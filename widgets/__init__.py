@@ -28,5 +28,6 @@ from plotters import *
 from page import *
 from root import *
 from key import *
+from fit import *
 from widgetfactory import *
 

@@ -74,6 +74,34 @@ class Widget:
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename )
 
+        # actions for widget
+        self.actionlist = []
+        self.actions = {}
+        self.actiondescr = {}
+
+    def addAction(self, name, function, descr=''):
+        """Assign name to operation.
+
+        name is name to assign
+        function is a function with no parameters to call
+        descr is description of routine.
+        """
+        self.actionlist.append(name)
+        self.actions[name] = function
+        self.actiondescr[name] = descr
+
+    def getActionList(self):
+        '''Get the list of actions'''
+        return self.actionlist
+
+    def getActionFunction(self, name):
+        '''Get function for action'''
+        return self.actions[name]
+
+    def getActionDescr(self, name):
+        '''Get description for action'''
+        return self.actiondescr[name]
+
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
         ap = self.allowedparenttypes 

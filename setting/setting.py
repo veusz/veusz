@@ -338,3 +338,52 @@ class ChoiceOrMore(Setting):
     def makeControl(self, *args):
         return controls.SettingChoice(self, True, self.vallist,
                                       *args)
+
+class FloatDict(Setting):
+    """A dictionary, taking floats as values."""
+
+    def __init__(self, name, val, descr = ''):
+        Setting.__init__(self, name, val, descr=descr)
+
+    def convertTo(self, val):
+        if type(val) != dict:
+            raise InvalidType
+
+        for i in val.itervalues():
+            if type(i) != float:
+                raise InvalidType
+
+        return val
+
+    def toText(self):
+        text = ''
+        for key, val in self.val.iteritems():
+            text += '%s = %g\n' % (key, val)
+        return text
+
+    def fromText(self, text):
+        """Do conversion from list of a=X\n values."""
+
+        out = {}
+        # break up into lines
+        for l in text.split('\n'):
+            l = l.strip()
+            if len(l) == 0:
+                continue
+
+            # break up using =
+            p = l.strip().split('=')
+
+            if len(p) != 2:
+                raise InvalidType
+
+            try:
+                v = float(p[1])
+            except ValueError:
+                raise InvalidType
+
+            out[ p[0].strip() ] = v
+        return out
+
+    def makeControl(self, *args):
+        return controls.SettingMultiLine(self, *args)

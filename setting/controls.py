@@ -88,50 +88,6 @@ class BoolSettingEdit(qt.QCheckBox):
         self.setting.set(state)
         self.emit( qt.PYSIGNAL('settingValueChanged'), () )
         
-# class SettingEditAuto(qt.QComboBox):
-#     """For editing settings which allow auto values."""
-
-#     def __init__(self, setting, *args):
-#         qt.QComboBox.__init__(self, *args)
-#         self.setting = setting
-#         self.bgcolour = self.paletteBackgroundColor()
-
-#         # we want the user to be able to edit items
-#         self.setEditable(True)
-
-#         # makes it obvious it can be auto
-#         self.insertItem('Auto')
-
-#         # set the text of the widget to the 
-#         self.setCurrentText( setting.toText() )
-
-#         # set tooltip for description
-#         d = setting.getDescription()
-#         if d != '':
-#             qt.QToolTip.add(self, d)
-
-#     def focusOutEvent(self, *args):
-#         """Allows us to check the contents of the widget."""
-        
-#         qt.QComboBox.focusOutEvent(self, *args)
-#         self.validateAndSet()
-        
-#     def validateAndSet(self):
-#         """Check the text is a valid setting and update it."""
-
-#         text = str(self.currentText())
-#         try:
-#             val = self.setting.fromText(text)
-#             self.setPaletteBackgroundColor(self.bgcolour)
-            
-#             # value has changed
-#             if self.setting.get() != val:
-#                 self.setting.set(val)
-#                 self.emit( qt.PYSIGNAL('settingValueChanged'), () )
-
-#         except setting.InvalidType:
-#             self.setPaletteBackgroundColor(qt.QColor('red'))
-
 class SettingChoice(qt.QComboBox):
     """For choosing between a set of values."""
 
@@ -170,6 +126,45 @@ class SettingChoice(qt.QComboBox):
         """If a different item is chosen."""
 
         text = str(self.currentText())
+        try:
+            val = self.setting.fromText(text)
+            self.setPaletteBackgroundColor(self.bgcolour)
+            
+            # value has changed
+            if self.setting.get() != val:
+                self.setting.set(val)
+                self.emit( qt.PYSIGNAL('settingValueChanged'), () )
+
+        except setting.InvalidType:
+            self.setPaletteBackgroundColor(qt.QColor('red'))
+
+class SettingMultiLine(qt.QTextEdit):
+    """For editting multi-line settings."""
+
+    def __init__(self, setting, parent):
+        """Initialise the widget."""
+
+        qt.QTextEdit.__init__(self, parent)
+        self.bgcolour = self.paletteBackgroundColor()
+        self.setting = setting
+
+        self.setTextFormat(qt.Qt.PlainText)
+        self.setWordWrap(qt.QTextEdit.NoWrap)
+        
+        # set the text of the widget to the 
+        self.setText( setting.toText() )
+
+        # set tooltip for description
+        d = setting.getDescription()
+        if d != '':
+            qt.QToolTip.add(self, d)
+
+    def focusOutEvent(self, *args):
+        """Allows us to check the contents of the widget."""
+        
+        qt.QTextEdit.focusOutEvent(self, *args)
+
+        text = str(self.text())
         try:
             val = self.setting.fromText(text)
             self.setPaletteBackgroundColor(self.bgcolour)

@@ -149,6 +149,10 @@ class FunctionPlotter(GenericPlotter):
             painter.setPen( s.Line.makeQPen(painter) )
             painter.drawLine(x, yp, x+width, yp)
 
+    def initEnviron(self):
+        """Initialise function evaluation environment each time."""
+        return self.fnenviron.copy()
+
     def draw(self, parentposn, painter):
         """Draw the function."""
 
@@ -165,29 +169,50 @@ class FunctionPlotter(GenericPlotter):
             return
 
         s = self.settings
+        env = self.initEnviron()
         if s.variable == 'x':
             # x function
             delta = (x2 - x1) / s.steps
             pxpts = N.arange(x1, x2+delta, delta).astype(N.Int32)
-            self.fnenviron['x'] = axes[0].plotterToGraphCoords(posn, pxpts)
-            y = eval( s.function + ' + 0*x', self.fnenviron )
-            pypts = axes[1].graphToPlotterCoords(posn, y)
+            env['x'] = axes[0].plotterToGraphCoords(posn, pxpts)
+            try:
+                y = eval( s.function + ' + 0*x', env )
+                bad = False
+            except:
+                bad = True
+            else:
+                pypts = axes[1].graphToPlotterCoords(posn, y)
 
         else:
             # y function
             delta = (y2 - y1) / s.steps
             pypts = N.arange(y1, y2+delta, delta).astype(N.Int32)
-            self.fnenviron['y'] = axes[1].plotterToGraphCoords(posn, pypts)
-            x = eval( s.function + ' + 0*y', self.fnenviron )
-            pxpts = axes[0].graphToPlotterCoords(posn, x)
+            env['y'] = axes[1].plotterToGraphCoords(posn, pypts)
+            try:
+                x = eval( s.function + ' + 0*y', env )
+                bad = False
+            except:
+                bad = True
+            else:
+                pxpts = axes[0].graphToPlotterCoords(posn, x)
 
         painter.save()
 
         # draw the function line
-        if not s.Line.hide:
+        if not s.Line.hide and not bad:
             painter.setBrush( qt.QBrush() )
             painter.setPen( s.Line.makeQPen(painter) )
             self._plotLine(painter, pxpts, pypts, posn)
+
+        if bad:
+            # not sure how to deal with errors here
+            painter.setPen( qt.QColor('red') )
+            f = qt.QFont()
+            f.setPointSize(20)
+            painter.setFont(f)
+            painter.drawText( qt.QRect(x1, y1, x2-x1, y2-y1),
+                              qt.Qt.AlignCenter,
+                              "Cannot evaluate '%s'" % s.function )
 
         painter.restore()
 

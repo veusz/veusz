@@ -24,8 +24,8 @@
 ####################################################
 
 from math import *
-from random import random
 from numarray import *
+import numarray.random_array as NRA
 
 # Constants
 OK    = 0
@@ -502,10 +502,10 @@ print df
 #	arrays to do that.
 """
 
-def f (x,a,b,c):
-    return a*sin(b*x) + c
+#def f (x,a,b,c):
+#    return a*sin(b*x) + c
 
-N = 30
+#N = 30
 
 #
 # Here I'm using numarrays.
@@ -520,16 +520,29 @@ N = 30
 #
 # Here I'm using regular python arrays.
 #
-xvals = range(N)
-yvals = []
-sigma = []
-for x in xvals:
-    sigma.append(0.1)
-    yvals.append(1*sin(2*x) + 1 )
+xvals = arange(0.,10.,0.01)
+yvals = (xvals**2)*0.01 + xvals*2 + (NRA.random(xvals.shape)*1.-0.5) + 3.
+sigma = xvals*0. + 1
 
-par = [3.,2.001,3.]
+par = array((0.0, 1.0, 0.05))
 
-err,chi,par = non_linear_regression(f,xvals,par,yvals,sigma)
+def f(x, a, b, c):
+    return a + b*x + c*(x**2)
+
+#fitLM(testfunc, inparams, xvals, yvals)
+err, chi, par = non_linear_regression(f, xvals, par, yvals, sigma)
+
+
+## xvals = range(N)
+## yvals = []
+## sigma = []
+## for x in xvals:
+##     sigma.append(0.1)
+##     yvals.append(1*sin(2*x) + 1 )
+
+## par = [3.,2.001,3.]
+
+## err,chi,par = non_linear_regression(f,xvals,par,yvals,sigma)
 
 print "Error:       ",err
 print "Chi Squared: ",chi

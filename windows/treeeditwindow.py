@@ -275,10 +275,23 @@ class TreeEditWindow(qt.QDockWindow):
             i.deleteLater()
         self.prefchilds = []
 
-        settings = item.settings
+        w = item.widget
+        # add action for widget
+        if w != None:
+            for name in w.getActionList():
+                l = qt.QLabel(name, self.prefgrid)
+                l.show()
+                self.prefchilds.append(l)
+
+                b = qt.QPushButton(w.getActionDescr(name), self.prefgrid)
+                b.show()
+                self.prefchilds.append(b)
+                
+                self.connect(b, qt.SIGNAL('pressed()'),
+                             w.getActionFunction(name))
 
         # make new widgets for the preferences
-        for setn in settings.getSettingList():
+        for setn in item.settings.getSettingList():
             l = qt.QLabel(setn.name, self.prefgrid)
             l.show()
             self.prefchilds.append(l)
