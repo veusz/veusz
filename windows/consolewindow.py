@@ -115,7 +115,7 @@ introtext=u'''Welcome to <b><font color="purple">Veusz</font></b> --- a scientif
 Veusz version %s, Copyright \u00a9 2003-2005 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt;
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are
 welcome to redistribute it under certain conditions. Enter "GPL()" for details.
-This window is a Python command line console.
+This window is a Python command line console and acts as a calculator.
 ''' % utils.version()
 
 class ConsoleWindow(qt.QDockWindow):

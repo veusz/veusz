@@ -332,21 +332,71 @@
     </section>
 
     <section>
-      <title>Getting started</title>
+      <title>The main window</title>
 
       <para>Once you have installed veusz, you should start it by
       executing veusz.py from its directory. This should present the
       Veusz main window.</para>
 
-
       <mediaobject>
 	<imageobject>
-	  <imagedata fileref="manimages/mainwindow.png" format="PNG" /> 
+	  <imagedata fileref="manimages/mainwindow.png" format="PNG"
+	  depth="5cm" scalefit="1" />
 	</imageobject>
       </mediaobject>
 
+      <para>The Veusz window is split into several sections. At the
+      top is the menu bar and tool bar. These work in the usual way to
+      other applications. Sometimes options are disabled (greyed out)
+      if they do not make sense to be used. If you hold your mouse
+      over a button for a few seconds, you will usually get an
+      explanation for what it does called a "tool tip".</para>
 
+      <para>Below the toolbar and to the right is the plot
+      window. This is where the current page of the current document
+      is shown. You can adjust the size of the plot on the screen (the
+      zoom factor) using the "View" menu or the zoom tool bar button
+      (the magnifying glass). Initially you will not see a plot in the
+      plot window, but you will see the Veusz logo. At the moment you
+      cannot do much else with the window. In the future you will be
+      able to click on items in the plot to modify them.</para>
 
+      <para>To the left of the plot window is the widget tree and the
+      widget properties windows. To the top of the widget tree is a
+      set of buttons which allow you to add widgets to the currently
+      selected widget. The widgets are arranged in a tree structure
+      from the main document. In the properties window the properties
+      of the currently selected widget are shown. Initially if you
+      click on the "document" widget, you will see the page width and
+      height. You can change these values and they will be reflected
+      in the plot window if you press Enter or move to the next
+      property. The tree and the properties window can be "dragged"
+      from the main window to "float" by themselves on the
+      screen.</para>
+
+      <para>To the bottom of the window is the console. This is a
+      Veusz and Python command line console. To read about the
+      commands available see <link
+      linkend="Commands">Commands</link>. As this is a Python console,
+      you can enter mathematical expressions (e.g. "1+2.0*cos(pi/4)") here
+      and they will be evaluated when you press Enter. The usual
+      special functions and the operators are supported. You can also
+      assign results to variables (e.g. "a=1+2") for use later. The
+      console also supports command history like many Unix
+      shells. Press the up and down cursor keys to browse through the
+      history. Command line completion is not available yet!</para>
+
+    </section>
+
+    <section>
+      <title>My first plot</title>
+
+      <para>If the document is selected in the widget tree, you will
+      see you are able to click on the little page icon in the set of
+      buttons above. If you do that you will see a page added to the
+      current document. Select the page which appears in the tree
+      window, and you will see you are able to add other kinds of
+      plots.</para>
     </section>
 
   </chapter>
@@ -479,7 +529,7 @@ SetData('y', y)
 
   <!---------------------------------------------------------------->
   <chapter>
-    <title>Command line interface</title>
+    <title><anchor id="Commands" />Command line interface</title>
 
     <section>
       <title>Introduction</title>

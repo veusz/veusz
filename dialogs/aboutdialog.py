@@ -29,7 +29,7 @@ import qt
 import utils
 
 _abouttext=u"""Veusz %s   http://home.gna.org/veusz/
-Veusz is Copyright \u00a9 2003 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright \u00a9 2003-2005 Jeremy Sanders <jeremy@jeremysanders.net>
 
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software
 and you are entitled to distribute it under the conditions of the GPL.
