@@ -421,7 +421,7 @@ class PointPlotter(GenericPlotter):
                              axes)
 
         # plot the points (we do this last so they are on top)
-        if not s.MarkerLine.hide and not s.MarkerFill.hide:
+        if not s.MarkerLine.hide or not s.MarkerFill.hide:
             size = int( utils.cnvtDist(s.markerSize, painter) )
 
             if not s.MarkerFill.hide:
@@ -430,7 +430,7 @@ class PointPlotter(GenericPlotter):
             if not s.MarkerLine.hide:
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
-                painter.setPen( qt.QPen( qt.Qt.None ) )
+                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
                 
             utils.plotMarkers(painter, xplotter, yplotter, s.marker,
                               size)
