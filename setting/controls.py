@@ -28,10 +28,10 @@ import setting
 class SettingEdit(qt.QLineEdit):
     """Main control for editing settings which are text."""
 
-    def __init__(self, setting, *args):
+    def __init__(self, setting, parent):
         """Initialise the setting widget."""
 
-        qt.QLineEdit.__init__(self, *args)
+        qt.QLineEdit.__init__(self, parent)
         self.setting = setting
         self.bgcolour = self.paletteBackgroundColor()
 
@@ -67,8 +67,8 @@ class SettingEdit(qt.QLineEdit):
 class BoolSettingEdit(qt.QCheckBox):
     """A check box for changing a bool setting."""
     
-    def __init__(self, setting, *args):
-        qt.QCheckBox.__init__(self, *args)
+    def __init__(self, setting, parent):
+        qt.QCheckBox.__init__(self, parent)
 
         self.setting = setting
         self.setChecked( setting.get() )
@@ -135,8 +135,8 @@ class BoolSettingEdit(qt.QCheckBox):
 class SettingChoice(qt.QComboBox):
     """For choosing between a set of values."""
 
-    def __init__(self, setting, iseditable, vallist, *args):
-        qt.QComboBox.__init__(self, *args)
+    def __init__(self, setting, iseditable, vallist, parent):
+        qt.QComboBox.__init__(self, parent)
         self.setting = setting
         self.bgcolour = self.paletteBackgroundColor()
 
