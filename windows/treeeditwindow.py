@@ -479,11 +479,16 @@ class TreeEditWindow(qt.QDockWindow):
     def slotWidgetDelete(self, a):
         """Delete the widget selected."""
 
+        # no item selected, so leave
+        if self.itemselected == None:
+            return
+
         # get the widget to act as the parent
         w = self.itemselected.widget
         if w == None:
             w = self.itemselected.parent.widget
             assert w != None
+        self.itemselected = None
 
         # find the parent
         p = w.parent
