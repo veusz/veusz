@@ -20,6 +20,8 @@
 
 # $Id$
 
+import itertools
+
 import qt
 import numarray as N
 
@@ -209,11 +211,15 @@ def _plotPolygons(painter, name, xpos, ypos, size):
 
     # make a polygon of the correct size
     pgn = (N.array(_Polygons[name], N.Float32) * size).astype(N.Int32)
+    pa = qt.QPointArray( pgn.flat.tolist() )
 
-    for x, y in zip(xpos, ypos):
-        pts = pgn + N.array( (x, y) )
-        pa = qt.QPointArray( pts.flat.tolist() )
+    xlast = 0
+    ylast = 0
+    for x, y in itertools.izip(xpos, ypos):
+        pa.translate(x-xlast, y-ylast)
         painter.drawPolygon(pa)
+        xlast = x
+        ylast = y
 
 def plotMarker(painter, xpos, ypos, markercode, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
@@ -229,6 +235,9 @@ def plotMarkers(painter, xpos, ypos, markername, markersize):
 
     if markername in _Polygons:
         _plotPolygons(painter, markername, xpos, ypos, markersize)
+    elif markername == 'none':
+        # little optimization
+        return
     else:
         fn = _MarkerLookup[markername]
         for x, y in zip(xpos, ypos):

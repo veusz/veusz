@@ -42,6 +42,7 @@ The first 3 mean the same thing, the last means read from 1 to 5
 
 import re
 import doc
+import StringIO
 
 class _DescriptorPart:
 
@@ -191,19 +192,14 @@ class _DescriptorPart:
 
         return names
 
-class DataStream:
-    """Abstract class to represent source of data."""
+class FileStream:
+    """Class to read in the data from the file-like object."""
 
-    def __init__(self):
+    def __init__(self, file):
+        """File can be any iterator-like object."""
+        
         self.remainingline = []
-
-    def _nextLine(self):
-        """Return next line of data source.
-
-        Returning a blank line signifies end of data
-        """
-        # override this method
-        pass
+        self.file = file
 
     def nextColumn(self):
         """Return value of next column of line."""
@@ -217,8 +213,10 @@ class DataStream:
 
         while 1:
             # get next line from data source
-            line = self._nextLine()
-            if len(line) == 0:
+            try:
+                line = self.file.next()
+            except StopIteration:
+                # end of file
                 return False
 
             # remove comment symbols
@@ -242,28 +240,13 @@ class DataStream:
             if not continuation:
                 return True
 
-class FileStream(DataStream):
-    '''For reading data from a file.'''
-
-    def __init__(self, file):
-        DataStream.__init__(self)
-        self.file = file
-
-    def _nextLine(self):
-        return self.file.readline()
-
-class StringStream(DataStream):
+class StringStream(FileStream):
     '''For reading data from a string.'''
     
     def __init__(self, text):
-        DataStream.__init__(self)
-        self.lines = text.splitlines(True)
-
-    def _nextLine(self):
-        try:
-            return self.lines.pop(0)
-        except IndexError:
-            return ''
+        """This works by using a StringIO class to iterate over the text."""
+        
+        FileStream.__init__( self, StringIO.StringIO(text) )
 
 class SimpleRead:
     '''Class to read in datasets from a stream.
