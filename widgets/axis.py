@@ -29,6 +29,7 @@ import qt
 import widget
 import axisticks
 import widgetfactory
+import graph
 
 import utils
 
@@ -36,6 +37,7 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
+    allowedparenttypes = [graph.Graph]
 
     def __init__(self, parent, name=None):
         """Initialise axis."""

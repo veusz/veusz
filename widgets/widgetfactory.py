@@ -36,6 +36,10 @@ class WidgetFactory:
         """Make a new widget of the appropriate type."""
         return self.regwidgets[widgetname]( *args, **optargs )
 
+    def getWidgetClass(self, name):
+        """Get the class for the widget."""
+        return self.regwidgets[name]
+
     def listWidgets(self):
         """Return an array of the widgets the factory can make."""
         names = self.regwidgets.keys()

@@ -71,7 +71,7 @@ class PreferencesLine(GenericPrefType):
 
     def _addPrefs(self):
         """ Initialise preferences """
-        self.prefs.addPref( 'color', 'string', '#000000' )
+        self.prefs.addPref( 'color', 'string', 'black' )
 
         self.prefs.addPref( 'width', 'string', '1pt' )
 
@@ -129,7 +129,7 @@ class PreferencesBrush(GenericPrefType):
 
     def _addPrefs(self):
         """ Initialise preferences."""
-        self.prefs.addPref( 'color', 'string', '#000000' )
+        self.prefs.addPref( 'color', 'string', 'black' )
         self.prefs.addPref( 'style', 'int', qt.Qt.SolidPattern )
         self.prefs.addPref( 'hide', 'bool', False )
 
@@ -187,7 +187,7 @@ class PreferencesGridLine(PreferencesLine):
 
     def _addPrefs(self):
         PreferencesLine._addPrefs(self)
-        self.prefs.setDefault( 'color', '#808080' )
+        self.prefs.setDefault( 'color', 'grey' )
         self.prefs.setDefault( 'hide', True )
         self.prefs.setDefault( 'style', qt.Qt.DotLine )
 
@@ -200,12 +200,10 @@ class PreferencesText(GenericPrefType):
         """ Initialise list of preferences """
         self.prefs.addPref( 'font', 'string', 'Times New Roman' )
         self.prefs.addPref( 'size', 'string', '12pt' )
+        self.prefs.addPref( 'color', 'string', 'black' )
         self.prefs.addPref( 'italic', 'bool', False )
         self.prefs.addPref( 'bold', 'bool', False )
         self.prefs.addPref( 'underline', 'bool', False )
-        self.prefs.addPref( 'valign', 'bool', False )
-        self.prefs.addPref( 'halign', 'bool', False )
-        self.prefs.addPref( 'color', 'string', '#000000' )
         self.prefs.addPref( 'hide', 'bool', False )
         
     def makeQFont(self, painter):

@@ -27,6 +27,7 @@ import numarray
 import widget
 import widgetfactory
 import axis
+import graph
 
 import utils
 
@@ -40,6 +41,7 @@ class GenericPlotter(widget.Widget):
     """Generic plotter."""
 
     typename='genericplotter'
+    allowedparenttypes=[graph.Graph]
 
     def __init__(self, parent, name=None, axis1=None, axis2=None):
         """Initialise object, setting axes."""
@@ -100,6 +102,8 @@ class FunctionPlotter(GenericPlotter):
     """Function plotting class."""
 
     typename='function'
+    allowusercreation=True
+    description='Plot a function'
     
     def __init__(self, parent, function=None, name=None, axis1=None,
                  axis2=None):
@@ -262,6 +266,8 @@ class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
     typename='xy'
+    allowusercreation=True
+    description='Plot points with lines and errorbars'
     
     def __init__(self, parent, xdata=None, ydata=None, name=None,
                  axis1=None, axis2=None):

@@ -30,12 +30,19 @@ class Widget:
     """ Fundamental plotting widget interface."""
 
     typename = 'generic'
+    allowusercreation = False
+
+    # list of allowed types this can have as a parent
+    allowedparenttypes = []
 
     def __init__(self, parent, name=None):
         """Initialise a blank widget."""
 
         # save parent widget for later
         self.parent = parent
+
+        if not self.isAllowedParent(parent):
+            raise RuntimeError, "parent is of incorrect type"
 
         if parent != None:
             parent.addChild(self)
@@ -65,6 +72,31 @@ class Widget:
 
         # preferences for part of the object
         self.subprefs = {}
+
+    def isAllowedParent(self, parent):
+        """Is the parent a suitable type?"""
+        ap = self.allowedparenttypes 
+        if parent == None and len(ap)>0 and ap[0] == None:
+            return True
+        
+        for p in ap:
+            if isinstance(parent, p):
+                return True
+        return False      
+
+    def willAllowParent(type, parent):
+        """Is the parent of an allowed type to have this type as a child?"""
+
+        # allow base widget to have no parent
+        ap = type.allowedparenttypes 
+        if parent == None and len(ap)>0 and ap[0] == None:
+            return True
+        
+        for p in ap:
+            if isinstance(parent, p):
+                return True
+        return False
+    willAllowParent = classmethod(willAllowParent)
 
     def addChild(self, child):
         """Add child to list."""
@@ -331,6 +363,6 @@ class Widget:
             file.write("To('%s')\n" % c.getName())
             c.saveToFile(file)
             file.write("To('..')\n")
-        
+
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

@@ -98,7 +98,7 @@ class Document( qt.QObject ):
         self.prefs.read()
 
         self.data = {}
-        self.basewidget = widgets.Widget(None)
+        self.basewidget = widgets.Region(None)
         self.basewidget.setDocument( self )
 
         self.setModified()
@@ -119,7 +119,7 @@ class Document( qt.QObject ):
     def hasData(self, name):
         """Whether dataset is defined."""
         return name in self.data
-    
+
     def setModified(self, ismodified=True):
         """Set the modified flag on the data, and inform views."""
         self.modified = ismodified

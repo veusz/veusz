@@ -26,4 +26,8 @@ import widget
 class Region(widget.Widget):
     """A class where the plotting is done and axes are drawn."""
 
+    typename='page'
+    allowusercreation = False
+    allowedparenttypes = [None]
+
     pass

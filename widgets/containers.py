@@ -29,6 +29,7 @@ Classes include
 
 import widget
 import widgetfactory
+import region
 
 class _gridengine:
     """Internal class to build up grid of widgets."""
@@ -145,6 +146,9 @@ class GridContainer(widget.Widget):
     """
 
     typename='grid'
+    allowusercreation=True
+    description='Arrange graphs in a grid'
+    allowedparenttypes=[region.Region]
 
     def __init__(self, parent, rows=None, columns=None, name=None):
         """Initialise the container.

@@ -21,7 +21,10 @@
 
 # $Id$
 
+import os
+
 import qt
+import widgets.widgetfactory as widgetfactory
 
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
@@ -99,10 +102,32 @@ class TreeEditWindow(qt.QDockWindow):
         self.connect( self.document, qt.PYSIGNAL("sigModified"),
                       self.slotModifiedDoc )
 
-        # put widgets in a vbox
-        split = qt.QSplitter(self)
+        self.tooltips = qt.QToolTip(self)
+
+        totvbox = qt.QVBox(self)
+        self.setWidget(totvbox)
+
+        # make buttons for each of the graph types
+        buttonhbox = qt.QHBox(totvbox)
+        dir = os.path.dirname(__file__)
+        for i in widgetfactory.thefactory.listWidgets():
+            if widgetfactory.thefactory.getWidgetClass(i).allowusercreation:
+                name = "%s/button_%s.png" % (dir, i)
+                b = qt.QToolButton(buttonhbox)
+                b.setPixmap( qt.QPixmap(name) )
+
+                try:
+                    self.tooltips.add(b, widgetfactory.thefactory.\
+                                      getWidgetClass(i).description)
+                except AttributeError:
+                    pass
+                #b.setFlat( True )
+                #b.setWFlags( qt.Qt.WStyle_NoBorder )
+
+        # put widgets in a movable splitter
+        split = qt.QSplitter(totvbox)
         split.setOrientation(qt.QSplitter.Vertical)
-        self.setWidget(split)
+        #self.setWidget(split)
 
         # first widget is a listview
         lv = qt.QListView(split)

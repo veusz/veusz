@@ -26,8 +26,9 @@ import axis
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
-
+    
     typename='graph'
+    allowedparenttypes = [widget.Widget]
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
