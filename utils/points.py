@@ -28,10 +28,14 @@ def _plot_none(painter, xpos, ypos, size):
     """
     pass
 
-def _plot_point(painter, xpos, ypos, size):
-    """ (internal) function to plot a point
+def _plot_dot(painter, xpos, ypos, size):
+    """ (internal) function to plot a dot
     """
-    painter.drawPoint( xpos, ypos )
+
+    # draw dot as circle with same radius as line thickness
+    #  - much more sensible than actual dot routine
+    w = painter.pen().width() / 2
+    painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
 
 def _plot_circle(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker
@@ -41,12 +45,13 @@ def _plot_circle(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
-def _plot_star(painter, xpos, ypos, size):
+def _plot_asterisk(painter, xpos, ypos, size):
     """ (internal) function to plot a *
     """
 
-    painter.drawLine( xpos - size, ypos - size, xpos + size, ypos + size )
-    painter.drawLine( xpos - size, ypos + size, xpos + size, ypos - size )
+    s2 = int(size*0.707107)
+    painter.drawLine( xpos - s2, ypos - s2, xpos + s2, ypos + s2 )
+    painter.drawLine( xpos - s2, ypos + s2, xpos + s2, ypos - s2 )
     painter.drawLine( xpos - size, ypos, xpos + size, ypos )
     painter.drawLine( xpos, ypos - size, xpos, ypos + size )
 
@@ -57,7 +62,8 @@ def _plot_circle_dot(painter, xpos, ypos, size):
 
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
-    painter.drawPoint( xpos, ypos )
+    w = painter.pen().width() / 2
+    painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
    
 def _plot_bullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
@@ -107,26 +113,6 @@ def _plot_arrow_down(painter, xpos, ypos, size):
     painter.drawLine(xpos, ypos, xpos-size, ypos-size)
     painter.drawLine(xpos, ypos, xpos+size, ypos-size)
 
-MarkerCodes = ['none', 'cross', 'plus', 'star', 'circle',
-               'circledot', 'diamond', 'square', 'barhorz', 'barvert',
-               'octogon', 'pentagon', 'tievert', 'tiehorz',
-               'bullseye', 'triangle',
-               'point', 'horzbar', 'vertbar',
-               'arrowleft', 'arrowright', 'arrowup',
-               'arrowdown']
-
-_MarkerFunctions = [_plot_none, None, None, None, _plot_circle,
-                    _plot_circle_dot, None, None, None, None,
-                    None, None, None, None,
-                    _plot_bullseye, None,
-                    _plot_point, _plot_line_horz, _plot_line_vert,
-                    _plot_arrow_left, _plot_arrow_right, _plot_arrow_up,
-                    _plot_arrow_down]
-
-_MarkerLookup = {}
-for code, fn in zip(MarkerCodes, _MarkerFunctions):
-    _MarkerLookup[code] = fn
-
 # list of markers to be automatically iterated through on new data
 AutoMarkers = [ 'X', '+', '*', 'O', 'Odot',
                 'box', 'boxdot', 'bullseye',
@@ -167,10 +153,35 @@ def nextAutos():
         _automarker = 0
 
 
+MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
+                'diamond', 'square', 'barhorz', 'barvert',
+                'octogon', 'pentagon', 'tievert', 'tiehorz',
+                'triangle',
+                'dot', 'circledot', 'bullseye', 'asterisk',
+                'linevert', 'linehorz',
+                'arrowleft', 'arrowright', 'arrowup',
+                'arrowdown' )
+
+# functions to call for special shapes
+_MarkerLookup = { 'none': _plot_none,
+                  'circle': _plot_circle,
+                  'dot': _plot_dot,
+                  'circledot': _plot_circle_dot,
+                  'bullseye': _plot_bullseye,
+                  'asterisk': _plot_asterisk,
+                  'linehorz': _plot_line_horz,
+                  'linevert': _plot_line_vert,
+                  'arrowleft': _plot_arrow_left,
+                  'arrowright': _plot_arrow_right,
+                  'arrowup': _plot_arrow_up,
+                  'arrowdown': _plot_arrow_down
+                  }
+
 # X and Y pts for corners of polygons
 _Polygons = {
     'square': ( (-1, -1), (1, -1), (1, 1), (-1, 1) ),
-    'diamond': ( (0, 1), (1, 0), (0, -1), (-1, 0) ),
+    # make the diamond the same area as the square
+    'diamond': ( (0., 1.414), (1.414, 0.), (0., -1.414), (-1.414, 0.) ),
     'barhorz': ( (-1, -0.5), (1, -0.5), (1, 0.5), (-1, 0.5) ),
     'barvert': ( (-0.5, -1), (0.5, -1), (0.5, 1), (-0.5, 1) ),
     'plus': ( (0.3, 1), (0.3, 0.3), (1, 0.3), (1, -0.3),
