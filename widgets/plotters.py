@@ -257,30 +257,13 @@ class FunctionPlotter(GenericPlotter):
 widgetfactory.thefactory.register( FunctionPlotter )
 
 ###############################################################################
-
-def _getRangeCoords(val, sym, neg, pos):
-    """Find the range of value for drawing errors."""
-    minvals = val.copy()
-    maxvals = val.copy()
-
-    if sym != None:
-        minvals -= sym
-        maxvals += sym
-
-    if neg != None:
-        minvals += neg
-
-    if pos != None:
-        maxvals += pos
-
-    return (minvals, maxvals)
         
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
     typename='xy'
     
-    def __init__(self, parent, xdata, ydata, name=None,
+    def __init__(self, parent, xdata=None, ydata=None, name=None,
                  axis1=None, axis2=None):
         """Initialise XY plotter plotting (xdata, ydata).
 
@@ -292,7 +275,15 @@ class PointPlotter(GenericPlotter):
         # FIXME: Add prefs here
         self.addPref('marker', 'string', 'O')
         self.addPref('markerSize', 'string', '5pt' )
+        self.addPref('xData', 'string', 'x')
+        self.addPref('yData', 'string', 'y')
         self.readPrefs()
+
+        # if we're passed names of datasets
+        if xdata != None:
+            self.xData = xdata
+        if ydata != None:
+            self.yData = ydata
 
         self.PlotLine = utils.PreferencesPlotLine( 'XYPlotLine' )
         self.MarkerLine = utils.PreferencesPlotLine( 'XYMarkerLine' )
@@ -306,13 +297,10 @@ class PointPlotter(GenericPlotter):
 
         utils.nextAutos()
 
-        self.xdata = xdata
-        self.ydata = ydata
-
     def getUserDescription(self):
         """User-friendly description."""
 
-        return "x='%s', y='%s', marker='%s'" % (self.xdata, self.ydata,
+        return "x='%s', y='%s', marker='%s'" % (self.xData, self.yData,
                                                 self.marker)
 
     def setData(self, xdata, ydata):
@@ -320,8 +308,8 @@ class PointPlotter(GenericPlotter):
         
         xdata and ydata are strings specifying the data in the document"""
 
-        self.xdata = xdata
-        self.ydata = ydata
+        self.xData = xdata
+        self.yData = ydata
 
     def _plotErrors(self, posn, painter, xplotter, yplotter):
         """Plot error bars (horizontal and vertical)."""
@@ -334,11 +322,11 @@ class PointPlotter(GenericPlotter):
         ax2 = self.getAxisVar( self.axes[1] )
 
         # get the data
-        xval, xsym, xneg, xpos = self.getDocument().getDataAll(self.xdata)
+        xdata = self.getDocument().getData(self.xData)
 
         # draw horizontal error bars
-        if xsym != None or xpos != None or xneg != None:
-            xmin, xmax = _getRangeCoords( xval, xsym, xneg, xpos )
+        if xdata.hasErrors():
+            xmin, xmax = xdata.getPointRanges()
                     
             # convert xmin and xmax to graph coordinates
             xmin = ax1.graphToPlotterCoords(posn, xmin)
@@ -350,10 +338,9 @@ class PointPlotter(GenericPlotter):
 
         # draw vertical error bars
         # get data
-        yval, ysym, yneg, ypos = self.getDocument().getDataAll(self.ydata)
-
-        if ysym != None or yneg != None or ypos != None:
-            ymin, ymax = _getRangeCoords( yval, ysym, yneg, ypos )
+        ydata = self.getDocument().getData(self.yData)
+        if ydata.hasErrors():
+            ymin, ymax = ydata.getPointRanges()
 
             # convert ymin and ymax to graph coordinates
             ymin = ax2.graphToPlotterCoords(posn, ymin)
@@ -369,24 +356,19 @@ class PointPlotter(GenericPlotter):
             
     def _autoAxis(self, dataname):
         """Determine range of data."""
-        vals = self.getDocument().getDataAll(dataname)
-
-        minvals, maxvals = _getRangeCoords( *vals )
-
-        # find the range of the values
-        minval = numarray.minimum.reduce(minvals)
-        maxval = numarray.maximum.reduce(maxvals)
-
-        return (minval, maxval)
+        if self.getDocument().hasData(dataname):
+            return self.getDocument().getData(dataname).getRange()
+        else:
+            return None
 
     def autoAxis(self, name):
         """Automatically determine the ranges of variable on the axes."""
         
         axes = self.getAxes()
         if name == axes[0]:
-            return self._autoAxis( self.xdata )
+            return self._autoAxis( self.xData )
         elif name == axes[1]:
-            return self._autoAxis( self.ydata )
+            return self._autoAxis( self.yData )
         else:
             return None
 
@@ -410,12 +392,16 @@ class PointPlotter(GenericPlotter):
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
-        xvals = self.getDocument().getData(self.xdata)
-        yvals = self.getDocument().getData(self.ydata)
+        # skip if there's no data
+        d = self.getDocument()
+        if not d.hasData(self.xData) or not d.hasData(self.yData):
+            return
+        
+        xvals = d.getData(self.xData)
+        yvals = d.getData(self.yData)
 
         # no points to plot
-        if xvals == None or yvals == None or \
-               len(xvals) == 0 or len(yvals) == 0:
+        if not xvals.empty() or not yvals.empty():
             return
 
         # get the axes

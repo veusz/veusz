@@ -296,14 +296,33 @@ class Axis(widget.Widget):
             self._updateBounds(b2, b2)
             painter.drawLine(b1, a1, b2, a2)
 
-    _ticklabel_alignments = (
-        (         # horizontal axis
-        (0, 1),    # normal
-        (1, 0)     # rotated
-        ),(       # vertical axis
-        (1, 0),    # normal
-        (0, -1)    # rotated
-        ))
+    _ticklabel_aligntable = {
+        (0, 0, 0, 0): ( 0, 1), # horz, normal, nonrefl
+        (0, 1, 0, 0): ( 1, 0), # horz, rot,    nonrefl
+        (0, 0, 1, 0): ( 0,-1), # horz, normal, refl
+        (0, 1, 1, 0): (-1, 0), # horz, rot,    refl
+        (0, 0, 0,-1): (-1, 1), # horz, normal, nonrefl, first
+        (0, 1, 0,-1): ( 1, 1), # horz, rot,    nonrefl, first
+        (0, 0, 1,-1): ( 0,-1), # horz, normal, refl,    first FIXME
+        (0, 1, 1,-1): (-1, 0), # horz, rot,    refl,    first FIXME
+        (0, 0, 0, 1): ( 1, 1), # horz, normal, nonrefl, last
+        (0, 1, 0, 1): ( 1,-1), # horz, rot,    nonrefl, last
+        (0, 0, 1, 1): ( 0,-1), # horz, normal, refl,    last FIXME
+        (0, 1, 1, 1): (-1, 0), # horz, rot,    refl,    last FIXME
+
+        (1, 0, 0, 0): ( 1, 0), # vert, normal, nonrefl
+        (1, 1, 0, 0): ( 0,-1), # vert, normal, nonrefl
+        (1, 0, 1, 0): (-1, 0), # vert, normal, refl
+        (1, 1, 1, 0): ( 0, 1), # vert, normal, refl
+        (1, 0, 0,-1): ( 1,-1), # vert, normal, nonrefl, first
+        (1, 1, 0,-1): (-1,-1), # vert, rot,    nonrefl, first
+        (1, 0, 1,-1): ( 0,-1), # vert, normal, refl,    first FIXME
+        (1, 1, 1,-1): (-1, 0), # vert, rot,    refl,    first FIXME
+        (1, 0, 0, 1): ( 1, 1), # vert, normal, nonrefl, last
+        (1, 1, 0, 1): ( 1,-1), # vert, rot,    nonrefl, last
+        (1, 0, 1, 1): ( 0,-1), # vert, normal, refl,    last  FIXME
+        (1, 1, 1, 1): (-1, 0), # vert, rot,    refl,    last FIXME
+       }
 
     _axislabel_alignments = (
         (         # horizontal axis
@@ -363,6 +382,19 @@ class Axis(widget.Widget):
         if startdelta < 0:
             self._delta_axis += abs(delta)
 
+    def _getTickLabelAlign(self, isfirst, islast):
+        if isfirst:
+            f = -1
+        elif islast:
+            f = 1
+        else:
+            f = 0
+
+        return Axis._ticklabel_aligntable[self.direction,
+                                          self.TickLabels.rotate,
+                                          self.reflect,
+                                          f]
+        
     def _drawTickLabels(self, painter, coordticks, sign):
         """Draw tick labels on the plot."""
 
@@ -374,22 +406,24 @@ class Axis(widget.Widget):
         tl_ascent  = painter.fontMetrics().ascent()
 
         # work out font alignment
-        ax, ay = Axis._ticklabel_alignments[self.direction] \
-                 [self.TickLabels.rotate]
         angle = 0
         if self.TickLabels.rotate: angle = 270
 
         # if reflected, we want the opposite alignment
+        ax, ay = Axis._ticklabel_alignments[self.direction] \
+                 [self.TickLabels.rotate]
         if self.reflect:
             ax, ay = ( -ax, -ay )
 
         # plot numbers
         f = self.TickLabels.format
         maxwidth = 0
-        for t, val in zip(coordticks, self.majortickscalc):
+        for i in xrange(len(coordticks)):
+            t, val = coordticks[i], self.majortickscalc[i]
             x, y = t, self.coordPerp + sign*(self._delta_axis+tl_spacing)
             if self.direction != 0:   x, y = y, x
 
+            ax, ay = self._getTickLabelAlign(i==0, i==len(coordticks)-1)
             num = utils.formatNumber(val, f)
             rec = utils.render( painter, font,
                                 x, y, num,

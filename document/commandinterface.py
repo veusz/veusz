@@ -32,6 +32,7 @@ import qt
 
 import widgets
 import utils
+import doc
 
 class CommandInterface:
     """Class provides command interface."""
@@ -153,15 +154,15 @@ class CommandInterface:
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Set data with values (and optionally errors)."""
 
-        d = self.document
-        d.setData(name, val, symerr=symerr, negerr=negerr, poserr=poserr)
+        data = doc.Dataset(val, symerr, negerr, poserr)
+        self.document.setData(name, data)
 
         if self.verbose:
             print "Set variable '%s':" % name
-            print "Values = %s" % str( d.getData(name) )
-            print "Symmetric errors = %s" % str( d.getSymErr(name) )
-            print "Negative errors = %s" % str( d.getNegErr(name) )
-            print "Positive errors = %s" % str( d.getPosErr(name) )
+            print "Values = %s" % str( data.vals )
+            print "Symmetric errors = %s" % str( data.serr )
+            print "Negative errors = %s" % str( data.nerr )
+            print "Positive errors = %s" % str( data.perr )
 
 
     def Print(self):

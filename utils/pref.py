@@ -225,15 +225,15 @@ class Preferences:
         # go through allowed entries, converting if necessary
         if val == None:
             pass
-        elif t == 'bool' and (tv == type(True) or tv == type(1)):
+        elif t == 'int' and tv == int:
             pass
-        elif t == 'int' and tv == type(1):
+        elif t == 'bool' and (tv == int or tv == bool):
             pass
-        elif t == 'double' and (tv == type(1.) or tv == type(1)):
+        elif t == 'double' and (tv == float or tv == int):
             val = float(val)
-        elif t == 'string' and tv == type(''):
+        elif t == 'string' and tv == str:
             pass
-        elif t == 'list' and tv == type([]):
+        elif t == 'list' and tv == list:
             pass
         else:
             raise TypeError, '%s passed to preference type %s' % (tv, t)

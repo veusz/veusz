@@ -29,13 +29,58 @@ import widgets
 import utils
 
 def _cnvt_numarray(a):
-    """Convert to a numarray if possible."""
+    """Convert to a numarray if possible (doing copy)."""
     if a == None:
         return None
     elif type(a) != type(numarray.arange(1)):
         return numarray.array(a, type=numarray.Float64)
     else:
         return a.astype(numarray.Float64)
+
+class Dataset:
+    '''Represents a dataset.'''
+
+    def __init__(self, data = None, serr = None, nerr = None, perr = None):
+        '''Initialse storage.'''
+        self.data = _cnvt_numarray(data)
+        self.serr = _cnvt_numarray(serr)
+        self.nerr = _cnvt_numarray(nerr)
+        self.perr = _cnvt_numarray(perr)
+
+    def hasErrors(self):
+        '''Whether errors on dataset'''
+        return self.serr != None or self.nerr != None or self.perr != None
+
+    def getPointRanges(self):
+        '''Get range of coordinates for each point in the form
+        (minima, maxima).'''
+
+        minvals = self.data.copy()
+        maxvals = self.data.copy()
+
+        if self.serr != None:
+            minvals -= self.serr
+            maxvals += self.serr
+
+        if self.nerr != None:
+            minvals += self.nerr
+
+        if self.perr != None:
+            maxvals += self.perr
+
+        return (minvals, maxvals)
+
+    def getRange(self):
+        '''Get total range of coordinates.'''
+        minvals, maxvals = self.getPointRanges()
+        return ( numarray.minimum.reduce(minvals),
+                 numarray.maximum.reduce(maxvals) )
+
+    def empty(self):
+        '''Is the data defined?'''
+        return self.data != None and len(self.data) != 0
+
+    # TODO implement mathematical operations on this type
 
 class Document( qt.QObject ):
     """Document class for holding the graph data.
@@ -58,15 +103,9 @@ class Document( qt.QObject ):
 
         self.setModified()
 
-    def setData(self, name, val, symerr = None, negerr = None, poserr = None):
+    def setData(self, name, dataset):
         """Set data to val, with symmetric or negative and positive errors."""
-        t = type(numarray.arange(1))
-
-        self.data[name] = _cnvt_numarray(val)
-        self.data[name + '_SYMERR_'] = _cnvt_numarray(symerr)
-        self.data[name + '_NEGERR_'] = _cnvt_numarray(negerr)
-        self.data[name + '_POSERR_'] = _cnvt_numarray(poserr)
-
+        self.data[name] = dataset
         self.setModified()
 
     def getBaseWidget(self):
@@ -74,27 +113,13 @@ class Document( qt.QObject ):
         return self.basewidget
 
     def getData(self, name):
-        """Get data with name."""
+        """Get data with name"""
         return self.data[name]
 
-    def getSymErr(self, name):
-        """Get data symmetric error."""
-        return self.data[name + '_SYMERR_']
-
-    def getNegErr(self, name):
-        """Get data negative error."""
-        return self.data[name + '_NEGERR_']
-
-    def getPosErr(self, name):
-        """Get data positive error."""
-        return self.data[name + '_POSERR_']
-
-    def getDataAll(self, name):
-        """Get (val, sym, neg, pos) data."""
-        return ( self.data[name], self.data[name + '_SYMERR_'],
-                 self.data[name + '_NEGERR_'],
-                 self.data[name + '_POSERR_'] )
-
+    def hasData(self, name):
+        """Whether dataset is defined."""
+        return name in self.data
+    
     def setModified(self, ismodified=True):
         """Set the modified flag on the data, and inform views."""
         self.modified = ismodified
