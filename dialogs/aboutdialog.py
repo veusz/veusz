@@ -23,6 +23,8 @@
 
 """Module defines about dialog for Veusz."""
 
+import os.path
+
 import qt
 import utils
 
@@ -34,7 +36,7 @@ and you are entitled to distribute it under the conditions of the GPL.
 See the file COPYING for details.""" % \
 utils.version()
 
-_logolocation='images/logo.png'
+_logolocation='%s/../images/logo.png' % os.path.dirname(__file__)
 
 class AboutDialog(qt.QDialog):
     """About dialog class for Veusz."""

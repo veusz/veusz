@@ -212,7 +212,7 @@ class Document( qt.QObject ):
         
         self.setModified(False)
 
-    def export(self, filename, color=True):
+    def export(self, filename, pagenumber, color=True):
         """Export the figure to the filename."""
 
         ext = os.path.splitext(filename)[1]
@@ -224,7 +224,7 @@ class Document( qt.QObject ):
             p.setOutputFileName(filename)
             p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
             p.newPage()
-            self.printTo( p )
+            self.printTo( p, [pagenumber] )
 
         elif ext == '.png':
             # write png file

@@ -348,7 +348,7 @@ class MainWindow(qt.QMainWindow):
 
             filename = str( fd.selectedFile() )
             try:
-                self.document.export(filename)
+                self.document.export(filename, self.plot.getPageNumber())
             except (IOError, RuntimeError), inst:
                 qt.QMessageBox("Veusz",
                                "Error exporting file:\n%s" % inst,
