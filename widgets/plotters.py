@@ -135,7 +135,12 @@ class FunctionPlotter(GenericPlotter):
 
     def getUserDescription(self):
         """User-friendly description."""
-        return self.function
+        if self.xfunc:
+            t = 'y = '
+        else:
+            t = 'x = '
+
+        return t+self.function
 
     def _fillYFn(self, painter, xpts, ypts, bounds, leftfill):
         """ Take the xpts and ypts, and fill above or below the line."""

@@ -23,8 +23,11 @@
 
 import qt
 
+# FIXME: this needs to be set somewhere when installed
+_logolocation='images/logo.png'
+
 class PlotWindow(qt.QScrollView):
-    """ Class to show the plot(s)."""
+    """Class to show the plot(s) in a scrollable window."""
     
     def __init__(self, document, *args):
         """Initialise the window."""
@@ -47,22 +50,43 @@ class PlotWindow(qt.QScrollView):
 
     def __callbackModifiedDoc(self, ismodified):
         """Called when the document has been modified."""
+
         if ismodified:
             self.modified = True
+            # repaint window without redrawing background
+            self.repaintContents( False )
+
+    def drawLogo(self, painter):
+        """Draw the Veusz logo in centre of window."""
+
+        logo = qt.QPixmap( _logolocation )
+        painter.drawPixmap( self.visibleWidth()/2 - logo.width()/2,
+                            self.visibleHeight()/2 - logo.height()/2,
+                            logo )
 
     def drawContents(self, painter, clipx=-1, clipy=-1, clipw=-1, cliph=-1):
         """Called when the contents need repainting."""
 
+        widget = self.document.getBaseWidget()
+
         # draw data into background pixmap if modified
         if self.modified:
-            self.bufferpixmap.fill( qt.Qt.white )
+            
+            # fill pixmap with proper background colour
+            self.bufferpixmap.fill( self.colorGroup().base() )
+
+            # make a QPainter to draw into the buffer pixmap
             p = qt.QPainter( self.bufferpixmap )
-            widget = self.document.getBaseWidget()
+            # draw the data into the buffer
             widget.draw( (50, 50, 250, 250), p )
+
             self.modified = False
 
         # blt the pixmap into the image
         painter.drawPixmap(0, 0, self.bufferpixmap)
-        
+
+        # add logo if no children
+        if len(widget.getChildren()) == 0:
+            self.drawLogo(painter)
         
         

@@ -29,8 +29,8 @@ external programs.
 import sys
 import string
 
-import document
 import widgets
+import utils
 
 class CommandInterface:
     """Class provides command interface."""
@@ -45,10 +45,15 @@ class CommandInterface:
         """Specify whether we want verbose output after operations."""
         self.verbose = v
 
-    def AddGraph(self, type, *args, **args_opt):
+    def Add(self, type, *args, **args_opt):
         """Add a graph to the plotset."""
         w = widgets.thefactory.makeWidget(type, self.currentwidget,
                                           *args, **args_opt)
+
+        if self.verbose:
+            print "Added a graph of type '%s' (%s)" % (type,
+                                                       w.getUserDescription())
+
         self.document.setModified()
 
     def _resolve(self, where):
@@ -80,19 +85,18 @@ class CommandInterface:
                 if baseobj.hasChild( p ):
                     baseobj = baseobj.getChild( p )
                 else:
-                    raise LookupError, "Child '%s' does not exist" % p
+                    raise utils.GraphError, "Child '%s' does not exist" % p
 
         # return widget
         return baseobj
 
-    def ToGraph(self, where):
+    def To(self, where):
         """Change to a graph within the current graph."""
 
         self.currentwidget = self._resolve(where)
 
         if self.verbose:
-            sys.stdout.write('Changed to graph %s\n' %
-                             self.currentwidget.getPath())
+            print "Changed to graph '%s'" % self.currentwidget.getPath()
 
     def List(self, graph=None):
         """List the contents of a graph."""
@@ -105,17 +109,26 @@ class CommandInterface:
         children = widget.getChildNames()
 
         if len(children) == 0:
-            sys.stdout.write('%30s\n' % 'No children found')
+            print '%30s' % 'No children found'
         else:
             # output format name, type
             for name in children:
                 w = widget.getChild(name)
                 type = w.getTypeName()
                 descr = w.getUserDescription()
-                sys.stdout.write('%10s %10s %30s\n' % (name, type, descr))
+                print '%10s %10s %30s' % (name, type, descr)
+
+    def Get(self, var):
+        """Get the value of a preference."""
+        return self.currentwidget.getPrefLookup(var)
 
     def Set(self, var, val):
-        """Set a variable var to val."""
+        """Set the value of a preference."""
+        self.currentwidget.setPrefLookup(var, val)
+        if self.verbose:
+            print "Set preference '%s' to '%s'" % \
+                  ( var, str(self.Get(var)) )
+
         self.document.setModified()
 
     def WriteEPS(self, filename):

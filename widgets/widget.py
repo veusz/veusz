@@ -37,7 +37,7 @@ class Widget:
         # save parent widget for later
         self.parent = parent
         if parent != None:
-            parent._addChild(self, name=name)
+            parent.__addChild(self, name=name)
             self.document = parent.getDocument()
         else:
             self.document = None
@@ -60,6 +60,18 @@ class Widget:
 
         # preferences for part of the object
         self.subprefs = {}
+
+    def __addChild(self, child, name=None):
+        """Add a child widget to draw. """
+
+        # autonumber children
+        if name == None:
+            name = str(self.child_index)
+            self.child_index += 1
+
+        # add child
+        self.child_order.append(name)
+        self.child_widgets[name] = child
 
     def getTypeName(self):
         """Return the type name."""
@@ -98,8 +110,8 @@ class Widget:
         return name in self.prefs.prefnames
         
     def getPrefLookup(self, name):
-        """Get the value of a preference in the form foo.bar.baz"""
-        parts = string.split(name, '.')
+        """Get the value of a preference in the form foo/bar/baz"""
+        parts = string.split(name, '/')
         noparts = len(parts)
 
         # this could be recursive, but why bother
@@ -111,17 +123,18 @@ class Widget:
             obj = obj.getChild( parts[i] )
             i += 1
 
-        # if we can't lookup the value, 
+        # if we can't lookup the value
         errorpref = ''
 
-        # should be a preference of this object
         if i == noparts-1:
+            # should be a preference of this object
             if obj.hasPref( parts[-1] ):
                 return obj.prefs.getPref( parts[-1] )
             else:
                 errorpref = parts[-1]
-            
+                
         elif i == noparts-2:
+            # should be a subpreference of this object
             if parts[-2] in obj.subprefs:
                 subpref = obj.subprefs[parts[-2]]
                 if subpref.hasPref( parts[-1] ):
@@ -130,10 +143,63 @@ class Widget:
                     errorpref = parts[-1]
             else:
                 errorpref = parts[-2]
+
+        elif i == noparts:
+            # preference not actually specified
+            raise utils.PreferenceError, \
+                  "No preference specified in graph '%s'" % name
+
         else:
             errorpref = parts[i]
             
-        raise KeyError, "No such object/preference as '%s'" % errorpref
+        raise utils.PreferenceError, \
+              "No such object/preference as '%s'" % errorpref
+
+    def setPrefLookup(self, name, val):
+        """Set a preference named in the form foo/bar/baz."""
+        parts = string.split(name, '/')
+        noparts = len(parts)
+
+        # loop while we iterate through the family
+        i = 0
+        obj = self
+        while i < noparts and obj.hasChild( parts[i] ):
+            obj = obj.getChild( parts[i] )
+            i += 1
+
+        # if we can't lookup the value
+        errorpref = ''
+
+        if i == noparts-1:
+            # should be a preference in this object
+            if obj.hasPref( parts[-1] ):
+                obj.prefs.setPref( parts[-1], val )
+                return
+            else:
+                errorpref = parts[-1]
+
+        elif i == noparts-2:
+            # should be a subpreference of this object
+            if parts[-2] in obj.subprefs:
+                subpref = obj.subprefs[parts[-2]]
+                if subpref.hasPref( parts[-1] ):
+                    obj.prefs.setPref( parts[-1], val )
+                    return
+                else:
+                    errorpref = parts[-1]
+            else:
+                errorpref = parts[-2]
+
+        elif i == noparts:
+            # preference not actually specified
+            raise utils.PreferenceError, \
+                  "No preference specified in graph '%s'" % name
+                
+        else:
+            errorpref = parts[i]
+                            
+        raise utils.PreferenceError, \
+              "No such object/preference as '%s'" % errorpref
 
     def hasChild(self, name):
         """Return whether there is a child with a name."""
@@ -158,18 +224,6 @@ class Widget:
     def getChildNames(self):
         """Return the child names."""
         return list( self.child_order )
-
-    def _addChild(self, child, name=None):
-        """Add a child widget to draw. """
-
-        # autonumber children
-        if name == None:
-            name = str(self.child_index)
-            self.child_index += 1
-
-        # add child
-        self.child_order.append(name)
-        self.child_widgets[name] = child
 
     def removeChild(self, name=None):
         """Remove a child. If name is not specified it is the last child added."""

@@ -1,5 +1,6 @@
-# __init__.py file for utils
-  
+# exceptions.py
+# veusz exceptions
+
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -16,14 +17,25 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-###############################################################################
+##############################################################################
 
 # $Id$
 
-from exceptions import *
-from utilfuncs import *
-from pref import *
-from preftypes import *
-from textrender import *
-from points import *
-from version import *
+"""Veusz-specific exceptions."""
+
+class VeuszException(Exception):
+    """Veusz-specific exception."""
+    
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+class PreferenceError(VeuszException):
+    """Exception thrown due to preferences."""
+    pass
+
+class GraphError(VeuszException):
+    """Exception thrown to a graph-related error."""
+    pass
+

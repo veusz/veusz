@@ -72,9 +72,11 @@ class CommandInterpreter:
         # define commands for interface
         self.cmds = { 'GPL': self.GPL,
                       'SetVerbose': i.SetVerbose,
-                      'AddGraph': i.AddGraph,
-                      'ToGraph': i.ToGraph,
+                      'Add': i.Add,
+                      'To': i.To,
                       'List': i.List,
+                      'Get': i.Get,
+                      'Set': i.Set,
                       'WriteEPS': i.WriteEPS }
 
         for i in self.cmds.items():
