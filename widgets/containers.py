@@ -24,7 +24,7 @@
 """Module containing container widget classes.
 
 Classes include
- GridContainer: Class to plot a grid of plots
+ Grid: Class to plot a grid of plots
 """
 
 import widget
@@ -136,7 +136,7 @@ class _gridengine:
             w = max(w, len(l))
         return (w, h)
     
-class GridContainer(widget.Widget):
+class Grid(widget.Widget):
     """Class to hold plots in a grid arrangement.
 
     The idea is we either specify how many rows or columns to use.
@@ -225,6 +225,6 @@ class GridContainer(widget.Widget):
         widget.Widget.draw(self, posn, painter)
 
 # allow the factory to instantiate a grid
-widgetfactory.thefactory.register( GridContainer )
+widgetfactory.thefactory.register( Grid )
 
        

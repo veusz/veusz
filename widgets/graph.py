@@ -24,12 +24,13 @@ import widget
 import widgetfactory
 import axis
 import region
+import containers
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = [region.Region]
+    allowedparenttypes = [region.Region, containers.Grid]
     allowusercreation = True
     description = 'Base graph'
 
