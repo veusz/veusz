@@ -26,15 +26,13 @@
   </bookinfo>
 
   <chapter>
-    <title>Walk through</title>
+    <title>Introduction</title>
 
     <section>
       <title>Starting the program</title>
 
       <para>You should start the script veusz.py from the main veusz
       directory</para>
-
-      <para></para>
     </section>
   </chapter>
 
@@ -49,7 +47,7 @@
       Python as its scripting language. Therefore you can freely mix
       Veusz and Python commands on the command line. Veusz can also
       read in Python scripts from files (see the <link
-      linkend="CommandLoad">Load</link> command).</para>
+      linkend="Command.Load">Load</link> command).</para>
 
       <para>When commands are entered in the command prompt in the
       Veusz window, Veusz supports a simplified command syntax, where
@@ -72,152 +70,266 @@
   </chapter>
 
   <chapter>
-      <title>Commands</title>
-
-      <para>We list the allowed set of commands below</para>
-
-      <section>
-	<title><anchor id="CommandAction" />Action</title>
-
-	<para><command>Action('actionname',
-	plotpartpath='.')</command></para>
-
-	<para>Initiates the specified action on the plot part given
+    <title>Commands</title>
+    
+    <para>We list the allowed set of commands below</para>
+    
+    <section>
+      <title><anchor id="Command.Action" />Action</title>
+      
+      <para><command>Action('actionname',
+	widgetpath='.')</command></para>
+      
+      <para>Initiates the specified action on the widget given
 	the action name. Actions perform certain automated
-	routines. These include "fit" on a fit plot part, and
+	routines. These include "fit" on a fit widget, and
 	"zeroMargins" on grids.</para>
-      </section>
+    </section>
 
-      <section>
-        <title><anchor id="CommandAdd" />Add</title>
-
-        <para><command>Add('plotparttype', name='nameofplotpart',
+    <section>
+      <title><anchor id="Command.Add" />Add</title>
+      
+      <para><command>Add('widgettype', name='nameforwidget',
         autoadd=True, optionalargs)</command></para>
-
-        <para>The Add command adds a graph into the current plotpart
-        (See the <link linkend="CommandTo">To</link> command to change
+      
+      <para>The Add command adds a graph into the current widget
+        (See the <link linkend="Command.To">To</link> command to change
         the current position).</para>
-
-	<para>The first argument is the type of plot part to
-        add. These include "graph", "page", "axis", "xy" and
-        "grid". <command>name</command> is the name of the new plot
-        part (if not given, it will be generated from the type of the
-        plot part plus a number). The <command>autoadd</command>
-        parameter if set, constructs the default sub-plot parts this
-        plot part has (for example, axes in a graph).</para>
-
-	<para>Optionally, default values for the graph settings may be
+      
+      <para>The first argument is the type of widget to add. These
+        include "graph", "page", "axis", "xy" and
+        "grid". <command>name</command> is the name of the new widget
+        (if not given, it will be generated from the type of the
+        widget plus a number). The <command>autoadd</command>
+        parameter if set, constructs the default sub-widgets this
+        widget has (for example, axes in a graph).</para>
+      
+      <para>Optionally, default values for the graph settings may be
         given, for example <command>Add('axis', name='y',
         direction='vertical')</command>.</para>
-      </section>
+      
+      <para>Returns: Name of widget added.</para>
+    </section>
 
-      <section>
-	<title><anchor id="CommandImportFile" />ImportFile</title>
+    <section>
+      <title><anchor id="Command.Export" />Export</title>
 
-	<para><command>ImportFile('filename',
+      <para><command>Export(filename, color=True,
+      page=0)</command></para>
+
+      <para>Export the page given to the filename given. The
+      <command>filename</command> must end with the correct extension
+      to get the right sort of output file. Currrenly supported
+      extensions are '.eps' and '.png'. If <command>color</command> is
+      True, then the output is in colour, else
+      greyscale. <command>page</command> is the page number of the
+      document to export (starting from 0 for the first page!).</para>
+    </section>
+
+    <section>
+      <title><anchor id="Command.Get" />Get</title>
+
+      <para><command>Get('settingpath')</command></para>
+
+      <para>Returns: The value of the setting given by the path.</para>
+
+      <informalexample>
+	<programlisting>
+>>> Get('/page1/graph1/x/min')
+'Auto'
+</programlisting>
+      </informalexample>
+    </section>
+
+    </section>
+    
+    <section>
+      <title><anchor id="Command.GetChildren" />GetChildren</title>
+
+      <para><command>GetChildren(where='.')</command></para>
+
+      <para>Returns: The names of the widgets which are children of
+      the path given</para>
+    </section>
+
+    <section>
+      <title><anchor id="Command.GetData" />GetData</title>
+      <para><command>GetData(name)</command></para>
+
+      <para>Returns: A tuple containing the datasets with the name
+      given. The tuple is (data, symerr, negerr, poserr), with each a
+      numarray of the same size or None. data are the values of the
+      dataset, symerr are the symmetric errors (if set), negerr and
+      poserr and negative and positive asymmetric errors (if
+      set).</para>
+
+      <informalexample>
+	<programlisting>
+data = GetData('x')
+SetData('x', data[0]*0.1, *data[1:])
+</programlisting>
+      </informalexample>
+    </section>
+
+    <section>
+      <title><anchor id="Command.GetDatasets" />GetDatasets</title>
+
+      <para><command>GetDatasets()</command></para>
+
+      <para>Returns: The names of the datasets in the current
+      document.</para>
+    </section>
+
+    <section>
+      <title><anchor id="Command.GPL" />GPL</title>
+
+      <para><command>GPL()</command></para>
+
+      <para>Print out the GNU Public Licence, which Veusz is licenced
+      under.</para>
+    </section>
+
+    <section>
+      <title><anchor id="Command.ImportFile" />ImportFile</title>
+      
+      <para><command>ImportFile('filename',
 	'descriptor')</command></para>
-
-	<para>Imports data from a file. The arguments are the filename
+      
+      <para>Imports data from a file. The arguments are the filename
 	to load data from and the descriptor.</para>
-
-	<para>The format of the descriptor is a list of variable names
+      
+      <para>The format of the descriptor is a list of variable names
         representing the columns of the data. For more information see
         <link linkend="Descriptors">Descriptors</link>.</para>
-      </section>
 
-      <section>
-	<title><anchor id="CommandImportString" />ImportString</title>
-
-	<para><command>ImportString('descriptor',
+      <para>Returns: list of datasets imported.</para>
+    </section>
+    
+    <section>
+      <title><anchor id="Command.ImportString" />ImportString</title>
+      
+      <para><command>ImportString('descriptor',
 	'data')</command></para>
-
-	<para>Like, <link
-	linkend="CommandImportFile">ImportFile</link>, but loads the
+      
+      <para>Like, <link
+	linkend="Command.ImportFile">ImportFile</link>, but loads the
 	data from the specfied string rather than a file. This allows
 	data to be easily embedded within a document. The data string is
 	usually a multi-line Python string.</para>
+      
+      <para>Returns: list of datasets imported.</para>
 
-	<informalexample>
-	  <programlisting>
+      <informalexample>
+	<programlisting>
 ImportString('x y', '''
 1   2
 2   5
 3   10
 ''')
 </programlisting>
-	</informalexample>
-      </section>
+      </informalexample>
 
-      <section>
-	<title><anchor id="CommandLoad" />Load</title>
+    </section>
+    
+    <section>
+      <title><anchor id="Command.List" />List</title>
+      
+      <para><command>List(where='.')</command></para>
+      
+      <para>List the widgets which are contained within the widget
+      with the path given, the type of widgets, and a brief
+      description.</para>
+    </section>
 
-	<para><command>Load('filename.vsz')</command></para>
-
-	<para>Loads the veusz script file given. The script file can
+    <section>
+      <title><anchor id="Command.Load" />Load</title>
+      
+      <para><command>Load('filename.vsz')</command></para>
+      
+      <para>Loads the veusz script file given. The script file can
 	be any Python code. The code is executed using the Veusz
 	interpreter.</para>
-
-	<para>Note: this command is only supported at the command line
+      
+      <para>Note: this command is only supported at the command line
 	and not in a script. Scripts may use the python
 	<command>execfile</command> function instead.</para>
-      </section>
-
-      <section>
-	<title><anchor id="CommandRemove" />Remove</title>
-
-	<para><command>Remove('plotpartpath')</command></para>
-	
-	<para>Remove the plot part selected using the path. See <link
-	linkend="CommandTo">To</link> for a description of the path
+    </section>
+    
+    <section>
+      <title><anchor id="Command.Remove" />Remove</title>
+      
+      <para><command>Remove('widgetpath')</command></para>
+      
+      <para>Remove the widget selected using the path. See <link
+	linkend="Command.To">To</link> for a description of the path
 	syntax.</para>
-      </section>
+    </section>
 
-      <section>
-	<title><anchor id="CommandSave" />Save</title>
-
-	<para><command>Save('filename.vsz')</command></para>
-
-	<para>Save the current document under the filename
+    <section>
+      <title><anchor id="Command.Save" />Save</title>
+      
+      <para><command>Save('filename.vsz')</command></para>
+      
+      <para>Save the current document under the filename
 	given.</para>
-      </section>
-
-      <section>
-	<title><anchor id="CommandSet" />Set</title>
-
-	<para><command>Set('settingpath', val)</command></para>
-
-	<para>Set the setting given by the path to the value given. If
+    </section>
+    
+    <section>
+      <title><anchor id="Command.Set" />Set</title>
+      
+      <para><command>Set('settingpath', val)</command></para>
+      
+      <para>Set the setting given by the path to the value given. If
 	the type of <command>val</command> is incorrect, an
-	<command>InvalidType</command> exception is thrown. The path to the
-	setting is the optional path to the plot part the setting is
-	contained within, an optional subsetting specifier, and the
-	setting itself. For example
-	<command>/page1/graph1/x/min</command>.</para>
-      </section>
+	<command>InvalidType</command> exception is thrown. The path
+	to the setting is the optional path to the widget the setting
+	is contained within, an optional subsetting specifier, and the
+	setting itself.</para>
 
-      <section>
-	<title><anchor id="CommandSetVerbose" />SetVerbose</title>
+      <informalexample>
+	<programlisting>
+Set('page1/graph1/x/min', -10.)
+</programlisting>
+      </informalexample>
 
-	<para><command>SetVerbose(v=True)</command></para>
+    </section>
 
-	<para>If <command>v</command> is <command>True</command>, then extra
+    <section>
+      <title><anchor id="Command.SetData" />Set</title>
+      
+      <para><command>SetData(name, val, symerr=None, negerr=None,
+      poserr=None)</command></para>
+
+      <para>Set the dataset name with the values given. If None is
+      given for an item, it will be left blank. val is the actual
+      data, symerr are the symmetric errors, negerr and poserr and the
+      getative and positive asymmetric errors. The data can be given
+      as lists or numarrays.</para>
+    </section>
+    
+    <section>
+      <title><anchor id="Command.SetVerbose" />SetVerbose</title>
+      
+      <para><command>SetVerbose(v=True)</command></para>
+      
+      <para>If <command>v</command> is <command>True</command>, then extra
 	information is printed out by commands.</para>
-      </section>
-
-      <section>
-        <title><anchor id="CommandTo" />To</title>
-
-        <para><command>To('plotpartpath')</command></para>
-
-        <para>The To command takes a path to a plot part and moves to
-        that plot part. For example, this may be "/", the root plot
-        part, "graph1", "/page1/graph1/x", "../x". The syntax is
-        designed to mimic Unix paths for files. "/" represents the
-        base plot part (where the pages reside), and ".." represents
-        the plot part next up the tree.</para>
-
-      </section>
-
+    </section>
+    
+    <section>
+      <title><anchor id="Command.To" />To</title>
+      
+      <para><command>To('widgetpath')</command></para>
+      
+      <para>The To command takes a path to a widget and moves to
+        that widget. For example, this may be "/", the root widget,
+        "graph1", "/page1/graph1/x", "../x". The syntax is designed to
+        mimic Unix paths for files. "/" represents the base widget
+        (where the pages reside), and ".." represents the widget next
+        up the tree.</para>
+      
+    </section>
+    
   </chapter>
-
+  
 </book>
