@@ -51,16 +51,20 @@ class _WidgetItem(qt.QListViewItem):
 
 class _PrefItem(qt.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
-    def __init__(self, pref, name, *args):
+    def __init__(self, preftype, name, *args):
         qt.QListViewItem.__init__(self, *args)
 
-        self.preftype = pref
+        self.preftype = preftype
         self.setText(0, name)
         self.setText(1, "setting")
 
     def getWidget(self):
         """Returns None as we don't have a widget."""
         return None
+
+    def getPreftype(self):
+        """Returns the preferences."""
+        return self.preftype
 
 class _ScrollView(qt.QScrollView):
     """A resizing scroll view."""
@@ -182,6 +186,10 @@ class TreeEditWindow(qt.QDockWindow):
         self._updateBranch(self.rootitem)
         self.listview.triggerUpdate()
 
+    def slotCntrlModifiesDoc(self):
+        """Called when a control modifies its value."""
+        self.document.setModified(True)
+
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
 
@@ -193,22 +201,30 @@ class TreeEditWindow(qt.QDockWindow):
             i.deleteLater()
         self.prefchilds = []
 
-        w = item.getWidget()
-        if w != None:
-            # make new widgets for the preferences
-            prefs = w.getPrefs()
-            for p in prefs.getPrefNames():
-                child = qt.QLabel(p, self.prefgrid)
-                child.show()
-                self.prefchilds.append(child)
-                child = qt.QLineEdit(self.prefgrid)
-                child.show()
-                self.prefchilds.append(child)
+        if item.getWidget() != None:
+            prefs = item.getWidget().getPrefs()
+        else:
+            prefs = item.getPreftype().getPrefs()
 
-            # UUGH - KLUDGE! Have to do this before program takes notice
-            # of adjustSize below!
-            # FIXME
-            qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
-                                                      100)
-            self.prefview.adjustSize()
+        # make new widgets for the preferences
+        for pname in prefs.getPrefNames():
+            l = qt.QLabel(pname, self.prefgrid)
+            l.show()
+            self.prefchilds.append(l)
+
+            type = prefs.getPrefType(pname)
+            val = prefs.getPref(pname)
+
+            cntrl = prefs.makePrefControl(pname, self.prefgrid)
+            cntrl.connect(cntrl, qt.PYSIGNAL('sigModified'),
+                          self.slotCntrlModifiesDoc)
+            cntrl.show()
+            self.prefchilds.append(cntrl)
+
+        # UUGH - KLUDGE! Have to do this before program takes notice
+        # of adjustSize below!
+        # FIXME
+        qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
+                                                  100)
+        self.prefview.adjustSize()
             

@@ -99,6 +99,91 @@ _write_functions = { 'int': _writeDefaultEntry,
                      'color': _writeColorEntry,
                      'list': _writeListEntry }
 
+class _PrefBool(qt.QCheckBox):
+    """A check box which connects directly with a bool preference."""
+
+    def __init__(self, prefs, name, *args):
+        qt.QCheckBox.__init__(self, *args)
+        self.prefs = prefs
+        self.name = name
+
+        self.setChecked(prefs.getPref(name))
+        self.connect(self, qt.SIGNAL("stateChanged(int)"),
+                     self.slotStateChanged)
+
+    def slotStateChanged(self, state):
+        """Called when the tick box is modified."""
+        on = (state == qt.QButton.On)
+        self.prefs.setPref(self.name, on)
+
+        # emit this signal so that changes can be notified
+        self.emit(qt.PYSIGNAL("sigModified"), ())
+
+class _PrefInt(qt.QSpinBox):
+    """A spin box which modifies a preference directly."""
+
+    def __init__(self, prefs, name, *args):
+        qt.QSpinBox.__init__(self, *args)
+        self.prefs = prefs
+        self.name = name
+
+        self.setValue(prefs.getPref(name))
+        self.connect(self, qt.SIGNAL("valueChanged(int)"),
+                     self.slotValueChanged)
+
+    def slotValueChanged(self, value):
+        """Called when the spin box is modified."""
+        self.prefs.setPref(self.name, value)
+
+        # emit this signal so that changes can be notified
+        self.emit(qt.PYSIGNAL("sigModified"), ())
+
+class _PrefString(qt.QLineEdit):
+    """A line edit which modifies a string preference directly."""
+
+    def __init__(self, prefs, name, *args):
+        qt.QLineEdit.__init__(self, *args)
+        self.prefs = prefs
+        self.name = name
+
+        self.setText(prefs.getPref(name))
+        self.connect(self, qt.SIGNAL("lostFocus()"),
+                     self.slotLostFocus)
+
+    def slotLostFocus(self):
+        """Called when the edit box is modified."""
+        value = self.text()
+        self.prefs.setPref(self.name, str(value))
+
+        # emit this signal so that changes can be notified
+        self.emit(qt.PYSIGNAL("sigModified"), ())
+
+class _PrefDouble(qt.QLineEdit):
+    """A line edit which modifies a double preference directly."""
+
+    def __init__(self, prefs, name, *args):
+        qt.QLineEdit.__init__(self, *args)
+        self.prefs = prefs
+        self.name = name
+
+        self.setText( str(prefs.getPref(name)) )
+        self.setValidator( qt.QDoubleValidator(self) )
+        
+        self.connect(self, qt.SIGNAL("lostFocus()"),
+                     self.slotLostFocus)
+
+    def slotLostFocus(self):
+        """Called when the edit box is modified."""
+        value = self.text()
+        self.prefs.setPref(self.name, float(str(value)) )
+
+        # emit this signal so that changes can be notified
+        self.emit(qt.PYSIGNAL("sigModified"), ())
+
+# map preference names to Qt classes for editing
+_prefQtClasses = { 'bool': _PrefBool, 'int': _PrefInt,
+                   'string': _PrefString, 'double': _PrefDouble }
+
 class Preferences:
     """Class for reading in default preferences."""
 
@@ -119,6 +204,10 @@ class Preferences:
     def setDefault(self, name, default):
         """Change the default value for a preference."""
         self.prefdefaults[name] = default
+
+    def getPrefType(self, name):
+        """Get the preference type."""
+        return self.preftypes[name]
 
     def setPref(self, name, val):
         """Set a preferences variable (checking the type).
@@ -155,6 +244,11 @@ class Preferences:
     def getPrefNames(self):
         """Get a list of the preferences."""
         return self.prefnames
+
+    def makePrefControl(self, name, *args):
+        """Make a QWidget to modify the preference with the name."""
+        cntrlclass = _prefQtClasses[ self.preftypes[name] ]
+        return cntrlclass(self, name, *args)
 
     def read(self):
         """Read in the listed preferences."""
