@@ -34,13 +34,24 @@ class Graph(widget.Widget):
         """Initialise object and create axes."""
 
         widget.Widget.__init__(self, parent, name=name)
-
-        self.margins = ['2cm', '2cm', '2cm', '2cm']
+        self.addPref( 'leftMargin', 'string', '2cm' )
+        self.addPref( 'rightMargin', 'string', '2cm' )
+        self.addPref( 'topMargin', 'string', '2cm' )
+        self.addPref( 'bottomMargin', 'string', '2cm' )
+        self.readPrefs()
 
         # make axes
         ax = axis.Axis(self, name='x')
         ay = axis.Axis(self, name='y')
         ay.direction = 1
+
+    def draw(self, parentposn, painter):
+        '''Update the margins before drawing.'''
+
+        self.margins = [self.leftMargin, self.topMargin,
+                        self.rightMargin, self.bottomMargin]
+
+        widget.Widget.draw(self, parentposn, painter)
 
 # allow users to make Graph objects
 widgetfactory.thefactory.register( Graph )
