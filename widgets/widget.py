@@ -36,16 +36,21 @@ class Widget:
 
         # save parent widget for later
         self.parent = parent
+        self.name = name
+
         if parent != None:
-            parent.__addChild(self, name=name)
+            parent.children.append( self )
+            if name == None:
+                self.name = str( parent.child_index )
+                parent.child_index += 1
             self.document = parent.getDocument()
         else:
+            self.name = '/'
             self.document = None
 
         # store child widgets
-        self.child_order   = []
-        self.child_widgets = {}
-
+        self.children = []
+        
         # automatic child name index
         self.child_index = 1
 
@@ -61,17 +66,9 @@ class Widget:
         # preferences for part of the object
         self.subprefs = {}
 
-    def __addChild(self, child, name=None):
-        """Add a child widget to draw. """
-
-        # autonumber children
-        if name == None:
-            name = str(self.child_index)
-            self.child_index += 1
-
-        # add child
-        self.child_order.append(name)
-        self.child_widgets[name] = child
+    def getName(self):
+        """Get the name of the widget."""
+        return self.name
 
     def getTypeName(self):
         """Return the type name."""
@@ -201,49 +198,46 @@ class Widget:
         raise utils.PreferenceError, \
               "No such object/preference as '%s'" % errorpref
 
-    def hasChild(self, name):
-        """Return whether there is a child with a name."""
-        return name in self.child_widgets
-
     def getChild(self, name):
         """Return a child with a name."""
-        return self.child_widgets[name]
+
+        for i in self.children:
+            if i.name == name:
+                return i
+        return None
+
+    def hasChild(self, name):
+        """Return whether there is a child with a name."""
+
+        return self.getChild(name) != None
 
     def getChildren(self):
         """Get a list of the children."""
-        return self.child_widgets.values()
-
-    def getChildName(self, child):
-        """Get the name of a child object."""
-        try:
-            i = self.child_widgets.values().index( child )
-            return self.child_widgets.keys()[i]
-        except ValueError:
-            return None
+        return self.children
 
     def getChildNames(self):
         """Return the child names."""
-        return list( self.child_order )
 
-    def removeChild(self, name=None):
-        """Remove a child. If name is not specified it is the last child added."""
-        # FIXME: handle errors properly here
-        if name == None:
-            name = self.child_order[-1]
-            i = -1
+        names = []
+        for i in self.children:
+            names.append( i.name )      
+        return names
+
+    def removeChild(self, name):
+        """Remove a child."""
+
+        i = 0
+        nc = len(self.children)
+        while( i < nc ):
+            if self.children[i].name == name:
+                break
+            i += 1
+
+        if i < nc:
+            self.children.pop(i)
         else:
-            i = self.child_order.index(name)
-
-        self.child_order.pop(i)
-        del self.child_widgets[name]
-
-    def getName(self):
-        """Get name of widget (from parent)."""
-
-        if self.parent == None:
-            return '/'
-        else:
-            return self.parent.getChildName(self)
+            raise utils.GraphError, \
+                  "Cannot remove graph '%s' - does not exist" % name
 
     def getPath(self):
         """Returns a path for the object, e.g. /plot1/x."""
@@ -251,14 +245,13 @@ class Widget:
         obj = self
         build = ''
         while obj.parent != None:
-            name = obj.parent.getChildName( obj )
-            build = '/' + name + build
+            build = '/' + obj.name + build
             obj = obj.parent
 
         if len(build) == 0:
-            return '/'
-        else:
-            return build
+            build = '/'
+
+        return build
 
     def autoAxis(self, axisname):
         """If the axis axisname is used by this widget,
@@ -277,6 +270,8 @@ class Widget:
     def draw(self, parentposn, painter):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
         """
+
+        print self.name, self.position
 
         # get parent's position
         x1, y1, x2, y2 = parentposn
@@ -303,8 +298,8 @@ class Widget:
         bounds = list(posn)
 
         # modify bounds if child requests it
-        for name in self.child_order:
-            self.child_widgets[name].autoMargin(posn, bounds)
+        for i in self.children:
+            i.autoMargin(posn, bounds)
 
         for i in range(4):
             if self.margins[i] < 0.:
@@ -312,8 +307,8 @@ class Widget:
                 posn[i] += posn[i] - bounds[i]
 
         # iterate over children
-        for name in self.child_order:
-            self.child_widgets[name].draw( posn, painter )
+        for i in self.children:
+            i.draw(posn, painter)
 
         # return our final bounds
         return posn

@@ -1,4 +1,4 @@
-# widgets __init__.py file
+# graph widget for containing other sorts of widget
 
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
@@ -20,11 +20,25 @@
 
 # $Id$
 
-from widget import *
-from axis import *
-from graph import *
-from containers import *
-from plotters import *
-from region import *
-from widgetfactory import *
+import widget
+import widgetfactory
+import axis
 
+class Graph(widget.Widget):
+    """Graph for containing other sorts of widgets"""
+
+    typename='graph'
+
+    def __init__(self, parent, name=None):
+        """Initialise object and create axes."""
+
+        widget.Widget.__init__(self, parent, name=name)
+
+        # make axes
+        ax = axis.Axis(self, name='x')
+        ay = axis.Axis(self, name='y')
+        ay.direction = 1
+
+# allow users to make Graph objects
+widgetfactory.thefactory.register( Graph )
+ 

@@ -119,9 +119,7 @@ class Axis(widget.Widget):
 
     def _autoLookupRange(self):
         """Automatically look up the plotable range from widgets that use this axis."""
-        # get the name of this axis from the parent
-        # design flaw?
-        ourname = self.parent.getChildName( self )
+        ourname = self.getName()
 
         # iterate over siblings to get axis range
         autorange = [1e99, -1e99]

@@ -24,7 +24,7 @@
 """Module containing container widget classes.
 
 Classes include
- PGridContainer: Class to plot a grid of plots
+ GridContainer: Class to plot a grid of plots
 """
 
 import widget
@@ -135,7 +135,7 @@ class _gridengine:
             w = max(w, len(l))
         return (w, h)
     
-class PGridContainer(widget.Widget):
+class GridContainer(widget.Widget):
     """Class to hold plots in a grid arrangement.
 
     The idea is we either specify how many rows or columns to use.
@@ -162,6 +162,9 @@ class PGridContainer(widget.Widget):
         self.child_dimensions = {}
         self.changeShape(rows, columns)
 
+        # maintain copy of children to check for mods
+        self._old_children = list(self.children)
+
     def changeShape(self, rows=None, columns=None):
         """Modify the shape of the container (as specified above)."""
         
@@ -174,32 +177,26 @@ class PGridContainer(widget.Widget):
         # force a recalculation of the positions of the children
         self.recalc = 1
 
-    def addChild(self, child, name=None, width=1, height=1):
-        """Add a child widget to the container."""
-
-        widget.Widget.addChild(self, child, name=name)
-        # get assigned name/number
-        n = self.child_order[-1]
-        # store dimensions
-        self.child_dimensions[n] = (width, height)
-
-        self.recalc = 1
-
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""
 
         ge = _gridengine(self.columns, self.rows)
 
         childrenposns = []
-        for c in self.child_order:
-            childrenposns.append( ge.add( *self.child_dimensions[c] ) )
+        for c in self.children:
+            name = c.getName()
+            childrenposns.append( ge.add( * self.child_dimensions[name] ) )
 
         nocols, norows = ge.getAllocedDimensions()
+
+        # exit if there aren't any children
+        if nocols == 0 or norows == 0:
+            return
+
         invc, invr = 1./nocols, 1./norows
 
-        for c, pos in zip(self.child_order, childrenposns):
-            child = self.child_widgets[c]
-            dim = self.child_dimensions[c]
+        for child in self.children:
+            dim = self.child_dimensions[child.getName()]
             child.position = ( pos[0]*invc, pos[1]*invr,
                                (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
 
@@ -208,11 +205,13 @@ class PGridContainer(widget.Widget):
 
         # if the contents have been modified, recalculate the positions
         if self.recalc:
+        if self.children != self._old_children:
+            self._old_children = self.children
             self._recalcPositions()
 
         widget.Widget.draw(self, posn, painter)
 
 # allow the factory to instantiate a grid
-widgetfactory.thefactory.register( PGridContainer )
+widgetfactory.thefactory.register( GridContainer )
 
        
