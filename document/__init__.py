@@ -21,7 +21,6 @@
 # $Id$
 
 from doc import *
-from data import *
 from commandinterface import *
 from commandinterpreter import *
 from simpleread import *
