@@ -161,25 +161,21 @@ class GridContainer(widget.Widget):
         """
 
         widget.Widget.__init__(self, parent, name=name)
+        self.addPref( 'rows', 'int', 2 )
+        self.addPref( 'columns', 'int', 2 )
         self.readPrefs()
 
+        if rows != None:
+            self.rows = rows
+        if columns != None:
+            self.columns = columns
+
+        self.olddimensions = (-1, -1)
+
         self.child_dimensions = {}
-        self.changeShape(rows, columns)
 
         # maintain copy of children to check for mods
         self._old_children = list(self.children)
-
-    def changeShape(self, rows=None, columns=None):
-        """Modify the shape of the container (as specified above)."""
-        
-        if rows == None and columns == None:
-            columns = 1
-
-        self.rows = rows
-        self.columns = columns
-
-        # force a recalculation of the positions of the children
-        self.recalc = 1
 
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""
@@ -218,9 +214,13 @@ class GridContainer(widget.Widget):
         """Draws the widget's children."""
 
         # if the contents have been modified, recalculate the positions
-        if self.children != self._old_children:
+        dimensions = (self.columns, self.rows)
+        if self.children != self._old_children or \
+           self.olddimensions != dimensions:
+            
             self._old_children = list(self.children)
             self._recalcPositions()
+            self.olddimensions = dimensions
 
         widget.Widget.draw(self, posn, painter)
 
