@@ -1,24 +1,22 @@
 Veusz basic installation procedure
 ----------------------------------
 
-The code just runs in its current directory at the moment. It can currently
-do very basic graphs.
+The code just runs in its current directory at the moment.
+It needs a distutils / installation script
 
 Requirements:
- python 2.2.3    http://www.python.org/
+ python 2.3      http://www.python.org/
  PyQt            http://www.riverbankcomputing.co.uk/pyqt/
  Numarray        http://www.stsci.edu/resources/software_hardware/numarray
 
+
 (PyQt requres
- QT              http://www.trolltech.com/products/qt/ )
+ QT              http://www.trolltech.com/products/qt/
+ SIP             http://www.riverbankcomputing.co.uk/sip/   )
 
 Install the above requirements.
 
-To test the plotting functionality, run
-
-python tests/testgraph.py
-
-or test the primative user interface, run
+Run the program using
 
 ./veusz.py
 

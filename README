@@ -42,6 +42,19 @@ To be done:
    [some of the external interface is complete]
  * Proper installation program
 
+Requirements:
+ Python (probably 2.3 or greater required)
+   http://www.python.org/
+ Qt (free edition)
+   http://www.trolltech.com/products/qt/  
+ PyQt (SIP is required to be installed first)
+   http://www.riverbankcomputing.co.uk/pyqt/
+   http://www.riverbankcomputing.co.uk/sip/
+ numarray
+   http://www.stsci.edu/resources/software_hardware/numarray
+ Microsoft Core Fonts (recommended)
+   http://corefonts.sourceforge.net/
+
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in pdf, html and text format (generated from docbook).
 
@@ -59,5 +72,4 @@ Jeremy
 
 -------------------------------------------------------------------------------
 $Id$
-
-
+ 
