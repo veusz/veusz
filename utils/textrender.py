@@ -22,6 +22,9 @@
 # $Id$
 
 import math
+import numarray as N
+
+import qt
 
 class _PartBuilder:
     """ A class to handle LaTeX-like expressions."""
@@ -183,7 +186,7 @@ class _PartBuilder:
         """ Return the separate parts."""
         return self.parts
 
-    def renderpart(self, painter, partno, font, render=0):
+    def renderpart(self, painter, partno, font, render=False):
         """ Render or measure the specified part.
 
         Blocks are iterated over, and recursively descended
@@ -309,7 +312,7 @@ def getTextDimensions(painter, font, text):
     painter.setFont(font)
     h = painter.fontMetrics().boundingRect('0').height()
     pb.reset_bounds()
-    pb.renderpart(painter, 0, font, render=0)
+    pb.renderpart(painter, 0, font, render=False)
     return (pb.x, h)
 
 def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
@@ -332,70 +335,68 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
 
     pb = _PartBuilder(text)
 
+    painter.setFont(font)
+    pb.x = 0
+    pb.y = 0
+    pb.renderpart(painter, 0, font, render=0)
+    totalwidth = pb.x
+    totalheight = painter.fontMetrics().boundingRect('0').height()
+
+    # in order to work out text position, we rotate a bounding box
+    coordx = N.array( [-totalwidth/2, totalwidth/2,
+                       totalwidth/2, -totalwidth/2.] )
+    coordy = N.array( [totalheight/2, totalheight/2,
+                       -totalheight/2, -totalheight/2] )
+
+    # rotate angles by theta
+    theta = -angle * (math.pi / 180.)
+    c = math.cos(theta)
+    s = math.sin(theta)
+    newx = coordx*c + coordy*s
+    newy = coordy*c - coordx*s
+    newbound = (newx.min(), newy.min(), newx.max(), newy.max())
+
+    # use rotated bounding box to find position of start text posn
+    if alignhorz < 0:
+        xr = ( x, x+(newbound[2]-newbound[0]) )
+        x += int(newx[0] - newbound[0])
+    elif alignhorz > 0:
+        xr = ( x-(newbound[2]-newbound[0]), x )
+        x += int(newx[0] - newbound[2])
+    else:
+        xr = ( x+newbound[0], x+newbound[2] )
+        x += int(newx[0])
+
+    if alignvert < 0:
+        yr = ( y + (newbound[1]-newbound[3]), y ) 
+        y += int(newy[0] - newbound[3])
+    elif alignvert > 0:
+        yr = ( y, y + (newbound[3]-newbound[1]) )
+        y += int(newy[0] - newbound[1])
+    else:
+        yr = ( y+newbound[1], y+newbound[3] )
+        y += int(newy[0])
+
     # if the text is rotated, change the coordinate frame
     if angle != 0:
         painter.save()
         painter.translate(x, y)
         painter.rotate(angle)
-        origcoord = (x, y)
-        x = 0
-        y = 0
-        
-    painter.setFont(font)
-
-    # centred or top alignment
-    if alignvert >= 0:
-        # why can't I use ascent() here??
-        h = painter.fontMetrics().boundingRect('0').height()
-        if alignvert == 0:
-            y += h/2  # centred
-        else:
-            y += h    # top
-
-    # centred or right alignment
-    if alignhorz >= 0:
-        # measure the width of the output first
-        pb.x = 0
-        pb.y = 0
-        pb.renderpart(painter, 0, font, render=0)
-        totalwidth = pb.x
-
-        if alignhorz == 0:
-            x -= totalwidth / 2 # centred
-        else:
-            x -= totalwidth     # right
+        x = y = 0
 
     # actually paint the string
     pb.x = x
     pb.y = y
     pb.reset_bounds()
+    painter.setFont(font)
     pb.renderpart(painter, 0, font, render=1)
-    totalwidth = pb.x - x
-
-    retbound = pb.get_bounds()
 
     # restore coordinate frame if text was rotated
     if angle != 0:
         painter.restore()
 
-        # rotate bounds in opposite direction to get real bounds...
-        # hope this stuff is correct
-        theta = -angle * (math.pi / 180.)
-        c = math.cos(theta)
-        s = math.sin(theta)
-
-        # rotate coordinates
-        b = ( retbound[0]*c + retbound[1]*s,
-              retbound[1]*c - retbound[0]*s,
-              retbound[2]*c + retbound[3]*s,
-              retbound[3]*c - retbound[2]*s )
-
-        # find bounding box of rotated rectangle
-        # we have to add back on the original coordinates
-        retbound = [ int( math.floor( min(b[0], b[2]) ) + origcoord[0] ),
-                     int( math.floor( min(b[1], b[3]) ) + origcoord[1] ),
-                     int( math.ceil( max(b[0], b[2]) ) + origcoord[0] ),
-                     int( math.ceil( max(b[1], b[3]) ) + origcoord[1] ) ]
+    # work out bounds
+    retbound = (xr[0], yr[0], xr[1], yr[1])
         
     # we might need this later
     return retbound
