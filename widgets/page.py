@@ -25,6 +25,7 @@ import qt
 import widget
 import root
 import widgetfactory
+import setting
 
 class Page(widget.Widget):
     """A class for representing a page of plotting."""

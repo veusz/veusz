@@ -72,7 +72,7 @@ class CommandInterface(qt.QObject):
     def Remove(self, name):
         """Remove a graph from the dataset."""
         w = self._resolve(name)
-        w.getParent().removeChild( w.getName() )
+        w.getParent().removeChild( w.name )
         self.document.setModified()
 
     def _resolve(self, where):
@@ -97,7 +97,7 @@ class CommandInterface(qt.QObject):
                 # relative to parent object
                 p = obj.getParent()
                 if p == None:
-                    raise utils.GraphError, "Base graph has no parent"
+                    raise ValueError, "Base graph has no parent"
                 obj = p
             elif p == '.' or len(p) == 0:
                 # relative to here
@@ -106,7 +106,7 @@ class CommandInterface(qt.QObject):
                 # child specified
                 obj = obj.getChild( p )
                 if obj == None:
-                    raise utils.GraphError, "Child '%s' does not exist" % p
+                    raise ValueError, "Child '%s' does not exist" % p
 
         # return widget
         return obj
@@ -141,11 +141,7 @@ class CommandInterface(qt.QObject):
 
     def Get(self, var):
         """Get the value of a preference."""
-        return self.currentwidget.getPrefLookup(var)
-
-    def Resize(self, width_inch, height_inch):
-        """Set the output size in inches."""
-        self.document.setSize( width_inch, height_inch )
+        return self.currentwidget.prefLookup(var).get()
 
     def Save(self, filename):
         """Save the state to a file."""
@@ -155,10 +151,12 @@ class CommandInterface(qt.QObject):
 
     def Set(self, var, val):
         """Set the value of a preference."""
-        self.currentwidget.setPrefLookup(var, val)
+        pref = self.currentwidget.prefLookup(var)
+        pref.set(val)
+
         if self.verbose:
-            print "Set preference '%s' to '%s'" % \
-                  ( var, str(self.Get(var)) )
+            print ( "Set preference '%s' to %s" %
+                    (var, repr(val)) )
 
         self.document.setModified()
 

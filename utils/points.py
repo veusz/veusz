@@ -159,27 +159,23 @@ def _plot_arrow_down(painter, xpos, ypos, size):
     painter.drawLine(xpos, ypos, xpos-size, ypos-size)
     painter.drawLine(xpos, ypos, xpos+size, ypos-size)
 
-# list of markers and the functions to plot them
-MarkerCodes = {
-    'none': _plot_none,
-    'X': _plot_X,
-    '+': _plot_plus,
-    '*': _plot_star,
-    'O': _plot_circle,
-    'Odot': _plot_circle_dot,
-    'box': _plot_box,
-    'boxdot': _plot_box_dot,
-    'bullseye': _plot_bullseye,
-    'triangle': _plot_triangle,
-    'triangledot': _plot_triangle_dot,
-    '.': _plot_point,
-    '-': _plot_line_horz,
-    '|': _plot_line_vert,
-    'arrowleft': _plot_arrow_left,
-    'arrowright': _plot_arrow_right,
-    'arrowup': _plot_arrow_up,
-    'arrowdown': _plot_arrow_down
-}
+MarkerCodes = ['none', 'cross', 'plus', 'star', 'circle',
+               'circledot', 'square', 'squaredot',
+               'bullseye', 'triangle', 'triangledot',
+               'point', 'horzbar', 'vertbar',
+               'arrowleft', 'arrowright', 'arrowup',
+               'arrowdown']
+
+_MarkerFunctions = [_plot_none, _plot_X, _plot_plus, _plot_star, _plot_circle,
+                    _plot_circle_dot, _plot_box, _plot_box_dot,
+                    _plot_bullseye, _plot_triangle, _plot_triangle_dot,
+                    _plot_point, _plot_line_horz, _plot_line_vert,
+                    _plot_arrow_left, _plot_arrow_right, _plot_arrow_up,
+                    _plot_arrow_down]
+
+_MarkerLookup = {}
+for code, fn in zip(MarkerCodes, _MarkerFunctions):
+    _MarkerLookup[code] = fn
 
 # list of markers to be automatically iterated through on new data
 AutoMarkers = [ 'X', '+', '*', 'O', 'Odot',
@@ -223,12 +219,12 @@ def nextAutos():
 def plotMarker(painter, xpos, ypos, markercode, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
     """
-    MarkerCodes[markercode](painter, xpos, ypos, markersize)
+    _MarkerLookup[markercode](painter, xpos, ypos, markersize)
 
 def plotMarkers(painter, xpos, ypos, markername, markersize):
     """Funtion to plot an array of markers on painter
     """
     noitems = len(xpos)
-    fn = MarkerCodes[markername]
+    fn = _MarkerLookup[markername]
     for i in xrange(noitems):
         fn(painter, xpos[i], ypos[i], markersize)

@@ -83,7 +83,7 @@ class Dataset:
 
     def empty(self):
         '''Is the data defined?'''
-        return self.data != None and len(self.data) != 0
+        return self.data == None or len(self.data) == 0
 
     # TODO implement mathematical operations on this type
 
@@ -164,7 +164,8 @@ class Document( qt.QObject ):
     
     def getSize(self):
         """Get the size of the main plot widget."""
-        return (self.basewidget.width, self.basewidget.height)
+        s = self.basewidget.settings
+        return (s.width, s.height)
 
     def printTo(self, printer, pages, scaling = 1.):
         """Print onto printing device."""

@@ -22,12 +22,13 @@
 # $Id$
 
 import qt
-import numarray
+import numarray as N
 
 import widget
 import widgetfactory
 import axis
 import graph
+import setting
 
 import utils
 
@@ -43,58 +44,32 @@ class GenericPlotter(widget.Widget):
     typename='genericplotter'
     allowedparenttypes=[graph.Graph]
 
-    def __init__(self, parent, name=None, axis1=None, axis2=None):
+    def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
 
-        self.axes = [None]*2
-        self.setAxes(axis1, axis2)
-
-    def _autoGetAxis(self, dirn):
-        """Automatically get the first axis of the given direction from the parent."""
-        # iterate over siblings
-        for c in self.parent.getChildren():
-            try:
-                if c._getAxisDirection() == dirn:
-                    return c.getName()
-            except AttributeError:
-                pass
-
-        # controversial??
-        # get here if there's no axis..., so we automatically make one!
-        # FIXME: we don't check whether there's an exisiting child called x
-        # or y
-        
-        if dirn == 0:
-            n = 'x'
-        else:
-            n = 'y'
-        a = axis.Axis(self.parent, name=n)
-        a.direction = dirn
-        return n
-
-    def setAxes(self, axis1='notset', axis2='notset'):
-        """Set axes. If specified as None, the values aren't changed."""
-
-        # automatically look up an appropriate axis in the parent
-        if axis1 == None:
-            axis1 = self._autoGetAxis(0)
-        if axis2 == None:
-            axis2 = self._autoGetAxis(1)
-
-        # If the axis isn't none, set it
-        if axis1 != 'notset':
-            self.axes[0] = axis1
-        if axis2 != 'notset':
-            self.axes[1] = axis2
-
-    def getAxisVar(self, axisname):
-        """Get the actual axis variable corresponding to the axisname."""
-        return self.parent.getChild( axisname )
+        s = self.settings
+        s.add( setting.Str('xAxis', 'x',
+                           descr = 'Name of X-axis to use') )
+        s.add( setting.Str('yAxis', 'y',
+                           descr = 'Name of Y-axis to use') )
 
     def getAxes(self):
-        """Get the axis names as a tuple."""
-        return self.axes
+        """Get the axes widgets to plot against."""
+
+        xaxis = None
+        yaxis = None
+
+        x = self.settings.xAxis
+        y = self.settings.yAxis
+        
+        for i in self.parent.getChildren():
+            if i.getName() == x:
+                xaxis = i
+            if i.getName() == y:
+                yaxis = i
+
+        return (xaxis, yaxis)
 
 ########################################################################
         
@@ -105,94 +80,34 @@ class FunctionPlotter(GenericPlotter):
     allowusercreation=True
     description='Plot a function'
     
-    def __init__(self, parent, function=None, name=None, axis1=None,
-                 axis2=None):
+    def __init__(self, parent, name=None):
         """Initialise plotter with axes."""
 
-        GenericPlotter.__init__(self, parent,
-                                axis1=axis1, axis2=axis2, name=name)
+        GenericPlotter.__init__(self, parent, name=name)
 
         # define environment to evaluate functions
         self.fnenviron = globals()
         exec 'from numarray import *' in self.fnenviron
 
-        # function to be plotted
-        self.addPref('function', 'string', 'x')
-        # is this a fn of x rather than y?
-        self.addPref('xfunc', 'bool', True)
-        # how often to evaluate the function
-        self.addPref('iter', 'int', 1)
-        self.readPrefs()
+        s = self.settings
+        s.add( setting.Int('steps', 50,
+                           descr = 'Number of steps to evaluate the function'
+                           ' over'), 0 )
+        s.add( setting.Choice('variable', ['x', 'y'], 'x',
+                              descr='Variable the function is a function of'),
+               0 )
+        s.add( setting.Str('function', 'x',
+                           descr='Function expression'), 0 )
 
-        if function != None:
-            self.function = function
+        s.add( setting.Line('Line',
+                            descr = 'Function line settings') )
+
+        s.readDefaults()
         
-        self.Line = utils.PreferencesPlotLine('FunctionPlotterLine')
-        self.Fill1 = utils.PreferencesPlotFill('FunctionFill1')
-        self.Fill2 = utils.PreferencesPlotFill('FunctionFill2')
-
-        self.addSubPref('PlotLine', self.Line)
-        self.addSubPref('Fill1', self.Fill1)
-        self.addSubPref('Fill2', self.Fill2)
-
-        utils.nextAutos()
-
     def getUserDescription(self):
         """User-friendly description."""
-        if self.xfunc:
-            t = 'y = '
-        else:
-            t = 'x = '
-
-        return t+self.function
-
-    def _fillYFn(self, painter, xpts, ypts, bounds, leftfill):
-        """ Take the xpts and ypts, and fill above or below the line."""
-        if len(xpts) == 0:
-            return
-
-        x1, y1, x2, y2 = bounds
-
-        if leftfill:
-            pts = [x1, y1]
-        else:
-            pts = [x2, y1]
-
-        for x,y in zip(xpts, ypts):
-            pts.append( _trim(x, x1, x2) )
-            pts.append(y)
-
-        if leftfill:
-            pts.append(x2)
-        else:
-            pts.append(x1)
-        pts.append(y2)
-
-        painter.drawPolygon( qt.QPointArray(pts) )
-
-    def _fillXFn(self, painter, xpts, ypts, bounds, belowfill):
-        """ Take the xpts and ypts, and fill to left or right of the line."""
-        if len(ypts) == 0:
-            return
-
-        x1, y1, x2, y2 = bounds
-
-        if belowfill:
-            pts = [x1, y2]
-        else:
-            pts = [x1, y1]
-
-        for x,y in zip(xpts, ypts):
-            pts.append(x)
-            pts.append( _trim(y, y1, y2) )
-
-        pts.append( x2 )
-        if belowfill:
-            pts.append( y2 )
-        else:
-            pts.append( y1 )
-
-        painter.drawPolygon( qt.QPointArray(pts) )
+        return "%s = %s" % ( self.settings.variable,
+                             self.settings.function )
 
     def _plotLine(self, painter, xpts, ypts, bounds):
         """ Plot the points in xpts, ypts."""
@@ -215,47 +130,136 @@ class FunctionPlotter(GenericPlotter):
             painter.drawPolyline( qt.QPointArray(pts) )
 
     def draw(self, parentposn, painter):
-        """Plot the function."""
+        """Draw the function."""
 
         posn = GenericPlotter.draw(self, parentposn, painter)
-
-        # the algorithm is to work out the fn for each pixel on the plot
-        # need to convert pixels -> graph coord -> calc fn -> pixels
-
         x1, y1, x2, y2 = posn
 
-        ax1 = self.getAxisVar( self.axes[0] )
-        ax2 = self.getAxisVar( self.axes[1] )
+        # get axes widgets
+        axes = self.getAxes()
 
-        if self.xfunc:
-            xplotter = numarray.arange(x1, x2+1, self.iter)
-            self.fnenviron['x'] = ax1.plotterToGraphCoords(posn, xplotter)
-            # HACK for constants
-            y = eval( self.function + " + (0*x)", self.fnenviron )
-            yplotter = ax2.graphToPlotterCoords(posn, y)
+        # return if there's no proper axes
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' ):
+            return
+
+        s = self.settings
+        if s.variable == 'x':
+            # x function
+            delta = (x2 - x1) / s.steps
+            pxpts = N.arange(x1, x2+delta, delta).astype(N.Int32)
+            self.fnenviron['x'] = axes[0].plotterToGraphCoords(posn, pxpts)
+            y = eval( s.function + ' + 0*x', self.fnenviron )
+            pypts = axes[1].graphToPlotterCoords(posn, y)
+
         else:
-            yplotter = numarray.arange(y1, y2+1, self.iter)
-            self.fnenviron['y'] = ax2.plotterToGraphCoords(posn, yplotter)
-            # HACK for constants
-            x = eval( self.function + " + (0*y)", self.fnenviron )
-            xplotter = ax1.graphToPlotterCoords(posn, x)
+            # y function
+            delta = (y2 - y1) / s.steps
+            pypts = N.arange(y1, y2+delta, delta).astype(N.Int32)
+            self.fnenviron['y'] = axes[1].plotterToGraphCoords(posn, pypts)
+            x = eval( s.function + ' + 0*y', self.fnenviron )
+            pxpts = axes[0].graphToPlotterCoords(posn, x)
 
-        # here we go through the generated points, and plot those that
-        # are in the plot (we can clip fairly easily).
-        # each time there is a section we can plot, we plot it
-        
         painter.save()
-        painter.setPen( qt.QPen( qt.QColor(), 0, qt.Qt.NoPen ) )
 
-        painter.setBrush( qt.QBrush(qt.QColor("darkcyan"),
-                                    qt.Qt.Dense6Pattern) )
-        self._fillXFn(painter, xplotter, yplotter, posn, 1)
-        
+        # draw the function line
         painter.setBrush( qt.QBrush() )
-        painter.setPen( self.Line.makeQPen(painter) )
-        self._plotLine(painter, xplotter, yplotter, posn)
+        painter.setPen( s.Line.makeQPen(painter) )
+        self._plotLine(painter, pxpts, pypts, posn)
 
         painter.restore()
+
+##     def _fillYFn(self, painter, xpts, ypts, bounds, leftfill):
+##         """ Take the xpts and ypts, and fill above or below the line."""
+##         if len(xpts) == 0:
+##             return
+
+##         x1, y1, x2, y2 = bounds
+
+##         if leftfill:
+##             pts = [x1, y1]
+##         else:
+##             pts = [x2, y1]
+
+##         for x,y in zip(xpts, ypts):
+##             pts.append( _trim(x, x1, x2) )
+##             pts.append(y)
+
+##         if leftfill:
+##             pts.append(x2)
+##         else:
+##             pts.append(x1)
+##         pts.append(y2)
+
+##         painter.drawPolygon( qt.QPointArray(pts) )
+
+##     def _fillXFn(self, painter, xpts, ypts, bounds, belowfill):
+##         """ Take the xpts and ypts, and fill to left or right of the line."""
+##         if len(ypts) == 0:
+##             return
+
+##         x1, y1, x2, y2 = bounds
+
+##         if belowfill:
+##             pts = [x1, y2]
+##         else:
+##             pts = [x1, y1]
+
+##         for x,y in zip(xpts, ypts):
+##             pts.append(x)
+##             pts.append( _trim(y, y1, y2) )
+
+##         pts.append( x2 )
+##         if belowfill:
+##             pts.append( y2 )
+##         else:
+##             pts.append( y1 )
+
+##         painter.drawPolygon( qt.QPointArray(pts) )
+
+##     def draw(self, parentposn, painter):
+##         """Plot the function."""
+
+##         posn = GenericPlotter.draw(self, parentposn, painter)
+
+##         # the algorithm is to work out the fn for each pixel on the plot
+##         # need to convert pixels -> graph coord -> calc fn -> pixels
+
+##         x1, y1, x2, y2 = posn
+
+##         ax1 = self.getAxisVar( self.axes[0] )
+##         ax2 = self.getAxisVar( self.axes[1] )
+
+##         if self.xfunc:
+##             xplotter = numarray.arange(x1, x2+1, self.iter)
+##             self.fnenviron['x'] = ax1.plotterToGraphCoords(posn, xplotter)
+##             # HACK for constants
+##             y = eval( self.function + " + (0*x)", self.fnenviron )
+##             yplotter = ax2.graphToPlotterCoords(posn, y)
+##         else:
+##             yplotter = numarray.arange(y1, y2+1, self.iter)
+##             self.fnenviron['y'] = ax2.plotterToGraphCoords(posn, yplotter)
+##             # HACK for constants
+##             x = eval( self.function + " + (0*y)", self.fnenviron )
+##             xplotter = ax1.graphToPlotterCoords(posn, x)
+
+##         # here we go through the generated points, and plot those that
+##         # are in the plot (we can clip fairly easily).
+##         # each time there is a section we can plot, we plot it
+        
+##         painter.save()
+##         painter.setPen( qt.QPen( qt.QColor(), 0, qt.Qt.NoPen ) )
+
+##         painter.setBrush( qt.QBrush(qt.QColor("darkcyan"),
+##                                     qt.Qt.Dense6Pattern) )
+##         self._fillXFn(painter, xplotter, yplotter, posn, 1)
+        
+##         painter.setBrush( qt.QBrush() )
+##         painter.setPen( self.Line.makeQPen(painter) )
+##         self._plotLine(painter, xplotter, yplotter, posn)
+
+##         painter.restore()
 
 # allow the factory to instantiate an function plotter
 widgetfactory.thefactory.register( FunctionPlotter )
@@ -269,92 +273,72 @@ class PointPlotter(GenericPlotter):
     allowusercreation=True
     description='Plot points with lines and errorbars'
     
-    def __init__(self, parent, xdata=None, ydata=None, name=None,
-                 axis1=None, axis2=None):
+    def __init__(self, parent, name=None):
         """Initialise XY plotter plotting (xdata, ydata).
 
-        xdata and ydata are strings specifying the data in the document
-        axis1 and axis2 are strings specifying the axis in the parent"""
+        xdata and ydata are strings specifying the data in the document"""
         
-        GenericPlotter.__init__(self, parent, axis1=axis1, axis2=axis2,
-                                name=name)
-        # FIXME: Add prefs here
-        self.addPref('marker', 'string', 'O')
-        self.addPref('markerSize', 'string', '5pt' )
-        self.addPref('xData', 'string', 'x')
-        self.addPref('yData', 'string', 'y')
-        self.readPrefs()
+        GenericPlotter.__init__(self, parent, name=name)
+        s = self.settings
+        s.add( setting.Distance('markerSize', '3pt'), 0 )
+        s.add( setting.Choice('marker', utils.MarkerCodes, 'circle'), 0 )
+        s.add( setting.Str('yData', 'y',
+                           descr = 'Variable containing y data'), 0 )
+        s.add( setting.Str('xData', 'x',
+                           descr = 'Variable containing x data'), 0 )
+        s.readDefaults()
 
-        # if we're passed names of datasets
-        if xdata != None:
-            self.xData = xdata
-        if ydata != None:
-            self.yData = ydata
-
-        self.PlotLine = utils.PreferencesPlotLine( 'XYPlotLine' )
-        self.MarkerLine = utils.PreferencesPlotLine( 'XYMarkerLine' )
-        self.ErrorBarLine = utils.PreferencesPlotLine( 'XYErrorBarLine' )
-        self.MarkerFill = utils.PreferencesPlotFill( 'XYMarkerFill' )
-
-        self.addSubPref('PlotLine', self.PlotLine)
-        self.addSubPref('MarkerLine', self.MarkerLine)
-        self.addSubPref('ErrorBarLine', self.ErrorBarLine)
-        self.addSubPref('MarkerFill', self.MarkerFill)
-
-        utils.nextAutos()
+        s.add( setting.Line('PlotLine',
+                            descr = 'Plot line settings') )
+        s.add( setting.Line('MarkerLine',
+                            descr = 'Line around the marker settings') )
+        s.add( setting.Brush('MarkerFill',
+                             descr = 'Marker fill settings') )
+        s.add( setting.Line('ErrorBarLine',
+                            descr = 'Error bar line settings') )
 
     def getUserDescription(self):
         """User-friendly description."""
 
-        return "x='%s', y='%s', marker='%s'" % (self.xData, self.yData,
-                                                self.marker)
+        s = self.settings
+        return "x='%s', y='%s', marker='%s'" % (s.xData, s.yData,
+                                                s.marker)
 
-    def setData(self, xdata, ydata):
-        """Set the variables to be plotted.
-        
-        xdata and ydata are strings specifying the data in the document"""
-
-        self.xData = xdata
-        self.yData = ydata
-
-    def _plotErrors(self, posn, painter, xplotter, yplotter):
+    def _plotErrors(self, posn, painter, xplotter, yplotter,
+                    axes):
         """Plot error bars (horizontal and vertical)."""
 
         # list of output lines
         pts = []
 
-        # get the axes
-        ax1 = self.getAxisVar( self.axes[0] )
-        ax2 = self.getAxisVar( self.axes[1] )
-
         # get the data
-        xdata = self.getDocument().getData(self.xData)
+        xdata = self.getDocument().getData(self.settings.xData)
 
         # draw horizontal error bars
         if xdata.hasErrors():
             xmin, xmax = xdata.getPointRanges()
                     
             # convert xmin and xmax to graph coordinates
-            xmin = ax1.graphToPlotterCoords(posn, xmin)
-            xmax = ax1.graphToPlotterCoords(posn, xmax)
+            xmin = axes[0].graphToPlotterCoords(posn, xmin)
+            xmax = axes[0].graphToPlotterCoords(posn, xmax)
 
             # draw lines between each of the points
-            for i in xrange( len(xmin) ):
-                pts += [ xmin[i], yplotter[i], xmax[i], yplotter[i] ]
+            for i in zip(xmin, yplotter, xmax, yplotter):
+                pts += i
 
         # draw vertical error bars
         # get data
-        ydata = self.getDocument().getData(self.yData)
+        ydata = self.getDocument().getData(self.settings.yData)
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
 
             # convert ymin and ymax to graph coordinates
-            ymin = ax2.graphToPlotterCoords(posn, ymin)
-            ymax = ax2.graphToPlotterCoords(posn, ymax)
+            ymin = axes[1].graphToPlotterCoords(posn, ymin)
+            ymax = axes[1].graphToPlotterCoords(posn, ymax)
 
             # draw lines between each of the points
-            for i in xrange( len(ymin) ):
-                pts += [ xplotter[i], ymin[i], xplotter[i], ymax[i] ]
+            for i in zip(xplotter, ymin, xplotter, ymax):
+                pts += i
 
         # finally draw the lines
         if len(pts) != 0:
@@ -369,12 +353,12 @@ class PointPlotter(GenericPlotter):
 
     def autoAxis(self, name):
         """Automatically determine the ranges of variable on the axes."""
-        
-        axes = self.getAxes()
-        if name == axes[0]:
-            return self._autoAxis( self.xData )
-        elif name == axes[1]:
-            return self._autoAxis( self.yData )
+
+        s = self.settings
+        if name == s.xAxis:
+            return self._autoAxis( s.xData )
+        elif name == s.yAxis:
+            return self._autoAxis( s.yData )
         else:
             return None
 
@@ -396,47 +380,54 @@ class PointPlotter(GenericPlotter):
 
         # skip if there's no data
         d = self.getDocument()
-        if not d.hasData(self.xData) or not d.hasData(self.yData):
+        s = self.settings
+        if not d.hasData(s.xData) or not d.hasData(s.yData):
             return
         
-        xvals = d.getData(self.xData)
-        yvals = d.getData(self.yData)
+        # get axes widgets
+        axes = self.getAxes()
+
+        # return if there's no proper axes
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' ):
+            return
+
+        xvals = d.getData(s.xData)
+        yvals = d.getData(s.yData)
 
         # no points to plot
-        if not xvals.empty() or not yvals.empty():
+        if xvals.empty() or yvals.empty():
             return
 
         # clip data within bounds of plotter
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
-        # get the axes
-        ax1 = self.getAxisVar( self.axes[0] )
-        ax2 = self.getAxisVar( self.axes[1] )
-
         # calc plotter coords of x and y points
-        xplotter = ax1.graphToPlotterCoords(posn, xvals.data)
-        yplotter = ax2.graphToPlotterCoords(posn, yvals.data)
+        xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
+        yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
 
         # plot data line
-        if self.PlotLine.notHidden():
-            painter.setPen( self.PlotLine.makeQPen(painter) )
+        if not s.PlotLine.hide:
+            painter.setPen( s.PlotLine.makeQPen(painter) )
             self._drawPlotLine( painter, xplotter, yplotter )
 
         # plot errors bars
-        if self.ErrorBarLine.notHidden():
-            painter.setPen( self.ErrorBarLine.makeQPen(painter) )
-            self._plotErrors(posn, painter, xplotter, yplotter)
+        if not s.ErrorBarLine.hide:
+            painter.setPen( s.ErrorBarLine.makeQPen(painter) )
+            self._plotErrors(posn, painter, xplotter, yplotter,
+                             axes)
 
         # plot the points (we do this last so they are on top)
-        if self.MarkerLine.notHidden():
-            size = int( utils.cnvtDist(self.markerSize, painter) )
+        if not s.MarkerLine.hide:
+            size = int( utils.cnvtDist(s.markerSize, painter) )
 
-            if self.MarkerFill.notHidden():
-                painter.setBrush( self.MarkerFill.makeQBrush() )
+            if not s.MarkerFill.hide:
+                painter.setBrush( s.MarkerFill.makeQBrush() )
                 
-            painter.setPen( self.MarkerLine.makeQPen(painter) )
-            utils.plotMarkers(painter, xplotter, yplotter, self.marker,
+            painter.setPen( s.MarkerLine.makeQPen(painter) )
+            utils.plotMarkers(painter, xplotter, yplotter, s.marker,
                               size)
 
         painter.restore()

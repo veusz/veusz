@@ -43,7 +43,22 @@ class Setting:
         """
         self.name = name
         self.descr = descr
+        self.default = val
+        self.onmodified = []
         self.set(val)
+
+    def setOnModified(self, fn):
+        """Set the function to be called on modification (passing True)."""
+        self.onmodified.append(fn)
+
+    def newDefault(self, val):
+        """Update the default and the value."""
+        self.default = val
+        self.set(val)
+
+    def isDefault(self):
+        """Is the current value a default?"""
+        return self.get() == self.default
 
     def getName(self):
         """Get the name of the setting."""
@@ -60,6 +75,8 @@ class Setting:
     def set(self, val):
         """Save the stored setting."""
         self.val = self.convertTo( val )
+        for i in self.onmodified:
+            i(True)
 
     def convertTo(self, val):
         """Convert for storage."""
@@ -273,6 +290,7 @@ class Choice(Setting):
     def __init__(self, name, vallist, val, images = {}, descr = ''):
         """Setting val must be in vallist."""
         
+        assert type(vallist) in (list, tuple)
         self.vallist = vallist
         self.images = images
         Setting.__init__(self, name, val, descr = descr)

@@ -25,6 +25,7 @@ import widgetfactory
 import axis
 import page
 import containers
+import setting
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
@@ -38,16 +39,25 @@ class Graph(widget.Widget):
         """Initialise object and create axes."""
 
         widget.Widget.__init__(self, parent, name=name)
-        self.addPref( 'leftMargin', 'string', '2cm' )
-        self.addPref( 'rightMargin', 'string', '2cm' )
-        self.addPref( 'topMargin', 'string', '2cm' )
-        self.addPref( 'bottomMargin', 'string', '2cm' )
-        self.readPrefs()
-
+        s = self.settings
+        s.add( setting.Distance( 'leftMargin', '10%', descr=
+                                 'Distance from left of graph to '
+                                 'edge of page') )
+        s.add( setting.Distance( 'rightMargin', '5%', descr=
+                                 'Distance from right of graph to '
+                                 'edge of page') )
+        s.add( setting.Distance( 'topMargin', '5%', descr=
+                                 'Distance from top of graph to '
+                                 'edge of page') )
+        s.add( setting.Distance( 'bottomMargin', '10%', descr=
+                                 'Distance from bottom of graph'
+                                 'to edge of page') )
+        s.readDefaults()
+        
         # make axes
         ax = axis.Axis(self, name='x')
         ay = axis.Axis(self, name='y')
-        ay.direction = 1
+        ay.settings.direction = 'vertical'
 
         # these widgets shouldn't be remade
         self.autoadd += ['x', 'y']
@@ -55,8 +65,9 @@ class Graph(widget.Widget):
     def draw(self, parentposn, painter):
         '''Update the margins before drawing.'''
 
-        self.margins = [self.leftMargin, self.topMargin,
-                        self.rightMargin, self.bottomMargin]
+        s = self.settings
+        self.margins = [s.leftMargin, s.topMargin,
+                        s.rightMargin, s.bottomMargin]
 
         widget.Widget.draw(self, parentposn, painter)
 

@@ -30,6 +30,7 @@ Classes include
 import widget
 import widgetfactory
 import page
+import setting
 
 class _gridengine:
     """Internal class to build up grid of widgets."""
@@ -150,7 +151,7 @@ class Grid(widget.Widget):
     description='Arrange graphs in a grid'
     allowedparenttypes=[page.Page]
 
-    def __init__(self, parent, rows=None, columns=None, name=None):
+    def __init__(self, parent, name=None):
         """Initialise the container.
 
         Specify rows to grow horizontal, but fill vertically
@@ -161,14 +162,13 @@ class Grid(widget.Widget):
         """
 
         widget.Widget.__init__(self, parent, name=name)
-        self.addPref( 'rows', 'int', 2 )
-        self.addPref( 'columns', 'int', 2 )
-        self.readPrefs()
 
-        if rows != None:
-            self.rows = rows
-        if columns != None:
-            self.columns = columns
+        s = self.settings
+        s.add(setting.Int('rows', 2,
+                          descr = 'Number of rows in grid') )
+        s.add(setting.Int('columns', 2,
+                          descr = 'Number of columns in grid') )
+        s.readDefaults()
 
         self.olddimensions = (-1, -1)
 
@@ -181,14 +181,14 @@ class Grid(widget.Widget):
         """(internal) recalculate the positions of the children."""
 
         # class to handle management
-        ge = _gridengine(self.columns, self.rows)
+        ge = _gridengine(self.settings.columns, self.settings.rows)
 
         # iterate over children, and collect dimensions of children
         # (a tuple width nocols x norows)
 
         childrenposns = []
         for c in self.children:
-            name = c.getName()
+            name = c.name
 
             if name not in self.child_dimensions:
                 self.child_dimensions[name] = (1, 1)
@@ -213,8 +213,9 @@ class Grid(widget.Widget):
     def draw(self, posn, painter):
         """Draws the widget's children."""
 
+        # FIXME: this is very stupid, but works
         # if the contents have been modified, recalculate the positions
-        dimensions = (self.columns, self.rows)
+        dimensions = (self.settings.columns, self.settings.rows)
         if self.children != self._old_children or \
            self.olddimensions != dimensions:
             

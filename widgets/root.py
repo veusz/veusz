@@ -25,6 +25,7 @@ import qt
 
 import widget
 import widgetfactory
+import setting
 
 class Root(widget.Widget):
     """Root widget class for plotting the document."""
@@ -37,9 +38,12 @@ class Root(widget.Widget):
         """Initialise object."""
 
         widget.Widget.__init__(self, parent, name=name)
-        self.addPref( 'width', 'string', '20cm' )
-        self.addPref( 'height', 'string', '20cm' )
-        self.readPrefs()
+        s = self.settings
+        s.add( setting.Distance('width', '20cm',
+                                descr='Width of the pages') )
+        s.add( setting.Distance('height', '20cm',
+                                descr='Height of the pages') )
+        s.readDefaults()
 
     def draw(self, parentposn, painter):
         """Draw the plotter. Clip graph inside bounds."""

@@ -79,7 +79,6 @@ class CommandInterpreter:
                       'SetData': i.SetData,
                       'Print': i.Print,
                       'Export': i.Export,
-                      'Resize': i.Resize,
                       'Save': i.Save,
                       'ImportString': i.ImportString,
                       'ImportFile': i.ImportFile,
@@ -227,8 +226,9 @@ class CommandInterpreter:
     def GPL(self):
         """Write the GPL to the console window."""
         # FIXME: This should open up a separate window
-        # FIXME: We need to incode the path to the file somewhere
-        file = open('COPYING', 'r')
+        dirname = os.path.dirname(__file__)
+        file = open('%s/../COPYING' % dirname, 'r')
+
         for line in file:
             sys.stdout.write(line)
 

@@ -27,19 +27,24 @@ import qt
 import widgets.widgetfactory as widgetfactory
 import widgets
 
+import setting
+
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
 
-    def __init__(self, widget, *args):
-        qt.QListViewItem.__init__(self, *args)
+    def __init__(self, widget, qtparent):
+        """Widget is the widget to show the settings for."""
+        
+        qt.QListViewItem.__init__(self, qtparent)
 
-        self.widget = widget
         self.index = '0000'
+        self.widget = widget
+        self.settings = widget.settings
 
         # add subitems for sub-prefs of widget
         no = 0
-        for name, pref in widget.getSubPrefs().items():
-            _PrefItem(pref, name, no, self, self)
+        for s in self.settings.getSettingsList():
+            _PrefItem(s, no, self)
             no += 1
 
     def setIndex(self, index):
@@ -58,31 +63,21 @@ class _WidgetItem(qt.QListViewItem):
             return self.index
         return ""
 
-    def getWidget(self):
-        """Get the associated widget."""
-        return self.widget
-
 class _PrefItem(qt.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
-    def __init__(self, preftype, name, number, parent, *args):
-        qt.QListViewItem.__init__(self, *args)
+    def __init__(self, settings, number, parent):
+        """settings is the settings class to work for
+        parent is the parent ListViewItem (of type _WidgetItem)
+        """
 
-        self.preftype = preftype
+        qt.QListViewItem.__init__(self, parent)
+
+        self.settings = settings
         self.parent = parent
-        self.setText(0, name)
+        self.widget = None
+        self.setText(0, settings.name)
         self.setText(1, "setting")
         self.setText(3, '%04i' % number)
-
-    def getWidget(self):
-        """Returns None as we don't have a widget."""
-        return None
-
-    def getParent(self):
-        return self.parent
-
-    def getPreftype(self):
-        """Returns the preferences."""
-        return self.preftype
 
 class _ScrollView(qt.QScrollView):
     """A resizing scroll view."""
@@ -203,7 +198,7 @@ class TreeEditWindow(qt.QDockWindow):
         items = {}
         i = root.firstChild()
         while i != None:
-            w = i.getWidget()
+            w = i.widget
             if w != None:
                 items[w] = i
             i = i.nextSibling()
@@ -212,7 +207,7 @@ class TreeEditWindow(qt.QDockWindow):
         # assign indicies to each one
         index = 0
         newitem = False
-        for c in root.getWidget().getChildren():
+        for c in root.widget.getChildren():
             childdict[c] = True
             if c in items:
                 items[c].setIndex(index)
@@ -225,8 +220,7 @@ class TreeEditWindow(qt.QDockWindow):
 
         # delete items not in child list
         for i in items.itervalues():
-            w = i.getWidget()
-            if w not in childdict:
+            if i.widget not in childdict:
                 root.takeItem(i)
 
         # open the branch if we've added/changed the children
@@ -258,9 +252,9 @@ class TreeEditWindow(qt.QDockWindow):
 
     def enableCorrectButtons(self, item):
         """Make sure the create graph buttons are correctly enabled."""
-        selw = item.getWidget()
+        selw = item.widget
         if selw == None:
-            selw = item.getParent().getWidget()
+            selw = item.parent.widget
             assert selw != None
 
         # check whether each button can have this widget as parent
@@ -283,34 +277,29 @@ class TreeEditWindow(qt.QDockWindow):
             i.deleteLater()
         self.prefchilds = []
 
-        if item.getWidget() != None:
-            prefs = item.getWidget().getPrefs()
-        else:
-            prefs = item.getPreftype().getPrefs()
+        settings = item.settings
 
         # make new widgets for the preferences
-        for pname in prefs.getPrefNames():
-            l = qt.QLabel(pname, self.prefgrid)
+        for setn in settings.getSettingList():
+            l = qt.QLabel(setn.name, self.prefgrid)
             l.show()
             self.prefchilds.append(l)
+            
+            c = setn.makeControl(self.prefgrid)
+            c.show()
+            self.prefchilds.append(c)
 
-            type = prefs.getPrefType(pname)
-            val = prefs.getPref(pname)
-
-            cntrl = prefs.makePrefControl(pname, self.prefgrid)
-            cntrl.connect(cntrl, qt.PYSIGNAL('sigModified'),
-                          self.slotCntrlModifiesDoc)
-            cntrl.show()
-            self.prefchilds.append(cntrl)
+            self.connect(c, qt.PYSIGNAL('settingValueChanged'),
+                         self.slotCntrlModifiesDoc)
 
         # Change the page to the selected widget
-        w = item.getWidget()
+        w = item.widget
         if w == None:
-            w = item.parent.getWidget()
+            w = item.parent.widget
 
         # repeat until we're at the root widget or we hit a page
         while w != None and not isinstance(w, widgets.Page):
-            w = w.getParent()
+            w = w.parent
 
         if w != None:
             # we have a page
@@ -335,9 +324,9 @@ class TreeEditWindow(qt.QDockWindow):
         """Called when an add widget button is clicked."""
 
         # get the widget to act as the parent
-        parent = self.itemselected.getWidget()
+        parent = self.itemselected.widget
         if parent == None:
-            parent = self.itemselected.getParent()
+            parent = self.itemselected.parent.widget
             assert parent != None
 
         # make the new widget and update the document
