@@ -27,6 +27,7 @@ import time
 import numarray
 import random
 import string
+import itertools
 
 import qt
 
@@ -110,17 +111,15 @@ class Dataset:
             descriptor += ',-'
             datasets.append(self.nerr)
 
-        text = "ImportString('%s','''\n" % descriptor
+        file.write( "ImportString('%s','''\n" % descriptor )
 
         # write line line-by-line
-        for line in zip( *datasets ):
-            l = ''
-            for i in line:
-                l += '%e ' % i
-            text += l[:-1] + '\n'
+        format = '%e ' * len(datasets)
+        format = format[:-1] + '\n'
+        for line in itertools.izip( *datasets ):
+            file.write( format % line )
 
-        text += "''')\n"
-        file.write(text)
+        file.write( "''')\n" )
 
 class Document( qt.QObject ):
     """Document class for holding the graph data.
