@@ -150,7 +150,7 @@ class ImportDialog(qt.QDialog):
         except IOError:
             mb = qt.QMessageBox("Veusz",
                                 "Cannot find file '%s'" % filename,
-                                qt.QMessageBox.Error,
+                                qt.QMessageBox.Warning,
                                 qt.QMessageBox.Ok | qt.QMessageBox.Default,
                                 qt.QMessageBox.NoButton,
                                 qt.QMessageBox.NoButton)
