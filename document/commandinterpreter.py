@@ -69,24 +69,27 @@ class CommandInterpreter:
         i = self.interface
 
         # define commands for interface
-        self.cmds = { 'GPL': self.GPL,
-                      'SetVerbose': i.SetVerbose,
-                      'Add': i.Add,
-                      'Remove': i.Remove,
-                      'To': i.To,
-                      'List': i.List,
-                      'Get': i.Get,
-                      'Set': i.Set,
-                      'SetData': i.SetData,
-                      'GetData': i.GetData,
-                      'Print': i.Print,
-                      'Export': i.Export,
-                      'Save': i.Save,
-                      'ImportString': i.ImportString,
-                      'ImportFile': i.ImportFile,
-                      'Action': i.Action,
-                      'Load': self.Load
-                      }
+        self.cmds = { 
+            'Action': i.Action,
+            'Add': i.Add,
+            'Export': i.Export,
+            'Get': i.Get,
+            'GetChildren': i.GetChildren,
+            'GetData': i.GetData,
+            'GetDatasets': i.GetDatasets,
+            'GPL': self.GPL,
+            'ImportString': i.ImportString,
+            'ImportFile': i.ImportFile,
+            'List': i.List,
+            'Load': self.Load,
+            'Print': i.Print,
+            'Remove': i.Remove,
+            'Save': i.Save,
+            'Set': i.Set,
+            'SetData': i.SetData,
+            'SetVerbose': i.SetVerbose,
+            'To': i.To
+            }
 
         for name, val in self.cmds.items():
             self.globals[name] = val

@@ -115,14 +115,10 @@ class CommandInterface(qt.QObject):
         if self.verbose:
             print "Changed to graph '%s'" % self.currentwidget.path
 
-    def List(self, graph=None):
+    def List(self, where='.'):
         """List the contents of a graph."""
 
-        # get widget to list
-        widget = self.currentwidget
-        if graph != None:
-            widget = self._resolve(graph)
-
+        widget = self._resolve(where)
         children = widget.childnames
 
         if len(children) == 0:
@@ -137,9 +133,19 @@ class CommandInterface(qt.QObject):
         """Get the value of a preference."""
         return self.currentwidget.prefLookup(var).get()
 
+    def GetChildren(self, where='.'):
+        """Return a list of widgets which are children of the widget of the
+        path given."""
+        return list( self._resolve(where).childnames )
+
+    def GetDatasets(self):
+        """Return a list of names of datasets."""
+        ds = self.document.data.keys()
+        ds.sort()
+        return ds
+
     def Save(self, filename):
         """Save the state to a file."""
-
         f = open(filename, 'w')
         self.document.saveToFile(f)
 
@@ -197,7 +203,7 @@ class CommandInterface(qt.QObject):
         stream = simpleread.StringStream(string)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
-        sr.setInDocument(self.document)
+        return sr.setInDocument(self.document)
 
     def ImportFile(self, filename, descriptor):
         """Read data from file with filename using descriptor."""
@@ -206,7 +212,7 @@ class CommandInterface(qt.QObject):
         stream = simpleread.FileStream(f)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
-        sr.setInDocument(self.document)
+        return sr.setInDocument(self.document)
 
     def Action(self, action, widget='.'):
         """Performs action on current widget."""
