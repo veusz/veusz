@@ -119,6 +119,10 @@ class CommandInterpreter:
         # pythonise!
         input = self._pythonise(input)
 
+        # ignore if blank
+        if len(string.strip(input)) == 0:
+            return
+
         # preserve output streams
         temp_stdout = sys.stdout
         temp_stderr = sys.stderr

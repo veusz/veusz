@@ -45,6 +45,7 @@ Add 'xy' 'dist' 'vel'
 Set 'x/Label/label' 'Distance (cm)'
 Set 'y/Label/label' 'Velocity (cm s^{-1})'
 Set '1/MarkerFill/color' 'blue'
+Set '1/MarkerFill/hide' False
 
 -------------------------------------------------------------------------------
 $Id$

@@ -402,7 +402,7 @@ class PointPlotter(GenericPlotter):
 
         # clip data within bounds of plotter
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1+1, y2-y1+1) )
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
         xvals = self.getDocument().getData(self.xdata)
         yvals = self.getDocument().getData(self.ydata)
