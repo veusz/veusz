@@ -72,8 +72,8 @@ def _plot_bullseye(painter, xpos, ypos, size):
     size is radius
     """
 
-    painter.drawEllipse( xpos - size/2, ypos - size/2 , size, size )
-    painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
+    painter.drawEllipse( xpos - size, ypos - size, size*2+1, size*2+1 )
+    painter.drawEllipse( xpos - size/2, ypos - size/2, size+1, size+1 )
 
 def _plot_line_horz(painter, xpos, ypos, size):
     """ (internal) function to plot a horizontal line
