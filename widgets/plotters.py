@@ -594,7 +594,10 @@ class TextLabel(GenericPlotter):
                               descr="Horizontal alignment of label"), 4)
         s.add( setting.Choice('alignVert',
                               ['top', 'centre', 'bottom'], 'bottom',
-                              descr="Vertical alignment of label"), 5)
+                              descr='Vertical alignment of label'), 5)
+
+        s.add( setting.Float('angle', 0.,
+                             descr='Angle of the label in degrees'), 6 )
 
         s.add( setting.Text('Text',
                             descr = 'Text settings') )
@@ -632,7 +635,8 @@ class TextLabel(GenericPlotter):
             utils.Renderer( painter, font, xp, yp,
                             s.label,
                             TextLabel.cnvtalignhorz[s.alignHorz],
-                            TextLabel.cnvtalignvert[s.alignVert] ).render()
+                            TextLabel.cnvtalignvert[s.alignVert],
+                            s.angle ).render()
 
 # allow the factory to instantiate a text label
 widgetfactory.thefactory.register( TextLabel )

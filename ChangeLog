@@ -1,3 +1,7 @@
+
+* 2005-03-26 Jeremy Sanders <jeremy@jeremysanders.net>
+	- TextLabels now support rotation
+
 * 2005-03-25 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Veusz now tracks default settings in ~/.veusz.def file for each
 	user
