@@ -99,8 +99,8 @@ class Axis(widget.Widget):
         self.minorticks = None
         self.majorticks = None
 
-        # we recompute the axis later
-        s.setModified()
+        # document updates change set variable when things need recalculating
+        self.docchangeset = -1
 
     def _autoCheckChildRanges(self, parent, range):
         """Check children of this parent to update autorange."""
@@ -174,8 +174,8 @@ class Axis(widget.Widget):
         if self.minorticks != None:
             self.minortickscalc = N.array(self.minorticks)
 
-        self.settings.setModified(False)
-
+        self.docchangeset = self.document.changeset
+        
     def _updatePlotRange(self, bounds):
         """Calculate coordinates on plotter of axis."""
 
@@ -211,8 +211,8 @@ class Axis(widget.Widget):
         Returns positions as numarray of integers
         """
 
-        # if the axis was modified, recompute the range
-        if self.settings.isModified():
+        # if the doc was modified, recompute the range
+        if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
         self._updatePlotRange(bounds)
@@ -241,9 +241,9 @@ class Axis(widget.Widget):
         vals is a numarray of coordinates
         returns a numarray of floats
         """
-        # if the axis was modified, recompute the range
 
-        if self.settings.isModified():
+        # if the doc was modified, recompute the range
+        if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
         self._updatePlotRange( bounds )
@@ -584,8 +584,8 @@ class Axis(widget.Widget):
 
         s = self.settings
 
-        # recompute if modified
-        if self.settings.isModified():
+        # recompute if document modified
+        if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
         posn = widget.Widget.draw(self, parentposn, painter, outerbounds)

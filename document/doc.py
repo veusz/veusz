@@ -131,6 +131,8 @@ class Document( qt.QObject ):
     def __init__(self):
         """Initialise the document."""
         qt.QObject.__init__( self )
+
+        self.changeset = 0
         self.wipe()
 
     def wipe(self):
@@ -163,6 +165,7 @@ class Document( qt.QObject ):
         # traceback.print_stack()
 
         self.modified = ismodified
+        self.changeset += 1
         self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
 
     def isModified(self):
