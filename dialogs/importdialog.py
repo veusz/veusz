@@ -56,9 +56,12 @@ class ImportDialog(qt.QDialog):
 
         # preview the file
         self.previewedit = qt.QTextEdit(self)
+        self.previewedit.setTextFormat(qt.Qt.PlainText)
         self.previewedit.setReadOnly(True)
         self.previewedit.setWordWrap(qt.QTextEdit.NoWrap)
         self.previewedit.setText('<preview>')
+        f = qt.QFont('Fixed')
+        self.previewedit.setFont(f)
         qt.QToolTip.add(self.previewedit,
                         'A preview of the contents of the file')
         
@@ -88,10 +91,22 @@ class ImportDialog(qt.QDialog):
         self.layout = qt.QVBoxLayout(self, spacing)
         self.layout.addWidget( fnhbox )
         self.layout.addWidget( self.previewedit )
+
+        l = qt.QLabel("The descriptor describes the format of the data in the file, "
+                      "eg x,+- [x with symmetric errors] y,+,- "
+                      "[y with asymmetric errors] z [no errors] "
+                      "x[1:5],+,- [x_1 to x_5, each with asymmetric errors]", self)
+        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
+        self.layout.addWidget( l )
+
         self.layout.addWidget( dhbox )
         self.layout.addWidget( bhbox )
 
     dirname = '.'
+
+    def sizeHint(self):
+        """Returns recommended size of dialog."""
+        return qt.QSize(600, 400)
 
     def slotBrowse(self):
         """Browse button pressed in dialog."""
@@ -118,7 +133,7 @@ class ImportDialog(qt.QDialog):
 
         try:
             ifile = open(str(filename), 'r')
-            text = ifile.read(1024)
+            text = ifile.read(2048)
             self.previewedit.setText(text)
 
         except IOError:
