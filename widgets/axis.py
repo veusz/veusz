@@ -334,7 +334,7 @@ class Axis(widget.Widget):
         """Draw minor ticks on plot."""
         
         painter.setPen( self.MinorTicks.makeQPen(painter) )
-        delta = int( self.MinorTicks.length * self._pixperpt )
+        delta = self.MinorTicks.getLength(painter)
         minorticks = self._graphToPlotter(self.minortickscalc)
 
         if self.direction != 0: delta *= -1   # vertical
@@ -348,7 +348,7 @@ class Axis(widget.Widget):
         """Draw major ticks on the plot."""
 
         painter.setPen( self.MajorTicks.makeQPen(painter) )
-        startdelta = int( self.MajorTicks.length * self._pixperpt )
+        startdelta = self.MajorTicks.getLength(painter)
         delta = startdelta
 
         if self.direction != 0: delta *= -1   # vertical

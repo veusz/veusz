@@ -115,7 +115,7 @@ class FunctionPlotter(GenericPlotter):
         # function to be plotted
         self.addPref('function', 'string', 'x')
         # is this a fn of x rather than y?
-        self.addPref('xfunc', 'int', 1)
+        self.addPref('xfunc', 'bool', True)
         # how often to evaluate the function
         self.addPref('iter', 'int', 1)
         self.readPrefs()
@@ -291,7 +291,7 @@ class PointPlotter(GenericPlotter):
                                 name=name)
         # FIXME: Add prefs here
         self.addPref('marker', 'string', 'O')
-        self.addPref('markerSize', 'int', 5 )
+        self.addPref('markerSize', 'string', '5pt' )
         self.readPrefs()
 
         self.PlotLine = utils.PreferencesPlotLine( 'XYPlotLine' )
@@ -438,7 +438,7 @@ class PointPlotter(GenericPlotter):
 
         # plot the points (we do this last so they are on top)
         if self.MarkerLine.notHidden():
-            size = int( utils.getPixelsPerPoint(painter) * self.markerSize )
+            size = int( utils.cnvtDist(self.markerSize, painter) )
 
             if self.MarkerFill.notHidden():
                 painter.setBrush( self.MarkerFill.makeQBrush() )

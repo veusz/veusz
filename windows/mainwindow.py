@@ -26,6 +26,7 @@ import sys
 
 import consolewindow
 import plotwindow
+import treeeditwindow
 import document
 import dialogs.aboutdialog
 
@@ -42,6 +43,10 @@ class MainWindow(qt.QMainWindow):
         self._defineMenus()
 
         self.plot = plotwindow.PlotWindow(self.document, self)
+
+        # likewise with the tree-editing window
+        self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
+        self.moveDockWindow( self.treeedit, qt.Qt.DockLeft )
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,

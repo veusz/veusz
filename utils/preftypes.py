@@ -158,14 +158,22 @@ class PreferencesMajorTick(PreferencesLine):
 
     def _addPrefs(self):
         PreferencesLine._addPrefs(self)
-        self.prefs.addPref( 'length', 'double', 6 )
+        self.prefs.addPref( 'length', 'string', '6pt' )
+
+    def getLength(self, painter):
+        """Get the tick length."""
+        return int( utils.cnvtDist( self.length, painter ) )
 
 class PreferencesMinorTick(PreferencesLine):
     """ Class to hold list of preferences for minor tick marks."""
 
     def _addPrefs(self):
         PreferencesLine._addPrefs(self)
-        self.prefs.addPref( 'length', 'double', 3 )
+        self.prefs.addPref( 'length', 'string', '3pt' )
+
+    def getLength(self, painter):
+        """Get the tick length."""
+        return int( utils.cnvtDist( self.length, painter ) )
 
 class PreferencesGridLine(PreferencesLine):
     """ Class to hold list of preferences for grid lines.
@@ -226,7 +234,7 @@ class PreferencesTickLabel(PreferencesText):
 
     def _addPrefs(self):
         PreferencesText._addPrefs(self)
-        self.prefs.addPref( 'rotate', 'int', 0 )
+        self.prefs.addPref( 'rotate', 'bool', False )
         self.prefs.addPref( 'format', 'string', 'g*' )
 
     def formatNumber(self, num):
