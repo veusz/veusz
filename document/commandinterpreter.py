@@ -84,7 +84,9 @@ class CommandInterpreter:
                       'Save': i.Save,
                       'ImportString': i.ImportString,
                       'ImportFile': i.ImportFile,
-                      'Load': self.Load }
+                      'Action': i.Action,
+                      'Load': self.Load
+                      }
 
         for name, val in self.cmds.items():
             self.globals[name] = val

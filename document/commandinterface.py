@@ -63,6 +63,7 @@ class CommandInterface(qt.QObject):
             print "Added a graph of type '%s' (%s)" % (type, w.userdescription)
 
         self.document.setModified()
+        return w.name
 
     def Remove(self, name):
         """Remove a graph from the dataset."""
@@ -206,6 +207,14 @@ class CommandInterface(qt.QObject):
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
         sr.setInDocument(self.document)
+
+    def Action(self, action, widget='.'):
+        """Performs action on current widget."""
+
+        w = self._resolve(widget)
+
+        # run action
+        w.actionfuncs[action]()
 
     def Print(self):
         """Print document."""
