@@ -142,6 +142,14 @@ class MainWindow(qt.QMainWindow):
             ('viewnextpage', 'Move to the next page', '&Next page',
              'view', self.slotViewNextPage, 'stock_next-page.png',
              True, 'Ctrl+PgDown'),
+            ('helphome', 'Go to the Veusz home page on the internet',
+             'Home page', 'help', self.slotHelpHomepage, '', False, ''),
+            ('helpproject', 'Go to the Veusz project page on the internet',
+             'GNA Project page', 'help', self.slotHelpProjectPage, '',
+             False, ''),
+            ('helpbug', 'Report a bug on the internet',
+             'Suggestions and bugs', 'help', self.slotHelpBug, '', False, ''),
+            ('help', ),
             ('helpabout', 'Displays information about the program', 'About...',
              'help', self.slotHelpAbout, '', False, '')
             ]
@@ -185,6 +193,21 @@ class MainWindow(qt.QMainWindow):
         """Display the import data dialog."""
         d = dialogs.importdialog.ImportDialog(self, self.document)
         d.show()
+
+    def slotHelpHomepage(self):
+        """Go to the veusz homepage."""
+        import webbrowser
+        webbrowser.open('http://home.gna.org/veusz/')
+
+    def slotHelpProjectPage(self):
+        """Go to the veusz project page."""
+        import webbrowser
+        webbrowser.open('http://gna.org/projects/veusz/')
+
+    def slotHelpBug(self):
+        """Go to the veusz bug page."""
+        import webbrowser
+        webbrowser.open('https://gna.org/bugs/?group=veusz')
 
     def slotHelpAbout(self):
         """Show about dialog."""
