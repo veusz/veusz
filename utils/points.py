@@ -21,6 +21,7 @@
 # $Id$
 
 import qt
+import numarray as N
 
 def _plot_none(painter, xpos, ypos, size):
     """ (internal) function plot nothing!
@@ -40,23 +41,23 @@ def _plot_circle(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
-def _plot_plus(painter, xpos, ypos, size):
-    """ (internal) function to plot a +
-    size is the length of one arm
-    """
+# def _plot_plus(painter, xpos, ypos, size):
+#     """ (internal) function to plot a +
+#     size is the length of one arm
+#     """
 
-    # horizontal
-    painter.drawLine( xpos - size, ypos, xpos + size, ypos )
-    # vertical
-    painter.drawLine( xpos, ypos - size, xpos, ypos + size )
+#     # horizontal
+#     painter.drawLine( xpos - size, ypos, xpos + size, ypos )
+#     # vertical
+#     painter.drawLine( xpos, ypos - size, xpos, ypos + size )
 
-def _plot_X(painter, xpos, ypos, size):
-    """ (internal) function to plot a X
-    size is the length in terms of DX and DY
-    """
+# def _plot_X(painter, xpos, ypos, size):
+#     """ (internal) function to plot a X
+#     size is the length in terms of DX and DY
+#     """
 
-    painter.drawLine( xpos - size, ypos - size, xpos + size, ypos + size )
-    painter.drawLine( xpos - size, ypos + size, xpos + size, ypos - size )
+#     painter.drawLine( xpos - size, ypos - size, xpos + size, ypos + size )
+#     painter.drawLine( xpos - size, ypos + size, xpos + size, ypos - size )
 
 def _plot_star(painter, xpos, ypos, size):
     """ (internal) function to plot a *
@@ -76,20 +77,20 @@ def _plot_circle_dot(painter, xpos, ypos, size):
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
     painter.drawPoint( xpos, ypos )
    
-def _plot_box(painter, xpos, ypos, size):
-    """ (internal) function to plot a box shape
-    size is half the length of a side
-    """
+# def _plot_box(painter, xpos, ypos, size):
+#     """ (internal) function to plot a box shape
+#     size is half the length of a side
+#     """
 
-    painter.drawRect( xpos - size, ypos - size, size*2+1, size*2+1 )
+#     painter.drawRect( xpos - size, ypos - size, size*2+1, size*2+1 )
 
-def _plot_box_dot(painter, xpos, ypos, size):
-    """ (internal) function to plot a box shape with dot at centre
-    size is half the length of a side
-    """
+# def _plot_box_dot(painter, xpos, ypos, size):
+#     """ (internal) function to plot a box shape with dot at centre
+#     size is half the length of a side
+#     """
 
-    painter.drawRect( xpos - size, ypos - size, size*2+1, size*2+1 )
-    painter.drawPoint( xpos, ypos )
+#     painter.drawRect( xpos - size, ypos - size, size*2+1, size*2+1 )
+#     painter.drawPoint( xpos, ypos )
 
 def _plot_bullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
@@ -99,25 +100,25 @@ def _plot_bullseye(painter, xpos, ypos, size):
     painter.drawEllipse( xpos - size/2, ypos - size/2 , size, size )
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
-def _plot_triangle_dot(painter, xpos, ypos, size):
-    """ (internal) function to plot a triangle shape with a dot at the core
-    """
+# def _plot_triangle_dot(painter, xpos, ypos, size):
+#     """ (internal) function to plot a triangle shape with a dot at the core
+#     """
 
 
-    dy = int(0.577*size)
-    pts = qt.QPointArray( [xpos, ypos-dy*2, xpos-size, ypos+dy,
-                           xpos+size, ypos+dy] )
-    painter.drawConvexPolygon( pts )
-    painter.drawPoint( xpos, ypos )
+#     dy = int(0.577*size)
+#     pts = qt.QPointArray( [xpos, ypos-dy*2, xpos-size, ypos+dy,
+#                            xpos+size, ypos+dy] )
+#     painter.drawConvexPolygon( pts )
+#     painter.drawPoint( xpos, ypos )
 
-def _plot_triangle(painter, xpos, ypos, size):
-    """ (internal) function to plot a triangle shape
-    """
+# def _plot_triangle(painter, xpos, ypos, size):
+#     """ (internal) function to plot a triangle shape
+#     """
 
-    dy = int(0.577*size)
-    pts = qt.QPointArray( [xpos, ypos-dy*2, xpos-size, ypos+dy,
-                           xpos+size, ypos+dy] )
-    painter.drawConvexPolygon( pts )
+#     dy = int(0.577*size)
+#     pts = qt.QPointArray( [xpos, ypos-dy*2, xpos-size, ypos+dy,
+#                            xpos+size, ypos+dy] )
+#     painter.drawConvexPolygon( pts )
 
 def _plot_line_horz(painter, xpos, ypos, size):
     """ (internal) function to plot a horizontal line
@@ -160,15 +161,17 @@ def _plot_arrow_down(painter, xpos, ypos, size):
     painter.drawLine(xpos, ypos, xpos+size, ypos-size)
 
 MarkerCodes = ['none', 'cross', 'plus', 'star', 'circle',
-               'circledot', 'square', 'squaredot',
-               'bullseye', 'triangle', 'triangledot',
+               'circledot', 'diamond', 'square', 'barhorz', 'barvert',
+               'octogon',
+               'bullseye', 'triangle',
                'point', 'horzbar', 'vertbar',
                'arrowleft', 'arrowright', 'arrowup',
                'arrowdown']
 
-_MarkerFunctions = [_plot_none, _plot_X, _plot_plus, _plot_star, _plot_circle,
-                    _plot_circle_dot, _plot_box, _plot_box_dot,
-                    _plot_bullseye, _plot_triangle, _plot_triangle_dot,
+_MarkerFunctions = [_plot_none, None, None, _plot_star, _plot_circle,
+                    _plot_circle_dot, None, None, None, None,
+                    None,
+                    _plot_bullseye, None,
                     _plot_point, _plot_line_horz, _plot_line_vert,
                     _plot_arrow_left, _plot_arrow_right, _plot_arrow_up,
                     _plot_arrow_down]
@@ -216,15 +219,51 @@ def nextAutos():
     if _automarker == len(AutoMarkers):
         _automarker = 0
 
+
+# X and Y pts for corners of polygons
+_Polygons = {
+    'square': ( (-1, -1), (1, -1), (1, 1), (-1, 1) ),
+    'diamond': ( (0, 1), (1, 0), (0, -1), (-1, 0) ),
+    'barhorz': ( (-1, -0.5), (1, -0.5), (1, 0.5), (-1, 0.5) ),
+    'barvert': ( (-0.5, -1), (0.5, -1), (0.5, 1), (-0.5, 1) ),
+    'plus': ( (0.3, 1), (0.3, 0.3), (1, 0.3), (1, -0.3),
+              (0.3, -0.3), (0.3, -1), (-0.3, -1), (-0.3, -0.3),
+              (-1, -0.3), (-1, 0.3), (-0.3, 0.3), (-0.3, 1) ),
+    'octogon': ( (0.414, 1), (1, 0.414), (1, -0.414), (0.414, -1),
+                 (-0.414, -1), (-1, -0.414), (-1, 0.414), (-0.414, 1) ),
+    'triangle': ( (0, -1), (0.866, 0.5), (-0.866, 0.5) ),
+    'cross': ( (-0.495, 0.919), (0.000, 0.424), (0.495, 0.919), (0.919, 0.495),
+               (0.424, -0.000), (0.919, -0.495), (0.495, -0.919),
+               (-0.000, -0.424), (-0.495, -0.919), (-0.919, -0.495),
+               (-0.424, 0.000), (-0.919, 0.495) )
+    }
+
+def _plotPolygons(painter, name, xpos, ypos, size):
+    '''Plots shapes which are polygons'''
+
+    # make a polygon of the correct size
+    pgn = ( N.array(_Polygons[name], N.Float32) * size ).astype(N.Int32)
+
+    for x, y in zip(xpos, ypos):
+        pts = pgn + N.array( (x, y) )
+        pa = qt.QPointArray( pts.flat.tolist() )
+        painter.drawPolygon(pa)
+
 def plotMarker(painter, xpos, ypos, markercode, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
     """
-    _MarkerLookup[markercode](painter, xpos, ypos, markersize)
+    if markercode in _Polygons:
+        _plotPolygons(painter, markercode, xpos, ypos, markersize)
+    else:
+        _MarkerLookup[markercode](painter, xpos, ypos, markersize)
 
 def plotMarkers(painter, xpos, ypos, markername, markersize):
     """Funtion to plot an array of markers on painter
     """
-    noitems = len(xpos)
-    fn = _MarkerLookup[markername]
-    for i in xrange(noitems):
-        fn(painter, xpos[i], ypos[i], markersize)
+
+    if markername in _Polygons:
+        _plotPolygons(painter, markername, xpos, ypos, markersize)
+    else:
+        fn = _MarkerLookup[markername]
+        for x, y in zip(xpos, ypos):
+            fn(painter, x, y, markersize)
