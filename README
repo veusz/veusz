@@ -12,7 +12,7 @@ data. Veusz is licenced under the GPL. Please read the file COPYING
 included in this distribution for information about the licence.
 
 This is a very preliminary version of the program. It demonstrates
-some of the features but has no human-usable interface as yet.
+some of the features but the interface is very cumbersome.
 
 The idea is to have a program which can generate publication-ready
 plots in Postscript, be easily scriptable, and easily extended.
@@ -25,6 +25,26 @@ Ideally, features to be included are:
 ...
 
 Please see the file INSTALL for installation instructions.
+
+--
+
+Sample commands for plotting are:
+
+You can run commands like:
+
+Add 'function' 'x**2'
+Set 'x/log' True
+Get 'y/log'
+Print
+
+-- or --
+
+SetData 'dist' arange(20)
+SetData 'vel' arange(20)**2
+Add 'xy' 'dist' 'vel'
+Set 'x/Label/label' 'Distance (cm)'
+Set 'y/Label/label' 'Velocity (cm s^{-1})'
+Set '1/MarkerFill/color' 'blue'
 
 -------------------------------------------------------------------------------
 $Id$

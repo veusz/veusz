@@ -1,8 +1,8 @@
 Veusz basic installation procedure
 ----------------------------------
 
-As the code is so immature, I do not include instructions on how to
-install this program in its own directory, just run it.
+The code just runs in its current directory at the moment. It can currently
+do very basic graphs.
 
 Requirements:
  python 2.2.3    http://www.python.org/
