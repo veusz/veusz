@@ -95,6 +95,7 @@ class MainWindow(qt.QMainWindow):
 
             ('file', '&File'),
             ('data', '&Data'),
+            ('insert', '&Insert'),
             ('view', '&View'),
             ('help', '&Help')
             ]

@@ -24,8 +24,10 @@
 import os
 
 import qt
+
 import widgets.widgetfactory as widgetfactory
 import widgets
+import action
 
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
@@ -114,32 +116,28 @@ class TreeEditWindow(qt.QDockWindow):
         self.setWidget(totvbox)
 
         # make buttons for each of the graph types
-        self.createGraphButtons = {}
+        self.createGraphActions = {}
         buttonhbox = qt.QHBox(totvbox)
         #buttonhbox = qt.QToolBar(self.parent)
         mdir = os.path.dirname(__file__)
 
+        insertmenu = parent.menus['insert']
+
         for w in widgetfactory.thefactory.listWidgets():
             wc = widgetfactory.thefactory.getWidgetClass(w)
             if wc.allowusercreation:
-                # make a new button, and set the pixmap
-                b = qt.QToolButton(buttonhbox)
-                b.setFocusPolicy(qt.QWidget.TabFocus)
-                name = "%s/icons/button_%s.png" % (mdir, w)
-                b.setPixmap( qt.QPixmap(name) )
-
-                # keep track of the buttons so we can disable/enable them
-                self.createGraphButtons[wc] = b
-
-                # set the tooltip to the graph description
-                try:
-                    qt.QToolTip.add(b, wc.description)
-                except AttributeError:
-                    pass
-
-                b.widgetname = w
-                self.connect(b, qt.SIGNAL('clicked()'),
-                             self.slotMakeWidgetButton)
+                a = action.Action(self,
+                                  (lambda w:
+                                   (lambda a: self.slotMakeWidgetButton(w)))
+                                  (w),
+                                  iconfilename = 'button_%s.png' % w,
+                                  menutext = 'Add a %s widget' % w,
+                                  statusbartext = 'Add a %s widget to the'
+                                  ' currently selected widget' % w,
+                                  tooltiptext = wc.description)
+                a.addTo(buttonhbox)
+                a.addTo(insertmenu)
+                self.createGraphActions[wc] = a
 
         # make buttons for user actions
         edithbox = qt.QHBox(totvbox)
@@ -268,8 +266,8 @@ class TreeEditWindow(qt.QDockWindow):
             assert selw != None
 
         # check whether each button can have this widget as parent
-        for wc, button in self.createGraphButtons.items():
-            button.setEnabled( wc.willAllowParent(selw) )
+        for wc, action in self.createGraphActions.items():
+            action.enable( wc.willAllowParent(selw) )
 
         # delete shouldn't allow root to be deleted
         self.editbuttons['delete'].setEnabled(
@@ -358,7 +356,7 @@ class TreeEditWindow(qt.QDockWindow):
                                                   100)
         self.prefview.adjustSize()
             
-    def slotMakeWidgetButton(self):
+    def slotMakeWidgetButton(self, widgetname):
         """Called when an add widget button is clicked."""
 
         # get the widget to act as the parent
@@ -368,8 +366,7 @@ class TreeEditWindow(qt.QDockWindow):
             assert parent != None
 
         # make the new widget and update the document
-        widgetfactory.thefactory.makeWidget(self.sender().widgetname,
-                                            parent)
+        widgetfactory.thefactory.makeWidget(widgetname, parent)
         self.document.setModified()
 
     def slotActionPressed(self):
