@@ -43,6 +43,7 @@ class Setting:
 
         descr is a description of the setting
         """
+        self.readonly = False
         self.parent = None
         self.name = name
         self.descr = descr
@@ -111,7 +112,7 @@ class Setting:
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""
 
-        if saveall or not self.isDefault():
+        if (saveall or not self.isDefault()) and not self.readonly:
             return "Set('%s%s', %s)\n" % ( rootname, self.name,
                                            repr(self.get()) )
         else:

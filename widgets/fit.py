@@ -48,6 +48,16 @@ class Fit(plotters.FunctionPlotter):
         s.add( setting.Str('yData', 'y',
                            descr = 'Y positions of data to fit'), 3 )
 
+        s.add( setting.Float('chi2', -1,
+                             descr = 'Output chi^2 from fitting'),
+               4, readonly=True )
+        s.add( setting.Int('dof', -1,
+                           descr = 'Output degrees of freedom from fitting'),
+               5, readonly=True )
+        s.add( setting.Float('redchi2', -1,
+                             descr = 'Output reduced-chi^2 from fitting'),
+               6, readonly=True )
+
         f = s.get('function')
         f.newDefault('a + b*x')
         f.descr = 'Function to fit'
@@ -105,14 +115,18 @@ class Fit(plotters.FunctionPlotter):
                 print "Warning: No errors on y values. Assuming 5% errors."
                 yserr = yvals*0.05
         
-        retn = utils.fitLM(self.evalfunc, params,
-                           xvals,
-                           yvals, yserr)
+        retn, chi2, dof = utils.fitLM(self.evalfunc, params,
+                                      xvals,
+                                      yvals, yserr)
 
         vals = {}
         for i, v in zip(names, retn):
             vals[i] = v
         s.values = vals
+
+        s.chi2 = chi2
+        s.dof = dof
+        s.redchi2 = chi2/dof
 
     def evalfunc(self, params, xvals):
 

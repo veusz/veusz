@@ -128,17 +128,10 @@ def fitLM(func, params, xvals, yvals, errors,
     if not done:
         sys.stderr.write("Warning: maximum number of iterations reached\n")
 
-    return params
+    # print out fit statistics at end
+    dof = len(yvals) - len(params)
+    redchi2 = chi2 / dof
+    print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (chi2, dof, redchi2)
 
-##import numarray.random_array as NRA
+    return (params, chi2, dof)
 
-## def testfunc(params, x):
-##     return params[0] + x*params[1] + x*x*params[2]
-
-## xvals = N.arange(0.,10.,0.5)
-## errors = 0.1
-## yvals = 3. + xvals*2. + (NRA.random( (len(xvals),) )-0.5)*2.*errors
-
-## inparams = N.array((0., -1., 1.))
-
-## fitLM(testfunc, inparams, xvals, yvals, errors)

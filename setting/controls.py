@@ -45,6 +45,9 @@ class SettingEdit(qt.QLineEdit):
 
         self.setting.setOnModified(self.onModified)
 
+        if setting.readonly:
+            self.setReadOnly(True)
+
     def done(self):
         """Delete modification notification."""
         self.setting.removeOnModified(self.onModified)
@@ -83,6 +86,9 @@ class BoolSettingEdit(qt.QCheckBox):
 
         self.setting.setOnModified(self.onModified)
 
+        if setting.readonly:
+            self.setEnabled(False)
+
     def done(self):
         """Delete modification notification."""
         self.setting.removeOnModified(self.onModified)
@@ -119,6 +125,9 @@ class SettingChoice(qt.QComboBox):
                       self.slotActivated )
 
         self.setting.setOnModified(self.onModified)
+
+        if setting.readonly:
+            self.setEnabled(False)
 
     def done(self):
         """Delete modification notification."""
@@ -164,6 +173,9 @@ class SettingMultiLine(qt.QTextEdit):
         self.setText( setting.toText() )
 
         self.setting.setOnModified(self.onModified)
+
+        if setting.readonly:
+            self.setReadOnly(True)
 
     def done(self):
         """Delete modification notification."""
