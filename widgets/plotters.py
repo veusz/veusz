@@ -309,6 +309,12 @@ class PointPlotter(GenericPlotter):
         self.xdata = xdata
         self.ydata = ydata
 
+    def getUserDescription(self):
+        """User-friendly description."""
+
+        return "x='%s', y='%s', marker='%s'" % (self.xdata, self.ydata,
+                                                self.marker)
+
     def setData(self, xdata, ydata):
         """Set the variables to be plotted.
         
