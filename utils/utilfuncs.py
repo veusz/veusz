@@ -27,6 +27,11 @@ import re
 
 import qt
 
+def reverse(data):
+    """For iterating over a sequence in reverse."""
+    for index in xrange(len(data)-1, -1, -1):
+        yield data[index]
+
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
 
@@ -111,7 +116,7 @@ def formatNumber(num, format):
             text = '%f' % num
 
     # split around exponential (if any)
-    parts = string.split(text, 'e')
+    parts = text.split('e')
 
     # remove trailing zeros before an exponential and after decimal pt
     fp = parts[0]

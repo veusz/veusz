@@ -104,7 +104,7 @@ class Widget(object):
 
         # allow base widget to have no parent
         ap = type.allowedparenttypes 
-        if parent == None and len(ap)>0 and ap[0] == None:
+        if parent == None and len(ap) > 0 and ap[0] == None:
             return True
         
         for p in ap:
@@ -247,8 +247,8 @@ class Widget(object):
         bounds = self.computeBounds(parentposn, painter)
 
         # iterate over children in reverse order
-        for i in range(len(self.children)-1, -1, -1 ):
-            self.children[i].draw(bounds, painter, outerbounds=outerbounds)
+        for i in utils.reverse(self.children):
+            i.draw(bounds, painter, outerbounds=outerbounds)
  
         # return our final bounds
         return bounds
@@ -285,6 +285,72 @@ class Widget(object):
         """Read the default settings."""
 
         self.settings.readDefaults('', self.name)
+
+    def _recursiveWidgetList(self, widgets):
+        """Build up a flat representation of the widgets."""
+        widgets.append(self)
+        for c in self.children:
+            c._recursiveWidgetList(widgets)
+
+    def moveChild(self, w, direction):
+        """Move the child widget w up in the hierarchy in the direction.
+        direction is -1 for 'up' or +1 for 'down'
+
+        Returns True if succeeded
+        """
+
+        c = self.children
+        ci = c.index(w)
+
+        if direction < 0 and ci > 0:
+            # swap widget and previous widget
+            c[ci-1], c[ci] = c[ci], c[ci-1]
+            return True
+        
+        elif direction > 0 and ci < len(c)-1:
+            # swap widget and next widget
+            c[ci+1], c[ci] = c[ci], c[ci+1]
+            return True
+        
+        else:
+            # we try to look "up" or "down" the tree to look for suitable
+            # parents
+            
+            # this is a stupid algorithm, so please replace if possible!
+
+            # get a list of all widgets in a flat format, but ordered
+            widgetlist = []
+            self.document.basewidget._recursiveWidgetList(widgetlist)
+
+            # find ourselves in the list, and look forwards for parents
+
+            # reverse list direction for moving up
+            if direction < 0:
+                widgetlist.reverse()
+
+            i = widgetlist.index(self)+1
+            while i < len(widgetlist) and not w.isAllowedParent(widgetlist[i]):
+                i += 1
+
+            if i == len(widgetlist):
+                return False
+
+            # drop the widget from me
+            newparent = widgetlist[i]
+            c.pop(ci)
+
+            # add it onto the other
+            existingname = w.name in newparent.childnames
+            if direction < 0:
+                newparent.children.append(w)
+            else:
+                newparent.children.insert(0, w)
+            w.parent = newparent
+
+            # The widget needs a new name
+            if existingname:
+                w.name = w.chooseName()
+            return True
 
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

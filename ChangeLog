@@ -1,4 +1,8 @@
-
+* 2005-04-02 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Fixed always-redrawing bug
+	- Implemented widget delete button
+	- Implemented widget moving buttons
+	
 * 2005-03-26 Jeremy Sanders <jeremy@jeremysanders.net>
 	- TextLabels now support rotation
 

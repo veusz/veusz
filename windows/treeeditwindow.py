@@ -37,7 +37,7 @@ class _WidgetItem(qt.QListViewItem):
         
         qt.QListViewItem.__init__(self, qtparent)
 
-        self.index = '0000'
+        self.index = 0
         self.widget = widget
         self.settings = widget.settings
 
@@ -47,9 +47,17 @@ class _WidgetItem(qt.QListViewItem):
             _PrefItem(s, no, self)
             no += 1
 
-    def setIndex(self, index):
-        """Set the sorting index."""
-        self.index = '%04i' % index
+    def compare(self, i, col, ascending):
+        """Always sort according to the index value."""
+
+        a = [-1, 1][ascending]
+            
+        if self.index < i.index:
+            return -1*a
+        elif self.index > i.index:
+            return 1*a
+        else:
+            return 0
 
     def text(self, column):
         """Get the text in a particular column."""
@@ -59,9 +67,7 @@ class _WidgetItem(qt.QListViewItem):
             return self.widget.typename
         elif column == 2:
             return self.widget.userdescription
-        elif column == 3:
-            return self.index
-        return ""
+        return ''
 
 class _PrefItem(qt.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
@@ -76,8 +82,20 @@ class _PrefItem(qt.QListViewItem):
         self.parent = parent
         self.widget = None
         self.setText(0, settings.name)
-        self.setText(1, "setting")
-        self.setText(3, '%04i' % number)
+        self.setText(1, 'setting')
+        self.index = number
+
+    def compare(self, i, col, ascending):
+        """Always sort according to the index value."""
+
+        a = [-1, 1][ascending]
+           
+        if self.index < i.index:
+            return -1*a
+        elif self.index > i.index:
+            return 1*a
+        else:
+            return 0
 
 class _ScrollView(qt.QScrollView):
     """A resizing scroll view."""
@@ -118,7 +136,6 @@ class TreeEditWindow(qt.QDockWindow):
         # make buttons for each of the graph types
         self.createGraphActions = {}
         horzbox = qt.QFrame(totvbox)
-        #horzbox.setFrameStyle(qt.QFrame.ToolBarPanel)
         self.boxlayout = qt.QBoxLayout(horzbox, qt.QBoxLayout.LeftToRight)
         self.boxlayout.insertSpacing(0, 4)
         self.boxlayout.addStrut(22)
@@ -155,10 +172,10 @@ class TreeEditWindow(qt.QDockWindow):
         for name, icon, tooltip, menutext, slot in (
             ('moveup', 'go-up', 'Move the selected widget up',
              'Move up',
-             self.slotWidgetMoveUp),
+             lambda a: self.slotWidgetMove(a, -1) ),
             ('movedown', 'go-down', 'Move the selected widget down',
              'Move down',
-             self.slotWidgetMoveDown),
+             lambda a: self.slotWidgetMove(a, 1) ),
             ('delete', 'delete', 'Remove the selected widget',
              'Delete',
              self.slotWidgetDelete)
@@ -190,10 +207,10 @@ class TreeEditWindow(qt.QDockWindow):
         lv.addColumn( "Name" )
         lv.addColumn( "Type" )
         lv.addColumn( "Detail" )
-        lv.addColumn( "Sort order")
-        lv.setColumnWidth(3, 0)
-        lv.setColumnWidthMode(3, qt.QListView.Manual)
-        lv.setSorting(3)
+        #lv.addColumn( "Sort order")
+        #lv.setColumnWidth(3, 0)
+        #lv.setColumnWidthMode(3, qt.QListView.Manual)
+        lv.setSorting(0)
         lv.setTreeStepSize(10)
 
         # add root widget to view
@@ -237,15 +254,15 @@ class TreeEditWindow(qt.QDockWindow):
 
         childdict = {}
         # assign indicies to each one
-        index = 1000
+        index = 10000
         newitem = False
         for c in root.widget.children:
             childdict[c] = True
             if c in items:
-                items[c].setIndex(index)
+                items[c].index = index
             else:
                 items[c] = _WidgetItem(c, root)
-                items[c].setIndex(index)
+                items[c].index = index
                 newitem = True
             self._updateBranch(items[c])
             index += 1
@@ -254,6 +271,9 @@ class TreeEditWindow(qt.QDockWindow):
         for i in items.itervalues():
             if i.widget not in childdict:
                 root.takeItem(i)
+
+        # have to re-sort children to ensure ordering is correct here
+        root.sort()
 
         # open the branch if we've added/changed the children
         if newitem:
@@ -475,9 +495,52 @@ class TreeEditWindow(qt.QDockWindow):
         p.removeChild(w.name)
         self.document.setModified()
 
-    def slotWidgetMoveUp(self, a):
-        pass
+    def selectWidget(self, widget):
+        """Select the associated listviewitem for the widget w in the
+        listview."""
+        
+        # an iterative algorithm, rather than a recursive one
+        # (for a change)
+        found = False
+        l = [self.listview.firstChild()]
+        while len(l) != 0 and not found:
+            item = l.pop()
 
-    def slotWidgetMoveDown(self, a):
-        pass
-    
+            i = item.firstChild()
+            while i != None:
+                if i.widget == widget:
+                    found = True
+                    break
+                else:
+                    l.append(i)
+                i = i.nextSibling()
+
+        assert found
+        self.listview.ensureItemVisible(i)
+        self.listview.setSelected(i, True)
+
+    def slotWidgetMove(self, a, direction):
+        """Move the selected widget up/down in the hierarchy.
+
+        a is the action (unused)
+        direction is -1 for 'up' and +1 for 'down'
+        """
+
+        # get the widget to act as the parent
+        w = self.itemselected.widget
+        if w == None:
+            w = self.itemselected.parent.widget
+            assert w != None
+
+        # find the parent
+        p = w.parent
+        if p == None:
+            return
+
+        # move it up
+        p.moveChild(w, direction)
+        self.document.setModified()
+
+        # try to highlight the associated item
+        self.selectWidget(w)
+        
