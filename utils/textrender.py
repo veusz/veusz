@@ -130,7 +130,8 @@ class Renderer:
     """
 
     def __init__(self, painter, font, x, y, text,
-                 alignhorz = -1, alignvert = -1, angle = 0):
+                 alignhorz = -1, alignvert = -1, angle = 0,
+                 usefullheight = False):
         """Initialise the renderer.
 
         painter is the painter to draw on
@@ -139,6 +140,8 @@ class Renderer:
         alignhorz = (-1, 0, 1) for (left, centre, right) alignment
         alignvert = (-1, 0, 1) for (above, centre, below) alignment
         angle is the angle to draw the text at
+        usefullheight means include descenders in calculation of height
+          of thext
 
         alignment is in the painter frame, not the text frame
         """
@@ -149,6 +152,7 @@ class Renderer:
         self.alignhorz = alignhorz
         self.alignvert = alignvert
         self.angle = angle
+        self.usefullheight = usefullheight
         self._makeParts(text)
 
         self.x = x
@@ -161,19 +165,36 @@ class Renderer:
         if self.calcbounds != None:
             return self.calcbounds
 
+        # no text
+        if len(self.parts) == 2:
+            self.xi = self.x
+            self.yi = self.y
+            self.calcbounds = [self.x, self.y, self.x, self.y]
+            return self.calcbounds
+
         # work out total width and height
         self.painter.setFont(self.font)
-        totalheight = self.painter.fontMetrics().boundingRect('0').height()
+
+        fm = self.painter.fontMetrics()
+        totalheight = fm.boundingRect('0').height()
+
+        # make the bounding box a bit bigger if we want to include descents
+        if self.usefullheight:
+            dy = fm.descent()
+        else:
+            dy = 0
+
         self.xpos = 0
         self.ypos = 0
         self._renderPart(0, self.font, render=0)
         totalwidth = self.xpos
 
         # in order to work out text position, we rotate a bounding box
+        # in fact we add two extra points to account for descent if reqd
         tw = totalwidth / 2
         th = totalheight / 2
-        coordx = N.array( [-tw,  tw,  tw, -tw] )
-        coordy = N.array( [ th,  th, -th, -th] )
+        coordx = N.array( [-tw,  tw,  tw, -tw, -tw,    tw   ] )
+        coordy = N.array( [ th,  th, -th, -th,  th+dy, th+dy] )
         
         # rotate angles by theta
         theta = -self.angle * (math.pi / 180.)
@@ -197,11 +218,12 @@ class Renderer:
             self.xi = self.x + int(newx[0])
 
         # y alignment
+        # adjust y by these values to ensure proper alignment
         if self.alignvert < 0:
             yr = ( self.y + (newbound[1]-newbound[3]), self.y )
             self.yi = self.y + int(newy[0] - newbound[3])
         elif self.alignvert > 0:
-            yr = ( self.y, self.y + (newbound[3]-newbound[1]) )
+            yr = ( self.y, self.y + (newbound[3]-newbound[1]))
             self.yi = self.y + int(newy[0] - newbound[1])
         else:
             yr = ( self.y+newbound[1], self.y+newbound[3] )
@@ -470,7 +492,8 @@ class Renderer:
         else:
             # write text
             # how far do we need to advance?
-            width = self.painter.fontMetrics().width( p )
+            fm = self.painter.fontMetrics()
+            width = fm.width( p )
 
             # actually write the text if requested
             if render:

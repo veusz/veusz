@@ -21,6 +21,7 @@
 
 # $Id$
 
+import qt
 import numarray as N
 
 import widget
@@ -382,8 +383,12 @@ class Axis(widget.Widget):
                                           s.reflect,
                                           f]
         
-    def _drawTickLabels(self, painter, coordticks, sign):
-        """Draw tick labels on the plot."""
+    def _drawTickLabels(self, painter, coordticks, sign, texttorender):
+        """Draw tick labels on the plot.
+
+        texttorender is a list which contains text for the axis to render
+        after checking for collisions
+        """
 
         s = self.settings
         vertical = s.direction == 'vertical'
@@ -433,7 +438,8 @@ class Axis(widget.Widget):
             r = utils.Renderer(painter, font, x, y, num, alignhorz=ax,
                                alignvert=ay, angle=angle)
             r.ensureInBox(extraspace=True, **bounds)
-            bnd = r.render()
+            bnd = r.getBounds()
+            texttorender.append(r)
 
             if vertical:
                 maxdim = max(maxdim, bnd[2] - bnd[0])
@@ -443,8 +449,13 @@ class Axis(widget.Widget):
         # keep track of where we are
         self._delta_axis += 2*tl_spacing + maxdim
 
-    def _drawAxisLabel(self, painter, sign):
-        """Draw an axis label on the plot."""
+    def _drawAxisLabel(self, painter, sign, gparentposn,
+                       texttorender):
+        """Draw an axis label on the plot.
+
+        texttorender is a list which contains text for the axis to render
+        after checking for collisions
+        """
 
         s = self.settings
         painter.setPen( s.get('Label').makeQPen() )
@@ -453,7 +464,8 @@ class Axis(widget.Widget):
         al_spacing = ( painter.fontMetrics().leading() +
                        painter.fontMetrics().descent() )
 
-        if s.direction == 'vertical':
+        horz = s.direction == 'horizontal'
+        if not horz:
             ax = 1
             ay = 0
         else:
@@ -465,25 +477,45 @@ class Axis(widget.Widget):
             ay = -ay
 
         # angle of text
-        if ( (s.direction == 'horizontal' and not s.Label.rotate) or
-             (s.direction == 'vertical' and s.Label.rotate) ):
+        if ( (horz and not s.Label.rotate) or
+             (not horz and s.Label.rotate) ):
             angle = 0
         else:
             angle = 270
 
         x = ( self.coordParr1 + self.coordParr2 ) / 2
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
-        if s.direction == 'vertical':
+        if not horz:
             x, y = y, x
 
-        # flush left/bottom
-        # FIXME later
-        if abs(s.otherPosition) < 1e-4:
-            pass
-        elif abs(s.otherPosition-1.) < 1e-4:
-            pass
+        # make axis label flush with edge of plot if
+        # it's appropriate
+        if gparentposn != None:
+            if abs(s.otherPosition) < 1e-4 and not s.reflect:
+                if horz:
+                    y = gparentposn[3]
+                    ay = -ay
+                else:
+                    x = gparentposn[0]
+                    ax = -ax
+            elif abs(s.otherPosition-1.) < 1e-4 and s.reflect:
+                if horz:
+                    y = gparentposn[1]
+                    ay = -ay
+                else:
+                    x = gparentposn[2]
+                    ax = -ax
 
-        utils.Renderer(painter, font, x, y, s.label, ax, ay, angle).render()
+        r = utils.Renderer(painter, font, x, y, s.label,
+                           ax, ay, angle,
+                           usefullheight = True)
+
+        # make sure text is in plot rectangle
+        if gparentposn != None:
+            r.ensureInBox( minx=gparentposn[0], maxx=gparentposn[2],
+                           miny=gparentposn[1], maxy=gparentposn[3] )
+
+        texttorender.insert(0, r)
 
     def _autoMirrorDraw(self, posn, painter, coordticks):
         """Mirror axis to opposite side of graph if there isn't
@@ -541,7 +573,7 @@ class Axis(widget.Widget):
 
         return widget.Widget.chooseName(self)
 
-    def draw(self, parentposn, painter, suppresstext=False):
+    def draw(self, parentposn, painter, suppresstext=False, gparentposn=None):
         """Plot the axis on the painter.
 
         if suppresstext is True, then we don't number or label the axis
@@ -549,13 +581,12 @@ class Axis(widget.Widget):
 
         s = self.settings
 
-        # do plotting of children (does that make sense?)
-        posn = widget.Widget.draw(self, parentposn, painter)
-
         # recompute if modified
         if self.settings.isModified():
             self._computePlottedRange()
 
+        posn = widget.Widget.draw(self, parentposn, painter,
+                                  gparentposn=gparentposn)
         self._updatePlotRange(posn)
 
         # get tick vals
@@ -563,6 +594,8 @@ class Axis(widget.Widget):
 
         # save the state of the painter for later
         painter.save()
+
+        texttorender = []
 
         # multiplication factor if reflection on the axis is requested
         sign = 1
@@ -592,15 +625,28 @@ class Axis(widget.Widget):
 
         # plot tick labels
         if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(painter, coordticks, sign)
+            self._drawTickLabels(painter, coordticks, sign,
+                                 texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
-            self._drawAxisLabel(painter, sign)
+            self._drawAxisLabel(painter, sign, gparentposn,
+                                texttorender)
 
         # mirror axis at other side of plot
         if s.autoMirror:
             self._autoMirrorDraw(posn, painter, coordticks)
+
+        # now we paint the text, checking for collisions
+        # this is done by keeping a qregion containing the painted region
+        # if new text overlaps this, don't paint it
+        drawntext = qt.QRegion()
+        for r in texttorender:
+            if not r.overlapsRegion(drawntext):
+                box = r.render()
+                drawntext += ( qt.QRegion(box[0], box[1],
+                                          box[2]-box[0]+1,
+                                          box[3]-box[1]+1) )
 
         # restore the state of the painter
         painter.restore()

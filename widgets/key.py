@@ -63,10 +63,8 @@ class Key(widget.Widget):
                               descr = 'Manual vertical fractional position') )
         s.readDefaults()
 
-    def draw(self, parentposn, painter):
+    def draw(self, parentposn, painter, gparentposn = None):
         """Plot the key on a plotter."""
-
-        widget.Widget.draw(self, parentposn, painter)
 
         painter.save()
 
@@ -87,7 +85,8 @@ class Key(widget.Widget):
             else:
                 if c.settings.key != '':
                     number += 1
-                    w, h = utils.Renderer(painter, font, 0, 0, c.settings.key).getDimensions()
+                    w, h = utils.Renderer(painter, font, 0, 0,
+                                          c.settings.key).getDimensions()
                     maxwidth = max(maxwidth, w)
                     maxsymbolwidth = max(c.getKeySymbolWidth(height),
                                          maxsymbolwidth)
@@ -148,7 +147,8 @@ class Key(widget.Widget):
                     # write key text
                     if not s.Text.hide:
                         painter.setPen(textpen)
-                        utils.Renderer(painter, font, x+height*2+maxsymbolwidth,
+                        utils.Renderer(painter, font,
+                                       x+height*2+maxsymbolwidth,
                                        ypos+height/2, c.settings.key,
                                        -1, 0).render()
                     ypos += height

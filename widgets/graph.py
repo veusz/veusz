@@ -114,12 +114,12 @@ class Graph(widget.Widget):
         for c in self.children:
             c.autoAxis(axisname, bounds)
 
-    def draw(self, parentposn, painter):
+    def draw(self, parentposn, painter, gparentposn = None):
         '''Update the margins before drawing.'''
 
         s = self.settings
-        self.margins = [s.leftMargin, s.topMargin,
-                        s.rightMargin, s.bottomMargin]
+        self.margins = [ s.leftMargin, s.topMargin,
+                         s.rightMargin, s.bottomMargin ]
 
         bounds = self.computeBounds(parentposn, painter)
 
@@ -135,6 +135,10 @@ class Graph(widget.Widget):
             painter.drawRect( bounds[0], bounds[1], bounds[2]-bounds[0]+1,
                               bounds[3]-bounds[1]+1 )
 
+        # do normal drawing of children
+        widget.Widget.draw( self, parentposn, painter,
+                            gparentposn=gparentposn )
+        
         # now need to find axes which aren't children, and draw those again
         axestodraw = {}
         childrennames = {}
@@ -149,8 +153,8 @@ class Graph(widget.Widget):
         # if there are any
         if len(axestodraw) != 0:
             # now redraw all these axes if they aren't children of us
-            axestodraw = [ i for i in axestodraw.keys()
-                           if i not in childrennames ]
+            axestodraw = [ i for i in axestodraw.keys() if i not in
+                           childrennames ]
 
             # nasty, as we have to work out whether we're on the edge of
             # a collection
@@ -166,12 +170,12 @@ class Graph(widget.Widget):
                 # or the distance to the edge is not zero,
                 # and the margin is zero, suppress text
                 
-                showtext = edge == None or edgezero[edge] or margins[edge] != 0
+                showtext = ( edge == None or edgezero[edge] or
+                             margins[edge] != 0 )
                 
-                w.draw(bounds, painter, suppresstext=not showtext)
-
-        widget.Widget.draw(self, parentposn, painter)
-
+                w.draw( bounds, painter, suppresstext = not showtext,
+                        gparentposn=parentposn )
+                            
 # allow users to make Graph objects
 widgetfactory.thefactory.register( Graph )
 
