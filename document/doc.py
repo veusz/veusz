@@ -226,9 +226,11 @@ class Document( qt.QObject ):
         if ext == '.eps':
             # write eps file
             p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p.setCreator('Veusz %s' % utils.version())
             p.setOutputToFile(True)
             p.setOutputFileName(filename)
             p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.setCreator('Veusz %s' % utils.version())
             p.newPage()
             self.printTo( p, [pagenumber] )
 

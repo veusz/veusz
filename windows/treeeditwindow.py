@@ -270,6 +270,11 @@ class TreeEditWindow(qt.QDockWindow):
                 i.done()
             except AttributeError:
                 pass
+
+            # need line below or occasionally get random error
+            # "QToolTip.maybeTip() is abstract and must be overridden"
+            qt.QToolTip.remove(i)
+
             i.deleteLater()
 
         w = item.widget
