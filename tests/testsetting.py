@@ -40,7 +40,7 @@ class TestSettings(unittest.TestCase):
         s.set('plugh')
         self.assertEqual(s.get(), 'plugh')
 
-        s.fromText('hi')
+        s.set( s.fromText('hi') )
         self.assertEqual(s.get(), 'hi')
 
         self.assertRaises(setting.InvalidType, s.set, 10)
@@ -58,9 +58,9 @@ class TestSettings(unittest.TestCase):
         self.assertRaises(setting.InvalidType, s.set, 'foo')
         self.assertRaises(setting.InvalidType, s.set, 3.14)
 
-        s.fromText('tRuE')
+        s.set( s.fromText('tRuE') )
         self.assertEqual(s.get(), True)
-        s.fromText('0')
+        s.set( s.fromText('0') )
         self.assertEqual(s.get(), False)
 
     def testInt(self):
@@ -72,7 +72,7 @@ class TestSettings(unittest.TestCase):
 
         self.assertEqual(s.toText(), '89')
 
-        s.fromText('43')
+        s.set( s.fromText('43') )
         self.assertEqual(s.get(), 43)
 
         self.assertRaises(setting.InvalidType, s.set, 'foo')
@@ -88,7 +88,7 @@ class TestSettings(unittest.TestCase):
 
         self.assertEqual(s.toText(), '89.0')
 
-        s.fromText('43')
+        s.set( s.fromText('43') )
         self.assertEqual(s.get(), 43.0)
 
         self.assertRaises(setting.InvalidType, s.fromText, 'foo')
@@ -102,7 +102,7 @@ class TestSettings(unittest.TestCase):
 
         self.assertEqual(s.toText(), '89')
 
-        s.fromText('43')
+        s.set( s.fromText('43') )
         self.assertEqual(s.get(), 43)
 
         self.assertRaises(setting.InvalidType, s.fromText, 'foo')
@@ -112,7 +112,7 @@ class TestSettings(unittest.TestCase):
         s.set('Auto')
         self.assertEqual( s.get(), 'Auto' )
 
-        s.fromText('AuTo')
+        s.set( s.fromText('AuTo') )
         self.assertEqual(s.get(), 'Auto')
 
     def testFloatOrAuto(self):
@@ -125,7 +125,7 @@ class TestSettings(unittest.TestCase):
 
         self.assertEqual(s.toText(), '89.0')
 
-        s.fromText('43')
+        s.set( s.fromText('43') )
         self.assertEqual(s.get(), 43.0)
 
         self.assertRaises(setting.InvalidType, s.fromText, 'foo')
@@ -135,7 +135,7 @@ class TestSettings(unittest.TestCase):
         s.set('Auto')
         self.assertEqual( s.get(), 'Auto' )
 
-        s.fromText('AuTo')
+        s.set( s.fromText('AuTo') )
         self.assertEqual(s.get(), 'Auto')
 
     def testDistance(self):
@@ -148,7 +148,7 @@ class TestSettings(unittest.TestCase):
         s.set('3/4')
         s.set('3.3mm')
 
-        s.fromText('3.5mm')
+        s.set( s.fromText('3.5mm') )
         self.assertEqual(s.get(), '3.5mm')
 
         self.assertRaises(setting.InvalidType, s.set, 'foo')
@@ -163,7 +163,7 @@ class TestSettings(unittest.TestCase):
         s.set('beta')
         self.assertEqual(s.get(), 'beta')
 
-        s.fromText('gamma')
+        s.set( s.fromText('gamma') )
         self.assertEqual(s.get(), 'gamma')
 
         self.assertRaises(setting.InvalidType, s.set, 'foo')

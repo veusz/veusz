@@ -26,13 +26,12 @@ class Settings:
     def __init__(self, name):
         """A new Settings with a name."""
 
+        self.__dict__['setdict'] = {}
         self.name = name
-        self.setdict  = {}  # keep a dict for quick access
         self.setnames = []  # a list of names
 
     def getName(self):
-        """Return name of this settings."""
-
+        """Get the name of the settings."""
         return self.name
 
     def getSettingsList(self):
@@ -43,20 +42,21 @@ class Settings:
     def add(self, setting):
         """Add a new setting with the name, or a set of subsettings."""
 
-        n = setting.getName()
         # we shouldn't add things twice
-        assert n not in self.setdict
-        self.setdict[n] = setting
-        self.setnames.append(n)
+        name = setting.getName()
+        assert name not in self.setdict
+        self.setdict[name] = setting
+        self.setnames.append(name)
         
     def __setattr__(self, name, val):
         """Allow us to do
 
         foo.setname = 42
         """
-        
-        if name in self.setdict:
-            self.setdict[name].set(val)
+
+        d = self.__dict__['setdict']
+        if name in d:
+            d[name].set(val)
         else:
             self.__dict__[name] = val
 
@@ -66,12 +66,17 @@ class Settings:
         print foo.setname
         """
 
-        if name in self.setdict:
-            return self.setdict[name].get()
+        d = self.__dict__['setdict']
+        if name in d:
+            return d[name].get()
         else:
-            return self.__dict__[name]
+            return d[name]
+        return d[name]
 
-    def get(self, name):
+    def get(self, name = None):
         """Get the setting variable."""
 
-        return self.setdict[name]
+        if name == None:
+            return self
+        else:
+            return self.setdict[name]

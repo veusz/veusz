@@ -29,6 +29,7 @@ s.fromText('42')
 """
 
 import utils
+import controls
 
 # if invalid type passed to set
 class InvalidType(Exception):
@@ -44,13 +45,17 @@ class Setting:
         self.descr = descr
         self.set(val)
 
+    def getName(self):
+        """Get the name of the setting."""
+        return self.name
+
+    def getDescription(self):
+        """Get the setting description."""
+        return self.descr
+
     def get(self):
         """Get the stored setting."""
         return self.convertFrom(self.val)
-
-    def getName(self):
-        """Return the name."""
-        return self.name
 
     def set(self, val):
         """Save the stored setting."""
@@ -69,8 +74,18 @@ class Setting:
         return ""
 
     def fromText(self, text):
-        """Convert text to saved type for loading."""
-        pass
+        """Convert text to type suitable for setting.
+
+        Raises InvalidType if cannot convert."""
+        return None
+
+    def makeControl(self, *args):
+        """Make a qt control for editing the setting.
+
+        The control emits settingValueChanged() when the setting has
+        changed value."""
+
+        return None
 
 # Store strings
 class Str(Setting):
@@ -85,7 +100,10 @@ class Str(Setting):
         return self.val
 
     def fromText(self, text):
-        self.set( text )
+        return text
+
+    def makeControl(self, *args):
+        return controls.SettingEdit(self, *args)
 
 # Store bools
 class Bool(Setting):
@@ -105,11 +123,14 @@ class Bool(Setting):
     def fromText(self, text):
         t = text.strip().lower()
         if t in ('true', '1', 't', 'y', 'yes'):
-            self.val = True
+            return True
         elif t in ('false', '0', 'f', 'n', 'no'):
-            self.val = False
+            return False
         else:
             raise InvalidType
+
+    def makeControl(self, *args):
+        return controls.BoolSettingEdit(self, *args)
 
 # Storing integers
 class Int(Setting):
@@ -125,9 +146,12 @@ class Int(Setting):
 
     def fromText(self, text):
         try:
-            self.val = int(text)
+            return int(text)
         except ValueError:
             raise InvalidType
+
+    def makeControl(self, *args):
+        return controls.SettingEdit(self, *args)
 
 # for storing floats
 class Float(Setting):
@@ -143,9 +167,12 @@ class Float(Setting):
 
     def fromText(self, text):
         try:
-            self.set( float(text) )
+            return float(text)
         except ValueError:
             raise InvalidType
+
+    def makeControl(self, *args):
+        return controls.SettingEdit(self, *args)
 
 class FloatOrAuto(Setting):
     """Save a float or text auto."""
@@ -172,12 +199,15 @@ class FloatOrAuto(Setting):
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
-            self.val = None
+            return 'Auto'
         else:
             try:
-                self.val = float(text)
+                return float(text)
             except ValueError:
                 raise InvalidType
+
+    def makeControl(self, *args):
+        return controls.SettingChoice(self, True, ['Auto'], *args)
             
 class IntOrAuto(Setting):
     """Save an int or text auto."""
@@ -204,13 +234,16 @@ class IntOrAuto(Setting):
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
-            self.val = None
+            return 'Auto'
         else:
             try:
-                self.val = int(text)
+                return int(text)
             except ValueError:
                 raise InvalidType
             
+    def makeControl(self, *args):
+        return controls.SettingChoice(self, True, ['Auto'], *args)
+
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
     
@@ -225,17 +258,20 @@ class Distance(Setting):
 
     def fromText(self, text):
         if utils.isDist(text):
-            self.val = text
+            return text
         else:
             raise InvalidType
         
+    def makeControl(self, *args):
+        return controls.SettingEdit(self, *args)
+
 class Choice(Setting):
     """One out of a list of strings."""
 
     # maybe should be implemented as a dict to speed up checks
 
     def __init__(self, name, vallist, val, images = {}, descr = ''):
-        """Setting has name, and val must be in vallist."""
+        """Setting val must be in vallist."""
         
         self.vallist = vallist
         self.images = images
@@ -252,17 +288,21 @@ class Choice(Setting):
 
     def fromText(self, text):
         if text in self.vallist:
-            self.val = text
+            return text
         else:
             raise InvalidType
         
+    def makeControl(self, *args):
+        return controls.SettingChoice(self, False, self.vallist,
+                                      *args)
+
 class ChoiceOrMore(Setting):
     """One out of a list of strings, or anything else."""
 
     # maybe should be implemented as a dict to speed up checks
 
     def __init__(self, name, vallist, val, images = {}, descr = ''):
-        """Setting has name, and val must be in vallist."""
+        """Setting has val must be in vallist."""
         
         self.vallist = vallist
         self.images = images
@@ -275,4 +315,8 @@ class ChoiceOrMore(Setting):
         return self.val
 
     def fromText(self, text):
-        self.val = text
+        return text
+
+    def makeControl(self, *args):
+        return controls.SettingChoice(self, True, self.vallist,
+                                      *args)
