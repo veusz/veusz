@@ -164,9 +164,10 @@ class FunctionPlotter(GenericPlotter):
         painter.save()
 
         # draw the function line
-        painter.setBrush( qt.QBrush() )
-        painter.setPen( s.Line.makeQPen(painter) )
-        self._plotLine(painter, pxpts, pypts, posn)
+        if not s.Line.hide:
+            painter.setBrush( qt.QBrush() )
+            painter.setPen( s.Line.makeQPen(painter) )
+            self._plotLine(painter, pxpts, pypts, posn)
 
         painter.restore()
 
@@ -420,13 +421,17 @@ class PointPlotter(GenericPlotter):
                              axes)
 
         # plot the points (we do this last so they are on top)
-        if not s.MarkerLine.hide:
+        if not s.MarkerLine.hide and not s.MarkerFill.hide:
             size = int( utils.cnvtDist(s.markerSize, painter) )
 
             if not s.MarkerFill.hide:
                 painter.setBrush( s.MarkerFill.makeQBrush() )
+
+            if not s.MarkerLine.hide:
+                painter.setPen( s.MarkerLine.makeQPen(painter) )
+            else:
+                painter.setPen( qt.QPen( qt.Qt.None ) )
                 
-            painter.setPen( s.MarkerLine.makeQPen(painter) )
             utils.plotMarkers(painter, xplotter, yplotter, s.marker,
                               size)
 

@@ -63,8 +63,7 @@ class MainWindow(qt.QMainWindow):
 
         # the plot window is the central window
         self.setCentralWidget( self.plot )
-
-        self.statusBar().message("Ready", 2000)
+        self.updateStatusbar('Ready')
 
         # keep page number up to date
         self.pagelabel = qt.QLabel(self.statusBar())
@@ -80,6 +79,10 @@ class MainWindow(qt.QMainWindow):
         # if the treeeditwindow changes the page, change the plot window
         self.connect( self.treeedit, qt.PYSIGNAL("sigPageChanged"),
                       self.plot.setPageNumber )
+
+    def updateStatusbar(self, text):
+        '''Display text for a set period.'''
+        self.statusBar().message(text, 2000)
 
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
@@ -201,6 +204,17 @@ class MainWindow(qt.QMainWindow):
                               qt.QMessageBox.No,
                               qt.QMessageBox.Cancel,
                               self).exec_loop()
+
+    def close(self, alsoDelete):
+        """Before closing, check whether we need to save first."""
+        if self.document.isModified():
+            v = self.queryOverwrite()
+            if v == qt.QMessageBox.Cancel:
+                return False
+            elif v == qt.QMessageBox.Yes:
+                self.slotFileSave()
+            return qt.QMainWindow.close(self, alsoDelete)
+
     def slotFileNew(self):
         """New file."""
 
@@ -226,6 +240,7 @@ class MainWindow(qt.QMainWindow):
             try:
                 file = open(self.filename, 'w')
                 self.document.saveToFile(file)
+                self.updateStatusbar("Saved to %s" % self.filename)
             except IOError:
                 qt.QMessageBox("Veusz",
                                "Cannot save file as '%s'" % self.filename,
@@ -284,6 +299,22 @@ class MainWindow(qt.QMainWindow):
 
             self.slotFileSave()
 
+    def openFile(self, filename):
+        '''Open the given filename.'''
+        try:
+            self.interpreter.Load(filename)
+            self.filename = filename
+            self.updateTitlebar()
+            self.updateStatusbar("Opened %s" % filename)
+        except IOError:
+            qt.QMessageBox("Veusz",
+                           "Cannot open file '%s'" % filename,
+                           qt.QMessageBox.Critical,
+                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                           qt.QMessageBox.NoButton,
+                           qt.QMessageBox.NoButton,
+                           self).exec_loop()
+
     def slotFileOpen(self):
         """Open an existing file."""
 
@@ -299,19 +330,7 @@ class MainWindow(qt.QMainWindow):
             MainWindow.dirname = fd.dir()
 
             filename = str( fd.selectedFile() )
-
-            try:
-                self.interpreter.Load(filename)
-                self.filename = filename
-                self.updateTitlebar()
-            except IOError:
-                qt.QMessageBox("Veusz",
-                               "Cannot open file '%s'" % self.filename,
-                               qt.QMessageBox.Critical,
-                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                               qt.QMessageBox.NoButton,
-                               qt.QMessageBox.NoButton,
-                               self).exec_loop()
+            self.openFile(filename)
                 
     def slotFileExport(self):
         """Export the graph."""

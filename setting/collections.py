@@ -104,6 +104,8 @@ class MajorTick(Line):
         Line.__init__(self, name, descr)
         self.add( setting.Distance( 'length', '6pt',
                                     descr = 'Length of ticks' ) )
+        self.add( setting.Int( 'number', 5,
+                               descr = 'Number of major ticks to aim for' ) )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -117,6 +119,8 @@ class MinorTick(Line):
         Line.__init__(self, name, descr)
         self.add( setting.Distance( 'length', '3pt',
                                     descr = 'Length of ticks' ) )
+        self.add( setting.Int( 'number', 30,
+                               descr = 'Number of minor ticks to aim for' ) )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''

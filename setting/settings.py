@@ -143,7 +143,7 @@ class Settings(qt.QObject):
                     return val
             else:
                 if isinstance(val, Settings):
-                    val.getFromPath(path[1:])
+                    return val.getFromPath(path[1:])
                 else:
                     raise ValueError, '"%s" not a valid subsetting' % name
         else:
@@ -166,11 +166,12 @@ class Settings(qt.QObject):
 
             if isinstance(val, Settings):
                 # get text of sub preference
-                text += val.saveText(saveall, rootname + self.name)
+                text += val.saveText(saveall, rootname + val.name)
             else:
                 if saveall or not val.isDefault():
                     text += "Set('%s%s', %s)\n" % ( rootname, name,
                                                     repr(val.get()) )
+        return text
 
     def readDefaults(self):
         """Return default values from saved text."""

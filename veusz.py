@@ -26,12 +26,35 @@
 import sys
 import qt
 
+import utils
 from windows.mainwindow import MainWindow
 
 app = qt.QApplication(sys.argv)
+
+# process command line arguments
+cmdline = [str(app.argv()[i]) for i in range(1, app.argc())]
+
+if '--help' in cmdline or len(cmdline) > 1:
+    sys.stderr.write('Veusz version %s\n' % utils.version())
+    sys.stderr.write('Copyright (C) Jeremy Sanders 2003 '
+                     '<jeremy@jeremysanders.net>\n\n')
+    sys.stderr.write('Usage: \n veusz saved.vsz\n')
+    sys.stderr.write('Optional arguments --help, --version\n')
+    sys.exit(0)
+elif '--version' in cmdline:
+    sys.stderr.write('Veusz version %s\n' % utils.version())
+    sys.stderr.write('Copyright (C) Jeremy Sanders 2003 '
+                     '<jeremy@jeremysanders.net>\n')
+    sys.exit(0)
+
 win = MainWindow()
 win.show()
 app.connect(app, qt.SIGNAL("lastWindowClosed()"),
             app, qt.SLOT("quit()"))
+
+# load in filename given
+if len(cmdline) != 0:
+    win.openFile(cmdline[0])
+
 app.exec_loop()
  

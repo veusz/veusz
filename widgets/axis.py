@@ -52,10 +52,6 @@ class Axis(widget.Widget):
                                    descr='Maximum value of axis') )
         s.add( setting.Bool('log', False,
                             descr = 'Whether axis is logarithmic') )
-        s.add( setting.Int('numTicks', 5,
-                           descr = 'Preferred number of major ticks') )
-        s.add( setting.Int('numMinorTicks', 40,
-                           descr = 'Preferred number of minor ticks') )
         s.add( setting.Bool('autoExtend', True,
                             descr = 'Extend axis to nearest major tick') )
         s.add( setting.Bool('autoExtendZero', True,
@@ -146,7 +142,7 @@ class Axis(widget.Widget):
         # work out tick values and expand axes if necessary
         
         as = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
-                                  s.numTicks, s.numMinorTicks,
+                                  s.MajorTicks.number, s.MinorTicks.number,
                                   extendbounds = s.autoExtend,
                                   extendzero = s.autoExtendZero,
                                   logaxis = s.log )
@@ -337,7 +333,8 @@ class Axis(widget.Widget):
 
         s = self.settings
         mt = s.get('MinorTicks')
-        delta = s.get('MinorTicks').getLength(painter)
+        painter.setPen( mt.makeQPen(painter) )
+        delta = mt.getLength(painter)
         minorticks = self._graphToPlotter(self.minortickscalc)
 
         if s.direction == 'vertical':
@@ -412,6 +409,7 @@ class Axis(widget.Widget):
                 x, y = y, x
 
             ax, ay = self._getTickLabelAlign(i==0, i==len(coordticks)-1)
+            #print x, y, ax, ay, num
             rec = utils.render( painter, font,
                                 x, y, num,
                                 ax, ay, angle )
@@ -520,7 +518,7 @@ class Axis(widget.Widget):
 
         # multiplication factor if reflection on the axis is requested
         sign = 1
-        if s.direction != 0:
+        if s.direction == 'vertical':
             sign *= -1
         if s.reflect:
             sign *= -1
