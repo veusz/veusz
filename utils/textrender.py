@@ -175,13 +175,14 @@ class Renderer:
         # work out total width and height
         self.painter.setFont(self.font)
 
-        fm = self.painter.fontMetrics()
-        totalheight = fm.boundingRect('0').height()
-
+        # work out height of box, and
         # make the bounding box a bit bigger if we want to include descents
+        fm = self.painter.fontMetrics()
         if self.usefullheight:
+            totalheight = fm.ascent()
             dy = fm.descent()
         else:
+            totalheight = fm.boundingRect('0').height()
             dy = 0
 
         self.xpos = 0
