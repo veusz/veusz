@@ -207,9 +207,7 @@ class TreeEditWindow(qt.QDockWindow):
         lv.addColumn( "Name" )
         lv.addColumn( "Type" )
         lv.addColumn( "Detail" )
-        #lv.addColumn( "Sort order")
-        #lv.setColumnWidth(3, 0)
-        #lv.setColumnWidthMode(3, qt.QListView.Manual)
+        lv.setColumnWidthMode(2, qt.QListView.Manual)
         lv.setSorting(0)
         lv.setTreeStepSize(10)
 
