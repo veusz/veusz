@@ -1,51 +1,61 @@
-Welcome to Veusz
-----------------
+Veusz 0.4  [first public release]
+---------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
 
-Veusz is Copyright (C) 2003 Jeremy S. Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2005 Jeremy Sanders <jeremy@jeremysanders.net>
+Licenced under the GPL (version 2 or greater)
 
-Veusz is a scientific plotting package written in Python. It uses PyQt
-for display and user-interfaces, and Numarray for handling the numeric
-data. Veusz is licenced under the GPL. Please read the file COPYING
-included in this distribution for information about the licence.
+Veusz is a scientific plotting package written in Python (currently
+100% Python). It uses PyQt for display and user-interfaces, and
+numarray for handling the numeric data. Veusz is designed to produce
+publication-ready Postscript output.
 
-This is a very preliminary version of the program. It demonstrates
-some of the features but the interface is very cumbersome.
+Veusz provides a GUI, command line and scripting interface (based on
+Python) to its plotting facilities. The plots are built using an
+object-based system to provide a consistent interface.
 
-The idea is to have a program which can generate publication-ready
-plots in Postscript, be easily scriptable, and easily extended.
+Currently done:
+ * X-Y plots (with errorbars)
+ * Stepped plots (for histograms)
+ * Line plots
+ * Function plots
+ * Stacked plots and arrays of plots
+ * Plot keys
+ * Plot labels
+ * LaTeX-like formatting for text
+ * EPS output
+ * Simple data importing
+ * Scripting interface
+ * Save/Load plots
+ * Some work on a manual and introduction
 
-Ideally, features to be included are:
- o Plotting
- o Fitting data
- o Contour plots
- o Image data
-...
+To be done:
+ * Contour plots
+ * Images
+ * Filled regions
+ * UI improvements
+ * Import filters (for qdp and other plotting packages, fits, csv)
+ * Data manipulation
+ * Python embedding interface (for embedding Veusz in other programs).
+   [some of the external interface is complete]
+ * Proper installation program
 
-Please see the file INSTALL for installation instructions.
+For documentation on using Veusz, see the "Documents" directory. The
+manual is in pdf, html and text format (generated from docbook).
 
---
+If you enjoy using Veusz, I would love to hear from you. Please join
+the mailing lists at
 
-Sample commands for plotting are:
+https://gna.org/mail/?group=veusz
 
-You can run commands like:
+to discuss new features or if you'd like to contribute code. The
+newest code can always be found in CVS.
 
-Add 'function' 'x**2'
-Set 'x/log' True
-Get 'y/log'
-Print
+Cheers
 
--- or --
-
-SetData 'dist' arange(20)
-SetData 'vel' arange(20)**2
-Add 'xy' 'dist' 'vel'
-Set 'x/Label/label' 'Distance (cm)'
-Set 'y/Label/label' 'Velocity (cm s^{-1})'
-Set '1/MarkerFill/color' 'blue'
-Set '1/MarkerFill/hide' False
+Jeremy
 
 -------------------------------------------------------------------------------
 $Id$
