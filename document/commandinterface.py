@@ -49,6 +49,7 @@ class CommandInterface:
         """Add a graph to the plotset."""
         w = widgets.thefactory.makeWidget(type, self.currentwidget,
                                           *args, **args_opt)
+        self.document.setModified()
 
     def _resolve(self, where):
         """Resolve graph relative to current graph.
@@ -115,7 +116,7 @@ class CommandInterface:
 
     def Set(self, var, val):
         """Set a variable var to val."""
-        pass
+        self.document.setModified()
 
     def WriteEPS(self, filename):
         """Write contents of graph to an eps file."""

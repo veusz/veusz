@@ -27,17 +27,42 @@ class PlotWindow(qt.QScrollView):
     """ Class to show the plot(s)."""
     
     def __init__(self, document, *args):
-        """ Initialise the window."""
+        """Initialise the window."""
 
         qt.QScrollView.__init__(self, *args)
-        self.viewport().setBackgroundMode( qt.Qt.PaletteBase )
-        self.resizeContents( 1000, 1000 )
+        self.viewport().setBackgroundMode( qt.Qt.NoBackground )
 
         self.document = document
+        document.addModifiedCallback( self.__callbackModifiedDoc )
+        self.modified = True
+
+        self.setOutputSize(1000, 1000)
+
+    def setOutputSize(self, xwidth, ywidth):
+        """Set the ouput display size."""
+
+        self.size = (xwidth, ywidth)
+        self.bufferpixmap = qt.QPixmap( *self.size )
+        self.resizeContents( *self.size )
+
+    def __callbackModifiedDoc(self, ismodified):
+        """Called when the document has been modified."""
+        if ismodified:
+            self.modified = True
 
     def drawContents(self, painter, clipx=-1, clipy=-1, clipw=-1, cliph=-1):
-        widget = self.document.getBaseWidget()
-        widget.draw( (50, 50, 250, 250), painter )
-        
+        """Called when the contents need repainting."""
 
+        # draw data into background pixmap if modified
+        if self.modified:
+            self.bufferpixmap.fill( qt.Qt.white )
+            p = qt.QPainter( self.bufferpixmap )
+            widget = self.document.getBaseWidget()
+            widget.draw( (50, 50, 250, 250), p )
+            self.modified = False
+
+        # blt the pixmap into the image
+        painter.drawPixmap(0, 0, self.bufferpixmap)
+        
+        
         

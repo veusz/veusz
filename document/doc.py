@@ -26,7 +26,7 @@ import numarray
 
 import widgets
 
-def _cnvt_numarray(a):
+def __cnvt_numarray(a):
     """Convert to a numarray if possible."""
     if a == None:
         return None
@@ -42,14 +42,19 @@ class Document:
         self.basewidget = widgets.Widget(None)
         self.basewidget.setDocument( self )
 
+        self.modified_callbacks = []
+        self.setModified()
+
     def setData(self, name, val, symerr = None, negerr = None, poserr = None):
         """Set data to val, with symmetric or negative and positive errors."""
         t = type(numarray.arange(1))
 
-        self.data[name] = _cnvt_numarray(val)
-        self.data[name + '_SYMERR_'] = _cnvt_numarray(symerr)
-        self.data[name + '_NEGERR_'] = _cnvt_numarray(negerr)
-        self.data[name + '_POSERR_'] = _cnvt_numarray(poserr)
+        self.data[name] = __cnvt_numarray(val)
+        self.data[name + '_SYMERR_'] = __cnvt_numarray(symerr)
+        self.data[name + '_NEGERR_'] = __cnvt_numarray(negerr)
+        self.data[name + '_POSERR_'] = __cnvt_numarray(poserr)
+
+        self.setModified()
 
     def getBaseWidget(self):
         """Return the base widget."""
@@ -76,4 +81,18 @@ class Document:
         return ( self.data[name], self.data[name + '_SYMERR_'],
                  self.data[name + '_NEGERR_'],
                  self.data[name + '_POSERR_'] )
+
+    def addModifiedCallback(self, callback):
+        """Register a callback function to be called if doc is modified."""
+        self.modified_callbacks.append(callback)
+
+    def setModified(self, ismodified=True):
+        """Set the modified flag on the data, and inform views."""
+        self.modified = ismodified
+        for c in self.modified_callbacks:
+            c(ismodified)
+
+    def isModifed(self):
+        """Return whether modified flag set."""
+        return self.modified
     
