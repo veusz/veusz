@@ -458,6 +458,7 @@ class Axis(widget.Widget):
         """
 
         s = self.settings
+        sl = s.Label
         painter.setPen( s.get('Label').makeQPen() )
         font = s.get('Label').makeQFont(painter)
         painter.setFont(font)
@@ -477,8 +478,8 @@ class Axis(widget.Widget):
             ay = -ay
 
         # angle of text
-        if ( (horz and not s.Label.rotate) or
-             (not horz and s.Label.rotate) ):
+        if ( (horz and not sl.rotate) or
+             (not horz and sl.rotate) ):
             angle = 0
         else:
             angle = 270
@@ -490,7 +491,7 @@ class Axis(widget.Widget):
 
         # make axis label flush with edge of plot if
         # it's appropriate
-        if outerbounds != None:
+        if outerbounds != None and sl.atEdge:
             if abs(s.otherPosition) < 1e-4 and not s.reflect:
                 if horz:
                     y = outerbounds[3]

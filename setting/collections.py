@@ -236,6 +236,9 @@ class AxisLabel(Text):
 
     def __init__(self, name, descr = ''):
         Text.__init__(self, name, descr=descr)
+        self.add( setting.Bool( 'atEdge', False,
+                                descr = 'Place axis label close to edge'
+                                ' of graph') )
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees' ) )
 
