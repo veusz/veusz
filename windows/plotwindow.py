@@ -82,7 +82,7 @@ class PlotWindow( qt.QScrollView ):
                             self.visibleHeight()/2 - logo.height()/2,
                             logo )
 
-    def drawContents(self, painter, clipx=-1, clipy=-1, clipw=-1, cliph=-1):
+    def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
         """Called when the contents need repainting."""
 
         widget = self.document.getBaseWidget()
@@ -95,14 +95,29 @@ class PlotWindow( qt.QScrollView ):
 
             # make a QPainter to draw into the buffer pixmap
             p = qt.QPainter( self.bufferpixmap )
+
             # draw the data into the buffer
-            #widget.draw( (50, 50, 250, 250), p )
             self.document.printTo( self.bufferpixmap )
 
             self.modified = False
 
-        # blt the pixmap into the image
-        painter.drawPixmap(0, 0, self.bufferpixmap)
+        # blt the visible part of the pixmap into the image
+        painter.drawPixmap(clipx, clipy, self.bufferpixmap,
+                           clipx, clipy, clipw, cliph)
+
+        # annoyingly we have to draw the surrounding grey ourselves
+        dim = ( self.contentsX(), self.contentsY(),
+                self.visibleWidth(), self.visibleHeight() )
+
+        if dim[0]+dim[2] > self.size[0]:
+            painter.fillRect(self.size[0], dim[1],
+                             dim[0]+dim[2]-self.size[0], dim[3],
+                             qt.QBrush( self.colorGroup().dark() ))
+
+        if dim[1]+dim[3] > self.size[1]:
+            painter.fillRect(dim[0], self.size[1],
+                             dim[2], dim[1]+dim[3]-self.size[1],
+                             qt.QBrush( self.colorGroup().dark() ))
 
         # add logo if no children
         if len(widget.getChildren()) == 0:
