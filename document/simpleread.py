@@ -41,8 +41,12 @@ The first 3 mean the same thing, the last means read from 1 to 5
 """
 
 import re
-import doc
+import sys
 import StringIO
+
+import numarray.ieeespecial
+
+import doc
 
 class _DescriptorPart:
 
@@ -60,6 +64,7 @@ class _DescriptorPart:
         self.negerr = -1
         self.val = -1
         self.name = None
+        self.errorcount = 0
 
         self.startindex = None
         self.stopindex = None
@@ -143,6 +148,13 @@ class _DescriptorPart:
                 val = stream.nextColumn()
                 if val == None:
                     return
+
+                # do conversion
+                try:
+                    val = float(val)
+                except ValueError:
+                    val = numarray.ieeespecial.nan
+                    self.errorcount += 1
 
                 # append a suffix to specfiy whether error or value
                 if count == self.symerr:
@@ -234,8 +246,8 @@ class FileStream:
             if continuation:
                 line = line[:-1]
 
-            # break up and convert to floats
-            self.remainingline += [float(i) for i in line.split()]
+            # break up and append to buffer
+            self.remainingline += line.split()
 
             if not continuation:
                 return True
@@ -271,6 +283,16 @@ class SimpleRead:
         while stream.newLine():
             for i in self.parts:
                 i.readFromStream(stream, self.datasets)
+
+    def getInvalidConversions(self):
+        """Return the number of invalid conversions after reading data.
+
+        Returns a dict of dataset, number values."""
+
+        out = {}
+        for i in self.parts:
+            out[i.name] = i.errorcount
+        return out
 
     def setInDocument(self, document):
         """Set the data in the document.

@@ -757,7 +757,12 @@ SetData('x', data[0]*0.1, *data[1:])
         representing the columns of the data. For more information see
         <link linkend="Descriptors">Descriptors</link>.</para>
 
-	<para>Returns: list of datasets imported.</para>
+	<para>Returns: A tuple containing a list of the imported
+	datasets and the number of conversions which failed for a
+	dataset.</para>
+
+	<para>Changed in version 0.5: A tuple is returned rather than
+	just the number of imported variables.</para>
       </section>
       
       <section>
@@ -772,7 +777,12 @@ SetData('x', data[0]*0.1, *data[1:])
 	data to be easily embedded within a document. The data string is
 	usually a multi-line Python string.</para>
 	
-	<para>Returns: list of datasets imported.</para>
+	<para>Returns: A tuple containing a list of the imported
+	datasets and the number of conversions which failed for a
+	dataset.</para>
+
+	<para>Changed in version 0.5: A tuple is returned rather than
+	just the number of imported variables.</para>
 
 	<informalexample>
 	  <programlisting>

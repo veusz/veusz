@@ -92,10 +92,12 @@ class ImportDialog(qt.QDialog):
         self.layout.addWidget( fnhbox )
         self.layout.addWidget( self.previewedit )
 
-        l = qt.QLabel("The descriptor describes the format of the data in the file, "
+        l = qt.QLabel("The descriptor describes the format of the data "
+                      "in the file, "
                       "eg x,+- [x with symmetric errors] y,+,- "
                       "[y with asymmetric errors] z [no errors] "
-                      "x[1:5],+,- [x_1 to x_5, each with asymmetric errors]", self)
+                      "x[1:5],+,- [x_1 to x_5, each with asymmetric errors]",
+                      self)
         l.setAlignment( l.alignment() | qt.Qt.WordBreak )
         self.layout.addWidget( l )
 
@@ -161,11 +163,21 @@ class ImportDialog(qt.QDialog):
         stream = document.FileStream(ifile)
         sr = document.SimpleRead(descriptor)
         sr.readData(stream)
+
+        text = ''
+        for var, count in sr.getInvalidConversions().items():
+            if count != 0:
+                text += '%i conversions failed for variable "%s"\n' % (
+                    count, var)
+        if text != '':
+            text += '\n'
+
         names = sr.setInDocument(self.document)
 
-        text = 'Successfully imported data for variables:\n'
+        text += 'Imported data for variables:\n'
         for i in names:
             text += i + '\n'
+
         self.previewedit.setText(text)
         
         

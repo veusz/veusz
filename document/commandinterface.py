@@ -198,21 +198,37 @@ class CommandInterface(qt.QObject):
         return (data, serr, nerr, perr)
 
     def ImportString(self, descriptor, string):
-        """Read data from the string using a descriptor."""
+        """Read data from the string using a descriptor.
+
+        Returned is a tuple (datasets, errors)
+         where datasets is a list of datasets read
+         errors is a dict of the datasets with the number of errors while
+         converting the data
+        """
 
         stream = simpleread.StringStream(string)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
-        return sr.setInDocument(self.document)
+        datasets = sr.setInDocument(self.document)
+        errors = sr.getInvalidConversions()
+        return (datasets, errors)
 
     def ImportFile(self, filename, descriptor):
-        """Read data from file with filename using descriptor."""
+        """Read data from file with filename using descriptor.
+
+        Returned is a tuple (datasets, errors)
+         where datasets is a list of datasets read
+         errors is a dict of the datasets with the number of errors while
+         converting the data
+        """
 
         f = open(filename, 'r')
         stream = simpleread.FileStream(f)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
-        return sr.setInDocument(self.document)
+        datasets = sr.setInDocument(self.document)
+        errors = sr.getInvalidConversions()
+        return (datasets, errors)
 
     def Action(self, action, widget='.'):
         """Performs action on current widget."""
