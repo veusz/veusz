@@ -221,6 +221,14 @@
 		  box, or not filled or surrounded.</para>
 	      </listitem>
 
+	      <listitem>
+		<para>label - a text label places on a graph. The
+		alignment can be adjusted and the font changed. The
+		position of the label can be specified in fractional
+		terms of the current graph, or using axis
+		coordinates.</para>
+	      </listitem>
+
 	    </orderedlist>
 
 	  </listitem>
