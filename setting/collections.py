@@ -173,7 +173,7 @@ class Text(settings.Settings):
 
         self.add( setting.Str('font', 'Times New Roman',
                   descr = 'Font name' ) )
-        self.add( setting.Distance('size', '12pt',
+        self.add( setting.Distance('size', '14pt',
                   descr = 'Font size' ) )
         self.add( setting.ChoiceOrMore( 'color', colors, 'black',
                                         descr = 'Font color' ) )

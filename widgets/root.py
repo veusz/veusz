@@ -39,9 +39,9 @@ class Root(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
-        s.add( setting.Distance('width', '20cm',
+        s.add( setting.Distance('width', '15cm',
                                 descr='Width of the pages') )
-        s.add( setting.Distance('height', '20cm',
+        s.add( setting.Distance('height', '15cm',
                                 descr='Height of the pages') )
         s.readDefaults()
 

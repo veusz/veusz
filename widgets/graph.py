@@ -41,16 +41,16 @@ class Graph(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
-        s.add( setting.Distance( 'leftMargin', '10%', descr=
+        s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
                                  'Distance from left of graph to '
                                  'edge of page') )
-        s.add( setting.Distance( 'rightMargin', '5%', descr=
+        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
                                  'Distance from right of graph to '
                                  'edge of page') )
-        s.add( setting.Distance( 'topMargin', '5%', descr=
+        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
                                  'Distance from top of graph to '
                                  'edge of page') )
-        s.add( setting.Distance( 'bottomMargin', '10%', descr=
+        s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
                                  'Distance from bottom of graph'
                                  'to edge of page') )
         s.add( setting.GraphBrush( 'Background',
