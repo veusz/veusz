@@ -21,8 +21,9 @@
 
 # $Id$
 
-import numarray
 import math
+
+import numarray as N
 
 """Algorithms for working with axis ticks.
 
@@ -85,7 +86,7 @@ class AxisTicks:
         startmult = int( math.ceil( minval / delta ) )
         stopmult = int( math.floor( maxval / delta ) )
         
-        return numarray.arange(startmult, stopmult+1) * delta
+        return N.arange(startmult, stopmult+1) * delta
 
     def _tickNums(self, minval, maxval, delta):
         """Calculate number of ticks between minval and maxval with delta."""
@@ -175,8 +176,8 @@ class AxisTicks:
         # this is a scale going e.g. 1,2,3,...8,9,10,20,30...90,100,200...
 
         # round down to nearest power of 10 for each
-        alpha = int( math.floor( numarray.log10(minval) ) )
-        beta = int( math.floor( numarray.log10(maxval) ) )
+        alpha = int( math.floor( N.log10(minval) ) )
+        beta = int( math.floor( N.log10(maxval) ) )
 
         ticks = []
         # iterate over range in log space
@@ -190,14 +191,14 @@ class AxisTicks:
                    ( math.fabs(v - maxval)/v < 1e-6 or v < maxval ) :
                     ticks.append(v)
 
-        return numarray.array( ticks )
+        return N.array( ticks )
         
     def _axisScaler(self, allowed_intervals):
         """With minval and maxval find best tick positions."""
 
         # work out range and log range
         therange = self.maxval - self.minval
-        intlogrange = int( numarray.log10( therange ) )
+        intlogrange = int( N.log10( therange ) )
 
         # we step variable to move through log space to find best ticks
         logstep = intlogrange + 1
@@ -273,33 +274,47 @@ class AxisTicks:
             intervals = AxisTicks.allowed_intervals_log
 
             # transform range into log space
-            self.minval = numarray.log10( self.minval )
-            self.maxval = numarray.log10( self.maxval )
+            self.minval = N.log10( self.minval )
+            self.maxval = N.log10( self.maxval )
 
         else:
             # which linear intervals we'll allow
             intervals = AxisTicks.allowed_intervals_linear
             
-        ticks = self._axisScaler( intervals )
-
-        interval = ticks[3]
-        loginterval = ticks[4]
+        minval, maxval, tickvals, interval, loginterval = self._axisScaler( intervals )
 
         # work out the most appropriate minor tick intervals
         if not self.logaxis:
             # just plain minor ticks
             # try to achieve no of minors close to value requested
             
-            minorticks = self._calcLinearMinorTickValues\
-                         (ticks[0], ticks[1], interval, loginterval,
-                          AxisTicks.allowed_minorintervals_linear[interval])
+            minorticks = self._calcLinearMinorTickValues(
+                minval, maxval, interval, loginterval,
+                AxisTicks.allowed_minorintervals_linear[interval]
+                )
+
         else:
             if interval == 1.:
+                # calculate minor ticks
                 # here we use 'conventional' minor log tick spacing
                 # e.g. 0.9, 1, 2, .., 8, 9, 10, 20, 30 ...
+                minorticks = self._calcLogMinorTickValues(10.**minval,
+                                                          10.**maxval)
+
+                # Here we test whether more log major tick values are needed...
+                # often we might only have one tick value, and so we add 2, then 5
+                # this is a bit of a hack: better ideas please!!
+
+                if len(tickvals) < 2:
+                    # get lower power of 10
+                    low10 = int( math.floor(minval) )
+
+                    # could use numarray here
+                    for i in (2., 5., 20., 50.):
+                        n = low10 + math.log10(i)
+                        if n >= minval and n <= maxval:
+                            tickvals = N.concatenate( (tickvals, N.array([n]) ))
                 
-                minorticks = self._calcLogMinorTickValues(10.**ticks[0],
-                                                          10.**ticks[1])
             else:
                 # if we increase by more than one power of 10 on the
                 # axis, we can't do the above, so we do linear ticks
@@ -308,12 +323,13 @@ class AxisTicks:
                 # to make it easy to read the axis. comments?
                 
                 minorticks = self._calcLinearMinorTickValues\
-                             (ticks[0], ticks[1], interval, loginterval,
+                             (minval, maxval, interval, loginterval,
                               AxisTicks.allowed_minorintervals_log)
                 minorticks = 10.**minorticks
                                                          
             # transform normal ticks back to real space
-            ticks = ( 10.**ticks[0], 10.**ticks[1], 10.**ticks[2] )
+            minval = 10.**minval
+            maxval = 10.**maxval
+            tickvals = 10.**tickvals
             
-        return ticks[:3] + (minorticks,)
-
+        return (minval, maxval, tickvals, minorticks)

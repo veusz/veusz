@@ -21,11 +21,12 @@
 
 # $Id$
 
+import numarray as N
+import numarray.ieeespecial as NIE
+
 import plotters
 import widgetfactory
 import setting
-import numarray as N
-import numarray.ieeespecial as NIE
 import utils
 
 class Fit(plotters.FunctionPlotter):

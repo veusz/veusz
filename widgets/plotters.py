@@ -55,26 +55,10 @@ class GenericPlotter(widget.Widget):
         s.add( setting.Str('yAxis', 'y',
                            descr = 'Name of Y-axis to use') )
 
-    def getAxes(self):
-        """Get the axes widgets to plot against."""
-
-        xaxis = None
-        yaxis = None
-
-        x = self.settings.xAxis
-        y = self.settings.yAxis
-
-        # recursively go back up the tree to find axes 
-        parent = self.parent
-        while parent != None and (xaxis == None or yaxis == None):
-            for i in parent.children:
-                if i.name == x and xaxis == None:
-                    xaxis = i
-                if i.name == y and yaxis == None:
-                    yaxis = i
-            parent = parent.parent
-
-        return (xaxis, yaxis)
+    def getAxesNames(self):
+        """Returns names of axes used."""
+        s = self.settings
+        return [s.xAxis, s.yAxis]
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line at (x,y) in a box width*height.
@@ -171,9 +155,10 @@ class FunctionPlotter(GenericPlotter):
 
         posn = GenericPlotter.draw(self, parentposn, painter)
         x1, y1, x2, y2 = posn
+        s = self.settings
 
         # get axes widgets
-        axes = self.getAxes()
+        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
         # return if there's no proper axes
         if ( None in axes or
@@ -181,7 +166,6 @@ class FunctionPlotter(GenericPlotter):
              axes[1].settings.direction != 'vertical' ):
             return
 
-        s = self.settings
         env = self.initEnviron()
         if s.variable == 'x':
             # x function
@@ -458,7 +442,7 @@ class PointPlotter(GenericPlotter):
         #  as the axis could be log
         elif steps == 'centre':
             xv = self.document.getData(s.xData)
-            axes = self.getAxes()
+            axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
             xcen = axes[0].graphToPlotterCoords(posn,
                                                 0.5*(xv.data[:-1]+xv.data[1:]))
 
@@ -517,7 +501,7 @@ class PointPlotter(GenericPlotter):
             return
         
         # get axes widgets
-        axes = self.getAxes()
+        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
         # return if there's no proper axes
         if ( None in axes or

@@ -31,6 +31,7 @@ import widget
 import widgetfactory
 import axis
 import page
+import graph
 import setting
 
 class _gridengine:
@@ -184,6 +185,9 @@ class Grid(widget.Widget):
                                  'to edge of page') )
         s.readDefaults()
 
+        self.addAction( 'zeroMargins', self.actionZeroMargins,
+                        descr = 'Zero graph margins' )
+
         self.olddimensions = (-1, -1)
 
         # maintain copy of children to check for mods
@@ -223,7 +227,18 @@ class Grid(widget.Widget):
             child.position = ( pos[0]*invc, pos[1]*invr,
                                (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
 
-    def draw(self, posn, painter):
+    def actionZeroMargins(self):
+        """Zero margins of plots inside this grid."""
+
+        for c in self.children:
+            if isinstance(c, graph.Graph):
+                s = c.settings
+                s.leftMargin = '0'
+                s.topMargin = '0'
+                s.rightMargin = '0'
+                s.bottomMargin = '0'
+
+    def draw(self, parentposn, painter):
         """Draws the widget's children."""
 
         s = self.settings
@@ -233,14 +248,22 @@ class Grid(widget.Widget):
         # FIXME: this is very stupid, but works
         # if the contents have been modified, recalculate the positions
         dimensions = (s.columns, s.rows)
-        if self.children != self._old_children or \
-           self.olddimensions != dimensions:
+        if ( self.children != self._old_children or
+             self.olddimensions != dimensions ):
             
             self._old_children = list(self.children)
             self._recalcPositions()
             self.olddimensions = dimensions
 
-        widget.Widget.draw(self, posn, painter)
+        # draw children in reverse order if they are not axes
+        bounds = self.computeBounds(parentposn, painter)
+        #for i in range(len(self.children)-1, -1, -1 ):
+        for i in range(len(self.children)):
+            c = self.children[i]
+            if not isinstance(c, axis.Axis):
+                self.children[i].draw(bounds, painter)
+
+        # do not call widget.Widget.draw
 
 # allow the factory to instantiate a grid
 widgetfactory.thefactory.register( Grid )

@@ -75,11 +75,8 @@ class InputListener(qt.QObject):
         """When a command is received, interpret it."""
 
         line = sys.stdin.readline()
-        print line
-        return
 
         if self.pickle:
-            print line
             # line is repr form of pickled string get get rid of \n
             retn = self.ci.runPickle( eval(line.strip()) )
             sys.stdout.write('%s\n' % repr(retn))

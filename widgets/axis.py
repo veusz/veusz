@@ -21,7 +21,7 @@
 
 # $Id$
 
-import numarray
+import numarray as N
 
 import widget
 import axisticks
@@ -105,7 +105,7 @@ class Axis(widget.Widget):
         """Check children of this parent to update autorange."""
 
         n = self.name
-        # ensures that we're the exis any other children refer to
+        # ensures that we're the axis any other children refer to
         for c in parent.children:
             if c != self and c.name == n:
                 return
@@ -168,10 +168,10 @@ class Axis(widget.Widget):
          self.majortickscalc, self.minortickscalc) =  as.getTicks()
 
         if self.majorticks != None:
-            self.majortickscalc = numarray.array(self.majorticks)
+            self.majortickscalc = N.array(self.majorticks)
 
         if self.minorticks != None:
-            self.minortickscalc = numarray.array(self.minorticks)
+            self.minortickscalc = N.array(self.minorticks)
 
         self.settings.setModified(False)
 
@@ -228,10 +228,8 @@ class Axis(widget.Widget):
             fracposns = self.linearConvertToPlotter( vals )
 
         # rounds to nearest integer
-        out = numarray.floor( 0.5 +
-                              self.coordParr1 +
-                              fracposns*(self.coordParr2-self.coordParr1) )
-        out = out.astype(numarray.Int32)
+        out = N.floor( 0.5 + self.coordParr1 +
+                       fracposns*(self.coordParr2-self.coordParr1) ).astype(N.Int32)
         return out
     
     def plotterToGraphCoords(self, bounds, vals):
@@ -249,7 +247,7 @@ class Axis(widget.Widget):
         self._updatePlotRange( bounds )
 
         # work out fractional positions of the plotter coords
-        frac = ( ( vals.astype(numarray.Float64) - self.coordParr1 ) /
+        frac = ( ( vals.astype(N.Float64) - self.coordParr1 ) /
                  ( self.coordParr2 - self.coordParr1 ) )
 
         # scaling...
@@ -274,9 +272,9 @@ class Axis(widget.Widget):
         """Convert graph coordinates to fractional plotter units for log10 scale.
         """
 
-        log1 = numarray.log(self.plottedrange[0])
-        log2 = numarray.log(self.plottedrange[1])
-        return ( numarray.log(v) - log1 )/( log2 - log1 )
+        log1 = N.log(self.plottedrange[0])
+        log2 = N.log(self.plottedrange[1])
+        return ( N.log( N.clip(v, 1e-99, 1e99) ) - log1 )/( log2 - log1 )
     
     def logConvertFromPlotter(self, v):
         """Convert from fraction plotter coords to graph coords with log scale.
@@ -284,49 +282,34 @@ class Axis(widget.Widget):
         return ( self.plottedrange[0] *
                  ( self.plottedrange[1]/self.plottedrange[0] )**v )
     
+    def againstWhichEdge(self):
+        """Returns edge this axis is against, if any.
+
+        Returns 0-3,None for (left, top, right, bottom, None)
+        """
+
+        s = self.settings
+        op = abs(s.otherPosition)
+        if op > 1e-3 and op < 0.999:
+            return None
+        else:
+            if s.direction == 'vertical':
+                if op <= 1e-3:
+                    return 0
+                else:
+                    return 2
+            else:
+                if op <= 1e-3:
+                    return 3
+                else:
+                    return 1
+    
     def swapline(self, painter, a1, b1, a2, b2):
         """ Draw line, but swap x & y coordinates if vertical axis."""
         if self.settings.direction == 'horizontal':
             painter.drawLine(a1, b1, a2, b2)
         else:
             painter.drawLine(b1, a1, b2, a2)
-
-    _ticklabel_aligntable = {
-        (0, 0, 0, 0): ( 0, 1), # horz, normal, nonrefl
-        (0, 1, 0, 0): ( 1, 0), # horz, rot,    nonrefl
-        (0, 0, 1, 0): ( 0,-1), # horz, normal, refl
-        (0, 1, 1, 0): (-1, 0), # horz, rot,    refl
-        (0, 0, 0,-1): (-1, 1), # horz, normal, nonrefl, first
-        (0, 1, 0,-1): ( 1, 1), # horz, rot,    nonrefl, first
-        (0, 0, 1,-1): ( 0,-1), # horz, normal, refl,    first FIXME
-        (0, 1, 1,-1): (-1, 0), # horz, rot,    refl,    first FIXME
-        (0, 0, 0, 1): ( 1, 1), # horz, normal, nonrefl, last
-        (0, 1, 0, 1): ( 1,-1), # horz, rot,    nonrefl, last
-        (0, 0, 1, 1): ( 0,-1), # horz, normal, refl,    last FIXME
-        (0, 1, 1, 1): (-1, 0), # horz, rot,    refl,    last FIXME
-
-        (1, 0, 0, 0): ( 1, 0), # vert, normal, nonrefl
-        (1, 1, 0, 0): ( 0,-1), # vert, normal, nonrefl
-        (1, 0, 1, 0): (-1, 0), # vert, normal, refl
-        (1, 1, 1, 0): ( 0, 1), # vert, normal, refl
-        (1, 0, 0,-1): ( 1,-1), # vert, normal, nonrefl, first
-        (1, 1, 0,-1): (-1,-1), # vert, rot,    nonrefl, first
-        (1, 0, 1,-1): ( 0,-1), # vert, normal, refl,    first FIXME
-        (1, 1, 1,-1): (-1, 0), # vert, rot,    refl,    first FIXME
-        (1, 0, 0, 1): ( 1, 1), # vert, normal, nonrefl, last
-        (1, 1, 0, 1): ( 1,-1), # vert, rot,    nonrefl, last
-        (1, 0, 1, 1): ( 0,-1), # vert, normal, refl,    last  FIXME
-        (1, 1, 1, 1): (-1, 0), # vert, rot,    refl,    last FIXME
-       }
-
-    _axislabel_alignments = (
-        (         # horizontal axis
-        (0, 1),    # normal
-        (1, 0)     # rotated
-        ),(       # vertical axis
-        (0, -1),   # normal
-        (1, 0)     # rotated
-        ))
 
     def _drawGridLines(self, painter, coordticks):
         """Draw grid lines on the plot."""
@@ -402,6 +385,7 @@ class Axis(widget.Widget):
         """Draw tick labels on the plot."""
 
         s = self.settings
+        vertical = s.direction == 'vertical'
         painter.setPen( s.get('TickLabels').makeQPen() )
         font = s.get('TickLabels').makeQFont(painter)
         painter.setFont(font)
@@ -410,35 +394,53 @@ class Axis(widget.Widget):
         tl_ascent  = painter.fontMetrics().ascent()
 
         # work out font alignment
-        angle = 0
         if s.TickLabels.rotate:
             angle = 270
+        else:
+            angle = 0
+        
+        if vertical:
+            # limit tick labels to be directly below/besides axis
+            bounds = { 'miny': min(self.coordParr1, self.coordParr2),
+                       'maxy': max(self.coordParr1, self.coordParr2) }
+            ax = 1
+            ay = 0
+        else:
+            bounds = { 'minx': min(self.coordParr1, self.coordParr2),
+                       'maxx': max(self.coordParr1, self.coordParr2) }
+            ax = 0
+            ay = 1
+
+        if s.reflect:
+            ax = -ax
+            ay = -ay
 
         # plot numbers
         format = s.TickLabels.format
-        maxwidth = 0
-        for i in xrange(len(coordticks)):
-            x = coordticks[i]
-            y = self.coordPerp + sign*(self._delta_axis+tl_spacing)
-            num = utils.formatNumber(self.majortickscalc[i], format)
+        maxdim = 0
 
-            if s.direction == 'vertical':
-                x, y = y, x
+        b = self.coordPerp + sign*(self._delta_axis+tl_spacing)
+        for a, num in zip(coordticks, self.majortickscalc):
 
-            ax, ay = self._getTickLabelAlign(i==0, i==len(coordticks)-1)
-            #print x, y, ax, ay, num
-            rec = utils.render( painter, font,
-                                x, y, num,
-                                ax, ay, angle )
-            maxwidth = max(maxwidth, rec[2] - rec[0])
+            # x and y round other way if vertical
+            if vertical:
+                x, y = b, a
+            else:
+                x, y = a, b
+
+            num = utils.formatNumber(num, format)
+            r = utils.Renderer(painter, font, x, y, num, alignhorz=ax, alignvert=ay,
+                               angle=angle)
+            r.ensureInBox(**bounds)
+            bnd = r.render()
+
+            if vertical:
+                maxdim = max(maxdim, bnd[2] - bnd[0])
+            else:
+                maxdim = max(maxdim, bnd[3] - bnd[1])
 
         # keep track of where we are
-        self._delta_axis += tl_spacing
-        if ( (s.direction == 'horizontal' and angle == 0) or
-             (s.direction == 'vertical' and angle != 0) ):
-            self._delta_axis += tl_ascent
-        else:
-            self._delta_axis += maxwidth
+        self._delta_axis += 2*tl_spacing + maxdim
 
     def _drawAxisLabel(self, painter, sign):
         """Draw an axis label on the plot."""
@@ -450,17 +452,20 @@ class Axis(widget.Widget):
         al_spacing = ( painter.fontMetrics().leading() +
                        painter.fontMetrics().descent() )
 
-        # work out font alignment
-        ax, ay = ( Axis._axislabel_alignments[s.direction == 'vertical']
-                   [s.Label.rotate] )
+        if s.direction == 'vertical':
+            ax = 1
+            ay = 0
+        else:
+            ax = 0
+            ay = 1
 
-        # if reflected, we want the opposite alignment
         if s.reflect:
-            ax, ay = ( -ax, -ay )
+            ax = -ax
+            ay = -ay
 
         # angle of text
         if ( (s.direction == 'horizontal' and not s.Label.rotate) or
-             (s.direction == 'verical' and s.Label.rotate) ):
+             (s.direction == 'vertical' and s.Label.rotate) ):
             angle = 0
         else:
             angle = 270
@@ -470,9 +475,7 @@ class Axis(widget.Widget):
         if s.direction == 'vertical':
             x, y = y, x
 
-        utils.render(painter, font, x, y,
-                     s.label,
-                     ax, ay, angle)
+        utils.Renderer(painter, font, x, y, s.label, ax, ay, angle).render()
 
     def _autoMirrorDraw(self, posn, painter, coordticks):
         """Mirror axis to opposite side of graph if there isn't
@@ -530,8 +533,11 @@ class Axis(widget.Widget):
 
         return widget.Widget.chooseName(self)
 
-    def draw(self, parentposn, painter):
-        """Plot the axis on the painter."""
+    def draw(self, parentposn, painter, suppresstext=False):
+        """Plot the axis on the painter.
+
+        if suppresstext is True, then we don't number or label the axis
+        """
 
         s = self.settings
 
@@ -577,11 +583,11 @@ class Axis(widget.Widget):
             self._drawMajorTicks(painter, coordticks)
 
         # plot tick labels
-        if not s.TickLabels.hide:
+        if not s.TickLabels.hide and not suppresstext:
             self._drawTickLabels(painter, coordticks, sign)
 
         # draw an axis label
-        if not s.Label.hide:
+        if not s.Label.hide and not suppresstext:
             self._drawAxisLabel(painter, sign)
 
         # mirror axis at other side of plot

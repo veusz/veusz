@@ -220,27 +220,30 @@ class Widget(object):
 
         pass
 
-    def draw(self, parentposn, painter):
-        """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
-        """
-
-        # print self.path, self.position, self.margins
+    def computeBounds(self, parentposn, painter):
+        """Compute a bounds array, giving the bounding box for the widget."""
 
         # get parent's position
         x1, y1, x2, y2 = parentposn
-        dx = x2 - x1
-        dy = y2 - y1
+        dx, dy = x2-x1, y2-y1
 
         # get our position
         x1, y1, x2, y2 = ( x1+dx*self.position[0], y1+dy*self.position[1],
                            x1+dx*self.position[2], y1+dy*self.position[3] )
-        dx = x2 - x1
-        dy = y2 - y1
+        dx, dy = x2-x1, y2-y1
 
         # convert margin to physical units and subtract
-        deltas = utils.cnvtDists( self.margins, painter )
-        bounds = ( int(x1+deltas[0]), int(y1+deltas[1]),
-                   int(x2-deltas[2]), int(y2-deltas[3]) )
+        deltas = utils.cnvtDists(self.margins, painter)
+        bounds = [ int(x1+deltas[0]), int(y1+deltas[1]),
+                   int(x2-deltas[2]), int(y2-deltas[3]) ]
+
+        return bounds
+
+    def draw(self, parentposn, painter):
+        """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
+        """
+
+        bounds = self.computeBounds(parentposn, painter)
 
         # iterate over children in reverse order
         for i in range(len(self.children)-1, -1, -1 ):
