@@ -102,3 +102,15 @@ def fitLM(func, params, xvals, thedata, weights = 1.):
 ## fitLM(testfunc, inparams, xvals, yvals)
 ## fitLM(testfunc, inparams, xvals, yvals)
 
+### JSS version
+
+def computeChi2(func, params, xvals, yvals, errors):
+    """Compute the chi2 for the given data."""
+    
+    ymodel = func(params, xvals)
+    return ((ymodel-yvals)**2) / (errors**2)
+
+def fit(func, params, xvals, yvals, errors):
+
+    lamda = 1e-4
+    
