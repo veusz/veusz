@@ -31,6 +31,7 @@ import treeeditwindow
 import document
 import dialogs.aboutdialog
 import dialogs.importdialog
+import dialogs.dataeditdialog
 import utils
 
 class MainWindow(qt.QMainWindow):
@@ -129,6 +130,8 @@ class MainWindow(qt.QMainWindow):
              self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
+            ('dataedit', 'Edit imported data', '&Edit...', 'data',
+             self.slotDataEdit, None, False, ''),
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
              self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
             ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
@@ -213,6 +216,11 @@ class MainWindow(qt.QMainWindow):
     def slotDataImport(self):
         """Display the import data dialog."""
         d = dialogs.importdialog.ImportDialog(self, self.document)
+        d.show()
+
+    def slotDataEdit(self):
+        """Display the import data dialog."""
+        d = dialogs.dataeditdialog.DataEditDialog(self, self.document)
         d.show()
 
     def slotHelpHomepage(self):
