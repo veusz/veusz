@@ -252,4 +252,3 @@ class TickLabel(Text):
         '''Format the number according to the format.'''
 
         return formatNumber(num, self.format)
-    

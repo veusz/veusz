@@ -73,23 +73,22 @@ class Key(widget.Widget):
         painter.setFont(font)
         height = painter.fontMetrics().height()
 
+        showtext = not s.Text.hide
+
         # count number of keys to draw
         number = 0
-        maxwidth = 10
+        maxwidth = 1
         maxsymbolwidth = 1
         for c in self.parent.children:
-            try:
-                c.drawKeySymbol
-            except AttributeError:
-                pass
-            else:
-                if c.settings.key != '':
-                    number += 1
+            if c.settings.isSetting('key') and c.settings.key != '':
+                number += 1
+                if showtext:
                     w, h = utils.Renderer(painter, font, 0, 0,
                                           c.settings.key).getDimensions()
                     maxwidth = max(maxwidth, w)
-                    maxsymbolwidth = max(c.getKeySymbolWidth(height),
-                                         maxsymbolwidth)
+                    
+                maxsymbolwidth = max(c.getKeySymbolWidth(height),
+                                     maxsymbolwidth)
 
         # total size of box
         totalwidth = maxwidth + 3*height + maxsymbolwidth
@@ -134,24 +133,20 @@ class Key(widget.Widget):
         # plot dataset entries
         ypos = y + height/2
         for c in self.parent.children:
-            try:
-                c.drawKeySymbol
-            except AttributeError:
-                pass
-            else:
-                if c.settings.key != '':
-                    # plot key symbol
-                    c.drawKeySymbol(painter, x+height, ypos,
-                                    maxsymbolwidth, height)
+            if c.settings.isSetting('key') and c.settings.key != '':
+                # plot key symbol
+                c.drawKeySymbol(painter, x+height, ypos,
+                                maxsymbolwidth, height)
+                
+                # write key text
+                if showtext:
+                    painter.setPen(textpen)
+                    utils.Renderer(painter, font,
+                                   x+height*2+maxsymbolwidth,
+                                   ypos+height/2, c.settings.key,
+                                   -1, 0).render()
 
-                    # write key text
-                    if not s.Text.hide:
-                        painter.setPen(textpen)
-                        utils.Renderer(painter, font,
-                                       x+height*2+maxsymbolwidth,
-                                       ypos+height/2, c.settings.key,
-                                       -1, 0).render()
-                    ypos += height
+                ypos += height
 
         painter.restore()
 

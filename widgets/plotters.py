@@ -558,3 +558,77 @@ class PointPlotter(GenericPlotter):
 widgetfactory.thefactory.register( PointPlotter )
 
 ###############################################################################
+
+class TextLabel(GenericPlotter):
+
+    """Add a text label to a graph."""
+
+    typename = 'label'
+    description = "Text label"
+    allowedparenttypes = [graph.Graph]
+    allowusercreation = True
+
+    def __init__(self, parent, name=None):
+        GenericPlotter.__init__(self, parent, name=name)
+        s = self.settings
+
+        # text labels don't need key symbols
+        s.remove('key')
+
+        s.add( setting.Str('label', '',
+                           descr='Text to show'), 0 )
+        s.add( setting.Float('xPos', 0.5,
+                             descr='x coordinate of the text'), 1 )
+        s.add( setting.Float('yPos', 0.5,
+                             descr='y coordinate of the text'), 2 )
+        s.add( setting.Choice('positioning',
+                              ['axes', 'relative'], 'relative',
+                              descr='Use axes or fractional position to '
+                              'place label'), 3)
+
+        s.add( setting.Choice('alignHorz',
+                              ['left', 'centre', 'right'], 'left',
+                              descr="Horizontal alignment of label"), 4)
+        s.add( setting.Choice('alignVert',
+                              ['top', 'centre', 'bottom'], 'bottom',
+                              descr="Vertical alignment of label"), 5)
+
+        s.add( setting.Text('Text',
+                            descr = 'Text settings') )
+
+        s.readDefaults()
+
+    # convert text to alignments used by Renderer
+    cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
+    cnvtalignvert = { 'top': 1, 'centre': 0, 'bottom': -1 }
+
+    def draw(self, parentposn, painter, outerbounds = None):
+        """Draw the text label."""
+
+        posn = GenericPlotter.draw(self, parentposn, painter,
+                                   outerbounds=outerbounds)
+
+        s = self.settings
+        if s.positioning == 'axes':
+            # translate xPos and yPos to plotter coordinates
+
+            axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            xp = axes[0].graphToPlotterCoords(posn, N.array( [s.xPos] ))[0]
+            yp = axes[1].graphToPlotterCoords(posn, N.array( [s.yPos] ))[0]
+        else:
+            # work out fractions inside pos
+            xp = posn[0] + (posn[2]-posn[0])*s.xPos
+            yp = posn[3] + (posn[1]-posn[3])*s.yPos
+
+        if not s.Text.hide:
+            textpen = s.get('Text').makeQPen()
+            painter.setPen(textpen)
+            font = s.get('Text').makeQFont(painter)
+
+            utils.Renderer( painter, font, xp, yp,
+                            s.label,
+                            TextLabel.cnvtalignhorz[s.alignHorz],
+                            TextLabel.cnvtalignvert[s.alignVert] ).render()
+
+# allow the factory to instantiate a text label
+widgetfactory.thefactory.register( TextLabel )
