@@ -48,6 +48,8 @@ class GenericPlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         s = self.settings
+        s.add( setting.Str('key', '',
+                           descr = 'Description of the plotted data') )
         s.add( setting.Str('xAxis', 'x',
                            descr = 'Name of X-axis to use') )
         s.add( setting.Str('yAxis', 'y',
@@ -69,6 +71,13 @@ class GenericPlotter(widget.Widget):
                 yaxis = i
 
         return (xaxis, yaxis)
+
+    def drawKeySymbol(self, painter, x, y, width, height):
+        """Draw the plot symbol and/or line at (x,y) in a box width*height.
+
+        This is used to plot a key
+        """
+        pass
 
 ########################################################################
         
@@ -127,6 +136,18 @@ class FunctionPlotter(GenericPlotter):
 
         if len(pts) >= 4:
             painter.drawPolyline( qt.QPointArray(pts) )
+
+    def drawKeySymbol(self, painter, x, y, width, height):
+        """Draw the plot symbol and/or line."""
+
+        s = self.settings
+        yp = y + height/2
+
+        # draw line
+        if not s.Line.hide:
+            painter.setBrush( qt.QBrush() )
+            painter.setPen( s.Line.makeQPen(painter) )
+            painter.drawLine(x, yp, x+width, yp)
 
     def draw(self, parentposn, painter):
         """Draw the function."""
@@ -371,6 +392,31 @@ class PointPlotter(GenericPlotter):
             pts.append(ypt)
 
         painter.drawPolyline( qt.QPointArray(pts) )
+
+    def drawKeySymbol(self, painter, x, y, width, height):
+        """Draw the plot symbol and/or line."""
+
+        s = self.settings
+        yp = y + height/2
+
+        # draw line
+        if not s.PlotLine.hide:
+            painter.setPen( s.PlotLine.makeQPen(painter) )
+            painter.drawLine(x, yp, x+width, yp)
+
+        # draw marker
+        if not s.MarkerLine.hide or not s.MarkerFill.hide:
+            size = int( utils.cnvtDist(s.markerSize, painter) )
+
+            if not s.MarkerFill.hide:
+                painter.setBrush( s.MarkerFill.makeQBrush() )
+
+            if not s.MarkerLine.hide:
+                painter.setPen( s.MarkerLine.makeQPen(painter) )
+            else:
+                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                
+            utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
     def draw(self, parentposn, painter):
         """Plot the data on a plotter."""

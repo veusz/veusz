@@ -64,7 +64,7 @@ class Line(settings.Settings):
 
         self.add( setting.ChoiceOrMore('color', colors, 'black',
                                        descr = 'Color of line') )
-        self.add( setting.Distance('width', '1pt',
+        self.add( setting.Distance('width', '0.5pt',
                                    descr = 'Width of line') )
         self.add( setting.Choice('style', linestyles, 'solid',
                                  descr = 'Line style') )
@@ -97,6 +97,22 @@ class Brush(settings.Settings):
         return qt.QBrush( qt.QColor(self.color),
                           convertfill[self.style] )
     
+class KeyBrush(Brush):
+    '''Fill used for back of key.'''
+
+    def __init__(self, name, descr=''):
+        Brush.__init__(self, name, descr)
+
+        self.get('color').newDefault('white')
+
+class GraphBrush(Brush):
+    '''Fill used for back of graph.'''
+
+    def __init__(self, name, descr=''):
+        Brush.__init__(self, name, descr)
+
+        self.get('color').newDefault('white')
+
 class MajorTick(Line):
     '''Major tick settings.'''
 

@@ -45,6 +45,7 @@ class Page(widget.Widget):
         x1, y1, x2, y2 = parentposn
 
         painter.save()
+        painter.veusz_page_size = (x2-x1, y2-y1)
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
         bounds = widget.Widget.draw(self, parentposn, painter)
         painter.restore()

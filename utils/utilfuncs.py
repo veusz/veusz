@@ -339,8 +339,11 @@ def cnvtDist(dist, painter):
         painter.veusz_scaling = 1.
 
     # work out maximum size
-    w = painter.window()
-    maxsize = max(w.width(), w.height())
+    try:
+        maxsize = max( *painter.veusz_page_size )
+    except AttributeError:
+        w = painter.window()
+        maxsize = max(w.width(), w.height())
 
     dist = dist.strip()
 

@@ -202,7 +202,10 @@ class Document( qt.QObject ):
         """Save the text representing a document to a file."""
 
         file.write('# Veusz saved document (version %s)\n' % utils.version())
-        file.write('# User: %s\n' % os.getlogin() )
+        try:
+            file.write('# User: %s\n' % os.environ['LOGNAME'] )
+        except KeyError:
+            pass
         file.write('# Date: %s\n\n' % time.strftime(
             "%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) )
         

@@ -165,22 +165,22 @@ class Axis(widget.Widget):
         p1, p2, pp = s.lowerPosition, s.upperPosition, s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
-            self.coordParr1 = x1 + int(dx * p1)
-            self.coordParr2 = x1 + int(dx * p2)
+            self.coordParr1 = x1 + int(dx * p1 + 0.5)
+            self.coordParr2 = x1 + int(dx * p2 + 0.5)
 
             # other axis coordinates
-            self.coordPerp  = y2 - int(dy * pp)
-            self.coordPerp1 = y2 - int(dy * p1)
-            self.coordPerp2 = y2 - int(dy * p2)
+            self.coordPerp  = y2 - int(dy * pp + 0.5)
+            self.coordPerp1 = y2 - int(dy * p1 + 0.5)
+            self.coordPerp2 = y2 - int(dy * p2 + 0.5)
 
         else: # vertical
-            self.coordParr1 = y2 - int(dy * p1)
-            self.coordParr2 = y2 - int(dy * p2)
+            self.coordParr1 = y2 - int(dy * p1 + 0.5)
+            self.coordParr2 = y2 - int(dy * p2 + 0.5)
 
             # other axis coordinates
-            self.coordPerp  = x1 + int(dx * pp)
-            self.coordPerp1 = x1 + int(dx * p1)
-            self.coordPerp2 = x1 + int(dx * p2)
+            self.coordPerp  = x1 + int(dx * pp + 0.5)
+            self.coordPerp1 = x1 + int(dx * p1 + 0.5)
+            self.coordPerp2 = x1 + int(dx * p2 + 0.5)
      
     def graphToPlotterCoords(self, bounds, vals):
         """Convert graph coordinates to plotter coordinates on this axis.

@@ -197,7 +197,7 @@ def _plotPolygons(painter, name, xpos, ypos, size):
     '''Plots shapes which are polygons'''
 
     # make a polygon of the correct size
-    pgn = ( N.array(_Polygons[name], N.Float32) * size ).astype(N.Int32)
+    pgn = (N.array(_Polygons[name], N.Float32) * size).astype(N.Int32)
 
     for x, y in zip(xpos, ypos):
         pts = pgn + N.array( (x, y) )
@@ -208,7 +208,7 @@ def plotMarker(painter, xpos, ypos, markercode, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
     """
     if markercode in _Polygons:
-        _plotPolygons(painter, markercode, xpos, ypos, markersize)
+        _plotPolygons(painter, markercode, (xpos,), (ypos,), markersize)
     else:
         _MarkerLookup[markercode](painter, xpos, ypos, markersize)
 

@@ -299,6 +299,18 @@ class _PartBuilder:
     def get_bounds(self):
         return self.bounds
 
+def getTextDimensions(painter, font, text):
+    """Get dimensions of text."""
+
+    pb = _PartBuilder(text)
+    pb.x = 0
+    pb.y = 0
+    painter.setFont(font)
+    h = painter.fontMetrics().boundingRect('0').height()
+    pb.reset_bounds()
+    pb.renderpart(painter, 0, font, render=0)
+    return (pb.x, h)
+
 def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
            angle = 0):
     """ Render text at a certain position using a certain font.

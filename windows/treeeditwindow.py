@@ -203,9 +203,9 @@ class TreeEditWindow(qt.QDockWindow):
 
         childdict = {}
         # assign indicies to each one
-        index = 0
+        index = 1000
         newitem = False
-        for c in root.widget.getChildren():
+        for c in root.widget.children:
             childdict[c] = True
             if c in items:
                 items[c].setIndex(index)

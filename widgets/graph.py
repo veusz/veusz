@@ -26,6 +26,7 @@ import axis
 import page
 import containers
 import setting
+import utils
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
@@ -52,6 +53,11 @@ class Graph(widget.Widget):
         s.add( setting.Distance( 'bottomMargin', '10%', descr=
                                  'Distance from bottom of graph'
                                  'to edge of page') )
+        s.add( setting.GraphBrush( 'Background',
+                                   descr = 'Background plot fill' ) )
+        s.add( setting.Line('Border',
+                            descr = 'Graph border line') )
+
         s.readDefaults()
         
         # make axes
@@ -68,6 +74,32 @@ class Graph(widget.Widget):
         s = self.settings
         self.margins = [s.leftMargin, s.topMargin,
                         s.rightMargin, s.bottomMargin]
+
+        # get parent's position
+        x1, y1, x2, y2 = parentposn
+        dx, dy = x2-x1, y2-y1
+
+        # get our position
+        x1, y1, x2, y2 = ( x1+dx*self.position[0], y1+dy*self.position[1],
+                           x1+dx*self.position[2], y1+dy*self.position[3] )
+        dx, dy = x2-x1, y2-y1
+
+        # convert margin to physical units and subtract
+        deltas = utils.cnvtDists( self.margins, painter )
+        bounds = ( int(x1+deltas[0]), int(y1+deltas[1]),
+                   int(x2-deltas[2]), int(y2-deltas[3]) )
+
+        # if there's a background
+        if not s.Background.hide:
+            brush = s.get('Background').makeQBrush()
+            painter.fillRect( bounds[0], bounds[1], bounds[2]-bounds[0]+1,
+                              bounds[3]-bounds[1]+1, brush )
+
+        # if there's a border
+        if not s.Border.hide:
+            painter.setPen( s.get('Border').makeQPen(painter) )
+            painter.drawRect( bounds[0], bounds[1], bounds[2]-bounds[0]+1,
+                              bounds[3]-bounds[1]+1 )
 
         widget.Widget.draw(self, parentposn, painter)
 
