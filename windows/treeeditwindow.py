@@ -110,14 +110,13 @@ class TreeEditWindow(qt.QDockWindow):
         self.connect( self.document, qt.PYSIGNAL("sigWiped"),
                       self.slotDocumentWiped )
 
-        self.tooltips = qt.QToolTip(self)
-
         totvbox = qt.QVBox(self)
         self.setWidget(totvbox)
 
         # make buttons for each of the graph types
         self.createGraphButtons = {}
         buttonhbox = qt.QHBox(totvbox)
+        #buttonhbox = qt.QToolBar(self.parent)
         mdir = os.path.dirname(__file__)
 
         for w in widgetfactory.thefactory.listWidgets():
@@ -125,6 +124,7 @@ class TreeEditWindow(qt.QDockWindow):
             if wc.allowusercreation:
                 # make a new button, and set the pixmap
                 b = qt.QToolButton(buttonhbox)
+                b.setFocusPolicy(qt.QWidget.TabFocus)
                 name = "%s/icons/button_%s.png" % (mdir, w)
                 b.setPixmap( qt.QPixmap(name) )
 
@@ -133,13 +133,29 @@ class TreeEditWindow(qt.QDockWindow):
 
                 # set the tooltip to the graph description
                 try:
-                    self.tooltips.add(b, wc.description)
+                    qt.QToolTip.add(b, wc.description)
                 except AttributeError:
                     pass
 
                 b.widgetname = w
                 self.connect(b, qt.SIGNAL('clicked()'),
                              self.slotMakeWidgetButton)
+
+        # make buttons for user actions
+        edithbox = qt.QHBox(totvbox)
+        self.editbuttons = {}
+
+        for name, icon, tooltip in (
+            ('moveup', 'go-up', 'Move the selected widget up'),
+            ('movedown', 'go-down', 'Move the selected widget down'),
+            ('delete', 'delete', 'Remove the selected widget')
+            ):
+
+            b = qt.QToolButton(edithbox)
+            b.setFocusPolicy(qt.QWidget.TabFocus)
+            b.setPixmap( qt.QPixmap("%s/icons/stock-%s.png" % (mdir, icon)) )
+            qt.QToolTip.add(b, tooltip)
+            self.editbuttons[name] = b
 
         # put widgets in a movable splitter
         split = qt.QSplitter(totvbox)
@@ -254,6 +270,10 @@ class TreeEditWindow(qt.QDockWindow):
         # check whether each button can have this widget as parent
         for wc, button in self.createGraphButtons.items():
             button.setEnabled( wc.willAllowParent(selw) )
+
+        # delete shouldn't allow root to be deleted
+        self.editbuttons['delete'].setEnabled(
+            not isinstance(selw, widgets.Root) )
 
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
