@@ -38,7 +38,7 @@ class WidgetFactory:
 
         # set all the passed default settings
         for name, val in optargs.iteritems():
-            w.settings.set(name, val)
+            w.settings.get(name).set(val)
 
         return w
 
