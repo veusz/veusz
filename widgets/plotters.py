@@ -170,7 +170,7 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         if s.variable == 'x':
             # x function
-            delta = (x2 - x1) / s.steps
+            delta = (x2 - x1) / float(s.steps)
             pxpts = N.arange(x1, x2+delta, delta).astype(N.Int32)
             env['x'] = axes[0].plotterToGraphCoords(posn, pxpts)
             try:
@@ -183,7 +183,7 @@ class FunctionPlotter(GenericPlotter):
 
         else:
             # y function
-            delta = (y2 - y1) / s.steps
+            delta = (y2 - y1) / float(s.steps)
             pypts = N.arange(y1, y2+delta, delta).astype(N.Int32)
             env['y'] = axes[1].plotterToGraphCoords(posn, pypts)
             try:

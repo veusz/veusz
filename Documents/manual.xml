@@ -334,20 +334,20 @@
     <para>Currently Veusz supports reading data from text file (fits
       support and a qdp-alike interface are also planned). Reading
       data is supported using the "Data, Import" dialog, or using the
-      <link linkend="CommandImportFile">ImportFile</link> and <link
-      linkend="CommandImportString">ImportString</link> commands which
+      <link linkend="Command.ImportFile">ImportFile</link> and <link
+      linkend="Command.ImportString">ImportString</link> commands which
       read data from files or an existing Python string (allowing data
       to be embedded in a Python script). Alternatively, a user may
       read the data themselves using a Python script, and import it
       into the program with the <link
-      linkend="CommandSetData">SetData</link> command.</para>
+      linkend="Command.SetData">SetData</link> command.</para>
     
     <section>
-      <title<anchor id="Descriptors" />>Descriptors</title>
+      <title><anchor id="Descriptors" />Descriptors</title>
       
       <para>The "Data, Import" dialog box, <link
-	linkend="CommandImportFile">ImportFile</link> and <link
-	linkend="CommandImportString">ImportString</link> commands use
+	linkend="Command.ImportFile">ImportFile</link> and <link
+	linkend="Command.ImportString">ImportString</link> commands use
 	a "Descriptor" to describe how the data are formatted in the
 	import file. The descriptor at its simplest is a list of the
 	names of the datasets to import (which are columns in the
@@ -430,11 +430,11 @@
 	  </informalexample>
 
       <para>Of course this data could be read using the <link
-	linkend="CommandImportFile">ImportFile</link>
+	linkend="Command.ImportFile">ImportFile</link>
 	command. However, you could also read it with the following
 	Veusz script (which could be saved to a file and loaded with
 	<command>execfile</command> or <link
-	linkend="CommandLoad">Load</link>. The script also places
+	linkend="Command.Load">Load</link>. The script also places
 	symmetric errors of 0.1 on the x dataset.</para>
 
       <informalexample>
