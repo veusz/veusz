@@ -78,6 +78,7 @@ class Key(widget.Widget):
         # count number of keys to draw
         number = 0
         maxwidth = 10
+        maxsymbolwidth = 1
         for c in self.parent.children:
             try:
                 c.drawKeySymbol
@@ -89,9 +90,11 @@ class Key(widget.Widget):
                     w, h = utils.getTextDimensions(painter, font,
                                                    c.settings.key)
                     maxwidth = max(maxwidth, w)
+                    maxsymbolwidth = max(c.getKeySymbolWidth(height),
+                                         maxsymbolwidth)
 
         # total size of box
-        totalwidth = maxwidth + 6*height
+        totalwidth = maxwidth + 3*height + maxsymbolwidth
         totalheight = (number+1)*height
 
         # work out horizontal position
@@ -140,13 +143,15 @@ class Key(widget.Widget):
             else:
                 if c.settings.key != '':
                     # plot key symbol
-                    c.drawKeySymbol(painter, x+height, ypos, 3*height, height)
+                    c.drawKeySymbol(painter, x+height, ypos,
+                                    maxsymbolwidth, height)
 
                     # write key text
                     if not s.Text.hide:
                         painter.setPen(textpen)
                         utils.render(painter,
-                                     font, x+height*5, ypos+height/2,
+                                     font, x + height*2 + maxsymbolwidth,
+                                     ypos+height/2,
                                      c.settings.key, -1, 0)
                     ypos += height
 
