@@ -40,14 +40,13 @@ class PlotWindow( qt.QScrollView ):
 
         # set up so if document is modified we are notified
         self.document = document
-        self.connect( self.document, qt.PYSIGNAL("sigModified"),
-                      self.slotModifiedDoc )
-        self.outdated = True
+        self.docchangeset = 99999
 
         self.size = (-1, -1)
         self.oldzoom = -1.
         self.zoomfactor = 1.
         self.pagenumber = 0
+        self.forceupdate = False
 
         # set up redrawing timer
         self.timer = qt.QTimer(self)
@@ -106,7 +105,8 @@ class PlotWindow( qt.QScrollView ):
         """Move the the selected page."""
 
         # we don't need to
-        if self.pagenumber == pageno and not self.outdated:
+        if (self.pagenumber == pageno and
+            self.document.changeset == self.docchangeset):
             return
 
         # keep within bounds
@@ -114,19 +114,12 @@ class PlotWindow( qt.QScrollView ):
         pageno = max(0, pageno)
 
         self.pagenumber = pageno
-        self.outdated = True
+        self.forceupdate = True
         self.updateContents()
 
     def getPageNumber(self):
         """Get the the selected page."""
         return self.pagenumber
-
-    def slotModifiedDoc(self, ismodified):
-        """Called when the document has been modified."""
-
-        if ismodified:
-            # this is picked up by a timer
-            self.outdated = True
 
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""
@@ -140,8 +133,8 @@ class PlotWindow( qt.QScrollView ):
         """Called after timer times out, to check for updates to window."""
 
         # no threads, so can't get interrupted here
-        if self.outdated:
-            self.updateContents()
+        if self.document.changeset != self.docchangeset:
+            self.updateContents(0, 0, 100000, 100000)
 
     def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
         """Called when the contents need repainting."""
@@ -149,7 +142,10 @@ class PlotWindow( qt.QScrollView ):
         widget = self.document.basewidget
 
         # draw data into background pixmap if modified
-        if self.outdated or self.zoomfactor != self.oldzoom:
+        if ( self.zoomfactor != self.oldzoom or
+             self.document.changeset != self.docchangeset or
+             self.forceupdate ):
+
             self.setOutputSize()
             
             # fill pixmap with proper background colour
@@ -166,7 +162,7 @@ class PlotWindow( qt.QScrollView ):
 
             self.emit( qt.PYSIGNAL("sigUpdatePage"), (self.pagenumber,) )
 
-            self.outdated = False
+            self.docchangeset = self.document.changeset
             self.oldzoom = self.zoomfactor
 
             # redraw whole window

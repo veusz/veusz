@@ -121,6 +121,24 @@ class Dataset:
 
         file.write( "''')\n" )
 
+def _recursiveGet(root, name, typename, outlist, maxlevels):
+    """Add those widgets in root with name and type to outlist.
+
+    If name or typename are None, then ignore the criterion.
+    maxlevels is the maximum number of levels to check
+    """
+
+    if maxlevels != 0:
+
+        # if levels is not zero, add the children of this root
+        newmaxlevels = maxlevels - 1
+        for w in root.children:
+            if ( (w.name == name or name == None) and
+                 (w.typename == typename or typename == None) ):
+                outlist.append(w)
+
+            _recursiveGet(w, name, typename, outlist, newmaxlevels)
+
 class Document( qt.QObject ):
     """Document class for holding the graph data.
 
@@ -166,6 +184,7 @@ class Document( qt.QObject ):
 
         self.modified = ismodified
         self.changeset += 1
+
         self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
 
     def isModified(self):
@@ -281,4 +300,47 @@ class Document( qt.QObject ):
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
+
+
+    def propagateSettings(self, setting, widgetname=None,
+                          root=None, maxlevels=-1):
+
+        """Take the setting given, and propagate it to other widgets,
+        according to the parameters here.
         
+        If widgetname is given then only propagate it to widgets with
+        the name given.
+
+        widgets are located from the widget given (root if not set)
+        """
+
+        # locate widget with the setting (building up path)
+        path = []
+        widget = setting
+        while not isinstance(widget, widgets.Widget):
+            path.insert(0, widget.name)
+            widget = widget.parent
+
+        # remove the name of the main settings of the widget
+        path = path[1:]
+
+        # default is root widget
+        if root == None:
+            root = self.basewidget
+
+        # get a list of matching widgets
+        widgetlist = []
+        _recursiveGet(root, widgetname, widget.typename, widgetlist,
+                      maxlevels)
+
+        val = setting.get()
+        # set the settings for the widgets
+        for w in widgetlist:
+            # lookup the setting
+            s = w.settings
+            for i in path:
+                s = s.get(i)
+
+            # set the setting
+            s.set(val)
+            

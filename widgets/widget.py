@@ -66,6 +66,7 @@ class Widget(object):
 
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename )
+        self.settings.parent = self
 
         # hook up settings to modify document flag if they are modified
         self.settings.setOnModified(self.slotSettingModified)

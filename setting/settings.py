@@ -32,6 +32,7 @@ class Settings:
         self.setnames = []  # a list of names
         self.modified = False
         self.onmodified = [] # fns to call on modification
+        self.parent = None
 
     def getName(self):
         """Get the name of the settings."""
@@ -69,6 +70,7 @@ class Settings:
         else:
             self.setnames.insert(posn, name)
         setting.setOnModified( self.setModified )
+        setting.parent = self
 
     def setModified(self, modified = True):
         """Set the modification flag."""
@@ -176,4 +178,4 @@ class Settings:
 
         # FIXME
         pass
-    
+

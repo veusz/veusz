@@ -41,11 +41,16 @@ class Setting:
 
         descr is a description of the setting
         """
+        self.parent = None
         self.name = name
         self.descr = descr
         self.default = val
         self.onmodified = []
         self.set(val)
+
+    def resetToDefault(self):
+        """Reset the value to its default."""
+        self.set(self.default)
 
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""

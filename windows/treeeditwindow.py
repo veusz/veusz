@@ -295,10 +295,15 @@ class TreeEditWindow(qt.QDockWindow):
 
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
-            l = qt.QLabel(setn.name, self.prefgrid)
-            qt.QToolTip.add(l, setn.descr)
-            l.show()
-            self.prefchilds.append(l)
+            b = qt.QPushButton(setn.name, self.prefgrid)
+            b.setFlat(True)
+            b.setMinimumWidth(10)
+            b.veuszSetting = setn
+            qt.QToolTip.add(b, setn.descr)
+            b.show()
+            self.prefchilds.append(b)
+            self.connect( b, qt.SIGNAL('pressed()'),
+                          self.slotLabelButtonPressed )
             
             c = setn.makeControl(self.prefgrid)
             qt.QToolTip.add(c, setn.descr)
@@ -361,3 +366,68 @@ class TreeEditWindow(qt.QDockWindow):
         action = button.veusz_action
         console = self.parent.console
         console.runFunction( action )
+
+    def slotLabelButtonPressed(self):
+        """Called when one of the label buttons is pressed.
+
+        This pops up a menu allowing propagation of values, resetting to
+        default, or making the default
+        """
+
+        # get the button pressed
+        button = self.sender()
+        button.setFocus()
+        setn = button.veuszSetting
+
+        # find the selected widget, get its type and name
+        widget = self.itemselected.widget
+        if widget == None:
+            widget = self.itemselected.parent.widget
+        type = widget.typename
+        name = widget.name
+        
+        # construct the popup menu
+        popup = qt.QPopupMenu(button)
+        popup.insertItem('Reset to default', 0)
+        popup.insertSeparator()
+        popup.insertItem('Copy to "%s" widgets' % type, 100)
+        popup.insertItem('Copy to "%s" siblings' % type, 101)
+        popup.insertItem('Copy to "%s" widgets called "%s"' %
+                         (type, name), 102)
+        popup.insertSeparator()
+        popup.insertItem('Make default for "%s" widgets' % type, 200)
+        popup.insertItem('Make default for "%s" widgets called "%s"' %
+                         (type, name), 201)
+        
+        ret = popup.exec_loop(
+            button.mapToGlobal( qt.QPoint(0, button.height()) ))
+
+        # convert values above to functions
+        doc = self.document
+        fnmap = {
+            0: setn.resetToDefault,
+            100: (lambda: doc.propagateSettings(setn)),
+            101: (lambda: doc.propagateSettings(setn, root=widget.parent,
+                                                maxlevels=1)),
+            102: (lambda: doc.propagateSettings(setn, widgetname=name))
+            }
+
+        # call a function if it's in the map
+        if ret in fnmap:
+            # FUDGE! NASTY HACK ALERT!
+            # if this line isn't here, then qt only allows drawing to the
+            # region occupied by the menu, due to some horrible clipping
+            # issue - probably need to ask Qt list...
+            # this line allows Qt to get rid of the menu first...
+            qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
+                                                      100000)
+            fnmap[ret]()
+        elif ret >= 0:
+            return qt.QMessageBox("Veusz",
+                                  "Not implemented. Sorry!",
+                                  qt.QMessageBox.Information,
+                                  qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                                  qt.QMessageBox.NoButton,
+                                  qt.QMessageBox.NoButton,
+                                  self).exec_loop()
+
