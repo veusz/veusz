@@ -45,15 +45,15 @@ class Root(widget.Widget):
                                 descr='Height of the pages') )
         s.readDefaults()
 
-    def draw(self, parentposn, painter, gparentposn = None):
+    def draw(self, parentposn, painter, outerbounds = None):
         """Draw the plotter. Clip graph inside bounds."""
 
         x1, y1, x2, y2 = parentposn
 
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1+1, y2-y1+1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
-                                    gparentposn = gparentposn)
+                                    outerbounds = parentposn)
         painter.restore()
 
         return bounds

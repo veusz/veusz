@@ -239,19 +239,18 @@ class Widget(object):
 
         return bounds
 
-    def draw(self, parentposn, painter, gparentposn = None):
+    def draw(self, parentposn, painter, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
 
         painter is the QPainter to draw on
-        gparentposn contains the bounds of the parent widget
+        outerbounds contains "ultimate" bounds we don't go outside
         """
 
         bounds = self.computeBounds(parentposn, painter)
 
         # iterate over children in reverse order
         for i in range(len(self.children)-1, -1, -1 ):
-            self.children[i].draw(bounds, painter,
-                                  gparentposn = parentposn)
+            self.children[i].draw(bounds, painter, outerbounds=outerbounds)
  
         # return our final bounds
         return bounds

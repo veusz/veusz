@@ -38,7 +38,7 @@ class Page(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
 
-    def draw(self, parentposn, painter, gparentposn=None):
+    def draw(self, parentposn, painter, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
 
         # document should pass us the page bounds
@@ -48,7 +48,7 @@ class Page(widget.Widget):
         painter.veusz_page_size = (x2-x1, y2-y1)
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
-                                    gparentposn = gparentposn)
+                                    parentposn)
         painter.restore()
 
         return bounds

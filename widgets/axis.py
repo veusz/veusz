@@ -449,7 +449,7 @@ class Axis(widget.Widget):
         # keep track of where we are
         self._delta_axis += 2*tl_spacing + maxdim
 
-    def _drawAxisLabel(self, painter, sign, gparentposn,
+    def _drawAxisLabel(self, painter, sign, outerbounds,
                        texttorender):
         """Draw an axis label on the plot.
 
@@ -490,20 +490,20 @@ class Axis(widget.Widget):
 
         # make axis label flush with edge of plot if
         # it's appropriate
-        if gparentposn != None:
+        if outerbounds != None:
             if abs(s.otherPosition) < 1e-4 and not s.reflect:
                 if horz:
-                    y = gparentposn[3]
+                    y = outerbounds[3]
                     ay = -ay
                 else:
-                    x = gparentposn[0]
+                    x = outerbounds[0]
                     ax = -ax
             elif abs(s.otherPosition-1.) < 1e-4 and s.reflect:
                 if horz:
-                    y = gparentposn[1]
+                    y = outerbounds[1]
                     ay = -ay
                 else:
-                    x = gparentposn[2]
+                    x = outerbounds[2]
                     ax = -ax
 
         r = utils.Renderer(painter, font, x, y, s.label,
@@ -511,9 +511,9 @@ class Axis(widget.Widget):
                            usefullheight = True)
 
         # make sure text is in plot rectangle
-        if gparentposn != None:
-            r.ensureInBox( minx=gparentposn[0], maxx=gparentposn[2],
-                           miny=gparentposn[1], maxy=gparentposn[3] )
+        if outerbounds != None:
+            r.ensureInBox( minx=outerbounds[0], maxx=outerbounds[2],
+                           miny=outerbounds[1], maxy=outerbounds[3] )
 
         texttorender.insert(0, r)
 
@@ -573,7 +573,7 @@ class Axis(widget.Widget):
 
         return widget.Widget.chooseName(self)
 
-    def draw(self, parentposn, painter, suppresstext=False, gparentposn=None):
+    def draw(self, parentposn, painter, suppresstext=False, outerbounds=None):
         """Plot the axis on the painter.
 
         if suppresstext is True, then we don't number or label the axis
@@ -585,8 +585,7 @@ class Axis(widget.Widget):
         if self.settings.isModified():
             self._computePlottedRange()
 
-        posn = widget.Widget.draw(self, parentposn, painter,
-                                  gparentposn=gparentposn)
+        posn = widget.Widget.draw(self, parentposn, painter, outerbounds)
         self._updatePlotRange(posn)
 
         # get tick vals
@@ -630,7 +629,7 @@ class Axis(widget.Widget):
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
-            self._drawAxisLabel(painter, sign, gparentposn,
+            self._drawAxisLabel(painter, sign, outerbounds,
                                 texttorender)
 
         # mirror axis at other side of plot

@@ -114,7 +114,7 @@ class Graph(widget.Widget):
         for c in self.children:
             c.autoAxis(axisname, bounds)
 
-    def draw(self, parentposn, painter, gparentposn = None):
+    def draw(self, parentposn, painter, outerbounds = None):
         '''Update the margins before drawing.'''
 
         s = self.settings
@@ -135,10 +135,20 @@ class Graph(widget.Widget):
             painter.drawRect( bounds[0], bounds[1], bounds[2]-bounds[0]+1,
                               bounds[3]-bounds[1]+1 )
 
+        # work out outer bounds
+        deltas = utils.cnvtDists(self.margins, painter)
+        if outerbounds == None or deltas != [0, 0, 0, 0]:
+            # if we don't have information, or the margins are non-zero
+            ob = parentposn
+        else:
+            # margins are zero, so we use the outerbounds from someone
+            # further up the chain
+            ob = outerbounds
+        
         # do normal drawing of children
         widget.Widget.draw( self, parentposn, painter,
-                            gparentposn=gparentposn )
-        
+                            outerbounds = ob )
+
         # now need to find axes which aren't children, and draw those again
         axestodraw = {}
         childrennames = {}
@@ -174,7 +184,7 @@ class Graph(widget.Widget):
                              margins[edge] != 0 )
                 
                 w.draw( bounds, painter, suppresstext = not showtext,
-                        gparentposn=parentposn )
+                        outerbounds=ob )
                             
 # allow users to make Graph objects
 widgetfactory.thefactory.register( Graph )

@@ -63,7 +63,7 @@ class Key(widget.Widget):
                               descr = 'Manual vertical fractional position') )
         s.readDefaults()
 
-    def draw(self, parentposn, painter, gparentposn = None):
+    def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""
 
         painter.save()

@@ -238,7 +238,7 @@ class Grid(widget.Widget):
                 s.rightMargin = '0'
                 s.bottomMargin = '0'
 
-    def draw(self, parentposn, painter, gparentposn=None):
+    def draw(self, parentposn, painter, outerbounds=None):
         """Draws the widget's children."""
 
         s = self.settings
@@ -261,8 +261,7 @@ class Grid(widget.Widget):
         for i in range(len(self.children)):
             c = self.children[i]
             if not isinstance(c, axis.Axis):
-                self.children[i].draw(bounds, painter,
-                                      gparentposn = parentposn)
+                self.children[i].draw(bounds, painter, outerbounds=parentposn)
 
         # do not call widget.Widget.draw
 

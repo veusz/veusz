@@ -150,11 +150,11 @@ class FunctionPlotter(GenericPlotter):
         """Initialise function evaluation environment each time."""
         return self.fnenviron.copy()
 
-    def draw(self, parentposn, painter, gparentposn = None):
+    def draw(self, parentposn, painter, outerbounds = None):
         """Draw the function."""
 
         posn = GenericPlotter.draw(self, parentposn, painter,
-                                   gparentposn = gparentposn)
+                                   outerbounds = outerbounds)
         x1, y1, x2, y2 = posn
         s = self.settings
 
@@ -489,11 +489,11 @@ class PointPlotter(GenericPlotter):
         else:
             return height
 
-    def draw(self, parentposn, painter, gparentposn=None):
+    def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
 
         posn = GenericPlotter.draw(self, parentposn, painter,
-                                   gparentposn=gparentposn)
+                                   outerbounds=outerbounds)
         x1, y1, x2, y2 = posn
 
         # skip if there's no data
