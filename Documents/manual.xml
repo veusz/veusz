@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<!-- $Id$ -->
+
 <book>
   <title>Veusz - a scientific plotting package</title>
 
@@ -324,8 +327,28 @@
       </itemizedlist>
 
       <para>You should start the script veusz.py from the main veusz
-      directory</para>
+      directory. That is until I get round to doing a proper
+      installation (maybe distutils based).</para>
     </section>
+
+    <section>
+      <title>Getting started</title>
+
+      <para>Once you have installed veusz, you should start it by
+      executing veusz.py from its directory. This should present the
+      Veusz main window.</para>
+
+
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="manimages/mainwindow.png" format="PNG" /> 
+	</imageobject>
+      </mediaobject>
+
+
+
+    </section>
+
   </chapter>
 
   <!---------------------------------------------------------------->
