@@ -157,7 +157,7 @@ class CommandInterface(qt.QObject):
         self.document.setModified()
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
-        """Set data with values (and optionally errors)."""
+        """Set dataset with name with values (and optionally errors)."""
 
         data = doc.Dataset(val, symerr, negerr, poserr)
         self.document.setData(name, data)
@@ -168,6 +168,30 @@ class CommandInterface(qt.QObject):
             print "Symmetric errors = %s" % str( data.serr )
             print "Negative errors = %s" % str( data.nerr )
             print "Positive errors = %s" % str( data.perr )
+
+    def GetData(self, name):
+        """Return the data with the name.
+
+        Returns a tuple containing:
+
+        (data, serr, nerr, perr)
+        Values not defined are set to None
+
+        Return copies, so that the original data can't be indirectly modified
+        """
+
+        d = self.document.getData(name)
+        data = serr = nerr = perr = None
+        if d.data != None:
+            data = d.data.copy()
+        if d.serr != None:
+            serr = d.serr.copy()
+        if d.nerr != None:
+            nerr = d.nerr.copy()
+        if d.perr != None:
+            perr = d.perr.copy()
+
+        return (data, serr, nerr, perr)
 
     def ImportString(self, descriptor, string):
         """Read data from the string using a descriptor."""

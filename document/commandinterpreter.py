@@ -77,6 +77,7 @@ class CommandInterpreter:
                       'Get': i.Get,
                       'Set': i.Set,
                       'SetData': i.SetData,
+                      'GetData': i.GetData,
                       'Print': i.Print,
                       'Export': i.Export,
                       'Save': i.Save,

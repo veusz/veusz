@@ -291,7 +291,8 @@ class _PartBuilder:
         self.x += width
 
         # update bounds with edge of this text
-        self._update_bounds( self.x, self.y - painter.fontMetrics().ascent() )
+        #self._update_bounds( self.x, self.y - painter.fontMetrics().ascent() )
+        self._update_bounds( self.x, self.y - painter.fontMetrics().height() )
 
         # return next part
         return partno + 1
