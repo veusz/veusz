@@ -43,24 +43,17 @@ class Widget(object):
         if not self.isAllowedParent(parent):
             raise RuntimeError, "parent is of incorrect type"
 
+        if name == None:
+            name = self.chooseName()
+        self.name = name
+
+        # propagate document
         if parent != None:
-            if name == None:
-                name = parent.createUniqueName(self.typename)
             self.document = parent.document
             parent.addChild(self)
 
-        else:
-            name = '/'
-            self.document = None
-
-        self.name = name
-
         # store child widgets
         self.children = []
-
-        # names which are automatically added to widget
-        # these aren't saved when the documnet is saved
-        self.autoadd = []
         
         # automatic child name index
         self.child_index = 1
@@ -81,6 +74,10 @@ class Widget(object):
         self.actions = []
         self.actionfuncs = {}
         self.actiondescr = {}
+
+    def addDefaultSubWidgets(self):
+        '''Add default sub widgets to widget, if any'''
+        pass
 
     def addAction(self, name, function, descr=''):
         """Assign name to operation.
@@ -130,6 +127,14 @@ class Widget(object):
         while "%s%i" % (prefix, i) in names:
             i += 1
         return "%s%i" % (prefix, i)
+
+    def chooseName(self):
+        """Make a name for widget if not specified."""
+
+        if self.parent == None:
+            return '/'
+        else:
+            return self.parent.createUniqueName(self.typename)
 
     def _getUserDescription(self):
         """Return a user-friendly description of what
@@ -206,13 +211,14 @@ class Widget(object):
         return build
     path = property(_getPath)
 
-    def autoAxis(self, axisname):
+    def autoAxis(self, axisname, bounds):
         """If the axis axisname is used by this widget,
-        return the bounds on that axis.
+        update the bounds on that axis.
+        bounds is a 2 item list
 
-        Return None if don't know or doesn't use the axis"""
+        Ignore if don't know how to use axis."""
 
-        return None
+        pass
 
     def draw(self, parentposn, painter):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
@@ -253,8 +259,8 @@ class Widget(object):
 
         # now go throught the subwidgets
         for c in self.children:
-            if c.name not in self.autoadd:
-                text += "Add('%s', name='%s')\n" % (c.typename, c.name)
+            text += ( "Add('%s', name='%s', autoadd=False)\n" %
+                      (c.typename, c.name) )
 
             # if we need to go to the child, go there
             ctext = c.getSaveText(saveall)

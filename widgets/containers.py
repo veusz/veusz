@@ -29,6 +29,7 @@ Classes include
 
 import widget
 import widgetfactory
+import axis
 import page
 import setting
 
@@ -168,11 +169,22 @@ class Grid(widget.Widget):
                           descr = 'Number of rows in grid') )
         s.add(setting.Int('columns', 2,
                           descr = 'Number of columns in grid') )
+
+        s.add( setting.Distance( 'leftMargin', '10%', descr=
+                                 'Distance from left of graph to '
+                                 'edge of page') )
+        s.add( setting.Distance( 'rightMargin', '5%', descr=
+                                 'Distance from right of graph to '
+                                 'edge of page') )
+        s.add( setting.Distance( 'topMargin', '5%', descr=
+                                 'Distance from top of graph to '
+                                 'edge of page') )
+        s.add( setting.Distance( 'bottomMargin', '10%', descr=
+                                 'Distance from bottom of graph'
+                                 'to edge of page') )
         s.readDefaults()
 
         self.olddimensions = (-1, -1)
-
-        self.child_dimensions = {}
 
         # maintain copy of children to check for mods
         self._old_children = list(self.children)
@@ -186,14 +198,15 @@ class Grid(widget.Widget):
         # iterate over children, and collect dimensions of children
         # (a tuple width nocols x norows)
 
+        # copy children, and remove any which are axes
+        children = [i for i in self.children if not isinstance(i, axis.Axis)]
+        child_dimensions = {}
+
         childrenposns = []
-        for c in self.children:
+        for c in children:
             name = c.name
-
-            if name not in self.child_dimensions:
-                self.child_dimensions[name] = (1, 1)
-
-            childrenposns.append( ge.add( * self.child_dimensions[name] ) )
+            child_dimensions[name] = (1, 1)
+            childrenposns.append( ge.add( * child_dimensions[name] ) )
 
         nocols, norows = ge.getAllocedDimensions()
 
@@ -205,17 +218,21 @@ class Grid(widget.Widget):
         invc, invr = 1./nocols, 1./norows
 
         # iterate over children, and modify positions
-        for child, pos in zip(self.children, childrenposns):
-            dim = self.child_dimensions[child.name]
+        for child, pos in zip(children, childrenposns):
+            dim = child_dimensions[child.name]
             child.position = ( pos[0]*invc, pos[1]*invr,
                                (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
 
     def draw(self, posn, painter):
         """Draws the widget's children."""
 
+        s = self.settings
+        self.margins = [s.leftMargin, s.topMargin,
+                        s.rightMargin, s.bottomMargin]
+
         # FIXME: this is very stupid, but works
         # if the contents have been modified, recalculate the positions
-        dimensions = (self.settings.columns, self.settings.rows)
+        dimensions = (s.columns, s.rows)
         if self.children != self._old_children or \
            self.olddimensions != dimensions:
             

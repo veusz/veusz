@@ -59,14 +59,12 @@ class Graph(widget.Widget):
                             descr = 'Graph border line') )
 
         s.readDefaults()
-        
-        # make axes
-        ax = axis.Axis(self, name='x')
-        ay = axis.Axis(self, name='y')
-        ay.settings.direction = 'vertical'
 
-        # these widgets shouldn't be remade
-        self.autoadd += ['x', 'y']
+    def addDefaultSubWidgets(self):
+        """Add axes automatically."""
+
+        axis.Axis(self, name='x')
+        axis.Axis(self, name='y')
 
     def draw(self, parentposn, painter):
         '''Update the margins before drawing.'''

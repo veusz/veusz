@@ -345,9 +345,14 @@ class TreeEditWindow(qt.QDockWindow):
     def slotActionPressed(self):
         """Called when an action button is pressed."""
 
+        # get the button clicked/activated
         button = self.sender()
-        action = button.veusz_action
+
+        # set focus to button to make sure other widgets lose
+        # focus and update their settings
+        button.setFocus()
 
         # run action in console
+        action = button.veusz_action
         console = self.parent.console
         console.runFunction( action )

@@ -32,13 +32,17 @@ class WidgetFactory:
         """Register a class with the factory."""
         self.regwidgets[classobj.typename] = classobj
 
-    def makeWidget(self, widgetname, parent, name=None, **optargs):
+    def makeWidget(self, widgetname, parent, name=None, autoadd=True,
+                   **optargs):
         """Make a new widget of the appropriate type."""
         w = self.regwidgets[widgetname](parent, name=name)
 
         # set all the passed default settings
         for name, val in optargs.iteritems():
             w.settings.get(name).set(val)
+
+        if autoadd:
+            w.addDefaultSubWidgets()
 
         return w
 

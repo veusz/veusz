@@ -63,12 +63,16 @@ class GenericPlotter(widget.Widget):
 
         x = self.settings.xAxis
         y = self.settings.yAxis
-        
-        for i in self.parent.children:
-            if i.name == x:
-                xaxis = i
-            if i.name == y:
-                yaxis = i
+
+        # recursively go back up the tree to find axes 
+        parent = self.parent
+        while parent != None and (xaxis == None or yaxis == None):
+            for i in parent.children:
+                if i.name == x and xaxis == None:
+                    xaxis = i
+                if i.name == y and yaxis == None:
+                    yaxis = i
+            parent = parent.parent
 
         return (xaxis, yaxis)
 
@@ -408,23 +412,21 @@ class PointPlotter(GenericPlotter):
         if len(pts) != 0:
             painter.drawLineSegments( qt.QPointArray(pts) )
             
-    def _autoAxis(self, dataname):
+    def _autoAxis(self, dataname, bounds):
         """Determine range of data."""
         if self.document.hasData(dataname):
-            return self.document.getData(dataname).getRange()
-        else:
-            return None
+            range = self.document.getData(dataname).getRange()
+            bounds[0] = min( bounds[0], range[0] )
+            bounds[1] = max( bounds[1], range[1] )
 
-    def autoAxis(self, name):
+    def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""
 
         s = self.settings
         if name == s.xAxis:
-            return self._autoAxis( s.xData )
+            self._autoAxis( s.xData, bounds )
         elif name == s.yAxis:
-            return self._autoAxis( s.yData )
-        else:
-            return None
+            self._autoAxis( s.yData, bounds )
 
     def _drawPlotLine( self, painter, xvals, yvals ):
         """Draw the line connecting the points."""

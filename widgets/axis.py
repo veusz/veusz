@@ -27,6 +27,7 @@ import widget
 import axisticks
 import widgetfactory
 import graph
+import containers
 import setting
 import utils
 
@@ -34,7 +35,9 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = [graph.Graph]
+    allowedparenttypes = [graph.Graph, containers.Grid]
+    allowusercreation = True
+    description = 'Axis to a plot or shared in a grid'
 
     def __init__(self, parent, name=None):
         """Initialise axis."""
@@ -59,6 +62,7 @@ class Axis(widget.Widget):
         s.add( setting.Bool('reflect', False,
                             descr = 'Place axis text and ticks on other side'
                             ' of axis') )
+
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
                               'horizontal',
@@ -88,11 +92,28 @@ class Axis(widget.Widget):
         
         s.readDefaults()
 
+        if self.name == 'y':
+            s.direction = 'vertical'
+
         self.minorticks = None
         self.majorticks = None
 
         # we recompute the axis later
         s.setModified()
+
+    def _autoCheckChildRanges(self, parent, range):
+        """Check children of this parent to update autorange."""
+
+        n = self.name
+        # ensures that we're the exis any other children refer to
+        for c in parent.children:
+            if c != self and c.name == n:
+                return
+
+        for c in parent.children:
+            c.autoAxis(n, range)
+            if len(c.children) != None:
+                self._autoCheckChildRanges(c, range)
 
     def _autoLookupRange(self):
         """Automatically look up the plotable range
@@ -101,18 +122,17 @@ class Axis(widget.Widget):
 
         # iterate over siblings to get axis range
         autorange = [1e99, -1e99]
-        changed = False
+        origrange = list(autorange)
 
-        for c in self.parent.children:
-            therange = c.autoAxis( ourname )
-            # if range is wider, expand
-            if therange != None:
-                autorange[0] = min( therange[0], autorange[0] )
-                autorange[1] = max( therange[1], autorange[1] )
-                changed = True
+        # find ranges
+        self._autoCheckChildRanges(self.parent, autorange)
 
         # return a default range if nobody gives us one
-        if changed:
+        if autorange != origrange:
+            # if it's a log axis, don't accept negative lower bounds
+            if self.settings.log:
+                autorange[0] = max(1e-50, autorange[0])
+            
             return autorange
         else:
             if self.settings.log:
@@ -492,6 +512,23 @@ class Axis(widget.Widget):
 
         # put axis back
         s.otherPosition = other
+
+    def chooseName(self):
+        """Axis are called x and y."""
+
+        checks = {'x': False, 'y': False}
+
+        # avoid choosing name which already exists
+        for i in self.parent.children:
+            if i.name in checks:
+                checks[i.name] = True
+
+        if not checks['x']:
+            return 'x'
+        if not checks['y']:
+            return 'y'
+
+        return widget.Widget.chooseName(self)
 
     def draw(self, parentposn, painter):
         """Plot the axis on the painter."""

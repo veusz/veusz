@@ -57,22 +57,21 @@ class Fit(plotters.FunctionPlotter):
         self.addAction( 'fit', self.actionFit,
                         descr='Fit function' )
 
-    def _autoAxis(self, dataname):
+    def _autoAxis(self, dataname, bounds):
         """Determine range of data."""
         if self.document.hasData(dataname):
-            return self.document.getData(dataname).getRange()
-        else:
-            return None
+            range = self.document.getData(dataname).getRange()
+            bounds[0] = min( bounds[0], range[0] )
+            bounds[1] = max( bounds[1], range[1] )
 
-    def autoAxis(self, name):
+    def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""
+
         s = self.settings
         if name == s.xAxis:
-            return self._autoAxis( s.xData )
+            self._autoAxis( s.xData, bounds )
         elif name == s.yAxis:
-            return self._autoAxis( s.yData )
-        else:
-            return None
+            self._autoAxis( s.yData, bounds )
 
     def initEnviron(self):
         """Copy data into environment."""
