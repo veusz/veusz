@@ -68,7 +68,7 @@ class GenericPlotter(widget.Widget):
         else:
             n = 'y'
         a = axis.Axis(self.parent, name=n)
-        a.setOutputPositions( dirn=dirn )
+        a.direction = dirn
         return n
 
     def setAxes(self, axis1='notset', axis2='notset'):

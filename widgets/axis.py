@@ -49,9 +49,11 @@ class Axis(widget.Widget):
         self.addPref( 'max', 'double', None ) # automatic
         self.addPref( 'reflect', 'int', False )
         self.addPref( 'log', 'int', False )
+        self.addPref( 'direction', 'int', 0 )
+        self.addPref( 'lowerPosition', 'double', 0. )
+        self.addPref( 'upperPosition', 'double', 1. )
+        self.addPref( 'otherPosition', 'double', 0. )
         self.readPrefs()
-
-        self.setOutputPositions()
 
         self.minorticks = None  # automatic
         self.majorticks = None  # automatic
@@ -76,7 +78,7 @@ class Axis(widget.Widget):
         
     def _getAxisDirection(self):
         """Return direction (0=horz, 1=vert)."""
-        return self.dirn
+        return self.direction
 
     def _setModified(self, modified=True):
         """Set internal modified bit."""
@@ -155,26 +157,15 @@ class Axis(widget.Widget):
 
         self._setModified(False)
 
-    def setOutputPositions(self, dirn=0, f1=0., f2=1., fother=0.):
-        """Set where the axis appears on the output graph.
-        
-        dirn = 0 (Horizontal) non-zero (vertical)
-        f1 = fractional position of axis along graph
-        f2 = ending fractional position
-        fother = fractional position in the other direction
-        """
-        self.posns = [float(f1), float(f2), float(fother)]
-        self.dirn = dirn
-    
     def _updatePlotRange(self, bounds):
         """Calculate coordinates on plotter of axis."""
 
         x1, y1, x2, y2 = bounds
         dx = x2 - x1
         dy = y2 - y1
-        p1, p2, pp = self.posns
+        p1, p2, pp = self.lowerPosition, self.upperPosition, self.otherPosition
 
-        if self.dirn == 0: # horizontal
+        if self.direction == 0: # horizontal
             self.coordParr1 = x1 + int(dx * p1)
             self.coordParr2 = x1 + int(dx * p2)
 
@@ -276,7 +267,7 @@ class Axis(widget.Widget):
     
     def swapline(self, painter, a1, b1, a2, b2):
         """ Draw line, but swap x & y coordinates if vertical axis."""
-        if self.dirn == 0:
+        if self.direction == 0:
             painter.drawLine(a1, b1, a2, b2)
         else:
             painter.drawLine(b1, a1, b2, a2)
@@ -323,7 +314,7 @@ class Axis(widget.Widget):
         delta = int( self.MinorTicks.length * self._pixperpt )
         minorticks = self._graphToPlotter(self.minortickscalc)
 
-        if self.dirn != 0: delta *= -1   # vertical
+        if self.direction != 0: delta *= -1   # vertical
         if self.reflect: delta *= -1     # reflection
         for t in minorticks:
             self.swapline( painter,
@@ -334,17 +325,18 @@ class Axis(widget.Widget):
         """Draw major ticks on the plot."""
 
         painter.setPen( self.MajorTicks.makeQPen(painter) )
-        delta = int( self.MajorTicks.length * self._pixperpt )
+        startdelta = int( self.MajorTicks.length * self._pixperpt )
+        delta = startdelta
 
-        if self.dirn != 0: delta *= -1   # vertical
+        if self.direction != 0: delta *= -1   # vertical
         if self.reflect: delta *= -1     # reflection
         for t in tickcoords:
             self.swapline( painter,
                            t, self.coordPerp,
                            t, self.coordPerp - delta )
 
-        # acount for ticks if they are in the direction of the label
-        if delta < 0:
+        # account for ticks if they are in the direction of the label
+        if startdelta < 0:
             self._delta_axis += abs(delta)
 
     def _drawTickLabels(self, painter, coordticks, sign):
@@ -358,7 +350,7 @@ class Axis(widget.Widget):
         tl_ascent  = painter.fontMetrics().ascent()
 
         # work out font alignment
-        ax, ay = Axis._ticklabel_alignments[self.dirn] \
+        ax, ay = Axis._ticklabel_alignments[self.direction] \
                  [self.TickLabels.rotate]
         angle = 0
         if self.TickLabels.rotate: angle = 270
@@ -372,7 +364,7 @@ class Axis(widget.Widget):
         maxwidth = 0
         for t, val in zip(coordticks, self.majortickscalc):
             x, y = t, self.coordPerp + sign*(self._delta_axis+tl_spacing)
-            if self.dirn != 0:   x, y = y, x
+            if self.direction != 0:   x, y = y, x
 
             num = utils.formatNumber(val, f)
             w = utils.render(painter, font,
@@ -382,8 +374,8 @@ class Axis(widget.Widget):
 
         # keep track of where we are
         self._delta_axis += tl_spacing
-        if (self.dirn == 0 and angle == 0) or \
-           (self.dirn != 0 and angle != 0):
+        if (self.direction == 0 and angle == 0) or \
+           (self.direction != 0 and angle != 0):
             self._delta_axis += tl_ascent
         else:
             self._delta_axis += maxwidth
@@ -398,7 +390,7 @@ class Axis(widget.Widget):
                      painter.fontMetrics().descent()
 
         # work out font alignment
-        ax, ay = Axis._axislabel_alignments[self.dirn] \
+        ax, ay = Axis._axislabel_alignments[self.direction] \
                  [self.Label.rotate]
 
         # if reflected, we want the opposite alignment
@@ -406,15 +398,15 @@ class Axis(widget.Widget):
             ax, ay = ( -ax, -ay )
 
         # angle of text
-        if (self.dirn == 0 and not self.Label.rotate) or \
-           (self.dirn != 0 and self.Label.rotate):
+        if (self.direction == 0 and not self.Label.rotate) or \
+           (self.direction != 0 and self.Label.rotate):
             angle = 0
         else:
             angle = 270
 
         x = (self.coordParr1 + self.coordParr2)/2
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
-        if self.dirn != 0:
+        if self.direction != 0:
             x, y = y, x
 
         utils.render(painter, font, x, y,
@@ -428,7 +420,7 @@ class Axis(widget.Widget):
         siblings = self.parent.getChildren()
         for s in siblings:
             try:
-                if self.dirn == s._getAxisDirection():
+                if self.direction == s._getAxisDirection():
                     countaxis += 1
                 
             except AttributeError:
@@ -440,12 +432,12 @@ class Axis(widget.Widget):
             return
 
         # swap axis to other side
-        other = self.posns[2]
+        other = self.otherPosition
         if other < 0.5:
             next = 1.
         else:
             next = 0.
-        self.posns[2] = next
+        self.otherPosition = next
 
         self.reflect = not self.reflect
         self._updatePlotRange(posn)
@@ -455,7 +447,7 @@ class Axis(widget.Widget):
         self.reflect = not self.reflect
 
         # put axis back
-        self.posns[2] = other
+        self.otherPosition = other
 
     def draw(self, parentposn, painter):
         """Plot the axis on the painter."""
@@ -479,7 +471,7 @@ class Axis(widget.Widget):
 
         # multiplication factor if reflection on the axis is requested
         sign = 1
-        if self.dirn != 0: sign *= -1
+        if self.direction != 0: sign *= -1
         if self.reflect:   sign *= -1
 
         # plot gridlines

@@ -247,7 +247,6 @@ class _PartBuilder:
         # actually write the text if requested
         if render:
             painter.drawText( self.x, self.y, p )
-            #painter.drawPoint( self.x, self.y )
 
         # move along, nothing to see
         self.x += width
@@ -282,15 +281,16 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1, angle = 0)
         y = 0
         
     painter.setFont(font)
-    #painter.drawRect(x, y, 3, 3)
 
     # centred or top alignment
     if alignvert >= 0:
-        ascent = painter.fontMetrics().ascent()
+        # why can't I use ascent() here??
+        h = painter.fontMetrics().boundingRect('0').height()
+        #ascent = painter.fontMetrics().ascent()
         if alignvert == 0:
-            y += ascent/2  # centred
+            y += h/2  # centred
         else:
-            y += ascent    # top
+            y += h    # top
 
     # centred or right alignment
     if alignhorz >= 0:
@@ -304,7 +304,7 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1, angle = 0)
             x -= totalwidth / 2 # centred
         else:
             x -= totalwidth     # right
-        
+
     # actually paint the string
     pb.x = x
     pb.y = y

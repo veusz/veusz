@@ -186,7 +186,7 @@ class PreferencesText(GenericPrefType):
 
     def _addPrefs(self):
         """ Initialise list of preferences """
-        self.prefs.addPref( 'font', 'string', 'Times-Roman' )
+        self.prefs.addPref( 'font', 'string', 'Serif' )
         self.prefs.addPref( 'size', 'int', 12 )
         self.prefs.addPref( 'italic', 'int', 0 )
         self.prefs.addPref( 'bold', 'int', 0 )
