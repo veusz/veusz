@@ -58,7 +58,7 @@ class Widget:
         self.position = (0., 0., 1., 1.)
 
         # fractional margins within this widget
-        self.margins = (-1., -1., -1., -1.)
+        self.margins = ('0', '0', '0', '0')
 
         # create a preference list for the widget
         self.prefs = utils.Preferences( 'PlotWidget_' + self.typename, self )
@@ -269,24 +269,11 @@ class Widget:
 
         return None
 
-    def autoSize(self, bounds):
-        """Return excess size needed to layout children properly."""
-        return (0, 0, 0, 0)
-
-    def getChildrenBounds(self, mybounds):
-        """Get array of bounds of children.
-
-        By default this returns a list of the input bounds for the children
-        """
-
-        # just return a copy for each child
-        return [mybounds]*len(self.children)
-
     def draw(self, parentposn, painter):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
         """
 
-        print self.getPath(), self.position
+        print self.getPath(), self.position, self.margins
 
         # get parent's position
         x1, y1, x2, y2 = parentposn
@@ -299,41 +286,17 @@ class Widget:
         dx = x2 - x1
         dy = y2 - y1
 
+        # convert margin to physical units and subtract
+        deltas = utils.cnvtDists( self.margins, painter )
+        bounds = ( int(x1+deltas[0]), int(y1+deltas[1]),
+                   int(x2-deltas[2]), int(y2-deltas[3]) )
 
-
-        # subtract margins
-        if self.margins[0] > 0:
-            x1 += self.margins[0]*dx
-        if self.margins[1] > 0:
-            y1 += self.margins[1]*dy
-        if self.margins[2] > 0:
-            x2 -= self.margins[2]*dx
-        if self.margins[3] > 0:
-            y2 -= self.margins[3]*dy
-
-        posn = ( int(x1), int(y1), int(x2), int(y2) )
-        childbounds = self.getChildrenBounds(posn)
-
-        # BROKEN!!!!
-        # modify bounds if child requests it
-##         for i in self.children:
-##             i.autoMargin(posn, bounds)
- 
-##         for i in range(4):
-##             if self.margins[i] < 0.:
-##                 # subtract difference
-##                 delta = posn[i] - bounds[i]
-##                 if delta > 0:
-##                     posn[i] += delta
-
-
- 
         # iterate over children in reverse order
         for i in range( len(self.children)-1, -1, -1 ):
-            self.children[i].draw(childbounds[i], painter)
+            self.children[i].draw(bounds, painter)
  
         # return our final bounds
-        return posn
+        return bounds
         
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

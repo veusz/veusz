@@ -69,19 +69,19 @@ class PreferencesLine(GenericPrefType):
         """ Initialise preferences """
         self.prefs.addPref( 'color', 'string', '#000000' )
 
-        # line width in points
-        self.prefs.addPref( 'width', 'double', 1. )
+        self.prefs.addPref( 'width', 'string', '1pt' )
 
         self.prefs.addPref( 'style', 'int', qt.Qt.SolidLine )        
-        self.prefs.addPref( 'hide', 'int', 0 )
+        self.prefs.addPref( 'hide', 'bool', False )
 
     def notHidden(self):
         return not self.hide
 
     def makeQPen(self, painter):
         """ Set the QPen from the one here. """
+
         # calculate thickness of line
-        width = int( utils.getPixelsPerPoint(painter) * self.width )
+        width = utils.cnvtDist( self.width, painter )
         return qt.QPen( qt.QColor(self.color), width, self.style )
 
 class PreferencesPlotLine(PreferencesLine):
@@ -127,7 +127,7 @@ class PreferencesBrush(GenericPrefType):
         """ Initialise preferences."""
         self.prefs.addPref( 'color', 'string', '#000000' )
         self.prefs.addPref( 'style', 'int', qt.Qt.SolidPattern )
-        self.prefs.addPref( 'hide', 'int', 0 )
+        self.prefs.addPref( 'hide', 'bool', False )
 
     def notHidden(self):
         return not self.hide
@@ -142,7 +142,7 @@ class PreferencesPlotFill(PreferencesBrush):
         """ Initialise prefs."""
         PreferencesBrush._addPrefs(self)
         self.prefs.setDefault( 'color', 'auto' )
-        self.prefs.setDefault( 'hide', 1 )
+        self.prefs.setDefault( 'hide', True )
 
     def __init__(self, name):
         PreferencesBrush.__init__(self, name)
@@ -176,7 +176,7 @@ class PreferencesGridLine(PreferencesLine):
     def _addPrefs(self):
         PreferencesLine._addPrefs(self)
         self.prefs.setDefault( 'color', '#808080' )
-        self.prefs.setDefault( 'hide', 1 )
+        self.prefs.setDefault( 'hide', True )
         self.prefs.setDefault( 'style', qt.Qt.DotLine )
 
 #####################################################################
@@ -187,20 +187,21 @@ class PreferencesText(GenericPrefType):
     def _addPrefs(self):
         """ Initialise list of preferences """
         self.prefs.addPref( 'font', 'string', 'Times New Roman' )
-        self.prefs.addPref( 'size', 'int', 12 )
-        self.prefs.addPref( 'italic', 'int', 0 )
-        self.prefs.addPref( 'bold', 'int', 0 )
-        self.prefs.addPref( 'underline', 'int', 0 )
-        self.prefs.addPref( 'valign', 'int', 0 )
-        self.prefs.addPref( 'halign', 'int', 0 )
+        self.prefs.addPref( 'size', 'string', '12pt' )
+        self.prefs.addPref( 'italic', 'bool', False )
+        self.prefs.addPref( 'bold', 'bool', False )
+        self.prefs.addPref( 'underline', 'bool', False )
+        self.prefs.addPref( 'valign', 'bool', False )
+        self.prefs.addPref( 'halign', 'bool', False )
         self.prefs.addPref( 'color', 'string', '#000000' )
-        self.prefs.addPref( 'hide', 'int', 0 )
+        self.prefs.addPref( 'hide', 'bool', False )
         
-    def makeQFont(self):
+    def makeQFont(self, painter):
         """ Return a qt.QFont object corresponding to the prefs """
+        size = utils.cnvtDist(self.size, painter)
         weight = qt.QFont.Normal
         if self.bold: weight = qt.QFont.Bold
-        f = qt.QFont(self.font, self.size,  weight, self.italic)
+        f = qt.QFont(self.font, size,  weight, self.italic)
         if self.underline: f.setUnderline(1)
         f.setStyleHint( qt.QFont.Times, qt.QFont.PreferDevice )
         return f
@@ -218,7 +219,7 @@ class PreferencesAxisLabel(PreferencesText):
     def _addPrefs(self):
         PreferencesText._addPrefs(self)
         self.prefs.addPref( 'label', 'string', '' )
-        self.prefs.addPref( 'rotate', 'int', 0 )
+        self.prefs.addPref( 'rotate', 'bool', False )
 
 class PreferencesTickLabel(PreferencesText):
     """ Hold the preferences for tick (or axis) label text."""

@@ -34,6 +34,8 @@ class Graph(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
 
+        self.margins = ['2cm', '2cm', '2cm', '2cm']
+
         # make axes
         ax = axis.Axis(self, name='x')
         ay = axis.Axis(self, name='y')

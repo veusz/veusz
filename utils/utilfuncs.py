@@ -355,7 +355,7 @@ _distRegexp=( (re.compile('^([0-9\.]+) *%$'),
                _distRatio)
               )
 
-def cnvtDist(dist, maxsize, painter):
+def cnvtDist(dist, painter):
     '''Convert a distance to plotter units.
 
     dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
@@ -363,6 +363,10 @@ def cnvtDist(dist, maxsize, painter):
     maxsize: size fractions are relative to
     painter: painter to get metrics to convert physical sizes
     '''
+
+    # work out maximum size
+    w = painter.window()
+    maxsize = max(w.width(), w.height())
 
     dist = string.strip(dist)
 
@@ -377,3 +381,8 @@ def cnvtDist(dist, maxsize, painter):
     # none of the regexps match
     raise vzexcept.DistanceError( "Cannot convert distance in form '%s'" %
                                   dist )
+
+def cnvtDists(distances, painter):
+    '''Convert a set of distances to plotter units.'''
+
+    return [ cnvtDist(d, painter) for d in distances ]

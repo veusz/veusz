@@ -26,6 +26,7 @@ import numarray
 import qt
 
 import widgets
+import utils
 
 def _cnvt_numarray(a):
     """Convert to a numarray if possible."""
@@ -47,8 +48,11 @@ class Document( qt.QObject ):
         """Initialise the document."""
         qt.QObject.__init__( self )
 
+        self.prefs = utils.Preferences( 'Document', self )
+        self.prefs.addPref('size', 'list', ['20cm', '20cm'])
+        self.prefs.read()
+
         self.data = {}
-        self.size_inch = (10, 10)
         self.basewidget = widgets.Widget(None)
         self.basewidget.setDocument( self )
 
@@ -96,10 +100,14 @@ class Document( qt.QObject ):
         self.modified = ismodified
         self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
 
-    def setSize(self, width_inch, height_inch):
+    def setSize(self, width, height):
         """Set the document size."""
-        self.size_inch = ( width_inch, height_inch )
-        self.emit( qt.PYSIGNAL("sigResize"), self.size_inch )
+        self.size = [ width, height ]
+        self.emit( qt.PYSIGNAL("sigResize"), self.size )
+
+    def getSize(self):
+        """Get the document size."""
+        return tuple(self.size)
 
     def isModifed(self):
         """Return whether modified flag set."""
@@ -111,8 +119,8 @@ class Document( qt.QObject ):
         
         painter = qt.QPainter()
         painter.begin( printer )
-        self.basewidget.draw( (0, 0,
-                               metrics.logicalDpiX()*self.size_inch[0],
-                               metrics.logicalDpiY()*self.size_inch[1]),
-                              painter )
+
+        # work out how many pixels correspond to the given size
+        width, height = utils.cnvtDists( self.size, painter )
+        self.basewidget.draw( (0, 0, width, height), painter )
         painter.end()

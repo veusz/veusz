@@ -44,13 +44,13 @@ class Axis(widget.Widget):
 
         self.addPref( 'numTicks', 'int', 5 )
         self.addPref( 'numMinorTicks', 'int', 40 )
-        self.addPref( 'autoExtend', 'int', True )
-        self.addPref( 'autoExtendZero', 'int', True )
-        self.addPref( 'autoMirror', 'int', True )
+        self.addPref( 'autoExtend', 'bool', True )
+        self.addPref( 'autoExtendZero', 'bool', True )
+        self.addPref( 'autoMirror', 'bool', True )
         self.addPref( 'min', 'double', None ) # automatic
         self.addPref( 'max', 'double', None ) # automatic
-        self.addPref( 'reflect', 'int', False )
-        self.addPref( 'log', 'int', False )
+        self.addPref( 'reflect', 'bool', False )
+        self.addPref( 'log', 'bool', False )
         self.addPref( 'direction', 'int', 0 )
         self.addPref( 'lowerPosition', 'double', 0. )
         self.addPref( 'upperPosition', 'double', 1. )
@@ -366,7 +366,7 @@ class Axis(widget.Widget):
         """Draw tick labels on the plot."""
 
         painter.setPen( self.TickLabels.makeQPen() )
-        font = self.TickLabels.makeQFont()
+        font = self.TickLabels.makeQFont(painter)
         painter.setFont(font)
         tl_spacing = painter.fontMetrics().leading() + \
                      painter.fontMetrics().descent()
@@ -408,7 +408,7 @@ class Axis(widget.Widget):
         """Draw an axis label on the plot."""
         
         painter.setPen( self.Label.makeQPen() )
-        font = self.Label.makeQFont()
+        font = self.Label.makeQFont(painter)
         painter.setFont(font)
         al_spacing = painter.fontMetrics().leading() + \
                      painter.fontMetrics().descent()
@@ -534,20 +534,20 @@ class Axis(widget.Widget):
         # restore the state of the painter
         painter.restore()
 
-    def autoMargin(self, posn, bounds):
-        """Update the bounds with what we're drawing."""
+##     def autoMargin(self, posn, bounds):
+##         """Update the bounds with what we're drawing."""
         
-        self.track_bounds = bounds
+##         self.track_bounds = bounds
 
-        # make a minimal pixmap to draw onto
-        pixmap = qt.QPixmap(1, 1)
-        painter = qt.QPainter(pixmap)
+##         # make a minimal pixmap to draw onto
+##         pixmap = qt.QPixmap(1, 1)
+##         painter = qt.QPainter(pixmap)
 
-        self.draw(posn, painter)
-        painter.end()
+##         self.draw(posn, painter)
+##         painter.end()
 
-        # assign current bounds into returned bounds
-        bounds[:] = self.track_bounds
+##         # assign current bounds into returned bounds
+##         bounds[:] = self.track_bounds
         
 # allow the factory to instantiate an axis
 widgetfactory.thefactory.register( Axis )

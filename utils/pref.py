@@ -65,8 +65,9 @@ def _writeDefaultEntry(settings, name, val, default):
 
 def _readListEntry(settings, name, default):
     """ Read a simple python list. Default is a list."""
+    # FIXME: is this insecure?
     txt, ok = settings.readEntry(name, repr(default))
-    return (eval(txt), ok)
+    return (eval(str(txt)), ok)
 
 def _readStringEntry(settings, name, default):
     """Read a string entry (required as Qt returns a QString."""
@@ -79,9 +80,10 @@ def _writeListEntry(settings, name, val, default):
         settings.removeEntry(name)
     else:
         settings.writeEntry(name, repr(val))
-        
+    
 # contains the functions to call to read preferences of a certain type
 _read_functions = { 'int': qt.QSettings.readNumEntry,
+                    'bool': qt.QSettings.readNumEntry,
                     'double': qt.QSettings.readDoubleEntry,
                     'string': _readStringEntry,
                     'font': _readFontEntry,
@@ -90,6 +92,7 @@ _read_functions = { 'int': qt.QSettings.readNumEntry,
 
 # functions to call to write preferences of certain types
 _write_functions = { 'int': _writeDefaultEntry,
+                     'bool': _writeDefaultEntry,
                      'double': _writeDefaultEntry,
                      'string': _writeDefaultEntry,
                      'font': _writeFontEntry,

@@ -23,6 +23,8 @@
 
 import qt
 
+import utils
+
 # FIXME: this needs to be set somewhere when installed
 _logolocation='images/logo.png'
 
@@ -43,20 +45,20 @@ class PlotWindow( qt.QScrollView ):
         self.connect( self.document, qt.PYSIGNAL("sigResize"),
                       self.slotResizeDoc )
 
-        self.setOutputSize(10, 10)
+        # set inital size
+        self.setOutputSize( *document.getSize() )
 
-    def setOutputSize(self, xwidth_inch, ywidth_inch ):
+    def setOutputSize(self, xwidth, ywidth ):
         """Set the ouput display size."""
 
-        self.realsize = ( xwidth_inch, ywidth_inch )
+        self.realsize = (xwidth, ywidth)
 
-        # convert physical units into pixels
-        metrics = qt.QPaintDeviceMetrics( self )
-        pixwidth = int( xwidth_inch * metrics.logicalDpiX() ) + 1
-        pixheight = int( ywidth_inch * metrics.logicalDpiY() ) + 1
+        # convert distances into pixels
+        painter = qt.QPainter( self )
+        self.size = utils.cnvtDists( self.realsize, painter )
+        painter.end()
 
-        # set the acutal pixel size
-        self.size = (pixwidth, pixheight)
+        # make new buffer and resize widget
         self.bufferpixmap = qt.QPixmap( *self.size )
         self.resizeContents( *self.size )
 
@@ -68,10 +70,9 @@ class PlotWindow( qt.QScrollView ):
             # repaint window without redrawing background
             self.updateContents()
 
-    def slotResizeDoc(self, width_inch, height_inch):
+    def slotResizeDoc(self, width, height):
         """Called when the document is resized."""
-
-        self.setOutputSize( width_inch, height_inch )
+        self.setOutputSize( pwidth, pheight )
         self.slotModifiedDoc( True )
 
     def drawLogo(self, painter):
