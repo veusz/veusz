@@ -23,12 +23,16 @@
 
 import qt
 import sys
+import os.path
+from math import sqrt
 
 import consolewindow
 import plotwindow
 import treeeditwindow
 import document
 import dialogs.aboutdialog
+import dialogs.importdialog
+import utils
 
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
@@ -38,11 +42,14 @@ class MainWindow(qt.QMainWindow):
 
         self.document = document.Document()
 
-        self.setCaption("Veusz")
+        self.filename = ''
+        self.updateTitlebar()
 
+        # construct menus and toolbars
         self._defineMenus()
 
         self.plot = plotwindow.PlotWindow(self.document, self)
+        self.plotzoom = 0
 
         # likewise with the tree-editing window
         self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
@@ -51,6 +58,7 @@ class MainWindow(qt.QMainWindow):
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
+        self.interpreter = self.console.getInterpreter()
         self.moveDockWindow( self.console, qt.Qt.DockBottom )
 
         # the plot window is the central window
@@ -58,31 +66,369 @@ class MainWindow(qt.QMainWindow):
 
         self.statusBar().message("Ready", 2000)
 
+        # keep page number up to date
+        self.pagelabel = qt.QLabel(self.statusBar())
+        self.statusBar().addWidget(self.pagelabel)
+
+        self.connect( self.plot, qt.PYSIGNAL("sigUpdatePage"),
+                      self.slotUpdatePage )
+
+        # disable save if already saved
+        self.connect( self.document, qt.PYSIGNAL("sigModified"),
+                      self.slotModifiedDoc )
+
+        # if the treeeditwindow changes the page, change the plot window
+        self.connect( self.treeedit, qt.PYSIGNAL("sigPageChanged"),
+                      self.plot.setPageNumber )
+
     def _defineMenus(self):
-        self.menuFile = qt.QPopupMenu( self )
-        self.menuBar().insertItem( "&File",
-                                   self.menuFile)
+        """Initialise the menus and toolbar."""
 
-        self.actionQuit = qt.QAction("Quit the program",
-                                     "&Quit", qt.QKeySequence(), self)
-        qt.QObject.connect( self.actionQuit, qt.SIGNAL( "activated()" ),
-                            qt.qApp, qt.SLOT( "closeAllWindows()" ))
+        # create toolbar
+        self.mainTools = qt.QToolBar(self, "main toolbar")
 
-        self.actionQuit.addTo( self.menuFile )
+        # add main menus
+        menus = [
 
-        self.menuHelp = qt.QPopupMenu( self )
-        self.menuBar().insertItem( "&Help",
-                                   self.menuHelp )
+            ('file', '&File'),
+            ('data', '&Data'),
+            ('view', '&View'),
+            ('help', '&Help')
+            ]
 
-        self.actionAbout = qt.QAction("Displays information about the program",
-                                      "About...", qt.QKeySequence(), self)
-        qt.QObject.connect( self.actionAbout, qt.SIGNAL("activated()" ),
-                            self.slotAbout )
-        self.actionAbout.addTo( self.menuHelp )
+        self.menus = {}
+        for id, text in menus:
+            menu = qt.QPopupMenu(self)
+            self.menuBar().insertItem( text, menu )
+            self.menus[id] = menu
 
+        # items for main menus
+        # Items are: Lookup id, description, menu text, which menu,
+        #  Slot, Icon (or ''), whether to add to toolbar,
+        #  Keyboard shortcut (or '')
+        items = [
+            ('filenew', 'New document', '&New', 'file',
+             self.slotFileNew, 'stock-new.png', True, 'Ctrl+N'),
+            ('fileopen', 'Open a document', '&Open...', 'file',
+             self.slotFileOpen, 'stock-open.png', True, 'Ctrl+O'),
+            ('file', ),
+            ('filesave', 'Save the document', '&Save', 'file',
+             self.slotFileSave, 'stock-save.png', True, 'Ctrl+S'),
+            ('filesaveas', 'Save the current graph under a new name',
+             'Save &As...', 'file', self.slotFileSaveAs, 'stock-save-as.png',
+             False, ''),
+            ('file', ),
+            ('fileprint', 'Print the document', '&Print...', 'file',
+             self.slotFilePrint, 'stock-print.png', True, ''),
+            ('fileexport', 'Export the current page', '&Export...', 'file',
+             self.slotFileExport, 'stock-export.png', True, ''),
+            ('file', ),
+            ('filequit', 'Exit the program', '&Quit', 'file',
+             self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
+            ('dataimport', 'Import data into Veusz', '&Import...', 'data',
+             self.slotDataImport, 'stock-import.png', False, ''),
+            ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
+             self.slotViewZoomIn, 'stock-zoom-in.png', True, 'Ctrl++'),
+            ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
+             self.slotViewZoomOut, 'stock-zoom-out.png', True, 'Ctrl+-'),
+            ('viewzoom11', 'Restore plot to natural size', 'Zoom 1:1', 'view',
+             self.slotViewZoom11, 'stock-zoom-100.png', True, 'Ctrl+1'),
+            ('view',),
+            ('viewprevpage', 'Move to the previous page', '&Previous page',
+             'view', self.slotViewPreviousPage, 'stock_previous-page.png',
+             True, 'Ctrl+PgUp'),
+            ('viewnextpage', 'Move to the next page', '&Next page',
+             'view', self.slotViewNextPage, 'stock_next-page.png',
+             True, 'Ctrl+PgDown'),
+            ('helpabout', 'Displays information about the program', 'About...',
+             'help', self.slotHelpAbout, '', False, '')
+            ]
+            
+        # construct the menus and toolbar from the above data
+        dirname = os.path.dirname(__file__)
+        self.actions = {}
+        for i in items:
+            # we just want to insert a separator
+            if len(i) == 1:
+                self.menus[i[0]].insertSeparator()
+                continue
+            
+            id, descr, menutext, menu, slot, icon, addtool, key = i
+            if key == '':
+                ks = qt.QKeySequence()
+            else:
+                ks = qt.QKeySequence(key)
 
-    def slotAbout(self):
+            action = qt.QAction(descr, menutext, ks, self)
+
+            # load icon if set
+            if icon != '':
+                action.setIconSet(qt.QIconSet( qt.QPixmap("%s/icons/%s" %
+                                                          (dirname, icon))) )
+
+            # connect the action to the slot
+            qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
+
+            # add to menu
+            action.addTo( self.menus[menu] )
+
+            # add to toolbar
+            if addtool:
+                action.addTo(self.mainTools)
+
+            # save for later
+            self.actions[id] = action
+
+    def slotDataImport(self):
+        """Display the import data dialog."""
+        d = dialogs.importdialog.ImportDialog(self, self.document)
+        d.show()
+
+    def slotHelpAbout(self):
         """Show about dialog."""
         d = dialogs.aboutdialog.AboutDialog(self)
         d.exec_loop()
 
+    def queryOverwrite(self):
+        """Do you want to overwrite the current document.
+
+        Returns qt.QMessageBox.(Yes,No,Cancel)."""
+        
+        return qt.QMessageBox("Veusz",
+                              "Document is modified. Save first?",
+                              qt.QMessageBox.Warning,
+                              qt.QMessageBox.Yes | qt.QMessageBox.Default,
+                              qt.QMessageBox.No,
+                              qt.QMessageBox.Cancel,
+                              self).exec_loop()
+    def slotFileNew(self):
+        """New file."""
+
+        # does the user want to save first?
+        if self.document.isModified():
+            v = self.queryOverwrite()
+            if v == qt.QMessageBox.Cancel:
+                return
+            elif v == qt.QMessageBox.Yes:
+                self.slotFileSave()
+
+        # destroy the current document
+        self.document.wipe()
+        self.filename = ''
+        self.updateTitlebar()
+
+    def slotFileSave(self):
+        """Save file."""
+
+        if self.filename == '':
+            self.slotFileSaveAs()
+        else:
+            try:
+                file = open(self.filename, 'w')
+                self.document.saveToFile(file)
+            except IOError:
+                qt.QMessageBox("Veusz",
+                               "Cannot save file as '%s'" % self.filename,
+                               qt.QMessageBox.Critical,
+                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                               qt.QMessageBox.NoButton,
+                               qt.QMessageBox.NoButton,
+                               self).exec_loop()
+                
+                
+    def updateTitlebar(self):
+        """Put the filename into the title bar."""
+        if self.filename == '':
+            self.setCaption('Veusz')
+        else:
+            self.setCaption( "%s - Veusz" %
+                             os.path.basename(self.filename) )
+
+    dirname = '.'
+    def slotFileSaveAs(self):
+        """Save As file."""
+
+        fd = qt.QFileDialog(self, 'save as dialog', True)
+        fd.setDir( MainWindow.dirname )
+        fd.setMode( qt.QFileDialog.AnyFile )
+        fd.setFilter( "Veusz script files (*.vsz)" )
+        fd.setCaption('Save as')
+
+        # okay was selected
+        if fd.exec_loop() == qt.QDialog.Accepted:
+            # save directory for next time
+            MainWindow.dirname = fd.dir()
+            # update the edit box
+            filename = str( fd.selectedFile() )
+            if os.path.splitext(filename)[1] == '':
+                filename += '.vsz'
+
+            # test whether file exists and ask whether to overwrite it
+            try:
+                open(filename, 'r')
+            except IOError:
+                pass
+            else:
+                v = qt.QMessageBox("Veusz",
+                                   "File exists, overwrite?",
+                                   qt.QMessageBox.Warning,
+                                   qt.QMessageBox.Yes,
+                                   qt.QMessageBox.No | qt.QMessageBox.Default,
+                                   qt.QMessageBox.NoButton,
+                                   self).exec_loop()
+                if v == qt.QMessageBox.No:
+                    return
+
+            self.filename = filename
+            self.updateTitlebar()
+
+            self.slotFileSave()
+
+    def slotFileOpen(self):
+        """Open an existing file."""
+
+        fd = qt.QFileDialog(self, 'open dialog', True)
+        fd.setDir( MainWindow.dirname )
+        fd.setMode( qt.QFileDialog.ExistingFile )
+        fd.setFilter ( "Veusz script files (*.vsz)" )
+        fd.setCaption('Open')
+
+        # if the user chooses a file
+        if fd.exec_loop() == qt.QDialog.Accepted:
+            # save directory for next time
+            MainWindow.dirname = fd.dir()
+
+            filename = str( fd.selectedFile() )
+
+            try:
+                self.interpreter.Load(filename)
+                self.filename = filename
+                self.updateTitlebar()
+            except IOError:
+                qt.QMessageBox("Veusz",
+                               "Cannot open file '%s'" % self.filename,
+                               qt.QMessageBox.Critical,
+                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                               qt.QMessageBox.NoButton,
+                               qt.QMessageBox.NoButton,
+                               self).exec_loop()
+                
+    def slotFileExport(self):
+        """Export the graph."""
+
+        fd = qt.QFileDialog(self, 'export dialog', True)
+        fd.setDir( MainWindow.dirname )
+        fd.setMode( qt.QFileDialog.AnyFile )
+        fd.setFilters( "Encapsulated Postscript (*.eps);;"
+                       "Portable Network Graphics (*.png)" )
+        fd.setCaption('Export')
+
+        if fd.exec_loop() == qt.QDialog.Accepted:
+            # save directory for next time
+            MainWindow.dirname = fd.dir()
+
+            filename = str( fd.selectedFile() )
+            try:
+                self.document.export(filename)
+            except (IOError, RuntimeError), inst:
+                qt.QMessageBox("Veusz",
+                               "Error exporting file:\n%s" % inst,
+                               qt.QMessageBox.Critical,
+                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                               qt.QMessageBox.NoButton,
+                               qt.QMessageBox.NoButton,
+                               self).exec_loop()
+
+    def slotFilePrint(self):
+        """Print the document."""
+
+        doc = self.document
+        prnt = qt.QPrinter(qt.QPrinter.HighResolution)
+        prnt.setColorMode(qt.QPrinter.Color)
+        prnt.setMinMax( 1, doc.getNumberPages() )
+        prnt.setCreator('Veusz %s' % utils.version())
+        prnt.setDocName(self.filename)
+
+        if prnt.setup():
+            # get page range
+            minval, maxval = prnt.fromPage(), prnt.toPage()
+
+            # all pages requested
+            if minval == 0 and maxval == 0:
+                minval, maxval = 1, doc.getNumberPages()
+
+            # pages are relative to zero
+            minval -= 1
+            maxval -= 1
+
+            # reverse or forward order
+            if prnt.pageOrder() == qt.QPrinter.FirstPageFirst:
+                pages = range(minval, maxval+1)
+            else:
+                pages = range(maxval, minval-1, -1)
+
+            # if more copies are requested
+            pages *= prnt.numCopies()
+
+            # do the printing
+            doc.printTo( prnt, pages )
+
+    def slotViewZoomIn(self):
+        """Zoom into the plot."""
+
+        if self.plotzoom < 6:
+            self.plotzoom += 1
+        self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
+
+    def slotViewZoomOut(self):
+        """Zoom out of the plot."""
+
+        if self.plotzoom > -6:
+            self.plotzoom -= 1
+        self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
+
+    def slotViewZoom11(self):
+        """Restore the zoom to 1:1"""
+        
+        self.plotzoom = 0
+        self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
+
+    def slotModifiedDoc(self, ismodified):
+        """Disable certain actions if document is not modified."""
+
+        # enable/disable file, save menu item
+        self.actions['filesave'].setEnabled(ismodified)
+
+    def slotFileQuit(self):
+        """File quit chosen."""
+
+        # does the user want to save first?
+        if self.document.isModified():
+            v = self.queryOverwrite()
+            if v == qt.QMessageBox.Cancel:
+                return
+            elif v == qt.QMessageBox.Yes:
+                self.slotFileSave()
+        
+        qt.qApp.closeAllWindows()
+        
+    def slotViewPreviousPage(self):
+        """View the previous page."""
+        self.plot.setPageNumber( self.plot.getPageNumber() - 1 )
+
+    def slotViewNextPage(self):
+        """View the next page."""
+        self.plot.setPageNumber( self.plot.getPageNumber() + 1 )
+
+    def slotUpdatePage(self, number):
+        """Update page number when the plot window says so."""
+
+        np = self.document.getNumberPages()
+        if np == 0:
+            self.pagelabel.setText("No pages")
+        else:
+            self.pagelabel.setText("Page %i/%i" % (number+1, np))
+
+        # disable previous and next page actions
+        self.actions['viewprevpage'].setEnabled( number != 0 )
+        self.actions['viewnextpage'].setEnabled( number < np-1 )

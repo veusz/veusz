@@ -21,12 +21,13 @@
 
 # $Id$
 
+import os
 import qt
 
 import utils
 
-# FIXME: this needs to be set somewhere when installed
-_logolocation='images/logo.png'
+dir = os.path.dirname(__file__)
+_logolocation='%s/../images/logo.png' % dir
 
 class PlotWindow( qt.QScrollView ):
     """Class to show the plot(s) in a scrollable window."""
@@ -41,39 +42,59 @@ class PlotWindow( qt.QScrollView ):
         self.document = document
         self.connect( self.document, qt.PYSIGNAL("sigModified"),
                       self.slotModifiedDoc )
-        self.modified = True
-        self.connect( self.document, qt.PYSIGNAL("sigResize"),
-                      self.slotResizeDoc )
+        self.outdated = True
 
-        # set inital size
-        self.setOutputSize( *document.getSize() )
+        self.size = (-1, -1)
+        self.oldzoom = -1.
+        self.zoomfactor = 1.
+        self.pagenumber = 0
 
-    def setOutputSize(self, xwidth, ywidth ):
+    def setOutputSize(self):
         """Set the ouput display size."""
-
-        self.realsize = (xwidth, ywidth)
 
         # convert distances into pixels
         painter = qt.QPainter( self )
-        self.size = utils.cnvtDists( self.realsize, painter )
+        painter.veusz_scaling = self.zoomfactor
+        size = utils.cnvtDists(self.document.getSize(), painter )
         painter.end()
 
         # make new buffer and resize widget
-        self.bufferpixmap = qt.QPixmap( *self.size )
-        self.resizeContents( *self.size )
+        if size != self.size:
+            self.size = size
+            self.bufferpixmap = qt.QPixmap( *self.size )
+            self.resizeContents( *self.size )
+
+    def setZoomFactor(self, zoomfactor):
+        """Set the zoom factor of the window."""
+        self.zoomfactor = float(zoomfactor)
+        self.updateContents()
+
+    def setPageNumber(self, pageno):
+        """Move the the selected page."""
+
+        # we don't need to
+        if self.pagenumber == pageno and not self.outdated:
+            return
+
+        # keep within bounds
+        pageno = min(pageno, self.document.getNumberPages()-1)
+        pageno = max(0, pageno)
+
+        self.pagenumber = pageno
+        self.outdated = True
+        self.updateContents()
+
+    def getPageNumber(self):
+        """Get the the selected page."""
+        return self.pagenumber
 
     def slotModifiedDoc(self, ismodified):
         """Called when the document has been modified."""
 
         if ismodified:
-            self.modified = True
+            self.outdated = True
             # repaint window without redrawing background
             self.updateContents()
-
-    def slotResizeDoc(self, width, height):
-        """Called when the document is resized."""
-        self.setOutputSize( pwidth, pheight )
-        self.slotModifiedDoc( True )
 
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""
@@ -89,18 +110,25 @@ class PlotWindow( qt.QScrollView ):
         widget = self.document.getBaseWidget()
 
         # draw data into background pixmap if modified
-        if self.modified:
+        if self.outdated or self.zoomfactor != self.oldzoom:
+            self.setOutputSize()
             
             # fill pixmap with proper background colour
             self.bufferpixmap.fill( self.colorGroup().base() )
 
-            # make a QPainter to draw into the buffer pixmap
-            p = qt.QPainter( self.bufferpixmap )
+            self.pagenumber = min( self.document.getNumberPages() - 1,
+                                   self.pagenumber )
+            if self.pagenumber >= 0:
+                # draw the data into the buffer
+                self.document.printTo( self.bufferpixmap, [self.pagenumber],
+                                       self.zoomfactor )
+            else:
+                self.pagenumber = 0
 
-            # draw the data into the buffer
-            self.document.printTo( self.bufferpixmap )
+            self.emit( qt.PYSIGNAL("sigUpdatePage"), (self.pagenumber,) )
 
-            self.modified = False
+            self.outdated = False
+            self.oldzoom = self.zoomfactor
 
         # blt the visible part of the pixmap into the image
         painter.drawPixmap(clipx, clipy, self.bufferpixmap,

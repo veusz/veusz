@@ -156,6 +156,10 @@ class ConsoleWindow(qt.QDockWindow):
         qt.QObject.connect( self._inputedit, qt.PYSIGNAL("sigEnter"),
                             self.slotEnter )
 
+    def getInterpreter(self):
+        """Return the command interpreter."""
+        return self.interpreter
+
     def output_stdout(self, text):
         """ Write text in stdout font to the log."""
 

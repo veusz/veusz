@@ -1,4 +1,5 @@
-# graph widget for containing other sorts of widget
+# root.py
+# Represents the root widget for plotting the document
 
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
@@ -20,46 +21,37 @@
 
 # $Id$
 
+import qt
+
 import widget
 import widgetfactory
-import axis
-import page
-import containers
 
-class Graph(widget.Widget):
-    """Graph for containing other sorts of widgets"""
-    
-    typename='graph'
-    allowedparenttypes = [page.Page, containers.Grid]
-    allowusercreation = True
-    description = 'Base graph'
+class Root(widget.Widget):
+    """Root widget class for plotting the document."""
+
+    typename='document'
+    allowusercreation = False
+    allowedparenttypes = [None]
 
     def __init__(self, parent, name=None):
-        """Initialise object and create axes."""
+        """Initialise object."""
 
         widget.Widget.__init__(self, parent, name=name)
-        self.addPref( 'leftMargin', 'string', '2cm' )
-        self.addPref( 'rightMargin', 'string', '2cm' )
-        self.addPref( 'topMargin', 'string', '2cm' )
-        self.addPref( 'bottomMargin', 'string', '2cm' )
+        self.addPref( 'width', 'string', '20cm' )
+        self.addPref( 'height', 'string', '20cm' )
         self.readPrefs()
 
-        # make axes
-        ax = axis.Axis(self, name='x')
-        ay = axis.Axis(self, name='y')
-        ay.direction = 1
-
-        # these widgets shouldn't be remade
-        self.autoadd += ['x', 'y']
-
     def draw(self, parentposn, painter):
-        '''Update the margins before drawing.'''
+        """Draw the plotter. Clip graph inside bounds."""
 
-        self.margins = [self.leftMargin, self.topMargin,
-                        self.rightMargin, self.bottomMargin]
+        x1, y1, x2, y2 = parentposn
 
-        widget.Widget.draw(self, parentposn, painter)
+        painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        bounds = widget.Widget.draw(self, parentposn, painter)
+        painter.restore()
 
-# allow users to make Graph objects
-widgetfactory.thefactory.register( Graph )
- 
+        return bounds
+
+# allow the factory to instantiate this
+widgetfactory.thefactory.register( Root )

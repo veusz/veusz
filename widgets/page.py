@@ -1,5 +1,5 @@
-# version.py
-# return the version number
+# page.py
+# Represents page in plot
 
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
@@ -21,18 +21,36 @@
 
 # $Id$
 
-"""
-Return Veusz' version number
-"""
+import qt
+import widget
+import root
+import widgetfactory
 
-import string
-import os
+class Page(widget.Widget):
+    """A class for representing a page of plotting."""
 
-def version():
-    """Return the version number as a string."""
+    typename='page'
+    allowusercreation = True
+    allowedparenttypes = [root.Root]
 
-    dir = os.path.dirname(__file__)
-    file = open('%s/../VERSION' % dir, 'r')
+    def __init__(self, parent, name=None):
+        """Initialise object."""
 
-    return file.readline().strip()
+        widget.Widget.__init__(self, parent, name=name)
 
+    def draw(self, parentposn, painter):
+        """Draw the plotter. Clip graph inside bounds."""
+
+        # document should pass us the page bounds
+        x1, y1, x2, y2 = parentposn
+
+        painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        bounds = widget.Widget.draw(self, parentposn, painter)
+        painter.restore()
+
+        return bounds
+
+# allow the factory to instantiate this
+widgetfactory.thefactory.register( Page )
+    

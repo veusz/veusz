@@ -21,8 +21,13 @@
 
 # $Id$
 
-import string
+import os
+import os.path
+import time
 import numarray
+import random
+import string
+
 import qt
 
 import widgets
@@ -82,26 +87,54 @@ class Dataset:
 
     # TODO implement mathematical operations on this type
 
+    def saveToFile(self, file, name):
+        '''Save data to file.'''
+
+        # build up descriptor
+        datasets = [self.data]
+        descriptor = name
+        if self.serr != None:
+            descriptor += ',+-'
+            datasets.append(self.serr)
+        if self.perr != None:
+            descriptor += ',+'
+            datasets.append(self.perr)
+        if self.nerr != None:
+            descriptor += ',-'
+            datasets.append(self.nerr)
+
+        text = "ImportString('%s','''\n" % descriptor
+
+        # write line line-by-line
+        for line in zip( *datasets ):
+            l = ''
+            for i in line:
+                l += '%e ' % i
+            text += l[:-1] + '\n'
+
+        text += "''')\n"
+        file.write(text)
+
 class Document( qt.QObject ):
     """Document class for holding the graph data.
 
     Emits: sigModified when the document has been modified
-           sigResize when the document size has changed.
+           sigWiped when document is wiped
     """
 
     def __init__(self):
         """Initialise the document."""
         qt.QObject.__init__( self )
+        self.wipe()
 
-        self.prefs = utils.Preferences( 'Document', self )
-        self.prefs.addPref('size', 'list', ['20cm', '20cm'])
-        self.prefs.read()
+    def wipe(self):
+        """Wipe out any stored data."""
 
         self.data = {}
-        self.basewidget = widgets.Region(None)
-        self.basewidget.setDocument( self )
-
+        self.basewidget = widgets.Root(None)
+        self.basewidget.setDocument(self)
         self.setModified()
+        self.emit( qt.PYSIGNAL("sigWiped"), () )
 
     def setData(self, name, dataset):
         """Set data to val, with symmetric or negative and positive errors."""
@@ -125,33 +158,111 @@ class Document( qt.QObject ):
         self.modified = ismodified
         self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
 
-    def setSize(self, width, height):
-        """Set the document size."""
-        self.size = [ width, height ]
-        self.emit( qt.PYSIGNAL("sigResize"), self.size )
-
-    def getSize(self):
-        """Get the document size."""
-        return tuple(self.size)
-
-    def isModifed(self):
+    def isModified(self):
         """Return whether modified flag set."""
         return self.modified
     
-    def printTo(self, printer):
+    def getSize(self):
+        """Get the size of the main plot widget."""
+        return (self.basewidget.width, self.basewidget.height)
+
+    def printTo(self, printer, pages, scaling = 1.):
         """Print onto printing device."""
-        metrics = qt.QPaintDeviceMetrics( printer )
-        
+
         painter = qt.QPainter()
         painter.begin( printer )
 
+        painter.veusz_scaling = scaling
+
         # work out how many pixels correspond to the given size
-        width, height = utils.cnvtDists( self.size, painter )
-        self.basewidget.draw( (0, 0, width, height), painter )
+        width, height = utils.cnvtDists(self.getSize(), painter)
+        children = self.basewidget.getChildren()
+
+        # This all assumes that only pages can go into the root widget
+        i = 0
+        no = len(pages)
+
+        for p in pages:
+            c = children[p]
+            c.draw( (0, 0, width, height), painter )
+
+            # start new pages between each page
+            if i < no-1:
+                printer.newPage()
+            i += 1
+
         painter.end()
+
+    def getNumberPages(self):
+        """Return the number of pages in the document."""
+        return len(self.basewidget.getChildren())
 
     def saveToFile(self, file):
         """Save the text representing a document to a file."""
 
-        self.getBaseWidget().saveToFile(file)
+        file.write('# Veusz saved document (version %s)\n' % utils.version())
+        file.write('# User: %s\n' % os.getlogin() )
+        file.write('# Date: %s\n\n' % time.strftime(
+            "%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) )
+        
+        for name, dataset in self.data.items():
+            dataset.saveToFile(file, name)
+        file.write(self.getBaseWidget().getSaveText())
+        
+        self.setModified(False)
+
+    def export(self, filename, color=True):
+        """Export the figure to the filename."""
+
+        ext = os.path.splitext(filename)[1]
+
+        if ext == '.eps':
+            # write eps file
+            p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p.setOutputToFile(True)
+            p.setOutputFileName(filename)
+            p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.newPage()
+            self.printTo( p )
+
+        elif ext == '.png':
+            # write png file
+            # unfortunately we need to pass QPrinter the name of an eps
+            # file: no secure way we can produce the file. FIXME INSECURE
+
+            dir = os.path.dirname(os.path.abspath(filename))
+            while 1:
+                digits = string.digits + string.ascii_letters
+                rndstr = ''
+                for i in xrange(40):
+                    rndstr += random.choice(digits)
+                tmpfilename = "%s/tmp_%s.eps" % (dir, rndstr)
+                try:
+                    os.stat(tmpfilename)
+                except OSError:
+                    break
+            
+            # write eps file
+            p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p.setOutputToFile(True)
+            p.setOutputFileName(tmpfilename)
+            p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.newPage()
+            self.printTo( p )
+
+            # now use ghostscript to convert the file into the relevent type
+            cmdline = ( 'gs -sDEVICE=pngalpha -dEPSCrop -dBATCH -dNOPAUSE'
+                        ' -sOutputFile="%s" "%s"' % (filename, tmpfilename) )
+            stdin, stdout, stderr = os.popen3(cmdline)
+            stdin.close()
+
+            # if anything goes to stderr, then report it
+            text = stderr.read().strip()
+            if len(text) != 0:
+                raise RuntimeError, text
+
+            os.unlink(tmpfilename)
+
+        else:
+            raise RuntimeError, "File type '%s' not supported" % ext
         

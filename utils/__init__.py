@@ -27,3 +27,4 @@ from preftypes import *
 from textrender import *
 from points import *
 from version import *
+from setting import *

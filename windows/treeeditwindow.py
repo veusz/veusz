@@ -25,6 +25,7 @@ import os
 
 import qt
 import widgets.widgetfactory as widgetfactory
+import widgets
 
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
@@ -33,10 +34,17 @@ class _WidgetItem(qt.QListViewItem):
         qt.QListViewItem.__init__(self, *args)
 
         self.widget = widget
+        self.index = '0000'
 
         # add subitems for sub-prefs of widget
+        no = 0
         for name, pref in widget.getSubPrefs().items():
-            _PrefItem(pref, name, self, self)
+            _PrefItem(pref, name, no, self, self)
+            no += 1
+
+    def setIndex(self, index):
+        """Set the sorting index."""
+        self.index = '%04i' % index
 
     def text(self, column):
         """Get the text in a particular column."""
@@ -46,6 +54,8 @@ class _WidgetItem(qt.QListViewItem):
             return self.widget.getTypeName()
         elif column == 2:
             return self.widget.getUserDescription()
+        elif column == 3:
+            return self.index
         return ""
 
     def getWidget(self):
@@ -54,13 +64,14 @@ class _WidgetItem(qt.QListViewItem):
 
 class _PrefItem(qt.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
-    def __init__(self, preftype, name, parent, *args):
+    def __init__(self, preftype, name, number, parent, *args):
         qt.QListViewItem.__init__(self, *args)
 
         self.preftype = preftype
         self.parent = parent
         self.setText(0, name)
         self.setText(1, "setting")
+        self.setText(3, '%04i' % number)
 
     def getWidget(self):
         """Returns None as we don't have a widget."""
@@ -84,15 +95,12 @@ class _ScrollView(qt.QScrollView):
 
     def adjustSize(self):
         h = self.grid.height()
-        #print self.visibleWidth(), h
         self.grid.resize(self.visibleWidth(), h)
         self.resizeContents(self.visibleWidth(), h)
 
     def resizeEvent(self, event):
-        #self.moveChild(self.grid, 0, 0)
         qt.QScrollView.resizeEvent(self, event)
         self.adjustSize()
-        #print "Here"
 
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
@@ -104,7 +112,9 @@ class TreeEditWindow(qt.QDockWindow):
 
         self.document = thedocument
         self.connect( self.document, qt.PYSIGNAL("sigModified"),
-                      self.slotModifiedDoc )
+                      self.slotDocumentModified )
+        self.connect( self.document, qt.PYSIGNAL("sigWiped"),
+                      self.slotDocumentWiped )
 
         self.tooltips = qt.QToolTip(self)
 
@@ -121,7 +131,7 @@ class TreeEditWindow(qt.QDockWindow):
             if wc.allowusercreation:
                 # make a new button, and set the pixmap
                 b = qt.QToolButton(buttonhbox)
-                name = "%s/button_%s.png" % (dir, w)
+                name = "%s/icons/button_%s.png" % (dir, w)
                 b.setPixmap( qt.QPixmap(name) )
 
                 # keep track of the buttons so we can disable/enable them
@@ -149,9 +159,15 @@ class TreeEditWindow(qt.QDockWindow):
         self.connect( lv, qt.SIGNAL("selectionChanged(QListViewItem*)"),
                       self.slotItemSelected )
 
+        # we use a hidden column to get the sort order correct
         lv.addColumn( "Name" )
         lv.addColumn( "Type" )
         lv.addColumn( "Detail" )
+        lv.addColumn( "Sort order")
+        lv.setColumnWidth(3, 0)
+        lv.setColumnWidthMode(3, qt.QListView.Manual)
+        lv.setSorting(3)
+        lv.setTreeStepSize(10)
 
         # add root widget to view
         self.rootitem = _WidgetItem( self.document.getBaseWidget(), lv )
@@ -174,7 +190,7 @@ class TreeEditWindow(qt.QDockWindow):
         # select the root item
         self.listview.setSelected(self.rootitem, True)
 
-    def slotModifiedDoc(self, ismodified):
+    def slotDocumentModified(self, ismodified):
         """Called when the document has been modified."""
  
         if ismodified:
@@ -183,49 +199,57 @@ class TreeEditWindow(qt.QDockWindow):
     def _updateBranch(self, root):
         """Recursively update items on branch."""
 
-        # collect together a list of treeitems (in original order)
-        # ignore those that don't correspond to widgets
-        items = []
+        # build dictionary of items
+        items = {}
         i = root.firstChild()
         while i != None:
-            if i.getWidget() != None:
-                items.insert(0, i)
+            w = i.getWidget()
+            if w != None:
+                items[w] = i
             i = i.nextSibling()
 
-        childs = root.getWidget().getChildren()
-        newchild = False
+        childdict = {}
+        # assign indicies to each one
+        index = 0
+        newitem = False
+        for c in root.getWidget().getChildren():
+            childdict[c] = True
+            if c in items:
+                items[c].setIndex(index)
+            else:
+                items[c] = _WidgetItem(c, root)
+                items[c].setIndex(index)
+                newitem = True
+            self._updateBranch(items[c])
+            index += 1
 
-        # go through the list and update those which have changed
-        for i, c in zip(items, childs):
-            if i.getWidget() != c:
-                # add in new item after the changed one
-                new = _WidgetItem(c, i)
-                # remove the original
+        # delete items not in child list
+        for i in items.itervalues():
+            w = i.getWidget()
+            if w not in childdict:
                 root.takeItem(i)
-                i = new
-                newChild = True
 
-            self._updateBranch(i)
-            
-        # if we need to add new items
-        for i in childs[len(items):]:
-            new = _WidgetItem(i, root)
-            self._updateBranch(new)
-            newchild = True
-
-        # if we need to delete old items
-        for i in items[len(childs):]:
-            root.takeItem(i)
-            del i
-            newchild = True
-        
         # open the branch if we've added/changed the children
-        if newchild:
+        if newitem:
             self.listview.setOpen(root, True)
+
+    def slotDocumentWiped(self):
+        """Called when there is a new document."""
+
+        self.listview.clear()
+        self.rootitem = _WidgetItem( self.document.getBaseWidget(),
+                                     self.listview )
+        self.listview.setSelected(self.rootitem, True)
+        self.updateContents()
 
     def updateContents(self):
         """Make the window reflect the document."""
+
         self._updateBranch(self.rootitem)
+        sel = self.listview.selectedItem()
+        if sel != None:
+            self.listview.ensureItemVisible(sel)
+
         self.listview.triggerUpdate()
 
     def slotCntrlModifiesDoc(self):
@@ -279,6 +303,27 @@ class TreeEditWindow(qt.QDockWindow):
             cntrl.show()
             self.prefchilds.append(cntrl)
 
+        # Change the page to the selected widget
+        w = item.getWidget()
+        if w == None:
+            w = item.parent.getWidget()
+
+        # repeat until we're at the root widget or we hit a page
+        while w != None and not isinstance(w, widgets.Page):
+            w = w.getParent()
+
+        if w != None:
+            # we have a page
+            count = 0
+            children = self.document.getBaseWidget().getChildren()
+            for c in children:
+                if c == w:
+                    break
+                count += 1
+
+            if count < len(children):
+                self.emit( qt.PYSIGNAL("sigPageChanged"), (count,) )
+        
         # UUGH - KLUDGE! Have to do this before program takes notice
         # of adjustSize below!
         # FIXME

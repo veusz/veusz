@@ -29,7 +29,6 @@ DataStream which sets up an input stream for reading data from.
 ReadDescriptor which reads data from a data stream using a descriptor."""
 
 import string
-import utils
 import data
 import sys
 import numarray.ieeespecial
@@ -38,6 +37,28 @@ import numarray.ieeespecial
 # separate routine for decoding data stream into numbers
 
 # datastream consists of a set of numbers or line endings or strings
+
+def splitOnColons(str):
+    """Break text into bits between colons.
+
+    Variables in the text are ignored (between $ signs)
+    """
+
+    invar = False
+    items = []
+    part = ''
+
+    for c in str + ':':
+        if c == ':' and not invar:
+            items.append(part)
+            part = ''
+        else:
+            part += c
+
+        if c == '$':
+            invar = not invar
+
+    return items
 
 class _EndOfFile(Exception):
     """Thrown if DataStream gets to the end of a file."""
@@ -217,7 +238,7 @@ class _DescrItemsFor(_DescrItems):
 
     def __init__(self, text):
         """Initialise loop descriptor."""
-        parts = utils.split_on_colons(text)
+        parts = utils.splitOnColons(text)
         self.fortype = _DescrItemsFor.fortypes['cols']
 
         self.var = '_for_' + str(_DescrItemsFor.loopnumber)
@@ -405,6 +426,13 @@ class ReadDescriptor:
                 sys.stdout.write('\n')
         sys.stdout.write('\n')
 
+f = open('test.dat', 'r')
+ds = DataStream(f)
+rd = ReadDescriptor()
+rd.parse('x')
+rd.read(ds)
+
+print data.x
 
 # a test
 #f = open('test.txt', 'r')

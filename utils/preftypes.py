@@ -146,7 +146,7 @@ class PreferencesPlotFill(PreferencesBrush):
         """ Initialise prefs."""
         PreferencesBrush._addPrefs(self)
         self.prefs.setDefault( 'color', 'auto' )
-        self.prefs.setDefault( 'hide', True )
+        self.prefs.setDefault( 'hide', False )
 
     def __init__(self, name):
         PreferencesBrush.__init__(self, name)
@@ -208,9 +208,10 @@ class PreferencesText(GenericPrefType):
         
     def makeQFont(self, painter):
         """ Return a qt.QFont object corresponding to the prefs """
-        size = utils.cnvtDist(self.size, painter)
+        size = utils.cnvtDistPts(self.size, painter)
         weight = qt.QFont.Normal
         if self.bold: weight = qt.QFont.Bold
+
         f = qt.QFont(self.font, size,  weight, self.italic)
         if self.underline: f.setUnderline(1)
         f.setStyleHint( qt.QFont.Times, qt.QFont.PreferDevice )

@@ -25,6 +25,7 @@ from axis import *
 from graph import *
 from containers import *
 from plotters import *
-from region import *
+from page import *
+from root import *
 from widgetfactory import *
 

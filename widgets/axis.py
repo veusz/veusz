@@ -45,15 +45,15 @@ class Axis(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         self.addPref( 'label', 'string', '' )
+        self.addPref( 'min', 'double', None ) # automatic
+        self.addPref( 'max', 'double', None ) # automatic
+        self.addPref( 'log', 'bool', False )
         self.addPref( 'numTicks', 'int', 5 )
         self.addPref( 'numMinorTicks', 'int', 40 )
         self.addPref( 'autoExtend', 'bool', True )
         self.addPref( 'autoExtendZero', 'bool', True )
         self.addPref( 'autoMirror', 'bool', True )
-        self.addPref( 'min', 'double', None ) # automatic
-        self.addPref( 'max', 'double', None ) # automatic
         self.addPref( 'reflect', 'bool', False )
-        self.addPref( 'log', 'bool', False )
         self.addPref( 'direction', 'int', 0 )
         self.addPref( 'lowerPosition', 'double', 0. )
         self.addPref( 'upperPosition', 'double', 1. )
@@ -498,9 +498,12 @@ class Axis(widget.Widget):
 
         self.reflect = not self.reflect
         self._updatePlotRange(posn)
-        self._drawAxisLine(painter)
-        self._drawMajorTicks(painter, coordticks)
-        self._drawMinorTicks(painter)
+        if self.Line.notHidden():
+            self._drawAxisLine(painter)
+        if self.MinorTicks.notHidden():
+            self._drawMinorTicks(painter)
+        if self.MajorTicks.notHidden():
+            self._drawMajorTicks(painter, coordticks)
         self.reflect = not self.reflect
 
         # put axis back

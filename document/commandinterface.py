@@ -27,21 +27,32 @@ external programs.
 """
 
 import sys
-import string
+import os.path
 import qt
 
 import widgets
 import utils
 import doc
+import simpleread
+import commandinterpreter
 
-class CommandInterface:
+class CommandInterface(qt.QObject):
     """Class provides command interface."""
 
     def __init__(self, document):
         """Initialise the interface."""
+        qt.QObject.__init__(self)
+
         self.document = document
         self.currentwidget = self.document.getBaseWidget()
         self.verbose = False
+
+        self.connect( self.document, qt.PYSIGNAL("sigWiped"),
+                      self.slotWipedDoc )
+
+    def slotWipedDoc(self):
+        """When the document is wiped, we change to the root widget."""
+        self.To('/')
 
     def SetVerbose(self, v=True):
         """Specify whether we want verbose output after operations."""
@@ -71,7 +82,7 @@ class CommandInterface:
         Returns widget
         """
 
-        parts = string.split(where, '/')
+        parts = where.split('/')
 
         if where[:1] == '/':
             # relative to base directory
@@ -164,6 +175,22 @@ class CommandInterface:
             print "Negative errors = %s" % str( data.nerr )
             print "Positive errors = %s" % str( data.perr )
 
+    def ImportString(self, descriptor, string):
+        """Read data from the string using a descriptor."""
+
+        stream = simpleread.StringStream(string)
+        sr = simpleread.SimpleRead(descriptor)
+        sr.readData(stream)
+        sr.setInDocument(self.document)
+
+    def ImportFile(self, filename, descriptor):
+        """Read data from file with filename using descriptor."""
+
+        file = open(filename, 'r')
+        stream = simpleread.FileStream(file)
+        sr = simpleread.SimpleRead(descriptor)
+        sr.readData(stream)
+        sr.setInDocument(self.document)
 
     def Print(self):
         """Print document."""
@@ -171,10 +198,11 @@ class CommandInterface:
 
         if p.setup():
             p.newPage()
-            self.document.printTo( p )
-
-    def WriteEPS(self, filename):
-        """Write contents of graph to an eps file."""
-
-        pass
-
+            self.document.printTo( p,
+                                   range(self.document.getNumberPages()) )
+            
+    def Export(self, filename, color=True):
+        """Export plot to filename."""
+        
+        self.document.export(filename, color=color)
+            

@@ -45,10 +45,11 @@ class Widget:
             raise RuntimeError, "parent is of incorrect type"
 
         if parent != None:
-            parent.addChild(self)
-            self.document = parent.getDocument()
             if name == None:
-                name = str( parent.createChildIndex() )
+                name = parent.createUniqueName(self.typename)
+            self.document = parent.getDocument()
+            parent.addChild(self)
+
         else:
             name = '/'
             self.document = None
@@ -57,6 +58,10 @@ class Widget:
 
         # store child widgets
         self.children = []
+
+        # names which are automatically added to widget
+        # these aren't saved when the documnet is saved
+        self.autoadd = []
         
         # automatic child name index
         self.child_index = 1
@@ -102,11 +107,14 @@ class Widget:
         """Add child to list."""
         self.children.append(child)
 
-    def createChildIndex(self):
-        """Return a new index to create a child."""
-        i = self.child_index
-        self.child_index += 1
-        return i
+    def createUniqueName(self, prefix):
+        """Create a name using the prefix which hasn't been used before."""
+        names = [c.name for c in self.children]
+
+        i = 1
+        while "%s%i" % (prefix, i) in names:
+            i += 1
+        return "%s%i" % (prefix, i)
 
     def getName(self):
         """Get the name of the widget."""
@@ -268,10 +276,7 @@ class Widget:
     def getChildNames(self):
         """Return the child names."""
 
-        names = []
-        for i in self.children:
-            names.append( i.name )      
-        return names
+        return [i.name for i in self.children]
 
     def removeChild(self, name):
         """Remove a child."""
@@ -338,31 +343,41 @@ class Widget:
         # return our final bounds
         return bounds
 
-    def saveToFile(self, file):
-        """Save the widget to the file."""
+    def getSaveText(self, saveall = False):
+        """Return text to restore object
+
+        If saveall is true, save everything, including defaults."""
+
+        text = ''
 
         # set the preferences of the object
         pref = self.prefs
         for p in pref.getPrefNames():
-            if not pref.isSetDefault(p):
-                file.write("Set('%s', %s)\n" % (p, repr(pref.getPref(p))))
+            if not pref.isSetDefault(p) or saveall:
+                text += "Set('%s', %s)\n" % (p, repr(pref.getPref(p)))
 
         # now set the subprefs
         for spname, spref in self.subprefs.items():
             pref = spref.getPrefs()
             for p in pref.getPrefNames():
-                if not pref.isSetDefault(p):
-                    file.write("Set('%s/%s', %s)\n" % (spname, p,
-                                                       repr(pref.getPref(p))))
+                if not pref.isSetDefault(p) or saveall:
+                    text += "Set('%s/%s', %s)\n" % (spname, p,
+                                                    repr(pref.getPref(p)))
 
         # now go throught the subwidgets
         for c in self.getChildren():
-            file.write("Add('%s', name='%s')\n" %
-                       (c.getTypeName(), c.getName()))
+            if c.getName() not in self.autoadd:
+                text += "Add('%s', name='%s')\n" % (c.getTypeName(),
+                                                    c.getName())
 
-            file.write("To('%s')\n" % c.getName())
-            c.saveToFile(file)
-            file.write("To('..')\n")
+            # if we need to go to the child, go there
+            ctext = c.getSaveText(saveall)
+            if ctext != '':
+                text += ("To('%s')\n"
+                         "%s"
+                         "To('..')\n") % (c.getName(), ctext)
+
+        return text
 
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

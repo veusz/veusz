@@ -1,7 +1,4 @@
-# version.py
-# return the version number
-
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2005 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -17,22 +14,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-##############################################################################
+###############################################################################
 
 # $Id$
 
-"""
-Return Veusz' version number
-"""
-
-import string
-import os
-
-def version():
-    """Return the version number as a string."""
-
-    dir = os.path.dirname(__file__)
-    file = open('%s/../VERSION' % dir, 'r')
-
-    return file.readline().strip()
+from setting import *
+from settings import *
 

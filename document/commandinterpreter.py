@@ -42,7 +42,6 @@ This class is modelled on the one described in
 
 import sys
 import traceback
-import string
 
 import commandinterface
 import utils
@@ -57,14 +56,13 @@ class CommandInterpreter:
 
         # initialise environment
         self.globals = globals()
-        self.locals = locals()
 
         # save the stdout & stderr
         self.write_stdout = sys.stdout
         self.write_stderr = sys.stderr
 
         # import numarray into the environment
-        exec "from numarray import *" in self.globals, self.locals
+        exec "from numarray import *" in self.globals
 
         # shortcut
         i = self.interface
@@ -80,12 +78,15 @@ class CommandInterpreter:
                       'Set': i.Set,
                       'SetData': i.SetData,
                       'Print': i.Print,
-                      'WriteEPS': i.WriteEPS,
+                      'Export': i.Export,
                       'Resize': i.Resize,
-                      'Save': i.Save }
+                      'Save': i.Save,
+                      'ImportString': i.ImportString,
+                      'ImportFile': i.ImportFile,
+                      'Load': self.Load }
 
-        for i in self.cmds.items():
-            self.globals[ i[0] ] = i[1]
+        for name, val in self.cmds.items():
+            self.globals[name] = val
 
     def setOutputs(self, stdout, stderr):
         """ Assign the environment output files."""
@@ -97,8 +98,8 @@ class CommandInterpreter:
         
         out = ''
         # iterate over lines
-        for l in string.split(text, '\n'):
-            parts = string.split(l)
+        for l in text.split('\n'):
+            parts = l.split()
 
             # turn Cmd a b c into Cmd(a,b,c)
             if len(parts) != 0 and parts[0] in self.cmds.keys():
@@ -122,7 +123,7 @@ class CommandInterpreter:
         input = self._pythonise(input)
 
         # ignore if blank
-        if len(string.strip(input)) == 0:
+        if len(input.strip()) == 0:
             return
 
         # preserve output streams
@@ -133,7 +134,7 @@ class CommandInterpreter:
 
         # count number of newlines in expression
         # If it's 2, then execute as a single statement (print out result)
-        if string.count(input, '\n') == 2:
+        if input.count('\n') == 2:
             stattype = 'single'
         else:
             stattype = 'exec'
@@ -150,7 +151,7 @@ class CommandInterpreter:
         else:
             # execute the code
             try:
-                exec c in self.globals, self.locals
+                exec c in self.globals
             except Exception, e:
                 # print out the backtrace to stderr
                 i = sys.exc_info()
@@ -161,6 +162,17 @@ class CommandInterpreter:
         # return output streams
         sys.stdout = temp_stdout
         sys.stderr = temp_stderr
+
+    def Load(self, filename):
+        """Replace the document with a new one from the filename."""
+
+        # FIXME: should update filename in main window
+        file = open(filename, 'r')
+        self.document.wipe()
+        self.interface.To('/')
+        self.runFile(file)
+        self.document.setModified()
+        self.document.setModified(False)
 
     def runFile(self, fileobject):
         """ Run a file in the preserved environment."""
@@ -173,7 +185,7 @@ class CommandInterpreter:
 
         # actually run the code
         try:
-            exec fileobject in self.globals, self.locals
+            exec fileobject in self.globals
         except Exception, e:
             # print out the backtrace to stderr
             i = sys.exc_info()
@@ -197,7 +209,7 @@ class CommandInterpreter:
 
         # actually run the code
         try:
-            retn = eval(expression, self.globals, self.locals)
+            retn = eval(expression, self.globals)
         except Exception, e:
             # print out the backtrace to stderr
             i = sys.exc_info()

@@ -28,28 +28,6 @@ import re
 
 import vzexcept
 
-def split_on_colons(str):
-    """Break text into bits between colons.
-
-    Variables in the text are ignored (between $ signs)
-    """
-
-    invar = False
-    items = []
-    part = ''
-
-    for c in str + ':':
-        if c == ':' and not invar:
-            items.append(part)
-            part = ''
-        else:
-            part += c
-
-        if c == '$':
-            invar = not invar
-
-    return items
-
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
 
@@ -109,24 +87,6 @@ def pythonise(text):
         out += ')'
 
     return out
-
-## def textout(painter, px, py, text, alignhorz = 0, alignvert = 0):
-##     r = painter.fontMetrics().boundingRect(text)
-    
-##     x = px
-##     y = py
-
-##     if alignhorz == 0: # centre
-##         x -= r.width() / 2
-##     elif alignhorz == 1: # right
-##         x -= r.width()
-
-##     if alignvert  == 0: # centre
-##         y += r.height() / 2
-##     elif alignvert == -1: # top
-##         y += r.height()
-
-##     painter.drawText(x, y, text)
 
 def formatNumber(num, format):
     """ Format a number in different ways.
@@ -313,8 +273,11 @@ def clipper(xpts, ypts, bounds):
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
 
-    pixperpt = getPixelsPerPoint(painter)
-    return int( ceil(pixperpt * mult * float(match.group(1))) )
+    fi = painter.fontInfo()
+    pixperpt = float(fi.pixelSize()) / fi.pointSize()
+
+    return int( ceil(pixperpt * mult * float(match.group(1)) *
+                     painter.veusz_scaling ) )
 
 def _distPerc(match, painter, maxsize):
     """Convert from a percentage of maxsize."""
@@ -339,7 +302,7 @@ def _distRatio(match, painter, maxsize):
 # mappings from regular expressions to function to convert distance
 # the recipient function takes regexp match, painter and maximum size of frac
 
-_distRegexp=( (re.compile('^([0-9\.]+) *%$'),
+_distRegexp=[ (re.compile('^([0-9\.]+) *%$'),
                _distPerc),
               (re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
                _distFrac),
@@ -353,7 +316,17 @@ _distRegexp=( (re.compile('^([0-9\.]+) *%$'),
                lambda match, painter, t: _distPhys(match, painter, 72.27)),
               (re.compile('^([0-9\.]+)$'),
                _distRatio)
-              )
+              ]
+
+def isDist(dist):
+    """Is the text a valid distance measure?"""
+
+    dist = dist.strip()
+    for reg, fn in _distRegexp:
+        if reg.match(dist) != None:
+            return True
+
+    return False
 
 def cnvtDist(dist, painter):
     '''Convert a distance to plotter units.
@@ -364,11 +337,15 @@ def cnvtDist(dist, painter):
     painter: painter to get metrics to convert physical sizes
     '''
 
+    # we set a scaling variable in the painter if it's not set
+    if 'veusz_scaling' not in painter.__dict__:
+        painter.veusz_scaling = 1.
+
     # work out maximum size
     w = painter.window()
     maxsize = max(w.width(), w.height())
 
-    dist = string.strip(dist)
+    dist = dist.strip()
 
     # compare string against each regexp
     for reg, fn in _distRegexp:
@@ -386,3 +363,10 @@ def cnvtDists(distances, painter):
     '''Convert a set of distances to plotter units.'''
 
     return [ cnvtDist(d, painter) for d in distances ]
+
+def cnvtDistPts(distance, painter):
+    """Get the distance in points."""
+
+    fi = painter.fontInfo()
+    pixperpt = float(fi.pixelSize()) / fi.pointSize()
+    return cnvtDist(distance, painter) / pixperpt
