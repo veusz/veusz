@@ -347,8 +347,8 @@ class PointPlotter(GenericPlotter):
                            descr = 'Variable containing x data'), 0 )
         s.readDefaults()
 
-        s.add( setting.Line('PlotLine',
-                            descr = 'Plot line settings') )
+        s.add( setting.XYPlotLine('PlotLine',
+                                  descr = 'Plot line settings') )
         s.add( setting.Line('MarkerLine',
                             descr = 'Line around the marker settings') )
         s.add( setting.Brush('MarkerFill',
@@ -408,10 +408,9 @@ class PointPlotter(GenericPlotter):
             for i in zip(xplotter, ymin, xplotter, ymax):
                 pts += i
 
-        # finally draw the lines
         if len(pts) != 0:
             painter.drawLineSegments( qt.QPointArray(pts) )
-            
+
     def _autoAxis(self, dataname, bounds):
         """Determine range of data."""
         if self.document.hasData(dataname):
@@ -428,13 +427,47 @@ class PointPlotter(GenericPlotter):
         elif name == s.yAxis:
             self._autoAxis( s.yData, bounds )
 
-    def _drawPlotLine( self, painter, xvals, yvals ):
+    def _drawPlotLine( self, painter, xvals, yvals, posn ):
         """Draw the line connecting the points."""
 
         pts = []
-        for xpt, ypt in zip(xvals, yvals):
-            pts.append(xpt)
-            pts.append(ypt)
+
+        s = self.settings
+        steps = s.PlotLine.steps
+
+        # simple continuous line
+        if steps == 'off':
+            for xpt, ypt in zip(xvals, yvals):
+                pts.append(xpt)
+                pts.append(ypt)
+
+        # stepped line, with points on left
+        elif steps == 'left':
+            for x1, x2, y1, y2 in zip(xvals[:-1], xvals[1:],
+                                      yvals[:-1], yvals[1:]):
+                pts += [x1, y1, x2, y1, x2, y2]
+
+        # stepped line, with points on right
+        elif steps == 'right':
+            for x1, x2, y1, y2 in zip(xvals[:-1], xvals[1:],
+                                      yvals[:-1], yvals[1:]):
+                pts += [x1, y1, x1, y2, x2, y2]
+            
+        # stepped line, with points in centre
+        # this is complex as we can't use the mean of the plotter coords,
+        #  as the axis could be log
+        elif steps == 'centre':
+            xv = self.document.getData(s.xData)
+            axes = self.getAxes()
+            xcen = axes[0].graphToPlotterCoords(posn,
+                                                0.5*(xv.data[:-1]+xv.data[1:]))
+
+            for x1, x2, xc, y1, y2 in zip(xvals[:-1], xvals[1:], xcen,
+                                          yvals[:-1], yvals[1:]):
+                pts += [x1, y1, xc, y1, xc, y2, x2, y2]
+
+        else:
+            assert 0
 
         painter.drawPolyline( qt.QPointArray(pts) )
 
@@ -510,7 +543,7 @@ class PointPlotter(GenericPlotter):
         # plot data line
         if not s.PlotLine.hide:
             painter.setPen( s.PlotLine.makeQPen(painter) )
-            self._drawPlotLine( painter, xplotter, yplotter )
+            self._drawPlotLine( painter, xplotter, yplotter, posn )
 
         # plot errors bars
         if not s.ErrorBarLine.hide:

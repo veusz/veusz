@@ -78,6 +78,18 @@ class Line(settings.Settings):
                         cnvtDist(self.width, painter),
                         convertline[self.style] )
 
+class XYPlotLine(Line):
+    '''A plot line for plotting data, allowing histogram-steps
+    to be plotted.'''
+    
+    def __init__(self, name, descr=''):
+        Line.__init__(self, name, descr=descr)
+
+        self.add( setting.Choice('steps',
+                                 ['off', 'left', 'centre', 'right'], 'off',
+                                 descr='Plot horizontal steps '
+                                 'instead of a line'), 0 )
+
 class Brush(settings.Settings):
     '''Settings of a fill.'''
 

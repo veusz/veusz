@@ -102,7 +102,11 @@ def formatNumber(num, format):
     elif format == 'f':
         text = '%f'
     else:
-        text = '%g' % num
+        if num >= 1e4:
+            text = '%e' % num
+        else:
+            text = '%f' % num
+        #text = '%g' % num
 
     # split around exponential (if any)
     parts = string.split(text, 'e')
