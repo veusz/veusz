@@ -125,12 +125,19 @@ class CommandInterpreter:
         sys.stdout = self.write_stdout
         sys.stderr = self.write_stderr
 
+        # count number of newlines in expression
+        # If it's 2, then execute as a single statement (print out result)
+        if string.count(input, '\n') == 2:
+            stattype = 'single'
+        else:
+            stattype = 'exec'
+
         # first compile the code to check for syntax errors
         try:
-            c = compile(input, filename, 'exec')
+            c = compile(input, filename, stattype)
         except (OverflowError, ValueError, SyntaxError), e:
             i = sys.exc_info()
-            backtrace=traceback.format_exception( *i )
+            backtrace = traceback.format_exception( *i )
             for l in backtrace:
                 sys.stderr.write(l)
 
