@@ -274,12 +274,13 @@
 	<para>Veusz understands a limited set of LaTeX-like formatting
 	for text. There are some differences (for example, "10^23"
 	puts the 2 and 3 into superscript), but it is fairly
-	similar. Veusz supports superscripts ("^"), subscripts ("_"),
-	brackets for applying attributes "{" and "}", greek letters
-	("\alpha" to "\omega" and "\Alpha" to "\Omega"). For
-	formatting, "\emph{hi}", "\italic{ho}" and "\textit{silver}"
-	are for italic text, "\bold{foo}" and "\textbf{bar}" for bold
-	and "\underline{yatta}" for underlined text. Also included are
+	similar. You should also leave out the dollar signs. Veusz
+	supports superscripts ("^"), subscripts ("_"), brackets for
+	applying attributes "{" and "}", greek letters ("\alpha" to
+	"\omega" and "\Alpha" to "\Omega"). For formatting,
+	"\emph{hi}", "\italic{ho}" and "\textit{silver}" are for
+	italic text, "\bold{foo}" and "\textbf{bar}" for bold and
+	"\underline{yatta}" for underlined text. Also included are
 	special symbols "\times", "\pm", "\deg", "\divide", "\dagger",
 	"\ddagger", "\bullet", "\AA", "\sqrt", "\propto", "\infty",
 	"\int", and "\sim".</para>
@@ -340,8 +341,7 @@
 
       <mediaobject>
 	<imageobject>
-	  <imagedata fileref="manimages/mainwindow.png" format="PNG"
-	  depth="5cm" scalefit="1" />
+	  <imagedata fileref="manimages/mainwindow.png" format="PNG" />
 	</imageobject>
       </mediaobject>
 
@@ -395,8 +395,82 @@
       see you are able to click on the little page icon in the set of
       buttons above. If you do that you will see a page added to the
       current document. Select the page which appears in the tree
-      window, and you will see you are able to add other kinds of
-      plots.</para>
+      window (labelled "page1"), and you will see you are able to add
+      other kinds of plots.</para>
+
+      <para>You can then click on the "graph" button (which looks like
+      a set of axes). You will see a graph along with axes are
+      added.</para>
+
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="manimages/winwithgraph.png" format="PNG" />
+	</imageobject>
+      </mediaobject>
+
+      <para>Select the x axis which has been added to the document
+      (click on "x" in the tree window). In the properties window you
+      will see a variety of different properties you can modify. For
+      instance you can enter a label for the axis by writing "Area
+      (cm^{2})" in the box next to label and pressing enter. Veusz
+      supports text in LaTeX-like form (without the dollar
+      signs). Other important parameters is the "log" switch which
+      switches between linear and logarithmic axes, and "min" and
+      "max" which allow the user to specify the minimum and maximum
+      values on the axes.</para>
+
+      <para>If you click the "+" symbol next to "x" on the tree
+      window, you will see a number of sets of subsettings open
+      up. For instance the "Line" set of subsettings allows you to
+      edit the line of the axis. Click on "Line", then you can then
+      modify its colour. Enter "green" instead of "black" and press
+      enter. Try making the axis label bold.</para>
+
+      <para>Now you can try plotting a function on the graph. Make
+      sure you have "graph1" selected in the tree window. You will
+      then be able to click the "function" button above (a red curve
+      on a graph). You will see a straight line (y=x) added to the
+      plot. If you selected "function1", you will be able to edit the
+      functional form plotted and the style of its line. Change the
+      function to "x**2" (x-squared).</para>
+
+      <para>We will now try plotting data on the graph. Go to your
+      favourite text editor and save the following data as
+      test.dat:</para>
+
+      <informalexample>
+	<programlisting>
+1     0.1   -0.12   1.1    0.1
+2.05  0.12  -0.14   4.08   0.12
+2.98  0.08  -0.1    2.9    0.11
+4.02  0.04  -0.1    15.3   1.0   
+</programlisting>
+	  </informalexample>
+
+      <para>The first three columns are the x data to plot plus its
+      asymmetric errors. The final two columns are the y data plus its
+      symmetric errors. In Veusz, go to the "Data" menu and select
+      "Import". Type the filename into the filename box, or use the
+      "Browse..." button to search for the file. You will see a
+      preview of the data pop up in the box below. Enter "x,+,- y,+-"
+      into the descriptors edit box. This describes the format of the
+      data which describes dataset "x" plus its asymmetric errors,
+      and "y" with its symmetric errors. If you now click "Import",
+      you will see it has imported datasets "x" and "y".</para>
+
+      <para>To plot the data you should now click on "graph1" in the
+      tree window. You are now able to click on the "xy" button (which
+      looks like points plotted on a graph). You will see your data
+      plotted on the graph. Veusz plots datasets "x" and "y" by
+      default, but you can change these in the properties of the "xy"
+      plotter.</para>
+
+      <para>You are able to choose from a variety of markers to
+      plot. You can remove the plot line by choosing the "PlotLine"
+      subsetting, and clicking on the "hide" option. You can change
+      the colour of the marker by going to the "MarkerFill"
+      subsetting, and entering a new colour (e.g. red), into the
+      colour property.</para>
     </section>
 
   </chapter>
