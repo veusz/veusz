@@ -100,7 +100,7 @@ def formatNumber(num, format):
     if format == 'e' or format == 'e*':
         text = '%e' % num
     elif format == 'f':
-        text = '%f'
+        text = '%f' % num
     else:
         a = abs(num)
         if a >= 1e4 or (a < 1e-2 and a > 1e-99):

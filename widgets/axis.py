@@ -229,7 +229,8 @@ class Axis(widget.Widget):
 
         # rounds to nearest integer
         out = N.floor( 0.5 + self.coordParr1 +
-                       fracposns*(self.coordParr2-self.coordParr1) ).astype(N.Int32)
+                       fracposns*(self.coordParr2 -
+                                  self.coordParr1) ).astype(N.Int32)
         return out
     
     def plotterToGraphCoords(self, bounds, vals):
@@ -429,9 +430,9 @@ class Axis(widget.Widget):
                 x, y = a, b
 
             num = utils.formatNumber(num, format)
-            r = utils.Renderer(painter, font, x, y, num, alignhorz=ax, alignvert=ay,
-                               angle=angle)
-            r.ensureInBox(**bounds)
+            r = utils.Renderer(painter, font, x, y, num, alignhorz=ax,
+                               alignvert=ay, angle=angle)
+            r.ensureInBox(extraspace=True, **bounds)
             bnd = r.render()
 
             if vertical:
@@ -474,6 +475,13 @@ class Axis(widget.Widget):
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
         if s.direction == 'vertical':
             x, y = y, x
+
+        # flush left/bottom
+        # FIXME later
+        if abs(s.otherPosition) < 1e-4:
+            pass
+        elif abs(s.otherPosition-1.) < 1e-4:
+            pass
 
         utils.Renderer(painter, font, x, y, s.label, ax, ay, angle).render()
 

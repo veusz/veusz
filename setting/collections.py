@@ -147,7 +147,7 @@ class MinorTick(Line):
         Line.__init__(self, name, descr)
         self.add( setting.Distance( 'length', '3pt',
                                     descr = 'Length of ticks' ) )
-        self.add( setting.Int( 'number', 30,
+        self.add( setting.Int( 'number', 20,
                                descr = 'Number of minor ticks to aim for' ) )
 
     def getLength(self, painter):

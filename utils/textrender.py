@@ -211,13 +211,22 @@ class Renderer:
         return self.calcbounds
 
     def ensureInBox(self, minx = -32767, maxx = 32767,
-                    miny = -32767, maxy = 32767):
+                    miny = -32767, maxy = 32767, extraspace = False):
         """Adjust position of text so that it is within this box."""
 
         if self.calcbounds == None:
             self.getBounds()
 
         cb = self.calcbounds
+
+        # add a small amount of extra room if requested
+        if extraspace:
+            self.painter.setFont(self.font)
+            l = self.painter.fontMetrics().leading()
+            minx += l
+            maxx -= l
+            miny += l
+            maxy -= l
 
         # twiddle positions and bounds
         if cb[2] > maxx:
