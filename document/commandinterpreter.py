@@ -81,7 +81,8 @@ class CommandInterpreter:
                       'SetData': i.SetData,
                       'Print': i.Print,
                       'WriteEPS': i.WriteEPS,
-                      'Resize': i.Resize }
+                      'Resize': i.Resize,
+                      'Save': i.Save }
 
         for i in self.cmds.items():
             self.globals[ i[0] ] = i[1]

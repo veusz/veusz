@@ -230,7 +230,6 @@ class PreferencesAxisLabel(PreferencesText):
 
     def _addPrefs(self):
         PreferencesText._addPrefs(self)
-        self.prefs.addPref( 'label', 'string', '' )
         self.prefs.addPref( 'rotate', 'bool', False )
 
 class PreferencesTickLabel(PreferencesText):

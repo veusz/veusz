@@ -124,3 +124,9 @@ class Document( qt.QObject ):
         width, height = utils.cnvtDists( self.size, painter )
         self.basewidget.draw( (0, 0, width, height), painter )
         painter.end()
+
+    def saveToFile(self, file):
+        """Save the text representing a document to a file."""
+
+        self.getBaseWidget().saveToFile(file)
+        

@@ -205,6 +205,11 @@ class Preferences:
         """Change the default value for a preference."""
         self.prefdefaults[name] = default
 
+    def isSetDefault(self, name):
+        """Is the preference set to default?"""
+
+        return self.prefdefaults[name] == self.getPref(name)
+
     def getPrefType(self, name):
         """Get the preference type."""
         return self.preftypes[name]
@@ -291,3 +296,15 @@ class Preferences:
             # (removing preferences that already exist)
             _write_functions[self.preftypes[pref]](settings, name, val,
                                                    self.prefdefaults[pref])
+
+    def getSaveText(self, path):
+        """Return the text to restore preferences using commandinterpreter."""
+
+        text = ''
+        for pref in self.prefnames:
+            val = self.getPref(pref)
+            # if preference has changed, save it
+            if val != self.prefdefaults[pref]:
+                text += "Set('%s%s', %s)\n" % (path, pref, repr(val))
+        return text
+    

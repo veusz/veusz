@@ -300,11 +300,37 @@ class Widget:
                    int(x2-deltas[2]), int(y2-deltas[3]) )
 
         # iterate over children in reverse order
-        for i in range( len(self.children)-1, -1, -1 ):
+        for i in range(len(self.children)-1, -1, -1 ):
             self.children[i].draw(bounds, painter)
  
         # return our final bounds
         return bounds
+
+    def saveToFile(self, file):
+        """Save the widget to the file."""
+
+        # set the preferences of the object
+        pref = self.prefs
+        for p in pref.getPrefNames():
+            if not pref.isSetDefault(p):
+                file.write("Set('%s', %s)\n" % (p, repr(pref.getPref(p))))
+
+        # now set the subprefs
+        for spname, spref in self.subprefs.items():
+            pref = spref.getPrefs()
+            for p in pref.getPrefNames():
+                if not pref.isSetDefault(p):
+                    file.write("Set('%s/%s', %s)\n" % (spname, p,
+                                                       repr(pref.getPref(p))))
+
+        # now go throught the subwidgets
+        for c in self.getChildren():
+            file.write("Add('%s', name='%s')\n" %
+                       (c.getTypeName(), c.getName()))
+
+            file.write("To('%s')\n" % c.getName())
+            c.saveToFile(file)
+            file.write("To('..')\n")
         
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

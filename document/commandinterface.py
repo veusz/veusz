@@ -135,6 +135,12 @@ class CommandInterface:
         """Set the output size in inches."""
         self.document.setSize( width_inch, height_inch )
 
+    def Save(self, filename):
+        """Save the state to a file."""
+
+        f = open(filename, 'w')
+        self.document.saveToFile(f)
+
     def Set(self, var, val):
         """Set the value of a preference."""
         self.currentwidget.setPrefLookup(var, val)

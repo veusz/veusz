@@ -42,6 +42,7 @@ class Axis(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
 
+        self.addPref( 'label', 'string', '' )
         self.addPref( 'numTicks', 'int', 5 )
         self.addPref( 'numMinorTicks', 'int', 40 )
         self.addPref( 'autoExtend', 'bool', True )
@@ -434,7 +435,7 @@ class Axis(widget.Widget):
             x, y = y, x
 
         rec = utils.render(painter, font, x, y,
-                           self.Label.label,
+                           self.label,
                            ax, ay, angle)
         self._updateBoundsRec(rec)
 
