@@ -51,7 +51,6 @@ class _WidgetItem(qt.QListViewItem):
 
 class _PrefItem(qt.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
-
     def __init__(self, pref, name, *args):
         qt.QListViewItem.__init__(self, *args)
 
@@ -62,6 +61,27 @@ class _PrefItem(qt.QListViewItem):
     def getWidget(self):
         """Returns None as we don't have a widget."""
         return None
+
+class _ScrollView(qt.QScrollView):
+    """A resizing scroll view."""
+
+    def __init__(self, *args):
+        qt.QScrollView.__init__(self, *args)
+
+    def setGrid(self, grid):
+        self.grid = grid
+
+    def adjustSize(self):
+        h = self.grid.height()
+        #print self.visibleWidth(), h
+        self.grid.resize(self.visibleWidth(), h)
+        self.resizeContents(self.visibleWidth(), h)
+
+    def resizeEvent(self, event):
+        #self.moveChild(self.grid, 0, 0)
+        qt.QScrollView.resizeEvent(self, event)
+        self.adjustSize()
+        #print "Here"
 
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
@@ -96,12 +116,16 @@ class TreeEditWindow(qt.QDockWindow):
 
         # add a scrollable view for the preferences
         # children get added to prefview
-        prefview = qt.QScrollView(split)
-        prefview.setResizePolicy(qt.QScrollView.AutoOneFit)
+        vbox = qt.QVBox(split)
+        label = qt.QLabel("Properties", vbox)
+        label.setMargin(2)
+        self.prefview = _ScrollView(vbox)
 
         self.prefgrid = qt.QGrid(2, qt.QGrid.Horizontal,
-                                 prefview.viewport())
-        prefview.addChild(self.prefgrid)
+                                 self.prefview.viewport())
+        self.prefview.setGrid(self.prefgrid)
+        self.prefview.addChild(self.prefgrid)
+        self.prefgrid.setMargin(4)
         self.prefchilds = []
 
     def slotModifiedDoc(self, ismodified):
@@ -161,12 +185,17 @@ class TreeEditWindow(qt.QDockWindow):
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
 
+        s = self.prefview.size()
+        self.prefview.adjustSize()
+
+        # delete the current widgets in the preferences list
         for i in self.prefchilds:
-            i.destroy()
+            i.deleteLater()
         self.prefchilds = []
 
         w = item.getWidget()
         if w != None:
+            # make new widgets for the preferences
             prefs = w.getPrefs()
             for p in prefs.getPrefNames():
                 child = qt.QLabel(p, self.prefgrid)
@@ -175,4 +204,11 @@ class TreeEditWindow(qt.QDockWindow):
                 child = qt.QLineEdit(self.prefgrid)
                 child.show()
                 self.prefchilds.append(child)
-                
+
+            # UUGH - KLUDGE! Have to do this before program takes notice
+            # of adjustSize below!
+            # FIXME
+            qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
+                                                      100)
+            self.prefview.adjustSize()
+            
