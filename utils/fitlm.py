@@ -54,8 +54,11 @@ def fitLM(func, params, xvals, yvals, errors,
     # optimisation to avoid computing this all the time
     inve2 = 1. / errors**2
 
+    # work out fit using current parameters
     oldfunc = func(params, xvals)
     chi2 = ( (oldfunc - yvals)**2 * inve2 ).sum()
+
+    # initialise temporary space
     beta = N.zeros( len(params), N.Float64 )
     alpha = N.zeros( (len(params), len(params)), N.Float64 )
     derivs = N.zeros( (len(params), len(xvals)), N.Float64 )
@@ -82,16 +85,21 @@ def fitLM(func, params, xvals, yvals, errors,
         derivs *= (1. / deltaderiv)
 
         # calculate alpha matrix
-        # FIXME: must be stupid
+        # FIXME: stupid - must be a better way to avoid this iteration
         for j in range( len(params) ):
-            for k in range( len(params) ):
-                alpha[j][k] = (derivs[j]*derivs[k] * inve2).sum()
+            for k in range(j+1):
+                v = (derivs[j]*derivs[k] * inve2).sum()
+                alpha[j][k] = v
+                alpha[k][j] = v
 
         # twiddle alpha using lambda
         alpha *= 1. + N.identity(len(params), N.Float64)*Lambda
+
+        # now work out deltas on parameters to get better fit
         epsilon = NLA.inverse( alpha )
         deltas = N.matrixmultiply(beta, epsilon)
 
+        # new solution
         new_params = params+deltas
         new_func = func(new_params, xvals)
         new_chi2 = ( (new_func - yvals)**2 * inve2 ).sum()

@@ -48,9 +48,16 @@ class Dataset:
     def __init__(self, data = None, serr = None, nerr = None, perr = None):
         '''Initialse storage.'''
         self.data = _cnvt_numarray(data)
-        self.serr = _cnvt_numarray(serr)
-        self.nerr = _cnvt_numarray(nerr)
-        self.perr = _cnvt_numarray(perr)
+        self.serr = self.nerr = self.perr = None
+
+        # adding data*0 ensures types of errors are the same
+        if self.data != None:
+            if serr != None:
+                self.serr = serr + self.data*0.
+            if nerr != None:
+                self.nerr = nerr + self.data*0.
+            if perr != None:
+                self.perr = perr + self.data*0.
 
     def hasErrors(self):
         '''Whether errors on dataset'''
