@@ -131,11 +131,11 @@ class Widget(object):
             i += 1
         return "%s%i" % (prefix, i)
 
-    def getUserDescription(self):
+    def _getUserDescription(self):
         """Return a user-friendly description of what
         this is (e.g. function)."""
         return ''
-    userdescription = property(getUserDescription)
+    userdescription = property(_getUserDescription)
 
     def prefLookup(self, name):
         """Get the value of a preference in the form foo/bar/baz"""

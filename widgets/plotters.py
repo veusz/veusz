@@ -112,10 +112,11 @@ class FunctionPlotter(GenericPlotter):
 
         s.readDefaults()
         
-    def getUserDescription(self):
+    def _getUserDescription(self):
         """User-friendly description."""
         return "%s = %s" % ( self.settings.variable,
                              self.settings.function )
+    userdescription = property(_getUserDescription)
 
     def _plotLine(self, painter, xpts, ypts, bounds):
         """ Plot the points in xpts, ypts."""
@@ -351,12 +352,13 @@ class PointPlotter(GenericPlotter):
         s.add( setting.Line('ErrorBarLine',
                             descr = 'Error bar line settings') )
 
-    def getUserDescription(self):
+    def _getUserDescription(self):
         """User-friendly description."""
 
         s = self.settings
         return "x='%s', y='%s', marker='%s'" % (s.xData, s.yData,
                                                 s.marker)
+    userdescription = property(_getUserDescription)
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
                     axes):
