@@ -109,7 +109,7 @@ def _plot_arrow_down(painter, xpos, ypos, size):
 
 MarkerCodes = ['none', 'cross', 'plus', 'star', 'circle',
                'circledot', 'diamond', 'square', 'barhorz', 'barvert',
-               'octogon', 'pentagon',
+               'octogon', 'pentagon', 'tievert', 'tiehorz',
                'bullseye', 'triangle',
                'point', 'horzbar', 'vertbar',
                'arrowleft', 'arrowright', 'arrowup',
@@ -117,7 +117,7 @@ MarkerCodes = ['none', 'cross', 'plus', 'star', 'circle',
 
 _MarkerFunctions = [_plot_none, None, None, None, _plot_circle,
                     _plot_circle_dot, None, None, None, None,
-                    None, None,
+                    None, None, None, None,
                     _plot_bullseye, None,
                     _plot_point, _plot_line_horz, _plot_line_vert,
                     _plot_arrow_left, _plot_arrow_right, _plot_arrow_up,
@@ -188,7 +188,9 @@ _Polygons = {
               (0.588, 0.809), (0.363, 0.118), (0.951, -0.309),
               (0.225, -0.309) ),
     'pentagon': ( (0, -1), (0.951, -0.309), (0.578, 0.809),
-                  (-0.578, 0.809), (-0.951, -0.309) )
+                  (-0.578, 0.809), (-0.951, -0.309) ),
+    'tievert': ( (-1, -1), (1, -1), (-1, 1), (1, 1) ),
+    'tiehorz': ( (-1, -1), (-1, 1), (1, -1), (1, 1) )
     }
 
 def _plotPolygons(painter, name, xpos, ypos, size):
