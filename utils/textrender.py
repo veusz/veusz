@@ -90,12 +90,13 @@ class _PartBuilder:
 
             self.part = ''
 
-    def split(self, text):
+    def __init__(self, text):
         """ Split text into its separate LaTeX-like parts."""
 
         self.parts = []
         self.part = ''
         self.parts.append(_PartBuilder.BlockStart)
+        self.reset_bounds()
         
         l = len(text)
         inmodifier = 0
@@ -140,10 +141,20 @@ class _PartBuilder:
         self.addpart()
         self.parts.append(_PartBuilder.BlockEnd)
 
+    def reset_bounds(self):
+        """Reset bounds to nothing."""
+        self.bounds = [ 10000000, 10000000, -10000000, -10000000 ]
+
+    def _update_bounds(self, x, y):
+        """Increase bounds if pixel outside them."""
+        if x < self.bounds[0]: self.bounds[0] = x
+        if y < self.bounds[1]: self.bounds[1] = y
+        if x > self.bounds[2]: self.bounds[2] = x
+        if y > self.bounds[3]: self.bounds[3] = y
+
     def getparts(self):
         """ Return the separate parts."""
         return self.parts
-
 
     def renderpart(self, painter, partno, font, render=0):
         """ Render or measure the specified part.
@@ -245,16 +256,24 @@ class _PartBuilder:
         width = painter.fontMetrics().width( p )
 
         # actually write the text if requested
+        self._update_bounds(self.x, self.y)
         if render:
             painter.drawText( self.x, self.y, p )
 
         # move along, nothing to see
         self.x += width
 
+        # update bounds with edge of this text
+        self._update_bounds( self.x, self.y + painter.fontMetrics().height() )
+
         # return next part
         return partno + 1
 
-def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1, angle = 0):
+    def get_bounds(self):
+        return self.bounds
+
+def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
+           angle = 0):
     """ Render text at a certain position using a certain font.
 
     painter is the QPainter device
@@ -264,13 +283,14 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1, angle = 0)
     angle is in degrees clockwise
     alignhorz is horzontal alignment (-1=left, 0=centre, 1=right)
     alignvert is vertical alignment (-1=bottom, 0=centre, 1=top)
+
+    Returns [x1, y1, x2, y2] bounds
     """
 
     if len(text) == 0:
-        return
+        return [x, y, x, y]
 
-    pb = _PartBuilder()
-    pb.split(text)
+    pb = _PartBuilder(text)
 
     # if the text is rotated, change the coordinate frame
     if angle != 0:
@@ -308,6 +328,7 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1, angle = 0)
     # actually paint the string
     pb.x = x
     pb.y = y
+    pb.reset_bounds()
     pb.renderpart(painter, 0, font, render=1)
     totalwidth = pb.x - x
 
@@ -316,4 +337,4 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1, angle = 0)
         painter.restore()
 
     # we might need this later
-    return totalwidth
+    return pb.get_bounds()

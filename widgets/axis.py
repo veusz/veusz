@@ -80,14 +80,22 @@ class Axis(widget.Widget):
 
         # we keep track of the drawing bounds of the current axis
         # to work out what size the axis is
-        self.measured_bounds = [10000000, 10000000, -10000000, -10000000]
+        # what a pain this is - surely Qt can do this??
+        self.track_bounds = [10000000, 10000000, -10000000, -10000000]
 
-    def _update_bounds(self, x, y):
+    def _updateBounds(self, x, y):
         """Increase bounds if pixel outside them."""
-        if x < self.measured_bounds[0]: self.measured_bounds[0]=x
-        if y < self.measured_bounds[1]: self.measured_bounds[1]=y
-        if x > self.measured_bounds[2]: self.measured_bounds[2]=x
-        if y > self.measured_bounds[3]: self.measured_bounds[3]=y
+        if x < self.track_bounds[0]: self.track_bounds[0] = x
+        if y < self.track_bounds[1]: self.track_bounds[1] = y
+        if x > self.track_bounds[2]: self.track_bounds[2] = x
+        if y > self.track_bounds[3]: self.track_bounds[3] = y
+
+    def _updateBoundsRec(self, r):
+        """Increase bounds with new rectangle."""
+        if r[0] < self.track_bounds[0]: self.track_bounds[0] = r[0]
+        if r[1] < self.track_bounds[1]: self.track_bounds[1] = r[1]
+        if r[2] > self.track_bounds[2]: self.track_bounds[2] = r[2]
+        if r[3] > self.track_bounds[3]: self.track_bounds[3] = r[3]
         
     def _getAxisDirection(self):
         """Return direction (0=horz, 1=vert)."""
@@ -281,8 +289,12 @@ class Axis(widget.Widget):
     def swapline(self, painter, a1, b1, a2, b2):
         """ Draw line, but swap x & y coordinates if vertical axis."""
         if self.direction == 0:
+            self._updateBounds(a1, b1)
+            self._updateBounds(a2, b2)
             painter.drawLine(a1, b1, a2, b2)
         else:
+            self._updateBounds(b1, a1)
+            self._updateBounds(b2, b2)
             painter.drawLine(b1, a1, b2, a2)
 
     _ticklabel_alignments = (
@@ -380,10 +392,11 @@ class Axis(widget.Widget):
             if self.direction != 0:   x, y = y, x
 
             num = utils.formatNumber(val, f)
-            w = utils.render(painter, font,
-                             x, y, num,
-                             ax, ay, angle)
-            maxwidth = max(maxwidth, w)
+            rec = utils.render( painter, font,
+                                x, y, num,
+                                ax, ay, angle )
+            self._updateBoundsRec(rec)
+            maxwidth = max(maxwidth, rec[2] - rec[0])
 
         # keep track of where we are
         self._delta_axis += tl_spacing
@@ -422,12 +435,14 @@ class Axis(widget.Widget):
         if self.direction != 0:
             x, y = y, x
 
-        utils.render(painter, font, x, y,
-                     self.Label.label,
-                     ax, ay, angle)
+        rec = utils.render(painter, font, x, y,
+                           self.Label.label,
+                           ax, ay, angle)
+        self._updateBoundsRec(rec)
 
     def _autoMirrorDraw(self, posn, painter, coordticks):
-        """Mirror axis to opposite side of graph if there isn't an axis there already."""
+        """Mirror axis to opposite side of graph if there isn't
+        an axis there already."""
 
         countaxis = 0
         siblings = self.parent.getChildren()
@@ -523,14 +538,18 @@ class Axis(widget.Widget):
 
     def autoMargin(self, posn, bounds):
         """Update the bounds with what we're drawing."""
-        self.measured_bounds = bounds
+        
+        self.track_bounds = bounds
 
         # make a minimal pixmap to draw onto
-        pixmap = qt.QPixmap(1,1)
+        pixmap = qt.QPixmap(1, 1)
         painter = qt.QPainter(pixmap)
 
         self.draw(posn, painter)
         painter.end()
+
+        # assign current bounds into returned bounds
+        bounds[:] = self.track_bounds
         
 # allow the factory to instantiate an axis
 widgetfactory.thefactory.register( Axis )

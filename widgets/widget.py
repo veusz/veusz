@@ -298,24 +298,25 @@ class Widget:
             x2 -= self.margins[2]*dx
         if self.margins[3] > 0:
             y2 -= self.margins[3]*dy
-        posn = ( int(x1), int(y1), int(x2), int(y2) )
 
+        posn = [ int(x1), int(y1), int(x2), int(y2) ]
         bounds = list(posn)
+
         # modify bounds if child requests it
         for name in self.child_order:
             self.child_widgets[name].autoMargin(posn, bounds)
 
-        # put back bound if margin > 0
-        for m, b, p in zip(self.margins, bounds, posn):
-            if m >= 0:
-                b = p
+        for i in range(4):
+            if self.margins[i] < 0.:
+                # subtract difference
+                posn[i] += posn[i] - bounds[i]
 
         # iterate over children
         for name in self.child_order:
-            self.child_widgets[name].draw( bounds, painter )
+            self.child_widgets[name].draw( posn, painter )
 
         # return our final bounds
-        return bounds
+        return posn
         
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )
