@@ -24,6 +24,7 @@
 
 import qt
 import document
+import setting
 
 class ImportDialog(qt.QDialog):
     """Data import dialog."""
@@ -105,6 +106,26 @@ class ImportDialog(qt.QDialog):
         self.layout.addWidget( bhbox )
 
     dirname = '.'
+
+    def closeEvent(self, evt):
+        """Called when the window closes."""
+
+        # store the current geometry in the settings database
+        geometry = ( self.x(), self.y(), self.width(), self.height() )
+        setting.settingdb.database['geometry_importdialog'] = geometry
+
+        qt.QDialog.closeEvent(self, evt)
+
+    def showEvent(self, evt):
+        """Restoring window geometry if possible."""
+
+        # if we can restore the geometry, do so
+        if 'geometry_importdialog' in setting.settingdb.database:
+            geometry =  setting.settingdb.database['geometry_importdialog']
+            self.resize( qt.QSize(geometry[2], geometry[3]) )
+            self.move( qt.QPoint(geometry[0], geometry[1]) )
+
+        qt.QDialog.showEvent(self, evt)
 
     def sizeHint(self):
         """Returns recommended size of dialog."""

@@ -102,7 +102,7 @@ class _SettingDB:
 
         # header
         f.write('# Veusz default settings file\n'
-                "# Items are in the form key='val'\n\n")
+                "# Items are in the form key=val\n\n")
 
         # write the items in alphabetical order
         keys = self.database.keys()

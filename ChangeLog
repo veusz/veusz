@@ -1,3 +1,8 @@
+* 2005-04-03 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Fixed widget moving buttons! - correct algorithm now
+	- Implemented save/restore of window and dock positions between
+	sessions
+
 * 2005-04-02 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed always-redrawing bug
 	- Implemented widget delete button

@@ -29,10 +29,12 @@ import consolewindow
 import plotwindow
 import treeeditwindow
 import document
+import utils
+import setting
+
 import dialogs.aboutdialog
 import dialogs.importdialog
 import dialogs.dataeditdialog
-import utils
 
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
@@ -88,7 +90,8 @@ class MainWindow(qt.QMainWindow):
         """Initialise the menus and toolbar."""
 
         # create toolbar
-        self.mainTools = qt.QToolBar(self, "main toolbar")
+        self.maintoolbar = qt.QToolBar(self, "main toolbar")
+        self.maintoolbar.setLabel("Veusz - toolbar")
 
         # add main menus
         menus = [
@@ -198,12 +201,12 @@ class MainWindow(qt.QMainWindow):
 
             # add to toolbar
             if addtool:
-                action.addTo(self.mainTools)
+                action.addTo(self.maintoolbar)
 
             # save for later
             self.actions[menuid] = action
 
-        zoomtb = qt.QToolButton(self.mainTools)
+        zoomtb = qt.QToolButton(self.maintoolbar)
         zoomtb.setIconSet(qt.QIconSet(qt.QPixmap("%s/icons/zoom-options.png" %
                                                  (dirname,) )))
 
@@ -268,6 +271,38 @@ class MainWindow(qt.QMainWindow):
                 self.slotFileSave()
 
         return qt.QMainWindow.close(self, alsoDelete)
+
+    def closeEvent(self, evt):
+        """Called when the window closes."""
+
+        # store the current geometry in the settings database
+        geometry = ( self.x(), self.y(), self.width(), self.height() )
+        setting.settingdb.database['geometry_mainwindow'] = geometry
+
+        # store docked windows
+        s = qt.QString()
+        stream = qt.QTextStream(s, qt.IO_WriteOnly)
+        stream << self
+        setting.settingdb.database['geometry_docwindows'] = str(s)
+
+        qt.QMainWindow.closeEvent(self, evt)
+
+    def showEvent(self, evt):
+        """Restoring window geometry if possible."""
+
+        # if we can restore the geometry, do so
+        if 'geometry_mainwindow' in setting.settingdb.database:
+            geometry = setting.settingdb.database['geometry_mainwindow']
+            self.resize( qt.QSize(geometry[2], geometry[3]) )
+            self.move( qt.QPoint(geometry[0], geometry[1]) )
+
+        # restore docked window geometry
+        if 'geometry_docwindows' in setting.settingdb.database:
+            s = qt.QString(setting.settingdb.database['geometry_docwindows'])
+            stream = qt.QTextStream(s, qt.IO_ReadOnly)
+            stream >> self
+
+        qt.QMainWindow.showEvent(self, evt)
 
     def slotFileNew(self):
         """New file."""
