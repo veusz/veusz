@@ -36,7 +36,7 @@ class _WidgetItem(qt.QListViewItem):
 
         # add subitems for sub-prefs of widget
         for name, pref in widget.getSubPrefs().items():
-            _PrefItem(pref, name, self)
+            _PrefItem(pref, name, self, self)
 
     def text(self, column):
         """Get the text in a particular column."""
@@ -54,16 +54,20 @@ class _WidgetItem(qt.QListViewItem):
 
 class _PrefItem(qt.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
-    def __init__(self, preftype, name, *args):
+    def __init__(self, preftype, name, parent, *args):
         qt.QListViewItem.__init__(self, *args)
 
         self.preftype = preftype
+        self.parent = parent
         self.setText(0, name)
         self.setText(1, "setting")
 
     def getWidget(self):
         """Returns None as we don't have a widget."""
         return None
+
+    def getParent(self):
+        return self.parent
 
     def getPreftype(self):
         """Returns the preferences."""
@@ -108,21 +112,30 @@ class TreeEditWindow(qt.QDockWindow):
         self.setWidget(totvbox)
 
         # make buttons for each of the graph types
+        self.createGraphButtons = {}
         buttonhbox = qt.QHBox(totvbox)
         dir = os.path.dirname(__file__)
-        for i in widgetfactory.thefactory.listWidgets():
-            if widgetfactory.thefactory.getWidgetClass(i).allowusercreation:
-                name = "%s/button_%s.png" % (dir, i)
+
+        for w in widgetfactory.thefactory.listWidgets():
+            wc = widgetfactory.thefactory.getWidgetClass(w)
+            if wc.allowusercreation:
+                # make a new button, and set the pixmap
                 b = qt.QToolButton(buttonhbox)
+                name = "%s/button_%s.png" % (dir, w)
                 b.setPixmap( qt.QPixmap(name) )
 
+                # keep track of the buttons so we can disable/enable them
+                self.createGraphButtons[wc] = b
+
+                # set the tooltip to the graph description
                 try:
-                    self.tooltips.add(b, widgetfactory.thefactory.\
-                                      getWidgetClass(i).description)
+                    self.tooltips.add(b, wc.description)
                 except AttributeError:
                     pass
-                #b.setFlat( True )
-                #b.setWFlags( qt.Qt.WStyle_NoBorder )
+
+                b.widgetname = w
+                self.connect(b, qt.SIGNAL('clicked()'),
+                             self.slotMakeWidgetButton)
 
         # put widgets in a movable splitter
         split = qt.QSplitter(totvbox)
@@ -139,7 +152,8 @@ class TreeEditWindow(qt.QDockWindow):
         lv.addColumn( "Name" )
         lv.addColumn( "Type" )
         lv.addColumn( "Detail" )
-        
+
+        # add root widget to view
         self.rootitem = _WidgetItem( self.document.getBaseWidget(), lv )
         self.listview = lv
 
@@ -156,6 +170,9 @@ class TreeEditWindow(qt.QDockWindow):
         self.prefview.addChild(self.prefgrid)
         self.prefgrid.setMargin(4)
         self.prefchilds = []
+
+        # select the root item
+        self.listview.setSelected(self.rootitem, True)
 
     def slotModifiedDoc(self, ismodified):
         """Called when the document has been modified."""
@@ -215,11 +232,27 @@ class TreeEditWindow(qt.QDockWindow):
         """Called when a control modifies its value."""
         self.document.setModified(True)
 
+    def enableCorrectButtons(self, item):
+        """Make sure the create graph buttons are correctly enabled."""
+        selw = item.getWidget()
+        if selw == None:
+            selw = item.getParent().getWidget()
+            assert selw != None
+
+        # check whether each button can have this widget as parent
+        for wc, button in self.createGraphButtons.items():
+            button.setEnabled( wc.willAllowParent(selw) )
+
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
 
+        # enable or disable the create graph buttons
+        self.enableCorrectButtons(item)
+
+        # FIXME: what does this do?
         s = self.prefview.size()
         self.prefview.adjustSize()
+        self.itemselected = item
 
         # delete the current widgets in the preferences list
         for i in self.prefchilds:
@@ -253,3 +286,16 @@ class TreeEditWindow(qt.QDockWindow):
                                                   100)
         self.prefview.adjustSize()
             
+    def slotMakeWidgetButton(self):
+        """Called when an add widget button is clicked."""
+
+        # get the widget to act as the parent
+        parent = self.itemselected.getWidget()
+        if parent == None:
+            parent = self.itemselected.getParent()
+            assert parent != None
+
+        # make the new widget and update the document
+        widgetfactory.thefactory.makeWidget(self.sender().widgetname,
+                                            parent)
+        self.document.setModified()

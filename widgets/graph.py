@@ -23,12 +23,15 @@
 import widget
 import widgetfactory
 import axis
+import region
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = [widget.Widget]
+    allowedparenttypes = [region.Region]
+    allowusercreation = True
+    description = 'Base graph'
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
