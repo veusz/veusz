@@ -36,17 +36,17 @@ class Widget:
 
         # save parent widget for later
         self.parent = parent
-        self.name = name
 
         if parent != None:
-            parent.children.append( self )
-            if name == None:
-                self.name = str( parent.child_index )
-                parent.child_index += 1
+            parent.addChild(self)
             self.document = parent.getDocument()
+            if name == None:
+                name = str( parent.createChildIndex() )
         else:
-            self.name = '/'
+            name = '/'
             self.document = None
+
+        self.name = name
 
         # store child widgets
         self.children = []
@@ -65,6 +65,16 @@ class Widget:
 
         # preferences for part of the object
         self.subprefs = {}
+
+    def addChild(self, child):
+        """Add child to list."""
+        self.children.append(child)
+
+    def createChildIndex(self):
+        """Return a new index to create a child."""
+        i = self.child_index
+        self.child_index += 1
+        return i
 
     def getName(self):
         """Get the name of the widget."""

@@ -204,7 +204,6 @@ class GridContainer(widget.Widget):
         """Draws the widget's children."""
 
         # if the contents have been modified, recalculate the positions
-        if self.recalc:
         if self.children != self._old_children:
             self._old_children = self.children
             self._recalcPositions()
