@@ -19,6 +19,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
+# $Id$
+
 """
 Module supplies the command interface used in the program, and for
 external programs.
@@ -106,33 +108,17 @@ class CommandInterface:
         else:
             # output format name, type
             for name in children:
-                type = widget.getChild(name).getTypeName()
-                sys.stdout.write('%30s %30s\n' % (name, type))
+                w = widget.getChild(name)
+                type = w.getTypeName()
+                descr = w.getUserDescription()
+                sys.stdout.write('%10s %10s %30s\n' % (name, type, descr))
+
+    def Set(self, var, val):
+        """Set a variable var to val."""
+        pass
 
     def WriteEPS(self, filename):
         """Write contents of graph to an eps file."""
 
         pass
-
-# d = document.Document()
-# ci = CommandInterface(d)
-# ci.SetVerbose()
-
-# ci.AddGraph('generic', name='boo')
-# ci.AddGraph('axis', name='x')
-# ci.AddGraph('axis', name='y')
-
-# ci.ToGraph('boo')
-# ci.AddGraph('generic')
-# ci.List()
-
-# ci.ToGraph('..')
-# ci.List()
-
-# ci.ToGraph('/boo/1')
-# ci.List()
-
-# ci.ToGraph('..')
-# ci.List()
-
 

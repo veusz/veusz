@@ -19,6 +19,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
+# $Id$
+
 import string
 
 import widgetfactory
@@ -62,6 +64,10 @@ class Widget:
     def getTypeName(self):
         """Return the type name."""
         return self.typename
+
+    def getUserDescription(self):
+        """Return a user-friendly description of what this is (e.g. function)."""
+        return ''
 
     def getParent(self):
         """Get parent widget."""

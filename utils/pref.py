@@ -18,6 +18,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ###############################################################################
 
+# $Id$
+
 import qt
 
 domain='jeremysanders.net'
@@ -64,7 +66,12 @@ def _writeDefaultEntry(settings, name, val, default):
 def _readListEntry(settings, name, default):
     """ Read a simple python list. Default is a list."""
     txt, ok = settings.readEntry(name, repr(default))
-    return eval(txt)
+    return (eval(txt), ok)
+
+def _readStringEntry(settings, name, default):
+    """Read a string entry (required as Qt returns a QString."""
+    txt, ok = settings.readEntry(name, default)
+    return (str(txt), ok)
 
 def _writeListEntry(settings, name, val, default):
     """ Write a simple python list to the preferences file."""
@@ -76,7 +83,7 @@ def _writeListEntry(settings, name, val, default):
 # contains the functions to call to read preferences of a certain type
 _read_functions = { 'int': qt.QSettings.readNumEntry,
                     'double': qt.QSettings.readDoubleEntry,
-                    'string': qt.QSettings.readEntry,
+                    'string': _readStringEntry,
                     'font': _readFontEntry,
                     'color': _readColorEntry,
                     'list': _readListEntry }

@@ -19,6 +19,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ###############################################################################
 
+# $Id$
+
 import qt
 import numarray
 
@@ -102,6 +104,7 @@ class FunctionPlotter(GenericPlotter):
     def __init__(self, parent, name=None, axis1=None, axis2=None,
                  f=None):
         """Initialise plotter with axes."""
+
         GenericPlotter.__init__(self, parent,
                                 axis1=axis1, axis2=axis2, name=name)
 
@@ -129,6 +132,10 @@ class FunctionPlotter(GenericPlotter):
         self.addSubPref('Fill2', self.Fill2)
 
         utils.nextAutos()
+
+    def getUserDescription(self):
+        """User-friendly description."""
+        return self.function
 
     def _fillYFn(self, painter, xpts, ypts, bounds, leftfill):
         """ Take the xpts and ypts, and fill above or below the line."""

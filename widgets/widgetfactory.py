@@ -19,6 +19,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
+# $Id$
+
 class WidgetFactory:
     """Class to help produce any type of widget you want by name."""
 

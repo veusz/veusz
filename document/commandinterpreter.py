@@ -19,6 +19,8 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
+# $Id$
+
 """
 A module for the execution of user 'macro' code inside a special
 environment. That way the commandline can be used to interact with
