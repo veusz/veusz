@@ -102,7 +102,7 @@ def formatNumber(num, format):
     elif format == 'f':
         text = '%f'
     else:
-        if num >= 1e4:
+        if abs(num) >= 1e4 or abs(num) < 1e-2 :
             text = '%e' % num
         else:
             text = '%f' % num
