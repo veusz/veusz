@@ -376,6 +376,10 @@ class PointPlotter(GenericPlotter):
             xmin = axes[0].graphToPlotterCoords(posn, xmin)
             xmax = axes[0].graphToPlotterCoords(posn, xmax)
 
+            # clip... (avoids problems with INFs, etc)
+            xmin = N.clip(xmin, posn[0]-1, posn[2]+1)
+            xmax = N.clip(xmax, posn[0]-1, posn[2]+1)
+
             # draw lines between each of the points
             for i in zip(xmin, yplotter, xmax, yplotter):
                 pts += i
@@ -389,6 +393,10 @@ class PointPlotter(GenericPlotter):
             # convert ymin and ymax to graph coordinates
             ymin = axes[1].graphToPlotterCoords(posn, ymin)
             ymax = axes[1].graphToPlotterCoords(posn, ymax)
+
+            # clip...
+            ymin = N.clip(ymin, posn[1]-1, posn[3]+1)
+            ymax = N.clip(ymax, posn[1]-1, posn[3]+1)
 
             # draw lines between each of the points
             for i in zip(xplotter, ymin, xplotter, ymax):
