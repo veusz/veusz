@@ -264,9 +264,13 @@ class TreeEditWindow(qt.QDockWindow):
         self.itemselected = item
 
         # delete the current widgets in the preferences list
-        for i in self.prefchilds:
+        while len(self.prefchilds) > 0:
+            i = self.prefchilds.pop()
+            try:
+                i.done()
+            except AttributeError:
+                pass
             i.deleteLater()
-        self.prefchilds = []
 
         w = item.widget
         # add action for widget
@@ -287,10 +291,12 @@ class TreeEditWindow(qt.QDockWindow):
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
             l = qt.QLabel(setn.name, self.prefgrid)
+            qt.QToolTip.add(l, setn.descr)
             l.show()
             self.prefchilds.append(l)
             
             c = setn.makeControl(self.prefgrid)
+            qt.QToolTip.add(c, setn.descr)
             c.show()
             self.prefchilds.append(c)
 

@@ -51,6 +51,11 @@ class Setting:
         """Set the function to be called on modification (passing True)."""
         self.onmodified.append(fn)
 
+    def removeOnModified(self, fn):
+        """Remove the function from the list of function to be called."""
+        i = self.onmodified.index(fn)
+        del self.onmodified[i]
+
     def newDefault(self, val):
         """Update the default and the value."""
         self.default = val
@@ -63,10 +68,6 @@ class Setting:
     def getName(self):
         """Get the name of the setting."""
         return self.name
-
-    def getDescription(self):
-        """Get the setting description."""
-        return self.descr
 
     def get(self):
         """Get the stored setting."""

@@ -43,11 +43,12 @@ class SettingEdit(qt.QLineEdit):
         self.connect(self, qt.SIGNAL('lostFocus()'),
                      self.validateAndSet)
 
-        # set tooltip for description
-        d = setting.getDescription()
-        if d != '':
-            qt.QToolTip.add(self, d)
-        
+        self.setting.setOnModified(self.onModified)
+
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
+
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
@@ -63,6 +64,10 @@ class SettingEdit(qt.QLineEdit):
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
 
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.setText( self.setting.toText() )
+        
 class BoolSettingEdit(qt.QCheckBox):
     """A check box for changing a bool setting."""
     
@@ -76,16 +81,20 @@ class BoolSettingEdit(qt.QCheckBox):
         self.connect( self, qt.SIGNAL('toggled(bool)'),
                       self.slotToggled )
 
-        # set tooltip for description
-        d = setting.getDescription()
-        if d != '':
-            qt.QToolTip.add(self, d)
+        self.setting.setOnModified(self.onModified)
+
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
-
         self.setting.set(state)
         
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.setChecked( self.setting.get() )
+
 class SettingChoice(qt.QComboBox):
     """For choosing between a set of values."""
 
@@ -105,24 +114,23 @@ class SettingChoice(qt.QComboBox):
         # set the text of the widget to the 
         self.setCurrentText( setting.toText() )
 
-        # set tooltip for description
-        d = setting.getDescription()
-        if d != '':
-            qt.QToolTip.add(self, d)
-
         # if a different item is selected
         self.connect( self, qt.SIGNAL('activated(const QString&)'),
                       self.slotActivated )
 
+        self.setting.setOnModified(self.onModified)
+
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
+
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
-        
         qt.QComboBox.focusOutEvent(self, *args)
         self.slotActivated('')
 
     def slotActivated(self, val):
         """If a different item is chosen."""
-
         text = str(self.currentText())
         try:
             val = self.setting.fromText(text)
@@ -134,6 +142,10 @@ class SettingChoice(qt.QComboBox):
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.setCurrentText( self.setting.toText() )
 
 class SettingMultiLine(qt.QTextEdit):
     """For editting multi-line settings."""
@@ -151,14 +163,14 @@ class SettingMultiLine(qt.QTextEdit):
         # set the text of the widget to the 
         self.setText( setting.toText() )
 
-        # set tooltip for description
-        d = setting.getDescription()
-        if d != '':
-            qt.QToolTip.add(self, d)
+        self.setting.setOnModified(self.onModified)
+
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
-        
         qt.QTextEdit.focusOutEvent(self, *args)
 
         text = str(self.text())
@@ -172,3 +184,7 @@ class SettingMultiLine(qt.QTextEdit):
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.setText( self.setting.toText() )
