@@ -167,6 +167,7 @@ class PlotWindow( qt.QScrollView ):
 
             self.docchangeset = self.document.changeset
             self.oldzoom = self.zoomfactor
+            self.forceupdate = False
 
             # redraw whole window
             clipx = clipy = 0
