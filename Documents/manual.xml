@@ -55,42 +55,117 @@
       Veusz window, Veusz supports a simplified command syntax, where
       brackets following commands names, and commas, can replaced by
       spaces in Veusz commands (not Python commands). For example,
-      <code>Add('graph', name='foo')</code>, may be entered as
-      <code>Add 'graph' name='foo'</code>.</para>
+      <command>Add('graph', name='foo')</command>, may be entered as
+      <command>Add 'graph' name='foo'</command>.</para>
 
       <para>The command prompt supports history (use the up and down cursor
       keys to recall previous commands). </para>
     </section>
+  </chapter>
 
+  <chapter>
+    <title>Reading data</title>
     <section>
+      <title><anchor id="Descriptors" />Descriptors</title>
+      <para>Foo bar</para>
+    </section>
+  </chapter>
+
+  <chapter>
       <title>Commands</title>
 
       <para>We list the allowed set of commands below</para>
 
       <section>
-        <title>Add</title>
+	<title><anchor id="CommandAction" />Action</title>
 
-        <para><code>Add('plotparttype', name='nameofplotpart',
-        optionalargs)</code></para>
+	<para><command>Action('actionname',
+	plotpartpath='.')</command></para>
 
-        <para>The Add command adds a graph into the current plotpart
-        (See the <link linkend="CommandTo">To</link> command to change
-        the current position) </para>
+	<para>Initiates the specified action on the plot part given
+	the action name. Actions perform certain automated
+	routines. These include "fit" on a fit plot part, and
+	"zeroMargins" on grids.</para>
       </section>
 
       <section>
-	<title><anchor id="CommandSetVerbose" />SetVerbose</title>
+        <title><anchor id="CommandAdd" />Add</title>
 
-	<para><code>SetVerbose(v=True)</code></para>
+        <para><command>Add('plotparttype', name='nameofplotpart',
+        autoadd=True, optionalargs)</command></para>
 
-	<para>If <code>v</code> is <code>True</code>, then extra
-	information is printed out by commands.</para>
+        <para>The Add command adds a graph into the current plotpart
+        (See the <link linkend="CommandTo">To</link> command to change
+        the current position).</para>
+
+	<para>The first argument is the type of plot part to
+        add. These include "graph", "page", "axis", "xy" and
+        "grid". <command>name</command> is the name of the new plot
+        part (if not given, it will be generated from the type of the
+        plot part plus a number). The <command>autoadd</command>
+        parameter if set, constructs the default sub-plot parts this
+        plot part has (for example, axes in a graph).</para>
+
+	<para>Optionally, default values for the graph settings may be
+        given, for example <command>Add('axis', name='y',
+        direction='vertical')</command>.</para>
+      </section>
+
+      <section>
+	<title><anchor id="CommandImportFile" />ImportFile</title>
+
+	<para><command>ImportFile('filename',
+	'descriptor')</command></para>
+
+	<para>Imports data from a file. The arguments are the filename
+	to load data from and the descriptor.</para>
+
+	<para>The format of the descriptor is a list of variable names
+        representing the columns of the data. For more information see
+        <link linkend="Descriptors">Descriptors</link>.</para>
+      </section>
+
+      <section>
+	<title><anchor id="CommandImportString" />ImportString</title>
+
+	<para><command>ImportString('descriptor',
+	'data')</command></para>
+
+	<para>Like, <link
+	linkend="CommandImportFile">ImportFile</link>, but loads the
+	data from the specfied string rather than a file. This allows
+	data to be easily embedded within a document. The data string is
+	usually a multi-line Python string.</para>
+
+	<informalexample>
+	  <programlisting>
+ImportString('x y', '''
+1   2
+2   5
+3   10
+''')
+</programlisting>
+	</informalexample>
+      </section>
+
+      <section>
+	<title><anchor id="CommandLoad" />Load</title>
+
+	<para><command>Load('filename.vsz')</command></para>
+
+	<para>Loads the veusz script file given. The script file can
+	be any Python code. The code is executed using the Veusz
+	interpreter.</para>
+
+	<para>Note: this command is only supported at the command line
+	and not in a script. Scripts may use the python
+	<command>execfile</command> function instead.</para>
       </section>
 
       <section>
 	<title><anchor id="CommandRemove" />Remove</title>
 
-	<para><code>Remove('plotpartpath')</code></para>
+	<para><command>Remove('plotpartpath')</command></para>
 	
 	<para>Remove the plot part selected using the path. See <link
 	linkend="CommandTo">To</link> for a description of the path
@@ -100,30 +175,39 @@
       <section>
 	<title><anchor id="CommandSave" />Save</title>
 
-	<para><code>Save('filename.vsz')</code></para>
+	<para><command>Save('filename.vsz')</command></para>
 
 	<para>Save the current document under the filename
 	given.</para>
       </section>
 
       <section>
-	<title><anchor id="CommandSet"> />Set</title>
+	<title><anchor id="CommandSet" />Set</title>
 
-	<para><code>Set('settingpath', val)</code></para>
+	<para><command>Set('settingpath', val)</command></para>
 
 	<para>Set the setting given by the path to the value given. If
-	the type of <code>val</code> is incorrect, an
-	<code>InvalidType</code> exception is thrown. The path to the
+	the type of <command>val</command> is incorrect, an
+	<command>InvalidType</command> exception is thrown. The path to the
 	setting is the optional path to the plot part the setting is
 	contained within, an optional subsetting specifier, and the
 	setting itself. For example
-	<code>/page1/graph1/x/min</code>.</para>
+	<command>/page1/graph1/x/min</command>.</para>
+      </section>
+
+      <section>
+	<title><anchor id="CommandSetVerbose" />SetVerbose</title>
+
+	<para><command>SetVerbose(v=True)</command></para>
+
+	<para>If <command>v</command> is <command>True</command>, then extra
+	information is printed out by commands.</para>
       </section>
 
       <section>
         <title><anchor id="CommandTo" />To</title>
 
-        <para><code>To('plotpartpath')</code></para>
+        <para><command>To('plotpartpath')</command></para>
 
         <para>The To command takes a path to a plot part and moves to
         that plot part. For example, this may be "/", the root plot
@@ -134,8 +218,6 @@
 
       </section>
 
-
-
-    </section>
   </chapter>
+
 </book>
