@@ -75,6 +75,29 @@ class PlotWindow( qt.QScrollView ):
         self.zoomfactor = float(zoomfactor)
         self.updateContents()
 
+    def zoomWidth(self):
+        """Make the zoom factor so that the plot fills the whole width."""
+
+        width = self.visibleWidth()
+        mult = width/float(self.size[0])
+        self.setZoomFactor( mult * self.zoomfactor )
+        
+    def zoomHeight(self):
+        """Make the zoom factor so that the plot fills the whole width."""
+
+        height = self.visibleHeight()
+        mult = height/float(self.size[1])
+        self.setZoomFactor( mult * self.zoomfactor )
+
+    def zoomPage(self):
+        """Make the zoom factor correct to show the whole page."""
+
+        width = self.visibleWidth()
+        height = self.visibleHeight()
+        multw = width/float(self.size[0])
+        multh = height/float(self.size[1])
+        self.setZoomFactor( min(multw, multh)*self.zoomfactor)
+
     def setPageNumber(self, pageno):
         """Move the the selected page."""
 

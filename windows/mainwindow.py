@@ -130,11 +130,20 @@ class MainWindow(qt.QMainWindow):
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
-             self.slotViewZoomIn, 'stock-zoom-in.png', True, 'Ctrl++'),
+             self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
             ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
-             self.slotViewZoomOut, 'stock-zoom-out.png', True, 'Ctrl+-'),
+             self.slotViewZoomOut, 'stock-zoom-out.png', False, 'Ctrl+-'),
             ('viewzoom11', 'Restore plot to natural size', 'Zoom 1:1', 'view',
-             self.slotViewZoom11, 'stock-zoom-100.png', True, 'Ctrl+1'),
+             self.slotViewZoom11, 'stock-zoom-100.png', False, 'Ctrl+1'),
+            ('viewzoomwidth', 'Zoom plot to show whole width',
+             'Zoom to width', 'view', self.slotViewZoomWidth,
+             'stock-zoom-fit.png', False, ''),
+            ('viewzoomheight', 'Zoom plot to show whole height',
+             'Zoom to height', 'view', self.slotViewZoomHeight,
+             'stock-zoom-fit.png', False, ''),
+            ('viewzoompage', 'Zoom plot to show whole page',
+             'Zoom to page', 'view', self.slotViewZoomPage,
+             'stock-zoom-fit.png', False, ''),
             ('view',),
             ('viewprevpage', 'Move to the previous page', '&Previous page',
              'view', self.slotViewPreviousPage, 'stock_previous-page.png',
@@ -188,6 +197,18 @@ class MainWindow(qt.QMainWindow):
 
             # save for later
             self.actions[menuid] = action
+
+        zoomtb = qt.QToolButton(self.mainTools)
+        zoomtb.setIconSet(qt.QIconSet(qt.QPixmap("%s/icons/zoom-options.png" %
+                                                 (dirname,) )))
+
+        # drop down zoom button on toolbar
+        zoompop = qt.QPopupMenu(zoomtb)
+        for action in ('viewzoomin', 'viewzoomout', 'viewzoom11',
+                       'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
+            self.actions[action].addTo(zoompop)
+        zoomtb.setPopup(zoompop)
+        zoomtb.setPopupDelay(0)
 
     def slotDataImport(self):
         """Display the import data dialog."""
@@ -434,6 +455,18 @@ class MainWindow(qt.QMainWindow):
         
         self.plotzoom = 0
         self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
+
+    def slotViewZoomWidth(self):
+        """Make the plot fit the page width."""
+        self.plot.zoomWidth()
+
+    def slotViewZoomHeight(self):
+        """Make the plot fit the page height."""
+        self.plot.zoomHeight()
+
+    def slotViewZoomPage(self):
+        """Make the plot fit the page."""
+        self.plot.zoomPage()
 
     def slotModifiedDoc(self, ismodified):
         """Disable certain actions if document is not modified."""
