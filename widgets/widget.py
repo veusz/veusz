@@ -108,9 +108,17 @@ class Widget:
         """Add a preference to the object."""
         self.prefs.addPref( name, type, defaultval )
 
+    def getPrefs(self):
+        """Return the preferences for the object."""
+        return self.prefs
+
     def addSubPref(self, name, pref):
         """Add a sub-preference to the list."""
         self.subprefs[name] = pref
+
+    def getSubPrefs(self):
+        """Return the sub-preferences."""
+        return self.subprefs
 
     def hasPref(self, name):
         """Whether there is a preference with name."""

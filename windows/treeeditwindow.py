@@ -31,6 +31,10 @@ class _WidgetItem(qt.QListViewItem):
 
         self.widget = widget
 
+        # add subitems for sub-prefs of widget
+        for name, pref in widget.getSubPrefs().items():
+            _PrefItem(pref, name, self)
+
     def text(self, column):
         """Get the text in a particular column."""
         if column == 0:
@@ -45,6 +49,20 @@ class _WidgetItem(qt.QListViewItem):
         """Get the associated widget."""
         return self.widget
 
+class _PrefItem(qt.QListViewItem):
+    """Item for displaying a preferences-set in TreeEditWindow."""
+
+    def __init__(self, pref, name, *args):
+        qt.QListViewItem.__init__(self, *args)
+
+        self.preftype = pref
+        self.setText(0, name)
+        self.setText(1, "setting")
+
+    def getWidget(self):
+        """Returns None as we don't have a widget."""
+        return None
+
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
 
@@ -58,13 +76,16 @@ class TreeEditWindow(qt.QDockWindow):
                       self.slotModifiedDoc )
 
         # put widgets in a vbox
-        self.vbox = qt.QVBox(self)
-        self.setWidget(self.vbox)
+        split = qt.QSplitter(self)
+        split.setOrientation(qt.QSplitter.Vertical)
+        self.setWidget(split)
 
         # first widget is a listview
-        lv = qt.QListView(self.vbox)
+        lv = qt.QListView(split)
         lv.setSorting(-1)
         lv.setRootIsDecorated(True)
+        self.connect( lv, qt.SIGNAL("selectionChanged(QListViewItem*)"),
+                      self.slotItemSelected )
 
         lv.addColumn( "Name" )
         lv.addColumn( "Type" )
@@ -72,6 +93,16 @@ class TreeEditWindow(qt.QDockWindow):
         
         self.rootitem = _WidgetItem( self.document.getBaseWidget(), lv )
         self.listview = lv
+
+        # add a scrollable view for the preferences
+        # children get added to prefview
+        prefview = qt.QScrollView(split)
+        prefview.setResizePolicy(qt.QScrollView.AutoOneFit)
+
+        self.prefgrid = qt.QGrid(2, qt.QGrid.Horizontal,
+                                 prefview.viewport())
+        prefview.addChild(self.prefgrid)
+        self.prefchilds = []
 
     def slotModifiedDoc(self, ismodified):
         """Called when the document has been modified."""
@@ -82,29 +113,42 @@ class TreeEditWindow(qt.QDockWindow):
     def _updateBranch(self, root):
         """Recursively update items on branch."""
 
-        childwidgets = root.getWidget().getChildren()
-        item = root.firstChild()
+        # collect together a list of treeitems (in original order)
+        # ignore those that don't correspond to widgets
+        items = []
+        i = root.firstChild()
+        while i != None:
+            if i.getWidget() != None:
+                items.insert(0, i)
+            i = i.nextSibling()
 
+        childs = root.getWidget().getChildren()
         newchild = False
 
-        for c in childwidgets:
+        # go through the list and update those which have changed
+        for i, c in zip(items, childs):
+            if i.getWidget() != c:
+                # add in new item after the changed one
+                new = _WidgetItem(c, i)
+                # remove the original
+                root.takeItem(i)
+                i = new
+                newChild = True
 
-            if item == None:
-                # add a new item if there are no more
-                item = _WidgetItem(c, root)
-                newchild = True
-            elif item.getWidget() != c:
-                # replace an item if it is wrong
-                newitem = _WidgetItem(c, root, item)
-                root.takeItem(item)
-                del item
-                item = newitem
-                newchild = True
+            self._updateBranch(i)
+            
+        # if we need to add new items
+        for i in childs[len(items):]:
+            new = _WidgetItem(i, root)
+            self._updateBranch(new)
+            newchild = True
 
-            # recursively update branches
-            self._updateBranch(item)
-            item = item.nextSibling()
-
+        # if we need to delete old items
+        for i in items[len(childs):]:
+            root.takeItem(i)
+            del i
+            newchild = True
+        
         # open the branch if we've added/changed the children
         if newchild:
             self.listview.setOpen(root, True)
@@ -113,3 +157,22 @@ class TreeEditWindow(qt.QDockWindow):
         """Make the window reflect the document."""
         self._updateBranch(self.rootitem)
         self.listview.triggerUpdate()
+
+    def slotItemSelected(self, item):
+        """Called when an item is selected in the listview."""
+
+        for i in self.prefchilds:
+            i.destroy()
+        self.prefchilds = []
+
+        w = item.getWidget()
+        if w != None:
+            prefs = w.getPrefs()
+            for p in prefs.getPrefNames():
+                child = qt.QLabel(p, self.prefgrid)
+                child.show()
+                self.prefchilds.append(child)
+                child = qt.QLineEdit(self.prefgrid)
+                child.show()
+                self.prefchilds.append(child)
+                
