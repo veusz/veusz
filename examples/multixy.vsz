@@ -1,0 +1,146 @@
+# Veusz saved document (version 0.4)
+# User: jss
+# Date: Sun, 13 Mar 2005 18:23:21 +0000
+
+ImportString('y1','''
+-8.627642e-01
+1.213047e+00
+-1.682870e+00
+2.540669e+00
+9.385744e-04
+-6.966657e-01
+-8.769203e-01
+-6.930465e-01
+-2.456379e-01
+-6.419765e-01
+-1.485679e+00
+-7.142200e-01
+8.639527e-02
+-1.155861e+00
+-9.576156e-01
+6.018372e-02
+-1.027861e+00
+2.953903e-01
+-3.615840e-01
+2.474292e-01
+''')
+ImportString('x','''
+0.000000e+00
+1.000000e+00
+2.000000e+00
+3.000000e+00
+4.000000e+00
+5.000000e+00
+6.000000e+00
+7.000000e+00
+8.000000e+00
+9.000000e+00
+1.000000e+01
+1.100000e+01
+1.200000e+01
+1.300000e+01
+1.400000e+01
+1.500000e+01
+1.600000e+01
+1.700000e+01
+1.800000e+01
+1.900000e+01
+''')
+ImportString('y3,+-','''
+1.537872e+00 3.000000e-01
+2.879103e-01 3.000000e-01
+7.127184e+00 3.000000e-01
+5.775675e+00 3.000000e-01
+3.390224e+00 3.000000e-01
+2.470264e+00 3.000000e-01
+1.019945e+00 3.000000e-01
+-5.690097e-01 3.000000e-01
+4.276276e+00 3.000000e-01
+-4.449537e+00 3.000000e-01
+-7.127589e-02 3.000000e-01
+-9.531333e-01 3.000000e-01
+-1.129021e+00 3.000000e-01
+2.561764e+00 3.000000e-01
+-1.763882e+00 3.000000e-01
+-3.791216e-01 3.000000e-01
+2.752641e-02 3.000000e-01
+-1.044617e+00 3.000000e-01
+2.075609e+00 3.000000e-01
+-7.859457e-01 3.000000e-01
+''')
+ImportString('y2','''
+7.356253e-01
+2.187511e+00
+9.680102e-01
+-7.393343e-01
+1.071199e+00
+1.763134e+00
+1.589872e+00
+2.015283e+00
+7.102356e-01
+1.808795e+00
+8.750188e-01
+1.477934e+00
+3.591239e-02
+3.046406e+00
+3.515513e+00
+7.194178e-01
+3.498590e+00
+4.465251e+00
+1.638100e+00
+3.577523e+00
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', 'Winged warriors')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', 'Death rate')
+Set('direction', 'vertical')
+To('..')
+Add('key', name='key1', autoadd=False)
+To('key1')
+Set('Background/color', '#f0f0f0')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('yData', 'y1')
+Set('key', 'Valkeries')
+To('..')
+Add('xy', name='xy2', autoadd=False)
+To('xy2')
+Set('yData', 'y2')
+Set('marker', 'diamond')
+Set('key', 'Swindon')
+Set('PlotLine/style', 'dotted')
+Set('MarkerFill/color', 'red')
+To('..')
+Add('xy', name='xy3', autoadd=False)
+To('xy3')
+Set('yData', 'y3')
+Set('marker', 'square')
+Set('key', 'Discworld')
+Set('PlotLine/style', 'dashed')
+Set('MarkerFill/color', 'blue')
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', 'The joy of plots')
+Set('yPos', 0.90000000000000002)
+Set('alignHorz', 'centre')
+Set('Text/size', '20pt')
+To('..')
+Add('function', name='function1', autoadd=False)
+To('function1')
+Set('function', '2.5')
+Set('key', 'Model')
+Set('Line/color', '#20f020')
+Set('Line/width', '2pt')
+To('..')
+To('..')
+To('..')

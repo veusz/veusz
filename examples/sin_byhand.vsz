@@ -1,0 +1,25 @@
+# this is sin.vsz
+# but this is what we would use if we were programming it by hand
+
+x=arange(16)/15. * 2* pi
+y=sin(x)
+SetData('x', x)
+SetData('y', y)
+
+To( Add('page') )
+To( Add('graph') )
+Set('x/label', '\\italic{x}')
+Set('y/label', 'sin \\italic{x}')
+
+# we could assume that the name of the xy is xy1, but
+# this code means other xys could be inserted before this one
+# but it would still work
+xy = Add('xy')
+Set('%s/MarkerFill/color' % xy, 'cyan')
+
+fn = Add('function')
+Set('%s/function' % fn, 'sin(x)')
+Set('%s/Line/color' % fn, 'red')
+
+To('..')
+To('..')
