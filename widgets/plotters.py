@@ -388,10 +388,6 @@ class PointPlotter(GenericPlotter):
         posn = GenericPlotter.draw(self, parentposn, painter)
         x1, y1, x2, y2 = posn
 
-        # clip data within bounds of plotter
-        painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
-
         # skip if there's no data
         d = self.getDocument()
         if not d.hasData(self.xData) or not d.hasData(self.yData):
@@ -404,13 +400,17 @@ class PointPlotter(GenericPlotter):
         if not xvals.empty() or not yvals.empty():
             return
 
+        # clip data within bounds of plotter
+        painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+
         # get the axes
         ax1 = self.getAxisVar( self.axes[0] )
         ax2 = self.getAxisVar( self.axes[1] )
 
         # calc plotter coords of x and y points
-        xplotter = ax1.graphToPlotterCoords(posn, xvals)
-        yplotter = ax2.graphToPlotterCoords(posn, yvals)
+        xplotter = ax1.graphToPlotterCoords(posn, xvals.data)
+        yplotter = ax2.graphToPlotterCoords(posn, yvals.data)
 
         # plot data line
         if self.PlotLine.notHidden():

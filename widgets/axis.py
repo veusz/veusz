@@ -409,12 +409,6 @@ class Axis(widget.Widget):
         angle = 0
         if self.TickLabels.rotate: angle = 270
 
-        # if reflected, we want the opposite alignment
-        ax, ay = Axis._ticklabel_alignments[self.direction] \
-                 [self.TickLabels.rotate]
-        if self.reflect:
-            ax, ay = ( -ax, -ay )
-
         # plot numbers
         f = self.TickLabels.format
         maxwidth = 0
