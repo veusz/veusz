@@ -224,7 +224,7 @@ class Widget(object):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
         """
 
-        print self.path, self.position, self.margins
+        # print self.path, self.position, self.margins
 
         # get parent's position
         x1, y1, x2, y2 = parentposn

@@ -27,7 +27,7 @@ import sys
 import qt
 
 import utils
-from windows.mainwindow import MainWindow
+import windows.mainwindow
 
 # if ran as a program
 if __name__ == '__main__':
@@ -50,7 +50,7 @@ if __name__ == '__main__':
                          '<jeremy@jeremysanders.net>\n')
         sys.exit(0)
 
-    win = MainWindow()
+    win = windows.mainwindow.MainWindow()
     win.show()
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
                 app, qt.SLOT("quit()"))

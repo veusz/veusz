@@ -216,8 +216,8 @@ class CommandInterface(qt.QObject):
             self.document.printTo( p,
                                    range(self.document.getNumberPages()) )
             
-    def Export(self, filename, color=True):
+    def Export(self, filename, color=True, page=0):
         """Export plot to filename."""
         
-        self.document.export(filename, color=color)
+        self.document.export(filename, page, color=color)
             

@@ -42,6 +42,7 @@ This class is modelled on the one described in
 
 import sys
 import traceback
+import pickle
 
 import commandinterface
 import utils
@@ -87,6 +88,11 @@ class CommandInterpreter:
 
         for name, val in self.cmds.items():
             self.globals[name] = val
+
+    def addCommand(self, name, command):
+        """Add the given command to the list of available commands."""
+        self.cmds[name] = command
+        self.globals[name] = command
 
     def setOutputs(self, stdout, stderr):
         """ Assign the environment output files."""
@@ -233,3 +239,29 @@ class CommandInterpreter:
         for line in file:
             sys.stdout.write(line)
 
+    def runPickle(self, command):
+        """Run a pickled command given as arguments.
+
+        command should consist of following:
+        dumps( (name, args, namedargs) )
+        name is name of function to execute in environment
+        args are the arguments (list)
+        namedargs are the named arguments (dict).
+        """
+
+        name, args, namedargs = pickle.loads(command)
+        self.globals['_tmp_args0'] = args
+        self.globals['_tmp_args1'] = namedargs
+
+        print name, args, namedargs
+        try:
+            retn = eval('%s(*_tmp_args0, **_tmp_args1)' % name)
+        except Exception, e:
+            # return exception picked if exception
+            retn = e
+            
+        del self.globals['_tmp_args0']
+        del self.globals['_tmp_args1']
+
+        return pickle.dumps(retn)
+    
