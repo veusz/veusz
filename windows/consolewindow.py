@@ -176,7 +176,7 @@ class ConsoleWindow(qt.QDockWindow):
         # therefore we keep text until we have a para
         if len(text) != 0 and text[-1] == '\n':
             self._outputdisplay.append(
-                '<b>%s</b>' %
+                '<font color="red">%s</font>' %
                 qt.QStyleSheet.escape( self.stderrbuffer + text[:-1])
                 )
             self.stderrbuffer = ''
@@ -208,7 +208,7 @@ class ConsoleWindow(qt.QDockWindow):
             prompt = '...'
 
         # output the command in the log pane
-        self.insertTextInOutput("<em>%s</em>" %
+        self.insertTextInOutput('<font color="blue">%s</font>' %
                                 str(qt.QStyleSheet.escape(prompt + ' ' +
                                                           command)) )
 

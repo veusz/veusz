@@ -290,6 +290,8 @@ class PointPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, axis1=axis1, axis2=axis2,
                                 name=name)
         # FIXME: Add prefs here
+        self.addPref('marker', 'string', 'O')
+        self.addPref('markerSize', 'int', 5 )
         self.readPrefs()
 
         self.PlotLine = utils.PreferencesPlotLine( 'XYPlotLine' )
@@ -306,9 +308,6 @@ class PointPlotter(GenericPlotter):
 
         self.xdata = xdata
         self.ydata = ydata
-        
-        self.PlotMarker = 'X'
-        self.MarkerSize = 3
 
     def setData(self, xdata, ydata):
         """Set the variables to be plotted.
@@ -433,11 +432,13 @@ class PointPlotter(GenericPlotter):
 
         # plot the points (we do this last so they are on top)
         if self.MarkerLine.notHidden():
-            size = int( utils.getPixelsPerPoint(painter) * self.MarkerSize )
+            size = int( utils.getPixelsPerPoint(painter) * self.markerSize )
 
-            painter.setBrush( self.MarkerFill.makeQBrush() )
+            if self.MarkerFill.notHidden():
+                painter.setBrush( self.MarkerFill.makeQBrush() )
+                
             painter.setPen( self.MarkerLine.makeQPen(painter) )
-            utils.plotMarkers(painter, xplotter, yplotter, self.PlotMarker,
+            utils.plotMarkers(painter, xplotter, yplotter, self.marker,
                               size)
 
         painter.restore()

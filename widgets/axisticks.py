@@ -60,7 +60,7 @@ class AxisTicks:
     # how much we should allow axes to extend to zero or intervals
     max_extend_factor = 0.10
 
-    def __init__( self, minval, maxval, noticks,
+    def __init__( self, minval, maxval, noticks, nominorticks,
                   logaxis = False, prefermore = True,
                   extendbounds = True, extendzero = True ):
         """Initialise the class.
@@ -75,7 +75,7 @@ class AxisTicks:
         self.minval = minval
         self.maxval = maxval
         self.noticks = noticks
-        self.nominorticks = 40
+        self.nominorticks = nominorticks
         self.logaxis = logaxis
         self.prefermore = prefermore
         self.extendbounds = extendbounds
@@ -177,8 +177,8 @@ class AxisTicks:
         # this is a scale going e.g. 1,2,3,...8,9,10,20,30...90,100,200...
 
         # round down to nearest power of 10 for each
-        alpha = int( math.floor( math.log10(minval) ) )
-        beta = int( math.floor( math.log10(maxval) ) )
+        alpha = int( math.floor( numarray.log10(minval) ) )
+        beta = int( math.floor( numarray.log10(maxval) ) )
 
         ticks = []
         # iterate over range in log space
@@ -199,7 +199,7 @@ class AxisTicks:
 
         # work out range and log range
         range = self.maxval - self.minval
-        intlogrange = int( math.log10( range ) )
+        intlogrange = int( numarray.log10( range ) )
 
         # we step variable to move through log space to find best ticks
         logstep = intlogrange + 1
@@ -275,8 +275,8 @@ class AxisTicks:
             intervals = AxisTicks.allowed_intervals_log
 
             # transform range into log space
-            self.minval = math.log10( self.minval )
-            self.maxval = math.log10( self.maxval )
+            self.minval = numarray.log10( self.minval )
+            self.maxval = numarray.log10( self.maxval )
 
         else:
             # which linear intervals we'll allow

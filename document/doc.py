@@ -26,14 +26,14 @@ import numarray
 
 import widgets
 
-def __cnvt_numarray(a):
+def _cnvt_numarray(a):
     """Convert to a numarray if possible."""
     if a == None:
         return None
     elif type(a) != type(numarray.arange(1)):
-        return numarray.array(a)
+        return numarray.array(a, type=numarray.Float64)
     else:
-        return a.copy()
+        return a.astype(numarray.Float64)
 
 class Document:
     def __init__(self):
@@ -49,10 +49,10 @@ class Document:
         """Set data to val, with symmetric or negative and positive errors."""
         t = type(numarray.arange(1))
 
-        self.data[name] = __cnvt_numarray(val)
-        self.data[name + '_SYMERR_'] = __cnvt_numarray(symerr)
-        self.data[name + '_NEGERR_'] = __cnvt_numarray(negerr)
-        self.data[name + '_POSERR_'] = __cnvt_numarray(poserr)
+        self.data[name] = _cnvt_numarray(val)
+        self.data[name + '_SYMERR_'] = _cnvt_numarray(symerr)
+        self.data[name + '_NEGERR_'] = _cnvt_numarray(negerr)
+        self.data[name + '_POSERR_'] = _cnvt_numarray(poserr)
 
         self.setModified()
 

@@ -41,34 +41,35 @@ class Axis(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         self.addPref( 'numTicks', 'int', 5 )
+        self.addPref( 'numMinorTicks', 'int', 40 )
         self.addPref( 'autoExtend', 'int', True )
         self.addPref( 'autoExtendZero', 'int', True )
         self.addPref( 'autoMirror', 'int', True )
         self.addPref( 'min', 'double', None ) # automatic
         self.addPref( 'max', 'double', None ) # automatic
         self.addPref( 'reflect', 'int', False )
+        self.addPref( 'log', 'int', False )
         self.readPrefs()
 
-        self.linear()
         self.setOutputPositions()
 
         self.minorticks = None  # automatic
         self.majorticks = None  # automatic
 
         # create sub-preferences
-        self.AxisLine = utils.PreferencesLine( 'AxisLine' )
+        self.Line = utils.PreferencesLine( 'Line' )
         self.MajorTicks = utils.PreferencesMajorTick( 'AxisMajorTick' )
         self.MinorTicks = utils.PreferencesMinorTick( 'AxisMinorTick' )
         self.TickLabels = utils.PreferencesTickLabel( 'TickLabels' )
         self.GridLines = utils.PreferencesGridLine( 'GridLines' )
-        self.AxisLabel = utils.PreferencesAxisLabel( 'AxisLabel' )
+        self.Label = utils.PreferencesAxisLabel( 'Label' )
 
-        self.addSubPref('AxisLine', self.AxisLine)
+        self.addSubPref('Line', self.Line)
         self.addSubPref('MajorTicks', self.MajorTicks)
         self.addSubPref('MinorTicks', self.MinorTicks)
         self.addSubPref('TickLabels', self.TickLabels)
         self.addSubPref('GridLines', self.GridLines)
-        self.addSubPref('AxisLabel', self.AxisLabel)
+        self.addSubPref('Label', self.Label)
 
         # we recompute the axis later
         self._setModified()
@@ -115,7 +116,10 @@ class Axis(widget.Widget):
         if changed:
             return autorange
         else:
-            return [0., 1.]
+            if self.log:
+                return [1e-2, 1.]
+            else:
+                return [0., 1.]
                 
     def _computePlottedRange(self):
         """Convert the range requested into a plotted range."""
@@ -128,15 +132,17 @@ class Axis(widget.Widget):
 
             if self.min == None:
                 self.plottedrange[0] = autorange[0]
+
             if self.max == None:
                 self.plottedrange[1] = autorange[1]
 
         # work out tick values and expand axes if necessary
+        
         as = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
-                                  self.numTicks,
+                                  self.numTicks, self.numMinorTicks,
                                   extendbounds = self.autoExtend,
                                   extendzero = self.autoExtendZero,
-                                  logaxis = self.is_log )
+                                  logaxis = self.log )
 
         (self.plottedrange[0],self.plottedrange[1],
          self.majortickscalc, self.minortickscalc) =  as.getTicks()
@@ -206,7 +212,11 @@ class Axis(widget.Widget):
         """Convert the coordinates assuming the machinery is in place."""
         
         # work out fractional posistions, then convert to pixels
-        fracposns = self.convertToPlotter( vals )
+        if self.log:
+            fracposns = self.logConvertToPlotter( vals )
+        else:
+            fracposns = self.linearConvertToPlotter( vals )
+
         # rounds to nearest integer
         out = numarray.floor( 0.5 +
                               self.coordParr1 +
@@ -227,35 +237,17 @@ class Axis(widget.Widget):
             self._computePlottedRange()
 
         self._updatePlotRange( bounds )
-        
+
         # work out fractional positions of the plotter coords
         frac = ( vals.astype(numarray.Float64) - self.coordParr1 ) / \
                ( self.coordParr2 - self.coordParr1 )
-        return self.convertFromPlotter( frac )
-    
-    def linear(self):
-        """Switch on linear scaling.
-        """
-        self.convertToPlotter = self.linearConvertToPlotter
-        self.convertFromPlotter = self.linearConvertFromPlotter
-        self.is_log = False
 
-    def log(self):
-        """Switch on log scaling.
-        """
-        self.convertToPlotter = self.logConvertToPlotter
-        self.convertFromPlotter = self.logConvertFromPlotter
-        self.autoExtendZero = False
-        self.autoExtend = False
-        self.is_log = True
+        # scaling...
+        if self.log:
+            return self.logConvertFromPlotter( frac )
+        else:
+            return self.linearConvertFromPlotter( frac )
         
-    def sqrt(self):
-        """Switch on sqrt scaling.
-        """
-        self.convertToPlotter = self.sqrtConvertToPlotter
-        self.convertFromPlotter = self.sqrtConvertFromPlotter
-        self.is_log = False
-
     def linearConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for linear scale.
         """
@@ -282,20 +274,6 @@ class Axis(widget.Widget):
         return self.plottedrange[0] * \
                ( self.plottedrange[1]/self.plottedrange[0] )**v
     
-    def sqrtConvertToPlotter(self, v):
-        """Convert graph coordinates to fractional plotter units for sqrt scale.
-        """
-        sq1 = numarray.sqrt(self.plottedrange[0])
-        sq2 = numarray.sqrt(self.plottedrange[1])
-        return ( numarray.sqrt(v)-sq1 )/( sq2-sq1 )
-    
-    def sqrtConvertFromPlotter(self, v):
-        """ Convert fractional plotter coordinates to graph coords with sqrt scale
-        """
-        sq1 = numarray.sqrt(self.plottedrange[0])
-        sq2 = numaray.sqrt(self.plottedrange[1])
-        return ( v*(sq2-sq1) + sq1 )**2
-
     def swapline(self, painter, a1, b1, a2, b2):
         """ Draw line, but swap x & y coordinates if vertical axis."""
         if self.dirn == 0:
@@ -333,7 +311,7 @@ class Axis(widget.Widget):
     def _drawAxisLine(self, painter):
         """Draw the line of the axis."""
 
-        painter.setPen( self.AxisLine.makeQPen(painter) )
+        painter.setPen( self.Line.makeQPen(painter) )
         self.swapline( painter,
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
@@ -413,23 +391,23 @@ class Axis(widget.Widget):
     def _drawAxisLabel(self, painter, sign):
         """Draw an axis label on the plot."""
         
-        painter.setPen( self.AxisLabel.makeQPen() )
-        font = self.AxisLabel.makeQFont()
+        painter.setPen( self.Label.makeQPen() )
+        font = self.Label.makeQFont()
         painter.setFont(font)
         al_spacing = painter.fontMetrics().leading() + \
                      painter.fontMetrics().descent()
 
         # work out font alignment
         ax, ay = Axis._axislabel_alignments[self.dirn] \
-                 [self.AxisLabel.rotate]
+                 [self.Label.rotate]
 
         # if reflected, we want the opposite alignment
         if self.reflect:
             ax, ay = ( -ax, -ay )
 
         # angle of text
-        if (self.dirn == 0 and not self.AxisLabel.rotate) or \
-           (self.dirn != 0 and self.AxisLabel.rotate):
+        if (self.dirn == 0 and not self.Label.rotate) or \
+           (self.dirn != 0 and self.Label.rotate):
             angle = 0
         else:
             angle = 270
@@ -440,7 +418,7 @@ class Axis(widget.Widget):
             x, y = y, x
 
         utils.render(painter, font, x, y,
-                     self.AxisLabel.label,
+                     self.Label.label,
                      ax, ay, angle)
 
     def _autoMirrorDraw(self, posn, painter, coordticks):
@@ -509,7 +487,7 @@ class Axis(widget.Widget):
             self._drawGridLines(painter, coordticks)
 
         # plot the line along the axis
-        if self.AxisLine.notHidden():
+        if self.Line.notHidden():
             self._drawAxisLine(painter)
 
         # plot minor ticks
@@ -528,7 +506,7 @@ class Axis(widget.Widget):
             self._drawTickLabels(painter, coordticks, sign)
 
         # draw an axis label
-        if self.AxisLabel.notHidden():
+        if self.Label.notHidden():
             self._drawAxisLabel(painter, sign)
 
         # mirror axis at other side of plot

@@ -183,7 +183,7 @@ class Widget:
             if parts[-2] in obj.subprefs:
                 subpref = obj.subprefs[parts[-2]]
                 if subpref.hasPref( parts[-1] ):
-                    obj.prefs.setPref( parts[-1], val )
+                    subpref.setPref( parts[-1], val )
                     return
                 else:
                     errorpref = parts[-1]

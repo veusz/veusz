@@ -52,6 +52,10 @@ class GenericPrefType:
         """Get the preference."""
         return self.prefs.getPref(name)
     
+    def setPref(self, name, val):
+        """Set the preference."""
+        self.prefs.setPref(name, val)
+
     def makeDefault(self):
         """ Make these values the saved preferences """
         self.prefs.write()

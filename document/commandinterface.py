@@ -131,6 +131,19 @@ class CommandInterface:
 
         self.document.setModified()
 
+    def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
+        """Set data with values (and optionally errors)."""
+
+        d = self.document
+        d.setData(name, val, symerr=symerr, negerr=negerr, poserr=poserr)
+
+        if self.verbose:
+            print "Set variable '%s':" % name
+            print "Values = %s" % str( d.getData(name) )
+            print "Symmetric errors = %s" % str( d.getSymErr(name) )
+            print "Negative errors = %s" % str( d.getNegErr(name) )
+            print "Positive errors = %s" % str( d.getPosErr(name) )
+
     def WriteEPS(self, filename):
         """Write contents of graph to an eps file."""
 
