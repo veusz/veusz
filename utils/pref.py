@@ -225,7 +225,9 @@ class Preferences:
         # go through allowed entries, converting if necessary
         if val == None:
             pass
-        elif (t == 'int' or t == 'bool') and tv == type(1):
+        elif t == 'bool' and (tv == type(True) or tv == type(1)):
+            pass
+        elif t == 'int' and tv == type(1):
             pass
         elif t == 'double' and (tv == type(1.) or tv == type(1)):
             val = float(val)
