@@ -24,6 +24,9 @@
 import string
 import qt
 import math
+import re
+
+import vzexcept
 
 def split_on_colons(str):
     """Break text into bits between colons.
@@ -107,23 +110,23 @@ def pythonise(text):
 
     return out
 
-def textout(painter, px, py, text, alignhorz = 0, alignvert = 0):
-    r = painter.fontMetrics().boundingRect(text)
+## def textout(painter, px, py, text, alignhorz = 0, alignvert = 0):
+##     r = painter.fontMetrics().boundingRect(text)
     
-    x = px
-    y = py
+##     x = px
+##     y = py
 
-    if alignhorz == 0: # centre
-        x -= r.width() / 2
-    elif alignhorz == 1: # right
-        x -= r.width()
+##     if alignhorz == 0: # centre
+##         x -= r.width() / 2
+##     elif alignhorz == 1: # right
+##         x -= r.width()
 
-    if alignvert  == 0: # centre
-        y += r.height() / 2
-    elif alignvert == -1: # top
-        y += r.height()
+##     if alignvert  == 0: # centre
+##         y += r.height() / 2
+##     elif alignvert == -1: # top
+##         y += r.height()
 
-    painter.drawText(x, y, text)
+##     painter.drawText(x, y, text)
 
 def formatNumber(num, format):
     """ Format a number in different ways.
@@ -306,3 +309,57 @@ def clipper(xpts, ypts, bounds):
 ##         firstpass = False
 
 ##     return pts
+
+def _distPhys(match, painter, mult):
+    """Convert a physical unit measure in multiples of points."""
+
+    pixperpt = getPixelsPerPoint(painter)
+    return int( pixperpt * mult * float(match.group(1)) )
+
+def _distPerc(match, painter, maxsize):
+    """Convert from a percentage of maxsize."""
+
+    return int( maxsize * 0.01 * float(match.group(1)) )
+
+def _distFrac(match, painter, maxsize):
+    """Convert from a fraction a/b of maxsize."""
+
+    return int( maxsize * float(match.group(1)) / float(match.group(2)) )
+
+def _distRatio(match, painter, maxsize):
+    """Convert from a simple 0.xx ratio of maxsize."""
+
+    return int( maxsize * float(match.group(1)) )
+
+# mappings from regular expressions to function to convert distance
+# the recipient function takes regexp match, painter and maximum size of frac
+
+_distRegexp=( (re.compile('^([0-9\.]+) *%$'), _distPerc),
+              (re.compile('^([0-9\.]+) */ *([0-9\.]+)$'), _distFrac),
+              (re.compile('^([0-9\.]+) *pt$'),
+               lambda match, painter, t: _distPhys(match, painter, 1.)),
+              (re.compile('^([0-9\.]+) *cm$'),
+               lambda match, painter, t: _distPhys(match, painter, 28.452756)),
+              (re.compile('^([0-9\.]+) *mm$'),
+               lambda match, painter, t: _distPhys(match, painter, 2.8452756)),
+              (re.compile('^([0-9\.]+) *(inch|in|")$'),
+               lambda match, painter, t: _distPhys(match, painter, 72.27)),
+              (re.compile('^([0-9\.]+)$'), _distRatio)
+              )
+
+def convertDistance(dist, maxsize, painter):
+    '''Convert a distance to plotter units.
+
+    dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
+             10pt, 1cm, 20mm, 1inch, 1in, 1" (size)
+    maxsize: size fractions are relative to
+    painter: painter to get metrics to convert physical sizes
+    '''
+
+    for reg, fn in _distRegexp:
+        m = reg.match(dist)
+        if m != None:
+            return fn(m, painter, maxsize)
+
+    raise vzexcept.DistanceError( "Cannot convert distance in form '%s'" %
+                                  dist )

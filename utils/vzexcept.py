@@ -1,4 +1,4 @@
-# exceptions.py
+# vzexcept.py
 # veusz exceptions
 
 #    Copyright (C) 2004 Jeremy S. Sanders
@@ -19,7 +19,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
-# $Id$
+# $Id $
 
 """Veusz-specific exceptions."""
 
@@ -30,6 +30,10 @@ class VeuszException(Exception):
         self.value = value
     def __str__(self):
         return repr(self.value)
+
+class DistanceError(VeuszException):
+    """Exception thrown if can't convert distance."""
+    pass
 
 class PreferenceError(VeuszException):
     """Exception thrown due to preferences."""

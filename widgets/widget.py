@@ -269,11 +269,18 @@ class Widget:
 
         return None
 
-    def autoMargin(self, posn, bounds):
-        """Funcion called for children to adjust the drawing bounds
-        before drawing.
+    def autoSize(self, bounds):
+        """Return excess size needed to layout children properly."""
+        return (0, 0, 0, 0)
+
+    def getChildrenBounds(self, mybounds):
+        """Get array of bounds of children.
+
+        By default this returns a list of the input bounds for the children
         """
-        pass
+
+        # just return a copy for each child
+        return [mybounds]*len(self.children)
 
     def draw(self, parentposn, painter):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
@@ -292,6 +299,8 @@ class Widget:
         dx = x2 - x1
         dy = y2 - y1
 
+
+
         # subtract margins
         if self.margins[0] > 0:
             x1 += self.margins[0]*dx
@@ -302,25 +311,26 @@ class Widget:
         if self.margins[3] > 0:
             y2 -= self.margins[3]*dy
 
-        posn = [ int(x1), int(y1), int(x2), int(y2) ]
-        bounds = list(posn)
+        posn = ( int(x1), int(y1), int(x2), int(y2) )
+        childbounds = self.getChildrenBounds(posn)
 
         # BROKEN!!!!
         # modify bounds if child requests it
-        for i in self.children:
-            i.autoMargin(posn, bounds)
+##         for i in self.children:
+##             i.autoMargin(posn, bounds)
  
-        for i in range(4):
-            if self.margins[i] < 0.:
-                # subtract difference
-                delta = posn[i] - bounds[i]
-                if delta > 0:
-                    posn[i] += delta
+##         for i in range(4):
+##             if self.margins[i] < 0.:
+##                 # subtract difference
+##                 delta = posn[i] - bounds[i]
+##                 if delta > 0:
+##                     posn[i] += delta
+
 
  
         # iterate over children in reverse order
         for i in range( len(self.children)-1, -1, -1 ):
-            self.children[i].draw(posn, painter)
+            self.children[i].draw(childbounds[i], painter)
  
         # return our final bounds
         return posn
