@@ -52,8 +52,8 @@ class PlotWindow( qt.QScrollView ):
 
         # convert physical units into pixels
         metrics = qt.QPaintDeviceMetrics( self )
-        pixwidth = int( xwidth_inch * metrics.logicalDpiX() )
-        pixheight = int( ywidth_inch * metrics.logicalDpiY() )
+        pixwidth = int( xwidth_inch * metrics.logicalDpiX() ) + 1
+        pixheight = int( ywidth_inch * metrics.logicalDpiY() ) + 1
 
         # set the acutal pixel size
         self.size = (pixwidth, pixheight)

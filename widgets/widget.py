@@ -53,7 +53,7 @@ class Widget:
         self.position = (0., 0., 1., 1.)
 
         # fractional margins within this widget
-        self.margins = (0., 0., 0., 0.)
+        self.margins = (-1., -1., -1., -1.)
 
         # create a preference list for the widget
         self.prefs = utils.Preferences( 'PlotWidget_' + self.typename, self )
@@ -261,11 +261,18 @@ class Widget:
             return build
 
     def autoAxis(self, axisname):
-        """If the axis axisname is used by this widget, return the bounds on that axis.
+        """If the axis axisname is used by this widget,
+        return the bounds on that axis.
 
         Return None if don't know or doesn't use the axis"""
 
         return None
+
+    def autoMargin(self, posn, bounds):
+        """Funcion called for children to adjust the drawing bounds
+        before drawing.
+        """
+        pass
 
     def draw(self, parentposn, painter):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
@@ -283,19 +290,32 @@ class Widget:
         dy = y2 - y1
 
         # subtract margins
-        x1 += self.margins[0]*dx
-        y1 += self.margins[1]*dy
-        x2 -= self.margins[2]*dx
-        y2 -= self.margins[3]*dy
+        if self.margins[0] > 0:
+            x1 += self.margins[0]*dx
+        if self.margins[1] > 0:
+            y1 += self.margins[1]*dy
+        if self.margins[2] > 0:
+            x2 -= self.margins[2]*dx
+        if self.margins[3] > 0:
+            y2 -= self.margins[3]*dy
         posn = ( int(x1), int(y1), int(x2), int(y2) )
+
+        bounds = list(posn)
+        # modify bounds if child requests it
+        for name in self.child_order:
+            self.child_widgets[name].autoMargin(posn, bounds)
+
+        # put back bound if margin > 0
+        for m, b, p in zip(self.margins, bounds, posn):
+            if m >= 0:
+                b = p
 
         # iterate over children
         for name in self.child_order:
-            c = self.child_widgets[name]
-            c.draw( posn, painter )
+            self.child_widgets[name].draw( bounds, painter )
 
-        # return our position
-        return posn
+        # return our final bounds
+        return bounds
         
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

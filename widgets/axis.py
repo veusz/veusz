@@ -24,6 +24,8 @@
 import sys
 import numarray
 
+import qt
+
 import widget
 import axisticks
 import widgetfactory
@@ -75,6 +77,17 @@ class Axis(widget.Widget):
 
         # we recompute the axis later
         self._setModified()
+
+        # we keep track of the drawing bounds of the current axis
+        # to work out what size the axis is
+        self.measured_bounds = [10000000, 10000000, -10000000, -10000000]
+
+    def _update_bounds(self, x, y):
+        """Increase bounds if pixel outside them."""
+        if x < self.measured_bounds[0]: self.measured_bounds[0]=x
+        if y < self.measured_bounds[1]: self.measured_bounds[1]=y
+        if x > self.measured_bounds[2]: self.measured_bounds[2]=x
+        if y > self.measured_bounds[3]: self.measured_bounds[3]=y
         
     def _getAxisDirection(self):
         """Return direction (0=horz, 1=vert)."""
@@ -508,5 +521,16 @@ class Axis(widget.Widget):
         # restore the state of the painter
         painter.restore()
 
+    def autoMargin(self, posn, bounds):
+        """Update the bounds with what we're drawing."""
+        self.measured_bounds = bounds
+
+        # make a minimal pixmap to draw onto
+        pixmap = qt.QPixmap(1,1)
+        painter = qt.QPainter(pixmap)
+
+        self.draw(posn, painter)
+        painter.end()
+        
 # allow the factory to instantiate an axis
 widgetfactory.thefactory.register( Axis )
