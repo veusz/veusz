@@ -123,6 +123,10 @@ class CommandInterface:
         """Get the value of a preference."""
         return self.currentwidget.getPrefLookup(var)
 
+    def Resize(self, width_inch, height_inch):
+        """Set the output size in inches."""
+        self.document.setSize( width_inch, height_inch )
+
     def Set(self, var, val):
         """Set the value of a preference."""
         self.currentwidget.setPrefLookup(var, val)

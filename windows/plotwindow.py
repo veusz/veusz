@@ -26,7 +26,7 @@ import qt
 # FIXME: this needs to be set somewhere when installed
 _logolocation='images/logo.png'
 
-class PlotWindow(qt.QScrollView):
+class PlotWindow( qt.QScrollView ):
     """Class to show the plot(s) in a scrollable window."""
     
     def __init__(self, document, *args):
@@ -35,26 +35,44 @@ class PlotWindow(qt.QScrollView):
         qt.QScrollView.__init__(self, *args)
         self.viewport().setBackgroundMode( qt.Qt.NoBackground )
 
+        # set up so if document is modified we are notified
         self.document = document
-        document.addModifiedCallback( self.__callbackModifiedDoc )
+        self.connect( self.document, qt.PYSIGNAL("sigModified"),
+                      self.slotModifiedDoc )
         self.modified = True
+        self.connect( self.document, qt.PYSIGNAL("sigResize"),
+                      self.slotResizeDoc )
 
-        self.setOutputSize(1000, 1000)
+        self.setOutputSize(10, 10)
 
-    def setOutputSize(self, xwidth, ywidth):
+    def setOutputSize(self, xwidth_inch, ywidth_inch ):
         """Set the ouput display size."""
 
-        self.size = (xwidth, ywidth)
+        self.realsize = ( xwidth_inch, ywidth_inch )
+
+        # convert physical units into pixels
+        metrics = qt.QPaintDeviceMetrics( self )
+        pixwidth = int( xwidth_inch * metrics.logicalDpiX() )
+        pixheight = int( ywidth_inch * metrics.logicalDpiY() )
+
+        # set the acutal pixel size
+        self.size = (pixwidth, pixheight)
         self.bufferpixmap = qt.QPixmap( *self.size )
         self.resizeContents( *self.size )
 
-    def __callbackModifiedDoc(self, ismodified):
+    def slotModifiedDoc(self, ismodified):
         """Called when the document has been modified."""
 
         if ismodified:
             self.modified = True
             # repaint window without redrawing background
-            self.repaintContents( False )
+            self.updateContents()
+
+    def slotResizeDoc(self, width_inch, height_inch):
+        """Called when the document is resized."""
+
+        self.setOutputSize( width_inch, height_inch )
+        self.slotModifiedDoc( True )
 
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""

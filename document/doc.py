@@ -23,6 +23,7 @@
 
 import string
 import numarray
+import qt
 
 import widgets
 
@@ -35,14 +36,22 @@ def _cnvt_numarray(a):
     else:
         return a.astype(numarray.Float64)
 
-class Document:
+class Document( qt.QObject ):
+    """Document class for holding the graph data.
+
+    Emits: sigModified when the document has been modified
+           sigResize when the document size has changed.
+    """
+
     def __init__(self):
         """Initialise the document."""
+        qt.QObject.__init__( self )
+
         self.data = {}
+        self.size_inch = (10, 10)
         self.basewidget = widgets.Widget(None)
         self.basewidget.setDocument( self )
 
-        self.modified_callbacks = []
         self.setModified()
 
     def setData(self, name, val, symerr = None, negerr = None, poserr = None):
@@ -82,15 +91,15 @@ class Document:
                  self.data[name + '_NEGERR_'],
                  self.data[name + '_POSERR_'] )
 
-    def addModifiedCallback(self, callback):
-        """Register a callback function to be called if doc is modified."""
-        self.modified_callbacks.append(callback)
-
     def setModified(self, ismodified=True):
         """Set the modified flag on the data, and inform views."""
         self.modified = ismodified
-        for c in self.modified_callbacks:
-            c(ismodified)
+        self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
+
+    def setSize(self, width_inch, height_inch):
+        """Set the document size."""
+        self.size_inch = ( width_inch, height_inch )
+        self.emit( qt.PYSIGNAL("sigResize"), self.size_inch )
 
     def isModifed(self):
         """Return whether modified flag set."""
