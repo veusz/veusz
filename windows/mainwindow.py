@@ -421,6 +421,7 @@ class MainWindow(qt.QMainWindow):
     def slotFileQuit(self):
         """File quit chosen."""
 
+        # FIXME check whether this causes quit dialog to be shown twice...
         # does the user want to save first?
         if self.document.isModified():
             v = self.queryOverwrite()

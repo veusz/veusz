@@ -1,116 +1,138 @@
-# python numerical fitting routine
-# Based on fit_lm.m Octave Code
+#    Copyright (C) 2005 Jeremy S. Sanders
+#    Email: Jeremy Sanders <jeremy@jeremysanders.net>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+###############################################################################
 
-from numarray import matrixmultiply, zeros, transpose, identity, sqrt, array, \
-     fabs, arange, Float64
-from numarray.linear_algebra import inverse
-from numarray.random_array import random
+# $Id$
 
-# FIXME diagonal should make matrix with vector on diagonal
+"""
+Numerical fitting of functions to data.
+"""
 
-def diag(vec):
-    assert len(vec.shape) == 1
-    return identity( vec.size() ) * vec
+import sys
 
-def fitLM(func, params, xvals, thedata, weights = 1.):
-    """Fit the function with the parameters
+import numarray as N
+import numarray.linear_algebra as NLA
 
-    func is passed params, xvals
-    params is a numarray of parameters to pass to the function
-    xvals are the data points the data are defined at
-    thedata are the data points
-    weights are proportional to 1/sigma
+def fitLM(func, params, xvals, yvals, errors,
+          stopdeltalambda = 1e-5,
+          deltaderiv = 1e-3, maxiters = 20, Lambda = 1e-4):
+
+    """
+    Use Marquardt method as described in Bevington & Robinson to fit data
+
+    func is a python function to evaluate. It takes two parameters, the
+    parameters to fit as a numarray, and the values of x to evaluate the
+    function at
+
+    params is a numarray of parameters to fit for. These are passed to
+    the function.
+
+    xvals are x data points (numarray), yvals are the y data points (numarray)
+    errors are a numarray of errors on the y data points.
+    Set all to 1 if not important.
+
+    stopdeltalambda: minimum change in chi2 to carry on fitting
+    deltaderiv: change to make in parameters to calculate derivative
+    maxiters: maximum number of better fitting solutions before stopping
+    Lambda: starting lambda value (as described in Bevington)
     """
 
-    eps = 1e-5
-    minstep = eps
-    minover = 1. - sqrt(eps)
-    maxeval = 1000
-    dstep = sqrt(eps)
+    # optimisation to avoid computing this all the time
+    inve2 = 1. / errors**2
 
-    alp = 10.
+    oldfunc = func(params, xvals)
+    chi2 = ( (oldfunc - yvals)**2 * inve2 ).sum()
+    beta = N.zeros( len(params), N.Float64 )
+    alpha = N.zeros( (len(params), len(params)), N.Float64 )
+    derivs = N.zeros( (len(params), len(xvals)), N.Float64 )
 
-    val = func(params, xvals)*weights
-    data = thedata * weights
-    neval = 1
-    new = matrixmultiply( transpose(val-data).conjugate(), val-data )
+    iters = 0
+    while iters < maxiters:
+        # iterate over each of the parameters and calculate the derivatives
+        # of chi2 to populate the beta vector
 
-    best = new+1
-    dpar = array( (2*minstep,) )
+        # also calculate the derivative of the function at each of the points
+        # wrt the parameters
 
-    while ( ((fabs(dpar)).mean() > minstep or
-             new / best < minover) and
-            neval < maxeval ):
+        for i in range( len(params) ):
+            params[i] += deltaderiv
+            new_func = func(params, xvals)
+            chi2_new = ((new_func - yvals)**2 * inve2).sum()
+            params[i] -= deltaderiv
 
-        if new <= best:
-            print params, new, alp
-            best = new
+            beta[i] = chi2_new - chi2
+            derivs[i] = new_func - oldfunc
 
-            deri = zeros( (val.size(), params.size()), Float64 )
-            for j in range(params.size()):
-                # fix by jss to get variable stepping to calculate
-                # derivative
-                step = params[j] * 0.001
-                if step < 1e-10:
-                    step = 1e-10
+        # beta is now dchi2 / dparam
+        beta *= (-0.5 / deltaderiv)
+        derivs *= (1. / deltaderiv)
 
-                dpar = zeros( params.size(), Float64 )
-                dpar[j] = step
-                params = params - dpar
-                val1 = func(params, xvals)
-                params = params + 2*dpar
-                val2 = func(params, xvals)
-                params = params - dpar
-                deri[:,j] = (val2-val1) * weights / (2*step)
+        # calculate alpha matrix
+        # FIXME: must be stupid
+        for j in range( len(params) ):
+            for k in range( len(params) ):
+                alpha[j][k] = (derivs[j]*derivs[k] * inve2).sum()
 
-            neval += 2*params.size()
+        # twiddle alpha using lambda
+        alpha *= 1. + N.identity(len(params), N.Float64)*Lambda
+        epsilon = NLA.inverse( alpha )
+        deltas = N.matrixmultiply(beta, epsilon)
 
-            korr = matrixmultiply( transpose(deri).conjugate(), deri )
-            korrdiag = diag( 1. / sqrt(korr.diagonal()) )
-            korr = matrixmultiply(matrixmultiply(korrdiag, korr), korrdiag)
-            alp *= 0.1
+        new_params = params+deltas
+        new_func = func(new_params, xvals)
+        new_chi2 = ( (new_func - yvals)**2 * inve2 ).sum()
 
+        if new_chi2 > chi2:
+            # if solution is worse, increase lambda
+            Lambda *= 10.
         else:
-            alp *= 10.
-            params = parbak
+            # better fit, so we accept this solution
 
-        inv = matrixmultiply(korrdiag, inverse(korr + alp *
-                                               diag(korr.diagonal())) )
-        inv = matrixmultiply(inv, korrdiag)
-        dpar = matrixmultiply(inv,
-                              (matrixmultiply(transpose(deri).conjugate(),
-                                              val-data)).getreal())
-        parbak = params.copy()
-        params = params - dpar
-        val = func(params, xvals)*weights
-        neval += 1
-        new = matrixmultiply(transpose(val-data).conjugate(), val-data)
+            # if the change is small
+            done = chi2 - new_chi2 < stopdeltalambda
 
-    print params
-    #return (fabs(dpar)).mean() > minstep or new/best < minover
+            chi2 = new_chi2
+            params = new_params
+            oldfunc = new_func
+            Lambda *= 0.1
+
+            # format new parameters
+            iters += 1
+            p = [iters, chi2] + params.tolist()
+            str = ("%5i " + "%8g " * (len(params)+1)) % tuple(p)
+            print str
+
+            if done:
+                break
+
+    if iters >= maxiters:
+        sys.stderr.write("Warning: maximum number of iterations reached\n")
+
     return params
 
-## def testfunc(params, xvals):
-##     return params[0] + params[1]*xvals + params[2]*xvals**2
+##import numarray.random_array as NRA
 
-## xvals = arange(0.,10.,0.1)
-## yvals = (xvals**2)*0.01 + xvals*2 + (random(xvals.shape)-0.5)*3. + 100.
-## errors = 3.
+## def testfunc(params, x):
+##     return params[0] + x*params[1] + x*x*params[2]
 
-## inparams = array((0.0, 1.0, 0.0))
+## xvals = N.arange(0.,10.,0.5)
+## errors = 0.1
+## yvals = 3. + xvals*2. + (NRA.random( (len(xvals),) )-0.5)*2.*errors
 
-## fitLM(testfunc, inparams, xvals, yvals)
-## fitLM(testfunc, inparams, xvals, yvals)
+## inparams = N.array((0., -1., 1.))
 
-### JSS version
-
-def computeChi2(func, params, xvals, yvals, errors):
-    """Compute the chi2 for the given data."""
-    
-    ymodel = func(params, xvals)
-    return ((ymodel-yvals)**2) / (errors**2)
-
-def fit(func, params, xvals, yvals, errors):
-
-    lamda = 1e-4
-    
+## fitLM(testfunc, inparams, xvals, yvals, errors)
