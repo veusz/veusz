@@ -59,7 +59,6 @@ class SettingEdit(qt.QLineEdit):
             # value has changed
             if self.setting.get() != val:
                 self.setting.set(val)
-                self.emit( qt.PYSIGNAL('settingValueChanged'), () )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -86,7 +85,6 @@ class BoolSettingEdit(qt.QCheckBox):
         """Emitted when checkbox toggled."""
 
         self.setting.set(state)
-        self.emit( qt.PYSIGNAL('settingValueChanged'), () )
         
 class SettingChoice(qt.QComboBox):
     """For choosing between a set of values."""
@@ -133,7 +131,6 @@ class SettingChoice(qt.QComboBox):
             # value has changed
             if self.setting.get() != val:
                 self.setting.set(val)
-                self.emit( qt.PYSIGNAL('settingValueChanged'), () )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -172,7 +169,6 @@ class SettingMultiLine(qt.QTextEdit):
             # value has changed
             if self.setting.get() != val:
                 self.setting.set(val)
-                self.emit( qt.PYSIGNAL('settingValueChanged'), () )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))

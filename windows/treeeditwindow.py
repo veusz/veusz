@@ -244,10 +244,6 @@ class TreeEditWindow(qt.QDockWindow):
 
         self.listview.triggerUpdate()
 
-    def slotCntrlModifiesDoc(self):
-        """Called when a control modifies its value."""
-        self.document.setModified(True)
-
     def enableCorrectButtons(self, item):
         """Make sure the create graph buttons are correctly enabled."""
         selw = item.widget
@@ -265,9 +261,6 @@ class TreeEditWindow(qt.QDockWindow):
         # enable or disable the create graph buttons
         self.enableCorrectButtons(item)
 
-        # FIXME: what does this do?
-        #s = self.prefview.size()
-        #self.prefview.adjustSize()
         self.itemselected = item
 
         # delete the current widgets in the preferences list
@@ -300,9 +293,6 @@ class TreeEditWindow(qt.QDockWindow):
             c = setn.makeControl(self.prefgrid)
             c.show()
             self.prefchilds.append(c)
-
-            self.connect(c, qt.PYSIGNAL('settingValueChanged'),
-                         self.slotCntrlModifiesDoc)
 
         # Change the page to the selected widget
         w = item.widget

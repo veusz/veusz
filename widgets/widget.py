@@ -74,6 +74,9 @@ class Widget(object):
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename )
 
+        # hook up settings to modify document flag if they are modified
+        self.settings.setOnModified(self.slotSettingModified)
+        
         # actions for widget
         self.actions = []
         self.actionfuncs = {}
@@ -261,6 +264,12 @@ class Widget(object):
                          "To('..')\n") % (c.name, ctext)
 
         return text
+
+    def slotSettingModified(self, ismodified):
+        """Called when settings is modified."""
+
+        if ismodified:
+            self.document.setModified(True)
 
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )
