@@ -49,6 +49,12 @@ class PlotWindow( qt.QScrollView ):
         self.zoomfactor = 1.
         self.pagenumber = 0
 
+        # set up redrawing timer
+        self.timer = qt.QTimer(self)
+        self.connect( self.timer, qt.SIGNAL('timeout()'),
+                      self.slotTimeout )
+        self.timer.start(1000)
+
     def setOutputSize(self):
         """Set the ouput display size."""
 
@@ -92,9 +98,8 @@ class PlotWindow( qt.QScrollView ):
         """Called when the document has been modified."""
 
         if ismodified:
+            # this is picked up by a timer
             self.outdated = True
-            # repaint window without redrawing background
-            self.updateContents()
 
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""
@@ -103,6 +108,13 @@ class PlotWindow( qt.QScrollView ):
         painter.drawPixmap( self.visibleWidth()/2 - logo.width()/2,
                             self.visibleHeight()/2 - logo.height()/2,
                             logo )
+
+    def slotTimeout(self):
+        """Called after timer times out, to check for updates to window."""
+
+        # no threads, so can't get interrupted here
+        if self.outdated:
+            self.updateContents()
 
     def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
         """Called when the contents need repainting."""
@@ -129,6 +141,10 @@ class PlotWindow( qt.QScrollView ):
 
             self.outdated = False
             self.oldzoom = self.zoomfactor
+
+            # redraw whole window
+            clipx = clipy = 0
+            clipw = cliph = -1
 
         # blt the visible part of the pixmap into the image
         painter.drawPixmap(clipx, clipy, self.bufferpixmap,
