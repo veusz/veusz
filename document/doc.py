@@ -139,7 +139,7 @@ class Document( qt.QObject ):
 
         self.data = {}
         self.basewidget = widgets.Root(None)
-        self.basewidget.setDocument(self)
+        self.basewidget.document = self
         self.setModified()
         self.emit( qt.PYSIGNAL("sigWiped"), () )
 
@@ -147,10 +147,6 @@ class Document( qt.QObject ):
         """Set data to val, with symmetric or negative and positive errors."""
         self.data[name] = dataset
         self.setModified()
-
-    def getBaseWidget(self):
-        """Return the base widget."""
-        return self.basewidget
 
     def getData(self, name):
         """Get data with name"""
@@ -184,7 +180,7 @@ class Document( qt.QObject ):
 
         # work out how many pixels correspond to the given size
         width, height = utils.cnvtDists(self.getSize(), painter)
-        children = self.basewidget.getChildren()
+        children = self.basewidget.children
 
         # This all assumes that only pages can go into the root widget
         i = 0
@@ -203,7 +199,7 @@ class Document( qt.QObject ):
 
     def getNumberPages(self):
         """Return the number of pages in the document."""
-        return len(self.basewidget.getChildren())
+        return len(self.basewidget.children)
 
     def saveToFile(self, file):
         """Save the text representing a document to a file."""
@@ -218,7 +214,7 @@ class Document( qt.QObject ):
         
         for name, dataset in self.data.items():
             dataset.saveToFile(file, name)
-        file.write(self.getBaseWidget().getSaveText())
+        file.write(self.basewidget.getSaveText())
         
         self.setModified(False)
 

@@ -23,6 +23,8 @@
 
 import qt
 import codeop
+import traceback
+import sys
 
 import document
 import utils
@@ -156,9 +158,29 @@ class ConsoleWindow(qt.QDockWindow):
         qt.QObject.connect( self._inputedit, qt.PYSIGNAL("sigEnter"),
                             self.slotEnter )
 
-    def getInterpreter(self):
-        """Return the command interpreter."""
-        return self.interpreter
+    def runFunction(self, func):
+        """Execute the function within the console window, trapping
+        exceptions."""
+
+        # preserve output streams
+        temp_stdout = sys.stdout
+        temp_stderr = sys.stderr
+        sys.stdout = _Writer(self.output_stdout)
+        sys.stderr = _Writer(self.output_stderr)
+
+        # catch any exceptions, printing problems to stderr
+        try:
+            func()
+        except Exception, e:
+            # print out the backtrace to stderr
+            i = sys.exc_info()
+            backtrace = traceback.format_exception( *i )
+            for l in backtrace:
+                sys.stderr.write(l)            
+
+        # return output streams
+        sys.stdout = temp_stdout
+        sys.stderr = temp_stderr
 
     def output_stdout(self, text):
         """ Write text in stdout font to the log."""

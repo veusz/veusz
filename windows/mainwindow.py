@@ -57,7 +57,7 @@ class MainWindow(qt.QMainWindow):
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
-        self.interpreter = self.console.getInterpreter()
+        self.interpreter = self.console.interpreter
         self.moveDockWindow( self.console, qt.Qt.DockBottom )
 
         # the plot window is the central window

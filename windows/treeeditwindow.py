@@ -52,11 +52,11 @@ class _WidgetItem(qt.QListViewItem):
     def text(self, column):
         """Get the text in a particular column."""
         if column == 0:
-            return self.widget.getName()
+            return self.widget.name
         elif column == 1:
-            return self.widget.getTypeName()
+            return self.widget.typename
         elif column == 2:
-            return self.widget.getUserDescription()
+            return self.widget.userdescription
         elif column == 3:
             return self.index
         return ""
@@ -98,11 +98,12 @@ class _ScrollView(qt.QScrollView):
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
 
-    def __init__(self, thedocument, *args):
-        qt.QDockWindow.__init__(self, *args)
+    def __init__(self, thedocument, parent):
+        qt.QDockWindow.__init__(self, parent)
         self.setResizeEnabled( True )
         self.setCaption("Graph tree - Veusz")
 
+        self.parent = parent
         self.document = thedocument
         self.connect( self.document, qt.PYSIGNAL("sigModified"),
                       self.slotDocumentModified )
@@ -143,7 +144,6 @@ class TreeEditWindow(qt.QDockWindow):
         # put widgets in a movable splitter
         split = qt.QSplitter(totvbox)
         split.setOrientation(qt.QSplitter.Vertical)
-        #self.setWidget(split)
 
         # first widget is a listview
         lv = qt.QListView(split)
@@ -163,7 +163,7 @@ class TreeEditWindow(qt.QDockWindow):
         lv.setTreeStepSize(10)
 
         # add root widget to view
-        self.rootitem = _WidgetItem( self.document.getBaseWidget(), lv )
+        self.rootitem = _WidgetItem( self.document.basewidget, lv )
         self.listview = lv
 
         # add a scrollable view for the preferences
@@ -229,7 +229,7 @@ class TreeEditWindow(qt.QDockWindow):
         """Called when there is a new document."""
 
         self.listview.clear()
-        self.rootitem = _WidgetItem( self.document.getBaseWidget(),
+        self.rootitem = _WidgetItem( self.document.basewidget,
                                      self.listview )
         self.listview.setSelected(self.rootitem, True)
         self.updateContents()
@@ -278,17 +278,18 @@ class TreeEditWindow(qt.QDockWindow):
         w = item.widget
         # add action for widget
         if w != None:
-            for name in w.getActionList():
+            for name in w.actions:
                 l = qt.QLabel(name, self.prefgrid)
                 l.show()
                 self.prefchilds.append(l)
 
-                b = qt.QPushButton(w.getActionDescr(name), self.prefgrid)
+                b = qt.QPushButton(w.actiondescr[name], self.prefgrid)
+                b.veusz_action = w.actionfuncs[name]
                 b.show()
                 self.prefchilds.append(b)
                 
-                self.connect(b, qt.SIGNAL('pressed()'),
-                             w.getActionFunction(name))
+                self.connect( b, qt.SIGNAL('pressed()'),
+                              self.slotActionPressed )
 
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
@@ -315,7 +316,7 @@ class TreeEditWindow(qt.QDockWindow):
         if w != None:
             # we have a page
             count = 0
-            children = self.document.getBaseWidget().getChildren()
+            children = self.document.basewidget.children
             for c in children:
                 if c == w:
                     break
@@ -344,3 +345,13 @@ class TreeEditWindow(qt.QDockWindow):
         widgetfactory.thefactory.makeWidget(self.sender().widgetname,
                                             parent)
         self.document.setModified()
+
+    def slotActionPressed(self):
+        """Called when an action button is pressed."""
+
+        button = self.sender()
+        action = button.veusz_action
+
+        # run action in console
+        console = self.parent.console
+        console.runFunction( action )

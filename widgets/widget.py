@@ -25,7 +25,7 @@ import widgetfactory
 import utils
 import setting
 
-class Widget:
+class Widget(object):
     """ Fundamental plotting widget interface."""
 
     typename = 'generic'
@@ -75,8 +75,8 @@ class Widget:
         self.settings = setting.Settings( 'Widget_' + self.typename )
 
         # actions for widget
-        self.actionlist = []
-        self.actions = {}
+        self.actions = []
+        self.actionfuncs = {}
         self.actiondescr = {}
 
     def addAction(self, name, function, descr=''):
@@ -86,21 +86,9 @@ class Widget:
         function is a function with no parameters to call
         descr is description of routine.
         """
-        self.actionlist.append(name)
-        self.actions[name] = function
+        self.actions.append(name)
+        self.actionfuncs[name] = function
         self.actiondescr[name] = descr
-
-    def getActionList(self):
-        '''Get the list of actions'''
-        return self.actionlist
-
-    def getActionFunction(self, name):
-        '''Get function for action'''
-        return self.actions[name]
-
-    def getActionDescr(self, name):
-        '''Get description for action'''
-        return self.actiondescr[name]
 
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
@@ -140,30 +128,11 @@ class Widget:
             i += 1
         return "%s%i" % (prefix, i)
 
-    def getName(self):
-        """Get the name of the widget."""
-        return self.name
-
-    def getTypeName(self):
-        """Return the type name."""
-        return self.typename
-
     def getUserDescription(self):
         """Return a user-friendly description of what
         this is (e.g. function)."""
         return ''
-
-    def getParent(self):
-        """Get parent widget."""
-        return self.parent
-
-    def setDocument(self, doc):
-        """Set the document to doc."""
-        self.document = doc
-
-    def getDocument(self):
-        """Return the document."""
-        return self.document
+    userdescription = property(getUserDescription)
 
     def prefLookup(self, name):
         """Get the value of a preference in the form foo/bar/baz"""
@@ -200,13 +169,10 @@ class Widget:
         """Return whether there is a child with a name."""
         return self.getChild(name) != None
 
-    def getChildren(self):
-        """Get a list of the children."""
-        return self.children
-
-    def getChildNames(self):
+    def _getChildNames(self):
         """Return the child names."""
         return [i.name for i in self.children]
+    childnames = property(_getChildNames)
 
     def removeChild(self, name):
         """Remove a child."""
@@ -222,7 +188,7 @@ class Widget:
             raise ValueError, \
                   "Cannot remove graph '%s' - does not exist" % name
 
-    def getPath(self):
+    def _getPath(self):
         """Returns a path for the object, e.g. /plot1/x."""
 
         obj = self
@@ -235,6 +201,7 @@ class Widget:
             build = '/'
 
         return build
+    path = property(_getPath)
 
     def autoAxis(self, axisname):
         """If the axis axisname is used by this widget,
@@ -248,7 +215,7 @@ class Widget:
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
         """
 
-        print self.getPath(), self.position, self.margins
+        print self.path, self.position, self.margins
 
         # get parent's position
         x1, y1, x2, y2 = parentposn
@@ -282,7 +249,7 @@ class Widget:
         text = self.settings.saveText(saveall)
 
         # now go throught the subwidgets
-        for c in self.getChildren():
+        for c in self.children:
             if c.name not in self.autoadd:
                 text += "Add('%s', name='%s')\n" % (c.typename, c.name)
 

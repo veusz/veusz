@@ -40,7 +40,7 @@ class CommandInterface(qt.QObject):
         qt.QObject.__init__(self)
 
         self.document = document
-        self.currentwidget = self.document.getBaseWidget()
+        self.currentwidget = self.document.basewidget
         self.verbose = False
 
         self.connect( self.document, qt.PYSIGNAL("sigWiped"),
@@ -60,15 +60,14 @@ class CommandInterface(qt.QObject):
                                           *args, **args_opt)
 
         if self.verbose:
-            print "Added a graph of type '%s' (%s)" % (type,
-                                                       w.getUserDescription())
+            print "Added a graph of type '%s' (%s)" % (type, w.userdescription)
 
         self.document.setModified()
 
     def Remove(self, name):
         """Remove a graph from the dataset."""
         w = self._resolve(name)
-        w.getParent().removeChild( w.name )
+        w.parent.removeChild( w.name )
         self.document.setModified()
 
     def _resolve(self, where):
@@ -82,7 +81,7 @@ class CommandInterface(qt.QObject):
 
         if where[:1] == '/':
             # relative to base directory
-            obj = self.document.getBaseWidget()
+            obj = self.document.basewidget
         else:
             # relative to here
             obj = self.currentwidget
@@ -91,7 +90,7 @@ class CommandInterface(qt.QObject):
         for p in parts:
             if p == '..':
                 # relative to parent object
-                p = obj.getParent()
+                p = obj.parent
                 if p == None:
                     raise ValueError, "Base graph has no parent"
                 obj = p
@@ -113,7 +112,7 @@ class CommandInterface(qt.QObject):
         self.currentwidget = self._resolve(where)
 
         if self.verbose:
-            print "Changed to graph '%s'" % self.currentwidget.getPath()
+            print "Changed to graph '%s'" % self.currentwidget.path
 
     def List(self, graph=None):
         """List the contents of a graph."""
@@ -123,7 +122,7 @@ class CommandInterface(qt.QObject):
         if graph != None:
             widget = self._resolve(graph)
 
-        children = widget.getChildNames()
+        children = widget.childnames
 
         if len(children) == 0:
             print '%30s' % 'No children found'
@@ -131,9 +130,7 @@ class CommandInterface(qt.QObject):
             # output format name, type
             for name in children:
                 w = widget.getChild(name)
-                type = w.getTypeName()
-                descr = w.getUserDescription()
-                print '%10s %10s %30s' % (name, type, descr)
+                print '%10s %10s %30s' % (name, w.typename, w.userdescription)
 
     def Get(self, var):
         """Get the value of a preference."""

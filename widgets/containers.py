@@ -206,7 +206,7 @@ class Grid(widget.Widget):
 
         # iterate over children, and modify positions
         for child, pos in zip(self.children, childrenposns):
-            dim = self.child_dimensions[child.getName()]
+            dim = self.child_dimensions[child.name]
             child.position = ( pos[0]*invc, pos[1]*invr,
                                (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
 

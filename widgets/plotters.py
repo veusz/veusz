@@ -64,10 +64,10 @@ class GenericPlotter(widget.Widget):
         x = self.settings.xAxis
         y = self.settings.yAxis
         
-        for i in self.parent.getChildren():
-            if i.getName() == x:
+        for i in self.parent.children:
+            if i.name == x:
                 xaxis = i
-            if i.getName() == y:
+            if i.name == y:
                 yaxis = i
 
         return (xaxis, yaxis)
@@ -366,7 +366,7 @@ class PointPlotter(GenericPlotter):
         pts = []
 
         # get the data
-        xdata = self.getDocument().getData(self.settings.xData)
+        xdata = self.document.getData(self.settings.xData)
 
         # draw horizontal error bars
         if xdata.hasErrors():
@@ -386,7 +386,7 @@ class PointPlotter(GenericPlotter):
 
         # draw vertical error bars
         # get data
-        ydata = self.getDocument().getData(self.settings.yData)
+        ydata = self.document.getData(self.settings.yData)
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
 
@@ -408,8 +408,8 @@ class PointPlotter(GenericPlotter):
             
     def _autoAxis(self, dataname):
         """Determine range of data."""
-        if self.getDocument().hasData(dataname):
-            return self.getDocument().getData(dataname).getRange()
+        if self.document.hasData(dataname):
+            return self.document.getData(dataname).getRange()
         else:
             return None
 
@@ -474,7 +474,7 @@ class PointPlotter(GenericPlotter):
         x1, y1, x2, y2 = posn
 
         # skip if there's no data
-        d = self.getDocument()
+        d = self.document
         s = self.settings
         if not d.hasData(s.xData) or not d.hasData(s.yData):
             return

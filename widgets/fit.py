@@ -60,7 +60,7 @@ class Fit(plotters.FunctionPlotter):
     def _autoAxis(self, dataname):
         """Determine range of data."""
         if self.document.hasData(dataname):
-            return self.getDocument().getData(dataname).getRange()
+            return self.document.getData(dataname).getRange()
         else:
             return None
 

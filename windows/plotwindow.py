@@ -107,7 +107,7 @@ class PlotWindow( qt.QScrollView ):
     def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
         """Called when the contents need repainting."""
 
-        widget = self.document.getBaseWidget()
+        widget = self.document.basewidget
 
         # draw data into background pixmap if modified
         if self.outdated or self.zoomfactor != self.oldzoom:
@@ -149,7 +149,7 @@ class PlotWindow( qt.QScrollView ):
                              qt.QBrush( self.colorGroup().dark() ))
 
         # add logo if no children
-        if len(widget.getChildren()) == 0:
+        if len(widget.children) == 0:
             self.drawLogo(painter)
         
         
