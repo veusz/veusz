@@ -238,9 +238,7 @@ class Widget:
 
         i = 0
         nc = len(self.children)
-        while( i < nc ):
-            if self.children[i].name == name:
-                break
+        while i < nc and self.children[i].name != name:
             i += 1
 
         if i < nc:
@@ -281,7 +279,7 @@ class Widget:
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
         """
 
-        print self.name, self.position
+        print self.getPath(), self.position
 
         # get parent's position
         x1, y1, x2, y2 = parentposn
@@ -307,19 +305,23 @@ class Widget:
         posn = [ int(x1), int(y1), int(x2), int(y2) ]
         bounds = list(posn)
 
+        # BROKEN!!!!
         # modify bounds if child requests it
         for i in self.children:
             i.autoMargin(posn, bounds)
-
+ 
         for i in range(4):
             if self.margins[i] < 0.:
                 # subtract difference
-                posn[i] += posn[i] - bounds[i]
+                delta = posn[i] - bounds[i]
+                if delta > 0:
+                    posn[i] += delta
 
-        # iterate over children
-        for i in self.children:
-            i.draw(posn, painter)
-
+ 
+        # iterate over children in reverse order
+        for i in range( len(self.children)-1, -1, -1 ):
+            self.children[i].draw(posn, painter)
+ 
         # return our final bounds
         return posn
         

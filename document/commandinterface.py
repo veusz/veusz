@@ -57,6 +57,12 @@ class CommandInterface:
 
         self.document.setModified()
 
+    def Remove(self, name):
+        """Remove a graph from the dataset."""
+        w = self._resolve(name)
+        w.getParent().removeChild( w.getName() )
+        self.document.setModified()
+
     def _resolve(self, where):
         """Resolve graph relative to current graph.
 
@@ -66,30 +72,32 @@ class CommandInterface:
 
         parts = string.split(where, '/')
 
-        # relative to base directory
         if where[:1] == '/':
-            baseobj = self.document.getBaseWidget()
+            # relative to base directory
+            obj = self.document.getBaseWidget()
         else:
-            baseobj = self.currentwidget
+            # relative to here
+            obj = self.currentwidget
 
         # iterate over parts in string
         for p in parts:
             if p == '..':
                 # relative to parent object
-                if baseobj.parent != None:
-                    baseobj = baseobj.parent
+                p = obj.getParent()
+                if p == None:
+                    raise utils.GraphError, "Base graph has no parent"
+                obj = p
             elif p == '.' or len(p) == 0:
                 # relative to here
                 pass
             else:
                 # child specified
-                if baseobj.hasChild( p ):
-                    baseobj = baseobj.getChild( p )
-                else:
+                obj = obj.getChild( p )
+                if obj == None:
                     raise utils.GraphError, "Child '%s' does not exist" % p
 
         # return widget
-        return baseobj
+        return obj
 
     def To(self, where):
         """Change to a graph within the current graph."""

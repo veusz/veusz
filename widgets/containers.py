@@ -180,11 +180,19 @@ class GridContainer(widget.Widget):
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""
 
+        # class to handle management
         ge = _gridengine(self.columns, self.rows)
+
+        # iterate over children, and collect dimensions of children
+        # (a tuple width nocols x norows)
 
         childrenposns = []
         for c in self.children:
             name = c.getName()
+
+            if name not in self.child_dimensions:
+                self.child_dimensions[name] = (1, 1)
+
             childrenposns.append( ge.add( * self.child_dimensions[name] ) )
 
         nocols, norows = ge.getAllocedDimensions()
@@ -193,9 +201,11 @@ class GridContainer(widget.Widget):
         if nocols == 0 or norows == 0:
             return
 
+        # fractions per col and row
         invc, invr = 1./nocols, 1./norows
 
-        for child in self.children:
+        # iterate over children, and modify positions
+        for child, pos in zip(self.children, childrenposns):
             dim = self.child_dimensions[child.getName()]
             child.position = ( pos[0]*invc, pos[1]*invr,
                                (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
@@ -205,7 +215,7 @@ class GridContainer(widget.Widget):
 
         # if the contents have been modified, recalculate the positions
         if self.children != self._old_children:
-            self._old_children = self.children
+            self._old_children = list(self.children)
             self._recalcPositions()
 
         widget.Widget.draw(self, posn, painter)

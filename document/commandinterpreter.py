@@ -73,6 +73,7 @@ class CommandInterpreter:
         self.cmds = { 'GPL': self.GPL,
                       'SetVerbose': i.SetVerbose,
                       'Add': i.Add,
+                      'Remove': i.Remove,
                       'To': i.To,
                       'List': i.List,
                       'Get': i.Get,
