@@ -21,9 +21,9 @@
 
 # $Id$
 
+from math import ceil
 import string
 import qt
-import math
 import re
 
 import vzexcept
@@ -314,28 +314,35 @@ def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
 
     pixperpt = getPixelsPerPoint(painter)
-    return int( pixperpt * mult * float(match.group(1)) )
+    return int( ceil(pixperpt * mult * float(match.group(1))) )
 
 def _distPerc(match, painter, maxsize):
     """Convert from a percentage of maxsize."""
 
-    return int( maxsize * 0.01 * float(match.group(1)) )
+    return int( ceil(maxsize * 0.01 * float(match.group(1))) )
 
 def _distFrac(match, painter, maxsize):
     """Convert from a fraction a/b of maxsize."""
 
-    return int( maxsize * float(match.group(1)) / float(match.group(2)) )
+    return int( ceil(maxsize * float(match.group(1)) /
+                     float(match.group(2))) )
 
 def _distRatio(match, painter, maxsize):
     """Convert from a simple 0.xx ratio of maxsize."""
 
-    return int( maxsize * float(match.group(1)) )
+    # if it's greater than 1 then assume it's a point measurement
+    if float(match.group(1)) > 1.:
+        return _distPhys(match, painter, 1)
+
+    return int( ceil(maxsize * float(match.group(1))) )
 
 # mappings from regular expressions to function to convert distance
 # the recipient function takes regexp match, painter and maximum size of frac
 
-_distRegexp=( (re.compile('^([0-9\.]+) *%$'), _distPerc),
-              (re.compile('^([0-9\.]+) */ *([0-9\.]+)$'), _distFrac),
+_distRegexp=( (re.compile('^([0-9\.]+) *%$'),
+               _distPerc),
+              (re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
+               _distFrac),
               (re.compile('^([0-9\.]+) *pt$'),
                lambda match, painter, t: _distPhys(match, painter, 1.)),
               (re.compile('^([0-9\.]+) *cm$'),
@@ -344,10 +351,11 @@ _distRegexp=( (re.compile('^([0-9\.]+) *%$'), _distPerc),
                lambda match, painter, t: _distPhys(match, painter, 2.8452756)),
               (re.compile('^([0-9\.]+) *(inch|in|")$'),
                lambda match, painter, t: _distPhys(match, painter, 72.27)),
-              (re.compile('^([0-9\.]+)$'), _distRatio)
+              (re.compile('^([0-9\.]+)$'),
+               _distRatio)
               )
 
-def convertDistance(dist, maxsize, painter):
+def cnvtDist(dist, maxsize, painter):
     '''Convert a distance to plotter units.
 
     dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
@@ -356,10 +364,16 @@ def convertDistance(dist, maxsize, painter):
     painter: painter to get metrics to convert physical sizes
     '''
 
+    dist = string.strip(dist)
+
+    # compare string against each regexp
     for reg, fn in _distRegexp:
         m = reg.match(dist)
+
+        # if there's a match, then call the appropriate conversion fn
         if m != None:
             return fn(m, painter, maxsize)
 
+    # none of the regexps match
     raise vzexcept.DistanceError( "Cannot convert distance in form '%s'" %
                                   dist )
