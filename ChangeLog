@@ -1,0 +1,18 @@
+* 2005-03-25 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Veusz now tracks default settings in ~/.veusz.def file for each
+	user
+	- It is possible to copy settings from one widget to another using
+	a menu
+	- The bullseye symbol works correctly now
+	- Reading data now gives the count of conversion errors rather
+	than throwing an exception (in the import dialog)
+	- ImportFile and ImportString now also return the number of
+	conversion errors during reading (as part of a tuple)
+	- Added ChangeLog file
+	- Fixed problems where Veusz doesn't update plot window due to Qt
+	clipping
+	- Fitting widget now stores chi2, dof, reduced chi2 setting
+	(readonly). This allows	scripts to query these values.
+	
+	
+	
