@@ -24,8 +24,6 @@
 import numarray
 import math
 
-import utils
-
 """Algorithms for working with axis ticks.
 
 These algorithms were designed by me (Jeremy Sanders), so there
@@ -198,8 +196,8 @@ class AxisTicks:
         """With minval and maxval find best tick positions."""
 
         # work out range and log range
-        range = self.maxval - self.minval
-        intlogrange = int( numarray.log10( range ) )
+        therange = self.maxval - self.minval
+        intlogrange = int( numarray.log10( therange ) )
 
         # we step variable to move through log space to find best ticks
         logstep = intlogrange + 1

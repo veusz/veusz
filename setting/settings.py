@@ -20,9 +20,7 @@
 
 """Module for holding collections of settings."""
 
-import qt
-
-class Settings(qt.QObject):
+class Settings:
     """A class for holding collections of settings."""
 
     def __init__(self, name, descr = ''):

@@ -22,7 +22,6 @@
 # $Id$
 
 import qt
-import sys
 import os.path
 from math import sqrt
 
@@ -100,10 +99,10 @@ class MainWindow(qt.QMainWindow):
             ]
 
         self.menus = {}
-        for id, text in menus:
+        for menuid, text in menus:
             menu = qt.QPopupMenu(self)
             self.menuBar().insertItem( text, menu )
-            self.menus[id] = menu
+            self.menus[menuid] = menu
 
         # items for main menus
         # Items are: Lookup id, description, menu text, which menu,
@@ -156,7 +155,7 @@ class MainWindow(qt.QMainWindow):
                 self.menus[i[0]].insertSeparator()
                 continue
             
-            id, descr, menutext, menu, slot, icon, addtool, key = i
+            menuid, descr, menutext, menu, slot, icon, addtool, key = i
             if key == '':
                 ks = qt.QKeySequence()
             else:
@@ -180,7 +179,7 @@ class MainWindow(qt.QMainWindow):
                 action.addTo(self.mainTools)
 
             # save for later
-            self.actions[id] = action
+            self.actions[menuid] = action
 
     def slotDataImport(self):
         """Display the import data dialog."""
@@ -213,7 +212,8 @@ class MainWindow(qt.QMainWindow):
                 return False
             elif v == qt.QMessageBox.Yes:
                 self.slotFileSave()
-            return qt.QMainWindow.close(self, alsoDelete)
+
+        return qt.QMainWindow.close(self, alsoDelete)
 
     def slotFileNew(self):
         """New file."""
@@ -238,8 +238,8 @@ class MainWindow(qt.QMainWindow):
             self.slotFileSaveAs()
         else:
             try:
-                file = open(self.filename, 'w')
-                self.document.saveToFile(file)
+                ofile = open(self.filename, 'w')
+                self.document.saveToFile(ofile)
                 self.updateStatusbar("Saved to %s" % self.filename)
             except IOError:
                 qt.QMessageBox("Veusz",

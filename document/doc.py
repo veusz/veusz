@@ -231,13 +231,13 @@ class Document( qt.QObject ):
             # unfortunately we need to pass QPrinter the name of an eps
             # file: no secure way we can produce the file. FIXME INSECURE
 
-            dir = os.path.dirname(os.path.abspath(filename))
+            fdir = os.path.dirname(os.path.abspath(filename))
             while 1:
                 digits = string.digits + string.ascii_letters
                 rndstr = ''
                 for i in xrange(40):
                     rndstr += random.choice(digits)
-                tmpfilename = "%s/tmp_%s.eps" % (dir, rndstr)
+                tmpfilename = "%s/tmp_%s.eps" % (fdir, rndstr)
                 try:
                     os.stat(tmpfilename)
                 except OSError:
@@ -249,7 +249,7 @@ class Document( qt.QObject ):
             p.setOutputFileName(tmpfilename)
             p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
             p.newPage()
-            self.printTo( p )
+            self.printTo( p, [pagenumber] )
 
             # now use ghostscript to convert the file into the relevent type
             cmdline = ( 'gs -sDEVICE=pngalpha -dEPSCrop -dBATCH -dNOPAUSE'

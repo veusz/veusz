@@ -27,8 +27,6 @@ import qt
 import widgets.widgetfactory as widgetfactory
 import widgets
 
-import setting
-
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
 
@@ -119,14 +117,14 @@ class TreeEditWindow(qt.QDockWindow):
         # make buttons for each of the graph types
         self.createGraphButtons = {}
         buttonhbox = qt.QHBox(totvbox)
-        dir = os.path.dirname(__file__)
+        mdir = os.path.dirname(__file__)
 
         for w in widgetfactory.thefactory.listWidgets():
             wc = widgetfactory.thefactory.getWidgetClass(w)
             if wc.allowusercreation:
                 # make a new button, and set the pixmap
                 b = qt.QToolButton(buttonhbox)
-                name = "%s/icons/button_%s.png" % (dir, w)
+                name = "%s/icons/button_%s.png" % (mdir, w)
                 b.setPixmap( qt.QPixmap(name) )
 
                 # keep track of the buttons so we can disable/enable them
@@ -268,8 +266,8 @@ class TreeEditWindow(qt.QDockWindow):
         self.enableCorrectButtons(item)
 
         # FIXME: what does this do?
-        s = self.prefview.size()
-        self.prefview.adjustSize()
+        #s = self.prefview.size()
+        #self.prefview.adjustSize()
         self.itemselected = item
 
         # delete the current widgets in the preferences list

@@ -20,7 +20,6 @@
 
 # $Id$
 
-from vzexcept import *
 from utilfuncs import *
 from pref import *
 from preftypes import *

@@ -23,10 +23,7 @@
 
 from math import ceil
 import string
-import qt
 import re
-
-import vzexcept
 
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
@@ -356,8 +353,8 @@ def cnvtDist(dist, painter):
             return fn(m, painter, maxsize)
 
     # none of the regexps match
-    raise vzexcept.DistanceError( "Cannot convert distance in form '%s'" %
-                                  dist )
+    raise ValueError( "Cannot convert distance in form '%s'" %
+                      dist )
 
 def cnvtDists(distances, painter):
     '''Convert a set of distances to plotter units.'''

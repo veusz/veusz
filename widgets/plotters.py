@@ -26,7 +26,6 @@ import numarray as N
 
 import widget
 import widgetfactory
-import axis
 import graph
 import setting
 

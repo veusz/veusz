@@ -21,10 +21,7 @@
 
 # $Id$
 
-import sys
 import numarray
-
-import qt
 
 import widget
 import axisticks
@@ -107,11 +104,11 @@ class Axis(widget.Widget):
         changed = False
 
         for c in self.parent.children:
-            range = c.autoAxis( ourname )
+            therange = c.autoAxis( ourname )
             # if range is wider, expand
-            if range != None:
-                autorange[0] = min( range[0], autorange[0] )
-                autorange[1] = max( range[1], autorange[1] )
+            if therange != None:
+                autorange[0] = min( therange[0], autorange[0] )
+                autorange[1] = max( therange[1], autorange[1] )
                 changed = True
 
         # return a default range if nobody gives us one
@@ -453,9 +450,9 @@ class Axis(widget.Widget):
         if s.direction == 'vertical':
             x, y = y, x
 
-        rec = utils.render(painter, font, x, y,
-                           s.label,
-                           ax, ay, angle)
+        utils.render(painter, font, x, y,
+                     s.label,
+                     ax, ay, angle)
 
     def _autoMirrorDraw(self, posn, painter, coordticks):
         """Mirror axis to opposite side of graph if there isn't

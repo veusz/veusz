@@ -26,8 +26,8 @@ import qt
 
 import utils
 
-dir = os.path.dirname(__file__)
-_logolocation='%s/../images/logo.png' % dir
+mdir = os.path.dirname(__file__)
+_logolocation='%s/../images/logo.png' % mdir
 
 class PlotWindow( qt.QScrollView ):
     """Class to show the plot(s) in a scrollable window."""

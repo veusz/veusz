@@ -117,8 +117,8 @@ class ImportDialog(qt.QDialog):
         """Update preview window when filename changed."""
 
         try:
-            file = open(str(filename), 'r')
-            text = file.read(1024)
+            ifile = open(str(filename), 'r')
+            text = ifile.read(1024)
             self.previewedit.setText(text)
 
         except IOError:
@@ -131,7 +131,7 @@ class ImportDialog(qt.QDialog):
         descriptor = str( self.descriptoredit.text() )
         
         try:
-            file = open(filename, 'r')
+            ifile = open(filename, 'r')
         except IOError:
             mb = qt.QMessageBox("Veusz",
                                 "Cannot find file '%s'" % filename,
@@ -143,7 +143,7 @@ class ImportDialog(qt.QDialog):
             return
 
         # do the import
-        stream = document.FileStream(file)
+        stream = document.FileStream(ifile)
         sr = document.SimpleRead(descriptor)
         sr.readData(stream)
         names = sr.setInDocument(self.document)

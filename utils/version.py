@@ -25,14 +25,12 @@
 Return Veusz' version number
 """
 
-import string
 import os
 
 def version():
     """Return the version number as a string."""
 
-    dir = os.path.dirname(__file__)
-    file = open('%s/../VERSION' % dir, 'r')
+    mdir = os.path.dirname(__file__)
+    vfile = open('%s/../VERSION' % mdir, 'r')
 
-    return file.readline().strip()
-
+    return vfile.readline().strip()

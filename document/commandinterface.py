@@ -26,15 +26,11 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
-import sys
-import os.path
 import qt
 
 import widgets
-import utils
 import doc
 import simpleread
-import commandinterpreter
 
 class CommandInterface(qt.QObject):
     """Class provides command interface."""
@@ -168,7 +164,7 @@ class CommandInterface(qt.QObject):
 
         if self.verbose:
             print "Set variable '%s':" % name
-            print "Values = %s" % str( data.vals )
+            print "Values = %s" % str( data.data )
             print "Symmetric errors = %s" % str( data.serr )
             print "Negative errors = %s" % str( data.nerr )
             print "Positive errors = %s" % str( data.perr )
@@ -184,8 +180,8 @@ class CommandInterface(qt.QObject):
     def ImportFile(self, filename, descriptor):
         """Read data from file with filename using descriptor."""
 
-        file = open(filename, 'r')
-        stream = simpleread.FileStream(file)
+        f = open(filename, 'r')
+        stream = simpleread.FileStream(f)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
         sr.setInDocument(self.document)

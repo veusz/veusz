@@ -41,24 +41,6 @@ def _plot_circle(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
-# def _plot_plus(painter, xpos, ypos, size):
-#     """ (internal) function to plot a +
-#     size is the length of one arm
-#     """
-
-#     # horizontal
-#     painter.drawLine( xpos - size, ypos, xpos + size, ypos )
-#     # vertical
-#     painter.drawLine( xpos, ypos - size, xpos, ypos + size )
-
-# def _plot_X(painter, xpos, ypos, size):
-#     """ (internal) function to plot a X
-#     size is the length in terms of DX and DY
-#     """
-
-#     painter.drawLine( xpos - size, ypos - size, xpos + size, ypos + size )
-#     painter.drawLine( xpos - size, ypos + size, xpos + size, ypos - size )
-
 def _plot_star(painter, xpos, ypos, size):
     """ (internal) function to plot a *
     """
@@ -77,21 +59,6 @@ def _plot_circle_dot(painter, xpos, ypos, size):
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
     painter.drawPoint( xpos, ypos )
    
-# def _plot_box(painter, xpos, ypos, size):
-#     """ (internal) function to plot a box shape
-#     size is half the length of a side
-#     """
-
-#     painter.drawRect( xpos - size, ypos - size, size*2+1, size*2+1 )
-
-# def _plot_box_dot(painter, xpos, ypos, size):
-#     """ (internal) function to plot a box shape with dot at centre
-#     size is half the length of a side
-#     """
-
-#     painter.drawRect( xpos - size, ypos - size, size*2+1, size*2+1 )
-#     painter.drawPoint( xpos, ypos )
-
 def _plot_bullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
     size is radius
@@ -99,26 +66,6 @@ def _plot_bullseye(painter, xpos, ypos, size):
 
     painter.drawEllipse( xpos - size/2, ypos - size/2 , size, size )
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
-
-# def _plot_triangle_dot(painter, xpos, ypos, size):
-#     """ (internal) function to plot a triangle shape with a dot at the core
-#     """
-
-
-#     dy = int(0.577*size)
-#     pts = qt.QPointArray( [xpos, ypos-dy*2, xpos-size, ypos+dy,
-#                            xpos+size, ypos+dy] )
-#     painter.drawConvexPolygon( pts )
-#     painter.drawPoint( xpos, ypos )
-
-# def _plot_triangle(painter, xpos, ypos, size):
-#     """ (internal) function to plot a triangle shape
-#     """
-
-#     dy = int(0.577*size)
-#     pts = qt.QPointArray( [xpos, ypos-dy*2, xpos-size, ypos+dy,
-#                            xpos+size, ypos+dy] )
-#     painter.drawConvexPolygon( pts )
 
 def _plot_line_horz(painter, xpos, ypos, size):
     """ (internal) function to plot a horizontal line

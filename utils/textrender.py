@@ -21,8 +21,6 @@
 
 # $Id$
 
-import qt
-import sys
 import math
 
 class _PartBuilder:
@@ -125,6 +123,7 @@ class _PartBuilder:
         self.part = ''
         self.parts.append(_PartBuilder.BlockStart)
         self.reset_bounds()
+        self.x = self.y = 0
         
         l = len(text)
         inmodifier = 0
@@ -213,7 +212,7 @@ class _PartBuilder:
             elif p == _PartBuilder.SuperScript:
                 oldascent = painter.fontMetrics().ascent()
                 size = font.pointSizeFloat()
-                font.setPointSizeFloat( size*0.5 )
+                font.setPointSizeFloat( size*0.6 )
                 painter.setFont(font)
 
                 ytemp = self.y
@@ -229,7 +228,7 @@ class _PartBuilder:
             # start a subscript part
             elif p == _PartBuilder.SubScript:
                 size = font.pointSizeFloat()
-                font.setPointSizeFloat( size*0.5 )
+                font.setPointSizeFloat( size*0.6 )
                 
                 painter.setFont(font)
                 
