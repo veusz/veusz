@@ -156,11 +156,7 @@ class CommandInterface:
 
         if p.setup():
             p.newPage()
-            pnt = qt.QPainter()
-            pnt.begin( p )
-            self.document.getBaseWidget().draw( (50, 50, 350, 350), pnt )
-            pnt.end()
-            
+            self.document.printTo( p )
 
     def WriteEPS(self, filename):
         """Write contents of graph to an eps file."""

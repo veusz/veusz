@@ -96,7 +96,8 @@ class PlotWindow( qt.QScrollView ):
             # make a QPainter to draw into the buffer pixmap
             p = qt.QPainter( self.bufferpixmap )
             # draw the data into the buffer
-            widget.draw( (50, 50, 250, 250), p )
+            #widget.draw( (50, 50, 250, 250), p )
+            self.document.printTo( self.bufferpixmap )
 
             self.modified = False
 

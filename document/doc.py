@@ -105,3 +105,14 @@ class Document( qt.QObject ):
         """Return whether modified flag set."""
         return self.modified
     
+    def printTo(self, printer):
+        """Print onto printing device."""
+        metrics = qt.QPaintDeviceMetrics( printer )
+        
+        painter = qt.QPainter()
+        painter.begin( printer )
+        self.basewidget.draw( (0, 0,
+                               metrics.logicalDpiX()*self.size_inch[0],
+                               metrics.logicalDpiY()*self.size_inch[1]),
+                              painter )
+        painter.end()
