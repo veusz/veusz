@@ -23,6 +23,7 @@
 
 import qt
 import sys
+import math
 
 class _PartBuilder:
     """ A class to handle LaTeX-like expressions."""
@@ -264,7 +265,7 @@ class _PartBuilder:
         self.x += width
 
         # update bounds with edge of this text
-        self._update_bounds( self.x, self.y + painter.fontMetrics().height() )
+        self._update_bounds( self.x, self.y - painter.fontMetrics().ascent() )
 
         # return next part
         return partno + 1
@@ -297,6 +298,7 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
         painter.save()
         painter.translate(x, y)
         painter.rotate(angle)
+        origcoord = (x, y)
         x = 0
         y = 0
         
@@ -306,7 +308,6 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
     if alignvert >= 0:
         # why can't I use ascent() here??
         h = painter.fontMetrics().boundingRect('0').height()
-        #ascent = painter.fontMetrics().ascent()
         if alignvert == 0:
             y += h/2  # centred
         else:
@@ -332,9 +333,30 @@ def render(painter, font, x, y, text, alignhorz = -1, alignvert = -1,
     pb.renderpart(painter, 0, font, render=1)
     totalwidth = pb.x - x
 
+    retbound = pb.get_bounds()
+
     # restore coordinate frame if text was rotated
     if angle != 0:
         painter.restore()
 
+        # rotate bounds in opposite direction to get real bounds...
+        # hope this stuff is correct
+        theta = -angle * (math.pi / 180.)
+        c = math.cos(theta)
+        s = math.sin(theta)
+
+        # rotate coordinates
+        b = ( retbound[0]*c + retbound[1]*s,
+              retbound[1]*c - retbound[0]*s,
+              retbound[2]*c + retbound[3]*s,
+              retbound[3]*c - retbound[2]*s )
+
+        # find bounding box of rotated rectangle
+        # we have to add back on the original coordinates
+        retbound = [ int( math.floor( min(b[0], b[2]) ) + origcoord[0] ),
+                     int( math.floor( min(b[1], b[3]) ) + origcoord[1] ),
+                     int( math.ceil( max(b[0], b[2]) ) + origcoord[0] ),
+                     int( math.ceil( max(b[1], b[3]) ) + origcoord[1] ) ]
+        
     # we might need this later
-    return pb.get_bounds()
+    return retbound
