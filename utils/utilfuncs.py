@@ -25,6 +25,8 @@ from math import ceil
 import string
 import re
 
+import qt
+
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
 
@@ -154,12 +156,6 @@ def formatNumber(num, format):
 
     return fp
 
-def getPixelsPerPoint(painter):
-    """ Returns number of pixels per point on the painter."""
-
-    return float( painter.fontInfo().pixelSize() ) / \
-           painter.fontInfo().pointSize()
-
 def clipper(xpts, ypts, bounds):
     """ Clip points that are safe to remove.
 
@@ -271,13 +267,21 @@ def clipper(xpts, ypts, bounds):
 
 ##     return pts
 
+def _calcPixPerPt(painter):
+    """Calculate the numbers of pixels per point for the painter.
+
+    This is stored in the variable veusz_pixperpt."""
+
+    dm = qt.QPaintDeviceMetrics(painter.device())
+    painter.veusz_pixperpt = dm.logicalDpiY() / 72.
+
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
 
-    fi = painter.fontInfo()
-    pixperpt = float(fi.pixelSize()) / fi.pointSize()
+    if not hasattr(painter, 'veusz_pixperpt'):
+        _calcPixPerPt(painter)
 
-    return int( ceil(pixperpt * mult * float(match.group(1)) *
+    return int( ceil(painter.veusz_pixperpt * mult * float(match.group(1)) *
                      painter.veusz_scaling ) )
 
 def _distPerc(match, painter, maxsize):
@@ -371,6 +375,7 @@ def cnvtDists(distances, painter):
 def cnvtDistPts(distance, painter):
     """Get the distance in points."""
 
-    fi = painter.fontInfo()
-    pixperpt = float(fi.pixelSize()) / fi.pointSize()
-    return cnvtDist(distance, painter) / pixperpt
+    if not hasattr(painter, 'veusz_pixperpt'):
+        _calcPixPerPt(painter)
+
+    return cnvtDist(distance, painter) / painter.veusz_pixperpt

@@ -168,10 +168,16 @@ class GridLine(Line):
 class Text(settings.Settings):
     '''Text settings.'''
 
+    # need to examine font table to see what's available
+    defaultfamily=''
+
     def __init__(self, name, descr = ''):
         settings.Settings.__init__(self, name, descr=descr)
 
-        self.add( setting.Str('font', 'Times New Roman',
+        if Text.defaultfamily == '':
+            Text._getDefaultFamily()
+
+        self.add( setting.Str('font', Text.defaultfamily,
                   descr = 'Font name' ) )
         self.add( setting.Distance('size', '14pt',
                   descr = 'Font size' ) )
@@ -185,7 +191,31 @@ class Text(settings.Settings):
                                 descr = 'Underline font' ) )
         self.add( setting.Bool( 'hide', False,
                                 descr = 'Hide the text') )
-        
+
+    def _getDefaultFamily():
+        '''Choose a default font family. We check through a list until we
+        get a sensible default.'''
+
+        db = qt.QFontDatabase()
+
+        # build a dict up with the list of families
+        families = {}
+        for i in db.families():
+            families[str(i)] = True
+
+        for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
+                  'Serif']:
+            if i in families:
+                Text.defaultfamily = i
+                qf = qt.QFont(i)
+                return
+
+        raise RuntimeError('Could not identify sensible default font for Veusz'
+                           '. Please report this bug if you have any fonts '
+                           'installed')
+
+    _getDefaultFamily = staticmethod(_getDefaultFamily)
+            
     def makeQFont(self, painter):
         '''Return a qt.QFont object corresponding to the settings.'''
         size = cnvtDistPts(self.size, painter)
@@ -195,6 +225,7 @@ class Text(settings.Settings):
         f = qt.QFont(self.font, size,  weight, self.italic)
         if self.underline: f.setUnderline(1)
         f.setStyleHint( qt.QFont.Times, qt.QFont.PreferDevice )
+
         return f
 
     def makeQPen(self):

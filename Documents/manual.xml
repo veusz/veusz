@@ -25,6 +25,7 @@
     </legalnotice>
   </bookinfo>
 
+  <!---------------------------------------------------------------->
   <chapter>
     <title>Introduction</title>
 
@@ -316,6 +317,7 @@
     </section>
   </chapter>
 
+  <!---------------------------------------------------------------->
   <chapter>
     <title>Reading data</title>
     <section>
@@ -324,6 +326,7 @@
     </section>
   </chapter>
 
+  <!---------------------------------------------------------------->
   <chapter>
     <title>Command line interface</title>
 
