@@ -78,6 +78,9 @@ class PlotWindow( qt.QScrollView ):
     def zoomWidth(self):
         """Make the zoom factor so that the plot fills the whole width."""
 
+        # FIXME zoomWidth/height/page routines fail to take into account
+        # width of scroll bars
+
         width = self.visibleWidth()
         mult = width/float(self.size[0])
         self.setZoomFactor( mult * self.zoomfactor )
@@ -94,6 +97,7 @@ class PlotWindow( qt.QScrollView ):
 
         width = self.visibleWidth()
         height = self.visibleHeight()
+
         multw = width/float(self.size[0])
         multh = height/float(self.size[1])
         self.setZoomFactor( min(multw, multh)*self.zoomfactor)

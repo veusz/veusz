@@ -347,6 +347,7 @@ class MainWindow(qt.QMainWindow):
         '''Open the given filename.'''
         try:
             self.interpreter.Load(filename)
+            self.document.setModified(False)
             self.filename = filename
             self.updateTitlebar()
             self.updateStatusbar("Opened %s" % filename)

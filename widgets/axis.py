@@ -541,9 +541,11 @@ class Axis(widget.Widget):
             next = 1.
         else:
             next = 0.
-        s.otherPosition = next
 
-        s.reflect = not s.reflect
+        # temporarily change these values
+        s.get('otherPosition').setSilent(next)
+        s.get('reflect').setSilent(not s.reflect)
+
         self._updatePlotRange(posn)
         if not s.Line.hide:
             self._drawAxisLine(painter)
@@ -551,10 +553,10 @@ class Axis(widget.Widget):
             self._drawMinorTicks(painter)
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
-        s.reflect = not s.reflect
 
         # put axis back
-        s.otherPosition = other
+        s.get('otherPosition').setSilent(other)
+        s.get('reflect').setSilent(not s.reflect)
 
     def chooseName(self):
         """Axis are called x and y."""

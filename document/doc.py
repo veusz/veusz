@@ -158,6 +158,11 @@ class Document( qt.QObject ):
 
     def setModified(self, ismodified=True):
         """Set the modified flag on the data, and inform views."""
+
+        # useful for tracking back modifications
+        # import traceback
+        # traceback.print_stack()
+
         self.modified = ismodified
         self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
 

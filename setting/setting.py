@@ -79,6 +79,14 @@ class Setting:
         for i in self.onmodified:
             i(True)
 
+    def setSilent(self, val):
+        """Set the setting, without propagating modified flags.
+
+        This shouldn't often be used as it defeats the automatic updation.
+        Used for temporary modifications."""
+
+        self.val = self.convertTo( val )
+
     def convertTo(self, val):
         """Convert for storage."""
         return val
