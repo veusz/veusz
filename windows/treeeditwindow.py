@@ -117,8 +117,12 @@ class TreeEditWindow(qt.QDockWindow):
 
         # make buttons for each of the graph types
         self.createGraphActions = {}
-        buttonhbox = qt.QHBox(totvbox)
-        #buttonhbox = qt.QToolBar(self.parent)
+        horzbox = qt.QFrame(totvbox)
+        #horzbox.setFrameStyle(qt.QFrame.ToolBarPanel)
+        self.boxlayout = qt.QBoxLayout(horzbox, qt.QBoxLayout.LeftToRight)
+        self.boxlayout.insertSpacing(0, 4)
+        self.boxlayout.addStrut(22)
+
         mdir = os.path.dirname(__file__)
 
         insertmenu = parent.menus['insert']
@@ -131,29 +135,45 @@ class TreeEditWindow(qt.QDockWindow):
                                    (lambda a: self.slotMakeWidgetButton(w)))
                                   (w),
                                   iconfilename = 'button_%s.png' % w,
-                                  menutext = 'Add a %s widget' % w,
+                                  menutext = 'Add %s widget' % w,
                                   statusbartext = 'Add a %s widget to the'
                                   ' currently selected widget' % w,
                                   tooltiptext = wc.description)
-                a.addTo(buttonhbox)
+                b = a.addTo(horzbox)
+                b.setAutoRaise(True)
+                self.boxlayout.addWidget(b)
                 a.addTo(insertmenu)
                 self.createGraphActions[wc] = a
 
+        self.boxlayout.addStretch()
+
         # make buttons for user actions
         edithbox = qt.QHBox(totvbox)
-        self.editbuttons = {}
+        self.editactions = {}
 
-        for name, icon, tooltip in (
-            ('moveup', 'go-up', 'Move the selected widget up'),
-            ('movedown', 'go-down', 'Move the selected widget down'),
-            ('delete', 'delete', 'Remove the selected widget')
+        editmenu = parent.menus['edit']
+        for name, icon, tooltip, menutext, slot in (
+            ('moveup', 'go-up', 'Move the selected widget up',
+             'Move up',
+             self.slotWidgetMoveUp),
+            ('movedown', 'go-down', 'Move the selected widget down',
+             'Move down',
+             self.slotWidgetMoveDown),
+            ('delete', 'delete', 'Remove the selected widget',
+             'Delete',
+             self.slotWidgetDelete)
             ):
 
-            b = qt.QToolButton(edithbox)
-            b.setFocusPolicy(qt.QWidget.TabFocus)
-            b.setPixmap( qt.QPixmap("%s/icons/stock-%s.png" % (mdir, icon)) )
-            qt.QToolTip.add(b, tooltip)
-            self.editbuttons[name] = b
+            a = action.Action(self, slot,
+                              iconfilename = 'stock-%s.png' % icon,
+                              menutext = menutext,
+                              statusbartext = tooltip,
+                              tooltiptext = tooltip)
+            b = a.addTo(horzbox)
+            b.setAutoRaise(True)
+            self.boxlayout.addWidget(b)
+            a.addTo(editmenu)
+            self.editactions[name] = a
 
         # put widgets in a movable splitter
         split = qt.QSplitter(totvbox)
@@ -270,7 +290,7 @@ class TreeEditWindow(qt.QDockWindow):
             action.enable( wc.willAllowParent(selw) )
 
         # delete shouldn't allow root to be deleted
-        self.editbuttons['delete'].setEnabled(
+        self.editactions['delete'].enable(
             not isinstance(selw, widgets.Root) )
 
     def slotItemSelected(self, item):
@@ -437,3 +457,27 @@ class TreeEditWindow(qt.QDockWindow):
         # call the function if item was selected
         if ret >= 0:
             fnmap[ret]()
+
+    def slotWidgetDelete(self, a):
+        """Delete the widget selected."""
+
+        # get the widget to act as the parent
+        w = self.itemselected.widget
+        if w == None:
+            w = self.itemselected.parent.widget
+            assert w != None
+
+        # find the parent
+        p = w.parent
+        assert p != None
+
+        # delete the widget
+        p.removeChild(w.name)
+        self.document.setModified()
+
+    def slotWidgetMoveUp(self, a):
+        pass
+
+    def slotWidgetMoveDown(self, a):
+        pass
+    

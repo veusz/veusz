@@ -55,9 +55,6 @@ class Widget(object):
         # store child widgets
         self.children = []
         
-        # automatic child name index
-        self.child_index = 1
-
         # position of this widget on its parent
         self.position = (0., 0., 1., 1.)
 

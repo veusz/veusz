@@ -94,6 +94,7 @@ class MainWindow(qt.QMainWindow):
         menus = [
 
             ('file', '&File'),
+            ('edit', '&Edit'),
             ('data', '&Data'),
             ('insert', '&Insert'),
             ('view', '&View'),

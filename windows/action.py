@@ -66,8 +66,22 @@ class Action(qt.QObject):
 
         widget can be an instance of QToolBar, QPopupMenu, a Q[HV]Box..."""
 
-        if ( isinstance(widget, qt.QToolBar) or isinstance(widget, qt.QHBox) or
-             isinstance(widget, qt.QVBox) ):
+        if isinstance(widget, qt.QPopupMenu):
+            if self.iconset != None:
+                num = widget.insertItem(self.iconset, self.menutext)
+            else:
+                num = widget.insertItem(self.menutext)
+            widget.connectItem(num, self.slotAction)
+            self.items.append( (widget, num) )
+
+            self.connect(widget, qt.SIGNAL('highlighted(int)'),
+                         self.slotMenuHighlighted)
+            self.connect(widget, qt.SIGNAL('aboutToHide()'),
+                         self.slotMenuAboutToHide)
+
+            return num
+
+        else:
             b = qt.QToolButton(widget)
             if self.iconset != None:
                 b.setIconSet(self.iconset)
@@ -81,28 +95,18 @@ class Action(qt.QObject):
 
             self.items.append( (b,) )
 
-        elif isinstance(widget, qt.QPopupMenu):
-            if self.iconset != None:
-                num = widget.insertItem(self.iconset, self.menutext)
-            else:
-                num = widget.insertItem(self.menutext)
-            widget.connectItem(num, self.slotAction)
-            self.items.append( (widget, num) )
-
-            self.connect(widget, qt.SIGNAL('highlighted(int)'),
-                         self.slotMenuHighlighted)
-            self.connect(widget, qt.SIGNAL('aboutToHide()'),
-                         self.slotMenuAboutToHide)
-
-        else:
-            assert False
+            return b
 
     def enable(self, enabled = True):
         """Enabled the item in the connected objects."""
 
         for i in self.items:
-            if isinstance(i[0], qt.QToolButton):
-                i[0].setEnabled(enabled)
+            if isinstance(i[0], qt.QButton):
+                if enabled:
+                    i[0].show()
+                else:
+                    i[0].hide()
+                #i[0].setEnabled(enabled)
             elif isinstance(i[0], qt.QPopupMenu):
                 i[0].setItemVisible(i[1], enabled)
             else:
