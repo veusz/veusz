@@ -1,0 +1,29 @@
+Welcome to Veusz
+----------------
+Velvet Ember Under Sky Zenith
+-----------------------------
+
+Veusz is Copyright (C) 2003 Jeremy S. Sanders <jeremy@jeremysanders.net>
+
+Veusz is a scientific plotting package written in Python. It uses PyQt
+for display and user-interfaces, and Numarray for handling the numeric
+data. Veusz is licenced under the GPL. Please read the file COPYING
+included in this distribution for information about the licence.
+
+This is a very preliminary version of the program. It demonstrates
+some of the features but has no human-usable interface as yet.
+
+The idea is to have a program which can generate publication-ready
+plots in Postscript, be easily scriptable, and easily extended.
+
+Ideally, features to be included are:
+ o Plotting
+ o Fitting data
+ o Contour plots
+ o Image data
+...
+
+Please see the file INSTALL for installation instructions.
+
+
+
