@@ -24,8 +24,8 @@
 import plotters
 import widgetfactory
 import setting
-import numarray
-import numarray.ieeespecial
+import numarray as N
+import numarray.ieeespecial as NIE
 import utils
 
 class Fit(plotters.FunctionPlotter):
@@ -87,14 +87,27 @@ class Fit(plotters.FunctionPlotter):
         s = self.settings
         names = s.values.keys()
         names.sort()
-        params = numarray.array( [s.values[i] for i in names] )
+        params = N.array( [s.values[i] for i in names] )
 
         # FIXME: loads of error handling!!
         d = self.document
+
+        xvals = d.getData(s.xData).data
+        ydata = d.getData(s.yData)
+        yvals = ydata.data
+        yserr = ydata.serr
+
+        if yserr == None:
+            if ydata.perr != None and ydata.nerr != None:
+                print "Warning: Symmeterising positive and negative errors"
+                yserr = N.sqrt( ydata.perr**2 + ydata.nerr**2 )
+            else:
+                print "Warning: No errors on y values. Assuming 5% errors."
+                yserr = yvals*0.05
+        
         retn = utils.fitLM(self.evalfunc, params,
-                           d.getData(s.xData).data,
-                           d.getData(s.yData).data,
-                           1. / d.getData(s.yData).serr)
+                           xvals,
+                           yvals, yserr)
 
         vals = {}
         for i, v in zip(names, retn):
@@ -117,7 +130,7 @@ class Fit(plotters.FunctionPlotter):
         try:
             return eval(s.function, env)
         except:
-            return numarray.ieeespecial.nan
+            return NIE.nan
 
 # allow the factory to instantiate an x,y plotter
 widgetfactory.thefactory.register( Fit )

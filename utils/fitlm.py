@@ -63,8 +63,9 @@ def fitLM(func, params, xvals, yvals, errors,
     alpha = N.zeros( (len(params), len(params)), N.Float64 )
     derivs = N.zeros( (len(params), len(xvals)), N.Float64 )
 
+    done = False
     iters = 0
-    while iters < maxiters:
+    while iters < maxiters and not done:
         # iterate over each of the parameters and calculate the derivatives
         # of chi2 to populate the beta vector
 
@@ -124,10 +125,7 @@ def fitLM(func, params, xvals, yvals, errors,
             str = ("%5i " + "%8g " * (len(params)+1)) % tuple(p)
             print str
 
-            if done:
-                break
-
-    if iters >= maxiters:
+    if not done:
         sys.stderr.write("Warning: maximum number of iterations reached\n")
 
     return params
