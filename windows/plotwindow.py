@@ -134,7 +134,7 @@ class PlotWindow( qt.QScrollView ):
 
         # no threads, so can't get interrupted here
         if self.document.changeset != self.docchangeset:
-            self.updateContents(0, 0, 100000, 100000)
+            self.updateContents()
 
     def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
         """Called when the contents need repainting."""

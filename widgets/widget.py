@@ -284,5 +284,10 @@ class Widget(object):
         if ismodified:
             self.document.setModified(True)
 
+    def readDefaults(self):
+        """Read the default settings."""
+
+        self.settings.readDefaults('', self.name)
+
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )

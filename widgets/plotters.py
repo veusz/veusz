@@ -98,7 +98,8 @@ class FunctionPlotter(GenericPlotter):
         s.add( setting.Line('Line',
                             descr = 'Function line settings') )
 
-        s.readDefaults()
+        if type(self) == FunctionPlotter:
+            self.readDefaults()
         
     def _getUserDescription(self):
         """User-friendly description."""
@@ -330,7 +331,6 @@ class PointPlotter(GenericPlotter):
                            descr = 'Variable containing y data'), 0 )
         s.add( setting.Str('xData', 'x',
                            descr = 'Variable containing x data'), 0 )
-        s.readDefaults()
 
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings') )
@@ -340,6 +340,9 @@ class PointPlotter(GenericPlotter):
                              descr = 'Marker fill settings') )
         s.add( setting.Line('ErrorBarLine',
                             descr = 'Error bar line settings') )
+
+        if type(self) == PointPlotter:
+            self.readDefaults()
 
     def _getUserDescription(self):
         """User-friendly description."""
@@ -596,7 +599,8 @@ class TextLabel(GenericPlotter):
         s.add( setting.Text('Text',
                             descr = 'Text settings') )
 
-        s.readDefaults()
+        if type(self) == TextLabel:
+            self.readDefaults()
 
     # convert text to alignments used by Renderer
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }

@@ -52,8 +52,8 @@ class Fit(plotters.FunctionPlotter):
         f.newDefault('a + b*x')
         f.descr = 'Function to fit'
 
-        # FIXME need way not to read defaults if not "topmost" class
-        s.readDefaults()
+        if type(self) == Fit:
+            self.readDefaults()
 
         self.addAction( 'fit', self.actionFit,
                         descr='Fit function' )

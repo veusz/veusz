@@ -18,6 +18,7 @@
 
 # $Id$
 
+from settingdb import *
 from setting import *
 from settings import *
 from controls import *

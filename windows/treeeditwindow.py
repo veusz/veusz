@@ -398,6 +398,7 @@ class TreeEditWindow(qt.QDockWindow):
         popup.insertItem('Make default for "%s" widgets' % type, 200)
         popup.insertItem('Make default for "%s" widgets called "%s"' %
                          (type, name), 201)
+        popup.insertItem('Forget this default setting', 202)
         
         ret = popup.exec_loop(
             button.mapToGlobal( qt.QPoint(0, button.height()) ))
@@ -409,25 +410,21 @@ class TreeEditWindow(qt.QDockWindow):
             100: (lambda: doc.propagateSettings(setn)),
             101: (lambda: doc.propagateSettings(setn, root=widget.parent,
                                                 maxlevels=1)),
-            102: (lambda: doc.propagateSettings(setn, widgetname=name))
+            102: (lambda: doc.propagateSettings(setn, widgetname=name)),
+            
+            200: (lambda: setn.setAsDefault(False)),
+            201: (lambda: setn.setAsDefault(True)),
+            202: setn.removeDefault
             }
 
-        # call a function if it's in the map
-        if ret in fnmap:
-            # FUDGE! NASTY HACK ALERT!
-            # if this line isn't here, then qt only allows drawing to the
-            # region occupied by the menu, due to some horrible clipping
-            # issue - probably need to ask Qt list...
-            # this line allows Qt to get rid of the menu first...
-            qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
-                                                      100000)
-            fnmap[ret]()
-        elif ret >= 0:
-            return qt.QMessageBox("Veusz",
-                                  "Not implemented. Sorry!",
-                                  qt.QMessageBox.Information,
-                                  qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                                  qt.QMessageBox.NoButton,
-                                  qt.QMessageBox.NoButton,
-                                  self).exec_loop()
+        # FUDGE! NASTY HACK ALERT!
+        # if this line isn't here, then qt only allows drawing to the
+        # region occupied by the menu, due to some horrible clipping
+        # issue - probably need to ask Qt list...
+        # this line allows Qt to get rid of the menu first...
+        # Don't think this actuall works
+        qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
+                                                  100000)
 
+        # call the function
+        fnmap[ret]()

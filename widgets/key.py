@@ -61,7 +61,9 @@ class Key(widget.Widget):
         s.add( setting.Float( 'vertManual',
                               0.,
                               descr = 'Manual vertical fractional position') )
-        s.readDefaults()
+
+        if type(self) == Key:
+            self.readDefaults()
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""

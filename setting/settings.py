@@ -150,32 +150,33 @@ class Settings:
             raise ValueError, '"%s" is not a setting' % name
 
 
-    def saveText(self, saveall, rootname = ''):
-        """Return the text ro reload the settings.
+    def saveText(self, saveall, rootname = None):
+        """Return the text which would reload the settings.
 
         if saveall is true, save those which haven't been modified.
         rootname is the part to stick on the front of the settings
         """
 
-        if rootname != '':
-            rootname += '/'
+        # we want to build the root up if we're not the first item
+        # (first item is implicit)
+        if rootname == None:
+            rootname = ''
+        else:
+            rootname += self.name + '/'
 
-        text = ''
-        for name in self.setnames:
-            val = self.setdict[name]
-
-            if isinstance(val, Settings):
-                # get text of sub preference
-                text += val.saveText(saveall, rootname + val.name)
-            else:
-                if saveall or not val.isDefault():
-                    text += "Set('%s%s', %s)\n" % ( rootname, name,
-                                                    repr(val.get()) )
+        text = ''.join( [self.setdict[name].saveText(saveall, rootname)
+                         for name in self.setnames] )
         return text
 
-    def readDefaults(self):
-        """Return default values from saved text."""
+    def readDefaults(self, root, widgetname):
+        """Return default values from saved text.
 
-        # FIXME
-        pass
+        root is the path of the setting in the db, built up by settings
+        above this one
 
+        widgetname is the name of the widget this setting belongs to
+        """
+
+        root = '%s/%s' % (root, self.name)
+        for s in self.setdict.values():
+            s.readDefaults(root, widgetname)

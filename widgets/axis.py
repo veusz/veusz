@@ -90,11 +90,14 @@ class Axis(widget.Widget):
                                 descr = 'Grid line settings') )
         s.add( setting.AxisLabel('Label',
                                  descr = 'Axis label settings') )
-        
-        s.readDefaults()
+
+        if type(self) == Axis:
+            self.readDefaults()
 
         if self.name == 'y':
             s.direction = 'vertical'
+        elif self.name == 'x':
+            s.direction = 'horizontal'
 
         self.minorticks = None
         self.majorticks = None

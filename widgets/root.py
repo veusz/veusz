@@ -43,7 +43,9 @@ class Root(widget.Widget):
                                 descr='Width of the pages') )
         s.add( setting.Distance('height', '15cm',
                                 descr='Height of the pages') )
-        s.readDefaults()
+
+        if type(self) == Root:
+            self.readDefaults()
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the plotter. Clip graph inside bounds."""

@@ -58,7 +58,7 @@ class Graph(widget.Widget):
         s.add( setting.Line('Border',
                             descr = 'Graph border line') )
 
-        s.readDefaults()
+        self.readDefaults()
 
     def addDefaultSubWidgets(self):
         """Add axes automatically."""

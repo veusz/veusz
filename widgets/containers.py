@@ -183,7 +183,10 @@ class Grid(widget.Widget):
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
                                  'Distance from bottom of graph'
                                  'to edge of page') )
-        s.readDefaults()
+
+        # we're not descended from
+        if type(self) == Grid:
+            self.readDefaults()
 
         self.addAction( 'zeroMargins', self.actionZeroMargins,
                         descr = 'Zero graph margins' )

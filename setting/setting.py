@@ -30,6 +30,8 @@ s.fromText('42')
 
 import utils
 import controls
+import widgets
+from settingdb import settingdb
 
 # if invalid type passed to set
 class InvalidType(Exception):
@@ -47,6 +49,73 @@ class Setting:
         self.default = val
         self.onmodified = []
         self.set(val)
+
+    def readDefaults(self, root, widgetname):
+        """Check whether the user has a default for this setting."""
+
+        deftext = None
+        unnamedpath = '%s/%s' % (root, self.name)
+        if unnamedpath in settingdb.database:
+            deftext = settingdb.database[unnamedpath]
+
+        # named defaults supersedes normal defaults
+        namedpath = '%s_NAME:%s' % (widgetname, unnamedpath)
+        if namedpath in settingdb.database:
+            deftext = settingdb.database[namedpath]
+    
+        if deftext != None:
+            self.set( self.fromText(deftext) )
+            self.default = self.val
+
+    def removeDefault(self):
+        """Remove the default setting for this setting."""
+
+        # build up setting path
+        path = ''
+        item = self
+        while not isinstance(item, widgets.Widget):
+            path = '/%s%s' % (item.name, path)
+            item = item.parent
+
+        # specific setting to this widgetname
+        namedpath = '%s_NAME:%s' % (item.name, path)
+
+        # remove the settings (ignore if they are not set)
+        if path in settingdb.database:
+            del settingdb.database[path]
+
+        if namedpath in settingdb.database:
+            del settingdb.database[namedpath]
+            print settingdb.database
+
+    def setAsDefault(self, withwidgetname = False):
+        """Set the current value of this setting as the default value
+
+        If withwidthname is True, then it is only the default for widgets
+        of the particular name this setting is contained within."""
+
+        # build up setting path
+        path = ''
+        item = self
+        while not isinstance(item, widgets.Widget):
+            path = '/%s%s' % (item.name, path)
+            item = item.parent
+
+        # if the setting is only for widgets with a certain name
+        if withwidgetname:
+            path = '%s_NAME:%s' % (item.name, path)
+
+        # set the default
+        settingdb.database[path] = self.toText()
+
+    def saveText(self, saveall, rootname = ''):
+        """Return text to restore the value of this setting."""
+
+        if saveall or not self.isDefault():
+            return "Set('%s%s', %s)\n" % ( rootname, self.name,
+                                           repr(self.get()) )
+        else:
+            return ''
 
     def resetToDefault(self):
         """Reset the value to its default."""
