@@ -421,16 +421,9 @@ class MainWindow(qt.QMainWindow):
     def slotFileQuit(self):
         """File quit chosen."""
 
-        # FIXME check whether this causes quit dialog to be shown twice...
-        # does the user want to save first?
-        if self.document.isModified():
-            v = self.queryOverwrite()
-            if v == qt.QMessageBox.Cancel:
-                return
-            elif v == qt.QMessageBox.Yes:
-                self.slotFileSave()
-        
-        qt.qApp.closeAllWindows()
+        # note: may need to be fixed if supports multiple top-level windows
+        # doing this prompts the user for saving if necessary
+        self.close(True)
         
     def slotViewPreviousPage(self):
         """View the previous page."""
