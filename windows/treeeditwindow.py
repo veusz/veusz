@@ -417,14 +417,6 @@ class TreeEditWindow(qt.QDockWindow):
             202: setn.removeDefault
             }
 
-        # FUDGE! NASTY HACK ALERT!
-        # if this line isn't here, then qt only allows drawing to the
-        # region occupied by the menu, due to some horrible clipping
-        # issue - probably need to ask Qt list...
-        # this line allows Qt to get rid of the menu first...
-        # Don't think this actuall works
-        qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
-                                                  100000)
-
-        # call the function
-        fnmap[ret]()
+        # call the function if item was selected
+        if ret >= 0:
+            fnmap[ret]()

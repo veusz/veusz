@@ -140,11 +140,14 @@ class PlotWindow( qt.QScrollView ):
         """Called when the contents need repainting."""
 
         widget = self.document.basewidget
+        dorepaint = False
 
         # draw data into background pixmap if modified
         if ( self.zoomfactor != self.oldzoom or
              self.document.changeset != self.docchangeset or
              self.forceupdate ):
+
+            dorepaint = painter.hasClipping()
 
             self.setOutputSize()
             
@@ -191,4 +194,6 @@ class PlotWindow( qt.QScrollView ):
         if len(widget.children) == 0:
             self.drawLogo(painter)
         
-        
+        # if we had a clipped region, we need to call this again...
+        if dorepaint:
+            self.updateContents()
