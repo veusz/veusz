@@ -27,5 +27,6 @@ from containers import *
 from plotters import *
 from page import *
 from root import *
+from key import *
 from widgetfactory import *
 
