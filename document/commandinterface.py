@@ -28,6 +28,7 @@ external programs.
 
 import sys
 import string
+import qt
 
 import widgets
 import utils
@@ -143,6 +144,19 @@ class CommandInterface:
             print "Symmetric errors = %s" % str( d.getSymErr(name) )
             print "Negative errors = %s" % str( d.getNegErr(name) )
             print "Positive errors = %s" % str( d.getPosErr(name) )
+
+
+    def Print(self):
+        """Print document."""
+        p = qt.QPrinter()
+
+        if p.setup():
+            p.newPage()
+            pnt = qt.QPainter()
+            pnt.begin( p )
+            self.document.getBaseWidget().draw( (50, 50, 350, 350), pnt )
+            pnt.end()
+            
 
     def WriteEPS(self, filename):
         """Write contents of graph to an eps file."""

@@ -186,7 +186,7 @@ class PreferencesText(GenericPrefType):
 
     def _addPrefs(self):
         """ Initialise list of preferences """
-        self.prefs.addPref( 'font', 'string', 'Helvetica' )
+        self.prefs.addPref( 'font', 'string', 'Times-Roman' )
         self.prefs.addPref( 'size', 'int', 12 )
         self.prefs.addPref( 'italic', 'int', 0 )
         self.prefs.addPref( 'bold', 'int', 0 )
@@ -202,6 +202,7 @@ class PreferencesText(GenericPrefType):
         if self.bold: weight = qt.QFont.Bold
         f = qt.QFont(self.font, self.size,  weight, self.italic)
         if self.underline: f.setUnderline(1)
+        f.setStyleHint( qt.QFont.Times, qt.QFont.PreferDevice )
         return f
 
     def notHidden(self):

@@ -58,7 +58,7 @@ class AxisTicks:
     allowed_minorintervals_log = (1., 3., 6., 9., 12., 15., 19.)
 
     # how much we should allow axes to extend to zero or intervals
-    max_extend_factor = 0.10
+    max_extend_factor = 0.15
 
     def __init__( self, minval, maxval, noticks, nominorticks,
                   logaxis = False, prefermore = True,

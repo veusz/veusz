@@ -101,8 +101,8 @@ class FunctionPlotter(GenericPlotter):
 
     typename='function'
     
-    def __init__(self, parent, name=None, axis1=None, axis2=None,
-                 f=None):
+    def __init__(self, parent, function=None, name=None, axis1=None,
+                 axis2=None):
         """Initialise plotter with axes."""
 
         GenericPlotter.__init__(self, parent,
@@ -120,8 +120,8 @@ class FunctionPlotter(GenericPlotter):
         self.addPref('iter', 'int', 1)
         self.readPrefs()
 
-        if f != None:
-            self.function = f
+        if function != None:
+            self.function = function
         
         self.Line = utils.PreferencesPlotLine('FunctionPlotterLine')
         self.Fill1 = utils.PreferencesPlotFill('FunctionFill1')

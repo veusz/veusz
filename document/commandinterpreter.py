@@ -78,6 +78,7 @@ class CommandInterpreter:
                       'Get': i.Get,
                       'Set': i.Set,
                       'SetData': i.SetData,
+                      'Print': i.Print,
                       'WriteEPS': i.WriteEPS }
 
         for i in self.cmds.items():
