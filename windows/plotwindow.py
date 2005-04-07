@@ -42,11 +42,12 @@ class PlotWindow( qt.QScrollView ):
         self.document = document
         self.docchangeset = 99999
 
-        self.size = (-1, -1)
+        self.size = (1, 1)
         self.oldzoom = -1.
         self.zoomfactor = 1.
         self.pagenumber = 0
         self.forceupdate = False
+        self.setOutputSize()
 
         # set up redrawing timer
         self.timer = qt.QTimer(self)
@@ -67,6 +68,7 @@ class PlotWindow( qt.QScrollView ):
         if size != self.size:
             self.size = size
             self.bufferpixmap = qt.QPixmap( *self.size )
+            self.bufferpixmap.fill( self.colorGroup().base() )
             self.resizeContents( *self.size )
 
     def setZoomFactor(self, zoomfactor):
@@ -133,21 +135,10 @@ class PlotWindow( qt.QScrollView ):
         """Called after timer times out, to check for updates to window."""
 
         # no threads, so can't get interrupted here
-        if self.document.changeset != self.docchangeset:
-            self.updateContents()
-
-    def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
-        """Called when the contents need repainting."""
-
-        widget = self.document.basewidget
-        dorepaint = False
-
         # draw data into background pixmap if modified
         if ( self.zoomfactor != self.oldzoom or
              self.document.changeset != self.docchangeset or
              self.forceupdate ):
-
-            dorepaint = painter.hasClipping()
 
             self.setOutputSize()
             
@@ -165,13 +156,14 @@ class PlotWindow( qt.QScrollView ):
 
             self.emit( qt.PYSIGNAL("sigUpdatePage"), (self.pagenumber,) )
 
-            self.docchangeset = self.document.changeset
             self.oldzoom = self.zoomfactor
             self.forceupdate = False
+            self.docchangeset = self.document.changeset
 
-            # redraw whole window
-            clipx = clipy = 0
-            clipw = cliph = -1
+            self.updateContents()
+            
+    def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
+        """Called when the contents need repainting."""
 
         # blt the visible part of the pixmap into the image
         painter.drawPixmap(clipx, clipy, self.bufferpixmap,
@@ -192,9 +184,6 @@ class PlotWindow( qt.QScrollView ):
                              qt.QBrush( self.colorGroup().dark() ))
 
         # add logo if no children
+        widget = self.document.basewidget
         if len(widget.children) == 0:
             self.drawLogo(painter)
-        
-        # if we had a clipped region, we need to call this again...
-        if dorepaint:
-            self.updateContents()

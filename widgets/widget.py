@@ -350,6 +350,7 @@ class Widget(object):
             if existingname:
                 w.name = w.chooseName()
 
+            self.document.setModified(True)
             return True
 
 # allow the factory to instantiate a generic widget
