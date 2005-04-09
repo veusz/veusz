@@ -99,6 +99,12 @@ class FunctionPlotter(GenericPlotter):
         s.add( setting.Line('Line',
                             descr = 'Function line settings') )
 
+        s.add( setting.PlotterFill('FillBelow',
+                                   descr = 'Fill below function') )
+        
+        s.add( setting.PlotterFill('FillAbove',
+                                   descr = 'Fill above function') )
+
         if type(self) == FunctionPlotter:
             self.readDefaults()
         
@@ -112,6 +118,9 @@ class FunctionPlotter(GenericPlotter):
         """ Plot the points in xpts, ypts."""
         x1, y1, x2, y2 = bounds
 
+        maxdeltax = (x2-x1)*3/4
+        maxdeltay = (y2-y1)*3/4
+
         # idea is to collect points until we go out of the bounds
         # or reach the end, then plot them
         pts = []
@@ -124,11 +133,8 @@ class FunctionPlotter(GenericPlotter):
                     painter.drawPolyline( qt.QPointArray(pts) )
                     pts = []
             else:
-                dx = abs(x-lastx)
-                dy = abs(y-lasty)
-
                 # if the jump wasn't too large, add the point to the points
-                if dx < (x2-x1)*3/4 and dy < (y2-y1)*3/4:
+                if abs(x-lastx) < maxdeltax and abs(y-lasty) < maxdeltay:
                     pts.append(x)
                     pts.append(y)
                 else:
@@ -143,6 +149,44 @@ class FunctionPlotter(GenericPlotter):
         # draw remaining points
         if len(pts) >= 4:
             painter.drawPolyline( qt.QPointArray(pts) )
+
+    def _fillRegion(self, painter, pxpts, pypts, bounds, belowleft):
+        """Fill the region above/below or left/right of the points.
+
+        belowleft fills below if the variable is 'x', or left if 'y'
+        otherwise it fills above/right."""
+
+        # find starting and ending points for the filled region
+        x1, y1, x2, y2 = bounds
+        if self.settings.variable == 'x':
+            if belowleft:
+                pts = [x1, y2]
+                endpt = [x2, y2]
+            else:
+                pts = [x1, y1]
+                endpt = [x2, y1]
+        else:
+            if belowleft:
+                pts = [x1, y1]
+                endpt = [x1, y2]
+            else:
+                pts = [x2, y1]
+                endpt = [x2, y2]
+
+        # add the points between (clipped to the bounds*2 - helps edges)
+        xw = x2-y2
+        xclip = N.clip(pxpts, x1-xw, x2+xw)
+        yw = y2-y1
+        yclip = N.clip(pypts, y1-yw, y2+yw)
+        for x, y in itertools.izip(xclip, yclip):
+            pts.append(x)
+            pts.append(y)
+
+        # stick on the ending point
+        pts += endpt
+
+        # actually do the filling
+        painter.drawPolygon( qt.QPointArray(pts) )
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -217,11 +261,6 @@ class FunctionPlotter(GenericPlotter):
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
         # draw the function line
-        if not s.Line.hide and not bad:
-            painter.setBrush( qt.QBrush() )
-            painter.setPen( s.Line.makeQPen(painter) )
-            self._plotLine(painter, pxpts, pypts, posn)
-
         if bad:
             # not sure how to deal with errors here
             painter.setPen( qt.QColor('red') )
@@ -231,99 +270,23 @@ class FunctionPlotter(GenericPlotter):
             painter.drawText( qt.QRect(x1, y1, x2-x1, y2-y1),
                               qt.Qt.AlignCenter,
                               "Cannot evaluate '%s'" % s.function )
+        else:
+            if not s.FillBelow.hide:
+                painter.setBrush( s.FillBelow.makeQBrush() )
+                painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                self._fillRegion(painter, pxpts, pypts, posn, True)
+
+            if not s.FillAbove.hide:
+                painter.setBrush( s.FillAbove.makeQBrush() )
+                painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                self._fillRegion(painter, pxpts, pypts, posn, False)
+
+            if not s.Line.hide:
+                painter.setBrush( qt.QBrush() )
+                painter.setPen( s.Line.makeQPen(painter) )
+                self._plotLine(painter, pxpts, pypts, posn)
 
         painter.restore()
-
-##     def _fillYFn(self, painter, xpts, ypts, bounds, leftfill):
-##         """ Take the xpts and ypts, and fill above or below the line."""
-##         if len(xpts) == 0:
-##             return
-
-##         x1, y1, x2, y2 = bounds
-
-##         if leftfill:
-##             pts = [x1, y1]
-##         else:
-##             pts = [x2, y1]
-
-##         for x,y in zip(xpts, ypts):
-##             pts.append( _trim(x, x1, x2) )
-##             pts.append(y)
-
-##         if leftfill:
-##             pts.append(x2)
-##         else:
-##             pts.append(x1)
-##         pts.append(y2)
-
-##         painter.drawPolygon( qt.QPointArray(pts) )
-
-##     def _fillXFn(self, painter, xpts, ypts, bounds, belowfill):
-##         """ Take the xpts and ypts, and fill to left or right of the line."""
-##         if len(ypts) == 0:
-##             return
-
-##         x1, y1, x2, y2 = bounds
-
-##         if belowfill:
-##             pts = [x1, y2]
-##         else:
-##             pts = [x1, y1]
-
-##         for x,y in zip(xpts, ypts):
-##             pts.append(x)
-##             pts.append( _trim(y, y1, y2) )
-
-##         pts.append( x2 )
-##         if belowfill:
-##             pts.append( y2 )
-##         else:
-##             pts.append( y1 )
-
-##         painter.drawPolygon( qt.QPointArray(pts) )
-
-##     def draw(self, parentposn, painter):
-##         """Plot the function."""
-
-##         posn = GenericPlotter.draw(self, parentposn, painter)
-
-##         # the algorithm is to work out the fn for each pixel on the plot
-##         # need to convert pixels -> graph coord -> calc fn -> pixels
-
-##         x1, y1, x2, y2 = posn
-
-##         ax1 = self.getAxisVar( self.axes[0] )
-##         ax2 = self.getAxisVar( self.axes[1] )
-
-##         if self.xfunc:
-##             xplotter = numarray.arange(x1, x2+1, self.iter)
-##             self.fnenviron['x'] = ax1.plotterToGraphCoords(posn, xplotter)
-##             # HACK for constants
-##             y = eval( self.function + " + (0*x)", self.fnenviron )
-##             yplotter = ax2.graphToPlotterCoords(posn, y)
-##         else:
-##             yplotter = numarray.arange(y1, y2+1, self.iter)
-##             self.fnenviron['y'] = ax2.plotterToGraphCoords(posn, yplotter)
-##             # HACK for constants
-##             x = eval( self.function + " + (0*y)", self.fnenviron )
-##             xplotter = ax1.graphToPlotterCoords(posn, x)
-
-##         # here we go through the generated points, and plot those that
-##         # are in the plot (we can clip fairly easily).
-##         # each time there is a section we can plot, we plot it
-        
-##         painter.save()
-##         painter.setPen( qt.QPen( qt.QColor(), 0, qt.Qt.NoPen ) )
-
-##         painter.setBrush( qt.QBrush(qt.QColor("darkcyan"),
-##                                     qt.Qt.Dense6Pattern) )
-##         self._fillXFn(painter, xplotter, yplotter, posn, 1)
-        
-##         painter.setBrush( qt.QBrush() )
-##         painter.setPen( self.Line.makeQPen(painter) )
-##         self._plotLine(painter, xplotter, yplotter, posn)
-
-##         painter.restore()
 
 # allow the factory to instantiate an function plotter
 widgetfactory.thefactory.register( FunctionPlotter )

@@ -1,6 +1,7 @@
 * 2005-04-09 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Different types of error bars supported (diamond, curve, box)
 	- Improve function plot line clipping near edges
+	- Filled regions above/below/left/right of function
 	
 * 2005-04-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed widget moving buttons! - correct algorithm now

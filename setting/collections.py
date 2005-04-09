@@ -125,6 +125,14 @@ class GraphBrush(Brush):
 
         self.get('color').newDefault('white')
 
+class PlotterFill(Brush):
+    '''Filling used for filling on plotters.'''
+
+    def __init__(self, name, descr=''):
+        Brush.__init__(self, name, descr)
+
+        self.get('hide').newDefault(True)
+
 class MajorTick(Line):
     '''Major tick settings.'''
 
