@@ -1,3 +1,6 @@
+* 2005-04-09 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Different types of error bars supported (diamond, curve, box)
+
 * 2005-04-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed widget moving buttons! - correct algorithm now
 	- Implemented save/restore of window and dock positions between

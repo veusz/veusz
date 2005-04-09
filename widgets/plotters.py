@@ -22,6 +22,7 @@
 # $Id$
 
 import qt
+import itertools
 import numarray as N
 
 import widget
@@ -114,7 +115,7 @@ class FunctionPlotter(GenericPlotter):
         # idea is to collect points until we go out of the bounds
         # or reach the end, then plot them
         pts = []
-        for x, y in zip(xpts, ypts):
+        for x, y in itertools.izip(xpts, ypts):
 
             if x >= x1 and x <= x2 and y >= y1 and y <= y2:
                 pts.append(x)
@@ -325,12 +326,17 @@ class PointPlotter(GenericPlotter):
         
         GenericPlotter.__init__(self, parent, name=name)
         s = self.settings
+
         s.add( setting.Distance('markerSize', '3pt'), 0 )
         s.add( setting.Choice('marker', utils.MarkerCodes, 'circle'), 0 )
         s.add( setting.Str('yData', 'y',
                            descr = 'Variable containing y data'), 0 )
         s.add( setting.Str('xData', 'x',
                            descr = 'Variable containing x data'), 0 )
+        s.add( setting.Choice('errorStyle',
+                              ['bar', 'box', 'diamond', 'curve',
+                               'barbox', 'bardiamond', 'barcurve'], 'bar',
+                              descr='Style of error bars to plot') )
 
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings') )
@@ -356,11 +362,9 @@ class PointPlotter(GenericPlotter):
                     axes):
         """Plot error bars (horizontal and vertical)."""
 
-        # list of output lines
-        pts = []
-
         # get the data
-        xdata = self.document.getData(self.settings.xData)
+        s = self.settings
+        xdata = self.document.getData(s.xData)
 
         # draw horizontal error bars
         if xdata.hasErrors():
@@ -375,12 +379,12 @@ class PointPlotter(GenericPlotter):
             xmax = N.clip(xmax, posn[0]-1, posn[2]+1)
 
             # draw lines between each of the points
-            for i in zip(xmin, yplotter, xmax, yplotter):
-                pts += i
+        else:
+            xmin = xmax = None
 
         # draw vertical error bars
         # get data
-        ydata = self.document.getData(self.settings.yData)
+        ydata = self.document.getData(s.yData)
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
 
@@ -393,11 +397,82 @@ class PointPlotter(GenericPlotter):
             ymax = N.clip(ymax, posn[1]-1, posn[3]+1)
 
             # draw lines between each of the points
-            for i in zip(xplotter, ymin, xplotter, ymax):
-                pts += i
+        else:
+            ymin = ymax = None
 
-        if len(pts) != 0:
-            painter.drawLineSegments( qt.QPointArray(pts) )
+        # draw normal error bars
+        style = s.errorStyle
+        if style in {'bar':True, 'bardiamond':True,
+                     'barcurve':True, 'barbox': True}:
+            # list of output lines
+            pts = []
+
+            # vertical error bars
+            if ymin != None and ymax != None:
+                for i in itertools.izip(xplotter, ymin, xplotter,
+                                        ymax):
+                    pts += i
+            # horizontal error bars
+            if xmin != None and xmax != None:
+                for i in itertools.izip(xmin, yplotter, xmax,
+                                        yplotter):
+                    pts += i
+
+            if len(pts) != 0:
+                painter.drawLineSegments( qt.QPointArray(pts) )
+
+        # special error bars (only works with proper x and y errors)
+        if ( ymin != None and ymax != None and xmin != None and
+             xmax != None ):
+
+            # draw boxes
+            if style in {'box':True, 'barbox':True}:
+
+                # non-filling brush
+                painter.setBrush( qt.QBrush() )
+
+                for xmn, ymn, xmx, ymx in (
+                    itertools.izip(xmin, ymin, xmax, ymax)):
+
+                    painter.drawPolygon(
+                        qt.QPointArray([xmn, ymn, xmx, ymn, xmx, ymx,
+                                        xmn, ymx]) )
+
+            # draw diamonds
+            elif style in {'diamond':True, 'bardiamond':True}:
+
+                # non-filling brush
+                painter.setBrush( qt.QBrush() )
+
+                for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
+                    xplotter, yplotter, xmin, ymin, xmax, ymax):
+
+                    painter.drawPolygon(
+                        qt.QPointArray([xmn, yp, xp, ymx, xmx, yp, xp, ymn]) )
+
+            # draw curved errors
+            elif style in {'curve':True, 'barcurve': True}:
+
+                # non-filling brush
+                painter.setBrush( qt.QBrush() )
+
+                for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
+                    xplotter, yplotter, xmin, ymin, xmax, ymax):
+
+                    # break up curve into four arcs (for asym error bars)
+                    # qt geometry means we have to calculate lots
+                    painter.drawArc(xp - (xmx-xp), yp - (yp-ymx),
+                                    (xmx-xp)*2+1, (yp-ymx)*2+1,
+                                    0, 1440)
+                    painter.drawArc(xp - (xp-xmn), yp - (yp-ymx),
+                                    (xp-xmn)*2+1, (yp-ymx)*2+1,
+                                    1440, 1440)
+                    painter.drawArc(xp - (xp-xmn), yp - (ymn-yp),
+                                    (xp-xmn)*2+1, (ymn-yp)*2+1,
+                                    2880, 1440)
+                    painter.drawArc(xp - (xmx-xp), yp - (ymn-yp),
+                                    (xmx-xp)*2+1, (ymn-yp)*2+1,
+                                    4320, 1440)
 
     def _autoAxis(self, dataname, bounds):
         """Determine range of data."""
@@ -425,20 +500,20 @@ class PointPlotter(GenericPlotter):
 
         # simple continuous line
         if steps == 'off':
-            for xpt, ypt in zip(xvals, yvals):
+            for xpt, ypt in itertools.izip(xvals, yvals):
                 pts.append(xpt)
                 pts.append(ypt)
 
         # stepped line, with points on left
         elif steps == 'left':
-            for x1, x2, y1, y2 in zip(xvals[:-1], xvals[1:],
-                                      yvals[:-1], yvals[1:]):
+            for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
+                                                 yvals[:-1], yvals[1:]):
                 pts += [x1, y1, x2, y1, x2, y2]
 
         # stepped line, with points on right
         elif steps == 'right':
-            for x1, x2, y1, y2 in zip(xvals[:-1], xvals[1:],
-                                      yvals[:-1], yvals[1:]):
+            for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
+                                                 yvals[:-1], yvals[1:]):
                 pts += [x1, y1, x1, y2, x2, y2]
             
         # stepped line, with points in centre
@@ -450,8 +525,9 @@ class PointPlotter(GenericPlotter):
             xcen = axes[0].graphToPlotterCoords(posn,
                                                 0.5*(xv.data[:-1]+xv.data[1:]))
 
-            for x1, x2, xc, y1, y2 in zip(xvals[:-1], xvals[1:], xcen,
-                                          yvals[:-1], yvals[1:]):
+            for x1, x2, xc, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
+                                                     xcen,
+                                                     yvals[:-1], yvals[1:]):
                 pts += [x1, y1, xc, y1, xc, y2, x2, y2]
 
         else:
