@@ -628,12 +628,18 @@ class PointPlotter(GenericPlotter):
             size = int( utils.cnvtDist(s.markerSize, painter) )
 
             if not s.MarkerFill.hide:
+                # filling for markers
                 painter.setBrush( s.MarkerFill.makeQBrush() )
+            else:
+                # no-filling brush
+                painter.setBrush( qt.QBrush() )
 
             if not s.MarkerLine.hide:
+                # edges of markers
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
-                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                # invisible pen
+                painter.setPen( qt.QPen(qt.Qt.NoPen) )
                 
             utils.plotMarkers(painter, xplotter, yplotter, s.marker,
                               size)

@@ -3,6 +3,9 @@
 	- Improve function plot line clipping near edges
 	- Filled regions above/below/left/right of function
 	- Filled regions above/below xy points (or histogram)
+	- Axis setting to match one axis to another (equal scales)
+	- resolve function moved to document from commandinterface
+	(helps axis matching)
 	
 * 2005-04-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed widget moving buttons! - correct algorithm now

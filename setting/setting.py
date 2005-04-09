@@ -471,3 +471,79 @@ class FloatDict(Setting):
 
     def makeControl(self, *args):
         return controls.SettingMultiLine(self, *args)
+
+class WidgetPath(Str):
+    """A setting holding a path to a widget. This is checked for validity."""
+
+    def __init__(self, name, val, relativetoparent=True,
+                 allowedwidgets = None,
+                 descr=''):
+        """Initialise the setting.
+
+        The widget is located relative to
+        parent if relativetoparent is True, otherwise this widget.
+
+        If allowedwidgets != None, only those widgets types in the list are
+        allowed by this setting.
+        """
+
+        Str.__init__(self, name, val, descr=descr)
+        self.relativetoparent = relativetoparent
+        self.allowedwidgets = allowedwidgets
+
+    def convertTo(self, val):
+        """Validate the text is a name of a widget relative to
+        this one."""
+
+        if type(val) != str:
+            raise InvalidType
+
+        # InvalidType will get raised in getWidget if it is incorrect
+        w = self.getWidget(val)
+        if w == None:
+            return ''
+        else:
+            return val
+
+    def getWidget(self, val = None):
+        """Get the widget referred to. We double-check here to make sure
+        it's the one.
+
+        Returns None if setting is blank
+        InvalidType is raised if there's a problem
+        """
+
+        # this is a bit of a hack, so we don't have to pass a value
+        # for the setting (which we need to from convertTo)
+        if val == None:
+            val = self.val
+
+        if val == '':
+            return None
+
+        # find the widget associated with this setting
+        widget = self
+        while not isinstance(widget, widgets.Widget):
+            widget = widget.parent
+
+        # usually makes sense to give paths relative to a parent of a widget
+        if self.relativetoparent:
+            widget = widget.parent
+
+        # resolve the text to a widget
+        try:
+            widget = widget.document.resolve(widget, val)
+        except ValueError:
+            raise InvalidType
+
+        # check the widget against the list of allowed types if given
+        if self.allowedwidgets != None:
+            allowed = False
+            for c in self.allowedwidgets:
+                if isinstance(widget, c):
+                    allowed = True
+            if not allowed:
+                raise InvalidType
+        
+        return widget
+    

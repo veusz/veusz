@@ -344,3 +344,39 @@ class Document( qt.QObject ):
             # set the setting
             s.set(val)
             
+    def resolve(self, fromwidget, where):
+        """Resolve graph relative to the widget fromwidget
+
+        Allows unix-style specifiers, e.g. /graph1/x
+        Returns widget
+        """
+
+        parts = where.split('/')
+
+        if where[:1] == '/':
+            # relative to base directory
+            obj = self.basewidget
+        else:
+            # relative to here
+            obj = fromwidget
+
+        # iterate over parts in string
+        for p in parts:
+            if p == '..':
+                # relative to parent object
+                p = obj.parent
+                if p == None:
+                    raise ValueError, "Base graph has no parent"
+                obj = p
+            elif p == '.' or len(p) == 0:
+                # relative to here
+                pass
+            else:
+                # child specified
+                obj = obj.getChild( p )
+                if obj == None:
+                    raise ValueError, "Child '%s' does not exist" % p
+
+        # return widget
+        return obj
+

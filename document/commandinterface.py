@@ -67,50 +67,15 @@ class CommandInterface(qt.QObject):
 
     def Remove(self, name):
         """Remove a graph from the dataset."""
-        w = self._resolve(name)
+        w = self.document.resolve(self.currentwidget, name)
         w.parent.removeChild( w.name )
         self.document.setModified()
-
-    def _resolve(self, where):
-        """Resolve graph relative to current graph.
-
-        Allows unix-style specifiers, e.g. /graph1/x
-        Returns widget
-        """
-
-        parts = where.split('/')
-
-        if where[:1] == '/':
-            # relative to base directory
-            obj = self.document.basewidget
-        else:
-            # relative to here
-            obj = self.currentwidget
-
-        # iterate over parts in string
-        for p in parts:
-            if p == '..':
-                # relative to parent object
-                p = obj.parent
-                if p == None:
-                    raise ValueError, "Base graph has no parent"
-                obj = p
-            elif p == '.' or len(p) == 0:
-                # relative to here
-                pass
-            else:
-                # child specified
-                obj = obj.getChild( p )
-                if obj == None:
-                    raise ValueError, "Child '%s' does not exist" % p
-
-        # return widget
-        return obj
 
     def To(self, where):
         """Change to a graph within the current graph."""
 
-        self.currentwidget = self._resolve(where)
+        self.currentwidget = self.document.resolve(self.currentwidget,
+                                                   where)
 
         if self.verbose:
             print "Changed to graph '%s'" % self.currentwidget.path
@@ -118,7 +83,7 @@ class CommandInterface(qt.QObject):
     def List(self, where='.'):
         """List the contents of a graph."""
 
-        widget = self._resolve(where)
+        widget = self.document.resolve(self.currentwidget, where)
         children = widget.childnames
 
         if len(children) == 0:
@@ -136,7 +101,8 @@ class CommandInterface(qt.QObject):
     def GetChildren(self, where='.'):
         """Return a list of widgets which are children of the widget of the
         path given."""
-        return list( self._resolve(where).childnames )
+        return list( self.document.resolve(self.currentwidget,
+                                           where).childnames )
 
     def GetDatasets(self):
         """Return a list of names of datasets."""
@@ -233,7 +199,7 @@ class CommandInterface(qt.QObject):
     def Action(self, action, widget='.'):
         """Performs action on current widget."""
 
-        w = self._resolve(widget)
+        w = self.document.resolve(self.currentwidget, widget)
 
         # run action
         w.actionfuncs[action]()

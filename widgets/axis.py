@@ -63,6 +63,11 @@ class Axis(widget.Widget):
         s.add( setting.Bool('reflect', False,
                             descr = 'Place axis text and ticks on other side'
                             ' of axis') )
+        s.add( setting.WidgetPath('match', '',
+                                  descr =
+                                  'Match the scale of this axis to the '
+                                  'axis specified',
+                                  allowedwidgets = [Axis] ))
 
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
@@ -150,8 +155,25 @@ class Axis(widget.Widget):
         s = self.settings
         self.plottedrange = [s.min, s.max]
 
+        # match the scale of this axis to another
+        matched = False
+        if s.match != '':
+            # locate widget we're matching
+            # this is ensured to be an Axis
+            widget = s.get('match').getWidget()
+
+            # this looks valid + sanity checks
+            if (widget != None and widget != self and
+                widget.settings.match == ''):
+                # update if out of date
+                if widget.docchangeset != self.document.changeset:
+                    widget._computePlottedRange()
+                # copy the range
+                self.plottedrange = list(widget.plottedrange)
+                matched = True
+
         # automatic lookup of minimum
-        if s.min == 'Auto' or s.max == 'Auto':
+        if (s.min == 'Auto' or s.max == 'Auto') and not matched:
             autorange = self._autoLookupRange()
 
             if s.min == 'Auto':
