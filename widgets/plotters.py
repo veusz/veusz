@@ -115,16 +115,32 @@ class FunctionPlotter(GenericPlotter):
         # idea is to collect points until we go out of the bounds
         # or reach the end, then plot them
         pts = []
+        lastx = lasty = -65536
         for x, y in itertools.izip(xpts, ypts):
 
-            if x >= x1 and x <= x2 and y >= y1 and y <= y2:
-                pts.append(x)
-                pts.append(y)
-            else:
+            # ignore point if it outside sensible bounds
+            if x < -32767 or y < -32767 or x > 32767 or y > 32767:
                 if len(pts) >= 4:
                     painter.drawPolyline( qt.QPointArray(pts) )
                     pts = []
+            else:
+                dx = abs(x-lastx)
+                dy = abs(y-lasty)
 
+                # if the jump wasn't too large, add the point to the points
+                if dx < (x2-x1)*3/4 and dy < (y2-y1)*3/4:
+                    pts.append(x)
+                    pts.append(y)
+                else:
+                    # draw what we have until now, and start a new line
+                    if len(pts) >= 4:
+                        painter.drawPolyline( qt.QPointArray(pts) )
+                    pts = [x, y]
+
+            lastx = x
+            lasty = y
+
+        # draw remaining points
         if len(pts) >= 4:
             painter.drawPolyline( qt.QPointArray(pts) )
 
@@ -196,7 +212,9 @@ class FunctionPlotter(GenericPlotter):
             else:
                 pxpts = axes[0].graphToPlotterCoords(posn, x)
 
+        # clip data within bounds of plotter
         painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
         # draw the function line
         if not s.Line.hide and not bad:
