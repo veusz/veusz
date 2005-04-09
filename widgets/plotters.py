@@ -327,6 +327,10 @@ class PointPlotter(GenericPlotter):
                              descr = 'Marker fill settings') )
         s.add( setting.Line('ErrorBarLine',
                             descr = 'Error bar line settings') )
+        s.add( setting.PlotterFill('FillBelow',
+                                   descr = 'Fill below plot line') )
+        s.add( setting.PlotterFill('FillAbove',
+                                   descr = 'Fill above plot line') )
 
         if type(self) == PointPlotter:
             self.readDefaults()
@@ -442,6 +446,7 @@ class PointPlotter(GenericPlotter):
 
                     # break up curve into four arcs (for asym error bars)
                     # qt geometry means we have to calculate lots
+                    # the big numbers are in 1/16 degrees
                     painter.drawArc(xp - (xmx-xp), yp - (yp-ymx),
                                     (xmx-xp)*2+1, (yp-ymx)*2+1,
                                     0, 1440)
@@ -514,7 +519,29 @@ class PointPlotter(GenericPlotter):
         else:
             assert 0
 
-        painter.drawPolyline( qt.QPointArray(pts) )
+        if len(pts) >= 4:
+            if not s.FillBelow.hide:
+                # empty pen (line gets drawn below)
+                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                painter.setBrush( s.FillBelow.makeQBrush() )
+
+                # FIXME: may need to sort points here??
+                newpts = [pts[0], posn[3]] + pts + [pts[-2], posn[3]]
+                painter.drawPolygon( qt.QPointArray(newpts) )
+
+            if not s.FillAbove.hide:
+                # empty pen (line gets drawn below)
+                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                painter.setBrush( s.FillAbove.makeQBrush() )
+
+                # FIXME: may need to sort points here??
+                newpts = [pts[0], posn[1]] + pts + [pts[-2], posn[1]]
+                painter.drawPolygon( qt.QPointArray(newpts) )
+
+            # draw line between points
+            if not s.PlotLine.hide:
+                painter.setPen( s.PlotLine.makeQPen(painter) )
+                painter.drawPolyline( qt.QPointArray(pts) )
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -586,9 +613,8 @@ class PointPlotter(GenericPlotter):
         xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
         yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
 
-        # plot data line
-        if not s.PlotLine.hide:
-            painter.setPen( s.PlotLine.makeQPen(painter) )
+        # plot data line (and/or filling above or below)
+        if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
             self._drawPlotLine( painter, xplotter, yplotter, posn )
 
         # plot errors bars

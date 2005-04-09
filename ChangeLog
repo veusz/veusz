@@ -2,6 +2,7 @@
 	- Different types of error bars supported (diamond, curve, box)
 	- Improve function plot line clipping near edges
 	- Filled regions above/below/left/right of function
+	- Filled regions above/below xy points (or histogram)
 	
 * 2005-04-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed widget moving buttons! - correct algorithm now
