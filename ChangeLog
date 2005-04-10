@@ -1,3 +1,6 @@
+* 2005-04-10 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Added exception dialog to send in bug reports
+	
 * 2005-04-09 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Different types of error bars supported (diamond, curve, box)
 	- Improve function plot line clipping near edges

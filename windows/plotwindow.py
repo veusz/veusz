@@ -22,8 +22,10 @@
 # $Id$
 
 import os
+import sys
 import qt
 
+import dialogs.exceptiondialog
 import utils
 
 mdir = os.path.dirname(__file__)
@@ -149,8 +151,14 @@ class PlotWindow( qt.QScrollView ):
                                    self.pagenumber )
             if self.pagenumber >= 0:
                 # draw the data into the buffer
-                self.document.printTo( self.bufferpixmap, [self.pagenumber],
-                                       self.zoomfactor )
+                # errors cause an exception window to pop up
+                try:
+                    self.document.printTo( self.bufferpixmap,
+                                           [self.pagenumber],
+                                           self.zoomfactor )
+                except Exception:
+                    dialogs.exceptiondialog.showException(sys.exc_info())
+                    
             else:
                 self.pagenumber = 0
 
