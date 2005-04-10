@@ -25,7 +25,9 @@ import traceback
 import time
 import smtplib
 import email.MIMEText
+import sys
 
+import numarray
 import qt
 
 import utils
@@ -120,6 +122,8 @@ class _ExceptionDialog(qt.QDialog):
 
 _reportformat='''
 Veusz version: %s
+Python version: %s
+Numarray version: %s
 Date: %s
 
 %s
@@ -167,6 +171,8 @@ class _SendDialog(qt.QDialog):
         # make a text edit with the text to send (read only)
         self.text = _reportformat % (
             utils.version(),
+            sys.version,
+            numarray.__version__,
             time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
             text
             )
