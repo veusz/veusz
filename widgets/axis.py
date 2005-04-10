@@ -189,8 +189,11 @@ class Axis(widget.Widget):
                 self.plottedrange[1] = ( self.plottedrange[0] +
                                          max(1., self.plottedrange[0]*0.1) )
 
+        # handle axis values round the wrong way
+        if self.plottedrange[0] >= self.plottedrange[1]:
+            self.plottedrange = [1e-2, 1.]
+
         # work out tick values and expand axes if necessary
-        
         as = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
                                   s.MajorTicks.number, s.MinorTicks.number,
                                   extendbounds = s.autoExtend,
