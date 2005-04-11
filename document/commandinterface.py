@@ -179,8 +179,10 @@ class CommandInterface(qt.QObject):
         errors = sr.getInvalidConversions()
         return (datasets, errors)
 
-    def ImportFile(self, filename, descriptor):
+    def ImportFile(self, filename, descriptor, linked=False):
         """Read data from file with filename using descriptor.
+        If linked is True, the data won't be saved in a saved document,
+        the data will be reread from the file.
 
         Returned is a tuple (datasets, errors)
          where datasets is a list of datasets read
@@ -188,12 +190,20 @@ class CommandInterface(qt.QObject):
          converting the data
         """
 
+        # if there's a link, set it up
+        if linked:
+            LF = doc.LinkedFile(filename, descriptor)
+        else:
+            LF = None
+
         f = open(filename, 'r')
         stream = simpleread.FileStream(f)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream)
-        datasets = sr.setInDocument(self.document)
+        datasets = sr.setInDocument(self.document,
+                                    linkedfile=LF)
         errors = sr.getInvalidConversions()
+
         return (datasets, errors)
 
     def Action(self, action, widget='.'):

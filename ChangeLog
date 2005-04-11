@@ -1,3 +1,8 @@
+* 2005-04-11 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Imported data files may be linked to the document, which means
+	their data won't be saved with the document, but reloaded each
+	time it is loaded
+	
 * 2005-04-10 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Added exception dialog to send in bug reports
 	- Axis values checked for being round wrong way

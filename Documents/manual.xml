@@ -555,7 +555,13 @@
 	addition comments and blank lines are ignored. Comments start
 	with a "#", ";", "!" or "%", and continue until the end of the
 	line.</para>
-      
+
+      <para>If data are imported from a file, Veusz will normally save
+      the data in its saved document format. If the data are changing,
+      quite often one wants to reread the data from the input
+      file. This can be achieved using the "linked=True" option on the
+      ImportFile command, or by clicking the "Link" checkbox in the
+      import dialog.</para>
     </section>
 
     <section>
@@ -748,7 +754,7 @@ SetData('x', data[0]*0.1, *data[1:])
 	<title><anchor id="Command.ImportFile" />ImportFile</title>
 	
 	<para><command>ImportFile('filename',
-	'descriptor')</command></para>
+	'descriptor' [, linked=False] )</command></para>
 	
 	<para>Imports data from a file. The arguments are the filename
 	to load data from and the descriptor.</para>
@@ -756,6 +762,12 @@ SetData('x', data[0]*0.1, *data[1:])
 	<para>The format of the descriptor is a list of variable names
         representing the columns of the data. For more information see
         <link linkend="Descriptors">Descriptors</link>.</para>
+
+	<para>If the linked parameter is set to True, if the document
+	is saved, the data imported will not be saved with the
+	document, but will be reread from the filename given the next
+	time the document is opened. The linked parameter is
+	optional.</para>
 
 	<para>Returns: A tuple containing a list of the imported
 	datasets and the number of conversions which failed for a

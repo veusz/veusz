@@ -43,11 +43,31 @@ def _cnvt_numarray(a):
     else:
         return a.astype(numarray.Float64)
 
+class LinkedFile:
+    '''Instead of reading data from a string, data can be read from
+    a "linked file". This means the same document can be reloaded, and
+    the data would be reread from the file.
+
+    This class is used to store a link filename with the descriptor
+    '''
+
+    def __init__(self, filename, descriptor):
+        '''Set up the linked file with the descriptor given.'''
+        self.filename = filename
+        self.descriptor = descriptor
+
+    def saveToFile(self, file):
+        '''Save the link to the document file.'''
+
+        file.write('ImportFile(%s, %s, linked=True)\n' %
+                   (repr(self.filename), repr(self.descriptor)))
+
 class Dataset:
     '''Represents a dataset.'''
 
-    def __init__(self, data = None, serr = None, nerr = None, perr = None):
-        '''Initialse storage.'''
+    def __init__(self, data = None, serr = None, nerr = None, perr = None,
+                 linked = None):
+        '''Initialise storage.'''
         self.data = _cnvt_numarray(data)
         self.serr = self.nerr = self.perr = None
 
@@ -59,6 +79,8 @@ class Dataset:
                 self.nerr = nerr + self.data*0.
             if perr != None:
                 self.perr = perr + self.data*0.
+
+        self.linked = linked
 
     def hasErrors(self):
         '''Whether errors on dataset'''
@@ -95,8 +117,25 @@ class Dataset:
 
     # TODO implement mathematical operations on this type
 
+    def saveLinksToFile(self, file, savedlinks):
+        '''Save the link to the file, if this dataset is linked.
+
+        savedlinks is a dict containing any linked files which have
+        already been written
+        '''
+
+        # links should only be saved once
+        if self.linked != None and self.linked not in savedlinks:
+            savedlinks[self.linked] = True
+            self.linked.saveToFile(file)
+
     def saveToFile(self, file, name):
-        '''Save data to file.'''
+        '''Save data to file.
+        '''
+
+        # return if there is a link
+        if self.linked != None:
+            return
 
         # build up descriptor
         datasets = [self.data]
@@ -111,7 +150,7 @@ class Dataset:
             descriptor += ',-'
             datasets.append(self.nerr)
 
-        file.write( "ImportString('%s','''\n" % descriptor )
+        file.write( "ImportString(%s,'''\n" % repr(descriptor) )
 
         # write line line-by-line
         format = '%e ' * len(datasets)
@@ -237,9 +276,18 @@ class Document( qt.QObject ):
             pass
         file.write('# Date: %s\n\n' % time.strftime(
             "%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) )
-        
+
+        # save those datasets which are linked
+        # we do this first in case the datasets are overridden below
+        savedlinks = {}
+        for name, dataset in self.data.items():
+            dataset.saveLinksToFile(file, savedlinks)
+
+        # save the remaining datasets
         for name, dataset in self.data.items():
             dataset.saveToFile(file, name)
+
+        # save the actual tree structure
         file.write(self.basewidget.getSaveText())
         
         self.setModified(False)

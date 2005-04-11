@@ -22,9 +22,23 @@
 
 """Module for implementing dialog box for importing data in Veusz."""
 
+import os.path
+
 import qt
 import document
 import setting
+
+_importhelp=('The descriptor describes the format of the data '
+             'in the file. Each dataset is described separated with spaces.'
+             ' Commas separate the dataset names from the description of the '
+             'errors\n'
+             'eg\tz\t[z with no errors - 1 column for dataset]\n'
+             '\tx,+-\t[x with symmetric errors - 2 columns for dataset]\n'
+             '\ty,+,-\t[y with asymmetric errors - 3 columns for dataset]\n'
+             '\tx[1:5],+,-\t[x_1 to x_5, each with asymmetric errors -'
+             ' 15 columns in total]\n'
+             '\tx y,+-\t[x with no errors, y with symmetric errors -'
+             ' 3 columns in total]')
 
 class ImportDialog(qt.QDialog):
     """Data import dialog."""
@@ -76,6 +90,14 @@ class ImportDialog(qt.QDialog):
                         'Names of columns when importing data, '
                         'e.g. "x y" or "a[:]"')
         
+        # allow links from the file, so the data are reread from the file
+        # on reloading
+        self.linkcheck = qt.QCheckBox('&Link the datasets to the file',
+                                      self)
+        qt.QToolTip.add(self.linkcheck,
+                        'Linked datasets are not saved to a document file,'
+                        '\nbut are reloaded from the linked data file.')
+
         # buttons
         bhbox = qt.QHBox(self)
         bhbox.setSpacing(spacing)
@@ -93,16 +115,12 @@ class ImportDialog(qt.QDialog):
         self.layout.addWidget( fnhbox )
         self.layout.addWidget( self.previewedit )
 
-        l = qt.QLabel("The descriptor describes the format of the data "
-                      "in the file, "
-                      "eg x,+- [x with symmetric errors] y,+,- "
-                      "[y with asymmetric errors] z [no errors] "
-                      "x[1:5],+,- [x_1 to x_5, each with asymmetric errors]",
-                      self)
+        l = qt.QLabel(_importhelp, self)
         l.setAlignment( l.alignment() | qt.Qt.WordBreak )
         self.layout.addWidget( l )
 
         self.layout.addWidget( dhbox )
+        self.layout.addWidget( self.linkcheck )
         self.layout.addWidget( bhbox )
 
     dirname = '.'
@@ -166,7 +184,9 @@ class ImportDialog(qt.QDialog):
         """Do the import data."""
         
         filename = str( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
         descriptor = str( self.descriptoredit.text() )
+        islinked = self.linkcheck.isChecked()
         
         try:
             ifile = open(filename, 'r')
@@ -193,11 +213,20 @@ class ImportDialog(qt.QDialog):
         if text != '':
             text += '\n'
 
-        names = sr.setInDocument(self.document)
+        # link the data to a file, if told to
+        if islinked:
+            LF = document.LinkedFile(filename, descriptor)
+        else:
+            LF = None
+
+        names = sr.setInDocument(self.document, linkedfile=LF)
 
         text += 'Imported data for variables:\n'
         for i in names:
             text += i + '\n'
+
+        if LF != None:
+            text += '\nDatasets were linked to file "%s"\n' % filename
 
         self.previewedit.setText(text)
         

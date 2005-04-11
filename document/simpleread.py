@@ -173,7 +173,7 @@ class _DescriptorPart:
 
                 count += 1
 
-    def setInDocument(self, datasets, document):
+    def setInDocument(self, datasets, document, linkedfile=None):
         """Set the read-in data in the document."""
 
         names = []
@@ -197,6 +197,9 @@ class _DescriptorPart:
 
                 ds = doc.Dataset( data = vals, serr = sym,
                                   nerr = neg, perr = pos )
+
+                ds.linked = linkedfile
+
                 document.setData( name, ds )
                 names.append(name)
             else:
@@ -294,7 +297,7 @@ class SimpleRead:
             out[i.name] = i.errorcount
         return out
 
-    def setInDocument(self, document):
+    def setInDocument(self, document, linkedfile=None):
         """Set the data in the document.
 
         Returns list of variable names read.
@@ -302,6 +305,7 @@ class SimpleRead:
 
         names = []
         for i in self.parts:
-            names += i.setInDocument(self.datasets, document)
+            names += i.setInDocument(self.datasets, document,
+                                     linkedfile)
 
         return names
