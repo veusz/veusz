@@ -1,23 +1,35 @@
 #!/usr/bin/env python
+# Veusz distutils setup script
+
+# $Id$
 
 import glob
-import distutils.sysconfig
-from distutils.core import setup
+from setuptools.core import setup
 
 version = open('VERSION').read().strip()
 
-maindir = '%s/veusz/' % distutils.sysconfig.get_python_lib()
-datafiles = [ (maindir + 'windows/icons', glob.glob('windows/icons/*.png')),
-              (maindir + 'images', ['images/logo.png'] ),
-              (maindir, ['VERSION']) ]
+descr = '''Veusz is a scientific plotting package, designed to create
+publication-ready Postscript output. It features GUI, command-line,
+and scripting interfaces. Graphs are constructed from "widgets",
+allowing complex layouts to be designed. Veusz supports plotting
+functions, data with errors, keys, labels, stacked plots,
+multiple plots, and fitting data.'''
 
 setup(name = 'veusz',
       version = version,
       description = 'A scientific plotting package',
+      long_description=descr,
       author = 'Jeremy Sanders',
       author_email = 'jeremy@jeremysanders.net',
       url = 'http://home.gna.org/veusz/',
-      classifiers = ['Programming Language :: Python'],
+      licence = 'GPL',
+      classifiers = ['Programming Language :: Python',
+                     'Development Status :: 4 - Beta',
+                     'Environment :: X11 Applications :: Qt',
+                     'Intended Audiance :: Advanced End Users',
+                     'Licence :: OSI Approved :: '
+                     'GNU General Public License (GPL)',
+                     'Topic :: Scientific/Engineering :: Visualization'],
       package_dir = { 'veusz': '',
                       'veusz.dialogs': 'dialogs',
                       'veusz.document': 'document',
@@ -25,7 +37,8 @@ setup(name = 'veusz',
                       'veusz.utils': 'utils',
                       'veusz.widgets': 'widgets',
                       'veusz.windows': 'windows' },
-      data_files = datafiles,
+      package_data = {'veusz.windows': ['icons/*.png'],
+                      'veusz': ['images/*.png', 'VERSION']},
       packages = ['veusz',
                   'veusz.dialogs',
                   'veusz.document',
