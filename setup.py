@@ -4,7 +4,7 @@
 # $Id$
 
 import glob
-from setuptools.core import setup
+from setuptools import setup
 
 version = open('VERSION').read().strip()
 
@@ -18,11 +18,11 @@ multiple plots, and fitting data.'''
 setup(name = 'veusz',
       version = version,
       description = 'A scientific plotting package',
-      long_description=descr,
+      long_description = descr,
       author = 'Jeremy Sanders',
       author_email = 'jeremy@jeremysanders.net',
       url = 'http://home.gna.org/veusz/',
-      licence = 'GPL',
+      license = 'GPL',
       classifiers = ['Programming Language :: Python',
                      'Development Status :: 4 - Beta',
                      'Environment :: X11 Applications :: Qt',
@@ -37,8 +37,8 @@ setup(name = 'veusz',
                       'veusz.utils': 'utils',
                       'veusz.widgets': 'widgets',
                       'veusz.windows': 'windows' },
-      package_data = {'veusz.windows': ['icons/*.png'],
-                      'veusz': ['images/*.png', 'VERSION']},
+      package_data = { 'veusz.windows': ['icons/*.png'],
+                       'veusz': ['VERSION', 'images/*.png'] },
       packages = ['veusz',
                   'veusz.dialogs',
                   'veusz.document',
