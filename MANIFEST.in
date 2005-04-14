@@ -1,5 +1,6 @@
 include VERSION AUTHORS ChangeLog COPYING INSTALL README
-include veusz veusz_listen
+include MANIFEST.in setup.py setup.cfg
+include scripts/veusz scripts/veusz_listen
 recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html
 recursive-include windows *.png README
 recursive-include examples *.vsz

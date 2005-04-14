@@ -1,3 +1,9 @@
+* 2005-04-14 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Introduced patch by James Graham to make the save warning dialog
+	use verbs instead of yes/no
+	- Imported distutils (setuputils), and added support for distutils
+	- Add scripts to start veusz from bin directory
+	
 * 2005-04-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Imported data files may be linked to the document, which means
 	their data won't be saved with the document, but reloaded each

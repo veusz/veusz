@@ -85,9 +85,8 @@ class InputListener(qt.QObject):
         else:
             self.ci.run(line)
 
-# if ran as a program
-if __name__ == '__main__':
-
+def run():
+    '''Actually run the program.'''
     app = qt.QApplication(sys.argv)
 
     if len(sys.argv) > 1:
@@ -104,3 +103,6 @@ if __name__ == '__main__':
 
     app.exec_loop()
 
+# if ran as a program
+if __name__ == '__main__':
+    run()

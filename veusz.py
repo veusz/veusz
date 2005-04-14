@@ -29,9 +29,8 @@ import qt
 import utils
 import windows.mainwindow
 
-# if ran as a program
-if __name__ == '__main__':
-
+def run():
+    '''Run the main application.'''
     app = qt.QApplication(sys.argv)
 
     # process command line arguments
@@ -60,3 +59,8 @@ if __name__ == '__main__':
         win.openFile(cmdline[0])
 
     app.exec_loop()
+
+# if ran as a program
+if __name__ == '__main__':
+    run()
+

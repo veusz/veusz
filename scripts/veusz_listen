@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+# Run veusz listening script
+# This is licenced under the GNU General Public Licence, v2 or greater
+# see the file COPYING for details
+
+import veusz.veusz_listen as veusz_listen
+veusz_listen.run()
