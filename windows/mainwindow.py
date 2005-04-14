@@ -253,13 +253,16 @@ class MainWindow(qt.QMainWindow):
 
         Returns qt.QMessageBox.(Yes,No,Cancel)."""
         
-        return qt.QMessageBox("Veusz",
-                              "Document is modified. Save first?",
-                              qt.QMessageBox.Warning,
-                              qt.QMessageBox.Yes | qt.QMessageBox.Default,
-                              qt.QMessageBox.No,
-                              qt.QMessageBox.Cancel,
-                              self).exec_loop()
+        mb = qt.QMessageBox("Veusz",
+                            "Document is modified. Save first?",
+                            qt.QMessageBox.Warning,
+                            qt.QMessageBox.Yes | qt.QMessageBox.Default,
+                            qt.QMessageBox.No,
+                            qt.QMessageBox.Cancel | qt.QMessageBox.Escape,
+                            self)
+        mb.setButtonText(qt.QMessageBox.Yes, "Save")
+        mb.setButtonText(qt.QMessageBox.No, "Discard")
+        return mb.exec_loop()
 
     def close(self, alsoDelete):
         """Before closing, check whether we need to save first."""
