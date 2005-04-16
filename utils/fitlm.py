@@ -26,6 +26,7 @@ import sys
 
 import numarray as N
 import numarray.linear_algebra as NLA
+import numarray.ieeespecial as NIE
 
 def fitLM(func, params, xvals, yvals, errors,
           stopdeltalambda = 1e-5,

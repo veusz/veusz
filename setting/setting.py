@@ -433,11 +433,14 @@ class FloatDict(Setting):
         if type(val) != dict:
             raise InvalidType
 
-        for i in val.itervalues():
-            if type(i) != float:
+        out = {}
+        for key, val in val.iteritems():
+            if type(val) not in (float, int):
                 raise InvalidType
+            else:
+                out[key] = val
 
-        return val
+        return out
 
     def toText(self):
         text = ''

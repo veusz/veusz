@@ -114,6 +114,7 @@ class Fit(plotters.FunctionPlotter):
             else:
                 print "Warning: No errors on y values. Assuming 5% errors."
                 yserr = yvals*0.05
+                yserr[yserr < 1e-8] = 1e-8
         
         retn, chi2, dof = utils.fitLM(self.evalfunc, params,
                                       xvals,
