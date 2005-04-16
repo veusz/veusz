@@ -24,11 +24,27 @@
 # $Id$
 
 import sys
+import os.path
+
 import qt
+
+# this allows modules relative to this one to be used,
+# allowing this program to be run from python, or using this script
+# please suggest a replacement for this
+sys.path.insert( 0, os.path.dirname(__file__) )
 
 import utils
 import windows.mainwindow
 
+copyr='''Veusz version %s
+Copyright (C) Jeremy Sanders 2003-2005 <jeremy@jeremysanders.net>
+Licenced under the GNU General Public Licence (version 2 or greater)
+'''
+
+def write_details():
+    '''Write the copyright details.'''
+    sys.stderr.write(copyr % utils.version())
+    
 def run():
     '''Run the main application.'''
     app = qt.QApplication(sys.argv)
@@ -37,16 +53,12 @@ def run():
     cmdline = [str(app.argv()[i]) for i in range(1, app.argc())]
 
     if '--help' in cmdline or len(cmdline) > 1:
-        sys.stderr.write('Veusz version %s\n' % utils.version())
-        sys.stderr.write('Copyright (C) Jeremy Sanders 2003 '
-                         '<jeremy@jeremysanders.net>\n\n')
-        sys.stderr.write('Usage: \n veusz saved.vsz\n')
+        write_details()
+        sys.stderr.write('\nUsage: \n veusz saved.vsz\n')
         sys.stderr.write('Optional arguments --help, --version\n')
         sys.exit(0)
     elif '--version' in cmdline:
-        sys.stderr.write('Veusz version %s\n' % utils.version())
-        sys.stderr.write('Copyright (C) Jeremy Sanders 2003 '
-                         '<jeremy@jeremysanders.net>\n')
+        write_details()
         sys.exit(0)
 
     win = windows.mainwindow.MainWindow()

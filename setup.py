@@ -2,30 +2,27 @@
 # Veusz distutils setup script
 # see the file INSTALL for details on how to install Veusz
 
-#    Copyright (C) 2005 Jeremy S. Sanders
-#    Email: Jeremy Sanders <jeremy@jeremysanders.net>
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-##############################################################################
-
 # $Id$
 
+import sys
+import os.path
 import glob
-from setuptools import setup
+
+from distutils.core import setup
+from distutils.command.install_data import install_data
 
 version = open('VERSION').read().strip()
+
+# Pete Shinner's distutils data file fix... from distutils-sig
+#  data installer with improved intelligence over distutils
+#  data files are copied into the project directory instead
+#  of willy-nilly
+class smart_install_data(install_data):   
+    def run(self):
+        # need to change self.install_dir to the library dir
+        install_cmd = self.get_finalized_command('install')
+        self.install_dir = getattr(install_cmd, 'install_lib')
+        return install_data.run(self)
 
 descr = '''Veusz is a scientific plotting package, designed to create
 publication-ready Postscript output. It features GUI, command-line,
@@ -42,6 +39,7 @@ setup(name = 'veusz',
       author_email = 'jeremy@jeremysanders.net',
       url = 'http://home.gna.org/veusz/',
       license = 'GPL',
+      cmdclass = { 'install_data': smart_install_data },
       classifiers = ['Programming Language :: Python',
                      'Development Status :: 4 - Beta',
                      'Environment :: X11 Applications :: Qt',
@@ -56,8 +54,11 @@ setup(name = 'veusz',
                       'veusz.utils': 'utils',
                       'veusz.widgets': 'widgets',
                       'veusz.windows': 'windows' },
-      package_data = { 'veusz.windows': ['icons/*.png'],
-                       'veusz': ['VERSION', 'images/*.png'] },
+      data_files = [ ('veusz', ['VERSION']),
+                     ('veusz/images', ['images/logo.png']),
+                     ('veusz/windows/icons',
+                      glob.glob('windows/icons/*.png') +
+                      ['windows/icons/README'] ) ],
       scripts = ['scripts/veusz', 'scripts/veusz_listen'],
       packages = ['veusz',
                   'veusz.dialogs',

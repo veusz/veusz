@@ -30,7 +30,11 @@ Zoom x: Change the zoom factor of the plot to x
 """
 
 import sys
+import os.path
+
 import qt
+
+sys.path.insert( 0, os.path.dirname(__file__) )
 
 import windows.simplewindow
 import document

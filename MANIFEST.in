@@ -5,4 +5,3 @@ recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html
 recursive-include windows *.png README
 recursive-include examples *.vsz
 recursive-include images *.png
-recursive-include setuptools *.py

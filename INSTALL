@@ -1,8 +1,9 @@
-Veusz basic installation procedure
-----------------------------------
+Veusz Installation
+==================
 
-The code just runs in its current directory at the moment.
-It needs a distutils / installation script
+Veusz now uses distutils for its installation. We actually provide a
+version of distutils with the distribution (see setuptools). This is
+to allow users of Python < 2.4 to allow installation.
 
 Requirements:
  python 2.3      http://www.python.org/
@@ -14,11 +15,27 @@ Requirements:
  QT              http://www.trolltech.com/products/qt/
  SIP             http://www.riverbankcomputing.co.uk/sip/   )
 
-Install the above requirements.
+Simple use
+==========
+If you don't want to bother installing veusz fully, it can be run from
+its own directory. Simply do:
 
-Run the program using
+# cd veusz-0.5
+#./veusz.py
 
-./veusz.py
+Proper installation
+===================
+There are a number of ways to install programs using distutils. I will
+list a few of the possible method here:
+
+==> To make an rpm from the distribution
+# cd veusz-0.5
+# python setup.py bdist_rpm
+
+An rpm should be generated in the dist subdirectory
+
+==> 
+
 
 -------------------------------------------------------------------------------
 $Id$
