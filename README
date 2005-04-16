@@ -1,4 +1,4 @@
-Veusz 0.4  [first public release]
+Veusz 0.5
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -16,11 +16,12 @@ Veusz provides a GUI, command line and scripting interface (based on
 Python) to its plotting facilities. The plots are built using an
 object-based system to provide a consistent interface.
 
-Currently done:
+Features of package:
  * X-Y plots (with errorbars)
  * Stepped plots (for histograms)
  * Line plots
  * Function plots
+ * Fitting functions to data
  * Stacked plots and arrays of plots
  * Plot keys
  * Plot labels
@@ -29,18 +30,39 @@ Currently done:
  * Simple data importing
  * Scripting interface
  * Save/Load plots
- * Some work on a manual and introduction
+
+Changes from 0.4:
+ Installation:
+  * distutils used to install the package. RPMS available.
+ Plotting:
+  * Different error bar styles (diamond, curve...)
+  * "Matched" axes, with the same scale on each
+  * Data can be linked from external files instead of embedded in
+    document
+  * Filled regions under/over functions or xy plots
+  * Improved function clipping near edge of plot
+  * Default values can be set for settings, which are remembered
+    between sessions (e.g. blue points for xy3).
+  * Rotated text labels
+  * Improved fitting, giving results from chi2, etc..
+ UI:
+  * Can move around widgets and delete them
+  * Exception dump dialog to send bug reports
+  * Improved import dialog help
+  * Propagate settings between widgets
+  * Window positions are saved between sessions	
+ Reading data:
+  * Better error handling when reading data
+ + Numerous bug fixes
 
 To be done:
  * Contour plots
  * Images
- * Filled regions
  * UI improvements
  * Import filters (for qdp and other plotting packages, fits, csv)
  * Data manipulation
  * Python embedding interface (for embedding Veusz in other programs).
    [some of the external interface is complete]
- * Proper installation program
 
 Requirements:
  Python (probably 2.3 or greater required)

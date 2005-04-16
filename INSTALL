@@ -1,41 +1,79 @@
 Veusz Installation
 ==================
 
-Veusz now uses distutils for its installation. We actually provide a
-version of distutils with the distribution (see setuptools). This is
-to allow users of Python < 2.4 to allow installation.
+Veusz now uses distutils for its installation. See below for how to use
+it.
 
 Requirements:
  python 2.3      http://www.python.org/
  PyQt            http://www.riverbankcomputing.co.uk/pyqt/
  Numarray        http://www.stsci.edu/resources/software_hardware/numarray
 
-
 (PyQt requres
  QT              http://www.trolltech.com/products/qt/
  SIP             http://www.riverbankcomputing.co.uk/sip/   )
 
+Veusz works much better with Microsoft's corefonts installed (or other good
+TrueType fonts). 
+ see             http://corefonts.sourceforge.net/
+
 Simple use
 ==========
 If you don't want to bother installing veusz fully, it can be run from
-its own directory. Simply do:
+its own directory (at the moment). Simply do:
 
+# tar xzf veusz-0.5.tar.gz     [change name here]
 # cd veusz-0.5
 #./veusz.py
 
-Proper installation
-===================
+Installing/upgrading from rpm
+=============================
+For rpm based distributions, download the rpm for your distribution
+(if it is available), and install as root:
+# rpm -Uvh veusz-0.5-1.noarch.rpm
+(use correct name of rpm here)
+
+If there is no rpm available for your distribution, download the source
+rpm and rebuild
+# rpmbuild --rebuild veusz-0.5-1.src.rpm
+then install it from the location given when that command completes.
+# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-0.5-1.noarch.rpm
+
+
+If this doesn't work, see below for how to create an rpm from the source.
+A "veusz" command is installed into your path to run the program.
+
+Full installation with distutils
+================================
 There are a number of ways to install programs using distutils. I will
 list a few of the possible method here:
 
-==> To make an rpm from the distribution
+To make an rpm from the distribution
+------------------------------------
 # cd veusz-0.5
 # python setup.py bdist_rpm
 
-An rpm should be generated in the dist subdirectory
+An rpm should be generated in the dist subdirectory, so...
 
-==> 
+# su
+[enter password]
+# rpm -Uvh dist/veusz-*-1.noarch.rpm
+# exit
 
+A veusz script is installed into your default binary location, so run veusz
+using the "veusz command"
+
+To install to the standard location on the hard disk (it's better to use
+rpms if you have an rpm-based linux distibution)
+------------------------------------------------------------------------
+# cd veusz-0.5
+# python setup.py build
+# su
+[enter root password]
+# python setup.py install 
+# exit
+
+For other ways of installing see http://docs.python.org/inst/inst.html
 
 -------------------------------------------------------------------------------
 $Id$
