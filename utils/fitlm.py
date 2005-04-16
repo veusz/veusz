@@ -106,6 +106,10 @@ def fitLM(func, params, xvals, yvals, errors,
         new_func = func(new_params, xvals)
         new_chi2 = ( (new_func - yvals)**2 * inve2 ).sum()
 
+        if NIE.isnan(new_chi2):
+            sys.stderr.write('Chi2 is NaN. Aborting fit.\n')
+            break
+
         if new_chi2 > chi2:
             # if solution is worse, increase lambda
             Lambda *= 10.
