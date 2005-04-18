@@ -203,7 +203,15 @@ class ImportDialog(qt.QDialog):
         # do the import
         stream = document.FileStream(ifile)
         sr = document.SimpleRead(descriptor)
+
+        # show a busy cursor
+        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
+        # read the data
         sr.readData(stream)
+
+        # restore the cursor
+        qt.QApplication.restoreOverrideCursor()
 
         text = ''
         for var, count in sr.getInvalidConversions().items():

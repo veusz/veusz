@@ -329,6 +329,9 @@ class MainWindow(qt.QMainWindow):
         if self.filename == '':
             self.slotFileSaveAs()
         else:
+            # show busy cursor
+            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
             try:
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
@@ -342,6 +345,8 @@ class MainWindow(qt.QMainWindow):
                                qt.QMessageBox.NoButton,
                                self).exec_loop()
                 
+            # restore the cursor
+            qt.QApplication.restoreOverrideCursor()
                 
     def updateTitlebar(self):
         """Put the filename into the title bar."""
@@ -393,7 +398,12 @@ class MainWindow(qt.QMainWindow):
 
     def openFile(self, filename):
         '''Open the given filename.'''
+
+        # show busy cursor
+        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
         try:
+            # load the document
             self.interpreter.Load(filename)
             self.document.setModified(False)
             self.filename = filename
@@ -407,6 +417,9 @@ class MainWindow(qt.QMainWindow):
                            qt.QMessageBox.NoButton,
                            qt.QMessageBox.NoButton,
                            self).exec_loop()
+
+        # restore the cursor
+        qt.QApplication.restoreOverrideCursor()
 
     def slotFileOpen(self):
         """Open an existing file."""
@@ -439,6 +452,9 @@ class MainWindow(qt.QMainWindow):
             # save directory for next time
             MainWindow.dirname = fd.dir()
 
+            # show busy cursor
+            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
             filename = str( fd.selectedFile() )
             try:
                 self.document.export(filename, self.plot.getPageNumber())
@@ -450,6 +466,9 @@ class MainWindow(qt.QMainWindow):
                                qt.QMessageBox.NoButton,
                                qt.QMessageBox.NoButton,
                                self).exec_loop()
+
+            # restore the cursor
+            qt.QApplication.restoreOverrideCursor()
 
     def slotFilePrint(self):
         """Print the document."""

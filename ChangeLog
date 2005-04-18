@@ -1,3 +1,10 @@
+* 2005-04-18 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Fixed fitting for old versions of numarray (no isnan)
+	- Fixed data reading bug, where numbers on columns which aren't
+	used are propagated to next line
+	- Show busy cursor while reading data and opening files, saving
+	files and exporting data
+
 * 2005-04-16 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Get distutils working properly with standard distutils
 	- Added histogram example

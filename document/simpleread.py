@@ -223,6 +223,10 @@ class FileStream:
         except IndexError:
             return None
 
+    def flushLine(self):
+        """Forget the rest of the line."""
+        self.remainingline = []
+
     def newLine(self):
         """Read in, and split the next line."""
 
@@ -286,6 +290,7 @@ class SimpleRead:
         while stream.newLine():
             for i in self.parts:
                 i.readFromStream(stream, self.datasets)
+            stream.flushLine()
 
     def getInvalidConversions(self):
         """Return the number of invalid conversions after reading data.
