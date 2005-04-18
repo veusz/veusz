@@ -198,7 +198,7 @@ class Document( qt.QObject ):
         self.data = {}
         self.basewidget = widgets.Root(None)
         self.basewidget.document = self
-        self.setModified()
+        self.setModified(False)
         self.emit( qt.PYSIGNAL("sigWiped"), () )
 
     def setData(self, name, dataset):

@@ -4,7 +4,8 @@
 	used are propagated to next line
 	- Show busy cursor while reading data and opening files, saving
 	files and exporting data
-
+	- Empty document is not "dirty", so don't show save dialog
+	
 * 2005-04-16 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Get distutils working properly with standard distutils
 	- Added histogram example
