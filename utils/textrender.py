@@ -68,6 +68,12 @@ _Symbols = {
     '\\infty': u'\u221e',
     '\\int': u'\u222b',
     '\\sim': u'\u223c',
+    '\\odot': u'\u2299',
+    '\\leftarrow': u'\u2190',
+    '\\uparrow': u'\u2191',
+    '\\rightarrow': u'\u2192',
+    '\\downarrow': u'\u2193',
+    '\\circ': u'\u26ef',
     
     # lower case greek letters
     '\\alpha': u'\u03b1',
