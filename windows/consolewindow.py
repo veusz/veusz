@@ -69,7 +69,7 @@ class _CommandEdit(qt.QLineEdit):
         """ Called if the return key is pressed in the edit control."""
 
         # retrieve the text
-        command = str( self.text() )
+        command = unicode( self.text() )
         self.setText("")
 
         # keep the command for history (and move back to top)
@@ -102,7 +102,7 @@ class _CommandEdit(qt.QLineEdit):
 
             # user has modified text since last set
             if self.edited():
-                self.history.append( str(self.text()) )
+                self.history.append( unicode(self.text()) )
                 self.history_posn += 1
 
             # replace the text in the control
@@ -235,8 +235,8 @@ class ConsoleWindow(qt.QDockWindow):
 
         # output the command in the log pane
         self.insertTextInOutput('<font color="blue">%s</font>' %
-                                str(qt.QStyleSheet.escape(prompt + ' ' +
-                                                          command)) )
+                                unicode(qt.QStyleSheet.escape(prompt + ' ' +
+                                                              command)) )
 
         # are we ready to run this?
         if c == None or (len(command) != 0 and
@@ -248,7 +248,7 @@ class ConsoleWindow(qt.QDockWindow):
             self._prompt.setText( '...' )
         else:
             # actually execute the command
-            self.interpreter.run( str(newc) )
+            self.interpreter.run( unicode(newc) )
             self.command_build = ''
             # modify the prompt
             self._prompt.setText( '>>>' )

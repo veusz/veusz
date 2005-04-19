@@ -173,7 +173,7 @@ class ImportDialog(qt.QDialog):
         """Update preview window when filename changed."""
 
         try:
-            ifile = open(str(filename), 'r')
+            ifile = open(unicode(filename), 'r')
             text = ifile.read(2048)
             self.previewedit.setText(text)
 
@@ -183,9 +183,9 @@ class ImportDialog(qt.QDialog):
     def slotImport(self):
         """Do the import data."""
         
-        filename = str( self.filenameedit.text() )
+        filename = unicode( self.filenameedit.text() )
         filename = os.path.abspath(filename)
-        descriptor = str( self.descriptoredit.text() )
+        descriptor = unicode( self.descriptoredit.text() )
         islinked = self.linkcheck.isChecked()
         
         try:
@@ -202,7 +202,18 @@ class ImportDialog(qt.QDialog):
 
         # do the import
         stream = document.FileStream(ifile)
-        sr = document.SimpleRead(descriptor)
+
+        try:
+            sr = document.SimpleRead(descriptor)
+        except ValueError:
+            mb = qt.QMessageBox("Veusz",
+                                "Cannot interpret descriptor",
+                                qt.QMessageBox.Warning,
+                                qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                                qt.QMessageBox.NoButton,
+                                qt.QMessageBox.NoButton)
+            mb.exec_loop()
+            return
 
         # show a busy cursor
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )

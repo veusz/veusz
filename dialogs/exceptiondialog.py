@@ -209,10 +209,10 @@ class _SendDialog(qt.QDialog):
         # build up the text of the message
         text = _emailformat % (
             self.text,
-            str(self.doingedit.text())
+            unicode(self.doingedit.text())
             )
 
-        fromaddress = str(self.emailedit.text())
+        fromaddress = unicode(self.emailedit.text())
 
         # construct the message object
         msg = email.MIMEText.MIMEText(text)

@@ -83,7 +83,7 @@ class DataEditDialog(qt.QDialog):
     def slotDatasetHighlighted(self, name):
         """Dataset highlighted in list box."""
         # convert to python string
-        name = str(name)
+        name = unicode(name)
 
         # update the table
         ds = self.document.data[name]

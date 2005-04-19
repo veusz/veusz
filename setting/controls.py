@@ -55,10 +55,12 @@ class SettingEdit(qt.QLineEdit):
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
-        text = str(self.text())
+        text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
             self.setPaletteBackgroundColor(self.bgcolour)
+
+            print "Going to compare ", repr(self.setting.get()), " ", repr(val)
             
             # value has changed
             if self.setting.get() != val:
@@ -140,7 +142,7 @@ class SettingChoice(qt.QComboBox):
 
     def slotActivated(self, val):
         """If a different item is chosen."""
-        text = str(self.currentText())
+        text = unicode(self.currentText())
         try:
             val = self.setting.fromText(text)
             self.setPaletteBackgroundColor(self.bgcolour)
@@ -185,7 +187,7 @@ class SettingMultiLine(qt.QTextEdit):
         """Allows us to check the contents of the widget."""
         qt.QTextEdit.focusOutEvent(self, *args)
 
-        text = str(self.text())
+        text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
             self.setPaletteBackgroundColor(self.bgcolour)

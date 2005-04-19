@@ -193,7 +193,7 @@ class Str(Setting):
     """String setting."""
 
     def convertTo(self, val):
-        if type(val) == str:
+        if type(val) in [str, unicode]:
             return val
         raise InvalidType
 
@@ -281,7 +281,7 @@ class FloatOrAuto(Setting):
     def convertTo(self, val):
         if type(val) in (int, float):
             return float(val)
-        elif type(val) == str and val.strip().lower() == 'auto':
+        elif type(val) in [str, unicode] and val.strip().lower() == 'auto':
             return None
         else:
             raise InvalidType
@@ -316,7 +316,7 @@ class IntOrAuto(Setting):
     def convertTo(self, val):
         if type(val) == int:
             return val
-        elif type(val) == str and val.strip().lower() == 'auto':
+        elif type(val) in [str, unicode] and val.strip().lower() == 'auto':
             return None
         else:
             raise InvalidType
@@ -498,7 +498,7 @@ class WidgetPath(Str):
         """Validate the text is a name of a widget relative to
         this one."""
 
-        if type(val) != str:
+        if type(val) not in [str, unicode]:
             raise InvalidType
 
         # InvalidType will get raised in getWidget if it is incorrect

@@ -371,7 +371,7 @@ class MainWindow(qt.QMainWindow):
             # save directory for next time
             MainWindow.dirname = fd.dir()
             # update the edit box
-            filename = str( fd.selectedFile() )
+            filename = unicode( fd.selectedFile() )
             if os.path.splitext(filename)[1] == '':
                 filename += '.vsz'
 
@@ -435,7 +435,7 @@ class MainWindow(qt.QMainWindow):
             # save directory for next time
             MainWindow.dirname = fd.dir()
 
-            filename = str( fd.selectedFile() )
+            filename = unicode( fd.selectedFile() )
             self.openFile(filename)
                 
     def slotFileExport(self):
@@ -455,7 +455,7 @@ class MainWindow(qt.QMainWindow):
             # show busy cursor
             qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
-            filename = str( fd.selectedFile() )
+            filename = unicode( fd.selectedFile() )
             try:
                 self.document.export(filename, self.plot.getPageNumber())
             except (IOError, RuntimeError), inst:

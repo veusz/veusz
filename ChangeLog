@@ -1,5 +1,8 @@
 * 2005-04-19 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix to allow unicode font names
+	- Lots more unicode fixes (like unicode labels, etc). Unicode
+	characters can now be used for filenames, and axis labels
+	- Handle bad descriptors in import dialog
 	
 * 2005-04-18 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed fitting for old versions of numarray (no isnan)
