@@ -1,3 +1,6 @@
+* 2005-04-19 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Fix to allow unicode font names
+	
 * 2005-04-18 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed fitting for old versions of numarray (no isnan)
 	- Fixed data reading bug, where numbers on columns which aren't

@@ -209,7 +209,7 @@ class Text(settings.Settings):
         # build a dict up with the list of families
         families = {}
         for i in db.families():
-            families[str(i)] = True
+            families[unicode(i)] = True
 
         for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
                   'Serif']:
