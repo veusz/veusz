@@ -60,8 +60,6 @@ class SettingEdit(qt.QLineEdit):
             val = self.setting.fromText(text)
             self.setPaletteBackgroundColor(self.bgcolour)
 
-            print "Going to compare ", repr(self.setting.get()), " ", repr(val)
-            
             # value has changed
             if self.setting.get() != val:
                 self.setting.set(val)
