@@ -152,9 +152,9 @@ class TreeEditWindow(qt.QDockWindow):
                                    (lambda a: self.slotMakeWidgetButton(w)))
                                   (w),
                                   iconfilename = 'button_%s.png' % w,
-                                  menutext = 'Add %s widget' % w,
-                                  statusbartext = 'Add a %s widget to the'
-                                  ' currently selected widget' % w,
+                                  menutext = 'Add %s' % w,
+                                  statusbartext = 'Add a %s item to the'
+                                  ' currently selected item' % w,
                                   tooltiptext = wc.description)
                 b = a.addTo(horzbox)
                 b.setAutoRaise(True)
@@ -303,9 +303,13 @@ class TreeEditWindow(qt.QDockWindow):
             selw = item.parent.widget
             assert selw != None
 
-        # check whether each button can have this widget as parent
+        # check whether each button can have this widget
+        # (or a parent) as parent
         for wc, action in self.createGraphActions.items():
-            action.enable( wc.willAllowParent(selw) )
+            w = selw
+            while w != None and not wc.willAllowParent(w):
+                w = w.parent
+            action.enable( w != None )
 
         # delete shouldn't allow root to be deleted
         self.editactions['delete'].enable(
@@ -394,8 +398,10 @@ class TreeEditWindow(qt.QDockWindow):
                                                   100)
         self.prefview.adjustSize()
             
-    def slotMakeWidgetButton(self, widgetname):
-        """Called when an add widget button is clicked."""
+    def slotMakeWidgetButton(self, widgettype):
+        """Called when an add widget button is clicked.
+        widgettype is the type of widget
+        """
 
         # get the widget to act as the parent
         parent = self.itemselected.widget
@@ -403,9 +409,20 @@ class TreeEditWindow(qt.QDockWindow):
             parent = self.itemselected.parent.widget
             assert parent != None
 
+        # find the parent to add the child to, we go up the tree looking
+        # for possible parents
+        wc = widgetfactory.thefactory.getWidgetClass(widgettype)
+        while parent != None and not wc.willAllowParent(parent):
+            parent = parent.parent
+
+        assert parent != None
+
         # make the new widget and update the document
-        widgetfactory.thefactory.makeWidget(widgetname, parent)
+        w = widgetfactory.thefactory.makeWidget(widgettype, parent)
         self.document.setModified()
+
+        # select the widget
+        self.selectWidget(w)
 
     def slotActionPressed(self):
         """Called when an action button is pressed."""

@@ -131,7 +131,7 @@ class Action(qt.QObject):
                     i[0].hide()
                 #i[0].setEnabled(enabled)
             elif isinstance(i[0], qt.QPopupMenu):
-                i[0].setItemVisible(i[1], enabled)
+                i[0].setItemEnabled(i[1], enabled)
             else:
                 assert False
 
