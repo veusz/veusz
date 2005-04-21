@@ -74,7 +74,7 @@ _Symbols = {
     '\\uparrow': u'\u2191',
     '\\rightarrow': u'\u2192',
     '\\downarrow': u'\u2193',
-    '\\circ': u'\u26ef',
+    '\\circ': u'\u0e50',
     
     # lower case greek letters
     '\\alpha': u'\u03b1',
