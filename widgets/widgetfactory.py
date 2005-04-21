@@ -56,5 +56,9 @@ class WidgetFactory:
         names.sort()
         return names
 
+    def listWidgetClasses(self):
+        """Return list of allowed classes."""
+        return self.regwidgets.values()
+
 # singleton
 thefactory = WidgetFactory()

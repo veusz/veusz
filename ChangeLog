@@ -2,6 +2,8 @@
 	- Widgets can now be added if a parent allows the widget as parent
 	- New item selected after widget is added
 	- Removed text widget from menu and tooltip
+	- Added widget buttons now in separate toolbar (ordering of
+	importance and alphabetical now)
 	
 * 2005-04-19 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix to allow unicode font names

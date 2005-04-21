@@ -28,6 +28,7 @@ import qt
 import widgets.widgetfactory as widgetfactory
 import widgets
 import action
+import utils
 
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
@@ -130,42 +131,43 @@ class TreeEditWindow(qt.QDockWindow):
         self.connect( self.document, qt.PYSIGNAL("sigWiped"),
                       self.slotDocumentWiped )
 
+        # make toolbar in parent to have the add graph/edit graph buttons
+        self.edittool = qt.QToolBar(parent, "treetoolbar")
+        self.edittool.setLabel("Veusz - editing toolbar")
+        parent.moveDockWindow(self.edittool, qt.Qt.DockLeft)
+
         totvbox = qt.QVBox(self)
         self.setWidget(totvbox)
 
         # make buttons for each of the graph types
         self.createGraphActions = {}
         horzbox = qt.QFrame(totvbox)
-        self.boxlayout = qt.QBoxLayout(horzbox, qt.QBoxLayout.LeftToRight)
-        self.boxlayout.insertSpacing(0, 4)
-        self.boxlayout.addStrut(22)
 
         mdir = os.path.dirname(__file__)
 
         insertmenu = parent.menus['insert']
 
-        for w in widgetfactory.thefactory.listWidgets():
-            wc = widgetfactory.thefactory.getWidgetClass(w)
+        for wc in self._getWidgetOrder():
+            name = wc.typename
             if wc.allowusercreation:
                 a = action.Action(self,
                                   (lambda w:
                                    (lambda a: self.slotMakeWidgetButton(w)))
-                                  (w),
-                                  iconfilename = 'button_%s.png' % w,
-                                  menutext = 'Add %s' % w,
-                                  statusbartext = 'Add a %s item to the'
-                                  ' currently selected item' % w,
+                                  (name),
+                                  iconfilename = 'button_%s.png' % name,
+                                  menutext = 'Add %s' % name,
+                                  statusbartext = wc.description,
                                   tooltiptext = wc.description)
-                b = a.addTo(horzbox)
-                b.setAutoRaise(True)
-                self.boxlayout.addWidget(b)
+                b = a.addTo(self.edittool)
+                #b.setAutoRaise(True)
+                #self.boxlayout.addWidget(b)
                 a.addTo(insertmenu)
                 self.createGraphActions[wc] = a
 
-        self.boxlayout.addStretch()
+
+        self.edittool.addSeparator()
 
         # make buttons for user actions
-        edithbox = qt.QHBox(totvbox)
         self.editactions = {}
 
         editmenu = parent.menus['edit']
@@ -186,11 +188,12 @@ class TreeEditWindow(qt.QDockWindow):
                               menutext = menutext,
                               statusbartext = tooltip,
                               tooltiptext = tooltip)
-            b = a.addTo(horzbox)
-            b.setAutoRaise(True)
-            self.boxlayout.addWidget(b)
+            a.addTo(self.edittool)
             a.addTo(editmenu)
             self.editactions[name] = a
+
+
+        #self.boxlayout.addStretch()
 
         # put widgets in a movable splitter
         split = qt.QSplitter(totvbox)
@@ -231,6 +234,27 @@ class TreeEditWindow(qt.QDockWindow):
 
         # select the root item
         self.listview.setSelected(self.rootitem, True)
+
+    def _getWidgetOrder(self):
+        """Return a list of the widgets, most important first.
+        """
+
+        # get list of allowed classes
+        wcl = [(i.typename, i)
+               for i in widgetfactory.thefactory.listWidgetClasses()
+               if i.allowusercreation]
+        wcl.sort()
+
+        # build up a list of pairs for topological sort
+        pairs = []
+        for name, wc in wcl:
+            for pwc in wc.allowedparenttypes:
+                pairs.append( (pwc, wc) )
+
+        # do topological sort
+        sorted = utils.topsort(pairs)
+
+        return sorted
 
     def slotDocumentModified(self, ismodified):
         """Called when the document has been modified."""

@@ -384,3 +384,58 @@ def cnvtDistPts(distance, painter):
         _calcPixPerPt(painter)
 
     return cnvtDist(distance, painter) / painter.veusz_pixperpt
+
+# This is Tim Peter's <tim_one@msn.com> topological sort
+# see http://www.python.org/tim_one/000332.html
+# adapted to use later python features
+
+def topsort(pairlist):
+    """Given a list of pairs, perform a topological sort.
+    That means, each item has something which needs to be done first.
+    
+    topsort( [(1,2), (3,4), (5,6), (1,3), (1,5), (1,6), (2,5)] )
+    returns [1, 2, 3, 5, 4, 6]
+    """
+    
+    numpreds = {}   # elt -> # of predecessors
+    successors = {} # elt -> list of successors
+    for first, second in pairlist:
+        # make sure every elt is a key in numpreds
+        if not numpreds.has_key( first ):
+            numpreds[first] = 0
+
+        if not numpreds.has_key( second ):
+            numpreds[second] = 0
+
+        # since first &lt; second, second gains a pred ...
+        numpreds[second] += 1
+
+        # ... and first gains a succ
+        if successors.has_key( first ):
+            successors[first].append( second )
+        else:
+            successors[first] = [second]
+
+    # suck up everything without a predecessor
+    answer = [key for key, item in numpreds.iteritems()
+              if item == 0]
+
+    # for everything in answer, knock down the pred count on
+    # its successors; note that answer grows *in* the loop
+
+    for x in answer:
+        del numpreds[x]
+        if successors.has_key( x ):
+            for y in successors[x]:
+                numpreds[y] -= 1
+                if numpreds[y] == 0:
+                    answer.append( y )
+            # following del; isn't needed; just makes
+            # CycleError details easier to grasp
+            # del successors[x]
+
+    # assert catches cycle errors
+    assert not numpreds
+    
+    return answer
+

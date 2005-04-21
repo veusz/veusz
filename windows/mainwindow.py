@@ -90,7 +90,7 @@ class MainWindow(qt.QMainWindow):
         """Initialise the menus and toolbar."""
 
         # create toolbar
-        self.maintoolbar = qt.QToolBar(self, "main toolbar")
+        self.maintoolbar = qt.QToolBar(self, "maintoolbar")
         self.maintoolbar.setLabel("Veusz - toolbar")
 
         # add main menus

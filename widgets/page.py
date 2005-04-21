@@ -32,7 +32,7 @@ class Page(widget.Widget):
     typename='page'
     allowusercreation = True
     allowedparenttypes = [root.Root]
-    description='a blank page'
+    description='Blank page'
 
     def __init__(self, parent, name=None):
         """Initialise object."""
