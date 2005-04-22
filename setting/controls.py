@@ -22,6 +22,8 @@
    to be changed.
 """
 
+import re
+
 import qt
 import setting
 
@@ -117,7 +119,7 @@ class SettingChoice(qt.QComboBox):
             items.append(i)
         self.insertStringList(items)
 
-        # set the text of the widget to the 
+        # set the text of the widget to the setting
         self.setCurrentText( setting.toText() )
 
         # if a different item is selected
@@ -140,6 +142,8 @@ class SettingChoice(qt.QComboBox):
 
     def slotActivated(self, val):
         """If a different item is chosen."""
+        #print self, "Activated!"
+
         text = unicode(self.currentText())
         try:
             val = self.setting.fromText(text)
@@ -200,3 +204,61 @@ class SettingMultiLine(qt.QTextEdit):
     def onModified(self, mod):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toText() )
+
+class SettingDistance(SettingChoice):
+    """For editing distance settings."""
+
+    # used to remove non-numerics from the string
+    # we also remove 
+    stripnumre = re.compile(r"[0-9]*/|[^0-9.]")
+
+    # remove spaces
+    stripspcre = re.compile(r"\s")
+
+    def __init__(self, setting, parent):
+        '''Initialise with blank list, then populate with sensible units.'''
+        SettingChoice.__init__(self, setting, True, [], parent)
+        self.updateComboList()
+        
+    def updateComboList(self):
+        '''Populates combo list with sensible list of other possible units.'''
+
+        # turn off signals, so our modifications don't create more signals
+        self.blockSignals(True)
+
+        # get current text
+        text = unicode(self.currentText())
+
+        # get rid of non-numeric things from the string
+        num = self.stripnumre.sub('', text)
+
+        # here are a list of possible different units
+        # should this be in utils?
+        newitems = [ num+'pt', num+'cm', num+'mm',
+                     num+'in', num+'%', '1/'+num ]
+
+        # if we're already in this list, we position the current selection
+        # to the correct item (up and down keys work properly then)
+        # spaces are removed to make sure we get sensible matches
+        try:
+            spcfree = self.stripspcre.sub('', text)
+            index = newitems.index(spcfree)
+        except ValueError:
+            index = 0
+            newitems.insert(0, text)
+
+        # get rid of existing items in list (clear doesn't work here)
+        for i in range(self.count()):
+            self.removeItem(0)
+
+        # put new items in and select the correct option
+        self.insertStrList(newitems)
+        self.setCurrentItem(index)
+
+        # must remember to do this!
+        self.blockSignals(False)
+
+    def slotActivated(self, val):
+        '''Populate the drop down list before activation.'''
+        self.updateComboList()
+        SettingChoice.slotActivated(self, val)

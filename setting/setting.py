@@ -364,7 +364,7 @@ class Distance(Setting):
             raise InvalidType
         
     def makeControl(self, *args):
-        return controls.SettingEdit(self, *args)
+        return controls.SettingDistance(self, *args)
 
 class Choice(Setting):
     """One out of a list of strings."""
