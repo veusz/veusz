@@ -142,8 +142,6 @@ class SettingChoice(qt.QComboBox):
 
     def slotActivated(self, val):
         """If a different item is chosen."""
-        #print self, "Activated!"
-
         text = unicode(self.currentText())
         try:
             val = self.setting.fromText(text)
@@ -209,7 +207,7 @@ class SettingDistance(SettingChoice):
     """For editing distance settings."""
 
     # used to remove non-numerics from the string
-    # we also remove 
+    # we also remove X/ from X/num
     stripnumre = re.compile(r"[0-9]*/|[^0-9.]")
 
     # remove spaces
@@ -232,16 +230,16 @@ class SettingDistance(SettingChoice):
         # get rid of non-numeric things from the string
         num = self.stripnumre.sub('', text)
 
-        # here are a list of possible different units
-        # should this be in utils?
+        # here are a list of possible different units the user can choose
+        # between. should this be in utils?
         newitems = [ num+'pt', num+'cm', num+'mm',
                      num+'in', num+'%', '1/'+num ]
 
         # if we're already in this list, we position the current selection
         # to the correct item (up and down keys work properly then)
         # spaces are removed to make sure we get sensible matches
+        spcfree = self.stripspcre.sub('', text)
         try:
-            spcfree = self.stripspcre.sub('', text)
             index = newitems.index(spcfree)
         except ValueError:
             index = 0
