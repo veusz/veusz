@@ -55,7 +55,7 @@ class MainWindow(qt.QMainWindow):
 
         # likewise with the tree-editing window
         self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
-        self.moveDockWindow( self.treeedit, qt.Qt.DockLeft )
+        self.moveDockWindow( self.treeedit, qt.Qt.DockLeft, True, 1 )
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
@@ -301,7 +301,11 @@ class MainWindow(qt.QMainWindow):
 
         # restore docked window geometry
         if 'geometry_docwindows' in setting.settingdb.database:
-            s = qt.QString(setting.settingdb.database['geometry_docwindows'])
+            s = setting.settingdb.database['geometry_docwindows']
+            # problem with loading old versions when new toolbars are included
+            if s.find('editing toolbar') == -1:
+                s = ''
+            s = qt.QString(s)
             stream = qt.QTextStream(s, qt.IO_ReadOnly)
             stream >> self
 

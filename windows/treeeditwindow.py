@@ -134,7 +134,7 @@ class TreeEditWindow(qt.QDockWindow):
         # make toolbar in parent to have the add graph/edit graph buttons
         self.edittool = qt.QToolBar(parent, "treetoolbar")
         self.edittool.setLabel("Veusz - editing toolbar")
-        parent.moveDockWindow(self.edittool, qt.Qt.DockLeft)
+        parent.moveDockWindow(self.edittool, qt.Qt.DockLeft, True, 0)
 
         totvbox = qt.QVBox(self)
         self.setWidget(totvbox)
