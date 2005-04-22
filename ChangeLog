@@ -1,5 +1,6 @@
 * 2005-04-22 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Display drop down list of units based on James Graham's patch
+	- Use drop down list of datasets for appropriate settings
 	
 * 2005-04-21 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Widgets can now be added if a parent allows the widget as parent

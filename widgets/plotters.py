@@ -310,10 +310,10 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.Distance('markerSize', '3pt'), 0 )
         s.add( setting.Choice('marker', utils.MarkerCodes, 'circle'), 0 )
-        s.add( setting.Str('yData', 'y',
-                           descr = 'Variable containing y data'), 0 )
-        s.add( setting.Str('xData', 'x',
-                           descr = 'Variable containing x data'), 0 )
+        s.add( setting.Dataset('yData', 'y', self.document,
+                               descr = 'Variable containing y data'), 0 )
+        s.add( setting.Dataset('xData', 'x', self.document,
+                               descr = 'Variable containing x data'), 0 )
         s.add( setting.Choice('errorStyle',
                               ['bar', 'box', 'diamond', 'curve',
                                'barbox', 'bardiamond', 'barcurve'], 'bar',

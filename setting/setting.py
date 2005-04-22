@@ -549,4 +549,18 @@ class WidgetPath(Str):
                 raise InvalidType
         
         return widget
+
+# choose from the possible datasets
+class Dataset(Str):
+    """A setting to choose from the possible datasets."""
+
+    def __init__(self, name, val, document, descr=''):
+        """Initialise using the document, so we can get the datasets later."""
+
+        Setting.__init__(self, name, val, descr)
+        self.document = document
+
+    def makeControl(self, *args):
+        """Allow user to choose between the datasets."""
+        return controls.DatasetChoose(self, self.document, *args)
     

@@ -260,3 +260,44 @@ class SettingDistance(SettingChoice):
         '''Populate the drop down list before activation.'''
         self.updateComboList()
         SettingChoice.slotActivated(self, val)
+
+class DatasetChoose(SettingChoice):
+    """Allow the user to choose between the possible datasets."""
+
+    def __init__(self, setting, document, parent):
+        """Initialise the combobox. The list is populated with datasets.
+
+        Changes on the document refresh the list of datasets."""
+        
+        SettingChoice.__init__(self, setting, True, [], parent)
+        self.document = document
+        self.populateEntries()
+        self.connect(document, qt.PYSIGNAL('sigModified'),
+                     self.slotModified)
+
+    def populateEntries(self):
+        """Put the list of datasets into the combobox."""
+
+        datasets = self.document.data.keys()
+        datasets.sort()
+
+        # get rid of existing items in list (clear doesn't work here)
+        for i in range(self.count()):
+            self.removeItem(0)
+
+        # existing setting
+        currenttext = unicode(self.currentText())
+
+        # put in new entries
+        self.insertStrList(datasets)
+    
+        # look up index in list if possible, and set to it
+        try:
+            self.setCurrentItem( datasets.index(currenttext) )
+        except ValueError:
+            pass
+
+    def slotModified(self, modified):
+        """Update the list of datasets if the document is modified."""
+        self.populateEntries()
+        
