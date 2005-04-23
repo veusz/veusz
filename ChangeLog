@@ -1,3 +1,6 @@
+* 2005-04-23 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Twiddle rounding in axis.py to try to avoid off-by-one pixel bugs
+
 * 2005-04-22 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Display drop down list of units based on James Graham's patch
 	- Use drop down list of datasets for appropriate settings

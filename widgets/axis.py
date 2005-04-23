@@ -221,22 +221,22 @@ class Axis(widget.Widget):
         p1, p2, pp = s.lowerPosition, s.upperPosition, s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
-            self.coordParr1 = x1 + int(dx * p1 + 0.5)
-            self.coordParr2 = x1 + int(dx * p2 + 0.5)
+            self.coordParr1 = x1 + int(dx * p1 + 0.5000002)
+            self.coordParr2 = x1 + int(dx * p2 + 0.5000002)
 
             # other axis coordinates
-            self.coordPerp  = y2 - int(dy * pp + 0.5)
-            self.coordPerp1 = y2 - int(dy * p1 + 0.5)
-            self.coordPerp2 = y2 - int(dy * p2 + 0.5)
+            self.coordPerp  = y2 - int(dy * pp + 0.5000002)
+            self.coordPerp1 = y2 - int(dy * p1 + 0.5000002)
+            self.coordPerp2 = y2 - int(dy * p2 + 0.5000002)
 
         else: # vertical
-            self.coordParr1 = y2 - int(dy * p1 + 0.5)
-            self.coordParr2 = y2 - int(dy * p2 + 0.5)
+            self.coordParr1 = y2 - int(dy * p1 + 0.5000002)
+            self.coordParr2 = y2 - int(dy * p2 + 0.5000002)
 
             # other axis coordinates
-            self.coordPerp  = x1 + int(dx * pp + 0.5)
-            self.coordPerp1 = x1 + int(dx * p1 + 0.5)
-            self.coordPerp2 = x1 + int(dx * p2 + 0.5)
+            self.coordPerp  = x1 + int(dx * pp + 0.5000002)
+            self.coordPerp1 = x1 + int(dx * p1 + 0.5000002)
+            self.coordPerp2 = x1 + int(dx * p2 + 0.5000002)
      
     def graphToPlotterCoords(self, bounds, vals):
         """Convert graph coordinates to plotter coordinates on this axis.
@@ -264,10 +264,10 @@ class Axis(widget.Widget):
             fracposns = self.linearConvertToPlotter( vals )
 
         # rounds to nearest integer
-        out = N.floor( 0.5 + self.coordParr1 +
-                       fracposns*(self.coordParr2 -
-                                  self.coordParr1) ).astype(N.Int32)
-        return out
+        # we use 0.5000002 instead of 0.5, to try to avoid fp rounding problems
+        return N.floor(0.5000002 + self.coordParr1 +
+                       fracposns*(self.coordParr2 - self.coordParr1)
+                       ).astype(N.Int32)
     
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
