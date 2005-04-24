@@ -118,10 +118,12 @@ class Graph(widget.Widget):
         '''Update the margins before drawing.'''
 
         s = self.settings
-        self.margins = [ s.leftMargin, s.topMargin,
-                         s.rightMargin, s.bottomMargin ]
 
-        bounds = self.computeBounds(parentposn, painter)
+        margins = ( s.get('leftMargin').convert(painter),
+                    s.get('topMargin').convert(painter),
+                    s.get('rightMargin').convert(painter),
+                    s.get('bottomMargin').convert(painter) )
+        bounds = self.computeBounds(parentposn, painter, margins=margins)
 
         # if there's a background
         if not s.Background.hide:
@@ -136,8 +138,7 @@ class Graph(widget.Widget):
                               bounds[3]-bounds[1]+1 )
 
         # work out outer bounds
-        deltas = utils.cnvtDists(self.margins, painter)
-        if outerbounds == None or deltas != [0, 0, 0, 0]:
+        if outerbounds == None or margins != (0., 0., 0., 0.):
             # if we don't have information, or the margins are non-zero
             ob = parentposn
         else:
@@ -146,8 +147,9 @@ class Graph(widget.Widget):
             ob = outerbounds
         
         # do normal drawing of children
-        widget.Widget.draw( self, parentposn, painter,
-                            outerbounds = ob )
+        # iterate over children in reverse order
+        for i in utils.reverse(self.children):
+            i.draw(bounds, painter, outerbounds=outerbounds)
 
         # now need to find axes which aren't children, and draw those again
         axestodraw = {}
@@ -169,7 +171,6 @@ class Graph(widget.Widget):
             # nasty, as we have to work out whether we're on the edge of
             # a collection
             edgezero = [ (a==b) for a, b in zip(bounds, parentposn) ]
-            margins = utils.cnvtDists(self.margins, painter)
 
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:

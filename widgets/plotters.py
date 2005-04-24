@@ -556,7 +556,7 @@ class PointPlotter(GenericPlotter):
 
         # draw marker
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            size = int( utils.cnvtDist(s.markerSize, painter) )
+            size = int( s.get('markerSize').convert(painter) )
 
             if not s.MarkerFill.hide:
                 painter.setBrush( s.MarkerFill.makeQBrush() )
@@ -625,7 +625,7 @@ class PointPlotter(GenericPlotter):
 
         # plot the points (we do this last so they are on top)
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            size = int( utils.cnvtDist(s.markerSize, painter) )
+            size = int( s.get('markerSize').convert(painter) )
 
             if not s.MarkerFill.hide:
                 # filling for markers

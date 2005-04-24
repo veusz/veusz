@@ -60,9 +60,6 @@ class Widget(object):
         # position of this widget on its parent
         self.position = (0., 0., 1., 1.)
 
-        # fractional margins within this widget
-        self.margins = ('0', '0', '0', '0')
-
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename )
         self.settings.parent = self
@@ -220,7 +217,7 @@ class Widget(object):
 
         pass
 
-    def computeBounds(self, parentposn, painter):
+    def computeBounds(self, parentposn, painter, margins = (0., 0., 0., 0.)):
         """Compute a bounds array, giving the bounding box for the widget."""
 
         # get parent's position
@@ -228,16 +225,10 @@ class Widget(object):
         dx, dy = x2-x1, y2-y1
 
         # get our position
-        x1, y1, x2, y2 = ( x1+dx*self.position[0], y1+dy*self.position[1],
-                           x1+dx*self.position[2], y1+dy*self.position[3] )
-        dx, dy = x2-x1, y2-y1
-
-        # convert margin to physical units and subtract
-        deltas = utils.cnvtDists(self.margins, painter)
-        bounds = [ int(x1+deltas[0]), int(y1+deltas[1]),
-                   int(x2-deltas[2]), int(y2-deltas[3]) ]
-
-        return bounds
+        px1, py1, px2, py2 = self.position
+        x1, y1, x2, y2 = ( x1+dx*px1, y1+dy*py1, x1+dx*px2, y1+dy*py2 )
+        dx1, dy1, dx2, dy2 = margins
+        return [ int(x1+dx1), int(y1+dy1), int(x2-dx2), int(y2-dy2) ]
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).

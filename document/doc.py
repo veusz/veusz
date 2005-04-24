@@ -230,11 +230,6 @@ class Document( qt.QObject ):
         """Return whether modified flag set."""
         return self.modified
     
-    def getSize(self):
-        """Get the size of the main plot widget."""
-        s = self.basewidget.settings
-        return (s.width, s.height)
-
     def printTo(self, printer, pages, scaling = 1.):
         """Print onto printing device."""
 
@@ -244,7 +239,7 @@ class Document( qt.QObject ):
         painter.veusz_scaling = scaling
 
         # work out how many pixels correspond to the given size
-        width, height = utils.cnvtDists(self.getSize(), painter)
+        width, height = self.basewidget.getSize(painter)
         children = self.basewidget.children
 
         # This all assumes that only pages can go into the root widget

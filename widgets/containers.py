@@ -236,17 +236,15 @@ class Grid(widget.Widget):
         for c in self.children:
             if isinstance(c, graph.Graph):
                 s = c.settings
-                s.leftMargin = '0'
-                s.topMargin = '0'
-                s.rightMargin = '0'
-                s.bottomMargin = '0'
+                s.leftMargin = '0cm'
+                s.topMargin = '0cm'
+                s.rightMargin = '0cm'
+                s.bottomMargin = '0cm'
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Draws the widget's children."""
 
         s = self.settings
-        self.margins = [s.leftMargin, s.topMargin,
-                        s.rightMargin, s.bottomMargin]
 
         # FIXME: this is very stupid, but works
         # if the contents have been modified, recalculate the positions
@@ -258,13 +256,17 @@ class Grid(widget.Widget):
             self._recalcPositions()
             self.olddimensions = dimensions
 
+        margins = ( s.get('leftMargin').convert(painter),
+                    s.get('topMargin').convert(painter),
+                    s.get('rightMargin').convert(painter),
+                    s.get('bottomMargin').convert(painter) )
+
         # draw children in reverse order if they are not axes
-        bounds = self.computeBounds(parentposn, painter)
-        #for i in range(len(self.children)-1, -1, -1 ):
+        bounds = self.computeBounds(parentposn, painter, margins=margins)
         for i in range(len(self.children)):
             c = self.children[i]
             if not isinstance(c, axis.Axis):
-                self.children[i].draw(bounds, painter, outerbounds=parentposn)
+                c.draw(bounds, painter, outerbounds=parentposn)
 
         # do not call widget.Widget.draw
 

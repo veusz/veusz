@@ -63,7 +63,7 @@ class PlotWindow( qt.QScrollView ):
         # convert distances into pixels
         painter = qt.QPainter( self )
         painter.veusz_scaling = self.zoomfactor
-        size = utils.cnvtDists(self.document.getSize(), painter )
+        size = self.document.basewidget.getSize(painter)
         painter.end()
 
         # make new buffer and resize widget

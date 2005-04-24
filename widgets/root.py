@@ -47,6 +47,11 @@ class Root(widget.Widget):
         if type(self) == Root:
             self.readDefaults()
 
+    def getSize(self, painter):
+        """Get dimensions of widget in painter coordinates."""
+        return ( self.settings.get('width').convert(painter),
+                 self.settings.get('height').convert(painter) )
+            
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the plotter. Clip graph inside bounds."""
 

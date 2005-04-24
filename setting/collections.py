@@ -24,7 +24,7 @@ import qt
 
 import settings
 import setting
-from utils import cnvtDist, cnvtDistPts, formatNumber
+from utils import formatNumber
 
 colors = [ 'black', 'red', 'green', 'blue',
            'cyan', 'magenta', 'yellow',
@@ -75,7 +75,7 @@ class Line(settings.Settings):
         '''Make a QPen from the description'''
 
         return qt.QPen( qt.QColor(self.color),
-                        cnvtDist(self.width, painter),
+                        self.get('width').convert(painter),
                         convertline[self.style] )
 
 class XYPlotLine(Line):
@@ -146,7 +146,7 @@ class MajorTick(Line):
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
         
-        return cnvtDist( self.length, painter )
+        return self.get('length').convert(painter)
     
 class MinorTick(Line):
     '''Minor tick settings.'''
@@ -161,7 +161,7 @@ class MinorTick(Line):
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
         
-        return cnvtDist( self.length, painter )
+        return self.get('length').convert(painter)
     
 class GridLine(Line):
     '''Grid line settings.'''
@@ -226,7 +226,8 @@ class Text(settings.Settings):
             
     def makeQFont(self, painter):
         '''Return a qt.QFont object corresponding to the settings.'''
-        size = cnvtDistPts(self.size, painter)
+        
+        size = self.get('size').convertPts(painter)
         weight = qt.QFont.Normal
         if self.bold: weight = qt.QFont.Bold
 

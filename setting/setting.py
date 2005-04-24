@@ -28,6 +28,10 @@ s.set(42)
 s.fromText('42')
 """
 
+import re
+import math
+import qt
+
 import utils
 import controls
 import widgets
@@ -345,11 +349,85 @@ class IntOrAuto(Setting):
     def makeControl(self, *args):
         return controls.SettingChoice(self, True, ['Auto'], *args)
 
+
+# these are functions used by the distance setting below.
+# they don't work as class methods
+
+def _calcPixPerPt(painter):
+    """Calculate the numbers of pixels per point for the painter.
+
+    This is stored in the variable veusz_pixperpt."""
+
+    dm = qt.QPaintDeviceMetrics(painter.device())
+    painter.veusz_pixperpt = dm.logicalDpiY() / 72.
+
+def _distPhys(match, painter, mult):
+    """Convert a physical unit measure in multiples of points."""
+
+    if not hasattr(painter, 'veusz_pixperpt'):
+        _calcPixPerPt(painter)
+
+    return int( math.ceil(painter.veusz_pixperpt * mult *
+                          float(match.group(1)) * painter.veusz_scaling ) )
+
+def _distPerc(match, painter, maxsize):
+    """Convert from a percentage of maxsize."""
+
+    return int( math.ceil(maxsize * 0.01 * float(match.group(1))) )
+
+def _distFrac(match, painter, maxsize):
+    """Convert from a fraction a/b of maxsize."""
+
+    return int( math.ceil(maxsize * float(match.group(1)) /
+                          float(match.group(2))) )
+
+def _distRatio(match, painter, maxsize):
+    """Convert from a simple 0.xx ratio of maxsize."""
+
+    # if it's greater than 1 then assume it's a point measurement
+    if float(match.group(1)) > 1.:
+        return _distPhys(match, painter, 1)
+
+    return int( math.ceil(maxsize * float(match.group(1))) )
+
+# mappings from regular expressions to function to convert distance
+# the recipient function takes regexp match,
+# painter and maximum size of frac
+_distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
+                  _distPerc ),
+                ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
+                  _distFrac ),
+                ( re.compile('^([0-9\.]+) *pt$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 1.) ),
+                ( re.compile('^([0-9\.]+) *cm$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 28.452756) ),
+                ( re.compile('^([0-9\.]+) *mm$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 2.8452756) ),
+                ( re.compile('^([0-9\.]+) *(inch|in|")$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 72.27) ),
+                ( re.compile('^([0-9\.]+)$'),
+                  _distRatio )
+                ]
+
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
-    
+
+    def isDist(self, dist):
+        """Is the text a valid distance measure?"""
+        
+        dist = dist.strip()
+        for reg, fn in _distregexp:
+            if reg.match(dist):
+                return True
+            
+        return False
+
     def convertTo(self, val):
-        if utils.isDist(val):
+        if self.isDist(val):
             return val
         else:
             raise InvalidType
@@ -358,7 +436,7 @@ class Distance(Setting):
         return self.val
 
     def fromText(self, text):
-        if utils.isDist(text):
+        if self.isDist(text):
             return text
         else:
             raise InvalidType
@@ -366,6 +444,47 @@ class Distance(Setting):
     def makeControl(self, *args):
         return controls.SettingDistance(self, *args)
 
+    def convert(self, painter):
+        '''Convert a distance to plotter units.
+
+        dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
+                 10pt, 1cm, 20mm, 1inch, 1in, 1" (size)
+        maxsize: size fractions are relative to
+        painter: painter to get metrics to convert physical sizes
+        '''
+
+        # we set a scaling variable in the painter if it's not set
+        if 'veusz_scaling' not in painter.__dict__:
+            painter.veusz_scaling = 1.
+
+        # work out maximum size
+        try:
+            maxsize = max( *painter.veusz_page_size )
+        except AttributeError:
+            w = painter.window()
+            maxsize = max(w.width(), w.height())
+
+        dist = self.val.strip()
+
+        # compare string against each regexp
+        for reg, fn in _distregexp:
+            m = reg.match(dist)
+
+            # if there's a match, then call the appropriate conversion fn
+            if m:
+                return fn(m, painter, maxsize)
+
+        # none of the regexps match
+        raise ValueError( "Cannot convert distance in form '%s'" %
+                          dist )
+
+    def convertPts(self, painter):
+        """Get the distance in points."""
+        if not hasattr(painter, 'veusz_pixperpt'):
+            _calcPixPerPt(painter)
+
+        return self.convert(painter) / painter.veusz_pixperpt
+        
 class Choice(Setting):
     """One out of a list of strings."""
 
