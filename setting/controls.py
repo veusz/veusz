@@ -288,6 +288,7 @@ class DatasetChoose(SettingChoice):
         # existing setting
         currenttext = unicode(self.currentText())
 
+        # get index for value, or add value if not set
         try:
             index = datasets.index(currenttext)
         except ValueError:
@@ -297,7 +298,7 @@ class DatasetChoose(SettingChoice):
         # put in new entries
         self.insertStrList(datasets)
     
-        # look up index in list if possible, and set to it
+        # set index to current value
         self.setCurrentItem(index)
 
     def slotModified(self, modified):
