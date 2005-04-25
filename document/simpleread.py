@@ -51,7 +51,7 @@ import doc
 class _DescriptorPart:
 
     # used to split the descriptor expression
-    partsplitter = re.compile( r'(\+-|\+|-|[a-zA-Z][a-zA-Z0-9_]*'
+    partsplitter = re.compile( r'(\+-|\+|-|[a-zA-Z0-9_]+'
                                r'|\[[\-0-9]*[:][\-0-9]*\]|,)' )
     # check a variable name
     #checkvar = re.compile(r'^[A-Za-z][A-za-z0-9]*$')
