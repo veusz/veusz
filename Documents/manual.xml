@@ -671,6 +671,10 @@ SetData('y', y)
         given, for example <command>Add('axis', name='y',
         direction='vertical')</command>.</para>
 	
+	<para>Subsettings may be set by using double underscores, for
+	example <command>Add('xy',
+	MarkerFill__color='red', ErrorBarLine__hide=True)</command>.</para>
+
 	<para>Returns: Name of widget added.</para>
       </section>
 

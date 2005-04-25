@@ -1,3 +1,7 @@
+* 2005-04-25 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Allow subsettings to be set in Add command
+	a__b maps to a/b, e.g. Add('xy', MarkerFill__color='red')
+
 * 2005-04-23 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Twiddle rounding in axis.py to try to avoid off-by-one pixel bugs
 	- Move distance calculation code into Distance setting

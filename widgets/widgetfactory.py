@@ -39,7 +39,10 @@ class WidgetFactory:
 
         # set all the passed default settings
         for name, val in optargs.iteritems():
-            w.settings.get(name).set(val)
+            # allow subsettings to be set using __ -> syntax
+            name = name.replace('__', '/')
+
+            w.prefLookup(name).set(val)
 
         if autoadd:
             w.addDefaultSubWidgets()
