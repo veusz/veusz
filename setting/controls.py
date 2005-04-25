@@ -288,14 +288,17 @@ class DatasetChoose(SettingChoice):
         # existing setting
         currenttext = unicode(self.currentText())
 
+        try:
+            index = datasets.index(currenttext)
+        except ValueError:
+            datasets.append(currenttext)
+            index = len(datasets)-1
+
         # put in new entries
         self.insertStrList(datasets)
     
         # look up index in list if possible, and set to it
-        try:
-            self.setCurrentItem( datasets.index(currenttext) )
-        except ValueError:
-            pass
+        self.setCurrentItem(index)
 
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
