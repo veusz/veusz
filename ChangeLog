@@ -1,3 +1,6 @@
+* 2005-04-28 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Fixed colour of axis/tick labels
+
 * 2005-04-25 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Allow subsettings to be set in Add command
 	a__b maps to a/b, e.g. Add('xy', MarkerFill__color='red')

@@ -427,7 +427,6 @@ class Axis(widget.Widget):
 
         s = self.settings
         vertical = s.direction == 'vertical'
-        painter.setPen( s.get('TickLabels').makeQPen() )
         font = s.get('TickLabels').makeQFont(painter)
         painter.setFont(font)
         tl_spacing = ( painter.fontMetrics().leading() +
@@ -461,6 +460,7 @@ class Axis(widget.Widget):
         maxdim = 0
 
         b = self.coordPerp + sign*(self._delta_axis+tl_spacing)
+        pen = s.get('TickLabels').makeQPen()
         for a, num in zip(coordticks, self.majortickscalc):
 
             # x and y round other way if vertical
@@ -474,7 +474,7 @@ class Axis(widget.Widget):
                                alignvert=ay, angle=angle)
             r.ensureInBox(extraspace=True, **bounds)
             bnd = r.getBounds()
-            texttorender.append(r)
+            texttorender.append( (r, pen) )
 
             if vertical:
                 maxdim = max(maxdim, bnd[2] - bnd[0])
@@ -494,7 +494,6 @@ class Axis(widget.Widget):
 
         s = self.settings
         sl = s.Label
-        painter.setPen( s.get('Label').makeQPen() )
         font = s.get('Label').makeQFont(painter)
         painter.setFont(font)
         al_spacing = ( painter.fontMetrics().leading() +
@@ -551,7 +550,7 @@ class Axis(widget.Widget):
             r.ensureInBox( minx=outerbounds[0], maxx=outerbounds[2],
                            miny=outerbounds[1], maxy=outerbounds[3] )
 
-        texttorender.insert(0, r)
+        texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
     def _autoMirrorDraw(self, posn, painter, coordticks):
         """Mirror axis to opposite side of graph if there isn't
@@ -678,8 +677,9 @@ class Axis(widget.Widget):
         # this is done by keeping a qregion containing the painted region
         # if new text overlaps this, don't paint it
         drawntext = qt.QRegion()
-        for r in texttorender:
+        for r, pen in texttorender:
             if not r.overlapsRegion(drawntext):
+                painter.setPen(pen)
                 box = r.render()
                 drawntext += ( qt.QRegion(box[0], box[1],
                                           box[2]-box[0]+1,

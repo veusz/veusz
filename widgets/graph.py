@@ -138,6 +138,7 @@ class Graph(widget.Widget):
                               bounds[3]-bounds[1]+1 )
 
         # work out outer bounds
+        # FIXME: Doesn't work if margin is zero on one axis
         if outerbounds == None or margins != (0., 0., 0., 0.):
             # if we don't have information, or the margins are non-zero
             ob = parentposn
