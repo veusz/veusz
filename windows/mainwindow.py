@@ -85,25 +85,65 @@ class MainWindow(qt.QMainWindow):
         self.connect( self.treeedit, qt.PYSIGNAL("sigPageChanged"),
                       self.plot.setPageNumber )
 
+        # put the dock windows on the view menu, so they can be shown/hidden
+        self._defineDockViewMenu()
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().message(text, 2000)
+
+    def _defineDockViewMenu(self):
+        """Put the dock windows on the view menu."""
+
+        view = self.menus['view']
+        view.setCheckable(True)
+        view.insertSeparator(0)
+        self.viewdockmenuitems = {}
+
+        for win in self.dockWindows():
+            # get name with veusz removed
+            # FIXME with something better here
+            text = win.caption()
+            text.replace(' - Veusz', '')
+
+            item = view.insertItem(text, -1, 0)
+            view.connectItem(item, self.slotViewDockWindow)
+            self.viewdockmenuitems[item] = win
+
+        self.connect(view, qt.SIGNAL('aboutToShow()'),
+                     self.slotAboutToShowView)
+
+    def slotAboutToShowView(self):
+        """Put check marks against dock menu items if appropriate."""
+
+        view = self.menus['view']
+        for item, win in self.viewdockmenuitems.items():
+            view.setItemChecked(item, win.isVisible())
+            view.setItemParameter(item, item)
+        
+    def slotViewDockWindow(self, item):
+        """Show or hide dock windows as selected."""
+
+        win = self.viewdockmenuitems[item]
+        if win.isVisible():
+            win.hide()
+        else:
+            win.show()
 
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
 
         # create toolbar
         self.maintoolbar = qt.QToolBar(self, "maintoolbar")
-        self.maintoolbar.setLabel("Veusz - toolbar")
+        self.maintoolbar.setLabel("Main toolbar - Veusz")
 
         # add main menus
         menus = [
-
             ('file', '&File'),
             ('edit', '&Edit'),
-            ('data', '&Data'),
-            ('insert', '&Insert'),
             ('view', '&View'),
+            ('insert', '&Insert'),
+            ('data', '&Data'),
             ('help', '&Help')
             ]
 

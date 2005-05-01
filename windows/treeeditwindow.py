@@ -182,7 +182,7 @@ class TreeEditWindow(qt.QDockWindow):
     def __init__(self, thedocument, parent):
         qt.QDockWindow.__init__(self, parent)
         self.setResizeEnabled( True )
-        self.setCaption("Graph tree - Veusz")
+        self.setCaption("Editing - Veusz")
 
         self.parent = parent
         self.document = thedocument
@@ -193,7 +193,7 @@ class TreeEditWindow(qt.QDockWindow):
 
         # make toolbar in parent to have the add graph/edit graph buttons
         self.edittool = qt.QToolBar(parent, "treetoolbar")
-        self.edittool.setLabel("Veusz - editing toolbar")
+        self.edittool.setLabel("Editing toolbar - Veusz")
         parent.moveDockWindow(self.edittool, qt.Qt.DockLeft, True, 0)
 
         totvbox = qt.QVBox(self)

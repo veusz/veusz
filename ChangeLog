@@ -2,6 +2,7 @@
 	- Put in patch from James Graham to choose from list of fonts
 	- Use context menu for settings, rather than button
 	- Add missing descr for marker and markerSize
+	- View menu can show/hide dock windows
 	
 * 2005-04-28 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fixed colour of axis/tick labels
