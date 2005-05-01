@@ -116,6 +116,66 @@ class _ScrollView(qt.QScrollView):
         qt.QScrollView.resizeEvent(self, event)
         self.adjustSize()
 
+class _PropertyLabel(qt.QLabel):
+    """A label which produces the veusz setting context menu."""
+    
+    def __init__(self, setting, *args):
+        """Initialise the label for the given setting."""
+        qt.QLabel.__init__(self, *args)
+        self.setting = setting
+        qt.QToolTip.add( self, "<strong>%s</strong> - %s" %
+                         (setting.name, setting.descr) )
+        self.setMinimumWidth(30)
+
+    def contextMenuEvent(self, event):
+        """Pop up the context menu."""
+
+        # forces settings to be updated
+        self.parentWidget().setFocus()
+
+        # get widget, with its type and name
+        widget = self.setting.parent
+        while not isinstance(widget, widgets.Widget):
+            widget = widget.parent
+
+        type = widget.typename
+        name = widget.name
+        
+        # construct the popup menu
+        popup = qt.QPopupMenu(self)
+        popup.insertItem('Reset to default', 0)
+        popup.insertSeparator()
+        popup.insertItem('Copy to "%s" widgets' % type, 100)
+        popup.insertItem('Copy to "%s" siblings' % type, 101)
+        popup.insertItem('Copy to "%s" widgets called "%s"' %
+                         (type, name), 102)
+        popup.insertSeparator()
+        popup.insertItem('Make default for "%s" widgets' % type, 200)
+        popup.insertItem('Make default for "%s" widgets called "%s"' %
+                         (type, name), 201)
+        popup.insertItem('Forget this default setting', 202)
+        
+        ret = popup.exec_loop( qt.QCursor.pos() )
+
+        # convert values above to functions
+        doc = widget.document
+        setn = self.setting
+        fnmap = {
+            0: setn.resetToDefault,
+            100: (lambda: doc.propagateSettings(setn)),
+            101: (lambda: doc.propagateSettings(setn, root=widget.parent,
+                                                maxlevels=1)),
+            102: (lambda: doc.propagateSettings(setn, widgetname=name)),
+            
+            200: (lambda: setn.setAsDefault(False)),
+            201: (lambda: setn.setAsDefault(True)),
+            202: setn.removeDefault
+            }
+
+        # call the function if item was selected
+        if ret >= 0:
+            fnmap[ret]()
+
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
 
@@ -379,16 +439,10 @@ class TreeEditWindow(qt.QDockWindow):
 
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
-            b = qt.QPushButton(setn.name, self.prefgrid)
-            b.setFlat(True)
-            b.setMinimumWidth(10)
-            b.veuszSetting = setn
-            qt.QToolTip.add(b, setn.descr)
-            b.show()
-            self.prefchilds.append(b)
-            self.connect( b, qt.SIGNAL('pressed()'),
-                          self.slotLabelButtonPressed )
-            
+            l = _PropertyLabel(setn, setn.name, self.prefgrid)
+            l.show()
+            self.prefchilds.append(l)
+
             c = setn.makeControl(self.prefgrid)
             qt.QToolTip.add(c, setn.descr)
             c.show()
@@ -462,60 +516,6 @@ class TreeEditWindow(qt.QDockWindow):
         action = button.veusz_action
         console = self.parent.console
         console.runFunction( action )
-
-    def slotLabelButtonPressed(self):
-        """Called when one of the label buttons is pressed.
-
-        This pops up a menu allowing propagation of values, resetting to
-        default, or making the default
-        """
-
-        # get the button pressed
-        button = self.sender()
-        button.setFocus()
-        setn = button.veuszSetting
-
-        # find the selected widget, get its type and name
-        widget = self.itemselected.widget
-        if widget == None:
-            widget = self.itemselected.parent.widget
-        type = widget.typename
-        name = widget.name
-        
-        # construct the popup menu
-        popup = qt.QPopupMenu(button)
-        popup.insertItem('Reset to default', 0)
-        popup.insertSeparator()
-        popup.insertItem('Copy to "%s" widgets' % type, 100)
-        popup.insertItem('Copy to "%s" siblings' % type, 101)
-        popup.insertItem('Copy to "%s" widgets called "%s"' %
-                         (type, name), 102)
-        popup.insertSeparator()
-        popup.insertItem('Make default for "%s" widgets' % type, 200)
-        popup.insertItem('Make default for "%s" widgets called "%s"' %
-                         (type, name), 201)
-        popup.insertItem('Forget this default setting', 202)
-        
-        ret = popup.exec_loop(
-            button.mapToGlobal( qt.QPoint(0, button.height()) ))
-
-        # convert values above to functions
-        doc = self.document
-        fnmap = {
-            0: setn.resetToDefault,
-            100: (lambda: doc.propagateSettings(setn)),
-            101: (lambda: doc.propagateSettings(setn, root=widget.parent,
-                                                maxlevels=1)),
-            102: (lambda: doc.propagateSettings(setn, widgetname=name)),
-            
-            200: (lambda: setn.setAsDefault(False)),
-            201: (lambda: setn.setAsDefault(True)),
-            202: setn.removeDefault
-            }
-
-        # call the function if item was selected
-        if ret >= 0:
-            fnmap[ret]()
 
     def slotWidgetDelete(self, a):
         """Delete the widget selected."""

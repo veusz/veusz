@@ -67,6 +67,9 @@ class MainWindow(qt.QMainWindow):
         self.setCentralWidget( self.plot )
         self.updateStatusbar('Ready')
 
+        # no dock menu, so we can popup context menus
+        self.setDockMenuEnabled(False)
+
         # keep page number up to date
         self.pagelabel = qt.QLabel(self.statusBar())
         self.statusBar().addWidget(self.pagelabel)
