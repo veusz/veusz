@@ -178,6 +178,7 @@ class Text(settings.Settings):
 
     # need to examine font table to see what's available
     defaultfamily=''
+    families = []
 
     def __init__(self, name, descr = ''):
         settings.Settings.__init__(self, name, descr=descr)
@@ -185,8 +186,9 @@ class Text(settings.Settings):
         if Text.defaultfamily == '':
             Text._getDefaultFamily()
 
-        self.add( setting.Str('font', Text.defaultfamily,
-                  descr = 'Font name' ) )
+        self.add( setting.ChoiceOrMore('font', Text.families,
+                                       Text.defaultfamily,
+                                       descr = 'Font name' ) )
         self.add( setting.Distance('size', '14pt',
                   descr = 'Font size' ) )
         self.add( setting.ChoiceOrMore( 'color', colors, 'black',
@@ -200,24 +202,27 @@ class Text(settings.Settings):
         self.add( setting.Bool( 'hide', False,
                                 descr = 'Hide the text') )
 
+    def _getFontFamilies():
+        '''Make list of font families available.'''
+        Text.families=[ unicode(name)
+                        for name in qt.QFontDatabase().families() ]
+        
+    _getFontFamilies = staticmethod(_getFontFamilies)
+
     def _getDefaultFamily():
         '''Choose a default font family. We check through a list until we
         get a sensible default.'''
 
-        db = qt.QFontDatabase()
-
-        # build a dict up with the list of families
-        families = {}
-        for i in db.families():
-            families[unicode(i)] = True
+        if not Text.families:
+            Text._getFontFamilies()
 
         for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
                   'Serif']:
-            if i in families:
+            if i in Text.families:
                 Text.defaultfamily = i
-                qf = qt.QFont(i)
                 return
 
+        Text.defaultfamily = Text.families[0]
         raise RuntimeError('Could not identify sensible default font for Veusz'
                            '. Please report this bug if you have any fonts '
                            'installed')
