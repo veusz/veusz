@@ -308,8 +308,10 @@ class PointPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, name=name)
         s = self.settings
 
-        s.add( setting.Distance('markerSize', '3pt'), 0 )
-        s.add( setting.Choice('marker', utils.MarkerCodes, 'circle'), 0 )
+        s.add( setting.Distance('markerSize', '3pt',
+                                descr = 'Size of marker to plot'), 0 )
+        s.add( setting.Choice('marker', utils.MarkerCodes, 'circle',
+                              descr = 'Type of marker to plot'), 0 )
         s.add( setting.Dataset('yData', 'y', self.document,
                                descr = 'Variable containing y data'), 0 )
         s.add( setting.Dataset('xData', 'x', self.document,
