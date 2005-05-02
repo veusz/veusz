@@ -143,6 +143,9 @@ class _PropertyLabel(qt.QLabel):
         self.setting = setting
         self.setMinimumWidth(50)
 
+        # a keyboard user can get to the label to operate the property menu
+        self.setFocusPolicy(qt.QWidget.StrongFocus)
+
     def contextMenuEvent(self, event):
         """Pop up the context menu."""
 
