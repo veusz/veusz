@@ -78,6 +78,9 @@ class Widget(object):
         if self.parent == None:
             raise ValueError, 'Cannot rename root widget'
 
+        if name.find('/') != -1:
+            raise ValueError, 'Names cannot contain "/"'
+
         # check whether name already exists in siblings
         for i in self.parent.children:
             if i != self and i.name == name:

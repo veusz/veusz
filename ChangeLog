@@ -8,6 +8,7 @@
 	- Widgets can now be renamed (Rename command added too)
 	- Labels for properties can now have keyboard focus. This allows
 	context menu to be used from keyboard.
+	- Widget names cannot contain /
 	
 * 2005-05-01 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Put in patch from James Graham to choose from list of fonts

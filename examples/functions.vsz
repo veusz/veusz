@@ -1,6 +1,6 @@
-# Veusz saved document (version 0.5)
+# Veusz saved document (version 0.6-cvs)
 # User: jss
-# Date: Sat, 16 Apr 2005 14:58:08 +0000
+# Date: Mon, 02 May 2005 16:52:50 +0000
 
 Add('page', name='page1', autoadd=False)
 To('page1')
@@ -53,7 +53,6 @@ Add('axis', name='axis1', autoadd=False)
 To('axis1')
 Set('label', 'Another axis')
 Set('log', True)
-Set('reflect', True)
 Set('direction', 'vertical')
 Set('otherPosition', 1.0)
 Set('TickLabels/format', 'e*')

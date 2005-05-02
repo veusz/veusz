@@ -35,6 +35,11 @@ class WidgetFactory:
     def makeWidget(self, widgetname, parent, name=None, autoadd=True,
                    **optargs):
         """Make a new widget of the appropriate type."""
+
+        # check for / in name of widget
+        if name != None and name.find('/') != -1:
+            raise ValueError, 'name cannot contain "/"'
+
         w = self.regwidgets[widgetname](parent, name=name)
 
         # set all the passed default settings
