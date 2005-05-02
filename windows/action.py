@@ -125,10 +125,6 @@ class Action(qt.QObject):
 
         for i in self.items:
             if isinstance(i[0], qt.QButton):
-                #if enabled:
-                #    i[0].show()
-                #else:
-                #    i[0].hide()
                 i[0].setEnabled(enabled)
             elif isinstance(i[0], qt.QPopupMenu):
                 i[0].setItemEnabled(i[1], enabled)

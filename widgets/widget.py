@@ -72,6 +72,20 @@ class Widget(object):
         self.actionfuncs = {}
         self.actiondescr = {}
 
+    def rename(self, name):
+        """Change name of self."""
+
+        if self.parent == None:
+            raise ValueError, 'Cannot rename root widget'
+
+        # check whether name already exists in siblings
+        for i in self.parent.children:
+            if i != self and i.name == name:
+                raise ValueError, 'New name "%s" already exists' % name
+
+        self.name = name
+        self.document.setModified()
+
     def addDefaultSubWidgets(self):
         '''Add default sub widgets to widget, if any'''
         pass
@@ -291,7 +305,7 @@ class Widget(object):
         for child, index in itertools.izip(self.children, itertools.count(1)):
             child._recursiveBuildSlots(slots)
             slots.append( (self, index) )
-            
+
     def moveChild(self, w, direction):
         """Move the child widget w up in the hierarchy in the direction.
         direction is -1 for 'up' or +1 for 'down'

@@ -83,6 +83,7 @@ class CommandInterpreter:
             'List': i.List,
             'Load': self.Load,
             'Print': i.Print,
+            'Rename': i.Rename,
             'Remove': i.Remove,
             'Save': i.Save,
             'Set': i.Set,

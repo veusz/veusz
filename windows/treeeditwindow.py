@@ -37,6 +37,7 @@ class _WidgetItem(qt.QListViewItem):
         """Widget is the widget to show the settings for."""
         
         qt.QListViewItem.__init__(self, qtparent)
+        self.setRenameEnabled(0, True)
 
         self.index = 0
         self.widget = widget
@@ -47,6 +48,23 @@ class _WidgetItem(qt.QListViewItem):
         for s in self.settings.getSettingsList():
             _PrefItem(s, no, self)
             no += 1
+
+    def setText(self, col, text):
+        """Update name of widget if rename is called."""
+
+        # update name of widget
+        if col == 0:
+            try:
+                self.widget.rename( unicode(text) )
+            except ValueError:
+                # if the rename failed
+                text = self.widget.name
+
+        qt.QListViewItem.setText(self, col, text)
+
+    def rename(self):
+        """Rename the listviewitem."""
+        self.startRename(0)
 
     def compare(self, i, col, ascending):
         """Always sort according to the index value."""
@@ -143,7 +161,8 @@ class _PropertyLabel(qt.QLabel):
         popup = qt.QPopupMenu(self)
 
         # put a label at top with name of setting
-        l = qt.QLabel('<strong>%s</strong>' % self.setting.name, self)
+        l = qt.QLabel('<strong>%s</strong>' %
+                      qt.QStyleSheet.escape(self.setting.name), self)
         l.setAlignment(qt.Qt.AlignCenter)
         popup.insertItem(l)
         
@@ -180,6 +199,33 @@ class _PropertyLabel(qt.QLabel):
         if ret >= 0:
             fnmap[ret]()
 
+class _ContextPopup(qt.QPopupMenu):
+    """A popup context menu for widgets."""
+
+    def __init__(self, parent):
+        """Create a popup menu, but add a label at the top."""
+        qt.QPopupMenu.__init__(self, parent)
+        self.label = qt.QLabel('', self)
+        self.label.setAlignment(qt.Qt.AlignCenter)
+        self.insertItem(self.label)
+
+    def exec_loop(self, widget, where):
+        """Show the menu for the widget given."""
+
+        text = '<strong>%s</strong> - %s' % (
+            qt.QStyleSheet.escape(widget.name),
+            qt.QStyleSheet.escape(widget.typename) )
+        self.label.setText(text)
+
+        qt.QPopupMenu.exec_loop(self, where)
+        
+class _WidgetListView(qt.QListView):
+    """A list view which emits contextMenu signals."""
+
+    def contextMenuEvent(self, event):
+        """Emit a context menu signal."""
+        self.emit( qt.PYSIGNAL('contextMenu'), () )
+
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
 
@@ -200,75 +246,24 @@ class TreeEditWindow(qt.QDockWindow):
         self.edittool.setLabel("Editing toolbar - Veusz")
         parent.moveDockWindow(self.edittool, qt.Qt.DockLeft, True, 0)
 
+        self._constructToolbarMenu()
+
+        # window uses vbox for arrangement
         totvbox = qt.QVBox(self)
         self.setWidget(totvbox)
-
-        # make buttons for each of the graph types
-        self.createGraphActions = {}
-        horzbox = qt.QFrame(totvbox)
-
-        mdir = os.path.dirname(__file__)
-
-        insertmenu = parent.menus['insert']
-
-        for wc in self._getWidgetOrder():
-            name = wc.typename
-            if wc.allowusercreation:
-                a = action.Action(self,
-                                  (lambda w:
-                                   (lambda a: self.slotMakeWidgetButton(w)))
-                                  (name),
-                                  iconfilename = 'button_%s.png' % name,
-                                  menutext = 'Add %s' % name,
-                                  statusbartext = wc.description,
-                                  tooltiptext = wc.description)
-                b = a.addTo(self.edittool)
-                #b.setAutoRaise(True)
-                #self.boxlayout.addWidget(b)
-                a.addTo(insertmenu)
-                self.createGraphActions[wc] = a
-
-
-        self.edittool.addSeparator()
-
-        # make buttons for user actions
-        self.editactions = {}
-
-        editmenu = parent.menus['edit']
-        for name, icon, tooltip, menutext, slot in (
-            ('moveup', 'go-up', 'Move the selected widget up',
-             'Move up',
-             lambda a: self.slotWidgetMove(a, -1) ),
-            ('movedown', 'go-down', 'Move the selected widget down',
-             'Move down',
-             lambda a: self.slotWidgetMove(a, 1) ),
-            ('delete', 'delete', 'Remove the selected widget',
-             'Delete',
-             self.slotWidgetDelete)
-            ):
-
-            a = action.Action(self, slot,
-                              iconfilename = 'stock-%s.png' % icon,
-                              menutext = menutext,
-                              statusbartext = tooltip,
-                              tooltiptext = tooltip)
-            a.addTo(self.edittool)
-            a.addTo(editmenu)
-            self.editactions[name] = a
-
-
-        #self.boxlayout.addStretch()
 
         # put widgets in a movable splitter
         split = qt.QSplitter(totvbox)
         split.setOrientation(qt.QSplitter.Vertical)
 
         # first widget is a listview
-        lv = qt.QListView(split)
+        lv = self.listview = _WidgetListView(split)
         lv.setSorting(-1)
         lv.setRootIsDecorated(True)
         self.connect( lv, qt.SIGNAL("selectionChanged(QListViewItem*)"),
                       self.slotItemSelected )
+        self.connect( lv, qt.PYSIGNAL('contextMenu'),
+                      self.slotListContextMenu )
 
         # we use a hidden column to get the sort order correct
         lv.addColumn( "Name" )
@@ -280,7 +275,6 @@ class TreeEditWindow(qt.QDockWindow):
 
         # add root widget to view
         self.rootitem = _WidgetItem( self.document.basewidget, lv )
-        self.listview = lv
 
         # add a scrollable view for the preferences
         # children get added to prefview
@@ -298,6 +292,63 @@ class TreeEditWindow(qt.QDockWindow):
 
         # select the root item
         self.listview.setSelected(self.rootitem, True)
+
+    def _constructToolbarMenu(self):
+        """Add items to edit/add graph toolbar and menu."""
+
+        # make buttons to add each of the widget types
+        self.createGraphActions = {}
+
+        insertmenu = self.parent.menus['insert']
+
+        for wc in self._getWidgetOrder():
+            name = wc.typename
+            if wc.allowusercreation:
+                a = action.Action(self,
+                                  (lambda w:
+                                   (lambda a: self.slotMakeWidgetButton(w)))
+                                  (name),
+                                  iconfilename = 'button_%s.png' % name,
+                                  menutext = 'Add %s' % name,
+                                  statusbartext = wc.description,
+                                  tooltiptext = wc.description)
+
+                a.addTo(self.edittool)
+                a.addTo(insertmenu)
+                self.createGraphActions[wc] = a
+
+        self.edittool.addSeparator()
+
+        # make buttons and menu items for the various item editing ops
+        self.editactions = {}
+        editmenu = self.parent.menus['edit']
+
+        self.contextpopup = _ContextPopup(self)
+
+        for name, icon, tooltip, menutext, slot in (
+            ('moveup', 'stock-go-up.png', 'Move the selected item up',
+             'Move &up',
+             lambda a: self.slotWidgetMove(a, -1) ),
+            ('movedown', 'stock-go-down.png', 'Move the selected item down',
+             'Move &down',
+             lambda a: self.slotWidgetMove(a, 1) ),
+            ('delete', 'stock-delete.png', 'Remove the selected item',
+             '&Delete',
+             self.slotWidgetDelete),
+            ('rename', 'icon-rename.png', 'Rename the selected item',
+             '&Rename',
+             self.slotWidgetRename)
+            ):
+
+            a = action.Action(self, slot,
+                              iconfilename = icon,
+                              menutext = menutext,
+                              statusbartext = tooltip,
+                              tooltiptext = tooltip)
+            a.addTo(self.edittool)
+            a.addTo(self.contextpopup)
+            a.addTo(editmenu)
+            self.editactions[name] = a
 
     def _getWidgetOrder(self):
         """Return a list of the widgets, most important first.
@@ -400,8 +451,10 @@ class TreeEditWindow(qt.QDockWindow):
             action.enable( w != None )
 
         # delete shouldn't allow root to be deleted
-        self.editactions['delete'].enable(
-            not isinstance(selw, widgets.Root) )
+        isnotroot = not isinstance(selw, widgets.Root)
+
+        self.editactions['delete'].enable(isnotroot)
+        self.editactions['rename'].enable(isnotroot)
 
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
@@ -596,3 +649,22 @@ class TreeEditWindow(qt.QDockWindow):
         # try to highlight the associated item
         self.selectWidget(w)
         
+    def slotListContextMenu(self):
+        """Pop up a context menu when an item is clicked on the list view."""
+
+        # get selected widget
+        item = self.itemselected
+        while item.widget == None:
+            item = item.parent
+        widget = item.widget
+
+        self.contextpopup.exec_loop(widget, qt.QCursor.pos())
+
+    def slotWidgetRename(self, action):
+        """Initiate renaming a widget."""
+
+        item = self.itemselected
+        while item.widget == None:
+            item = item.parent
+
+        item.rename()

@@ -228,3 +228,12 @@ class CommandInterface(qt.QObject):
         
         self.document.export(filename, page, color=color)
             
+    def Rename(self, widget, newname):
+        """Rename the widget with the path given to the new name.
+
+        eg Rename('graph1/xy1', 'scatter')
+        This function does not move widgets."""
+
+        w = self.document.resolve(self.currentwidget, widget)
+        w.rename(newname)
+        

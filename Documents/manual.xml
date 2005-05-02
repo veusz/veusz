@@ -837,6 +837,17 @@ ImportString('x y', '''
       </section>
       
       <section>
+	<title><anchor id="Command.Rename" />Rename</title>
+	
+	<para><command>Remove('widgetpath', 'newname')</command></para>
+	
+	<para>Rename the widget at the path given to a new name. This
+	command does not move widgets.  See <link
+	linkend="Command.To">To</link> for a description of the path
+	syntax. '.' can be used to select the current widget.</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.Remove" />Remove</title>
 	
 	<para><command>Remove('widgetpath')</command></para>
