@@ -303,8 +303,9 @@ class MainWindow(qt.QMainWindow):
                             qt.QMessageBox.No,
                             qt.QMessageBox.Cancel | qt.QMessageBox.Escape,
                             self)
-        mb.setButtonText(qt.QMessageBox.Yes, "Save")
-        mb.setButtonText(qt.QMessageBox.No, "Discard")
+        mb.setButtonText(qt.QMessageBox.Yes, "&Save")
+        mb.setButtonText(qt.QMessageBox.No, "&Discard")
+        mb.setButtonText(qt.QMessageBox.Cancel, "&Cancel")
         return mb.exec_loop()
 
     def close(self, alsoDelete):
