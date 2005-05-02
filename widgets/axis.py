@@ -365,6 +365,15 @@ class Axis(widget.Widget):
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
 
+    def _reflected(self):
+        """Is the axis reflected?"""
+
+        s = self.settings
+        if s.otherPosition > 0.5:
+            return not s.reflect
+        else:
+            return s.reflect
+
     def _drawMinorTicks(self, painter):
         """Draw minor ticks on plot."""
 
@@ -376,7 +385,7 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if s.reflect:
+        if self._reflected():
             delta *= -1
         for t in minorticks:
             self.swapline( painter,
@@ -393,7 +402,7 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if s.reflect:
+        if self._reflected():
             delta *= -1
         for t in tickcoords:
             self.swapline( painter,
@@ -404,20 +413,6 @@ class Axis(widget.Widget):
         if startdelta < 0:
             self._delta_axis += abs(delta)
 
-    def _getTickLabelAlign(self, isfirst, islast):
-        if isfirst:
-            f = -1
-        elif islast:
-            f = 1
-        else:
-            f = 0
-
-        s = self.settings
-        return Axis._ticklabel_aligntable[s.direction == 'vertical',
-                                          s.TickLabels.rotate,
-                                          s.reflect,
-                                          f]
-        
     def _drawTickLabels(self, painter, coordticks, sign, texttorender):
         """Draw tick labels on the plot.
 
@@ -435,7 +430,10 @@ class Axis(widget.Widget):
 
         # work out font alignment
         if s.TickLabels.rotate:
-            angle = 270
+            if self._reflected():
+                angle = 90
+            else:
+                angle = 270
         else:
             angle = 0
         
@@ -451,7 +449,7 @@ class Axis(widget.Widget):
             ax = 0
             ay = 1
 
-        if s.reflect:
+        if self._reflected():
             ax = -ax
             ay = -ay
 
@@ -507,7 +505,8 @@ class Axis(widget.Widget):
             ax = 0
             ay = 1
 
-        if s.reflect:
+        reflected = self._reflected()
+        if reflected:
             ax = -ax
             ay = -ay
 
@@ -516,7 +515,10 @@ class Axis(widget.Widget):
              (not horz and sl.rotate) ):
             angle = 0
         else:
-            angle = 270
+            if reflected:
+                angle = 90
+            else:
+                angle = 270
 
         x = ( self.coordParr1 + self.coordParr2 ) / 2
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
@@ -526,14 +528,14 @@ class Axis(widget.Widget):
         # make axis label flush with edge of plot if
         # it's appropriate
         if outerbounds != None and sl.atEdge:
-            if abs(s.otherPosition) < 1e-4 and not s.reflect:
+            if abs(s.otherPosition) < 1e-4 and not reflected:
                 if horz:
                     y = outerbounds[3]
                     ay = -ay
                 else:
                     x = outerbounds[0]
                     ax = -ax
-            elif abs(s.otherPosition-1.) < 1e-4 and s.reflect:
+            elif abs(s.otherPosition-1.) < 1e-4 and reflected:
                 if horz:
                     y = outerbounds[1]
                     ay = -ay
@@ -577,9 +579,8 @@ class Axis(widget.Widget):
         else:
             next = 0.
 
-        # temporarily change these values
+        # temporarily change position of axis
         s.get('otherPosition').setSilent(next)
-        s.get('reflect').setSilent(not s.reflect)
 
         self._updatePlotRange(posn)
         if not s.Line.hide:
@@ -591,7 +592,6 @@ class Axis(widget.Widget):
 
         # put axis back
         s.get('otherPosition').setSilent(other)
-        s.get('reflect').setSilent(not s.reflect)
 
     def chooseName(self):
         """Axis are called x and y."""
@@ -637,7 +637,7 @@ class Axis(widget.Widget):
         sign = 1
         if s.direction == 'vertical':
             sign *= -1
-        if s.reflect:
+        if self._reflected():
             sign *= -1
 
         # plot gridlines
