@@ -121,11 +121,9 @@ class _PropertyLabel(qt.QLabel):
     
     def __init__(self, setting, *args):
         """Initialise the label for the given setting."""
-        qt.QLabel.__init__(self, *args)
+        qt.QLabel.__init__(self, setting.name, *args)
         self.setting = setting
-        qt.QToolTip.add( self, "<strong>%s</strong> - %s" %
-                         (setting.name, setting.descr) )
-        self.setMinimumWidth(30)
+        self.setMinimumWidth(50)
 
     def contextMenuEvent(self, event):
         """Pop up the context menu."""
@@ -445,12 +443,16 @@ class TreeEditWindow(qt.QDockWindow):
 
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
-            l = _PropertyLabel(setn, setn.name, self.prefgrid)
+            tooltext = "<strong>%s</strong> - %s" % (setn.name,
+                                                     setn.descr)
+            
+            l = _PropertyLabel(setn, self.prefgrid)
+            qt.QToolTip.add(l, tooltext)
             l.show()
             self.prefchilds.append(l)
 
             c = setn.makeControl(self.prefgrid)
-            qt.QToolTip.add(c, setn.descr)
+            qt.QToolTip.add(c, tooltext)
             c.show()
             self.prefchilds.append(c)
 

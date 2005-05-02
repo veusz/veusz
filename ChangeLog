@@ -3,6 +3,7 @@
 	- Reflected text rotated by 90 rather than 270 degrees
 	- Put property name on property context menu
 	- Shortcut keys added to quitting dialog
+	- Slight tooltip fixes in property editor
 	
 * 2005-05-01 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Put in patch from James Graham to choose from list of fonts
