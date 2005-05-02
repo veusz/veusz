@@ -181,7 +181,7 @@ class _PropertyLabel(qt.QLabel):
                          (type, name), 201)
         popup.insertItem('Forget this default setting', 202)
         
-        ret = popup.exec_loop( qt.QCursor.pos() )
+        ret = popup.exec_loop( event.globalPos() )
 
         # convert values above to functions
         doc = widget.document
@@ -227,7 +227,7 @@ class _WidgetListView(qt.QListView):
 
     def contextMenuEvent(self, event):
         """Emit a context menu signal."""
-        self.emit( qt.PYSIGNAL('contextMenu'), () )
+        self.emit( qt.PYSIGNAL('contextMenu'), (event.globalPos(),) )
 
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
@@ -282,9 +282,10 @@ class TreeEditWindow(qt.QDockWindow):
         # add a scrollable view for the preferences
         # children get added to prefview
         vbox = qt.QVBox(split)
-        label = qt.QLabel("Properties", vbox)
+        label = qt.QLabel("&Properties", vbox)
         label.setMargin(2)
         self.prefview = _ScrollView(vbox)
+        label.setBuddy(self.prefview)
 
         self.prefgrid = qt.QGrid(2, qt.QGrid.Horizontal,
                                  self.prefview.viewport())
@@ -652,7 +653,7 @@ class TreeEditWindow(qt.QDockWindow):
         # try to highlight the associated item
         self.selectWidget(w)
         
-    def slotListContextMenu(self):
+    def slotListContextMenu(self, pos):
         """Pop up a context menu when an item is clicked on the list view."""
 
         # get selected widget
@@ -661,7 +662,7 @@ class TreeEditWindow(qt.QDockWindow):
             item = item.parent
         widget = item.widget
 
-        self.contextpopup.exec_loop(widget, qt.QCursor.pos())
+        self.contextpopup.exec_loop(widget, pos)
 
     def slotWidgetRename(self, action):
         """Initiate renaming a widget."""
