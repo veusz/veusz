@@ -1,6 +1,7 @@
 * 2005-05-02 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Axes on other side of graph are automatically reflected
 	- Reflected text rotated by 90 rather than 270 degrees
+	- Put property name on property context menu
 	
 * 2005-05-01 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Put in patch from James Graham to choose from list of fonts

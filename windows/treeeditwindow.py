@@ -143,6 +143,12 @@ class _PropertyLabel(qt.QLabel):
         
         # construct the popup menu
         popup = qt.QPopupMenu(self)
+
+        # put a label at top with name of setting
+        l = qt.QLabel('<strong>%s</strong>' % self.setting.name, self)
+        l.setAlignment(qt.Qt.AlignCenter)
+        popup.insertItem(l)
+        
         popup.insertItem('Reset to default', 0)
         popup.insertSeparator()
         popup.insertItem('Copy to "%s" widgets' % type, 100)
