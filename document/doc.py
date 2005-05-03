@@ -206,6 +206,19 @@ class Document( qt.QObject ):
         self.data[name] = dataset
         self.setModified()
 
+    def deleteDataset(self, name):
+        """Remove the selected dataset."""
+        del self.data[name]
+        self.setModified()
+
+    def renameDataset(self, oldname, newname):
+        """Rename the dataset."""
+        d = self.data[oldname]
+        del self.data[oldname]
+        self.data[newname] = d
+
+        self.setModified()
+
     def getData(self, name):
         """Get data with name"""
         return self.data[name]

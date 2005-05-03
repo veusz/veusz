@@ -22,6 +22,8 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
+import re
+
 import qt
 import qttable
 
@@ -32,36 +34,51 @@ class DataEditDialog(qt.QDialog):
         """Initialise dialog."""
 
         qt.QDialog.__init__(self, parent, 'DataEditDialog', False)
-        self.setCaption('Edit data')
+        self.setCaption('Edit data - Veusz')
         self.document = document
         self.connect(document, qt.PYSIGNAL('sigModified'),
                      self.slotDocumentModified)
 
         spacing = self.fontMetrics().height() / 2
+        self.layout = qt.QVBoxLayout(self, spacing)
 
-        datahbox = qt.QHBox(self)
-        datahbox.setSpacing(spacing)
+        # list of datasets on left of table
+        datasplitter = qt.QSplitter(self)
+        self.layout.addWidget( datasplitter )
 
-        self.dslistbox = qt.QListBox(datahbox)
+        self.dslistbox = qt.QListBox(datasplitter)
         self.connect( self.dslistbox, qt.SIGNAL('highlighted(const QString&)'),
                       self.slotDatasetHighlighted )
 
-        self.dstable = qttable.QTable(datahbox)
-
         # initialise table
-        self.dstable.setNumCols(4)
-        
+        tab = self.dstable = qttable.QTable(datasplitter)
+        tab.setReadOnly(True)
+        tab.setNumCols(4)
+        for num, text in zip( range(4),
+                              ['Value', 'Symmetric error', 'Positive error',
+                               'Negative error'] ):
+            tab.horizontalHeader().setLabel(num, text)
+
+        # operation buttons
+        opbox = qt.QHBox(self)
+        opbox.setSpacing(spacing)
+        self.layout.addWidget( opbox )
+
+        for name, slot in [ ('&Delete', self.slotDatasetDelete),
+                            ('&Rename...', self.slotDatasetRename),
+                            ('D&uplicate...', self.slotDatasetDuplicate),
+                            ('&New...', self.slotDatasetNew) ]:
+            b = qt.QPushButton(name, opbox)
+            self.connect(b, qt.SIGNAL('pressed()'), slot)
+            
         # buttons
         bhbox = qt.QHBox(self)
+        self.layout.addWidget( bhbox )
         bhbox.setSpacing(spacing)
         
         closebutton = qt.QPushButton("&Close", bhbox)
         self.connect( closebutton, qt.SIGNAL('clicked()'),
                       self.slotClose )
-
-        self.layout = qt.QVBoxLayout(self, spacing)
-        self.layout.addWidget( datahbox )
-        self.layout.addWidget( bhbox )
 
         # populate initially
         self.slotDocumentModified()
@@ -82,6 +99,7 @@ class DataEditDialog(qt.QDialog):
 
     def slotDatasetHighlighted(self, name):
         """Dataset highlighted in list box."""
+
         # convert to python string
         name = unicode(name)
 
@@ -102,3 +120,38 @@ class DataEditDialog(qt.QDialog):
                     t.setText(i, col, str(v))
 
         t.setUpdatesEnabled(True)
+
+    def slotDatasetDelete(self):
+        """Delete button pressed."""
+
+        item = self.dslistbox.selectedItem()
+        if item != None:
+            name = unicode(item.text())
+            self.document.deleteDataset(name)
+
+    def _checkDatasetName(self, name):
+        """Is the name given valid?"""
+
+        return not re.search('[ ,+-]', name)
+
+    def slotDatasetRename(self):
+        """Rename selected dataset."""
+
+        item = self.dslistbox.selectedItem()
+        if item != None:
+            name = unicode(item.text())
+            newname, okay = qt.QInputDialog.getText(
+                'Rename dataset',
+                'Enter a new name for the dataset "%s"' % name)
+
+            newname = unicode(newname).strip()
+            if okay and newname:
+                if self._checkDatasetName(newname):
+                    self.document.renameDataset(name, newname)
+
+    def slotDatasetDuplicate(self):
+        pass
+
+    def slotDatasetNew(self):
+        pass
+

@@ -47,7 +47,7 @@ class ImportDialog(qt.QDialog):
         """Initialise document."""
 
         qt.QDialog.__init__(self, parent, 'DataImportDialog', False)
-        self.setCaption('Import data')
+        self.setCaption('Import data - Veusz')
         self.document = document
 
         spacing = self.fontMetrics().height() / 2
