@@ -346,9 +346,6 @@ class MainWindow(qt.QMainWindow):
         # restore docked window geometry
         if 'geometry_docwindows' in setting.settingdb.database:
             s = setting.settingdb.database['geometry_docwindows']
-            # problem with loading old versions when new toolbars are included
-            if s.find('editing toolbar') == -1:
-                s = ''
             s = qt.QString(s)
             stream = qt.QTextStream(s, qt.IO_ReadOnly)
             stream >> self
