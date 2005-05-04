@@ -396,7 +396,7 @@ class MainWindow(qt.QMainWindow):
     def updateTitlebar(self):
         """Put the filename into the title bar."""
         if self.filename == '':
-            self.setCaption('Veusz')
+            self.setCaption('Untitled - Veusz')
         else:
             self.setCaption( "%s - Veusz" %
                              os.path.basename(self.filename) )

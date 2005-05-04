@@ -1,3 +1,6 @@
+* 2005-05-04 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Put in Jamie Crummy's patch to show "Untitled" for new document
+	
 * 2005-05-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Take out toolbar position hack from mainwindow
 	- More work on data edit dialog
