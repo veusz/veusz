@@ -1,6 +1,7 @@
 * 2005-05-07 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Complete data editing dialog
 	- Add data new dialog
+	- Add data new dialog to Data menu in main window
 	
 * 2005-05-04 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Put in Jamie Crummy's patch to show "Untitled" for new document
