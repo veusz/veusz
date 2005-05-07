@@ -82,6 +82,10 @@ class Dataset:
 
         self.linked = linked
 
+    def duplicate(self):
+        """Return new dataset based on this one."""
+        return Dataset(self.data, self.serr, self.nerr, self.perr, None)
+
     def hasErrors(self):
         '''Whether errors on dataset'''
         return self.serr != None or self.nerr != None or self.perr != None
@@ -217,6 +221,15 @@ class Document( qt.QObject ):
         del self.data[oldname]
         self.data[newname] = d
 
+        self.setModified()
+
+    def duplicateDataset(self, name, newname):
+        """Duplicate the dataset to the newname."""
+
+        if newname in self.data:
+            raise ValueError, "Dataset %s already exists" % newname
+
+        self.data[newname] = self.data[name].duplicate()
         self.setModified()
 
     def getData(self, name):

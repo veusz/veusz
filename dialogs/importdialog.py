@@ -196,7 +196,8 @@ class ImportDialog(qt.QDialog):
                                 qt.QMessageBox.Warning,
                                 qt.QMessageBox.Ok | qt.QMessageBox.Default,
                                 qt.QMessageBox.NoButton,
-                                qt.QMessageBox.NoButton)
+                                qt.QMessageBox.NoButton,
+                                self)
             mb.exec_loop()
             return
 
@@ -211,7 +212,8 @@ class ImportDialog(qt.QDialog):
                                 qt.QMessageBox.Warning,
                                 qt.QMessageBox.Ok | qt.QMessageBox.Default,
                                 qt.QMessageBox.NoButton,
-                                qt.QMessageBox.NoButton)
+                                qt.QMessageBox.NoButton,
+                                self)
             mb.exec_loop()
             return
 
