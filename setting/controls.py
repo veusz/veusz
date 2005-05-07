@@ -281,12 +281,12 @@ class DatasetChoose(SettingChoice):
         datasets = self.document.data.keys()
         datasets.sort()
 
+        # existing setting
+        currenttext = unicode(self.currentText())
+
         # get rid of existing items in list (clear doesn't work here)
         for i in range(self.count()):
             self.removeItem(0)
-
-        # existing setting
-        currenttext = unicode(self.currentText())
 
         # get index for value, or add value if not set
         try:

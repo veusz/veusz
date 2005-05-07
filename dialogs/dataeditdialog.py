@@ -23,11 +23,14 @@
 """Module for implementing dialog box for viewing/editing data."""
 
 import re
+import itertools
 
+import numarray as N
 import qt
 import qttable
 
 import setting
+import document
 
 class _DatasetNameValidator(qt.QValidator):
     """A validator to check for dataset names.
@@ -129,13 +132,293 @@ class _DatasetNameDialog(qt.QDialog):
         """Return the name entered."""
         return unicode(self.lineedit.text())
 
+class _DSException(RuntimeError):
+    """A class to handle errors while trying to create datasets."""
+    pass
+
+class DatasetNewDialog(qt.QDialog):
+    """New dataset dialog."""
+
+    def __init__(self, document, parent):
+        qt.QDialog.__init__(self, parent, 'DataNewDialog')
+        self.document = document
+
+        self.setCaption("New dataset - Veusz")
+
+        spacing = self.fontMetrics().height() / 2
+        vboxlayout = qt.QVBoxLayout(self, spacing, spacing)
+
+        # change the name of the dataset
+        hbox = qt.QHBox(self)
+        hbox.setSpacing(spacing)
+        l = qt.QLabel("&Name", hbox)
+        self.nameedit = qt.QLineEdit("", hbox)
+        self.nameedit.setValidator( _DatasetNameValidator(document, self) )
+        l.setBuddy(self.nameedit)
+        vboxlayout.addWidget(hbox)
+
+        # choose the method of creating data
+        methgrp = qt.QVButtonGroup("Method of creating new data", self)
+        self.connect(methgrp, qt.SIGNAL('pressed(int)'), self.slotRadioPressed)
+        vboxlayout.addWidget(methgrp)
+
+        # if we want to specify a value or range
+        valds = qt.QRadioButton("&Value or range", methgrp)
+
+        hbox = qt.QHBox(methgrp)
+        hbox.setSpacing(spacing)
+        qt.QLabel('Number of steps', hbox)
+        self.valsteps = qt.QLineEdit('100', hbox)
+        val = qt.QIntValidator(self)
+        val.setBottom(2)
+        self.valsteps.setValidator(val)
+
+        # create use parametric form
+        exprds = qt.QRadioButton("&Parametric form", methgrp)
+
+        hbox = qt.QHBox(methgrp)
+        hbox.setSpacing(spacing)
+        qt.QLabel('t =', hbox)
+        self.parastart = qt.QLineEdit('0', hbox)
+        self.parastart.setValidator( qt.QDoubleValidator(self) )
+        qt.QLabel('to', hbox)
+        self.paraend = qt.QLineEdit('1', hbox)
+        self.paraend.setValidator( qt.QDoubleValidator(self) )
+        qt.QLabel('in', hbox)
+        self.parasteps = qt.QLineEdit('100', hbox)
+        val = qt.QIntValidator(self)
+        val.setBottom(2)
+        self.parasteps.setValidator(val)
+        qt.QLabel('steps (inclusive)', hbox)
+
+        # use existing datasets to create an expression
+        exprds = qt.QRadioButton("&Expression from existing datasets", methgrp)
+
+        # enter values for dataset
+        dsgrp = qt.QVButtonGroup("Dataset", self)
+        vboxlayout.addWidget(dsgrp)
+
+        self.valuelabel = qt.QLabel('', dsgrp)
+        v = self.valsettings = qt.QWidget(dsgrp)
+        grdlayout = qt.QGridLayout(v, -1, -1, spacing)
+        self.dsedits = {}
+        for num, l in itertools.izip( itertools.count(),
+                                      [('data', 'V&alue'),
+                                       ('serr', '&Symmetric error'),
+                                       ('perr', 'P&ositive error'),
+                                       ('nerr', 'Ne&gative error')]):
+            name, caption = l
+            l = qt.QLabel(caption, v)
+            grdlayout.addWidget(l, num, 0)
+            e = qt.QLineEdit('', v)
+            l.setBuddy(e)
+            grdlayout.addWidget(e, num, 1)
+            self.dsedits[name] = e
+            
+        # buttons
+        hbox = qt.QHBox(self)
+        hbox.setSpacing(spacing)
+        vboxlayout.addWidget(hbox)
+
+        b = qt.QPushButton('C&reate', hbox)
+        self.connect(b, qt.SIGNAL('pressed()'), self.slotCreate )
+        b = qt.QPushButton('&Close', hbox)
+        self.connect(b, qt.SIGNAL('pressed()'), self.slotClose )
+        
+        # initially check the first option (value/range)
+        valds.setChecked(True)
+        self.slotRadioPressed(0)
+
+    def slotClose(self):
+        """Close the dialog."""
+        self.done(0)
+
+    def slotRadioPressed(self, item):
+        """If a radio button is pressed."""
+
+        self.selectedmethod = item
+
+        # enable correct edit boxes
+        # use item number to look up correct widgets
+        for id, wid in [ (0, self.valsteps),
+                         (1, self.parastart),
+                         (1, self.paraend),
+                         (1, self.parasteps) ]:
+            wid.setEnabled( id == item )
+
+        # set a help label
+        self.valuelabel.setText(
+            ['Enter constant values here, leave blank if appropriate, '
+             'or enter an inclusive range, e.g. 1:10',
+             'Enter expressions as a function of t, or leave blank',
+             'Enter expressions as a function of existing datasets']
+            [item]
+            )
+
+    def slotCreate(self):
+        """Actually create the dataset."""
+
+        try:
+            name = unicode( self.nameedit.text() )
+            if not self.nameedit.hasAcceptableInput():
+                raise _DSException("Invalid dataset name '%s'" % name)
+
+            # call appropriate function for option
+            fn = [self.createFromRange, self.createParametric,
+                  self.createFromExpression][self.selectedmethod]
+            vals = fn()
+
+            # make a new dataset from the returned data
+            ds = document.Dataset(**vals)
+            self.document.setData(name, ds)
+
+        except _DSException, e:
+            # all bad roads lead here - take exception string and tell user
+            qt.QMessageBox("Veusz",
+                           str(e),
+                           qt.QMessageBox.Warning,
+                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                           qt.QMessageBox.NoButton,
+                           qt.QMessageBox.NoButton,
+                           self).exec_loop()
+
+    def createFromRange(self):
+        """Make dataset from a range or constant.
+
+        Raises _DSException if error
+        """
+
+        # check whether number of steps is valid
+        if not self.valsteps.hasAcceptableInput():
+            raise _DSException("Number of steps is invalid")
+        numsteps = int( unicode(self.valsteps.text()) )
+
+        # go over each of the ranges / values
+        vals = {}
+        for key, cntrl in self.dsedits.iteritems():
+            text = unicode( cntrl.text() ).strip()
+
+            if not text:
+                # blank text
+                vals[key] = None
+
+            elif text.find(':') != -1:
+                # a range a:b
+                parts = text.split(':')
+                if len(parts) != 2:
+                    raise _DSException("Incorrect range format")
+                try:
+                    minval, maxval = float(parts[0]), float(parts[1])
+                except ValueError:
+                    raise _DSException("Incorrect number in range")
+
+                # hard to use arange to do this as endpoints inaccurate
+                delta = (maxval - minval) / (numsteps-1)
+                vals[key] = N.fromfunction( lambda x: minval+x*delta,
+                                            (numsteps,) )
+
+            else:
+                # a value (expand to size of numsteps)
+                try:
+                    vals[key] = float(text) + N.zeros( (numsteps,),
+                                                       type=N.Float64 )
+
+                except ValueError:
+                    raise _DSException("Invalid floating point value")
+
+        return vals
+
+    def createParametric(self):
+        """Use a parametric form to create the dataset.
+
+        Raises _DSException if error
+        """
+
+        # check whether number and range of steps is valid
+        if not self.parastart.hasAcceptableInput():
+            raise _DSException("Starting value invalid")
+        start = float( unicode(self.parastart.text()) )
+        if not self.paraend.hasAcceptableInput():
+            raise _DSException("Ending value invalid")
+        end = float( unicode(self.paraend.text()) )
+        if not self.parasteps.hasAcceptableInput():
+            raise _DSException("Invalid number of steps")
+        steps = int( unicode(self.parasteps.text()) )
+
+        # use these values to calculate the array t
+        delta = (end-start) / (steps-1)
+        t =  N.fromfunction( lambda x: start+x*delta,
+                             (steps,) )
+
+        # define environment to evaluate
+        fnenviron = globals().copy()
+        exec 'from numarray import *' in fnenviron
+        fnenviron['t'] = t
+
+        vals = {}
+        for key, cntrl in self.dsedits.iteritems():
+            text = unicode( cntrl.text() ).strip()
+
+            if not text:
+                # blank text
+                vals[key] = None
+            else:
+                # HACK to ensure the result is a numarray
+                expr = '(%s) + t*0.' % text
+                try:
+                    vals[key] = eval( expr, fnenviron )
+                except Exception, e:
+                    raise _DSException("Error evaluating expession '%s'\n"
+                                       "Error: '%s'" % (text, str(e)) )
+
+        return vals
+
+    def createFromExpression(self):
+
+        # define environment to evaluate expressions
+        fnenviron = globals().copy()
+        exec 'from numarray import *' in fnenviron
+
+        vals = {}
+        for key, cntrl in self.dsedits.iteritems():
+            text = unicode( cntrl.text() ).strip()
+
+            if not text:
+                # blank text
+                vals[key] = None
+            else:
+                # populate environment with parts of dataset
+                # this assumes that dataset has members data, serr, nerr, perr
+                env = fnenviron.copy()
+                for name, ds in self.document.data.iteritems():
+                    env[name] = ds.__dict__[key]
+
+                # evaluate the expression
+                try:
+                    vals[key] = eval(text, env)
+                except Exception, e:
+                    raise _DSException("Error evaluating expession '%s'\n"
+                                       "Error: '%s'" % (text, str(e)) )
+
+        # check length of values is the same
+        last = None
+        for val in vals.itervalues():
+            if val != None:
+                if last != None and last != len(val):
+                    raise _DSException("Expressions for dataset parts do not "
+                                       "yield results of the same length")
+                last = len(val)
+
+        return vals
+
 class DataEditDialog(qt.QDialog):
     """Data editting dialog."""
 
     def __init__(self, parent, document):
         """Initialise dialog."""
 
-        qt.QDialog.__init__(self, parent, 'DataEditDialog', False)
+        qt.QDialog.__init__(self, parent, 'DataEditDialog')
+        self.parent = parent
         self.setCaption('Edit data - Veusz')
         self.document = document
         self.connect(document, qt.PYSIGNAL('sigModified'),
@@ -146,7 +429,7 @@ class DataEditDialog(qt.QDialog):
 
         # list of datasets on left of table
         datasplitter = qt.QSplitter(self)
-        self.layout.addWidget( datasplitter )
+        self.layout.addWidget(datasplitter)
 
         self.dslistbox = qt.QListBox(datasplitter)
         self.connect( self.dslistbox, qt.SIGNAL('highlighted(const QString&)'),
@@ -154,12 +437,13 @@ class DataEditDialog(qt.QDialog):
 
         # initialise table
         tab = self.dstable = qttable.QTable(datasplitter)
-        tab.setSizePolicy(qt.QSizePolicy.Expanding,  qt.QSizePolicy.Expanding)
+        tab.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
         tab.setReadOnly(True)
         tab.setNumCols(4)
-        for num, text in zip( range(4),
-                              ['Value', 'Symmetric error', 'Positive error',
-                               'Negative error'] ):
+        for num, text in itertools.izip( itertools.count(),
+                                         ['Value', 'Symmetric error',
+                                          'Positive error',
+                                          'Negative error'] ):
             tab.horizontalHeader().setLabel(num, text)
 
         # operation buttons
@@ -182,8 +466,7 @@ class DataEditDialog(qt.QDialog):
         bhbox.setSpacing(spacing)
         
         closebutton = qt.QPushButton("&Close", bhbox)
-        self.connect( closebutton, qt.SIGNAL('pressed()'),
-                      self.slotClose )
+        self.connect(closebutton, qt.SIGNAL('pressed()'), self.slotClose )
 
         # populate initially
         self.slotDocumentModified()
@@ -223,8 +506,7 @@ class DataEditDialog(qt.QDialog):
 
     def slotClose(self):
         """Close the dialog."""
-
-        self.close(True)
+        self.done(0)
 
     def slotDatasetHighlighted(self, name):
         """Dataset highlighted in list box."""
@@ -286,5 +568,8 @@ class DataEditDialog(qt.QDialog):
                 self.document.duplicateDataset(name, newname)
 
     def slotDatasetNew(self):
-        pass
+        """Create datasets from scratch."""
 
+        nds = DatasetNewDialog(self.document, self.parent)
+        nds.show()
+        
