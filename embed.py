@@ -93,7 +93,7 @@ class Embedded(object):
             thread.start_new_thread(Embedded._startThread, ())
 
         # open window for this embedded instance
-        Embedded._runCommand( self.NewWindow, name )
+        Embedded._runCommand( self._NewWindow, name )
 
     def _runCommand(cmd, *args, **args2):
         """Execute the given function in the Qt thread with the arguments
@@ -126,7 +126,7 @@ class Embedded(object):
 
     _runCommand = staticmethod(_runCommand)
 
-    def NewWindow(self, name):
+    def _NewWindow(self, name):
         """Start up a new window instance.
 
         This is called by the constructor
