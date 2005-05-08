@@ -95,6 +95,13 @@ class Embedded(object):
         # open window for this embedded instance
         Embedded._runCommand( self._NewWindow, name )
 
+    def __del__(self):
+        """Remove the window if deleted."""
+
+        # FIXME: this never gets called. Don't know why.
+        if self.window != None:
+            self.Close()
+
     def _runCommand(cmd, *args, **args2):
         """Execute the given function in the Qt thread with the arguments
         given."""
@@ -146,6 +153,11 @@ class Embedded(object):
     def _Close(self):
         """Close this window."""
         self.window.close()
+
+        self.document = None
+        self.window = None
+        self.plot = None
+        self.ci = None
 
     def _Zoom(self, zoomfactor):
         """Set the plot zoom factor."""
