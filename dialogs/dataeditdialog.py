@@ -272,6 +272,14 @@ class DatasetNewDialog(qt.QDialog):
             ds = document.Dataset(**vals)
             self.document.setData(name, ds)
 
+            qt.QMessageBox("Veusz",
+                           "Created dataset '%s'" % name,
+                           qt.QMessageBox.Information,
+                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                           qt.QMessageBox.NoButton,
+                           qt.QMessageBox.NoButton,
+                           self).exec_loop()
+
         except _DSException, e:
             # all bad roads lead here - take exception string and tell user
             qt.QMessageBox("Veusz",
@@ -355,6 +363,7 @@ class DatasetNewDialog(qt.QDialog):
         exec 'from numarray import *' in fnenviron
         fnenviron['t'] = t
 
+        # calculate for each of the dataset components
         vals = {}
         for key, cntrl in self.dsedits.iteritems():
             text = unicode( cntrl.text() ).strip()
@@ -379,6 +388,7 @@ class DatasetNewDialog(qt.QDialog):
         fnenviron = globals().copy()
         exec 'from numarray import *' in fnenviron
 
+        # calculate for each of the dataset components
         vals = {}
         for key, cntrl in self.dsedits.iteritems():
             text = unicode( cntrl.text() ).strip()
