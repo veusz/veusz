@@ -118,7 +118,7 @@ class Embedded(object):
 
         # wait for command to be executed
         # second thread writes a character into the pipe when done
-        r = Embedded.pipefromveusz_r.read(1)
+        Embedded.pipefromveusz_r.read(1)
         Embedded.lock.acquire()
         retval = Embedded.retval
         Embedded.command = None
@@ -216,32 +216,30 @@ class Embedded(object):
                 # notify sending thread
                 Embedded.pipefromveusz_w.write('r')
 
-        # create a QApplication instance
+        # create a PyQt application instance
+        # we fake argv to hope the real argv isn't messed up
         argv = [ sys.argv[0] ]
-        Embedded.app = _App(argv)
+        app = _App(argv)
 
         # application has a notifier to know when it needs to do something
-        Embedded.notifier = qt.QSocketNotifier( Embedded.pipetoveusz_r,
-                                                qt.QSocketNotifier.Read )
+        notifier = qt.QSocketNotifier(Embedded.pipetoveusz_r,
+                                      qt.QSocketNotifier.Read)
 
         # connect app to notifier
-        Embedded.app.connect( Embedded.notifier,
-                              qt.SIGNAL('activated(int)'),
-                              Embedded.app.notification )
-        Embedded.notifier.setEnabled(True)
+        app.connect(notifier, qt.SIGNAL('activated(int)'), app.notification)
+        notifier.setEnabled(True)
 
         # start the main Qt event loop
-        Embedded.app.exec_loop()
+        app.exec_loop()
 
-        # need this otherwise we get a weird python thread error
-        # presumably this is due to the non-Qt thread trying to delete the app
-        Embedded.app = None
-        
+        # exits when app.quit() is called
+       
     _startThread = staticmethod(_startThread)
     
     def _exitQt():
         """Exit the Qt thread."""
-        Embedded.app.quit()
+        import qt
+        qt.qApp.quit()
     _exitQt = staticmethod(_exitQt)
 
     def _atExit():
