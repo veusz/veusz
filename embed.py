@@ -48,9 +48,22 @@ import os.path
 import atexit
 
 # nasty hack to ensure we can load all the veusz components
-dir = os.path.dirname(__file__)
-if dir not in sys.path:
-    sys.path.insert(0, dir)
+_dir = os.path.dirname(__file__)
+if _dir not in sys.path:
+    sys.path.insert(0, _dir)
+
+class Bind1st(object):
+    """Bind the first argument of a given function to the given
+    parameter. Returns a callable object."""
+
+    def __init__(self, function, arg):
+        """function is the function to call, arg is the first param."""
+        self.function = function
+        self.arg = arg
+
+    def __call__(self, *args, **args2):
+        """This makes the object appear to be a function."""
+        return self.function(self.arg, *args, **args2)
 
 class Embedded(object):
     """An embedded instance of Veusz.
@@ -167,21 +180,9 @@ class Embedded(object):
     def __getattr__(self, name):
         """If there's no name, then lookup in command interpreter."""
 
-        class _Bind1st(object):
-            """Bind the first argument of a given function to the given
-            parameter. Returns a callable object."""
-            
-            def __init__(self, function, arg):
-                """function is the function to call, arg is the first param."""
-                self.function = function
-                self.arg = arg
-
-            def __call__(self, *args, **args2):
-                """This makes the object appear to be a function."""
-                return self.function(self.arg, *args, **args2)
 
         if name in self.ci.cmds:
-            return _Bind1st(Embedded._runCommand, self.ci.cmds[name])
+            return Bind1st(Embedded._runCommand, self.ci.cmds[name])
         else:
             raise AttributeError, "instance has no attribute %s" % name
 
