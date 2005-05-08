@@ -43,6 +43,7 @@ More than one embedded window can be opened at once
 
 import sys
 import thread
+import os
 import os.path
 import atexit
 
@@ -189,12 +190,14 @@ class Embedded(object):
 
         import qt
 
-        class _VeuszApp(qt.QApplication):
+        class _App(qt.QApplication):
             """An application class which has a notifier to receive
-            commands."""
+            commands from the main thread."""
 
-            def notifier(self):
-                """When something needs to be read."""
+            def notification(self, i):
+                """Called when the main thread wants to call something in this
+                thread.
+                """
                 Embedded.lock.acquire()
 
                 # get rid of input character
@@ -215,7 +218,7 @@ class Embedded(object):
 
         # create a QApplication instance
         argv = [ sys.argv[0] ]
-        Embedded.app = _VeuszApp(argv)
+        Embedded.app = _App(argv)
 
         # application has a notifier to know when it needs to do something
         Embedded.notifier = qt.QSocketNotifier( Embedded.pipetoveusz_r,
@@ -224,7 +227,7 @@ class Embedded(object):
         # connect app to notifier
         Embedded.app.connect( Embedded.notifier,
                               qt.SIGNAL('activated(int)'),
-                              Embedded.app.notifier )
+                              Embedded.app.notification )
         Embedded.notifier.setEnabled(True)
 
         # start the main Qt event loop
