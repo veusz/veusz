@@ -183,7 +183,7 @@ class Embedded(object):
         if name in self.ci.cmds:
             return _Bind1st(Embedded._runCommand, self.ci.cmds[name])
         else:
-            return None
+            raise AttributeError, "instance has no attribute %s" % name
 
     def _startThread():
         """Start up the Qt application in a thread."""
