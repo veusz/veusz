@@ -62,6 +62,7 @@ class InputListener(qt.QObject):
                                             qt.QSocketNotifier.Read )
         self.connect( self.notifier, qt.SIGNAL('activated(int)'),
                       self.dataReceived )
+        self.notifier.setEnabled(True)
 
     def quitProgram(self):
         """Exit the program."""
