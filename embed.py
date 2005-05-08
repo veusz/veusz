@@ -188,7 +188,6 @@ class Embedded(object):
         """Start up the Qt application in a thread."""
 
         import qt
-        import windows
 
         class _VeuszApp(qt.QApplication):
             """An application class which has a notifier to receive
@@ -198,7 +197,7 @@ class Embedded(object):
                 """When something needs to be read."""
                 Embedded.lock.acquire()
 
-                # get rid of input into buffer
+                # get rid of input character
                 os.read(Embedded.pipetoveusz_r, 1)
 
                 # handle command
