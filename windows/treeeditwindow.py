@@ -312,10 +312,10 @@ class TreeEditWindow(qt.QDockWindow):
         # add a scrollable view for the preferences
         # children get added to prefview
         vbox = qt.QVBox(split)
-        label = qt.QLabel("&Properties", vbox)
-        label.setMargin(2)
+        self.proplabel = qt.QLabel("&Properties", vbox)
+        self.proplabel.setMargin(2)
         self.prefview = _ScrollView(vbox)
-        label.setBuddy(self.prefview)
+        self.proplabel.setBuddy(self.prefview)
 
         self.prefgrid = qt.QGrid(2, qt.QGrid.Horizontal,
                                  self.prefview.viewport())
@@ -543,6 +543,10 @@ class TreeEditWindow(qt.QDockWindow):
             c.show()
             self.prefchilds.append(c)
 
+        # make properties keyboard shortcut point to first item
+        if len(self.prefchilds) > 1:
+            self.proplabel.setBuddy(self.prefchilds[1])
+            
         # Change the page to the selected widget
         w = item.widget
         if w == None:

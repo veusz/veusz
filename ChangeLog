@@ -2,6 +2,7 @@
 	- Fix problem with log axis if minimum is zero
 	- Highlight setting label if has mouse over / focus / context menu
 	- Remove label from top of context menus
+	- Fix properties shortcut label
 	
 * 2005-05-08 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add embed module to embed Veusz in other Python apps
