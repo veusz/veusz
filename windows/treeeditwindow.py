@@ -135,22 +135,75 @@ class _ScrollView(qt.QScrollView):
         self.adjustSize()
 
 class _PropertyLabel(qt.QLabel):
-    """A label which produces the veusz setting context menu."""
-    
-    def __init__(self, setting, *args):
-        """Initialise the label for the given setting."""
-        qt.QLabel.__init__(self, setting.name, *args)
-        self.setting = setting
-        self.setMinimumWidth(50)
+    """A label which produces the veusz setting context menu.
 
-        # a keyboard user can get to the label to operate the property menu
+    This label handles mouse move and focus events. Both of these
+    shade the widget darker, giving the user information that the widget
+    has focus, and a context menu.
+    """
+    
+    def __init__(self, setting, parent):
+        """Initialise the label for the given setting."""
+
+        qt.QLabel.__init__(self, setting.name, parent)
+        self.bgcolor = self.paletteBackgroundColor()
         self.setFocusPolicy(qt.QWidget.StrongFocus)
+        self.setMargin(1)
+
+        self.setting = setting
+        self.inmenu = False
+        self.inmouse = False
+        self.infocus = False
+
+    def _setBg(self):
+        """Set the background of the widget according to its state."""
+
+        num = 100
+        if self.inmenu:
+            num += 20
+        else:
+            if self.inmouse:
+                num += 10
+            if self.infocus:
+                num += 10
+        
+        self.setPaletteBackgroundColor(self.bgcolor.dark(num) )
+
+    def enterEvent(self, event):
+        """When the mouse enters the widget."""
+        qt.QLabel.enterEvent(self, event)
+        self.inmouse = True
+        self._setBg()
+
+    def leaveEvent(self, event):
+        """When the mouse leaves the widget."""
+        qt.QLabel.leaveEvent(self, event)
+        self.inmouse = False
+        self._setBg()
+
+    def focusInEvent(self, event):
+        """When widget gets focus."""
+        qt.QLabel.focusInEvent(self, event)
+        self.infocus = True
+        self._setBg()
+        #self.setText('<u>%s</u>' % self.setting.name)
+
+    def focusOutEvent(self, event):
+        """When widget loses focus."""
+        qt.QLabel.focusOutEvent(self, event)
+        self.infocus = False
+        self._setBg()
+        #self.setText(self.setting.name)
 
     def contextMenuEvent(self, event):
         """Pop up the context menu."""
 
         # forces settings to be updated
         self.parentWidget().setFocus()
+
+        # darken the widget (gives stability)
+        self.inmenu = True
+        self._setBg()
 
         # get widget, with its type and name
         widget = self.setting.parent
@@ -163,12 +216,6 @@ class _PropertyLabel(qt.QLabel):
         # construct the popup menu
         popup = qt.QPopupMenu(self)
 
-        # put a label at top with name of setting
-        l = qt.QLabel('<strong>%s</strong>' %
-                      qt.QStyleSheet.escape(self.setting.name), self)
-        l.setAlignment(qt.Qt.AlignCenter)
-        popup.insertItem(l)
-        
         popup.insertItem('Reset to default', 0)
         popup.insertSeparator()
         popup.insertItem('Copy to "%s" widgets' % type, 100)
@@ -202,26 +249,10 @@ class _PropertyLabel(qt.QLabel):
         if ret >= 0:
             fnmap[ret]()
 
-class _ContextPopup(qt.QPopupMenu):
-    """A popup context menu for widgets."""
+        # return widget to previous colour
+        self.inmenu = False
+        self._setBg()
 
-    def __init__(self, parent):
-        """Create a popup menu, but add a label at the top."""
-        qt.QPopupMenu.__init__(self, parent)
-        self.label = qt.QLabel('', self)
-        self.label.setAlignment(qt.Qt.AlignCenter)
-        self.insertItem(self.label)
-
-    def exec_loop(self, widget, where):
-        """Show the menu for the widget given."""
-
-        text = '<strong>%s</strong> - %s' % (
-            qt.QStyleSheet.escape(widget.name),
-            qt.QStyleSheet.escape(widget.typename) )
-        self.label.setText(text)
-
-        qt.QPopupMenu.exec_loop(self, where)
-        
 class _WidgetListView(qt.QListView):
     """A list view which emits contextMenu signals."""
 
@@ -327,7 +358,7 @@ class TreeEditWindow(qt.QDockWindow):
         self.editactions = {}
         editmenu = self.parent.menus['edit']
 
-        self.contextpopup = _ContextPopup(self)
+        self.contextpopup = qt.QPopupMenu(self)
 
         for name, icon, tooltip, menutext, slot in (
             ('moveup', 'stock-go-up.png', 'Move the selected item up',
@@ -656,13 +687,7 @@ class TreeEditWindow(qt.QDockWindow):
     def slotListContextMenu(self, pos):
         """Pop up a context menu when an item is clicked on the list view."""
 
-        # get selected widget
-        item = self.itemselected
-        while item.widget == None:
-            item = item.parent
-        widget = item.widget
-
-        self.contextpopup.exec_loop(widget, pos)
+        self.contextpopup.exec_loop(pos)
 
     def slotWidgetRename(self, action):
         """Initiate renaming a widget."""
