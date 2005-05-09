@@ -158,6 +158,7 @@ class _PropertyLabel(qt.QLabel):
     def _setBg(self):
         """Set the background of the widget according to its state."""
 
+        # darken widget according to num (100 is normal state)
         num = 100
         if self.inmenu:
             num += 20
@@ -167,7 +168,7 @@ class _PropertyLabel(qt.QLabel):
             if self.infocus:
                 num += 10
         
-        self.setPaletteBackgroundColor(self.bgcolor.dark(num) )
+        self.setPaletteBackgroundColor(self.bgcolor.dark(num))
 
     def enterEvent(self, event):
         """When the mouse enters the widget."""
@@ -186,14 +187,12 @@ class _PropertyLabel(qt.QLabel):
         qt.QLabel.focusInEvent(self, event)
         self.infocus = True
         self._setBg()
-        #self.setText('<u>%s</u>' % self.setting.name)
 
     def focusOutEvent(self, event):
         """When widget loses focus."""
         qt.QLabel.focusOutEvent(self, event)
         self.infocus = False
         self._setBg()
-        #self.setText(self.setting.name)
 
     def contextMenuEvent(self, event):
         """Pop up the context menu."""
