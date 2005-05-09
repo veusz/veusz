@@ -140,7 +140,7 @@ class Axis(widget.Widget):
         if autorange != origrange:
             # if it's a log axis, don't accept negative lower bounds
             if self.settings.log:
-                autorange[0] = max(1e-50, autorange[0])
+                autorange[0] = max(1e-99, autorange[0])
             
             return autorange
         else:
@@ -192,6 +192,9 @@ class Axis(widget.Widget):
         # handle axis values round the wrong way
         if self.plottedrange[0] >= self.plottedrange[1]:
             self.plottedrange = [1e-2, 1.]
+
+        if self.plottedrange[0] <= 0. and s.log:
+            self.plottedrange[0] = 1e-99
 
         # work out tick values and expand axes if necessary
         as = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],

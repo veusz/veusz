@@ -1,3 +1,6 @@
+* 2005-05-09 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Fix problem with log axis if minimum is zero
+	
 * 2005-05-08 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add embed module to embed Veusz in other Python apps
 	
