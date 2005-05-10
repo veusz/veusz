@@ -3,6 +3,7 @@
 	- Added \font{fontname}{text} and \size{[+-]fontsize}{text} to
 	LaTeX-like parser to change font or font size
 	- Also some bug fixes to LaTeX-like parser
+	- Modeless dialogs fixed to use close instead of done
 	
 * 2005-05-09 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix problem with log axis if minimum is zero

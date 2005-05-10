@@ -140,7 +140,8 @@ class DatasetNewDialog(qt.QDialog):
     """New dataset dialog."""
 
     def __init__(self, document, parent):
-        qt.QDialog.__init__(self, parent, 'DataNewDialog')
+        qt.QDialog.__init__(self, parent, 'DataNewDialog', False,
+                            qt.Qt.WDestructiveClose)
         self.document = document
 
         self.setCaption("New dataset - Veusz")
@@ -231,7 +232,7 @@ class DatasetNewDialog(qt.QDialog):
 
     def slotClose(self):
         """Close the dialog."""
-        self.done(0)
+        self.close()
 
     def slotRadioPressed(self, item):
         """If a radio button is pressed."""
@@ -427,7 +428,8 @@ class DataEditDialog(qt.QDialog):
     def __init__(self, parent, document):
         """Initialise dialog."""
 
-        qt.QDialog.__init__(self, parent, 'DataEditDialog')
+        qt.QDialog.__init__(self, parent, 'DataEditDialog', False,
+                            qt.Qt.WDestructiveClose)
         self.parent = parent
         self.setCaption('Edit data - Veusz')
         self.document = document
@@ -516,7 +518,7 @@ class DataEditDialog(qt.QDialog):
 
     def slotClose(self):
         """Close the dialog."""
-        self.done(0)
+        self.close()
 
     def slotDatasetHighlighted(self, name):
         """Dataset highlighted in list box."""
