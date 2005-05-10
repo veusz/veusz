@@ -285,6 +285,16 @@
 	"\ddagger", "\bullet", "\AA", "\sqrt", "\propto", "\infty",
 	"\int", and "\sim".</para>
 
+	<para>Also supported are commands to change font. The command
+	"\font{name}{text}" changes the font text is written in to
+	name. This may be useful if a symbol is missing from the
+	current font, e.g. "\font{symbol}{g}" should produce a
+	gamma. You can increase, decrease, or set the size of the font
+	with "\size{+2}{text}", "\size{-2}{text}", or
+	"\size{20}{text}". Numbers are in points (the pt symbol is
+	optional). Other measurements may be supported in the
+	future.</para>
+
 	<para>Veusz plots these symbols with Qt's unicode support. If
 	your current font does not contain these symbols then you may
 	get messy results. If you find this is the case, I highly

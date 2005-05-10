@@ -35,6 +35,8 @@ _SubScript = 4
 _FontItalic = 5
 _FontBold = 6
 _FontUnderline = 7
+_FontFont = 8
+_FontSize = 9
 
 _Modifiers = {
     '\\italic': _FontItalic,
@@ -42,7 +44,9 @@ _Modifiers = {
     '\\bold':   _FontBold,
     '\\underline': _FontUnderline,
     '\\textbf': _FontBold,
-    '\\textit': _FontItalic
+    '\\textit': _FontItalic,
+    '\\font': _FontFont,
+    '\\size': _FontSize
     }
 
 # lookup table for specials
@@ -414,6 +418,12 @@ class Renderer:
         Returns the next part no to be rendered
         """
 
+        # code's pretty manky - probably could do better
+        # maybe caching tree parser?
+
+        if partno > len(self.parts):
+            return partno
+
         p = self.parts[partno]
 
         # is this a modifier or just text?
@@ -431,6 +441,10 @@ class Renderer:
                         break
                 
                     partno = self._renderPart(partno, font, render)
+
+            # in case the block ends before it is supposed to
+            elif p == _BlockEnd:
+                pass
 
             # start a superscript part
             elif p == _SuperScript:
@@ -490,6 +504,66 @@ class Renderer:
                 font.setUnderline( not font.underline() )
                 self.painter.setFont(font)
 
+            elif p == _FontFont:
+                # change font to that given next
+                # requires a blockstart name blockend text
+                left = len(self.parts) - partno
+                if (left > 4 and (self.parts[partno+1] == _BlockStart and
+                                  self.parts[partno+3] == _BlockEnd) and
+                    not isinstance(self.parts[partno+2], int)):
+                    name = self.parts[partno+2]
+                    oldfamily = font.family()
+                    font.setFamily(name)
+                    self.painter.setFont(font)
+                    
+                    partno = self._renderPart(partno+4, font, render)
+
+                    font.setFamily(oldfamily)
+                    self.painter.setFont(font)
+                else:
+                    partno += 1
+
+            elif p == _FontSize:
+                # modify the font size
+                left = len(self.parts) - partno
+                if (left > 4 and (self.parts[partno+1] == _BlockStart and
+                                  self.parts[partno+3] == _BlockEnd) and
+                    not isinstance(self.parts[partno+2], int)):
+
+                    # try to interpret next part as font size
+                    oldsize = font.pointSizeFloat()
+                    size = oldsize
+                    # get text (minus pts people might leave)
+                    sizetext = self.parts[partno+2].strip().replace('pt','')
+
+                    try:
+                        # work out whether font size is absolute, added, or
+                        # subtracted
+                        if len(sizetext)>0:
+                            if sizetext[0] == '+':
+                                size += float( sizetext[1:] )
+                            elif sizetext[0] == '-':
+                                size -= float( sizetext[1:] )
+                                if size < 1.:
+                                    size = 1.
+                            else:
+                                size = float(sizetext)
+                        else:
+                            raise ValueError
+
+                        # increment font size
+                        font.setPointSizeFloat(size)
+                        self.painter.setFont(font)
+                        partno = self._renderPart(partno+4, font, render)
+                        font.setPointSizeFloat(oldsize)
+                        self.painter.setFont(font)
+
+                    except ValueError:
+                        # ignore errors which have invalid floats
+                        partno += 1
+                else:
+                    partno += 1
+                    
             # should throw something instead
             else:
                 assert False
