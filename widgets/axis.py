@@ -214,6 +214,13 @@ class Axis(widget.Widget):
 
         self.docchangeset = self.document.changeset
         
+    def getPlottedRange(self):
+        """Return the range plotted by the axes."""
+
+        if self.docchangeset != self.document.changeset:
+            self._computePlottedRange()
+        return (self.plottedrange[0], self.plottedrange[1])
+
     def _updatePlotRange(self, bounds):
         """Calculate coordinates on plotter of axis."""
 

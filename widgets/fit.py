@@ -47,15 +47,20 @@ class Fit(plotters.FunctionPlotter):
                                descr = 'Variable containing x data'), 2 )
         s.add( setting.Dataset('yData', 'y', self.document,
                                descr = 'Variable containing y data'), 3 )
+        s.add( setting.Bool('fitRange', False,
+                            descr = 'Fit only the data between the '
+                            'minimum and maximum of the axis for '
+                            'the function variable'),
+               4 )
         s.add( setting.Float('chi2', -1,
                              descr = 'Output chi^2 from fitting'),
-               4, readonly=True )
+               5, readonly=True )
         s.add( setting.Int('dof', -1,
                            descr = 'Output degrees of freedom from fitting'),
-               5, readonly=True )
+               6, readonly=True )
         s.add( setting.Float('redchi2', -1,
                              descr = 'Output reduced-chi^2 from fitting'),
-               6, readonly=True )
+               7, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
@@ -94,6 +99,8 @@ class Fit(plotters.FunctionPlotter):
         """Fit the data."""
 
         s = self.settings
+
+        # populate the input parameters
         names = s.values.keys()
         names.sort()
         params = N.array( [s.values[i] for i in names] )
@@ -101,11 +108,19 @@ class Fit(plotters.FunctionPlotter):
         # FIXME: loads of error handling!!
         d = self.document
 
-        xvals = d.getData(s.xData).data
-        ydata = d.getData(s.yData)
-        yvals = ydata.data
-        yserr = ydata.serr
+        # choose dataset depending on fit variable
+        if s.variable == 'x':
+            xvals = d.getData(s.xData).data
+            ydata = d.getData(s.yData)
+            yvals = ydata.data
+            yserr = ydata.serr
+        else:
+            xvals = d.getData(s.yData).data
+            ydata = d.getData(s.xData)
+            yvals = ydata.data
+            yserr = ydata.serr
 
+        # if there are no errors on data
         if yserr == None:
             if ydata.perr != None and ydata.nerr != None:
                 print "Warning: Symmeterising positive and negative errors"
@@ -115,18 +130,52 @@ class Fit(plotters.FunctionPlotter):
                 yserr = yvals*0.05
                 yserr[yserr < 1e-8] = 1e-8
         
+        # if the fitRange parameter is on, we chop out data outside the
+        # range of the axis
+        if s.fitRange:
+            # get ranges for axes
+            if s.variable == 'x':
+                range = self.parent.getAxes((s.xAxis,))[0].getPlottedRange()
+                mask = N.logical_and(xvals >= range[0], xvals <= range[1])
+            else:
+                range = self.parent.getAxes((s.yAxis,))[0].getPlottedRange()
+                mask = N.logical_and(yvals >= range[0], yvals <= range[1])
+            xvals = xvals[mask]
+            yvals = yvals[mask]
+            yserr = yserr[mask]
+            print "Fitting %s from %g to %g" % (s.variable,
+                                                range[0], range[1])
+
+        # various error checks
+        if len(xvals) == 0:
+            sys.stderr.write('No data values. Not fitting.\n')
+            return
+        if len(xvals) != len(yvals) or len(xvals) != len(yserr):
+            sys.stderr.write('Fit data not equal in length. Not fitting.\n')
+            return
+        if len(params) > len(xvals):
+            sys.stderr.write('No degrees of freedom for fit. Not fitting\n')
+            return
+
+        # actually do the fit
         retn, chi2, dof = utils.fitLM(self.evalfunc, params,
                                       xvals,
                                       yvals, yserr)
 
+        # populate the return parameters
         vals = {}
         for i, v in zip(names, retn):
             vals[i] = v
         s.values = vals
 
+        # populate the read-only fit quality params
         s.chi2 = chi2
         s.dof = dof
-        s.redchi2 = chi2/dof
+        if dof <= 0:
+            print 'No degrees of freedom in fit.\n'
+            s.redchi2 = -1.
+        else:
+            s.redchi2 = chi2/dof
 
     def evalfunc(self, params, xvals):
 
