@@ -43,11 +43,10 @@ class Fit(plotters.FunctionPlotter):
         s.add( setting.FloatDict('values',
                                  {'a': 0.0, 'b': 1.0},
                                  descr = 'Variables and fit values'), 1 )
-        s.add( setting.Str('xData', 'x',
-                           descr = 'X positions of data to fit'), 2 )
-        s.add( setting.Str('yData', 'y',
-                           descr = 'Y positions of data to fit'), 3 )
-
+        s.add( setting.Dataset('xData', 'x', self.document,
+                               descr = 'Variable containing x data'), 2 )
+        s.add( setting.Dataset('yData', 'y', self.document,
+                               descr = 'Variable containing y data'), 3 )
         s.add( setting.Float('chi2', -1,
                              descr = 'Output chi^2 from fitting'),
                4, readonly=True )
