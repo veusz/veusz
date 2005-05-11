@@ -193,7 +193,13 @@ class Renderer:
             totalheight = fm.ascent()
             dy = fm.descent()
         else:
-            totalheight = fm.boundingRect('0').height()
+            if self.alignvert == 0:
+                # if want vertical centering, better to centre around middle
+                # of typical letter
+                totalheight = fm.boundingRect('0').height()
+            else:
+                # if top/bottom alignment, better to use maximum letter height
+                totalheight = fm.ascent()
             dy = 0
 
         self.xpos = 0
@@ -448,13 +454,13 @@ class Renderer:
 
             # start a superscript part
             elif p == _SuperScript:
-                oldascent = self.painter.fontMetrics().ascent()
+                oldheight = self.painter.fontMetrics().height()
                 size = font.pointSizeFloat()
                 font.setPointSizeFloat(size*0.6)
                 self.painter.setFont(font)
 
                 oldy = self.ypos
-                self.ypos -= (oldascent - self.painter.fontMetrics().ascent())
+                self.ypos -= (oldheight - self.painter.fontMetrics().height())
             
                 partno = self._renderPart(partno+1, font, render)
 
@@ -468,8 +474,11 @@ class Renderer:
                 font.setPointSizeFloat(size*0.6)
                 
                 self.painter.setFont(font)
-                
+
+                oldy = self.ypos
+                self.ypos += self.painter.fontMetrics().descent()
                 partno = self._renderPart(partno+1, font, render)
+                self.ypos = oldy
                 
                 font.setPointSizeFloat(size)
                 self.painter.setFont(font)
