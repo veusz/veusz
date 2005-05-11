@@ -1,6 +1,8 @@
 * 2005-05-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Make super and subscripts move further up and down
 	- Adjust alignment code to take account of above modification
+	- Document embedding Veusz in other programs
+	- Document security of Veusz scripts
 	
 * 2005-05-10 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fit dataset options now have drop down menus

@@ -638,6 +638,10 @@ SetData('y', y)
       <command>Add('graph', name='foo')</command>, may be entered as
       <command>Add 'graph' name='foo'</command>.</para>
 
+      <para>The <command>numarray</command> package is already
+      imported into the command line interface (as "*"), so you do not
+      need to import it first.</para>
+
       <para>The command prompt supports history (use the up and down cursor
       keys to recall previous commands). </para>
     </section>
@@ -933,6 +937,148 @@ Set('page1/graph1/x/min', -10.)
       </section>
     </section>
 
+    <section>
+      <title>Security</title>
+      <para>As Veusz is written in Python and its script files are
+      essentially Python scripts, these files are insecure. They may
+      contain dangerous commands. Do not open Veusz scripts from
+      untrusted sources.</para>
+
+      <para>There is no easy way to restrict the commands placed
+      inside a script as there is no secure Python restricted
+      environment.</para>
+
+      <para>In the future I will investigate creating an additional
+      basic file format with less flexibility. This will be difficult
+      as Python is used to evaluate functions and so on. It is hard to
+      currently prevent dangerous Python commands from being encoded
+      in such strings.</para>
+    </section>
+
   </chapter>
   
+  <!---------------------------------------------------------------->
+  <chapter>
+    <title>Using Veusz from other programs</title>
+
+    <section>
+      <title>Non-Qt Python programs</title>
+      <para>Veusz supports being embedded within other Python
+      programs. The calling program can open up any number of plot
+      windows, and manipulate the graphs using the Veusz scripting
+      commands, which are exposed as methods of graph objects.
+      </para>
+
+      <para>Thanks to some pretty nifty programming (if I say so
+      myself), the Python program can ignore the fact that Veusz is a
+      Qt application. The embedding program continues to run when a
+      graph is shown, can can take further user input. In addition
+      Veusz can be used from a standard Python command line. This is
+      achieved by Veusz and PyQt running in a separate
+      thread. Commands are transparently passed from the Python
+      program to the Veusz thread, and any results or exceptions are
+      passed back (and rethrown in the case of exceptions).</para>
+
+      <para>An example Python program embedding Veusz is below:</para>
+	<informalexample>
+	  <programlisting>
+import time
+import numarray
+import veusz.embed as veusz
+ 
+g = veusz.Embedded('new window title')
+g.To( g.Add('page') )
+g.To( g.Add('graph') )
+g.SetData('x', numarray.arange(20))
+g.SetData('y', numarray.arange(20)**2)
+g.Add('xy')
+g.Zoom(0.5)
+ 
+# wait 20 seconds
+time.sleep(20)
+
+win2 = veusz.Embedded('second window example')
+win2.To( win2.Add('page') )
+win2.To( win2.Add('graph') )
+win2.Add('function', function='x**2')
+win2.Set('x/label', 'An example axis \\emph{label}')
+
+time.sleep(20)
+
+g.Close()
+</programlisting>
+	</informalexample>
+
+      <para>The supported commands are the same as in <link
+      linkend="Commands">Commands</link>, with the addition of a
+      <command>Zoom(zoomfactor)</command> command to control the size
+      of the plot in the window, and <command>Close()</command> which
+      closes the window given.</para>
+
+      <para>Embedding works on the Python versions I have access to,
+      but may be affected by threading bugs. In addition Veusz must be
+      installed in an appropriate place, so that it is in the
+      PYTHONPATH.</para>
+    </section>
+
+    <section>
+      <title>PyQt programs</title>
+      <para>There is no support for PyQt programs embedding
+      Veusz. However this will be easy to do, and so I will support
+      this setup if requested or for a near future release.</para>
+    </section>
+
+    <section>
+      <title>Non Python programs</title>
+
+      <para>Support for non Python programs is available in a limited
+      form. External programs may execute the
+      <command>veusz_listen</command> executable or
+      <command>veusz_listen.py</command> Python module. Veusz will
+      read its input from the standard input, and write output to
+      standard output. This is a full Python execution environment,
+      and supports all the scripting commands mentioned in <link
+      linkend="Commands">Commands</link>, a <command>Quit()</command>
+      command and the <command>Zoom(factor)</command> command listed
+      above. Only one window is supported at once, but many
+      <command>veusz_listen</command> programs may be started.</para>
+
+      <para><command>veusz_listen</command> may be used from the shell
+      command line by doing something like:</para>
+	<informalexample>
+	  <programlisting>
+veusz_listen < in.vsz
+</programlisting>
+      </informalexample>
+      <para>where <command>in.vsz</command> contains:</para>
+	<informalexample>
+	  <programlisting>
+To(Add('page') )
+To(Add('graph') )
+SetData('x', arange(20))
+SetData('y', arange(20)**2)
+Add('xy')
+Zoom(0.5)
+Export("foo.eps")
+Quit()
+</programlisting>
+      </informalexample>
+
+    <para>A program may interface with Veusz in this way by using the
+    <command>popen</command> C Unix function, which allows a program
+    to be started having control of its standard input and
+    output. Veusz can then be controlled by writing commands to an
+    input pipe.</para>
+    </section>
+
+    <section>
+      <title>C, C++ and Fortran</title>
+
+      <para>A callable library interface to Veusz is on my todo list
+      for C, C++ and Fortran. Please tell me if you would be
+      interested in this option.</para>
+
+    </section>
+
+  </chapter>
 </book>
