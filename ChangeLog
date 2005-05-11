@@ -88,7 +88,8 @@
 * 2005-04-16 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Get distutils working properly with standard distutils
 	- Added histogram example
-
+	- Released 0.5
+	
 * 2005-04-14 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Introduced patch by James Graham to make the save warning dialog
 	use verbs instead of yes/no
