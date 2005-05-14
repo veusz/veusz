@@ -24,6 +24,7 @@
 import os
 
 import qt
+import qttable
 
 import widgets.widgetfactory as widgetfactory
 import widgets
@@ -116,24 +117,6 @@ class _PrefItem(qt.QListViewItem):
         else:
             return 0
 
-class _ScrollView(qt.QScrollView):
-    """A resizing scroll view."""
-
-    def __init__(self, *args):
-        qt.QScrollView.__init__(self, *args)
-
-    def setGrid(self, grid):
-        self.grid = grid
-
-    def adjustSize(self):
-        h = self.grid.height()
-        self.grid.resize(self.visibleWidth(), h)
-        self.resizeContents(self.visibleWidth(), h)
-
-    def resizeEvent(self, event):
-        qt.QScrollView.resizeEvent(self, event)
-        self.adjustSize()
-
 class _PropertyLabel(qt.QLabel):
     """A label which produces the veusz setting context menu.
 
@@ -141,11 +124,11 @@ class _PropertyLabel(qt.QLabel):
     shade the widget darker, giving the user information that the widget
     has focus, and a context menu.
     """
-    
-    def __init__(self, setting, parent):
+
+    def __init__(self, setting, text, parent):
         """Initialise the label for the given setting."""
 
-        qt.QLabel.__init__(self, setting.name, parent)
+        qt.QLabel.__init__(self, text, parent)
         self.bgcolor = self.paletteBackgroundColor()
         self.setFocusPolicy(qt.QWidget.StrongFocus)
         self.setMargin(1)
@@ -194,11 +177,36 @@ class _PropertyLabel(qt.QLabel):
         self.infocus = False
         self._setBg()
 
+    def keyPressEvent(self, event):
+        """Use cursor keys to move focus."""
+
+        key = event.key()
+        # move up two as in a 2 column grid
+        if key == qt.Qt.Key_Up:
+            self.focusNextPrevChild(False)
+            self.focusNextPrevChild(False)
+        elif key == qt.Qt.Key_Down:
+            self.focusNextPrevChild(True)
+            self.focusNextPrevChild(True)
+        elif key == qt.Qt.Key_Left:
+            self.focusNextPrevChild(False)
+        elif key == qt.Qt.Key_Right:
+            self.focusNextPrevChild(True)
+        else:
+            event.ignore()
+
     def contextMenuEvent(self, event):
         """Pop up the context menu."""
 
+        # for labels which don't correspond to settings
+        if self.setting == None:
+            event.ignore()
+            return
+
         # forces settings to be updated
         self.parentWidget().setFocus()
+        # get it back straight away
+        self.setFocus()
 
         # darken the widget (gives stability)
         self.inmenu = True
@@ -259,6 +267,46 @@ class _WidgetListView(qt.QListView):
         """Emit a context menu signal."""
         self.emit( qt.PYSIGNAL('contextMenu'), (event.globalPos(),) )
 
+class _PropTable(qttable.QTable):
+    """The table which shows the properties of the selected widget."""
+
+    def __init__(self, parent):
+        """Initialise the table."""
+        qttable.QTable.__init__(self, parent)
+        self.setFocusPolicy(qt.QWidget.NoFocus)
+        self.setNumCols(2)
+        self.setTopMargin(0)
+        self.setLeftMargin(0)
+        self.setShowGrid(False)
+        self.setColumnStretchable(1, True)
+        self.setSelectionMode(qttable.QTable.NoSelection)
+
+    def keyPressEvent(self, event):
+        """This method is necessary as the table steals keyboard input
+        even if it cannot have focus."""
+        fw = self.focusWidget()
+        if fw != self:
+            try:
+                fw.keyPressEvent(event)
+            except RuntimeError:
+                # doesn't work for controls which aren't Python based
+                event.ignore()
+        else:
+            event.ignore()
+
+    def keyReleaseEvent(self, event):
+        """This method is necessary as the table steals keyboard input
+        even if it cannot have focus."""
+        fw = self.focusWidget()
+        if fw != self:
+            try:
+                fw.keyReleaseEvent(event)
+            except RuntimeError:
+                # doesn't work for controls which aren't Python based
+                event.ignore()
+        else:
+            event.ignore()
+
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
 
@@ -290,7 +338,12 @@ class TreeEditWindow(qt.QDockWindow):
         split.setOrientation(qt.QSplitter.Vertical)
 
         # first widget is a listview
-        lv = self.listview = _WidgetListView(split)
+        vbox = qt.QVBox(split)
+        l = qt.QLabel("Items", vbox)
+        l.setMargin(2)
+
+        lv = self.listview = _WidgetListView(vbox)
+        l.setBuddy(lv)
         lv.setSorting(-1)
         lv.setRootIsDecorated(True)
         self.connect( lv, qt.SIGNAL("selectionChanged(QListViewItem*)"),
@@ -314,14 +367,9 @@ class TreeEditWindow(qt.QDockWindow):
         vbox = qt.QVBox(split)
         self.proplabel = qt.QLabel("&Properties", vbox)
         self.proplabel.setMargin(2)
-        self.prefview = _ScrollView(vbox)
-        self.proplabel.setBuddy(self.prefview)
+        self.proplabel.setBuddy(self)
+        self.proptab = _PropTable(vbox)
 
-        self.prefgrid = qt.QGrid(2, qt.QGrid.Horizontal,
-                                 self.prefview.viewport())
-        self.prefview.setGrid(self.prefgrid)
-        self.prefview.addChild(self.prefgrid)
-        self.prefgrid.setMargin(4)
         self.prefchilds = []
 
         # select the root item
@@ -512,40 +560,55 @@ class TreeEditWindow(qt.QDockWindow):
 
             i.deleteLater()
 
+        # calculate number of rows
+        rows = len(item.settings.getSettingList())
         w = item.widget
+        if w != None:
+            rows += len(w.actions)
+        self.proptab.setNumRows(rows)
+
+        row = 0
+        view = self.proptab.viewport()
         # add action for widget
         if w != None:
             for name in w.actions:
-                l = qt.QLabel(name, self.prefgrid)
-                l.show()
+                l = _PropertyLabel(None, name, view)
+                self.proptab.setCellWidget(row, 0, l)
                 self.prefchilds.append(l)
 
-                b = qt.QPushButton(w.actiondescr[name], self.prefgrid)
+                b = qt.QPushButton(w.actiondescr[name], view)
                 b.veusz_action = w.actionfuncs[name]
-                b.show()
+                self.proptab.setCellWidget(row, 1, b)
                 self.prefchilds.append(b)
                 
                 self.connect( b, qt.SIGNAL('pressed()'),
                               self.slotActionPressed )
+                row += 1
 
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
             tooltext = "<strong>%s</strong> - %s" % (setn.name,
                                                      setn.descr)
             
-            l = _PropertyLabel(setn, self.prefgrid)
+            l = _PropertyLabel(setn, setn.name, view)
+            self.proptab.setCellWidget(row, 0, l)
             qt.QToolTip.add(l, tooltext)
-            l.show()
             self.prefchilds.append(l)
 
-            c = setn.makeControl(self.prefgrid)
+            c = setn.makeControl(view)
+            self.proptab.setCellWidget(row, 1, c)
             qt.QToolTip.add(c, tooltext)
-            c.show()
             self.prefchilds.append(c)
 
+            self.proptab.adjustRow(row)
+
+            row += 1
+
         # make properties keyboard shortcut point to first item
-        if len(self.prefchilds) > 1:
-            self.proplabel.setBuddy(self.prefchilds[1])
+        if len(self.prefchilds) > 0:
+            self.proplabel.setBuddy(self.prefchilds[0])
+        else:
+            self.proplabel.setBuddy(self)
             
         # Change the page to the selected widget
         w = item.widget
@@ -567,13 +630,6 @@ class TreeEditWindow(qt.QDockWindow):
 
             if count < len(children):
                 self.emit( qt.PYSIGNAL("sigPageChanged"), (count,) )
-        
-        # UUGH - KLUDGE! Have to do this before program takes notice
-        # of adjustSize below!
-        # FIXME
-        qt.QApplication.eventLoop().processEvents(qt.QEventLoop.AllEvents,
-                                                  100)
-        self.prefview.adjustSize()
             
     def slotMakeWidgetButton(self, widgettype):
         """Called when an add widget button is clicked.
