@@ -581,8 +581,8 @@ class TreeEditWindow(qt.QDockWindow):
                 self.proptab.setCellWidget(row, 1, b)
                 self.prefchilds.append(b)
                 
-                self.connect( b, qt.SIGNAL('pressed()'),
-                              self.slotActionPressed )
+                self.connect( b, qt.SIGNAL('clicked()'),
+                              self.slotActionClicked )
                 row += 1
 
         # make new widgets for the preferences
@@ -636,6 +636,10 @@ class TreeEditWindow(qt.QDockWindow):
         widgettype is the type of widget
         """
 
+        # if no widget selected, bomb out
+        if self.itemselected == None:
+            return
+
         # get the widget to act as the parent
         parent = self.itemselected.widget
         if parent == None:
@@ -657,8 +661,8 @@ class TreeEditWindow(qt.QDockWindow):
         # select the widget
         self.selectWidget(w)
 
-    def slotActionPressed(self):
-        """Called when an action button is pressed."""
+    def slotActionClicked(self):
+        """Called when an action button is clicked."""
 
         # get the button clicked/activated
         button = self.sender()

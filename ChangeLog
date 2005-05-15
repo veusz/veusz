@@ -3,6 +3,10 @@
 	- Patch adapted from James to make new documents start in new windows
 	- Add context menu to plot window to change update period
 	- Also add force update option
+	- Change lots of button pressed() to clicked() as pressed() breaks
+	appearance of button
+	- Allow datasets to be unlinked in data edit dialog
+	- Add Import button to data edit dialog
 	
 * 2005-05-14 Jeremy Sanders <jeremy@jeremysanders.net>
 	- New widget property code using QTable

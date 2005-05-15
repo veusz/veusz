@@ -31,6 +31,7 @@ import qttable
 
 import setting
 import document
+import importdialog
 
 class _DatasetNameValidator(qt.QValidator):
     """A validator to check for dataset names.
@@ -99,12 +100,12 @@ class _DatasetNameDialog(qt.QDialog):
         buttonlayout.addItem(spacer)
 
         okbutton = qt.QPushButton("&OK", self)
-        self.connect(okbutton, qt.SIGNAL('pressed()'),
+        self.connect(okbutton, qt.SIGNAL('clicked()'),
                      self.slotOK)
         buttonlayout.addWidget(okbutton)
 
         cancelbutton = qt.QPushButton("&Cancel", self)
-        self.connect(cancelbutton, qt.SIGNAL('pressed()'),
+        self.connect(cancelbutton, qt.SIGNAL('clicked()'),
                      self.reject)
         buttonlayout.addWidget(cancelbutton)
 
@@ -140,11 +141,11 @@ class DatasetNewDialog(qt.QDialog):
     """New dataset dialog."""
 
     def __init__(self, document, parent):
-        qt.QDialog.__init__(self, parent, 'DataNewDialog', False,
+        qt.QDialog.__init__(self, parent, 'DataCreateDialog', False,
                             qt.Qt.WDestructiveClose)
         self.document = document
 
-        self.setCaption("New dataset - Veusz")
+        self.setCaption("Create dataset - Veusz")
 
         spacing = self.fontMetrics().height() / 2
         vboxlayout = qt.QVBoxLayout(self, spacing, spacing)
@@ -160,7 +161,7 @@ class DatasetNewDialog(qt.QDialog):
 
         # choose the method of creating data
         methgrp = qt.QVButtonGroup("Method of creating new data", self)
-        self.connect(methgrp, qt.SIGNAL('pressed(int)'), self.slotRadioPressed)
+        self.connect(methgrp, qt.SIGNAL('clicked(int)'), self.slotRadioPressed)
         vboxlayout.addWidget(methgrp)
 
         # if we want to specify a value or range
@@ -222,9 +223,9 @@ class DatasetNewDialog(qt.QDialog):
         vboxlayout.addWidget(hbox)
 
         b = qt.QPushButton('C&reate', hbox)
-        self.connect(b, qt.SIGNAL('pressed()'), self.slotCreate )
+        self.connect(b, qt.SIGNAL('clicked()'), self.slotCreate )
         b = qt.QPushButton('&Close', hbox)
-        self.connect(b, qt.SIGNAL('pressed()'), self.slotClose )
+        self.connect(b, qt.SIGNAL('clicked()'), self.slotClose )
         
         # initially check the first option (value/range)
         valds.setChecked(True)
@@ -448,7 +449,9 @@ class DataEditDialog(qt.QDialog):
                       self.slotDatasetHighlighted )
 
         # initialise table
-        tab = self.dstable = qttable.QTable(datasplitter)
+        vbox = qt.QVBox(datasplitter)
+        vbox.setSpacing(spacing)
+        tab = self.dstable = qttable.QTable(vbox)
         tab.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
         tab.setReadOnly(True)
         tab.setNumCols(4)
@@ -457,6 +460,19 @@ class DataEditDialog(qt.QDialog):
                                           'Positive error',
                                           'Negative error'] ):
             tab.horizontalHeader().setLabel(num, text)
+
+        # if dataset is linked, show filename
+        hbox = qt.QHBox(vbox)
+        hbox.setSpacing(spacing)
+        self.linklabel = qt.QLabel('', hbox)
+        hbox.layout().addItem( qt.QSpacerItem(1, 1,
+                                              qt.QSizePolicy.Maximum,
+                                              qt.QSizePolicy.Minimum) )
+        self.linkbutton = qt.QPushButton('Unlink...', hbox)
+        self.linkbutton.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Fixed,
+                                                      qt.QSizePolicy.Minimum) )
+        self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
+                     self.slotDatasetUnlink)
 
         # operation buttons
         opbox = qt.QHBox(self)
@@ -467,9 +483,10 @@ class DataEditDialog(qt.QDialog):
         for name, slot in [ ('&Delete', self.slotDatasetDelete),
                             ('&Rename...', self.slotDatasetRename),
                             ('D&uplicate...', self.slotDatasetDuplicate),
-                            ('&New...', self.slotDatasetNew) ]:
+                            ('Crea&te...', self.slotDatasetNew),
+                            ('&Import...', self.slotDatasetImport) ]:
             b = qt.QPushButton(name, opbox)
-            self.connect(b, qt.SIGNAL('pressed()'), slot)
+            self.connect(b, qt.SIGNAL('clicked()'), slot)
             
         # buttons
         bhbox = qt.QHBox(self)
@@ -478,7 +495,7 @@ class DataEditDialog(qt.QDialog):
         bhbox.setSpacing(spacing)
         
         closebutton = qt.QPushButton("&Close", bhbox)
-        self.connect(closebutton, qt.SIGNAL('pressed()'), self.slotClose )
+        self.connect(closebutton, qt.SIGNAL('clicked()'), self.slotClose )
 
         # populate initially
         self.slotDocumentModified()
@@ -523,6 +540,8 @@ class DataEditDialog(qt.QDialog):
     def slotDatasetHighlighted(self, name):
         """Dataset highlighted in list box."""
 
+        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
         # convert to python string
         name = unicode(name)
 
@@ -543,6 +562,15 @@ class DataEditDialog(qt.QDialog):
                     t.setText(i, col, str(v))
 
         t.setUpdatesEnabled(True)
+        qt.QApplication.restoreOverrideCursor()
+
+        # linked dataset
+        if ds.linked == None:
+            l = 'None'
+        else:
+            l = ds.linked.filename
+        self.linkbutton.setEnabled( ds.linked != None)
+        self.linklabel.setText('Linked file: %s' % l)
 
     def slotDatasetDelete(self):
         """Delete selected dataset."""
@@ -585,3 +613,31 @@ class DataEditDialog(qt.QDialog):
         nds = DatasetNewDialog(self.document, self.parent)
         nds.show()
         
+    def slotDatasetImport(self):
+        """Import data from a file."""
+
+        ids = importdialog.ImportDialog(self.parent, self.document)
+        ids.show()
+        
+    def slotDatasetUnlink(self):
+        """Allow user to remove link to file."""
+
+        item = self.dslistbox.selectedItem()
+        if item != None:
+            # check with the user first, as this is drastic
+            name = unicode( item.text() )
+            mb = qt.QMessageBox("Veusz",
+                                "Unlink dataset '%s'?" % name,
+                                qt.QMessageBox.Information,
+                                qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                                qt.QMessageBox.Cancel,
+                                qt.QMessageBox.NoButton,
+                                self)
+            mb.setButtonText(qt.QMessageBox.Ok, "&Unlink")
+            mb.setButtonText(qt.QMessageBox.Cancel, "&Cancel")
+
+            # if they want to carry on
+            if mb.exec_loop() == qt.QMessageBox.Ok:
+                self.document.unlinkDataset(name)
+                # update display
+                self.dslistbox.setCurrentItem( self.dslistbox.currentItem() )

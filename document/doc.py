@@ -236,6 +236,11 @@ class Document( qt.QObject ):
         self.data[newname] = self.data[name].duplicate()
         self.setModified()
 
+    def unlinkDataset(self, name):
+        """Remove any links to file from the dataset."""
+        self.data[name].linked = None
+        self.setModified()
+
     def getData(self, name):
         """Get data with name"""
         return self.data[name]

@@ -180,8 +180,8 @@ class MainWindow(qt.QMainWindow):
              self.slotDataImport, 'stock-import.png', False, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
              self.slotDataEdit, None, False, ''),
-            ('datanew', 'Create new datasets', '&New...', 'data',
-             self.slotDataNew, None, False, ''),
+            ('datacreate', 'Create new datasets', '&Create...', 'data',
+             self.slotDataCreate, None, False, ''),
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
              self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
             ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
@@ -273,8 +273,8 @@ class MainWindow(qt.QMainWindow):
         d = dialogs.dataeditdialog.DataEditDialog(self, self.document)
         d.show()
 
-    def slotDataNew(self):
-        """Make new datasets."""
+    def slotDataCreate(self):
+        """Create new datasets."""
         d = dialogs.dataeditdialog.DatasetNewDialog(self.document, self)
         d.show()
 

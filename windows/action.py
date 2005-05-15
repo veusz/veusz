@@ -113,7 +113,7 @@ class Action(qt.QObject):
             else:
                 qt.QToolTip.add(b, self.tooltiptext,
                                 self.tipgroup, self.statusbartext)
-            self.connect(b, qt.SIGNAL('pressed()'),
+            self.connect(b, qt.SIGNAL('clicked()'),
                          self.slotAction)
 
             self.items.append( (b,) )
