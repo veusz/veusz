@@ -44,7 +44,7 @@ class PlotWindow( qt.QScrollView ):
 
         # set up so if document is modified we are notified
         self.document = document
-        self.docchangeset = 99999
+        self.docchangeset = -100
 
         self.size = (1, 1)
         self.oldzoom = -1.
@@ -215,10 +215,11 @@ class PlotWindow( qt.QScrollView ):
         popup = qt.QPopupMenu(self)
         popup.setCheckable(True)
 
-        # add option to disable updates
-        popup.insertItem('Disable updates', 1)
+        # option to force an update
+        popup.insertItem('Force update', 1)
+        popup.insertItem('Disable updates', 2)
         if self.interval == None:
-            popup.setItemChecked(1, True)
+            popup.setItemChecked(2, True)
         popup.insertSeparator()
 
         # populate menu with update periods
@@ -227,11 +228,15 @@ class PlotWindow( qt.QScrollView ):
             popup.insertItem('Update every %gs' % (i * 0.001), 100+id)
             if i == self.interval:
                 popup.setItemChecked(100+id, True)
-        
+
         # show menu
         ret = popup.exec_loop( event.globalPos() )
 
         if ret == 1:
+            # force an update
+            self.docchangeset = -100
+            self.slotTimeout()
+        elif ret == 2:
             # stop updates
             self.interval = None
             self.timer.stop()
