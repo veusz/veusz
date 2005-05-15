@@ -52,9 +52,13 @@ class ImportDialog(qt.QDialog):
 
         spacing = self.fontMetrics().height() / 2
 
+        # layout for dialog
+        self.layout = qt.QVBoxLayout(self, spacing)
+
         # change the filename
         fnhbox = qt.QHBox(self)
         fnhbox.setSpacing(spacing)
+        self.layout.addWidget( fnhbox )
         l = qt.QLabel('&Filename:', fnhbox)
         self.filenameedit = qt.QLineEdit(fnhbox)
         l.setBuddy(self.filenameedit)
@@ -71,6 +75,7 @@ class ImportDialog(qt.QDialog):
 
         # preview the file
         self.previewedit = qt.QTextEdit(self)
+        self.layout.addWidget( self.previewedit )
         self.previewedit.setTextFormat(qt.Qt.PlainText)
         self.previewedit.setReadOnly(True)
         self.previewedit.setWordWrap(qt.QTextEdit.NoWrap)
@@ -83,6 +88,7 @@ class ImportDialog(qt.QDialog):
         # edit the descriptor
         dhbox = qt.QHBox(self)
         dhbox.setSpacing(spacing)
+        self.layout.addWidget( dhbox )
         l = qt.QLabel('&Descriptor:', dhbox)
         self.descriptoredit = qt.QLineEdit(dhbox)
         l.setBuddy(self.descriptoredit)
@@ -90,38 +96,36 @@ class ImportDialog(qt.QDialog):
                         'Names of columns when importing data, '
                         'e.g. "x y" or "a[:]"')
         
+        # help for user
+        l = qt.QLabel(_importhelp, self)
+        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
+        self.layout.addWidget( l )
+
         # allow links from the file, so the data are reread from the file
         # on reloading
         self.linkcheck = qt.QCheckBox('&Link the datasets to the file',
                                       self)
+        self.layout.addWidget( self.linkcheck )
         qt.QToolTip.add(self.linkcheck,
                         'Linked datasets are not saved to a document file,'
                         '\nbut are reloaded from the linked data file.')
 
         # buttons
-        bhbox = qt.QHBox(self)
-        bhbox.setSpacing(spacing)
+        w = qt.QWidget(self)
+        self.layout.addWidget(w)
+        w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
+        l = qt.QHBoxLayout(w, 0, spacing)
+        l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
+                                  qt.QSizePolicy.Minimum) )
         
-        importbutton = qt.QPushButton("&Import", bhbox)
-        importbutton.setDefault( True )
-        closebutton = qt.QPushButton("&Close", bhbox)
-        qt.QObject.connect( closebutton, qt.SIGNAL('clicked()'),
-                            self.slotClose )
-        qt.QObject.connect( importbutton, qt.SIGNAL('clicked()'),
-                            self.slotImport )
+        b = qt.QPushButton("&Import", w)
+        b.setDefault(True)
+        l.addWidget(b)
+        self.connect(b, qt.SIGNAL('clicked()'), self.slotImport)
+        b = qt.QPushButton("&Close", w)
+        l.addWidget(b)
+        self.connect(b, qt.SIGNAL('clicked()'), self.slotClose)
 
-        # construct the dialog
-        self.layout = qt.QVBoxLayout(self, spacing)
-        self.layout.addWidget( fnhbox )
-        self.layout.addWidget( self.previewedit )
-
-        l = qt.QLabel(_importhelp, self)
-        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
-        self.layout.addWidget( l )
-
-        self.layout.addWidget( dhbox )
-        self.layout.addWidget( self.linkcheck )
-        self.layout.addWidget( bhbox )
 
     dirname = '.'
 
@@ -250,5 +254,3 @@ class ImportDialog(qt.QDialog):
             text += '\nDatasets were linked to file "%s"\n' % filename
 
         self.previewedit.setText(text)
-        
-        

@@ -218,13 +218,19 @@ class DatasetNewDialog(qt.QDialog):
             self.dsedits[name] = e
             
         # buttons
-        hbox = qt.QHBox(self)
-        hbox.setSpacing(spacing)
-        vboxlayout.addWidget(hbox)
+        w = qt.QWidget(self)
+        vboxlayout.addWidget(w)
+        l = qt.QHBoxLayout(w, 0, spacing)
 
-        b = qt.QPushButton('C&reate', hbox)
+        self.statuslabel = qt.QLabel('', w)
+        l.addWidget(self.statuslabel)
+        l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
+                                  qt.QSizePolicy.Minimum) )
+        b = qt.QPushButton('C&reate', w)
+        l.addWidget(b)
         self.connect(b, qt.SIGNAL('clicked()'), self.slotCreate )
-        b = qt.QPushButton('&Close', hbox)
+        b = qt.QPushButton('&Close', w)
+        l.addWidget(b)
         self.connect(b, qt.SIGNAL('clicked()'), self.slotClose )
         
         # initially check the first option (value/range)
@@ -274,16 +280,11 @@ class DatasetNewDialog(qt.QDialog):
             ds = document.Dataset(**vals)
             self.document.setData(name, ds)
 
-            qt.QMessageBox("Veusz",
-                           "Created dataset '%s'" % name,
-                           qt.QMessageBox.Information,
-                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                           qt.QMessageBox.NoButton,
-                           qt.QMessageBox.NoButton,
-                           self).exec_loop()
+            self.statuslabel.setText("Created dataset '%s'" % name)
 
         except _DSException, e:
             # all bad roads lead here - take exception string and tell user
+            self.statuslabel.setText("Creation failed")
             qt.QMessageBox("Veusz",
                            str(e),
                            qt.QMessageBox.Warning,
@@ -462,40 +463,44 @@ class DataEditDialog(qt.QDialog):
             tab.horizontalHeader().setLabel(num, text)
 
         # if dataset is linked, show filename
-        hbox = qt.QHBox(vbox)
-        hbox.setSpacing(spacing)
-        self.linklabel = qt.QLabel('', hbox)
-        hbox.layout().addItem( qt.QSpacerItem(1, 1,
-                                              qt.QSizePolicy.Maximum,
-                                              qt.QSizePolicy.Minimum) )
-        self.linkbutton = qt.QPushButton('Unlink...', hbox)
-        self.linkbutton.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Fixed,
-                                                      qt.QSizePolicy.Minimum) )
+        w = qt.QWidget(vbox)
+        w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum)
+        l = qt.QHBoxLayout(w, 0, spacing)
+
+        self.linklabel = qt.QLabel('', w)
+        l.addSpacing(spacing)
+        l.addWidget(self.linklabel)
+        l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
+                                  qt.QSizePolicy.Minimum) )
+        self.linkbutton = qt.QPushButton('Unlink...', w)
+        l.addWidget(self.linkbutton)
         self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
                      self.slotDatasetUnlink)
 
         # operation buttons
-        opbox = qt.QHBox(self)
-        opbox.setSpacing(spacing)
-        opbox.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        self.layout.addWidget(opbox)
+        buttons = [ ('&Delete', self.slotDatasetDelete),
+                    ('&Rename...', self.slotDatasetRename),
+                    ('D&uplicate...', self.slotDatasetDuplicate),
+                    (None, None),
+                    ('Crea&te...', self.slotDatasetNew),
+                    ('&Import...', self.slotDatasetImport),
+                    (None, None),
+                    ('&Close', self.slotClose) ]
 
-        for name, slot in [ ('&Delete', self.slotDatasetDelete),
-                            ('&Rename...', self.slotDatasetRename),
-                            ('D&uplicate...', self.slotDatasetDuplicate),
-                            ('Crea&te...', self.slotDatasetNew),
-                            ('&Import...', self.slotDatasetImport) ]:
-            b = qt.QPushButton(name, opbox)
-            self.connect(b, qt.SIGNAL('clicked()'), slot)
-            
-        # buttons
-        bhbox = qt.QHBox(self)
-        bhbox.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        self.layout.addWidget(bhbox)
-        bhbox.setSpacing(spacing)
-        
-        closebutton = qt.QPushButton("&Close", bhbox)
-        self.connect(closebutton, qt.SIGNAL('clicked()'), self.slotClose )
+        w = qt.QWidget(self)
+        self.layout.addWidget(w)
+        w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
+        l = qt.QHBoxLayout(w, 0, spacing)
+        l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
+                                  qt.QSizePolicy.Minimum) )
+
+        for name, slot in buttons:
+            if name == None:
+                l.addSpacing(spacing)
+            else:
+                b = qt.QPushButton(name, w)
+                l.addWidget(b)
+                self.connect(b, qt.SIGNAL('clicked()'), slot)
 
         # populate initially
         self.slotDocumentModified()

@@ -7,6 +7,7 @@
 	appearance of button
 	- Allow datasets to be unlinked in data edit dialog
 	- Add Import button to data edit dialog
+	- Dialog box improvements (spacing and so on)
 	
 * 2005-05-14 Jeremy Sanders <jeremy@jeremysanders.net>
 	- New widget property code using QTable
