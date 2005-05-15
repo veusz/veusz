@@ -23,10 +23,12 @@
 
 import os
 import sys
+import itertools
+
 import qt
 
+import setting
 import dialogs.exceptiondialog
-import utils
 
 mdir = os.path.dirname(__file__)
 _logolocation='%s/../images/logo.png' % mdir
@@ -55,7 +57,18 @@ class PlotWindow( qt.QScrollView ):
         self.timer = qt.QTimer(self)
         self.connect( self.timer, qt.SIGNAL('timeout()'),
                       self.slotTimeout )
-        self.timer.start(1000)
+
+        # get update period from setting database
+        if 'plot_updateinterval' in setting.settingdb.database:
+            self.interval = setting.settingdb.database['plot_updateinterval']
+        else:
+            self.interval = 1000
+
+        if self.interval != None:
+            self.timer.start(self.interval)
+
+        # allow window to get foucs, to allow context menu
+        self.setFocusPolicy(qt.QWidget.StrongFocus)
 
     def setOutputSize(self):
         """Set the ouput display size."""
@@ -195,3 +208,41 @@ class PlotWindow( qt.QScrollView ):
         widget = self.document.basewidget
         if len(widget.children) == 0:
             self.drawLogo(painter)
+
+    def contextMenuEvent(self, event):
+        """A context to change update periods, or disable updates."""
+
+        popup = qt.QPopupMenu(self)
+        popup.setCheckable(True)
+
+        # add option to disable updates
+        popup.insertItem('Disable updates', 1)
+        if self.interval == None:
+            popup.setItemChecked(1, True)
+        popup.insertSeparator()
+
+        # populate menu with update periods
+        intervals = [100, 250, 500, 1000, 2000, 5000, 10000]
+        for i, id in itertools.izip(intervals, itertools.count()):
+            popup.insertItem('Update every %gs' % (i * 0.001), 100+id)
+            if i == self.interval:
+                popup.setItemChecked(100+id, True)
+        
+        # show menu
+        ret = popup.exec_loop( event.globalPos() )
+
+        if ret == 1:
+            # stop updates
+            self.interval = None
+            self.timer.stop()
+        elif ret >= 100:
+            # change interval to one selected
+            self.interval = intervals[ret-100]
+            self.timer.changeInterval(self.interval)
+            # start timer if it was stopped
+            if not self.timer.isActive():
+                self.timer.start()
+
+        # update setting database
+        if ret > 0:
+            setting.settingdb.database['plot_updateinterval'] = self.interval

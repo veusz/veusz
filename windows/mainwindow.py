@@ -463,6 +463,7 @@ class MainWindow(qt.QMainWindow):
                            self).exec_loop()
         except Exception, e:
             # parsing problem with document
+            # FIXME: never used
             qt.QMessageBox("Veusz",
                            "Error in file '%s'\n'%s'" % (filename, str(e)),
                            qt.QMessageBox.Critical,
