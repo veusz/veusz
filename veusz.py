@@ -52,9 +52,9 @@ def run():
     # process command line arguments
     cmdline = [str(app.argv()[i]) for i in range(1, app.argc())]
 
-    if '--help' in cmdline or len(cmdline) > 1:
+    if '--help' in cmdline:
         write_details()
-        sys.stderr.write('\nUsage: \n veusz saved.vsz\n')
+        sys.stderr.write('\nUsage: \n veusz saved.vsz ...\n')
         sys.stderr.write('Optional arguments --help, --version\n')
         sys.exit(0)
     elif '--version' in cmdline:
@@ -69,6 +69,12 @@ def run():
     # load in filename given
     if len(cmdline) != 0:
         win.openFile(cmdline[0])
+
+        # open up more windows if multiple files given
+        for i in cmdline[1:]:
+            win = windows.mainwindow.MainWindow()
+            win.show()
+            win.openFile(i)
 
     app.exec_loop()
 

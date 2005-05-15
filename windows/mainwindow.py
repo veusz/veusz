@@ -170,7 +170,7 @@ class MainWindow(qt.QMainWindow):
              False, ''),
             ('file', ),
             ('fileprint', 'Print the document', '&Print...', 'file',
-             self.slotFilePrint, 'stock-print.png', True, ''),
+             self.slotFilePrint, 'stock-print.png', True, 'Ctrl+P'),
             ('fileexport', 'Export the current page', '&Export...', 'file',
              self.slotFileExport, 'stock-export.png', True, ''),
             ('file', ),
@@ -362,18 +362,9 @@ class MainWindow(qt.QMainWindow):
     def slotFileNew(self):
         """New file."""
 
-        # does the user want to save first?
-        if self.document.isModified():
-            v = self.queryOverwrite()
-            if v == qt.QMessageBox.Cancel:
-                return
-            elif v == qt.QMessageBox.Yes:
-                self.slotFileSave()
-
-        # destroy the current document
-        self.document.wipe()
-        self.filename = ''
-        self.updateTitlebar()
+        # create a new main window for the new file
+        win = MainWindow()
+        win.show()
 
     def slotFileSave(self):
         """Save file."""
@@ -449,7 +440,7 @@ class MainWindow(qt.QMainWindow):
             self.slotFileSave()
 
     def openFile(self, filename):
-        '''Open the given filename.'''
+        '''Open the given filename in the current window.'''
 
         # show busy cursor
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
@@ -462,8 +453,18 @@ class MainWindow(qt.QMainWindow):
             self.updateTitlebar()
             self.updateStatusbar("Opened %s" % filename)
         except IOError:
+            # problem reading file
             qt.QMessageBox("Veusz",
                            "Cannot open file '%s'" % filename,
+                           qt.QMessageBox.Critical,
+                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                           qt.QMessageBox.NoButton,
+                           qt.QMessageBox.NoButton,
+                           self).exec_loop()
+        except Exception, e:
+            # parsing problem with document
+            qt.QMessageBox("Veusz",
+                           "Error in file '%s'\n'%s'" % (filename, str(e)),
                            qt.QMessageBox.Critical,
                            qt.QMessageBox.Ok | qt.QMessageBox.Default,
                            qt.QMessageBox.NoButton,
@@ -474,7 +475,7 @@ class MainWindow(qt.QMainWindow):
         qt.QApplication.restoreOverrideCursor()
 
     def slotFileOpen(self):
-        """Open an existing file."""
+        """Open an existing file in a new window."""
 
         fd = qt.QFileDialog(self, 'open dialog', True)
         fd.setDir( MainWindow.dirname )
@@ -484,11 +485,19 @@ class MainWindow(qt.QMainWindow):
 
         # if the user chooses a file
         if fd.exec_loop() == qt.QDialog.Accepted:
+            if self.document.isBlank():
+                # open in current window
+                win = self
+            else:
+                # create new window
+                win = MainWindow()
+                win.show()
+            
             # save directory for next time
             MainWindow.dirname = fd.dir()
 
             filename = unicode( fd.selectedFile() )
-            self.openFile(filename)
+            win.openFile(filename)
                 
     def slotFileExport(self):
         """Export the graph."""

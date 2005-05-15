@@ -205,6 +205,10 @@ class Document( qt.QObject ):
         self.setModified(False)
         self.emit( qt.PYSIGNAL("sigWiped"), () )
 
+    def isBlank(self):
+        """Does the document contain widgets and no data"""
+        return len(self.basewidget.children) == 0 and len(self.data) == 0
+
     def setData(self, name, dataset):
         """Set data to val, with symmetric or negative and positive errors."""
         self.data[name] = dataset

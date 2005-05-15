@@ -40,6 +40,9 @@ This class is modelled on the one described in
 'GUI Programming in Python: QT Edition' (Boudewijn Rempt)
 """
 
+# get globals before things are imported
+_globals = globals()
+
 import sys
 import traceback
 import pickle
@@ -48,6 +51,8 @@ import commandinterface
 import utils
 
 class CommandInterpreter:
+    """Class for executing commands in the Veusz command line language."""
+
     def __init__(self, document):
         """ Initialise object with the document it interfaces."""
         self.document = document
@@ -55,8 +60,8 @@ class CommandInterpreter:
         # set up interface to document
         self.interface = commandinterface.CommandInterface(document)
 
-        # initialise environment
-        self.globals = globals()
+        # initialise environment (make a copy from inital globals)
+        self.globals = _globals.copy()
 
         # save the stdout & stderr
         self.write_stdout = sys.stdout

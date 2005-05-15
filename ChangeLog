@@ -1,5 +1,9 @@
+* 2005-05-15 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Patch from James Graham to make Ctrl+P print
+	- Patch adapted from James to make new documents start in new windows
+	
 * 2005-05-14 Jeremy Sanders <jeremy@jeremysanders.net>
-	- Start of new widget property GUI
+	- New widget property code using QTable
 	
 * 2005-05-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Make super and subscripts move further up and down
