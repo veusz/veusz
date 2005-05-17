@@ -25,6 +25,7 @@
 
 import sys
 import os.path
+import signal
 
 import qt
 
@@ -45,8 +46,13 @@ def write_details():
     '''Write the copyright details.'''
     sys.stderr.write(copyr % utils.version())
     
+def handleIntSignal(signum, frame):
+    '''Ask windows to close if Ctrl+C pressed.'''
+    qt.qApp.closeAllWindows()
+
 def run():
     '''Run the main application.'''
+
     app = qt.QApplication(sys.argv)
 
     # process command line arguments
@@ -61,6 +67,10 @@ def run():
         write_details()
         sys.exit(0)
 
+    # register a signal handler to catch ctrl+c
+    signal.signal(signal.SIGINT, handleIntSignal)
+
+    # open the main window
     win = windows.mainwindow.MainWindow()
     win.show()
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
