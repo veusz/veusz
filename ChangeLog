@@ -1,6 +1,8 @@
 * 2005-05-17 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add signal handler to catch ctrl+c and ask to close docs -
 	James Graham's idea
+	- Changed File->Quit to close all windows. File->Close Window
+	closes current window
 	
 * 2005-05-15 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Patch from James Graham to make Ctrl+P print

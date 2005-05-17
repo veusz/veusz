@@ -174,6 +174,8 @@ class MainWindow(qt.QMainWindow):
             ('fileexport', 'Export the current page', '&Export...', 'file',
              self.slotFileExport, 'stock-export.png', True, ''),
             ('file', ),
+            ('fileclose', 'Close current window', 'Close Window', 'file',
+             self.slotFileClose, None, False, 'Ctrl+W'),
             ('filequit', 'Exit the program', '&Quit', 'file',
              self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
@@ -604,12 +606,13 @@ class MainWindow(qt.QMainWindow):
         # enable/disable file, save menu item
         self.actions['filesave'].setEnabled(ismodified)
 
+    def slotFileClose(self):
+        """File close window chosen."""
+        self.close(True)
+
     def slotFileQuit(self):
         """File quit chosen."""
-
-        # note: may need to be fixed if supports multiple top-level windows
-        # doing this prompts the user for saving if necessary
-        self.close(True)
+        qt.qApp.closeAllWindows()
         
     def slotViewPreviousPage(self):
         """View the previous page."""
