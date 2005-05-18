@@ -68,6 +68,7 @@ class Dataset:
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
         '''Initialise storage.'''
+        self.document = None
         self.data = _cnvt_numarray(data)
         self.serr = self.nerr = self.perr = None
 
@@ -81,6 +82,11 @@ class Dataset:
                 self.perr = perr + self.data*0.
 
         self.linked = linked
+
+        # check the sizes of things match up
+        s = self.data.shape
+        for i in (self.serr, self.nerr, self.perr):
+            assert i == None or i.shape == s
 
     def duplicate(self):
         """Return new dataset based on this one."""
@@ -118,6 +124,29 @@ class Dataset:
     def empty(self):
         '''Is the data defined?'''
         return self.data == None or len(self.data) == 0
+
+    def changeValues(self, type, vals):
+        """Change the requested part of the dataset to vals.
+
+        type == vals | serr | perr | nerr
+        """
+        if type == 'vals':
+            self.data = vals
+        elif type == 'serr':
+            self.serr = vals
+        elif type == 'nerr':
+            self.nerr = vals
+        elif type == 'perr':
+            self.perr = vals
+        else:
+            raise ValueError, 'type does not contain an allowed value'
+
+        # just a check...
+        s = self.data.shape
+        for i in (self.serr, self.nerr, self.perr):
+            assert i == None or i.shape == s
+
+        self.document.setModified(True)
 
     # TODO implement mathematical operations on this type
 
@@ -198,7 +227,6 @@ class Document( qt.QObject ):
 
     def wipe(self):
         """Wipe out any stored data."""
-
         self.data = {}
         self.basewidget = widgets.Root(None)
         self.basewidget.document = self
@@ -212,6 +240,7 @@ class Document( qt.QObject ):
     def setData(self, name, dataset):
         """Set data to val, with symmetric or negative and positive errors."""
         self.data[name] = dataset
+        dataset.document = self
         self.setModified()
 
     def deleteDataset(self, name):

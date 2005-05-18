@@ -424,6 +424,150 @@ class DatasetNewDialog(qt.QDialog):
 
         return vals
 
+class _DataEditTable(qttable.QTable):
+    """A QTable for displaying data from datasets.
+
+    The table draws data itself, and notifies the document of any changes
+    to the data.
+    """
+
+    def __init__(self, parent):
+        """Initialise the table with the given parent."""
+
+        qttable.QTable.__init__(self, 0, 4, parent)
+        self.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
+        self.setLeftMargin(self.fontMetrics().width("W999999W"))
+        self.setSelectionMode(qttable.QTable.NoSelection)
+
+        # set the headers to appropriate values
+        for num, text in itertools.izip( itertools.count(),
+                                         ['Value', 'Symmetric error',
+                                          'Positive error',
+                                          'Negative error'] ):
+            self.horizontalHeader().setLabel(num, text)
+
+        # data the table shows
+        self.coldata = (None, None, None, None)
+
+        # the edit control, if any
+        self.edit = None
+
+    def setDataset(self, ds):
+        """Show the given dataset in the widget."""
+        self.dataset = ds
+        self.coldata = (ds.data, ds.serr, ds.perr, ds.nerr)
+        self.setNumRows( len(self.coldata[0]) )
+
+    # all these do nothing, as we're not using TableItems
+    def resizeData(self, i):
+        return
+    def item(self, r, c):
+        return None
+    def setItem(self, r, c, i):
+        return
+    def clearCell(self, r, c):
+        return
+    def insertWidget(self, r, c, w):
+        return
+    def clearCellWidget(self, r, c):
+        return
+
+    def text(self, r, c):
+        """Return the text for the specified cell."""
+        ds = self.coldata[c]
+        if ds == None:
+            return ''
+        else:
+            return str(ds[r])
+
+    def paintCell(self, painter, r, c, cr, selected, colgroup = None):
+        """Draw the given cell (r,c) in rectangle cr, selected if it is
+        selected, and in the colour colgroup."""
+
+        if colgroup == None:
+            colgroup = self.colorGroup()
+
+        # draw background and grid
+        qttable.QTable.paintCell(self, painter, r, c, cr, selected, colgroup)
+
+        # change font to appropriate colour
+        if selected:
+            painter.setPen( qt.QPen(colgroup.highlightedText()) )
+        else:
+            painter.setPen( qt.QPen(colgroup.text()) )
+
+        # draw text for cell
+        painter.drawText(0, 0, cr.width(), cr.height(),
+                         qt.Qt.AlignRight | qt.Qt.AlignVCenter,
+                         self.text(r, c))
+
+    def createEditor(self, r, c, initfromcell):
+        """Called if the user starts editing a cell."""
+        self.edit = qt.QLineEdit(self.viewport())
+        v = qt.QDoubleValidator(self.edit)
+        self.edit.setValidator(v)
+        if initfromcell:
+            self.edit.setText(self.text(r, c))
+        return self.edit
+
+    def cellWidget(self, r, c):
+        """Return widget for cell."""
+        if r == self.currEditRow() and c == self.currEditCol():
+            return self.edit
+        return None
+
+    def beginEdit(self, r, c, replace):
+        """Check whether it is valid to edit the column."""
+        # check whether there is data in the column
+        if self.coldata[c] == None:
+            mb = qt.QMessageBox("Veusz",
+                                "This column has no data. Initialise with "
+                                "zero and continue?",
+                                qt.QMessageBox.Warning,
+                                qt.QMessageBox.Yes|qt.QMessageBox.Default,
+                                qt.QMessageBox.No,
+                                qt.QMessageBox.NoButton,
+                                self)
+            mb.setButtonText(qt.QMessageBox.Yes, "&Initialise")
+            mb.setButtonText(qt.QMessageBox.No, "&Cancel")
+            if mb.exec_loop() != qt.QMessageBox.Yes:
+                return None
+
+        return qttable.QTable.beginEdit(self, r, c, replace)
+    
+    def endEdit(self, r, c, accept, replace):
+        """User finished editing."""
+        qttable.QTable.endEdit(self, r, c, accept, replace)
+        if self.edit != None:
+            e = self.edit
+            self.edit = None
+            e.deleteLater()
+
+    def setCellContentFromEditor(self, r, c):
+        """Use the edit control to set the value in the dataset."""
+
+        if self.edit != None:
+            nums = self.coldata[c]
+            if nums == None:
+                nums = N.zeros(self.coldata[0].shape, N.Float64)
+            try:
+                nums[r] = float( unicode(self.edit.text()) )
+            except ValueError:
+                # floating point conversion error
+                self.edit.setText(self.text(r, c))
+                qt.QMessageBox("Veusz",
+                               "Invalid number",
+                               qt.QMessageBox.Warning,
+                               qt.QMessageBox.Ok,
+                               qt.QMessageBox.NoButton,
+                               qt.QMessageBox.NoButton,
+                               self).exec_loop()
+                return
+
+            # modify the value in the dataset
+            self.dataset.changeValues(['vals', 'serr', 'perr', 'nerr'][c],
+                                      nums)
+
 class DataEditDialog(qt.QDialog):
     """Data editting dialog."""
 
@@ -452,16 +596,8 @@ class DataEditDialog(qt.QDialog):
         # initialise table
         vbox = qt.QVBox(datasplitter)
         vbox.setSpacing(spacing)
-        tab = self.dstable = qttable.QTable(vbox)
-        tab.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
-        tab.setReadOnly(True)
-        tab.setNumCols(4)
-        for num, text in itertools.izip( itertools.count(),
-                                         ['Value', 'Symmetric error',
-                                          'Positive error',
-                                          'Negative error'] ):
-            tab.horizontalHeader().setLabel(num, text)
-
+        self.dstable = _DataEditTable(vbox)
+        
         # if dataset is linked, show filename
         w = qt.QWidget(vbox)
         w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum)
@@ -535,8 +671,27 @@ class DataEditDialog(qt.QDialog):
         # update dataset list
         datasets = self.document.data.keys()
         datasets.sort()
+
+        # get current item (to reselect later)
+        item = self.dslistbox.selectedItem()
+        if item != None:
+            name = unicode(item.text())
+        else:
+            name = None
+
         self.dslistbox.clear()
         self.dslistbox.insertStrList( datasets )
+
+        # reselect old item
+        item = None
+        if name != None:
+            item = self.dslistbox.findItem(name, qt.Qt.ExactMatch)
+            if item != None:
+                self.dslistbox.setCurrentItem(item)
+        if name == None or item == None:
+            # select first item
+            if self.dslistbox.numRows() != 0:
+                self.dslistbox.setCurrentItem(0)
 
     def slotClose(self):
         """Close the dialog."""
@@ -545,29 +700,12 @@ class DataEditDialog(qt.QDialog):
     def slotDatasetHighlighted(self, name):
         """Dataset highlighted in list box."""
 
-        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
-
         # convert to python string
         name = unicode(name)
 
         # update the table
         ds = self.document.data[name]
-        norows = len(ds.data)
-        t = self.dstable
-        t.setUpdatesEnabled(False)
-        t.setNumRows(norows)
-
-        datasets = (ds.data, ds.serr, ds.perr, ds.nerr)
-        for array, col in zip(datasets, range(len(datasets))):
-            if array == None:
-                for i in range(norows):
-                    t.setText(i, col, '')
-            else:
-                for i, v in zip(range(norows), array):
-                    t.setText(i, col, str(v))
-
-        t.setUpdatesEnabled(True)
-        qt.QApplication.restoreOverrideCursor()
+        self.dstable.setDataset(ds)
 
         # linked dataset
         if ds.linked == None:
@@ -646,3 +784,4 @@ class DataEditDialog(qt.QDialog):
                 self.document.unlinkDataset(name)
                 # update display
                 self.dslistbox.setCurrentItem( self.dslistbox.currentItem() )
+
