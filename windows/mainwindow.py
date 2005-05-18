@@ -36,11 +36,16 @@ import dialogs.aboutdialog
 import dialogs.importdialog
 import dialogs.dataeditdialog
 
+_fdirname = os.path.dirname(__file__)
+
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
 
     def __init__(self, *args):
         qt.QMainWindow.__init__(self, *args)
+
+        self.setIcon( qt.QPixmap(os.path.join(_fdirname, '..',
+                                              'images', 'icon.png')) )
 
         self.document = document.Document()
 
@@ -219,7 +224,6 @@ class MainWindow(qt.QMainWindow):
             ]
             
         # construct the menus and toolbar from the above data
-        dirname = os.path.dirname(__file__)
         self.actions = {}
         for i in items:
             # we just want to insert a separator
@@ -238,7 +242,7 @@ class MainWindow(qt.QMainWindow):
             # load icon if set
             if icon != '':
                 action.setIconSet(qt.QIconSet( qt.QPixmap("%s/icons/%s" %
-                                                          (dirname, icon))) )
+                                                          (_fdirname, icon))) )
 
             # connect the action to the slot
             qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
@@ -255,7 +259,7 @@ class MainWindow(qt.QMainWindow):
 
         zoomtb = qt.QToolButton(self.maintoolbar)
         zoomtb.setIconSet(qt.QIconSet(qt.QPixmap("%s/icons/zoom-options.png" %
-                                                 (dirname,) )))
+                                                 (_fdirname,) )))
 
         # drop down zoom button on toolbar
         zoompop = qt.QPopupMenu(zoomtb)
