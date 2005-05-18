@@ -22,6 +22,7 @@
 
 import sys
 import os
+import os.path
 
 class _SettingDB:
     """A singleton class to handle the settings file.
@@ -40,7 +41,8 @@ class _SettingDB:
 
         self.systemdefaultfile = '/etc/veusz.conf'
         try:
-            self.userdefaultfile = '/home/%s/.veusz.def' % os.environ['USER']
+            self.userdefaultfile = os.path.join(os.environ['HOME'],
+                                                '.veusz.def')
         except KeyError:
             self.userdefaultfile = ''
 

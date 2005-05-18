@@ -1,5 +1,6 @@
 * 2005-05-18 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add icon for main window
+	- Veusz should look in $HOME not /home/$USER for config file
 	
 * 2005-05-17 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add signal handler to catch ctrl+c and ask to close docs -
