@@ -46,7 +46,7 @@
       necessary to write some parts in another language for speed, but
       this will be kept to an absolute minimum). It is also designed
       in an object oriented fashion, where a document is built up by a
-      number of widgets in a hierarchy. The advantage of using Python
+      number of components in a hierarchy. The advantage of using Python
       is that is is easy to allow the user to script Veusz using
       Python as a very powerful scripting language. Indeed, the
       saved file format is a Python script.</para>
@@ -60,6 +60,10 @@
       the user a relatively shallow learning curve, and a command line
       interface. The command line interface is also used by scripting
       and in the saved file format.</para>
+
+      <para>Furthermore, Veusz can be embedded within other Python
+      programs, with plots in their own windows, or it can be
+      controlled from any other application.</para>
     </section>
 
     <section>
@@ -67,25 +71,25 @@
       <para>Here I define some terminology for future use.</para>
 
       <section>
-	<title>Widget</title>
+	<title>Component</title>
 	<para>A document and its graphs are built up from
-	  widgets. These widgets can often by placed within each
-	  other, depending on the type of the widget. A widget has
-	  children, those widgets placed within it, and its
-	  parent. The widgets have a number of different settings
+	  components. These components can often by placed within each
+	  other, depending on the type of the component. A component has
+	  children, those components placed within it, and its
+	  parent. The components have a number of different settings
 	  which modify their behaviour. These include the font to be
 	  used, the line thickness, and whether an axis is
 	  logarithmic. In addition they have actions, which perform
-	  some sort of activity on the widget or its children, like
-	  "fit" for a fit widget.</para>
+	  some sort of activity on the component or its children, like
+	  "fit" for a fit component.</para>
 	
-	<para>Widgets are specified with a "path", like a file in Unix
-	or Windows. These can be relative to the current widget (do
+	<para>Components are specified with a "path", like a file in Unix
+	or Windows. These can be relative to the current component (do
 	not start with a slash), or absolute (do not start with a
 	slash). Examples of paths include, "/page1/graph1/x", "x" and
 	".".</para>
 
-	<para>The widget types include</para>
+	<para>The component types include</para>
 	
 	<orderedlist>
 	  <listitem>
@@ -105,11 +109,11 @@
 	      graph are its axes and plotters. A graph can be given a
 	      background fill and a border if required. It also has a
 	      margin, which specifies how far away from the edge of
-	      its parent widget to plot the body of the graph.</para>
+	      its parent component to plot the body of the graph.</para>
 
 	    <para>A graph can contain several axes, at any position
 	      on the plot. In addition a graph can use axes defined in
-	      parent widgets, shared with other graphs.</para>
+	      parent components, shared with other graphs.</para>
 
 	    <para>More than one graph can be placed within in a
 	      page. The margins can be adjusted so that they lie
@@ -139,9 +143,9 @@
 	  </listitem>
 
 	  <listitem>
-	    <para>plotters - types of widgets which plot data or add
+	    <para>plotters - types of components which plot data or add
 	      other things on a graph. There is no actual plotter
-	      widget which can be added, but several types of plotters
+	      component which can be added, but several types of plotters
 	      listed below. Plotters typically take an axis as a
 	      setting, which is the axis used to plot the data on the
 	      graph (default x and y).</para>
@@ -161,7 +165,7 @@
 		<para>As well as the function setting, also settable
 		  is the line type to plot the function, and the
 		  number of steps to evaluate the function when
-		  plotting. The function widget will also support
+		  plotting. The function component will also support
 		  filled regions when implemented.</para>
 	      </listitem>
 
@@ -175,7 +179,7 @@
 		  histograms to be plotted (note that it doesn't yet
 		  do the binning of the data).</para>
 
-		<para>The settings for the xy widget are the various
+		<para>The settings for the xy component are the various
 		  attibutes for the points, line and error bars, the
 		  datasets to plot, and the axes to plot on.</para>
 	      </listitem>
@@ -185,7 +189,7 @@
 		  a like the function plotter, but allows fitting of
 		  the function to data. This is achived by clicking on
 		  a "fit" button, or using the "fit" action of the
-		  widget. The fitter takes a function to fit
+		  component. The fitter takes a function to fit
 		  containing the unknowns, e.g. "a*x**2 + b*x + c",
 		  and initial values for the variables (here a, b and
 		  c). It then fits the data (note that at the moment,
@@ -200,7 +204,7 @@
 		  everywhere, or symmetrises asymmetric errors.</para>
 
 		<para>Note that more work is required in this
-		  widget, as if a parameter is not well defined by the
+		  component, as if a parameter is not well defined by the
 		  data, the matrix inversion in the fit will fail. In
 		  addition Veusz does not supply estimates for the
 		  errors or the final chi-squared in a machine
@@ -213,14 +217,14 @@
 		  for "key" settings of the other data plotted within
 		  a graph. If there any it builds up a box containing
 		  the symbol and line for the plotter, and the text in
-		  the "key" setting of the widget. This allows a key
+		  the "key" setting of the component. This allows a key
 		  to be very easily added to a plot.</para>
 
 		<para>The key may be placed in any of the corners of
 		  the plot, in the centre, or manually
-		  placed. Depending on the ordering of the widgets,
+		  placed. Depending on the ordering of the components,
 		  the key will be placed behind or on top of the
-		  widget. The key can be filled and surrounded by a
+		  component. The key can be filled and surrounded by a
 		  box, or not filled or surrounded.</para>
 	      </listitem>
 
@@ -253,7 +257,7 @@
       <section>
 	<title>Settings</title>
 
-	<para>The various settings of the widgets come in a number of
+	<para>The various settings of the components come in a number of
 	types, including integers (e.g. 10), floats (e.g. 3.14), text
 	("hi there!"), distances (see above), options ("horizontal" or
 	"vertical" for axes).</para>
@@ -371,16 +375,17 @@
       cannot do much else with the window. In the future you will be
       able to click on items in the plot to modify them.</para>
 
-      <para>To the left of the plot window is the widget tree and the
-      widget properties windows. To the top of the widget tree is a
-      set of buttons which allow you to add widgets to the currently
-      selected widget. The widgets are arranged in a tree structure
-      from the main document. In the properties window the properties
-      of the currently selected widget are shown. Initially if you
-      click on the "document" widget, you will see the page width and
+      <para>To the left of the plot window is the editing window, the
+      editing toolbar and the properties windows. To the left of the
+      editing toolbar is a set of buttons which allow you to add
+      components to the currently selected component, or its
+      parent. The compenents are arranged in a tree structure from the
+      main document. In the properties window the properties of the
+      currently selected component are shown. Initially if you click on
+      the "document" component, you will see the page width and
       height. You can change these values and they will be reflected
       in the plot window if you press Enter or move to the next
-      property. The tree and the properties window can be "dragged"
+      property. The editing and the properties window can be "dragged"
       from the main window to "float" by themselves on the
       screen.</para>
 
@@ -395,18 +400,17 @@
       console also supports command history like many Unix
       shells. Press the up and down cursor keys to browse through the
       history. Command line completion is not available yet!</para>
-
     </section>
 
     <section>
       <title>My first plot</title>
 
-      <para>If the document is selected in the widget tree, you will
-      see you are able to click on the little page icon in the set of
-      buttons above. If you do that you will see a page added to the
-      current document. Select the page which appears in the tree
-      window (labelled "page1"), and you will see you are able to add
-      other kinds of plots.</para>
+      <para>On the left of the main window, you will see the document
+      is selected in the editing window. The toolbar on the left adds
+      a new component to the selected component. Click on the page
+      icon to add a new page to the document. You will see the new
+      page is selected in the editing window. You can now see that
+      other types of component are able to be added.</para>
 
       <para>You can then click on the "graph" button (which looks like
       a set of axes). You will see a graph along with axes are
@@ -436,13 +440,13 @@
       modify its colour. Enter "green" instead of "black" and press
       enter. Try making the axis label bold.</para>
 
-      <para>Now you can try plotting a function on the graph. Make
-      sure you have "graph1" selected in the tree window. You will
-      then be able to click the "function" button above (a red curve
-      on a graph). You will see a straight line (y=x) added to the
-      plot. If you selected "function1", you will be able to edit the
-      functional form plotted and the style of its line. Change the
-      function to "x**2" (x-squared).</para>
+      <para>Now you can try plotting a function on the graph. If the
+      graph, or its children are selected, you will then be able to
+      click the "function" button to the left (a red curve on a
+      graph). You will see a straight line (y=x) added to the plot. If
+      you select "function1", you will be able to edit the functional
+      form plotted and the style of its line. Change the function to
+      "x**2" (x-squared).</para>
 
       <para>We will now try plotting data on the graph. Go to your
       favourite text editor and save the following data as
@@ -655,31 +659,31 @@ SetData('y', y)
 	<title><anchor id="Command.Action" />Action</title>
 	
 	<para><command>Action('actionname',
-	widgetpath='.')</command></para>
+	componentpath='.')</command></para>
 	
-	<para>Initiates the specified action on the widget given
+	<para>Initiates the specified action on the component given
 	the action name. Actions perform certain automated
-	routines. These include "fit" on a fit widget, and
+	routines. These include "fit" on a fit component, and
 	"zeroMargins" on grids.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.Add" />Add</title>
 	
-	<para><command>Add('widgettype', name='nameforwidget',
+	<para><command>Add('componenttype', name='nameforcomponent',
         autoadd=True, optionalargs)</command></para>
 	
-	<para>The Add command adds a graph into the current widget
+	<para>The Add command adds a graph into the current component
         (See the <link linkend="Command.To">To</link> command to change
         the current position).</para>
 	
-	<para>The first argument is the type of widget to add. These
+	<para>The first argument is the type of component to add. These
         include "graph", "page", "axis", "xy" and
-        "grid". <command>name</command> is the name of the new widget
+        "grid". <command>name</command> is the name of the new component
         (if not given, it will be generated from the type of the
-        widget plus a number). The <command>autoadd</command>
-        parameter if set, constructs the default sub-widgets this
-        widget has (for example, axes in a graph).</para>
+        component plus a number). The <command>autoadd</command>
+        parameter if set, constructs the default sub-components this
+        component has (for example, axes in a graph).</para>
 	
 	<para>Optionally, default values for the graph settings may be
         given, for example <command>Add('axis', name='y',
@@ -689,7 +693,7 @@ SetData('y', y)
 	example <command>Add('xy',
 	MarkerFill__color='red', ErrorBarLine__hide=True)</command>.</para>
 
-	<para>Returns: Name of widget added.</para>
+	<para>Returns: Name of component added.</para>
       </section>
 
       <section>
@@ -727,7 +731,7 @@ SetData('y', y)
 
 	<para><command>GetChildren(where='.')</command></para>
 
-	<para>Returns: The names of the widgets which are children of
+	<para>Returns: The names of the components which are children of
       the path given</para>
       </section>
 
@@ -831,8 +835,8 @@ ImportString('x y', '''
 	
 	<para><command>List(where='.')</command></para>
 	
-	<para>List the widgets which are contained within the widget
-      with the path given, the type of widgets, and a brief
+	<para>List the components which are contained within the component
+      with the path given, the type of components, and a brief
       description.</para>
       </section>
 
@@ -853,20 +857,20 @@ ImportString('x y', '''
       <section>
 	<title><anchor id="Command.Rename" />Rename</title>
 	
-	<para><command>Remove('widgetpath', 'newname')</command></para>
+	<para><command>Remove('componentpath', 'newname')</command></para>
 	
-	<para>Rename the widget at the path given to a new name. This
-	command does not move widgets.  See <link
+	<para>Rename the component at the path given to a new name. This
+	command does not move components.  See <link
 	linkend="Command.To">To</link> for a description of the path
-	syntax. '.' can be used to select the current widget.</para>
+	syntax. '.' can be used to select the current component.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.Remove" />Remove</title>
 	
-	<para><command>Remove('widgetpath')</command></para>
+	<para><command>Remove('componentpath')</command></para>
 	
-	<para>Remove the widget selected using the path. See <link
+	<para>Remove the component selected using the path. See <link
 	linkend="Command.To">To</link> for a description of the path
 	syntax.</para>
       </section>
@@ -888,7 +892,7 @@ ImportString('x y', '''
 	<para>Set the setting given by the path to the value given. If
 	the type of <command>val</command> is incorrect, an
 	<command>InvalidType</command> exception is thrown. The path
-	to the setting is the optional path to the widget the setting
+	to the setting is the optional path to the component the setting
 	is contained within, an optional subsetting specifier, and the
 	setting itself.</para>
 
@@ -925,13 +929,13 @@ Set('page1/graph1/x/min', -10.)
       <section>
 	<title><anchor id="Command.To" />To</title>
 	
-	<para><command>To('widgetpath')</command></para>
+	<para><command>To('componentpath')</command></para>
 	
-	<para>The To command takes a path to a widget and moves to
-        that widget. For example, this may be "/", the root widget,
+	<para>The To command takes a path to a component and moves to
+        that component. For example, this may be "/", the root component,
         "graph1", "/page1/graph1/x", "../x". The syntax is designed to
-        mimic Unix paths for files. "/" represents the base widget
-        (where the pages reside), and ".." represents the widget next
+        mimic Unix paths for files. "/" represents the base component
+        (where the pages reside), and ".." represents the component next
         up the tree.</para>
 	
       </section>
