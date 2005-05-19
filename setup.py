@@ -56,7 +56,7 @@ setup(name = 'veusz',
                       'veusz.windows': 'windows',
                       'veusz.tests': 'tests' },
       data_files = [ ('veusz', ['VERSION']),
-                     ('veusz/images', ['images/logo.png']),
+                     ('veusz/images', ['images/logo.png', 'images/icon.png']),
                      ('veusz/windows/icons',
                       glob.glob('windows/icons/*.png') +
                       ['windows/icons/README'] ) ],
