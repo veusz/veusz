@@ -375,6 +375,10 @@ class TreeEditWindow(qt.QDockWindow):
         # select the root item
         self.listview.setSelected(self.rootitem, True)
 
+    def sizeHint(self):
+        """Returns recommended size of dialog."""
+        return qt.QSize(250, 500)
+
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
