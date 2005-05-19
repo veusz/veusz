@@ -1,4 +1,4 @@
-Veusz 0.5
+Veusz 0.6
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -16,6 +16,18 @@ Veusz provides a GUI, command line and scripting interface (based on
 Python) to its plotting facilities. The plots are built using an
 object-based system to provide a consistent interface.
 
+Changes from 0.5:
+ Please refer to ChangeLog for all the changes.
+ Highlights include:
+  * Major UI enhancements - much faster to control now, more dialogs
+  * Veusz can be embedded within other non-PyQt Python programs. Its plots
+    can be updated at any time from the embedding program using the
+    command line interface.
+  * Dialogs for manipulating datasets using expressions, and direct editing
+  * Multiple documents can be opened simultaneously
+  * Lots of bug fixes (e.g. log axes improvement, rotation of labels)
+  * Unicode support in plots
+
 Features of package:
  * X-Y plots (with errorbars)
  * Stepped plots (for histograms)
@@ -30,39 +42,14 @@ Features of package:
  * Simple data importing
  * Scripting interface
  * Save/Load plots
-
-Changes from 0.4:
- Installation:
-  * distutils used to install the package. RPMS available.
- Plotting:
-  * Different error bar styles (diamond, curve...)
-  * "Matched" axes, with the same scale on each
-  * Data can be linked from external files instead of embedded in
-    document
-  * Filled regions under/over functions or xy plots
-  * Improved function clipping near edge of plot
-  * Default values can be set for settings, which are remembered
-    between sessions (e.g. blue points for xy3).
-  * Rotated text labels
-  * Improved fitting, giving results from chi2, etc..
- UI:
-  * Can move around widgets and delete them
-  * Exception dump dialog to send bug reports
-  * Improved import dialog help
-  * Propagate settings between widgets
-  * Window positions are saved between sessions	
- Reading data:
-  * Better error handling when reading data
- + Numerous bug fixes
+ * Dataset manipulation
+ * Embed Veusz within other programs
 
 To be done:
  * Contour plots
  * Images
  * UI improvements
  * Import filters (for qdp and other plotting packages, fits, csv)
- * Data manipulation
- * Python embedding interface (for embedding Veusz in other programs).
-   [some of the external interface is complete]
 
 Requirements:
  Python (probably 2.3 or greater required)
@@ -87,6 +74,10 @@ https://gna.org/mail/?group=veusz
 
 to discuss new features or if you'd like to contribute code. The
 newest code can always be found in CVS.
+
+If non GPL projects are interested in using Veusz code, please contact
+me. I am happy to consider relicencing code for other free projects,
+if I am legally allowed to do so.
 
 Cheers
 

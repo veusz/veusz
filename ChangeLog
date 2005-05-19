@@ -1,6 +1,8 @@
 * 2005-05-19 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Make size of property window more sensible by default
 	- Documentation update
+	- Add inside.vsz example
+	- Released 0.6
 	
 * 2005-05-18 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add icon for main window

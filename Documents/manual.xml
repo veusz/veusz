@@ -983,6 +983,11 @@ Set('page1/graph1/x/min', -10.)
       program to the Veusz thread, and any results or exceptions are
       passed back (and rethrown in the case of exceptions).</para>
 
+      <para>Veusz must be installed in the PYTHONPATH for embedding to
+      work. This can be done with the <command>setup.py</command>
+      distutils script. An example embedding program is in
+      <command>examples/embedexample.py</command>.</para>
+
       <para>An example Python program embedding Veusz is below:</para>
 	<informalexample>
 	  <programlisting>
