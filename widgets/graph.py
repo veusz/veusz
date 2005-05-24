@@ -138,14 +138,12 @@ class Graph(widget.Widget):
                               bounds[3]-bounds[1]+1 )
 
         # work out outer bounds
-        # FIXME: Doesn't work if margin is zero on one axis
-        if outerbounds == None or margins != (0., 0., 0., 0.):
-            # if we don't have information, or the margins are non-zero
-            ob = parentposn
-        else:
-            # margins are zero, so we use the outerbounds from someone
-            # further up the chain
-            ob = outerbounds
+        ob = list(parentposn)
+        if outerbounds != None:
+            # see whether margin, is zero, and borrow from above if so
+            for i in range(4):
+                if margins[i] == 0.:
+                    ob[i] = outerbounds[i]
         
         # do normal drawing of children
         # iterate over children in reverse order
