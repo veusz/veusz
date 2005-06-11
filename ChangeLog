@@ -1,3 +1,9 @@
+* 2005-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Command line parsing now uses optparse (thanks to J Graham for
+	inspiration)
+	- MainWindow now accepts drops of files (patch by James Graham)
+	- MainWindow has per-window working directory
+
 * 2005-05-24 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix axis positioning in stacked plot where one margin is zero
 	

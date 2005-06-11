@@ -49,6 +49,8 @@ class MainWindow(qt.QMainWindow):
 
         self.document = document.Document()
 
+        self.setAcceptDrops(True)
+
         self.filename = ''
         self.updateTitlebar()
 
@@ -78,6 +80,8 @@ class MainWindow(qt.QMainWindow):
         # keep page number up to date
         self.pagelabel = qt.QLabel(self.statusBar())
         self.statusBar().addWidget(self.pagelabel)
+
+        self.dirname = ''
 
         self.connect( self.plot, qt.PYSIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
@@ -117,6 +121,36 @@ class MainWindow(qt.QMainWindow):
 
         self.connect(view, qt.SIGNAL('aboutToShow()'),
                      self.slotAboutToShowView)
+
+    def dragEnterEvent(self, event):
+        if (event.provides("text/uri-list") and self._getVeuszFiles(event)):
+            event.accept(True)
+
+    def dropEvent(self, event):
+        """Respond to a drop event on the current window"""
+        if event.provides("text/uri-list"):
+            files = self._getVeuszFiles(event)
+            if files:
+                if self.document.isBlank():
+                    self.openFile(files[0])
+                else:
+                    CreateWindow(files[0])
+                for filename in files[1:]:
+                    CreateWindow(filename, self)
+            
+            
+    def _getVeuszFiles(self, event):
+        """Return a list of veusz files from a drag/drop event containing a
+        text/uri-list"""
+        draggedFiles = qt.QStringList()
+        qt.QUriDrag.decodeLocalFiles(event, draggedFiles)
+        fileList = []
+        for i in range(len(draggedFiles)):
+            filename=draggedFiles[i]
+            if filename[-4:] == ".vsz":
+                fileList.append(unicode(filename))
+        return fileList
+                
 
     def slotAboutToShowView(self):
         """Put check marks against dock menu items if appropriate."""
@@ -367,10 +401,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotFileNew(self):
         """New file."""
-
-        # create a new main window for the new file
-        win = MainWindow()
-        win.show()
+        CreateWindow(opener=self)
 
     def slotFileSave(self):
         """Save file."""
@@ -405,12 +436,11 @@ class MainWindow(qt.QMainWindow):
             self.setCaption( "%s - Veusz" %
                              os.path.basename(self.filename) )
 
-    dirname = '.'
     def slotFileSaveAs(self):
         """Save As file."""
 
         fd = qt.QFileDialog(self, 'save as dialog', True)
-        fd.setDir( MainWindow.dirname )
+        fd.setDir(self.dirname)
         fd.setMode( qt.QFileDialog.AnyFile )
         fd.setFilter( "Veusz script files (*.vsz)" )
         fd.setCaption('Save as')
@@ -418,7 +448,7 @@ class MainWindow(qt.QMainWindow):
         # okay was selected
         if fd.exec_loop() == qt.QDialog.Accepted:
             # save directory for next time
-            MainWindow.dirname = fd.dir()
+            self.dirname = fd.dir()
             # update the edit box
             filename = unicode( fd.selectedFile() )
             if os.path.splitext(filename)[1] == '':
@@ -452,7 +482,7 @@ class MainWindow(qt.QMainWindow):
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
         try:
-            # load the document
+            # load the document in a new window
             self.interpreter.Load(filename)
             self.document.setModified(False)
             self.filename = filename
@@ -485,7 +515,7 @@ class MainWindow(qt.QMainWindow):
         """Open an existing file in a new window."""
 
         fd = qt.QFileDialog(self, 'open dialog', True)
-        fd.setDir( MainWindow.dirname )
+        fd.setDir( self.dirname )
         fd.setMode( qt.QFileDialog.ExistingFile )
         fd.setFilter ( "Veusz script files (*.vsz)" )
         fd.setCaption('Open')
@@ -501,16 +531,20 @@ class MainWindow(qt.QMainWindow):
                 win.show()
             
             # save directory for next time
-            MainWindow.dirname = fd.dir()
-
+            self.dirname = fd.dir()
             filename = unicode( fd.selectedFile() )
-            win.openFile(filename)
+            if self.document.isBlank():
+                #If the file is new and there are no modifications,
+                #reuse the current window
+                self.openFile(filename)
+            else:
+                CreateWindow(filename, self)
                 
     def slotFileExport(self):
         """Export the graph."""
 
         fd = qt.QFileDialog(self, 'export dialog', True)
-        fd.setDir( MainWindow.dirname )
+        fd.setDir( self.dirname )
         fd.setMode( qt.QFileDialog.AnyFile )
         fd.setFilters( "Encapsulated Postscript (*.eps);;"
                        "Portable Network Graphics (*.png)" )
@@ -518,7 +552,7 @@ class MainWindow(qt.QMainWindow):
 
         if fd.exec_loop() == qt.QDialog.Accepted:
             # save directory for next time
-            MainWindow.dirname = fd.dir()
+            self.dirname = fd.dir()
 
             # show busy cursor
             qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
@@ -638,3 +672,13 @@ class MainWindow(qt.QMainWindow):
         # disable previous and next page actions
         self.actions['viewprevpage'].setEnabled( number != 0 )
         self.actions['viewnextpage'].setEnabled( number < np-1 )
+
+def CreateWindow(filename=None, opener=None):
+    """Window factory function"""
+    win = MainWindow()
+    win.show()
+    if filename:
+        win.openFile(filename)
+    if opener:
+        win.dirname = opener.dirname
+    return win

@@ -26,6 +26,7 @@
 import sys
 import os.path
 import signal
+import optparse
 
 import qt
 
@@ -37,15 +38,12 @@ sys.path.insert( 0, os.path.dirname(__file__) )
 import utils
 import windows.mainwindow
 
-copyr='''Veusz version %s
+copyr='''Veusz %s
+
 Copyright (C) Jeremy Sanders 2003-2005 <jeremy@jeremysanders.net>
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
-def write_details():
-    '''Write the copyright details.'''
-    sys.stderr.write(copyr % utils.version())
-    
 def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
     qt.qApp.closeAllWindows()
@@ -55,36 +53,31 @@ def run():
 
     app = qt.QApplication(sys.argv)
 
-    # process command line arguments
-    cmdline = [str(app.argv()[i]) for i in range(1, app.argc())]
-
-    if '--help' in cmdline:
-        write_details()
-        sys.stderr.write('\nUsage: \n veusz saved.vsz ...\n')
-        sys.stderr.write('Optional arguments --help, --version\n')
-        sys.exit(0)
-    elif '--version' in cmdline:
-        write_details()
-        sys.exit(0)
-
     # register a signal handler to catch ctrl+c
     signal.signal(signal.SIGINT, handleIntSignal)
+    
+    if app.argv():
 
-    # open the main window
-    win = windows.mainwindow.MainWindow()
-    win.show()
+        parser = optparse.OptionParser(
+            usage="%prog [options] filename.vsz ...",
+            version=copyr % utils.version())
+
+        options, args = parser.parse_args( app.argv() )
+
+        filelist = args[1:]
+ 
+        # load in filename given
+        if filelist:
+            for filename in filelist:
+                #XXX - need error handling here...
+                windows.mainwindow.CreateWindow(filename)
+        else:
+            windows.mainwindow.CreateWindow()
+    else:
+        windows.mainwindow.CreateWindow()
+    
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
                 app, qt.SLOT("quit()"))
-
-    # load in filename given
-    if len(cmdline) != 0:
-        win.openFile(cmdline[0])
-
-        # open up more windows if multiple files given
-        for i in cmdline[1:]:
-            win = windows.mainwindow.MainWindow()
-            win.show()
-            win.openFile(i)
 
     app.exec_loop()
 
