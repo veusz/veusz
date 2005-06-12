@@ -650,7 +650,7 @@ class DataEditDialog(qt.QDialog):
 
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )
-        setting.settingdb.database['geometry_dataeditdialog'] = geometry
+        setting.settingdb['geometry_dataeditdialog'] = geometry
 
         qt.QDialog.closeEvent(self, evt)
 
@@ -658,8 +658,8 @@ class DataEditDialog(qt.QDialog):
         """Restoring window geometry if possible."""
 
         # if we can restore the geometry, do so
-        if 'geometry_dataeditdialog' in setting.settingdb.database:
-            geometry =  setting.settingdb.database['geometry_dataeditdialog']
+        if 'geometry_dataeditdialog' in setting.settingdb:
+            geometry =  setting.settingdb['geometry_dataeditdialog']
             self.resize( qt.QSize(geometry[2], geometry[3]) )
             self.move( qt.QPoint(geometry[0], geometry[1]) )
 

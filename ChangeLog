@@ -6,6 +6,8 @@
 	- GPL() command works now
 	- function plotters can be set to plot only over a particular
 	range (patch by James Graham)
+	- Use QSettings to do settings code rather than own code (based on
+	patch by James Graham)
 	
 * 2005-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Command line parsing now uses optparse (thanks to J Graham for

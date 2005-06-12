@@ -59,8 +59,8 @@ class PlotWindow( qt.QScrollView ):
                       self.slotTimeout )
 
         # get update period from setting database
-        if 'plot_updateinterval' in setting.settingdb.database:
-            self.interval = setting.settingdb.database['plot_updateinterval']
+        if 'plot_updateinterval' in setting.settingdb:
+            self.interval = setting.settingdb['plot_updateinterval']
         else:
             self.interval = 1000
 
@@ -250,4 +250,4 @@ class PlotWindow( qt.QScrollView ):
 
         # update setting database
         if ret > 0:
-            setting.settingdb.database['plot_updateinterval'] = self.interval
+            setting.settingdb['plot_updateinterval'] = self.interval

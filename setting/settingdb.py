@@ -13,7 +13,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 ###############################################################################
 
 # $Id$
@@ -23,10 +23,97 @@
 import sys
 import os
 import os.path
+import atexit
 
-class _SettingDB:
+import qt
+
+class _SettingDB(object):
+    """A class which provides access to a persistant settings database.
+    
+    Items are accesses as a dict, with items as key=value
+    """
+
+    def __init__(self):
+        """Initialise the object, reading the settings."""
+
+        # This domain name is fictional!
+        self.domain = 'veusz.org'
+        self.product = 'veusz'
+        self.database = {}
+        self.removedsettings = []
+
+        # read settings using QSettings
+        self.readSettings()
+
+        # Import old settings
+        if 'importPerformed' not in self.database:
+            self.database['importPerformed'] = True
+
+            oldsettings = _OldSettingDB()
+            if oldsettings.filefound:
+                self.database.update( oldsettings.database )
+                print ("Imported settings from $HOME/.veusz.def "
+                       "and /etc/veusz.conf")
+
+    def readSettings(self):
+        """Read the settings using QSettings."""
+
+        s = qt.QSettings()
+        s.setPath(self.domain, self.product)
+        path = '/%s/%s' % (self.domain, self.product)
+
+        # read each entry, keeping track of what has been read
+        for key in s.entryList(path):
+            key = unicode(key)
+            val, ok = s.readEntry( '%s/%s' % (path, key) )
+            assert ok
+
+            try:
+                self.database[key] = eval(unicode(val))
+            except:
+                print >>sys.stderr, ('Error interpreting item "%s" in '
+                                     'settings file' % key)
+
+    def writeSettings(self):
+        """Write the settings using QSettings.
+
+        This is called by the atexit handler below
+        """
+
+        s = qt.QSettings()
+        s.setPath(self.domain, self.product)
+        path = '/%s/%s' % (self.domain, self.product)
+
+        # write each entry, keeping track of which ones haven't been written
+        for key, value in self.database.iteritems():
+            if not s.writeEntry('%s/%s' % (path, key), repr(value)):
+                print >>sys.stderr, 'Error writing setting "%s"' % key
+
+        # now remove all the values which have been removed
+        for key in self.removedsettings:
+            if not s.removeEntry( '%s/%s' % (path, key) ):
+                print >>sys.stderr, 'Error removing setting "%s"' % key
+
+    def __getitem__(self, key):
+        """Get the item from the database."""
+        return self.database[key]
+
+    def __setitem__(self, key, value):
+        """Set the value in the database."""
+        self.database[key] = value
+
+    def __delitem__(self, key):
+        """Remove the key from the database."""
+        del self.database[key]
+        self.removedsettings.append(key)
+
+    def __contains__(self, key):
+        """Is the key in the database."""
+        return key in self.database
+
+class _OldSettingDB:
     """A singleton class to handle the settings file.
-
+    
     Reads the settings file on activation, and updates the settings
     file on destruction.
     """
@@ -36,7 +123,7 @@ class _SettingDB:
 
         This reads the settings from a global configuration file,
         and then from a user configuration file.
-
+        
         FIXME: Unix specific, fix for other OS."""
 
         self.systemdefaultfile = '/etc/veusz.conf'
@@ -48,19 +135,13 @@ class _SettingDB:
 
         self.database = {}
 
-        # FIXME: Unix specific
-        self.importFile(self.systemdefaultfile)
+        # Unix specific (this is why we moved to QSettings)
+        defaults = self.importFile(self.systemdefaultfile)
         self.sysdefaults = self.database.copy()
-        self.importFile(self.userdefaultfile)
+        user = self.importFile(self.userdefaultfile)
 
-    def __del__(self):
-        """Update the defaults file.
-        
-        If the setting was set in the global defaults file, don't
-        replicate it in the user's configuration file
-        (this allows the default to be easily changed)
-        """
-        self.writeDefaults(self.userdefaultfile)
+        # Did we manage to find either settings file?
+        self.filefound = (defaults or user)
 
     def importFile(self, filename):
         """Read in a configuration file made up of a=b strings."""
@@ -69,7 +150,7 @@ class _SettingDB:
             f = open(filename, 'r')
         except IOError:
             # no error if the file does not exist
-            return
+            return False
 
         for l in f:
             l = l.strip()
@@ -83,38 +164,17 @@ class _SettingDB:
 
             # in case of error
             if pos == -1:
-                sys.stderr.write('Error in configuration file "%s", line is:\n'
-                                 '>>>%s<<<\n' % (filename, l))
+                sys.stderr.write('Error in configuration file "%s", '
+                                 'line is:\n>>>%s<<<\n' % (filename, l))
                 continue
 
             key = l[:pos].strip()
             val = l[pos+1:].strip()
             self.database[key] = eval(val)
-
-    def writeDefaults(self, filename):
-        """Write the list of defaults to the file given."""
-
-        # try to open the output file
-        try:
-            f = open(filename, 'w')
-        except:
-            sys.stderr.write('Cannot write to user settings file "%s"\n' %
-                             self.userdefaultfile)
-            return
-
-        # header
-        f.write('# Veusz default settings file\n'
-                "# Items are in the form key=val\n\n")
-
-        # write the items in alphabetical order
-        keys = self.database.keys()
-        keys.sort()
-        for key in keys:
-            # only update keys which aren't in system defaults or have
-            # been modified
-            if ( key not in self.sysdefaults or
-                 self.sysdefaults[key] != self.database[key] ):
-                f.write( '%s=%s\n' % (key, repr(self.database[key])) )
+        return True
 
 # create the SettingDB singleton
 settingdb = _SettingDB()
+
+# write out settings at exit
+atexit.register(settingdb.writeSettings)

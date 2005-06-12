@@ -60,13 +60,17 @@ class Setting:
 
         deftext = None
         unnamedpath = '%s/%s' % (root, self.name)
-        if unnamedpath in settingdb.database:
-            deftext = settingdb.database[unnamedpath]
+        try:
+            deftext = settingdb[unnamedpath]
+        except KeyError:
+            pass
 
         # named defaults supersedes normal defaults
         namedpath = '%s_NAME:%s' % (widgetname, unnamedpath)
-        if namedpath in settingdb.database:
-            deftext = settingdb.database[namedpath]
+        try:
+            deftext = settingdb[namedpath]
+        except KeyError:
+            pass
     
         if deftext != None:
             self.set( self.fromText(deftext) )
@@ -82,16 +86,15 @@ class Setting:
             path = '/%s%s' % (item.name, path)
             item = item.parent
 
+        # remove the settings (ignore if they are not set)
+        if path in settingdb:
+            del settingdb[path]
+
         # specific setting to this widgetname
         namedpath = '%s_NAME:%s' % (item.name, path)
 
-        # remove the settings (ignore if they are not set)
-        if path in settingdb.database:
-            del settingdb.database[path]
-
-        if namedpath in settingdb.database:
-            del settingdb.database[namedpath]
-            print settingdb.database
+        if namedpath in settingdb:
+            del settingdb[namedpath]
 
     def setAsDefault(self, withwidgetname = False):
         """Set the current value of this setting as the default value
@@ -111,7 +114,7 @@ class Setting:
             path = '%s_NAME:%s' % (item.name, path)
 
         # set the default
-        settingdb.database[path] = self.toText()
+        settingdb[path] = self.toText()
 
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""

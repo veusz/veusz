@@ -379,13 +379,13 @@ class MainWindow(qt.QMainWindow):
 
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )
-        setting.settingdb.database['geometry_mainwindow'] = geometry
+        setting.settingdb['geometry_mainwindow'] = geometry
 
         # store docked windows
         s = qt.QString()
         stream = qt.QTextStream(s, qt.IO_WriteOnly)
         stream << self
-        setting.settingdb.database['geometry_docwindows'] = str(s)
+        setting.settingdb['geometry_docwindows'] = str(s)
 
         qt.QMainWindow.closeEvent(self, evt)
 
@@ -393,14 +393,14 @@ class MainWindow(qt.QMainWindow):
         """Restoring window geometry if possible."""
 
         # if we can restore the geometry, do so
-        if 'geometry_mainwindow' in setting.settingdb.database:
-            geometry = setting.settingdb.database['geometry_mainwindow']
+        if 'geometry_mainwindow' in setting.settingdb:
+            geometry = setting.settingdb['geometry_mainwindow']
             self.resize( qt.QSize(geometry[2], geometry[3]) )
             self.move( qt.QPoint(geometry[0], geometry[1]) )
 
         # restore docked window geometry
-        if 'geometry_docwindows' in setting.settingdb.database:
-            s = setting.settingdb.database['geometry_docwindows']
+        if 'geometry_docwindows' in setting.settingdb:
+            s = setting.settingdb['geometry_docwindows']
             s = qt.QString(s)
             stream = qt.QTextStream(s, qt.IO_ReadOnly)
             stream >> self
