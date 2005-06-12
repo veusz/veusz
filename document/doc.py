@@ -33,6 +33,7 @@ import qt
 
 import widgets
 import utils
+import simpleread
 
 def _cnvt_numarray(a):
     """Convert to a numarray if possible (doing copy)."""
@@ -61,6 +62,37 @@ class LinkedFile:
 
         file.write('ImportFile(%s, %s, linked=True)\n' %
                    (repr(self.filename), repr(self.descriptor)))
+
+    def reloadLinks(self, document):
+        '''Reload datasets linked to this file.
+
+        Returns a tuple of
+        - List of datasets read
+        - Dict of tuples containing dataset names and number of errors
+        '''
+
+        # a bit clumsy, but we need to load this into a separate document
+        # to make sure we do not overwrited non-linked data (which may
+        # be specified in the descriptor)
+        
+        tempdoc = Document()
+        sr = simpleread.SimpleRead(self.descriptor)
+        sr.readData( simpleread.FileStream(open(self.filename)) )
+        sr.setInDocument(tempdoc, linkedfile=self)
+
+        errors = sr.getInvalidConversions()
+
+        # move new datasets in if they are linked to us
+        read = []
+        for name, ds in tempdoc.data.items():
+            if name in document.data and document.data[name].linked == self:
+                read.append(name)
+                document.data[name] = ds
+                ds.document = document
+
+        # returns list of datasets read, and a dict of variables with number
+        # of errors
+        return (read, errors)
 
 class Dataset:
     '''Represents a dataset.'''
@@ -148,10 +180,8 @@ class Dataset:
 
         self.document.setModified(True)
 
-    # TODO implement mathematical operations on this type
-
-    def saveLinksToFile(self, file, savedlinks):
-        '''Save the link to the file, if this dataset is linked.
+    def saveLinksToSavedDoc(self, file, savedlinks):
+        '''Save the link to the saved document, if this dataset is linked.
 
         savedlinks is a dict containing any linked files which have
         already been written
@@ -243,6 +273,34 @@ class Document( qt.QObject ):
         dataset.document = self
         self.setModified()
 
+    def reloadLinkedDatasets(self):
+        """Reload linked datasets from their files.
+
+        Returns a tuple of
+        - List of datasets read
+        - Dict of tuples containing dataset names and number of errors
+        """
+
+        # build up a list of linked files
+        links = {}
+        for ds in self.data.itervalues():
+            if ds.linked:
+                links[ ds.linked ] = True
+
+        read = []
+        errors = {}
+
+        # load in the files, merging the vars read and errors
+        if links:
+            for l in links.iterkeys():
+                nread, nerrors = l.reloadLinks(self)
+                read += nread
+                errors.update(nerrors)
+            self.setModified()
+
+        read.sort()
+        return (read, errors)
+
     def deleteDataset(self, name):
         """Remove the selected dataset."""
         del self.data[name]
@@ -267,6 +325,7 @@ class Document( qt.QObject ):
 
     def unlinkDataset(self, name):
         """Remove any links to file from the dataset."""
+
         self.data[name].linked = None
         self.setModified()
 
@@ -340,7 +399,7 @@ class Document( qt.QObject ):
         # we do this first in case the datasets are overridden below
         savedlinks = {}
         for name, dataset in self.data.items():
-            dataset.saveLinksToFile(file, savedlinks)
+            dataset.saveLinksToSavedDoc(file, savedlinks)
 
         # save the remaining datasets
         for name, dataset in self.data.items():

@@ -206,6 +206,17 @@ class CommandInterface(qt.QObject):
 
         return (datasets, errors)
 
+    def ReloadData(self):
+        """Reload any linked datasets.
+
+        Returned is a tuple (datasets, errors)
+         where datasets is a list of datasets read
+         errors is a dict of the datasets with the number of errors while
+         converting the data
+        """
+
+        return self.document.reloadLinkedDatasets()
+
     def Action(self, action, widget='.'):
         """Performs action on current widget."""
 

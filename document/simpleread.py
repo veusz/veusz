@@ -48,6 +48,10 @@ import numarray.ieeespecial
 
 import doc
 
+class DescriptorError(ValueError):
+    """Used to indicate an error with the descriptor."""
+    pass
+
 class _DescriptorPart:
 
     # used to split the descriptor expression
@@ -88,8 +92,8 @@ class _DescriptorPart:
 
             # there's no match on this part
             elif _DescriptorPart.partsplitter.match(p) == None:
-                raise ValueError, ( 'Cannot understand descriptor '
-                                    'syntax "%s"' % p )
+                raise DescriptorError, ( 'Cannot understand descriptor '
+                                         'syntax "%s"' % p )
 
             # column indicator
             elif p[0] == '[':
@@ -122,7 +126,7 @@ class _DescriptorPart:
                 self.name = p
 
         if self.name == None:
-            raise ValueError, 'Value name missing in "%s"' % text
+            raise DescriptorError, 'Value name missing in "%s"' % text
 
         # Calculate indicies for looping over values
         self.single = self.startindex == None and self.stopindex == None

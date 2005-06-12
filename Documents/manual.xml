@@ -853,6 +853,19 @@ ImportString('x y', '''
 	and not in a script. Scripts may use the python
 	<command>execfile</command> function instead.</para>
       </section>
+
+      <section>
+	<title><anchor id="Command.ReloadData" />ReloadData</title>
+
+	<para><command>ReloadData()</command></para>
+
+	<para>Reload any datasets which have been linked to
+	files.</para>
+
+	<para>Returns: A tuple containing a list of the imported
+	datasets and the number of conversions which failed for a
+	dataset.</para>
+      </section>
       
       <section>
 	<title><anchor id="Command.Rename" />Rename</title>

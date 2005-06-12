@@ -35,6 +35,7 @@ import setting
 import dialogs.aboutdialog
 import dialogs.importdialog
 import dialogs.dataeditdialog
+import dialogs.reloaddata
 
 _fdirname = os.path.dirname(__file__)
 
@@ -220,9 +221,11 @@ class MainWindow(qt.QMainWindow):
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
-             self.slotDataEdit, None, False, ''),
+             self.slotDataEdit, 'stock-edit.png', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
-             self.slotDataCreate, None, False, ''),
+             self.slotDataCreate, 'stock-new.png', False, ''),
+            ('datareload', 'Reload linked datasets', '&Reload', 'data',
+             self.slotDataReload, 'stock-refresh.png', False, ''),
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
              self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
             ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
@@ -316,6 +319,11 @@ class MainWindow(qt.QMainWindow):
     def slotDataCreate(self):
         """Create new datasets."""
         d = dialogs.dataeditdialog.DatasetNewDialog(self.document, self)
+        d.show()
+
+    def slotDataReload(self):
+        """Reload linked datasets."""
+        d = dialogs.reloaddata.ReloadData(self, self.document)
         d.show()
 
     def slotHelpHomepage(self):

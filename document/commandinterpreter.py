@@ -46,6 +46,7 @@ _globals = globals()
 import sys
 import traceback
 import pickle
+import os.path
 
 import commandinterface
 import utils
@@ -88,6 +89,7 @@ class CommandInterpreter:
             'List': i.List,
             'Load': self.Load,
             'Print': i.Print,
+            'ReloadData': i.ReloadData,
             'Rename': i.Rename,
             'Remove': i.Remove,
             'Save': i.Save,
@@ -245,7 +247,7 @@ class CommandInterpreter:
         """Write the GPL to the console window."""
         # FIXME: This should open up a separate window
         dirname = os.path.dirname(__file__)
-        file = open('%s/../COPYING' % dirname, 'r')
+        file = open(os.path.join(dirname, '..', 'COPYING'), 'rU')
 
         for line in file:
             sys.stdout.write(line)

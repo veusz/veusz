@@ -1,8 +1,15 @@
+* 2005-06-12 Jeremy Sanders <jeremy@jeremysanders.net>
+        - ReloadData command and Data, Reload dialog added to reload
+	linked datasets (idea J. Graham)
+	- Add icon for reload, create, and new datasets
+	- os.path import added to commandinterface
+	- GPL() command works now
+	
 * 2005-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Command line parsing now uses optparse (thanks to J Graham for
 	inspiration)
 	- MainWindow now accepts drops of files (patch by James Graham)
-	- MainWindow has per-window working directory
+	- MainWindow has per-window working directory (again J. Graham)
 
 * 2005-05-24 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix axis positioning in stacked plot where one margin is zero

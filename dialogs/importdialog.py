@@ -210,7 +210,7 @@ class ImportDialog(qt.QDialog):
 
         try:
             sr = document.SimpleRead(descriptor)
-        except ValueError:
+        except document.DescriptorError:
             mb = qt.QMessageBox("Veusz",
                                 "Cannot interpret descriptor",
                                 qt.QMessageBox.Warning,
@@ -233,7 +233,7 @@ class ImportDialog(qt.QDialog):
         text = ''
         for var, count in sr.getInvalidConversions().items():
             if count != 0:
-                text += '%i conversions failed for variable "%s"\n' % (
+                text += '%i conversions failed for dataset "%s"\n' % (
                     count, var)
         if text != '':
             text += '\n'
@@ -246,7 +246,7 @@ class ImportDialog(qt.QDialog):
 
         names = sr.setInDocument(self.document, linkedfile=LF)
 
-        text += 'Imported data for variables:\n'
+        text += 'Imported data for datasets:\n'
         for i in names:
             text += i + '\n'
 
