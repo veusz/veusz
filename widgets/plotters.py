@@ -97,10 +97,10 @@ class FunctionPlotter(GenericPlotter):
                            descr='Function expression'), 0 )
 
         s.add(setting.FloatOrAuto('min', 'Auto',
-                             descr='Minimum value at which to calculate function'))
+                             descr='Minimum value at which to plot function'))
         
         s.add(setting.FloatOrAuto('max', 'Auto',
-                                  descr='Maximum value at which to calculate function'))
+                                  descr='Maximum value at which to plot function'))
 
         s.add( setting.Line('Line',
                             descr = 'Function line settings') )
