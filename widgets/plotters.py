@@ -96,6 +96,12 @@ class FunctionPlotter(GenericPlotter):
         s.add( setting.Str('function', 'x',
                            descr='Function expression'), 0 )
 
+        s.add(setting.FloatOrAuto('min', 'Auto',
+                             descr='Minimum value at which to calculate function'))
+        
+        s.add(setting.FloatOrAuto('max', 'Auto',
+                                  descr='Maximum value at which to calculate function'))
+
         s.add( setting.Line('Line',
                             descr = 'Function line settings') )
 
@@ -228,13 +234,21 @@ class FunctionPlotter(GenericPlotter):
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return
-
+            
         env = self.initEnviron()
         if s.variable == 'x':
+            if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:
+                x_min = N.array([s.min])
+                x1 = axes[0].graphToPlotterCoords(posn, x_min).astype(N.Int32)[0]
+            if not(s.max == 'Auto') and s.max < axes[0].getPlottedRange()[1]:
+                x_max = N.array([s.max])
+                x2 = axes[0].graphToPlotterCoords(posn, x_max).astype(N.Int32)[0]
+                
             # x function
             delta = (x2 - x1) / float(s.steps)
             pxpts = N.arange(x1, x2+delta, delta).astype(N.Int32)
-            env['x'] = axes[0].plotterToGraphCoords(posn, pxpts)
+            x = axes[0].plotterToGraphCoords(posn, pxpts)
+            env['x'] = x
             try:
                 y = eval( s.function + ' + 0*x', env )
                 bad = False
@@ -245,6 +259,13 @@ class FunctionPlotter(GenericPlotter):
 
         else:
             # y function
+            if not(s.min == 'Auto') and s.min > axes[1].getPlottedRange()[0]:
+                y_min = N.array([s.min])
+                y2 = axes[1].graphToPlotterCoords(posn, y_min).astype(N.Int32)[0]
+            if not(s.max == 'Auto') and s.max < axes[1].getPlottedRange()[1]:
+                y_max = N.array([s.max])
+                y1 = axes[1].graphToPlotterCoords(posn, y_max).astype(N.Int32)[0]
+            
             delta = (y2 - y1) / float(s.steps)
             pypts = N.arange(y1, y2+delta, delta).astype(N.Int32)
             env['y'] = axes[1].plotterToGraphCoords(posn, pypts)
