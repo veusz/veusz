@@ -40,7 +40,8 @@ class _SettingDB(object):
         self.domain = 'veusz.org'
         self.product = 'veusz'
         self.database = {}
-        self.removedsettings = []
+        self.removedsettings = {}
+        self.sepchars = "_-%-_"
 
         # read settings using QSettings
         self.readSettings()
@@ -56,24 +57,31 @@ class _SettingDB(object):
                        "and /etc/veusz.conf")
 
     def readSettings(self):
-        """Read the settings using QSettings."""
+        """Read the settings using QSettings.
+
+        Entries have / replaced with set of characters self.sepchars
+        This is because it greatly simplifies the logic as QSettings
+        has special meaning for /
+
+        This is probably a kludge.
+
+        The only issues are that the key may be larger than 255 characters
+        We should probably check for this
+        """
 
         s = qt.QSettings()
         s.setPath(self.domain, self.product)
         path = '/%s/%s' % (self.domain, self.product)
-
-        # read each entry, keeping track of what has been read
         for key in s.entryList(path):
             key = unicode(key)
-            val, ok = s.readEntry( '%s/%s' % (path, key) )
-            assert ok
-
+            val, ok = s.readEntry("%s/%s" % (path, key))
+            realkey = key.replace(self.sepchars, '/')
             try:
-                self.database[key] = eval(unicode(val))
+                self.database[realkey] = eval( unicode(val) )
             except:
                 print >>sys.stderr, ('Error interpreting item "%s" in '
-                                     'settings file' % key)
-
+                                     'settings file' % realkey)
+        
     def writeSettings(self):
         """Write the settings using QSettings.
 
@@ -86,12 +94,14 @@ class _SettingDB(object):
 
         # write each entry, keeping track of which ones haven't been written
         for key, value in self.database.iteritems():
-            if not s.writeEntry('%s/%s' % (path, key), repr(value)):
+            fkey = "%s/%s" % (path, key.replace('/', self.sepchars) )
+            if not s.writeEntry(fkey, repr(value)):
                 print >>sys.stderr, 'Error writing setting "%s"' % key
 
         # now remove all the values which have been removed
-        for key in self.removedsettings:
-            if not s.removeEntry( '%s/%s' % (path, key) ):
+        for key in self.removedsettings.iterkeys():
+            fkey = "%s/%s" % (path, key.replace('/', self.sepchars) )
+            if not s.removeEntry(fkey):
                 print >>sys.stderr, 'Error removing setting "%s"' % key
 
     def __getitem__(self, key):
@@ -101,11 +111,13 @@ class _SettingDB(object):
     def __setitem__(self, key, value):
         """Set the value in the database."""
         self.database[key] = value
+        if key in self.removedsettings:
+            del self.removedsettings[key]
 
     def __delitem__(self, key):
         """Remove the key from the database."""
         del self.database[key]
-        self.removedsettings.append(key)
+        self.removedsettings[key] = True
 
     def __contains__(self, key):
         """Is the key in the database."""

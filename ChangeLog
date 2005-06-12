@@ -8,6 +8,7 @@
 	range (patch by James Graham)
 	- Use QSettings to do settings code rather than own code (based on
 	patch by James Graham)
+	- Default settings for root widget fixed
 	
 * 2005-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Command line parsing now uses optparse (thanks to J Graham for

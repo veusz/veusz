@@ -34,7 +34,7 @@ class Root(widget.Widget):
     allowusercreation = False
     allowedparenttypes = [None]
 
-    def __init__(self, parent, name=None):
+    def __init__(self, parent, name=None, document=None):
         """Initialise object."""
 
         widget.Widget.__init__(self, parent, name=name)
@@ -43,6 +43,7 @@ class Root(widget.Widget):
                                 descr='Width of the pages') )
         s.add( setting.Distance('height', '15cm',
                                 descr='Height of the pages') )
+        self.document = document
 
         if type(self) == Root:
             self.readDefaults()

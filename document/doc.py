@@ -258,8 +258,7 @@ class Document( qt.QObject ):
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}
-        self.basewidget = widgets.Root(None)
-        self.basewidget.document = self
+        self.basewidget = widgets.Root(None, document=self)
         self.setModified(False)
         self.emit( qt.PYSIGNAL("sigWiped"), () )
 
