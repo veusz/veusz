@@ -417,7 +417,11 @@ class DatasetNewDialog(qt.QDialog):
         last = None
         for val in vals.itervalues():
             if val != None:
-                if last != None and last != len(val):
+                try:
+                    l = len(val)
+                except TypeError:
+                    l = -100
+                if last != None and last != l:
                     raise _DSException("Expressions for dataset parts do not "
                                        "yield results of the same length")
                 last = len(val)

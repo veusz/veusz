@@ -374,6 +374,11 @@ class PointPlotter(GenericPlotter):
         s = self.settings
         xdata = self.document.getData(s.xData)
 
+        # distances for clipping - we make them larger than the
+        # real width, to help get gradients and so on correct
+        xwc = posn[2]-posn[0]*4
+        ywc = posn[3]-posn[1]*4
+
         # draw horizontal error bars
         if xdata.hasErrors():
             xmin, xmax = xdata.getPointRanges()
@@ -383,8 +388,8 @@ class PointPlotter(GenericPlotter):
             xmax = axes[0].graphToPlotterCoords(posn, xmax)
 
             # clip... (avoids problems with INFs, etc)
-            xmin = N.clip(xmin, posn[0]-1, posn[2]+1)
-            xmax = N.clip(xmax, posn[0]-1, posn[2]+1)
+            xmin = N.clip(xmin, posn[0]-xwc, posn[2]+xwc)
+            xmax = N.clip(xmax, posn[0]-xwc, posn[2]+xwc)
 
             # draw lines between each of the points
         else:
@@ -401,8 +406,8 @@ class PointPlotter(GenericPlotter):
             ymax = axes[1].graphToPlotterCoords(posn, ymax)
 
             # clip...
-            ymin = N.clip(ymin, posn[1]-1, posn[3]+1)
-            ymax = N.clip(ymax, posn[1]-1, posn[3]+1)
+            ymin = N.clip(ymin, posn[1]-ywc, posn[3]+ywc)
+            ymax = N.clip(ymax, posn[1]-ywc, posn[3]+ywc)
 
             # draw lines between each of the points
         else:

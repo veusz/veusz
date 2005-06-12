@@ -9,6 +9,9 @@
 	- Use QSettings to do settings code rather than own code (based on
 	patch by James Graham)
 	- Default settings for root widget fixed
+	- Made clipping region larger to help get diamond error box angles
+	correct
+	- Small fix to dataset creation dialog (unsized object error)
 	
 * 2005-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Command line parsing now uses optparse (thanks to J Graham for
