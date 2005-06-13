@@ -530,22 +530,16 @@ class MainWindow(qt.QMainWindow):
 
         # if the user chooses a file
         if fd.exec_loop() == qt.QDialog.Accepted:
-            if self.document.isBlank():
-                # open in current window
-                win = self
-            else:
-                # create new window
-                win = MainWindow()
-                win.show()
-            
             # save directory for next time
             self.dirname = fd.dir()
+
             filename = unicode( fd.selectedFile() )
             if self.document.isBlank():
-                #If the file is new and there are no modifications,
-                #reuse the current window
+                # If the file is new and there are no modifications,
+                # reuse the current window
                 self.openFile(filename)
             else:
+                # create a new window
                 CreateWindow(filename, self)
                 
     def slotFileExport(self):
