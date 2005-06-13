@@ -79,7 +79,7 @@ class Action(qt.QObject):
 
         # make icon set
         if iconfilename != None:
-            filename = "%s/%s" % (icondir, iconfilename)
+            filename = os.path.join(icondir, iconfilename)
             self.iconset = qt.QIconSet( qt.QPixmap(qt.QPixmap(filename)) )
         else:
             self.iconset = None

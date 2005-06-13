@@ -1,6 +1,7 @@
 * 2005-06-13 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix multi-window problem on opening files
 	- Fix xy widget line clipping problem
+	- Move directory manipulation to using os.path
 	
 * 2005-06-12 Jeremy Sanders <jeremy@jeremysanders.net>
         - ReloadData command and Data, Reload dialog added to reload

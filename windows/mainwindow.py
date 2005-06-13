@@ -215,7 +215,7 @@ class MainWindow(qt.QMainWindow):
              self.slotFileExport, 'stock-export.png', True, ''),
             ('file', ),
             ('fileclose', 'Close current window', 'Close Window', 'file',
-             self.slotFileClose, None, False, 'Ctrl+W'),
+             self.slotFileClose, '', False, 'Ctrl+W'),
             ('filequit', 'Exit the program', '&Quit', 'file',
              self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
@@ -278,8 +278,8 @@ class MainWindow(qt.QMainWindow):
 
             # load icon if set
             if icon != '':
-                action.setIconSet(qt.QIconSet( qt.QPixmap("%s/icons/%s" %
-                                                          (_fdirname, icon))) )
+                f = os.path.join(_fdirname, 'icons', icon)
+                action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
 
             # connect the action to the slot
             qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
@@ -295,8 +295,8 @@ class MainWindow(qt.QMainWindow):
             self.actions[menuid] = action
 
         zoomtb = qt.QToolButton(self.maintoolbar)
-        zoomtb.setIconSet(qt.QIconSet(qt.QPixmap("%s/icons/zoom-options.png" %
-                                                 (_fdirname,) )))
+        f = os.path.join(_fdirname, 'icons', 'zoom-options.png')
+        zoomtb.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
 
         # drop down zoom button on toolbar
         zoompop = qt.QPopupMenu(zoomtb)
