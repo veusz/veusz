@@ -376,8 +376,8 @@ class PointPlotter(GenericPlotter):
 
         # distances for clipping - we make them larger than the
         # real width, to help get gradients and so on correct
-        xwc = posn[2]-posn[0]*4
-        ywc = posn[3]-posn[1]*4
+        xwc = abs(posn[2]-posn[0])*4
+        ywc = abs(posn[3]-posn[1])*4
 
         # draw horizontal error bars
         if xdata.hasErrors():
