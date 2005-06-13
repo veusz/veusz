@@ -2,6 +2,8 @@
 	- Fix multi-window problem on opening files
 	- Fix xy widget line clipping problem
 	- Move directory manipulation to using os.path
+	- Make a new control for text property editing. Can popup a window
+	to help the user edit the text
 	
 * 2005-06-12 Jeremy Sanders <jeremy@jeremysanders.net>
         - ReloadData command and Data, Reload dialog added to reload

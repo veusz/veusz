@@ -72,6 +72,162 @@ class SettingEdit(qt.QLineEdit):
     def onModified(self, mod):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toText() )
+
+class _EscapeLineEdit(qt.QTextEdit):
+    """A special line editor which signals when a return character is pressed.
+
+    Emits escapePressed()
+    """
+
+    def __init__(self, parent):
+        qt.QTextEdit.__init__(self, parent)
+        self.setTextFormat(qt.Qt.PlainText)
+    
+    def keyPressEvent(self, event):
+        qt.QTextEdit.keyPressEvent(self, event)
+        if event.key() == qt.Qt.Key_Escape:
+            self.emit( qt.PYSIGNAL('escapePressed'), () )
+
+class _SettingEditBox(qt.QFrame):
+    """A popup edit box to support editing long text sections."""
+
+    def __init__(self, text, parent):
+        """Make a popup, framed widget containing a text editor."""
+
+        qt.QFrame.__init__(self, parent, 'settingeditbox',
+                           qt.Qt.WType_Popup)
+
+        self.spacing = self.fontMetrics().height()
+        self.layout = qt.QVBoxLayout(self, self.spacing/4)
+
+        self.edit = _EscapeLineEdit(self)
+        self.layout.addWidget(self.edit)
+        self.connect(self.edit, qt.PYSIGNAL('escapePressed'),
+                     self.escapePressed)
+        self.connect(self.edit, qt.SIGNAL('returnPressed()'),
+                     self.close)
+
+        self.origtext = text
+        self.edit.setText(text)
+
+        if self.style().inherits("QWindowsStyle"):
+            fs = qt.QFrame.WinPanel
+        else:
+            fs = qt.QFrame.Panel
+        self.setFrameStyle( fs | qt.QFrame.Raised )            
+
+    def sizeHint(self):
+        """A reasonable size for the text editor."""
+        return qt.QSize(self.spacing*40, self.spacing*3)
+
+    def exec_loop(self, widget):
+        """Open the edit box below the widget."""
+
+        pos = widget.parentWidget().mapToGlobal( widget.pos() )
+        desktop = qt.QApplication.desktop()
+
+        # recalculates out position so that size is correct below
+        self.adjustSize()
+
+        # is there room to put this widget besides the widget?
+        if pos.y() + self.height() + 1 < desktop.height():
+            # put below
+            y = pos.y() + 1
+        else:
+            # put above
+            y = pos.y() - self.height() - 1
+        
+        # is there room to the left for us?
+        if pos.x() + widget.width() + self.width() < desktop.width():
+            # put left justified with widget
+            x = pos.x() + widget.width()
+        else:
+            # put extending to left
+            x = pos.x() - self.width() - 1
+
+        self.move(x, y)
+        self.show()
+        self.edit.moveCursor(qt.QTextEdit.MoveEnd, False)
+        self.edit.setFocus()
+
+        # wait until editing is done
+        qt.qApp.enter_loop()
+
+        # bah, don't allow multilines in output
+        txt = self.edit.text()
+        txt = txt.replace('\n', '')
+        return txt
+
+    def escapePressed(self):
+        """If the user wants to break back out."""
+        self.edit.setText(self.origtext)
+        self.close()
+
+    def closeEvent(self, event):
+        """Stop the event loop when the widget is closed."""
+        event.accept()
+        qt.qApp.exit_loop()
+
+class StringSettingEdit(qt.QHBox):
+    """A line editor which allows editting in a larger popup window."""
+
+    def __init__(self, setting, parent):
+        qt.QHBox.__init__(self, parent)
+
+        self.setting = setting
+        self.edit = qt.QLineEdit(self)
+        self.button = qt.QPushButton('..', self)
+        self.button.setSizePolicy(qt.QSizePolicy.Preferred,
+                                  qt.QSizePolicy.Preferred)
+        self.button.resize( qt.QSize(12, 12) )
+
+        self.bgcolour = self.edit.paletteBackgroundColor()
+        
+        # set the text of the widget to the 
+        self.edit.setText( setting.toText() )
+
+        self.connect(self.edit, qt.SIGNAL('returnPressed()'),
+                     self.validateAndSet)
+        self.connect(self.edit, qt.SIGNAL('lostFocus()'),
+                     self.validateAndSet)
+        self.connect(self.button, qt.SIGNAL('clicked()'),
+                     self.buttonClicked)
+
+        self.setting.setOnModified(self.onModified)
+
+        if setting.readonly:
+            self.edit.setReadOnly(True)
+
+    def buttonClicked(self):
+        e = _SettingEditBox(self.edit.text(), self)
+        txt = e.exec_loop(self.button)
+        self.edit.setText(txt)
+        self.edit.setFocus()
+        self.parentWidget().setFocus()
+        self.edit.setFocus()
+
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
+
+    def validateAndSet(self):
+        """Check the text is a valid setting and update it."""
+
+        text = unicode(self.edit.text())
+        try:
+            val = self.setting.fromText(text)
+            self.edit.setPaletteBackgroundColor(self.bgcolour)
+
+            # value has changed
+            if self.setting.get() != val:
+                self.setting.set(val)
+
+        except setting.InvalidType:
+            self.edit.setPaletteBackgroundColor(qt.QColor('red'))
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.edit.setText( self.setting.toText() )
         
 class BoolSettingEdit(qt.QCheckBox):
     """A check box for changing a bool setting."""

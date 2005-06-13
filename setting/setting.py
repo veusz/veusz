@@ -211,7 +211,7 @@ class Str(Setting):
         return text
 
     def makeControl(self, *args):
-        return controls.SettingEdit(self, *args)
+        return controls.StringSettingEdit(self, *args)
 
 # Store bools
 class Bool(Setting):
