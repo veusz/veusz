@@ -199,8 +199,10 @@ class StringSettingEdit(qt.QHBox):
             self.edit.setReadOnly(True)
 
     def buttonClicked(self):
+        self.button.setDown(True)
         e = _SettingEditBox(self.edit.text(), self)
         txt = e.exec_loop(self.button)
+        self.button.setDown(False)
         self.edit.setText(txt)
         self.edit.setFocus()
         self.parentWidget().setFocus()
