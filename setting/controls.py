@@ -74,7 +74,7 @@ class SettingEdit(qt.QLineEdit):
         self.setText( self.setting.toText() )
 
 class _EscapeLineEdit(qt.QTextEdit):
-    """A special line editor which signals when a return character is pressed.
+    """A special line editor which signals when an escape character is pressed.
 
     Emits escapePressed()
     """
@@ -89,9 +89,12 @@ class _EscapeLineEdit(qt.QTextEdit):
             self.emit( qt.PYSIGNAL('escapePressed'), () )
 
 class _SettingEditBox(qt.QFrame):
-    """A popup edit box to support editing long text sections."""
+    """A popup edit box to support editing long text sections.
 
-    def __init__(self, text, readonly, parent):
+    Emits closing(text) when the box closes
+    """
+
+    def __init__(self, origtext, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
 
         qt.QFrame.__init__(self, parent, 'settingeditbox',
@@ -107,8 +110,8 @@ class _SettingEditBox(qt.QFrame):
         self.connect(self.edit, qt.SIGNAL('returnPressed()'),
                      self.close)
 
-        self.origtext = text
-        self.edit.setText(text)
+        self.origtext = origtext
+        self.edit.setText(origtext)
 
         if self.style().inherits("QWindowsStyle"):
             fs = qt.QFrame.WinPanel
@@ -119,11 +122,13 @@ class _SettingEditBox(qt.QFrame):
         if readonly:
             self.edit.setReadOnly(True)
 
+        self.positionSelf(parent)
+
     def sizeHint(self):
         """A reasonable size for the text editor."""
         return qt.QSize(self.spacing*40, self.spacing*3)
 
-    def exec_loop(self, widget):
+    def positionSelf(self, widget):
         """Open the edit box below the widget."""
 
         pos = widget.parentWidget().mapToGlobal( widget.pos() )
@@ -141,7 +146,8 @@ class _SettingEditBox(qt.QFrame):
             y = pos.y() - self.height() - 1
         
         # is there room to the left for us?
-        if pos.x() + widget.width() + self.width() < desktop.width():
+        if ( (pos.x() + widget.width() + self.width() < desktop.width()) or
+             (pos.x() + widget.width() < desktop.width()/2) ):
             # put left justified with widget
             x = pos.x() + widget.width()
         else:
@@ -149,27 +155,22 @@ class _SettingEditBox(qt.QFrame):
             x = pos.x() - self.width() - 1
 
         self.move(x, y)
-        self.show()
         self.edit.moveCursor(qt.QTextEdit.MoveEnd, False)
         self.edit.setFocus()
-
-        # wait until editing is done
-        qt.qApp.enter_loop()
-
-        # bah, don't allow multilines in output
-        txt = self.edit.text()
-        txt = txt.replace('\n', '')
-        return txt
 
     def escapePressed(self):
         """If the user wants to break back out."""
         self.edit.setText(self.origtext)
         self.close()
-
+ 
     def closeEvent(self, event):
-        """Stop the event loop when the widget is closed."""
+        """Tell the calling widget that we are closing, and provide
+        the new text."""
+
+        text = unicode(self.edit.text())
+        text = text.replace('\n', '')
+        self.emit( qt.PYSIGNAL('closing'), (text,) )
         event.accept()
-        qt.qApp.exit_loop()
 
 class StringSettingEdit(qt.QHBox):
     """A line editor which allows editting in a larger popup window."""
@@ -179,10 +180,11 @@ class StringSettingEdit(qt.QHBox):
 
         self.setting = setting
         self.edit = qt.QLineEdit(self)
-        self.button = qt.QPushButton('..', self)
-        self.button.setSizePolicy(qt.QSizePolicy.Preferred,
+        b = self.button = qt.QPushButton('..', self)
+        b.setToggleButton(True)
+        b.setSizePolicy(qt.QSizePolicy.Preferred,
                                   qt.QSizePolicy.Preferred)
-        self.button.resize( qt.QSize(12, 12) )
+        b.resize( qt.QSize(12, 12) )
 
         self.bgcolour = self.edit.paletteBackgroundColor()
         
@@ -193,23 +195,51 @@ class StringSettingEdit(qt.QHBox):
                      self.validateAndSet)
         self.connect(self.edit, qt.SIGNAL('lostFocus()'),
                      self.validateAndSet)
-        self.connect(self.button, qt.SIGNAL('clicked()'),
-                     self.buttonClicked)
+        self.connect(b, qt.SIGNAL('toggled(bool)'),
+                     self.buttonToggled)
 
         self.setting.setOnModified(self.onModified)
+
+        self.editwin = None
 
         if setting.readonly:
             self.edit.setReadOnly(True)
 
-    def buttonClicked(self):
-        self.button.setDown(True)
-        e = _SettingEditBox(self.edit.text(), self.setting.readonly, self)
-        txt = e.exec_loop(self.button)
-        self.button.setDown(False)
-        self.edit.setText(txt)
-        self.edit.setFocus()
-        self.parentWidget().setFocus()
-        self.edit.setFocus()
+    def buttonToggled(self, on):
+        """Button is pressed to bring popup up / down."""
+
+        # if button is down and there's no existing popup, bring up a new one
+        if on and self.editwin == None:
+            e = _SettingEditBox( unicode(self.edit.text()),
+                                 self.setting.readonly, self.button)
+
+            # we get notified with text when the popup closes
+            self.connect(e, qt.PYSIGNAL('closing'), self.boxClosing)
+            e.show()
+            self.editwin = e
+
+    def boxClosing(self, text):
+        """Called when the popup edit box closes."""
+
+        # update the text if we can
+        if not self.setting.readonly:
+            self.edit.setText(text)
+            self.edit.setFocus()
+            self.parentWidget().setFocus()
+            self.edit.setFocus()
+
+        # this evily has to check a bit later whether a new window has been
+        # created before turing off the toggle button
+        # unfortunately clicking on the button to close the popup means
+        # a new popup is created if we don't do this
+        
+        self.editwin = None
+        qt.QTimer.singleShot(100, self.timerButtonOff)
+
+    def timerButtonOff(self):
+        """Disable button if there's no popup window."""
+        if self.editwin == None:
+            self.button.setOn(False)
 
     def done(self):
         """Delete modification notification."""
