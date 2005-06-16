@@ -1,3 +1,6 @@
+* 2005-06-16 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Provide fit outExpr setting, giving output expression as text
+	
 * 2005-06-13 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix multi-window problem on opening files
 	- Fix xy widget line clipping problem

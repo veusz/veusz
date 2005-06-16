@@ -91,7 +91,7 @@ class _EscapeLineEdit(qt.QTextEdit):
 class _SettingEditBox(qt.QFrame):
     """A popup edit box to support editing long text sections."""
 
-    def __init__(self, text, parent):
+    def __init__(self, text, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
 
         qt.QFrame.__init__(self, parent, 'settingeditbox',
@@ -115,6 +115,9 @@ class _SettingEditBox(qt.QFrame):
         else:
             fs = qt.QFrame.Panel
         self.setFrameStyle( fs | qt.QFrame.Raised )            
+
+        if readonly:
+            self.edit.setReadOnly(True)
 
     def sizeHint(self):
         """A reasonable size for the text editor."""
@@ -200,7 +203,7 @@ class StringSettingEdit(qt.QHBox):
 
     def buttonClicked(self):
         self.button.setDown(True)
-        e = _SettingEditBox(self.edit.text(), self)
+        e = _SettingEditBox(self.edit.text(), self.setting.readonly, self)
         txt = e.exec_loop(self.button)
         self.button.setDown(False)
         self.edit.setText(txt)

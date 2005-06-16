@@ -21,6 +21,9 @@
 
 # $Id$
 
+import re
+import itertools
+
 import numarray as N
 import numarray.ieeespecial as NIE
 
@@ -52,15 +55,18 @@ class Fit(plotters.FunctionPlotter):
                             'minimum and maximum of the axis for '
                             'the function variable'),
                4 )
+        s.add( setting.Str('outExpr', '',
+                           descr = 'Output best fitting expression'),
+               5, readonly=True )
         s.add( setting.Float('chi2', -1,
                              descr = 'Output chi^2 from fitting'),
-               5, readonly=True )
+               6, readonly=True )
         s.add( setting.Int('dof', -1,
                            descr = 'Output degrees of freedom from fitting'),
-               6, readonly=True )
+               7, readonly=True )
         s.add( setting.Float('redchi2', -1,
                              descr = 'Output reduced-chi^2 from fitting'),
-               7, readonly=True )
+               8, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
@@ -177,6 +183,8 @@ class Fit(plotters.FunctionPlotter):
         else:
             s.redchi2 = chi2/dof
 
+        self.generateOutputExpr()
+
     def evalfunc(self, params, xvals):
 
         # make an environment
@@ -194,6 +202,29 @@ class Fit(plotters.FunctionPlotter):
             return eval(s.function, env)
         except:
             return NIE.nan
+
+    def generateOutputExpr(self):
+        """Try to generate text form of output expression."""
+
+        s = self.settings
+        paramvals = s.values.copy()
+
+        # also substitute in data name for variable
+        if s.variable == 'x':
+            paramvals['x'] = s.xData
+        else:
+            paramvals['y'] = s.yData
+
+        # split expression up into parts of text and nums, separated
+        # by non-text/nums
+        parts = re.split('([^A-Za-z0-9.])', s.function)
+
+        # replace part by things in paramvals, if they exist
+        for p, i in itertools.izip(parts, itertools.count()):
+            if p in paramvals:
+                parts[i] = str( paramvals[p] )
+
+        s.outExpr = ''.join(parts)
 
 # allow the factory to instantiate an x,y plotter
 widgetfactory.thefactory.register( Fit )
