@@ -105,6 +105,8 @@ def formatNumber(num, format):
         text = '%e' % num
     elif format == 'f':
         text = '%f' % num
+    elif format == 'percent':
+        text = '%g' % (num*100.)
     else:
         a = abs(num)
         if a >= 1e4 or (a < 1e-2 and a > 1e-99):
