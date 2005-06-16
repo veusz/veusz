@@ -130,7 +130,7 @@ class Fit(plotters.FunctionPlotter):
         if yserr == None:
             if ydata.perr != None and ydata.nerr != None:
                 print "Warning: Symmeterising positive and negative errors"
-                yserr = N.sqrt( ydata.perr**2 + ydata.nerr**2 )
+                yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
                 print "Warning: No errors on y values. Assuming 5% errors."
                 yserr = yvals*0.05
