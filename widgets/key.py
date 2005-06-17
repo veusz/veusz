@@ -137,8 +137,10 @@ class Key(widget.Widget):
         for c in self.parent.children:
             if c.settings.isSetting('key') and c.settings.key != '':
                 # plot key symbol
+                painter.save()
                 c.drawKeySymbol(painter, x+height, ypos,
                                 maxsymbolwidth, height)
+                painter.restore()
                 
                 # write key text
                 if showtext:
