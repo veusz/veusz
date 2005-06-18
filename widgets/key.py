@@ -55,6 +55,9 @@ class Key(widget.Widget):
                                'bottom',
                                descr = 'Vertical key position' ) )
                                
+        s.add( setting.Distance('keyLength', '1cm',
+                                descr = 'Length of line to show in sample') )
+
         s.add( setting.Float( 'horzManual',
                               0.,
                               descr = 'Manual horizontal fractional position'))
@@ -80,7 +83,6 @@ class Key(widget.Widget):
         # count number of keys to draw
         number = 0
         maxwidth = 1
-        maxsymbolwidth = 1
         for c in self.parent.children:
             if c.settings.isSetting('key') and c.settings.key != '':
                 number += 1
@@ -88,12 +90,10 @@ class Key(widget.Widget):
                     w, h = utils.Renderer(painter, font, 0, 0,
                                           c.settings.key).getDimensions()
                     maxwidth = max(maxwidth, w)
-                    
-                maxsymbolwidth = max(c.getKeySymbolWidth(height),
-                                     maxsymbolwidth)
 
         # total size of box
-        totalwidth = maxwidth + 3*height + maxsymbolwidth
+        symbolwidth = s.get('keyLength').convert(painter)
+        totalwidth = maxwidth + 3*height + symbolwidth
         totalheight = (number+1)*height
 
         # work out horizontal position
@@ -139,15 +139,15 @@ class Key(widget.Widget):
                 # plot key symbol
                 painter.save()
                 c.drawKeySymbol(painter, x+height, ypos,
-                                maxsymbolwidth, height)
+                                symbolwidth, height)
                 painter.restore()
                 
                 # write key text
                 if showtext:
                     painter.setPen(textpen)
                     utils.Renderer(painter, font,
-                                   x+height*2+maxsymbolwidth,
-                                   ypos+height/2, c.settings.key,
+                                   x+height*2 + symbolwidth,
+                                   ypos + height/2, c.settings.key,
                                    -1, 0).render()
 
                 ypos += height

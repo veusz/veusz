@@ -1,3 +1,6 @@
+* 2005-06-18 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Enable key length of line to be changed
+	
 * 2005-06-17 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix bug with unfilled symbols on key
 	

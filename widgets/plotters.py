@@ -206,14 +206,6 @@ class FunctionPlotter(GenericPlotter):
             painter.setPen( s.Line.makeQPen(painter) )
             painter.drawLine(x, yp, x+width, yp)
 
-    def getKeySymbolWidth(self, height):
-        """Get preferred width of key symbol of height."""
-
-        if not self.settings.Line.hide:
-            return 3*height
-        else:
-            return height
-
     def initEnviron(self):
         """Initialise function evaluation environment each time."""
         return self.fnenviron.copy()
@@ -595,14 +587,6 @@ class PointPlotter(GenericPlotter):
                 painter.setPen( qt.QPen( qt.Qt.NoPen ) )
                 
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
-
-    def getKeySymbolWidth(self, height):
-        """Get preferred width of key symbol of height."""
-
-        if not self.settings.PlotLine.hide:
-            return 3*height
-        else:
-            return height
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
