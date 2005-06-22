@@ -545,6 +545,16 @@ class ChoiceOrMore(Setting):
         return controls.SettingChoice(self, True, self.vallist,
                                       *args)
 
+class Axis(Str):
+    """A setting for choosing an axis."""
+
+    def __init__(self, name, val, descr = ''):
+        Str.__init__(self, name, val, descr=descr)
+
+    def makeControl(self, *args):
+        return controls.SettingGeneratedList(self, FIXME)
+
+
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
 

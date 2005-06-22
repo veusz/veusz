@@ -417,7 +417,6 @@ class Document( qt.QObject ):
         if ext == '.eps':
             # write eps file
             p = qt.QPrinter(qt.QPrinter.HighResolution)
-            p.setCreator('Veusz %s' % utils.version())
             p.setOutputToFile(True)
             p.setOutputFileName(filename)
             p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
@@ -431,12 +430,10 @@ class Document( qt.QObject ):
             # file: no secure way we can produce the file. FIXME INSECURE
 
             fdir = os.path.dirname(os.path.abspath(filename))
+            digits = string.digits + string.ascii_letters
             while 1:
-                digits = string.digits + string.ascii_letters
-                rndstr = ''
-                for i in xrange(40):
-                    rndstr += random.choice(digits)
-                tmpfilename = "%s/tmp_%s.eps" % (fdir, rndstr)
+                rndstr = ''.join( [random.choice(digits) for i in xrange(20)] )
+                tmpfilename = os.path.join(fdir, "tmp_%s.eps" % rndstr)
                 try:
                     os.stat(tmpfilename)
                 except OSError:
