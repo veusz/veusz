@@ -24,7 +24,7 @@
 import os
 import os.path
 import time
-import numarray
+import numarray as N
 import random
 import string
 import itertools
@@ -39,10 +39,10 @@ def _cnvt_numarray(a):
     """Convert to a numarray if possible (doing copy)."""
     if a == None:
         return None
-    elif type(a) != type(numarray.arange(1)):
-        return numarray.array(a, type=numarray.Float64)
+    elif type(a) != type(N.arange(1)):
+        return N.array(a, type=N.Float64)
     else:
-        return a.astype(numarray.Float64)
+        return a.astype(N.Float64)
 
 class LinkedFile:
     '''Instead of reading data from a string, data can be read from
@@ -94,8 +94,42 @@ class LinkedFile:
         # of errors
         return (read, errors)
 
-class Dataset:
+class DatasetBase(object):
+    """A base dataset class."""
+
+    # number of dimensions the dataset holds
+    dimensions = 0
+
+class Dataset2D(DatasetBase):
+    '''Represents a two-dimensional dataset.'''
+
+    # number of dimensions the dataset holds
+    dimensions = 2
+
+    def __init__(self, data, xpos=None, ypos=None):
+        '''Create a two dimensional dataset based on data.
+
+        data [2d numarray]
+        xpos = list/numarray of x positions of each point
+        ypos = list/numarray of y positions of each point
+        '''
+
+        self.document = None
+        self.linked = None
+        self.datagrid = _cnvt_numarray(data)
+        self.xpos = _cnvt_numarray(xpos)
+        self.ypos = _cnvt_numarray(ypos)
+
+        if self.xpos == None:
+            self.xpos = N.arange( data.shape[0], type=N.Float64 )
+        if self.ypos == None:
+            self.ypos = N.arange( data.shape[1], type=N.Float64 )
+
+class Dataset(DatasetBase):
     '''Represents a dataset.'''
+
+    # number of dimensions the dataset holds
+    dimensions = 1
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
@@ -150,8 +184,8 @@ class Dataset:
     def getRange(self):
         '''Get total range of coordinates.'''
         minvals, maxvals = self.getPointRanges()
-        return ( numarray.minimum.reduce(minvals),
-                 numarray.maximum.reduce(maxvals) )
+        return ( N.minimum.reduce(minvals),
+                 N.maximum.reduce(maxvals) )
 
     def empty(self):
         '''Is the data defined?'''
@@ -324,7 +358,6 @@ class Document( qt.QObject ):
 
     def unlinkDataset(self, name):
         """Remove any links to file from the dataset."""
-
         self.data[name].linked = None
         self.setModified()
 
@@ -430,8 +463,11 @@ class Document( qt.QObject ):
             # file: no secure way we can produce the file. FIXME INSECURE
 
             fdir = os.path.dirname(os.path.abspath(filename))
+            if not os.path.exists(fdir):
+                raise RuntimeError, 'Directory "%s" does not exist' % fdir
+
             digits = string.digits + string.ascii_letters
-            while 1:
+            while True:
                 rndstr = ''.join( [random.choice(digits) for i in xrange(20)] )
                 tmpfilename = os.path.join(fdir, "tmp_%s.eps" % rndstr)
                 try:
@@ -455,10 +491,9 @@ class Document( qt.QObject ):
 
             # if anything goes to stderr, then report it
             text = stderr.read().strip()
+            os.unlink(tmpfilename)
             if len(text) != 0:
                 raise RuntimeError, text
-
-            os.unlink(tmpfilename)
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext

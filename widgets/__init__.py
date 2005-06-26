@@ -29,5 +29,5 @@ from page import *
 from root import *
 from key import *
 from fit import *
+from image import *
 from widgetfactory import *
-

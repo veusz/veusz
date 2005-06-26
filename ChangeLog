@@ -1,3 +1,6 @@
+* 2005-06-26 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Initial Image support (not yet working)
+
 * 2005-06-21 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Slight changes to doc eps/png generation logic
 	
