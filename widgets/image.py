@@ -23,6 +23,7 @@
 import string
 import os.path
 
+import qt
 import numarray as N
 
 import setting
@@ -33,60 +34,24 @@ class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
     coordinate system."""
 
+    # a dict of colormaps loaded in from external file
     colormaps = None
 
     typename='image'
     allowusercreation=True
     description='Plot a 2d dataset as an image'
 
-    def readColorMaps(self):
-        """Read color maps data file.
-
-        File is made up of:
-          comments (prefaced by # on separate line)
-          colormapname
-          list of colors with B G R alpha order from 0->255 on separate lines
-          [colormapname ...]
-        """
-
-        name = ''
-        vals = []
-        Image.colormaps = {}
-
-        dir = os.path.dirname( os.path.abspath(__file__) )
-        filename = os.path.join(dir, 'data', 'colormaps.dat')
-        f = open(filename)
-        for l in f:
-            p = l.split()
-            if len(p) == 0 or p[0][0] == '#':
-                continue
-            if p[0][0] not in string.digits:
-                if len(vals) != 0:
-                    Image.colormaps[name] = N.array(vals).astype(N.UInt8)
-                name = p[0]
-                vals = []
-            else:
-                assert name != ''
-                vals.append( [int(i) for i in p] )
-        if name != '':
-            Image.colormaps[name] = N.array(vals).astype(N.UInt8)
-
-        # collect names and sort alphabetically
-        names = Image.colormaps.keys()
-        names.sort()
-        Image.colormapnames = names
-
     def __init__(self, parent, name=None):
         """Initialise plotter with axes."""
 
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
-        # lazy read of colormap file
+        # lazy read of colormap file (Let's help startup times)
         if Image.colormaps == None:
-            self.readColorMaps()
+            Image.readColorMaps()
 
         s = self.settings
-        s.add( setting.Dataset('data', 'd', self.document,
+        s.add( setting.Dataset('data', '', self.document,
                                descr = 'Dataset to plot' ),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
@@ -106,6 +71,57 @@ class Image(plotters.GenericPlotter):
                               descr = 'Set of colors to plot data with'),
                4 )
 
+        self.lastcolormap = None
+        self.lastdataset = None
+        self.schangeset = -1
+
+    def readColorMaps(C):
+        """Read color maps data file (a class method)
+
+        File is made up of:
+          comments (prefaced by # on separate line)
+          colormapname
+          list of colors with B G R alpha order from 0->255 on separate lines
+          [colormapname ...]
+        """
+
+        name = ''
+        vals = []
+        C.colormaps = {}
+
+        # locate file holding colormap data
+        dir = os.path.dirname( os.path.abspath(__file__) )
+        filename = os.path.join(dir, 'data', 'colormaps.dat')
+
+        # iterate over file
+        for l in open(filename):
+            p = l.split()
+            if len(p) == 0 or p[0][0] == '#':
+                # blank or commented line
+                pass
+            elif p[0][0] not in string.digits:
+                # new colormap follows
+                if name != '':
+                    C.colormaps[name] = N.array(vals).astype(N.UInt8)
+                name = p[0]
+                vals = []
+            else:
+                # add value to current colormap
+                assert name != ''
+                assert len(p) == 4
+                vals.append( [int(i) for i in p] )
+
+        # add on final colormap
+        if name != '':
+            C.colormaps[name] = N.array(vals).astype(N.UInt8)
+
+        # collect names and sort alphabetically
+        names = C.colormaps.keys()
+        names.sort()
+        C.colormapnames = names
+
+    readColorMaps = classmethod(readColorMaps)
+
     def applyColourMap(self, cmap, data, minval, maxval):
         """Apply a colour map to the 2d data given.
 
@@ -120,7 +136,7 @@ class Image(plotters.GenericPlotter):
         fracs = N.clip(fracs, 0., 1.)
 
         # number of bands to split the data between (take account of end point)
-        c = Image.colormaps[cmap]
+        c = self.colormaps[cmap]
         numbands = c.shape[0]-1
 
         # Work out which is the minimum colour map. Assumes we have <255 bands.
@@ -139,15 +155,106 @@ class Image(plotters.GenericPlotter):
                  (1.-deltafracs)*c[bands]).astype(N.UInt8)
 
         # convert 32bit quads to a Qt QImage
+        # FIXME: Does this assume C-style array layout??
         s = quads.tostring()
         img = qt.QImage(s, data.shape[1], data.shape[0], 32, None, 0,
                         qt.QImage.IgnoreEndian)
 
-        # we need to store the string while the image exists
-        # this is a hacky, but simple way of ensuring this
-        img._pythonstring = s
+        # convert QImage to QPixmap and return
+        # docs suggest pixmaps are quicker for plotting...
+        pixmap = qt.QPixmap(img)
+        return pixmap
 
-        return img
+    def updatePixmap(self):
+        """Update the pixmap with new contents."""
+
+        s = self.settings
+        d = self.document
+        data = d.getData(s.data)
+
+        minval = s.min
+        if minval == 'Auto':
+            minval = data.data.min()
+        maxval = s.max
+        if maxval == 'Auto':
+            maxval = data.data.max()
+
+        self.pixmap = self.applyColourMap(s.colorMap, data.data,
+                                          minval, maxval)
+
+    def autoAxis(self, name, bounds):
+        """Automatically determine the ranges of variable on the axes."""
+
+        s = self.settings
+        d = self.document
+
+        # return if no data
+        if not d.hasData(s.data):
+            return
+
+        # return if the dataset isn't two dimensional
+        data = d.getData(s.data)
+        if data.dimensions != 2:
+            return
+
+        xrange = data.xrange
+        yrange = data.yrange
+
+        if name == s.xAxis:
+            bounds[0] = min( bounds[0], xrange[0] )
+            bounds[1] = max( bounds[1], xrange[1] )
+        elif name == s.yAxis:
+            bounds[0] = min( bounds[0], yrange[0] )
+            bounds[1] = max( bounds[1], yrange[1] )
+
+    def draw(self, parentposn, painter, outerbounds = None):
+        """Draw the image."""
+
+        posn = plotters.GenericPlotter.draw(self, parentposn, painter,
+                                            outerbounds = outerbounds)
+        x1, y1, x2, y2 = posn
+        s = self.settings
+        d = self.document
+        
+        # get axes widgets
+        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+
+        # return if there's no proper axes
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' or
+             not d.hasData(s.data) ):
+            return
+
+        # return if the dataset isn't two dimensional
+        data = d.getData(s.data)
+        if data.dimensions != 2:
+            return
+
+        # recalculate pixmap if image has changed
+        if data != self.lastdataset or self.schangeset != s.changeset:
+            self.updatePixmap()
+            self.lastdataset = data
+            self.schangeset = s.changeset
+
+        # find coordinates of image coordinate bounds
+        rangex, rangey = data.getDataRanges()
+
+        # translate coordinates to plotter coordinates
+        coordsx = axes[0].graphToPlotterCoords(posn, N.array(rangex))
+        coordsy = axes[1].graphToPlotterCoords(posn, N.array(rangey))
+
+        # clip data within bounds of plotter
+        painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+
+        # now draw pixmap
+        painter.drawPixmap( qt.QRect(coordsx[0], coordsy[1],
+                                     coordsx[1]-coordsx[0]+1,
+                                     coordsy[0]-coordsy[1]+1),
+                            self.pixmap )
+
+        painter.restore()
 
 # allow the factory to instantiate an axis
 widgetfactory.thefactory.register( Image )

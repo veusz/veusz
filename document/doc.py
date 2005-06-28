@@ -106,24 +106,34 @@ class Dataset2D(DatasetBase):
     # number of dimensions the dataset holds
     dimensions = 2
 
-    def __init__(self, data, xpos=None, ypos=None):
+    def __init__(self, data, xrange=None, yrange=None):
         '''Create a two dimensional dataset based on data.
 
-        data [2d numarray]
-        xpos = list/numarray of x positions of each point
-        ypos = list/numarray of y positions of each point
+        data: 2d numarray of imaging data
+        xrange: a tuple of (start, end) coordinates for x
+        yrange: a tuple of (start, end) coordinates for y
         '''
 
         self.document = None
         self.linked = None
-        self.datagrid = _cnvt_numarray(data)
-        self.xpos = _cnvt_numarray(xpos)
-        self.ypos = _cnvt_numarray(ypos)
+        self.data = _cnvt_numarray(data)
 
-        if self.xpos == None:
-            self.xpos = N.arange( data.shape[0], type=N.Float64 )
-        if self.ypos == None:
-            self.ypos = N.arange( data.shape[1], type=N.Float64 )
+        self.xrange = xrange
+        self.yrange = yrange
+
+        if not self.xrange:
+            self.xrange = (0, data.shape[0]-1)
+        if not self.yrange:
+            self.yrange = (0, data.shape[1]-1)
+
+    def getDataRanges(self):
+        return self.xrange, self.yrange
+
+    def saveLinksToSavedDoc(self, file, savedlinks):
+        pass
+
+    def saveToFile(self, file, name):
+        pass
 
 class Dataset(DatasetBase):
     '''Represents a dataset.'''

@@ -131,13 +131,22 @@ class CommandInterface(qt.QObject):
 
         data = doc.Dataset(val, symerr, negerr, poserr)
         self.document.setData(name, data)
-
+ 
         if self.verbose:
             print "Set variable '%s':" % name
-            print "Values = %s" % str( data.data )
-            print "Symmetric errors = %s" % str( data.serr )
-            print "Negative errors = %s" % str( data.nerr )
-            print "Positive errors = %s" % str( data.perr )
+            print " Values = %s" % str( data.data )
+            print " Symmetric errors = %s" % str( data.serr )
+            print " Negative errors = %s" % str( data.nerr )
+            print " Positive errors = %s" % str( data.perr )
+
+    def SetData2D(self, name, data, xrange=None, yrange=None):
+        """Create a 2D dataset."""
+
+        data = doc.Dataset2D(data, xrange=xrange, yrange=yrange)
+        self.document.setData(name, data)
+
+        if self.verbose:
+            print "Set 2d dataset '%s'" % name
 
     def GetData(self, name):
         """Return the data with the name.
@@ -178,6 +187,20 @@ class CommandInterface(qt.QObject):
         datasets = sr.setInDocument(self.document)
         errors = sr.getInvalidConversions()
         return (datasets, errors)
+
+    def ImportString2D(self, xrange=None, yrange=None, string=None):
+        """Read two dimensional data from the string specified.
+        """
+
+        # FIXME
+        pass
+
+    def ImportFile2D(self, filename, xrange=None, yrange=None):
+        """Import two-dimensional data from a string.
+        """
+
+        # FIXME
+        pass
 
     def ImportFile(self, filename, descriptor, linked=False):
         """Read data from file with filename using descriptor.

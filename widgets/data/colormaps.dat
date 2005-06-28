@@ -4,8 +4,6 @@
 #   B G R alpha
 #   ...
 # name: name of colourmap
-# L/S: use linear interpolation or steps
-# number: number of steps
 # B G R alpha are quads for each point on map
 
 # $Id$

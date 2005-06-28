@@ -32,6 +32,7 @@ class Settings:
         self.setnames = []  # a list of names
         self.modified = False
         self.onmodified = [] # fns to call on modification
+        self.changeset = 0
         self.parent = None
 
     def getName(self):
@@ -78,6 +79,7 @@ class Settings:
     def setModified(self, modified = True):
         """Set the modification flag."""
         self.modified = modified
+        self.changeset += 1
         for i in self.onmodified:
             i(modified)
         

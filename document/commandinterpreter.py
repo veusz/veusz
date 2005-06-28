@@ -85,7 +85,9 @@ class CommandInterpreter:
             'GetDatasets': i.GetDatasets,
             'GPL': self.GPL,
             'ImportString': i.ImportString,
+            'ImportString2D': i.ImportString2D,
             'ImportFile': i.ImportFile,
+            'ImportFile2D': i.ImportFile2D,
             'List': i.List,
             'Load': self.Load,
             'Print': i.Print,
@@ -95,6 +97,7 @@ class CommandInterpreter:
             'Save': i.Save,
             'Set': i.Set,
             'SetData': i.SetData,
+            'SetData2D': i.SetData2D,
             'SetVerbose': i.SetVerbose,
             'To': i.To
             }
