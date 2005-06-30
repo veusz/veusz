@@ -676,13 +676,18 @@ class WidgetPath(Str):
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
-    def __init__(self, name, val, document, descr=''):
-        """Initialise using the document, so we can get the datasets later."""
+    def __init__(self, name, val, document, dimensions=1, descr=''):
+        """Initialise using the document, so we can get the datasets later.
+
+        dimensions is the number of dimensions the dataset needs
+        """
 
         Setting.__init__(self, name, val, descr)
         self.document = document
+        self.dimensions = dimensions
 
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.DatasetChoose(self, self.document, *args)
+        return controls.DatasetChoose(self, self.document, self.dimensions,
+                                      *args)
     

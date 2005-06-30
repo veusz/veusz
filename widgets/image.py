@@ -30,6 +30,65 @@ import setting
 import widgetfactory
 import plotters
 
+def applyScaling(data, mode, minval, maxval):
+    """Apply a scaling transformation on the data.
+
+    mode is one of 'linear', 'sqrt', 'log', or 'squared'
+    minval is the minimum value of the scale
+    maxval is the maximum value of the scale
+
+    returns transformed (data, minval, maxval)
+    """
+
+    if mode == 'linear':
+        pass
+
+    elif mode == 'sqrt':
+        minval = max(0., minval)
+        maxval = max(0., maxval)
+
+        # replace illegal values
+        belowzero = data < 0.
+        data = data.copy()
+        data[belowzero] = minval
+
+        # calculate transform
+        data = N.sqrt(data)
+        minval = N.sqrt(minval)
+        maxval = N.sqrt(maxval)
+
+    elif mode == 'log':
+        minval = max(1e-200, minval)
+        maxval = max(1e-200, maxval)
+
+        # replace illegal values
+        bad = data < 1e-200
+        data = data.copy()
+        data[bad] = minval
+
+        # transform
+        data = N.log(data)
+        minval = N.log(minval)
+        maxval = N.log(maxval)
+
+    elif mode == 'squared':
+        # very simple to do this...
+        minval = minval**2
+        maxval = maxval**2
+
+        data = data**2
+
+    else:
+        raise RuntimeError, 'Invalid scaling mode "%s"' % mode
+
+    if minval > maxval:
+        minval, maxval = maxval, minval
+    if minval == maxval:
+        minval = 0.
+        maxval = 1.
+
+    return (data, minval, maxval)
+
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
     coordinate system."""
@@ -52,6 +111,7 @@ class Image(plotters.GenericPlotter):
 
         s = self.settings
         s.add( setting.Dataset('data', '', self.document,
+                               dimensions = 2,
                                descr = 'Dataset to plot' ),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
@@ -61,7 +121,7 @@ class Image(plotters.GenericPlotter):
                                    descr = 'Maximum value of image scale'),
                2 )
         s.add( setting.Choice('colorScaling',
-                              ['linear', 'sqrt', 'log'],
+                              ['linear', 'sqrt', 'log', 'squared'],
                               'linear',
                               descr = 'Scaling to transform numbers to color'),
                3 )
@@ -122,14 +182,18 @@ class Image(plotters.GenericPlotter):
 
     readColorMaps = classmethod(readColorMaps)
 
-    def applyColourMap(self, cmap, data, minval, maxval):
+    def applyColourMap(self, cmap, scaling, datain, minval, maxval):
         """Apply a colour map to the 2d data given.
 
         cmap is the color map (numarray of BGRalpha quads)
+        scaling is scaling mode => 'linear', 'sqrt', 'log' or 'squared'
         data are the imaging data
         minval and maxval are the extremes of the data for the colormap
         Returns a QImage
         """
+
+        # apply scaling of data
+        data, minval, maxval = applyScaling(datain, scaling, minval, maxval)
 
         # calculate fraction between min and max of data
         fracs = (N.ravel(data)-minval) * (1./(maxval-minval))
@@ -160,13 +224,14 @@ class Image(plotters.GenericPlotter):
         img = qt.QImage(s, data.shape[1], data.shape[0], 32, None, 0,
                         qt.QImage.IgnoreEndian)
 
-        # convert QImage to QPixmap and return
-        # docs suggest pixmaps are quicker for plotting...
-        pixmap = qt.QPixmap(img)
-        return pixmap
+        # hack to ensure string isn't freed before QImage
+        img.veusz_string = s
 
-    def updatePixmap(self):
-        """Update the pixmap with new contents."""
+        # done!
+        return img
+
+    def updateImage(self):
+        """Update the image with new contents."""
 
         s = self.settings
         d = self.document
@@ -179,8 +244,9 @@ class Image(plotters.GenericPlotter):
         if maxval == 'Auto':
             maxval = data.data.max()
 
-        self.pixmap = self.applyColourMap(s.colorMap, data.data,
-                                          minval, maxval)
+        self.image = self.applyColourMap(s.colorMap, s.colorScaling,
+                                         data.data,
+                                         minval, maxval)
 
     def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""
@@ -206,6 +272,58 @@ class Image(plotters.GenericPlotter):
         elif name == s.yAxis:
             bounds[0] = min( bounds[0], yrange[0] )
             bounds[1] = max( bounds[1], yrange[1] )
+
+    def cutImageToFit(self, pltx, plty, posn):
+        x1, y1, x2, y2 = posn
+        pltx1, pltx2 = pltx
+        pltw = pltx2-pltx1
+        plty1, plty2 = plty
+        plth = plty2-plty1
+
+        imw = self.image.width()
+        imh = self.image.height()
+        pixw = pltw / float(imw)
+        pixh = plth / float(imh)
+        cutr = [0, 0, imw-1, imh-1]
+
+        # work out where image intercepts posn, and make sure image
+        # fills at least that area
+
+        print cutr, pltx, plty
+        print pixw, pixh
+
+        # need to chop left
+        if pltx1 < x1:
+            d = int((x1-pltx1) / pixw)
+            cutr[0] += d
+            pltx[0] += int(d*pixw)
+
+        # need to chop right
+        if pltx2 > x2:
+            d = max(0, int((pltx2-x2) / pixw) - 1)
+            cutr[2] -= d
+            pltx[1] += int(d*pixh)
+
+        # chop top
+        if plty1 < y1:
+            d = int((y1-plty1) / pixh)
+            cutr[1] += d
+            plty[0] += int(d*pixh)
+            
+        # chop bottom
+        if plty2 > y2:
+            d = max(0, int((plty2-y2) / pixh) - 1)
+            cutr[3] -= d
+            plty[1] -= int(d*pixh)
+
+        print cutr, pltx, plty
+
+        # create chopped-down image
+        newimage = self.image.copy(cutr[0], cutr[1],
+                                   cutr[2]-cutr[0]+1, cutr[3]-cutr[1]+1)
+
+        # return new image coordinates and image
+        return pltx, plty, newimage
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the image."""
@@ -233,7 +351,7 @@ class Image(plotters.GenericPlotter):
 
         # recalculate pixmap if image has changed
         if data != self.lastdataset or self.schangeset != s.changeset:
-            self.updatePixmap()
+            self.updateImage()
             self.lastdataset = data
             self.schangeset = s.changeset
 
@@ -244,15 +362,25 @@ class Image(plotters.GenericPlotter):
         coordsx = axes[0].graphToPlotterCoords(posn, N.array(rangex))
         coordsy = axes[1].graphToPlotterCoords(posn, N.array(rangey))
 
+        # truncate image down if necessary
+        # This assumes linear pixels!
+        if ( coordsx[0] < x1 or coordsx[1] > x2 or
+             coordsy[0] < y1 or coordsy[1] > y2 ):
+
+            coordsx, coordsy, image = self.cutImageToFit(coordsx, coordsy,
+                                                         posn)
+        else:
+            image = self.image
+
         # clip data within bounds of plotter
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
         # now draw pixmap
-        painter.drawPixmap( qt.QRect(coordsx[0], coordsy[1],
-                                     coordsx[1]-coordsx[0]+1,
-                                     coordsy[0]-coordsy[1]+1),
-                            self.pixmap )
+        painter.drawImage( qt.QRect(coordsx[0], coordsy[1],
+                                    coordsx[1]-coordsx[0]+1,
+                                    coordsy[0]-coordsy[1]+1),
+                           image )
 
         painter.restore()
 

@@ -455,13 +455,16 @@ class SettingDistance(SettingChoice):
 class DatasetChoose(SettingChoice):
     """Allow the user to choose between the possible datasets."""
 
-    def __init__(self, setting, document, parent):
+    def __init__(self, setting, document, dimensions, parent):
         """Initialise the combobox. The list is populated with datasets.
+
+        dimensions specifies the dimension of the dataset to list
 
         Changes on the document refresh the list of datasets."""
         
         SettingChoice.__init__(self, setting, True, [], parent)
         self.document = document
+        self.dimensions = dimensions
         self.populateEntries()
         self.connect(document, qt.PYSIGNAL('sigModified'),
                      self.slotModified)
@@ -469,7 +472,11 @@ class DatasetChoose(SettingChoice):
     def populateEntries(self):
         """Put the list of datasets into the combobox."""
 
-        datasets = self.document.data.keys()
+        # get datasets of the correct dimension
+        datasets = []
+        for name, ds in self.document.data.iteritems():
+            if ds.dimensions == self.dimensions:
+                datasets.append(name)
         datasets.sort()
 
         # existing setting
