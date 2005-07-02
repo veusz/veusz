@@ -458,6 +458,11 @@ class _DataEditTable(qttable.QTable):
 
     def setDataset(self, ds):
         """Show the given dataset in the widget."""
+
+        # FIXME
+        if ds.dimensions != 1:
+            return
+
         self.dataset = ds
         self.coldata = (ds.data, ds.serr, ds.perr, ds.nerr)
         self.setNumRows( len(self.coldata[0]) )

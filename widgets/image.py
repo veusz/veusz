@@ -130,6 +130,9 @@ class Image(plotters.GenericPlotter):
                               'grey',
                               descr = 'Set of colors to plot data with'),
                4 )
+        s.add( setting.Bool('colorInvert', False,
+                            descr = 'Invert color map'),
+               5 )
 
         self.lastcolormap = None
         self.lastdataset = None
@@ -199,11 +202,8 @@ class Image(plotters.GenericPlotter):
         fracs = (N.ravel(data)-minval) * (1./(maxval-minval))
         fracs = N.clip(fracs, 0., 1.)
 
-        # number of bands to split the data between (take account of end point)
-        c = self.colormaps[cmap]
-        numbands = c.shape[0]-1
-
         # Work out which is the minimum colour map. Assumes we have <255 bands.
+        numbands = cmap.shape[0]-1
         bands = (fracs*numbands).astype(N.UInt8)
         bands = N.clip(bands, 0, numbands-1)
 
@@ -215,14 +215,15 @@ class Image(plotters.GenericPlotter):
 
         # calculate BGRalpha quadruplets
         # this is a linear interpolation between the band and the next band
-        quads = (deltafracs*c[bands+1] +
-                 (1.-deltafracs)*c[bands]).astype(N.UInt8)
+        quads = (deltafracs*cmap[bands+1] +
+                 (1.-deltafracs)*cmap[bands]).astype(N.UInt8)
 
         # convert 32bit quads to a Qt QImage
         # FIXME: Does this assume C-style array layout??
         s = quads.tostring()
         img = qt.QImage(s, data.shape[1], data.shape[0], 32, None, 0,
                         qt.QImage.IgnoreEndian)
+        img = img.mirror()
 
         # hack to ensure string isn't freed before QImage
         img.veusz_string = s
@@ -244,7 +245,11 @@ class Image(plotters.GenericPlotter):
         if maxval == 'Auto':
             maxval = data.data.max()
 
-        self.image = self.applyColourMap(s.colorMap, s.colorScaling,
+        cmap = self.colormaps[s.colorMap]
+        if s.colorInvert:
+            cmap = cmap[::-1]
+
+        self.image = self.applyColourMap(cmap, s.colorScaling,
                                          data.data,
                                          minval, maxval)
 
@@ -289,9 +294,6 @@ class Image(plotters.GenericPlotter):
         # work out where image intercepts posn, and make sure image
         # fills at least that area
 
-        print cutr, pltx, plty
-        print pixw, pixh
-
         # need to chop left
         if pltx1 < x1:
             d = int((x1-pltx1) / pixw)
@@ -315,8 +317,6 @@ class Image(plotters.GenericPlotter):
             d = max(0, int((plty2-y2) / pixh) - 1)
             cutr[3] -= d
             plty[1] -= int(d*pixh)
-
-        print cutr, pltx, plty
 
         # create chopped-down image
         newimage = self.image.copy(cutr[0], cutr[1],

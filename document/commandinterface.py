@@ -186,21 +186,51 @@ class CommandInterface(qt.QObject):
         sr.readData(stream)
         datasets = sr.setInDocument(self.document)
         errors = sr.getInvalidConversions()
+
+        if self.verbose:
+            print "Imported datasets %s" % (' '.join(datasets),)
+            for name, num in errors.iteritems():
+                print "%i errors encountered reading dataset %s" % (num, name)
+
         return (datasets, errors)
 
-    def ImportString2D(self, xrange=None, yrange=None, string=None):
+    def ImportString2D(self, datasets, string=None):
         """Read two dimensional data from the string specified.
+        datasets is a list of datasets to read from the string or a single
+        dataset name
         """
 
-        # FIXME
-        pass
+        if type(datasets) in (str, unicode):
+            datasets = [datasets]
 
-    def ImportFile2D(self, filename, xrange=None, yrange=None):
+        stream = simpleread.StringStream(string)
+        for name in datasets:
+            sr = simpleread.SimpleRead2D(name)
+            sr.readData(stream)
+            sr.setInDocument(self.document)
+            if self.verbose:
+                print "Imported dataset %s" % name
+
+    def ImportFile2D(self, filename, datasets, linked=False):
         """Import two-dimensional data from a string.
+        filename is the name of the file to read
+        datasets is a list of datasets to read from the file, or a single
+        dataset name
         """
 
-        # FIXME
-        pass
+        # FIXME - links not implemented
+
+        if type(datasets) in (str, unicode):
+            datasets = [datasets]
+
+        f = open(filename, 'r')
+        stream = simpleread.FileStream(f)
+        for name in datasets:
+            sr = simpleread.SimpleRead2D(name)
+            sr.readData(stream)
+            sr.setInDocument(self.document)
+            if self.verbose:
+                print "Imported dataset %s" % name
 
     def ImportFile(self, filename, descriptor, linked=False):
         """Read data from file with filename using descriptor.
@@ -226,6 +256,11 @@ class CommandInterface(qt.QObject):
         datasets = sr.setInDocument(self.document,
                                     linkedfile=LF)
         errors = sr.getInvalidConversions()
+
+        if self.verbose:
+            print "Imported datasets %s" % (' '.join(datasets),)
+            for name, num in errors.iteritems():
+                print "%i errors encountered reading dataset %s" % (num, name)
 
         return (datasets, errors)
 

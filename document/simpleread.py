@@ -44,7 +44,8 @@ import re
 import sys
 import StringIO
 
-import numarray.ieeespecial
+import numarray as N
+import numarray.ieeespecial as NIE
 
 import doc
 
@@ -157,7 +158,7 @@ class _DescriptorPart:
                 try:
                     val = float(val)
                 except ValueError:
-                    val = numarray.ieeespecial.nan
+                    val = NIE.nan
                     self.errorcount += 1
 
                 # append a suffix to specfiy whether error or value
@@ -226,6 +227,10 @@ class FileStream:
             return self.remainingline.pop(0)
         except IndexError:
             return None
+
+    def allColumns(self):
+        """Get all columns of current line (none are discarded)."""
+        return self.remainingline
 
     def flushLine(self):
         """Forget the rest of the line."""
@@ -318,3 +323,131 @@ class SimpleRead:
                                      linkedfile)
 
         return names
+
+#####################################################################
+# 2D data reading
+
+class Read2DError(ValueError):
+    pass
+
+class SimpleRead2D:
+    def __init__(self, name):
+        """Read dataset with name given."""
+        self.name = name
+        self.xrange = None
+        self.yrange = None
+        self.invertrows = False
+        self.invertcols = False
+        self.transpose = False
+
+    ####################################################################
+    # Follow functions are for setting parameters during reading of data
+
+    def _paramXRange(self, cols):
+        try:
+            self.xrange = ( float(cols[1]), float(cols[2]) )
+        except ValueError:
+            raise Read2DError, "Could not interpret xrange"
+        
+    def _paramYRange(self, cols):
+        try:
+            self.yrange = ( float(cols[1]), float(cols[2]) )
+        except ValueError:
+            raise Read2DError, "Could not interpret yrange"
+
+    def _paramInvertRows(self, cols):
+        self.invertrows = True
+        
+    def _paramInvertCols(self, cols):
+        self.invertcols = True
+
+    def _paramTranspose(self, cols):
+        self.transpose = True
+
+    ####################################################################
+
+    def readData(self, stream):
+        """Read data from stream given
+
+        stream consists of:
+        optional:
+         xrange A B   - set the range of x from A to B
+         yrange A B   - set the range of y from A to B
+         invertrows   - invert order of the rows
+         invertcols   - invert order of the columns
+         transpose    - swap rows and columns
+        then:
+         matrix of columns and rows, separated by line endings
+         the rows are in reverse-y order (highest y first)
+         blank line stops reading for further datasets
+        """
+
+        settings = {
+            'xrange': self._paramXRange,
+            'yrange': self._paramYRange,
+            'invertrows': self._paramInvertRows,
+            'invertcols': self._paramInvertCols,
+            'transpose': self._paramTranspose
+            }
+
+        rows = []
+        # loop over lines
+        while stream.newLine():
+            cols = stream.allColumns()
+
+            if len(cols) > 0:
+                # check to see whether parameter is set
+                c = cols[0].lower()
+                if c in settings:
+                    settings[c](cols)
+                    stream.flushLine()
+                    continue
+            else:
+                # if there's data and we get to a blank line, finish
+                if len(rows) != 0:
+                    break
+
+            # read columns
+            line = []
+            while True:
+                v = stream.nextColumn()
+                if v == None:
+                    break
+                try:
+                    line.append( float(v) )
+                except ValueError:
+                    raise Read2DError, "Could not interpret number '%s'" % v
+
+            # add row to dataset
+            if len(line) != 0:
+                if self.invertcols:
+                    line.reverse()
+                rows.insert(0, line)
+
+        # swap rows if requested
+        if self.invertrows:
+            rows.reverse()
+
+        try:
+            self.data = N.array(rows)
+        except ValueError:
+            raise Read2DError, "Could not convert data to 2D matrix"
+
+        if len(self.data.shape) != 2:
+            raise Read2DError, "Dataset was not 2D"
+
+        # transpose matrix if requested
+        if self.transpose:
+            self.data = N.transpose(self.data).copy()
+
+    def setInDocument(self, document, linkedfile=None):
+        """Set the data in the document.
+        """
+
+        ds = doc.Dataset2D(self.data, xrange=self.xrange,
+                           yrange=self.yrange)
+        ds.linked = linkedfile
+
+        document.setData(self.name, ds)
+        
+

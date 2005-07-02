@@ -39,7 +39,7 @@ def _cnvt_numarray(a):
     """Convert to a numarray if possible (doing copy)."""
     if a == None:
         return None
-    elif type(a) != type(N.arange(1)):
+    elif type(a) != type(N.arange(1, type=N.Float64)):
         return N.array(a, type=N.Float64)
     else:
         return a.astype(N.Float64)
@@ -133,7 +133,18 @@ class Dataset2D(DatasetBase):
         pass
 
     def saveToFile(self, file, name):
-        pass
+        """Write the 2d dataset to the file given."""
+
+        file.write("ImportString2D(%s, '''\n" % repr(name))
+        file.write("xrange %e %e\n" % self.xrange)
+        file.write("yrange %e %e\n" % self.yrange)
+
+        # write rows backwards, so lowest y comes first
+        for row in self.data[::-1]:
+            s = ('%e ' * len(row)) % tuple(row)
+            file.write("%s\n" % (s[:-1],))
+
+        file.write("''')\n")
 
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
