@@ -428,11 +428,17 @@ class SimpleRead2D:
         if self.invertrows:
             rows.reverse()
 
+        # dodgy formatting probably...
+        if len(rows) == 0:
+            raise Read2DError, "No data could be imported for dataset"
+
+        # convert the data to a numarray
         try:
             self.data = N.array(rows)
         except ValueError:
             raise Read2DError, "Could not convert data to 2D matrix"
 
+        # obvious check
         if len(self.data.shape) != 2:
             raise Read2DError, "Dataset was not 2D"
 

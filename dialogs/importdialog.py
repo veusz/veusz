@@ -20,44 +20,35 @@
 
 # $Id$
 
-"""Module for implementing dialog box for importing data in Veusz."""
+"""Module for implementing dialog boxes for importing data in Veusz."""
 
 import os.path
+import re
 
 import qt
 import document
 import setting
 
-_importhelp=('The descriptor describes the format of the data '
-             'in the file. Each dataset is described separated with spaces.'
-             ' Commas separate the dataset names from the description of the '
-             'errors\n'
-             'eg\tz\t[z with no errors - 1 column for dataset]\n'
-             '\tx,+-\t[x with symmetric errors - 2 columns for dataset]\n'
-             '\ty,+,-\t[y with asymmetric errors - 3 columns for dataset]\n'
-             '\tx[1:5],+,-\t[x_1 to x_5, each with asymmetric errors -'
-             ' 15 columns in total]\n'
-             '\tx y,+-\t[x with no errors, y with symmetric errors -'
-             ' 3 columns in total]')
+class ImportDialogBase(qt.QDialog):
+    """Base class for data importing dialogs.
 
-class ImportDialog(qt.QDialog):
-    """Data import dialog."""
+    A lot of the functionality is replicated otherwise
+    """
+
+    dirname = '.'
 
     def __init__(self, parent, document):
-        """Initialise document."""
-
         qt.QDialog.__init__(self, parent, 'DataImportDialog', False)
-        self.setCaption('Import data - Veusz')
         self.document = document
 
-        spacing = self.fontMetrics().height() / 2
+        self.spacing = self.fontMetrics().height() / 2
 
         # layout for dialog
-        self.layout = qt.QVBoxLayout(self, spacing)
-
+        self.layout = qt.QVBoxLayout(self, self.spacing)
+ 
         # change the filename
         fnhbox = qt.QHBox(self)
-        fnhbox.setSpacing(spacing)
+        fnhbox.setSpacing(self.spacing)
         self.layout.addWidget( fnhbox )
         l = qt.QLabel('&Filename:', fnhbox)
         self.filenameedit = qt.QLineEdit(fnhbox)
@@ -85,21 +76,10 @@ class ImportDialog(qt.QDialog):
         qt.QToolTip.add(self.previewedit,
                         'A preview of the contents of the file')
         
-        # edit the descriptor
-        dhbox = qt.QHBox(self)
-        dhbox.setSpacing(spacing)
-        self.layout.addWidget( dhbox )
-        l = qt.QLabel('&Descriptor:', dhbox)
-        self.descriptoredit = qt.QLineEdit(dhbox)
-        l.setBuddy(self.descriptoredit)
-        qt.QToolTip.add(self.descriptoredit,
-                        'Names of columns when importing data, '
-                        'e.g. "x y" or "a[:]"')
-        
-        # help for user
-        l = qt.QLabel(_importhelp, self)
-        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
-        self.layout.addWidget( l )
+        # space for descendents of this class to add widgets
+        self.widgetspace = qt.QVBox(self)
+        self.layout.addWidget(self.widgetspace)
+        self.widgetspace.setSpacing(self.spacing)
 
         # allow links from the file, so the data are reread from the file
         # on reloading
@@ -114,11 +94,13 @@ class ImportDialog(qt.QDialog):
         w = qt.QWidget(self)
         self.layout.addWidget(w)
         w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        l = qt.QHBoxLayout(w, 0, spacing)
+        l = qt.QHBoxLayout(w, 0, self.spacing)
         l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
                                   qt.QSizePolicy.Minimum) )
         
         b = qt.QPushButton("&Import", w)
+        self.importbutton = b
+        b.setEnabled(False)
         b.setDefault(True)
         l.addWidget(b)
         self.connect(b, qt.SIGNAL('clicked()'), self.slotImport)
@@ -126,8 +108,9 @@ class ImportDialog(qt.QDialog):
         l.addWidget(b)
         self.connect(b, qt.SIGNAL('clicked()'), self.slotClose)
 
-
-    dirname = '.'
+    def sizeHint(self):
+        """Returns recommended size of dialog."""
+        return qt.QSize(600, 400)
 
     def closeEvent(self, evt):
         """Called when the window closes."""
@@ -149,10 +132,6 @@ class ImportDialog(qt.QDialog):
 
         qt.QDialog.showEvent(self, evt)
 
-    def sizeHint(self):
-        """Returns recommended size of dialog."""
-        return qt.QSize(600, 400)
-
     def slotBrowse(self):
         """Browse button pressed in dialog."""
 
@@ -170,7 +149,6 @@ class ImportDialog(qt.QDialog):
 
     def slotClose(self):
         """Close the dialog."""
-
         self.close(True)
 
     def slotFilenameChanged(self, filename):
@@ -180,34 +158,59 @@ class ImportDialog(qt.QDialog):
             ifile = open(unicode(filename), 'r')
             text = ifile.read(2048)
             self.previewedit.setText(text)
+            self.importbutton.setEnabled(True)
 
         except IOError:
             self.previewedit.setText('<preview>')
+            self.importbutton.setEnabled(False)
+
+    def slotImport(self):
+        """Import the data."""
+        pass
+
+_import1dhelp='''
+The descriptor describes the format of the data in the file. Each dataset is described separated with spaces. Commas separate the dataset names from the description of the errors
+
+e.g.\tz\t[z with no errors - 1 column for dataset]
+\tx,+-\t[x with symmetric errors - 2 columns for dataset]
+\ty,+,-\t[y with asymmetric errors - 3 columns for dataset]
+\tx[1:5],+,-\t[x_1 to x_5, each with asymmetric errors - 15 columns in total]
+\tx y,+-\t[x with no errors, y with symmetric errors - 3 columns in total]
+'''
+
+class ImportDialog(ImportDialogBase):
+    """1D data import dialog.
+
+    Dialog allows user to choose a file and specify a descriptor, and
+    optionally link to a file.
+    """
+
+
+    def __init__(self, parent, document):
+        """Initialise dialog."""
+
+        ImportDialogBase.__init__(self, parent, document)
+        self.setCaption('Import data - Veusz')
+
+        # edit the descriptor
+        dhbox = qt.QHBox(self.widgetspace)
+        dhbox.setSpacing(self.spacing)
+        l = qt.QLabel('&Descriptor:', dhbox)
+        self.descriptoredit = qt.QLineEdit(dhbox)
+        l.setBuddy(self.descriptoredit)
+        qt.QToolTip.add(self.descriptoredit,
+                        'Names of columns when importing data, '
+                        'e.g. "x y" or "a[:]"')
+        
+        # help for user
+        l = qt.QLabel(_import1dhelp.strip(), self.widgetspace)
+        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
         
     def slotImport(self):
-        """Do the import data."""
+        """Do the importing"""
         
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
+        # decode the descriptor
         descriptor = unicode( self.descriptoredit.text() )
-        islinked = self.linkcheck.isChecked()
-        
-        try:
-            ifile = open(filename, 'r')
-        except IOError:
-            mb = qt.QMessageBox("Veusz",
-                                "Cannot find file '%s'" % filename,
-                                qt.QMessageBox.Warning,
-                                qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                                qt.QMessageBox.NoButton,
-                                qt.QMessageBox.NoButton,
-                                self)
-            mb.exec_loop()
-            return
-
-        # do the import
-        stream = document.FileStream(ifile)
-
         try:
             sr = document.SimpleRead(descriptor)
         except document.DescriptorError:
@@ -221,6 +224,14 @@ class ImportDialog(qt.QDialog):
             mb.exec_loop()
             return
 
+        # open file (shouldn't have got here if the file didn't exist
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+        ifile = open(filename, 'r')
+
+        # open up an import stream
+        stream = document.FileStream(ifile)
+
         # show a busy cursor
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
@@ -230,15 +241,16 @@ class ImportDialog(qt.QDialog):
         # restore the cursor
         qt.QApplication.restoreOverrideCursor()
 
-        text = ''
+        lines = []
         for var, count in sr.getInvalidConversions().items():
             if count != 0:
-                text += '%i conversions failed for dataset "%s"\n' % (
-                    count, var)
-        if text != '':
-            text += '\n'
+                lines.append('%i conversions failed for dataset "%s"' %
+                             (count, var))
+        if len(lines) != 0:
+            lines.append('')
 
         # link the data to a file, if told to
+        islinked = self.linkcheck.isChecked()
         if islinked:
             LF = document.LinkedFile(filename, descriptor)
         else:
@@ -246,11 +258,147 @@ class ImportDialog(qt.QDialog):
 
         names = sr.setInDocument(self.document, linkedfile=LF)
 
-        text += 'Imported data for datasets:\n'
-        for i in names:
-            text += i + '\n'
+        lines.append('Imported data for datasets:')
+        for n in names:
+            shape = self.document.getData(n).data.shape
+            lines.append(' %s (%i items)' % (n, shape[0]))
 
         if LF != None:
-            text += '\nDatasets were linked to file "%s"\n' % filename
+            lines.append('')
+            lines.append('Datasets were linked to file "%s"' % filename)
 
-        self.previewedit.setText(text)
+        self.previewedit.setText( '\n'.join(lines) )
+
+_import2dhelp = '''
+
+Data are read as a 2D matrix from the file.  X is read from left to
+right, Y from bottom to top, by default. The default coordinate ranges
+of data are 0 to M, 0 to N if the matrix is M*N in size.  These
+parameters can be altered by including xrange A B, yrange A B,
+invertrows, invertcols and transpose as lines in the data file.
+Multiple datasets can be included by separating with blank lines.
+
+'''
+
+class ImportDialog2D(ImportDialogBase):
+    """Import 2D datasets"""
+    
+    def __init__(self, parent, document):
+        """Initialise dialog."""
+        
+        ImportDialogBase.__init__(self, parent, document)
+        self.setCaption('Import 2D data - Veusz')
+
+        ws = self.widgetspace
+
+        # edit datasets
+        h = qt.QHBox(ws)
+        h.setSpacing(self.spacing)
+        l = qt.QLabel('&Datasets:', h)
+        self.datasetsedit = qt.QLineEdit(h)
+        l.setBuddy(self.datasetsedit)
+        qt.QToolTip.add(self.datasetsedit,
+                        'A space separated list of datasets to import '
+                        'from the file')
+
+        grp = qt.QGroupBox("Import parameters", ws)
+        grp.setColumns(1)
+
+        # allow range of datasets to be changed
+        self.rangeedits = []
+        for v in ('X', 'Y'):
+            h = qt.QHBox(grp)
+            h.setSpacing(self.spacing)
+            l = qt.QLabel('Range of &%s: ' % v, h)
+            s = qt.QLineEdit(h)
+            s.setValidator( qt.QDoubleValidator(self) )
+            qt.QToolTip.add(s, 'Optionally specify the inclusive '
+                            'range of the %s coordinate' % v)
+            l.setBuddy(s)
+            qt.QLabel('to', h)
+            e = qt.QLineEdit(h)
+            e.setValidator( qt.QDoubleValidator(self) )
+            self.rangeedits += [s, e]
+
+        self.invertrows = qt.QCheckBox('Invert &rows in file', grp)
+        self.invertcols = qt.QCheckBox('Invert colu&mns in file', grp)
+        self.transpose = qt.QCheckBox('&Transpose X and Y', grp)
+
+        txt = _import2dhelp.replace('\n', ' ').strip()
+        l = qt.QLabel(txt, grp)
+        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
+
+    def slotImport(self):
+        """Actually import the data."""
+
+        # get datasets and split into a list
+        datasets = unicode( self.datasetsedit.text() )
+        datasets = re.split('[, ]+', datasets)
+
+        # strip out blank items
+        datasets = [i for i in datasets if i != '']
+
+        # an obvious error...
+        if len(datasets) == 0:
+            self.previewedit.setText('At least one dataset needs to be '
+                                     'specified')
+            return
+        
+        # convert range parameters
+        ranges = []
+        for e in self.rangeedits:
+            f = unicode(e.text())
+            r = None
+            try:
+                r = float(f)
+            except ValueError:
+                pass
+            ranges.append(r)
+
+        # open file (shouldn't have got here if the file didn't exist
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+        ifile = open(filename, 'r')
+
+        # open up an import stream
+        stream = document.FileStream(ifile)
+
+        # show a busy cursor
+        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
+        # loop over datasets and read...
+        lines = []
+        for dsname in datasets:
+            sr = document.SimpleRead2D(dsname)
+
+            # propagate settings from dialog to reader
+            if ranges[0] != None and ranges[1] != None:
+                sr.xrange = (ranges[0], ranges[1])
+            if ranges[2] != None and ranges[3] != None:
+                sr.yrange = (ranges[2], ranges[3])
+            if self.invertrows.isChecked():
+                sr.invertrows = True
+            if self.invertcols.isChecked():
+                sr.invertcols = True
+            if self.transpose.isChecked():
+                sr.transpose = True
+
+            try:
+                # actually read the data
+                sr.readData(stream)
+                sr.setInDocument(self.document)
+                shape = self.document.getData(dsname).data.shape
+                lines.append('Imported dataset "%s" (%i*%i)' % (dsname,
+                                                                shape[1],
+                                                                shape[0]))
+            except document.Read2DError, e:
+                # error reading data
+                lines.append('Error importing dataset "%s":' % dsname)
+                lines.append(' %s' % str(e))
+                
+        # restore the cursor
+        qt.QApplication.restoreOverrideCursor()
+
+        # show status in preview box
+        self.previewedit.setText('\n'.join(lines))
+ 
