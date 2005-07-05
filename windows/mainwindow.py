@@ -36,6 +36,7 @@ import dialogs.aboutdialog
 import dialogs.importdialog
 import dialogs.dataeditdialog
 import dialogs.reloaddata
+import dialogs.importfits
 
 _fdirname = os.path.dirname(__file__)
 
@@ -222,6 +223,8 @@ class MainWindow(qt.QMainWindow):
              self.slotDataImport, 'stock-import.png', False, ''),
             ('dataimport2d', 'Import 2D data into Veusz', 'Import &2D...', 'data',
              self.slotDataImport2D, 'stock-import.png', False, ''),
+            ('dataimportfits', 'Import FITS files into Veusz',
+             'Import FITS...', 'data', self.slotDataImportFITS, '', False, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
              self.slotDataEdit, 'stock-edit.png', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
@@ -316,6 +319,11 @@ class MainWindow(qt.QMainWindow):
     def slotDataImport2D(self):
         """Display the 2D import data dialog."""
         d = dialogs.importdialog.ImportDialog2D(self, self.document)
+        d.show()
+
+    def slotDataImportFITS(self):
+        """Display the FITS import dialog."""
+        d = dialogs.importfits.ImportFITS(self, self.document)
         d.show()
 
     def slotDataEdit(self):
