@@ -20,7 +20,11 @@
 
 """A FITS import dialog."""
 
+import itertools
+
 import qt
+
+import document
 
 # delay initialisation until dialog is opened
 pyfits = None
@@ -80,9 +84,39 @@ class ImportFITS(qt.QDialog):
                             self.slotBrowse )
 
         # list view to hold the fits structure
-        self.listview = qt.QListView(self)
-        self.listview.addColumn('Item')
-        self.listview.addColumn('Type')
+        lv = self.listview = qt.QListView(self)
+        layout.addWidget(lv)
+        lv.addColumn('N')
+        lv.addColumn('Item')
+        lv.addColumn('Type')
+        lv.setAllColumnsShowFocus(True)
+        lv.setRootIsDecorated(True)
+        self.connect(lv, qt.SIGNAL('selectionChanged(QListViewItem*)'),
+                     self.slotSelectionChanged)
+
+        # dataset name
+        h = qt.QHBox(self)
+        h.setSpacing(self.spacing)
+        layout.addWidget(h)
+        l = qt.QLabel('Dataset &name:', h)
+        l.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
+        self.dsname = qt.QComboBox(h)
+        l.setBuddy(self.dsname)
+        self.dsname.setEditable(True)
+        self.connect(self.dsname, qt.SIGNAL('textChanged(const QString&)'),
+                     self.slotDatasetNameChanged )
+        self.connect(self.document, qt.PYSIGNAL('sigModified'),
+                     self.populateDatasetNames)
+
+        self.dspart = qt.QComboBox(h)
+        self.dspart.insertStrList(['Data', 'Symmetric error',
+                                   'Positive error', 'Negative error'])
+        self.dspart.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
+
+        # whether to link the dataset
+        self.linkds = qt.QCheckBox('&Link the dataset to the file',
+                                   self)
+        layout.addWidget(self.linkds)
 
         # buttons
         w = qt.QWidget(self)
@@ -101,6 +135,9 @@ class ImportFITS(qt.QDialog):
         b = qt.QPushButton("&Close", w)
         l.addWidget(b)
         self.connect(b, qt.SIGNAL('clicked()'), self.slotClose)
+
+        self.updateEnabledControls()
+        self.populateDatasetNames()
 
     def slotBrowse(self):
         """Browse button pressed in dialog."""
@@ -130,10 +167,11 @@ class ImportFITS(qt.QDialog):
                 raise IOError
             ifile.close()
             self.updateListView(filename)
-            self.importbutton.setEnabled(True)
 
         except IOError:
-            self.importbutton.setEnabled(False)
+            self.listview.clear()
+
+        self.updateEnabledControls()
 
     def updateListView(self, filename):
         """Update the listview with the structure of the file."""
@@ -142,11 +180,102 @@ class ImportFITS(qt.QDialog):
         lv = self.listview
         lv.clear()
 
+        for hdu, hdunum in itertools.izip(f, itertools.count()):
+            header = hdu.header
+            item = qt.QListViewItem(lv, str(hdunum), hdu.name)
+            item.hdu = hdunum
+            try:
+                # if it's table
+                rows = header['NAXIS2']
+                text = 'Table (%i rows)' % rows
+                item.setText(2, text)
+                item.type = 'table'
+
+                # get the columns, and add them as items
+                cols = hdu.get_coldefs()
+                for num, col in itertools.izip(itertools.count(1), cols):
+                    i = qt.QListViewItem(item, str(num), col.name,
+                                         'Column (%s)' % col.format)
+                    i.hdu = hdunum
+                    i.column = col.name
+                    i.type = 'column'
+
+            except AttributeError:
+                # this is an image
+                naxis = header['NAXIS']
+                dims = [str(header['NAXIS%i' % (i+1)]) for i in range(naxis)]
+                dims = '*'.join(dims)
+                text = '%iD image (%s)' % (naxis, dims)
+                item.setText(2, text)
+                item.type = 'image'
+
+        f.close()
+        lv.setSelected(lv.firstChild(), True)
+
     def slotClose(self):
         """Close dialog."""
         self.close(True)
 
+    def updateEnabledControls(self):
+        """Enable/disable controls when items are changed."""
+
+        enableimport = False
+        enabletype = False
+
+        # is item is selected in listview?
+        item = self.listview.selectedItem()
+        if item != None:
+            enableimport = item.type in ('image', 'column')
+            enabletype = item.type != 'image'
+
+        # any name for the dataset?
+        if unicode(self.dsname.currentText()) == '':
+            enableimport = False
+
+        self.importbutton.setEnabled(enableimport)
+        self.dspart.setEnabled(enabletype)
+    
+    def slotSelectionChanged(self, item):
+        """An item is selected in the list view - enable/disable import"""
+        self.updateEnabledControls()
+        self.populateDatasetNames()
+
+        # automatically provide dataset name from column name
+        if item.type == 'column':
+            self.dsname.setCurrentText(item.column.lower())
+
+    def slotDatasetNameChanged(self, name):
+        """Dataset name is changed."""
+        self.updateEnabledControls()
+
+    def populateDatasetNames(self):
+        """Populate the list of dataset names."""
+
+        d = self.dsname
+        current = d.currentText()
+        d.clear()
+        names = self.document.data.keys()
+        names.sort()
+        d.insertStrList(names)
+        d.setCurrentText(current)
+
     def slotImport(self):
         """Actually import the data."""
-        pass
-    
+
+        item = self.listview.selectedItem()
+        filename = unicode(self.filenameedit.text())
+        name = unicode(self.dsname.currentText())
+
+        f = pyfits.open(filename, 'readonly')
+
+        if item.type == 'image':
+            hdu = f[item.hdu]
+            data = hdu.data
+            ds = document.Dataset2D(data)
+            self.document.setData(name, ds)
+
+        else:
+            pass
+
+        f.close()
+        
