@@ -21,6 +21,7 @@
 """A FITS import dialog."""
 
 import itertools
+import os.path
 
 import qt
 
@@ -39,10 +40,10 @@ class ImportFITS(qt.QDialog):
         self.setCaption('Import FITS file - Veusz')
         self.document = document
 
-        self.spacing = self.fontMetrics().height() / 2
+        spacing = self.fontMetrics().height() / 2
 
         # layout for dialog
-        layout = qt.QVBoxLayout(self, self.spacing)
+        layout = qt.QVBoxLayout(self, spacing)
         
         # lazy load pyfits, so we don't have to wait until startup
         global pyfits
@@ -67,7 +68,7 @@ class ImportFITS(qt.QDialog):
 
         # change the filename
         fnhbox = qt.QHBox(self)
-        fnhbox.setSpacing(self.spacing)
+        fnhbox.setSpacing(spacing)
         layout.addWidget( fnhbox )
         l = qt.QLabel('&Filename:', fnhbox)
         self.filenameedit = qt.QLineEdit(fnhbox)
@@ -96,7 +97,7 @@ class ImportFITS(qt.QDialog):
 
         # dataset name
         h = qt.QHBox(self)
-        h.setSpacing(self.spacing)
+        h.setSpacing(spacing)
         layout.addWidget(h)
         l = qt.QLabel('Dataset &name:', h)
         l.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
@@ -108,10 +109,17 @@ class ImportFITS(qt.QDialog):
         self.connect(self.document, qt.PYSIGNAL('sigModified'),
                      self.populateDatasetNames)
 
-        self.dspart = qt.QComboBox(h)
-        self.dspart.insertStrList(['Data', 'Symmetric error',
-                                   'Positive error', 'Negative error'])
-        self.dspart.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
+        g = qt.QGrid(2, self)
+        g.setSpacing(spacing)
+        layout.addWidget(g)
+        self.columncombos = []
+        for i in ('&Data:', '&Symmetric error:', '&Positive error:',
+                  'Ne&gative error:'):
+            l = qt.QLabel(i, g)
+            c = qt.QComboBox(g)
+            l.setBuddy(c)
+            c.setEnabled(False)
+            self.columncombos.append(c)
 
         # whether to link the dataset
         self.linkds = qt.QCheckBox('&Link the dataset to the file',
@@ -122,7 +130,7 @@ class ImportFITS(qt.QDialog):
         w = qt.QWidget(self)
         layout.addWidget(w)
         w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        l = qt.QHBoxLayout(w, 0, self.spacing)
+        l = qt.QHBoxLayout(w, 0, spacing)
         l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
                                   qt.QSizePolicy.Minimum) )
         
@@ -143,10 +151,18 @@ class ImportFITS(qt.QDialog):
         """Browse button pressed in dialog."""
 
         fd = qt.QFileDialog(self, 'importfitsdialog', True)
-        fd.setDir( ImportFITS.dirname )
         fd.setMode( qt.QFileDialog.ExistingFile )
         fd.setCaption('Browse FITS file')
         fd.addFilter('FITS files (*.fits *.FITS)')
+
+        # use filename to guess a path if possible
+        filename = unicode(self.filenameedit.text())
+        if os.path.isdir(filename):
+            ImportFITS.dirname = filename
+        elif os.path.isdir( os.path.dirname(filename) ):
+            ImportFITS.dirname = os.path.dirname(filename)
+        
+        fd.setDir( ImportFITS.dirname )
 
         # okay was selected
         if fd.exec_loop() == qt.QDialog.Accepted:
@@ -185,20 +201,15 @@ class ImportFITS(qt.QDialog):
             item = qt.QListViewItem(lv, str(hdunum), hdu.name)
             item.hdu = hdunum
             try:
-                # if it's table
+                # if this fails, show an image
+                cols = hdu.get_coldefs()
+
+                # it's a table
+                item.columns = cols
                 rows = header['NAXIS2']
                 text = 'Table (%i rows)' % rows
                 item.setText(2, text)
                 item.type = 'table'
-
-                # get the columns, and add them as items
-                cols = hdu.get_coldefs()
-                for num, col in itertools.izip(itertools.count(1), cols):
-                    i = qt.QListViewItem(item, str(num), col.name,
-                                         'Column (%s)' % col.format)
-                    i.hdu = hdunum
-                    i.column = col.name
-                    i.type = 'column'
 
             except AttributeError:
                 # this is an image
@@ -220,29 +231,37 @@ class ImportFITS(qt.QDialog):
         """Enable/disable controls when items are changed."""
 
         enableimport = False
-        enabletype = False
+        enablecolumns = False
 
         # is item is selected in listview?
         item = self.listview.selectedItem()
         if item != None:
-            enableimport = item.type in ('image', 'column')
-            enabletype = item.type != 'image'
+            enableimport = True
 
         # any name for the dataset?
         if unicode(self.dsname.currentText()) == '':
             enableimport = False
 
+        # the actual import button
         self.importbutton.setEnabled(enableimport)
-        self.dspart.setEnabled(enabletype)
+
+        # populate columns combos
+        cols = ['N/A']
+        if item != None and item.type == 'table':
+            enablecolumns = True
+            cols = ['None']
+            cols += ['%s (%s)' %
+                     (i.name, i.format) for i in item.columns]
+
+        for i in self.columncombos:
+            i.setEnabled(enablecolumns)
+            i.clear()
+            i.insertStrList(cols)
     
     def slotSelectionChanged(self, item):
         """An item is selected in the list view - enable/disable import"""
         self.updateEnabledControls()
         self.populateDatasetNames()
-
-        # automatically provide dataset name from column name
-        if item.type == 'column':
-            self.dsname.setCurrentText(item.column.lower())
 
     def slotDatasetNameChanged(self, name):
         """Dataset name is changed."""
@@ -265,17 +284,25 @@ class ImportFITS(qt.QDialog):
         item = self.listview.selectedItem()
         filename = unicode(self.filenameedit.text())
         name = unicode(self.dsname.currentText())
+        linked = self.linkds.isChecked()
 
-        f = pyfits.open(filename, 'readonly')
-
-        if item.type == 'image':
-            hdu = f[item.hdu]
-            data = hdu.data
-            ds = document.Dataset2D(data)
-            self.document.setData(name, ds)
+        if item.type == 'table':
+            # if item is a table
+            cols = []
+            for c in self.columncombos:
+                i = c.currentItem()
+                if i == 0:
+                    cols.append(None)
+                else:
+                    cols.append(item.columns[i-1].name)
 
         else:
-            pass
+            # item is an image, so no columns
+            cols = [None]*4
 
-        f.close()
+        # actually import the data
+        self.document.importFITS(name, filename, item.hdu,
+                                 datacol=cols[0], symerrcol=cols[1],
+                                 poserrcol=cols[2], negerrcol=cols[3],
+                                 linked=linked)
         

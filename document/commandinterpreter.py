@@ -88,6 +88,7 @@ class CommandInterpreter:
             'ImportString2D': i.ImportString2D,
             'ImportFile': i.ImportFile,
             'ImportFile2D': i.ImportFile2D,
+            'ImportFITSFile': i.ImportFITSFile,
             'List': i.List,
             'Load': self.Load,
             'Print': i.Print,

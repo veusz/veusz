@@ -136,14 +136,22 @@ class ImportDialogBase(qt.QDialog):
         """Browse button pressed in dialog."""
 
         fd = qt.QFileDialog(self, 'import dialog', True)
-        fd.setDir( ImportDialog.dirname )
         fd.setMode( qt.QFileDialog.ExistingFile )
         fd.setCaption('Browse data file')
 
+        # use filename to guess a path if possible
+        filename = unicode(self.filenameedit.text())
+        if os.path.isdir(filename):
+            ImportDialogBase.dirname = filename
+        elif os.path.isdir( os.path.dirname(filename) ):
+            ImportDialogBase.dirname = os.path.dirname(filename)
+        
+        fd.setDir( ImportDialogBase.dirname )
+        
         # okay was selected
         if fd.exec_loop() == qt.QDialog.Accepted:
             # save directory for next time
-            ImportDialog.dirname = fd.dir()
+            ImportDialogBase.dirname = fd.dir()
             # update the edit box
             self.filenameedit.setText( fd.selectedFile() )
 

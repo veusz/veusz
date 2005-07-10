@@ -264,6 +264,28 @@ class CommandInterface(qt.QObject):
 
         return (datasets, errors)
 
+    def ImportFITSFile(self, dsname, filename, hdu,
+                       datacol = None, symerrcol = None,
+                       poserrcol = None, negerrcol = None,
+                       linked = False):
+        """Import data from a FITS file
+
+        dsname is the name of the dataset
+        filename is name of the fits file to open
+        hdu is the number/name of the hdu to access
+
+        if the hdu is a table, datacol, symerrcol, poserrcol and negerrcol
+        specify the columns containing the data, symmetric error,
+        positive and negative errors.
+
+        linked specfies that the dataset is linked to the file
+        """
+
+        self.document.importFITS(dsname, filename, hdu,
+                                 datacol=datacol, symerrcol=symerrcol,
+                                 poserrcol=poserrcol, negerrcol=negerrcol,
+                                 linked=linked)
+
     def ReloadData(self):
         """Reload any linked datasets.
 

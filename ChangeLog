@@ -1,3 +1,8 @@
+* 2005-07-10 Jeremy Sanders <jeremy@jeremysanders.net>
+	- FITS dialog finished
+	- FITS data can be linked to files
+	- ImportFITSFile added to command interface
+	
 * 2005-07-05 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Start FITS import dialog
 	

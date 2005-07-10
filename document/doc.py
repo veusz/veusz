@@ -94,11 +94,64 @@ class LinkedFile:
         # of errors
         return (read, errors)
 
+class LinkedFITSFile:
+    """Links a FITS file to the data."""
+    
+    def __init__(self, dsname, filename, hdu, columns):
+        '''Initialise the linked file object
+
+        dsname is name of dataset
+        filename is filename to load data from
+        hdu is the hdu to load the data from
+        columns is a list of columns for data, sym, pos and neg data
+        '''
+        
+        self.dsname = dsname
+        self.filename = filename
+        self.hdu = hdu
+        self.columns = columns
+
+    def saveToFile(self, file):
+        '''Save the link to the document file.'''
+
+        args = [self.dsname, self.filename, self.hdu]
+        args = [repr(i) for i in args]
+        for c, a in itertools.izip(self.columns,
+                                   ('datacol', 'symerrcol',
+                                    'poserrcol', 'negerrcol')):
+            if c != None:
+                args.append('%s=%s' % (a, repr(c)))
+        args.append('linked=True')
+
+        file.write('ImportFITSFile(%s)\n' % ', '.join(args))
+
+    def reloadLinks(self, document):
+        '''Reload datasets linked to this file.'''
+
+        document.importFITS(self.dsname, self.filename,
+                            self.hdu,
+                            datacol = self.columns[0],
+                            symerrcol = self.columns[1],
+                            poserrcol = self.columns[2],
+                            negerrcol = self.columns[3])
+
 class DatasetBase(object):
     """A base dataset class."""
 
     # number of dimensions the dataset holds
     dimensions = 0
+
+    def saveLinksToSavedDoc(self, file, savedlinks):
+        '''Save the link to the saved document, if this dataset is linked.
+
+        savedlinks is a dict containing any linked files which have
+        already been written
+        '''
+
+        # links should only be saved once
+        if self.linked != None and self.linked not in savedlinks:
+            savedlinks[self.linked] = True
+            self.linked.saveToFile(file)
 
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
@@ -129,11 +182,12 @@ class Dataset2D(DatasetBase):
     def getDataRanges(self):
         return self.xrange, self.yrange
 
-    def saveLinksToSavedDoc(self, file, savedlinks):
-        pass
-
     def saveToFile(self, file, name):
         """Write the 2d dataset to the file given."""
+
+        # return if there is a link
+        if self.linked != None:
+            return
 
         file.write("ImportString2D(%s, '''\n" % repr(name))
         file.write("xrange %e %e\n" % self.xrange)
@@ -234,18 +288,6 @@ class Dataset(DatasetBase):
             assert i == None or i.shape == s
 
         self.document.setModified(True)
-
-    def saveLinksToSavedDoc(self, file, savedlinks):
-        '''Save the link to the saved document, if this dataset is linked.
-
-        savedlinks is a dict containing any linked files which have
-        already been written
-        '''
-
-        # links should only be saved once
-        if self.linked != None and self.linked not in savedlinks:
-            savedlinks[self.linked] = True
-            self.linked.saveToFile(file)
 
     def saveToFile(self, file, name):
         '''Save data to file.
@@ -598,3 +640,86 @@ class Document( qt.QObject ):
         # return widget
         return obj
 
+    def importFITS(self, dsname, filename, hdu,
+                   datacol = None, symerrcol = None,
+                   poserrcol = None, negerrcol = None,
+                   linked = False):
+        """Import dataset from FITS file.
+
+        dsname is the name of the dataset
+        filename is name of the fits file to open
+        hdu is the number/name of the hdu to access
+
+        if the hdu is a table, datacol, symerrcol, poserrcol and negerrcol
+        specify the columns containing the data, symmetric error,
+        positive and negative errors.
+
+        linked specfies that the dataset is linked to the file
+        """
+
+        try:
+            import pyfits
+        except ImportError:
+            raise RuntimeError, ( 'PyFITS is required to import '
+                                  'data from FITS files' )
+
+        f = pyfits.open(filename, 'readonly')
+        rhdu = f[hdu]
+        data = rhdu.data
+
+        try:
+            # raise an exception if this isn't a table
+            cols = rhdu.get_coldefs()
+
+            datav = None
+            symv = None
+            posv = None
+            negv = None
+
+            # read the columns required
+            if datacol != None:
+                datav = data.field(datacol)
+            if symerrcol != None:
+                symv = data.field(symerrcol)
+            if poserrcol != None:
+                posv = data.field(poserrcol)
+            if negerrcol != None:
+                negv = data.field(negerrcol)
+
+            # actually create the dataset
+            ds = Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
+
+        except AttributeError:
+            # Import a 2D image
+            if ( datacol != None or symerrcol != None or poserrcol != None
+                 or negerrcol != None ):
+                print "Warning: ignoring columns as import 2D dataset"
+
+            header = rhdu.header
+
+            try:
+                # try to read WCS for image, and work out x/yrange
+                wcs = [header[i] for i in ('CRVAL1', 'CRPIX1', 'CDELT1',
+                                           'CRVAL2', 'CRPIX2', 'CDELT2')]
+
+                # ximage = (xpix-crpix)*cdelt + crval
+                xrange = ( (0-wcs[1])*wcs[2] + wcs[0],
+                           (data.shape[1]-wcs[1])*wcs[2] + wcs[0] )
+                yrange = ( (0-wcs[4])*wcs[5] + wcs[3],
+                           (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
+
+            except KeyError:
+                # no / broken wcs
+                xrange = None
+                yrange = None
+
+            ds = Dataset2D(data, xrange=xrange, yrange=yrange)
+
+        if linked:
+            ds.linked = LinkedFITSFile(dsname, filename, hdu,
+                                       [datacol, symerrcol,
+                                        poserrcol, negerrcol])
+
+        self.setData(dsname, ds)
+        f.close()
+        
