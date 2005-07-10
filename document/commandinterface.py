@@ -211,26 +211,32 @@ class CommandInterface(qt.QObject):
             if self.verbose:
                 print "Imported dataset %s" % name
 
-    def ImportFile2D(self, filename, datasets, linked=False):
-        """Import two-dimensional data from a string.
+    def ImportFile2D(self, filename, datasets, xrange=None, yrange=None,
+                     invertrows=None, invertcols=None, transpose=None,
+                     linked=False):
+        """Import two-dimensional data from a file.
         filename is the name of the file to read
         datasets is a list of datasets to read from the file, or a single
         dataset name
-        """
 
-        # FIXME - links not implemented
+        xrange is a tuple containing the range of data in x coordinates
+        yrange is a tuple containing the range of data in y coordinates
+        if invertrows=True, then rows are inverted when read
+        if invertcols=True, then cols are inverted when read
+        if transpose=True, then rows and columns are swapped
+
+        if linked=True then the dataset is linked to the file
+        """
 
         if type(datasets) in (str, unicode):
             datasets = [datasets]
 
-        f = open(filename, 'r')
-        stream = simpleread.FileStream(f)
-        for name in datasets:
-            sr = simpleread.SimpleRead2D(name)
-            sr.readData(stream)
-            sr.setInDocument(self.document)
-            if self.verbose:
-                print "Imported dataset %s" % name
+        self.document.import2D(filename, datasets, xrange=xrange,
+                               yrange=yrange, invertrows=invertrows,
+                               invertcols=invertcols, transpose=transpose,
+                               linked=linked)
+        if self.verbose:
+            print "Imported datasets %s" % (', '.join(datasets))
 
     def ImportFile(self, filename, descriptor, linked=False):
         """Read data from file with filename using descriptor.

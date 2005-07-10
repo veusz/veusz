@@ -89,9 +89,66 @@ class LinkedFile:
                 read.append(name)
                 document.data[name] = ds
                 ds.document = document
+        document.setModified(True)
 
         # returns list of datasets read, and a dict of variables with number
         # of errors
+        return (read, errors)
+
+class Linked2DFile:
+    '''Class representing a file linked to a 2d dataset.'''
+
+    def __init__(self, filename, datasets):
+        self.filename = filename
+        self.datasets = datasets
+
+        self.xrange = None
+        self.yrange = None
+        self.invertrows = None
+        self.invertcols = None
+        self.transpose = None
+
+    def saveToFile(self, file):
+        '''Save the link to the document file.'''
+
+        args = [repr(self.filename), repr(self.datasets)]
+        for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose'):
+            v = getattr(self, p)
+            if v != None:
+                args.append( '%s=%s' % (p, repr(v)) )
+        args.append('linked=True')
+
+        file.write('ImportFile2D(%s)\n' % ', '.join(args))
+
+    def reloadLinks(self, document):
+        '''Reload datasets linked to this file.
+        '''
+
+        # put data in a temporary document as above
+        tempdoc = Document()
+        try:
+            tempdoc.import2D(self.filename, self.datasets, xrange=self.xrange,
+                             yrange=self.yrange, invertrows=self.invertrows,
+                             invertcols=self.invertcols,
+                             transpose=self.transpose)
+        except simpleread.Read2DError:
+            errors = {}
+            for i in self.datasets:
+                errors[i] = 1
+            return ([], errors)
+
+        # move new datasets in if they are linked to us
+        read = []
+        errors = {}
+        for name, ds in tempdoc.data.items():
+            if name in document.data and document.data[name].linked == self:
+                read.append(name)
+                errors[name] = 0
+                ds.linked = self
+                document.data[name] = ds
+                ds.document = document
+        document.setModified(True)
+
         return (read, errors)
 
 class LinkedFITSFile:
@@ -640,6 +697,51 @@ class Document( qt.QObject ):
 
         # return widget
         return obj
+
+    def import2D(self, filename, datasets, xrange=None, yrange=None,
+                 invertrows=None, invertcols=None, transpose=None,
+                 linked=False):
+        """Import two-dimensional data from a file.
+        filename is the name of the file to read
+        datasets is a list of datasets to read from the file, or a single
+        dataset name
+
+        xrange is a tuple containing the range of data in x coordinates
+        yrange is a tuple containing the range of data in y coordinates
+        if invertrows=True, then rows are inverted when read
+        if invertcols=True, then cols are inverted when read
+        if transpose=True, then rows and columns are swapped
+
+        if linked=True then the dataset is linked to the file
+        """
+        
+        if linked:
+            LF = Linked2DFile(filename, datasets)
+            LF.xrange = xrange
+            LF.yrange = yrange
+            LF.invertrows = invertrows
+            LF.invertcols = invertcols
+            LF.transpose = transpose
+        else:
+            LF = None
+
+        f = open(filename, 'r')
+        stream = simpleread.FileStream(f)
+        for name in datasets:
+            sr = simpleread.SimpleRead2D(name)
+            if xrange != None:
+                sr.xrange = xrange
+            if yrange != None:
+                sr.yrange = yrange
+            if invertrows != None:
+                sr.invertrows = invertrows
+            if invertcols != None:
+                sr.invertcols = invertcols
+            if transpose != None:
+                sr.transpose = transpose
+
+            sr.readData(stream)
+            sr.setInDocument(self, linkedfile=LF)
 
     def importFITS(self, dsname, filename, hdu,
                    datacol = None, symerrcol = None,

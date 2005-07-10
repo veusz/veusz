@@ -363,50 +363,45 @@ class ImportDialog2D(ImportDialogBase):
                 pass
             ranges.append(r)
 
-        # open file (shouldn't have got here if the file didn't exist
+        # propagate settings from dialog to reader
+        xrange = None
+        yrange = None
+        invertrows = None
+        invertcols = None
+        transpose = None
+        linked = self.linkcheck.isChecked()
+        
+        if ranges[0] != None and ranges[1] != None:
+            xrange = (ranges[0], ranges[1])
+        if ranges[2] != None and ranges[3] != None:
+            yrange = (ranges[2], ranges[3])
+        if self.invertrows.isChecked():
+            invertrows = True
+        if self.invertcols.isChecked():
+            invertcols = True
+        if self.transpose.isChecked():
+            transpose = True
+
+        # get filename
         filename = unicode( self.filenameedit.text() )
         filename = os.path.abspath(filename)
-        ifile = open(filename, 'r')
-
-        # open up an import stream
-        stream = document.FileStream(ifile)
 
         # show a busy cursor
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
         # loop over datasets and read...
-        lines = []
-        for dsname in datasets:
-            sr = document.SimpleRead2D(dsname)
-
-            # propagate settings from dialog to reader
-            if ranges[0] != None and ranges[1] != None:
-                sr.xrange = (ranges[0], ranges[1])
-            if ranges[2] != None and ranges[3] != None:
-                sr.yrange = (ranges[2], ranges[3])
-            if self.invertrows.isChecked():
-                sr.invertrows = True
-            if self.invertcols.isChecked():
-                sr.invertcols = True
-            if self.transpose.isChecked():
-                sr.transpose = True
-
-            try:
-                # actually read the data
-                sr.readData(stream)
-                sr.setInDocument(self.document)
-                shape = self.document.getData(dsname).data.shape
-                lines.append('Imported dataset "%s" (%i*%i)' % (dsname,
-                                                                shape[1],
-                                                                shape[0]))
-            except document.Read2DError, e:
-                # error reading data
-                lines.append('Error importing dataset "%s":' % dsname)
-                lines.append(' %s' % str(e))
+        try:
+            self.document.import2D(filename, datasets, xrange=xrange,
+                                   yrange=yrange, invertrows=invertrows,
+                                   invertcols=invertcols, transpose=transpose,
+                                   linked=linked)
+            output = 'Successfully read datasets %s' % (' ,'.join(datasets))
+        except document.Read2DError, e:
+            output = 'Error importing datasets:\n %s' % str(e)
                 
         # restore the cursor
         qt.QApplication.restoreOverrideCursor()
 
         # show status in preview box
-        self.previewedit.setText('\n'.join(lines))
+        self.previewedit.setText(output)
  
