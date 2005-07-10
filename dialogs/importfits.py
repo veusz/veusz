@@ -25,8 +25,6 @@ import os.path
 
 import qt
 
-import document
-
 # delay initialisation until dialog is opened
 pyfits = None
 
