@@ -134,6 +134,7 @@ class LinkedFITSFile:
                             symerrcol = self.columns[1],
                             poserrcol = self.columns[2],
                             negerrcol = self.columns[3])
+        return (self.dsname, {self.dsname: 0})
 
 class DatasetBase(object):
     """A base dataset class."""
@@ -703,8 +704,8 @@ class Document( qt.QObject ):
                                            'CRVAL2', 'CRPIX2', 'CDELT2')]
 
                 # ximage = (xpix-crpix)*cdelt + crval
-                xrange = ( (0-wcs[1])*wcs[2] + wcs[0],
-                           (data.shape[1]-wcs[1])*wcs[2] + wcs[0] )
+                xrange = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
+                           (0-wcs[1])*wcs[2] + wcs[0])
                 yrange = ( (0-wcs[4])*wcs[5] + wcs[3],
                            (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
 
