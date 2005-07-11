@@ -1,3 +1,7 @@
+* 2005-07-11 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Add patch by James Graham to add the correct extension to
+	an exported file if it is not given (slightly modified)
+	
 * 2005-07-10 Jeremy Sanders <jeremy@jeremysanders.net>
 	- FITS dialog finished
 	- FITS data can be linked to files

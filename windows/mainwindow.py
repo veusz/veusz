@@ -84,7 +84,8 @@ class MainWindow(qt.QMainWindow):
         self.statusBar().addWidget(self.pagelabel)
 
         self.dirname = ''
-
+        self.exportDir = ''
+        
         self.connect( self.plot, qt.PYSIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
 
@@ -138,7 +139,7 @@ class MainWindow(qt.QMainWindow):
                 else:
                     CreateWindow(files[0])
                 for filename in files[1:]:
-                    CreateWindow(filename, self)
+                    CreateWindow(filename)
             
             
     def _getVeuszFiles(self, event):
@@ -424,7 +425,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotFileNew(self):
         """New file."""
-        CreateWindow(opener=self)
+        CreateWindow()
 
     def slotFileSave(self):
         """Save file."""
@@ -503,9 +504,10 @@ class MainWindow(qt.QMainWindow):
 
         # show busy cursor
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
-
+        
         try:
-            # load the document in a new window
+            # load the document in the current window
+            self.dirname = os.path.dirname(filename)
             self.interpreter.Load(filename)
             self.document.setModified(False)
             self.filename = filename
@@ -555,26 +557,63 @@ class MainWindow(qt.QMainWindow):
                 self.openFile(filename)
             else:
                 # create a new window
-                CreateWindow(filename, self)
+                CreateWindow(filename)
                 
     def slotFileExport(self):
         """Export the graph."""
 
+        #XXX - This should be disabled if the page count is 0
+
+        #File types we can export to in the form ([extensions], Name)
+        formats = [(["eps"], "Encapsulated Postscript"),
+                   (["png"], "Portable Network Graphics")]
+
         fd = qt.QFileDialog(self, 'export dialog', True)
-        fd.setDir( self.dirname )
+        if not self.exportDir:
+            fd.setDir( self.dirname )
+        else:
+            fd.setDir( self.exportDir )
+            
         fd.setMode( qt.QFileDialog.AnyFile )
-        fd.setFilters( "Encapsulated Postscript (*.eps);;"
-                       "Portable Network Graphics (*.png)" )
+
+        #Create a mapping between a format string and extensions
+        filtertoext = {}
+        filters = []
+        # a list of extensions which are allowed
+        validextns = []
+        for extns, name in formats:
+            extensions = " ".join(["(*." + item + ")"
+                                   for item in extns])
+            #join eveything together to make a filter string
+            filterstr = " ".join([name, extensions])
+            filtertoext[filterstr] = extns
+            filters.append(filterstr)
+            validextns += extns
+
+        print validextns
+            
+        fd.setFilters(";;".join(filters))
+            
         fd.setCaption('Export')
 
         if fd.exec_loop() == qt.QDialog.Accepted:
             # save directory for next time
-            self.dirname = fd.dir()
+            self.exportDir = fd.dir()
 
+            filterused = str(fd.selectedFilter())
+            chosenextns = filtertoext[filterused]
+            
             # show busy cursor
             qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
             filename = unicode( fd.selectedFile() )
+            
+            # Add a default extension if one isn't supplied
+            # this is the extension without the dot
+            ext = os.path.splitext(filename)[1][1:]
+            if (ext not in validextns) and (ext not in chosenextns):
+                filename = filename + "." + returnedextns[0]
+
             try:
                 self.document.export(filename, self.plot.getPageNumber())
             except (IOError, RuntimeError), inst:
@@ -690,12 +729,10 @@ class MainWindow(qt.QMainWindow):
         self.actions['viewprevpage'].setEnabled( number != 0 )
         self.actions['viewnextpage'].setEnabled( number < np-1 )
 
-def CreateWindow(filename=None, opener=None):
+def CreateWindow(filename=None):
     """Window factory function"""
     win = MainWindow()
     win.show()
     if filename:
         win.openFile(filename)
-    if opener:
-        win.dirname = opener.dirname
     return win
