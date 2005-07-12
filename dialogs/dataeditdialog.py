@@ -404,7 +404,7 @@ class DatasetNewDialog(qt.QDialog):
                 # this assumes that dataset has members data, serr, nerr, perr
                 env = fnenviron.copy()
                 for name, ds in self.document.data.iteritems():
-                    env[name] = ds.__dict__[key]
+                    env[name] = getattr(ds, key)
 
                 # evaluate the expression
                 try:

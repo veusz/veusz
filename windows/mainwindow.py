@@ -590,8 +590,6 @@ class MainWindow(qt.QMainWindow):
             filters.append(filterstr)
             validextns += extns
 
-        print validextns
-            
         fd.setFilters(";;".join(filters))
             
         fd.setCaption('Export')
