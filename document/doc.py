@@ -811,6 +811,10 @@ class Document( qt.QObject ):
                 yrange = ( (0-wcs[4])*wcs[5] + wcs[3],
                            (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
 
+                print "xrange", xrange
+                print "yrange", yrange
+                xrange = (xrange[1], xrange[0])
+
             except KeyError:
                 # no / broken wcs
                 xrange = None

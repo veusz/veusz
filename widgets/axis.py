@@ -190,11 +190,16 @@ class Axis(widget.Widget):
                                          max(1., self.plottedrange[0]*0.1) )
 
         # handle axis values round the wrong way
-        if self.plottedrange[0] >= self.plottedrange[1]:
-            self.plottedrange = [1e-2, 1.]
+        invertaxis = self.plottedrange[0] > self.plottedrange[1]
+        if invertaxis:
+            self.plottedrange.reverse()
 
-        if self.plottedrange[0] <= 0. and s.log:
-            self.plottedrange[0] = 1e-99
+        # make sure log axes don't blow up
+        if s.log:
+            if self.plottedrange[0] <= 0.:
+                self.plottedrange[0] = 1e-99
+            if self.plottedrange[1] <= 0.:
+                self.plottedrange[1] = 1e-99
 
         # work out tick values and expand axes if necessary
         as = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
@@ -205,6 +210,10 @@ class Axis(widget.Widget):
 
         (self.plottedrange[0],self.plottedrange[1],
          self.majortickscalc, self.minortickscalc) =  as.getTicks()
+
+        # invert bounds if axis was inverted
+        if invertaxis:
+            self.plottedrange.reverse()
 
         if self.majorticks != None:
             self.majortickscalc = N.array(self.majorticks)
