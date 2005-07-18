@@ -112,9 +112,13 @@ class Key(widget.Widget):
         # work out vertical position
         v = s.vertPosn
         if v == 'top':
-            y = parentposn[1] + height
+            y = parentposn[1]
+            if not s.Border.hide:
+                y += height
         elif v == 'bottom':
-            y = parentposn[3] - height - totalheight
+            y = parentposn[3] - totalheight
+            if not s.Border.hide:
+                y -= height
         elif v == 'centre':
             y = (parentposn[1] +
                  (parentposn[3] - parentposn[1])/2 - totalheight/2)

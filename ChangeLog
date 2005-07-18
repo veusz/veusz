@@ -1,3 +1,6 @@
+* 2005-07-18 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Make area around key smaller if no border
+	
 * 2005-07-17 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Handle axis with max < min (reversed)
 	- Get RA WCS correct on FITS import
