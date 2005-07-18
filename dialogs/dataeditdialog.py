@@ -405,6 +405,9 @@ class DatasetNewDialog(qt.QDialog):
                 env = fnenviron.copy()
                 for name, ds in self.document.data.iteritems():
                     env[name] = getattr(ds, key)
+                    # also provide other parts of dataset for expression
+                    for otherkey in self.dsedits.iterkeys():
+                        env["%s_%s" % (name, otherkey)] = getattr(ds, otherkey)
 
                 # evaluate the expression
                 try:
