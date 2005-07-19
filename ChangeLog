@@ -1,3 +1,6 @@
+* 2005-07-19 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Document FITS import and 2D dataset commands
+	
 * 2005-07-18 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Make area around key smaller if no border
 	

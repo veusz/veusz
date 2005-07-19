@@ -800,6 +800,93 @@ SetData('x', data[0]*0.1, *data[1:])
       </section>
       
       <section>
+	<title><anchor id="Command.ImportFile2D" />ImportFile2D</title>
+	
+	<para><command>ImportFile2D('filename', datasets,
+xrange=(a,b), yrange=(c,d), invertrows=True/False,
+invertcols=True/False, transpose=True/False, linked=True/False)</command></para>
+	
+	<para>Imports two-dimensional data from a file. The required
+	arguments are the filename to load data from and the dataset
+	name, or a list of names to use.</para>
+
+	<para>filename is a string which contains the filename to
+	use. datasets is either a string (for a single dataset), or a
+	list of strings (for multiple datasets).</para>
+
+	<para>The xrange parameter is a tuple which contains the range
+	of the X-axis along the two-dimensional dataset, for example
+	(-1., 1.) represents an inclusive range of -1 to 1. The yrange
+	parameter specifies the range of the Y-axis similarly. If they
+	are not specified, (0, N) is the default, where N is the
+	number of datapoints along a particular axis.</para>
+
+	<para>invertrows and invertcols if set to True, invert the
+	rows and columns respectively after they are read by
+	Veusz. transpose swaps the rows and columns.</para>
+
+	<para>If the linked parameter is True, then the datasets are
+	linked to the imported file, and are not saved within a saved
+	document.</para>
+
+	<para>The file format this command accepts is a
+	two-dimensional matrix of numbers, with the columns separated
+	by spaces or tabs, and the rows separated by new
+	lines. The X-coordinate is taken to be in the direction of the
+	columns. Comments are supported (use "#", "!" or "%"), as are
+	continuation characters ("\"). Separate datasets are
+	deliminated by using blank lines.</para>
+
+	<para>In addition to the matrix of numbers, the various
+	optional parameters this command takes can also be specified
+	in the data file. These commands should be given on separate
+	lines before the matrix of numbers. They are:</para>
+	<orderedlist>
+	  <listitem><para>xrange A B</para></listitem>
+	  <listitem><para>yrange C D</para></listitem>
+	  <listitem><para>invertrows</para></listitem>
+	  <listitem><para>invertcols</para></listitem>
+	  <listitem><para>transpose</para></listitem>
+	</orderedlist>
+
+      </section>
+
+      <section>
+	<title><anchor id="Command.ImportFITSFile" />
+	    ImportFITSFile</title>
+	
+	<para><command>ImportFITSFile(datasetname, filename, hdu,
+	    datacol='A', symerrcol='B', poserrcol='C', negerrcol='D',
+	    linked=True/False)</command></para>
+
+	<para>This command does a simple import from a FITS file. The
+FITS format is used within the astronomical community to transport
+binary data. For a more powerful FITS interface, you can use PyFITS
+within your scripts.</para>
+
+	<para>The datasetname is the name of the dataset to import,
+the filename is the name of the FITS file to import from. The hdu
+parameter specifies the HDU to import data from (numerical or a
+name).</para>
+
+	<para>If the HDU specified is a primary HDU or image
+	extension, then a two-dimensional dataset is loaded from the
+	file. The optional parameters (other than linked) are
+	ignored. Any WCS information within the HDU are used to
+	provide a suitable xrange and yrange.</para>
+
+	<para>If the HDU is a table, then the datacol parameter must
+	be specified (and optionally symerrcol, poserrcol and
+	negerrcol). The dataset is read in from the named column in
+	the table. Any errors are read in from the other specified
+	columns.</para>
+
+	<para>If linked is True, then the dataset is not saved with a
+	saved document, but is reread from the data file each time the
+	document is loaded.</para>
+      </section>
+	
+      <section>
 	<title><anchor id="Command.ImportString" />ImportString</title>
 	
 	<para><command>ImportString('descriptor',
@@ -830,6 +917,23 @@ ImportString('x y', '''
 
       </section>
       
+      <section>
+	<title><anchor
+	id="Command.ImportString2D" />ImportString2D</title>
+	
+	<para><command>ImportString2D(datasets,	string)</command></para>
+
+	<para>Imports a two-dimensional dataset from the string
+	given. This is similar to the <link
+	linkend="Command.ImportFile2D">ImportFile2D</link> command,
+	with the same dataset format within the string. This command,
+	however, does not currently take any optional parameters. The
+	various controlling parameters can be set within the
+	string. See the <link
+	linkend="Command.ImportFile2D">ImportFile2D</link> section for
+	details.</para>
+      </section>
+
       <section>
 	<title><anchor id="Command.List" />List</title>
 	
@@ -918,7 +1022,7 @@ Set('page1/graph1/x/min', -10.)
       </section>
 
       <section>
-	<title><anchor id="Command.SetData" />Set</title>
+	<title><anchor id="Command.SetData" />SetData</title>
 	
 	<para><command>SetData(name, val, symerr=None, negerr=None,
       poserr=None)</command></para>
@@ -930,6 +1034,21 @@ Set('page1/graph1/x/min', -10.)
       as lists or numarrays.</para>
       </section>
       
+      <section>
+	<title><anchor id="Command.SetData2D" />SetData2D</title>
+	
+	<para><command>SetData2D('name', val, xrange=(A,B),
+	yrange=(C,D))</command></para>
+
+	<para>Creates a two-dimensional dataset with the name
+	given. val is either a two-dimensional numarray array, or is a
+	list of lists, with each list in the list representing a
+	row.</para>
+
+	<para>xrange and yrange are optional tuples giving the
+	inclusive range of the X and Y coordinates of the data.</para>
+      </section>
+
       <section>
 	<title><anchor id="Command.SetVerbose" />SetVerbose</title>
 	

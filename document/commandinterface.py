@@ -194,7 +194,7 @@ class CommandInterface(qt.QObject):
 
         return (datasets, errors)
 
-    def ImportString2D(self, datasets, string=None):
+    def ImportString2D(self, datasets, string):
         """Read two dimensional data from the string specified.
         datasets is a list of datasets to read from the string or a single
         dataset name
