@@ -42,6 +42,7 @@ The first 3 mean the same thing, the last means read from 1 to 5
 
 import re
 import sys
+import itertools
 import StringIO
 
 import numarray as N
@@ -56,7 +57,7 @@ class DescriptorError(ValueError):
 class _DescriptorPart:
 
     # used to split the descriptor expression
-    partsplitter = re.compile( r'(\+-|\+|-|[a-zA-Z0-9_]+'
+    partsplitter = re.compile( r'(\+-|\+|-|[\.a-zA-Z0-9_]+'
                                r'|\[[\-0-9]*[:][\-0-9]*\]|,)' )
     # check a variable name
     #checkvar = re.compile(r'^[A-Za-z][A-za-z0-9]*$')
@@ -64,48 +65,41 @@ class _DescriptorPart:
     def __init__(self, text):
         """Initialise descriptor for 1 variable plus errors."""
 
-        self.symerr = -1
-        self.poserr = -1
-        self.negerr = -1
-        self.val = -1
         self.name = None
         self.errorcount = 0
+        self.columns = []
 
         self.startindex = None
         self.stopindex = None
 
-        # split up the expression into its components
+        # split up the expression into its components (removing blank parts)
         parts = _DescriptorPart.partsplitter.split(text)
+        parts = [i for i in parts if i != ""]
 
         index = 0
-        for p in parts:
-            if p == '':
-                pass
-            elif p == '+-':
-                self.symerr = index
-                index += 1
-            elif p == '+':
-                self.poserr = index
-                index += 1
-            elif p == '-':
-                self.negerr = index
-                index += 1
+        for count, part in itertools.izip(itertools.count(), parts):
+            if part == '+-':
+                self.columns.append('SYM')
+            elif part == '+':
+                self.columns.append('POS')
+            elif part == '-':
+                self.columns.append('NEG')
 
             # there's no match on this part
-            elif _DescriptorPart.partsplitter.match(p) == None:
+            elif _DescriptorPart.partsplitter.match(part) == None:
                 raise DescriptorError, ( 'Cannot understand descriptor '
-                                         'syntax "%s"' % p )
+                                         'syntax "%s"' % part )
 
             # column indicator
-            elif p[0] == '[':
+            elif part[0] == '[':
                 # remove brackets
-                p = p[1:-1]
+                part = part[1:-1]
 
                 # retrieve start and stop values if specified
-                colon = p.find(':')
+                colon = part.find(':')
                 if colon >= 0:
-                    startindex = p[:colon]
-                    stopindex = p[colon+1:]
+                    startindex = part[:colon]
+                    stopindex = part[colon+1:]
 
                     if len(startindex) > 0:
                         self.startindex = int(startindex)
@@ -116,15 +110,15 @@ class _DescriptorPart:
                     else:
                         self.stopindex = 999999
 
-            elif p == ',':
-                # skip
-                pass
+            elif part == ',':
+                # multiple commas skip columns
+                if count == len(parts)-1 or parts[count+1] == ',':
+                    self.columns.append('SKIP')
 
             # must be variable name
             else:
-                self.val = index
-                index += 1
-                self.name = p
+                self.columns.append('DATA')
+                self.name = part
 
         if self.name == None:
             raise DescriptorError, 'Value name missing in "%s"' % text
@@ -135,21 +129,24 @@ class _DescriptorPart:
             # one value only
             self.startindex = self.stopindex = 1
 
-    def readFromStream(self, stream, datasets):
+    def readFromStream(self, stream, datasets, block=None):
         """Read data from stream, and write to datasets."""
 
-        valindexes = (self.val, self.symerr, self.poserr, self.negerr)
         # loop over column range
         for index in xrange(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
-                name = '%s' % (self.name,)
+                name = self.name
             else:
                 name = '%s_%i' % (self.name, index)
 
+            # if we're reading multiple blocks
+            if block != None:
+                name += '_%i' % block
+
             # loop over columns until we run out, or we don't need any
-            count = 0
-            while count in valindexes:
+            for col in self.columns:
+                # get next column and return if we run out of data
                 val = stream.nextColumn()
                 if val == None:
                     return
@@ -161,24 +158,16 @@ class _DescriptorPart:
                     val = NIE.nan
                     self.errorcount += 1
 
-                # append a suffix to specfiy whether error or value
-                if count == self.symerr:
-                    fullname = '%s_sym' % name
-                elif count == self.poserr:
-                    fullname = '%s_pos' % name
-                elif count == self.negerr:
-                    fullname = '%s_neg' % name
-                else:
-                    fullname = name
+                # append a suffix to specify whether error or value
+                # \0 is used as the user cannot enter it
+                fullname = '%s\0%s' % (name, col)
 
                 # add data into dataset
                 if fullname not in datasets:
                     datasets[fullname] = []
                 datasets[fullname].append(val)
 
-                count += 1
-
-    def setInDocument(self, datasets, document, linkedfile=None):
+    def setInDocument(self, datasets, document, block=None, linkedfile=None):
         """Set the read-in data in the document."""
 
         names = []
@@ -188,21 +177,24 @@ class _DescriptorPart:
                 name = '%s' % (self.name,)
             else:
                 name = '%s_%i' % (self.name, index)
+            if block != None:
+                name += '_%i' % block
 
-            if name in datasets:
-                vals = datasets[name]
+            if name+'\0DATA' in datasets:
+                vals = datasets[name+'\0DATA']
                 pos = neg = sym = None
 
-                if name + '_pos' in datasets:
-                    pos = datasets[ name + '_pos' ]
-                if name + '_neg' in datasets:
-                    neg = datasets[ name + '_neg' ]
-                if name + '_sym' in datasets:
-                    sym = datasets[ name + '_sym' ]
+                # retrieve the data for this dataset
+                if name+'\0POS' in datasets:
+                    pos = datasets[name+'\0POS']
+                if name+'\0NEG' in datasets:
+                    neg = datasets[name+'\0NEG']
+                if name+'\0SYM' in datasets:
+                    sym = datasets[name+'\0SYM']
 
+                # create the dataset
                 ds = doc.Dataset( data = vals, serr = sym,
                                   nerr = neg, perr = pos )
-
                 ds.linked = linkedfile
 
                 document.setData( name, ds )
@@ -284,15 +276,28 @@ class SimpleRead:
     '''
     
     def __init__(self, descriptor):
-        self.parseDescriptor(descriptor)
+        self._parseDescriptor(descriptor)
         self.datasets = {}
 
-    def parseDescriptor(self, descriptor):
+    def _parseDescriptor(self, descriptor):
         """Take a descriptor, and parse it into its individual parts."""
 
         self.parts = [_DescriptorPart(i) for i in descriptor.split()]
 
-    def readData(self, stream):
+    def readData(self, stream, useblocks=False):
+        """Read in the data from the stream.
+
+        If useblocks is True, data are read as separate blocks.
+        Dataset names are appending with an underscore and a block
+        number if set.
+        """
+
+        if useblocks:
+            self._readDataBlocked(stream)
+        else:
+            self._readDataUnblocked(stream)
+
+    def _readDataUnblocked(self, stream):
         """Read in that data from the stream."""
 
         # loop over lines
@@ -300,6 +305,32 @@ class SimpleRead:
             for i in self.parts:
                 i.readFromStream(stream, self.datasets)
             stream.flushLine()
+        self.blocks = None
+
+    def _readDataBlocked(self, stream):
+        """Read in the data, using blocks."""
+
+        blocks = {}
+        block = 1
+        while stream.newLine():
+            l = stream.remainingline
+
+            # if this is a blank line, separating data then advance to a new
+            # block
+            if len(l) == 0 or l[0] == 'no':
+                # blank lines separate blocks
+                if block in blocks:
+                    block += 1
+            else:
+                # read in data
+                for i in self.parts:
+                    i.readFromStream(stream, self.datasets, block=block)
+                blocks[block] = True
+
+            # lose remaining data
+            stream.flushLine()
+
+        self.blocks = blocks.keys()
 
     def getInvalidConversions(self):
         """Return the number of invalid conversions after reading data.
@@ -317,10 +348,17 @@ class SimpleRead:
         Returns list of variable names read.
         """
 
+        # iterate over blocks used
+        if self.blocks == None:
+            blocks = [None]
+        else:
+            blocks = self.blocks
+
         names = []
-        for i in self.parts:
-            names += i.setInDocument(self.datasets, document,
-                                     linkedfile)
+        for b in blocks:
+            for i in self.parts:
+                names += i.setInDocument(self.datasets, document,
+                                         block=b, linkedfile=linkedfile)
 
         return names
 

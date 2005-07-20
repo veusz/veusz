@@ -172,8 +172,12 @@ class CommandInterface(qt.QObject):
 
         return (data, serr, nerr, perr)
 
-    def ImportString(self, descriptor, string):
+    def ImportString(self, descriptor, string, useblocks=False):
         """Read data from the string using a descriptor.
+
+        If useblocks is set, then blank lines or the word 'no' are used
+        to split the data into blocks. Dataset names are appended with an
+        underscore and the block number (starting from 1).
 
         Returned is a tuple (datasets, errors)
          where datasets is a list of datasets read
@@ -183,7 +187,7 @@ class CommandInterface(qt.QObject):
 
         stream = simpleread.StringStream(string)
         sr = simpleread.SimpleRead(descriptor)
-        sr.readData(stream)
+        sr.readData(stream, useblocks=useblocks)
         datasets = sr.setInDocument(self.document)
         errors = sr.getInvalidConversions()
 
@@ -238,10 +242,14 @@ class CommandInterface(qt.QObject):
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasets))
 
-    def ImportFile(self, filename, descriptor, linked=False):
+    def ImportFile(self, filename, descriptor, useblocks=False, linked=False):
         """Read data from file with filename using descriptor.
         If linked is True, the data won't be saved in a saved document,
         the data will be reread from the file.
+
+        If useblocks is set, then blank lines or the word 'no' are used
+        to split the data into blocks. Dataset names are appended with an
+        underscore and the block number (starting from 1).
 
         Returned is a tuple (datasets, errors)
          where datasets is a list of datasets read
@@ -251,14 +259,14 @@ class CommandInterface(qt.QObject):
 
         # if there's a link, set it up
         if linked:
-            LF = doc.LinkedFile(filename, descriptor)
+            LF = doc.LinkedFile(filename, descriptor, useblocks=useblocks)
         else:
             LF = None
 
         f = open(filename, 'r')
         stream = simpleread.FileStream(f)
         sr = simpleread.SimpleRead(descriptor)
-        sr.readData(stream)
+        sr.readData(stream, useblocks=useblocks)
         datasets = sr.setInDocument(self.document,
                                     linkedfile=LF)
         errors = sr.getInvalidConversions()

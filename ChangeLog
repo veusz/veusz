@@ -1,3 +1,7 @@
+* 2005-07-20 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Add support for blocks of data in import files
+	- Add support for skipped columns using a comma
+	
 * 2005-07-19 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Document FITS import and 2D dataset commands
 	

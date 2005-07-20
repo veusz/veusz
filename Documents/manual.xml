@@ -491,18 +491,31 @@
 
   <!---------------------------------------------------------------->
   <chapter>
-    <title>Reading data</title>
-    <para>Currently Veusz supports reading data from text file (fits
-      support and a qdp-alike interface are also planned). Reading
-      data is supported using the "Data, Import" dialog, or using the
-      <link linkend="Command.ImportFile">ImportFile</link> and <link
-      linkend="Command.ImportString">ImportString</link> commands which
-      read data from files or an existing Python string (allowing data
-      to be embedded in a Python script). Alternatively, a user may
-      read the data themselves using a Python script, and import it
-      into the program with the <link
-      linkend="Command.SetData">SetData</link> command.</para>
+    <title>Reading data</title> <para>Currently Veusz supports reading
+    data from text file (a qdp-alike interface is also
+    planned). Reading data is supported using the "Data, Import"
+    dialog, or using the <link
+    linkend="Command.ImportFile">ImportFile</link> and <link
+    linkend="Command.ImportString">ImportString</link> commands which
+    read data from files or an existing Python string (allowing data
+    to be embedded in a Python script). Alternatively, a user may read
+    the data themselves using a Python script, and import it into the
+    program with the <link linkend="Command.SetData">SetData</link>
+    command.</para>
     
+    <para>In addition data may also be read in from FITS files if the
+    PyFITS Python module is installed. FITS is a widespread
+    astronomical data format. FITS files are read using the "Data,
+    Import FITS" dialog or using the <link
+    linkend="Command.ImportFITSFile">ImportFITSFile</link>
+    command.</para>
+
+    <para>Two dimensional data are also supported using the "Data,
+    Import 2D" dialog box, <link
+    linkend="Command.ImportFile2D">ImportFile2D</link> and <link
+    linkend="Command.ImportString2D">ImportString2D</link>
+    commands.</para>
+
     <section>
       <title><anchor id="Descriptors" />Descriptors</title>
       
@@ -555,12 +568,14 @@
 	    columns as a dataset and its symmetric error, calling them
 	    "y[1]" to "y[n]".</para>
 	</listitem>
+
+	<listitem>
+	  <para><command>x,,+-</command> - read the first column as
+	  the x dataset, skip a column, and read the third column as
+	  its symmetric error.</para>
+	</listitem>
       </orderedlist>
       
-      <para>Veusz will also support "blocks" of data in the future,
-	separated by blank lines or a block separator. Unfortunately
-	these haven't been implemented yet.</para>
-
       <para>When reading in data, Veusz just uses whitespace for
 	separating columns. The columns do not actually need to be in
 	columns! Furthermore a "\" symbol can be placed at the end of
@@ -569,6 +584,16 @@
 	addition comments and blank lines are ignored. Comments start
 	with a "#", ";", "!" or "%", and continue until the end of the
 	line.</para>
+
+      <para>Data may be optionally split into "blocks" of data
+      separated by blank lines (or the word "no" on a line, for
+      obscure reasons). The name of each read in dataset has an
+      underscore and the number of the block (starting from 1)
+      added. This is specified by clicking the blocks checkbox in the
+      import dialog, or by using the useblocks=True option on the
+      <link linkend="Command.ImportFile">ImportFile</link> or <link
+      linkend="Command.ImportString">ImportString</link>
+      commands.</para>
 
       <para>If data are imported from a file, Veusz will normally save
       the data in its saved document format. If the data are changing,

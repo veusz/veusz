@@ -52,16 +52,23 @@ class LinkedFile:
     This class is used to store a link filename with the descriptor
     '''
 
-    def __init__(self, filename, descriptor):
+    def __init__(self, filename, descriptor, useblocks=False):
         '''Set up the linked file with the descriptor given.'''
         self.filename = filename
         self.descriptor = descriptor
+        self.useblocks = useblocks
 
     def saveToFile(self, file):
         '''Save the link to the document file.'''
 
-        file.write('ImportFile(%s, %s, linked=True)\n' %
-                   (repr(self.filename), repr(self.descriptor)))
+        params = [ repr(self.filename),
+                   repr(self.descriptor),
+                   'linked=True' ]
+
+        if self.useblocks:
+            params.append('useblocks=True')
+
+        file.write('ImportFile(%s)\n' % (', '.join(params)))
 
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.

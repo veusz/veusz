@@ -214,6 +214,14 @@ class ImportDialog(ImportDialogBase):
         l = qt.QLabel(_import1dhelp.strip(), self.widgetspace)
         l.setAlignment( l.alignment() | qt.Qt.WordBreak )
         
+        self.blockcheck = qt.QCheckBox('Read data in bloc&ks',
+                                       self.widgetspace)
+        qt.QToolTip.add(self.blockcheck,
+                        'If this is selected, blank lines or the word\n'
+                        '"no" are used to separate the file into blocks.\n'
+                        'An underscore followed by the block number is\n'
+                        'added to the dataset names')
+
     def slotImport(self):
         """Do the importing"""
         
@@ -244,7 +252,8 @@ class ImportDialog(ImportDialogBase):
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
         # read the data
-        sr.readData(stream)
+        useblocks = self.blockcheck.isChecked()
+        sr.readData(stream, useblocks=useblocks)
 
         # restore the cursor
         qt.QApplication.restoreOverrideCursor()
@@ -260,13 +269,14 @@ class ImportDialog(ImportDialogBase):
         # link the data to a file, if told to
         islinked = self.linkcheck.isChecked()
         if islinked:
-            LF = document.LinkedFile(filename, descriptor)
+            LF = document.LinkedFile(filename, descriptor, useblocks=useblocks)
         else:
             LF = None
 
         names = sr.setInDocument(self.document, linkedfile=LF)
 
         lines.append('Imported data for datasets:')
+        names.sort()
         for n in names:
             shape = self.document.getData(n).data.shape
             lines.append(' %s (%i items)' % (n, shape[0]))
