@@ -317,7 +317,7 @@ class SimpleRead:
 
             # if this is a blank line, separating data then advance to a new
             # block
-            if len(l) == 0 or l[0] == 'no':
+            if len(l) == 0 or l[0].lower() == 'no':
                 # blank lines separate blocks
                 if block in blocks:
                     block += 1
