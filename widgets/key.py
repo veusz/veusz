@@ -93,8 +93,10 @@ class Key(widget.Widget):
 
         # total size of box
         symbolwidth = s.get('keyLength').convert(painter)
-        totalwidth = maxwidth + 3*height + symbolwidth
+        totalwidth = maxwidth + 2*height + symbolwidth
         totalheight = (number+1)*height
+        if not s.Border.hide:
+            totalwidth += height
 
         # work out horizontal position
         h = s.horzPosn
