@@ -1,5 +1,7 @@
 * 2005-07-23 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix PNG export without extension
+	- Add Mandelbrot example
+	- Released 0.7
 	
 * 2005-07-20 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add support for blocks of data in import files

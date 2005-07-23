@@ -13,31 +13,34 @@ Requirements:
  QT              http://www.trolltech.com/products/qt/
  SIP             http://www.riverbankcomputing.co.uk/sip/   )
 
-Veusz works much better with Microsoft's corefonts installed (or other good
-TrueType fonts). 
- see             http://corefonts.sourceforge.net/
+Optional requirements:
+ PyFITS>=0.9.8.2 http://www.stsci.edu/resources/software_hardware/pyfits
+
+ Veusz works much better with Microsoft's corefonts installed (or other good
+ TrueType fonts). 
+  see            http://corefonts.sourceforge.net/
 
 Simple use
 ==========
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-0.5.tar.gz     [change name here]
-# cd veusz-0.5
-#./veusz.py
+# tar xzf veusz-0.7.tar.gz     [change version here]
+# cd veusz-0.7
+# ./veusz.py
 
 Installing/upgrading from rpm
 =============================
 For rpm based distributions, download the rpm for your distribution
 (if it is available), and install as root:
-# rpm -Uvh veusz-0.5-1.noarch.rpm
+# rpm -Uvh veusz-0.7-1.noarch.rpm
 (use correct name of rpm here)
 
 If there is no rpm available for your distribution, download the source
 rpm and rebuild
-# rpmbuild --rebuild veusz-0.5-1.src.rpm
+# rpmbuild --rebuild veusz-0.7-1.src.rpm
 then install it from the location given when that command completes.
-# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-0.5-1.noarch.rpm
+# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-0.7-1.noarch.rpm
 
 
 If this doesn't work, see below for how to create an rpm from the source.
@@ -50,7 +53,7 @@ list a few of the possible method here:
 
 To make an rpm from the distribution
 ------------------------------------
-# cd veusz-0.5
+# cd veusz-0.7
 # python setup.py bdist_rpm
 
 An rpm should be generated in the dist subdirectory, so...
@@ -66,7 +69,7 @@ using the "veusz command"
 To install to the standard location on the hard disk (it's better to use
 rpms if you have an rpm-based linux distibution)
 ------------------------------------------------------------------------
-# cd veusz-0.5
+# cd veusz-0.7
 # python setup.py build
 # su
 [enter root password]
@@ -74,6 +77,17 @@ rpms if you have an rpm-based linux distibution)
 # exit
 
 For other ways of installing see http://docs.python.org/inst/inst.html
+
+Using FITS files
+================
+To enable FITS file data import, PyFITS must be installed in the
+Python path. This can be accomplished by putting the pyfits.py file
+into the standard Python install directory
+(e.g. /usr/local/lib/python2.3), adding its directory into the
+PYTHONPATH environment variable, or by copying the file into the main
+Veusz directory.
+
+I will also invesigate whether PyFITS can be distributed with Veusz.
 
 -------------------------------------------------------------------------------
 $Id$

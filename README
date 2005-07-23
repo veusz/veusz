@@ -1,4 +1,4 @@
-Veusz 0.6
+Veusz 0.7
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -16,20 +16,21 @@ Veusz provides a GUI, command line and scripting interface (based on
 Python) to its plotting facilities. The plots are built using an
 object-based system to provide a consistent interface.
 
-Changes from 0.5:
+Changes from 0.6:
  Please refer to ChangeLog for all the changes.
  Highlights include:
-  * Major UI enhancements - much faster to control now, more dialogs
-  * Veusz can be embedded within other non-PyQt Python programs. Its plots
-    can be updated at any time from the embedding program using the
-    command line interface.
-  * Dialogs for manipulating datasets using expressions, and direct editing
-  * Multiple documents can be opened simultaneously
-  * Lots of bug fixes (e.g. log axes improvement, rotation of labels)
-  * Unicode support in plots
+  * 2D image support
+  * FITS file data import (1D + 2D) with PyFITS module
+  * Support for line separated blocks of data when importing
+  * Reversed axes supported
+  * Key length option
+  * Linked dataset reload UI
+  * Plot functions over specific range
+  * Several UI improvements 
 
 Features of package:
  * X-Y plots (with errorbars)
+ * Images (with colour mappings)
  * Stepped plots (for histograms)
  * Line plots
  * Function plots
@@ -47,7 +48,6 @@ Features of package:
 
 To be done:
  * Contour plots
- * Images
  * UI improvements
  * Import filters (for qdp and other plotting packages, fits, csv)
 
@@ -63,6 +63,8 @@ Requirements:
    http://www.stsci.edu/resources/software_hardware/numarray
  Microsoft Core Fonts (recommended)
    http://corefonts.sourceforge.net/
+ PyFITS (optional)
+   http://www.stsci.edu/resources/software_hardware/pyfits
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in pdf, html and text format (generated from docbook).

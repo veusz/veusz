@@ -6,3 +6,4 @@ recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html
 recursive-include windows *.png README
 recursive-include examples *.vsz *.eps *.py
 recursive-include images *.png
+recursive-include widgets *.dat
