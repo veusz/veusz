@@ -576,7 +576,7 @@ class MainWindow(qt.QMainWindow):
             
         fd.setMode( qt.QFileDialog.AnyFile )
 
-        #Create a mapping between a format string and extensions
+        # Create a mapping between a format string and extensions
         filtertoext = {}
         filters = []
         # a list of extensions which are allowed
@@ -610,7 +610,7 @@ class MainWindow(qt.QMainWindow):
             # this is the extension without the dot
             ext = os.path.splitext(filename)[1][1:]
             if (ext not in validextns) and (ext not in chosenextns):
-                filename = filename + "." + returnedextns[0]
+                filename = filename + "." + chosenextns[0]
 
             try:
                 self.document.export(filename, self.plot.getPageNumber())
