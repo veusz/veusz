@@ -51,10 +51,10 @@ class GenericPlotter(widget.Widget):
         s = self.settings
         s.add( setting.Str('key', '',
                            descr = 'Description of the plotted data') )
-        s.add( setting.Str('xAxis', 'x',
-                           descr = 'Name of X-axis to use') )
-        s.add( setting.Str('yAxis', 'y',
-                           descr = 'Name of Y-axis to use') )
+        s.add( setting.Axis('xAxis', 'x', self.document, 'horizontal',
+                            descr = 'Name of X-axis to use') )
+        s.add( setting.Axis('yAxis', 'y', self.document, 'vertical',
+                            descr = 'Name of Y-axis to use') )
 
     def getAxesNames(self):
         """Returns names of axes used."""
@@ -323,7 +323,7 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.Distance('markerSize', '3pt',
                                 descr = 'Size of marker to plot'), 0 )
-        s.add( setting.Choice('marker', utils.MarkerCodes, 'circle',
+        s.add( setting.Marker('marker', 'circle',
                               descr = 'Type of marker to plot'), 0 )
         s.add( setting.Dataset('yData', 'y', self.document,
                                descr = 'Variable containing y data'), 0 )

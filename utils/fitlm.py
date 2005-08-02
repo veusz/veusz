@@ -30,7 +30,7 @@ import numarray.ieeespecial as NIE
 
 def fitLM(func, params, xvals, yvals, errors,
           stopdeltalambda = 1e-5,
-          deltaderiv = 1e-3, maxiters = 20, Lambda = 1e-4):
+          deltaderiv = 1e-5, maxiters = 20, Lambda = 1e-4):
 
     """
     Use Marquardt method as described in Bevington & Robinson to fit data

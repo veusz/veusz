@@ -22,12 +22,42 @@
    to be changed.
 """
 
+import itertools
 import re
 
 import qt
-import setting
 
-class SettingEdit(qt.QLineEdit):
+import setting
+import widgets
+import utils
+
+def _populateCombo(combo, items):
+    """Populate the combo with the list of items given.
+
+    This also makes sure the currently entered text persists
+    """
+
+    # existing setting
+    currenttext = unicode(combo.currentText())
+
+    # get rid of existing items in list (clear doesn't work here)
+    for i in range(combo.count()):
+        combo.removeItem(0)
+
+    # get index for value, or add value if not set
+    try:
+        index = items.index(currenttext)
+    except ValueError:
+        items.append(currenttext)
+        index = len(items)-1
+
+    # put in new entries
+    combo.insertStrList(items)
+    
+    # set index to current value
+    combo.setCurrentItem(index)
+
+class Edit(qt.QLineEdit):
     """Main control for editing settings which are text."""
 
     def __init__(self, setting, parent):
@@ -88,7 +118,7 @@ class _EscapeLineEdit(qt.QTextEdit):
         if event.key() == qt.Qt.Key_Escape:
             self.emit( qt.PYSIGNAL('escapePressed'), () )
 
-class _SettingEditBox(qt.QFrame):
+class _EditBox(qt.QFrame):
     """A popup edit box to support editing long text sections.
 
     Emits closing(text) when the box closes
@@ -172,7 +202,7 @@ class _SettingEditBox(qt.QFrame):
         self.emit( qt.PYSIGNAL('closing'), (text,) )
         event.accept()
 
-class StringSettingEdit(qt.QHBox):
+class String(qt.QHBox):
     """A line editor which allows editting in a larger popup window."""
 
     def __init__(self, setting, parent):
@@ -181,10 +211,8 @@ class StringSettingEdit(qt.QHBox):
         self.setting = setting
         self.edit = qt.QLineEdit(self)
         b = self.button = qt.QPushButton('..', self)
+        b.setMaximumWidth(b.height())
         b.setToggleButton(True)
-        b.setSizePolicy(qt.QSizePolicy.Preferred,
-                                  qt.QSizePolicy.Preferred)
-        b.resize( qt.QSize(12, 12) )
 
         self.bgcolour = self.edit.paletteBackgroundColor()
         
@@ -210,8 +238,8 @@ class StringSettingEdit(qt.QHBox):
 
         # if button is down and there's no existing popup, bring up a new one
         if on and self.editwin == None:
-            e = _SettingEditBox( unicode(self.edit.text()),
-                                 self.setting.readonly, self.button)
+            e = _EditBox( unicode(self.edit.text()),
+                          self.setting.readonly, self.button)
 
             # we get notified with text when the popup closes
             self.connect(e, qt.PYSIGNAL('closing'), self.boxClosing)
@@ -228,6 +256,7 @@ class StringSettingEdit(qt.QHBox):
             self.parentWidget().setFocus()
             self.edit.setFocus()
 
+        # KLUDGE! KLUDGE! KLUDGE!
         # this evily has to check a bit later whether a new window has been
         # created before turing off the toggle button
         # unfortunately clicking on the button to close the popup means
@@ -264,7 +293,7 @@ class StringSettingEdit(qt.QHBox):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
         
-class BoolSettingEdit(qt.QCheckBox):
+class Bool(qt.QCheckBox):
     """A check box for changing a bool setting."""
     
     def __init__(self, setting, parent):
@@ -294,21 +323,24 @@ class BoolSettingEdit(qt.QCheckBox):
         """called when the setting is changed remotely"""
         self.setChecked( self.setting.get() )
 
-class SettingChoice(qt.QComboBox):
+class Choice(qt.QComboBox):
     """For choosing between a set of values."""
 
-    def __init__(self, setting, iseditable, vallist, parent):
+    def __init__(self, setting, iseditable, vallist, parent, pixmaps=None):
+        
         qt.QComboBox.__init__(self, parent)
         self.setting = setting
         self.bgcolour = self.paletteBackgroundColor()
 
         self.setEditable(iseditable)
 
-        # add items to list
-        items = qt.QStringList()
-        for i in vallist:
-            items.append(i)
-        self.insertStringList(items)
+        if pixmaps == None:
+            # add items to list (text only)
+            self.insertStrList( list(vallist) )
+        else:
+            # add pixmaps and text to list
+            for pix, txt in itertools.izip(pixmaps, vallist):
+                self.insertItem(pix, txt, -1)
 
         # set the text of the widget to the setting
         self.setCurrentText( setting.toText() )
@@ -349,7 +381,7 @@ class SettingChoice(qt.QComboBox):
         """called when the setting is changed remotely"""
         self.setCurrentText( self.setting.toText() )
 
-class SettingMultiLine(qt.QTextEdit):
+class MultiLine(qt.QTextEdit):
     """For editting multi-line settings."""
 
     def __init__(self, setting, parent):
@@ -394,7 +426,7 @@ class SettingMultiLine(qt.QTextEdit):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toText() )
 
-class SettingDistance(SettingChoice):
+class Distance(Choice):
     """For editing distance settings."""
 
     # used to remove non-numerics from the string
@@ -406,7 +438,7 @@ class SettingDistance(SettingChoice):
 
     def __init__(self, setting, parent):
         '''Initialise with blank list, then populate with sensible units.'''
-        SettingChoice.__init__(self, setting, True, [], parent)
+        Choice.__init__(self, setting, True, [], parent)
         self.updateComboList()
         
     def updateComboList(self):
@@ -450,9 +482,9 @@ class SettingDistance(SettingChoice):
     def slotActivated(self, val):
         '''Populate the drop down list before activation.'''
         self.updateComboList()
-        SettingChoice.slotActivated(self, val)
+        Choice.slotActivated(self, val)
 
-class DatasetChoose(SettingChoice):
+class Dataset(Choice):
     """Allow the user to choose between the possible datasets."""
 
     def __init__(self, setting, document, dimensions, parent):
@@ -462,14 +494,14 @@ class DatasetChoose(SettingChoice):
 
         Changes on the document refresh the list of datasets."""
         
-        SettingChoice.__init__(self, setting, True, [], parent)
+        Choice.__init__(self, setting, True, [], parent)
         self.document = document
         self.dimensions = dimensions
-        self.populateEntries()
+        self._populateEntries()
         self.connect(document, qt.PYSIGNAL('sigModified'),
                      self.slotModified)
 
-    def populateEntries(self):
+    def _populateEntries(self):
         """Put the list of datasets into the combobox."""
 
         # get datasets of the correct dimension
@@ -479,27 +511,219 @@ class DatasetChoose(SettingChoice):
                 datasets.append(name)
         datasets.sort()
 
-        # existing setting
-        currenttext = unicode(self.currentText())
-
-        # get rid of existing items in list (clear doesn't work here)
-        for i in range(self.count()):
-            self.removeItem(0)
-
-        # get index for value, or add value if not set
-        try:
-            index = datasets.index(currenttext)
-        except ValueError:
-            datasets.append(currenttext)
-            index = len(datasets)-1
-
-        # put in new entries
-        self.insertStrList(datasets)
-    
-        # set index to current value
-        self.setCurrentItem(index)
+        _populateCombo(self, datasets)
 
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
-        self.populateEntries()
+        self._populateEntries()
         
+class FillStyle(Choice):
+    """For choosing between fill styles."""
+
+    _pixmaps = None
+
+    def __init__(self, setting, fills, fillcnvt, parent):
+        if self._pixmaps == None:
+            self._generatePixmaps(fills, fillcnvt)
+
+        Choice.__init__(self, setting, False,
+                        fills, parent,
+                        pixmaps=self._pixmaps)
+
+    def _generatePixmaps(self, fills, fillcnvt):
+        """Generate a list of pixmaps for drop down menu."""
+
+        size = 12
+        pixmaps = []
+        c = qt.QColor('red')
+        for f in fills:
+            pix = qt.QPixmap(size, size)
+            pix.fill()
+            painter = qt.QPainter(pix)
+            brush = qt.QBrush(c, fillcnvt[f])
+            painter.fillRect(0, 0, size, size, brush)
+            pixmaps.append(pix)
+
+        FillStyle._pixmaps = pixmaps
+
+class Marker(Choice):
+    """A control to let the user choose a marker."""
+
+    _pixmaps = None
+
+    def __init__(self, setting, parent):
+        if self._pixmaps == None:
+            self._generatePixmaps()
+
+        Choice.__init__(self, setting, False,
+                        utils.MarkerCodes, parent,
+                        pixmaps=self._pixmaps)
+
+    def _generatePixmaps(self):
+
+        size = 16
+        pixmaps = []
+        c = qt.QColor('red')
+        for marker in utils.MarkerCodes:
+            pix = qt.QPixmap(size, size)
+            pix.fill()
+            painter = qt.QPainter(pix)
+            painter.setBrush(c)
+            utils.plotMarker(painter, size/2, size/2, marker, int(size*0.33))
+            pixmaps.append(pix)
+
+        Marker._pixmaps = pixmaps
+
+class LineStyle(Choice):
+    """For choosing between line styles."""
+
+    _pixmaps = None
+
+    def __init__(self, setting, lines, linecnvt, parent):
+        if self._pixmaps == None:
+            self._generatePixmaps(lines, linecnvt)
+
+        Choice.__init__(self, setting, False,
+                        lines, parent,
+                        pixmaps=self._pixmaps)
+
+    def _generatePixmaps(self, linestyles, linecnvt):
+        """Generate a list of pixmaps for drop down menu."""
+
+        size = 12
+        pixmaps = []
+        c = qt.QColor('black')
+        for l in linestyles:
+            pix = qt.QPixmap(size*4, size)
+            pix.fill()
+            painter = qt.QPainter(pix)
+            pen = qt.QPen(c, 2, linecnvt[l])
+            painter.setPen(pen)
+            painter.drawLine(size, size/2, size*3, size/2)
+            pixmaps.append(pix)
+
+        LineStyle._pixmaps = pixmaps
+
+class Color(qt.QHBox):
+    """A control which lets the user choose a color.
+
+    A drop down list and a button to bring up a dialog are used
+    """
+
+    _pixmaps = None
+
+    def __init__(self, setting, colors, parent):
+        qt.QHBox.__init__(self, parent)
+
+        if self._pixmaps == None:
+            self._generatePixmaps(colors)
+
+        self.setting = setting
+
+        # combo box
+        c = self.combo = qt.QComboBox(self)
+        c.setEditable(True)
+        for pix, txt in itertools.izip(self._pixmaps, colors):
+            c.insertItem(pix, txt, -1)
+        c.setCurrentText( self.setting.toText() )
+        self.connect(c, qt.SIGNAL('activated(const QString&)'),
+                     self.slotActivated )
+
+        # button for selecting colors
+        b = self.button = qt.QPushButton(self)
+        b.setMaximumWidth(b.height())
+        self.connect(b, qt.SIGNAL('clicked()'),
+                     self.slotButtonClicked)
+
+        self.setting.setOnModified(self.onModified)
+        self._updateButtonColor()
+
+    def _generatePixmaps(self, colors):
+        """Generate a list of pixmaps for drop down menu."""
+
+        size = 12
+        pixmaps = []
+        for c in colors:
+            pix = qt.QPixmap(size, size)
+            pix.fill( qt.QColor(c) )
+            pixmaps.append(pix)
+
+        Color._pixmaps = pixmaps
+
+    def _updateButtonColor(self):
+        """Update the color on the button from the setting."""
+
+        size = 12
+        pix = qt.QPixmap(size, size)
+        pix.fill(self.setting.color())
+
+        self.button.setIconSet( qt.QIconSet(pix) )
+
+    def slotButtonClicked(self):
+        """Open dialog to edit color."""
+
+        col = qt.QColorDialog.getColor( self.setting.color(),
+                                        self )
+        if col.isValid():
+            # change setting
+            name = col.name()
+            self.setting.set(unicode(name))
+
+    def slotActivated(self, val):
+        """A different value is selected."""
+        
+        text = unicode(self.combo.currentText())
+        val = self.setting.fromText(text)
+            
+        # value has changed
+        if self.setting.get() != val:
+            self.setting.set(val)
+            
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+
+        self.combo.setCurrentText( self.setting.toText() )
+        self._updateButtonColor()
+
+class Axis(Choice):
+    """Choose an axis to plot against."""
+
+    def __init__(self, setting, document, direction, parent):
+        """Initialise and populate combobox."""
+
+        Choice.__init__(self, setting, True, [], parent)
+        self.document = document
+        self.direction = direction
+        self._populateEntries()
+        self.connect(document, qt.PYSIGNAL('sigModified'),
+                     self.slotModified)
+
+    def _populateEntries(self):
+        """Build up a list of possible axes."""
+
+        # get parent widget
+        widget = self.setting
+        while not isinstance(widget, widgets.Widget) and widget != None:
+            widget = widget.parent
+
+        # get list of axis widgets up the tree
+        axes = {}
+        while widget != None:
+            for w in widget.children:
+                if ( isinstance(w, widgets.Axis) and
+                     w.settings.direction == self.direction ):
+                    axes[w.name] = True
+            widget = widget.parent
+
+        names = axes.keys()
+        names.sort()
+
+        _populateCombo(self, names)
+
+    def slotModified(self, modified):
+        """Update list of axes."""
+        self._populateEntries()

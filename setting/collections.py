@@ -26,48 +26,18 @@ import settings
 import setting
 from utils import formatNumber
 
-colors = [ 'black', 'red', 'green', 'blue',
-           'cyan', 'magenta', 'yellow',
-           'grey', 'darkred', 'darkgreen', 'darkblue',
-           'darkcyan', 'darkmagenta', 'darkyellow' ]
-
-linestyles = ['solid', 'dashed', 'dotted',
-              'dash-dot', 'dash-dot-dot' ]
-
-convertline = { 'solid': qt.Qt.SolidLine, 'dashed': qt.Qt.DashLine,
-                'dotted': qt.Qt.DotLine, 'dash-dot': qt.Qt.DashDotLine,
-                'dash-dot-dot': qt.Qt.DashDotDotLine }
-
-fillstyles = [ 'solid', 'horizontal', 'vertical', 'cross',
-               'forward diagonals', 'backward diagonals', 'diagonal cross',
-               '94% dense', '88% dense', '63% dense', '50% dense',
-               '37% dense', '12% dense', '6% dense' ]
-
-convertfill = { 'solid': qt.Qt.SolidPattern, 'horizontal': qt.Qt.HorPattern,
-                'vertical': qt.Qt.VerPattern, 'cross': qt.Qt.CrossPattern,
-                'forward diagonals': qt.Qt.FDiagPattern,
-                'backward diagonals': qt.Qt.BDiagPattern,
-                'diagonal cross': qt.Qt.DiagCrossPattern,
-                '94% dense': qt.Qt.Dense1Pattern,
-                '88% dense': qt.Qt.Dense2Pattern,
-                '63% dense': qt.Qt.Dense3Pattern,
-                '50% dense': qt.Qt.Dense4Pattern,
-                '37% dense': qt.Qt.Dense5Pattern,
-                '12% dense': qt.Qt.Dense6Pattern,
-                '6% dense': qt.Qt.Dense7Pattern }
-
 class Line(settings.Settings):
     '''For holding properities of a line.'''
 
     def __init__(self, name, descr=''):
         settings.Settings.__init__(self, name, descr=descr)
 
-        self.add( setting.ChoiceOrMore('color', colors, 'black',
-                                       descr = 'Color of line') )
+        self.add( setting.Color('color', 'black',
+                                descr = 'Color of line') )
         self.add( setting.Distance('width', '0.5pt',
                                    descr = 'Width of line') )
-        self.add( setting.Choice('style', linestyles, 'solid',
-                                 descr = 'Line style') )
+        self.add( setting.LineStyle('style', 'solid',
+                                    descr = 'Line style') )
         self.add( setting.Bool('hide', False,
                                descr = 'Hide the line') )
         
@@ -76,7 +46,7 @@ class Line(settings.Settings):
 
         return qt.QPen( qt.QColor(self.color),
                         self.get('width').convert(painter),
-                        convertline[self.style] )
+                        self.get('style').qtStyle() )
 
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
@@ -96,10 +66,10 @@ class Brush(settings.Settings):
     def __init__(self, name, descr=''):
         settings.Settings.__init__(self, name, descr=descr)
 
-        self.add( setting.ChoiceOrMore( 'color', colors, 'black',
-                                        descr = 'Fill colour' ) )
-        self.add( setting.Choice( 'style', fillstyles, 'solid',
-                                  descr = 'Fill style' ) )
+        self.add( setting.Color( 'color', 'black',
+                                 descr = 'Fill colour' ) )
+        self.add( setting.FillStyle( 'style', 'solid',
+                                     descr = 'Fill style' ) )
         self.add( setting.Bool( 'hide', False,
                                 descr = 'Hide the fill') )
         
@@ -107,7 +77,7 @@ class Brush(settings.Settings):
         '''Make a qbrush from the settings.'''
 
         return qt.QBrush( qt.QColor(self.color),
-                          convertfill[self.style] )
+                          self.get('style').qtStyle() )
     
 class KeyBrush(Brush):
     '''Fill used for back of key.'''
@@ -191,8 +161,8 @@ class Text(settings.Settings):
                                        descr = 'Font name' ) )
         self.add( setting.Distance('size', '14pt',
                   descr = 'Font size' ) )
-        self.add( setting.ChoiceOrMore( 'color', colors, 'black',
-                                        descr = 'Font color' ) )
+        self.add( setting.Color( 'color', 'black',
+                                 descr = 'Font color' ) )
         self.add( setting.Bool( 'italic', False,
                                 descr = 'Italic font' ) )
         self.add( setting.Bool( 'bold', False,
@@ -234,10 +204,12 @@ class Text(settings.Settings):
         
         size = self.get('size').convertPts(painter)
         weight = qt.QFont.Normal
-        if self.bold: weight = qt.QFont.Bold
+        if self.bold:
+            weight = qt.QFont.Bold
 
         f = qt.QFont(self.font, size,  weight, self.italic)
-        if self.underline: f.setUnderline(1)
+        if self.underline:
+            f.setUnderline(True)
         f.setStyleHint( qt.QFont.Times, qt.QFont.PreferDevice )
 
         return f

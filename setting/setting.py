@@ -30,6 +30,7 @@ s.fromText('42')
 
 import re
 import math
+
 import qt
 
 import utils
@@ -200,7 +201,7 @@ class Str(Setting):
     """String setting."""
 
     def convertTo(self, val):
-        if type(val) in [str, unicode]:
+        if type(val) in (str, unicode):
             return val
         raise InvalidType
 
@@ -211,7 +212,7 @@ class Str(Setting):
         return text
 
     def makeControl(self, *args):
-        return controls.StringSettingEdit(self, *args)
+        return controls.String(self, *args)
 
 # Store bools
 class Bool(Setting):
@@ -238,7 +239,7 @@ class Bool(Setting):
             raise InvalidType
 
     def makeControl(self, *args):
-        return controls.BoolSettingEdit(self, *args)
+        return controls.Bool(self, *args)
 
 # Storing integers
 class Int(Setting):
@@ -259,7 +260,7 @@ class Int(Setting):
             raise InvalidType
 
     def makeControl(self, *args):
-        return controls.SettingEdit(self, *args)
+        return controls.Edit(self, *args)
 
 # for storing floats
 class Float(Setting):
@@ -280,7 +281,7 @@ class Float(Setting):
             raise InvalidType
 
     def makeControl(self, *args):
-        return controls.SettingEdit(self, *args)
+        return controls.Edit(self, *args)
 
 class FloatOrAuto(Setting):
     """Save a float or text auto."""
@@ -315,7 +316,7 @@ class FloatOrAuto(Setting):
                 raise InvalidType
 
     def makeControl(self, *args):
-        return controls.SettingChoice(self, True, ['Auto'], *args)
+        return controls.Choice(self, True, ['Auto'], *args)
             
 class IntOrAuto(Setting):
     """Save an int or text auto."""
@@ -350,7 +351,7 @@ class IntOrAuto(Setting):
                 raise InvalidType
             
     def makeControl(self, *args):
-        return controls.SettingChoice(self, True, ['Auto'], *args)
+        return controls.Choice(self, True, ['Auto'], *args)
 
 
 # these are functions used by the distance setting below.
@@ -445,7 +446,7 @@ class Distance(Setting):
             raise InvalidType
         
     def makeControl(self, *args):
-        return controls.SettingDistance(self, *args)
+        return controls.Distance(self, *args)
 
     def convert(self, painter):
         '''Convert a distance to plotter units.
@@ -493,12 +494,11 @@ class Choice(Setting):
 
     # maybe should be implemented as a dict to speed up checks
 
-    def __init__(self, name, vallist, val, images = {}, descr = ''):
+    def __init__(self, name, vallist, val, descr = ''):
         """Setting val must be in vallist."""
         
         assert type(vallist) in (list, tuple)
         self.vallist = vallist
-        self.images = images
         Setting.__init__(self, name, val, descr = descr)
 
     def convertTo(self, val):
@@ -517,19 +517,17 @@ class Choice(Setting):
             raise InvalidType
         
     def makeControl(self, *args):
-        return controls.SettingChoice(self, False, self.vallist,
-                                      *args)
+        return controls.Choice(self, False, self.vallist, *args)
 
 class ChoiceOrMore(Setting):
     """One out of a list of strings, or anything else."""
 
     # maybe should be implemented as a dict to speed up checks
 
-    def __init__(self, name, vallist, val, images = {}, descr = ''):
+    def __init__(self, name, vallist, val, descr = ''):
         """Setting has val must be in vallist."""
         
         self.vallist = vallist
-        self.images = images
         Setting.__init__(self, name, val, descr = descr)
 
     def convertTo(self, val):
@@ -542,8 +540,7 @@ class ChoiceOrMore(Setting):
         return text
 
     def makeControl(self, *args):
-        return controls.SettingChoice(self, True, self.vallist,
-                                      *args)
+        return controls.Choice(self, True, self.vallist, *args)
 
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
@@ -595,7 +592,7 @@ class FloatDict(Setting):
         return out
 
     def makeControl(self, *args):
-        return controls.SettingMultiLine(self, *args)
+        return controls.MultiLine(self, *args)
 
 class WidgetPath(Str):
     """A setting holding a path to a widget. This is checked for validity."""
@@ -672,7 +669,6 @@ class WidgetPath(Str):
         
         return widget
 
-# choose from the possible datasets
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
@@ -688,6 +684,113 @@ class Dataset(Str):
 
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.DatasetChoose(self, self.document, self.dimensions,
-                                      *args)
+        return controls.Dataset(self, self.document, self.dimensions, *args)
+    
+class Color(ChoiceOrMore):
+    """A color setting."""
+
+    _colors = [ 'white', 'black', 'red', 'green', 'blue',
+                'cyan', 'magenta', 'yellow',
+                'grey', 'darkred', 'darkgreen', 'darkblue',
+                'darkcyan', 'darkmagenta' ]
+
+    def __init__(self, name, default, descr = None):
+        """Initialise the color setting with the given name, default
+        and description."""
+        
+        ChoiceOrMore.__init__(self, name, self._colors, default,
+                              descr=descr)
+
+    def color(self):
+        """Return QColor for color."""
+        return qt.QColor(self.val)
+    
+    def makeControl(self, *args):
+        return controls.Color(self, self._colors, *args)
+
+class FillStyle(Choice):
+    """A setting for the different fill styles provided by Qt."""
+    
+    _fillstyles = [ 'solid', 'horizontal', 'vertical', 'cross',
+                    'forward diagonals', 'backward diagonals',
+                    'diagonal cross',
+                    '94% dense', '88% dense', '63% dense', '50% dense',
+                    '37% dense', '12% dense', '6% dense' ]
+
+    _fillcnvt = { 'solid': qt.Qt.SolidPattern,
+                  'horizontal': qt.Qt.HorPattern,
+                  'vertical': qt.Qt.VerPattern,
+                  'cross': qt.Qt.CrossPattern,
+                  'forward diagonals': qt.Qt.FDiagPattern,
+                  'backward diagonals': qt.Qt.BDiagPattern,
+                  'diagonal cross': qt.Qt.DiagCrossPattern,
+                  '94% dense': qt.Qt.Dense1Pattern,
+                  '88% dense': qt.Qt.Dense2Pattern,
+                  '63% dense': qt.Qt.Dense3Pattern,
+                  '50% dense': qt.Qt.Dense4Pattern,
+                  '37% dense': qt.Qt.Dense5Pattern,
+                  '12% dense': qt.Qt.Dense6Pattern,
+                  '6% dense': qt.Qt.Dense7Pattern }
+
+    def __init__(self, name, default, descr=None):
+        Choice.__init__(self, name, self._fillstyles, default, descr=descr)
+
+    def qtStyle(self):
+        """Return Qt ID of fill."""
+        return self._fillcnvt[self.val]
+
+    def makeControl(self, *args):
+        return controls.FillStyle(self, self._fillstyles,
+                                  self._fillcnvt, *args)
+
+class LineStyle(Choice):
+    """A setting choosing a particular line style."""
+
+    _linestyles = ['solid', 'dashed', 'dotted',
+                   'dash-dot', 'dash-dot-dot' ]
+
+    _linecnvt = { 'solid': qt.Qt.SolidLine, 'dashed': qt.Qt.DashLine,
+                  'dotted': qt.Qt.DotLine, 'dash-dot': qt.Qt.DashDotLine,
+                  'dash-dot-dot': qt.Qt.DashDotDotLine }
+    
+    def __init__(self, name, default, descr=None):
+        Choice.__init__(self, name, self._linestyles, default, descr=descr)
+
+    def qtStyle(self):
+        """Get Qt ID of chosen line style."""
+        return self._linecnvt[self.val]
+    
+    def makeControl(self, *args):
+        return controls.LineStyle(self, self._linestyles,
+                                  self._linecnvt, *args)
+
+class Axis(Str):
+    """A setting to hold the name of an axis."""
+
+    def __init__(self, name, val, document, direction, descr=''):
+        """Initialise using the document, so we can get the axes later.
+        
+        direction is horizontal or vertical to specify the type of axis to
+        show
+        """
+
+        Setting.__init__(self, name, val, descr)
+        self.document = document
+        self.direction = direction
+
+    def makeControl(self, *args):
+        """Allows user to choose an axis or enter a name."""
+
+        return controls.Axis(self, self.document, self.direction, *args)
+    
+class Marker(Choice):
+    """Choose a marker type from one allowable."""
+
+    def __init__(self, name, default, descr=None):
+        Choice.__init__(self, name, utils.MarkerCodes, default, descr=descr)
+
+    def makeControl(self, *args):
+        return controls.Marker(self, *args)
+    
+
     

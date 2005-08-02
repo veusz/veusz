@@ -1,3 +1,16 @@
+* 2005-08-02 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Settings controls cleanups
+	- Implement Axis setting (for choosing axes)
+	- Show Marker pixmaps on drop down list
+	
+* 2005-07-29 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Add line styles pixmaps to drop down menu
+	- Add colour pixmaps to drop down menu
+
+* 2005-07-28 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Add colour choosing button
+	- Put fill styles pixmap on drop down menu
+	
 * 2005-07-23 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Fix PNG export without extension
 	- Add Mandelbrot example

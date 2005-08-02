@@ -220,6 +220,10 @@ class MainWindow(qt.QMainWindow):
              self.slotFileClose, '', False, 'Ctrl+W'),
             ('filequit', 'Exit the program', '&Quit', 'file',
              self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
+
+            ('editcopy', 'Copy data to clipboard', '&Copy', 'edit',
+             self.slotEditCopy, '', False, ''),
+
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
             ('dataimport2d', 'Import 2D data into Veusz', 'Import &2D...', 'data',
@@ -232,6 +236,7 @@ class MainWindow(qt.QMainWindow):
              self.slotDataCreate, 'stock-new.png', False, ''),
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
              self.slotDataReload, 'stock-refresh.png', False, ''),
+
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
              self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
             ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
@@ -254,6 +259,7 @@ class MainWindow(qt.QMainWindow):
             ('viewnextpage', 'Move to the next page', '&Next page',
              'view', self.slotViewNextPage, 'stock_next-page.png',
              True, 'Ctrl+PgDown'),
+
             ('helphome', 'Go to the Veusz home page on the internet',
              'Home page', 'help', self.slotHelpHomepage, '', False, ''),
             ('helpproject', 'Go to the Veusz project page on the internet',
@@ -311,6 +317,10 @@ class MainWindow(qt.QMainWindow):
             self.actions[action].addTo(zoompop)
         zoomtb.setPopup(zoompop)
         zoomtb.setPopupDelay(0)
+
+        # modify edit menu before it pops up
+        self.connect( self.menus['edit'], qt.SIGNAL('aboutToShow()'),
+                      self.slotEditAboutToShow )
 
     def slotDataImport(self):
         """Display the import data dialog."""
@@ -726,6 +736,36 @@ class MainWindow(qt.QMainWindow):
         # disable previous and next page actions
         self.actions['viewprevpage'].setEnabled( number != 0 )
         self.actions['viewnextpage'].setEnabled( number < np-1 )
+
+    def slotEditAboutToShow(self):
+        """Disable/enable various items on edit menu according to status."""
+
+        widget = self.focusWidget()
+        print widget
+
+        # should enable edit copy?
+        showcopy = False
+        if ( isinstance(widget, qt.QLineEdit) or
+             isinstance(widget, qt.QTextEdit) ):
+            if widget.hasSelectedText():
+                showcopy = True
+
+        self.actions['editcopy'].setEnabled(showcopy)
+        
+    def slotEditCopy(self):
+        # get the widget with the current focus
+        widget = self.focusWidget()
+
+        if ( isinstance(widget, qt.QLineEdit) or
+             isinstance(widget, qt.QTextEdit) ):
+            widget.copy()
+
+        elif isinstance(widget, qt.QComboBox):
+            le = widget.lineEdit()
+            if le != None:
+                le.copy()
+            
+        print widget
 
 def CreateWindow(filename=None):
     """Window factory function"""
