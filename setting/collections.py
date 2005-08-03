@@ -237,7 +237,6 @@ class TickLabel(Text):
         self.add( setting.Str( 'format', 'g*',
                                descr = 'Format of the tick labels' ) )
 
-    def formatNumber(self, num):
-        '''Format the number according to the format.'''
-
-        return formatNumber(num, self.format)
+        self.add( setting.Float('scale', 1.,
+                                descr='A scale factor to apply to the values '
+                                'of the tick labels') )

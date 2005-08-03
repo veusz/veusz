@@ -1,7 +1,7 @@
 # axis.py
 # package to handle an axis, and the conversion of data -> coordinates
 
-#    Copyright (C) 2003 Jeremy S. Sanders
+#    Copyright (C) 2003-2005 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -477,7 +477,9 @@ class Axis(widget.Widget):
         maxdim = 0
 
         b = self.coordPerp + sign*(self._delta_axis+tl_spacing)
-        pen = s.get('TickLabels').makeQPen()
+        tl = s.get('TickLabels')
+        scale = tl.scale
+        pen = tl.makeQPen()
         for a, num in zip(coordticks, self.majortickscalc):
 
             # x and y round other way if vertical
@@ -486,7 +488,7 @@ class Axis(widget.Widget):
             else:
                 x, y = a, b
 
-            num = utils.formatNumber(num, format)
+            num = utils.formatNumber(num*scale, format)
             r = utils.Renderer(painter, font, x, y, num, alignhorz=ax,
                                alignvert=ay, angle=angle)
             r.ensureInBox(extraspace=True, **bounds)
