@@ -145,11 +145,29 @@ class PlotWindow( qt.QScrollView ):
         # allow window to get foucs, to allow context menu
         self.setFocusPolicy(qt.QWidget.StrongFocus)
 
+    def contentsMousePressEvent(self, event):
+        """Allow user to drag window around."""
+
+        if event.button() == qt.Qt.MidButton:
+            # store start position
+            event.accept()
+            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
+            self.grabPos = (event.globalX(), event.globalY())
+
+    def contentsMouseMoveEvent(self, event):
+        """Scroll window by how much the mouse has moved since last time."""
+
+        if self.grabPos != None:
+            pos = (event.globalX(), event.globalY())
+            self.scrollBy(self.grabPos[0]-pos[0], self.grabPos[1]-pos[1])
+            self.grabPos = pos
+
     def contentsMouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
 
-        if event.button() == qt.Qt.LeftButton:
+        button = event.button()
+        if button == qt.Qt.LeftButton:
             # work out where the mouse clicked
             event.accept()
             x, y = event.x(), event.y()
@@ -169,6 +187,11 @@ class PlotWindow( qt.QScrollView ):
             if widget != None:
                 # tell connected caller that widget was clicked
                 self.emit( qt.PYSIGNAL('sigWidgetClicked'), (widget,) )
+
+        elif button == qt.Qt.MidButton:
+            # restore cursor to normal state after dragging
+            qt.QApplication.restoreOverrideCursor()
+            self.grabPos = None
 
         else:
             qt.QScrollView.contentsMouseReleaseEvent(self, event)

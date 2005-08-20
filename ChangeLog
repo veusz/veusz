@@ -2,6 +2,7 @@
 	- Change drop down lists to use grey rather than red
 	- Allow user to click on widgets, and they are selected
 	in the widget tree
+	- Middle mouse button can scroll the plot window around
 	
 * 2005-08-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add "scale" setting for TickLabels
