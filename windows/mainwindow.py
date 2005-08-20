@@ -97,6 +97,10 @@ class MainWindow(qt.QMainWindow):
         self.connect( self.treeedit, qt.PYSIGNAL("sigPageChanged"),
                       self.plot.setPageNumber )
 
+        # if a widget in the plot window is clicked by the user
+        self.connect( self.plot, qt.PYSIGNAL("sigWidgetClicked"),
+                      self.treeedit.slotSelectWidget )
+
         # put the dock windows on the view menu, so they can be shown/hidden
         self._defineDockViewMenu()
 

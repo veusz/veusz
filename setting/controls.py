@@ -535,7 +535,7 @@ class FillStyle(Choice):
 
         size = 12
         pixmaps = []
-        c = qt.QColor('red')
+        c = qt.QColor('darkgrey')
         for f in fills:
             pix = qt.QPixmap(size, size)
             pix.fill()
@@ -563,7 +563,7 @@ class Marker(Choice):
 
         size = 16
         pixmaps = []
-        c = qt.QColor('red')
+        c = qt.QColor('darkgrey')
         for marker in utils.MarkerCodes:
             pix = qt.QPixmap(size, size)
             pix.fill()

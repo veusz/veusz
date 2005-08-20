@@ -125,6 +125,8 @@ class Graph(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
+        painter.beginPaintingWidget(self)
+
         # if there's a background
         if not s.Background.hide:
             brush = s.get('Background').makeQBrush()
@@ -144,6 +146,8 @@ class Graph(widget.Widget):
             for i in range(4):
                 if margins[i] == 0.:
                     ob[i] = outerbounds[i]
+
+        painter.endPaintingWidget()
         
         # do normal drawing of children
         # iterate over children in reverse order

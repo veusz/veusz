@@ -650,6 +650,7 @@ class Axis(widget.Widget):
         coordticks = self._graphToPlotter(self.majortickscalc)
 
         # save the state of the painter for later
+        painter.beginPaintingWidget(self)
         painter.save()
 
         texttorender = []
@@ -708,6 +709,7 @@ class Axis(widget.Widget):
 
         # restore the state of the painter
         painter.restore()
+        painter.endPaintingWidget()
 
 # allow the factory to instantiate an axis
 widgetfactory.thefactory.register( Axis )

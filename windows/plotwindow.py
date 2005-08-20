@@ -29,9 +29,84 @@ import qt
 
 import setting
 import dialogs.exceptiondialog
+import widgets
 
 mdir = os.path.dirname(__file__)
 _logolocation='%s/../images/logo.png' % mdir
+
+class ClickPainter(widgets.Painter):
+    """A variant of a painter which checks to see whether a certain
+    sized area is drawn over each time a widget is drawn. This allows
+    the program to identify clicks with a widget.
+
+    The painter monitors a certain sized region in the output pixmap
+    """
+
+    def __init__(self, pixmap, xmin, ymin, xw, yw):
+        """Monitor the region from (xmin, ymin) to (xmin+xw, ymin+yw).
+
+        pixmap is the region the painter monitors
+        """
+        
+        widgets.Painter.__init__(self)
+
+        self.pixmap = pixmap
+        self.xmin = xmin
+        self.ymin = ymin
+        self.xw = xw
+        self.yw = yw
+
+        # a stack keeping track of the widgets being painted currently
+        self.widgets = []
+        # a stack of starting state pixmaps of the widgets
+        self.pixmaps = []
+        # a list of widgets which change the region
+        self.foundwidgets = []
+
+        # we hope this color isn't actually used by the user
+        # if a pixel changes from this color, a widget has drawn something
+        self.specialcolor = qt.QColor(254, 255, 254)
+        self.pixmap.fill(self.specialcolor)
+        self.begin(self.pixmap)
+
+    def beginPaintingWidget(self, widget):
+        self.widgets.append(widget)
+
+        # make a small pixmap of the starting state of the image
+        # we can compare this after the widget is painted
+        pixmap = qt.QPixmap(self.xw, self.yw, 24)
+        qt.copyBlt(pixmap, 0, 0, self.pixmap, self.xmin, self.ymin,
+                   self.xw, self.yw)
+        self.pixmaps.append(pixmap)
+
+    def endPaintingWidget(self):
+        """When a widget has finished."""
+
+        oldpixmap = self.pixmaps.pop()
+        widget = self.widgets.pop()
+
+        # compare current pixmap for region with initial contents
+        self.flush()
+        newpixmap = qt.QPixmap(self.xw, self.yw, 24)
+        qt.copyBlt(newpixmap, 0, 0, self.pixmap, self.xmin, self.ymin,
+                   self.xw, self.yw)
+
+        if oldpixmap.convertToImage() != newpixmap.convertToImage():
+            # drawn here, so make a note
+            self.foundwidgets.append(widget)
+
+            # copy back original
+            qt.copyBlt(self.pixmap, self.xmin, self.ymin,
+                       oldpixmap, 0, 0, self.xw, self.yw)
+
+    def getFoundWidget(self):
+        """Return the widget lowest in the tree near the click of the mouse.
+        """
+
+        if self.foundwidgets:
+            return self.foundwidgets[-1]
+        else:
+            return None
 
 class PlotWindow( qt.QScrollView ):
     """Class to show the plot(s) in a scrollable window."""
@@ -70,11 +145,39 @@ class PlotWindow( qt.QScrollView ):
         # allow window to get foucs, to allow context menu
         self.setFocusPolicy(qt.QWidget.StrongFocus)
 
+    def contentsMouseReleaseEvent(self, event):
+        """If the mouse button is released, check whether the mouse
+        clicked on a widget, and emit a sigWidgetClicked(widget)."""
+
+        if event.button() == qt.Qt.LeftButton:
+            # work out where the mouse clicked
+            event.accept()
+            x, y = event.x(), event.y()
+
+            # now crazily draw the whole thing again
+            # see which widgets change the region in the small box given below
+            bufferpixmap = qt.QPixmap( *self.size )
+            painter = ClickPainter(bufferpixmap, x-2, y-2, 5, 5)
+            painter.veusz_scaling = self.zoomfactor
+
+            self.pagenumber = min( self.document.getNumberPages() - 1,
+                                   self.pagenumber )
+            self.document.paintTo(painter, self.pagenumber)
+            painter.end()
+
+            widget = painter.getFoundWidget()
+            if widget != None:
+                # tell connected caller that widget was clicked
+                self.emit( qt.PYSIGNAL('sigWidgetClicked'), (widget,) )
+
+        else:
+            qt.QScrollView.contentsMouseReleaseEvent(self, event)
+
     def setOutputSize(self):
         """Set the ouput display size."""
 
         # convert distances into pixels
-        painter = qt.QPainter( self )
+        painter = widgets.Painter(self)
         painter.veusz_scaling = self.zoomfactor
         size = self.document.basewidget.getSize(painter)
         painter.end()

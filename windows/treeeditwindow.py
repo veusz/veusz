@@ -261,11 +261,35 @@ class _PropertyLabel(qt.QLabel):
         self._setBg()
 
 class _WidgetListView(qt.QListView):
-    """A list view which emits contextMenu signals."""
+    """A list view for the widgets
+
+    It emits contextMenu signals, and allows widgets to be selected
+    """
 
     def contextMenuEvent(self, event):
         """Emit a context menu signal."""
         self.emit( qt.PYSIGNAL('contextMenu'), (event.globalPos(),) )
+
+    def selectWidget(self, widget):
+        """Find the widget in the list and select it."""
+
+        # check each item in the list to see whether it corresponds
+        # to the widget
+        iter = qt.QListViewItemIterator(self)
+
+        found = None
+        while True:
+            item = iter.current()
+            if item == None:
+                break
+            if item.widget == widget:
+                found = item
+                break
+            iter += 1
+
+        if found:
+            self.ensureItemVisible(found)
+            self.setSelected(found, True)
 
 class _PropTable(qttable.QTable):
     """The table which shows the properties of the selected widget."""
@@ -764,3 +788,10 @@ class TreeEditWindow(qt.QDockWindow):
             item = item.parent
 
         item.rename()
+
+    def slotSelectWidget(self, widget):
+        """The plot window says that a widget was selected, so we
+        select it in the listview."""
+
+        self.listview.selectWidget(widget)
+        

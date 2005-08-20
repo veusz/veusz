@@ -23,6 +23,8 @@
 
 import itertools
 
+import qt
+
 import widgetfactory
 import utils
 import setting
@@ -250,7 +252,7 @@ class Widget(object):
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
 
-        painter is the QPainter to draw on
+        painter is the widget.Painter to draw on
         outerbounds contains "ultimate" bounds we don't go outside
         """
 
@@ -363,3 +365,21 @@ class Widget(object):
 
 # allow the factory to instantiate a generic widget
 widgetfactory.thefactory.register( Widget )
+
+class Painter(qt.QPainter):
+    """A painter which allows the program to know which widget it is
+    currently drawing."""
+    
+    def __init__(self, *args):
+        qt.QPainter.__init__(self, *args)
+
+        self.veusz_scaling = 1.
+
+    def beginPaintingWidget(self, widget):
+        """Keep track of the widget currently being painted."""
+        pass
+
+    def endPaintingWidget(self):
+        """Widget is now finished."""
+        pass
+    

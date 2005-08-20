@@ -270,6 +270,7 @@ class FunctionPlotter(GenericPlotter):
                 pxpts = axes[0].graphToPlotterCoords(posn, x)
 
         # clip data within bounds of plotter
+        painter.beginPaintingWidget(self)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
@@ -300,6 +301,7 @@ class FunctionPlotter(GenericPlotter):
                 self._plotLine(painter, pxpts, pypts, posn)
 
         painter.restore()
+        painter.endPaintingWidget()
 
 # allow the factory to instantiate an function plotter
 widgetfactory.thefactory.register( FunctionPlotter )
@@ -618,6 +620,7 @@ class PointPlotter(GenericPlotter):
             return
 
         # clip data within bounds of plotter
+        painter.beginPaintingWidget(self)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
@@ -657,6 +660,7 @@ class PointPlotter(GenericPlotter):
                               size)
 
         painter.restore()
+        painter.endPaintingWidget()
 
 # allow the factory to instantiate an x,y plotter
 widgetfactory.thefactory.register( PointPlotter )
@@ -729,6 +733,8 @@ class TextLabel(GenericPlotter):
             yp = posn[3] + (posn[1]-posn[3])*s.yPos
 
         if not s.Text.hide:
+            painter.beginPaintingWidget(self)
+            painter.save()
             textpen = s.get('Text').makeQPen()
             painter.setPen(textpen)
             font = s.get('Text').makeQFont(painter)
@@ -738,6 +744,8 @@ class TextLabel(GenericPlotter):
                             TextLabel.cnvtalignhorz[s.alignHorz],
                             TextLabel.cnvtalignvert[s.alignVert],
                             s.angle ).render()
+            painter.restore()
+            painter.endPaintingWidget()
 
 # allow the factory to instantiate a text label
 widgetfactory.thefactory.register( TextLabel )

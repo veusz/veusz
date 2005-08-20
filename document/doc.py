@@ -516,10 +516,9 @@ class Document( qt.QObject ):
     def printTo(self, printer, pages, scaling = 1.):
         """Print onto printing device."""
 
-        painter = qt.QPainter()
-        painter.begin( printer )
-
+        painter = widgets.Painter()
         painter.veusz_scaling = scaling
+        painter.begin( printer )
 
         # work out how many pixels correspond to the given size
         width, height = self.basewidget.getSize(painter)
@@ -539,6 +538,12 @@ class Document( qt.QObject ):
             i += 1
 
         painter.end()
+
+    def paintTo(self, painter, page):
+        """Paint page specified to the painter."""
+        
+        width, height = self.basewidget.getSize(painter)
+        self.basewidget.children[page].draw( (0, 0, width, height), painter)
 
     def getNumberPages(self):
         """Return the number of pages in the document."""

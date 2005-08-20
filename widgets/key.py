@@ -71,6 +71,7 @@ class Key(widget.Widget):
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""
 
+        painter.beginPaintingWidget(self)
         painter.save()
 
         s = self.settings
@@ -159,5 +160,6 @@ class Key(widget.Widget):
                 ypos += height
 
         painter.restore()
+        painter.endPaintingWidget()
 
 widgetfactory.thefactory.register( Key )

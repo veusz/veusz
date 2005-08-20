@@ -373,6 +373,7 @@ class Image(plotters.GenericPlotter):
             image = self.image
 
         # clip data within bounds of plotter
+        painter.beginPaintingWidget(self)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
@@ -383,6 +384,7 @@ class Image(plotters.GenericPlotter):
                            image )
 
         painter.restore()
+        painter.endPaintingWidget()
 
 # allow the factory to instantiate an axis
 widgetfactory.thefactory.register( Image )
