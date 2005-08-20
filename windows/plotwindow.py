@@ -179,9 +179,10 @@ class PlotWindow( qt.QScrollView ):
             painter = ClickPainter(bufferpixmap, x-2, y-2, 5, 5)
             painter.veusz_scaling = self.zoomfactor
 
-            self.pagenumber = min( self.document.getNumberPages() - 1,
-                                   self.pagenumber )
-            self.document.paintTo(painter, self.pagenumber)
+            pagenumber = min( self.document.getNumberPages() - 1,
+                              self.pagenumber )
+            if pagenumber > 0:
+                self.document.paintTo(painter, self.pagenumber)
             painter.end()
 
             widget = painter.getFoundWidget()
