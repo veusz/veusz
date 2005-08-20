@@ -133,6 +133,9 @@ class PlotWindow( qt.QScrollView ):
         self.connect( self.timer, qt.SIGNAL('timeout()'),
                       self.slotTimeout )
 
+        # for drag scrolling
+        self.grabPos = None
+
         # get update period from setting database
         if 'plot_updateinterval' in setting.settingdb:
             self.interval = setting.settingdb['plot_updateinterval']
@@ -181,7 +184,7 @@ class PlotWindow( qt.QScrollView ):
 
             pagenumber = min( self.document.getNumberPages() - 1,
                               self.pagenumber )
-            if pagenumber > 0:
+            if pagenumber >= 0:
                 self.document.paintTo(painter, self.pagenumber)
             painter.end()
 
