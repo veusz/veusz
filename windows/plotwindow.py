@@ -158,6 +158,7 @@ class PlotWindow( qt.QScrollView ):
         """Scroll window by how much the mouse has moved since last time."""
 
         if self.grabPos != None:
+            event.accept()
             pos = (event.globalX(), event.globalY())
             self.scrollBy(self.grabPos[0]-pos[0], self.grabPos[1]-pos[1])
             self.grabPos = pos
@@ -190,6 +191,7 @@ class PlotWindow( qt.QScrollView ):
 
         elif button == qt.Qt.MidButton:
             # restore cursor to normal state after dragging
+            event.accept()
             qt.QApplication.restoreOverrideCursor()
             self.grabPos = None
 
