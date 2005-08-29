@@ -273,7 +273,12 @@ class Dataset(DatasetBase):
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
-        '''Initialise storage.'''
+        '''Initialise dataset with the sets of values given.
+
+        The values can be given as numarray 1d arrays or lists of numbers
+        linked optionally specifies a LinkedFile to link the dataset to
+        '''
+        
         self.document = None
         self.data = _cnvt_numarray(data)
         self.serr = self.nerr = self.perr = None
@@ -384,6 +389,109 @@ class Dataset(DatasetBase):
             file.write( format % line )
 
         file.write( "''')\n" )
+
+class DatasetExpressionException(Exception):
+    """Raised if there is an error evaluating a dataset expression."""
+    pass
+
+class DatasetExpression(Dataset):
+    """A dataset which is linked to another dataset by an expression."""
+
+    def __init__(self, data=None, serr=None, nerr=None, perr=None):
+        """Initialise the dataset with the expressions given."""
+
+        self.document = None
+        self.docchangeset = None
+        self.linked = None
+
+        # store the expressions to use to generate the dataset
+        self.expr = {}
+        self.expr['data'] = data
+        self.expr['serr'] = serr
+        self.expr['nerr'] = nerr
+        self.expr['perr'] = perr
+
+        self.evaluated = {}
+
+        # set up a default environment
+        self.environment = globals().copy()
+        exec 'from numarray import *' in self.environment
+
+    def updateValues(self):
+        """Update the values using the current document."""
+
+        # iterate over the expressions
+        for part, expr in self.expr.iteritems():
+
+            if expr == None or expr == '':
+                self.evaluated[part] = None
+            else:
+                # populate environment with other datasets
+                env = self.environment.copy()
+
+                for name, ds in self.document.data.iteritems():
+                    if ds != self and ds.dimensions == 1:
+                        # put dataset into environment
+                        env[name] = getattr(ds, part)
+
+                        # also populate with different parts of datasets
+                        for otherpart in ('data', 'serr', 'nerr', 'perr'):
+                            env['%s_%s' % (name, otherpart)] = getattr(ds, otherpart)
+
+                # actually evaluate the expression
+                try:
+                    self.evaluated[part] = eval(expr, env)
+                except Exception, e:
+                    raise DatasetExpressionException("Error evaluating expession '%s'\n"
+                                                     "Error: '%s'" % (expr, str(e)) )
+
+        # check length of evaluated products is the same
+        last = None
+        for val in self.evaluated.itervalues():
+            if val != None:
+                try:
+                    l = len(val)
+                except TypeError:
+                    l = -100
+                if last != None and last != l:
+                    raise DatasetExpressionException("Expressions for dataset parts do not "
+                                                     "yield results of the same length")
+                last = len(val)
+
+    def _propValues(self, name):
+        """Check whether expressions need reevaluating, and recalculate if necessary."""
+
+        assert self.document != None
+
+        # reevaluate expressions if document has changed
+        if self.document.changeset != self.docchangeset:
+            self.changeset = self.document.changeset
+            self.updateValues()
+
+        return self.evaluated[name]
+
+    def saveToFile(self, file, name):
+        '''Save data to file.
+        '''
+
+        parts = [name, repr(self.expr['data'])]
+        if self.expr['serr']:
+            parts.append('symerr=%s' % repr(self.expr['serr']))
+        if self.expr['nerr']:
+            parts.append('negerr=%s' % repr(self.expr['nerr']))
+        if self.expr['perr']:
+            parts.append('poserr=%s' % repr(self.expr['perr']))
+        parts.append('linked=True')
+
+        s = 'SetDataExpression(%s)\n' % ', '.join(parts)
+        file.write(s)
+        
+    # expose evaluated data as properties
+    # this allows us to recalculate the expressions on the fly
+    data = property(lambda self: self._propValues('data'))
+    serr = property(lambda self: self._propValues('serr'))
+    perr = property(lambda self: self._propValues('perr'))
+    nerr = property(lambda self: self._propValues('nerr'))
 
 def _recursiveGet(root, name, typename, outlist, maxlevels):
     """Add those widgets in root with name and type to outlist.
@@ -841,4 +949,3 @@ class Document( qt.QObject ):
 
         self.setData(dsname, ds)
         f.close()
-        

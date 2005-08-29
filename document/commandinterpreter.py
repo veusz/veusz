@@ -98,6 +98,7 @@ class CommandInterpreter:
             'Save': i.Save,
             'Set': i.Set,
             'SetData': i.SetData,
+            'SetDataExpression': i.SetDataExpression,
             'SetData2D': i.SetData2D,
             'SetVerbose': i.SetVerbose,
             'To': i.To

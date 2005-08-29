@@ -139,6 +139,39 @@ class CommandInterface(qt.QObject):
             print " Negative errors = %s" % str( data.nerr )
             print " Positive errors = %s" % str( data.perr )
 
+    def SetDataExpression(self, name, val, symerr=None, negerr=None, poserr=None,
+                          linked=False):
+        """Create a dataset based on text expressions.
+
+        Expressions are functions of existing datasets.
+        If evaluating the expression 'y*10' in negerr, then the negerrs of dataset y
+        are used, and so on.
+        To access a specific part of the dataset y, the suffixes _data, _serr, _perr,
+        and _nerr can be appended.
+        
+        If linked is True then the expressions are reevaluated if the document
+        is modified
+        """
+
+        data = doc.DatasetExpression(data=val, serr=symerr, nerr=negerr,
+                                     perr=poserr)
+
+        # if not linked, create a dataset based on the linked one
+        if not linked:
+            data.document = self.document
+            data = doc.Dataset(data=data.data, serr=data.serr,
+                               nerr=data.nerr, perr=data.perr)
+
+        # actually set the dataset
+        self.document.setData(name, data)
+
+        if self.verbose:
+            print "Set variable '%s' based on expression:" % name
+            print " Values = %s" % str( data.data )
+            print " Symmetric errors = %s" % str( data.serr )
+            print " Negative errors = %s" % str( data.nerr )
+            print " Positive errors = %s" % str( data.perr )
+
     def SetData2D(self, name, data, xrange=None, yrange=None):
         """Create a 2D dataset."""
 

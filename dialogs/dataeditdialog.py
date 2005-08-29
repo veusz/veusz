@@ -216,6 +216,10 @@ class DatasetNewDialog(qt.QDialog):
             l.setBuddy(e)
             grdlayout.addWidget(e, num, 1)
             self.dsedits[name] = e
+
+        # below text boxes...
+        self.linkbutton = qt.QCheckBox('Keep this dataset &linked to these expressions',
+                                       dsgrp)
             
         # buttons
         w = qt.QWidget(self)
@@ -263,6 +267,9 @@ class DatasetNewDialog(qt.QDialog):
             [item]
             )
 
+        # only allow links if an expression is used
+        self.linkbutton.setEnabled(item == 2)
+
     def slotCreate(self):
         """Actually create the dataset."""
 
@@ -274,10 +281,11 @@ class DatasetNewDialog(qt.QDialog):
             # call appropriate function for option
             fn = [self.createFromRange, self.createParametric,
                   self.createFromExpression][self.selectedmethod]
-            vals = fn()
 
             # make a new dataset from the returned data
-            ds = document.Dataset(**vals)
+            ds = fn()
+
+            #ds = document.Dataset(**vals)
             self.document.setData(name, ds)
 
             self.statuslabel.setText("Created dataset '%s'" % name)
@@ -337,7 +345,7 @@ class DatasetNewDialog(qt.QDialog):
                 except ValueError:
                     raise _DSException("Invalid floating point value")
 
-        return vals
+        return document.Dataset(**vals)
 
     def createParametric(self):
         """Use a parametric form to create the dataset.
@@ -383,53 +391,36 @@ class DatasetNewDialog(qt.QDialog):
                     raise _DSException("Error evaluating expession '%s'\n"
                                        "Error: '%s'" % (text, str(e)) )
 
-        return vals
+        return document.Dataset(**vals)
 
     def createFromExpression(self):
+        """Create a dataset based on the expressions given."""
 
-        # define environment to evaluate expressions
-        fnenviron = globals().copy()
-        exec 'from numarray import *' in fnenviron
-
-        # calculate for each of the dataset components
-        vals = {}
+        # get expression for each part of the dataset
+        text = {}
         for key, cntrl in self.dsedits.iteritems():
-            text = unicode( cntrl.text() ).strip()
+            text[key] = unicode( cntrl.text() ).strip()
 
-            if not text:
-                # blank text
-                vals[key] = None
-            else:
-                # populate environment with parts of dataset
-                # this assumes that dataset has members data, serr, nerr, perr
-                env = fnenviron.copy()
-                for name, ds in self.document.data.iteritems():
-                    env[name] = getattr(ds, key)
-                    # also provide other parts of dataset for expression
-                    for otherkey in self.dsedits.iterkeys():
-                        env["%s_%s" % (name, otherkey)] = getattr(ds, otherkey)
+        ds = document.DatasetExpression(data=text['data'], serr=text['serr'],
+                                        nerr=text['nerr'], perr=text['perr'])
+        ds.document = self.document
 
-                # evaluate the expression
-                try:
-                    vals[key] = eval(text, env)
-                except Exception, e:
-                    raise _DSException("Error evaluating expession '%s'\n"
-                                       "Error: '%s'" % (text, str(e)) )
+        try:
+            # we force an evaluation of the dataset for the first time, to
+            # check for errors in the expressions
 
-        # check length of values is the same
-        last = None
-        for val in vals.itervalues():
-            if val != None:
-                try:
-                    l = len(val)
-                except TypeError:
-                    l = -100
-                if last != None and last != l:
-                    raise _DSException("Expressions for dataset parts do not "
-                                       "yield results of the same length")
-                last = len(val)
+            data = ds.data
+            
+        except document.DatasetExpressionException, e:
+            raise _DSException(str(e))
 
-        return vals
+        if self.linkbutton.isChecked():
+            # if the linked button is checked, return the linked dataset
+            return ds
+        else:
+            # else return a copy of the values
+            return document.Document(data=ds.data, serr=ds.serr,
+                                     perr=ds.perr, nerr=ds.nerr)
 
 class _DataEditTable(qttable.QTable):
     """A QTable for displaying data from datasets.
@@ -720,12 +711,31 @@ class DataEditDialog(qt.QDialog):
         self.dstable.setDataset(ds)
 
         # linked dataset
+        readonly = False
         if ds.linked == None:
-            l = 'None'
+            fn = 'None'
+            enabled = False
         else:
-            l = ds.linked.filename
-        self.linkbutton.setEnabled( ds.linked != None)
-        self.linklabel.setText('Linked file: %s' % l)
+            fn = ds.linked.filename
+            enabled = True
+        text = 'Linked file: %s' % fn
+        
+        if isinstance(ds, document.DatasetExpression):
+            # for datasets linked by expressions
+            items = ['Linked expression dataset:']
+            for label, part in ( ('Values', 'data'),
+                                 ('Symmetric errors', 'serr'),
+                                 ('Positive errors', 'perr'),
+                                 ('Negative errors', 'nerr') ):
+                if ds.expr[part]:
+                    items.append('%s: %s' % (label, ds.expr[part]))
+            text = '\n'.join(items)
+            enabled = True
+            readonly = True
+            
+        self.linkbutton.setEnabled(enabled)
+        self.linklabel.setText(text)
+        self.dstable.setReadOnly(readonly)
 
     def slotDatasetDelete(self):
         """Delete selected dataset."""
@@ -775,7 +785,7 @@ class DataEditDialog(qt.QDialog):
         ids.show()
         
     def slotDatasetUnlink(self):
-        """Allow user to remove link to file."""
+        """Allow user to remove link to file or other datasets."""
 
         item = self.dslistbox.selectedItem()
         if item != None:
@@ -793,7 +803,18 @@ class DataEditDialog(qt.QDialog):
 
             # if they want to carry on
             if mb.exec_loop() == qt.QMessageBox.Ok:
-                self.document.unlinkDataset(name)
+
+                ds = self.document.data[name]
+                if isinstance(ds, document.DatasetExpression):
+                    # check whether linked expression
+                    # create a new dataset based on values from old
+                    ds = document.Dataset(data=ds.data, serr=ds.serr,
+                                          perr=ds.perr, nerr=ds.nerr)
+                    self.document.setData(name, ds)
+                else:
+                    # unlink file
+                    self.document.unlinkDataset(name)
+                    
                 # update display
                 self.dslistbox.setCurrentItem( self.dslistbox.currentItem() )
 

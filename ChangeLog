@@ -1,3 +1,9 @@
+* 2005-08-29 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Allow datasets to be linked to other datasets using expressions
+	- Add SetDataExpression command
+	- Modify create dataset and edit dataset dialogs to allow linked
+	datasets
+
 * 2005-08-20 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Change drop down lists to use grey rather than red
 	- Allow user to click on widgets, and they are selected
