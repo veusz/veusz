@@ -22,6 +22,7 @@
 # $Id$
 
 import os
+import os.path
 import sys
 import itertools
 
@@ -30,9 +31,6 @@ import qt
 import setting
 import dialogs.exceptiondialog
 import widgets
-
-mdir = os.path.dirname(__file__)
-_logolocation='%s/../images/logo.png' % mdir
 
 class ClickPainter(widgets.Painter):
     """A variant of a painter which checks to see whether a certain
@@ -110,12 +108,16 @@ class ClickPainter(widgets.Painter):
 
 class PlotWindow( qt.QScrollView ):
     """Class to show the plot(s) in a scrollable window."""
-    
+
     def __init__(self, document, *args):
         """Initialise the window."""
 
         qt.QScrollView.__init__(self, *args)
         self.viewport().setBackgroundMode( qt.Qt.NoBackground )
+
+        # show splash logo until timer runs out (3s)
+        self.showlogo = True
+        qt.QTimer.singleShot(3000, self.slotSplashDisable)
 
         # set up so if document is modified we are notified
         self.document = document
@@ -270,10 +272,17 @@ class PlotWindow( qt.QScrollView ):
         """Get the the selected page."""
         return self.pagenumber
 
+    def slotSplashDisable(self):
+        """Disable drawing the splash logo."""
+        self.showlogo = False
+        self.updateContents()
+
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""
 
-        logo = qt.QPixmap( _logolocation )
+        logolocation = os.path.join(os.path.dirname(__file__),
+                                    '..', 'images', 'logo.png')
+        logo = qt.QPixmap( logolocation )
         painter.drawPixmap( self.visibleWidth()/2 - logo.width()/2,
                             self.visibleHeight()/2 - logo.height()/2,
                             logo )
@@ -338,7 +347,7 @@ class PlotWindow( qt.QScrollView ):
 
         # add logo if no children
         widget = self.document.basewidget
-        if len(widget.children) == 0:
+        if len(widget.children) == 0 and self.showlogo:
             self.drawLogo(painter)
 
     def contextMenuEvent(self, event):

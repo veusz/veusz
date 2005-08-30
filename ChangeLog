@@ -1,3 +1,6 @@
+* 2005-08-30 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Time out splash logo
+	
 * 2005-08-29 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Allow datasets to be linked to other datasets using expressions
 	- Add SetDataExpression command
