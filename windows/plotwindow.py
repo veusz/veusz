@@ -153,11 +153,23 @@ class PlotWindow( qt.QScrollView ):
     def contentsMousePressEvent(self, event):
         """Allow user to drag window around."""
 
-        if event.button() == qt.Qt.MidButton:
-            # store start position
-            event.accept()
-            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
+        if event.button() == qt.Qt.LeftButton:
+            # we set this to true unless the timer runs out (400ms), then it
+            # becomes a scroll click
+            # scroll clicks drag the window around, and selecting clicks
+            # select widgets!
+            self.selectingClick = True
+
             self.grabPos = (event.globalX(), event.globalY())
+            qt.QTimer.singleShot(400, self.slotBecomeScrollClick)
+
+    def slotBecomeScrollClick(self):
+        """If the click is still down when this timer is reached then
+        we turn the click into a scrolling click."""
+
+        if self.selectingClick:
+            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
+            self.selectingClick = False
 
     def contentsMouseMoveEvent(self, event):
         """Scroll window by how much the mouse has moved since last time."""
@@ -172,37 +184,38 @@ class PlotWindow( qt.QScrollView ):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
 
-        button = event.button()
-        if button == qt.Qt.LeftButton:
-            # work out where the mouse clicked
+        if event.button() == qt.Qt.LeftButton:
             event.accept()
-            x, y = event.x(), event.y()
-
-            # now crazily draw the whole thing again
-            # see which widgets change the region in the small box given below
-            bufferpixmap = qt.QPixmap( *self.size )
-            painter = ClickPainter(bufferpixmap, x-2, y-2, 5, 5)
-            painter.veusz_scaling = self.zoomfactor
-
-            pagenumber = min( self.document.getNumberPages() - 1,
-                              self.pagenumber )
-            if pagenumber >= 0:
-                self.document.paintTo(painter, self.pagenumber)
-            painter.end()
-
-            widget = painter.getFoundWidget()
-            if widget != None:
-                # tell connected caller that widget was clicked
-                self.emit( qt.PYSIGNAL('sigWidgetClicked'), (widget,) )
-
-        elif button == qt.Qt.MidButton:
-            # restore cursor to normal state after dragging
-            event.accept()
-            qt.QApplication.restoreOverrideCursor()
-            self.grabPos = None
-
+            if self.selectingClick:
+                # work out where the mouse clicked and choose widget
+                self.locateClickWidget(event.x(), event.y())
+            else:
+                # return the cursor to normal after scrolling
+                qt.QApplication.restoreOverrideCursor()
+            self.selectingClick = False
         else:
             qt.QScrollView.contentsMouseReleaseEvent(self, event)
+
+    def locateClickWidget(self, x, y):
+        """Work out which widget was clicked, and if necessary send
+        a sigWidgetClicked(widget) signal."""
+        
+        # now crazily draw the whole thing again
+        # see which widgets change the region in the small box given below
+        bufferpixmap = qt.QPixmap( *self.size )
+        painter = ClickPainter(bufferpixmap, x-2, y-2, 5, 5)
+        painter.veusz_scaling = self.zoomfactor
+
+        pagenumber = min( self.document.getNumberPages() - 1,
+                          self.pagenumber )
+        if pagenumber >= 0:
+            self.document.paintTo(painter, self.pagenumber)
+        painter.end()
+
+        widget = painter.getFoundWidget()
+        if widget != None:
+            # tell connected caller that widget was clicked
+            self.emit( qt.PYSIGNAL('sigWidgetClicked'), (widget,) )
 
     def setOutputSize(self):
         """Set the ouput display size."""

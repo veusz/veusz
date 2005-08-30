@@ -1,5 +1,7 @@
 * 2005-08-30 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Time out splash logo
+	- Use left click for panning instead of middle click. Left click
+	after timeout changes cursor to panning cursor
 	
 * 2005-08-29 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Allow datasets to be linked to other datasets using expressions
