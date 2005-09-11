@@ -35,10 +35,6 @@ class Settings:
         self.changeset = 0
         self.parent = None
 
-    def getName(self):
-        """Get the name of the settings."""
-        return self.name
-
     def getSettingsNames(self):
         """Get a list of names of settings."""
         return self.setnames
@@ -63,7 +59,7 @@ class Settings:
 
     def add(self, setting, posn = -1, readonly = False):
         """Add a new setting with the name, or a set of subsettings."""
-        name = setting.getName()
+        name = setting.name
         assert name not in self.setdict
         self.setdict[name] = setting
         if posn < 0:
@@ -105,7 +101,7 @@ class Settings:
 
         d = self.__dict__['setdict']
         if name in d:
-            d[name].set(val)
+            d[name].val = val
             self.setModified()
         else:
             self.__dict__[name] = val
@@ -119,7 +115,11 @@ class Settings:
         d = self.__dict__['setdict']
         try:
             if name in d:
-                return d[name].get()
+                s = d[name]
+                if isinstance(s, Settings):
+                    return s
+                else:
+                    return s.val
             else:
                 return self.__dict__[name]
         except KeyError:

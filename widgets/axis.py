@@ -601,6 +601,7 @@ class Axis(widget.Widget):
             next = 0.
 
         # temporarily change position of axis
+        # ** this is a horrible kludge **
         s.get('otherPosition').setSilent(next)
 
         self._updatePlotRange(posn)

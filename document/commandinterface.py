@@ -95,8 +95,8 @@ class CommandInterface(qt.QObject):
                 print '%10s %10s %30s' % (name, w.typename, w.userdescription)
 
     def Get(self, var):
-        """Get the value of a preference."""
-        return self.currentwidget.prefLookup(var).get()
+        """Get the value of a setting."""
+        return self.currentwidget.prefLookup(var).val
 
     def GetChildren(self, where='.'):
         """Return a list of widgets which are children of the widget of the
@@ -116,15 +116,13 @@ class CommandInterface(qt.QObject):
         self.document.saveToFile(f)
 
     def Set(self, var, val):
-        """Set the value of a preference."""
+        """Set the value of a setting."""
         pref = self.currentwidget.prefLookup(var)
-        pref.set(val)
+        pref.val = val
 
         if self.verbose:
-            print ( "Set preference '%s' to %s" %
+            print ( "Set setting '%s' to %s" %
                     (var, repr(val)) )
-
-        self.document.setModified()
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Set dataset with name with values (and optionally errors)."""

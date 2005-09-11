@@ -771,7 +771,7 @@ class Document( qt.QObject ):
         _recursiveGet(root, widgetname, widget.typename, widgetlist,
                       maxlevels)
 
-        val = setting.get()
+        val = setting.val
         # set the settings for the widgets
         for w in widgetlist:
             # lookup the setting
@@ -780,7 +780,7 @@ class Document( qt.QObject ):
                 s = s.get(i)
 
             # set the setting
-            s.set(val)
+            s.val = val
             
     def resolve(self, fromwidget, where):
         """Resolve graph relative to the widget fromwidget

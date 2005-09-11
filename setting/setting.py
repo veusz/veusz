@@ -42,8 +42,8 @@ from settingdb import settingdb
 class InvalidType(Exception):
     pass
 
-class Setting:
-    def __init__(self, name, val, descr=''):
+class Setting(object):
+    def __init__(self, name, value, descr=''):
         """Initialise the values.
 
         descr is a description of the setting
@@ -52,9 +52,59 @@ class Setting:
         self.parent = None
         self.name = name
         self.descr = descr
-        self.default = val
+        self.default = value
         self.onmodified = []
-        self.set(val)
+        self._val = None
+        self.tied = None
+
+        self.val = value
+
+    def get(self):
+        """Get the value, or get the value from the tied variable."""
+        if self.tied == None:
+            return self.convertFrom(self._val)
+        else:
+            return self.tied.val
+
+    def set(self, v):
+        """Set the value, or set the tied variable."""
+        if self.tied == None:
+            self._val = self.convertTo(v)
+            for mod in self.onmodified:
+                mod(True)
+        else:
+            self.tied.val = v
+
+    val = property(get, set, None,
+                   'Get or modify the value of the setting')
+
+    def tie(self, setting):
+        """Tie this setting to another."""
+        if self.tied != None:
+            self.untie()
+        self.tied = setting
+        self.tied.setOnModified(self._tiedModified)
+
+    def untie(self):
+        """Untie association with another setting."""
+        if self.tied != None:
+            self.tied.removeOnModified(self._tiedModified)
+            self.tied = None
+
+    def _tiedModified(self, ismodified):
+        """Called when the setting this setting is tied to is modified."""
+        for mod in self.onmodified:
+            mod(True)
+
+    def toText(self):
+        """Convert the type to text for saving."""
+        return ""
+
+    def fromText(self, text):
+        """Convert text to type suitable for setting.
+
+        Raises InvalidType if cannot convert."""
+        return None
 
     def readDefaults(self, root, widgetname):
         """Check whether the user has a default for this setting."""
@@ -74,7 +124,7 @@ class Setting:
             pass
     
         if deftext != None:
-            self.set( self.fromText(deftext) )
+            self.val = self.fromText(deftext)
             self.default = self.val
 
     def removeDefault(self):
@@ -122,13 +172,13 @@ class Setting:
 
         if (saveall or not self.isDefault()) and not self.readonly:
             return "Set('%s%s', %s)\n" % ( rootname, self.name,
-                                           repr(self.get()) )
+                                           repr(self.val) )
         else:
             return ''
 
     def resetToDefault(self):
         """Reset the value to its default."""
-        self.set(self.default)
+        self.val = self.default
 
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""
@@ -139,28 +189,14 @@ class Setting:
         i = self.onmodified.index(fn)
         del self.onmodified[i]
 
-    def newDefault(self, val):
+    def newDefault(self, value):
         """Update the default and the value."""
-        self.default = val
-        self.set(val)
+        self.default = value
+        self.val = value
 
     def isDefault(self):
         """Is the current value a default?"""
-        return self.get() == self.default
-
-    def getName(self):
-        """Get the name of the setting."""
-        return self.name
-
-    def get(self):
-        """Get the stored setting."""
-        return self.convertFrom(self.val)
-
-    def set(self, val):
-        """Save the stored setting."""
-        self.val = self.convertTo( val )
-        for i in self.onmodified:
-            i(True)
+        return self.val == self.default
 
     def setSilent(self, val):
         """Set the setting, without propagating modified flags.
@@ -168,7 +204,10 @@ class Setting:
         This shouldn't often be used as it defeats the automatic updation.
         Used for temporary modifications."""
 
-        self.val = self.convertTo( val )
+        if self.tied == None:
+            self._val = self.convertTo(val)
+        else:
+            self.tied.setSilent(val)
 
     def convertTo(self, val):
         """Convert for storage."""
@@ -177,16 +216,6 @@ class Setting:
     def convertFrom(self, val):
         """Convert to storage."""
         return val
-
-    def toText(self):
-        """Convert the type to text for saving."""
-        return ""
-
-    def fromText(self, text):
-        """Convert text to type suitable for setting.
-
-        Raises InvalidType if cannot convert."""
-        return None
 
     def makeControl(self, *args):
         """Make a qt control for editing the setting.

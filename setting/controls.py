@@ -93,8 +93,8 @@ class Edit(qt.QLineEdit):
             self.setPaletteBackgroundColor(self.bgcolour)
 
             # value has changed
-            if self.setting.get() != val:
-                self.setting.set(val)
+            if self.setting.val != val:
+                self.setting.val = val
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -283,8 +283,8 @@ class String(qt.QHBox):
             self.edit.setPaletteBackgroundColor(self.bgcolour)
 
             # value has changed
-            if self.setting.get() != val:
-                self.setting.set(val)
+            if self.setting.val != val:
+                self.setting.val = val
 
         except setting.InvalidType:
             self.edit.setPaletteBackgroundColor(qt.QColor('red'))
@@ -300,7 +300,7 @@ class Bool(qt.QCheckBox):
         qt.QCheckBox.__init__(self, parent)
 
         self.setting = setting
-        self.setChecked( setting.get() )
+        self.setChecked(setting.val)
 
         # we get a signal when the button is toggled
         self.connect( self, qt.SIGNAL('toggled(bool)'),
@@ -317,11 +317,11 @@ class Bool(qt.QCheckBox):
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
-        self.setting.set(state)
+        self.setting.val = state
         
     def onModified(self, mod):
         """called when the setting is changed remotely"""
-        self.setChecked( self.setting.get() )
+        self.setChecked( self.setting.val )
 
 class Choice(qt.QComboBox):
     """For choosing between a set of values."""
@@ -371,8 +371,8 @@ class Choice(qt.QComboBox):
             self.setPaletteBackgroundColor(self.bgcolour)
             
             # value has changed
-            if self.setting.get() != val:
-                self.setting.set(val)
+            if self.setting.val != val:
+                self.setting.val = val
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -416,8 +416,8 @@ class MultiLine(qt.QTextEdit):
             self.setPaletteBackgroundColor(self.bgcolour)
             
             # value has changed
-            if self.setting.get() != val:
-                self.setting.set(val)
+            if self.setting.val != val:
+                self.setting.val = val
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -667,7 +667,7 @@ class Color(qt.QHBox):
         if col.isValid():
             # change setting
             name = col.name()
-            self.setting.set(unicode(name))
+            self.setting.val = unicode(name)
 
     def slotActivated(self, val):
         """A different value is selected."""
@@ -676,8 +676,8 @@ class Color(qt.QHBox):
         val = self.setting.fromText(text)
             
         # value has changed
-        if self.setting.get() != val:
-            self.setting.set(val)
+        if self.setting.val != val:
+            self.setting.val = val
             
     def done(self):
         """Delete modification notification."""

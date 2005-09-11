@@ -83,5 +83,6 @@ def run():
 
 # if ran as a program
 if __name__ == '__main__':
+    #profile.run('run()')
     run()
 
