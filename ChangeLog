@@ -1,3 +1,7 @@
+* 2005-09-11 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Increase size of star, cross and triangle markers by 20%
+	to match other markers better
+	
 * 2005-08-30 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Time out splash logo
 	- Use left click for panning instead of middle click. Left click
