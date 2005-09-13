@@ -474,7 +474,7 @@ class DatasetExpression(Dataset):
         '''Save data to file.
         '''
 
-        parts = [name, repr(self.expr['data'])]
+        parts = [repr(name), repr(self.expr['data'])]
         if self.expr['serr']:
             parts.append('symerr=%s' % repr(self.expr['serr']))
         if self.expr['nerr']:

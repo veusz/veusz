@@ -419,8 +419,8 @@ class DatasetNewDialog(qt.QDialog):
             return ds
         else:
             # else return a copy of the values
-            return document.Document(data=ds.data, serr=ds.serr,
-                                     perr=ds.perr, nerr=ds.nerr)
+            return document.Dataset(data=ds.data, serr=ds.serr,
+                                    perr=ds.perr, nerr=ds.nerr)
 
 class _DataEditTable(qttable.QTable):
     """A QTable for displaying data from datasets.

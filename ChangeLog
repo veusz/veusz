@@ -1,5 +1,6 @@
 * 2005-09-13 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add linecross and lineplus markers
+	- Fix a couple of dataset link bugs
 	
 * 2005-09-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Increase size of star, cross and triangle markers by 20%
