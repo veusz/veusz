@@ -57,6 +57,19 @@ def _plot_asterisk(painter, xpos, ypos, size):
     painter.drawLine( xpos - size, ypos, xpos + size, ypos )
     painter.drawLine( xpos, ypos - size, xpos, ypos + size )
 
+def _plot_line_plus(painter, xpos, ypos, size):
+    """ (internal) function to plot a + in lines.
+    """
+    painter.drawLine( xpos - size, ypos, xpos + size, ypos )
+    painter.drawLine( xpos, ypos - size, xpos, ypos + size )
+
+def _plot_line_cross(painter, xpos, ypos, size):
+    """ (internal) function to plot a x in lines.
+    """
+    s2 = int(size*0.707107)
+    painter.drawLine( xpos - s2, ypos - s2, xpos + s2, ypos + s2 )
+    painter.drawLine( xpos - s2, ypos + s2, xpos + s2, ypos - s2 )
+
 def _plot_circle_dot(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker with dot at core
     size is the radius of the circle
@@ -160,6 +173,7 @@ MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'octogon', 'pentagon', 'tievert', 'tiehorz',
                 'triangle',
                 'dot', 'circledot', 'bullseye', 'asterisk',
+                'lineplus', 'linecross',
                 'linevert', 'linehorz',
                 'arrowleft', 'arrowright', 'arrowup',
                 'arrowdown' )
@@ -171,6 +185,8 @@ _MarkerLookup = { 'none': _plot_none,
                   'circledot': _plot_circle_dot,
                   'bullseye': _plot_bullseye,
                   'asterisk': _plot_asterisk,
+                  'lineplus': _plot_line_plus,
+                  'linecross': _plot_line_cross,
                   'linehorz': _plot_line_horz,
                   'linevert': _plot_line_vert,
                   'arrowleft': _plot_arrow_left,

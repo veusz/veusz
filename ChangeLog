@@ -1,3 +1,6 @@
+* 2005-09-13 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Add linecross and lineplus markers
+	
 * 2005-09-11 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Increase size of star, cross and triangle markers by 20%
 	to match other markers better
