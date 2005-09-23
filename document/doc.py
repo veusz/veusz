@@ -28,6 +28,7 @@ import numarray as N
 import random
 import string
 import itertools
+import re
 
 import qt
 
@@ -394,6 +395,60 @@ class DatasetExpressionException(Exception):
     """Raised if there is an error evaluating a dataset expression."""
     pass
 
+# This code requires Python 2.4
+# class _ExprDict(dict):
+#     """A subclass of a dict which help evaluate expressions on the fly.
+
+#     We do this because there's not an easy way to work out what order
+#     the expressions should be evaluated in if there is interdependence
+
+#     This is a subclass of dict so we can grab values from the document
+#     if they match dataset names
+
+#     part should be set to the part currently being evaluated
+#     """
+
+#     # allowed extensions to dataset names
+#     _validextn = {'data': True, 'serr': True, 'nerr': True, 'perr': True}
+
+#     def __init__(self, oldenvironment, document, part):
+#         """Evaluate expressions in environment of document.
+
+#         document is the document to look for data in
+#         oldenvironment is a globals environment or suchlike
+#         part is the part of the dataset to use by default (e.g. 'serr')
+#         """
+
+#         # copy environment from existing environment
+#         self.update(oldenvironment)
+#         self.document = document
+#         self.part = part
+
+#     def __getitem__(self, item):
+#         """Return the value corresponding to key item from the dict
+
+#         This works by checking for the dataset in the document first, and
+#         returning that if it exists
+#         """
+
+#         # make a copy as we might change it if it contains an extn
+#         i = item
+
+#         # look for a valid extension to the dataset name
+#         part = self.part
+#         p = item.split('_')
+#         if len(p) > 1:
+#             if p[-1] in _ExprDict._validextn:
+#                 part = p[-1]
+#             i = '_'.join(p[:-1])
+
+#         print "**", i, "**"
+#         if i in self.document.data:
+#             return getattr(self.document.data[i], part)
+#         else:
+#             # revert to old behaviour
+#             return dict.__getitem__(self, item)
+
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
@@ -401,7 +456,6 @@ class DatasetExpression(Dataset):
         """Initialise the dataset with the expressions given."""
 
         self.document = None
-        self.docchangeset = None
         self.linked = None
 
         # store the expressions to use to generate the dataset
@@ -411,64 +465,85 @@ class DatasetExpression(Dataset):
         self.expr['nerr'] = nerr
         self.expr['perr'] = perr
 
+        self.docchangeset = { 'data': None, 'serr': None,
+                              'perr': None, 'nerr': None }
         self.evaluated = {}
 
         # set up a default environment
         self.environment = globals().copy()
         exec 'from numarray import *' in self.environment
 
-    def updateValues(self):
-        """Update the values using the current document."""
+        # this fn gets called to return the value of a dataset
+        self.environment['_DS_'] = self._evaluateDataset
 
-        # iterate over the expressions
-        for part, expr in self.expr.iteritems():
+        # used to break the dataset expression into parts
+        # to look for dataset names
+        # basically this is most non-alphanumeric chars (except _)
+        self.splitre = re.compile(r'([+\-*/\(\)\[\],<>=!|%^~&])')
 
-            if expr == None or expr == '':
-                self.evaluated[part] = None
-            else:
-                # populate environment with other datasets
-                env = self.environment.copy()
+    def _substituteDatasets(self, expression, thispart):
+        """Subsitiute the names of datasets with calls to a function which will evaluate
+        them.
 
-                for name, ds in self.document.data.iteritems():
-                    if ds != self and ds.dimensions == 1:
-                        # put dataset into environment
-                        env[name] = getattr(ds, part)
+        This is horribly hacky, but python-2.3 can't use eval with dict subclass
+        """
 
-                        # also populate with different parts of datasets
-                        for otherpart in ('data', 'serr', 'nerr', 'perr'):
-                            env['%s_%s' % (name, otherpart)] = getattr(ds, otherpart)
+        # split apart the expression to look for dataset names
+        # re could be compiled if this gets slow
+        bits = self.splitre.split(expression)
 
-                # actually evaluate the expression
-                try:
-                    self.evaluated[part] = eval(expr, env)
-                except Exception, e:
-                    raise DatasetExpressionException("Error evaluating expession '%s'\n"
-                                                     "Error: '%s'" % (expr, str(e)) )
+        datasets = self.document.data
 
-        # check length of evaluated products is the same
-        last = None
-        for val in self.evaluated.itervalues():
-            if val != None:
-                try:
-                    l = len(val)
-                except TypeError:
-                    l = -100
-                if last != None and last != l:
-                    raise DatasetExpressionException("Expressions for dataset parts do not "
-                                                     "yield results of the same length")
-                last = len(val)
+        for i, bit in enumerate(bits):
+            # test whether there's an _data, _serr or such at the end of the name
+            part = thispart
+            bitbits = bit.split('_')
+            if len(bitbits) > 1:
+                if bitbits[-1] in self.expr:
+                    part = bitbits.pop(-1)
+                bit = '_'.join(bitbits)
 
-    def _propValues(self, name):
+            if bit in datasets:
+                # replace name with a function to call
+                bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
+
+        return ''.join(bits)
+
+    def _evaluateDataset(self, dsname, dspart):
+        """Return the dataset given.
+        
+        dsname is the name of the dataset
+        dspart is the part to get (e.g. data, serr)
+        """
+        return getattr(self.document.data[dsname], dspart)
+                    
+    def _propValues(self, part):
         """Check whether expressions need reevaluating, and recalculate if necessary."""
 
         assert self.document != None
 
-        # reevaluate expressions if document has changed
-        if self.document.changeset != self.docchangeset:
-            self.changeset = self.document.changeset
-            self.updateValues()
+        # if document has been modified since the last invocation
+        if self.docchangeset[part] != self.document.changeset:
+            # avoid infinite recursion!
+            self.docchangeset[part] = self.document.changeset
+            expr = self.expr[part]
+            self.evaluated[part] = None
 
-        return self.evaluated[name]
+            if expr != None and expr != '':
+                # replace dataset names with calls (ugly hack)
+                # but necessary for Python 2.3 as we can't replace
+                # dict in eval by subclass
+                expr = self._substituteDatasets(expr, part)
+                env = self.environment.copy()
+                
+                try:
+                    self.evaluated[part] = eval(expr, env)
+                except Exception, e:
+                    raise DatasetExpressionException("Error evaluating expession: %s\n"
+                                                     "Error: %s" % (self.expr[part], str(e)) )
+
+        # return the evaluated form of the expression
+        return self.evaluated[part]
 
     def saveToFile(self, file, name):
         '''Save data to file.

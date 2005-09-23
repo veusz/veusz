@@ -1,3 +1,6 @@
+* 2005-09-23 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Finally get dataset linking working with cross dependencies
+	
 * 2005-09-13 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add linecross and lineplus markers
 	- Fix a couple of dataset link bugs
