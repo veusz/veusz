@@ -70,11 +70,11 @@ def run():
         if filelist:
             for filename in filelist:
                 #XXX - need error handling here...
-                windows.mainwindow.CreateWindow(filename)
+                windows.mainwindow.MainWindow.CreateWindow(filename)
         else:
-            windows.mainwindow.CreateWindow()
+            windows.mainwindow.MainWindow.CreateWindow()
     else:
-        windows.mainwindow.CreateWindow()
+        windows.mainwindow.MainWindow.CreateWindow()
     
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
                 app, qt.SLOT("quit()"))

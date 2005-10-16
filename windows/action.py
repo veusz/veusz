@@ -32,7 +32,7 @@ class Action(qt.QObject):
     menu items, and so on."""
 
     def __init__(self, parent, onaction, iconfilename = None, menutext = None,
-                 tooltiptext = None, statusbartext = None):
+                 tooltiptext = None, statusbartext = None, accel=None):
         qt.QObject.__init__(self)
 
         self.parent = parent
@@ -41,7 +41,11 @@ class Action(qt.QObject):
         self.tooltiptext = tooltiptext
         self.statusbartext = statusbartext
         self.items = []
-
+        if accel:
+            self.accel = qt.QKeySequence(accel)
+        else:
+            self.accel = None
+            
         if self.statusbartext == None:
             if self.menutext != None:
                 # if there is no text, use the status bar text (removing ...)
@@ -94,6 +98,8 @@ class Action(qt.QObject):
                 num = widget.insertItem(self.iconset, self.menutext)
             else:
                 num = widget.insertItem(self.menutext)
+            if self.accel:
+                widget.setAccel(self.accel, num)
             widget.connectItem(num, self.slotAction)
             self.items.append( (widget, num) )
 

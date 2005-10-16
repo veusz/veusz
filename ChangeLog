@@ -1,3 +1,10 @@
+* 2005-10-16 Jeremy Sanders <jeremy@jeremysanders.net>
+	- A long wait!
+	- Added patch by James Graham to support copy/cut/paste support
+	of widgets. Cleaned up to make the logic more simple.
+	- A widget should get the selection after another is deleted
+	- CreateWindow becomes a MainWindow classmethod
+	
 * 2005-09-23 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Finally get dataset linking working with cross dependencies
 	

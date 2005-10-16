@@ -28,6 +28,7 @@ from math import sqrt
 import consolewindow
 import plotwindow
 import treeeditwindow
+
 import document
 import utils
 import setting
@@ -42,6 +43,22 @@ _fdirname = os.path.dirname(__file__)
 
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
+
+    def CreateWindow(cls, filename=None):
+        """Window factory function.
+
+        If filename is given then that file is loaded into the window.
+        Returns window created
+        """
+
+        # create the window, and optionally load a saved file
+        win = cls()
+        win.show()
+        if filename:
+            win.openFile(filename)
+        return win
+
+    CreateWindow = classmethod(CreateWindow)
 
     def __init__(self, *args):
         qt.QMainWindow.__init__(self, *args)
@@ -141,9 +158,9 @@ class MainWindow(qt.QMainWindow):
                 if self.document.isBlank():
                     self.openFile(files[0])
                 else:
-                    CreateWindow(files[0])
+                    self.CreateWindow(files[0])
                 for filename in files[1:]:
-                    CreateWindow(filename)
+                    self.CreateWindow(filename)
             
             
     def _getVeuszFiles(self, event):
@@ -224,9 +241,6 @@ class MainWindow(qt.QMainWindow):
              self.slotFileClose, '', False, 'Ctrl+W'),
             ('filequit', 'Exit the program', '&Quit', 'file',
              self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
-
-            ('editcopy', 'Copy data to clipboard', '&Copy', 'edit',
-             self.slotEditCopy, '', False, ''),
 
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
@@ -321,10 +335,6 @@ class MainWindow(qt.QMainWindow):
             self.actions[action].addTo(zoompop)
         zoomtb.setPopup(zoompop)
         zoomtb.setPopupDelay(0)
-
-        # modify edit menu before it pops up
-        self.connect( self.menus['edit'], qt.SIGNAL('aboutToShow()'),
-                      self.slotEditAboutToShow )
 
     def slotDataImport(self):
         """Display the import data dialog."""
@@ -439,7 +449,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotFileNew(self):
         """New file."""
-        CreateWindow()
+        self.CreateWindow()
 
     def slotFileSave(self):
         """Save file."""
@@ -571,7 +581,7 @@ class MainWindow(qt.QMainWindow):
                 self.openFile(filename)
             else:
                 # create a new window
-                CreateWindow(filename)
+                self.CreateWindow(filename)
                 
     def slotFileExport(self):
         """Export the graph."""
@@ -740,41 +750,3 @@ class MainWindow(qt.QMainWindow):
         # disable previous and next page actions
         self.actions['viewprevpage'].setEnabled( number != 0 )
         self.actions['viewnextpage'].setEnabled( number < np-1 )
-
-    def slotEditAboutToShow(self):
-        """Disable/enable various items on edit menu according to status."""
-
-        widget = self.focusWidget()
-        print widget
-
-        # should enable edit copy?
-        showcopy = False
-        if ( isinstance(widget, qt.QLineEdit) or
-             isinstance(widget, qt.QTextEdit) ):
-            if widget.hasSelectedText():
-                showcopy = True
-
-        self.actions['editcopy'].setEnabled(showcopy)
-        
-    def slotEditCopy(self):
-        # get the widget with the current focus
-        widget = self.focusWidget()
-
-        if ( isinstance(widget, qt.QLineEdit) or
-             isinstance(widget, qt.QTextEdit) ):
-            widget.copy()
-
-        elif isinstance(widget, qt.QComboBox):
-            le = widget.lineEdit()
-            if le != None:
-                le.copy()
-            
-        print widget
-
-def CreateWindow(filename=None):
-    """Window factory function"""
-    win = MainWindow()
-    win.show()
-    if filename:
-        win.openFile(filename)
-    return win

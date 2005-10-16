@@ -334,6 +334,9 @@ class _PropTable(qttable.QTable):
 class TreeEditWindow(qt.QDockWindow):
     """A graph editing window with tree display."""
 
+    # mime type when widgets are stored on the clipboard
+    widgetmime = 'text/x-vnd.veusz-clipboard'
+
     def __init__(self, thedocument, parent):
         qt.QDockWindow.__init__(self, parent)
         self.setResizeEnabled( True )
@@ -435,18 +438,27 @@ class TreeEditWindow(qt.QDockWindow):
 
         self.contextpopup = qt.QPopupMenu(self)
 
-        for name, icon, tooltip, menutext, slot in (
+        for name, icon, tooltip, menutext, accel, slot in (
+            ('cut', 'stock-cut.png', 'Cut the selected item',
+             '&Cut', 'Ctrl+X',
+             self.slotWidgetCut),
+            ('copy', 'stock-copy.png', 'Copy the selected item',
+             '&Copy', 'Ctrl+C',
+             self.slotWidgetCopy),
+            ('paste', 'stock-paste.png', 'Paste from the clipboard',
+             '&Paste','Ctrl+V',
+             self.slotWidgetPaste),
             ('moveup', 'stock-go-up.png', 'Move the selected item up',
-             'Move &up',
+             'Move &up','',
              lambda a: self.slotWidgetMove(a, -1) ),
             ('movedown', 'stock-go-down.png', 'Move the selected item down',
-             'Move &down',
+             'Move &down','',
              lambda a: self.slotWidgetMove(a, 1) ),
             ('delete', 'stock-delete.png', 'Remove the selected item',
-             '&Delete',
+             '&Delete','',
              self.slotWidgetDelete),
             ('rename', 'icon-rename.png', 'Rename the selected item',
-             '&Rename',
+             '&Rename','',
              self.slotWidgetRename)
             ):
 
@@ -454,7 +466,8 @@ class TreeEditWindow(qt.QDockWindow):
                               iconfilename = icon,
                               menutext = menutext,
                               statusbartext = tooltip,
-                              tooltiptext = tooltip)
+                              tooltiptext = tooltip,
+                              accel=accel)
             a.addTo(self.edittool)
             a.addTo(self.contextpopup)
             a.addTo(editmenu)
@@ -560,12 +573,22 @@ class TreeEditWindow(qt.QDockWindow):
                 w = w.parent
             action.enable( w != None )
 
-        # delete shouldn't allow root to be deleted
+        # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
-
+        
+        self.editactions['cut'].enable(isnotroot)
+        self.editactions['copy'].enable(isnotroot)
         self.editactions['delete'].enable(isnotroot)
         self.editactions['rename'].enable(isnotroot)
+        self.editactions['moveup'].enable(isnotroot)
+        self.editactions['movedown'].enable(isnotroot)
 
+        if isnotroot:
+            # cut and copy aren't currently possible on a non-widget
+            cancopy = item.widget != None
+            self.editactions['cut'].enable(cancopy)
+            self.editactions['copy'].enable(cancopy)
+       
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
 
@@ -573,6 +596,7 @@ class TreeEditWindow(qt.QDockWindow):
         self.enableCorrectButtons(item)
 
         self.itemselected = item
+        self.updatePasteButton()
 
         # delete the current widgets in the preferences list
         while len(self.prefchilds) > 0:
@@ -664,12 +688,38 @@ class TreeEditWindow(qt.QDockWindow):
         widgettype is the type of widget
         """
 
+        self.makeWidget(widgettype)
+
+    def makeWidget(self, widgettype, autoadd=True):
+        """Called when an add widget button is clicked.
+        widgettype is the type of widget
+        autoadd specifies whether to add default children
+        """
+
         # if no widget selected, bomb out
         if self.itemselected == None:
             return
+        parent = self.getSuitableParent(widgettype)
+
+        assert parent != None
+
+        # make the new widget and update the document
+        w = widgetfactory.thefactory.makeWidget(widgettype, parent,
+                                                autoadd=autoadd)
+        self.document.setModified()
+
+        # select the widget
+        self.selectWidget(w)
+
+    def getSuitableParent(self, widgettype, initialParent = None):
+        """Find the nearest relevant parent for the widgettype given."""
 
         # get the widget to act as the parent
-        parent = self.itemselected.widget
+        if not initialParent:
+            parent = self.itemselected.widget
+        else:
+            parent  = initialParent
+        
         if parent == None:
             parent = self.itemselected.parent.widget
             assert parent != None
@@ -680,14 +730,7 @@ class TreeEditWindow(qt.QDockWindow):
         while parent != None and not wc.willAllowParent(parent):
             parent = parent.parent
 
-        assert parent != None
-
-        # make the new widget and update the document
-        w = widgetfactory.thefactory.makeWidget(widgettype, parent)
-        self.document.setModified()
-
-        # select the widget
-        self.selectWidget(w)
+        return parent
 
     def slotActionClicked(self):
         """Called when an action button is clicked."""
@@ -704,6 +747,71 @@ class TreeEditWindow(qt.QDockWindow):
         console = self.parent.console
         console.runFunction( action )
 
+    def getClipboardData(self):
+        """Return veusz clipboard data or False if no data is avaliable
+        The first line of the returned data is a widget type, the
+        remaining lines are commands to customise the widget and add children
+        """
+
+        clipboard = qt.qApp.clipboard()
+        cbSource = clipboard.data(clipboard.Clipboard)
+        if not cbSource.provides(self.widgetmime):
+            # Bail if the clipboard doesn't provide the data type we want
+            return False
+        
+        data = unicode(cbSource.encodedData(self.widgetmime))
+        data = data.split('\n')
+        return data
+
+    def _makeDragObject(self, widget):
+        """Make a QStoredDrag object representing the subtree with the
+        current selection at the root"""
+
+        if widget:
+            clipboardData = qt.QStoredDrag(self.widgetmime)
+            data = str('\n'.join((widget.typename,
+                                  widget.getSaveText())))
+            clipboardData.setEncodedData(data)
+            return clipboardData
+        else:
+            return None
+
+    def slotWidgetCut(self, a):
+        """Cut the selected widget"""
+        self.slotWidgetCopy(a)
+        self.slotWidgetDelete(a)
+        self.updatePasteButton()
+
+    def slotWidgetCopy(self, a):
+        """Copy selected widget to the clipboard."""
+        clipboard = qt.qApp.clipboard()
+        dragObj = self._makeDragObject(self.itemselected.widget)
+        clipboard.setData(dragObj, clipboard.Clipboard)
+        self.updatePasteButton()
+        
+    def slotWidgetPaste(self, a):
+        """Paste something from the clipboard"""
+
+        data = self.getClipboardData()
+        if data:
+            # The first line of the clipboard data is the widget type
+            widgettype = data[0]
+
+            # Add the first widget being pasted
+            self.makeWidget(widgettype, autoadd=False)
+            
+            interpreter = self.parent.interpreter
+        
+            # Select the current widget in the interpreter
+            tmpCurrentwidget = interpreter.interface.currentwidget
+            interpreter.interface.currentwidget = self.itemselected.widget
+
+            # Use the command interface to create the subwidgets
+            for command in data[1:]:
+                interpreter.run(command)
+            # reset the interpreter widget
+            interpreter.interface.currentwidget = tmpCurrentwidget
+        
     def slotWidgetDelete(self, a):
         """Delete the widget selected."""
 
@@ -711,11 +819,24 @@ class TreeEditWindow(qt.QDockWindow):
         if self.itemselected == None:
             return
 
-        # get the widget to act as the parent
+        # work out which widget to delete
         w = self.itemselected.widget
         if w == None:
             w = self.itemselected.parent.widget
-            assert w != None
+        assert w != None
+            
+        # get the item to next get the selection when this widget is deleted
+        # this is done by looking down the list to get the next useful one
+        next = self.itemselected
+        while next != None and (next.widget == w or (next.widget == None and
+                                                     next.parent.widget == w)):
+            next = next.itemBelow()
+
+        # if there aren't any, use the root item
+        if next == None:
+            next = self.rootitem
+
+        # remove the reference
         self.itemselected = None
 
         # find the parent
@@ -725,6 +846,10 @@ class TreeEditWindow(qt.QDockWindow):
         # delete the widget
         p.removeChild(w.name)
         self.document.setModified()
+
+        # select the next widget
+        self.listview.ensureItemVisible(next)
+        self.listview.setSelected(next, True)
 
     def selectWidget(self, widget):
         """Select the associated listviewitem for the widget w in the
@@ -779,6 +904,21 @@ class TreeEditWindow(qt.QDockWindow):
         """Pop up a context menu when an item is clicked on the list view."""
 
         self.contextpopup.exec_loop(pos)
+
+    def updatePasteButton(self):
+        """Is the data on the clipboard a valid paste at the currently
+        selected widget?"""
+        
+        data = self.getClipboardData()
+        show = False
+        if data:
+            # The first line of the clipboard data is the widget type
+            widgettype = data[0]
+            # Check if we can paste into the current widget or a parent
+            if self.getSuitableParent(widgettype, self.itemselected.widget):
+                show = True
+
+        self.editactions['paste'].enable(show)
 
     def slotWidgetRename(self, action):
         """Initiate renaming a widget."""
