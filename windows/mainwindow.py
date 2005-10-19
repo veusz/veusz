@@ -590,7 +590,8 @@ class MainWindow(qt.QMainWindow):
 
         #File types we can export to in the form ([extensions], Name)
         formats = [(["eps"], "Encapsulated Postscript"),
-                   (["png"], "Portable Network Graphics")]
+                   (["png"], "Portable Network Graphics"),
+                   (["svg"], "Scalable Vector Graphics")]
 
         fd = qt.QFileDialog(self, 'export dialog', True)
         if not self.exportDir:

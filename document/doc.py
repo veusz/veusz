@@ -778,6 +778,8 @@ class Document( qt.QObject ):
             # unfortunately we need to pass QPrinter the name of an eps
             # file: no secure way we can produce the file. FIXME INSECURE
 
+            # FIXME: doesn't work in Windows
+
             fdir = os.path.dirname(os.path.abspath(filename))
             if not os.path.exists(fdir):
                 raise RuntimeError, 'Directory "%s" does not exist' % fdir
@@ -810,6 +812,13 @@ class Document( qt.QObject ):
             os.unlink(tmpfilename)
             if len(text) != 0:
                 raise RuntimeError, text
+
+        elif ext == '.svg':
+            # Use qt's QPicture environment to export the drawing commands
+            # as svg (scalable vector graphics)
+            p = qt.QPicture()
+            self.printTo( p, [pagenumber] )
+            p.save(filename, 'svg')
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
