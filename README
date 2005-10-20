@@ -1,4 +1,4 @@
-Veusz 0.7
+Veusz 0.8
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -16,17 +16,15 @@ Veusz provides a GUI, command line and scripting interface (based on
 Python) to its plotting facilities. The plots are built using an
 object-based system to provide a consistent interface.
 
-Changes from 0.6:
+Changes from 0.7:
  Please refer to ChangeLog for all the changes.
  Highlights include:
-  * 2D image support
-  * FITS file data import (1D + 2D) with PyFITS module
-  * Support for line separated blocks of data when importing
-  * Reversed axes supported
-  * Key length option
-  * Linked dataset reload UI
-  * Plot functions over specific range
-  * Several UI improvements 
+  * Datasets can be linked together with expressions
+  * SVG export
+  * Edit/Copy/Cut support of widgets
+  * Pan image with mouse
+  * Click on graph to change settings
+  * Lots of UI improvements
 
 Features of package:
  * X-Y plots (with errorbars)
