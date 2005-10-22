@@ -730,10 +730,11 @@ SetData('y', y)
 	<para>Export the page given to the filename given. The
       <command>filename</command> must end with the correct extension
       to get the right sort of output file. Currrenly supported
-      extensions are '.eps' and '.png'. If <command>color</command> is
-      True, then the output is in colour, else
-      greyscale. <command>page</command> is the page number of the
-      document to export (starting from 0 for the first page!).</para>
+      extensions are '.eps', '.svg' and '.png'. If
+      <command>color</command> is True, then the output is in colour,
+      else greyscale. <command>page</command> is the page number of
+      the document to export (starting from 0 for the first
+      page!).</para>
       </section>
 
       <section>
