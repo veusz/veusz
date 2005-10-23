@@ -341,11 +341,11 @@ class Image(plotters.GenericPlotter):
         if ( None in axes or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' or
-             not d.hasData(s.data) ):
+             not s.data in d.data ):
             return
 
         # return if the dataset isn't two dimensional
-        data = d.getData(s.data)
+        data = d.data[s.data]
         if data.dimensions != 2:
             return
 

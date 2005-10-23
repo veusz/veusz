@@ -65,32 +65,40 @@ class Contour(plotters.GenericPlotter):
                            minval = 1,
                            descr = 'Number of contour levels to plot'),
                3 )
-
         s.add( setting.Choice('scaling',
                               ['linear', 'sqrt', 'log', 'squared', 'manual'],
                               'linear',
                               descr = 'Scaling between contour levels'),
                4 )
-
         s.add( setting.FloatList('manualLevels',
-                                 [0.],
+                                 [],
                                  descr = 'Levels to use for manual scaling'),
                5 )
+        s.add( setting.FloatList('levelsOut',
+                                 [],
+                                 descr = 'Levels used in the plot'),
+               6, readonly=True )
 
+        # keep track of settings so we recalculate when necessary
         self.lastdataset = None
-        self.schangeset = -1
+        self.contsettings = None
 
     def _calculateLevels(self):
-        """Calculate contour levels."""
+        """Calculate contour levels from data and settings.
+
+        Returns levels as 1d numarray
+        """
 
         # get dataset
         s = self.settings
         d = self.document
 
         if s.data not in d.data:
+            # this dataset doesn't exist
             minval = 0.
             maxval = 1.
         else:
+            # scan data
             data = d.data[s.data]
             minval = data.data.min()
             maxval = data.data.max()
@@ -105,13 +113,15 @@ class Contour(plotters.GenericPlotter):
         scaling = s.scaling
 
         if numlevels == 1 and scaling != 'manual':
-            levels = minval
+            # calculations below assume numlevels > 1
+            levels = N.array([minval,])
         else:
             # trap out silly cases
             if minval == maxval:
                 minval = 0.
                 maxval = 1.
-        
+                
+            # calculate levels for each scaling
             if scaling == 'linear':
                 delta = (maxval - minval) / (numlevels-1)
                 levels = minval + N.arange(numlevels)*delta
@@ -126,7 +136,79 @@ class Contour(plotters.GenericPlotter):
                 levels = minval + N.sqrt(N.arange(numlevels)*delta)
             else:
                 # manual
-                levels = s.manualLevels
+                levels = N.array(s.manualLevels)
+
+        # for the user later
+        s.levelsOut = list(levels)
+
+        return levels
+
+    def autoAxis(self, name, bounds):
+        """Automatically determine the ranges of variable on the axes."""
+
+        # this is copied from Image, probably should combine
+        s = self.settings
+        d = self.document
+
+        # return if no data
+        if s.data not in d.data:
+            return
+
+        # return if the dataset isn't two dimensional
+        data = d.data[s.data]
+        if data.dimensions != 2:
+            return
+
+        xrange = data.xrange
+        yrange = data.yrange
+
+        if name == s.xAxis:
+            bounds[0] = min( bounds[0], xrange[0] )
+            bounds[1] = max( bounds[1], xrange[1] )
+        elif name == s.yAxis:
+            bounds[0] = min( bounds[0], yrange[0] )
+            bounds[1] = max( bounds[1], yrange[1] )
+
+    def draw(self, parentposn, painter, outerbounds = None):
+        """Draw the contours."""
+
+        posn = plotters.GenericPlotter.draw(self, parentposn, painter,
+                                            outerbounds = outerbounds)
+        x1, y1, x2, y2 = posn
+        s = self.settings
+        d = self.document
+        
+        # get axes widgets
+        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+
+        # return if there's no proper axes
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' or
+             not s.data in d.data ):
+            return
+
+        # return if the dataset isn't two dimensional
+        data = d.data[s.data]
+        if data.dimensions != 2:
+            return
+
+        # recalculate contours if image has changed
+        contsettings = ( s.min, s.max, s.numLevels, s.scaling,
+                         tuple(s.manualLevels) )
+
+        if data != self.lastdataset or contsettings != self.contsettings:
+            self.updateContours()
+            self.lastdataset = data
+            self.contsettings = contsettings
+
+        # FIXME: add plotting here
+
+    def updateContours(self):
+        """Update calculated contours."""
+
+        levels = self._calculateLevels()
+        
 
 # allow the factory to instantiate a contour
 widgetfactory.thefactory.register( Contour )
