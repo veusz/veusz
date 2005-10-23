@@ -274,9 +274,25 @@ class Bool(Setting):
 class Int(Setting):
     """Integer settings."""
 
+    def __init__(self, name, value, minval=-1000000, maxval=1000000,
+                 descr=''):
+        """Initialise the values.
+
+        minval is minimum possible value of setting
+        maxval is maximum possible value of setting
+        descr is a description of the setting
+        """
+
+        self.minval = minval
+        self.maxval = maxval
+        Setting.__init__(self, name, value, descr=descr)
+
     def convertTo(self, val):
         if type(val) == int:
-            return val
+            if val >= self.minval and val <= self.maxval:
+                return val
+            else:
+                raise InvalidType, 'Out of range allowed'
         raise InvalidType
 
     def toText(self):
@@ -284,7 +300,11 @@ class Int(Setting):
 
     def fromText(self, text):
         try:
-            return int(text)
+            i = int(text)
+            if i >= self.minval and i <= self.maxval:
+                return i
+            else:
+                raise InvalidType, 'Out of range allowed'
         except ValueError:
             raise InvalidType
 
@@ -574,9 +594,6 @@ class ChoiceOrMore(Setting):
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
 
-    def __init__(self, name, val, descr = ''):
-        Setting.__init__(self, name, val, descr=descr)
-
     def convertTo(self, val):
         if type(val) != dict:
             raise InvalidType
@@ -622,6 +639,41 @@ class FloatDict(Setting):
 
     def makeControl(self, *args):
         return controls.MultiLine(self, *args)
+
+class FloatList(Setting):
+    """A list of float values."""
+
+    def convertTo(self, val):
+        if type(val) not in (list, tuple):
+            raise InvalidType
+
+        # horribly slow test for invalid entries
+        out = []
+        for i in val:
+            if type(i) not in (float, int):
+                raise InvalidType
+            else:
+                out.append( float(i) )
+        return out
+
+    def toText(self):
+        """Make a string a, b, c."""
+        return ', '.join( [str(i) for i in self.val] )
+
+    def fromText(self, text):
+        """Convert from a, b, c or a b c."""
+
+        p = re.split(r'[\t\n, ]+', text.strip())
+
+        try:
+            out = [float(i) for i in p]
+        except ValueError:
+            raise InvalidType
+
+        return out
+
+    def makeControl(self, *args):
+        return controls.String(self, *args)
 
 class WidgetPath(Str):
     """A setting holding a path to a widget. This is checked for validity."""

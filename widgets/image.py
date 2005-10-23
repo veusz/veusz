@@ -236,7 +236,7 @@ class Image(plotters.GenericPlotter):
 
         s = self.settings
         d = self.document
-        data = d.getData(s.data)
+        data = d.data[s.data]
 
         minval = s.min
         if minval == 'Auto':
@@ -260,11 +260,11 @@ class Image(plotters.GenericPlotter):
         d = self.document
 
         # return if no data
-        if not d.hasData(s.data):
+        if s.data not in d.data:
             return
 
         # return if the dataset isn't two dimensional
-        data = d.getData(s.data)
+        data = d.data[s.data]
         if data.dimensions != 2:
             return
 
@@ -386,5 +386,5 @@ class Image(plotters.GenericPlotter):
         painter.restore()
         painter.endPaintingWidget()
 
-# allow the factory to instantiate an axis
+# allow the factory to instantiate an image
 widgetfactory.thefactory.register( Image )

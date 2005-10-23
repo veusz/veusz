@@ -30,4 +30,5 @@ from root import *
 from key import *
 from fit import *
 from image import *
+from contour import *
 from widgetfactory import *
