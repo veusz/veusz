@@ -469,7 +469,7 @@ _distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
 
-    def isDist(self, dist):
+    def isDist(dist):
         """Is the text a valid distance measure?"""
         
         dist = dist.strip()
@@ -478,6 +478,7 @@ class Distance(Setting):
                 return True
             
         return False
+    isDist = staticmethod(isDist)
 
     def convertTo(self, val):
         if self.isDist(val):
@@ -497,7 +498,7 @@ class Distance(Setting):
     def makeControl(self, *args):
         return controls.Distance(self, *args)
 
-    def convert(self, painter):
+    def convertDistance(painter, distance):
         '''Convert a distance to plotter units.
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
@@ -517,7 +518,7 @@ class Distance(Setting):
             w = painter.window()
             maxsize = max(w.width(), w.height())
 
-        dist = self.val.strip()
+        dist = distance.strip()
 
         # compare string against each regexp
         for reg, fn in _distregexp:
@@ -530,6 +531,13 @@ class Distance(Setting):
         # none of the regexps match
         raise ValueError( "Cannot convert distance in form '%s'" %
                           dist )
+
+    convertDistance = staticmethod(convertDistance)
+
+    def convert(self, painter):
+        """Convert this setting's distance as above"""
+        
+        return self.convertDistance(painter, self.val)
 
     def convertPts(self, painter):
         """Get the distance in points."""
@@ -774,6 +782,8 @@ class Color(ChoiceOrMore):
                 'cyan', 'magenta', 'yellow',
                 'grey', 'darkred', 'darkgreen', 'darkblue',
                 'darkcyan', 'darkmagenta' ]
+    
+    controls.Color._colors = _colors
 
     def __init__(self, name, default, descr = None):
         """Initialise the color setting with the given name, default
@@ -787,7 +797,7 @@ class Color(ChoiceOrMore):
         return qt.QColor(self.val)
     
     def makeControl(self, *args):
-        return controls.Color(self, self._colors, *args)
+        return controls.Color(self, *args)
 
 class FillStyle(Choice):
     """A setting for the different fill styles provided by Qt."""
@@ -813,6 +823,9 @@ class FillStyle(Choice):
                   '12% dense': qt.Qt.Dense6Pattern,
                   '6% dense': qt.Qt.Dense7Pattern }
 
+    controls.FillStyle._fills = _fillstyles
+    controls.FillStyle._fillcnvt = _fillcnvt
+
     def __init__(self, name, default, descr=None):
         Choice.__init__(self, name, self._fillstyles, default, descr=descr)
 
@@ -821,8 +834,7 @@ class FillStyle(Choice):
         return self._fillcnvt[self.val]
 
     def makeControl(self, *args):
-        return controls.FillStyle(self, self._fillstyles,
-                                  self._fillcnvt, *args)
+        return controls.FillStyle(self, *args)
 
 class LineStyle(Choice):
     """A setting choosing a particular line style."""
@@ -834,6 +846,9 @@ class LineStyle(Choice):
                   'dotted': qt.Qt.DotLine, 'dash-dot': qt.Qt.DashDotLine,
                   'dash-dot-dot': qt.Qt.DashDotDotLine }
     
+    controls.LineStyle._lines = _linestyles
+    controls.LineStyle._linecnvt = _linecnvt
+    
     def __init__(self, name, default, descr=None):
         Choice.__init__(self, name, self._linestyles, default, descr=descr)
 
@@ -842,8 +857,7 @@ class LineStyle(Choice):
         return self._linecnvt[self.val]
     
     def makeControl(self, *args):
-        return controls.LineStyle(self, self._linestyles,
-                                  self._linecnvt, *args)
+        return controls.LineStyle(self, *args)
 
 class Axis(Str):
     """A setting to hold the name of an axis."""
@@ -861,7 +875,6 @@ class Axis(Str):
 
     def makeControl(self, *args):
         """Allows user to choose an axis or enter a name."""
-
         return controls.Axis(self, self.document, self.direction, *args)
     
 class Marker(Choice):
@@ -873,5 +886,38 @@ class Marker(Choice):
     def makeControl(self, *args):
         return controls.Marker(self, *args)
     
+class LineSet(Setting):
+    """A setting which corresponds to a set of lines.
 
+    This setting keeps an internal array of LineSettings.
+    """
+
+    def convertTo(self, val):
+        """Takes a tuple/list of tuples:
+        [('color', '1pt', 'dotted', False), ...]
+
+        These are obviously, color, width, style, and hide.
+        """
+
+        if type(val) not in (list, tuple):
+            raise InvalidType
+
+        # check each entry in the list is appropriate
+        for line in val:
+            try:
+                color, width, style, hide = line
+            except ValueError:
+                raise InvalidType
+
+            if ( type(color) not in (string, unicode) or
+                 not Distance.isDist(width) or
+                 style not in LineStyle._linestyles or
+                 type(hide) not in (int, bool) ):
+                raise InvalidType
+
+        return val
+    
+    def makeControl(self, *args):
+        """Make specialised lineset control."""
+        return controls.LineSet(self, *args)
     

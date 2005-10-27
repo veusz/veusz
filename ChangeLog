@@ -1,6 +1,9 @@
 * 2005-10-27 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Basic contour plotting added (requires veusz_helpers package
 	at the moment)
+	- Change several setting types to use classmethods where
+	appropriate
+	- Start of work towards LineSet setting type
 	
 * 2005-10-23 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Some work towards contour plotting

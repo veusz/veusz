@@ -240,3 +240,4 @@ class TickLabel(Text):
         self.add( setting.Float('scale', 1.,
                                 descr='A scale factor to apply to the values '
                                 'of the tick labels') )
+

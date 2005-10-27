@@ -521,30 +521,33 @@ class FillStyle(Choice):
     """For choosing between fill styles."""
 
     _pixmaps = None
+    _fills = None
+    _fillcnvt = None
 
-    def __init__(self, setting, fills, fillcnvt, parent):
+    def __init__(self, setting, parent):
         if self._pixmaps == None:
-            self._generatePixmaps(fills, fillcnvt)
+            self._generatePixmaps()
 
         Choice.__init__(self, setting, False,
-                        fills, parent,
+                        self._fills, parent,
                         pixmaps=self._pixmaps)
 
-    def _generatePixmaps(self, fills, fillcnvt):
+    def _generatePixmaps(cls):
         """Generate a list of pixmaps for drop down menu."""
 
         size = 12
         pixmaps = []
         c = qt.QColor('darkgrey')
-        for f in fills:
+        for f in cls._fills:
             pix = qt.QPixmap(size, size)
             pix.fill()
             painter = qt.QPainter(pix)
-            brush = qt.QBrush(c, fillcnvt[f])
+            brush = qt.QBrush(c, cls._fillcnvt[f])
             painter.fillRect(0, 0, size, size, brush)
             pixmaps.append(pix)
 
-        FillStyle._pixmaps = pixmaps
+        cls._pixmaps = pixmaps
+    _generatePixmaps = classmethod(_generatePixmaps)
 
 class Marker(Choice):
     """A control to let the user choose a marker."""
@@ -559,8 +562,7 @@ class Marker(Choice):
                         utils.MarkerCodes, parent,
                         pixmaps=self._pixmaps)
 
-    def _generatePixmaps(self):
-
+    def _generatePixmaps(cls):
         size = 16
         pixmaps = []
         c = qt.QColor('darkgrey')
@@ -572,37 +574,40 @@ class Marker(Choice):
             utils.plotMarker(painter, size/2, size/2, marker, int(size*0.33))
             pixmaps.append(pix)
 
-        Marker._pixmaps = pixmaps
+        cls._pixmaps = pixmaps
+    _generatePixmaps = classmethod(_generatePixmaps)
 
 class LineStyle(Choice):
     """For choosing between line styles."""
 
     _pixmaps = None
+    _lines = None
+    _linecnvt = None
 
-    def __init__(self, setting, lines, linecnvt, parent):
+    def __init__(self, setting, parent):
         if self._pixmaps == None:
-            self._generatePixmaps(lines, linecnvt)
+            self._generatePixmaps()
 
         Choice.__init__(self, setting, False,
-                        lines, parent,
+                        self._lines, parent,
                         pixmaps=self._pixmaps)
 
-    def _generatePixmaps(self, linestyles, linecnvt):
+    def _generatePixmaps(cls):
         """Generate a list of pixmaps for drop down menu."""
-
         size = 12
         pixmaps = []
         c = qt.QColor('black')
-        for l in linestyles:
+        for l in cls._lines:
             pix = qt.QPixmap(size*4, size)
             pix.fill()
             painter = qt.QPainter(pix)
-            pen = qt.QPen(c, 2, linecnvt[l])
+            pen = qt.QPen(c, 2, cls._linecnvt[l])
             painter.setPen(pen)
             painter.drawLine(size, size/2, size*3, size/2)
             pixmaps.append(pix)
 
-        LineStyle._pixmaps = pixmaps
+        cls._pixmaps = pixmaps
+    _generatePixmaps = classmethod(_generatePixmaps)
 
 class Color(qt.QHBox):
     """A control which lets the user choose a color.
@@ -611,19 +616,20 @@ class Color(qt.QHBox):
     """
 
     _pixmaps = None
+    _colors = None
 
-    def __init__(self, setting, colors, parent):
+    def __init__(self, setting,  parent):
         qt.QHBox.__init__(self, parent)
 
         if self._pixmaps == None:
-            self._generatePixmaps(colors)
+            self._generatePixmaps()
 
         self.setting = setting
 
         # combo box
         c = self.combo = qt.QComboBox(self)
         c.setEditable(True)
-        for pix, txt in itertools.izip(self._pixmaps, colors):
+        for pix, txt in itertools.izip(self._pixmaps, self._colors):
             c.insertItem(pix, txt, -1)
         c.setCurrentText( self.setting.toText() )
         self.connect(c, qt.SIGNAL('activated(const QString&)'),
@@ -638,17 +644,18 @@ class Color(qt.QHBox):
         self.setting.setOnModified(self.onModified)
         self._updateButtonColor()
 
-    def _generatePixmaps(self, colors):
+    def _generatePixmaps(cls):
         """Generate a list of pixmaps for drop down menu."""
 
         size = 12
         pixmaps = []
-        for c in colors:
+        for c in cls._colors:
             pix = qt.QPixmap(size, size)
             pix.fill( qt.QColor(c) )
             pixmaps.append(pix)
 
-        Color._pixmaps = pixmaps
+        cls._pixmaps = pixmaps
+    _generatePixmaps = classmethod(_generatePixmaps)
 
     def _updateButtonColor(self):
         """Update the color on the button from the setting."""
@@ -727,3 +734,16 @@ class Axis(Choice):
     def slotModified(self, modified):
         """Update list of axes."""
         self._populateEntries()
+
+class LineSet(qt.QVBox):
+    """A list of line styles."""
+
+    def __init__(self, setting, parent):
+        qt.QHBox.__init__(self, parent)
+        self.setting = setting
+
+    def populateSelf(self):
+        """Populate vbox with line styles."""
+
+        pass
+    
