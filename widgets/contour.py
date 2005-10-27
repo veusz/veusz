@@ -18,7 +18,13 @@
 
 # $Id$
 
-"""Contour plotting from 2d datasets."""
+"""Contour plotting from 2d datasets.
+
+Contour plotting requires that the veusz_helpers package is installed,
+as a C routine (taken from matplotlib) is used to trace the contours.
+"""
+
+import itertools
 
 import qt
 import numarray as N
@@ -26,16 +32,6 @@ import numarray as N
 import setting
 import widgetfactory
 import plotters
-
-# try to get _na_contour from somewhere
-# options are veusz_helpers or matplotlib
-try:
-    import veusz_helpers._na_contour as _contour
-except ImportError:
-    try:
-        import matplotlib._na_contour as _contour
-    except ImportError:
-        _contour = None
 
 class Contour(plotters.GenericPlotter):
     """A class which plots contours on a graph with a specified
@@ -49,6 +45,16 @@ class Contour(plotters.GenericPlotter):
         """Initialise plotter with axes."""
 
         plotters.GenericPlotter.__init__(self, parent, name=name)
+
+        # try to import contour helpers here
+        try:
+            from veusz_helpers._na_cntr import Cntr
+        except ImportError:
+            try:
+                from matplotlib._na_cntr import Cntr
+            except ImportError:
+                Cntr = None
+        self.Cntr = Cntr
 
         s = self.settings
         s.add( setting.Dataset('data', '', self.document,
@@ -185,7 +191,7 @@ class Contour(plotters.GenericPlotter):
         if ( None in axes or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' or
-             not s.data in d.data ):
+             s.data not in d.data ):
             return
 
         # return if the dataset isn't two dimensional
@@ -202,13 +208,74 @@ class Contour(plotters.GenericPlotter):
             self.lastdataset = data
             self.contsettings = contsettings
 
-        # FIXME: add plotting here
+        # plot the precalculated contours
+        self.plotContours(painter, posn, axes)
 
     def updateContours(self):
         """Update calculated contours."""
 
+        s = self.settings
+        d = self.document
+
         levels = self._calculateLevels()
-        
+
+        # find coordinates of image coordinate bounds
+        data = d.data[s.data]
+        rangex, rangey = data.getDataRanges()
+        xw, yw = data.data.shape
+
+        # calculate location of pixels...
+        xpts = (0.5+N.arange(xw))*(rangex[1]-rangex[0])/xw + rangex[0]
+        ypts = (0.5+N.arange(xw))*(rangey[1]-rangey[0])/yw + rangey[0]
+
+        # convert 1D arrays into 2D
+        y, x = N.indices( (yw, xw) )
+        xpts = xpts[x]
+        ypts = ypts[y]
+        del x, y
+
+        # iterate over the levels and trace the contours
+        self._alllines = []
+        if self.Cntr != None:
+            c = self.Cntr(xpts, ypts, data.data)
+
+            for level in levels:
+                linelist = c.trace(level)
+                self._alllines.append(linelist)
+
+        else:
+            print "Warning: contour plotting not found"
+
+    def plotContours(self, painter, posn, axes):
+        """Plot the traced contours on the painter."""
+
+        s = self.settings
+        x1, y1, x2, y2 = posn
+
+        # ensure plotting of contours does not go outside the area
+        painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+
+        # iterate over each level, and list of lines
+        for level, linelist in itertools.izip(s.levelsOut, self._alllines):
+
+            # iterate over each complete line of the contour
+            for curve in linelist:
+                # convert coordinates from graph to plotter
+                xplt = axes[0].graphToPlotterCoords(posn, curve[0])
+                yplt = axes[1].graphToPlotterCoords(posn, curve[1])
+
+                # there should be a nice itertools way of doing this
+                pts = []
+                for x, y in itertools.izip(xplt, yplt):
+                    pts.append(x)
+                    pts.append(y)
+
+                # actually draw the curve to the plotter
+                painter.drawPolyline( qt.QPointArray(pts) )
+
+        # remove clip region
+        painter.restore()
 
 # allow the factory to instantiate a contour
 widgetfactory.thefactory.register( Contour )
