@@ -1,3 +1,6 @@
+* 2005-10-03 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Much more contour setting work
+	
 * 2005-10-27 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Basic contour plotting added (requires veusz_helpers package
 	at the moment)

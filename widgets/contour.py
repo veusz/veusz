@@ -85,6 +85,9 @@ class Contour(plotters.GenericPlotter):
                                  descr = 'Levels used in the plot'),
                6, readonly=True )
 
+        s.add( setting.LineSet('lines',
+                               [('black', '1pt', 'solid', False)]) )
+
         # keep track of settings so we recalculate when necessary
         self.lastdataset = None
         self.contsettings = None

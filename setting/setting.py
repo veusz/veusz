@@ -909,7 +909,7 @@ class LineSet(Setting):
             except ValueError:
                 raise InvalidType
 
-            if ( type(color) not in (string, unicode) or
+            if ( type(color) not in (str, unicode) or
                  not Distance.isDist(width) or
                  style not in LineStyle._linestyles or
                  type(hide) not in (int, bool) ):
