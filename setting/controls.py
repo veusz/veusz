@@ -66,7 +66,7 @@ class Edit(qt.QLineEdit):
 
         qt.QLineEdit.__init__(self, parent)
         self.setting = setting
-        self.bgcolour = self.paletteBackgroundColor()
+        self.bgcolor = self.paletteBackgroundColor()
 
         # set the text of the widget to the 
         self.setText( setting.toText() )
@@ -91,7 +91,7 @@ class Edit(qt.QLineEdit):
         text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
-            self.setPaletteBackgroundColor(self.bgcolour)
+            self.setPaletteBackgroundColor(self.bgcolor)
 
             # value has changed
             if self.setting.val != val:
@@ -215,7 +215,7 @@ class String(qt.QHBox):
         b.setMaximumWidth(b.height())
         b.setToggleButton(True)
 
-        self.bgcolour = self.edit.paletteBackgroundColor()
+        self.bgcolor = self.edit.paletteBackgroundColor()
         
         # set the text of the widget to the 
         self.edit.setText( setting.toText() )
@@ -281,7 +281,7 @@ class String(qt.QHBox):
         text = unicode(self.edit.text())
         try:
             val = self.setting.fromText(text)
-            self.edit.setPaletteBackgroundColor(self.bgcolour)
+            self.edit.setPaletteBackgroundColor(self.bgcolor)
 
             # value has changed
             if self.setting.val != val:
@@ -331,7 +331,7 @@ class Choice(qt.QComboBox):
         
         qt.QComboBox.__init__(self, parent)
         self.setting = setting
-        self.bgcolour = self.paletteBackgroundColor()
+        self.bgcolor = self.paletteBackgroundColor()
 
         self.setEditable(iseditable)
 
@@ -369,7 +369,7 @@ class Choice(qt.QComboBox):
         text = unicode(self.currentText())
         try:
             val = self.setting.fromText(text)
-            self.setPaletteBackgroundColor(self.bgcolour)
+            self.setPaletteBackgroundColor(self.bgcolor)
             
             # value has changed
             if self.setting.val != val:
@@ -389,7 +389,7 @@ class MultiLine(qt.QTextEdit):
         """Initialise the widget."""
 
         qt.QTextEdit.__init__(self, parent)
-        self.bgcolour = self.paletteBackgroundColor()
+        self.bgcolor = self.paletteBackgroundColor()
         self.setting = setting
 
         self.setTextFormat(qt.Qt.PlainText)
@@ -414,7 +414,7 @@ class MultiLine(qt.QTextEdit):
         text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
-            self.setPaletteBackgroundColor(self.bgcolour)
+            self.setPaletteBackgroundColor(self.bgcolor)
             
             # value has changed
             if self.setting.val != val:
@@ -741,37 +741,52 @@ class Axis(Choice):
         """Update list of axes."""
         self._populateEntries()
 
-class LineSet(qt.QWidget):
-    """A list of line styles.
+class ListSet(qt.QWidget):
+    """A widget for constructing settings which are lists of other
+    properties.
 
-    This code is nasty! Please think of a way to make it simple
-    We probably need to abstract this later on
+    This code is pretty nasty and horrible, so we abstract it in this
+    base widget
     """
 
-    def __init__(self, setting, parent):
+    pixsize = 12
+
+    def __init__(self, defaultval, setting, parent):
+        """Initialise this base widget.
+
+        defaultval is the default entry to add if add is clicked with
+        no current entries
+
+        setting is the setting this widget corresponds to
+
+        parent is the parent widget.
+        """
+        
         qt.QWidget.__init__(self, parent)
+        self.defaultval = defaultval
         self.setting = setting
         self.controls = []
         self.layout = qt.QGridLayout(self, 1, 1, 2, 2)
-
-        # size of pixmaps
-        self.pixsize = 12
 
         # ignore changes if this set
         self.ignorechange = False
 
         self.populate()
         self.setting.setOnModified(self.onModified)
+    
+    def done(self):
+        """Delete modification notification."""
+        self.setting.removeOnModified(self.onModified)
 
+    def populateRow(self, row, val):
+        """Populate the row in the control.
+
+        Returns a list of the widgets created.
+        """
+        return None
+    
     def populate(self):
-        """Populate vbox with line styles."""
-
-        # we steal pixmaps from the classes above to avoid
-        # replication
-        if LineStyle._pixmaps == None:
-            LineStyle._generatePixmaps()
-        if Color._pixmaps == None:
-            Color._generatePixmaps()
+        """Construct the list of controls."""
 
         # delete all children in case of refresh
         self.controls = []
@@ -781,59 +796,32 @@ class LineSet(qt.QWidget):
                 c.deleteLater()
         c = None
 
-        row = 0
-        lines = self.setting.val
-        for color, width, style, hide in lines:
-            
-            wlinestyle = qt.QComboBox(self)
-            self.layout.addWidget(wlinestyle, row, 0)
-            for pixmap in LineStyle._pixmaps:
-                wlinestyle.insertItem(pixmap)
-            wlinestyle.setCurrentItem(LineStyle._lines.index(style))
-            qt.QToolTip.add(wlinestyle, 'Line style')
-            self.connect(wlinestyle, qt.SIGNAL('activated(int)'),
-                         self.onLineStyleChanged)
+        # iterate over each row
+        row = -1
+        for row, val in enumerate(self.setting.val):
+            cntrls = self.populateRow(row, val)
+            for i in cntrls:
+                i.show()
+            self.controls.append(cntrls)
 
-            wwidth = qt.QLineEdit(self)
-            self.layout.addWidget(wwidth, row, 1)
-            wwidth.setText(width)
-            qt.QToolTip.add(wwidth, 'Line width')
-            self.connect(wwidth, qt.SIGNAL('returnPressed()'),
-                         self.onWidthChanged)
-            self.connect(wwidth, qt.SIGNAL('lostFocus()'),
-                         self.onWidthChanged)
-            self.bgcolour = wwidth.paletteBackgroundColor()
-
-            wcolor = qt.QPushButton(self)
-            self.layout.addWidget(wcolor, row, 2)
-            wcolor.setMaximumWidth(wcolor.height())
-            pix = qt.QPixmap(self.pixsize, self.pixsize)
-            pix.fill( qt.QColor(color) )
-            wcolor.setIconSet( qt.QIconSet(pix) )
-            qt.QToolTip.add(wcolor, 'Line color')
-            self.connect(wcolor, qt.SIGNAL('clicked()'), self.onColorClicked)
-
-            whide = qt.QCheckBox(self)
-            self.layout.addWidget(whide, row, 3)
-            whide.setChecked(hide)
-            qt.QToolTip.add(whide, 'Hide line')
-            self.connect(whide, qt.SIGNAL('toggled(bool)'), self.onHideToggled)
-
-            self.controls.append( (wcolor, wwidth, wlinestyle, whide) )
-
-            wcolor.show()
-            wwidth.show()
-            wlinestyle.show()
-            whide.show()
-
-            row += 1
-
-        b = qt.QPushButton('Add new line style', self)
-        b.show()
-        self.layout.addMultiCellWidget(b, row, row, 0, 3, qt.Qt.AlignLeft)
+        h = qt.QHBox(self)
+        self.layout.addMultiCellWidget(h, row+1, row+1, 0,
+                                       self.layout.numCols()-1)
+        
+        # a button to add a new entry
+        b = qt.QPushButton('Add new entry', h)
         self.connect(b, qt.SIGNAL('clicked()'), self.onAddClicked)
-        self._adjustSize()
+        b.show()
 
+        # a button to delete the last entry
+        b = qt.QPushButton('Delete entry', h)
+        self.connect(b, qt.SIGNAL('clicked()'), self.onDeleteClicked)
+        b.setEnabled( len(self.setting.val) > 0 )
+        b.show()
+        h.show()
+        
+        self._adjustSize()
+        
     def _adjustSize(self):
         """Tell the Grid to make us the correct size."""
         
@@ -864,12 +852,18 @@ class LineSet(qt.QWidget):
     def onAddClicked(self):
         """Add a line style to the list given."""
 
-        lines = list(self.setting.val)
-        if len(lines) != 0:
-            lines.append(lines[-1])
+        rows = list(self.setting.val)
+        if len(rows) != 0:
+            rows.append(rows[-1])
         else:
-            lines.append( ('black', '1pt', 'solid', False) )
-        self.setting.set(lines)
+            rows.append(self.defaultval)
+        self.setting.set(rows)
+
+    def onDeleteClicked(self):
+        """Remove final entry in settings list."""
+
+        rows = list(self.setting.val)[:-1]
+        self.setting.set(rows)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -879,84 +873,186 @@ class LineSet(qt.QWidget):
         else:
             self.ignorechange = False
 
-    def _identifyRow(self, widget):
-        """Identify the row this widget is associated with.
+    def identifyPosn(self, widget):
+        """Identify the position this widget is in.
 
-        Return None if not found."""
+        Returns (row, col) or (None, None) if not found.
+        """
 
-        for num, cntrls in enumerate(self.controls):
-            for c in cntrls:
-                if c == widget:
-                    return num
-        return None
+        for row, cntrls in enumerate(self.controls):
+            for col, cntrl in enumerate(cntrls):
+                if cntrl == widget:
+                    return (row, col)
+        return (None, None)
+
+    def addColorButton(self, row, col, tooltip):
+        """Add a color button to the list at the position specified."""
+
+        color = self.setting.val[row][col]
+        wcolor = qt.QPushButton(self)
+        self.layout.addWidget(wcolor, row, col)
+        wcolor.setMaximumWidth(wcolor.height())
+        pix = qt.QPixmap(self.pixsize, self.pixsize)
+        pix.fill( qt.QColor(color) )
+        wcolor.setIconSet( qt.QIconSet(pix) )
+        qt.QToolTip.add(wcolor, tooltip)
+        self.connect(wcolor, qt.SIGNAL('clicked()'), self.onColorClicked)
+        return wcolor
+
+    def addToggleButton(self, row, col, tooltip):
+        """Make a toggle button."""
+
+        toggle = self.setting.val[row][col]
+        wtoggle = qt.QCheckBox(self)
+        self.layout.addWidget(wtoggle, row, col)
+        wtoggle.setChecked(toggle)
+        qt.QToolTip.add(wtoggle, tooltip)
+        self.connect(wtoggle, qt.SIGNAL('toggled(bool)'), self.onToggled)
+        return wtoggle
+
+    def addCombo(self, row, col, tooltip, values, pixmaps, texts):
+        """Make an enumeration combo - choose from a set of pixmaps."""
+        
+        val = self.setting.val[row][col]
+
+        wcombo = qt.QComboBox(self)
+        self.layout.addWidget(wcombo, row, col)
+
+        if texts == None:
+            for pixmap in pixmaps:
+                wcombo.insertItem(pixmap)
+        else:
+            for text, pixmap in zip(texts, pixmaps):
+                wcombo.insertItem(pixmap, text)
+
+        wcombo.setCurrentItem(values.index(val))
+        qt.QToolTip.add(wcombo, tooltip)
+        self.connect(wcombo, qt.SIGNAL('activated(int)'),
+                     self.onComboChanged)
+        wcombo._vz_values = values
+        return wcombo
+
+    def _updateRowCol(self, row, col, val):
+        """Update value on row and column."""
+        rows = list(self.setting.val)
+        items = list(rows[row])
+        items[col] = val
+        rows[row] = tuple(items)
+        self.ignorechange = True
+        self.setting.set(rows)
+        
+    def onToggled(self, on):
+        """Checkbox toggled."""
+        row, col = self.identifyPosn(self.sender())
+        self._updateRowCol(row, col, on)
+
+    def onComboChanged(self, val):
+        """Update the setting if the combo changes."""
+        sender = self.sender()
+        row, col = self.identifyPosn(sender)
+        self._updateRowCol(row, col, sender._vz_values[val])
 
     def onColorClicked(self):
         """Color button clicked for line."""
-
-        # work out which button sent this - unfortunately
-        # lambdas don't work...
         sender = self.sender()
-        row = self._identifyRow(sender)
+        row, col = self.identifyPosn(sender)
 
-        if row != None:
-            lines = self.setting.val
-            col = qt.QColorDialog.getColor( qt.QColor(lines[row][0]),
-                                            self )
-            if col.isValid():
-                # change setting
-                # this is a bit irritating, as have to do lots of
-                # tedious conversions
-                name = unicode(col.name())
-                lines = list(lines)
-                thisrow = list(lines[row])
-                thisrow[0] = name
-                lines[row] = tuple(thisrow)
-                self.ignorechange = True
-                self.setting.set(lines)
+        rows = self.setting.val
+        color = qt.QColorDialog.getColor( qt.QColor(rows[row][col]),
+                                          self )
+        if color.isValid():
+            # change setting
+            # this is a bit irritating, as have to do lots of
+            # tedious conversions
+            color = unicode(color.name())
+            self._updateRowCol(row, col, color)
 
-                # change the color
-                pix = qt.QPixmap(self.pixsize, self.pixsize)
-                pix.fill(col)
-                sender.setIconSet( qt.QIconSet(pix) )
-                
-    def onLineStyleChanged(self, val):
-        """Update the setting if the line style changes."""
+            # change the color
+            pix = qt.QPixmap(self.pixsize, self.pixsize)
+            pix.fill(qt.QColor(color))
+            sender.setIconSet( qt.QIconSet(pix) )
+            
+class LineSet(ListSet):
+    """A list of line styles.
+    """
+
+    def __init__(self, setting, parent):
+        ListSet.__init__(self, ('solid', '1pt', 'black', False),
+                         setting, parent)
+
+    def populateRow(self, row, val):
+        """Add the widgets for the row given."""
+
+        # create line pixmaps if not already created
+        if LineStyle._pixmaps == None:
+            LineStyle._generatePixmaps()
+
+        # make line style selector
+        wlinestyle = self.addCombo(row, 0, 'Line style',
+                                   LineStyle._lines,
+                                   LineStyle._pixmaps, None)
         
-        row = self._identifyRow(self.sender())
-        lines = list(self.setting.val)
-        thisrow = list(lines[row])
-        thisrow[2] = LineStyle._lines[val]
-        lines[row] = tuple(thisrow)
-        self.ignorechange = True
-        self.setting.set(lines)
+        # make line width edit box
+        wwidth = qt.QLineEdit(self)
+        self.layout.addWidget(wwidth, row, 1)
+        wwidth.setText(self.setting.val[row][1])
+        qt.QToolTip.add(wwidth, 'Line width')
+        self.connect(wwidth, qt.SIGNAL('returnPressed()'),
+                     self.onWidthChanged)
+        self.connect(wwidth, qt.SIGNAL('lostFocus()'),
+                     self.onWidthChanged)
+        self.bgcolor = wwidth.paletteBackgroundColor()
 
-    def onHideToggled(self, on):
-        """Hide the line if button toggled."""
+        # make color selector button
+        wcolor = self.addColorButton(row, 2, 'Line color')
 
-        row = self._identifyRow(self.sender())
-        lines = list(self.setting.val)
-        thisrow = list(lines[row])
-        thisrow[3] = bool(on)
-        lines[row] = tuple(thisrow)
-        self.ignorechange = True
-        self.setting.set(lines)
+        # make hide checkbox
+        whide = self.addToggleButton(row, 3, 'Hide line')
+
+        # return created controls
+        return [wlinestyle, wwidth, wcolor, whide]
 
     def onWidthChanged(self):
         """Width has changed - validate."""
 
         sender = self.sender()
-        row = self._identifyRow(sender)
+        row, col = self.identifyPosn(sender)
 
         text = unicode(sender.text())
         if setting.Distance.isDist(text):
             # valid distance
-            sender.setPaletteBackgroundColor(self.bgcolour)
-            lines = list(self.setting.val)
-            thisrow = list(lines[row])
-            thisrow[1] = text
-            lines[row] = tuple(thisrow)
-            self.ignorechange = True
-            self.setting.set(lines)
+            sender.setPaletteBackgroundColor(self.bgcolor)
+            self._updateRowCol(row, col, text)
         else:
             # invalid distance
             sender.setPaletteBackgroundColor(qt.QColor('red'))
+
+class FillSet(ListSet):
+    """A list of fill settings."""
+
+    def __init__(self, setting, parent):
+        ListSet.__init__(self, ('solid', 'black', False),
+                         setting, parent)
+
+    def populateRow(self, row, val):
+        """Add the widgets for the row given."""
+
+        # construct fill pixmaps if not already done
+        if FillStyle._pixmaps == None:
+            FillStyle._generatePixmaps()
+    
+        # make fill style selector
+        wfillstyle = self.addCombo(row, 0, 'Fill style',
+                                   FillStyle._fills,
+                                   FillStyle._pixmaps,
+                                   FillStyle._fills)
+        wfillstyle.setMinimumWidth(self.pixsize)
+
+        # make color selector button
+        wcolor = self.addColorButton(row, 1, 'Fill color')
+
+        # make hide checkbox
+        whide = self.addToggleButton(row, 2, 'Hide fill')
+
+        # return widgets
+        return [wfillstyle, wcolor, whide]

@@ -888,15 +888,13 @@ class Marker(Choice):
     
 class LineSet(Setting):
     """A setting which corresponds to a set of lines.
-
-    This setting keeps an internal array of LineSettings.
     """
 
     def convertTo(self, val):
         """Takes a tuple/list of tuples:
-        [('color', '1pt', 'dotted', False), ...]
+        [('dotted', '1pt', 'color', False), ...]
 
-        These are obviously, color, width, style, and hide.
+        These are style, width, color, and hide.
         """
 
         if type(val) not in (list, tuple):
@@ -905,7 +903,7 @@ class LineSet(Setting):
         # check each entry in the list is appropriate
         for line in val:
             try:
-                color, width, style, hide = line
+                style, width, color, hide = line
             except ValueError:
                 raise InvalidType
 
@@ -920,4 +918,38 @@ class LineSet(Setting):
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.LineSet(self, *args)
+    
+class FillSet(Setting):
+    """A setting which corresponds to a set of fills.
+
+    This setting keeps an internal array of LineSettings.
+    """
+
+    def convertTo(self, val):
+        """Takes a tuple/list of tuples:
+        [('solid', 'color', False), ...]
+
+        These are color, fill style, and hide.
+        """
+
+        if type(val) not in (list, tuple):
+            raise InvalidType
+
+        # check each entry in the list is appropriate
+        for fill in val:
+            try:
+                style, color, hide = fill
+            except ValueError:
+                raise InvalidType
+
+            if ( type(color) not in (str, unicode) or
+                 style not in FillStyle._fillstyles or
+                 type(hide) not in (int, bool) ):
+                raise InvalidType
+
+        return val
+    
+    def makeControl(self, *args):
+        """Make specialised lineset control."""
+        return controls.FillSet(self, *args)
     
