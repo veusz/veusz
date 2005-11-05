@@ -1,5 +1,6 @@
 * 2005-10-05 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Rejigged and cleaned contour setting work
+	- Contour plotting and filling largely complete and functional
 	
 * 2005-10-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Much more contour setting work

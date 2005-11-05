@@ -918,6 +918,24 @@ class LineSet(Setting):
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.LineSet(self, *args)
+
+    def makePen(self, painter, row):
+        """Make a pen for the painter using row.
+
+        If row is outside of range, then cycle
+        """
+
+        if len(self.val) == 0:
+            return qt.QPen(qt.Qt.NoPen)
+        else:
+            row = row % len(self.val)
+            style, width, color, hide = self.val[row]
+            width = Distance.convertDistance(painter, width)
+            p = qt.QPen( qt.QColor(color), width,
+                         LineStyle._linecnvt[style] )
+            if hide:
+                p.setStyle(qt.Qt.NoPen)
+            return p
     
 class FillSet(Setting):
     """A setting which corresponds to a set of fills.
@@ -952,4 +970,21 @@ class FillSet(Setting):
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.FillSet(self, *args)
+    
+    def makeBrush(self, row):
+        """Make a Qt brush corresponding to the row given.
+
+        If row is outside of range, then cycle
+        """
+
+        if len(self.val) == 0:
+            return qt.QBrush()
+        else:
+            row = row % len(self.val)
+            style, color, hide = self.val[row]
+            b = qt.QBrush( qt.QColor(color),
+                           FillStyle._fillcnvt[style] )
+            if hide:
+                b.setStyle(qt.Qt.NoBrush)
+            return b
     

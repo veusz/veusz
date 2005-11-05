@@ -99,6 +99,10 @@ class Contour(plotters.GenericPlotter):
         self.lastdataset = None
         self.contsettings = None
 
+        # cached traced contours
+        self._cachedcontours = None
+        self._cachedpolygons = None
+
     def _calculateLevels(self):
         """Calculate contour levels from data and settings.
 
@@ -209,16 +213,23 @@ class Contour(plotters.GenericPlotter):
         if data.dimensions != 2:
             return
 
+        # delete cached polygons if no filling
+        if len(s.fills) == 0:
+            self._cachedpolygons = None
+
         # recalculate contours if image has changed
+        # we also recalculate if the user has switched on fills
         contsettings = ( s.min, s.max, s.numLevels, s.scaling,
                          tuple(s.manualLevels) )
 
-        if data != self.lastdataset or contsettings != self.contsettings:
+        if (data != self.lastdataset or contsettings != self.contsettings or
+            (self._cachedpolygons == None and len(s.fills) != 0)):
             self.updateContours()
             self.lastdataset = data
             self.contsettings = contsettings
 
         # plot the precalculated contours
+        self.plotContourFills(painter, posn, axes)
         self.plotContours(painter, posn, axes)
 
     def updateContours(self):
@@ -245,13 +256,25 @@ class Contour(plotters.GenericPlotter):
         del x, y
 
         # iterate over the levels and trace the contours
-        self._alllines = []
+        self._cachedcontours = None
+        self._cachedpolygons = None
+
         if self.Cntr != None:
             c = self.Cntr(xpts, ypts, data.data)
 
-            for level in levels:
-                linelist = c.trace(level)
-                self._alllines.append(linelist)
+            # trace the contour levels
+            if len(s.lines) != 0:
+                self._cachedcontours = []
+                for level in levels:
+                    linelist = c.trace(level)
+                    self._cachedcontours.append(linelist)
+
+            # trace the polygons between the contours
+            if len(s.fills) != 0 and len(levels) > 1:
+                self._cachedpolygons = []
+                for level1, level2 in itertools.izip(levels[:-1], levels[1:]):
+                    linelist = c.trace(level1, level2)
+                    self._cachedpolygons.append(linelist)
 
         else:
             print "Warning: contour plotting not found"
@@ -262,13 +285,20 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         x1, y1, x2, y2 = posn
 
+        # no lines cached as no line styles
+        if self._cachedcontours == None:
+            return
+
         # ensure plotting of contours does not go outside the area
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
         # iterate over each level, and list of lines
-        for level, linelist in itertools.izip(s.levelsOut, self._alllines):
+        for num, linelist in enumerate(self._cachedcontours):
 
+            # move to the next line style
+            painter.setPen(s.get('lines').makePen(painter, num))
+                
             # iterate over each complete line of the contour
             for curve in linelist:
                 # convert coordinates from graph to plotter
@@ -283,6 +313,45 @@ class Contour(plotters.GenericPlotter):
 
                 # actually draw the curve to the plotter
                 painter.drawPolyline( qt.QPointArray(pts) )
+
+        # remove clip region
+        painter.restore()
+
+    def plotContourFills(self, painter, posn, axes):
+        """Plot the traced contours on the painter."""
+
+        s = self.settings
+        x1, y1, x2, y2 = posn
+
+        # don't draw if there are no cached polygons
+        if self._cachedpolygons == None:
+            return
+
+        # ensure plotting of contours does not go outside the area
+        painter.save()
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setPen(qt.QPen(qt.Qt.NoPen))
+
+        # iterate over each level, and list of lines
+        for num, polylist in enumerate(self._cachedpolygons):
+
+            # move to the next line style
+            painter.setBrush(s.get('fills').makeBrush(num))
+                
+            # iterate over each complete line of the contour
+            for poly in polylist:
+                # convert coordinates from graph to plotter
+                xplt = axes[0].graphToPlotterCoords(posn, poly[0])
+                yplt = axes[1].graphToPlotterCoords(posn, poly[1])
+
+                # there should be a nice itertools way of doing this
+                pts = []
+                for x, y in itertools.izip(xplt, yplt):
+                    pts.append(x)
+                    pts.append(y)
+
+                # actually draw the curve to the plotter
+                painter.drawPolygon( qt.QPointArray(pts) )
 
         # remove clip region
         painter.restore()
