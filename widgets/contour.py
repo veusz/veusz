@@ -25,6 +25,7 @@ as a C routine (taken from matplotlib) is used to trace the contours.
 """
 
 import itertools
+import sys
 
 import qt
 import numarray as N
@@ -48,12 +49,13 @@ class Contour(plotters.GenericPlotter):
 
         # try to import contour helpers here
         try:
-            from veusz_helpers._na_cntr import Cntr
+            from helpers._na_cntr import Cntr
         except ImportError:
-            try:
-                from matplotlib._na_cntr import Cntr
-            except ImportError:
-                Cntr = None
+            Cntr = None
+            print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'
+                                'Please run python setup.py build\n'
+                                'Contour support is disabled')
+            
         self.Cntr = Cntr
 
         s = self.settings
@@ -275,9 +277,6 @@ class Contour(plotters.GenericPlotter):
                 for level1, level2 in itertools.izip(levels[:-1], levels[1:]):
                     linelist = c.trace(level1, level2)
                     self._cachedpolygons.append(linelist)
-
-        else:
-            print "Warning: contour plotting not found"
 
     def plotContours(self, painter, posn, axes):
         """Plot the traced contours on the painter."""

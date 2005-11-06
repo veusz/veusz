@@ -1,3 +1,6 @@
+* 2005-10-06 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Imported matplotlib contour routine into source
+	
 * 2005-10-05 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Rejigged and cleaned contour setting work
 	- Contour plotting and filling largely complete and functional

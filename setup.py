@@ -8,7 +8,7 @@ import sys
 import os.path
 import glob
 
-from distutils.core import setup
+from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
 
 version = open('VERSION').read().strip()
@@ -50,6 +50,7 @@ setup(name = 'veusz',
       package_dir = { 'veusz': '',
                       'veusz.dialogs': 'dialogs',
                       'veusz.document': 'document',
+                      'veusz.helpers': 'helpers',
                       'veusz.setting': 'setting',
                       'veusz.utils': 'utils',
                       'veusz.widgets': 'widgets',
@@ -68,5 +69,9 @@ setup(name = 'veusz',
                   'veusz.setting',
                   'veusz.utils',
                   'veusz.widgets',
-                  'veusz.windows']
+                  'veusz.helpers',
+                  'veusz.windows'],
+      ext_modules = [ Extension('veusz.helpers._na_cntr',
+                                ['helpers/src/_na_cntr.c'],
+                                define_macros=[ ('NUMARRAY',1) ]) ]
       )
