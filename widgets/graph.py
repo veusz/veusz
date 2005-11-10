@@ -125,7 +125,7 @@ class Graph(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, bounds)
 
         # if there's a background
         if not s.Background.hide:

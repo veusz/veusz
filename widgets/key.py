@@ -71,7 +71,7 @@ class Key(widget.Widget):
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""
 
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, parentposn)
         painter.save()
 
         s = self.settings

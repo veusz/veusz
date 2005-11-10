@@ -377,7 +377,7 @@ class Painter(qt.QPainter):
 
         self.veusz_scaling = 1.
 
-    def beginPaintingWidget(self, widget):
+    def beginPaintingWidget(self, widget, bounds):
         """Keep track of the widget currently being painted."""
         pass
 

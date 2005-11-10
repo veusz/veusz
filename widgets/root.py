@@ -58,7 +58,7 @@ class Root(widget.Widget):
 
         x1, y1, x2, y2 = parentposn
 
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, parentposn)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1+1, y2-y1+1) )
         bounds = widget.Widget.draw(self, parentposn, painter,

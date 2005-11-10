@@ -27,10 +27,36 @@ import sys
 import itertools
 
 import qt
+import numarray as N
 
 import setting
 import dialogs.exceptiondialog
 import widgets
+
+class PointPainter(widgets.Painter):
+    """A simple painter variant which works out the last widget
+    to overlap with the point specified."""
+
+    def __init__(self, pixmap, x, y):
+        """Watch the point x, y."""
+        widgets.Painter.__init__(self)
+        self.x = x
+        self.y = y
+        self.widget = None
+        self.bounds = {}
+
+        self.pixmap = pixmap
+        self.begin(pixmap)
+
+    def beginPaintingWidget(self, widget, bounds):
+
+        if (isinstance(widget, widgets.Graph) and
+            bounds[0] <= self.x and bounds[1] <= self.y and
+            bounds[2] >= self.x and bounds[3] >= self.y):
+            self.widget = widget
+
+        # record bounds of each widget
+        self.bounds[widget] = bounds
 
 class ClickPainter(widgets.Painter):
     """A variant of a painter which checks to see whether a certain
@@ -67,7 +93,7 @@ class ClickPainter(widgets.Painter):
         self.pixmap.fill(self.specialcolor)
         self.begin(self.pixmap)
 
-    def beginPaintingWidget(self, widget):
+    def beginPaintingWidget(self, widget, bounds):
         self.widgets.append(widget)
 
         # make a small pixmap of the starting state of the image
@@ -130,6 +156,10 @@ class PlotWindow( qt.QScrollView ):
         self.forceupdate = False
         self.setOutputSize()
 
+        # mode for clicking
+        self.clickmode = 'select'
+        self.currentclickmode = None
+
         # set up redrawing timer
         self.timer = qt.QTimer(self)
         self.connect( self.timer, qt.SIGNAL('timeout()'),
@@ -137,6 +167,11 @@ class PlotWindow( qt.QScrollView ):
 
         # for drag scrolling
         self.grabPos = None
+        self.scrolltimer = qt.QTimer(self)
+
+        # for turning clicking into scrolling after a period
+        self.connect( self.scrolltimer, qt.SIGNAL('timeout()'),
+                      self.slotBecomeScrollClick )
 
         # get update period from setting database
         if 'plot_updateinterval' in setting.settingdb:
@@ -154,31 +189,155 @@ class PlotWindow( qt.QScrollView ):
         """Allow user to drag window around."""
 
         if event.button() == qt.Qt.LeftButton:
-            # we set this to true unless the timer runs out (400ms), then it
-            # becomes a scroll click
-            # scroll clicks drag the window around, and selecting clicks
-            # select widgets!
-            self.selectingClick = True
 
             self.grabPos = (event.globalX(), event.globalY())
-            qt.QTimer.singleShot(400, self.slotBecomeScrollClick)
+            if self.clickmode == 'select':
+                # we set this to true unless the timer runs out (400ms),
+                # then it becomes a scroll click
+                # scroll clicks drag the window around, and selecting clicks
+                # select widgets!
+                self.scrolltimer.start(400, True)
+
+            elif self.clickmode == 'scroll':
+                qt.QApplication.setOverrideCursor(
+                    qt.QCursor(qt.Qt.SizeAllCursor))
+
+            elif self.clickmode == 'graphzoom':
+                qt.QApplication.setOverrideCursor(
+                    qt.QCursor(qt.Qt.CrossCursor))
+                self._drawZoomRect(self.grabPos)
+
+            # record what mode we were clicked in
+            self.currentclickmode = self.clickmode
+
+    def _drawZoomRect(self, pos):
+        """Draw a dotted rectangle xored."""
+
+        # convert global coordinates of edges into viewport coordinates
+        self._currentzoomrect = pos
+        minx = min(self.grabPos[0], pos[0])
+        maxx = max(self.grabPos[0], pos[0])
+        miny = min(self.grabPos[1], pos[1])
+        maxy = max(self.grabPos[1], pos[1])
+        w = maxx - minx + 1
+        h = maxy - miny + 1
+
+        # draw the rectangle on the viewport
+        view = self.viewport()
+        pt = view.mapFromGlobal( qt.QPoint(minx, miny) )
+        painter = qt.QPainter(view, True)
+        painter.setPen(qt.QPen(qt.QColor('black'), 0, qt.Qt.DotLine))
+        painter.drawRect(pt.x(), pt.y(), w, h)
+
+    def _hideZoomRect(self):
+        """Remove the zoom rectangle painted by _drawZoomRect."""
+
+        # convert bounds of old zoom rect (in global coords)
+        # to contents coordinates
+        pos = self._currentzoomrect
+        minx = min(self.grabPos[0], pos[0])
+        maxx = max(self.grabPos[0], pos[0])
+        miny = min(self.grabPos[1], pos[1])
+        maxy = max(self.grabPos[1], pos[1])
+        w = maxx - minx + 1
+        h = maxy - miny + 1
+
+        view = self.viewport()
+        pt1 = view.mapFromGlobal(qt.QPoint(minx, miny))
+        pt2 = view.mapFromGlobal(qt.QPoint(maxx, maxy))
+        pt1x, pt1y = self.viewportToContents(pt1.x(), pt1.y())
+        pt2x, pt2y = self.viewportToContents(pt2.x(), pt2.y())
+
+        # repaint the contents along the edges of the zoom rect
+        self.repaintContents(pt1x, pt1y, w, 1, False)
+        self.repaintContents(pt1x, pt1y, 1, h, False)
+        self.repaintContents(pt1x, pt2y, w, 1, False)
+        self.repaintContents(pt2x, pt1y, 1, h, False)
+
+    def doZoomRect(self):
+        """Take the zoom rectangle drawn by the user and do the zooming.
+
+        This is pretty messy - first we have to work out the graph associated
+        to the first point
+
+        Then we have to iterate over each of the plotters, identify their
+        axes, and change the range of the axes to match the screen region
+        selected.
+        """
+
+        pt1 = self.viewport().mapFromGlobal(qt.QPoint(*self.grabPos))
+        pt2 = self.viewport().mapFromGlobal(qt.QPoint(*self._currentzoomrect))
+        pt1 = self.viewportToContents(pt1)
+        pt2 = self.viewportToContents(pt2)
+
+        # try to work out in which widget the first point is in
+        bufferpixmap = qt.QPixmap( *self.size )
+        painter = PointPainter(bufferpixmap, pt1.x(), pt1.y())
+        painter.veusz_scaling = self.zoomfactor
+        pagenumber = min( self.document.getNumberPages() - 1,
+                          self.pagenumber )
+        if pagenumber >= 0:
+            self.document.paintTo(painter, self.pagenumber)
+        painter.end()
+
+        # get widget
+        widget = painter.widget
+        if widget != None:
+
+            # convert points on plotter to points on axis for each axis
+            xpts = N.array( [pt1.x(), pt2.x()] )
+            ypts = N.array( [pt1.y(), pt2.y()] )
+
+            # iterate over children, to look for plotters
+            for c in widget.children:
+                if isinstance(c, widgets.GenericPlotter):
+
+                    # get axes associated with plotter
+                    axes = c.parent.getAxes( (c.settings.xAxis,
+                                              c.settings.yAxis) )
+
+                    # iterate over each, and update the ranges
+                    for axis in [a for a in axes if a != None]:
+                        s = axis.settings
+                        if s.direction == 'horizontal':
+                            p = xpts
+                        else:
+                            p = ypts
+
+                        # convert points on plotter to axis coordinates
+                        # FIXME: Need To Trap Conversion Errors!
+                        r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+
+                        # invert if min and max are inverted
+                        if r[1] < r[0]:
+                            r[1], r[0] = r[0], r[1]
+
+                        # actually set the axis
+                        if s.min != r[0]:
+                            s.min = r[0]
+                        if s.max != r[1]:
+                            s.max = r[1]
 
     def slotBecomeScrollClick(self):
         """If the click is still down when this timer is reached then
         we turn the click into a scrolling click."""
 
-        if self.selectingClick:
+        if self.currentclickmode == 'select':
             qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
-            self.selectingClick = False
+            self.currentclickmode = 'scroll'
 
     def contentsMouseMoveEvent(self, event):
         """Scroll window by how much the mouse has moved since last time."""
 
-        if self.grabPos != None:
+        if self.currentclickmode == 'scroll':
             event.accept()
             pos = (event.globalX(), event.globalY())
             self.scrollBy(self.grabPos[0]-pos[0], self.grabPos[1]-pos[1])
             self.grabPos = pos
+        elif self.currentclickmode == 'graphzoom':
+            # get rid of current rectangle
+            self._hideZoomRect()
+            self._drawZoomRect((event.globalX(), event.globalY()))
 
     def contentsMouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
@@ -186,13 +345,17 @@ class PlotWindow( qt.QScrollView ):
 
         if event.button() == qt.Qt.LeftButton:
             event.accept()
-            if self.selectingClick:
+            self.scrolltimer.stop()
+            if self.currentclickmode == 'select':
                 # work out where the mouse clicked and choose widget
                 self.locateClickWidget(event.x(), event.y())
-            else:
+            elif self.currentclickmode == 'scroll':
                 # return the cursor to normal after scrolling
                 qt.QApplication.restoreOverrideCursor()
-            self.selectingClick = False
+            elif self.currentclickmode == 'graphzoom':
+                self._hideZoomRect()
+                qt.QApplication.restoreOverrideCursor()
+                self.doZoomRect()
         else:
             qt.QScrollView.contentsMouseReleaseEvent(self, event)
 

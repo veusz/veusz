@@ -373,7 +373,7 @@ class Image(plotters.GenericPlotter):
             image = self.image
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, posn)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 

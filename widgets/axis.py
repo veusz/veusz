@@ -651,7 +651,7 @@ class Axis(widget.Widget):
         coordticks = self._graphToPlotter(self.majortickscalc)
 
         # save the state of the painter for later
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, posn)
         painter.save()
 
         texttorender = []

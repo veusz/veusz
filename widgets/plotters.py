@@ -270,7 +270,7 @@ class FunctionPlotter(GenericPlotter):
                 pxpts = axes[0].graphToPlotterCoords(posn, x)
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, posn)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
@@ -620,7 +620,7 @@ class PointPlotter(GenericPlotter):
             return
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self)
+        painter.beginPaintingWidget(self, posn)
         painter.save()
         painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
 
@@ -725,6 +725,8 @@ class TextLabel(GenericPlotter):
             # translate xPos and yPos to plotter coordinates
 
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            if none in axes:
+                return
             xp = axes[0].graphToPlotterCoords(posn, N.array( [s.xPos] ))[0]
             yp = axes[1].graphToPlotterCoords(posn, N.array( [s.yPos] ))[0]
         else:
@@ -733,7 +735,7 @@ class TextLabel(GenericPlotter):
             yp = posn[3] + (posn[1]-posn[3])*s.yPos
 
         if not s.Text.hide:
-            painter.beginPaintingWidget(self)
+            painter.beginPaintingWidget(self, parentposn)
             painter.save()
             textpen = s.get('Text').makeQPen()
             painter.setPen(textpen)

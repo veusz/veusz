@@ -1,11 +1,14 @@
-* 2005-10-06 Jeremy Sanders <jeremy@jeremysanders.net>
+* 2005-11-10 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Rubber band graph zooming mostly working
+	
+* 2005-11-06 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Imported matplotlib contour routine into source
 	
-* 2005-10-05 Jeremy Sanders <jeremy@jeremysanders.net>
+* 2005-11-05 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Rejigged and cleaned contour setting work
 	- Contour plotting and filling largely complete and functional
 	
-* 2005-10-03 Jeremy Sanders <jeremy@jeremysanders.net>
+* 2005-11-03 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Much more contour setting work
 	
 * 2005-10-27 Jeremy Sanders <jeremy@jeremysanders.net>
