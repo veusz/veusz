@@ -60,6 +60,17 @@ class XYPlotLine(Line):
                                  descr='Plot horizontal steps '
                                  'instead of a line'), 0 )
 
+class ErrorBarLine(Line):
+    '''A line style for error bar plotting.'''
+
+    def __init__(self, name, descr=''):
+        Line.__init__(self, name, descr=descr)
+
+        self.add( setting.Bool('hideHorz', False,
+                               descr = 'Hide horizontal errors') )
+        self.add( setting.Bool('hideVert', False,
+                               descr = 'Hide vertical errors') )
+
 class Brush(settings.Settings):
     '''Settings of a fill.'''
 

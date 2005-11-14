@@ -1,3 +1,8 @@
+* 2005-11-14 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Added options to hide horizontal and vertical error bars
+	- Added "descriptor" command in data files to change descriptor
+	on the fly
+	
 * 2005-11-10 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Rubber band graph zooming mostly working
 	

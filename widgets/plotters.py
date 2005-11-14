@@ -342,8 +342,8 @@ class PointPlotter(GenericPlotter):
                             descr = 'Line around the marker settings') )
         s.add( setting.Brush('MarkerFill',
                              descr = 'Marker fill settings') )
-        s.add( setting.Line('ErrorBarLine',
-                            descr = 'Error bar line settings') )
+        s.add( setting.ErrorBarLine('ErrorBarLine',
+                                    descr = 'Error bar line settings') )
         s.add( setting.PlotterFill('FillBelow',
                                    descr = 'Fill below plot line') )
         s.add( setting.PlotterFill('FillAbove',
@@ -415,12 +415,12 @@ class PointPlotter(GenericPlotter):
             pts = []
 
             # vertical error bars
-            if ymin != None and ymax != None:
+            if ymin != None and ymax != None and not s.ErrorBarLine.hideVert :
                 for i in itertools.izip(xplotter, ymin, xplotter,
                                         ymax):
                     pts += i
             # horizontal error bars
-            if xmin != None and xmax != None:
+            if xmin != None and xmax != None and not s.ErrorBarLine.hideHorz:
                 for i in itertools.izip(xmin, yplotter, xmax,
                                         yplotter):
                     pts += i

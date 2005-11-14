@@ -300,11 +300,23 @@ class SimpleRead:
     def _readDataUnblocked(self, stream):
         """Read in that data from the stream."""
 
+        allparts = self.parts
+
         # loop over lines
         while stream.newLine():
-            for i in self.parts:
-                i.readFromStream(stream, self.datasets)
+
+            if stream.remainingline[:1] == ['descriptor']:
+                # a change descriptor statement
+                descriptor =  ' '.join(stream.remainingline[1:])
+                self._parseDescriptor(descriptor)
+                allparts += self.parts
+            else:
+                # normal text
+                for i in self.parts:
+                    i.readFromStream(stream, self.datasets)
             stream.flushLine()
+
+        self.parts = allparts
         self.blocks = None
 
     def _readDataBlocked(self, stream):
