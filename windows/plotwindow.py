@@ -32,6 +32,7 @@ import numarray as N
 import setting
 import dialogs.exceptiondialog
 import widgets
+import action
 
 class PointPainter(widgets.Painter):
     """A simple painter variant which works out the last widget
@@ -184,6 +185,65 @@ class PlotWindow( qt.QScrollView ):
 
         # allow window to get foucs, to allow context menu
         self.setFocusPolicy(qt.QWidget.StrongFocus)
+
+        # optional view toolbar
+        self.viewtoolbar = None
+        self.viewactions = None
+
+    def createToolbar(self, parent, menu=None):
+        """Make a view toolbar, and optionally update menu."""
+
+        self.zoomtoolbar = qt.QToolBar(parent, "viewtoolbar")
+        self.zoomtoolbar.setLabel("View toolbar - Veusz")
+
+        items = [
+            ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
+             self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
+            ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
+             self.slotViewZoomOut, 'stock-zoom-out.png', False, 'Ctrl+-'),
+            ('viewzoom11', 'Restore plot to natural size', 'Zoom 1:1', 'view',
+             self.slotViewZoom11, 'stock-zoom-100.png', False, 'Ctrl+1'),
+            ('viewzoomwidth', 'Zoom plot to show whole width',
+             'Zoom to width', 'view', self.slotViewZoomWidth,
+             'stock_zoom-page-width.png', False, ''),
+            ('viewzoomheight', 'Zoom plot to show whole height',
+             'Zoom to height', 'view', self.slotViewZoomHeight,
+             'stock_zoom-page-height.png', False, ''),
+            ('viewzoompage', 'Zoom plot to show whole page',
+             'Zoom to page', 'view', self.slotViewZoomPage,
+             'stock_zoom-page.png', False, ''),
+            ('view',),
+            ('viewprevpage', 'Move to the previous page', '&Previous page',
+             'view', self.slotViewPreviousPage, 'stock_previous-page.png',
+             True, 'Ctrl+PgUp'),
+            ('viewnextpage', 'Move to the next page', '&Next page',
+             'view', self.slotViewNextPage, 'stock_next-page.png',
+             True, 'Ctrl+PgDown'),
+            ('viewzoomgraph', 'Zoom into graph', 'Zoom graph',
+             'view', self.slotViewZoomGraph, 'zoom_graph.png',
+             True, '')
+            ]
+
+        menus = None
+        if menu != None:
+            menus = {}
+            menus['view'] = menu
+
+        self.viewactions = action.populateMenuToolbars(items, self.zoomtoolbar,
+                                                       menus)
+                                                   
+        zoomtb = qt.QToolButton(self.zoomtoolbar)
+        zoomicon = os.path.join(os.path.dirname(__file__), 'icons',
+                                'zoom-options.png')
+        zoomtb.setIconSet(qt.QIconSet( qt.QPixmap(zoomicon) ))
+
+        # drop down zoom button on toolbar
+        zoompop = qt.QPopupMenu(zoomtb)
+        for act in ('viewzoomin', 'viewzoomout', 'viewzoom11',
+                    'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
+            self.viewactions[act].addTo(zoompop)
+        zoomtb.setPopup(zoompop)
+        zoomtb.setPopupDelay(0)
 
     def contentsMousePressEvent(self, event):
         """Allow user to drag window around."""
@@ -396,38 +456,6 @@ class PlotWindow( qt.QScrollView ):
             self.bufferpixmap.fill( self.colorGroup().base() )
             self.resizeContents( *self.size )
 
-    def setZoomFactor(self, zoomfactor):
-        """Set the zoom factor of the window."""
-        self.zoomfactor = float(zoomfactor)
-        self.updateContents()
-
-    def zoomWidth(self):
-        """Make the zoom factor so that the plot fills the whole width."""
-
-        # FIXME zoomWidth/height/page routines fail to take into account
-        # width of scroll bars
-
-        width = self.visibleWidth()
-        mult = width/float(self.size[0])
-        self.setZoomFactor( mult * self.zoomfactor )
-        
-    def zoomHeight(self):
-        """Make the zoom factor so that the plot fills the whole width."""
-
-        height = self.visibleHeight()
-        mult = height/float(self.size[1])
-        self.setZoomFactor( mult * self.zoomfactor )
-
-    def zoomPage(self):
-        """Make the zoom factor correct to show the whole page."""
-
-        width = self.visibleWidth()
-        height = self.visibleHeight()
-
-        multw = width/float(self.size[0])
-        multh = height/float(self.size[1])
-        self.setZoomFactor( min(multw, multh)*self.zoomfactor)
-
     def setPageNumber(self, pageno):
         """Move the the selected page."""
 
@@ -493,6 +521,7 @@ class PlotWindow( qt.QScrollView ):
                 self.pagenumber = 0
 
             self.emit( qt.PYSIGNAL("sigUpdatePage"), (self.pagenumber,) )
+            self.updatePageToolbar()
 
             self.oldzoom = self.zoomfactor
             self.forceupdate = False
@@ -568,3 +597,67 @@ class PlotWindow( qt.QScrollView ):
         # update setting database
         if ret > 0:
             setting.settingdb['plot_updateinterval'] = self.interval
+
+    def setZoomFactor(self, zoomfactor):
+        """Set the zoom factor of the window."""
+        self.zoomfactor = float(zoomfactor)
+        self.updateContents()
+
+    def slotViewZoomIn(self):
+        """Zoom into the plot."""
+        self.setZoomFactor(self.zoomfactor * N.sqrt(2.))
+
+    def slotViewZoomOut(self):
+        """Zoom out of the plot."""
+        self.setZoomFactor(self.zoomfactor / N.sqrt(2.))
+
+    def slotViewZoomWidth(self):
+        """Make the zoom factor so that the plot fills the whole width."""
+
+        # FIXME zoomWidth/height/page routines fail to take into account
+        # width of scroll bars
+
+        width = self.visibleWidth()
+        mult = width/float(self.size[0])
+        self.setZoomFactor(self.zoomfactor * mult)
+        
+    def slotViewZoomHeight(self):
+        """Make the zoom factor so that the plot fills the whole width."""
+
+        height = self.visibleHeight()
+        mult = height/float(self.size[1])
+        self.setZoomFactor(self.zoomfactor * mult)
+
+    def slotViewZoomPage(self):
+        """Make the zoom factor correct to show the whole page."""
+
+        width = self.visibleWidth()
+        height = self.visibleHeight()
+
+        multw = width/float(self.size[0])
+        multh = height/float(self.size[1])
+        self.setZoomFactor(self.zoomfactor * min(multw, multh))
+
+    def slotViewZoom11(self):
+        """Restore the zoom to 1:1"""
+        self.setZoomFactor(1.)
+
+    def slotViewPreviousPage(self):
+        """View the previous page."""
+        self.setPageNumber( self.pagenumber - 1 )
+ 
+    def slotViewNextPage(self):
+        """View the next page."""
+        self.setPageNumber( self.pagenumber + 1 )
+
+    def slotViewZoomGraph(self):
+        """Zoom into graph."""
+
+    def updatePageToolbar(self):
+        """Update page number when the plot window says so."""
+
+        # disable previous and next page actions
+        if self.viewactions != None:
+            np = self.document.getNumberPages()
+            self.viewactions['viewprevpage'].setEnabled(self.pagenumber != 0)
+            self.viewactions['viewnextpage'].setEnabled(self.pagenumber < np-1)

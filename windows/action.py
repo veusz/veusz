@@ -25,7 +25,7 @@
 import qt
 import os.path
 
-icondir = os.path.dirname(__file__) + '/icons'
+_icondir = os.path.join(os.path.dirname(__file__), 'icons')
 
 class Action(qt.QObject):
     """A QAction-like object for associating actions with buttons,
@@ -83,7 +83,7 @@ class Action(qt.QObject):
 
         # make icon set
         if iconfilename != None:
-            filename = os.path.join(icondir, iconfilename)
+            filename = os.path.join(_icondir, iconfilename)
             self.iconset = qt.QIconSet( qt.QPixmap(qt.QPixmap(filename)) )
         else:
             self.iconset = None
@@ -152,3 +152,51 @@ class Action(qt.QObject):
     def slotMenuAboutToHide(self):
         """Menu about to go, so we hide the status bar text."""
         self.statusbar.clear()
+
+def populateMenuToolbars(items, toolbar, menus):
+    """Construct the menus and toolbar from the list of items.
+    toolbar is a QToolbar object
+    menus is a dict of menus to add to
+
+    Items are tuples consisting of:
+    (actioname, status bar text, menu text, menu id, slot,
+     icon filename, add to toolbar (bool), shortcut text)
+
+    Returns a dict of actions
+    """
+
+    actions = {}
+    parent = toolbar.parent()
+    for i in items:
+        if len(i) == 1:
+            menus[i[0]].insertSeparator()
+            continue
+        
+        menuid, descr, menutext, menu, slot, icon, addtool, key = i
+        if key == '':
+            ks = qt.QKeySequence()
+        else:
+            ks = qt.QKeySequence(key)
+
+        action = qt.QAction(descr, menutext, ks, parent)
+
+        # load icon if set
+        if icon != '':
+            f = os.path.join(_icondir, icon)
+            action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
+
+        # connect the action to the slot
+        qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
+
+        # add to menu
+        if menus != None:
+            action.addTo( menus[menu] )
+
+        # add to toolbar
+        if addtool and toolbar != None:
+            action.addTo(toolbar)
+
+        # save for later
+        actions[menuid] = action
+
+    return actions

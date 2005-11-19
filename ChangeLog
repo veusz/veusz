@@ -1,3 +1,6 @@
+* 2005-11-19 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Reorganisation of view toolbar / menus into PlotWindow
+	
 * 2005-11-14 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Added options to hide horizontal and vertical error bars
 	- Added "descriptor" command in data files to change descriptor

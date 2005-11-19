@@ -23,11 +23,11 @@
 
 import qt
 import os.path
-from math import sqrt
 
 import consolewindow
 import plotwindow
 import treeeditwindow
+import action
 
 import document
 import utils
@@ -77,7 +77,7 @@ class MainWindow(qt.QMainWindow):
         self._defineMenus()
 
         self.plot = plotwindow.PlotWindow(self.document, self)
-        self.plotzoom = 0
+        self.plot.createToolbar(self, self.menus['view'])
 
         # likewise with the tree-editing window
         self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
@@ -162,7 +162,6 @@ class MainWindow(qt.QMainWindow):
                 for filename in files[1:]:
                     self.CreateWindow(filename)
             
-            
     def _getVeuszFiles(self, event):
         """Return a list of veusz files from a drag/drop event containing a
         text/uri-list"""
@@ -174,7 +173,6 @@ class MainWindow(qt.QMainWindow):
             if filename[-4:] == ".vsz":
                 fileList.append(unicode(filename))
         return fileList
-                
 
     def slotAboutToShowView(self):
         """Put check marks against dock menu items if appropriate."""
@@ -255,29 +253,6 @@ class MainWindow(qt.QMainWindow):
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
              self.slotDataReload, 'stock-refresh.png', False, ''),
 
-            ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
-             self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
-            ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
-             self.slotViewZoomOut, 'stock-zoom-out.png', False, 'Ctrl+-'),
-            ('viewzoom11', 'Restore plot to natural size', 'Zoom 1:1', 'view',
-             self.slotViewZoom11, 'stock-zoom-100.png', False, 'Ctrl+1'),
-            ('viewzoomwidth', 'Zoom plot to show whole width',
-             'Zoom to width', 'view', self.slotViewZoomWidth,
-             'stock_zoom-page-width.png', False, ''),
-            ('viewzoomheight', 'Zoom plot to show whole height',
-             'Zoom to height', 'view', self.slotViewZoomHeight,
-             'stock_zoom-page-height.png', False, ''),
-            ('viewzoompage', 'Zoom plot to show whole page',
-             'Zoom to page', 'view', self.slotViewZoomPage,
-             'stock_zoom-page.png', False, ''),
-            ('view',),
-            ('viewprevpage', 'Move to the previous page', '&Previous page',
-             'view', self.slotViewPreviousPage, 'stock_previous-page.png',
-             True, 'Ctrl+PgUp'),
-            ('viewnextpage', 'Move to the next page', '&Next page',
-             'view', self.slotViewNextPage, 'stock_next-page.png',
-             True, 'Ctrl+PgDown'),
-
             ('helphome', 'Go to the Veusz home page on the internet',
              'Home page', 'help', self.slotHelpHomepage, '', False, ''),
             ('helpproject', 'Go to the Veusz project page on the internet',
@@ -290,51 +265,9 @@ class MainWindow(qt.QMainWindow):
              'help', self.slotHelpAbout, '', False, '')
             ]
             
-        # construct the menus and toolbar from the above data
-        self.actions = {}
-        for i in items:
-            # we just want to insert a separator
-            if len(i) == 1:
-                self.menus[i[0]].insertSeparator()
-                continue
-            
-            menuid, descr, menutext, menu, slot, icon, addtool, key = i
-            if key == '':
-                ks = qt.QKeySequence()
-            else:
-                ks = qt.QKeySequence(key)
-
-            action = qt.QAction(descr, menutext, ks, self)
-
-            # load icon if set
-            if icon != '':
-                f = os.path.join(_fdirname, 'icons', icon)
-                action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
-
-            # connect the action to the slot
-            qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
-
-            # add to menu
-            action.addTo( self.menus[menu] )
-
-            # add to toolbar
-            if addtool:
-                action.addTo(self.maintoolbar)
-
-            # save for later
-            self.actions[menuid] = action
-
-        zoomtb = qt.QToolButton(self.maintoolbar)
-        f = os.path.join(_fdirname, 'icons', 'zoom-options.png')
-        zoomtb.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
-
-        # drop down zoom button on toolbar
-        zoompop = qt.QPopupMenu(zoomtb)
-        for action in ('viewzoomin', 'viewzoomout', 'viewzoom11',
-                       'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
-            self.actions[action].addTo(zoompop)
-        zoomtb.setPopup(zoompop)
-        zoomtb.setPopupDelay(0)
+        self.actions = action.populateMenuToolbars(items, self.maintoolbar,
+                                                   self.menus)
+                                                   
 
     def slotDataImport(self):
         """Display the import data dialog."""
@@ -685,38 +618,6 @@ class MainWindow(qt.QMainWindow):
             # do the printing
             doc.printTo( prnt, pages )
 
-    def slotViewZoomIn(self):
-        """Zoom into the plot."""
-
-        if self.plotzoom < 6:
-            self.plotzoom += 1
-        self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
-
-    def slotViewZoomOut(self):
-        """Zoom out of the plot."""
-
-        if self.plotzoom > -6:
-            self.plotzoom -= 1
-        self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
-
-    def slotViewZoom11(self):
-        """Restore the zoom to 1:1"""
-        
-        self.plotzoom = 0
-        self.plot.setZoomFactor( sqrt(2) ** self.plotzoom )
-
-    def slotViewZoomWidth(self):
-        """Make the plot fit the page width."""
-        self.plot.zoomWidth()
-
-    def slotViewZoomHeight(self):
-        """Make the plot fit the page height."""
-        self.plot.zoomHeight()
-
-    def slotViewZoomPage(self):
-        """Make the plot fit the page."""
-        self.plot.zoomPage()
-
     def slotModifiedDoc(self, ismodified):
         """Disable certain actions if document is not modified."""
 
@@ -731,14 +632,6 @@ class MainWindow(qt.QMainWindow):
         """File quit chosen."""
         qt.qApp.closeAllWindows()
         
-    def slotViewPreviousPage(self):
-        """View the previous page."""
-        self.plot.setPageNumber( self.plot.getPageNumber() - 1 )
-
-    def slotViewNextPage(self):
-        """View the next page."""
-        self.plot.setPageNumber( self.plot.getPageNumber() + 1 )
-
     def slotUpdatePage(self, number):
         """Update page number when the plot window says so."""
 
@@ -747,7 +640,3 @@ class MainWindow(qt.QMainWindow):
             self.pagelabel.setText("No pages")
         else:
             self.pagelabel.setText("Page %i/%i" % (number+1, np))
-
-        # disable previous and next page actions
-        self.actions['viewprevpage'].setEnabled( number != 0 )
-        self.actions['viewnextpage'].setEnabled( number < np-1 )
