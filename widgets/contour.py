@@ -231,8 +231,10 @@ class Contour(plotters.GenericPlotter):
             self.contsettings = contsettings
 
         # plot the precalculated contours
+        painter.beginPaintingWidget(self, posn)
         self.plotContourFills(painter, posn, axes)
         self.plotContours(painter, posn, axes)
+        painter.endPaintingWidget()
 
     def updateContours(self):
         """Update calculated contours."""

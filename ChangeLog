@@ -1,3 +1,6 @@
+* 2005-11-21 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Allow contours to be clicked on
+	
 * 2005-11-19 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Reorganisation of view toolbar / menus into PlotWindow
 	
