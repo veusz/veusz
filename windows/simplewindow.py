@@ -38,7 +38,17 @@ class SimpleWindow(qt.QMainWindow):
 
         self.plot = plotwindow.PlotWindow(self.document, self)
         self.plotzoom = 0
+        self.toolbar = None
 
         self.setCentralWidget( self.plot )
 
-        
+    def enableToolbar(self, enable=True):
+        """Enable or disable the zoom toolbar in this window."""
+
+        if self.toolbar == None and enable:
+            self.toolbar = self.plot.createToolbar(self, None)
+
+        if self.toolbar != None and not enable:
+            self.toolbar.close()
+            self.toolbar = None
+            

@@ -1179,8 +1179,10 @@ g.Close()
       <para>The supported commands are the same as in <link
       linkend="Commands">Commands</link>, with the addition of a
       <command>Zoom(zoomfactor)</command> command to control the size
-      of the plot in the window, and <command>Close()</command> which
-      closes the window given.</para>
+      of the plot in the window, the
+      <command>EnableToolbar()</command> to enable to graph toolbar,
+      and the <command>Close()</command> which closes the window
+      given.</para>
 
       <para>Embedding works on the Python versions I have access to,
       but may be affected by threading bugs. In addition Veusz must be
@@ -1206,8 +1208,9 @@ g.Close()
       standard output. This is a full Python execution environment,
       and supports all the scripting commands mentioned in <link
       linkend="Commands">Commands</link>, a <command>Quit()</command>
-      command and the <command>Zoom(factor)</command> command listed
-      above. Only one window is supported at once, but many
+      command, the <command>EnableToolbar()</command> and the
+      <command>Zoom(factor)</command> command listed above. Only one
+      window is supported at once, but many
       <command>veusz_listen</command> programs may be started.</para>
 
       <para><command>veusz_listen</command> may be used from the shell

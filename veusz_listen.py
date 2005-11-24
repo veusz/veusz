@@ -56,6 +56,7 @@ class InputListener(qt.QObject):
         self.ci = document.CommandInterpreter(self.document)
         self.ci.addCommand('Quit', self.quitProgram)
         self.ci.addCommand('Zoom', self.plotZoom)
+        self.ci.addCommand('EnableToolbar', self.enableToolbar)
         self.ci.addCommand('Pickle', self.enablePickle)
 
         self.notifier = qt.QSocketNotifier( sys.stdin.fileno(),
@@ -72,6 +73,10 @@ class InputListener(qt.QObject):
         """Set the plot zoom factor."""
         self.plot.setZoomFactor(zoomfactor)
 
+    def enableToolbar(self, enable=True):
+        """Enable plot toolbar."""
+        self.window.enableToolbar(enable)
+        
     def enablePickle(self, on=True):
         """Enable/disable pickling of commands to/data from veusz"""
         self.pickle = on

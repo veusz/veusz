@@ -163,6 +163,7 @@ class Embedded(object):
         self.ci = document.CommandInterpreter(self.document)
         self.ci.addCommand('Close', self._Close)
         self.ci.addCommand('Zoom', self._Zoom)
+        self.ci.addCommand('EnableToolbar', self._EnableToolbar)
 
     def _Close(self):
         """Close this window."""
@@ -177,9 +178,12 @@ class Embedded(object):
         """Set the plot zoom factor."""
         self.plot.setZoomFactor(zoomfactor)
 
+    def _EnableToolbar(self, enable=True):
+        """Enable the toolbar in this plotwindow."""
+        self.window.enableToolbar(enable)
+
     def __getattr__(self, name):
         """If there's no name, then lookup in command interpreter."""
-
 
         if name in self.ci.cmds:
             return Bind1st(Embedded._runCommand, self.ci.cmds[name])

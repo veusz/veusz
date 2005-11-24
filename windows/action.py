@@ -169,7 +169,8 @@ def populateMenuToolbars(items, toolbar, menus):
     parent = toolbar.parent()
     for i in items:
         if len(i) == 1:
-            menus[i[0]].insertSeparator()
+            if menus != None:
+                menus[i[0]].insertSeparator()
             continue
         
         menuid, descr, menutext, menu, slot, icon, addtool, key = i

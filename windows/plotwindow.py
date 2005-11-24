@@ -258,6 +258,8 @@ class PlotWindow( qt.QScrollView ):
         self.viewactions['viewselect'].setOn(True)
         self.connect(g, qt.SIGNAL('selected(QAction*)'), self.slotSelectMode)
 
+        return self.zoomtoolbar
+
     def contentsMousePressEvent(self, event):
         """Allow user to drag window around."""
 
