@@ -1,3 +1,6 @@
+* 2005-11-23 Jeremy Sanders <jeremy@jeremysanders.net>
+	- Add Pointer button, and enable graph zooming
+	
 * 2005-11-21 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Allow contours to be clicked on
 	

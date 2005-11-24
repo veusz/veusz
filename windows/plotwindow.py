@@ -219,8 +219,11 @@ class PlotWindow( qt.QScrollView ):
             ('viewnextpage', 'Move to the next page', '&Next page',
              'view', self.slotViewNextPage, 'stock_next-page.png',
              True, 'Ctrl+PgDown'),
+            ('viewselect', 'Select items from the graph or scroll',
+             'Select items or scroll', 'view', None,
+             'pointer.png', True, ''),
             ('viewzoomgraph', 'Zoom into graph', 'Zoom graph',
-             'view', self.slotViewZoomGraph, 'zoom_graph.png',
+             'view', None, 'zoom_graph.png',
              True, '')
             ]
 
@@ -244,6 +247,16 @@ class PlotWindow( qt.QScrollView ):
             self.viewactions[act].addTo(zoompop)
         zoomtb.setPopup(zoompop)
         zoomtb.setPopupDelay(0)
+
+        # define action group for various different selection models
+        g = self.selectactiongrp = qt.QActionGroup(self)
+        g.setExclusive(True)
+        for a in [self.viewactions[i] for i in
+                  ('viewselect', 'viewzoomgraph')]:
+            g.add(a)
+            a.setToggleAction(True)
+        self.viewactions['viewselect'].setOn(True)
+        self.connect(g, qt.SIGNAL('selected(QAction*)'), self.slotSelectMode)
 
     def contentsMousePressEvent(self, event):
         """Allow user to drag window around."""
@@ -325,8 +338,18 @@ class PlotWindow( qt.QScrollView ):
         selected.
         """
 
-        pt1 = self.viewport().mapFromGlobal(qt.QPoint(*self.grabPos))
-        pt2 = self.viewport().mapFromGlobal(qt.QPoint(*self._currentzoomrect))
+        # get points corresponding to corners of rectangle
+        pt1 = qt.QPoint(*self.grabPos)
+        pt2 = qt.QPoint(*self._currentzoomrect)
+
+        # work out whether it's worthwhile to zoom: only zoom if there
+        # are >=5 pixels movement
+        if abs((pt2-pt1).x()) < 10 or abs((pt2-pt1).y()) < 10:
+            return
+
+        # convert to coordinates of contents of scrollview
+        pt1 = self.viewport().mapFromGlobal(pt1)
+        pt2 = self.viewport().mapFromGlobal(pt2)
         pt1 = self.viewportToContents(pt1)
         pt2 = self.viewportToContents(pt2)
 
@@ -342,41 +365,42 @@ class PlotWindow( qt.QScrollView ):
 
         # get widget
         widget = painter.widget
-        if widget != None:
+        if widget == None:
+            return
+        
+        # convert points on plotter to points on axis for each axis
+        xpts = N.array( [pt1.x(), pt2.x()] )
+        ypts = N.array( [pt1.y(), pt2.y()] )
 
-            # convert points on plotter to points on axis for each axis
-            xpts = N.array( [pt1.x(), pt2.x()] )
-            ypts = N.array( [pt1.y(), pt2.y()] )
+        # iterate over children, to look for plotters
+        for c in [i for i in widget.children if
+                  isinstance(i, widgets.GenericPlotter)]:
 
-            # iterate over children, to look for plotters
-            for c in widget.children:
-                if isinstance(c, widgets.GenericPlotter):
+            # get axes associated with plotter
+            axes = c.parent.getAxes( (c.settings.xAxis,
+                                      c.settings.yAxis) )
 
-                    # get axes associated with plotter
-                    axes = c.parent.getAxes( (c.settings.xAxis,
-                                              c.settings.yAxis) )
+            # iterate over each, and update the ranges
+            for axis in [a for a in axes if a != None]:
+                s = axis.settings
+                if s.direction == 'horizontal':
+                    p = xpts
+                else:
+                    p = ypts
 
-                    # iterate over each, and update the ranges
-                    for axis in [a for a in axes if a != None]:
-                        s = axis.settings
-                        if s.direction == 'horizontal':
-                            p = xpts
-                        else:
-                            p = ypts
+                # convert points on plotter to axis coordinates
+                # FIXME: Need To Trap Conversion Errors!
+                r = axis.plotterToGraphCoords(painter.bounds[axis], p)
 
-                        # convert points on plotter to axis coordinates
-                        # FIXME: Need To Trap Conversion Errors!
-                        r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+                # invert if min and max are inverted
+                if r[1] < r[0]:
+                    r[1], r[0] = r[0], r[1]
 
-                        # invert if min and max are inverted
-                        if r[1] < r[0]:
-                            r[1], r[0] = r[0], r[1]
-
-                        # actually set the axis
-                        if s.min != r[0]:
-                            s.min = r[0]
-                        if s.max != r[1]:
-                            s.max = r[1]
+                # actually set the axis
+                if s.min != r[0]:
+                    s.min = r[0]
+                if s.max != r[1]:
+                    s.max = r[1]
 
     def slotBecomeScrollClick(self):
         """If the click is still down when this timer is reached then
@@ -650,9 +674,6 @@ class PlotWindow( qt.QScrollView ):
         """View the next page."""
         self.setPageNumber( self.pagenumber + 1 )
 
-    def slotViewZoomGraph(self):
-        """Zoom into graph."""
-
     def updatePageToolbar(self):
         """Update page number when the plot window says so."""
 
@@ -661,3 +682,13 @@ class PlotWindow( qt.QScrollView ):
             np = self.document.getNumberPages()
             self.viewactions['viewprevpage'].setEnabled(self.pagenumber != 0)
             self.viewactions['viewnextpage'].setEnabled(self.pagenumber < np-1)
+
+    def slotSelectMode(self, action):
+        """Called when the selection mode has changed."""
+
+        modecnvt = { self.viewactions['viewselect'] : 'select',
+                     self.viewactions['viewzoomgraph'] : 'graphzoom' }
+        
+        # convert action into clicking mode
+        self.clickmode = modecnvt[action]
+        

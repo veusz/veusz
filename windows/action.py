@@ -186,7 +186,8 @@ def populateMenuToolbars(items, toolbar, menus):
             action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
 
         # connect the action to the slot
-        qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
+        if slot != None:
+            qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
 
         # add to menu
         if menus != None:
