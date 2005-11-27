@@ -442,6 +442,8 @@ class PlotWindow( qt.QScrollView ):
                 self._hideZoomRect()
                 qt.QApplication.restoreOverrideCursor()
                 self.doZoomRect()
+            elif self.currentclickmode == 'viewgetclick':
+                self.clickmode = 'select'
         else:
             qt.QScrollView.contentsMouseReleaseEvent(self, event)
 
@@ -694,3 +696,63 @@ class PlotWindow( qt.QScrollView ):
         # convert action into clicking mode
         self.clickmode = modecnvt[action]
         
+    def getClick(self):
+        """Return a click point from the graph."""
+
+        # wait for click from user
+        qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.CrossCursor))
+        oldmode = self.clickmode
+        self.clickmode = 'viewgetclick'
+        while self.clickmode == 'viewgetclick':
+            qt.qApp.processEvents()
+        self.clickmode = oldmode
+        qt.QApplication.restoreOverrideCursor()
+
+        # take clicked point and convert to coords of scrollview
+        pt = qt.QPoint(*self.grabPos)
+        pt = self.viewport().mapFromGlobal(pt)
+        pt = self.viewportToContents(pt)
+
+        # try to work out in which widget the first point is in
+        bufferpixmap = qt.QPixmap( *self.size )
+        painter = PointPainter(bufferpixmap, pt.x(), pt.y())
+        painter.veusz_scaling = self.zoomfactor
+        pagenumber = min( self.document.getNumberPages() - 1,
+                          self.pagenumber )
+        if pagenumber >= 0:
+            self.document.paintTo(painter, self.pagenumber)
+        painter.end()
+
+        # get widget
+        widget = painter.widget
+        if widget == None:
+            return []
+        
+        # convert points on plotter to points on axis for each axis
+        xpts = N.array( [pt.x()] )
+        ypts = N.array( [pt.y()] )
+
+        axesretn = []
+        # iterate over children, to look for plotters
+        for c in [i for i in widget.children if
+                  isinstance(i, widgets.GenericPlotter)]:
+
+            # get axes associated with plotter
+            axes = c.parent.getAxes( (c.settings.xAxis,
+                                      c.settings.yAxis) )
+
+            # iterate over each, and update the ranges
+            for axis in [a for a in axes if a != None]:
+                s = axis.settings
+                if s.direction == 'horizontal':
+                    p = xpts
+                else:
+                    p = ypts
+
+                # convert point on plotter to axis coordinate
+                # FIXME: Need To Trap Conversion Errors!
+                r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+
+                axesretn.append( (axis.path, r[0]) )
+
+        return axesretn

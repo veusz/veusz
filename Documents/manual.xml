@@ -722,6 +722,26 @@ SetData('y', y)
       </section>
 
       <section>
+	<title><anchor id="Command.Close" />Close</title>
+	
+	<para><command>Close()</command></para>
+	
+	<para>Closes the plotwindow. This is only supported in
+	embedded mode.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.EnableToolbar"
+	/>EnableToolbar</title>
+	
+	<para><command>EnableToolbar(enable=True)</command></para>
+	
+	<para>Enable/disable the zooming toolbar in the
+	plotwindow. This command is only supported in embedded mode or
+	from veusz_listen.</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.Export" />Export</title>
 
 	<para><command>Export(filename, color=True,
@@ -759,6 +779,20 @@ SetData('y', y)
 
 	<para>Returns: The names of the components which are children of
       the path given</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.GetClick" />GetClick</title>
+
+	<para><command>GetClick()</command></para>
+
+	<para>Waits for the user to click on a graph and returns the
+	position of the click on appropriate axes. Command only works
+	in embedded mode.</para>
+
+	<para>Returns: A list containing tuples of the form (axispath,
+	val) for each axis for which the click was in range. The value
+	is the value on the axis for the click.</para>
       </section>
 
       <section>
@@ -1096,6 +1130,24 @@ Set('page1/graph1/x/min', -10.)
         (where the pages reside), and ".." represents the component next
         up the tree.</para>
 	
+      </section>
+
+      <section>
+	<title><anchor id="Command.Quit" />Quit</title>
+	
+	<para><command>Quit()</command></para>
+	
+	<para>Quits Veusz. This is only supported in
+	veusz_listen.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.Zoom" />Zoom</title>
+	
+	<para><command>Zoom(factor)</command></para>
+	
+	<para>Sets the plot zoomfactor. This is only supported in
+	embedded mode or veusz_listen.</para>
       </section>
     </section>
 

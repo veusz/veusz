@@ -164,6 +164,7 @@ class Embedded(object):
         self.ci.addCommand('Close', self._Close)
         self.ci.addCommand('Zoom', self._Zoom)
         self.ci.addCommand('EnableToolbar', self._EnableToolbar)
+        self.ci.addCommand('GetClick', self._GetClick)
 
     def _Close(self):
         """Close this window."""
@@ -181,6 +182,11 @@ class Embedded(object):
     def _EnableToolbar(self, enable=True):
         """Enable the toolbar in this plotwindow."""
         self.window.enableToolbar(enable)
+
+    def _GetClick(self):
+        """Return a clicked point."""
+
+        return self.plot.getClick()
 
     def __getattr__(self, name):
         """If there's no name, then lookup in command interpreter."""
