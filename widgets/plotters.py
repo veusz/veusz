@@ -725,7 +725,7 @@ class TextLabel(GenericPlotter):
             # translate xPos and yPos to plotter coordinates
 
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-            if none in axes:
+            if None in axes:
                 return
             xp = axes[0].graphToPlotterCoords(posn, N.array( [s.xPos] ))[0]
             yp = axes[1].graphToPlotterCoords(posn, N.array( [s.yPos] ))[0]
