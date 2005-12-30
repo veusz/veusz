@@ -1,6 +1,3 @@
-# mainwindow.py
-# the main window of the application
-
 #    Copyright (C) 2003 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -21,6 +18,8 @@
 
 # $Id$
 
+"""Implements the main window of the application."""
+
 import qt
 import os.path
 
@@ -38,8 +37,6 @@ import dialogs.importdialog
 import dialogs.dataeditdialog
 import dialogs.reloaddata
 import dialogs.importfits
-
-_fdirname = os.path.dirname(__file__)
 
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
@@ -63,8 +60,8 @@ class MainWindow(qt.QMainWindow):
     def __init__(self, *args):
         qt.QMainWindow.__init__(self, *args)
 
-        self.setIcon( qt.QPixmap(os.path.join(_fdirname, '..',
-                                              'images', 'icon.png')) )
+        imgdir = os.path.join(os.path.dirname(__file__), '..', 'images')
+        self.setIcon( qt.QPixmap(os.path.join(imgdir, 'icon.png')) )
 
         self.document = document.Document()
 
@@ -120,6 +117,10 @@ class MainWindow(qt.QMainWindow):
 
         # put the dock windows on the view menu, so they can be shown/hidden
         self._defineDockViewMenu()
+
+        # enable/disable undo/redo
+        self.connect(self.menus['edit'], qt.SIGNAL('aboutToShow()'),
+                     self.slotAboutToShowEdit)
 
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
@@ -182,6 +183,35 @@ class MainWindow(qt.QMainWindow):
             view.setItemChecked(item, win.isVisible())
             view.setItemParameter(item, item)
         
+    def slotAboutToShowEdit(self):
+        """Enable/disable undo/redo menu items."""
+        
+        # enable distable, and add appropriate text to describe
+        # the operation being undone/redone
+        canundo = self.document.canUndo()
+        undotext = 'Undo'
+        if canundo:
+            undotext = "%s %s" % (undotext, self.document.historyundo[-1].descr)
+        self.actions['editundo'].setMenuText(undotext)
+        self.actions['editundo'].setEnabled(canundo)
+        
+        canredo = self.document.canRedo()
+        redotext = 'Redo'
+        if canredo:
+            redotext = "%s %s" % (redotext, self.document.historyredo[-1].descr)
+        self.actions['editredo'].setMenuText(redotext)
+        self.actions['editredo'].setEnabled(canredo)
+        
+    def slotEditUndo(self):
+        """Undo the previous operation"""
+        if self.document.canUndo():
+            self.document.undoOperation()
+        
+    def slotEditRedo(self):
+        """Redo the previous operation"""
+        if self.document.canRedo():
+            self.document.redoOperation()
+        
     def slotViewDockWindow(self, item):
         """Show or hide dock windows as selected."""
 
@@ -240,6 +270,12 @@ class MainWindow(qt.QMainWindow):
             ('filequit', 'Exit the program', '&Quit', 'file',
              self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
 
+            ('editundo', 'Undo the previous operation', 'Undo', 'edit',
+             self.slotEditUndo, '', False,  'Ctrl+Z'),
+            ('editredo', 'Redo the previous operation', 'Redo', 'edit',
+             self.slotEditRedo, '', False, 'Ctrl+Shift+Z'),
+            ('edit', ),
+            
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
             ('dataimport2d', 'Import 2D data into Veusz', 'Import &2D...', 'data',

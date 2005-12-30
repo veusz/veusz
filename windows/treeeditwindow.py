@@ -1,6 +1,3 @@
-# treeeditwindow.py
-# A class for editing the graph tree with a GUI
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -21,6 +18,9 @@
 
 # $Id$
 
+"""Edit the document using a tree and properties.
+"""
+
 import os
 
 import qt
@@ -30,6 +30,7 @@ import widgets.widgetfactory as widgetfactory
 import widgets
 import action
 import utils
+import document
 
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
@@ -56,7 +57,8 @@ class _WidgetItem(qt.QListViewItem):
         # update name of widget
         if col == 0:
             try:
-                self.widget.rename( unicode(text) )
+                self.widget.document.applyOperation(
+                    document.OperationWidgetRename(self.widget, unicode(text)) )
             except ValueError:
                 # if the rename failed
                 text = self.widget.name
@@ -648,6 +650,7 @@ class TreeEditWindow(qt.QDockWindow):
             self.prefchilds.append(l)
 
             c = setn.makeControl(view)
+            self.connect(c, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
             self.proptab.setCellWidget(row, 1, c)
             qt.QToolTip.add(c, tooltext)
             self.prefchilds.append(c)
@@ -683,6 +686,15 @@ class TreeEditWindow(qt.QDockWindow):
             if count < len(children):
                 self.emit( qt.PYSIGNAL("sigPageChanged"), (count,) )
             
+    def slotSettingChanged(self, setting, val):
+        """Called when a setting is changed by the user.
+        
+        This updates the setting to the value using an operation so that
+        it can be undone.
+        """
+        
+        self.document.applyOperation(document.OperationSettingSet(setting, val))
+            
     def slotMakeWidgetButton(self, widgettype):
         """Called when an add widget button is clicked.
         widgettype is the type of widget
@@ -704,9 +716,7 @@ class TreeEditWindow(qt.QDockWindow):
         assert parent != None
 
         # make the new widget and update the document
-        w = widgetfactory.thefactory.makeWidget(widgettype, parent,
-                                                autoadd=autoadd)
-        self.document.setModified()
+        w = self.document.applyOperation( document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd) )
 
         # select the widget
         self.selectWidget(w)
@@ -839,13 +849,8 @@ class TreeEditWindow(qt.QDockWindow):
         # remove the reference
         self.itemselected = None
 
-        # find the parent
-        p = w.parent
-        assert p != None
-
-        # delete the widget
-        p.removeChild(w.name)
-        self.document.setModified()
+        # delete selected widget
+        self.document.applyOperation( document.OperationWidgetDelete(w) )
 
         # select the next widget
         self.listview.ensureItemVisible(next)
@@ -888,14 +893,8 @@ class TreeEditWindow(qt.QDockWindow):
             w = self.itemselected.parent.widget
             assert w != None
 
-        # find the parent
-        p = w.parent
-        if p == None:
-            return
-
-        # move it up
-        p.moveChild(w, direction)
-        self.document.setModified()
+        # actually move the widget
+        self.document.applyOperation( document.OperationWidgetMove(w, direction) )
 
         # try to highlight the associated item
         self.selectWidget(w)

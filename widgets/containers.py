@@ -33,6 +33,7 @@ import axis
 import page
 import graph
 import setting
+import document
 
 class _gridengine:
     """Internal class to build up grid of widgets."""
@@ -233,13 +234,14 @@ class Grid(widget.Widget):
     def actionZeroMargins(self):
         """Zero margins of plots inside this grid."""
 
+        operations = []
         for c in self.children:
             if isinstance(c, graph.Graph):
                 s = c.settings
-                s.leftMargin = '0cm'
-                s.topMargin = '0cm'
-                s.rightMargin = '0cm'
-                s.bottomMargin = '0cm'
+                for v in ('leftMargin', 'topMargin', 'rightMargin', 'bottomMargin'):
+                    operations.append( document.OperationSettingSet(s.get(v), '0cm') )
+                    
+        self.document.applyOperation( document.OperationMultiple(operations, descr='zero margins') )
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Draws the widget's children."""

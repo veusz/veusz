@@ -29,7 +29,7 @@ external programs.
 import qt
 
 import widgets
-import doc
+import datasets
 import simpleread
 
 class CommandInterface(qt.QObject):
@@ -127,7 +127,7 @@ class CommandInterface(qt.QObject):
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Set dataset with name with values (and optionally errors)."""
 
-        data = doc.Dataset(val, symerr, negerr, poserr)
+        data = datasets.Dataset(val, symerr, negerr, poserr)
         self.document.setData(name, data)
  
         if self.verbose:
@@ -151,14 +151,14 @@ class CommandInterface(qt.QObject):
         is modified
         """
 
-        data = doc.DatasetExpression(data=val, serr=symerr, nerr=negerr,
-                                     perr=poserr)
+        data = datasets.DatasetExpression(data=val, serr=symerr, nerr=negerr,
+                                          perr=poserr)
 
         # if not linked, create a dataset based on the linked one
         if not linked:
             data.document = self.document
-            data = doc.Dataset(data=data.data, serr=data.serr,
-                               nerr=data.nerr, perr=data.perr)
+            data = datasets.Dataset(data=data.data, serr=data.serr,
+                                    nerr=data.nerr, perr=data.perr)
 
         # actually set the dataset
         self.document.setData(name, data)
@@ -173,7 +173,7 @@ class CommandInterface(qt.QObject):
     def SetData2D(self, name, data, xrange=None, yrange=None):
         """Create a 2D dataset."""
 
-        data = doc.Dataset2D(data, xrange=xrange, yrange=yrange)
+        data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange)
         self.document.setData(name, data)
 
         if self.verbose:
@@ -290,7 +290,7 @@ class CommandInterface(qt.QObject):
 
         # if there's a link, set it up
         if linked:
-            LF = doc.LinkedFile(filename, descriptor, useblocks=useblocks)
+            LF = datasets.LinkedFile(filename, descriptor, useblocks=useblocks)
         else:
             LF = None
 

@@ -33,6 +33,7 @@ import setting
 import dialogs.exceptiondialog
 import widgets
 import action
+import document
 
 class PointPainter(widgets.Painter):
     """A simple painter variant which works out the last widget
@@ -374,6 +375,9 @@ class PlotWindow( qt.QScrollView ):
         xpts = N.array( [pt1.x(), pt2.x()] )
         ypts = N.array( [pt1.y(), pt2.y()] )
 
+        # build up operation list to do zoom
+        operations = []
+        
         # iterate over children, to look for plotters
         for c in [i for i in widget.children if
                   isinstance(i, widgets.GenericPlotter)]:
@@ -398,12 +402,18 @@ class PlotWindow( qt.QScrollView ):
                 if r[1] < r[0]:
                     r[1], r[0] = r[0], r[1]
 
-                # actually set the axis
+                # build up operations to change axis
                 if s.min != r[0]:
-                    s.min = r[0]
+                    operations.append( document.OperationSettingSet(s.get('min'),
+                                                                    r[0]) )
                 if s.max != r[1]:
-                    s.max = r[1]
+                    operations.append( document.OperationSettingSet(s.get('max'),
+                                                                    r[1]) )
 
+
+        # finally change the axes
+        self.document.applyOperation( document.OperationMultiple(operations, descr='zoom axes') )
+                    
     def slotBecomeScrollClick(self):
         """If the click is still down when this timer is reached then
         we turn the click into a scrolling click."""

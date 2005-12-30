@@ -1,3 +1,9 @@
+* 2005-12-31 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Yet more undo/redo changes
+
+* 2005-12-27 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Undo/redo implementation mostly done
+
 * 2005-11-27 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add GetClick command. Returns position on axes for user's click
 

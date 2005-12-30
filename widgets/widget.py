@@ -47,7 +47,6 @@ class Widget(object):
         if not self.isAllowedParent(parent):
             print self.typename, parent.typename, parent.name
             raise RuntimeError, "parent is of incorrect type"
-        
 
         if name == None:
             name = self.chooseName()
@@ -133,9 +132,12 @@ class Widget(object):
         return False
     willAllowParent = classmethod(willAllowParent)
 
-    def addChild(self, child):
-        """Add child to list."""
-        self.children.append(child)
+    def addChild(self, child, index=9999999):
+        """Add child to list.
+        
+        index is a position to place the new child
+        """
+        self.children.insert(index, child)
 
     def createUniqueName(self, prefix):
         """Create a name using the prefix which hasn't been used before."""

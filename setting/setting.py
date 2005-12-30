@@ -78,6 +78,23 @@ class Setting(object):
     val = property(get, set, None,
                    'Get or modify the value of the setting')
 
+    def _path(self):
+        """Return full path of setting."""
+        path = []
+        obj = self
+        while obj != None:
+            # logic easier to understand here
+            # do not add settings name for settings of widget
+            if not isinstance(obj, widgets.Widget) and isinstance(obj.parent, widgets.Widget):
+                pass
+            else:
+                path.insert(0, obj.name)
+            obj = obj.parent
+        return '/'.join(path)
+        
+    path = property(_path, None, None,
+                    'Return the full path of the setting')
+    
     def tie(self, setting):
         """Tie this setting to another."""
         if self.tied != None:

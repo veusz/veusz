@@ -1,6 +1,3 @@
-# simpleread.py
-# A simple data reading routine
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -48,7 +45,7 @@ import StringIO
 import numarray as N
 import numarray.ieeespecial as NIE
 
-import doc
+import datasets
 
 class DescriptorError(ValueError):
     """Used to indicate an error with the descriptor."""
@@ -129,8 +126,8 @@ class _DescriptorPart:
             # one value only
             self.startindex = self.stopindex = 1
 
-    def readFromStream(self, stream, datasets, block=None):
-        """Read data from stream, and write to datasets."""
+    def readFromStream(self, stream, thedatasets, block=None):
+        """Read data from stream, and write to thedatasets."""
 
         # loop over column range
         for index in xrange(self.startindex, self.stopindex+1):
@@ -163,11 +160,11 @@ class _DescriptorPart:
                 fullname = '%s\0%s' % (name, col)
 
                 # add data into dataset
-                if fullname not in datasets:
-                    datasets[fullname] = []
-                datasets[fullname].append(val)
+                if fullname not in thedatasets:
+                    thedatasets[fullname] = []
+                thedatasets[fullname].append(val)
 
-    def setInDocument(self, datasets, document, block=None, linkedfile=None):
+    def setInDocument(self, thedatasets, document, block=None, linkedfile=None):
         """Set the read-in data in the document."""
 
         names = []
@@ -180,21 +177,21 @@ class _DescriptorPart:
             if block != None:
                 name += '_%i' % block
 
-            if name+'\0DATA' in datasets:
-                vals = datasets[name+'\0DATA']
+            if name+'\0DATA' in thedatasets:
+                vals = thedatasets[name+'\0DATA']
                 pos = neg = sym = None
 
                 # retrieve the data for this dataset
-                if name+'\0POS' in datasets:
-                    pos = datasets[name+'\0POS']
-                if name+'\0NEG' in datasets:
-                    neg = datasets[name+'\0NEG']
-                if name+'\0SYM' in datasets:
-                    sym = datasets[name+'\0SYM']
+                if name+'\0POS' in thedatasets:
+                    pos = thedatasets[name+'\0POS']
+                if name+'\0NEG' in thedatasets:
+                    neg = thedatasets[name+'\0NEG']
+                if name+'\0SYM' in thedatasets:
+                    sym = thedatasets[name+'\0SYM']
 
                 # create the dataset
-                ds = doc.Dataset( data = vals, serr = sym,
-                                  nerr = neg, perr = pos )
+                ds = datasets.Dataset(data = vals, serr = sym,
+                                      nerr = neg, perr = pos)
                 ds.linked = linkedfile
 
                 document.setData( name, ds )
@@ -500,8 +497,8 @@ class SimpleRead2D:
         """Set the data in the document.
         """
 
-        ds = doc.Dataset2D(self.data, xrange=self.xrange,
-                           yrange=self.yrange)
+        ds = datasets.Dataset2D(self.data, xrange=self.xrange,
+                                yrange=self.yrange)
         ds.linked = linkedfile
 
         document.setData(self.name, ds)

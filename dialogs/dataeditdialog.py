@@ -743,7 +743,7 @@ class DataEditDialog(qt.QDialog):
         item = self.dslistbox.selectedItem()
         if item != None:
             name = unicode(item.text())
-            self.document.deleteDataset(name)
+            self.document.applyOperation(document.OperationDatasetDelete(name))
 
     def slotDatasetRename(self):
         """Rename selected dataset."""
@@ -756,8 +756,8 @@ class DataEditDialog(qt.QDialog):
                                     self.document, name, self)
             if rn.exec_loop() == qt.QDialog.Accepted:
                 newname = rn.getName()
-                self.document.renameDataset(name, newname)
-                    
+                self.document.applyOperation(document.OperationDatasetRename(name, newname))
+                
     def slotDatasetDuplicate(self):
         """Duplicate selected dataset."""
         
@@ -770,7 +770,7 @@ class DataEditDialog(qt.QDialog):
                                      self.document, name, self)
             if dds.exec_loop() == qt.QDialog.Accepted:
                 newname = dds.getName()
-                self.document.duplicateDataset(name, newname)
+                self.document.applyOperation(document.OperationDatasetDuplicate(name, newname))
 
     def slotDatasetNew(self):
         """Create datasets from scratch."""
@@ -804,16 +804,7 @@ class DataEditDialog(qt.QDialog):
             # if they want to carry on
             if mb.exec_loop() == qt.QMessageBox.Ok:
 
-                ds = self.document.data[name]
-                if isinstance(ds, document.DatasetExpression):
-                    # check whether linked expression
-                    # create a new dataset based on values from old
-                    ds = document.Dataset(data=ds.data, serr=ds.serr,
-                                          perr=ds.perr, nerr=ds.nerr)
-                    self.document.setData(name, ds)
-                else:
-                    # unlink file
-                    self.document.unlinkDataset(name)
+                self.document.applyOperation( document.OperationDatasetUnlink(name) )
                     
                 # update display
                 self.dslistbox.setCurrentItem( self.dslistbox.currentItem() )

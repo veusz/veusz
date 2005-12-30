@@ -20,6 +20,9 @@
 
 """Module for creating QWidgets for the settings, to enable their values
    to be changed.
+
+    These widgets emit settingChanged(setting, val) when the setting is
+    changed. The creator should use this to change the setting.
 """
 
 import itertools
@@ -95,7 +98,8 @@ class Edit(qt.QLineEdit):
 
             # value has changed
             if self.setting.val != val:
-                self.setting.val = val
+                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+                #self.setting.val = val
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -285,7 +289,7 @@ class String(qt.QHBox):
 
             # value has changed
             if self.setting.val != val:
-                self.setting.val = val
+                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
 
         except setting.InvalidType:
             self.edit.setPaletteBackgroundColor(qt.QColor('red'))
@@ -318,7 +322,7 @@ class Bool(qt.QCheckBox):
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
-        self.setting.val = state
+        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, state) )
         
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -373,7 +377,7 @@ class Choice(qt.QComboBox):
             
             # value has changed
             if self.setting.val != val:
-                self.setting.val = val
+                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -418,7 +422,7 @@ class MultiLine(qt.QTextEdit):
             
             # value has changed
             if self.setting.val != val:
-                self.setting.val = val
+                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -680,7 +684,7 @@ class Color(qt.QHBox):
         if col.isValid():
             # change setting
             name = col.name()
-            self.setting.val = unicode(name)
+            self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, unicode(name)) )
 
     def slotActivated(self, val):
         """A different value is selected."""
@@ -690,8 +694,8 @@ class Color(qt.QHBox):
             
         # value has changed
         if self.setting.val != val:
-            self.setting.val = val
-            
+            self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+
     def done(self):
         """Delete modification notification."""
         self.setting.removeOnModified(self.onModified)
@@ -857,13 +861,13 @@ class ListSet(qt.QWidget):
             rows.append(rows[-1])
         else:
             rows.append(self.defaultval)
-        self.setting.set(rows)
+        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, rows) )
 
     def onDeleteClicked(self):
         """Remove final entry in settings list."""
 
         rows = list(self.setting.val)[:-1]
-        self.setting.set(rows)
+        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, rows) )
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -939,7 +943,7 @@ class ListSet(qt.QWidget):
         items[col] = val
         rows[row] = tuple(items)
         self.ignorechange = True
-        self.setting.set(rows)
+        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, rows) )
         
     def onToggled(self, on):
         """Checkbox toggled."""
