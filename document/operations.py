@@ -30,16 +30,17 @@ because some operations cannot restore references (e.g. add object)
 
 # FIXME:
 # need operations for the following:
-#  create dataset
 #  set dataset?
 #  paste widget
 
+import numarray as N
+
 import utils
-import doc
 import datasets
 import widgets
+import simpleread
     
-######################################################
+###############################################################################
 # Setting operations
 
 class OperationSettingSet:
@@ -65,9 +66,96 @@ class OperationSettingSet:
         
         setting = document.resolveFullSettingPath(self.settingpath)
         setting.set(self.oldvalue)
-        
 
-######################################################
+class OperationSettingPropagate:
+    """Propagate setting to other widgets."""
+    
+    descr = 'propagate setting'
+    
+    def __init__(self, setting, widgetname = None, root = None,
+                 maxlevels = -1):
+
+        """Take the setting given, and propagate it to other widgets,
+        according to the parameters here.
+        
+        If widgetname is given then only propagate it to widgets with
+        the name given.
+
+        widgets are located from the widget given (root if not set)
+        
+        Up to maxlevels levels of widgets are changed (<0 means infinite)
+        """
+
+        self.val = setting.val
+        self.widgetname = widgetname
+        if root:
+            self.rootpath = root.path
+        else:
+            self.rootpath = None
+        self.maxlevels = maxlevels
+
+        # work out path of setting relative to widget
+        path = []
+        s = setting
+        while not isinstance(s, widgets.Widget):
+            path.insert(0, s.name)
+            s = s.parent
+        self.setpath = path[1:]
+        self.widgettype = s.typename
+        
+    def do(self, document):
+        """Apply the setting propagation."""
+        # default is root widget
+        if not self.rootpath:
+            root = document.basewidget
+        else:
+            root = document.resolveFullWidgetPath(self.rootpath)
+            
+        # get a list of matching widgets
+        widgetlist = []
+        self._recursiveGet(root, self.widgetname, self.widgettype, widgetlist,
+                           self.maxlevels)
+
+        self.restorevals = {}
+        # set the settings for the widgets
+        for w in widgetlist:
+            # lookup the setting
+            s = w.settings
+            for i in self.setpath:
+                s = s.get(i)
+
+            self.restorevals[s.path] = s.val
+            s.set(self.val)
+          
+    def undo(self, document):
+        """Undo all those changes."""
+        
+        for setpath, setval in self.restorevals.iteritems():
+            setting = document.resolveFullSettingPath(setpath)
+            setting.set(setval)
+
+    def _recursiveGet(root, name, typename, outlist, maxlevels):
+        """Add those widgets in root with name and type to outlist.
+    
+        If name or typename are None, then ignore the criterion.
+        maxlevels is the maximum number of levels to check
+        """
+    
+        if maxlevels != 0:
+    
+            # if levels is not zero, add the children of this root
+            newmaxlevels = maxlevels - 1
+            for w in root.children:
+                if ( (w.name == name or name == None) and
+                     (w.typename == typename or typename == None) ):
+                    outlist.append(w)
+    
+                OperationSettingPropagate._recursiveGet(w, name, typename,
+                                                        outlist, newmaxlevels)
+
+    _recursiveGet = staticmethod(_recursiveGet)
+            
+###############################################################################
 # Widget operations
         
 class OperationWidgetRename:
@@ -190,18 +278,8 @@ class OperationWidgetAdd:
         parent = document.resolveFullWidgetPath(self.parentpath)
         parent.removeChild(self.createdname)
 
-######################################################
+###############################################################################
 # Dataset operations
-
-class OperationDataImport:
-    """Import a dataset."""
-    
-    descr = 'import dataset'
-    
-class OperationDataValSet:
-    """Set a value manually in a dataset."""
-
-    descr = 'change dataset value'
     
 class OperationDatasetDelete:
     """Delete a dateset."""
@@ -218,7 +296,7 @@ class OperationDatasetDelete:
         
     def undo(self, document):
         """Put dataset back"""
-        document.data[self.datasetname] = self.olddata
+        document.setData(self.datasetname, self.olddata)
     
 class OperationDatasetRename:
     """Rename the dataset.
@@ -298,7 +376,7 @@ class OperationDatasetUnlink:
         else:
             assert False
         
-class OperationDataCreate:
+class OperationDatasetCreate:
     """Create dataset base class."""
     
     def __init__(self, datasetname):
@@ -315,76 +393,329 @@ class OperationDataCreate:
         """Delete the created dataset."""
         del document.data[self.datasetname]
         
-class OperationDataCreateRange(OperationDataCreate):
+class OperationDatasetCreateRange(OperationDatasetCreate):
     """Create a dataset in a specfied range."""
     
     descr = 'create dataset from range'
     
-    def __init__(self, datasetname, numsteps):
-        """Create a dataset with numsteps values."""
-        OperationDataCreate.__init__(self, datasetname)
-        self.numsteps = numsteps
+    def __init__(self, datasetname, numsteps, parts):
+        """Create a dataset with numsteps values.
         
-    def setPart(self, part, minval, maxval):
-        """Set the part to begin at minval and end at maxval."""
-        OperationDataCreate.setPart(self, part, (minval, maxval))
+        parts is a dict containing keys 'data', 'serr', 'perr' and/or 'nerr'. The values
+        are tuples with (start, stop) values for each range.
+        """
+        OperationDatasetCreate.__init__(self, datasetname)
+        self.numsteps = numsteps
+        self.parts = parts
         
     def do(self, document):
         """Create dataset using range."""
         
         vals = {}
-        for partname, range in self.parts.iteritems():
-            minval, maxval = range
+        for partname, therange in self.parts.iteritems():
+            minval, maxval = therange
             delta = (maxval - minval) / (self.numsteps-1)
-            vals[partname] = N.fromfunction( lambda x: minval+x*delta,
-                                            (self.numsteps,) )
-            
+            vals[partname] = N.arange(self.numsteps)*delta + minval
+
+        ds = datasets.Dataset(**vals)
+        assert self.datasetname not in document.data
+        document.setData(self.datasetname, ds)
+
+class CreateDatasetException(Exception):
+    """Thrown by dataset creation routines."""
+    pass
         
-class OperationDataCreate:
-    """Create a dataset."""
+class OperationDatasetCreateParameteric(OperationDatasetCreate):
+    """Create a dataset using expressions dependent on t."""
     
-    def __init__(self, datasetname):
-        """Setup create operation
-        """
-        self.datasetname = datasetname
-        self.mode = None
-        self.parts = {}
+    descr = 'create parametric dataset'
+    
+    def __init__(self, datasetname, t0, t1, numsteps, parts):
+        """Create a parametric dataset.
         
-    def setModeRange(self, numsteps):
-        """Use a range with number of steps."""
-        self.mode = 'range'
+        Variable t goes from t0 to t1 in numsteps.
+        parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
+        The values are expressions for evaluating."""
+        
+        OperationDatasetCreate.__init__(self, datasetname)
         self.numsteps = numsteps
-        
-    def setPartRange(self, part, startval, stopval):
-        """Specify the range to create.
-        
-        part can be one of 'data', 'serr', 'nerr', 'perr'
-        """
-        self.parts[part] = (startval, stopval)
-        
-    def setModeParametric(self, t0, t1, numsteps):
-        """Use a parameteric mode where t goes from t0 to t1 in numsteps."""
-        self.mode = 'parametric'
         self.t0 = t0
         self.t1 = t1
-        self.numsteps = numsteps
+        self.parts = parts
+        
+    def do(self, document):
+        deltat = (self.t1 - self.t0) / (self.numsteps-1)
+        t = N.arange(self.numsteps)*deltat + self.t0
+        
+        # define environment to evaluate
+        fnenviron = globals().copy()
+        exec 'from numarray import *' in fnenviron
+        fnenviron['t'] = t
+
+        # calculate for each of the dataset components
+        vals = {}
+        for key, expr in self.parts.iteritems():
+            # HACK to ensure the result is a numarray
+            expr = '(%s) + t*0.' % expr
+            try:
+                vals[key] = eval( expr, fnenviron )
+            except Exception, e:
+                raise CreateDatasetException("Error evaluating expession '%s'\n"
+                                             "Error: '%s'" % (expr, str(e)) )
+
+        ds = datasets.Dataset(**vals)
+        assert self.datasetname not in document.data
+        document.setData(self.datasetname, ds)
+
+class OperationDatasetCreateExpression(OperationDatasetCreate):
+    descr = 'create dataset from expression'
+
+    def __init__(self, datasetname, parts, link):
+        """Create a dataset from existing dataset using expressions.
+        
+        parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
+        The values are expressions for evaluating.
+        
+        If link is True, then the dataset is linked to the expressions
+        """
+        
+        OperationDatasetCreate.__init__(self, datasetname)
+        self.parts = parts
+        self.link = link
+        
+    def do(self, document):
+        """Create the dataset."""
+        
+        try:
+            ds = datasets.DatasetExpression(**self.parts)
+            ds.document = document
+            
+            # we force an evaluation of the dataset for the first time, to
+            # check for errors in the expressions
+            for i in self.parts.iterkeys():
+                getattr(ds, i)
+            
+        except datasets.DatasetExpressionException, e:
+            raise CreateDatasetException(str(e))
+
+        if not self.link:
+            # copy these values if we don't want to link
+            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
+                                  perr=ds.perr, nerr=ds.nerr)
+        
+        assert self.datasetname not in document.data
+        document.setData(self.datasetname, ds)
+
+###############################################################################
+# Import datasets
+        
+class OperationDataImport:
+    """Import 1D data from text files."""
     
-    def setPartParametric(self, part, expr):
-        """Set the part to be the expression expr."""
-        self.part[part] = expr
+    descr = 'import data'
+    
+    def __init__(self, descriptor, useblocks=False, linked=False,
+                 filename=None, datastr=None):
+        """Setup operation.
         
-    def setModeExpression(self, linked):
-        """Each of the parts are expressions.
+        descriptor is descriptor for import
+        useblocks specifies whether blocks are used in the import
+        if reading from a file, linked specfies whether linked
+        filename is the filename if reading from a file
+        datastr is a string to read from if reading from a string
         
-        If linked is True then the dataset is linked to the expressions."""
-        self.mode = 'expression'
+        filename and datastr are exclusive
+        """
+        
+        self.simpleread = simpleread.SimpleRead(descriptor)
+        self.descriptor = descriptor
+        self.useblocks = useblocks
+        self.linked = linked
+        self.filename = filename
+        self.datastr = datastr
+        
+    def do(self, document):
+        """Import data.
+        
+        Returns a list of datasets which were imported.
+        """
+        
+        # open stream to import data from
+        if self.filename != None:
+            stream = simpleread.FileStream( open(self.filename) )
+        elif self.datastr != None:
+            stream = simpleread.StringStream(self.datastr)
+        else:
+            assert False
+        
+        # do the import
+        self.simpleread.clearState()
+        self.simpleread.readData(stream, useblocks=self.useblocks)
+        
+        # associate file
+        if self.linked:
+            assert self.filename != None
+            LF = datasets.LinkedFile(self.filename, self.descriptor,
+                                     useblocks=self.useblocks)
+        else:
+            LF = None
+
+        # backup datasets in document for undo
+        # this has possible space issues!
+        self.olddatasets = dict(document.data)
+        
+        # actually set the data in the document
+        names = self.simpleread.setInDocument(document, linkedfile=LF)
+        return names
+        
+    def undo(self, document):
+        """Undo import."""
+        
+        # restore old datasets
+        document.data = self.olddatasets
+        
+class OperationDataImport2D:
+    """Import a 2D matrix from a file."""
+    
+    descr = 'import 2d data'
+
+    def __init__(self, datasets,
+                 filename=None, datastr=None,
+                 xrange=None, yrange=None,
+                 invertrows=None, invertcols=None, transpose=None,
+                 linked=False):
+        """Import two-dimensional data from a file.
+        filename is the name of the file to read,
+        or datastr is the string to read from
+        datasets is a list of datasets to read from the file, or a single
+        dataset name
+
+        xrange is a tuple containing the range of data in x coordinates
+        yrange is a tuple containing the range of data in y coordinates
+        if invertrows=True, then rows are inverted when read
+        if invertcols=True, then cols are inverted when read
+        if transpose=True, then rows and columns are swapped
+
+        if linked=True then the dataset is linked to the file
+        """
+
+        self.datasets = datasets
+        self.filename = filename
+        self.datastr = datastr
+        self.xrange = xrange
+        self.yrange = yrange
+        self.invertrows = invertrows
+        self.invertcols = invertcols
+        self.transpose = transpose
         self.linked = linked
         
-    def setPartExpression(self, part, expr):
-        """Set the part to the expression expr."""
-        self.part[part] = expr
+    def do(self, document):
+        """Import data
         
-######################################################
+        Returns list of datasets read."""
+        
+        if self.filename != None:
+            stream = simpleread.FileStream( open(self.filename) )
+        elif self.datastr != None:
+            stream = simpleread.StringStream(self.datastr)
+        else:
+            assert False
+        
+        if self.linked:
+            assert self.filename
+            LF = datasets.Linked2DFile(self.filename, self.datasets)
+            LF.xrange = self.xrange
+            LF.yrange = self.yrange
+            LF.invertrows = self.invertrows
+            LF.invertcols = self.invertcols
+            LF.transpose = self.transpose
+        else:
+            LF = None
+
+        # backup datasets in document for undo
+        self.olddatasets = dict(document.data)
+            
+        readds = []
+        for name in self.datasets:
+            sr = simpleread.SimpleRead2D(name)
+            if self.xrange != None:
+                sr.xrange = self.xrange
+            if self.yrange != None:
+                sr.yrange = self.yrange
+            if self.invertrows != None:
+                sr.invertrows = self.invertrows
+            if self.invertcols != None:
+                sr.invertcols = self.invertcols
+            if self.transpose != None:
+                sr.transpose = self.transpose
+
+            sr.readData(stream)
+            readds += sr.setInDocument(document, linkedfile=LF)
+        return readds
+
+    def undo(self, document):
+        """Undo import."""
+        
+        # restore old datasets
+        document.data = self.olddatasets
+    
+###############################################################################
+# Alter dataset
+
+class OperationDatasetAddColumn:
+    """Add a column to a dataset, blanked to zero."""
+    
+    descr = 'add dataset column'
+    
+    def __init__(self, datasetname, columnname):
+        """Initialise column columnname in datasetname.
+        
+        columnname can be one of 'data', 'serr', 'perr' or 'nerr'
+        """
+        self.datasetname = datasetname
+        self.columnname = columnname
+        
+    def do(self, document):
+        """Zero the column."""
+        ds = document.data[self.datasetname]
+        datacol = ds.data
+        setattr(ds, self.columnname, N.zeros(datacol.shape, type=N.Float64))
+        document.setData(self.datasetname, ds)
+        
+    def undo(self, document):
+        """Remove the column."""
+        ds = document.data[self.datasetname]
+        setattr(ds, self.columnname, None)
+        document.setData(self.datasetname, ds)
+        
+class OperationDatasetSetVal:
+    """Set a value in the dataset."""
+
+    descr = 'change dataset value'
+    
+    def __init__(self, datasetname, columnname, row, val):
+        """Set row in column columnname to val."""
+        self.datasetname = datasetname
+        self.columnname = columnname
+        self.row = row
+        self.val = val
+        
+    def do(self, document):
+        """Set the value."""
+        ds = document.data[self.datasetname]
+        datacol = getattr(ds, self.columnname)
+        self.oldval = datacol[self.row]
+        datacol[self.row] = self.val
+        document.setData(self.datasetname, ds)
+        
+    def undo(self, document):
+        """Restore the value."""
+        ds = document.data[self.datasetname]
+        datacol = getattr(ds, self.columnname)
+        datacol[self.row] = self.oldval
+        document.setData(self.datasetname, ds)
+    
+###############################################################################
 # Misc operations
         
 class OperationMultiple:

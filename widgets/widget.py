@@ -118,11 +118,11 @@ class Widget(object):
                 return True
         return False      
 
-    def willAllowParent(type, parent):
+    def willAllowParent(cls, parent):
         """Is the parent of an allowed type to have this type as a child?"""
 
         # allow base widget to have no parent
-        ap = type.allowedparenttypes 
+        ap = cls.allowedparenttypes 
         if parent == None and len(ap) > 0 and ap[0] == None:
             return True
         

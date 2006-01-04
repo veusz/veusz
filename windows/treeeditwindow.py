@@ -243,11 +243,10 @@ class _PropertyLabel(qt.QLabel):
         doc = widget.document
         setn = self.setting
         fnmap = {
-            0: setn.resetToDefault,
-            100: (lambda: doc.propagateSettings(setn)),
-            101: (lambda: doc.propagateSettings(setn, root=widget.parent,
-                                                maxlevels=1)),
-            102: (lambda: doc.propagateSettings(setn, widgetname=name)),
+            0: (lambda: doc.applyOperation( document.OperationSettingSet(setn, setn.default) )),
+            100: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn) )),
+            101: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, root=widget.parent, maxlevels=1) )),
+            102: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, widgetname=name) )),
             
             200: (lambda: setn.setAsDefault(False)),
             201: (lambda: setn.setAsDefault(True)),

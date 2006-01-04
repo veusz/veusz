@@ -1,9 +1,17 @@
+* 2006-01-02 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Bug fix with missing axes
+  - Update main copyright years to 2006
+  
+* 2006-01-01 Jeremy Sanders <jeremy@jeremysanders.net>
+  - pychecker fixes
+  - Yet more undo/redo changes (dataset edit)
+  
 * 2005-12-31 Jeremy Sanders <jeremy@jeremysanders.net>
   - Yet more undo/redo changes
   - Take dataset operations out of doc.py
 
 * 2005-12-27 Jeremy Sanders <jeremy@jeremysanders.net>
-  - Undo/redo implementation mostly done
+  - Undo/redo implementation started
 
 * 2005-11-27 Jeremy Sanders <jeremy@jeremysanders.net>
 	- Add GetClick command. Returns position on axes for user's click

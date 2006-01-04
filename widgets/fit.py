@@ -23,6 +23,7 @@
 
 import re
 import itertools
+import sys
 
 import numarray as N
 import numarray.ieeespecial as NIE

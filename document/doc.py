@@ -28,8 +28,6 @@ import os.path
 import time
 import random
 import string
-import itertools
-import re
 
 import qt
 
@@ -199,11 +197,6 @@ class Document( qt.QObject ):
         self.data[newname] = self.data[name].duplicate()
         self.setModified()
 
-##    def unlinkDataset(self, name):
-##        """Remove any links to file from the dataset."""
-##        self.data[name].linked = None
-##        self.setModified()
-
     def getData(self, name):
         """Get data with name"""
         return self.data[name]
@@ -354,49 +347,6 @@ class Document( qt.QObject ):
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
-
-
-    def propagateSettings(self, setting, widgetname=None,
-                          root=None, maxlevels=-1):
-
-        """Take the setting given, and propagate it to other widgets,
-        according to the parameters here.
-        
-        If widgetname is given then only propagate it to widgets with
-        the name given.
-
-        widgets are located from the widget given (root if not set)
-        """
-
-        # locate widget with the setting (building up path)
-        path = []
-        widget = setting
-        while not isinstance(widget, widgets.Widget):
-            path.insert(0, widget.name)
-            widget = widget.parent
-
-        # remove the name of the main settings of the widget
-        path = path[1:]
-
-        # default is root widget
-        if root == None:
-            root = self.basewidget
-
-        # get a list of matching widgets
-        widgetlist = []
-        _recursiveGet(root, widgetname, widget.typename, widgetlist,
-                      maxlevels)
-
-        val = setting.val
-        # set the settings for the widgets
-        for w in widgetlist:
-            # lookup the setting
-            s = w.settings
-            for i in path:
-                s = s.get(i)
-
-            # set the setting
-            s.val = val
             
     def resolve(self, fromwidget, where):
         """Resolve graph relative to the widget fromwidget
@@ -434,51 +384,6 @@ class Document( qt.QObject ):
         # return widget
         return obj
 
-    def import2D(self, filename, datasets, xrange=None, yrange=None,
-                 invertrows=None, invertcols=None, transpose=None,
-                 linked=False):
-        """Import two-dimensional data from a file.
-        filename is the name of the file to read
-        datasets is a list of datasets to read from the file, or a single
-        dataset name
-
-        xrange is a tuple containing the range of data in x coordinates
-        yrange is a tuple containing the range of data in y coordinates
-        if invertrows=True, then rows are inverted when read
-        if invertcols=True, then cols are inverted when read
-        if transpose=True, then rows and columns are swapped
-
-        if linked=True then the dataset is linked to the file
-        """
-        
-        if linked:
-            LF = datasets.Linked2DFile(filename, datasets)
-            LF.xrange = xrange
-            LF.yrange = yrange
-            LF.invertrows = invertrows
-            LF.invertcols = invertcols
-            LF.transpose = transpose
-        else:
-            LF = None
-
-        f = open(filename, 'r')
-        stream = simpleread.FileStream(f)
-        for name in datasets:
-            sr = simpleread.SimpleRead2D(name)
-            if xrange != None:
-                sr.xrange = xrange
-            if yrange != None:
-                sr.yrange = yrange
-            if invertrows != None:
-                sr.invertrows = invertrows
-            if invertcols != None:
-                sr.invertcols = invertcols
-            if transpose != None:
-                sr.transpose = transpose
-
-            sr.readData(stream)
-            sr.setInDocument(self, linkedfile=LF)
-
     def importFITS(self, dsname, filename, hdu,
                    datacol = None, symerrcol = None,
                    poserrcol = None, negerrcol = None,
@@ -508,7 +413,7 @@ class Document( qt.QObject ):
 
         try:
             # raise an exception if this isn't a table
-            cols = rhdu.get_coldefs()
+            rhdu.get_coldefs()
 
             datav = None
             symv = None
@@ -526,7 +431,7 @@ class Document( qt.QObject ):
                 negv = data.field(negerrcol)
 
             # actually create the dataset
-            ds = Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
+            ds = datasets.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
 
         except AttributeError:
             # Import a 2D image
@@ -542,21 +447,21 @@ class Document( qt.QObject ):
                                            'CRVAL2', 'CRPIX2', 'CDELT2')]
 
                 # ximage = (xpix-crpix)*cdelt + crval
-                xrange = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
+                rangex = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
                            (0-wcs[1])*wcs[2] + wcs[0])
-                yrange = ( (0-wcs[4])*wcs[5] + wcs[3],
+                rangey = ( (0-wcs[4])*wcs[5] + wcs[3],
                            (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
 
-                print "xrange", xrange
-                print "yrange", yrange
-                xrange = (xrange[1], xrange[0])
+                print "xrange", rangex
+                print "yrange", rangey
+                rangex = (rangex[1], rangex[0])
 
             except KeyError:
                 # no / broken wcs
-                xrange = None
-                yrange = None
+                rangex = None
+                rangey = None
 
-            ds = Dataset2D(data, xrange=xrange, yrange=yrange)
+            ds = datasets.Dataset2D(data, xrange=rangex, yrange=rangey)
 
         if linked:
             ds.linked = datasets.LinkedFITSFile(dsname, filename, hdu,

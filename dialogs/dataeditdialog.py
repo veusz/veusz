@@ -283,14 +283,11 @@ class DatasetNewDialog(qt.QDialog):
                   self.createFromExpression][self.selectedmethod]
 
             # make a new dataset from the returned data
-            ds = fn()
-
-            #ds = document.Dataset(**vals)
-            self.document.setData(name, ds)
+            fn(name)
 
             self.statuslabel.setText("Created dataset '%s'" % name)
 
-        except _DSException, e:
+        except (document.CreateDatasetException, _DSException), e:
             # all bad roads lead here - take exception string and tell user
             self.statuslabel.setText("Creation failed")
             qt.QMessageBox("Veusz",
@@ -301,9 +298,10 @@ class DatasetNewDialog(qt.QDialog):
                            qt.QMessageBox.NoButton,
                            self).exec_loop()
 
-    def createFromRange(self):
+    def createFromRange(self, name):
         """Make dataset from a range or constant.
-
+        name is the name of the dataset
+        
         Raises _DSException if error
         """
 
@@ -318,36 +316,32 @@ class DatasetNewDialog(qt.QDialog):
             text = unicode( cntrl.text() ).strip()
 
             if not text:
-                # blank text
-                vals[key] = None
-
-            elif text.find(':') != -1:
-                # a range a:b
+                continue
+                
+            if text.find(':') != -1:
+                # an actual range
                 parts = text.split(':')
+                
                 if len(parts) != 2:
-                    raise _DSException("Incorrect range format")
+                    raise _DSException("Incorrect range format, use form 1:10")
                 try:
                     minval, maxval = float(parts[0]), float(parts[1])
                 except ValueError:
-                    raise _DSException("Incorrect number in range")
-
-                # hard to use arange to do this as endpoints inaccurate
-                delta = (maxval - minval) / (numsteps-1)
-                vals[key] = N.fromfunction( lambda x: minval+x*delta,
-                                            (numsteps,) )
+                    raise _DSException("Invalid number in range")
 
             else:
-                # a value (expand to size of numsteps)
                 try:
-                    vals[key] = float(text) + N.zeros( (numsteps,),
-                                                       type=N.Float64 )
-
+                    minval = float(text)
                 except ValueError:
-                    raise _DSException("Invalid floating point value")
+                    raise _DSException("Invalid number")
+                maxval = minval
+                
+            vals[key] = (minval, maxval)
+            
+        op = document.OperationDatasetCreateRange(name, numsteps, vals)
+        self.document.applyOperation(op)
 
-        return document.Dataset(**vals)
-
-    def createParametric(self):
+    def createParametric(self, name):
         """Use a parametric form to create the dataset.
 
         Raises _DSException if error
@@ -356,71 +350,38 @@ class DatasetNewDialog(qt.QDialog):
         # check whether number and range of steps is valid
         if not self.parastart.hasAcceptableInput():
             raise _DSException("Starting value invalid")
-        start = float( unicode(self.parastart.text()) )
+        t0 = float( unicode(self.parastart.text()) )
         if not self.paraend.hasAcceptableInput():
             raise _DSException("Ending value invalid")
-        end = float( unicode(self.paraend.text()) )
+        t1 = float( unicode(self.paraend.text()) )
         if not self.parasteps.hasAcceptableInput():
             raise _DSException("Invalid number of steps")
-        steps = int( unicode(self.parasteps.text()) )
+        numsteps = int( unicode(self.parasteps.text()) )
 
-        # use these values to calculate the array t
-        delta = (end-start) / (steps-1)
-        t =  N.fromfunction( lambda x: start+x*delta,
-                             (steps,) )
-
-        # define environment to evaluate
-        fnenviron = globals().copy()
-        exec 'from numarray import *' in fnenviron
-        fnenviron['t'] = t
-
-        # calculate for each of the dataset components
+        # get expressions
         vals = {}
         for key, cntrl in self.dsedits.iteritems():
             text = unicode( cntrl.text() ).strip()
-
-            if not text:
-                # blank text
-                vals[key] = None
-            else:
-                # HACK to ensure the result is a numarray
-                expr = '(%s) + t*0.' % text
-                try:
-                    vals[key] = eval( expr, fnenviron )
-                except Exception, e:
-                    raise _DSException("Error evaluating expession '%s'\n"
-                                       "Error: '%s'" % (text, str(e)) )
-
-        return document.Dataset(**vals)
-
-    def createFromExpression(self):
+            if text:
+                vals[key] = text
+           
+        op = document.OperationDatasetCreateParameteric(name, t0, t1, numsteps,
+                                                        vals)
+        self.document.applyOperation(op)
+      
+    def createFromExpression(self, name):
         """Create a dataset based on the expressions given."""
 
         # get expression for each part of the dataset
-        text = {}
+        vals = {}
         for key, cntrl in self.dsedits.iteritems():
-            text[key] = unicode( cntrl.text() ).strip()
+            text = unicode( cntrl.text() ).strip()
+            if text:
+                vals[key] = text
 
-        ds = document.DatasetExpression(data=text['data'], serr=text['serr'],
-                                        nerr=text['nerr'], perr=text['perr'])
-        ds.document = self.document
-
-        try:
-            # we force an evaluation of the dataset for the first time, to
-            # check for errors in the expressions
-
-            data = ds.data
-            
-        except document.DatasetExpressionException, e:
-            raise _DSException(str(e))
-
-        if self.linkbutton.isChecked():
-            # if the linked button is checked, return the linked dataset
-            return ds
-        else:
-            # else return a copy of the values
-            return document.Dataset(data=ds.data, serr=ds.serr,
-                                    perr=ds.perr, nerr=ds.nerr)
+        link = self.linkbutton.isChecked()
+        op = document.OperationDatasetCreateExpression(name, vals, link)
+        self.document.applyOperation(op)
 
 class _DataEditTable(qttable.QTable):
     """A QTable for displaying data from datasets.
@@ -428,8 +389,13 @@ class _DataEditTable(qttable.QTable):
     The table draws data itself, and notifies the document of any changes
     to the data.
     """
+    
+    # TODO: Add operation to delete columns
+    # TODO: Add cut/paste operations
 
-    def __init__(self, parent):
+    colnames = ('data', 'serr', 'perr', 'nerr')
+    
+    def __init__(self, parent, document):
         """Initialise the table with the given parent."""
 
         qttable.QTable.__init__(self, 0, 4, parent)
@@ -445,20 +411,25 @@ class _DataEditTable(qttable.QTable):
             self.horizontalHeader().setLabel(num, text)
 
         # data the table shows
-        self.coldata = (None, None, None, None)
+        self.coldata = [None, None, None, None]
 
         # the edit control, if any
         self.edit = None
-
-    def setDataset(self, ds):
+        
+        # keep track of document
+        self.document = document
+        
+    def setDataset(self, datasetname):
         """Show the given dataset in the widget."""
 
-        # FIXME
+        ds = self.document.data[datasetname]
+
+        # FIXME: Multidimensional datasets not handled properly
         if ds.dimensions != 1:
             return
 
-        self.dataset = ds
-        self.coldata = (ds.data, ds.serr, ds.perr, ds.nerr)
+        self.datasetname = datasetname
+        self.coldata = [ds.data, ds.serr, ds.perr, ds.nerr]
         self.setNumRows( len(self.coldata[0]) )
 
     # all these do nothing, as we're not using TableItems
@@ -523,6 +494,8 @@ class _DataEditTable(qttable.QTable):
         """Check whether it is valid to edit the column."""
         # check whether there is data in the column
         if self.coldata[c] == None:
+            if self.isReadOnly():
+                return None
             mb = qt.QMessageBox("Veusz",
                                 "This column has no data. Initialise with "
                                 "zero and continue?",
@@ -535,7 +508,10 @@ class _DataEditTable(qttable.QTable):
             mb.setButtonText(qt.QMessageBox.No, "&Cancel")
             if mb.exec_loop() != qt.QMessageBox.Yes:
                 return None
-
+            self.document.applyOperation( document.OperationDatasetAddColumn(self.datasetname, self.colnames[c]) )
+            ds = self.document.data[self.datasetname]
+            self.coldata[c] = getattr(ds, self.colnames[c])
+                
         return qttable.QTable.beginEdit(self, r, c, replace)
     
     def endEdit(self, r, c, accept, replace):
@@ -551,10 +527,9 @@ class _DataEditTable(qttable.QTable):
 
         if self.edit != None:
             nums = self.coldata[c]
-            if nums == None:
-                nums = N.zeros(self.coldata[0].shape, N.Float64)
+            assert nums != None
             try:
-                nums[r] = float( unicode(self.edit.text()) )
+                val = float( unicode(self.edit.text()) )
             except ValueError:
                 # floating point conversion error
                 self.edit.setText(self.text(r, c))
@@ -567,9 +542,10 @@ class _DataEditTable(qttable.QTable):
                                self).exec_loop()
                 return
 
-            # modify the value in the dataset
-            self.dataset.changeValues(['vals', 'serr', 'perr', 'nerr'][c],
-                                      nums)
+            op = document.OperationDatasetSetVal(self.datasetname,
+                                                 self.colnames[c],
+                                                 r, val)
+            self.document.applyOperation(op)
 
 class DataEditDialog(qt.QDialog):
     """Data editting dialog."""
@@ -599,7 +575,7 @@ class DataEditDialog(qt.QDialog):
         # initialise table
         vbox = qt.QVBox(datasplitter)
         vbox.setSpacing(spacing)
-        self.dstable = _DataEditTable(vbox)
+        self.dstable = _DataEditTable(vbox, self.document)
         
         # if dataset is linked, show filename
         w = qt.QWidget(vbox)
@@ -708,7 +684,7 @@ class DataEditDialog(qt.QDialog):
 
         # update the table
         ds = self.document.data[name]
-        self.dstable.setDataset(ds)
+        self.dstable.setDataset(name)
 
         # linked dataset
         readonly = False

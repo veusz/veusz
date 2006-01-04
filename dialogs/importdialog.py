@@ -193,7 +193,6 @@ class ImportDialog(ImportDialogBase):
     optionally link to a file.
     """
 
-
     def __init__(self, parent, document):
         """Initialise dialog."""
 
@@ -225,10 +224,19 @@ class ImportDialog(ImportDialogBase):
     def slotImport(self):
         """Do the importing"""
         
-        # decode the descriptor
+        # convert controls to values
         descriptor = unicode( self.descriptoredit.text() )
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+        useblocks = self.blockcheck.isChecked()
+        linked = self.linkcheck.isChecked()
+        
         try:
-            sr = document.SimpleRead(descriptor)
+            # construct operation. this checks the descriptor.
+            op = document.OperationDataImport(descriptor, filename=filename,
+                                              useblocks=useblocks, 
+                                              linked=linked)
+
         except document.DescriptorError:
             mb = qt.QMessageBox("Veusz",
                                 "Cannot interpret descriptor",
@@ -240,48 +248,43 @@ class ImportDialog(ImportDialogBase):
             mb.exec_loop()
             return
 
-        # open file (shouldn't have got here if the file didn't exist
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
-        ifile = open(filename, 'r')
-
-        # open up an import stream
-        stream = document.FileStream(ifile)
-
         # show a busy cursor
         qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
-        # read the data
-        useblocks = self.blockcheck.isChecked()
-        sr.readData(stream, useblocks=useblocks)
-
+        # actually import the data
+        dsnames = self.document.applyOperation(op)
+        
         # restore the cursor
         qt.QApplication.restoreOverrideCursor()
 
+        # tell the user what happened
+        # failures in conversion
         lines = []
-        for var, count in sr.getInvalidConversions().items():
+        for var, count in op.simpleread.getInvalidConversions().iteritems():
             if count != 0:
                 lines.append('%i conversions failed for dataset "%s"' %
                              (count, var))
         if len(lines) != 0:
             lines.append('')
-
-        # link the data to a file, if told to
-        islinked = self.linkcheck.isChecked()
-        if islinked:
-            LF = document.LinkedFile(filename, descriptor, useblocks=useblocks)
-        else:
-            LF = None
-
-        names = sr.setInDocument(self.document, linkedfile=LF)
-
+            
+        # what datasets were imported
         lines.append('Imported data for datasets:')
-        names.sort()
-        for n in names:
-            shape = self.document.getData(n).data.shape
-            lines.append(' %s (%i items)' % (n, shape[0]))
+        dsnames.sort()
+        for name in dsnames:
+            ds = self.document.getData(name)
+            # build up description
+            descr = [name]
+            if ds.serr != None:
+                descr.append('+-')
+            if ds.perr != None:
+                descr.append('+')
+            if ds.nerr != None:
+                descr.append('-')
+            descr = ','.join(descr)
+            lines.append(' %s (%i items)' % (descr, ds.data.shape[0]))
 
-        if LF != None:
+        # whether the data were linked
+        if linked:
             lines.append('')
             lines.append('Datasets were linked to file "%s"' % filename)
 
@@ -401,11 +404,14 @@ class ImportDialog2D(ImportDialogBase):
 
         # loop over datasets and read...
         try:
-            self.document.import2D(filename, datasets, xrange=xrange,
-                                   yrange=yrange, invertrows=invertrows,
-                                   invertcols=invertcols, transpose=transpose,
-                                   linked=linked)
-            output = 'Successfully read datasets %s' % (' ,'.join(datasets))
+            op = document.OperationDataImport2D(datasets, filename=filename,
+                                                xrange=xrange, yrange=yrange,
+                                                invertrows=invertrows,
+                                                invertcols=invertcols,
+                                                transpose=transpose,
+                                                linked=linked)
+            readds = self.document.applyOperation(op)
+            output = 'Successfully read datasets %s' % (' ,'.join(readds))
         except document.Read2DError, e:
             output = 'Error importing datasets:\n %s' % str(e)
                 

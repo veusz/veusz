@@ -31,6 +31,7 @@ import qt
 import widgets
 import datasets
 import simpleread
+import operations
 
 class CommandInterface(qt.QObject):
     """Class provides command interface."""
@@ -219,7 +220,7 @@ class CommandInterface(qt.QObject):
         stream = simpleread.StringStream(string)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream, useblocks=useblocks)
-        datasets = sr.setInDocument(self.document)
+        ds = sr.setInDocument(self.document)
         errors = sr.getInvalidConversions()
 
         if self.verbose:
@@ -227,31 +228,39 @@ class CommandInterface(qt.QObject):
             for name, num in errors.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
-        return (datasets, errors)
+        return (ds, errors)
 
-    def ImportString2D(self, datasets, string):
+    def ImportString2D(self, datasetnames, string, xrange=None, yrange=None,
+                       invertrows=None, invertcols=None, transpose=None):
         """Read two dimensional data from the string specified.
-        datasets is a list of datasets to read from the string or a single
+        datasetnames is a list of datasets to read from the string or a single
         dataset name
+
+
+        xrange is a tuple containing the range of data in x coordinates
+        yrange is a tuple containing the range of data in y coordinates
+        if invertrows=True, then rows are inverted when read
+        if invertcols=True, then cols are inverted when read
+        if transpose=True, then rows and columns are swapped
+
         """
+        
+        if type(datasetnames) in (str, unicode):
+            datasetnames = [datasetnames]
 
-        if type(datasets) in (str, unicode):
-            datasets = [datasets]
+        op = operations.OperationDataImport2D(datasetnames, datastr=string, xrange=xrange,
+                                              yrange=yrange, invertrows=invertrows,
+                                              invertcols=invertcols, transpose=transpose)
+        self.document.applyOperation(op)
+        if self.verbose:
+            print "Imported datasets %s" % (', '.join(datasetnames))
 
-        stream = simpleread.StringStream(string)
-        for name in datasets:
-            sr = simpleread.SimpleRead2D(name)
-            sr.readData(stream)
-            sr.setInDocument(self.document)
-            if self.verbose:
-                print "Imported dataset %s" % name
-
-    def ImportFile2D(self, filename, datasets, xrange=None, yrange=None,
+    def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
                      invertrows=None, invertcols=None, transpose=None,
                      linked=False):
         """Import two-dimensional data from a file.
         filename is the name of the file to read
-        datasets is a list of datasets to read from the file, or a single
+        datasetnames is a list of datasets to read from the file, or a single
         dataset name
 
         xrange is a tuple containing the range of data in x coordinates
@@ -263,15 +272,16 @@ class CommandInterface(qt.QObject):
         if linked=True then the dataset is linked to the file
         """
 
-        if type(datasets) in (str, unicode):
-            datasets = [datasets]
+        if type(datasetnames) in (str, unicode):
+            datasetnames = [datasetnames]
 
-        self.document.import2D(filename, datasets, xrange=xrange,
-                               yrange=yrange, invertrows=invertrows,
-                               invertcols=invertcols, transpose=transpose,
-                               linked=linked)
+        op = operations.OperationDataImport2D(datasetnames, filename=filename, xrange=xrange,
+                                              yrange=yrange, invertrows=invertrows,
+                                              invertcols=invertcols, transpose=transpose,
+                                              linked=linked)
+        self.document.applyOperation(op)
         if self.verbose:
-            print "Imported datasets %s" % (', '.join(datasets))
+            print "Imported datasets %s" % (', '.join(datasetnames))
 
     def ImportFile(self, filename, descriptor, useblocks=False, linked=False):
         """Read data from file with filename using descriptor.
@@ -298,16 +308,16 @@ class CommandInterface(qt.QObject):
         stream = simpleread.FileStream(f)
         sr = simpleread.SimpleRead(descriptor)
         sr.readData(stream, useblocks=useblocks)
-        datasets = sr.setInDocument(self.document,
-                                    linkedfile=LF)
+        datasetnames = sr.setInDocument(self.document,
+                                        linkedfile=LF)
         errors = sr.getInvalidConversions()
 
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(datasets),)
+            print "Imported datasets %s" % (' '.join(datasetnames),)
             for name, num in errors.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
-        return (datasets, errors)
+        return (datasetnames, errors)
 
     def ImportFITSFile(self, dsname, filename, hdu,
                        datacol = None, symerrcol = None,

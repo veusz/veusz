@@ -20,8 +20,14 @@
 
 """Classes to represent datasets."""
 
-import numarray as N
 import itertools
+import re
+
+import numarray as N
+
+import doc
+import simpleread
+import operations
 
 def _cnvt_numarray(a):
     """Convert to a numarray if possible (doing copy)."""
@@ -70,7 +76,7 @@ class LinkedFile:
         # to make sure we do not overwrited non-linked data (which may
         # be specified in the descriptor)
         
-        tempdoc = Document()
+        tempdoc = doc.Document()
         sr = simpleread.SimpleRead(self.descriptor)
         sr.readData( simpleread.FileStream(open(self.filename)) )
         sr.setInDocument(tempdoc, linkedfile=self)
@@ -120,12 +126,16 @@ class Linked2DFile:
         '''
 
         # put data in a temporary document as above
-        tempdoc = Document()
+        tempdoc = doc.Document()
         try:
-            tempdoc.import2D(self.filename, self.datasets, xrange=self.xrange,
-                             yrange=self.yrange, invertrows=self.invertrows,
-                             invertcols=self.invertcols,
-                             transpose=self.transpose)
+            op = operations.OperationDataImport2D(self.datasets,
+                                                  filename=self.filename,
+                                                  xrange=self.xrange,
+                                                  yrange=self.yrange,
+                                                  invertrows=self.invertrows,
+                                                  invertcols=self.invertcols,
+                                                  transpose=self.transpose)
+            tempdoc.applyOperation(op)
         except simpleread.Read2DError:
             errors = {}
             for i in self.datasets:
@@ -555,20 +565,3 @@ class DatasetExpression(Dataset):
     perr = property(lambda self: self._propValues('perr'))
     nerr = property(lambda self: self._propValues('nerr'))
 
-def _recursiveGet(root, name, typename, outlist, maxlevels):
-    """Add those widgets in root with name and type to outlist.
-
-    If name or typename are None, then ignore the criterion.
-    maxlevels is the maximum number of levels to check
-    """
-
-    if maxlevels != 0:
-
-        # if levels is not zero, add the children of this root
-        newmaxlevels = maxlevels - 1
-        for w in root.children:
-            if ( (w.name == name or name == None) and
-                 (w.typename == typename or typename == None) ):
-                outlist.append(w)
-
-            _recursiveGet(w, name, typename, outlist, newmaxlevels)

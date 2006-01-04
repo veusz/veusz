@@ -133,10 +133,10 @@ class CommandInterpreter:
 
         return out
         
-    def run(self, input, filename = None):
+    def run(self, inputcmds, filename = None):
         """ Run a set of commands inside the preserved environment.
 
-        input: a string with the commands to run
+        inputcmds: a string with the commands to run
         filename: a filename to report if there are errors
         """
         
@@ -144,10 +144,10 @@ class CommandInterpreter:
             filename = '<string>'
 
         # pythonise!
-        input = self._pythonise(input)
+        inputcmds = self._pythonise(inputcmds)
 
         # ignore if blank
-        if len(input.strip()) == 0:
+        if len(inputcmds.strip()) == 0:
             return
 
         # preserve output streams
@@ -158,15 +158,15 @@ class CommandInterpreter:
 
         # count number of newlines in expression
         # If it's 2, then execute as a single statement (print out result)
-        if input.count('\n') == 2:
+        if inputcmds.count('\n') == 2:
             stattype = 'single'
         else:
             stattype = 'exec'
 
         # first compile the code to check for syntax errors
         try:
-            c = compile(input, filename, stattype)
-        except (OverflowError, ValueError, SyntaxError), e:
+            c = compile(inputcmds, filename, stattype)
+        except (OverflowError, ValueError, SyntaxError):
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
             for l in backtrace:
@@ -176,7 +176,7 @@ class CommandInterpreter:
             # execute the code
             try:
                 exec c in self.globals
-            except Exception, e:
+            except Exception:
                 # print out the backtrace to stderr
                 i = sys.exc_info()
                 backtrace = traceback.format_exception( *i )
@@ -191,10 +191,10 @@ class CommandInterpreter:
         """Replace the document with a new one from the filename."""
 
         # FIXME: should update filename in main window
-        file = open(filename, 'r')
+        f = open(filename, 'r')
         self.document.wipe()
         self.interface.To('/')
-        self.runFile(file)
+        self.runFile(f)
         self.document.setModified()
         self.document.setModified(False)
 
@@ -210,7 +210,7 @@ class CommandInterpreter:
         # actually run the code
         try:
             exec fileobject in self.globals
-        except Exception, e:
+        except Exception:
             # print out the backtrace to stderr
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
@@ -234,7 +234,7 @@ class CommandInterpreter:
         # actually run the code
         try:
             retn = eval(expression, self.globals)
-        except Exception, e:
+        except Exception:
             # print out the backtrace to stderr
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
@@ -252,9 +252,9 @@ class CommandInterpreter:
         """Write the GPL to the console window."""
         # FIXME: This should open up a separate window
         dirname = os.path.dirname(__file__)
-        file = open(os.path.join(dirname, '..', 'COPYING'), 'rU')
+        f = open(os.path.join(dirname, '..', 'COPYING'), 'rU')
 
-        for line in file:
+        for line in f:
             sys.stdout.write(line)
 
     def runPickle(self, command):

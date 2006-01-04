@@ -138,7 +138,7 @@ class Image(plotters.GenericPlotter):
         self.lastdataset = None
         self.schangeset = -1
 
-    def readColorMaps(C):
+    def readColorMaps(cls):
         """Read color maps data file (a class method)
 
         File is made up of:
@@ -150,7 +150,7 @@ class Image(plotters.GenericPlotter):
 
         name = ''
         vals = []
-        C.colormaps = {}
+        cls.colormaps = {}
 
         # locate file holding colormap data
         dir = os.path.dirname( os.path.abspath(__file__) )
@@ -165,7 +165,7 @@ class Image(plotters.GenericPlotter):
             elif p[0][0] not in string.digits:
                 # new colormap follows
                 if name != '':
-                    C.colormaps[name] = N.array(vals).astype(N.UInt8)
+                    cls.colormaps[name] = N.array(vals).astype(N.UInt8)
                 name = p[0]
                 vals = []
             else:
@@ -176,12 +176,12 @@ class Image(plotters.GenericPlotter):
 
         # add on final colormap
         if name != '':
-            C.colormaps[name] = N.array(vals).astype(N.UInt8)
+            cls.colormaps[name] = N.array(vals).astype(N.UInt8)
 
         # collect names and sort alphabetically
-        names = C.colormaps.keys()
+        names = cls.colormaps.keys()
         names.sort()
-        C.colormapnames = names
+        cls.colormapnames = names
 
     readColorMaps = classmethod(readColorMaps)
 

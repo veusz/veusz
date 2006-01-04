@@ -193,10 +193,6 @@ class Setting(object):
         else:
             return ''
 
-    def resetToDefault(self):
-        """Reset the value to its default."""
-        self.val = self.default
-
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""
         self.onmodified.append(fn)

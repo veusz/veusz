@@ -127,7 +127,6 @@ class Axis(widget.Widget):
     def _autoLookupRange(self):
         """Automatically look up the plotable range
         from widgets that use this axis."""
-        ourname = self.name
 
         # iterate over siblings to get axis range
         autorange = [1e99, -1e99]
@@ -445,7 +444,6 @@ class Axis(widget.Widget):
         painter.setFont(font)
         tl_spacing = ( painter.fontMetrics().leading() +
                        painter.fontMetrics().descent() )
-        tl_ascent  = painter.fontMetrics().ascent()
 
         # work out font alignment
         if s.TickLabels.rotate:

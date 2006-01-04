@@ -177,6 +177,9 @@ class Graph(widget.Widget):
 
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:
+                if w == None:
+                    continue
+                    
                 # find which side the axis is against
                 edge = w.againstWhichEdge()
 

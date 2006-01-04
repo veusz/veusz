@@ -1,6 +1,3 @@
-# page.py
-# Represents page in plot
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -20,6 +17,8 @@
 ##############################################################################
 
 # $Id$
+
+"""Widget that represents a page in the document."""
 
 import qt
 import widget

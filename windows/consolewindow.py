@@ -112,7 +112,7 @@ class _CommandEdit(qt.QLineEdit):
             self.setText(text)
 
 introtext=u'''Welcome to <b><font color="purple">Veusz</font></b> --- a scientific plotting application.
-Veusz version %s, Copyright \u00a9 2003-2005 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt;
+Veusz version %s, Copyright \u00a9 2003-2006 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt;
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are
 welcome to redistribute it under certain conditions. Enter "GPL()" for details.
 This window is a Python command line console and acts as a calculator.
@@ -120,7 +120,6 @@ This window is a Python command line console and acts as a calculator.
 
 class ConsoleWindow(qt.QDockWindow):
     """ A python-like qt console."""
-
 
     def __init__(self, thedocument, *args):
         qt.QDockWindow.__init__(self, *args)

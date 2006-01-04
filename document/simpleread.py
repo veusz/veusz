@@ -73,7 +73,6 @@ class _DescriptorPart:
         parts = _DescriptorPart.partsplitter.split(text)
         parts = [i for i in parts if i != ""]
 
-        index = 0
         for count, part in itertools.izip(itertools.count(), parts):
             if part == '+-':
                 self.columns.append('SYM')
@@ -228,7 +227,7 @@ class FileStream:
     def newLine(self):
         """Read in, and split the next line."""
 
-        while 1:
+        while True:
             # get next line from data source
             try:
                 line = self.file.next()
@@ -274,8 +273,13 @@ class SimpleRead:
     
     def __init__(self, descriptor):
         self._parseDescriptor(descriptor)
-        self.datasets = {}
+        self.clearState()
 
+    def clearState(self):
+        """Start reading from scratch."""
+        self.datasets = {}
+        self.blocks = None
+        
     def _parseDescriptor(self, descriptor):
         """Take a descriptor, and parse it into its individual parts."""
 
@@ -495,6 +499,8 @@ class SimpleRead2D:
 
     def setInDocument(self, document, linkedfile=None):
         """Set the data in the document.
+
+        Returns list containing name of dataset read
         """
 
         ds = datasets.Dataset2D(self.data, xrange=self.xrange,
@@ -503,4 +509,5 @@ class SimpleRead2D:
 
         document.setData(self.name, ds)
         
+        return [self.name]
 

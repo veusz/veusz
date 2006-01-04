@@ -40,7 +40,7 @@ import windows.mainwindow
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2005 <jeremy@jeremysanders.net>
+Copyright (C) Jeremy Sanders 2003-2006 <jeremy@jeremysanders.net>
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 

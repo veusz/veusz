@@ -539,7 +539,7 @@ class PointPlotter(GenericPlotter):
                 pts += [x1, y1, xc, y1, xc, y2, x2, y2]
 
         else:
-            assert 0
+            assert False
 
         if len(pts) >= 4:
             if not s.FillBelow.hide:
