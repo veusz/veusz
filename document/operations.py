@@ -30,7 +30,6 @@ because some operations cannot restore references (e.g. add object)
 
 # FIXME:
 # need operations for the following:
-#  set dataset?
 #  paste widget
 
 import numarray as N
@@ -281,6 +280,32 @@ class OperationWidgetAdd:
 ###############################################################################
 # Dataset operations
     
+class OperationDatasetSet:
+    """Set a dataset to that specified."""
+    
+    descr = 'set dataset'
+    
+    def __init__(self, datasetname, dataset):
+        self.datasetname = datasetname
+        self.dataset = dataset
+        
+    def do(self, document):
+        """Set dataset, backing up existing one."""
+    
+        if self.datasetname in document.data:
+            self.olddata = document.data[self.datasetname]
+        else:
+            self.olddata = None
+            
+        document.setData(self.datasetname, self.dataset)
+
+    def undo(self, document):
+        """Undo the data setting."""
+        
+        del document.data[self.datasetname]
+        if self.olddata != None:
+            document.setData(self.datasetname, self.olddata)
+    
 class OperationDatasetDelete:
     """Delete a dateset."""
     
@@ -420,7 +445,8 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         ds = datasets.Dataset(**vals)
         assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
-
+        return ds
+        
 class CreateDatasetException(Exception):
     """Thrown by dataset creation routines."""
     pass
@@ -466,7 +492,8 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         ds = datasets.Dataset(**vals)
         assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
-
+        return ds
+        
 class OperationDatasetCreateExpression(OperationDatasetCreate):
     descr = 'create dataset from expression'
 
@@ -505,7 +532,8 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         
         assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
-
+        return ds
+        
 ###############################################################################
 # Import datasets
         

@@ -57,20 +57,20 @@ class CommandInterface(qt.QObject):
 
     def Add(self, type, *args, **args_opt):
         """Add a graph to the plotset."""
-        w = widgets.thefactory.makeWidget(type, self.currentwidget,
-                                          *args, **args_opt)
+
+        op = operations.OperationWidgetAdd(self.currentwidget, type, *args, **args_opt)
+        w = self.document.applyOperation(op)
 
         if self.verbose:
             print "Added a graph of type '%s' (%s)" % (type, w.userdescription)
 
-        self.document.setModified()
         return w.name
 
     def Remove(self, name):
         """Remove a graph from the dataset."""
         w = self.document.resolve(self.currentwidget, name)
-        w.parent.removeChild( w.name )
-        self.document.setModified()
+        op = operations.OperationWidgetDelete(w)
+        self.document.applyOperation(op)
 
     def To(self, where):
         """Change to a graph within the current graph."""
@@ -119,17 +119,20 @@ class CommandInterface(qt.QObject):
     def Set(self, var, val):
         """Set the value of a setting."""
         pref = self.currentwidget.prefLookup(var)
-        pref.val = val
 
+        op = operations.OperationSettingSet(pref, val)
+        self.document.applyOperation(op)
+        
         if self.verbose:
             print ( "Set setting '%s' to %s" %
-                    (var, repr(val)) )
+                    (var, repr(pref.get())) )
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Set dataset with name with values (and optionally errors)."""
 
         data = datasets.Dataset(val, symerr, negerr, poserr)
-        self.document.setData(name, data)
+        op = operations.OperationDatasetSet(name, data)
+        self.document.applyOperation(op)
  
         if self.verbose:
             print "Set variable '%s':" % name
@@ -152,18 +155,11 @@ class CommandInterface(qt.QObject):
         is modified
         """
 
-        data = datasets.DatasetExpression(data=val, serr=symerr, nerr=negerr,
-                                          perr=poserr)
+        expr = {'data': val, 'serr': symerr, 'nerr': negerr, 'perr': poserr}
+        op = operations.OperationDatasetCreateExpression(name, expr, linked)
 
-        # if not linked, create a dataset based on the linked one
-        if not linked:
-            data.document = self.document
-            data = datasets.Dataset(data=data.data, serr=data.serr,
-                                    nerr=data.nerr, perr=data.perr)
-
-        # actually set the dataset
-        self.document.setData(name, data)
-
+        data = self.document.applyOperation(op)
+        
         if self.verbose:
             print "Set variable '%s' based on expression:" % name
             print " Values = %s" % str( data.data )
@@ -175,7 +171,8 @@ class CommandInterface(qt.QObject):
         """Create a 2D dataset."""
 
         data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange)
-        self.document.setData(name, data)
+        op = operations.OperationDatasetSet(name, data)
+        self.document.applyOperation(op)
 
         if self.verbose:
             print "Set 2d dataset '%s'" % name
@@ -224,7 +221,8 @@ class CommandInterface(qt.QObject):
         errors = sr.getInvalidConversions()
 
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(datasets),)
+            # FIXME: Broken below
+            #print "Imported datasets %s" % (' '.join(datasets),)
             for name, num in errors.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
@@ -381,5 +379,5 @@ class CommandInterface(qt.QObject):
         This function does not move widgets."""
 
         w = self.document.resolve(self.currentwidget, widget)
-        w.rename(newname)
-        
+        op = operations.OperationWidgetRename(w, newname)
+        self.document.applyOperation(op)
