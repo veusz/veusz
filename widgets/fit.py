@@ -22,7 +22,6 @@
 # $Id$
 
 import re
-import itertools
 import sys
 
 import numarray as N
@@ -32,6 +31,7 @@ import plotters
 import widgetfactory
 import setting
 import utils
+import document
 
 class Fit(plotters.FunctionPlotter):
     """A plotter to fit a function to data."""
@@ -169,23 +169,32 @@ class Fit(plotters.FunctionPlotter):
                                       xvals,
                                       yvals, yserr)
 
+        # list of operations do we can undo the changes
+        operations = []
+                                      
         # populate the return parameters
         vals = {}
         for i, v in zip(names, retn):
             vals[i] = v
-        s.values = vals
+        operations.append( document.OperationSettingSet(s.get('values'), vals) )
 
         # populate the read-only fit quality params
-        s.chi2 = chi2
-        s.dof = dof
+        operations.append( document.OperationSettingSet(s.get('chi2'), chi2) )
+        operations.append( document.OperationSettingSet(s.get('dof'), dof) )
         if dof <= 0:
             print 'No degrees of freedom in fit.\n'
-            s.redchi2 = -1.
+            redchi2 = -1.
         else:
-            s.redchi2 = chi2/dof
+            redchi2 = chi2/dof
+        operations.append( document.OperationSettingSet(s.get('redchi2'), redchi2) )
 
-        self.generateOutputExpr()
+        # expression for fit
+        expr = self.generateOutputExpr(vals)
+        operations.append( document.OperationSettingSet(s.get('outExpr'), expr) )
 
+        # actually change all the settings
+        d.applyOperation( document.OperationMultiple(operations, descr='fit') )
+    
     def evalfunc(self, params, xvals):
 
         # make an environment
@@ -204,11 +213,15 @@ class Fit(plotters.FunctionPlotter):
         except:
             return NIE.nan
 
-    def generateOutputExpr(self):
-        """Try to generate text form of output expression."""
+    def generateOutputExpr(self, vals):
+        """Try to generate text form of output expression.
+        
+        vals is a dict of variable: value pairs
+        returns the expression
+        """
 
+        paramvals = vals.copy()
         s = self.settings
-        paramvals = s.values.copy()
 
         # also substitute in data name for variable
         if s.variable == 'x':
@@ -221,11 +234,11 @@ class Fit(plotters.FunctionPlotter):
         parts = re.split('([^A-Za-z0-9.])', s.function)
 
         # replace part by things in paramvals, if they exist
-        for p, i in itertools.izip(parts, itertools.count()):
+        for i, p in enumerate(parts):
             if p in paramvals:
                 parts[i] = str( paramvals[p] )
 
-        s.outExpr = ''.join(parts)
+        return ''.join(parts)
 
 # allow the factory to instantiate an x,y plotter
 widgetfactory.thefactory.register( Fit )

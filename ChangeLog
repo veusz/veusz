@@ -1,3 +1,6 @@
+* 2006-01-14
+  - Make fitting use operation
+
 * 2006-01-02 Jeremy Sanders <jeremy@jeremysanders.net>
   - Bug fix with missing axes
   - Update main copyright years to 2006
