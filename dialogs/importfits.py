@@ -25,6 +25,8 @@ import os.path
 
 import qt
 
+import document
+
 # delay initialisation until dialog is opened
 pyfits = None
 
@@ -177,7 +179,7 @@ class ImportFITS(qt.QDialog):
             ifile = open(filename)
             line = ifile.readline()
             # is this a hack?
-            if line.find('/ file does conform to FITS standard') == -1:
+            if line.find('SIMPLE  =                    T') == -1:
                 raise IOError
             ifile.close()
             self.updateListView(filename)
@@ -299,8 +301,9 @@ class ImportFITS(qt.QDialog):
             cols = [None]*4
 
         # actually import the data
-        self.document.importFITS(name, filename, item.hdu,
-                                 datacol=cols[0], symerrcol=cols[1],
-                                 poserrcol=cols[2], negerrcol=cols[3],
-                                 linked=linked)
+        op = document.OperationDataImportFITS(name, filename, item.hdu,
+                                              datacol=cols[0], symerrcol=cols[1],
+                                              poserrcol=cols[2], negerrcol=cols[3],
+                                              linked=linked)
+        self.document.applyOperation(op)
         

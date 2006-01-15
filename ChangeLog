@@ -1,3 +1,8 @@
+* 2006-01-15 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Convert FITS import to operations
+  - All CommandInterface now uses operations
+  - Fix FITS file detection code
+
 * 2006-01-14 Jeremy Sanders <jeremy@jeremysanders.net>
   - Make fitting use operations
   - Update (some) commandinterface to use operations

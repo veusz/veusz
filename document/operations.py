@@ -687,6 +687,131 @@ class OperationDataImport2D:
         # restore old datasets
         document.data = self.olddatasets
     
+class OperationDataImportFITS:
+    """Import 1d or 2d data from a fits file."""
+
+    descr = 'import FITS file'
+    
+    def __init__(self, dsname, filename, hdu,
+                 datacol = None, symerrcol = None,
+                 poserrcol = None, negerrcol = None,
+                 linked = False):
+        """Import data from FITS file.
+
+        dsname is the name of the dataset
+        filename is name of the fits file to open
+        hdu is the number/name of the hdu to access
+
+        if the hdu is a table, datacol, symerrcol, poserrcol and negerrcol
+        specify the columns containing the data, symmetric error,
+        positive and negative errors.
+
+        linked specfies that the dataset is linked to the file
+        """
+
+        self.dsname = dsname
+        self.filename = filename
+        self.hdu = hdu
+        self.datacol = datacol
+        self.symerrcol = symerrcol
+        self.poserrcol = poserrcol
+        self.negerrcol = negerrcol
+        self.linked = linked
+        
+    def _import1d(self, hdu):
+        """Import 1d data from hdu."""
+
+        data = hdu.data
+        datav = None
+        symv = None
+        posv = None
+        negv = None
+
+        # read the columns required
+        if self.datacol != None:
+            datav = data.field(self.datacol)
+        if self.symerrcol != None:
+            symv = data.field(self.symerrcol)
+        if self.poserrcol != None:
+            posv = data.field(self.poserrcol)
+        if self.negerrcol != None:
+            negv = data.field(self.negerrcol)
+
+        # actually create the dataset
+        return datasets.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
+
+    def _import2d(self, hdu):
+        """Import 2d data from hdu."""
+    
+        if ( self.datacol != None or self.symerrcol != None or self.poserrcol != None or
+             self.negerrcol != None ):
+            print "Warning: ignoring columns as import 2D dataset"
+
+        header = hdu.header
+        data = hdu.data
+
+        try:
+            # try to read WCS for image, and work out x/yrange
+            wcs = [header[i] for i in ('CRVAL1', 'CRPIX1', 'CDELT1',
+                                       'CRVAL2', 'CRPIX2', 'CDELT2')]
+
+            rangex = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
+                       (0-wcs[1])*wcs[2] + wcs[0])
+            rangey = ( (0-wcs[4])*wcs[5] + wcs[3],
+                       (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
+
+            rangex = (rangex[1], rangex[0])
+
+        except KeyError:
+            # no / broken wcs
+            rangex = None
+            rangey = None
+
+        return datasets.Dataset2D(data, xrange=rangex, yrange=rangey)
+
+    def do(self, document):
+        """Do the import."""
+
+        try:
+            import pyfits
+        except ImportError:
+            raise RuntimeError, ( 'PyFITS is required to import '
+                                  'data from FITS files' )
+
+        f = pyfits.open(self.filename, 'readonly')
+        hdu = f[self.hdu]
+        data = hdu.data
+
+        try:
+            # raise an exception if this isn't a table therefore is an image
+            hdu.get_coldefs()
+            ds = self._import1d(hdu)
+
+        except AttributeError:
+            ds = self._import2d(hdu)
+
+        f.close()
+            
+        if self.linked:
+            ds.linked = datasets.LinkedFITSFile(self.dsname, self.filename, self.hdu,
+                                                [self.datacol, self.symerrcol,
+                                                 self.poserrcol, self.negerrcol])
+
+        if self.dsname in document.data:
+            self.olddataset = document.data[self.dsname]
+        else:
+            self.olddataset = None
+        document.setData(self.dsname, ds)
+
+    def undo(self, document):
+        """Undo the import."""
+        
+        if self.dsname in document.data:
+            del document.data[self.dsname]
+            
+        if self.olddataset != None:
+            document.setData(self.dsname, self.olddataset)
+        
 ###############################################################################
 # Alter dataset
 

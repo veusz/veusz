@@ -190,13 +190,17 @@ class LinkedFITSFile:
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.'''
 
-        document.importFITS(self.dsname, self.filename,
-                            self.hdu,
-                            datacol = self.columns[0],
-                            symerrcol = self.columns[1],
-                            poserrcol = self.columns[2],
-                            negerrcol = self.columns[3])
-        return (self.dsname, {self.dsname: 0})
+        op = operations.OperationDataImportFITS(self.dsname, self.filename,
+                                                self.hdu,
+                                                datacol = self.columns[0],
+                                                symerrcol = self.columns[1],
+                                                poserrcol = self.columns[2],
+                                                negerrcol = self.columns[3])
+
+        # don't use applyoperation interface as we don't want this to be undoable
+        op.do(document)
+        
+        return ([self.dsname], {self.dsname: 0})
 
 class DatasetBase(object):
     """A base dataset class."""

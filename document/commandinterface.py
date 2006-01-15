@@ -214,19 +214,16 @@ class CommandInterface(qt.QObject):
          converting the data
         """
 
-        stream = simpleread.StringStream(string)
-        sr = simpleread.SimpleRead(descriptor)
-        sr.readData(stream, useblocks=useblocks)
-        ds = sr.setInDocument(self.document)
-        errors = sr.getInvalidConversions()
-
+        op = operations.OperationDataImport(descriptor, datastr=string, useblocks=useblocks)
+        dsnames = self.document.applyOperation(op)
+        errors = op.simpleread.getInvalidConversions()
+            
         if self.verbose:
-            # FIXME: Broken below
-            #print "Imported datasets %s" % (' '.join(datasets),)
+            print "Imported datasets %s" % (' '.join(dsnames),)
             for name, num in errors.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
-        return (ds, errors)
+        return (dsnames, errors)
 
     def ImportString2D(self, datasetnames, string, xrange=None, yrange=None,
                        invertrows=None, invertcols=None, transpose=None):
@@ -296,26 +293,17 @@ class CommandInterface(qt.QObject):
          converting the data
         """
 
-        # if there's a link, set it up
-        if linked:
-            LF = datasets.LinkedFile(filename, descriptor, useblocks=useblocks)
-        else:
-            LF = None
-
-        f = open(filename, 'r')
-        stream = simpleread.FileStream(f)
-        sr = simpleread.SimpleRead(descriptor)
-        sr.readData(stream, useblocks=useblocks)
-        datasetnames = sr.setInDocument(self.document,
-                                        linkedfile=LF)
-        errors = sr.getInvalidConversions()
-
+        op = operations.OperationDataImport(descriptor, filename=filename,
+                                            useblocks=useblocks, linked=linked)
+        dsnames = self.document.applyOperation(op)
+        errors = op.simpleread.getInvalidConversions()
+            
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(datasetnames),)
+            print "Imported datasets %s" % (' '.join(dsnames),)
             for name, num in errors.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
-        return (datasetnames, errors)
+        return (dsnames, errors)
 
     def ImportFITSFile(self, dsname, filename, hdu,
                        datacol = None, symerrcol = None,
@@ -334,10 +322,11 @@ class CommandInterface(qt.QObject):
         linked specfies that the dataset is linked to the file
         """
 
-        self.document.importFITS(dsname, filename, hdu,
-                                 datacol=datacol, symerrcol=symerrcol,
-                                 poserrcol=poserrcol, negerrcol=negerrcol,
-                                 linked=linked)
+        op = operations.OperationDataImportFITS(dsname, filename, hdu,
+                                                datacol=datacol, symerrcol=symerrcol,
+                                                poserrcol=poserrcol, negerrcol=negerrcol,
+                                                linked=linked)
+        self.document.applyOperation(op)
 
     def ReloadData(self):
         """Reload any linked datasets.
