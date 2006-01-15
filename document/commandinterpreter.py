@@ -197,7 +197,8 @@ class CommandInterpreter:
         self.runFile(f)
         self.document.setModified()
         self.document.setModified(False)
-
+        self.document.clearHistory()
+        
     def runFile(self, fileobject):
         """ Run a file in the preserved environment."""
 

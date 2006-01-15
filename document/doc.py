@@ -49,8 +49,7 @@ class Document( qt.QObject ):
         qt.QObject.__init__( self )
 
         self.changeset = 0
-        self.historyundo = []
-        self.historyredo = []
+        self.clearHistory()
         self.wipe()
 
     def applyOperation(self, operation):
@@ -65,6 +64,12 @@ class Document( qt.QObject ):
         self.historyredo = []
         self.setModified()
         return retn
+
+    def clearHistory(self):
+        """Clear any history."""
+        
+        self.historyundo = []
+        self.historyredo = []
         
     def undoOperation(self):
         """Undo the previous operation."""
