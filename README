@@ -1,33 +1,31 @@
-Veusz 0.8
+Veusz 0.9
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
 
-Veusz is Copyright (C) 2003-2005 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
 Licenced under the GPL (version 2 or greater)
 
-Veusz is a scientific plotting package written in Python (currently
-100% Python). It uses PyQt for display and user-interfaces, and
-numarray for handling the numeric data. Veusz is designed to produce
-publication-ready Postscript output.
+Veusz is a scientific plotting package written in Python. It uses PyQt
+for display and user-interfaces, and numarray for handling the numeric
+data. Veusz is designed to produce publication-ready Postscript
+output.
 
 Veusz provides a GUI, command line and scripting interface (based on
 Python) to its plotting facilities. The plots are built using an
 object-based system to provide a consistent interface.
 
-Changes from 0.7:
+Changes from 0.8:
  Please refer to ChangeLog for all the changes.
  Highlights include:
-  * Datasets can be linked together with expressions
-  * SVG export
-  * Edit/Copy/Cut support of widgets
-  * Pan image with mouse
-  * Click on graph to change settings
-  * Lots of UI improvements
+  * Contour support (thanks to the code of the matplotlib guys!)
+  * Undo/redo
+  * Rubber band axis zooming
 
 Features of package:
  * X-Y plots (with errorbars)
+ * Contour plots
  * Images (with colour mappings)
  * Stepped plots (for histograms)
  * Line plots
@@ -45,7 +43,6 @@ Features of package:
  * Embed Veusz within other programs
 
 To be done:
- * Contour plots
  * UI improvements
  * Import filters (for qdp and other plotting packages, fits, csv)
 

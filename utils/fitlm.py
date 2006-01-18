@@ -25,8 +25,11 @@ Numerical fitting of functions to data.
 import sys
 
 import numarray as N
-import numarray.linear_algebra as NLA
 import numarray.ieeespecial as NIE
+try:
+    import numarray.linear_algebra as NLA
+except:
+    import scipy.linalg as NLA
 
 def fitLM(func, params, xvals, yvals, errors,
           stopdeltalambda = 1e-5,
