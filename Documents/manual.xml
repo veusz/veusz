@@ -595,6 +595,28 @@
       linkend="Command.ImportString">ImportString</link>
       commands.</para>
 
+      <para>Instead of specifying the descriptor in the import dialog,
+      the descriptor can be placed in the data file using a descriptor
+      statement on a separate line, consisting of "descriptor"
+      followed by the descriptor. Multiple descriptors can be placed
+      in a single file, for example:</para>
+	  <informalexample>
+	    <programlisting>
+# here is one section
+descriptor x,+- y,+,-
+1 0.5  2 0.1 -0.1
+2 0.3  4 0.2 -0.1
+
+# my next block
+descriptor alpha beta gamma
+1 2 3
+4 5 6
+7 8 9
+
+# etc...
+</programlisting>
+	  </informalexample>
+
       <para>If data are imported from a file, Veusz will normally save
       the data in its saved document format. If the data are changing,
       quite often one wants to reread the data from the input
