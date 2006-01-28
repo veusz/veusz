@@ -226,11 +226,14 @@ class Document( qt.QObject ):
         """Return whether modified flag set."""
         return self.modified
     
-    def printTo(self, printer, pages, scaling = 1.):
+    def printTo(self, printer, pages, scaling = 1., dpi = None):
         """Print onto printing device."""
 
         painter = widgets.Painter()
         painter.veusz_scaling = scaling
+        if dpi  != None:
+            painter.veusz_pixperpt = dpi / 72.
+        
         painter.begin( printer )
 
         # work out how many pixels correspond to the given size
@@ -252,9 +255,12 @@ class Document( qt.QObject ):
 
         painter.end()
 
-    def paintTo(self, painter, page):
+    def paintTo(self, painter, page, scaling = 1., dpi = None):
         """Paint page specified to the painter."""
         
+        painter.veusz_scaling = scaling
+        if dpi  != None:
+            painter.veusz_pixperpt = dpi / 72.
         width, height = self.basewidget.getSize(painter)
         self.basewidget.children[page].draw( (0, 0, width, height), painter)
 

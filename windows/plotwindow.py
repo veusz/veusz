@@ -156,6 +156,13 @@ class PlotWindow( qt.QScrollView ):
         self.zoomfactor = 1.
         self.pagenumber = 0
         self.forceupdate = False
+
+        # work out dpi
+        painter = qt.QPainter(self)
+        metrics = qt.QPaintDeviceMetrics(painter.device())
+        self.widgetdpi = metrics.logicalDpiY()
+
+        # convert size to pixels
         self.setOutputSize()
 
         # mode for clicking
@@ -359,11 +366,11 @@ class PlotWindow( qt.QScrollView ):
         # try to work out in which widget the first point is in
         bufferpixmap = qt.QPixmap( *self.size )
         painter = PointPainter(bufferpixmap, pt1.x(), pt1.y())
-        painter.veusz_scaling = self.zoomfactor
         pagenumber = min( self.document.getNumberPages() - 1,
                           self.pagenumber )
         if pagenumber >= 0:
-            self.document.paintTo(painter, self.pagenumber)
+            self.document.paintTo(painter, self.pagenumber,
+                                  scaling=self.zoomfactor, dpi=self.widgetdpi)
         painter.end()
 
         # get widget
@@ -465,12 +472,12 @@ class PlotWindow( qt.QScrollView ):
         # see which widgets change the region in the small box given below
         bufferpixmap = qt.QPixmap( *self.size )
         painter = ClickPainter(bufferpixmap, x-2, y-2, 5, 5)
-        painter.veusz_scaling = self.zoomfactor
 
         pagenumber = min( self.document.getNumberPages() - 1,
                           self.pagenumber )
         if pagenumber >= 0:
-            self.document.paintTo(painter, self.pagenumber)
+            self.document.paintTo(painter, self.pagenumber,
+                                  scaling=self.zoomfactor, dpi=self.widgetdpi)
         painter.end()
 
         widget = painter.getFoundWidget()
@@ -484,6 +491,7 @@ class PlotWindow( qt.QScrollView ):
         # convert distances into pixels
         painter = widgets.Painter(self)
         painter.veusz_scaling = self.zoomfactor
+        painter.veusz_pixperpt = self.widgetdpi / 72.
         size = self.document.basewidget.getSize(painter)
         painter.end()
 
@@ -551,7 +559,8 @@ class PlotWindow( qt.QScrollView ):
                 try:
                     self.document.printTo( self.bufferpixmap,
                                            [self.pagenumber],
-                                           self.zoomfactor )
+                                           scaling = self.zoomfactor,
+                                           dpi = self.widgetdpi )
                 except Exception:
                     dialogs.exceptiondialog.showException(sys.exc_info())
                     
@@ -726,11 +735,11 @@ class PlotWindow( qt.QScrollView ):
         # try to work out in which widget the first point is in
         bufferpixmap = qt.QPixmap( *self.size )
         painter = PointPainter(bufferpixmap, pt.x(), pt.y())
-        painter.veusz_scaling = self.zoomfactor
         pagenumber = min( self.document.getNumberPages() - 1,
                           self.pagenumber )
         if pagenumber >= 0:
-            self.document.paintTo(painter, self.pagenumber)
+            self.document.paintTo(painter, self.pagenumber,
+                                  scaling=self.zoomfactor, dpi=self.widgetdpi)
         painter.end()
 
         # get widget
