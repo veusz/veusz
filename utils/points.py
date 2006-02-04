@@ -47,6 +47,22 @@ def _plot_circle(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
+def _plot_ellipse_vert(painter, xpos, ypos, size):
+    """ (internal) function to plot a vertical ellipse marker
+    size is the radius of the ellipse on the long end
+    """
+
+    # qt uses a bounding rectangle, so we have to do this the hard way
+    painter.drawEllipse( xpos - size/2, ypos - size , size+1, size*2+1 )
+
+def _plot_ellipse_horz(painter, xpos, ypos, size):
+    """ (internal) function to plot a horizontal ellipse marker
+    size is the radius of the ellipse on the lon end
+    """
+
+    # qt uses a bounding rectangle, so we have to do this the hard way
+    painter.drawEllipse( xpos - size, ypos - size/2 , size*2+1, size+1 )
+
 def _plot_asterisk(painter, xpos, ypos, size):
     """ (internal) function to plot a *
     """
@@ -128,55 +144,38 @@ def _plot_arrow_down(painter, xpos, ypos, size):
     painter.drawLine(xpos, ypos, xpos-size, ypos-size)
     painter.drawLine(xpos, ypos, xpos+size, ypos-size)
 
-# list of markers to be automatically iterated through on new data
-AutoMarkers = [ 'X', '+', '*', 'O', 'Odot',
-                'box', 'boxdot', 'bullseye',
-                'triangle', 'triangledot',
-                '.' ]
+def _plot_limit_lower(painter, xpos, ypos, size):
+    """Plot lower limit."""
+    _plot_arrow_down(painter, xpos, ypos, size)
+    _plot_line_horz(painter, xpos, ypos, size)
 
-# where we are in the above list
-_automarker = 0
+def _plot_limit_upper(painter, xpos, ypos, size):
+    """Plot upper limit."""
+    _plot_arrow_up(painter, xpos, ypos, size)
+    _plot_line_horz(painter, xpos, ypos, size)
+    
+def _plot_limit_left(painter, xpos, ypos, size):
+    """Plot left limit."""
+    _plot_arrow_left(painter, xpos, ypos, size)
+    _plot_line_vert(painter, xpos, ypos, size)
 
-# default colours
-AutoColors = [ 'black', 'red', 'blue', 'green', 'magenta',
-               'cyan', 'DarkRed', 'DarkBlue', 'DarkGreen',
-               'DarkMagenta', 'DarkCyan', 'purple' ]
-
-_autocolor = 0
-
-def getAutoColor():
-    """ Get the next available colour."""
-    global _autocolor
-    return AutoColors[_autocolor]
-
-def getAutoMarker():
-    """ Get the next automatic marker."""
-    global _automarker
-    return AutoMarkers[_automarker]
-
-def nextAutos():
-    """ Move to the next colour and marker."""
-    global _autocolor
-    global _automarker
-
-    _autocolor += 1
-    if _autocolor == len(AutoColors):
-        _autocolor = 0
-
-    _automarker += 1
-    if _automarker == len(AutoMarkers):
-        _automarker = 0
-
-
+def _plot_limit_right(painter, xpos, ypos, size):
+    """Plot right limit."""
+    _plot_arrow_right(painter, xpos, ypos, size)
+    _plot_line_vert(painter, xpos, ypos, size)
+    
 MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'diamond', 'square', 'barhorz', 'barvert',
                 'octogon', 'pentagon', 'tievert', 'tiehorz',
                 'triangle', 'triangledown',
-                'dot', 'circledot', 'bullseye', 'asterisk',
+                'dot', 'circledot', 'bullseye',
+                'ellipsehorz', 'ellipsevert',
+                'asterisk',
                 'lineplus', 'linecross',
                 'linevert', 'linehorz',
                 'arrowleft', 'arrowright', 'arrowup',
-                'arrowdown' )
+                'arrowdown',
+                'limitupper', 'limitlower', 'limitleft', 'limitright')
 
 # functions to call for special shapes
 _MarkerLookup = { 'none': _plot_none,
@@ -184,6 +183,8 @@ _MarkerLookup = { 'none': _plot_none,
                   'dot': _plot_dot,
                   'circledot': _plot_circle_dot,
                   'bullseye': _plot_bullseye,
+                  'ellipsehorz': _plot_ellipse_horz,
+                  'ellipsevert': _plot_ellipse_vert,
                   'asterisk': _plot_asterisk,
                   'lineplus': _plot_line_plus,
                   'linecross': _plot_line_cross,
@@ -192,7 +193,11 @@ _MarkerLookup = { 'none': _plot_none,
                   'arrowleft': _plot_arrow_left,
                   'arrowright': _plot_arrow_right,
                   'arrowup': _plot_arrow_up,
-                  'arrowdown': _plot_arrow_down
+                  'arrowdown': _plot_arrow_down,
+                  'limitupper': _plot_limit_upper,
+                  'limitlower': _plot_limit_lower,
+                  'limitleft': _plot_limit_left,
+                  'limitright': _plot_limit_right
                   }
 
 # X and Y pts for corners of polygons
