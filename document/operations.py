@@ -882,6 +882,10 @@ class OperationMultiple:
         self.operations = operations
         self.descr = descr
         
+    def addOperation(self, op):
+        """Add an operation to the list of operations."""
+        self.operations.append(op)
+        
     def do(self, document):
         """Do the multiple operations."""
         for op in self.operations:

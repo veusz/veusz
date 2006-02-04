@@ -701,10 +701,11 @@ class TreeEditWindow(qt.QDockWindow):
 
         self.makeWidget(widgettype)
 
-    def makeWidget(self, widgettype, autoadd=True):
+    def makeWidget(self, widgettype, autoadd=True, name=None):
         """Called when an add widget button is clicked.
         widgettype is the type of widget
         autoadd specifies whether to add default children
+        if name is set this name is used if possible (ie no other children have it)
         """
 
         # if no widget selected, bomb out
@@ -714,8 +715,12 @@ class TreeEditWindow(qt.QDockWindow):
 
         assert parent != None
 
+        if name in parent.childnames:
+            name = None
+        
         # make the new widget and update the document
-        w = self.document.applyOperation( document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd) )
+        w = self.document.applyOperation( document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
+                                                                      name=name) )
 
         # select the widget
         self.selectWidget(w)
@@ -779,7 +784,8 @@ class TreeEditWindow(qt.QDockWindow):
         if widget:
             clipboardData = qt.QStoredDrag(self.widgetmime)
             data = str('\n'.join((widget.typename,
-                                  widget.getSaveText())))
+                widget.name,
+                widget.getSaveText())))
             clipboardData.setEncodedData(data)
             return clipboardData
         else:
@@ -805,9 +811,17 @@ class TreeEditWindow(qt.QDockWindow):
         if data:
             # The first line of the clipboard data is the widget type
             widgettype = data[0]
+            # The second is the original name
+            widgetname = data[1]
 
+            # make the document enter batch mode
+            # This is so that the user can undo this in one step
+            op = document.OperationMultiple([], descr='paste')
+            self.document.applyOperation(op)
+            self.document.batchHistory(True)
+            
             # Add the first widget being pasted
-            self.makeWidget(widgettype, autoadd=False)
+            self.makeWidget(widgettype, autoadd=False, name=widgetname)
             
             interpreter = self.parent.interpreter
         
@@ -816,11 +830,15 @@ class TreeEditWindow(qt.QDockWindow):
             interpreter.interface.currentwidget = self.itemselected.widget
 
             # Use the command interface to create the subwidgets
-            for command in data[1:]:
+            for command in data[2:]:
                 interpreter.run(command)
+                
+            # stop the history batching
+            self.document.batchHistory(False)
+                
             # reset the interpreter widget
             interpreter.interface.currentwidget = tmpCurrentwidget
-        
+            
     def slotWidgetDelete(self, a):
         """Delete the widget selected."""
 

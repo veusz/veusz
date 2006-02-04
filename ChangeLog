@@ -1,5 +1,7 @@
 * 2006-02-04 Jeremy Sanders <jeremy@jeremysanders.net>
   - Add a few more plot symbols
+  - Make Paste undoable
+  - Paste preserves widget name if possible
 	
 * 2006-02-02 Jeremy Sanders <jeremy@jeremysanders.net>
   - Add upside down triangle plot symbol
