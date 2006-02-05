@@ -305,6 +305,24 @@ class CommandInterface(qt.QObject):
 
         return (dsnames, errors)
 
+    def ImportFileCSV(self, filename, readrows=False, prefix=None,
+                      linked=False):
+        """Read data from a comma separated file (CSV).
+
+        Data are read from filename
+        If readrows is True, then data are read across rather than down
+        Variable names are prepended with prefix if set
+        If linked is True the data are linked with the file."""
+
+        op = operations.OperationDataImportCSV(filename, readrows=readrows,
+                                               prefix=prefix, linked=linked)
+        dsnames = self.document.applyOperation(op)
+            
+        if self.verbose:
+            print "Imported datasets %s" % (' '.join(dsnames),)
+
+        return dsnames
+
     def ImportFITSFile(self, dsname, filename, hdu,
                        datacol = None, symerrcol = None,
                        poserrcol = None, negerrcol = None,

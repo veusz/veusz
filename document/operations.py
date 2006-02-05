@@ -38,6 +38,7 @@ import utils
 import datasets
 import widgets
 import simpleread
+import readcsv
     
 ###############################################################################
 # Setting operations
@@ -605,6 +606,51 @@ class OperationDataImport:
         names = self.simpleread.setInDocument(document, linkedfile=LF)
         return names
         
+    def undo(self, document):
+        """Undo import."""
+        
+        # restore old datasets
+        document.data = self.olddatasets
+
+class OperationDataImportCSV:
+    """Import data from a CSV file."""
+
+    descr = 'import CSV data'
+
+    def __init__(self, filename, readrows=False, prefix=None, linked=False):
+        """Import CSV data from filename
+
+        If readrows, then read in rows rather than columns.
+        Prefix is appended to each dataset name.
+        Data are linked to file if linked is True.
+        """
+
+        self.filename = filename
+        self.readrows = readrows
+        self.prefix = prefix
+        self.linked = linked
+
+    def do(self, document):
+        """Do the data import."""
+        
+        csvr = readcsv.ReadCSV(self.filename, readrows=self.readrows,
+                               prefix=self.prefix)
+        csvr.readData()
+
+        if self.linked:
+            LF = datasets.LinkedCSVFile(self.filename, readrows=self.readrows,
+                                        prefix=self.prefix)
+        else:
+            LF = None
+
+        # backup datasets in document for undo
+        # this has possible space issues!
+        self.olddatasets = dict(document.data)
+        
+        # set the data
+        names = csvr.setData(document, linkedfile=LF)
+        return names
+
     def undo(self, document):
         """Undo import."""
         

@@ -28,8 +28,9 @@ import numarray as N
 import doc
 import simpleread
 import operations
+import readcsv
 
-def _cnvt_numarray(a):
+def _convertNumarray(a):
     """Convert to a numarray if possible (doing copy)."""
     if a == None:
         return None
@@ -38,7 +39,39 @@ def _cnvt_numarray(a):
     else:
         return a.astype(N.Float64)
 
-class LinkedFile:
+class LinkedFileBase(object):
+    """A base class for linked files containing common routines."""
+
+    def saveToFile(self, file):
+        '''Save the link to the document file.'''
+        pass
+
+    def reloadLinks(self, document):
+        '''Reload datasets linked to this file.'''
+        pass
+
+    def _deleteLinkedDatasets(self, document):
+        """Delete linked datasets from document linking to self."""
+
+        for name, ds in document.data.items():
+            if ds.linked == self:
+                del document.data[name]
+
+    def _moveReadDatasets(self, tempdoc, document):
+        """Move datasets from tempdoc to document if they do not exist
+        in the destination."""
+
+        read = []
+        for name, ds in tempdoc.data.items():
+            if name not in document.data:
+                read.append(name)
+                document.data[name] = ds
+                ds.document = document
+                ds.linked = self
+        document.setModified(True)
+        return read
+
+class LinkedFile(LinkedFileBase):
     '''Instead of reading data from a string, data can be read from
     a "linked file". This means the same document can be reloaded, and
     the data would be reread from the file.
@@ -83,20 +116,14 @@ class LinkedFile:
 
         errors = sr.getInvalidConversions()
 
-        # move new datasets in if they are linked to us
-        read = []
-        for name, ds in tempdoc.data.items():
-            if name in document.data and document.data[name].linked == self:
-                read.append(name)
-                document.data[name] = ds
-                ds.document = document
-        document.setModified(True)
+        self._deleteLinkedDatasets(document)
+        read = self._moveReadDatasets(tempdoc, document)
 
         # returns list of datasets read, and a dict of variables with number
         # of errors
         return (read, errors)
 
-class Linked2DFile:
+class Linked2DFile(LinkedFileBase):
     '''Class representing a file linked to a 2d dataset.'''
 
     def __init__(self, filename, datasets):
@@ -142,21 +169,15 @@ class Linked2DFile:
                 errors[i] = 1
             return ([], errors)
 
-        # move new datasets in if they are linked to us
-        read = []
-        errors = {}
-        for name, ds in tempdoc.data.items():
-            if name in document.data and document.data[name].linked == self:
-                read.append(name)
-                errors[name] = 0
-                ds.linked = self
-                document.data[name] = ds
-                ds.document = document
-        document.setModified(True)
+        self._deleteLinkedDatasets(document)
+        read = self._moveReadDatasets(tempdoc, document)
+
+        # zero errors
+        errors = dict( [(ds, 0) for ds in read] )
 
         return (read, errors)
 
-class LinkedFITSFile:
+class LinkedFITSFile(LinkedFileBase):
     """Links a FITS file to the data."""
     
     def __init__(self, dsname, filename, hdu, columns):
@@ -202,6 +223,56 @@ class LinkedFITSFile:
         
         return ([self.dsname], {self.dsname: 0})
 
+class LinkedCSVFile(LinkedFileBase):
+    """A CSV file linked to datasets."""
+
+    def __init__(self, filename, readrows=False, prefix=None):
+        """Read CSV data from filename
+
+        Read across rather than down if readrows
+        Prepend prefix to dataset names if set.
+        """
+
+        self.filename = filename
+        self.readrows = readrows
+        self.prefix = prefix
+
+    def saveToFile(self, file):
+        """Save the link to the document file."""
+
+        params = [repr(self.filename),
+                  'linked=True']
+        if self.prefix:
+            params.append('prefix=%s' % repr(self.prefix))
+        if self.readrows:
+            params.append('readrows=True')
+
+        file.write('ImportFileCSV(%s)\n' % (', '.join(params)))
+        
+    def reloadLinks(self, document):
+        """Reload any linked data from the CSV file."""
+
+        # again, this is messy as we have to make sure we don't
+        # overwrite any non-linked data
+
+        tempdoc = doc.Document()
+        csv = readcsv.ReadCSV(self.filename, readrows=self.readrows,
+                              prefix=self.prefix)
+        csv.readData()
+        csv.setData(tempdoc, linkedfile=self)
+
+        self._deleteLinkedDatasets(document)
+        read = self._moveReadDatasets(tempdoc, document)
+
+        # zero errors
+        errors = dict( [(ds, 0) for ds in read] )
+
+        return (read, errors)
+        
+class DatasetException(Exception):
+    """Raised with dataset errors."""
+    pass
+
 class DatasetBase(object):
     """A base dataset class."""
 
@@ -236,7 +307,7 @@ class Dataset2D(DatasetBase):
 
         self.document = None
         self.linked = None
-        self.data = _cnvt_numarray(data)
+        self.data = _convertNumarray(data)
 
         self.xrange = xrange
         self.yrange = yrange
@@ -282,24 +353,17 @@ class Dataset(DatasetBase):
         '''
         
         self.document = None
-        self.data = _cnvt_numarray(data)
-        self.serr = self.nerr = self.perr = None
-
-        # adding data*0 ensures types of errors are the same
-        if self.data != None:
-            if serr != None:
-                self.serr = serr + self.data*0.
-            if nerr != None:
-                self.nerr = nerr + self.data*0.
-            if perr != None:
-                self.perr = perr + self.data*0.
-
+        self.data = _convertNumarray(data)
+        self.serr = _convertNumarray(serr)
+        self.perr = _convertNumarray(perr)
+        self.nerr = _convertNumarray(nerr)
         self.linked = linked
 
         # check the sizes of things match up
         s = self.data.shape
         for i in (self.serr, self.nerr, self.perr):
-            assert i == None or i.shape == s
+            if i != None and i.shape != s:
+                raise DatasetException('Lengths of error data do not match data')
 
     def duplicate(self):
         """Return new dataset based on this one."""
@@ -392,7 +456,7 @@ class Dataset(DatasetBase):
 
         file.write( "''')\n" )
 
-class DatasetExpressionException(Exception):
+class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
     pass
 
