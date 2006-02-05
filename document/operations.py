@@ -509,10 +509,12 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         OperationDatasetCreate.__init__(self, datasetname)
         self.parts = parts
         self.link = link
-        
-    def do(self, document):
-        """Create the dataset."""
-        
+
+    def validateExpression(self, document):
+        """Validate the expression is okay.
+        A CreateDatasetException is raised if not
+        """
+
         try:
             ds = datasets.DatasetExpression(**self.parts)
             ds.document = document
@@ -524,6 +526,13 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
             
         except datasets.DatasetExpressionException, e:
             raise CreateDatasetException(str(e))
+
+        
+    def do(self, document):
+        """Create the dataset."""
+        
+        ds = datasets.DatasetExpression(**self.parts)
+        ds.document = document
 
         if not self.link:
             # copy these values if we don't want to link

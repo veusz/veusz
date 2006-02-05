@@ -1,3 +1,6 @@
+* 2006-02-05 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Fixed bug where linked datasets may not work in saved files
+	
 * 2006-02-04 Jeremy Sanders <jeremy@jeremysanders.net>
   - Add a few more plot symbols
   - Make Paste undoable

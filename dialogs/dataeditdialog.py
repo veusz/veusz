@@ -381,6 +381,7 @@ class DatasetNewDialog(qt.QDialog):
 
         link = self.linkbutton.isChecked()
         op = document.OperationDatasetCreateExpression(name, vals, link)
+        op.validateExpression(self.document)
         self.document.applyOperation(op)
 
 class _DataEditTable(qttable.QTable):
