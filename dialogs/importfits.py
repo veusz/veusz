@@ -57,7 +57,9 @@ class ImportFITS(qt.QDialog):
         # if pyfits is not installed
         if pyfits == None:
             l = qt.QLabel('FITS file support requires that pyfits is placed'
-                          ' in the PYTHONPATH. Please download from blah...',
+                          ' in the PYTHONPATH or the Veusz directory.'
+                          ' Please download from'
+                          ' http://www.stsci.edu/resources/software_hardware/pyfits',
                           self)
             l.setAlignment( l.alignment() | qt.Qt.WordBreak )
             layout.addWidget(l)
