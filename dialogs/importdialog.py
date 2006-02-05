@@ -186,6 +186,14 @@ e.g.\tz\t[z with no errors - 1 column for dataset]
 \tx y,+-\t[x with no errors, y with symmetric errors - 3 columns in total]
 '''
 
+_importcsvhelp='''
+Comma Separated Value (CSV) files are often used to export data from applications such as Excel and OpenOffice. Veusz can read data from these files. At the top of each column of data, a dataset name can be given for the data below. Multiple datasets can be placed below each other if new names are given.
+
+To import error bars, columns with the names "+", "-" or "+-" should be given in columns immediately to the right of the dataset, for positive, negative or symmetric errors.
+
+Veusz can also read data organised in rows rather than columns.
+'''
+
 class ImportDialog(ImportDialogBase):
     """1D data import dialog.
 
@@ -199,8 +207,19 @@ class ImportDialog(ImportDialogBase):
         ImportDialogBase.__init__(self, parent, document)
         self.setCaption('Import data - Veusz')
 
+        self.methodtab = qt.QTabWidget(self.widgetspace)
+        self._addStandardTab()
+        self._addCSVTab()
+
+    def _addStandardTab(self):
+        """Create tab for standard Veusz import."""
+
+        tabbed = qt.QVBox(self.methodtab)
+        tabbed.setSpacing(self.spacing)
+        tabbed.setMargin(self.spacing)
+
         # edit the descriptor
-        dhbox = qt.QHBox(self.widgetspace)
+        dhbox = qt.QHBox(tabbed)
         dhbox.setSpacing(self.spacing)
         l = qt.QLabel('&Descriptor:', dhbox)
         self.descriptoredit = qt.QLineEdit(dhbox)
@@ -210,20 +229,124 @@ class ImportDialog(ImportDialogBase):
                         'e.g. "x y" or "a[:]"')
         
         # help for user
-        l = qt.QLabel(_import1dhelp.strip(), self.widgetspace)
+        l = qt.QLabel(_import1dhelp.strip(), tabbed)
         l.setAlignment( l.alignment() | qt.Qt.WordBreak )
         
         self.blockcheck = qt.QCheckBox('Read data in bloc&ks',
-                                       self.widgetspace)
+                                       tabbed)
         qt.QToolTip.add(self.blockcheck,
                         'If this is selected, blank lines or the word\n'
                         '"no" are used to separate the file into blocks.\n'
                         'An underscore followed by the block number is\n'
                         'added to the dataset names')
 
+        self.methodtab.addTab(tabbed, 'Standard')
+
+    def _addCSVTab(self):
+        """Create tab for CSV import."""
+
+        tabbed = qt.QVBox(self.methodtab)
+        tabbed.setSpacing(self.spacing)
+        tabbed.setMargin(self.spacing)
+
+        grd = qt.QGrid(2, tabbed)
+        grd.setSpacing(self.spacing)
+        l = qt.QLabel('&Direction:', grd)
+        self.dirncombo = qt.QComboBox(False, grd)
+        l.setBuddy(self.dirncombo)
+        self.dirncombo.insertStrList(['Columns', 'Rows'])
+        qt.QToolTip.add(self.dirncombo,
+                        'The direction the data are organised in.')
+
+        l = qt.QLabel('&Prefix:', grd)
+        self.prefixedit = qt.QLineEdit(grd)
+        l.setBuddy(self.prefixedit)
+        qt.QToolTip.add(self.prefixedit,
+                        'This prefix is prepended to the name of each \n'
+                        'dataset imported from the file. This is useful \n'
+                        'to make the names unique.')
+
+        # help for user
+        l = qt.QLabel(_importcsvhelp.strip(), tabbed)
+        l.setAlignment( l.alignment() | qt.Qt.WordBreak )
+
+        self.methodtab.addTab(tabbed, 'CSV')
+
     def slotImport(self):
         """Do the importing"""
+
+        tabindex = self.methodtab.currentPageIndex()
+
+        if tabindex == 0:
+            # standard Veusz import
+            self.importStandard()
+        elif tabindex == 1:
+            self.importCSV()
+        else:
+            assert False
+
+    def _retnDatasetInfo(self, dsnames):
+        """Return a list of information for the dataset names given."""
         
+        lines = []
+        lines.append('Imported data for datasets:')
+        dsnames.sort()
+        for name in dsnames:
+            ds = self.document.getData(name)
+            # build up description
+            descr = [name]
+            if ds.serr != None:
+                descr.append('+-')
+            if ds.perr != None:
+                descr.append('+')
+            if ds.nerr != None:
+                descr.append('-')
+            descr = ','.join(descr)
+            lines.append(' %s (%i items)' % (descr, ds.data.shape[0]))
+
+        linked = self.linkcheck.isChecked()
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+
+        # whether the data were linked
+        if linked:
+            lines.append('')
+            lines.append('Datasets were linked to file "%s"' % filename)
+
+        return lines
+
+    def importCSV(self):
+        """Import from CSV file."""
+
+        # get various values
+        inrows = self.dirncombo.currentItem() == 1
+        prefix = unicode( self.prefixedit.text() )
+        if len(prefix.strip()) == 0:
+            prefix = None
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+        linked = self.linkcheck.isChecked()
+
+        op = document.OperationDataImportCSV(filename, readrows=inrows,
+                                             prefix=prefix, linked=linked)
+        
+        # show a busy cursor
+        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+
+        # actually import the data
+        dsnames = self.document.applyOperation(op)
+        
+        # restore the cursor
+        qt.QApplication.restoreOverrideCursor()
+
+        # what datasets were imported
+        lines = self._retnDatasetInfo(dsnames)
+
+        self.previewedit.setText( '\n'.join(lines) )
+
+    def importStandard(self):
+        """Standard Veusz importing."""
+
         # convert controls to values
         descriptor = unicode( self.descriptoredit.text() )
         filename = unicode( self.filenameedit.text() )
@@ -267,26 +390,7 @@ class ImportDialog(ImportDialogBase):
         if len(lines) != 0:
             lines.append('')
             
-        # what datasets were imported
-        lines.append('Imported data for datasets:')
-        dsnames.sort()
-        for name in dsnames:
-            ds = self.document.getData(name)
-            # build up description
-            descr = [name]
-            if ds.serr != None:
-                descr.append('+-')
-            if ds.perr != None:
-                descr.append('+')
-            if ds.nerr != None:
-                descr.append('-')
-            descr = ','.join(descr)
-            lines.append(' %s (%i items)' % (descr, ds.data.shape[0]))
-
-        # whether the data were linked
-        if linked:
-            lines.append('')
-            lines.append('Datasets were linked to file "%s"' % filename)
+        lines += self._retnDatasetInfo(dsnames)
 
         self.previewedit.setText( '\n'.join(lines) )
 

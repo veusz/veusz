@@ -4,6 +4,7 @@
   - Reorganising some of the Dataset/LinkedFile code
   - Backend CSV importing done
   - Added ImportFileCSV command
+  - Added CSV tab to import dialog
 	
 * 2006-02-04 Jeremy Sanders <jeremy@jeremysanders.net>
   - Add a few more plot symbols
