@@ -94,10 +94,10 @@ class Key(widget.Widget):
 
         # total size of box
         symbolwidth = s.get('keyLength').convert(painter)
-        totalwidth = maxwidth + 2*height + symbolwidth
+        totalwidth = maxwidth + height + symbolwidth
         totalheight = (number+1)*height
         if not s.Border.hide:
-            totalwidth += height
+            totalwidth += height*2
 
         # work out horizontal position
         h = s.horzPosn
@@ -129,6 +129,9 @@ class Key(widget.Widget):
             y = int( parentposn[3] -
                      (parentposn[3]-parentposn[1])*s.vertManual - totalheight)
 
+        # position of text in x
+        symbxpos = x
+
         # draw surrounding box
         if not s.Background.hide:
             brush = s.get('Background').makeQBrush()
@@ -136,6 +139,7 @@ class Key(widget.Widget):
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
             painter.drawRect(x, y, totalwidth, totalheight)
+            symbxpos += height
 
         textpen = s.get('Text').makeQPen()
 
@@ -145,7 +149,7 @@ class Key(widget.Widget):
             if c.settings.isSetting('key') and c.settings.key != '':
                 # plot key symbol
                 painter.save()
-                c.drawKeySymbol(painter, x+height, ypos,
+                c.drawKeySymbol(painter, symbxpos, ypos,
                                 symbolwidth, height)
                 painter.restore()
                 
@@ -153,7 +157,7 @@ class Key(widget.Widget):
                 if showtext:
                     painter.setPen(textpen)
                     utils.Renderer(painter, font,
-                                   x+height*2 + symbolwidth,
+                                   symbxpos + height + symbolwidth,
                                    ypos + height/2, c.settings.key,
                                    -1, 0).render()
 
