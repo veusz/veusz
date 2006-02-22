@@ -119,30 +119,70 @@ def _plot_line_vert(painter, xpos, ypos, size):
 def _plot_arrow_left(painter, xpos, ypos, size):
     """ (internal) function to plot a left arrow
     """
-    painter.drawLine(xpos, ypos, xpos+size*2, ypos)
-    painter.drawLine(xpos, ypos, xpos+size, ypos+size)
-    painter.drawLine(xpos, ypos, xpos+size, ypos-size)
+    painter.drawPolyline( qt.QPointArray([xpos+size, ypos-size,
+                                          xpos, ypos,
+                                          xpos+size, ypos+size]) )
+    painter.drawLine(xpos+size*2, ypos, xpos, ypos)
+
+def _plot_arrow_left_away(painter, xpos, ypos, size):
+    """ (internal) function to plot a left arrow from the point
+    """
+    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
+                                          xpos-2*size, ypos,
+                                          xpos-size, ypos+size]) )
+    painter.drawLine(xpos-size*2, ypos, xpos, ypos)
 
 def _plot_arrow_right(painter, xpos, ypos, size):
     """ (internal) function to plot a right arrow
     """
-    painter.drawLine(xpos, ypos, xpos-size*2, ypos)
-    painter.drawLine(xpos, ypos, xpos-size, ypos+size)
-    painter.drawLine(xpos, ypos, xpos-size, ypos-size)
+    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
+                                          xpos, ypos,
+                                          xpos-size, ypos+size]) )
+    painter.drawLine(xpos-size*2, ypos, xpos, ypos)
+
+def _plot_arrow_right_away(painter, xpos, ypos, size):
+    """ (internal) function to plot a right arrow from the point
+    """
+    painter.drawPolyline( qt.QPointArray([xpos+size, ypos-size,
+                                          xpos+2*size, ypos,
+                                          xpos+size, ypos+size]) )
+    painter.drawLine(xpos+size*2, ypos, xpos, ypos)
 
 def _plot_arrow_up(painter, xpos, ypos, size):
     """ (internal) function to plot an up arrow
     """
-    painter.drawLine(xpos, ypos, xpos, ypos+size*2)
-    painter.drawLine(xpos, ypos, xpos-size, ypos+size)
-    painter.drawLine(xpos, ypos, xpos+size, ypos+size)
 
+    painter.drawPolyline( qt.QPointArray([xpos-size, ypos+size,
+                                          xpos, ypos,
+                                          xpos+size, ypos+size]) )
+    painter.drawLine(xpos, ypos+size*2, xpos, ypos)
+
+def _plot_arrow_up_away(painter, xpos, ypos, size):
+    """ (internal) function to plot an up arrow from the point
+    """
+
+    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
+                                          xpos, ypos-size*2,
+                                          xpos+size, ypos-size]) )
+    painter.drawLine(xpos, ypos, xpos, ypos-size*2)
+    
 def _plot_arrow_down(painter, xpos, ypos, size):
     """ (internal) function to plot a down arrow
     """
-    painter.drawLine(xpos, ypos, xpos, ypos-size*2)
-    painter.drawLine(xpos, ypos, xpos-size, ypos-size)
-    painter.drawLine(xpos, ypos, xpos+size, ypos-size)
+
+    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
+                                          xpos, ypos,
+                                          xpos+size, ypos-size]) )
+    painter.drawLine(xpos, ypos-size*2, xpos, ypos)
+
+def _plot_arrow_down_away(painter, xpos, ypos, size):
+    """ (internal) function to plot a down arrow from the point
+    """
+
+    painter.drawPolyline( qt.QPointArray([xpos-size, ypos+size,
+                                          xpos, ypos+size*2,
+                                          xpos+size, ypos+size]) )
+    painter.drawLine(xpos, ypos, xpos, ypos+size*2)
 
 def _plot_limit_lower(painter, xpos, ypos, size):
     """Plot lower limit."""
@@ -175,6 +215,8 @@ MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'linevert', 'linehorz',
                 'arrowleft', 'arrowright', 'arrowup',
                 'arrowdown',
+                'arrowleftaway', 'arrowrightaway',
+                'arrowupaway', 'arrowdownaway',
                 'limitupper', 'limitlower', 'limitleft', 'limitright')
 
 # functions to call for special shapes
@@ -194,6 +236,10 @@ _MarkerLookup = { 'none': _plot_none,
                   'arrowright': _plot_arrow_right,
                   'arrowup': _plot_arrow_up,
                   'arrowdown': _plot_arrow_down,
+                  'arrowleftaway': _plot_arrow_left_away,
+                  'arrowrightaway': _plot_arrow_right_away,
+                  'arrowupaway': _plot_arrow_up_away,
+                  'arrowdownaway': _plot_arrow_down_away,
                   'limitupper': _plot_limit_upper,
                   'limitlower': _plot_limit_lower,
                   'limitleft': _plot_limit_left,

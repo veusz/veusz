@@ -1,3 +1,7 @@
+* 2006-02-22 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Improved arrow symbol shapes
+  - Added arrows pointing away from the point
+	
 * 2006-02-13 Jeremy Sanders <jeremy@jeremysanders.net>
   - Fixed problem reloading data files with blocks
 	
