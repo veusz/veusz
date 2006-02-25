@@ -217,5 +217,5 @@ def plotMarkers(painter, xpos, ypos, markername, markersize):
         return
     else:
         fn = _MarkerLookup[markername]
-        for x, y in zip(xpos, ypos):
+        for x, y in itertools.izip(xpos, ypos):
             fn(painter, x, y, markersize)
