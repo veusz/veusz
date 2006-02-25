@@ -25,12 +25,12 @@ import itertools
 import qt
 import numarray as N
 
-def _plot_none(painter, xpos, ypos, size):
+def _plotNone(painter, xpos, ypos, size):
     """ (internal) function plot nothing!
     """
     pass
 
-def _plot_dot(painter, xpos, ypos, size):
+def _plotDot(painter, xpos, ypos, size):
     """ (internal) function to plot a dot
     """
 
@@ -39,7 +39,7 @@ def _plot_dot(painter, xpos, ypos, size):
     w = painter.pen().width() / 2
     painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
 
-def _plot_circle(painter, xpos, ypos, size):
+def _plotCircle(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker
     size is the radius of the circle
     """
@@ -47,7 +47,7 @@ def _plot_circle(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
-def _plot_ellipse_vert(painter, xpos, ypos, size):
+def _plotEllipseVert(painter, xpos, ypos, size):
     """ (internal) function to plot a vertical ellipse marker
     size is the radius of the ellipse on the long end
     """
@@ -55,7 +55,7 @@ def _plot_ellipse_vert(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size/2, ypos - size , size+1, size*2+1 )
 
-def _plot_ellipse_horz(painter, xpos, ypos, size):
+def _plotEllipseHorz(painter, xpos, ypos, size):
     """ (internal) function to plot a horizontal ellipse marker
     size is the radius of the ellipse on the lon end
     """
@@ -63,7 +63,7 @@ def _plot_ellipse_horz(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size/2 , size*2+1, size+1 )
 
-def _plot_circle_dot(painter, xpos, ypos, size):
+def _plotCircleDot(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker with dot at core
     size is the radius of the circle
     """
@@ -73,7 +73,7 @@ def _plot_circle_dot(painter, xpos, ypos, size):
     w = painter.pen().width() / 2
     painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
 
-def _plot_bullseye(painter, xpos, ypos, size):
+def _plotBullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
     size is radius
     """
@@ -81,7 +81,17 @@ def _plot_bullseye(painter, xpos, ypos, size):
     painter.drawEllipse( xpos - size, ypos - size, size*2+1, size*2+1 )
     painter.drawEllipse( xpos - size/2, ypos - size/2, size+1, size+1 )
 
-_LineSymbols = {
+# functions to call for special shapes
+_markerlookup = { 'none': _plotNone,
+                  'circle': _plotCircle,
+                  'dot': _plotDot,
+                  'circledot': _plotCircleDot,
+                  'bullseye': _plotBullseye,
+                  'ellipsehorz': _plotEllipseHorz,
+                  'ellipsevert': _plotEllipseVert
+                  }
+
+_linesymbols = {
     'asterisk': ( (-0.707, -0.707, 0.707,  0.707),
                   (-0.707,  0.707, 0.707, -0.707),
                   (-1, 0, 1, 0), (0, -1, 0, 1) ),
@@ -109,7 +119,7 @@ def _plotLineSymbols(painter, name, xpos, ypos, size):
 
     # make a set of point arrays for each plotted symbol
     ptarrays = []
-    for lines in _LineSymbols[name]:
+    for lines in _linesymbols[name]:
         pgn = (N.array(lines, N.Float32)*size).astype(N.Int32)
         pa = qt.QPointArray( pgn.flat.tolist() )
         ptarrays.append(pa)
@@ -123,34 +133,8 @@ def _plotLineSymbols(painter, name, xpos, ypos, size):
         xlast = x
         ylast = y
     
-MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
-                'diamond', 'square', 'barhorz', 'barvert',
-                'octogon', 'pentagon', 'tievert', 'tiehorz',
-                'triangle', 'triangledown',
-                'dot', 'circledot', 'bullseye',
-                'ellipsehorz', 'ellipsevert',
-                'lozengehorz', 'lozengevert',
-                'asterisk',
-                'lineplus', 'linecross',
-                'linevert', 'linehorz',
-                'arrowleft', 'arrowright', 'arrowup',
-                'arrowdown',
-                'arrowleftaway', 'arrowrightaway',
-                'arrowupaway', 'arrowdownaway',
-                'limitupper', 'limitlower', 'limitleft', 'limitright')
-
-# functions to call for special shapes
-_MarkerLookup = { 'none': _plot_none,
-                  'circle': _plot_circle,
-                  'dot': _plot_dot,
-                  'circledot': _plot_circle_dot,
-                  'bullseye': _plot_bullseye,
-                  'ellipsehorz': _plot_ellipse_horz,
-                  'ellipsevert': _plot_ellipse_vert
-                  }
-
 # X and Y pts for corners of polygons
-_Polygons = {
+_polygons = {
     'square': ( (-1, -1), (1, -1), (1, 1), (-1, 1) ),
     # make the diamond the same area as the square
     'diamond': ( (0., 1.414), (1.414, 0.), (0., -1.414), (-1.414, 0.) ),
@@ -183,7 +167,7 @@ def _plotPolygons(painter, name, xpos, ypos, size):
     '''Plots shapes which are polygons'''
 
     # make a polygon of the correct size
-    pgn = (N.array(_Polygons[name], N.Float32) * size).astype(N.Int32)
+    pgn = (N.array(_polygons[name], N.Float32) * size).astype(N.Int32)
     pa = qt.QPointArray( pgn.flat.tolist() )
 
     xlast = 0
@@ -194,28 +178,44 @@ def _plotPolygons(painter, name, xpos, ypos, size):
         xlast = x
         ylast = y
 
+MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
+                'diamond', 'square', 'barhorz', 'barvert',
+                'octogon', 'pentagon', 'tievert', 'tiehorz',
+                'triangle', 'triangledown',
+                'dot', 'circledot', 'bullseye',
+                'ellipsehorz', 'ellipsevert',
+                'lozengehorz', 'lozengevert',
+                'asterisk',
+                'lineplus', 'linecross',
+                'linevert', 'linehorz',
+                'arrowleft', 'arrowright', 'arrowup',
+                'arrowdown',
+                'arrowleftaway', 'arrowrightaway',
+                'arrowupaway', 'arrowdownaway',
+                'limitupper', 'limitlower', 'limitleft', 'limitright')
+
 def plotMarker(painter, xpos, ypos, markercode, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
     """
-    if markercode in _Polygons:
+    if markercode in _polygons:
         _plotPolygons(painter, markercode, (xpos,), (ypos,), markersize)
-    elif markercode in _LineSymbols:
+    elif markercode in _linesymbols:
         _plotLineSymbols(painter, markercode, (xpos,), (ypos,), markersize)
     else:
-        _MarkerLookup[markercode](painter, xpos, ypos, markersize)
+        _markerlookup[markercode](painter, xpos, ypos, markersize)
 
 def plotMarkers(painter, xpos, ypos, markername, markersize):
     """Funtion to plot an array of markers on painter
     """
 
-    if markername in _Polygons:
+    if markername in _polygons:
         _plotPolygons(painter, markername, xpos, ypos, markersize)
-    elif markername in _LineSymbols:
+    elif markername in _linesymbols:
         _plotLineSymbols(painter, markername, xpos, ypos, markersize)
     elif markername == 'none':
         # little optimization
         return
     else:
-        fn = _MarkerLookup[markername]
+        fn = _markerlookup[markername]
         for x, y in itertools.izip(xpos, ypos):
             fn(painter, x, y, markersize)
