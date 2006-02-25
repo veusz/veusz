@@ -63,29 +63,6 @@ def _plot_ellipse_horz(painter, xpos, ypos, size):
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( xpos - size, ypos - size/2 , size*2+1, size+1 )
 
-def _plot_asterisk(painter, xpos, ypos, size):
-    """ (internal) function to plot a *
-    """
-
-    s2 = int(size*0.707107)
-    painter.drawLine( xpos - s2, ypos - s2, xpos + s2, ypos + s2 )
-    painter.drawLine( xpos - s2, ypos + s2, xpos + s2, ypos - s2 )
-    painter.drawLine( xpos - size, ypos, xpos + size, ypos )
-    painter.drawLine( xpos, ypos - size, xpos, ypos + size )
-
-def _plot_line_plus(painter, xpos, ypos, size):
-    """ (internal) function to plot a + in lines.
-    """
-    painter.drawLine( xpos - size, ypos, xpos + size, ypos )
-    painter.drawLine( xpos, ypos - size, xpos, ypos + size )
-
-def _plot_line_cross(painter, xpos, ypos, size):
-    """ (internal) function to plot a x in lines.
-    """
-    s2 = int(size*0.707107)
-    painter.drawLine( xpos - s2, ypos - s2, xpos + s2, ypos + s2 )
-    painter.drawLine( xpos - s2, ypos + s2, xpos + s2, ypos - s2 )
-
 def _plot_circle_dot(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker with dot at core
     size is the radius of the circle
@@ -95,7 +72,7 @@ def _plot_circle_dot(painter, xpos, ypos, size):
     painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
     w = painter.pen().width() / 2
     painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
-   
+
 def _plot_bullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
     size is radius
@@ -104,105 +81,47 @@ def _plot_bullseye(painter, xpos, ypos, size):
     painter.drawEllipse( xpos - size, ypos - size, size*2+1, size*2+1 )
     painter.drawEllipse( xpos - size/2, ypos - size/2, size+1, size+1 )
 
-def _plot_line_horz(painter, xpos, ypos, size):
-    """ (internal) function to plot a horizontal line
-    """
+_LineSymbols = {
+    'asterisk': ( (-0.707, -0.707, 0.707,  0.707),
+                  (-0.707,  0.707, 0.707, -0.707),
+                  (-1, 0, 1, 0), (0, -1, 0, 1) ),
+    'lineplus': ( (-1, 0, 1, 0), (0, -1, 0, 1) ),
+    'linecross': ( (-0.707, -0.707, 0.707,  0.707),
+                   (-0.707,  0.707, 0.707, -0.707) ),
+    'linehorz': ( (-1, 0, 1, 0), ),
+    'linevert': ( (0, -1, 0, 1), ),
+    'arrowleft': ( (1, -1, 0, 0, 1, 1), (2, 0, 0, 0) ),
+    'arrowleftaway': ( (-1, -1, -2, 0, -1, 1), (-2, 0, 0, 0) ),
+    'arrowright': ( (-1, -1, 0, 0, -1, 1), (-2, 0, 0, 0) ),
+    'arrowrightaway': ( (1, -1, 2, 0, 1, 1), (2, 0, 0, 0) ),
+    'arrowup': ( (-1, 1, 0, 0, 1, 1), (0, 2, 0, 0) ),
+    'arrowupaway': ( (-1, -1, 0, -2, 1, -1), (0, 0, 0, -2) ),
+    'arrowdown': ( (-1, -1, 0, 0, 1, -1), (0, -2, 0, 0) ),
+    'arrowdownaway': ( (-1, 1, 0, 2, 1, 1), (0, 0, 0, 2) ),
+    'limitlower': ( (-1, -1, 0, 0, 1, -1), (0, -2, 0, 0), (-1, 0, 1, 0) ),
+    'limitupper': ( (-1, 1, 0, 0, 1, 1), (0, 2, 0, 0), (-1, 0, 1, 0) ),
+    'limitleft': ( (1, -1, 0, 0, 1, 1), (2, 0, 0, 0), (0, -1, 0, 1) ),
+    'limitright': ( (-1, -1, 0, 0, -1, 1), (-2, 0, 0, 0), (0, -1, 0, 1) )
+    }
 
-    painter.drawLine( xpos-size, ypos, xpos+size, ypos)
+def _plotLineSymbols(painter, name, xpos, ypos, size):
+    '''Plots shapes which are made out of line segments'''
 
-def _plot_line_vert(painter, xpos, ypos, size):
-    """ (internal) function to plot a horizontal line
-    """
+    # make a set of point arrays for each plotted symbol
+    ptarrays = []
+    for lines in _LineSymbols[name]:
+        pgn = (N.array(lines, N.Float32)*size).astype(N.Int32)
+        pa = qt.QPointArray( pgn.flat.tolist() )
+        ptarrays.append(pa)
 
-    painter.drawLine( xpos, ypos-size, xpos, ypos+size)
-
-def _plot_arrow_left(painter, xpos, ypos, size):
-    """ (internal) function to plot a left arrow
-    """
-    painter.drawPolyline( qt.QPointArray([xpos+size, ypos-size,
-                                          xpos, ypos,
-                                          xpos+size, ypos+size]) )
-    painter.drawLine(xpos+size*2, ypos, xpos, ypos)
-
-def _plot_arrow_left_away(painter, xpos, ypos, size):
-    """ (internal) function to plot a left arrow from the point
-    """
-    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
-                                          xpos-2*size, ypos,
-                                          xpos-size, ypos+size]) )
-    painter.drawLine(xpos-size*2, ypos, xpos, ypos)
-
-def _plot_arrow_right(painter, xpos, ypos, size):
-    """ (internal) function to plot a right arrow
-    """
-    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
-                                          xpos, ypos,
-                                          xpos-size, ypos+size]) )
-    painter.drawLine(xpos-size*2, ypos, xpos, ypos)
-
-def _plot_arrow_right_away(painter, xpos, ypos, size):
-    """ (internal) function to plot a right arrow from the point
-    """
-    painter.drawPolyline( qt.QPointArray([xpos+size, ypos-size,
-                                          xpos+2*size, ypos,
-                                          xpos+size, ypos+size]) )
-    painter.drawLine(xpos+size*2, ypos, xpos, ypos)
-
-def _plot_arrow_up(painter, xpos, ypos, size):
-    """ (internal) function to plot an up arrow
-    """
-
-    painter.drawPolyline( qt.QPointArray([xpos-size, ypos+size,
-                                          xpos, ypos,
-                                          xpos+size, ypos+size]) )
-    painter.drawLine(xpos, ypos+size*2, xpos, ypos)
-
-def _plot_arrow_up_away(painter, xpos, ypos, size):
-    """ (internal) function to plot an up arrow from the point
-    """
-
-    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
-                                          xpos, ypos-size*2,
-                                          xpos+size, ypos-size]) )
-    painter.drawLine(xpos, ypos, xpos, ypos-size*2)
-    
-def _plot_arrow_down(painter, xpos, ypos, size):
-    """ (internal) function to plot a down arrow
-    """
-
-    painter.drawPolyline( qt.QPointArray([xpos-size, ypos-size,
-                                          xpos, ypos,
-                                          xpos+size, ypos-size]) )
-    painter.drawLine(xpos, ypos-size*2, xpos, ypos)
-
-def _plot_arrow_down_away(painter, xpos, ypos, size):
-    """ (internal) function to plot a down arrow from the point
-    """
-
-    painter.drawPolyline( qt.QPointArray([xpos-size, ypos+size,
-                                          xpos, ypos+size*2,
-                                          xpos+size, ypos+size]) )
-    painter.drawLine(xpos, ypos, xpos, ypos+size*2)
-
-def _plot_limit_lower(painter, xpos, ypos, size):
-    """Plot lower limit."""
-    _plot_arrow_down(painter, xpos, ypos, size)
-    _plot_line_horz(painter, xpos, ypos, size)
-
-def _plot_limit_upper(painter, xpos, ypos, size):
-    """Plot upper limit."""
-    _plot_arrow_up(painter, xpos, ypos, size)
-    _plot_line_horz(painter, xpos, ypos, size)
-    
-def _plot_limit_left(painter, xpos, ypos, size):
-    """Plot left limit."""
-    _plot_arrow_left(painter, xpos, ypos, size)
-    _plot_line_vert(painter, xpos, ypos, size)
-
-def _plot_limit_right(painter, xpos, ypos, size):
-    """Plot right limit."""
-    _plot_arrow_right(painter, xpos, ypos, size)
-    _plot_line_vert(painter, xpos, ypos, size)
+    xlast = 0
+    ylast = 0
+    for x, y in itertools.izip(xpos, ypos):
+        for pa in ptarrays:
+            pa.translate(x-xlast, y-ylast)
+            painter.drawPolyline(pa)
+        xlast = x
+        ylast = y
     
 MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'diamond', 'square', 'barhorz', 'barvert',
@@ -210,6 +129,7 @@ MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'triangle', 'triangledown',
                 'dot', 'circledot', 'bullseye',
                 'ellipsehorz', 'ellipsevert',
+                'lozengehorz', 'lozengevert',
                 'asterisk',
                 'lineplus', 'linecross',
                 'linevert', 'linehorz',
@@ -226,24 +146,7 @@ _MarkerLookup = { 'none': _plot_none,
                   'circledot': _plot_circle_dot,
                   'bullseye': _plot_bullseye,
                   'ellipsehorz': _plot_ellipse_horz,
-                  'ellipsevert': _plot_ellipse_vert,
-                  'asterisk': _plot_asterisk,
-                  'lineplus': _plot_line_plus,
-                  'linecross': _plot_line_cross,
-                  'linehorz': _plot_line_horz,
-                  'linevert': _plot_line_vert,
-                  'arrowleft': _plot_arrow_left,
-                  'arrowright': _plot_arrow_right,
-                  'arrowup': _plot_arrow_up,
-                  'arrowdown': _plot_arrow_down,
-                  'arrowleftaway': _plot_arrow_left_away,
-                  'arrowrightaway': _plot_arrow_right_away,
-                  'arrowupaway': _plot_arrow_up_away,
-                  'arrowdownaway': _plot_arrow_down_away,
-                  'limitupper': _plot_limit_upper,
-                  'limitlower': _plot_limit_lower,
-                  'limitleft': _plot_limit_left,
-                  'limitright': _plot_limit_right
+                  'ellipsevert': _plot_ellipse_vert
                   }
 
 # X and Y pts for corners of polygons
@@ -271,7 +174,9 @@ _Polygons = {
     'pentagon': ((0, -1.2), (1.1412, -0.3708), (0.6936, 0.9708),
                  (-0.6936, 0.9708), (-1.1412, -0.3708)),
     'tievert': ( (-1, -1), (1, -1), (-1, 1), (1, 1) ),
-    'tiehorz': ( (-1, -1), (-1, 1), (1, -1), (1, 1) )
+    'tiehorz': ( (-1, -1), (-1, 1), (1, -1), (1, 1) ),
+    'lozengehorz': ( (0, 0.707), (1.414, 0), (0, -0.707), (-1.414, 0) ),
+    'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) )
     }
 
 def _plotPolygons(painter, name, xpos, ypos, size):
@@ -294,6 +199,8 @@ def plotMarker(painter, xpos, ypos, markercode, markersize):
     """
     if markercode in _Polygons:
         _plotPolygons(painter, markercode, (xpos,), (ypos,), markersize)
+    elif markercode in _LineSymbols:
+        _plotLineSymbols(painter, markercode, (xpos,), (ypos,), markersize)
     else:
         _MarkerLookup[markercode](painter, xpos, ypos, markersize)
 
@@ -303,6 +210,8 @@ def plotMarkers(painter, xpos, ypos, markername, markersize):
 
     if markername in _Polygons:
         _plotPolygons(painter, markername, xpos, ypos, markersize)
+    elif markername in _LineSymbols:
+        _plotLineSymbols(painter, markername, xpos, ypos, markersize)
     elif markername == 'none':
         # little optimization
         return
