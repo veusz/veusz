@@ -471,7 +471,7 @@ class PlotWindow( qt.QScrollView ):
         # now crazily draw the whole thing again
         # see which widgets change the region in the small box given below
         bufferpixmap = qt.QPixmap( *self.size )
-        painter = ClickPainter(bufferpixmap, x-2, y-2, 5, 5)
+        painter = ClickPainter(bufferpixmap, x-3, y-3, 7, 7)
 
         pagenumber = min( self.document.getNumberPages() - 1,
                           self.pagenumber )

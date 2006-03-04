@@ -59,7 +59,7 @@ class Contour(plotters.GenericPlotter):
         self.Cntr = Cntr
 
         s = self.settings
-        s.add( setting.Dataset('data', '', self.document,
+        s.add( setting.Dataset('data', '',
                                dimensions = 2,
                                descr = 'Dataset to plot' ),
                0 )

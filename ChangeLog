@@ -1,7 +1,8 @@
 * 2006-02-25 Jeremy Sanders <jeremy@jeremysanders.net>
   - Rework line marker point plotting 
   - Add lozenge plot symbols
-	
+  - Tweak click to select to add another couple of pixels
+  
 * 2006-02-22 Jeremy Sanders <jeremy@jeremysanders.net>
   - Improved arrow symbol shapes
   - Added arrows pointing away from the point

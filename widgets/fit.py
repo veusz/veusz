@@ -47,9 +47,9 @@ class Fit(plotters.FunctionPlotter):
         s.add( setting.FloatDict('values',
                                  {'a': 0.0, 'b': 1.0},
                                  descr = 'Variables and fit values'), 1 )
-        s.add( setting.Dataset('xData', 'x', self.document,
+        s.add( setting.Dataset('xData', 'x',
                                descr = 'Variable containing x data'), 2 )
-        s.add( setting.Dataset('yData', 'y', self.document,
+        s.add( setting.Dataset('yData', 'y',
                                descr = 'Variable containing y data'), 3 )
         s.add( setting.Bool('fitRange', False,
                             descr = 'Fit only the data between the '

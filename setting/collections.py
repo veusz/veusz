@@ -22,15 +22,18 @@
 
 import qt
 
-import settings
 import setting
+from settings import Settings
+from stylesheet import StyleSheet
 from utils import formatNumber
 
-class Line(settings.Settings):
+StyleSheet.register(None, setting.Distance('linewidth', '0.5pt', descr='Default line width'))
+
+class Line(Settings):
     '''For holding properities of a line.'''
 
     def __init__(self, name, descr=''):
-        settings.Settings.__init__(self, name, descr=descr)
+        Settings.__init__(self, name, descr=descr)
 
         self.add( setting.Color('color', 'black',
                                 descr = 'Color of line') )
@@ -71,11 +74,11 @@ class ErrorBarLine(Line):
         self.add( setting.Bool('hideVert', False,
                                descr = 'Hide vertical errors') )
 
-class Brush(settings.Settings):
+class Brush(Settings):
     '''Settings of a fill.'''
 
     def __init__(self, name, descr=''):
-        settings.Settings.__init__(self, name, descr=descr)
+        Settings.__init__(self, name, descr=descr)
 
         self.add( setting.Color( 'color', 'black',
                                  descr = 'Fill colour' ) )
@@ -154,7 +157,7 @@ class GridLine(Line):
         self.get('hide').newDefault(True)
         self.get('style').newDefault('dotted')
 
-class Text(settings.Settings):
+class Text(Settings):
     '''Text settings.'''
 
     # need to examine font table to see what's available
@@ -162,7 +165,7 @@ class Text(settings.Settings):
     families = []
 
     def __init__(self, name, descr = ''):
-        settings.Settings.__init__(self, name, descr=descr)
+        Settings.__init__(self, name, descr=descr)
 
         if Text.defaultfamily == '':
             Text._getDefaultFamily()

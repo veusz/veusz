@@ -154,9 +154,9 @@ class Document( qt.QObject ):
             
     def wipe(self):
         """Wipe out any stored data."""
-        # TODO: remove as this doesn't appear used anymore
         self.data = {}
         self.basewidget = widgets.Root(None, document=self)
+        self.stylesheet = setting.StyleSheet(self)
         self.setModified(False)
         self.emit( qt.PYSIGNAL("sigWiped"), () )
 

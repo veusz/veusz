@@ -51,9 +51,9 @@ class GenericPlotter(widget.Widget):
         s = self.settings
         s.add( setting.Str('key', '',
                            descr = 'Description of the plotted data') )
-        s.add( setting.Axis('xAxis', 'x', self.document, 'horizontal',
+        s.add( setting.Axis('xAxis', 'x', 'horizontal',
                             descr = 'Name of X-axis to use') )
-        s.add( setting.Axis('yAxis', 'y', self.document, 'vertical',
+        s.add( setting.Axis('yAxis', 'y', 'vertical',
                             descr = 'Name of Y-axis to use') )
 
     def getAxesNames(self):
@@ -327,9 +327,9 @@ class PointPlotter(GenericPlotter):
                                 descr = 'Size of marker to plot'), 0 )
         s.add( setting.Marker('marker', 'circle',
                               descr = 'Type of marker to plot'), 0 )
-        s.add( setting.Dataset('yData', 'y', self.document,
+        s.add( setting.Dataset('yData', 'y',
                                descr = 'Variable containing y data'), 0 )
-        s.add( setting.Dataset('xData', 'x', self.document,
+        s.add( setting.Dataset('xData', 'x',
                                descr = 'Variable containing x data'), 0 )
         s.add( setting.Choice('errorStyle',
                               ['bar', 'box', 'diamond', 'curve',

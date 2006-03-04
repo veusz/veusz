@@ -42,6 +42,33 @@ from settingdb import settingdb
 class InvalidType(Exception):
     pass
 
+class SettingReference(object):
+    """A value a setting can have to point to another setting.
+    
+    Formats of a reference are like
+    /foo/bar/setting or
+    ../Line/width
+    
+    alternatively style sheets can be used with the format, e.g.
+    //xy/PlotLine/width
+    """
+    
+    def __init__(self, value):
+        if len(value) <= 2 or value[0] != '`' or value[-1] != '`':
+            raise ValueError, "Value is of incorrect format for reference"
+        
+        self.parts = value[1:-1].split('/')
+            
+    def resolve(self, value):
+        """Return the setting object associated with the reference."""
+        
+        if self.parts[0] == '' and self.parts[1] == '':
+            # style sheet reference
+            pass
+        else:
+            # reference to another widget, etc..
+            pass
+            
 class Setting(object):
     def __init__(self, name, value, descr=''):
         """Initialise the values.
@@ -55,25 +82,26 @@ class Setting(object):
         self.default = value
         self.onmodified = []
         self._val = None
-        self.tied = None
 
+        # calls the set function for the val property
         self.val = value
 
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        obj = self.__class__(self.name, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+        
     def get(self):
-        """Get the value, or get the value from the tied variable."""
-        if self.tied == None:
-            return self.convertFrom(self._val)
-        else:
-            return self.tied.val
+        """Get the value."""
+        return self.convertFrom(self._val)
 
     def set(self, v):
-        """Set the value, or set the tied variable."""
-        if self.tied == None:
-            self._val = self.convertTo(v)
-            for mod in self.onmodified:
-                mod(True)
-        else:
-            self.tied.val = v
+        """Set the value."""
+        self._val = self.convertTo(v)
+        for mod in self.onmodified:
+            mod(True)
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
@@ -95,24 +123,6 @@ class Setting(object):
     path = property(_path, None, None,
                     'Return the full path of the setting')
     
-    def tie(self, setting):
-        """Tie this setting to another."""
-        if self.tied != None:
-            self.untie()
-        self.tied = setting
-        self.tied.setOnModified(self._tiedModified)
-
-    def untie(self):
-        """Untie association with another setting."""
-        if self.tied != None:
-            self.tied.removeOnModified(self._tiedModified)
-            self.tied = None
-
-    def _tiedModified(self, ismodified):
-        """Called when the setting this setting is tied to is modified."""
-        for mod in self.onmodified:
-            mod(True)
-
     def toText(self):
         """Convert the type to text for saving."""
         return ""
@@ -217,10 +227,7 @@ class Setting(object):
         This shouldn't often be used as it defeats the automatic updation.
         Used for temporary modifications."""
 
-        if self.tied == None:
-            self._val = self.convertTo(val)
-        else:
-            self.tied.setSilent(val)
+        self._val = self.convertTo(val)
 
     def convertTo(self, val):
         """Convert for storage."""
@@ -301,7 +308,7 @@ class Int(Setting):
         Setting.__init__(self, name, value, descr=descr)
 
     def convertTo(self, val):
-        if type(val) == int:
+        if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
                 return val
             else:
@@ -571,6 +578,13 @@ class Choice(Setting):
         self.vallist = vallist
         Setting.__init__(self, name, val, descr = descr)
 
+    def copy(self):
+        """Make a copy of the setting."""
+        obj = self.__class__(self.name, self.vallist, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+        
     def convertTo(self, val):
         if val in self.vallist:
             return val
@@ -599,6 +613,13 @@ class ChoiceOrMore(Setting):
         
         self.vallist = vallist
         Setting.__init__(self, name, val, descr = descr)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        obj = self.__class__(self.name, self.vallist, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
 
     def convertTo(self, val):
         return val
@@ -715,6 +736,16 @@ class WidgetPath(Str):
         self.relativetoparent = relativetoparent
         self.allowedwidgets = allowedwidgets
 
+    def copy(self):
+        """Make a copy of the setting."""
+        obj = self.__class__(self.name, self.val,
+                             relativetoparent=self.relativetoparent,
+                             allowediwidgets=self.allowedwidgets,
+                             descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+
     def convertTo(self, val):
         """Validate the text is a name of a widget relative to
         this one."""
@@ -774,19 +805,30 @@ class WidgetPath(Str):
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
-    def __init__(self, name, val, document, dimensions=1, descr=''):
-        """Initialise using the document, so we can get the datasets later.
-
+    def __init__(self, name, val, dimensions=1, descr=''):
+        """
         dimensions is the number of dimensions the dataset needs
         """
 
         Setting.__init__(self, name, val, descr)
-        self.document = document
         self.dimensions = dimensions
 
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        obj = self.__class__(self.name, self.val, dimensions=self.dimensions,
+                             descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+        
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.Dataset(self, self.document, self.dimensions, *args)
+        # find document
+        p = self.parent
+        while not hasattr(p, 'document'):
+            p = p.parent
+            
+        return controls.Dataset(self, p.document, self.dimensions, *args)
     
 class Color(ChoiceOrMore):
     """A color setting."""
@@ -875,7 +917,7 @@ class LineStyle(Choice):
 class Axis(Str):
     """A setting to hold the name of an axis."""
 
-    def __init__(self, name, val, document, direction, descr=''):
+    def __init__(self, name, val, direction, descr=''):
         """Initialise using the document, so we can get the axes later.
         
         direction is horizontal or vertical to specify the type of axis to
@@ -883,12 +925,24 @@ class Axis(Str):
         """
 
         Setting.__init__(self, name, val, descr)
-        self.document = document
         self.direction = direction
-
+        
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        obj = self.__class__(self.name, self.val, self.direction,
+                             descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+        
     def makeControl(self, *args):
         """Allows user to choose an axis or enter a name."""
-        return controls.Axis(self, self.document, self.direction, *args)
+        # find document
+        p = self.parent
+        while not hasattr(p, 'document'):
+            p = p.parent
+
+        return controls.Axis(self, p.document, self.direction, *args)
     
 class Marker(Choice):
     """Choose a marker type from one allowable."""
