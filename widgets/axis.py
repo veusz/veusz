@@ -399,7 +399,10 @@ class Axis(widget.Widget):
         mt = s.get('MinorTicks')
         painter.setPen( mt.makeQPen(painter) )
         delta = mt.getLength(painter)
-        minorticks = self._graphToPlotter(self.minortickscalc)
+        if len(self.minortickscalc):
+            minorticks = self._graphToPlotter(self.minortickscalc)
+        else:
+            minorticks = []
 
         if s.direction == 'vertical':
             delta *= -1
