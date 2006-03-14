@@ -122,6 +122,9 @@ class MainWindow(qt.QMainWindow):
         self.connect(self.menus['edit'], qt.SIGNAL('aboutToShow()'),
                      self.slotAboutToShowEdit)
 
+        #Get the list of recently opened files
+        self.populateRecentFiles()
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().message(text, 2000)
@@ -248,11 +251,17 @@ class MainWindow(qt.QMainWindow):
         # Items are: Lookup id, description, menu text, which menu,
         #  Slot, Icon (or ''), whether to add to toolbar,
         #  Keyboard shortcut (or '')
+        # For menus wih submenus slot should be replaced by a list of
+        # submenus items of the dame form where the menu will be of the form
+        # menuid.itemid
         items = [
             ('filenew', 'New document', '&New', 'file',
              self.slotFileNew, 'stock-new.png', True, 'Ctrl+N'),
             ('fileopen', 'Open a document', '&Open...', 'file',
              self.slotFileOpen, 'stock-open.png', True, 'Ctrl+O'),
+            #If we were looking for HIG goodness, there wouldn't be a submenu here
+            ('filerecent', 'Open a recently edited document',
+             'Open &Recent', 'file', [], '', False, ''),
             ('file', ),
             ('filesave', 'Save the document', '&Save', 'file',
              self.slotFileSave, 'stock-save.png', True, 'Ctrl+S'),
@@ -492,6 +501,17 @@ class MainWindow(qt.QMainWindow):
 
             self.slotFileSave()
 
+    def doFileOpen(self,filename):
+        """(Needs a better name) - select whether to load the file in the
+        current window or in a blank window and calls the appropriate loader"""
+        if self.document.isBlank():
+            # If the file is new and there are no modifications,
+            # reuse the current window
+            self.openFile(filename)
+        else:
+            # create a new window
+            self.CreateWindow(filename)
+
     def openFile(self, filename):
         '''Open the given filename in the current window.'''
 
@@ -525,7 +545,7 @@ class MainWindow(qt.QMainWindow):
                            qt.QMessageBox.NoButton,
                            qt.QMessageBox.NoButton,
                            self).exec_loop()
-
+        
         # restore the cursor
         qt.QApplication.restoreOverrideCursor()
 
@@ -544,14 +564,55 @@ class MainWindow(qt.QMainWindow):
             self.dirname = fd.dir()
 
             filename = unicode( fd.selectedFile() )
-            if self.document.isBlank():
-                # If the file is new and there are no modifications,
-                # reuse the current window
-                self.openFile(filename)
+        
+            #Update the list of recently opened files
+            if 'recent_files' in setting.settingdb:
+                filelist = setting.settingdb['recent_files']
+                if filename in filelist:
+                    filelist.remove(filename)
+                filelist.insert(0, filename)
+                filelist = filelist[:5]
             else:
-                # create a new window
-                self.CreateWindow(filename)
+                filelist = [filename]
+            setting.settingdb['recent_files'] = filelist
+            self.populateRecentFiles()
+
+            self.doFileOpen(filename)
+        
+    def populateRecentFiles(self):
+        """Populate the recently opened files menu with a list of
+        recently opened files"""
+
+        menu = self.menus["file.filerecent"]
+        menu.clear()
+        newMenuItems = []
+        if 'recent_files' in setting.settingdb and setting.settingdb['recent_files']:
+            files = setting.settingdb['recent_files']
+            self._openRecentFunctions = []
+            for i, path in enumerate(files):
+
+                #Surely there is an easier way to do this?
+                def fileOpenerFunction(filename):
+                    path=filename
+                    def f():
+                        self.doFileOpen(path)
+                    return f
+                f = fileOpenerFunction(path)
+                self._openRecentFunctions.append(f)
                 
+                newMenuItems.append(('filerecent%i'%i, 'Open File %s'%path,
+                                     os.path.basename(path),
+                                     'file.filerecent', f,
+                                     '', False, ''))
+
+            menu.setEnabled(True)
+            self.recentFileActions = action.populateMenuToolbars(newMenuItems,
+                                                                 self.maintoolbar,
+                                                                 self.menus)
+        else:
+            menu.setEnabled(False)
+                
+    
     def slotFileExport(self):
         """Export the graph."""
 

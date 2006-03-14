@@ -1,4 +1,4 @@
-# action.py
+## action.py
 # A QAction-like object which can add buttons to things other than
 # QToolBars
 
@@ -186,13 +186,23 @@ def populateMenuToolbars(items, toolbar, menus):
             f = os.path.join(_icondir, icon)
             action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
 
-        # connect the action to the slot
-        if slot != None:
-            qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
-
-        # add to menu
-        if menus != None:
-            action.addTo( menus[menu] )
+        if callable(slot):
+            # connect the action to the slot
+            if slot is not None:
+                qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
+                # add to menu
+            if menus is not None:
+                action.addTo( menus[menu] )
+        elif slot is not None:
+            if menus is not None:
+                submenu = qt.QPopupMenu(menus[menu].parentWidget())
+                menus["%s.%s"%(menu ,menuid)] = submenu
+                menus[menu].insertItem(menutext,submenu)
+                populateMenuToolbars(slot, toolbar, menus)
+        else:
+            if menus is not None:
+                action.addTo( menus[menu] )
+                
 
         # add to toolbar
         if addtool and toolbar != None:
