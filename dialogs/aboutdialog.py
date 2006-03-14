@@ -31,6 +31,10 @@ import utils
 _abouttext=u"""Veusz %s   http://home.gna.org/veusz/
 Veusz is Copyright \u00a9 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
 
+Authors:
+ Jeremy Sanders <jeremy@jeremysanders.net>
+ James Graham <jg307@cam.ac.uk>
+
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software
 and you are entitled to distribute it under the conditions of the GPL.
 See the file COPYING for details.""" % \
