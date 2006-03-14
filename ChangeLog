@@ -1,5 +1,7 @@
 * 2006-03-14 Jeremy Sanders <jeremy@jeremysanders.net>
   - Added patch from James to add recent files menu
+  - Correct bug where very small graph ranges cause problems
+	 (thanks James)
 	
 * 2006-02-25 Jeremy Sanders <jeremy@jeremysanders.net>
   - Rework line marker point plotting 
