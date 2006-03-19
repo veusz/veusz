@@ -1,3 +1,6 @@
+* 2006-03-19 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Command line opened files should also act as recent files
+	
 * 2006-03-14 Jeremy Sanders <jeremy@jeremysanders.net>
   - Added patch from James to add recent files menu
   - Correct bug where very small graph ranges cause problems

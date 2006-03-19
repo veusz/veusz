@@ -52,7 +52,7 @@ class MainWindow(qt.QMainWindow):
         win = cls()
         win.show()
         if filename:
-            win.openFile(filename)
+            win.openFileInWindow(filename)
         return win
 
     CreateWindow = classmethod(CreateWindow)
@@ -160,7 +160,7 @@ class MainWindow(qt.QMainWindow):
             files = self._getVeuszFiles(event)
             if files:
                 if self.document.isBlank():
-                    self.openFile(files[0])
+                    self.openFileInWindow(files[0])
                 else:
                     self.CreateWindow(files[0])
                 for filename in files[1:]:
@@ -501,18 +501,18 @@ class MainWindow(qt.QMainWindow):
 
             self.slotFileSave()
 
-    def doFileOpen(self,filename):
-        """(Needs a better name) - select whether to load the file in the
+    def openFile(self,filename):
+        """Select whether to load the file in the
         current window or in a blank window and calls the appropriate loader"""
         if self.document.isBlank():
             # If the file is new and there are no modifications,
             # reuse the current window
-            self.openFile(filename)
+            self.openFileInWindow(filename)
         else:
             # create a new window
             self.CreateWindow(filename)
 
-    def openFile(self, filename):
+    def openFileInWindow(self, filename):
         '''Open the given filename in the current window.'''
 
         # show busy cursor
@@ -526,6 +526,20 @@ class MainWindow(qt.QMainWindow):
             self.filename = filename
             self.updateTitlebar()
             self.updateStatusbar("Opened %s" % filename)
+
+            #Update the list of recently opened files
+            fullname = os.path.abspath(filename)
+            if 'recent_files' in setting.settingdb:
+                filelist = setting.settingdb['recent_files']
+                if fullname in filelist:
+                    filelist.remove(fullname)
+                filelist.insert(0, fullname)
+                filelist = filelist[:5]
+            else:
+                filelist = [fullname]
+            setting.settingdb['recent_files'] = filelist
+            self.populateRecentFiles()
+
         except IOError:
             # problem reading file
             qt.QMessageBox("Veusz",
@@ -564,20 +578,8 @@ class MainWindow(qt.QMainWindow):
             self.dirname = fd.dir()
 
             filename = unicode( fd.selectedFile() )
-        
-            #Update the list of recently opened files
-            if 'recent_files' in setting.settingdb:
-                filelist = setting.settingdb['recent_files']
-                if filename in filelist:
-                    filelist.remove(filename)
-                filelist.insert(0, filename)
-                filelist = filelist[:5]
-            else:
-                filelist = [filename]
-            setting.settingdb['recent_files'] = filelist
-            self.populateRecentFiles()
 
-            self.doFileOpen(filename)
+            self.openFile(filename)
         
     def populateRecentFiles(self):
         """Populate the recently opened files menu with a list of
@@ -595,7 +597,7 @@ class MainWindow(qt.QMainWindow):
                 def fileOpenerFunction(filename):
                     path=filename
                     def f():
-                        self.doFileOpen(path)
+                        self.openFile(path)
                     return f
                 f = fileOpenerFunction(path)
                 self._openRecentFunctions.append(f)
