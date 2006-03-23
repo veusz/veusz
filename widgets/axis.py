@@ -212,7 +212,11 @@ class Axis(widget.Widget):
 
         # override values if requested
         if len(s.MajorTicks.manualTicks) > 0:
-            self.majortickscalc = N.array(s.MajorTicks.manualTicks)
+            ticks = []
+            for i in s.MajorTicks.manualTicks:
+                if i >= self.plottedrange[0] and i <= self.plottedrange[1]:
+                    ticks.append(i)
+            self.majortickscalc = N.array(ticks)
 
         # invert bounds if axis was inverted
         if invertaxis:
