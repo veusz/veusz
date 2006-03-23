@@ -126,6 +126,10 @@ class MajorTick(Line):
                                     descr = 'Length of ticks' ) )
         self.add( setting.Int( 'number', 5,
                                descr = 'Number of major ticks to aim for' ) )
+        self.add( setting.FloatList('manualTicks',
+                                    [],
+                                    descr = 'List of tick values'
+                                    ' overriding defaults') )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''

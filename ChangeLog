@@ -1,3 +1,6 @@
+* 2006-03-23 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Manual major tick values can be specified
+	
 * 2006-03-19 Jeremy Sanders <jeremy@jeremysanders.net>
   - Command line opened files should also act as recent files
 	

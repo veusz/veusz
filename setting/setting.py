@@ -708,7 +708,7 @@ class FloatList(Setting):
         p = re.split(r'[\t\n, ]+', text.strip())
 
         try:
-            out = [float(i) for i in p]
+            out = [float(i) for i in p if i]
         except ValueError:
             raise InvalidType
 
