@@ -45,6 +45,9 @@ class _WidgetItem(qt.QListViewItem):
         self.widget = widget
         self.settings = widget.settings
 
+        pixmap = qt.QPixmap(os.path.join(action.imagedir, 'button_%s.png' % widget.typename))
+        self.setPixmap(0, pixmap)
+        
         self.recursiveAddPrefs(0, self.settings, self)
 
     def getAssociatedWidget(self):
@@ -116,6 +119,10 @@ class _PrefItem(qt.QListViewItem):
         self.setText(1, 'setting')
         self.index = number
 
+        if hasattr(settings, 'pixmap'):
+            pixmap = qt.QPixmap(os.path.join(action.imagedir, 'settings_%s.png' % settings.pixmap))
+            self.setPixmap(0, pixmap)
+        
     def compare(self, i, col, ascending):
         """Always sort according to the index value."""
 

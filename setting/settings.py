@@ -57,7 +57,7 @@ class Settings:
         """Is the name a supported setting?"""
         return name in self.setdict
 
-    def add(self, setting, posn = -1, readonly = False):
+    def add(self, setting, posn = -1, readonly = False, pixmap=None):
         """Add a new setting with the name, or a set of subsettings."""
         name = setting.name
         assert name not in self.setdict
@@ -68,6 +68,9 @@ class Settings:
             self.setnames.insert(posn, name)
         setting.setOnModified( self.setModified )
         setting.parent = self
+        
+        if pixmap:
+            setting.pixmap = pixmap
 
         if readonly:
             setting.readonly = True

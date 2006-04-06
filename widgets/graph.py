@@ -54,10 +54,9 @@ class Graph(widget.Widget):
                                  'Distance from bottom of graph'
                                  'to edge of page') )
         s.add( setting.GraphBrush( 'Background',
-                                   descr = 'Background plot fill' ) )
-        s.add( setting.Line('Border',
-                            descr = 'Graph border line') )
-
+                                   descr = 'Background plot fill' ), pixmap='bgfill' )
+        s.add( setting.Line('Border', descr = 'Graph border line'), pixmap='border')
+        
         self.readDefaults()
 
     def addDefaultSubWidgets(self):
