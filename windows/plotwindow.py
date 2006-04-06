@@ -244,8 +244,7 @@ class PlotWindow( qt.QScrollView ):
                                                        menus)
                                                    
         zoomtb = qt.QToolButton(self.zoomtoolbar)
-        zoomicon = os.path.join(os.path.dirname(__file__), 'icons',
-                                'zoom-options.png')
+        zoomicon = os.path.join(action.imagedir, 'zoom-options.png')
         zoomtb.setIconSet(qt.QIconSet( qt.QPixmap(zoomicon) ))
 
         # drop down zoom button on toolbar

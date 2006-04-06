@@ -200,8 +200,9 @@ class Embedded(object):
         """Start up the Qt application in a thread."""
 
         import qt
-
-        class _App(qt.QApplication):
+        from application import Application
+        
+        class _App(Application):
             """An application class which has a notifier to receive
             commands from the main thread."""
 

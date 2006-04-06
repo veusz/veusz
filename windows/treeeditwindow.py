@@ -45,12 +45,21 @@ class _WidgetItem(qt.QListViewItem):
         self.widget = widget
         self.settings = widget.settings
 
-        # add subitems for sub-prefs of widget
-        no = 0
-        for s in self.settings.getSettingsList():
-            _PrefItem(s, no, self)
-            no += 1
+        self.recursiveAddPrefs(0, self.settings, self)
 
+    def getAssociatedWidget(self):
+        """Return the widget associated with this item."""
+        return self.widget
+        
+    def recursiveAddPrefs(self, no, settings, parent):
+        """Recursively add preference subsettings."""
+        for s in settings.getSettingsList():
+            i = _PrefItem(s, no, parent)
+            no += 1
+            no = self.recursiveAddPrefs(no, s, i)
+            
+        return no
+            
     def setText(self, col, text):
         """Update name of widget if rename is called."""
 
@@ -119,6 +128,10 @@ class _PrefItem(qt.QListViewItem):
         else:
             return 0
 
+    def getAssociatedWidget(self):
+        """Get widget associated with this item."""
+        self.parent.getAssociatedWidget()
+            
 class _PropertyLabel(qt.QLabel):
     """A label which produces the veusz setting context menu.
 
@@ -135,6 +148,7 @@ class _PropertyLabel(qt.QLabel):
         self.setFocusPolicy(qt.QWidget.StrongFocus)
         self.setMargin(1)
 
+        self.control = None
         self.setting = setting
         self.inmenu = False
         self.inmouse = False
@@ -243,7 +257,7 @@ class _PropertyLabel(qt.QLabel):
         doc = widget.document
         setn = self.setting
         fnmap = {
-            0: (lambda: doc.applyOperation( document.OperationSettingSet(setn, setn.default) )),
+            0: (lambda: self.emit( qt.PYSIGNAL('settingChanged'), (self.control, setn, setn.default) )),
             100: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn) )),
             101: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, root=widget.parent, maxlevels=1) )),
             102: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, widgetname=name) )),
@@ -261,6 +275,42 @@ class _PropertyLabel(qt.QLabel):
         self.inmenu = False
         self._setBg()
 
+class _ReferenceSetting(qt.QHBox):
+    """A widget for a setting which is a reference to another setting."""
+    
+    link = None
+    
+    def __init__(self, parent, setting):
+        qt.QHBox.__init__(self, parent)
+        
+        if not _ReferenceSetting.link:
+            _ReferenceSetting.link = qt.QIconSet(qt.QPixmap(os.path.join(action.imagedir, 'link.png')))
+        
+        self.linkbutton = qt.QPushButton(_ReferenceSetting.link, "", self)
+        self.linkbutton.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed) )
+        self.connect(self.linkbutton, qt.SIGNAL('clicked()'), self.buttonClicked)
+        
+        qt.QToolTip.add(self.linkbutton, "Linked to %s" % setting.getReference().value)
+        
+        self.setting = setting
+        self.setncopy = setting.copy()
+        self.setncopy.readonly = True
+        self.control = self.setncopy.makeControl(self)
+        
+    def buttonClicked(self):
+        """Create a popup menu when the button is clicked."""
+        popup = qt.QPopupMenu(self)
+
+        popup.insertItem('Unlink setting', 100)
+        popup.insertItem('Edit linked setting', 101)
+        
+        ret = popup.exec_loop( qt.QCursor.pos() )
+
+        if ret == 100:
+            # update setting with own value to get rid of reference
+            val = self.setting.get()
+            self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
+        
 class _WidgetListView(qt.QListView):
     """A list view for the widgets
 
@@ -561,10 +611,7 @@ class TreeEditWindow(qt.QDockWindow):
 
     def enableCorrectButtons(self, item):
         """Make sure the create graph buttons are correctly enabled."""
-        selw = item.widget
-        if selw == None:
-            selw = item.parent.widget
-            assert selw != None
+        selw = item.getAssociatedWidget()
 
         # check whether each button can have this widget
         # (or a parent) as parent
@@ -590,6 +637,33 @@ class TreeEditWindow(qt.QDockWindow):
             self.editactions['cut'].enable(cancopy)
             self.editactions['copy'].enable(cancopy)
        
+    def _makeSettingControl(self, row, setn):
+        """Construct widget for settting on the row given."""
+        tooltext = "<strong>%s</strong> - %s" % (setn.name,
+                                                 setn.descr)
+        
+        view = self.proptab.viewport()
+        l = _PropertyLabel(setn, setn.name, view)
+        self.proptab.setCellWidget(row, 0, l)
+        qt.QToolTip.add(l, tooltext)
+        self.connect(l, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
+        self.prefchilds.append(l)
+
+        if setn.isReference():
+            c = _ReferenceSetting(view, setn)
+        else:
+            c = setn.makeControl(view)
+
+        c.veusz_rownumber = row
+        self.connect(c, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
+        self.proptab.setCellWidget(row, 1, c)
+        qt.QToolTip.add(c, tooltext)
+        self.prefchilds.append(c)
+
+        l.control = c
+        
+        self.proptab.adjustRow(row)
+    
     def slotItemSelected(self, item):
         """Called when an item is selected in the listview."""
 
@@ -609,7 +683,7 @@ class TreeEditWindow(qt.QDockWindow):
 
             # need line below or occasionally get random error
             # "QToolTip.maybeTip() is abstract and must be overridden"
-            qt.QToolTip.remove(i)
+            #qt.QToolTip.remove(i)
 
             i.deleteLater()
 
@@ -640,22 +714,7 @@ class TreeEditWindow(qt.QDockWindow):
 
         # make new widgets for the preferences
         for setn in item.settings.getSettingList():
-            tooltext = "<strong>%s</strong> - %s" % (setn.name,
-                                                     setn.descr)
-            
-            l = _PropertyLabel(setn, setn.name, view)
-            self.proptab.setCellWidget(row, 0, l)
-            qt.QToolTip.add(l, tooltext)
-            self.prefchilds.append(l)
-
-            c = setn.makeControl(view)
-            self.connect(c, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
-            self.proptab.setCellWidget(row, 1, c)
-            qt.QToolTip.add(c, tooltext)
-            self.prefchilds.append(c)
-
-            self.proptab.adjustRow(row)
-
+            self._makeSettingControl(row, setn)
             row += 1
 
         # make properties keyboard shortcut point to first item
@@ -685,14 +744,22 @@ class TreeEditWindow(qt.QDockWindow):
             if count < len(children):
                 self.emit( qt.PYSIGNAL("sigPageChanged"), (count,) )
             
-    def slotSettingChanged(self, setting, val):
+    def slotSettingChanged(self, widget, setting, val):
         """Called when a setting is changed by the user.
         
         This updates the setting to the value using an operation so that
         it can be undone.
         """
         
+        recreatecontrol = setting.isReference()
         self.document.applyOperation(document.OperationSettingSet(setting, val))
+        if setting.isReference():
+            recreatecontrol = True
+            
+        if recreatecontrol:
+            # need to recreate control if changed to/from reference
+            row = widget.veusz_rownumber
+            self._makeSettingControl(row, setting)
             
     def slotMakeWidgetButton(self, widgettype):
         """Called when an add widget button is clicked.
@@ -847,10 +914,7 @@ class TreeEditWindow(qt.QDockWindow):
             return
 
         # work out which widget to delete
-        w = self.itemselected.widget
-        if w == None:
-            w = self.itemselected.parent.widget
-        assert w != None
+        w = self.itemselected.getAssociatedWidget()
             
         # get the item to next get the selection when this widget is deleted
         # this is done by looking down the list to get the next useful one
@@ -905,10 +969,7 @@ class TreeEditWindow(qt.QDockWindow):
         """
 
         # get the widget to act as the parent
-        w = self.itemselected.widget
-        if w == None:
-            w = self.itemselected.parent.widget
-            assert w != None
+        w = self.itemselected.getAssociatedWidget()
 
         # actually move the widget
         self.document.applyOperation( document.OperationWidgetMove(w, direction) )

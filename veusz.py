@@ -37,6 +37,7 @@ sys.path.insert( 0, os.path.dirname(__file__) )
 
 import utils
 import windows.mainwindow
+from application import Application
 
 copyr='''Veusz %s
 
@@ -51,10 +52,14 @@ def handleIntSignal(signum, frame):
 def run():
     '''Run the main application.'''
 
-    app = qt.QApplication(sys.argv)
+    app = Application(sys.argv)
 
     # register a signal handler to catch ctrl+c
     signal.signal(signal.SIGINT, handleIntSignal)
+
+    # call these functions on startup
+    for function in utils.callonstartup:
+        function()
     
     if app.argv():
 

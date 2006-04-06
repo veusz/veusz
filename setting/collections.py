@@ -23,11 +23,14 @@
 import qt
 
 import setting
+import utils
 from settings import Settings
 from stylesheet import StyleSheet
 from utils import formatNumber
+from application import Application
 
-StyleSheet.register(None, setting.Distance('linewidth', '0.5pt', descr='Default line width'))
+StyleSheet.register('Line', setting.Distance('width', '0.5pt', descr='Default line width'))
+StyleSheet.register('Line', setting.Color('color', 'black', descr='Default line color'))
 
 class Line(Settings):
     '''For holding properities of a line.'''
@@ -35,9 +38,9 @@ class Line(Settings):
     def __init__(self, name, descr=''):
         Settings.__init__(self, name, descr=descr)
 
-        self.add( setting.Color('color', 'black',
+        self.add( setting.Color('color', setting.Reference('/StyleSheet/Line/color'),
                                 descr = 'Color of line') )
-        self.add( setting.Distance('width', '0.5pt',
+        self.add( setting.Distance('width', setting.Reference('/StyleSheet/Line/width'),
                                    descr = 'Width of line') )
         self.add( setting.LineStyle('style', 'solid',
                                     descr = 'Line style') )
@@ -161,12 +164,64 @@ class GridLine(Line):
         self.get('hide').newDefault(True)
         self.get('style').newDefault('dotted')
 
+class _FontList(object):
+    '''A wrapped list class to interogate the list of fonts on usage.
+    
+    This is needed because we can't get the list of fonts until the QApplication has started.
+    This class looks like a readonly list
+    '''
+    
+    def __init__(self):
+        self.vals = None
+    
+    def __len__(self):
+        if self.vals == None:
+            self._getFonts()
+        return len(self.vals)
+    
+    def __getitem__(self, key):
+        if self.vals == None:
+            self._getFonts()
+        return self.vals[key]
+
+    def __iter__(self):
+        if self.vals == None:
+            self._getFonts()
+        return self.vals.__iter__()
+    
+    def _getFonts(self):
+        """Construct list of fonts from Qt."""
+        self.vals = [ unicode(name) for name in qt.QFontDatabase().families() ]
+
+def _registerFontStyleSheet():
+    """Get fonts, and register default with StyleSheet."""
+    families = [ unicode(name) for name in qt.QFontDatabase().families() ]
+    
+    default = None
+    for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
+              'Serif']:
+        if i in families:
+            default = unicode(i)
+            break
+            
+    if default == None:
+        print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
+        default = unicode(_fontfamilies[0])
+    
+    Text.defaultfamily = default
+    Text.families = families
+    StyleSheet.register('Font', setting.ChoiceOrMore('font', families, default, descr='Font name'))
+    StyleSheet.register('Font', setting.Distance('size', '14pt', descr='Default font size'))
+    StyleSheet.register('Font', setting.Color('color', 'black', descr='Default font color'))
+    
+Application.startupfunctions.append(_registerFontStyleSheet)
+
 class Text(Settings):
     '''Text settings.'''
 
     # need to examine font table to see what's available
-    defaultfamily=''
-    families = []
+    defaultfamily = None
+    families = None
 
     def __init__(self, name, descr = ''):
         Settings.__init__(self, name, descr=descr)
@@ -175,11 +230,11 @@ class Text(Settings):
             Text._getDefaultFamily()
 
         self.add( setting.ChoiceOrMore('font', Text.families,
-                                       Text.defaultfamily,
+                                       setting.Reference('/StyleSheet/Font/font'),
                                        descr = 'Font name' ) )
-        self.add( setting.Distance('size', '14pt',
+        self.add( setting.Distance('size', setting.Reference('/StyleSheet/Font/size'),
                   descr = 'Font size' ) )
-        self.add( setting.Color( 'color', 'black',
+        self.add( setting.Color( 'color', setting.Reference('/StyleSheet/Font/color'),
                                  descr = 'Font color' ) )
         self.add( setting.Bool( 'italic', False,
                                 descr = 'Italic font' ) )

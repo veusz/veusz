@@ -60,8 +60,7 @@ class MainWindow(qt.QMainWindow):
     def __init__(self, *args):
         qt.QMainWindow.__init__(self, *args)
 
-        imgdir = os.path.join(os.path.dirname(__file__), '..', 'images')
-        self.setIcon( qt.QPixmap(os.path.join(imgdir, 'icon.png')) )
+        self.setIcon( qt.QPixmap(os.path.join(action.imagedir, 'icon.png')) )
 
         self.document = document.Document()
 

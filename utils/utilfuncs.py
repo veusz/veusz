@@ -325,3 +325,35 @@ def topsort(pairlist):
     
     return answer
 
+class _NoneSoFar:
+    pass
+_NoneSoFar = _NoneSoFar()
+
+def lazy(func, resultclass):
+    """A decorator to allow lazy evaluation of functions.
+    The products of this function is a lazy version of the function
+    given.
+
+    func is the function to evaluate
+    resultclass is the class this function returns."""
+    
+    class __proxy__:
+        def __init__(self, args, kw):
+            self.__func = func
+            self.__args = args
+            self.__kw = kw
+            self.__result = _NoneSoFar
+            for (k, v) in resultclass.__dict__.items():
+                setattr(self, k, self.__promise__(v))
+        
+        def __promise__(self, func):
+            def __wrapper__(*args, **kw):
+                if self.__result is _NoneSoFar:
+                    self.__result = self.__func(*self.__args, **self.__kw)
+                return func(self.__result, *args, **kw)
+            return __wrapper__
+        
+    def __wrapper__(*args, **kw):
+        return __proxy__(args, kw)
+            
+    return __wrapper__

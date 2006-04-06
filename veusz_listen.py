@@ -38,6 +38,7 @@ sys.path.insert( 0, os.path.dirname(__file__) )
 
 import windows.simplewindow
 import document
+from application import Application
 
 class InputListener(qt.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
@@ -97,13 +98,13 @@ class InputListener(qt.QObject):
 
 def run():
     '''Actually run the program.'''
-    app = qt.QApplication(sys.argv)
+    app = Application(sys.argv)
 
     if len(sys.argv) > 1:
         name = sys.argv[1]
     else:
         name = 'Veusz output'
-
+        
     win = windows.simplewindow.SimpleWindow(name)
     win.show()
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),

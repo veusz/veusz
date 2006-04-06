@@ -21,7 +21,7 @@
 """Module for creating QWidgets for the settings, to enable their values
    to be changed.
 
-    These widgets emit settingChanged(setting, val) when the setting is
+    These widgets emit settingChanged(control, setting, val) when the setting is
     changed. The creator should use this to change the setting.
 """
 
@@ -98,7 +98,7 @@ class Edit(qt.QLineEdit):
 
             # value has changed
             if self.setting.val != val:
-                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+                self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
                 #self.setting.val = val
 
         except setting.InvalidType:
@@ -289,7 +289,7 @@ class String(qt.QHBox):
 
             # value has changed
             if self.setting.val != val:
-                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+                self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
 
         except setting.InvalidType:
             self.edit.setPaletteBackgroundColor(qt.QColor('red'))
@@ -322,7 +322,7 @@ class Bool(qt.QCheckBox):
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
-        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, state) )
+        self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, state) )
         
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -377,7 +377,7 @@ class Choice(qt.QComboBox):
             
             # value has changed
             if self.setting.val != val:
-                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+                self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -422,7 +422,7 @@ class MultiLine(qt.QTextEdit):
             
             # value has changed
             if self.setting.val != val:
-                self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+                self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt.QColor('red'))
@@ -646,6 +646,10 @@ class Color(qt.QHBox):
         self.connect(b, qt.SIGNAL('clicked()'),
                      self.slotButtonClicked)
 
+        if setting.readonly:
+            c.setEnabled(False)
+            b.setEnabled(False)
+                     
         self.setting.setOnModified(self.onModified)
         self._updateButtonColor()
 
@@ -684,7 +688,7 @@ class Color(qt.QHBox):
         if col.isValid():
             # change setting
             name = col.name()
-            self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, unicode(name)) )
+            self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, unicode(name)) )
 
     def slotActivated(self, val):
         """A different value is selected."""
@@ -694,7 +698,7 @@ class Color(qt.QHBox):
             
         # value has changed
         if self.setting.val != val:
-            self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, val) )
+            self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
 
     def done(self):
         """Delete modification notification."""
@@ -861,13 +865,13 @@ class ListSet(qt.QWidget):
             rows.append(rows[-1])
         else:
             rows.append(self.defaultval)
-        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, rows) )
+        self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, rows) )
 
     def onDeleteClicked(self):
         """Remove final entry in settings list."""
 
         rows = list(self.setting.val)[:-1]
-        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, rows) )
+        self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, rows) )
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -943,7 +947,7 @@ class ListSet(qt.QWidget):
         items[col] = val
         rows[row] = tuple(items)
         self.ignorechange = True
-        self.emit( qt.PYSIGNAL('settingChanged'), (self.setting, rows) )
+        self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, rows) )
         
     def onToggled(self, on):
         """Checkbox toggled."""

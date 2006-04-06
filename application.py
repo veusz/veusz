@@ -1,6 +1,4 @@
-# __init__.py file for utils
-  
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2006 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -16,18 +14,25 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-###############################################################################
+##############################################################################
 
 # $Id$
 
-from utilfuncs import *
-from pref import *
-from preftypes import *
-from textrender import *
-from points import *
-from version import *
-from setting import *
-from fitlm import *
+"""Main Veusz application.
 
-# add to this list to be called on app startup
-callonstartup = []
+This doesn't do much, except allow functions to be registered for application
+startup.
+"""
+
+import qt
+
+class Application(qt.QApplication):
+    """Main Veusz application class."""
+    
+    startupfunctions = []
+    
+    def __init__(self, *args):
+        qt.QApplication.__init__(self, *args)
+        
+        for fn in self.startupfunctions:
+            fn()

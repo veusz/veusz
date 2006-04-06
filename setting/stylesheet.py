@@ -36,10 +36,9 @@ class StyleSheet(settings.Settings):
         kls.registeredsettings.append( (widgettype, setting) )
     register = classmethod(register)
     
-    def __init__(self, document):
+    def __init__(self):
         """Create the default settings."""
-        settings.Settings.__init__(self, '/', 'style sheet')
-        self.document = document
+        settings.Settings.__init__(self, 'StyleSheet', 'global styles')
         
         # make copies of all the registered settings
         for widgettype, setting in self.registeredsettings:

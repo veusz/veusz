@@ -43,6 +43,7 @@ class Root(widget.Widget):
                                 descr='Width of the pages') )
         s.add( setting.Distance('height', '15cm',
                                 descr='Height of the pages') )
+        s.add( setting.StyleSheet() )
         self.document = document
 
         if type(self) == Root:

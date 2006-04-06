@@ -36,13 +36,14 @@ import qt
 import utils
 import controls
 import widgets
+import settings
 from settingdb import settingdb
 
 # if invalid type passed to set
 class InvalidType(Exception):
     pass
 
-class SettingReference(object):
+class Reference(object):
     """A value a setting can have to point to another setting.
     
     Formats of a reference are like
@@ -50,25 +51,47 @@ class SettingReference(object):
     ../Line/width
     
     alternatively style sheets can be used with the format, e.g.
-    //xy/PlotLine/width
+    /StyleSheet/linewidth
     """
     
     def __init__(self, value):
-        if len(value) <= 2 or value[0] != '`' or value[-1] != '`':
-            raise ValueError, "Value is of incorrect format for reference"
-        
-        self.parts = value[1:-1].split('/')
-            
-    def resolve(self, value):
+        self.value = value
+    
+    def resolve(self, thissetting):
         """Return the setting object associated with the reference."""
         
-        if self.parts[0] == '' and self.parts[1] == '':
-            # style sheet reference
-            pass
-        else:
-            # reference to another widget, etc..
-            pass
-            
+        item = thissetting.parent
+        parts = self.value.split('/')
+        if parts[0] == '':
+            # need root widget if begins with slash
+            while item.parent != None:
+                item = item.parent
+            parts = parts[1:]
+        
+        # do an iterative lookup of the setting
+        for p in parts:
+            if p == '..':
+                if p.parent != None:
+                    p = p.parent
+            elif p == '':
+                pass
+            else:
+                if isinstance(item, widgets.Widget):
+                    child = item.getChild(p)
+                    if not child:
+                        item = item.settings.get(p)
+                    else:
+                        item = child
+                elif isinstance(item, settings.Settings):
+                    item = item.get(p)
+                else:
+                    assert not "Invalid item in tree"
+                    
+        assert isinstance(item, Setting)
+        assert item != thissetting
+        assert isinstance(item, thissetting.__class__)
+        return item
+        
 class Setting(object):
     def __init__(self, name, value, descr=''):
         """Initialise the values.
@@ -95,17 +118,35 @@ class Setting(object):
         
     def get(self):
         """Get the value."""
-        return self.convertFrom(self._val)
+        
+        if isinstance(self._val, Reference):
+            return self._val.resolve(self).get()
+        else:
+            return self.convertFrom(self._val)
 
     def set(self, v):
         """Set the value."""
-        self._val = self.convertTo(v)
+
+        if isinstance(v, Reference):
+            self._val = v
+        else:
+            # this also removes the linked value if there is one set
+            self._val = self.convertTo(v)
         for mod in self.onmodified:
             mod(True)
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
 
+    def isReference(self):
+        """Is this a setting a reference to another object."""
+        return isinstance(self._val, Reference)
+
+    def getReference(self):
+        """Return the reference object."""
+        assert isinstance(self._val, Reference)
+        return self._val
+               
     def _path(self):
         """Return full path of setting."""
         path = []
@@ -219,7 +260,10 @@ class Setting(object):
 
     def isDefault(self):
         """Is the current value a default?"""
-        return self.val == self.default
+        if isinstance(self._val, Reference) and self._val == self.default:
+            return True
+        else:
+            return self.val == self.default
 
     def setSilent(self, val):
         """Set the setting, without propagating modified flags.
@@ -847,6 +891,13 @@ class Color(ChoiceOrMore):
         ChoiceOrMore.__init__(self, name, self._colors, default,
                               descr=descr)
 
+    def copy(self):
+        """Make a copy of the setting."""
+        obj = self.__class__(self.name, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+                              
     def color(self):
         """Return QColor for color."""
         return qt.QColor(self.val)

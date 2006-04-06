@@ -25,7 +25,8 @@
 import qt
 import os.path
 
-_icondir = os.path.join(os.path.dirname(__file__), 'icons')
+# where images are stored
+imagedir = os.path.join(os.path.dirname(__file__), 'icons')
 
 class Action(qt.QObject):
     """A QAction-like object for associating actions with buttons,
@@ -83,7 +84,7 @@ class Action(qt.QObject):
 
         # make icon set
         if iconfilename != None:
-            filename = os.path.join(_icondir, iconfilename)
+            filename = os.path.join(imagedir, iconfilename)
             self.iconset = qt.QIconSet( qt.QPixmap(qt.QPixmap(filename)) )
         else:
             self.iconset = None
@@ -183,7 +184,7 @@ def populateMenuToolbars(items, toolbar, menus):
 
         # load icon if set
         if icon != '':
-            f = os.path.join(_icondir, icon)
+            f = os.path.join(imagedir, icon)
             action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
 
         if callable(slot):
