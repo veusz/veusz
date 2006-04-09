@@ -138,6 +138,111 @@ class _PrefItem(qt.QListViewItem):
         """Get widget associated with this item."""
         self.parent.getAssociatedWidget()
 
+class _NewPropertyLabel(qt.QHBox):
+    """A widget for displaying the label for a setting."""
+
+    def __init__(self, setting, parent):
+
+        qt.QHBox.__init__(self, parent)
+        self.setting = setting
+
+        self.menubutton = qt.QPushButton(setting.name, self)
+        self.menubutton.setFlat(True)
+        self.connect(self.menubutton, qt.SIGNAL('clicked()'),
+                     self.slotContextMenu)
+        
+        tooltext = "<strong>%s</strong> - %s" % (setting.name,
+                                                 setting.descr)
+        qt.QToolTip.add(self.menubutton, tooltext)
+
+        self.linkbutton = qt.QPushButton(action.getIconSet('link.png'), '', self)
+        self.linkbutton.setMaximumWidth(self.linkbutton.height())
+        self.linkbutton.setFlat(True)
+
+        self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
+                     self.buttonClicked)
+
+        if not setting.isReference():
+            self.linkbutton.hide()
+
+        setting.setOnModified(self.slotOnModified)
+
+    def slotOnModified(self, mod):
+        """Alter reference button if setting is modified."""
+        
+        self.linkbutton.setShown(self.setting.isReference())
+
+    def getWidget(self):
+        """Get associated Veusz widget."""
+        widget = self.setting.parent
+        while not isinstance(widget, widgets.Widget):
+            widget = widget.parent
+        return widget
+
+    def slotContextMenu(self):
+        """Pop up the context menu."""
+
+        # forces settings to be updated
+        self.parentWidget().setFocus()
+        # get it back straight away
+        self.menubutton.setFocus()
+
+        widget = self.getWidget()
+        type = widget.typename
+        name = widget.name
+        
+        # construct the popup menu
+        popup = qt.QPopupMenu(self)
+
+        popup.insertItem('Reset to default', 0)
+        popup.insertSeparator()
+        popup.insertItem('Copy to "%s" widgets' % type, 100)
+        popup.insertItem('Copy to "%s" siblings' % type, 101)
+        popup.insertItem('Copy to "%s" widgets called "%s"' %
+                         (type, name), 102)
+        popup.insertSeparator()
+        popup.insertItem('Make default for "%s" widgets' % type, 200)
+        popup.insertItem('Make default for "%s" widgets called "%s"' %
+                         (type, name), 201)
+        popup.insertItem('Forget this default setting', 202)
+
+        pos = self.menubutton.mapToGlobal(self.menubutton.pos())
+        ret = popup.exec_loop(pos)
+
+        # convert values above to functions
+        doc = widget.document
+        setn = self.setting
+        fnmap = {
+            0: (lambda: doc.applyOperation( document.OperationSettingSet(setn, setn.default) )),
+            100: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn) )),
+            101: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, root=widget.parent, maxlevels=1) )),
+            102: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, widgetname=name) )),
+            
+            200: (lambda: setn.setAsDefault(False)),
+            201: (lambda: setn.setAsDefault(True)),
+            202: setn.removeDefault
+            }
+
+        # call the function if item was selected
+        if ret >= 0:
+            fnmap[ret]()
+
+    def buttonClicked(self):
+        """Create a popup menu when the button is clicked."""
+        popup = qt.QPopupMenu(self)
+
+        popup.insertItem('Unlink setting', 100)
+        popup.insertItem('Edit linked setting', 101)
+        
+        ret = popup.exec_loop( qt.QCursor.pos() )
+
+        setn = self.setting
+        widget = self.getWidget()
+        doc = widget.document
+        if ret == 100:
+            # update setting with own value to get rid of reference
+            doc.applyOperation( document.OperationSettingSet(setn, setn.get()) )
+
 class _PropertyLabelLabel(qt.QLabel):
     """A widget for displaying the actual label in the property label."""
 
@@ -658,7 +763,7 @@ class TreeEditWindow(qt.QDockWindow):
                                                  setn.descr)
         
         view = self.proptab.viewport()
-        l = _PropertyLabel(setn, setn.name, view)
+        l = _NewPropertyLabel(setn, view)
         self.proptab.setCellWidget(row, 0, l)
         qt.QToolTip.add(l, tooltext)
         self.prefchilds.append(l)
