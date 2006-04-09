@@ -28,6 +28,21 @@ import os.path
 # where images are stored
 imagedir = os.path.join(os.path.dirname(__file__), 'icons')
 
+_pixmapcache = {}
+def getPixmap(pixmap):
+    """Return a cached QPixmap for the filename in the icons directory."""
+    if pixmap not in _pixmapcache:
+        _pixmapcache[pixmap] = qt.QPixmap(os.path.join(imagedir, pixmap))
+    return _pixmapcache[pixmap]
+
+_iconsetcache = {}
+def getIconSet(icon):
+    """Return a cached QIconSet for the filename in the icons directory."""
+    if icon not in _iconsetcache:
+        pixmap = getPixmap(icon)
+        _iconsetcache[icon] = qt.QIconSet(pixmap)
+    return _iconsetcache[icon]
+
 class Action(qt.QObject):
     """A QAction-like object for associating actions with buttons,
     menu items, and so on."""
@@ -84,8 +99,7 @@ class Action(qt.QObject):
 
         # make icon set
         if iconfilename != None:
-            filename = os.path.join(imagedir, iconfilename)
-            self.iconset = qt.QIconSet( qt.QPixmap(qt.QPixmap(filename)) )
+            self.iconset = getIconSet(iconfilename)
         else:
             self.iconset = None
 
@@ -184,8 +198,7 @@ def populateMenuToolbars(items, toolbar, menus):
 
         # load icon if set
         if icon != '':
-            f = os.path.join(imagedir, icon)
-            action.setIconSet(qt.QIconSet( qt.QPixmap(f) ))
+            action.setIconSet(getIconSet(icon))
 
         if callable(slot):
             # connect the action to the slot

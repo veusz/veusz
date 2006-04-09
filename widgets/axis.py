@@ -84,17 +84,23 @@ class Axis(widget.Widget):
                              'in its perpendicular direction') )
 
         s.add( setting.Line('Line',
-                            descr = 'Axis line settings') )
+                            descr = 'Axis line settings'),
+               pixmap = 'axisline' )
         s.add( setting.MajorTick('MajorTicks',
-                                 descr = 'Major tick line settings') )
+                                 descr = 'Major tick line settings'),
+               pixmap = 'axismajorticks' )
         s.add( setting.MinorTick('MinorTicks',
-                                 descr = 'Minor tick line settings') )
+                                 descr = 'Minor tick line settings'),
+               pixmap = 'axisminorticks' )
         s.add( setting.TickLabel('TickLabels',
-                                 descr = 'Tick label settings') )
+                                 descr = 'Tick label settings'),
+               pixmap = 'axisticklabels' )
         s.add( setting.GridLine('GridLines',
-                                descr = 'Grid line settings') )
+                                descr = 'Grid line settings'),
+               pixmap = 'axisgridlines' )
         s.add( setting.AxisLabel('Label',
-                                 descr = 'Axis label settings') )
+                                 descr = 'Axis label settings'),
+               pixmap = 'axislabel' )
 
         if type(self) == Axis:
             self.readDefaults()

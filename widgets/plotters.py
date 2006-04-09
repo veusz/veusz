@@ -103,13 +103,16 @@ class FunctionPlotter(GenericPlotter):
                                   descr='Maximum value at which to plot function'))
 
         s.add( setting.Line('Line',
-                            descr = 'Function line settings') )
+                            descr = 'Function line settings'),
+               pixmap = 'plotline' )
 
         s.add( setting.PlotterFill('FillBelow',
-                                   descr = 'Fill below function') )
+                                   descr = 'Fill below function'),
+               pixmap = 'plotfillbelow' )
         
         s.add( setting.PlotterFill('FillAbove',
-                                   descr = 'Fill above function') )
+                                   descr = 'Fill above function'),
+               pixmap = 'plotfillabove' )
 
         if type(self) == FunctionPlotter:
             self.readDefaults()
@@ -337,17 +340,23 @@ class PointPlotter(GenericPlotter):
                               descr='Style of error bars to plot') )
 
         s.add( setting.XYPlotLine('PlotLine',
-                                  descr = 'Plot line settings') )
+                                  descr = 'Plot line settings'),
+               pixmap = 'plotline' )
         s.add( setting.Line('MarkerLine',
-                            descr = 'Line around the marker settings') )
+                            descr = 'Line around the marker settings'),
+               pixmap = 'plotmarkerline' )
         s.add( setting.Brush('MarkerFill',
-                             descr = 'Marker fill settings') )
+                             descr = 'Marker fill settings'),
+               pixmap = 'plotmarkerfill' )
         s.add( setting.ErrorBarLine('ErrorBarLine',
-                                    descr = 'Error bar line settings') )
+                                    descr = 'Error bar line settings'),
+               pixmap = 'ploterrorline' )
         s.add( setting.PlotterFill('FillBelow',
-                                   descr = 'Fill below plot line') )
+                                   descr = 'Fill below plot line'),
+               pixmap = 'plotfillbelow' )
         s.add( setting.PlotterFill('FillAbove',
-                                   descr = 'Fill above plot line') )
+                                   descr = 'Fill above plot line'),
+               pixmap = 'plotfillabove' )
 
         if type(self) == PointPlotter:
             self.readDefaults()
@@ -705,7 +714,8 @@ class TextLabel(GenericPlotter):
                              descr='Angle of the label in degrees'), 6 )
 
         s.add( setting.Text('Text',
-                            descr = 'Text settings') )
+                            descr = 'Text settings'),
+               pixmap = 'axislabel' )
 
         if type(self) == TextLabel:
             self.readDefaults()

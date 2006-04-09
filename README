@@ -5,7 +5,7 @@ Velvet Ember Under Sky Zenith
 http://home.gna.org/veusz/
 
 Veusz is Copyright (C) 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
-Licenced under the GPL (version 2 or greater)
+Licenced under the GPL (version 2 or greater).
 
 Veusz is a scientific plotting package written in Python. It uses PyQt
 for display and user-interfaces, and numarray for handling the numeric

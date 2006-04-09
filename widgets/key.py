@@ -40,11 +40,14 @@ class Key(widget.Widget):
 
         s = self.settings
         s.add( setting.Text('Text',
-                            descr = 'Text settings') )
+                            descr = 'Text settings'),
+               pixmap = 'axislabel' )
         s.add( setting.KeyBrush('Background',
-                                descr = 'Key background fill') )
+                                descr = 'Key background fill'),
+               pixmap = 'bgfill' )
         s.add( setting.Line('Border',
-                            descr = 'Key border line') )
+                            descr = 'Key border line'),
+               pixmap = 'border' )
 
         s.add( setting.Choice( 'horzPosn',
                                ('left', 'centre', 'right', 'manual'),

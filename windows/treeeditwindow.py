@@ -45,8 +45,7 @@ class _WidgetItem(qt.QListViewItem):
         self.widget = widget
         self.settings = widget.settings
 
-        pixmap = qt.QPixmap(os.path.join(action.imagedir, 'button_%s.png' % widget.typename))
-        self.setPixmap(0, pixmap)
+        self.setPixmap(0, action.getPixmap('button_%s.png' % widget.typename) )
         
         self.recursiveAddPrefs(0, self.settings, self)
 
@@ -120,8 +119,8 @@ class _PrefItem(qt.QListViewItem):
         self.index = number
 
         if hasattr(settings, 'pixmap'):
-            pixmap = qt.QPixmap(os.path.join(action.imagedir, 'settings_%s.png' % settings.pixmap))
-            self.setPixmap(0, pixmap)
+            self.setPixmap(0, action.getPixmap('settings_%s.png' %
+                                               settings.pixmap) )
         
     def compare(self, i, col, ascending):
         """Always sort according to the index value."""
@@ -285,19 +284,18 @@ class _PropertyLabel(qt.QLabel):
 class _ReferenceSetting(qt.QHBox):
     """A widget for a setting which is a reference to another setting."""
     
-    link = None
-    
     def __init__(self, parent, setting):
         qt.QHBox.__init__(self, parent)
         
-        if not _ReferenceSetting.link:
-            _ReferenceSetting.link = qt.QIconSet(qt.QPixmap(os.path.join(action.imagedir, 'link.png')))
+        self.linkbutton = qt.QPushButton(action.getIconSet('link.png'), "",
+                                         self)
+        self.linkbutton.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Fixed,
+                                                      qt.QSizePolicy.Fixed) )
+        self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
+                     self.buttonClicked)
         
-        self.linkbutton = qt.QPushButton(_ReferenceSetting.link, "", self)
-        self.linkbutton.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed) )
-        self.connect(self.linkbutton, qt.SIGNAL('clicked()'), self.buttonClicked)
-        
-        qt.QToolTip.add(self.linkbutton, "Linked to %s" % setting.getReference().value)
+        qt.QToolTip.add(self.linkbutton, "Linked to %s" %
+                        setting.getReference().value)
         
         self.setting = setting
         self.setncopy = setting.copy()
