@@ -84,10 +84,6 @@ class Edit(qt.QLineEdit):
         if setting.readonly:
             self.setReadOnly(True)
 
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
-
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
@@ -275,10 +271,6 @@ class String(qt.QHBox):
         if self.editwin == None:
             self.button.setOn(False)
 
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
-
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
@@ -315,10 +307,6 @@ class Bool(qt.QCheckBox):
 
         if setting.readonly:
             self.setEnabled(False)
-
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
@@ -358,10 +346,6 @@ class Choice(qt.QComboBox):
 
         if setting.readonly:
             self.setEnabled(False)
-
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
@@ -406,10 +390,6 @@ class MultiLine(qt.QTextEdit):
 
         if setting.readonly:
             self.setReadOnly(True)
-
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
@@ -700,10 +680,6 @@ class Color(qt.QHBox):
         if self.setting.val != val:
             self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
 
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
-
     def onModified(self, mod):
         """called when the setting is changed remotely"""
 
@@ -782,10 +758,6 @@ class ListSet(qt.QWidget):
         self.populate()
         self.setting.setOnModified(self.onModified)
     
-    def done(self):
-        """Delete modification notification."""
-        self.setting.removeOnModified(self.onModified)
-
     def populateRow(self, row, val):
         """Populate the row in the control.
 

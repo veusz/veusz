@@ -1,3 +1,10 @@
+* 2006-04-09 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Further icons for treeview
+  - Move link buttons into label of setting
+  - Linked setting should not be RO by default
+  - Use weak references in settings for notification of changes
+    (removes need for deleting references to notifiers)
+	
 * 2006-04-06 Jeremy Sanders <jeremy@jeremysanders.net>
   - Large chunk of new stylesheet code added
   - Extra icons for treeview

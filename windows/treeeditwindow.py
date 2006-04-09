@@ -137,29 +137,26 @@ class _PrefItem(qt.QListViewItem):
     def getAssociatedWidget(self):
         """Get widget associated with this item."""
         self.parent.getAssociatedWidget()
-            
-class _PropertyLabel(qt.QLabel):
-    """A label which produces the veusz setting context menu.
 
-    This label handles mouse move and focus events. Both of these
-    shade the widget darker, giving the user information that the widget
-    has focus, and a context menu.
-    """
+class _PropertyLabelLabel(qt.QLabel):
+    """A widget for displaying the actual label in the property label."""
 
     def __init__(self, setting, text, parent):
-        """Initialise the label for the given setting."""
+        """Initialise widget showing text
 
+        setting is the appropriate setting."""
+        
         qt.QLabel.__init__(self, text, parent)
         self.bgcolor = self.paletteBackgroundColor()
         self.setFocusPolicy(qt.QWidget.StrongFocus)
         self.setMargin(1)
 
-        self.control = None
         self.setting = setting
         self.inmenu = False
         self.inmouse = False
         self.infocus = False
-
+        self.parent = parent
+        
     def _setBg(self):
         """Set the background of the widget according to its state."""
 
@@ -263,7 +260,8 @@ class _PropertyLabel(qt.QLabel):
         doc = widget.document
         setn = self.setting
         fnmap = {
-            0: (lambda: self.emit( qt.PYSIGNAL('settingChanged'), (self.control, setn, setn.default) )),
+            0: (lambda: self.parent.control.emit( qt.PYSIGNAL('settingChanged'),
+                                                  (self.parent.control, setn, setn.default) )),
             100: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn) )),
             101: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, root=widget.parent, maxlevels=1) )),
             102: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, widgetname=name) )),
@@ -280,28 +278,40 @@ class _PropertyLabel(qt.QLabel):
         # return widget to previous colour
         self.inmenu = False
         self._setBg()
+            
+class _PropertyLabel(qt.QHBox):
+    """A label which produces the veusz setting context menu.
 
-class _ReferenceSetting(qt.QHBox):
-    """A widget for a setting which is a reference to another setting."""
-    
-    def __init__(self, parent, setting):
+    This label handles mouse move and focus events. Both of these
+    shade the widget darker, giving the user information that the widget
+    has focus, and a context menu.
+    """
+
+    def __init__(self, setting, text, parent):
+        """Initialise the label for the given setting."""
+
         qt.QHBox.__init__(self, parent)
-        
-        self.linkbutton = qt.QPushButton(action.getIconSet('link.png'), "",
-                                         self)
-        self.linkbutton.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Fixed,
-                                                      qt.QSizePolicy.Fixed) )
+        self.setMargin(0)
+        self.setting = setting
+        self.control = None
+
+        self.label = _PropertyLabelLabel(setting, text, self)
+        self.label.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Minimum,
+                                                 qt.QSizePolicy.Fixed) )
+
+        self.linkbutton = qt.QPushButton(action.getIconSet('link.png'), '', self)
+        self.linkbutton.setMaximumWidth(self.linkbutton.height())
         self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
                      self.buttonClicked)
         
-        qt.QToolTip.add(self.linkbutton, "Linked to %s" %
-                        setting.getReference().value)
-        
-        self.setting = setting
-        self.setncopy = setting.copy()
-        self.setncopy.readonly = True
-        self.control = self.setncopy.makeControl(self)
-        
+        if not setting.isReference():
+            self.linkbutton.hide()
+
+        setting.setOnModified(self.slotOnModified)
+
+    def slotOnModified(self, mod):
+        self.linkbutton.setShown(self.setting.isReference())
+
     def buttonClicked(self):
         """Create a popup menu when the button is clicked."""
         popup = qt.QPopupMenu(self)
@@ -651,14 +661,9 @@ class TreeEditWindow(qt.QDockWindow):
         l = _PropertyLabel(setn, setn.name, view)
         self.proptab.setCellWidget(row, 0, l)
         qt.QToolTip.add(l, tooltext)
-        self.connect(l, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
         self.prefchilds.append(l)
 
-        if setn.isReference():
-            c = _ReferenceSetting(view, setn)
-        else:
-            c = setn.makeControl(view)
-
+        c = setn.makeControl(view)
         c.veusz_rownumber = row
         self.connect(c, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
         self.proptab.setCellWidget(row, 1, c)
@@ -681,10 +686,6 @@ class TreeEditWindow(qt.QDockWindow):
         # delete the current widgets in the preferences list
         while len(self.prefchilds) > 0:
             i = self.prefchilds.pop()
-            try:
-                i.done()
-            except AttributeError:
-                pass
 
             # need line below or occasionally get random error
             # "QToolTip.maybeTip() is abstract and must be overridden"
@@ -756,15 +757,7 @@ class TreeEditWindow(qt.QDockWindow):
         it can be undone.
         """
         
-        recreatecontrol = setting.isReference()
         self.document.applyOperation(document.OperationSettingSet(setting, val))
-        if setting.isReference():
-            recreatecontrol = True
-            
-        if recreatecontrol:
-            # need to recreate control if changed to/from reference
-            row = widget.veusz_rownumber
-            self._makeSettingControl(row, setting)
             
     def slotMakeWidgetButton(self, widgettype):
         """Called when an add widget button is clicked.

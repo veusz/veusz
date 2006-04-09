@@ -23,11 +23,32 @@
 
 import string
 import qt
+import weakref
 
 def reverse(data):
     """For iterating over a sequence in reverse."""
     for index in xrange(len(data)-1, -1, -1):
         yield data[index]
+
+class WeakBoundMethod:
+    """A weak reference to a bound method.
+
+    Based on code by Frederic Jolliton
+    See http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/81253
+    """
+    
+    def __init__(self, f):
+        self.f = f.im_func
+        self.c = weakref.ref(f.im_self)
+
+    def isEqual(self, f):
+        """Is the bound method pointed to the same as this one?"""
+        return f.im_func == self.f and f.im_self == self.c
+
+    def __call__(self , *arg):
+        if self.c() == None:
+            raise ValueError, 'Method called on dead object'
+        self.f(self.c(), *arg)
 
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.

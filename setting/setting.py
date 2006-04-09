@@ -93,6 +93,7 @@ class Reference(object):
         return item
         
 class Setting(object):
+
     def __init__(self, name, value, descr=''):
         """Initialise the values.
 
@@ -132,8 +133,16 @@ class Setting(object):
         else:
             # this also removes the linked value if there is one set
             self._val = self.convertTo(v)
-        for mod in self.onmodified:
-            mod(True)
+
+        # iterate over weakly referenced objects
+        # delete those which cannot be called
+        i = 0
+        while i < len(self.onmodified):
+            try:
+                self.onmodified[i](True)
+                i += 1
+            except ValueError:
+                del self.onmodified[i]
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
@@ -246,12 +255,17 @@ class Setting(object):
 
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""
-        self.onmodified.append(fn)
+        self.onmodified.append( utils.WeakBoundMethod(fn) )
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
-        i = self.onmodified.index(fn)
-        del self.onmodified[i]
+
+        i = 0
+        while i < len(self.onmodified):
+            f = self.onmodified[i]
+            if f.isEqual(fn):
+                del self.onmodified[i]
+            i += 1
 
     def newDefault(self, value):
         """Update the default and the value."""
