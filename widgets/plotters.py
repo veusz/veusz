@@ -68,6 +68,22 @@ class GenericPlotter(widget.Widget):
         """
         pass
 
+    def clipAxesBounds(self, painter, axes, bounds):
+        """Clip painter to start and stop values of axis."""
+
+        # update cached coordinates of axes
+        axes[0].plotterToGraphCoords(bounds, N.array([]))
+        axes[1].plotterToGraphCoords(bounds, N.array([]))
+
+        # get range
+        x1 = axes[0].coordParr1
+        x2 = axes[0].coordParr2
+        y1 = axes[1].coordParr1
+        y2 = axes[1].coordParr2
+
+        # actually clip the data
+        painter.setClipRect( qt.QRect(x1, y2, x2-x1, y1-y2) )
+
 ########################################################################
         
 class FunctionPlotter(GenericPlotter):
@@ -275,7 +291,7 @@ class FunctionPlotter(GenericPlotter):
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        self.clipAxesBounds(painter, axes, posn)
 
         # draw the function line
         if bad:
@@ -631,7 +647,7 @@ class PointPlotter(GenericPlotter):
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        self.clipAxesBounds(painter, axes, posn)
 
         # calc plotter coords of x and y points
         xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
