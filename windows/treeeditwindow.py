@@ -403,33 +403,6 @@ class _PropertyLabel(qt.QHBox):
         self.label = _PropertyLabelLabel(setting, text, self)
         self.label.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Minimum,
                                                  qt.QSizePolicy.Fixed) )
-
-        self.linkbutton = qt.QPushButton(action.getIconSet('link.png'), '', self)
-        self.linkbutton.setMaximumWidth(self.linkbutton.height())
-        self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
-                     self.buttonClicked)
-        
-        if not setting.isReference():
-            self.linkbutton.hide()
-
-        setting.setOnModified(self.slotOnModified)
-
-    def slotOnModified(self, mod):
-        self.linkbutton.setShown(self.setting.isReference())
-
-    def buttonClicked(self):
-        """Create a popup menu when the button is clicked."""
-        popup = qt.QPopupMenu(self)
-
-        popup.insertItem('Unlink setting', 100)
-        popup.insertItem('Edit linked setting', 101)
-        
-        ret = popup.exec_loop( qt.QCursor.pos() )
-
-        if ret == 100:
-            # update setting with own value to get rid of reference
-            val = self.setting.get()
-            self.emit( qt.PYSIGNAL('settingChanged'), (self, self.setting, val) )
         
 class _WidgetListView(qt.QListView):
     """A list view for the widgets

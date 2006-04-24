@@ -1,3 +1,6 @@
+* 2006-04-24 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Fix new labels on actions
+	
 * 2006-04-10 Jeremy Sanders <jeremy@jeremysanders.net>
   - Clip plotters to axes ranges rather than plot
 	
