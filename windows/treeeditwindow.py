@@ -162,15 +162,18 @@ class _NewPropertyLabel(qt.QHBox):
         self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
                      self.buttonClicked)
 
-        if not setting.isReference():
-            self.linkbutton.hide()
-
         setting.setOnModified(self.slotOnModified)
-
+        # show linkbutton if appropriate, update tooltip
+        self.slotOnModified(True)
+        
     def slotOnModified(self, mod):
         """Alter reference button if setting is modified."""
         
-        self.linkbutton.setShown(self.setting.isReference())
+        isref = self.setting.isReference()
+        if isref:
+            ref = self.setting.getReference()
+            qt.QToolTip.add(self.linkbutton, "Linked to %s" % ref.value)
+        self.linkbutton.setShown(isref)
 
     def getWidget(self):
         """Get associated Veusz widget."""
@@ -206,8 +209,8 @@ class _NewPropertyLabel(qt.QHBox):
                          (type, name), 201)
         popup.insertItem('Forget this default setting', 202)
 
-        pos = self.menubutton.mapToGlobal(self.menubutton.pos())
-        ret = popup.exec_loop(pos)
+        #pos = self.menubutton.mapToGlobal(self.menubutton.pos())
+        ret = popup.exec_loop( qt.QCursor.pos() )
 
         # convert values above to functions
         doc = widget.document
@@ -738,7 +741,6 @@ class TreeEditWindow(qt.QDockWindow):
         view = self.proptab.viewport()
         l = _NewPropertyLabel(setn, view)
         self.proptab.setCellWidget(row, 0, l)
-        qt.QToolTip.add(l, tooltext)
         self.prefchilds.append(l)
 
         c = setn.makeControl(view)

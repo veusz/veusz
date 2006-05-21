@@ -58,7 +58,10 @@ class OperationSettingSet:
         """Apply setting variable."""
         
         setting = document.resolveFullSettingPath(self.settingpath)
-        self.oldvalue = setting.get()
+        if setting.isReference():
+            self.oldvalue = setting.getReference()
+        else:
+            self.oldvalue = setting.get()
         setting.set(self.value)
         
     def undo(self, document):
