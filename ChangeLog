@@ -1,6 +1,9 @@
 * 2006-05-21 Jeremy Sanders <jeremy@jeremysanders.net>
   - Further reference improvements
   - Add icon for stylesheet
+  - Add default filename for exporting eps files
+  - Clean up document operation batching
+  - Add Import/Export stylesheet menu items
   
 * 2006-04-24 Jeremy Sanders <jeremy@jeremysanders.net>
   - Fix new labels on actions

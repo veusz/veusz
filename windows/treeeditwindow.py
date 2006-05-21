@@ -963,7 +963,7 @@ class TreeEditWindow(qt.QDockWindow):
             # This is so that the user can undo this in one step
             op = document.OperationMultiple([], descr='paste')
             self.document.applyOperation(op)
-            self.document.batchHistory(True)
+            self.document.batchHistory(op)
             
             # Add the first widget being pasted
             self.makeWidget(widgettype, autoadd=False, name=widgetname)
@@ -979,7 +979,7 @@ class TreeEditWindow(qt.QDockWindow):
                 interpreter.run(command)
                 
             # stop the history batching
-            self.document.batchHistory(False)
+            self.document.batchHistory(None)
                 
             # reset the interpreter widget
             interpreter.interface.currentwidget = tmpCurrentwidget

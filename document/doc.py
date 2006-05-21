@@ -60,34 +60,39 @@ class Document( qt.QObject ):
         """
         
         retn = operation.do(self)
-        
+
         if self.historybatch:
             # in batch mode, create an OperationMultiple for all changes
-            self.historyundo[-1].addOperation(operation)
+            self.historybatch[-1].addOperation(operation)
         else:
             # standard mode
             self.historyundo.append(operation)
         self.historyredo = []
+
         self.setModified()
         return retn
 
     def clearHistory(self):
         """Clear any history."""
         
-        self.historybatch = False
+        self.historybatch = []
         self.historyundo = []
         self.historyredo = []
         
-    def batchHistory(self, batch=True):
+    def batchHistory(self, batch):
         """Enable/disable batch history mode.
         
-        In this mode the user applies a blank OperationMultiple to the doc, then
-        switches batchHistory on. Further updates are collected on the OperationMultiple
-        until batchHistory is set to False.
+        In this mode further operations are added to the OperationMultiple specified,
+        untile batchHistory is called with None.
+        
+        The objects are pushed into a list and popped off
         
         This allows multiple operations to be batched up for simple undo.
         """
-        self.historybatch = batch
+        if batch:
+            self.historybatch.append(batch)
+        else:
+            self.historybatch.pop()
         
     def undoOperation(self):
         """Undo the previous operation."""
@@ -285,17 +290,20 @@ class Document( qt.QObject ):
         """Return the number of pages in the document."""
         return len(self.basewidget.children)
 
-    def saveToFile(self, file):
-        """Save the text representing a document to a file."""
-
-        file.write('# Veusz saved document (version %s)\n' % utils.version())
+    def _writeFileHeader(self, file, type):
+        """Write a header to a saved file of type."""
+        file.write('# Veusz %s (version %s)\n' % (type, utils.version()))
         try:
             file.write('# User: %s\n' % os.environ['LOGNAME'] )
         except KeyError:
             pass
-        file.write('# Date: %s\n\n' % time.strftime(
-            "%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) )
+        file.write('# Date: %s\n\n' % time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) )
+        
+    def saveToFile(self, file):
+        """Save the text representing a document to a file."""
 
+        self._writeFileHeader(file, 'saved document')
+        
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
@@ -311,6 +319,14 @@ class Document( qt.QObject ):
         
         self.setModified(False)
 
+    def exportStyleSheet(self, file):
+        """Export the StyleSheet to a file."""
+
+        self._writeFileHeader(file, 'exported stylesheet')
+        stylesheet = self.basewidget.settings.StyleSheet
+
+        file.write( stylesheet.saveText(True, rootname='') )
+        
     def export(self, filename, pagenumber, color=True):
         """Export the figure to the filename."""
 

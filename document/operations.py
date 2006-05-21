@@ -34,11 +34,14 @@ because some operations cannot restore references (e.g. add object)
 
 import numarray as N
 
+import document
 import utils
 import datasets
 import widgets
 import simpleread
+import commandinterpreter
 import readcsv
+import os.path
     
 ###############################################################################
 # Setting operations
@@ -157,7 +160,7 @@ class OperationSettingPropagate:
                                                         outlist, newmaxlevels)
 
     _recursiveGet = staticmethod(_recursiveGet)
-            
+
 ###############################################################################
 # Widget operations
         
@@ -955,4 +958,29 @@ class OperationMultiple:
         # operations need to undone in reverse order
         for op in utils.reverse(self.operations):
             op.undo(document)
-            
+
+class OperationImportStyleSheet(OperationMultiple):
+    """An operation to import a stylesheet."""
+    
+    def __init__(self, filename):
+        """Import stylesheet with filename."""
+        OperationMultiple.__init__(self, [], descr='import stylesheet')
+        self.filename = os.path.abspath(filename)
+        
+    def do(self, document):
+        """Do the import."""
+
+        # get document to keep track of changes for undo/redo
+        document.batchHistory(self)
+
+        # fire up interpreter to read file
+        interpreter = commandinterpreter.CommandInterpreter(document)
+        e = None
+        try:
+            interpreter.runFile( open(self.filename) )
+        except Exception, e:
+            pass
+        document.batchHistory(None)
+        if e:
+            raise e
+        

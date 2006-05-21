@@ -272,6 +272,11 @@ class MainWindow(qt.QMainWindow):
              self.slotFilePrint, 'stock-print.png', True, 'Ctrl+P'),
             ('fileexport', 'Export the current page', '&Export...', 'file',
              self.slotFileExport, 'stock-export.png', True, ''),
+            ('fileexportstylesheet', 'Export stylesheet to file', 'Export stylesheet...', 'file',
+             self.slotFileExportStyleSheet, '', False, ''), 
+            ('fileimportstylesheet', 'Import stylesheet from file', 'Import stylesheet...', 'file',
+             self.slotFileImportStyleSheet, '', False, ''), 
+ 
             ('file', ),
             ('fileclose', 'Close current window', 'Close Window', 'file',
              self.slotFileClose, '', False, 'Ctrl+W'),
@@ -461,14 +466,14 @@ class MainWindow(qt.QMainWindow):
             self.setCaption( "%s - Veusz" %
                              os.path.basename(self.filename) )
 
-    def slotFileSaveAs(self):
-        """Save As file."""
-
-        fd = qt.QFileDialog(self, 'save as dialog', True)
+    def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
+        """A generic file save dialog for exporting / saving."""
+        
+        fd = qt.QFileDialog(self, 'saveasdialog', True)
         fd.setDir(self.dirname)
         fd.setMode( qt.QFileDialog.AnyFile )
-        fd.setFilter( "Veusz script files (*.vsz)" )
-        fd.setCaption('Save as')
+        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        fd.setCaption(dialogtitle)
 
         # okay was selected
         if fd.exec_loop() == qt.QDialog.Accepted:
@@ -477,11 +482,11 @@ class MainWindow(qt.QMainWindow):
             # update the edit box
             filename = unicode( fd.selectedFile() )
             if os.path.splitext(filename)[1] == '':
-                filename += '.vsz'
+                filename += '.' + filetype
 
             # test whether file exists and ask whether to overwrite it
             try:
-                open(filename, 'r')
+                open(filename)
             except IOError:
                 pass
             else:
@@ -493,14 +498,51 @@ class MainWindow(qt.QMainWindow):
                                    qt.QMessageBox.NoButton,
                                    self).exec_loop()
                 if v == qt.QMessageBox.No:
-                    return
+                    return None
 
+            return filename
+        return None
+
+    def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
+        """Display an open dialog and return a filename."""
+        
+        fd = qt.QFileDialog(self, 'opendialog', True)
+        fd.setDir( self.dirname )
+        fd.setMode( qt.QFileDialog.ExistingFile )
+        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        fd.setCaption(dialogtitle)
+
+        # if the user chooses a file
+        if fd.exec_loop() == qt.QDialog.Accepted:
+            # save directory for next time
+            self.dirname = fd.dir()
+
+            filename = unicode( fd.selectedFile() )
+            try:
+                open(filename)
+            except IOError, e:
+                qt.QMessageBox("Veusz",
+                               "Unable to open file '%s'\n'%s'" % (filename, str(e)),
+                               qt.QMessageBox.Critical,
+                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                               qt.QMessageBox.NoButton,
+                               qt.QMessageBox.NoButton,
+                               self).exec_loop()
+                return None
+            return filename
+        return None
+
+    def slotFileSaveAs(self):
+        """Save As file."""
+
+        filename = self._fileSaveDialog('vsz', 'Veusz script files', 'Save as')
+        if filename:
             self.filename = filename
             self.updateTitlebar()
 
             self.slotFileSave()
 
-    def openFile(self,filename):
+    def openFile(self, filename):
         """Select whether to load the file in the
         current window or in a blank window and calls the appropriate loader"""
         if self.document.isBlank():
@@ -565,19 +607,8 @@ class MainWindow(qt.QMainWindow):
     def slotFileOpen(self):
         """Open an existing file in a new window."""
 
-        fd = qt.QFileDialog(self, 'open dialog', True)
-        fd.setDir( self.dirname )
-        fd.setMode( qt.QFileDialog.ExistingFile )
-        fd.setFilter ( "Veusz script files (*.vsz)" )
-        fd.setCaption('Open')
-
-        # if the user chooses a file
-        if fd.exec_loop() == qt.QDialog.Accepted:
-            # save directory for next time
-            self.dirname = fd.dir()
-
-            filename = unicode( fd.selectedFile() )
-
+        filename = self._fileOpenDialog('vsz', 'Veusz script files', 'Open')
+        if filename:
             self.openFile(filename)
         
     def populateRecentFiles(self):
@@ -650,6 +681,12 @@ class MainWindow(qt.QMainWindow):
             
         fd.setCaption('Export')
 
+        if self.filename:
+            # try to convert current filename to export name
+            filename = os.path.basename(self.filename)
+            filename = os.path.splitext(filename)[0] + '.eps'
+            fd.setSelection(filename)
+        
         if fd.exec_loop() == qt.QDialog.Accepted:
             # save directory for next time
             self.exportDir = fd.dir()
@@ -738,3 +775,29 @@ class MainWindow(qt.QMainWindow):
             self.pagelabel.setText("No pages")
         else:
             self.pagelabel.setText("Page %i/%i" % (number+1, np))
+
+    def slotFileExportStyleSheet(self):
+        """Export stylesheet as a file."""
+    
+        filename = self._fileSaveDialog('vst', 'Veusz stylesheet', 'Export stylesheet')
+        if filename:
+            try:
+                f = open(filename, 'w')
+            except IOError:
+                qt.QMessageBox("Veusz",
+                               "Cannot export stylesheet as '%s'" % filename,
+                               qt.QMessageBox.Critical,
+                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
+                               qt.QMessageBox.NoButton,
+                               qt.QMessageBox.NoButton,
+                               self).exec_loop()
+                return
+            
+            self.document.exportStyleSheet(f)
+            
+    def slotFileImportStyleSheet(self):
+        """Import a style sheet."""
+        filename = self._fileOpenDialog('vst', 'Veusz stylesheet', 'Import stylesheet')
+        if filename:
+            self.document.applyOperation( document.OperationImportStyleSheet(filename) )
+            
