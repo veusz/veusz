@@ -31,6 +31,7 @@ from application import Application
 
 StyleSheet.register('Line', setting.Distance('width', '0.5pt', descr='Default line width'))
 StyleSheet.register('Line', setting.Color('color', 'black', descr='Default line color'))
+StyleSheet.setPixmap('Line', 'plotline')
 
 class Line(Settings):
     '''For holding properities of a line.'''
@@ -213,6 +214,7 @@ def _registerFontStyleSheet():
     StyleSheet.register('Font', setting.ChoiceOrMore('font', families, default, descr='Font name'))
     StyleSheet.register('Font', setting.Distance('size', '14pt', descr='Default font size'))
     StyleSheet.register('Font', setting.Color('color', 'black', descr='Default font color'))
+    StyleSheet.setPixmap('Font', 'axislabel')
     
 Application.startupfunctions.append(_registerFontStyleSheet)
 

@@ -18,7 +18,7 @@
 
 # $Id$
 
-"""Handles default values of settings for widgets."""
+"""Handles default values of settings."""
 
 import settings
 
@@ -28,28 +28,40 @@ class StyleSheet(settings.Settings):
     Settings are registered to be added to the stylesheet."""
 
     registeredsettings = []
+    settingpixmaps = {}
     
-    def register(kls, widgettype, setting):
+    def register(kls, settingtype, setting):
         """Register the setting so that the document can access it.
-        widgettype is None for global settings
+        settingtype is None for global settings
         """
-        kls.registeredsettings.append( (widgettype, setting) )
+        kls.registeredsettings.append( (settingtype, setting) )
     register = classmethod(register)
+    
+    def setPixmap(kls, settingtype, pixmap):
+        """Set the pixmap for the settingtype."""
+        kls.settingpixmaps[settingtype] = pixmap
+    setPixmap = classmethod(setPixmap)
     
     def __init__(self):
         """Create the default settings."""
         settings.Settings.__init__(self, 'StyleSheet', 'global styles')
+        self.pixmap = 'stylesheet'
         
         # make copies of all the registered settings
-        for widgettype, setting in self.registeredsettings:
+        for settingtype, setting in self.registeredsettings:
             # add subsetting if not there
-            if widgettype and (widgettype not in self.setnames):
-                s = settings.Settings(widgettype)
+            if settingtype and (settingtype not in self.setnames):
+                s = settings.Settings(settingtype)
+                # set pixmap if one is set
+                try:
+                    s.pixmap = self.settingpixmaps[settingtype]
+                except KeyError:
+                    pass
                 self.add(s)
             
             # work out subsetting
-            if widgettype:
-                s = self.setdict[widgettype]
+            if settingtype:
+                s = self.setdict[settingtype]
             else:
                 s = self
             
