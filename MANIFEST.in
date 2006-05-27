@@ -5,6 +5,5 @@ recursive-include tests *.py *.sh *.vsz
 recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html
 recursive-include windows *.png README
 recursive-include examples *.vsz *.eps *.py
-recursive-include images *.png
 recursive-include widgets *.dat
 recursive-include helpers *.c README LICENSE_*

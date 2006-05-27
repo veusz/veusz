@@ -60,7 +60,7 @@ class MainWindow(qt.QMainWindow):
     def __init__(self, *args):
         qt.QMainWindow.__init__(self, *args)
 
-        self.setIcon( qt.QPixmap(os.path.join(action.imagedir, 'icon.png')) )
+        self.setIcon( qt.QPixmap(os.path.join(action.imagedir, 'veusz.png')) )
 
         self.document = document.Document()
 

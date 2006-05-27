@@ -529,8 +529,7 @@ class PlotWindow( qt.QScrollView ):
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""
 
-        logolocation = os.path.join(os.path.dirname(__file__),
-                                    '..', 'images', 'logo.png')
+        logolocation = os.path.join(action.imagedir, 'logo.png')
         logo = qt.QPixmap( logolocation )
         painter.drawPixmap( self.visibleWidth()/2 - logo.width()/2,
                             self.visibleHeight()/2 - logo.height()/2,
