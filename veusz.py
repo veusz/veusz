@@ -57,10 +57,7 @@ def run():
     # register a signal handler to catch ctrl+c
     signal.signal(signal.SIGINT, handleIntSignal)
 
-    # call these functions on startup
-    for function in utils.callonstartup:
-        function()
-    
+    # handle arguments
     if app.argv():
 
         parser = optparse.OptionParser(

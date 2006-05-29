@@ -166,11 +166,11 @@ class GridLine(Line):
         self.get('style').newDefault('dotted')
 
 class _FontList(object):
-    '''A wrapped list class to interogate the list of fonts on usage.
+    """A wrapped list class to interogate the list of fonts on usage.
     
     This is needed because we can't get the list of fonts until the QApplication has started.
     This class looks like a readonly list
-    '''
+    """
     
     def __init__(self):
         self.vals = None
@@ -215,7 +215,7 @@ def _registerFontStyleSheet():
     StyleSheet.register('Font', setting.Distance('size', '14pt', descr='Default font size'))
     StyleSheet.register('Font', setting.Color('color', 'black', descr='Default font color'))
     StyleSheet.setPixmap('Font', 'axislabel')
-    
+
 Application.startupfunctions.append(_registerFontStyleSheet)
 
 class Text(Settings):
