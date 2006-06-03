@@ -1,5 +1,8 @@
-* 2006-05-29 Jeremy Sanders <jeremy@jeremysanders.net.
-  - Horrible import path munging to avoid 2x importing
+* 2006-06-03 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Remove obsolete pref.py from utils
+	
+* 2006-05-29 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Import path munging to avoid 2x importing
 	
 * 2006-05-28 Jeremy Sanders <jeremy@jeremysanders.net>
   - Further minor changes for rpm packaging

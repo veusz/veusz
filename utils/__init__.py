@@ -21,8 +21,6 @@
 # $Id$
 
 from utilfuncs import *
-from pref import *
-from preftypes import *
 from textrender import *
 from points import *
 from version import *
