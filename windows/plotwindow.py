@@ -35,13 +35,13 @@ import widgets
 import action
 import document
 
-class PointPainter(widgets.Painter):
+class PointPainter(document.Painter):
     """A simple painter variant which works out the last widget
     to overlap with the point specified."""
 
     def __init__(self, pixmap, x, y):
         """Watch the point x, y."""
-        widgets.Painter.__init__(self)
+        document.Painter.__init__(self)
         self.x = x
         self.y = y
         self.widget = None
@@ -60,7 +60,7 @@ class PointPainter(widgets.Painter):
         # record bounds of each widget
         self.bounds[widget] = bounds
 
-class ClickPainter(widgets.Painter):
+class ClickPainter(document.Painter):
     """A variant of a painter which checks to see whether a certain
     sized area is drawn over each time a widget is drawn. This allows
     the program to identify clicks with a widget.
@@ -74,7 +74,7 @@ class ClickPainter(widgets.Painter):
         pixmap is the region the painter monitors
         """
         
-        widgets.Painter.__init__(self)
+        document.Painter.__init__(self)
 
         self.pixmap = pixmap
         self.xmin = xmin
@@ -488,7 +488,7 @@ class PlotWindow( qt.QScrollView ):
         """Set the ouput display size."""
 
         # convert distances into pixels
-        painter = widgets.Painter(self)
+        painter = document.Painter(self)
         painter.veusz_scaling = self.zoomfactor
         painter.veusz_pixperpt = self.widgetdpi / 72.
         size = self.document.basewidget.getSize(painter)

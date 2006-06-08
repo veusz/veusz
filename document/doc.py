@@ -251,7 +251,7 @@ class Document( qt.QObject ):
     def printTo(self, printer, pages, scaling = 1., dpi = None):
         """Print onto printing device."""
 
-        painter = widgets.Painter()
+        painter = Painter()
         painter.veusz_scaling = scaling
         if dpi  != None:
             painter.veusz_pixperpt = dpi / 72.
@@ -427,3 +427,21 @@ class Document( qt.QObject ):
 
         # return widget
         return obj
+
+class Painter(qt.QPainter):
+    """A painter which allows the program to know which widget it is
+    currently drawing."""
+    
+    def __init__(self, *args):
+        qt.QPainter.__init__(self, *args)
+
+        self.veusz_scaling = 1.
+
+    def beginPaintingWidget(self, widget, bounds):
+        """Keep track of the widget currently being painted."""
+        pass
+
+    def endPaintingWidget(self):
+        """Widget is now finished."""
+        pass
+    

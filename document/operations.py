@@ -34,10 +34,9 @@ because some operations cannot restore references (e.g. add object)
 
 import numarray as N
 
-import document
 import utils
 import datasets
-import widgets
+import widgetfactory
 import simpleread
 import commandinterpreter
 import readcsv
@@ -103,7 +102,7 @@ class OperationSettingPropagate:
         # work out path of setting relative to widget
         path = []
         s = setting
-        while not isinstance(s, widgets.Widget):
+        while not s.isWidget():
             path.insert(0, s.name)
             s = s.parent
         self.setpath = path[1:]
@@ -271,10 +270,10 @@ class OperationWidgetAdd:
         """
         
         parent = document.resolveFullWidgetPath(self.parentpath)
-        w = widgets.thefactory.makeWidget(self.type, parent,
-                                          autoadd=self.autoadd,
-                                          name=self.name,
-                                          **self.defaultvals)
+        w = widgetfactory.thefactory.makeWidget(self.type, parent,
+                                                autoadd=self.autoadd,
+                                                name=self.name,
+                                                **self.defaultvals)
         self.createdname = w.name
         return w
         

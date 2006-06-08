@@ -26,7 +26,7 @@ import os
 import qt
 import qttable
 
-import widgets.widgetfactory as widgetfactory
+import widgetfactory
 import widgets
 import action
 import utils
