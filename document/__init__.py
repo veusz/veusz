@@ -20,6 +20,7 @@
 
 # $Id$
 
+from widgetfactory import *
 from doc import *
 from datasets import *
 from commandinterface import *

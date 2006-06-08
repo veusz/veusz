@@ -28,12 +28,11 @@ Classes include
 """
 
 import widget
-import widgetfactory
+import document
 import axis
 import page
 import graph
 import setting
-import document
 
 class _gridengine:
     """Internal class to build up grid of widgets."""
@@ -273,6 +272,6 @@ class Grid(widget.Widget):
         # do not call widget.Widget.draw
 
 # allow the factory to instantiate a grid
-widgetfactory.thefactory.register( Grid )
+document.thefactory.register( Grid )
 
        

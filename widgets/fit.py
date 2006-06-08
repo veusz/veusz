@@ -28,10 +28,9 @@ import numarray as N
 import numarray.ieeespecial as NIE
 
 import plotters
-import widgetfactory
+import document
 import setting
 import utils
-import document
 
 class Fit(plotters.FunctionPlotter):
     """A plotter to fit a function to data."""
@@ -241,4 +240,4 @@ class Fit(plotters.FunctionPlotter):
         return ''.join(parts)
 
 # allow the factory to instantiate an x,y plotter
-widgetfactory.thefactory.register( Fit )
+document.thefactory.register( Fit )

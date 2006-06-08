@@ -23,7 +23,7 @@
 import plotters
 import widget
 import graph
-import widgetfactory
+import document
 import setting
 import utils
 
@@ -169,4 +169,4 @@ class Key(widget.Widget):
         painter.restore()
         painter.endPaintingWidget()
 
-widgetfactory.thefactory.register( Key )
+document.thefactory.register( Key )

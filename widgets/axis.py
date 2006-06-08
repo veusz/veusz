@@ -26,7 +26,7 @@ import numarray as N
 
 import widget
 import axisticks
-import widgetfactory
+import document
 import graph
 import containers
 import setting
@@ -728,4 +728,4 @@ class Axis(widget.Widget):
         painter.endPaintingWidget()
 
 # allow the factory to instantiate an axis
-widgetfactory.thefactory.register( Axis )
+document.thefactory.register( Axis )

@@ -21,7 +21,7 @@
 # $Id$
 
 import widget
-import widgetfactory
+import document
 import axis
 import page
 import containers
@@ -193,5 +193,5 @@ class Graph(widget.Widget):
                         outerbounds=ob )
                             
 # allow users to make Graph objects
-widgetfactory.thefactory.register( Graph )
+document.thefactory.register( Graph )
 

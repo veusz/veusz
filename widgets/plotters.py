@@ -26,7 +26,7 @@ import itertools
 import numarray as N
 
 import widget
-import widgetfactory
+import document
 import graph
 import setting
 
@@ -323,7 +323,7 @@ class FunctionPlotter(GenericPlotter):
         painter.endPaintingWidget()
 
 # allow the factory to instantiate an function plotter
-widgetfactory.thefactory.register( FunctionPlotter )
+document.thefactory.register( FunctionPlotter )
 
 ###############################################################################
         
@@ -688,7 +688,7 @@ class PointPlotter(GenericPlotter):
         painter.endPaintingWidget()
 
 # allow the factory to instantiate an x,y plotter
-widgetfactory.thefactory.register( PointPlotter )
+document.thefactory.register( PointPlotter )
 
 ###############################################################################
 
@@ -776,4 +776,4 @@ class TextLabel(GenericPlotter):
             painter.endPaintingWidget()
 
 # allow the factory to instantiate a text label
-widgetfactory.thefactory.register( TextLabel )
+document.thefactory.register( TextLabel )

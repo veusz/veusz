@@ -31,7 +31,7 @@ import qt
 import numarray as N
 
 import setting
-import widgetfactory
+import document
 import plotters
 
 class Contour(plotters.GenericPlotter):
@@ -358,4 +358,4 @@ class Contour(plotters.GenericPlotter):
         painter.restore()
 
 # allow the factory to instantiate a contour
-widgetfactory.thefactory.register( Contour )
+document.thefactory.register( Contour )

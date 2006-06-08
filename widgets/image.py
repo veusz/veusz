@@ -27,7 +27,7 @@ import qt
 import numarray as N
 
 import setting
-import widgetfactory
+import document
 import plotters
 
 def applyScaling(data, mode, minval, maxval):
@@ -387,4 +387,4 @@ class Image(plotters.GenericPlotter):
         painter.endPaintingWidget()
 
 # allow the factory to instantiate an image
-widgetfactory.thefactory.register( Image )
+document.thefactory.register( Image )

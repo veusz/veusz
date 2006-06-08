@@ -25,7 +25,7 @@ import itertools
 
 import qt
 
-import widgetfactory
+import document
 import utils
 import setting
 
@@ -372,4 +372,4 @@ class Widget(object):
             return True
 
 # allow the factory to instantiate a generic widget
-widgetfactory.thefactory.register( Widget )
+document.thefactory.register( Widget )

@@ -31,7 +31,7 @@ import string
 
 import qt
 
-import widgets
+import widgetfactory
 import utils
 import simpleread
 import setting
@@ -160,7 +160,9 @@ class Document( qt.QObject ):
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}
-        self.basewidget = widgets.Root(None, document=self)
+        self.basewidget = widgetfactory.thefactory.makeWidget(
+            'document', None, None)
+        self.basewidget.document = self
         self.setModified(False)
         self.emit( qt.PYSIGNAL("sigWiped"), () )
 

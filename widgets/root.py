@@ -24,7 +24,7 @@
 import qt
 
 import widget
-import widgetfactory
+import document
 import setting
 
 class Root(widget.Widget):
@@ -70,4 +70,4 @@ class Root(widget.Widget):
         return bounds
 
 # allow the factory to instantiate this
-widgetfactory.thefactory.register( Root )
+document.thefactory.register( Root )

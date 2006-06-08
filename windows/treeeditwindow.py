@@ -26,7 +26,6 @@ import os
 import qt
 import qttable
 
-import widgetfactory
 import widgets
 import action
 import utils
@@ -626,7 +625,7 @@ class TreeEditWindow(qt.QDockWindow):
 
         # get list of allowed classes
         wcl = [(i.typename, i)
-               for i in widgetfactory.thefactory.listWidgetClasses()
+               for i in document.thefactory.listWidgetClasses()
                if i.allowusercreation]
         wcl.sort()
 
@@ -885,7 +884,7 @@ class TreeEditWindow(qt.QDockWindow):
 
         # find the parent to add the child to, we go up the tree looking
         # for possible parents
-        wc = widgetfactory.thefactory.getWidgetClass(widgettype)
+        wc = document.thefactory.getWidgetClass(widgettype)
         while parent != None and not wc.willAllowParent(parent):
             parent = parent.parent
 
