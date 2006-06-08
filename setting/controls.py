@@ -32,7 +32,6 @@ import qt
 import qttable
 
 import setting
-import widgets
 import utils
 
 def _populateCombo(combo, items):
@@ -704,16 +703,19 @@ class Axis(Choice):
 
         # get parent widget
         widget = self.setting
-        while not isinstance(widget, widgets.Widget) and widget != None:
+        while not widget.isWidget() and widget != None:
             widget = widget.parent
 
         # get list of axis widgets up the tree
         axes = {}
         while widget != None:
             for w in widget.children:
-                if ( isinstance(w, widgets.Axis) and
-                     w.settings.direction == self.direction ):
-                    axes[w.name] = True
+                try:
+                    # succeeds if axis
+                    if w.settings.direction == self.direction:
+                        axes[w.name] = True
+                except AttributeError:
+                    pass
             widget = widget.parent
 
         names = axes.keys()

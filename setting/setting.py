@@ -35,7 +35,6 @@ import qt
 
 import utils
 import controls
-import widgets
 import settings
 from settingdb import settingdb
 
@@ -76,7 +75,7 @@ class Reference(object):
             elif p == '':
                 pass
             else:
-                if isinstance(item, widgets.Widget):
+                if item.isWidget():
                     child = item.getChild(p)
                     if not child:
                         item = item.settings.get(p)
@@ -109,6 +108,10 @@ class Setting(object):
 
         # calls the set function for the val property
         self.val = value
+
+    def isWidget(self):
+        """Is this object a widget?"""
+        return False
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
@@ -163,7 +166,7 @@ class Setting(object):
         while obj != None:
             # logic easier to understand here
             # do not add settings name for settings of widget
-            if not isinstance(obj, widgets.Widget) and isinstance(obj.parent, widgets.Widget):
+            if not obj.isWidget() and obj.parent.isWidget():
                 pass
             else:
                 path.insert(0, obj.name)
@@ -210,7 +213,7 @@ class Setting(object):
         # build up setting path
         path = ''
         item = self
-        while not isinstance(item, widgets.Widget):
+        while not item.isWidget():
             path = '/%s%s' % (item.name, path)
             item = item.parent
 
@@ -233,7 +236,7 @@ class Setting(object):
         # build up setting path
         path = ''
         item = self
-        while not isinstance(item, widgets.Widget):
+        while not item.isWidget():
             path = '/%s%s' % (item.name, path)
             item = item.parent
 
@@ -836,7 +839,7 @@ class WidgetPath(Str):
 
         # find the widget associated with this setting
         widget = self
-        while not isinstance(widget, widgets.Widget):
+        while not widget.isWidget():
             widget = widget.parent
 
         # usually makes sense to give paths relative to a parent of a widget

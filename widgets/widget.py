@@ -75,6 +75,10 @@ class Widget(object):
         self.actionfuncs = {}
         self.actiondescr = {}
 
+    def isWidget(self):
+        """Is this object a widget?"""
+        return True
+
     def rename(self, name):
         """Change name of self."""
 

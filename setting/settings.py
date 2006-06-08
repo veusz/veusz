@@ -35,6 +35,10 @@ class Settings:
         self.changeset = 0
         self.parent = None
 
+    def isWidget(self):
+        """Is this object a widget?"""
+        return False
+
     def getSettingsNames(self):
         """Get a list of names of settings."""
         return self.setnames

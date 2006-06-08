@@ -1,3 +1,6 @@
+* 2006-06-08 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Remove dependency of widget module on settings module
+	
 * 2006-06-03 Jeremy Sanders <jeremy@jeremysanders.net>
   - Remove obsolete pref.py from utils
 	
