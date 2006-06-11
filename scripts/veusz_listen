@@ -4,18 +4,7 @@
 # This is licenced under the GNU General Public Licence, v2 or greater
 # see the file COPYING for details
 
-# horrible magic go get path correct
-# we need to get the veusz module into the python path
-import imp
-import sys
-import os.path
+# $Id:$
 
-# this finds the path of the veusz module
-path = imp.find_module('veusz')[1]
-
-# add to the python path
-sys.path.insert(0, os.path.abspath(path))
-
-# import the veusz_listen.py in the veusz module
-import veusz_listen
-veusz_listen.run()
+import veusz.veusz_listen
+veusz.veusz_listen.run()

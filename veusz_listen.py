@@ -34,10 +34,10 @@ import os.path
 
 import qt
 
-sys.path.insert( 0, os.path.dirname(__file__) )
+#sys.path.insert( 0, os.path.dirname(__file__) )
 
-import windows.simplewindow
-import document
+from veusz.windows.simplewindow import SimpleWindow
+import veusz.document as document
 from application import Application
 
 class InputListener(qt.QObject):
@@ -105,7 +105,7 @@ def run():
     else:
         name = 'Veusz output'
         
-    win = windows.simplewindow.SimpleWindow(name)
+    win = SimpleWindow(name)
     win.show()
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
                 app, qt.SLOT("quit()"))

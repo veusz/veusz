@@ -32,7 +32,7 @@ import qt
 import qttable
 
 import setting
-import utils
+import veusz.utils as utils
 
 def _populateCombo(combo, items):
     """Populate the combo with the list of items given.

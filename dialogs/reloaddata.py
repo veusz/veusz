@@ -24,7 +24,7 @@
 
 import qt
 
-import document
+import veusz.document as document
 
 class ReloadData(qt.QDialog):
     """Dialog for reloading linked datasets."""

@@ -32,15 +32,17 @@ because some operations cannot restore references (e.g. add object)
 # need operations for the following:
 #  paste widget
 
+import os.path
+
 import numarray as N
 
-import utils
 import datasets
 import widgetfactory
 import simpleread
 import commandinterpreter
 import readcsv
-import os.path
+
+import veusz.utils as utils
     
 ###############################################################################
 # Setting operations

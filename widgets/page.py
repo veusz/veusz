@@ -21,9 +21,11 @@
 """Widget that represents a page in the document."""
 
 import qt
+
+import veusz.document as document
+
 import widget
 import root
-import document
 
 class Page(widget.Widget):
     """A class for representing a page of plotting."""

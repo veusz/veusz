@@ -20,13 +20,14 @@
 
 # $Id$
 
+import veusz.setting as setting
+import veusz.utils as utils
+import veusz.document as document
+
 import widget
-import document
 import axis
 import page
 import containers
-import setting
-import utils
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""

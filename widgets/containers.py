@@ -27,12 +27,13 @@ Classes include
  Grid: Class to plot a grid of plots
 """
 
+import veusz.document as document
+import veusz.setting as setting
+
 import widget
-import document
 import axis
 import page
 import graph
-import setting
 
 class _gridengine:
     """Internal class to build up grid of widgets."""

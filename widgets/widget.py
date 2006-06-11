@@ -25,9 +25,9 @@ import itertools
 
 import qt
 
-import document
-import utils
-import setting
+import veusz.document as document
+import veusz.utils as utils
+import veusz.setting as setting
 
 class Widget(object):
     """ Fundamental plotting widget interface."""

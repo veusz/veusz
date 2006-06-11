@@ -23,9 +23,10 @@
 
 import qt
 
+import veusz.document as document
+import veusz.setting as setting
+
 import widget
-import document
-import setting
 
 class Root(widget.Widget):
     """Root widget class for plotting the document."""

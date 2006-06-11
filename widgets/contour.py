@@ -30,8 +30,9 @@ import sys
 import qt
 import numarray as N
 
-import setting
-import document
+import veusz.setting as setting
+import veusz.document as document
+
 import plotters
 
 class Contour(plotters.GenericPlotter):
@@ -49,7 +50,7 @@ class Contour(plotters.GenericPlotter):
 
         # try to import contour helpers here
         try:
-            from helpers._na_cntr import Cntr
+            from veusz.helpers._na_cntr import Cntr
         except ImportError:
             Cntr = None
             print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'

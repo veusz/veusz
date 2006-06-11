@@ -1,3 +1,10 @@
+* 2006-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Move to Subversion from CVS
+
+* 2006-06-10 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Get rid of hack on PYTHONPATH - everything is imported
+    from under veusz
+
 * 2006-06-08 Jeremy Sanders <jeremy@jeremysanders.net>
   - Remove dependency of widget module on settings module
   - Move Painter from widgets to document

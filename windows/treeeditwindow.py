@@ -26,10 +26,11 @@ import os
 import qt
 import qttable
 
-import widgets
+import veusz.widgets as widgets
+import veusz.utils as utils
+import veusz.document as document
+
 import action
-import utils
-import document
 
 class _WidgetItem(qt.QListViewItem):
     """Item for displaying in the TreeEditWindow."""

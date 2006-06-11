@@ -23,20 +23,20 @@
 import qt
 import os.path
 
+import veusz.document as document
+import veusz.utils as utils
+import veusz.setting as setting
+
 import consolewindow
 import plotwindow
 import treeeditwindow
 import action
 
-import document
-import utils
-import setting
-
-import dialogs.aboutdialog
-import dialogs.importdialog
-import dialogs.dataeditdialog
-import dialogs.reloaddata
-import dialogs.importfits
+from veusz.dialogs.aboutdialog import AboutDialog
+from veusz.dialogs.reloaddata import ReloadData
+from veusz.dialogs.importfits import ImportFITS
+import veusz.dialogs.importdialog as importdialog
+import veusz.dialogs.dataeditdialog as dataeditdialog
 
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
@@ -320,32 +320,32 @@ class MainWindow(qt.QMainWindow):
 
     def slotDataImport(self):
         """Display the import data dialog."""
-        d = dialogs.importdialog.ImportDialog(self, self.document)
+        d = importdialog.ImportDialog(self, self.document)
         d.show()
 
     def slotDataImport2D(self):
         """Display the 2D import data dialog."""
-        d = dialogs.importdialog.ImportDialog2D(self, self.document)
+        d = importdialog.ImportDialog2D(self, self.document)
         d.show()
 
     def slotDataImportFITS(self):
         """Display the FITS import dialog."""
-        d = dialogs.importfits.ImportFITS(self, self.document)
+        d = ImportFITS(self, self.document)
         d.show()
 
     def slotDataEdit(self):
         """Edit existing datasets."""
-        d = dialogs.dataeditdialog.DataEditDialog(self, self.document)
+        d = dataeditdialog.DataEditDialog(self, self.document)
         d.show()
 
     def slotDataCreate(self):
         """Create new datasets."""
-        d = dialogs.dataeditdialog.DatasetNewDialog(self.document, self)
+        d = dataeditdialog.DatasetNewDialog(self.document, self)
         d.show()
 
     def slotDataReload(self):
         """Reload linked datasets."""
-        d = dialogs.reloaddata.ReloadData(self, self.document)
+        d = ReloadData(self, self.document)
         d.show()
 
     def slotHelpHomepage(self):
@@ -365,7 +365,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotHelpAbout(self):
         """Show about dialog."""
-        d = dialogs.aboutdialog.AboutDialog(self)
+        d = AboutDialog(self)
         d.exec_loop()
 
     def queryOverwrite(self):

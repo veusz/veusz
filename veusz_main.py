@@ -33,11 +33,11 @@ import qt
 # this allows modules relative to this one to be used,
 # allowing this program to be run from python, or using this script
 # please suggest a replacement for this
-sys.path.insert( 0, os.path.dirname(__file__) )
+#sys.path.insert( 0, os.path.dirname(__file__) )
 
-import utils
-import windows.mainwindow
-from application import Application
+import veusz.utils as utils
+from veusz.windows.mainwindow import MainWindow
+from veusz.application import Application
 
 copyr='''Veusz %s
 
@@ -72,11 +72,11 @@ def run():
         if filelist:
             for filename in filelist:
                 #XXX - need error handling here...
-                windows.mainwindow.MainWindow.CreateWindow(filename)
+                MainWindow.CreateWindow(filename)
         else:
-            windows.mainwindow.MainWindow.CreateWindow()
+            MainWindow.CreateWindow()
     else:
-        windows.mainwindow.MainWindow.CreateWindow()
+        MainWindow.CreateWindow()
     
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
                 app, qt.SLOT("quit()"))

@@ -24,13 +24,14 @@
 import qt
 import numarray as N
 
+import veusz.document as document
+import veusz.setting as setting
+import veusz.utils as utils
+
 import widget
 import axisticks
-import document
 import graph
 import containers
-import setting
-import utils
 
 class Axis(widget.Widget):
     """Manages and draws an axis."""

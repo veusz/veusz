@@ -25,12 +25,12 @@ import qt
 import itertools
 import numarray as N
 
-import widget
-import document
-import graph
-import setting
+import veusz.document as document
+import veusz.setting as setting
+import veusz.utils as utils
 
-import utils
+import widget
+import graph
 
 def _trim(x, x1, x2):
     """Truncate x in range x1->x2."""

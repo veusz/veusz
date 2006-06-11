@@ -26,8 +26,9 @@ import os.path
 import qt
 import numarray as N
 
-import setting
-import document
+import veusz.setting as setting
+import veusz.document as document
+
 import plotters
 
 def applyScaling(data, mode, minval, maxval):

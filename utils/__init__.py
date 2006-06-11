@@ -24,8 +24,4 @@ from utilfuncs import *
 from textrender import *
 from points import *
 from version import *
-from setting import *
 from fitlm import *
-
-# add to this list to be called on app startup
-callonstartup = []

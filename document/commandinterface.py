@@ -28,9 +28,7 @@ external programs.
 
 import qt
 
-import widgets
 import datasets
-import simpleread
 import operations
 
 class CommandInterface(qt.QObject):

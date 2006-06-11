@@ -26,8 +26,9 @@ import os.path
 import re
 
 import qt
-import document
-import setting
+
+import veusz.document as document
+import veusz.setting as setting
 
 class ImportDialogBase(qt.QDialog):
     """Base class for data importing dialogs.

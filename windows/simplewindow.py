@@ -20,7 +20,7 @@
 
 import qt
 
-import document
+import veusz.document as document
 import plotwindow
 
 """

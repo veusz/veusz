@@ -33,10 +33,11 @@ import math
 
 import qt
 
-import utils
 import controls
 import settings
 from settingdb import settingdb
+
+import veusz.utils as utils
 
 # if invalid type passed to set
 class InvalidType(Exception):

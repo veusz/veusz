@@ -29,8 +29,8 @@ import numarray as N
 import qt
 import qttable
 
-import setting
-import document
+import veusz.setting as setting
+import veusz.document as document
 import importdialog
 
 class _DatasetNameValidator(qt.QValidator):

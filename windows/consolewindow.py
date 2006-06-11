@@ -26,8 +26,8 @@ import codeop
 import traceback
 import sys
 
-import document
-import utils
+import veusz.document as document
+import veusz.utils as utils
 
 # TODO - command line completion
 

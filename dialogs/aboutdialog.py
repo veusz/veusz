@@ -26,8 +26,9 @@
 import os.path
 
 import qt
-import utils
-import windows.action
+
+import veusz.utils as utils
+import veusz.windows.action as action
 
 _abouttext=u"""Veusz %s   http://home.gna.org/veusz/
 Veusz is Copyright \u00a9 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
@@ -51,8 +52,7 @@ class AboutDialog(qt.QDialog):
         self.setCaption( 'About Veusz' )
 
         # label with logo (white background)
-        self.logo = qt.QPixmap( os.path.join(windows.action.imagedir,
-                                             'logo.png') )
+        self.logo = qt.QPixmap( os.path.join(action.imagedir, 'logo.png') )
         self.logolabel = qt.QLabel( self )
         self.logolabel.setPixmap( self.logo )
         self.logolabel.setAlignment( qt.Qt.AlignHCenter | qt.Qt.AlignVCenter )

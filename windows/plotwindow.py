@@ -29,11 +29,12 @@ import itertools
 import qt
 import numarray as N
 
-import setting
-import dialogs.exceptiondialog
-import widgets
+import veusz.setting as setting
+import veusz.dialogs.exceptiondialog as exceptiondialog
+import veusz.widgets as widgets
+import veusz.document as document
+
 import action
-import document
 
 class PointPainter(document.Painter):
     """A simple painter variant which works out the last widget
@@ -560,7 +561,7 @@ class PlotWindow( qt.QScrollView ):
                                            scaling = self.zoomfactor,
                                            dpi = self.widgetdpi )
                 except Exception:
-                    dialogs.exceptiondialog.showException(sys.exc_info())
+                    exceptiondialog.showException(sys.exc_info())
                     
             else:
                 self.pagenumber = 0

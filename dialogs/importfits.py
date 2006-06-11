@@ -25,7 +25,7 @@ import os.path
 
 import qt
 
-import document
+import veusz.document as document
 
 # delay initialisation until dialog is opened
 pyfits = None

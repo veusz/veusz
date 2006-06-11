@@ -23,11 +23,11 @@
 import qt
 
 import setting
-import utils
 from settings import Settings
 from stylesheet import StyleSheet
-from utils import formatNumber
-from application import Application
+
+from veusz.utils import formatNumber
+from veusz.application import Application
 
 StyleSheet.register('Line', setting.Distance('width', '0.5pt', descr='Default line width'))
 StyleSheet.register('Line', setting.Color('color', 'black', descr='Default line color'))

@@ -29,8 +29,8 @@ from numarray import *
 
 sys.path.append('./')
 
-import widgets
-import document
+import veusz.widgets as widgets
+import veusz.document as document
 
 class PlotWidget(qt.QWidget):
     def __init__(self, *args):

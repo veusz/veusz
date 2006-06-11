@@ -48,9 +48,9 @@ import os.path
 import atexit
 
 # nasty hack to ensure we can load all the veusz components
-_dir = os.path.dirname(__file__)
-if _dir not in sys.path:
-    sys.path.insert(0, _dir)
+#_dir = os.path.dirname(__file__)
+#if _dir not in sys.path:
+#    sys.path.insert(0, _dir)
 
 class Bind1st(object):
     """Bind the first argument of a given function to the given
@@ -153,10 +153,10 @@ class Embedded(object):
         This is called by the constructor
         """
 
-        import windows.simplewindow
-        import document
+        from veusz.windows.simplewindow import SimpleWindow
+        import veusz.document as document
 
-        self.window = windows.simplewindow.SimpleWindow(name)
+        self.window = SimpleWindow(name)
         self.window.show()
         self.document = self.window.document
         self.plot = self.window.plot
@@ -200,7 +200,7 @@ class Embedded(object):
         """Start up the Qt application in a thread."""
 
         import qt
-        from application import Application
+        from veusz.application import Application
         
         class _App(Application):
             """An application class which has a notifier to receive

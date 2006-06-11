@@ -24,7 +24,7 @@ import sys
 sys.path.append('../')
 
 import unittest
-import setting
+import veusz.setting as setting
 
 # test setting routines
 

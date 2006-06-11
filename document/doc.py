@@ -32,10 +32,11 @@ import string
 import qt
 
 import widgetfactory
-import utils
 import simpleread
-import setting
 import datasets
+
+import veusz.utils as utils
+import veusz.setting as setting
 
 class Document( qt.QObject ):
     """Document class for holding the graph data.

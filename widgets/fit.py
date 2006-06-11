@@ -27,10 +27,11 @@ import sys
 import numarray as N
 import numarray.ieeespecial as NIE
 
+import veusz.document as document
+import veusz.setting as setting
+import veusz.utils as utils
+
 import plotters
-import document
-import setting
-import utils
 
 class Fit(plotters.FunctionPlotter):
     """A plotter to fit a function to data."""

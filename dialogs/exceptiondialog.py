@@ -30,7 +30,7 @@ import sys
 import numarray
 import qt
 
-import utils
+import veusz.utils as utils
 
 class _ExceptionItem(qt.QListViewItem):
     def __init__(self, parent, exceptiontext):
