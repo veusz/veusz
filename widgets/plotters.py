@@ -183,20 +183,22 @@ class FunctionPlotter(GenericPlotter):
 
         # find starting and ending points for the filled region
         x1, y1, x2, y2 = bounds
+        s = self.settings
+        
         if self.settings.variable == 'x':
             if belowleft:
-                pts = [x1, y2]
-                endpt = [x2, y2]
+                pts = [pxpts[0], y2]
+                endpt = [pxpts[-1], y2]
             else:
-                pts = [x1, y1]
-                endpt = [x2, y1]
+                pts = [pxpts[0], y1]
+                endpt = [pxpts[-1], y1]
         else:
             if belowleft:
-                pts = [x1, y1]
-                endpt = [x1, y2]
+                pts = [x1, pypts[0]]
+                endpt = [x1, pypts[-1]]
             else:
-                pts = [x2, y1]
-                endpt = [x2, y2]
+                pts = [x2, pypts[0]]
+                endpt = [x2, pypts[-1]]
 
         # add the points between (clipped to the bounds*2 - helps edges)
         xw = x2-y2
