@@ -141,9 +141,16 @@ class ReadCSV:
                     # append on suffix to previous name if an error
                     name = col
                     if col in ('+', '-', '+-'):
-                        if colnum > 0:
-                            name = colnames[colnum-1] + col
+                        # loop to find previous valid column
+                        prevcol = colnum - 1
+                        while colnum > 0:
+                            n = colnames[prevcol]
+                            if len(n) > 0 and n[-1] not in "+-":
+                                name = n + col
+                                break
+                            prevcol -= 1
                         else:
+                            # did not find anything
                             name = self._generateName(colnum)
 
                     else:

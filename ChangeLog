@@ -3,6 +3,7 @@
   - Fix embed.py under new regime
   - Add multiaxes example
   - Add linkeddatasets example
+  - Fix bug with CSV asymmetric errors
 	
 * 2006-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
   - Move to Subversion from CVS
