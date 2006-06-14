@@ -19,7 +19,7 @@ manipulation and editing of datasets.
 Changes from 0.9:
  Please refer to ChangeLog for all the changes.
  Highlights include:
-   * CVS import of data
+   * CSV import of data
    * Stylesheets to easily change graph appearance
    * Many user interface improvements
    * Extra plotting features and bug fixes
