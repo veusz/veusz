@@ -2,6 +2,7 @@
   - Fix filling under functions with start and end points
   - Fix embed.py under new regime
   - Add multiaxes example
+  - Add linkeddatasets example
 	
 * 2006-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
   - Move to Subversion from CVS
