@@ -200,6 +200,9 @@ class Embedded(object):
         """Start up the Qt application in a thread."""
 
         import qt
+
+        # drag in veusz before opening application
+        import veusz.document
         from veusz.application import Application
         
         class _App(Application):
