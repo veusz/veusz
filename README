@@ -1,5 +1,5 @@
-Veusz 0.9
----------
+Veusz 0.10
+----------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
@@ -7,21 +7,22 @@ http://home.gna.org/veusz/
 Veusz is Copyright (C) 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
 Licenced under the GPL (version 2 or greater).
 
-Veusz is a scientific plotting package written in Python. It uses PyQt
+Veusz is a scientific plotting package written in Python, using PyQt
 for display and user-interfaces, and numarray for handling the numeric
 data. Veusz is designed to produce publication-ready Postscript
-output.
+output. The user interface aims to be simple, consistent and powerful.
 
-Veusz provides a GUI, command line and scripting interface (based on
-Python) to its plotting facilities. The plots are built using an
-object-based system to provide a consistent interface.
+Veusz provides a GUI, command line, embedding and scripting interface
+(based on Python) to its plotting facilities. It also allows for
+manipulation and editing of datasets.
 
-Changes from 0.8:
+Changes from 0.9:
  Please refer to ChangeLog for all the changes.
  Highlights include:
-  * Contour support (thanks to the code of the matplotlib guys!)
-  * Undo/redo
-  * Rubber band axis zooming
+   * CVS import of data
+   * Stylesheets to easily change graph appearance
+   * Many user interface improvements
+   * Extra plotting features and bug fixes
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -41,10 +42,6 @@ Features of package:
  * Save/Load plots
  * Dataset manipulation
  * Embed Veusz within other programs
-
-To be done:
- * UI improvements
- * Import filters (for qdp and other plotting packages, fits, csv)
 
 Requirements:
  Python (probably 2.3 or greater required)
@@ -70,15 +67,13 @@ the mailing lists at
 https://gna.org/mail/?group=veusz
 
 to discuss new features or if you'd like to contribute code. The
-newest code can always be found in CVS.
+latest code can always be found in the SVN repository.
 
 If non GPL projects are interested in using Veusz code, please contact
 me. I am happy to consider relicencing code for other free projects,
 if I am legally allowed to do so.
 
-Cheers
-
-Jeremy
+Jeremy Sanders
 
 -------------------------------------------------------------------------------
 $Id$
