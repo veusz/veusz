@@ -140,6 +140,10 @@
 
 	    <para>An axis may be "horizontal" or "vertical" and can
 	    appear anywhere on its parent graph or grid.</para>
+
+	    <para>If an axis appears within a grid, then it can be
+	  shared by all the graphs which are contained within the
+	  grid.</para>
 	  </listitem>
 
 	  <listitem>
@@ -251,8 +255,7 @@
 	distances specified in physical units, e.g. 1cm, 0.05m, 10mm,
 	5in, 10pt and 5", and relative units, which are relative to
 	the largest dimension of the page, including 5%, 1/20,
-	0.05.</para>
-      </section>
+	0.05.</para> </section>
 
       <section>
 	<title>Settings</title>
@@ -491,11 +494,12 @@
 
   <!---------------------------------------------------------------->
   <chapter>
-    <title>Reading data</title> <para>Currently Veusz supports reading
-    data from text file (a qdp-alike interface is also
-    planned). Reading data is supported using the "Data, Import"
-    dialog, or using the <link
-    linkend="Command.ImportFile">ImportFile</link> and <link
+    <title>Reading data</title>
+
+    <para>Currently Veusz supports reading data from a text file (a
+    qdp-alike interface is also planned) or from CSV files. Reading
+    data is supported using the "Data, Import" dialog, or using the
+    <link linkend="Command.ImportFile">ImportFile</link> and <link
     linkend="Command.ImportString">ImportString</link> commands which
     read data from files or an existing Python string (allowing data
     to be embedded in a Python script). Alternatively, a user may read
@@ -503,6 +507,9 @@
     program with the <link linkend="Command.SetData">SetData</link>
     command.</para>
     
+    <para>CSV files are intuitive to use and are described
+    below.</para>
+
     <para>In addition data may also be read in from FITS files if the
     PyFITS Python module is installed. FITS is a widespread
     astronomical data format. FITS files are read using the "Data,
@@ -665,6 +672,70 @@ SetData('y', y)
 </programlisting>
       </informalexample>
     </section>
+
+    <section>
+    <title>Reading CSV files</title>
+
+    <para>CVS (comma separated variable) files are often written from
+    other programs, such as spreadsheets, including Excel and
+    Gnumeric. Veusz supports reading from these files.</para>
+
+    <para>In the import dialog choose "CSV", then choose a filename to
+    import from. In the CSV file the user should place the data in
+    either rows or columns. Veusz will use a name above a column or to
+    the left of a row to specify what the dataset name should be. The
+    user can use new names further down in columns or right in rows to
+    specify a different dataset name. Names do not have to be used,
+    and Veusz will assign default "col" and "row" names if not
+    given. You can also specify a prefix which is prepended to each
+    dataset name read from the file.</para>
+
+    <para>To specify symmetric errors for a column, put "+-" as the
+    dataset name in the next column or row. Asymmetric errors can be
+    stated with "+" and "-" in the columns.</para>
+
+    <para>The data can be linked with the CSV file so that it can be
+    updated when the file changes. See the example CSV import for
+    details.</para>
+
+    </section>
+
+    <section>
+      <title>Manipulating datasets</title>
+
+      <para>Imported datasets can easily be modified in the Edit data
+      dialog box, by clicking on a value and entering a new one. What
+      is probably more interesting is using the Create dialog box to
+      make new datasets from scratch or based on other
+      datasets.</para>
+
+      <para>New datasets can be made by entering a name, and choosing
+      whether to make a dataset consisting of a single value or over a
+      range, from expressions based on a parametric expression, or
+      from expressions based on existing datasets.</para>
+
+      <para>For instance, if the user has already imported dataset d,
+      then they can create d2 which consists of d**2. Expressions are
+      in Python syntax and can include the usual mathematical
+      functions. Error bars can also be given as expressions of other
+      datasets. By appending _data, _serr, _perr or _nerr to the name
+      of the dataset in the expression, the user can base their
+      expression on particular parts of the given dataset (the main
+      data, symmetric errors, positive errors or negative
+      errors). Otherwise the program uses the same parts as is
+      currently being specified.</para>
+
+      <para>A particularly useful feature is to be able to link a
+      dataset to an expression, so if the expression changes the
+      dataset changes with it, like in a spreadsheet.</para>
+
+      <para>Data can also be chopped in this method, for example using
+      the expression x[10:20], which makes a dataset based on the 11th
+      to 20th item in the x dataset (the ranges are Python syntax, and
+      are zero-based). Negative indices count backwards from the end
+      of the dataset.</para>
+
+      </section>      
 
   </chapter>
 
@@ -932,6 +1003,22 @@ invertcols=True/False, transpose=True/False, linked=True/False)</command></para>
 	</orderedlist>
 
       </section>
+
+      <section>
+	<title><anchor id="Command.ImportFileCSV" />ImportFileCSV</title>
+	
+	<para><command>ImportFileCSV('filename', readrows=False,
+	prefix=None, linked=False)</command></para>
+
+	<para>This command imports data from a CSV format file. Data
+	are read from the file using the dataset names given at the
+	top of the files in columns. Please see the reading data
+	section of this manual for more information. prefix is
+	prepended to each dataset name, and linked specifies whether
+	the data will be linked.
+	</para>
+
+	</section>
 
       <section>
 	<title><anchor id="Command.ImportFITSFile" />

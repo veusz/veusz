@@ -5,6 +5,7 @@
   - Add linkeddatasets example
   - Fix bug with CSV asymmetric errors
   - Add csv_example plot
+  - Add CSV details to documentation
 	
 * 2006-06-11 Jeremy Sanders <jeremy@jeremysanders.net>
   - Move to Subversion from CVS
