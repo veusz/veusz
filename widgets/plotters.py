@@ -201,7 +201,7 @@ class FunctionPlotter(GenericPlotter):
                 endpt = [x2, pypts[-1]]
 
         # add the points between (clipped to the bounds*2 - helps edges)
-        xw = x2-y2
+        xw = x2-x1
         xclip = N.clip(pxpts, x1-xw, x2+xw)
         yw = y2-y1
         yclip = N.clip(pypts, y1-yw, y2+yw)
