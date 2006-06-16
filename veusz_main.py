@@ -39,6 +39,7 @@ except ImportError:
     import __init__ as veusz
     thisdir = os.path.dirname( os.path.abspath(__file__) )
     veusz.__path__ = [thisdir]
+    veusz.__name__ = 'veusz'
     sys.modules['veusz'] = veusz
 
 import veusz.utils as utils
