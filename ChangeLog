@@ -1,3 +1,6 @@
+* 2006-06-16 Jeremy Sanders <jeremy@jeremysanders.net.
+  - Fixed Veusz to be able to run without being installed
+	
 * 2006-06-15 Jeremy Sanders <jeremy@jeremysanders.net>
   - Fix mix up of x and y in function plotting clipping
 	

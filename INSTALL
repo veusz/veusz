@@ -2,7 +2,8 @@ Veusz Installation
 ==================
 
 Veusz now uses distutils for its installation. See below for how to use
-it.
+it. Note that the main veusz executable has changed from veusz.py
+to veusz_main.py
 
 Requirements:
  python 2.3      http://www.python.org/
@@ -25,9 +26,9 @@ Simple use
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-0.9.tar.gz     [change version here]
-# cd veusz-0.9
-# ./veusz.py
+# tar xzf veusz-0.10.tar.gz     [change version here]
+# cd veusz-0.10
+# ./veusz_main.py
 
 However certain features (currently contours) require C modules to be
 built. Currently only contour support requires this. You can build
@@ -40,14 +41,14 @@ Installing/upgrading from rpm
 =============================
 For rpm based distributions, download the rpm for your distribution
 (if it is available), and install as root:
-# rpm -Uvh veusz-0.9-1.i386.rpm
+# rpm -Uvh veusz-0.10-1.i386.rpm
 (use correct name of rpm here)
 
 If there is no rpm available for your distribution, download the source
 rpm and rebuild
-# rpmbuild --rebuild veusz-0.9-1.src.rpm
+# rpmbuild --rebuild veusz-0.10-1.src.rpm
 then install it from the location given when that command completes.
-# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-0.9-1.i386.rpm
+# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-0.10-1.i386.rpm
 
 If this doesn't work, see below for how to create an rpm from the source.
 A "veusz" command is installed into your path to run the program.
@@ -59,7 +60,7 @@ list a few of the possible method here:
 
 To make an rpm from the distribution
 ------------------------------------
-# cd veusz-0.9
+# cd veusz-0.10
 # python setup.py bdist_rpm
 
 An rpm should be generated in the dist subdirectory, so...
@@ -75,7 +76,7 @@ using the "veusz command"
 To install to the standard location on the hard disk (it's better to use
 rpms if you have an rpm-based linux distibution)
 ------------------------------------------------------------------------
-# cd veusz-0.9
+# cd veusz-0.10
 # python setup.py build
 # su
 [enter root password]

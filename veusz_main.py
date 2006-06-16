@@ -30,10 +30,16 @@ import optparse
 
 import qt
 
-# this allows modules relative to this one to be used,
-# allowing this program to be run from python, or using this script
-# please suggest a replacement for this
-#sys.path.insert( 0, os.path.dirname(__file__) )
+# Allow veusz to be run even if not installed into PYTHONPATH
+try:
+    import veusz
+except ImportError:
+    # load in the veusz module, but change its path to
+    # the veusz directory, and insert it into sys.modules    
+    import __init__ as veusz
+    thisdir = os.path.dirname( os.path.abspath(__file__) )
+    veusz.__path__ = [thisdir]
+    sys.modules['veusz'] = veusz
 
 import veusz.utils as utils
 from veusz.windows.mainwindow import MainWindow
