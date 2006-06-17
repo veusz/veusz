@@ -2,6 +2,7 @@
   - Supply __file__ to document file so that they know
     where the are on disk
   - Add example_import.vsz example file
+  - Bump version to 0.10 ready for release
 	
 * 2006-06-16 Jeremy Sanders <jeremy@jeremysanders.net>
   - Fixed Veusz to be able to run without being installed
