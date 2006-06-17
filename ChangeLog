@@ -1,4 +1,8 @@
-* 2006-06-16 Jeremy Sanders <jeremy@jeremysanders.net.
+* 2006-06-17 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Supply __file__ to document file so that they know
+    where the are on disk
+	
+* 2006-06-16 Jeremy Sanders <jeremy@jeremysanders.net>
   - Fixed Veusz to be able to run without being installed
   - Likewise change veusz_listen.py
 	

@@ -1,8 +1,12 @@
-# Veusz saved document (version 0.10.cvs)
-# User: jss
-# Date: Wed, 14 Jun 2006 21:06:37 +0000
+# Veusz saved document (version 0.10)
 
-ImportFileCSV(u'example_csv.csv', linked=True)
+# this code is so that the document can find its data
+# file
+import os.path
+filename = os.path.join(os.path.dirname(__file__),
+                        'example_csv.csv')
+ImportFileCSV(filename, linked=True)
+
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)

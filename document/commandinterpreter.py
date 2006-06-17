@@ -192,10 +192,15 @@ class CommandInterpreter:
         """Replace the document with a new one from the filename."""
 
         # FIXME: should update filename in main window
+        # This gives the document a __file__ variable so it
+        # knows what it is
         f = open(filename, 'r')
         self.document.wipe()
         self.interface.To('/')
+        oldfile = self.globals['__file__']
+        self.globals['__file__'] = os.path.abspath(filename)
         self.runFile(f)
+        self.globals['__file__'] = oldfile
         self.document.setModified()
         self.document.setModified(False)
         self.document.clearHistory()
