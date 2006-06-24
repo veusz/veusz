@@ -27,7 +27,7 @@ as a C routine (taken from matplotlib) is used to trace the contours.
 import itertools
 import sys
 
-import qt
+import veusz.qtall as qt
 import numarray as N
 
 import veusz.setting as setting

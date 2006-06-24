@@ -25,7 +25,7 @@
 
 import os.path
 
-import qt
+import veusz.qtall as qt
 
 import veusz.utils as utils
 import veusz.windows.action as action

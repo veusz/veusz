@@ -26,7 +26,7 @@ import os.path
 import sys
 import itertools
 
-import qt
+import veusz.qtall as qt
 import numarray as N
 
 import veusz.setting as setting

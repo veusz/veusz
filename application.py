@@ -24,7 +24,7 @@ This doesn't do much, except allow functions to be registered for application
 startup.
 """
 
-import qt
+import veusz.qtall as qt
 
 class Application(qt.QApplication):
     """Main Veusz application class."""

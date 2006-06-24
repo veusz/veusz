@@ -28,8 +28,10 @@
 import itertools
 import re
 
-import qt
-import qttable
+import veusz.qtall as qt
+
+# QT4FIXME
+#import qttable
 
 import setting
 import veusz.utils as utils
@@ -202,11 +204,11 @@ class _EditBox(qt.QFrame):
         self.emit( qt.PYSIGNAL('closing'), (text,) )
         event.accept()
 
-class String(qt.QHBox):
+class String(qt.QHBoxLayout):
     """A line editor which allows editting in a larger popup window."""
 
     def __init__(self, setting, parent):
-        qt.QHBox.__init__(self, parent)
+        qt.QHBoxLayout.__init__(self, parent)
 
         self.setting = setting
         self.edit = qt.QLineEdit(self)
@@ -593,7 +595,7 @@ class LineStyle(Choice):
         cls._pixmaps = pixmaps
     _generatePixmaps = classmethod(_generatePixmaps)
 
-class Color(qt.QHBox):
+class Color(qt.QHBoxLayout):
     """A control which lets the user choose a color.
 
     A drop down list and a button to bring up a dialog are used
@@ -603,7 +605,7 @@ class Color(qt.QHBox):
     _colors = None
 
     def __init__(self, setting,  parent):
-        qt.QHBox.__init__(self, parent)
+        qt.QHBoxLayout.__init__(self, parent)
 
         if self._pixmaps == None:
             self._generatePixmaps()
@@ -786,7 +788,7 @@ class ListSet(qt.QWidget):
                 i.show()
             self.controls.append(cntrls)
 
-        h = qt.QHBox(self)
+        h = qt.QHBoxLayout(self)
         self.layout.addMultiCellWidget(h, row+1, row+1, 0,
                                        self.layout.numCols()-1)
         

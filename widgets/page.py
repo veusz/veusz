@@ -20,7 +20,7 @@
 
 """Widget that represents a page in the document."""
 
-import qt
+import veusz.qtall as qt
 
 import veusz.document as document
 

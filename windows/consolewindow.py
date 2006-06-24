@@ -21,7 +21,7 @@
 
 # $Id$
 
-import qt
+import veusz.qtall as qt
 import codeop
 import traceback
 import sys
@@ -62,8 +62,7 @@ class _CommandEdit(qt.QLineEdit):
         qt.QObject.connect( self, qt.SIGNAL("returnPressed()"),
                             self.slotReturnPressed )
 
-        qt.QToolTip.add( self,
-                         "Input a python expression here and press enter" )
+        self.setToolTip("Input a python expression here and press enter" )
 
     def slotReturnPressed(self):
         """ Called if the return key is pressed in the edit control."""
@@ -77,7 +76,7 @@ class _CommandEdit(qt.QLineEdit):
         self.history_posn = 0
 
         # tell the console we have a command
-        self.emit( qt.PYSIGNAL("sigEnter"), (command,))
+        self.emit( qt.SIGNAL("sigEnter"), command)
 
     historykeys = (qt.Qt.Key_Up, qt.Qt.Key_Down)
 
@@ -101,7 +100,7 @@ class _CommandEdit(qt.QLineEdit):
             self.history_posn = min(self.history_posn, len(self.history))
 
             # user has modified text since last set
-            if self.edited():
+            if self.isModified():
                 self.history.append( unicode(self.text()) )
                 self.history_posn += 1
 
@@ -111,24 +110,26 @@ class _CommandEdit(qt.QLineEdit):
                 text = self.history[ -self.history_posn ]
             self.setText(text)
 
-introtext=u'''Welcome to <b><font color="purple">Veusz</font></b> --- a scientific plotting application.
-Veusz version %s, Copyright \u00a9 2003-2006 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt;
-Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are
-welcome to redistribute it under certain conditions. Enter "GPL()" for details.
-This window is a Python command line console and acts as a calculator.
+introtext=u'''Welcome to <b><font color="purple">Veusz</font></b> --- a scientific plotting application.<br>
+Veusz version %s, Copyright \u00a9 2003-2006 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt;<br>
+Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are<br>
+welcome to redistribute it under certain conditions. Enter "GPL()" for details.<br>
+This window is a Python command line console and acts as a calculator.<br>
 ''' % utils.version()
 
-class ConsoleWindow(qt.QDockWindow):
+class ConsoleWindow(qt.QDockWidget):
     """ A python-like qt console."""
 
     def __init__(self, thedocument, *args):
-        qt.QDockWindow.__init__(self, *args)
-        self.setResizeEnabled( True )
-        self.setCaption("Console - Veusz")
+        qt.QDockWidget.__init__(self, *args)
+        #QT4FIXME
+        #self.setResizeEnabled( True )
+        self.setWindowTitle("Console - Veusz")
 
         # arrange sub-widgets in a vbox
-        self.vbox = qt.QVBox( self )
-        self.setWidget( self.vbox )
+        self.vbox = qt.QWidget(self)
+        self.setWidget(self.vbox)
+        vlayout = qt.QVBoxLayout(self.vbox)
 
         # start an interpreter instance to the document
         self.interpreter = document.CommandInterpreter(thedocument)
@@ -139,22 +140,28 @@ class ConsoleWindow(qt.QDockWindow):
         self.stderrbuffer = ""
 
         # the output from the console goes here
-        self._outputdisplay = qt.QTextEdit( self.vbox )
-        self._outputdisplay.setTextFormat( qt.Qt.LogText )
-        self._outputdisplay.append( introtext )
+        self._outputdisplay = qt.QTextEdit(self.vbox)
+        self._outputdisplay.setReadOnly(True)
+        self._outputdisplay.insertHtml( introtext )
+        vlayout.addWidget(self._outputdisplay)
 
-        self._hbox = qt.QHBox(self.vbox)
+        self._hbox = qt.QWidget(self.vbox)
+        hlayout = qt.QHBoxLayout(self._hbox)
+        vlayout.addWidget(self._hbox)
+        
         self._prompt = qt.QLabel(">>>", self._hbox)
+        hlayout.addWidget(self._prompt)
 
         # where commands are typed in
         self._inputedit = _CommandEdit( self._hbox )
+        hlayout.addWidget(self._inputedit)
         self._inputedit.setFocus()
 
         # keep track of multiple line commands
         self.command_build = ''
 
         # get called if enter is pressed in the input control
-        qt.QObject.connect( self._inputedit, qt.PYSIGNAL("sigEnter"),
+        qt.QObject.connect( self._inputedit, qt.SIGNAL("sigEnter"),
                             self.slotEnter )
 
     def runFunction(self, func):
@@ -183,36 +190,23 @@ class ConsoleWindow(qt.QDockWindow):
 
     def output_stdout(self, text):
         """ Write text in stdout font to the log."""
-
-        # annoyingly we have to insert paras at a time :-(
-        # therefore we keep text until we have a para
-        if len(text) != 0 and text[-1] == '\n':
-            self._outputdisplay.append(
-                qt.QStyleSheet.escape(self.stdoutbuffer + text[:-1]) )
-            self.stdoutbuffer = ""
-            self._outputdisplay.scrollToBottom()
-        else:
-            self.stdoutbuffer += text
+        self._outputdisplay.insertPlainText(text)
+        self._outputdisplay.ensureCursorVisible()
 
     def output_stderr(self, text):
         """ Write text in stderr font to the log."""
 
-        # annoyingly we have to insert paras at a time :-(
-        # therefore we keep text until we have a para
-        if len(text) != 0 and text[-1] == '\n':
-            self._outputdisplay.append(
-                '<font color="red">%s</font>' %
-                qt.QStyleSheet.escape( self.stderrbuffer + text[:-1])
-                )
-            self.stderrbuffer = ''
-            self._outputdisplay.scrollToBottom()
-        else:
-            self.stderrbuffer += text
+        # insert text as red
+        oldcol = self._outputdisplay.textColor()
+        self._outputdisplay.setTextColor(qt.QColor("red"))
+        self._outputdisplay.insertPlainText(text)
+        self._outputdisplay.setTextColor(oldcol)
+        self._outputdisplay.ensureCursorVisible()
 
     def insertTextInOutput(self, text):
         """ Inserts the text into the log."""
         self._outputdisplay.append( text )
-        self._outputdisplay.scrollToBottom()
+        self._outputdisplay.ensureCursorVisible()
 
     def slotEnter(self, command):
         """ Called if the return key is pressed in the edit control."""
@@ -233,9 +227,11 @@ class ConsoleWindow(qt.QDockWindow):
             prompt = '...'
 
         # output the command in the log pane
-        self.insertTextInOutput('<font color="blue">%s</font>' %
-                                unicode(qt.QStyleSheet.escape(prompt + ' ' +
-                                                              command)) )
+        oldcol = self._outputdisplay.textColor()
+        self._outputdisplay.setTextColor(qt.QColor("blue"))
+        self._outputdisplay.insertPlainText('%s %s\n' % (prompt, command))
+        self._outputdisplay.setTextColor(oldcol)
+        self._outputdisplay.ensureCursorVisible()
 
         # are we ready to run this?
         if c == None or (len(command) != 0 and

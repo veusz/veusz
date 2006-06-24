@@ -23,8 +23,7 @@
 
 import os
 
-import qt
-import qttable
+import veusz.qtall as qt
 
 import veusz.widgets as widgets
 import veusz.utils as utils

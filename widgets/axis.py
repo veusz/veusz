@@ -21,7 +21,7 @@
 
 # $Id$
 
-import qt
+import veusz.qtall as qt
 import numarray as N
 
 import veusz.document as document

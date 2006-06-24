@@ -23,7 +23,7 @@
 import itertools
 import os.path
 
-import qt
+import veusz.qtall as qt
 
 import veusz.document as document
 

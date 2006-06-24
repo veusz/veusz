@@ -22,7 +22,7 @@
 
 """Dialog for reloading linked data."""
 
-import qt
+import veusz.qtall as qt
 
 import veusz.document as document
 

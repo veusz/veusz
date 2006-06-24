@@ -26,7 +26,7 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
-import qt
+import veusz.qtall as qt
 
 import datasets
 import operations
@@ -42,7 +42,7 @@ class CommandInterface(qt.QObject):
         self.currentwidget = self.document.basewidget
         self.verbose = False
 
-        self.connect( self.document, qt.PYSIGNAL("sigWiped"),
+        self.connect( self.document, qt.SIGNAL("sigWiped"),
                       self.slotWipedDoc )
 
     def slotWipedDoc(self):

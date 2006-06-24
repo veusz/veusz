@@ -20,7 +20,7 @@
 
 """Implements the main window of the application."""
 
-import qt
+import veusz.qtall as qt
 import os.path
 
 import veusz.document as document
@@ -28,19 +28,22 @@ import veusz.utils as utils
 import veusz.setting as setting
 
 import consolewindow
-import plotwindow
-import treeeditwindow
+#FIXMEQT4
+#import plotwindow
+#FIXMEQT4
+#import treeeditwindow
 import action
 
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
 from veusz.dialogs.importfits import ImportFITS
 import veusz.dialogs.importdialog as importdialog
-import veusz.dialogs.dataeditdialog as dataeditdialog
+#import veusz.dialogs.dataeditdialog as dataeditdialog
 
 class MainWindow(qt.QMainWindow):
     """ The main window class for the application."""
 
+    windows = []
     def CreateWindow(cls, filename=None):
         """Window factory function.
 
@@ -53,6 +56,8 @@ class MainWindow(qt.QMainWindow):
         win.show()
         if filename:
             win.openFileInWindow(filename)
+            pass
+        cls.windows.append(win)
         return win
 
     CreateWindow = classmethod(CreateWindow)
@@ -60,7 +65,7 @@ class MainWindow(qt.QMainWindow):
     def __init__(self, *args):
         qt.QMainWindow.__init__(self, *args)
 
-        self.setIcon( qt.QPixmap(os.path.join(action.imagedir, 'veusz.png')) )
+        self.setWindowIcon( qt.QIcon(os.path.join(action.imagedir, 'veusz.png')) )
 
         self.document = document.Document()
 
@@ -72,25 +77,34 @@ class MainWindow(qt.QMainWindow):
         # construct menus and toolbars
         self._defineMenus()
 
-        self.plot = plotwindow.PlotWindow(self.document, self)
-        self.plot.createToolbar(self, self.menus['view'])
+        # FIXMEQT4
+        self.plot = qt.QWidget(self)
+        self.plot.setSizePolicy(qt.QSizePolicy.Expanding,
+                                qt.QSizePolicy.Expanding)
+        self.plot.show()
+        self.setCentralWidget(self.plot)
+
+        #self.plot = plotwindow.PlotWindow(self.document, self)
+        #self.plot.createToolbar(self, self.menus['view'])
 
         # likewise with the tree-editing window
-        self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
-        self.moveDockWindow( self.treeedit, qt.Qt.DockLeft, True, 1 )
+        #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
+        #self.moveDockWindow( self.treeedit, qt.Qt.DockLeft, True, 1 )
+        self.treeedit = qt.QWidget(self)
 
+        # FIXMEQT4
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
         self.interpreter = self.console.interpreter
-        self.moveDockWindow( self.console, qt.Qt.DockBottom )
+        #self.moveDockWindow( self.console, qt.Qt.DockBottom )
 
         # the plot window is the central window
-        self.setCentralWidget( self.plot )
         self.updateStatusbar('Ready')
 
+        return
         # no dock menu, so we can popup context menus
-        self.setDockMenuEnabled(False)
+        #self.setDockMenuEnabled(False)
 
         # keep page number up to date
         self.pagelabel = qt.QLabel(self.statusBar())
@@ -99,23 +113,24 @@ class MainWindow(qt.QMainWindow):
         self.dirname = ''
         self.exportDir = ''
         
-        self.connect( self.plot, qt.PYSIGNAL("sigUpdatePage"),
+        self.connect( self.plot, qt.SIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
 
         # disable save if already saved
-        self.connect( self.document, qt.PYSIGNAL("sigModified"),
+        self.connect( self.document, qt.SIGNAL("sigModified"),
                       self.slotModifiedDoc )
 
         # if the treeeditwindow changes the page, change the plot window
-        self.connect( self.treeedit, qt.PYSIGNAL("sigPageChanged"),
-                      self.plot.setPageNumber )
+        # FIXMEQT4
+        #self.connect( self.treeedit, qt.SIGNAL("sigPageChanged"),
+        #              self.plot.setPageNumber )
 
         # if a widget in the plot window is clicked by the user
-        self.connect( self.plot, qt.PYSIGNAL("sigWidgetClicked"),
-                      self.treeedit.slotSelectWidget )
+        #self.connect( self.plot, qt.SIGNAL("sigWidgetClicked"),
+        #              self.treeedit.slotSelectWidget )
 
         # put the dock windows on the view menu, so they can be shown/hidden
-        self._defineDockViewMenu()
+        #self._defineDockViewMenu()
 
         # enable/disable undo/redo
         self.connect(self.menus['edit'], qt.SIGNAL('aboutToShow()'),
@@ -126,13 +141,14 @@ class MainWindow(qt.QMainWindow):
 
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
-        self.statusBar().message(text, 2000)
+        self.statusBar().showMessage(text, 2000)
 
     def _defineDockViewMenu(self):
         """Put the dock windows on the view menu."""
 
         view = self.menus['view']
-        view.setCheckable(True)
+        # FIXMEQT4
+        # view.setCheckable(True)
         view.insertSeparator(0)
         self.viewdockmenuitems = {}
 
@@ -227,8 +243,7 @@ class MainWindow(qt.QMainWindow):
         """Initialise the menus and toolbar."""
 
         # create toolbar
-        self.maintoolbar = qt.QToolBar(self, "maintoolbar")
-        self.maintoolbar.setLabel("Main toolbar - Veusz")
+        self.maintoolbar = qt.QToolBar("Main toolbar - Veusz", self)
 
         # add main menus
         menus = [
@@ -242,8 +257,7 @@ class MainWindow(qt.QMainWindow):
 
         self.menus = {}
         for menuid, text in menus:
-            menu = qt.QPopupMenu(self)
-            self.menuBar().insertItem( text, menu )
+            menu = self.menuBar().addMenu(text)
             self.menus[menuid] = menu
 
         # items for main menus
@@ -366,7 +380,7 @@ class MainWindow(qt.QMainWindow):
     def slotHelpAbout(self):
         """Show about dialog."""
         d = AboutDialog(self)
-        d.exec_loop()
+        d.exec_()
 
     def queryOverwrite(self):
         """Do you want to overwrite the current document.
@@ -461,10 +475,10 @@ class MainWindow(qt.QMainWindow):
     def updateTitlebar(self):
         """Put the filename into the title bar."""
         if self.filename == '':
-            self.setCaption('Untitled - Veusz')
+            self.setWindowTitle('Untitled - Veusz')
         else:
-            self.setCaption( "%s - Veusz" %
-                             os.path.basename(self.filename) )
+            self.setWindowTitle( "%s - Veusz" %
+                                 os.path.basename(self.filename) )
 
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
@@ -599,7 +613,7 @@ class MainWindow(qt.QMainWindow):
                            qt.QMessageBox.Ok | qt.QMessageBox.Default,
                            qt.QMessageBox.NoButton,
                            qt.QMessageBox.NoButton,
-                           self).exec_loop()
+                           self).exec_()
         
         # restore the cursor
         qt.QApplication.restoreOverrideCursor()

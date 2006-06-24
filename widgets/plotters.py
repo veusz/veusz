@@ -21,7 +21,7 @@
 
 # $Id$
 
-import qt
+import veusz.qtall as qt
 import itertools
 import numarray as N
 

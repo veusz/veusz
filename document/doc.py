@@ -29,7 +29,7 @@ import time
 import random
 import string
 
-import qt
+import veusz.qtall as qt
 
 import widgetfactory
 import simpleread
@@ -165,7 +165,7 @@ class Document( qt.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
-        self.emit( qt.PYSIGNAL("sigWiped"), () )
+        self.emit( qt.SIGNAL("sigWiped"), () )
 
     def isBlank(self):
         """Does the document contain widgets and no data"""
@@ -245,7 +245,7 @@ class Document( qt.QObject ):
         self.modified = ismodified
         self.changeset += 1
 
-        self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
+        self.emit( qt.SIGNAL("sigModified"), ( ismodified, ) )
 
     def isModified(self):
         """Return whether modified flag set."""

@@ -32,7 +32,7 @@ Zoom x: Change the zoom factor of the plot to x
 import sys
 import os.path
 
-import qt
+import veusz.qtall as qt
 
 # Allow veusz to be run even if not installed into PYTHONPATH
 try:

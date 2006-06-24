@@ -28,7 +28,7 @@ import email.MIMEText
 import sys
 
 import numarray
-import qt
+import veusz.qtall as qt
 
 import veusz.utils as utils
 

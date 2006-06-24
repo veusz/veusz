@@ -21,7 +21,7 @@
 
 # $Id$
 
-import qt
+import veusz.qtall as qt
 
 import veusz.document as document
 import veusz.setting as setting

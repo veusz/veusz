@@ -24,7 +24,7 @@
 import math
 
 import numarray as N
-import qt
+import veusz.qtall as qt
 
 # constants for special parts of an expression
 _BlockStart = 1

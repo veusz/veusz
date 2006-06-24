@@ -20,7 +20,7 @@
 
 """Collections of predefined settings for common settings."""
 
-import qt
+import veusz.qtall as qt
 
 import setting
 from settings import Settings

@@ -26,7 +26,7 @@ import re
 import itertools
 
 import numarray as N
-import qt
+import veusz.qtall as qt
 import qttable
 
 import veusz.setting as setting

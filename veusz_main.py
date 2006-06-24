@@ -28,8 +28,6 @@ import os.path
 import signal
 import optparse
 
-import qt
-
 # Allow veusz to be run even if not installed into PYTHONPATH
 try:
     import veusz
@@ -42,9 +40,12 @@ except ImportError:
     veusz.__name__ = 'veusz'
     sys.modules['veusz'] = veusz
 
+import veusz.qtall as qt
+
 import veusz.utils as utils
 from veusz.windows.mainwindow import MainWindow
 from veusz.application import Application
+import veusz.widgets
 
 copyr='''Veusz %s
 
@@ -88,7 +89,7 @@ def run():
     app.connect(app, qt.SIGNAL("lastWindowClosed()"),
                 app, qt.SLOT("quit()"))
 
-    app.exec_loop()
+    app.exec_()
 
 # if ran as a program
 if __name__ == '__main__':

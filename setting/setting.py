@@ -31,7 +31,7 @@ s.fromText('42')
 import re
 import math
 
-import qt
+import veusz.qtall as qt
 
 import controls
 import settings

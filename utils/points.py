@@ -22,7 +22,7 @@
 
 import itertools
 
-import qt
+import veusz.qtall as qt
 import numarray as N
 
 def _plotNone(painter, xpos, ypos, size):

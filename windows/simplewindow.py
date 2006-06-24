@@ -18,7 +18,7 @@
 
 # $Id$
 
-import qt
+import veusz.qtall as qt
 
 import veusz.document as document
 import plotwindow
