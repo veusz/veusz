@@ -136,13 +136,18 @@ class ClickPainter(document.Painter):
         else:
             return None
 
-class PlotWindow( qt.QWidget ):
+class PlotWindow( qt.QScrollArea ):
     """Class to show the plot(s) in a scrollable window."""
 
-    def __init__(self, document, *args):
+    def __init__(self, document, parent):
         """Initialise the window."""
 
-        qt.QWidget.__init__(self, *args)
+        qt.QScrollArea.__init__(self, parent)
+        self.label = qt.QLabel()
+        self.setWidget(self.label)
+        self.setBackgroundRole(qt.QPalette.Dark)
+        self.label.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
+
         # show splash logo until timer runs out (3s)
         self.showlogo = True
         qt.QTimer.singleShot(3000, self.slotSplashDisable)
@@ -195,12 +200,6 @@ class PlotWindow( qt.QWidget ):
         # optional view toolbar
         self.viewtoolbar = None
         self.viewactions = None
-
-        self.scrollarea = qt.QScrollArea()
-        self.scrollarea.setWidget(self)
-        self.scrollarea.setBackgroundRole(qt.QPalette.Dark)
-
-
 
     def createToolbar(self, parent, menu=None):
         """Make a view toolbar, and optionally update menu."""
@@ -450,7 +449,7 @@ class PlotWindow( qt.QWidget ):
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
         else:
-            qt.QWidget.contentsMouseReleaseEvent(self, event)
+            qt.QLabel.contentsMouseReleaseEvent(self, event)
 
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
@@ -477,7 +476,8 @@ class PlotWindow( qt.QWidget ):
         """Set the ouput display size."""
 
         # convert distances into pixels
-        painter = document.Painter(self)
+        pix = qt.QPixmap(1, 1)
+        painter = document.Painter(pix)
         painter.veusz_scaling = self.zoomfactor
         painter.veusz_pixperpt = self.widgetdpi / 72.
         size = self.document.basewidget.getSize(painter)
@@ -487,12 +487,8 @@ class PlotWindow( qt.QWidget ):
         if size != self.size:
             self.size = size
             self.bufferpixmap = qt.QPixmap( *self.size )
-            self.bufferpixmap.fill( self.palette().color(qt.QPalette.Base) )
-            #self.setFixedSize( *self.size )
-
-    def sizeHint(self):
-        print self.size
-        return qt.QSize(*self.size)
+            self.forceupdate = True
+            self.label.resize(*size)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -508,7 +504,6 @@ class PlotWindow( qt.QWidget ):
 
         self.pagenumber = pageno
         self.forceupdate = True
-        self.update()
 
     def getPageNumber(self):
         """Get the the selected page."""
@@ -564,13 +559,8 @@ class PlotWindow( qt.QWidget ):
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
-            self.update()
+            self.label.setPixmap(self.bufferpixmap)
             
-    def paintEvent(self, event):
-
-        pt = qt.QPainter(self)
-        pt.drawPixmap(0, 0, self.bufferpixmap)
-
     def contextMenuEvent(self, event):
         """A context to change update periods, or disable updates."""
 

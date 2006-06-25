@@ -80,13 +80,13 @@ class MainWindow(qt.QMainWindow):
         # FIXMEQT4
 
         self.plot = plotwindow.PlotWindow(self.document, self)
-        self.plot.createToolbar(self, self.menus['view'])
         self.setCentralWidget(self.plot)
+        self.plot.createToolbar(self, self.menus['view'])
 
         # likewise with the tree-editing window
         #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
         #self.moveDockWindow( self.treeedit, qt.Qt.DockLeft, True, 1 )
-        self.treeedit = qt.QWidget(self)
+        self.treeedit = qt.QWidget()
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
