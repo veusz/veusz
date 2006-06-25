@@ -29,7 +29,7 @@ import veusz.setting as setting
 
 import consolewindow
 #FIXMEQT4
-#import plotwindow
+import plotwindow
 #FIXMEQT4
 #import treeeditwindow
 import action
@@ -78,31 +78,25 @@ class MainWindow(qt.QMainWindow):
         self._defineMenus()
 
         # FIXMEQT4
-        self.plot = qt.QWidget(self)
-        self.plot.setSizePolicy(qt.QSizePolicy.Expanding,
-                                qt.QSizePolicy.Expanding)
-        self.plot.show()
-        self.setCentralWidget(self.plot)
 
-        #self.plot = plotwindow.PlotWindow(self.document, self)
-        #self.plot.createToolbar(self, self.menus['view'])
+        self.plot = plotwindow.PlotWindow(self.document, self)
+        self.plot.createToolbar(self, self.menus['view'])
+        self.setCentralWidget(self.plot)
 
         # likewise with the tree-editing window
         #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
         #self.moveDockWindow( self.treeedit, qt.Qt.DockLeft, True, 1 )
         self.treeedit = qt.QWidget(self)
 
-        # FIXMEQT4
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
         self.interpreter = self.console.interpreter
-        #self.moveDockWindow( self.console, qt.Qt.DockBottom )
+        self.addDockWidget(qt.Qt.BottomDockWidgetArea, self.console)
 
         # the plot window is the central window
         self.updateStatusbar('Ready')
 
-        return
         # no dock menu, so we can popup context menus
         #self.setDockMenuEnabled(False)
 
@@ -119,7 +113,6 @@ class MainWindow(qt.QMainWindow):
         # disable save if already saved
         self.connect( self.document, qt.SIGNAL("sigModified"),
                       self.slotModifiedDoc )
-
         # if the treeeditwindow changes the page, change the plot window
         # FIXMEQT4
         #self.connect( self.treeedit, qt.SIGNAL("sigPageChanged"),
@@ -210,14 +203,14 @@ class MainWindow(qt.QMainWindow):
         undotext = 'Undo'
         if canundo:
             undotext = "%s %s" % (undotext, self.document.historyundo[-1].descr)
-        self.actions['editundo'].setMenuText(undotext)
+        self.actions['editundo'].setText(undotext)
         self.actions['editundo'].setEnabled(canundo)
         
         canredo = self.document.canRedo()
         redotext = 'Redo'
         if canredo:
             redotext = "%s %s" % (redotext, self.document.historyredo[-1].descr)
-        self.actions['editredo'].setMenuText(redotext)
+        self.actions['editredo'].setText(redotext)
         self.actions['editredo'].setEnabled(canredo)
         
     def slotEditUndo(self):
@@ -244,6 +237,7 @@ class MainWindow(qt.QMainWindow):
 
         # create toolbar
         self.maintoolbar = qt.QToolBar("Main toolbar - Veusz", self)
+        self.addToolBar(qt.Qt.TopToolBarArea, self.maintoolbar)
 
         # add main menus
         menus = [
@@ -483,18 +477,16 @@ class MainWindow(qt.QMainWindow):
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
         
-        fd = qt.QFileDialog(self, 'saveasdialog', True)
-        fd.setDir(self.dirname)
-        fd.setMode( qt.QFileDialog.AnyFile )
-        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
-        fd.setCaption(dialogtitle)
+        fd = qt.QFileDialog(self, dialogtitle, self.dirname,
+                            "%s (*.%s)" % (filedescr, filetype) )
+        fd.setFileMode( qt.QFileDialog.AnyFile )
 
         # okay was selected
-        if fd.exec_loop() == qt.QDialog.Accepted:
+        if fd.exec_() == qt.QDialog.Accepted:
             # save directory for next time
-            self.dirname = fd.dir()
+            self.dirname = fd.directory()
             # update the edit box
-            filename = unicode( fd.selectedFile() )
+            filename = unicode( fd.selectedFiles()[0] )
             if os.path.splitext(filename)[1] == '':
                 filename += '.' + filetype
 
@@ -520,18 +512,16 @@ class MainWindow(qt.QMainWindow):
     def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
         """Display an open dialog and return a filename."""
         
-        fd = qt.QFileDialog(self, 'opendialog', True)
-        fd.setDir( self.dirname )
-        fd.setMode( qt.QFileDialog.ExistingFile )
-        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
-        fd.setCaption(dialogtitle)
+        fd = qt.QFileDialog(self, dialogtitle, self.dirname,
+                            "%s (*.%s)" % (filedescr, filetype) )
+        fd.setFileMode( qt.QFileDialog.ExistingFile )
 
         # if the user chooses a file
-        if fd.exec_loop() == qt.QDialog.Accepted:
+        if fd.exec_() == qt.QDialog.Accepted:
             # save directory for next time
-            self.dirname = fd.dir()
+            self.dirname = fd.directory()
 
-            filename = unicode( fd.selectedFile() )
+            filename = unicode( fd.selectedFiles()[0] )
             try:
                 open(filename)
             except IOError, e:

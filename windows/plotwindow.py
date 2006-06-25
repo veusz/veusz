@@ -30,7 +30,8 @@ import veusz.qtall as qt
 import numarray as N
 
 import veusz.setting as setting
-import veusz.dialogs.exceptiondialog as exceptiondialog
+#FIXMEQT4
+#import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.widgets as widgets
 import veusz.document as document
 
@@ -135,15 +136,13 @@ class ClickPainter(document.Painter):
         else:
             return None
 
-class PlotWindow( qt.QScrollView ):
+class PlotWindow( qt.QWidget ):
     """Class to show the plot(s) in a scrollable window."""
 
     def __init__(self, document, *args):
         """Initialise the window."""
 
-        qt.QScrollView.__init__(self, *args)
-        self.viewport().setBackgroundMode( qt.Qt.NoBackground )
-
+        qt.QWidget.__init__(self, *args)
         # show splash logo until timer runs out (3s)
         self.showlogo = True
         qt.QTimer.singleShot(3000, self.slotSplashDisable)
@@ -159,9 +158,7 @@ class PlotWindow( qt.QScrollView ):
         self.forceupdate = False
 
         # work out dpi
-        painter = qt.QPainter(self)
-        metrics = qt.QPaintDeviceMetrics(painter.device())
-        self.widgetdpi = metrics.logicalDpiY()
+        self.widgetdpi = self.logicalDpiY()
 
         # convert size to pixels
         self.setOutputSize()
@@ -193,17 +190,23 @@ class PlotWindow( qt.QScrollView ):
             self.timer.start(self.interval)
 
         # allow window to get foucs, to allow context menu
-        self.setFocusPolicy(qt.QWidget.StrongFocus)
+        self.setFocusPolicy(qt.Qt.StrongFocus)
 
         # optional view toolbar
         self.viewtoolbar = None
         self.viewactions = None
 
+        self.scrollarea = qt.QScrollArea()
+        self.scrollarea.setWidget(self)
+        self.scrollarea.setBackgroundRole(qt.QPalette.Dark)
+
+
+
     def createToolbar(self, parent, menu=None):
         """Make a view toolbar, and optionally update menu."""
 
-        self.zoomtoolbar = qt.QToolBar(parent, "viewtoolbar")
-        self.zoomtoolbar.setLabel("View toolbar - Veusz")
+        self.zoomtoolbar = qt.QToolBar("View toolbar - Veusz", parent)
+        parent.addToolBar(qt.Qt.TopToolBarArea, self.zoomtoolbar)
 
         items = [
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
@@ -245,35 +248,34 @@ class PlotWindow( qt.QScrollView ):
                                                        menus)
                                                    
         zoomtb = qt.QToolButton(self.zoomtoolbar)
-        zoomicon = os.path.join(action.imagedir, 'zoom-options.png')
-        zoomtb.setIconSet(qt.QIconSet( qt.QPixmap(zoomicon) ))
+        zoomtb.setIcon( action.getIcon('zoom-options.png') )
 
         # drop down zoom button on toolbar
-        zoompop = qt.QPopupMenu(zoomtb)
+        zoompop = qt.QMenu(zoomtb)
         for act in ('viewzoomin', 'viewzoomout', 'viewzoom11',
                     'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
-            self.viewactions[act].addTo(zoompop)
-        zoomtb.setPopup(zoompop)
-        zoomtb.setPopupDelay(0)
+            zoompop.addAction(self.viewactions[act])
+        #zoomtb.setPopup(zoompop)
+        #zoomtb.setPopupDelay(0)
 
         # define action group for various different selection models
         g = self.selectactiongrp = qt.QActionGroup(self)
         g.setExclusive(True)
         for a in [self.viewactions[i] for i in
                   ('viewselect', 'viewzoomgraph')]:
-            g.add(a)
-            a.setToggleAction(True)
-        self.viewactions['viewselect'].setOn(True)
-        self.connect(g, qt.SIGNAL('selected(QAction*)'), self.slotSelectMode)
+            a.setActionGroup(g)
+            #a.setToggleAction(True)
+        self.viewactions['viewselect'].setEnabled(True)
+        self.connect(g, qt.SIGNAL('triggered(QAction*)'), self.slotSelectMode)
 
         return self.zoomtoolbar
 
-    def contentsMousePressEvent(self, event):
+    def mousePressEvent(self, event):
         """Allow user to drag window around."""
 
         if event.button() == qt.Qt.LeftButton:
 
-            self.grabPos = (event.globalX(), event.globalY())
+            self.grabPos = (event.x(), event.y())
             if self.clickmode == 'select':
                 # we set this to true unless the timer runs out (400ms),
                 # then it becomes a scroll click
@@ -296,7 +298,6 @@ class PlotWindow( qt.QScrollView ):
     def _drawZoomRect(self, pos):
         """Draw a dotted rectangle xored."""
 
-        # convert global coordinates of edges into viewport coordinates
         self._currentzoomrect = pos
         minx = min(self.grabPos[0], pos[0])
         maxx = max(self.grabPos[0], pos[0])
@@ -306,8 +307,7 @@ class PlotWindow( qt.QScrollView ):
         h = maxy - miny + 1
 
         # draw the rectangle on the viewport
-        view = self.viewport()
-        pt = view.mapFromGlobal( qt.QPoint(minx, miny) )
+        pt = qt.QPoint(minx, miny)
         painter = qt.QPainter(view, True)
         painter.setPen(qt.QPen(qt.QColor('black'), 0, qt.Qt.DotLine))
         painter.drawRect(pt.x(), pt.y(), w, h)
@@ -325,17 +325,11 @@ class PlotWindow( qt.QScrollView ):
         w = maxx - minx + 1
         h = maxy - miny + 1
 
-        view = self.viewport()
-        pt1 = view.mapFromGlobal(qt.QPoint(minx, miny))
-        pt2 = view.mapFromGlobal(qt.QPoint(maxx, maxy))
-        pt1x, pt1y = self.viewportToContents(pt1.x(), pt1.y())
-        pt2x, pt2y = self.viewportToContents(pt2.x(), pt2.y())
-
         # repaint the contents along the edges of the zoom rect
-        self.repaintContents(pt1x, pt1y, w, 1, False)
-        self.repaintContents(pt1x, pt1y, 1, h, False)
-        self.repaintContents(pt1x, pt2y, w, 1, False)
-        self.repaintContents(pt2x, pt1y, 1, h, False)
+        self.repaint(minx, miny, w, 1)
+        self.repaint(minx, miny, 1, h)
+        self.repaint(minx, maxy, w, 1)
+        self.repaint(minx, maxy, 1, h)
 
     def doZoomRect(self):
         """Take the zoom rectangle drawn by the user and do the zooming.
@@ -356,12 +350,6 @@ class PlotWindow( qt.QScrollView ):
         # are >=5 pixels movement
         if abs((pt2-pt1).x()) < 10 or abs((pt2-pt1).y()) < 10:
             return
-
-        # convert to coordinates of contents of scrollview
-        pt1 = self.viewport().mapFromGlobal(pt1)
-        pt2 = self.viewport().mapFromGlobal(pt2)
-        pt1 = self.viewportToContents(pt1)
-        pt2 = self.viewportToContents(pt2)
 
         # try to work out in which widget the first point is in
         bufferpixmap = qt.QPixmap( *self.size )
@@ -434,13 +422,13 @@ class PlotWindow( qt.QScrollView ):
 
         if self.currentclickmode == 'scroll':
             event.accept()
-            pos = (event.globalX(), event.globalY())
-            self.scrollBy(self.grabPos[0]-pos[0], self.grabPos[1]-pos[1])
+            pos = (event.x(), event.y())
+            self.scrollarea.scrollContentsBy(self.grabPos[0]-pos[0], self.grabPos[1]-pos[1])
             self.grabPos = pos
         elif self.currentclickmode == 'graphzoom':
             # get rid of current rectangle
             self._hideZoomRect()
-            self._drawZoomRect((event.globalX(), event.globalY()))
+            self._drawZoomRect((event.x(), event.y()))
 
     def contentsMouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
@@ -462,7 +450,7 @@ class PlotWindow( qt.QScrollView ):
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
         else:
-            qt.QScrollView.contentsMouseReleaseEvent(self, event)
+            qt.QWidget.contentsMouseReleaseEvent(self, event)
 
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
@@ -483,7 +471,7 @@ class PlotWindow( qt.QScrollView ):
         widget = painter.getFoundWidget()
         if widget != None:
             # tell connected caller that widget was clicked
-            self.emit( qt.PYSIGNAL('sigWidgetClicked'), (widget,) )
+            self.emit( qt.PYSIGNAL('sigWidgetClicked'), widget )
 
     def setOutputSize(self):
         """Set the ouput display size."""
@@ -499,8 +487,12 @@ class PlotWindow( qt.QScrollView ):
         if size != self.size:
             self.size = size
             self.bufferpixmap = qt.QPixmap( *self.size )
-            self.bufferpixmap.fill( self.colorGroup().base() )
-            self.resizeContents( *self.size )
+            self.bufferpixmap.fill( self.palette().color(qt.QPalette.Base) )
+            #self.setFixedSize( *self.size )
+
+    def sizeHint(self):
+        print self.size
+        return qt.QSize(*self.size)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -516,7 +508,7 @@ class PlotWindow( qt.QScrollView ):
 
         self.pagenumber = pageno
         self.forceupdate = True
-        self.updateContents()
+        self.update()
 
     def getPageNumber(self):
         """Get the the selected page."""
@@ -525,13 +517,12 @@ class PlotWindow( qt.QScrollView ):
     def slotSplashDisable(self):
         """Disable drawing the splash logo."""
         self.showlogo = False
-        self.updateContents()
+        self.update()
 
     def drawLogo(self, painter):
         """Draw the Veusz logo in centre of window."""
 
-        logolocation = os.path.join(action.imagedir, 'logo.png')
-        logo = qt.QPixmap( logolocation )
+        logo = action.getPixmap('logo.png')
         painter.drawPixmap( self.visibleWidth()/2 - logo.width()/2,
                             self.visibleHeight()/2 - logo.height()/2,
                             logo )
@@ -548,63 +539,42 @@ class PlotWindow( qt.QScrollView ):
             self.setOutputSize()
             
             # fill pixmap with proper background colour
-            self.bufferpixmap.fill( self.colorGroup().base() )
+            self.bufferpixmap.fill( self.palette().color(qt.QPalette.Base) )
 
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
             if self.pagenumber >= 0:
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
-                try:
-                    self.document.printTo( self.bufferpixmap,
-                                           [self.pagenumber],
-                                           scaling = self.zoomfactor,
-                                           dpi = self.widgetdpi )
-                except Exception:
-                    exceptiondialog.showException(sys.exc_info())
+                #try:
+                self.document.printTo( self.bufferpixmap,
+                                       [self.pagenumber],
+                                       scaling = self.zoomfactor,
+                                       dpi = self.widgetdpi )
+                #except Exception:
+                #    exceptiondialog.showException(sys.exc_info())
                     
             else:
                 self.pagenumber = 0
 
-            self.emit( qt.PYSIGNAL("sigUpdatePage"), (self.pagenumber,) )
+            self.emit( qt.SIGNAL("sigUpdatePage"), self.pagenumber )
             self.updatePageToolbar()
 
             self.oldzoom = self.zoomfactor
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
-            self.updateContents()
+            self.update()
             
-    def drawContents(self, painter, clipx=0, clipy=0, clipw=-1, cliph=-1):
-        """Called when the contents need repainting."""
+    def paintEvent(self, event):
 
-        # blt the visible part of the pixmap into the image
-        painter.drawPixmap(clipx, clipy, self.bufferpixmap,
-                           clipx, clipy, clipw, cliph)
-
-        # annoyingly we have to draw the surrounding grey ourselves
-        dim = ( self.contentsX(), self.contentsY(),
-                self.visibleWidth(), self.visibleHeight() )
-
-        if dim[0]+dim[2] > self.size[0]:
-            painter.fillRect(self.size[0], dim[1],
-                             dim[0]+dim[2]-self.size[0], dim[3],
-                             qt.QBrush( self.colorGroup().dark() ))
-
-        if dim[1]+dim[3] > self.size[1]:
-            painter.fillRect(dim[0], self.size[1],
-                             dim[2], dim[1]+dim[3]-self.size[1],
-                             qt.QBrush( self.colorGroup().dark() ))
-
-        # add logo if no children
-        widget = self.document.basewidget
-        if len(widget.children) == 0 and self.showlogo:
-            self.drawLogo(painter)
+        pt = qt.QPainter(self)
+        pt.drawPixmap(0, 0, self.bufferpixmap)
 
     def contextMenuEvent(self, event):
         """A context to change update periods, or disable updates."""
 
-        popup = qt.QPopupMenu(self)
+        popup = qt.QMenu(self)
         popup.setCheckable(True)
 
         # option to force an update
@@ -647,7 +617,7 @@ class PlotWindow( qt.QScrollView ):
     def setZoomFactor(self, zoomfactor):
         """Set the zoom factor of the window."""
         self.zoomfactor = float(zoomfactor)
-        self.updateContents()
+        self.update()
 
     def slotViewZoomIn(self):
         """Zoom into the plot."""

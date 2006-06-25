@@ -654,6 +654,7 @@ class Axis(widget.Widget):
         if suppresstext is True, then we don't number or label the axis
         """
 
+        return
         s = self.settings
 
         # recompute if document modified

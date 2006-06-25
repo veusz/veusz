@@ -165,7 +165,7 @@ class Document( qt.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
-        self.emit( qt.SIGNAL("sigWiped"), () )
+        self.emit( qt.SIGNAL("sigWiped") )
 
     def isBlank(self):
         """Does the document contain widgets and no data"""
@@ -245,7 +245,7 @@ class Document( qt.QObject ):
         self.modified = ismodified
         self.changeset += 1
 
-        self.emit( qt.SIGNAL("sigModified"), ( ismodified, ) )
+        self.emit( qt.SIGNAL("sigModified"), ismodified )
 
     def isModified(self):
         """Return whether modified flag set."""
@@ -260,6 +260,7 @@ class Document( qt.QObject ):
             painter.veusz_pixperpt = dpi / 72.
         
         painter.begin( printer )
+        painter.setRenderHint(qt.QPainter.Antialiasing)
 
         # work out how many pixels correspond to the given size
         width, height = self.basewidget.getSize(painter)

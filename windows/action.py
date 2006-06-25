@@ -96,7 +96,7 @@ def populateMenuToolbars(items, toolbar, menus):
                 populateMenuToolbars(slot, toolbar, menus)
         else:
             if menus is not None:
-                action.addTo( menus[menu] )
+                menus[menu].addAction(action)
                 
 
         # add to toolbar
