@@ -23,7 +23,7 @@
 import string
 import os.path
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import numarray as N
 
 import veusz.setting as setting
@@ -222,9 +222,9 @@ class Image(plotters.GenericPlotter):
         # convert 32bit quads to a Qt QImage
         # FIXME: Does this assume C-style array layout??
         s = quads.tostring()
-        img = qt.QImage(s, data.shape[1], data.shape[0], 32, None, 0,
-                        qt.QImage.IgnoreEndian)
-        img = img.mirror()
+        img = qt4.QImage(s, data.shape[1], data.shape[0],
+                         qt4.QImage.Format_RGB32)
+        img = img.mirrored()
 
         # hack to ensure string isn't freed before QImage
         img.veusz_string = s
@@ -376,12 +376,12 @@ class Image(plotters.GenericPlotter):
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt4.QRect(x1, y1, x2-x1, y2-y1) )
 
         # now draw pixmap
-        painter.drawImage( qt.QRect(coordsx[0], coordsy[1],
-                                    coordsx[1]-coordsx[0]+1,
-                                    coordsy[0]-coordsy[1]+1),
+        painter.drawImage( qt4.QRect(coordsx[0], coordsy[1],
+                                     coordsx[1]-coordsx[0]+1,
+                                     coordsy[0]-coordsy[1]+1),
                            image )
 
         painter.restore()
