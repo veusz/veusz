@@ -22,7 +22,6 @@
 # $Id$
 
 import string
-import veusz.qtall as qt
 import weakref
 
 def reverse(data):

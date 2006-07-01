@@ -25,7 +25,7 @@ import os
 import os.path
 import atexit
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 class _SettingDB(object):
     """A class which provides access to a persistant settings database.
@@ -72,8 +72,8 @@ class _SettingDB(object):
         # QT4FIXME
         return
 
-        s = qt.QSettings(self.domain, self.product)
-        #s.setPath(qt.QSettings.IniFormat, self.domain, self.product)
+        s = qt4.QSettings(self.domain, self.product)
+        #s.setPath(qt4.QSettings.IniFormat, self.domain, self.product)
         path = '/%s/%s' % (self.domain, self.product)
         for key in s.entryList(path):
             key = unicode(key)
@@ -94,7 +94,7 @@ class _SettingDB(object):
         # QT4FIXME
         return
 
-        s = qt.QSettings()
+        s = qt4.QSettings()
         s.setPath(self.domain, self.product)
         path = '/%s/%s' % (self.domain, self.product)
 

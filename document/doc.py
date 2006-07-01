@@ -29,7 +29,7 @@ import time
 import random
 import string
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import widgetfactory
 import simpleread
@@ -38,7 +38,7 @@ import datasets
 import veusz.utils as utils
 import veusz.setting as setting
 
-class Document( qt.QObject ):
+class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
     Emits: sigModified when the document has been modified
@@ -47,7 +47,7 @@ class Document( qt.QObject ):
 
     def __init__(self):
         """Initialise the document."""
-        qt.QObject.__init__( self )
+        qt4.QObject.__init__( self )
 
         self.changeset = 0
         self.clearHistory()
@@ -165,7 +165,7 @@ class Document( qt.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
-        self.emit( qt.SIGNAL("sigWiped") )
+        self.emit( qt4.SIGNAL("sigWiped") )
 
     def isBlank(self):
         """Does the document contain widgets and no data"""
@@ -245,7 +245,7 @@ class Document( qt.QObject ):
         self.modified = ismodified
         self.changeset += 1
 
-        self.emit( qt.SIGNAL("sigModified"), ismodified )
+        self.emit( qt4.SIGNAL("sigModified"), ismodified )
 
     def isModified(self):
         """Return whether modified flag set."""
@@ -260,7 +260,7 @@ class Document( qt.QObject ):
             painter.veusz_pixperpt = dpi / 72.
         
         painter.begin( printer )
-        painter.setRenderHint(qt.QPainter.Antialiasing)
+        painter.setRenderHint(qt4.QPainter.Antialiasing)
 
         # work out how many pixels correspond to the given size
         width, height = self.basewidget.getSize(painter)
@@ -338,10 +338,10 @@ class Document( qt.QObject ):
 
         if ext == '.eps':
             # write eps file
-            p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p = qt4.QPrinter(qt4.QPrinter.HighResolution)
             p.setOutputToFile(True)
             p.setOutputFileName(filename)
-            p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
             p.setCreator('Veusz %s' % utils.version())
             p.newPage()
             self.printTo( p, [pagenumber] )
@@ -367,10 +367,10 @@ class Document( qt.QObject ):
                     break
             
             # write eps file
-            p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p = qt4.QPrinter(qt4.QPrinter.HighResolution)
             p.setOutputToFile(True)
             p.setOutputFileName(tmpfilename)
-            p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
             p.newPage()
             self.printTo( p, [pagenumber] )
 
@@ -389,7 +389,7 @@ class Document( qt.QObject ):
         elif ext == '.svg':
             # Use qt's QPicture environment to export the drawing commands
             # as svg (scalable vector graphics)
-            p = qt.QPicture()
+            p = qt4.QPicture()
             self.printTo( p, [pagenumber] )
             p.save(filename, 'svg')
 
@@ -432,12 +432,12 @@ class Document( qt.QObject ):
         # return widget
         return obj
 
-class Painter(qt.QPainter):
+class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is
     currently drawing."""
     
     def __init__(self, *args):
-        qt.QPainter.__init__(self, *args)
+        qt4.QPainter.__init__(self, *args)
 
         self.veusz_scaling = 1.
 

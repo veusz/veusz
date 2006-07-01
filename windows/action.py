@@ -22,7 +22,7 @@
 
 # $Id$
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import os.path
 
 # where images are stored
@@ -32,7 +32,7 @@ _pixmapcache = {}
 def getPixmap(pixmap):
     """Return a cached QPixmap for the filename in the icons directory."""
     if pixmap not in _pixmapcache:
-        _pixmapcache[pixmap] = qt.QPixmap(os.path.join(imagedir, pixmap))
+        _pixmapcache[pixmap] = qt4.QPixmap(os.path.join(imagedir, pixmap))
     return _pixmapcache[pixmap]
 
 _iconcache = {}
@@ -40,7 +40,7 @@ def getIcon(icon):
     """Return a cached QIconSet for the filename in the icons directory."""
     if icon not in _iconcache:
         pixmap = getPixmap(icon)
-        _iconcache[icon] = qt.QIcon(pixmap)
+        _iconcache[icon] = qt4.QIcon(pixmap)
     return _iconcache[icon]
 
 
@@ -66,13 +66,13 @@ def populateMenuToolbars(items, toolbar, menus):
         
         menuid, descr, menutext, menu, slot, icon, addtool, key = i
         if key == '':
-            ks = qt.QKeySequence()
+            ks = qt4.QKeySequence()
         else:
-            ks = qt.QKeySequence(key)
+            ks = qt4.QKeySequence(key)
 
         #action = qt.QAction(descr, menutext, ks, parent)
         # FIXMEQT4
-        action = qt.QAction(parent)
+        action = qt4.QAction(parent)
         action.setText(menutext)
         action.setStatusTip(descr)
         action.setToolTip(descr)
@@ -85,7 +85,7 @@ def populateMenuToolbars(items, toolbar, menus):
         if callable(slot):
             # connect the action to the slot
             if slot is not None:
-                qt.QObject.connect( action, qt.SIGNAL('activated()'), slot )
+                qt4.QObject.connect( action, qt4.SIGNAL('activated()'), slot )
                 # add to menu
             if menus is not None:
                 menus[menu].addAction(action)

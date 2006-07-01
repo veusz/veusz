@@ -31,7 +31,7 @@ s.fromText('42')
 import re
 import math
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import controls
 import settings
@@ -493,7 +493,7 @@ def _calcPixPerPt(painter):
 
     This is stored in the variable veusz_pixperpt."""
 
-    dm = qt.QPaintDeviceMetrics(painter.device())
+    dm = qt4.QPaintDeviceMetrics(painter.device())
     painter.veusz_pixperpt = dm.logicalDpiY() / 72.
 
 def _distPhys(match, painter, mult):
@@ -918,7 +918,7 @@ class Color(ChoiceOrMore):
                               
     def color(self):
         """Return QColor for color."""
-        return qt.QColor(self.val)
+        return qt4.QColor(self.val)
     
     def makeControl(self, *args):
         return controls.Color(self, *args)
@@ -932,20 +932,20 @@ class FillStyle(Choice):
                     '94% dense', '88% dense', '63% dense', '50% dense',
                     '37% dense', '12% dense', '6% dense' ]
 
-    _fillcnvt = { 'solid': qt.Qt.SolidPattern,
-                  'horizontal': qt.Qt.HorPattern,
-                  'vertical': qt.Qt.VerPattern,
-                  'cross': qt.Qt.CrossPattern,
-                  'forward diagonals': qt.Qt.FDiagPattern,
-                  'backward diagonals': qt.Qt.BDiagPattern,
-                  'diagonal cross': qt.Qt.DiagCrossPattern,
-                  '94% dense': qt.Qt.Dense1Pattern,
-                  '88% dense': qt.Qt.Dense2Pattern,
-                  '63% dense': qt.Qt.Dense3Pattern,
-                  '50% dense': qt.Qt.Dense4Pattern,
-                  '37% dense': qt.Qt.Dense5Pattern,
-                  '12% dense': qt.Qt.Dense6Pattern,
-                  '6% dense': qt.Qt.Dense7Pattern }
+    _fillcnvt = { 'solid': qt4.Qt.SolidPattern,
+                  'horizontal': qt4.Qt.HorPattern,
+                  'vertical': qt4.Qt.VerPattern,
+                  'cross': qt4.Qt.CrossPattern,
+                  'forward diagonals': qt4.Qt.FDiagPattern,
+                  'backward diagonals': qt4.Qt.BDiagPattern,
+                  'diagonal cross': qt4.Qt.DiagCrossPattern,
+                  '94% dense': qt4.Qt.Dense1Pattern,
+                  '88% dense': qt4.Qt.Dense2Pattern,
+                  '63% dense': qt4.Qt.Dense3Pattern,
+                  '50% dense': qt4.Qt.Dense4Pattern,
+                  '37% dense': qt4.Qt.Dense5Pattern,
+                  '12% dense': qt4.Qt.Dense6Pattern,
+                  '6% dense': qt4.Qt.Dense7Pattern }
 
     controls.FillStyle._fills = _fillstyles
     controls.FillStyle._fillcnvt = _fillcnvt
@@ -966,9 +966,9 @@ class LineStyle(Choice):
     _linestyles = ['solid', 'dashed', 'dotted',
                    'dash-dot', 'dash-dot-dot' ]
 
-    _linecnvt = { 'solid': qt.Qt.SolidLine, 'dashed': qt.Qt.DashLine,
-                  'dotted': qt.Qt.DotLine, 'dash-dot': qt.Qt.DashDotLine,
-                  'dash-dot-dot': qt.Qt.DashDotDotLine }
+    _linecnvt = { 'solid': qt4.Qt.SolidLine, 'dashed': qt4.Qt.DashLine,
+                  'dotted': qt4.Qt.DotLine, 'dash-dot': qt4.Qt.DashDotLine,
+                  'dash-dot-dot': qt4.Qt.DashDotDotLine }
     
     controls.LineStyle._lines = _linestyles
     controls.LineStyle._linecnvt = _linecnvt
@@ -1062,15 +1062,15 @@ class LineSet(Setting):
         """
 
         if len(self.val) == 0:
-            return qt.QPen(qt.Qt.NoPen)
+            return qt4.QPen(qt4.Qt.NoPen)
         else:
             row = row % len(self.val)
             style, width, color, hide = self.val[row]
             width = Distance.convertDistance(painter, width)
-            p = qt.QPen( qt.QColor(color), width,
-                         LineStyle._linecnvt[style] )
+            p = qt4.QPen( qt4.QColor(color), width,
+                          LineStyle._linecnvt[style] )
             if hide:
-                p.setStyle(qt.Qt.NoPen)
+                p.setStyle(qt4.Qt.NoPen)
             return p
     
 class FillSet(Setting):
@@ -1114,13 +1114,13 @@ class FillSet(Setting):
         """
 
         if len(self.val) == 0:
-            return qt.QBrush()
+            return qt4.QBrush()
         else:
             row = row % len(self.val)
             style, color, hide = self.val[row]
-            b = qt.QBrush( qt.QColor(color),
-                           FillStyle._fillcnvt[style] )
+            b = qt4.QBrush( qt4.QColor(color),
+                            FillStyle._fillcnvt[style] )
             if hide:
-                b.setStyle(qt.Qt.NoBrush)
+                b.setStyle(qt4.Qt.NoBrush)
             return b
     

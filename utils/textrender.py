@@ -24,7 +24,7 @@
 import math
 
 import numarray as N
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 # constants for special parts of an expression
 _BlockStart = 1
@@ -313,7 +313,7 @@ class Renderer:
         # if the text is rotated, change the coordinate frame
         if self.angle != 0:
             self.painter.save()
-            self.painter.translate( qt.QPointF(self.xpos, self.ypos) )
+            self.painter.translate( qt4.QPointF(self.xpos, self.ypos) )
             self.painter.rotate(self.angle)
             self.xpos = 0
             self.ypos = 0
@@ -578,7 +578,7 @@ class Renderer:
 
             # actually write the text if requested
             if render:
-                self.painter.drawText( qt.QPointF(self.xpos, self.ypos), p )
+                self.painter.drawText( qt4.QPointF(self.xpos, self.ypos), p )
                 
             # move along, nothing to see
             self.xpos += width

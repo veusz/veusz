@@ -26,7 +26,7 @@ import os.path
 import sys
 import itertools
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import numarray as N
 
 import veusz.setting as setting
@@ -93,7 +93,7 @@ class ClickPainter(document.Painter):
 
         # we hope this color isn't actually used by the user
         # if a pixel changes from this color, a widget has drawn something
-        self.specialcolor = qt.QColor(254, 255, 254)
+        self.specialcolor = qt4.QColor(254, 255, 254)
         self.pixmap.fill(self.specialcolor)
         self.begin(self.pixmap)
 
@@ -102,9 +102,9 @@ class ClickPainter(document.Painter):
 
         # make a small pixmap of the starting state of the image
         # we can compare this after the widget is painted
-        pixmap = qt.QPixmap(self.xw, self.yw, 24)
-        qt.copyBlt(pixmap, 0, 0, self.pixmap, self.xmin, self.ymin,
-                   self.xw, self.yw)
+        pixmap = qt4.QPixmap(self.xw, self.yw, 24)
+        qt4.copyBlt(pixmap, 0, 0, self.pixmap, self.xmin, self.ymin,
+                    self.xw, self.yw)
         self.pixmaps.append(pixmap)
 
     def endPaintingWidget(self):
@@ -115,17 +115,17 @@ class ClickPainter(document.Painter):
 
         # compare current pixmap for region with initial contents
         self.flush()
-        newpixmap = qt.QPixmap(self.xw, self.yw, 24)
-        qt.copyBlt(newpixmap, 0, 0, self.pixmap, self.xmin, self.ymin,
-                   self.xw, self.yw)
+        newpixmap = qt4.QPixmap(self.xw, self.yw, 24)
+        qt4.copyBlt(newpixmap, 0, 0, self.pixmap, self.xmin, self.ymin,
+                    self.xw, self.yw)
 
         if oldpixmap.convertToImage() != newpixmap.convertToImage():
             # drawn here, so make a note
             self.foundwidgets.append(widget)
 
             # copy back original
-            qt.copyBlt(self.pixmap, self.xmin, self.ymin,
-                       oldpixmap, 0, 0, self.xw, self.yw)
+            qt4.copyBlt(self.pixmap, self.xmin, self.ymin,
+                        oldpixmap, 0, 0, self.xw, self.yw)
 
     def getFoundWidget(self):
         """Return the widget lowest in the tree near the click of the mouse.
@@ -136,21 +136,21 @@ class ClickPainter(document.Painter):
         else:
             return None
 
-class PlotWindow( qt.QScrollArea ):
+class PlotWindow( qt4.QScrollArea ):
     """Class to show the plot(s) in a scrollable window."""
 
     def __init__(self, document, parent):
         """Initialise the window."""
 
-        qt.QScrollArea.__init__(self, parent)
-        self.label = qt.QLabel()
+        qt4.QScrollArea.__init__(self, parent)
+        self.label = qt4.QLabel()
         self.setWidget(self.label)
-        self.setBackgroundRole(qt.QPalette.Dark)
-        self.label.setSizePolicy(qt.QSizePolicy.Fixed, qt.QSizePolicy.Fixed)
+        self.setBackgroundRole(qt4.QPalette.Dark)
+        self.label.setSizePolicy(qt4.QSizePolicy.Fixed, qt4.QSizePolicy.Fixed)
 
         # show splash logo until timer runs out (3s)
         self.showlogo = True
-        qt.QTimer.singleShot(3000, self.slotSplashDisable)
+        qt4.QTimer.singleShot(3000, self.slotSplashDisable)
 
         # set up so if document is modified we are notified
         self.document = document
@@ -173,16 +173,16 @@ class PlotWindow( qt.QScrollArea ):
         self.currentclickmode = None
 
         # set up redrawing timer
-        self.timer = qt.QTimer(self)
-        self.connect( self.timer, qt.SIGNAL('timeout()'),
+        self.timer = qt4.QTimer(self)
+        self.connect( self.timer, qt4.SIGNAL('timeout()'),
                       self.slotTimeout )
 
         # for drag scrolling
         self.grabPos = None
-        self.scrolltimer = qt.QTimer(self)
+        self.scrolltimer = qt4.QTimer(self)
 
         # for turning clicking into scrolling after a period
-        self.connect( self.scrolltimer, qt.SIGNAL('timeout()'),
+        self.connect( self.scrolltimer, qt4.SIGNAL('timeout()'),
                       self.slotBecomeScrollClick )
 
         # get update period from setting database
@@ -195,7 +195,7 @@ class PlotWindow( qt.QScrollArea ):
             self.timer.start(self.interval)
 
         # allow window to get foucs, to allow context menu
-        self.setFocusPolicy(qt.Qt.StrongFocus)
+        self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         # optional view toolbar
         self.viewtoolbar = None
@@ -204,8 +204,8 @@ class PlotWindow( qt.QScrollArea ):
     def createToolbar(self, parent, menu=None):
         """Make a view toolbar, and optionally update menu."""
 
-        self.zoomtoolbar = qt.QToolBar("View toolbar - Veusz", parent)
-        parent.addToolBar(qt.Qt.TopToolBarArea, self.zoomtoolbar)
+        self.zoomtoolbar = qt4.QToolBar("View toolbar - Veusz", parent)
+        parent.addToolBar(qt4.Qt.TopToolBarArea, self.zoomtoolbar)
 
         items = [
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
@@ -246,11 +246,11 @@ class PlotWindow( qt.QScrollArea ):
         self.viewactions = action.populateMenuToolbars(items, self.zoomtoolbar,
                                                        menus)
                                                    
-        zoomtb = qt.QToolButton(self.zoomtoolbar)
+        zoomtb = qt4.QToolButton(self.zoomtoolbar)
         zoomtb.setIcon( action.getIcon('zoom-options.png') )
 
         # drop down zoom button on toolbar
-        zoompop = qt.QMenu(zoomtb)
+        zoompop = qt4.QMenu(zoomtb)
         for act in ('viewzoomin', 'viewzoomout', 'viewzoom11',
                     'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
             zoompop.addAction(self.viewactions[act])
@@ -258,21 +258,21 @@ class PlotWindow( qt.QScrollArea ):
         #zoomtb.setPopupDelay(0)
 
         # define action group for various different selection models
-        g = self.selectactiongrp = qt.QActionGroup(self)
+        g = self.selectactiongrp = qt4.QActionGroup(self)
         g.setExclusive(True)
         for a in [self.viewactions[i] for i in
                   ('viewselect', 'viewzoomgraph')]:
             a.setActionGroup(g)
             #a.setToggleAction(True)
         self.viewactions['viewselect'].setEnabled(True)
-        self.connect(g, qt.SIGNAL('triggered(QAction*)'), self.slotSelectMode)
+        self.connect(g, qt4.SIGNAL('triggered(QAction*)'), self.slotSelectMode)
 
         return self.zoomtoolbar
 
     def mousePressEvent(self, event):
         """Allow user to drag window around."""
 
-        if event.button() == qt.Qt.LeftButton:
+        if event.button() == qt4.Qt.LeftButton:
 
             self.grabPos = (event.x(), event.y())
             if self.clickmode == 'select':
@@ -283,12 +283,12 @@ class PlotWindow( qt.QScrollArea ):
                 self.scrolltimer.start(400, True)
 
             elif self.clickmode == 'scroll':
-                qt.QApplication.setOverrideCursor(
-                    qt.QCursor(qt.Qt.SizeAllCursor))
+                qt4.QApplication.setOverrideCursor(
+                    qt4.QCursor(qt4.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
-                qt.QApplication.setOverrideCursor(
-                    qt.QCursor(qt.Qt.CrossCursor))
+                qt4.QApplication.setOverrideCursor(
+                    qt4.QCursor(qt4.Qt.CrossCursor))
                 self._drawZoomRect(self.grabPos)
 
             # record what mode we were clicked in
@@ -306,9 +306,9 @@ class PlotWindow( qt.QScrollArea ):
         h = maxy - miny + 1
 
         # draw the rectangle on the viewport
-        pt = qt.QPoint(minx, miny)
-        painter = qt.QPainter(view, True)
-        painter.setPen(qt.QPen(qt.QColor('black'), 0, qt.Qt.DotLine))
+        pt = qt4.QPoint(minx, miny)
+        painter = qt4.QPainter(view, True)
+        painter.setPen(qt4.QPen(qt4.QColor('black'), 0, qt4.Qt.DotLine))
         painter.drawRect(pt.x(), pt.y(), w, h)
 
     def _hideZoomRect(self):
@@ -342,8 +342,8 @@ class PlotWindow( qt.QScrollArea ):
         """
 
         # get points corresponding to corners of rectangle
-        pt1 = qt.QPoint(*self.grabPos)
-        pt2 = qt.QPoint(*self._currentzoomrect)
+        pt1 = qt4.QPoint(*self.grabPos)
+        pt2 = qt4.QPoint(*self._currentzoomrect)
 
         # work out whether it's worthwhile to zoom: only zoom if there
         # are >=5 pixels movement
@@ -351,7 +351,7 @@ class PlotWindow( qt.QScrollArea ):
             return
 
         # try to work out in which widget the first point is in
-        bufferpixmap = qt.QPixmap( *self.size )
+        bufferpixmap = qt4.QPixmap( *self.size )
         painter = PointPainter(bufferpixmap, pt1.x(), pt1.y())
         pagenumber = min( self.document.getNumberPages() - 1,
                           self.pagenumber )
@@ -413,7 +413,7 @@ class PlotWindow( qt.QScrollArea ):
         we turn the click into a scrolling click."""
 
         if self.currentclickmode == 'select':
-            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
+            qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.SizeAllCursor))
             self.currentclickmode = 'scroll'
 
     def contentsMouseMoveEvent(self, event):
@@ -433,7 +433,7 @@ class PlotWindow( qt.QScrollArea ):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
 
-        if event.button() == qt.Qt.LeftButton:
+        if event.button() == qt4.Qt.LeftButton:
             event.accept()
             self.scrolltimer.stop()
             if self.currentclickmode == 'select':
@@ -441,15 +441,15 @@ class PlotWindow( qt.QScrollArea ):
                 self.locateClickWidget(event.x(), event.y())
             elif self.currentclickmode == 'scroll':
                 # return the cursor to normal after scrolling
-                qt.QApplication.restoreOverrideCursor()
+                qt4.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
                 self._hideZoomRect()
-                qt.QApplication.restoreOverrideCursor()
+                qt4.QApplication.restoreOverrideCursor()
                 self.doZoomRect()
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
         else:
-            qt.QLabel.contentsMouseReleaseEvent(self, event)
+            qt4.QLabel.contentsMouseReleaseEvent(self, event)
 
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
@@ -457,7 +457,7 @@ class PlotWindow( qt.QScrollArea ):
         
         # now crazily draw the whole thing again
         # see which widgets change the region in the small box given below
-        bufferpixmap = qt.QPixmap( *self.size )
+        bufferpixmap = qt4.QPixmap( *self.size )
         painter = ClickPainter(bufferpixmap, x-3, y-3, 7, 7)
 
         pagenumber = min( self.document.getNumberPages() - 1,
@@ -470,13 +470,13 @@ class PlotWindow( qt.QScrollArea ):
         widget = painter.getFoundWidget()
         if widget != None:
             # tell connected caller that widget was clicked
-            self.emit( qt.PYSIGNAL('sigWidgetClicked'), widget )
+            self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
 
     def setOutputSize(self):
         """Set the ouput display size."""
 
         # convert distances into pixels
-        pix = qt.QPixmap(1, 1)
+        pix = qt4.QPixmap(1, 1)
         painter = document.Painter(pix)
         painter.veusz_scaling = self.zoomfactor
         painter.veusz_pixperpt = self.widgetdpi / 72.
@@ -486,7 +486,7 @@ class PlotWindow( qt.QScrollArea ):
         # make new buffer and resize widget
         if size != self.size:
             self.size = size
-            self.bufferpixmap = qt.QPixmap( *self.size )
+            self.bufferpixmap = qt4.QPixmap( *self.size )
             self.forceupdate = True
             self.label.resize(*size)
 
@@ -534,7 +534,7 @@ class PlotWindow( qt.QScrollArea ):
             self.setOutputSize()
             
             # fill pixmap with proper background colour
-            self.bufferpixmap.fill( self.palette().color(qt.QPalette.Base) )
+            self.bufferpixmap.fill( self.palette().color(qt4.QPalette.Base) )
 
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
@@ -552,7 +552,7 @@ class PlotWindow( qt.QScrollArea ):
             else:
                 self.pagenumber = 0
 
-            self.emit( qt.SIGNAL("sigUpdatePage"), self.pagenumber )
+            self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
             self.updatePageToolbar()
 
             self.oldzoom = self.zoomfactor
@@ -564,7 +564,7 @@ class PlotWindow( qt.QScrollArea ):
     def contextMenuEvent(self, event):
         """A context to change update periods, or disable updates."""
 
-        popup = qt.QMenu(self)
+        popup = qt4.QMenu(self)
         popup.setCheckable(True)
 
         # option to force an update
@@ -678,21 +678,21 @@ class PlotWindow( qt.QScrollArea ):
         """Return a click point from the graph."""
 
         # wait for click from user
-        qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.CrossCursor))
+        qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.CrossCursor))
         oldmode = self.clickmode
         self.clickmode = 'viewgetclick'
         while self.clickmode == 'viewgetclick':
-            qt.qApp.processEvents()
+            qt4.qApp.processEvents()
         self.clickmode = oldmode
-        qt.QApplication.restoreOverrideCursor()
+        qt4.QApplication.restoreOverrideCursor()
 
         # take clicked point and convert to coords of scrollview
-        pt = qt.QPoint(*self.grabPos)
+        pt = qt4.QPoint(*self.grabPos)
         pt = self.viewport().mapFromGlobal(pt)
         pt = self.viewportToContents(pt)
 
         # try to work out in which widget the first point is in
-        bufferpixmap = qt.QPixmap( *self.size )
+        bufferpixmap = qt4.QPixmap( *self.size )
         painter = PointPainter(bufferpixmap, pt.x(), pt.y())
         pagenumber = min( self.document.getNumberPages() - 1,
                           self.pagenumber )

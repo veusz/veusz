@@ -18,7 +18,7 @@
 
 # $Id$
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import veusz.document as document
 import plotwindow
@@ -27,11 +27,11 @@ import plotwindow
 A simple window class for wrapping a plotwindow
 """
 
-class SimpleWindow(qt.QMainWindow):
+class SimpleWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
     def __init__(self, title):
-        qt.QMainWindow.__init__(self)
+        qt4.QMainWindow.__init__(self)
         self.setCaption(title)
 
         self.document = document.Document()

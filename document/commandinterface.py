@@ -26,23 +26,23 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import datasets
 import operations
 
-class CommandInterface(qt.QObject):
+class CommandInterface(qt4.QObject):
     """Class provides command interface."""
 
     def __init__(self, document):
         """Initialise the interface."""
-        qt.QObject.__init__(self)
+        qt4.QObject.__init__(self)
 
         self.document = document
         self.currentwidget = self.document.basewidget
         self.verbose = False
 
-        self.connect( self.document, qt.SIGNAL("sigWiped"),
+        self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotWipedDoc )
 
     def slotWipedDoc(self):
@@ -365,7 +365,7 @@ class CommandInterface(qt.QObject):
 
     def Print(self):
         """Print document."""
-        p = qt.QPrinter()
+        p = qt4.QPrinter()
 
         if p.setup():
             p.newPage()

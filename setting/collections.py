@@ -20,7 +20,7 @@
 
 """Collections of predefined settings for common settings."""
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import setting
 from settings import Settings
@@ -51,10 +51,10 @@ class Line(Settings):
     def makeQPen(self, painter):
         '''Make a QPen from the description'''
 
-        return qt.QPen( qt.QColor(self.color),
-                        self.get('width').convert(painter),
-                        self.get('style').qtStyle() )
-
+        return qt4.QPen( qt4.QColor(self.color),
+                         self.get('width').convert(painter),
+                         self.get('style').qtStyle() )
+    
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
     to be plotted.'''
@@ -94,8 +94,8 @@ class Brush(Settings):
     def makeQBrush(self):
         '''Make a qbrush from the settings.'''
 
-        return qt.QBrush( qt.QColor(self.color),
-                          self.get('style').qtStyle() )
+        return qt4.QBrush( qt4.QColor(self.color),
+                           self.get('style').qtStyle() )
     
 class KeyBrush(Brush):
     '''Fill used for back of key.'''
@@ -192,11 +192,11 @@ class _FontList(object):
     
     def _getFonts(self):
         """Construct list of fonts from Qt."""
-        self.vals = [ unicode(name) for name in qt.QFontDatabase().families() ]
+        self.vals = [ unicode(name) for name in qt4.QFontDatabase().families() ]
 
 def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet."""
-    families = [ unicode(name) for name in qt.QFontDatabase().families() ]
+    families = [ unicode(name) for name in qt4.QFontDatabase().families() ]
     
     default = None
     for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
@@ -250,7 +250,7 @@ class Text(Settings):
     def _getFontFamilies():
         '''Make list of font families available.'''
         Text.families=[ unicode(name)
-                        for name in qt.QFontDatabase().families() ]
+                        for name in qt4.QFontDatabase().families() ]
         
     _getFontFamilies = staticmethod(_getFontFamilies)
 
@@ -275,23 +275,23 @@ class Text(Settings):
     _getDefaultFamily = staticmethod(_getDefaultFamily)
             
     def makeQFont(self, painter):
-        '''Return a qt.QFont object corresponding to the settings.'''
+        '''Return a qt4.QFont object corresponding to the settings.'''
         
         size = self.get('size').convertPts(painter)
-        weight = qt.QFont.Normal
+        weight = qt4.QFont.Normal
         if self.bold:
-            weight = qt.QFont.Bold
+            weight = qt4.QFont.Bold
 
-        f = qt.QFont(self.font, size,  weight, self.italic)
+        f = qt4.QFont(self.font, size,  weight, self.italic)
         if self.underline:
             f.setUnderline(True)
-        f.setStyleHint( qt.QFont.Times, qt.QFont.PreferDevice )
+        f.setStyleHint( qt4.QFont.Times, qt4.QFont.PreferDevice )
 
         return f
 
     def makeQPen(self):
-        """ Return a qt.QPen object for the font pen """
-        return qt.QPen(qt.QColor(self.color))
+        """ Return a qt4.QPen object for the font pen """
+        return qt4.QPen(qt4.QColor(self.color))
         
 class AxisLabel(Text):
 

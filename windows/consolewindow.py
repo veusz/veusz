@@ -21,10 +21,11 @@
 
 # $Id$
 
-import veusz.qtall as qt
 import codeop
 import traceback
 import sys
+
+import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.utils as utils
@@ -47,7 +48,7 @@ class _Writer:
         """ Does nothing as yet."""
         pass
 
-class _CommandEdit(qt.QLineEdit):
+class _CommandEdit(qt4.QLineEdit):
     """ A special class to allow entering of the command line.
 
     emits sigEnter if the return key is pressed, and returns command
@@ -55,12 +56,12 @@ class _CommandEdit(qt.QLineEdit):
     """
 
     def __init__(self, *args):
-        qt.QLineEdit.__init__(self, *args)
+        qt4.QLineEdit.__init__(self, *args)
         self.history = []
         self.history_posn = 0
 
-        qt.QObject.connect( self, qt.SIGNAL("returnPressed()"),
-                            self.slotReturnPressed )
+        qt4.QObject.connect( self, qt4.SIGNAL("returnPressed()"),
+                             self.slotReturnPressed )
 
         self.setToolTip("Input a python expression here and press enter" )
 
@@ -76,23 +77,23 @@ class _CommandEdit(qt.QLineEdit):
         self.history_posn = 0
 
         # tell the console we have a command
-        self.emit( qt.SIGNAL("sigEnter"), command)
+        self.emit( qt4.SIGNAL("sigEnter"), command)
 
-    historykeys = (qt.Qt.Key_Up, qt.Qt.Key_Down)
+    historykeys = (qt4.Qt.Key_Up, qt4.Qt.Key_Down)
 
     def keyPressEvent(self, key):
         """ Overridden to handle history. """
 
-        qt.QLineEdit.keyPressEvent(self, key)
+        qt4.QLineEdit.keyPressEvent(self, key)
         code = key.key()
 
         # check whether one of the "history keys" has been pressed
         if code in _CommandEdit.historykeys:
 
             # move up or down in the history list
-            if code == qt.Qt.Key_Up:
+            if code == qt4.Qt.Key_Up:
                 self.history_posn += 1
-            elif code == qt.Qt.Key_Down:
+            elif code == qt4.Qt.Key_Down:
                 self.history_posn -= 1
 
             # make sure counter is within bounds
@@ -117,19 +118,19 @@ welcome to redistribute it under certain conditions. Enter "GPL()" for details.<
 This window is a Python command line console and acts as a calculator.<br>
 ''' % utils.version()
 
-class ConsoleWindow(qt.QDockWidget):
+class ConsoleWindow(qt4.QDockWidget):
     """ A python-like qt console."""
 
     def __init__(self, thedocument, *args):
-        qt.QDockWidget.__init__(self, *args)
+        qt4.QDockWidget.__init__(self, *args)
         #QT4FIXME
         #self.setResizeEnabled( True )
         self.setWindowTitle("Console - Veusz")
 
         # arrange sub-widgets in a vbox
-        self.vbox = qt.QWidget(self)
+        self.vbox = qt4.QWidget(self)
         self.setWidget(self.vbox)
-        vlayout = qt.QVBoxLayout(self.vbox)
+        vlayout = qt4.QVBoxLayout(self.vbox)
 
         # start an interpreter instance to the document
         self.interpreter = document.CommandInterpreter(thedocument)
@@ -140,16 +141,16 @@ class ConsoleWindow(qt.QDockWidget):
         self.stderrbuffer = ""
 
         # the output from the console goes here
-        self._outputdisplay = qt.QTextEdit(self.vbox)
+        self._outputdisplay = qt4.QTextEdit(self.vbox)
         self._outputdisplay.setReadOnly(True)
         self._outputdisplay.insertHtml( introtext )
         vlayout.addWidget(self._outputdisplay)
 
-        self._hbox = qt.QWidget(self.vbox)
-        hlayout = qt.QHBoxLayout(self._hbox)
+        self._hbox = qt4.QWidget(self.vbox)
+        hlayout = qt4.QHBoxLayout(self._hbox)
         vlayout.addWidget(self._hbox)
         
-        self._prompt = qt.QLabel(">>>", self._hbox)
+        self._prompt = qt4.QLabel(">>>", self._hbox)
         hlayout.addWidget(self._prompt)
 
         # where commands are typed in
@@ -161,8 +162,8 @@ class ConsoleWindow(qt.QDockWidget):
         self.command_build = ''
 
         # get called if enter is pressed in the input control
-        qt.QObject.connect( self._inputedit, qt.SIGNAL("sigEnter"),
-                            self.slotEnter )
+        qt4.QObject.connect( self._inputedit, qt4.SIGNAL("sigEnter"),
+                             self.slotEnter )
 
     def runFunction(self, func):
         """Execute the function within the console window, trapping
@@ -198,7 +199,7 @@ class ConsoleWindow(qt.QDockWidget):
 
         # insert text as red
         oldcol = self._outputdisplay.textColor()
-        self._outputdisplay.setTextColor(qt.QColor("red"))
+        self._outputdisplay.setTextColor(qt4.QColor("red"))
         self._outputdisplay.insertPlainText(text)
         self._outputdisplay.setTextColor(oldcol)
         self._outputdisplay.ensureCursorVisible()
@@ -228,7 +229,7 @@ class ConsoleWindow(qt.QDockWidget):
 
         # output the command in the log pane
         oldcol = self._outputdisplay.textColor()
-        self._outputdisplay.setTextColor(qt.QColor("blue"))
+        self._outputdisplay.setTextColor(qt4.QColor("blue"))
         self._outputdisplay.insertPlainText('%s %s\n' % (prompt, command))
         self._outputdisplay.setTextColor(oldcol)
         self._outputdisplay.ensureCursorVisible()
