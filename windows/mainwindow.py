@@ -20,7 +20,7 @@
 
 """Implements the main window of the application."""
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import os.path
 
 import veusz.document as document
@@ -40,7 +40,7 @@ from veusz.dialogs.importfits import ImportFITS
 import veusz.dialogs.importdialog as importdialog
 #import veusz.dialogs.dataeditdialog as dataeditdialog
 
-class MainWindow(qt.QMainWindow):
+class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
     windows = []
@@ -63,9 +63,9 @@ class MainWindow(qt.QMainWindow):
     CreateWindow = classmethod(CreateWindow)
 
     def __init__(self, *args):
-        qt.QMainWindow.__init__(self, *args)
+        qt4.QMainWindow.__init__(self, *args)
 
-        self.setWindowIcon( qt.QIcon(os.path.join(action.imagedir, 'veusz.png')) )
+        self.setWindowIcon( qt4.QIcon(os.path.join(action.imagedir, 'veusz.png')) )
 
         self.document = document.Document()
 
@@ -85,14 +85,14 @@ class MainWindow(qt.QMainWindow):
 
         # likewise with the tree-editing window
         #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
-        #self.moveDockWindow( self.treeedit, qt.Qt.DockLeft, True, 1 )
-        self.treeedit = qt.QWidget()
+        #self.moveDockWindow( self.treeedit, qt4.Qt.DockLeft, True, 1 )
+        self.treeedit = qt4.QWidget()
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
         self.interpreter = self.console.interpreter
-        self.addDockWidget(qt.Qt.BottomDockWidgetArea, self.console)
+        self.addDockWidget(qt4.Qt.BottomDockWidgetArea, self.console)
 
         # the plot window is the central window
         self.updateStatusbar('Ready')
@@ -101,32 +101,32 @@ class MainWindow(qt.QMainWindow):
         #self.setDockMenuEnabled(False)
 
         # keep page number up to date
-        self.pagelabel = qt.QLabel(self.statusBar())
+        self.pagelabel = qt4.QLabel(self.statusBar())
         self.statusBar().addWidget(self.pagelabel)
 
         self.dirname = ''
         self.exportDir = ''
         
-        self.connect( self.plot, qt.SIGNAL("sigUpdatePage"),
+        self.connect( self.plot, qt4.SIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
 
         # disable save if already saved
-        self.connect( self.document, qt.SIGNAL("sigModified"),
+        self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.slotModifiedDoc )
         # if the treeeditwindow changes the page, change the plot window
         # FIXMEQT4
-        #self.connect( self.treeedit, qt.SIGNAL("sigPageChanged"),
+        #self.connect( self.treeedit, qt4.SIGNAL("sigPageChanged"),
         #              self.plot.setPageNumber )
 
         # if a widget in the plot window is clicked by the user
-        #self.connect( self.plot, qt.SIGNAL("sigWidgetClicked"),
+        #self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
         #              self.treeedit.slotSelectWidget )
 
         # put the dock windows on the view menu, so they can be shown/hidden
         #self._defineDockViewMenu()
 
         # enable/disable undo/redo
-        self.connect(self.menus['edit'], qt.SIGNAL('aboutToShow()'),
+        self.connect(self.menus['edit'], qt4.SIGNAL('aboutToShow()'),
                      self.slotAboutToShowEdit)
 
         #Get the list of recently opened files
@@ -155,7 +155,7 @@ class MainWindow(qt.QMainWindow):
             view.connectItem(item, self.slotViewDockWindow)
             self.viewdockmenuitems[item] = win
 
-        self.connect(view, qt.SIGNAL('aboutToShow()'),
+        self.connect(view, qt4.SIGNAL('aboutToShow()'),
                      self.slotAboutToShowView)
 
     def dragEnterEvent(self, event):
@@ -177,8 +177,8 @@ class MainWindow(qt.QMainWindow):
     def _getVeuszFiles(self, event):
         """Return a list of veusz files from a drag/drop event containing a
         text/uri-list"""
-        draggedFiles = qt.QStringList()
-        qt.QUriDrag.decodeLocalFiles(event, draggedFiles)
+        draggedFiles = qt4.QStringList()
+        qt4.QUriDrag.decodeLocalFiles(event, draggedFiles)
         fileList = []
         for i in range(len(draggedFiles)):
             filename=draggedFiles[i]
@@ -236,8 +236,8 @@ class MainWindow(qt.QMainWindow):
         """Initialise the menus and toolbar."""
 
         # create toolbar
-        self.maintoolbar = qt.QToolBar("Main toolbar - Veusz", self)
-        self.addToolBar(qt.Qt.TopToolBarArea, self.maintoolbar)
+        self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
+        self.addToolBar(qt4.Qt.TopToolBarArea, self.maintoolbar)
 
         # add main menus
         menus = [
@@ -379,30 +379,30 @@ class MainWindow(qt.QMainWindow):
     def queryOverwrite(self):
         """Do you want to overwrite the current document.
 
-        Returns qt.QMessageBox.(Yes,No,Cancel)."""
+        Returns qt4.QMessageBox.(Yes,No,Cancel)."""
         
-        mb = qt.QMessageBox("Veusz",
-                            "Document is modified. Save first?",
-                            qt.QMessageBox.Warning,
-                            qt.QMessageBox.Yes | qt.QMessageBox.Default,
-                            qt.QMessageBox.No,
-                            qt.QMessageBox.Cancel | qt.QMessageBox.Escape,
-                            self)
-        mb.setButtonText(qt.QMessageBox.Yes, "&Save")
-        mb.setButtonText(qt.QMessageBox.No, "&Discard")
-        mb.setButtonText(qt.QMessageBox.Cancel, "&Cancel")
+        mb = qt4.QMessageBox("Veusz",
+                             "Document is modified. Save first?",
+                             qt4.QMessageBox.Warning,
+                             qt4.QMessageBox.Yes | qt4.QMessageBox.Default,
+                             qt4.QMessageBox.No,
+                             qt4.QMessageBox.Cancel | qt4.QMessageBox.Escape,
+                             self)
+        mb.setButtonText(qt4.QMessageBox.Yes, "&Save")
+        mb.setButtonText(qt4.QMessageBox.No, "&Discard")
+        mb.setButtonText(qt4.QMessageBox.Cancel, "&Cancel")
         return mb.exec_loop()
 
     def close(self, alsoDelete):
         """Before closing, check whether we need to save first."""
         if self.document.isModified():
             v = self.queryOverwrite()
-            if v == qt.QMessageBox.Cancel:
+            if v == qt4.QMessageBox.Cancel:
                 return False
-            elif v == qt.QMessageBox.Yes:
+            elif v == qt4.QMessageBox.Yes:
                 self.slotFileSave()
 
-        return qt.QMainWindow.close(self, alsoDelete)
+        return qt4.QMainWindow.close(self, alsoDelete)
 
     def closeEvent(self, evt):
         """Called when the window closes."""
@@ -412,12 +412,12 @@ class MainWindow(qt.QMainWindow):
         setting.settingdb['geometry_mainwindow'] = geometry
 
         # store docked windows
-        s = qt.QString()
-        stream = qt.QTextStream(s, qt.IO_WriteOnly)
+        s = qt4.QString()
+        stream = qt4.QTextStream(s, qt4.IO_WriteOnly)
         stream << self
         setting.settingdb['geometry_docwindows'] = str(s)
 
-        qt.QMainWindow.closeEvent(self, evt)
+        qt4.QMainWindow.closeEvent(self, evt)
 
     def showEvent(self, evt):
         """Restoring window geometry if possible."""
@@ -425,17 +425,17 @@ class MainWindow(qt.QMainWindow):
         # if we can restore the geometry, do so
         if 'geometry_mainwindow' in setting.settingdb:
             geometry = setting.settingdb['geometry_mainwindow']
-            self.resize( qt.QSize(geometry[2], geometry[3]) )
-            self.move( qt.QPoint(geometry[0], geometry[1]) )
+            self.resize( qt4.QSize(geometry[2], geometry[3]) )
+            self.move( qt4.QPoint(geometry[0], geometry[1]) )
 
         # restore docked window geometry
         if 'geometry_docwindows' in setting.settingdb:
             s = setting.settingdb['geometry_docwindows']
-            s = qt.QString(s)
-            stream = qt.QTextStream(s, qt.IO_ReadOnly)
+            s = qt4.QString(s)
+            stream = qt4.QTextStream(s, qt4.IO_ReadOnly)
             stream >> self
 
-        qt.QMainWindow.showEvent(self, evt)
+        qt4.QMainWindow.showEvent(self, evt)
 
     def slotFileNew(self):
         """New file."""
@@ -448,23 +448,23 @@ class MainWindow(qt.QMainWindow):
             self.slotFileSaveAs()
         else:
             # show busy cursor
-            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
             try:
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
                 self.updateStatusbar("Saved to %s" % self.filename)
             except IOError:
-                qt.QMessageBox("Veusz",
-                               "Cannot save file as '%s'" % self.filename,
-                               qt.QMessageBox.Critical,
-                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                               qt.QMessageBox.NoButton,
-                               qt.QMessageBox.NoButton,
-                               self).exec_loop()
+                qt4.QMessageBox("Veusz",
+                                "Cannot save file as '%s'" % self.filename,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_loop()
                 
             # restore the cursor
-            qt.QApplication.restoreOverrideCursor()
+            qt4.QApplication.restoreOverrideCursor()
                 
     def updateTitlebar(self):
         """Put the filename into the title bar."""
@@ -477,12 +477,12 @@ class MainWindow(qt.QMainWindow):
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
         
-        fd = qt.QFileDialog(self, dialogtitle, self.dirname,
-                            "%s (*.%s)" % (filedescr, filetype) )
-        fd.setFileMode( qt.QFileDialog.AnyFile )
+        fd = qt4.QFileDialog(self, dialogtitle, self.dirname,
+                             "%s (*.%s)" % (filedescr, filetype) )
+        fd.setFileMode( qt4.QFileDialog.AnyFile )
 
         # okay was selected
-        if fd.exec_() == qt.QDialog.Accepted:
+        if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
             self.dirname = fd.directory()
             # update the edit box
@@ -496,14 +496,14 @@ class MainWindow(qt.QMainWindow):
             except IOError:
                 pass
             else:
-                v = qt.QMessageBox("Veusz",
-                                   "File exists, overwrite?",
-                                   qt.QMessageBox.Warning,
-                                   qt.QMessageBox.Yes,
-                                   qt.QMessageBox.No | qt.QMessageBox.Default,
-                                   qt.QMessageBox.NoButton,
-                                   self).exec_loop()
-                if v == qt.QMessageBox.No:
+                v = qt4.QMessageBox("Veusz",
+                                    "File exists, overwrite?",
+                                    qt4.QMessageBox.Warning,
+                                    qt4.QMessageBox.Yes,
+                                    qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                                    qt4.QMessageBox.NoButton,
+                                    self).exec_loop()
+                if v == qt4.QMessageBox.No:
                     return None
 
             return filename
@@ -512,12 +512,12 @@ class MainWindow(qt.QMainWindow):
     def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
         """Display an open dialog and return a filename."""
         
-        fd = qt.QFileDialog(self, dialogtitle, self.dirname,
-                            "%s (*.%s)" % (filedescr, filetype) )
-        fd.setFileMode( qt.QFileDialog.ExistingFile )
+        fd = qt4.QFileDialog(self, dialogtitle, self.dirname,
+                             "%s (*.%s)" % (filedescr, filetype) )
+        fd.setFileMode( qt4.QFileDialog.ExistingFile )
 
         # if the user chooses a file
-        if fd.exec_() == qt.QDialog.Accepted:
+        if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
             self.dirname = fd.directory()
 
@@ -525,13 +525,13 @@ class MainWindow(qt.QMainWindow):
             try:
                 open(filename)
             except IOError, e:
-                qt.QMessageBox("Veusz",
-                               "Unable to open file '%s'\n'%s'" % (filename, str(e)),
-                               qt.QMessageBox.Critical,
-                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                               qt.QMessageBox.NoButton,
-                               qt.QMessageBox.NoButton,
-                               self).exec_loop()
+                qt4.QMessageBox("Veusz",
+                                "Unable to open file '%s'\n'%s'" % (filename, str(e)),
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_loop()
                 return None
             return filename
         return None
@@ -561,7 +561,7 @@ class MainWindow(qt.QMainWindow):
         '''Open the given filename in the current window.'''
 
         # show busy cursor
-        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
         
         try:
             # load the document in the current window
@@ -587,26 +587,26 @@ class MainWindow(qt.QMainWindow):
 
         except IOError:
             # problem reading file
-            qt.QMessageBox("Veusz",
-                           "Cannot open file '%s'" % filename,
-                           qt.QMessageBox.Critical,
-                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                           qt.QMessageBox.NoButton,
-                           qt.QMessageBox.NoButton,
-                           self).exec_loop()
+            qt4.QMessageBox("Veusz",
+                            "Cannot open file '%s'" % filename,
+                            qt4.QMessageBox.Critical,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_loop()
         except Exception, e:
             # parsing problem with document
             # FIXME: never used
-            qt.QMessageBox("Veusz",
-                           "Error in file '%s'\n'%s'" % (filename, str(e)),
-                           qt.QMessageBox.Critical,
-                           qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                           qt.QMessageBox.NoButton,
-                           qt.QMessageBox.NoButton,
-                           self).exec_()
+            qt4.QMessageBox("Veusz",
+                            "Error in file '%s'\n'%s'" % (filename, str(e)),
+                            qt4.QMessageBox.Critical,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
         
         # restore the cursor
-        qt.QApplication.restoreOverrideCursor()
+        qt4.QApplication.restoreOverrideCursor()
 
     def slotFileOpen(self):
         """Open an existing file in a new window."""
@@ -659,13 +659,13 @@ class MainWindow(qt.QMainWindow):
                    (["png"], "Portable Network Graphics"),
                    (["svg"], "Scalable Vector Graphics")]
 
-        fd = qt.QFileDialog(self, 'export dialog', True)
+        fd = qt4.QFileDialog(self, 'export dialog', True)
         if not self.exportDir:
             fd.setDir( self.dirname )
         else:
             fd.setDir( self.exportDir )
             
-        fd.setMode( qt.QFileDialog.AnyFile )
+        fd.setMode( qt4.QFileDialog.AnyFile )
 
         # Create a mapping between a format string and extensions
         filtertoext = {}
@@ -691,7 +691,7 @@ class MainWindow(qt.QMainWindow):
             filename = os.path.splitext(filename)[0] + '.eps'
             fd.setSelection(filename)
         
-        if fd.exec_loop() == qt.QDialog.Accepted:
+        if fd.exec_loop() == qt4.QDialog.Accepted:
             # save directory for next time
             self.exportDir = fd.dir()
 
@@ -699,7 +699,7 @@ class MainWindow(qt.QMainWindow):
             chosenextns = filtertoext[filterused]
             
             # show busy cursor
-            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
+            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
             filename = unicode( fd.selectedFile() )
             
@@ -712,23 +712,23 @@ class MainWindow(qt.QMainWindow):
             try:
                 self.document.export(filename, self.plot.getPageNumber())
             except (IOError, RuntimeError), inst:
-                qt.QMessageBox("Veusz",
-                               "Error exporting file:\n%s" % inst,
-                               qt.QMessageBox.Critical,
-                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                               qt.QMessageBox.NoButton,
-                               qt.QMessageBox.NoButton,
-                               self).exec_loop()
-
+                qt4.QMessageBox("Veusz",
+                                "Error exporting file:\n%s" % inst,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_loop()
+                
             # restore the cursor
-            qt.QApplication.restoreOverrideCursor()
+            qt4.QApplication.restoreOverrideCursor()
 
     def slotFilePrint(self):
         """Print the document."""
 
         doc = self.document
-        prnt = qt.QPrinter(qt.QPrinter.HighResolution)
-        prnt.setColorMode(qt.QPrinter.Color)
+        prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
+        prnt.setColorMode(qt4.QPrinter.Color)
         prnt.setMinMax( 1, doc.getNumberPages() )
         prnt.setCreator('Veusz %s' % utils.version())
         prnt.setDocName(self.filename)
@@ -746,7 +746,7 @@ class MainWindow(qt.QMainWindow):
             maxval -= 1
 
             # reverse or forward order
-            if prnt.pageOrder() == qt.QPrinter.FirstPageFirst:
+            if prnt.pageOrder() == qt4.QPrinter.FirstPageFirst:
                 pages = range(minval, maxval+1)
             else:
                 pages = range(maxval, minval-1, -1)
@@ -769,7 +769,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotFileQuit(self):
         """File quit chosen."""
-        qt.qApp.closeAllWindows()
+        qt4.qApp.closeAllWindows()
         
     def slotUpdatePage(self, number):
         """Update page number when the plot window says so."""
@@ -788,13 +788,13 @@ class MainWindow(qt.QMainWindow):
             try:
                 f = open(filename, 'w')
             except IOError:
-                qt.QMessageBox("Veusz",
-                               "Cannot export stylesheet as '%s'" % filename,
-                               qt.QMessageBox.Critical,
-                               qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                               qt.QMessageBox.NoButton,
-                               qt.QMessageBox.NoButton,
-                               self).exec_loop()
+                qt4.QMessageBox("Veusz",
+                                "Cannot export stylesheet as '%s'" % filename,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_loop()
                 return
             
             self.document.exportStyleSheet(f)
