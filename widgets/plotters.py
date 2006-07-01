@@ -21,7 +21,7 @@
 
 # $Id$
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import itertools
 import numarray as N
 
@@ -82,7 +82,7 @@ class GenericPlotter(widget.Widget):
         y2 = axes[1].coordParr2
 
         # actually clip the data
-        painter.setClipRect( qt.QRect(x1, y2, x2-x1, y1-y2) )
+        painter.setClipRect( qt4.QRect(x1, y2, x2-x1, y1-y2) )
 
 ########################################################################
         
@@ -148,31 +148,32 @@ class FunctionPlotter(GenericPlotter):
 
         # idea is to collect points until we go out of the bounds
         # or reach the end, then plot them
-        pts = []
+        pts = qt4.QPolygonF()
         lastx = lasty = -65536
         for x, y in itertools.izip(xpts, ypts):
 
             # ignore point if it outside sensible bounds
             if x < -32767 or y < -32767 or x > 32767 or y > 32767:
                 if len(pts) >= 2:
-                    painter.drawPolyline( qt.QPolygon(pts) )
-                    pts = []
+                    painter.drawPolyline(pts)
+                    pts.clear()
             else:
                 # if the jump wasn't too large, add the point to the points
                 if abs(x-lastx) < maxdeltax and abs(y-lasty) < maxdeltay:
-                    pts.append( qt.QPoint(x, y) )
+                    pts.append( qt4.QPointF(x, y) )
                 else:
                     # draw what we have until now, and start a new line
                     if len(pts) >= 2:
-                        painter.drawPolyline( qt.QPolygon(pts) )
-                    pts = [qt.QPoint(x, y)]
+                        painter.drawPolyline(pts)
+                    pts.clear()
+                    pts.append( qt4.QPointF(x, y) )
 
             lastx = x
             lasty = y
 
         # draw remaining points
         if len(pts) >= 2:
-            painter.drawPolyline( qt.QPolygon(pts) )
+            painter.drawPolyline(pts)
 
     def _fillRegion(self, painter, pxpts, pypts, bounds, belowleft):
         """Fill the region above/below or left/right of the points.
@@ -184,20 +185,21 @@ class FunctionPlotter(GenericPlotter):
         x1, y1, x2, y2 = bounds
         s = self.settings
         
+        pts = qt4.QPolygonF()
         if self.settings.variable == 'x':
             if belowleft:
-                pts = [qt.QPoint(pxpts[0], y2)]
-                endpt = [pxpts[-1], y2]
+                pts.append(qt4.QPointF(pxpts[0], y2))
+                endpt = qt4.QPointF(pxpts[-1], y2)
             else:
-                pts = [qt.QPoint(pxpts[0], y1)]
-                endpt = [pxpts[-1], y1]
+                pts.append(qt4.QPointF(pxpts[0], y1))
+                endpt = qt4.QPointF(pxpts[-1], y1)
         else:
             if belowleft:
-                pts = [qt.QPoint(x1, pypts[0])]
-                endpt = [x1, pypts[-1]]
+                pts.append(qt4.QPointF(x1, pypts[0]))
+                endpt = qt4.QPointF(x1, pypts[-1])
             else:
-                pts = [qt.QPoint(x2, pypts[0])]
-                endpt = [x2, pypts[-1]]
+                pts.append(qt4.QPointF(x2, pypts[0]))
+                endpt = qt4.QPointF(x2, pypts[-1])
 
         # add the points between (clipped to the bounds*2 - helps edges)
         xw = x2-x1
@@ -205,13 +207,13 @@ class FunctionPlotter(GenericPlotter):
         yw = y2-y1
         yclip = N.clip(pypts, y1-yw, y2+yw)
         for x, y in itertools.izip(xclip, yclip):
-            pts.append( qt.QPoint(x, y) )
+            pts.append( qt4.QPointF(x, y) )
 
         # stick on the ending point
-        pts += qt.QPoint(*endpt)
+        pts.append(endpt)
 
         # actually do the filling
-        painter.drawPolygon( qt.QPolygon(pts) )
+        painter.drawPolygon(pts)
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -221,7 +223,7 @@ class FunctionPlotter(GenericPlotter):
 
         # draw line
         if not s.Line.hide:
-            painter.setBrush( qt.QBrush() )
+            painter.setBrush( qt4.QBrush() )
             painter.setPen( s.Line.makeQPen(painter) )
             painter.drawLine(x, yp, x+width, yp)
 
@@ -250,14 +252,14 @@ class FunctionPlotter(GenericPlotter):
         if s.variable == 'x':
             if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:
                 x_min = N.array([s.min])
-                x1 = axes[0].graphToPlotterCoords(posn, x_min).astype(N.Int32)[0]
+                x1 = axes[0].graphToPlotterCoords(posn, x_min)[0]
             if not(s.max == 'Auto') and s.max < axes[0].getPlottedRange()[1]:
                 x_max = N.array([s.max])
-                x2 = axes[0].graphToPlotterCoords(posn, x_max).astype(N.Int32)[0]
+                x2 = axes[0].graphToPlotterCoords(posn, x_max)[0]
                 
             # x function
             delta = (x2 - x1) / float(s.steps)
-            pxpts = N.arange(x1, x2+delta, delta).astype(N.Int32)
+            pxpts = N.arange(x1, x2+delta, delta)
             x = axes[0].plotterToGraphCoords(posn, pxpts)
             env['x'] = x
             try:
@@ -272,13 +274,13 @@ class FunctionPlotter(GenericPlotter):
             # y function
             if not(s.min == 'Auto') and s.min > axes[1].getPlottedRange()[0]:
                 y_min = N.array([s.min])
-                y2 = axes[1].graphToPlotterCoords(posn, y_min).astype(N.Int32)[0]
+                y2 = axes[1].graphToPlotterCoords(posn, y_min)[0]
             if not(s.max == 'Auto') and s.max < axes[1].getPlottedRange()[1]:
                 y_max = N.array([s.max])
-                y1 = axes[1].graphToPlotterCoords(posn, y_max).astype(N.Int32)[0]
+                y1 = axes[1].graphToPlotterCoords(posn, y_max)[0]
             
             delta = (y2 - y1) / float(s.steps)
-            pypts = N.arange(y1, y2+delta, delta).astype(N.Int32)
+            pypts = N.arange(y1, y2+delta, delta)
             env['y'] = axes[1].plotterToGraphCoords(posn, pypts)
             try:
                 x = eval( s.function + ' + 0*y', env )
@@ -296,26 +298,26 @@ class FunctionPlotter(GenericPlotter):
         # draw the function line
         if bad:
             # not sure how to deal with errors here
-            painter.setPen( qt.QColor('red') )
-            f = qt.QFont()
+            painter.setPen( qt4.QColor('red') )
+            f = qt4.QFont()
             f.setPointSize(20)
             painter.setFont(f)
-            painter.drawText( qt.QRect(x1, y1, x2-x1, y2-y1),
-                              qt.Qt.AlignCenter,
+            painter.drawText( qt4.QRect(x1, y1, x2-x1, y2-y1),
+                              qt4.Qt.AlignCenter,
                               "Cannot evaluate '%s'" % s.function )
         else:
             if not s.FillBelow.hide:
                 painter.setBrush( s.FillBelow.makeQBrush() )
-                painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
                 self._fillRegion(painter, pxpts, pypts, posn, True)
 
             if not s.FillAbove.hide:
                 painter.setBrush( s.FillAbove.makeQBrush() )
-                painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
                 self._fillRegion(painter, pxpts, pypts, posn, False)
 
             if not s.Line.hide:
-                painter.setBrush( qt.QBrush() )
+                painter.setBrush( qt4.QBrush() )
                 painter.setPen( s.Line.makeQPen(painter) )
                 self._plotLine(painter, pxpts, pypts, posn)
 
@@ -441,17 +443,20 @@ class PointPlotter(GenericPlotter):
 
             # vertical error bars
             if ymin != None and ymax != None and not s.ErrorBarLine.hideVert :
-                for i in itertools.izip(xplotter, ymin, xplotter,
-                                        ymax):
-                    pts.append(qt.QLine(*i))
+                for x1, y1, x2, y2 in itertools.izip(xplotter, ymin, xplotter,
+                                                     ymax):
+                    pts.append(qt4.QPointF(x1, y1))
+                    pts.append(qt4.QPointF(x2, y2))
+
             # horizontal error bars
             if xmin != None and xmax != None and not s.ErrorBarLine.hideHorz:
-                for i in itertools.izip(xmin, yplotter, xmax,
-                                                  yplotter):
-                    pts.append(qt.QLine(*i))
+                for x1, y1, x2, y2 in itertools.izip(xmin, yplotter, xmax,
+                                                     yplotter):
+                    pts.append(qt4.QPointF(x1, y1))
+                    pts.append(qt4.QPointF(x2, y2))
 
             if len(pts) != 0:
-                painter.drawLines( qt.QPolygon(pts) )
+                painter.drawLines(pts)
 
         # special error bars (only works with proper x and y errors)
         if ( ymin != None and ymax != None and xmin != None and
@@ -461,32 +466,35 @@ class PointPlotter(GenericPlotter):
             if style in {'box':True, 'barbox':True}:
 
                 # non-filling brush
-                painter.setBrush( qt.QBrush() )
+                painter.setBrush( qt4.QBrush() )
 
                 for xmn, ymn, xmx, ymx in (
                     itertools.izip(xmin, ymin, xmax, ymax)):
 
-                    painter.drawPolygon(
-                        qt.QPolygon([xmn, ymn, xmx, ymn, xmx, ymx,
-                                     xmn, ymx]) )
+                    painter.drawPolygon( qt4.QPointF(xmn, ymn),
+                                         qt4.QPointF(xmx, ymn),
+                                         qt4.QPointF(xmx, ymx),
+                                         qt4.QPointF(xmn, ymx) )
 
             # draw diamonds
             elif style in {'diamond':True, 'bardiamond':True}:
 
                 # non-filling brush
-                painter.setBrush( qt.QBrush() )
+                painter.setBrush( qt4.QBrush() )
 
                 for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
                     xplotter, yplotter, xmin, ymin, xmax, ymax):
 
-                    painter.drawPolygon(
-                        qt.QPolygon([xmn, yp, xp, ymx, xmx, yp, xp, ymn]) )
+                    painter.drawPolygon( qt4.QPointF(xmn, yp),
+                                         qt4.QPointF(xp, ymx),
+                                         qt4.QPointF(xmx, yp),
+                                         qt4.QPointF(xp, ymn) )
 
             # draw curved errors
             elif style in {'curve':True, 'barcurve': True}:
 
                 # non-filling brush
-                painter.setBrush( qt.QBrush() )
+                painter.setBrush( qt4.QBrush() )
 
                 for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
                     xplotter, yplotter, xmin, ymin, xmax, ymax):
@@ -494,17 +502,17 @@ class PointPlotter(GenericPlotter):
                     # break up curve into four arcs (for asym error bars)
                     # qt geometry means we have to calculate lots
                     # the big numbers are in 1/16 degrees
-                    painter.drawArc(xp - (xmx-xp), yp - (yp-ymx),
-                                    (xmx-xp)*2+1, (yp-ymx)*2+1,
+                    painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
+                                               (xmx-xp)*2+1, (yp-ymx)*2+1),
                                     0, 1440)
-                    painter.drawArc(xp - (xp-xmn), yp - (yp-ymx),
-                                    (xp-xmn)*2+1, (yp-ymx)*2+1,
+                    painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
+                                               (xp-xmn)*2+1, (yp-ymx)*2+1),
                                     1440, 1440)
-                    painter.drawArc(xp - (xp-xmn), yp - (ymn-yp),
-                                    (xp-xmn)*2+1, (ymn-yp)*2+1,
+                    painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
+                                               (xp-xmn)*2+1, (ymn-yp)*2+1),
                                     2880, 1440)
-                    painter.drawArc(xp - (xmx-xp), yp - (ymn-yp),
-                                    (xmx-xp)*2+1, (ymn-yp)*2+1,
+                    painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
+                                               (xmx-xp)*2+1, (ymn-yp)*2+1),
                                     4320, 1440)
 
     def _autoAxis(self, dataname, bounds):
@@ -526,7 +534,7 @@ class PointPlotter(GenericPlotter):
     def _drawPlotLine( self, painter, xvals, yvals, posn ):
         """Draw the line connecting the points."""
 
-        pts = []
+        pts = qt4.QPolygonF()
 
         s = self.settings
         steps = s.PlotLine.steps
@@ -534,19 +542,23 @@ class PointPlotter(GenericPlotter):
         # simple continuous line
         if steps == 'off':
             for xpt, ypt in itertools.izip(xvals, yvals):
-                pts.append(qt.QPoint(xpt, ypt))
+                pts.append(qt4.QPointF(xpt, ypt))
 
         # stepped line, with points on left
         elif steps == 'left':
             for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                  yvals[:-1], yvals[1:]):
-                pts += [qt.QPoint(x1, y1), qt.QPoint(x2, y1), qt.QPoint(x2, y2)]
+                pts.append(qt4.QPointF(x1, y1))
+                pts.append(qt4.QPointF(x2, y1))
+                pts.append(qt4.QPointF(x2, y2))
 
         # stepped line, with points on right
         elif steps == 'right':
             for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                  yvals[:-1], yvals[1:]):
-                pts += [qt.QPoint(x1, y1), qt.QPoint(x1, y2), qt.QPoint(x2, y2)]
+                pts.append(qt4.QPointF(x1, y1))
+                pts.append(qt4.QPointF(x2, y2))
+                pts.append(qt4.QPointF(x2, y2))
             
         # stepped line, with points in centre
         # this is complex as we can't use the mean of the plotter coords,
@@ -560,7 +572,10 @@ class PointPlotter(GenericPlotter):
             for x1, x2, xc, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                      xcen,
                                                      yvals[:-1], yvals[1:]):
-                pts += [qt.QPoint(x1, y1), qt.QPoint(xc, y1), qt.QPoint(xc, y2), qt.QPoint(x2, y2)]
+                pts.append(qt4.QPointF(x1, y1))
+                pts.append(qt4.QPointF(xc, y1))
+                pts.append(qt4.QPointF(xc, y2))
+                pts.append(qt4.QPointF(x2, y2))
 
         else:
             assert False
@@ -568,26 +583,28 @@ class PointPlotter(GenericPlotter):
         if len(pts) >= 2:
             if not s.FillBelow.hide:
                 # empty pen (line gets drawn below)
-                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
                 painter.setBrush( s.FillBelow.makeQBrush() )
 
-                # FIXME: may need to sort points here??
-                newpts = [qt.QPoint(pts[0], posn[3])] + pts + [qt.QPoint(pts[-2], posn[3])]
-                painter.drawPolygon( qt.QPolygon(newpts) )
+                newpts = qt4.QPolygonF(pts)
+                newpts.insert(0, qt4.QPointF(pts[0].x(), posn[3]))
+                newpts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[3]))
+                painter.drawPolygon(newpts)
 
             if not s.FillAbove.hide:
                 # empty pen (line gets drawn below)
-                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
                 painter.setBrush( s.FillAbove.makeQBrush() )
 
-                # FIXME: may need to sort points here??
-                newpts = [qt.QPoint(pts[0], posn[1])] + pts + [qt.QPoint(pts[-2], posn[1])]
-                painter.drawPolygon( qt.QPolygon(newpts) )
+                newpts = qt4.QPolygonF(pts)
+                newpts.insert(0, qt4.QPointF(pts[0].x(), posn[1]))
+                newpts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[1]))
+                painter.drawPolygon(newpts)
 
             # draw line between points
             if not s.PlotLine.hide:
                 painter.setPen( s.PlotLine.makeQPen(painter) )
-                painter.drawPolyline( qt.QPolygon(pts) )
+                painter.drawPolyline(pts)
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -610,7 +627,7 @@ class PointPlotter(GenericPlotter):
             if not s.MarkerLine.hide:
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
-                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
                 
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
@@ -671,14 +688,14 @@ class PointPlotter(GenericPlotter):
                 painter.setBrush( s.MarkerFill.makeQBrush() )
             else:
                 # no-filling brush
-                painter.setBrush( qt.QBrush() )
+                painter.setBrush( qt4.QBrush() )
 
             if not s.MarkerLine.hide:
                 # edges of markers
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
                 # invisible pen
-                painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
                 
             utils.plotMarkers(painter, xplotter, yplotter, s.marker,
                               size)

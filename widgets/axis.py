@@ -21,7 +21,7 @@
 
 # $Id$
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import numarray as N
 
 import veusz.document as document
@@ -254,29 +254,29 @@ class Axis(widget.Widget):
         p1, p2, pp = s.lowerPosition, s.upperPosition, s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
-            self.coordParr1 = x1 + int(dx * p1 + 0.5000002)
-            self.coordParr2 = x1 + int(dx * p2 + 0.5000002)
+            self.coordParr1 = x1 + dx*p1
+            self.coordParr2 = x1 + dx*p2
 
             # other axis coordinates
-            self.coordPerp  = y2 - int(dy * pp + 0.5000002)
-            self.coordPerp1 = y2 - int(dy * p1 + 0.5000002)
-            self.coordPerp2 = y2 - int(dy * p2 + 0.5000002)
+            self.coordPerp  = y2 - dy*pp
+            self.coordPerp1 = y2 - dy*p1
+            self.coordPerp2 = y2 - dy*p2
 
         else: # vertical
-            self.coordParr1 = y2 - int(dy * p1 + 0.5000002)
-            self.coordParr2 = y2 - int(dy * p2 + 0.5000002)
+            self.coordParr1 = y2 - dy*p1
+            self.coordParr2 = y2 - dy*p2
 
             # other axis coordinates
-            self.coordPerp  = x1 + int(dx * pp + 0.5000002)
-            self.coordPerp1 = x1 + int(dx * p1 + 0.5000002)
-            self.coordPerp2 = x1 + int(dx * p2 + 0.5000002)
+            self.coordPerp  = x1 + dx*pp
+            self.coordPerp1 = x1 + dx*p1
+            self.coordPerp2 = x1 + dx*p2
      
     def graphToPlotterCoords(self, bounds, vals):
         """Convert graph coordinates to plotter coordinates on this axis.
 
         bounds specifies the plot bounds
         vals is numarray of coordinates
-        Returns positions as numarray of integers
+        Returns positions as a numarray
         """
 
         # if the doc was modified, recompute the range
@@ -296,11 +296,7 @@ class Axis(widget.Widget):
         else:
             fracposns = self.linearConvertToPlotter( vals )
 
-        # rounds to nearest integer
-        # we use 0.5000002 instead of 0.5, to try to avoid fp rounding problems
-        return N.floor(0.5000002 + self.coordParr1 +
-                       fracposns*(self.coordParr2 - self.coordParr1)
-                       ).astype(N.Int32)
+        return self.coordParr1 + fracposns*(self.coordParr2-self.coordParr1)
     
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
@@ -377,9 +373,9 @@ class Axis(widget.Widget):
     def swapline(self, painter, a1, b1, a2, b2):
         """ Draw line, but swap x & y coordinates if vertical axis."""
         if self.settings.direction == 'horizontal':
-            painter.drawLine(a1, b1, a2, b2)
+            painter.drawLine(qt4.QPointF(a1, b1), qt4.QPointF(a2, b2))
         else:
-            painter.drawLine(b1, a1, b2, a2)
+            painter.drawLine(qt4.QPointF(b1, a1), qt4.QPointF(b2, a2))
 
     def _drawGridLines(self, painter, coordticks):
         """Draw grid lines on the plot."""
@@ -654,7 +650,6 @@ class Axis(widget.Widget):
         if suppresstext is True, then we don't number or label the axis
         """
 
-        return
         s = self.settings
 
         # recompute if document modified
@@ -713,17 +708,18 @@ class Axis(widget.Widget):
         if s.autoMirror:
             self._autoMirrorDraw(posn, painter, coordticks)
 
-        # now we paint the text, checking for collisions
-        # this is done by keeping a qregion containing the painted region
-        # if new text overlaps this, don't paint it
-        drawntext = qt.QRegion()
+        # all the text is drawn at the end so that
+        # we can check it doesn't overlap
+        drawntext = qt4.QPainterPath()
         for r, pen in texttorender:
-            if not r.overlapsRegion(drawntext):
+            bounds = r.getBounds()
+            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0]+1,
+                              bounds[3]-bounds[1]+1)
+
+            if not drawntext.intersects(rect):
                 painter.setPen(pen)
                 box = r.render()
-                drawntext += ( qt.QRegion(box[0], box[1],
-                                          box[2]-box[0]+1,
-                                          box[3]-box[1]+1) )
+                drawntext.addRect(rect)
 
         # restore the state of the painter
         painter.restore()
