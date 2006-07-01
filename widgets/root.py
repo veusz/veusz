@@ -21,7 +21,7 @@
 
 # $Id$
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.setting as setting
@@ -62,7 +62,7 @@ class Root(widget.Widget):
 
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1+1, y2-y1+1) )
+        painter.setClipRect( qt4.QRect(x1, y1, x2-x1+1, y2-y1+1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
                                     outerbounds = parentposn)
         painter.restore()
