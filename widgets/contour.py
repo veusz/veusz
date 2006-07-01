@@ -27,7 +27,7 @@ as a C routine (taken from matplotlib) is used to trace the contours.
 import itertools
 import sys
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 import numarray as N
 
 import veusz.setting as setting
@@ -293,7 +293,7 @@ class Contour(plotters.GenericPlotter):
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt4.QRect(x1, y1, x2-x1, y2-y1) )
 
         # iterate over each level, and list of lines
         for num, linelist in enumerate(self._cachedcontours):
@@ -308,13 +308,12 @@ class Contour(plotters.GenericPlotter):
                 yplt = axes[1].graphToPlotterCoords(posn, curve[1])
 
                 # there should be a nice itertools way of doing this
-                pts = []
+                pts = qt4.QPolygonF()
                 for x, y in itertools.izip(xplt, yplt):
-                    pts.append(x)
-                    pts.append(y)
+                    pts.append( qt4.QPointF(x, y) )
 
                 # actually draw the curve to the plotter
-                painter.drawPolyline( qt.QPointArray(pts) )
+                painter.drawPolyline(pts)
 
         # remove clip region
         painter.restore()
@@ -331,8 +330,8 @@ class Contour(plotters.GenericPlotter):
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
-        painter.setPen(qt.QPen(qt.Qt.NoPen))
+        painter.setClipRect( qt4.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setPen(qt4.QPen(qt4.Qt.NoPen))
 
         # iterate over each level, and list of lines
         for num, polylist in enumerate(self._cachedpolygons):
@@ -347,13 +346,12 @@ class Contour(plotters.GenericPlotter):
                 yplt = axes[1].graphToPlotterCoords(posn, poly[1])
 
                 # there should be a nice itertools way of doing this
-                pts = []
+                pts = qt4.QPolygonF()
                 for x, y in itertools.izip(xplt, yplt):
-                    pts.append(x)
-                    pts.append(y)
+                    pts.append( qt4.QPointF(x, y) )
 
                 # actually draw the curve to the plotter
-                painter.drawPolygon( qt.QPointArray(pts) )
+                painter.drawPolygon(pts)
 
         # remove clip region
         painter.restore()
