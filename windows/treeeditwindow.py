@@ -23,7 +23,7 @@
 
 import os
 
-import veusz.qtall as qt
+import veusz.qtall as qt4
 
 import veusz.widgets as widgets
 import veusz.utils as utils
@@ -31,13 +31,13 @@ import veusz.document as document
 
 import action
 
-class _WidgetItem(qt.QListViewItem):
+class _WidgetItem(qt4.QListViewItem):
     """Item for displaying in the TreeEditWindow."""
 
     def __init__(self, widget, qtparent):
         """Widget is the widget to show the settings for."""
         
-        qt.QListViewItem.__init__(self, qtparent)
+        qt4.QListViewItem.__init__(self, qtparent)
         self.setRenameEnabled(0, True)
 
         self.index = 0
@@ -73,7 +73,7 @@ class _WidgetItem(qt.QListViewItem):
                 # if the rename failed
                 text = self.widget.name
 
-        qt.QListViewItem.setText(self, col, text)
+        qt4.QListViewItem.setText(self, col, text)
 
     def rename(self):
         """Rename the listviewitem."""
@@ -101,14 +101,14 @@ class _WidgetItem(qt.QListViewItem):
             return self.widget.userdescription
         return ''
 
-class _PrefItem(qt.QListViewItem):
+class _PrefItem(qt4.QListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
     def __init__(self, settings, number, parent):
         """settings is the settings class to work for
         parent is the parent ListViewItem (of type _WidgetItem)
         """
 
-        qt.QListViewItem.__init__(self, parent)
+        qt4.QListViewItem.__init__(self, parent)
 
         self.settings = settings
         self.parent = parent
@@ -137,28 +137,28 @@ class _PrefItem(qt.QListViewItem):
         """Get widget associated with this item."""
         self.parent.getAssociatedWidget()
 
-class _NewPropertyLabel(qt.QHBox):
+class _NewPropertyLabel(qt4.QHBox):
     """A widget for displaying the label for a setting."""
 
     def __init__(self, setting, parent):
 
-        qt.QHBox.__init__(self, parent)
+        qt4.QHBox.__init__(self, parent)
         self.setting = setting
 
-        self.menubutton = qt.QPushButton(setting.name, self)
+        self.menubutton = qt4.QPushButton(setting.name, self)
         self.menubutton.setFlat(True)
-        self.connect(self.menubutton, qt.SIGNAL('clicked()'),
+        self.connect(self.menubutton, qt4.SIGNAL('clicked()'),
                      self.slotContextMenu)
         
         tooltext = "<strong>%s</strong> - %s" % (setting.name,
                                                  setting.descr)
-        qt.QToolTip.add(self.menubutton, tooltext)
+        qt4.QToolTip.add(self.menubutton, tooltext)
 
-        self.linkbutton = qt.QPushButton(action.getIconSet('link.png'), '', self)
+        self.linkbutton = qt4.QPushButton(action.getIconSet('link.png'), '', self)
         self.linkbutton.setMaximumWidth(self.linkbutton.height())
         self.linkbutton.setFlat(True)
 
-        self.connect(self.linkbutton, qt.SIGNAL('clicked()'),
+        self.connect(self.linkbutton, qt4.SIGNAL('clicked()'),
                      self.buttonClicked)
 
         setting.setOnModified(self.slotOnModified)
@@ -171,7 +171,7 @@ class _NewPropertyLabel(qt.QHBox):
         isref = self.setting.isReference()
         if isref:
             ref = self.setting.getReference()
-            qt.QToolTip.add(self.linkbutton, "Linked to %s" % ref.value)
+            qt4.QToolTip.add(self.linkbutton, "Linked to %s" % ref.value)
         self.linkbutton.setShown(isref)
 
     def getWidget(self):
@@ -194,7 +194,7 @@ class _NewPropertyLabel(qt.QHBox):
         name = widget.name
         
         # construct the popup menu
-        popup = qt.QPopupMenu(self)
+        popup = qt4.QPopupMenu(self)
 
         popup.insertItem('Reset to default', 0)
         popup.insertSeparator()
@@ -209,7 +209,7 @@ class _NewPropertyLabel(qt.QHBox):
         popup.insertItem('Forget this default setting', 202)
 
         #pos = self.menubutton.mapToGlobal(self.menubutton.pos())
-        ret = popup.exec_loop( qt.QCursor.pos() )
+        ret = popup.exec_loop( qt4.QCursor.pos() )
 
         # convert values above to functions
         doc = widget.document
@@ -231,12 +231,12 @@ class _NewPropertyLabel(qt.QHBox):
 
     def buttonClicked(self):
         """Create a popup menu when the button is clicked."""
-        popup = qt.QPopupMenu(self)
+        popup = qt4.QPopupMenu(self)
 
         popup.insertItem('Unlink setting', 100)
         popup.insertItem('Edit linked setting', 101)
         
-        ret = popup.exec_loop( qt.QCursor.pos() )
+        ret = popup.exec_loop( qt4.QCursor.pos() )
 
         setn = self.setting
         widget = self.getWidget()
@@ -245,7 +245,7 @@ class _NewPropertyLabel(qt.QHBox):
             # update setting with own value to get rid of reference
             doc.applyOperation( document.OperationSettingSet(setn, setn.get()) )
 
-class _PropertyLabelLabel(qt.QLabel):
+class _PropertyLabelLabel(qt4.QLabel):
     """A widget for displaying the actual label in the property label."""
 
     def __init__(self, setting, text, parent):
@@ -253,9 +253,9 @@ class _PropertyLabelLabel(qt.QLabel):
 
         setting is the appropriate setting."""
         
-        qt.QLabel.__init__(self, text, parent)
+        qt4.QLabel.__init__(self, text, parent)
         self.bgcolor = self.paletteBackgroundColor()
-        self.setFocusPolicy(qt.QWidget.StrongFocus)
+        self.setFocusPolicy(qt4.QWidget.StrongFocus)
         self.setMargin(1)
 
         self.setting = setting
@@ -281,25 +281,25 @@ class _PropertyLabelLabel(qt.QLabel):
 
     def enterEvent(self, event):
         """When the mouse enters the widget."""
-        qt.QLabel.enterEvent(self, event)
+        qt4.QLabel.enterEvent(self, event)
         self.inmouse = True
         self._setBg()
 
     def leaveEvent(self, event):
         """When the mouse leaves the widget."""
-        qt.QLabel.leaveEvent(self, event)
+        qt4.QLabel.leaveEvent(self, event)
         self.inmouse = False
         self._setBg()
 
     def focusInEvent(self, event):
         """When widget gets focus."""
-        qt.QLabel.focusInEvent(self, event)
+        qt4.QLabel.focusInEvent(self, event)
         self.infocus = True
         self._setBg()
 
     def focusOutEvent(self, event):
         """When widget loses focus."""
-        qt.QLabel.focusOutEvent(self, event)
+        qt4.QLabel.focusOutEvent(self, event)
         self.infocus = False
         self._setBg()
 
@@ -308,15 +308,15 @@ class _PropertyLabelLabel(qt.QLabel):
 
         key = event.key()
         # move up two as in a 2 column grid
-        if key == qt.Qt.Key_Up:
+        if key == qt4.Qt.Key_Up:
             self.focusNextPrevChild(False)
             self.focusNextPrevChild(False)
-        elif key == qt.Qt.Key_Down:
+        elif key == qt4.Qt.Key_Down:
             self.focusNextPrevChild(True)
             self.focusNextPrevChild(True)
-        elif key == qt.Qt.Key_Left:
+        elif key == qt4.Qt.Key_Left:
             self.focusNextPrevChild(False)
-        elif key == qt.Qt.Key_Right:
+        elif key == qt4.Qt.Key_Right:
             self.focusNextPrevChild(True)
         else:
             event.ignore()
@@ -347,7 +347,7 @@ class _PropertyLabelLabel(qt.QLabel):
         name = widget.name
         
         # construct the popup menu
-        popup = qt.QPopupMenu(self)
+        popup = qt4.QPopupMenu(self)
 
         popup.insertItem('Reset to default', 0)
         popup.insertSeparator()
@@ -367,7 +367,7 @@ class _PropertyLabelLabel(qt.QLabel):
         doc = widget.document
         setn = self.setting
         fnmap = {
-            0: (lambda: self.parent.control.emit( qt.PYSIGNAL('settingChanged'),
+            0: (lambda: self.parent.control.emit( qt4.SIGNAL('settingChanged'),
                                                   (self.parent.control, setn, setn.default) )),
             100: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn) )),
             101: (lambda: doc.applyOperation( document.OperationSettingPropagate(setn, root=widget.parent, maxlevels=1) )),
@@ -386,7 +386,7 @@ class _PropertyLabelLabel(qt.QLabel):
         self.inmenu = False
         self._setBg()
             
-class _PropertyLabel(qt.QHBox):
+class _PropertyLabel(qt4.QHBox):
     """A label which produces the veusz setting context menu.
 
     This label handles mouse move and focus events. Both of these
@@ -397,16 +397,16 @@ class _PropertyLabel(qt.QHBox):
     def __init__(self, setting, text, parent):
         """Initialise the label for the given setting."""
 
-        qt.QHBox.__init__(self, parent)
+        qt4.QHBox.__init__(self, parent)
         self.setMargin(0)
         self.setting = setting
         self.control = None
 
         self.label = _PropertyLabelLabel(setting, text, self)
-        self.label.setSizePolicy( qt.QSizePolicy(qt.QSizePolicy.Minimum,
-                                                 qt.QSizePolicy.Fixed) )
+        self.label.setSizePolicy( qt4.QSizePolicy(qt4.QSizePolicy.Minimum,
+                                                  qt4.QSizePolicy.Fixed) )
         
-class _WidgetListView(qt.QListView):
+class _WidgetListView(qt4.QListView):
     """A list view for the widgets
 
     It emits contextMenu signals, and allows widgets to be selected
@@ -414,14 +414,14 @@ class _WidgetListView(qt.QListView):
 
     def contextMenuEvent(self, event):
         """Emit a context menu signal."""
-        self.emit( qt.PYSIGNAL('contextMenu'), (event.globalPos(),) )
+        self.emit( qt4.SIGNAL('contextMenu'), (event.globalPos(),) )
 
     def selectWidget(self, widget):
         """Find the widget in the list and select it."""
 
         # check each item in the list to see whether it corresponds
         # to the widget
-        iter = qt.QListViewItemIterator(self)
+        iter = qt4.QListViewItemIterator(self)
 
         found = None
         while True:
@@ -443,7 +443,7 @@ class _PropTable(qttable.QTable):
     def __init__(self, parent):
         """Initialise the table."""
         qttable.QTable.__init__(self, parent)
-        self.setFocusPolicy(qt.QWidget.NoFocus)
+        self.setFocusPolicy(qt4.QWidget.NoFocus)
         self.setNumCols(2)
         self.setTopMargin(0)
         self.setLeftMargin(0)
@@ -477,58 +477,58 @@ class _PropTable(qttable.QTable):
         else:
             event.ignore()
 
-class TreeEditWindow(qt.QDockWindow):
+class TreeEditWindow(qt4.QDockWindow):
     """A graph editing window with tree display."""
 
     # mime type when widgets are stored on the clipboard
     widgetmime = 'text/x-vnd.veusz-clipboard'
 
     def __init__(self, thedocument, parent):
-        qt.QDockWindow.__init__(self, parent)
+        qt4.QDockWindow.__init__(self, parent)
         self.setResizeEnabled( True )
         self.setCaption("Editing - Veusz")
 
         self.parent = parent
         self.document = thedocument
-        self.connect( self.document, qt.PYSIGNAL("sigModified"),
+        self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.slotDocumentModified )
-        self.connect( self.document, qt.PYSIGNAL("sigWiped"),
+        self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotDocumentWiped )
 
         # make toolbar in parent to have the add graph/edit graph buttons
-        self.edittool = qt.QToolBar(parent, "treetoolbar")
+        self.edittool = qt4.QToolBar(parent, "treetoolbar")
         self.edittool.setLabel("Editing toolbar - Veusz")
-        parent.moveDockWindow(self.edittool, qt.Qt.DockLeft, True, 0)
+        parent.moveDockWindow(self.edittool, qt4.Qt.DockLeft, True, 0)
 
         self._constructToolbarMenu()
 
         # window uses vbox for arrangement
-        totvbox = qt.QVBox(self)
+        totvbox = qt4.QVBox(self)
         self.setWidget(totvbox)
 
         # put widgets in a movable splitter
-        split = qt.QSplitter(totvbox)
-        split.setOrientation(qt.QSplitter.Vertical)
+        split = qt4.QSplitter(totvbox)
+        split.setOrientation(qt4.QSplitter.Vertical)
 
         # first widget is a listview
-        vbox = qt.QVBox(split)
-        l = qt.QLabel("Items", vbox)
+        vbox = qt4.QVBox(split)
+        l = qt4.QLabel("Items", vbox)
         l.setMargin(2)
 
         lv = self.listview = _WidgetListView(vbox)
         l.setBuddy(lv)
         lv.setSorting(-1)
         lv.setRootIsDecorated(True)
-        self.connect( lv, qt.SIGNAL("selectionChanged(QListViewItem*)"),
+        self.connect( lv, qt4.SIGNAL("selectionChanged(QListViewItem*)"),
                       self.slotItemSelected )
-        self.connect( lv, qt.PYSIGNAL('contextMenu'),
+        self.connect( lv, qt4.SIGNAL('contextMenu'),
                       self.slotListContextMenu )
 
         # we use a hidden column to get the sort order correct
         lv.addColumn( "Name" )
         lv.addColumn( "Type" )
         lv.addColumn( "Detail" )
-        lv.setColumnWidthMode(2, qt.QListView.Manual)
+        lv.setColumnWidthMode(2, qt4.QListView.Manual)
         lv.setSorting(0)
         lv.setTreeStepSize(10)
 
@@ -537,8 +537,8 @@ class TreeEditWindow(qt.QDockWindow):
 
         # add a scrollable view for the preferences
         # children get added to prefview
-        vbox = qt.QVBox(split)
-        self.proplabel = qt.QLabel("&Properties", vbox)
+        vbox = qt4.QVBox(split)
+        self.proplabel = qt4.QLabel("&Properties", vbox)
         self.proplabel.setMargin(2)
         self.proplabel.setBuddy(self)
         self.proptab = _PropTable(vbox)
@@ -550,7 +550,7 @@ class TreeEditWindow(qt.QDockWindow):
 
     def sizeHint(self):
         """Returns recommended size of dialog."""
-        return qt.QSize(250, 500)
+        return qt4.QSize(250, 500)
 
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
@@ -582,7 +582,7 @@ class TreeEditWindow(qt.QDockWindow):
         self.editactions = {}
         editmenu = self.parent.menus['edit']
 
-        self.contextpopup = qt.QPopupMenu(self)
+        self.contextpopup = qt4.QPopupMenu(self)
 
         for name, icon, tooltip, menutext, accel, slot in (
             ('cut', 'stock-cut.png', 'Cut the selected item',
@@ -744,9 +744,9 @@ class TreeEditWindow(qt.QDockWindow):
 
         c = setn.makeControl(view)
         c.veusz_rownumber = row
-        self.connect(c, qt.PYSIGNAL('settingChanged'), self.slotSettingChanged)
+        self.connect(c, qt4.SIGNAL('settingChanged'), self.slotSettingChanged)
         self.proptab.setCellWidget(row, 1, c)
-        qt.QToolTip.add(c, tooltext)
+        qt4.QToolTip.add(c, tooltext)
         self.prefchilds.append(c)
 
         l.control = c
@@ -768,7 +768,7 @@ class TreeEditWindow(qt.QDockWindow):
 
             # need line below or occasionally get random error
             # "QToolTip.maybeTip() is abstract and must be overridden"
-            #qt.QToolTip.remove(i)
+            #qt4.QToolTip.remove(i)
 
             i.deleteLater()
 
@@ -788,12 +788,12 @@ class TreeEditWindow(qt.QDockWindow):
                 self.proptab.setCellWidget(row, 0, l)
                 self.prefchilds.append(l)
 
-                b = qt.QPushButton(w.actiondescr[name], view)
+                b = qt4.QPushButton(w.actiondescr[name], view)
                 b.veusz_action = w.actionfuncs[name]
                 self.proptab.setCellWidget(row, 1, b)
                 self.prefchilds.append(b)
                 
-                self.connect( b, qt.SIGNAL('clicked()'),
+                self.connect( b, qt4.SIGNAL('clicked()'),
                               self.slotActionClicked )
                 row += 1
 
@@ -827,7 +827,7 @@ class TreeEditWindow(qt.QDockWindow):
                 count += 1
 
             if count < len(children):
-                self.emit( qt.PYSIGNAL("sigPageChanged"), (count,) )
+                self.emit( qt4.SIGNAL("sigPageChanged"), (count,) )
             
     def slotSettingChanged(self, widget, setting, val):
         """Called when a setting is changed by the user.
@@ -911,7 +911,7 @@ class TreeEditWindow(qt.QDockWindow):
         remaining lines are commands to customise the widget and add children
         """
 
-        clipboard = qt.qApp.clipboard()
+        clipboard = qt4.qApp.clipboard()
         cbSource = clipboard.data(clipboard.Clipboard)
         if not cbSource.provides(self.widgetmime):
             # Bail if the clipboard doesn't provide the data type we want
@@ -926,7 +926,7 @@ class TreeEditWindow(qt.QDockWindow):
         current selection at the root"""
 
         if widget:
-            clipboardData = qt.QStoredDrag(self.widgetmime)
+            clipboardData = qt4.QStoredDrag(self.widgetmime)
             data = str('\n'.join((widget.typename,
                 widget.name,
                 widget.getSaveText())))
@@ -943,7 +943,7 @@ class TreeEditWindow(qt.QDockWindow):
 
     def slotWidgetCopy(self, a):
         """Copy selected widget to the clipboard."""
-        clipboard = qt.qApp.clipboard()
+        clipboard = qt4.qApp.clipboard()
         dragObj = self._makeDragObject(self.itemselected.widget)
         clipboard.setData(dragObj, clipboard.Clipboard)
         self.updatePasteButton()

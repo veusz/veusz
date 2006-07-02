@@ -65,7 +65,7 @@ class MainWindow(qt4.QMainWindow):
     def __init__(self, *args):
         qt4.QMainWindow.__init__(self, *args)
 
-        self.setWindowIcon( qt4.QIcon(os.path.join(action.imagedir, 'veusz.png')) )
+        self.setWindowIcon( action.getIcon('veusz.png') )
 
         self.document = document.Document()
 
@@ -115,8 +115,8 @@ class MainWindow(qt4.QMainWindow):
                       self.slotModifiedDoc )
         # if the treeeditwindow changes the page, change the plot window
         # FIXMEQT4
-        #self.connect( self.treeedit, qt4.SIGNAL("sigPageChanged"),
-        #              self.plot.setPageNumber )
+        self.connect( self.treeedit, qt4.SIGNAL("sigPageChanged"),
+                      self.plot.setPageNumber )
 
         # if a widget in the plot window is clicked by the user
         #self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
@@ -391,7 +391,7 @@ class MainWindow(qt4.QMainWindow):
         mb.setButtonText(qt4.QMessageBox.Yes, "&Save")
         mb.setButtonText(qt4.QMessageBox.No, "&Discard")
         mb.setButtonText(qt4.QMessageBox.Cancel, "&Cancel")
-        return mb.exec_loop()
+        return mb.exec_()
 
     def close(self, alsoDelete):
         """Before closing, check whether we need to save first."""
@@ -461,7 +461,7 @@ class MainWindow(qt4.QMainWindow):
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                                 qt4.QMessageBox.NoButton,
                                 qt4.QMessageBox.NoButton,
-                                self).exec_loop()
+                                self).exec_()
                 
             # restore the cursor
             qt4.QApplication.restoreOverrideCursor()
@@ -502,7 +502,7 @@ class MainWindow(qt4.QMainWindow):
                                     qt4.QMessageBox.Yes,
                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
                                     qt4.QMessageBox.NoButton,
-                                    self).exec_loop()
+                                    self).exec_()
                 if v == qt4.QMessageBox.No:
                     return None
 
@@ -531,7 +531,7 @@ class MainWindow(qt4.QMainWindow):
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                                 qt4.QMessageBox.NoButton,
                                 qt4.QMessageBox.NoButton,
-                                self).exec_loop()
+                                self).exec_()
                 return None
             return filename
         return None
@@ -593,7 +593,7 @@ class MainWindow(qt4.QMainWindow):
                             qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                             qt4.QMessageBox.NoButton,
                             qt4.QMessageBox.NoButton,
-                            self).exec_loop()
+                            self).exec_()
         except Exception, e:
             # parsing problem with document
             # FIXME: never used
@@ -659,13 +659,13 @@ class MainWindow(qt4.QMainWindow):
                    (["png"], "Portable Network Graphics"),
                    (["svg"], "Scalable Vector Graphics")]
 
-        fd = qt4.QFileDialog(self, 'export dialog', True)
+        fd = qt4.QFileDialog(self, 'Export page')
         if not self.exportDir:
-            fd.setDir( self.dirname )
+            fd.setDirectory( self.dirname )
         else:
-            fd.setDir( self.exportDir )
+            fd.setDirectory( self.exportDir )
             
-        fd.setMode( qt4.QFileDialog.AnyFile )
+        fd.setFileMode( qt4.QFileDialog.AnyFile )
 
         # Create a mapping between a format string and extensions
         filtertoext = {}
@@ -673,25 +673,22 @@ class MainWindow(qt4.QMainWindow):
         # a list of extensions which are allowed
         validextns = []
         for extns, name in formats:
-            extensions = " ".join(["(*." + item + ")"
-                                   for item in extns])
+            extensions = " ".join(["*." + item for item in extns])
             #join eveything together to make a filter string
-            filterstr = " ".join([name, extensions])
+            filterstr = '%s (%s)' % (name, extensions)
             filtertoext[filterstr] = extns
             filters.append(filterstr)
             validextns += extns
 
-        fd.setFilters(";;".join(filters))
-            
-        fd.setCaption('Export')
+        fd.setFilters(filters)
 
         if self.filename:
             # try to convert current filename to export name
             filename = os.path.basename(self.filename)
             filename = os.path.splitext(filename)[0] + '.eps'
-            fd.setSelection(filename)
+            fd.selectFile(filename)
         
-        if fd.exec_loop() == qt4.QDialog.Accepted:
+        if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
             self.exportDir = fd.dir()
 
@@ -701,7 +698,7 @@ class MainWindow(qt4.QMainWindow):
             # show busy cursor
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
-            filename = unicode( fd.selectedFile() )
+            filename = unicode( fd.selectedFiles()[0] )
             
             # Add a default extension if one isn't supplied
             # this is the extension without the dot
@@ -718,7 +715,7 @@ class MainWindow(qt4.QMainWindow):
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                                 qt4.QMessageBox.NoButton,
                                 qt4.QMessageBox.NoButton,
-                                self).exec_loop()
+                                self).exec_()
                 
             # restore the cursor
             qt4.QApplication.restoreOverrideCursor()
@@ -794,7 +791,7 @@ class MainWindow(qt4.QMainWindow):
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                                 qt4.QMessageBox.NoButton,
                                 qt4.QMessageBox.NoButton,
-                                self).exec_loop()
+                                self).exec_()
                 return
             
             self.document.exportStyleSheet(f)
