@@ -31,13 +31,159 @@ import veusz.document as document
 
 import action
 
-class _WidgetItem(qt4.QListViewItem):
+class WidgetTreeModel(qt4.QAbstractItemModel):
+    """A model representing the widget tree structure."""
+
+    def __init__(self, document, parent=None):
+        """Initialise using document."""
+        
+        qt4.QAbstractItemModel.__init__(self, parent)
+
+        self.document = document
+
+    def columnCount(self, parent):
+        """Return number of columns of data."""
+        return 3
+
+    def data(self, index, role):
+        """Return data for the index given."""
+
+        # why do we get passed invalid indicies? :-)
+        if not index.isValid():
+            return qt4.QVariant()
+
+        # FIXME: Implement icons and suchlike
+        if role != qt4.Qt.DisplayRole:
+            return qt4.QVariant()
+
+        if not hasattr(index, 'veusz_object'):
+            return qt4.QVariant("foo")
+
+        column = index.column()
+        obj = index.veusz_object
+
+        if obj.isWidget():
+            # is a widget
+            if column == 0:
+                val = obj.name
+            elif column == 1:
+                val = obj.typename
+            else:
+                val = obj.userdescription
+        else:
+            # are settings
+            if column == 0:
+                val = obj.name
+            elif column == 1:
+                val = 'setting'
+            else:
+                val = ''
+
+        return qt4.QVariant(val)
+
+    def flags(self, index):
+        """What we can do with the item."""
+        
+        if not index.isValid():
+            return qt4.Qt.ItemIsEnabled
+
+        return qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
+
+    def headerData(self, section, orientation, role):
+        """Return the header of the tree."""
+        
+        if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
+            val = ['Name', 'Type', 'Detail'][section]
+            return qt4.QVariant(val)
+
+        return qt4.QVariant()
+
+    def _getChildren(self, parent):
+        """Get a list of children for the parent given (None selects root)."""
+
+        if parent is None:
+            return [self.document]
+        else:
+            if parent.isWidget():
+                return parent.settings.getSettingsList() + parent.children
+            else:
+                return parent.getSettingsList()
+        
+    def index(self, row, column, parent):
+        """Construct an index for a child of parent."""
+        
+        if not parent.isValid() or not hasattr(parent, 'veusz_object'):
+            parentobj = None
+        else:
+            parentobj = parent.veusz_object
+
+        children = self._getChildren(parentobj)
+
+        if row < len(children):
+            idx = self.createIndex(row, column)
+            idx.veusz_object = children[row]
+            return idx
+        else:
+            assert False
+            return qt4.QModelIndex()
+
+    def parent(self, index):
+        """Find the parent of the index given."""
+
+        if not index.isValid() or not hasattr(index, 'veusz_object'):
+            return qt4.QModelIndex()
+
+        parentobj = index.veusz_object.parent
+        if parentobj is None:
+            return qt4.QModelIndex()
+        else:
+            # find object in parent's child list
+            children = self._getChildren(parentobj)
+            row = children.index(index.veusz_object)
+
+            idx = self.createIndex(row, 0)
+            idx.veusz_object = parentobj
+            return idx
+
+    def rowCount(self, parent):
+        """Return number of rows of children."""
+        
+        if not parent.isValid() or not hasattr(parent, 'veusz_object'):
+            parentobj = None
+        else:
+            parentobj = parent.veusz_object
+
+        return len(self._getChildren(parentobj))
+
+
+class TreeEditWindow2(qt4.QDockWidget):
+    """A window for editing the document as a tree."""
+
+    def __init__(self, document, *args):
+        qt4.QDockWidget.__init__(self, *args)
+        self.setWindowTitle("Editing - Veusz")
+
+        self.treeview = qt4.QTreeView(self)
+        self.treemodel = WidgetTreeModel(document)
+        self.treeview.setModel(self.treemodel)
+        self.setWidget(self.treeview)
+
+
+##############################################################
+
+# define this so stuff runs below (all needs updating for qt4)
+XListViewItem = qt4.QObject
+XHBox = qt4.QWidget
+XTable = qt4.QWidget
+XDockWindow = qt4.QWidget
+
+class _WidgetItem(XListViewItem):
     """Item for displaying in the TreeEditWindow."""
 
     def __init__(self, widget, qtparent):
         """Widget is the widget to show the settings for."""
         
-        qt4.QListViewItem.__init__(self, qtparent)
+        XListViewItem.__init__(self, qtparent)
         self.setRenameEnabled(0, True)
 
         self.index = 0
@@ -73,7 +219,7 @@ class _WidgetItem(qt4.QListViewItem):
                 # if the rename failed
                 text = self.widget.name
 
-        qt4.QListViewItem.setText(self, col, text)
+        XListViewItem.setText(self, col, text)
 
     def rename(self):
         """Rename the listviewitem."""
@@ -101,14 +247,14 @@ class _WidgetItem(qt4.QListViewItem):
             return self.widget.userdescription
         return ''
 
-class _PrefItem(qt4.QListViewItem):
+class _PrefItem(XListViewItem):
     """Item for displaying a preferences-set in TreeEditWindow."""
     def __init__(self, settings, number, parent):
         """settings is the settings class to work for
         parent is the parent ListViewItem (of type _WidgetItem)
         """
 
-        qt4.QListViewItem.__init__(self, parent)
+        XListViewItem.__init__(self, parent)
 
         self.settings = settings
         self.parent = parent
@@ -137,12 +283,12 @@ class _PrefItem(qt4.QListViewItem):
         """Get widget associated with this item."""
         self.parent.getAssociatedWidget()
 
-class _NewPropertyLabel(qt4.QHBox):
+class _NewPropertyLabel(XHBox):
     """A widget for displaying the label for a setting."""
 
     def __init__(self, setting, parent):
 
-        qt4.QHBox.__init__(self, parent)
+        XHBox.__init__(self, parent)
         self.setting = setting
 
         self.menubutton = qt4.QPushButton(setting.name, self)
@@ -386,7 +532,7 @@ class _PropertyLabelLabel(qt4.QLabel):
         self.inmenu = False
         self._setBg()
             
-class _PropertyLabel(qt4.QHBox):
+class _PropertyLabel(XHBox):
     """A label which produces the veusz setting context menu.
 
     This label handles mouse move and focus events. Both of these
@@ -397,7 +543,7 @@ class _PropertyLabel(qt4.QHBox):
     def __init__(self, setting, text, parent):
         """Initialise the label for the given setting."""
 
-        qt4.QHBox.__init__(self, parent)
+        XHBox.__init__(self, parent)
         self.setMargin(0)
         self.setting = setting
         self.control = None
@@ -421,7 +567,7 @@ class _WidgetListView(qt4.QListView):
 
         # check each item in the list to see whether it corresponds
         # to the widget
-        iter = qt4.QListViewItemIterator(self)
+        iter = XListViewItemIterator(self)
 
         found = None
         while True:
@@ -437,7 +583,7 @@ class _WidgetListView(qt4.QListView):
             self.ensureItemVisible(found)
             self.setSelected(found, True)
 
-class _PropTable(qttable.QTable):
+class _PropTable(XTable):
     """The table which shows the properties of the selected widget."""
 
     def __init__(self, parent):
@@ -477,14 +623,14 @@ class _PropTable(qttable.QTable):
         else:
             event.ignore()
 
-class TreeEditWindow(qt4.QDockWindow):
+class TreeEditWindow(XDockWindow):
     """A graph editing window with tree display."""
 
     # mime type when widgets are stored on the clipboard
     widgetmime = 'text/x-vnd.veusz-clipboard'
 
     def __init__(self, thedocument, parent):
-        qt4.QDockWindow.__init__(self, parent)
+        XDockWindow.__init__(self, parent)
         self.setResizeEnabled( True )
         self.setCaption("Editing - Veusz")
 

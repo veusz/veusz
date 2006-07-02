@@ -31,7 +31,7 @@ import consolewindow
 #FIXMEQT4
 import plotwindow
 #FIXMEQT4
-#import treeeditwindow
+import treeeditwindow
 import action
 
 from veusz.dialogs.aboutdialog import AboutDialog
@@ -86,7 +86,9 @@ class MainWindow(qt4.QMainWindow):
         # likewise with the tree-editing window
         #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
         #self.moveDockWindow( self.treeedit, qt4.Qt.DockLeft, True, 1 )
-        self.treeedit = qt4.QWidget()
+        self.treeedit = treeeditwindow.TreeEditWindow2(self.document, self)
+
+        self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.treeedit)
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
