@@ -102,7 +102,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """Get a list of children for the parent given (None selects root)."""
 
         if parent is None:
-            return [self.document]
+            return [self.document.basewidget]
         else:
             if parent.isWidget():
                 return parent.settings.getSettingsList() + parent.children
@@ -122,6 +122,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if row < len(children):
             idx = self.createIndex(row, column)
             idx.veusz_object = children[row]
+            print "Returning", idx, idx.veusz_object
             return idx
         else:
             assert False
@@ -153,7 +154,9 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         else:
             parentobj = parent.veusz_object
 
-        return len(self._getChildren(parentobj))
+        children = self._getChildren(parentobj)
+        print children
+        return len(children)
 
 
 class TreeEditWindow2(qt4.QDockWidget):
