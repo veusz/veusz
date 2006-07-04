@@ -87,7 +87,6 @@ class MainWindow(qt4.QMainWindow):
         #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
         #self.moveDockWindow( self.treeedit, qt4.Qt.DockLeft, True, 1 )
         self.treeedit = treeeditwindow.TreeEditWindow2(self.document, self)
-
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.treeedit)
 
         # make the console window a dock
@@ -551,6 +550,7 @@ class MainWindow(qt4.QMainWindow):
     def openFile(self, filename):
         """Select whether to load the file in the
         current window or in a blank window and calls the appropriate loader"""
+
         if self.document.isBlank():
             # If the file is new and there are no modifications,
             # reuse the current window
@@ -559,12 +559,13 @@ class MainWindow(qt4.QMainWindow):
             # create a new window
             self.CreateWindow(filename)
 
+
     def openFileInWindow(self, filename):
         '''Open the given filename in the current window.'''
 
         # show busy cursor
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-        
+
         try:
             # load the document in the current window
             self.dirname = os.path.dirname(filename)

@@ -49,6 +49,17 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.document = document
         self.objdict = weakref.WeakValueDictionary()
 
+        self.connect( self.document, qt4.SIGNAL("sigModified"),
+                      self.slotDocumentModified )
+        self.connect( self.document, qt4.SIGNAL("sigWiped"),
+                      self.slotDocumentModified )
+
+    def slotDocumentModified(self):
+        """The document has been changed."""
+        self.emit( qt4.SIGNAL('dataChanged'),
+                   self.index(0, 0, qt4.QModelIndex()),
+                   self.index(0, 0, qt4.QModelIndex()) )
+
     def columnCount(self, parent):
         """Return number of columns of data."""
         return 3
@@ -60,14 +71,19 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if not index.isValid():
             return qt4.QVariant()
 
-        # FIXME: Implement icons and suchlike
-        if role != qt4.Qt.DisplayRole:
-            return qt4.QVariant()
-
         column = index.column()
-
         obj = self.objdict[index.internalId()]
 
+        if role == qt4.Qt.DisplayRole:
+            return self.getTextData(obj, column)
+        elif role == qt4.Qt.DecorationRole:
+            return self.getIconData(obj, column)
+        else:
+            # return nothing
+            return qt4.QVariant()
+
+    def getTextData(self, obj, column):
+        """Get textual data for the column."""
         if obj.isWidget():
             # is a widget
             if column == 0:
@@ -86,6 +102,21 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
                 val = ''
 
         return qt4.QVariant(val)
+
+    def getIconData(self, obj, column):
+        """Return icon for object and and column given."""
+        if column == 0:
+            # icons only for column 0
+            if obj.isWidget():
+                # is a widget
+                return qt4.QVariant(action.getIcon('button_%s.png' % obj.typename))
+            else:
+                # is a settings
+                if hasattr(obj, 'pixmap'):
+                    return qt4.QVariant(action.getIcon('settings_%s.png' % obj.pixmap))
+
+
+        return qt4.QVariant()
 
     def flags(self, index):
         """What we can do with the item."""
@@ -152,17 +183,19 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         thisobj = self.objdict[index.internalId()]
         parentobj = self._getParent(thisobj)
+
         if parentobj is None:
             return qt4.QModelIndex()
         else:
-            # find object in parent's child list
-            children = self._getChildren(parentobj)
-            row = children.index(thisobj)
-
+            # stick parent into dict if not there
             pid = id(parentobj)
             self.objdict[pid] = parentobj
 
-            return self.createIndex(row, 0, pid)
+            # lookup parent in grandparent's children
+            grandparentchildren = self._getChildren(self._getParent(parentobj))
+            parentrow = grandparentchildren.index(parentobj)
+
+            return self.createIndex(parentrow, 0, pid)
 
     def rowCount(self, parent):
         """Return number of rows of children."""
