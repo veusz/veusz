@@ -33,7 +33,13 @@ import veusz.document as document
 import action
 
 class WidgetTreeModel(qt4.QAbstractItemModel):
-    """A model representing the widget tree structure."""
+    """A model representing the widget tree structure.
+
+    Idea is to keep a weakref dict of the widgets in the document, mapped
+    by their object id.
+
+    The qt indices into the tree contain these ids, so they can be looked up
+    """
 
     def __init__(self, document, parent=None):
         """Initialise using document."""
@@ -41,8 +47,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         qt4.QAbstractItemModel.__init__(self, parent)
 
         self.document = document
-        self.objdict = weakref.WeakKeyDictionary()
-        #self.objdict = {}
+        self.objdict = weakref.WeakValueDictionary()
 
     def columnCount(self, parent):
         """Return number of columns of data."""
@@ -61,9 +66,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         column = index.column()
 
-        print index.row(), index.column()
-        print index.parent()
-        obj = self.objdict[index]
+        obj = self.objdict[index.internalId()]
 
         if obj.isWidget():
             # is a widget
@@ -111,50 +114,65 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
                 return parent.settings.getSettingsList() + parent.children
             else:
                 return parent.getSettingsList()
-        
+
     def index(self, row, column, parent):
         """Construct an index for a child of parent."""
 
         if not parent.isValid():
             parentobj = None
         else:
-            parentobj = self.objdict[parent]
+            parentobj = self.objdict[parent.internalId()]
 
         children = self._getChildren(parentobj)
 
-        assert row < len(children)
-        idx = self.createIndex(row, column)
-        self.objdict[idx] = children[row]
-        return idx
+        c = children[row]
+        cid = id(c)
+        self.objdict[cid] = c
 
+        return self.createIndex(row, column, cid)
+
+    def _getParent(self, obj):
+        """Work out a parent for an object
+
+        This is more difficult as subsettings of a widget's settings
+        should point back to the widget."""
+
+        if obj.isWidget():
+            return obj.parent
+        elif obj.parent.parent.isWidget():
+            return obj.parent.parent
+        else:
+            return obj.parent
+        
     def parent(self, index):
         """Find the parent of the index given."""
 
         if not index.isValid():
             return qt4.QModelIndex()
 
-        parentobj = self.objdict[index].parent
+        thisobj = self.objdict[index.internalId()]
+        parentobj = self._getParent(thisobj)
         if parentobj is None:
             return qt4.QModelIndex()
         else:
             # find object in parent's child list
             children = self._getChildren(parentobj)
-            row = children.index(self.objdict[index])
+            row = children.index(thisobj)
 
-            idx = self.createIndex(row, 0)
-            self.objdict[idx] = parentobj
-            return idx
+            pid = id(parentobj)
+            self.objdict[pid] = parentobj
+
+            return self.createIndex(row, 0, pid)
 
     def rowCount(self, parent):
         """Return number of rows of children."""
         
-        if not parent.isValid() or not parent in self.objdict:
+        if not parent.isValid():
             parentobj = None
         else:
-            parentobj = self.objdict[parent]
+            parentobj = self.objdict[parent.internalId()]
 
         children = self._getChildren(parentobj)
-        print children
         return len(children)
 
 class TreeEditWindow2(qt4.QDockWidget):
