@@ -329,7 +329,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataImport(self):
         """Display the import data dialog."""
-        d = importdialog.ImportDialog(self, self.document)
+        d = importdialog.ImportDialog2(self, self.document)
         d.show()
 
     def slotDataImport2D(self):
@@ -693,7 +693,7 @@ class MainWindow(qt4.QMainWindow):
         
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
-            self.exportDir = fd.dir()
+            self.exportDir = unicode(fd.directory().absolutePath())
 
             filterused = str(fd.selectedFilter())
             chosenextns = filtertoext[filterused]

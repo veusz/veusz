@@ -338,8 +338,7 @@ class Document( qt4.QObject ):
 
         if ext == '.eps':
             # write eps file
-            p = qt4.QPrinter(qt4.QPrinter.HighResolution)
-            p.setOutputToFile(True)
+            p = qt4.QPrinter()
             p.setOutputFileName(filename)
             p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
             p.setCreator('Veusz %s' % utils.version())

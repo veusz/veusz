@@ -493,8 +493,7 @@ def _calcPixPerPt(painter):
 
     This is stored in the variable veusz_pixperpt."""
 
-    dm = qt4.QPaintDeviceMetrics(painter.device())
-    painter.veusz_pixperpt = dm.logicalDpiY() / 72.
+    painter.veusz_pixperpt = painter.device().logicalDpiY() / 72.
 
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
