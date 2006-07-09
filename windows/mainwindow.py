@@ -38,7 +38,7 @@ from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
 from veusz.dialogs.importfits import ImportFITS
 import veusz.dialogs.importdialog as importdialog
-#import veusz.dialogs.dataeditdialog as dataeditdialog
+import veusz.dialogs.dataeditdialog as dataeditdialog
 
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
@@ -344,7 +344,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataEdit(self):
         """Edit existing datasets."""
-        d = dataeditdialog.DataEditDialog(self, self.document)
+        d = dataeditdialog.DataEditDialog2(self, self.document)
         d.show()
 
     def slotDataCreate(self):
