@@ -549,6 +549,11 @@ class TreeEditWindow(qt.QDockWindow):
         # select the root item
         self.listview.setSelected(self.rootitem, True)
 
+        # time to update tree view
+        self.updatetimer = qt.QTimer(self)
+        self.connect( self.updatetimer, qt.SIGNAL('timeout()'),
+                      self.slotUpdateTimerTimeout )
+
     def sizeHint(self):
         """Returns recommended size of dialog."""
         return qt.QSize(250, 500)
@@ -645,7 +650,15 @@ class TreeEditWindow(qt.QDockWindow):
         """Called when the document has been modified."""
  
         if ismodified:
-            self.updateContents()
+            # do this so we avoid refreshing the tree every time
+            # the document is modified
+            # this speeds things up a lot, and has the effect of batching
+            # operations
+            self.updatetimer.start(50, True)
+
+    def slotUpdateTimerTimeout(self):
+        """Update the tree when times out."""
+        self.updateContents()
 
     def _updateBranch(self, root):
         """Recursively update items on branch."""
@@ -1019,6 +1032,9 @@ class TreeEditWindow(qt.QDockWindow):
         """Select the associated listviewitem for the widget w in the
         listview."""
         
+        # update in case tree does not reflect document
+        self.updateContents()
+
         # an iterative algorithm, rather than a recursive one
         # (for a change)
         found = False
