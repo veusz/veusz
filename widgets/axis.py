@@ -298,10 +298,11 @@ class Axis(widget.Widget):
 
         # rounds to nearest integer
         # we use 0.5000002 instead of 0.5, to try to avoid fp rounding problems
-        return N.floor(0.5000002 + self.coordParr1 +
+        vals = N.floor(0.5000002 + self.coordParr1 +
                        fracposns*(self.coordParr2 - self.coordParr1)
                        ).astype(N.Int32)
-    
+        return N.clip(vals, -32000, 32000)
+        
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
         

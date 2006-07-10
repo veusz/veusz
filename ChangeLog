@@ -1,3 +1,6 @@
+* 2006-07-10 Jeremy Sanders <jeremy@jeremysanders.net>
+  - Fix problems if plotter coords exceed ~32000
+	
 * 2006-06-27 Jeremy Sanders <jeremy@jeremysanders.net>
   - Spaces are allowed in dataset expressions
 
