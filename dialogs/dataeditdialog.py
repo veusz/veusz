@@ -28,7 +28,6 @@ import os.path
 
 import numarray as N
 import veusz.qtall as qt4
-#import qttable
 
 import veusz.setting as setting
 import veusz.document as document
@@ -638,10 +637,12 @@ class DatasetListModel(qt4.QAbstractListModel):
         self.updateList()
 
     def updateList(self):
+        """Update internal list."""
         self.datasets = list( self.document.data.keys() )
         self.datasets.sort()
 
     def slotDocumentModified(self):
+        """Called when document modified."""
         self.updateList()
         self.emit( qt4.SIGNAL('layoutChanged()') )
 
@@ -657,6 +658,30 @@ class DatasetListModel(qt4.QAbstractListModel):
 
         # return nothing otherwise
         return qt4.QVariant()
+
+    def flags(self, index):
+        """Return flags for items."""
+        if not index.isValid():
+            return qt4.Qt.ItemIsEnabled
+        
+        return qt4.QAbstractListModel.flags(self, index) | qt4.Qt.ItemIsEditable
+
+    def setData(self, index, value, role):
+        """Called to rename a dataset."""
+
+        if index.isValid() and role == qt4.Qt.EditRole:
+            name = self.datasetName(index)
+            newname = unicode( value.toString() )
+            if not re.match(r'^[A-za-z][^ +-,]+$', newname):
+                return False
+
+            self.datasets[index.row()] = newname
+            self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &'), index, index)
+
+            self.document.applyOperation(document.OperationDatasetRename(name, newname))
+            return True
+
+        return False
     
 class DataEditDialog2(qt4.QDialog):
     """Dialog for editing and rearranging data sets."""
@@ -674,6 +699,10 @@ class DataEditDialog2(qt4.QDialog):
         self.dslistmodel = DatasetListModel(self, document)
         self.datasetlistview.setModel(self.dslistmodel)
 
+        # document changes
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.slotDocumentModified)
+
         # receive change in selection
         self.connect(self.datasetlistview.selectionModel(),
                      qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
@@ -688,172 +717,36 @@ class DataEditDialog2(qt4.QDialog):
         # connect buttons
         self.connect(self.deletebutton, qt4.SIGNAL('clicked()'),
                      self.slotDatasetDelete)
-
+        self.connect(self.unlinkbutton, qt4.SIGNAL('clicked()'),
+                     self.slotDatasetUnlink)
+        self.connect(self.duplicatebutton, qt4.SIGNAL('clicked()'),
+                     self.slotDatasetDuplicate)
 
     def slotDatasetSelected(self, current, previous):
         """Called when a new dataset is selected."""
 
-        name = self.dslistmodel.datasetName(current.indexes()[0])
+        # FIXME: Make readonly models readonly!!
+        index = current.indexes()[0]
+        name = self.dslistmodel.datasetName(index)
         self.datatableview.setModel( DatasetTableModel(self, self.document,
                                                        name) )
-        
-    def slotDatasetDelete(self):
-        """Delete selected dataset."""
 
-        selitems = self.dslistbox.selectedItems()
-        if len(selitems) != 0:
-            datasetname = unicode(selitems[0].text())
-            self.document.applyOperation(document.OperationDatasetDelete(datasetname))
+        self.setUnlinkState()
 
-
-
-class DataEditDialog(qt4.QDialog):
-    """Data editting dialog."""
-
-    def __init__(self, parent, document):
-        """Initialise dialog."""
-
-        qt4.QDialog.__init__(self, parent, 'DataEditDialog', False,
-                            qt4.Qt.WDestructiveClose)
-        self.parent = parent
-        self.setCaption('Edit data - Veusz')
-        self.document = document
-        self.connect(document, qt4.PYSIGNAL('sigModified'),
-                     self.slotDocumentModified)
-
-        spacing = self.fontMetrics().height() / 2
-        self.layout = qt4.QVBoxLayout(self, spacing)
-
-        # list of datasets on left of table
-        datasplitter = qt4.QSplitter(self)
-        self.layout.addWidget(datasplitter)
-
-        self.dslistbox = qt4.QListBox(datasplitter)
-        self.connect( self.dslistbox, qt4.SIGNAL('highlighted(const QString&)'),
-                      self.slotDatasetHighlighted )
-
-        # initialise table
-        vbox = qt4.QVBox(datasplitter)
-        vbox.setSpacing(spacing)
-        self.dstable = _DataEditTable(vbox, self.document)
-        
-        # if dataset is linked, show filename
-        w = qt4.QWidget(vbox)
-        w.setSizePolicy(qt4.QSizePolicy.Expanding, qt4.QSizePolicy.Minimum)
-        l = qt4.QHBoxLayout(w, 0, spacing)
-
-        self.linklabel = qt4.QLabel('', w)
-        l.addSpacing(spacing)
-        l.addWidget(self.linklabel)
-        l.addItem( qt4.QSpacerItem(1, 1, qt4.QSizePolicy.Expanding,
-                                  qt4.QSizePolicy.Minimum) )
-        self.linkbutton = qt4.QPushButton('Unlink...', w)
-        l.addWidget(self.linkbutton)
-        self.connect(self.linkbutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetUnlink)
-
-        # operation buttons
-        buttons = [ ('&Delete', self.slotDatasetDelete),
-                    ('&Rename...', self.slotDatasetRename),
-                    ('D&uplicate...', self.slotDatasetDuplicate),
-                    (None, None),
-                    ('Crea&te...', self.slotDatasetNew),
-                    ('&Import...', self.slotDatasetImport),
-                    (None, None),
-                    ('&Close', self.slotClose) ]
-
-        w = qt4.QWidget(self)
-        self.layout.addWidget(w)
-        w.setSizePolicy(qt4.QSizePolicy.Expanding, qt4.QSizePolicy.Fixed)
-        l = qt4.QHBoxLayout(w, 0, spacing)
-        l.addItem( qt4.QSpacerItem(1, 1, qt4.QSizePolicy.Expanding,
-                                  qt4.QSizePolicy.Minimum) )
-
-        for name, slot in buttons:
-            if name == None:
-                l.addSpacing(spacing)
-            else:
-                b = qt4.QPushButton(name, w)
-                l.addWidget(b)
-                self.connect(b, qt4.SIGNAL('clicked()'), slot)
-
-        # populate initially
-        self.slotDocumentModified()
-
-    def sizeHint(self):
-        """Returns recommended size of dialog."""
-        return qt4.QSize(600, 400)
-
-    def closeEvent(self, evt):
-        """Called when the window closes."""
-
-        # store the current geometry in the settings database
-        geometry = ( self.x(), self.y(), self.width(), self.height() )
-        setting.settingdb['geometry_dataeditdialog'] = geometry
-
-        qt4.QDialog.closeEvent(self, evt)
-
-    def showEvent(self, evt):
-        """Restoring window geometry if possible."""
-
-        # if we can restore the geometry, do so
-        if 'geometry_dataeditdialog' in setting.settingdb:
-            geometry =  setting.settingdb['geometry_dataeditdialog']
-            self.resize( qt4.QSize(geometry[2], geometry[3]) )
-            self.move( qt4.QPoint(geometry[0], geometry[1]) )
-
-        qt4.QDialog.showEvent(self, evt)
-
-    def slotDocumentModified(self):
-        '''Called when the dialog needs to be modified.'''
-
-        # update dataset list
-        datasets = self.document.data.keys()
-        datasets.sort()
-
-        # get current item (to reselect later)
-        item = self.dslistbox.selectedItem()
-        if item != None:
-            name = unicode(item.text())
-        else:
-            name = None
-
-        self.dslistbox.clear()
-        self.dslistbox.insertStrList( datasets )
-
-        # reselect old item
-        item = None
-        if name != None:
-            item = self.dslistbox.findItem(name, qt4.Qt.ExactMatch)
-            if item != None:
-                self.dslistbox.setCurrentItem(item)
-        if name == None or item == None:
-            # select first item
-            if self.dslistbox.numRows() != 0:
-                self.dslistbox.setCurrentItem(0)
-
-    def slotClose(self):
-        """Close the dialog."""
-        self.close()
-
-    def slotDatasetHighlighted(self, name):
-        """Dataset highlighted in list box."""
-
-        # convert to python string
-        name = unicode(name)
-
-        # update the table
-        ds = self.document.data[name]
-        self.dstable.setDataset(name)
+    def setUnlinkState(self):
+        """Enable the unlink button correctly."""
+        # get dataset
+        dsname = self.getSelectedDataset()
+        ds = self.document.data[dsname]
 
         # linked dataset
         readonly = False
         if ds.linked == None:
             fn = 'None'
-            enabled = False
+            unlink = False
         else:
             fn = ds.linked.filename
-            enabled = True
+            unlink = True
         text = 'Linked file: %s' % fn
         
         if isinstance(ds, document.DatasetExpression):
@@ -866,82 +759,48 @@ class DataEditDialog(qt4.QDialog):
                 if ds.expr[part]:
                     items.append('%s: %s' % (label, ds.expr[part]))
             text = '\n'.join(items)
-            enabled = True
+            unlink = True
             readonly = True
             
-        self.linkbutton.setEnabled(enabled)
-        self.linklabel.setText(text)
-        self.dstable.setReadOnly(readonly)
+        self.unlinkbutton.setEnabled(unlink)
+        self.linkedlabel.setText(text)
 
+    def slotDocumentModified(self):
+        """Set unlink status when document modified."""
+        self.setUnlinkState()
+
+    def getSelectedDataset(self):
+        """Return the selected dataset."""
+        selitems = self.datasetlistview.selectionModel().selection().indexes()
+        if len(selitems) != 0:
+            return self.dslistmodel.datasetName(selitems[0])
+        else:
+            return None
+        
     def slotDatasetDelete(self):
         """Delete selected dataset."""
 
-        item = self.dslistbox.selectedItem()
-        if item != None:
-            name = unicode(item.text())
-            self.document.applyOperation(document.OperationDatasetDelete(name))
+        datasetname = self.getSelectedDataset()
+        if datasetname is not None:
+            self.document.applyOperation(document.OperationDatasetDelete(datasetname))
 
-    def slotDatasetRename(self):
-        """Rename selected dataset."""
-
-        item = self.dslistbox.selectedItem()
-        if item != None:
-            name = unicode( item.text() )
-            rn = _DatasetNameDialog("Rename dataset",
-                                    "Enter a new name for dataset '%s'" % name,
-                                    self.document, name, self)
-            if rn.exec_loop() == qt4.QDialog.Accepted:
-                newname = rn.getName()
-                self.document.applyOperation(document.OperationDatasetRename(name, newname))
-                
-    def slotDatasetDuplicate(self):
-        """Duplicate selected dataset."""
-        
-        item = self.dslistbox.selectedItem()
-        if item != None:
-            name = unicode( item.text() )
-            dds = _DatasetNameDialog("Duplicate dataset",
-                                     "Enter the duplicate's name for "
-                                     "dataset '%s'" % name,
-                                     self.document, name, self)
-            if dds.exec_loop() == qt4.QDialog.Accepted:
-                newname = dds.getName()
-                self.document.applyOperation(document.OperationDatasetDuplicate(name, newname))
-
-    def slotDatasetNew(self):
-        """Create datasets from scratch."""
-
-        nds = DatasetNewDialog(self.document, self.parent)
-        nds.show()
-        
-    def slotDatasetImport(self):
-        """Import data from a file."""
-
-        ids = importdialog.ImportDialog(self.parent, self.document)
-        ids.show()
-        
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
 
-        item = self.dslistbox.selectedItem()
-        if item != None:
-            # check with the user first, as this is drastic
-            name = unicode( item.text() )
-            mb = qt4.QMessageBox("Veusz",
-                                "Unlink dataset '%s'?" % name,
-                                qt4.QMessageBox.Information,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.Cancel,
-                                qt4.QMessageBox.NoButton,
-                                self)
-            mb.setButtonText(qt4.QMessageBox.Ok, "&Unlink")
-            mb.setButtonText(qt4.QMessageBox.Cancel, "&Cancel")
+        datasetname = self.getSelectedDataset()
+        if datasetname is not None:
+            self.document.applyOperation( document.OperationDatasetUnlink(datasetname) )
 
-            # if they want to carry on
-            if mb.exec_loop() == qt4.QMessageBox.Ok:
+    def slotDatasetDuplicate(self):
+        """Duplicate selected dataset."""
+        
+        datasetname = self.getSelectedDataset()
+        if datasetname is not None:
+            # generate new name for dataset
+            newname = datasetname + '_copy'
+            index = 2
+            while newname in self.document.data:
+                newname = '%s_copy_%i' % (datasetname, index)
+                index += 1
 
-                self.document.applyOperation( document.OperationDatasetUnlink(name) )
-                    
-                # update display
-                self.dslistbox.setCurrentItem( self.dslistbox.currentItem() )
-
+            self.document.applyOperation(document.OperationDatasetDuplicate(datasetname, newname))

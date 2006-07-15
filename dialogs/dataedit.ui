@@ -65,7 +65,7 @@
             </sizepolicy>
            </property>
            <property name="text" >
-            <string>Unlink...</string>
+            <string>Unlink</string>
            </property>
           </widget>
          </item>
@@ -106,7 +106,7 @@
      <item>
       <widget class="QPushButton" name="duplicatebutton" >
        <property name="text" >
-        <string>D&amp;uplicate...</string>
+        <string>D&amp;uplicate</string>
        </property>
       </widget>
      </item>
