@@ -27,16 +27,7 @@
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QListWidget" name="dslistbox" >
-      <property name="sizePolicy" >
-       <sizepolicy>
-        <hsizetype>5</hsizetype>
-        <vsizetype>7</vsizetype>
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
+     <widget class="QListView" name="datasetlistview" />
      <widget class="QWidget" name="layoutWidget" >
       <layout class="QVBoxLayout" >
        <property name="margin" >

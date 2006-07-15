@@ -633,68 +633,70 @@ class DatasetListModel(qt4.QAbstractListModel):
         qt4.QAbstractListModel.__init__(self, parent)
         self.document = document
 
-    
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.slotDocumentModified)
+        self.updateList()
+
+    def updateList(self):
+        self.datasets = list( self.document.data.keys() )
+        self.datasets.sort()
+
+    def slotDocumentModified(self):
+        self.updateList()
+        self.emit( qt4.SIGNAL('layoutChanged()') )
+
+    def rowCount(self, parent):
+        return len(self.datasets)
+
+    def datasetName(self, index):
+        return self.datasets[index.row()]
+
+    def data(self, index, role):
+        if role == qt4.Qt.DisplayRole:
+            return qt4.QVariant(self.datasets[index.row()])
+
+        # return nothing otherwise
+        return qt4.QVariant()
     
 class DataEditDialog2(qt4.QDialog):
     """Dialog for editing and rearranging data sets."""
     
     def __init__(self, parent, document, *args):
 
+        # load up UI
         qt4.QDialog.__init__(self, parent, *args)
         qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 'dataedit.ui'),
                    self)
         self.document = document
 
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
-        self.connect(self.dslistbox, qt4.SIGNAL('itemSelectionChanged()'),
+        # set up dataset list
+        self.dslistmodel = DatasetListModel(self, document)
+        self.datasetlistview.setModel(self.dslistmodel)
+
+        # receive change in selection
+        self.connect(self.datasetlistview.selectionModel(),
+                     qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
                      self.slotDatasetSelected)
+
+        # select first item (phew)
+        if self.dslistmodel.rowCount(None) > 0:
+            self.datasetlistview.selectionModel().select(
+                self.dslistmodel.createIndex(0, 0),
+                qt4.QItemSelectionModel.Select)
 
         # connect buttons
         self.connect(self.deletebutton, qt4.SIGNAL('clicked()'),
                      self.slotDatasetDelete)
 
-        # initial dataset update
-        self.slotDocumentModified()
 
-    def slotDocumentModified(self):
-        '''Called when the dialog needs to be modified.'''
-
-        # update dataset list
-        datasets = self.document.data.keys()
-        datasets.sort()
-
-        # get current item (to reselect later)
-        selitems = self.dslistbox.selectedItems()
-        if len(selitems) != 0:
-            currentname = unicode(selitems[0].text())
-        else:
-            currentname = None
-
-        self.dslistbox.clear()
-        self.dslistbox.insertItems(0, datasets)
-
-        # reselect old item
-        selected = False
-        if currentname is not None:
-            items = self.dslistbox.findItems(currentname, qt4.Qt.MatchExactly)
-            if len(items) != 0:
-                self.dslistbox.setCurrentItem(items[0])
-                selected = True
-
-        # select 1st row if possible
-        if not selected and self.dslistbox.count() != 0:
-            self.dslistbox.setCurrentRow(0)
-
-    def slotDatasetSelected(self):
+    def slotDatasetSelected(self, current, previous):
         """Called when a new dataset is selected."""
 
-        selitems = self.dslistbox.selectedItems()
-        if len(selitems) != 0:
-            datasetname = unicode(selitems[0].text())
-            self.datatableview.setModel( DatasetTableModel(self, self.document,
-                                                           datasetname) )
+        name = self.dslistmodel.datasetName(current.indexes()[0])
+        self.datatableview.setModel( DatasetTableModel(self, self.document,
+                                                       name) )
+        
     def slotDatasetDelete(self):
         """Delete selected dataset."""
 
