@@ -612,7 +612,7 @@ class DatasetTableModel(qt4.QAbstractTableModel):
 
             # add new column if necessary
             if data == None:
-                self.document.applyOperation( self.document.OperationDatasetAddColumn(self.datasetname, self.colnames[column]) )
+                self.document.applyOperation( document.OperationDatasetAddColumn(self.dsname, self.colnames[column]) )
 
 
             # update if conversion okay
@@ -626,9 +626,17 @@ class DatasetTableModel(qt4.QAbstractTableModel):
 
         return False
 
+class DatasetListModel(qt4.QAbstractListModel):
+    """A model to allow the list of datasets to be viewed."""
+
+    def __init__(self, parent, document):
+        qt4.QAbstractListModel.__init__(self, parent)
+        self.document = document
+
+    
     
 class DataEditDialog2(qt4.QDialog):
-
+    """Dialog for editing and rearranging data sets."""
     
     def __init__(self, parent, document, *args):
 
@@ -642,7 +650,10 @@ class DataEditDialog2(qt4.QDialog):
                      self.slotDocumentModified)
         self.connect(self.dslistbox, qt4.SIGNAL('itemSelectionChanged()'),
                      self.slotDatasetSelected)
-                     
+
+        # connect buttons
+        self.connect(self.deletebutton, qt4.SIGNAL('clicked()'),
+                     self.slotDatasetDelete)
 
         # initial dataset update
         self.slotDocumentModified()
@@ -655,32 +666,43 @@ class DataEditDialog2(qt4.QDialog):
         datasets.sort()
 
         # get current item (to reselect later)
-        item = self.dslistbox.currentItem()
-        if item != None:
-            name = unicode(item.text())
+        selitems = self.dslistbox.selectedItems()
+        if len(selitems) != 0:
+            currentname = unicode(selitems[0].text())
         else:
-            name = None
+            currentname = None
 
         self.dslistbox.clear()
         self.dslistbox.insertItems(0, datasets)
 
         # reselect old item
-        item = None
-        if name != None:
-            items = self.dslistbox.findItems(name, qt4.Qt.MatchExactly)
+        selected = False
+        if currentname is not None:
+            items = self.dslistbox.findItems(currentname, qt4.Qt.MatchExactly)
             if len(items) != 0:
                 self.dslistbox.setCurrentItem(items[0])
-        if name == None or item == None:
-            # select first item
-            if self.dslistbox.count() != 0:
-                self.dslistbox.setCurrentRow(0)
+                selected = True
+
+        # select 1st row if possible
+        if not selected and self.dslistbox.count() != 0:
+            self.dslistbox.setCurrentRow(0)
 
     def slotDatasetSelected(self):
         """Called when a new dataset is selected."""
 
-        datasetname = unicode(self.dslistbox.selectedItems()[0].text())
-        self.datatableview.setModel( DatasetTableModel(self, self.document,
-                                                       datasetname) )
+        selitems = self.dslistbox.selectedItems()
+        if len(selitems) != 0:
+            datasetname = unicode(selitems[0].text())
+            self.datatableview.setModel( DatasetTableModel(self, self.document,
+                                                           datasetname) )
+    def slotDatasetDelete(self):
+        """Delete selected dataset."""
+
+        selitems = self.dslistbox.selectedItems()
+        if len(selitems) != 0:
+            datasetname = unicode(selitems[0].text())
+            self.document.applyOperation(document.OperationDatasetDelete(datasetname))
+
 
 
 class DataEditDialog(qt4.QDialog):
