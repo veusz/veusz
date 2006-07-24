@@ -23,11 +23,17 @@
 
 import string
 import weakref
+import re
 
 def reverse(data):
     """For iterating over a sequence in reverse."""
     for index in xrange(len(data)-1, -1, -1):
         yield data[index]
+
+dsname_re = re.compile('[A-Za-z][A-Za-z0-9_]*')
+def validateDatasetName(name):
+    """Validate dataset name is okay."""
+    return dsname_re.match(name) is not None
 
 class WeakBoundMethod:
     """A weak reference to a bound method.

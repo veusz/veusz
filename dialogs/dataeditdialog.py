@@ -721,6 +721,8 @@ class DataEditDialog2(qt4.QDialog):
                      self.slotDatasetUnlink)
         self.connect(self.duplicatebutton, qt4.SIGNAL('clicked()'),
                      self.slotDatasetDuplicate)
+        self.connect(self.importbutton, qt4.SIGNAL('clicked()'),
+                     self.slotDatasetImport)
 
     def slotDatasetSelected(self, current, previous):
         """Called when a new dataset is selected."""
@@ -804,3 +806,10 @@ class DataEditDialog2(qt4.QDialog):
                 index += 1
 
             self.document.applyOperation(document.OperationDatasetDuplicate(datasetname, newname))
+
+    def slotDatasetImport(self):
+        """Show import dialog."""
+
+        impd = importdialog.ImportDialog2(self.parent(), self.document)
+        impd.show()
+        
