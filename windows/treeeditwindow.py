@@ -891,10 +891,13 @@ class TreeEditWindow(qt.QDockWindow):
             parent = self.itemselected.widget
         else:
             parent  = initialParent
-        
-        if parent == None:
+
+        num = 0
+        while parent == None and num < 10:
             parent = self.itemselected.parent.widget
-            assert parent != None
+            num += 1
+
+        assert parent != None
 
         # find the parent to add the child to, we go up the tree looking
         # for possible parents
