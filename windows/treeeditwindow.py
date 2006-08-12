@@ -206,6 +206,16 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         children = self._getChildren(parentobj)
         return len(children)
 
+    def getSettings(self, index):
+        """Return the settings for the index selected."""
+
+        obj = self.objdict[index.internalId()]
+
+        if obj.isWidget():
+            return obj.settings
+        else:
+            return obj
+
 class TreeEditWindow2(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
@@ -213,11 +223,69 @@ class TreeEditWindow2(qt4.QDockWidget):
         qt4.QDockWidget.__init__(self, *args)
         self.setWindowTitle("Editing - Veusz")
 
-        self.treeview = qt4.QTreeView(self)
+        # construct tree
         self.treemodel = WidgetTreeModel(document)
+        self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
-        self.setWidget(self.treeview)
 
+        # receive change in selection
+        self.connect(self.treeview.selectionModel(),
+                     qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
+                     self.slotTreeItemSelected)
+
+        # construct list of properties (in scrollable area)
+        self.proplistscroll = qt4.QScrollArea()
+        self.proplist = PropertyList(document)
+        #self.proplistscroll.setWidget(self.proplist)
+
+        # splitter splits tree from properties
+        self.splitter = qt4.QSplitter(qt4.Qt.Vertical, self)
+        self.setWidget(self.splitter)
+        self.splitter.addWidget(self.treeview)
+        self.splitter.addWidget(self.proplist)
+
+    def slotTreeItemSelected(self, current, previous):
+        """New item selected in tree.
+
+        This updates the list of properties
+        """
+        
+        index = current.indexes()[0]
+        settings = self.treemodel.getSettings(index)
+        self.proplist.updateProperties(settings)
+
+class PropertyList(qt4.QWidget):
+    """Edit the widget properties using a set of controls."""
+
+    def __init__(self, document, *args):
+        qt4.QWidget.__init__(self, *args)
+        self.document = document
+
+        self.layout = qt4.QGridLayout(self)
+        self.children = []
+
+    def updateProperties(self, settings):
+        """Update the list of controls with new ones for the settings."""
+
+        # delete all child widgets
+        while len(self.children) > 0:
+            self.children.pop().deleteLater()
+
+        row = 0
+        # FIXME: add actions
+
+        for setn in settings.getSettingList():
+            # label for setting
+            text = '<strong>%s</strong> - %s' % (setn.name, setn.descr)
+            lab = qt4.QLabel(text, self)
+            self.layout.addWidget(lab, row, 0)
+            self.children.append(lab)
+
+            temp = qt4.QLabel('foo', self)
+            self.layout.addWidget(temp, row, 1)
+            self.children.append(temp)
+
+            row += 1
 
 ##############################################################
 
