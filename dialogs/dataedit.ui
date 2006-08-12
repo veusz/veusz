@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Veusz - Edit data</string>
+   <string>Edit data - Veusz</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >

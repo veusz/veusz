@@ -1,4 +1,4 @@
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2004-2006 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -56,9 +56,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def slotDocumentModified(self):
         """The document has been changed."""
-        self.emit( qt4.SIGNAL('dataChanged'),
-                   self.index(0, 0, qt4.QModelIndex()),
-                   self.index(0, 0, qt4.QModelIndex()) )
+        self.emit( qt4.SIGNAL('layoutChanged()') )
 
     def columnCount(self, parent):
         """Return number of columns of data."""

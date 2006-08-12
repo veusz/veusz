@@ -345,7 +345,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataEdit(self):
         """Edit existing datasets."""
-        d = dataeditdialog.DataEditDialog2(self, self.document)
+        d = dataeditdialog.DataEditDialog(self, self.document)
         d.show()
 
     def slotDataCreate(self):
