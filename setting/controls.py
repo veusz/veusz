@@ -57,7 +57,7 @@ def _populateCombo(combo, items):
         index = len(items)-1
 
     # put in new entries
-    combo.insertStrList(items)
+    combo.addItems(items)
     
     # set index to current value
     combo.setCurrentItem(index)
@@ -70,7 +70,8 @@ class Edit(qt4.QLineEdit):
 
         qt4.QLineEdit.__init__(self, parent)
         self.setting = setting
-        self.bgcolor = self.paletteBackgroundColor()
+        self.bgcolor = self.palette().color(qt4.QPalette.Window)
+        #self.bgcolor = self.paletteBackgroundColor()
 
         # set the text of the widget to the 
         self.setText( setting.toText() )
@@ -91,36 +92,22 @@ class Edit(qt4.QLineEdit):
         text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
-            self.setPaletteBackgroundColor(self.bgcolor)
+            self.palette().setColor(qt4.QPalette.Window, self.bgcolor)
 
             # value has changed
             if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, val) )
+                self.emit( qt4.SIGNAL('settingChanged'),
+                           self, self.setting, val )
                 #self.setting.val = val
 
         except setting.InvalidType:
-            self.setPaletteBackgroundColor(qt4.QColor('red'))
+            self.palette().setColor(qt4.QPalette.Window, qt4.QColor('red'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toText() )
 
-class _EscapeLineEdit(qt4.QTextEdit):
-    """A special line editor which signals when an escape character is pressed.
-
-    Emits escapePressed()
-    """
-
-    def __init__(self, parent):
-        qt4.QTextEdit.__init__(self, parent)
-        self.setTextFormat(qt4.Qt.PlainText)
-    
-    def keyPressEvent(self, event):
-        qt4.QTextEdit.keyPressEvent(self, event)
-        if event.key() == qt4.Qt.Key_Escape:
-            self.emit( qt4.SIGNAL('escapePressed'), () )
-
-class _EditBox(qt4.QFrame):
+class _EditBox(qt4.QTextEdit):
     """A popup edit box to support editing long text sections.
 
     Emits closing(text) when the box closes
@@ -129,32 +116,35 @@ class _EditBox(qt4.QFrame):
     def __init__(self, origtext, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
 
-        qt4.QFrame.__init__(self, parent, 'settingeditbox',
-                            qt4.Qt.WType_Popup)
+        qt4.QTextEdit.__init__(self, parent)
+        self.setWindowFlags(qt4.Qt.Popup)
 
         self.spacing = self.fontMetrics().height()
-        self.layout = qt4.QVBoxLayout(self, self.spacing/4)
-
-        self.edit = _EscapeLineEdit(self)
-        self.layout.addWidget(self.edit)
-        self.connect(self.edit, qt4.SIGNAL('escapePressed'),
-                     self.escapePressed)
-        self.connect(self.edit, qt4.SIGNAL('returnPressed()'),
-                     self.close)
 
         self.origtext = origtext
-        self.edit.setText(origtext)
+        self.setPlainText(origtext)
 
-        if self.style().inherits("QWindowsStyle"):
-            fs = qt4.QFrame.WinPanel
-        else:
-            fs = qt4.QFrame.Panel
-        self.setFrameStyle( fs | qt4.QFrame.Raised )            
+        cursor = self.textCursor()
+        cursor.movePosition(qt4.QTextCursor.End)
+        self.setTextCursor(cursor)
 
         if readonly:
-            self.edit.setReadOnly(True)
+            self.setReadOnly(True)
 
         self.positionSelf(parent)
+
+    def keyPressEvent(self, event):
+        """Close if escape or return is pressed."""
+        qt4.QTextEdit.keyPressEvent(self, event)
+
+        key = event.key()
+        if key == qt4.Qt.Key_Escape:
+            # restore original content
+            self.setPlainText(self.origtext)
+            self.close()
+        elif key == qt4.Qt.Key_Return:
+            # keep changes
+            self.close()
 
     def sizeHint(self):
         """A reasonable size for the text editor."""
@@ -187,36 +177,34 @@ class _EditBox(qt4.QFrame):
             x = pos.x() - self.width() - 1
 
         self.move(x, y)
-        self.edit.moveCursor(qt4.QTextEdit.MoveEnd, False)
-        self.edit.setFocus()
+        self.setFocus()
 
-    def escapePressed(self):
-        """If the user wants to break back out."""
-        self.edit.setText(self.origtext)
-        self.close()
- 
     def closeEvent(self, event):
         """Tell the calling widget that we are closing, and provide
         the new text."""
 
-        text = unicode(self.edit.text())
+        text = unicode(self.toPlainText())
         text = text.replace('\n', '')
-        self.emit( qt4.SIGNAL('closing'), (text,) )
+        self.emit( qt4.SIGNAL('closing'), text)
         event.accept()
 
-class String(qt4.QHBoxLayout):
+class String(qt4.QWidget):
     """A line editor which allows editting in a larger popup window."""
 
     def __init__(self, setting, parent):
-        qt4.QHBoxLayout.__init__(self, parent)
+        qt4.QWidget.__init__(self, parent)
 
         self.setting = setting
         self.edit = qt4.QLineEdit(self)
         b = self.button = qt4.QPushButton('..', self)
         b.setMaximumWidth(b.height())
-        b.setToggleButton(True)
+        b.setCheckable(True)
 
-        self.bgcolor = self.edit.paletteBackgroundColor()
+        layout = qt4.QHBoxLayout(self)
+        layout.addWidget(self.edit)
+        layout.addWidget(b)
+
+        self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
         
         # set the text of the widget to the 
         self.edit.setText( setting.toText() )
@@ -230,8 +218,6 @@ class String(qt4.QHBoxLayout):
 
         self.setting.setOnModified(self.onModified)
 
-        self.editwin = None
-
         if setting.readonly:
             self.edit.setReadOnly(True)
 
@@ -239,14 +225,13 @@ class String(qt4.QHBoxLayout):
         """Button is pressed to bring popup up / down."""
 
         # if button is down and there's no existing popup, bring up a new one
-        if on and self.editwin == None:
+        if on:
             e = _EditBox( unicode(self.edit.text()),
                           self.setting.readonly, self.button)
 
             # we get notified with text when the popup closes
             self.connect(e, qt4.SIGNAL('closing'), self.boxClosing)
             e.show()
-            self.editwin = e
 
     def boxClosing(self, text):
         """Called when the popup edit box closes."""
@@ -258,19 +243,7 @@ class String(qt4.QHBoxLayout):
             self.parentWidget().setFocus()
             self.edit.setFocus()
 
-        # KLUDGE! KLUDGE! KLUDGE!
-        # this evily has to check a bit later whether a new window has been
-        # created before turing off the toggle button
-        # unfortunately clicking on the button to close the popup means
-        # a new popup is created if we don't do this
-        
-        self.editwin = None
-        qt4.QTimer.singleShot(100, self.timerButtonOff)
-
-    def timerButtonOff(self):
-        """Disable button if there's no popup window."""
-        if self.editwin == None:
-            self.button.setOn(False)
+        self.button.setChecked(False)
 
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
@@ -278,14 +251,14 @@ class String(qt4.QHBoxLayout):
         text = unicode(self.edit.text())
         try:
             val = self.setting.fromText(text)
-            self.edit.setPaletteBackgroundColor(self.bgcolor)
+            self.edit.palette().setColor(qt4.QPalette.Base, self.bgcolor)
 
             # value has changed
             if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, val) )
+                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val)
 
         except setting.InvalidType:
-            self.edit.setPaletteBackgroundColor(qt4.QColor('red'))
+            self.edit.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -311,7 +284,7 @@ class Bool(qt4.QCheckBox):
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
-        self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, state) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, state )
         
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -320,24 +293,24 @@ class Bool(qt4.QCheckBox):
 class Choice(qt4.QComboBox):
     """For choosing between a set of values."""
 
-    def __init__(self, setting, iseditable, vallist, parent, pixmaps=None):
+    def __init__(self, setting, iseditable, vallist, parent, icons=None):
         
         qt4.QComboBox.__init__(self, parent)
         self.setting = setting
-        self.bgcolor = self.paletteBackgroundColor()
+        self.bgcolor = None
 
         self.setEditable(iseditable)
 
-        if pixmaps == None:
+        if icons is None:
             # add items to list (text only)
-            self.insertStrList( list(vallist) )
+            self.addItems( list(vallist) )
         else:
             # add pixmaps and text to list
-            for pix, txt in itertools.izip(pixmaps, vallist):
-                self.insertItem(pix, txt, -1)
+            for icon, text in itertools.izip(icons, vallist):
+                self.addItem(icon, text)
 
         # set the text of the widget to the setting
-        self.setCurrentText( setting.toText() )
+        self.setEditText( setting.toText() )
 
         # if a different item is selected
         self.connect( self, qt4.SIGNAL('activated(const QString&)'),
@@ -355,21 +328,31 @@ class Choice(qt4.QComboBox):
 
     def slotActivated(self, val):
         """If a different item is chosen."""
+
+        # control to highlight if there are problems
+        highcntrl = self.lineEdit()
+        if highcntrl is None:
+            highcntrl = self
+
+        # keep track of original background
+        if self.bgcolor is None:
+            self.bgcolor = highcntrl.palette().color(qt4.QPalette.Base)
+
         text = unicode(self.currentText())
         try:
             val = self.setting.fromText(text)
-            self.setPaletteBackgroundColor(self.bgcolor)
+            highcntrl.palette().setColor(qt4.QPalette.Base, self.bgcolor)
             
             # value has changed
             if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, val) )
+                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
-            self.setPaletteBackgroundColor(qt4.QColor('red'))
+            highcntrl.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
-        self.setCurrentText( self.setting.toText() )
+        self.setEditText( self.setting.toText() )
 
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
@@ -403,7 +386,7 @@ class MultiLine(qt4.QTextEdit):
             
             # value has changed
             if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, val) )
+                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
             self.setPaletteBackgroundColor(qt4.QColor('red'))
@@ -459,8 +442,8 @@ class Distance(Choice):
             self.removeItem(0)
 
         # put new items in and select the correct option
-        self.insertStrList(newitems)
-        self.setCurrentItem(index)
+        self.addItems(newitems)
+        self.setCurrentIndex(index)
 
         # must remember to do this!
         self.blockSignals(False)
@@ -506,23 +489,23 @@ class Dataset(Choice):
 class FillStyle(Choice):
     """For choosing between fill styles."""
 
-    _pixmaps = None
+    _icons = None
     _fills = None
     _fillcnvt = None
 
     def __init__(self, setting, parent):
-        if self._pixmaps == None:
-            self._generatePixmaps()
+        if self._icons == None:
+            self._generateIcons()
 
         Choice.__init__(self, setting, False,
                         self._fills, parent,
-                        pixmaps=self._pixmaps)
+                        icons=self._icons)
 
-    def _generatePixmaps(cls):
+    def _generateIcons(cls):
         """Generate a list of pixmaps for drop down menu."""
 
         size = 12
-        pixmaps = []
+        icons = []
         c = qt4.QColor('darkgrey')
         for f in cls._fills:
             pix = qt4.QPixmap(size, size)
@@ -530,27 +513,28 @@ class FillStyle(Choice):
             painter = qt4.QPainter(pix)
             brush = qt4.QBrush(c, cls._fillcnvt[f])
             painter.fillRect(0, 0, size, size, brush)
-            pixmaps.append(pix)
+            painter.end()
+            icons.append( qt4.QIcon(pix) )
 
-        cls._pixmaps = pixmaps
-    _generatePixmaps = classmethod(_generatePixmaps)
+        cls._icons = icons
+    _generateIcons = classmethod(_generateIcons)
 
 class Marker(Choice):
     """A control to let the user choose a marker."""
 
-    _pixmaps = None
+    _icons = None
 
     def __init__(self, setting, parent):
-        if self._pixmaps == None:
-            self._generatePixmaps()
+        if self._icons == None:
+            self._generateIcons()
 
         Choice.__init__(self, setting, False,
                         utils.MarkerCodes, parent,
-                        pixmaps=self._pixmaps)
+                        icons=self._icons)
 
-    def _generatePixmaps(cls):
+    def _generateIcons(cls):
         size = 16
-        pixmaps = []
+        icons = []
         c = qt4.QColor('darkgrey')
         for marker in utils.MarkerCodes:
             pix = qt4.QPixmap(size, size)
@@ -558,30 +542,31 @@ class Marker(Choice):
             painter = qt4.QPainter(pix)
             painter.setBrush(c)
             utils.plotMarker(painter, size/2, size/2, marker, int(size*0.33))
-            pixmaps.append(pix)
+            painter.end()
+            icons.append( qt4.QIcon(pix) )
 
-        cls._pixmaps = pixmaps
-    _generatePixmaps = classmethod(_generatePixmaps)
+        cls._icons = icons
+    _generateIcons = classmethod(_generateIcons)
 
 class LineStyle(Choice):
     """For choosing between line styles."""
 
-    _pixmaps = None
+    _icons = None
     _lines = None
     _linecnvt = None
 
     def __init__(self, setting, parent):
-        if self._pixmaps == None:
-            self._generatePixmaps()
+        if self._icons == None:
+            self._generateIcons()
 
         Choice.__init__(self, setting, False,
                         self._lines, parent,
-                        pixmaps=self._pixmaps)
+                        icons=self._icons)
 
-    def _generatePixmaps(cls):
-        """Generate a list of pixmaps for drop down menu."""
+    def _generateIcons(cls):
+        """Generate a list of icons for drop down menu."""
         size = 12
-        pixmaps = []
+        icons = []
         c = qt4.QColor('black')
         for l in cls._lines:
             pix = qt4.QPixmap(size*4, size)
@@ -590,25 +575,26 @@ class LineStyle(Choice):
             pen = qt4.QPen(c, 2, cls._linecnvt[l])
             painter.setPen(pen)
             painter.drawLine(size, size/2, size*3, size/2)
-            pixmaps.append(pix)
+            painter.end()
+            icons.append( qt4.QIcon(pix) )
 
-        cls._pixmaps = pixmaps
-    _generatePixmaps = classmethod(_generatePixmaps)
+        cls._icons = icons
+    _generateIcons = classmethod(_generateIcons)
 
-class Color(qt4.QHBoxLayout):
+class Color(qt4.QWidget):
     """A control which lets the user choose a color.
 
     A drop down list and a button to bring up a dialog are used
     """
 
-    _pixmaps = None
+    _icons = None
     _colors = None
 
     def __init__(self, setting,  parent):
-        qt4.QHBoxLayout.__init__(self, parent)
+        qt4.QWidget.__init__(self, parent)
 
-        if self._pixmaps == None:
-            self._generatePixmaps()
+        if self._icons == None:
+            self._generateIcons()
 
         self.setting = setting
 
@@ -616,10 +602,12 @@ class Color(qt4.QHBoxLayout):
         c = self.combo = qt4.QComboBox(self)
         c.setEditable(True)
         for color in self._colors:
-            c.insertItem(self._pixmaps[color], color, -1)
-        c.setCurrentText( self.setting.toText() )
+            c.addItem(self._icons[color], color)
         self.connect(c, qt4.SIGNAL('activated(const QString&)'),
                      self.slotActivated )
+
+        # set current value
+        c.setEditText( self.setting.toText() )
 
         # button for selecting colors
         b = self.button = qt4.QPushButton(self)
@@ -631,26 +619,30 @@ class Color(qt4.QHBoxLayout):
             c.setEnabled(False)
             b.setEnabled(False)
                      
+        layout = qt4.QHBoxLayout(self)
+        layout.addWidget(c)
+        layout.addWidget(b)
+
         self.setting.setOnModified(self.onModified)
         self._updateButtonColor()
 
-    def _generatePixmaps(cls):
-        """Generate a list of pixmaps for drop down menu.
-        Does not generate existing pixmaps
+    def _generateIcons(cls):
+        """Generate a list of icons for drop down menu.
+        Does not generate existing icons
         """
 
         size = 12
-        if cls._pixmaps == None:
-            cls._pixmaps = {}
+        if cls._icons == None:
+            cls._icons = {}
         
-        pixmaps = cls._pixmaps
+        icons = cls._icons
         for c in cls._colors:
-            if c not in pixmaps:
+            if c not in icons:
                 pix = qt4.QPixmap(size, size)
                 pix.fill( qt4.QColor(c) )
-                pixmaps[c] = pix
+                icons[c] = qt4.QIcon(pix)
 
-    _generatePixmaps = classmethod(_generatePixmaps)
+    _generateIcons = classmethod(_generateIcons)
     
     def _updateButtonColor(self):
         """Update the color on the button from the setting."""
@@ -659,17 +651,17 @@ class Color(qt4.QHBoxLayout):
         pix = qt4.QPixmap(size, size)
         pix.fill(self.setting.color())
 
-        self.button.setIconSet( qt4.QIconSet(pix) )
+        self.button.setIcon( qt4.QIcon(pix) )
 
     def slotButtonClicked(self):
         """Open dialog to edit color."""
 
-        col = qt4.QColorDialog.getColor( self.setting.color(),
-                                        self )
+        col = qt4.QColorDialog.getColor(self.setting.color(), self)
         if col.isValid():
             # change setting
-            name = col.name()
-            self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, unicode(name)) )
+            val = unicode( col.name() )
+            if self.setting.val != val:
+                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val)
 
     def slotActivated(self, val):
         """A different value is selected."""
@@ -679,12 +671,12 @@ class Color(qt4.QHBoxLayout):
             
         # value has changed
         if self.setting.val != val:
-            self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, val) )
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
 
-        self.combo.setCurrentText( self.setting.toText() )
+        self.combo.setEditText( self.setting.toText() )
         self._updateButtonColor()
 
 class Axis(Choice):
@@ -841,13 +833,13 @@ class ListSet(qt4.QWidget):
             rows.append(rows[-1])
         else:
             rows.append(self.defaultval)
-        self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, rows) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
 
     def onDeleteClicked(self):
         """Remove final entry in settings list."""
 
         rows = list(self.setting.val)[:-1]
-        self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, rows) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -894,8 +886,8 @@ class ListSet(qt4.QWidget):
         self.connect(wtoggle, qt4.SIGNAL('toggled(bool)'), self.onToggled)
         return wtoggle
 
-    def addCombo(self, row, col, tooltip, values, pixmaps, texts):
-        """Make an enumeration combo - choose from a set of pixmaps."""
+    def addCombo(self, row, col, tooltip, values, icons, texts):
+        """Make an enumeration combo - choose from a set of icons."""
         
         val = self.setting.val[row][col]
 
@@ -903,10 +895,10 @@ class ListSet(qt4.QWidget):
         self.layout.addWidget(wcombo, row, col)
 
         if texts == None:
-            for pixmap in pixmaps:
+            for pixmap in icons:
                 wcombo.insertItem(pixmap)
         else:
-            for text, pixmap in zip(texts, pixmaps):
+            for text, pixmap in zip(texts, icons):
                 wcombo.insertItem(pixmap, text)
 
         wcombo.setCurrentItem(values.index(val))
@@ -923,7 +915,7 @@ class ListSet(qt4.QWidget):
         items[col] = val
         rows[row] = tuple(items)
         self.ignorechange = True
-        self.emit( qt4.SIGNAL('settingChanged'), (self, self.setting, rows) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
         
     def onToggled(self, on):
         """Checkbox toggled."""
@@ -967,14 +959,14 @@ class LineSet(ListSet):
     def populateRow(self, row, val):
         """Add the widgets for the row given."""
 
-        # create line pixmaps if not already created
-        if LineStyle._pixmaps == None:
-            LineStyle._generatePixmaps()
+        # create line icons if not already created
+        if LineStyle._icons == None:
+            LineStyle._generateIcons()
 
         # make line style selector
         wlinestyle = self.addCombo(row, 0, 'Line style',
                                    LineStyle._lines,
-                                   LineStyle._pixmaps, None)
+                                   LineStyle._icons, None)
         
         # make line width edit box
         wwidth = qt4.QLineEdit(self)
@@ -1021,14 +1013,14 @@ class FillSet(ListSet):
     def populateRow(self, row, val):
         """Add the widgets for the row given."""
 
-        # construct fill pixmaps if not already done
-        if FillStyle._pixmaps == None:
-            FillStyle._generatePixmaps()
+        # construct fill icons if not already done
+        if FillStyle._icons == None:
+            FillStyle._generateIcons()
     
         # make fill style selector
         wfillstyle = self.addCombo(row, 0, 'Fill style',
                                    FillStyle._fills,
-                                   FillStyle._pixmaps,
+                                   FillStyle._icons,
                                    FillStyle._fills)
         wfillstyle.setMinimumWidth(self.pixsize)
 

@@ -235,14 +235,15 @@ class TreeEditWindow2(qt4.QDockWidget):
 
         # construct list of properties (in scrollable area)
         self.proplistscroll = qt4.QScrollArea()
+        self.proplistscroll.setWidgetResizable(True)
         self.proplist = PropertyList(document)
-        #self.proplistscroll.setWidget(self.proplist)
+        self.proplistscroll.setWidget(self.proplist)
 
         # splitter splits tree from properties
         self.splitter = qt4.QSplitter(qt4.Qt.Vertical, self)
         self.setWidget(self.splitter)
         self.splitter.addWidget(self.treeview)
-        self.splitter.addWidget(self.proplist)
+        self.splitter.addWidget(self.proplistscroll)
 
     def slotTreeItemSelected(self, current, previous):
         """New item selected in tree.
@@ -281,12 +282,23 @@ class PropertyList(qt4.QWidget):
             self.layout.addWidget(lab, row, 0)
             self.children.append(lab)
 
-            temp = qt4.QLabel('foo', self)
-            self.layout.addWidget(temp, row, 1)
-            self.children.append(temp)
+            cntrl = setn.makeControl(self)
+            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                         self.slotSettingChanged)
+            self.layout.addWidget(cntrl, row, 1)
+            self.children.append(cntrl)
 
             row += 1
 
+    def slotSettingChanged(self, widget, setting, val):
+        """Called when a setting is changed by the user.
+        
+        This updates the setting to the value using an operation so that
+        it can be undone.
+        """
+        
+        self.document.applyOperation(document.OperationSettingSet(setting, val))
+            
 ##############################################################
 
 # define this so stuff runs below (all needs updating for qt4)
