@@ -202,10 +202,10 @@ class FunctionPlotter(GenericPlotter):
                 endpt = qt4.QPointF(x2, pypts[-1])
 
         # add the points between (clipped to the bounds*2 - helps edges)
-        xw = x2-x1
-        xclip = N.clip(pxpts, x1-xw, x2+xw)
-        yw = y2-y1
-        yclip = N.clip(pypts, y1-yw, y2+yw)
+        xw = abs(x2-x1)
+        xclip = N.clip(pxpts, x1-xw-1, x2+xw+1)
+        yw = abs(y2-y1)
+        yclip = N.clip(pypts, y1-yw-1, y2+yw+1)
         for x, y in itertools.izip(xclip, yclip):
             pts.append( qt4.QPointF(x, y) )
 

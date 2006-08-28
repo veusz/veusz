@@ -60,7 +60,7 @@ def _populateCombo(combo, items):
     combo.addItems(items)
     
     # set index to current value
-    combo.setCurrentItem(index)
+    combo.setCurrentIndex(index)
 
 class Edit(qt4.QLineEdit):
     """Main control for editing settings which are text."""
@@ -197,10 +197,14 @@ class String(qt4.QWidget):
         self.setting = setting
         self.edit = qt4.QLineEdit(self)
         b = self.button = qt4.QPushButton('..', self)
-        b.setMaximumWidth(b.height())
+        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        b.setMaximumHeight(self.edit.height())
+        b.setMaximumWidth(b.height()/2)
         b.setCheckable(True)
 
         layout = qt4.QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setMargin(0)
         layout.addWidget(self.edit)
         layout.addWidget(b)
 
@@ -309,8 +313,15 @@ class Choice(qt4.QComboBox):
             for icon, text in itertools.izip(icons, vallist):
                 self.addItem(icon, text)
 
-        # set the text of the widget to the setting
-        self.setEditText( setting.toText() )
+        # choose the correct setting
+        try:
+            index = list(vallist).index(setting.toText())
+            self.setCurrentIndex(index)
+        except ValueError:
+            # for cases when this is editable
+            # set the text of the widget to the setting
+            assert iseditable
+            self.setEditText( setting.toText() )
 
         # if a different item is selected
         self.connect( self, qt4.SIGNAL('activated(const QString&)'),
@@ -361,14 +372,14 @@ class MultiLine(qt4.QTextEdit):
         """Initialise the widget."""
 
         qt4.QTextEdit.__init__(self, parent)
-        self.bgcolor = self.paletteBackgroundColor()
+        self.bgcolor = self.palette().color(qt4.QPalette.Window)
         self.setting = setting
 
-        self.setTextFormat(qt4.Qt.PlainText)
-        self.setWordWrap(qt4.QTextEdit.NoWrap)
+        self.setWordWrapMode(qt4.QTextOption.NoWrap)
+        self.setTabChangesFocus(True)
         
         # set the text of the widget to the 
-        self.setText( setting.toText() )
+        self.setPlainText( setting.toText() )
 
         self.setting.setOnModified(self.onModified)
 
@@ -379,21 +390,21 @@ class MultiLine(qt4.QTextEdit):
         """Allows us to check the contents of the widget."""
         qt4.QTextEdit.focusOutEvent(self, *args)
 
-        text = unicode(self.text())
+        text = unicode(self.toPlainText())
         try:
             val = self.setting.fromText(text)
-            self.setPaletteBackgroundColor(self.bgcolor)
+            self.palette().setColor(qt4.QPalette.Window, self.bgcolor)
             
             # value has changed
             if self.setting.val != val:
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
-            self.setPaletteBackgroundColor(qt4.QColor('red'))
+            self.palette().setColor(qt4.QPalette.Window, qt4.QColor('red'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
-        self.setText( self.setting.toText() )
+        self.setPlainText( self.setting.toText() )
 
 class Distance(Choice):
     """For editing distance settings."""
@@ -511,6 +522,7 @@ class FillStyle(Choice):
             pix = qt4.QPixmap(size, size)
             pix.fill()
             painter = qt4.QPainter(pix)
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
             brush = qt4.QBrush(c, cls._fillcnvt[f])
             painter.fillRect(0, 0, size, size, brush)
             painter.end()
@@ -540,6 +552,7 @@ class Marker(Choice):
             pix = qt4.QPixmap(size, size)
             pix.fill()
             painter = qt4.QPainter(pix)
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
             painter.setBrush(c)
             utils.plotMarker(painter, size/2, size/2, marker, int(size*0.33))
             painter.end()
@@ -572,6 +585,7 @@ class LineStyle(Choice):
             pix = qt4.QPixmap(size*4, size)
             pix.fill()
             painter = qt4.QPainter(pix)
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
             pen = qt4.QPen(c, 2, cls._linecnvt[l])
             painter.setPen(pen)
             painter.drawLine(size, size/2, size*3, size/2)
@@ -606,11 +620,19 @@ class Color(qt4.QWidget):
         self.connect(c, qt4.SIGNAL('activated(const QString&)'),
                      self.slotActivated )
 
-        # set current value
-        c.setEditText( self.setting.toText() )
+        # choose the correct setting
+        try:
+            index = self._colors.index(setting.toText())
+            self.combo.setCurrentIndex(index)
+        except ValueError:
+            # not existing colors
+            # set the text of the widget to the setting
+            self.combo.setEditText( setting.toText() )
 
         # button for selecting colors
         b = self.button = qt4.QPushButton(self)
+        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        b.setMaximumHeight(self.combo.height())
         b.setMaximumWidth(b.height())
         self.connect(b, qt4.SIGNAL('clicked()'),
                      self.slotButtonClicked)
@@ -620,6 +642,8 @@ class Color(qt4.QWidget):
             b.setEnabled(False)
                      
         layout = qt4.QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setMargin(0)
         layout.addWidget(c)
         layout.addWidget(b)
 
@@ -721,7 +745,7 @@ class Axis(Choice):
         """Update list of axes."""
         self._populateEntries()
 
-class ListSet(qt4.QWidget):
+class ListSet(qt4.QFrame):
     """A widget for constructing settings which are lists of other
     properties.
 
@@ -742,11 +766,14 @@ class ListSet(qt4.QWidget):
         parent is the parent widget.
         """
         
-        qt4.QWidget.__init__(self, parent)
+        qt4.QFrame.__init__(self, parent)
+        self.setFrameStyle(qt4.QFrame.Box)
         self.defaultval = defaultval
         self.setting = setting
         self.controls = []
-        self.layout = qt4.QGridLayout(self, 1, 1, 2, 2)
+        self.layout = qt4.QGridLayout(self)
+        self.layout.setMargin( self.layout.margin()/2 )
+        self.layout.setSpacing( self.layout.spacing()/4 )
 
         # ignore changes if this set
         self.ignorechange = False
@@ -768,7 +795,7 @@ class ListSet(qt4.QWidget):
         self.controls = []
         for c in self.children():
             if isinstance(c, qt4.QWidget):
-                self.layout.remove(c)
+                self.layout.removeWidget(c)
                 c.deleteLater()
         c = None
 
@@ -780,27 +807,31 @@ class ListSet(qt4.QWidget):
                 i.show()
             self.controls.append(cntrls)
 
-        h = qt4.QHBoxLayout(self)
-        self.layout.addMultiCellWidget(h, row+1, row+1, 0,
-                                       self.layout.numCols()-1)
+        # buttons at end
+        bbox = qt4.QWidget(self)
+        h = qt4.QHBoxLayout(bbox)
+        h.setMargin(0)
+        self.layout.addWidget(bbox, row+1, 0, 1, -1)
         
         # a button to add a new entry
-        b = qt4.QPushButton('Add new entry', h)
+        b = qt4.QPushButton('Add', bbox)
+        h.addWidget(b)
         self.connect(b, qt4.SIGNAL('clicked()'), self.onAddClicked)
         b.show()
 
         # a button to delete the last entry
-        b = qt4.QPushButton('Delete entry', h)
+        b = qt4.QPushButton('Delete', bbox)
+        h.addWidget(b)
         self.connect(b, qt4.SIGNAL('clicked()'), self.onDeleteClicked)
         b.setEnabled( len(self.setting.val) > 0 )
         b.show()
-        h.show()
         
         self._adjustSize()
         
     def _adjustSize(self):
         """Tell the Grid to make us the correct size."""
-        
+
+        return
         # EVIL CODE BELOW - KLUDGE!
         # when the widget resizes, it must tell the QTable it is in
         # to adjust its row! Yuck! There must be a better way to do this
@@ -870,8 +901,10 @@ class ListSet(qt4.QWidget):
         wcolor.setMaximumWidth(wcolor.height())
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
         pix.fill( qt4.QColor(color) )
-        wcolor.setIconSet( qt4.QIconSet(pix) )
-        qt4.QToolTip.add(wcolor, tooltip)
+        wcolor.setIcon( qt4.QIcon(pix) )
+        wcolor.setToolTip(tooltip)
+        wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+
         self.connect(wcolor, qt4.SIGNAL('clicked()'), self.onColorClicked)
         return wcolor
 
@@ -882,7 +915,7 @@ class ListSet(qt4.QWidget):
         wtoggle = qt4.QCheckBox(self)
         self.layout.addWidget(wtoggle, row, col)
         wtoggle.setChecked(toggle)
-        qt4.QToolTip.add(wtoggle, tooltip)
+        wtoggle.setToolTip(tooltip)
         self.connect(wtoggle, qt4.SIGNAL('toggled(bool)'), self.onToggled)
         return wtoggle
 
@@ -894,15 +927,15 @@ class ListSet(qt4.QWidget):
         wcombo = qt4.QComboBox(self)
         self.layout.addWidget(wcombo, row, col)
 
-        if texts == None:
-            for pixmap in icons:
-                wcombo.insertItem(pixmap)
+        if texts is None:
+            for icon in icons:
+                wcombo.addItem(icon, "")
         else:
-            for text, pixmap in zip(texts, icons):
-                wcombo.insertItem(pixmap, text)
+            for text, icon in itertools.izip(texts, icons):
+                wcombo.addItem(icon, text)
 
-        wcombo.setCurrentItem(values.index(val))
-        qt4.QToolTip.add(wcombo, tooltip)
+        wcombo.setCurrentIndex(values.index(val))
+        wcombo.setToolTip(tooltip)
         self.connect(wcombo, qt4.SIGNAL('activated(int)'),
                      self.onComboChanged)
         wcombo._vz_values = values
@@ -946,7 +979,7 @@ class ListSet(qt4.QWidget):
             # change the color
             pix = qt4.QPixmap(self.pixsize, self.pixsize)
             pix.fill(qt4.QColor(color))
-            sender.setIconSet( qt4.QIconSet(pix) )
+            sender.setIcon( qt4.QIcon(pix) )
             
 class LineSet(ListSet):
     """A list of line styles.
@@ -972,12 +1005,12 @@ class LineSet(ListSet):
         wwidth = qt4.QLineEdit(self)
         self.layout.addWidget(wwidth, row, 1)
         wwidth.setText(self.setting.val[row][1])
-        qt4.QToolTip.add(wwidth, 'Line width')
+        wwidth.setToolTip('Line width')
         self.connect(wwidth, qt4.SIGNAL('returnPressed()'),
                      self.onWidthChanged)
         self.connect(wwidth, qt4.SIGNAL('lostFocus()'),
                      self.onWidthChanged)
-        self.bgcolor = wwidth.paletteBackgroundColor()
+        self.bgcolor = wwidth.palette().color(qt4.QPalette.Window)
 
         # make color selector button
         wcolor = self.addColorButton(row, 2, 'Line color')
@@ -997,11 +1030,11 @@ class LineSet(ListSet):
         text = unicode(sender.text())
         if setting.Distance.isDist(text):
             # valid distance
-            sender.setPaletteBackgroundColor(self.bgcolor)
+            sender.palette().setColor(qt4.QPalette.Window, self.bgcolor)
             self._updateRowCol(row, col, text)
         else:
             # invalid distance
-            sender.setPaletteBackgroundColor(qt4.QColor('red'))
+            sender.palette().setColor(qt4.QPalette.Window, qt4.QColor('red'))
 
 class FillSet(ListSet):
     """A list of fill settings."""

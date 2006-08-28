@@ -263,6 +263,9 @@ class PropertyList(qt4.QWidget):
         self.document = document
 
         self.layout = qt4.QGridLayout(self)
+
+        self.layout.setSpacing( self.layout.spacing()/2 )
+        
         self.children = []
 
     def updateProperties(self, settings):
@@ -277,8 +280,9 @@ class PropertyList(qt4.QWidget):
 
         for setn in settings.getSettingList():
             # label for setting
-            text = '<strong>%s</strong> - %s' % (setn.name, setn.descr)
+            text = '<strong>%s</strong>' % setn.name
             lab = qt4.QLabel(text, self)
+            lab.setToolTip(setn.descr)
             self.layout.addWidget(lab, row, 0)
             self.children.append(lab)
 
