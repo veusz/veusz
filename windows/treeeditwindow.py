@@ -255,6 +255,78 @@ class TreeEditWindow2(qt4.QDockWidget):
         settings = self.treemodel.getSettings(index)
         self.proplist.updateProperties(settings)
 
+class SettingLabelButton(qt4.QPushButton):
+    """A label next to each setting in the form of a button."""
+
+    def __init__(self, document, setting, parent):
+        """Initialise botton, passing document, setting, and parent widget."""
+        
+        qt4.QPushButton.__init__(self, setting.name, parent)
+
+        self.document = document
+        self.setting = setting
+
+        self.setToolTip(setting.descr)
+        self.connect(self, qt4.SIGNAL('clicked()'), self.settingMenu)
+        self.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+
+    def settingMenu(self):
+        """Pop up menu for each setting."""
+
+        # forces settings to be updated
+        self.parentWidget().setFocus()
+        # get it back straight away
+        self.setFocus()
+
+        # get widget, with its type and name
+        widget = self.setting.parent
+        while not isinstance(widget, widgets.Widget):
+            widget = widget.parent
+        self._clickwidget = widget
+
+        wtype = widget.typename
+        name = widget.name
+
+        popup = qt4.QMenu(self)
+        popup.addAction('Reset to default', self.actionResetDefault)
+        popup.addSeparator()
+        popup.addAction('Copy to "%s" widgets' % wtype,
+                        self.actionCopyTypedWidgets)
+        popup.addAction('Copy to "%s" siblings' % wtype,
+                        self.actionCopyTypedSiblings)
+        popup.addAction('Copy to "%s" widgets called "%s"' % (wtype, name),
+                        self.actionCopyTypedNamedWidgets)
+        popup.addSeparator()
+        popup.addAction('Make default for "%s" widgets' % wtype,
+                        self.actionDefaultTyped)
+        popup.addAction('Make default for "%s" widgets called "%s"' %
+                        (wtype, name),
+                        self.actionDefaultTypedNamed)
+        popup.addAction('Forget this default setting',
+                        self.actionDefaultForget)
+        popup.exec_(qt4.QCursor.pos())
+
+    def actionResetDefault(self):
+        self.document.applyOperation( document.OperationSettingSet(self.setting, self.setting.default) )
+
+    def actionCopyTypedWidgets(self):
+        self.document.applyOperation( document.OperationSettingPropagate(self.setting) )
+
+    def actionCopyTypedSiblings(self):
+        self.document.applyOperation( document.OperationSettingPropagate(self.setting, root=self._clickwidget.parent, maxlevels=1) )
+
+    def actionCopyTypedNamedWidgets(self):
+        self.document.applyOperation( document.OperationSettingPropagate(self.setting, widgetname=self._clickwidget.name) )
+
+    def actionDefaultTyped(self):
+        self.setting.setAsDefault(False)
+
+    def actionDefaultTypedNamed(self):
+        self.setting.setAsDefault(True)
+
+    def actionDefaultForget(self):
+        self.setting.removeDefault()
+    
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
 
@@ -279,10 +351,7 @@ class PropertyList(qt4.QWidget):
         # FIXME: add actions
 
         for setn in settings.getSettingList():
-            # label for setting
-            text = '<strong>%s</strong>' % setn.name
-            lab = qt4.QLabel(text, self)
-            lab.setToolTip(setn.descr)
+            lab = SettingLabelButton(self.document, setn, self)
             self.layout.addWidget(lab, row, 0)
             self.children.append(lab)
 
@@ -302,6 +371,7 @@ class PropertyList(qt4.QWidget):
         """
         
         self.document.applyOperation(document.OperationSettingSet(setting, val))
+        
             
 ##############################################################
 
@@ -470,7 +540,7 @@ class _NewPropertyLabel(XHBox):
         self.menubutton.setFocus()
 
         widget = self.getWidget()
-        type = widget.typename
+        wtype = widget.typename
         name = widget.name
         
         # construct the popup menu
@@ -478,14 +548,14 @@ class _NewPropertyLabel(XHBox):
 
         popup.insertItem('Reset to default', 0)
         popup.insertSeparator()
-        popup.insertItem('Copy to "%s" widgets' % type, 100)
-        popup.insertItem('Copy to "%s" siblings' % type, 101)
+        popup.insertItem('Copy to "%s" widgets' % wtype, 100)
+        popup.insertItem('Copy to "%s" siblings' % wtype, 101)
         popup.insertItem('Copy to "%s" widgets called "%s"' %
-                         (type, name), 102)
+                         (wtype, name), 102)
         popup.insertSeparator()
-        popup.insertItem('Make default for "%s" widgets' % type, 200)
+        popup.insertItem('Make default for "%s" widgets' % wtype, 200)
         popup.insertItem('Make default for "%s" widgets called "%s"' %
-                         (type, name), 201)
+                         (wtype, name), 201)
         popup.insertItem('Forget this default setting', 202)
 
         #pos = self.menubutton.mapToGlobal(self.menubutton.pos())
@@ -614,32 +684,34 @@ class _PropertyLabelLabel(qt4.QLabel):
         # get it back straight away
         self.setFocus()
 
-        # darken the widget (gives stability)
-        self.inmenu = True
-        self._setBg()
-
         # get widget, with its type and name
         widget = self.setting.parent
         while not isinstance(widget, widgets.Widget):
             widget = widget.parent
 
-        type = widget.typename
+        wtype = widget.typename
         name = widget.name
-        
-        # construct the popup menu
-        popup = qt4.QPopupMenu(self)
 
-        popup.insertItem('Reset to default', 0)
-        popup.insertSeparator()
-        popup.insertItem('Copy to "%s" widgets' % type, 100)
-        popup.insertItem('Copy to "%s" siblings' % type, 101)
-        popup.insertItem('Copy to "%s" widgets called "%s"' %
-                         (type, name), 102)
-        popup.insertSeparator()
-        popup.insertItem('Make default for "%s" widgets' % type, 200)
-        popup.insertItem('Make default for "%s" widgets called "%s"' %
-                         (type, name), 201)
-        popup.insertItem('Forget this default setting', 202)
+        popup = qt4.QMenu(self)
+        popup.addAction('Reset to default', self.actionResetDefault)
+        popup.addSeparator()
+        popup.addAction('Copy to "%s" widgets' % wtype,
+                        self.actionCopyTypedWidgets)
+        popup.addAction('Copy to "%s" siblings' % wtype,
+                        self.actionCopyTypedSiblings)
+        popup.addAction('Copy to "%s" widgets called "%s"' % (wtype, name),
+                        self.actionCopyTypedNamedWidgets)
+        popup.addSeparator()
+        popup.addAction('Make default for "%s" widgets' % wtype,
+                        self.actionDefaultTyped)
+        popup.addAction('Make default for "%s" widgets called "%s"' %
+                        (wtype, name),
+                        self.actionDefaultTypedNamed)
+        popup.addAction('Forget this default setting',
+                        self.actionDefaultForget)
+        popup.exec_()
+
+    def actionCopyTypedWidgets(self):
         
         ret = popup.exec_loop( event.globalPos() )
 
