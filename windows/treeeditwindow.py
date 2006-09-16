@@ -219,8 +219,9 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 class TreeEditWindow2(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
-    def __init__(self, document, *args):
-        qt4.QDockWidget.__init__(self, *args)
+    def __init__(self, document, parent):
+        qt4.QDockWidget.__init__(self, parent)
+        self.parent = parent
         self.setWindowTitle("Editing - Veusz")
 
         # construct tree
@@ -245,6 +246,13 @@ class TreeEditWindow2(qt4.QDockWidget):
         self.splitter.addWidget(self.treeview)
         self.splitter.addWidget(self.proplistscroll)
 
+        # toolbar to create widgets, etc
+        self.toolbar = qt4.QToolBar("Editing toolbar - Veusz",
+                                    parent)
+        self.toolbar.setOrientation(qt4.Qt.Vertical)
+        parent.addToolBar(qt4.Qt.LeftToolBarArea, self.toolbar)
+        self._constructToolbarMenu()
+
     def slotTreeItemSelected(self, current, previous):
         """New item selected in tree.
 
@@ -254,6 +262,205 @@ class TreeEditWindow2(qt4.QDockWidget):
         index = current.indexes()[0]
         settings = self.treemodel.getSettings(index)
         self.proplist.updateProperties(settings)
+
+    def _getWidgetOrder(self):
+        """Return a list of the widgets, most important first.
+        """
+
+        # get list of allowed classes
+        wcl = [(i.typename, i)
+               for i in document.thefactory.listWidgetClasses()
+               if i.allowusercreation]
+        wcl.sort()
+
+        # build up a list of pairs for topological sort
+        pairs = []
+        for name, wc in wcl:
+            for pwc in wc.allowedparenttypes:
+                pairs.append( (pwc, wc) )
+
+        # do topological sort
+        sorted = utils.topsort(pairs)
+
+        return sorted
+
+    def _constructToolbarMenu(self):
+        """Add items to edit/add graph toolbar and menu."""
+
+        class _BoundCaller(object):
+            """A callable class to wrap a function and its arguments."""
+            def __init__(self, fn, *params):
+                self.fn = fn
+                self.params = params
+            def __call__(self, *params):
+                self.fn( *(self.params+params) )
+
+        self.toolbar.setIconSize( qt4.QSize(16, 16) )
+
+        actions = []
+        self.addslots = []
+        for wc in self._getWidgetOrder():
+            name = wc.typename
+            if wc.allowusercreation:
+
+                slot = _BoundCaller(self.slotMakeWidgetButton, wc)
+                self.addslots.append(slot)
+
+                val = ( 'add%s' % wc, wc.description,
+                        'Add %s' % name, 'insert',
+                        slot,
+                        'button_%s.png' % name,
+                        True, '')
+                actions.append(val)
+        action.populateMenuToolbars(actions, self.toolbar,
+                                    self.parent.menus)
+        self.toolbar.addSeparator()
+
+        # make buttons and menu items for the various item editing ops
+        moveup = _BoundCaller(self.slotWidgetMove, -1)
+        movedown = _BoundCaller(self.slotWidgetMove, 1)
+        self.addslots += [moveup, movedown]
+
+        edititems = [
+            ('cut', 'Cut the selected item', 'Cu&t', 'edit',
+             self.slotWidgetCut, 'stock-cut.png', True, 'Ctrl+X'),
+            ('copy', 'Copy the selected item', '&Copy', 'edit',
+             self.slotWidgetCopy, 'stock-copy.png', True, 'Ctrl+C'),
+            ('paste', 'Paste item from the clipboard', '&Paste', 'edit',
+             self.slotWidgetPaste, 'stock-paste.png', True, 'Ctrl+V'),
+            ('moveup', 'Move the selected item up', 'Move &up', 'edit',
+             moveup, 'stock-go-up.png',
+             True, ''),
+            ('moveup', 'Move the selected item down', 'Move d&own', 'edit',
+             movedown, 'stock-go-down.png',
+             True, ''),
+            ('delete', 'Remove the selected item', '&Delete', 'edit',
+             self.slotWidgetDelete, 'stock-delete.png', True, '')
+            ]
+        action.populateMenuToolbars(edititems, self.toolbar,
+                                    self.parent.menus)
+
+    def slotMakeWidgetButton(self, wc):
+        print wc
+
+    def slotWidgetCut(self, a):
+        """Cut the selected widget"""
+        self.slotWidgetCopy(a)
+        self.slotWidgetDelete(a)
+        self.updatePasteButton()
+
+    def slotWidgetCopy(self, a):
+        """Copy selected widget to the clipboard."""
+        clipboard = qt4.qApp.clipboard()
+        dragObj = self._makeDragObject(self.itemselected.widget)
+        clipboard.setData(dragObj, clipboard.Clipboard)
+        self.updatePasteButton()
+        
+    def slotWidgetPaste(self, a):
+        """Paste something from the clipboard"""
+
+        data = self.getClipboardData()
+        if data:
+            # The first line of the clipboard data is the widget type
+            widgettype = data[0]
+            # The second is the original name
+            widgetname = data[1]
+
+            # make the document enter batch mode
+            # This is so that the user can undo this in one step
+            op = document.OperationMultiple([], descr='paste')
+            self.document.applyOperation(op)
+            self.document.batchHistory(op)
+            
+            # Add the first widget being pasted
+            self.makeWidget(widgettype, autoadd=False, name=widgetname)
+            
+            interpreter = self.parent.interpreter
+        
+            # Select the current widget in the interpreter
+            tmpCurrentwidget = interpreter.interface.currentwidget
+            interpreter.interface.currentwidget = self.itemselected.widget
+
+            # Use the command interface to create the subwidgets
+            for command in data[2:]:
+                interpreter.run(command)
+                
+            # stop the history batching
+            self.document.batchHistory(None)
+                
+            # reset the interpreter widget
+            interpreter.interface.currentwidget = tmpCurrentwidget
+            
+    def slotWidgetDelete(self, a):
+        """Delete the widget selected."""
+
+        # no item selected, so leave
+        if self.itemselected == None:
+            return
+
+        # work out which widget to delete
+        w = self.itemselected.getAssociatedWidget()
+            
+        # get the item to next get the selection when this widget is deleted
+        # this is done by looking down the list to get the next useful one
+        next = self.itemselected
+        while next != None and (next.widget == w or (next.widget == None and
+                                                     next.parent.widget == w)):
+            next = next.itemBelow()
+
+        # if there aren't any, use the root item
+        if next == None:
+            next = self.rootitem
+
+        # remove the reference
+        self.itemselected = None
+
+        # delete selected widget
+        self.document.applyOperation( document.OperationWidgetDelete(w) )
+
+        # select the next widget
+        self.listview.ensureItemVisible(next)
+        self.listview.setSelected(next, True)
+
+    def selectWidget(self, widget):
+        """Select the associated listviewitem for the widget w in the
+        listview."""
+        
+        # an iterative algorithm, rather than a recursive one
+        # (for a change)
+        found = False
+        l = [self.listview.firstChild()]
+        while len(l) != 0 and not found:
+            item = l.pop()
+
+            i = item.firstChild()
+            while i != None:
+                if i.widget == widget:
+                    found = True
+                    break
+                else:
+                    l.append(i)
+                i = i.nextSibling()
+
+        assert found
+        self.listview.ensureItemVisible(i)
+        self.listview.setSelected(i, True)
+
+    def slotWidgetMove(self, direction):
+        """Move the selected widget up/down in the hierarchy.
+
+        a is the action (unused)
+        direction is -1 for 'up' and +1 for 'down'
+        """
+
+        # get the widget to act as the parent
+        w = self.itemselected.getAssociatedWidget()
+
+        # actually move the widget
+        self.document.applyOperation( document.OperationWidgetMove(w, direction) )
+
+        # try to highlight the associated item
+        self.selectWidget(w)
 
 class SettingLabelButton(qt4.QPushButton):
     """A label next to each setting in the form of a button."""
