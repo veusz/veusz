@@ -46,12 +46,12 @@ class Widget(object):
             print self.typename, parent.typename, parent.name
             raise RuntimeError, "parent is of incorrect type"
 
-        if name == None:
+        if name is None:
             name = self.chooseName()
         self.name = name
 
         # propagate document
-        if parent != None:
+        if parent is not None:
             self.document = parent.document
             parent.addChild(self)
 
@@ -80,7 +80,7 @@ class Widget(object):
     def rename(self, name):
         """Change name of self."""
 
-        if self.parent == None:
+        if self.parent is None:
             raise ValueError, 'Cannot rename root widget'
 
         if name.find('/') != -1:
@@ -112,7 +112,7 @@ class Widget(object):
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
         ap = self.allowedparenttypes 
-        if parent == None and len(ap)>0 and ap[0] == None:
+        if parent is None and len(ap)>0 and ap[0] is None:
             return True
         
         for p in ap:
@@ -125,7 +125,7 @@ class Widget(object):
 
         # allow base widget to have no parent
         ap = cls.allowedparenttypes 
-        if parent == None and len(ap) > 0 and ap[0] == None:
+        if parent is None and len(ap) > 0 and ap[0] is None:
             return True
         
         for p in ap:
@@ -153,7 +153,7 @@ class Widget(object):
     def chooseName(self):
         """Make a name for widget if not specified."""
 
-        if self.parent == None:
+        if self.parent is None:
             return '/'
         else:
             return self.parent.createUniqueName(self.typename)
@@ -197,7 +197,7 @@ class Widget(object):
 
     def hasChild(self, name):
         """Return whether there is a child with a name."""
-        return self.getChild(name) != None
+        return self.getChild(name) is not None
 
     def _getChildNames(self):
         """Return the child names."""
@@ -223,7 +223,7 @@ class Widget(object):
 
         obj = self
         build = ''
-        while obj.parent != None:
+        while obj.parent is not None:
             build = '/' + obj.name + build
             obj = obj.parent
 
