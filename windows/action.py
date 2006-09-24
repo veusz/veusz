@@ -43,7 +43,6 @@ def getIcon(icon):
         _iconcache[icon] = qt4.QIcon(pixmap)
     return _iconcache[icon]
 
-
 def populateMenuToolbars(items, toolbar, menus):
     """Construct the menus and toolbar from the list of items.
     toolbar is a QToolbar object
@@ -97,7 +96,6 @@ def populateMenuToolbars(items, toolbar, menus):
         else:
             if menus is not None:
                 menus[menu].addAction(action)
-                
 
         # add to toolbar
         if addtool and toolbar != None:

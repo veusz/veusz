@@ -304,6 +304,13 @@ class Widget(object):
 
         self.settings.readDefaults('', self.name)
 
+    def buildFlatWidgetList(self, thelist):
+        """Return a built up list of the widgets in the tree."""
+
+        thelist.append(self)
+        for child in self.children:
+            child.buildFlatWidgetList(thelist)
+
     def _recursiveBuildSlots(self, slots):
         """Build up a flat representation of the places where widgets
         can be placed

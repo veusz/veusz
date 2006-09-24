@@ -160,6 +160,25 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         return self.createIndex(row, column, cid)
 
+    def getWidgetIndex(self, widget):
+        """Returns index for widget specified."""
+
+        # walk index tree back to widget from root
+        widgetlist = []
+        w = widget
+        while w is not None:
+            widgetlist.append(w)
+            w = w.parent
+
+        # now iteratively look up indices
+        parent = qt4.QModelIndex()
+        while widgetlist:
+            w = widgetlist.pop()
+            row = self._getChildren(w.parent).index(w)
+            parent = self.index(row, 0, parent)
+
+        return parent
+    
     def _getParent(self, obj):
         """Work out a parent for an object
 
@@ -216,6 +235,14 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         else:
             return obj
 
+    def getWidget(self, index):
+        """Get associated widget for index selected."""
+        obj = self.objdict[index.internalId()]
+
+        while not obj.isWidget():
+            obj = obj.parent
+        return obj
+
 class TreeEditWindow2(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
@@ -225,6 +252,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         self.setWindowTitle("Editing - Veusz")
 
         # construct tree
+        self.document = document
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
@@ -253,15 +281,55 @@ class TreeEditWindow2(qt4.QDockWidget):
         parent.addToolBar(qt4.Qt.LeftToolBarArea, self.toolbar)
         self._constructToolbarMenu()
 
+        # this sets various things up
+        self.selectWidget(document.basewidget)
+
     def slotTreeItemSelected(self, current, previous):
         """New item selected in tree.
 
         This updates the list of properties
         """
         
-        index = current.indexes()[0]
-        settings = self.treemodel.getSettings(index)
+        indexes = current.indexes()
+
+        if len(indexes) > 1:
+            index = indexes[0]
+            self.selwidget = self.treemodel.getWidget(index)
+            settings = self.treemodel.getSettings(index)
+        else:
+            self.selwidget = None
+            settings = None
+
         self.proplist.updateProperties(settings)
+        self._enableCorrectButtons()
+
+    def _enableCorrectButtons(self):
+        """Make sure the create graph buttons are correctly enabled."""
+
+        selw = self.selwidget
+
+        # check whether each button can have this widget
+        # (or a parent) as parent
+
+        menu = self.parent.menus['insert']
+        for wc, action in self.addslots.iteritems():
+            w = selw
+            while w is not None and not wc.willAllowParent(w):
+                w = w.parent
+
+            self.addactions['add%s' % wc.typename].setEnabled(w is not None)
+
+        # certain actions shouldn't allow root to be deleted
+        isnotroot = not isinstance(selw, widgets.Root)
+
+        for i in ('cut', 'copy', 'delete', 'moveup', 'movedown'):
+            self.editactions[i].setEnabled(isnotroot)
+
+        if isnotroot:
+            # cut and copy aren't currently possible on a non-widget
+            cancopy = selw is not None
+            self.editactions['cut'].setEnabled(cancopy)
+            self.editactions['copy'].setEnabled(cancopy)
 
     def _getWidgetOrder(self):
         """Return a list of the widgets, most important first.
@@ -298,28 +366,28 @@ class TreeEditWindow2(qt4.QDockWidget):
         self.toolbar.setIconSize( qt4.QSize(16, 16) )
 
         actions = []
-        self.addslots = []
+        self.addslots = {}
         for wc in self._getWidgetOrder():
             name = wc.typename
             if wc.allowusercreation:
 
                 slot = _BoundCaller(self.slotMakeWidgetButton, wc)
-                self.addslots.append(slot)
+                self.addslots[wc] = slot
 
-                val = ( 'add%s' % wc, wc.description,
+                val = ( 'add%s' % name, wc.description,
                         'Add %s' % name, 'insert',
                         slot,
                         'button_%s.png' % name,
                         True, '')
                 actions.append(val)
-        action.populateMenuToolbars(actions, self.toolbar,
-                                    self.parent.menus)
+        self.addactions = action.populateMenuToolbars(actions, self.toolbar,
+                                                      self.parent.menus)
         self.toolbar.addSeparator()
 
         # make buttons and menu items for the various item editing ops
         moveup = _BoundCaller(self.slotWidgetMove, -1)
         movedown = _BoundCaller(self.slotWidgetMove, 1)
-        self.addslots += [moveup, movedown]
+        self.editslots = [moveup, movedown]
 
         edititems = [
             ('cut', 'Cut the selected item', 'Cu&t', 'edit',
@@ -331,28 +399,71 @@ class TreeEditWindow2(qt4.QDockWidget):
             ('moveup', 'Move the selected item up', 'Move &up', 'edit',
              moveup, 'stock-go-up.png',
              True, ''),
-            ('moveup', 'Move the selected item down', 'Move d&own', 'edit',
+            ('movedown', 'Move the selected item down', 'Move d&own', 'edit',
              movedown, 'stock-go-down.png',
              True, ''),
             ('delete', 'Remove the selected item', '&Delete', 'edit',
              self.slotWidgetDelete, 'stock-delete.png', True, '')
             ]
-        action.populateMenuToolbars(edititems, self.toolbar,
-                                    self.parent.menus)
+        self.editactions = action.populateMenuToolbars(edititems, self.toolbar,
+                                                       self.parent.menus)
 
     def slotMakeWidgetButton(self, wc):
-        print wc
+        """User clicks button to make widget."""
+        self.makeWidget(wc.typename)
 
-    def slotWidgetCut(self, a):
+    def makeWidget(self, widgettype, autoadd=True, name=None):
+        """Called when an add widget button is clicked.
+        widgettype is the type of widget
+        autoadd specifies whether to add default children
+        if name is set this name is used if possible (ie no other children have it)
+        """
+
+        # if no widget selected, bomb out
+        if self.selwidget is None:
+            return
+        parent = self.getSuitableParent(widgettype)
+
+        assert parent != None
+
+        if name in parent.childnames:
+            name = None
+        
+        # make the new widget and update the document
+        w = self.document.applyOperation( document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
+                                                                      name=name) )
+
+        # select the widget
+        self.selectWidget(w)
+
+    def getSuitableParent(self, widgettype, initialParent = None):
+        """Find the nearest relevant parent for the widgettype given."""
+
+        # get the widget to act as the parent
+        if not initialParent:
+            parent = self.selwidget
+        else:
+            parent  = initialParent
+        
+        # find the parent to add the child to, we go up the tree looking
+        # for possible parents
+        wc = document.thefactory.getWidgetClass(widgettype)
+        while parent is not None and not wc.willAllowParent(parent):
+            parent = parent.parent
+
+        return parent
+
+    def slotWidgetCut(self):
         """Cut the selected widget"""
-        self.slotWidgetCopy(a)
-        self.slotWidgetDelete(a)
+        self.slotWidgetCopy()
+        self.slotWidgetDelete()
         self.updatePasteButton()
 
-    def slotWidgetCopy(self, a):
+    def slotWidgetCopy(self):
         """Copy selected widget to the clipboard."""
+
         clipboard = qt4.qApp.clipboard()
-        dragObj = self._makeDragObject(self.itemselected.widget)
+        dragObj = self._makeDragObject(self.selwidget)
         clipboard.setData(dragObj, clipboard.Clipboard)
         self.updatePasteButton()
         
@@ -379,7 +490,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         
             # Select the current widget in the interpreter
             tmpCurrentwidget = interpreter.interface.currentwidget
-            interpreter.interface.currentwidget = self.itemselected.widget
+            interpreter.interface.currentwidget = self.selwidget
 
             # Use the command interface to create the subwidgets
             for command in data[2:]:
@@ -391,60 +502,44 @@ class TreeEditWindow2(qt4.QDockWidget):
             # reset the interpreter widget
             interpreter.interface.currentwidget = tmpCurrentwidget
             
-    def slotWidgetDelete(self, a):
+    def slotWidgetDelete(self):
         """Delete the widget selected."""
 
         # no item selected, so leave
-        if self.itemselected == None:
+        w = self.selwidget
+        if w is None:
             return
 
-        # work out which widget to delete
-        w = self.itemselected.getAssociatedWidget()
-            
-        # get the item to next get the selection when this widget is deleted
-        # this is done by looking down the list to get the next useful one
-        next = self.itemselected
-        while next != None and (next.widget == w or (next.widget == None and
-                                                     next.parent.widget == w)):
-            next = next.itemBelow()
-
-        # if there aren't any, use the root item
-        if next == None:
-            next = self.rootitem
-
-        # remove the reference
-        self.itemselected = None
+        # get list of widgets in order
+        widgetlist = []
+        self.document.basewidget.buildFlatWidgetList(widgetlist)
+        
+        widgetnum = widgetlist.index(w)
+        assert widgetnum >= 0
 
         # delete selected widget
         self.document.applyOperation( document.OperationWidgetDelete(w) )
 
+        # rebuild list
+        widgetlist = []
+        self.document.basewidget.buildFlatWidgetList(widgetlist)
+
+        # find next to select
+        if widgetnum < len(widgetlist):
+            nextwidget = widgetlist[widgetnum]
+        else:
+            nextwidget = self.document.basewidget
+
         # select the next widget
-        self.listview.ensureItemVisible(next)
-        self.listview.setSelected(next, True)
+        self.selectWidget(nextwidget)
 
     def selectWidget(self, widget):
         """Select the associated listviewitem for the widget w in the
         listview."""
-        
-        # an iterative algorithm, rather than a recursive one
-        # (for a change)
-        found = False
-        l = [self.listview.firstChild()]
-        while len(l) != 0 and not found:
-            item = l.pop()
 
-            i = item.firstChild()
-            while i != None:
-                if i.widget == widget:
-                    found = True
-                    break
-                else:
-                    l.append(i)
-                i = i.nextSibling()
-
-        assert found
-        self.listview.ensureItemVisible(i)
-        self.listview.setSelected(i, True)
+        index = self.treemodel.getWidgetIndex(widget)
+        self.treeview.scrollTo(index)
+        self.treeview.setCurrentIndex(index)
 
     def slotWidgetMove(self, direction):
         """Move the selected widget up/down in the hierarchy.
@@ -553,6 +648,9 @@ class PropertyList(qt4.QWidget):
         # delete all child widgets
         while len(self.children) > 0:
             self.children.pop().deleteLater()
+
+        if settings is None:
+            return
 
         row = 0
         # FIXME: add actions
