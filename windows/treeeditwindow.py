@@ -22,7 +22,6 @@
 """
 
 import os
-import weakref
 
 import veusz.qtall as qt4
 
@@ -34,11 +33,6 @@ import action
 
 class WidgetTreeModel(qt4.QAbstractItemModel):
     """A model representing the widget tree structure.
-
-    Idea is to keep a weakref dict of the widgets in the document, mapped
-    by their object id.
-
-    The qt indices into the tree contain these ids, so they can be looked up
     """
 
     def __init__(self, document, parent=None):
@@ -47,7 +41,6 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         qt4.QAbstractItemModel.__init__(self, parent)
 
         self.document = document
-        self.objdict = weakref.WeakValueDictionary()
 
         self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.slotDocumentModified )
@@ -70,7 +63,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             return qt4.QVariant()
 
         column = index.column()
-        obj = self.objdict[index.internalId()]
+        obj = index.internalPointer()
 
         if role == qt4.Qt.DisplayRole:
             return self.getTextData(obj, column)
@@ -150,15 +143,12 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if not parent.isValid():
             parentobj = None
         else:
-            parentobj = self.objdict[parent.internalId()]
+            parentobj = parent.internalPointer()
 
         children = self._getChildren(parentobj)
 
         c = children[row]
-        cid = id(c)
-        self.objdict[cid] = c
-
-        return self.createIndex(row, column, cid)
+        return self.createIndex(row, column, c)
 
     def getWidgetIndex(self, widget):
         """Returns index for widget specified."""
@@ -198,21 +188,17 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if not index.isValid():
             return qt4.QModelIndex()
 
-        thisobj = self.objdict[index.internalId()]
+        thisobj = index.internalPointer()
         parentobj = self._getParent(thisobj)
 
         if parentobj is None:
             return qt4.QModelIndex()
         else:
-            # stick parent into dict if not there
-            pid = id(parentobj)
-            self.objdict[pid] = parentobj
-
             # lookup parent in grandparent's children
             grandparentchildren = self._getChildren(self._getParent(parentobj))
             parentrow = grandparentchildren.index(parentobj)
 
-            return self.createIndex(parentrow, 0, pid)
+            return self.createIndex(parentrow, 0, parentobj)
 
     def rowCount(self, parent):
         """Return number of rows of children."""
@@ -220,7 +206,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if not parent.isValid():
             parentobj = None
         else:
-            parentobj = self.objdict[parent.internalId()]
+            parentobj = parent.internalPointer()
 
         children = self._getChildren(parentobj)
         return len(children)
@@ -228,7 +214,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
     def getSettings(self, index):
         """Return the settings for the index selected."""
 
-        obj = self.objdict[index.internalId()]
+        obj = index.internalPointer()
 
         if obj.isWidget():
             return obj.settings
@@ -237,7 +223,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def getWidget(self, index):
         """Get associated widget for index selected."""
-        obj = self.objdict[index.internalId()]
+        obj = index.internalPointer()
 
         while not obj.isWidget():
             obj = obj.parent
