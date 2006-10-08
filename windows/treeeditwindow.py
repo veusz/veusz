@@ -232,6 +232,9 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 class TreeEditWindow2(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
+    # mime type when widgets are stored on the clipboard
+    widgetmime = 'text/x-vnd.veusz-clipboard'
+
     def __init__(self, document, parent):
         qt4.QDockWidget.__init__(self, parent)
         self.parent = parent
@@ -269,6 +272,11 @@ class TreeEditWindow2(qt4.QDockWidget):
 
         # this sets various things up
         self.selectWidget(document.basewidget)
+
+        # update paste button when clipboard changes
+        self.connect(qt4.QApplication.clipboard(),
+                     qt4.SIGNAL('dataChanged()'),
+                     self.updatePasteButton)
 
     def slotTreeItemSelected(self, current, previous):
         """New item selected in tree.
@@ -316,6 +324,7 @@ class TreeEditWindow2(qt4.QDockWidget):
             cancopy = selw is not None
             self.editactions['cut'].setEnabled(cancopy)
             self.editactions['copy'].setEnabled(cancopy)
+        self.updatePasteButton()
 
     def _getWidgetOrder(self):
         """Return a list of the widgets, most important first.
@@ -443,16 +452,57 @@ class TreeEditWindow2(qt4.QDockWidget):
         """Cut the selected widget"""
         self.slotWidgetCopy()
         self.slotWidgetDelete()
-        self.updatePasteButton()
 
     def slotWidgetCopy(self):
         """Copy selected widget to the clipboard."""
 
-        clipboard = qt4.qApp.clipboard()
-        dragObj = self._makeDragObject(self.selwidget)
-        clipboard.setData(dragObj, clipboard.Clipboard)
-        self.updatePasteButton()
-        
+        mimedata = self._makeMimeData(self.selwidget)
+        if mimedata:
+            clipboard = qt4.QApplication.clipboard()
+            clipboard.setMimeData(mimedata)
+            #clipboard.setText(mimedata)
+
+    def _makeMimeData(self, widget):
+        """Make a QMimeData object representing the subtree with the
+        current selection at the root"""
+
+        if widget:
+            mimedata = qt4.QMimeData()
+            text = str('\n'.join((widget.typename,
+                                  widget.name,
+                                  widget.getSaveText())))
+            mimedata.setData('text/plain', qt4.QByteArray(text))
+            #mimedata.setText(text)
+            return mimedata
+            #return text
+        else:
+            return None
+
+    def getClipboardData(self):
+        """Return the clipboard data if it is in the correct format."""
+
+        mimedata = qt4.QApplication.clipboard().mimeData()
+        if self.widgetmime in mimedata.formats():
+            data = unicode(mimedata.data(self.widgetmime)).split('\n')
+            return data
+        else:
+            return None
+
+    def updatePasteButton(self):
+        """Is the data on the clipboard a valid paste at the currently
+        selected widget? If so, enable paste button"""
+
+        data = self.getClipboardData()
+        show = False
+        if data:
+            # The first line of the clipboard data is the widget type
+            widgettype = data[0]
+            # Check if we can paste into the current widget or a parent
+            if self.getSuitableParent(widgettype, self.selwidget):
+                show = True
+
+        self.editactions['paste'].setEnabled(show)
+
     def slotWidgetPaste(self, a):
         """Paste something from the clipboard"""
 
@@ -1565,14 +1615,19 @@ class TreeEditWindow(XDockWindow):
         return data
 
     def _makeDragObject(self, widget):
-        """Make a QStoredDrag object representing the subtree with the
+        """Make a QDrag object representing the subtree with the
         current selection at the root"""
 
         if widget:
-            clipboardData = qt4.QStoredDrag(self.widgetmime)
+            drag = qt4.QDrag(self)
+            mimedata = qt4.QMimeData()
+
             data = str('\n'.join((widget.typename,
                 widget.name,
                 widget.getSaveText())))
+            mimedata.setText(data)
+            drag.setMimeData(mimedata)
+
             clipboardData.setEncodedData(data)
             return clipboardData
         else:
