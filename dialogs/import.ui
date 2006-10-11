@@ -9,11 +9,11 @@
     <x>0</x>
     <y>0</y>
     <width>576</width>
-    <height>480</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Veusz - Import data</string>
+   <string>Import data - Veusz</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -116,6 +116,9 @@
             <widget class="QLabel" name="label_2" >
              <property name="text" >
               <string>&amp;Descriptor</string>
+             </property>
+             <property name="buddy" >
+              <cstring>descriptoredit</cstring>
              </property>
             </widget>
            </item>
