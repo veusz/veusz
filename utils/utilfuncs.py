@@ -55,6 +55,14 @@ class WeakBoundMethod:
             raise ValueError, 'Method called on dead object'
         self.f(self.c(), *arg)
 
+class BoundCaller(object):
+    """A callable class to wrap a function and its arguments."""
+    def __init__(self, fn, *params):
+        self.fn = fn
+        self.params = params
+    def __call__(self, *params):
+        self.fn( *(self.params+params) )
+
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
 

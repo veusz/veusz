@@ -78,15 +78,12 @@ class MainWindow(qt4.QMainWindow):
         # construct menus and toolbars
         self._defineMenus()
 
-        # FIXMEQT4
-
+        # make plot window
         self.plot = plotwindow.PlotWindow(self.document, self)
         self.setCentralWidget(self.plot)
-        self.plot.createToolbar(self, self.menus['view'])
+        self.plot.showToolbar()
 
         # likewise with the tree-editing window
-        #self.treeedit = treeeditwindow.TreeEditWindow(self.document, self)
-        #self.moveDockWindow( self.treeedit, qt4.Qt.DockLeft, True, 1 )
         self.treeedit = treeeditwindow.TreeEditWindow2(self.document, self)
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.treeedit)
 
@@ -116,13 +113,12 @@ class MainWindow(qt4.QMainWindow):
         self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.slotModifiedDoc )
         # if the treeeditwindow changes the page, change the plot window
-        # FIXMEQT4
         self.connect( self.treeedit, qt4.SIGNAL("sigPageChanged"),
                       self.plot.setPageNumber )
 
         # if a widget in the plot window is clicked by the user
-        #self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
-        #              self.treeedit.slotSelectWidget )
+        self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
+                      self.treeedit.selectWidget )
 
         # put the dock windows on the view menu, so they can be shown/hidden
         #self._defineDockViewMenu()

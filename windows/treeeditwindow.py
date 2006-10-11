@@ -350,14 +350,6 @@ class TreeEditWindow2(qt4.QDockWidget):
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
-        class _BoundCaller(object):
-            """A callable class to wrap a function and its arguments."""
-            def __init__(self, fn, *params):
-                self.fn = fn
-                self.params = params
-            def __call__(self, *params):
-                self.fn( *(self.params+params) )
-
         self.toolbar.setIconSize( qt4.QSize(16, 16) )
 
         actions = []
@@ -366,7 +358,7 @@ class TreeEditWindow2(qt4.QDockWidget):
             name = wc.typename
             if wc.allowusercreation:
 
-                slot = _BoundCaller(self.slotMakeWidgetButton, wc)
+                slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
                 self.addslots[wc] = slot
 
                 val = ( 'add%s' % name, wc.description,
@@ -380,8 +372,8 @@ class TreeEditWindow2(qt4.QDockWidget):
         self.toolbar.addSeparator()
 
         # make buttons and menu items for the various item editing ops
-        moveup = _BoundCaller(self.slotWidgetMove, -1)
-        movedown = _BoundCaller(self.slotWidgetMove, 1)
+        moveup = utils.BoundCaller(self.slotWidgetMove, -1)
+        movedown = utils.BoundCaller(self.slotWidgetMove, 1)
         self.editslots = [moveup, movedown]
 
         edititems = [
