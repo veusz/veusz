@@ -463,7 +463,8 @@ class TreeEditWindow2(qt4.QDockWidget):
             text = str('\n'.join((widget.typename,
                                   widget.name,
                                   widget.getSaveText())))
-            mimedata.setData('text/plain', qt4.QByteArray(text))
+            self.mimedata = qt4.QByteArray(text)
+            mimedata.setData('text/plain', self.mimedata)
             #mimedata.setText(text)
             return mimedata
             #return text

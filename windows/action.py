@@ -84,7 +84,7 @@ def populateMenuToolbars(items, toolbar, menus):
         if callable(slot):
             # connect the action to the slot
             if slot is not None:
-                qt4.QObject.connect( action, qt4.SIGNAL('activated()'), slot )
+                qt4.QObject.connect( action, qt4.SIGNAL('triggered()'), slot )
                 # add to menu
             if menus is not None:
                 menus[menu].addAction(action)

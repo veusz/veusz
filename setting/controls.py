@@ -76,9 +76,7 @@ class Edit(qt4.QLineEdit):
         # set the text of the widget to the 
         self.setText( setting.toText() )
 
-        self.connect(self, qt4.SIGNAL('returnPressed()'),
-                     self.validateAndSet)
-        self.connect(self, qt4.SIGNAL('lostFocus()'),
+        self.connect(self, qt4.SIGNAL('editingFinished()'),
                      self.validateAndSet)
 
         self.setting.setOnModified(self.onModified)
@@ -213,9 +211,7 @@ class String(qt4.QWidget):
         # set the text of the widget to the 
         self.edit.setText( setting.toText() )
 
-        self.connect(self.edit, qt4.SIGNAL('returnPressed()'),
-                     self.validateAndSet)
-        self.connect(self.edit, qt4.SIGNAL('lostFocus()'),
+        self.connect(self.edit, qt4.SIGNAL('editingFinished()'),
                      self.validateAndSet)
         self.connect(b, qt4.SIGNAL('toggled(bool)'),
                      self.buttonToggled)
