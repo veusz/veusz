@@ -685,28 +685,41 @@ class PlotWindow( qt4.QScrollArea ):
     def slotViewZoomWidth(self):
         """Make the zoom factor so that the plot fills the whole width."""
 
-        # FIXME zoomWidth/height/page routines fail to take into account
-        # width of scroll bars
+        # need to take account of scroll bars when deciding size
+        viewportsize = self.maximumViewportSize()
+        aspectwin = viewportsize.width()*1./viewportsize.height()
+        aspectplot = self.size[0]*1./self.size[1]
 
-        width = self.visibleWidth()
-        mult = width/float(self.size[0])
+        width = viewportsize.width()
+        if aspectwin > aspectplot:
+            # take account of scroll bar
+            width -= self.verticalScrollBar().width()
+            
+        mult = width*1./self.size[0]
         self.setZoomFactor(self.zoomfactor * mult)
         
     def slotViewZoomHeight(self):
         """Make the zoom factor so that the plot fills the whole width."""
 
-        height = self.visibleHeight()
-        mult = height/float(self.size[1])
+        # need to take account of scroll bars when deciding size
+        viewportsize = self.maximumViewportSize()
+        aspectwin = viewportsize.width()*1./viewportsize.height()
+        aspectplot = self.size[0]*1./self.size[1]
+
+        height = viewportsize.height()
+        if aspectwin < aspectplot:
+            # take account of scroll bar
+            height -= self.horizontalScrollBar().height()
+            
+        mult = height*1./self.size[1]
         self.setZoomFactor(self.zoomfactor * mult)
 
     def slotViewZoomPage(self):
         """Make the zoom factor correct to show the whole page."""
 
-        width = self.visibleWidth()
-        height = self.visibleHeight()
-
-        multw = width/float(self.size[0])
-        multh = height/float(self.size[1])
+        viewportsize = self.maximumViewportSize()
+        multw = viewportsize.width()*1./self.size[0]
+        multh = viewportsize.height()*1./self.size[1]
         self.setZoomFactor(self.zoomfactor * min(multw, multh))
 
     def slotViewZoom11(self):
