@@ -34,7 +34,7 @@ import veusz.document as document
 import importdialog
 import datacreate
 
-class DatasetTableModel(qt4.QAbstractTableModel):
+class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
 
     colnames = ('data', 'serr', 'perr', 'nerr')
@@ -110,6 +110,51 @@ class DatasetTableModel(qt4.QAbstractTableModel):
                 return True
 
         return False
+
+class DatasetTableModel2D(qt4.QAbstractTableModel):
+    """A 2D dataset model."""
+
+    def __init__(self, parent, document, datasetname):
+        qt4.QAbstractTableModel.__init__(self, parent)
+
+        self.document = document
+        self.dsname = datasetname
+
+    def rowCount(self, parent):
+        ds = self.document.data[self.dsname].data
+        return ds.shape[0]
+
+    def columnCount(self, parent):
+        ds = self.document.data[self.dsname].data
+        return ds.shape[1]
+
+    def data(self, index, role):
+        if role == qt4.Qt.DisplayRole:
+            # select correct part of dataset
+            ds = self.document.data[self.dsname].data
+            num = ds[ds.shape[0]-index.row()-1, index.column()]
+            return qt4.QVariant(num)
+
+        return qt4.QVariant()
+
+    def headerData(self, section, orientation, role):
+        """Return headers at top."""
+
+        if role == qt4.Qt.DisplayRole:
+            ds = self.document.data[self.dsname]
+
+            # return a number for the top left of the cell
+            if orientation == qt4.Qt.Horizontal:
+                r = ds.xrange
+                num = ds.data.shape[1]
+            else:
+                r = ds.yrange
+                r = (r[1], r[0]) # swap
+                num = ds.data.shape[0]
+            val = (r[1]-r[0])/num*(section+0.5)+r[0]
+            return qt4.QVariant( '%g' % val )
+
+        return qt4.QVariant()
 
 class DatasetListModel(qt4.QAbstractListModel):
     """A model to allow the list of datasets to be viewed."""
@@ -218,9 +263,15 @@ class DataEditDialog(qt4.QDialog):
         # FIXME: Make readonly models readonly!!
         index = current.indexes()[0]
         name = self.dslistmodel.datasetName(index)
-        self.datatableview.setModel( DatasetTableModel(self, self.document,
-                                                       name) )
+        ds = self.document.data[name]
 
+        if ds.dimensions == 1:
+            model = DatasetTableModel1D(self, self.document, name)
+        elif ds.dimensions == 2:
+            model = DatasetTableModel2D(self, self.document, name)
+
+        self.datatableview.setModel(model)
+            
         self.setUnlinkState()
 
     def setUnlinkState(self):
