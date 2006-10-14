@@ -135,6 +135,77 @@ class ClickPainter(document.Painter):
         else:
             return None
 
+class DisplayWidget(qt4.QLabel):
+    """A widget for displaying the plot, embedded in scrollable area."""
+    
+    def __init__(self, *args):
+        qt4.QLabel.__init__(self, *args)
+
+        # no zoom rectangle initially
+        self._zoomrect = None
+
+        # show splash logo until timer runs out (3s)
+        self._showlogo = True
+        qt4.QTimer.singleShot(3000, self.slotSplashDisable)
+
+    def slotSplashDisable(self):
+        """Disable drawing the splash logo."""
+        self._showlogo = False
+        self.update()
+
+    def paintEvent(self, event):
+        """Paint display widget."""
+
+        qt4.QLabel.paintEvent(self, event)
+
+        if self._zoomrect:
+            # draw zoom rectangle if any shown
+            painter = qt4.QPainter(self)
+            painter.setPen(qt4.QPen(qt4.QColor('black'), 0, qt4.Qt.DotLine))
+            painter.drawRect(*self._zoomrect)
+
+        if self._showlogo:
+            # show logo until timer runs out
+            painter = qt4.QPainter(self)
+            logo = action.getPixmap('logo.png')
+            painter.drawPixmap(self.width()/2 - logo.width()/2,
+                               self.height()/2 - logo.height()/2,
+                               logo)
+
+    def drawRect(self, pt1, pt2):
+        """Draw a zoom rectangle from QPoint pt1 to pt2."""
+
+        if self._zoomrect:
+            self.hideRect()
+
+        minx = min(pt1.x(), pt2.x())
+        maxx = max(pt1.x(), pt2.x())
+        miny = min(pt1.y(), pt2.y())
+        maxy = max(pt1.y(), pt2.y())
+        w = maxx - minx
+        h = maxy - miny
+        self._zoomrect = (minx, miny, w, h)
+        self._repaintRect(self._zoomrect)
+
+    def _repaintRect(self, rect):
+        """Repaint rectangle region."""
+
+        minx, miny, w, h = rect
+        maxx = minx + w
+        maxy = miny + h
+        self.repaint(minx, miny, w, 1)
+        self.repaint(minx, maxy, w, 1)
+        self.repaint(maxx, miny, 1, h)
+        self.repaint(minx, miny, 1, h)
+
+    def hideRect(self):
+        """Hide any shown zoom rectangle."""
+
+        if self._zoomrect:
+            old = self._zoomrect
+            self._zoomrect = None
+            self._repaintRect(old)
+
 class PlotWindow( qt4.QScrollArea ):
     """Class to show the plot(s) in a scrollable window."""
 
@@ -142,14 +213,10 @@ class PlotWindow( qt4.QScrollArea ):
         """Initialise the window."""
 
         qt4.QScrollArea.__init__(self, parent)
-        self.label = qt4.QLabel()
+        self.label = DisplayWidget()
         self.setWidget(self.label)
         self.setBackgroundRole(qt4.QPalette.Dark)
         self.label.setSizePolicy(qt4.QSizePolicy.Fixed, qt4.QSizePolicy.Fixed)
-
-        # show splash logo until timer runs out (3s)
-        self.showlogo = True
-        qt4.QTimer.singleShot(3000, self.slotSplashDisable)
 
         # set up so if document is modified we are notified
         self.document = document
@@ -276,44 +343,9 @@ class PlotWindow( qt4.QScrollArea ):
 
         return self.zoomtoolbar
 
-    def _drawZoomRect(self, pos):
-        """Draw a dotted rectangle xored."""
-
-        self._currentzoomrect = pos
-        minx = min(self.grabPos[0], pos[0])
-        maxx = max(self.grabPos[0], pos[0])
-        miny = min(self.grabPos[1], pos[1])
-        maxy = max(self.grabPos[1], pos[1])
-        w = maxx - minx + 1
-        h = maxy - miny + 1
-
-        # draw the rectangle on the viewport
-        pt = qt4.QPoint(minx, miny)
-        painter = qt4.QPainter(view, True)
-        painter.setPen(qt4.QPen(qt4.QColor('black'), 0, qt4.Qt.DotLine))
-        painter.drawRect(pt.x(), pt.y(), w, h)
-
-    def _hideZoomRect(self):
-        """Remove the zoom rectangle painted by _drawZoomRect."""
-
-        # convert bounds of old zoom rect (in global coords)
-        # to contents coordinates
-        pos = self._currentzoomrect
-        minx = min(self.grabPos[0], pos[0])
-        maxx = max(self.grabPos[0], pos[0])
-        miny = min(self.grabPos[1], pos[1])
-        maxy = max(self.grabPos[1], pos[1])
-        w = maxx - minx + 1
-        h = maxy - miny + 1
-
-        # repaint the contents along the edges of the zoom rect
-        self.repaint(minx, miny, w, 1)
-        self.repaint(minx, miny, 1, h)
-        self.repaint(minx, maxy, w, 1)
-        self.repaint(minx, maxy, 1, h)
-
-    def doZoomRect(self):
+    def doZoomRect(self, endpos):
         """Take the zoom rectangle drawn by the user and do the zooming.
+        endpos is a QPoint end point
 
         This is pretty messy - first we have to work out the graph associated
         to the first point
@@ -324,8 +356,8 @@ class PlotWindow( qt4.QScrollArea ):
         """
 
         # get points corresponding to corners of rectangle
-        pt1 = qt4.QPoint(*self.grabPos)
-        pt2 = qt4.QPoint(*self._currentzoomrect)
+        pt1 = qt4.QPoint(self.grabPos)
+        pt2 = qt4.QPoint(endpos)
 
         # work out whether it's worthwhile to zoom: only zoom if there
         # are >=5 pixels movement
@@ -421,7 +453,7 @@ class PlotWindow( qt4.QScrollArea ):
             elif self.clickmode == 'graphzoom':
                 qt4.QApplication.setOverrideCursor(
                     qt4.QCursor(qt4.Qt.CrossCursor))
-                self._drawZoomRect(self.grabPos)
+                self.label.drawRect(self.grabPos, self.grabPos)
 
             # record what mode we were clicked in
             self.currentclickmode = self.clickmode
@@ -447,8 +479,8 @@ class PlotWindow( qt4.QScrollArea ):
 
         elif self.currentclickmode == 'graphzoom':
             # get rid of current rectangle
-            self._hideZoomRect()
-            self._drawZoomRect((pos.x(), pos.y()))
+            pos = self.widget().mapFromParent(event.pos())
+            self.label.drawRect(self.grabPos, pos)
 
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
@@ -465,9 +497,9 @@ class PlotWindow( qt4.QScrollArea ):
                 # return the cursor to normal after scrolling
                 qt4.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
-                self._hideZoomRect()
+                self.label.hideRect()
                 qt4.QApplication.restoreOverrideCursor()
-                self.doZoomRect()
+                self.doZoomRect(self.widget().mapFromParent(event.pos()))
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
         else:
@@ -491,8 +523,7 @@ class PlotWindow( qt4.QScrollArea ):
 
         widget = painter.getFoundWidget()
         if widget:
-            print widget
-            # tell connected caller that widget was clicked
+            # tell connected objects that widget was clicked
             self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
 
     def setOutputSize(self):
@@ -531,19 +562,6 @@ class PlotWindow( qt4.QScrollArea ):
     def getPageNumber(self):
         """Get the the selected page."""
         return self.pagenumber
-
-    def slotSplashDisable(self):
-        """Disable drawing the splash logo."""
-        self.showlogo = False
-        self.update()
-
-    def drawLogo(self, painter):
-        """Draw the Veusz logo in centre of window."""
-
-        logo = action.getPixmap('logo.png')
-        painter.drawPixmap( self.visibleWidth()/2 - logo.width()/2,
-                            self.visibleHeight()/2 - logo.height()/2,
-                            logo )
 
     def slotTimeout(self):
         """Called after timer times out, to check for updates to window."""
