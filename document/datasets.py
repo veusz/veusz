@@ -42,6 +42,8 @@ def _convertNumarray(a):
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
 
+    # filename is member
+
     def saveToFile(self, file):
         '''Save the link to the document file.'''
         pass
@@ -292,6 +294,19 @@ class DatasetBase(object):
             savedlinks[self.linked] = True
             self.linked.saveToFile(file)
 
+    def name(self):
+        """Get dataset name."""
+        for name, ds in self.document.data.iteritems():
+            if ds == self:
+                break
+        else:
+            raise ValueError('Could not find self in document.data')
+        return name
+
+    def description(self):
+        """Get description of database."""
+        return ""
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -339,6 +354,16 @@ class Dataset2D(DatasetBase):
 
         file.write("''')\n")
 
+    def description(self):
+        """Get description of dataset."""
+        text = self.name()
+        text += ' (%ix%i)' % self.data.shape
+        text += ', x=%g->%g' % tuple(self.xrange)
+        text += ', y=%g->%g' % tuple(self.yrange)
+        if self.linked:
+            text += ', linked to %s' % self.linked.filename
+        return text
+
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
 
@@ -365,6 +390,22 @@ class Dataset(DatasetBase):
         for i in (self.serr, self.nerr, self.perr):
             if i != None and i.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
+
+    def description(self):
+        """Get description of dataset."""
+
+        text = self.name()
+        if self.serr is not None:
+            text += ',+-'
+        if self.perr is not None:
+            text += ',+'
+        if self.nerr is not None:
+            text += ',-'
+        text += ' (length %i)' % len(self.data)
+
+        if self.linked:
+            text += ' linked to %s' % self.linked.filename
+        return text
 
     def duplicate(self):
         """Return new dataset based on this one."""

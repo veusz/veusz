@@ -108,11 +108,11 @@ class ImportDialog2(qt4.QDialog):
             ds = self.document.getData(name)
             # build up description
             descr = [name]
-            if ds.serr != None:
+            if ds.serr is not None:
                 descr.append('+-')
-            if ds.perr != None:
+            if ds.perr is not None:
                 descr.append('+')
-            if ds.nerr != None:
+            if ds.nerr is not None:
                 descr.append('-')
             descr = ','.join(descr)
             lines.append(' %s (%i items)' % (descr, ds.data.shape[0]))
@@ -473,11 +473,11 @@ class ImportDialog(ImportDialogBase):
             ds = self.document.getData(name)
             # build up description
             descr = [name]
-            if ds.serr != None:
+            if ds.serr is not None:
                 descr.append('+-')
-            if ds.perr != None:
+            if ds.perr is not None:
                 descr.append('+')
-            if ds.nerr != None:
+            if ds.nerr is not None:
                 descr.append('-')
             descr = ','.join(descr)
             lines.append(' %s (%i items)' % (descr, ds.data.shape[0]))
@@ -666,9 +666,9 @@ class ImportDialog2D(ImportDialogBase):
         transpose = None
         linked = self.linkcheck.isChecked()
         
-        if ranges[0] != None and ranges[1] != None:
+        if ranges[0] is not None and ranges[1] is not None:
             xrange = (ranges[0], ranges[1])
-        if ranges[2] != None and ranges[3] != None:
+        if ranges[2] is not None and ranges[3] is not None:
             yrange = (ranges[2], ranges[3])
         if self.invertrows.isChecked():
             invertrows = True
