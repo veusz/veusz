@@ -28,9 +28,7 @@ import veusz.utils as utils
 import veusz.setting as setting
 
 import consolewindow
-#FIXMEQT4
 import plotwindow
-#FIXMEQT4
 import treeeditwindow
 import action
 
