@@ -130,7 +130,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
     def data(self, index, role):
         if role == qt4.Qt.DisplayRole:
-            # select correct part of dataset
+            # get data (note y is reversed, sigh)
             ds = self.document.data[self.dsname].data
             num = ds[ds.shape[0]-index.row()-1, index.column()]
             return qt4.QVariant(num)
@@ -149,7 +149,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
                 num = ds.data.shape[1]
             else:
                 r = ds.yrange
-                r = (r[1], r[0]) # swap
+                r = (r[1], r[0]) # swap (as y reversed)
                 num = ds.data.shape[0]
             val = (r[1]-r[0])/num*(section+0.5)+r[0]
             return qt4.QVariant( '%g' % val )
