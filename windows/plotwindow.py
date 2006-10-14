@@ -31,7 +31,7 @@ import numarray as N
 
 import veusz.setting as setting
 #FIXMEQT4
-#import veusz.dialogs.exceptiondialog as exceptiondialog
+import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.widgets as widgets
 import veusz.document as document
 import veusz.utils as utils
@@ -582,13 +582,23 @@ class PlotWindow( qt4.QScrollArea ):
             if self.pagenumber >= 0:
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
-                #try:
-                self.document.printTo( self.bufferpixmap,
-                                       [self.pagenumber],
-                                       scaling = self.zoomfactor,
-                                       dpi = self.widgetdpi )
-                #except Exception:
-                #    exceptiondialog.showException(sys.exc_info())
+                try:
+                    self.document.printTo( self.bufferpixmap,
+                                           [self.pagenumber],
+                                           scaling = self.zoomfactor,
+                                           dpi = self.widgetdpi )
+                    import random
+                    if random.random() < 0.5:
+                        xxx
+                    else:
+                        yyy
+                except Exception:
+                    # stop updates this time round and show exception dialog
+                    d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
+                    self.oldzoom = self.zoomfactor
+                    self.forceupdate = False
+                    self.docchangeset = self.document.changeset
+                    d.exec_()
                     
             else:
                 self.pagenumber = 0
