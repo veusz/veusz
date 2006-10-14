@@ -296,6 +296,22 @@ class TreeEditWindow2(qt4.QDockWidget):
 
         self.proplist.updateProperties(settings)
         self._enableCorrectButtons()
+        self._checkPageChange()
+
+    def _checkPageChange(self):
+        """Check to see whether page has changed."""
+
+        w = self.selwidget
+        while w is not None and not isinstance(w, widgets.Page):
+            w = w.parent
+
+        if w is not None:
+            # have page, so check what number we are in basewidget children
+            try:
+                i = self.document.basewidget.children.index(w)
+                self.emit(qt4.SIGNAL("sigPageChanged"), i)
+            except ValueError:
+                pass
 
     def _enableCorrectButtons(self):
         """Make sure the create graph buttons are correctly enabled."""

@@ -30,7 +30,6 @@ import veusz.qtall as qt4
 import numarray as N
 
 import veusz.setting as setting
-#FIXMEQT4
 import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.widgets as widgets
 import veusz.document as document
@@ -547,7 +546,7 @@ class PlotWindow( qt4.QScrollArea ):
     def setPageNumber(self, pageno):
         """Move the the selected page."""
 
-        # we don't need to
+        # we don't need to do anything
         if (self.pagenumber == pageno and
             self.document.changeset == self.docchangeset):
             return
@@ -587,11 +586,6 @@ class PlotWindow( qt4.QScrollArea ):
                                            [self.pagenumber],
                                            scaling = self.zoomfactor,
                                            dpi = self.widgetdpi )
-                    import random
-                    if random.random() < 0.5:
-                        xxx
-                    else:
-                        yyy
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
