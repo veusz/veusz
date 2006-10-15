@@ -30,6 +30,8 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 
+pyfits = None
+
 class ImportDialog2(qt4.QDialog):
 
     dirname = '.'
@@ -81,9 +83,13 @@ class ImportDialog2(qt4.QDialog):
         filename = unicode(self.filenameedit.text())
         tab = self.methodtab.currentIndex()
         if tab == 0:
-            self.doPreviewStandard(filename)
+            okay = self.doPreviewStandard(filename)
         elif tab == 1:
-            self.doPreviewCSV(filename)
+            okay = self.doPreviewCSV(filename)
+        elif tab == 2:
+            okay = self.doPreviewFITS(filename)
+
+        self.importbutton.setEnabled(okay)
 
     def doPreviewStandard(self, filename):
         """Standard preview - show start of text."""
@@ -92,11 +98,12 @@ class ImportDialog2(qt4.QDialog):
             ifile = open(filename, 'r')
         except IOError:
             self.previewedit.setPlainText('')
-            self.importbutton.setEnabled(False)
-        else:
-            text = ifile.read(2048)
-            self.previewedit.setPlainText(text)
-            self.importbutton.setEnabled(True)
+            return False
+
+        text = ifile.read(2048)
+        self.previewedit.setPlainText(text)
+        self.importbutton.setEnabled(True)
+        return True
 
     def doPreviewCSV(self, filename):
         """CSV preview - show first few rows"""
@@ -124,21 +131,86 @@ class ImportDialog2(qt4.QDialog):
             numrows = len(rows)
 
         except IOError:
-            self.importbutton.setEnabled(False)
+            return False
         except csv.Error:
+            return False
+
+        # fill up table
+        t.setColumnCount(numcols)
+        t.setRowCount(numrows)
+        for r in xrange(numrows):
+            for c in xrange(numcols):
+                if c < len(rows[r]):
+                    item = qt4.QTableWidgetItem(str(rows[r][c]))
+                    t.setItem(r, c, item)
+
+        return True
+
+    def doPreviewFITS(self, filename):
+        """Set up controls for FITS file."""
+
+        # load pyfits if available
+        global pyfits
+        if pyfits is None:
+            try:
+                import pyfits as PF
+                pyfits = PF
+            except ImportError:
+                pyfits = None
+
+        # if it isn't
+        if pyfits is None:
+            self.fitslabel.setText('FITS file support requires that PyFITS is installed.'
+                                   ' You can download it from'
+                                   ' http://www.stsci.edu/resources/software_hardware/pyfits')
             self.importbutton.setEnabled(False)
+            return False
+        
+        # try to identify fits file
+        try:
+            ifile = open(filename)
+            line = ifile.readline()
+            # is this a hack?
+            if line.find('SIMPLE  =                    T') == -1:
+                raise IOError
+            ifile.close()
+        except IOError:
+            return False
 
-        else:
-            # fill up table
-            t.setColumnCount(numcols)
-            t.setRowCount(numrows)
-            for r in xrange(numrows):
-                for c in xrange(numcols):
-                    if c < len(rows[r]):
-                        item = qt4.QTableWidgetItem(str(rows[r][c]))
-                        t.setItem(r, c, item)
+        f = pyfits.open(filename, 'readonly')
+        t = self.fitshdutable
+        t.verticalHeader().hide()
+        t.horizontalHeader().setStretchLastSection(True)
+        t.clear()
+        t.setColumnCount(3)
+        t.setRowCount(len(f))
+        t.setHorizontalHeaderLabels(['HDU', 'Name', 'Type'])
+        for hdunum, hdu in enumerate(f):
+            header = hdu.header
+            hduitem = qt4.QTableWidgetItem(str(hdunum))
+            t.setItem(hdunum, 0, hduitem)
+            t.setItem(hdunum, 1, qt4.QTableWidgetItem(hdu.name))
+            hduitem.hdu = hdunum
+            try:
+                # if this fails, show an image
+                cols = hdu.get_coldefs()
 
-            self.importbutton.setEnabled(True)
+                # it's a table
+                hduitem.columns = cols
+                rows = header['NAXIS2']
+                text = 'Table (%i rows)' % rows
+                t.setItem(hdunum, 2, qt4.QTableWidgetItem(text))
+                hduitem.type = 'table'
+
+            except AttributeError:
+                # this is an image
+                naxis = header['NAXIS']
+                dims = [str(header['NAXIS%i' % (i+1)]) for i in range(naxis)]
+                dims = '*'.join(dims)
+                text = '%iD image (%s)' % (naxis, dims)
+                t.setItem(hdunum, 2, qt4.QTableWidgetItem(text))
+                hduitem.type = 'image'
+        return False
 
     def slotImport(self):
         """Do the importing"""
