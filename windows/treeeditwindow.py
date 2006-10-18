@@ -593,13 +593,14 @@ class TreeEditWindow2(qt4.QDockWidget):
         direction is -1 for 'up' and +1 for 'down'
         """
 
-        # get the widget to act as the parent
-        w = self.itemselected.getAssociatedWidget()
-
+        # widget to move
+        w = self.selwidget
+        
         # actually move the widget
-        self.document.applyOperation( document.OperationWidgetMove(w, direction) )
+        self.document.applyOperation(
+            document.OperationWidgetMove(w, direction) )
 
-        # try to highlight the associated item
+        # rehilight moved widget
         self.selectWidget(w)
 
 class SettingLabelButton(qt4.QPushButton):
