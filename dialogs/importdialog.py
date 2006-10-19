@@ -54,8 +54,19 @@ class ImportDialog2(qt4.QDialog):
         self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
                       self.slotImport)
 
+        # notification tab has changed
         self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
                       self.slotUpdatePreview )
+
+        # if different items are selected in fits tab
+        self.connect( self.fitshdulist, qt4.SIGNAL('itemSelectionChanged()'),
+                      self.slotFitsUpdateCombos )
+        self.connect( self.fitsdatasetname,
+                      qt4.SIGNAL('textChanged(const QString&)'),
+                      self.slotFitsCheckValid )
+        self.connect( self.fitsdatacolumn,
+                      qt4.SIGNAL('currentIndexChanged(int)'),
+                      self.slotFitsCheckValid )
 
     def slotBrowseClicked(self):
         """Browse for a data file."""
@@ -89,7 +100,8 @@ class ImportDialog2(qt4.QDialog):
         elif tab == 2:
             okay = self.doPreviewFITS(filename)
 
-        self.importbutton.setEnabled(okay)
+        if okay is not None:
+            self.importbutton.setEnabled(okay)
 
     def doPreviewStandard(self, filename):
         """Standard preview - show start of text."""
@@ -177,51 +189,121 @@ class ImportDialog2(qt4.QDialog):
         except IOError:
             return False
 
+        self.updateFITSView(filename)
+
+        return None
+        
+    def updateFITSView(self, filename):
+        """Update the fits file details in the import dialog."""
         f = pyfits.open(filename, 'readonly')
-        t = self.fitshdutable
-        t.verticalHeader().hide()
-        t.horizontalHeader().setStretchLastSection(True)
-        t.clear()
-        t.setColumnCount(3)
-        t.setRowCount(len(f))
-        t.setHorizontalHeaderLabels(['HDU', 'Name', 'Type'])
+        l = self.fitshdulist
+        l.setColumnCount(3)
+        l.setHeaderLabels(['HDU', 'Name', 'Type'])
+        l.clear()
+
+        # this is so we can lookup item attributes later
+        self.fitsitemdata = []
+        items = []
         for hdunum, hdu in enumerate(f):
             header = hdu.header
-            hduitem = qt4.QTableWidgetItem(str(hdunum))
-            t.setItem(hdunum, 0, hduitem)
-            t.setItem(hdunum, 1, qt4.QTableWidgetItem(hdu.name))
-            hduitem.hdu = hdunum
+            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name])
+            data = []
             try:
                 # if this fails, show an image
                 cols = hdu.get_coldefs()
 
                 # it's a table
-                hduitem.columns = cols
+                data = ['table', cols]
                 rows = header['NAXIS2']
-                text = 'Table (%i rows)' % rows
-                t.setItem(hdunum, 2, qt4.QTableWidgetItem(text))
-                hduitem.type = 'table'
+                descr = 'Table (%i rows)' % rows
 
             except AttributeError:
                 # this is an image
+                data = ['image']
                 naxis = header['NAXIS']
-                dims = [str(header['NAXIS%i' % (i+1)]) for i in range(naxis)]
+                dims = [str(header['NAXIS%i' % (i+1)]) for i in xrange(naxis)]
                 dims = '*'.join(dims)
-                text = '%iD image (%s)' % (naxis, dims)
-                t.setItem(hdunum, 2, qt4.QTableWidgetItem(text))
-                hduitem.type = 'image'
-        return False
+                descr = '%iD image (%s)' % (naxis, dims)
+
+            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
+            items.insert(0, hduitem)
+            self.fitsitemdata.append(data)
+
+        l.addTopLevelItems(items)
+        l.setCurrentItem(items[-1])
+
+    def slotFitsUpdateCombos(self):
+        """Update list of fits columns when new item is selected."""
+        
+        items = self.fitshdulist.selectedItems()
+        if len(items) != 0:
+            item = items[0]
+            hdunum = int( str(item.text(0)) )
+        else:
+            item = None
+            hdunum = -1
+
+        cols = ['N/A']
+        enablecolumns = False
+        if hdunum >= 0:
+            data = self.fitsitemdata[hdunum]
+            if data[0] == 'table':
+                enablecolumns = True
+                cols = ['None']
+                cols += ['%s (%s)' %
+                         (i.name, i.format) for i in data[1]]
+        
+        for c in ('data', 'sym', 'pos', 'neg'):
+            cntrl = getattr(self, 'fits%scolumn' % c)
+            cntrl.setEnabled(enablecolumns)
+            cntrl.clear()
+            cntrl.addItems(cols)
+
+        # update enable icon as appropriate
+        self.slotFitsCheckValid()
+
+    def slotFitsCheckValid(self, *args):
+        """Check validity of Fits import."""
+
+        enableimport = True
+
+        items = self.fitshdulist.selectedItems()
+        if len(items) != 0:
+            enableimport = True
+            item = items[0]
+            hdunum = int( str(item.text(0)) )
+
+            # any name for the dataset?
+            if unicode(self.fitsdatasetname.text()) == '':
+                enableimport = False
+
+            # if a table, need selected item
+            data = self.fitsitemdata[hdunum]
+            if data[0] == 'table' and self.fitsdatacolumn.currentIndex() == 0:
+                enableimport = False
+
+        else:
+            enableimport = False
+
+        self.importbutton.setEnabled(enableimport)
 
     def slotImport(self):
         """Do the importing"""
 
         tabindex = self.methodtab.currentIndex()
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+        linked = self.linkcheckbox.isChecked()
 
         if tabindex == 0:
             # standard Veusz import
-            self.importStandard()
+            self.importStandard(filename, linked)
         elif tabindex == 1:
-            self.importCSV()
+            # csv import
+            self.importCSV(filename, linked)
+        elif tabindex == 2:
+            # fits import
+            self.importFits(filename, linked)
         else:
             assert False
 
@@ -255,44 +337,12 @@ class ImportDialog2(qt4.QDialog):
 
         return lines
 
-    def importCSV(self):
-        """Import from CSV file."""
-
-        # get various values
-        inrows = self.directioncombo.currentIndex() == 1
-        prefix = unicode( self.prefixedit.text() )
-        if len(prefix.strip()) == 0:
-            prefix = None
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
-        linked = self.linkcheckbox.isChecked()
-
-        op = document.OperationDataImportCSV(filename, readrows=inrows,
-                                             prefix=prefix, linked=linked)
-        
-        # show a busy cursor
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
-        # actually import the data
-        dsnames = self.document.applyOperation(op)
-        
-        # restore the cursor
-        qt4.QApplication.restoreOverrideCursor()
-
-        # what datasets were imported
-        lines = self._retnDatasetInfo(dsnames)
-
-        self.previewedit.setPlainText( '\n'.join(lines) )
-
-    def importStandard(self):
+    def importStandard(self, filename, linked):
         """Standard Veusz importing."""
 
         # convert controls to values
         descriptor = unicode( self.descriptoredit.text() )
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
         useblocks = self.blockcheckbox.isChecked()
-        linked = self.linkcheckbox.isChecked()
         
         try:
             # construct operation. this checks the descriptor.
@@ -334,3 +384,75 @@ class ImportDialog2(qt4.QDialog):
 
         self.previewedit.setPlainText( '\n'.join(lines) )
 
+    def importCSV(self, filename, linked):
+        """Import from CSV file."""
+
+        # get various values
+        inrows = self.directioncombo.currentIndex() == 1
+        prefix = unicode( self.prefixedit.text() )
+        if len(prefix.strip()) == 0:
+            prefix = None
+
+        op = document.OperationDataImportCSV(filename, readrows=inrows,
+                                             prefix=prefix, linked=linked)
+        
+        # show a busy cursor
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+
+        # actually import the data
+        dsnames = self.document.applyOperation(op)
+        
+        # restore the cursor
+        qt4.QApplication.restoreOverrideCursor()
+
+        # what datasets were imported
+        lines = self._retnDatasetInfo(dsnames)
+
+        self.previewedit.setPlainText( '\n'.join(lines) )
+
+    def importFits(self, filename, linked):
+        """Import fits file."""
+        
+        item = self.fitshdulist.selectedItems()[0]
+        hdunum = int( str(item.text(0)) )
+        data = self.fitsitemdata[hdunum]
+
+        name = unicode(self.fitsdatasetname.text())
+
+        if data[0] == 'table':
+            # get list of appropriate columns
+            cols = []
+
+            # get data from controls
+            for c in ('data', 'sym', 'pos', 'neg'):
+                cntrl = getattr(self, 'fits%scolumn' % c)
+                
+                i = cntrl.currentIndex()
+                if i == 0:
+                    cols.append(None)
+                else:
+                    cols.append(data[1][i-1].name)
+                    
+        else:
+            # item is an image, so no columns
+            cols = [None]*4
+
+        op = document.OperationDataImportFITS(name, filename, hdunum,
+                                              datacol=cols[0],
+                                              symerrcol=cols[1],
+                                              poserrcol=cols[2],
+                                              negerrcol=cols[3],
+                                              linked=linked)
+
+        # show a busy cursor
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+
+        # actually do the import
+        self.document.applyOperation(op)
+        
+        # restore the cursor
+        qt4.QApplication.restoreOverrideCursor()
+
+        # inform user
+        self.fitsimportstatus.setText("Imported dataset '%s'" % name)
+        qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)

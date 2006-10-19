@@ -297,8 +297,6 @@ class MainWindow(qt4.QMainWindow):
              self.slotDataImport, 'stock-import.png', False, ''),
             ('dataimport2d', 'Import 2D data into Veusz', 'Import &2D...', 'data',
              self.slotDataImport2D, 'stock-import.png', False, ''),
-            ('dataimportfits', 'Import FITS files into Veusz',
-             'Import FITS...', 'data', self.slotDataImportFITS, '', False, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
              self.slotDataEdit, 'stock-edit.png', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
