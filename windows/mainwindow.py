@@ -729,6 +729,10 @@ class MainWindow(qt.QMainWindow):
         prnt.setCreator('Veusz %s' % utils.version())
         prnt.setDocName(self.filename)
 
+        # recall previous printer if set
+        if 'veusz_print_printer' in setting.settingdb:
+            prnt.setPrinterName(setting.settingdb['veusz_print_printer'])
+
         if prnt.setup():
             # get page range
             minval, maxval = prnt.fromPage(), prnt.toPage()
@@ -753,6 +757,9 @@ class MainWindow(qt.QMainWindow):
             # do the printing
             doc.printTo( prnt, pages )
 
+            # remember printer
+            setting.settingdb['veusz_print_printer'] = unicode(prnt.printerName())
+            
     def slotModifiedDoc(self, ismodified):
         """Disable certain actions if document is not modified."""
 
