@@ -434,6 +434,9 @@ Veusz can also read data organised in rows rather than columns.
        </item>
        <item>
         <widget class="QTextEdit" name="twod_previewedit" >
+         <property name="lineWrapMode" >
+          <enum>QTextEdit::NoWrap</enum>
+         </property>
          <property name="readOnly" >
           <bool>true</bool>
          </property>
