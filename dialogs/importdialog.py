@@ -121,6 +121,9 @@ class ImportDialog2(qt4.QDialog):
         """CSV preview - show first few rows"""
 
         t = self.previewtablecsv
+        t.verticalHeader().show() # restore from a previous import
+        t.horizontalHeader().show()
+        t.horizontalHeader().setStretchLastSection(False)
         t.clear()
         t.setColumnCount(0)
         t.setRowCount(0)
@@ -408,7 +411,17 @@ class ImportDialog2(qt4.QDialog):
         # what datasets were imported
         lines = self._retnDatasetInfo(dsnames)
 
-        self.previewedit.setPlainText( '\n'.join(lines) )
+        t = self.previewtablecsv
+        t.verticalHeader().hide()
+        t.horizontalHeader().hide()
+        t.horizontalHeader().setStretchLastSection(True)
+
+        t.clear()
+        t.setColumnCount(1)
+        t.setRowCount(len(lines))
+        for i, l in enumerate(lines):
+            item = qt4.QTableWidgetItem(l)
+            t.setItem(i, 0, item)
 
     def importFits(self, filename, linked):
         """Import fits file."""
