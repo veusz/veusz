@@ -68,6 +68,12 @@ class ImportDialog2(qt4.QDialog):
                       qt4.SIGNAL('currentIndexChanged(int)'),
                       self.slotFitsCheckValid )
 
+        # set up some validators for 2d edits
+        dval = qt4.QDoubleValidator(self)
+        for i in (self.twod_xminedit, self.twod_xmaxedit,
+                  self.twod_yminedit, self.twod_ymaxedit):
+            i.setValidator(dval)
+
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
@@ -99,6 +105,10 @@ class ImportDialog2(qt4.QDialog):
             okay = self.doPreviewCSV(filename)
         elif tab == 2:
             okay = self.doPreviewFITS(filename)
+        elif tab == 3:
+            okay = self.doPreviewTwoD(filename)
+        else:
+            assert False
 
         if okay is not None:
             self.importbutton.setEnabled(okay)
@@ -112,9 +122,8 @@ class ImportDialog2(qt4.QDialog):
             self.previewedit.setPlainText('')
             return False
 
-        text = ifile.read(2048)
+        text = ifile.read(2048)+'\n...\n'
         self.previewedit.setPlainText(text)
-        self.importbutton.setEnabled(True)
         return True
 
     def doPreviewCSV(self, filename):
@@ -195,7 +204,20 @@ class ImportDialog2(qt4.QDialog):
         self.updateFITSView(filename)
 
         return None
+
+    def doPreviewTwoD(self, filename):
+        """Preview 2d dataset files."""
         
+        try:
+            ifile = open(filename, 'r')
+        except IOError:
+            self.twod_previewedit.setPlainText('')
+            return False
+
+        text = ifile.read(2048) + '\n...\n'
+        self.twod_previewedit.setPlainText(text)
+        return True
+
     def updateFITSView(self, filename):
         """Update the fits file details in the import dialog."""
         f = pyfits.open(filename, 'readonly')
@@ -298,15 +320,15 @@ class ImportDialog2(qt4.QDialog):
         filename = os.path.abspath(filename)
         linked = self.linkcheckbox.isChecked()
 
+        # import according to tab selected
         if tabindex == 0:
-            # standard Veusz import
             self.importStandard(filename, linked)
         elif tabindex == 1:
-            # csv import
             self.importCSV(filename, linked)
         elif tabindex == 2:
-            # fits import
             self.importFits(filename, linked)
+        elif tabindex == 3:
+            self.importTwoD(filename, linked)
         else:
             assert False
 
@@ -469,3 +491,68 @@ class ImportDialog2(qt4.QDialog):
         # inform user
         self.fitsimportstatus.setText("Imported dataset '%s'" % name)
         qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
+
+    def importTwoD(self, filename, linked):
+        """Import from 2D file."""
+
+        # this really needs improvement...
+
+        # get datasets and split into a list
+        datasets = unicode( self.twod_datasetsedit.text() )
+        datasets = re.split('[, ]+', datasets)
+
+        # strip out blank items
+        datasets = [i for i in datasets if i != '']
+
+        # an obvious error...
+        if len(datasets) == 0:
+            self.twod_previewedit.setPlainText('At least one dataset needs to '
+                                               'be specified')
+            return
+        
+        # convert range parameters
+        ranges = []
+        for e in (self.twod_xminedit, self.twod_xmaxedit,
+                  self.twod_yminedit, self.twod_ymaxedit):
+            f = unicode(e.text())
+            r = None
+            try:
+                r = float(f)
+            except ValueError:
+                pass
+            ranges.append(r)
+
+        # propagate settings from dialog to reader
+        xrange = None
+        yrange = None
+        if ranges[0] is not None and ranges[1] is not None:
+            xrange = (ranges[0], ranges[1])
+        if ranges[2] is not None and ranges[3] is not None:
+            yrange = (ranges[2], ranges[3])
+
+        invertrows = self.twod_invertrowscheck.isChecked()
+        invertcols = self.twod_invertcolscheck.isChecked()
+        transpose = self.twod_transposecheck.isChecked()
+
+        # show a busy cursor
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+
+        # loop over datasets and read...
+        try:
+            op = document.OperationDataImport2D(datasets, filename=filename,
+                                                xrange=xrange, yrange=yrange,
+                                                invertrows=invertrows,
+                                                invertcols=invertcols,
+                                                transpose=transpose,
+                                                linked=linked)
+            readds = self.document.applyOperation(op)
+            output = 'Successfully read datasets %s' % (' ,'.join(readds))
+        except document.Read2DError, e:
+            output = 'Error importing datasets:\n %s' % str(e)
+                
+        # restore the cursor
+        qt4.QApplication.restoreOverrideCursor()
+
+        # show status in preview box
+        self.twod_previewedit.setPlainText(output)
+ 

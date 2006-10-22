@@ -295,8 +295,6 @@ class MainWindow(qt4.QMainWindow):
             
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
-            ('dataimport2d', 'Import 2D data into Veusz', 'Import &2D...', 'data',
-             self.slotDataImport2D, 'stock-import.png', False, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
              self.slotDataEdit, 'stock-edit.png', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
@@ -323,16 +321,6 @@ class MainWindow(qt4.QMainWindow):
     def slotDataImport(self):
         """Display the import data dialog."""
         d = importdialog.ImportDialog2(self, self.document)
-        d.show()
-
-    def slotDataImport2D(self):
-        """Display the 2D import data dialog."""
-        d = importdialog.ImportDialog2D(self, self.document)
-        d.show()
-
-    def slotDataImportFITS(self):
-        """Display the FITS import dialog."""
-        d = ImportFITS(self, self.document)
         d.show()
 
     def slotDataEdit(self):

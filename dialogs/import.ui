@@ -63,10 +63,7 @@
      </property>
      <widget class="QWidget" name="standardtab" >
       <attribute name="title" >
-       <string>Standard</string>
-      </attribute>
-      <attribute name="toolTip" >
-       <string>Standard plain text import</string>
+       <string>&amp;Standard</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
@@ -165,6 +162,9 @@ e.g.	z	[z with no errors - 1 column for dataset]
        </item>
        <item>
         <widget class="QCheckBox" name="blockcheckbox" >
+         <property name="toolTip" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this is selected, blank lines or the word "no" are used to separate the file into blocks. An underscore followed by the block number is added to the dataset names&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
          <property name="text" >
           <string>Read data in bloc&amp;ks</string>
          </property>
@@ -174,10 +174,7 @@ e.g.	z	[z with no errors - 1 column for dataset]
      </widget>
      <widget class="QWidget" name="csvtab" >
       <attribute name="title" >
-       <string>CSV</string>
-      </attribute>
-      <attribute name="toolTip" >
-       <string>For importing comma separated variable files</string>
+       <string>CS&amp;V</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
@@ -273,7 +270,7 @@ Veusz can also read data organised in rows rather than columns.
      </widget>
      <widget class="QWidget" name="fitstab" >
       <attribute name="title" >
-       <string>FITS</string>
+       <string>FI&amp;TS</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
@@ -338,7 +335,11 @@ Veusz can also read data organised in rows rather than columns.
            </widget>
           </item>
           <item row="0" column="1" >
-           <widget class="QLineEdit" name="fitsdatasetname" />
+           <widget class="QLineEdit" name="fitsdatasetname" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column or image specified is imported using the name given here&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0" >
            <widget class="QLabel" name="label_11" >
@@ -363,6 +364,9 @@ Veusz can also read data organised in rows rather than columns.
           </item>
           <item row="4" column="1" >
            <widget class="QComboBox" name="fitsnegcolumn" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column used for negative errors, if appropriate&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
             <property name="editable" >
              <bool>false</bool>
             </property>
@@ -377,6 +381,9 @@ Veusz can also read data organised in rows rather than columns.
           </item>
           <item row="2" column="1" >
            <widget class="QComboBox" name="fitssymcolumn" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column used for symmetric errors, if appropriate&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
             <property name="editable" >
              <bool>false</bool>
             </property>
@@ -384,6 +391,9 @@ Veusz can also read data organised in rows rather than columns.
           </item>
           <item row="3" column="1" >
            <widget class="QComboBox" name="fitsposcolumn" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column used for positive errors, if appropriate&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
             <property name="editable" >
              <bool>false</bool>
             </property>
@@ -391,6 +401,9 @@ Veusz can also read data organised in rows rather than columns.
           </item>
           <item row="1" column="1" >
            <widget class="QComboBox" name="fitsdatacolumn" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If importing a table, this is the column used to provide the main data&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
             <property name="editable" >
              <bool>false</bool>
             </property>
@@ -401,10 +414,168 @@ Veusz can also read data organised in rows rather than columns.
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab2d" >
+      <attribute name="title" >
+       <string>&amp;2D</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_9" >
+         <property name="text" >
+          <string>File preview:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="twod_previewedit" >
+         <property name="readOnly" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_20" >
+           <property name="text" >
+            <string>Datasets:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="twod_datasetsedit" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">A space separated list of dataset names to import from the file&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item row="1" column="2" >
+          <widget class="QLabel" name="label_17" >
+           <property name="text" >
+            <string>to</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_18" >
+           <property name="text" >
+            <string>Range of &amp;Y:</string>
+           </property>
+           <property name="buddy" >
+            <cstring>twod_yminedit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3" >
+          <widget class="QLineEdit" name="twod_ymaxedit" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a number for the maximum coordinate of the Y axis (default number of rows in file)&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QLineEdit" name="twod_xminedit" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a number for the minimum coordinate of the X axis (default 0)&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3" >
+          <widget class="QLineEdit" name="twod_xmaxedit" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a value for a maximum coordinate of the X axis (default is number of columns in file)&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="QLineEdit" name="twod_yminedit" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a number for the minimum coordinate of the Y axis (default 0)&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label_15" >
+           <property name="text" >
+            <string>Range of &amp;X:</string>
+           </property>
+           <property name="buddy" >
+            <cstring>twod_xminedit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" >
+          <widget class="QLabel" name="label_16" >
+           <property name="text" >
+            <string>to</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="twod_invertrowscheck" >
+         <property name="text" >
+          <string>Invert &amp;rows when reading</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="twod_invertcolscheck" >
+         <property name="text" >
+          <string>Invert colu&amp;mns when reading</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="twod_transposecheck" >
+         <property name="text" >
+          <string>Trans&amp;pose rows and columns</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_19" >
+         <property name="text" >
+          <string>Data are read as a 2D matrix from the file.  X is read from left to right, Y from bottom to top, by default. These parameters listed here can be altered by including xrange A B, yrange A B, invertrows, invertcols and transpose as lines in the data file. Multiple datasets can be included by separating with blank lines.
+</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="linkcheckbox" >
+     <property name="toolTip" >
+      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Data imported are not stored in the Veusz saved file, but are reloaded each time the Veusz file is opened, or Data-&amp;gt;Reload is selected on the menu.&lt;/p>&lt;/body>&lt;/html></string>
+     </property>
      <property name="text" >
       <string>&amp;Link datasets to file</string>
      </property>
@@ -473,18 +644,27 @@ Veusz can also read data organised in rows rather than columns.
   <tabstop>previewedit</tabstop>
   <tabstop>descriptoredit</tabstop>
   <tabstop>blockcheckbox</tabstop>
-  <tabstop>linkcheckbox</tabstop>
-  <tabstop>importbutton</tabstop>
-  <tabstop>closebutton</tabstop>
+  <tabstop>previewtablecsv</tabstop>
+  <tabstop>directioncombo</tabstop>
+  <tabstop>prefixedit</tabstop>
+  <tabstop>fitshdulist</tabstop>
+  <tabstop>fitsdatasetname</tabstop>
+  <tabstop>fitsdatacolumn</tabstop>
   <tabstop>fitssymcolumn</tabstop>
   <tabstop>fitsposcolumn</tabstop>
   <tabstop>fitsnegcolumn</tabstop>
-  <tabstop>directioncombo</tabstop>
-  <tabstop>previewtablecsv</tabstop>
-  <tabstop>fitsdatacolumn</tabstop>
-  <tabstop>fitshdulist</tabstop>
-  <tabstop>prefixedit</tabstop>
-  <tabstop>fitsdatasetname</tabstop>
+  <tabstop>twod_previewedit</tabstop>
+  <tabstop>twod_datasetsedit</tabstop>
+  <tabstop>twod_xminedit</tabstop>
+  <tabstop>twod_xmaxedit</tabstop>
+  <tabstop>twod_yminedit</tabstop>
+  <tabstop>twod_ymaxedit</tabstop>
+  <tabstop>twod_invertrowscheck</tabstop>
+  <tabstop>twod_invertcolscheck</tabstop>
+  <tabstop>twod_transposecheck</tabstop>
+  <tabstop>linkcheckbox</tabstop>
+  <tabstop>importbutton</tabstop>
+  <tabstop>closebutton</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -495,8 +675,8 @@ Veusz can also read data organised in rows rather than columns.
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>526</x>
-     <y>449</y>
+     <x>634</x>
+     <y>524</y>
     </hint>
     <hint type="destinationlabel" >
      <x>318</x>
