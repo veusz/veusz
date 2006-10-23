@@ -233,6 +233,7 @@ class MainWindow(qt4.QMainWindow):
 
         # create toolbar
         self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
+        self.maintoolbar.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, self.maintoolbar)
 
         # add main menus
@@ -394,10 +395,8 @@ class MainWindow(qt4.QMainWindow):
         setting.settingdb['geometry_mainwindow'] = geometry
 
         # store docked windows
-        s = qt4.QString()
-        stream = qt4.QTextStream(s, qt4.IO_WriteOnly)
-        stream << self
-        setting.settingdb['geometry_docwindows'] = str(s)
+        data = str(self.saveState())
+        setting.settingdb['geometry_mainwindowstate'] = data
 
         qt4.QMainWindow.closeEvent(self, evt)
 

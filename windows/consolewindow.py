@@ -123,9 +123,8 @@ class ConsoleWindow(qt4.QDockWidget):
 
     def __init__(self, thedocument, *args):
         qt4.QDockWidget.__init__(self, *args)
-        #QT4FIXME
-        #self.setResizeEnabled( True )
         self.setWindowTitle("Console - Veusz")
+        self.setObjectName("veuszconsolewindow")
 
         # arrange sub-widgets in a vbox
         self.vbox = qt4.QWidget(self)

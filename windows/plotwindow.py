@@ -271,14 +271,15 @@ class PlotWindow( qt4.QScrollArea ):
 
     def showToolbar(self, show=True):
         """Show or hide toolbar"""
-        self.zoomtoolbar.setVisible(show)
+        self.viewtoolbar.setVisible(show)
 
     def createToolbar(self, parent, menu=None):
         """Make a view toolbar, and optionally update menu."""
 
-        self.zoomtoolbar = qt4.QToolBar("View toolbar - Veusz", parent)
-        self.zoomtoolbar.hide()
-        parent.addToolBar(qt4.Qt.TopToolBarArea, self.zoomtoolbar)
+        self.viewtoolbar = qt4.QToolBar("View toolbar - Veusz", parent)
+        self.viewtoolbar.setObjectName('veuszviewtoolbar')
+        self.viewtoolbar.hide()
+        parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
 
         items = [
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
@@ -316,10 +317,10 @@ class PlotWindow( qt4.QScrollArea ):
             menus = {}
             menus['view'] = menu
 
-        self.viewactions = action.populateMenuToolbars(items, self.zoomtoolbar,
+        self.viewactions = action.populateMenuToolbars(items, self.viewtoolbar,
                                                        menus)
                                                    
-        zoomtb = qt4.QToolButton(self.zoomtoolbar)
+        zoomtb = qt4.QToolButton(self.viewtoolbar)
         zoomtb.setIcon( action.getIcon('zoom-options.png') )
 
         # drop down zoom button on toolbar
@@ -340,7 +341,7 @@ class PlotWindow( qt4.QScrollArea ):
         self.viewactions['viewselect'].setEnabled(True)
         self.connect(g, qt4.SIGNAL('triggered(QAction*)'), self.slotSelectMode)
 
-        return self.zoomtoolbar
+        return self.viewtoolbar
 
     def doZoomRect(self, endpos):
         """Take the zoom rectangle drawn by the user and do the zooming.

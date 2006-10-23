@@ -239,6 +239,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         qt4.QDockWidget.__init__(self, parent)
         self.parent = parent
         self.setWindowTitle("Editing - Veusz")
+        self.setObjectName("veuszeditingwindow")
 
         # construct tree
         self.document = document
@@ -266,6 +267,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         # toolbar to create widgets, etc
         self.toolbar = qt4.QToolBar("Editing toolbar - Veusz",
                                     parent)
+        self.toolbar.setObjectName("veuszeditingtoolbar")
         self.toolbar.setOrientation(qt4.Qt.Vertical)
         parent.addToolBar(qt4.Qt.LeftToolBarArea, self.toolbar)
         self._constructToolbarMenu()
