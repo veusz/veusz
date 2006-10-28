@@ -188,12 +188,12 @@ class Axis(widget.Widget):
             if s.max == 'Auto':
                 self.plottedrange[1] = autorange[1]
 
-            # yuck, but sometimes it's true
-            # tweak range to make sure things don't blow up further down the
-            # line
-            if self.plottedrange[0] == self.plottedrange[1]:
-                self.plottedrange[1] = ( self.plottedrange[0] +
-                                         max(1., self.plottedrange[0]*0.1) )
+        # yuck, but sometimes it's true
+        # tweak range to make sure things don't blow up further down the
+        # line
+        if self.plottedrange[0] == self.plottedrange[1]:
+               self.plottedrange[1] = ( self.plottedrange[0] +
+                                        max(1., self.plottedrange[0]*0.1) )
 
         # handle axis values round the wrong way
         invertaxis = self.plottedrange[0] > self.plottedrange[1]
