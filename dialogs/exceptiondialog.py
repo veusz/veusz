@@ -137,26 +137,28 @@ class ExceptionDialog(qt4.QDialog):
             ExceptionDialog.exceptions.append( [backtrace, 1] )
 
         # fill in exception table
-        e = self.exceptiontable
-        e.setRowCount(len(ExceptionDialog.exceptions))
-        e.setHorizontalHeaderLabels(['Problem', 'Count'])
-        e.horizontalHeader().setResizeMode(0, qt4.QHeaderView.Stretch)
+        e = self.exceptionlist
+        e.clear()
+        e.setHeaderLabels(['Problem', 'Count'])
 
-        newrow = 0
+        items = []
+        thisrow = None
         for row, (exc, num) in enumerate(ExceptionDialog.exceptions):
+            item = qt4.QTreeWidgetItem([exc, str(num)])
             if exc == backtrace:
-                newrow = row
-            e.setItem(row, 0, qt4.QTableWidgetItem(exc))
-            e.setItem(row, 1, qt4.QTableWidgetItem(str(num)))
-            
-        e.selectRow(newrow)
+                thisrow = item
+            items.insert(0, item)
+
+        e.addTopLevelItems(items)
+        e.resizeColumnToContents(0)
+        e.setCurrentItem(thisrow)
         
     def accept(self):
         """Accept by opening send dialog."""
 
         # get text for selected item
-        selitems = self.exceptiontable.selectedItems()
-        excepttext = unicode(selitems[0].text())
+        selitems = self.exceptionlist.selectedItems()
+        excepttext = unicode(selitems[0].text(0))
 
         d = ExceptionSendDialog(excepttext, self)
         if d.exec_() == qt4.QDialog.Accepted:
