@@ -319,7 +319,8 @@ class PlotWindow( qt4.QScrollArea ):
 
         self.viewactions = action.populateMenuToolbars(items, self.viewtoolbar,
                                                        menus)
-                                                   
+
+        # a button for the zoom icon
         zoomtb = qt4.QToolButton(self.viewtoolbar)
         zoomtb.setIcon( action.getIcon('zoom-options.png') )
 
@@ -328,8 +329,9 @@ class PlotWindow( qt4.QScrollArea ):
         for act in ('viewzoomin', 'viewzoomout', 'viewzoom11',
                     'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
             zoompop.addAction(self.viewactions[act])
-        #zoomtb.setPopup(zoompop)
-        #zoomtb.setPopupDelay(0)
+        zoomtb.setMenu(zoompop)
+        zoomtb.setPopupMode(qt4.QToolButton.InstantPopup)
+        self.viewtoolbar.addWidget(zoomtb)
 
         # define action group for various different selection models
         g = self.selectactiongrp = qt4.QActionGroup(self)
