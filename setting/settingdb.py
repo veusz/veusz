@@ -78,7 +78,6 @@ class _SettingDB(object):
 
         # write each entry, keeping track of which ones haven't been written
         cleankeys = []
-        print self.database
         for key, value in self.database.iteritems():
             cleankey = key.replace('/', self.sepchars)
             cleankeys.append(cleankey)
@@ -92,19 +91,19 @@ class _SettingDB(object):
 
     def __getitem__(self, key):
         """Get the item from the database."""
-        return self.database[unicode(key)]
+        return self.database[key]
 
     def __setitem__(self, key, value):
         """Set the value in the database."""
-        self.database[unicode(key)] = value
+        self.database[key] = value
 
     def __delitem__(self, key):
         """Remove the key from the database."""
-        del self.database[unicode(key)]
+        del self.database[key]
 
     def __contains__(self, key):
         """Is the key in the database."""
-        return unicode(key) in self.database
+        return key in self.database
 
 # create the SettingDB singleton
 settingdb = _SettingDB()

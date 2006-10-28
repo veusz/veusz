@@ -296,7 +296,7 @@ class Widget(object):
     def slotSettingModified(self, ismodified):
         """Called when settings is modified."""
 
-        if ismodified:
+        if ismodified and self.document:
             self.document.setModified(True)
 
     def readDefaults(self):
