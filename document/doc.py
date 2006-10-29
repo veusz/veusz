@@ -336,9 +336,11 @@ class Document( qt4.QObject ):
 
         ext = os.path.splitext(filename)[1]
 
-        if ext == '.eps':
+        if ext == '.eps' or ext == '.pdf':
             # write eps file
             p = qt4.QPrinter()
+            if ext == '.pdf':
+                p.setOutputFormat(qt4.QPrinter.PdfFormat)
             p.setOutputFileName(filename)
             p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
             p.setCreator('Veusz %s' % utils.version())
@@ -384,13 +386,6 @@ class Document( qt4.QObject ):
             os.unlink(tmpfilename)
             if len(text) != 0:
                 raise RuntimeError, text
-
-        elif ext == '.svg':
-            # Use qt's QPicture environment to export the drawing commands
-            # as svg (scalable vector graphics)
-            p = qt4.QPicture()
-            self.printTo( p, [pagenumber] )
-            p.save(filename, 'svg')
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext

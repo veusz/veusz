@@ -653,7 +653,7 @@ class MainWindow(qt4.QMainWindow):
         # File types we can export to in the form ([extensions], Name)
         formats = [(["eps"], "Encapsulated Postscript"),
                    (["png"], "Portable Network Graphics"),
-                   (["svg"], "Scalable Vector Graphics")]
+                   (["pdf"], "Portable Document Format")]
 
         fd = qt4.QFileDialog(self, 'Export page')
         if not self.exportDir:
