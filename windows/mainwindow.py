@@ -101,8 +101,8 @@ class MainWindow(qt4.QMainWindow):
         self.pagelabel = qt4.QLabel(self.statusBar())
         self.statusBar().addWidget(self.pagelabel)
 
-        self.dirname = ''
-        self.exportDir = ''
+        self.dirname = os.getcwd()
+        self.exportDir = os.getcwd()
         
         self.connect( self.plot, qt4.SIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
@@ -410,11 +410,9 @@ class MainWindow(qt4.QMainWindow):
             self.move( qt4.QPoint(geometry[0], geometry[1]) )
 
         # restore docked window geometry
-        if 'geometry_docwindows' in setting.settingdb:
-            s = setting.settingdb['geometry_docwindows']
-            s = qt4.QString(s)
-            stream = qt4.QTextStream(s, qt4.IO_ReadOnly)
-            stream >> self
+        if 'geometry_mainwindowstate' in setting.settingdb:
+            b = qt4.QByteArray(setting.settingdb['geometry_mainwindowstate'])
+            self.restoreState(b)
 
         qt4.QMainWindow.showEvent(self, evt)
 
@@ -430,7 +428,6 @@ class MainWindow(qt4.QMainWindow):
         else:
             # show busy cursor
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
             try:
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
@@ -458,9 +455,11 @@ class MainWindow(qt4.QMainWindow):
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
         
-        fd = qt4.QFileDialog(self, dialogtitle, self.dirname,
-                             "%s (*.%s)" % (filedescr, filetype) )
+        fd = qt4.QFileDialog(self, dialogtitle)
+        fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.AnyFile )
+        fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
+        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
 
         # okay was selected
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -493,10 +492,12 @@ class MainWindow(qt4.QMainWindow):
     def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
         """Display an open dialog and return a filename."""
         
-        fd = qt4.QFileDialog(self, dialogtitle, self.dirname,
-                             "%s (*.%s)" % (filedescr, filetype) )
+        fd = qt4.QFileDialog(self, dialogtitle)
+        fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
-
+        fd.setAcceptMode( qt4.QFileDialog.AcceptOpen )
+        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        
         # if the user chooses a file
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
@@ -637,7 +638,7 @@ class MainWindow(qt4.QMainWindow):
 
         #XXX - This should be disabled if the page count is 0
 
-        #File types we can export to in the form ([extensions], Name)
+        # File types we can export to in the form ([extensions], Name)
         formats = [(["eps"], "Encapsulated Postscript"),
                    (["png"], "Portable Network Graphics"),
                    (["svg"], "Scalable Vector Graphics")]
@@ -657,7 +658,7 @@ class MainWindow(qt4.QMainWindow):
         validextns = []
         for extns, name in formats:
             extensions = " ".join(["*." + item for item in extns])
-            #join eveything together to make a filter string
+            # join eveything together to make a filter string
             filterstr = '%s (%s)' % (name, extensions)
             filtertoext[filterstr] = extns
             filters.append(filterstr)
