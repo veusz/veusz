@@ -155,13 +155,15 @@ class MainWindow(qt4.QMainWindow):
                      self.slotAboutToShowView)
 
     def dragEnterEvent(self, event):
-        if (event.provides("text/uri-list") and self._getVeuszFiles(event)):
-            event.accept(True)
+        """Check whether event is valid to be dropped."""
+        if (event.provides("text/uri-list") and
+            self._getVeuszDropFiles(event)):
+            event.acceptProposedAction()
 
     def dropEvent(self, event):
         """Respond to a drop event on the current window"""
         if event.provides("text/uri-list"):
-            files = self._getVeuszFiles(event)
+            files = self._getVeuszDropFiles(event)
             if files:
                 if self.document.isBlank():
                     self.openFileInWindow(files[0])
@@ -170,17 +172,18 @@ class MainWindow(qt4.QMainWindow):
                 for filename in files[1:]:
                     self.CreateWindow(filename)
             
-    def _getVeuszFiles(self, event):
+    def _getVeuszDropFiles(self, event):
         """Return a list of veusz files from a drag/drop event containing a
         text/uri-list"""
-        draggedFiles = qt4.QStringList()
-        qt4.QUriDrag.decodeLocalFiles(event, draggedFiles)
-        fileList = []
-        for i in range(len(draggedFiles)):
-            filename=draggedFiles[i]
-            if filename[-4:] == ".vsz":
-                fileList.append(unicode(filename))
-        return fileList
+
+        mime = event.mimeData()
+        if not mime.hasUrls():
+            return []
+        else:
+            # get list of vsz files dropped
+            urls = [unicode(u.path()) for u in mime.urls()]
+            urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
+            return urls
 
     def slotAboutToShowView(self):
         """Put check marks against dock menu items if appropriate."""
