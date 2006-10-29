@@ -639,7 +639,16 @@ class MainWindow(qt4.QMainWindow):
     def slotFileExport(self):
         """Export the graph."""
 
-        #XXX - This should be disabled if the page count is 0
+        # check there is a page
+        if self.document.getNumberPages() == 0:
+                qt4.QMessageBox("Veusz",
+                                "No pages to export",
+                                qt4.QMessageBox.Warning,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+                return
 
         # File types we can export to in the form ([extensions], Name)
         formats = [(["eps"], "Encapsulated Postscript"),
@@ -710,21 +719,26 @@ class MainWindow(qt4.QMainWindow):
     def slotFilePrint(self):
         """Print the document."""
 
-        doc = self.document
+        if self.document.getNumberPages() == 0:
+                qt4.QMessageBox("Veusz",
+                                "No pages to print",
+                                qt4.QMessageBox.Warning,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+                return
+
         prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
         prnt.setColorMode(qt4.QPrinter.Color)
         prnt.setCreator('Veusz %s' % utils.version())
         prnt.setDocName(self.filename)
 
         dialog = qt4.QPrintDialog(prnt, self)
-        dialog.setMinMax(1, doc.getNumberPages())
+        dialog.setMinMax(1, self.document.getNumberPages())
         if dialog.exec_():
             # get page range
             minval, maxval = dialog.minPage(), dialog.maxPage()
-
-            # all pages requested
-            if minval == 0 and maxval == 0:
-                minval, maxval = 1, doc.getNumberPages()
 
             # pages are relative to zero
             minval -= 1
@@ -740,7 +754,7 @@ class MainWindow(qt4.QMainWindow):
             pages *= prnt.numCopies()
 
             # do the printing
-            doc.printTo( prnt, pages )
+            self.document.printTo( prnt, pages )
 
     def slotModifiedDoc(self, ismodified):
         """Disable certain actions if document is not modified."""
