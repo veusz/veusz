@@ -713,13 +713,14 @@ class MainWindow(qt4.QMainWindow):
         doc = self.document
         prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
         prnt.setColorMode(qt4.QPrinter.Color)
-        prnt.setMinMax( 1, doc.getNumberPages() )
         prnt.setCreator('Veusz %s' % utils.version())
         prnt.setDocName(self.filename)
 
-        if prnt.setup():
+        dialog = qt4.QPrintDialog(prnt, self)
+        dialog.setMinMax(1, doc.getNumberPages())
+        if dialog.exec_():
             # get page range
-            minval, maxval = prnt.fromPage(), prnt.toPage()
+            minval, maxval = dialog.minPage(), dialog.maxPage()
 
             # all pages requested
             if minval == 0 and maxval == 0:
