@@ -339,8 +339,8 @@ class PlotWindow( qt4.QScrollArea ):
         for a in [self.viewactions[i] for i in
                   ('viewselect', 'viewzoomgraph')]:
             a.setActionGroup(g)
-            #a.setToggleAction(True)
-        self.viewactions['viewselect'].setEnabled(True)
+            a.setCheckable(True)
+        self.viewactions['viewselect'].setChecked(True)
         self.connect(g, qt4.SIGNAL('triggered(QAction*)'), self.slotSelectMode)
 
         return self.viewtoolbar
@@ -453,8 +453,6 @@ class PlotWindow( qt4.QScrollArea ):
                     qt4.QCursor(qt4.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
-                qt4.QApplication.setOverrideCursor(
-                    qt4.QCursor(qt4.Qt.CrossCursor))
                 self.label.drawRect(self.grabPos, self.grabPos)
 
             # record what mode we were clicked in
@@ -500,7 +498,6 @@ class PlotWindow( qt4.QScrollArea ):
                 qt4.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
                 self.label.hideRect()
-                qt4.QApplication.restoreOverrideCursor()
                 self.doZoomRect(self.widget().mapFromParent(event.pos()))
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
@@ -758,9 +755,16 @@ class PlotWindow( qt4.QScrollArea ):
         
         # convert action into clicking mode
         self.clickmode = modecnvt[action]
+
+        if self.clickmode == 'select':
+            self.label.setCursor(qt4.Qt.ArrowCursor)
+        elif self.clickmode == 'graphzoom':
+            self.label.setCursor(qt4.Qt.CrossCursor)
         
     def getClick(self):
         """Return a click point from the graph."""
+
+        # FIXME does not work for qt4 probably
 
         # wait for click from user
         qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.CrossCursor))
