@@ -53,7 +53,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def columnCount(self, parent):
         """Return number of columns of data."""
-        return 3
+        return 2
 
     def data(self, index, role):
         """Return data for the index given."""
@@ -69,43 +69,29 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             return self.getTextData(obj, column)
         elif role == qt4.Qt.DecorationRole:
             return self.getIconData(obj, column)
-        else:
-            # return nothing
-            return qt4.QVariant()
+        elif role == qt4.Qt.ToolTipRole:
+            if obj.userdescription:
+                return qt4.QVariant(obj.userdescription)
+
+        # return nothing
+        return qt4.QVariant()
 
     def getTextData(self, obj, column):
         """Get textual data for the column."""
-        if obj.isWidget():
-            # is a widget
-            if column == 0:
-                val = obj.name
-            elif column == 1:
-                val = obj.typename
-            else:
-                val = obj.userdescription
+        # is a widget
+        if column == 0:
+            val = obj.name
+        elif column == 1:
+            val = obj.typename
         else:
-            # are settings
-            if column == 0:
-                val = obj.name
-            elif column == 1:
-                val = 'setting'
-            else:
-                val = ''
+            val = obj.userdescription
 
         return qt4.QVariant(val)
 
     def getIconData(self, obj, column):
         """Return icon for object and and column given."""
         if column == 0:
-            # icons only for column 0
-            if obj.isWidget():
-                # is a widget
-                return qt4.QVariant(action.getIcon('button_%s.png' % obj.typename))
-            else:
-                # is a settings
-                if hasattr(obj, 'pixmap'):
-                    return qt4.QVariant(action.getIcon('settings_%s.png' % obj.pixmap))
-
+            return qt4.QVariant(action.getIcon('button_%s.png' % obj.typename))
 
         return qt4.QVariant()
 
@@ -132,10 +118,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if parent is None:
             return [self.document.basewidget]
         else:
-            if parent.isWidget():
-                return parent.settings.getSettingsList() + parent.children
-            else:
-                return parent.getSettingsList()
+            return parent.children
 
     def index(self, row, column, parent):
         """Construct an index for a child of parent."""
@@ -169,19 +152,6 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         return parent
     
-    def _getParent(self, obj):
-        """Work out a parent for an object
-
-        This is more difficult as subsettings of a widget's settings
-        should point back to the widget."""
-
-        if obj.isWidget():
-            return obj.parent
-        elif obj.parent.parent.isWidget():
-            return obj.parent.parent
-        else:
-            return obj.parent
-        
     def parent(self, index):
         """Find the parent of the index given."""
 
@@ -189,13 +159,13 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             return qt4.QModelIndex()
 
         thisobj = index.internalPointer()
-        parentobj = self._getParent(thisobj)
+        parentobj = thisobj.parent
 
         if parentobj is None:
             return qt4.QModelIndex()
         else:
             # lookup parent in grandparent's children
-            grandparentchildren = self._getChildren(self._getParent(parentobj))
+            grandparentchildren = self._getChildren(parentobj.parent)
             parentrow = grandparentchildren.index(parentobj)
 
             return self.createIndex(parentrow, 0, parentobj)
@@ -215,19 +185,99 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """Return the settings for the index selected."""
 
         obj = index.internalPointer()
-
-        if obj.isWidget():
-            return obj.settings
-        else:
-            return obj
+        return obj.settings
 
     def getWidget(self, index):
         """Get associated widget for index selected."""
         obj = index.internalPointer()
 
-        while not obj.isWidget():
-            obj = obj.parent
         return obj
+
+class PropertyList(qt4.QWidget):
+    """Edit the widget properties using a set of controls."""
+
+    def __init__(self, document, showsubsettings=True, *args):
+        qt4.QWidget.__init__(self, *args)
+        self.document = document
+        self.showsubsettings = showsubsettings
+
+        self.layout = qt4.QGridLayout(self)
+
+        self.layout.setSpacing( self.layout.spacing()/2 )
+        self.layout.setMargin(4)
+        
+        self.children = []
+
+    def updateProperties(self, settings):
+        """Update the list of controls with new ones for the settings."""
+
+        # delete all child widgets
+        while len(self.children) > 0:
+            self.children.pop().deleteLater()
+
+        if settings is None:
+            return
+
+        row = 0
+        # FIXME: add actions
+
+        # add subsettings if necessary
+        if settings.getSettingsList() and self.showsubsettings:
+            tabbed = TabbedSettings(self.document, settings, self)
+            self.layout.addWidget(tabbed, row, 1, 1, 2)
+            row += 1
+            self.children.append(tabbed)
+
+        for setn in settings.getSettingList():
+            lab = SettingLabelButton(self.document, setn, self)
+            self.layout.addWidget(lab, row, 0)
+            self.children.append(lab)
+
+            cntrl = setn.makeControl(self)
+            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                         self.slotSettingChanged)
+            self.layout.addWidget(cntrl, row, 1)
+            self.children.append(cntrl)
+
+            row += 1
+
+    def slotSettingChanged(self, widget, setting, val):
+        """Called when a setting is changed by the user.
+        
+        This updates the setting to the value using an operation so that
+        it can be undone.
+        """
+        
+        self.document.applyOperation(document.OperationSettingSet(setting, val))
+        
+class TabbedSettings(qt4.QTabWidget):
+    """Class to have tabbed set of settings."""
+
+    def __init__(self, document, settings, *args):
+        qt4.QTabWidget.__init__(self, *args)
+
+        for subset in settings.getSettingsList():
+
+            tab = qt4.QWidget()
+            layout = qt4.QVBoxLayout()
+            layout.setMargin(2)
+            tab.setLayout(layout)
+
+            scroll = qt4.QScrollArea(tab)
+            layout.addWidget(scroll)
+            scroll.setWidgetResizable(True)
+
+            plist = PropertyList(document)
+            plist.updateProperties(subset)
+            scroll.setWidget(plist)
+            plist.show()
+
+            if hasattr(subset, 'pixmap'):
+                icon = action.getIcon('settings_%s.png' % subset.pixmap)
+                indx = self.addTab(tab, icon, '')
+                self.setTabToolTip(indx, subset.name)
+            else:
+                self.addTab(tab, subset.name)
 
 class FormatWindow(qt4.QDockWidget):
     """A window for formatting the current widget.
@@ -241,43 +291,21 @@ class FormatWindow(qt4.QDockWidget):
         self.setObjectName("veuszformattingwindow")
 
         self.document = document
-        
-        self.maintab = qt4.QTabWidget(self)
-        self.setWidget(self.maintab)
+        self.tabwidget = None
 
     def selectWidget(self, widget):
         """Add formatting tabs for each sub-option."""
-
-        # delete existing tab
-        while self.maintab.count() != 0:
-            self.maintab.removeTab(0)
 
         # exit if no widget selected
         if widget is None:
             return
 
-        settings = widget.settings
-        for subset in settings.getSettingsList():
-            tab = qt4.QWidget()
-            layout = qt4.QVBoxLayout()
-            layout.setMargin(2)
-            tab.setLayout(layout)
+        # delete old tabwidget
+        if self.tabwidget:
+            self.tabwidget.deleteLater()
 
-            scroll = qt4.QScrollArea(tab)
-            layout.addWidget(scroll)
-            scroll.setWidgetResizable(True)
-
-            plist = PropertyList(self.document)
-            plist.updateProperties(subset)
-            scroll.setWidget(plist)
-            plist.show()
-
-            if hasattr(subset, 'pixmap'):
-                icon = action.getIcon('settings_%s.png' % subset.pixmap)
-                indx = self.maintab.addTab(tab, icon, '')
-                self.maintab.setTabToolTip(indx, subset.name)
-            else:
-                self.maintab.addTab(tab, subset.name)
+        self.tabwidget = TabbedSettings(self.document, widget.settings, self)
+        self.setWidget(self.tabwidget)
 
 class TreeEditWindow2(qt4.QDockWidget):
     """A window for editing the document as a tree."""
@@ -307,7 +335,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         # construct list of properties (in scrollable area)
         self.proplistscroll = qt4.QScrollArea()
         self.proplistscroll.setWidgetResizable(True)
-        self.proplist = PropertyList(document)
+        self.proplist = PropertyList(document, showsubsettings=False)
         self.proplistscroll.setWidget(self.proplist)
 
         # splitter splits tree from properties
@@ -731,55 +759,6 @@ class SettingLabelButton(qt4.QPushButton):
     def actionDefaultForget(self):
         self.setting.removeDefault()
     
-class PropertyList(qt4.QWidget):
-    """Edit the widget properties using a set of controls."""
-
-    def __init__(self, document, *args):
-        qt4.QWidget.__init__(self, *args)
-        self.document = document
-
-        self.layout = qt4.QGridLayout(self)
-
-        self.layout.setSpacing( self.layout.spacing()/2 )
-        self.layout.setMargin(4)
-        
-        self.children = []
-
-    def updateProperties(self, settings):
-        """Update the list of controls with new ones for the settings."""
-
-        # delete all child widgets
-        while len(self.children) > 0:
-            self.children.pop().deleteLater()
-
-        if settings is None:
-            return
-
-        row = 0
-        # FIXME: add actions
-
-        for setn in settings.getSettingList():
-            lab = SettingLabelButton(self.document, setn, self)
-            self.layout.addWidget(lab, row, 0)
-            self.children.append(lab)
-
-            cntrl = setn.makeControl(self)
-            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                         self.slotSettingChanged)
-            self.layout.addWidget(cntrl, row, 1)
-            self.children.append(cntrl)
-
-            row += 1
-
-    def slotSettingChanged(self, widget, setting, val):
-        """Called when a setting is changed by the user.
-        
-        This updates the setting to the value using an operation so that
-        it can be undone.
-        """
-        
-        self.document.applyOperation(document.OperationSettingSet(setting, val))
-        
             
 ##############################################################
 
