@@ -261,7 +261,7 @@ class MainWindow(qt4.QMainWindow):
         # For menus wih submenus slot should be replaced by a list of
         # submenus items of the dame form where the menu will be of the form
         # menuid.itemid
-        items = [
+        items = (
             ('filenew', 'New document', '&New', 'file',
              self.slotFileNew, 'stock-new.png', True, 'Ctrl+N'),
             ('fileopen', 'Open a document', '&Open...', 'file',
@@ -316,7 +316,7 @@ class MainWindow(qt4.QMainWindow):
             ('help', ),
             ('helpabout', 'Displays information about the program', 'About...',
              'help', self.slotHelpAbout, '', False, '')
-            ]
+            )
             
         self.actions = action.populateMenuToolbars(items, self.maintoolbar,
                                                    self.menus)

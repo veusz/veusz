@@ -32,7 +32,7 @@ import readcsv
 
 def _convertNumarray(a):
     """Convert to a numarray if possible (doing copy)."""
-    if a == None:
+    if a is None:
         return None
     elif type(a) != type(N.arange(1, type=N.Float64)):
         return N.array(a, type=N.Float64)
@@ -145,7 +145,7 @@ class Linked2DFile(LinkedFileBase):
         args = [repr(self.filename), repr(self.datasets)]
         for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose'):
             v = getattr(self, p)
-            if v != None:
+            if v is not None:
                 args.append( '%s=%s' % (p, repr(v)) )
         args.append('linked=True')
 
@@ -205,7 +205,7 @@ class LinkedFITSFile(LinkedFileBase):
         for c, a in itertools.izip(self.columns,
                                    ('datacol', 'symerrcol',
                                     'poserrcol', 'negerrcol')):
-            if c != None:
+            if c is not None:
                 args.append('%s=%s' % (a, repr(c)))
         args.append('linked=True')
 
@@ -290,7 +290,7 @@ class DatasetBase(object):
         '''
 
         # links should only be saved once
-        if self.linked != None and self.linked not in savedlinks:
+        if self.linked is not None and self.linked not in savedlinks:
             savedlinks[self.linked] = True
             self.linked.saveToFile(file)
 
@@ -340,7 +340,7 @@ class Dataset2D(DatasetBase):
         """Write the 2d dataset to the file given."""
 
         # return if there is a link
-        if self.linked != None:
+        if self.linked is not None:
             return
 
         file.write("ImportString2D(%s, '''\n" % repr(name))
@@ -388,7 +388,7 @@ class Dataset(DatasetBase):
         # check the sizes of things match up
         s = self.data.shape
         for i in (self.serr, self.nerr, self.perr):
-            if i != None and i.shape != s:
+            if i is not None and i.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
 
     def description(self):
@@ -413,7 +413,8 @@ class Dataset(DatasetBase):
 
     def hasErrors(self):
         '''Whether errors on dataset'''
-        return self.serr != None or self.nerr != None or self.perr != None
+        return (self.serr is not None or self.nerr is not None or
+                self.perr is not None)
 
     def getPointRanges(self):
         '''Get range of coordinates for each point in the form
@@ -422,14 +423,14 @@ class Dataset(DatasetBase):
         minvals = self.data.copy()
         maxvals = self.data.copy()
 
-        if self.serr != None:
+        if self.serr is not None:
             minvals -= self.serr
             maxvals += self.serr
 
-        if self.nerr != None:
+        if self.nerr is not None:
             minvals += self.nerr
 
-        if self.perr != None:
+        if self.perr is not None:
             maxvals += self.perr
 
         return (minvals, maxvals)
@@ -442,7 +443,7 @@ class Dataset(DatasetBase):
 
     def empty(self):
         '''Is the data defined?'''
-        return self.data == None or len(self.data) == 0
+        return self.data is None or len(self.data) == 0
 
     def changeValues(self, type, vals):
         """Change the requested part of the dataset to vals.
@@ -463,7 +464,7 @@ class Dataset(DatasetBase):
         # just a check...
         s = self.data.shape
         for i in (self.serr, self.nerr, self.perr):
-            assert i == None or i.shape == s
+            assert i is None or i.shape == s
 
         self.document.setModified(True)
 
@@ -472,19 +473,19 @@ class Dataset(DatasetBase):
         '''
 
         # return if there is a link
-        if self.linked != None:
+        if self.linked is not None:
             return
 
         # build up descriptor
         datasets = [self.data]
         descriptor = name
-        if self.serr != None:
+        if self.serr is not None:
             descriptor += ',+-'
             datasets.append(self.serr)
-        if self.perr != None:
+        if self.perr is not None:
             descriptor += ',+'
             datasets.append(self.perr)
-        if self.nerr != None:
+        if self.nerr is not None:
             descriptor += ',-'
             datasets.append(self.nerr)
 
@@ -627,7 +628,7 @@ class DatasetExpression(Dataset):
     def _propValues(self, part):
         """Check whether expressions need reevaluating, and recalculate if necessary."""
 
-        assert self.document != None
+        assert self.document is not None
 
         # if document has been modified since the last invocation
         if self.docchangeset[part] != self.document.changeset:
@@ -636,7 +637,7 @@ class DatasetExpression(Dataset):
             expr = self.expr[part]
             self.evaluated[part] = None
 
-            if expr != None and expr != '':
+            if expr is not None and expr != '':
                 # replace dataset names with calls (ugly hack)
                 # but necessary for Python 2.3 as we can't replace
                 # dict in eval by subclass

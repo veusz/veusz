@@ -141,7 +141,7 @@ class CommandInterpreter:
         filename: a filename to report if there are errors
         """
         
-        if filename == None:
+        if filename is None:
             filename = '<string>'
 
         # pythonise!

@@ -229,6 +229,56 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             obj = obj.parent
         return obj
 
+class FormatWindow(qt4.QDockWidget):
+    """A window for formatting the current widget.
+    Provides tabbed formatting properties
+    """
+
+    def __init__(self, document, parent):
+        qt4.QDockWidget.__init__(self, parent)
+        self.parent = parent
+        self.setWindowTitle("Formatting - Veusz")
+        self.setObjectName("veuszformattingwindow")
+
+        self.document = document
+        
+        self.maintab = qt4.QTabWidget(self)
+        self.setWidget(self.maintab)
+
+    def selectWidget(self, widget):
+        """Add formatting tabs for each sub-option."""
+
+        # delete existing tab
+        while self.maintab.count() != 0:
+            self.maintab.removeTab(0)
+
+        # exit if no widget selected
+        if widget is None:
+            return
+
+        settings = widget.settings
+        for subset in settings.getSettingsList():
+            tab = qt4.QWidget()
+            layout = qt4.QVBoxLayout()
+            layout.setMargin(2)
+            tab.setLayout(layout)
+
+            scroll = qt4.QScrollArea(tab)
+            layout.addWidget(scroll)
+            scroll.setWidgetResizable(True)
+
+            plist = PropertyList(self.document)
+            plist.updateProperties(subset)
+            scroll.setWidget(plist)
+            plist.show()
+
+            if hasattr(subset, 'pixmap'):
+                icon = action.getIcon('settings_%s.png' % subset.pixmap)
+                indx = self.maintab.addTab(tab, icon, '')
+                self.maintab.setTabToolTip(indx, subset.name)
+            else:
+                self.maintab.addTab(tab, subset.name)
+
 class TreeEditWindow2(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
@@ -240,6 +290,8 @@ class TreeEditWindow2(qt4.QDockWidget):
         self.parent = parent
         self.setWindowTitle("Editing - Veusz")
         self.setObjectName("veuszeditingwindow")
+
+        self.formatwindow = FormatWindow(document, parent)
 
         # construct tree
         self.document = document
@@ -300,6 +352,8 @@ class TreeEditWindow2(qt4.QDockWidget):
         self._enableCorrectButtons()
         self._checkPageChange()
 
+        self.formatwindow.selectWidget(self.selwidget)
+
     def _checkPageChange(self):
         """Check to see whether page has changed."""
 
@@ -348,7 +402,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         """Return a list of the widgets, most important first.
         """
 
-        # get list of allowed classes
+        # get list of allowed classes, sorted by type name
         wcl = [(i.typename, i)
                for i in document.thefactory.listWidgetClasses()
                if i.allowusercreation]
@@ -394,7 +448,7 @@ class TreeEditWindow2(qt4.QDockWidget):
         movedown = utils.BoundCaller(self.slotWidgetMove, 1)
         self.editslots = [moveup, movedown]
 
-        edititems = [
+        edititems = (
             ('cut', 'Cut the selected item', 'Cu&t', 'edit',
              self.slotWidgetCut, 'stock-cut.png', True, 'Ctrl+X'),
             ('copy', 'Copy the selected item', '&Copy', 'edit',
@@ -409,7 +463,7 @@ class TreeEditWindow2(qt4.QDockWidget):
              True, ''),
             ('delete', 'Remove the selected item', '&Delete', 'edit',
              self.slotWidgetDelete, 'stock-delete.png', True, '')
-            ]
+            )
         self.editactions = action.populateMenuToolbars(edititems, self.toolbar,
                                                        self.parent.menus)
 
@@ -429,7 +483,7 @@ class TreeEditWindow2(qt4.QDockWidget):
             return
         parent = self.getSuitableParent(widgettype)
 
-        assert parent != None
+        assert parent is not None
 
         if name in parent.childnames:
             name = None
@@ -687,6 +741,7 @@ class PropertyList(qt4.QWidget):
         self.layout = qt4.QGridLayout(self)
 
         self.layout.setSpacing( self.layout.spacing()/2 )
+        self.layout.setMargin(4)
         
         self.children = []
 
@@ -1028,7 +1083,7 @@ class _PropertyLabelLabel(qt4.QLabel):
         """Pop up the context menu."""
 
         # for labels which don't correspond to settings
-        if self.setting == None:
+        if self.setting is None:
             event.ignore()
             return
 
@@ -1131,7 +1186,7 @@ class _WidgetListView(qt4.QListView):
         found = None
         while True:
             item = iter.current()
-            if item == None:
+            if item is None:
                 break
             if item.widget == widget:
                 found = item
@@ -1357,9 +1412,9 @@ class TreeEditWindow(XDockWindow):
         # build dictionary of items
         items = {}
         i = root.firstChild()
-        while i != None:
+        while i is not None:
             w = i.widget
-            if w != None:
+            if w is not None:
                 items[w] = i
             i = i.nextSibling()
 
@@ -1404,7 +1459,7 @@ class TreeEditWindow(XDockWindow):
 
         self._updateBranch(self.rootitem)
         sel = self.listview.selectedItem()
-        if sel != None:
+        if sel is not None:
             self.listview.ensureItemVisible(sel)
 
         self.listview.triggerUpdate()
@@ -1417,9 +1472,9 @@ class TreeEditWindow(XDockWindow):
         # (or a parent) as parent
         for wc, action in self.createGraphActions.items():
             w = selw
-            while w != None and not wc.willAllowParent(w):
+            while w is not None and not wc.willAllowParent(w):
                 w = w.parent
-            action.enable( w != None )
+            action.enable( w is not None )
 
         # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
@@ -1433,7 +1488,7 @@ class TreeEditWindow(XDockWindow):
 
         if isnotroot:
             # cut and copy aren't currently possible on a non-widget
-            cancopy = item.widget != None
+            cancopy = item.widget is not None
             self.editactions['cut'].enable(cancopy)
             self.editactions['copy'].enable(cancopy)
        
@@ -1480,14 +1535,14 @@ class TreeEditWindow(XDockWindow):
         # calculate number of rows
         rows = len(item.settings.getSettingList())
         w = item.widget
-        if w != None:
+        if w is not None:
             rows += len(w.actions)
         self.proptab.setNumRows(rows)
 
         row = 0
         view = self.proptab.viewport()
         # add action for widget
-        if w != None:
+        if w is not None:
             for name in w.actions:
                 l = _PropertyLabel(None, name, view)
                 self.proptab.setCellWidget(row, 0, l)
@@ -1515,14 +1570,14 @@ class TreeEditWindow(XDockWindow):
             
         # Change the page to the selected widget
         w = item.widget
-        if w == None:
+        if w is None:
             w = item.parent.widget
 
         # repeat until we're at the root widget or we hit a page
-        while w != None and not isinstance(w, widgets.Page):
+        while w is not None and not isinstance(w, widgets.Page):
             w = w.parent
 
-        if w != None:
+        if w is not None:
             # we have a page
             count = 0
             children = self.document.basewidget.children
@@ -1558,11 +1613,11 @@ class TreeEditWindow(XDockWindow):
         """
 
         # if no widget selected, bomb out
-        if self.itemselected == None:
+        if self.itemselected is None:
             return
         parent = self.getSuitableParent(widgettype)
 
-        assert parent != None
+        assert parent is not None
 
         if name in parent.childnames:
             name = None
@@ -1583,14 +1638,14 @@ class TreeEditWindow(XDockWindow):
         else:
             parent  = initialParent
         
-        if parent == None:
+        if parent is None:
             parent = self.itemselected.parent.widget
-            assert parent != None
+            assert parent is not None
 
         # find the parent to add the child to, we go up the tree looking
         # for possible parents
         wc = document.thefactory.getWidgetClass(widgettype)
-        while parent != None and not wc.willAllowParent(parent):
+        while parent is not None and not wc.willAllowParent(parent):
             parent = parent.parent
 
         return parent
@@ -1697,7 +1752,7 @@ class TreeEditWindow(XDockWindow):
         """Delete the widget selected."""
 
         # no item selected, so leave
-        if self.itemselected == None:
+        if self.itemselected is None:
             return
 
         # work out which widget to delete
@@ -1706,12 +1761,12 @@ class TreeEditWindow(XDockWindow):
         # get the item to next get the selection when this widget is deleted
         # this is done by looking down the list to get the next useful one
         next = self.itemselected
-        while next != None and (next.widget == w or (next.widget == None and
+        while next is not None and (next.widget == w or (next.widget is None and
                                                      next.parent.widget == w)):
             next = next.itemBelow()
 
         # if there aren't any, use the root item
-        if next == None:
+        if next is None:
             next = self.rootitem
 
         # remove the reference
@@ -1736,7 +1791,7 @@ class TreeEditWindow(XDockWindow):
             item = l.pop()
 
             i = item.firstChild()
-            while i != None:
+            while i is not None:
                 if i.widget == widget:
                     found = True
                     break
@@ -1788,7 +1843,7 @@ class TreeEditWindow(XDockWindow):
         """Initiate renaming a widget."""
 
         item = self.itemselected
-        while item.widget == None:
+        while item.widget is None:
             item = item.parent
 
         item.rename()
