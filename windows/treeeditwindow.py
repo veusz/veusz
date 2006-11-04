@@ -223,7 +223,7 @@ class PropertyList(qt4.QWidget):
 
         # add subsettings if necessary
         if settings.getSettingsList() and self.showsubsettings:
-            tabbed = TabbedSettings(self.document, settings, self)
+            tabbed = TabbedFormatting(self.document, settings, self)
             self.layout.addWidget(tabbed, row, 1, 1, 2)
             row += 1
             self.children.append(tabbed)
@@ -250,28 +250,33 @@ class PropertyList(qt4.QWidget):
         
         self.document.applyOperation(document.OperationSettingSet(setting, val))
         
-class TabbedSettings(qt4.QTabWidget):
+class TabbedFormatting(qt4.QTabWidget):
     """Class to have tabbed set of settings."""
 
     def __init__(self, document, settings, *args):
         qt4.QTabWidget.__init__(self, *args)
 
+        # add tab for each subsettings
         for subset in settings.getSettingsList():
 
+            # create tab
             tab = qt4.QWidget()
             layout = qt4.QVBoxLayout()
             layout.setMargin(2)
             tab.setLayout(layout)
 
+            # create scrollable area
             scroll = qt4.QScrollArea(tab)
             layout.addWidget(scroll)
             scroll.setWidgetResizable(True)
 
+            # create list of properties
             plist = PropertyList(document)
             plist.updateProperties(subset)
             scroll.setWidget(plist)
             plist.show()
 
+            # add tab to widget
             if hasattr(subset, 'pixmap'):
                 icon = action.getIcon('settings_%s.png' % subset.pixmap)
                 indx = self.addTab(tab, icon, '')
@@ -279,35 +284,71 @@ class TabbedSettings(qt4.QTabWidget):
             else:
                 self.addTab(tab, subset.name)
 
-class FormatWindow(qt4.QDockWidget):
+class FormatDock(qt4.QDockWidget):
     """A window for formatting the current widget.
     Provides tabbed formatting properties
     """
 
-    def __init__(self, document, parent):
-        qt4.QDockWidget.__init__(self, parent)
-        self.parent = parent
+    def __init__(self, document, treeedit, *args):
+        qt4.QDockWidget.__init__(self, *args)
         self.setWindowTitle("Formatting - Veusz")
-        self.setObjectName("veuszformattingwindow")
+        self.setObjectName("veuszformattingdock")
 
         self.document = document
         self.tabwidget = None
 
-    def selectWidget(self, widget):
-        """Add formatting tabs for each sub-option."""
+        # update our view when the tree edit window selection changes
+        self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
+                     self.selectWidget)
 
-        # exit if no widget selected
-        if widget is None:
-            return
+    def selectWidget(self, widget):
+        """Created tabbed widget for formatting for each subsettings."""
 
         # delete old tabwidget
         if self.tabwidget:
             self.tabwidget.deleteLater()
+            self.tabwidget = None
 
-        self.tabwidget = TabbedSettings(self.document, widget.settings, self)
+        # create new tabbed widget showing formatting
+        settings = None
+        if widget is not None:
+            settings = widget.settings
+
+        self.tabwidget = TabbedFormatting(self.document, settings, self)
         self.setWidget(self.tabwidget)
 
-class TreeEditWindow2(qt4.QDockWidget):
+class PropertiesDock(qt4.QDockWidget):
+    """A window for editing properties for widgets."""
+
+    def __init__(self, document, treeedit, *args):
+        qt4.QDockWidget.__init__(self, *args)
+        self.setWindowTitle("Properties - Veusz")
+        self.setObjectName("veuszpropertiesdock")
+
+        self.document = document
+
+        # update our view when the tree edit window selection changes
+        self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
+                     self.selectWidget)
+
+        # construct scrollable area
+        self.scroll = qt4.QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.setWidget(self.scroll)
+
+        # construct properties list in scrollable area
+        self.proplist = PropertyList(document, showsubsettings=False)
+        self.scroll.setWidget(self.proplist)
+
+    def selectWidget(self, widget):
+        """Update properties when selected widget changes."""
+
+        settings = None
+        if widget is not None:
+            settings = widget.settings
+        self.proplist.updateProperties(settings)
+
+class TreeEditDock(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
     # mime type when widgets are stored on the clipboard
@@ -319,30 +360,23 @@ class TreeEditWindow2(qt4.QDockWidget):
         self.setWindowTitle("Editing - Veusz")
         self.setObjectName("veuszeditingwindow")
 
-        self.formatwindow = FormatWindow(document, parent)
-
         # construct tree
         self.document = document
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
+        self.treeview.setRootIsDecorated(False)
+        #self.treeview.setItemsExpandable(False)
         self.treeview.setModel(self.treemodel)
+        #self.treeview.header().setResizeMode(0, qt4.QHeaderView.Stretch)
+        #self.treeview.header().setResizeMode(1, qt4.QHeaderView.Interactive)
 
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
                      qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
                      self.slotTreeItemSelected)
 
-        # construct list of properties (in scrollable area)
-        self.proplistscroll = qt4.QScrollArea()
-        self.proplistscroll.setWidgetResizable(True)
-        self.proplist = PropertyList(document, showsubsettings=False)
-        self.proplistscroll.setWidget(self.proplist)
-
-        # splitter splits tree from properties
-        self.splitter = qt4.QSplitter(qt4.Qt.Vertical, self)
-        self.setWidget(self.splitter)
-        self.splitter.addWidget(self.treeview)
-        self.splitter.addWidget(self.proplistscroll)
+        # set tree as main widget
+        self.setWidget(self.treeview)
 
         # toolbar to create widgets, etc
         self.toolbar = qt4.QToolBar("Editing toolbar - Veusz",
@@ -376,11 +410,10 @@ class TreeEditWindow2(qt4.QDockWidget):
             self.selwidget = None
             settings = None
 
-        self.proplist.updateProperties(settings)
         self._enableCorrectButtons()
         self._checkPageChange()
 
-        self.formatwindow.selectWidget(self.selwidget)
+        self.emit( qt4.SIGNAL('widgetSelected'), self.selwidget )
 
     def _checkPageChange(self):
         """Check to see whether page has changed."""

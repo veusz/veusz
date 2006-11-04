@@ -82,8 +82,14 @@ class MainWindow(qt4.QMainWindow):
         self.plot.showToolbar()
 
         # likewise with the tree-editing window
-        self.treeedit = treeeditwindow.TreeEditWindow2(self.document, self)
+        self.treeedit = treeeditwindow.TreeEditDock(self.document, self)
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.treeedit)
+        self.propdock = treeeditwindow.PropertiesDock(self.document,
+                                                      self.treeedit, self)
+        self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.propdock)
+        self.formatdock = treeeditwindow.FormatDock(self.document,
+                                                    self.treeedit, self)
+        self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.formatdock)
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
