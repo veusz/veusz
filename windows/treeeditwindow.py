@@ -66,42 +66,46 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         obj = index.internalPointer()
 
         if role == qt4.Qt.DisplayRole:
-            return self.getTextData(obj, column)
+            # return text for columns
+            if column == 0:
+                return qt4.QVariant(obj.name)
+            elif column == 1:
+                return qt4.QVariant(obj.typename)
         elif role == qt4.Qt.DecorationRole:
-            return self.getIconData(obj, column)
+            # return icon for first column
+            if column == 0:
+                return qt4.QVariant(action.getIcon('button_%s.png' %
+                                                   obj.typename))
         elif role == qt4.Qt.ToolTipRole:
+            # provide tool tip showing description
             if obj.userdescription:
                 return qt4.QVariant(obj.userdescription)
 
         # return nothing
         return qt4.QVariant()
 
-    def getTextData(self, obj, column):
-        """Get textual data for the column."""
-        # is a widget
-        if column == 0:
-            val = obj.name
-        elif column == 1:
-            val = obj.typename
-        else:
-            val = obj.userdescription
+    def setData(self, index, value, role):
+        """User renames object. This renames the widget."""
+        
+        widget = index.internalPointer()
+        name = unicode(value.toString())
+        self.document.applyOperation(
+            document.OperationWidgetRename(widget, name))
 
-        return qt4.QVariant(val)
-
-    def getIconData(self, obj, column):
-        """Return icon for object and and column given."""
-        if column == 0:
-            return qt4.QVariant(action.getIcon('button_%s.png' % obj.typename))
-
-        return qt4.QVariant()
-
+        self.emit( qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &)'), index, index )
+        return True
+            
     def flags(self, index):
         """What we can do with the item."""
         
         if not index.isValid():
             return qt4.Qt.ItemIsEnabled
 
-        return qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
+        flags = qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
+        if index.internalPointer() is not self.document.basewidget:
+            # allow items other than root to be edited
+            flags |= qt4.Qt.ItemIsEditable
+        return flags
 
     def headerData(self, section, orientation, role):
         """Return the header of the tree."""
@@ -256,6 +260,9 @@ class TabbedFormatting(qt4.QTabWidget):
     def __init__(self, document, settings, *args):
         qt4.QTabWidget.__init__(self, *args)
 
+        if settings is None:
+            return
+
         # add tab for each subsettings
         for subset in settings.getSettingsList():
 
@@ -364,11 +371,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.document = document
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
-        self.treeview.setRootIsDecorated(False)
-        #self.treeview.setItemsExpandable(False)
         self.treeview.setModel(self.treemodel)
-        #self.treeview.header().setResizeMode(0, qt4.QHeaderView.Stretch)
-        #self.treeview.header().setResizeMode(1, qt4.QHeaderView.Interactive)
 
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
