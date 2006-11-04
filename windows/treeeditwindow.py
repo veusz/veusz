@@ -89,6 +89,14 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         
         widget = index.internalPointer()
         name = unicode(value.toString())
+
+        # check symbols in name
+        if not utils.validateWidgetName(name):
+            return False
+        # check name not already used
+        if widget.parent.hasChild(name):
+            return False
+
         self.document.applyOperation(
             document.OperationWidgetRename(widget, name))
 
@@ -102,7 +110,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             return qt4.Qt.ItemIsEnabled
 
         flags = qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
-        if index.internalPointer() is not self.document.basewidget:
+        if index.internalPointer() is not self.document.basewidget and index.column() == 0:
             # allow items other than root to be edited
             flags |= qt4.Qt.ItemIsEditable
         return flags
@@ -216,15 +224,18 @@ class PropertyList(qt4.QWidget):
         """Update the list of controls with new ones for the settings."""
 
         # delete all child widgets
+        self.setUpdatesEnabled(False)
         while len(self.children) > 0:
             self.children.pop().deleteLater()
 
         if settings is None:
+            self.setUpdatesEnabled(True)
             return
 
         row = 0
         # FIXME: add actions
 
+        self.layout.setEnabled(False)
         # add subsettings if necessary
         if settings.getSettingsList() and self.showsubsettings:
             tabbed = TabbedFormatting(self.document, settings, self)
@@ -244,7 +255,9 @@ class PropertyList(qt4.QWidget):
             self.children.append(cntrl)
 
             row += 1
-
+        self.setUpdatesEnabled(True)
+        self.layout.setEnabled(True)
+ 
     def slotSettingChanged(self, widget, setting, val):
         """Called when a setting is changed by the user.
         

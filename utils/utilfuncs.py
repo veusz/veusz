@@ -35,6 +35,10 @@ def validateDatasetName(name):
     """Validate dataset name is okay."""
     return dsname_re.match(name) is not None
 
+def validateWidgetName(name):
+    """Validate widget name is okay."""
+    return dsname_re.match(name) is not None
+
 class WeakBoundMethod:
     """A weak reference to a bound method.
 
