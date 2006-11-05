@@ -356,7 +356,13 @@ class Choice(qt4.QComboBox):
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
-        self.setEditText( self.setting.toText() )
+
+        text = self.setting.toText()
+        index = self.findText(text)
+        if index >= 0:
+            self.setCurrentIndex(index)
+        if self.isEditable():
+            self.setEditText( self.setting.toText() )
 
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
