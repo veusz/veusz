@@ -153,8 +153,8 @@ class OperationSettingPropagate:
             # if levels is not zero, add the children of this root
             newmaxlevels = maxlevels - 1
             for w in root.children:
-                if ( (w.name == name or name == None) and
-                     (w.typename == typename or typename == None) ):
+                if ( (w.name == name or name is None) and
+                     (w.typename == typename or typename is None) ):
                     outlist.append(w)
     
                 OperationSettingPropagate._recursiveGet(w, name, typename,
@@ -311,7 +311,7 @@ class OperationDatasetSet:
         """Undo the data setting."""
         
         del document.data[self.datasetname]
-        if self.olddata != None:
+        if self.olddata is not None:
             document.setData(self.datasetname, self.olddata)
     
 class OperationDatasetDelete:
@@ -586,9 +586,9 @@ class OperationDataImport:
         """
         
         # open stream to import data from
-        if self.filename != None:
+        if self.filename is not None:
             stream = simpleread.FileStream( open(self.filename) )
-        elif self.datastr != None:
+        elif self.datastr is not None:
             stream = simpleread.StringStream(self.datastr)
         else:
             assert False
@@ -599,7 +599,7 @@ class OperationDataImport:
         
         # associate file
         if self.linked:
-            assert self.filename != None
+            assert self.filename is not None
             LF = datasets.LinkedFile(self.filename, self.descriptor,
                                      useblocks=self.useblocks)
         else:
@@ -704,9 +704,9 @@ class OperationDataImport2D:
         
         Returns list of datasets read."""
         
-        if self.filename != None:
+        if self.filename is not None:
             stream = simpleread.FileStream( open(self.filename) )
-        elif self.datastr != None:
+        elif self.datastr is not None:
             stream = simpleread.StringStream(self.datastr)
         else:
             assert False
@@ -728,15 +728,15 @@ class OperationDataImport2D:
         readds = []
         for name in self.datasets:
             sr = simpleread.SimpleRead2D(name)
-            if self.xrange != None:
+            if self.xrange is not None:
                 sr.xrange = self.xrange
-            if self.yrange != None:
+            if self.yrange is not None:
                 sr.yrange = self.yrange
-            if self.invertrows != None:
+            if self.invertrows is not None:
                 sr.invertrows = self.invertrows
-            if self.invertcols != None:
+            if self.invertcols is not None:
                 sr.invertcols = self.invertcols
-            if self.transpose != None:
+            if self.transpose is not None:
                 sr.transpose = self.transpose
 
             sr.readData(stream)
@@ -790,13 +790,13 @@ class OperationDataImportFITS:
         negv = None
 
         # read the columns required
-        if self.datacol != None:
+        if self.datacol is not None:
             datav = data.field(self.datacol)
-        if self.symerrcol != None:
+        if self.symerrcol is not None:
             symv = data.field(self.symerrcol)
-        if self.poserrcol != None:
+        if self.poserrcol is not None:
             posv = data.field(self.poserrcol)
-        if self.negerrcol != None:
+        if self.negerrcol is not None:
             negv = data.field(self.negerrcol)
 
         # actually create the dataset
@@ -805,8 +805,8 @@ class OperationDataImportFITS:
     def _import2d(self, hdu):
         """Import 2d data from hdu."""
     
-        if ( self.datacol != None or self.symerrcol != None or self.poserrcol != None or
-             self.negerrcol != None ):
+        if ( self.datacol is not None or self.symerrcol is not None or self.poserrcol is not None or
+             self.negerrcol is not None ):
             print "Warning: ignoring columns as import 2D dataset"
 
         header = hdu.header
@@ -871,7 +871,7 @@ class OperationDataImportFITS:
         if self.dsname in document.data:
             del document.data[self.dsname]
             
-        if self.olddataset != None:
+        if self.olddataset is not None:
             document.setData(self.dsname, self.olddataset)
         
 ###############################################################################

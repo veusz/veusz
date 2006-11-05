@@ -107,7 +107,7 @@ class Image(plotters.GenericPlotter):
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
         # lazy read of colormap file (Let's help startup times)
-        if Image.colormaps == None:
+        if Image.colormaps is None:
             Image.readColorMaps()
 
         s = self.settings

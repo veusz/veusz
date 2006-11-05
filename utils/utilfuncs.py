@@ -55,7 +55,7 @@ class WeakBoundMethod:
         return f.im_func == self.f and f.im_self == self.c
 
     def __call__(self , *arg):
-        if self.c() == None:
+        if self.c() is None:
             raise ValueError, 'Method called on dead object'
         self.f(self.c(), *arg)
 

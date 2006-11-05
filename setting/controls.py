@@ -30,9 +30,6 @@ import re
 
 import veusz.qtall as qt4
 
-# QT4FIXME
-#import qttable
-
 import setting
 import veusz.utils as utils
 
@@ -501,7 +498,7 @@ class FillStyle(Choice):
     _fillcnvt = None
 
     def __init__(self, setting, parent):
-        if self._icons == None:
+        if self._icons is None:
             self._generateIcons()
 
         Choice.__init__(self, setting, False,
@@ -533,7 +530,7 @@ class Marker(Choice):
     _icons = None
 
     def __init__(self, setting, parent):
-        if self._icons == None:
+        if self._icons is None:
             self._generateIcons()
 
         Choice.__init__(self, setting, False,
@@ -565,7 +562,7 @@ class LineStyle(Choice):
     _linecnvt = None
 
     def __init__(self, setting, parent):
-        if self._icons == None:
+        if self._icons is None:
             self._generateIcons()
 
         Choice.__init__(self, setting, False,
@@ -589,6 +586,7 @@ class LineStyle(Choice):
             icons.append( qt4.QIcon(pix) )
 
         cls._icons = icons
+        
     _generateIcons = classmethod(_generateIcons)
 
 class Color(qt4.QWidget):
@@ -603,7 +601,7 @@ class Color(qt4.QWidget):
     def __init__(self, setting,  parent):
         qt4.QWidget.__init__(self, parent)
 
-        if self._icons == None:
+        if self._icons is None:
             self._generateIcons()
 
         self.setting = setting
@@ -652,7 +650,7 @@ class Color(qt4.QWidget):
         """
 
         size = 12
-        if cls._icons == None:
+        if cls._icons is None:
             cls._icons = {}
         
         icons = cls._icons
@@ -717,12 +715,12 @@ class Axis(Choice):
 
         # get parent widget
         widget = self.setting
-        while not widget.isWidget() and widget != None:
+        while not widget.isWidget() and widget is not None:
             widget = widget.parent
 
         # get list of axis widgets up the tree
         axes = {}
-        while widget != None:
+        while widget is not None:
             for w in widget.children:
                 try:
                     # succeeds if axis
@@ -821,31 +819,6 @@ class ListSet(qt4.QFrame):
         self.connect(b, qt4.SIGNAL('clicked()'), self.onDeleteClicked)
         b.setEnabled( len(self.setting.val) > 0 )
         b.show()
-        
-        self._adjustSize()
-        
-    def _adjustSize(self):
-        """Tell the Grid to make us the correct size."""
-
-        return
-        # EVIL CODE BELOW - KLUDGE!
-        # when the widget resizes, it must tell the QTable it is in
-        # to adjust its row! Yuck! There must be a better way to do this
-        # not sure why the QTable is 3 levels up
-
-        table = self
-        for i in range(3):
-            table = table.parent()
-            if table == None:
-                break
-
-        # only do this if the parent is a table
-        if table != None and isinstance(table, qttable.QTable):
-            # we have to check each widget to see which row we're on
-            for r in xrange(table.numRows()):
-                for c in xrange(table.numCols()):
-                    if table.cellWidget(r, c) == self:
-                        table.adjustRow(r)
 
     def polish(self):
         """Remove tooltip from widget - avoid Qt bugs."""
@@ -989,7 +962,7 @@ class LineSet(ListSet):
         """Add the widgets for the row given."""
 
         # create line icons if not already created
-        if LineStyle._icons == None:
+        if LineStyle._icons is None:
             LineStyle._generateIcons()
 
         # make line style selector
@@ -1043,7 +1016,7 @@ class FillSet(ListSet):
         """Add the widgets for the row given."""
 
         # construct fill icons if not already done
-        if FillStyle._icons == None:
+        if FillStyle._icons is None:
             FillStyle._generateIcons()
     
         # make fill style selector

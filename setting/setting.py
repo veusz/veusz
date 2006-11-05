@@ -64,14 +64,14 @@ class Reference(object):
         parts = self.value.split('/')
         if parts[0] == '':
             # need root widget if begins with slash
-            while item.parent != None:
+            while item.parent is not None:
                 item = item.parent
             parts = parts[1:]
         
         # do an iterative lookup of the setting
         for p in parts:
             if p == '..':
-                if p.parent != None:
+                if p.parent is not None:
                     p = p.parent
             elif p == '':
                 pass
@@ -164,7 +164,7 @@ class Setting(object):
         """Return full path of setting."""
         path = []
         obj = self
-        while obj != None:
+        while obj is not None:
             # logic easier to understand here
             # do not add settings name for settings of widget
             if not obj.isWidget() and obj.parent.isWidget():
@@ -204,7 +204,7 @@ class Setting(object):
         except KeyError:
             pass
     
-        if deftext != None:
+        if deftext is not None:
             self.val = self.fromText(deftext)
             self.default = self.val
 
@@ -426,13 +426,13 @@ class FloatOrAuto(Setting):
             raise InvalidType
 
     def convertFrom(self, val):
-        if val == None:
+        if val is None:
             return 'Auto'
         else:
             return val
 
     def toText(self):
-        if self.val == None:
+        if self.val is None:
             return 'Auto'
         else:
             return str(self.val)
@@ -461,13 +461,13 @@ class IntOrAuto(Setting):
             raise InvalidType
 
     def convertFrom(self, val):
-        if val == None:
+        if val is None:
             return 'Auto'
         else:
             return val
 
     def toText(self):
-        if self.val == None:
+        if self.val is None:
             return 'Auto'
         else:
             return str(self.val)
@@ -789,7 +789,7 @@ class WidgetPath(Str):
         The widget is located relative to
         parent if relativetoparent is True, otherwise this widget.
 
-        If allowedwidgets != None, only those widgets types in the list are
+        If allowedwidgets is not None, only those widgets types in the list are
         allowed by this setting.
         """
 
@@ -816,7 +816,7 @@ class WidgetPath(Str):
 
         # InvalidType will get raised in getWidget if it is incorrect
         w = self.getWidget(val)
-        if w == None:
+        if w is None:
             return ''
         else:
             return val
@@ -831,7 +831,7 @@ class WidgetPath(Str):
 
         # this is a bit of a hack, so we don't have to pass a value
         # for the setting (which we need to from convertTo)
-        if val == None:
+        if val is None:
             val = self.val
 
         if val == '':
@@ -853,7 +853,7 @@ class WidgetPath(Str):
             raise InvalidType
 
         # check the widget against the list of allowed types if given
-        if self.allowedwidgets != None:
+        if self.allowedwidgets is not None:
             allowed = False
             for c in self.allowedwidgets:
                 if isinstance(widget, c):

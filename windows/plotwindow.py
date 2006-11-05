@@ -313,7 +313,7 @@ class PlotWindow( qt4.QScrollArea ):
             ]
 
         menus = None
-        if menu != None:
+        if menu is not None:
             menus = {}
             menus['view'] = menu
 
@@ -378,7 +378,7 @@ class PlotWindow( qt4.QScrollArea ):
 
         # get widget
         widget = painter.widget
-        if widget == None:
+        if widget is None:
             return
         
         # convert points on plotter to points on axis for each axis
@@ -397,7 +397,7 @@ class PlotWindow( qt4.QScrollArea ):
                                       c.settings.yAxis) )
 
             # iterate over each, and update the ranges
-            for axis in [a for a in axes if a != None]:
+            for axis in [a for a in axes if a is not None]:
                 s = axis.settings
                 if s.direction == 'horizontal':
                     p = xpts
@@ -742,7 +742,7 @@ class PlotWindow( qt4.QScrollArea ):
         """Update page number when the plot window says so."""
 
         # disable previous and next page actions
-        if self.viewactions != None:
+        if self.viewactions is not None:
             np = self.document.getNumberPages()
             self.viewactions['viewprevpage'].setEnabled(self.pagenumber != 0)
             self.viewactions['viewnextpage'].setEnabled(self.pagenumber < np-1)
@@ -792,7 +792,7 @@ class PlotWindow( qt4.QScrollArea ):
 
         # get widget
         widget = painter.widget
-        if widget == None:
+        if widget is None:
             return []
         
         # convert points on plotter to points on axis for each axis
@@ -809,7 +809,7 @@ class PlotWindow( qt4.QScrollArea ):
                                       c.settings.yAxis) )
 
             # iterate over each, and update the ranges
-            for axis in [a for a in axes if a != None]:
+            for axis in [a for a in axes if a is not None]:
                 s = axis.settings
                 if s.direction == 'horizontal':
                     p = xpts

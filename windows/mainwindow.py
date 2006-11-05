@@ -34,7 +34,6 @@ import action
 
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
-from veusz.dialogs.importfits import ImportFITS
 from veusz.dialogs.datacreate import DataCreateDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog

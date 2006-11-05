@@ -226,7 +226,7 @@ class Contour(plotters.GenericPlotter):
                          tuple(s.manualLevels) )
 
         if (data != self.lastdataset or contsettings != self.contsettings or
-            (self._cachedpolygons == None and len(s.fills) != 0)):
+            (self._cachedpolygons is None and len(s.fills) != 0)):
             self.updateContours()
             self.lastdataset = data
             self.contsettings = contsettings
@@ -264,7 +264,7 @@ class Contour(plotters.GenericPlotter):
         self._cachedcontours = None
         self._cachedpolygons = None
 
-        if self.Cntr != None:
+        if self.Cntr is not None:
             c = self.Cntr(xpts, ypts, data.data)
 
             # trace the contour levels
@@ -288,7 +288,7 @@ class Contour(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
 
         # no lines cached as no line styles
-        if self._cachedcontours == None:
+        if self._cachedcontours is None:
             return
 
         # ensure plotting of contours does not go outside the area
@@ -325,7 +325,7 @@ class Contour(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
 
         # don't draw if there are no cached polygons
-        if self._cachedpolygons == None:
+        if self._cachedpolygons is None:
             return
 
         # ensure plotting of contours does not go outside the area

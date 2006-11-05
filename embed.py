@@ -113,7 +113,7 @@ class Embedded(object):
         """Remove the window if deleted."""
 
         # FIXME: this never gets called. Don't know why.
-        if self.window != None:
+        if self.window is not None:
             self.Close()
 
     def _runCommand(cmd, *args, **args2):
@@ -219,7 +219,7 @@ class Embedded(object):
                 os.read(Embedded.pipetoveusz_r, 1)
 
                 # handle command
-                assert Embedded.command != None
+                assert Embedded.command is not None
                 cmd, args, args2 = Embedded.command
                 try:
                     Embedded.retval = cmd(*args, **args2)
@@ -259,7 +259,7 @@ class Embedded(object):
 
     def _atExit():
         """Close the Qt thread if we're closing the program."""
-        if Embedded.lock != None:
+        if Embedded.lock is not None:
             # open window for this embedded instance
             Embedded._runCommand( Embedded._exitQt )
     _atExit = staticmethod(_atExit)

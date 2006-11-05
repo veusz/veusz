@@ -98,7 +98,7 @@ class ReadCSV:
             prefix = 'col'
 
         name = '%s%i' % (prefix, column+1)
-        if self.prefix != None:
+        if self.prefix is not None:
             name = '%s_%s' % (self.prefix, name)
         return name
 
@@ -155,7 +155,7 @@ class ReadCSV:
 
                     else:
                         # add on prefix if reqd
-                        if self.prefix != None:
+                        if self.prefix is not None:
                             name = '%s_%s' % (self.prefix, name)
 
                     # add on dataset

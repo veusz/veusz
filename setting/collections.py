@@ -176,17 +176,17 @@ class _FontList(object):
         self.vals = None
     
     def __len__(self):
-        if self.vals == None:
+        if self.vals is None:
             self._getFonts()
         return len(self.vals)
     
     def __getitem__(self, key):
-        if self.vals == None:
+        if self.vals is None:
             self._getFonts()
         return self.vals[key]
 
     def __iter__(self):
-        if self.vals == None:
+        if self.vals is None:
             self._getFonts()
         return self.vals.__iter__()
     
@@ -205,7 +205,7 @@ def _registerFontStyleSheet():
             default = unicode(i)
             break
             
-    if default == None:
+    if default is None:
         print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
         default = unicode(_fontfamilies[0])
     

@@ -237,7 +237,7 @@ class ConsoleWindow(qt4.QDockWidget):
         self._outputdisplay.ensureCursorVisible()
 
         # are we ready to run this?
-        if c == None or (len(command) != 0 and
+        if c is None or (len(command) != 0 and
                          len(self.command_build) != 0 and
                          (command[0] == ' ' or command[0] == '\t')):
             # build up the expression

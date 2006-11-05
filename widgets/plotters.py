@@ -442,14 +442,14 @@ class PointPlotter(GenericPlotter):
             pts = []
 
             # vertical error bars
-            if ymin != None and ymax != None and not s.ErrorBarLine.hideVert :
+            if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert :
                 for x1, y1, x2, y2 in itertools.izip(xplotter, ymin, xplotter,
                                                      ymax):
                     pts.append(qt4.QPointF(x1, y1))
                     pts.append(qt4.QPointF(x2, y2))
 
             # horizontal error bars
-            if xmin != None and xmax != None and not s.ErrorBarLine.hideHorz:
+            if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
                 for x1, y1, x2, y2 in itertools.izip(xmin, yplotter, xmax,
                                                      yplotter):
                     pts.append(qt4.QPointF(x1, y1))
@@ -459,8 +459,8 @@ class PointPlotter(GenericPlotter):
                 painter.drawLines(pts)
 
         # special error bars (only works with proper x and y errors)
-        if ( ymin != None and ymax != None and xmin != None and
-             xmax != None ):
+        if ( ymin is not None and ymax is not None and xmin is not None and
+             xmax is not None ):
 
             # draw boxes
             if style in {'box':True, 'barbox':True}:

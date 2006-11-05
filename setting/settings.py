@@ -135,7 +135,7 @@ class Settings:
     def get(self, name = None):
         """Get the setting variable."""
 
-        if name == None:
+        if name is None:
             return self
         else:
             return self.setdict[name]
@@ -171,7 +171,7 @@ class Settings:
 
         # we want to build the root up if we're not the first item
         # (first item is implicit)
-        if rootname == None:
+        if rootname is None:
             rootname = ''
         else:
             rootname += self.name + '/'

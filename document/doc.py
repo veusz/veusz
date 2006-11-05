@@ -256,7 +256,7 @@ class Document( qt4.QObject ):
 
         painter = Painter()
         painter.veusz_scaling = scaling
-        if dpi  != None:
+        if dpi is not None:
             painter.veusz_pixperpt = dpi / 72.
         
         painter.begin( printer )
@@ -285,7 +285,7 @@ class Document( qt4.QObject ):
         """Paint page specified to the painter."""
         
         painter.veusz_scaling = scaling
-        if dpi  != None:
+        if dpi is not None:
             painter.veusz_pixperpt = dpi / 72.
         width, height = self.basewidget.getSize(painter)
         self.basewidget.children[page].draw( (0, 0, width, height), painter)
@@ -411,7 +411,7 @@ class Document( qt4.QObject ):
             if p == '..':
                 # relative to parent object
                 p = obj.parent
-                if p == None:
+                if p is None:
                     raise ValueError, "Base graph has no parent"
                 obj = p
             elif p == '.' or len(p) == 0:
@@ -420,7 +420,7 @@ class Document( qt4.QObject ):
             else:
                 # child specified
                 obj = obj.getChild( p )
-                if obj == None:
+                if obj is None:
                     raise ValueError, "Child '%s' does not exist" % p
 
         # return widget

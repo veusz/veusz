@@ -58,7 +58,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             ds = self.document.data[self.dsname]
             data = getattr(ds, self.colnames[index.column()])
 
-            if data != None:
+            if data is not None:
                 return qt4.QVariant( data[index.row()] )
 
         # return nothing otherwise
@@ -96,7 +96,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             data = getattr(ds, self.colnames[index.column()])
 
             # add new column if necessary
-            if data == None:
+            if data is None:
                 self.document.applyOperation( document.OperationDatasetAddColumn(self.dsname, self.colnames[column]) )
 
 
@@ -282,7 +282,7 @@ class DataEditDialog(qt4.QDialog):
 
         # linked dataset
         readonly = False
-        if ds.linked == None:
+        if ds.linked is None:
             fn = 'None'
             unlink = False
         else:

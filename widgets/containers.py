@@ -86,7 +86,7 @@ class _gridengine:
 
     def add(self, width, height):
         """Add a block of width x height, returning position as tuple."""
-        if self.columns != None:
+        if self.columns is not None:
             # wrap around if item too wide
             # (providing we didn't request more columns than we have -
             #  in that case we ignore the request)

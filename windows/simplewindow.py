@@ -45,10 +45,10 @@ class SimpleWindow(qt4.QMainWindow):
     def enableToolbar(self, enable=True):
         """Enable or disable the zoom toolbar in this window."""
 
-        if self.toolbar == None and enable:
+        if self.toolbar is None and enable:
             self.toolbar = self.plot.createToolbar(self, None)
 
-        if self.toolbar != None and not enable:
+        if self.toolbar is not None and not enable:
             self.toolbar.close()
             self.toolbar = None
             

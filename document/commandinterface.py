@@ -188,13 +188,13 @@ class CommandInterface(qt4.QObject):
 
         d = self.document.getData(name)
         data = serr = nerr = perr = None
-        if d.data != None:
+        if d.data is not None:
             data = d.data.copy()
-        if d.serr != None:
+        if d.serr is not None:
             serr = d.serr.copy()
-        if d.nerr != None:
+        if d.nerr is not None:
             nerr = d.nerr.copy()
-        if d.perr != None:
+        if d.perr is not None:
             perr = d.perr.copy()
 
         return (data, serr, nerr, perr)

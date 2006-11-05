@@ -35,6 +35,11 @@ def getPixmap(pixmap):
         _pixmapcache[pixmap] = qt4.QPixmap(os.path.join(imagedir, pixmap))
     return _pixmapcache[pixmap]
 
+def pixmapExists(pixmap):
+    """Does the pixmap exist?"""
+    return (pixmap in _pixmapcache or
+            os.path.exists(os.path.join(imagedir, pixmap)))
+
 _iconcache = {}
 def getIcon(icon):
     """Return a cached QIconSet for the filename in the icons directory."""
@@ -59,26 +64,24 @@ def populateMenuToolbars(items, toolbar, menus):
     parent = toolbar.parent()
     for i in items:
         if len(i) == 1:
-            if menus != None:
+            if menus is not None:
                 menus[i[0]].addSeparator()
             continue
         
         menuid, descr, menutext, menu, slot, icon, addtool, key = i
-        if key == '':
-            ks = qt4.QKeySequence()
-        else:
-            ks = qt4.QKeySequence(key)
 
-        #action = qt.QAction(descr, menutext, ks, parent)
-        # FIXMEQT4
+        # create action
         action = qt4.QAction(parent)
         action.setText(menutext)
         action.setStatusTip(descr)
         action.setToolTip(descr)
-        action.setShortcut(ks)
+
+        # set shortcut if set
+        if key:
+            action.setShortcut( qt4.QKeySequence(key) )
 
         # load icon if set
-        if icon != '':
+        if icon:
             action.setIcon(getIcon(icon))
 
         if callable(slot):
@@ -98,7 +101,7 @@ def populateMenuToolbars(items, toolbar, menus):
                 menus[menu].addAction(action)
 
         # add to toolbar
-        if addtool and toolbar != None:
+        if addtool and toolbar is not None:
             toolbar.addAction(action)
 
         # save for later

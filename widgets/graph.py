@@ -63,9 +63,9 @@ class Graph(widget.Widget):
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 
-        if self.parent.getChild('x') == None:
+        if self.parent.getChild('x') is None:
             axis.Axis(self, name='x')
-        if self.parent.getChild('y') == None:
+        if self.parent.getChild('y') is None:
             axis.Axis(self, name='y')
 
     def getAxes(self, names):
@@ -80,10 +80,10 @@ class Graph(widget.Widget):
 
         # recursively go back up the tree to find axes 
         w = self
-        while w != None and remain > 0:
+        while w is not None and remain > 0:
             for c in w.children:
                 name = c.name
-                if name in widgets and widgets[name] == None:
+                if name in widgets and widgets[name] is None:
                     widgets[name] = c
                     remain -= 1
             w = w.parent
@@ -141,7 +141,7 @@ class Graph(widget.Widget):
 
         # work out outer bounds
         ob = list(parentposn)
-        if outerbounds != None:
+        if outerbounds is not None:
             # see whether margin, is zero, and borrow from above if so
             for i in range(4):
                 if margins[i] == 0.:
@@ -177,17 +177,17 @@ class Graph(widget.Widget):
 
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:
-                if w == None:
+                if w is None:
                     continue
                     
                 # find which side the axis is against
                 edge = w.againstWhichEdge()
 
-                # if it's in the middle of the plot (edges == None)
+                # if it's in the middle of the plot (edges is None)
                 # or the distance to the edge is not zero,
                 # and the margin is zero, suppress text
                 
-                showtext = ( edge == None or edgezero[edge] or
+                showtext = ( edge is None or edgezero[edge] or
                              margins[edge] != 0 )
                 
                 w.draw( bounds, painter, suppresstext = not showtext,

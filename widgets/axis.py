@@ -128,7 +128,7 @@ class Axis(widget.Widget):
 
         for c in parent.children:
             c.autoAxis(n, range)
-            if len(c.children) != None:
+            if len(c.children) is not None:
                 self._autoCheckChildRanges(c, range)
 
     def _autoLookupRange(self):
@@ -169,7 +169,7 @@ class Axis(widget.Widget):
             widget = s.get('match').getWidget()
 
             # this looks valid + sanity checks
-            if (widget != None and widget != self and
+            if (widget is not None and widget != self and
                 widget.settings.match == ''):
                 # update if out of date
                 if widget.docchangeset != self.document.changeset:
@@ -229,10 +229,10 @@ class Axis(widget.Widget):
         if invertaxis:
             self.plottedrange.reverse()
 
-        if self.majorticks != None:
+        if self.majorticks is not None:
             self.majortickscalc = N.array(self.majorticks)
 
-        if self.minorticks != None:
+        if self.minorticks is not None:
             self.minortickscalc = N.array(self.minorticks)
 
         self.docchangeset = self.document.changeset
@@ -560,7 +560,7 @@ class Axis(widget.Widget):
 
         # make axis label flush with edge of plot if
         # it's appropriate
-        if outerbounds != None and sl.atEdge:
+        if outerbounds is not None and sl.atEdge:
             if abs(s.otherPosition) < 1e-4 and not reflected:
                 if horz:
                     y = outerbounds[3]
@@ -581,7 +581,7 @@ class Axis(widget.Widget):
                            usefullheight = True)
 
         # make sure text is in plot rectangle
-        if outerbounds != None:
+        if outerbounds is not None:
             r.ensureInBox( minx=outerbounds[0], maxx=outerbounds[2],
                            miny=outerbounds[1], maxy=outerbounds[3] )
 

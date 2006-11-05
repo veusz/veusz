@@ -173,7 +173,7 @@ class Renderer:
     def getBounds(self):
         """Get bounds of text on screen."""
 
-        if self.calcbounds != None:
+        if self.calcbounds is not None:
             return self.calcbounds
 
         # no text
@@ -254,7 +254,7 @@ class Renderer:
                     miny = -32767, maxy = 32767, extraspace = False):
         """Adjust position of text so that it is within this box."""
 
-        if self.calcbounds == None:
+        if self.calcbounds is None:
             self.getBounds()
 
         cb = self.calcbounds
@@ -296,7 +296,7 @@ class Renderer:
     def getDimensions(self):
         """Get the (w, h) of the bounding box."""
 
-        if self.calcbounds == None:
+        if self.calcbounds is None:
             self.getBounds()
         cb = self.calcbounds
         return (cb[2]-cb[0]+1, cb[3]-cb[1]+1)
@@ -304,7 +304,7 @@ class Renderer:
     def render(self):
         """Render the text."""
 
-        if self.calcbounds == None:
+        if self.calcbounds is None:
             self.getBounds()
 
         self.xpos = self.xi
