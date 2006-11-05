@@ -94,10 +94,12 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         # check symbols in name
         if not utils.validateWidgetName(name):
             return False
+        
         # check name not already used
         if widget.parent.hasChild(name):
             return False
 
+        # actually rename the widget
         self.document.applyOperation(
             document.OperationWidgetRename(widget, name))
 
@@ -256,6 +258,14 @@ class PropertyList(qt4.QWidget):
             self.children.append(cntrl)
 
             row += 1
+
+        # add empty widget to take rest of space
+        w = qt4.QWidget(self)
+        w.setSizePolicy(qt4.QSizePolicy.Maximum,
+                        qt4.QSizePolicy.MinimumExpanding)
+        self.layout.addWidget(w, row, 0)
+        self.children.append(w)
+
         self.setUpdatesEnabled(True)
         self.layout.setEnabled(True)
  
@@ -322,6 +332,9 @@ class FormatDock(qt4.QDockWidget):
         self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
                      self.selectWidget)
 
+        # do initial selection
+        self.selectWidget(treeedit.selwidget)
+
     def selectWidget(self, widget):
         """Created tabbed widget for formatting for each subsettings."""
 
@@ -361,6 +374,9 @@ class PropertiesDock(qt4.QDockWidget):
         self.proplist = PropertyList(document, showsubsettings=False)
         self.scroll.setWidget(self.proplist)
 
+        # do initial selection
+        self.selectWidget(treeedit.selwidget)
+
     def selectWidget(self, widget):
         """Update properties when selected widget changes."""
 
@@ -386,6 +402,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
+        #self.treeview.header().
 
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
@@ -737,11 +754,11 @@ class TreeEditDock(qt4.QDockWidget):
         # rehilight moved widget
         self.selectWidget(w)
 
-class SettingLabel2(qt4.QLabel):
+class SettingLabel2(qt4.QWidget):
     def __init__(self, document, setting, parent):
         """Initialise botton, passing document, setting, and parent widget."""
         
-        qt4.QLabel.__init__(self, setting.name, parent)
+        qt4.QWidget.__init__(self, parent)
         self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         self.document = document
@@ -749,56 +766,61 @@ class SettingLabel2(qt4.QLabel):
 
         self.setToolTip(setting.descr)
 
-        self.setAlignment(qt4.Qt.AlignLeft | qt4.Qt.AlignVCenter)
-        self.setIndent(16)
-        self.label2 = qt4.QLabel(self)
-        self.label2.hide()
-        self.label2.setPixmap(action.getPixmap('downarrow.png'))
-        self.label2.setAlignment(qt4.Qt.AlignLeft | qt4.Qt.AlignVCenter)
+        self.layout = qt4.QHBoxLayout(self)
+        self.layout.setMargin(2)
+        self.labelicon = qt4.QLabel(setting.name, self)
+        self.layout.addWidget(self.labelicon)
+        
+        self.iconlabel = qt4.QLabel(self)
+        self.layout.addWidget(self.iconlabel)
+
+        self.connect(self, qt4.SIGNAL('clicked'), self.settingMenu)
 
         self.infocus = False
         self.inmouse = False
-
-        self.connect(self, qt4.SIGNAL('clicked()'), self.settingMenu)
+        self.inmenu = False
+        self.updateHighlight()
 
     def mouseReleaseEvent(self, event):
-        self.emit(qt4.SIGNAL('clicked()'))
-        return qt4.QLabel.mouseReleaseEvent(self, event)
+        self.emit( qt4.SIGNAL('clicked'),
+                   self.mapToGlobal(event.pos()) )
+        return qt4.QWidget.mouseReleaseEvent(self, event)
 
     def keyReleaseEvent(self, event):
         if event.key() == qt4.Qt.Key_Space:
-            self.emit(qt4.SIGNAL('clicked()'))
+            self.emit( qt4.SIGNAL('clicked'),
+                       self.mapToGlobal(self.iconlabel.pos()) )
             event.accept()
         else:
-            return qt4.QLabel.keyReleaseEvent(self, event)
+            return qt4.QWidget.keyReleaseEvent(self, event)
 
     def updateHighlight(self):
-        if self.inmouse or self.infocus:
-            self.label2.show()
+        if self.inmouse or self.infocus or self.inmenu:
+            self.iconlabel.setPixmap(action.getPixmap('downarrow.png'))
         else:
-            self.label2.hide()
+            self.iconlabel.setPixmap(action.getPixmap('downarrow_blank.png'))
 
     def enterEvent(self, event):
         self.inmouse = True
         self.updateHighlight()
-        return qt4.QLabel.enterEvent(self, event)
+        return qt4.QWidget.enterEvent(self, event)
 
     def leaveEvent(self, event):
         self.inmouse = False
         self.updateHighlight()
-        return qt4.QLabel.leaveEvent(self, event)
+        return qt4.QWidget.leaveEvent(self, event)
 
     def focusInEvent(self, event):
         self.infocus = True
         self.updateHighlight()
-        return qt4.QLabel.focusInEvent(self, event)
+        return qt4.QWidget.focusInEvent(self, event)
 
     def focusOutEvent(self, event):
         self.infocus = False
         self.updateHighlight()
-        return qt4.QLabel.focusOutEvent(self, event)
+        return qt4.QWidget.focusOutEvent(self, event)
 
-    def settingMenu(self):
+    def settingMenu(self, pos):
         """Pop up menu for each setting."""
 
         # forces settings to be updated
@@ -816,7 +838,8 @@ class SettingLabel2(qt4.QLabel):
         name = widget.name
 
         popup = qt4.QMenu(self)
-        popup.addAction('Reset to default', self.actionResetDefault)
+        popup.addAction('Reset %s to default' % self.setting.name,
+                        self.actionResetDefault)
         popup.addSeparator()
         popup.addAction('Copy to "%s" widgets' % wtype,
                         self.actionCopyTypedWidgets)
@@ -832,7 +855,11 @@ class SettingLabel2(qt4.QLabel):
                         self.actionDefaultTypedNamed)
         popup.addAction('Forget this default setting',
                         self.actionDefaultForget)
-        popup.exec_(qt4.QCursor.pos())
+        self.inmenu = True
+        self.updateHighlight()
+        popup.exec_(pos)
+        self.inmenu = False
+        self.updateHighlight()
 
     def actionResetDefault(self):
         self.document.applyOperation( document.OperationSettingSet(self.setting, self.setting.default) )
@@ -855,75 +882,3 @@ class SettingLabel2(qt4.QLabel):
     def actionDefaultForget(self):
         self.setting.removeDefault()
 
-class SettingLabelButton(qt4.QPushButton):
-    """A label next to each setting in the form of a button."""
-
-    def __init__(self, document, setting, parent):
-        """Initialise botton, passing document, setting, and parent widget."""
-        
-        qt4.QPushButton.__init__(self, setting.name, parent)
-
-        self.document = document
-        self.setting = setting
-
-        self.setToolTip(setting.descr)
-        self.connect(self, qt4.SIGNAL('clicked()'), self.settingMenu)
-        #self.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
-
-    def settingMenu(self):
-        """Pop up menu for each setting."""
-
-        # forces settings to be updated
-        self.parentWidget().setFocus()
-        # get it back straight away
-        self.setFocus()
-
-        # get widget, with its type and name
-        widget = self.setting.parent
-        while not isinstance(widget, widgets.Widget):
-            widget = widget.parent
-        self._clickwidget = widget
-
-        wtype = widget.typename
-        name = widget.name
-
-        popup = qt4.QMenu(self)
-        popup.addAction('Reset to default', self.actionResetDefault)
-        popup.addSeparator()
-        popup.addAction('Copy to "%s" widgets' % wtype,
-                        self.actionCopyTypedWidgets)
-        popup.addAction('Copy to "%s" siblings' % wtype,
-                        self.actionCopyTypedSiblings)
-        popup.addAction('Copy to "%s" widgets called "%s"' % (wtype, name),
-                        self.actionCopyTypedNamedWidgets)
-        popup.addSeparator()
-        popup.addAction('Make default for "%s" widgets' % wtype,
-                        self.actionDefaultTyped)
-        popup.addAction('Make default for "%s" widgets called "%s"' %
-                        (wtype, name),
-                        self.actionDefaultTypedNamed)
-        popup.addAction('Forget this default setting',
-                        self.actionDefaultForget)
-        popup.exec_(qt4.QCursor.pos())
-
-    def actionResetDefault(self):
-        self.document.applyOperation( document.OperationSettingSet(self.setting, self.setting.default) )
-
-    def actionCopyTypedWidgets(self):
-        self.document.applyOperation( document.OperationSettingPropagate(self.setting) )
-
-    def actionCopyTypedSiblings(self):
-        self.document.applyOperation( document.OperationSettingPropagate(self.setting, root=self._clickwidget.parent, maxlevels=1) )
-
-    def actionCopyTypedNamedWidgets(self):
-        self.document.applyOperation( document.OperationSettingPropagate(self.setting, widgetname=self._clickwidget.name) )
-
-    def actionDefaultTyped(self):
-        self.setting.setAsDefault(False)
-
-    def actionDefaultTypedNamed(self):
-        self.setting.setAsDefault(True)
-
-    def actionDefaultForget(self):
-        self.setting.removeDefault()
-    
