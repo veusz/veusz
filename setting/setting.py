@@ -94,7 +94,7 @@ class Reference(object):
         
 class Setting(object):
 
-    def __init__(self, name, value, descr=''):
+    def __init__(self, name, value, descr='', usertext=''):
         """Initialise the values.
 
         descr is a description of the setting
@@ -103,6 +103,7 @@ class Setting(object):
         self.parent = None
         self.name = name
         self.descr = descr
+        self.usertext = usertext
         self.default = value
         self.onmodified = []
         self._val = None
@@ -114,12 +115,28 @@ class Setting(object):
         """Is this object a widget?"""
         return False
 
-    def copy(self):
-        """Make a setting which has its values copied from this one."""
-        obj = self.__class__(self.name, self.val, descr=self.descr)
+    def _copyHelper(self, before, after, optional):
+        """Help copy an object.
+
+        before are arguments before val
+        after are arguments after val
+        optinal as optional arguments
+        """
+        args = (self.name,) + before + (self.val,) + after
+        opt = optional.copy()
+        opt['descr'] = self.descr
+        opt['usertext'] = self.usertext
+        obj = self.__class__(*args, **opt)
         obj.readonly = self.readonly
         obj.default = self.default
-        return obj
+        return obj        
+
+    def copy(self):
+        """Make a setting which has its values copied from this one.
+
+        This needs to be overridden if the constructor changes
+        """
+        return self._copyHelper((), (), {})
         
     def get(self):
         """Get the value."""
@@ -357,7 +374,7 @@ class Int(Setting):
     """Integer settings."""
 
     def __init__(self, name, value, minval=-1000000, maxval=1000000,
-                 descr=''):
+                 **args):
         """Initialise the values.
 
         minval is minimum possible value of setting
@@ -367,8 +384,16 @@ class Int(Setting):
 
         self.minval = minval
         self.maxval = maxval
-        Setting.__init__(self, name, value, descr=descr)
+        Setting.__init__(self, name, value, **args)
 
+    def copy(self):
+        """Make a setting which has its values copied from this one.
+
+        This needs to be overridden if the constructor changes
+        """
+        return self._copyHelper((), (), {'minval': self.minval,
+                                         'maxval': self.maxval})
+        
     def convertTo(self, val):
         if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
@@ -632,19 +657,16 @@ class Choice(Setting):
 
     # maybe should be implemented as a dict to speed up checks
 
-    def __init__(self, name, vallist, val, descr = ''):
+    def __init__(self, name, vallist, val, **args):
         """Setting val must be in vallist."""
         
         assert type(vallist) in (list, tuple)
         self.vallist = vallist
-        Setting.__init__(self, name, val, descr = descr)
+        Setting.__init__(self, name, val, **args)
 
     def copy(self):
         """Make a copy of the setting."""
-        obj = self.__class__(self.name, self.vallist, self.val, descr=self.descr)
-        obj.readonly = self.readonly
-        obj.default = self.default
-        return obj
+        return self._copyHelper((self.vallist,), (), {})
         
     def convertTo(self, val):
         if val in self.vallist:
@@ -669,18 +691,15 @@ class ChoiceOrMore(Setting):
 
     # maybe should be implemented as a dict to speed up checks
 
-    def __init__(self, name, vallist, val, descr = ''):
+    def __init__(self, name, vallist, val, **args):
         """Setting has val must be in vallist."""
         
         self.vallist = vallist
-        Setting.__init__(self, name, val, descr = descr)
+        Setting.__init__(self, name, val, **args)
 
     def copy(self):
         """Make a copy of the setting."""
-        obj = self.__class__(self.name, self.vallist, self.val, descr=self.descr)
-        obj.readonly = self.readonly
-        obj.default = self.default
-        return obj
+        return self._copyHelper((self.vallist,), (), {})
 
     def convertTo(self, val):
         return val
@@ -783,7 +802,7 @@ class WidgetPath(Str):
 
     def __init__(self, name, val, relativetoparent=True,
                  allowedwidgets = None,
-                 descr=''):
+                 **args):
         """Initialise the setting.
 
         The widget is located relative to
@@ -793,19 +812,15 @@ class WidgetPath(Str):
         allowed by this setting.
         """
 
-        Str.__init__(self, name, val, descr=descr)
+        Str.__init__(self, name, val, **args)
         self.relativetoparent = relativetoparent
         self.allowedwidgets = allowedwidgets
 
     def copy(self):
         """Make a copy of the setting."""
-        obj = self.__class__(self.name, self.val,
-                             relativetoparent=self.relativetoparent,
-                             allowediwidgets=self.allowedwidgets,
-                             descr=self.descr)
-        obj.readonly = self.readonly
-        obj.default = self.default
-        return obj
+        return self._copyHelper((), (),
+                                {'relativetoparent': self.relativetoparent,
+                                 'allowedwidgets': self.allowedwidgets})
 
     def convertTo(self, val):
         """Validate the text is a name of a widget relative to
@@ -866,21 +881,18 @@ class WidgetPath(Str):
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
-    def __init__(self, name, val, dimensions=1, descr=''):
+    def __init__(self, name, val, dimensions=1, **args):
         """
         dimensions is the number of dimensions the dataset needs
         """
 
-        Setting.__init__(self, name, val, descr)
+        Setting.__init__(self, name, val, **args)
         self.dimensions = dimensions
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
-        obj = self.__class__(self.name, self.val, dimensions=self.dimensions,
-                             descr=self.descr)
-        obj.readonly = self.readonly
-        obj.default = self.default
-        return obj
+        return self._copyHelper((), (),
+                                {'dimensions': self.dimensions})
         
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
@@ -901,19 +913,16 @@ class Color(ChoiceOrMore):
     
     controls.Color._colors = _colors
 
-    def __init__(self, name, default, descr = None):
+    def __init__(self, name, value, **args):
         """Initialise the color setting with the given name, default
         and description."""
         
-        ChoiceOrMore.__init__(self, name, self._colors, default,
-                              descr=descr)
+        ChoiceOrMore.__init__(self, name, self._colors, value,
+                              **args)
 
     def copy(self):
         """Make a copy of the setting."""
-        obj = self.__class__(self.name, self.val, descr=self.descr)
-        obj.readonly = self.readonly
-        obj.default = self.default
-        return obj
+        return self._copyHelper((), (), {})
                               
     def color(self):
         """Return QColor for color."""
@@ -949,9 +958,13 @@ class FillStyle(Choice):
     controls.FillStyle._fills = _fillstyles
     controls.FillStyle._fillcnvt = _fillcnvt
 
-    def __init__(self, name, default, descr=None):
-        Choice.__init__(self, name, self._fillstyles, default, descr=descr)
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, self._fillstyles, value, **args)
 
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+                              
     def qtStyle(self):
         """Return Qt ID of fill."""
         return self._fillcnvt[self.val]
@@ -972,9 +985,13 @@ class LineStyle(Choice):
     controls.LineStyle._lines = _linestyles
     controls.LineStyle._linecnvt = _linecnvt
     
-    def __init__(self, name, default, descr=None):
-        Choice.__init__(self, name, self._linestyles, default, descr=descr)
+    def __init__(self, name, default, **args):
+        Choice.__init__(self, name, self._linestyles, default, **args)
 
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+                              
     def qtStyle(self):
         """Get Qt ID of chosen line style."""
         return self._linecnvt[self.val]
@@ -985,24 +1002,20 @@ class LineStyle(Choice):
 class Axis(Str):
     """A setting to hold the name of an axis."""
 
-    def __init__(self, name, val, direction, descr=''):
+    def __init__(self, name, val, direction, **args):
         """Initialise using the document, so we can get the axes later.
         
         direction is horizontal or vertical to specify the type of axis to
         show
         """
 
-        Setting.__init__(self, name, val, descr)
+        Setting.__init__(self, name, val, **args)
         self.direction = direction
         
     def copy(self):
-        """Make a setting which has its values copied from this one."""
-        obj = self.__class__(self.name, self.val, self.direction,
-                             descr=self.descr)
-        obj.readonly = self.readonly
-        obj.default = self.default
-        return obj
-        
+        """Make a copy of the setting."""
+        return self._copyHelper((), (self.direction,), {})
+
     def makeControl(self, *args):
         """Allows user to choose an axis or enter a name."""
         # find document
@@ -1015,9 +1028,13 @@ class Axis(Str):
 class Marker(Choice):
     """Choose a marker type from one allowable."""
 
-    def __init__(self, name, default, descr=None):
-        Choice.__init__(self, name, utils.MarkerCodes, default, descr=descr)
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, utils.MarkerCodes, value, **args)
 
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+                              
     def makeControl(self, *args):
         return controls.Marker(self, *args)
     
