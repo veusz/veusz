@@ -50,11 +50,14 @@ class GenericPlotter(widget.Widget):
 
         s = self.settings
         s.add( setting.Str('key', '',
-                           descr = 'Description of the plotted data') )
+                           descr = 'Description of the plotted data',
+                           usertext='Key') )
         s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = 'Name of X-axis to use') )
+                            descr = 'Name of X-axis to use',
+                            usertext='X axis') )
         s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = 'Name of Y-axis to use') )
+                            descr = 'Name of Y-axis to use',
+                            usertext='Y axis') )
 
     def getAxesNames(self):
         """Returns names of axes used."""
@@ -105,18 +108,22 @@ class FunctionPlotter(GenericPlotter):
         s = self.settings
         s.add( setting.Int('steps', 50,
                            descr = 'Number of steps to evaluate the function'
-                           ' over'), 0 )
+                           ' over', usertext='Steps'), 0 )
         s.add( setting.Choice('variable', ['x', 'y'], 'x',
-                              descr='Variable the function is a function of'),
+                              descr='Variable the function is a function of',
+                              usertext='Variable'),
                0 )
         s.add( setting.Str('function', 'x',
-                           descr='Function expression'), 0 )
+                           descr='Function expression',
+                           usertext='Function'), 0 )
 
         s.add(setting.FloatOrAuto('min', 'Auto',
-                             descr='Minimum value at which to plot function'))
+                                  descr='Minimum value at which to plot function',
+                                  usertext='Min'))
         
         s.add(setting.FloatOrAuto('max', 'Auto',
-                                  descr='Maximum value at which to plot function'))
+                                  descr='Maximum value at which to plot function',
+                                  usertext='Max'))
 
         s.add( setting.Line('Line',
                             descr = 'Function line settings'),
@@ -345,17 +352,22 @@ class PointPlotter(GenericPlotter):
         s = self.settings
 
         s.add( setting.Distance('markerSize', '3pt',
-                                descr = 'Size of marker to plot'), 0 )
+                                descr = 'Size of marker to plot',
+                                usertext='Marker size'), 0 )
         s.add( setting.Marker('marker', 'circle',
-                              descr = 'Type of marker to plot'), 0 )
+                              descr = 'Type of marker to plot',
+                              usertext='Marker'), 0 )
         s.add( setting.Dataset('yData', 'y',
-                               descr = 'Variable containing y data'), 0 )
+                               descr = 'Variable containing y data',
+                               usertext='Y dataset'), 0 )
         s.add( setting.Dataset('xData', 'x',
-                               descr = 'Variable containing x data'), 0 )
+                               descr = 'Variable containing x data',
+                               usertext='X dataset'), 0 )
         s.add( setting.Choice('errorStyle',
                               ['bar', 'box', 'diamond', 'curve',
                                'barbox', 'bardiamond', 'barcurve'], 'bar',
-                              descr='Style of error bars to plot') )
+                              descr='Style of error bars to plot',
+                              usertext='Error style') )
 
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings'),

@@ -29,8 +29,12 @@ from stylesheet import StyleSheet
 from veusz.utils import formatNumber
 from veusz.application import Application
 
-StyleSheet.register('Line', setting.Distance('width', '0.5pt', descr='Default line width'))
-StyleSheet.register('Line', setting.Color('color', 'black', descr='Default line color'))
+StyleSheet.register('Line', setting.Distance('width', '0.5pt',
+                                             descr='Default line width',
+                                             usertext='Width'))
+StyleSheet.register('Line', setting.Color('color', 'black',
+                                          descr='Default line color',
+                                          usertext='Color'))
 StyleSheet.setPixmap('Line', 'plotline')
 
 class Line(Settings):
@@ -40,13 +44,17 @@ class Line(Settings):
         Settings.__init__(self, name, descr=descr)
 
         self.add( setting.Color('color', setting.Reference('/StyleSheet/Line/color'),
-                                descr = 'Color of line') )
+                                descr = 'Color of line',
+                                usertext='Color') )
         self.add( setting.Distance('width', setting.Reference('/StyleSheet/Line/width'),
-                                   descr = 'Width of line') )
+                                   descr = 'Width of line',
+                                   usertext='Width') )
         self.add( setting.LineStyle('style', 'solid',
-                                    descr = 'Line style') )
+                                    descr = 'Line style',
+                                    usertext='Style') )
         self.add( setting.Bool('hide', False,
-                               descr = 'Hide the line') )
+                               descr = 'Hide the line',
+                               usertext='Hide') )
         
     def makeQPen(self, painter):
         '''Make a QPen from the description'''
@@ -65,7 +73,8 @@ class XYPlotLine(Line):
         self.add( setting.Choice('steps',
                                  ['off', 'left', 'centre', 'right'], 'off',
                                  descr='Plot horizontal steps '
-                                 'instead of a line'), 0 )
+                                 'instead of a line',
+                                 usertext='Steps'), 0 )
 
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''
@@ -74,9 +83,11 @@ class ErrorBarLine(Line):
         Line.__init__(self, name, descr=descr)
 
         self.add( setting.Bool('hideHorz', False,
-                               descr = 'Hide horizontal errors') )
+                               descr = 'Hide horizontal errors',
+                               usertext='Hide horz.') )
         self.add( setting.Bool('hideVert', False,
-                               descr = 'Hide vertical errors') )
+                               descr = 'Hide vertical errors',
+                               usertext='Hide vert.') )
 
 class Brush(Settings):
     '''Settings of a fill.'''
@@ -85,11 +96,14 @@ class Brush(Settings):
         Settings.__init__(self, name, descr=descr)
 
         self.add( setting.Color( 'color', 'black',
-                                 descr = 'Fill colour' ) )
+                                 descr = 'Fill colour',
+                                 usertext='Color') )
         self.add( setting.FillStyle( 'style', 'solid',
-                                     descr = 'Fill style' ) )
+                                     descr = 'Fill style',
+                                     usertext='Style') )
         self.add( setting.Bool( 'hide', False,
-                                descr = 'Hide the fill') )
+                                descr = 'Hide the fill',
+                                usertext='Hide') )
         
     def makeQBrush(self):
         '''Make a qbrush from the settings.'''
@@ -127,13 +141,16 @@ class MajorTick(Line):
     def __init__(self, name, descr=''):
         Line.__init__(self, name, descr)
         self.add( setting.Distance( 'length', '6pt',
-                                    descr = 'Length of ticks' ) )
+                                    descr = 'Length of ticks',
+                                    usertext='Length') )
         self.add( setting.Int( 'number', 5,
-                               descr = 'Number of major ticks to aim for' ) )
+                               descr = 'Number of major ticks to aim for',
+                               usertext='Number') )
         self.add( setting.FloatList('manualTicks',
                                     [],
                                     descr = 'List of tick values'
-                                    ' overriding defaults') )
+                                    ' overriding defaults',
+                                    usertext='Manual ticks') )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -146,9 +163,11 @@ class MinorTick(Line):
     def __init__(self, name, descr=''):
         Line.__init__(self, name, descr)
         self.add( setting.Distance( 'length', '3pt',
-                                    descr = 'Length of ticks' ) )
+                                    descr = 'Length of ticks',
+                                    usertext='Length') )
         self.add( setting.Int( 'number', 20,
-                               descr = 'Number of minor ticks to aim for' ) )
+                               descr = 'Number of minor ticks to aim for',
+                               usertext='Number') )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -211,9 +230,12 @@ def _registerFontStyleSheet():
     
     Text.defaultfamily = default
     Text.families = families
-    StyleSheet.register('Font', setting.ChoiceOrMore('font', families, default, descr='Font name'))
-    StyleSheet.register('Font', setting.Distance('size', '14pt', descr='Default font size'))
-    StyleSheet.register('Font', setting.Color('color', 'black', descr='Default font color'))
+    StyleSheet.register('Font', setting.ChoiceOrMore('font', families, default,
+                                                     descr='Font name', usertext='Font'))
+    StyleSheet.register('Font', setting.Distance('size', '14pt',
+                                                 descr='Default font size', usertext='Size'))
+    StyleSheet.register('Font', setting.Color('color', 'black', descr='Default font color',
+                                              usertext='Color'))
     StyleSheet.setPixmap('Font', 'axislabel')
 
 Application.startupfunctions.append(_registerFontStyleSheet)
@@ -233,19 +255,20 @@ class Text(Settings):
 
         self.add( setting.ChoiceOrMore('font', Text.families,
                                        setting.Reference('/StyleSheet/Font/font'),
-                                       descr = 'Font name' ) )
+                                       descr = 'Font name',
+                                       usertext='Font') )
         self.add( setting.Distance('size', setting.Reference('/StyleSheet/Font/size'),
-                  descr = 'Font size' ) )
+                  descr = 'Font size', usertext='Size' ) )
         self.add( setting.Color( 'color', setting.Reference('/StyleSheet/Font/color'),
-                                 descr = 'Font color' ) )
+                                 descr = 'Font color', usertext='Color' ) )
         self.add( setting.Bool( 'italic', False,
-                                descr = 'Italic font' ) )
+                                descr = 'Italic font', usertext='Italic' ) )
         self.add( setting.Bool( 'bold', False,
-                                descr = 'Bold font' ) )
+                                descr = 'Bold font', usertext='Bold' ) )
         self.add( setting.Bool( 'underline', False,
-                                descr = 'Underline font' ) )
+                                descr = 'Underline font', usertext='Underline' ) )
         self.add( setting.Bool( 'hide', False,
-                                descr = 'Hide the text') )
+                                descr = 'Hide the text', usertext='Hide') )
 
     def _getFontFamilies():
         '''Make list of font families available.'''
@@ -299,20 +322,25 @@ class AxisLabel(Text):
         Text.__init__(self, name, descr=descr)
         self.add( setting.Bool( 'atEdge', False,
                                 descr = 'Place axis label close to edge'
-                                ' of graph') )
+                                ' of graph',
+                                usertext='At edge') )
         self.add( setting.Bool( 'rotate', False,
-                                descr = 'Rotate the label by 90 degrees' ) )
+                                descr = 'Rotate the label by 90 degrees',
+                                usertext='Rotate') )
 
 class TickLabel(Text):
 
     def __init__(self, name, descr = ''):
         Text.__init__(self, name, descr=descr)
         self.add( setting.Bool( 'rotate', False,
-                                descr = 'Rotate the label by 90 degrees' ) )
+                                descr = 'Rotate the label by 90 degrees',
+                                usertext='Rotate') )
         self.add( setting.Str( 'format', 'g*',
-                               descr = 'Format of the tick labels' ) )
+                               descr = 'Format of the tick labels',
+                               usertext='Format') )
 
         self.add( setting.Float('scale', 1.,
                                 descr='A scale factor to apply to the values '
-                                'of the tick labels') )
+                                'of the tick labels',
+                                usertext='Scale') )
 

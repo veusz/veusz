@@ -47,42 +47,55 @@ class Axis(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
         s.add( setting.Str('label', '',
-                           descr='Axis label text') )
+                           descr='Axis label text',
+                           usertext='Label') )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr='Minimum value of axis') )
+                                   descr='Minimum value of axis',
+                                   usertext='Min') )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr='Maximum value of axis') )
+                                   descr='Maximum value of axis',
+                                   usertext='Max') )
         s.add( setting.Bool('log', False,
-                            descr = 'Whether axis is logarithmic') )
+                            descr = 'Whether axis is logarithmic',
+                            usertext='Log') )
         s.add( setting.Bool('autoExtend', True,
-                            descr = 'Extend axis to nearest major tick') )
+                            descr = 'Extend axis to nearest major tick',
+                            usertext='Auto extend') )
         s.add( setting.Bool('autoExtendZero', True,
-                            descr = 'Extend axis to zero if close') )
+                            descr = 'Extend axis to zero if close',
+                            usertext='Zero extend') )
         s.add( setting.Bool('autoMirror', True,
                             descr = 'Place axis on opposite side of graph '
-                            'if none') )
+                            'if none',
+                            usertext='Auto mirror') )
         s.add( setting.Bool('reflect', False,
                             descr = 'Place axis text and ticks on other side'
-                            ' of axis') )
+                            ' of axis',
+                            usertext='Reflect') )
         s.add( setting.WidgetPath('match', '',
                                   descr =
                                   'Match the scale of this axis to the '
                                   'axis specified',
+                                  usertext='Match',
                                   allowedwidgets = [Axis] ))
 
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
                               'horizontal',
-                              descr = 'Direction of axis') )
+                              descr = 'Direction of axis',
+                              usertext='Direction') )
         s.add( setting.Float('lowerPosition', 0.,
                              descr='Fractional position of lower end of '
-                             'axis on graph') )
+                             'axis on graph',
+                             usertext='Min position') )
         s.add( setting.Float('upperPosition', 1.,
                              descr='Fractional position of upper end of '
-                             'axis on graph') )
+                             'axis on graph',
+                             usertext='Max position') )
         s.add( setting.Float('otherPosition', 0.,
                              descr='Fractional position of axis '
-                             'in its perpendicular direction') )
+                             'in its perpendicular direction',
+                             usertext='Axis position') )
 
         s.add( setting.Line('Line',
                             descr = 'Axis line settings'),

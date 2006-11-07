@@ -247,7 +247,7 @@ class PropertyList(qt4.QWidget):
             self.children.append(tabbed)
 
         for setn in settings.getSettingList():
-            lab = SettingLabel2(self.document, setn, self)
+            lab = SettingLabel(self.document, setn, self)
             self.layout.addWidget(lab, row, 0)
             self.children.append(lab)
 
@@ -754,7 +754,7 @@ class TreeEditDock(qt4.QDockWidget):
         # rehilight moved widget
         self.selectWidget(w)
 
-class SettingLabel2(qt4.QWidget):
+class SettingLabel(qt4.QWidget):
     def __init__(self, document, setting, parent):
         """Initialise botton, passing document, setting, and parent widget."""
         
@@ -768,7 +768,12 @@ class SettingLabel2(qt4.QWidget):
 
         self.layout = qt4.QHBoxLayout(self)
         self.layout.setMargin(2)
-        self.labelicon = qt4.QLabel(setting.name, self)
+
+        if setting.usertext:
+            text = setting.usertext
+        else:
+            text = setting.name
+        self.labelicon = qt4.QLabel(text, self)
         self.layout.addWidget(self.labelicon)
         
         self.iconlabel = qt4.QLabel(self)

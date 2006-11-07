@@ -41,9 +41,11 @@ class Root(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
         s.add( setting.Distance('width', '15cm',
-                                descr='Width of the pages') )
+                                descr='Width of the pages',
+                                usertext='Page width') )
         s.add( setting.Distance('height', '15cm',
-                                descr='Height of the pages') )
+                                descr='Height of the pages',
+                                usertext='Page height') )
         s.add( setting.StyleSheet() )
         self.document = document
 
