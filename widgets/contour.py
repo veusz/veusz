@@ -62,40 +62,48 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
-                               descr = 'Dataset to plot' ),
+                               descr = 'Dataset to plot',
+                               usertext='Dataset'),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr = 'Minimum value of contour scale'),
+                                   descr = 'Minimum value of contour scale',
+                                   usertext='Min. value'),
                1 )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr = 'Maximum value of contour scale'),
+                                   descr = 'Maximum value of contour scale',
+                                   usertext='Max. value'),
                2 )
         s.add( setting.Int('numLevels', 5,
                            minval = 1,
-                           descr = 'Number of contour levels to plot'),
+                           descr = 'Number of contour levels to plot',
+                           usertext='Number levels'),
                3 )
         s.add( setting.Choice('scaling',
                               ['linear', 'sqrt', 'log', 'squared', 'manual'],
                               'linear',
-                              descr = 'Scaling between contour levels'),
+                              descr = 'Scaling between contour levels',
+                              usertext='Scaling'),
                4 )
         s.add( setting.FloatList('manualLevels',
                                  [],
-                                 descr = 'Levels to use for manual scaling'),
+                                 descr = 'Levels to use for manual scaling',
+                                 usertext='Manual levels'),
                5 )
         s.add( setting.FloatList('levelsOut',
                                  [],
-                                 descr = 'Levels used in the plot'),
+                                 descr = 'Levels used in the plot',
+                                 usertext='Output levels'),
                6, readonly=True )
 
         s.add( setting.LineSet('lines',
                                [('solid', '1pt', 'black', False)],
                                descr = 'Line styles to plot the contours '
-                               'using'),
+                               'using', usertext='Line styles'),
                7 )
 
         s.add( setting.FillSet('fills', [],
-                               descr = 'Fill styles to plot between contours'),
+                               descr = 'Fill styles to plot between contours',
+                               usertext='Fill styles'),
                8 )
 
         # keep track of settings so we recalculate when necessary

@@ -46,32 +46,44 @@ class Fit(plotters.FunctionPlotter):
         s = self.settings
         s.add( setting.FloatDict('values',
                                  {'a': 0.0, 'b': 1.0},
-                                 descr = 'Variables and fit values'), 1 )
+                                 descr = 'Variables and fit values',
+                                 usertext='Parameters'), 1 )
         s.add( setting.Dataset('xData', 'x',
-                               descr = 'Variable containing x data'), 2 )
+                               descr = 'Variable containing x data to fit',
+                               usertext='X dataset'), 2 )
         s.add( setting.Dataset('yData', 'y',
-                               descr = 'Variable containing y data'), 3 )
+                               descr = 'Variable containing y data to fit',
+                               usertext='Y dataset'), 3 )
         s.add( setting.Bool('fitRange', False,
                             descr = 'Fit only the data between the '
                             'minimum and maximum of the axis for '
-                            'the function variable'),
+                            'the function variable',
+                            usertext='Fit only range'),
                4 )
         s.add( setting.Str('outExpr', '',
-                           descr = 'Output best fitting expression'),
+                           descr = 'Output best fitting expression',
+                           usertext='Output expression'),
                5, readonly=True )
         s.add( setting.Float('chi2', -1,
-                             descr = 'Output chi^2 from fitting'),
+                             descr = 'Output chi^2 from fitting',
+                             usertext='Fit &chi;<sup>2</sup>'),
                6, readonly=True )
         s.add( setting.Int('dof', -1,
-                           descr = 'Output degrees of freedom from fitting'),
+                           descr = 'Output degrees of freedom from fitting',
+                           usertext='Fit d.o.f.'),
                7, readonly=True )
         s.add( setting.Float('redchi2', -1,
-                             descr = 'Output reduced-chi^2 from fitting'),
+                             descr = 'Output reduced-chi-squared from fitting',
+                             usertext='Fit reduced &chi;<sup>2</sup>'),
                8, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
         f.descr = 'Function to fit'
+
+        # modify description
+        s.get('min').usertext='Min. fit range'
+        s.get('max').usertext='Max. fit range'
 
         if type(self) == Fit:
             self.readDefaults()

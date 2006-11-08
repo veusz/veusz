@@ -113,26 +113,32 @@ class Image(plotters.GenericPlotter):
         s = self.settings
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
-                               descr = 'Dataset to plot' ),
+                               descr = 'Dataset to plot',
+                               usertext='Dataset'),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr = 'Minimum value of image scale'),
+                                   descr = 'Minimum value of image scale',
+                                   usertext='Min. value'),
                1 )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr = 'Maximum value of image scale'),
+                                   descr = 'Maximum value of image scale',
+                                   usertext='Max. value'),
                2 )
         s.add( setting.Choice('colorScaling',
                               ['linear', 'sqrt', 'log', 'squared'],
                               'linear',
-                              descr = 'Scaling to transform numbers to color'),
+                              descr = 'Scaling to transform numbers to color',
+                              usertext='Scaling'),
                3 )
 
         s.add( setting.Choice('colorMap', Image.colormapnames,
                               'grey',
-                              descr = 'Set of colors to plot data with'),
+                              descr = 'Set of colors to plot data with',
+                              usertext='Colormap'),
                4 )
         s.add( setting.Bool('colorInvert', False,
-                            descr = 'Invert color map'),
+                            descr = 'Invert color map',
+                            usertext='Invert colormap'),
                5 )
 
         self.lastcolormap = None

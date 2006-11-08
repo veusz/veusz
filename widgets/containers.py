@@ -168,22 +168,28 @@ class Grid(widget.Widget):
 
         s = self.settings
         s.add(setting.Int('rows', 2,
-                          descr = 'Number of rows in grid') )
+                          descr = 'Number of rows in grid',
+                          usertext='Number of rows') )
         s.add(setting.Int('columns', 2,
-                          descr = 'Number of columns in grid') )
+                          descr = 'Number of columns in grid',
+                          usertext='Number of columns') )
 
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
                                  'Distance from left of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Left margin') )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
                                  'Distance from right of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Right margin') )
         s.add( setting.Distance( 'topMargin', '0.1cm', descr=
                                  'Distance from top of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Top margin') )
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
                                  'Distance from bottom of graph'
-                                 'to edge of page') )
+                                 'to edge of page',
+                                 usertext='Bottom margin') )
 
         # we're not descended from
         if type(self) == Grid:
