@@ -44,16 +44,20 @@ class Graph(widget.Widget):
         s = self.settings
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
                                  'Distance from left of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Left margin') )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
                                  'Distance from right of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Right margin') )
         s.add( setting.Distance( 'topMargin', '0.1cm', descr=
                                  'Distance from top of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Top margin') )
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
                                  'Distance from bottom of graph'
-                                 'to edge of page') )
+                                 'to edge of page',
+                                 usertext='Bottom margin') )
         s.add( setting.GraphBrush( 'Background',
                                    descr = 'Background plot fill' ), pixmap='bgfill' )
         s.add( setting.Line('Border', descr = 'Graph border line'), pixmap='border')
