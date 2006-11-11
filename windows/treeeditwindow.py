@@ -448,6 +448,18 @@ class TreeEditDock(qt4.QDockWidget):
 
         self.emit( qt4.SIGNAL('widgetSelected'), self.selwidget )
 
+    def contextMenuEvent(self, event):
+        """Bring up context menu."""
+
+        m = qt4.QMenu(self)
+        for act in ('cut', 'copy', 'paste',
+                    'moveup', 'movedown', 'delete', 'rename'):
+            m.addAction(self.editactions[act])
+
+        m.exec_(self.mapToGlobal(event.pos()))
+
+        event.accept()
+
     def _checkPageChange(self):
         """Check to see whether page has changed."""
 
@@ -482,7 +494,7 @@ class TreeEditDock(qt4.QDockWidget):
         # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
 
-        for i in ('cut', 'copy', 'delete', 'moveup', 'movedown'):
+        for i in ('cut', 'copy', 'delete', 'moveup', 'movedown', 'rename'):
             self.editactions[i].setEnabled(isnotroot)
 
         if isnotroot:
@@ -542,7 +554,9 @@ class TreeEditDock(qt4.QDockWidget):
              movedown, 'stock-go-down.png',
              True, ''),
             ('delete', 'Remove the selected item', '&Delete', 'edit',
-             self.slotWidgetDelete, 'stock-delete.png', True, '')
+             self.slotWidgetDelete, 'stock-delete.png', True, ''),
+            ('rename', 'Renames the selected item', '&Rename', 'edit',
+             self.slotWidgetRename, 'icon-rename.png', False, '')
             )
         self.editactions = action.populateMenuToolbars(edititems, self.toolbar,
                                                        self.parent.menus)
@@ -709,10 +723,17 @@ class TreeEditDock(qt4.QDockWidget):
         if widgetnum < len(widgetlist):
             nextwidget = widgetlist[widgetnum]
         else:
-            nextwidget = self.document.basewidget
+            nextwidget = widgetlist[-1]
 
         # select the next widget
         self.selectWidget(nextwidget)
+
+    def slotWidgetRename(self):
+        """Renames the selected widget."""
+
+        selected = self.treeview.selectedIndexes()
+        if len(selected) != 0:
+            self.treeview.edit(selected[0])
 
     def selectWidget(self, widget):
         """Select the associated listviewitem for the widget w in the
