@@ -35,6 +35,7 @@ import action
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
 from veusz.dialogs.datacreate import DataCreateDialog
+from veusz.dialogs.preferences import PreferencesDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -226,6 +227,10 @@ class MainWindow(qt4.QMainWindow):
         """Redo the previous operation"""
         if self.document.canRedo():
             self.document.redoOperation()
+
+    def slotEditPreferences(self):
+        dialog = PreferencesDialog(self)
+        dialog.exec_()
         
     def slotViewDockWindow(self, item):
         """Show or hide dock windows as selected."""
@@ -300,6 +305,9 @@ class MainWindow(qt4.QMainWindow):
              self.slotEditUndo, '', False,  'Ctrl+Z'),
             ('editredo', 'Redo the previous operation', 'Redo', 'edit',
              self.slotEditRedo, '', False, 'Ctrl+Shift+Z'),
+            ('edit', ),
+            ('editprefs', 'Edit preferences', 'Preferences', 'edit',
+             self.slotEditPreferences, '', False, ''),
             ('edit', ),
             
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
@@ -566,15 +574,11 @@ class MainWindow(qt4.QMainWindow):
 
             #Update the list of recently opened files
             fullname = os.path.abspath(filename)
-            if 'recent_files' in setting.settingdb:
-                filelist = setting.settingdb['recent_files']
-                if fullname in filelist:
-                    filelist.remove(fullname)
-                filelist.insert(0, fullname)
-                filelist = filelist[:5]
-            else:
-                filelist = [fullname]
-            setting.settingdb['recent_files'] = filelist
+            filelist = setting.settingdb['main_recentfiles']
+            if fullname in filelist:
+                filelist.remove(fullname)
+            filelist.insert(0, fullname)
+            filelist = filelist[:5]
             self.populateRecentFiles()
 
         except IOError:
@@ -614,8 +618,8 @@ class MainWindow(qt4.QMainWindow):
         menu = self.menus["file.filerecent"]
         menu.clear()
         newMenuItems = []
-        if 'recent_files' in setting.settingdb and setting.settingdb['recent_files']:
-            files = setting.settingdb['recent_files']
+        if setting.settingdb['main_recentfiles']:
+            files = setting.settingdb['main_recentfiles']
             self._openRecentFunctions = []
             for i, path in enumerate(files):
 

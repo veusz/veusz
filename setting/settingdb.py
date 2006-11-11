@@ -27,6 +27,21 @@ import atexit
 
 import veusz.qtall as qt4
 
+# default values to some settings in case the user does not have these
+defaultValues = {
+    # export options
+    'export_DPI': 150,
+    'export_color': True,
+    'export_antialias': True,
+
+    # plot options
+    'plot_updateinterval': 1000,
+    'plot_antialias': True,
+
+    # recent files list
+    'main_recentfiles': []
+    }
+
 class _SettingDB(object):
     """A class which provides access to a persistant settings database.
     
@@ -67,6 +82,11 @@ class _SettingDB(object):
             except:
                 print >>sys.stderr, ('Error interpreting item "%s" in '
                                      'settings file' % realkey)
+
+        # set any defaults which haven't been set
+        for key, value in defaultValues.iteritems():
+            if key not in self.database:
+                self.database[key] = value
         
     def writeSettings(self):
         """Write the settings using QSettings.

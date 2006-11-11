@@ -252,14 +252,10 @@ class PlotWindow( qt4.QScrollArea ):
                       self.slotBecomeScrollClick )
 
         # get update period from setting database
-        self.interval = 1000
-        if 'plot_updateinterval' in setting.settingdb:
-            self.interval = setting.settingdb['plot_updateinterval']
+        self.interval = setting.settingdb['plot_updateinterval']
 
         # load antialias settings
-        self.antialias = True
-        if 'plot_antialias' in setting.settingdb:
-            self.antialias = setting.settingdb['plot_antialias']
+        self.antialias = setting.settingdb['plot_antialias']
 
         if self.interval > 0:
             self.timer.start(self.interval)
