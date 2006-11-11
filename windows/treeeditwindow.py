@@ -363,7 +363,7 @@ class PropertiesDock(qt4.QDockWidget):
 
         # update our view when the tree edit window selection changes
         self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
-                     self.selectWidget)
+                     self.slotWidgetSelected)
 
         # construct scrollable area
         self.scroll = qt4.QScrollArea()
@@ -375,9 +375,9 @@ class PropertiesDock(qt4.QDockWidget):
         self.scroll.setWidget(self.proplist)
 
         # do initial selection
-        self.selectWidget(treeedit.selwidget)
+        self.slotWidgetSelected(treeedit.selwidget)
 
-    def selectWidget(self, widget):
+    def slotWidgetSelected(self, widget):
         """Update properties when selected widget changes."""
 
         settings = None
@@ -769,9 +769,9 @@ class SettingLabel(qt4.QWidget):
         self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         self.document = document
-        self.setting = setting
+        self.connect(document, qt4.SIGNAL('sigModified'), self.slotDocModified)
 
-        self.setToolTip(setting.descr)
+        self.setting = setting
 
         self.layout = qt4.QHBoxLayout(self)
         self.layout.setMargin(2)
@@ -791,7 +791,9 @@ class SettingLabel(qt4.QWidget):
         self.infocus = False
         self.inmouse = False
         self.inmenu = False
-        self.updateHighlight()
+
+        # initialise settings
+        self.slotDocModified()
 
     def mouseReleaseEvent(self, event):
         """Emit clicked(pos) on mouse release."""
@@ -808,12 +810,29 @@ class SettingLabel(qt4.QWidget):
         else:
             return qt4.QWidget.keyReleaseEvent(self, event)
 
+    def slotDocModified(self):
+        """If the document has been modified."""
+
+        # update pixmap (e.g. link added/removed)
+        self.updateHighlight()
+
+        # update tooltip
+        tooltip = self.setting.descr
+        if self.setting.isReference():
+            tooltip += ('\nLinked to %s' %
+                        self.setting.getReference().resolve(self.setting).path)
+        self.setToolTip(tooltip)
+
     def updateHighlight(self):
         """Show drop down arrow if item has focus."""
         if self.inmouse or self.infocus or self.inmenu:
-            self.iconlabel.setPixmap(action.getPixmap('downarrow.png'))
+            pixmap = 'downarrow.png'
         else:
-            self.iconlabel.setPixmap(action.getPixmap('downarrow_blank.png'))
+            if self.setting.isReference():
+                pixmap = 'link.png'
+            else:
+                pixmap = 'downarrow_blank.png'
+        self.iconlabel.setPixmap(action.getPixmap(pixmap))
 
     def enterEvent(self, event):
         """Focus on mouse enter."""
@@ -874,6 +893,15 @@ class SettingLabel(qt4.QWidget):
                         self.actionDefaultTypedNamed)
         popup.addAction('Forget this default setting',
                         self.actionDefaultForget)
+
+        # special actions for references
+        if self.setting.isReference():
+            popup.addSeparator()
+            popup.addAction('Unlink setting', self.actionUnlinkSetting)
+            #popup.addAction('Edit linked setting',
+            #                self.actionEditLinkedSetting)
+
+
         self.inmenu = True
         self.updateHighlight()
         popup.exec_(pos)
@@ -881,23 +909,56 @@ class SettingLabel(qt4.QWidget):
         self.updateHighlight()
 
     def actionResetDefault(self):
-        self.document.applyOperation( document.OperationSettingSet(self.setting, self.setting.default) )
+        """Reset setting to default."""
+        self.document.applyOperation(
+            document.OperationSettingSet(self.setting, self.setting.default) )
 
     def actionCopyTypedWidgets(self):
-        self.document.applyOperation( document.OperationSettingPropagate(self.setting) )
+        """Copy setting to widgets of same type."""
+        self.document.applyOperation(
+            document.OperationSettingPropagate(self.setting) )
 
     def actionCopyTypedSiblings(self):
-        self.document.applyOperation( document.OperationSettingPropagate(self.setting, root=self._clickwidget.parent, maxlevels=1) )
+        """Copy setting to siblings of the same type."""
+        self.document.applyOperation(
+            document.OperationSettingPropagate(self.setting,
+                                               root=self._clickwidget.parent,
+                                               maxlevels=1) )
 
     def actionCopyTypedNamedWidgets(self):
-        self.document.applyOperation( document.OperationSettingPropagate(self.setting, widgetname=self._clickwidget.name) )
+        """Copy setting to widgets with the same name and type."""
+        self.document.applyOperation(
+            document.OperationSettingPropagate(self.setting,
+                                               widgetname=
+                                               self._clickwidget.name) )
 
     def actionDefaultTyped(self):
+        """Make default for widgets with the same type."""
         self.setting.setAsDefault(False)
 
     def actionDefaultTypedNamed(self):
+        """Make default for widgets with the same name and type."""
         self.setting.setAsDefault(True)
 
     def actionDefaultForget(self):
+        """Forget any default setting."""
         self.setting.removeDefault()
 
+    def actionUnlinkSetting(self):
+        """Unlink the setting if it is a reference."""
+        self.document.applyOperation(
+            document.OperationSettingSet(self.setting, self.setting.get()) )
+
+    def actionEditLinkedSetting(self):
+        """Edit the linked setting rather than the setting."""
+        
+        realsetn = self.setting.getReference().resolve(self.setting)
+        widget = realsetn
+        while not isinstance(widget, widgets.Widget) and widget is not None:
+            widget = widget.parent
+
+        # need to select widget, so need to find treeditwindow :-(
+        window = self
+        while not hasattr(window, 'treeedit'):
+            window = window.parent()
+        window.treeedit.selectWidget(widget)
