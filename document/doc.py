@@ -251,7 +251,8 @@ class Document( qt4.QObject ):
         """Return whether modified flag set."""
         return self.modified
     
-    def printTo(self, printer, pages, scaling = 1., dpi = None):
+    def printTo(self, printer, pages, scaling = 1., dpi = None,
+                antialias = False):
         """Print onto printing device."""
 
         painter = Painter()
@@ -260,7 +261,8 @@ class Document( qt4.QObject ):
             painter.veusz_pixperpt = dpi / 72.
         
         painter.begin( printer )
-        painter.setRenderHint(qt4.QPainter.Antialiasing)
+        if antialias:
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
 
         # work out how many pixels correspond to the given size
         width, height = self.basewidget.getSize(painter)

@@ -252,10 +252,14 @@ class PlotWindow( qt4.QScrollArea ):
                       self.slotBecomeScrollClick )
 
         # get update period from setting database
+        self.interval = 1000
         if 'plot_updateinterval' in setting.settingdb:
             self.interval = setting.settingdb['plot_updateinterval']
-        else:
-            self.interval = 1000
+
+        # load antialias settings
+        self.antialias = True
+        if 'plot_antialias' in setting.settingdb:
+            self.antialias = setting.settingdb['plot_antialias']
 
         if self.interval > 0:
             self.timer.start(self.interval)
@@ -585,7 +589,8 @@ class PlotWindow( qt4.QScrollArea ):
                     self.document.printTo( self.bufferpixmap,
                                            [self.pagenumber],
                                            scaling = self.zoomfactor,
-                                           dpi = self.widgetdpi )
+                                           dpi = self.widgetdpi,
+                                           antialias = self.antialias )
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
@@ -644,6 +649,12 @@ class PlotWindow( qt4.QScrollArea ):
             if intv == self.interval:
                 act.setChecked(True)
             submenu.addAction(act)
+
+        # antialias
+        menu.addSeparator()
+        act = menu.addAction('Antialias', self.actionAntialias)
+        act.setCheckable(True)
+        act.setChecked(self.antialias)
         
     def contextMenuEvent(self, event):
         """Show context menu."""
@@ -672,6 +683,12 @@ class PlotWindow( qt4.QScrollArea ):
 
         # remember changes for next time
         setting.settingdb['plot_updateinterval'] = self.interval
+
+    def actionAntialias(self):
+        """Toggle antialias."""
+        self.antialias = not self.antialias
+        setting.settingdb['plot_antialias'] = self.antialias
+        self.actionForceUpdate()
 
     def setZoomFactor(self, zoomfactor):
         """Set the zoom factor of the window."""
