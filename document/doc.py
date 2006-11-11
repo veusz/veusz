@@ -370,8 +370,7 @@ class Document( qt4.QObject ):
                     break
             
             # write eps file
-            p = qt4.QPrinter(qt4.QPrinter.HighResolution)
-            p.setOutputToFile(True)
+            p = qt4.QPrinter()
             p.setOutputFileName(tmpfilename)
             p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
             p.newPage()
