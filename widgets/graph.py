@@ -59,8 +59,10 @@ class Graph(widget.Widget):
                                  'to edge of page',
                                  usertext='Bottom margin') )
         s.add( setting.GraphBrush( 'Background',
-                                   descr = 'Background plot fill' ), pixmap='bgfill' )
-        s.add( setting.Line('Border', descr = 'Graph border line'), pixmap='border')
+                                   descr = 'Background plot fill',
+                                   usertext='Background'), pixmap='bgfill' )
+        s.add( setting.Line('Border', descr = 'Graph border line',
+                            usertext='Border'), pixmap='border')
         
         self.readDefaults()
 

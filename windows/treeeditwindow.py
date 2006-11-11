@@ -311,7 +311,10 @@ class TabbedFormatting(qt4.QTabWidget):
             if hasattr(subset, 'pixmap'):
                 icon = action.getIcon('settings_%s.png' % subset.pixmap)
                 indx = self.addTab(tab, icon, '')
-                self.setTabToolTip(indx, subset.name)
+                text = subset.usertext
+                if not subset.usertext:
+                    text = subset.name
+                self.setTabToolTip(indx, text)
             else:
                 self.addTab(tab, subset.name)
 

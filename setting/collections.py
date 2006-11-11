@@ -40,8 +40,8 @@ StyleSheet.setPixmap('Line', 'plotline')
 class Line(Settings):
     '''For holding properities of a line.'''
 
-    def __init__(self, name, descr=''):
-        Settings.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
 
         self.add( setting.Color('color', setting.Reference('/StyleSheet/Line/color'),
                                 descr = 'Color of line',
@@ -67,8 +67,8 @@ class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
     to be plotted.'''
     
-    def __init__(self, name, descr=''):
-        Line.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
 
         self.add( setting.Choice('steps',
                                  ['off', 'left', 'centre', 'right'], 'off',
@@ -79,8 +79,8 @@ class XYPlotLine(Line):
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''
 
-    def __init__(self, name, descr=''):
-        Line.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
 
         self.add( setting.Bool('hideHorz', False,
                                descr = 'Hide horizontal errors',
@@ -92,8 +92,8 @@ class ErrorBarLine(Line):
 class Brush(Settings):
     '''Settings of a fill.'''
 
-    def __init__(self, name, descr=''):
-        Settings.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
 
         self.add( setting.Color( 'color', 'black',
                                  descr = 'Fill colour',
@@ -114,32 +114,32 @@ class Brush(Settings):
 class KeyBrush(Brush):
     '''Fill used for back of key.'''
 
-    def __init__(self, name, descr=''):
-        Brush.__init__(self, name, descr)
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
 
         self.get('color').newDefault('white')
 
 class GraphBrush(Brush):
     '''Fill used for back of graph.'''
 
-    def __init__(self, name, descr=''):
-        Brush.__init__(self, name, descr)
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
 
         self.get('color').newDefault('white')
 
 class PlotterFill(Brush):
     '''Filling used for filling on plotters.'''
 
-    def __init__(self, name, descr=''):
-        Brush.__init__(self, name, descr)
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
 
         self.get('hide').newDefault(True)
 
 class MajorTick(Line):
     '''Major tick settings.'''
 
-    def __init__(self, name, descr=''):
-        Line.__init__(self, name, descr)
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
         self.add( setting.Distance( 'length', '6pt',
                                     descr = 'Length of ticks',
                                     usertext='Length') )
@@ -160,8 +160,8 @@ class MajorTick(Line):
 class MinorTick(Line):
     '''Minor tick settings.'''
 
-    def __init__(self, name, descr=''):
-        Line.__init__(self, name, descr)
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
         self.add( setting.Distance( 'length', '3pt',
                                     descr = 'Length of ticks',
                                     usertext='Length') )
@@ -177,8 +177,8 @@ class MinorTick(Line):
 class GridLine(Line):
     '''Grid line settings.'''
 
-    def __init__(self, name, descr=''):
-        Line.__init__(self, name, descr)
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
 
         self.get('color').newDefault('grey')
         self.get('hide').newDefault(True)
@@ -247,8 +247,8 @@ class Text(Settings):
     defaultfamily = None
     families = None
 
-    def __init__(self, name, descr = ''):
-        Settings.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
 
         if Text.defaultfamily == '':
             Text._getDefaultFamily()
@@ -318,8 +318,8 @@ class Text(Settings):
         
 class AxisLabel(Text):
 
-    def __init__(self, name, descr = ''):
-        Text.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Text.__init__(self, name, **args)
         self.add( setting.Bool( 'atEdge', False,
                                 descr = 'Place axis label close to edge'
                                 ' of graph',
@@ -330,8 +330,8 @@ class AxisLabel(Text):
 
 class TickLabel(Text):
 
-    def __init__(self, name, descr = ''):
-        Text.__init__(self, name, descr=descr)
+    def __init__(self, name, **args):
+        Text.__init__(self, name, **args)
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )

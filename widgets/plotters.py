@@ -126,15 +126,18 @@ class FunctionPlotter(GenericPlotter):
                                   usertext='Max'))
 
         s.add( setting.Line('Line',
-                            descr = 'Function line settings'),
+                            descr = 'Function line settings',
+                            usertext = 'Plot line'),
                pixmap = 'plotline' )
 
         s.add( setting.PlotterFill('FillBelow',
-                                   descr = 'Fill below function'),
+                                   descr = 'Fill below function',
+                                   usertext = 'Fill below'),
                pixmap = 'plotfillbelow' )
         
         s.add( setting.PlotterFill('FillAbove',
-                                   descr = 'Fill above function'),
+                                   descr = 'Fill above function',
+                                   usertext = 'Fill above'),
                pixmap = 'plotfillabove' )
 
         if type(self) == FunctionPlotter:
@@ -370,22 +373,28 @@ class PointPlotter(GenericPlotter):
                               usertext='Error style') )
 
         s.add( setting.XYPlotLine('PlotLine',
-                                  descr = 'Plot line settings'),
+                                  descr = 'Plot line settings',
+                                  usertext = 'Plot line'),
                pixmap = 'plotline' )
         s.add( setting.Line('MarkerLine',
-                            descr = 'Line around the marker settings'),
+                            descr = 'Line around the marker settings',
+                            usertext = 'Marker border'),
                pixmap = 'plotmarkerline' )
         s.add( setting.Brush('MarkerFill',
-                             descr = 'Marker fill settings'),
+                             descr = 'Marker fill settings',
+                             usertext = 'Marker fill'),
                pixmap = 'plotmarkerfill' )
         s.add( setting.ErrorBarLine('ErrorBarLine',
-                                    descr = 'Error bar line settings'),
+                                    descr = 'Error bar line settings',
+                                    usertext = 'Error bar line'),
                pixmap = 'ploterrorline' )
         s.add( setting.PlotterFill('FillBelow',
-                                   descr = 'Fill below plot line'),
+                                   descr = 'Fill below plot line',
+                                   usertext = 'Fill below'),
                pixmap = 'plotfillbelow' )
         s.add( setting.PlotterFill('FillAbove',
-                                   descr = 'Fill above plot line'),
+                                   descr = 'Fill above plot line',
+                                   usertext = 'Fill above'),
                pixmap = 'plotfillabove' )
 
         if type(self) == PointPlotter:
@@ -737,28 +746,36 @@ class TextLabel(GenericPlotter):
         s.remove('key')
 
         s.add( setting.Str('label', '',
-                           descr='Text to show'), 0 )
+                           descr='Text to show',
+                           usertext='Label'), 0 )
         s.add( setting.Float('xPos', 0.5,
-                             descr='x coordinate of the text'), 1 )
+                             descr='x coordinate of the text',
+                             usertext='X position'), 1 )
         s.add( setting.Float('yPos', 0.5,
-                             descr='y coordinate of the text'), 2 )
+                             descr='y coordinate of the text',
+                             usertext='Y position'), 2 )
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
                               descr='Use axes or fractional position to '
-                              'place label'), 3)
+                              'place label',
+                              usertext='Position mode'), 3)
 
         s.add( setting.Choice('alignHorz',
                               ['left', 'centre', 'right'], 'left',
-                              descr="Horizontal alignment of label"), 4)
+                              descr="Horizontal alignment of label",
+                              usertext='Horz alignment'), 4)
         s.add( setting.Choice('alignVert',
                               ['top', 'centre', 'bottom'], 'bottom',
-                              descr='Vertical alignment of label'), 5)
+                              descr='Vertical alignment of label',
+                              usertext='Vert alignment'), 5)
 
         s.add( setting.Float('angle', 0.,
-                             descr='Angle of the label in degrees'), 6 )
+                             descr='Angle of the label in degrees',
+                             usertext='Angle'), 6 )
 
         s.add( setting.Text('Text',
-                            descr = 'Text settings'),
+                            descr = 'Text settings',
+                            usertext='Text'),
                pixmap = 'axislabel' )
 
         if type(self) == TextLabel:

@@ -41,25 +41,28 @@ class Key(widget.Widget):
 
         s = self.settings
         s.add( setting.Text('Text',
-                            descr = 'Text settings'),
+                            descr = 'Text settings',
+                            usertext='Text'),
                pixmap = 'axislabel' )
         s.add( setting.KeyBrush('Background',
-                                descr = 'Key background fill'),
+                                descr = 'Key background fill',
+                                usertext='Background'),
                pixmap = 'bgfill' )
         s.add( setting.Line('Border',
-                            descr = 'Key border line'),
+                            descr = 'Key border line',
+                            usertext='Border'),
                pixmap = 'border' )
 
         s.add( setting.Choice( 'horzPosn',
                                ('left', 'centre', 'right', 'manual'),
                                'right',
                                descr = 'Horizontal key position',
-                               usertext='Horz. posn.') )
+                               usertext='Horz posn') )
         s.add( setting.Choice( 'vertPosn',
                                ('top', 'centre', 'bottom', 'manual'),
                                'bottom',
                                descr = 'Vertical key position',
-                               usertext='Vert. posn.') )
+                               usertext='Vert posn') )
                                
         s.add( setting.Distance('keyLength', '1cm',
                                 descr = 'Length of line to show in sample',
@@ -68,11 +71,11 @@ class Key(widget.Widget):
         s.add( setting.Float( 'horzManual',
                               0.,
                               descr = 'Manual horizontal fractional position',
-                              usertext='Horz. manual') )
+                              usertext='Horz manual') )
         s.add( setting.Float( 'vertManual',
                               0.,
                               descr = 'Manual vertical fractional position',
-                              usertext='Vert. manual') )
+                              usertext='Vert manual') )
 
         if type(self) == Key:
             self.readDefaults()

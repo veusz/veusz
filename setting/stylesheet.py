@@ -42,9 +42,9 @@ class StyleSheet(settings.Settings):
         kls.settingpixmaps[settingtype] = pixmap
     setPixmap = classmethod(setPixmap)
     
-    def __init__(self):
+    def __init__(self, **args):
         """Create the default settings."""
-        settings.Settings.__init__(self, 'StyleSheet', 'global styles')
+        settings.Settings.__init__(self, 'StyleSheet', **args)
         self.pixmap = 'stylesheet'
         
         # make copies of all the registered settings

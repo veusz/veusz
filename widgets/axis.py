@@ -98,22 +98,28 @@ class Axis(widget.Widget):
                              usertext='Axis position') )
 
         s.add( setting.Line('Line',
-                            descr = 'Axis line settings'),
+                            descr = 'Axis line settings',
+                            usertext = 'Axis line'),
                pixmap = 'axisline' )
         s.add( setting.MajorTick('MajorTicks',
-                                 descr = 'Major tick line settings'),
+                                 descr = 'Major tick line settings',
+                                 usertext = 'Major ticks'),
                pixmap = 'axismajorticks' )
         s.add( setting.MinorTick('MinorTicks',
-                                 descr = 'Minor tick line settings'),
+                                 descr = 'Minor tick line settings',
+                                 usertext = 'Minor ticks'),
                pixmap = 'axisminorticks' )
         s.add( setting.TickLabel('TickLabels',
-                                 descr = 'Tick label settings'),
+                                 descr = 'Tick label settings',
+                                 usertext = 'Tick labels'),
                pixmap = 'axisticklabels' )
         s.add( setting.GridLine('GridLines',
-                                descr = 'Grid line settings'),
+                                descr = 'Grid line settings',
+                                usertext = 'Grid lines'),
                pixmap = 'axisgridlines' )
         s.add( setting.AxisLabel('Label',
-                                 descr = 'Axis label settings'),
+                                 descr = 'Axis label settings',
+                                 usertext = 'Axis label'),
                pixmap = 'axislabel' )
 
         if type(self) == Axis:

@@ -23,12 +23,13 @@
 class Settings:
     """A class for holding collections of settings."""
 
-    def __init__(self, name, descr = ''):
+    def __init__(self, name, descr = '', usertext=''):
         """A new Settings with a name."""
 
         self.__dict__['setdict'] = {}
         self.name = name
         self.descr = descr
+        self.usertext = usertext
         self.setnames = []  # a list of names
         self.modified = False
         self.onmodified = [] # fns to call on modification

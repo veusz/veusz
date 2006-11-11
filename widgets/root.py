@@ -46,7 +46,8 @@ class Root(widget.Widget):
         s.add( setting.Distance('height', '15cm',
                                 descr='Height of the pages',
                                 usertext='Page height') )
-        s.add( setting.StyleSheet() )
+        s.add( setting.StyleSheet(descr='Master settings for document',
+                                  usertext='Style sheet') )
         self.document = document
 
         if type(self) == Root:
