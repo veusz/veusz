@@ -122,7 +122,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """Return the header of the tree."""
         
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
-            val = ['Name', 'Type', 'Detail'][section]
+            val = ['Name', 'Type'][section]
             return qt4.QVariant(val)
 
         return qt4.QVariant()
@@ -402,7 +402,6 @@ class TreeEditDock(qt4.QDockWidget):
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
-        #self.treeview.header().
 
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
@@ -493,27 +492,6 @@ class TreeEditDock(qt4.QDockWidget):
             self.editactions['copy'].setEnabled(cancopy)
         self.updatePasteButton()
 
-    def _getWidgetOrder(self):
-        """Return a list of the widgets, most important first.
-        """
-
-        # get list of allowed classes, sorted by type name
-        wcl = [(i.typename, i)
-               for i in document.thefactory.listWidgetClasses()
-               if i.allowusercreation]
-        wcl.sort()
-
-        # build up a list of pairs for topological sort
-        pairs = []
-        for name, wc in wcl:
-            for pwc in wc.allowedparenttypes:
-                pairs.append( (pwc, wc) )
-
-        # do topological sort
-        sorted = utils.topsort(pairs)
-
-        return sorted
-
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
@@ -521,7 +499,14 @@ class TreeEditDock(qt4.QDockWidget):
 
         actions = []
         self.addslots = {}
-        for wc in self._getWidgetOrder():
+
+        # iterate over each type of widget
+        for widgettype in ('page', 'grid', 'graph', 'axis',
+                           'xy', 'fit', 'function',
+                           'image', 'contour',
+                           'key', 'label'):
+
+            wc = document.thefactory.getWidgetClass(widgettype)
             name = wc.typename
             if wc.allowusercreation:
 
