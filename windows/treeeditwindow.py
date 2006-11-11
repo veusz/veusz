@@ -122,7 +122,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """Return the header of the tree."""
         
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
-            val = ['Name', 'Type'][section]
+            val = ('Name', 'Type')[section]
             return qt4.QVariant(val)
 
         return qt4.QVariant()
@@ -494,14 +494,9 @@ class TreeEditDock(qt4.QDockWidget):
         # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
 
-        for i in ('cut', 'copy', 'delete', 'moveup', 'movedown', 'rename'):
-            self.editactions[i].setEnabled(isnotroot)
+        for act in ('cut', 'copy', 'delete', 'moveup', 'movedown', 'rename'):
+            self.editactions[act].setEnabled(isnotroot)
 
-        if isnotroot:
-            # cut and copy aren't currently possible on a non-widget
-            cancopy = selw is not None
-            self.editactions['cut'].setEnabled(cancopy)
-            self.editactions['copy'].setEnabled(cancopy)
         self.updatePasteButton()
 
     def _constructToolbarMenu(self):
@@ -729,7 +724,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.selectWidget(nextwidget)
 
     def slotWidgetRename(self):
-        """Renames the selected widget."""
+        """Allows the user to rename the selected widget."""
 
         selected = self.treeview.selectedIndexes()
         if len(selected) != 0:
