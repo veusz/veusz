@@ -362,7 +362,7 @@ class Choice(qt4.QComboBox):
         if index >= 0:
             self.setCurrentIndex(index)
         if self.isEditable():
-            self.setEditText( self.setting.toText() )
+            self.setEditText(text)
 
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""

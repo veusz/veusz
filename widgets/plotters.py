@@ -51,7 +51,7 @@ class GenericPlotter(widget.Widget):
         s = self.settings
         s.add( setting.Str('key', '',
                            descr = 'Description of the plotted data',
-                           usertext='Key') )
+                           usertext='Key text') )
         s.add( setting.Axis('xAxis', 'x', 'horizontal',
                             descr = 'Name of X-axis to use',
                             usertext='X axis') )

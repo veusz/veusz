@@ -755,8 +755,14 @@ class TreeEditDock(qt4.QDockWidget):
         self.selectWidget(w)
 
 class SettingLabel(qt4.QWidget):
+    """A label to describe a setting.
+
+    This widget shows the name, a tooltip description, and gives
+    access to the context menu
+    """
+    
     def __init__(self, document, setting, parent):
-        """Initialise botton, passing document, setting, and parent widget."""
+        """Initialise button, passing document, setting, and parent widget."""
         
         qt4.QWidget.__init__(self, parent)
         self.setFocusPolicy(qt4.Qt.StrongFocus)
@@ -787,11 +793,13 @@ class SettingLabel(qt4.QWidget):
         self.updateHighlight()
 
     def mouseReleaseEvent(self, event):
+        """Emit clicked(pos) on mouse release."""
         self.emit( qt4.SIGNAL('clicked'),
                    self.mapToGlobal(event.pos()) )
         return qt4.QWidget.mouseReleaseEvent(self, event)
 
     def keyReleaseEvent(self, event):
+        """Emit clicked(pos) on key release."""
         if event.key() == qt4.Qt.Key_Space:
             self.emit( qt4.SIGNAL('clicked'),
                        self.mapToGlobal(self.iconlabel.pos()) )
@@ -800,27 +808,32 @@ class SettingLabel(qt4.QWidget):
             return qt4.QWidget.keyReleaseEvent(self, event)
 
     def updateHighlight(self):
+        """Show drop down arrow if item has focus."""
         if self.inmouse or self.infocus or self.inmenu:
             self.iconlabel.setPixmap(action.getPixmap('downarrow.png'))
         else:
             self.iconlabel.setPixmap(action.getPixmap('downarrow_blank.png'))
 
     def enterEvent(self, event):
+        """Focus on mouse enter."""
         self.inmouse = True
         self.updateHighlight()
         return qt4.QWidget.enterEvent(self, event)
 
     def leaveEvent(self, event):
+        """Clear focus on mouse leaving."""
         self.inmouse = False
         self.updateHighlight()
         return qt4.QWidget.leaveEvent(self, event)
 
     def focusInEvent(self, event):
+        """Focus if widgets gets focus."""
         self.infocus = True
         self.updateHighlight()
         return qt4.QWidget.focusInEvent(self, event)
 
     def focusOutEvent(self, event):
+        """Lose focus if widget loses focus."""
         self.infocus = False
         self.updateHighlight()
         return qt4.QWidget.focusOutEvent(self, event)
