@@ -41,8 +41,8 @@ g.Close()
 More than one embedded window can be opened at once
 """
 
-import sys
 import thread
+import sys
 import os
 import os.path
 import atexit
@@ -199,7 +199,7 @@ class Embedded(object):
     def _startThread():
         """Start up the Qt application in a thread."""
 
-        import qt
+        import veusz.qtall as qt4
 
         # drag in veusz before opening application
         import veusz.document
@@ -237,15 +237,15 @@ class Embedded(object):
         app = _App(argv)
 
         # application has a notifier to know when it needs to do something
-        notifier = qt.QSocketNotifier(Embedded.pipetoveusz_r,
-                                      qt.QSocketNotifier.Read)
+        notifier = qt4.QSocketNotifier(Embedded.pipetoveusz_r,
+                                       qt4.QSocketNotifier.Read)
 
         # connect app to notifier
-        app.connect(notifier, qt.SIGNAL('activated(int)'), app.notification)
+        app.connect(notifier, qt4.SIGNAL('activated(int)'), app.notification)
         notifier.setEnabled(True)
 
         # start the main Qt event loop
-        app.exec_loop()
+        app.exec_()
 
         # exits when app.quit() is called
        
@@ -253,8 +253,8 @@ class Embedded(object):
     
     def _exitQt():
         """Exit the Qt thread."""
-        import qt
-        qt.qApp.quit()
+        import veusz.qtall as qt4
+        qt4.qApp.quit()
     _exitQt = staticmethod(_exitQt)
 
     def _atExit():
@@ -263,5 +263,5 @@ class Embedded(object):
             # open window for this embedded instance
             Embedded._runCommand( Embedded._exitQt )
     _atExit = staticmethod(_atExit)
-  
+
 atexit.register(Embedded._atExit)
