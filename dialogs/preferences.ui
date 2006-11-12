@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>187</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -43,29 +43,27 @@
          <property name="spacing" >
           <number>6</number>
          </property>
-         <item row="0" column="2" >
-          <widget class="QCheckBox" name="exportAntialias" >
-           <property name="text" >
-            <string>Antialias</string>
+         <item row="1" column="1" >
+          <widget class="QSpinBox" name="exportQuality" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose Jpeg quality setting. Lower values are lower quality with more compression.&lt;/p>&lt;/body>&lt;/html></string>
            </property>
-          </widget>
-         </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label" >
-           <property name="text" >
-            <string>Bitmap DPI</string>
+           <property name="maximum" >
+            <number>100</number>
            </property>
-          </widget>
-         </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
-            <string>Postscript color</string>
+           <property name="minimum" >
+            <number>0</number>
+           </property>
+           <property name="value" >
+            <number>85</number>
            </property>
           </widget>
          </item>
          <item row="0" column="1" >
           <widget class="QComboBox" name="exportDPI" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Dots Per Inch is used to convert from the physical size of the plot to the number of pixels in output bitmaps&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
            <property name="editable" >
             <bool>true</bool>
            </property>
@@ -91,8 +89,42 @@
            </item>
           </widget>
          </item>
-         <item row="1" column="1" >
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_3" >
+           <property name="text" >
+            <string>Jpeg quality</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QLabel" name="label_2" >
+           <property name="text" >
+            <string>Postscript color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label" >
+           <property name="text" >
+            <string>Bitmap DPI</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" >
+          <widget class="QCheckBox" name="exportAntialias" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Appy antialiasing, or smoothing, to output bitmap images. This is recommended for most purposes.&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+           <property name="text" >
+            <string>Antialias</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" colspan="2" >
           <widget class="QComboBox" name="exportColor" >
+           <property name="toolTip" >
+            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Output postscript as full color, or convert to greyscale&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
            <item>
             <property name="text" >
              <string>Color</string>
@@ -154,6 +186,7 @@
  <tabstops>
   <tabstop>exportDPI</tabstop>
   <tabstop>exportAntialias</tabstop>
+  <tabstop>exportQuality</tabstop>
   <tabstop>exportColor</tabstop>
   <tabstop>okButton</tabstop>
   <tabstop>cancelButton</tabstop>

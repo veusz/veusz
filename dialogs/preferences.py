@@ -39,6 +39,9 @@ class PreferencesDialog(qt4.QDialog):
         # set antialias
         self.exportAntialias.setChecked( setting.settingdb['export_antialias'])
 
+        # quality of jpeg export
+        self.exportQuality.setValue( setting.settingdb['export_quality'] )
+
         # set color setting
         self.exportColor.setCurrentIndex(
             {True:0, False:1}[setting.settingdb['export_color']])
@@ -56,6 +59,7 @@ class PreferencesDialog(qt4.QDialog):
 
         # other settings
         setting.settingdb['export_antialias'] = self.exportAntialias.isChecked()
+        setting.settingdb['export_quality'] = self.exportQuality.value()
 
         setting.settingdb['export_color'] = {0: True, 1: False}[self.exportColor.currentIndex()]
         

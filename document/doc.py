@@ -332,8 +332,53 @@ class Document( qt4.QObject ):
         stylesheet = self.basewidget.settings.StyleSheet
 
         file.write( stylesheet.saveText(True, rootname='') )
+
+    def _exportBitmap(self, filename, pagenumber, dpi=100, antialias=True,
+                      quality=85):
+        """Export the pagenumber to the requested bitmap filename."""
+
+        # firstly have to convert dpi to image size
+        # have to use a temporary bitmap first
+        tmp = qt4.QPixmap(1, 1)
+        tmppainter = Painter(tmp)
+        realdpi = tmppainter.device().logicalDpiY()
+        width, height = self.basewidget.getSize(tmppainter)
+        scaling = dpi/float(realdpi)
+        tmppainter.end()
+        del tmp, tmppainter
+
+        # work out format
+        format = os.path.splitext(filename)[1]
+        if not format:
+            format = '.png'
+        # str is required as unicode not supported
+        format = str(format[1:].lower())
+
+        # create real output image
+        pixmap = qt4.QPixmap(int(width*scaling), int(height*scaling))
+        if format == 'png':
+            # allows transparent
+            pixmap.fill( qt4.Qt.transparent )
+        else:
+            # fill white
+            pixmap.fill()        
+
+        # paint to the image
+        painter = Painter(pixmap)
+        if antialias:
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
+        self.paintTo(painter, pagenumber, scaling=scaling, dpi=realdpi)
+        painter.end()
+
+        # write image to disk
+        writer = qt4.QImageWriter()
+        writer.setFormat(qt4.QByteArray(format))
+        writer.setFileName(filename)
+        writer.setQuality(quality)
+        writer.write( pixmap.toImage() )
         
-    def export(self, filename, pagenumber, color=True):
+    def export(self, filename, pagenumber, color=True, dpi=100,
+               antialias=True, quality=85):
         """Export the figure to the filename."""
 
         ext = os.path.splitext(filename)[1]
@@ -341,52 +386,18 @@ class Document( qt4.QObject ):
         if ext == '.eps' or ext == '.pdf':
             # write eps file
             p = qt4.QPrinter()
+            p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
+            p.setColorMode( qt4.QPrinter.GrayScale )
             if ext == '.pdf':
                 p.setOutputFormat(qt4.QPrinter.PdfFormat)
             p.setOutputFileName(filename)
-            p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
             p.setCreator('Veusz %s' % utils.version())
             p.newPage()
             self.printTo( p, [pagenumber] )
 
-        elif ext == '.png':
-            # write png file
-            # unfortunately we need to pass QPrinter the name of an eps
-            # file: no secure way we can produce the file. FIXME INSECURE
-
-            # FIXME: doesn't work in Windows
-
-            fdir = os.path.dirname(os.path.abspath(filename))
-            if not os.path.exists(fdir):
-                raise RuntimeError, 'Directory "%s" does not exist' % fdir
-
-            digits = string.digits + string.ascii_letters
-            while True:
-                rndstr = ''.join( [random.choice(digits) for i in xrange(20)] )
-                tmpfilename = os.path.join(fdir, "tmp_%s.eps" % rndstr)
-                try:
-                    os.stat(tmpfilename)
-                except OSError:
-                    break
-            
-            # write eps file
-            p = qt4.QPrinter()
-            p.setOutputFileName(tmpfilename)
-            p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
-            p.newPage()
-            self.printTo( p, [pagenumber] )
-
-            # now use ghostscript to convert the file into the relevent type
-            cmdline = ( 'gs -sDEVICE=pngalpha -dEPSCrop -dBATCH -dNOPAUSE'
-                        ' -sOutputFile="%s" "%s"' % (filename, tmpfilename) )
-            stdin, stdout, stderr = os.popen3(cmdline)
-            stdin.close()
-
-            # if anything goes to stderr, then report it
-            text = stderr.read().strip()
-            os.unlink(tmpfilename)
-            if len(text) != 0:
-                raise RuntimeError, text
+        elif ext in ('.png', '.jpg', '.jpeg', '.bmp'):
+            self._exportBitmap(filename, pagenumber, dpi=dpi,
+                               antialias=antialias, quality=quality)
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext

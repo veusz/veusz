@@ -30,9 +30,10 @@ import veusz.qtall as qt4
 # default values to some settings in case the user does not have these
 defaultValues = {
     # export options
-    'export_DPI': 150,
+    'export_DPI': 100,
     'export_color': True,
     'export_antialias': True,
+    'export_quality': 85,
 
     # plot options
     'plot_updateinterval': 1000,

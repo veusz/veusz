@@ -662,6 +662,8 @@ class MainWindow(qt4.QMainWindow):
         # File types we can export to in the form ([extensions], Name)
         formats = [(["eps"], "Encapsulated Postscript"),
                    (["png"], "Portable Network Graphics"),
+                   (["jpg"], "Jpeg bitmap format"),
+                   (["bmp"], "Windows bitmap format"),
                    (["pdf"], "Portable Document Format")]
 
         fd = qt4.QFileDialog(self, 'Export page')
@@ -671,6 +673,7 @@ class MainWindow(qt4.QMainWindow):
             fd.setDirectory( self.exportDir )
             
         fd.setFileMode( qt4.QFileDialog.AnyFile )
+        fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
 
         # Create a mapping between a format string and extensions
         filtertoext = {}
@@ -712,7 +715,11 @@ class MainWindow(qt4.QMainWindow):
                 filename = filename + "." + chosenextns[0]
 
             try:
-                self.document.export(filename, self.plot.getPageNumber())
+                self.document.export(filename, self.plot.getPageNumber(),
+                                     dpi=setting.settingdb['export_DPI'],
+                                     antialias=setting.settingdb['export_antialias'],
+                                     color=setting.settingdb['export_color'],
+                                     quality=setting.settingdb['export_quality'])
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox("Veusz",
                                 "Error exporting file:\n%s" % inst,
