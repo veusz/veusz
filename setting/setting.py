@@ -59,7 +59,7 @@ class Reference(object):
     
     def resolve(self, thissetting):
         """Return the setting object associated with the reference."""
-        
+
         item = thissetting.parent
         parts = self.value.split('/')
         if parts[0] == '':

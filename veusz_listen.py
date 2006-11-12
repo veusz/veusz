@@ -32,8 +32,6 @@ Zoom x: Change the zoom factor of the plot to x
 import sys
 import os.path
 
-import veusz.qtall as qt4
-
 # Allow veusz to be run even if not installed into PYTHONPATH
 try:
     import veusz
@@ -46,9 +44,11 @@ except ImportError:
     veusz.__name__ = 'veusz'
     sys.modules['veusz'] = veusz
 
+import veusz.qtall as qt4
+
 from veusz.windows.simplewindow import SimpleWindow
 import veusz.document as document
-from application import Application
+from veusz.application import Application
 
 class InputListener(qt4.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
@@ -122,7 +122,7 @@ def run():
 
     l = InputListener(win)
 
-    app.exec_loop()
+    app.exec_()
 
 # if ran as a program
 if __name__ == '__main__':

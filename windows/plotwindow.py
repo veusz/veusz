@@ -208,8 +208,11 @@ class DisplayWidget(qt4.QLabel):
 class PlotWindow( qt4.QScrollArea ):
     """Class to show the plot(s) in a scrollable window."""
 
-    def __init__(self, document, parent):
-        """Initialise the window."""
+    def __init__(self, document, parent, menu=None):
+        """Initialise the window.
+
+        menu gives a menu to add any menu items to
+        """
 
         qt4.QScrollArea.__init__(self, parent)
         self.label = DisplayWidget()
@@ -264,7 +267,7 @@ class PlotWindow( qt4.QScrollArea ):
         self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         # create toolbar in main window (urgh)
-        self.createToolbar(parent, parent.menus['view'])
+        self.createToolbar(parent, menu)
 
         # make the context menu object
         self._constructContextMenu()

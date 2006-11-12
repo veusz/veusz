@@ -77,7 +77,8 @@ class MainWindow(qt4.QMainWindow):
         self._defineMenus()
 
         # make plot window
-        self.plot = plotwindow.PlotWindow(self.document, self)
+        self.plot = plotwindow.PlotWindow(self.document, self,
+                                          menu = self.menus['view'])
         self.setCentralWidget(self.plot)
         self.plot.showToolbar()
 
@@ -306,7 +307,7 @@ class MainWindow(qt4.QMainWindow):
             ('editredo', 'Redo the previous operation', 'Redo', 'edit',
              self.slotEditRedo, '', False, 'Ctrl+Shift+Z'),
             ('edit', ),
-            ('editprefs', 'Edit preferences', 'Preferences', 'edit',
+            ('editprefs', 'Edit preferences', 'Preferences...', 'edit',
              self.slotEditPreferences, '', False, ''),
             ('edit', ),
             
