@@ -377,25 +377,59 @@ class Document( qt4.QObject ):
         writer.setQuality(quality)
         writer.write( pixmap.toImage() )
         
+    def _exportPS(self, filename, page, color=True):
+        """Postscript or eps format."""
+
+        ext = os.path.splitext(filename)[1]
+
+        p = qt4.QPrinter()
+        p.setFullPage(True)
+
+        # set printer parameters
+        p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
+        if ext == '.pdf':
+            p.setOutputFormat(qt4.QPrinter.PdfFormat)
+        p.setOutputFileName(filename)
+        p.setCreator('Veusz %s' % utils.version())
+
+        # draw the page
+        p.newPage()
+        painter = Painter(p)
+        width, height = self.basewidget.getSize(painter)
+        self.basewidget.children[page].draw( (0, 0, width, height), painter)
+        painter.end()
+
+        # fixup eps file - yuck HACK! - hope qt gets fixed
+        # this makes the bounding box correct
+        if ext == '.eps':
+            # copy eps to a temporary file
+            tmpfile = "%s.tmp.%i" % (filename, random.randint(0,1000000))
+            fout = open(tmpfile, 'w')
+            fin = open(filename)
+            for line in fin:
+                if line[:14] == '%%BoundingBox:':
+                    # replace bounding box line by calculated one
+                    parts = line.split()
+                    widthfactor = float(parts[3]) / p.width()
+                    print >>fout, "%s %i %i %i %i" % (
+                        parts[0], 0, int(float(parts[4])-widthfactor*height),
+                        int(widthfactor*width), int(float(parts[4])) )
+                else:
+                    # otherwise copy line
+                    fout.write(line)
+            fout.close()
+            fin.close()
+            os.remove(filename)
+            os.rename(tmpfile, filename)
+
     def export(self, filename, pagenumber, color=True, dpi=100,
                antialias=True, quality=85):
         """Export the figure to the filename."""
 
         ext = os.path.splitext(filename)[1]
 
-        if ext == '.eps' or ext == '.pdf':
-            # write eps file
-            p = qt4.QPrinter()
-            p.setFullPage(True)
-
-            p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
-            if ext == '.pdf':
-                p.setOutputFormat(qt4.QPrinter.PdfFormat)
-            p.setOutputFileName(filename)
-            p.setCreator('Veusz %s' % utils.version())
-
-            p.newPage()
-            self.printTo( p, [pagenumber] )
+        if ext in ('.eps', '.pdf'):
+            self._exportPS(filename, pagenumber, color=color)
 
         elif ext in ('.png', '.jpg', '.jpeg', '.bmp'):
             self._exportBitmap(filename, pagenumber, dpi=dpi,
