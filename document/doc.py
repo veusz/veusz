@@ -386,12 +386,14 @@ class Document( qt4.QObject ):
         if ext == '.eps' or ext == '.pdf':
             # write eps file
             p = qt4.QPrinter()
+            p.setFullPage(True)
+
             p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
-            p.setColorMode( qt4.QPrinter.GrayScale )
             if ext == '.pdf':
                 p.setOutputFormat(qt4.QPrinter.PdfFormat)
             p.setOutputFileName(filename)
             p.setCreator('Veusz %s' % utils.version())
+
             p.newPage()
             self.printTo( p, [pagenumber] )
 
