@@ -101,6 +101,14 @@ class Axis(widget.Widget):
                             descr = 'Axis line settings',
                             usertext = 'Axis line'),
                pixmap = 'axisline' )
+        s.add( setting.AxisLabel('Label',
+                                 descr = 'Axis label settings',
+                                 usertext = 'Axis label'),
+               pixmap = 'axislabel' )
+        s.add( setting.TickLabel('TickLabels',
+                                 descr = 'Tick label settings',
+                                 usertext = 'Tick labels'),
+               pixmap = 'axisticklabels' )
         s.add( setting.MajorTick('MajorTicks',
                                  descr = 'Major tick line settings',
                                  usertext = 'Major ticks'),
@@ -109,18 +117,10 @@ class Axis(widget.Widget):
                                  descr = 'Minor tick line settings',
                                  usertext = 'Minor ticks'),
                pixmap = 'axisminorticks' )
-        s.add( setting.TickLabel('TickLabels',
-                                 descr = 'Tick label settings',
-                                 usertext = 'Tick labels'),
-               pixmap = 'axisticklabels' )
         s.add( setting.GridLine('GridLines',
                                 descr = 'Grid line settings',
                                 usertext = 'Grid lines'),
                pixmap = 'axisgridlines' )
-        s.add( setting.AxisLabel('Label',
-                                 descr = 'Axis label settings',
-                                 usertext = 'Axis label'),
-               pixmap = 'axislabel' )
 
         if type(self) == Axis:
             self.readDefaults()
