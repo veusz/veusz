@@ -392,7 +392,8 @@ class Dataset(DatasetBase):
             self._invalidpoints = NIE.isnan(self.data)
             for error in self.serr, self.perr, self.nerr:
                 if error is not None:
-                    self._invalidpoints |= NIE.isnan(error)
+                    self._invalidpoints = N.logical_or(self._invalidpoints,
+                                                       NIE.isnan(error))
         return self._invalidpoints
     
     def hasErrors(self):

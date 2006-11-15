@@ -626,7 +626,7 @@ class PointPlotter(GenericPlotter):
         for d in datasets[1:]:
             invalid = d.invalidDataPoints()
             if invalid.shape == nans.shape:
-                nans |= invalid
+                nans = N.logical_or(nans, invalid)
 
         # get indexes of NaNs
         indexes = nans.nonzero()[0].tolist()
