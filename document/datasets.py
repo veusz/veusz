@@ -24,20 +24,26 @@ import itertools
 import re
 
 import numarray as N
+import numarray.ieeespecial as NIE
 
 import doc
 import simpleread
 import operations
 import readcsv
 
+# need to refer to numarray object's type later
+numarraytype = type(N.arange(1, type=N.Float64))
+
 def _convertNumarray(a):
-    """Convert to a numarray if possible (doing copy)."""
-    if a == None:
+    """Convert to a numarray if possible."""
+    if a is None:
         return None
-    elif type(a) != type(N.arange(1, type=N.Float64)):
+    elif not isinstance(a, numarraytype):
         return N.array(a, type=N.Float64)
-    else:
+    elif a.type != 'Float64':
         return a.astype(N.Float64)
+    else:
+        return a
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
@@ -354,6 +360,7 @@ class Dataset(DatasetBase):
         '''
         
         self.document = None
+        self._invalidpoints = None
         self.data = _convertNumarray(data)
         self.serr = _convertNumarray(serr)
         self.perr = _convertNumarray(perr)
@@ -363,13 +370,31 @@ class Dataset(DatasetBase):
         # check the sizes of things match up
         s = self.data.shape
         for i in (self.serr, self.nerr, self.perr):
-            if i != None and i.shape != s:
+            if i is not None and i.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
 
     def duplicate(self):
         """Return new dataset based on this one."""
-        return Dataset(self.data, self.serr, self.nerr, self.perr, None)
 
+        # make copies of non-None elements
+        vals = {}
+        for attr in ('data', 'serr', 'nerr', 'perr'):
+            data = getattr(self, attr)
+            if data is not None:
+                vals[attr] = data.copy()
+        
+        return Dataset(**vals)
+
+    def invalidDataPoints(self):
+        """Return a numarray bool detailing which datapoints are invalid."""
+        if self._invalidpoints is None:
+            # recalculate valid points
+            self._invalidpoints = NIE.isnan(self.data)
+            for error in self.serr, self.perr, self.nerr:
+                if error is not None:
+                    self._invalidpoints |= NIE.isnan(error)
+        return self._invalidpoints
+    
     def hasErrors(self):
         '''Whether errors on dataset'''
         return self.serr != None or self.nerr != None or self.perr != None
@@ -424,6 +449,7 @@ class Dataset(DatasetBase):
         for i in (self.serr, self.nerr, self.perr):
             assert i == None or i.shape == s
 
+        self._invalidpoints = None
         self.document.setModified(True)
 
     def saveToFile(self, file, name):
@@ -523,6 +549,7 @@ class DatasetExpression(Dataset):
 
         self.document = None
         self.linked = None
+        self._invalidpoints = None
 
         # store the expressions to use to generate the dataset
         self.expr = {}
