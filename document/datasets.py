@@ -329,9 +329,9 @@ class Dataset2D(DatasetBase):
         self.yrange = yrange
 
         if not self.xrange:
-            self.xrange = (0, data.shape[0])
+            self.xrange = (0, data.shape[1])
         if not self.yrange:
-            self.yrange = (0, data.shape[1])
+            self.yrange = (0, data.shape[0])
 
     def getDataRanges(self):
         return self.xrange, self.yrange
