@@ -223,7 +223,7 @@ class PropertyList(qt4.QWidget):
         
         self.children = []
 
-    def updateProperties(self, settings):
+    def updateProperties(self, settings, title=False):
         """Update the list of controls with new ones for the settings."""
 
         # delete all child widgets
@@ -237,6 +237,15 @@ class PropertyList(qt4.QWidget):
 
         row = 0
         self.layout.setEnabled(False)
+
+        # add a title if requested
+        if title:
+            lab = qt4.QLabel(settings.usertext)
+            lab.setFrameShape(qt4.QFrame.Panel)
+            lab.setFrameShadow(qt4.QFrame.Sunken)
+            lab.setToolTip(settings.descr)
+            self.layout.addWidget(lab, row, 0, 1, -1)
+            row += 1
 
         # add actions if parent is widget
         if settings.parent.isWidget():
@@ -269,6 +278,7 @@ class PropertyList(qt4.QWidget):
             row += 1
             self.children.append(tabbed)
 
+        # add settings proper
         for setn in settings.getSettingList():
             lab = SettingLabel(self.document, setn, self)
             self.layout.addWidget(lab, row, 0)
@@ -337,7 +347,7 @@ class TabbedFormatting(qt4.QTabWidget):
 
             # create list of properties
             plist = PropertyList(document)
-            plist.updateProperties(subset)
+            plist.updateProperties(subset, title=True)
             scroll.setWidget(plist)
             plist.show()
 
