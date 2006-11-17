@@ -32,6 +32,7 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import plotters
+import widget
 
 class Fit(plotters.FunctionPlotter):
     """A plotter to fit a function to data."""
@@ -88,8 +89,9 @@ class Fit(plotters.FunctionPlotter):
         if type(self) == Fit:
             self.readDefaults()
 
-        self.addAction( 'fit', self.actionFit,
-                        descr='Fit function' )
+        self.addAction( widget.Action('fit', self.actionFit,
+                                      descr = 'Fit function',
+                                      usertext = 'Fit function') )
 
     def _autoAxis(self, dataname, bounds):
         """Determine range of data."""

@@ -361,7 +361,7 @@ class CommandInterface(qt4.QObject):
         w = self.document.resolve(self.currentwidget, widget)
 
         # run action
-        w.actionfuncs[action]()
+        w.getAction(action).function()
 
     def Print(self):
         """Print document."""

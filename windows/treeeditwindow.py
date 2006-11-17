@@ -236,9 +236,32 @@ class PropertyList(qt4.QWidget):
             return
 
         row = 0
-        # FIXME: add actions
-
         self.layout.setEnabled(False)
+
+        # add actions if parent is widget
+        if settings.parent.isWidget():
+            widget = settings.parent
+            for action in widget.actions:
+                text = action.name
+                if action.usertext:
+                    text = action.usertext
+
+                lab = qt4.QLabel(text, self)
+                self.layout.addWidget(lab, row, 0)
+                self.children.append(lab)
+
+                button = qt4.QPushButton(text, self)
+                button.setToolTip(action.descr)
+                # need to save reference to caller object
+                button.caller = utils.BoundCaller(self.slotActionPressed,
+                                                  action)
+                self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
+                             
+                self.layout.addWidget(button, row, 1)
+                self.children.append(button)
+
+                row += 1
+
         # add subsettings if necessary
         if settings.getSettingsList() and self.showsubsettings:
             tabbed = TabbedFormatting(self.document, settings, self)
@@ -278,6 +301,17 @@ class PropertyList(qt4.QWidget):
         
         self.document.applyOperation(document.OperationSettingSet(setting, val))
         
+    def slotActionPressed(self, action):
+        """Activate the action."""
+
+        # find console window, this is horrible: HACK
+        win = self
+        while not hasattr(win, 'console'):
+            win = win.parent()
+        console = win.console
+
+        console.runFunction(action.function)
+
 class TabbedFormatting(qt4.QTabWidget):
     """Class to have tabbed set of settings."""
 

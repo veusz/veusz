@@ -27,6 +27,29 @@ import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting
 
+class Action(object):
+    """A class to wrap functions operating on widgets.
+
+    Attributes:
+    name: name of action
+    function: function to call with no arguments
+    descr: description of action
+    usertext: name of action to display to user
+    """
+
+    def __init__(self, name, function, descr='', usertext=''):
+        """Initialise Action
+
+        Name of action is name
+        Calls function function() on invocation
+        Action has description descr
+        Usertext is short form of name to display to user."""
+
+        self.name = name
+        self.function = function
+        self.descr = descr
+        self.usertext = usertext
+
 class Widget(object):
     """ Fundamental plotting widget interface."""
 
@@ -70,8 +93,6 @@ class Widget(object):
         
         # actions for widget
         self.actions = []
-        self.actionfuncs = {}
-        self.actiondescr = {}
 
     def isWidget(self):
         """Is this object a widget?"""
@@ -98,16 +119,18 @@ class Widget(object):
         '''Add default sub widgets to widget, if any'''
         pass
 
-    def addAction(self, name, function, descr=''):
+    def addAction(self, action):
         """Assign name to operation.
-
-        name is name to assign
-        function is a function with no parameters to call
-        descr is description of routine.
+        action is action class above
         """
-        self.actions.append(name)
-        self.actionfuncs[name] = function
-        self.actiondescr[name] = descr
+        self.actions.append( action )
+
+    def getAction(self, name):
+        """Get action associated with name."""
+        for a in self.actions:
+            if a.name == name:
+                return a
+        return None
 
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""

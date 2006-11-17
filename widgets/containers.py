@@ -195,8 +195,9 @@ class Grid(widget.Widget):
         if type(self) == Grid:
             self.readDefaults()
 
-        self.addAction( 'zeroMargins', self.actionZeroMargins,
-                        descr = 'Zero margins of graphs in grid' )
+        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
+                                      descr = 'Zero margins of graphs in grid',
+                                      usertext = 'Zero margins') )
 
         self.olddimensions = (-1, -1)
 
@@ -331,8 +332,9 @@ class Splitter(widget.Widget):
         if type(self) == Splitter:
             self.readDefaults()
 
-        self.addAction( 'zeroMargins', self.actionZeroMargins,
-                        descr = 'Zero margins of graphs in splitter' )
+        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
+                                      descr = 'Zero margins of graphs in splitter',
+                                      usertext = 'Zero margins') )
 
     def actionZeroMargins(self):
         """Zero margins of plots inside this splitter."""
