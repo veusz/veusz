@@ -175,19 +175,19 @@ class Grid(widget.Widget):
                           usertext='Number of columns') )
 
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
-                                 'Distance from left of graph to '
+                                 'Distance from left of grid to '
                                  'edge of page',
                                  usertext='Left margin') )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
-                                 'Distance from right of graph to '
+                                 'Distance from right of grid to '
                                  'edge of page',
                                  usertext='Right margin') )
         s.add( setting.Distance( 'topMargin', '0.1cm', descr=
-                                 'Distance from top of graph to '
+                                 'Distance from top of grid to '
                                  'edge of page',
                                  usertext='Top margin') )
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
-                                 'Distance from bottom of graph'
+                                 'Distance from bottom of grid'
                                  'to edge of page',
                                  usertext='Bottom margin') )
 
@@ -196,7 +196,7 @@ class Grid(widget.Widget):
             self.readDefaults()
 
         self.addAction( 'zeroMargins', self.actionZeroMargins,
-                        descr = 'Zero graph margins' )
+                        descr = 'Zero margins of graphs in grid' )
 
         self.olddimensions = (-1, -1)
 
@@ -269,10 +269,8 @@ class Grid(widget.Widget):
                     s.get('rightMargin').convert(painter),
                     s.get('bottomMargin').convert(painter) )
 
-        # draw children in reverse order if they are not axes
         bounds = self.computeBounds(parentposn, painter, margins=margins)
-        for i in range(len(self.children)):
-            c = self.children[i]
+        for c in self.children:
             if not isinstance(c, axis.Axis):
                 c.draw(bounds, painter, outerbounds=parentposn)
 
@@ -282,3 +280,127 @@ class Grid(widget.Widget):
 document.thefactory.register( Grid )
 
        
+class Splitter(widget.Widget):
+    """Class to hold plots with the page split into bits
+    """
+
+    typename='splitter'
+    allowusercreation=True
+    description='Split page into separate graphs'
+    allowedparenttypes=[page.Page]
+
+    def __init__(self, *args, **optargs):
+        """Initialise the Splitter.
+
+        User can specify 'Horizontal' or 'Vertical' to split
+        in different directions."""
+        
+        widget.Widget.__init__(self, *args, **optargs)
+
+        s = self.settings
+        s.add( setting.Choice('direction',
+                              ['horizontal', 'vertical'],
+                              'vertical',
+                              descr = 'Split horizonally or vertically',
+                              usertext='Split direction') )
+
+        s.add( setting.FloatList('sizes',
+                                 [],
+                                 descr = 'List of relative sizes for each graph'
+                                 'in the splitter.\nThese are in terms of the '
+                                 'ratio to the total.\nAssumed to be 1 by default.',
+                                 usertext='Relative sizes'))
+        
+        s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
+                                 'Distance from left of splitter to '
+                                 'edge of page',
+                                 usertext='Left margin') )
+        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
+                                 'Distance from right of splitter to '
+                                 'edge of page',
+                                 usertext='Right margin') )
+        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
+                                 'Distance from top of splitter to '
+                                 'edge of page',
+                                 usertext='Top margin') )
+        s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
+                                 'Distance from bottom of splitter'
+                                 'to edge of page',
+                                 usertext='Bottom margin') )
+
+        if type(self) == Splitter:
+            self.readDefaults()
+
+        self.addAction( 'zeroMargins', self.actionZeroMargins,
+                        descr = 'Zero margins of graphs in splitter' )
+
+    def actionZeroMargins(self):
+        """Zero margins of plots inside this splitter."""
+
+        operations = []
+        for c in self.children:
+            if isinstance(c, graph.Graph):
+                s = c.settings
+                for v in ('leftMargin', 'topMargin', 'rightMargin', 'bottomMargin'):
+                    operations.append( document.OperationSettingSet(s.get(v), '0cm') )
+                    
+        self.document.applyOperation( document.OperationMultiple(operations, descr='zero margins') )
+
+    def draw(self, parentposn, painter, outerbounds=None):
+        """Draws the widget's children."""
+
+        s = self.settings
+
+        margins = ( s.get('leftMargin').convert(painter),
+                    s.get('topMargin').convert(painter),
+                    s.get('rightMargin').convert(painter),
+                    s.get('bottomMargin').convert(painter) )
+
+        graphs = [c for c in self.children if not isinstance(c, axis.Axis)]
+        sizes = s.sizes
+
+        # add up total size of graphs in splitter
+        totalsize = 0.
+        for i in xrange(len(graphs)):
+            if i < len(sizes):
+                totalsize += sizes[i]
+            else:
+                totalsize += 1.0
+
+        # work out how to split margins
+        if s.direction == 'horizontal':
+            splitindices = (0, 2)
+        else:
+            splitindices = (1, 3)
+
+        # get bounds of splitter, and draw children who aren't axes
+        bounds = self.computeBounds(parentposn, painter, margins=margins)
+
+        runningsize = 0.
+        for i, child in enumerate(graphs):
+            if i < len(sizes):
+                thissize = sizes[i]
+            else:
+                thissize = 1.
+
+            oldposition = child.position
+            
+            # work out position of child graph in splitter
+            scaling = 1./totalsize
+            childbounds = [0., 0., 1., 1.]
+            childbounds[splitindices[0]] = scaling*runningsize
+            childbounds[splitindices[1]] = scaling*(runningsize+thissize)
+
+            child.position = childbounds
+
+            # actually draw graph
+            child.draw(bounds, painter, outerbounds=parentposn)
+
+            # retain position again
+            child.position = oldposition
+
+            runningsize += thissize
+
+# allow the factory to instantiate a splitter
+document.thefactory.register( Splitter )
+

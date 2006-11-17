@@ -46,7 +46,7 @@ def _plotCircle(painter, xpos, ypos, size):
 
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2+1, size*2+1) )
+                                    size*2, size*2) )
 
 def _plotEllipseVert(painter, xpos, ypos, size):
     """ (internal) function to plot a vertical ellipse marker

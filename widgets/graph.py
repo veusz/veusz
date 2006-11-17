@@ -33,7 +33,7 @@ class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = [page.Page, containers.Grid]
+    allowedparenttypes = [page.Page, containers.Grid, containers.Splitter]
     allowusercreation = True
     description = 'Base graph'
 

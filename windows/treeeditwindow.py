@@ -511,7 +511,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.addslots = {}
 
         # iterate over each type of widget
-        for widgettype in ('page', 'grid', 'graph', 'axis',
+        for widgettype in ('page', 'grid', 'splitter', 'graph', 'axis',
                            'xy', 'fit', 'function',
                            'image', 'contour',
                            'key', 'label'):
