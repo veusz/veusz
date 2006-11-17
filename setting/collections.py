@@ -23,19 +23,25 @@
 import veusz.qtall as qt4
 
 import setting
-from settings import Settings
-from stylesheet import StyleSheet
+from settings import Settings, StyleSheet
 
 from veusz.utils import formatNumber
 from veusz.application import Application
 
-StyleSheet.register('Line', setting.Distance('width', '0.5pt',
-                                             descr='Default line width',
-                                             usertext='Width'))
-StyleSheet.register('Line', setting.Color('color', 'black',
-                                          descr='Default line color',
-                                          usertext='Color'))
-StyleSheet.setPixmap('Line', 'plotline')
+class StylesheetLine(Settings):
+    """Hold the properties of the default line."""
+    def __init__(self):
+        Settings.__init__(self, 'Line', pixmap='plotline',
+                          descr='Default line style for document',
+                          usertext='Line')
+        self.add( setting.Distance('width', '0.5pt',
+                                   descr='Default line width',
+                                   usertext='Width') )
+        self.add( setting.Color('color', 'black',
+                               descr='Default line color',
+                               usertext='Color') )
+# register these properties with the stylesheet
+StyleSheet.register(StylesheetLine())
 
 class Line(Settings):
     '''For holding properities of a line.'''
@@ -184,35 +190,6 @@ class GridLine(Line):
         self.get('hide').newDefault(True)
         self.get('style').newDefault('dotted')
 
-class _FontList(object):
-    """A wrapped list class to interogate the list of fonts on usage.
-    
-    This is needed because we can't get the list of fonts until the QApplication has started.
-    This class looks like a readonly list
-    """
-    
-    def __init__(self):
-        self.vals = None
-    
-    def __len__(self):
-        if self.vals is None:
-            self._getFonts()
-        return len(self.vals)
-    
-    def __getitem__(self, key):
-        if self.vals is None:
-            self._getFonts()
-        return self.vals[key]
-
-    def __iter__(self):
-        if self.vals is None:
-            self._getFonts()
-        return self.vals.__iter__()
-    
-    def _getFonts(self):
-        """Construct list of fonts from Qt."""
-        self.vals = [ unicode(name) for name in qt4.QFontDatabase().families() ]
-
 def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet."""
     families = [ unicode(name) for name in qt4.QFontDatabase().families() ]
@@ -227,16 +204,35 @@ def _registerFontStyleSheet():
     if default is None:
         print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
         default = unicode(_fontfamilies[0])
-    
+
+    class StylesheetText(Settings):
+        """Hold properties of default text font."""
+
+        def __init__(self, defaultfamily, families):
+            """Initialise with default font family and list of families."""
+            Settings.__init__(self, 'Font', pixmap='axislabel',
+                              descr='Default font for document',
+                              usertext='Font')
+            self.defaultfamily = defaultfamily
+            self.families = families
+
+            self.add( setting.ChoiceOrMore('font', families, default,
+                                           descr='Font name', usertext='Font'))
+            self.add( setting.Distance('size', '14pt',
+                                       descr='Default font size', usertext='Size'))
+            self.add( setting.Color('color', 'black', descr='Default font color',
+                                    usertext='Color'))
+
+        def copy(self):
+            """Make copy of settings."""
+            c = Settings.copy(self)
+            c.defaultfamily = self.defaultfamily
+            c.families = self.families
+            return c
+
+    StyleSheet.register(StylesheetText(default, families))
     Text.defaultfamily = default
     Text.families = families
-    StyleSheet.register('Font', setting.ChoiceOrMore('font', families, default,
-                                                     descr='Font name', usertext='Font'))
-    StyleSheet.register('Font', setting.Distance('size', '14pt',
-                                                 descr='Default font size', usertext='Size'))
-    StyleSheet.register('Font', setting.Color('color', 'black', descr='Default font color',
-                                              usertext='Color'))
-    StyleSheet.setPixmap('Font', 'axislabel')
 
 Application.startupfunctions.append(_registerFontStyleSheet)
 
@@ -244,14 +240,12 @@ class Text(Settings):
     '''Text settings.'''
 
     # need to examine font table to see what's available
+    # this is set on app startup
     defaultfamily = None
     families = None
 
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
-
-        if Text.defaultfamily == '':
-            Text._getDefaultFamily()
 
         self.add( setting.ChoiceOrMore('font', Text.families,
                                        setting.Reference('/StyleSheet/Font/font'),
@@ -270,33 +264,13 @@ class Text(Settings):
         self.add( setting.Bool( 'hide', False,
                                 descr = 'Hide the text', usertext='Hide') )
 
-    def _getFontFamilies():
-        '''Make list of font families available.'''
-        Text.families=[ unicode(name)
-                        for name in qt4.QFontDatabase().families() ]
-        
-    _getFontFamilies = staticmethod(_getFontFamilies)
+    def copy(self):
+        """Make copy of settings."""
+        c = Settings.copy(self)
+        c.defaultfamily = self.defaultfamily
+        c.families = self.families
+        return c
 
-    def _getDefaultFamily():
-        '''Choose a default font family. We check through a list until we
-        get a sensible default.'''
-
-        if not Text.families:
-            Text._getFontFamilies()
-
-        for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
-                  'Serif']:
-            if i in Text.families:
-                Text.defaultfamily = i
-                return
-
-        Text.defaultfamily = Text.families[0]
-        raise RuntimeError('Could not identify sensible default font for Veusz'
-                           '. Please report this bug if you have any fonts '
-                           'installed')
-
-    _getDefaultFamily = staticmethod(_getDefaultFamily)
-            
     def makeQFont(self, painter):
         '''Return a qt4.QFont object corresponding to the settings.'''
         
