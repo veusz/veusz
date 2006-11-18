@@ -107,13 +107,17 @@ class MainWindow(qt4.QMainWindow):
         # keep page number up to date
         self.pagelabel = qt4.QLabel(self.statusBar())
         self.statusBar().addWidget(self.pagelabel)
+        self.axisvalueslabel = qt4.QLabel(self.statusBar())
+        self.statusBar().addWidget(self.axisvalueslabel)
 
         self.dirname = os.getcwd()
         self.exportDir = os.getcwd()
         
         self.connect( self.plot, qt4.SIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
-
+        self.connect( self.plot, qt4.SIGNAL("sigAxisValuesFromMouse"),
+                      self.slotUpdateAxisValues )
+        
         # disable save if already saved
         self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.slotModifiedDoc )
@@ -795,6 +799,19 @@ class MainWindow(qt4.QMainWindow):
             self.pagelabel.setText("No pages")
         else:
             self.pagelabel.setText("Page %i/%i" % (number+1, np))
+
+    def slotUpdateAxisValues(self, values):
+        """Update the position where the mouse is relative to the axes."""
+
+        if values:
+            # construct comma separated text representing axis values
+            valitems = []
+            for name, val in values.iteritems():
+                valitems.append('%s=%.4g' % (name, val))
+            valitems.sort()
+            self.axisvalueslabel.setText(', '.join(valitems))
+        else:
+            self.axisvalueslabel.setText('No position')
 
     def slotFileExportStyleSheet(self):
         """Export stylesheet as a file."""

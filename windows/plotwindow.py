@@ -37,6 +37,20 @@ import veusz.utils as utils
 
 import action
 
+class RecordingPainter(document.Painter):
+    """A painter to remember where the positions of the
+    painted widgets."""
+
+    def __init__(self, device):
+        """Start painting on device."""
+        document.Painter.__init__(self)
+        self.widgetpositions = []
+        self.begin(device)
+
+    def beginPaintingWidget(self, widget, bounds):
+        """Record the widget and position."""
+        self.widgetpositions.append( (widget, bounds) )
+
 class PointPainter(document.Painter):
     """A simple painter variant which works out the last widget
     to overlap with the point specified."""
@@ -240,6 +254,9 @@ class PlotWindow( qt4.QScrollArea ):
         self.clickmode = 'select'
         self.currentclickmode = None
 
+        # list of widgets and positions last painted
+        self.widgetpositions = []
+
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
         self.connect( self.timer, qt4.SIGNAL('timeout()'),
@@ -263,8 +280,12 @@ class PlotWindow( qt4.QScrollArea ):
         if self.interval > 0:
             self.timer.start(self.interval)
 
-        # allow window to get foucs, to allow context menu
+        # allow window to get focus, to allow context menu
         self.setFocusPolicy(qt4.Qt.StrongFocus)
+
+        # get mouse move events if mouse is not pressed
+        self.setMouseTracking(True)
+        self.label.setMouseTracking(True)
 
         # create toolbar in main window (urgh)
         self.createToolbar(parent, menu)
@@ -485,6 +506,28 @@ class PlotWindow( qt4.QScrollArea ):
             pos = self.widget().mapFromParent(event.pos())
             self.label.drawRect(self.grabPos, pos)
 
+        elif self.clickmode == 'select':
+            # find axes which map to this position
+            pos = self.widget().mapFromParent(event.pos())
+            px, py = pos.x(), pos.y()
+
+            vals = {}
+            for widget, bounds in self.widgetpositions:
+                # if widget is axis, and point lies within bounds
+                if ( isinstance(widget, widgets.Axis) and
+                     px>=bounds[0] and px<=bounds[2] and
+                     py>=bounds[1] and py<=bounds[3] ):
+
+                    # convert correct pointer position
+                    if widget.settings.direction == 'horizontal':
+                        val = px
+                    else:
+                        val = py
+                    coords=widget.plotterToGraphCoords(bounds, N.array([val]))
+                    vals[widget.name] = coords[0]
+
+            self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
+
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
@@ -585,11 +628,15 @@ class PlotWindow( qt4.QScrollArea ):
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
                 try:
-                    self.document.printTo( self.bufferpixmap,
-                                           [self.pagenumber],
+                    painter = RecordingPainter(self.bufferpixmap)
+                    if self.antialias:
+                        painter.setRenderHint(qt4.QPainter.Antialiasing)
+                    self.document.paintTo( painter, self.pagenumber,
                                            scaling = self.zoomfactor,
-                                           dpi = self.widgetdpi,
-                                           antialias = self.antialias )
+                                           dpi = self.widgetdpi )
+                    painter.end()
+                    self.widgetpositions = painter.widgetpositions
+                    
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
