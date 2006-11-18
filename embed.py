@@ -24,14 +24,14 @@
 For example:
 
 import time
-import numarray
+import numpy
 import veusz.embed as veusz
 
 g = veusz.Embedded('new win')
 g.To( g.Add('page') )
 g.To( g.Add('graph') )
-g.SetData('x', numarray.arange(20))
-g.SetData('y', numarray.arange(20)**2)
+g.SetData('x', numpy.arange(20))
+g.SetData('y', numpy.arange(20)**2)
 g.Add('xy')
 g.Zoom(0.5)
 

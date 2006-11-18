@@ -24,7 +24,7 @@ import string
 import os.path
 
 import veusz.qtall as qt4
-import numarray as N
+import numpy as N
 
 import veusz.setting as setting
 import veusz.document as document
@@ -172,7 +172,7 @@ class Image(plotters.GenericPlotter):
             elif p[0][0] not in string.digits:
                 # new colormap follows
                 if name != '':
-                    cls.colormaps[name] = N.array(vals).astype(N.UInt8)
+                    cls.colormaps[name] = N.array(vals).astype('uint8')
                 name = p[0]
                 vals = []
             else:
@@ -183,7 +183,7 @@ class Image(plotters.GenericPlotter):
 
         # add on final colormap
         if name != '':
-            cls.colormaps[name] = N.array(vals).astype(N.UInt8)
+            cls.colormaps[name] = N.array(vals).astype('uint8')
 
         # collect names and sort alphabetically
         names = cls.colormaps.keys()
@@ -195,7 +195,7 @@ class Image(plotters.GenericPlotter):
     def applyColourMap(self, cmap, scaling, datain, minval, maxval):
         """Apply a colour map to the 2d data given.
 
-        cmap is the color map (numarray of BGRalpha quads)
+        cmap is the color map (numpy of BGRalpha quads)
         scaling is scaling mode => 'linear', 'sqrt', 'log' or 'squared'
         data are the imaging data
         minval and maxval are the extremes of the data for the colormap
@@ -211,7 +211,7 @@ class Image(plotters.GenericPlotter):
 
         # Work out which is the minimum colour map. Assumes we have <255 bands.
         numbands = cmap.shape[0]-1
-        bands = (fracs*numbands).astype(N.UInt8)
+        bands = (fracs*numbands).astype('uint8')
         bands = N.clip(bands, 0, numbands-1)
 
         # work out fractional difference of data from band to next band
@@ -223,7 +223,7 @@ class Image(plotters.GenericPlotter):
         # calculate BGRalpha quadruplets
         # this is a linear interpolation between the band and the next band
         quads = (deltafracs*cmap[bands+1] +
-                 (1.-deltafracs)*cmap[bands]).astype(N.UInt8)
+                 (1.-deltafracs)*cmap[bands]).astype('uint8')
 
         # convert 32bit quads to a Qt QImage
         # FIXME: Does this assume C-style array layout??

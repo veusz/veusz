@@ -68,8 +68,8 @@ class CommandInterpreter:
         self.write_stdout = sys.stdout
         self.write_stderr = sys.stderr
 
-        # import numarray into the environment
-        exec "from numarray import *" in self.globals
+        # import numpy into the environment
+        exec "from numpy import *" in self.globals
 
         # shortcut
         i = self.interface

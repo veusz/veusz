@@ -29,7 +29,7 @@ import traceback
 import smtplib
 import email.MIMEText
 
-import numarray
+import numpy
 
 import veusz.qtall as qt4
 import veusz.utils as utils
@@ -72,7 +72,7 @@ class ExceptionSendDialog(qt4.QDialog):
         self.text = _reportformat % (
             utils.version(),
             sys.version,
-            numarray.__version__,
+            numpy.__version__,
             time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
             exception
             )

@@ -42,8 +42,7 @@ import sys
 import itertools
 import StringIO
 
-import numarray as N
-import numarray.ieeespecial as NIE
+import numpy as N
 
 import datasets
 
@@ -151,7 +150,7 @@ class _DescriptorPart:
                 try:
                     val = float(val)
                 except ValueError:
-                    val = NIE.nan
+                    val = N.nan
                     self.errorcount += 1
 
                 # append a suffix to specify whether error or value
@@ -483,7 +482,7 @@ class SimpleRead2D:
         if len(rows) == 0:
             raise Read2DError, "No data could be imported for dataset"
 
-        # convert the data to a numarray
+        # convert the data to a numpy
         try:
             self.data = N.array(rows)
         except ValueError:

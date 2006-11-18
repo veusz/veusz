@@ -23,7 +23,7 @@
 
 import veusz.qtall as qt4
 import itertools
-import numarray as N
+import numpy as N
 
 import veusz.document as document
 import veusz.setting as setting
@@ -103,7 +103,7 @@ class FunctionPlotter(GenericPlotter):
 
         # define environment to evaluate functions
         self.fnenviron = globals()
-        exec 'from numarray import *' in self.fnenviron
+        exec 'from numpy import *' in self.fnenviron
 
         s = self.settings
         s.add( setting.Int('steps', 50,

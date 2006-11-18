@@ -27,7 +27,7 @@ import sys
 import itertools
 
 import veusz.qtall as qt4
-import numarray as N
+import numpy as N
 
 import veusz.setting as setting
 import veusz.dialogs.exceptiondialog as exceptiondialog
@@ -418,10 +418,10 @@ class PlotWindow( qt4.QScrollArea ):
                 # build up operations to change axis
                 if s.min != r[0]:
                     operations.append( document.OperationSettingSet(s.get('min'),
-                                                                    r[0]) )
+                                                                    float(r[0])) )
                 if s.max != r[1]:
                     operations.append( document.OperationSettingSet(s.get('max'),
-                                                                    r[1]) )
+                                                                    float(r[1])) )
 
 
         # finally change the axes

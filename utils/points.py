@@ -23,7 +23,7 @@
 import itertools
 
 import veusz.qtall as qt4
-import numarray as N
+import numpy as N
 
 def _plotNone(painter, xpos, ypos, size):
     """ (internal) function plot nothing!

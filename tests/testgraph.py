@@ -25,7 +25,7 @@
 
 import sys
 import veusz.qtall as qt
-from numarray import *
+from numpy import *
 
 sys.path.append('./')
 

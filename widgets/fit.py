@@ -24,8 +24,7 @@
 import re
 import sys
 
-import numarray as N
-import numarray.ieeespecial as NIE
+import numpy as N
 
 import veusz.document as document
 import veusz.setting as setting
@@ -189,17 +188,17 @@ class Fit(plotters.FunctionPlotter):
         # populate the return parameters
         vals = {}
         for i, v in zip(names, retn):
-            vals[i] = v
+            vals[i] = float(v)
         operations.append( document.OperationSettingSet(s.get('values'), vals) )
 
         # populate the read-only fit quality params
-        operations.append( document.OperationSettingSet(s.get('chi2'), chi2) )
-        operations.append( document.OperationSettingSet(s.get('dof'), dof) )
+        operations.append( document.OperationSettingSet(s.get('chi2'), float(chi2)) )
+        operations.append( document.OperationSettingSet(s.get('dof'), int(dof)) )
         if dof <= 0:
             print 'No degrees of freedom in fit.\n'
             redchi2 = -1.
         else:
-            redchi2 = chi2/dof
+            redchi2 = float(chi2/dof)
         operations.append( document.OperationSettingSet(s.get('redchi2'), redchi2) )
 
         # expression for fit
@@ -225,7 +224,7 @@ class Fit(plotters.FunctionPlotter):
         try:
             return eval(s.function, env)
         except:
-            return NIE.nan
+            return N.nan
 
     def generateOutputExpr(self, vals):
         """Try to generate text form of output expression.

@@ -28,7 +28,7 @@ import itertools
 import sys
 
 import veusz.qtall as qt4
-import numarray as N
+import numpy as N
 
 import veusz.setting as setting
 import veusz.document as document
@@ -117,7 +117,7 @@ class Contour(plotters.GenericPlotter):
     def _calculateLevels(self):
         """Calculate contour levels from data and settings.
 
-        Returns levels as 1d numarray
+        Returns levels as 1d numpy
         """
 
         # get dataset

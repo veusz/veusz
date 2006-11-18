@@ -23,7 +23,7 @@
 
 import math
 
-import numarray as N
+import numpy as N
 import veusz.qtall as qt4
 
 # constants for special parts of an expression

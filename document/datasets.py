@@ -23,21 +23,27 @@
 import itertools
 import re
 
-import numarray as N
+import numpy as N
 
 import doc
 import simpleread
 import operations
 import readcsv
 
-def _convertNumarray(a):
-    """Convert to a numarray if possible (doing copy)."""
+def _convertNumpy(a):
+    """Convert to a numpy double if possible."""
     if a is None:
+        # leave as None
         return None
-    elif type(a) != type(N.arange(1, type=N.Float64)):
-        return N.array(a, type=N.Float64)
+    elif not isinstance(a, N.ndarray):
+        # convert to numpy array
+        return N.array(a, dtype='float64')
     else:
-        return a.astype(N.Float64)
+        # make conversion if numpy type is not correct
+        if a.dtype != N.dtype('float64'):
+            return a.astype('float64')
+        else:
+            return a
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
@@ -316,14 +322,14 @@ class Dataset2D(DatasetBase):
     def __init__(self, data, xrange=None, yrange=None):
         '''Create a two dimensional dataset based on data.
 
-        data: 2d numarray of imaging data
+        data: 2d numpy of imaging data
         xrange: a tuple of (start, end) coordinates for x
         yrange: a tuple of (start, end) coordinates for y
         '''
 
         self.document = None
         self.linked = None
-        self.data = _convertNumarray(data)
+        self.data = _convertNumpy(data)
 
         self.xrange = xrange
         self.yrange = yrange
@@ -374,15 +380,15 @@ class Dataset(DatasetBase):
                  linked = None):
         '''Initialise dataset with the sets of values given.
 
-        The values can be given as numarray 1d arrays or lists of numbers
+        The values can be given as numpy 1d arrays or lists of numbers
         linked optionally specifies a LinkedFile to link the dataset to
         '''
         
         self.document = None
-        self.data = _convertNumarray(data)
-        self.serr = _convertNumarray(serr)
-        self.perr = _convertNumarray(perr)
-        self.nerr = _convertNumarray(nerr)
+        self.data = _convertNumpy(data)
+        self.serr = _convertNumpy(serr)
+        self.perr = _convertNumpy(perr)
+        self.nerr = _convertNumpy(nerr)
         self.linked = linked
 
         # check the sizes of things match up
@@ -409,7 +415,13 @@ class Dataset(DatasetBase):
 
     def duplicate(self):
         """Return new dataset based on this one."""
-        return Dataset(self.data, self.serr, self.nerr, self.perr, None)
+        attrs = {}
+        for attr in ('data', 'serr', 'nerr', 'perr'):
+            data = getattr(self, attr)
+            if data is not None:
+                attrs[attr] = data.copy()
+        
+        return Dataset(**attrs)
 
     def hasErrors(self):
         '''Whether errors on dataset'''
@@ -579,7 +591,7 @@ class DatasetExpression(Dataset):
 
         # set up a default environment
         self.environment = globals().copy()
-        exec 'from numarray import *' in self.environment
+        exec 'from numpy import *' in self.environment
 
         # this fn gets called to return the value of a dataset
         self.environment['_DS_'] = self._evaluateDataset

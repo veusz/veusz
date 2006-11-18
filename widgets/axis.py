@@ -22,7 +22,7 @@
 # $Id$
 
 import veusz.qtall as qt4
-import numarray as N
+import numpy as N
 
 import veusz.document as document
 import veusz.setting as setting
@@ -295,8 +295,8 @@ class Axis(widget.Widget):
         """Convert graph coordinates to plotter coordinates on this axis.
 
         bounds specifies the plot bounds
-        vals is numarray of coordinates
-        Returns positions as a numarray
+        vals is numpy of coordinates
+        Returns positions as a numpy
         """
 
         # if the doc was modified, recompute the range
@@ -322,8 +322,8 @@ class Axis(widget.Widget):
         """Convert plotter coordinates on this axis to graph coordinates.
         
         bounds specifies the plot bounds
-        vals is a numarray of coordinates
-        returns a numarray of floats
+        vals is a numpy of coordinates
+        returns a numpy of floats
         """
 
         # if the doc was modified, recompute the range
@@ -333,7 +333,7 @@ class Axis(widget.Widget):
         self._updatePlotRange( bounds )
 
         # work out fractional positions of the plotter coords
-        frac = ( ( vals.astype(N.Float64) - self.coordParr1 ) /
+        frac = ( ( vals.astype('float64') - self.coordParr1 ) /
                  ( self.coordParr2 - self.coordParr1 ) )
 
         # scaling...

@@ -34,7 +34,7 @@ because some operations cannot restore references (e.g. add object)
 
 import os.path
 
-import numarray as N
+import numpy as N
 
 import datasets
 import widgetfactory
@@ -483,13 +483,13 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         
         # define environment to evaluate
         fnenviron = globals().copy()
-        exec 'from numarray import *' in fnenviron
+        exec 'from numpy import *' in fnenviron
         fnenviron['t'] = t
 
         # calculate for each of the dataset components
         vals = {}
         for key, expr in self.parts.iteritems():
-            # HACK to ensure the result is a numarray
+            # HACK to ensure the result is a numpy
             expr = '(%s) + t*0.' % expr
             try:
                 vals[key] = eval( expr, fnenviron )
