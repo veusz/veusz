@@ -42,10 +42,12 @@ class Root(widget.Widget):
         s = self.settings
         s.add( setting.Distance('width', '15cm',
                                 descr='Width of the pages',
-                                usertext='Page width') )
+                                usertext='Page width',
+                                formatting=True) )
         s.add( setting.Distance('height', '15cm',
                                 descr='Height of the pages',
-                                usertext='Page height') )
+                                usertext='Page height',
+                                formatting=True) )
         s.add( setting.StyleSheet(descr='Master settings for document',
                                   usertext='Style sheet') )
         self.document = document

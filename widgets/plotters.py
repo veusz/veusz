@@ -108,7 +108,7 @@ class FunctionPlotter(GenericPlotter):
         s = self.settings
         s.add( setting.Int('steps', 50,
                            descr = 'Number of steps to evaluate the function'
-                           ' over', usertext='Steps'), 0 )
+                           ' over', usertext='Steps', formatting=True), 0 )
         s.add( setting.Choice('variable', ['x', 'y'], 'x',
                               descr='Variable the function is a function of',
                               usertext='Variable'),
@@ -356,10 +356,10 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.Distance('markerSize', '3pt',
                                 descr = 'Size of marker to plot',
-                                usertext='Marker size'), 0 )
+                                usertext='Marker size', formatting=True), 0 )
         s.add( setting.Marker('marker', 'circle',
                               descr = 'Type of marker to plot',
-                              usertext='Marker'), 0 )
+                              usertext='Marker', formatting=True), 0 )
         s.add( setting.Dataset('yData', 'y',
                                descr = 'Variable containing y data',
                                usertext='Y dataset'), 0 )
@@ -370,7 +370,7 @@ class PointPlotter(GenericPlotter):
                               ['bar', 'box', 'diamond', 'curve',
                                'barbox', 'bardiamond', 'barcurve'], 'bar',
                               descr='Style of error bars to plot',
-                              usertext='Error style') )
+                              usertext='Error style', formatting=True) )
 
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings',
@@ -750,28 +750,34 @@ class TextLabel(GenericPlotter):
                            usertext='Label'), 0 )
         s.add( setting.Float('xPos', 0.5,
                              descr='x coordinate of the text',
-                             usertext='X position'), 1 )
+                             usertext='X position',
+                             formatting=False), 1 )
         s.add( setting.Float('yPos', 0.5,
                              descr='y coordinate of the text',
-                             usertext='Y position'), 2 )
+                             usertext='Y position',
+                             formatting=False), 2 )
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
                               descr='Use axes or fractional position to '
                               'place label',
-                              usertext='Position mode'), 3)
+                              usertext='Position mode',
+                              formatting=False), 3)
 
         s.add( setting.Choice('alignHorz',
                               ['left', 'centre', 'right'], 'left',
                               descr="Horizontal alignment of label",
-                              usertext='Horz alignment'), 4)
+                              usertext='Horz alignment',
+                              formatting=True), 4)
         s.add( setting.Choice('alignVert',
                               ['top', 'centre', 'bottom'], 'bottom',
                               descr='Vertical alignment of label',
-                              usertext='Vert alignment'), 5)
+                              usertext='Vert alignment',
+                              formatting=True), 5)
 
         s.add( setting.Float('angle', 0.,
                              descr='Angle of the label in degrees',
-                             usertext='Angle'), 6 )
+                             usertext='Angle',
+                             formatting=True), 6 )
 
         s.add( setting.Text('Text',
                             descr = 'Text settings',

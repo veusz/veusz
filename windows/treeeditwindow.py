@@ -28,6 +28,7 @@ import veusz.qtall as qt4
 import veusz.widgets as widgets
 import veusz.utils as utils
 import veusz.document as document
+import veusz.setting as setting
 
 import action
 
@@ -211,7 +212,8 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
 
-    def __init__(self, document, showsubsettings=True, *args):
+    def __init__(self, document, showsubsettings=True,
+                 *args):
         qt4.QWidget.__init__(self, *args)
         self.document = document
         self.showsubsettings = showsubsettings
@@ -223,7 +225,7 @@ class PropertyList(qt4.QWidget):
         
         self.children = []
 
-    def updateProperties(self, settings, title=False):
+    def updateProperties(self, settings, title=False, showformatting=True):
         """Update the list of controls with new ones for the settings."""
 
         # delete all child widgets
@@ -280,6 +282,10 @@ class PropertyList(qt4.QWidget):
 
         # add settings proper
         for setn in settings.getSettingList():
+            # skip if not to show formatting
+            if not showformatting and setn.formatting:
+                continue
+
             lab = SettingLabel(self.document, setn, self)
             self.layout.addWidget(lab, row, 0)
             self.children.append(lab)
@@ -331,8 +337,20 @@ class TabbedFormatting(qt4.QTabWidget):
         if settings is None:
             return
 
+        setnslist = settings.getSettingsList()
+
+        # make a temporary list of formatting settings
+        formatters = setting.Settings('Main', descr='Main formatting options',
+                                      usertext='Main', pixmap='main')
+        formatters.parent = settings.parent
+        for setn in settings.getSettingList():
+            if setn.formatting:
+                formatters.add(setn)
+        if formatters.getSettingList():
+            setnslist.insert(0, formatters)
+
         # add tab for each subsettings
-        for subset in settings.getSettingsList():
+        for subset in setnslist:
 
             # create tab
             tab = qt4.QWidget()
@@ -430,7 +448,7 @@ class PropertiesDock(qt4.QDockWidget):
         settings = None
         if widget is not None:
             settings = widget.settings
-        self.proplist.updateProperties(settings)
+        self.proplist.updateProperties(settings, showformatting=False)
 
 class TreeEditDock(qt4.QDockWidget):
     """A window for editing the document as a tree."""

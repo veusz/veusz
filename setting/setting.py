@@ -94,16 +94,22 @@ class Reference(object):
         
 class Setting(object):
 
-    def __init__(self, name, value, descr='', usertext=''):
+    def __init__(self, name, value, descr='', usertext='',
+                 formatting=False):
         """Initialise the values.
 
-        descr is a description of the setting
+        name: setting name
+        value: default value and initial value
+        descr:  description of the setting
+        usertext: name of setting for user
+        formatting: whether setting applies to formatting
         """
         self.readonly = False
         self.parent = None
         self.name = name
         self.descr = descr
         self.usertext = usertext
+        self.formatting = formatting
         self.default = value
         self.onmodified = []
         self._val = None
@@ -126,6 +132,7 @@ class Setting(object):
         opt = optional.copy()
         opt['descr'] = self.descr
         opt['usertext'] = self.usertext
+        opt['formatting'] = self.formatting
         obj = self.__class__(*args, **opt)
         obj.readonly = self.readonly
         obj.default = self.default
