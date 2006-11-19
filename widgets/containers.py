@@ -214,12 +214,14 @@ class Grid(widget.Widget):
                                       descr = 'Zero margins of graphs in grid',
                                       usertext = 'Zero margins') )
 
-        self.lastdimensions = None
-        self.lastscalings = None
+        # calculated positions for children
         self.childpositions = {}
 
-        # maintain copy of children to check for mods
-        self._old_children = list(self.children)
+        # watch for changes to these variables to decide whether to
+        # recalculate positions
+        self.lastdimensions = None
+        self.lastscalings = None
+        self.lastchildren = None
 
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""
@@ -228,7 +230,7 @@ class Grid(widget.Widget):
         ge = _gridengine(self.settings.columns, self.settings.rows)
 
         # copy children, and remove any which are axes
-        children = [i for i in self.children if not isinstance(i, axis.Axis)]
+        children = [c for c in self.children if not isinstance(c, axis.Axis)]
         child_dimensions = {}
         child_posns = {}
         for c in children:
@@ -295,12 +297,12 @@ class Grid(widget.Widget):
         # if the contents have been modified, recalculate the positions
         dimensions = (s.columns, s.rows)
         scalings = (s.scaleRows, s.scaleCols)
-        if ( self.children != self._old_children or
+        if ( self.children != self.lastchildren or
              self.lastdimensions != dimensions or
              self.lastscalings != scalings ):
             
-            self._old_children = list(self.children)
             self._recalcPositions()
+            self.lastchildren = list(self.children)
             self.lastdimensions = dimensions
             self.lastscalings = scalings
 
