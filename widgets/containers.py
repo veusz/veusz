@@ -27,6 +27,8 @@ Classes include
  Grid: Class to plot a grid of plots
 """
 
+import itertools
+
 import veusz.document as document
 import veusz.setting as setting
 
@@ -62,8 +64,8 @@ class _gridengine:
 
     def isAllocedBlock(self, c, r, w, h):
         """Is the block (c,r) -> (c+w,r+h) allocated?"""
-        for y in range(h):
-            for x in range(w):
+        for y in xrange(h):
+            for x in xrange(w):
                 if self.isAlloced(c+x, y+r):
                     return True
         return False
@@ -80,8 +82,8 @@ class _gridengine:
 
     def setAllocedBlock(self, c, r, w, h):
         """Set block (c,r)->(c+w,r+h) as allocated."""
-        for y in range(h):
-            for x in range(w):
+        for y in xrange(h):
+            for x in xrange(w):
                 self.setAlloced(x+c, y+r)
 
     def add(self, width, height):
@@ -199,7 +201,8 @@ class Grid(widget.Widget):
                                       descr = 'Zero margins of graphs in grid',
                                       usertext = 'Zero margins') )
 
-        self.olddimensions = (-1, -1)
+        self.lastdimensions = (-1, -1)
+        self.childpositions = {}
 
         # maintain copy of children to check for mods
         self._old_children = list(self.children)
@@ -210,18 +213,14 @@ class Grid(widget.Widget):
         # class to handle management
         ge = _gridengine(self.settings.columns, self.settings.rows)
 
-        # iterate over children, and collect dimensions of children
-        # (a tuple width nocols x norows)
-
         # copy children, and remove any which are axes
         children = [i for i in self.children if not isinstance(i, axis.Axis)]
         child_dimensions = {}
-
-        childrenposns = []
+        child_posns = {}
         for c in children:
-            name = c.name
-            child_dimensions[name] = (1, 1)
-            childrenposns.append( ge.add( * child_dimensions[name] ) )
+            dims = (1, 1)
+            child_dimensions[c] = dims
+            child_posns[c] = ge.add(*dims)
 
         nocols, norows = ge.getAllocedDimensions()
 
@@ -233,10 +232,13 @@ class Grid(widget.Widget):
         invc, invr = 1./nocols, 1./norows
 
         # iterate over children, and modify positions
-        for child, pos in zip(children, childrenposns):
-            dim = child_dimensions[child.name]
-            child.position = ( pos[0]*invc, pos[1]*invr,
-                               (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
+        self.childpositions.clear()
+        for child in children:
+            dims = child_dimensions[child]
+            pos = child_posns[child]
+            self.childpositions[child] = ( pos[0]*invc, pos[1]*invr,
+                                           (pos[0]+dims[0])*invc,
+                                           (pos[1]+dims[1])*invr )
 
     def actionZeroMargins(self):
         """Zero margins of plots inside this grid."""
@@ -255,15 +257,14 @@ class Grid(widget.Widget):
 
         s = self.settings
 
-        # FIXME: this is very stupid, but works
         # if the contents have been modified, recalculate the positions
         dimensions = (s.columns, s.rows)
         if ( self.children != self._old_children or
-             self.olddimensions != dimensions ):
+             self.lastdimensions != dimensions ):
             
             self._old_children = list(self.children)
             self._recalcPositions()
-            self.olddimensions = dimensions
+            self.lastdimensions = dimensions
 
         margins = ( s.get('leftMargin').convert(painter),
                     s.get('topMargin').convert(painter),
@@ -273,13 +274,18 @@ class Grid(widget.Widget):
         bounds = self.computeBounds(parentposn, painter, margins=margins)
         for c in self.children:
             if not isinstance(c, axis.Axis):
+                # save old position, then update with calculated
+                oldposn = c.position
+                c.position = self.childpositions[c]
+                # draw widget
                 c.draw(bounds, painter, outerbounds=parentposn)
+                # restore position
+                c.position = oldposn
 
         # do not call widget.Widget.draw
 
 # allow the factory to instantiate a grid
 document.thefactory.register( Grid )
-
        
 class Splitter(widget.Widget):
     """Class to hold plots with the page split into bits
