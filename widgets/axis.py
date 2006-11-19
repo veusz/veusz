@@ -37,8 +37,7 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = [graph.Graph, containers.Grid,
-                          containers.Splitter]
+    allowedparenttypes = [graph.Graph, containers.Grid]
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
 

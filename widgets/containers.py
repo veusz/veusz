@@ -176,6 +176,19 @@ class Grid(widget.Widget):
                           descr = 'Number of columns in grid',
                           usertext='Number of columns') )
 
+        s.add( setting.FloatList('scaleRows',
+                                 [],
+                                 descr = 'Row scaling factors. A sequence'
+                                 ' of values\nby which to scale rows '
+                                 'relative to each other.',
+                                 usertext='Row scalings') )
+        s.add( setting.FloatList('scaleCols',
+                                 [],
+                                 descr = 'Column scaling factors. A sequence'
+                                 ' of values\nby which to scale columns'
+                                 ' relative to each other.',
+                                 usertext='Column scalings') )
+
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
                                  'Distance from left of grid to '
                                  'edge of page',
@@ -201,7 +214,8 @@ class Grid(widget.Widget):
                                       descr = 'Zero margins of graphs in grid',
                                       usertext = 'Zero margins') )
 
-        self.lastdimensions = (-1, -1)
+        self.lastdimensions = None
+        self.lastscalings = None
         self.childpositions = {}
 
         # maintain copy of children to check for mods
@@ -223,22 +237,43 @@ class Grid(widget.Widget):
             child_posns[c] = ge.add(*dims)
 
         nocols, norows = ge.getAllocedDimensions()
-
         # exit if there aren't any children
         if nocols == 0 or norows == 0:
             return
 
-        # fractions per col and row
-        invc, invr = 1./nocols, 1./norows
+        # get total scaling factors for cols
+        scalecols = list(self.settings.scaleCols[:nocols])
+        scalecols += [1.]*(nocols-len(scalecols))
+        totscalecols = sum(scalecols)
+
+        # fractional starting positions of columns
+        last = 0.
+        startcols = [last]
+        for scale in scalecols:
+            last += scale/totscalecols
+            startcols.append(last)
+
+        # similarly get total scaling factors for rows
+        scalerows = list(self.settings.scaleRows[:norows])
+        scalerows += [1.]*(norows-len(scalerows))
+        totscalerows = sum(scalerows)
+
+        # fractional starting positions of rows
+        last = 0.
+        startrows = [last]
+        for scale in scalerows:
+            last += scale/totscalerows
+            startrows.append(last)
 
         # iterate over children, and modify positions
         self.childpositions.clear()
         for child in children:
             dims = child_dimensions[child]
             pos = child_posns[child]
-            self.childpositions[child] = ( pos[0]*invc, pos[1]*invr,
-                                           (pos[0]+dims[0])*invc,
-                                           (pos[1]+dims[1])*invr )
+            self.childpositions[child] = ( startcols[pos[0]],
+                                           startrows[pos[1]],
+                                           startcols[pos[0]+dims[0]],
+                                           startrows[pos[1]+dims[1]] )
 
     def actionZeroMargins(self):
         """Zero margins of plots inside this grid."""
@@ -259,12 +294,15 @@ class Grid(widget.Widget):
 
         # if the contents have been modified, recalculate the positions
         dimensions = (s.columns, s.rows)
+        scalings = (s.scaleRows, s.scaleCols)
         if ( self.children != self._old_children or
-             self.lastdimensions != dimensions ):
+             self.lastdimensions != dimensions or
+             self.lastscalings != scalings ):
             
             self._old_children = list(self.children)
             self._recalcPositions()
             self.lastdimensions = dimensions
+            self.lastscalings = scalings
 
         margins = ( s.get('leftMargin').convert(painter),
                     s.get('topMargin').convert(painter),
@@ -287,129 +325,3 @@ class Grid(widget.Widget):
 
 # allow the factory to instantiate a grid
 document.thefactory.register( Grid )
-       
-class Splitter(widget.Widget):
-    """Class to hold plots with the page split into bits
-    """
-
-    typename='splitter'
-    allowusercreation=True
-    description='Split page into separate graphs'
-    allowedparenttypes=[page.Page]
-
-    def __init__(self, *args, **optargs):
-        """Initialise the Splitter.
-
-        User can specify 'Horizontal' or 'Vertical' to split
-        in different directions."""
-        
-        widget.Widget.__init__(self, *args, **optargs)
-
-        s = self.settings
-        s.add( setting.Choice('direction',
-                              ['horizontal', 'vertical'],
-                              'vertical',
-                              descr = 'Split horizonally or vertically',
-                              usertext='Split direction') )
-
-        s.add( setting.FloatList('sizes',
-                                 [],
-                                 descr = 'List of relative sizes for each graph'
-                                 'in the splitter.\nThese are in terms of the '
-                                 'ratio to the total.\nAssumed to be 1 by default.',
-                                 usertext='Relative sizes'))
-        
-        s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
-                                 'Distance from left of splitter to '
-                                 'edge of page',
-                                 usertext='Left margin') )
-        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
-                                 'Distance from right of splitter to '
-                                 'edge of page',
-                                 usertext='Right margin') )
-        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
-                                 'Distance from top of splitter to '
-                                 'edge of page',
-                                 usertext='Top margin') )
-        s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
-                                 'Distance from bottom of splitter'
-                                 'to edge of page',
-                                 usertext='Bottom margin') )
-
-        if type(self) == Splitter:
-            self.readDefaults()
-
-        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
-                                      descr = 'Zero margins of graphs in splitter',
-                                      usertext = 'Zero margins') )
-
-    def actionZeroMargins(self):
-        """Zero margins of plots inside this splitter."""
-
-        operations = []
-        for c in self.children:
-            if isinstance(c, graph.Graph):
-                s = c.settings
-                for v in ('leftMargin', 'topMargin', 'rightMargin', 'bottomMargin'):
-                    operations.append( document.OperationSettingSet(s.get(v), '0cm') )
-                    
-        self.document.applyOperation( document.OperationMultiple(operations, descr='zero margins') )
-
-    def draw(self, parentposn, painter, outerbounds=None):
-        """Draws the widget's children."""
-
-        s = self.settings
-
-        margins = ( s.get('leftMargin').convert(painter),
-                    s.get('topMargin').convert(painter),
-                    s.get('rightMargin').convert(painter),
-                    s.get('bottomMargin').convert(painter) )
-
-        graphs = [c for c in self.children if not isinstance(c, axis.Axis)]
-        sizes = s.sizes
-
-        # add up total size of graphs in splitter
-        totalsize = 0.
-        for i in xrange(len(graphs)):
-            if i < len(sizes):
-                totalsize += sizes[i]
-            else:
-                totalsize += 1.0
-
-        # work out how to split margins
-        if s.direction == 'horizontal':
-            splitindices = (0, 2)
-        else:
-            splitindices = (1, 3)
-
-        # get bounds of splitter, and draw children who aren't axes
-        bounds = self.computeBounds(parentposn, painter, margins=margins)
-
-        runningsize = 0.
-        for i, child in enumerate(graphs):
-            if i < len(sizes):
-                thissize = sizes[i]
-            else:
-                thissize = 1.
-
-            oldposition = child.position
-            
-            # work out position of child graph in splitter
-            scaling = 1./totalsize
-            childbounds = [0., 0., 1., 1.]
-            childbounds[splitindices[0]] = scaling*runningsize
-            childbounds[splitindices[1]] = scaling*(runningsize+thissize)
-
-            child.position = childbounds
-
-            # actually draw graph
-            child.draw(bounds, painter, outerbounds=parentposn)
-
-            # retain position again
-            child.position = oldposition
-
-            runningsize += thissize
-
-# allow the factory to instantiate a splitter
-document.thefactory.register( Splitter )
-
