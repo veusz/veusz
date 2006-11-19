@@ -98,17 +98,17 @@ class MainWindow(qt4.QMainWindow):
         self.interpreter = self.console.interpreter
         self.addDockWidget(qt4.Qt.BottomDockWidgetArea, self.console)
 
-        # the plot window is the central window
-        self.updateStatusbar('Ready')
-
         # no dock menu, so we can popup context menus
         #self.setDockMenuEnabled(False)
 
         # keep page number up to date
-        self.pagelabel = qt4.QLabel(self.statusBar())
-        self.statusBar().addWidget(self.pagelabel)
-        self.axisvalueslabel = qt4.QLabel(self.statusBar())
-        self.statusBar().addWidget(self.axisvalueslabel)
+        statusbar = self.statusbar = qt4.QStatusBar(self)
+        self.setStatusBar(statusbar)
+        self.updateStatusbar('Ready')
+        self.pagelabel = qt4.QLabel(statusbar)
+        statusbar.addWidget(self.pagelabel)
+        self.axisvalueslabel = qt4.QLabel(statusbar)
+        statusbar.addWidget(self.axisvalueslabel)
 
         self.dirname = os.getcwd()
         self.exportDir = os.getcwd()
