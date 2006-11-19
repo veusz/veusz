@@ -807,7 +807,7 @@ class MainWindow(qt4.QMainWindow):
             # construct comma separated text representing axis values
             valitems = []
             for name, val in values.iteritems():
-                valitems.append('%s=%.4g' % (name, val))
+                valitems.append('%s=%#.4g' % (name, val))
             valitems.sort()
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
