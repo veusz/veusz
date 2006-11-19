@@ -276,7 +276,8 @@ class Grid(widget.Widget):
             if not isinstance(c, axis.Axis):
                 # save old position, then update with calculated
                 oldposn = c.position
-                c.position = self.childpositions[c]
+                if c in self.childpositions:
+                    c.position = self.childpositions[c]
                 # draw widget
                 c.draw(bounds, painter, outerbounds=parentposn)
                 # restore position
