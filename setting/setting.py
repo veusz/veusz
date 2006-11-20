@@ -738,8 +738,11 @@ class FloatDict(Setting):
 
     def toText(self):
         text = ''
-        for key, val in self.val.iteritems():
-            text += '%s = %g\n' % (key, val)
+        keys = self.val.keys()
+        keys.sort()
+        
+        for key in keys:
+            text += '%s = %g\n' % (key, self.val[key])
         return text
 
     def fromText(self, text):
