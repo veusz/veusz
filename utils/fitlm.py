@@ -62,9 +62,9 @@ def fitLM(func, params, xvals, yvals, errors,
     chi2 = ( (oldfunc - yvals)**2 * inve2 ).sum()
 
     # initialise temporary space
-    beta = N.zeros( len(params), N.Float64 )
-    alpha = N.zeros( (len(params), len(params)), N.Float64 )
-    derivs = N.zeros( (len(params), len(xvals)), N.Float64 )
+    beta = N.zeros( len(params), dtype='float64' )
+    alpha = N.zeros( (len(params), len(params)), dtype='float64' )
+    derivs = N.zeros( (len(params), len(xvals)), dtype='float64' )
 
     done = False
     iters = 0
@@ -97,11 +97,11 @@ def fitLM(func, params, xvals, yvals, errors,
                 alpha[k][j] = v
 
         # twiddle alpha using lambda
-        alpha *= 1. + N.identity(len(params), N.Float64)*Lambda
+        alpha *= 1. + N.identity(len(params), dtype='float64')*Lambda
 
         # now work out deltas on parameters to get better fit
         epsilon = NLA.inv( alpha )
-        deltas = N.matrixmultiply(beta, epsilon)
+        deltas = N.dot(beta, epsilon)
 
         # new solution
         new_params = params+deltas

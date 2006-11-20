@@ -894,7 +894,7 @@ class OperationDatasetAddColumn:
         """Zero the column."""
         ds = document.data[self.datasetname]
         datacol = ds.data
-        setattr(ds, self.columnname, N.zeros(datacol.shape, type=N.Float64))
+        setattr(ds, self.columnname, N.zeros(datacol.shape, dtype='float64'))
         document.setData(self.datasetname, ds)
         
     def undo(self, document):
