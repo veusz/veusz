@@ -737,13 +737,11 @@ class FloatDict(Setting):
         return out
 
     def toText(self):
-        text = ''
         keys = self.val.keys()
         keys.sort()
         
-        for key in keys:
-            text += '%s = %g\n' % (key, self.val[key])
-        return text
+        text = ['%s = %g' % (key, self.val[key]) for key in keys]
+        return '\n'.join(text)
 
     def fromText(self, text):
         """Do conversion from list of a=X\n values."""
