@@ -340,8 +340,8 @@ class TabbedFormatting(qt4.QTabWidget):
         setnslist = settings.getSettingsList()
 
         # make a temporary list of formatting settings
-        formatters = setting.Settings('Main', descr='Main formatting options',
-                                      usertext='Main', pixmap='main')
+        formatters = setting.Settings('Basic', descr='Basic formatting options',
+                                      usertext='Basic', pixmap='main')
         formatters.parent = settings.parent
         for setn in settings.getSettingList():
             if setn.formatting:

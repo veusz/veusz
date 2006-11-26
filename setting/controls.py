@@ -516,7 +516,7 @@ class FillStyle(Choice):
 
         size = 12
         icons = []
-        c = qt4.QColor('darkgrey')
+        c = qt4.QColor('grey')
         for f in cls._fills:
             pix = qt4.QPixmap(size, size)
             pix.fill()
@@ -567,6 +567,8 @@ class LineStyle(Choice):
     _lines = None
     _linecnvt = None
 
+    size = (24, 8)
+
     def __init__(self, setting, parent):
         if self._icons is None:
             self._generateIcons()
@@ -574,20 +576,22 @@ class LineStyle(Choice):
         Choice.__init__(self, setting, False,
                         self._lines, parent,
                         icons=self._icons)
+        self.setIconSize( qt4.QSize(*self.size) )
 
     def _generateIcons(cls):
         """Generate a list of icons for drop down menu."""
-        size = 12
         icons = []
+        size = cls.size
         c = qt4.QColor('black')
         for l in cls._lines:
-            pix = qt4.QPixmap(size*4, size)
+            pix = qt4.QPixmap(*size)
             pix.fill()
             painter = qt4.QPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
-            pen = qt4.QPen(c, 2, cls._linecnvt[l])
+            pen = qt4.QPen(c, 1, cls._linecnvt[l])
             painter.setPen(pen)
-            painter.drawLine(size, size/2, size*3, size/2)
+            painter.drawLine( int(size[0]*0.1), size[1]/2,
+                              int(size[0]*0.9), size[1]/2 )
             painter.end()
             icons.append( qt4.QIcon(pix) )
 
