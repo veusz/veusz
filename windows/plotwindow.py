@@ -263,7 +263,7 @@ class PlotWindow( qt4.QScrollArea ):
                       self.slotTimeout )
 
         # for drag scrolling
-        self.grabPos = None
+        self.grabpos = None
         self.scrolltimer = qt4.QTimer(self)
         self.scrolltimer.setSingleShot(True)
 
@@ -381,8 +381,12 @@ class PlotWindow( qt4.QScrollArea ):
         selected.
         """
 
+        # safety net
+        if self.grabpos is None or endpos is None:
+            return
+
         # get points corresponding to corners of rectangle
-        pt1 = qt4.QPoint(self.grabPos)
+        pt1 = qt4.QPoint(self.grabpos)
         pt2 = qt4.QPoint(endpos)
 
         # work out whether it's worthwhile to zoom: only zoom if there
@@ -462,8 +466,8 @@ class PlotWindow( qt4.QScrollArea ):
         if event.button() == qt4.Qt.LeftButton:
 
             # need to copy position, otherwise it gets reused!
-            self.winPos = qt4.QPoint(event.pos())
-            self.grabPos = self.widget().mapFromParent(self.winPos)
+            self.winpos = qt4.QPoint(event.pos())
+            self.grabpos = self.widget().mapFromParent(self.winpos)
 
             if self.clickmode == 'select':
                 # we set this to true unless the timer runs out (400ms),
@@ -477,7 +481,7 @@ class PlotWindow( qt4.QScrollArea ):
                     qt4.QCursor(qt4.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
-                self.label.drawRect(self.grabPos, self.grabPos)
+                self.label.drawRect(self.grabpos, self.grabpos)
 
             # record what mode we were clicked in
             self.currentclickmode = self.clickmode
@@ -490,21 +494,21 @@ class PlotWindow( qt4.QScrollArea ):
 
             # move scroll bars by amount
             pos = event.pos()
-            dx = self.winPos.x()-pos.x()
+            dx = self.winpos.x()-pos.x()
             scrollx = self.horizontalScrollBar()
             scrollx.setValue( scrollx.value() + dx )
 
-            dy = self.winPos.y()-pos.y()
+            dy = self.winpos.y()-pos.y()
             scrolly = self.verticalScrollBar()
             scrolly.setValue( scrolly.value() + dy )
 
             # need to copy point
-            self.winPos = qt4.QPoint(event.pos())
+            self.winpos = qt4.QPoint(event.pos())
 
-        elif self.currentclickmode == 'graphzoom':
+        elif self.currentclickmode == 'graphzoom' and self.grabpos is not None:
             # get rid of current rectangle
             pos = self.widget().mapFromParent(event.pos())
-            self.label.drawRect(self.grabPos, pos)
+            self.label.drawRect(self.grabpos, pos)
 
         elif self.clickmode == 'select':
             # find axes which map to this position
@@ -545,6 +549,7 @@ class PlotWindow( qt4.QScrollArea ):
             elif self.currentclickmode == 'graphzoom':
                 self.label.hideRect()
                 self.doZoomRect(self.widget().mapFromParent(event.pos()))
+                self.grabpos = None
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
         else:
@@ -839,7 +844,7 @@ class PlotWindow( qt4.QScrollArea ):
         qt4.QApplication.restoreOverrideCursor()
 
         # take clicked point and convert to coords of scrollview
-        pt = qt4.QPoint(*self.grabPos)
+        pt = qt4.QPoint(*self.grabpos)
         pt = self.viewport().mapFromGlobal(pt)
         pt = self.viewportToContents(pt)
 
