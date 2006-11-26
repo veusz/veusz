@@ -280,7 +280,11 @@ class DataEditDialog(qt4.QDialog):
         """Enable the unlink button correctly."""
         # get dataset
         dsname = self.getSelectedDataset()
-        ds = self.document.data[dsname]
+
+        try:
+            ds = self.document.data[dsname]
+        except KeyError:
+            return
 
         # linked dataset
         readonly = False

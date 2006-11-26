@@ -73,6 +73,9 @@ class MainWindow(qt4.QMainWindow):
         self.filename = ''
         self.updateTitlebar()
 
+        # keep a list of references to dialogs
+        self.dialogs = []
+
         # construct menus and toolbars
         self._defineMenus()
 
@@ -342,18 +345,21 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataImport(self):
         """Display the import data dialog."""
-        d = importdialog.ImportDialog2(self, self.document)
-        d.show()
+        dialog = importdialog.ImportDialog2(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
 
     def slotDataEdit(self):
         """Edit existing datasets."""
-        d = dataeditdialog.DataEditDialog(self, self.document)
-        d.show()
+        dialog = dataeditdialog.DataEditDialog(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
 
     def slotDataCreate(self):
         """Create new datasets."""
-        d = DataCreateDialog(self, self.document)
-        d.show()
+        dialog = DataCreateDialog(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
 
     def slotDataReload(self):
         """Reload linked datasets."""
