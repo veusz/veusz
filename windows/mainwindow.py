@@ -390,9 +390,15 @@ class MainWindow(qt4.QMainWindow):
         """Do you want to overwrite the current document.
 
         Returns qt4.QMessageBox.(Yes,No,Cancel)."""
-        
+
+        # include filename in mesage box if we can
+        filetext = ''
+        if self.filename:
+            filetext = " '%s'" % os.path.basename(self.filename)
+
+        # show message box
         mb = qt4.QMessageBox("Veusz",
-                             "Document is modified. Save first?",
+                             "Document%s was modified. Save first?" % filetext,
                              qt4.QMessageBox.Warning,
                              qt4.QMessageBox.Yes | qt4.QMessageBox.Default,
                              qt4.QMessageBox.No,
@@ -403,19 +409,17 @@ class MainWindow(qt4.QMainWindow):
         mb.setButtonText(qt4.QMessageBox.Cancel, "&Cancel")
         return mb.exec_()
 
-    def close(self, alsoDelete):
+    def closeEvent(self, event):
         """Before closing, check whether we need to save first."""
+
+        # if the document has been modified then query user for saving
         if self.document.isModified():
             v = self.queryOverwrite()
             if v == qt4.QMessageBox.Cancel:
-                return False
+                event.ignore()
+                return
             elif v == qt4.QMessageBox.Yes:
                 self.slotFileSave()
-
-        return qt4.QMainWindow.close(self, alsoDelete)
-
-    def closeEvent(self, evt):
-        """Called when the window closes."""
 
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )
@@ -425,7 +429,7 @@ class MainWindow(qt4.QMainWindow):
         data = str(self.saveState())
         setting.settingdb['geometry_mainwindowstate'] = data
 
-        qt4.QMainWindow.closeEvent(self, evt)
+        event.accept()
 
     def showEvent(self, evt):
         """Restoring window geometry if possible."""
@@ -791,7 +795,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotFileClose(self):
         """File close window chosen."""
-        self.close(True)
+        self.close()
 
     def slotFileQuit(self):
         """File quit chosen."""

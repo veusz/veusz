@@ -395,12 +395,12 @@ class FormatDock(qt4.QDockWidget):
 
         # update our view when the tree edit window selection changes
         self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
-                     self.selectWidget)
+                     self.selectedWidget)
 
         # do initial selection
-        self.selectWidget(treeedit.selwidget)
+        self.selectedWidget(treeedit.selwidget)
 
-    def selectWidget(self, widget):
+    def selectedWidget(self, widget):
         """Created tabbed widget for formatting for each subsettings."""
 
         # delete old tabwidget
@@ -462,8 +462,11 @@ class TreeEditDock(qt4.QDockWidget):
         self.setWindowTitle("Editing - Veusz")
         self.setObjectName("veuszeditingwindow")
 
-        # construct tree
         self.document = document
+        self.connect( self.document, qt4.SIGNAL("sigWiped"),
+                      self.slotDocumentWiped )
+
+        # construct tree
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
@@ -491,6 +494,10 @@ class TreeEditDock(qt4.QDockWidget):
         self.connect(qt4.QApplication.clipboard(),
                      qt4.SIGNAL('dataChanged()'),
                      self.updatePasteButton)
+
+    def slotDocumentWiped(self):
+        """If the document is wiped, reselect root widget."""
+        self.selectWidget(self.document.basewidget)
 
     def slotTreeItemSelected(self, current, previous):
         """New item selected in tree.

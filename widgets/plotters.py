@@ -32,12 +32,6 @@ import veusz.utils as utils
 import widget
 import graph
 
-def _trim(x, x1, x2):
-    """Truncate x in range x1->x2."""
-    if x < x1: return x1
-    if x > x2: return x2
-    return x
-
 class GenericPlotter(widget.Widget):
     """Generic plotter."""
 
