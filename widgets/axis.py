@@ -681,6 +681,10 @@ class Axis(widget.Widget):
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
 
+        # exit if axis is hidden
+        if s.hide:
+            return
+
         # save the state of the painter for later
         painter.beginPaintingWidget(self, posn)
         painter.save()

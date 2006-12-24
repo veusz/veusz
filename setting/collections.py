@@ -58,6 +58,11 @@ class Line(Settings):
         self.add( setting.LineStyle('style', 'solid',
                                     descr = 'Line style',
                                     usertext='Style') )
+        self.add( setting.Int( 'transparency', 0,
+                               descr = 'Transparency percentage',
+                               usertext = 'Transparency',
+                               minval = 0,
+                               maxval = 100 ) )
         self.add( setting.Bool('hide', False,
                                descr = 'Hide the line',
                                usertext='Hide') )
@@ -65,7 +70,9 @@ class Line(Settings):
     def makeQPen(self, painter):
         '''Make a QPen from the description'''
 
-        return qt4.QPen( qt4.QColor(self.color),
+        color = qt4.QColor(self.color)
+        color.setAlphaF( (100-self.transparency) / 100.)
+        return qt4.QPen( color,
                          self.get('width').convert(painter),
                          self.get('style').qtStyle() )
     
@@ -107,6 +114,11 @@ class Brush(Settings):
         self.add( setting.FillStyle( 'style', 'solid',
                                      descr = 'Fill style',
                                      usertext='Style') )
+        self.add( setting.Int( 'transparency', 0,
+                               descr = 'Transparency percentage',
+                               usertext = 'Transparency',
+                               minval = 0,
+                               maxval = 100 ) )
         self.add( setting.Bool( 'hide', False,
                                 descr = 'Hide the fill',
                                 usertext='Hide') )
@@ -114,8 +126,9 @@ class Brush(Settings):
     def makeQBrush(self):
         '''Make a qbrush from the settings.'''
 
-        return qt4.QBrush( qt4.QColor(self.color),
-                           self.get('style').qtStyle() )
+        color = qt4.QColor(self.color)
+        color.setAlphaF( (100-self.transparency) / 100.)
+        return qt4.QBrush( color, self.get('style').qtStyle() )
     
 class KeyBrush(Brush):
     '''Fill used for back of key.'''

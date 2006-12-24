@@ -340,6 +340,10 @@ class Image(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
         s = self.settings
         d = self.document
+
+        # exit if hidden
+        if s.hide:
+            return
         
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )

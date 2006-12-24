@@ -83,10 +83,13 @@ class Key(widget.Widget):
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""
 
+        s = self.settings
+        if s.hide:
+            return
+
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
 
-        s = self.settings
         font = s.get('Text').makeQFont(painter)
         painter.setFont(font)
         height = painter.fontMetrics().height()

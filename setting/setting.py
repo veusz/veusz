@@ -71,8 +71,8 @@ class Reference(object):
         # do an iterative lookup of the setting
         for p in parts:
             if p == '..':
-                if p.parent is not None:
-                    p = p.parent
+                if item.parent is not None:
+                    item = item.parent
             elif p == '':
                 pass
             else:

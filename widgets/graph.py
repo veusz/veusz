@@ -135,6 +135,10 @@ class Graph(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
+        # do no painting if hidden
+        if s.hide:
+            return bounds
+
         painter.beginPaintingWidget(self, bounds)
 
         # if there's a background
@@ -202,6 +206,8 @@ class Graph(widget.Widget):
                 
                 w.draw( bounds, painter, suppresstext = not showtext,
                         outerbounds=ob )
+
+        return bounds
                             
 # allow users to make Graph objects
 document.thefactory.register( Graph )

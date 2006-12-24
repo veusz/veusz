@@ -66,7 +66,6 @@ class Widget(object):
         self.parent = parent
 
         if not self.isAllowedParent(parent):
-            print self.typename, parent.typename, parent.name
             raise RuntimeError, "parent is of incorrect type"
 
         if name is None:
@@ -87,6 +86,11 @@ class Widget(object):
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename )
         self.settings.parent = self
+
+        self.settings.add( setting.Bool('hide', False,
+                                        descr = 'Hide object',
+                                        usertext = 'Hide',
+                                        formatting = True) )
 
         # hook up settings to modify document flag if they are modified
         self.settings.setOnModified(self.slotSettingModified)
@@ -287,9 +291,11 @@ class Widget(object):
 
         bounds = self.computeBounds(parentposn, painter)
 
-        # iterate over children in reverse order
-        for i in utils.reverse(self.children):
-            i.draw(bounds, painter, outerbounds=outerbounds)
+        if not self.settings.hide:
+
+            # iterate over children in reverse order
+            for i in utils.reverse(self.children):
+                i.draw(bounds, painter, outerbounds=outerbounds)
  
         # return our final bounds
         return bounds

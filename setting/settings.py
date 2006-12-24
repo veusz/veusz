@@ -142,6 +142,10 @@ class Settings:
         except KeyError:
             raise AttributeError, "'%s' is not a setting" % name
 
+    def __contains__(self, name):
+        """Whether settings contains name."""
+        return name in self.__dict__['setdict']
+
     def get(self, name = None):
         """Get the setting variable."""
 

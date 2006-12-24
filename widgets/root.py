@@ -40,6 +40,10 @@ class Root(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
+
+        # don't want user to be able to hide entire document
+        s.remove('hide')
+
         s.add( setting.Distance('width', '15cm',
                                 descr='Width of the pages',
                                 usertext='Page width',

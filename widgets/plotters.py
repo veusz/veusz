@@ -243,6 +243,10 @@ class FunctionPlotter(GenericPlotter):
         x1, y1, x2, y2 = posn
         s = self.settings
 
+        # exit if hidden
+        if s.hide:
+            return
+
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
@@ -332,17 +336,24 @@ class FunctionPlotter(GenericPlotter):
 document.thefactory.register( FunctionPlotter )
 
 ###############################################################################
-        
+
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
     typename='xy'
     allowusercreation=True
     description='Plot points with lines and errorbars'
+
+    class MarkerFillBrush(setting.Brush):
+        def __init__(self, name, **args):
+            setting.Brush.__init__(self, name, **args)
+
+            self.get('color').newDefault( setting.Reference(
+                '../PlotLine/color') )
     
     def __init__(self, parent, name=None):
         """Initialise XY plotter plotting (xdata, ydata).
-
+        
         xdata and ydata are strings specifying the data in the document"""
         
         GenericPlotter.__init__(self, parent, name=name)
@@ -374,9 +385,9 @@ class PointPlotter(GenericPlotter):
                             descr = 'Line around the marker settings',
                             usertext = 'Marker border'),
                pixmap = 'plotmarkerline' )
-        s.add( setting.Brush('MarkerFill',
-                             descr = 'Marker fill settings',
-                             usertext = 'Marker fill'),
+        s.add( PointPlotter.MarkerFillBrush('MarkerFill',
+                                            descr = 'Marker fill settings',
+                                            usertext = 'Marker fill'),
                pixmap = 'plotmarkerfill' )
         s.add( setting.ErrorBarLine('ErrorBarLine',
                                     descr = 'Error bar line settings',
@@ -659,6 +670,10 @@ class PointPlotter(GenericPlotter):
         if not d.hasData(s.xData) or not d.hasData(s.yData):
             return
         
+        # exit if hidden
+        if s.hide:
+            return
+
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
@@ -792,6 +807,11 @@ class TextLabel(GenericPlotter):
                                    outerbounds=outerbounds)
 
         s = self.settings
+
+        # exit if hidden
+        if s.hide:
+            return
+
         if s.positioning == 'axes':
             # translate xPos and yPos to plotter coordinates
 

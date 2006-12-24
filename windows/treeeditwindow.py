@@ -72,16 +72,33 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
                 return qt4.QVariant(obj.name)
             elif column == 1:
                 return qt4.QVariant(obj.typename)
+
         elif role == qt4.Qt.DecorationRole:
             # return icon for first column
             if column == 0:
                 filename = 'button_%s.png' % obj.typename
                 if action.pixmapExists(filename):
                     return qt4.QVariant(action.getIcon(filename))
+
         elif role == qt4.Qt.ToolTipRole:
             # provide tool tip showing description
             if obj.userdescription:
                 return qt4.QVariant(obj.userdescription)
+
+        elif role == qt4.Qt.TextColorRole:
+            # show disabled looking text if object or any parent is hidden
+            hidden = False
+            p = obj
+            while p is not None:
+                if 'hide' in p.settings and p.settings.hide:
+                    hidden = True
+                    break
+                p = p.parent
+
+            # return brush for hidden widget text, based on disabled text
+            if hidden:
+                return qt4.QVariant(qt4.QPalette().brush(qt4.QPalette.Disabled,
+                                                         qt4.QPalette.Text))
 
         # return nothing
         return qt4.QVariant()
@@ -528,6 +545,15 @@ class TreeEditDock(qt4.QDockWidget):
                     'moveup', 'movedown', 'delete', 'rename'):
             m.addAction(self.editactions[act])
 
+        # allow show or hides of selected widget
+        if 'hide' in self.selwidget.settings:
+            m.addSeparator()
+            hide = self.selwidget.settings.hide
+            act = qt4.QAction( ('Hide object', 'Show object')[hide], m )
+            self.connect(act, qt4.SIGNAL('triggered()'),
+                         (self.slotWidgetHide, self.slotWidgetShow)[hide])
+            m.addAction(act)
+
         m.exec_(self.mapToGlobal(event.pos()))
 
         event.accept()
@@ -826,6 +852,18 @@ class TreeEditDock(qt4.QDockWidget):
 
         # rehilight moved widget
         self.selectWidget(w)
+
+    def slotWidgetHide(self):
+        """Hide the selected widget."""
+        self.document.applyOperation(
+            document.OperationSettingSet(self.selwidget.settings.get('hide'),
+                                         True) )
+    def slotWidgetShow(self):
+        """Show the selected widget."""
+        self.document.applyOperation(
+            document.OperationSettingSet(self.selwidget.settings.get('hide'),
+                                         False) )
+        
 
 class SettingLabel(qt4.QWidget):
     """A label to describe a setting.
