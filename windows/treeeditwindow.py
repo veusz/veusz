@@ -471,7 +471,7 @@ class TreeEditDock(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
     # mime type when widgets are stored on the clipboard
-    widgetmime = 'text/x-vnd.veusz-clipboard'
+    widgetmime = 'text/x-vnd.veusz2-clipboard'
 
     def __init__(self, document, parent):
         qt4.QDockWidget.__init__(self, parent)

@@ -50,7 +50,7 @@ class Contour(plotters.GenericPlotter):
 
         # try to import contour helpers here
         try:
-            from veusz.helpers._na_cntr import Cntr
+            from veusz.helpers._nc_cntr import Cntr
         except ImportError:
             Cntr = None
             print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'
@@ -170,7 +170,7 @@ class Contour(plotters.GenericPlotter):
                 levels = N.array(s.manualLevels)
 
         # for the user later
-        s.levelsOut = list(levels)
+        s.levelsOut = [float(i) for i in levels]
 
         return levels
 
@@ -316,8 +316,8 @@ class Contour(plotters.GenericPlotter):
             # iterate over each complete line of the contour
             for curve in linelist:
                 # convert coordinates from graph to plotter
-                xplt = axes[0].graphToPlotterCoords(posn, curve[0])
-                yplt = axes[1].graphToPlotterCoords(posn, curve[1])
+                xplt = axes[0].graphToPlotterCoords(posn, curve[:,0])
+                yplt = axes[1].graphToPlotterCoords(posn, curve[:,1])
 
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
@@ -354,8 +354,8 @@ class Contour(plotters.GenericPlotter):
             # iterate over each complete line of the contour
             for poly in polylist:
                 # convert coordinates from graph to plotter
-                xplt = axes[0].graphToPlotterCoords(posn, poly[0])
-                yplt = axes[1].graphToPlotterCoords(posn, poly[1])
+                xplt = axes[0].graphToPlotterCoords(posn, poly[:,0])
+                yplt = axes[1].graphToPlotterCoords(posn, poly[:,1])
 
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()

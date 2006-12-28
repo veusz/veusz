@@ -7,6 +7,7 @@
 import sys
 import os.path
 import glob
+import numpy
 
 from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
@@ -69,7 +70,7 @@ setup(name = 'veusz',
                   'veusz.widgets',
                   'veusz.helpers',
                   'veusz.windows'],
-      ext_modules = [ Extension('veusz.helpers._na_cntr',
-                                ['helpers/src/_na_cntr.c'],
-                                define_macros=[ ('NUMARRAY',1) ]) ]
+      ext_modules = [ Extension('veusz.helpers._nc_cntr',
+                                ['helpers/src/_nc_cntr.c'],
+                                include_dirs=[numpy.get_include()]) ]
       )
