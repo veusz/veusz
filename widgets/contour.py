@@ -98,12 +98,14 @@ class Contour(plotters.GenericPlotter):
         s.add( setting.LineSet('lines',
                                [('solid', '1pt', 'black', False)],
                                descr = 'Line styles to plot the contours '
-                               'using', usertext='Line styles'),
-               7 )
+                               'using', usertext='Line styles',
+                               formatting=True),
+               7)
 
         s.add( setting.FillSet('fills', [],
                                descr = 'Fill styles to plot between contours',
-                               usertext='Fill styles'),
+                               usertext='Fill styles',
+                               formatting=True),
                8 )
 
         # keep track of settings so we recalculate when necessary

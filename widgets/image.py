@@ -134,11 +134,13 @@ class Image(plotters.GenericPlotter):
         s.add( setting.Choice('colorMap', Image.colormapnames,
                               'grey',
                               descr = 'Set of colors to plot data with',
-                              usertext='Colormap'),
+                              usertext='Colormap',
+                              formatting=True),
                4 )
         s.add( setting.Bool('colorInvert', False,
                             descr = 'Invert color map',
-                            usertext='Invert colormap'),
+                            usertext='Invert colormap',
+                            formatting=True),
                5 )
 
         self.lastcolormap = None
