@@ -131,11 +131,11 @@ class Image(plotters.GenericPlotter):
                               usertext='Scaling'),
                3 )
 
-        s.add( setting.Choice('colorMap', Image.colormapnames,
-                              'grey',
-                              descr = 'Set of colors to plot data with',
-                              usertext='Colormap',
-                              formatting=True),
+        s.add( ColormapSetting('colorMap',
+                               'grey',
+                               descr = 'Set of colors to plot data with',
+                               usertext='Colormap',
+                               formatting=True),
                4 )
         s.add( setting.Bool('colorInvert', False,
                             descr = 'Invert color map',
@@ -194,7 +194,7 @@ class Image(plotters.GenericPlotter):
 
     readColorMaps = classmethod(readColorMaps)
 
-    def applyColourMap(self, cmap, scaling, datain, minval, maxval):
+    def applyColorMap(self, cmap, scaling, datain, minval, maxval):
         """Apply a colour map to the 2d data given.
 
         cmap is the color map (numpy of BGRalpha quads)
@@ -240,6 +240,8 @@ class Image(plotters.GenericPlotter):
         # done!
         return img
 
+    applyColorMap = classmethod(applyColorMap)
+
     def updateImage(self):
         """Update the image with new contents."""
 
@@ -258,9 +260,9 @@ class Image(plotters.GenericPlotter):
         if s.colorInvert:
             cmap = cmap[::-1]
 
-        self.image = self.applyColourMap(cmap, s.colorScaling,
-                                         data.data,
-                                         minval, maxval)
+        self.image = self.applyColorMap(cmap, s.colorScaling,
+                                        data.data,
+                                        minval, maxval)
 
     def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""
@@ -401,3 +403,51 @@ class Image(plotters.GenericPlotter):
 
 # allow the factory to instantiate an image
 document.thefactory.register( Image )
+
+class ColormapSetting(setting.Choice):
+    """A setting to set the colour map used in an image."""
+
+    def __init__(self, name, value, **args):
+        setting.Choice.__init__(self, name, Image.colormapnames, value, **args)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+                              
+    def makeControl(self, *args):
+        return ColormapControl(self, *args)
+
+class ColormapControl(setting.controls.Choice):
+    """Give the user a preview of colourmaps."""
+
+    _icons = []
+
+    size = (32, 12)
+
+    def __init__(self, setn, parent):
+        if not self._icons:
+            self._generateIcons()
+
+        setting.controls.Choice.__init__(self, setn, False,
+                                         Image.colormapnames, parent,
+                                         icons=self._icons)
+        self.setIconSize( qt4.QSize(*self.size) )
+
+    def _generateIcons(cls):
+        """Generate a list of icons for drop down menu."""
+        size = cls.size
+
+        # create a fake dataset smoothly varying from 0 to size[0]-1
+        fakedataset = N.fromfunction(lambda x, y: y,
+                                     (size[1], size[0]))
+
+        # iterate over colour maps
+        for cmap in Image.colormapnames:
+            image = Image.applyColorMap(Image.colormaps[cmap], 'linear',
+                                        fakedataset,
+                                        0., size[0]-1.)
+            pixmap = qt4.QPixmap.fromImage(image)
+            cls._icons.append( qt4.QIcon(pixmap) )
+        
+    _generateIcons = classmethod(_generateIcons)
+    
