@@ -49,9 +49,23 @@ class Document( qt4.QObject ):
         """Initialise the document."""
         qt4.QObject.__init__( self )
 
-        self.changeset = 0
+        self.changeset = 0          # increased when the document changes
+        self.suspendupdates = False # if True then do not notify listeners of updates
         self.clearHistory()
         self.wipe()
+
+    def suspendUpdates(self):
+        """Holds sending update messages. This speeds up modification of the document."""
+        assert not self.suspendupdates
+        self.suspendchangeset = self.changeset
+        self.suspendupdates = True
+
+    def enableUpdates(self):
+        """Reenables document updates."""
+        assert self.suspendupdates
+        self.suspendupdates = False
+        if self.suspendchangeset != self.changeset:
+            self.setModified()
 
     def applyOperation(self, operation):
         """Apply operation to the document.
@@ -245,7 +259,8 @@ class Document( qt4.QObject ):
         self.modified = ismodified
         self.changeset += 1
 
-        self.emit( qt4.SIGNAL("sigModified"), ismodified )
+        if not self.suspendupdates:
+            self.emit( qt4.SIGNAL("sigModified"), ismodified )
 
     def isModified(self):
         """Return whether modified flag set."""

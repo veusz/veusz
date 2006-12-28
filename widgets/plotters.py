@@ -557,8 +557,8 @@ class PointPlotter(GenericPlotter):
         elif name == s.yAxis:
             self._autoAxis( s.yData, bounds )
 
-    def _drawPlotLine( self, painter, xvals, yvals, posn ):
-        """Draw the line connecting the points."""
+    def _getLinePoints( self, xvals, yvals, posn ):
+        """Get the points corresponding to the line connecting the points."""
 
         pts = qt4.QPolygonF()
 
@@ -592,6 +592,9 @@ class PointPlotter(GenericPlotter):
         elif steps == 'centre':
             xv = self.document.getData(s.xData)
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            # Have to an extra conversion here as we can't
+            # guarantee device coords of middles of bins are half way
+            # between edges. This is bad code.
             xcen = axes[0].graphToPlotterCoords(posn,
                                                 0.5*(xv.data[:-1]+xv.data[1:]))
 
@@ -605,6 +608,14 @@ class PointPlotter(GenericPlotter):
 
         else:
             assert False
+
+        return pts
+
+    def _drawPlotLine( self, painter, xvals, yvals, posn ):
+        """Draw the line connecting the points."""
+
+        s = self.settings
+        pts = self._getLinePoints(xvals, yvals, posn)
 
         if len(pts) >= 2:
             if not s.FillBelow.hide:

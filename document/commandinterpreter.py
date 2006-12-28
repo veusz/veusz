@@ -214,6 +214,8 @@ class CommandInterpreter:
         sys.stdout = self.write_stdout
         sys.stderr = self.write_stderr
 
+        self.document.suspendUpdates()
+
         # actually run the code
         try:
             exec fileobject in self.globals
@@ -223,6 +225,8 @@ class CommandInterpreter:
             backtrace = traceback.format_exception( *i )
             for l in backtrace:
                 sys.stderr.write(l)            
+
+        self.document.enableUpdates()
 
         # return output streams
         sys.stdout = temp_stdout
