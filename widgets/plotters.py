@@ -235,6 +235,56 @@ class FunctionPlotter(GenericPlotter):
         """Initialise function evaluation environment each time."""
         return self.fnenviron.copy()
 
+    def _calcFunctionPoints(self, axes, posn):
+        """Calculate the pixels to plot for the function
+        returns (pxpts, pypts)."""
+
+        s = self.settings
+        x1, y1, x2, y2 = posn
+
+        env = self.initEnviron()
+        if s.variable == 'x':
+            if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:
+                x_min = N.array([s.min])
+                x1 = axes[0].graphToPlotterCoords(posn, x_min)[0]
+            if not(s.max == 'Auto') and s.max < axes[0].getPlottedRange()[1]:
+                x_max = N.array([s.max])
+                x2 = axes[0].graphToPlotterCoords(posn, x_max)[0]
+                
+            # x function
+            delta = (x2 - x1) / float(s.steps)
+            pxpts = N.arange(x1, x2+delta, delta)
+            x = axes[0].plotterToGraphCoords(posn, pxpts)
+            env['x'] = x
+            try:
+                y = eval('(%s) + x*0.' % s.function, env)
+            except:
+                pypts = None
+            else:
+                pypts = axes[1].graphToPlotterCoords(posn, y)
+
+        else:
+            # y function
+            if not(s.min == 'Auto') and s.min > axes[1].getPlottedRange()[0]:
+                y_min = N.array([s.min])
+                y2 = axes[1].graphToPlotterCoords(posn, y_min)[0]
+            if not(s.max == 'Auto') and s.max < axes[1].getPlottedRange()[1]:
+                y_max = N.array([s.max])
+                y1 = axes[1].graphToPlotterCoords(posn, y_max)[0]
+            
+            delta = (y2 - y1) / float(s.steps)
+            pypts = N.arange(y1, y2+delta, delta)
+            y = axes[1].plotterToGraphCoords(posn, pypts)
+            env['y'] = y
+            try:
+                x = eval('(%s) + y*0.' % s.function, env)
+            except:
+                pxpts = None
+            else:
+                pxpts = axes[0].graphToPlotterCoords(posn, x)
+
+        return pxpts, pypts
+
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the function."""
 
@@ -256,55 +306,16 @@ class FunctionPlotter(GenericPlotter):
              axes[1].settings.direction != 'vertical' ):
             return
             
-        env = self.initEnviron()
-        if s.variable == 'x':
-            if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:
-                x_min = N.array([s.min])
-                x1 = axes[0].graphToPlotterCoords(posn, x_min)[0]
-            if not(s.max == 'Auto') and s.max < axes[0].getPlottedRange()[1]:
-                x_max = N.array([s.max])
-                x2 = axes[0].graphToPlotterCoords(posn, x_max)[0]
-                
-            # x function
-            delta = (x2 - x1) / float(s.steps)
-            pxpts = N.arange(x1, x2+delta, delta)
-            x = axes[0].plotterToGraphCoords(posn, pxpts)
-            env['x'] = x
-            try:
-                y = eval( s.function + ' + 0*x', env )
-                bad = False
-            except:
-                bad = True
-            else:
-                pypts = axes[1].graphToPlotterCoords(posn, y)
-
-        else:
-            # y function
-            if not(s.min == 'Auto') and s.min > axes[1].getPlottedRange()[0]:
-                y_min = N.array([s.min])
-                y2 = axes[1].graphToPlotterCoords(posn, y_min)[0]
-            if not(s.max == 'Auto') and s.max < axes[1].getPlottedRange()[1]:
-                y_max = N.array([s.max])
-                y1 = axes[1].graphToPlotterCoords(posn, y_max)[0]
-            
-            delta = (y2 - y1) / float(s.steps)
-            pypts = N.arange(y1, y2+delta, delta)
-            env['y'] = axes[1].plotterToGraphCoords(posn, pypts)
-            try:
-                x = eval( s.function + ' + 0*y', env )
-                bad = False
-            except:
-                bad = True
-            else:
-                pxpts = axes[0].graphToPlotterCoords(posn, x)
-
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
         self.clipAxesBounds(painter, axes, posn)
 
+        # get the points to plot by evaluating the function
+        pxpts, pypts = self._calcFunctionPoints(axes, posn)
+
         # draw the function line
-        if bad:
+        if pxpts is None or pypts is None:
             # not sure how to deal with errors here
             painter.setPen( qt4.QColor('red') )
             f = qt4.QFont()
