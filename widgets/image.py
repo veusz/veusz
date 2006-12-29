@@ -38,57 +38,44 @@ def applyScaling(data, mode, minval, maxval):
     minval is the minimum value of the scale
     maxval is the maximum value of the scale
 
-    returns transformed (data, minval, maxval)
+    returns transformed data, valid between 0 and 1
     """
 
+    # catch naughty people by hardcoding a range
+    if minval == maxval:
+        minval, maxval = 0., 1.
+        
     if mode == 'linear':
-        pass
+        # linear scaling
+        data = (data - minval) / (maxval - minval)
 
     elif mode == 'sqrt':
-        minval = max(0., minval)
-        maxval = max(0., maxval)
-
-        # replace illegal values
-        belowzero = data < 0.
-        data = data.copy()
-        data[belowzero] = minval
-
-        # calculate transform
+        # sqrt scaling
+        # translate into fractions of range
+        data = (data - minval) / (maxval - minval)
+        # clip off any bad sqrts
+        data[data < 0.] = 0.
+        # actually do the sqrt transform
         data = N.sqrt(data)
-        minval = N.sqrt(minval)
-        maxval = N.sqrt(maxval)
 
     elif mode == 'log':
-        minval = max(1e-200, minval)
-        maxval = max(1e-200, maxval)
-
-        # replace illegal values
-        bad = data < 1e-200
-        data = data.copy()
-        data[bad] = minval
-
-        # transform
-        data = N.log(data)
-        minval = N.log(minval)
-        maxval = N.log(maxval)
+        # log scaling of image
+        # clip any values less than lowermin
+        lowermin = data < minval
+        data = N.log(data - (minval - 1)) / N.log(maxval - (minval - 1))
+        data[lowermin] = 0.
 
     elif mode == 'squared':
-        # very simple to do this...
-        minval = minval**2
-        maxval = maxval**2
-
-        data = data**2
+        # squared scaling
+        # clip any negative values
+        lowermin = data < minval
+        data = (data-minval)**2 / (maxval-minval)**2
+        data[lowermin] = 0.
 
     else:
         raise RuntimeError, 'Invalid scaling mode "%s"' % mode
 
-    if minval > maxval:
-        minval, maxval = maxval, minval
-    if minval == maxval:
-        minval = 0.
-        maxval = 1.
-
-    return (data, minval, maxval)
+    return data
 
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
@@ -204,12 +191,14 @@ class Image(plotters.GenericPlotter):
         Returns a QImage
         """
 
+        # invert colour map if min and max are swapped
+        if minval > maxval:
+            minval, maxval = maxval, minval
+            cmap = cmap[::-1]
+        
         # apply scaling of data
-        data, minval, maxval = applyScaling(datain, scaling, minval, maxval)
-
-        # calculate fraction between min and max of data
-        fracs = (N.ravel(data)-minval) * (1./(maxval-minval))
-        fracs = N.clip(fracs, 0., 1.)
+        fracs = applyScaling(datain, scaling, minval, maxval)
+        fracs = N.clip(N.ravel(fracs), 0., 1.)
 
         # Work out which is the minimum colour map. Assumes we have <255 bands.
         numbands = cmap.shape[0]-1
@@ -230,7 +219,7 @@ class Image(plotters.GenericPlotter):
         # convert 32bit quads to a Qt QImage
         # FIXME: Does this assume C-style array layout??
         s = quads.tostring()
-        img = qt4.QImage(s, data.shape[1], data.shape[0],
+        img = qt4.QImage(s, datain.shape[1], datain.shape[0],
                          qt4.QImage.Format_RGB32)
         img = img.mirrored()
 

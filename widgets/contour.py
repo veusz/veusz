@@ -172,6 +172,7 @@ class Contour(plotters.GenericPlotter):
                 levels = N.array(s.manualLevels)
 
         # for the user later
+        # we do this to convert array to list of floats
         s.levelsOut = [float(i) for i in levels]
 
         return levels
