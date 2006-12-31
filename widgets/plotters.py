@@ -139,8 +139,7 @@ class FunctionPlotter(GenericPlotter):
         
     def _getUserDescription(self):
         """User-friendly description."""
-        return "%s = %s" % ( self.settings.variable,
-                             self.settings.function )
+        return "%(variable)s = %(function)s" % self.settings
     userdescription = property(_getUserDescription)
 
     def _plotLine(self, painter, xpts, ypts, bounds):

@@ -116,6 +116,19 @@ class Contour(plotters.GenericPlotter):
         self._cachedcontours = None
         self._cachedpolygons = None
 
+    def _getUserDescription(self):
+        """User friendly description."""
+        s = self.settings
+        out = []
+        if s.data:
+            out.append( s.data )
+        if s.scaling == 'manual':
+            out.append('manual levels (%s)' %  (', '.join([str(i) for i in s.manualLevels])))
+        else:
+            out.append('%(numLevels)i %(scaling)s levels (%(min)s to %(max)s)' % s)
+        return ', '.join(out)
+    userdescription = property(_getUserDescription)
+
     def _calculateLevels(self):
         """Calculate contour levels from data and settings.
 

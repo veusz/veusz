@@ -136,6 +136,13 @@ class Axis(widget.Widget):
         # document updates change set variable when things need recalculating
         self.docchangeset = -1
 
+    def _getUserDescription(self):
+        """User friendly description."""
+        s = self.settings
+        return "range %s to %s%s" % ( str(s.min), str(s.max),
+                                      ['',' (log)'][s.log])
+    userdescription = property(_getUserDescription)
+
     def _autoCheckChildRanges(self, parent, range):
         """Check children of this parent to update autorange."""
 

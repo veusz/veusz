@@ -134,6 +134,16 @@ class Image(plotters.GenericPlotter):
         self.lastdataset = None
         self.schangeset = -1
 
+    def _getUserDescription(self):
+        """User friendly description."""
+        s = self.settings
+        out = []
+        if s.data:
+            out.append(s.data)
+        out += [s.colorScaling, s.colorMap]
+        return ', '.join(out)
+    userdescription = property(_getUserDescription)
+
     def readColorMaps(cls):
         """Read color maps data file (a class method)
 

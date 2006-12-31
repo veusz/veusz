@@ -142,6 +142,22 @@ class Settings:
         except KeyError:
             raise AttributeError, "'%s' is not a setting" % name
 
+    def __getitem__(self, name):
+        """Also allows us to do
+
+        print foo['setname']
+        """
+
+        d = self.__dict__['setdict']
+        try:
+            s = d[name]
+            if isinstance(s, Settings):
+                return s
+            else:
+                return s.val
+        except KeyError:
+            raise KeyError, "'%s' is not a setting" % name
+
     def __contains__(self, name):
         """Whether settings contains name."""
         return name in self.__dict__['setdict']

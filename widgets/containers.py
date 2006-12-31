@@ -223,6 +223,12 @@ class Grid(widget.Widget):
         self.lastscalings = None
         self.lastchildren = None
 
+    def _getUserDescription(self):
+        """User friendly description."""
+        s = self.settings
+        return "%(rows)i rows, %(columns)i columns"  % s
+    userdescription = property(_getUserDescription)
+
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""
 
