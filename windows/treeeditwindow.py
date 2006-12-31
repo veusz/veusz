@@ -488,6 +488,12 @@ class TreeEditDock(qt4.QDockWidget):
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
 
+        # make 1st column stretch
+        hdr = self.treeview.header()
+        hdr.setStretchLastSection(False)
+        hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
+        hdr.setResizeMode(1, qt4.QHeaderView.Custom)
+
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
                      qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
