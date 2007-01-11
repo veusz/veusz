@@ -179,6 +179,8 @@ class Graph(widget.Widget):
             except AttributeError:
                 pass
 
+        # FIXME: this code is terrible - find a better way to do this
+
         # if there are any
         if len(axestodraw) != 0:
             # now redraw all these axes if they aren't children of us
@@ -187,7 +189,7 @@ class Graph(widget.Widget):
 
             # nasty, as we have to work out whether we're on the edge of
             # a collection
-            edgezero = [ (a==b) for a, b in zip(bounds, parentposn) ]
+            edgezero = [ abs(a-b)<2 for a, b in zip(bounds, parentposn) ]
 
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:
