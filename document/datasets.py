@@ -599,7 +599,7 @@ class DatasetExpression(Dataset):
         # used to break the dataset expression into parts
         # to look for dataset names
         # basically this is most non-alphanumeric chars (except _)
-        self.splitre = re.compile(r'([+\-*/\(\)\[\],<>=!|%^~&])')
+        self.splitre = re.compile(r'([+\-*/\(\)\[\],<>=!|%^~& ])')
 
     def _substituteDatasets(self, expression, thispart):
         """Subsitiute the names of datasets with calls to a function which will evaluate
