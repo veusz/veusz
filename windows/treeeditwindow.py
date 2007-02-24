@@ -517,8 +517,9 @@ class TreeEditDock(qt4.QDockWidget):
                                     parent)
         self.toolbar.setObjectName("veuszeditingtoolbar")
         self.toolbar.setOrientation(qt4.Qt.Vertical)
-        parent.addToolBar(qt4.Qt.LeftToolBarArea, self.toolbar)
         self._constructToolbarMenu()
+        parent.addToolBarBreak(qt4.Qt.TopToolBarArea)
+        parent.addToolBar(qt4.Qt.TopToolBarArea, self.toolbar)
 
         # this sets various things up
         self.selectWidget(document.basewidget)
