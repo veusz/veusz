@@ -21,9 +21,23 @@
 
 # $Id$
 
+import sys
 import string
 import weakref
 import re
+import os.path
+
+def _getVeuszDirectory():
+    """Get installed directory to find files relative to this one."""
+
+    if hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
+        # for py2exe compatability
+        return os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        # standard installation
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+veuszDirectory = _getVeuszDirectory()
 
 def reverse(data):
     """For iterating over a sequence in reverse."""

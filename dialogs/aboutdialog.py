@@ -34,7 +34,7 @@ class AboutDialog(qt4.QDialog):
 
     def __init__(self, *args):
         qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'about.ui'),
                    self)
 

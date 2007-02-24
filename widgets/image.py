@@ -28,6 +28,7 @@ import numpy as N
 
 import veusz.setting as setting
 import veusz.document as document
+import veusz.utils as utils
 
 import plotters
 
@@ -159,8 +160,8 @@ class Image(plotters.GenericPlotter):
         cls.colormaps = {}
 
         # locate file holding colormap data
-        dir = os.path.dirname( os.path.abspath(__file__) )
-        filename = os.path.join(dir, 'data', 'colormaps.dat')
+        filename = os.path.join(utils.veuszDirectory, 'widgets', 'data',
+                                'colormaps.dat')
 
         # iterate over file
         for l in open(filename):

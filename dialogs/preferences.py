@@ -22,13 +22,14 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.setting as setting
+import veusz.utils as utils
 
 class PreferencesDialog(qt4.QDialog):
     """Preferences dialog."""
 
     def __init__(self, *args):
         qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'preferences.ui'),
                    self)
 

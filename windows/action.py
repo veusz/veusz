@@ -23,10 +23,11 @@
 # $Id$
 
 import veusz.qtall as qt4
+import veusz.utils as utils
 import os.path
 
 # where images are stored
-imagedir = os.path.join(os.path.dirname(__file__), 'icons')
+imagedir = os.path.join(utils.veuszDirectory, 'windows', 'icons')
 
 _pixmapcache = {}
 def getPixmap(pixmap):

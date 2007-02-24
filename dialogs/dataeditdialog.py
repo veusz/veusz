@@ -31,6 +31,7 @@ import veusz.qtall as qt4
 
 import veusz.setting as setting
 import veusz.document as document
+import veusz.utils as utils
 import importdialog
 import datacreate
 
@@ -221,7 +222,7 @@ class DataEditDialog(qt4.QDialog):
 
         # load up UI
         qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'dataedit.ui'),
                    self)
         self.document = document

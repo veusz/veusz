@@ -35,7 +35,7 @@ class DataCreateDialog(qt4.QDialog):
         """Initialise dialog with document."""
 
         qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'datacreate.ui'),
                    self)
         self.document = document

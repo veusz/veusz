@@ -29,6 +29,7 @@ import csv
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
+import veusz.utils as utils
 
 pyfits = None
 
@@ -39,7 +40,7 @@ class ImportDialog2(qt4.QDialog):
     def __init__(self, parent, document, *args):
 
         qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'import.ui'),
                    self)
         self.document = document

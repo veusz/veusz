@@ -26,6 +26,7 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.document as document
+import veusz.utils as utils
 
 class ReloadData(qt4.QDialog):
     """Dialog for reloading linked datasets."""
@@ -34,7 +35,7 @@ class ReloadData(qt4.QDialog):
         """Initialise the dialog."""
 
         qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'reloaddata.ui'),
                    self)
 

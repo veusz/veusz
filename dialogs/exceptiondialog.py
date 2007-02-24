@@ -64,7 +64,7 @@ class ExceptionSendDialog(qt4.QDialog):
 
         # load up UI
         qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'exceptionsend.ui'),
                    self)
 
@@ -123,7 +123,7 @@ class ExceptionDialog(qt4.QDialog):
 
         # load up UI
         qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'exceptionlist.ui'),
                    self)
 
