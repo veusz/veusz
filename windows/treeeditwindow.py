@@ -420,6 +420,12 @@ class FormatDock(qt4.QDockWidget):
     def selectedWidget(self, widget):
         """Created tabbed widget for formatting for each subsettings."""
 
+        # get current tab (so we can set it afterwards)
+        if self.tabwidget:
+            tab = self.tabwidget.currentIndex()
+        else:
+            tab = 0
+
         # delete old tabwidget
         if self.tabwidget:
             self.tabwidget.deleteLater()
@@ -432,6 +438,10 @@ class FormatDock(qt4.QDockWidget):
 
         self.tabwidget = TabbedFormatting(self.document, settings, self)
         self.setWidget(self.tabwidget)
+
+        # wrap tab from zero to max number
+        tab = max( min(self.tabwidget.count()-1, tab), 0 )
+        self.tabwidget.setCurrentIndex(tab)
 
 class PropertiesDock(qt4.QDockWidget):
     """A window for editing properties for widgets."""
