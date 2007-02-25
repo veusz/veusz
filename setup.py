@@ -12,6 +12,12 @@ import numpy
 from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
 
+# use py2exe if available
+try:
+    import py2exe
+except ImportError:
+    pass
+
 version = open('VERSION').read().strip()
 
 # Pete Shinner's distutils data file fix... from distutils-sig
