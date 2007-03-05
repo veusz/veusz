@@ -16,7 +16,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
-# $Id: graph.py 556 2007-01-11 17:31:27Z jeremysanders $
+# $Id: $
 
 """A colorbar widget for the image widget. Should show the scale of
 the image."""
@@ -80,11 +80,9 @@ class ColorBar(widget.Widget):
                                  usertext='Bottom margin',
                                  formatting=True) )
 
-        # the colorbar contains a hidden axis to plot the numbers
-        #self.hiddenaxis = axis.Axis(None, 'hidden')
+        # evil: we keep a document to construct a hidden graph which
+        # is plotted to show the colorbar
 
-        # scale containing (min, max, scaling)
-        self.cacheScale = (None, None, None)
 
     def draw(self, parentposn, painter, outerbounds = None):
         '''Update the margins before drawing.'''
@@ -97,14 +95,17 @@ class ColorBar(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
-        # do no painting if hidden
-        if s.hide:
+        # do no painting if hidden or no image
+        img = s.get('image').findImage()
+        if s.hide or not img:
             return bounds
 
-        painter.beginPaintingWidget(self, bounds)
+        # update image if necessary with new settings
+        img.recomputeInternals()
+        imgrange = img.cacheddatarange
 
-        img = s.get('image').findImage()
-        print img
+        painter.beginPaintingWidget(self, bounds)
+        print imgrange
 
         painter.endPaintingWidget()
             

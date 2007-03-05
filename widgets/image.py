@@ -135,6 +135,10 @@ class Image(plotters.GenericPlotter):
         self.lastdataset = None
         self.schangeset = -1
 
+        # this is the range of data plotted, computed when plot is changed
+        # the ColorBar object needs this later
+        self.cacheddatarange = (0, 1)
+
     def _getUserDescription(self):
         """User friendly description."""
         s = self.settings
@@ -256,6 +260,9 @@ class Image(plotters.GenericPlotter):
         if maxval == 'Auto':
             maxval = data.data.max()
 
+        # this is used currently by colorbar objects
+        self.cacheddatarange = (minval, maxval)
+
         cmap = self.colormaps[s.colorMap]
         if s.colorInvert:
             cmap = cmap[::-1]
@@ -336,6 +343,31 @@ class Image(plotters.GenericPlotter):
         # return new image coordinates and image
         return pltx, plty, newimage
 
+    def recomputeInternals(self):
+        """Recompute the internals if required.
+
+        This is used by colorbar as it needs to know data range when plotting
+        """
+
+        s = self.settings
+        d = self.document
+
+        # return if the dataset isn't two dimensional
+        try:
+            data = d.data[s.data]
+        except KeyError:
+            return None
+
+        # recompute data
+        if data.dimensions == 2:
+            if data != self.lastdataset or self.schangeset != s.changeset:
+                self.updateImage()
+                self.lastdataset = data
+                self.schangeset = s.changeset
+            return data
+        else:
+            return None
+    
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the image."""
 
@@ -345,30 +377,19 @@ class Image(plotters.GenericPlotter):
         s = self.settings
         d = self.document
 
-        # exit if hidden
-        if s.hide:
-            return
-        
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
         # return if there's no proper axes
         if ( None in axes or
              axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' or
-             s.data not in d.data ):
+             axes[1].settings.direction != 'vertical' ):
             return
 
-        # return if the dataset isn't two dimensional
-        data = d.data[s.data]
-        if data.dimensions != 2:
+        # get data and update internal computations
+        data = self.recomputeInternals()
+        if not data or s.hide:
             return
-
-        # recalculate pixmap if image has changed
-        if data != self.lastdataset or self.schangeset != s.changeset:
-            self.updateImage()
-            self.lastdataset = data
-            self.schangeset = s.changeset
 
         # find coordinates of image coordinate bounds
         rangex, rangey = data.getDataRanges()
