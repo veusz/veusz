@@ -707,24 +707,59 @@ class Color(qt4.QWidget):
         self.combo.setEditText( self.setting.toText() )
         self._updateButtonColor()
 
-class Axis(Choice):
+class WidgetSelector(Choice):
+    """For choosing from a list of widgets."""
+
+    def __init__(self, setting, document, parent):
+        """Initialise and populate combobox."""
+
+        Choice.__init__(self, setting, True, [], parent)
+        self.document = document
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.slotModified)
+
+    def _populateEntries(self):
+        pass
+    
+    def slotModified(self, modified):
+        """Update list of axes."""
+        self._populateEntries()
+
+class Image(WidgetSelector):
+    """Choose an image."""
+
+    def __init__(self, setting, document, parent):
+        """Initialise and populate combobox."""
+
+        WidgetSelector.__init__(self, setting, document, parent)
+        self._populateEntries()
+
+    def _populateEntries(self):
+        """Build up a list of images for combobox."""
+
+        images = self.setting.getImageList()
+
+        # we only need the list of names
+        names = images.keys()
+        names.sort()
+
+        _populateCombo(self, names)
+
+class Axis(WidgetSelector):
     """Choose an axis to plot against."""
 
     def __init__(self, setting, document, direction, parent):
         """Initialise and populate combobox."""
 
-        Choice.__init__(self, setting, True, [], parent)
-        self.document = document
+        WidgetSelector.__init__(self, setting, document, parent)
         self.direction = direction
         self._populateEntries()
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotModified)
 
     def _populateEntries(self):
         """Build up a list of possible axes."""
 
         # get parent widget
-        widget = self.setting
+        widget = self.setting.parent
         while not widget.isWidget() and widget is not None:
             widget = widget.parent
 
@@ -744,10 +779,6 @@ class Axis(Choice):
         names.sort()
 
         _populateCombo(self, names)
-
-    def slotModified(self, modified):
-        """Update list of axes."""
-        self._populateEntries()
 
 class ListSet(qt4.QFrame):
     """A widget for constructing settings which are lists of other

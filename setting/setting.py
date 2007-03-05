@@ -1032,6 +1032,76 @@ class Axis(Str):
             p = p.parent
 
         return controls.Axis(self, p.document, self.direction, *args)
+
+class Image(Str):
+    """Hold the name of a child image."""
+
+    def buildImageList(level, widget, outdict):
+        """A recursive helper to build up a list of possible image widgets.
+
+        This iterates over widget's children, and adds Image widgets as tuples
+        to outdict using outdict[name] = (widget, level)
+
+        Lower level images of the same name outweigh other images further down
+        the tree
+        """
+
+        for child in widget.children:
+            if child.typename == 'image':
+                if (child.name not in outdict) or (outdict[child.name][1]>level):
+                    outdict[child.name] = (child, level)
+                else:
+                    Image.buildImageList(level+1, child, outdict)
+
+    buildImageList = staticmethod(buildImageList)
+
+    def getImageList(self):
+        """Return a dict of valid image names and the corresponding objects."""
+
+        # find widget which contains setting
+        widget = self.parent
+        while not widget.isWidget() and widget is not None:
+            widget = widget.parent
+
+        # get widget's parent
+        if widget is not None:
+            widget = widget.parent
+
+        # get list of images from recursive find
+        images = {}
+        if widget is not None:
+            Image.buildImageList(0, widget, images)
+
+        # turn (object, level) pairs into object
+        outdict = {}
+        for name, val in images.iteritems():
+            outdict[name] = val[0]
+        return outdict
+
+    def findImage(self):
+        """Find the image corresponding to this setting.
+
+        Returns Image object if succeeds or None if fails
+        """
+
+        images = self.getImageList()
+        try:
+            return images[self.get()]
+        except KeyError:
+            return None
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+    def makeControl(self, *args):
+        """Allows user to choose an image widget or enter a name."""
+        # find document
+        p = self.parent
+        while not hasattr(p, 'document'):
+            p = p.parent
+
+        return controls.Image(self, p.document, *args)
     
 class Marker(Choice):
     """Choose a marker type from one allowable."""

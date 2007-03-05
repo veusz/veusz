@@ -626,7 +626,7 @@ class TreeEditDock(qt4.QDockWidget):
         for widgettype in ('page', 'grid', 'graph', 'axis',
                            'xy', 'fit', 'function',
                            'image', 'contour',
-                           'key', 'label'):
+                           'key', 'label', 'colorbar'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             name = wc.typename

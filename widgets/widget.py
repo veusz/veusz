@@ -66,7 +66,7 @@ class Widget(object):
         self.parent = parent
 
         if not self.isAllowedParent(parent):
-            raise RuntimeError, "parent is of incorrect type"
+            raise RuntimeError, "Widget parent is of incorrect type"
 
         if name is None:
             name = self.chooseName()
