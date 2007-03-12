@@ -343,6 +343,60 @@ class Image(plotters.GenericPlotter):
         # return new image coordinates and image
         return pltx, plty, newimage
 
+    def makeColorbarImage(self, direction='horz'):
+        """Make a QImage colorbar for the current plot.
+
+        direction is 'horizontal' or 'vertical' to draw horizontal or
+          vertical bars
+
+        Returns a tuple (minval, maxval, scale, qimage)
+
+        minval is the minimum value which should be plotted on the axis
+        maxval is the maximum "                                       "
+        scale is 'linear' or 'log', depending on how numbers should be scaled
+        qimage is a QImage of 1 x barsize
+        """
+
+        self.recomputeInternals()
+
+        barsize = 128
+        s = self.settings
+        minval, maxval = self.cacheddatarange
+
+        if s.colorScaling in ('linear', 'sqrt', 'squared'):
+            # do a linear color scaling
+            vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
+            colorscaling = s.colorScaling
+            coloraxisscale = 'linear'
+        else:
+            assert s.colorScaling == 'log'
+
+            # a logarithmic color scaling
+            # we cheat here by actually plotting a linear colorbar
+            # and telling veusz to put a log axis along it
+            # (as we only care about the endpoints)
+            # maybe should do this better...
+            
+            vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
+            colorscaling = 'linear'
+            coloraxisscale = 'log'
+
+        # convert 1d array to 2d image
+        if direction == 'horizontal':
+            vals = vals.reshape(1, barsize)
+        else:
+            assert direction == 'vertical'
+            vals = vals.reshape(barsize, 1)
+
+        cmap = self.colormaps[s.colorMap]
+        if s.colorInvert:
+            cmap = cmap[::-1]
+
+        img = self.applyColorMap(cmap, colorscaling, vals,
+                                 minval, maxval)
+
+        return (minval, maxval, coloraxisscale, img)
+
     def recomputeInternals(self):
         """Recompute the internals if required.
 

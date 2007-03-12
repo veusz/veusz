@@ -30,7 +30,7 @@ import os.path
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
 
-    if hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
+    if hasattr(sys, 'frozen'):
         # for py2exe compatability
         return os.path.dirname(os.path.abspath(sys.executable))
     else:

@@ -617,11 +617,14 @@ class Axis(widget.Widget):
         """Mirror axis to opposite side of graph if there isn't
         an axis there already."""
 
+        # This is a nasty hack: must think of a better way to do this
         s = self.settings
         countaxis = 0
         for c in self.parent.children:
             try:
-                if s.direction == c.settings.direction:
+                # don't allow descendents of axis to look like an axis
+                # to this function (e.g. colorbar)
+                if type(c) == Axis and s.direction == c.settings.direction:
                     countaxis += 1
             except AttributeError:
                 # if it's not an axis we get here

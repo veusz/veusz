@@ -95,7 +95,7 @@ class Reference(object):
 class Setting(object):
 
     def __init__(self, name, value, descr='', usertext='',
-                 formatting=False):
+                 formatting=False, hidden=False):
         """Initialise the values.
 
         name: setting name

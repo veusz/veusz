@@ -21,6 +21,9 @@
 """A colorbar widget for the image widget. Should show the scale of
 the image."""
 
+import veusz.qtall as qt4
+import numpy as N
+
 import veusz.document as document
 import veusz.setting as setting
 
@@ -29,9 +32,13 @@ import containers
 import image
 import axis
 import widget
+import axis
 
-class ColorBar(widget.Widget):
-    """Color bar for showing scale of image."""
+class ColorBar(axis.Axis):
+    """Color bar for showing scale of image.
+
+    This naturally is descended from an axis
+    """
 
     typename='colorbar'
     allowedparenttypes = [graph.Graph, containers.Grid]
@@ -41,48 +48,49 @@ class ColorBar(widget.Widget):
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
 
-        widget.Widget.__init__(self, parent, name=name)
+        axis.Axis.__init__(self, parent, name=name)
         s = self.settings
 
-        s.add( setting.Text('Text',
-                            descr = 'Text settings',
-                            usertext='Text'),
-               pixmap = 'axislabel' )
-        
         s.add( setting.Image('image', '',
                              descr = 'Corresponding image',
                              usertext = 'Image') )
 
-        s.add( setting.Choice('direction',
-                              ['horizontal', 'vertical'],
-                              'horizontal',
-                              descr = 'Direction of colorbar',
-                              usertext='Direction') )
+        s.get('log').readonly = True
 
-        s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
-                                 'Distance from left of graph to '
-                                 'edge of page',
+        s.add( setting.Distance( 'leftMargin', '0.1cm', descr=
+                                 'Distance from left of colorbar to '
+                                 'edge of parent',
                                  usertext='Left margin',
                                  formatting=True) )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
-                                 'Distance from right of graph to '
-                                 'edge of page',
+                                 'Distance from right of colorbar to '
+                                 'edge of parent',
                                  usertext='Right margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
-                                 'Distance from top of graph to '
-                                 'edge of page',
+        s.add( setting.Distance( 'topMargin', '1cm', descr=
+                                 'Distance from top of colorbar to '
+                                 'edge of parent',
                                  usertext='Top margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
-                                 'Distance from bottom of graph'
-                                 'to edge of page',
+        s.add( setting.Distance( 'bottomMargin', '1cm', descr=
+                                 'Distance from bottom of colorbar'
+                                 'to edge of parent',
                                  usertext='Bottom margin',
                                  formatting=True) )
+        s.add( setting.Line('Border', descr = 'Colorbar border line',
+                            usertext='Border'), pixmap='border')
 
-        # evil: we keep a document to construct a hidden graph which
-        # is plotted to show the colorbar
+        if type(self) == ColorBar:
+            self.readDefaults()
+        
+        self._cachedrange = [None, None]
 
+    def _autoLookupRange(self):
+        """Get automatic minimum and maximum of axis."""
+
+        # this is pretty hacky -
+        # this variable is updated every draw
+        return self._cachedrange
 
     def draw(self, parentposn, painter, outerbounds = None):
         '''Update the margins before drawing.'''
@@ -96,16 +104,37 @@ class ColorBar(widget.Widget):
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
         # do no painting if hidden or no image
-        img = s.get('image').findImage()
-        if s.hide or not img:
+        imgwidget = s.get('image').findImage()
+        if s.hide or not imgwidget:
             return bounds
 
         # update image if necessary with new settings
-        img.recomputeInternals()
-        imgrange = img.cacheddatarange
+
+        minval, maxval, axisscale, img = \
+                imgwidget.makeColorbarImage(s.direction)
+        self._cachedrange = [minval, maxval]
+        s.log = (axisscale == 'log')            
 
         painter.beginPaintingWidget(self, bounds)
-        print imgrange
+
+        # if there's a border
+        if not s.Border.hide:
+            painter.setPen( s.get('Border').makeQPen(painter) )
+            painter.drawRect( bounds[0], bounds[1], bounds[2]-bounds[0],
+                              bounds[3]-bounds[1] )
+
+        # now draw image on axis...
+        minpix, maxpix = self.graphToPlotterCoords( bounds,
+                                                    N.array([minval, maxval]) )
+
+        if s.direction == 'horizontal':
+            c = [ minpix, bounds[1], maxpix, bounds[3] ]
+        else:
+            c = [ bounds[0], maxpix, bounds[2], minpix ]
+        r = qt4.QRect(c[0], c[1], c[2]-c[0]+1, c[3]-c[1]+1)
+        
+        painter.drawImage(r, img)
+        axis.Axis.draw(self, bounds, painter)
 
         painter.endPaintingWidget()
             
