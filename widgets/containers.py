@@ -319,7 +319,7 @@ class Grid(widget.Widget):
 
         bounds = self.computeBounds(parentposn, painter, margins=margins)
         for c in self.children:
-            if not isinstance(c, axis.Axis):
+            if c.typename != 'axis':
                 # save old position, then update with calculated
                 oldposn = c.position
                 if c in self.childpositions:

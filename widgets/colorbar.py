@@ -16,7 +16,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
-# $Id: $
+# $Id:$
 
 """A colorbar widget for the image widget. Should show the scale of
 the image."""
@@ -85,6 +85,12 @@ class ColorBar(axis.Axis):
         
         self._cachedrange = [None, None]
 
+    def chooseName(self):
+        """Get name of widget."""
+
+        # override axis naming of x and y
+        return widget.Widget.chooseName(self)
+
     def _autoLookupRange(self):
         """Get automatic minimum and maximum of axis."""
 
@@ -113,7 +119,7 @@ class ColorBar(axis.Axis):
         minval, maxval, axisscale, img = \
                 imgwidget.makeColorbarImage(s.direction)
         self._cachedrange = [minval, maxval]
-        s.log = (axisscale == 'log')            
+        s.get('log').set(axisscale == 'log')            
 
         painter.beginPaintingWidget(self, bounds)
 

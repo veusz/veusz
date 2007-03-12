@@ -624,7 +624,7 @@ class Axis(widget.Widget):
             try:
                 # don't allow descendents of axis to look like an axis
                 # to this function (e.g. colorbar)
-                if type(c) == Axis and s.direction == c.settings.direction:
+                if c.typename == 'axis' and s.direction == c.settings.direction:
                     countaxis += 1
             except AttributeError:
                 # if it's not an axis we get here
@@ -642,7 +642,7 @@ class Axis(widget.Widget):
             next = 0.
 
         # temporarily change position of axis
-        # ** this is a horrible kludge **
+        # ** FIXME: this is a horrible kludge **
         s.get('otherPosition').setSilent(next)
 
         self._updatePlotRange(posn)

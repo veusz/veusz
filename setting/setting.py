@@ -1050,8 +1050,8 @@ class Image(Str):
             if child.typename == 'image':
                 if (child.name not in outdict) or (outdict[child.name][1]>level):
                     outdict[child.name] = (child, level)
-                else:
-                    Image.buildImageList(level+1, child, outdict)
+            else:
+                Image.buildImageList(level+1, child, outdict)
 
     buildImageList = staticmethod(buildImageList)
 
@@ -1076,6 +1076,7 @@ class Image(Str):
         outdict = {}
         for name, val in images.iteritems():
             outdict[name] = val[0]
+
         return outdict
 
     def findImage(self):
