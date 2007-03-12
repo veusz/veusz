@@ -236,7 +236,7 @@ class Grid(widget.Widget):
         ge = _gridengine(self.settings.columns, self.settings.rows)
 
         # copy children, and remove any which are axes
-        children = [c for c in self.children if not isinstance(c, axis.Axis)]
+        children = [c for c in self.children if c.typename != 'axis']
         child_dimensions = {}
         child_posns = {}
         for c in children:
