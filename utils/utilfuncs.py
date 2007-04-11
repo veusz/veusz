@@ -25,6 +25,7 @@ import sys
 import string
 import weakref
 import re
+import time
 import os.path
 
 def _getVeuszDirectory():
@@ -141,76 +142,115 @@ def pythonise(text):
 
     return out
 
+_formaterror = 'FormatError'
+
+def formatSciNotation(num, formatargs=''):
+    """Format number into form X \times 10^{Y}.
+    This function trims trailing zeros and decimal point unless a formatting
+    argument is supplied
+
+    This is similar to the %e format string
+    formatargs is the standard argument in a format string to control the
+    number of decimal places, etc."""
+
+    # create an initial formatting string
+    if formatargs:
+        format = '%' + formatargs + 'e'
+    else:
+        format = '%.10e'
+
+    # try to format the number
+    # this may be user-supplied data, so don't crash hard by returning
+    # useless output
+    try:
+        text = format % num
+    except:
+        return _formaterror
+
+    # split around the exponent
+    leader, exponent = text.split('e')
+
+    # strip off trailing decimal point and zeros if no format args
+    if not formatargs:
+        leader = '%.10g' % float(leader)
+
+    # trim off leading 1
+    if leader == '1' and not formatargs:
+        leader = ''
+    else:
+        leader = leader + r' \times '
+
+    return '%s10^{%i}' % (leader, int(exponent))
+
+def formatGeneral(num, fmtarg):
+    """General formatting which switches from normal to scientic
+    notation."""
+    
+    a = abs(num)
+    # manually choose when to switch from normal to scientific
+    # as the default isn't very good
+    if a >= 1e4 or (a < 1e-2 and a > 1e-110):
+        return formatSciNotation(num, fmtarg)
+    else:
+        if fmtarg:
+            f = '%' + fmtarg + 'g'
+        else:
+            f = '%.10g'
+
+        try:
+            return f % num
+        except:
+            return _formaterror
+
+_formatRE = re.compile(r'%([^A-Za-z]*)(VD.|V.|[A-Za-z])')
+
 def formatNumber(num, format):
     """ Format a number in different ways.
 
-    Format types are
-    e - 1.23e20
-    g - automatic change from f to e
-    f - 12.34
+    format is a standard C format string, with some additions:
+     %Ve    scientific notation X \times 10^{Y}
+     %Vg    switches from normal notation to scientific outside 10^-2 to 10^4
 
-    g* \  Change e20 to x 10^20
-    e* /
+     %VDx   date formatting, where x is one of the arguments in 
+            http://docs.python.org/lib/module-time.html in the function
+            strftime
     """
 
-    if format == 'e' or format == 'e*':
-        text = '%e' % num
-    elif format == 'f':
-        text = '%f' % num
-    elif format == 'percent':
-        text = '%g' % (num*100.)
-    else:
-        a = abs(num)
-        if a >= 1e4 or (a < 1e-2 and a > 1e-99):
-            text = '%e' % num
-        else:
-            text = '%f' % num
+    while True:
+        # repeatedly try to do string format
+        m = _formatRE.search(format)
+        if not m:
+            break
 
-    # split around exponential (if any)
-    parts = text.split('e')
+        # argument and type of formatting
+        farg, ftype = m.groups()
 
-    # remove trailing zeros before an exponential and after decimal pt
-    fp = parts[0]
-    hitdec = False
-    lastnonzero = -1
-    for i in xrange(len(fp)):
-        c = fp[i]
-        if c != '0':
-            lastnonzero = i
-        if c == '.':
-            hitdec = True
-            if i != 0:
-                lastnonzero = i-1
-
-    if hitdec:
-        fp = fp[:lastnonzero+1]
-
-    # put back the exponential part
-    if len(parts) != 1:
-        sp = parts[1]
-
-        # get rid of + on exponential and strip a leading zero
-        if sp[0] == '+':
-            sp = sp[1:]
-            if len(sp) > 1 and sp[0] == '0':
-                sp = sp[1:]
-        elif sp[0] == '-':
-            if len(sp) > 2 and sp[1] == '0':
-                sp = sp[0:1] + sp[2]
-
-        # change 1.2e20 to 1.2\times10^29
-        if format == 'g*' or format == 'e*':
-
-            # get rid of 1x before anything
-            if fp != '1':
-                fp += u'\u00d7'
+        # special veusz formatting
+        if ftype[:1] == 'V':
+            # special veusz formatting
+            if ftype == 'Ve':
+                out = formatSciNotation(num, farg)
+            elif ftype == 'Vg':
+                out = formatGeneral(num, farg)
+            elif ftype[:2] == 'VD':
+                # date formatting (seconds since start of epoch)
+                try:
+                    out = time.strftime('%'+ftype[2:], time.gmtime(num))
+                except ValueError:
+                    out = _formaterror
             else:
-                fp = ''
-            fp += '10^{%s}' % sp
-        else:
-            fp += 'e' + sp
+                out = _formaterror
 
-    return fp
+        else:
+            # standard C formatting
+            try:
+                out = ('%' + farg + ftype) % num
+            except:
+                out = _formaterror
+
+        format = format[:m.start()] + out + format[m.end():]
+
+    return format
 
 def clipper(xpts, ypts, bounds):
     """ Clip points that are safe to remove.
