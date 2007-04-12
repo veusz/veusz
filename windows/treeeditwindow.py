@@ -163,7 +163,13 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         children = self._getChildren(parentobj)
 
-        c = children[row]
+        try:
+            c = children[row]
+        except IndexError:
+            # sometimes this function gets called with an invalid row
+            # when deleting, so we return an error result
+            return qt4.QModelIndex()
+
         return self.createIndex(row, column, c)
 
     def getWidgetIndex(self, widget):
