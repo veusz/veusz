@@ -96,21 +96,25 @@ class Key(widget.Widget):
 
         showtext = not s.Text.hide
 
-        # count number of keys to draw
-        number = 0
+        # keep track of widgets to place
+        keywidgets = []
+        # maximum width of text required
         maxwidth = 1
+
+        # iterate over children and find widgets which are suitable
         for c in self.parent.children:
-            if c.settings.isSetting('key') and c.settings.key != '':
-                number += 1
+            childset = c.settings
+            if childset.isSetting('key') and childset.key and not childset.hide:
+                keywidgets.append(c)
                 if showtext:
                     w, h = utils.Renderer(painter, font, 0, 0,
-                                          c.settings.key).getDimensions()
+                                          childset.key).getDimensions()
                     maxwidth = max(maxwidth, w)
 
         # total size of box
         symbolwidth = s.get('keyLength').convert(painter)
         totalwidth = maxwidth + height + symbolwidth
-        totalheight = (number+1)*height
+        totalheight = (len(keywidgets)+1)*height
         if not s.Border.hide:
             totalwidth += height*2
 
@@ -160,23 +164,22 @@ class Key(widget.Widget):
 
         # plot dataset entries
         ypos = y + height/2
-        for c in self.parent.children:
-            if c.settings.isSetting('key') and c.settings.key != '':
-                # plot key symbol
-                painter.save()
-                c.drawKeySymbol(painter, symbxpos, ypos,
-                                symbolwidth, height)
-                painter.restore()
-                
-                # write key text
-                if showtext:
-                    painter.setPen(textpen)
-                    utils.Renderer(painter, font,
-                                   symbxpos + height + symbolwidth,
-                                   ypos + height/2, c.settings.key,
-                                   -1, 0).render()
+        for c in keywidgets:
+            # plot key symbol
+            painter.save()
+            c.drawKeySymbol(painter, symbxpos, ypos,
+                            symbolwidth, height)
+            painter.restore()
 
-                ypos += height
+            # write key text
+            if showtext:
+                painter.setPen(textpen)
+                utils.Renderer(painter, font,
+                               symbxpos + height + symbolwidth,
+                               ypos + height/2, c.settings.key,
+                               -1, 0).render()
+
+            ypos += height
 
         painter.restore()
         painter.endPaintingWidget()
