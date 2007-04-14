@@ -45,4 +45,30 @@ class AboutDialog(qt4.QDialog):
         copyrighttext = unicode(self.copyrightlabel.text())
         copyrighttext = copyrighttext % {'version': utils.version()}
         self.copyrightlabel.setText(copyrighttext)
+
+        self.connect(self.licenseButton, qt4.SIGNAL('clicked()'),
+                     self.licenseClicked)
+
+    def licenseClicked(self):
+        """Show the license."""
+
+        d = LicenseDialog(self)
+        d.exec_()
         
+class LicenseDialog(qt4.QDialog):
+    """About license dialog."""
+
+    def __init__(self, *args):
+        qt4.QDialog.__init__(self, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'license.ui'),
+                   self)
+
+        try:
+            f = open(os.path.join(utils.veuszDirectory, 'COPYING'), 'rU')
+            text = f.read()
+        except IOError:
+            text = 'Could not open the license file.'
+
+        self.licenseEdit.setPlainText(text)
+    
