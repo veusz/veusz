@@ -545,6 +545,8 @@ class PlotWindow( qt4.QScrollArea ):
                 self.locateClickWidget(pos.x(), pos.y())
             elif self.currentclickmode == 'scroll':
                 # return the cursor to normal after scrolling
+                self.clickmode = 'select'
+                self.currentclickmode = None
                 qt4.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
                 self.label.hideRect()
