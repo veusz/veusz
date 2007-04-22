@@ -53,30 +53,42 @@ class ColorBar(axis.Axis):
 
         s.add( setting.Image('image', '',
                              descr = 'Corresponding image',
-                             usertext = 'Image') )
+                             usertext = 'Image'), 0 )
 
         s.get('log').readonly = True
 
-        s.add( setting.Distance( 'leftMargin', '0.1cm', descr=
-                                 'Distance from left of colorbar to '
-                                 'edge of parent',
-                                 usertext='Left margin',
-                                 formatting=True) )
-        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
-                                 'Distance from right of colorbar to '
-                                 'edge of parent',
-                                 usertext='Right margin',
-                                 formatting=True) )
-        s.add( setting.Distance( 'topMargin', '1cm', descr=
-                                 'Distance from top of colorbar to '
-                                 'edge of parent',
-                                 usertext='Top margin',
-                                 formatting=True) )
-        s.add( setting.Distance( 'bottomMargin', '1cm', descr=
-                                 'Distance from bottom of colorbar'
-                                 'to edge of parent',
-                                 usertext='Bottom margin',
-                                 formatting=True) )
+        s.add( setting.Choice( 'horzPosn',
+                               ('left', 'centre', 'right', 'manual'),
+                               'right',
+                               descr = 'Horizontal key position',
+                               usertext='Horz posn',
+                               formatting=True) )
+        s.add( setting.Choice( 'vertPosn',
+                               ('top', 'centre', 'bottom', 'manual'),
+                               'bottom',
+                               descr = 'Vertical key position',
+                               usertext='Vert posn',
+                               formatting=True) )
+        s.add( setting.Distance('width', '5cm',
+                                descr = 'Width of colorbar',
+                                usertext='Width',
+                                formatting=True) )
+        s.add( setting.Distance('height', '1cm',
+                                descr = 'Height of colorbar',
+                                usertext='Height',
+                                formatting=True) )
+        
+        s.add( setting.Float( 'horzManual',
+                              0.,
+                              descr = 'Manual horizontal fractional position',
+                              usertext='Horz manual',
+                              formatting=True) )
+        s.add( setting.Float( 'vertManual',
+                              0.,
+                              descr = 'Manual vertical fractional position',
+                              usertext='Vert manual',
+                              formatting=True) )
+
         s.add( setting.Line('Border', descr = 'Colorbar border line',
                             usertext='Border'), pixmap='border')
 
@@ -103,11 +115,47 @@ class ColorBar(axis.Axis):
 
         s = self.settings
 
-        margins = ( s.get('leftMargin').convert(painter),
-                    s.get('topMargin').convert(painter),
-                    s.get('rightMargin').convert(painter),
-                    s.get('bottomMargin').convert(painter) )
-        bounds = self.computeBounds(parentposn, painter, margins=margins)
+        totalwidth = s.get('width').convert(painter)
+        totalheight = s.get('height').convert(painter)
+
+        font = s.get('Label').makeQFont(painter)
+        painter.setFont(font)
+        fontheight = painter.fontMetrics().height()
+
+        # work out horizontal position
+        h = s.horzPosn
+        pp = list(parentposn)
+        if h == 'left':
+            pp[0] += fontheight
+            pp[2] = pp[0] + totalwidth
+        elif h == 'right':
+            pp[2] -= fontheight
+            pp[0] = pp[2] - totalwidth
+        elif h == 'centre':
+            delta = (pp[2]-pp[0]-totalwidth)/2.
+            pp[0] += delta
+            pp[2] -= delta
+        elif h == 'manual':
+            pp[0] += (pp[2]-pp[0])*s.horzManual
+            pp[2] = pp[0] + totalwidth
+
+        # work out vertical position
+        v = s.vertPosn
+        if v == 'top':
+            pp[1] += fontheight
+            pp[3] = pp[1] + totalheight 
+        elif v == 'bottom':
+            pp[3] -= fontheight
+            pp[1] = pp[3] - totalheight 
+        elif v == 'centre':
+            delta = (pp[3]-pp[1]-totalheight)/2.
+            pp[1] += delta
+            pp[3] -= delta
+        elif v == 'manual':
+            pp[1] += (pp[3]-pp[1])*s.vertManual
+            pp[3] = pp[1] + totalheight
+
+        bounds = self.computeBounds(pp, painter)
 
         # do no painting if hidden or no image
         imgwidget = s.get('image').findImage()
