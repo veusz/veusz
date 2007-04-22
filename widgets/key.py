@@ -57,25 +57,30 @@ class Key(widget.Widget):
                                ('left', 'centre', 'right', 'manual'),
                                'right',
                                descr = 'Horizontal key position',
-                               usertext='Horz posn') )
+                               usertext='Horz posn',
+                               formatting=True) )
         s.add( setting.Choice( 'vertPosn',
                                ('top', 'centre', 'bottom', 'manual'),
                                'bottom',
                                descr = 'Vertical key position',
-                               usertext='Vert posn') )
+                               usertext='Vert posn',
+                               formatting=True) )
                                
         s.add( setting.Distance('keyLength', '1cm',
                                 descr = 'Length of line to show in sample',
-                                usertext='Key length') )
+                                usertext='Key length',
+                                formatting=True) )
 
         s.add( setting.Float( 'horzManual',
                               0.,
                               descr = 'Manual horizontal fractional position',
-                              usertext='Horz manual') )
+                              usertext='Horz manual',
+                              formatting=True) )
         s.add( setting.Float( 'vertManual',
                               0.,
                               descr = 'Manual vertical fractional position',
-                              usertext='Vert manual') )
+                              usertext='Vert manual',
+                              formatting=True) )
 
         if type(self) == Key:
             self.readDefaults()
