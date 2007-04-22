@@ -48,7 +48,11 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def rowCount(self, parent):
         """Return number of rows."""
-        return len(self.document.data[self.dsname].data)
+
+        try:
+            return len(self.document.data[self.dsname].data)
+        except KeyError:
+            return 0
         
     def columnCount(self, parent):
         return 4
@@ -166,16 +170,21 @@ class DatasetListModel(qt4.QAbstractListModel):
 
         self.connect(document, qt4.SIGNAL('sigModified'),
                      self.slotDocumentModified)
-        self.updateList()
 
-    def updateList(self):
-        """Update internal list."""
-        self.datasets = list( self.document.data.keys() )
-        self.datasets.sort()
+        # initial variable state
+        self._changeset = -1
+
+    def _getDSList(self):
+        """A cached copy of a list of datasets, which updates if doc changes."""
+        if self._changeset != self.document.changeset:
+            self._changeset = self.document.changeset
+            self._realDSList = self.document.data.keys()
+            self._realDSList.sort()
+        return self._realDSList
+    datasets = property(_getDSList)
 
     def slotDocumentModified(self):
         """Called when document modified."""
-        self.updateList()
         self.emit( qt4.SIGNAL('layoutChanged()') )
 
     def rowCount(self, parent):
@@ -260,7 +269,7 @@ class DataEditDialog(qt4.QDialog):
         self.connect(self.createbutton, qt4.SIGNAL('clicked()'),
                      self.slotDatasetCreate)
 
-    def slotDatasetSelected(self, current, previous):
+    def slotDatasetSelected(self, current, deselected):
         """Called when a new dataset is selected."""
 
         # FIXME: Make readonly models readonly!!
@@ -331,6 +340,8 @@ class DataEditDialog(qt4.QDialog):
         datasetname = self.getSelectedDataset()
         if datasetname is not None:
             self.document.applyOperation(document.OperationDatasetDelete(datasetname))
+        print self.getSelectedDataset()
+        
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
