@@ -188,7 +188,9 @@ class Renderer:
 
         # work out height of box, and
         # make the bounding box a bit bigger if we want to include descents
-        fm = self.painter.fontMetrics()
+
+        fm = qt4.QFontMetricsF(self.font, self.painter.device())
+        
         if self.usefullheight:
             totalheight = fm.ascent()
             dy = fm.descent()
@@ -197,6 +199,7 @@ class Renderer:
                 # if want vertical centering, better to centre around middle
                 # of typical letter
                 totalheight = fm.boundingRect('0').height()
+                
             else:
                 # if top/bottom alignment, better to use maximum letter height
                 totalheight = fm.ascent()
@@ -262,7 +265,7 @@ class Renderer:
         # add a small amount of extra room if requested
         if extraspace:
             self.painter.setFont(self.font)
-            l = self.painter.fontMetrics().leading()
+            l = qt4.QFontMetricsF(self.font, self.painter.device()).leading()
             minx += l
             maxx -= l
             miny += l
@@ -444,13 +447,13 @@ class Renderer:
 
             # start a superscript part
             elif p == _SuperScript:
-                oldheight = self.painter.fontMetrics().height()
+                oldheight = qt4.QFontMetricsF(font, self.painter.device()).height()
                 size = font.pointSizeF()
                 font.setPointSizeF(size*0.6)
                 self.painter.setFont(font)
 
                 oldy = self.ypos
-                self.ypos -= (oldheight - self.painter.fontMetrics().height())
+                self.ypos -= (oldheight - qt4.QFontMetricsF(font, self.painter.device()).height())
             
                 partno = self._renderPart(partno+1, font, render)
 
@@ -466,7 +469,7 @@ class Renderer:
                 self.painter.setFont(font)
 
                 oldy = self.ypos
-                self.ypos += self.painter.fontMetrics().descent()
+                self.ypos += qt4.QFontMetricsF(font, self.painter.device()).decent()
                 partno = self._renderPart(partno+1, font, render)
                 self.ypos = oldy
                 
@@ -573,8 +576,7 @@ class Renderer:
         else:
             # write text
             # how far do we need to advance?
-            fm = self.painter.fontMetrics()
-            width = fm.width( p )
+            width = qt4.QFontMetricsF(font, self.painter.device()).width(p)
 
             # actually write the text if requested
             if render:
