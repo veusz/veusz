@@ -636,8 +636,10 @@ class PlotWindow( qt4.QScrollArea ):
                 # errors cause an exception window to pop up
                 try:
                     painter = RecordingPainter(self.bufferpixmap)
-                    if self.antialias:
-                        painter.setRenderHint(qt4.QPainter.Antialiasing)
+                    painter.setRenderHint(qt4.QPainter.Antialiasing,
+                                          self.antialias)
+                    painter.setRenderHint(qt4.QPainter.TextAntialiasing,
+                                          self.antialias)
                     self.document.paintTo( painter, self.pagenumber,
                                            scaling = self.zoomfactor,
                                            dpi = self.widgetdpi )

@@ -276,8 +276,10 @@ class Document( qt4.QObject ):
             painter.veusz_pixperpt = dpi / 72.
         
         painter.begin( printer )
-        if antialias:
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
+        painter.setRenderHint(qt4.QPainter.Antialiasing,
+                              antialias)
+        painter.setRenderHint(qt4.QPainter.TextAntialiasing,
+                              antialias)
 
         # work out how many pixels correspond to the given size
         width, height = self.basewidget.getSize(painter)
@@ -380,8 +382,10 @@ class Document( qt4.QObject ):
 
         # paint to the image
         painter = Painter(pixmap)
-        if antialias:
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
+        painter.setRenderHint(qt4.QPainter.Antialiasing,
+                              antialias)
+        painter.setRenderHint(qt4.QPainter.TextAntialiasing,
+                              antialias)
         self.paintTo(painter, pagenumber, scaling=scaling, dpi=realdpi)
         painter.end()
 
