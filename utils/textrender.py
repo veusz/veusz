@@ -198,7 +198,7 @@ class Renderer:
             if self.alignvert == 0:
                 # if want vertical centering, better to centre around middle
                 # of typical letter
-                totalheight = fm.boundingRect('0').height()
+                totalheight = fm.boundingRect(qt4.QChar('0')).height()
                 
             else:
                 # if top/bottom alignment, better to use maximum letter height
