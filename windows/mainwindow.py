@@ -593,7 +593,6 @@ class MainWindow(qt4.QMainWindow):
             if fullname in filelist:
                 filelist.remove(fullname)
             filelist.insert(0, fullname)
-            filelist = filelist[:5]
             self.populateRecentFiles()
 
         except IOError:
@@ -635,6 +634,7 @@ class MainWindow(qt4.QMainWindow):
         newMenuItems = []
         if setting.settingdb['main_recentfiles']:
             files = setting.settingdb['main_recentfiles']
+            files = files[:10]
             self._openRecentFunctions = []
             for i, path in enumerate(files):
 
