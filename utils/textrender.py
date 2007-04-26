@@ -469,7 +469,7 @@ class Renderer:
                 self.painter.setFont(font)
 
                 oldy = self.ypos
-                self.ypos += qt4.QFontMetricsF(font, self.painter.device()).decent()
+                self.ypos += qt4.QFontMetricsF(font, self.painter.device()).descent()
                 partno = self._renderPart(partno+1, font, render)
                 self.ypos = oldy
                 
