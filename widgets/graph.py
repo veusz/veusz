@@ -20,6 +20,7 @@
 
 # $Id$
 
+import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
@@ -144,14 +145,16 @@ class Graph(widget.Widget):
         # if there's a background
         if not s.Background.hide:
             brush = s.get('Background').makeQBrush()
-            painter.fillRect( bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1], brush )
+            painter.fillRect( qt4.QRectF(bounds[0], bounds[1],
+                                         bounds[2]-bounds[0],
+                                         bounds[3]-bounds[1]), brush )
 
         # if there's a border
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.drawRect( bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1] )
+            painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
+                                         bounds[2]-bounds[0],
+                                         bounds[3]-bounds[1]) )
 
         # work out outer bounds
         ob = list(parentposn)

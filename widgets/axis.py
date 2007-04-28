@@ -1,7 +1,4 @@
-# axis.py
-# package to handle an axis, and the conversion of data -> coordinates
-
-#    Copyright (C) 2003-2005 Jeremy S. Sanders
+#    Copyright (C) 2003-2007 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -21,6 +18,9 @@
 
 # $Id$
 
+"""Widget to plot axes, and to handle conversion of coordinates to plot
+positions."""
+
 import veusz.qtall as qt4
 import numpy as N
 
@@ -32,6 +32,7 @@ import widget
 import axisticks
 import graph
 import containers
+import itertools
 
 class Axis(widget.Widget):
     """Manages and draws an axis."""
@@ -518,7 +519,7 @@ class Axis(widget.Widget):
         tl = s.get('TickLabels')
         scale = tl.scale
         pen = tl.makeQPen()
-        for a, num in zip(coordticks, self.majortickscalc):
+        for a, num in itertools.izip(coordticks, self.majortickscalc):
 
             # x and y round other way if vertical
             if vertical:
@@ -631,7 +632,7 @@ class Axis(widget.Widget):
                 pass
 
         # another axis in the same direction, so we don't mirror it
-        if countaxis != 1:
+        if countaxis > 1:
             return
 
         # swap axis to other side

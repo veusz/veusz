@@ -321,7 +321,7 @@ class Contour(plotters.GenericPlotter):
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt4.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
 
         # iterate over each level, and list of lines
         for num, linelist in enumerate(self._cachedcontours):
@@ -358,7 +358,7 @@ class Contour(plotters.GenericPlotter):
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt4.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
         painter.setPen(qt4.QPen(qt4.Qt.NoPen))
 
         # iterate over each level, and list of lines

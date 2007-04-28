@@ -79,7 +79,7 @@ class GenericPlotter(widget.Widget):
         y2 = axes[1].coordParr2
 
         # actually clip the data
-        painter.setClipRect( qt4.QRect(x1, y2, x2-x1, y1-y2) )
+        painter.setClipRect( qt4.QRectF(x1, y2, x2-x1, y1-y2) )
 
 ########################################################################
         
@@ -228,7 +228,7 @@ class FunctionPlotter(GenericPlotter):
         if not s.Line.hide:
             painter.setBrush( qt4.QBrush() )
             painter.setPen( s.Line.makeQPen(painter) )
-            painter.drawLine(x, yp, x+width, yp)
+            painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
 
     def initEnviron(self):
         """Initialise function evaluation environment each time."""
@@ -320,7 +320,7 @@ class FunctionPlotter(GenericPlotter):
             f = qt4.QFont()
             f.setPointSize(20)
             painter.setFont(f)
-            painter.drawText( qt4.QRect(x1, y1, x2-x1, y2-y1),
+            painter.drawText( qt4.QRectF(x1, y1, x2-x1, y2-y1),
                               qt4.Qt.AlignCenter,
                               "Cannot evaluate '%s'" % s.function )
         else:
@@ -662,11 +662,11 @@ class PointPlotter(GenericPlotter):
         # draw line
         if not s.PlotLine.hide:
             painter.setPen( s.PlotLine.makeQPen(painter) )
-            painter.drawLine(x, yp, x+width, yp)
+            painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
 
         # draw marker
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            size = int( s.get('markerSize').convert(painter) )
+            size = s.get('markerSize').convert(painter)
 
             if not s.MarkerFill.hide:
                 painter.setBrush( s.MarkerFill.makeQBrush() )
@@ -732,7 +732,7 @@ class PointPlotter(GenericPlotter):
 
         # plot the points (we do this last so they are on top)
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            size = int( s.get('markerSize').convert(painter) )
+            size = s.get('markerSize').convert(painter)
 
             if not s.MarkerFill.hide:
                 # filling for markers

@@ -516,7 +516,6 @@ class IntOrAuto(Setting):
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
 
-
 # these are functions used by the distance setting below.
 # they don't work as class methods
 
@@ -533,19 +532,18 @@ def _distPhys(match, painter, mult):
     if not hasattr(painter, 'veusz_pixperpt'):
         _calcPixPerPt(painter)
 
-    return int( math.ceil(painter.veusz_pixperpt * mult *
-                          float(match.group(1)) * painter.veusz_scaling ) )
+    return (painter.veusz_pixperpt * mult *
+            float(match.group(1)) * painter.veusz_scaling)
 
 def _distPerc(match, painter, maxsize):
     """Convert from a percentage of maxsize."""
 
-    return int( math.ceil(maxsize * 0.01 * float(match.group(1))) )
+    return maxsize * 0.01 * float(match.group(1))
 
 def _distFrac(match, painter, maxsize):
     """Convert from a fraction a/b of maxsize."""
 
-    return int( math.ceil(maxsize * float(match.group(1)) /
-                          float(match.group(2))) )
+    return maxsize * float(match.group(1)) / float(match.group(2))
 
 def _distRatio(match, painter, maxsize):
     """Convert from a simple 0.xx ratio of maxsize."""
@@ -554,44 +552,44 @@ def _distRatio(match, painter, maxsize):
     if float(match.group(1)) > 1.:
         return _distPhys(match, painter, 1)
 
-    return int( math.ceil(maxsize * float(match.group(1))) )
-
-# mappings from regular expressions to function to convert distance
-# the recipient function takes regexp match,
-# painter and maximum size of frac
-_distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
-                  _distPerc ),
-                ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
-                  _distFrac ),
-                ( re.compile('^([0-9\.]+) *pt$'),
-                  lambda match, painter, t:
-                  _distPhys(match, painter, 1.) ),
-                ( re.compile('^([0-9\.]+) *cm$'),
-                  lambda match, painter, t:
-                  _distPhys(match, painter, 28.452756) ),
-                ( re.compile('^([0-9\.]+) *mm$'),
-                  lambda match, painter, t:
-                  _distPhys(match, painter, 2.8452756) ),
-                ( re.compile('^([0-9\.]+) *(inch|in|")$'),
-                  lambda match, painter, t:
-                  _distPhys(match, painter, 72.27) ),
-                ( re.compile('^([0-9\.]+)$'),
-                  _distRatio )
-                ]
+    return maxsize * float(match.group(1))
 
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
 
-    def isDist(dist):
+    # mappings from regular expressions to function to convert distance
+    # the recipient function takes regexp match,
+    # painter and maximum size of frac
+    distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
+                     _distPerc ),
+                   ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
+                     _distFrac ),
+                   ( re.compile('^([0-9\.]+) *pt$'),
+                    lambda match, painter, t:
+                     _distPhys(match, painter, 1.) ),
+                   ( re.compile('^([0-9\.]+) *cm$'),
+                     lambda match, painter, t:
+                            _distPhys(match, painter, 28.452756) ),
+                   ( re.compile('^([0-9\.]+) *mm$'),
+                     lambda match, painter, t:
+                        _distPhys(match, painter, 2.8452756) ),
+                   ( re.compile('^([0-9\.]+) *(inch|in|")$'),
+                        lambda match, painter, t:
+                    _distPhys(match, painter, 72.27) ),
+                   ( re.compile('^([0-9\.]+)$'),
+                    _distRatio )
+                   ]
+    
+    def isDist(kls, dist):
         """Is the text a valid distance measure?"""
         
         dist = dist.strip()
-        for reg, fn in _distregexp:
+        for reg, fn in kls.distregexp:
             if reg.match(dist):
                 return True
             
         return False
-    isDist = staticmethod(isDist)
+    isDist = classmethod(isDist)
 
     def convertTo(self, val):
         if self.isDist(val):
@@ -611,7 +609,7 @@ class Distance(Setting):
     def makeControl(self, *args):
         return controls.Distance(self, *args)
 
-    def convertDistance(painter, distance):
+    def convertDistance(kls, painter, distance):
         '''Convert a distance to plotter units.
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
@@ -634,7 +632,7 @@ class Distance(Setting):
         dist = distance.strip()
 
         # compare string against each regexp
-        for reg, fn in _distregexp:
+        for reg, fn in kls.distregexp:
             m = reg.match(dist)
 
             # if there's a match, then call the appropriate conversion fn
@@ -645,7 +643,7 @@ class Distance(Setting):
         raise ValueError( "Cannot convert distance in form '%s'" %
                           dist )
 
-    convertDistance = staticmethod(convertDistance)
+    convertDistance = classmethod(convertDistance)
 
     def convert(self, painter):
         """Convert this setting's distance as above"""
@@ -659,6 +657,17 @@ class Distance(Setting):
 
         return self.convert(painter) / painter.veusz_pixperpt
         
+class DistanceOrAuto(Distance):
+    """A distance or the value Auto"""
+
+    distregexp = Distance.distregexp + [ (re.compile('^Auto$'), None) ]
+    
+    def isAuto(self):
+        return self.val == 'Auto'
+
+    def makeControl(self, *args):
+        return controls.Distance(self, allowauto=True, *args)
+
 class Choice(Setting):
     """One out of a list of strings."""
 

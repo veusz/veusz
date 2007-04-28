@@ -71,7 +71,7 @@ class Root(widget.Widget):
 
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
-        painter.setClipRect( qt4.QRect(x1, y1, x2-x1+1, y2-y1+1) )
+        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1+1, y2-y1+1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
                                     outerbounds = parentposn)
         painter.restore()

@@ -280,7 +280,7 @@ class Widget(object):
         px1, py1, px2, py2 = self.position
         x1, y1, x2, y2 = ( x1+dx*px1, y1+dy*py1, x1+dx*px2, y1+dy*py2 )
         dx1, dy1, dx2, dy2 = margins
-        return [ int(x1+dx1), int(y1+dy1), int(x2-dx2), int(y2-dy2) ]
+        return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).

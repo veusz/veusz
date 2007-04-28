@@ -415,9 +415,10 @@ class Distance(Choice):
     # remove spaces
     stripspcre = re.compile(r"\s")
 
-    def __init__(self, setting, parent):
+    def __init__(self, setting, parent, allowauto=False):
         '''Initialise with blank list, then populate with sensible units.'''
         Choice.__init__(self, setting, True, [], parent)
+        self.allowauto = allowauto
         self.updateComboList()
         
     def updateComboList(self):
@@ -436,6 +437,9 @@ class Distance(Choice):
         # between. should this be in utils?
         newitems = [ num+'pt', num+'cm', num+'mm',
                      num+'in', num+'%', '1/'+num ]
+
+        if self.allowauto:
+            newitems.insert(0, 'Auto')
 
         # if we're already in this list, we position the current selection
         # to the correct item (up and down keys work properly then)

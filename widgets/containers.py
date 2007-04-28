@@ -192,19 +192,23 @@ class Grid(widget.Widget):
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
                                  'Distance from left of grid to '
                                  'edge of page',
-                                 usertext='Left margin') )
+                                 usertext='Left margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
                                  'Distance from right of grid to '
                                  'edge of page',
-                                 usertext='Right margin') )
+                                 usertext='Right margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'topMargin', '0.1cm', descr=
                                  'Distance from top of grid to '
                                  'edge of page',
-                                 usertext='Top margin') )
+                                 usertext='Top margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
                                  'Distance from bottom of grid'
                                  'to edge of page',
-                                 usertext='Bottom margin') )
+                                 usertext='Bottom margin',
+                                 formatting=True) )
 
         # we're not descended from
         if type(self) == Grid:

@@ -20,6 +20,7 @@
 
 # $Id$
 
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
@@ -130,11 +131,10 @@ class Key(widget.Widget):
         elif h == 'right':
             x = parentposn[2] - height - totalwidth
         elif h == 'centre':
-            x = (parentposn[0] +
-                 (parentposn[2] - parentposn[0])/2 - totalwidth/2)
+            x = ( parentposn[0] +
+                  (parentposn[2] - 0.5*parentposn[0]) - 0.5*totalwidth )
         elif h == 'manual':
-            x = int( parentposn[0] +
-                     (parentposn[2]-parentposn[0])*s.horzManual )
+            x = parentposn[0] + (parentposn[2]-parentposn[0])*s.horzManual
 
         # work out vertical position
         v = s.vertPosn
@@ -148,10 +148,10 @@ class Key(widget.Widget):
                 y -= height
         elif v == 'centre':
             y = (parentposn[1] +
-                 (parentposn[3] - parentposn[1])/2 - totalheight/2)
+                 0.5*(parentposn[3] - parentposn[1]) - 0.5*totalheight)
         elif v == 'manual':
-            y = int( parentposn[3] -
-                     (parentposn[3]-parentposn[1])*s.vertManual - totalheight)
+            y = ( parentposn[3] -
+                  (parentposn[3]-parentposn[1])*s.vertManual - totalheight )
 
         # position of text in x
         symbxpos = x
@@ -159,10 +159,10 @@ class Key(widget.Widget):
         # draw surrounding box
         if not s.Background.hide:
             brush = s.get('Background').makeQBrush()
-            painter.fillRect(x, y, totalwidth, totalheight, brush)
+            painter.fillRect( qt4.QRectF(x, y, totalwidth, totalheight), brush)
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.drawRect(x, y, totalwidth, totalheight)
+            painter.drawRect( qt4.QRectF(x, y, totalwidth, totalheight) )
             symbxpos += height
 
         textpen = s.get('Text').makeQPen()
