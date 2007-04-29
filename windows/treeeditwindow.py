@@ -734,7 +734,6 @@ class TreeEditDock(qt4.QDockWidget):
         if mimedata:
             clipboard = qt4.QApplication.clipboard()
             clipboard.setMimeData(mimedata)
-            #clipboard.setText(mimedata)
 
     def _makeMimeData(self, widget):
         """Make a QMimeData object representing the subtree with the
@@ -746,10 +745,8 @@ class TreeEditDock(qt4.QDockWidget):
                                   widget.name,
                                   widget.getSaveText())))
             self.mimedata = qt4.QByteArray(text)
-            mimedata.setData('text/plain', self.mimedata)
-            #mimedata.setText(text)
+            mimedata.setData(self.widgetmime, self.mimedata)
             return mimedata
-            #return text
         else:
             return None
 
@@ -778,7 +775,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         self.editactions['paste'].setEnabled(show)
 
-    def slotWidgetPaste(self, a):
+    def slotWidgetPaste(self):
         """Paste something from the clipboard"""
 
         data = self.getClipboardData()
