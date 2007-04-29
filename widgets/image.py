@@ -130,6 +130,13 @@ class Image(plotters.GenericPlotter):
                             usertext='Invert colormap',
                             formatting=True),
                5 )
+        s.add( setting.Int( 'transparency', 0,
+                            descr = 'Transparency percentage',
+                            usertext = 'Transparency',
+                            minval = 0,
+                            maxval = 100,
+                            formatting=True),
+               6 )
 
         self.lastcolormap = None
         self.lastdataset = None
@@ -196,13 +203,15 @@ class Image(plotters.GenericPlotter):
 
     readColorMaps = classmethod(readColorMaps)
 
-    def applyColorMap(self, cmap, scaling, datain, minval, maxval):
+    def applyColorMap(self, cmap, scaling, datain, minval, maxval,
+                      transparency):
         """Apply a colour map to the 2d data given.
 
         cmap is the color map (numpy of BGRalpha quads)
         scaling is scaling mode => 'linear', 'sqrt', 'log' or 'squared'
         data are the imaging data
         minval and maxval are the extremes of the data for the colormap
+        transparency is a number from 0 to 100
         Returns a QImage
         """
 
@@ -210,6 +219,11 @@ class Image(plotters.GenericPlotter):
         if minval > maxval:
             minval, maxval = maxval, minval
             cmap = cmap[::-1]
+
+        # apply transparency
+        if transparency != 0:
+            cmap = cmap.copy()
+            cmap[:,3] = (cmap[:,3].astype('float32') * (100-transparency) / 100.).astype('uint8')
         
         # apply scaling of data
         fracs = applyScaling(datain, scaling, minval, maxval)
@@ -234,8 +248,12 @@ class Image(plotters.GenericPlotter):
         # convert 32bit quads to a Qt QImage
         # FIXME: Does this assume C-style array layout??
         s = quads.tostring()
-        img = qt4.QImage(s, datain.shape[1], datain.shape[0],
-                         qt4.QImage.Format_RGB32)
+
+        fmt = qt4.QImage.Format_RGB32
+        if transparency != 0:
+            fmt = qt4.QImage.Format_ARGB32
+        
+        img = qt4.QImage(s, datain.shape[1], datain.shape[0], fmt)
         img = img.mirrored()
 
         # hack to ensure string isn't freed before QImage
@@ -269,7 +287,7 @@ class Image(plotters.GenericPlotter):
 
         self.image = self.applyColorMap(cmap, s.colorScaling,
                                         data.data,
-                                        minval, maxval)
+                                        minval, maxval, s.transparency)
 
     def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""
@@ -393,7 +411,7 @@ class Image(plotters.GenericPlotter):
             cmap = cmap[::-1]
 
         img = self.applyColorMap(cmap, colorscaling, vals,
-                                 minval, maxval)
+                                 minval, maxval, s.transparency)
 
         return (minval, maxval, coloraxisscale, img)
 
@@ -520,7 +538,7 @@ class ColormapControl(setting.controls.Choice):
         for cmap in Image.colormapnames:
             image = Image.applyColorMap(Image.colormaps[cmap], 'linear',
                                         fakedataset,
-                                        0., size[0]-1.)
+                                        0., size[0]-1., 0)
             pixmap = qt4.QPixmap.fromImage(image)
             cls._icons.append( qt4.QIcon(pixmap) )
         
