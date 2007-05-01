@@ -766,17 +766,17 @@ class PointPlotter(GenericPlotter):
             xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
             yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
 
-            #print "Painting plot line"
-            # plot data line (and/or filling above or below)
-            if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                self._drawPlotLine( painter, xplotter, yplotter, posn )
-
             #print "Painting error bars"
             # plot errors bars
             if not s.ErrorBarLine.hide:
                 painter.setPen( s.ErrorBarLine.makeQPen(painter) )
                 self._plotErrors(posn, painter, xplotter, yplotter,
                                  axes, xvals, yvals)
+
+            #print "Painting plot line"
+            # plot data line (and/or filling above or below)
+            if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
+                self._drawPlotLine( painter, xplotter, yplotter, posn )
 
             # plot the points (we do this last so they are on top)
             if not s.MarkerLine.hide or not s.MarkerFill.hide:
