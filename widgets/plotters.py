@@ -589,7 +589,7 @@ class PointPlotter(GenericPlotter):
             for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                  yvals[:-1], yvals[1:]):
                 pts.append(qt4.QPointF(x1, y1))
-                pts.append(qt4.QPointF(x2, y2))
+                pts.append(qt4.QPointF(x1, y2))
                 pts.append(qt4.QPointF(x2, y2))
             
         # stepped line, with points in centre
