@@ -589,6 +589,7 @@ class DatasetExpression(Dataset):
 
         self.document = None
         self.linked = None
+        self._invalidpoints = None
 
         # store the expressions to use to generate the dataset
         self.expr = {}
