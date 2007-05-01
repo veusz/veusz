@@ -385,6 +385,7 @@ class Dataset(DatasetBase):
         '''
         
         self.document = None
+        self._invalidpoints = None
         self.data = _convertNumpy(data)
         self.serr = _convertNumpy(serr)
         self.perr = _convertNumpy(perr)
@@ -423,6 +424,17 @@ class Dataset(DatasetBase):
         
         return Dataset(**attrs)
 
+    def invalidDataPoints(self):
+        """Return a numarray bool detailing which datapoints are invalid."""
+        if self._invalidpoints is None:
+            # recalculate valid points
+            self._invalidpoints = N.logical_not(N.isfinite(self.data))
+            for error in self.serr, self.perr, self.nerr:
+                if error is not None:
+                    self._invalidpoints = N.logical_or(self._invalidpoints,
+                                                       N.logical_not(N.isfinite(error)))
+        return self._invalidpoints
+    
     def hasErrors(self):
         '''Whether errors on dataset'''
         return (self.serr is not None or self.nerr is not None or

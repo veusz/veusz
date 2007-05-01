@@ -424,12 +424,10 @@ class PointPlotter(GenericPlotter):
     userdescription = property(_getUserDescription)
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
-                    axes):
+                    axes, xdata, ydata):
         """Plot error bars (horizontal and vertical)."""
 
-        # get the data
         s = self.settings
-        xdata = self.document.getData(s.xData)
 
         # distances for clipping - we make them larger than the
         # real width, to help get gradients and so on correct
@@ -453,8 +451,6 @@ class PointPlotter(GenericPlotter):
             xmin = xmax = None
 
         # draw vertical error bars
-        # get data
-        ydata = self.document.getData(s.yData)
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
 
@@ -678,6 +674,49 @@ class PointPlotter(GenericPlotter):
                 
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
+    def chopInvalid(self, *datasets):
+        """Chop datasets into bits according to whether numbers are finite."""
+
+        attrs = ('data', 'serr', 'perr', 'nerr')
+
+        # find NaNs and INFs in input dataset
+        invalid = datasets[0].invalidDataPoints()
+        for d in datasets[1:]:
+            invalid = d.invalidDataPoints()
+            if invalid.shape == invalid.shape:
+                invalid = N.logical_or(invalid, invalid)
+
+        # get indexes of invalid pounts
+        indexes = invalid.nonzero()[0].tolist()
+
+        # append last array index not to lose data
+        # chop to shortest dataset to ensure equal length
+        indexes.append( min([ds.data.shape[0] for ds in datasets]) )
+
+        # iterate over datasets
+        # chop each dataset according to where the invalid points occur within
+        # the datasets
+        outdss = []  # output datasets
+        for inds in datasets:
+            outds = []
+            lastindex = 0
+            for idx in indexes:
+                # skip consecutive NaNs or INFs
+                if idx != lastindex:
+                    # build up parameters for dataset
+                    vals = {}
+                    for attr in attrs:
+                        data = getattr(inds, attr)
+                        if data is not None:
+                            vals[attr] = data[lastindex:idx]
+
+                    outds.append( document.Dataset(**vals) )
+                lastindex = idx+1
+
+            outdss.append(outds)
+
+        return outdss
+
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
 
@@ -704,11 +743,11 @@ class PointPlotter(GenericPlotter):
              axes[1].settings.direction != 'vertical' ):
             return
 
-        xvals = d.getData(s.xData)
-        yvals = d.getData(s.yData)
+        xv = d.getData(s.xData)
+        yv = d.getData(s.yData)
 
         # no points to plot
-        if xvals.empty() or yvals.empty():
+        if xv.empty() or yv.empty():
             return
 
         # clip data within bounds of plotter
@@ -716,40 +755,51 @@ class PointPlotter(GenericPlotter):
         painter.save()
         self.clipAxesBounds(painter, axes, posn)
 
-        # calc plotter coords of x and y points
-        xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
-        yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
+        # chop up values according to where there are NaNs
+        xvlist, yvlist= self.chopInvalid(xv, yv)
 
-        # plot data line (and/or filling above or below)
-        if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-            self._drawPlotLine( painter, xplotter, yplotter, posn )
+        # loop over chopped up values
+        for xvals, yvals in itertools.izip(xvlist, yvlist):
 
-        # plot errors bars
-        if not s.ErrorBarLine.hide:
-            painter.setPen( s.ErrorBarLine.makeQPen(painter) )
-            self._plotErrors(posn, painter, xplotter, yplotter,
-                             axes)
+            #print "Calculating coordinates"
+            # calc plotter coords of x and y points
+            xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
+            yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
 
-        # plot the points (we do this last so they are on top)
-        if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            size = s.get('markerSize').convert(painter)
+            #print "Painting plot line"
+            # plot data line (and/or filling above or below)
+            if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
+                self._drawPlotLine( painter, xplotter, yplotter, posn )
 
-            if not s.MarkerFill.hide:
-                # filling for markers
-                painter.setBrush( s.MarkerFill.makeQBrush() )
-            else:
-                # no-filling brush
-                painter.setBrush( qt4.QBrush() )
+            #print "Painting error bars"
+            # plot errors bars
+            if not s.ErrorBarLine.hide:
+                painter.setPen( s.ErrorBarLine.makeQPen(painter) )
+                self._plotErrors(posn, painter, xplotter, yplotter,
+                                 axes, xvals, yvals)
 
-            if not s.MarkerLine.hide:
-                # edges of markers
-                painter.setPen( s.MarkerLine.makeQPen(painter) )
-            else:
-                # invisible pen
-                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                
-            utils.plotMarkers(painter, xplotter, yplotter, s.marker,
-                              size)
+            # plot the points (we do this last so they are on top)
+            if not s.MarkerLine.hide or not s.MarkerFill.hide:
+                size = s.get('markerSize').convert(painter)
+
+                #print "Painting marker fill"
+                if not s.MarkerFill.hide:
+                    # filling for markers
+                    painter.setBrush( s.MarkerFill.makeQBrush() )
+                else:
+                    # no-filling brush
+                    painter.setBrush( qt4.QBrush() )
+
+                #print "Painting marker lines"
+                if not s.MarkerLine.hide:
+                    # edges of markers
+                    painter.setPen( s.MarkerLine.makeQPen(painter) )
+                else:
+                    # invisible pen
+                    painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+
+                utils.plotMarkers(painter, xplotter, yplotter, s.marker,
+                                  size)
 
         painter.restore()
         painter.endPaintingWidget()
