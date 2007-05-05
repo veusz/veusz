@@ -328,7 +328,7 @@ class MainWindow(qt4.QMainWindow):
             return f
 
         # set whether windows are visible and connect up to toggle windows
-        self._winfns = []
+        self.viewwinfns = []
         for win, act in ((self.treeedit, 'viewedit'),
                          (self.propdock, 'viewprops'),
                          (self.formatdock, 'viewformat'),
@@ -339,10 +339,20 @@ class MainWindow(qt4.QMainWindow):
 
             a = self.actions[act]
             a.setCheckable(True)
-            a.setChecked(not win.isHidden())
-            f = viewHideWindow(win)
-            self._winfns.append(f)
-            self.connect(a, qt4.SIGNAL('triggered()'), f)
+            fn = viewHideWindow(win)
+            self.viewwinfns.append( (win, a, fn) )
+            self.connect(a, qt4.SIGNAL('triggered()'), fn)
+
+        # needs to update state every time menu is shown
+        self.connect(self.menus['view.viewwindows'],
+                     qt4.SIGNAL('aboutToShow()'),
+                     self.slotAboutToShowViewWindow)
+
+    def slotAboutToShowViewWindow(self):
+        """Enable/disable View->Window item check boxes."""
+
+        for win, act, fn in self.viewwinfns:
+            act.setChecked(not win.isHidden())
 
     def slotDataImport(self):
         """Display the import data dialog."""
