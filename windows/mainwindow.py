@@ -434,11 +434,18 @@ class MainWindow(qt4.QMainWindow):
     def showEvent(self, evt):
         """Restoring window geometry if possible."""
 
+        # count number of main windows shown
+        nummain = 0
+        for w in qt4.qApp.topLevelWidgets():
+            if isinstance(w, qt4.QMainWindow):
+                nummain += 1
+
         # if we can restore the geometry, do so
         if 'geometry_mainwindow' in setting.settingdb:
             geometry = setting.settingdb['geometry_mainwindow']
             self.resize( qt4.QSize(geometry[2], geometry[3]) )
-            self.move( qt4.QPoint(geometry[0], geometry[1]) )
+            if nummain == 1:
+                self.move( qt4.QPoint(geometry[0], geometry[1]) )
 
         # restore docked window geometry
         if 'geometry_mainwindowstate' in setting.settingdb:
