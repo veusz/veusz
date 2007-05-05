@@ -101,9 +101,6 @@ class MainWindow(qt4.QMainWindow):
         self.interpreter = self.console.interpreter
         self.addDockWidget(qt4.Qt.BottomDockWidgetArea, self.console)
 
-        # no dock menu, so we can popup context menus
-        #self.setDockMenuEnabled(False)
-
         # keep page number up to date
         statusbar = self.statusbar = qt4.QStatusBar(self)
         self.setStatusBar(statusbar)
@@ -132,41 +129,18 @@ class MainWindow(qt4.QMainWindow):
         self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
                       self.treeedit.selectWidget )
 
-        # put the dock windows on the view menu, so they can be shown/hidden
-        #self._defineDockViewMenu()
-
         # enable/disable undo/redo
         self.connect(self.menus['edit'], qt4.SIGNAL('aboutToShow()'),
                      self.slotAboutToShowEdit)
 
         #Get the list of recently opened files
         self.populateRecentFiles()
+        self.setupWindowGeometry()
+        self.defineViewWindowMenu()
 
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().showMessage(text, 2000)
-
-    def _defineDockViewMenu(self):
-        """Put the dock windows on the view menu."""
-
-        view = self.menus['view']
-        # FIXMEQT4
-        # view.setCheckable(True)
-        view.insertSeparator(0)
-        self.viewdockmenuitems = {}
-
-        for win in self.dockWindows():
-            # get name with veusz removed
-            # FIXME with something better here
-            text = win.caption()
-            text.replace(' - Veusz', '')
-
-            item = view.insertItem(text, -1, 0)
-            view.connectItem(item, self.slotViewDockWindow)
-            self.viewdockmenuitems[item] = win
-
-        self.connect(view, qt4.SIGNAL('aboutToShow()'),
-                     self.slotAboutToShowView)
 
     def dragEnterEvent(self, event):
         """Check whether event is valid to be dropped."""
@@ -199,14 +173,6 @@ class MainWindow(qt4.QMainWindow):
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
 
-    def slotAboutToShowView(self):
-        """Put check marks against dock menu items if appropriate."""
-
-        view = self.menus['view']
-        for item, win in self.viewdockmenuitems.items():
-            view.setItemChecked(item, win.isVisible())
-            view.setItemParameter(item, item)
-        
     def slotAboutToShowEdit(self):
         """Enable/disable undo/redo menu items."""
         
@@ -240,15 +206,6 @@ class MainWindow(qt4.QMainWindow):
         dialog = PreferencesDialog(self)
         dialog.exec_()
         
-    def slotViewDockWindow(self, item):
-        """Show or hide dock windows as selected."""
-
-        win = self.viewdockmenuitems[item]
-        if win.isVisible():
-            win.hide()
-        else:
-            win.show()
-
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
 
@@ -317,6 +274,25 @@ class MainWindow(qt4.QMainWindow):
             ('editprefs', 'Edit preferences', 'Preferences...', 'edit',
              self.slotEditPreferences, '', False, ''),
             ('edit', ),
+
+            ('viewwindows', 'Show or hide windows or toolbars',
+             'Windows', 'view', [], '', False, ''),
+            ('viewedit', 'Show or hide edit window', 'Edit window',
+             'view.viewwindows', None, '', False, ''),
+            ('viewprops', 'Show or hide property window', 'Properties window',
+             'view.viewwindows', None, '', False, ''),
+            ('viewformat', 'Show or hide formatting window', 'Formatting window',
+             'view.viewwindows', None, '', False, ''),
+            ('viewconsole', 'Show or hide console window', 'Console window',
+             'view.viewwindows', None, '', False, ''),
+            ('view.viewwindows', ),
+            ('viewmaintool', 'Show or hide main toolbar', 'Main toolbar',
+             'view.viewwindows', None, '', False, ''),
+            ('viewviewtool', 'Show or hide view toolbar', 'View toolbar',
+             'view.viewwindows', None, '', False, ''),
+            ('viewedittool', 'Show or hide editing toolbar', 'Editing toolbar',
+             'view.viewwindows', None, '', False, ''),
+            ('view', ),
             
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
              self.slotDataImport, 'stock-import.png', False, ''),
@@ -341,7 +317,32 @@ class MainWindow(qt4.QMainWindow):
             
         self.actions = action.populateMenuToolbars(items, self.maintoolbar,
                                                    self.menus)
-                                                   
+    def defineViewWindowMenu(self):
+        """Setup View -> Window menu."""
+
+        def viewHideWindow(window):
+            """Toggle window visibility."""
+            w = window
+            def f():
+                w.setVisible(not w.isVisible())
+            return f
+
+        # set whether windows are visible and connect up to toggle windows
+        self._winfns = []
+        for win, act in ((self.treeedit, 'viewedit'),
+                         (self.propdock, 'viewprops'),
+                         (self.formatdock, 'viewformat'),
+                         (self.console, 'viewconsole'),
+                         (self.maintoolbar, 'viewmaintool'),
+                         (self.treeedit.toolbar, 'viewedittool'),
+                         (self.plot.viewtoolbar, 'viewviewtool')):
+
+            a = self.actions[act]
+            a.setCheckable(True)
+            a.setChecked(not win.isHidden())
+            f = viewHideWindow(win)
+            self._winfns.append(f)
+            self.connect(a, qt4.SIGNAL('triggered()'), f)
 
     def slotDataImport(self):
         """Display the import data dialog."""
@@ -431,7 +432,7 @@ class MainWindow(qt4.QMainWindow):
 
         event.accept()
 
-    def showEvent(self, evt):
+    def setupWindowGeometry(self):
         """Restoring window geometry if possible."""
 
         # count number of main windows shown
@@ -444,15 +445,13 @@ class MainWindow(qt4.QMainWindow):
         if 'geometry_mainwindow' in setting.settingdb:
             geometry = setting.settingdb['geometry_mainwindow']
             self.resize( qt4.QSize(geometry[2], geometry[3]) )
-            if nummain == 1:
+            if nummain <= 1:
                 self.move( qt4.QPoint(geometry[0], geometry[1]) )
 
         # restore docked window geometry
         if 'geometry_mainwindowstate' in setting.settingdb:
             b = qt4.QByteArray(setting.settingdb['geometry_mainwindowstate'])
             self.restoreState(b)
-
-        qt4.QMainWindow.showEvent(self, evt)
 
     def slotFileNew(self):
         """New file."""
@@ -577,7 +576,6 @@ class MainWindow(qt4.QMainWindow):
         else:
             # create a new window
             self.CreateWindow(filename)
-
 
     def openFileInWindow(self, filename):
         '''Open the given filename in the current window.'''
