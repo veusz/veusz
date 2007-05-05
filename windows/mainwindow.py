@@ -704,11 +704,18 @@ class MainWindow(qt4.QMainWindow):
             validextns += extns
 
         fd.setFilters(filters)
+        # restore last format if possible
+        try:
+            filt = setting.settingdb['export_lastformat']
+            fd.selectFilter(filt)
+            extn = formats[filters.index(filt)][0][0]
+        except KeyError:
+            extn = 'eps'
 
         if self.filename:
             # try to convert current filename to export name
             filename = os.path.basename(self.filename)
-            filename = os.path.splitext(filename)[0] + '.eps'
+            filename = os.path.splitext(filename)[0] + '.' + extn
             fd.selectFile(filename)
         
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -716,6 +723,8 @@ class MainWindow(qt4.QMainWindow):
             self.exportDir = unicode(fd.directory().absolutePath())
 
             filterused = str(fd.selectedFilter())
+            setting.settingdb['export_lastformat'] = filterused
+
             chosenextns = filtertoext[filterused]
             
             # show busy cursor
