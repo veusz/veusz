@@ -569,7 +569,7 @@ class TreeEditDock(qt4.QDockWidget):
             m.addAction(self.editactions[act])
 
         # allow show or hides of selected widget
-        if 'hide' in self.selwidget.settings:
+        if self.selwidget and 'hide' in self.selwidget.settings:
             m.addSeparator()
             hide = self.selwidget.settings.hide
             act = qt4.QAction( ('Hide object', 'Show object')[hide], m )
