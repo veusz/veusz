@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog" >
   <property name="geometry" >
@@ -9,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>567</width>
-    <height>464</height>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -245,6 +242,9 @@
         <property name="text" >
          <string>&amp;Link this dataset to these expressions</string>
         </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -296,7 +296,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <tabstops>
   <tabstop>nameedit</tabstop>
   <tabstop>valueradio</tabstop>
