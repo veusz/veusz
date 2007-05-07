@@ -503,7 +503,10 @@ class TreeEditDock(qt4.QDockWidget):
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
-        self.treeview.expandAll()
+        try:
+            self.treeview.expandAll()
+        except AttributeError: # only in Qt-4.2
+            pass
 
         # make 1st column stretch
         hdr = self.treeview.header()
