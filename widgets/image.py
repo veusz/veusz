@@ -250,7 +250,7 @@ class Image(plotters.GenericPlotter):
         s = quads.tostring()
 
         fmt = qt4.QImage.Format_RGB32
-        if transparency != 0:
+        if N.any(cmap[:,3] != 255): # any transparency
             fmt = qt4.QImage.Format_ARGB32
         
         img = qt4.QImage(s, datain.shape[1], datain.shape[0], fmt)
