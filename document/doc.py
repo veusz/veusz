@@ -406,8 +406,16 @@ class Document( qt4.QObject ):
 
         # set printer parameters
         p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
+
         if ext == '.pdf':
-            p.setOutputFormat(qt4.QPrinter.PdfFormat)
+            f = qt4.QPrinter.PdfFormat
+        else:
+            try:
+                f = qt4.QPrinter.PostScriptFormat
+            except AttributeError:
+                # < qt4.2 bah
+                f = qt4.QPrinter.NativeFormat
+        p.setOutputFormat(f)
         p.setOutputFileName(filename)
         p.setCreator('Veusz %s' % utils.version())
 
