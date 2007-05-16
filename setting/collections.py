@@ -72,10 +72,15 @@ class Line(Settings):
 
         color = qt4.QColor(self.color)
         color.setAlphaF( (100-self.transparency) / 100.)
-        return qt4.QPen( color,
-                         self.get('width').convert(painter),
-                         self.get('style').qtStyle() )
-    
+        width = self.get('width').convert(painter)
+        style, dashpattern = setting.LineStyle._linecnvt[self.style]
+        pen = qt4.QPen( color, width, style )
+
+        if dashpattern:
+            pen.setDashPattern(dashpattern)
+
+        return pen
+        
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
     to be plotted.'''

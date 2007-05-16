@@ -584,16 +584,25 @@ class LineStyle(Choice):
 
     def _generateIcons(cls):
         """Generate a list of icons for drop down menu."""
+
+        # import later for dependency issues
+        import veusz.setting.collections
+
         icons = []
         size = cls.size
-        c = qt4.QColor('black')
-        for l in cls._lines:
+        setn = veusz.setting.collections.Line('temp')
+        setn.get('color').set('black')
+        setn.get('width').set('1pt')
+        
+        for lstyle in cls._lines:
             pix = qt4.QPixmap(*size)
             pix.fill()
             painter = qt4.QPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
-            pen = qt4.QPen(c, 1, cls._linecnvt[l])
-            painter.setPen(pen)
+
+            setn.get('style').set(lstyle)
+            
+            painter.setPen( setn.makeQPen(painter) )
             painter.drawLine( int(size[0]*0.1), size[1]/2,
                               int(size[0]*0.9), size[1]/2 )
             painter.end()

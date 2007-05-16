@@ -992,15 +992,19 @@ class FillStyle(Choice):
 class LineStyle(Choice):
     """A setting choosing a particular line style."""
 
+    # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
-                   'dash-dot', 'dash-dot-dot' ]
+                   'dash-dot', 'dash-dot-dot', 'dotted-fine' ]
 
-    _linecnvt = { 'solid': qt4.Qt.SolidLine, 'dashed': qt4.Qt.DashLine,
-                  'dotted': qt4.Qt.DotLine, 'dash-dot': qt4.Qt.DashDotLine,
-                  'dash-dot-dot': qt4.Qt.DashDotDotLine }
+    # convert from line styles to Qt constants and a custom pattern (if any)
+    _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
+                  'dashed': (qt4.Qt.DashLine, None),
+                  'dotted': (qt4.Qt.DotLine, None),
+                  'dash-dot': (qt4.Qt.DashDotLine, None),
+                  'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
+                  'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]) }
     
     controls.LineStyle._lines = _linestyles
-    controls.LineStyle._linecnvt = _linecnvt
     
     def __init__(self, name, default, **args):
         Choice.__init__(self, name, self._linestyles, default, **args)
