@@ -29,6 +29,7 @@ Changes from 0.10:
   * Native PNG and PDF export
   * Separate formatting/properties dialog
   * Handling of INF/NaN in input data
+  * Transparency of graphs (not for EPS output)
  Plus many more useful changes (see ChangeLog)
 
 Features of package:
@@ -72,7 +73,7 @@ Issues:
  * Can be very slow to plot large datasets if antialiasing is enabled.
    Right click on graph and disable antialias to speed up output.
  * Some older versions of Qt (<4.2.2) can produce very large postscript
-   output and random crashes.
+   output and random crashes. This may not be completely resolved.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
 the mailing lists at
