@@ -21,11 +21,13 @@ if sys.platform == 'win32':
     upx = True
 else:
     # unix
-    name = 'buildveusz_main/veusz'
+    name = 'buildveusz_pyinst/veusz'
     thisdir = '/home/jss/veusz.qt4'
     console = 1
     aargs = {}
     upx = False
+
+print name
 
 a = Analysis([os.path.join(HOMEPATH,'support/_mountzlib.py'),
               os.path.join(HOMEPATH,'support/useUnicode.py'), 'veusz_main.py'],
@@ -35,11 +37,11 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=1,
-          name=name
+          name=name,
           debug=False,
           strip=True,
           upx=upx,
-          console=console, **args)
+          console=console, **aargs)
 
 # add necessary documentation, licence
 binaries = a.binaries
