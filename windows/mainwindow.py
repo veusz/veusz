@@ -55,7 +55,6 @@ class MainWindow(qt4.QMainWindow):
         win.show()
         if filename:
             win.openFileInWindow(filename)
-            pass
         cls.windows.append(win)
         return win
 
