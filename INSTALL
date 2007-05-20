@@ -1,33 +1,43 @@
 Veusz Installation
 ==================
 
-Veusz now uses distutils for its installation. See below for how to use
-it. Note that the main veusz executable has changed from veusz.py
-to veusz_main.py
+Veusz uses distutils for its installation. See below for how to use
+it.
 
 Requirements:
  python 2.3      http://www.python.org/
- PyQt            http://www.riverbankcomputing.co.uk/pyqt/
- Numarray        http://www.stsci.edu/resources/software_hardware/numarray
+ PyQt >= 4.1     http://www.riverbankcomputing.co.uk/pyqt/ (4.2 recommended)
+ numpy >= 1.0    http://numpy.scipy.org/
 
-(PyQt requres
- QT              http://www.trolltech.com/products/qt/
+(PyQt requires
+ QT4             http://www.trolltech.com/products/qt/ (free version)
  SIP             http://www.riverbankcomputing.co.uk/sip/   )
 
 Optional requirements:
- PyFITS>=0.9.8.2 http://www.stsci.edu/resources/software_hardware/pyfits
+ PyFITS>=1.1rc3  http://www.stsci.edu/resources/software_hardware/pyfits
 
  Veusz works much better with Microsoft's corefonts installed (or other good
  TrueType fonts). 
   see            http://corefonts.sourceforge.net/
 
-Simple use
-==========
+Linux binary
+============
+If you do not have the requirements, you can use the Linux binary
+instead. Note that this is not guaranteed to work due to glibc/library
+incompatibilities. You need to simply unpack the tar file and run the
+main executable:
+
+# tar xzf veusz-linux-i386-0.99.0.tar.gz     [change version here]
+# cd veusz-linux-i386-0.99.0
+# ./veusz
+
+Simple source use (if requirements installed)
+=============================================
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-0.10.tar.gz     [change version here]
-# cd veusz-0.10
+# tar xzf veusz-0.99.0.tar.gz                [change version here]
+# cd veusz-0.99.0
 # ./veusz_main.py
 
 However certain features (currently contours) require C modules to be
@@ -39,6 +49,8 @@ this without installing by doing:
 
 Installing/upgrading from rpm
 =============================
+(FIXME: no RPMS available yet for new beta)
+
 For rpm based distributions, download the rpm for your distribution
 (if it is available), and install as root:
 # rpm -Uvh veusz-0.10-1.i386.rpm
@@ -58,9 +70,21 @@ Full installation with distutils
 There are a number of ways to install programs using distutils. I will
 list a few of the possible method here:
 
+To install to the standard location on the hard disk (it's better to use
+rpms if you have an rpm-based linux distibution)
+------------------------------------------------------------------------
+# cd veusz-0.99.0
+# python setup.py build
+# su
+[enter root password]
+# python setup.py install 
+# exit
+
 To make an rpm from the distribution
 ------------------------------------
-# cd veusz-0.10
+(FIXME: not checked for beta)
+
+# cd veusz-0.99.0
 # python setup.py bdist_rpm
 
 An rpm should be generated in the dist subdirectory, so...
@@ -73,28 +97,12 @@ An rpm should be generated in the dist subdirectory, so...
 A veusz script is installed into your default binary location, so run veusz
 using the "veusz command"
 
-To install to the standard location on the hard disk (it's better to use
-rpms if you have an rpm-based linux distibution)
-------------------------------------------------------------------------
-# cd veusz-0.10
-# python setup.py build
-# su
-[enter root password]
-# python setup.py install 
-# exit
+Installing in Windows
+=====================
+Simply run the setup.exe binary installer.
+Use control panel add/remove programs to remove.
 
 For other ways of installing see http://docs.python.org/inst/inst.html
-
-Using FITS files
-================
-To enable FITS file data import, PyFITS must be installed in the
-Python path. This can be accomplished by putting the pyfits.py file
-into the standard Python install directory
-(e.g. /usr/local/lib/python2.3), adding its directory into the
-PYTHONPATH environment variable, or by copying the file into the main
-Veusz directory.
-
-I will also invesigate whether PyFITS can be distributed with Veusz.
 
 -------------------------------------------------------------------------------
 $Id$
