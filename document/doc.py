@@ -401,11 +401,11 @@ class Document( qt4.QObject ):
 
         ext = os.path.splitext(filename)[1]
 
-        p = qt4.QPrinter()
-        p.setFullPage(True)
+        printer = qt4.QPrinter()
+        printer.setFullPage(True)
 
         # set printer parameters
-        p.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
+        printer.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
 
         if ext == '.pdf':
             f = qt4.QPrinter.PdfFormat
@@ -415,35 +415,55 @@ class Document( qt4.QObject ):
             except AttributeError:
                 # < qt4.2 bah
                 f = qt4.QPrinter.NativeFormat
-        p.setOutputFormat(f)
-        p.setOutputFileName(filename)
-        p.setCreator('Veusz %s' % utils.version())
+        printer.setOutputFormat(f)
+        printer.setOutputFileName(filename)
+        printer.setCreator('Veusz %s' % utils.version())
 
         # draw the page
-        p.newPage()
-        painter = Painter(p)
+        printer.newPage()
+        painter = Painter(printer)
         width, height = self.basewidget.getSize(painter)
         self.basewidget.children[page].draw( (0, 0, width, height), painter)
         painter.end()
 
-        # fixup eps file - yuck HACK! - hope qt gets fixed
+        # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
         # this makes the bounding box correct
-        if ext == '.eps':
+        if ext == '.eps' or ext == '.pdf':
             # copy eps to a temporary file
             tmpfile = "%s.tmp.%i" % (filename, random.randint(0,1000000))
             fout = open(tmpfile, 'w')
             fin = open(filename)
+
+            outcount = 0  # keep track of character index for pdf
             for line in fin:
-                if line[:14] == '%%BoundingBox:':
+                if line[:14] == '%%BoundingBox:' and ext == '.eps':
                     # replace bounding box line by calculated one
                     parts = line.split()
-                    widthfactor = float(parts[3]) / p.width()
-                    print >>fout, "%s %i %i %i %i" % (
+                    widthfactor = float(parts[3]) / printer.width()
+                    line = "%s %i %i %i %i\n" % (
                         parts[0], 0, int(float(parts[4])-widthfactor*height),
                         int(widthfactor*width), int(float(parts[4])) )
-                else:
-                    # otherwise copy line
-                    fout.write(line)
+                elif ext == '.pdf':
+                    if line[:9] == '/MediaBox':
+                        # do similar thing for pdf
+                        parts = line.strip()[11:-1].split()
+                        widthfactor = float(parts[2]) / printer.width()
+                        line = "/MediaBox [%i %i %i %i]\n" % (
+                            0, int(float(parts[3])-widthfactor*height),
+                            int(widthfactor*width), int(float(parts[3])) )
+                    elif line[:6] == 'endobj':
+                        # need to know when endobj occurs for pdf for stream length
+                        lastobj = outcount + len(line)
+                    elif line[:9] == 'startxref':
+                        # write corrected pdf footer
+                        print >>fout, 'startxref'
+                        print >>fout, lastobj
+                        print >>fout, '%%EOF'
+                        break
+
+                outcount += len(line)
+                fout.write(line)
+                
             fout.close()
             fin.close()
             os.remove(filename)
