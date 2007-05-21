@@ -431,8 +431,8 @@ class Document( qt4.QObject ):
         if ext == '.eps' or ext == '.pdf':
             # copy eps to a temporary file
             tmpfile = "%s.tmp.%i" % (filename, random.randint(0,1000000))
-            fout = open(tmpfile, 'w')
-            fin = open(filename)
+            fout = open(tmpfile, 'wb')
+            fin = open(filename, 'rb')
 
             outcount = 0  # keep track of character index for pdf
             for line in fin:
