@@ -1175,11 +1175,15 @@ class LineSet(Setting):
             row = row % len(self.val)
             style, width, color, hide = self.val[row]
             width = Distance.convertDistance(painter, width)
-            p = qt4.QPen( qt4.QColor(color), width,
-                          LineStyle._linecnvt[style] )
+            style, dashpattern = LineStyle._linecnvt[style]
+            pen = qt4.QPen(qt4.QColor(color), width, style)
+
+            if dashpattern:
+                pen.setDashPattern(dashpattern)
+
             if hide:
-                p.setStyle(qt4.Qt.NoPen)
-            return p
+                pen.setStyle(qt4.Qt.NoPen)
+            return pen
     
 class FillSet(Setting):
     """A setting which corresponds to a set of fills.
