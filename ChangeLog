@@ -1,4 +1,64 @@
 ------------------------------------------------------------------------
+r613 | jeremysanders | 2007-05-22 21:05:56 +0100 (Tue, 22 May 2007) | 2 lines
+
+Update manual images for veusz-0.99.0
+
+------------------------------------------------------------------------
+r612 | jeremysanders | 2007-05-21 22:28:18 +0100 (Mon, 21 May 2007) | 2 lines
+
+Fix contours with new line styles
+
+------------------------------------------------------------------------
+r611 | jeremysanders | 2007-05-21 22:28:03 +0100 (Mon, 21 May 2007) | 2 lines
+
+Fix pdf output for windows
+
+------------------------------------------------------------------------
+r610 | jeremysanders | 2007-05-20 12:44:28 +0100 (Sun, 20 May 2007) | 2 lines
+
+slight README fix
+
+------------------------------------------------------------------------
+r609 | jeremysanders | 2007-05-20 12:41:17 +0100 (Sun, 20 May 2007) | 2 lines
+
+Update README and INSTALL for new release
+
+------------------------------------------------------------------------
+r608 | jeremysanders | 2007-05-20 12:23:21 +0100 (Sun, 20 May 2007) | 2 lines
+
+Hack PDF output to fix paper size
+
+------------------------------------------------------------------------
+r607 | jeremysanders | 2007-05-20 11:23:15 +0100 (Sun, 20 May 2007) | 2 lines
+
+Update windows installer file for pyinstaller and add keywords
+
+------------------------------------------------------------------------
+r606 | jeremysanders | 2007-05-20 11:18:09 +0100 (Sun, 20 May 2007) | 2 lines
+
+Add Qt4 entries to changelog
+
+------------------------------------------------------------------------
+r605 | jeremysanders | 2007-05-20 11:12:32 +0100 (Sun, 20 May 2007) | 2 lines
+
+Update manifest
+
+------------------------------------------------------------------------
+r604 | jeremysanders | 2007-05-20 11:11:48 +0100 (Sun, 20 May 2007) | 2 lines
+
+Update install
+
+------------------------------------------------------------------------
+r603 | jeremysanders | 2007-05-20 10:59:56 +0100 (Sun, 20 May 2007) | 2 lines
+
+Fixes for pyinstaller
+
+------------------------------------------------------------------------
+r602 | jeremysanders | 2007-05-20 10:47:12 +0100 (Sun, 20 May 2007) | 2 lines
+
+Merge windows and unix installer scripts
+
+------------------------------------------------------------------------
 r601 | jeremysanders | 2007-05-16 10:08:09 +0100 (Wed, 16 May 2007) | 2 lines
 
 Add capacity for extra line style, and added dotted-fine style
