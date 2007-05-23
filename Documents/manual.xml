@@ -53,7 +53,7 @@
 
       <para>The technologies behind Veusz include PyQt (a very easy to
       use Python interface to Qt, which is used for rendering and the
-      graphical user interface, GUI) and numarray (a package for Python
+      graphical user interface, GUI) and numpy (a package for Python
       which makes the handling of large datasets easy).</para>
 
       <para>Veusz has two user interfaces: a graphical one which gives
@@ -163,8 +163,8 @@
 		  close to most other languages. For example "3*x**2 +
 		  2*x - 4". A number of functions are available
 		  (e.g. sin, cos, tan, exp, log...). Technically,
-		  Veusz imports the numarray package when evaluating,
-		  so numarray functions are available.</para>
+		  Veusz imports the numpy package when evaluating,
+		  so numpy functions are available.</para>
 
 		<para>As well as the function setting, also settable
 		  is the line type to plot the function, and the
@@ -733,7 +733,7 @@ SetData('y', y)
       <command>Add('graph', name='foo')</command>, may be entered as
       <command>Add 'graph' name='foo'</command>.</para>
 
-      <para>The <command>numarray</command> package is already
+      <para>The <command>numpy</command> package is already
       imported into the command line interface (as "*"), so you do not
       need to import it first.</para>
 
@@ -866,7 +866,7 @@ SetData('y', y)
 
 	<para>Returns: A tuple containing the datasets with the name
       given. The tuple is (data, symerr, negerr, poserr), with each a
-      numarray of the same size or None. data are the values of the
+      numpy array of the same size or None. data are the values of the
       dataset, symerr are the symmetric errors (if set), negerr and
       poserr and negative and positive asymmetric errors (if
       set).</para>
@@ -1172,7 +1172,7 @@ Set('page1/graph1/x/min', -10.)
       given for an item, it will be left blank. val is the actual
       data, symerr are the symmetric errors, negerr and poserr and the
       getative and positive asymmetric errors. The data can be given
-      as lists or numarrays.</para>
+      as lists or numpys.</para>
       </section>
       
       <section>
@@ -1182,7 +1182,7 @@ Set('page1/graph1/x/min', -10.)
 	yrange=(C,D))</command></para>
 
 	<para>Creates a two-dimensional dataset with the name
-	given. val is either a two-dimensional numarray array, or is a
+	given. val is either a two-dimensional numpy array, or is a
 	list of lists, with each list in the list representing a
 	row.</para>
 
@@ -1283,14 +1283,14 @@ Set('page1/graph1/x/min', -10.)
 	<informalexample>
 	  <programlisting>
 import time
-import numarray
+import numpy
 import veusz.embed as veusz
  
 g = veusz.Embedded('new window title')
 g.To( g.Add('page') )
 g.To( g.Add('graph') )
-g.SetData('x', numarray.arange(20))
-g.SetData('y', numarray.arange(20)**2)
+g.SetData('x', numpy.arange(20))
+g.SetData('y', numpy.arange(20)**2)
 g.Add('xy')
 g.Zoom(0.5)
  
