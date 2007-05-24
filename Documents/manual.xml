@@ -480,6 +480,12 @@
     program with the <link linkend="Command.SetData">SetData</link>
     command.</para>
     
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="manimages/importdialog.png" format="PNG" />
+	</imageobject>
+      </mediaobject>
+
     <para>CSV files are intuitive to use and are described
     below.</para>
 
@@ -510,12 +516,12 @@
       
       <orderedlist>
 	<listitem>
-	  <para><command>x y</command> - two columns are present in the
+	  <para><command>x y</command> two columns are present in the
 	    file, they will be read in as datasets "x" and "y".</para>
 	</listitem>
 	
 	<listitem>
-	  <para><command>x,+- y,+,-</command> - two datasets are in the
+	  <para><command>x,+- y,+,-</command> two datasets are in the
 	    file. Dataset "x" consists of the first two columns. The
 	    first column are the values and the second are the
 	    symmetric errors. "y" consists of three columns (note the
@@ -526,9 +532,9 @@
 	  <para>Suppose the input file contains:</para>
 	  <informalexample>
 	    <programlisting>
-1.0 0.3  2 0.1 -0.2
-1.5 0.2 2.3 2e-2 -0.3E0
-2.19 0.02 5 0.1 -0.1 
+1.0  0.3  2   0.1  -0.2
+1.5  0.2  2.3 2e-2 -0.3E0
+2.19 0.02 5    0.1 -0.1 
 </programlisting>
 	  </informalexample>
 	  
@@ -538,19 +544,19 @@
 	</listitem>
 	
 	<listitem>
-	  <para><command>x[1:2] y[:]</command> - the first column is
+	  <para><command>x[1:2] y[:]</command> the first column is
 	    the data "x_1", the second "x_2". Subsequent columns are
 	    read as "y[1]" to "y[n]".</para>
 	</listitem>
 	
 	<listitem>
-	  <para><command>y[:]+-</command> - read each pair of
+	  <para><command>y[:]+-</command>  read each pair of
 	    columns as a dataset and its symmetric error, calling them
 	    "y[1]" to "y[n]".</para>
 	</listitem>
 
 	<listitem>
-	  <para><command>x,,+-</command> - read the first column as
+	  <para><command>x,,+-</command>  read the first column as
 	  the x dataset, skip a column, and read the third column as
 	  its symmetric error.</para>
 	</listitem>
