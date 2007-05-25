@@ -563,7 +563,7 @@ class PointPlotter(GenericPlotter):
         elif name == s.yAxis:
             self._autoAxis( s.yData, bounds )
 
-    def _getLinePoints( self, xvals, yvals, posn ):
+    def _getLinePoints( self, xvals, yvals, posn, xdata, ydata ):
         """Get the points corresponding to the line connecting the points."""
 
         pts = qt4.QPolygonF()
@@ -596,13 +596,12 @@ class PointPlotter(GenericPlotter):
         # this is complex as we can't use the mean of the plotter coords,
         #  as the axis could be log
         elif steps == 'centre':
-            xv = self.document.getData(s.xData)
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
             # Have to an extra conversion here as we can't
             # guarantee device coords of middles of bins are half way
             # between edges. This is bad code.
             xcen = axes[0].graphToPlotterCoords(posn,
-                                                0.5*(xv.data[:-1]+xv.data[1:]))
+                                                0.5*(xdata[:-1]+xdata[1:]))
 
             for x1, x2, xc, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                      xcen,
@@ -617,11 +616,11 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
-    def _drawPlotLine( self, painter, xvals, yvals, posn ):
+    def _drawPlotLine( self, painter, xvals, yvals, posn, xdata, ydata ):
         """Draw the line connecting the points."""
 
         s = self.settings
-        pts = self._getLinePoints(xvals, yvals, posn)
+        pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
 
         if len(pts) >= 2:
             if not s.FillBelow.hide:
@@ -776,7 +775,8 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                self._drawPlotLine( painter, xplotter, yplotter, posn )
+                self._drawPlotLine( painter, xplotter, yplotter, posn,
+                                    xvals.data, yvals.data )
 
             # plot the points (we do this last so they are on top)
             if not s.MarkerLine.hide or not s.MarkerFill.hide:
