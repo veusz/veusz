@@ -602,6 +602,7 @@ class PointPlotter(GenericPlotter):
             # between edges. This is bad code.
             xcen = axes[0].graphToPlotterCoords(posn,
                                                 0.5*(xdata[:-1]+xdata[1:]))
+            xcen = N.clip(xcen, -32767, 32767)
 
             for x1, x2, xc, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                      xcen,
@@ -764,6 +765,10 @@ class PointPlotter(GenericPlotter):
             # calc plotter coords of x and y points
             xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
             yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
+
+            # need to remove silly points as these stuff up output
+            xplotter = N.clip(xplotter, -32767, 32767)
+            yplotter = N.clip(yplotter, -32767, 32767)
 
             #print "Painting error bars"
             # plot errors bars
