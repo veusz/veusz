@@ -334,9 +334,11 @@ class Setting(object):
     def getDocument(self):
         """Return document."""
         p = self.parent
-        while p and not hasattr(p, 'document'):
+        while p:
+            if hasattr(p, 'document'):
+                return p.document
             p = p.parent
-        return p.document
+        return None
 
 # Store strings
 class Str(Setting):
@@ -923,8 +925,7 @@ class Dataset(Str):
         
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        doc = self.getDocument()
-        return controls.Dataset(self, doc, self.dimensions,
+        return controls.Dataset(self, self.getDocument(), self.dimensions,
                                 self.datatype, *args)
 
 class DatasetOrFloat(Dataset):
