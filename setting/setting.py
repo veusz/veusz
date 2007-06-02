@@ -331,6 +331,13 @@ class Setting(object):
 
         return None
 
+    def getDocument(self):
+        """Return document."""
+        p = self.parent
+        while p and not hasattr(p, 'document'):
+            p = p.parent
+        return p.document
+
 # Store strings
 class Str(Setting):
     """String setting."""
@@ -916,14 +923,43 @@ class Dataset(Str):
         
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        # find document
-        p = self.parent
-        while not hasattr(p, 'document'):
-            p = p.parent
-            
-        return controls.Dataset(self, p.document, self.dimensions,
+        doc = self.getDocument()
+        return controls.Dataset(self, doc, self.dimensions,
                                 self.datatype, *args)
+
+class DatasetOrFloat(Dataset):
+    """Choose a dataset or specify a float value."""
+
+    def getData(self):
+        """Return either a numpy array of data, a float value, or None if error."""
+        ret = None
+        doc = self.getDocument()
+        if doc:
+            ds = doc.data.get(self.val)
+            if ds:
+                ret = ds.data
+            else:
+                try:
+                    ret = float(self.val)
+                except ValueError:
+                    pass
+        return ret
     
+class DatasetOrStr(dataset):
+    """Choose a dataset or enter a string."""
+
+    def getData(self):
+        """Return either a list of strings, a string value, or None if error."""
+        ret = None
+        doc = self.getDocument()
+        if doc:
+            ds = doc.data.get(self.val)
+            if ds:
+                ret = ds.data
+            else:
+                ret = unicode(self.val)
+        return ret
+
 class Color(ChoiceOrMore):
     """A color setting."""
 
