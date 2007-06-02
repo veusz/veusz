@@ -342,15 +342,7 @@ class ImportDialog2(qt4.QDialog):
         for name in dsnames:
             ds = self.document.getData(name)
             # build up description
-            descr = [name]
-            if ds.serr is not None:
-                descr.append('+-')
-            if ds.perr is not None:
-                descr.append('+')
-            if ds.nerr is not None:
-                descr.append('-')
-            descr = ','.join(descr)
-            lines.append(' %s (%i items)' % (descr, ds.data.shape[0]))
+            lines.append( ' %s' % ds.description(showlinked=False) )
 
         linked = self.linkcheckbox.isChecked()
         filename = unicode( self.filenameedit.text() )
@@ -547,7 +539,12 @@ class ImportDialog2(qt4.QDialog):
                                                 transpose=transpose,
                                                 linked=linked)
             readds = self.document.applyOperation(op)
-            output = 'Successfully read datasets %s' % (' ,'.join(readds))
+
+            output = ['Successfully read datasets:']
+            for ds in readds:
+                output.append(' %s' % self.document.data[ds].description(showlinked=False))
+            
+            output = '\n'.join(output)
         except document.Read2DError, e:
             output = 'Error importing datasets:\n %s' % str(e)
                 

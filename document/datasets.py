@@ -287,6 +287,7 @@ class DatasetBase(object):
 
     # number of dimensions the dataset holds
     dimensions = 0
+    datatype = 'numeric'
 
     def saveLinksToSavedDoc(self, file, savedlinks):
         '''Save the link to the saved document, if this dataset is linked.
@@ -309,7 +310,7 @@ class DatasetBase(object):
             raise ValueError('Could not find self in document.data')
         return name
 
-    def description(self):
+    def description(self, showlinked=True):
         """Get description of database."""
         return ""
 
@@ -360,13 +361,13 @@ class Dataset2D(DatasetBase):
 
         file.write("''')\n")
 
-    def description(self):
+    def description(self, showlinked=True):
         """Get description of dataset."""
         text = self.name()
         text += ' (%ix%i)' % self.data.shape
         text += ', x=%g->%g' % tuple(self.xrange)
         text += ', y=%g->%g' % tuple(self.yrange)
-        if self.linked:
+        if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
 
@@ -398,7 +399,7 @@ class Dataset(DatasetBase):
             if i is not None and i.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
 
-    def description(self):
+    def description(self, showlinked=True):
         """Get description of dataset."""
 
         text = self.name()
@@ -410,7 +411,7 @@ class Dataset(DatasetBase):
             text += ',-'
         text += ' (length %i)' % len(self.data)
 
-        if self.linked:
+        if self.linked and showlinked:
             text += ' linked to %s' % self.linked.filename
         return text
 
@@ -522,6 +523,41 @@ class Dataset(DatasetBase):
             file.write( format % line )
 
         file.write( "''')\n" )
+
+class DatasetText(DatasetBase):
+    """Represents a text dataset: holding an array of strings."""
+
+    dimensions = 1
+    datatype = 'text'
+
+    def __init__(self, data=None, linked=None):
+        """Initialise dataset with data given. Data are a list of strings."""
+
+        self.data = list(data)
+        self.linked = linked
+
+    def description(self, showlinked=True):
+        text = '%s (%i items)' % (self.name(), len(self.data))
+        if self.linked and showlinked:
+            text += ', linked to %s' % self.linked.filename
+        return text
+
+    def duplicate(self):
+        return DatasetText(data=self.data) # data is copied by this constructor
+
+    def changeValues(self, type, vals):
+        if type == 'vals':
+            self.data = list(vals)
+        else:
+            raise ValueError, 'type does not contain an allowed value'
+
+        self.document.setModified(True)
+    
+    def saveToFile(self, file, name):
+        '''Save data to file.
+        '''
+
+        # FIXME: lots!
 
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
