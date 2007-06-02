@@ -945,7 +945,7 @@ class DatasetOrFloat(Dataset):
                     pass
         return ret
     
-class DatasetOrStr(dataset):
+class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
 
     def getData(self):
@@ -1079,12 +1079,7 @@ class Axis(Str):
 
     def makeControl(self, *args):
         """Allows user to choose an axis or enter a name."""
-        # find document
-        p = self.parent
-        while not hasattr(p, 'document'):
-            p = p.parent
-
-        return controls.Axis(self, p.document, self.direction, *args)
+        return controls.Axis(self, self.getDocument(), self.direction, *args)
 
 class Image(Str):
     """Hold the name of a child image."""
@@ -1150,12 +1145,7 @@ class Image(Str):
 
     def makeControl(self, *args):
         """Allows user to choose an image widget or enter a name."""
-        # find document
-        p = self.parent
-        while not hasattr(p, 'document'):
-            p = p.parent
-
-        return controls.Image(self, p.document, *args)
+        return controls.Image(self, self.getDocument(), *args)
     
 class Marker(Choice):
     """Choose a marker type from one allowable."""
