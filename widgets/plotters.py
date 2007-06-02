@@ -376,10 +376,10 @@ class PointPlotter(GenericPlotter):
                               descr = 'Type of marker to plot',
                               usertext='Marker', formatting=True), 0 )
         s.add( setting.Dataset('yData', 'y',
-                               descr = 'Variable containing y data',
+                               descr = 'Dataset containing y data',
                                usertext='Y dataset'), 0 )
         s.add( setting.Dataset('xData', 'x',
-                               descr = 'Variable containing x data',
+                               descr = 'Dataset containing x data',
                                usertext='X dataset'), 0 )
         s.add( setting.Choice('errorStyle',
                               ['bar', 'box', 'diamond', 'curve',
@@ -841,28 +841,42 @@ class TextLabel(GenericPlotter):
                              descr='y coordinate of the text',
                              usertext='Y position',
                              formatting=False), 2 )
+
+        s.add( setting.Dataset('xPosDataset', '',
+                               descr = 'Dataset containing x positions for multiple labels',
+                               usertext = 'X dataset'), 3)
+        
+        s.add( setting.Dataset('yPosDataset', '',
+                               descr = 'Dataset containing y positions for multiple labels',
+                               usertext = 'Y dataset'), 4)
+
+        s.add( setting.Dataset('textDataset', '',
+                               descr = 'Dataset containing text for multiple labels',
+                               usertext = 'Text dataset',
+                               datatype = 'text'), 5)
+
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
                               descr='Use axes or fractional position to '
                               'place label',
                               usertext='Position mode',
-                              formatting=False), 3)
+                              formatting=False), 6)
 
         s.add( setting.Choice('alignHorz',
                               ['left', 'centre', 'right'], 'left',
                               descr="Horizontal alignment of label",
                               usertext='Horz alignment',
-                              formatting=True), 4)
+                              formatting=True), 7)
         s.add( setting.Choice('alignVert',
                               ['top', 'centre', 'bottom'], 'bottom',
                               descr='Vertical alignment of label',
                               usertext='Vert alignment',
-                              formatting=True), 5)
+                              formatting=True), 8)
 
         s.add( setting.Float('angle', 0.,
                              descr='Angle of the label in degrees',
                              usertext='Angle',
-                             formatting=True), 6 )
+                             formatting=True), 9 )
 
         s.add( setting.Text('Text',
                             descr = 'Text settings',
@@ -883,10 +897,34 @@ class TextLabel(GenericPlotter):
                                    outerbounds=outerbounds)
 
         s = self.settings
+        d = self.document
 
         # exit if hidden
         if s.hide:
             return
+
+        xPosDataset = d.data.get(s.xPosDataset)
+        yPosDataset = d.data.get(s.yPosDataset)
+        textDataset = d.data.get(s.textDataset)
+
+        # check type of data
+        if xPosDataset and (xPosDataset.datatype != 'numeric' or xPosDataset.dimensions != 1):
+            xPosDataset = None
+        if yPosDataset and (yPosDataset.datatype != 'numeric' or yPosDataset.dimensions != 1):
+            yPosDataset = None
+        if textDataset and (textDataset.datatype != 'text' or textDataset.dimensions != 1):
+            textDataset = None
+
+        if xPosDataset and yPosDataset and textDataset:
+            # multiple points
+            pointsX = xPosDataset.data
+            pointsY = yPosDataset.data
+            text = textDataset.data
+        else:
+            # single point
+            pointsX = N.array([s.xPos])
+            pointsY = N.array([s.yPos])
+            text = [s.label]
 
         if s.positioning == 'axes':
             # translate xPos and yPos to plotter coordinates
@@ -894,12 +932,12 @@ class TextLabel(GenericPlotter):
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
             if None in axes:
                 return
-            xp = axes[0].graphToPlotterCoords(posn, N.array( [s.xPos] ))[0]
-            yp = axes[1].graphToPlotterCoords(posn, N.array( [s.yPos] ))[0]
+            xp = axes[0].graphToPlotterCoords(posn, pointsX)
+            yp = axes[1].graphToPlotterCoords(posn, pointsY)
         else:
             # work out fractions inside pos
-            xp = posn[0] + (posn[2]-posn[0])*s.xPos
-            yp = posn[3] + (posn[1]-posn[3])*s.yPos
+            xp = posn[0] + (posn[2]-posn[0])*pointsX
+            yp = posn[3] + (posn[1]-posn[3])*pointsY
 
         if not s.Text.hide:
             painter.beginPaintingWidget(self, parentposn)
@@ -908,11 +946,11 @@ class TextLabel(GenericPlotter):
             painter.setPen(textpen)
             font = s.get('Text').makeQFont(painter)
 
-            utils.Renderer( painter, font, xp, yp,
-                            s.label,
-                            TextLabel.cnvtalignhorz[s.alignHorz],
-                            TextLabel.cnvtalignvert[s.alignVert],
-                            s.angle ).render()
+            for x, y, t in itertools.izip(xp, yp, text):
+                utils.Renderer( painter, font, x, y, t,
+                                TextLabel.cnvtalignhorz[s.alignHorz],
+                                TextLabel.cnvtalignvert[s.alignVert],
+                                s.angle ).render()
             painter.restore()
             painter.endPaintingWidget()
 

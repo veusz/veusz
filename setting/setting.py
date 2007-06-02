@@ -898,18 +898,21 @@ class WidgetPath(Str):
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
-    def __init__(self, name, val, dimensions=1, **args):
+    def __init__(self, name, val, dimensions=1, datatype='numeric',
+                 **args):
         """
         dimensions is the number of dimensions the dataset needs
         """
 
         Setting.__init__(self, name, val, **args)
         self.dimensions = dimensions
+        self.datatype = datatype
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
         return self._copyHelper((), (),
-                                {'dimensions': self.dimensions})
+                                {'dimensions': self.dimensions,
+                                 'datatype': self.datatype})
         
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
@@ -918,7 +921,8 @@ class Dataset(Str):
         while not hasattr(p, 'document'):
             p = p.parent
             
-        return controls.Dataset(self, p.document, self.dimensions, *args)
+        return controls.Dataset(self, p.document, self.dimensions,
+                                self.datatype, *args)
     
 class Color(ChoiceOrMore):
     """A color setting."""

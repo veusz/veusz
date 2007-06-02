@@ -470,7 +470,7 @@ class Distance(Choice):
 class Dataset(Choice):
     """Allow the user to choose between the possible datasets."""
 
-    def __init__(self, setting, document, dimensions, parent):
+    def __init__(self, setting, document, dimensions, datatype, parent):
         """Initialise the combobox. The list is populated with datasets.
 
         dimensions specifies the dimension of the dataset to list
@@ -480,6 +480,7 @@ class Dataset(Choice):
         Choice.__init__(self, setting, True, [], parent)
         self.document = document
         self.dimensions = dimensions
+        self.datatype = datatype
         self._populateEntries()
         self.connect(document, qt4.SIGNAL('sigModified'),
                      self.slotModified)
@@ -490,7 +491,7 @@ class Dataset(Choice):
         # get datasets of the correct dimension
         datasets = []
         for name, ds in self.document.data.iteritems():
-            if ds.dimensions == self.dimensions:
+            if ds.dimensions == self.dimensions and ds.datatype == self.datatype:
                 datasets.append(name)
         datasets.sort()
 
