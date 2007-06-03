@@ -44,7 +44,7 @@ class GenericPlotter(widget.Widget):
 
         s = self.settings
         s.add( setting.Str('key', '',
-                           descr = 'Description of the plotted data',
+                           descr = 'Description of the plotted data to appear in key',
                            usertext='Key text') )
         s.add( setting.Axis('xAxis', 'x', 'horizontal',
                             descr = 'Name of X-axis to use',
@@ -375,12 +375,12 @@ class PointPlotter(GenericPlotter):
         s.add( setting.Marker('marker', 'circle',
                               descr = 'Type of marker to plot',
                               usertext='Marker', formatting=True), 0 )
-        s.add( setting.Dataset('yData', 'y',
-                               descr = 'Dataset containing y data',
-                               usertext='Y dataset'), 0 )
-        s.add( setting.Dataset('xData', 'x',
-                               descr = 'Dataset containing x data',
-                               usertext='X dataset'), 0 )
+        s.add( setting.DatasetOrFloatList('yData', 'y',
+                                          descr = 'Dataset containing y data or list of values',
+                                          usertext='Y data'), 0 )
+        s.add( setting.DatasetOrFloatList('xData', 'x',
+                                          descr = 'Dataset containing x data or list of values',
+                                          usertext='X data'), 0 )
         s.add( setting.Choice('errorStyle',
                               ['bar', 'box', 'diamond', 'curve',
                                'barbox', 'bardiamond', 'barcurve'], 'bar',
@@ -549,8 +549,10 @@ class PointPlotter(GenericPlotter):
 
     def _autoAxis(self, dataname, bounds):
         """Determine range of data."""
-        if self.document.hasData(dataname):
-            range = self.document.getData(dataname).getRange()
+
+        data = self.settings.get(dataname).getData(self.document)
+        if data:
+            range = data.getRange()
             bounds[0] = min( bounds[0], range[0] )
             bounds[1] = max( bounds[1], range[1] )
 
@@ -559,9 +561,9 @@ class PointPlotter(GenericPlotter):
 
         s = self.settings
         if name == s.xAxis:
-            self._autoAxis( s.xData, bounds )
+            self._autoAxis( 'xData', bounds )
         elif name == s.yAxis:
-            self._autoAxis( s.yData, bounds )
+            self._autoAxis( 'yData', bounds )
 
     def _getLinePoints( self, xvals, yvals, posn, xdata, ydata ):
         """Get the points corresponding to the line connecting the points."""
@@ -724,16 +726,20 @@ class PointPlotter(GenericPlotter):
                                    outerbounds=outerbounds)
         x1, y1, x2, y2 = posn
 
-        # skip if there's no data
-        d = self.document
         s = self.settings
-        if not d.hasData(s.xData) or not d.hasData(s.yData):
-            return
-        
+
         # exit if hidden
         if s.hide:
             return
 
+        # get data
+        doc = self.document
+        xv = s.get('xData').getData(doc)
+        yv = s.get('yData').getData(doc)
+
+        if not xv or not yv:
+            return
+        
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
@@ -741,13 +747,6 @@ class PointPlotter(GenericPlotter):
         if ( None in axes or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
-            return
-
-        xv = d.getData(s.xData)
-        yv = d.getData(s.yData)
-
-        # no points to plot
-        if xv.empty() or yv.empty():
             return
 
         # clip data within bounds of plotter

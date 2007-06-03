@@ -345,7 +345,7 @@ class Str(Setting):
     """String setting."""
 
     def convertTo(self, val):
-        if type(val) in (str, unicode):
+        if isinstance(val, basestring):
             return val
         raise InvalidType
 
@@ -461,7 +461,7 @@ class FloatOrAuto(Setting):
     def convertTo(self, val):
         if type(val) in (int, float):
             return float(val)
-        elif type(val) in [str, unicode] and val.strip().lower() == 'auto':
+        elif isinstance(val, basestring) and val.strip().lower() == 'auto':
             return None
         else:
             raise InvalidType
@@ -494,9 +494,9 @@ class IntOrAuto(Setting):
     """Save an int or text auto."""
 
     def convertTo(self, val):
-        if type(val) == int:
+        if isinstance(val, int):
             return val
-        elif type(val) in [str, unicode] and val.strip().lower() == 'auto':
+        elif isinstance(val, basestring) and val.strip().lower() == 'auto':
             return None
         else:
             raise InvalidType
@@ -791,6 +791,8 @@ class FloatDict(Setting):
 class FloatList(Setting):
     """A list of float values."""
 
+    list_re = re.compile(r'[\t\n, ]+')
+
     def convertTo(self, val):
         if type(val) not in (list, tuple):
             raise InvalidType
@@ -811,7 +813,7 @@ class FloatList(Setting):
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
 
-        p = re.split(r'[\t\n, ]+', text.strip())
+        p = self.list_re.split(text.strip())
 
         try:
             out = [float(i) for i in p if i]
@@ -852,7 +854,7 @@ class WidgetPath(Str):
         """Validate the text is a name of a widget relative to
         this one."""
 
-        if type(val) not in [str, unicode]:
+        if not isinstance(val, basestring):
             raise InvalidType
 
         # InvalidType will get raised in getWidget if it is incorrect
@@ -928,23 +930,52 @@ class Dataset(Str):
         return controls.Dataset(self, self.getDocument(), self.dimensions,
                                 self.datatype, *args)
 
-class DatasetOrFloat(Dataset):
-    """Choose a dataset or specify a float value."""
+class DatasetOrFloatList(Dataset):
+    """Choose a dataset or specify a list of float values."""
 
-    def getData(self):
-        """Return either a numpy array of data, a float value, or None if error."""
-        ret = None
-        doc = self.getDocument()
-        if doc:
-            ds = doc.data.get(self.val)
-            if ds:
-                ret = ds.data
+    digits = dict([(i,None) for i in '0123456789.-'])
+
+    def convertTo(self, val):
+        """Check is a string (dataset name) or a list of floats (numbers)."""
+        if isinstance(val, basestring):
+            return val
+
+        if type(val) not in (list, tuple):
+            raise InvalidType
+
+        out = []
+        for i in val:
+            if type(i) not in (float, int):
+                raise InvalidType
             else:
-                try:
-                    ret = float(self.val)
-                except ValueError:
-                    pass
-        return ret
+                out.append( float(i) )
+        return out
+
+    def toText(self):
+        if isinstance(self.val, basestring):
+            return self.val
+        else:
+            return ', '.join( [str(i) for i in self.val] )
+
+    def fromText(self, text):
+        text = text.strip()
+        if text and text[0] in self.digits:
+            p = FloatList.list_re.split(text.strip())
+            try:
+                return [float(i) for i in p if i]
+            except ValueError:
+                raise InvalidType
+        else:
+            return text
+            
+    def getData(self, doc):
+        """Return veusz dataset"""
+        if isinstance(self.val, basestring):
+            return doc.data.get(self.val)
+        else:
+            # blah - need to import here due to dependencies
+            import veusz.document as document
+            return document.Dataset(data=self.val)
     
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
@@ -1182,7 +1213,7 @@ class LineSet(Setting):
             except ValueError:
                 raise InvalidType
 
-            if ( type(color) not in (str, unicode) or
+            if ( not isinstance(color, basestring) or
                  not Distance.isDist(width) or
                  style not in LineStyle._linestyles or
                  type(hide) not in (int, bool) ):
@@ -1239,7 +1270,7 @@ class FillSet(Setting):
             except ValueError:
                 raise InvalidType
 
-            if ( type(color) not in (str, unicode) or
+            if ( not isinstance(color, basestring) or
                  style not in FillStyle._fillstyles or
                  type(hide) not in (int, bool) ):
                 raise InvalidType
