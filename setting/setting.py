@@ -31,6 +31,7 @@ s.fromText('42')
 import re
 import math
 
+import numpy as N
 import veusz.qtall as qt4
 
 import controls
@@ -936,37 +937,48 @@ class DatasetOrFloatList(Dataset):
     digits = dict([(i,None) for i in '0123456789.-'])
 
     def convertTo(self, val):
-        """Check is a string (dataset name) or a list of floats (numbers)."""
+        """Check is a string (dataset name) or a list of floats (numbers).
+
+        """
         if isinstance(val, basestring):
             return val
-
-        if type(val) not in (list, tuple):
-            raise InvalidType
-
-        out = []
-        for i in val:
-            if type(i) not in (float, int):
+        elif isinstance(val, float) or isinstance(val, int):
+            return [val]
+        else:
+            try:
+                return [float(x) for x in val]
+            except (TypeError, ValueError):
                 raise InvalidType
-            else:
-                out.append( float(i) )
-        return out
 
     def toText(self):
         if isinstance(self.val, basestring):
             return self.val
         else:
-            return ', '.join( [str(i) for i in self.val] )
+            return ', '.join( [str(x) for x in self.val] )
 
     def fromText(self, text):
         text = text.strip()
         if text and text[0] in self.digits:
             p = FloatList.list_re.split(text.strip())
             try:
-                return [float(i) for i in p if i]
+                return [float(x) for x in p if x]
             except ValueError:
                 raise InvalidType
         else:
             return text
+
+    def getFloatArray(self, doc):
+        """Get a numpy of values or None."""
+        if isinstance(self.val, basestring):
+            ds = doc.data.get(self.val)
+            if ds:
+                # get numpy of values
+                return ds.data
+            else:
+                return None
+        else:
+            # list of values
+            return N.array(self.val)
             
     def getData(self, doc):
         """Return veusz dataset"""
@@ -980,17 +992,20 @@ class DatasetOrFloatList(Dataset):
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
 
-    def getData(self):
-        """Return either a list of strings, a string value, or None if error."""
-        ret = None
-        doc = self.getDocument()
+    def getData(self, doc):
+        """Return either a list of strings, a single item list."""
         if doc:
             ds = doc.data.get(self.val)
-            if ds:
-                ret = ds.data
-            else:
-                ret = unicode(self.val)
-        return ret
+            if ds and ds.datatype == self.datatype:
+                return ds.data
+        return [unicode(self.val)]
+
+    def makeControl(self, *args):
+        # use string editor rather than drop down list
+        # need to write a custom control
+        return controls.DatasetOrString(self, self.getDocument(), self.dimensions,
+                                        self.datatype, *args)
+        #return controls.String(self, *args)
 
 class Color(ChoiceOrMore):
     """A color setting."""

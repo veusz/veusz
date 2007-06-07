@@ -828,30 +828,17 @@ class TextLabel(GenericPlotter):
         # text labels don't need key symbols
         s.remove('key')
 
-        s.add( setting.Str('label', '',
-                           descr='Text to show',
-                           usertext='Label'), 0 )
-        s.add( setting.Float('xPos', 0.5,
-                             descr='x coordinate of the text',
-                             usertext='X position',
-                             formatting=False), 1 )
-        s.add( setting.Float('yPos', 0.5,
-                             descr='y coordinate of the text',
-                             usertext='Y position',
-                             formatting=False), 2 )
-
-        s.add( setting.Dataset('xPosDataset', '',
-                               descr = 'Dataset containing x positions for multiple labels',
-                               usertext = 'X dataset'), 3)
-        
-        s.add( setting.Dataset('yPosDataset', '',
-                               descr = 'Dataset containing y positions for multiple labels',
-                               usertext = 'Y dataset'), 4)
-
-        s.add( setting.Dataset('textDataset', '',
-                               descr = 'Dataset containing text for multiple labels',
-                               usertext = 'Text dataset',
-                               datatype = 'text'), 5)
+        s.add( setting.DatasetOrStr('label', '',
+                                    descr='Text to show or text dataset',
+                                    usertext='Label', datatype='text'), 0 )
+        s.add( setting.DatasetOrFloatList('xPos', 0.5,
+                                          descr='List of X coordinates or dataset',
+                                          usertext='X position',
+                                          formatting=False), 1 )
+        s.add( setting.DatasetOrFloatList('yPos', 0.5,
+                                          descr='List of Y coordinates or dataset',
+                                          usertext='Y position',
+                                          formatting=False), 2 )
 
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
@@ -898,31 +885,12 @@ class TextLabel(GenericPlotter):
         d = self.document
 
         # exit if hidden
-        if s.hide:
+        if s.hide or s.Text.hide:
             return
 
-        xPosDataset = d.data.get(s.xPosDataset)
-        yPosDataset = d.data.get(s.yPosDataset)
-        textDataset = d.data.get(s.textDataset)
-
-        # check type of data
-        if xPosDataset and (xPosDataset.datatype != 'numeric' or xPosDataset.dimensions != 1):
-            xPosDataset = None
-        if yPosDataset and (yPosDataset.datatype != 'numeric' or yPosDataset.dimensions != 1):
-            yPosDataset = None
-        if textDataset and (textDataset.datatype != 'text' or textDataset.dimensions != 1):
-            textDataset = None
-
-        if xPosDataset and yPosDataset and textDataset:
-            # multiple points
-            pointsX = xPosDataset.data
-            pointsY = yPosDataset.data
-            text = textDataset.data
-        else:
-            # single point
-            pointsX = N.array([s.xPos])
-            pointsY = N.array([s.yPos])
-            text = [s.label]
+        text = s.get('label').getData(d)
+        pointsX = s.get('xPos').getFloatArray(d)
+        pointsY = s.get('yPos').getFloatArray(d)
 
         if s.positioning == 'axes':
             # translate xPos and yPos to plotter coordinates
@@ -937,20 +905,19 @@ class TextLabel(GenericPlotter):
             xp = posn[0] + (posn[2]-posn[0])*pointsX
             yp = posn[3] + (posn[1]-posn[3])*pointsY
 
-        if not s.Text.hide:
-            painter.beginPaintingWidget(self, parentposn)
-            painter.save()
-            textpen = s.get('Text').makeQPen()
-            painter.setPen(textpen)
-            font = s.get('Text').makeQFont(painter)
+        painter.beginPaintingWidget(self, parentposn)
+        painter.save()
+        textpen = s.get('Text').makeQPen()
+        painter.setPen(textpen)
+        font = s.get('Text').makeQFont(painter)
 
-            for x, y, t in itertools.izip(xp, yp, text):
-                utils.Renderer( painter, font, x, y, t,
-                                TextLabel.cnvtalignhorz[s.alignHorz],
-                                TextLabel.cnvtalignvert[s.alignVert],
-                                s.angle ).render()
-            painter.restore()
-            painter.endPaintingWidget()
+        for x, y, t in itertools.izip(xp, yp, itertools.cycle(text)):
+            utils.Renderer( painter, font, x, y, t,
+                            TextLabel.cnvtalignhorz[s.alignHorz],
+                            TextLabel.cnvtalignvert[s.alignVert],
+                            s.angle ).render()
+        painter.restore()
+        painter.endPaintingWidget()
 
 # allow the factory to instantiate a text label
 document.thefactory.register( TextLabel )

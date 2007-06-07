@@ -501,6 +501,61 @@ class Dataset(Choice):
         """Update the list of datasets if the document is modified."""
         self._populateEntries()
         
+class DatasetOrString(qt4.QWidget):
+    """Allow use to choose a dataset or enter some text."""
+
+    def __init__(self, setting, document, dimensions, datatype, parent):
+        qt4.QWidget.__init__(self, parent)
+        self.datachoose = Dataset(setting, document, dimensions, datatype,
+                                  self)
+        
+        b = self.button = qt4.QPushButton('..', self)
+        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        b.setMaximumHeight(self.datachoose.height())
+        b.setMaximumWidth(b.height()/2)
+        b.setCheckable(True)
+
+        layout = qt4.QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setMargin(0)
+        layout.addWidget(self.datachoose)
+        layout.addWidget(b)
+
+        self.bgcolor = self.datachoose.palette().color(qt4.QPalette.Base)
+
+        self.connect(b, qt4.SIGNAL('toggled(bool)'),
+                     self.buttonToggled)
+        self.connect(self.datachoose, qt4.SIGNAL('settingChanged'),
+                     self.slotSettingChanged)
+
+    def slotSettingChanged(self, *args):
+        """When datachoose changes, inform any listeners."""
+        self.emit( qt4.SIGNAL('settingChanged'), *args )
+        
+    def buttonToggled(self, on):
+        """Button is pressed to bring popup up / down."""
+
+        # if button is down and there's no existing popup, bring up a new one
+        if on:
+            e = _EditBox( unicode(self.datachoose.currentText()),
+                          self.datachoose.setting.readonly, self.button)
+
+            # we get notified with text when the popup closes
+            self.connect(e, qt4.SIGNAL('closing'), self.boxClosing)
+            e.show()
+
+    def boxClosing(self, text):
+        """Called when the popup edit box closes."""
+
+        # update the text if we can
+        if not self.datachoose.setting.readonly:
+            self.datachoose.setEditText(text)
+            self.datachoose.setFocus()
+            self.parentWidget().setFocus()
+            self.datachoose.setFocus()
+
+        self.button.setChecked(False)
+
 class FillStyle(Choice):
     """For choosing between fill styles."""
 
