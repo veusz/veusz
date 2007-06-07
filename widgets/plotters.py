@@ -606,13 +606,12 @@ class PointPlotter(GenericPlotter):
                                                 0.5*(xdata[:-1]+xdata[1:]))
             xcen = N.clip(xcen, -32767, 32767)
 
-            for x1, x2, xc, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
-                                                     xcen,
-                                                     yvals[:-1], yvals[1:]):
+            for x1, xc, y1, y2 in itertools.izip(xvals[:-1], xcen,
+                                                 yvals[:-1], yvals[1:]):
                 pts.append(qt4.QPointF(x1, y1))
                 pts.append(qt4.QPointF(xc, y1))
                 pts.append(qt4.QPointF(xc, y2))
-                pts.append(qt4.QPointF(x2, y2))
+            pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
 
         else:
             assert False
