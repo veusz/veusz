@@ -611,7 +611,9 @@ class PointPlotter(GenericPlotter):
                 pts.append(qt4.QPointF(x1, y1))
                 pts.append(qt4.QPointF(xc, y1))
                 pts.append(qt4.QPointF(xc, y2))
-            pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
+
+            if len(xvals) > 0:
+                pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
 
         else:
             assert False
