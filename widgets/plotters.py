@@ -553,8 +553,9 @@ class PointPlotter(GenericPlotter):
         data = self.settings.get(dataname).getData(self.document)
         if data:
             range = data.getRange()
-            bounds[0] = min( bounds[0], range[0] )
-            bounds[1] = max( bounds[1], range[1] )
+            if range:
+                bounds[0] = min( bounds[0], range[0] )
+                bounds[1] = max( bounds[1], range[1] )
 
     def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""

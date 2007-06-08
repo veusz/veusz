@@ -96,8 +96,9 @@ class Fit(plotters.FunctionPlotter):
         """Determine range of data."""
         if self.document.hasData(dataname):
             range = self.document.getData(dataname).getRange()
-            bounds[0] = min( bounds[0], range[0] )
-            bounds[1] = max( bounds[1], range[1] )
+            if range:
+                bounds[0] = min( bounds[0], range[0] )
+                bounds[1] = max( bounds[1], range[1] )
 
     def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""

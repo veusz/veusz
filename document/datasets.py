@@ -458,13 +458,16 @@ class Dataset(DatasetBase):
         if self.perr is not None:
             maxvals += self.perr
 
-        return (minvals, maxvals)
+        return ( minvals[N.isfinite(minvals)],
+                 maxvals[N.isfinite(maxvals)] )
 
     def getRange(self):
-        '''Get total range of coordinates.'''
+        '''Get total range of coordinates. Returns None if empty.'''
         minvals, maxvals = self.getPointRanges()
-        return ( N.minimum.reduce(minvals),
-                 N.maximum.reduce(maxvals) )
+        if len(minvals) > 0 and len(maxvals) > 0:
+            return ( minvals.min(), maxvals.max() )
+        else:
+            return None
 
     def empty(self):
         '''Is the data defined?'''
