@@ -38,8 +38,6 @@ import datacreate
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
 
-    colnames = ('data', 'serr', 'perr', 'nerr')
-    
     def __init__(self, parent, document, datasetname):
         qt4.QAbstractTableModel.__init__(self, parent)
 
@@ -51,17 +49,18 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         try:
             return len(self.document.data[self.dsname].data)
-        except KeyError:
+        except (KeyError, AttributeError):
             return 0
         
     def columnCount(self, parent):
-        return 4
+        ds = self.document.data[self.dsname]
+        return len( ds.column_descriptions )
 
     def data(self, index, role):
         if role == qt4.Qt.DisplayRole:
             # select correct part of dataset
             ds = self.document.data[self.dsname]
-            data = getattr(ds, self.colnames[index.column()])
+            data = getattr(ds, ds.columns[index.column()])
 
             if data is not None:
                 return qt4.QVariant( data[index.row()] )
@@ -74,9 +73,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
-                val = ['Data', 'Sym. errors', 'Pos. errors',
-                       'Neg. errors'][section]
-                return qt4.QVariant(val)
+                ds = self.document.data[self.dsname]
+                return qt4.QVariant( ds.column_descriptions[section] )
             else:
                 # return row numbers
                 return qt4.QVariant(section+1)
@@ -98,23 +96,28 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             row = index.row()
             column = index.column()
             ds = self.document.data[self.dsname]
-            data = getattr(ds, self.colnames[index.column()])
+            data = getattr(ds, ds.columns[index.column()])
 
             # add new column if necessary
             if data is None:
-                self.document.applyOperation( document.OperationDatasetAddColumn(self.dsname, self.colnames[column]) )
+                self.document.applyOperation( document.OperationDatasetAddColumn(self.dsname,
+                                                                                 ds.columns[column]) )
 
 
             # update if conversion okay
-            f, ok = value.toDouble()
-            if ok:
-                op = document.OperationDatasetSetVal(self.dsname,
-                                                     self.colnames[column],
-                                                     row, f)
-                self.document.applyOperation(op)
-                return True
+            try:
+                val = ds.convertToDataItem( value.toString() )
+            except ValueError:
+                return False
+            
+            op = document.OperationDatasetSetVal(self.dsname,
+                                                 ds.columns[column],
+                                                 row, val)
+            self.document.applyOperation(op)
+            return True
 
-        return False
+        else:
+            return False
 
 class DatasetTableModel2D(qt4.QAbstractTableModel):
     """A 2D dataset model."""
@@ -309,10 +312,8 @@ class DataEditDialog(qt4.QDialog):
         if isinstance(ds, document.DatasetExpression):
             # for datasets linked by expressions
             items = ['Linked expression dataset:']
-            for label, part in ( ('Values', 'data'),
-                                 ('Symmetric errors', 'serr'),
-                                 ('Positive errors', 'perr'),
-                                 ('Negative errors', 'nerr') ):
+            for label, part in itertools.izip(ds.column_descriptions,
+                                              ds.columns):
                 if ds.expr[part]:
                     items.append('%s: %s' % (label, ds.expr[part]))
             text = '\n'.join(items)

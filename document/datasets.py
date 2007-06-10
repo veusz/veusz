@@ -288,6 +288,8 @@ class DatasetBase(object):
     # number of dimensions the dataset holds
     dimensions = 0
     datatype = 'numeric'
+    columns = ()
+    column_descriptions = ()
 
     def saveLinksToSavedDoc(self, file, savedlinks):
         '''Save the link to the saved document, if this dataset is linked.
@@ -313,6 +315,10 @@ class DatasetBase(object):
     def description(self, showlinked=True):
         """Get description of database."""
         return ""
+
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return None
 
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
@@ -371,11 +377,17 @@ class Dataset2D(DatasetBase):
             text += ', linked to %s' % self.linked.filename
         return text
 
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return float(val)
+
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
 
     # number of dimensions the dataset holds
     dimensions = 1
+    columns = ('data', 'serr', 'nerr', 'perr')
+    column_descriptions = ('Data', 'Sym. errors', 'Pos. errors', 'Neg. errors')
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
@@ -527,11 +539,17 @@ class Dataset(DatasetBase):
 
         file.write( "''')\n" )
 
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return float(val)
+
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
     dimensions = 1
     datatype = 'text'
+    columns = ('data',)
+    column_descriptions = ('Data',)
 
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
@@ -556,6 +574,10 @@ class DatasetText(DatasetBase):
 
         self.document.setModified(True)
     
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return unicode(val)
+
     def saveToFile(self, file, name):
         '''Save data to file.
         '''
