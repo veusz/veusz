@@ -320,6 +320,17 @@ class DatasetBase(object):
         """Return a value cast to this dataset data type."""
         return None
 
+    def split(self, startindex, stopindex):
+        """Return a new dataset for the data between these indices."""
+
+        args = {}
+        for col in self.columns:
+            array = getattr(self, col)
+            if array is not None:
+                args[col] = array[startindex:stopindex]
+        
+        return type(self)(**args)
+    
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -438,7 +449,7 @@ class Dataset(DatasetBase):
         return Dataset(**attrs)
 
     def invalidDataPoints(self):
-        """Return a numarray bool detailing which datapoints are invalid."""
+        """Return a numpy bool detailing which datapoints are invalid."""
         if self._invalidpoints is None:
             # recalculate valid points
             self._invalidpoints = N.logical_not(N.isfinite(self.data))
@@ -446,6 +457,7 @@ class Dataset(DatasetBase):
                 if error is not None:
                     self._invalidpoints = N.logical_or(self._invalidpoints,
                                                        N.logical_not(N.isfinite(error)))
+
         return self._invalidpoints
     
     def hasErrors(self):
@@ -485,26 +497,21 @@ class Dataset(DatasetBase):
         '''Is the data defined?'''
         return self.data is None or len(self.data) == 0
 
-    def changeValues(self, type, vals):
+    def changeValues(self, thetype, vals):
         """Change the requested part of the dataset to vals.
 
-        type == vals | serr | perr | nerr
+        thetype == data | serr | perr | nerr
         """
-        if type == 'vals':
-            self.data = vals
-        elif type == 'serr':
-            self.serr = vals
-        elif type == 'nerr':
-            self.nerr = vals
-        elif type == 'perr':
-            self.perr = vals
+        self._invalidpoints = None
+        if thetype in self.columns:
+            setattr(self, thetype, vals)
         else:
-            raise ValueError, 'type does not contain an allowed value'
+            raise ValueError, 'thetype does not contain an allowed value'
 
         # just a check...
         s = self.data.shape
-        for i in (self.serr, self.nerr, self.perr):
-            assert i is None or i.shape == s
+        for x in (self.serr, self.nerr, self.perr):
+            assert x is None or x.shape == s
 
         self.document.setModified(True)
 

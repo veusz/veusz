@@ -983,7 +983,11 @@ class DatasetOrFloatList(Dataset):
     def getData(self, doc):
         """Return veusz dataset"""
         if isinstance(self.val, basestring):
-            return doc.data.get(self.val)
+            d = doc.data.get(self.val)
+            if ( d and d.datatype == self.datatype and
+                 d.dimensions == self.dimensions ):
+                return d
+            return None
         else:
             # blah - need to import here due to dependencies
             import veusz.document as document
@@ -992,13 +996,18 @@ class DatasetOrFloatList(Dataset):
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
 
-    def getData(self, doc):
-        """Return either a list of strings, a single item list."""
+    def getData(self, doc, checknull=False):
+        """Return either a list of strings, a single item list.
+        If checknull then None is returned if blank
+        """
         if doc:
             ds = doc.data.get(self.val)
             if ds and ds.datatype == self.datatype:
                 return ds.data
-        return [unicode(self.val)]
+        if checknull and not self.val:
+            return None
+        else:
+            return [unicode(self.val)]
 
     def makeControl(self, *args):
         # use string editor rather than drop down list
@@ -1081,7 +1090,8 @@ class LineStyle(Choice):
 
     # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
-                   'dash-dot', 'dash-dot-dot', 'dotted-fine' ]
+                   'dash-dot', 'dash-dot-dot', 'dotted-fine',
+                   'dashed-fine']
 
     # convert from line styles to Qt constants and a custom pattern (if any)
     _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
@@ -1089,7 +1099,8 @@ class LineStyle(Choice):
                   'dotted': (qt4.Qt.DotLine, None),
                   'dash-dot': (qt4.Qt.DashDotLine, None),
                   'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
-                  'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]) }
+                  'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]),
+                  'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]) }
     
     controls.LineStyle._lines = _linestyles
     

@@ -387,6 +387,10 @@ class PointPlotter(GenericPlotter):
                               descr='Style of error bars to plot',
                               usertext='Error style', formatting=True) )
 
+        s.add( setting.DatasetOrStr('labels', '',
+                                    descr='Dataset or string to label points',
+                                    usertext='Labels', datatype='text') )
+
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings',
                                   usertext = 'Plot line'),
@@ -411,6 +415,10 @@ class PointPlotter(GenericPlotter):
                                    descr = 'Fill above plot line',
                                    usertext = 'Fill above'),
                pixmap = 'plotfillabove' )
+        s.add( setting.PointLabel('Label',
+                                  descr = 'Label settings',
+                                  usertext='Label'),
+               pixmap = 'axislabel' )
 
         if type(self) == PointPlotter:
             self.readDefaults()
@@ -678,20 +686,25 @@ class PointPlotter(GenericPlotter):
                 
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
+    class TempDataset:
+        pass
+
     def chopInvalid(self, *datasets):
         """Chop datasets into bits according to whether numbers are finite."""
-
-        attrs = ('data', 'serr', 'perr', 'nerr')
 
         # find NaNs and INFs in input dataset
         invalid = datasets[0].invalidDataPoints()
         for d in datasets[1:]:
-            invalid = d.invalidDataPoints()
-            if invalid.shape == invalid.shape:
-                invalid = N.logical_or(invalid, invalid)
+            nextinvalid = d.invalidDataPoints()
+            if nextinvalid.shape == invalid.shape:
+                invalid = N.logical_or(invalid, nextinvalid)
 
         # get indexes of invalid pounts
         indexes = invalid.nonzero()[0].tolist()
+
+        # return originals if no bad points
+        if not indexes:
+            return [[x] for x in datasets]
 
         # append last array index not to lose data
         # chop to shortest dataset to ensure equal length
@@ -707,14 +720,7 @@ class PointPlotter(GenericPlotter):
             for idx in indexes:
                 # skip consecutive NaNs or INFs
                 if idx != lastindex:
-                    # build up parameters for dataset
-                    vals = {}
-                    for attr in attrs:
-                        data = getattr(inds, attr)
-                        if data is not None:
-                            vals[attr] = data[lastindex:idx]
-
-                    outds.append( document.Dataset(**vals) )
+                    outds.append( inds.split(lastindex, idx) )
                 lastindex = idx+1
 
             outdss.append(outds)
@@ -738,10 +744,17 @@ class PointPlotter(GenericPlotter):
         doc = self.document
         xv = s.get('xData').getData(doc)
         yv = s.get('yData').getData(doc)
+        text = s.get('labels').getData(doc, checknull=True)
 
         if not xv or not yv:
             return
-        
+
+        # if text entered, then multiply up to get same number of values
+        # as datapoints
+        if text:
+            length = min( len(xv.data), len(yv.data) )
+            text = text*(length / len(text)) + text[:length % len(text)]
+
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
@@ -757,7 +770,7 @@ class PointPlotter(GenericPlotter):
         self.clipAxesBounds(painter, axes, posn)
 
         # chop up values according to where there are NaNs
-        xvlist, yvlist= self.chopInvalid(xv, yv)
+        xvlist, yvlist = self.chopInvalid(xv, yv)
 
         # loop over chopped up values
         for xvals, yvals in itertools.izip(xvlist, yvlist):

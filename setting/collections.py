@@ -309,6 +309,7 @@ class Text(Settings):
         return qt4.QPen(qt4.QColor(self.color))
         
 class AxisLabel(Text):
+    """For axis labels."""
 
     def __init__(self, name, **args):
         Text.__init__(self, name, **args)
@@ -321,6 +322,7 @@ class AxisLabel(Text):
                                 usertext='Rotate') )
 
 class TickLabel(Text):
+    """For tick labels on axes."""
 
     def __init__(self, name, **args):
         Text.__init__(self, name, **args)
@@ -336,3 +338,19 @@ class TickLabel(Text):
                                 'of the tick labels',
                                 usertext='Scale') )
 
+class PointLabel(Text):
+    """For labelling points on plots."""
+
+    def __init__(self, name, **args):
+        Text.__init__(self, name, **args)
+        
+        self.add( setting.Choice('posnVert',
+                                 ['top', 'centre', 'bottom'], 'centre',
+                                 descr='Vertical position of label',
+                                 usertext='Vert position',
+                                 formatting=True), 0 )
+        self.add( setting.Choice('posnHorz',
+                                 ['left', 'centre', 'right'], 'right',
+                                 descr="Horizontal position of label",
+                                 usertext='Horz position',
+                                 formatting=True), 0 )

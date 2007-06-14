@@ -921,14 +921,14 @@ class OperationDatasetSetVal:
         datacol = getattr(ds, self.columnname)
         self.oldval = datacol[self.row]
         datacol[self.row] = self.val
-        document.setData(self.datasetname, ds)
-        
+        ds.changeValues(self.columnname, datacol)
+
     def undo(self, document):
         """Restore the value."""
         ds = document.data[self.datasetname]
         datacol = getattr(ds, self.columnname)
         datacol[self.row] = self.oldval
-        document.setData(self.datasetname, ds)
+        ds.changeValues(self.columnname, datacol)
     
 ###############################################################################
 # Misc operations
