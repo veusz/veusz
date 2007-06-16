@@ -344,6 +344,10 @@ class PointLabel(Text):
     def __init__(self, name, **args):
         Text.__init__(self, name, **args)
         
+        self.add( setting.Float('angle', 0.,
+                                descr='Angle of the labels in degrees',
+                                usertext='Angle',
+                                formatting=True), 0 )
         self.add( setting.Choice('posnVert',
                                  ['top', 'centre', 'bottom'], 'centre',
                                  descr='Vertical position of label',
@@ -354,7 +358,3 @@ class PointLabel(Text):
                                  descr="Horizontal position of label",
                                  usertext='Horz position',
                                  formatting=True), 0 )
-        self.add( setting.Float('angle', 0.,
-                                descr='Angle of the labels in degrees',
-                                usertext='Angle',
-                                formatting=True), 0 )

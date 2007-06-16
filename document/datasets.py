@@ -321,7 +321,10 @@ class DatasetBase(object):
         return None
 
     def __getitem__(self, key):
-        """Return a dataset based on this dataset, e.g. ranges."""
+        """Return a dataset based on this dataset
+
+        e.g. dataset[5:100] - make a dataset based on items 5 to 99 inclusive
+        """
 
         args = {}
         for col in self.columns:
@@ -330,6 +333,11 @@ class DatasetBase(object):
                 args[col] = array[key]
         
         return type(self)(**args)
+
+    def __len__(self):
+        """Return length of dataset."""
+
+        return len(self.data)
     
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''

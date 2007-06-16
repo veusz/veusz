@@ -709,7 +709,7 @@ class PointPlotter(GenericPlotter):
             return
 
         # add on shortest length of datasets
-        indexes.append( min([ds.data.shape[0] for ds in datasets if hasattr(ds, 'data')]) )
+        indexes.append( min([len(ds) for ds in datasets if ds]) )
     
         lastindex = 0
         for index in indexes:
@@ -729,8 +729,6 @@ class PointPlotter(GenericPlotter):
         s = self.settings
         lab = s.get('Label')
         
-        painter.save()
-
         # work out offset an alignment
         deltax = markersize*1.5*{'left':-1, 'centre':0, 'right':1}[lab.posnHorz]
         deltay = markersize*1.5*{'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
@@ -748,8 +746,6 @@ class PointPlotter(GenericPlotter):
                                       textvals):
             utils.Renderer( painter, font, x, y, t,
                             alignhorz, alignvert, angle ).render()
-
-        painter.restore()
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
