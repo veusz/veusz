@@ -7,7 +7,7 @@ This animates a sin plot, then finishes
 """
 
 import time
-import numarray
+import numpy
 import veusz.embed as veusz
 
 # construct a Veusz embedded window
@@ -29,8 +29,8 @@ g.Zoom(0.8)
 
 # loop, changing the values of the x and y datasets
 for i in range(10):
-    x = numarray.arange(0+i/2., 7.+i/2., 0.05)
-    y = numarray.sin(x)
+    x = numpy.arange(0+i/2., 7.+i/2., 0.05)
+    y = numpy.sin(x)
     g.SetData('x', x)
     g.SetData('y', y)
 

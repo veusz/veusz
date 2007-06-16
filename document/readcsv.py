@@ -98,7 +98,7 @@ class ReadCSV:
             prefix = 'col'
 
         name = '%s%i' % (prefix, column+1)
-        if self.prefix != None:
+        if self.prefix is not None:
             name = '%s_%s' % (self.prefix, name)
         return name
 
@@ -117,6 +117,9 @@ class ReadCSV:
 
         # dataset names for each column
         colnames = {}
+        # whether is a text column (ignore name changes below)
+        textcol = {}
+        self.nameistextcol = {}
 
         # iterate over each line (or column)
         while True:
@@ -129,7 +132,12 @@ class ReadCSV:
             for colnum, col in enumerate(line):
                 try:
                     # try to convert to a float
-                    f = float(col)
+                    if colnum not in textcol:
+                        # floating point column
+                        v = float(col)
+                    else:
+                        # text column
+                        v = col
 
                 except ValueError:
                     # not a number, so generate a dataset name
@@ -155,8 +163,15 @@ class ReadCSV:
 
                     else:
                         # add on prefix if reqd
-                        if self.prefix != None:
+                        if self.prefix is not None:
                             name = '%s_%s' % (self.prefix, name)
+
+                    # check whether a text column
+                    if name.split()[-1] == '(text)':
+                        textcol[colnum] = True
+                        # strip off (text)
+                        name = ' '.join(name.split()[:-1])
+                        self.nameistextcol[name] = True
 
                     # add on dataset
                     colnames[colnum] = name
@@ -175,7 +190,7 @@ class ReadCSV:
 
                     # append number to data
                     coldata = self.data[colnames[colnum]]
-                    coldata.append(f)
+                    coldata.append(v)
 
     def setData(self, document, linkedfile=None):
         """Set the read-in datasets in the document."""
@@ -196,8 +211,12 @@ class ReadCSV:
             perr = self.data.get(name+'+', None)
             nerr = self.data.get(name+'-', None)
                                 
-            ds = datasets.Dataset(data=data, serr=serr, perr=perr,
-                                  nerr=nerr, linked=linkedfile)
+            # normal dataset
+            if name in self.nameistextcol:
+                ds = datasets.DatasetText(data=data, linked=linkedfile)
+            else:
+                ds = datasets.Dataset(data=data, serr=serr, perr=perr,
+                                      nerr=nerr, linked=linkedfile)
             document.setData(name, ds)
 
         dsnames.sort()

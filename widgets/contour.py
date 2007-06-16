@@ -27,8 +27,8 @@ as a C routine (taken from matplotlib) is used to trace the contours.
 import itertools
 import sys
 
-import qt
-import numarray as N
+import veusz.qtall as qt4
+import numpy as N
 
 import veusz.setting as setting
 import veusz.document as document
@@ -50,7 +50,7 @@ class Contour(plotters.GenericPlotter):
 
         # try to import contour helpers here
         try:
-            from veusz.helpers._na_cntr import Cntr
+            from veusz.helpers._nc_cntr import Cntr
         except ImportError:
             Cntr = None
             print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'
@@ -62,40 +62,50 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
-                               descr = 'Dataset to plot' ),
+                               descr = 'Dataset to plot',
+                               usertext='Dataset'),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr = 'Minimum value of contour scale'),
+                                   descr = 'Minimum value of contour scale',
+                                   usertext='Min. value'),
                1 )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr = 'Maximum value of contour scale'),
+                                   descr = 'Maximum value of contour scale',
+                                   usertext='Max. value'),
                2 )
         s.add( setting.Int('numLevels', 5,
                            minval = 1,
-                           descr = 'Number of contour levels to plot'),
+                           descr = 'Number of contour levels to plot',
+                           usertext='Number levels'),
                3 )
         s.add( setting.Choice('scaling',
                               ['linear', 'sqrt', 'log', 'squared', 'manual'],
                               'linear',
-                              descr = 'Scaling between contour levels'),
+                              descr = 'Scaling between contour levels',
+                              usertext='Scaling'),
                4 )
         s.add( setting.FloatList('manualLevels',
                                  [],
-                                 descr = 'Levels to use for manual scaling'),
+                                 descr = 'Levels to use for manual scaling',
+                                 usertext='Manual levels'),
                5 )
         s.add( setting.FloatList('levelsOut',
                                  [],
-                                 descr = 'Levels used in the plot'),
+                                 descr = 'Levels used in the plot',
+                                 usertext='Output levels'),
                6, readonly=True )
 
         s.add( setting.LineSet('lines',
                                [('solid', '1pt', 'black', False)],
                                descr = 'Line styles to plot the contours '
-                               'using'),
-               7 )
+                               'using', usertext='Line styles',
+                               formatting=True),
+               7)
 
         s.add( setting.FillSet('fills', [],
-                               descr = 'Fill styles to plot between contours'),
+                               descr = 'Fill styles to plot between contours',
+                               usertext='Fill styles',
+                               formatting=True),
                8 )
 
         # keep track of settings so we recalculate when necessary
@@ -106,10 +116,23 @@ class Contour(plotters.GenericPlotter):
         self._cachedcontours = None
         self._cachedpolygons = None
 
+    def _getUserDescription(self):
+        """User friendly description."""
+        s = self.settings
+        out = []
+        if s.data:
+            out.append( s.data )
+        if s.scaling == 'manual':
+            out.append('manual levels (%s)' %  (', '.join([str(i) for i in s.manualLevels])))
+        else:
+            out.append('%(numLevels)i %(scaling)s levels (%(min)s to %(max)s)' % s)
+        return ', '.join(out)
+    userdescription = property(_getUserDescription)
+
     def _calculateLevels(self):
         """Calculate contour levels from data and settings.
 
-        Returns levels as 1d numarray
+        Returns levels as 1d numpy
         """
 
         # get dataset
@@ -162,7 +185,8 @@ class Contour(plotters.GenericPlotter):
                 levels = N.array(s.manualLevels)
 
         # for the user later
-        s.levelsOut = list(levels)
+        # we do this to convert array to list of floats
+        s.levelsOut = [float(i) for i in levels]
 
         return levels
 
@@ -200,6 +224,10 @@ class Contour(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
         s = self.settings
         d = self.document
+
+        # do not paint if hidden
+        if s.hide:
+            return
         
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
@@ -226,7 +254,7 @@ class Contour(plotters.GenericPlotter):
                          tuple(s.manualLevels) )
 
         if (data != self.lastdataset or contsettings != self.contsettings or
-            (self._cachedpolygons == None and len(s.fills) != 0)):
+            (self._cachedpolygons is None and len(s.fills) != 0)):
             self.updateContours()
             self.lastdataset = data
             self.contsettings = contsettings
@@ -264,7 +292,7 @@ class Contour(plotters.GenericPlotter):
         self._cachedcontours = None
         self._cachedpolygons = None
 
-        if self.Cntr != None:
+        if self.Cntr is not None:
             c = self.Cntr(xpts, ypts, data.data)
 
             # trace the contour levels
@@ -288,12 +316,12 @@ class Contour(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
 
         # no lines cached as no line styles
-        if self._cachedcontours == None:
+        if self._cachedcontours is None:
             return
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
 
         # iterate over each level, and list of lines
         for num, linelist in enumerate(self._cachedcontours):
@@ -304,17 +332,16 @@ class Contour(plotters.GenericPlotter):
             # iterate over each complete line of the contour
             for curve in linelist:
                 # convert coordinates from graph to plotter
-                xplt = axes[0].graphToPlotterCoords(posn, curve[0])
-                yplt = axes[1].graphToPlotterCoords(posn, curve[1])
+                xplt = axes[0].graphToPlotterCoords(posn, curve[:,0])
+                yplt = axes[1].graphToPlotterCoords(posn, curve[:,1])
 
                 # there should be a nice itertools way of doing this
-                pts = []
+                pts = qt4.QPolygonF()
                 for x, y in itertools.izip(xplt, yplt):
-                    pts.append(x)
-                    pts.append(y)
+                    pts.append( qt4.QPointF(x, y) )
 
                 # actually draw the curve to the plotter
-                painter.drawPolyline( qt.QPointArray(pts) )
+                painter.drawPolyline(pts)
 
         # remove clip region
         painter.restore()
@@ -326,13 +353,13 @@ class Contour(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
 
         # don't draw if there are no cached polygons
-        if self._cachedpolygons == None:
+        if self._cachedpolygons is None:
             return
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
-        painter.setPen(qt.QPen(qt.Qt.NoPen))
+        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
+        painter.setPen(qt4.QPen(qt4.Qt.NoPen))
 
         # iterate over each level, and list of lines
         for num, polylist in enumerate(self._cachedpolygons):
@@ -343,17 +370,16 @@ class Contour(plotters.GenericPlotter):
             # iterate over each complete line of the contour
             for poly in polylist:
                 # convert coordinates from graph to plotter
-                xplt = axes[0].graphToPlotterCoords(posn, poly[0])
-                yplt = axes[1].graphToPlotterCoords(posn, poly[1])
+                xplt = axes[0].graphToPlotterCoords(posn, poly[:,0])
+                yplt = axes[1].graphToPlotterCoords(posn, poly[:,1])
 
                 # there should be a nice itertools way of doing this
-                pts = []
+                pts = qt4.QPolygonF()
                 for x, y in itertools.izip(xplt, yplt):
-                    pts.append(x)
-                    pts.append(y)
+                    pts.append( qt4.QPointF(x, y) )
 
                 # actually draw the curve to the plotter
-                painter.drawPolygon( qt.QPointArray(pts) )
+                painter.drawPolygon(pts)
 
         # remove clip region
         painter.restore()

@@ -23,7 +23,7 @@
 
 import math
 
-import numarray as N
+import numpy as N
 
 """Algorithms for working with axis ticks.
 
@@ -309,7 +309,7 @@ class AxisTicks:
                     # get lower power of 10
                     low10 = int( math.floor(minval) )
 
-                    # could use numarray here
+                    # could use numpy here
                     for i in (2., 5., 20., 50.):
                         n = low10 + math.log10(i)
                         if n >= minval and n <= maxval:

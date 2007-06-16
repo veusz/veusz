@@ -24,14 +24,14 @@
 For example:
 
 import time
-import numarray
+import numpy
 import veusz.embed as veusz
 
 g = veusz.Embedded('new win')
 g.To( g.Add('page') )
 g.To( g.Add('graph') )
-g.SetData('x', numarray.arange(20))
-g.SetData('y', numarray.arange(20)**2)
+g.SetData('x', numpy.arange(20))
+g.SetData('y', numpy.arange(20)**2)
 g.Add('xy')
 g.Zoom(0.5)
 
@@ -41,8 +41,8 @@ g.Close()
 More than one embedded window can be opened at once
 """
 
-import sys
 import thread
+import sys
 import os
 import os.path
 import atexit
@@ -113,7 +113,7 @@ class Embedded(object):
         """Remove the window if deleted."""
 
         # FIXME: this never gets called. Don't know why.
-        if self.window != None:
+        if self.window is not None:
             self.Close()
 
     def _runCommand(cmd, *args, **args2):
@@ -199,7 +199,7 @@ class Embedded(object):
     def _startThread():
         """Start up the Qt application in a thread."""
 
-        import qt
+        import veusz.qtall as qt4
 
         # drag in veusz before opening application
         import veusz.document
@@ -219,7 +219,7 @@ class Embedded(object):
                 os.read(Embedded.pipetoveusz_r, 1)
 
                 # handle command
-                assert Embedded.command != None
+                assert Embedded.command is not None
                 cmd, args, args2 = Embedded.command
                 try:
                     Embedded.retval = cmd(*args, **args2)
@@ -237,15 +237,15 @@ class Embedded(object):
         app = _App(argv)
 
         # application has a notifier to know when it needs to do something
-        notifier = qt.QSocketNotifier(Embedded.pipetoveusz_r,
-                                      qt.QSocketNotifier.Read)
+        notifier = qt4.QSocketNotifier(Embedded.pipetoveusz_r,
+                                       qt4.QSocketNotifier.Read)
 
         # connect app to notifier
-        app.connect(notifier, qt.SIGNAL('activated(int)'), app.notification)
+        app.connect(notifier, qt4.SIGNAL('activated(int)'), app.notification)
         notifier.setEnabled(True)
 
         # start the main Qt event loop
-        app.exec_loop()
+        app.exec_()
 
         # exits when app.quit() is called
        
@@ -253,15 +253,15 @@ class Embedded(object):
     
     def _exitQt():
         """Exit the Qt thread."""
-        import qt
-        qt.qApp.quit()
+        import veusz.qtall as qt4
+        qt4.qApp.quit()
     _exitQt = staticmethod(_exitQt)
 
     def _atExit():
         """Close the Qt thread if we're closing the program."""
-        if Embedded.lock != None:
+        if Embedded.lock is not None:
             # open window for this embedded instance
             Embedded._runCommand( Embedded._exitQt )
     _atExit = staticmethod(_atExit)
-  
+
 atexit.register(Embedded._atExit)

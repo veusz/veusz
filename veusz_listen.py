@@ -32,8 +32,6 @@ Zoom x: Change the zoom factor of the plot to x
 import sys
 import os.path
 
-import qt
-
 # Allow veusz to be run even if not installed into PYTHONPATH
 try:
     import veusz
@@ -46,18 +44,20 @@ except ImportError:
     veusz.__name__ = 'veusz'
     sys.modules['veusz'] = veusz
 
+import veusz.qtall as qt4
+
 from veusz.windows.simplewindow import SimpleWindow
 import veusz.document as document
-from application import Application
+from veusz.application import Application
 
-class InputListener(qt.QObject):
+class InputListener(qt4.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
 
     def __init__(self, window):
         """Initialse the listening object to send commands to the
         document given by window."""
         
-        qt.QObject.__init__(self)
+        qt4.QObject.__init__(self)
 
         self.window = window
         self.document = window.document
@@ -70,9 +70,9 @@ class InputListener(qt.QObject):
         self.ci.addCommand('EnableToolbar', self.enableToolbar)
         self.ci.addCommand('Pickle', self.enablePickle)
 
-        self.notifier = qt.QSocketNotifier( sys.stdin.fileno(),
-                                            qt.QSocketNotifier.Read )
-        self.connect( self.notifier, qt.SIGNAL('activated(int)'),
+        self.notifier = qt4.QSocketNotifier( sys.stdin.fileno(),
+                                             qt4.QSocketNotifier.Read )
+        self.connect( self.notifier, qt4.SIGNAL('activated(int)'),
                       self.dataReceived )
         self.notifier.setEnabled(True)
 
@@ -117,12 +117,12 @@ def run():
         
     win = SimpleWindow(name)
     win.show()
-    app.connect(app, qt.SIGNAL("lastWindowClosed()"),
-                app, qt.SLOT("quit()"))
+    app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
+                app, qt4.SLOT("quit()"))
 
     l = InputListener(win)
 
-    app.exec_loop()
+    app.exec_()
 
 # if ran as a program
 if __name__ == '__main__':

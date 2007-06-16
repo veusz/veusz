@@ -23,30 +23,32 @@
 import itertools
 import re
 
-import numarray as N
-import numarray.ieeespecial as NIE
+import numpy as N
 
 import doc
 import simpleread
 import operations
 import readcsv
 
-# need to refer to numarray object's type later
-numarraytype = type(N.arange(1, type=N.Float64))
-
-def _convertNumarray(a):
-    """Convert to a numarray if possible."""
+def _convertNumpy(a):
+    """Convert to a numpy double if possible."""
     if a is None:
+        # leave as None
         return None
-    elif not isinstance(a, numarraytype):
-        return N.array(a, type=N.Float64)
-    elif a.type != 'Float64':
-        return a.astype(N.Float64)
+    elif not isinstance(a, N.ndarray):
+        # convert to numpy array
+        return N.array(a, dtype='float64')
     else:
-        return a
+        # make conversion if numpy type is not correct
+        if a.dtype != N.dtype('float64'):
+            return a.astype('float64')
+        else:
+            return a
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
+
+    # filename is member
 
     def saveToFile(self, file):
         '''Save the link to the document file.'''
@@ -149,7 +151,7 @@ class Linked2DFile(LinkedFileBase):
         args = [repr(self.filename), repr(self.datasets)]
         for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose'):
             v = getattr(self, p)
-            if v != None:
+            if v is not None:
                 args.append( '%s=%s' % (p, repr(v)) )
         args.append('linked=True')
 
@@ -209,7 +211,7 @@ class LinkedFITSFile(LinkedFileBase):
         for c, a in itertools.izip(self.columns,
                                    ('datacol', 'symerrcol',
                                     'poserrcol', 'negerrcol')):
-            if c != None:
+            if c is not None:
                 args.append('%s=%s' % (a, repr(c)))
         args.append('linked=True')
 
@@ -285,6 +287,9 @@ class DatasetBase(object):
 
     # number of dimensions the dataset holds
     dimensions = 0
+    datatype = 'numeric'
+    columns = ()
+    column_descriptions = ()
 
     def saveLinksToSavedDoc(self, file, savedlinks):
         '''Save the link to the saved document, if this dataset is linked.
@@ -294,10 +299,46 @@ class DatasetBase(object):
         '''
 
         # links should only be saved once
-        if self.linked != None and self.linked not in savedlinks:
+        if self.linked is not None and self.linked not in savedlinks:
             savedlinks[self.linked] = True
             self.linked.saveToFile(file)
 
+    def name(self):
+        """Get dataset name."""
+        for name, ds in self.document.data.iteritems():
+            if ds == self:
+                break
+        else:
+            raise ValueError('Could not find self in document.data')
+        return name
+
+    def description(self, showlinked=True):
+        """Get description of database."""
+        return ""
+
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return None
+
+    def __getitem__(self, key):
+        """Return a dataset based on this dataset
+
+        e.g. dataset[5:100] - make a dataset based on items 5 to 99 inclusive
+        """
+
+        args = {}
+        for col in self.columns:
+            array = getattr(self, col)
+            if array is not None:
+                args[col] = array[key]
+        
+        return type(self)(**args)
+
+    def __len__(self):
+        """Return length of dataset."""
+
+        return len(self.data)
+    
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -307,14 +348,14 @@ class Dataset2D(DatasetBase):
     def __init__(self, data, xrange=None, yrange=None):
         '''Create a two dimensional dataset based on data.
 
-        data: 2d numarray of imaging data
+        data: 2d numpy of imaging data
         xrange: a tuple of (start, end) coordinates for x
         yrange: a tuple of (start, end) coordinates for y
         '''
 
         self.document = None
         self.linked = None
-        self.data = _convertNumarray(data)
+        self.data = _convertNumpy(data)
 
         self.xrange = xrange
         self.yrange = yrange
@@ -331,7 +372,7 @@ class Dataset2D(DatasetBase):
         """Write the 2d dataset to the file given."""
 
         # return if there is a link
-        if self.linked != None:
+        if self.linked is not None:
             return
 
         file.write("ImportString2D(%s, '''\n" % repr(name))
@@ -345,26 +386,42 @@ class Dataset2D(DatasetBase):
 
         file.write("''')\n")
 
+    def description(self, showlinked=True):
+        """Get description of dataset."""
+        text = self.name()
+        text += ' (%ix%i)' % self.data.shape
+        text += ', x=%g->%g' % tuple(self.xrange)
+        text += ', y=%g->%g' % tuple(self.yrange)
+        if self.linked and showlinked:
+            text += ', linked to %s' % self.linked.filename
+        return text
+
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return float(val)
+
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
 
     # number of dimensions the dataset holds
     dimensions = 1
+    columns = ('data', 'serr', 'nerr', 'perr')
+    column_descriptions = ('Data', 'Sym. errors', 'Pos. errors', 'Neg. errors')
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
         '''Initialise dataset with the sets of values given.
 
-        The values can be given as numarray 1d arrays or lists of numbers
+        The values can be given as numpy 1d arrays or lists of numbers
         linked optionally specifies a LinkedFile to link the dataset to
         '''
         
         self.document = None
         self._invalidpoints = None
-        self.data = _convertNumarray(data)
-        self.serr = _convertNumarray(serr)
-        self.perr = _convertNumarray(perr)
-        self.nerr = _convertNumarray(nerr)
+        self.data = _convertNumpy(data)
+        self.serr = _convertNumpy(serr)
+        self.perr = _convertNumpy(perr)
+        self.nerr = _convertNumpy(nerr)
         self.linked = linked
 
         # check the sizes of things match up
@@ -373,32 +430,48 @@ class Dataset(DatasetBase):
             if i is not None and i.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
 
+    def description(self, showlinked=True):
+        """Get description of dataset."""
+
+        text = self.name()
+        if self.serr is not None:
+            text += ',+-'
+        if self.perr is not None:
+            text += ',+'
+        if self.nerr is not None:
+            text += ',-'
+        text += ' (length %i)' % len(self.data)
+
+        if self.linked and showlinked:
+            text += ' linked to %s' % self.linked.filename
+        return text
+
     def duplicate(self):
         """Return new dataset based on this one."""
-
-        # make copies of non-None elements
-        vals = {}
+        attrs = {}
         for attr in ('data', 'serr', 'nerr', 'perr'):
             data = getattr(self, attr)
             if data is not None:
-                vals[attr] = data.copy()
+                attrs[attr] = data.copy()
         
-        return Dataset(**vals)
+        return Dataset(**attrs)
 
     def invalidDataPoints(self):
-        """Return a numarray bool detailing which datapoints are invalid."""
+        """Return a numpy bool detailing which datapoints are invalid."""
         if self._invalidpoints is None:
             # recalculate valid points
-            self._invalidpoints = NIE.isnan(self.data)
+            self._invalidpoints = N.logical_not(N.isfinite(self.data))
             for error in self.serr, self.perr, self.nerr:
                 if error is not None:
                     self._invalidpoints = N.logical_or(self._invalidpoints,
-                                                       NIE.isnan(error))
+                                                       N.logical_not(N.isfinite(error)))
+
         return self._invalidpoints
     
     def hasErrors(self):
         '''Whether errors on dataset'''
-        return self.serr != None or self.nerr != None or self.perr != None
+        return (self.serr is not None or self.nerr is not None or
+                self.perr is not None)
 
     def getPointRanges(self):
         '''Get range of coordinates for each point in the form
@@ -407,50 +480,47 @@ class Dataset(DatasetBase):
         minvals = self.data.copy()
         maxvals = self.data.copy()
 
-        if self.serr != None:
+        if self.serr is not None:
             minvals -= self.serr
             maxvals += self.serr
 
-        if self.nerr != None:
+        if self.nerr is not None:
             minvals += self.nerr
 
-        if self.perr != None:
+        if self.perr is not None:
             maxvals += self.perr
 
-        return (minvals, maxvals)
+        return ( minvals[N.isfinite(minvals)],
+                 maxvals[N.isfinite(maxvals)] )
 
     def getRange(self):
-        '''Get total range of coordinates.'''
+        '''Get total range of coordinates. Returns None if empty.'''
         minvals, maxvals = self.getPointRanges()
-        return ( N.minimum.reduce(minvals),
-                 N.maximum.reduce(maxvals) )
+        if len(minvals) > 0 and len(maxvals) > 0:
+            return ( minvals.min(), maxvals.max() )
+        else:
+            return None
 
     def empty(self):
         '''Is the data defined?'''
-        return self.data == None or len(self.data) == 0
+        return self.data is None or len(self.data) == 0
 
-    def changeValues(self, type, vals):
+    def changeValues(self, thetype, vals):
         """Change the requested part of the dataset to vals.
 
-        type == vals | serr | perr | nerr
+        thetype == data | serr | perr | nerr
         """
-        if type == 'vals':
-            self.data = vals
-        elif type == 'serr':
-            self.serr = vals
-        elif type == 'nerr':
-            self.nerr = vals
-        elif type == 'perr':
-            self.perr = vals
+        self._invalidpoints = None
+        if thetype in self.columns:
+            setattr(self, thetype, vals)
         else:
-            raise ValueError, 'type does not contain an allowed value'
+            raise ValueError, 'thetype does not contain an allowed value'
 
         # just a check...
         s = self.data.shape
-        for i in (self.serr, self.nerr, self.perr):
-            assert i == None or i.shape == s
+        for x in (self.serr, self.nerr, self.perr):
+            assert x is None or x.shape == s
 
-        self._invalidpoints = None
         self.document.setModified(True)
 
     def saveToFile(self, file, name):
@@ -458,19 +528,19 @@ class Dataset(DatasetBase):
         '''
 
         # return if there is a link
-        if self.linked != None:
+        if self.linked is not None:
             return
 
         # build up descriptor
         datasets = [self.data]
         descriptor = name
-        if self.serr != None:
+        if self.serr is not None:
             descriptor += ',+-'
             datasets.append(self.serr)
-        if self.perr != None:
+        if self.perr is not None:
             descriptor += ',+'
             datasets.append(self.perr)
-        if self.nerr != None:
+        if self.nerr is not None:
             descriptor += ',-'
             datasets.append(self.nerr)
 
@@ -483,6 +553,51 @@ class Dataset(DatasetBase):
             file.write( format % line )
 
         file.write( "''')\n" )
+
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return float(val)
+
+class DatasetText(DatasetBase):
+    """Represents a text dataset: holding an array of strings."""
+
+    dimensions = 1
+    datatype = 'text'
+    columns = ('data',)
+    column_descriptions = ('Data',)
+
+    def __init__(self, data=None, linked=None):
+        """Initialise dataset with data given. Data are a list of strings."""
+
+        self.data = list(data)
+        self.linked = linked
+
+    def description(self, showlinked=True):
+        text = '%s (%i items)' % (self.name(), len(self.data))
+        if self.linked and showlinked:
+            text += ', linked to %s' % self.linked.filename
+        return text
+
+    def duplicate(self):
+        return DatasetText(data=self.data) # data is copied by this constructor
+
+    def changeValues(self, type, vals):
+        if type == 'vals':
+            self.data = list(vals)
+        else:
+            raise ValueError, 'type does not contain an allowed value'
+
+        self.document.setModified(True)
+    
+    def convertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        return unicode(val)
+
+    def saveToFile(self, file, name):
+        '''Save data to file.
+        '''
+
+        # FIXME: lots!
 
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
@@ -565,7 +680,7 @@ class DatasetExpression(Dataset):
 
         # set up a default environment
         self.environment = globals().copy()
-        exec 'from numarray import *' in self.environment
+        exec 'from numpy import *' in self.environment
 
         # this fn gets called to return the value of a dataset
         self.environment['_DS_'] = self._evaluateDataset
@@ -614,7 +729,7 @@ class DatasetExpression(Dataset):
     def _propValues(self, part):
         """Check whether expressions need reevaluating, and recalculate if necessary."""
 
-        assert self.document != None
+        assert self.document is not None
 
         # if document has been modified since the last invocation
         if self.docchangeset[part] != self.document.changeset:
@@ -623,7 +738,7 @@ class DatasetExpression(Dataset):
             expr = self.expr[part]
             self.evaluated[part] = None
 
-            if expr != None and expr != '':
+            if expr is not None and expr != '':
                 # replace dataset names with calls (ugly hack)
                 # but necessary for Python 2.3 as we can't replace
                 # dict in eval by subclass

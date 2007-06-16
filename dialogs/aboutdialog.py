@@ -1,7 +1,7 @@
 # about dialog box
 # aboutdialog.py
 
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2006 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -21,63 +21,54 @@
 
 # $Id$
 
-"""Module defines about dialog for Veusz."""
+"""About dialog module."""
 
 import os.path
 
-import qt
-
+import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.windows.action as action
 
-_abouttext=u"""Veusz %s   http://home.gna.org/veusz/
-Veusz is Copyright \u00a9 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
+class AboutDialog(qt4.QDialog):
+    """About dialog."""
 
-Authors:
- Jeremy Sanders <jeremy@jeremysanders.net>
- James Graham <jg307@cam.ac.uk>
+    def __init__(self, *args):
+        qt4.QDialog.__init__(self, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'about.ui'),
+                   self)
 
-Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software
-and you are entitled to distribute it under the conditions of the GPL.
-See the file COPYING for details.""" % \
-utils.version()
+        # draw logo in dialog
+        self.logolabel.setPixmap( action.getPixmap('logo.png') )
 
-class AboutDialog(qt.QDialog):
-    """About dialog class for Veusz."""
+        # add version to copyright text
+        copyrighttext = unicode(self.copyrightlabel.text())
+        copyrighttext = copyrighttext % {'version': utils.version()}
+        self.copyrightlabel.setText(copyrighttext)
 
-    def __init__(self, parent):
-        """Initialise dialog."""
+        self.connect(self.licenseButton, qt4.SIGNAL('clicked()'),
+                     self.licenseClicked)
 
-        qt.QDialog.__init__(self, parent, 'AboutDialog', True)
-        self.setCaption( 'About Veusz' )
+    def licenseClicked(self):
+        """Show the license."""
 
-        # label with logo (white background)
-        self.logo = qt.QPixmap( os.path.join(action.imagedir, 'logo.png') )
-        self.logolabel = qt.QLabel( self )
-        self.logolabel.setPixmap( self.logo )
-        self.logolabel.setAlignment( qt.Qt.AlignHCenter | qt.Qt.AlignVCenter )
-        self.logolabel.setFrameStyle( qt.QFrame.Panel | qt.QFrame.Raised )
-        self.logolabel.setBackgroundMode( qt.Qt.PaletteBase )
+        d = LicenseDialog(self)
+        d.exec_()
+        
+class LicenseDialog(qt4.QDialog):
+    """About license dialog."""
 
-        # about text (see above)
-        self.text = qt.QLabel( _abouttext, self )
-        self.text.setAlignment( qt.Qt.AlignHCenter | qt.Qt.AlignVCenter )
+    def __init__(self, *args):
+        qt4.QDialog.__init__(self, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'license.ui'),
+                   self)
 
-        # vertical layout
-        h = self.fontMetrics().height()
-        self.layout = qt.QVBoxLayout( self, h )
-        self.layout.addWidget( self.logolabel )
-        self.layout.addWidget( self.text )
+        try:
+            f = open(os.path.join(utils.veuszDirectory, 'COPYING'), 'rU')
+            text = f.read()
+        except IOError:
+            text = 'Could not open the license file.'
 
-        # put OK button to right of dialog (is this correct)
-        # OK button shouldn't expand to fill the space available
-        self.buttonbox = qt.QHBoxLayout( self.layout )
-        self.spacer = qt.QSpacerItem(0, 0, qt.QSizePolicy.Expanding,
-                                     qt.QSizePolicy.Minimum)
-        self.buttonbox.addItem( self.spacer )
-        self.okbutton = qt.QPushButton( "OK", self )
-        self.buttonbox.addWidget( self.okbutton )
-
-        # close dialog on ok being pressed
-        qt.QObject.connect( self.okbutton, qt.SIGNAL('clicked()'),
-                            self, qt.SLOT( 'accept()' ) )
+        self.licenseEdit.setPlainText(text)
+    

@@ -51,6 +51,10 @@ Add('label', label='The Mandelbrot Set', yPos=0.95,
     alignHorz='centre', alignVert='top',
     Text__size='30pt')
 
+# add colorbar in front of image
+Add('colorbar', name='colorbar1', image='image1',
+    direction='vertical', vertPosn='top')
+
 # add image
 Add('image', name='image1', data='image', min=1,
     colorScaling='log', colorMap='heat', colorInvert=True)

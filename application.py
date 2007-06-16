@@ -24,15 +24,15 @@ This doesn't do much, except allow functions to be registered for application
 startup.
 """
 
-import qt
+import veusz.qtall as qt4
 
-class Application(qt.QApplication):
+class Application(qt4.QApplication):
     """Main Veusz application class."""
     
     startupfunctions = []
     
     def __init__(self, *args):
-        qt.QApplication.__init__(self, *args)
+        qt4.QApplication.__init__(self, *args)
         
         for fn in self.startupfunctions:
             fn()
