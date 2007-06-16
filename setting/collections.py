@@ -354,3 +354,7 @@ class PointLabel(Text):
                                  descr="Horizontal position of label",
                                  usertext='Horz position',
                                  formatting=True), 0 )
+        self.add( setting.Float('angle', 0.,
+                                descr='Angle of the labels in degrees',
+                                usertext='Angle',
+                                formatting=True), 0 )

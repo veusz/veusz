@@ -686,46 +686,70 @@ class PointPlotter(GenericPlotter):
                 
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
-    class TempDataset:
-        pass
-
-    def chopInvalid(self, *datasets):
-        """Chop datasets into bits according to whether numbers are finite."""
+    def generateValidDatasetParts(self, *datasets):
+        """Generator to return array of valid parts of datasets."""
 
         # find NaNs and INFs in input dataset
         invalid = datasets[0].invalidDataPoints()
-        for d in datasets[1:]:
-            nextinvalid = d.invalidDataPoints()
-            if nextinvalid.shape == invalid.shape:
-                invalid = N.logical_or(invalid, nextinvalid)
-
+        for ds in datasets[1:]:
+            try:
+                nextinvalid = ds.invalidDataPoints()
+                if nextinvalid.shape == invalid.shape:
+                    invalid = N.logical_or(invalid, nextinvalid)
+            except AttributeError:
+                # if not a dataset
+                pass
+        
         # get indexes of invalid pounts
         indexes = invalid.nonzero()[0].tolist()
 
-        # return originals if no bad points
+        # no bad points: optimisation
         if not indexes:
-            return [[x] for x in datasets]
+            yield datasets
+            return
 
-        # append last array index not to lose data
-        # chop to shortest dataset to ensure equal length
-        indexes.append( min([ds.data.shape[0] for ds in datasets]) )
+        # add on shortest length of datasets
+        indexes.append( min([ds.data.shape[0] for ds in datasets if hasattr(ds, 'data')]) )
+    
+        lastindex = 0
+        for index in indexes:
+            if index != lastindex:
+                retn = []
+                for ds in datasets:
+                    if ds is not None:
+                        retn.append( ds[lastindex:index] )
+                    else:
+                        retn.append( None )
+                yield retn
+            lastindex = index+1
 
-        # iterate over datasets
-        # chop each dataset according to where the invalid points occur within
-        # the datasets
-        outdss = []  # output datasets
-        for inds in datasets:
-            outds = []
-            lastindex = 0
-            for idx in indexes:
-                # skip consecutive NaNs or INFs
-                if idx != lastindex:
-                    outds.append( inds.split(lastindex, idx) )
-                lastindex = idx+1
+    def drawLabels(self, painter, xplotter, yplotter, textvals, markersize):
+        """Draw labels for the points."""
 
-            outdss.append(outds)
+        s = self.settings
+        lab = s.get('Label')
+        
+        painter.save()
 
-        return outdss
+        # work out offset an alignment
+        deltax = markersize*1.5*{'left':-1, 'centre':0, 'right':1}[lab.posnHorz]
+        deltay = markersize*1.5*{'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
+        alignhorz = {'left':1, 'centre':0, 'right':-1}[lab.posnHorz]
+        alignvert = {'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
+
+        # make font and len
+        textpen = lab.makeQPen()
+        painter.setPen(textpen)
+        font = lab.makeQFont(painter)
+        angle = lab.angle
+
+        # iterate over each point and plot each label
+        for x, y, t in itertools.izip(xplotter+deltax, yplotter+deltay,
+                                      textvals):
+            utils.Renderer( painter, font, x, y, t,
+                            alignhorz, alignvert, angle ).render()
+
+        painter.restore()
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
@@ -769,11 +793,8 @@ class PointPlotter(GenericPlotter):
         painter.save()
         self.clipAxesBounds(painter, axes, posn)
 
-        # chop up values according to where there are NaNs
-        xvlist, yvlist = self.chopInvalid(xv, yv)
-
         # loop over chopped up values
-        for xvals, yvals in itertools.izip(xvlist, yvlist):
+        for xvals, yvals, tvals in self.generateValidDatasetParts(xv, yv, text):
 
             #print "Calculating coordinates"
             # calc plotter coords of x and y points
@@ -798,8 +819,9 @@ class PointPlotter(GenericPlotter):
                                     xvals.data, yvals.data )
 
             # plot the points (we do this last so they are on top)
+            markersize = 0
             if not s.MarkerLine.hide or not s.MarkerFill.hide:
-                size = s.get('markerSize').convert(painter)
+                markersize = s.get('markerSize').convert(painter)
 
                 #print "Painting marker fill"
                 if not s.MarkerFill.hide:
@@ -818,7 +840,11 @@ class PointPlotter(GenericPlotter):
                     painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
                 utils.plotMarkers(painter, xplotter, yplotter, s.marker,
-                                  size)
+                                  markersize)
+
+            # finally plot any labels
+            if tvals and not s.Label.hide:
+                self.drawLabels(painter, xplotter, yplotter, tvals, markersize)
 
         painter.restore()
         painter.endPaintingWidget()

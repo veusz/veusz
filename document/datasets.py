@@ -320,14 +320,14 @@ class DatasetBase(object):
         """Return a value cast to this dataset data type."""
         return None
 
-    def split(self, startindex, stopindex):
-        """Return a new dataset for the data between these indices."""
+    def __getitem__(self, key):
+        """Return a dataset based on this dataset, e.g. ranges."""
 
         args = {}
         for col in self.columns:
             array = getattr(self, col)
             if array is not None:
-                args[col] = array[startindex:stopindex]
+                args[col] = array[key]
         
         return type(self)(**args)
     
