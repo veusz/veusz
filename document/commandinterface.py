@@ -26,23 +26,23 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
-import veusz.qtall as qt4
+import qt
 
 import datasets
 import operations
 
-class CommandInterface(qt4.QObject):
+class CommandInterface(qt.QObject):
     """Class provides command interface."""
 
     def __init__(self, document):
         """Initialise the interface."""
-        qt4.QObject.__init__(self)
+        qt.QObject.__init__(self)
 
         self.document = document
         self.currentwidget = self.document.basewidget
         self.verbose = False
 
-        self.connect( self.document, qt4.SIGNAL("sigWiped"),
+        self.connect( self.document, qt.PYSIGNAL("sigWiped"),
                       self.slotWipedDoc )
 
     def slotWipedDoc(self):
@@ -188,13 +188,13 @@ class CommandInterface(qt4.QObject):
 
         d = self.document.getData(name)
         data = serr = nerr = perr = None
-        if d.data is not None:
+        if d.data != None:
             data = d.data.copy()
-        if d.serr is not None:
+        if d.serr != None:
             serr = d.serr.copy()
-        if d.nerr is not None:
+        if d.nerr != None:
             nerr = d.nerr.copy()
-        if d.perr is not None:
+        if d.perr != None:
             perr = d.perr.copy()
 
         return (data, serr, nerr, perr)
@@ -361,11 +361,11 @@ class CommandInterface(qt4.QObject):
         w = self.document.resolve(self.currentwidget, widget)
 
         # run action
-        w.getAction(action).function()
+        w.actionfuncs[action]()
 
     def Print(self):
         """Print document."""
-        p = qt4.QPrinter()
+        p = qt.QPrinter()
 
         if p.setup():
             p.newPage()

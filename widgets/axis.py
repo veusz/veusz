@@ -1,4 +1,7 @@
-#    Copyright (C) 2003-2007 Jeremy S. Sanders
+# axis.py
+# package to handle an axis, and the conversion of data -> coordinates
+
+#    Copyright (C) 2003-2005 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -18,11 +21,8 @@
 
 # $Id$
 
-"""Widget to plot axes, and to handle conversion of coordinates to plot
-positions."""
-
-import veusz.qtall as qt4
-import numpy as N
+import qt
+import numarray as N
 
 import veusz.document as document
 import veusz.setting as setting
@@ -32,7 +32,6 @@ import widget
 import axisticks
 import graph
 import containers
-import itertools
 
 class Axis(widget.Widget):
     """Manages and draws an axis."""
@@ -48,80 +47,61 @@ class Axis(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
         s.add( setting.Str('label', '',
-                           descr='Axis label text',
-                           usertext='Label') )
+                           descr='Axis label text') )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr='Minimum value of axis',
-                                   usertext='Min') )
+                                   descr='Minimum value of axis') )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr='Maximum value of axis',
-                                   usertext='Max') )
+                                   descr='Maximum value of axis') )
         s.add( setting.Bool('log', False,
-                            descr = 'Whether axis is logarithmic',
-                            usertext='Log') )
+                            descr = 'Whether axis is logarithmic') )
         s.add( setting.Bool('autoExtend', True,
-                            descr = 'Extend axis to nearest major tick',
-                            usertext='Auto extend') )
+                            descr = 'Extend axis to nearest major tick') )
         s.add( setting.Bool('autoExtendZero', True,
-                            descr = 'Extend axis to zero if close',
-                            usertext='Zero extend') )
+                            descr = 'Extend axis to zero if close') )
         s.add( setting.Bool('autoMirror', True,
                             descr = 'Place axis on opposite side of graph '
-                            'if none',
-                            usertext='Auto mirror') )
+                            'if none') )
         s.add( setting.Bool('reflect', False,
                             descr = 'Place axis text and ticks on other side'
-                            ' of axis',
-                            usertext='Reflect') )
+                            ' of axis') )
         s.add( setting.WidgetPath('match', '',
                                   descr =
                                   'Match the scale of this axis to the '
                                   'axis specified',
-                                  usertext='Match',
                                   allowedwidgets = [Axis] ))
 
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
                               'horizontal',
-                              descr = 'Direction of axis',
-                              usertext='Direction') )
+                              descr = 'Direction of axis') )
         s.add( setting.Float('lowerPosition', 0.,
                              descr='Fractional position of lower end of '
-                             'axis on graph',
-                             usertext='Min position') )
+                             'axis on graph') )
         s.add( setting.Float('upperPosition', 1.,
                              descr='Fractional position of upper end of '
-                             'axis on graph',
-                             usertext='Max position') )
+                             'axis on graph') )
         s.add( setting.Float('otherPosition', 0.,
                              descr='Fractional position of axis '
-                             'in its perpendicular direction',
-                             usertext='Axis position') )
+                             'in its perpendicular direction') )
 
         s.add( setting.Line('Line',
-                            descr = 'Axis line settings',
-                            usertext = 'Axis line'),
+                            descr = 'Axis line settings'),
                pixmap = 'axisline' )
-        s.add( setting.AxisLabel('Label',
-                                 descr = 'Axis label settings',
-                                 usertext = 'Axis label'),
-               pixmap = 'axislabel' )
-        s.add( setting.TickLabel('TickLabels',
-                                 descr = 'Tick label settings',
-                                 usertext = 'Tick labels'),
-               pixmap = 'axisticklabels' )
         s.add( setting.MajorTick('MajorTicks',
-                                 descr = 'Major tick line settings',
-                                 usertext = 'Major ticks'),
+                                 descr = 'Major tick line settings'),
                pixmap = 'axismajorticks' )
         s.add( setting.MinorTick('MinorTicks',
-                                 descr = 'Minor tick line settings',
-                                 usertext = 'Minor ticks'),
+                                 descr = 'Minor tick line settings'),
                pixmap = 'axisminorticks' )
+        s.add( setting.TickLabel('TickLabels',
+                                 descr = 'Tick label settings'),
+               pixmap = 'axisticklabels' )
         s.add( setting.GridLine('GridLines',
-                                descr = 'Grid line settings',
-                                usertext = 'Grid lines'),
+                                descr = 'Grid line settings'),
                pixmap = 'axisgridlines' )
+        s.add( setting.AxisLabel('Label',
+                                 descr = 'Axis label settings'),
+               pixmap = 'axislabel' )
 
         if type(self) == Axis:
             self.readDefaults()
@@ -137,13 +117,6 @@ class Axis(widget.Widget):
         # document updates change set variable when things need recalculating
         self.docchangeset = -1
 
-    def _getUserDescription(self):
-        """User friendly description."""
-        s = self.settings
-        return "range %s to %s%s" % ( str(s.min), str(s.max),
-                                      ['',' (log)'][s.log])
-    userdescription = property(_getUserDescription)
-
     def _autoCheckChildRanges(self, parent, range):
         """Check children of this parent to update autorange."""
 
@@ -155,7 +128,7 @@ class Axis(widget.Widget):
 
         for c in parent.children:
             c.autoAxis(n, range)
-            if len(c.children) is not None:
+            if len(c.children) != None:
                 self._autoCheckChildRanges(c, range)
 
     def _autoLookupRange(self):
@@ -196,7 +169,7 @@ class Axis(widget.Widget):
             widget = s.get('match').getWidget()
 
             # this looks valid + sanity checks
-            if (widget is not None and widget != self and
+            if (widget != None and widget != self and
                 widget.settings.match == ''):
                 # update if out of date
                 if widget.docchangeset != self.document.changeset:
@@ -215,12 +188,12 @@ class Axis(widget.Widget):
             if s.max == 'Auto':
                 self.plottedrange[1] = autorange[1]
 
-        # yuck, but sometimes it's true
-        # tweak range to make sure things don't blow up further down the
-        # line
-        if self.plottedrange[0] == self.plottedrange[1]:
-               self.plottedrange[1] = ( self.plottedrange[0] +
-                                        max(1., self.plottedrange[0]*0.1) )
+            # yuck, but sometimes it's true
+            # tweak range to make sure things don't blow up further down the
+            # line
+            if self.plottedrange[0] == self.plottedrange[1]:
+                self.plottedrange[1] = ( self.plottedrange[0] +
+                                         max(1., self.plottedrange[0]*0.1) )
 
         # handle axis values round the wrong way
         invertaxis = self.plottedrange[0] > self.plottedrange[1]
@@ -256,10 +229,10 @@ class Axis(widget.Widget):
         if invertaxis:
             self.plottedrange.reverse()
 
-        if self.majorticks is not None:
+        if self.majorticks != None:
             self.majortickscalc = N.array(self.majorticks)
 
-        if self.minorticks is not None:
+        if self.minorticks != None:
             self.minortickscalc = N.array(self.minorticks)
 
         self.docchangeset = self.document.changeset
@@ -281,29 +254,29 @@ class Axis(widget.Widget):
         p1, p2, pp = s.lowerPosition, s.upperPosition, s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
-            self.coordParr1 = x1 + dx*p1
-            self.coordParr2 = x1 + dx*p2
+            self.coordParr1 = x1 + int(dx * p1 + 0.5000002)
+            self.coordParr2 = x1 + int(dx * p2 + 0.5000002)
 
             # other axis coordinates
-            self.coordPerp  = y2 - dy*pp
-            self.coordPerp1 = y2 - dy*p1
-            self.coordPerp2 = y2 - dy*p2
+            self.coordPerp  = y2 - int(dy * pp + 0.5000002)
+            self.coordPerp1 = y2 - int(dy * p1 + 0.5000002)
+            self.coordPerp2 = y2 - int(dy * p2 + 0.5000002)
 
         else: # vertical
-            self.coordParr1 = y2 - dy*p1
-            self.coordParr2 = y2 - dy*p2
+            self.coordParr1 = y2 - int(dy * p1 + 0.5000002)
+            self.coordParr2 = y2 - int(dy * p2 + 0.5000002)
 
             # other axis coordinates
-            self.coordPerp  = x1 + dx*pp
-            self.coordPerp1 = x1 + dx*p1
-            self.coordPerp2 = x1 + dx*p2
+            self.coordPerp  = x1 + int(dx * pp + 0.5000002)
+            self.coordPerp1 = x1 + int(dx * p1 + 0.5000002)
+            self.coordPerp2 = x1 + int(dx * p2 + 0.5000002)
      
     def graphToPlotterCoords(self, bounds, vals):
         """Convert graph coordinates to plotter coordinates on this axis.
 
         bounds specifies the plot bounds
-        vals is numpy of coordinates
-        Returns positions as a numpy
+        vals is numarray of coordinates
+        Returns positions as numarray of integers
         """
 
         # if the doc was modified, recompute the range
@@ -323,14 +296,19 @@ class Axis(widget.Widget):
         else:
             fracposns = self.linearConvertToPlotter( vals )
 
-        return self.coordParr1 + fracposns*(self.coordParr2-self.coordParr1)
-    
+        # rounds to nearest integer
+        # we use 0.5000002 instead of 0.5, to try to avoid fp rounding problems
+        vals = N.floor(0.5000002 + self.coordParr1 +
+                       fracposns*(self.coordParr2 - self.coordParr1)
+                       ).astype(N.Int32)
+        return N.clip(vals, -32000, 32000)
+        
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
         
         bounds specifies the plot bounds
-        vals is a numpy of coordinates
-        returns a numpy of floats
+        vals is a numarray of coordinates
+        returns a numarray of floats
         """
 
         # if the doc was modified, recompute the range
@@ -340,7 +318,7 @@ class Axis(widget.Widget):
         self._updatePlotRange( bounds )
 
         # work out fractional positions of the plotter coords
-        frac = ( ( vals.astype('float64') - self.coordParr1 ) /
+        frac = ( ( vals.astype(N.Float64) - self.coordParr1 ) /
                  ( self.coordParr2 - self.coordParr1 ) )
 
         # scaling...
@@ -400,9 +378,9 @@ class Axis(widget.Widget):
     def swapline(self, painter, a1, b1, a2, b2):
         """ Draw line, but swap x & y coordinates if vertical axis."""
         if self.settings.direction == 'horizontal':
-            painter.drawLine(qt4.QPointF(a1, b1), qt4.QPointF(a2, b2))
+            painter.drawLine(a1, b1, a2, b2)
         else:
-            painter.drawLine(qt4.QPointF(b1, a1), qt4.QPointF(b2, a2))
+            painter.drawLine(b1, a1, b2, a2)
 
     def _drawGridLines(self, painter, coordticks):
         """Draw grid lines on the plot."""
@@ -519,7 +497,7 @@ class Axis(widget.Widget):
         tl = s.get('TickLabels')
         scale = tl.scale
         pen = tl.makeQPen()
-        for a, num in itertools.izip(coordticks, self.majortickscalc):
+        for a, num in zip(coordticks, self.majortickscalc):
 
             # x and y round other way if vertical
             if vertical:
@@ -587,7 +565,7 @@ class Axis(widget.Widget):
 
         # make axis label flush with edge of plot if
         # it's appropriate
-        if outerbounds is not None and sl.atEdge:
+        if outerbounds != None and sl.atEdge:
             if abs(s.otherPosition) < 1e-4 and not reflected:
                 if horz:
                     y = outerbounds[3]
@@ -608,7 +586,7 @@ class Axis(widget.Widget):
                            usefullheight = True)
 
         # make sure text is in plot rectangle
-        if outerbounds is not None:
+        if outerbounds != None:
             r.ensureInBox( minx=outerbounds[0], maxx=outerbounds[2],
                            miny=outerbounds[1], maxy=outerbounds[3] )
 
@@ -618,21 +596,18 @@ class Axis(widget.Widget):
         """Mirror axis to opposite side of graph if there isn't
         an axis there already."""
 
-        # This is a nasty hack: must think of a better way to do this
         s = self.settings
         countaxis = 0
         for c in self.parent.children:
             try:
-                # don't allow descendents of axis to look like an axis
-                # to this function (e.g. colorbar)
-                if c.typename == 'axis' and s.direction == c.settings.direction:
+                if s.direction == c.settings.direction:
                     countaxis += 1
             except AttributeError:
                 # if it's not an axis we get here
                 pass
 
         # another axis in the same direction, so we don't mirror it
-        if countaxis > 1:
+        if countaxis != 1:
             return
 
         # swap axis to other side
@@ -643,7 +618,7 @@ class Axis(widget.Widget):
             next = 0.
 
         # temporarily change position of axis
-        # ** FIXME: this is a horrible kludge **
+        # ** this is a horrible kludge **
         s.get('otherPosition').setSilent(next)
 
         self._updatePlotRange(posn)
@@ -692,10 +667,6 @@ class Axis(widget.Widget):
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
 
-        # exit if axis is hidden
-        if s.hide:
-            return
-
         # save the state of the painter for later
         painter.beginPaintingWidget(self, posn)
         painter.save()
@@ -742,18 +713,17 @@ class Axis(widget.Widget):
         if s.autoMirror:
             self._autoMirrorDraw(posn, painter, coordticks)
 
-        # all the text is drawn at the end so that
-        # we can check it doesn't overlap
-        drawntext = qt4.QPainterPath()
+        # now we paint the text, checking for collisions
+        # this is done by keeping a qregion containing the painted region
+        # if new text overlaps this, don't paint it
+        drawntext = qt.QRegion()
         for r, pen in texttorender:
-            bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0]+1,
-                              bounds[3]-bounds[1]+1)
-
-            if not drawntext.intersects(rect):
+            if not r.overlapsRegion(drawntext):
                 painter.setPen(pen)
                 box = r.render()
-                drawntext.addRect(rect)
+                drawntext += ( qt.QRegion(box[0], box[1],
+                                          box[2]-box[0]+1,
+                                          box[3]-box[1]+1) )
 
         # restore the state of the painter
         painter.restore()

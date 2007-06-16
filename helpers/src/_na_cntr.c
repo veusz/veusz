@@ -19,13 +19,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* modified by jss */
-#define NUMERIC
-#include "numpy/arrayobject.h"
-
-#ifndef PyArray_SBYTE
-#include "numpy/oldnumeric.h"
+#ifdef NUMARRAY
+#include "numarray/arrayobject.h"
+#else
+#include "Numeric/arrayobject.h"
 #endif
+
 
 /* Note that all arrays in these routines are Fortran-style,
    in the sense that the "i" index varies fastest; the dimensions
@@ -1345,8 +1344,8 @@ build_cntr_list_v(long *np, double *xp, double *yp, int nparts, long ntotal)
     for (i = 0; i < nparts; i++)
     {
         dims[0] = np[i];
-        xv = (PyArrayObject *) PyArray_FromDims(1, dims, PyArray_DOUBLE);
-        yv = (PyArrayObject *) PyArray_FromDims(1, dims, PyArray_DOUBLE);
+        xv = (PyArrayObject *) PyArray_FromDims(1, dims, 'd');
+        yv = (PyArrayObject *) PyArray_FromDims(1, dims, 'd');
         if (xv == NULL || yv == NULL)  goto error;
         for (j = 0; j < dims[0]; j++)
         {
@@ -1365,41 +1364,6 @@ build_cntr_list_v(long *np, double *xp, double *yp, int nparts, long ntotal)
     return NULL;
 }
 
-/* Build a list of XY 2-D arrays, shape (N,2) */
-static PyObject *
-build_cntr_list_v2(long *np, double *xp, double *yp, int nparts, long ntotal)
-{
-    PyObject *point, *all_contours;
-    PyArrayObject *xyv;
-    int dims[2];
-    int i;
-    long j, k;
-
-    all_contours = PyList_New(nparts);
-
-    k = 0;
-    for (i = 0; i < nparts; i++)
-    {
-        dims[0] = np[i];
-        dims[1] = 2;
-        xyv = (PyArrayObject *) PyArray_FromDims(2, dims, PyArray_DOUBLE);
-        if (xyv == NULL)  goto error;
-        for (j = 0; j < dims[0]; j++)
-        {
-            ((double *)xyv->data)[2*j] = xp[k];
-            ((double *)xyv->data)[2*j+1] = yp[k];
-            k++;
-        }
-        if (PyList_SetItem(all_contours, i, (PyObject *)xyv)) goto error;
-    }
-    return all_contours;
-
-    error:
-    Py_XDECREF(all_contours);
-    return NULL;
-}
-
-
 
 /* cntr_trace is called once per contour level or level pair.
    If nlevels is 1, a set of contour lines will be returned; if nlevels
@@ -1409,7 +1373,7 @@ build_cntr_list_v2(long *np, double *xp, double *yp, int nparts, long ntotal)
 */
 
 PyObject *
-cntr_trace(Csite *site, double levels[], int nlevels, int points, long nchunk)
+cntr_trace(Csite *site, double levels[], int nlevels, int points)
 {
     PyObject *c_list;
     double *xp0;
@@ -1417,7 +1381,7 @@ cntr_trace(Csite *site, double levels[], int nlevels, int points, long nchunk)
     long *nseg0;
     int iseg;
 
-    /* long nchunk = 30; was hardwired */
+    long nchunk = 30; /* hardwired for now */
     long n;
     long nparts = 0;
     long ntotal = 0;
@@ -1494,7 +1458,7 @@ cntr_trace(Csite *site, double levels[], int nlevels, int points, long nchunk)
     }
     else
     {
-        c_list = build_cntr_list_v2(nseg0, xp0, yp0, nparts, ntotal);
+        c_list = build_cntr_list_v(nseg0, xp0, yp0, nparts, ntotal);
     }
     PyMem_Free(xp0); PyMem_Free(yp0); PyMem_Free(nseg0);
     site->xcp = NULL; site->ycp = NULL;
@@ -1580,13 +1544,13 @@ Cntr_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int
 Cntr_init(Cntr *self, PyObject *args, PyObject *kwds)
 {
-    static char *kwlist[] = {"x", "y", "z", "mask", NULL};
     PyObject *xarg, *yarg, *zarg, *marg;
     PyArrayObject *xpa, *ypa, *zpa, *mpa;
     long iMax, jMax;
     char *mask;
 
     marg = NULL;
+    static char *kwlist[] = {"x", "y", "z", "mask", NULL};
 
     if (! PyArg_ParseTupleAndKeywords(args, kwds, "OOO|O", kwlist,
                                       &xarg, &yarg, &zarg, &marg))
@@ -1602,17 +1566,11 @@ Cntr_init(Cntr *self, PyObject *args, PyObject *kwds)
         return -1;
     }
 
-    xpa = (PyArrayObject *) PyArray_ContiguousFromObject(xarg,
-							 PyArray_DOUBLE, 2, 2);
-    ypa = (PyArrayObject *) PyArray_ContiguousFromObject(yarg,
-							 PyArray_DOUBLE,
-							 2, 2);
-    zpa = (PyArrayObject *) PyArray_ContiguousFromObject(zarg, PyArray_DOUBLE,
-							 2, 2);
+    xpa = (PyArrayObject *) PyArray_ContiguousFromObject(xarg, 'd', 2, 2);
+    ypa = (PyArrayObject *) PyArray_ContiguousFromObject(yarg, 'd', 2, 2);
+    zpa = (PyArrayObject *) PyArray_ContiguousFromObject(zarg, 'd', 2, 2);
     if (marg)
-        mpa = (PyArrayObject *) PyArray_ContiguousFromObject(marg,
-							     PyArray_SBYTE,
-							     2, 2);
+        mpa = (PyArrayObject *) PyArray_ContiguousFromObject(marg, '1', 2, 2);
     else
         mpa = NULL;
 
@@ -1663,17 +1621,16 @@ Cntr_trace(Cntr *self, PyObject *args, PyObject *kwds)
     double levels[2] = {0.0, -1e100};
     int nlevels = 2;
     int points = 0;
-    long nchunk = 0L;
-    static char *kwlist[] = {"level0", "level1", "points", "nchunk", NULL};
+    static char *kwlist[] = {"level0", "level1", "points", NULL};
 
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "d|dil", kwlist,
-                                      levels, levels+1, &points, &nchunk))
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "d|di", kwlist,
+                                      levels, levels+1, &points))
     {
         return NULL;
     }
     if (levels[1] == -1e100 || levels[1] <= levels[0])
         nlevels = 1;
-    return cntr_trace(self->site, levels, nlevels, points, nchunk);
+    return cntr_trace(self->site, levels, nlevels, points);
 }
 
 static PyMethodDef Cntr_methods[] = {
@@ -1685,8 +1642,6 @@ static PyMethodDef Cntr_methods[] = {
      "        the levels.\n"
      "    Optional argument: points; if 0 (default), return a list of\n"
      "        vector pairs; otherwise, return a list of lists of points.\n"
-     "    Optional argument: nchunk; approximate number of grid points\n"
-     "        per chunk. 0 (default) for no chunking.\n"
     },
     {NULL}  /* Sentinel */
 };
@@ -1739,11 +1694,7 @@ static PyMethodDef module_methods[] = {
 
 
 #ifdef NUMARRAY
-#if PY_MINOR_VERSION > 2
 PyMODINIT_FUNC
-#else
-DL_EXPORT(void)
-#endif
 init_na_cntr(void)
 {
     PyObject* m;
@@ -1761,13 +1712,9 @@ init_na_cntr(void)
     Py_INCREF(&CntrType);
     PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
 }
-#endif
-#ifdef NUMERIC
-#if PY_MINOR_VERSION > 2
-PyMODINIT_FUNC
+
 #else
-DL_EXPORT(void)
-#endif
+PyMODINIT_FUNC
 init_nc_cntr(void)
 {
     PyObject* m;
@@ -1785,31 +1732,7 @@ init_nc_cntr(void)
     Py_INCREF(&CntrType);
     PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
 }
-#endif
 
-#ifdef SCIPY
-#if PY_MINOR_VERSION > 2
-PyMODINIT_FUNC
-#else
-DL_EXPORT(void)
-#endif
-init_ns_cntr(void)
-{
-    PyObject* m;
-
-    if (PyType_Ready(&CntrType) < 0)
-        return;
-
-    m = Py_InitModule3("_ns_cntr", module_methods,
-                       "Contouring engine as an extension type (Scipy).");
-
-    if (m == NULL)
-      return;
-
-    import_array();
-    Py_INCREF(&CntrType);
-    PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
-}
 #endif
 
 

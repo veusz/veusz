@@ -20,7 +20,7 @@
 
 """Widget that represents a page in the document."""
 
-import veusz.qtall as qt4
+import qt
 
 import veusz.document as document
 
@@ -46,14 +46,10 @@ class Page(widget.Widget):
         # document should pass us the page bounds
         x1, y1, x2, y2 = parentposn
 
-        if self.settings.hide:
-            bounds = self.computeBounds(parentposn, painter)
-            return bounds
-
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
         painter.veusz_page_size = (x2-x1, y2-y1)
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1, y2-y1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
                                     parentposn)
         painter.restore()

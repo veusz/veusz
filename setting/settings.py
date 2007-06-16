@@ -23,27 +23,17 @@
 class Settings:
     """A class for holding collections of settings."""
 
-    def __init__(self, name, descr = '', usertext='', pixmap=''):
+    def __init__(self, name, descr = ''):
         """A new Settings with a name."""
 
         self.__dict__['setdict'] = {}
         self.name = name
         self.descr = descr
-        self.pixmap = pixmap
-        self.usertext = usertext
         self.setnames = []  # a list of names
         self.modified = False
         self.onmodified = [] # fns to call on modification
         self.changeset = 0
         self.parent = None
-
-    def copy(self):
-        """Make a copy of the settings and its subsettings."""
-        s = Settings(self.name, descr=self.descr, usertext=self.usertext,
-                     pixmap=self.pixmap)
-        for name in self.setnames:
-            s.add( self.setdict[name].copy() )
-        return s
 
     def isWidget(self):
         """Is this object a widget?"""
@@ -142,30 +132,10 @@ class Settings:
         except KeyError:
             raise AttributeError, "'%s' is not a setting" % name
 
-    def __getitem__(self, name):
-        """Also allows us to do
-
-        print foo['setname']
-        """
-
-        d = self.__dict__['setdict']
-        try:
-            s = d[name]
-            if isinstance(s, Settings):
-                return s
-            else:
-                return s.val
-        except KeyError:
-            raise KeyError, "'%s' is not a setting" % name
-
-    def __contains__(self, name):
-        """Whether settings contains name."""
-        return name in self.__dict__['setdict']
-
     def get(self, name = None):
         """Get the setting variable."""
 
-        if name is None:
+        if name == None:
             return self
         else:
             return self.setdict[name]
@@ -201,7 +171,7 @@ class Settings:
 
         # we want to build the root up if we're not the first item
         # (first item is implicit)
-        if rootname is None:
+        if rootname == None:
             rootname = ''
         else:
             rootname += self.name + '/'
@@ -222,25 +192,3 @@ class Settings:
         root = '%s/%s' % (root, self.name)
         for s in self.setdict.values():
             s.readDefaults(root, widgetname)
-
-class StyleSheet(Settings):
-    """A class for handling default values of settings.
-    
-    Settings are registered to be added to the stylesheet."""
-
-    registeredsettings = []
-
-    def register(kls, settings):
-        """Register a settings object with the stylesheet.
-        This settings object is copied for each new document.
-        """
-        kls.registeredsettings.append(settings)
-    register = classmethod(register)
-
-    def __init__(self, **args):
-        """Create the default settings."""
-        Settings.__init__(self, 'StyleSheet', **args)
-        self.pixmap = 'stylesheet'
-
-        for subset in self.registeredsettings:
-            self.add( subset.copy() )

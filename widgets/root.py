@@ -21,7 +21,7 @@
 
 # $Id$
 
-import veusz.qtall as qt4
+import qt
 
 import veusz.document as document
 import veusz.setting as setting
@@ -40,20 +40,11 @@ class Root(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
-
-        # don't want user to be able to hide entire document
-        s.remove('hide')
-
         s.add( setting.Distance('width', '15cm',
-                                descr='Width of the pages',
-                                usertext='Page width',
-                                formatting=True) )
+                                descr='Width of the pages') )
         s.add( setting.Distance('height', '15cm',
-                                descr='Height of the pages',
-                                usertext='Page height',
-                                formatting=True) )
-        s.add( setting.StyleSheet(descr='Master settings for document',
-                                  usertext='Style sheet') )
+                                descr='Height of the pages') )
+        s.add( setting.StyleSheet() )
         self.document = document
 
         if type(self) == Root:
@@ -71,7 +62,7 @@ class Root(widget.Widget):
 
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1+1, y2-y1+1) )
+        painter.setClipRect( qt.QRect(x1, y1, x2-x1+1, y2-y1+1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
                                     outerbounds = parentposn)
         painter.restore()

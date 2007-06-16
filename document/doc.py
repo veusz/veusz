@@ -29,7 +29,7 @@ import time
 import random
 import string
 
-import veusz.qtall as qt4
+import qt
 
 import widgetfactory
 import simpleread
@@ -38,7 +38,7 @@ import datasets
 import veusz.utils as utils
 import veusz.setting as setting
 
-class Document( qt4.QObject ):
+class Document( qt.QObject ):
     """Document class for holding the graph data.
 
     Emits: sigModified when the document has been modified
@@ -47,25 +47,11 @@ class Document( qt4.QObject ):
 
     def __init__(self):
         """Initialise the document."""
-        qt4.QObject.__init__( self )
+        qt.QObject.__init__( self )
 
-        self.changeset = 0          # increased when the document changes
-        self.suspendupdates = False # if True then do not notify listeners of updates
+        self.changeset = 0
         self.clearHistory()
         self.wipe()
-
-    def suspendUpdates(self):
-        """Holds sending update messages. This speeds up modification of the document."""
-        assert not self.suspendupdates
-        self.suspendchangeset = self.changeset
-        self.suspendupdates = True
-
-    def enableUpdates(self):
-        """Reenables document updates."""
-        assert self.suspendupdates
-        self.suspendupdates = False
-        if self.suspendchangeset != self.changeset:
-            self.setModified()
 
     def applyOperation(self, operation):
         """Apply operation to the document.
@@ -179,7 +165,7 @@ class Document( qt4.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
-        self.emit( qt4.SIGNAL("sigWiped") )
+        self.emit( qt.PYSIGNAL("sigWiped"), () )
 
     def isBlank(self):
         """Does the document contain widgets and no data"""
@@ -259,27 +245,21 @@ class Document( qt4.QObject ):
         self.modified = ismodified
         self.changeset += 1
 
-        if not self.suspendupdates:
-            self.emit( qt4.SIGNAL("sigModified"), ismodified )
+        self.emit( qt.PYSIGNAL("sigModified"), ( ismodified, ) )
 
     def isModified(self):
         """Return whether modified flag set."""
         return self.modified
     
-    def printTo(self, printer, pages, scaling = 1., dpi = None,
-                antialias = False):
+    def printTo(self, printer, pages, scaling = 1., dpi = None):
         """Print onto printing device."""
 
         painter = Painter()
         painter.veusz_scaling = scaling
-        if dpi is not None:
+        if dpi  != None:
             painter.veusz_pixperpt = dpi / 72.
         
         painter.begin( printer )
-        painter.setRenderHint(qt4.QPainter.Antialiasing,
-                              antialias)
-        painter.setRenderHint(qt4.QPainter.TextAntialiasing,
-                              antialias)
 
         # work out how many pixels correspond to the given size
         width, height = self.basewidget.getSize(painter)
@@ -304,7 +284,7 @@ class Document( qt4.QObject ):
         """Paint page specified to the painter."""
         
         painter.veusz_scaling = scaling
-        if dpi is not None:
+        if dpi  != None:
             painter.veusz_pixperpt = dpi / 72.
         width, height = self.basewidget.getSize(painter)
         self.basewidget.children[page].draw( (0, 0, width, height), painter)
@@ -349,138 +329,68 @@ class Document( qt4.QObject ):
         stylesheet = self.basewidget.settings.StyleSheet
 
         file.write( stylesheet.saveText(True, rootname='') )
-
-    def _exportBitmap(self, filename, pagenumber, dpi=100, antialias=True,
-                      quality=85):
-        """Export the pagenumber to the requested bitmap filename."""
-
-        # firstly have to convert dpi to image size
-        # have to use a temporary bitmap first
-        tmp = qt4.QPixmap(1, 1)
-        tmppainter = Painter(tmp)
-        realdpi = tmppainter.device().logicalDpiY()
-        width, height = self.basewidget.getSize(tmppainter)
-        scaling = dpi/float(realdpi)
-        tmppainter.end()
-        del tmp, tmppainter
-
-        # work out format
-        format = os.path.splitext(filename)[1]
-        if not format:
-            format = '.png'
-        # str is required as unicode not supported
-        format = str(format[1:].lower())
-
-        # create real output image
-        pixmap = qt4.QPixmap(int(width*scaling), int(height*scaling))
-        if format == 'png':
-            # allows transparent
-            pixmap.fill( qt4.Qt.transparent )
-        else:
-            # fill white
-            pixmap.fill()        
-
-        # paint to the image
-        painter = Painter(pixmap)
-        painter.setRenderHint(qt4.QPainter.Antialiasing,
-                              antialias)
-        painter.setRenderHint(qt4.QPainter.TextAntialiasing,
-                              antialias)
-        self.paintTo(painter, pagenumber, scaling=scaling, dpi=realdpi)
-        painter.end()
-
-        # write image to disk
-        writer = qt4.QImageWriter()
-        writer.setFormat(qt4.QByteArray(format))
-        writer.setFileName(filename)
-        writer.setQuality(quality)
-        writer.write( pixmap.toImage() )
         
-    def _exportPS(self, filename, page, color=True):
-        """Postscript or eps format."""
-
-        ext = os.path.splitext(filename)[1]
-
-        printer = qt4.QPrinter()
-        printer.setFullPage(True)
-
-        # set printer parameters
-        printer.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[color] )
-
-        if ext == '.pdf':
-            f = qt4.QPrinter.PdfFormat
-        else:
-            try:
-                f = qt4.QPrinter.PostScriptFormat
-            except AttributeError:
-                # < qt4.2 bah
-                f = qt4.QPrinter.NativeFormat
-        printer.setOutputFormat(f)
-        printer.setOutputFileName(filename)
-        printer.setCreator('Veusz %s' % utils.version())
-
-        # draw the page
-        printer.newPage()
-        painter = Painter(printer)
-        width, height = self.basewidget.getSize(painter)
-        self.basewidget.children[page].draw( (0, 0, width, height), painter)
-        painter.end()
-
-        # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
-        # this makes the bounding box correct
-        if ext == '.eps' or ext == '.pdf':
-            # copy eps to a temporary file
-            tmpfile = "%s.tmp.%i" % (filename, random.randint(0,1000000))
-            fout = open(tmpfile, 'wb')
-            fin = open(filename, 'rb')
-
-            outcount = 0  # keep track of character index for pdf
-            for line in fin:
-                if line[:14] == '%%BoundingBox:' and ext == '.eps':
-                    # replace bounding box line by calculated one
-                    parts = line.split()
-                    widthfactor = float(parts[3]) / printer.width()
-                    line = "%s %i %i %i %i\n" % (
-                        parts[0], 0, int(float(parts[4])-widthfactor*height),
-                        int(widthfactor*width), int(float(parts[4])) )
-                elif ext == '.pdf':
-                    if line[:9] == '/MediaBox':
-                        # do similar thing for pdf
-                        parts = line.strip()[11:-1].split()
-                        widthfactor = float(parts[2]) / printer.width()
-                        line = "/MediaBox [%i %i %i %i]\n" % (
-                            0, int(float(parts[3])-widthfactor*height),
-                            int(widthfactor*width), int(float(parts[3])) )
-                    elif line[:6] == 'endobj':
-                        # need to know when endobj occurs for pdf for stream length
-                        lastobj = outcount + len(line)
-                    elif line[:9] == 'startxref':
-                        # write corrected pdf footer
-                        print >>fout, 'startxref'
-                        print >>fout, lastobj
-                        print >>fout, '%%EOF'
-                        break
-
-                outcount += len(line)
-                fout.write(line)
-                
-            fout.close()
-            fin.close()
-            os.remove(filename)
-            os.rename(tmpfile, filename)
-
-    def export(self, filename, pagenumber, color=True, dpi=100,
-               antialias=True, quality=85):
+    def export(self, filename, pagenumber, color=True):
         """Export the figure to the filename."""
 
         ext = os.path.splitext(filename)[1]
 
-        if ext in ('.eps', '.pdf'):
-            self._exportPS(filename, pagenumber, color=color)
+        if ext == '.eps':
+            # write eps file
+            p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p.setOutputToFile(True)
+            p.setOutputFileName(filename)
+            p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.setCreator('Veusz %s' % utils.version())
+            p.newPage()
+            self.printTo( p, [pagenumber] )
 
-        elif ext in ('.png', '.jpg', '.jpeg', '.bmp'):
-            self._exportBitmap(filename, pagenumber, dpi=dpi,
-                               antialias=antialias, quality=quality)
+        elif ext == '.png':
+            # write png file
+            # unfortunately we need to pass QPrinter the name of an eps
+            # file: no secure way we can produce the file. FIXME INSECURE
+
+            # FIXME: doesn't work in Windows
+
+            fdir = os.path.dirname(os.path.abspath(filename))
+            if not os.path.exists(fdir):
+                raise RuntimeError, 'Directory "%s" does not exist' % fdir
+
+            digits = string.digits + string.ascii_letters
+            while True:
+                rndstr = ''.join( [random.choice(digits) for i in xrange(20)] )
+                tmpfilename = os.path.join(fdir, "tmp_%s.eps" % rndstr)
+                try:
+                    os.stat(tmpfilename)
+                except OSError:
+                    break
+            
+            # write eps file
+            p = qt.QPrinter(qt.QPrinter.HighResolution)
+            p.setOutputToFile(True)
+            p.setOutputFileName(tmpfilename)
+            p.setColorMode( (qt.QPrinter.GrayScale, qt.QPrinter.Color)[color] )
+            p.newPage()
+            self.printTo( p, [pagenumber] )
+
+            # now use ghostscript to convert the file into the relevent type
+            cmdline = ( 'gs -sDEVICE=pngalpha -dEPSCrop -dBATCH -dNOPAUSE'
+                        ' -sOutputFile="%s" "%s"' % (filename, tmpfilename) )
+            stdin, stdout, stderr = os.popen3(cmdline)
+            stdin.close()
+
+            # if anything goes to stderr, then report it
+            text = stderr.read().strip()
+            os.unlink(tmpfilename)
+            if len(text) != 0:
+                raise RuntimeError, text
+
+        elif ext == '.svg':
+            # Use qt's QPicture environment to export the drawing commands
+            # as svg (scalable vector graphics)
+            p = qt.QPicture()
+            self.printTo( p, [pagenumber] )
+            p.save(filename, 'svg')
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
@@ -506,7 +416,7 @@ class Document( qt4.QObject ):
             if p == '..':
                 # relative to parent object
                 p = obj.parent
-                if p is None:
+                if p == None:
                     raise ValueError, "Base graph has no parent"
                 obj = p
             elif p == '.' or len(p) == 0:
@@ -515,18 +425,18 @@ class Document( qt4.QObject ):
             else:
                 # child specified
                 obj = obj.getChild( p )
-                if obj is None:
+                if obj == None:
                     raise ValueError, "Child '%s' does not exist" % p
 
         # return widget
         return obj
 
-class Painter(qt4.QPainter):
+class Painter(qt.QPainter):
     """A painter which allows the program to know which widget it is
     currently drawing."""
     
     def __init__(self, *args):
-        qt4.QPainter.__init__(self, *args)
+        qt.QPainter.__init__(self, *args)
 
         self.veusz_scaling = 1.
 

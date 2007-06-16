@@ -7,16 +7,9 @@
 import sys
 import os.path
 import glob
-import numpy
 
 from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
-
-# use py2exe if available
-try:
-    import py2exe
-except ImportError:
-    pass
 
 version = open('VERSION').read().strip()
 
@@ -64,7 +57,6 @@ setup(name = 'veusz',
                       'veusz.windows': 'windows',
                       'veusz.tests': 'tests' },
       data_files = [ ('veusz', ['VERSION']),
-                     ('veusz/dialogs', glob.glob('dialogs/*.ui')),
                      ('veusz/widgets/data', glob.glob('widgets/data/*.dat')),
                      ('veusz/windows/icons',
                       glob.glob('windows/icons/*.png') ) ],
@@ -77,7 +69,7 @@ setup(name = 'veusz',
                   'veusz.widgets',
                   'veusz.helpers',
                   'veusz.windows'],
-      ext_modules = [ Extension('veusz.helpers._nc_cntr',
-                                ['helpers/src/_nc_cntr.c'],
-                                include_dirs=[numpy.get_include()]) ]
+      ext_modules = [ Extension('veusz.helpers._na_cntr',
+                                ['helpers/src/_na_cntr.c'],
+                                define_macros=[ ('NUMARRAY',1) ]) ]
       )

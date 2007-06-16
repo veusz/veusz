@@ -23,8 +23,8 @@
 
 import math
 
-import numpy as N
-import veusz.qtall as qt4
+import numarray as N
+import qt
 
 # constants for special parts of an expression
 _BlockStart = 1
@@ -173,7 +173,7 @@ class Renderer:
     def getBounds(self):
         """Get bounds of text on screen."""
 
-        if self.calcbounds is not None:
+        if self.calcbounds != None:
             return self.calcbounds
 
         # no text
@@ -188,9 +188,7 @@ class Renderer:
 
         # work out height of box, and
         # make the bounding box a bit bigger if we want to include descents
-
-        fm = qt4.QFontMetricsF(self.font, self.painter.device())
-        
+        fm = self.painter.fontMetrics()
         if self.usefullheight:
             totalheight = fm.ascent()
             dy = fm.descent()
@@ -198,8 +196,7 @@ class Renderer:
             if self.alignvert == 0:
                 # if want vertical centering, better to centre around middle
                 # of typical letter
-                totalheight = fm.boundingRect(qt4.QChar('0')).height()
-                
+                totalheight = fm.boundingRect('0').height()
             else:
                 # if top/bottom alignment, better to use maximum letter height
                 totalheight = fm.ascent()
@@ -230,25 +227,25 @@ class Renderer:
         # use rotated bounding box to find position of start text posn
         if self.alignhorz < 0:
             xr = ( self.x, self.x+(newbound[2]-newbound[0]) )
-            self.xi = self.x + (newx[0] - newbound[0])
+            self.xi = self.x + int(newx[0] - newbound[0])
         elif self.alignhorz > 0:
             xr = ( self.x-(newbound[2]-newbound[0]), self.x )
-            self.xi = self.x + (newx[0] - newbound[2])
+            self.xi = self.x + int(newx[0] - newbound[2])
         else:
             xr = ( self.x+newbound[0], self.x+newbound[2] )
-            self.xi = self.x + newx[0]
+            self.xi = self.x + int(newx[0])
 
         # y alignment
         # adjust y by these values to ensure proper alignment
         if self.alignvert < 0:
             yr = ( self.y + (newbound[1]-newbound[3]), self.y )
-            self.yi = self.y + (newy[0] - newbound[3])
+            self.yi = self.y + int(newy[0] - newbound[3])
         elif self.alignvert > 0:
             yr = ( self.y, self.y + (newbound[3]-newbound[1]))
-            self.yi = self.y + (newy[0] - newbound[1])
+            self.yi = self.y + int(newy[0] - newbound[1])
         else:
             yr = ( self.y+newbound[1], self.y+newbound[3] )
-            self.yi = self.y + newy[0]
+            self.yi = self.y + int(newy[0])
 
         self.calcbounds = [xr[0], yr[0], xr[1], yr[1]]
         return self.calcbounds
@@ -257,7 +254,7 @@ class Renderer:
                     miny = -32767, maxy = 32767, extraspace = False):
         """Adjust position of text so that it is within this box."""
 
-        if self.calcbounds is None:
+        if self.calcbounds == None:
             self.getBounds()
 
         cb = self.calcbounds
@@ -265,7 +262,7 @@ class Renderer:
         # add a small amount of extra room if requested
         if extraspace:
             self.painter.setFont(self.font)
-            l = qt4.QFontMetricsF(self.font, self.painter.device()).leading()
+            l = self.painter.fontMetrics().leading()
             minx += l
             maxx -= l
             miny += l
@@ -296,18 +293,28 @@ class Renderer:
             cb[3] += dy
             cb[1] += dy
 
+    def overlapsRegion(self, region):
+        """Do the bounds of the text overlap with the qt QRegion given?"""
+
+        if self.calcbounds == None:
+            self.getBounds()
+
+        cb = self.calcbounds
+        return region.contains( qt.QRect(cb[0], cb[1],
+                                         cb[2]-cb[0]+1, cb[3]-cb[1]+1) )
+
     def getDimensions(self):
         """Get the (w, h) of the bounding box."""
 
-        if self.calcbounds is None:
+        if self.calcbounds == None:
             self.getBounds()
         cb = self.calcbounds
         return (cb[2]-cb[0]+1, cb[3]-cb[1]+1)
 
     def render(self):
         """Render the text."""
-
-        if self.calcbounds is None:
+        
+        if self.calcbounds == None:
             self.getBounds()
 
         self.xpos = self.xi
@@ -316,7 +323,7 @@ class Renderer:
         # if the text is rotated, change the coordinate frame
         if self.angle != 0:
             self.painter.save()
-            self.painter.translate( qt4.QPointF(self.xpos, self.ypos) )
+            self.painter.translate(self.xpos, self.ypos)
             self.painter.rotate(self.angle)
             self.xpos = 0
             self.ypos = 0
@@ -447,33 +454,33 @@ class Renderer:
 
             # start a superscript part
             elif p == _SuperScript:
-                oldheight = qt4.QFontMetricsF(font, self.painter.device()).height()
-                size = font.pointSizeF()
-                font.setPointSizeF(size*0.6)
+                oldheight = self.painter.fontMetrics().height()
+                size = font.pointSizeFloat()
+                font.setPointSizeFloat(size*0.6)
                 self.painter.setFont(font)
 
                 oldy = self.ypos
-                self.ypos -= (oldheight - qt4.QFontMetricsF(font, self.painter.device()).height())
+                self.ypos -= (oldheight - self.painter.fontMetrics().height())
             
                 partno = self._renderPart(partno+1, font, render)
 
                 self.ypos = oldy
-                font.setPointSizeF(size)
+                font.setPointSizeFloat(size)
                 self.painter.setFont(font)
 
             # start a subscript part
             elif p == _SubScript:
-                size = font.pointSizeF()
-                font.setPointSizeF(size*0.6)
+                size = font.pointSizeFloat()
+                font.setPointSizeFloat(size*0.6)
                 
                 self.painter.setFont(font)
 
                 oldy = self.ypos
-                self.ypos += qt4.QFontMetricsF(font, self.painter.device()).descent()
+                self.ypos += self.painter.fontMetrics().descent()
                 partno = self._renderPart(partno+1, font, render)
                 self.ypos = oldy
                 
-                font.setPointSizeF(size)
+                font.setPointSizeFloat(size)
                 self.painter.setFont(font)
             
             elif p == _FontItalic:
@@ -533,7 +540,7 @@ class Renderer:
                     not isinstance(self.parts[partno+2], int)):
 
                     # try to interpret next part as font size
-                    oldsize = font.pointSizeF()
+                    oldsize = font.pointSizeFloat()
                     size = oldsize
                     # get text (minus pts people might leave)
                     sizetext = self.parts[partno+2].strip().replace('pt','')
@@ -554,10 +561,10 @@ class Renderer:
                             raise ValueError
 
                         # increment font size
-                        font.setPointSizeF(size)
+                        font.setPointSizeFloat(size)
                         self.painter.setFont(font)
                         partno = self._renderPart(partno+4, font, render)
-                        font.setPointSizeF(oldsize)
+                        font.setPointSizeFloat(oldsize)
                         self.painter.setFont(font)
 
                     except ValueError:
@@ -576,11 +583,12 @@ class Renderer:
         else:
             # write text
             # how far do we need to advance?
-            width = qt4.QFontMetricsF(font, self.painter.device()).width(p)
+            fm = self.painter.fontMetrics()
+            width = fm.width( p )
 
             # actually write the text if requested
             if render:
-                self.painter.drawText( qt4.QPointF(self.xpos, self.ypos), p )
+                self.painter.drawText( self.xpos, self.ypos, p )
                 
             # move along, nothing to see
             self.xpos += width

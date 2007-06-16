@@ -34,7 +34,7 @@ because some operations cannot restore references (e.g. add object)
 
 import os.path
 
-import numpy as N
+import numarray as N
 
 import datasets
 import widgetfactory
@@ -153,8 +153,8 @@ class OperationSettingPropagate:
             # if levels is not zero, add the children of this root
             newmaxlevels = maxlevels - 1
             for w in root.children:
-                if ( (w.name == name or name is None) and
-                     (w.typename == typename or typename is None) ):
+                if ( (w.name == name or name == None) and
+                     (w.typename == typename or typename == None) ):
                     outlist.append(w)
     
                 OperationSettingPropagate._recursiveGet(w, name, typename,
@@ -311,7 +311,7 @@ class OperationDatasetSet:
         """Undo the data setting."""
         
         del document.data[self.datasetname]
-        if self.olddata is not None:
+        if self.olddata != None:
             document.setData(self.datasetname, self.olddata)
     
 class OperationDatasetDelete:
@@ -483,13 +483,13 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         
         # define environment to evaluate
         fnenviron = globals().copy()
-        exec 'from numpy import *' in fnenviron
+        exec 'from numarray import *' in fnenviron
         fnenviron['t'] = t
 
         # calculate for each of the dataset components
         vals = {}
         for key, expr in self.parts.iteritems():
-            # HACK to ensure the result is a numpy
+            # HACK to ensure the result is a numarray
             expr = '(%s) + t*0.' % expr
             try:
                 vals[key] = eval( expr, fnenviron )
@@ -586,9 +586,9 @@ class OperationDataImport:
         """
         
         # open stream to import data from
-        if self.filename is not None:
+        if self.filename != None:
             stream = simpleread.FileStream( open(self.filename) )
-        elif self.datastr is not None:
+        elif self.datastr != None:
             stream = simpleread.StringStream(self.datastr)
         else:
             assert False
@@ -599,7 +599,7 @@ class OperationDataImport:
         
         # associate file
         if self.linked:
-            assert self.filename is not None
+            assert self.filename != None
             LF = datasets.LinkedFile(self.filename, self.descriptor,
                                      useblocks=self.useblocks)
         else:
@@ -704,9 +704,9 @@ class OperationDataImport2D:
         
         Returns list of datasets read."""
         
-        if self.filename is not None:
+        if self.filename != None:
             stream = simpleread.FileStream( open(self.filename) )
-        elif self.datastr is not None:
+        elif self.datastr != None:
             stream = simpleread.StringStream(self.datastr)
         else:
             assert False
@@ -728,15 +728,15 @@ class OperationDataImport2D:
         readds = []
         for name in self.datasets:
             sr = simpleread.SimpleRead2D(name)
-            if self.xrange is not None:
+            if self.xrange != None:
                 sr.xrange = self.xrange
-            if self.yrange is not None:
+            if self.yrange != None:
                 sr.yrange = self.yrange
-            if self.invertrows is not None:
+            if self.invertrows != None:
                 sr.invertrows = self.invertrows
-            if self.invertcols is not None:
+            if self.invertcols != None:
                 sr.invertcols = self.invertcols
-            if self.transpose is not None:
+            if self.transpose != None:
                 sr.transpose = self.transpose
 
             sr.readData(stream)
@@ -790,13 +790,13 @@ class OperationDataImportFITS:
         negv = None
 
         # read the columns required
-        if self.datacol is not None:
+        if self.datacol != None:
             datav = data.field(self.datacol)
-        if self.symerrcol is not None:
+        if self.symerrcol != None:
             symv = data.field(self.symerrcol)
-        if self.poserrcol is not None:
+        if self.poserrcol != None:
             posv = data.field(self.poserrcol)
-        if self.negerrcol is not None:
+        if self.negerrcol != None:
             negv = data.field(self.negerrcol)
 
         # actually create the dataset
@@ -805,8 +805,8 @@ class OperationDataImportFITS:
     def _import2d(self, hdu):
         """Import 2d data from hdu."""
     
-        if ( self.datacol is not None or self.symerrcol is not None or self.poserrcol is not None or
-             self.negerrcol is not None ):
+        if ( self.datacol != None or self.symerrcol != None or self.poserrcol != None or
+             self.negerrcol != None ):
             print "Warning: ignoring columns as import 2D dataset"
 
         header = hdu.header
@@ -871,7 +871,7 @@ class OperationDataImportFITS:
         if self.dsname in document.data:
             del document.data[self.dsname]
             
-        if self.olddataset is not None:
+        if self.olddataset != None:
             document.setData(self.dsname, self.olddataset)
         
 ###############################################################################
@@ -894,7 +894,7 @@ class OperationDatasetAddColumn:
         """Zero the column."""
         ds = document.data[self.datasetname]
         datacol = ds.data
-        setattr(ds, self.columnname, N.zeros(datacol.shape, dtype='float64'))
+        setattr(ds, self.columnname, N.zeros(datacol.shape, type=N.Float64))
         document.setData(self.datasetname, ds)
         
     def undo(self, document):
@@ -921,14 +921,14 @@ class OperationDatasetSetVal:
         datacol = getattr(ds, self.columnname)
         self.oldval = datacol[self.row]
         datacol[self.row] = self.val
-        ds.changeValues(self.columnname, datacol)
-
+        document.setData(self.datasetname, ds)
+        
     def undo(self, document):
         """Restore the value."""
         ds = document.data[self.datasetname]
         datacol = getattr(ds, self.columnname)
         datacol[self.row] = self.oldval
-        ds.changeValues(self.columnname, datacol)
+        document.setData(self.datasetname, ds)
     
 ###############################################################################
 # Misc operations

@@ -31,8 +31,7 @@ s.fromText('42')
 import re
 import math
 
-import numpy as N
-import veusz.qtall as qt4
+import qt
 
 import controls
 import settings
@@ -60,20 +59,20 @@ class Reference(object):
     
     def resolve(self, thissetting):
         """Return the setting object associated with the reference."""
-
+        
         item = thissetting.parent
         parts = self.value.split('/')
         if parts[0] == '':
             # need root widget if begins with slash
-            while item.parent is not None:
+            while item.parent != None:
                 item = item.parent
             parts = parts[1:]
         
         # do an iterative lookup of the setting
         for p in parts:
             if p == '..':
-                if item.parent is not None:
-                    item = item.parent
+                if p.parent != None:
+                    p = p.parent
             elif p == '':
                 pass
             else:
@@ -95,22 +94,15 @@ class Reference(object):
         
 class Setting(object):
 
-    def __init__(self, name, value, descr='', usertext='',
-                 formatting=False, hidden=False):
+    def __init__(self, name, value, descr=''):
         """Initialise the values.
 
-        name: setting name
-        value: default value and initial value
-        descr:  description of the setting
-        usertext: name of setting for user
-        formatting: whether setting applies to formatting
+        descr is a description of the setting
         """
         self.readonly = False
         self.parent = None
         self.name = name
         self.descr = descr
-        self.usertext = usertext
-        self.formatting = formatting
         self.default = value
         self.onmodified = []
         self._val = None
@@ -122,29 +114,12 @@ class Setting(object):
         """Is this object a widget?"""
         return False
 
-    def _copyHelper(self, before, after, optional):
-        """Help copy an object.
-
-        before are arguments before val
-        after are arguments after val
-        optinal as optional arguments
-        """
-        args = (self.name,) + before + (self.val,) + after
-        opt = optional.copy()
-        opt['descr'] = self.descr
-        opt['usertext'] = self.usertext
-        opt['formatting'] = self.formatting
-        obj = self.__class__(*args, **opt)
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        obj = self.__class__(self.name, self.val, descr=self.descr)
         obj.readonly = self.readonly
         obj.default = self.default
-        return obj        
-
-    def copy(self):
-        """Make a setting which has its values copied from this one.
-
-        This needs to be overridden if the constructor changes
-        """
-        return self._copyHelper((), (), {})
+        return obj
         
     def get(self):
         """Get the value."""
@@ -189,7 +164,7 @@ class Setting(object):
         """Return full path of setting."""
         path = []
         obj = self
-        while obj is not None:
+        while obj != None:
             # logic easier to understand here
             # do not add settings name for settings of widget
             if not obj.isWidget() and obj.parent.isWidget():
@@ -229,7 +204,7 @@ class Setting(object):
         except KeyError:
             pass
     
-        if deftext is not None:
+        if deftext != None:
             self.val = self.fromText(deftext)
             self.default = self.val
 
@@ -332,21 +307,12 @@ class Setting(object):
 
         return None
 
-    def getDocument(self):
-        """Return document."""
-        p = self.parent
-        while p:
-            if hasattr(p, 'document'):
-                return p.document
-            p = p.parent
-        return None
-
 # Store strings
 class Str(Setting):
     """String setting."""
 
     def convertTo(self, val):
-        if isinstance(val, basestring):
+        if type(val) in (str, unicode):
             return val
         raise InvalidType
 
@@ -391,7 +357,7 @@ class Int(Setting):
     """Integer settings."""
 
     def __init__(self, name, value, minval=-1000000, maxval=1000000,
-                 **args):
+                 descr=''):
         """Initialise the values.
 
         minval is minimum possible value of setting
@@ -401,16 +367,8 @@ class Int(Setting):
 
         self.minval = minval
         self.maxval = maxval
-        Setting.__init__(self, name, value, **args)
+        Setting.__init__(self, name, value, descr=descr)
 
-    def copy(self):
-        """Make a setting which has its values copied from this one.
-
-        This needs to be overridden if the constructor changes
-        """
-        return self._copyHelper((), (), {'minval': self.minval,
-                                         'maxval': self.maxval})
-        
     def convertTo(self, val):
         if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
@@ -462,19 +420,19 @@ class FloatOrAuto(Setting):
     def convertTo(self, val):
         if type(val) in (int, float):
             return float(val)
-        elif isinstance(val, basestring) and val.strip().lower() == 'auto':
+        elif type(val) in [str, unicode] and val.strip().lower() == 'auto':
             return None
         else:
             raise InvalidType
 
     def convertFrom(self, val):
-        if val is None:
+        if val == None:
             return 'Auto'
         else:
             return val
 
     def toText(self):
-        if self.val is None:
+        if self.val == None:
             return 'Auto'
         else:
             return str(self.val)
@@ -495,21 +453,21 @@ class IntOrAuto(Setting):
     """Save an int or text auto."""
 
     def convertTo(self, val):
-        if isinstance(val, int):
+        if type(val) == int:
             return val
-        elif isinstance(val, basestring) and val.strip().lower() == 'auto':
+        elif type(val) in [str, unicode] and val.strip().lower() == 'auto':
             return None
         else:
             raise InvalidType
 
     def convertFrom(self, val):
-        if val is None:
+        if val == None:
             return 'Auto'
         else:
             return val
 
     def toText(self):
-        if self.val is None:
+        if self.val == None:
             return 'Auto'
         else:
             return str(self.val)
@@ -526,6 +484,7 @@ class IntOrAuto(Setting):
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
 
+
 # these are functions used by the distance setting below.
 # they don't work as class methods
 
@@ -534,7 +493,8 @@ def _calcPixPerPt(painter):
 
     This is stored in the variable veusz_pixperpt."""
 
-    painter.veusz_pixperpt = painter.device().logicalDpiY() / 72.
+    dm = qt.QPaintDeviceMetrics(painter.device())
+    painter.veusz_pixperpt = dm.logicalDpiY() / 72.
 
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
@@ -542,18 +502,19 @@ def _distPhys(match, painter, mult):
     if not hasattr(painter, 'veusz_pixperpt'):
         _calcPixPerPt(painter)
 
-    return (painter.veusz_pixperpt * mult *
-            float(match.group(1)) * painter.veusz_scaling)
+    return int( math.ceil(painter.veusz_pixperpt * mult *
+                          float(match.group(1)) * painter.veusz_scaling ) )
 
 def _distPerc(match, painter, maxsize):
     """Convert from a percentage of maxsize."""
 
-    return maxsize * 0.01 * float(match.group(1))
+    return int( math.ceil(maxsize * 0.01 * float(match.group(1))) )
 
 def _distFrac(match, painter, maxsize):
     """Convert from a fraction a/b of maxsize."""
 
-    return maxsize * float(match.group(1)) / float(match.group(2))
+    return int( math.ceil(maxsize * float(match.group(1)) /
+                          float(match.group(2))) )
 
 def _distRatio(match, painter, maxsize):
     """Convert from a simple 0.xx ratio of maxsize."""
@@ -562,44 +523,44 @@ def _distRatio(match, painter, maxsize):
     if float(match.group(1)) > 1.:
         return _distPhys(match, painter, 1)
 
-    return maxsize * float(match.group(1))
+    return int( math.ceil(maxsize * float(match.group(1))) )
+
+# mappings from regular expressions to function to convert distance
+# the recipient function takes regexp match,
+# painter and maximum size of frac
+_distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
+                  _distPerc ),
+                ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
+                  _distFrac ),
+                ( re.compile('^([0-9\.]+) *pt$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 1.) ),
+                ( re.compile('^([0-9\.]+) *cm$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 28.452756) ),
+                ( re.compile('^([0-9\.]+) *mm$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 2.8452756) ),
+                ( re.compile('^([0-9\.]+) *(inch|in|")$'),
+                  lambda match, painter, t:
+                  _distPhys(match, painter, 72.27) ),
+                ( re.compile('^([0-9\.]+)$'),
+                  _distRatio )
+                ]
 
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
 
-    # mappings from regular expressions to function to convert distance
-    # the recipient function takes regexp match,
-    # painter and maximum size of frac
-    distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
-                     _distPerc ),
-                   ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
-                     _distFrac ),
-                   ( re.compile('^([0-9\.]+) *pt$'),
-                    lambda match, painter, t:
-                     _distPhys(match, painter, 1.) ),
-                   ( re.compile('^([0-9\.]+) *cm$'),
-                     lambda match, painter, t:
-                            _distPhys(match, painter, 28.452756) ),
-                   ( re.compile('^([0-9\.]+) *mm$'),
-                     lambda match, painter, t:
-                        _distPhys(match, painter, 2.8452756) ),
-                   ( re.compile('^([0-9\.]+) *(inch|in|")$'),
-                        lambda match, painter, t:
-                    _distPhys(match, painter, 72.27) ),
-                   ( re.compile('^([0-9\.]+)$'),
-                    _distRatio )
-                   ]
-    
-    def isDist(kls, dist):
+    def isDist(dist):
         """Is the text a valid distance measure?"""
         
         dist = dist.strip()
-        for reg, fn in kls.distregexp:
+        for reg, fn in _distregexp:
             if reg.match(dist):
                 return True
             
         return False
-    isDist = classmethod(isDist)
+    isDist = staticmethod(isDist)
 
     def convertTo(self, val):
         if self.isDist(val):
@@ -619,7 +580,7 @@ class Distance(Setting):
     def makeControl(self, *args):
         return controls.Distance(self, *args)
 
-    def convertDistance(kls, painter, distance):
+    def convertDistance(painter, distance):
         '''Convert a distance to plotter units.
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
@@ -642,7 +603,7 @@ class Distance(Setting):
         dist = distance.strip()
 
         # compare string against each regexp
-        for reg, fn in kls.distregexp:
+        for reg, fn in _distregexp:
             m = reg.match(dist)
 
             # if there's a match, then call the appropriate conversion fn
@@ -653,7 +614,7 @@ class Distance(Setting):
         raise ValueError( "Cannot convert distance in form '%s'" %
                           dist )
 
-    convertDistance = classmethod(convertDistance)
+    convertDistance = staticmethod(convertDistance)
 
     def convert(self, painter):
         """Convert this setting's distance as above"""
@@ -667,32 +628,24 @@ class Distance(Setting):
 
         return self.convert(painter) / painter.veusz_pixperpt
         
-class DistanceOrAuto(Distance):
-    """A distance or the value Auto"""
-
-    distregexp = Distance.distregexp + [ (re.compile('^Auto$'), None) ]
-    
-    def isAuto(self):
-        return self.val == 'Auto'
-
-    def makeControl(self, *args):
-        return controls.Distance(self, allowauto=True, *args)
-
 class Choice(Setting):
     """One out of a list of strings."""
 
     # maybe should be implemented as a dict to speed up checks
 
-    def __init__(self, name, vallist, val, **args):
+    def __init__(self, name, vallist, val, descr = ''):
         """Setting val must be in vallist."""
         
         assert type(vallist) in (list, tuple)
         self.vallist = vallist
-        Setting.__init__(self, name, val, **args)
+        Setting.__init__(self, name, val, descr = descr)
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((self.vallist,), (), {})
+        obj = self.__class__(self.name, self.vallist, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
         
     def convertTo(self, val):
         if val in self.vallist:
@@ -717,15 +670,18 @@ class ChoiceOrMore(Setting):
 
     # maybe should be implemented as a dict to speed up checks
 
-    def __init__(self, name, vallist, val, **args):
+    def __init__(self, name, vallist, val, descr = ''):
         """Setting has val must be in vallist."""
         
         self.vallist = vallist
-        Setting.__init__(self, name, val, **args)
+        Setting.__init__(self, name, val, descr = descr)
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((self.vallist,), (), {})
+        obj = self.__class__(self.name, self.vallist, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
 
     def convertTo(self, val):
         return val
@@ -756,11 +712,10 @@ class FloatDict(Setting):
         return out
 
     def toText(self):
-        keys = self.val.keys()
-        keys.sort()
-        
-        text = ['%s = %g' % (key, self.val[key]) for key in keys]
-        return '\n'.join(text)
+        text = ''
+        for key, val in self.val.iteritems():
+            text += '%s = %g\n' % (key, val)
+        return text
 
     def fromText(self, text):
         """Do conversion from list of a=X\n values."""
@@ -792,8 +747,6 @@ class FloatDict(Setting):
 class FloatList(Setting):
     """A list of float values."""
 
-    list_re = re.compile(r'[\t\n, ]+')
-
     def convertTo(self, val):
         if type(val) not in (list, tuple):
             raise InvalidType
@@ -814,7 +767,7 @@ class FloatList(Setting):
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
 
-        p = self.list_re.split(text.strip())
+        p = re.split(r'[\t\n, ]+', text.strip())
 
         try:
             out = [float(i) for i in p if i]
@@ -831,36 +784,40 @@ class WidgetPath(Str):
 
     def __init__(self, name, val, relativetoparent=True,
                  allowedwidgets = None,
-                 **args):
+                 descr=''):
         """Initialise the setting.
 
         The widget is located relative to
         parent if relativetoparent is True, otherwise this widget.
 
-        If allowedwidgets is not None, only those widgets types in the list are
+        If allowedwidgets != None, only those widgets types in the list are
         allowed by this setting.
         """
 
-        Str.__init__(self, name, val, **args)
+        Str.__init__(self, name, val, descr=descr)
         self.relativetoparent = relativetoparent
         self.allowedwidgets = allowedwidgets
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((), (),
-                                {'relativetoparent': self.relativetoparent,
-                                 'allowedwidgets': self.allowedwidgets})
+        obj = self.__class__(self.name, self.val,
+                             relativetoparent=self.relativetoparent,
+                             allowediwidgets=self.allowedwidgets,
+                             descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
 
     def convertTo(self, val):
         """Validate the text is a name of a widget relative to
         this one."""
 
-        if not isinstance(val, basestring):
+        if type(val) not in [str, unicode]:
             raise InvalidType
 
         # InvalidType will get raised in getWidget if it is incorrect
         w = self.getWidget(val)
-        if w is None:
+        if w == None:
             return ''
         else:
             return val
@@ -875,7 +832,7 @@ class WidgetPath(Str):
 
         # this is a bit of a hack, so we don't have to pass a value
         # for the setting (which we need to from convertTo)
-        if val is None:
+        if val == None:
             val = self.val
 
         if val == '':
@@ -897,7 +854,7 @@ class WidgetPath(Str):
             raise InvalidType
 
         # check the widget against the list of allowed types if given
-        if self.allowedwidgets is not None:
+        if self.allowedwidgets != None:
             allowed = False
             for c in self.allowedwidgets:
                 if isinstance(widget, c):
@@ -910,112 +867,31 @@ class WidgetPath(Str):
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
-    def __init__(self, name, val, dimensions=1, datatype='numeric',
-                 **args):
+    def __init__(self, name, val, dimensions=1, descr=''):
         """
         dimensions is the number of dimensions the dataset needs
         """
 
-        Setting.__init__(self, name, val, **args)
+        Setting.__init__(self, name, val, descr)
         self.dimensions = dimensions
-        self.datatype = datatype
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
-        return self._copyHelper((), (),
-                                {'dimensions': self.dimensions,
-                                 'datatype': self.datatype})
+        obj = self.__class__(self.name, self.val, dimensions=self.dimensions,
+                             descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
         
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.Dataset(self, self.getDocument(), self.dimensions,
-                                self.datatype, *args)
-
-class DatasetOrFloatList(Dataset):
-    """Choose a dataset or specify a list of float values."""
-
-    digits = dict([(i,None) for i in '0123456789.-'])
-
-    def convertTo(self, val):
-        """Check is a string (dataset name) or a list of floats (numbers).
-
-        """
-        if isinstance(val, basestring):
-            return val
-        elif isinstance(val, float) or isinstance(val, int):
-            return [val]
-        else:
-            try:
-                return [float(x) for x in val]
-            except (TypeError, ValueError):
-                raise InvalidType
-
-    def toText(self):
-        if isinstance(self.val, basestring):
-            return self.val
-        else:
-            return ', '.join( [str(x) for x in self.val] )
-
-    def fromText(self, text):
-        text = text.strip()
-        if text and text[0] in self.digits:
-            p = FloatList.list_re.split(text.strip())
-            try:
-                return [float(x) for x in p if x]
-            except ValueError:
-                raise InvalidType
-        else:
-            return text
-
-    def getFloatArray(self, doc):
-        """Get a numpy of values or None."""
-        if isinstance(self.val, basestring):
-            ds = doc.data.get(self.val)
-            if ds:
-                # get numpy of values
-                return ds.data
-            else:
-                return None
-        else:
-            # list of values
-            return N.array(self.val)
+        # find document
+        p = self.parent
+        while not hasattr(p, 'document'):
+            p = p.parent
             
-    def getData(self, doc):
-        """Return veusz dataset"""
-        if isinstance(self.val, basestring):
-            d = doc.data.get(self.val)
-            if ( d and d.datatype == self.datatype and
-                 d.dimensions == self.dimensions ):
-                return d
-            return None
-        else:
-            # blah - need to import here due to dependencies
-            import veusz.document as document
-            return document.Dataset(data=self.val)
+        return controls.Dataset(self, p.document, self.dimensions, *args)
     
-class DatasetOrStr(Dataset):
-    """Choose a dataset or enter a string."""
-
-    def getData(self, doc, checknull=False):
-        """Return either a list of strings, a single item list.
-        If checknull then None is returned if blank
-        """
-        if doc:
-            ds = doc.data.get(self.val)
-            if ds and ds.datatype == self.datatype:
-                return ds.data
-        if checknull and not self.val:
-            return None
-        else:
-            return [unicode(self.val)]
-
-    def makeControl(self, *args):
-        # use string editor rather than drop down list
-        # need to write a custom control
-        return controls.DatasetOrString(self, self.getDocument(), self.dimensions,
-                                        self.datatype, *args)
-        #return controls.String(self, *args)
-
 class Color(ChoiceOrMore):
     """A color setting."""
 
@@ -1026,20 +902,23 @@ class Color(ChoiceOrMore):
     
     controls.Color._colors = _colors
 
-    def __init__(self, name, value, **args):
+    def __init__(self, name, default, descr = None):
         """Initialise the color setting with the given name, default
         and description."""
         
-        ChoiceOrMore.__init__(self, name, self._colors, value,
-                              **args)
+        ChoiceOrMore.__init__(self, name, self._colors, default,
+                              descr=descr)
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
+        obj = self.__class__(self.name, self.val, descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
                               
     def color(self):
         """Return QColor for color."""
-        return qt4.QColor(self.val)
+        return qt.QColor(self.val)
     
     def makeControl(self, *args):
         return controls.Color(self, *args)
@@ -1053,31 +932,27 @@ class FillStyle(Choice):
                     '94% dense', '88% dense', '63% dense', '50% dense',
                     '37% dense', '12% dense', '6% dense' ]
 
-    _fillcnvt = { 'solid': qt4.Qt.SolidPattern,
-                  'horizontal': qt4.Qt.HorPattern,
-                  'vertical': qt4.Qt.VerPattern,
-                  'cross': qt4.Qt.CrossPattern,
-                  'forward diagonals': qt4.Qt.FDiagPattern,
-                  'backward diagonals': qt4.Qt.BDiagPattern,
-                  'diagonal cross': qt4.Qt.DiagCrossPattern,
-                  '94% dense': qt4.Qt.Dense1Pattern,
-                  '88% dense': qt4.Qt.Dense2Pattern,
-                  '63% dense': qt4.Qt.Dense3Pattern,
-                  '50% dense': qt4.Qt.Dense4Pattern,
-                  '37% dense': qt4.Qt.Dense5Pattern,
-                  '12% dense': qt4.Qt.Dense6Pattern,
-                  '6% dense': qt4.Qt.Dense7Pattern }
+    _fillcnvt = { 'solid': qt.Qt.SolidPattern,
+                  'horizontal': qt.Qt.HorPattern,
+                  'vertical': qt.Qt.VerPattern,
+                  'cross': qt.Qt.CrossPattern,
+                  'forward diagonals': qt.Qt.FDiagPattern,
+                  'backward diagonals': qt.Qt.BDiagPattern,
+                  'diagonal cross': qt.Qt.DiagCrossPattern,
+                  '94% dense': qt.Qt.Dense1Pattern,
+                  '88% dense': qt.Qt.Dense2Pattern,
+                  '63% dense': qt.Qt.Dense3Pattern,
+                  '50% dense': qt.Qt.Dense4Pattern,
+                  '37% dense': qt.Qt.Dense5Pattern,
+                  '12% dense': qt.Qt.Dense6Pattern,
+                  '6% dense': qt.Qt.Dense7Pattern }
 
     controls.FillStyle._fills = _fillstyles
     controls.FillStyle._fillcnvt = _fillcnvt
 
-    def __init__(self, name, value, **args):
-        Choice.__init__(self, name, self._fillstyles, value, **args)
+    def __init__(self, name, default, descr=None):
+        Choice.__init__(self, name, self._fillstyles, default, descr=descr)
 
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-                              
     def qtStyle(self):
         """Return Qt ID of fill."""
         return self._fillcnvt[self.val]
@@ -1088,29 +963,19 @@ class FillStyle(Choice):
 class LineStyle(Choice):
     """A setting choosing a particular line style."""
 
-    # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
-                   'dash-dot', 'dash-dot-dot', 'dotted-fine',
-                   'dashed-fine']
+                   'dash-dot', 'dash-dot-dot' ]
 
-    # convert from line styles to Qt constants and a custom pattern (if any)
-    _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
-                  'dashed': (qt4.Qt.DashLine, None),
-                  'dotted': (qt4.Qt.DotLine, None),
-                  'dash-dot': (qt4.Qt.DashDotLine, None),
-                  'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
-                  'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]),
-                  'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]) }
+    _linecnvt = { 'solid': qt.Qt.SolidLine, 'dashed': qt.Qt.DashLine,
+                  'dotted': qt.Qt.DotLine, 'dash-dot': qt.Qt.DashDotLine,
+                  'dash-dot-dot': qt.Qt.DashDotDotLine }
     
     controls.LineStyle._lines = _linestyles
+    controls.LineStyle._linecnvt = _linecnvt
     
-    def __init__(self, name, default, **args):
-        Choice.__init__(self, name, self._linestyles, default, **args)
+    def __init__(self, name, default, descr=None):
+        Choice.__init__(self, name, self._linestyles, default, descr=descr)
 
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-                              
     def qtStyle(self):
         """Get Qt ID of chosen line style."""
         return self._linecnvt[self.val]
@@ -1121,100 +986,39 @@ class LineStyle(Choice):
 class Axis(Str):
     """A setting to hold the name of an axis."""
 
-    def __init__(self, name, val, direction, **args):
+    def __init__(self, name, val, direction, descr=''):
         """Initialise using the document, so we can get the axes later.
         
         direction is horizontal or vertical to specify the type of axis to
         show
         """
 
-        Setting.__init__(self, name, val, **args)
+        Setting.__init__(self, name, val, descr)
         self.direction = direction
         
     def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (self.direction,), {})
-
+        """Make a setting which has its values copied from this one."""
+        obj = self.__class__(self.name, self.val, self.direction,
+                             descr=self.descr)
+        obj.readonly = self.readonly
+        obj.default = self.default
+        return obj
+        
     def makeControl(self, *args):
         """Allows user to choose an axis or enter a name."""
-        return controls.Axis(self, self.getDocument(), self.direction, *args)
+        # find document
+        p = self.parent
+        while not hasattr(p, 'document'):
+            p = p.parent
 
-class Image(Str):
-    """Hold the name of a child image."""
-
-    def buildImageList(level, widget, outdict):
-        """A recursive helper to build up a list of possible image widgets.
-
-        This iterates over widget's children, and adds Image widgets as tuples
-        to outdict using outdict[name] = (widget, level)
-
-        Lower level images of the same name outweigh other images further down
-        the tree
-        """
-
-        for child in widget.children:
-            if child.typename == 'image':
-                if (child.name not in outdict) or (outdict[child.name][1]>level):
-                    outdict[child.name] = (child, level)
-            else:
-                Image.buildImageList(level+1, child, outdict)
-
-    buildImageList = staticmethod(buildImageList)
-
-    def getImageList(self):
-        """Return a dict of valid image names and the corresponding objects."""
-
-        # find widget which contains setting
-        widget = self.parent
-        while not widget.isWidget() and widget is not None:
-            widget = widget.parent
-
-        # get widget's parent
-        if widget is not None:
-            widget = widget.parent
-
-        # get list of images from recursive find
-        images = {}
-        if widget is not None:
-            Image.buildImageList(0, widget, images)
-
-        # turn (object, level) pairs into object
-        outdict = {}
-        for name, val in images.iteritems():
-            outdict[name] = val[0]
-
-        return outdict
-
-    def findImage(self):
-        """Find the image corresponding to this setting.
-
-        Returns Image object if succeeds or None if fails
-        """
-
-        images = self.getImageList()
-        try:
-            return images[self.get()]
-        except KeyError:
-            return None
-
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-
-    def makeControl(self, *args):
-        """Allows user to choose an image widget or enter a name."""
-        return controls.Image(self, self.getDocument(), *args)
+        return controls.Axis(self, p.document, self.direction, *args)
     
 class Marker(Choice):
     """Choose a marker type from one allowable."""
 
-    def __init__(self, name, value, **args):
-        Choice.__init__(self, name, utils.MarkerCodes, value, **args)
+    def __init__(self, name, default, descr=None):
+        Choice.__init__(self, name, utils.MarkerCodes, default, descr=descr)
 
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-                              
     def makeControl(self, *args):
         return controls.Marker(self, *args)
     
@@ -1239,7 +1043,7 @@ class LineSet(Setting):
             except ValueError:
                 raise InvalidType
 
-            if ( not isinstance(color, basestring) or
+            if ( type(color) not in (str, unicode) or
                  not Distance.isDist(width) or
                  style not in LineStyle._linestyles or
                  type(hide) not in (int, bool) ):
@@ -1258,20 +1062,16 @@ class LineSet(Setting):
         """
 
         if len(self.val) == 0:
-            return qt4.QPen(qt4.Qt.NoPen)
+            return qt.QPen(qt.Qt.NoPen)
         else:
             row = row % len(self.val)
             style, width, color, hide = self.val[row]
             width = Distance.convertDistance(painter, width)
-            style, dashpattern = LineStyle._linecnvt[style]
-            pen = qt4.QPen(qt4.QColor(color), width, style)
-
-            if dashpattern:
-                pen.setDashPattern(dashpattern)
-
+            p = qt.QPen( qt.QColor(color), width,
+                         LineStyle._linecnvt[style] )
             if hide:
-                pen.setStyle(qt4.Qt.NoPen)
-            return pen
+                p.setStyle(qt.Qt.NoPen)
+            return p
     
 class FillSet(Setting):
     """A setting which corresponds to a set of fills.
@@ -1296,7 +1096,7 @@ class FillSet(Setting):
             except ValueError:
                 raise InvalidType
 
-            if ( not isinstance(color, basestring) or
+            if ( type(color) not in (str, unicode) or
                  style not in FillStyle._fillstyles or
                  type(hide) not in (int, bool) ):
                 raise InvalidType
@@ -1314,13 +1114,13 @@ class FillSet(Setting):
         """
 
         if len(self.val) == 0:
-            return qt4.QBrush()
+            return qt.QBrush()
         else:
             row = row % len(self.val)
             style, color, hide = self.val[row]
-            b = qt4.QBrush( qt4.QColor(color),
-                            FillStyle._fillcnvt[style] )
+            b = qt.QBrush( qt.QColor(color),
+                           FillStyle._fillcnvt[style] )
             if hide:
-                b.setStyle(qt4.Qt.NoBrush)
+                b.setStyle(qt.Qt.NoBrush)
             return b
     

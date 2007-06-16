@@ -3,8 +3,7 @@ include MANIFEST.in setup.py setup.cfg
 include scripts/veusz scripts/veusz_listen
 recursive-include tests *.py *.sh *.vsz
 recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html
-recursive-include windows *.png *.ico README
-recursive-include dialogs *.ui
+recursive-include windows *.png README
 recursive-include examples *.vsz *.py *.csv *.dat
 recursive-include widgets *.dat
 recursive-include helpers *.c README LICENSE_*

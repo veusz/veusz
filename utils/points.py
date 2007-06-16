@@ -22,8 +22,8 @@
 
 import itertools
 
-import veusz.qtall as qt4
-import numpy as N
+import qt
+import numarray as N
 
 def _plotNone(painter, xpos, ypos, size):
     """ (internal) function plot nothing!
@@ -45,8 +45,7 @@ def _plotCircle(painter, xpos, ypos, size):
     """
 
     # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2, size*2) )
+    painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
 
 def _plotEllipseVert(painter, xpos, ypos, size):
     """ (internal) function to plot a vertical ellipse marker
@@ -54,8 +53,7 @@ def _plotEllipseVert(painter, xpos, ypos, size):
     """
 
     # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size*0.5, ypos - size,
-                                    size+1, size*2+1 ) )
+    painter.drawEllipse( xpos - size/2, ypos - size , size+1, size*2+1 )
 
 def _plotEllipseHorz(painter, xpos, ypos, size):
     """ (internal) function to plot a horizontal ellipse marker
@@ -63,8 +61,7 @@ def _plotEllipseHorz(painter, xpos, ypos, size):
     """
 
     # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size*0.5,
-                                    size*2+1, size+1) )
+    painter.drawEllipse( xpos - size, ypos - size/2 , size*2+1, size+1 )
 
 def _plotCircleDot(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker with dot at core
@@ -72,20 +69,17 @@ def _plotCircleDot(painter, xpos, ypos, size):
     """
 
     # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2+1, size*2+1) )
-    w = painter.pen().width()*0.5
-    painter.drawEllipse( qt4.QRectF(xpos-w, ypos-w, w*2+1, w*2+1) )
+    painter.drawEllipse( xpos - size, ypos - size , size*2+1, size*2+1 )
+    w = painter.pen().width() / 2
+    painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
 
 def _plotBullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
     size is radius
     """
 
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2+1, size*2+1) )
-    painter.drawEllipse( qt4.QRectF(xpos - size*0.5, ypos - size*0.5,
-                                    size+1, size+1) )
+    painter.drawEllipse( xpos - size, ypos - size, size*2+1, size*2+1 )
+    painter.drawEllipse( xpos - size/2, ypos - size/2, size+1, size+1 )
 
 # functions to call for special shapes
 _markerlookup = { 'none': _plotNone,
@@ -98,30 +92,26 @@ _markerlookup = { 'none': _plotNone,
                   }
 
 _linesymbols = {
-    'asterisk': ( ((-0.707, -0.707), (0.707,  0.707)),
-                  ((-0.707,  0.707), (0.707, -0.707)),
-                  ((-1, 0), (1, 0)), ((0, -1), (0, 1)) ),
-    'lineplus': ( ((-1, 0), (1, 0)), ((0, -1), (0, 1)) ),
-    'linecross': ( ((-0.707, -0.707), (0.707,  0.707)),
-                   ((-0.707,  0.707), (0.707, -0.707)) ),
-    'linehorz': ( ((-1, 0), (1, 0)), ),
-    'linevert': ( ((0, -1), (0, 1)), ),
-    'arrowleft': ( ((1, -1), (0, 0), (1, 1)), ((2, 0), (0, 0)) ),
-    'arrowleftaway': ( ((-1, -1), (-2, 0), (-1, 1)), ((-2, 0), (0, 0)) ),
-    'arrowright': ( ((-1, -1), (0, 0), (-1, 1)), ((-2, 0), (0, 0)) ),
-    'arrowrightaway': ( ((1, -1), (2, 0), (1, 1)), ((2, 0), (0, 0)) ),
-    'arrowup': ( ((-1, 1), (0, 0), (1, 1)), ((0, 2), (0, 0)) ),
-    'arrowupaway': ( ((-1, -1), (0, -2), (1, -1)), ((0, 0), (0, -2)) ),
-    'arrowdown': ( ((-1, -1), (0, 0), (1, -1)), ((0, -2), (0, 0)) ),
-    'arrowdownaway': ( ((-1, 1), (0, 2), (1, 1)), ((0, 0), (0, 2)) ),
-    'limitlower': ( ((-1, -1), (0, 0), (1, -1)), ((0, -2), (0, 0)),
-                    ((-1, 0), (1, 0)) ),
-    'limitupper': ( ((-1, 1), (0, 0), (1, 1)), ((0, 2), (0, 0)),
-                    ((-1, 0), (1, 0)) ),
-    'limitleft': ( ((1, -1), (0, 0), (1, 1)), ((2, 0), (0, 0)),
-                   ((0, -1), (0, 1)) ),
-    'limitright': ( ((-1, -1), (0, 0), (-1, 1)), ((-2, 0), (0, 0)),
-                    ((0, -1), (0, 1)) )
+    'asterisk': ( (-0.707, -0.707, 0.707,  0.707),
+                  (-0.707,  0.707, 0.707, -0.707),
+                  (-1, 0, 1, 0), (0, -1, 0, 1) ),
+    'lineplus': ( (-1, 0, 1, 0), (0, -1, 0, 1) ),
+    'linecross': ( (-0.707, -0.707, 0.707,  0.707),
+                   (-0.707,  0.707, 0.707, -0.707) ),
+    'linehorz': ( (-1, 0, 1, 0), ),
+    'linevert': ( (0, -1, 0, 1), ),
+    'arrowleft': ( (1, -1, 0, 0, 1, 1), (2, 0, 0, 0) ),
+    'arrowleftaway': ( (-1, -1, -2, 0, -1, 1), (-2, 0, 0, 0) ),
+    'arrowright': ( (-1, -1, 0, 0, -1, 1), (-2, 0, 0, 0) ),
+    'arrowrightaway': ( (1, -1, 2, 0, 1, 1), (2, 0, 0, 0) ),
+    'arrowup': ( (-1, 1, 0, 0, 1, 1), (0, 2, 0, 0) ),
+    'arrowupaway': ( (-1, -1, 0, -2, 1, -1), (0, 0, 0, -2) ),
+    'arrowdown': ( (-1, -1, 0, 0, 1, -1), (0, -2, 0, 0) ),
+    'arrowdownaway': ( (-1, 1, 0, 2, 1, 1), (0, 0, 0, 2) ),
+    'limitlower': ( (-1, -1, 0, 0, 1, -1), (0, -2, 0, 0), (-1, 0, 1, 0) ),
+    'limitupper': ( (-1, 1, 0, 0, 1, 1), (0, 2, 0, 0), (-1, 0, 1, 0) ),
+    'limitleft': ( (1, -1, 0, 0, 1, 1), (2, 0, 0, 0), (0, -1, 0, 1) ),
+    'limitright': ( (-1, -1, 0, 0, -1, 1), (-2, 0, 0, 0), (0, -1, 0, 1) )
     }
 
 def _plotLineSymbols(painter, name, xpos, ypos, size):
@@ -130,18 +120,18 @@ def _plotLineSymbols(painter, name, xpos, ypos, size):
     # make a set of point arrays for each plotted symbol
     ptarrays = []
     for lines in _linesymbols[name]:
-        pa = qt4.QPolygonF()
-        for x, y in lines:
-            pa.append(qt4.QPointF(x*size, y*size))
+        pgn = (N.array(lines, N.Float32)*size).astype(N.Int32)
+        pa = qt.QPointArray( pgn.flat.tolist() )
         ptarrays.append(pa)
 
-    lastx = 0.
-    lasty = 0.
+    xlast = 0
+    ylast = 0
     for x, y in itertools.izip(xpos, ypos):
         for pa in ptarrays:
-            pa2 = qt4.QPolygonF(pa)
-            pa2.translate(x, y)
-            painter.drawPolyline(pa2)
+            pa.translate(x-xlast, y-ylast)
+            painter.drawPolyline(pa)
+        xlast = x
+        ylast = y
     
 # X and Y pts for corners of polygons
 _polygons = {
@@ -176,14 +166,17 @@ _polygons = {
 def _plotPolygons(painter, name, xpos, ypos, size):
     '''Plots shapes which are polygons'''
 
-    pgn = qt4.QPolygonF()
-    for x, y in _polygons[name]:
-        pgn.append(qt4.QPointF(x*size, y*size))
+    # make a polygon of the correct size
+    pgn = (N.array(_polygons[name], N.Float32) * size).astype(N.Int32)
+    pa = qt.QPointArray( pgn.flat.tolist() )
 
+    xlast = 0
+    ylast = 0
     for x, y in itertools.izip(xpos, ypos):
-        pgn2 = qt4.QPolygonF(pgn)
-        pgn2.translate(x, y)
-        painter.drawPolygon(pgn2)
+        pa.translate(x-xlast, y-ylast)
+        painter.drawPolygon(pa)
+        xlast = x
+        ylast = y
 
 MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'diamond', 'square', 'barhorz', 'barvert',

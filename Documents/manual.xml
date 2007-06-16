@@ -46,14 +46,14 @@
       necessary to write some parts in another language for speed, but
       this will be kept to an absolute minimum). It is also designed
       in an object oriented fashion, where a document is built up by a
-      number of parts in a hierarchy. The advantage of using Python
+      number of components in a hierarchy. The advantage of using Python
       is that is is easy to allow the user to script Veusz using
       Python as a very powerful scripting language. Indeed, the
       saved file format is a Python script.</para>
 
       <para>The technologies behind Veusz include PyQt (a very easy to
       use Python interface to Qt, which is used for rendering and the
-      graphical user interface, GUI) and numpy (a package for Python
+      graphical user interface, GUI) and numarray (a package for Python
       which makes the handling of large datasets easy).</para>
 
       <para>Veusz has two user interfaces: a graphical one which gives
@@ -71,25 +71,25 @@
       <para>Here I define some terminology for future use.</para>
 
       <section>
-	<title>Part</title>
+	<title>Component</title>
 	<para>A document and its graphs are built up from
-	  parts. These parts can often by placed within each
-	  other, depending on the type of the part. A part has
-	  children, those parts placed within it, and its
-	  parent. The parts have a number of different settings
+	  components. These components can often by placed within each
+	  other, depending on the type of the component. A component has
+	  children, those components placed within it, and its
+	  parent. The components have a number of different settings
 	  which modify their behaviour. These include the font to be
 	  used, the line thickness, and whether an axis is
 	  logarithmic. In addition they have actions, which perform
-	  some sort of activity on the part or its children, like
-	  "fit" for a fit part.</para>
+	  some sort of activity on the component or its children, like
+	  "fit" for a fit component.</para>
 	
-	<para>Parts are specified with a "path", like a file in Unix
-	or Windows. These can be relative to the current part (do
+	<para>Components are specified with a "path", like a file in Unix
+	or Windows. These can be relative to the current component (do
 	not start with a slash), or absolute (do not start with a
 	slash). Examples of paths include, "/page1/graph1/x", "x" and
 	".".</para>
 
-	<para>The part types include</para>
+	<para>The component types include</para>
 	
 	<orderedlist>
 	  <listitem>
@@ -109,11 +109,11 @@
 	      graph are its axes and plotters. A graph can be given a
 	      background fill and a border if required. It also has a
 	      margin, which specifies how far away from the edge of
-	      its parent part to plot the body of the graph.</para>
+	      its parent component to plot the body of the graph.</para>
 
 	    <para>A graph can contain several axes, at any position
 	      on the plot. In addition a graph can use axes defined in
-	      parent parts, shared with other graphs.</para>
+	      parent components, shared with other graphs.</para>
 
 	    <para>More than one graph can be placed within in a
 	      page. The margins can be adjusted so that they lie
@@ -147,9 +147,9 @@
 	  </listitem>
 
 	  <listitem>
-	    <para>plotters - types of parts which plot data or add
+	    <para>plotters - types of components which plot data or add
 	      other things on a graph. There is no actual plotter
-	      part which can be added, but several types of plotters
+	      component which can be added, but several types of plotters
 	      listed below. Plotters typically take an axis as a
 	      setting, which is the axis used to plot the data on the
 	      graph (default x and y).</para>
@@ -163,13 +163,13 @@
 		  close to most other languages. For example "3*x**2 +
 		  2*x - 4". A number of functions are available
 		  (e.g. sin, cos, tan, exp, log...). Technically,
-		  Veusz imports the numpy package when evaluating,
-		  so numpy functions are available.</para>
+		  Veusz imports the numarray package when evaluating,
+		  so numarray functions are available.</para>
 
 		<para>As well as the function setting, also settable
 		  is the line type to plot the function, and the
 		  number of steps to evaluate the function when
-		  plotting. The function part will also support
+		  plotting. The function component will also support
 		  filled regions when implemented.</para>
 	      </listitem>
 
@@ -183,7 +183,7 @@
 		  histograms to be plotted (note that it doesn't yet
 		  do the binning of the data).</para>
 
-		<para>The settings for the xy part are the various
+		<para>The settings for the xy component are the various
 		  attibutes for the points, line and error bars, the
 		  datasets to plot, and the axes to plot on.</para>
 	      </listitem>
@@ -193,7 +193,7 @@
 		  a like the function plotter, but allows fitting of
 		  the function to data. This is achived by clicking on
 		  a "fit" button, or using the "fit" action of the
-		  part. The fitter takes a function to fit
+		  component. The fitter takes a function to fit
 		  containing the unknowns, e.g. "a*x**2 + b*x + c",
 		  and initial values for the variables (here a, b and
 		  c). It then fits the data (note that at the moment,
@@ -208,7 +208,7 @@
 		  everywhere, or symmetrises asymmetric errors.</para>
 
 		<para>Note that more work is required in this
-		  part, as if a parameter is not well defined by the
+		  component, as if a parameter is not well defined by the
 		  data, the matrix inversion in the fit will fail. In
 		  addition Veusz does not supply estimates for the
 		  errors or the final chi-squared in a machine
@@ -221,14 +221,14 @@
 		  for "key" settings of the other data plotted within
 		  a graph. If there any it builds up a box containing
 		  the symbol and line for the plotter, and the text in
-		  the "key" setting of the part. This allows a key
+		  the "key" setting of the component. This allows a key
 		  to be very easily added to a plot.</para>
 
 		<para>The key may be placed in any of the corners of
 		  the plot, in the centre, or manually
-		  placed. Depending on the ordering of the parts,
+		  placed. Depending on the ordering of the components,
 		  the key will be placed behind or on top of the
-		  part. The key can be filled and surrounded by a
+		  component. The key can be filled and surrounded by a
 		  box, or not filled or surrounded.</para>
 	      </listitem>
 
@@ -253,14 +253,14 @@
 	<para>Distances, widths and lengths in Veusz can be specified
 	in a number of different ways. These include absolute
 	distances specified in physical units, e.g. 1cm, 0.05m, 10mm,
-	5in and 10pt, and relative units, which are relative to
+	5in, 10pt and 5", and relative units, which are relative to
 	the largest dimension of the page, including 5%, 1/20,
 	0.05.</para> </section>
 
       <section>
 	<title>Settings</title>
 
-	<para>The various settings of the parts come in a number of
+	<para>The various settings of the components come in a number of
 	types, including integers (e.g. 10), floats (e.g. 3.14), text
 	("hi there!"), distances (see above), options ("horizontal" or
 	"vertical" for axes).</para>
@@ -314,15 +314,45 @@
     <section>
       <title>Installation</title>
 
-      <para>Please look at the Installation notes (INSTALL) for
-      details on installing Veusz.</para>
+      <para>To install Veusz you require the following:</para>
+      <itemizedlist>
 
+	<listitem>
+	  <para>A recent version of Python. Checked versions include
+	  2.3.3 and 2.4.</para>
+	</listitem>
+
+	<listitem>
+	  <para>A recent version of numarray. Checked versions include
+	  1.0.</para>
+	</listitem>
+
+	<listitem>
+	  <para>A recent Qt and PyQt (which requires SIP). Checked
+	  versions include Qt-3.3.3, sip-3.10.1, and PyQt-3.11.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Also recommended are Microsoft's Corefonts, which
+	  include "Times New Roman" and "Arial". Veusz needs good
+	  fonts in order to support special symbols. See <link
+	  linkend="TextFonts">Text</link> for information. Note that
+	  if you do not use TrueType fonts, Qt tends to embed bitmaps
+	  into output postscript files. Although this works, your
+	  files may be several times larger than necessary.</para>
+	</listitem>
+
+      </itemizedlist>
+
+      <para>You should start the script veusz.py from the main veusz
+      directory. That is until I get round to doing a proper
+      installation (maybe distutils based).</para>
     </section>
 
     <section>
       <title>The main window</title>
 
-      <para>Once you have installed Veusz, you should start it by
+      <para>Once you have installed veusz, you should start it by
       executing veusz.py from its directory. This should present the
       Veusz main window.</para>
 
@@ -339,13 +369,7 @@
       over a button for a few seconds, you will usually get an
       explanation for what it does called a "tool tip".</para>
 
-      <para>Below the main toolbar is a second toolbar for
-      constructing the graph by adding parts (on the left), and some
-      editing buttons. The add part buttons add the request part to
-      the currently selected part in the selection window. The parts
-      are arranged in a tree-like structure.</para>
-
-      <para>Below these toolbars and to the right is the plot
+      <para>Below the toolbar and to the right is the plot
       window. This is where the current page of the current document
       is shown. You can adjust the size of the plot on the screen (the
       zoom factor) using the "View" menu or the zoom tool bar button
@@ -354,16 +378,19 @@
       cannot do much else with the window. In the future you will be
       able to click on items in the plot to modify them.</para>
 
-      <para>To the left of the plot window is the selection window,
-      and the properties and formatting windows. The properties window
-      lets you edit various aspects of the selected part (such as the
-      minimum and maximum values on an axis). Changing these values
-      should update the plot. The formatting lets you modify the
-      appearance of the selected part. There are a series of tabs for
-      choosing what aspect to modify.</para>
-
-      <para>The various windows can be "dragged" from the main window
-      to "float" by themselves on the screen.</para>
+      <para>To the left of the plot window is the editing window, the
+      editing toolbar and the properties windows. To the left of the
+      editing toolbar is a set of buttons which allow you to add
+      components to the currently selected component, or its
+      parent. The compenents are arranged in a tree structure from the
+      main document. In the properties window the properties of the
+      currently selected component are shown. Initially if you click on
+      the "document" component, you will see the page width and
+      height. You can change these values and they will be reflected
+      in the plot window if you press Enter or move to the next
+      property. The editing and the properties window can be "dragged"
+      from the main window to "float" by themselves on the
+      screen.</para>
 
       <para>To the bottom of the window is the console. This is a
       Veusz and Python command line console. To read about the
@@ -382,11 +409,11 @@
       <title>My first plot</title>
 
       <para>On the left of the main window, you will see the document
-      is selected in the selection window. The toolbar above adds
-      a new part to the selected part. Click on the page
+      is selected in the editing window. The toolbar on the left adds
+      a new component to the selected component. Click on the page
       icon to add a new page to the document. You will see the new
       page is selected in the editing window. You can now see that
-      other types of part are able to be added.</para>
+      other types of component are able to be added.</para>
 
       <para>You can then click on the "graph" button (which looks like
       a set of axes). You will see a graph along with axes are
@@ -399,25 +426,26 @@
       </mediaobject>
 
       <para>Select the x axis which has been added to the document
-      (click on "x" in the selection window). In the properties window
-      you will see a variety of different properties you can
-      modify. For instance you can enter a label for the axis by
-      writing "Area (cm^{2})" in the box next to label and pressing
-      enter. Veusz supports text in LaTeX-like form (without the
-      dollar signs). Other important parameters is the "log" switch
-      which switches between linear and logarithmic axes, and "min"
-      and "max" which allow the user to specify the minimum and
-      maximum values on the axes.</para>
+      (click on "x" in the tree window). In the properties window you
+      will see a variety of different properties you can modify. For
+      instance you can enter a label for the axis by writing "Area
+      (cm^{2})" in the box next to label and pressing enter. Veusz
+      supports text in LaTeX-like form (without the dollar
+      signs). Other important parameters is the "log" switch which
+      switches between linear and logarithmic axes, and "min" and
+      "max" which allow the user to specify the minimum and maximum
+      values on the axes.</para>
 
-      <para>The formatting dialog lets you edit various aspects of the
-      graph appearance. For instance the "Line" tab allows you to edit
-      the line of the axis. Click on "Line", then you can then modify
-      its colour. Enter "green" instead of "black" and press
+      <para>If you click the "+" symbol next to "x" on the tree
+      window, you will see a number of sets of subsettings open
+      up. For instance the "Line" set of subsettings allows you to
+      edit the line of the axis. Click on "Line", then you can then
+      modify its colour. Enter "green" instead of "black" and press
       enter. Try making the axis label bold.</para>
 
       <para>Now you can try plotting a function on the graph. If the
       graph, or its children are selected, you will then be able to
-      click the "function" button at the top (a red curve on a
+      click the "function" button to the left (a red curve on a
       graph). You will see a straight line (y=x) added to the plot. If
       you select "function1", you will be able to edit the functional
       form plotted and the style of its line. Change the function to
@@ -455,9 +483,9 @@
       plotter.</para>
 
       <para>You are able to choose from a variety of markers to
-      plot. You can remove the plot line by choosing the "Plot Line"
+      plot. You can remove the plot line by choosing the "PlotLine"
       subsetting, and clicking on the "hide" option. You can change
-      the colour of the marker by going to the "Marker Fill"
+      the colour of the marker by going to the "MarkerFill"
       subsetting, and entering a new colour (e.g. red), into the
       colour property.</para>
     </section>
@@ -469,10 +497,9 @@
     <title>Reading data</title>
 
     <para>Currently Veusz supports reading data from a text file (a
-    qdp-alike interface is also planned), FITS format files or from
-    CSV files. Reading data is supported using the "Data, Import"
-    dialog, or using the <link
-    linkend="Command.ImportFile">ImportFile</link> and <link
+    qdp-alike interface is also planned) or from CSV files. Reading
+    data is supported using the "Data, Import" dialog, or using the
+    <link linkend="Command.ImportFile">ImportFile</link> and <link
     linkend="Command.ImportString">ImportString</link> commands which
     read data from files or an existing Python string (allowing data
     to be embedded in a Python script). Alternatively, a user may read
@@ -480,24 +507,18 @@
     program with the <link linkend="Command.SetData">SetData</link>
     command.</para>
     
-      <mediaobject>
-	<imageobject>
-	  <imagedata fileref="manimages/importdialog.png" format="PNG" />
-	</imageobject>
-      </mediaobject>
-
     <para>CSV files are intuitive to use and are described
     below.</para>
 
     <para>In addition data may also be read in from FITS files if the
     PyFITS Python module is installed. FITS is a widespread
-    astronomical data format. FITS files are read using the FITS tab
-    on the import dialog or using the <link
+    astronomical data format. FITS files are read using the "Data,
+    Import FITS" dialog or using the <link
     linkend="Command.ImportFITSFile">ImportFITSFile</link>
     command.</para>
 
-    <para>Two dimensional data are also supported using the 2D tab on
-    the Import dialog box, <link
+    <para>Two dimensional data are also supported using the "Data,
+    Import 2D" dialog box, <link
     linkend="Command.ImportFile2D">ImportFile2D</link> and <link
     linkend="Command.ImportString2D">ImportString2D</link>
     commands.</para>
@@ -516,12 +537,12 @@
       
       <orderedlist>
 	<listitem>
-	  <para><command>x y</command> two columns are present in the
+	  <para><command>x y</command> - two columns are present in the
 	    file, they will be read in as datasets "x" and "y".</para>
 	</listitem>
 	
 	<listitem>
-	  <para><command>x,+- y,+,-</command> two datasets are in the
+	  <para><command>x,+- y,+,-</command> - two datasets are in the
 	    file. Dataset "x" consists of the first two columns. The
 	    first column are the values and the second are the
 	    symmetric errors. "y" consists of three columns (note the
@@ -532,9 +553,9 @@
 	  <para>Suppose the input file contains:</para>
 	  <informalexample>
 	    <programlisting>
-1.0  0.3  2   0.1  -0.2
-1.5  0.2  2.3 2e-2 -0.3E0
-2.19 0.02 5    0.1 -0.1 
+1.0 0.3  2 0.1 -0.2
+1.5 0.2 2.3 2e-2 -0.3E0
+2.19 0.02 5 0.1 -0.1 
 </programlisting>
 	  </informalexample>
 	  
@@ -544,19 +565,19 @@
 	</listitem>
 	
 	<listitem>
-	  <para><command>x[1:2] y[:]</command> the first column is
+	  <para><command>x[1:2] y[:]</command> - the first column is
 	    the data "x_1", the second "x_2". Subsequent columns are
 	    read as "y[1]" to "y[n]".</para>
 	</listitem>
 	
 	<listitem>
-	  <para><command>y[:]+-</command>  read each pair of
+	  <para><command>y[:]+-</command> - read each pair of
 	    columns as a dataset and its symmetric error, calling them
 	    "y[1]" to "y[n]".</para>
 	</listitem>
 
 	<listitem>
-	  <para><command>x,,+-</command>  read the first column as
+	  <para><command>x,,+-</command> - read the first column as
 	  the x dataset, skip a column, and read the third column as
 	  its symmetric error.</para>
 	</listitem>
@@ -739,7 +760,7 @@ SetData('y', y)
       <command>Add('graph', name='foo')</command>, may be entered as
       <command>Add 'graph' name='foo'</command>.</para>
 
-      <para>The <command>numpy</command> package is already
+      <para>The <command>numarray</command> package is already
       imported into the command line interface (as "*"), so you do not
       need to import it first.</para>
 
@@ -758,28 +779,29 @@ SetData('y', y)
 	<para><command>Action('actionname',
 	componentpath='.')</command></para>
 	
-	<para>Initiates the specified action on the part (component)
-	given the action name. Actions perform certain automated
-	routines. These include "fit" on a fit part, and
-	"zeroMargins" on grids.</para> </section>
+	<para>Initiates the specified action on the component given
+	the action name. Actions perform certain automated
+	routines. These include "fit" on a fit component, and
+	"zeroMargins" on grids.</para>
+      </section>
 
       <section>
 	<title><anchor id="Command.Add" />Add</title>
 	
-	<para><command>Add('parttype', name='nameforpart',
+	<para><command>Add('componenttype', name='nameforcomponent',
         autoadd=True, optionalargs)</command></para>
 	
-	<para>The Add command adds a graph into the current part
+	<para>The Add command adds a graph into the current component
         (See the <link linkend="Command.To">To</link> command to change
         the current position).</para>
 	
-	<para>The first argument is the type of part to add. These
+	<para>The first argument is the type of component to add. These
         include "graph", "page", "axis", "xy" and
-        "grid". <command>name</command> is the name of the new part
+        "grid". <command>name</command> is the name of the new component
         (if not given, it will be generated from the type of the
-        part plus a number). The <command>autoadd</command>
-        parameter if set, constructs the default sub-parts this
-        part has (for example, axes in a graph).</para>
+        component plus a number). The <command>autoadd</command>
+        parameter if set, constructs the default sub-components this
+        component has (for example, axes in a graph).</para>
 	
 	<para>Optionally, default values for the graph settings may be
         given, for example <command>Add('axis', name='y',
@@ -789,7 +811,7 @@ SetData('y', y)
 	example <command>Add('xy',
 	MarkerFill__color='red', ErrorBarLine__hide=True)</command>.</para>
 
-	<para>Returns: Name of part added.</para>
+	<para>Returns: Name of component added.</para>
       </section>
 
       <section>
@@ -848,7 +870,7 @@ SetData('y', y)
 
 	<para><command>GetChildren(where='.')</command></para>
 
-	<para>Returns: The names of the parts which are children of
+	<para>Returns: The names of the components which are children of
       the path given</para>
       </section>
 
@@ -872,7 +894,7 @@ SetData('y', y)
 
 	<para>Returns: A tuple containing the datasets with the name
       given. The tuple is (data, symerr, negerr, poserr), with each a
-      numpy array of the same size or None. data are the values of the
+      numarray of the same size or None. data are the values of the
       dataset, symerr are the symmetric errors (if set), negerr and
       poserr and negative and positive asymmetric errors (if
       set).</para>
@@ -1086,8 +1108,8 @@ ImportString('x y', '''
 	
 	<para><command>List(where='.')</command></para>
 	
-	<para>List the parts which are contained within the part
-      with the path given, the type of parts, and a brief
+	<para>List the components which are contained within the component
+      with the path given, the type of components, and a brief
       description.</para>
       </section>
 
@@ -1121,20 +1143,20 @@ ImportString('x y', '''
       <section>
 	<title><anchor id="Command.Rename" />Rename</title>
 	
-	<para><command>Remove('partpath', 'newname')</command></para>
+	<para><command>Remove('componentpath', 'newname')</command></para>
 	
-	<para>Rename the part at the path given to a new name. This
-	command does not move parts.  See <link
+	<para>Rename the component at the path given to a new name. This
+	command does not move components.  See <link
 	linkend="Command.To">To</link> for a description of the path
-	syntax. '.' can be used to select the current part.</para>
+	syntax. '.' can be used to select the current component.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.Remove" />Remove</title>
 	
-	<para><command>Remove('partpath')</command></para>
+	<para><command>Remove('componentpath')</command></para>
 	
-	<para>Remove the part selected using the path. See <link
+	<para>Remove the component selected using the path. See <link
 	linkend="Command.To">To</link> for a description of the path
 	syntax.</para>
       </section>
@@ -1156,7 +1178,7 @@ ImportString('x y', '''
 	<para>Set the setting given by the path to the value given. If
 	the type of <command>val</command> is incorrect, an
 	<command>InvalidType</command> exception is thrown. The path
-	to the setting is the optional path to the part the setting
+	to the setting is the optional path to the component the setting
 	is contained within, an optional subsetting specifier, and the
 	setting itself.</para>
 
@@ -1178,7 +1200,7 @@ Set('page1/graph1/x/min', -10.)
       given for an item, it will be left blank. val is the actual
       data, symerr are the symmetric errors, negerr and poserr and the
       getative and positive asymmetric errors. The data can be given
-      as lists or numpys.</para>
+      as lists or numarrays.</para>
       </section>
       
       <section>
@@ -1188,7 +1210,7 @@ Set('page1/graph1/x/min', -10.)
 	yrange=(C,D))</command></para>
 
 	<para>Creates a two-dimensional dataset with the name
-	given. val is either a two-dimensional numpy array, or is a
+	given. val is either a two-dimensional numarray array, or is a
 	list of lists, with each list in the list representing a
 	row.</para>
 
@@ -1208,13 +1230,13 @@ Set('page1/graph1/x/min', -10.)
       <section>
 	<title><anchor id="Command.To" />To</title>
 	
-	<para><command>To('partpath')</command></para>
+	<para><command>To('componentpath')</command></para>
 	
-	<para>The To command takes a path to a part and moves to
-        that part. For example, this may be "/", the root part,
+	<para>The To command takes a path to a component and moves to
+        that component. For example, this may be "/", the root component,
         "graph1", "/page1/graph1/x", "../x". The syntax is designed to
-        mimic Unix paths for files. "/" represents the base part
-        (where the pages reside), and ".." represents the part next
+        mimic Unix paths for files. "/" represents the base component
+        (where the pages reside), and ".." represents the component next
         up the tree.</para>
 	
       </section>
@@ -1289,14 +1311,14 @@ Set('page1/graph1/x/min', -10.)
 	<informalexample>
 	  <programlisting>
 import time
-import numpy
+import numarray
 import veusz.embed as veusz
  
 g = veusz.Embedded('new window title')
 g.To( g.Add('page') )
 g.To( g.Add('graph') )
-g.SetData('x', numpy.arange(20))
-g.SetData('y', numpy.arange(20)**2)
+g.SetData('x', numarray.arange(20))
+g.SetData('y', numarray.arange(20)**2)
 g.Add('xy')
 g.Zoom(0.5)
  

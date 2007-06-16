@@ -28,6 +28,8 @@ import os.path
 import signal
 import optparse
 
+import qt
+
 # Allow veusz to be run even if not installed into PYTHONPATH
 try:
     import veusz
@@ -40,12 +42,9 @@ except ImportError:
     veusz.__name__ = 'veusz'
     sys.modules['veusz'] = veusz
 
-import veusz.qtall as qt4
-
 import veusz.utils as utils
 from veusz.windows.mainwindow import MainWindow
 from veusz.application import Application
-import veusz.widgets
 
 copyr='''Veusz %s
 
@@ -55,7 +54,7 @@ Licenced under the GNU General Public Licence (version 2 or greater)
 
 def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
-    qt4.qApp.closeAllWindows()
+    qt.qApp.closeAllWindows()
 
 def run():
     '''Run the main application.'''
@@ -86,14 +85,13 @@ def run():
     else:
         MainWindow.CreateWindow()
     
-    app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
-                app, qt4.SLOT("quit()"))
+    app.connect(app, qt.SIGNAL("lastWindowClosed()"),
+                app, qt.SLOT("quit()"))
 
-    app.exec_()
+    app.exec_loop()
 
 # if ran as a program
 if __name__ == '__main__':
-    #import profile
     #profile.run('run()')
     run()
 
