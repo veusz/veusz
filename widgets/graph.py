@@ -20,6 +20,7 @@
 
 # $Id$
 
+import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
@@ -44,28 +45,38 @@ class Graph(widget.Widget):
         s = self.settings
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
                                  'Distance from left of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Left margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
                                  'Distance from right of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Right margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'topMargin', '0.1cm', descr=
                                  'Distance from top of graph to '
-                                 'edge of page') )
+                                 'edge of page',
+                                 usertext='Top margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
                                  'Distance from bottom of graph'
-                                 'to edge of page') )
+                                 'to edge of page',
+                                 usertext='Bottom margin',
+                                 formatting=True) )
         s.add( setting.GraphBrush( 'Background',
-                                   descr = 'Background plot fill' ), pixmap='bgfill' )
-        s.add( setting.Line('Border', descr = 'Graph border line'), pixmap='border')
+                                   descr = 'Background plot fill',
+                                   usertext='Background'), pixmap='bgfill' )
+        s.add( setting.Line('Border', descr = 'Graph border line',
+                            usertext='Border'), pixmap='border')
         
         self.readDefaults()
 
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 
-        if self.parent.getChild('x') == None:
+        if self.parent.getChild('x') is None:
             axis.Axis(self, name='x')
-        if self.parent.getChild('y') == None:
+        if self.parent.getChild('y') is None:
             axis.Axis(self, name='y')
 
     def getAxes(self, names):
@@ -80,10 +91,10 @@ class Graph(widget.Widget):
 
         # recursively go back up the tree to find axes 
         w = self
-        while w != None and remain > 0:
+        while w is not None and remain > 0:
             for c in w.children:
                 name = c.name
-                if name in widgets and widgets[name] == None:
+                if name in widgets and widgets[name] is None:
                     widgets[name] = c
                     remain -= 1
             w = w.parent
@@ -125,23 +136,29 @@ class Graph(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
+        # do no painting if hidden
+        if s.hide:
+            return bounds
+
         painter.beginPaintingWidget(self, bounds)
 
         # if there's a background
         if not s.Background.hide:
             brush = s.get('Background').makeQBrush()
-            painter.fillRect( bounds[0], bounds[1], bounds[2]-bounds[0]+1,
-                              bounds[3]-bounds[1]+1, brush )
+            painter.fillRect( qt4.QRectF(bounds[0], bounds[1],
+                                         bounds[2]-bounds[0],
+                                         bounds[3]-bounds[1]), brush )
 
         # if there's a border
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.drawRect( bounds[0], bounds[1], bounds[2]-bounds[0]+1,
-                              bounds[3]-bounds[1]+1 )
+            painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
+                                         bounds[2]-bounds[0],
+                                         bounds[3]-bounds[1]) )
 
         # work out outer bounds
         ob = list(parentposn)
-        if outerbounds != None:
+        if outerbounds is not None:
             # see whether margin, is zero, and borrow from above if so
             for i in range(4):
                 if margins[i] == 0.:
@@ -165,6 +182,8 @@ class Graph(widget.Widget):
             except AttributeError:
                 pass
 
+        # FIXME: this code is terrible - find a better way to do this
+
         # if there are any
         if len(axestodraw) != 0:
             # now redraw all these axes if they aren't children of us
@@ -173,25 +192,27 @@ class Graph(widget.Widget):
 
             # nasty, as we have to work out whether we're on the edge of
             # a collection
-            edgezero = [ (a==b) for a, b in zip(bounds, parentposn) ]
+            edgezero = [ abs(a-b)<2 for a, b in zip(bounds, parentposn) ]
 
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:
-                if w == None:
+                if w is None:
                     continue
                     
                 # find which side the axis is against
                 edge = w.againstWhichEdge()
 
-                # if it's in the middle of the plot (edges == None)
+                # if it's in the middle of the plot (edges is None)
                 # or the distance to the edge is not zero,
                 # and the margin is zero, suppress text
                 
-                showtext = ( edge == None or edgezero[edge] or
+                showtext = ( edge is None or edgezero[edge] or
                              margins[edge] != 0 )
                 
                 w.draw( bounds, painter, suppresstext = not showtext,
                         outerbounds=ob )
+
+        return bounds
                             
 # allow users to make Graph objects
 document.thefactory.register( Graph )

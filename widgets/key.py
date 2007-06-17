@@ -20,6 +20,7 @@
 
 # $Id$
 
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
@@ -41,33 +42,46 @@ class Key(widget.Widget):
 
         s = self.settings
         s.add( setting.Text('Text',
-                            descr = 'Text settings'),
+                            descr = 'Text settings',
+                            usertext='Text'),
                pixmap = 'axislabel' )
         s.add( setting.KeyBrush('Background',
-                                descr = 'Key background fill'),
+                                descr = 'Key background fill',
+                                usertext='Background'),
                pixmap = 'bgfill' )
         s.add( setting.Line('Border',
-                            descr = 'Key border line'),
+                            descr = 'Key border line',
+                            usertext='Border'),
                pixmap = 'border' )
 
         s.add( setting.Choice( 'horzPosn',
                                ('left', 'centre', 'right', 'manual'),
                                'right',
-                               descr = 'Horizontal key position' ) )
+                               descr = 'Horizontal key position',
+                               usertext='Horz posn',
+                               formatting=True) )
         s.add( setting.Choice( 'vertPosn',
                                ('top', 'centre', 'bottom', 'manual'),
                                'bottom',
-                               descr = 'Vertical key position' ) )
+                               descr = 'Vertical key position',
+                               usertext='Vert posn',
+                               formatting=True) )
                                
         s.add( setting.Distance('keyLength', '1cm',
-                                descr = 'Length of line to show in sample') )
+                                descr = 'Length of line to show in sample',
+                                usertext='Key length',
+                                formatting=True) )
 
         s.add( setting.Float( 'horzManual',
                               0.,
-                              descr = 'Manual horizontal fractional position'))
+                              descr = 'Manual horizontal fractional position',
+                              usertext='Horz manual',
+                              formatting=True) )
         s.add( setting.Float( 'vertManual',
                               0.,
-                              descr = 'Manual vertical fractional position') )
+                              descr = 'Manual vertical fractional position',
+                              usertext='Vert manual',
+                              formatting=True) )
 
         if type(self) == Key:
             self.readDefaults()
@@ -75,31 +89,38 @@ class Key(widget.Widget):
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""
 
+        s = self.settings
+        if s.hide:
+            return
+
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
 
-        s = self.settings
         font = s.get('Text').makeQFont(painter)
         painter.setFont(font)
         height = painter.fontMetrics().height()
 
         showtext = not s.Text.hide
 
-        # count number of keys to draw
-        number = 0
+        # keep track of widgets to place
+        keywidgets = []
+        # maximum width of text required
         maxwidth = 1
+
+        # iterate over children and find widgets which are suitable
         for c in self.parent.children:
-            if c.settings.isSetting('key') and c.settings.key != '':
-                number += 1
+            childset = c.settings
+            if childset.isSetting('key') and childset.key and not childset.hide:
+                keywidgets.append(c)
                 if showtext:
                     w, h = utils.Renderer(painter, font, 0, 0,
-                                          c.settings.key).getDimensions()
+                                          childset.key).getDimensions()
                     maxwidth = max(maxwidth, w)
 
         # total size of box
         symbolwidth = s.get('keyLength').convert(painter)
         totalwidth = maxwidth + height + symbolwidth
-        totalheight = (number+1)*height
+        totalheight = (len(keywidgets)+1)*height
         if not s.Border.hide:
             totalwidth += height*2
 
@@ -110,11 +131,10 @@ class Key(widget.Widget):
         elif h == 'right':
             x = parentposn[2] - height - totalwidth
         elif h == 'centre':
-            x = (parentposn[0] +
-                 (parentposn[2] - parentposn[0])/2 - totalwidth/2)
+            x = ( parentposn[0] +
+                  (parentposn[2] - 0.5*parentposn[0]) - 0.5*totalwidth )
         elif h == 'manual':
-            x = int( parentposn[0] +
-                     (parentposn[2]-parentposn[0])*s.horzManual )
+            x = parentposn[0] + (parentposn[2]-parentposn[0])*s.horzManual
 
         # work out vertical position
         v = s.vertPosn
@@ -128,10 +148,10 @@ class Key(widget.Widget):
                 y -= height
         elif v == 'centre':
             y = (parentposn[1] +
-                 (parentposn[3] - parentposn[1])/2 - totalheight/2)
+                 0.5*(parentposn[3] - parentposn[1]) - 0.5*totalheight)
         elif v == 'manual':
-            y = int( parentposn[3] -
-                     (parentposn[3]-parentposn[1])*s.vertManual - totalheight)
+            y = ( parentposn[3] -
+                  (parentposn[3]-parentposn[1])*s.vertManual - totalheight )
 
         # position of text in x
         symbxpos = x
@@ -139,33 +159,32 @@ class Key(widget.Widget):
         # draw surrounding box
         if not s.Background.hide:
             brush = s.get('Background').makeQBrush()
-            painter.fillRect(x, y, totalwidth, totalheight, brush)
+            painter.fillRect( qt4.QRectF(x, y, totalwidth, totalheight), brush)
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.drawRect(x, y, totalwidth, totalheight)
+            painter.drawRect( qt4.QRectF(x, y, totalwidth, totalheight) )
             symbxpos += height
 
         textpen = s.get('Text').makeQPen()
 
         # plot dataset entries
         ypos = y + height/2
-        for c in self.parent.children:
-            if c.settings.isSetting('key') and c.settings.key != '':
-                # plot key symbol
-                painter.save()
-                c.drawKeySymbol(painter, symbxpos, ypos,
-                                symbolwidth, height)
-                painter.restore()
-                
-                # write key text
-                if showtext:
-                    painter.setPen(textpen)
-                    utils.Renderer(painter, font,
-                                   symbxpos + height + symbolwidth,
-                                   ypos + height/2, c.settings.key,
-                                   -1, 0).render()
+        for c in keywidgets:
+            # plot key symbol
+            painter.save()
+            c.drawKeySymbol(painter, symbxpos, ypos,
+                            symbolwidth, height)
+            painter.restore()
 
-                ypos += height
+            # write key text
+            if showtext:
+                painter.setPen(textpen)
+                utils.Renderer(painter, font,
+                               symbxpos + height + symbolwidth,
+                               ypos + height/2, c.settings.key,
+                               -1, 0).render()
+
+            ypos += height
 
         painter.restore()
         painter.endPaintingWidget()

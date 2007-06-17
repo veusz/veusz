@@ -42,8 +42,7 @@ import sys
 import itertools
 import StringIO
 
-import numarray as N
-import numarray.ieeespecial as NIE
+import numpy as N
 
 import datasets
 
@@ -82,7 +81,7 @@ class _DescriptorPart:
                 self.columns.append('NEG')
 
             # there's no match on this part
-            elif _DescriptorPart.partsplitter.match(part) == None:
+            elif _DescriptorPart.partsplitter.match(part) is None:
                 raise DescriptorError, ( 'Cannot understand descriptor '
                                          'syntax "%s"' % part )
 
@@ -116,11 +115,11 @@ class _DescriptorPart:
                 self.columns.append('DATA')
                 self.name = part
 
-        if self.name == None:
+        if self.name is None:
             raise DescriptorError, 'Value name missing in "%s"' % text
 
         # Calculate indicies for looping over values
-        self.single = self.startindex == None and self.stopindex == None
+        self.single = self.startindex is None and self.stopindex is None
         if self.single:
             # one value only
             self.startindex = self.stopindex = 1
@@ -137,21 +136,21 @@ class _DescriptorPart:
                 name = '%s_%i' % (self.name, index)
 
             # if we're reading multiple blocks
-            if block != None:
+            if block is not None:
                 name += '_%i' % block
 
             # loop over columns until we run out, or we don't need any
             for col in self.columns:
                 # get next column and return if we run out of data
                 val = stream.nextColumn()
-                if val == None:
+                if val is None:
                     return
 
                 # do conversion
                 try:
                     val = float(val)
                 except ValueError:
-                    val = NIE.nan
+                    val = N.nan
                     self.errorcount += 1
 
                 # append a suffix to specify whether error or value
@@ -173,7 +172,7 @@ class _DescriptorPart:
                 name = '%s' % (self.name,)
             else:
                 name = '%s_%i' % (self.name, index)
-            if block != None:
+            if block is not None:
                 name += '_%i' % block
 
             if name+'\0DATA' in thedatasets:
@@ -362,7 +361,7 @@ class SimpleRead:
         """
 
         # iterate over blocks used
-        if self.blocks == None:
+        if self.blocks is None:
             blocks = [None]
         else:
             blocks = self.blocks
@@ -462,7 +461,7 @@ class SimpleRead2D:
             line = []
             while True:
                 v = stream.nextColumn()
-                if v == None:
+                if v is None:
                     break
                 try:
                     line.append( float(v) )
@@ -483,7 +482,7 @@ class SimpleRead2D:
         if len(rows) == 0:
             raise Read2DError, "No data could be imported for dataset"
 
-        # convert the data to a numarray
+        # convert the data to a numpy
         try:
             self.data = N.array(rows)
         except ValueError:

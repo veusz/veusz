@@ -24,14 +24,14 @@
 import re
 import sys
 
-import numarray as N
-import numarray.ieeespecial as NIE
+import numpy as N
 
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
 import plotters
+import widget
 
 class Fit(plotters.FunctionPlotter):
     """A plotter to fit a function to data."""
@@ -46,45 +46,59 @@ class Fit(plotters.FunctionPlotter):
         s = self.settings
         s.add( setting.FloatDict('values',
                                  {'a': 0.0, 'b': 1.0},
-                                 descr = 'Variables and fit values'), 1 )
+                                 descr = 'Variables and fit values',
+                                 usertext='Parameters'), 1 )
         s.add( setting.Dataset('xData', 'x',
-                               descr = 'Variable containing x data'), 2 )
+                               descr = 'Variable containing x data to fit',
+                               usertext='X dataset'), 2 )
         s.add( setting.Dataset('yData', 'y',
-                               descr = 'Variable containing y data'), 3 )
+                               descr = 'Variable containing y data to fit',
+                               usertext='Y dataset'), 3 )
         s.add( setting.Bool('fitRange', False,
                             descr = 'Fit only the data between the '
                             'minimum and maximum of the axis for '
-                            'the function variable'),
+                            'the function variable',
+                            usertext='Fit only range'),
                4 )
         s.add( setting.Str('outExpr', '',
-                           descr = 'Output best fitting expression'),
+                           descr = 'Output best fitting expression',
+                           usertext='Output expression'),
                5, readonly=True )
         s.add( setting.Float('chi2', -1,
-                             descr = 'Output chi^2 from fitting'),
+                             descr = 'Output chi^2 from fitting',
+                             usertext='Fit &chi;<sup>2</sup>'),
                6, readonly=True )
         s.add( setting.Int('dof', -1,
-                           descr = 'Output degrees of freedom from fitting'),
+                           descr = 'Output degrees of freedom from fitting',
+                           usertext='Fit d.o.f.'),
                7, readonly=True )
         s.add( setting.Float('redchi2', -1,
-                             descr = 'Output reduced-chi^2 from fitting'),
+                             descr = 'Output reduced-chi-squared from fitting',
+                             usertext='Fit reduced &chi;<sup>2</sup>'),
                8, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
         f.descr = 'Function to fit'
 
+        # modify description
+        s.get('min').usertext='Min. fit range'
+        s.get('max').usertext='Max. fit range'
+
         if type(self) == Fit:
             self.readDefaults()
 
-        self.addAction( 'fit', self.actionFit,
-                        descr='Fit function' )
+        self.addAction( widget.Action('fit', self.actionFit,
+                                      descr = 'Fit function',
+                                      usertext = 'Fit function') )
 
     def _autoAxis(self, dataname, bounds):
         """Determine range of data."""
         if self.document.hasData(dataname):
             range = self.document.getData(dataname).getRange()
-            bounds[0] = min( bounds[0], range[0] )
-            bounds[1] = max( bounds[1], range[1] )
+            if range:
+                bounds[0] = min( bounds[0], range[0] )
+                bounds[1] = max( bounds[1], range[1] )
 
     def autoAxis(self, name, bounds):
         """Automatically determine the ranges of variable on the axes."""
@@ -128,8 +142,8 @@ class Fit(plotters.FunctionPlotter):
             yserr = ydata.serr
 
         # if there are no errors on data
-        if yserr == None:
-            if ydata.perr != None and ydata.nerr != None:
+        if yserr is None:
+            if ydata.perr is not None and ydata.nerr is not None:
                 print "Warning: Symmeterising positive and negative errors"
                 yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
@@ -175,17 +189,17 @@ class Fit(plotters.FunctionPlotter):
         # populate the return parameters
         vals = {}
         for i, v in zip(names, retn):
-            vals[i] = v
+            vals[i] = float(v)
         operations.append( document.OperationSettingSet(s.get('values'), vals) )
 
         # populate the read-only fit quality params
-        operations.append( document.OperationSettingSet(s.get('chi2'), chi2) )
-        operations.append( document.OperationSettingSet(s.get('dof'), dof) )
+        operations.append( document.OperationSettingSet(s.get('chi2'), float(chi2)) )
+        operations.append( document.OperationSettingSet(s.get('dof'), int(dof)) )
         if dof <= 0:
             print 'No degrees of freedom in fit.\n'
             redchi2 = -1.
         else:
-            redchi2 = chi2/dof
+            redchi2 = float(chi2/dof)
         operations.append( document.OperationSettingSet(s.get('redchi2'), redchi2) )
 
         # expression for fit
@@ -211,7 +225,7 @@ class Fit(plotters.FunctionPlotter):
         try:
             return eval(s.function, env)
         except:
-            return NIE.nan
+            return N.nan
 
     def generateOutputExpr(self, vals):
         """Try to generate text form of output expression.

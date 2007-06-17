@@ -23,11 +23,32 @@
 
 import itertools
 
-import qt
-
 import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting
+
+class Action(object):
+    """A class to wrap functions operating on widgets.
+
+    Attributes:
+    name: name of action
+    function: function to call with no arguments
+    descr: description of action
+    usertext: name of action to display to user
+    """
+
+    def __init__(self, name, function, descr='', usertext=''):
+        """Initialise Action
+
+        Name of action is name
+        Calls function function() on invocation
+        Action has description descr
+        Usertext is short form of name to display to user."""
+
+        self.name = name
+        self.function = function
+        self.descr = descr
+        self.usertext = usertext
 
 class Widget(object):
     """ Fundamental plotting widget interface."""
@@ -45,15 +66,14 @@ class Widget(object):
         self.parent = parent
 
         if not self.isAllowedParent(parent):
-            print self.typename, parent.typename, parent.name
-            raise RuntimeError, "parent is of incorrect type"
+            raise RuntimeError, "Widget parent is of incorrect type"
 
-        if name == None:
+        if name is None:
             name = self.chooseName()
         self.name = name
 
         # propagate document
-        if parent != None:
+        if parent is not None:
             self.document = parent.document
             parent.addChild(self)
 
@@ -67,13 +87,16 @@ class Widget(object):
         self.settings = setting.Settings( 'Widget_' + self.typename )
         self.settings.parent = self
 
+        self.settings.add( setting.Bool('hide', False,
+                                        descr = 'Hide object',
+                                        usertext = 'Hide',
+                                        formatting = True) )
+
         # hook up settings to modify document flag if they are modified
         self.settings.setOnModified(self.slotSettingModified)
         
         # actions for widget
         self.actions = []
-        self.actionfuncs = {}
-        self.actiondescr = {}
 
     def isWidget(self):
         """Is this object a widget?"""
@@ -82,7 +105,7 @@ class Widget(object):
     def rename(self, name):
         """Change name of self."""
 
-        if self.parent == None:
+        if self.parent is None:
             raise ValueError, 'Cannot rename root widget'
 
         if name.find('/') != -1:
@@ -100,21 +123,23 @@ class Widget(object):
         '''Add default sub widgets to widget, if any'''
         pass
 
-    def addAction(self, name, function, descr=''):
+    def addAction(self, action):
         """Assign name to operation.
-
-        name is name to assign
-        function is a function with no parameters to call
-        descr is description of routine.
+        action is action class above
         """
-        self.actions.append(name)
-        self.actionfuncs[name] = function
-        self.actiondescr[name] = descr
+        self.actions.append( action )
+
+    def getAction(self, name):
+        """Get action associated with name."""
+        for a in self.actions:
+            if a.name == name:
+                return a
+        return None
 
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
         ap = self.allowedparenttypes 
-        if parent == None and len(ap)>0 and ap[0] == None:
+        if parent is None and len(ap)>0 and ap[0] is None:
             return True
         
         for p in ap:
@@ -127,7 +152,7 @@ class Widget(object):
 
         # allow base widget to have no parent
         ap = cls.allowedparenttypes 
-        if parent == None and len(ap) > 0 and ap[0] == None:
+        if parent is None and len(ap) > 0 and ap[0] is None:
             return True
         
         for p in ap:
@@ -155,7 +180,7 @@ class Widget(object):
     def chooseName(self):
         """Make a name for widget if not specified."""
 
-        if self.parent == None:
+        if self.parent is None:
             return '/'
         else:
             return self.parent.createUniqueName(self.typename)
@@ -199,7 +224,7 @@ class Widget(object):
 
     def hasChild(self, name):
         """Return whether there is a child with a name."""
-        return self.getChild(name) != None
+        return self.getChild(name) is not None
 
     def _getChildNames(self):
         """Return the child names."""
@@ -225,7 +250,7 @@ class Widget(object):
 
         obj = self
         build = ''
-        while obj.parent != None:
+        while obj.parent is not None:
             build = '/' + obj.name + build
             obj = obj.parent
 
@@ -255,7 +280,7 @@ class Widget(object):
         px1, py1, px2, py2 = self.position
         x1, y1, x2, y2 = ( x1+dx*px1, y1+dy*py1, x1+dx*px2, y1+dy*py2 )
         dx1, dy1, dx2, dy2 = margins
-        return [ int(x1+dx1), int(y1+dy1), int(x2-dx2), int(y2-dy2) ]
+        return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
@@ -266,9 +291,11 @@ class Widget(object):
 
         bounds = self.computeBounds(parentposn, painter)
 
-        # iterate over children in reverse order
-        for i in utils.reverse(self.children):
-            i.draw(bounds, painter, outerbounds=outerbounds)
+        if not self.settings.hide:
+
+            # iterate over children in reverse order
+            for i in utils.reverse(self.children):
+                i.draw(bounds, painter, outerbounds=outerbounds)
  
         # return our final bounds
         return bounds
@@ -298,13 +325,20 @@ class Widget(object):
     def slotSettingModified(self, ismodified):
         """Called when settings is modified."""
 
-        if ismodified:
+        if ismodified and self.document:
             self.document.setModified(True)
 
     def readDefaults(self):
         """Read the default settings."""
 
         self.settings.readDefaults('', self.name)
+
+    def buildFlatWidgetList(self, thelist):
+        """Return a built up list of the widgets in the tree."""
+
+        thelist.append(self)
+        for child in self.children:
+            child.buildFlatWidgetList(thelist)
 
     def _recursiveBuildSlots(self, slots):
         """Build up a flat representation of the places where widgets

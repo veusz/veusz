@@ -1,65 +1,81 @@
-Veusz 0.10
-----------
+Veusz 0.99.0 (new Qt4/numpy beta)
+------------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
 
-Veusz is Copyright (C) 2003-2006 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2007 Jeremy Sanders <jeremy@jeremysanders.net>
 Licenced under the GPL (version 2 or greater).
 
-Veusz is a scientific plotting package written in Python, using PyQt
-for display and user-interfaces, and numarray for handling the numeric
-data. Veusz is designed to produce publication-ready Postscript
+Veusz is a scientific plotting package written in Python, using PyQt4
+for display and user-interfaces, and numpy for handling the numeric
+data. Veusz is designed to produce publication-ready Postscript/PDF
 output. The user interface aims to be simple, consistent and powerful.
 
 Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Changes from 0.9:
- Please refer to ChangeLog for all the changes.
- Highlights include:
-   * CSV import of data
-   * Stylesheets to easily change graph appearance
-   * Many user interface improvements
-   * Extra plotting features and bug fixes
+Changes from 0.10:
+ This is the first release of a much rewritten version of Veusz
+ It has been updated to run under Qt4 and numpy, and now supports Windows
+ The user interface is also signficantly easier to use
+
+ Other useful features include:
+  * Colorbars for images (better color scaling for images too)
+  * Grids of graphs with different sized subgraphs
+  * Much better import dialog 
+  * Antialiased screen output
+  * Native PNG and PDF export
+  * Separate formatting/properties dialog
+  * Handling of INF/NaN in input data
+  * Transparency of graphs (not for EPS output)
+ Plus many more useful changes (see ChangeLog)
 
 Features of package:
  * X-Y plots (with errorbars)
+ * Line and function plots
  * Contour plots
- * Images (with colour mappings)
+ * Images (with colour mappings and colorbars)
  * Stepped plots (for histograms)
- * Line plots
- * Function plots
  * Fitting functions to data
  * Stacked plots and arrays of plots
  * Plot keys
  * Plot labels
  * LaTeX-like formatting for text
- * EPS output
- * Simple data importing
+ * EPS/PDF/PNG export
  * Scripting interface
- * Save/Load plots
- * Dataset manipulation
+ * Dataset creation/manipulation
  * Embed Veusz within other programs
+ * Text, CSV and FITS importing
 
 Requirements:
- Python (probably 2.3 or greater required)
+ Python (2.3 or greater required)
    http://www.python.org/
- Qt (free edition)
+ Qt >= 4.1 (free edition)
    http://www.trolltech.com/products/qt/  
- PyQt (SIP is required to be installed first)
+ PyQt >= 4.1 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/pyqt/
    http://www.riverbankcomputing.co.uk/sip/
- numarray
-   http://www.stsci.edu/resources/software_hardware/numarray
- Microsoft Core Fonts (recommended)
+ numpy >= 1.0
+   http://numpy.scipy.org/
+ Microsoft Core Fonts (recommended for nice output)
    http://corefonts.sourceforge.net/
- PyFITS (optional)
+ PyFITS >= 1.1rc3 (optional for FITS import)
    http://www.stsci.edu/resources/software_hardware/pyfits
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in pdf, html and text format (generated from docbook).
+
+Issues:
+ * This is a new beta, so there are likely to be a number of bugs, even
+   though it has been used by a couple of people for some time.
+ * Can be very slow to plot large datasets if antialiasing is enabled.
+   Right click on graph and disable antialias to speed up output.
+ * Some older versions of Qt (<4.2.2) can produce very large postscript
+   output and random crashes. This may not be completely resolved
+   (especially on windows).
+ * The embedding interface appears to crash on exiting.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
 the mailing lists at
@@ -68,10 +84,6 @@ https://gna.org/mail/?group=veusz
 
 to discuss new features or if you'd like to contribute code. The
 latest code can always be found in the SVN repository.
-
-If non GPL projects are interested in using Veusz code, please contact
-me. I am happy to consider relicencing code for other free projects,
-if I am legally allowed to do so.
 
 Jeremy Sanders
 

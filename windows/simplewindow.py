@@ -18,7 +18,7 @@
 
 # $Id$
 
-import qt
+import veusz.qtall as qt4
 
 import veusz.document as document
 import plotwindow
@@ -27,12 +27,12 @@ import plotwindow
 A simple window class for wrapping a plotwindow
 """
 
-class SimpleWindow(qt.QMainWindow):
+class SimpleWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
     def __init__(self, title):
-        qt.QMainWindow.__init__(self)
-        self.setCaption(title)
+        qt4.QMainWindow.__init__(self)
+        self.setWindowTitle(title)
 
         self.document = document.Document()
 
@@ -45,10 +45,10 @@ class SimpleWindow(qt.QMainWindow):
     def enableToolbar(self, enable=True):
         """Enable or disable the zoom toolbar in this window."""
 
-        if self.toolbar == None and enable:
+        if self.toolbar is None and enable:
             self.toolbar = self.plot.createToolbar(self, None)
 
-        if self.toolbar != None and not enable:
+        if self.toolbar is not None and not enable:
             self.toolbar.close()
             self.toolbar = None
             

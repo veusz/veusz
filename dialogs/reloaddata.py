@@ -22,58 +22,27 @@
 
 """Dialog for reloading linked data."""
 
-import qt
+import os.path
 
+import veusz.qtall as qt4
 import veusz.document as document
+import veusz.utils as utils
 
-class ReloadData(qt.QDialog):
+class ReloadData(qt4.QDialog):
     """Dialog for reloading linked datasets."""
 
-    def __init__(self, parent, document):
+    def __init__(self, document, *args):
         """Initialise the dialog."""
 
-        qt.QDialog.__init__(self, parent, 'DataReloadDialog', False)
-        self.setCaption('Reload linked data - Veusz')
+        qt4.QDialog.__init__(self, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'reloaddata.ui'),
+                   self)
 
         self.document = document
 
-        spacing = self.fontMetrics().height() / 2
-
-        # layout for dialog
-        self.layout = qt.QVBoxLayout(self, spacing)
-
-        self.outputedit = qt.QTextEdit(self)
-        self.layout.addWidget( self.outputedit )
-        self.outputedit.setTextFormat(qt.Qt.PlainText)
-        self.outputedit.setReadOnly(True)
-        self.outputedit.setWordWrap(qt.QTextEdit.NoWrap)
-        f = qt.QFont('Fixed')
-        self.outputedit.setFont(f)
-
-        # buttons
-        w = qt.QWidget(self)
-        self.layout.addWidget(w)
-        w.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Fixed)
-        l = qt.QHBoxLayout(w, 0, spacing)
-        l.addItem( qt.QSpacerItem(1, 1, qt.QSizePolicy.Expanding,
-                                  qt.QSizePolicy.Minimum) )
-        
-        b = qt.QPushButton("&Close", w)
-        b.setDefault(True)
-        l.addWidget(b)
-        self.connect(b, qt.SIGNAL('clicked()'), self.slotClose)
-
         # actually reload the data (and show the user)
         self.reloadData()
-
-    def sizeHint(self):
-        """Returns recommended size of dialog."""
-        return qt.QSize(600, 400)
-
-    def slotClose(self):
-        """Close the dialog."""
-
-        self.close(True)
 
     def reloadData(self):
         """Reload linked data. Show the user what was done."""
@@ -90,8 +59,14 @@ class ReloadData(qt.QDialog):
                               (count, var) )
 
             # show successes
-            for var in datasets:
-                text += 'Imported dataset "%s"\n' % var
+            if len(datasets) != 0:
+                text += 'Reloaded\n'
+                for var in datasets:
+                    descr = self.document.data[var].description()
+                    if descr:
+                        text += ' %s\n' % descr
+                    else:
+                        text += ' %s\n' % var
 
         except IOError, e:
             text = 'Error reading file:\n' + unicode(e)
@@ -101,5 +76,5 @@ class ReloadData(qt.QDialog):
         if text == '':
             text = 'Nothing to do. No linked datasets.'
 
-        self.outputedit.setText(text)
+        self.outputedit.setPlainText(text)
         

@@ -68,8 +68,8 @@ class CommandInterpreter:
         self.write_stdout = sys.stdout
         self.write_stderr = sys.stderr
 
-        # import numarray into the environment
-        exec "from numarray import *" in self.globals
+        # import numpy into the environment
+        exec "from numpy import *" in self.globals
 
         # shortcut
         i = self.interface
@@ -141,7 +141,7 @@ class CommandInterpreter:
         filename: a filename to report if there are errors
         """
         
-        if filename == None:
+        if filename is None:
             filename = '<string>'
 
         # pythonise!
@@ -214,6 +214,8 @@ class CommandInterpreter:
         sys.stdout = self.write_stdout
         sys.stderr = self.write_stderr
 
+        self.document.suspendUpdates()
+
         # actually run the code
         try:
             exec fileobject in self.globals
@@ -223,6 +225,8 @@ class CommandInterpreter:
             backtrace = traceback.format_exception( *i )
             for l in backtrace:
                 sys.stderr.write(l)            
+
+        self.document.enableUpdates()
 
         # return output streams
         sys.stdout = temp_stdout
@@ -257,13 +261,15 @@ class CommandInterpreter:
 
     def GPL(self):
         """Write the GPL to the console window."""
-        # FIXME: This should open up a separate window
-        dirname = os.path.dirname(__file__)
-        f = open(os.path.join(dirname, '..', 'COPYING'), 'rU')
 
-        for line in f:
-            sys.stdout.write(line)
-
+        try:
+            f = open(os.path.join(utils.veuszDirectory, 'COPYING'), 'rU')
+        except IOError:
+            sys.stdout.write('Could not open the license file.\n')
+        else:
+            for line in f:
+                sys.stdout.write(line)
+            
     def runPickle(self, command):
         """Run a pickled command given as arguments.
 

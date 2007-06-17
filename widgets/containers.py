@@ -27,6 +27,8 @@ Classes include
  Grid: Class to plot a grid of plots
 """
 
+import itertools
+
 import veusz.document as document
 import veusz.setting as setting
 
@@ -62,8 +64,8 @@ class _gridengine:
 
     def isAllocedBlock(self, c, r, w, h):
         """Is the block (c,r) -> (c+w,r+h) allocated?"""
-        for y in range(h):
-            for x in range(w):
+        for y in xrange(h):
+            for x in xrange(w):
                 if self.isAlloced(c+x, y+r):
                     return True
         return False
@@ -80,13 +82,13 @@ class _gridengine:
 
     def setAllocedBlock(self, c, r, w, h):
         """Set block (c,r)->(c+w,r+h) as allocated."""
-        for y in range(h):
-            for x in range(w):
+        for y in xrange(h):
+            for x in xrange(w):
                 self.setAlloced(x+c, y+r)
 
     def add(self, width, height):
         """Add a block of width x height, returning position as tuple."""
-        if self.columns != None:
+        if self.columns is not None:
             # wrap around if item too wide
             # (providing we didn't request more columns than we have -
             #  in that case we ignore the request)
@@ -168,34 +170,68 @@ class Grid(widget.Widget):
 
         s = self.settings
         s.add(setting.Int('rows', 2,
-                          descr = 'Number of rows in grid') )
+                          descr = 'Number of rows in grid',
+                          usertext='Number of rows') )
         s.add(setting.Int('columns', 2,
-                          descr = 'Number of columns in grid') )
+                          descr = 'Number of columns in grid',
+                          usertext='Number of columns') )
+
+        s.add( setting.FloatList('scaleRows',
+                                 [],
+                                 descr = 'Row scaling factors. A sequence'
+                                 ' of values\nby which to scale rows '
+                                 'relative to each other.',
+                                 usertext='Row scalings') )
+        s.add( setting.FloatList('scaleCols',
+                                 [],
+                                 descr = 'Column scaling factors. A sequence'
+                                 ' of values\nby which to scale columns'
+                                 ' relative to each other.',
+                                 usertext='Column scalings') )
 
         s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
-                                 'Distance from left of graph to '
-                                 'edge of page') )
+                                 'Distance from left of grid to '
+                                 'edge of page',
+                                 usertext='Left margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
-                                 'Distance from right of graph to '
-                                 'edge of page') )
+                                 'Distance from right of grid to '
+                                 'edge of page',
+                                 usertext='Right margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'topMargin', '0.1cm', descr=
-                                 'Distance from top of graph to '
-                                 'edge of page') )
+                                 'Distance from top of grid to '
+                                 'edge of page',
+                                 usertext='Top margin',
+                                 formatting=True) )
         s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
-                                 'Distance from bottom of graph'
-                                 'to edge of page') )
+                                 'Distance from bottom of grid'
+                                 'to edge of page',
+                                 usertext='Bottom margin',
+                                 formatting=True) )
 
         # we're not descended from
         if type(self) == Grid:
             self.readDefaults()
 
-        self.addAction( 'zeroMargins', self.actionZeroMargins,
-                        descr = 'Zero graph margins' )
+        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
+                                      descr = 'Zero margins of graphs in grid',
+                                      usertext = 'Zero margins') )
 
-        self.olddimensions = (-1, -1)
+        # calculated positions for children
+        self.childpositions = {}
 
-        # maintain copy of children to check for mods
-        self._old_children = list(self.children)
+        # watch for changes to these variables to decide whether to
+        # recalculate positions
+        self.lastdimensions = None
+        self.lastscalings = None
+        self.lastchildren = None
+
+    def _getUserDescription(self):
+        """User friendly description."""
+        s = self.settings
+        return "%(rows)i rows, %(columns)i columns"  % s
+    userdescription = property(_getUserDescription)
 
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""
@@ -203,33 +239,53 @@ class Grid(widget.Widget):
         # class to handle management
         ge = _gridengine(self.settings.columns, self.settings.rows)
 
-        # iterate over children, and collect dimensions of children
-        # (a tuple width nocols x norows)
-
         # copy children, and remove any which are axes
-        children = [i for i in self.children if not isinstance(i, axis.Axis)]
+        children = [c for c in self.children if c.typename != 'axis']
         child_dimensions = {}
-
-        childrenposns = []
+        child_posns = {}
         for c in children:
-            name = c.name
-            child_dimensions[name] = (1, 1)
-            childrenposns.append( ge.add( * child_dimensions[name] ) )
+            dims = (1, 1)
+            child_dimensions[c] = dims
+            child_posns[c] = ge.add(*dims)
 
         nocols, norows = ge.getAllocedDimensions()
-
         # exit if there aren't any children
         if nocols == 0 or norows == 0:
             return
 
-        # fractions per col and row
-        invc, invr = 1./nocols, 1./norows
+        # get total scaling factors for cols
+        scalecols = list(self.settings.scaleCols[:nocols])
+        scalecols += [1.]*(nocols-len(scalecols))
+        totscalecols = sum(scalecols)
+
+        # fractional starting positions of columns
+        last = 0.
+        startcols = [last]
+        for scale in scalecols:
+            last += scale/totscalecols
+            startcols.append(last)
+
+        # similarly get total scaling factors for rows
+        scalerows = list(self.settings.scaleRows[:norows])
+        scalerows += [1.]*(norows-len(scalerows))
+        totscalerows = sum(scalerows)
+
+        # fractional starting positions of rows
+        last = 0.
+        startrows = [last]
+        for scale in scalerows:
+            last += scale/totscalerows
+            startrows.append(last)
 
         # iterate over children, and modify positions
-        for child, pos in zip(children, childrenposns):
-            dim = child_dimensions[child.name]
-            child.position = ( pos[0]*invc, pos[1]*invr,
-                               (pos[0]+dim[0])*invc, (pos[1]+dim[1])*invr )
+        self.childpositions.clear()
+        for child in children:
+            dims = child_dimensions[child]
+            pos = child_posns[child]
+            self.childpositions[child] = ( startcols[pos[0]],
+                                           startrows[pos[1]],
+                                           startcols[pos[0]+dims[0]],
+                                           startrows[pos[1]+dims[1]] )
 
     def actionZeroMargins(self):
         """Zero margins of plots inside this grid."""
@@ -248,31 +304,36 @@ class Grid(widget.Widget):
 
         s = self.settings
 
-        # FIXME: this is very stupid, but works
         # if the contents have been modified, recalculate the positions
         dimensions = (s.columns, s.rows)
-        if ( self.children != self._old_children or
-             self.olddimensions != dimensions ):
+        scalings = (s.scaleRows, s.scaleCols)
+        if ( self.children != self.lastchildren or
+             self.lastdimensions != dimensions or
+             self.lastscalings != scalings ):
             
-            self._old_children = list(self.children)
             self._recalcPositions()
-            self.olddimensions = dimensions
+            self.lastchildren = list(self.children)
+            self.lastdimensions = dimensions
+            self.lastscalings = scalings
 
         margins = ( s.get('leftMargin').convert(painter),
                     s.get('topMargin').convert(painter),
                     s.get('rightMargin').convert(painter),
                     s.get('bottomMargin').convert(painter) )
 
-        # draw children in reverse order if they are not axes
         bounds = self.computeBounds(parentposn, painter, margins=margins)
-        for i in range(len(self.children)):
-            c = self.children[i]
-            if not isinstance(c, axis.Axis):
+        for c in self.children:
+            if c.typename != 'axis':
+                # save old position, then update with calculated
+                oldposn = c.position
+                if c in self.childpositions:
+                    c.position = self.childpositions[c]
+                # draw widget
                 c.draw(bounds, painter, outerbounds=parentposn)
+                # restore position
+                c.position = oldposn
 
         # do not call widget.Widget.draw
 
 # allow the factory to instantiate a grid
 document.thefactory.register( Grid )
-
-       
