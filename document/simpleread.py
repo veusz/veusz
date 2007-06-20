@@ -202,6 +202,15 @@ class _DescriptorPart:
 class FileStream:
     """Class to read in the data from the file-like object."""
 
+    # this regular expression is for splitting up the stream into words
+    # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
+    split_re = re.compile( '|'.join( [r'""',         # match empty double-quoted string
+                                      r'".*?[^\\]"', # match double-quoted string, ignoring escaped quotes
+                                      r"''",         # match empty single-quoted string
+                                      r"'.*?[^\\]'", # match single-quoted string, ignoring escaped quotes
+                                      r'[^ \t\n]+']  # match normal space/tab separated items
+                                     ) )
+                                      
     def __init__(self, file):
         """File can be any iterator-like object."""
         
@@ -250,7 +259,8 @@ class FileStream:
                 line = line[:-1]
 
             # break up and append to buffer
-            self.remainingline += line.split()
+            # self.remainingline += line.split()
+            self.remainingline += self.split_re.findall(line)
 
             if not continuation:
                 return True
