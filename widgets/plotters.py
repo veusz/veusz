@@ -691,11 +691,12 @@ class PointPlotter(GenericPlotter):
 
         # find NaNs and INFs in input dataset
         invalid = datasets[0].invalidDataPoints()
+        minlen = invalid.shape[0]
         for ds in datasets[1:]:
             try:
                 nextinvalid = ds.invalidDataPoints()
-                if nextinvalid.shape == invalid.shape:
-                    invalid = N.logical_or(invalid, nextinvalid)
+                minlen = min(nextinvalid.shape[0], minlen)
+                invalid = N.logical_or(invalid[:minlen], nextinvalid[:minlen])
             except AttributeError:
                 # if not a dataset
                 pass
@@ -709,7 +710,7 @@ class PointPlotter(GenericPlotter):
             return
 
         # add on shortest length of datasets
-        indexes.append( min([len(ds) for ds in datasets if ds]) )
+        indexes.append( minlen )
     
         lastindex = 0
         for index in indexes:
