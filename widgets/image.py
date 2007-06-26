@@ -318,7 +318,7 @@ class Image(plotters.GenericPlotter):
         x1, y1, x2, y2 = posn
         pltx1, pltx2 = pltx
         pltw = pltx2-pltx1
-        plty1, plty2 = plty
+        plty2, plty1 = plty
         plth = plty2-plty1
 
         imw = self.image.width()
@@ -334,25 +334,25 @@ class Image(plotters.GenericPlotter):
         if pltx1 < x1:
             d = int((x1-pltx1) / pixw)
             cutr[0] += d
-            pltx[0] += int(d*pixw)
+            pltx[0] += d*pixw
 
         # need to chop right
         if pltx2 > x2:
             d = max(0, int((pltx2-x2) / pixw) - 1)
             cutr[2] -= d
-            pltx[1] += int(d*pixh)
+            pltx[1] -= d*pixw
 
         # chop top
         if plty1 < y1:
             d = int((y1-plty1) / pixh)
             cutr[1] += d
-            plty[0] += int(d*pixh)
+            plty[1] += d*pixh
             
         # chop bottom
         if plty2 > y2:
             d = max(0, int((plty2-y2) / pixh) - 1)
             cutr[3] -= d
-            plty[1] -= int(d*pixh)
+            plty[0] -= d*pixh
 
         # create chopped-down image
         newimage = self.image.copy(cutr[0], cutr[1],
