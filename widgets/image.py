@@ -273,10 +273,10 @@ class Image(plotters.GenericPlotter):
 
         minval = s.min
         if minval == 'Auto':
-            minval = data.data.min()
+            minval = N.nanmin(data.data)
         maxval = s.max
         if maxval == 'Auto':
-            maxval = data.data.max()
+            maxval = N.nanmax(data.data)
 
         # this is used currently by colorbar objects
         self.cacheddatarange = (minval, maxval)
