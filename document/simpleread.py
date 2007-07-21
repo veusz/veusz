@@ -40,7 +40,7 @@ The first 3 mean the same thing, the last means read from 1 to 5
 import re
 import sys
 import itertools
-import StringIO
+import cStringIO
 
 import numpy as N
 
@@ -245,34 +245,23 @@ class FileStream:
                 # end of file
                 return False
 
-            # remove comment symbols
-            for sym in "#;!%":
-                comment = line.find(sym)
-                if comment >= 0:
-                    line = line[:comment]
+            # break up and append to buffer (removing comments)
+            self.remainingline += [ x for x in split_re.findall(line) if
+                                    x[0] not in '#!%;' ]
 
-            # check for continuation character
-            line = line.strip()
-            if len(line) == 0:
-                return True
-
-            continuation = line[-1] == '\\'
-            if continuation:
-                line = line[:-1]
-
-            # break up and append to buffer
-            self.remainingline += split_re.findall(line)
-
-            if not continuation:
+            if self.remainingline and self.remainingline[-1] == '\\':
+                # this is a continuation: drop this item and read next line
+                self.remainingline.pop()
+            else:
                 return True
 
 class StringStream(FileStream):
     '''For reading data from a string.'''
     
     def __init__(self, text):
-        """This works by using a StringIO class to iterate over the text."""
+        """A stream which reads in from a text string."""
         
-        FileStream.__init__( self, StringIO.StringIO(text) )
+        FileStream.__init__( self, cStringIO.StringIO(text) )
 
 class SimpleRead:
     '''Class to read in datasets from a stream.
