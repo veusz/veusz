@@ -777,3 +777,17 @@ class DatasetExpression(Dataset):
     perr = property(lambda self: self._propValues('perr'))
     nerr = property(lambda self: self._propValues('nerr'))
 
+    def __getitem__(self, key):
+        """Return a dataset based on this dataset
+
+        We override this from DatasetBase as it would return a
+        DatsetExpression otherwise, not chopped sets of data.
+        """
+
+        args = {}
+        for col in self.columns:
+            array = getattr(self, col)
+            if array is not None:
+                args[col] = array[key]
+        
+        return Dataset(**args)
