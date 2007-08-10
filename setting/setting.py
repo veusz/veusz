@@ -934,12 +934,15 @@ class Dataset(Str):
 class DatasetOrFloatList(Dataset):
     """Choose a dataset or specify a list of float values."""
 
-    digits = dict([(i,None) for i in '0123456789.-'])
+    # a list of numbers separated by spaces or tabs
+    # (requires number at end of line)
+    numbers_re = re.compile(r'^([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?[ \t,$]+)+$')
 
     def convertTo(self, val):
         """Check is a string (dataset name) or a list of floats (numbers).
 
         """
+        
         if isinstance(val, basestring):
             return val
         elif isinstance(val, float) or isinstance(val, int):
@@ -958,8 +961,8 @@ class DatasetOrFloatList(Dataset):
 
     def fromText(self, text):
         text = text.strip()
-        if text and text[0] in self.digits:
-            p = FloatList.list_re.split(text.strip())
+        if text and self.numbers_re.match(text + ' '):
+            p = FloatList.list_re.split(text)
             try:
                 return [float(x) for x in p if x]
             except ValueError:
