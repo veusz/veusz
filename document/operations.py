@@ -447,8 +447,11 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         vals = {}
         for partname, therange in self.parts.iteritems():
             minval, maxval = therange
-            delta = (maxval - minval) / (self.numsteps-1)
-            vals[partname] = N.arange(self.numsteps)*delta + minval
+            if self.numsteps == 1:
+                vals[partname] = N.array( [minval] )
+            else:
+                delta = (maxval - minval) / (self.numsteps-1)
+                vals[partname] = N.arange(self.numsteps)*delta + minval
 
         ds = datasets.Dataset(**vals)
         assert self.datasetname not in document.data
