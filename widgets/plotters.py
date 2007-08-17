@@ -816,9 +816,8 @@ class PointPlotter(GenericPlotter):
                                     xvals.data, yvals.data )
 
             # plot the points (we do this last so they are on top)
-            markersize = 0
+            markersize = s.get('markerSize').convert(painter)
             if not s.MarkerLine.hide or not s.MarkerFill.hide:
-                markersize = s.get('markerSize').convert(painter)
 
                 #print "Painting marker fill"
                 if not s.MarkerFill.hide:
