@@ -608,21 +608,39 @@ class PointPlotter(GenericPlotter):
         #  as the axis could be log
         elif steps == 'centre':
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-            # Have to an extra conversion here as we can't
-            # guarantee device coords of middles of bins are half way
-            # between edges. This is bad code.
-            xcen = axes[0].graphToPlotterCoords(posn,
-                                                0.5*(xdata[:-1]+xdata[1:]))
-            xcen = N.clip(xcen, -32767, 32767)
 
-            for x1, xc, y1, y2 in itertools.izip(xvals[:-1], xcen,
-                                                 yvals[:-1], yvals[1:]):
-                pts.append(qt4.QPointF(x1, y1))
-                pts.append(qt4.QPointF(xc, y1))
-                pts.append(qt4.QPointF(xc, y2))
+            if xdata.hasErrors():
+                # Special case if error bars on x points:
+                # here we use the error bars to define the steps
+                xmin, xmax = xdata.getPointRanges()
 
-            if len(xvals) > 0:
-                pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
+                # this is duplicated from drawing error bars: bad
+                # convert xmin and xmax to graph coordinates
+                xmin = axes[0].graphToPlotterCoords(posn, xmin)
+                xmax = axes[0].graphToPlotterCoords(posn, xmax)
+                xmin = N.clip(xmin, -32767, 32767)
+                xmax = N.clip(xmax, -32767, 32767)
+
+                for xmn, xmx, y in itertools.izip(xmin, xmax, yvals):
+                    pts.append( qt4.QPointF(xmn, y) )
+                    pts.append( qt4.QPointF(xmx, y) )
+
+            else:
+                # Have to an extra conversion here as we can't
+                # guarantee device coords of middles of bins are half way
+                # between edges. This is bad code.
+                xcen = axes[0].graphToPlotterCoords(posn,
+                                                    0.5*(xdata.data[:-1]+xdata.data[1:]))
+                xcen = N.clip(xcen, -32767, 32767)
+
+                for x1, xc, y1, y2 in itertools.izip(xvals[:-1], xcen,
+                                                     yvals[:-1], yvals[1:]):
+                    pts.append(qt4.QPointF(x1, y1))
+                    pts.append(qt4.QPointF(xc, y1))
+                    pts.append(qt4.QPointF(xc, y2))
+
+                if len(xvals) > 0:
+                    pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
 
         else:
             assert False
@@ -813,7 +831,7 @@ class PointPlotter(GenericPlotter):
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
                 self._drawPlotLine( painter, xplotter, yplotter, posn,
-                                    xvals.data, yvals.data )
+                                    xvals, yvals )
 
             # plot the points (we do this last so they are on top)
             markersize = s.get('markerSize').convert(painter)
