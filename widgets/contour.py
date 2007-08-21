@@ -32,6 +32,7 @@ import numpy as N
 
 import veusz.setting as setting
 import veusz.document as document
+import veusz.utils as utils
 
 import plotters
 
@@ -108,7 +109,12 @@ class Contour(plotters.GenericPlotter):
                                formatting=True),
                8 )
 
-        # keep track of settings so we recalculate when necessary
+        s.add( setting.ContourLabel('ContourLabels',
+                                    descr = 'Contour label settings',
+                                    usertext = 'Contour labels'),
+               pixmap = 'axisticklabels' )
+
+         # keep track of settings so we recalculate when necessary
         self.lastdataset = None
         self.contsettings = None
 
@@ -309,6 +315,44 @@ class Contour(plotters.GenericPlotter):
                     linelist = c.trace(level1, level2)
                     self._cachedpolygons.append(linelist)
 
+    def plotContourLabel(self, painter, number, xplt, yplt):
+        s = self.settings
+        cl = s.get('ContourLabels')
+
+        painter.save()
+
+        # get text and font
+        text = utils.formatNumber(number * cl.scale,
+                                  s.ContourLabels.format)
+        font = cl.makeQFont(painter)
+        descent = qt4.QFontMetrics(font).descent()
+
+        # work out where text lies
+        half = len(xplt)/2
+        hx, hy = xplt[half], yplt[half]
+        r = utils.Renderer(painter, font, hx, hy, text, alignhorz=0,
+                           alignvert=0, angle=0)
+        bounds = r.getBounds()
+
+        # clip region containing text
+        oldclip = painter.clipRegion()
+        cr = oldclip - qt4.QRegion( bounds[0]-descent, bounds[1]-descent,
+                                    bounds[2]-bounds[0]+descent*2,
+                                    bounds[3]-bounds[1]+descent*2 )
+        painter.setClipRegion(cr)
+
+        # draw lines
+        pts = qt4.QPolygonF()
+        for x, y in itertools.izip(xplt, yplt):
+            pts.append( qt4.QPointF(x, y) )
+        painter.drawPolyline(pts)
+
+        painter.setClipRegion(oldclip)
+        painter.setPen( cl.makeQPen() )
+        r.render()
+
+        painter.restore()
+
     def plotContours(self, painter, posn, axes):
         """Plot the traced contours on the painter."""
 
@@ -323,6 +367,8 @@ class Contour(plotters.GenericPlotter):
         painter.save()
         painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
 
+        showlabels = not s.ContourLabels.hide
+
         # iterate over each level, and list of lines
         for num, linelist in enumerate(self._cachedcontours):
 
@@ -335,13 +381,18 @@ class Contour(plotters.GenericPlotter):
                 xplt = axes[0].graphToPlotterCoords(posn, curve[:,0])
                 yplt = axes[1].graphToPlotterCoords(posn, curve[:,1])
 
+                    
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
                 for x, y in itertools.izip(xplt, yplt):
                     pts.append( qt4.QPointF(x, y) )
 
-                # actually draw the curve to the plotter
-                painter.drawPolyline(pts)
+
+                if showlabels:
+                    self.plotContourLabel(painter, s.levelsOut[num], xplt, yplt)
+                else:
+                    # actually draw the curve to the plotter
+                    painter.drawPolyline(pts)
 
         # remove clip region
         painter.restore()
