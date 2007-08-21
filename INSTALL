@@ -5,7 +5,7 @@ Veusz uses distutils for its installation. See below for how to use
 it.
 
 Requirements:
- python 2.3      http://www.python.org/
+ python >= 2.3   http://www.python.org/
  PyQt >= 4.1     http://www.riverbankcomputing.co.uk/pyqt/
  numpy >= 1.0    http://numpy.scipy.org/
 
