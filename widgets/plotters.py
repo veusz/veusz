@@ -626,15 +626,11 @@ class PointPlotter(GenericPlotter):
                     pts.append( qt4.QPointF(xmx, y) )
 
             else:
-                # Have to an extra conversion here as we can't
-                # guarantee device coords of middles of bins are half way
-                # between edges. This is bad code.
-                xcen = axes[0].graphToPlotterCoords(posn,
-                                                    0.5*(xdata.data[:-1]+xdata.data[1:]))
-                xcen = N.clip(xcen, -32767, 32767)
-
-                for x1, xc, y1, y2 in itertools.izip(xvals[:-1], xcen,
+                # we put the bin edges half way between the points
+                # we assume this is the correct thing to do even in log space
+                for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
                                                      yvals[:-1], yvals[1:]):
+                    xc = 0.5*(x1+x2)
                     pts.append(qt4.QPointF(x1, y1))
                     pts.append(qt4.QPointF(xc, y1))
                     pts.append(qt4.QPointF(xc, y2))
