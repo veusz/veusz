@@ -81,7 +81,7 @@ class Document( qt4.QObject ):
             self.historybatch[-1].addOperation(operation)
         else:
             # standard mode
-            self.historyundo.append(operation)
+            self.historyundo = self.historyundo[-9:] + [operation]
         self.historyredo = []
 
         self.setModified()
