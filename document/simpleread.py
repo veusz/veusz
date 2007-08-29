@@ -26,10 +26,12 @@ varname<error specifiers><[repeater]>
 where <> marks optional arguments, e.g.
 
 x+- y+,- z+-[1:5]
+x<text> y<date> z<number>
 
 +- means symmetric error bars
 +,- means asymmetric error bars
 , is a separator
+<text> or <date> specifies 
 
 z+-[1:5] means read z_1+- z_2+- ... z_5+-
 
@@ -49,6 +51,34 @@ import datasets
 class DescriptorError(ValueError):
     """Used to indicate an error with the descriptor."""
     pass
+
+# this is a regular expression to match properly quoted strings
+# hopefully a matching expression can be passed to eval
+string_re = re.compile( r'''
+"" |            # match empty double-quoted string
+".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
+'' |            # match empty single-quoted string
+'.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
+''', re.VERBOSE )
+
+# this regular expression is for splitting up the stream into words
+# I'll try to explain this bit-by-bit (these are ORd, and matched in order)
+split_re = re.compile( r'''
+"" |            # match empty double-quoted string
+".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
+'' |            # match empty single-quoted string
+'.*?[^\\]' |    # match single-quoted string, ignoring escaped quotes
+[#!%;].* |      # match comment to end of line
+[^ \t\n#!%;]+   # match normal space/tab separated items
+''', re.VERBOSE )
+
+# date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
+# date and time part are optional (check we have at least one!)
+date_re = re.compile( r'''
+^
+([0-9]{4}-[0-9]{2}-[0-9]{2})? T? ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)?
+$
+''', re.VERBOSE )
 
 class _DescriptorPart:
 
@@ -70,7 +100,7 @@ class _DescriptorPart:
 
         # split up the expression into its components (removing blank parts)
         parts = _DescriptorPart.partsplitter.split(text)
-        parts = [i for i in parts if i != ""]
+        parts = [p for p in parts if p != ""]
 
         for count, part in itertools.izip(itertools.count(), parts):
             if part == '+-':
@@ -124,6 +154,50 @@ class _DescriptorPart:
             # one value only
             self.startindex = self.stopindex = 1
 
+    def getDataType(self, val, datasetname):
+        """Try to work out data type from sample value (val)
+        and datasetname.
+
+        Return values are one of
+        float, string, or date
+        """
+
+        # if the dataset type is specified
+        # check for identifiers in dataset name
+        for text, retn in (('(float)', 'float'),
+                           ('(numeric)', 'float'),
+                           ('(number)', 'float'),
+                           ('(text)', 'string'),
+                           ('(string)', 'string'),
+                           ('(date)', 'date'),
+                           ('(time)', 'date')):
+            if text in datasetname:
+                return retn
+
+        # guess the type:
+        # obvious float
+        try:
+            float(val)
+            return 'float'
+        except ValueError:
+            pass
+
+        # do all libcs check for these?
+        if val.lower() in ('inf', '+inf', '-inf', 'nan'):
+            return 'float'
+
+        # obvious string
+        if string_re.match(val):
+            return 'string'
+
+        # date
+        m = date_re.match(val)
+        if m and (m.group(1) is not None or m.group(2) is not None):
+            return 'date'
+
+        # assume string otherwise
+        return 'string'
+
     def readFromStream(self, stream, thedatasets, block=None):
         """Read data from stream, and write to thedatasets."""
 
@@ -146,6 +220,19 @@ class _DescriptorPart:
                 if val is None:
                     return
 
+                # append a suffix to specify whether error or value
+                # \0 is used as the user cannot enter it
+                fullname = '%s\0%s' % (name, col)
+
+                # get dataset (or get new one)
+                try:
+                    dataset = thedatasets[fullname]
+                except KeyError:
+                    dataset = thedatasets[fullname] = []
+
+                    # try to guess type of data
+                    print self.getDataType(val, name)
+
                 # do conversion
                 try:
                     val = float(val)
@@ -153,14 +240,8 @@ class _DescriptorPart:
                     val = N.nan
                     self.errorcount += 1
 
-                # append a suffix to specify whether error or value
-                # \0 is used as the user cannot enter it
-                fullname = '%s\0%s' % (name, col)
-
                 # add data into dataset
-                if fullname not in thedatasets:
-                    thedatasets[fullname] = []
-                thedatasets[fullname].append(val)
+                dataset.append(val)
 
     def setInDocument(self, thedatasets, document, block=None, linkedfile=None):
         """Set the read-in data in the document."""
@@ -198,17 +279,6 @@ class _DescriptorPart:
                 break
 
         return names
-
-# this regular expression is for splitting up the stream into words
-# I'll try to explain this bit-by-bit (these are ORd, and matched in order)
-split_re = re.compile( r'''
-"" |            # match empty double-quoted string
-".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
-'' |            # match empty single-quoted string
-'.*?[^\\]' |    # match single-quoted string, ignoring escaped quotes
-[#!%;].* |      # match comment to end of line
-[^ \t\n#!%;]+   # match normal space/tab separated items
-''', re.VERBOSE )
 
 class FileStream:
     """Class to read in the data from the file-like object."""
@@ -282,7 +352,7 @@ class SimpleRead:
     def _parseDescriptor(self, descriptor):
         """Take a descriptor, and parse it into its individual parts."""
 
-        self.parts = [_DescriptorPart(i) for i in descriptor.split()]
+        self.parts = [_DescriptorPart(p) for p in descriptor.split()]
 
     def readData(self, stream, useblocks=False):
         """Read in the data from the stream.
@@ -312,8 +382,8 @@ class SimpleRead:
                 allparts += self.parts
             else:
                 # normal text
-                for i in self.parts:
-                    i.readFromStream(stream, self.datasets)
+                for p in self.parts:
+                    p.readFromStream(stream, self.datasets)
             stream.flushLine()
 
         self.parts = allparts
@@ -335,8 +405,8 @@ class SimpleRead:
                     block += 1
             else:
                 # read in data
-                for i in self.parts:
-                    i.readFromStream(stream, self.datasets, block=block)
+                for p in self.parts:
+                    p.readFromStream(stream, self.datasets, block=block)
                 blocks[block] = True
 
             # lose remaining data
@@ -350,8 +420,8 @@ class SimpleRead:
         Returns a dict of dataset, number values."""
 
         out = {}
-        for i in self.parts:
-            out[i.name] = i.errorcount
+        for p in self.parts:
+            out[p.name] = p.errorcount
         return out
 
     def setInDocument(self, document, linkedfile=None):
@@ -368,8 +438,8 @@ class SimpleRead:
 
         names = []
         for b in blocks:
-            for i in self.parts:
-                names += i.setInDocument(self.datasets, document,
+            for p in self.parts:
+                names += p.setInDocument(self.datasets, document,
                                          block=b, linkedfile=linkedfile)
 
         return names
