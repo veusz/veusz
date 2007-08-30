@@ -154,7 +154,7 @@ class _DescriptorPart:
                 if count == len(parts)-1 or parts[count+1] == ',':
                     self.columns.append('SKIP')
 
-            elif part == '(':
+            elif part[0] == '(':
                 dtype = part[1:-1]
                 try:
                     # lookup datatype conversion
@@ -308,9 +308,13 @@ class _DescriptorPart:
                     sym = thedatasets[name+'\0SYM']
 
                 # create the dataset
-                ds = datasets.Dataset(data = vals, serr = sym,
-                                      nerr = neg, perr = pos)
-                ds.linked = linkedfile
+                if self.datatype in ('float', 'date'):
+                    ds = datasets.Dataset(data = vals, serr = sym,
+                                          nerr = neg, perr = pos,
+                                          linked = linkedfile)
+                elif self.datatype == 'string':
+                    ds = datasets.DatasetText( data=vals,
+                                               linked = linkedfile )
 
                 document.setData( name, ds )
                 names.append(name)

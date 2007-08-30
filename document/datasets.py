@@ -533,7 +533,7 @@ class Dataset(DatasetBase):
 
         # build up descriptor
         datasets = [self.data]
-        descriptor = name
+        descriptor = "%s(numeric)" % name
         if self.serr is not None:
             descriptor += ',+-'
             datasets.append(self.serr)
@@ -597,7 +597,15 @@ class DatasetText(DatasetBase):
         '''Save data to file.
         '''
 
-        # FIXME: lots!
+        # don't save if a link
+        if self.linked is not None:
+            return
+
+        descriptor = '%s(text)' % name
+        file.write( "ImportString(%s,'''\n" % repr(descriptor) )
+        for line in self.data:
+            file.write( repr(line) + '\n' )
+        file.write( "''')\n" )
 
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
