@@ -41,7 +41,6 @@ The first 3 mean the same thing, the last means read from 1 to 5
 
 import re
 import sys
-import itertools
 import cStringIO
 
 import numpy as N
@@ -52,42 +51,53 @@ class DescriptorError(ValueError):
     """Used to indicate an error with the descriptor."""
     pass
 
-# this is a regular expression to match properly quoted strings
-# hopefully a matching expression can be passed to eval
-string_re = re.compile( r'''
-"" |            # match empty double-quoted string
-".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
-'' |            # match empty single-quoted string
-'.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
-''', re.VERBOSE )
-
-# this regular expression is for splitting up the stream into words
-# I'll try to explain this bit-by-bit (these are ORd, and matched in order)
-split_re = re.compile( r'''
-"" |            # match empty double-quoted string
-".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
-'' |            # match empty single-quoted string
-'.*?[^\\]' |    # match single-quoted string, ignoring escaped quotes
-[#!%;].* |      # match comment to end of line
-[^ \t\n#!%;]+   # match normal space/tab separated items
-''', re.VERBOSE )
-
-# date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
-# date and time part are optional (check we have at least one!)
-date_re = re.compile( r'''
-^
-([0-9]{4}-[0-9]{2}-[0-9]{2})? T? ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)?
-$
-''', re.VERBOSE )
-
 class _DescriptorPart:
+    """Represents part of a descriptor, e.g. 'x,+,-'
+    """
 
-    # used to split the descriptor expression
-    partsplitter = re.compile( r'(\+-|\+|-|[\.a-zA-Z0-9_]+'
-                               r'|\[[\-0-9]*[:][\-0-9]*\]|,)' )
-    # check a variable name
-    #checkvar = re.compile(r'^[A-Za-z][A-za-z0-9]*$')
-    
+    # split up descriptor name into bits
+    partsplitter_re = re.compile( r'''
+    (
+     \+- |                      # +- error
+     \+  |                      # + error
+     -   |                      # - error
+     [\.a-zA-Z0-9_]+         |  # name
+     \[[\-0-9]*[:][\-0-9]*\] |  # bracket brange
+     ,   |                      # separator
+     \([a-zA-Z]+\)              # data type
+    )
+    ''', re.VERBOSE)
+
+    # date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
+    # date and time part are optional (check we have at least one!)
+    date_re = re.compile( r'''
+    ^
+    ([0-9]{4}-[0-9]{2}-[0-9]{2})? T? ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)?
+    $
+    ''', re.VERBOSE )
+
+    # this is a regular expression to match properly quoted strings
+    # hopefully a matching expression can be passed to eval
+    string_re = re.compile( r'''
+    ^
+    "" |            # match empty double-quoted string
+    ".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
+    '' |            # match empty single-quoted string
+    '.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
+    $
+    ''', re.VERBOSE )
+
+    # convert data type strings in descriptor to internal datatype
+    allowed_datatypes = {
+        'float': 'float',
+        'numeric': 'float',
+        'number': 'float',
+        'text': 'string',
+        'string': 'string',
+        'date': 'date',
+        'time': 'time'
+        }
+
     def __init__(self, text):
         """Initialise descriptor for 1 variable plus errors."""
 
@@ -95,14 +105,18 @@ class _DescriptorPart:
         self.errorcount = 0
         self.columns = []
 
+        # for ranges
         self.startindex = None
         self.stopindex = None
 
+        # type of data
+        self.datatype = None
+
         # split up the expression into its components (removing blank parts)
-        parts = _DescriptorPart.partsplitter.split(text)
+        parts = self.partsplitter_re.split(text)
         parts = [p for p in parts if p != ""]
 
-        for count, part in itertools.izip(itertools.count(), parts):
+        for count, part in enumerate(parts):
             if part == '+-':
                 self.columns.append('SYM')
             elif part == '+':
@@ -111,7 +125,7 @@ class _DescriptorPart:
                 self.columns.append('NEG')
 
             # there's no match on this part
-            elif _DescriptorPart.partsplitter.match(part) is None:
+            elif self.partsplitter_re.match(part) is None:
                 raise DescriptorError, ( 'Cannot understand descriptor '
                                          'syntax "%s"' % part )
 
@@ -140,6 +154,15 @@ class _DescriptorPart:
                 if count == len(parts)-1 or parts[count+1] == ',':
                     self.columns.append('SKIP')
 
+            elif part == '(':
+                dtype = part[1:-1]
+                try:
+                    # lookup datatype conversion
+                    self.datatype = self.allowed_datatypes[dtype]
+                except KeyError:
+                    raise DescriptorError, \
+                          'Invalid data type "%s" in descriptor' % dtype
+
             # must be variable name
             else:
                 self.columns.append('DATA')
@@ -154,9 +177,8 @@ class _DescriptorPart:
             # one value only
             self.startindex = self.stopindex = 1
 
-    def getDataType(self, val, datasetname):
+    def guessDataType(self, val):
         """Try to work out data type from sample value (val)
-        and datasetname.
 
         Return values are one of
         float, string, or date
@@ -164,16 +186,6 @@ class _DescriptorPart:
 
         # if the dataset type is specified
         # check for identifiers in dataset name
-        for text, retn in (('(float)', 'float'),
-                           ('(numeric)', 'float'),
-                           ('(number)', 'float'),
-                           ('(text)', 'string'),
-                           ('(string)', 'string'),
-                           ('(date)', 'date'),
-                           ('(time)', 'date')):
-            if text in datasetname:
-                return retn
-
         # guess the type:
         # obvious float
         try:
@@ -187,11 +199,11 @@ class _DescriptorPart:
             return 'float'
 
         # obvious string
-        if string_re.match(val):
+        if self.string_re.match(val):
             return 'string'
 
         # date
-        m = date_re.match(val)
+        m = self.date_re.match(val)
         if m and (m.group(1) is not None or m.group(2) is not None):
             return 'date'
 
@@ -230,18 +242,45 @@ class _DescriptorPart:
                 except KeyError:
                     dataset = thedatasets[fullname] = []
 
-                    # try to guess type of data
-                    print self.getDataType(val, name)
+                    if not self.datatype:
+                        # try to guess type of data
+                        self.datatype = self.guessDataType(val)
 
-                # do conversion
-                try:
-                    val = float(val)
-                except ValueError:
-                    val = N.nan
-                    self.errorcount += 1
+                # convert according to datatype
+                if self.datatype == 'float':
+                    try:
+                        # do conversion
+                        dat = float(val)
+                    except ValueError:
+                        dat = N.nan
+                        self.errorcount += 1
+                        
+                elif self.datatype == 'string':
+                    if self.string_re.match(val):
+                        # possible security issue:
+                        # regular expression checks this is safe
+                        dat = eval(val)
+                    else:
+                        dat = val
+                        
+                elif self.datatype == 'date':
+                    m = self.date_re.match(val)
+                    if m:
+                        # break up into bits
+                        # FIXME
+                        date, time = m.groups()
+                        if date and time:
+                            pass
+                        elif date:
+                            pass
+                        else:
+                            pass
+                    else:
+                        # bad date
+                        dat = N.nan
 
                 # add data into dataset
-                dataset.append(val)
+                dataset.append(dat)
 
     def setInDocument(self, thedatasets, document, block=None, linkedfile=None):
         """Set the read-in data in the document."""
@@ -283,6 +322,17 @@ class _DescriptorPart:
 class FileStream:
     """Class to read in the data from the file-like object."""
                                     
+    # this regular expression is for splitting up the stream into words
+    # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
+    split_re = re.compile( r'''
+    "" |            # match empty double-quoted string
+    ".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
+    '' |            # match empty single-quoted string
+    '.*?[^\\]' |    # match single-quoted string, ignoring escaped quotes
+    [#!%;].* |      # match comment to end of line
+    [^ \t\n#!%;]+   # match normal space/tab separated items
+    ''', re.VERBOSE )
+
     def __init__(self, file):
         """File can be any iterator-like object."""
         
@@ -316,7 +366,7 @@ class FileStream:
                 return False
 
             # break up and append to buffer (removing comments)
-            self.remainingline += [ x for x in split_re.findall(line) if
+            self.remainingline += [ x for x in self.split_re.findall(line) if
                                     x[0] not in '#!%;' ]
 
             if self.remainingline and self.remainingline[-1] == '\\':
