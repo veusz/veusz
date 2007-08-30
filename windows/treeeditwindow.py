@@ -211,7 +211,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def rowCount(self, parent):
         """Return number of rows of children."""
-        
+
         if not parent.isValid():
             parentobj = None
         else:
@@ -494,6 +494,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.parent = parent
         self.setWindowTitle("Editing - Veusz")
         self.setObjectName("veuszeditingwindow")
+        self.selwidget = None
 
         self.document = document
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
