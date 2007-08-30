@@ -51,6 +51,70 @@ class DescriptorError(ValueError):
     """Used to indicate an error with the descriptor."""
     pass
 
+# date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
+# date and time part are optional (check we have at least one!)
+date_re = re.compile( r'''
+^
+([0-9]{4}-[0-9]{2}-[0-9]{2})? T? ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)?
+$
+''', re.VERBOSE )
+
+# this is a regular expression to match properly quoted strings
+# hopefully a matching expression can be passed to eval
+string_re = re.compile( r'''
+^
+"" |            # match empty double-quoted string
+".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
+'' |            # match empty single-quoted string
+'.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
+$
+''', re.VERBOSE )
+
+# convert data type strings in descriptor to internal datatype
+datatype_name_convert = {
+    'float': 'float',
+    'numeric': 'float',
+    'number': 'float',
+    'text': 'string',
+    'string': 'string',
+    'date': 'date',
+    'time': 'time'
+    }
+
+def guessDataType(val):
+    """Try to work out data type from sample value (val)
+
+    Return values are one of
+    float, string, or date
+    """
+
+    # if the dataset type is specified
+    # check for identifiers in dataset name
+    # guess the type:
+    # obvious float
+    try:
+        float(val)
+        return 'float'
+    except ValueError:
+        pass
+
+    # do all libcs check for these?
+    if val.lower() in ('inf', '+inf', '-inf', 'nan'):
+        return 'float'
+
+    # obvious string
+    if string_re.match(val):
+        return 'string'
+
+    # date
+    m = date_re.match(val)
+    if m and (m.group(1) is not None or m.group(2) is not None):
+        return 'date'
+
+    # assume string otherwise
+    return 'string'
+
+
 class _DescriptorPart:
     """Represents part of a descriptor, e.g. 'x,+,-'
     """
@@ -67,36 +131,6 @@ class _DescriptorPart:
      \([a-zA-Z]+\)              # data type
     )
     ''', re.VERBOSE)
-
-    # date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
-    # date and time part are optional (check we have at least one!)
-    date_re = re.compile( r'''
-    ^
-    ([0-9]{4}-[0-9]{2}-[0-9]{2})? T? ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)?
-    $
-    ''', re.VERBOSE )
-
-    # this is a regular expression to match properly quoted strings
-    # hopefully a matching expression can be passed to eval
-    string_re = re.compile( r'''
-    ^
-    "" |            # match empty double-quoted string
-    ".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
-    '' |            # match empty single-quoted string
-    '.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
-    $
-    ''', re.VERBOSE )
-
-    # convert data type strings in descriptor to internal datatype
-    allowed_datatypes = {
-        'float': 'float',
-        'numeric': 'float',
-        'number': 'float',
-        'text': 'string',
-        'string': 'string',
-        'date': 'date',
-        'time': 'time'
-        }
 
     def __init__(self, text):
         """Initialise descriptor for 1 variable plus errors."""
@@ -158,7 +192,7 @@ class _DescriptorPart:
                 dtype = part[1:-1]
                 try:
                     # lookup datatype conversion
-                    self.datatype = self.allowed_datatypes[dtype]
+                    self.datatype = datatype_name_convert[dtype]
                 except KeyError:
                     raise DescriptorError, \
                           'Invalid data type "%s" in descriptor' % dtype
@@ -176,39 +210,6 @@ class _DescriptorPart:
         if self.single:
             # one value only
             self.startindex = self.stopindex = 1
-
-    def guessDataType(self, val):
-        """Try to work out data type from sample value (val)
-
-        Return values are one of
-        float, string, or date
-        """
-
-        # if the dataset type is specified
-        # check for identifiers in dataset name
-        # guess the type:
-        # obvious float
-        try:
-            float(val)
-            return 'float'
-        except ValueError:
-            pass
-
-        # do all libcs check for these?
-        if val.lower() in ('inf', '+inf', '-inf', 'nan'):
-            return 'float'
-
-        # obvious string
-        if self.string_re.match(val):
-            return 'string'
-
-        # date
-        m = self.date_re.match(val)
-        if m and (m.group(1) is not None or m.group(2) is not None):
-            return 'date'
-
-        # assume string otherwise
-        return 'string'
 
     def readFromStream(self, stream, thedatasets, block=None):
         """Read data from stream, and write to thedatasets."""
@@ -244,7 +245,7 @@ class _DescriptorPart:
 
                     if not self.datatype:
                         # try to guess type of data
-                        self.datatype = self.guessDataType(val)
+                        self.datatype = guessDataType(val)
 
                 # convert according to datatype
                 if self.datatype == 'float':
@@ -256,7 +257,7 @@ class _DescriptorPart:
                         self.errorcount += 1
                         
                 elif self.datatype == 'string':
-                    if self.string_re.match(val):
+                    if string_re.match(val):
                         # possible security issue:
                         # regular expression checks this is safe
                         dat = eval(val)
@@ -264,7 +265,7 @@ class _DescriptorPart:
                         dat = val
                         
                 elif self.datatype == 'date':
-                    m = self.date_re.match(val)
+                    m = date_re.match(val)
                     if m:
                         # break up into bits
                         # FIXME
