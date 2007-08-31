@@ -602,9 +602,11 @@ class DatasetText(DatasetBase):
             return
 
         descriptor = '%s(text)' % name
-        file.write( "ImportString(%s,'''\n" % repr(descriptor) )
+        file.write( "ImportString(%s,r'''\n" % repr(descriptor) )
         for line in self.data:
-            file.write( repr(line) + '\n' )
+            # need to "escape" ''' marks in text
+            r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
+            file.write(r)
         file.write( "''')\n" )
 
 class DatasetExpressionException(DatasetException):
