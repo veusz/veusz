@@ -1094,7 +1094,7 @@ class LineStyle(Choice):
     # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
                    'dash-dot', 'dash-dot-dot', 'dotted-fine',
-                   'dashed-fine']
+                   'dashed-fine', 'dash-dot-fine']
 
     # convert from line styles to Qt constants and a custom pattern (if any)
     _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
@@ -1103,7 +1103,8 @@ class LineStyle(Choice):
                   'dash-dot': (qt4.Qt.DashDotLine, None),
                   'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
                   'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]),
-                  'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]) }
+                  'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]),
+                  'dash-dot-fine': (qt4.Qt.CustomDashLine, [8, 4, 2, 4])}
     
     controls.LineStyle._lines = _linestyles
     
