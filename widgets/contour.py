@@ -212,15 +212,14 @@ class Contour(plotters.GenericPlotter):
         if data.dimensions != 2:
             return
 
-        xrange = data.xrange
-        yrange = data.yrange
-
         if name == s.xAxis:
-            bounds[0] = min( bounds[0], xrange[0] )
-            bounds[1] = max( bounds[1], xrange[1] )
+            dxrange = data.xrange
+            bounds[0] = min( bounds[0], dxrange[0] )
+            bounds[1] = max( bounds[1], dxrange[1] )
         elif name == s.yAxis:
-            bounds[0] = min( bounds[0], yrange[0] )
-            bounds[1] = max( bounds[1], yrange[1] )
+            dyrange = data.yrange
+            bounds[0] = min( bounds[0], dyrange[0] )
+            bounds[1] = max( bounds[1], dyrange[1] )
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the contours."""
@@ -282,17 +281,15 @@ class Contour(plotters.GenericPlotter):
         # find coordinates of image coordinate bounds
         data = d.data[s.data]
         rangex, rangey = data.getDataRanges()
-        xw, yw = data.data.shape
+        yw, xw = data.data.shape
 
-        # calculate location of pixels...
-        xpts = (0.5+N.arange(xw))*(rangex[1]-rangex[0])/xw + rangex[0]
-        ypts = (0.5+N.arange(xw))*(rangey[1]-rangey[0])/yw + rangey[0]
-
-        # convert 1D arrays into 2D
-        y, x = N.indices( (yw, xw) )
-        xpts = xpts[x]
-        ypts = ypts[y]
-        del x, y
+        # arrays containing coordinates of pixels in x and y
+        xpts = N.fromfunction(lambda y,x:
+                              (x+0.5)*((rangex[1]-rangex[0])/xw) + rangex[0],
+                              (yw, xw))
+        ypts = N.fromfunction(lambda y,x:
+                              (y+0.5)*((rangey[1]-rangey[0])/yw) + rangey[0],
+                              (yw, xw))
 
         # iterate over the levels and trace the contours
         self._cachedcontours = None
