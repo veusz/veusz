@@ -1085,9 +1085,7 @@ class LineSet(ListSet):
         self.layout.addWidget(wwidth, row, 1)
         wwidth.setText(self.setting.val[row][1])
         wwidth.setToolTip('Line width')
-        self.connect(wwidth, qt4.SIGNAL('returnPressed()'),
-                     self.onWidthChanged)
-        self.connect(wwidth, qt4.SIGNAL('lostFocus()'),
+        self.connect(wwidth, qt4.SIGNAL('editingFinished()'),
                      self.onWidthChanged)
         self.bgcolor = wwidth.palette().color(qt4.QPalette.Window)
 
