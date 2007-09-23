@@ -124,5 +124,23 @@ class DataCreate2DDialog(qt4.QDialog):
         
     def createButtonClickedSlot(self):
         """Create button pressed."""
-        pass
+
+        text = {}
+        for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
+            text[name] = unicode(getattr(self, name+'combo').currentText())
+
+        link = self.linkcheckbox.checkState() == qt4.Qt.Checked
+        if self.mode == 'xyzexpr':
+            op = document.OperationDataset2DCreateExpressionXYZ(
+                text['name'],
+                text['xexpr'], text['yexpr'], text['zexpr'],
+                link)
+            self.document.applyOperation(op)
+
+            self.document.data[text['name']].data
+
+        elif self.mode == '2dexpr':
+            pass
+        else:
+            pass
 

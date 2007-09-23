@@ -840,7 +840,7 @@ def getSpacing(data):
                 if N.fabs(int(ratio)-ratio) > 1e-10:
                     raise DatasetExpressionException('Variable spacings not yet supported in constructing 2D datasets')
     return (uniquesorted[0], uniquesorted[-1], mindelta,
-            int((uniquesorted[-1]-uniquesorted[0])/mindelta))
+            int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 
 class Dataset2DXYZExpression(DatasetBase):
     '''A 2d dataset with expressions for x, y and z.'''
@@ -886,7 +886,7 @@ class Dataset2DXYZExpression(DatasetBase):
         # update changeset
         self.lastchangeset = self.document.changeset
 
-        evalulated = {}
+        evaluated = {}
         env = self.environment.copy()
 
         # evaluate the x, y and z expressions
@@ -898,7 +898,7 @@ class Dataset2DXYZExpression(DatasetBase):
                 evaluated[name] = eval(expr, env)
             except Exception, e:
                 raise DatasetExpressionException("Error evaluating expession: %s\n"
-                                                 "Error: %s" % (self.expr[part], str(e)) )
+                                                 "Error: %s" % (expr, str(e)) )
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
         miny, maxy, stepy, stepsy = getSpacing(evaluated['expry'])
@@ -909,11 +909,11 @@ class Dataset2DXYZExpression(DatasetBase):
         
         self.cacheddata = N.empty( (stepsy, stepsx) )
         self.cacheddata[:,:] = N.nan
-        xpts = ((1./stepx)*(exprx-minx)).astype('int32')
-        ypts = ((1./stepy)*(expry-miny)).astype('int32')
+        xpts = ((1./stepx)*(evaluated['exprx']-minx)).astype('int32')
+        ypts = ((1./stepy)*(evaluated['expry']-miny)).astype('int32')
 
         # this is ugly - is this really the way to do it?
-        self.cacheddata.flat [ xpts + ypts*stepsx ] = zpts
+        self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
 
     def getXrange(self):
         """Get x range of data as a tuple (min, max)."""

@@ -553,6 +553,47 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
         return ds
+
+class OperationDataset2DCreateExpressionXYZ:
+    descr = 'create 2D dataset from x, y and z expressions'
+    
+    def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
+        self.datasetname = datasetname
+        self.xexpr = xexpr
+        self.yexpr = yexpr
+        self.zexpr = zexpr
+        self.link = link
+
+    def validateExpression(self, document):
+        """Validate expression is okay."""
+        try:
+            ds = datasets.Dataset2DXYZExpression(self.xexpr, self.yexpr,
+                                                 self.zexpr)
+            ds.document = document
+            temp = ds.data
+            
+        except datasets.DatasetExpressionException, e:
+            raise CreateDatasetException(str(e))
+
+    def do(self, document):
+        # keep backup
+        self.olddataset = document.data.get(self.datasetname, None)
+
+        # make new dataset
+        ds = datasets.Dataset2DXYZExpression(self.xexpr, self.yexpr,
+                                             self.zexpr)
+        ds.document = document
+        if not self.link:
+            # unlink if necessary
+            ds = datasets.Dataset2D(ds.data, xrange=ds.xrange,
+                                    yrange=ds.yrange)
+        document.setData(self.datasetname, ds)
+        return ds
+
+    def undo(self, document):
+        del document.data[self.datasetname]
+        if self.olddataset:
+            document.setData(self.datasetname, self.olddataset)
         
 ###############################################################################
 # Import datasets
