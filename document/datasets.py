@@ -667,6 +667,49 @@ class DatasetExpressionException(DatasetException):
 #             # revert to old behaviour
 #             return dict.__getitem__(self, item)
 
+dataexpr_split_re = re.compile(r'([+\-*/\(\)\[\],<>=!|%^~& ])')
+dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
+
+def _substituteDatasets(datasets, expression, thispart):
+    """Subsitiute the names of datasets with calls to a function which will
+    evaluate them.
+
+    This is horribly hacky, but python-2.3 can't use eval with dict subclass
+    """
+
+    # split apart the expression to look for dataset names
+    # re could be compiled if this gets slow
+    bits = dataexpr_split_re.split(expression)
+
+    for i, bit in enumerate(bits):
+        # test whether there's an _data, _serr or such at the end of the name
+        part = thispart
+        bitbits = bit.split('_')
+        if len(bitbits) > 1:
+            if bitbits[-1] in dataexpr_columns:
+                part = bitbits.pop(-1)
+            bit = '_'.join(bitbits)
+
+        if bit in datasets:
+            # replace name with a function to call
+            bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
+
+    return ''.join(bits)
+
+def _evaluateDataset(datasets, dsname, dspart):
+    """Return the dataset given.
+
+    dsname is the name of the dataset
+    dspart is the part to get (e.g. data, serr)
+    """
+    if dspart in dataexpr_columns:
+        val = getattr(datasets[dsname], dspart)
+        if val is None:
+            raise DatasetExpressionException("Dataset '%s' does not have part '%s'" % (dsname, dspart))
+        return val
+    else:
+        raise DatasetExpressionException('Internal error - invalid dataset part')
+
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
@@ -693,48 +736,15 @@ class DatasetExpression(Dataset):
         exec 'from numpy import *' in self.environment
 
         # this fn gets called to return the value of a dataset
-        self.environment['_DS_'] = self._evaluateDataset
+        self.environment['_DS_'] = self.evaluateDataset
 
-        # used to break the dataset expression into parts
-        # to look for dataset names
-        # basically this is most non-alphanumeric chars (except _)
-        self.splitre = re.compile(r'([+\-*/\(\)\[\],<>=!|%^~& ])')
-
-    def _substituteDatasets(self, expression, thispart):
-        """Subsitiute the names of datasets with calls to a function which will evaluate
-        them.
-
-        This is horribly hacky, but python-2.3 can't use eval with dict subclass
-        """
-
-        # split apart the expression to look for dataset names
-        # re could be compiled if this gets slow
-        bits = self.splitre.split(expression)
-
-        datasets = self.document.data
-
-        for i, bit in enumerate(bits):
-            # test whether there's an _data, _serr or such at the end of the name
-            part = thispart
-            bitbits = bit.split('_')
-            if len(bitbits) > 1:
-                if bitbits[-1] in self.expr:
-                    part = bitbits.pop(-1)
-                bit = '_'.join(bitbits)
-
-            if bit in datasets:
-                # replace name with a function to call
-                bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
-
-        return ''.join(bits)
-
-    def _evaluateDataset(self, dsname, dspart):
+    def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
         
         dsname is the name of the dataset
         dspart is the part to get (e.g. data, serr)
         """
-        return getattr(self.document.data[dsname], dspart)
+        return _evaluateDataset(self.document.data, dsname, dspart)
                     
     def _propValues(self, part):
         """Check whether expressions need reevaluating, and recalculate if necessary."""
@@ -752,7 +762,7 @@ class DatasetExpression(Dataset):
                 # replace dataset names with calls (ugly hack)
                 # but necessary for Python 2.3 as we can't replace
                 # dict in eval by subclass
-                expr = self._substituteDatasets(expr, part)
+                expr = _substituteDatasets(self.document.data, expr, part)
                 env = self.environment.copy()
                 
                 try:
@@ -801,3 +811,120 @@ class DatasetExpression(Dataset):
                 args[col] = array[key]
         
         return Dataset(**args)
+
+def getSpacing(data):
+    """Given a set of values, get minimum, maximum, step size
+    and number of steps.
+    
+    Function allows that values may be missing
+
+    Function assumes that at least one of the steps is the minimum step size
+    (i.e. steps are not all multiples of some mininimum)
+    """
+
+    uniquesorted = N.unique1d(data)
+    sigfactor = (uniquesorted[-1]-uniquesorted[0])*1e-13
+
+    # differences between elements
+    deltas = N.unique1d( N.ediff1d(uniquesorted) )
+
+    mindelta = None
+    for delta in deltas:
+        if delta > sigfactor:
+            if mindelta is None:
+                # first delta
+                mindelta = delta
+            elif N.fabs(mindelta-delta) > sigfactor:
+                # new delta - check is multiple of old delta
+                ratio = delta/mindelta
+                if N.fabs(int(ratio)-ratio) > 1e-10:
+                    raise DatasetExpressionException('Variable spacings not yet supported in constructing 2D datasets')
+    return (uniquesorted[0], uniquesorted[-1], mindelta,
+            int((uniquesorted[-1]-uniquesorted[0])/mindelta))
+
+class Dataset2DXYZExpression(DatasetBase):
+    '''A 2d dataset with expressions for x, y and z.'''
+
+    # number of dimensions the dataset holds
+    dimensions = 2
+
+    def __init__(self, exprx, expry, exprz):
+        """Initialise dataset.
+
+        Parameters are mathematical expressions based on datasets."""
+
+        self.document = None
+        self.linked = None
+        self._invalidpoints = None
+        self.lastchangeset = -1
+        self.cacheddata = None
+        
+        self.environment = globals().copy()
+        exec 'from numpy import *' in self.environment
+        # this fn gets called to return the value of a dataset
+        self.environment['_DS_'] = self.evaluateDataset
+
+        # copy parameters
+        self.exprx = exprx
+        self.expry = expry
+        self.exprz = exprz
+
+    def evaluateDataset(self, dsname, dspart):
+        """Return the dataset given.
+        
+        dsname is the name of the dataset
+        dspart is the part to get (e.g. data, serr)
+        """
+        return _evaluateDataset(self.document.data, dsname, dspart)
+                    
+    def evalDataset(self):
+        """Return the evaluated dataset."""
+        # return cached data if document unchanged
+        if self.document.changeset == self.lastchangeset:
+            return self.cacheddata
+
+        # update changeset
+        self.lastchangeset = self.document.changeset
+
+        evalulated = {}
+        env = self.environment.copy()
+
+        # evaluate the x, y and z expressions
+        for name in ('exprx', 'expry', 'exprz'):
+            expr = _substituteDatasets(self.document.data, getattr(self, name),
+                                       'data')
+
+            try:
+                evaluated[name] = eval(expr, env)
+            except Exception, e:
+                raise DatasetExpressionException("Error evaluating expession: %s\n"
+                                                 "Error: %s" % (self.expr[part], str(e)) )
+
+        minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
+        miny, maxy, stepy, stepsy = getSpacing(evaluated['expry'])
+
+        # update cached x and y ranges
+        self._xrange = (minx-stepx*0.5, maxx+stepx*0.5)
+        self._yrange = (miny-stepy*0.5, maxy+stepy*0.5)
+        
+        self.cacheddata = N.empty( (stepsy, stepsx) )
+        self.cacheddata[:,:] = N.nan
+        xpts = ((1./stepx)*(exprx-minx)).astype('int32')
+        ypts = ((1./stepy)*(expry-miny)).astype('int32')
+
+        # this is ugly - is this really the way to do it?
+        self.cacheddata.flat [ xpts + ypts*stepsx ] = zpts
+
+    def getXrange(self):
+        """Get x range of data as a tuple (min, max)."""
+        self.evalDataset()
+        return self._xrange
+    
+    def getYrange(self):
+        """Get y range of data as a tuple (min, max)."""
+        self.evalDataset()
+        return self._yrange
+        
+    data = property(evalDataset)
+    xrange = property(getXrange)
+    yrange = property(getYrange)
