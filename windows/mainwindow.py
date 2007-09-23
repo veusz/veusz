@@ -35,6 +35,7 @@ import action
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
 from veusz.dialogs.datacreate import DataCreateDialog
+from veusz.dialogs.datacreate2d import DataCreate2DDialog
 from veusz.dialogs.preferences import PreferencesDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
@@ -299,6 +300,8 @@ class MainWindow(qt4.QMainWindow):
              self.slotDataEdit, 'stock-edit.png', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
              self.slotDataCreate, 'stock-new.png', False, ''),
+            ('datacreate2d', 'Create new 2D datasets', 'Create &2D...', 'data',
+             self.slotDataCreate2D, 'stock-new.png', False, ''),
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
              self.slotDataReload, 'stock-refresh.png', False, ''),
 
@@ -368,6 +371,12 @@ class MainWindow(qt4.QMainWindow):
     def slotDataCreate(self):
         """Create new datasets."""
         dialog = DataCreateDialog(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
+
+    def slotDataCreate2D(self):
+        """Create new datasets."""
+        dialog = DataCreate2DDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
 

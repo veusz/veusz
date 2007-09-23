@@ -78,7 +78,10 @@
         <item row="0" column="0" >
          <widget class="QLabel" name="label_2" >
           <property name="text" >
-           <string>X expression or range</string>
+           <string>&amp;X expression or range</string>
+          </property>
+          <property name="buddy" >
+           <cstring>xexprcombo</cstring>
           </property>
          </widget>
         </item>
@@ -92,7 +95,10 @@
         <item row="1" column="0" >
          <widget class="QLabel" name="label_3" >
           <property name="text" >
-           <string>Y expression or range</string>
+           <string>&amp;Y expression or range</string>
+          </property>
+          <property name="buddy" >
+           <cstring>yexprcombo</cstring>
           </property>
          </widget>
         </item>
@@ -106,7 +112,10 @@
         <item row="2" column="0" >
          <widget class="QLabel" name="label_4" >
           <property name="text" >
-           <string>Z expression</string>
+           <string>&amp;Z expression</string>
+          </property>
+          <property name="buddy" >
+           <cstring>zexprcombo</cstring>
           </property>
          </widget>
         </item>
@@ -181,5 +190,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>closebutton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>590</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>318</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
