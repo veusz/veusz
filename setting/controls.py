@@ -33,7 +33,7 @@ import veusz.qtall as qt4
 import setting
 import veusz.utils as utils
 
-def _populateCombo(combo, items):
+def populateCombo(combo, items):
     """Populate the combo with the list of items given.
 
     This also makes sure the currently entered text persists
@@ -43,7 +43,7 @@ def _populateCombo(combo, items):
     currenttext = unicode(combo.currentText())
 
     # get rid of existing items in list (clear doesn't work here)
-    for i in range(combo.count()):
+    for i in xrange(combo.count()):
         combo.removeItem(0)
 
     # get index for value, or add value if not set
@@ -495,7 +495,7 @@ class Dataset(Choice):
                 datasets.append(name)
         datasets.sort()
 
-        _populateCombo(self, datasets)
+        populateCombo(self, datasets)
 
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
@@ -812,7 +812,7 @@ class Image(WidgetSelector):
         names = images.keys()
         names.sort()
 
-        _populateCombo(self, names)
+        populateCombo(self, names)
 
 class Axis(WidgetSelector):
     """Choose an axis to plot against."""
@@ -847,7 +847,7 @@ class Axis(WidgetSelector):
         names = axes.keys()
         names.sort()
 
-        _populateCombo(self, names)
+        populateCombo(self, names)
 
 class ListSet(qt4.QFrame):
     """A widget for constructing settings which are lists of other

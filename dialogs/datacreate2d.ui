@@ -21,12 +21,22 @@
         <string>&amp;Name</string>
        </property>
        <property name="buddy" >
-        <cstring>nameedit</cstring>
+        <cstring>namecombo</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="nameedit" />
+      <widget class="QComboBox" name="namecombo" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="editable" >
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -87,6 +97,12 @@
         </item>
         <item row="0" column="1" >
          <widget class="QComboBox" name="xexprcombo" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="editable" >
            <bool>true</bool>
           </property>
@@ -104,6 +120,12 @@
         </item>
         <item row="1" column="1" >
          <widget class="QComboBox" name="yexprcombo" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="editable" >
            <bool>true</bool>
           </property>
@@ -121,6 +143,12 @@
         </item>
         <item row="2" column="1" >
          <widget class="QComboBox" name="zexprcombo" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="editable" >
            <bool>true</bool>
           </property>

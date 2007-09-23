@@ -24,6 +24,7 @@ import os.path
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
+from veusz.setting.controls import populateCombo
 
 class DataCreate2DDialog(qt4.QDialog):
 
@@ -39,7 +40,89 @@ class DataCreate2DDialog(qt4.QDialog):
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
                       self.createButtonClickedSlot )
 
+        self.connect( self.fromxyfunc, qt4.SIGNAL('toggled(bool)'),
+                      self.fromxyfuncSlot )
+        self.connect( self.fromxyzexpr, qt4.SIGNAL('toggled(bool)'),
+                      self.fromxyzexprSlot )
+        self.connect( self.from2dexpr, qt4.SIGNAL('toggled(bool)'),
+                      self.from2dexprSlot )
+
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.updateDatasetLists)
+
+        for combo in (self.namecombo, self.xexprcombo, self.yexprcombo,
+                      self.zexprcombo):
+            self.connect(combo,
+                         qt4.SIGNAL('editTextChanged(const QString&)'),
+                         self.enableDisableCreate)
+
+        self.fromxyzexpr.toggle()
+
+    # change mode according to radio pressed
+    def fromxyfuncSlot(self, checked):
+        self.mode = 'xyfunc'
+        if checked: self.updateDatasetLists()
+    def fromxyzexprSlot(self, checked):
+        self.mode = 'xyzexpr'
+        if checked: self.updateDatasetLists()
+    def from2dexprSlot(self, checked):
+        self.mode = '2dexpr'
+        if checked: self.updateDatasetLists()
+
+    def updateDatasetLists(self):
+        """Update controls depending on selected mode."""
+
+        # get list of 1d and 2d numeric datasets
+        datasets = [[],[]]
+        for name, ds in self.document.data.iteritems():
+            if ds.datatype == 'numeric':
+                datasets[ds.dimensions-1].append(name)
+        datasets[0].sort()
+        datasets[1].sort()        
+
+        # help the user by listing existing datasets
+        populateCombo(self.namecombo, datasets[0])
+
+        if self.mode == 'xyzexpr':
+            # enable everything
+            for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
+                combo.setDisabled(False)
+                populateCombo(combo, datasets[0])
+        elif self.mode == '2dexpr':
+            # only enable the z expression button
+            self.xexprcombo.setDisabled(True)
+            self.yexprcombo.setDisabled(True)
+            self.zexprcombo.setDisabled(False)
+            populateCombo(self.zexprcombo, datasets[1])
+        else:
+            # enable everything
+            for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
+                combo.setDisabled(False)
+
+            # put in some examples to help the the user
+            populateCombo(self.xexprcombo, ['0:10:0.1'])
+            populateCombo(self.yexprcombo, ['0:10:0.1'])
+            populateCombo(self.zexprcombo, ['x+y'])
+
+    def enableDisableCreate(self):
+        """Enable or disable create button."""
+        
+        disable = False
+        disable = disable or self.namecombo.currentText().isEmpty()
+        
+        if self.mode == 'xyzexpr':
+            for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
+                disable = disable or combo.currentText().isEmpty()
+        elif self.mode == '2dexpr':
+            disable = disable or self.zexprcombo.currentText().isEmpty()
+        else:
+            for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
+                disable = disable or combo.currentText().isEmpty()
+            # FIXME: validate range?
+
+        self.createbutton.setDisabled(disable)
+        
     def createButtonClickedSlot(self):
         """Create button pressed."""
-        
         pass
+
