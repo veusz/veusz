@@ -101,6 +101,7 @@ class CommandInterpreter:
             'SetData': i.SetData,
             'SetDataExpression': i.SetDataExpression,
             'SetData2D': i.SetData2D,
+            'SetData2DExpressionXYZ': i.SetData2DExpressionXYZ,
             'SetVerbose': i.SetVerbose,
             'To': i.To
             }

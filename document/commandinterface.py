@@ -164,6 +164,29 @@ class CommandInterface(qt4.QObject):
             print " Symmetric errors = %s" % str( data.serr )
             print " Negative errors = %s" % str( data.nerr )
             print " Positive errors = %s" % str( data.perr )
+            print " linked to expression = %s" % repr(linked)
+
+    def SetData2DExpressionXYZ(self, name, xexpr, yexpr, zexpr, linked=False):
+        """Create a 2D dataset based on expressions in x, y and z
+
+        xexpr is an expression which expands to an equally-spaced grid of x coordinates
+        yexpr expands to equally spaced y coordinates
+        zexpr expands to z coordinates.
+        linked specifies whether to permanently link the dataset to the expressions
+        """
+
+        op = operations.OperationDataset2DCreateExpressionXYZ(name, xexpr, yexpr, zexpr,
+                                                              linked)
+        data = self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Set 2D dataset '%s' based on expressions" % name
+            print " X expression = %s" % repr(xexpr)
+            print " Y expression = %s" % repr(yexpr)
+            print " Z expression = %s" % repr(zexpr)
+            print " linked to expression = %s" % repr(linked)
+            print " Made a dataset (%i x %i)" % (data.data.shape[0],
+                                                 data.data.shape[1])
 
     def SetData2D(self, name, data, xrange=None, yrange=None):
         """Create a 2D dataset."""

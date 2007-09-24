@@ -914,6 +914,7 @@ class Dataset2DXYZExpression(DatasetBase):
 
         # this is ugly - is this really the way to do it?
         self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
+        return self.cacheddata
 
     def getXrange(self):
         """Get x range of data as a tuple (min, max)."""
@@ -925,6 +926,25 @@ class Dataset2DXYZExpression(DatasetBase):
         self.evalDataset()
         return self._yrange
         
+    def getDataRanges(self):
+        self.evalDataset()
+        return (self._xrange, self._yrange)
+
+    def description(self, showlinked=True):
+        # FIXME: dataeditdialog descriptions should be taken from here somewhere
+        text = self.name()
+        text += ' (%ix%i)' % self.data.shape
+        text += ', x=%g->%g' % tuple(self.xrange)
+        text += ', y=%g->%g' % tuple(self.yrange)
+
+    def saveToFile(self, file, name):
+        '''Save expressions to file.
+        '''
+
+        s = 'SetData2DExpressionXYZ(%s, %s, %s, %s, linked=True)\n' % (
+            repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
+        file.write(s)
+
     data = property(evalDataset)
     xrange = property(getXrange)
     yrange = property(getYrange)
