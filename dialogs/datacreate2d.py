@@ -73,6 +73,7 @@ class DataCreate2DDialog(qt4.QDialog):
                          self.enableDisableCreate)
 
         self.fromxyzexpr.toggle()
+        self.enableDisableCreate()
 
     # change mode according to radio pressed
     def fromxyfuncSlot(self, checked):
@@ -122,25 +123,30 @@ class DataCreate2DDialog(qt4.QDialog):
 
     def enableDisableCreate(self):
         """Enable or disable create button."""
-        
+
+        # get contents of combo boxes
         text = {}
         for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
             text[name] = unicode(getattr(self, name+'combo').currentText()).strip()
 
         disable = False
+        # need name and zexpr
         disable = disable or not text['name'] or not text['zexpr']
         
         if self.mode == 'xyzexpr':
+            # need x and yexpr
             disable = disable or not text['xexpr'] or not text['yexpr']
 
         elif self.mode == '2dexpr':
-            disable = disable or not text['zexpr']
+            # nothing else
+            pass
                 
         elif self.mode == 'xyfunc':
-            disable = disable or not text['zexpr']
+            # need x and yexpr in special step format min:max:step
             disable = disable or ( checkGetStep(text['xexpr']) is None or
                                    checkGetStep(text['yexpr']) is None )
 
+        # finally check button
         self.createbutton.setDisabled(disable)
         
     def createButtonClickedSlot(self):
@@ -152,13 +158,11 @@ class DataCreate2DDialog(qt4.QDialog):
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
         if self.mode == 'xyzexpr':
+            # build operation
             op = document.OperationDataset2DCreateExpressionXYZ(
                 text['name'],
                 text['xexpr'], text['yexpr'], text['zexpr'],
                 link)
-            # FIXME need to catch exceptions here
-            self.document.applyOperation(op)
-            self.document.data[text['name']].data
 
         elif self.mode == '2dexpr':
             pass
@@ -166,16 +170,34 @@ class DataCreate2DDialog(qt4.QDialog):
         elif self.mode == 'xyfunc':
             xstep = checkGetStep(text['xexpr'])
             ystep = checkGetStep(text['yexpr'])
-            
+
+            # build operation
             op = document.OperationDataset2DXYFunc(
                 text['name'],
                 xstep, ystep,
                 text['zexpr'], link)
-            # FIXME need to catch exceptions here
-            self.document.applyOperation(op)
-            self.document.data[text['name']].data
 
-        self.notifylabel.setText("Created dataset '%s'" % text['name'])
+        # apply operation, catching evaluation errors
+        try:
+            # try to make dataset
+            self.document.applyOperation(op)
+            # forces an evaluation
+            self.document.data[text['name']].data
+        except (document.CreateDatasetException,
+                document.DatasetException), e:
+            # error in evaluation or something
+            qt4.QMessageBox("Veusz",
+                            'Dataset creation failed: %s' % unicode(e),
+                            qt4.QMessageBox.Warning,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
+            msg = "Failed to create dataset '%s'" % text['name']
+        else:
+            msg = "Created dataset '%s'" % text['name']
+
+        self.notifylabel.setText(msg)
         qt4.QTimer.singleShot(4000, self.clearNotifySlot)
 
     def clearNotifySlot(self):
