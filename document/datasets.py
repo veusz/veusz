@@ -948,3 +948,72 @@ class Dataset2DXYZExpression(DatasetBase):
     data = property(evalDataset)
     xrange = property(getXrange)
     yrange = property(getYrange)
+
+class Dataset2DXYFunc(DatasetBase):
+    """Given a range of x and y, this is a dataset which is a function of
+    this.
+    """
+
+    # number of dimensions the dataset holds
+    dimensions = 2
+
+    def __init__(self, xstep, ystep, expr):
+        """Create 2d dataset:
+
+        xstep: tuple(xmin, xmax, step)
+        ystep: tuple(ymin, ymax, step)
+        expr: expression of x and y
+        """
+
+        self.document = None
+        self.linked = None
+        self._invalidpoints = None
+
+        self.xstep = xstep
+        self.ystep = ystep
+        self.expr = expr
+
+        self.environment = globals().copy()
+        exec 'from numpy import *' in self.environment
+
+        self._create2DData()
+
+    def _create2DData(self):
+        """Make the 2d dataset."""
+
+        env = self.environment.copy()
+
+        xarange = N.arange(self.xstep[0], self.xstep[1]+self.xstep[2],
+                           self.xstep[2])
+        yarange = N.arange(self.ystep[0], self.ystep[1]+self.ystep[2],
+                           self.ystep[2])
+
+        ystep, xstep = N.indices( (len(yarange), len(xarange)) )
+        xstep = xarange[xstep]
+        ystep = yarange[ystep]
+
+        env['x'] = xstep
+        env['y'] = ystep
+        try:
+            data = eval(self.expr, env)
+        except Exception, e:
+            raise DatasetExpressionException("Error evaluating expession: %s\n"
+                                             "Error: %s" % (self.expr,
+                                                            str(e)) )
+        self.data = data
+        # points are defined in centres
+        self.xrange = (xarange[0]-self.xstep[2]*0.5,
+                       xarange[-1]+self.xstep[2]*0.5)
+        self.yrange = (yarange[0]-self.ystep[2]*0.5,
+                       yarange[-1]+self.ystep[2]*0.5)
+
+    def getDataRanges(self):
+        return (self.xrange, self.yrange)
+
+    def saveToFile(self, file, name):
+        '''Save expressions to file.
+        '''
+
+        s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
+            repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
+        file.write(s)

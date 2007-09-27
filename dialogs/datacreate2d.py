@@ -21,10 +21,26 @@
 """Dataset creation dialog for 2d data."""
 
 import os.path
+import re
+
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 from veusz.setting.controls import populateCombo
+
+def checkGetStep(text):
+    """Check step syntax is okay.
+    Syntax is min:max:stepsize
+    Returns None if fails
+    """
+
+    parts = text.split(':')
+    if len(parts) == 3:
+        try:
+            return tuple([float(x) for x in parts])
+        except ValueError:
+            pass
+    return None
 
 class DataCreate2DDialog(qt4.QDialog):
 
@@ -107,18 +123,23 @@ class DataCreate2DDialog(qt4.QDialog):
     def enableDisableCreate(self):
         """Enable or disable create button."""
         
+        text = {}
+        for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
+            text[name] = unicode(getattr(self, name+'combo').currentText()).strip()
+
         disable = False
-        disable = disable or self.namecombo.currentText().isEmpty()
+        disable = disable or not text['name'] or not text['zexpr']
         
         if self.mode == 'xyzexpr':
-            for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
-                disable = disable or combo.currentText().isEmpty()
+            disable = disable or not text['xexpr'] or not text['yexpr']
+
         elif self.mode == '2dexpr':
-            disable = disable or self.zexprcombo.currentText().isEmpty()
-        else:
-            for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
-                disable = disable or combo.currentText().isEmpty()
-            # FIXME: validate range?
+            disable = disable or not text['zexpr']
+                
+        elif self.mode == 'xyfunc':
+            disable = disable or not text['zexpr']
+            disable = disable or ( checkGetStep(text['xexpr']) is None or
+                                   checkGetStep(text['yexpr']) is None )
 
         self.createbutton.setDisabled(disable)
         
@@ -127,7 +148,7 @@ class DataCreate2DDialog(qt4.QDialog):
 
         text = {}
         for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
-            text[name] = unicode(getattr(self, name+'combo').currentText())
+            text[name] = unicode(getattr(self, name+'combo').currentText()).strip()
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
         if self.mode == 'xyzexpr':
@@ -135,12 +156,28 @@ class DataCreate2DDialog(qt4.QDialog):
                 text['name'],
                 text['xexpr'], text['yexpr'], text['zexpr'],
                 link)
+            # FIXME need to catch exceptions here
             self.document.applyOperation(op)
-
             self.document.data[text['name']].data
 
         elif self.mode == '2dexpr':
             pass
-        else:
-            pass
 
+        elif self.mode == 'xyfunc':
+            xstep = checkGetStep(text['xexpr'])
+            ystep = checkGetStep(text['yexpr'])
+            
+            op = document.OperationDataset2DXYFunc(
+                text['name'],
+                xstep, ystep,
+                text['zexpr'], link)
+            # FIXME need to catch exceptions here
+            self.document.applyOperation(op)
+            self.document.data[text['name']].data
+
+        self.notifylabel.setText("Created dataset '%s'" % text['name'])
+        qt4.QTimer.singleShot(4000, self.clearNotifySlot)
+
+    def clearNotifySlot(self):
+        self.notifylabel.setText("")
+        

@@ -595,6 +595,42 @@ class OperationDataset2DCreateExpressionXYZ:
         if self.olddataset:
             document.setData(self.datasetname, self.olddataset)
         
+class OperationDataset2DXYFunc:
+    descr = 'create 2D dataset from function of x and y'
+
+    def __init__(self, datasetname, xstep, ystep, expr, link):
+        """Create 2d dataset:
+
+        xstep: tuple(xmin, xmax, step)
+        ystep: tuple(ymin, ymax, step)
+        expr: expression of x and y
+        link: whether to link to this expression
+        """
+        self.datasetname = datasetname
+        self.xstep = xstep
+        self.ystep = ystep
+        self.expr = expr
+        self.link = link
+        
+    def do(self, document):
+        # keep backup
+        self.olddataset = document.data.get(self.datasetname, None)
+
+        # make new dataset
+        ds = datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
+        ds.document = document
+        if not self.link:
+            # unlink if necessary
+            ds = datasets.Dataset2D(ds.data, xrange=ds.xrange,
+                                    yrange=ds.yrange)
+        document.setData(self.datasetname, ds)
+        return ds
+
+    def undo(self, document):
+        del document.data[self.datasetname]
+        if self.olddataset:
+            document.setData(self.datasetname, self.olddataset)
+
 ###############################################################################
 # Import datasets
         

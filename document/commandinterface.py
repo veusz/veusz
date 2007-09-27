@@ -188,6 +188,28 @@ class CommandInterface(qt4.QObject):
             print " Made a dataset (%i x %i)" % (data.data.shape[0],
                                                  data.data.shape[1])
 
+    def SetData2DXYFunc(self, name, xstep, ystep, expr, linked=False):
+        """Create a 2D dataset based on expressions of a range of x and y
+
+        xstep is a tuple(min, max, step)
+        ystep is a tuple(min, max, step)
+        expr is an expression of x and y
+        linked specifies whether to permanently link the dataset to the expressions
+        """
+
+        op = operations.OperationDataset2DXYFunc(name, xstep, ystep,
+                                                 expr, linked)
+        data = self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Set 2D dataset '%s' based on function of x and y" % name
+            print " X steps = %s" % repr(xstep)
+            print " Y steps = %s" % repr(ystep)
+            print " Expression = %s" % repr(expr)
+            print " linked to expression = %s" % repr(linked)
+            print " Made a dataset (%i x %i)" % (data.data.shape[0],
+                                                 data.data.shape[1])
+
     def SetData2D(self, name, data, xrange=None, yrange=None):
         """Create a 2D dataset."""
 
