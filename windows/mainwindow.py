@@ -516,7 +516,7 @@ class MainWindow(qt4.QMainWindow):
         fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
         fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
 
-        # okay was selected
+        # okay was selected (and is okay to overwrite if it exists)
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
             self.dirname = fd.directory()
@@ -524,22 +524,6 @@ class MainWindow(qt4.QMainWindow):
             filename = unicode( fd.selectedFiles()[0] )
             if os.path.splitext(filename)[1] == '':
                 filename += '.' + filetype
-
-            # test whether file exists and ask whether to overwrite it
-            try:
-                open(filename)
-            except IOError:
-                pass
-            else:
-                v = qt4.QMessageBox("Veusz",
-                                    "File exists, overwrite?",
-                                    qt4.QMessageBox.Warning,
-                                    qt4.QMessageBox.Yes,
-                                    qt4.QMessageBox.No | qt4.QMessageBox.Default,
-                                    qt4.QMessageBox.NoButton,
-                                    self).exec_()
-                if v == qt4.QMessageBox.No:
-                    return None
 
             return filename
         return None
