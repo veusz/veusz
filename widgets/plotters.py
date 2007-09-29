@@ -135,6 +135,7 @@ class FunctionPlotter(GenericPlotter):
 
         self.cachedfunc = None
         self.cachedvar = None
+        self.cachedcomp = None
         
     def _getUserDescription(self):
         """User-friendly description."""
@@ -229,6 +230,10 @@ class FunctionPlotter(GenericPlotter):
             painter.setPen( s.Line.makeQPen(painter) )
             painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
 
+    def initEnviron(self):
+        """Set up function environment."""
+        return utils.veusz_eval_context.copy()
+            
     def _calcFunctionPoints(self, axes, posn):
         """Calculate the pixels to plot for the function
         returns (pxpts, pypts)."""
@@ -251,7 +256,7 @@ class FunctionPlotter(GenericPlotter):
                 # return nothing
                 return None, None
 
-        env = utils.veusz_eval_context.copy()
+        env = self.initEnviron()
         if s.variable == 'x':
             # x function
             if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:

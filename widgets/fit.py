@@ -111,9 +111,8 @@ class Fit(plotters.FunctionPlotter):
 
     def initEnviron(self):
         """Copy data into environment."""
-        env = self.fnenviron.copy()
-        for name, val in self.settings.values.iteritems():
-            env[name] = val
+        env = utils.veusz_eval_context.copy()
+        env.update( self.settings.values )
         return env
 
     def actionFit(self):
@@ -223,7 +222,7 @@ class Fit(plotters.FunctionPlotter):
             env[name] = val
 
         try:
-            return eval(s.function, env)
+            return eval(self.cachedcomp, env) + xvals*0.
         except:
             return N.nan
 
