@@ -25,3 +25,4 @@ from textrender import *
 from points import *
 from version import *
 from fitlm import *
+from safe_eval import veusz_eval_context, checkCode

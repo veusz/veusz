@@ -95,10 +95,6 @@ class FunctionPlotter(GenericPlotter):
 
         GenericPlotter.__init__(self, parent, name=name)
 
-        # define environment to evaluate functions
-        self.fnenviron = globals()
-        exec 'from numpy import *' in self.fnenviron
-
         s = self.settings
         s.add( setting.Int('steps', 50,
                            descr = 'Number of steps to evaluate the function'
@@ -136,6 +132,9 @@ class FunctionPlotter(GenericPlotter):
 
         if type(self) == FunctionPlotter:
             self.readDefaults()
+
+        self.cachedfunc = None
+        self.cachedvar = None
         
     def _getUserDescription(self):
         """User-friendly description."""
@@ -230,10 +229,6 @@ class FunctionPlotter(GenericPlotter):
             painter.setPen( s.Line.makeQPen(painter) )
             painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
 
-    def initEnviron(self):
-        """Initialise function evaluation environment each time."""
-        return self.fnenviron.copy()
-
     def _calcFunctionPoints(self, axes, posn):
         """Calculate the pixels to plot for the function
         returns (pxpts, pypts)."""
@@ -241,8 +236,24 @@ class FunctionPlotter(GenericPlotter):
         s = self.settings
         x1, y1, x2, y2 = posn
 
-        env = self.initEnviron()
+        # check function doesn't contain dangerous code
+        if self.cachedfunc != s.function or self.cachedvar != s.variable:
+            checked = utils.checkCode(s.function)
+            if checked is not None:
+                return None, None
+            self.cachedfunc = s.function
+            self.cachedvar = s.variable
+
+            try:
+                # compile code
+                self.cachedcomp = compile(self.cachedfunc, '<string>', 'eval')
+            except:
+                # return nothing
+                return None, None
+
+        env = utils.veusz_eval_context.copy()
         if s.variable == 'x':
+            # x function
             if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:
                 x_min = N.array([s.min])
                 x1 = axes[0].graphToPlotterCoords(posn, x_min)[0]
@@ -250,17 +261,16 @@ class FunctionPlotter(GenericPlotter):
                 x_max = N.array([s.max])
                 x2 = axes[0].graphToPlotterCoords(posn, x_max)[0]
                 
-            # x function
             delta = (x2 - x1) / float(s.steps)
             pxpts = N.arange(x1, x2+delta, delta)
             x = axes[0].plotterToGraphCoords(posn, pxpts)
             env['x'] = x
             try:
-                y = eval('(%s) + x*0.' % s.function, env)
+                y = eval(self.cachedcomp, env)
             except:
                 pypts = None
             else:
-                pypts = axes[1].graphToPlotterCoords(posn, y)
+                pypts = axes[1].graphToPlotterCoords(posn, y+x*0.)
 
         else:
             # y function
@@ -276,11 +286,11 @@ class FunctionPlotter(GenericPlotter):
             y = axes[1].plotterToGraphCoords(posn, pypts)
             env['y'] = y
             try:
-                x = eval('(%s) + y*0.' % s.function, env)
+                x = eval(self.cachedcomp, env)
             except:
                 pxpts = None
             else:
-                pxpts = axes[0].graphToPlotterCoords(posn, x)
+                pxpts = axes[0].graphToPlotterCoords(posn, x+y*0.)
 
         return pxpts, pypts
 
@@ -304,7 +314,7 @@ class FunctionPlotter(GenericPlotter):
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return
-            
+
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
