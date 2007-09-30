@@ -30,6 +30,8 @@ import simpleread
 import operations
 import readcsv
 
+import veusz.utils as utils
+
 def _convertNumpy(a):
     """Convert to a numpy double if possible."""
     if a is None:
@@ -731,9 +733,13 @@ class DatasetExpression(Dataset):
                               'perr': None, 'nerr': None }
         self.evaluated = {}
 
+        # check each expression
+        for name, expr in self.expr.iteritems():
+            if expr and utils.checkCode(expr) is not None:
+                raise DatasetExpressionException("Unsafe expression '%s' in %s part of dataset" % (expr, name))
+
         # set up a default environment
-        self.environment = globals().copy()
-        exec 'from numpy import *' in self.environment
+        self.environment = utils.veusz_eval_context.copy()
 
         # this fn gets called to return the value of a dataset
         self.environment['_DS_'] = self.evaluateDataset
@@ -763,10 +769,9 @@ class DatasetExpression(Dataset):
                 # but necessary for Python 2.3 as we can't replace
                 # dict in eval by subclass
                 expr = _substituteDatasets(self.document.data, expr, part)
-                env = self.environment.copy()
                 
                 try:
-                    self.evaluated[part] = eval(expr, env)
+                    self.evaluated[part] = eval(expr, self.environment)
                 except Exception, e:
                     raise DatasetExpressionException("Error evaluating expession: %s\n"
                                                      "Error: %s" % (self.expr[part], str(e)) )
@@ -859,8 +864,11 @@ class Dataset2DXYZExpression(DatasetBase):
         self.lastchangeset = -1
         self.cacheddata = None
         
-        self.environment = globals().copy()
-        exec 'from numpy import *' in self.environment
+        for expr in exprx, expry, exprz:
+            if utils.checkCode(expr) is not None:
+                raise DatasetExpressionException("Unsafe expression '%s'" % expr)
+
+        self.environment = utils.veusz_eval_context.copy()
         # this fn gets called to return the value of a dataset
         self.environment['_DS_'] = self.evaluateDataset
 
@@ -887,7 +895,6 @@ class Dataset2DXYZExpression(DatasetBase):
         self.lastchangeset = self.document.changeset
 
         evaluated = {}
-        env = self.environment.copy()
 
         # evaluate the x, y and z expressions
         for name in ('exprx', 'expry', 'exprz'):
@@ -895,7 +902,7 @@ class Dataset2DXYZExpression(DatasetBase):
                                        'data')
 
             try:
-                evaluated[name] = eval(expr, env)
+                evaluated[name] = eval(expr, self.environment)
             except Exception, e:
                 raise DatasetExpressionException("Error evaluating expession: %s\n"
                                                  "Error: %s" % (expr, str(e)) )
@@ -973,15 +980,17 @@ class Dataset2DXYFunc(DatasetBase):
         self.ystep = ystep
         self.expr = expr
 
-        self.environment = globals().copy()
-        exec 'from numpy import *' in self.environment
+        if utils.checkCode(expr) is not None:
+            raise DatasetExpressionException("Unsafe expression '%s'" % expr)
+        
+        self.environment = utils.veusz_eval_context.copy()
 
         self._create2DData()
 
     def _create2DData(self):
         """Make the 2d dataset."""
 
-        env = self.environment.copy()
+        env = self.environment
 
         xarange = N.arange(self.xstep[0], self.xstep[1]+self.xstep[2],
                            self.xstep[2])

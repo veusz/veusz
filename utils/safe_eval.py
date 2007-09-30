@@ -297,6 +297,7 @@ def checkContextOkay(context):
         raise SafeEvalContextException(ctx_errkeys, ctx_errors)
 
 # set up environment in dict
+# FIXME: add constants
 veusz_eval_context = {}
 for name, fn in N.__dict__.iteritems():
     if callable(fn) and name[:1] != '_' and name[-1:] != '_':

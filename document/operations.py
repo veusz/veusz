@@ -485,7 +485,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         t = N.arange(self.numsteps)*deltat + self.t0
         
         # define environment to evaluate
-        fnenviron = utils.veusz_eval_context
+        fnenviron = utils.veusz_eval_context.copy()
         fnenviron['t'] = t
 
         # calculate for each of the dataset components
