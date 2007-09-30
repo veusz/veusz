@@ -20,8 +20,11 @@
 
 """Implements the main window of the application."""
 
-import veusz.qtall as qt4
 import os.path
+import sys
+import traceback
+
+import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.utils as utils
@@ -37,6 +40,7 @@ from veusz.dialogs.reloaddata import ReloadData
 from veusz.dialogs.datacreate import DataCreateDialog
 from veusz.dialogs.datacreate2d import DataCreate2DDialog
 from veusz.dialogs.preferences import PreferencesDialog
+from veusz.dialogs.errorloading import ErrorLoadingDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -488,6 +492,7 @@ class MainWindow(qt4.QMainWindow):
                 self.document.saveToFile(ofile)
                 self.updateStatusbar("Saved to %s" % self.filename)
             except IOError:
+                qt4.QApplication.restoreOverrideCursor()
                 qt4.QMessageBox("Veusz",
                                 "Cannot save file as '%s'" % self.filename,
                                 qt4.QMessageBox.Critical,
@@ -495,9 +500,9 @@ class MainWindow(qt4.QMainWindow):
                                 qt4.QMessageBox.NoButton,
                                 qt4.QMessageBox.NoButton,
                                 self).exec_()
-                
-            # restore the cursor
-            qt4.QApplication.restoreOverrideCursor()
+            else:
+                # restore the cursor
+                qt4.QApplication.restoreOverrideCursor()
                 
     def updateTitlebar(self):
         """Put the filename into the title bar."""
@@ -580,49 +585,62 @@ class MainWindow(qt4.QMainWindow):
             self.CreateWindow(filename)
 
     def openFileInWindow(self, filename):
-        '''Open the given filename in the current window.'''
 
-        # show busy cursor
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
+        # read script
+        script = open(filename, 'r').read()
+
+        # check code for any security issues
+        errors = utils.checkCode(script)
+        if errors is not None:
+            qt4.QApplication.restoreOverrideCursor()
+            msgbox = qt4.QMessageBox("Veusz",
+                                     "The file '%s' contains potentially unsafe code "
+                                     "which may damage your computer or data. "
+                                     "Please check the file comes from a"
+                                     " trusted source." % filename,
+                                     qt4.QMessageBox.Warning,
+                                     qt4.QMessageBox.Yes,
+                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                                     qt4.QMessageBox.NoButton,
+                                     self)
+            msgbox.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
+            msgbox.setButtonText(qt4.QMessageBox.No, "&Stop loading")
+            if msgbox.exec_() == qt4.QMessageBox.No:
+                return
+
+        # set up environment to run script
+        env = utils.veusz_eval_context.copy()
+        interface = document.CommandInterface(self.document)
+
+        # allow safe commands as-is
+        for cmd in interface.safe_commands:
+            env[cmd] = getattr(interface, cmd)
+        # FIXME: wrapped unsafe commands?
+
+        env['__file__'] = os.path.abspath(filename)
+        self.document.wipe()
+        self.document.suspendUpdates()
+
         try:
-            # load the document in the current window
-            self.dirname = os.path.dirname(filename)
-            self.interpreter.Load(filename)
-            self.document.setModified(False)
-            self.filename = filename
-            self.updateTitlebar()
-            self.updateStatusbar("Opened %s" % filename)
-
-            #Update the list of recently opened files
-            fullname = os.path.abspath(filename)
-            filelist = setting.settingdb['main_recentfiles']
-            if fullname in filelist:
-                filelist.remove(fullname)
-            filelist.insert(0, fullname)
-            self.populateRecentFiles()
-
-        except IOError:
-            # problem reading file
-            qt4.QMessageBox("Veusz",
-                            "Cannot open file '%s'" % filename,
-                            qt4.QMessageBox.Critical,
-                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
+            # actually run script text
+            exec script in env
         except Exception, e:
-            # parsing problem with document
-            # FIXME: never used
-            qt4.QMessageBox("Veusz",
-                            "Error in file '%s'\n'%s'" % (filename, str(e)),
-                            qt4.QMessageBox.Critical,
-                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
-        
-        # restore the cursor
+            qt4.QApplication.restoreOverrideCursor()
+            self.document.enableUpdates()
+            i = sys.exc_info()
+            backtrace = traceback.format_exception( *i )
+            d = ErrorLoadingDialog(self, filename, ''.join(backtrace))
+            d.exec_()
+            return
+
+        self.document.enableUpdates()
+        self.document.setModified(False)
+            
+        self.filename = filename
+        self.updateTitlebar()
+        self.updateStatusbar("Opened %s" % filename)
         qt4.QApplication.restoreOverrideCursor()
 
     def slotFileOpen(self):
