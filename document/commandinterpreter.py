@@ -48,7 +48,7 @@ import traceback
 import pickle
 import os.path
 
-import commandinterface
+from commandinterface import CommandInterface
 import veusz.utils as utils
 
 class CommandInterpreter:
@@ -59,7 +59,7 @@ class CommandInterpreter:
         self.document = document
 
         # set up interface to document
-        self.interface = commandinterface.CommandInterface(document)
+        self.interface = CommandInterface(document)
 
         # initialise environment (make a copy from inital globals)
         self.globals = _globals.copy()
@@ -75,40 +75,15 @@ class CommandInterpreter:
         i = self.interface
 
         # define commands for interface
-        self.cmds = { 
-            'Action': i.Action,
-            'Add': i.Add,
-            'Export': i.Export,
-            'Get': i.Get,
-            'GetChildren': i.GetChildren,
-            'GetData': i.GetData,
-            'GetDatasets': i.GetDatasets,
-            'GPL': self.GPL,
-            'ImportString': i.ImportString,
-            'ImportString2D': i.ImportString2D,
-            'ImportFile': i.ImportFile,
-            'ImportFile2D': i.ImportFile2D,
-            'ImportFileCSV': i.ImportFileCSV,
-            'ImportFITSFile': i.ImportFITSFile,
-            'List': i.List,
-            'Load': self.Load,
-            'Print': i.Print,
-            'ReloadData': i.ReloadData,
-            'Rename': i.Rename,
-            'Remove': i.Remove,
-            'Save': i.Save,
-            'Set': i.Set,
-            'SetData': i.SetData,
-            'SetDataExpression': i.SetDataExpression,
-            'SetData2D': i.SetData2D,
-            'SetData2DExpressionXYZ': i.SetData2DExpressionXYZ,
-            'SetData2DXYFunc': i.SetData2DXYFunc,
-            'SetVerbose': i.SetVerbose,
-            'To': i.To
-            }
+        self.cmds = {}
+        for cmd in CommandInterface.safe_commands:
+            self.cmds[cmd] = getattr(i, cmd)
+        for cmd in CommandInterface.unsafe_commands:
+            self.cmds[cmd] = getattr(i, cmd)
+        self.cmds['GPL'] = self.GPL
+        self.cmds['Load'] = self.Load
 
-        for name, val in self.cmds.items():
-            self.globals[name] = val
+        self.globals.update( self.cmds )
 
     def addCommand(self, name, command):
         """Add the given command to the list of available commands."""

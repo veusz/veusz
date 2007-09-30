@@ -34,6 +34,41 @@ import operations
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
 
+    # commands which are safe in any script
+    safe_commands = (
+        'Action',
+        'Add',
+        'Get',
+        'GetChildren',
+        'GetData',
+        'GetDatasets',
+        'ImportFITSFile',
+        'ImportFile',
+        'ImportFile2D',
+        'ImportFileCSV',
+        'ImportString',
+        'ImportString2D',
+        'List',
+        'ReloadData',
+        'Remove',
+        'Rename',
+        'Set',
+        'SetData',
+        'SetData2D',
+        'SetData2DExpressionXYZ',
+        'SetData2DXYFunc',
+        'SetDataExpression',
+        'SetVerbose',
+        'To',
+        )
+
+    # commands which can modify disk, etc
+    unsafe_commands = (
+        'Export',        
+        'Print',
+        'Save',
+        )
+
     def __init__(self, document):
         """Initialise the interface."""
         qt4.QObject.__init__(self)
