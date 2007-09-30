@@ -485,17 +485,19 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         t = N.arange(self.numsteps)*deltat + self.t0
         
         # define environment to evaluate
-        fnenviron = globals().copy()
-        exec 'from numpy import *' in fnenviron
+        fnenviron = utils.veusz_eval_context
         fnenviron['t'] = t
 
         # calculate for each of the dataset components
         vals = {}
         for key, expr in self.parts.iteritems():
-            # HACK to ensure the result is a numpy
-            expr = '(%s) + t*0.' % expr
+            errors = utils.checkCode(expr)
+            if errors is not None:
+                raise CreateDatasetException("Will not create dataset\n"
+                                             "Unsafe code in expression '%s'\n" % expr)
+                
             try:
-                vals[key] = eval( expr, fnenviron )
+                vals[key] = eval( expr, fnenviron ) + t*0.
             except Exception, e:
                 raise CreateDatasetException("Error evaluating expession '%s'\n"
                                              "Error: '%s'" % (expr, str(e)) )
