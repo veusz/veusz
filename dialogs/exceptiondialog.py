@@ -117,8 +117,6 @@ class ExceptionSendDialog(qt4.QDialog):
 class ExceptionDialog(qt4.QDialog):
     """Choose an exception to send to developers."""
     
-    exceptions = []
-
     def __init__(self, exception, *args):
 
         # load up UI
@@ -129,38 +127,18 @@ class ExceptionDialog(qt4.QDialog):
 
         # create backtrace text from exception, and add to list
         backtrace = ''.join(traceback.format_exception(*exception)).strip()
-        for i in ExceptionDialog.exceptions:
-            if i[0] == backtrace:
-                i[1] += 1
-                break
-        else:
-            ExceptionDialog.exceptions.append( [backtrace, 1] )
+        self.errortextedit.setPlainText(backtrace)
 
-        # fill in exception table
-        e = self.exceptionlist
-        e.clear()
-        e.setHeaderLabels(['Problem', 'Count'])
+        # set critical pixmap to left of dialog
+        self.erroriconlabel.setPixmap( qt4.qApp.style().standardPixmap(
+            qt4.QStyle.SP_MessageBoxCritical) )
 
-        items = []
-        thisrow = None
-        for row, (exc, num) in enumerate(ExceptionDialog.exceptions):
-            item = qt4.QTreeWidgetItem([exc, str(num)])
-            if exc == backtrace:
-                thisrow = item
-            items.insert(0, item)
-
-        e.addTopLevelItems(items)
-        e.resizeColumnToContents(0)
-        e.setCurrentItem(thisrow)
+        self.backtrace = backtrace
         
     def accept(self):
         """Accept by opening send dialog."""
 
-        # get text for selected item
-        selitems = self.exceptionlist.selectedItems()
-        excepttext = unicode(selitems[0].text(0))
-
-        d = ExceptionSendDialog(excepttext, self)
+        d = ExceptionSendDialog(self.backtrace, self)
         if d.exec_() == qt4.QDialog.Accepted:
             qt4.QDialog.accept(self)
         
