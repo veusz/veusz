@@ -136,8 +136,12 @@ class ConsoleWindow(qt4.QDockWidget):
         # start an interpreter instance to the document
         self.interpreter = document.CommandInterpreter(thedocument)
         # output from the interpreter goes to self.output_stdxxx
-        self.interpreter.setOutputs( _Writer(self.output_stdout),
-                                     _Writer(self.output_stderr) )
+
+
+        self.con_stdout = _Writer(self.output_stdout)
+        self.con_stderr = _Writer(self.output_stderr)
+
+        self.interpreter.setOutputs(self.con_stdout, self.con_stderr)
         self.stdoutbuffer = ""
         self.stderrbuffer = ""
 

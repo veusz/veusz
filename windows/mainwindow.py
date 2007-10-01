@@ -585,6 +585,7 @@ class MainWindow(qt4.QMainWindow):
             self.CreateWindow(filename)
 
     def openFileInWindow(self, filename):
+        """Actually do the work of loading a new document."""
 
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
@@ -596,13 +597,15 @@ class MainWindow(qt4.QMainWindow):
         if errors is not None:
             qt4.QApplication.restoreOverrideCursor()
             msgbox = qt4.QMessageBox("Veusz",
-                                     "The file '%s' contains potentially unsafe code "
-                                     "which may damage your computer or data. "
-                                     "Please check the file comes from a"
-                                     " trusted source." % filename,
+                                     "The file '%s' contains potentially "
+                                     "unsafe code which may damage your "
+                                     "computer or data. Please check that the "
+                                     "file comes from a "
+                                     "trusted source." % filename,
                                      qt4.QMessageBox.Warning,
                                      qt4.QMessageBox.Yes,
-                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                                     qt4.QMessageBox.No |
+                                     qt4.QMessageBox.Default,
                                      qt4.QMessageBox.NoButton,
                                      self)
             msgbox.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
@@ -619,6 +622,12 @@ class MainWindow(qt4.QMainWindow):
             env[cmd] = getattr(interface, cmd)
         # FIXME: wrapped unsafe commands?
 
+        # save stdout and stderr, then redirect to console
+        stdout, stderr = sys.stdout, sys.stderr
+        sys.stdout = self.console.con_stdout
+        sys.stderr = self.console.con_stderr
+
+        # get ready to load document
         env['__file__'] = os.path.abspath(filename)
         self.document.wipe()
         self.document.suspendUpdates()
@@ -627,18 +636,26 @@ class MainWindow(qt4.QMainWindow):
             # actually run script text
             exec script in env
         except Exception, e:
+            # need to remember to restore stdout, stderr
+            sys.stdout, sys.stderr = stdout, stderr
+            
+            # display error dialog if there is an error loading
             qt4.QApplication.restoreOverrideCursor()
             self.document.enableUpdates()
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
-            d = ErrorLoadingDialog(self, filename, str(e),
-                                   ''.join(backtrace))
+            d = ErrorLoadingDialog(self, filename, str(e), ''.join(backtrace))
             d.exec_()
             return
 
+        # need to remember to restore stdout, stderr
+        sys.stdout, sys.stderr = stdout, stderr
+
+        # document is loaded
         self.document.enableUpdates()
         self.document.setModified(False)
-            
+
+        # let the main window know
         self.filename = filename
         self.updateTitlebar()
         self.updateStatusbar("Opened %s" % filename)

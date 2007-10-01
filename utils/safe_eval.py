@@ -297,11 +297,14 @@ def checkContextOkay(context):
         raise SafeEvalContextException(ctx_errkeys, ctx_errors)
 
 # set up environment in dict
-# FIXME: add constants
 veusz_eval_context = {}
-for name, fn in N.__dict__.iteritems():
-    if callable(fn) and name[:1] != '_' and name[-1:] != '_':
-        veusz_eval_context[name] = fn
+
+# add callables (not modules) and floats which don't override builtins
+for name, val in N.__dict__.iteritems():
+    if ( (callable(val) or type(val)==float) and
+         name not in __builtins__ and
+         name[:1] != '_' and name[-1:] != '_' ):
+        veusz_eval_context[name] = val
 
 def checkCode(code):
     """Check code, returning errors (if any) or None if okay"""
