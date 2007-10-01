@@ -590,13 +590,26 @@ class MainWindow(qt4.QMainWindow):
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
         # read script
-        script = open(filename, 'r').read()
+        try:
+            script = open(filename, 'r').read()
+        except IOError, e:
+            qt4.QApplication.restoreOverrideCursor()
+            qt4.QMessageBox("Could not open document",
+                            "Could not open the document '%s'\n"
+                            "\n%s (error %i)" % (filename,
+                                                 e.strerror, e.errno),
+                            qt4.QMessageBox.Warning,
+                            qt4.QMessageBox.Ok,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
 
         # check code for any security issues
         errors = utils.checkCode(script)
         if errors is not None:
             qt4.QApplication.restoreOverrideCursor()
-            msgbox = qt4.QMessageBox("Veusz",
+            msgbox = qt4.QMessageBox("Unsafe code in file",
                                      "The file '%s' contains potentially "
                                      "unsafe code which may damage your "
                                      "computer or data. Please check that the "
