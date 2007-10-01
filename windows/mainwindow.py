@@ -420,7 +420,7 @@ class MainWindow(qt4.QMainWindow):
             filetext = " '%s'" % os.path.basename(self.filename)
 
         # show message box
-        mb = qt4.QMessageBox("Veusz",
+        mb = qt4.QMessageBox("Save file?",
                              "Document%s was modified. Save first?" % filetext,
                              qt4.QMessageBox.Warning,
                              qt4.QMessageBox.Yes | qt4.QMessageBox.Default,
@@ -491,12 +491,14 @@ class MainWindow(qt4.QMainWindow):
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
                 self.updateStatusbar("Saved to %s" % self.filename)
-            except IOError:
+            except IOError, e:
                 qt4.QApplication.restoreOverrideCursor()
-                qt4.QMessageBox("Veusz",
-                                "Cannot save file as '%s'" % self.filename,
+                qt4.QMessageBox("Cannot save document",
+                                "Cannot save document as '%s'\n"
+                                "\n%s (error %i)" % (self.filename,
+                                                     e.strerror, e.errno),
                                 qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.Ok,
                                 qt4.QMessageBox.NoButton,
                                 qt4.QMessageBox.NoButton,
                                 self).exec_()
@@ -551,7 +553,7 @@ class MainWindow(qt4.QMainWindow):
             try:
                 open(filename)
             except IOError, e:
-                qt4.QMessageBox("Veusz",
+                qt4.QMessageBox("Unable to open file",
                                 "Unable to open file '%s'\n'%s'" % (filename, str(e)),
                                 qt4.QMessageBox.Critical,
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
@@ -594,8 +596,8 @@ class MainWindow(qt4.QMainWindow):
             script = open(filename, 'r').read()
         except IOError, e:
             qt4.QApplication.restoreOverrideCursor()
-            qt4.QMessageBox("Could not open document",
-                            "Could not open the document '%s'\n"
+            qt4.QMessageBox("Cannot open document",
+                            "Cannot open the document '%s'\n"
                             "\n%s (error %i)" % (filename,
                                                  e.strerror, e.errno),
                             qt4.QMessageBox.Warning,
