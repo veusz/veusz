@@ -16,7 +16,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
-# $Id: aboutdialog.py 572 2007-04-14 16:20:13Z jeremysanders $
+# $Id$
 
 """Dialog to show if there is an error loading."""
 
