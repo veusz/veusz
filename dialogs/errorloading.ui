@@ -36,6 +36,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="errormessagelabel" >
+       <property name="font" >
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text" >
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QTextEdit" name="errortextedit" >
        <property name="readOnly" >
         <bool>true</bool>

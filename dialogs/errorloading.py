@@ -28,7 +28,7 @@ import veusz.utils as utils
 class ErrorLoadingDialog(qt4.QDialog):
     """Dialog when error loading."""
 
-    def __init__(self, parent, filename, traceback):
+    def __init__(self, parent, filename, error, traceback):
         qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'errorloading.ui'),
@@ -38,6 +38,7 @@ class ErrorLoadingDialog(qt4.QDialog):
         text = unicode(self.errorlabel.text())
         text = text % filename
         self.errorlabel.setText(text)
+        self.errormessagelabel.setText(error)
 
         # put backtrace into error edit box
         self.errortextedit.setPlainText(traceback)

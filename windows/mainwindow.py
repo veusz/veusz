@@ -631,7 +631,8 @@ class MainWindow(qt4.QMainWindow):
             self.document.enableUpdates()
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
-            d = ErrorLoadingDialog(self, filename, ''.join(backtrace))
+            d = ErrorLoadingDialog(self, filename, str(e),
+                                   ''.join(backtrace))
             d.exec_()
             return
 
