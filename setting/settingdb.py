@@ -129,5 +129,9 @@ class _SettingDB(object):
 # create the SettingDB singleton
 settingdb = _SettingDB()
 
+# a normal dict for non-persistent settings
+# (e.g. disable safe mode)
+transient_settings = {}
+
 # write out settings at exit
 atexit.register(settingdb.writeSettings)

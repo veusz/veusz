@@ -46,6 +46,7 @@ import veusz.utils as utils
 from veusz.windows.mainwindow import MainWindow
 from veusz.application import Application
 import veusz.widgets
+import veusz.setting
 
 copyr='''Veusz %s
 
@@ -71,21 +72,30 @@ def run():
         parser = optparse.OptionParser(
             usage="%prog [options] filename.vsz ...",
             version=copyr % utils.version())
+        parser.add_option('--unsafe-mode', action='store_true',
+                          dest='unsafe_mode',
+                          help='disable safety checks when running documents'
+                          ' or scripts')
 
         options, args = parser.parse_args( app.argv() )
+
+        # for people who want to run any old script
+        veusz.setting.transient_settings['unsafe_mode'] = bool(
+            options.unsafe_mode)
 
         filelist = args[1:]
  
         # load in filename given
         if filelist:
             for filename in filelist:
-                #XXX - need error handling here...
                 MainWindow.CreateWindow(filename)
         else:
+            # create blank window
             MainWindow.CreateWindow()
     else:
+        # create blank window
         MainWindow.CreateWindow()
-    
+
     app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
                 app, qt4.SLOT("quit()"))
 

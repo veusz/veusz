@@ -647,13 +647,15 @@ class MainWindow(qt4.QMainWindow):
             return
 
         # check code for any security issues
-        errors = utils.checkCode(script)
-        ignore_unsafe = False
-        if errors is not None:
-            qt4.QApplication.restoreOverrideCursor()
-            if self._unsafeCmdMsgBox(self, filename).exec_() == qt4.QMessageBox.No:
-                return
-            ignore_unsafe = True # allow unsafe veusz commands below
+        ignore_unsafe = setting.transient_settings['unsafe_mode']
+        if not ignore_unsafe:
+            errors = utils.checkCode(script)
+            if errors is not None:
+                qt4.QApplication.restoreOverrideCursor()
+                if self._unsafeCmdMsgBox(self, filename).exec_() == \
+                   qt4.QMessageBox.No:
+                    return
+                ignore_unsafe = True # allow unsafe veusz commands below
 
         # set up environment to run script
         env = utils.veusz_eval_context.copy()
