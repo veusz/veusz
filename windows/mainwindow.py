@@ -664,25 +664,19 @@ class MainWindow(qt4.QMainWindow):
             env[cmd] = getattr(interface, cmd)
 
         # wrap "unsafe" commands with a message box to check the user
-        # says they are okay to run
         safenow = [ignore_unsafe]
-        class _unsafeCaller(object):
-            def __init__(self, func, window):
-                self.func = func
-                self.window = window
-            def __call__(self, *args, **argsk):
-                if not safenow[0]:
-                    qt4.QApplication.restoreOverrideCursor()
-                    if self.window._unsafeVeuszCmdMsgBox(
-                        self.window).exec_() == qt4.QMessageBox.No:
-                        return
-                    safenow[0] = True
-                # actually call the function
-                self.func(*args, **argsk)
-
-        # add wrapped functions to the environment
         for name in interface.unsafe_commands:
-            env[name] = _unsafeCaller(getattr(interface, name), self)
+            def _unsafeCaller(func):
+                def wrapped(*args, **argsk):
+                    if not safenow[0]:
+                        qt4.QApplication.restoreOverrideCursor()
+                        if self._unsafeVeuszCmdMsgBox(
+                            self).exec_() == qt4.QMessageBox.No:
+                            return
+                        safenow[0] = True
+                        func(*args, **argsk)
+                return wrapped
+            env[name] = _unsafeCaller(getattr(interface, name))
                                
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
