@@ -586,8 +586,47 @@ class MainWindow(qt4.QMainWindow):
             # create a new window
             self.CreateWindow(filename)
 
+    class _unsafeCmdMsgBox(qt4.QMessageBox):
+        """Show document is unsafe."""
+        def __init__(self, window, filename):
+            qt4.QMessageBox.__init__(self, "Unsafe code in document",
+                                     "The document '%s' contains potentially "
+                                     "unsafe code which may damage your "
+                                     "computer or data. Please check that the "
+                                     "file comes from a "
+                                     "trusted source." % filename,
+                                     qt4.QMessageBox.Warning,
+                                     qt4.QMessageBox.Yes,
+                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                                     qt4.QMessageBox.NoButton,
+                                     window)
+            self.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
+            self.setButtonText(qt4.QMessageBox.No, "&Stop loading")
+ 
+    class _unsafeVeuszCmdMsgBox(qt4.QMessageBox):
+        """Show document has unsafe Veusz commands."""
+        def __init__(self, window):
+            qt4.QMessageBox.__init__(self, 'Unsafe Veusz commands',
+                                     'This Veusz document contains potentially'
+                                     ' unsafe Veusz commands for Saving, '
+                                     'Exporting or Printing. Please check that the'
+                                     ' file comes from a trusted source.',
+                                     qt4.QMessageBox.Warning,
+                                     qt4.QMessageBox.Yes,
+                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                                     qt4.QMessageBox.NoButton,
+                                     window)
+            self.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
+            self.setButtonText(qt4.QMessageBox.No, "&Ignore command")
+
     def openFileInWindow(self, filename):
-        """Actually do the work of loading a new document."""
+        """Actually do the work of loading a new document.
+        """
+
+        # FIXME: This function suffers from spaghetti code
+        # it needs splitting up into bits to make it clearer
+        # the steps are fairly well documented below, however
+        #####################################################
 
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
@@ -609,24 +648,12 @@ class MainWindow(qt4.QMainWindow):
 
         # check code for any security issues
         errors = utils.checkCode(script)
+        ignore_unsafe = False
         if errors is not None:
             qt4.QApplication.restoreOverrideCursor()
-            msgbox = qt4.QMessageBox("Unsafe code in file",
-                                     "The file '%s' contains potentially "
-                                     "unsafe code which may damage your "
-                                     "computer or data. Please check that the "
-                                     "file comes from a "
-                                     "trusted source." % filename,
-                                     qt4.QMessageBox.Warning,
-                                     qt4.QMessageBox.Yes,
-                                     qt4.QMessageBox.No |
-                                     qt4.QMessageBox.Default,
-                                     qt4.QMessageBox.NoButton,
-                                     self)
-            msgbox.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
-            msgbox.setButtonText(qt4.QMessageBox.No, "&Stop loading")
-            if msgbox.exec_() == qt4.QMessageBox.No:
+            if self._unsafeCmdMsgBox(self, filename).exec_() == qt4.QMessageBox.No:
                 return
+            ignore_unsafe = True # allow unsafe veusz commands below
 
         # set up environment to run script
         env = utils.veusz_eval_context.copy()
@@ -635,8 +662,28 @@ class MainWindow(qt4.QMainWindow):
         # allow safe commands as-is
         for cmd in interface.safe_commands:
             env[cmd] = getattr(interface, cmd)
-        # FIXME: wrapped unsafe commands?
 
+        # wrap "unsafe" commands with a message box to check the user
+        # says they are okay to run
+        safenow = [ignore_unsafe]
+        class _unsafeCaller(object):
+            def __init__(self, func, window):
+                self.func = func
+                self.window = window
+            def __call__(self, *args, **argsk):
+                if not safenow[0]:
+                    qt4.QApplication.restoreOverrideCursor()
+                    if self.window._unsafeVeuszCmdMsgBox(
+                        self.window).exec_() == qt4.QMessageBox.No:
+                        return
+                    safenow[0] = True
+                # actually call the function
+                self.func(*args, **argsk)
+
+        # add wrapped functions to the environment
+        for name in interface.unsafe_commands:
+            env[name] = _unsafeCaller(getattr(interface, name), self)
+                               
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = self.console.con_stdout
