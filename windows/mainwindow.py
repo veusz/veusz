@@ -665,17 +665,17 @@ class MainWindow(qt4.QMainWindow):
 
         # wrap "unsafe" commands with a message box to check the user
         safenow = [ignore_unsafe]
+        def _unsafeCaller(func):
+            def wrapped(*args, **argsk):
+                if not safenow[0]:
+                    qt4.QApplication.restoreOverrideCursor()
+                    if self._unsafeVeuszCmdMsgBox(self).exec_() == \
+                           qt4.QMessageBox.No:
+                        return
+                safenow[0] = True
+                func(*args, **argsk)
+            return wrapped
         for name in interface.unsafe_commands:
-            def _unsafeCaller(func):
-                def wrapped(*args, **argsk):
-                    if not safenow[0]:
-                        qt4.QApplication.restoreOverrideCursor()
-                        if self._unsafeVeuszCmdMsgBox(
-                            self).exec_() == qt4.QMessageBox.No:
-                            return
-                        safenow[0] = True
-                        func(*args, **argsk)
-                return wrapped
             env[name] = _unsafeCaller(getattr(interface, name))
                                
         # save stdout and stderr, then redirect to console
