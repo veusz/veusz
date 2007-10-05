@@ -17,7 +17,7 @@
     </author>
 
     <copyright>
-      <year>2005</year>
+      <year>2007</year>
     </copyright>
 
     <legalnotice>
@@ -186,6 +186,14 @@
 		<para>The settings for the xy part are the various
 		  attibutes for the points, line and error bars, the
 		  datasets to plot, and the axes to plot on.</para>
+
+		<para>The xy plotter can plot a label next to each
+		dataset, which is either the same for each point or
+		taken from a text dataset.</para>
+
+		<para>If you wish to leave gaps in a plot, the input
+		value "nan" can be specified in the numeric
+		dataset.</para>
 	      </listitem>
 
 	      <listitem>
@@ -240,6 +248,29 @@
 		coordinates.</para>
 	      </listitem>
 
+	      <listitem>
+		<para>contour - plot contours of a 2D dataset on the
+		graph. Contours are automatically calculated between
+		the minimum and maximum values of the graph or chosen
+		manually. The line style of the contours can be chosen
+		individually and the region between contours can be
+		filled with shading or color.</para>
+
+		<para>2D datasets currently consist of a regular grid
+		of values between minimum and maximum positions in x
+		and y. They can be constructed from three 1D datasets
+		of x, y and z if they form a regular x, y grid.</para>
+	      </listitem>
+
+	      <listitem>
+		<para>image - plot a 2D dataset as a colored
+		image. Different color schemes can be chosen. The
+		scaling between the values and the image can be
+		specified as linear, logarithmic, square-root or
+		square.
+		</para>
+	      </listitem>
+
 	    </orderedlist>
 
 	  </listitem>
@@ -283,14 +314,17 @@
 	puts the 2 and 3 into superscript), but it is fairly
 	similar. You should also leave out the dollar signs. Veusz
 	supports superscripts ("^"), subscripts ("_"), brackets for
-	applying attributes "{" and "}", greek letters ("\alpha" to
-	"\omega" and "\Alpha" to "\Omega"). For formatting,
-	"\emph{hi}", "\italic{ho}" and "\textit{silver}" are for
-	italic text, "\bold{foo}" and "\textbf{bar}" for bold and
-	"\underline{yatta}" for underlined text. Also included are
-	special symbols "\times", "\pm", "\deg", "\divide", "\dagger",
-	"\ddagger", "\bullet", "\AA", "\sqrt", "\propto", "\infty",
-	"\int", and "\sim".</para>
+	grouping attributes are "{" and "}".</para>
+
+	 <para>Special symbols include greek letters ("\alpha" to
+	"\omega" and "\Alpha" to "\Omega"). Also included are symbols
+	"\times", "\pm", "\deg", "\divide", "\dagger", "\ddagger",
+	"\bullet", "\AA", "\sqrt", "\propto", "\infty", "\int",
+	"\sim", "\odot", "\leftarrow", "\uparrow", "\rightarrow",
+	"\downarrow" and "\circ". Please request additional characters
+	if they are required (and exist in the unicode character
+	set). Special symbols can be included directly from a
+	character map.</para>
 
 	<para>Also supported are commands to change font. The command
 	"\font{name}{text}" changes the font text is written in to
@@ -298,9 +332,15 @@
 	current font, e.g. "\font{symbol}{g}" should produce a
 	gamma. You can increase, decrease, or set the size of the font
 	with "\size{+2}{text}", "\size{-2}{text}", or
-	"\size{20}{text}". Numbers are in points (the pt symbol is
-	optional). Other measurements may be supported in the
-	future.</para>
+	"\size{20}{text}". Numbers are in points.</para>
+
+	<para>Various font attributes can be changed: for example,
+	"\italic{some italic text}" (or use "\textit" or "\emph"),
+	"\bold{some bold text}" (or use "\textbf") and "\underline{some
+	underlined text}".</para>
+
+	<para>Example text could include "Area / \pi (10^{-23}
+	cm^{-2})", or "\pi\bold{g}".</para>
 
 	<para>Veusz plots these symbols with Qt's unicode support. If
 	your current font does not contain these symbols then you may
@@ -322,9 +362,7 @@
     <section>
       <title>The main window</title>
 
-      <para>Once you have installed Veusz, you should start it by
-      executing veusz.py from its directory. This should present the
-      Veusz main window.</para>
+      <para>You should see the main window when you run Veusz.</para>
 
       <mediaobject>
 	<imageobject>
@@ -569,7 +607,30 @@
 	as if it were placed at the end of the current line. In
 	addition comments and blank lines are ignored. Comments start
 	with a "#", ";", "!" or "%", and continue until the end of the
-	line.</para>
+	line. The special value "nan" can be used to specify a break
+	in a dataset.</para>
+
+      <para>Veusz now has support for reading in other types of data
+      other than numbers. The type of data can be added in round
+      brackets after the name. Veusz will try to guess the type of
+      data based on the first value, so you should specify it if there
+      is any form of ambiguity (e.g. is 3 text or a number). Supported
+      types are numbers (use numeric in brackets) and text (use text
+      in brackets). An example descriptor would be "x(numeric),+-
+      y(numeric),+,- label(text)" for an x dataset followed by its
+      symmetric errors, a y dataset followed by two columns of
+      asymmetric errors, and a final column of text for the label
+      dataset.</para>
+
+      <para>A text column does not need quotation unless it contains
+      space characters or escape characters. Quotation marks are
+      recommended if you wish to avoid ambiguity. Text is quoted
+      according to the Python rules for text. Double or single
+      quotation marks can be used, e.g. "A 'test'", 'A second
+      "test"'. Quotes can be escaped by prefixing them with a
+      backslash, e.g. "A new \"test\"". If the data are generated from
+      a Python script, the repr function provides the text in a
+      suitable form.</para>
 
       <para>Data may be optionally split into "blocks" of data
       separated by blank lines (or the word "no" on a line, for
@@ -676,6 +737,12 @@ SetData('y', y)
     <para>The data can be linked with the CSV file so that it can be
     updated when the file changes. See the example CSV import for
     details.</para>
+
+    <para>Text datasets are not yet autodetected for CSV files. You
+    can specify a text dataset by using "(text)" after the name of the
+    dataset at the top of the column. A future release show allow a
+    more general method for autodetecting data or specifying, as the
+    standard Veusz file format currently does.</para>
 
     </section>
 
@@ -1197,6 +1264,34 @@ Set('page1/graph1/x/min', -10.)
       </section>
 
       <section>
+	<title><anchor id="Command.SetData2DExpressionXYZ"
+	/>SetData2DExpressionXYZ</title>
+
+	<para><command>SetData2DExpressionXYZ('name', 'xexpr',
+	'yexpr', 'zexpr', linked=False)</command></para>
+
+	<para>Create a 2D dataset based on three 1D expressions. The
+	x, y expressions need to evaluate to a grid of x, y points,
+	with the z expression as the 2D value at that point. Currently
+	only linear fixed grids are supported. This function is
+	intended to convert calculations or measurements at fixed
+	points into a 2D dataset easily. Missing values are filled
+	with NaN.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetData2DXYFunc"
+	/>SetData2DXYFunc(self, 'name', xstep, ystep, 'expr',
+	linked=False)</title>
+
+	<para>Construct a 2D dataset using a mathematical expression
+	of "x" and "y". The x values are specified as (min, max, step)
+	in xstep as a tuple, the y values similarly. If linked remains
+	as False, then a real 2D dataset is created, where values can
+	be modified and the data are stored in the saved file.</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.SetVerbose" />SetVerbose</title>
 	
 	<para><command>SetVerbose(v=True)</command></para>
@@ -1240,20 +1335,21 @@ Set('page1/graph1/x/min', -10.)
 
     <section>
       <title>Security</title>
-      <para>As Veusz is written in Python and its script files are
-      essentially Python scripts, these files are insecure. They may
-      contain dangerous commands. Do not open Veusz scripts from
-      untrusted sources.</para>
+      <para>With the 1.0 release of Veusz, input scripts and
+      expressions are checked for possible security risks. Only a
+      limited subset of Python functionality is allowed, or a dialog
+      box is opened allowing the user to cancel the
+      operation. Specifically you cannot import modules, get
+      attributes of Python objects, access globals() or locals() or do
+      any sort of file reading or manipulation. Basically anything
+      which might break in Veusz or modify a system is not
+      supported. In addition internal Veusz functions which can modify
+      a system are also warned against, specifically Print(), Save()
+      and Export().</para>
 
-      <para>There is no easy way to restrict the commands placed
-      inside a script as there is no secure Python restricted
-      environment.</para>
-
-      <para>In the future I will investigate creating an additional
-      basic file format with less flexibility. This will be difficult
-      as Python is used to evaluate functions and so on. It is hard to
-      currently prevent dangerous Python commands from being encoded
-      in such strings.</para>
+      <para>If you are running your own scripts and do not want to be
+      bothered by these dialogs, you can run veusz with the
+      <command>--unsafe-mode</command> option.</para>
     </section>
 
   </chapter>
