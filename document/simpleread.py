@@ -26,12 +26,12 @@ varname<error specifiers><[repeater]>
 where <> marks optional arguments, e.g.
 
 x+- y+,- z+-[1:5]
-x<text> y<date> z<number>
+x(text) y(date) z(number),+-
 
 +- means symmetric error bars
 +,- means asymmetric error bars
 , is a separator
-<text> or <date> specifies 
+(text) or (date) specifies datatype
 
 z+-[1:5] means read z_1+- z_2+- ... z_5+-
 
