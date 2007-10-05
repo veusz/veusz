@@ -321,13 +321,17 @@ def makePartList(text):
     for p in splitter_re.split(text):
         if p[:1] == '\\':
             # we may need to drop excess spaces after \foo commands
-            p = p.rstrip()
-            if p in symbols:
+            ps = p.rstrip()
+            if ps in symbols:
                 # convert to symbol if possible
-                doAdd(symbols[p])
+                text = symbols[ps]
+                if ps != p:
+                    # add back spacing
+                    text += p[len(ps)-len(p):]
+                doAdd(text)
             else:
                 # add as possible command
-                doAdd(p)
+                doAdd(ps)
         elif p == '{':
             # add a new level
             parents.append( doAdd([]) )
