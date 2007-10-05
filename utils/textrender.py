@@ -262,16 +262,35 @@ class PartFont(Part):
 class PartSize(Part):
     """Change font size in part."""
     def __init__(self, children):
+        self.size = None
+        self.deltasize = None
+
+        # convert size
         try:
-            self.size = float(children[0].text)
+            size = children[0].text.replace('pt', '') # crap code
+            if size[:1] in '+-':
+                # is a modification of font size
+                self.deltasize = float(size)
+            else:
+                # is an absolute font size
+                self.size = float(size)
         except AttributeError, ValueError:
-            self.size = 0.
+            self.deltasize = 0.
+
         self.children = children[1:]
 
     def render(self, state):
         font = state.font
-        oldsize = font.pointSizeF()
-        font.setPointSizeF(oldsize+self.size)
+        size = oldsize = font.pointSizeF()
+
+        if self.size:
+            # absolute size
+            size = self.size
+        elif self.deltasize:
+            # change of size
+            size = max(size+self.deltasize, 0.1)
+        
+        font.setPointSizeF(size)
         state.painter.setFont(font)
 
         Part.render(self, state)
