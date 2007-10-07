@@ -47,23 +47,16 @@ import os
 import os.path
 import atexit
 
-# nasty hack to ensure we can load all the veusz components
-#_dir = os.path.dirname(__file__)
-#if _dir not in sys.path:
-#    sys.path.insert(0, _dir)
+import veusz.qtall as Qt4
 
-class Bind1st(object):
+def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
-    parameter. Returns a callable object."""
+    parameter."""
 
-    def __init__(self, function, arg):
-        """function is the function to call, arg is the first param."""
-        self.function = function
-        self.arg = arg
+    def runner(*args, **args2):
+        return function( arg, *args, **args2 )
 
-    def __call__(self, *args, **args2):
-        """This makes the object appear to be a function."""
-        return self.function(self.arg, *args, **args2)
+    return runner
 
 class Embedded(object):
     """An embedded instance of Veusz.
@@ -108,13 +101,6 @@ class Embedded(object):
 
         # open window for this embedded instance
         Embedded._runCommand( self._NewWindow, name )
-
-    def __del__(self):
-        """Remove the window if deleted."""
-
-        # FIXME: this never gets called. Don't know why.
-        if self.window is not None:
-            self.Close()
 
     def _runCommand(cmd, *args, **args2):
         """Execute the given function in the Qt thread with the arguments
@@ -254,7 +240,9 @@ class Embedded(object):
     def _exitQt():
         """Exit the Qt thread."""
         import veusz.qtall as qt4
+        self.window.close()
         qt4.qApp.quit()
+        
     _exitQt = staticmethod(_exitQt)
 
     def _atExit():
