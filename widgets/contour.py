@@ -331,12 +331,19 @@ class Contour(plotters.GenericPlotter):
                            alignvert=0, angle=0)
         bounds = r.getBounds()
 
-        # clip region containing text
-        oldclip = painter.clipRegion()
-        cr = oldclip - qt4.QRegion( bounds[0]-descent, bounds[1]-descent,
-                                    bounds[2]-bounds[0]+descent*2,
-                                    bounds[3]-bounds[1]+descent*2 )
-        painter.setClipRegion(cr)
+        # heuristics of when to plot label
+        # we try to only plot label if underlying line is long enough
+        height = bounds[3]-bounds[1]
+        showtext = ( height*1.5 < (yplt.max() - yplt.min()) or
+                     (height*4 < (xplt.max() - xplt.min())) )
+
+        if showtext:
+            # clip region containing text
+            oldclip = painter.clipRegion()
+            cr = oldclip - qt4.QRegion( bounds[0]-descent, bounds[1]-descent,
+                                        bounds[2]-bounds[0]+descent*2,
+                                        bounds[3]-bounds[1]+descent*2 )
+            painter.setClipRegion(cr)
 
         # draw lines
         pts = qt4.QPolygonF()
@@ -344,9 +351,11 @@ class Contour(plotters.GenericPlotter):
             pts.append( qt4.QPointF(x, y) )
         painter.drawPolyline(pts)
 
-        painter.setClipRegion(oldclip)
-        painter.setPen( cl.makeQPen() )
-        r.render()
+        # actually plot the label
+        if showtext:
+            painter.setClipRegion(oldclip)
+            painter.setPen( cl.makeQPen() )
+            r.render()
 
         painter.restore()
 
