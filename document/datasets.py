@@ -729,14 +729,11 @@ class DatasetExpression(Dataset):
         self.expr['nerr'] = nerr
         self.expr['perr'] = perr
 
+        self.cachedexpr = {}
+
         self.docchangeset = { 'data': None, 'serr': None,
                               'perr': None, 'nerr': None }
         self.evaluated = {}
-
-        # check each expression
-        for name, expr in self.expr.iteritems():
-            if expr and utils.checkCode(expr) is not None:
-                raise DatasetExpressionException("Unsafe expression '%s' in %s part of dataset" % (expr, name))
 
         # set up a default environment
         self.environment = utils.veusz_eval_context.copy()
@@ -769,7 +766,14 @@ class DatasetExpression(Dataset):
                 # but necessary for Python 2.3 as we can't replace
                 # dict in eval by subclass
                 expr = _substituteDatasets(self.document.data, expr, part)
-                
+
+                # check expression for nasties if it has changed
+                if self.cachedexpr.get(part) != expr:
+                    if utils.checkCode(expr) is not None:
+                        raise DatasetExpressionException("Unsafe expression '%s' in %s part of dataset" % (self.expr[part], part))
+                    self.cachedexpr[part] = expr
+
+                # actually evaluate the expression
                 try:
                     self.evaluated[part] = eval(expr, self.environment)
                 except Exception, e:
