@@ -557,6 +557,11 @@ class Axis(widget.Widget):
         al_spacing = ( painter.fontMetrics().leading() +
                        painter.fontMetrics().descent() )
 
+        text = s.label
+        # avoid adding blank text to plot
+        if not text:
+            return
+
         horz = s.direction == 'horizontal'
         if not horz:
             ax = 1
@@ -603,7 +608,7 @@ class Axis(widget.Widget):
                     x = outerbounds[2]
                     ax = -ax
 
-        r = utils.Renderer(painter, font, x, y, s.label,
+        r = utils.Renderer(painter, font, x, y, text,
                            ax, ay, angle,
                            usefullheight = True)
 
