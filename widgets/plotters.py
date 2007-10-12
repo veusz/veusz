@@ -242,16 +242,17 @@ class FunctionPlotter(GenericPlotter):
         x1, y1, x2, y2 = posn
 
         # check function doesn't contain dangerous code
-        if self.cachedfunc != s.function or self.cachedvar != s.variable:
-            checked = utils.checkCode(s.function)
+        fn = s.function.strip()
+        if self.cachedfunc != fn or self.cachedvar != s.variable:
+            checked = utils.checkCode(fn)
             if checked is not None:
                 return None, None
-            self.cachedfunc = s.function
+            self.cachedfunc = fn
             self.cachedvar = s.variable
 
             try:
                 # compile code
-                self.cachedcomp = compile(self.cachedfunc, '<string>', 'eval')
+                self.cachedcomp = compile(fn, '<string>', 'eval')
             except:
                 # return nothing
                 return None, None
