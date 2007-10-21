@@ -36,6 +36,8 @@ import parser
 import inspect, compiler.ast
 import thread, time
 import __builtin__
+import os.path
+
 import numpy as N
 
 #----------------------------------------------------------------------
@@ -158,6 +160,8 @@ unallowed_attr = (
 unallowed_attr = dict( (i, True) for i in unallowed_attr )
 
 def is_unallowed_attr(name):
+    if name == '__file__':
+        return False
     return ( (name[:2] == '__' and name[-2:] == '__') or
              (name in unallowed_attr) )
 
@@ -305,6 +309,10 @@ for name, val in N.__dict__.iteritems():
          name not in __builtins__ and
          name[:1] != '_' and name[-1:] != '_' ):
         veusz_eval_context[name] = val
+
+# useful safe functions
+veusz_eval_context['os_path_join'] = os.path.join
+veusz_eval_context['os_path_dirname'] = os.path.dirname
 
 def checkCode(code):
     """Check code, returning errors (if any) or None if okay"""

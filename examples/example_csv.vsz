@@ -2,9 +2,7 @@
 
 # this code is so that the document can find its data
 # file
-import os.path
-filename = os.path.join(os.path.dirname(__file__),
-                        'example_csv.csv')
+filename = os_path_join(os_path_dirname(__file__), 'example_csv.csv')
 ImportFileCSV(filename, linked=True)
 
 Add('page', name='page1', autoadd=False)
