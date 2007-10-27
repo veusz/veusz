@@ -65,7 +65,7 @@ Requirements:
    http://numpy.scipy.org/
  Microsoft Core Fonts (recommended for nice output)
    http://corefonts.sourceforge.net/
- PyFITS >= 1.1rc3 (optional for FITS import)
+ PyFITS >= 1.1 (optional for FITS import)
    http://www.stsci.edu/resources/software_hardware/pyfits
 
 For documentation on using Veusz, see the "Documents" directory. The
