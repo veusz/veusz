@@ -1,5 +1,5 @@
-Veusz 0.99.0 (new Qt4/numpy beta)
-------------
+Veusz 1.0
+---------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
@@ -16,21 +16,25 @@ Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Changes from 0.10:
- This is the first release of a much rewritten version of Veusz
- It has been updated to run under Qt4 and numpy, and now supports Windows
- The user interface is also signficantly easier to use
+Feature changes from 0.99.0:
+ * Import of Text datasets
+ * Labels can be plotted next to X-Y points
+ * Numbers can be directly plotted by entering into X-Y datasets as X and Y
+ * More line styles
+ * Loaded document and functions are checked for unsafe Python features
+ * Contours can be labelled with numbers
+ * 2D dataset creation to make 2D datasets from x, y, z 1D datasets
 
- Other useful features include:
-  * Colorbars for images (better color scaling for images too)
-  * Grids of graphs with different sized subgraphs
-  * Much better import dialog 
-  * Antialiased screen output
-  * Native PNG and PDF export
-  * Separate formatting/properties dialog
-  * Handling of INF/NaN in input data
-  * Transparency of graphs (not for EPS output)
- Plus many more useful changes (see ChangeLog)
+Bug and minor fixes from 0.99.0:
+ * Zooming into X-Y images works now
+ * Contour plots work on datasets with non equal X and Y sizes
+ * Various fixes for datasets including NaN or Inf
+ * Large changes to data import filter to support loading strings (and dates
+   later)
+ * Reduce number of undo levels for memory/speed
+ * Text renderer rewritten to be more simple
+ * Improved error dialogs
+ * Proper error dialog for invalid loading of documents
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -52,9 +56,9 @@ Features of package:
 Requirements:
  Python (2.3 or greater required)
    http://www.python.org/
- Qt >= 4.1 (free edition)
+ Qt >= 4.3 (free edition)
    http://www.trolltech.com/products/qt/  
- PyQt >= 4.1 (SIP is required to be installed first)
+ PyQt >= 4.3 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/pyqt/
    http://www.riverbankcomputing.co.uk/sip/
  numpy >= 1.0
@@ -68,13 +72,9 @@ For documentation on using Veusz, see the "Documents" directory. The
 manual is in pdf, html and text format (generated from docbook).
 
 Issues:
- * This is a new beta, so there are likely to be a number of bugs, even
-   though it has been used by a couple of people for some time.
+ * Reqires a rather new version of PyQt, otherwise dialogs don't work.
  * Can be very slow to plot large datasets if antialiasing is enabled.
    Right click on graph and disable antialias to speed up output.
- * Some older versions of Qt (<4.2.2) can produce very large postscript
-   output and random crashes. This may not be completely resolved
-   (especially on windows).
  * The embedding interface appears to crash on exiting.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
