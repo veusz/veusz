@@ -669,7 +669,7 @@ class DatasetExpressionException(DatasetException):
 #             # revert to old behaviour
 #             return dict.__getitem__(self, item)
 
-dataexpr_split_re = re.compile(r'([+\-*/\(\)\[\],<>=!|%^~& ])')
+dataexpr_split_re = re.compile(r'([\.+\-*/\(\)\[\],<>=!|%^~& ])')
 dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
 
 def _substituteDatasets(datasets, expression, thispart):
