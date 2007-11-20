@@ -408,7 +408,7 @@ class Dataset(DatasetBase):
     # number of dimensions the dataset holds
     dimensions = 1
     columns = ('data', 'serr', 'nerr', 'perr')
-    column_descriptions = ('Data', 'Sym. errors', 'Pos. errors', 'Neg. errors')
+    column_descriptions = ('Data', 'Sym. errors', 'Neg. errors', 'Pos. errors')
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
