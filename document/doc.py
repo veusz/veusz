@@ -469,6 +469,27 @@ class Document( qt4.QObject ):
             os.remove(filename)
             os.rename(tmpfile, filename)
 
+    def _exportSVG(self, filename, page):
+        """Export document as SVG"""
+
+        import PyQt4.QtSvg
+
+        # we have to make a temporary painter first to get the document size
+        # this is because setSize needs to come before begin
+        temprend =  PyQt4.QtSvg.QSvgGenerator()
+        temprend.setFileName(filename)
+        p = Painter(temprend)
+        width, height = self.basewidget.getSize(p)
+        p.end()
+
+        # actually paint the image
+        rend = PyQt4.QtSvg.QSvgGenerator()
+        rend.setFileName(filename)
+        rend.setSize( qt4.QSize(int(width), int(height)) )
+        painter = Painter(rend)
+        self.basewidget.children[page].draw( (0, 0, width, height), painter)
+        painter.end()
+
     def export(self, filename, pagenumber, color=True, dpi=100,
                antialias=True, quality=85):
         """Export the figure to the filename."""
@@ -481,6 +502,9 @@ class Document( qt4.QObject ):
         elif ext in ('.png', '.jpg', '.jpeg', '.bmp'):
             self._exportBitmap(filename, pagenumber, dpi=dpi,
                                antialias=antialias, quality=quality)
+
+        elif ext == '.svg':
+            self._exportSVG(filename, pagenumber)
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
