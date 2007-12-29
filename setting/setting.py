@@ -983,6 +983,11 @@ class DatasetOrFloatList(Dataset):
             # list of values
             return N.array(self.val)
             
+    def isDataset(self, doc):
+        """Is this setting a dataset?"""
+        return (isinstance(self.val, basestring) and
+                doc.data.get(self.val))
+
     def getData(self, doc):
         """Return veusz dataset"""
         if isinstance(self.val, basestring):

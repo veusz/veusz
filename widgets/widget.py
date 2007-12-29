@@ -98,6 +98,9 @@ class Widget(object):
         # actions for widget
         self.actions = []
 
+        # pts user can move around
+        self.controlpts = {}
+
     def isWidget(self):
         """Is this object a widget?"""
         return True

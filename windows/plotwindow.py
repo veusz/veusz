@@ -161,6 +161,10 @@ class DisplayWidget(qt4.QLabel):
         self._showlogo = True
         qt4.QTimer.singleShot(3000, self.slotSplashDisable)
 
+        # show control points
+        #self._controlpts_show = False
+        self._controlpts = []
+
     def slotSplashDisable(self):
         """Disable drawing the splash logo."""
         self._showlogo = False
@@ -171,19 +175,25 @@ class DisplayWidget(qt4.QLabel):
 
         qt4.QLabel.paintEvent(self, event)
 
+        painter = qt4.QPainter(self)
+
         if self._zoomrect:
             # draw zoom rectangle if any shown
-            painter = qt4.QPainter(self)
             painter.setPen(qt4.QPen(qt4.QColor('black'), 0, qt4.Qt.DotLine))
             painter.drawRect(*self._zoomrect)
 
         if self._showlogo:
             # show logo until timer runs out
-            painter = qt4.QPainter(self)
             logo = action.getPixmap('logo.png')
             painter.drawPixmap(self.width()/2 - logo.width()/2,
                                self.height()/2 - logo.height()/2,
                                logo)
+
+        # draw control points
+        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+        painter.setBrush( qt4.QBrush(qt4.QColor(0, 0, 0, 127)) )
+        for pt in self._controlpts:
+            painter.drawEllipse( pt[0], pt[1], 10, 10 )
 
     def drawRect(self, pt1, pt2):
         """Draw a zoom rectangle from QPoint pt1 to pt2."""
@@ -243,6 +253,7 @@ class PlotWindow( qt4.QScrollArea ):
         self.zoomfactor = 1.
         self.pagenumber = 0
         self.forceupdate = False
+        self.controlpts = []
 
         # work out dpi
         self.widgetdpi = self.logicalDpiY()
@@ -532,6 +543,16 @@ class PlotWindow( qt4.QScrollArea ):
 
             self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
 
+            # check whether mouse cursor is close to any control points
+            newcontrolpts = []
+            for pt, widget, key in self.controlpts:
+                if N.sqrt((px-pt[0])**2+(py-pt[1])**2) < 100:
+                    newcontrolpts.append( pt )
+
+            if newcontrolpts != self.label._controlpts:
+                self.label._controlpts = newcontrolpts
+                self.label.repaint(0, 0, -1, -1)
+
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
@@ -664,7 +685,23 @@ class PlotWindow( qt4.QScrollArea ):
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
+            self.updateControlPts()
+
             self.label.setPixmap(self.bufferpixmap)
+
+    def _recurseControlPts(self, widget):
+        """Recursively add to list of control points from widget and children."""
+        for key, pos in widget.controlpts.iteritems():
+            self.controlpts.append( (pos, widget, key) )
+
+        for c in widget.children:
+            self._recurseControlPts(c)
+
+    def updateControlPts(self):
+        """Update list of control points for objects in the document."""
+
+        del self.controlpts[:]
+        self._recurseControlPts(self.document.basewidget)
 
     def _constructContextMenu(self):
         """Construct the context menu."""
@@ -895,3 +932,4 @@ class PlotWindow( qt4.QScrollArea ):
                 axesretn.append( (axis.path, r[0]) )
 
         return axesretn
+

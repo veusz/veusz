@@ -960,6 +960,9 @@ class TextLabel(GenericPlotter):
         pointsX = s.get('xPos').getFloatArray(d)
         pointsY = s.get('yPos').getFloatArray(d)
 
+        if pointsX is None or pointsY is None:
+            return
+
         if s.positioning == 'axes':
             # translate xPos and yPos to plotter coordinates
 
@@ -979,11 +982,19 @@ class TextLabel(GenericPlotter):
         painter.setPen(textpen)
         font = s.get('Text').makeQFont(painter)
 
-        for x, y, t in itertools.izip(xp, yp, itertools.cycle(text)):
+        self.controlpts.clear()
+        isdataset = ( not s.get('xPos').isDataset(d) and 
+                      not s.get('yPos').isDataset(d) )
+
+        index = 0
+        for i, (x, y, t) in enumerate(itertools.izip(xp, yp, itertools.cycle(text))):
             utils.Renderer( painter, font, x, y, t,
                             TextLabel.cnvtalignhorz[s.alignHorz],
                             TextLabel.cnvtalignvert[s.alignVert],
                             s.angle ).render()
+            if isdataset:
+                self.controlpts[i] = (x, y)
+
         painter.restore()
         painter.endPaintingWidget()
 
