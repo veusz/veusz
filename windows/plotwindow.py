@@ -25,6 +25,7 @@ import os
 import os.path
 import sys
 import itertools
+import math
 
 import veusz.qtall as qt4
 import numpy as N
@@ -229,7 +230,7 @@ class DisplayWidget(qt4.QLabel):
             self._zoomrect = None
             self._repaintRect(old)
 
-class PlotWindow( qt4.QScrollArea ):
+class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
     def __init__(self, document, parent, menu=None):
@@ -238,11 +239,15 @@ class PlotWindow( qt4.QScrollArea ):
         menu gives a menu to add any menu items to
         """
 
-        qt4.QScrollArea.__init__(self, parent)
-        self.label = DisplayWidget()
-        self.setWidget(self.label)
+        qt4.QGraphicsView.__init__(self, parent)
         self.setBackgroundRole(qt4.QPalette.Dark)
-        self.label.setSizePolicy(qt4.QSizePolicy.Fixed, qt4.QSizePolicy.Fixed)
+        self.scene = qt4.QGraphicsScene()
+        self.setScene(self.scene)
+
+        # this graphics scene item is the actual graph
+        self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
+        self.controlitems = self.scene.createItemGroup([])
+        self.controlitems.setZValue(1.)
 
         # set up so if document is modified we are notified
         self.document = document
@@ -253,7 +258,10 @@ class PlotWindow( qt4.QScrollArea ):
         self.zoomfactor = 1.
         self.pagenumber = 0
         self.forceupdate = False
+
         self.controlpts = []
+        self.nearbycontrolpts = []
+        self.controlgraphitems = []
 
         # work out dpi
         self.widgetdpi = self.logicalDpiY()
@@ -296,7 +304,6 @@ class PlotWindow( qt4.QScrollArea ):
 
         # get mouse move events if mouse is not pressed
         self.setMouseTracking(True)
-        self.label.setMouseTracking(True)
 
         # create toolbar in main window (urgh)
         self.createToolbar(parent, menu)
@@ -478,7 +485,7 @@ class PlotWindow( qt4.QScrollArea ):
 
             # need to copy position, otherwise it gets reused!
             self.winpos = qt4.QPoint(event.pos())
-            self.grabpos = self.widget().mapFromParent(self.winpos)
+            self.grabpos = self.mapToScene(self.winpos)
 
             if self.clickmode == 'select':
                 # we set this to true unless the timer runs out (400ms),
@@ -492,7 +499,8 @@ class PlotWindow( qt4.QScrollArea ):
                     qt4.QCursor(qt4.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
-                self.label.drawRect(self.grabpos, self.grabpos)
+                pass
+                #self.label.drawRect(self.grabpos, self.grabpos)
 
             # record what mode we were clicked in
             self.currentclickmode = self.clickmode
@@ -518,12 +526,12 @@ class PlotWindow( qt4.QScrollArea ):
 
         elif self.currentclickmode == 'graphzoom' and self.grabpos is not None:
             # get rid of current rectangle
-            pos = self.widget().mapFromParent(event.pos())
-            self.label.drawRect(self.grabpos, pos)
+            pos = self.mapToScene(event.pos())
+            #self.label.drawRect(self.grabpos, pos)
 
         elif self.clickmode == 'select':
             # find axes which map to this position
-            pos = self.widget().mapFromParent(event.pos())
+            pos = self.mapToScene(event.pos())
             px, py = pos.x(), pos.y()
 
             vals = {}
@@ -544,14 +552,13 @@ class PlotWindow( qt4.QScrollArea ):
             self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
 
             # check whether mouse cursor is close to any control points
-            newcontrolpts = []
-            for pt, widget, key in self.controlpts:
-                if N.sqrt((px-pt[0])**2+(py-pt[1])**2) < 100:
-                    newcontrolpts.append( pt )
-
-            if newcontrolpts != self.label._controlpts:
-                self.label._controlpts = newcontrolpts
-                self.label.repaint(0, 0, -1, -1)
+            nearcurs = qt4.QGraphicsEllipseItem(px-50, py-50, 100, 100)
+            for c in self.controlitems.children():
+                vis = c.collidesWithItem(nearcurs)
+                if vis:
+                    c.show()
+                else:
+                    c.hide()
 
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
@@ -562,7 +569,7 @@ class PlotWindow( qt4.QScrollArea ):
             self.scrolltimer.stop()
             if self.currentclickmode == 'select':
                 # work out where the mouse clicked and choose widget
-                pos = self.widget().mapFromParent(event.pos())
+                pos = self.mapToScene(event.pos())
                 self.locateClickWidget(pos.x(), pos.y())
             elif self.currentclickmode == 'scroll':
                 # return the cursor to normal after scrolling
@@ -570,8 +577,8 @@ class PlotWindow( qt4.QScrollArea ):
                 self.currentclickmode = None
                 qt4.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
-                self.label.hideRect()
-                self.doZoomRect(self.widget().mapFromParent(event.pos()))
+                #self.label.hideRect()
+                self.doZoomRect(self.mapToScene(event.pos()))
                 self.grabpos = None
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
@@ -615,7 +622,8 @@ class PlotWindow( qt4.QScrollArea ):
             self.size = size
             self.bufferpixmap = qt4.QPixmap( *self.size )
             self.forceupdate = True
-            self.label.resize(*size)
+            self.setSceneRect( 0, 0, size[0], size[1] )
+            #self.label.resize(*size)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -687,21 +695,36 @@ class PlotWindow( qt4.QScrollArea ):
 
             self.updateControlPts()
 
-            self.label.setPixmap(self.bufferpixmap)
+            self.pixmapitem.setPixmap(self.bufferpixmap)
 
-    def _recurseControlPts(self, widget):
+    def _recurseControlPts(self, widget, pts):
         """Recursively add to list of control points from widget and children."""
         for key, pos in widget.controlpts.iteritems():
-            self.controlpts.append( (pos, widget, key) )
+            pts.append( (pos, widget, key) )
 
         for c in widget.children:
-            self._recurseControlPts(c)
+            self._recurseControlPts(c, pts)
 
     def updateControlPts(self):
         """Update list of control points for objects in the document."""
 
+        # get new control points from graph
         del self.controlpts[:]
-        self._recurseControlPts(self.document.basewidget)
+        self._recurseControlPts(self.document.basewidget,
+                                self.controlpts)
+
+        # removes old control points from view
+        for c in self.controlitems.children():
+            self.scene.removeItem(c)
+
+        # adds new control points to view
+        pen = qt4.QPen(qt4.Qt.NoPen)
+        brush = qt4.QBrush(qt4.QColor(0, 0, 0, 127))
+        for pt in self.controlpts:
+            el = qt4.QGraphicsEllipseItem(pt[0][0]-5, pt[0][1]-5,
+                                          10, 10, self.controlitems)
+            el.setPen(pen)
+            el.setBrush(brush)
 
     def _constructContextMenu(self):
         """Construct the context menu."""
@@ -866,9 +889,11 @@ class PlotWindow( qt4.QScrollArea ):
         self.clickmode = modecnvt[action]
 
         if self.clickmode == 'select':
-            self.label.setCursor(qt4.Qt.ArrowCursor)
+            pass
+            #self.label.setCursor(qt4.Qt.ArrowCursor)
         elif self.clickmode == 'graphzoom':
-            self.label.setCursor(qt4.Qt.CrossCursor)
+            pass
+            #self.label.setCursor(qt4.Qt.CrossCursor)
         
     def getClick(self):
         """Return a click point from the graph."""
