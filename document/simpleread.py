@@ -243,9 +243,9 @@ class _DescriptorPart:
                 except KeyError:
                     dataset = thedatasets[fullname] = []
 
-                    if not self.datatype:
-                        # try to guess type of data
-                        self.datatype = guessDataType(val)
+                if not self.datatype:
+                    # try to guess type of data
+                    self.datatype = guessDataType(val)
 
                 # convert according to datatype
                 if self.datatype == 'float':
