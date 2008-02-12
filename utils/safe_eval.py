@@ -317,7 +317,10 @@ veusz_eval_context['os_path_dirname'] = os.path.dirname
 def checkCode(code):
     """Check code, returning errors (if any) or None if okay"""
     
-    ast = compiler.parse(code)
+    try:
+        ast = compiler.parse(code)
+    except SyntaxError, e:
+        return [e]
     checker = SafeEvalVisitor()
 
     if checker.walk(ast):
