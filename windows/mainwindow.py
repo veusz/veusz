@@ -880,7 +880,12 @@ class MainWindow(qt4.QMainWindow):
         dialog.setMinMax(1, self.document.getNumberPages())
         if dialog.exec_():
             # get page range
-            minval, maxval = dialog.minPage(), dialog.maxPage()
+            if dialog.printRange() == qt4.QAbstractPrintDialog.PageRange:
+                # page range
+                minval, maxval = dialog.fromPage(), dialog.toPage()
+            else:
+                # all pages
+                minval, maxval = 1, self.document.getNumberPages()
 
             # pages are relative to zero
             minval -= 1
