@@ -132,7 +132,7 @@ class Key(widget.Widget):
             x = parentposn[2] - height - totalwidth
         elif h == 'centre':
             x = ( parentposn[0] +
-                  (parentposn[2] - 0.5*parentposn[0]) - 0.5*totalwidth )
+                  0.5*(parentposn[2] - parentposn[0] - totalwidth) )
         elif h == 'manual':
             x = parentposn[0] + (parentposn[2]-parentposn[0])*s.horzManual
 
