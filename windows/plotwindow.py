@@ -149,86 +149,23 @@ class ClickPainter(document.Painter):
         else:
             return None
 
-class DisplayWidget(qt4.QLabel):
-    """A widget for displaying the plot, embedded in scrollable area."""
-    
+class ControlPointItem( qt4.QGraphicsEllipseItem ):
+    """A control point to move items around."""
+
     def __init__(self, *args):
-        qt4.QLabel.__init__(self, *args)
+        qt4.QGraphicsEllipseItem.__init__(self, *args)
+        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
 
-        # no zoom rectangle initially
-        self._zoomrect = None
+    def itemChange(self, change, value):
+        print change
+        return qt4.QGraphicsEllipseItem.itemChange(self, change, value)
+        if change == QtGui.QGraphicsItem.ItemPositionChange:
+            for edge in self.edgeList:
+                edge.adjust()
+            self.graph.itemMoved()
 
-        # show splash logo until timer runs out (3s)
-        self._showlogo = True
-        qt4.QTimer.singleShot(3000, self.slotSplashDisable)
+        return QtGui.QGraphicsItem.itemChange(self, change, value)
 
-        # show control points
-        #self._controlpts_show = False
-        self._controlpts = []
-
-    def slotSplashDisable(self):
-        """Disable drawing the splash logo."""
-        self._showlogo = False
-        self.update()
-
-    def paintEvent(self, event):
-        """Paint display widget."""
-
-        qt4.QLabel.paintEvent(self, event)
-
-        painter = qt4.QPainter(self)
-
-        if self._zoomrect:
-            # draw zoom rectangle if any shown
-            painter.setPen(qt4.QPen(qt4.QColor('black'), 0, qt4.Qt.DotLine))
-            painter.drawRect(*self._zoomrect)
-
-        if self._showlogo:
-            # show logo until timer runs out
-            logo = action.getPixmap('logo.png')
-            painter.drawPixmap(self.width()/2 - logo.width()/2,
-                               self.height()/2 - logo.height()/2,
-                               logo)
-
-        # draw control points
-        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-        painter.setBrush( qt4.QBrush(qt4.QColor(0, 0, 0, 127)) )
-        for pt in self._controlpts:
-            painter.drawEllipse( pt[0], pt[1], 10, 10 )
-
-    def drawRect(self, pt1, pt2):
-        """Draw a zoom rectangle from QPoint pt1 to pt2."""
-
-        if self._zoomrect:
-            self.hideRect()
-
-        minx = min(pt1.x(), pt2.x())
-        maxx = max(pt1.x(), pt2.x())
-        miny = min(pt1.y(), pt2.y())
-        maxy = max(pt1.y(), pt2.y())
-        w = maxx - minx
-        h = maxy - miny
-        self._zoomrect = (minx, miny, w, h)
-        self._repaintRect(self._zoomrect)
-
-    def _repaintRect(self, rect):
-        """Repaint rectangle region."""
-
-        minx, miny, w, h = rect
-        maxx = minx + w
-        maxy = miny + h
-        self.repaint(minx, miny, w, 1)
-        self.repaint(minx, maxy, w, 1)
-        self.repaint(maxx, miny, 1, h)
-        self.repaint(minx, miny, 1, h)
-
-    def hideRect(self):
-        """Hide any shown zoom rectangle."""
-
-        if self._zoomrect:
-            old = self._zoomrect
-            self._zoomrect = None
-            self._repaintRect(old)
 
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
@@ -248,6 +185,12 @@ class PlotWindow( qt4.QGraphicsView ):
         self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
         self.controlitems = self.scene.createItemGroup([])
         self.controlitems.setZValue(1.)
+
+        # zoom rectangle for zooming into graph (not shown normally)
+        self.zoomrect = self.scene.addRect( 0, 0, 100, 100,
+                                            qt4.QPen(qt4.Qt.DotLine) )
+        self.zoomrect.setZValue(2.)
+        self.zoomrect.hide()
 
         # set up so if document is modified we are notified
         self.document = document
@@ -404,8 +347,8 @@ class PlotWindow( qt4.QGraphicsView ):
             return
 
         # get points corresponding to corners of rectangle
-        pt1 = qt4.QPoint(self.grabpos)
-        pt2 = qt4.QPoint(endpos)
+        pt1 = self.grabpos
+        pt2 = endpos
 
         # work out whether it's worthwhile to zoom: only zoom if there
         # are >=5 pixels movement
@@ -481,6 +424,8 @@ class PlotWindow( qt4.QGraphicsView ):
     def mousePressEvent(self, event):
         """Allow user to drag window around."""
 
+        qt4.QGraphicsView.mousePressEvent(self, event)
+
         if event.button() == qt4.Qt.LeftButton:
 
             # need to copy position, otherwise it gets reused!
@@ -499,7 +444,10 @@ class PlotWindow( qt4.QGraphicsView ):
                     qt4.QCursor(qt4.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
-                pass
+                self.zoomrect.setRect(self.grabpos.x(), self.grabpos.y(),
+                                      0, 0)
+                self.zoomrect.show()
+
                 #self.label.drawRect(self.grabpos, self.grabpos)
 
             # record what mode we were clicked in
@@ -508,6 +456,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def mouseMoveEvent(self, event):
         """Scroll window by how much the mouse has moved since last time."""
 
+        qt4.QGraphicsView.mouseMoveEvent(self, event)
         if self.currentclickmode == 'scroll':
             event.accept()
 
@@ -525,9 +474,10 @@ class PlotWindow( qt4.QGraphicsView ):
             self.winpos = qt4.QPoint(event.pos())
 
         elif self.currentclickmode == 'graphzoom' and self.grabpos is not None:
-            # get rid of current rectangle
             pos = self.mapToScene(event.pos())
-            #self.label.drawRect(self.grabpos, pos)
+            r = self.zoomrect.rect()
+            self.zoomrect.setRect( r.x(), r.y(), pos.x()-r.x(),
+                                   pos.y()-r.y() )
 
         elif self.clickmode == 'select':
             # find axes which map to this position
@@ -554,8 +504,7 @@ class PlotWindow( qt4.QGraphicsView ):
             # check whether mouse cursor is close to any control points
             nearcurs = qt4.QGraphicsEllipseItem(px-50, py-50, 100, 100)
             for c in self.controlitems.children():
-                vis = c.collidesWithItem(nearcurs)
-                if vis:
+                if c.collidesWithItem(nearcurs):
                     c.show()
                 else:
                     c.hide()
@@ -564,6 +513,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
 
+        qt4.QGraphicsView.mouseReleaseEvent(self, event)
         if event.button() == qt4.Qt.LeftButton:
             event.accept()
             self.scrolltimer.stop()
@@ -577,7 +527,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.currentclickmode = None
                 qt4.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
-                #self.label.hideRect()
+                self.zoomrect.hide()
                 self.doZoomRect(self.mapToScene(event.pos()))
                 self.grabpos = None
             elif self.currentclickmode == 'viewgetclick':
@@ -721,10 +671,11 @@ class PlotWindow( qt4.QGraphicsView ):
         pen = qt4.QPen(qt4.Qt.NoPen)
         brush = qt4.QBrush(qt4.QColor(0, 0, 0, 127))
         for pt in self.controlpts:
-            el = qt4.QGraphicsEllipseItem(pt[0][0]-5, pt[0][1]-5,
-                                          10, 10, self.controlitems)
+            el = ControlPointItem(pt[0][0]-5, pt[0][1]-5,
+                                  10, 10, self.controlitems)
             el.setPen(pen)
             el.setBrush(brush)
+            el.hide()
 
     def _constructContextMenu(self):
         """Construct the context menu."""
