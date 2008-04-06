@@ -408,5 +408,14 @@ class Widget(object):
             self.document.setModified(True)
             return True
 
+    def updateControlPoint(self, name, pos, bounds):
+        """Update the widget's control point.
+        
+        name is name of control point
+        pos is new position in pixels
+        bounds was the bounds used to draw the widget."""
+
+        pass
+
 # allow the factory to instantiate a generic widget
 document.thefactory.register( Widget )

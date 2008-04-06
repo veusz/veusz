@@ -46,11 +46,13 @@ class RecordingPainter(document.Painter):
         """Start painting on device."""
         document.Painter.__init__(self)
         self.widgetpositions = []
+        self.widgetpositionslookup = {}
         self.begin(device)
 
     def beginPaintingWidget(self, widget, bounds):
         """Record the widget and position."""
         self.widgetpositions.append( (widget, bounds) )
+        self.widgetpositionslookup[widget] = bounds
 
 class PointPainter(document.Painter):
     """A simple painter variant which works out the last widget
@@ -149,23 +151,41 @@ class ClickPainter(document.Painter):
         else:
             return None
 
-class ControlPointItem( qt4.QGraphicsEllipseItem ):
+class ControlPointItem( qt4.QGraphicsItem ):
     """A control point to move items around."""
 
-    def __init__(self, *args):
-        qt4.QGraphicsEllipseItem.__init__(self, *args)
+    def __init__(self, point, widget, key, bounds, parent=None):
+        qt4.QGraphicsItem.__init__(self, parent)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
+        self.setPos(point[0], point[1])
+        self.setZValue(1.)
+        self.hide()
+        self.widget = widget
+        self.key = key
+        self.bounds = bounds
 
-    def itemChange(self, change, value):
-        print change
-        return qt4.QGraphicsEllipseItem.itemChange(self, change, value)
-        if change == QtGui.QGraphicsItem.ItemPositionChange:
-            for edge in self.edgeList:
-                edge.adjust()
-            self.graph.itemMoved()
+    def paint(self, painter, option, widget):
+        painter.setPen(qt4.Qt.NoPen)
+        if option.state & qt4.QStyle.State_Sunken:
+            brush = qt4.Qt.red
+        else:
+            brush = qt4.Qt.darkGray
+        painter.setBrush(brush)
+        painter.drawEllipse(-8, -8, 16, 16)
 
-        return QtGui.QGraphicsItem.itemChange(self, change, value)
+    def boundingRect(self):
+        return qt4.QRectF(-8, -8, 16, 16)
 
+    def mousePressEvent(self, event):
+        self.update()
+        self.startpos = self.pos()
+        qt4.QGraphicsItem.mousePressEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        self.update()
+        if self.pos() != self.startpos:
+            self.widget.updateControlPoint(self.key, self.pos(), self.bounds)
+        qt4.QGraphicsItem.mouseReleaseEvent(self, event)
 
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
@@ -183,8 +203,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # this graphics scene item is the actual graph
         self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
-        self.controlitems = self.scene.createItemGroup([])
-        self.controlitems.setZValue(1.)
+        self.controlitems = []
 
         # zoom rectangle for zooming into graph (not shown normally)
         self.zoomrect = self.scene.addRect( 0, 0, 100, 100,
@@ -202,10 +221,6 @@ class PlotWindow( qt4.QGraphicsView ):
         self.pagenumber = 0
         self.forceupdate = False
 
-        self.controlpts = []
-        self.nearbycontrolpts = []
-        self.controlgraphitems = []
-
         # work out dpi
         self.widgetdpi = self.logicalDpiY()
 
@@ -218,6 +233,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # list of widgets and positions last painted
         self.widgetpositions = []
+        self.widgetpositionslookup = {}
 
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
@@ -411,7 +427,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
 
         # finally change the axes
-        self.document.applyOperation( document.OperationMultiple(operations, descr='zoom axes') )
+        self.document.applyOperation(
+            document.OperationMultiple(operations,descr='zoom axes') )
                     
     def slotBecomeScrollClick(self):
         """If the click is still down when this timer is reached then
@@ -426,7 +443,11 @@ class PlotWindow( qt4.QGraphicsView ):
 
         qt4.QGraphicsView.mousePressEvent(self, event)
 
-        if event.button() == qt4.Qt.LeftButton:
+        # work out whether user is clicking on a control point
+        self.ignoreclick = isinstance(self.itemAt(event.pos()),
+                                      ControlPointItem)
+
+        if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
 
             # need to copy position, otherwise it gets reused!
             self.winpos = qt4.QPoint(event.pos())
@@ -457,6 +478,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Scroll window by how much the mouse has moved since last time."""
 
         qt4.QGraphicsView.mouseMoveEvent(self, event)
+
         if self.currentclickmode == 'scroll':
             event.accept()
 
@@ -503,7 +525,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
             # check whether mouse cursor is close to any control points
             nearcurs = qt4.QGraphicsEllipseItem(px-50, py-50, 100, 100)
-            for c in self.controlitems.children():
+            for c in self.controlitems:
                 if c.collidesWithItem(nearcurs):
                     c.show()
                 else:
@@ -514,7 +536,7 @@ class PlotWindow( qt4.QGraphicsView ):
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
 
         qt4.QGraphicsView.mouseReleaseEvent(self, event)
-        if event.button() == qt4.Qt.LeftButton:
+        if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
             event.accept()
             self.scrolltimer.stop()
             if self.currentclickmode == 'select':
@@ -532,8 +554,6 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.grabpos = None
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
-        else:
-            qt4.QLabel.contentsMouseReleaseEvent(self, event)
 
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
@@ -573,7 +593,6 @@ class PlotWindow( qt4.QGraphicsView ):
             self.bufferpixmap = qt4.QPixmap( *self.size )
             self.forceupdate = True
             self.setSceneRect( 0, 0, size[0], size[1] )
-            #self.label.resize(*size)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -624,7 +643,8 @@ class PlotWindow( qt4.QGraphicsView ):
                                            dpi = self.widgetdpi )
                     painter.end()
                     self.widgetpositions = painter.widgetpositions
-                    
+                    self.widgetpositionslookup = painter.widgetpositionslookup
+
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
@@ -647,35 +667,31 @@ class PlotWindow( qt4.QGraphicsView ):
 
             self.pixmapitem.setPixmap(self.bufferpixmap)
 
-    def _recurseControlPts(self, widget, pts):
+    def _recurseControlItems(self, widget, items):
         """Recursively add to list of control points from widget and children."""
         for key, pos in widget.controlpts.iteritems():
-            pts.append( (pos, widget, key) )
+            items.append( ControlPointItem(pos, widget, key,
+                                           self.widgetpositionslookup[widget]) )
 
         for c in widget.children:
-            self._recurseControlPts(c, pts)
+            self._recurseControlItems(c, items)
 
     def updateControlPts(self):
         """Update list of control points for objects in the document."""
 
-        # get new control points from graph
-        del self.controlpts[:]
-        self._recurseControlPts(self.document.basewidget,
-                                self.controlpts)
-
         # removes old control points from view
-        for c in self.controlitems.children():
+        for c in self.controlitems:
             self.scene.removeItem(c)
+        del self.controlitems[:]
+
+        # get new control points from graph
+        self._recurseControlItems(self.document.basewidget,
+                                  self.controlitems)
+
 
         # adds new control points to view
-        pen = qt4.QPen(qt4.Qt.NoPen)
-        brush = qt4.QBrush(qt4.QColor(0, 0, 0, 127))
-        for pt in self.controlpts:
-            el = ControlPointItem(pt[0][0]-5, pt[0][1]-5,
-                                  10, 10, self.controlitems)
-            el.setPen(pen)
-            el.setBrush(brush)
-            el.hide()
+        for el in self.controlitems:
+            self.scene.addItem(el)
 
     def _constructContextMenu(self):
         """Construct the context menu."""

@@ -983,20 +983,46 @@ class TextLabel(GenericPlotter):
         font = s.get('Text').makeQFont(painter)
 
         self.controlpts.clear()
-        isdataset = ( not s.get('xPos').isDataset(d) and 
-                      not s.get('yPos').isDataset(d) )
+        isnotdataset = ( not s.get('xPos').isDataset(d) and 
+                         not s.get('yPos').isDataset(d) )
 
-        index = 0
         for i, (x, y, t) in enumerate(itertools.izip(xp, yp, itertools.cycle(text))):
             utils.Renderer( painter, font, x, y, t,
                             TextLabel.cnvtalignhorz[s.alignHorz],
                             TextLabel.cnvtalignvert[s.alignVert],
                             s.angle ).render()
-            if isdataset:
+            if isnotdataset:
                 self.controlpts[i] = (x, y)
 
         painter.restore()
         painter.endPaintingWidget()
+
+    def updateControlPoint(self, name, pos, bounds):
+        """Update position of point given new name and vals."""
+
+        s = self.settings
+        pointsX = s.xPos
+        pointsY = s.yPos
+
+        if s.positioning == 'axes':
+            # positions in axes coordinates
+            axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            if not (None in axes):
+                pointsX[name] = axes[0].plotterToGraphCoords(bounds,
+                                                             N.array(pos.x()))
+                pointsY[name] = axes[1].plotterToGraphCoords(bounds,
+                                                             N.array(pos.y()))
+        else:
+            # positions in graph relative coordinates
+            pointsX[name] = (pos.x() - bounds[0]) / (bounds[2]-bounds[0])
+            pointsY[name] = (pos.y() - bounds[3]) / (bounds[1]-bounds[3])
+
+        operations = (
+            document.OperationSettingSet(s.get('xPos'), pointsX),
+            document.OperationSettingSet(s.get('yPos'), pointsY)
+            )
+        self.document.applyOperation(
+            document.OperationMultiple(operations, descr='move label') )
 
 # allow the factory to instantiate a text label
 document.thefactory.register( TextLabel )
