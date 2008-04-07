@@ -31,6 +31,7 @@ import operations
 import readcsv
 
 import veusz.utils as utils
+import veusz.setting as setting
 
 def _convertNumpy(a):
     """Convert to a numpy double if possible."""
@@ -769,7 +770,8 @@ class DatasetExpression(Dataset):
 
                 # check expression for nasties if it has changed
                 if self.cachedexpr.get(part) != expr:
-                    if utils.checkCode(expr) is not None:
+                    if ((not setting.transient_settings['unsafe_mode']) and
+                        (utils.checkCode(expr) is not None)):
                         raise DatasetExpressionException("Unsafe expression '%s' in %s part of dataset" % (self.expr[part], part))
                     self.cachedexpr[part] = expr
 
