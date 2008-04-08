@@ -307,11 +307,15 @@ class Document( qt4.QObject ):
         if dpi is not None:
             painter.veusz_pixperpt = dpi / 72.
         width, height = self.basewidget.getSize(painter)
-        self.basewidget.children[page].draw( (0, 0, width, height), painter)
+        self.getPage(page).draw( (0, 0, width, height), painter)
 
     def getNumberPages(self):
         """Return the number of pages in the document."""
         return len(self.basewidget.children)
+
+    def getPage(self, pagenumber):
+        """Return widget for page."""
+        return self.basewidget.children[pagenumber]
 
     def _writeFileHeader(self, file, type):
         """Write a header to a saved file of type."""
@@ -423,7 +427,7 @@ class Document( qt4.QObject ):
         printer.newPage()
         painter = Painter(printer)
         width, height = self.basewidget.getSize(painter)
-        self.basewidget.children[page].draw( (0, 0, width, height), painter)
+        self.getPage(page).draw( (0, 0, width, height), painter)
         painter.end()
 
         # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
@@ -487,7 +491,7 @@ class Document( qt4.QObject ):
         rend.setFileName(filename)
         rend.setSize( qt4.QSize(int(width), int(height)) )
         painter = Painter(rend)
-        self.basewidget.children[page].draw( (0, 0, width, height), painter)
+        self.getPage(page).draw( (0, 0, width, height), painter)
         painter.end()
 
     def export(self, filename, pagenumber, color=True, dpi=100,
