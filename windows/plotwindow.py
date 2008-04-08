@@ -685,8 +685,9 @@ class PlotWindow( qt4.QGraphicsView ):
         del self.controlitems[:]
 
         # get new control points from graph
-        self._recurseControlItems(self.document.getPage(self.pagenumber),
-                                  self.controlitems)
+        if self.pagenumber < self.document.getNumberPages():
+            self._recurseControlItems(self.document.getPage(self.pagenumber),
+                                      self.controlitems)
 
 
         # adds new control points to view
