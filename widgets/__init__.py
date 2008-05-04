@@ -25,6 +25,9 @@ from axis import *
 from graph import *
 from containers import *
 from plotters import *
+from point import *
+from function import *
+from textlabel import *
 from page import *
 from root import *
 from key import *
@@ -32,4 +35,3 @@ from fit import *
 from image import *
 from contour import *
 from colorbar import *
-from textlabel import *

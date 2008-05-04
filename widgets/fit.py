@@ -30,10 +30,10 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import plotters
+from function import FunctionPlotter
 import widget
 
-class Fit(plotters.FunctionPlotter):
+class Fit(FunctionPlotter):
     """A plotter to fit a function to data."""
 
     typename='fit'
@@ -41,7 +41,7 @@ class Fit(plotters.FunctionPlotter):
     description='Fit a function to data'
 
     def __init__(self, parent, name=None):
-        plotters.FunctionPlotter.__init__(self, parent, name=name)
+        FunctionPlotter.__init__(self, parent, name=name)
 
         s = self.settings
         s.add( setting.FloatDict('values',
