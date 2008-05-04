@@ -270,11 +270,8 @@ class Document( qt4.QObject ):
                 antialias = False):
         """Print onto printing device."""
 
-        painter = Painter()
-        painter.veusz_scaling = scaling
-        if dpi is not None:
-            painter.veusz_pixperpt = dpi / 72.
-        
+        painter = Painter(scaling=scaling, dpi=dpi)
+       
         painter.begin( printer )
         painter.setRenderHint(qt4.QPainter.Antialiasing,
                               antialias)
@@ -553,10 +550,12 @@ class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is
     currently drawing."""
     
-    def __init__(self, *args):
+    def __init__(self, *args, **argsv):
         qt4.QPainter.__init__(self, *args)
 
-        self.veusz_scaling = 1.
+        self.veusz_scaling = argsv.get('scaling', 1.)
+        if 'dpi' in argsv:
+            self.veusz_pixperpt = argsv['dpi'] / 72.
 
     def beginPaintingWidget(self, widget, bounds):
         """Keep track of the widget currently being painted."""

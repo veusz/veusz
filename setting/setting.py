@@ -629,7 +629,7 @@ class Distance(Setting):
         '''
 
         # we set a scaling variable in the painter if it's not set
-        if 'veusz_scaling' not in painter.__dict__:
+        if not hasattr(painter, 'veusz_scaling'):
             painter.veusz_scaling = 1.
 
         # work out maximum size

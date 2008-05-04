@@ -163,6 +163,7 @@ class ControlPointItem( qt4.QGraphicsItem ):
         self.widget = widget
         self.key = key
         self.bounds = bounds
+        self.setCursor(qt4.Qt.CrossCursor)
 
     def paint(self, painter, option, widget):
         painter.setPen(qt4.Qt.NoPen)
@@ -581,9 +582,9 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # convert distances into pixels
         pix = qt4.QPixmap(1, 1)
-        painter = document.Painter(pix)
-        painter.veusz_scaling = self.zoomfactor
-        painter.veusz_pixperpt = self.widgetdpi / 72.
+        painter = document.Painter(pix,
+                                   scaling = self.zoomfactor,
+                                   dpi = self.widgetdpi)
         size = self.document.basewidget.getSize(painter)
         painter.end()
 

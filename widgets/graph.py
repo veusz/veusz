@@ -136,6 +136,14 @@ class Graph(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
+        # allow use to move bounds of graph
+        #self.controlpts = {
+        #    0: (bounds[0], bounds[1]),
+        #    1: (bounds[2], bounds[1]),
+        #    2: (bounds[0], bounds[3]),
+        #    3: (bounds[2], bounds[3])
+        #    }
+
         # do no painting if hidden
         if s.hide:
             return bounds
@@ -213,6 +221,13 @@ class Graph(widget.Widget):
                         outerbounds=ob )
 
         return bounds
+
+    def updateControlPoint(self, name, pos, bounds):
+        """Update position of point given new name and vals."""
+
+        s = self.settings
+
+
                             
 # allow users to make Graph objects
 document.thefactory.register( Graph )
