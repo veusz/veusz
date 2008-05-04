@@ -16,7 +16,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ###############################################################################
 
-# $Id: $
+# $Id$
 
 """For plotting one or more text labels on a graph."""
 
