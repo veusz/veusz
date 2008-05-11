@@ -136,14 +136,6 @@ class Graph(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
 
-        # allow use to move bounds of graph
-        #self.controlpts = {
-        #    0: (bounds[0], bounds[1]),
-        #    1: (bounds[2], bounds[1]),
-        #    2: (bounds[0], bounds[3]),
-        #    3: (bounds[2], bounds[3])
-        #    }
-
         # do no painting if hidden
         if s.hide:
             return bounds

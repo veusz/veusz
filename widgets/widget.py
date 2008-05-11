@@ -23,9 +23,40 @@
 
 import itertools
 
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting
+
+class ControlGraphMovableItem(qt4.QGraphicsRectItem):
+    """Item for user display for controlling widget."""
+
+    def __init__(self, widget, boxbounds):
+        qt4.QGraphicsRectItem.__init__(self, boxbounds[0], boxbounds[1],
+                                       boxbounds[2]-boxbounds[0],
+                                       boxbounds[3]-boxbounds[1])
+        self.widget = widget
+        self.boxbounds = boxbounds
+        self.setCursor(qt4.Qt.SizeAllCursor)
+        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
+        self.setZValue(1.)
+        self.setPen(qt4.QPen(qt4.Qt.DotLine))
+
+    def mousePressEvent(self, event):
+        self.update()
+        self.startpos = self.pos()
+        qt4.QGraphicsRectItem.mousePressEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        self.update()
+        if self.pos() != self.startpos:
+            self.widget.updateControlItem(self)
+        qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
+
+    def paint(self, painter, option, widget):
+        qt4.QGraphicsRectItem.paint(self, painter, option, widget)
+
+        painter.drawRect(-2, -2, 4, 4)
 
 class Action(object):
     """A class to wrap functions operating on widgets.
@@ -99,7 +130,7 @@ class Widget(object):
         self.actions = []
 
         # pts user can move around
-        self.controlpts = {}
+        self.controlgraphitems = []
 
     def isWidget(self):
         """Is this object a widget?"""
@@ -408,12 +439,10 @@ class Widget(object):
             self.document.setModified(True)
             return True
 
-    def updateControlPoint(self, name, pos, bounds):
+    def updateControlItem(self, controlitem, pos):
         """Update the widget's control point.
         
-        name is name of control point
-        pos is new position in pixels
-        bounds was the bounds used to draw the widget."""
+        controlitem is the control item in question."""
 
         pass
 

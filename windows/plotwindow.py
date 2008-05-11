@@ -35,6 +35,7 @@ import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.widgets as widgets
 import veusz.document as document
 import veusz.utils as utils
+import veusz.widgets as widgets
 
 import action
 
@@ -151,43 +152,6 @@ class ClickPainter(document.Painter):
         else:
             return None
 
-class ControlPointItem( qt4.QGraphicsItem ):
-    """A control point to move items around."""
-
-    def __init__(self, point, widget, key, bounds, parent=None):
-        qt4.QGraphicsItem.__init__(self, parent)
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.setPos(point[0], point[1])
-        self.setZValue(1.)
-        self.hide()
-        self.widget = widget
-        self.key = key
-        self.bounds = bounds
-        self.setCursor(qt4.Qt.CrossCursor)
-
-    def paint(self, painter, option, widget):
-        painter.setPen(qt4.Qt.NoPen)
-        if option.state & qt4.QStyle.State_Sunken:
-            brush = qt4.Qt.red
-        else:
-            brush = qt4.Qt.darkGray
-        painter.setBrush(brush)
-        painter.drawEllipse(-8, -8, 16, 16)
-
-    def boundingRect(self):
-        return qt4.QRectF(-8, -8, 16, 16)
-
-    def mousePressEvent(self, event):
-        self.update()
-        self.startpos = self.pos()
-        qt4.QGraphicsItem.mousePressEvent(self, event)
-
-    def mouseReleaseEvent(self, event):
-        self.update()
-        if self.pos() != self.startpos:
-            self.widget.updateControlPoint(self.key, self.pos(), self.bounds)
-        qt4.QGraphicsItem.mouseReleaseEvent(self, event)
-
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
@@ -205,6 +169,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # this graphics scene item is the actual graph
         self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
         self.controlitems = []
+        self.selwidget = None
 
         # zoom rectangle for zooming into graph (not shown normally)
         self.zoomrect = self.scene.addRect( 0, 0, 100, 100,
@@ -446,7 +411,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # work out whether user is clicking on a control point
         self.ignoreclick = isinstance(self.itemAt(event.pos()),
-                                      ControlPointItem)
+                                      widgets.ControlGraphMovableItem)
 
         if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
 
@@ -523,14 +488,6 @@ class PlotWindow( qt4.QGraphicsView ):
                     vals[widget.name] = coords[0]
 
             self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
-
-            # check whether mouse cursor is close to any control points
-            nearcurs = qt4.QGraphicsEllipseItem(px-50, py-50, 100, 100)
-            for c in self.controlitems:
-                if c.collidesWithItem(nearcurs):
-                    c.show()
-                else:
-                    c.hide()
 
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
@@ -646,6 +603,9 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.widgetpositions = painter.widgetpositions
                     self.widgetpositionslookup = painter.widgetpositionslookup
 
+                    # update selected widget items
+                    self.selectedWidget(self.selwidget)
+                    
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
@@ -664,36 +624,7 @@ class PlotWindow( qt4.QGraphicsView ):
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
-            self.updateControlPts()
-
             self.pixmapitem.setPixmap(self.bufferpixmap)
-
-    def _recurseControlItems(self, widget, items):
-        """Recursively add to list of control points from widget and children."""
-        for key, pos in widget.controlpts.iteritems():
-            items.append( ControlPointItem(pos, widget, key,
-                                           self.widgetpositionslookup[widget]) )
-
-        for c in widget.children:
-            self._recurseControlItems(c, items)
-
-    def updateControlPts(self):
-        """Update list of control points for objects in the document."""
-
-        # removes old control points from view
-        for c in self.controlitems:
-            self.scene.removeItem(c)
-        del self.controlitems[:]
-
-        # get new control points from graph
-        if self.pagenumber < self.document.getNumberPages():
-            self._recurseControlItems(self.document.getPage(self.pagenumber),
-                                      self.controlitems)
-
-
-        # adds new control points to view
-        for el in self.controlitems:
-            self.scene.addItem(el)
 
     def _constructContextMenu(self):
         """Construct the context menu."""
@@ -867,8 +798,6 @@ class PlotWindow( qt4.QGraphicsView ):
     def getClick(self):
         """Return a click point from the graph."""
 
-        # FIXME does not work for qt4 probably
-
         # wait for click from user
         qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.CrossCursor))
         oldmode = self.clickmode
@@ -927,3 +856,18 @@ class PlotWindow( qt4.QGraphicsView ):
 
         return axesretn
 
+    def selectedWidget(self, widget):
+        """Update control items on screen associated with widget."""
+
+        self.selwidget = widget
+
+        # remove old items from scene
+        for item in self.controlitems:
+            self.scene.removeItem(item)
+        del self.controlitems[:]
+        
+        # put in new items
+        if widget is not None:
+            for item in widget.controlgraphitems:
+                self.controlitems.append(item)
+                self.scene.addItem(item)

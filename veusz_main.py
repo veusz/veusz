@@ -103,7 +103,7 @@ def run():
 
 # if ran as a program
 if __name__ == '__main__':
-    #import profile
-    #profile.run('run()')
+    #import cProfile
+    #cProfile.run('run()', 'outprofile.dat')
     run()
 

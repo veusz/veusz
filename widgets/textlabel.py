@@ -22,12 +22,16 @@
 
 import itertools
 
+import numpy as N
+
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
 import plotters
 import graph
+import widget
 
 class TextLabel(plotters.GenericPlotter):
 
@@ -131,40 +135,49 @@ class TextLabel(plotters.GenericPlotter):
         painter.setPen(textpen)
         font = s.get('Text').makeQFont(painter)
 
-        self.controlpts.clear()
+        del self.controlgraphitems[:]
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
                          not s.get('yPos').isDataset(d) )
 
-        for i, (x, y, t) in enumerate(itertools.izip(xp, yp, itertools.cycle(text))):
-            utils.Renderer( painter, font, x, y, t,
-                            TextLabel.cnvtalignhorz[s.alignHorz],
-                            TextLabel.cnvtalignvert[s.alignVert],
-                            s.angle ).render()
+        for index, (x, y, t) in enumerate(itertools.izip(
+                xp, yp, itertools.cycle(text))):
+            tbounds = utils.Renderer( painter, font, x, y, t,
+                                      TextLabel.cnvtalignhorz[s.alignHorz],
+                                      TextLabel.cnvtalignvert[s.alignVert],
+                                      s.angle ).render()
             if isnotdataset:
-                self.controlpts[i] = (x, y)
+                cgi = widget.ControlGraphMovableItem(self, tbounds)
+                cgi.labelpt = (x, y)
+                cgi.widgetposn = posn
+                cgi.index = index
+                self.controlgraphitems.append(cgi)
 
         painter.restore()
         painter.endPaintingWidget()
 
-    def updateControlPoint(self, name, pos, bounds):
+    def updateControlItem(self, cgi):
         """Update position of point given new name and vals."""
 
         s = self.settings
         pointsX = s.xPos
         pointsY = s.yPos
+        bounds = cgi.widgetposn
+        ind = cgi.index
+
+        # convert movement of bounds into movement of label itself
+        x = cgi.labelpt[0] + cgi.pos().x()
+        y = cgi.labelpt[1] + cgi.pos().y()
 
         if s.positioning == 'axes':
             # positions in axes coordinates
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
             if not (None in axes):
-                pointsX[name] = axes[0].plotterToGraphCoords(bounds,
-                                                             N.array(pos.x()))
-                pointsY[name] = axes[1].plotterToGraphCoords(bounds,
-                                                             N.array(pos.y()))
+                pointsX[ind] = axes[0].plotterToGraphCoords(bounds, N.array(x))
+                pointsY[ind] = axes[1].plotterToGraphCoords(bounds, N.array(y))
         else:
             # positions in graph relative coordinates
-            pointsX[name] = (pos.x() - bounds[0]) / (bounds[2]-bounds[0])
-            pointsY[name] = (pos.y() - bounds[3]) / (bounds[1]-bounds[3])
+            pointsX[ind] = (x - bounds[0]) / (bounds[2]-bounds[0])
+            pointsY[ind] = (y - bounds[3]) / (bounds[1]-bounds[3])
 
         operations = (
             document.OperationSettingSet(s.get('xPos'), pointsX),
