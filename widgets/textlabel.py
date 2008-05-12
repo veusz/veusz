@@ -159,8 +159,8 @@ class TextLabel(plotters.GenericPlotter):
         """Update position of point given new name and vals."""
 
         s = self.settings
-        pointsX = s.xPos
-        pointsY = s.yPos
+        pointsX = list(s.xPos)   # make a copy here so original is not modifed
+        pointsY = list(s.yPos)
         bounds = cgi.widgetposn
         ind = cgi.index
 
