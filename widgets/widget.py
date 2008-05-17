@@ -28,35 +28,52 @@ import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting
 
-class ControlGraphMovableItem(qt4.QGraphicsRectItem):
-    """Item for user display for controlling widget."""
+class ControlGraphMovableItem(qt4.QGraphicsItem):
+    """Item for user display for controlling widget.
+    This is a dotted movable box with an optional "cross" where
+    the real position of the widget is
+    """
 
-    def __init__(self, widget, boxbounds):
-        qt4.QGraphicsRectItem.__init__(self, boxbounds[0], boxbounds[1],
-                                       boxbounds[2]-boxbounds[0],
-                                       boxbounds[3]-boxbounds[1])
+    def __init__(self, widget, boxbounds, crosspos=None):
+        qt4.QGraphicsItem.__init__(self)
         self.widget = widget
         self.boxbounds = boxbounds
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
         self.setZValue(1.)
-        self.setPen(qt4.QPen(qt4.Qt.DotLine))
+        self.crosspos = crosspos
 
     def mousePressEvent(self, event):
         self.update()
         self.startpos = self.pos()
-        qt4.QGraphicsRectItem.mousePressEvent(self, event)
+        qt4.QGraphicsItem.mousePressEvent(self, event)
 
     def mouseReleaseEvent(self, event):
+        """If widget has moved, tell it."""
         self.update()
         if self.pos() != self.startpos:
             self.widget.updateControlItem(self)
-        qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
+        qt4.QGraphicsItem.mouseReleaseEvent(self, event)
 
     def paint(self, painter, option, widget):
-        qt4.QGraphicsRectItem.paint(self, painter, option, widget)
+        """Draw box and 'cross'."""
+        if self.crosspos:
+            painter.setPen( qt4.Qt.NoPen )
+            painter.setBrush( qt4.Qt.black )
+            painter.drawRect(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
 
-        painter.drawRect(-2, -2, 4, 4)
+        painter.setPen( qt4.Qt.DotLine )
+        painter.setBrush( qt4.QBrush() )
+        bb = self.boxbounds
+        painter.drawRect(bb[0], bb[1], bb[2]-bb[0], bb[3]-bb[1])
+
+    def boundingRect(self):
+        """Work out bounding rectangle"""
+        bb = self.boxbounds
+        br = qt4.QRectF(bb[0]-1, bb[1]-1, bb[2]-bb[0]+2, bb[3]-bb[1]+2)
+        if self.crosspos:
+            br |= qt4.QRectF(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
+        return br
 
 class Action(object):
     """A class to wrap functions operating on widgets.

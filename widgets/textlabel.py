@@ -146,7 +146,8 @@ class TextLabel(plotters.GenericPlotter):
                                       TextLabel.cnvtalignvert[s.alignVert],
                                       s.angle ).render()
             if isnotdataset:
-                cgi = widget.ControlGraphMovableItem(self, tbounds)
+                cgi = widget.ControlGraphMovableItem(self, tbounds,
+                                                     crosspos = (x, y))
                 cgi.labelpt = (x, y)
                 cgi.widgetposn = posn
                 cgi.index = index
