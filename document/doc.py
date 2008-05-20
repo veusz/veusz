@@ -554,7 +554,7 @@ class Painter(qt4.QPainter):
         qt4.QPainter.__init__(self, *args)
 
         self.veusz_scaling = argsv.get('scaling', 1.)
-        if 'dpi' in argsv:
+        if 'dpi' in argsv and argsv['dpi'] is not None:
             self.veusz_pixperpt = argsv['dpi'] / 72.
 
     def beginPaintingWidget(self, widget, bounds):
