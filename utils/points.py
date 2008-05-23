@@ -36,8 +36,8 @@ def _plotDot(painter, xpos, ypos, size):
 
     # draw dot as circle with same radius as line thickness
     #  - much more sensible than actual dot routine
-    w = painter.pen().width() / 2
-    painter.drawEllipse( xpos-w, ypos-w, w*2+1, w*2+1)
+    w = painter.pen().width() * 0.5
+    painter.drawEllipse( qt4.QRectF(xpos-w, ypos-w, w*2, w*2) )
 
 def _plotCircle(painter, xpos, ypos, size):
     """ (internal) function to plot a circle marker
@@ -55,7 +55,7 @@ def _plotEllipseVert(painter, xpos, ypos, size):
 
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( qt4.QRectF(xpos - size*0.5, ypos - size,
-                                    size+1, size*2+1 ) )
+                                    size, size*2 ) )
 
 def _plotEllipseHorz(painter, xpos, ypos, size):
     """ (internal) function to plot a horizontal ellipse marker
@@ -73,9 +73,9 @@ def _plotCircleDot(painter, xpos, ypos, size):
 
     # qt uses a bounding rectangle, so we have to do this the hard way
     painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2+1, size*2+1) )
+                                    size*2, size*2) )
     w = painter.pen().width()*0.5
-    painter.drawEllipse( qt4.QRectF(xpos-w, ypos-w, w*2+1, w*2+1) )
+    painter.drawEllipse( qt4.QRectF(xpos-w, ypos-w, w*2, w*2) )
 
 def _plotBullseye(painter, xpos, ypos, size):
     """ (internal) function to plot a bullseye shape
@@ -83,9 +83,23 @@ def _plotBullseye(painter, xpos, ypos, size):
     """
 
     painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2+1, size*2+1) )
+                                    size*2, size*2) )
     painter.drawEllipse( qt4.QRectF(xpos - size*0.5, ypos - size*0.5,
-                                    size+1, size+1) )
+                                    size, size) )
+
+def _plotSquareRounded(painter, xpos, ypos, size):
+    """Plot a rounded square."""
+
+    painter.drawRoundRect( qt4.QRectF(xpos-size, ypos-size,
+                                      size*2, size*2),
+                           50, 50 )
+
+def _plotRing(painter, xpos, ypos, size):
+    path = qt4.QPainterPath()
+    path.addEllipse( qt4.QRectF(xpos-size, ypos-size, size*2, size*2) )
+    path.addEllipse( qt4.QRectF(xpos-0.5*size, ypos-0.5*size, size, size) )
+    path.closeSubpath()
+    painter.drawPath(path)
 
 # functions to call for special shapes
 _markerlookup = { 'none': _plotNone,
@@ -94,7 +108,9 @@ _markerlookup = { 'none': _plotNone,
                   'circledot': _plotCircleDot,
                   'bullseye': _plotBullseye,
                   'ellipsehorz': _plotEllipseHorz,
-                  'ellipsevert': _plotEllipseVert
+                  'ellipsevert': _plotEllipseVert,
+                  'squarerounded': _plotSquareRounded,
+                  'ring': _plotRing
                   }
 
 _linesymbols = {
@@ -197,9 +213,10 @@ MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'diamond', 'square', 'barhorz', 'barvert',
                 'octogon', 'pentagon', 'tievert', 'tiehorz',
                 'triangle', 'triangledown',
-                'dot', 'circledot', 'bullseye',
+                'dot', 'circledot', 'bullseye', 'ring',
                 'ellipsehorz', 'ellipsevert',
                 'lozengehorz', 'lozengevert',
+                'squarerounded',
                 'asterisk',
                 'lineplus', 'linecross',
                 'linevert', 'linehorz',
