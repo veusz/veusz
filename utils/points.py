@@ -121,7 +121,11 @@ _linesymbols = {
     'limitleft': ( ((1, -1), (0, 0), (1, 1)), ((2, 0), (0, 0)),
                    ((0, -1), (0, 1)) ),
     'limitright': ( ((-1, -1), (0, 0), (-1, 1)), ((-2, 0), (0, 0)),
-                    ((0, -1), (0, 1)) )
+                    ((0, -1), (0, 1)) ),
+    'limitupperaway': ( ((-1, -1), (0, -2), (1, -1)), ((0, 0), (0, -2)),
+                        ((-1, 0), (1, 0)) ),
+    'limitloweraway': ( ((-1, 1), (0, 2), (1, 1)), ((0, 0), (0, 2)),
+                        ((-1, 0), (1, 0)) ),
     }
 
 def _plotLineSymbols(painter, name, xpos, ypos, size):
@@ -199,7 +203,8 @@ MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
                 'arrowdown',
                 'arrowleftaway', 'arrowrightaway',
                 'arrowupaway', 'arrowdownaway',
-                'limitupper', 'limitlower', 'limitleft', 'limitright')
+                'limitupper', 'limitlower', 'limitleft', 'limitright',
+                'limitupperaway', 'limitloweraway' )
 
 def plotMarker(painter, xpos, ypos, markercode, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
