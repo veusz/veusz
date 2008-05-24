@@ -606,14 +606,16 @@ class Marker(Choice):
     def _generateIcons(cls):
         size = 16
         icons = []
-        c = qt4.QColor('darkgrey')
+        brush = qt4.QBrush( qt4.QColor('darkgrey') )
+        pen = qt4.QPen( qt4.QBrush(qt4.Qt.black), 1. )
         for marker in utils.MarkerCodes:
             pix = qt4.QPixmap(size, size)
             pix.fill()
             painter = qt4.QPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
-            painter.setBrush(c)
-            utils.plotMarker(painter, size/2, size/2, marker, int(size*0.33))
+            painter.setBrush(brush)
+            painter.setPen(pen)
+            utils.plotMarker(painter, size*0.5, size*0.5, marker, size*0.33)
             painter.end()
             icons.append( qt4.QIcon(pix) )
 

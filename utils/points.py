@@ -25,93 +25,21 @@ import itertools
 import veusz.qtall as qt4
 import numpy as N
 
-def _plotNone(painter, xpos, ypos, size):
-    """ (internal) function plot nothing!
-    """
-    pass
+"""This is the symbol plotting part of Veusz
 
-def _plotDot(painter, xpos, ypos, size):
-    """ (internal) function to plot a dot
-    """
+There are actually several different ways symbols are plotted.
+We choose the most appropriate one for the shape:
 
-    # draw dot as circle with same radius as line thickness
-    #  - much more sensible than actual dot routine
-    w = painter.pen().width() * 0.5
-    painter.drawEllipse( qt4.QRectF(xpos-w, ypos-w, w*2, w*2) )
+QPainterPath symbols plotted with _plotPathSymbols
+line symbols are plotted with _plotLineSymbols
+ploygon symbols are plotted wiht _plotPolygonSymbols
 
-def _plotCircle(painter, xpos, ypos, size):
-    """ (internal) function to plot a circle marker
-    size is the radius of the circle
-    """
+Many of these are implemented as paths internally, and drawn using
+QPainterPaths
+"""
 
-    # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2, size*2) )
-
-def _plotEllipseVert(painter, xpos, ypos, size):
-    """ (internal) function to plot a vertical ellipse marker
-    size is the radius of the ellipse on the long end
-    """
-
-    # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size*0.5, ypos - size,
-                                    size, size*2 ) )
-
-def _plotEllipseHorz(painter, xpos, ypos, size):
-    """ (internal) function to plot a horizontal ellipse marker
-    size is the radius of the ellipse on the lon end
-    """
-
-    # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size*0.5,
-                                    size*2+1, size+1) )
-
-def _plotCircleDot(painter, xpos, ypos, size):
-    """ (internal) function to plot a circle marker with dot at core
-    size is the radius of the circle
-    """
-
-    # qt uses a bounding rectangle, so we have to do this the hard way
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2, size*2) )
-    w = painter.pen().width()*0.5
-    painter.drawEllipse( qt4.QRectF(xpos-w, ypos-w, w*2, w*2) )
-
-def _plotBullseye(painter, xpos, ypos, size):
-    """ (internal) function to plot a bullseye shape
-    size is radius
-    """
-
-    painter.drawEllipse( qt4.QRectF(xpos - size, ypos - size,
-                                    size*2, size*2) )
-    painter.drawEllipse( qt4.QRectF(xpos - size*0.5, ypos - size*0.5,
-                                    size, size) )
-
-def _plotSquareRounded(painter, xpos, ypos, size):
-    """Plot a rounded square."""
-
-    painter.drawRoundRect( qt4.QRectF(xpos-size, ypos-size,
-                                      size*2, size*2),
-                           50, 50 )
-
-def _plotRing(painter, xpos, ypos, size):
-    path = qt4.QPainterPath()
-    path.addEllipse( qt4.QRectF(xpos-size, ypos-size, size*2, size*2) )
-    path.addEllipse( qt4.QRectF(xpos-0.5*size, ypos-0.5*size, size, size) )
-    path.closeSubpath()
-    painter.drawPath(path)
-
-# functions to call for special shapes
-_markerlookup = { 'none': _plotNone,
-                  'circle': _plotCircle,
-                  'dot': _plotDot,
-                  'circledot': _plotCircleDot,
-                  'bullseye': _plotBullseye,
-                  'ellipsehorz': _plotEllipseHorz,
-                  'ellipsevert': _plotEllipseVert,
-                  'squarerounded': _plotSquareRounded,
-                  'ring': _plotRing
-                  }
+#######################################################################
+## draw symbols which are sets of line segments
 
 _linesymbols = {
     'asterisk': ( ((-0.707, -0.707), (0.707,  0.707)),
@@ -159,24 +87,26 @@ def _plotLineSymbols(painter, name, xpos, ypos, size):
             pa.append(qt4.QPointF(x*size, y*size))
         ptarrays.append(pa)
 
-    lastx = 0.
-    lasty = 0.
+    painter.save()
     for x, y in itertools.izip(xpos, ypos):
+        painter.translate(x, y)
         for pa in ptarrays:
-            pa2 = qt4.QPolygonF(pa)
-            pa2.translate(x, y)
-            painter.drawPolyline(pa2)
-    
+            painter.drawPolyline(pa)
+        painter.resetTransform()
+    painter.restore()
+
+#######################################################################
+## draw symbols which are polygons
+
 # X and Y pts for corners of polygons
 _polygons = {
-    'square': ( (-1, -1), (1, -1), (1, 1), (-1, 1) ),
     # make the diamond the same area as the square
     'diamond': ( (0., 1.414), (1.414, 0.), (0., -1.414), (-1.414, 0.) ),
     'barhorz': ( (-1, -0.5), (1, -0.5), (1, 0.5), (-1, 0.5) ),
     'barvert': ( (-0.5, -1), (0.5, -1), (0.5, 1), (-0.5, 1) ),
-    'plus': ( (0.3, 1), (0.3, 0.3), (1, 0.3), (1, -0.3),
-              (0.3, -0.3), (0.3, -1), (-0.3, -1), (-0.3, -0.3),
-              (-1, -0.3), (-1, 0.3), (-0.3, 0.3), (-0.3, 1) ),
+    'plus': ( (0.4, 1), (0.4, 0.4), (1, 0.4), (1, -0.4),
+              (0.4, -0.4), (0.4, -1), (-0.4, -1), (-0.4, -0.4),
+              (-1, -0.4), (-1, 0.4), (-0.4, 0.4), (-0.4, 1) ),
     'octogon': ( (0.414, 1), (1, 0.414), (1, -0.414), (0.414, -1),
                  (-0.414, -1), (-1, -0.414), (-1, 0.414), (-0.414, 1) ),
     'triangle': ( (0, -1.2), (1.0392, 0.6), (-1.0392, 0.6) ),
@@ -197,59 +127,160 @@ _polygons = {
     'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) )
     }
 
-def _plotPolygons(painter, name, xpos, ypos, size):
+def _addPolyPath( path, vals ):
+    """Add a polygon with the list of x,y pts as tuples in vals."""
+    poly = qt4.QPolygonF()
+    for x, y in vals:
+        poly.append( qt4.QPointF(x, y) )
+    path.addPolygon(poly)
+    path.closeSubpath()
+
+def _plotPolygonSymbols(painter, name, xpos, ypos, size):
     '''Plots shapes which are polygons'''
 
-    pgn = qt4.QPolygonF()
-    for x, y in _polygons[name]:
-        pgn.append(qt4.QPointF(x*size, y*size))
+    path = qt4.QPainterPath()
+    _addPolyPath(path, N.array(_polygons[name])*size)
 
+    painter.save()
     for x, y in itertools.izip(xpos, ypos):
-        pgn2 = qt4.QPolygonF(pgn)
-        pgn2.translate(x, y)
-        painter.drawPolygon(pgn2)
+        painter.translate(x, y)
+        painter.drawPath(path)
+        painter.resetTransform()
+    painter.restore()
 
-MarkerCodes = ( 'none', 'cross', 'plus', 'star', 'circle',
-                'diamond', 'square', 'barhorz', 'barvert',
+#######################################################################
+## draw symbols using a QPainterPath
+
+def _squarePath(painter, path, size):
+    """Square path of size given."""
+    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+
+def _circlePath(painter, path, size):
+    """Circle path of size given."""
+    path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
+
+def _ellipseHorzPath(painter, path, size):
+    """Horizontal ellipse path."""
+    path.addEllipse( qt4.QRectF(-size, -size*0.5, size*2, size) )
+
+def _ellipseVertPath(painter, path, size):
+    """Vertical ellipse path."""
+    path.addEllipse( qt4.QRectF(-size*0.5, -size, size, size*2) )
+
+def _circleHolePath(painter, path, size):
+    """Circle with centre missing."""
+    _circlePath(painter, path, size)
+    _circlePath(painter, path, size*0.5)
+
+def _squareHolePath(painter, path, size):
+    """Square with centre missing."""
+    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addRect( qt4.QRectF(-size*0.5, -size*0.5, size, size) )
+
+def _diamondHolePath(painter, path, size):
+    """Diamond with centre missing."""
+    pts = N.array(_polygons['diamond'])*size
+    _addPolyPath(path, pts)
+    _addPolyPath(path, pts*0.5)
+
+def _pentagonHolePath(painter, path, size):
+    """Pentagon with centre missing."""
+    pts = N.array(_polygons['pentagon'])*size
+    _addPolyPath(path, pts)
+    _addPolyPath(path, pts*0.5)
+
+def _squareRoundedPath(painter, path, size):
+    """A square with rounded corners."""
+    path.addRoundRect( qt4.QRectF(-size, -size, size*2, size*2), 50, 50 )
+
+def _dotPath(painter, path, size):
+    """Draw a dot."""
+    w = painter.pen().widthF()
+    path.addEllipse( qt4.QRectF(-w*0.5, -w*0.5, w, w) )
+
+def _bullseyePath(painter, path, size):
+    """A filled circle inside a filled circle."""
+    path.setFillRule(qt4.Qt.WindingFill)
+    _circlePath(painter, path, size)
+    _circlePath(painter, path, size*0.5)
+
+def _circleDotPath(painter, path, size):
+    """A dot inside a circle."""
+    path.setFillRule(qt4.Qt.WindingFill)
+    _circlePath(painter, path, size)
+    _dotPath(painter, path, size)
+
+_pathsymbols = {
+    'square': _squarePath,
+    'circle': _circlePath,
+    'ellipsehorz': _ellipseHorzPath,
+    'ellipsevert': _ellipseVertPath,
+    'circlehole': _circleHolePath,
+    'squarehole': _squareHolePath,
+    'diamondhole': _diamondHolePath,
+    'pentagonhole': _pentagonHolePath,
+    'squarerounded': _squareRoundedPath,
+    'dot': _dotPath,
+    'bullseye': _bullseyePath,
+    'circledot': _circleDotPath,
+    }
+
+def _plotPathSymbols(painter, name, xpos, ypos, size):
+    """Draw symbols using a QPainterPath."""
+
+    path = qt4.QPainterPath()
+    _pathsymbols[name](painter, path, size)
+
+    painter.save()
+    for x, y in itertools.izip(xpos, ypos):
+        painter.translate(x, y)
+        painter.drawPath(path)
+        painter.resetTransform()
+    painter.restore()
+
+#######################################################################
+## external interfaces
+
+# list of codes
+MarkerCodes = ( 'none',
+                'circle', 'diamond', 'square',
+                'cross', 'plus', 'star',
+                'barhorz', 'barvert',
                 'octogon', 'pentagon', 'tievert', 'tiehorz',
                 'triangle', 'triangledown',
-                'dot', 'circledot', 'bullseye', 'ring',
+                'dot', 'circledot', 'bullseye',
+                'circlehole', 'squarehole', 'diamondhole', 'pentagonhole',
+                'squarerounded',
                 'ellipsehorz', 'ellipsevert',
                 'lozengehorz', 'lozengevert',
-                'squarerounded',
                 'asterisk',
                 'lineplus', 'linecross',
                 'linevert', 'linehorz',
-                'arrowleft', 'arrowright', 'arrowup',
-                'arrowdown',
+                'arrowleft', 'arrowright', 'arrowup', 'arrowdown',
                 'arrowleftaway', 'arrowrightaway',
                 'arrowupaway', 'arrowdownaway',
                 'limitupper', 'limitlower', 'limitleft', 'limitright',
                 'limitupperaway', 'limitloweraway',
-                'limitleftaway', 'limitrightaway' )
-
-def plotMarker(painter, xpos, ypos, markercode, markersize):
-    """Function to plot a marker on a painter, posn xpos, ypos, type and size
-    """
-    if markercode in _polygons:
-        _plotPolygons(painter, markercode, (xpos,), (ypos,), markersize)
-    elif markercode in _linesymbols:
-        _plotLineSymbols(painter, markercode, (xpos,), (ypos,), markersize)
-    else:
-        _markerlookup[markercode](painter, xpos, ypos, markersize)
+                'limitleftaway', 'limitrightaway',
+                )
 
 def plotMarkers(painter, xpos, ypos, markername, markersize):
     """Funtion to plot an array of markers on painter
     """
 
     if markername in _polygons:
-        _plotPolygons(painter, markername, xpos, ypos, markersize)
+        _plotPolygonSymbols(painter, markername, xpos, ypos, markersize)
     elif markername in _linesymbols:
         _plotLineSymbols(painter, markername, xpos, ypos, markersize)
+    elif markername in _pathsymbols:
+        _plotPathSymbols(painter, markername, xpos, ypos, markersize)
     elif markername == 'none':
-        # little optimization
-        return
+        pass
     else:
-        fn = _markerlookup[markername]
-        for x, y in itertools.izip(xpos, ypos):
-            fn(painter, x, y, markersize)
+        raise ValueError, "Invalid marker name %s" % markername
+
+def plotMarker(painter, xpos, ypos, markername, markersize):
+    """Function to plot a marker on a painter, posn xpos, ypos, type and size
+    """
+    plotMarkers(painter, (xpos,), (ypos,), markername, markersize)
+
