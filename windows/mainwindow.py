@@ -113,6 +113,7 @@ class MainWindow(qt4.QMainWindow):
         statusbar.addWidget(self.pagelabel)
         self.axisvalueslabel = qt4.QLabel(statusbar)
         statusbar.addWidget(self.axisvalueslabel)
+        self.axisvalueslabel.show()
 
         self.dirname = os.getcwd()
         self.exportDir = os.getcwd()
