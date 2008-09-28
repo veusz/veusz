@@ -39,6 +39,7 @@ class GenericPlotter(widget.Widget):
 
     typename='genericplotter'
     allowedparenttypes=[graph.Graph]
+    isplotter = True
 
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
@@ -58,7 +59,35 @@ class GenericPlotter(widget.Widget):
     def getAxesNames(self):
         """Returns names of axes used."""
         s = self.settings
-        return [s.xAxis, s.yAxis]
+        return (s.xAxis, s.yAxis)
+
+    def lookupAxis(self, axisname):
+        """Find widget associated with axisname."""
+        w = self.parent
+        while w:
+            for c in w.children:
+                if c.name == axisname and hasattr(c, 'isaxis'):
+                    return c
+            w = w.parent
+        return None
+
+    def providesAxesDependency(self):
+        """Returns information on the following axes.
+        format is ( ('x', 'sx'), ('y', 'sy') )
+        where key is the axis and value is a provided bound
+        """
+        return ()
+
+    def requiresAxesDependency(self):
+        """Requires information about the axis given before providing
+        information.
+        Format (('sx': 'x'), ('sy': 'y'))
+        """
+        return ()
+    
+    def updateAxisRange(self, depname, range):
+        """Update range variable for axis with dependency name given."""
+        pass
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line at (x,y) in a box width*height.

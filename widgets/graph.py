@@ -102,29 +102,6 @@ class Graph(widget.Widget):
         # return list of found widgets
         return [widgets[n] for n in names]
 
-    def getAxesNames(self):
-        """Return list of axes names used by children of this widget."""
-        
-        axes = []
-        for c in self.children:
-            try:
-                axes += c.getAxesNames()
-            except AttributeError:
-                pass
-        return axes
-
-    def autoAxis(self, axisname, bounds):
-        """If axis is used by children, update bounds."""
-
-        # skip if another axis overrides this one
-        for c in self.children:
-            if c.name == axisname:
-                return
-
-        # update bounds for each of the children
-        for c in self.children:
-            c.autoAxis(axisname, bounds)
-
     def draw(self, parentposn, painter, outerbounds = None):
         '''Update the margins before drawing.'''
 
@@ -214,13 +191,6 @@ class Graph(widget.Widget):
 
         return bounds
 
-    def updateControlPoint(self, name, pos, bounds):
-        """Update position of point given new name and vals."""
-
-        s = self.settings
-
-
-                            
 # allow users to make Graph objects
 document.thefactory.register( Graph )
 

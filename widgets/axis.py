@@ -41,6 +41,7 @@ class Axis(widget.Widget):
     allowedparenttypes = [graph.Graph, containers.Grid]
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
+    isaxis = True
 
     def __init__(self, parent, name=None):
         """Initialise axis."""
@@ -134,6 +135,9 @@ class Axis(widget.Widget):
         self.minorticks = None
         self.majorticks = None
 
+        # automatic range 
+        self.setAutoRange(None)
+
         # document updates change set variable when things need recalculating
         self.docchangeset = -1
 
@@ -144,43 +148,18 @@ class Axis(widget.Widget):
                                       ['',' (log)'][s.log])
     userdescription = property(_getUserDescription)
 
-    def _autoCheckChildRanges(self, parent, range):
-        """Check children of this parent to update autorange."""
+    def setAutoRange(self, autorange):
+        """Set the automatic range of this axis (called from page helper)."""
 
-        n = self.name
-        # ensures that we're the axis any other children refer to
-        for c in parent.children:
-            if c != self and c.name == n:
-                return
-
-        for c in parent.children:
-            c.autoAxis(n, range)
-            if len(c.children) is not None:
-                self._autoCheckChildRanges(c, range)
-
-    def _autoLookupRange(self):
-        """Automatically look up the plotable range
-        from widgets that use this axis."""
-
-        # iterate over siblings to get axis range
-        autorange = [1e99, -1e99]
-        origrange = list(autorange)
-
-        # find ranges
-        self._autoCheckChildRanges(self.parent, autorange)
-
-        # return a default range if nobody gives us one
-        if autorange != origrange:
-            # if it's a log axis, don't accept negative lower bounds
+        if autorange:
+            self.autorange = ar = list(autorange)
             if self.settings.log:
-                autorange[0] = max(1e-99, autorange[0])
-            
-            return autorange
+                ar[0] = max(1e-99, ar[0])
         else:
             if self.settings.log:
-                return [1e-2, 1.]
+                self.autorange = [1e-2, 1.]
             else:
-                return [0., 1.]
+                self.autorange = [0., 1.]
                 
     def _computePlottedRange(self):
         """Convert the range requested into a plotted range."""
@@ -207,13 +186,11 @@ class Axis(widget.Widget):
 
         # automatic lookup of minimum
         if (s.min == 'Auto' or s.max == 'Auto') and not matched:
-            autorange = self._autoLookupRange()
-
             if s.min == 'Auto':
-                self.plottedrange[0] = autorange[0]
+                self.plottedrange[0] = self.autorange[0]
 
             if s.max == 'Auto':
-                self.plottedrange[1] = autorange[1]
+                self.plottedrange[1] = self.autorange[1]
 
         # yuck, but sometimes it's true
         # tweak range to make sure things don't blow up further down the

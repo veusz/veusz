@@ -238,24 +238,19 @@ class PointPlotter(GenericPlotter):
                                                (xmx-xp)*2+1, (ymn-yp)*2+1),
                                     4320, 1440)
 
-    def _autoAxis(self, dataname, bounds):
-        """Determine range of data."""
+    def providesAxesDependency(self):
+        """This widget provides range information about these axes."""
+        s = self.settings
+        return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
+    def updateAxisRange(self, depname, axrange):
+        dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
         data = self.settings.get(dataname).getData(self.document)
         if data:
-            range = data.getRange()
-            if range:
-                bounds[0] = min( bounds[0], range[0] )
-                bounds[1] = max( bounds[1], range[1] )
-
-    def autoAxis(self, name, bounds):
-        """Automatically determine the ranges of variable on the axes."""
-
-        s = self.settings
-        if name == s.xAxis:
-            self._autoAxis( 'xData', bounds )
-        elif name == s.yAxis:
-            self._autoAxis( 'yData', bounds )
+            drange = data.getRange()
+            if drange:
+                axrange[0] = min(axrange[0], drange[0])
+                axrange[1] = max(axrange[1], drange[1])
 
     def _getLinePoints( self, xvals, yvals, posn, xdata, ydata ):
         """Get the points corresponding to the line connecting the points."""

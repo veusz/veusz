@@ -196,7 +196,12 @@ class Contour(plotters.GenericPlotter):
 
         return levels
 
-    def autoAxis(self, name, bounds):
+    def providesAxesDependency(self):
+        """Range information provided by widget."""
+        s = self.settings
+        return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
+
+    def updateAxisRange(self, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
         # this is copied from Image, probably should combine
@@ -212,14 +217,14 @@ class Contour(plotters.GenericPlotter):
         if data.dimensions != 2:
             return
 
-        if name == s.xAxis:
+        if depname == 'sx':
             dxrange = data.xrange
-            bounds[0] = min( bounds[0], dxrange[0] )
-            bounds[1] = max( bounds[1], dxrange[1] )
-        elif name == s.yAxis:
+            axrange[0] = min( axrange[0], dxrange[0] )
+            axrange[1] = max( axrange[1], dxrange[1] )
+        elif depname == 'sy':
             dyrange = data.yrange
-            bounds[0] = min( bounds[0], dyrange[0] )
-            bounds[1] = max( bounds[1], dyrange[1] )
+            axrange[0] = min( axrange[0], dyrange[0] )
+            axrange[1] = max( axrange[1], dyrange[1] )
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the contours."""

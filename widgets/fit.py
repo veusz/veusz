@@ -92,22 +92,25 @@ class Fit(FunctionPlotter):
                                       descr = 'Fit function',
                                       usertext = 'Fit function') )
 
-    def _autoAxis(self, dataname, bounds):
-        """Determine range of data."""
-        if self.document.hasData(dataname):
-            range = self.document.getData(dataname).getRange()
-            if range:
-                bounds[0] = min( bounds[0], range[0] )
-                bounds[1] = max( bounds[1], range[1] )
 
-    def autoAxis(self, name, bounds):
-        """Automatically determine the ranges of variable on the axes."""
 
+    def providesAxesDependency(self):
+        """This widget provides range information about these axes."""
         s = self.settings
-        if name == s.xAxis:
-            self._autoAxis( s.xData, bounds )
-        elif name == s.yAxis:
-            self._autoAxis( s.yData, bounds )
+        return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
+
+    def updateAxisRange(self, depname, axrange):
+        """Update range with range of data."""
+        if depname == 'sx':
+            dataname = self.settings.xData
+        else:
+            dataname = self.settings.yData
+
+        if self.document.hasData(dataname):
+            drange = self.document.getData(dataname).getRange()
+            if drange:
+                axrange[0] = min(axrange[0], drange[0])
+                axrange[1] = max(axrange[1], drange[1])
 
     def initEnviron(self):
         """Copy data into environment."""

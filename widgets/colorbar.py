@@ -95,20 +95,11 @@ class ColorBar(axis.Axis):
         if type(self) == ColorBar:
             self.readDefaults()
         
-        self._cachedrange = [None, None]
-
     def chooseName(self):
         """Get name of widget."""
 
         # override axis naming of x and y
         return widget.Widget.chooseName(self)
-
-    def _autoLookupRange(self):
-        """Get automatic minimum and maximum of axis."""
-
-        # this is pretty hacky -
-        # this variable is updated every draw
-        return self._cachedrange
 
     def draw(self, parentposn, painter, outerbounds = None):
         '''Update the margins before drawing.'''
@@ -186,7 +177,7 @@ class ColorBar(axis.Axis):
         # update image if necessary with new settings
         minval, maxval, axisscale, img = \
                 imgwidget.makeColorbarImage(s.direction)
-        self._cachedrange = [minval, maxval]
+        self.setAutoRange([minval, maxval])
 
         s.get('log').setSilent(axisscale == 'log')            
 

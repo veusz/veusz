@@ -89,6 +89,20 @@ class FunctionPlotter(GenericPlotter):
         return "%(variable)s = %(function)s" % self.settings
     userdescription = property(_getUserDescription)
 
+    def providesAxesDependency(self):
+        s = self.settings
+        if s.variable == 'x':
+            return ((s.yAxis, 'both'),)
+        else:
+            return ((s.xAxis, 'both'),)
+
+    def requiresAxesDependency(self):
+        s = self.settings
+        if s.variable == 'x':
+            return (('both', s.xAxis),)
+        else:
+            return (('both', s.yAxis),)
+
     def _plotLine(self, painter, xpts, ypts, bounds):
         """ Plot the points in xpts, ypts."""
         x1, y1, x2, y2 = bounds

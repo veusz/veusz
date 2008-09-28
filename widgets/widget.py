@@ -311,15 +311,6 @@ class Widget(object):
         return build
     path = property(_getPath)
 
-    def autoAxis(self, axisname, bounds):
-        """If the axis axisname is used by this widget,
-        update the bounds on that axis.
-        bounds is a 2 item list
-
-        Ignore if don't know how to use axis."""
-
-        pass
-
     def computeBounds(self, parentposn, painter, margins = (0., 0., 0., 0.)):
         """Compute a bounds array, giving the bounding box for the widget."""
 

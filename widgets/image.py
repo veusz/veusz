@@ -289,9 +289,15 @@ class Image(plotters.GenericPlotter):
                                         data.data,
                                         minval, maxval, s.transparency)
 
-    def autoAxis(self, name, bounds):
+    def providesAxesDependency(self):
+        """Range information provided by widget."""
+        s = self.settings
+        return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
+
+    def updateAxisRange(self, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
+        # this is copied from Image, probably should combine
         s = self.settings
         d = self.document
 
@@ -304,15 +310,14 @@ class Image(plotters.GenericPlotter):
         if data.dimensions != 2:
             return
 
-        xrange = data.xrange
-        yrange = data.yrange
-
-        if name == s.xAxis:
-            bounds[0] = min( bounds[0], xrange[0] )
-            bounds[1] = max( bounds[1], xrange[1] )
-        elif name == s.yAxis:
-            bounds[0] = min( bounds[0], yrange[0] )
-            bounds[1] = max( bounds[1], yrange[1] )
+        if depname == 'sx':
+            dxrange = data.xrange
+            axrange[0] = min( axrange[0], dxrange[0] )
+            axrange[1] = max( axrange[1], dxrange[1] )
+        elif depname == 'sy':
+            dyrange = data.yrange
+            axrange[0] = min( axrange[0], dyrange[0] )
+            axrange[1] = max( axrange[1], dyrange[1] )
 
     def cutImageToFit(self, pltx, plty, posn):
         x1, y1, x2, y2 = posn
