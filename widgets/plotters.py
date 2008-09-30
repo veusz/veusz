@@ -85,7 +85,7 @@ class GenericPlotter(widget.Widget):
         """
         return ()
     
-    def updateAxisRange(self, depname, range):
+    def updateAxisRange(self, axis, depname, range):
         """Update range variable for axis with dependency name given."""
         pass
 

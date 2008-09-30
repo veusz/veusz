@@ -103,6 +103,53 @@ class FunctionPlotter(GenericPlotter):
         else:
             return (('both', s.yAxis),)
 
+    def updateAxisRange(self, axis, depname, axrange):
+        """Adjust the range of the axis depending on the values plotted."""
+        s = self.settings
+
+        # ignore if function isn't sensible
+        if not self._checkCachedFunction():
+            return
+
+        # find axis to find variable range over
+        axis = self.lookupAxis( {'x': s.xAxis, 'y': s.yAxis}[s.variable] )
+        if not axis:
+            return
+
+        # get range of that axis
+        varaxrange = list(axis.getPlottedRange())
+        if varaxrange[0] == varaxrange[1]:
+            return
+
+        # trim to range
+        if s.min != 'Auto':
+            varaxrange[0] = max(s.min, varaxrange[0])
+        if s.max != 'Auto':
+            varaxrange[1] = min(s.max, varaxrange[1])
+
+        # work out function in steps
+        if axis.settings.log:
+            # log spaced steps 
+            l1, l2 = N.log(varaxrange[1]), N.log(varaxrange[0])
+            delta = (l2-l1)/20.
+            points = N.exp(N.arange(l1, l2+delta, delta))
+        else:
+            # linear spaced steps
+            delta = (varaxrange[1] - varaxrange[0])/20.
+            points = N.arange(varaxrange[0], varaxrange[1]+delta, delta)
+
+        env = self.initEnviron()
+        env[s.variable] = points
+        try:
+            vals = eval(self.cachedcomp, env)
+        except:
+            # something wrong in the evaluation
+            return
+
+        # update the automatic range
+        axrange[0] = min(N.nanmin(vals), axrange[0])
+        axrange[1] = max(N.nanmax(vals), axrange[1])
+
     def _plotLine(self, painter, xpts, ypts, bounds):
         """ Plot the points in xpts, ypts."""
         x1, y1, x2, y2 = bounds
@@ -194,15 +241,10 @@ class FunctionPlotter(GenericPlotter):
     def initEnviron(self):
         """Set up function environment."""
         return utils.veusz_eval_context.copy()
-            
-    def _calcFunctionPoints(self, axes, posn):
-        """Calculate the pixels to plot for the function
-        returns (pxpts, pypts)."""
-
+       
+    def _checkCachedFunction(self):
+        """check function doesn't contain dangerous code."""
         s = self.settings
-        x1, y1, x2, y2 = posn
-
-        # check function doesn't contain dangerous code
         fn = s.function.strip()
         if self.cachedfunc != fn or self.cachedvar != s.variable:
             checked = utils.checkCode(fn)
@@ -216,15 +258,26 @@ class FunctionPlotter(GenericPlotter):
                 self.cachedcomp = compile(fn, '<string>', 'eval')
             except:
                 # return nothing
-                return None, None
+                return False
+        return True
+     
+    def _calcFunctionPoints(self, axes, posn):
+        """Calculate the pixels to plot for the function
+        returns (pxpts, pypts)."""
+
+        s = self.settings
+        x1, y1, x2, y2 = posn
+
+        if not self._checkCachedFunction():
+            return
 
         env = self.initEnviron()
         if s.variable == 'x':
             # x function
-            if not(s.min == 'Auto') and s.min > axes[0].getPlottedRange()[0]:
+            if s.min != 'Auto' and s.min > axes[0].getPlottedRange()[0]:
                 x_min = N.array([s.min])
                 x1 = axes[0].graphToPlotterCoords(posn, x_min)[0]
-            if not(s.max == 'Auto') and s.max < axes[0].getPlottedRange()[1]:
+            if s.max != 'Auto' and s.max < axes[0].getPlottedRange()[1]:
                 x_max = N.array([s.max])
                 x2 = axes[0].graphToPlotterCoords(posn, x_max)[0]
                 

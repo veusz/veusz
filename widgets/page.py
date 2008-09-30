@@ -104,7 +104,7 @@ class _AxisDependHelper(object):
                 dwidget, dwidget_dep = dep
                 if hasattr(dwidget, 'isplotter'):
                     # update range of axis with (dwidget, dwidget_dep)
-                    dwidget.updateAxisRange(dwidget_dep,
+                    dwidget.updateAxisRange(widget, dwidget_dep,
                                             self.ranges[widget])
                 elif hasattr(dwidget, 'isaxis'):
                     # set actual range on axis, as axis no longer has a

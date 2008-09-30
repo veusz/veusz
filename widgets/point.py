@@ -243,7 +243,7 @@ class PointPlotter(GenericPlotter):
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
-    def updateAxisRange(self, depname, axrange):
+    def updateAxisRange(self, axis, depname, axrange):
         dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
         data = self.settings.get(dataname).getData(self.document)
         if data:

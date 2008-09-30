@@ -201,7 +201,7 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
-    def updateAxisRange(self, depname, axrange):
+    def updateAxisRange(self, axis, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
         # this is copied from Image, probably should combine

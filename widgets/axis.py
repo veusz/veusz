@@ -185,12 +185,11 @@ class Axis(widget.Widget):
                 matched = True
 
         # automatic lookup of minimum
-        if (s.min == 'Auto' or s.max == 'Auto') and not matched:
-            if s.min == 'Auto':
-                self.plottedrange[0] = self.autorange[0]
+        if s.min == 'Auto' and not matched:
+            self.plottedrange[0] = self.autorange[0]
 
-            if s.max == 'Auto':
-                self.plottedrange[1] = self.autorange[1]
+        if s.max == 'Auto' and not matched:
+            self.plottedrange[1] = self.autorange[1]
 
         # yuck, but sometimes it's true
         # tweak range to make sure things don't blow up further down the
