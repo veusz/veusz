@@ -1,10 +1,10 @@
-Veusz 1.0
+Veusz 1.1
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
 
-Veusz is Copyright (C) 2003-2007 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2008 Jeremy Sanders <jeremy@jeremysanders.net>
 Licenced under the GPL (version 2 or greater).
 
 Veusz is a scientific plotting package written in Python, using PyQt4
@@ -16,26 +16,15 @@ Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Feature changes from 0.99.0:
- * Import of Text datasets
- * Labels can be plotted next to X-Y points
- * Numbers can be directly plotted by entering into X-Y datasets as X and Y
- * More line styles
- * Loaded document and functions are checked for unsafe Python features
- * Contours can be labelled with numbers
- * 2D dataset creation to make 2D datasets from x, y, z 1D datasets
+Feature changes from 1.0:
+ * Axes autoscale when plotting functions
+ * Labels can be dragged around on plots
+ * More marker symbols
+ * SVG export of plots
 
-Bug and minor fixes from 0.99.0:
- * Zooming into X-Y images works now
- * Contour plots work on datasets with non equal X and Y sizes
- * Various fixes for datasets including NaN or Inf
- * Large changes to data import filter to support loading strings (and dates
-   later)
- * Reduce number of undo levels for memory/speed
- * Text renderer rewritten to be more simple
- * Improved error dialogs
- * Proper error dialog for invalid loading of documents
-
+ * The point plotting and axis range code has been rewritten.
+ * Includes quite a few minor bugfixes
+ 
 Features of package:
  * X-Y plots (with errorbars)
  * Line and function plots
@@ -72,7 +61,6 @@ For documentation on using Veusz, see the "Documents" directory. The
 manual is in pdf, html and text format (generated from docbook).
 
 Issues:
- * Reqires a rather new version of PyQt, otherwise dialogs don't work.
  * Can be very slow to plot large datasets if antialiasing is enabled.
    Right click on graph and disable antialias to speed up output.
  * The embedding interface appears to crash on exiting.
