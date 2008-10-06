@@ -67,7 +67,7 @@ class Edit(qt4.QLineEdit):
 
         qt4.QLineEdit.__init__(self, parent)
         self.setting = setting
-        self.bgcolor = self.palette().color(qt4.QPalette.Window)
+        self.bgcolor = self.palette().color(qt4.QPalette.Base)
         #self.bgcolor = self.paletteBackgroundColor()
 
         # set the text of the widget to the 
@@ -87,7 +87,7 @@ class Edit(qt4.QLineEdit):
         text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
-            self.palette().setColor(qt4.QPalette.Window, self.bgcolor)
+            self.palette().setColor(qt4.QPalette.Base, self.bgcolor)
 
             # value has changed
             if self.setting.val != val:
@@ -96,7 +96,7 @@ class Edit(qt4.QLineEdit):
                 #self.setting.val = val
 
         except setting.InvalidType:
-            self.palette().setColor(qt4.QPalette.Window, qt4.QColor('red'))
+            self.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
