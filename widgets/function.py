@@ -141,7 +141,7 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = points
         try:
-            vals = eval(self.cachedcomp, env)
+            vals = eval(self.cachedcomp, env) + points*0.
         except:
             # something wrong in the evaluation
             return
