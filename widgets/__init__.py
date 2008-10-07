@@ -35,3 +35,4 @@ from fit import *
 from image import *
 from contour import *
 from colorbar import *
+from shape import *

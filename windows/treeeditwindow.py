@@ -630,30 +630,52 @@ class TreeEditDock(qt4.QDockWidget):
 
         self.toolbar.setIconSize( qt4.QSize(16, 16) )
 
-        actions = []
         self.addslots = {}
-
-        # iterate over each type of widget
+        actions = {}
         for widgettype in ('page', 'grid', 'graph', 'axis',
                            'xy', 'fit', 'function',
                            'image', 'contour',
-                           'key', 'label', 'colorbar'):
+                           'key', 'label', 'colorbar',
+                           'rect', 'ellipse', 'roundrect'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
-            name = wc.typename
-            if wc.allowusercreation:
+            slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
+            self.addslots[wc] = slot
+            val = ( 'add%s' % widgettype, wc.description,
+                    'Add %s' % widgettype, 'insert',
+                    slot,
+                    'button_%s.png' % widgettype,
+                    True, '')
+            actions[widgettype] = val
 
-                slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
-                self.addslots[wc] = slot
+        # add non-shape widgets to toolbar and menu
+        self.addactions = action.populateMenuToolbars(
+            [actions[wt] for wt in
+             ('page', 'grid', 'graph', 'axis',
+              'xy', 'fit', 'function',
+              'image', 'contour',
+              'key', 'label', 'colorbar')],
+            self.toolbar, self.parent.menus)
 
-                val = ( 'add%s' % name, wc.description,
-                        'Add %s' % name, 'insert',
-                        slot,
-                        'button_%s.png' % name,
-                        True, '')
-                actions.append(val)
-        self.addactions = action.populateMenuToolbars(actions, self.toolbar,
-                                                      self.parent.menus)
+        # create shape toolbar button
+        shapetb = qt4.QToolButton(self.toolbar)
+        shapetb.setIcon( action.getIcon('veusz-shape.png') )
+        shapepop = qt4.QMenu(shapetb)
+        shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
+        self.toolbar.addWidget(shapetb)
+
+        # create menu item for shapes
+        shapemenu = qt4.QMenu('Add shape', self.parent.menus['insert'])
+        shapemenu.setIcon( action.getIcon('veusz-shape-menu.png') )
+        self.parent.menus['insert'].addMenu(shapemenu)
+
+        # add shape items to menu and toolbar button
+        shapeacts = action.populateMenuToolbars(
+            [actions[wt] for wt in
+             ('rect', 'roundrect', 'ellipse')],
+            shapetb, {'insert': shapemenu})
+        self.addactions.update(shapeacts)
+
         self.toolbar.addSeparator()
 
         # make buttons and menu items for the various item editing ops

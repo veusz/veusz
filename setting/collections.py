@@ -159,6 +159,15 @@ class PlotterFill(Brush):
 
         self.get('hide').newDefault(True)
 
+class ShapeFill(Brush):
+    '''Filling used for filling shapes.'''
+
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
+
+        self.get('hide').newDefault(True)
+        self.get('color').newDefault('white')
+
 class MajorTick(Line):
     '''Major tick settings.'''
 
