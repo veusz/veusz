@@ -659,7 +659,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         # create shape toolbar button
         shapetb = qt4.QToolButton(self.toolbar)
-        shapetb.setIcon( action.getIcon('veusz-shape.png') )
+        shapetb.setIcon( action.getIcon('veusz-shape-menu.png') )
         shapepop = qt4.QMenu(shapetb)
         shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
         self.toolbar.addWidget(shapetb)
