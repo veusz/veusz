@@ -936,7 +936,7 @@ class DatasetOrFloatList(Dataset):
 
     # a list of numbers separated by spaces or tabs
     # (requires number at end of line)
-    numbers_re = re.compile(r'^([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?[ \t,$]+)+$')
+    numbers_re = re.compile(r'^([-+]?[0-9]*\.?[0-9]*([eE][-+]?[0-9]+)?[ \t,$]+)+$')
 
     def convertTo(self, val):
         """Check is a string (dataset name) or a list of floats (numbers).
