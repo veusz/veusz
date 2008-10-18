@@ -117,7 +117,8 @@ class BoxShape(Shape):
         height = s.get('height').getFloatArray(d)
         rotate = s.get('rotate').getFloatArray(d)
 
-        if xpos is None or ypos is None or width is None or height is None:
+        if (xpos is None or ypos is None or width is None or height is None
+            or rotate is None):
             return
 
         self.lastposn = posn
