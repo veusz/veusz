@@ -32,6 +32,7 @@ import veusz.utils as utils
 import plotters
 import graph
 import widget
+import controlgraph
 
 class TextLabel(plotters.GenericPlotter):
 
@@ -146,8 +147,8 @@ class TextLabel(plotters.GenericPlotter):
                                       TextLabel.cnvtalignvert[s.alignVert],
                                       s.angle ).render()
             if isnotdataset:
-                cgi = widget.ControlGraphMovableItem(self, tbounds,
-                                                     crosspos = (x, y))
+                cgi = controlgraph.ControlGraphMovableItem(self, tbounds,
+                                                           crosspos = (x, y))
                 cgi.labelpt = (x, y)
                 cgi.widgetposn = posn
                 cgi.index = index

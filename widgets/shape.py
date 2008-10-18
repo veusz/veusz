@@ -21,6 +21,7 @@
 """For plotting shapes."""
 
 import itertools
+import numpy as N
 
 import veusz.qtall as qt4
 import veusz.setting as setting
@@ -29,6 +30,7 @@ import veusz.document as document
 import widget
 import page
 import graph
+import controlgraph
 
 class Shape(widget.Widget):
     """A shape on a page/graph."""
@@ -57,28 +59,35 @@ class BoxShape(Shape):
         s = self.settings
 
         s.add( setting.DatasetOrFloatList('xPos', 0.5,
-                                          descr='List of fractional X coordinates or dataset',
+                                          descr='List of fractional X '
+                                          'coordinates or dataset',
                                           usertext='X position',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('yPos', 0.5,
-                                          descr='List of fractional Y coordinates or dataset',
+                                          descr='List of fractional Y '
+                                          'coordinates or dataset',
                                           usertext='Y position',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('width', 0.1,
-                                          descr='List of fractional widths or dataset',
+                                          descr='List of fractional '
+                                          'widths or dataset',
                                           usertext='Width',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('height', 0.1,
-                                          descr='List of fractional heights or dataset',
+                                          descr='List of fractional '
+                                          'heights or dataset',
                                           usertext='Height',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('rotate', 0.,
-                                          descr='Rotation angle of shape heights or dataset',
-                                          usertext='Rotate', formatting=False) )
+                                          descr='Rotation angle of '
+                                          'shape heights or dataset',
+                                          usertext='Rotate',
+                                          formatting=False) )
 
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
-                              descr='Use axes or fractional position to place label',
+                              descr='Use axes or fractional '
+                              'position to place label',
                               usertext='Position mode',
                               formatting=False) )
         s.add( setting.Axis('xAxis', 'x', 'horizontal',
@@ -108,6 +117,8 @@ class BoxShape(Shape):
 
         if xpos is None or ypos is None or width is None or height is None:
             return
+
+        self.lastposn = posn
 
         # translate coordinates from axes or relative values
         if s.positioning == 'axes':
@@ -145,6 +156,7 @@ class BoxShape(Shape):
             painter.setBrush( qt4.QBrush() )
 
         # iterate over positions
+        index = 0
         dx, dy = posn[2]-posn[0], posn[3]-posn[1]
         for x, y, w, h, r in itertools.izip(xpos, ypos,
                                             itertools.cycle(width),
@@ -158,8 +170,64 @@ class BoxShape(Shape):
             self.drawShape(painter, qt4.QRectF(-wp*0.5, -hp*0.5, wp, hp))
             painter.restore()
 
+            if isnotdataset:
+                cgi = controlgraph.ControlGraphResizableItem(
+                    self, [x, y], [wp, hp], r, allowrotate=True)
+                cgi.index = index
+                index += 1
+                self.controlgraphitems.append(cgi)
+
         painter.restore()
         painter.endPaintingWidget()
+
+    def updateControlItem(self, cgi):
+        """If control item is moved or resized, this is called."""
+        s = self.settings
+        try:
+            cgiindex = self.controlgraphitems.index(cgi)
+        except ValueError:
+            return
+
+        # calculate new position coordinate for item
+        if s.positioning == 'axes':
+            if hasattr(self.parent, 'getAxes'):
+                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            else:
+                return
+            if None in axes:
+                return
+            
+            xpos = axes[0].plotterToGraphCoords(self.lastposn,
+                                                N.array(cgi.posn[0]))
+            ypos = axes[1].plotterToGraphCoords(self.lastposn,
+                                                N.array(cgi.posn[1]))
+        else:
+            xpos = ((cgi.posn[0] - self.lastposn[0]) /
+                    (self.lastposn[2]-self.lastposn[0]))
+            ypos = ((cgi.posn[1] - self.lastposn[3]) /
+                    (self.lastposn[1]-self.lastposn[3]))
+
+        xw = abs(cgi.dims[0] / (self.lastposn[2]-self.lastposn[0]))
+        yw = abs(cgi.dims[1] / (self.lastposn[1]-self.lastposn[3]))
+
+        # actually do the adjustment on the document
+        xp, yp = list(s.xPos), list(s.yPos)
+        w, h, r = list(s.width), list(s.height), list(s.rotate)
+        xp[cgiindex] = xpos
+        yp[cgiindex] = ypos
+        w[min(cgiindex, len(w)-1)] = xw
+        h[min(cgiindex, len(h)-1)] = yw
+        r[min(cgiindex, len(r)-1)] = cgi.angle
+
+        operations = (
+            document.OperationSettingSet(s.get('xPos'), xp),
+            document.OperationSettingSet(s.get('yPos'), yp),
+            document.OperationSettingSet(s.get('width'), w),
+            document.OperationSettingSet(s.get('height'), h),
+            document.OperationSettingSet(s.get('rotate'), r)
+            )
+        self.document.applyOperation(
+            document.OperationMultiple(operations, descr='adjust shape') )
 
 class Rectangle(BoxShape):
     """Draw a rectangle, or rounded rectangle."""
