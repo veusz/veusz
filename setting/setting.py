@@ -1333,3 +1333,8 @@ class FillSet(Setting):
                 b.setStyle(qt4.Qt.NoBrush)
             return b
     
+class Filename(Str):
+    """Represents a filename setting.
+
+    TODO: Add control to select files."""
+    pass

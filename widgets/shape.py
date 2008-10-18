@@ -21,11 +21,13 @@
 """For plotting shapes."""
 
 import itertools
+import os
 import numpy as N
 
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.document as document
+import veusz.utils as utils
 
 import widget
 import page
@@ -171,7 +173,7 @@ class BoxShape(Shape):
             painter.restore()
 
             if isnotdataset:
-                cgi = controlgraph.ControlGraphResizableItem(
+                cgi = controlgraph.ControlGraphResizableBox(
                     self, [x, y], [wp, hp], r, allowrotate=True)
                 cgi.index = index
                 index += 1
@@ -246,10 +248,9 @@ class Rectangle(BoxShape):
     def drawShape(self, painter, rect):
         s = self.settings
         if s.rounding == 0:
-            painter.drawRect( qt4.QRectF(rect) )
+            painter.drawRect(rect)
         else:
-            painter.drawRoundRect( qt4.QRectF(rect),
-                                   s.rounding, s.rounding )
+            painter.drawRoundRect(rect, s.rounding, s.rounding )
 
 class Ellipse(BoxShape):
     """Draw an ellipse."""
@@ -259,7 +260,84 @@ class Ellipse(BoxShape):
     allowusercreation = True
 
     def drawShape(self, painter, rect):
-        painter.drawEllipse( qt4.QRectF(rect) )
+        painter.drawEllipse(rect)
+
+class ImageFile(BoxShape):
+    """Draw an image."""
+
+    typename = 'imagefile'
+    description = 'Image file'
+    allowusercreation = True
+
+    def __init__(self, parent, name=None):
+        BoxShape.__init__(self, parent, name=name)
+        self.settings.add( setting.Filename('filename', '',
+                                            descr='Image filename',
+                                            usertext='Filename',
+                                            formatting=False),
+                           posn=0 )
+        self.settings.add( setting.Bool('aspect', True,
+                                        descr='Preserve aspect ratio',
+                                        usertext='Preserve aspect',
+                                        formatting=True),
+                           posn=0 )
+        self.settings.Border.get('hide').newDefault(True)
+
+        self.cachepixmap = None
+        self.cachefilename = None
+        self.cachestat = None
+
+    def updateCachedPixmap(self):
+        """Update cache."""
+        s = self.settings
+        self.cachestat = os.stat(s.filename)
+        self.cachepixmap = qt4.QPixmap(s.filename)
+        self.cachefilename = s.filename
+        return self.cachepixmap
+
+    def drawShape(self, painter, rect):
+        """Draw pixmap."""
+        s = self.settings
+
+        # draw border and fill
+        painter.drawRect(rect)
+
+        # cache pixmap
+        pixmap = None
+        if s.filename != '' and os.path.exists(s.filename):
+            if (self.cachefilename != s.filename or 
+                os.stat(s.filename) != self.cachestat):
+                self.updateCachedPixmap()
+            pixmap = self.cachepixmap
+
+        # if no pixmap, then use default image
+        if not pixmap:
+            pixmap = utils.getPixmap('button_imagefile.png')
+        
+        # pixmap rectangle
+        prect = qt4.QRectF(pixmap.rect())
+
+        # preserve aspect ratio
+        if s.aspect:
+            xr = rect.width() / prect.width()
+            yr = rect.height() / prect.height()
+
+            if xr > yr:
+                rect = qt4.QRectF(rect.left()+(rect.width()-
+                                               prect.width()*yr)*0.5,
+                                  rect.top(),
+                                  prect.width()*yr,
+                                  rect.height())
+            else:
+                rect = qt4.QRectF(rect.left(),
+                                  rect.top()+(rect.height()-
+                                              prect.height()*xr)*0.5,
+                                  rect.width(),
+                                  prect.height()*xr)
+
+        # finally draw pixmap
+        painter.drawPixmap(rect, pixmap, prect)
 
 document.thefactory.register( Ellipse )
 document.thefactory.register( Rectangle )
+document.thefactory.register( ImageFile )

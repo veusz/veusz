@@ -16,7 +16,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##############################################################################
 
-# $Id:$
+# $Id$
 
 """
 Classes for moving widgets around
@@ -49,8 +49,8 @@ class _ShapeCorner(qt4.QGraphicsRectItem):
         qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
         self.parentItem().doUpdate()
 
-class ControlGraphResizableItem(qt4.QGraphicsRectItem):
-    """Control a resizable item.
+class ControlGraphResizableBox(qt4.QGraphicsRectItem):
+    """Control a resizable box.
     Item resizes centred around a position
     """
 
@@ -144,7 +144,7 @@ class ControlGraphResizableItem(qt4.QGraphicsRectItem):
         """Tell the user the graphicsitem has been moved or resized."""
         self.widget.updateControlItem(self)
 
-class ControlGraphMovableItem(qt4.QGraphicsItem):
+class ControlGraphMovableBox(qt4.QGraphicsItem):
     """Item for user display for controlling widget.
     This is a dotted movable box with an optional "cross" where
     the real position of the widget is

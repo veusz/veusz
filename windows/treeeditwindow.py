@@ -30,8 +30,6 @@ import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
 
-import action
-
 class WidgetTreeModel(qt4.QAbstractItemModel):
     """A model representing the widget tree structure.
     """
@@ -77,8 +75,8 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             # return icon for first column
             if column == 0:
                 filename = 'button_%s.png' % obj.typename
-                if action.pixmapExists(filename):
-                    return qt4.QVariant(action.getIcon(filename))
+                if utils.pixmapExists(filename):
+                    return qt4.QVariant(utils.getIcon(filename))
 
         elif role == qt4.Qt.ToolTipRole:
             # provide tool tip showing description
@@ -394,7 +392,7 @@ class TabbedFormatting(qt4.QTabWidget):
 
             # add tab to widget
             if hasattr(subset, 'pixmap'):
-                icon = action.getIcon('settings_%s.png' % subset.pixmap)
+                icon = utils.getIcon('settings_%s.png' % subset.pixmap)
                 indx = self.addTab(tab, icon, '')
                 text = subset.usertext
                 if not subset.usertext:
@@ -636,7 +634,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'xy', 'fit', 'function',
                            'image', 'contour',
                            'key', 'label', 'colorbar',
-                           'rect', 'ellipse'):
+                           'rect', 'ellipse', 'imagefile'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
@@ -649,7 +647,7 @@ class TreeEditDock(qt4.QDockWidget):
             actions[widgettype] = val
 
         # add non-shape widgets to toolbar and menu
-        self.addactions = action.populateMenuToolbars(
+        self.addactions = utils.populateMenuToolbars(
             [actions[wt] for wt in
              ('page', 'grid', 'graph', 'axis',
               'xy', 'fit', 'function',
@@ -659,20 +657,20 @@ class TreeEditDock(qt4.QDockWidget):
 
         # create shape toolbar button
         shapetb = qt4.QToolButton(self.toolbar)
-        shapetb.setIcon( action.getIcon('veusz-shape-menu.png') )
+        shapetb.setIcon( utils.getIcon('veusz-shape-menu.png') )
         shapepop = qt4.QMenu(shapetb)
         shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
         self.toolbar.addWidget(shapetb)
 
         # create menu item for shapes
         shapemenu = qt4.QMenu('Add shape', self.parent.menus['insert'])
-        shapemenu.setIcon( action.getIcon('veusz-shape-menu.png') )
+        shapemenu.setIcon( utils.getIcon('veusz-shape-menu.png') )
         self.parent.menus['insert'].addMenu(shapemenu)
 
         # add shape items to menu and toolbar button
-        shapeacts = action.populateMenuToolbars(
+        shapeacts = utils.populateMenuToolbars(
             [actions[wt] for wt in
-             ('rect', 'ellipse')],
+             ('rect', 'ellipse', 'imagefile')],
             shapetb, {'insert': shapemenu})
         self.addactions.update(shapeacts)
 
@@ -701,8 +699,8 @@ class TreeEditDock(qt4.QDockWidget):
             ('rename', 'Renames the selected item', '&Rename', 'edit',
              self.slotWidgetRename, 'icon-rename.png', False, '')
             )
-        self.editactions = action.populateMenuToolbars(edititems, self.toolbar,
-                                                       self.parent.menus)
+        self.editactions = utils.populateMenuToolbars(edititems, self.toolbar,
+                                                      self.parent.menus)
 
     def slotMakeWidgetButton(self, wc):
         """User clicks button to make widget."""
@@ -989,7 +987,7 @@ class SettingLabel(qt4.QWidget):
                 pixmap = 'link.png'
             else:
                 pixmap = 'downarrow_blank.png'
-        self.iconlabel.setPixmap(action.getPixmap(pixmap))
+        self.iconlabel.setPixmap(utils.getPixmap(pixmap))
 
     def enterEvent(self, event):
         """Focus on mouse enter."""

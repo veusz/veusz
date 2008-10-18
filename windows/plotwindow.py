@@ -37,8 +37,6 @@ import veusz.document as document
 import veusz.utils as utils
 import veusz.widgets as widgets
 
-import action
-
 class RecordingPainter(document.Painter):
     """A painter to remember where the positions of the
     painted widgets."""
@@ -284,12 +282,12 @@ class PlotWindow( qt4.QGraphicsView ):
             menus = {}
             menus['view'] = menu
 
-        self.viewactions = action.populateMenuToolbars(items, self.viewtoolbar,
-                                                       menus)
+        self.viewactions = utils.populateMenuToolbars(items, self.viewtoolbar,
+                                                      menus)
 
         # a button for the zoom icon
         zoomtb = qt4.QToolButton(self.viewtoolbar)
-        zoomtb.setIcon( action.getIcon('zoom-options.png') )
+        zoomtb.setIcon( utils.getIcon('zoom-options.png') )
 
         # drop down zoom button on toolbar
         zoompop = qt4.QMenu(zoomtb)

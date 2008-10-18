@@ -33,7 +33,6 @@ import veusz.setting as setting
 import consolewindow
 import plotwindow
 import treeeditwindow
-import action
 
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
@@ -68,7 +67,7 @@ class MainWindow(qt4.QMainWindow):
     def __init__(self, *args):
         qt4.QMainWindow.__init__(self, *args)
 
-        self.setWindowIcon( action.getIcon('veusz.png') )
+        self.setWindowIcon( utils.getIcon('veusz.png') )
 
         self.document = document.Document()
 
@@ -324,8 +323,8 @@ class MainWindow(qt4.QMainWindow):
              'help', self.slotHelpAbout, '', False, '')
             )
             
-        self.actions = action.populateMenuToolbars(items, self.maintoolbar,
-                                                   self.menus)
+        self.actions = utils.populateMenuToolbars(items, self.maintoolbar,
+                                                  self.menus)
     def defineViewWindowMenu(self):
         """Setup View -> Window menu."""
 
@@ -757,8 +756,8 @@ class MainWindow(qt4.QMainWindow):
                                      '', False, ''))
 
             menu.setEnabled(True)
-            self.recentFileActions = action.populateMenuToolbars(newMenuItems,
-                                                                 self.maintoolbar,
+            self.recentFileActions = utils.populateMenuToolbars(newMenuItems,
+                                                                self.maintoolbar,
                                                                  self.menus)
         else:
             menu.setEnabled(False)

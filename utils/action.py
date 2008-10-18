@@ -1,7 +1,3 @@
-## action.py
-# A QAction-like object which can add buttons to things other than
-# QToolBars
-
 #    Copyright (C) 2005 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -23,11 +19,11 @@
 # $Id$
 
 import veusz.qtall as qt4
-import veusz.utils as utils
+import utilfuncs
 import os.path
 
 # where images are stored
-imagedir = os.path.join(utils.veuszDirectory, 'windows', 'icons')
+imagedir = os.path.join(utilfuncs.veuszDirectory, 'windows', 'icons')
 
 _pixmapcache = {}
 def getPixmap(pixmap):
