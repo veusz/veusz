@@ -286,3 +286,51 @@ def plotMarker(painter, xpos, ypos, markername, markersize):
     """
     plotMarkers(painter, (xpos,), (ypos,), markername, markersize)
 
+
+
+# translate arrow shapes to point types (we reuse them)
+arrow_translate = {
+    'none': 'none',
+    'arrow': 'triangleright',
+    'arrowreverse': 'triangleleft',
+    'circle': 'circle',
+    'square': 'square',
+    'diamond': 'diamond',
+    'linearrow': 'arrowright',
+    'linearrowreverse': 'arrowleft',
+    'bar': 'linevert'
+}
+
+# codes of allowable arrows
+ArrowCodes = ( 'none', 'arrow', 'arrowreverse',
+               'linearrow', 'linearrowreverse', 'bar',
+               'circle', 'square', 'diamond',
+               )
+
+def plotLineArrow(painter, xpos, ypos, length, angle,
+                  arrowsize=0,
+                  arrowleft='none', arrowright='none'):
+    """Plot a line or arrow.
+    
+    xpos, ypos is the starting point of the line
+    angle is the angle to the horizontal (degrees)
+    arrowleft and arrowright are arrow codes."""
+
+    painter.save()
+    painter.translate(xpos, ypos)
+    painter.rotate(angle)
+
+    # draw line between points
+    painter.drawLine( qt4.QPointF(0., 0.),
+                      qt4.QPointF(length, 0.) )
+
+    # plot marker at one end of line
+    plotMarker(painter, length, 0., 
+               arrow_translate[arrowright], arrowsize)
+
+    # plot reversed marker at other end
+    painter.scale(-1, 1)
+    plotMarker(painter, 0., 0., 
+               arrow_translate[arrowleft], arrowsize)
+
+    painter.restore()

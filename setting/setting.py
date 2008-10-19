@@ -1227,6 +1227,19 @@ class Marker(Choice):
     def makeControl(self, *args):
         return controls.Marker(self, *args)
     
+class Arrow(Choice):
+    """Choose an arrow type from one allowable."""
+
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, utils.ArrowCodes, value, **args)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+                              
+    def makeControl(self, *args):
+        return controls.Arrow(self, *args)
+
 class LineSet(Setting):
     """A setting which corresponds to a set of lines.
     """

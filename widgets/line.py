@@ -39,6 +39,13 @@ class Line(widget.Widget):
     typename='line'
     description='Line or arrow'
 
+    class ArrowFillBrush(setting.Brush):
+        def __init__(self, name, **args):
+            setting.Brush.__init__(self, name, **args)
+
+            self.get('color').newDefault( setting.Reference(
+                '../Line/color') )
+    
     def __init__(self, parent, name=None):
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
@@ -67,6 +74,10 @@ class Line(widget.Widget):
                             descr = 'Line style',
                             usertext = 'Line'),
                pixmap = 'plotline' )
+        s.add( Line.ArrowFillBrush('Fill',
+                                   descr = 'Arrow fill settings',
+                                   usertext = 'Arrow fill'),
+               pixmap = 'plotmarkerfill' )
 
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
@@ -80,6 +91,17 @@ class Line(widget.Widget):
         s.add( setting.Axis('yAxis', 'y', 'vertical',
                             descr = 'Name of Y-axis to use',
                             usertext='Y axis') )
+
+        s.add( setting.Distance('arrowSize', '5pt',
+                                descr = 'Size of arrow to plot',
+                                usertext='Arrow size', formatting=True), 0)
+        s.add( setting.Arrow('arrowright', 'none',
+                             descr = 'Arrow to plot on right side',
+                             usertext='Arrow right', formatting=True), 0)
+        s.add( setting.Arrow('arrowleft', 'none',
+                             descr = 'Arrow to plot on left side',
+                             usertext='Arrow left', formatting=True), 0)
+
 
     def draw(self, posn, painter, outerbounds = None):
         """Plot the key on a plotter."""
@@ -121,6 +143,8 @@ class Line(widget.Widget):
                          not s.get('angle').isDataset(d) )
         del self.controlgraphitems[:]
 
+        arrowsize = s.get('arrowSize').convert(painter)
+
         painter.beginPaintingWidget(self, posn)
         painter.save()
 
@@ -130,20 +154,25 @@ class Line(widget.Widget):
         else:
             painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
+        # settings for fill
+        if not s.Fill.hide:
+            painter.setBrush( s.get('Fill').makeQBrush() )
+        else:
+            painter.setBrush( qt4.QBrush() )
+
         # iterate over positions
         index = 0
         dx, dy = posn[2]-posn[0], posn[3]-posn[1]
         for x, y, l, a in itertools.izip(xpos, ypos,
                                          itertools.cycle(length),
                                          itertools.cycle(angle)):
-            painter.save()
-            painter.translate(x, y)
-            painter.rotate(a)
 
-            painter.drawLine( qt4.QPointF(0., 0.),
-                              qt4.QPointF(l*dx, 0.) )
-            painter.restore()
+            utils.plotLineArrow(painter, x, y, l*dx, a,
+                                arrowsize=arrowsize,
+                                arrowleft=s.arrowleft,
+                                arrowright=s.arrowright)
 
         painter.restore()
+        painter.endPaintingWidget()
 
 document.thefactory.register( Line )

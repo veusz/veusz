@@ -634,7 +634,8 @@ class TreeEditDock(qt4.QDockWidget):
                            'xy', 'fit', 'function',
                            'image', 'contour',
                            'key', 'label', 'colorbar',
-                           'rect', 'ellipse', 'imagefile'):
+                           'rect', 'ellipse', 'imagefile',
+                           'line'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
@@ -670,7 +671,7 @@ class TreeEditDock(qt4.QDockWidget):
         # add shape items to menu and toolbar button
         shapeacts = utils.populateMenuToolbars(
             [actions[wt] for wt in
-             ('rect', 'ellipse', 'imagefile')],
+             ('rect', 'ellipse', 'line', 'imagefile')],
             shapetb, {'insert': shapemenu})
         self.addactions.update(shapeacts)
 

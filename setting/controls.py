@@ -622,6 +622,41 @@ class Marker(Choice):
         cls._icons = icons
     _generateIcons = classmethod(_generateIcons)
 
+class Arrow(Choice):
+    """A control to let the user choose an arrowhead."""
+
+    _icons = None
+
+    def __init__(self, setting, parent):
+        if self._icons is None:
+            self._generateIcons()
+
+        Choice.__init__(self, setting, False,
+                        utils.ArrowCodes, parent,
+                        icons=self._icons)
+
+    def _generateIcons(cls):
+        size = 16
+        icons = []
+        brush = qt4.QBrush(qt4.Qt.black)
+        pen = qt4.QPen( qt4.QBrush(qt4.Qt.black), 1. )
+        for arrow in utils.ArrowCodes:
+            pix = qt4.QPixmap(size, size)
+            pix.fill()
+            painter = qt4.QPainter(pix)
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter.setBrush(brush)
+            painter.setPen(pen)
+            utils.plotLineArrow(painter, size*0.5, size*0.5,
+                                size*2, 0.,
+                                arrowsize=size*0.25,
+                                arrowleft=arrow, arrowright=arrow)
+            painter.end()
+            icons.append( qt4.QIcon(pix) )
+
+        cls._icons = icons
+    _generateIcons = classmethod(_generateIcons)
+
 class LineStyle(Choice):
     """For choosing between line styles."""
 
