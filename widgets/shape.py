@@ -22,6 +22,7 @@
 
 import itertools
 import os
+import math
 import numpy as N
 
 import veusz.qtall as qt4
@@ -63,26 +64,26 @@ class BoxShape(Shape):
         s.add( setting.DatasetOrFloatList('xPos', 0.5,
                                           descr='List of fractional X '
                                           'coordinates or dataset',
-                                          usertext='X position',
+                                          usertext='X positions',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('yPos', 0.5,
                                           descr='List of fractional Y '
                                           'coordinates or dataset',
-                                          usertext='Y position',
+                                          usertext='Y positions',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('width', 0.1,
                                           descr='List of fractional '
                                           'widths or dataset',
-                                          usertext='Width',
+                                          usertext='Widths',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('height', 0.1,
                                           descr='List of fractional '
                                           'heights or dataset',
-                                          usertext='Height',
+                                          usertext='Heights',
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('rotate', 0.,
-                                          descr='Rotation angle of '
-                                          'shape heights or dataset',
+                                          descr='Rotation angles of '
+                                          'shape or dataset',
                                           usertext='Rotate',
                                           formatting=False) )
 

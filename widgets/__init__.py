@@ -36,3 +36,4 @@ from image import *
 from contour import *
 from colorbar import *
 from shape import *
+from line import *
