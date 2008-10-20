@@ -435,36 +435,28 @@ class Document( qt4.QObject ):
             fout = open(tmpfile, 'wb')
             fin = open(filename, 'rb')
 
-            outcount = 0  # keep track of character index for pdf
-            for line in fin:
-                if line[:14] == '%%BoundingBox:' and ext == '.eps':
-                    # replace bounding box line by calculated one
-                    parts = line.split()
-                    widthfactor = float(parts[3]) / printer.width()
-                    line = "%s %i %i %i %i\n" % (
-                        parts[0], 0, int(float(parts[4])-widthfactor*height),
-                        int(widthfactor*width), int(float(parts[4])) )
-                elif ext == '.pdf':
-                    if line[:9] == '/MediaBox':
-                        # do similar thing for pdf
-                        parts = line.strip()[11:-1].split()
-                        widthfactor = float(parts[2]) / printer.width()
-                        line = "/MediaBox [%i %i %i %i]\n" % (
-                            0, int(float(parts[3])-widthfactor*height),
-                            int(widthfactor*width), int(float(parts[3])) )
-                    elif line[:6] == 'endobj':
-                        # need to know when endobj occurs for pdf for stream length
-                        lastobj = outcount + len(line)
-                    elif line[:9] == 'startxref':
-                        # write corrected pdf footer
-                        print >>fout, 'startxref'
-                        print >>fout, lastobj
-                        print >>fout, '%%EOF'
-                        break
+            if ext == '.eps':
+                # adjust bounding box
+                for line in fin:
+                    if line[:14] == '%%BoundingBox:' and ext == '.eps':
+                        # replace bounding box line by calculated one
+                        parts = line.split()
+                        widthfactor = float(parts[3]) / printer.width()
+                        line = "%s %i %i %i %i\n" % (
+                            parts[0], 0,
+                            int(float(parts[4])-widthfactor*height),
+                            int(widthfactor*width), int(float(parts[4])) )
+                    fout.write(line)
 
-                outcount += len(line)
-                fout.write(line)
-                
+            elif ext == '.pdf':
+                # change pdf bounding box and correct pdf index
+                text = fin.read()
+                text = utils.scalePDFMediaBox(text,
+                                              printer.width(),
+                                              width, height)
+                text = utils.fixupPDFIndices(text)
+                fout.write(text)
+
             fout.close()
             fin.close()
             os.remove(filename)

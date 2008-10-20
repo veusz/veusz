@@ -191,3 +191,15 @@ class ControlGraphMovableBox(qt4.QGraphicsItem):
             br |= qt4.QRectF(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
         return br
 
+class ControlGraphLine(qt4.QGraphicsLineItem):
+
+    def __init__(self, widget, x1, y1, x2, y2):
+        qt4.QGraphicsLineItem(self, x1, y1, x2, y2)
+        self.widget = widget
+        self.setCursor(qt4.Qt.SizeAllCursor)
+        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
+        self.setZValue(1.)
+        self.pts = [_ShapeCorner(self), _ShapeCorner(self)]
+        self.pos = [x1, y1, x2, y2]
+        self.pts[0].setPos(x1, y1)
+        self.pts[1].setPos(x2, y2)
