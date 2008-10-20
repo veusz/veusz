@@ -306,14 +306,14 @@ class ImageFile(BoxShape):
 
         # cache pixmap
         pixmap = None
-        if s.filename != '' and os.path.exists(s.filename):
+        if s.filename != '' and os.path.isfile(s.filename):
             if (self.cachefilename != s.filename or 
                 os.stat(s.filename) != self.cachestat):
                 self.updateCachedPixmap()
             pixmap = self.cachepixmap
 
         # if no pixmap, then use default image
-        if not pixmap:
+        if not pixmap or pixmap.width() == 0 or pixmap.height() == 0:
             pixmap = utils.getPixmap('button_imagefile.png')
         
         # pixmap rectangle
