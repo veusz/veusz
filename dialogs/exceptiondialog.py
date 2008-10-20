@@ -37,7 +37,7 @@ import veusz.utils as utils
 _reportformat='''
 Veusz version: %s
 Python version: %s
-Numarray version: %s
+Numpy version: %s
 Date: %s
 
 %s
