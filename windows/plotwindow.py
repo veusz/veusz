@@ -357,38 +357,42 @@ class PlotWindow( qt4.QGraphicsView ):
         # build up operation list to do zoom
         operations = []
         
+        axes = {}
         # iterate over children, to look for plotters
         for c in [i for i in widget.children if
                   isinstance(i, widgets.GenericPlotter)]:
 
             # get axes associated with plotter
-            axes = c.parent.getAxes( (c.settings.xAxis,
+            caxes = c.parent.getAxes( (c.settings.xAxis,
                                       c.settings.yAxis) )
 
-            # iterate over each, and update the ranges
-            for axis in [a for a in axes if a is not None]:
-                s = axis.settings
-                if s.direction == 'horizontal':
-                    p = xpts
-                else:
-                    p = ypts
+            for a in caxes:
+                if a:
+                    axes[a] = True
 
-                # convert points on plotter to axis coordinates
-                # FIXME: Need To Trap Conversion Errors!
-                r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+        # iterate over each axis, and update the ranges
+        for axis in axes.iterkeys():
+            s = axis.settings
+            if s.direction == 'horizontal':
+                p = xpts
+            else:
+                p = ypts
 
-                # invert if min and max are inverted
-                if r[1] < r[0]:
-                    r[1], r[0] = r[0], r[1]
+            # convert points on plotter to axis coordinates
+            # FIXME: Need To Trap Conversion Errors!
+            r = axis.plotterToGraphCoords(painter.bounds[axis], p)
 
-                # build up operations to change axis
-                if s.min != r[0]:
-                    operations.append( document.OperationSettingSet(s.get('min'),
-                                                                    float(r[0])) )
-                if s.max != r[1]:
-                    operations.append( document.OperationSettingSet(s.get('max'),
-                                                                    float(r[1])) )
+            # invert if min and max are inverted
+            if r[1] < r[0]:
+                r[1], r[0] = r[0], r[1]
 
+            # build up operations to change axis
+            if s.min != r[0]:
+                operations.append( document.OperationSettingSet(s.get('min'),
+                                                                float(r[0])) )
+            if s.max != r[1]:
+                operations.append( document.OperationSettingSet(s.get('max'),
+                                                                float(r[1])) )
 
         # finally change the axes
         self.document.applyOperation(
