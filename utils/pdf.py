@@ -56,20 +56,17 @@ def fixupPDFIndices(text):
         index = int(m.group(1))
         indices[index] = m.start(0)
 
-    # build up xref block
-    fmt = '%010i %05i n'
-    xref = ['xref', '0 %i' % (len(indices)+1), '0000000000 65535 f']
+    # build up xref block (note trailing spaces)
+    xref = ['xref', '0 %i' % (len(indices)+1), '0000000000 65535 f ']
     for i in xrange(len(indices)):
-        xref.append( fmt % (indices[i+1], 0) )
+        xref.append( '%010i %05i n ' % (indices[i+1], 0) )
     xref.append('trailer\n')
     xref = '\n'.join(xref)
 
     # replace current xref with this one
-    xref_re = re.compile('^xref\n.*trailer\n', re.DOTALL | re.MULTILINE)
-    text = xref_re.sub(xref, text)
-
-    # find the xref block start
-    xref_index = re.search('^xref\n', text, re.MULTILINE).start(0)
+    xref_match = re.search('^xref\n.*trailer\n', text, re.DOTALL | re.MULTILINE)
+    xref_index = xref_match.start(0)
+    text = text[:xref_index] + xref + text[xref_match.end(0):]
 
     # put the correct index to the xref after startxref
     startxref_re = re.compile('^startxref\n[0-9]+\n', re.DOTALL | re.MULTILINE)
