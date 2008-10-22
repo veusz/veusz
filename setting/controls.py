@@ -513,7 +513,7 @@ class DatasetOrString(qt4.QWidget):
         b = self.button = qt4.QPushButton('..')
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumHeight(self.datachoose.height())
-        b.setMaximumWidth(b.height()/2)
+        b.setMaximumWidth(16)
         b.setCheckable(True)
 
         layout = qt4.QHBoxLayout()
