@@ -292,12 +292,16 @@ class Choice(qt4.QComboBox):
     """For choosing between a set of values."""
 
     def __init__(self, setting, iseditable, vallist, parent, icons=None):
-        
         qt4.QComboBox.__init__(self, parent)
+
         self.setting = setting
         self.bgcolor = None
 
         self.setEditable(iseditable)
+
+        # stops combobox readjusting in size to fit contents
+        self.setSizeAdjustPolicy(
+            qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
         if icons is None:
             # add items to list (text only)
