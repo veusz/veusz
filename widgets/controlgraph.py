@@ -194,12 +194,35 @@ class ControlGraphMovableBox(qt4.QGraphicsItem):
 class ControlGraphLine(qt4.QGraphicsLineItem):
 
     def __init__(self, widget, x1, y1, x2, y2):
-        qt4.QGraphicsLineItem(self, x1, y1, x2, y2)
+        qt4.QGraphicsLineItem.__init__(self, x1, y1, x2, y2)
         self.widget = widget
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
         self.setZValue(1.)
-        self.pts = [_ShapeCorner(self), _ShapeCorner(self)]
-        self.pos = [x1, y1, x2, y2]
+        self.setPen( qt4.QPen(qt4.Qt.DotLine) )
+        self.pts = [_ShapeCorner(self, rotator=True),
+                    _ShapeCorner(self, rotator=True)]
         self.pts[0].setPos(x1, y1)
         self.pts[1].setPos(x2, y2)
+        self.pts[0].setCursor(qt4.Qt.CrossCursor)
+        self.pts[1].setCursor(qt4.Qt.CrossCursor)
+
+    def updateFromCorner(self, corner, event):
+        """Take position and update ends of line."""
+        self.setLine( self.pts[0].x(), self.pts[0].y(),
+                      self.pts[1].x(), self.pts[1].y() )
+
+    def mouseReleaseEvent(self, event):
+        """If widget has moved, tell it."""
+        qt4.QGraphicsItem.mouseReleaseEvent(self, event)
+        self.doUpdate()
+
+    def doUpdate(self):
+        """Update caller with position and line positions."""
+
+        pt1 = ( self.pts[0].x() + self.pos().x(),
+                self.pts[0].y() + self.pos().y() )
+        pt2 = ( self.pts[1].x() + self.pos().x(),
+                self.pts[1].y() + self.pos().y() )
+
+        self.widget.updateControlItem(self, pt1, pt2)

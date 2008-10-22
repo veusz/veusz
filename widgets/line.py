@@ -21,6 +21,7 @@
 """Plotting a line with arrowheads or labels."""
 
 import itertools
+import math
 import numpy as N
 
 import veusz.qtall as qt4
@@ -172,7 +173,64 @@ class Line(widget.Widget):
                                 arrowleft=s.arrowleft,
                                 arrowright=s.arrowright)
 
+            if isnotdataset:
+                cgi = controlgraph.ControlGraphLine(
+                    self, x, y,
+                    x + l*dx*math.cos(a/180.*math.pi),
+                    y + l*dx*math.sin(a/180.*math.pi))
+                cgi.index = index
+                index += 1
+                self.controlgraphitems.append(cgi)
+
         painter.restore()
         painter.endPaintingWidget()
+
+    def updateControlItem(self, cgi, pt1, pt2):
+        """If control items are moved, update line."""
+        s = self.settings
+        try:
+            cgiindex = self.controlgraphitems.index(cgi)
+        except ValueError:
+            return
+
+        # calculate new position coordinate for item
+        if s.positioning == 'axes':
+            if hasattr(self.parent, 'getAxes'):
+                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            else:
+                return
+            if None in axes:
+                return
+            
+            xpos = axes[0].plotterToGraphCoords(self.lastposn,
+                                                N.array(pt1[0]))
+            ypos = axes[1].plotterToGraphCoords(self.lastposn,
+                                                N.array(pt1[1]))
+        else:
+            xpos = ((pt1[0] - self.lastposn[0]) /
+                    (self.lastposn[2]-self.lastposn[0]))
+            ypos = ((pt1[1] - self.lastposn[3]) /
+                    (self.lastposn[1]-self.lastposn[3]))
+
+        length = ( math.sqrt( (pt2[0]-pt1[0])**2 + (pt2[1]-pt1[1])**2 ) /
+                   (self.lastposn[2]-self.lastposn[0]) )
+        angle = ( (math.atan2( pt2[1]-pt1[1], pt2[0]-pt1[0] )
+                   * 180. / math.pi) % 360. )
+
+        x, y = list(s.xPos), list(s.yPos)
+        l, a = list(s.length), list(s.angle)
+        x[cgiindex] = xpos
+        y[cgiindex] = ypos
+        l[min(cgiindex, len(l)-1)] = length
+        a[min(cgiindex, len(a)-1)] = angle
+
+        operations = (
+            document.OperationSettingSet(s.get('xPos'), x),
+            document.OperationSettingSet(s.get('yPos'), y),
+            document.OperationSettingSet(s.get('length'), l),
+            document.OperationSettingSet(s.get('angle'), a),
+            )
+        self.document.applyOperation(
+            document.OperationMultiple(operations, descr='adjust shape') )
 
 document.thefactory.register( Line )
