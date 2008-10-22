@@ -244,15 +244,16 @@ class PropertyList(qt4.QWidget):
         self.layout.setSpacing( self.layout.spacing()/2 )
         self.layout.setMargin(4)
         
-        self.children = []
+        self.childlist = []
 
     def updateProperties(self, settings, title=False, showformatting=True):
         """Update the list of controls with new ones for the settings."""
 
         # delete all child widgets
         self.setUpdatesEnabled(False)
-        while len(self.children) > 0:
-            self.children.pop().deleteLater()
+
+        while len(self.childlist) > 0:
+            self.childlist.pop().deleteLater()
 
         if settings is None:
             self.setUpdatesEnabled(True)
@@ -278,11 +279,11 @@ class PropertyList(qt4.QWidget):
                 if action.usertext:
                     text = action.usertext
 
-                lab = qt4.QLabel(text, self)
+                lab = qt4.QLabel(text)
                 self.layout.addWidget(lab, row, 0)
-                self.children.append(lab)
+                self.childlist.append(lab)
 
-                button = qt4.QPushButton(text, self)
+                button = qt4.QPushButton(text)
                 button.setToolTip(action.descr)
                 # need to save reference to caller object
                 button.caller = utils.BoundCaller(self.slotActionPressed,
@@ -290,16 +291,16 @@ class PropertyList(qt4.QWidget):
                 self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
                              
                 self.layout.addWidget(button, row, 1)
-                self.children.append(button)
+                self.childlist.append(button)
 
                 row += 1
 
         # add subsettings if necessary
         if settings.getSettingsList() and self.showsubsettings:
-            tabbed = TabbedFormatting(self.document, settings, self)
+            tabbed = TabbedFormatting(self.document, settings, None)
             self.layout.addWidget(tabbed, row, 1, 1, 2)
             row += 1
-            self.children.append(tabbed)
+            self.childlist.append(tabbed)
 
         # add settings proper
         for setn in settings.getSettingList():
@@ -307,24 +308,24 @@ class PropertyList(qt4.QWidget):
             if not showformatting and setn.formatting:
                 continue
 
-            lab = SettingLabel(self.document, setn, self)
+            lab = SettingLabel(self.document, setn, None)
             self.layout.addWidget(lab, row, 0)
-            self.children.append(lab)
+            self.childlist.append(lab)
 
-            cntrl = setn.makeControl(self)
+            cntrl = setn.makeControl(None)
             self.connect(cntrl, qt4.SIGNAL('settingChanged'),
                          self.slotSettingChanged)
             self.layout.addWidget(cntrl, row, 1)
-            self.children.append(cntrl)
+            self.childlist.append(cntrl)
 
             row += 1
 
         # add empty widget to take rest of space
-        w = qt4.QWidget(self)
+        w = qt4.QWidget()
         w.setSizePolicy(qt4.QSizePolicy.Maximum,
                         qt4.QSizePolicy.MinimumExpanding)
         self.layout.addWidget(w, row, 0)
-        self.children.append(w)
+        self.childlist.append(w)
 
         self.setUpdatesEnabled(True)
         self.layout.setEnabled(True)
@@ -380,7 +381,7 @@ class TabbedFormatting(qt4.QTabWidget):
             tab.setLayout(layout)
 
             # create scrollable area
-            scroll = qt4.QScrollArea(tab)
+            scroll = qt4.QScrollArea(None)
             layout.addWidget(scroll)
             scroll.setWidgetResizable(True)
 
@@ -657,7 +658,7 @@ class TreeEditDock(qt4.QDockWidget):
             self.toolbar, self.parent.menus)
 
         # create shape toolbar button
-        shapetb = qt4.QToolButton(self.toolbar)
+        shapetb = qt4.QToolButton()
         shapetb.setIcon( utils.getIcon('veusz-shape-menu.png') )
         shapepop = qt4.QMenu(shapetb)
         shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
@@ -936,10 +937,10 @@ class SettingLabel(qt4.QWidget):
             text = setting.usertext
         else:
             text = setting.name
-        self.labelicon = qt4.QLabel(text, self)
+        self.labelicon = qt4.QLabel(text)
         self.layout.addWidget(self.labelicon)
         
-        self.iconlabel = qt4.QLabel(self)
+        self.iconlabel = qt4.QLabel()
         self.layout.addWidget(self.iconlabel)
 
         self.connect(self, qt4.SIGNAL('clicked'), self.settingMenu)
