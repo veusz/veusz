@@ -548,7 +548,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         This updates the list of properties
         """
-        
+
         indexes = current.indexes()
 
         if len(indexes) > 1:
@@ -865,7 +865,8 @@ class TreeEditDock(qt4.QDockWidget):
         else:
             nextwidget = widgetlist[-1]
 
-        # select the next widget
+        # select the next widget (we have to select root first!)
+        self.selectWidget(self.document.basewidget)
         self.selectWidget(nextwidget)
 
     def slotWidgetRename(self):

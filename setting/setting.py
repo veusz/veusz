@@ -94,7 +94,6 @@ class Reference(object):
         return item
         
 class Setting(object):
-
     def __init__(self, name, value, descr='', usertext='',
                  formatting=False, hidden=False):
         """Initialise the values.

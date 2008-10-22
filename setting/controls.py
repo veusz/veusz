@@ -744,8 +744,8 @@ class Color(qt4.QWidget):
         # button for selecting colors
         b = self.button = qt4.QPushButton()
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
-        b.setMaximumHeight(self.combo.height())
-        b.setMaximumWidth(b.height())
+        b.setMaximumHeight(24)
+        b.setMaximumWidth(24)
         self.connect(b, qt4.SIGNAL('clicked()'),
                      self.slotButtonClicked)
 
