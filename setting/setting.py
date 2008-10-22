@@ -112,7 +112,7 @@ class Setting(object):
         self.usertext = usertext
         self.formatting = formatting
         self.default = value
-        self.onmodified = []
+        self.onmodified = qt4.QObject()
         self._val = None
 
         # calls the set function for the val property
@@ -165,13 +165,7 @@ class Setting(object):
 
         # iterate over weakly referenced objects
         # delete those which cannot be called
-        i = 0
-        while i < len(self.onmodified):
-            try:
-                self.onmodified[i](True)
-                i += 1
-            except ValueError:
-                del self.onmodified[i]
+        self.onmodified.emit(qt4.SIGNAL("onModified"), True)
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
@@ -284,17 +278,12 @@ class Setting(object):
 
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""
-        self.onmodified.append( utils.WeakBoundMethod(fn) )
+        self.onmodified.connect(self.onmodified,
+                                qt4.SIGNAL("onModified"), fn)
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
-
-        i = 0
-        while i < len(self.onmodified):
-            f = self.onmodified[i]
-            if f.isEqual(fn):
-                del self.onmodified[i]
-            i += 1
+        self.onmodified.disconnect(self.onmodified, 0, fn, 0)
 
     def newDefault(self, value):
         """Update the default and the value."""

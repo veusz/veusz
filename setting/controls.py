@@ -188,20 +188,21 @@ class String(qt4.QWidget):
 
     def __init__(self, setting, parent):
         qt4.QWidget.__init__(self, parent)
-
         self.setting = setting
-        self.edit = qt4.QLineEdit(self)
-        b = self.button = qt4.QPushButton('..', self)
-        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
-        b.setMaximumHeight(self.edit.height())
-        b.setMaximumWidth(b.height()/2)
-        b.setCheckable(True)
 
-        layout = qt4.QHBoxLayout(self)
+        layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
         layout.setMargin(0)
+        self.setLayout(layout)
+
+        self.edit = qt4.QLineEdit()
         layout.addWidget(self.edit)
+
+        b = self.button = qt4.QPushButton('..')
         layout.addWidget(b)
+        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        b.setMaximumWidth(16)
+        b.setCheckable(True)
 
         self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
         
@@ -260,7 +261,7 @@ class String(qt4.QWidget):
     def onModified(self, mod):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
-        
+
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""
     
@@ -507,15 +508,16 @@ class DatasetOrString(qt4.QWidget):
     def __init__(self, setting, document, dimensions, datatype, parent):
         qt4.QWidget.__init__(self, parent)
         self.datachoose = Dataset(setting, document, dimensions, datatype,
-                                  self)
+                                  None)
         
-        b = self.button = qt4.QPushButton('..', self)
+        b = self.button = qt4.QPushButton('..')
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumHeight(self.datachoose.height())
         b.setMaximumWidth(b.height()/2)
         b.setCheckable(True)
 
-        layout = qt4.QHBoxLayout(self)
+        layout = qt4.QHBoxLayout()
+        self.setLayout(layout)
         layout.setSpacing(0)
         layout.setMargin(0)
         layout.addWidget(self.datachoose)
@@ -723,7 +725,7 @@ class Color(qt4.QWidget):
         self.setting = setting
 
         # combo box
-        c = self.combo = qt4.QComboBox(self)
+        c = self.combo = qt4.QComboBox()
         c.setEditable(True)
         for color in self._colors:
             c.addItem(self._icons[color], color)
@@ -740,7 +742,7 @@ class Color(qt4.QWidget):
             self.combo.setEditText( setting.toText() )
 
         # button for selecting colors
-        b = self.button = qt4.QPushButton(self)
+        b = self.button = qt4.QPushButton()
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumHeight(self.combo.height())
         b.setMaximumWidth(b.height())
@@ -751,7 +753,8 @@ class Color(qt4.QWidget):
             c.setEnabled(False)
             b.setEnabled(False)
                      
-        layout = qt4.QHBoxLayout(self)
+        layout = qt4.QHBoxLayout()
+        self.setLayout(layout)
         layout.setSpacing(0)
         layout.setMargin(0)
         layout.addWidget(c)
@@ -949,19 +952,20 @@ class ListSet(qt4.QFrame):
             self.controls.append(cntrls)
 
         # buttons at end
-        bbox = qt4.QWidget(self)
+        bbox = qt4.QWidget()
         h = qt4.QHBoxLayout(bbox)
         h.setMargin(0)
+        bbox.setLayout(h)
         self.layout.addWidget(bbox, row+1, 0, 1, -1)
         
         # a button to add a new entry
-        b = qt4.QPushButton('Add', bbox)
+        b = qt4.QPushButton('Add')
         h.addWidget(b)
         self.connect(b, qt4.SIGNAL('clicked()'), self.onAddClicked)
         b.show()
 
         # a button to delete the last entry
-        b = qt4.QPushButton('Delete', bbox)
+        b = qt4.QPushButton('Delete')
         h.addWidget(b)
         self.connect(b, qt4.SIGNAL('clicked()'), self.onDeleteClicked)
         b.setEnabled( len(self.setting.val) > 0 )
@@ -1012,7 +1016,7 @@ class ListSet(qt4.QFrame):
         """Add a color button to the list at the position specified."""
 
         color = self.setting.val[row][col]
-        wcolor = qt4.QPushButton(self)
+        wcolor = qt4.QPushButton()
         self.layout.addWidget(wcolor, row, col)
         wcolor.setMaximumWidth(wcolor.height())
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
@@ -1028,7 +1032,7 @@ class ListSet(qt4.QFrame):
         """Make a toggle button."""
 
         toggle = self.setting.val[row][col]
-        wtoggle = qt4.QCheckBox(self)
+        wtoggle = qt4.QCheckBox()
         self.layout.addWidget(wtoggle, row, col)
         wtoggle.setChecked(toggle)
         wtoggle.setToolTip(tooltip)
@@ -1040,7 +1044,7 @@ class ListSet(qt4.QFrame):
         
         val = self.setting.val[row][col]
 
-        wcombo = qt4.QComboBox(self)
+        wcombo = qt4.QComboBox()
         self.layout.addWidget(wcombo, row, col)
 
         if texts is None:
@@ -1118,7 +1122,7 @@ class LineSet(ListSet):
                                    LineStyle._icons, None)
         
         # make line width edit box
-        wwidth = qt4.QLineEdit(self)
+        wwidth = qt4.QLineEdit()
         self.layout.addWidget(wwidth, row, 1)
         wwidth.setText(self.setting.val[row][1])
         wwidth.setToolTip('Line width')
