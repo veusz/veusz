@@ -223,8 +223,6 @@ class ImportDialog2(qt4.QDialog):
         """Update the fits file details in the import dialog."""
         f = pyfits.open(filename, 'readonly')
         l = self.fitshdulist
-        l.setColumnCount(3)
-        l.setHeaderLabels(['HDU', 'Name', 'Type'])
         l.clear()
 
         # this is so we can lookup item attributes later
@@ -252,11 +250,13 @@ class ImportDialog2(qt4.QDialog):
                 descr = '%iD image (%s)' % (naxis, dims)
 
             hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
-            items.insert(0, hduitem)
+            items.append(hduitem)
+            #items.insert(0, hduitem)
             self.fitsitemdata.append(data)
 
-        l.addTopLevelItems(items)
-        l.setCurrentItem(items[-1])
+        if items:
+            l.addTopLevelItems(items)
+            l.setCurrentItem(items[0])
 
     def slotFitsUpdateCombos(self):
         """Update list of fits columns when new item is selected."""

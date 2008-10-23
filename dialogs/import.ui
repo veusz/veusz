@@ -311,9 +311,22 @@ Veusz can also read data organised in rows rather than columns.
          <property name="rootIsDecorated" >
           <bool>false</bool>
          </property>
+         <property name="columnCount" >
+          <number>3</number>
+         </property>
          <column>
           <property name="text" >
-           <string>1</string>
+           <string>HDU</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Type</string>
           </property>
          </column>
         </widget>
