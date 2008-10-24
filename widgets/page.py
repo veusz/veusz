@@ -135,7 +135,7 @@ class _AxisDependHelper(object):
 
             for (widget, widget_depname), depends in nodes.iteritems():
                 # go through dependencies of widget
-                if self.processDepends(widget, depends):
+                if widget and self.processDepends(widget, depends):
                     # if modified, we keep looping
                     inloop = False
 
