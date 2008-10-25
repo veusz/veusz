@@ -192,6 +192,7 @@ class ControlGraphMovableBox(qt4.QGraphicsItem):
         return br
 
 class ControlGraphLine(qt4.QGraphicsLineItem):
+    """For controlling the position and ends of a line."""
 
     def __init__(self, widget, x1, y1, x2, y2):
         qt4.QGraphicsLineItem.__init__(self, x1, y1, x2, y2)
@@ -199,7 +200,7 @@ class ControlGraphLine(qt4.QGraphicsLineItem):
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
         self.setZValue(1.)
-        self.setPen( qt4.QPen(qt4.Qt.DotLine) )
+        self.setPen( qt4.QPen(qt4.QBrush(qt4.Qt.black), 2, qt4.Qt.DotLine) )
         self.pts = [_ShapeCorner(self, rotator=True),
                     _ShapeCorner(self, rotator=True)]
         self.pts[0].setPos(x1, y1)

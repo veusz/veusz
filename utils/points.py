@@ -74,6 +74,10 @@ _linesymbols = {
                        ((0, -1), (0, 1)) ),
     'limitrightaway': ( ((1, -1), (2, 0), (1, 1)), ((2, 0), (0, 0)),
                         ((0, -1), (0, 1)) ),
+
+    # for arrows
+    '_linearrow': ( ((-1.8, -1), (0, 0), (-1.8, 1)), ),
+    '_linearrowreverse': ( ((1.8, -1), (0, 0), (1.8, 1)), ),
     }
 
 def _plotLineSymbols(painter, name, xpos, ypos, size):
@@ -126,7 +130,12 @@ _polygons = {
     'tievert': ( (-1, -1), (1, -1), (-1, 1), (1, 1) ),
     'tiehorz': ( (-1, -1), (-1, 1), (1, -1), (1, 1) ),
     'lozengehorz': ( (0, 0.707), (1.414, 0), (0, -0.707), (-1.414, 0) ),
-    'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) )
+    'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) ),
+
+    # special arrow symbols
+    '_arrow': ( (0, 0), (-1.8, 1), (-1.8, -1) ),
+    '_arrownarrow': ( (0, 0), (-1.8, 0.5), (-1.8, -0.5) ),
+    '_arrowreverse': ( (-1.8, 0), (0., 1), (0., -1) ),
     }
 
 def _addPolyPath( path, vals ):
@@ -291,19 +300,25 @@ def plotMarker(painter, xpos, ypos, markername, markersize):
 # translate arrow shapes to point types (we reuse them)
 arrow_translate = {
     'none': 'none',
-    'arrow': 'triangleright',
-    'arrowreverse': 'triangleleft',
+    'arrow': '_arrow',
+    'arrownarrow': '_arrownarrow',
+    'arrowreverse': '_arrowreverse',
+    'linearrow': '_linearrow',
+    'linearrowreverse': '_linearrowreverse',
+    'bar': 'linevert',
+    'linecross': 'linecross',
+    'asterisk': 'asterisk',
     'circle': 'circle',
     'square': 'square',
     'diamond': 'diamond',
-    'linearrow': 'arrowright',
-    'linearrowreverse': 'arrowleft',
-    'bar': 'linevert'
 }
 
 # codes of allowable arrows
-ArrowCodes = ( 'none', 'arrow', 'arrowreverse',
-               'linearrow', 'linearrowreverse', 'bar',
+ArrowCodes = ( 'none', 'arrow', 'arrownarrow',
+               'arrowreverse',
+               'linearrow', 'linearrowreverse',
+               'bar', 'linecross',
+               'asterisk',
                'circle', 'square', 'diamond',
                )
 

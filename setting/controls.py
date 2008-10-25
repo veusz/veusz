@@ -653,9 +653,9 @@ class Arrow(Choice):
             painter.setRenderHint(qt4.QPainter.Antialiasing)
             painter.setBrush(brush)
             painter.setPen(pen)
-            utils.plotLineArrow(painter, size*0.5, size*0.5,
+            utils.plotLineArrow(painter, size*0.4, size*0.5,
                                 size*2, 0.,
-                                arrowsize=size*0.25,
+                                arrowsize=size*0.2,
                                 arrowleft=arrow, arrowright=arrow)
             painter.end()
             icons.append( qt4.QIcon(pix) )
