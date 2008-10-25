@@ -133,9 +133,10 @@ _polygons = {
     'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) ),
 
     # special arrow symbols
-    '_arrow': ( (0, 0), (-1.8, 1), (-1.8, -1) ),
+    '_arrow': ( (0, 0), (-1.8, 1), (-1.4, 0), (-1.8, -1) ),
+    '_arrowtriangle': ( (0, 0), (-1.8, 1), (-1.8, -1) ),
     '_arrownarrow': ( (0, 0), (-1.8, 0.5), (-1.8, -0.5) ),
-    '_arrowreverse': ( (-1.8, 0), (0., 1), (0., -1) ),
+    '_arrowreverse': ( (0, 0), (1.8, 1), (1.4, 0), (1.8, -1) ),
     }
 
 def _addPolyPath( path, vals ):
@@ -302,6 +303,7 @@ arrow_translate = {
     'none': 'none',
     'arrow': '_arrow',
     'arrownarrow': '_arrownarrow',
+    'arrowtriangle': '_arrowtriangle',
     'arrowreverse': '_arrowreverse',
     'linearrow': '_linearrow',
     'linearrowreverse': '_linearrowreverse',
@@ -315,6 +317,7 @@ arrow_translate = {
 
 # codes of allowable arrows
 ArrowCodes = ( 'none', 'arrow', 'arrownarrow',
+               'arrowtriangle',
                'arrowreverse',
                'linearrow', 'linearrowreverse',
                'bar', 'linecross',
