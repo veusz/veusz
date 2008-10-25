@@ -60,6 +60,14 @@ class Document( qt4.QObject ):
         self.suspendchangeset = self.changeset
         self.suspendupdates = True
 
+    def makeDefaultDoc(self):
+        """Add default widgets to create document."""
+        page = widgetfactory.thefactory.makeWidget('page', self.basewidget)
+        graph = widgetfactory.thefactory.makeWidget('graph', page)
+        self.setModified()
+        self.setModified(False)
+        self.changeset = 0
+
     def enableUpdates(self):
         """Reenables document updates."""
         assert self.suspendupdates
@@ -183,7 +191,7 @@ class Document( qt4.QObject ):
 
     def isBlank(self):
         """Does the document contain widgets and no data"""
-        return len(self.basewidget.children) == 0 and len(self.data) == 0
+        return self.changeset == 0
 
     def setData(self, name, dataset):
         """Set data to val, with symmetric or negative and positive errors."""

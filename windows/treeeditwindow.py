@@ -802,6 +802,18 @@ class TreeEditDock(qt4.QDockWidget):
 
         self.editactions['paste'].setEnabled(show)
 
+    def doInitialWidgetSelect(self):
+        """Select a sensible initial widget."""
+        w = self.document.basewidget
+        for i in xrange(2):
+            try:
+                c = w.children[0]
+            except IndexError:
+                break
+            if c:
+                w = c
+        self.selectWidget(w)
+
     def slotWidgetPaste(self):
         """Paste something from the clipboard"""
 

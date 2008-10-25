@@ -58,7 +58,15 @@ class MainWindow(qt4.QMainWindow):
         win = cls()
         win.show()
         if filename:
+            # load document
             win.openFileInWindow(filename)
+        else:
+            # add page and default graph
+            win.document.makeDefaultDoc()
+
+        # try to select first graph of first page
+        win.treeedit.doInitialWidgetSelect()
+            
         cls.windows.append(win)
         return win
 
