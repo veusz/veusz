@@ -27,7 +27,6 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.utils as utils
-import veusz.windows.action as action
 
 class AboutDialog(qt4.QDialog):
     """About dialog."""
@@ -39,7 +38,7 @@ class AboutDialog(qt4.QDialog):
                    self)
 
         # draw logo in dialog
-        self.logolabel.setPixmap( action.getPixmap('logo.png') )
+        self.logolabel.setPixmap( utils.getPixmap('logo.png') )
 
         # add version to copyright text
         copyrighttext = unicode(self.copyrightlabel.text())
