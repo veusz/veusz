@@ -41,11 +41,8 @@ except ImportError:
     sys.modules['veusz'] = veusz
 
 import veusz.qtall as qt4
-
-import veusz.utils as utils
-from veusz.windows.mainwindow import MainWindow
 from veusz.application import Application
-import veusz.widgets
+import veusz.utils as utils
 import veusz.setting
 
 copyr='''Veusz %s
@@ -85,7 +82,6 @@ def makeSplashLogo():
     doc.setHtml(splashcopyr % utils.version())
     p.translate(0, 2*border + logo.height())
     doc.drawContents(p)
-    
     p.end()
     return pix
 
@@ -97,6 +93,11 @@ def run():
     splash = qt4.QSplashScreen(makeSplashLogo())
     splash.show()
     app.processEvents()
+
+    # import these after showing splash screen so we don't
+    # have too long a wait before
+    from veusz.windows.mainwindow import MainWindow
+    import veusz.widgets
 
     # register a signal handler to catch ctrl+c
     signal.signal(signal.SIGINT, handleIntSignal)
