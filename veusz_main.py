@@ -50,18 +50,53 @@ import veusz.setting
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2006 <jeremy@jeremysanders.net>
+Copyright (C) Jeremy Sanders 2003-2008 <jeremy@jeremysanders.net>
 Licenced under the GNU General Public Licence (version 2 or greater)
+'''
+
+splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
+Copyright (C) Jeremy Sanders 2003-2008<br>
+Licenced under the GPL (version 2 or greater)
 '''
 
 def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
     qt4.qApp.closeAllWindows()
 
+def makeSplashLogo():
+    """Make a splash screen logo."""
+    border = 16
+    xw, yw = 520, 240
+    pix = qt4.QPixmap(xw, yw)
+    pix.fill()
+    p = qt4.QPainter(pix)
+
+    # draw logo on pixmap
+    logo = utils.getPixmap('logo.png')
+    p.drawPixmap( xw/2 - logo.width()/2, border, logo )
+
+    # add copyright text
+    doc = qt4.QTextDocument()
+    doc.setPageSize( qt4.QSizeF(xw, yw - 3*border - logo.height()) )
+    f = qt4.qApp.font()
+    f.setPointSize(14)
+    doc.setDefaultFont(f)
+    doc.setDefaultTextOption( qt4.QTextOption(qt4.Qt.AlignCenter) )
+    doc.setHtml(splashcopyr % utils.version())
+    p.translate(0, 2*border + logo.height())
+    doc.drawContents(p)
+    
+    p.end()
+    return pix
+
 def run():
     '''Run the main application.'''
 
     app = Application(sys.argv)
+
+    splash = qt4.QSplashScreen(makeSplashLogo())
+    splash.show()
+    app.processEvents()
 
     # register a signal handler to catch ctrl+c
     signal.signal(signal.SIGINT, handleIntSignal)
@@ -99,6 +134,7 @@ def run():
     app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
                 app, qt4.SLOT("quit()"))
 
+    splash.finish(app.topLevelWidgets()[0])
     app.exec_()
 
 # if ran as a program
