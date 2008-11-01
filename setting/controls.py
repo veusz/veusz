@@ -1187,3 +1187,71 @@ class FillSet(ListSet):
 
         # return widgets
         return [wfillstyle, wcolor, whide]
+
+class Filename(qt4.QWidget):
+    def __init__(self, setting, parent):
+        qt4.QWidget.__init__(self, parent)
+        self.setting = setting
+
+        layout = qt4.QHBoxLayout()
+        layout.setSpacing(0)
+        layout.setMargin(0)
+        self.setLayout(layout)
+
+        self.edit = qt4.QLineEdit()
+        layout.addWidget(self.edit)
+
+        b = self.button = qt4.QPushButton('..')
+        layout.addWidget(b)
+        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        b.setMaximumWidth(16)
+
+        self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
+        
+        self.edit.setText( setting.toText() )
+
+        self.connect(self.edit, qt4.SIGNAL('editingFinished()'),
+                     self.validateAndSet)
+        self.connect(b, qt4.SIGNAL('clicked()'),
+                     self.buttonClicked)
+
+        if setting.readonly:
+            self.edit.setReadOnly(True)
+
+        self.setting.setOnModified(self.onModified)
+
+    def buttonClicked(self):
+        """Button clicked - show file open dialog."""
+
+        filename = qt4.QFileDialog.getOpenFileName(
+            self,
+            "Choose image",
+            self.edit.text(),
+            "Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
+            "*.gif *.xbm *.xpm);;"
+            "All files (*)")
+        if filename:
+            val = unicode(filename)
+            if self.setting.val != val:
+                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                           val )
+
+    def validateAndSet(self):
+        """Check the text is a valid setting and update it."""
+
+        text = unicode(self.edit.text())
+        try:
+            val = self.setting.fromText(text)
+            self.edit.palette().setColor(qt4.QPalette.Base, self.bgcolor)
+
+            # value has changed
+            if self.setting.val != val:
+                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                           val )
+
+        except setting.InvalidType:
+            self.edit.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.edit.setText( self.setting.toText() )

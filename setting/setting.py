@@ -1338,4 +1338,8 @@ class Filename(Str):
     """Represents a filename setting.
 
     TODO: Add control to select files."""
-    pass
+
+    def makeControl(self, *args):
+        """Make specialised lineset control."""
+        return controls.Filename(self, *args)
+    
