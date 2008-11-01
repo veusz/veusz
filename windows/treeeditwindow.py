@@ -272,7 +272,7 @@ class PropertyList(qt4.QWidget):
             row += 1
 
         # add actions if parent is widget
-        if settings.parent.isWidget():
+        if settings.parent.isWidget() and not showformatting:
             widget = settings.parent
             for action in widget.actions:
                 text = action.name
