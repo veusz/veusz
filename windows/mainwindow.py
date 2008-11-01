@@ -109,6 +109,7 @@ class MainWindow(qt4.QMainWindow):
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
+        self.console.hide()
         self.interpreter = self.console.interpreter
         self.addDockWidget(qt4.Qt.BottomDockWidgetArea, self.console)
 
