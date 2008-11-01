@@ -127,7 +127,7 @@ class ConsoleWindow(qt4.QDockWidget):
         self.setObjectName("veuszconsolewindow")
 
         # arrange sub-widgets in a vbox
-        self.vbox = qt4.QWidget(self)
+        self.vbox = qt4.QWidget()
         self.setWidget(self.vbox)
         vlayout = qt4.QVBoxLayout(self.vbox)
         vlayout.setMargin( vlayout.margin()/4 )
@@ -137,7 +137,6 @@ class ConsoleWindow(qt4.QDockWidget):
         self.interpreter = document.CommandInterpreter(thedocument)
         # output from the interpreter goes to self.output_stdxxx
 
-
         self.con_stdout = _Writer(self.output_stdout)
         self.con_stderr = _Writer(self.output_stderr)
 
@@ -145,22 +144,27 @@ class ConsoleWindow(qt4.QDockWidget):
         self.stdoutbuffer = ""
         self.stderrbuffer = ""
 
+        # (mostly) hidden notification
+        self._hiddennotify = qt4.QLabel()
+        vlayout.addWidget(self._hiddennotify)
+        self._hiddennotify.hide()
+
         # the output from the console goes here
-        self._outputdisplay = qt4.QTextEdit(self.vbox)
+        self._outputdisplay = qt4.QTextEdit()
         self._outputdisplay.setReadOnly(True)
         self._outputdisplay.insertHtml( introtext )
         vlayout.addWidget(self._outputdisplay)
 
-        self._hbox = qt4.QWidget(self.vbox)
+        self._hbox = qt4.QWidget()
         hlayout = qt4.QHBoxLayout(self._hbox)
         hlayout.setMargin(0)
         vlayout.addWidget(self._hbox)
         
-        self._prompt = qt4.QLabel(">>>", self._hbox)
+        self._prompt = qt4.QLabel(">>>")
         hlayout.addWidget(self._prompt)
 
         # where commands are typed in
-        self._inputedit = _CommandEdit( self._hbox )
+        self._inputedit = _CommandEdit()
         hlayout.addWidget(self._inputedit)
         self._inputedit.setFocus()
 
@@ -195,13 +199,32 @@ class ConsoleWindow(qt4.QDockWidget):
         sys.stdout = temp_stdout
         sys.stderr = temp_stderr
 
+    def checkVisible(self):
+        """If this window is hidden, show it, then hide it again in a few
+        seconds."""
+        if self.isHidden():
+            self._hiddennotify.setText("This window will shortly disappear. "
+                                       "You can bring it back by selecting "
+                                       "View, Windows, Console Window on the "
+                                       "menu.")
+            qt4.QTimer.singleShot(5000, self.hideConsole)
+            self.show()
+            self._hiddennotify.show()
+
+    def hideConsole(self):
+        """Hide window and notification widget."""
+        self._hiddennotify.hide()
+        self.hide()
+
     def output_stdout(self, text):
         """ Write text in stdout font to the log."""
+        self.checkVisible()
         self._outputdisplay.insertPlainText(text)
         self._outputdisplay.ensureCursorVisible()
 
     def output_stderr(self, text):
         """ Write text in stderr font to the log."""
+        self.checkVisible()
 
         # insert text as red
         oldcol = self._outputdisplay.textColor()
