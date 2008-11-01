@@ -62,24 +62,22 @@ class Axis(widget.Widget):
                             usertext='Log') )
         s.add( setting.Bool('autoExtend', True,
                             descr = 'Extend axis to nearest major tick',
-                            usertext='Auto extend') )
+                            usertext='Auto extend',
+                            formatting=True ) )
         s.add( setting.Bool('autoExtendZero', True,
                             descr = 'Extend axis to zero if close',
-                            usertext='Zero extend') )
+                            usertext='Zero extend',
+                            formatting=True) )
         s.add( setting.Bool('autoMirror', True,
                             descr = 'Place axis on opposite side of graph '
                             'if none',
-                            usertext='Auto mirror') )
+                            usertext='Auto mirror',
+                            formatting=True) )
         s.add( setting.Bool('reflect', False,
                             descr = 'Place axis text and ticks on other side'
                             ' of axis',
-                            usertext='Reflect') )
-        s.add( setting.WidgetPath('match', '',
-                                  descr =
-                                  'Match the scale of this axis to the '
-                                  'axis specified',
-                                  usertext='Match',
-                                  allowedwidgets = [Axis] ))
+                            usertext='Reflect',
+                            formatting=True) )
 
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
@@ -98,6 +96,13 @@ class Axis(widget.Widget):
                              descr='Fractional position of axis '
                              'in its perpendicular direction',
                              usertext='Axis position') )
+
+        s.add( setting.WidgetPath('match', '',
+                                  descr =
+                                  'Match the scale of this axis to the '
+                                  'axis specified',
+                                  usertext='Match',
+                                  allowedwidgets = [Axis] ))
 
         s.add( setting.Line('Line',
                             descr = 'Axis line settings',
@@ -211,14 +216,14 @@ class Axis(widget.Widget):
                 self.plottedrange[1] = 1e-99
 
         # work out tick values and expand axes if necessary
-        as = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
-                                  s.MajorTicks.number, s.MinorTicks.number,
-                                  extendbounds = s.autoExtend,
-                                  extendzero = s.autoExtendZero,
-                                  logaxis = s.log )
+        axs = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
+                                   s.MajorTicks.number, s.MinorTicks.number,
+                                   extendbounds = s.autoExtend,
+                                   extendzero = s.autoExtendZero,
+                                   logaxis = s.log )
 
         (self.plottedrange[0],self.plottedrange[1],
-         self.majortickscalc, self.minortickscalc) =  as.getTicks()
+         self.majortickscalc, self.minortickscalc) =  axs.getTicks()
 
         # override values if requested
         if len(s.MajorTicks.manualTicks) > 0:
