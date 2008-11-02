@@ -149,11 +149,7 @@ def main():
         sys.exit(1)
 
     app = EmbedApplication(sys.argv)
-
-    # stop app exiting if no windows left
-    hiddenwin = qt4.QWidget()
-    hiddenwin.hide()
-
+    app.setQuitOnLastWindowClosed(False)
     app.exec_()
 
 if __name__ == '__main__':
