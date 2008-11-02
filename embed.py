@@ -41,13 +41,12 @@ g.Close()
 More than one embedded window can be opened at once
 """
 
-import thread
-import sys
-import os
-import os.path
 import atexit
-
-import veusz.qtall as Qt4
+import sys
+import os.path
+import struct
+import new
+import cPickle
 
 def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
@@ -64,15 +63,7 @@ class Embedded(object):
     This embedded instance supports all the normal veusz functions
     """
 
-    # a lock to sync the thread
-    lock = None
-
-    # the passed command to the Qt thread
-    # command consists of tuple: (bound method, *args, **args)
-    command = None
-
-    # values returned by command from Qt thread
-    retval = None
+    remote = False
 
     def __init__(self, name = 'Veusz'):
         """Initialse the embedded veusz window.
@@ -81,175 +72,52 @@ class Embedded(object):
         This method creates a new thread to run Qt if necessary
         """
 
-        if not Embedded.lock:
-            # a lock to ensure we don't get mixed up passing commands
-            Embedded.lock = thread.allocate_lock()
+        if not Embedded.remote:
+            Embedded.startRemote()
 
-            # we notify the QApplication via this pipe
-            # sending a character causes the application to execute the command
-            Embedded.pipetoveusz_r, w = os.pipe()
-            Embedded.pipetoveusz_w = os.fdopen(w, 'w', 0)
+        self.winno, cmds = self.sendCommand( (-1, '_NewWindow',
+                                               (name,), {}) )
+        for cmd in cmds:
+            setattr(self, cmd,
+                    new.instancemethod( Bind1st(self.runCommand, cmd),
+                                        Embedded ) )
 
-            # this is a return pipe, to tell app when command has completed
-            # if we get a character, we read the return value from retval
-            r, w = os.pipe()
-            Embedded.pipefromveusz_r = os.fdopen(r, 'r', 0)
-            Embedded.pipefromveusz_w = os.fdopen(w, 'w', 0)
+    def startRemote(cls):
+        cls.remote = True
+        cmd = ('%s %s RunFromEmbed' %
+               (sys.executable, 
+                os.path.join( os.path.dirname(os.path.abspath(__file__)),
+                              'embed_remote.py' )))
+        cls.to_pipe, cls.from_pipe = os.popen2(cmd)
+        cls.cmdlen = len(struct.pack('Q', 0))
+        atexit.register(cls.exitQt)
+    startRemote = classmethod(startRemote)
 
-            # actually start the thread
-            thread.start_new_thread(Embedded._startThread, ())
+    def sendCommand(kls, cmd):
+        """Send the command to the remote process."""
 
-        # open window for this embedded instance
-        Embedded._runCommand( self._NewWindow, name )
+        outs = cPickle.dumps(cmd)
 
-    def _runCommand(cmd, *args, **args2):
+        kls.to_pipe.write( struct.pack('Q', len(outs)) )
+        kls.to_pipe.write( outs )
+        kls.to_pipe.flush()
+
+        backlen = kls.from_pipe.read(kls.cmdlen)
+        rets = kls.from_pipe.read( struct.unpack('Q', backlen)[0] )
+        retobj = cPickle.loads(rets)
+        if isinstance(retobj, Exception):
+            raise retobj
+        else:
+            return retobj
+    sendCommand = classmethod(sendCommand)
+
+    def runCommand(self, cmd, *args, **args2):
         """Execute the given function in the Qt thread with the arguments
         given."""
+        return self.sendCommand( (self.winno, cmd, args[1:], args2) )
 
-        assert Embedded.command==None and Embedded.retval==None
-
-        # send the command to the thread
-        # we write a character into the pipe to notify the thread
-        Embedded.lock.acquire()
-        Embedded.command = (cmd, args, args2)
-        Embedded.lock.release()
-        Embedded.pipetoveusz_w.write('N')
-
-        # wait for command to be executed
-        # second thread writes a character into the pipe when done
-        Embedded.pipefromveusz_r.read(1)
-        Embedded.lock.acquire()
-        retval = Embedded.retval
-        Embedded.command = None
-        Embedded.retval = None
-        Embedded.lock.release()
-
-        if isinstance(retval, Exception):
-            # if an exception happened, reraise as an exception
-            raise retval
-        else:
-            # else return the returned value
-            return retval
-
-    _runCommand = staticmethod(_runCommand)
-
-    def _NewWindow(self, name):
-        """Start up a new window instance.
-
-        This is called by the constructor
-        """
-
-        from veusz.windows.simplewindow import SimpleWindow
-        import veusz.document as document
-
-        self.window = SimpleWindow(name)
-        self.window.show()
-        self.document = self.window.document
-        self.plot = self.window.plot
-        self.ci = document.CommandInterpreter(self.document)
-        self.ci.addCommand('Close', self._Close)
-        self.ci.addCommand('Zoom', self._Zoom)
-        self.ci.addCommand('EnableToolbar', self._EnableToolbar)
-        self.ci.addCommand('GetClick', self._GetClick)
-
-    def _Close(self):
-        """Close this window."""
-        self.window.close()
-
-        self.document = None
-        self.window = None
-        self.plot = None
-        self.ci = None
-
-    def _Zoom(self, zoomfactor):
-        """Set the plot zoom factor."""
-        self.plot.setZoomFactor(zoomfactor)
-
-    def _EnableToolbar(self, enable=True):
-        """Enable the toolbar in this plotwindow."""
-        self.window.enableToolbar(enable)
-
-    def _GetClick(self):
-        """Return a clicked point."""
-
-        return self.plot.getClick()
-
-    def __getattr__(self, name):
-        """If there's no name, then lookup in command interpreter."""
-
-        if name in self.ci.cmds:
-            return Bind1st(Embedded._runCommand, self.ci.cmds[name])
-        else:
-            raise AttributeError, "instance has no attribute %s" % name
-
-    def _startThread():
-        """Start up the Qt application in a thread."""
-
-        import veusz.qtall as qt4
-
-        # drag in veusz before opening application
-        import veusz.document
-        from veusz.application import Application
-        
-        class _App(Application):
-            """An application class which has a notifier to receive
-            commands from the main thread."""
-
-            def notification(self, i):
-                """Called when the main thread wants to call something in this
-                thread.
-                """
-                Embedded.lock.acquire()
-
-                # get rid of input character
-                os.read(Embedded.pipetoveusz_r, 1)
-
-                # handle command
-                assert Embedded.command is not None
-                cmd, args, args2 = Embedded.command
-                try:
-                    Embedded.retval = cmd(*args, **args2)
-                except Exception, e:
-                    Embedded.retval = e
-
-                Embedded.lock.release()
-
-                # notify sending thread
-                Embedded.pipefromveusz_w.write('r')
-
-        # create a PyQt application instance
-        # we fake argv to hope the real argv isn't messed up
-        argv = [ sys.argv[0] ]
-        app = _App(argv)
-
-        # application has a notifier to know when it needs to do something
-        notifier = qt4.QSocketNotifier(Embedded.pipetoveusz_r,
-                                       qt4.QSocketNotifier.Read)
-
-        # connect app to notifier
-        app.connect(notifier, qt4.SIGNAL('activated(int)'), app.notification)
-        notifier.setEnabled(True)
-
-        # start the main Qt event loop
-        app.exec_()
-
-        # exits when app.quit() is called
-       
-    _startThread = staticmethod(_startThread)
-    
-    def _exitQt():
+    def exitQt(cls):
         """Exit the Qt thread."""
-        import veusz.qtall as qt4
-        self.window.close()
-        qt4.qApp.quit()
-        
-    _exitQt = staticmethod(_exitQt)
+        cls.sendCommand( (-1, '_Quit', (), {}) )
+    exitQt = classmethod(exitQt)
 
-    def _atExit():
-        """Close the Qt thread if we're closing the program."""
-        if Embedded.lock is not None:
-            # open window for this embedded instance
-            Embedded._runCommand( Embedded._exitQt )
-    _atExit = staticmethod(_atExit)
-
-atexit.register(Embedded._atExit)

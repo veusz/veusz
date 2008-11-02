@@ -813,9 +813,7 @@ class PlotWindow( qt4.QGraphicsView ):
         qt4.QApplication.restoreOverrideCursor()
 
         # take clicked point and convert to coords of scrollview
-        pt = qt4.QPoint(*self.grabpos)
-        pt = self.viewport().mapFromGlobal(pt)
-        pt = self.viewportToContents(pt)
+        pt = self.grabpos
 
         # try to work out in which widget the first point is in
         bufferpixmap = qt4.QPixmap( *self.size )

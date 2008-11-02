@@ -47,6 +47,7 @@ class SimpleWindow(qt4.QMainWindow):
 
         if self.toolbar is None and enable:
             self.toolbar = self.plot.createToolbar(self, None)
+            self.toolbar.show()
 
         if self.toolbar is not None and not enable:
             self.toolbar.close()
