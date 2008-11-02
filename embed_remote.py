@@ -124,13 +124,13 @@ class EmbedApplication(Application):
             interpreter = self.clients[window].ci
 
             # window commands
-            #try:
-            if cmd not in interpreter.cmds:
-                raise AttributeError, "No Veusz command %s" % cmd
+            try:
+                if cmd not in interpreter.cmds:
+                    raise AttributeError, "No Veusz command %s" % cmd
 
-            retval = interpreter.cmds[cmd](*args, **argsv)
-            #except Exception, e:
-            #    retval = e
+                retval = interpreter.cmds[cmd](*args, **argsv)
+            except Exception, e:
+                retval = e
         
         # format return data
         outstr = cPickle.dumps(retval)
