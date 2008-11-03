@@ -1366,15 +1366,13 @@ Set('page1/graph1/x/min', -10.)
       commands, which are exposed as methods of graph objects.
       </para>
 
-      <para>Thanks to some pretty nifty programming (if I say so
-      myself), the Python program can ignore the fact that Veusz is a
-      Qt application. The embedding program continues to run when a
-      graph is shown, can can take further user input. In addition
-      Veusz can be used from a standard Python command line. This is
-      achieved by Veusz and PyQt running in a separate
-      thread. Commands are transparently passed from the Python
-      program to the Veusz thread, and any results or exceptions are
-      passed back (and rethrown in the case of exceptions).</para>
+      <para>Using the embedding interface, a Python program can create
+      multiple Veusz plot windows showing the same or different
+      documents. The standard Veusz operations are supported with the
+      addition of a few specific commands.</para>
+
+      <para>The embedding interface runs Veusz in a second process,
+      sending the commands over a pipe.</para>
 
       <para>Veusz must be installed in the PYTHONPATH for embedding to
       work. This can be done with the <command>setup.py</command>
@@ -1412,24 +1410,42 @@ g.Close()
 	</informalexample>
 
       <para>The supported commands are the same as in <link
-      linkend="Commands">Commands</link>, with the addition of a
-      <command>Zoom(zoomfactor)</command> command to control the size
-      of the plot in the window, the
-      <command>EnableToolbar()</command> to enable to graph toolbar,
-      and the <command>Close()</command> which closes the window
-      given.</para>
+      linkend="Commands">Commands</link>, with the addition of:</para>
 
-      <para>Embedding works on the Python versions I have access to,
-      but may be affected by threading bugs. In addition Veusz must be
-      installed in an appropriate place, so that it is in the
-      PYTHONPATH.</para>
+	<orderedlist>
+	  <listitem><para>Close(): close window</para></listitem>
+
+	  <listitem><para>EnableToolbar(enable=True): enable or
+	  disable plot window toolbar</para></listitem>
+
+	  <listitem><para>MoveToPage(pagenum): move the view of the
+	  document to be the page number requested (starting from 1).
+	  </para></listitem>
+
+	  <listitem><para>ResizeWindow(width, height): resize window
+	  to be width by height pixels.</para></listitem>
+
+	  <listitem><para>SetUpdateInterval(interval): set minimum
+	  time period between graph redraws in
+	  milliseconds.</para></listitem>
+
+	  <listitem><para>StartSecondView(name = 'window title'):
+	  start a second view onto the same document with the window
+	  title given. Returns a new Embedded
+	  object. </para></listitem>
+
+	  <listitem><para>Zoom(zoomfactor): zoom graph by factor
+	  given, or "page", "width" or "height" to zoom to page,
+	  width or height, respecively.</para></listitem>
+
+	</orderedlist>
+
     </section>
 
     <section>
-      <title>PyQt programs</title>
-      <para>There is no support for PyQt programs embedding
-      Veusz. However this will be easy to do, and so I will support
-      this setup if requested or for a near future release.</para>
+      <title>PyQt4 programs</title>
+      <para>There is no direct PyQt4 interface. The standard
+      embedding interface should work, however.</para>
     </section>
 
     <section>
