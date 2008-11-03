@@ -73,7 +73,7 @@ class Embedded(object):
 
     remote = None
 
-    def __init__(self, name = 'Veusz'):
+    def __init__(self, name = 'Veusz', copyof = None):
         """Initialse the embedded veusz window.
 
         name is the name of the window to show.
@@ -83,12 +83,29 @@ class Embedded(object):
         if not Embedded.remote:
             Embedded.startRemote()
 
-        self.winno, cmds = self.sendCommand( (-1, '_NewWindow',
-                                               (name,), {}) )
-        for cmd in cmds:
-            setattr(self, cmd,
-                    new.instancemethod( Bind1st(self.runCommand, cmd),
-                                        Embedded ) )
+        if not copyof:
+            retval = self.sendCommand( (-1, '_NewWindow',
+                                         (name,), {}) )
+        else:
+            retval = self.sendCommand( (-1, '_NewWindowCopy',
+                                         (name, copyof.winno), {}) )
+
+        self.winno, cmds = retval
+
+        # add methods corresponding to Veusz commands
+        for name, doc in cmds:
+            func = Bind1st(self.runCommand, name)
+            func.__doc__ = doc    # set docstring
+            func.__name__ = name  # make name match what it calls
+            method = new.instancemethod(func, Embedded)
+            setattr(self, name, method) # assign to self
+
+    def StartSecondView(self, name = 'Veusz'):
+        """Provides a second view onto the document of this window.
+
+        Returns an Embedded instance
+        """
+        return Embedded(name=name, copyof=self)
 
     def startRemote(cls):
         """Start remote process."""

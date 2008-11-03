@@ -685,6 +685,16 @@ class PlotWindow( qt4.QGraphicsView ):
         self.docchangeset = -100
         self.slotTimeout()
 
+    def setTimeout(self, interval):
+        """Change timer setting without changing save value."""
+        if interval == 0:
+            if self.timer.isActive():
+                self.timer.stop()
+        else:
+            self.timer.setInterval(interval)
+            if not self.timer.isActive():
+                self.timer.start()
+
     def actionSetTimeout(self, interval, checked):
         """Called by setting the interval."""
 

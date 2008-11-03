@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #    Copyright (C) 2008 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -34,8 +32,8 @@ import veusz.document as document
 
 class EmbeddedClient(object):
 
-    def __init__(self, title):
-        self.window = SimpleWindow(title)
+    def __init__(self, title, doc=None):
+        self.window = SimpleWindow(title, doc=doc)
         self.window.show()
         self.document = self.window.document
         self.plot = self.window.plot
@@ -44,9 +42,14 @@ class EmbeddedClient(object):
         self.ci.addCommand('Zoom', self.cmdZoom)
         self.ci.addCommand('EnableToolbar', self.cmdEnableToolbar)
         self.ci.addCommand('GetClick', self.cmdGetClick)
+        self.ci.addCommand('ResizeWindow', self.cmdResizeWindow)
+        self.ci.addCommand('SetUpdateInterval', self.cmdSetUpdateInterval)
+        self.ci.addCommand('MoveToPage', self.cmdMoveToPage)
 
     def cmdClose(self):
-        """Close this window."""
+        """Close()
+
+        Close this window."""
         self.window.close()
 
         self.document = None
@@ -54,17 +57,68 @@ class EmbeddedClient(object):
         self.plot = None
         self.ci = None
 
-    def cmdZoom(self, zoomfactor):
-        """Set the plot zoom factor."""
-        self.plot.setZoomFactor(zoomfactor)
+    def cmdZoom(self, zoom):
+        """Zoom(zoom)
+
+        Set the plot zoom level:
+        This is a number to for the zoom from 1:1 or
+        'page': zoom to page
+        'width': zoom to fit width
+        'height': zoom to fit height
+        """
+        if zoom == 'page':
+            self.plot.slotViewZoomPage()
+        elif zoom == 'width':
+            self.plot.slotViewZoomWidth()
+        elif zoom == 'height':
+            self.plot.slotViewZoomHeight()
+        else:
+            self.plot.setZoomFactor(zoom)
 
     def cmdEnableToolbar(self, enable=True):
-        """Enable the toolbar in this plotwindow."""
+        """EnableToolbar(enable=True)
+
+        Enable the toolbar in this plotwindow.
+        if enable is False, disable it.
+        """
         self.window.enableToolbar(enable)
 
     def cmdGetClick(self):
-        """Return a clicked point."""
+        """GetClick()
+
+        Return a clicked point. The user can click a point on the graph
+
+        This returns a list of tuples containing items for each axis in
+        the clicked region:
+         (axisname, valonaxis)
+        where axisname is the full name of an axis
+        valonaxis is value clicked along the axis
+
+        [] is returned if no axes span the clicked region
+        """
         return self.plot.getClick()
+
+    def cmdResizeWindow(self, width, height):
+        """ResizeWindow(width, height)
+
+        Resize the window to be width x height pixels."""
+        self.window.resize(width, height)
+
+    def cmdSetUpdateInterval(self, interval):
+        """SetUpdateInterval(interval)
+
+        Set graph update interval.
+        interval is in milliseconds (ms)
+        set to zero to disable updates
+        """
+        self.plot.setTimeout(interval)
+
+    def cmdMoveToPage(self, pagenum):
+        """MoveToPage(pagenum)
+
+        Tell window to show specified pagenumber (starting from 1).
+        """
+        self.plot.setPageNumber(pagenum-1)
 
 class EmbedApplication(Application):
     """Application to run remote end of embed connection.
@@ -105,6 +159,19 @@ class EmbedApplication(Application):
             EmbedApplication.readLenFromSocket(socket, length))
     readCommand = staticmethod(readCommand)
 
+    def makeNewClient(self, title, doc=None):
+        """Make a new client window."""
+        client = EmbeddedClient(title, doc=doc)
+        self.clients[self.clientcounter] = client
+        # return new number and list of commands and docstrings
+        retfuncs = []
+        for name, cmd in client.ci.cmds.iteritems():
+            retfuncs.append( (name, cmd.__doc__) )
+
+        retval = self.clientcounter, retfuncs
+        self.clientcounter += 1
+        return retval
+
     def slotDataToRead(self, socket):
         self.notifier.setEnabled(False)
         
@@ -112,17 +179,17 @@ class EmbedApplication(Application):
         window, cmd, args, argsv = self.readCommand(socket)
 
         if cmd == '_NewWindow':
-            # create new client
-            client = EmbeddedClient(args[0])
-            self.clients[self.clientcounter] = client
-            # return new number and list of commands
-            retval = self.clientcounter, client.ci.cmds.keys()
-            self.clientcounter += 1
+            retval = self.makeNewClient(args[0])
         elif cmd == '_Quit':
             # exits client
             self.closeAllWindows()
             self.quit()
             retval = None
+        elif cmd == '_NewWindowCopy':
+            # sets the document of this window to be the same as the
+            # one specified
+            retval = self.makeNewClient( args[0],
+                                         doc=self.clients[args[1]].document )
         else:
             interpreter = self.clients[window].ci
 

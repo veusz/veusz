@@ -30,14 +30,16 @@ A simple window class for wrapping a plotwindow
 class SimpleWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
-    def __init__(self, title):
+    def __init__(self, title, doc=None):
         qt4.QMainWindow.__init__(self)
         self.setWindowTitle(title)
 
-        self.document = document.Document()
+        self.document = doc
+        if not doc:
+            self.document = document.Document()
 
         self.plot = plotwindow.PlotWindow(self.document, self)
-        self.plotzoom = 0
+        self.zoomfactor = 0
         self.toolbar = None
 
         self.setCentralWidget( self.plot )
