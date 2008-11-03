@@ -581,12 +581,13 @@
     <section>
       <title><anchor id="Descriptors" />Descriptors</title>
       
-      <para>The "Data, Import" dialog box, <link
-	linkend="Command.ImportFile">ImportFile</link> and <link
-	linkend="Command.ImportString">ImportString</link> commands use
-	a "Descriptor" to describe how the data are formatted in the
-	import file. The descriptor at its simplest is a list of the
-	names of the datasets to import (which are columns in the
+      <para>The "Data, Import" dialog
+	box, <link linkend="Command.ImportFile">ImportFile</link>
+	and <link linkend="Command.ImportString">ImportString</link>
+	commands use a "Descriptor", or list of dataset names, to
+	describe how the data are formatted in the import file. The
+	descriptor at its simplest is a list of the names of the
+	datasets to import (which are columns in the
 	file). Additionally modifiers are added if errors are also
 	read in. Examples of descriptors are below:</para>
       
@@ -1344,8 +1345,8 @@ Set('page1/graph1/x/min', -10.)
 	<title><anchor id="Command.SetData2DXYFunc"
 	/>SetData2DXYFunc</title>
 
-	<para><command>SetData2DXYFunc(self, 'name', xstep, ystep,
-	'expr', linked=False)</command></para>
+	<para><command>SetData2DXYFunc('name', xstep, ystep, 'expr',
+	linked=False)</command></para>
 
 	<para>Construct a 2D dataset using a mathematical expression
 	of "x" and "y". The x values are specified as (min, max, step)
