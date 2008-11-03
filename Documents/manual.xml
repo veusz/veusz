@@ -1219,7 +1219,7 @@ ImportString('x y', '''
 	document.</para>
 	
 	<para>Note: this command is only supported in the embedding
-	interface.</para>
+	interface or veusz_listen.</para>
       </section>
 
       <section>
@@ -1264,7 +1264,7 @@ ImportString('x y', '''
 	<para>Resizes window to be width by height pixels.</para>
 	
 	<para>Note: this command is only supported in the embedding
-	interface.</para>
+	interface or veusz_listen.</para>
       </section>
 
       <section>
@@ -1365,7 +1365,7 @@ Set('page1/graph1/x/min', -10.)
 	called with a positive value.</para>
 	
 	<para>Note: this command is only supported in the embedding
-	interface.</para>
+	interface or veusz_listen.</para>
       </section>
 
       <section>
