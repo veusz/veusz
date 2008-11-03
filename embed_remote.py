@@ -73,11 +73,14 @@ class EmbedApplication(Application):
     """
 
     # lengths of lengths sent to application
-    cmdlenlen = len(struct.pack('Q', 0))
+    cmdlenlen = len(struct.pack('L', 0))
 
-    def __init__(self, args):
+    def __init__(self, to_pipe, from_pipe, args):
         Application.__init__(self, args)
-        self.notifier = qt4.QSocketNotifier(sys.stdin.fileno(),
+        self.to_pipe = to_pipe
+        self.from_pipe = from_pipe
+
+        self.notifier = qt4.QSocketNotifier(self.from_pipe,
                                             qt4.QSocketNotifier.Read)
         self.connect(self.notifier, qt4.SIGNAL('activated(int)'),
                      self.slotDataToRead)
@@ -95,7 +98,7 @@ class EmbedApplication(Application):
 
     def readCommand(socket):
         # get length of packet
-        length = struct.unpack('Q', EmbedApplication.readLenFromSocket(
+        length = struct.unpack('L', EmbedApplication.readLenFromSocket(
                 socket, EmbedApplication.cmdlenlen))[0]
         # unpickle command and arguments
         return cPickle.loads(
@@ -136,19 +139,18 @@ class EmbedApplication(Application):
         outstr = cPickle.dumps(retval)
 
         # send return data to stdout
-        sys.stdout.write( struct.pack('Q', len(outstr)) )
-        sys.stdout.write( outstr )
-        sys.stdout.flush()
+        os.write( self.to_pipe,  struct.pack('L', len(outstr)) )
+        os.write( self.to_pipe, outstr )
 
         self.notifier.setEnabled(True)
 
 def main():
-    if len(sys.argv) < 2 or sys.argv[1] != 'RunFromEmbed':
+    if len(sys.argv) < 4 or sys.argv[1] != 'RunFromEmbed':
         print >>sys.stderr, ("This program must be run from "
                              "the Veusz embedding module")
         sys.exit(1)
 
-    app = EmbedApplication(sys.argv)
+    app = EmbedApplication(int(sys.argv[2]), int(sys.argv[3]), [])
     app.setQuitOnLastWindowClosed(False)
     app.exec_()
 
