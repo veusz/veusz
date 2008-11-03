@@ -70,11 +70,37 @@ class InputListener(qt4.QObject):
         self.ci.addCommand('EnableToolbar', self.enableToolbar)
         self.ci.addCommand('Pickle', self.enablePickle)
 
+        self.ci.addCommand('ResizeWindow', self.resizeWindow)
+        self.ci.addCommand('SetUpdateInterval', self.setUpdateInterval)
+        self.ci.addCommand('MoveToPage', self.moveToPage)
+
         self.notifier = qt4.QSocketNotifier( sys.stdin.fileno(),
                                              qt4.QSocketNotifier.Read )
         self.connect( self.notifier, qt4.SIGNAL('activated(int)'),
                       self.dataReceived )
         self.notifier.setEnabled(True)
+
+    def resizeWindow(self, width, height):
+        """ResizeWindow(width, height)
+
+        Resize the window to be width x height pixels."""
+        self.window.resize(width, height)
+
+    def setUpdateInterval(self, interval):
+        """SetUpdateInterval(interval)
+
+        Set graph update interval.
+        interval is in milliseconds (ms)
+        set to zero to disable updates
+        """
+        self.plot.setTimeout(interval)
+
+    def moveToPage(self, pagenum):
+        """MoveToPage(pagenum)
+
+        Tell window to show specified pagenumber (starting from 1).
+        """
+        self.plot.setPageNumber(pagenum-1)
 
     def quitProgram(self):
         """Exit the program."""
@@ -82,7 +108,7 @@ class InputListener(qt4.QObject):
 
     def plotZoom(self, zoomfactor):
         """Set the plot zoom factor."""
-        self.plot.setZoomFactor(zoomfactor)
+        self.window.setZoom(zoomfactor)
 
     def enableToolbar(self, enable=True):
         """Enable plot toolbar."""

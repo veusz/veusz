@@ -66,14 +66,7 @@ class EmbeddedClient(object):
         'width': zoom to fit width
         'height': zoom to fit height
         """
-        if zoom == 'page':
-            self.plot.slotViewZoomPage()
-        elif zoom == 'width':
-            self.plot.slotViewZoomWidth()
-        elif zoom == 'height':
-            self.plot.slotViewZoomHeight()
-        else:
-            self.plot.setZoomFactor(zoom)
+        self.window.setZoom(zoom)
 
     def cmdEnableToolbar(self, enable=True):
         """EnableToolbar(enable=True)

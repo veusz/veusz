@@ -39,7 +39,6 @@ class SimpleWindow(qt4.QMainWindow):
             self.document = document.Document()
 
         self.plot = plotwindow.PlotWindow(self.document, self)
-        self.zoomfactor = 0
         self.toolbar = None
 
         self.setCentralWidget( self.plot )
@@ -55,3 +54,20 @@ class SimpleWindow(qt4.QMainWindow):
             self.toolbar.close()
             self.toolbar = None
             
+    def setZoom(self, zoom):
+        """Zoom(zoom)
+
+        Set the plot zoom level:
+        This is a number to for the zoom from 1:1 or
+        'page': zoom to page
+        'width': zoom to fit width
+        'height': zoom to fit height
+        """
+        if zoom == 'page':
+            self.plot.slotViewZoomPage()
+        elif zoom == 'width':
+            self.plot.slotViewZoomWidth()
+        elif zoom == 'height':
+            self.plot.slotViewZoomHeight()
+        else:
+            self.plot.setZoomFactor(zoom)
