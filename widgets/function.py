@@ -146,9 +146,12 @@ class FunctionPlotter(GenericPlotter):
             # something wrong in the evaluation
             return
 
+        # get values which are finite: excluding nan and inf
+        finitevals = vals[N.isfinite(vals)]
+
         # update the automatic range
-        axrange[0] = min(N.nanmin(vals), axrange[0])
-        axrange[1] = max(N.nanmax(vals), axrange[1])
+        axrange[0] = min(N.min(finitevals), axrange[0])
+        axrange[1] = max(N.max(finitevals), axrange[1])
 
     def _plotLine(self, painter, xpts, ypts, bounds):
         """ Plot the points in xpts, ypts."""
