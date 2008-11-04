@@ -83,6 +83,13 @@ class Key(widget.Widget):
                               usertext='Vert manual',
                               formatting=True) )
 
+        s.add( setting.Int( 'columns', 1,
+                            descr = 'Number of columns in key',
+                            usertext = 'Columns',
+                            minval = 1,
+                            maxval = 100,
+                            formatting = True) )
+
         if type(self) == Key:
             self.readDefaults()
 
@@ -117,12 +124,21 @@ class Key(widget.Widget):
                                           childset.key).getDimensions()
                     maxwidth = max(maxwidth, w)
 
+        # get number of columns
+        count = len(keywidgets)
+        numcols = min(s.columns, count)
+        numrows = count / numcols
+        if count % numcols != 0:
+            numrows += 1
+
         # total size of box
         symbolwidth = s.get('keyLength').convert(painter)
-        totalwidth = maxwidth + height + symbolwidth
-        totalheight = (len(keywidgets)+1)*height
+        totalwidth = ( (maxwidth + height + symbolwidth)*numcols +
+                       height*(numcols-1) )
+        totalheight = numrows * height
         if not s.Border.hide:
-            totalwidth += height*2
+            totalwidth += 2*height
+            totalheight += height
 
         # work out horizontal position
         h = s.horzPosn
@@ -139,22 +155,15 @@ class Key(widget.Widget):
         # work out vertical position
         v = s.vertPosn
         if v == 'top':
-            y = parentposn[1]
-            if not s.Border.hide:
-                y += height
+            y = parentposn[1] + height
         elif v == 'bottom':
-            y = parentposn[3] - totalheight
-            if not s.Border.hide:
-                y -= height
+            y = parentposn[3] - totalheight - height
         elif v == 'centre':
-            y = (parentposn[1] +
-                 0.5*(parentposn[3] - parentposn[1]) - 0.5*totalheight)
+            y = ( parentposn[1] +
+                  0.5*(parentposn[3] - parentposn[1]) - 0.5*totalheight)
         elif v == 'manual':
             y = ( parentposn[3] -
                   (parentposn[3]-parentposn[1])*s.vertManual - totalheight )
-
-        # position of text in x
-        symbxpos = x
 
         # draw surrounding box
         if not s.Background.hide:
@@ -163,28 +172,31 @@ class Key(widget.Widget):
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
             painter.drawRect( qt4.QRectF(x, y, totalwidth, totalheight) )
-            symbxpos += height
+            x += height
+            y += height*0.5
 
         textpen = s.get('Text').makeQPen()
 
         # plot dataset entries
-        ypos = y + height/2
-        for c in keywidgets:
+        for index, plotter in enumerate(keywidgets):
+            xp, yp = index / numrows, index % numrows
+            xpos = x + xp*(maxwidth+2*height+symbolwidth)
+            ypos = y + yp*height
+
             # plot key symbol
             painter.save()
-            c.drawKeySymbol(painter, symbxpos, ypos,
-                            symbolwidth, height)
+            plotter.drawKeySymbol(painter, xpos, ypos,
+                                  symbolwidth, height)
             painter.restore()
 
             # write key text
             if showtext:
                 painter.setPen(textpen)
                 utils.Renderer(painter, font,
-                               symbxpos + height + symbolwidth,
-                               ypos + height/2, c.settings.key,
-                               -1, 0).render()
-
-            ypos += height
+                               xpos + height + symbolwidth,
+                               ypos,
+                               plotter.settings.key,
+                               -1, 1).render()
 
         painter.restore()
         painter.endPaintingWidget()
