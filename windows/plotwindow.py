@@ -184,6 +184,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.zoomfactor = 1.
         self.pagenumber = 0
         self.forceupdate = False
+        self.ignoreclick = False
 
         # work out dpi
         self.widgetdpi = self.logicalDpiY()
