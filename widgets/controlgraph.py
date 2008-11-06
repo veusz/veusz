@@ -23,7 +23,10 @@ Classes for moving widgets around
 """
 
 import math
+import itertools
+
 import veusz.qtall as qt4
+import veusz.document as document
 
 class _ShapeCorner(qt4.QGraphicsRectItem):
     """Representing the corners of the rectangle."""
@@ -49,6 +52,121 @@ class _ShapeCorner(qt4.QGraphicsRectItem):
         qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
         self.parentItem().doUpdate()
 
+#######################################################################
+
+class ControlGraphMarginBox(qt4.QGraphicsItem):
+    mapcornertoposn = ( (0, 1), (2, 1), (0, 3), (2, 3) )
+
+    def __init__(self, widget, posn, maxposn, painter):
+        qt4.QGraphicsItem.__init__(self)
+
+        self.corners = [_ShapeCorner(self) for i in xrange(4)]
+        self.lines = [qt4.QGraphicsLineItem(self) for i in xrange(4)]
+        for l in self.lines:
+            l.setPen( qt4.QPen(qt4.Qt.DotLine) )
+
+        self.origposn = self.posn = posn
+        self.maxposn = maxposn
+        self.widget = widget
+        self.updateCornerPosns()
+
+        # we need these later to convert back to original units
+        self.page_size = painter.veusz_page_size
+        self.scaling = painter.veusz_scaling
+        self.pixperpt = painter.veusz_pixperpt
+
+    def updateCornerPosns(self):
+        """Update all corners from updated box."""
+
+        # update cursors
+        self.corners[0].setCursor(qt4.Qt.SizeFDiagCursor)
+        self.corners[1].setCursor(qt4.Qt.SizeBDiagCursor)
+        self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
+        self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
+
+        # trim box to maximum size
+        self.posn[0] = max(self.posn[0], self.maxposn[0])
+        self.posn[1] = max(self.posn[1], self.maxposn[1])
+        self.posn[2] = min(self.posn[2], self.maxposn[2])
+        self.posn[3] = min(self.posn[3], self.maxposn[3])
+
+        # move corners
+        for corner, (xindex, yindex) in itertools.izip(self.corners,
+                                                       self.mapcornertoposn):
+            corner.setPos( qt4.QPointF( self.posn[xindex], self.posn[yindex] ) )
+
+        # move lines
+        self.lines[0].setLine(self.posn[0], self.posn[1],
+                              self.posn[2], self.posn[1])
+        self.lines[1].setLine(self.posn[0], self.posn[3],
+                              self.posn[2], self.posn[3])
+        self.lines[2].setLine(self.posn[0], self.posn[1],
+                              self.posn[0], self.posn[3])
+        self.lines[3].setLine(self.posn[2], self.posn[1],
+                              self.posn[2], self.posn[3])
+
+
+    def updateFromCorner(self, corner, event):
+        """Move corner of box to new position."""
+        index = self.corners.index(corner)
+        self.posn[ self.mapcornertoposn[index][0] ] = corner.x()
+        self.posn[ self.mapcornertoposn[index][1] ] = corner.y()
+
+        # this is needed if the corners move past each other
+        if self.posn[0] > self.posn[2]:
+            # swap x
+            self.posn[0], self.posn[2] = self.posn[2], self.posn[0]
+            self.corners[0], self.corners[1] = self.corners[1], self.corners[0]
+            self.corners[2], self.corners[3] = self.corners[3], self.corners[2]
+        if self.posn[1] > self.posn[3]:
+            # swap y
+            self.posn[1], self.posn[3] = self.posn[3], self.posn[1]
+            self.corners[0], self.corners[2] = self.corners[2], self.corners[0]
+            self.corners[1], self.corners[3] = self.corners[3], self.corners[1]
+
+        self.updateCornerPosns()
+        
+    def boundingRect(self):
+        return qt4.QRectF(0, 0, 0, 0)
+
+    def paint(self, painter, option, widget):
+        """Intentionally empty painter."""
+
+    def doUpdate(self):
+        """Update widget margins."""
+
+        s = self.widget.settings
+
+        # get margins in pixels
+        left = self.posn[0] - self.maxposn[0]
+        right = self.maxposn[2] - self.posn[2]
+        top = self.posn[1] - self.maxposn[1]
+        bottom = self.maxposn[3] - self.posn[3]
+
+        # set up fake painter containing veusz scalings
+        fakepainter = qt4.QPainter()
+        fakepainter.veusz_page_size = self.page_size
+        fakepainter.veusz_scaling = self.scaling
+        fakepainter.veusz_pixperpt = self.pixperpt
+
+        # convert to physical units
+        left = s.get('leftMargin').convertInverse(left, fakepainter)
+        right = s.get('rightMargin').convertInverse(right, fakepainter)
+        top = s.get('topMargin').convertInverse(top, fakepainter)
+        bottom = s.get('bottomMargin').convertInverse(bottom, fakepainter)
+
+        # modify widget margins
+        operations = (
+            document.OperationSettingSet(s.get('leftMargin'), left),
+            document.OperationSettingSet(s.get('rightMargin'), right),
+            document.OperationSettingSet(s.get('topMargin'), top),
+            document.OperationSettingSet(s.get('bottomMargin'), bottom)
+            )
+        self.widget.document.applyOperation(
+            document.OperationMultiple(operations, descr='Resize margins'))
+
+########################################################################
+
 class ControlGraphResizableBox(qt4.QGraphicsRectItem):
     """Control a resizable box.
     Item resizes centred around a position
@@ -68,6 +186,7 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
         self.angle = angle
         self.rotate(angle)
 
+        # initial setup
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setZValue(1.)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
@@ -81,6 +200,7 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
         self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
 
+        # whether box is allowed to be rotated
         self.rotator = None
         if allowrotate:
             self.rotator = _ShapeCorner(self, rotator=True)

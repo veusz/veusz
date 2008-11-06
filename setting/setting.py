@@ -533,14 +533,23 @@ def _distPhys(match, painter, mult):
     return (painter.veusz_pixperpt * mult *
             float(match.group(1)) * painter.veusz_scaling)
 
+def _distInvPhys(pixdist, painter, mult, unit):
+    """Convert number of pixels into physical distance."""
+    dist = pixdist / (mult * painter.veusz_pixperpt *
+                      painter.veusz_scaling)
+    return "%.3g%s" % (dist, unit)
+
 def _distPerc(match, painter, maxsize):
     """Convert from a percentage of maxsize."""
-
     return maxsize * 0.01 * float(match.group(1))
+
+def _distInvPerc(pixdist, painter, maxsize):
+    """Convert pixel distance into percentage."""
+    perc = pixdist * 100. / maxsize
+    return "%.3g%%" % perc
 
 def _distFrac(match, painter, maxsize):
     """Convert from a fraction a/b of maxsize."""
-
     return maxsize * float(match.group(1)) / float(match.group(2))
 
 def _distRatio(match, painter, maxsize):
@@ -558,31 +567,58 @@ class Distance(Setting):
     # mappings from regular expressions to function to convert distance
     # the recipient function takes regexp match,
     # painter and maximum size of frac
-    distregexp = [ ( re.compile('^([0-9\.]+) *%$'),
-                     _distPerc ),
-                   ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
-                     _distFrac ),
-                   ( re.compile('^([0-9\.]+) *pt$'),
-                    lambda match, painter, t:
-                     _distPhys(match, painter, 1.) ),
-                   ( re.compile('^([0-9\.]+) *cm$'),
-                     lambda match, painter, t:
-                            _distPhys(match, painter, 28.452756) ),
-                   ( re.compile('^([0-9\.]+) *mm$'),
-                     lambda match, painter, t:
-                        _distPhys(match, painter, 2.8452756) ),
-                   ( re.compile('^([0-9\.]+) *(inch|in|")$'),
-                        lambda match, painter, t:
-                    _distPhys(match, painter, 72.27) ),
-                   ( re.compile('^([0-9\.]+)$'),
-                    _distRatio )
-                   ]
+
+    # the second function is to do the inverse calculation
+    distregexp = [
+        # cm distance
+        ( re.compile('^([0-9\.]+) *cm$'),
+          lambda match, painter, t:
+              _distPhys(match, painter, 28.452756),
+          lambda pixdist, painter, t:
+              _distInvPhys(pixdist, painter, 28.452756, 'cm') ),
+
+        # point size
+        ( re.compile('^([0-9\.]+) *pt$'),
+          lambda match, painter, t:
+              _distPhys(match, painter, 1.),
+          lambda pixdist, painter, t:
+              _distInvPhys(pixdist, painter, 1., 'pt') ),
+
+        # mm distance
+        ( re.compile('^([0-9\.]+) *mm$'),
+          lambda match, painter, t:
+              _distPhys(match, painter, 2.8452756),
+          lambda pixdist, painter, t:
+              _distInvPhys(pixdist, painter, 2.8452756, 'mm') ),
+
+        # inch distance
+        ( re.compile('^([0-9\.]+) *(inch|in|")$'),
+          lambda match, painter, t:
+              _distPhys(match, painter, 72.27),
+          lambda pixdist, painter, t:
+              _distInvPhys(pixdist, painter, 72.27, 'in') ),
+
+        # plain fraction
+        ( re.compile('^([0-9\.]+)$'),
+          _distRatio,
+          _distInvPerc ),
+
+        # percentage
+        ( re.compile('^([0-9\.]+) *%$'),
+          _distPerc,
+          _distInvPerc ),
+
+        # fractional
+        ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
+          _distFrac,
+          _distInvPerc ),
+        ]
     
     def isDist(kls, dist):
         """Is the text a valid distance measure?"""
         
         dist = dist.strip()
-        for reg, fn in kls.distregexp:
+        for reg, fn, fninv in kls.distregexp:
             if reg.match(dist):
                 return True
             
@@ -630,7 +666,7 @@ class Distance(Setting):
         dist = distance.strip()
 
         # compare string against each regexp
-        for reg, fn in kls.distregexp:
+        for reg, fn, fninv in kls.distregexp:
             m = reg.match(dist)
 
             # if there's a match, then call the appropriate conversion fn
@@ -655,10 +691,32 @@ class Distance(Setting):
 
         return self.convert(painter) / painter.veusz_pixperpt
         
+    def convertInverse(self, distpix, painter):
+        """Convert distance in pixels into units of this distance.
+
+        Not that great coding as takes "painter" containing veusz
+        scaling parameters. Should be cleaned up.
+        """
+
+        # identify units and get inverse mapping
+        v = self.val
+        inversefn = None
+        for reg, fn, fninv in self.distregexp:
+            if reg.match(v):
+                inversefn = fninv
+                break
+        if not inversefn:
+            inversefn = self.distregexp[0][2]
+
+        maxsize = max( *painter.veusz_page_size )
+
+        # do inverse mapping
+        return inversefn(distpix, painter, maxsize)
+
 class DistanceOrAuto(Distance):
     """A distance or the value Auto"""
 
-    distregexp = Distance.distregexp + [ (re.compile('^Auto$'), None) ]
+    distregexp = Distance.distregexp + [(re.compile('^Auto$'), None, None)]
     
     def isAuto(self):
         return self.val == 'Auto'

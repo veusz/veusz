@@ -171,6 +171,11 @@ class Page(widget.Widget):
     def draw(self, parentposn, painter, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
 
+        # special scaling properties are stored in painter
+        if not hasattr(painter, 'veusz_scaling'):
+            painter.veusz_scaling = 1.
+        painter.veusz_pixperpt = painter.device().logicalDpiY() / 72.
+
         # document should pass us the page bounds
         x1, y1, x2, y2 = parentposn
 
@@ -185,7 +190,11 @@ class Page(widget.Widget):
 
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
+
+        # page size is stored in painter
         painter.veusz_page_size = (x2-x1, y2-y1)
+
+        # clip to page
         painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
         bounds = widget.Widget.draw(self, parentposn, painter,
                                     parentposn)

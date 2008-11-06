@@ -29,6 +29,7 @@ import widget
 import axis
 import page
 import containers
+import controlgraph
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
@@ -112,6 +113,13 @@ class Graph(widget.Widget):
                     s.get('rightMargin').convert(painter),
                     s.get('bottomMargin').convert(painter) )
         bounds = self.computeBounds(parentposn, painter, margins=margins)
+        maxbounds = self.computeBounds(parentposn, painter)
+
+        # controls for adjusting graph margins
+        self.controlgraphitems = [
+            controlgraph.ControlGraphMarginBox(self, bounds, maxbounds,
+                                               painter)
+            ]
 
         # do no painting if hidden
         if s.hide:

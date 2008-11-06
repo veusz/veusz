@@ -36,6 +36,7 @@ import widget
 import axis
 import page
 import graph
+import controlgraph
 
 class _gridengine:
     """Internal class to build up grid of widgets."""
@@ -322,6 +323,14 @@ class Grid(widget.Widget):
                     s.get('bottomMargin').convert(painter) )
 
         bounds = self.computeBounds(parentposn, painter, margins=margins)
+        maxbounds = self.computeBounds(parentposn, painter)
+
+        # controls for adjusting grid margins
+        self.controlgraphitems = [
+            controlgraph.ControlGraphMarginBox(self, bounds, maxbounds,
+                                               painter)
+            ]
+
         for c in self.children:
             if c.typename != 'axis':
                 # save old position, then update with calculated
