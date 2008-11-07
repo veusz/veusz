@@ -60,10 +60,12 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
     def __init__(self, widget, posn, maxposn, painter):
         qt4.QGraphicsItem.__init__(self)
 
+        self.setZValue(2.)
         self.corners = [_ShapeCorner(self) for i in xrange(4)]
         self.lines = [qt4.QGraphicsLineItem(self) for i in xrange(4)]
         for l in self.lines:
             l.setPen( qt4.QPen(qt4.Qt.DotLine) )
+            l.setZValue(2.)
 
         self.origposn = self.posn = posn
         self.maxposn = maxposn
