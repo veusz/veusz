@@ -199,6 +199,10 @@ class Graph(widget.Widget):
 
         return bounds
 
+    def updateControlItem(self, cgi):
+        """Graph resized or moved - call helper routine to move self."""
+        cgi.setWidgetMargins()
+
 # allow users to make Graph objects
 document.thefactory.register( Graph )
 

@@ -344,5 +344,9 @@ class Grid(widget.Widget):
 
         # do not call widget.Widget.draw
 
+    def updateControlItem(self, cgi):
+        """Grid resized or moved - call helper routine to move self."""
+        cgi.setWidgetMargins()
+
 # allow the factory to instantiate a grid
 document.thefactory.register( Grid )
