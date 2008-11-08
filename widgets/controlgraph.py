@@ -56,11 +56,13 @@ class _ShapeCorner(qt4.QGraphicsRectItem):
 
 ##############################################################################
 
+dottedlinepen = qt4.QPen(qt4.Qt.blue, 2, qt4.Qt.DotLine)
+
 class _EdgeLine(qt4.QGraphicsLineItem):
     """Line used for edges of resizing box."""
     def __init__(self, parent, ismovable = True):
         qt4.QGraphicsLineItem.__init__(self, parent)
-        self.setPen( qt4.QPen(qt4.Qt.blue, 2, qt4.Qt.DotLine) )
+        self.setPen(dottedlinepen)
         self.setZValue(2.)
         if ismovable:
             self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
@@ -79,10 +81,26 @@ class _EdgeLine(qt4.QGraphicsLineItem):
 ##############################################################################
 
 class ControlGraphMarginBox(qt4.QGraphicsItem):
+    """A box which can be moved or resized.
+
+    Can automatically set margins or widget
+    """
+
+    # posn coords of each corner
     mapcornertoposn = ( (0, 1), (2, 1), (0, 3), (2, 3) )
 
     def __init__(self, widget, posn, maxposn, painter,
                  ismovable = True, isresizable = True):
+        """Create control box item.
+
+        widget: widget this is controllng
+        posn: coordinates of box [x1, y1, x2, y2]
+        maxposn: coordinates of biggest possibe box
+        painter: painter to get scaling from
+        ismovable: box can be moved
+        isresizable: box can be resized
+        """
+
         qt4.QGraphicsItem.__init__(self)
         self.setZValue(2.)
 
@@ -263,7 +281,7 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setZValue(1.)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.setPen( qt4.QPen(qt4.Qt.DotLine) )
+        self.setPen(dottedlinepen)
         self.setBrush( qt4.QBrush() )
 
         # create child graphicsitem for each corner
@@ -373,7 +391,7 @@ class ControlGraphMovableBox(qt4.QGraphicsItem):
             painter.setBrush( qt4.Qt.black )
             painter.drawRect(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
 
-        painter.setPen( qt4.Qt.DotLine )
+        painter.setPen( dottedlinepen )
         painter.setBrush( qt4.QBrush() )
         bb = self.boxbounds
         painter.drawRect(bb[0], bb[1], bb[2]-bb[0], bb[3]-bb[1])
@@ -397,7 +415,7 @@ class ControlGraphLine(qt4.QGraphicsLineItem):
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
         self.setZValue(1.)
-        self.setPen( qt4.QPen(qt4.QBrush(qt4.Qt.black), 2, qt4.Qt.DotLine) )
+        self.setPen(dottedlinepen)
         self.pts = [_ShapeCorner(self, rotator=True),
                     _ShapeCorner(self, rotator=True)]
         self.pts[0].setPos(x1, y1)
