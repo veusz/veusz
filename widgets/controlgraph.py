@@ -357,52 +357,43 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
 
 ##############################################################################
 
-class ControlGraphMovableBox(qt4.QGraphicsItem):
+class ControlGraphMovableBox(ControlGraphMarginBox):
     """Item for user display for controlling widget.
     This is a dotted movable box with an optional "cross" where
     the real position of the widget is
     """
 
-    def __init__(self, widget, boxbounds, crosspos=None):
-        qt4.QGraphicsItem.__init__(self)
-        self.widget = widget
-        self.boxbounds = boxbounds
-        self.setCursor(qt4.Qt.SizeAllCursor)
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.setZValue(1.)
-        self.crosspos = crosspos
+    def __init__(self, widget, posn, painter, crosspos=None):
+        ControlGraphMarginBox.__init__(self, widget, posn,
+                                       [-10000, -10000, 10000, 10000],
+                                       painter, isresizable=False)
+        self.cross = _ShapeCorner(self)
+        self.crosspos = (crosspos[0] - posn[0],
+                         crosspos[1] - posn[1])
+        self.updateCornerPosns()
 
-    def mousePressEvent(self, event):
-        self.update()
-        self.startpos = self.pos()
-        qt4.QGraphicsItem.mousePressEvent(self, event)
+    def updateCornerPosns(self):
+        ControlGraphMarginBox.updateCornerPosns(self)
 
-    def mouseReleaseEvent(self, event):
-        """If widget has moved, tell it."""
-        self.update()
-        if self.pos() != self.startpos:
-            self.widget.updateControlItem(self)
-        qt4.QGraphicsItem.mouseReleaseEvent(self, event)
+        # this fails if called before self.cross is initialised!
+        if hasattr(self, 'cross'):
+            self.cross.setPos( self.crosspos[0] + self.posn[0],
+                               self.crosspos[1] + self.posn[1] )
 
-    def paint(self, painter, option, widget):
-        """Draw box and 'cross'."""
-        if self.crosspos:
-            painter.setPen( qt4.Qt.NoPen )
-            painter.setBrush( qt4.Qt.black )
-            painter.drawRect(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
+    def updateFromCorner(self, corner, event):
+        if corner == self.cross:
+            # if cross moves, move whole box
+            cx, cy = self.cross.pos().x(), self.cross.pos().y()
+            dx = cx - (self.crosspos[0] + self.posn[0])
+            dy = cy - (self.crosspos[1] + self.posn[1])
 
-        painter.setPen( dottedlinepen )
-        painter.setBrush( qt4.QBrush() )
-        bb = self.boxbounds
-        painter.drawRect(bb[0], bb[1], bb[2]-bb[0], bb[3]-bb[1])
-
-    def boundingRect(self):
-        """Work out bounding rectangle"""
-        bb = self.boxbounds
-        br = qt4.QRectF(bb[0]-1, bb[1]-1, bb[2]-bb[0]+2, bb[3]-bb[1]+2)
-        if self.crosspos:
-            br |= qt4.QRectF(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
-        return br
+            self.posn[0] += dx
+            self.posn[1] += dy
+            self.posn[2] += dx
+            self.posn[3] += dy
+            self.updateCornerPosns()
+        else:
+            ControlGraphMarginBox.updateFromCorner(self, corner, event)
 
 ##############################################################################
 

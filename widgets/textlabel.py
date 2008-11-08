@@ -148,6 +148,7 @@ class TextLabel(plotters.GenericPlotter):
                                       s.angle ).render()
             if isnotdataset:
                 cgi = controlgraph.ControlGraphMovableBox(self, tbounds,
+                                                          painter,
                                                           crosspos = (x, y))
                 cgi.labelpt = (x, y)
                 cgi.widgetposn = posn
@@ -167,8 +168,8 @@ class TextLabel(plotters.GenericPlotter):
         ind = cgi.index
 
         # convert movement of bounds into movement of label itself
-        x = cgi.labelpt[0] + cgi.pos().x()
-        y = cgi.labelpt[1] + cgi.pos().y()
+        x = cgi.crosspos[0] + cgi.posn[0]
+        y = cgi.crosspos[1] + cgi.posn[1]
 
         if s.positioning == 'axes':
             # positions in axes coordinates
