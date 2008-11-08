@@ -286,22 +286,14 @@ class Document( qt4.QObject ):
         painter.setRenderHint(qt4.QPainter.TextAntialiasing,
                               antialias)
 
-        # work out how many pixels correspond to the given size
-        width, height = self.basewidget.getSize(painter)
-        children = self.basewidget.children
-
         # This all assumes that only pages can go into the root widget
-        i = 0
-        no = len(pages)
-
-        for p in pages:
-            c = children[p]
-            c.draw( (0, 0, width, height), painter )
+        num = len(pages)
+        for count, page in enumerate(pages):
+            self.basewidget.draw(painter, page)
 
             # start new pages between each page
-            if i < no-1:
+            if count < num-1:
                 printer.newPage()
-            i += 1
 
         painter.end()
 
@@ -311,8 +303,7 @@ class Document( qt4.QObject ):
         painter.veusz_scaling = scaling
         if dpi is not None:
             painter.veusz_pixperpt = dpi / 72.
-        width, height = self.basewidget.getSize(painter)
-        self.getPage(page).draw( (0, 0, width, height), painter)
+        self.basewidget.draw(painter, page)
 
     def getNumberPages(self):
         """Return the number of pages in the document."""
@@ -432,7 +423,7 @@ class Document( qt4.QObject ):
         printer.newPage()
         painter = Painter(printer)
         width, height = self.basewidget.getSize(painter)
-        self.getPage(page).draw( (0, 0, width, height), painter)
+        self.basewidget.draw(painter, page)
         painter.end()
 
         # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
@@ -488,7 +479,7 @@ class Document( qt4.QObject ):
         rend.setFileName(filename)
         rend.setSize( qt4.QSize(int(width), int(height)) )
         painter = Painter(rend)
-        self.getPage(page).draw( (0, 0, width, height), painter)
+        self.basewidget.draw( painter, page )
         painter.end()
 
     def export(self, filename, pagenumber, color=True, dpi=100,

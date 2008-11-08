@@ -224,7 +224,7 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
             document.OperationSettingSet(s.get('bottomMargin'), bottom)
             )
         self.widget.document.applyOperation(
-            document.OperationMultiple(operations, descr='Resize margins'))
+            document.OperationMultiple(operations, descr='resize margins'))
 
 ##############################################################################
 

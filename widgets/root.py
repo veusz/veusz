@@ -27,6 +27,7 @@ import veusz.document as document
 import veusz.setting as setting
 
 import widget
+import controlgraph
 
 class Root(widget.Widget):
     """Root widget class for plotting the document."""
@@ -64,20 +65,51 @@ class Root(widget.Widget):
         return ( self.settings.get('width').convert(painter),
                  self.settings.get('height').convert(painter) )
             
-    def draw(self, parentposn, painter, outerbounds = None):
-        """Draw the plotter. Clip graph inside bounds."""
+    def draw(self, painter, pagenum):
+        """Draw the page requested on the painter."""
 
-        x1, y1, x2, y2 = parentposn
+        xw, yw = self.getSize(painter)
+        posn = [0, 0, xw, yw]
+        painter.beginPaintingWidget(self, posn)
+        page = self.children[pagenum]
+        page.draw( posn, painter )
 
-        painter.beginPaintingWidget(self, parentposn)
-        painter.save()
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1+1, y2-y1+1) )
-        bounds = widget.Widget.draw(self, parentposn, painter,
-                                    outerbounds = parentposn)
-        painter.restore()
+        self.controlgraphitems = [
+            controlgraph.ControlGraphMarginBox(self, posn,
+                                               [-10000, -10000,
+                                                 10000,  10000],
+                                               painter,
+                                               ismovable = False)
+            ]
+
         painter.endPaintingWidget()
 
-        return bounds
+    def updateControlItem(self, cgi):
+        """Graph resized or moved - call helper routine to move self."""
+
+        s = self.settings
+
+        # get margins in pixels
+        width = cgi.posn[2] - cgi.posn[0]
+        height = cgi.posn[3] - cgi.posn[1]
+
+        # set up fake painter containing veusz scalings
+        fakepainter = qt4.QPainter()
+        fakepainter.veusz_page_size = cgi.page_size
+        fakepainter.veusz_scaling = cgi.scaling
+        fakepainter.veusz_pixperpt = cgi.pixperpt
+
+        # convert to physical units
+        width = s.get('width').convertInverse(width, fakepainter)
+        height = s.get('height').convertInverse(height, fakepainter)
+
+        # modify widget margins
+        operations = (
+            document.OperationSettingSet(s.get('width'), width),
+            document.OperationSettingSet(s.get('height'), height),
+            )
+        self.document.applyOperation(
+            document.OperationMultiple(operations, descr='change page size'))
 
 # allow the factory to instantiate this
 document.thefactory.register( Root )

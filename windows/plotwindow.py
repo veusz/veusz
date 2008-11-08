@@ -886,7 +886,7 @@ class PlotWindow( qt4.QGraphicsView ):
         for item in self.controlitems:
             self.scene.removeItem(item)
         del self.controlitems[:]
-        
+
         # put in new items
         if widget is not None and widget in self.widgetcontrolgraphs:
             for item in self.widgetcontrolgraphs[widget]:
