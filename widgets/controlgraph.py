@@ -151,6 +151,18 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
 
         # add on deltas to box coordinates
         dx, dy = thispos.x()-ox, thispos.y()-oy
+
+        # make sure box can't be moved outside the allowed region
+        if dx > 0:
+            dx = min(dx, self.maxposn[2]-self.posn[2])
+        else:
+            dx = -min(abs(dx), abs(self.maxposn[0]-self.posn[0]))
+        if dy > 0:
+            dy = min(dy, self.maxposn[3]-self.posn[3])
+        else:
+            dy = -min(abs(dy), abs(self.maxposn[1]-self.posn[1]))
+
+        # move the box
         self.posn[0] += dx
         self.posn[1] += dy
         self.posn[2] += dx

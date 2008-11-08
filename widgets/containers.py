@@ -325,6 +325,9 @@ class Grid(widget.Widget):
         bounds = self.computeBounds(parentposn, painter, margins=margins)
         maxbounds = self.computeBounds(parentposn, painter)
 
+        painter.beginPaintingWidget(self, bounds)
+        painter.endPaintingWidget()
+        
         # controls for adjusting grid margins
         self.controlgraphitems = [
             controlgraph.ControlGraphMarginBox(self, bounds, maxbounds,
