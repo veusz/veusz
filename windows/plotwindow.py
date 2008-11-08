@@ -167,6 +167,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # this graphics scene item is the actual graph
         self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
         self.controlitems = []
+        self.widgetcontrolgraphs = {}
         self.selwidget = None
 
         # zoom rectangle for zooming into graph (not shown normally)
@@ -609,6 +610,12 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.widgetpositions = painter.widgetpositions
                     self.widgetpositionslookup = painter.widgetpositionslookup
 
+                    # collect all controlgraphs (in case these change later
+                    # from e.g. printing)
+                    self.widgetcontrolgraphs = dict(
+                        [ (w[0], w[0].controlgraphitems)
+                          for w in self.widgetpositions ]) 
+
                     # update selected widget items
                     self.selectedWidget(self.selwidget)
                     
@@ -881,7 +888,7 @@ class PlotWindow( qt4.QGraphicsView ):
         del self.controlitems[:]
         
         # put in new items
-        if widget is not None:
-            for item in widget.controlgraphitems:
+        if widget is not None and widget in self.widgetcontrolgraphs:
+            for item in self.widgetcontrolgraphs[widget]:
                 self.controlitems.append(item)
                 self.scene.addItem(item)

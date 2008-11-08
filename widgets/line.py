@@ -121,8 +121,6 @@ class Line(widget.Widget):
         if (xpos is None or ypos is None or length is None or angle is None):
             return
 
-        self.lastposn = posn
-
         # translate coordinates from axes or relative values
         if s.positioning == 'axes':
             if hasattr(self.parent, 'getAxes'):
@@ -142,7 +140,7 @@ class Line(widget.Widget):
                          not s.get('yPos').isDataset(d) and
                          not s.get('length').isDataset(d) and
                          not s.get('angle').isDataset(d) )
-        del self.controlgraphitems[:]
+        self.controlgraphitems = []
 
         arrowsize = s.get('arrowSize').convert(painter)
 
@@ -179,6 +177,7 @@ class Line(widget.Widget):
                     x + l*dx*math.cos(a/180.*math.pi),
                     y + l*dx*math.sin(a/180.*math.pi))
                 cgi.index = index
+                cgi.widgetposn = posn
                 index += 1
                 self.controlgraphitems.append(cgi)
 
@@ -202,18 +201,18 @@ class Line(widget.Widget):
             if None in axes:
                 return
             
-            xpos = axes[0].plotterToGraphCoords(self.lastposn,
+            xpos = axes[0].plotterToGraphCoords(cgi.widgetposn,
                                                 N.array(pt1[0]))
-            ypos = axes[1].plotterToGraphCoords(self.lastposn,
+            ypos = axes[1].plotterToGraphCoords(cgi.widgetposn,
                                                 N.array(pt1[1]))
         else:
-            xpos = ((pt1[0] - self.lastposn[0]) /
-                    (self.lastposn[2]-self.lastposn[0]))
-            ypos = ((pt1[1] - self.lastposn[3]) /
-                    (self.lastposn[1]-self.lastposn[3]))
+            xpos = ((pt1[0] - cgi.widgetposn[0]) /
+                    (cgi.widgetposn[2]-cgi.widgetposn[0]))
+            ypos = ((pt1[1] - cgi.widgetposn[3]) /
+                    (cgi.widgetposn[1]-cgi.widgetposn[3]))
 
         length = ( math.sqrt( (pt2[0]-pt1[0])**2 + (pt2[1]-pt1[1])**2 ) /
-                   (self.lastposn[2]-self.lastposn[0]) )
+                   (cgi.widgetposn[2]-cgi.widgetposn[0]) )
         angle = ( (math.atan2( pt2[1]-pt1[1], pt2[0]-pt1[0] )
                    * 180. / math.pi) % 360. )
 

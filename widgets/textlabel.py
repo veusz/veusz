@@ -136,7 +136,7 @@ class TextLabel(plotters.GenericPlotter):
         painter.setPen(textpen)
         font = s.get('Text').makeQFont(painter)
 
-        del self.controlgraphitems[:]
+        self.controlgraphitems = []
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
                          not s.get('yPos').isDataset(d) )
 

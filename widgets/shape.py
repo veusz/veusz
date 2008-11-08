@@ -142,7 +142,7 @@ class BoxShape(Shape):
                          not s.get('width').isDataset(d) and
                          not s.get('height').isDataset(d) and
                          not s.get('rotate').isDataset(d) )
-        del self.controlgraphitems[:]
+        self.controlgraphitems = []
 
         painter.beginPaintingWidget(self, posn)
         painter.save()
@@ -176,7 +176,7 @@ class BoxShape(Shape):
                 cgi = controlgraph.ControlGraphResizableBox(
                     self, [x, y], [wp, hp], r, allowrotate=True)
                 cgi.index = index
-                cgi.lastposn = posn
+                cgi.widgetposn = posn
                 index += 1
                 self.controlgraphitems.append(cgi)
 
@@ -200,18 +200,18 @@ class BoxShape(Shape):
             if None in axes:
                 return
             
-            xpos = axes[0].plotterToGraphCoords(cgi.lastposn,
+            xpos = axes[0].plotterToGraphCoords(cgi.widgetposn,
                                                 N.array(cgi.posn[0]))
-            ypos = axes[1].plotterToGraphCoords(cgi.lastposn,
+            ypos = axes[1].plotterToGraphCoords(cgi.widgetposn,
                                                 N.array(cgi.posn[1]))
         else:
-            xpos = ((cgi.posn[0] - cgi.lastposn[0]) /
-                    (cgi.lastposn[2]-cgi.lastposn[0]))
-            ypos = ((cgi.posn[1] - cgi.lastposn[3]) /
-                    (cgi.lastposn[1]-cgi.lastposn[3]))
+            xpos = ((cgi.posn[0] - cgi.widgetposn[0]) /
+                    (cgi.widgetposn[2]-cgi.widgetposn[0]))
+            ypos = ((cgi.posn[1] - cgi.widgetposn[3]) /
+                    (cgi.widgetposn[1]-cgi.widgetposn[3]))
 
-        xw = abs(cgi.dims[0] / (cgi.lastposn[2]-cgi.lastposn[0]))
-        yw = abs(cgi.dims[1] / (cgi.lastposn[1]-cgi.lastposn[3]))
+        xw = abs(cgi.dims[0] / (cgi.widgetposn[2]-cgi.widgetposn[0]))
+        yw = abs(cgi.dims[1] / (cgi.widgetposn[1]-cgi.widgetposn[3]))
 
         # actually do the adjustment on the document
         xp, yp = list(s.xPos), list(s.yPos)

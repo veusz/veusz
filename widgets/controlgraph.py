@@ -28,6 +28,8 @@ import itertools
 import veusz.qtall as qt4
 import veusz.document as document
 
+##############################################################################
+
 class _ShapeCorner(qt4.QGraphicsRectItem):
     """Representing the corners of the rectangle."""
     def __init__(self, parent, rotator=False):
@@ -52,7 +54,7 @@ class _ShapeCorner(qt4.QGraphicsRectItem):
         qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
         self.parentItem().doUpdate()
 
-#######################################################################
+##############################################################################
 
 class _EdgeLine(qt4.QGraphicsLineItem):
     """Line used for edges of resizing box."""
@@ -73,6 +75,8 @@ class _EdgeLine(qt4.QGraphicsLineItem):
         """Notify parent on unclicking."""
         qt4.QGraphicsLineItem.mouseReleaseEvent(self, event)
         self.parentItem().doUpdate()
+
+##############################################################################
 
 class ControlGraphMarginBox(qt4.QGraphicsItem):
     mapcornertoposn = ( (0, 1), (2, 1), (0, 3), (2, 3) )
@@ -222,7 +226,7 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
         self.widget.document.applyOperation(
             document.OperationMultiple(operations, descr='Resize margins'))
 
-########################################################################
+##############################################################################
 
 class ControlGraphResizableBox(qt4.QGraphicsRectItem):
     """Control a resizable box.
@@ -321,6 +325,8 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
         """Tell the user the graphicsitem has been moved or resized."""
         self.widget.updateControlItem(self)
 
+##############################################################################
+
 class ControlGraphMovableBox(qt4.QGraphicsItem):
     """Item for user display for controlling widget.
     This is a dotted movable box with an optional "cross" where
@@ -367,6 +373,8 @@ class ControlGraphMovableBox(qt4.QGraphicsItem):
         if self.crosspos:
             br |= qt4.QRectF(self.crosspos[0]-4, self.crosspos[1]-4, 8, 8)
         return br
+
+##############################################################################
 
 class ControlGraphLine(qt4.QGraphicsLineItem):
     """For controlling the position and ends of a line."""
