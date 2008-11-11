@@ -290,6 +290,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # a button for the zoom icon
         zoomtb = qt4.QToolButton(self.viewtoolbar)
         zoomtb.setIcon( utils.getIcon('zoom-options.png') )
+        zoomtb.setToolTip("Zoom in or out of the page")
 
         # drop down zoom button on toolbar
         zoompop = qt4.QMenu(zoomtb)
