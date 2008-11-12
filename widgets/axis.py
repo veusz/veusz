@@ -33,6 +33,7 @@ import axisticks
 import graph
 import containers
 import itertools
+import controlgraph
 
 class Axis(widget.Widget):
     """Manages and draws an axis."""
@@ -675,6 +676,15 @@ class Axis(widget.Widget):
         posn = widget.Widget.draw(self, parentposn, painter, outerbounds)
         self._updatePlotRange(posn)
 
+        # make control item for axis
+        self.controlgraphitems = [
+            controlgraph.ControlAxisLine(self, s.direction,
+                                         self.coordParr1,
+                                         self.coordParr2,
+                                         self.coordPerp,
+                                         posn)
+            ]
+
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
 
@@ -743,7 +753,33 @@ class Axis(widget.Widget):
 
         # restore the state of the painter
         painter.restore()
+
         painter.endPaintingWidget()
+
+    def updateControlItem(self, cgi):
+        """Update axis position from control item."""
+
+        s = self.settings
+        p = cgi.maxposn
+        if s.direction == 'horizontal':
+            minfrac = abs((cgi.minpos - p[0]) / (p[2] - p[0]))
+            maxfrac = abs((cgi.maxpos - p[0]) / (p[2] - p[0]))
+            axisfrac = abs((cgi.axispos - p[3]) / (p[1] - p[3]))
+        else:
+            minfrac = abs((cgi.minpos - p[3]) / (p[1] - p[3]))
+            maxfrac = abs((cgi.maxpos - p[3]) / (p[1] - p[3]))
+            axisfrac = abs((cgi.axispos - p[0]) / (p[2] - p[0]))
+
+        if minfrac > maxfrac:
+            minfrac, maxfrac = maxfrac, minfrac
+
+        operations = (
+            document.OperationSettingSet(s.get('lowerPosition'), minfrac),
+            document.OperationSettingSet(s.get('upperPosition'), maxfrac),
+            document.OperationSettingSet(s.get('otherPosition'), axisfrac),
+            )
+        self.document.applyOperation(
+            document.OperationMultiple(operations, descr='adjust axis'))
 
 # allow the factory to instantiate an axis
 document.thefactory.register( Axis )
