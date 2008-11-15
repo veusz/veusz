@@ -174,7 +174,10 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
         """Edge line of box was moved - update bounding box."""
 
         # need old coordinate to work out how far line has moved
-        li = self.lines.index(line)
+        try:
+            li = self.lines.index(line)
+        except ValueError:
+            return
         ox = self.posn[ (0, 2, 2, 0)[li] ]
         oy = self.posn[ (1, 1, 3, 3)[li] ]
 
@@ -202,7 +205,10 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
 
     def updateFromCorner(self, corner, event):
         """Move corner of box to new position."""
-        index = self.corners.index(corner)
+        try:
+            index = self.corners.index(corner)
+        except ValueError:
+            return
         self.posn[ self.mapcornertoposn[index][0] ] = corner.x()
         self.posn[ self.mapcornertoposn[index][1] ] = corner.y()
 
