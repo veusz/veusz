@@ -20,6 +20,9 @@
 
 """
 Classes for moving widgets around
+
+ControlGraphItems have a prepareToShow(self) which is called before
+the plot window shows the cgi - this setups the cgi for being shown
 """
 
 import math
@@ -104,32 +107,36 @@ class ControlGraphMarginBox(qt4.QGraphicsItem):
         qt4.QGraphicsItem.__init__(self)
 
         # save values
-        self.origposn = self.posn = posn
+        self.posn = posn
         self.maxposn = maxposn
         self.widget = widget
+        self.ismovable = ismovable
+        self.isresizable = isresizable
 
         # we need these later to convert back to original units
         self.page_size = painter.veusz_page_size
         self.scaling = painter.veusz_scaling
         self.pixperpt = painter.veusz_pixperpt
 
+    def prepareToShow(self):
+        """Box is about to be shown."""
+
         self.setZValue(2.)
 
-        # corners of box
+        # create corners of box
         self.corners = [_ShapeCorner(self)
                         for i in xrange(4)]
 
         # lines connecting corners
-        self.lines = [_EdgeLine(self, ismovable=ismovable)
+        self.lines = [_EdgeLine(self, ismovable=self.ismovable)
                       for i in xrange(4)]
 
         # hide corners if box is not resizable
-        if not isresizable:
+        if not self.isresizable:
             for c in self.corners:
                 c.hide()
 
         self.updateCornerPosns()
-
 
     def updateCornerPosns(self):
         """Update all corners from updated box."""
@@ -273,13 +280,18 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
         """
 
         qt4.QGraphicsRectItem.__init__(self, 0., 0., dims[0], dims[1])
-        self.setPos(posn[0], posn[1])
 
         self.widget = widget
         self.posn = posn
         self.dims = dims
         self.angle = angle
-        self.rotate(angle)
+        self.allowrotate = allowrotate
+
+    def prepareToShow(self):
+        """Box about to be shown."""
+        self.resetTransform()
+        self.setPos(self.posn[0], self.posn[1])
+        self.rotate(self.angle)
 
         # initial setup
         self.setCursor(qt4.Qt.SizeAllCursor)
@@ -297,7 +309,7 @@ class ControlGraphResizableBox(qt4.QGraphicsRectItem):
 
         # whether box is allowed to be rotated
         self.rotator = None
-        if allowrotate:
+        if self.allowrotate:
             self.rotator = _ShapeCorner(self, rotator=True)
             self.rotator.setCursor(qt4.Qt.CrossCursor)
 
@@ -374,6 +386,8 @@ class ControlGraphMovableBox(ControlGraphMarginBox):
         self.cross = _ShapeCorner(self)
         self.crosspos = (crosspos[0] - posn[0],
                          crosspos[1] - posn[1])
+
+    def prepareToShow(self):
         self.updateCornerPosns()
 
     def updateCornerPosns(self):
@@ -407,6 +421,11 @@ class ControlGraphLine(qt4.QGraphicsLineItem):
     def __init__(self, widget, x1, y1, x2, y2):
         qt4.QGraphicsLineItem.__init__(self, x1, y1, x2, y2)
         self.widget = widget
+        self.initline = x1, y1, x2, y2
+
+    def prepareToShow(self):
+        """Line about to be shown."""
+        x1, y1, x2, y2 = self.initline
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
         self.setZValue(1.)
@@ -444,6 +463,7 @@ class _AxisGraphicsLineItem(qt4.QGraphicsLineItem):
     def __init__(self, parent):
         qt4.QGraphicsLineItem.__init__(self, parent)
         self.parent = parent
+
         self.setPen(dottedlinepen)
         self.setZValue(2.)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
@@ -474,12 +494,14 @@ class ControlAxisLine(qt4.QGraphicsItem):
         self.axispos = axispos
         self.maxposn = maxposn
 
+    def prepareToShow(self):
+        """Line is about to be shown."""
         self.pts = [ _ShapeCorner(self),
                      _ShapeCorner(self) ]
         self.line = _AxisGraphicsLineItem(self)
 
         # set correct coordinates
-        self.horz = direction == 'horizontal'
+        self.horz = (self.direction == 'horizontal')
         endcurs = self.curs[not self.horz]
         self.pts[0].setCursor(endcurs)
         self.pts[1].setCursor(endcurs)

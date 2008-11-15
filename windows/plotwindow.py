@@ -891,5 +891,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # put in new items
         if widget is not None and widget in self.widgetcontrolgraphs:
             for item in self.widgetcontrolgraphs[widget]:
+                item.prepareToShow()
                 self.controlitems.append(item)
                 self.scene.addItem(item)
