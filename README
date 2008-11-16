@@ -1,4 +1,4 @@
-Veusz 1.1
+Veusz 1.2
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -7,23 +7,30 @@ http://home.gna.org/veusz/
 Veusz is Copyright (C) 2003-2008 Jeremy Sanders <jeremy@jeremysanders.net>
 Licenced under the GPL (version 2 or greater).
 
-Veusz is a scientific plotting package written in Python, using PyQt4
-for display and user-interfaces, and numpy for handling the numeric
-data. Veusz is designed to produce publication-ready Postscript/PDF
-output. The user interface aims to be simple, consistent and powerful.
+Veusz is a scientific plotting package. It is written in Python, using
+PyQt4 for display and user-interfaces, and numpy for handling the
+numeric data. Veusz is designed to produce publication-ready
+Postscript/PDF output. The user interface aims to be simple,
+consistent and powerful.
 
 Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Feature changes from 1.0:
- * Axes autoscale when plotting functions
- * Labels can be dragged around on plots
- * More marker symbols
- * SVG export of plots
+Changes from 1.1:
+ * Boxes, ellipses, lines, arrows and image files can now be added to
+   the plot or page and interactively adjusted.
+ * Page sizes, graphs, grids and axes can be interactively resized.
+ * Plot keys can have multiple columns.
 
- * The point plotting and axis range code has been rewritten.
- * Includes quite a few minor bugfixes
+ * Several user interface usability enhancements.
+
+ * Embedding interface has been rewritten to be more robust using
+   multiple processes.
+ * Embedding interface has been expanded.
+
+ * PDF export fixed for recent versions of Qt
+ * Quite a lot of minor bug fixes
  
 Features of package:
  * X-Y plots (with errorbars)
@@ -35,8 +42,9 @@ Features of package:
  * Stacked plots and arrays of plots
  * Plot keys
  * Plot labels
+ * Shapes and arrows on plots
  * LaTeX-like formatting for text
- * EPS/PDF/PNG export
+ * EPS/PDF/PNG/SVG export
  * Scripting interface
  * Dataset creation/manipulation
  * Embed Veusz within other programs
@@ -52,6 +60,8 @@ Requirements:
    http://www.riverbankcomputing.co.uk/sip/
  numpy >= 1.0
    http://numpy.scipy.org/
+
+Optional:
  Microsoft Core Fonts (recommended for nice output)
    http://corefonts.sourceforge.net/
  PyFITS >= 1.1 (optional for FITS import)
@@ -63,7 +73,6 @@ manual is in pdf, html and text format (generated from docbook).
 Issues:
  * Can be very slow to plot large datasets if antialiasing is enabled.
    Right click on graph and disable antialias to speed up output.
- * The embedding interface appears to crash on exiting.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
 the mailing lists at
@@ -77,4 +86,3 @@ Jeremy Sanders
 
 -------------------------------------------------------------------------------
 $Id$
- 

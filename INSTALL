@@ -23,13 +23,14 @@ Optional requirements:
 
 Linux binary
 ============
-If you do not have the requirements, you can use the Linux binary
-instead. Note that this is not guaranteed to work due to glibc/library
-incompatibilities. You need to simply unpack the tar file and run the
-main executable:
 
-# tar xzf veusz-linux-i386-1.1.tar.gz     [change version here]
-# cd veusz-linux-i386-1.1
+If you do not have the requirements, you can use the Linux binary
+instead (if available). Note that this is not guaranteed to work due
+to glibc/library incompatibilities. You need to simply unpack the tar
+file and run the main executable:
+
+# tar xzf veusz-linux-i386-1.2.tar.gz     [change version here]
+# cd veusz-linux-i386-1.2
 # ./veusz
 
 Simple source use (if requirements installed)
@@ -37,8 +38,8 @@ Simple source use (if requirements installed)
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-1.1.tar.gz                [change version here]
-# cd veusz-1.1
+# tar xzf veusz-1.2.tar.gz                [change version here]
+# cd veusz-1.2
 # ./veusz_main.py
 
 However certain features (currently contours) require C modules to be
@@ -54,14 +55,14 @@ Installing/upgrading from rpm
 
 For rpm based distributions, download the rpm for your distribution
 (if it is available), and install as root:
-# rpm -Uvh veusz-1.1-1.i386.rpm
+# rpm -Uvh veusz-1.2-1.i386.rpm
 (use correct name of rpm here)
 
 If there is no rpm available for your distribution, download the source
 rpm and rebuild
-# rpmbuild --rebuild veusz-1.1-1.src.rpm
+# rpmbuild --rebuild veusz-1.2-1.src.rpm
 then install it from the location given when that command completes.
-# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-1.1-1.i386.rpm
+# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-1.2-1.i386.rpm
 
 If this doesn't work, see below for how to create an rpm from the source.
 A "veusz" command is installed into your path to run the program.
@@ -74,7 +75,7 @@ list a few of the possible method here:
 To install to the standard location on the hard disk (it's better to use
 rpms if you have an rpm-based linux distibution)
 ------------------------------------------------------------------------
-# cd veusz-1.1
+# cd veusz-1.2
 # python setup.py build
 # su
 [enter root password]
@@ -84,7 +85,7 @@ rpms if you have an rpm-based linux distibution)
 To make an rpm from the distribution
 ------------------------------------
 
-# cd veusz-1.1
+# cd veusz-1.2
 # python setup.py bdist_rpm
 
 An rpm should be generated in the dist subdirectory, so...
@@ -103,6 +104,18 @@ Simply run the setup.exe binary installer.
 Use control panel add/remove programs to remove.
 
 For other ways of installing see http://docs.python.org/inst/inst.html
+
+Installing on Mac OS X
+======================
+Veusz can be installed on Mac OS X. The requirements can be obtained
+using a system such as MacPorts. You can install them with MacPorts
+using:
+
+$ sudo port install qt4-mac
+$ sudo port install py-numpy
+
+Once these have successfully built and installed, you can unpack veusz
+and install as above.
 
 -------------------------------------------------------------------------------
 $Id$
