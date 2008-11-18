@@ -135,18 +135,18 @@ class EmbedApplication(Application):
         self.clients = {}
         self.clientcounter = 0
 
-    def readLenFromSocket(socket, length):
+    def readLenFromSocket(thesocket, length):
         """Read length bytes from socket."""
         s = ''
         while len(s) < length:
-            s += socket.recv(length-len(s))
+            s += thesocket.recv(length-len(s))
         return s
     readLenFromSocket = staticmethod(readLenFromSocket)
 
-    def writeToSocket(socket, data):
+    def writeToSocket(thesocket, data):
         count = 0
         while count < len(data):
-            count += socket.send(data[count:])
+            count += thesocket.send(data[count:])
     writeToSocket = staticmethod(writeToSocket)
 
     def readCommand(socket):
@@ -173,6 +173,7 @@ class EmbedApplication(Application):
 
     def slotDataToRead(self, socketfd):
         self.notifier.setEnabled(False)
+        self.socket.setblocking(1)
         
         # unpickle command and arguments
         window, cmd, args, argsv = self.readCommand(self.socket)
@@ -214,6 +215,7 @@ class EmbedApplication(Application):
             self.closeAllWindows()
             self.quit()
 
+        self.socket.setblocking(0)
         self.notifier.setEnabled(True)
 
 def main():
