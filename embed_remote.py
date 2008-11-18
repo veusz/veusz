@@ -22,6 +22,7 @@ import sys
 import os
 import struct
 import cPickle
+import socket
 
 import veusz.qtall as qt4
 from veusz.application import Application
@@ -122,12 +123,11 @@ class EmbedApplication(Application):
     # lengths of lengths sent to application
     cmdlenlen = len(struct.pack('L', 0))
 
-    def __init__(self, to_pipe, from_pipe, args):
+    def __init__(self, socket, args):
         Application.__init__(self, args)
-        self.to_pipe = to_pipe
-        self.from_pipe = from_pipe
+        self.socket = socket
 
-        self.notifier = qt4.QSocketNotifier(self.from_pipe,
+        self.notifier = qt4.QSocketNotifier(self.socket.fileno(),
                                             qt4.QSocketNotifier.Read)
         self.connect(self.notifier, qt4.SIGNAL('activated(int)'),
                      self.slotDataToRead)
@@ -139,9 +139,15 @@ class EmbedApplication(Application):
         """Read length bytes from socket."""
         s = ''
         while len(s) < length:
-            s += os.read(socket, length-len(s))
+            s += socket.recv(length-len(s))
         return s
     readLenFromSocket = staticmethod(readLenFromSocket)
+
+    def writeToSocket(socket, data):
+        count = 0
+        while count < len(data):
+            count += socket.send(data[count:])
+    writeToSocket = staticmethod(writeToSocket)
 
     def readCommand(socket):
         # get length of packet
@@ -165,11 +171,11 @@ class EmbedApplication(Application):
         self.clientcounter += 1
         return retval
 
-    def slotDataToRead(self, socket):
+    def slotDataToRead(self, socketfd):
         self.notifier.setEnabled(False)
         
         # unpickle command and arguments
-        window, cmd, args, argsv = self.readCommand(socket)
+        window, cmd, args, argsv = self.readCommand(self.socket)
 
         if cmd == '_NewWindow':
             retval = self.makeNewClient(args[0])
@@ -199,18 +205,22 @@ class EmbedApplication(Application):
         outstr = cPickle.dumps(retval)
 
         # send return data to stdout
-        os.write( self.to_pipe,  struct.pack('L', len(outstr)) )
-        os.write( self.to_pipe, outstr )
+        self.writeToSocket( self.socket, struct.pack('L', len(outstr)) )
+        self.writeToSocket( self.socket, outstr )
 
         self.notifier.setEnabled(True)
 
 def main():
-    if len(sys.argv) < 4 or sys.argv[1] != 'RunFromEmbed':
+    if len(sys.argv) != 3 or sys.argv[1] != 'RunFromEmbed':
         print >>sys.stderr, ("This program must be run from "
                              "the Veusz embedding module")
         sys.exit(1)
 
-    app = EmbedApplication(int(sys.argv[2]), int(sys.argv[3]), [])
+    listensocket = socket.fromfd( int(sys.argv[2]),
+                                  socket.AF_UNIX,
+                                  socket.SOCK_STREAM )
+
+    app = EmbedApplication(listensocket, [])
     app.setQuitOnLastWindowClosed(False)
     app.exec_()
 

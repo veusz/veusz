@@ -48,6 +48,7 @@ import os.path
 import struct
 import new
 import cPickle
+import socket
 
 # check for subprocess
 try:
@@ -109,17 +110,15 @@ class Embedded(object):
 
     def startRemote(cls):
         """Start remote process."""
-
-        # create pipes to talk to and from process
-        cls.from_pipe, to_pipe = os.pipe()
-        from_pipe, cls.to_pipe = os.pipe()
+        child_socket, serv_socket = socket.socketpair()
+        cls.serv_socket = serv_socket
 
         # command line to run remote process
         cmdline = [ sys.executable,
                     os.path.join( os.path.dirname(
                     os.path.abspath(__file__)), 'embed_remote.py' ),
                     'RunFromEmbed', 
-                    str(to_pipe), str(from_pipe) ]
+                    str(child_socket.fileno()) ]
 
         # start remote process (using subprocess if it is available)
         if have_subprocess:
@@ -137,21 +136,27 @@ class Embedded(object):
         """Read length bytes from socket."""
         s = ''
         while len(s) < length:
-            s += os.read(socket, length-len(s))
+            s += socket.recv(length-len(s))
         return s
     readLenFromSocket = staticmethod(readLenFromSocket)
+
+    def writeToSocket(socket, data):
+        count = 0
+        while count < len(data):
+            count += socket.send(data[count:])
+    writeToSocket = staticmethod(writeToSocket)
 
     def sendCommand(kls, cmd):
         """Send the command to the remote process."""
 
         outs = cPickle.dumps(cmd)
 
-        os.write( kls.to_pipe, struct.pack('L', len(outs)) )
-        os.write( kls.to_pipe, outs )
+        kls.writeToSocket( kls.serv_socket, struct.pack('L', len(outs)) )
+        kls.writeToSocket( kls.serv_socket, outs )
 
-        backlen = struct.unpack('L', kls.readLenFromSocket(kls.from_pipe,
+        backlen = struct.unpack('L', kls.readLenFromSocket(kls.serv_socket,
                                                            kls.cmdlen))[0]
-        rets = kls.readLenFromSocket( kls.from_pipe, backlen )
+        rets = kls.readLenFromSocket( kls.serv_socket, backlen )
         retobj = cPickle.loads(rets)
         if isinstance(retobj, Exception):
             raise retobj
@@ -167,9 +172,8 @@ class Embedded(object):
     def exitQt(kls):
         """Exit the Qt thread."""
         kls.sendCommand( (-1, '_Quit', (), {}) )
-        os.close(kls.to_pipe)
-        os.close(kls.from_pipe)
-        kls.to_pipe, kls.from_pipe = -1, -1
+        kls.serv_socket.close()
+        kls.serv_socket, kls.from_pipe = -1, -1
 
     exitQt = classmethod(exitQt)
 
