@@ -177,12 +177,12 @@ class EmbedApplication(Application):
         # unpickle command and arguments
         window, cmd, args, argsv = self.readCommand(self.socket)
 
+        doquit = False
         if cmd == '_NewWindow':
             retval = self.makeNewClient(args[0])
         elif cmd == '_Quit':
             # exits client
-            self.closeAllWindows()
-            self.quit()
+            doquit = True
             retval = None
         elif cmd == '_NewWindowCopy':
             # sets the document of this window to be the same as the
@@ -208,18 +208,41 @@ class EmbedApplication(Application):
         self.writeToSocket( self.socket, struct.pack('L', len(outstr)) )
         self.writeToSocket( self.socket, outstr )
 
+        # do quit after if requested
+        if doquit:
+            self.socket.shutdown(socket.SHUT_RDWR)
+            self.closeAllWindows()
+            self.quit()
+
         self.notifier.setEnabled(True)
 
 def main():
-    if len(sys.argv) != 3 or sys.argv[1] != 'RunFromEmbed':
+    if len(sys.argv) != 2 or sys.argv[1] != 'RunFromEmbed':
         print >>sys.stderr, ("This program must be run from "
                              "the Veusz embedding module")
         sys.exit(1)
 
-    listensocket = socket.fromfd( int(sys.argv[2]),
-                                  socket.AF_UNIX,
-                                  socket.SOCK_STREAM )
+    # get connection parameters
+    params = sys.stdin.readline().split()
 
+    if params[0] == 'unix':
+        # talk to existing unix domain socket
+        listensocket = socket.fromfd( int(params[1]),
+                                      socket.AF_UNIX,
+                                      socket.SOCK_STREAM )
+
+    elif params[0] == 'internet':
+        # talk to internet port
+        listensocket = socket.socket( socket.AF_INET,
+                                      socket.SOCK_STREAM )
+        listensocket.connect( (params[1], int(params[2])) )
+
+    # get secret from stdin and send back to socket
+    # this is a security check
+    secret = sys.stdin.readline()
+    EmbedApplication.writeToSocket(listensocket, secret)
+
+    # finally start listening application
     app = EmbedApplication(listensocket, [])
     app.setQuitOnLastWindowClosed(False)
     app.exec_()

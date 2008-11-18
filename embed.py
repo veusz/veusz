@@ -49,6 +49,7 @@ import struct
 import new
 import cPickle
 import socket
+import random
 
 # check for subprocess
 try:
@@ -108,24 +109,65 @@ class Embedded(object):
         """
         return Embedded(name=name, copyof=self)
 
+    def makeSockets(cls):
+        """Make socket(s) to communicate with remote process.
+        Returns string to send to remote process
+        """
+
+        try:
+            # convenient interface
+            cls.sockfamily = socket.AF_UNIX
+            sock, socket2 = socket.socketpair(cls.sockfamily,
+                                              socket.SOCK_STREAM)
+            sendtext = 'unix %i\n' % socket2.fileno()
+            cls.socket2 = socket2
+            waitaccept = False
+
+        except AttributeError:
+            # otherwise mess around with internet sockets for windows...
+            cls.sockfamily = socket.AF_INET
+            sock = socket.socket(cls.sockfamily, socket.SOCK_STREAM)
+            sock.bind( ('localhost', 0) )
+            interface, port = sock.getsockname()
+            sock.listen(1)
+            sendtext = 'internet %s %i\n' % (interface, port)
+            waitaccept = True
+
+        return (sock, sendtext, waitaccept)
+    makeSockets = classmethod(makeSockets)
+
     def startRemote(cls):
         """Start remote process."""
-        child_socket, serv_socket = socket.socketpair()
-        cls.serv_socket = serv_socket
+        cls.serv_socket, sendtext, waitaccept = cls.makeSockets()
 
         # command line to run remote process
         cmdline = [ sys.executable,
                     os.path.join( os.path.dirname(
                     os.path.abspath(__file__)), 'embed_remote.py' ),
-                    'RunFromEmbed', 
-                    str(child_socket.fileno()) ]
+                    'RunFromEmbed' ]
 
         # start remote process (using subprocess if it is available)
         if have_subprocess:
-            cls.remote = subprocess.Popen(cmdline,
-                                          shell=False, bufsize=0, close_fds=False)
+            cls.remote = subprocess.Popen(cmdline, shell=False, bufsize=0,
+                                          close_fds=False, stdin=subprocess.PIPE)
+
+            # send socket number over pipe
+            cls.remote.stdin.write( sendtext )
         else:
             cls.remote = os.spawnl(os.P_NOWAIT, sys.executable, *cmdline)
+
+        if waitaccept:
+            cls.serv_socket, address = cls.serv_socket.accept()
+
+        # send a secret to the remote program by secure route andd
+        # check it comes back
+        secret = ''.join([random.choice('ABCDEFGHUJKLMNOPQRSTUVWXYZ'
+                                        'abcdefghijklmnopqrstuvwxyz'
+                                        '0123456789')
+                          for i in xrange(16)]) + '\n'
+        cls.remote.stdin.write(secret)
+        secretback = cls.readLenFromSocket(cls.serv_socket, len(secret))
+        assert secret == secretback
 
         # packet length for command bytes
         cls.cmdlen = len(struct.pack('L', 0))
@@ -172,6 +214,7 @@ class Embedded(object):
     def exitQt(kls):
         """Exit the Qt thread."""
         kls.sendCommand( (-1, '_Quit', (), {}) )
+        kls.serv_socket.shutdown(socket.SHUT_RDWR)
         kls.serv_socket.close()
         kls.serv_socket, kls.from_pipe = -1, -1
 
