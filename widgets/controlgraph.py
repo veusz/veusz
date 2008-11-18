@@ -389,20 +389,20 @@ class ControlGraphMovableBox(ControlGraphMarginBox):
         ControlGraphMarginBox.__init__(self, widget, posn,
                                        [-10000, -10000, 10000, 10000],
                                        painter, isresizable=False)
-        self.cross = _ShapeCorner(self)
-        self.crosspos = (crosspos[0] - posn[0],
-                         crosspos[1] - posn[1])
+        self.incrosspos = crosspos
 
     def prepareToShow(self):
-        self.updateCornerPosns()
+        self.cross = _ShapeCorner(self)
+        self.crosspos = (self.incrosspos[0] - self.posn[0],
+                         self.incrosspos[1] - self.posn[1])
+        ControlGraphMarginBox.prepareToShow(self)
 
     def updateCornerPosns(self):
         ControlGraphMarginBox.updateCornerPosns(self)
 
         # this fails if called before self.cross is initialised!
-        if hasattr(self, 'cross'):
-            self.cross.setPos( self.crosspos[0] + self.posn[0],
-                               self.crosspos[1] + self.posn[1] )
+        self.cross.setPos( self.crosspos[0] + self.posn[0],
+                           self.crosspos[1] + self.posn[1] )
 
     def updateFromCorner(self, corner, event):
         if corner == self.cross:
@@ -512,6 +512,7 @@ class ControlAxisLine(qt4.QGraphicsItem):
         self.pts[0].setCursor(endcurs)
         self.pts[1].setCursor(endcurs)
         self.line.setCursor( self.curs[self.horz] )
+        self.setZValue(2.)
 
         self.updatePos()
 
