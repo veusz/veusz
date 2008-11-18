@@ -65,7 +65,7 @@ class PointPlotter(GenericPlotter):
                                           descr = 'Dataset containing x data or list of values',
                                           usertext='X data'), 0 )
         s.add( setting.Choice('errorStyle',
-                              ['bar', 'box', 'diamond', 'curve',
+                              ['bar', 'barends', 'box', 'diamond', 'curve',
                                'barbox', 'bardiamond', 'barcurve'], 'bar',
                               descr='Style of error bars to plot',
                               usertext='Error style', formatting=True) )
@@ -159,34 +159,48 @@ class PointPlotter(GenericPlotter):
 
         # draw normal error bars
         style = s.errorStyle
-        if style in {'bar':True, 'bardiamond':True,
-                     'barcurve':True, 'barbox': True}:
+        if style in { 'bar': True, 'bardiamond': True,
+                      'barcurve': True, 'barbox': True,
+                      'barends': True }:
             # list of output lines
             pts = []
 
             # vertical error bars
             if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert :
-                for x1, y1, x2, y2 in itertools.izip(xplotter, ymin, xplotter,
-                                                     ymax):
-                    pts.append(qt4.QPointF(x1, y1))
-                    pts.append(qt4.QPointF(x2, y2))
+                for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
+                    pts.append(qt4.QPointF(x, y1))
+                    pts.append(qt4.QPointF(x, y2))
 
             # horizontal error bars
             if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-                for x1, y1, x2, y2 in itertools.izip(xmin, yplotter, xmax,
-                                                     yplotter):
-                    pts.append(qt4.QPointF(x1, y1))
-                    pts.append(qt4.QPointF(x2, y2))
-
-            if len(pts) != 0:
+                for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
+                    pts.append(qt4.QPointF(x1, y))
+                    pts.append(qt4.QPointF(x2, y))
+            if pts:
                 painter.drawLines(pts)
+
+        # draw "ends" on error bars if requested
+        if style == 'barends':
+            size = s.get('markerSize').convert(painter)
+            lines = []
+            if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert :
+                for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
+                    lines.append( qt4.QLineF(x-size, y1, x+size, y1) )
+                    lines.append( qt4.QLineF(x-size, y2, x+size, y2) )
+ 
+            if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
+                for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
+                    lines.append( qt4.QLineF(x1, y-size, x1, y+size) )
+                    lines.append( qt4.QLineF(x2, y-size, x2, y+size) )
+            if lines:
+                painter.drawLines(lines)
 
         # special error bars (only works with proper x and y errors)
         if ( ymin is not None and ymax is not None and xmin is not None and
              xmax is not None ):
 
             # draw boxes
-            if style in {'box':True, 'barbox':True}:
+            if style in { 'box': True, 'barbox': True }:
 
                 # non-filling brush
                 painter.setBrush( qt4.QBrush() )
