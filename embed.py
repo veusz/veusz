@@ -56,6 +56,7 @@ try:
     import subprocess
     have_subprocess = True
 except ImportError:
+    import popen2
     have_subprocess = False
 
 def Bind1st(function, arg):
@@ -114,7 +115,9 @@ class Embedded(object):
         Returns string to send to remote process
         """
 
-        try:
+        if ( have_subprocess and
+             hasattr(socket, 'AF_UNIX') and hasattr(socket, 'socketpair') ):
+
             # convenient interface
             cls.sockfamily = socket.AF_UNIX
             sock, socket2 = socket.socketpair(cls.sockfamily,
@@ -123,8 +126,12 @@ class Embedded(object):
             cls.socket2 = socket2
             waitaccept = False
 
-        except AttributeError:
-            # otherwise mess around with internet sockets for windows...
+        else:
+            # otherwise mess around with internet sockets
+            # * This is required for windows, which doesn't have AF_UNIX
+            # * It is required for old Pythons that does not have subprocess
+            #    as unix sockets are not passed by popen2
+            # * It is required where socketpair is not supported
             cls.sockfamily = socket.AF_INET
             sock = socket.socket(cls.sockfamily, socket.SOCK_STREAM)
             sock.bind( ('localhost', 0) )
@@ -141,31 +148,39 @@ class Embedded(object):
         cls.serv_socket, sendtext, waitaccept = cls.makeSockets()
 
         # command line to run remote process
-        cmdline = [ sys.executable,
-                    os.path.join( os.path.dirname(
-                    os.path.abspath(__file__)), 'embed_remote.py' ),
-                    'RunFromEmbed' ]
+        remotecmd = os.path.join( os.path.dirname(os.path.abspath(__file__)),
+                                  'embed_remote.py' )
 
-        # start remote process (using subprocess if it is available)
         if have_subprocess:
+            # start remote process (using subprocess if it is available)
+            cmdline = [ sys.executable, remotecmd, 'RunFromEmbed' ]
             cls.remote = subprocess.Popen(cmdline, shell=False, bufsize=0,
-                                          close_fds=False, stdin=subprocess.PIPE)
+                                          close_fds=False,
+                                          stdin=subprocess.PIPE)
+            stdin = cls.remote.stdin
 
-            # send socket number over pipe
-            cls.remote.stdin.write( sendtext )
         else:
-            cls.remote = os.spawnl(os.P_NOWAIT, sys.executable, *cmdline)
+            # have to resort to popen2 (hoping this quoting works)
+            cmdline = '"%s" "%s" RunFromEmbed' % (sys.executable, remotecmd)
+            cls.stdout, cls.stdin = popen2.popen2(cmdline, 0)
+            stdin = cls.stdin
 
+        # send socket number over pipe
+        stdin.write( sendtext )
+
+        # accept connection if necessary
         if waitaccept:
             cls.serv_socket, address = cls.serv_socket.accept()
 
-        # send a secret to the remote program by secure route andd
+        # send a secret to the remote program by secure route and
         # check it comes back
+        # this is to check that no program has secretly connected
+        # on our port, which isn't really useful for AF_UNIX sockets
         secret = ''.join([random.choice('ABCDEFGHUJKLMNOPQRSTUVWXYZ'
                                         'abcdefghijklmnopqrstuvwxyz'
                                         '0123456789')
                           for i in xrange(16)]) + '\n'
-        cls.remote.stdin.write(secret)
+        stdin.write(secret)
         secretback = cls.readLenFromSocket(cls.serv_socket, len(secret))
         assert secret == secretback
 
