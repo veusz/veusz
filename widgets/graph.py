@@ -117,8 +117,7 @@ class Graph(widget.Widget):
 
         # controls for adjusting graph margins
         self.controlgraphitems = [
-            controlgraph.ControlGraphMarginBox(self, bounds, maxbounds,
-                                               painter)
+            controlgraph.ControlMarginBox(self, bounds, maxbounds, painter)
             ]
 
         # do no painting if hidden

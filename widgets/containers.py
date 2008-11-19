@@ -330,8 +330,7 @@ class Grid(widget.Widget):
         
         # controls for adjusting grid margins
         self.controlgraphitems = [
-            controlgraph.ControlGraphMarginBox(self, bounds, maxbounds,
-                                               painter)
+            controlgraph.ControlMarginBox(self, bounds, maxbounds, painter)
             ]
 
         for c in self.children:

@@ -166,7 +166,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # this graphics scene item is the actual graph
         self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
-        self.controlitems = []
+        self.controlgraphs = []
         self.widgetcontrolgraphs = {}
         self.selwidget = None
 
@@ -884,13 +884,13 @@ class PlotWindow( qt4.QGraphicsView ):
         self.selwidget = widget
 
         # remove old items from scene
-        for item in self.controlitems:
+        for item in self.controlgraphs:
             self.scene.removeItem(item)
-        del self.controlitems[:]
+        del self.controlgraphs[:]
 
         # put in new items
         if widget is not None and widget in self.widgetcontrolgraphs:
-            for item in self.widgetcontrolgraphs[widget]:
-                item.prepareToShow()
-                self.controlitems.append(item)
-                self.scene.addItem(item)
+            for control in self.widgetcontrolgraphs[widget]:
+                graphitem = control.createGraphicsItem()
+                self.controlgraphs.append(graphitem)
+                self.scene.addItem(graphitem)

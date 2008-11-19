@@ -75,11 +75,11 @@ class Root(widget.Widget):
         page.draw( posn, painter )
 
         self.controlgraphitems = [
-            controlgraph.ControlGraphMarginBox(self, posn,
-                                               [-10000, -10000,
-                                                 10000,  10000],
-                                               painter,
-                                               ismovable = False)
+            controlgraph.ControlMarginBox(self, posn,
+                                          [-10000, -10000,
+                                            10000,  10000],
+                                          painter,
+                                          ismovable = False)
             ]
 
         painter.endPaintingWidget()

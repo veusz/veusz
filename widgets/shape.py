@@ -173,7 +173,7 @@ class BoxShape(Shape):
             painter.restore()
 
             if isnotdataset:
-                cgi = controlgraph.ControlGraphResizableBox(
+                cgi = controlgraph.ControlResizableBox(
                     self, [x, y], [wp, hp], r, allowrotate=True)
                 cgi.index = index
                 cgi.widgetposn = posn

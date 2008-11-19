@@ -172,7 +172,7 @@ class Line(widget.Widget):
                                 arrowright=s.arrowright)
 
             if isnotdataset:
-                cgi = controlgraph.ControlGraphLine(
+                cgi = controlgraph.ControlLine(
                     self, x, y,
                     x + l*dx*math.cos(a/180.*math.pi),
                     y + l*dx*math.sin(a/180.*math.pi))
