@@ -17,17 +17,23 @@ Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Changes from 1.1:
+Changes in 1.2:
  * Boxes, ellipses, lines, arrows and image files can now be added to
    the plot or page and interactively adjusted.
- * Page sizes, graphs, grids and axes can be interactively resized.
+ * Page sizes, graphs, grids and axes can be interactively adjusted.
  * Plot keys can have multiple columns.
+ * Error bars can have cross-ends.
 
  * Several user interface usability enhancements.
 
- * Embedding interface has been rewritten to be more robust using
-   multiple processes.
- * Embedding interface has been expanded.
+ * Embedding interface has been rewritten to be more robust. It now
+   uses multiple processes and sockets.
+ * Embedding now works fully on Windows.
+ * Embedding interface has been expanded:
+    - Zoom width, height and page options for zooming graph to window
+    - Dynamically change update interval
+    - Move between pages of documents
+    - Open up more than one view onto a document
 
  * PDF export fixed for recent versions of Qt
  * Quite a lot of minor bug fixes
