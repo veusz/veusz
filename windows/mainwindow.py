@@ -74,13 +74,20 @@ class MainWindow(qt4.QMainWindow):
 
     def __init__(self, *args):
         qt4.QMainWindow.__init__(self, *args)
-
-        self.setWindowIcon( utils.getIcon('veusz.png') )
-
-        self.document = document.Document()
-
         self.setAcceptDrops(True)
 
+        # icon and different size variations
+        d = utils.imagedir
+        icon = qt4.QIcon()
+        for size in (16, 32, 48, 64, 128):
+            icon.addFile(os.path.join(d, 'veusz_%i.png' % size),
+                                      qt4.QSize(size, size))
+        self.setWindowIcon(icon)
+
+        # master documenent
+        self.document = document.Document()
+
+        # filename for document and update titlebar
         self.filename = ''
         self.updateTitlebar()
 
