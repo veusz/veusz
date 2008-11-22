@@ -38,6 +38,8 @@ class AboutDialog(qt4.QDialog):
                    self)
 
         # draw logo in dialog
+        self.frame.setBackgroundRole(qt4.QPalette.Base)
+        self.frame.setAutoFillBackground(True)
         self.logolabel.setPixmap( utils.getPixmap('logo.png') )
 
         # add version to copyright text
