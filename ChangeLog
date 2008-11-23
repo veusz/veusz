@@ -1,4 +1,379 @@
 ------------------------------------------------------------------------
+r827 | jeremysanders | 2008-11-19 09:48:32 +0000 (Wed, 19 Nov 2008) | 2 lines
+
+Fix embedding if subprocess is not available
+
+------------------------------------------------------------------------
+r826 | jeremysanders | 2008-11-18 21:51:41 +0000 (Tue, 18 Nov 2008) | 2 lines
+
+Fix non-blocking socket problem in windows
+
+------------------------------------------------------------------------
+r825 | jeremysanders | 2008-11-18 21:12:28 +0000 (Tue, 18 Nov 2008) | 2 lines
+
+Use internet sockets if unix sockets not available
+
+------------------------------------------------------------------------
+r824 | jeremysanders | 2008-11-18 17:59:17 +0000 (Tue, 18 Nov 2008) | 2 lines
+
+Move embed interface to use a socket
+
+------------------------------------------------------------------------
+r823 | jeremysanders | 2008-11-18 09:50:53 +0000 (Tue, 18 Nov 2008) | 2 lines
+
+Fixes for controlgraphitems
+
+------------------------------------------------------------------------
+r822 | jeremysanders | 2008-11-18 09:50:38 +0000 (Tue, 18 Nov 2008) | 2 lines
+
+Add ability to add "ends" to error bars (barends error bar type)
+
+------------------------------------------------------------------------
+r821 | jeremysanders | 2008-11-16 22:41:52 +0000 (Sun, 16 Nov 2008) | 2 lines
+
+Get ready for 1.2 release
+
+------------------------------------------------------------------------
+r820 | jeremysanders | 2008-11-15 23:49:26 +0000 (Sat, 15 Nov 2008) | 2 lines
+
+Trap some errors
+
+------------------------------------------------------------------------
+r819 | jeremysanders | 2008-11-15 23:41:15 +0000 (Sat, 15 Nov 2008) | 2 lines
+
+Optimisation by having second stage of init for ControlGraphItems
+
+------------------------------------------------------------------------
+r818 | jeremysanders | 2008-11-12 22:35:22 +0000 (Wed, 12 Nov 2008) | 2 lines
+
+Allow axis to be repositioned or resized
+
+------------------------------------------------------------------------
+r817 | jeremysanders | 2008-11-12 10:21:57 +0000 (Wed, 12 Nov 2008) | 2 lines
+
+Update year in about dialog
+
+------------------------------------------------------------------------
+r816 | jeremysanders | 2008-11-11 21:15:59 +0000 (Tue, 11 Nov 2008) | 2 lines
+
+Add tooltips for buttons
+
+------------------------------------------------------------------------
+r815 | jeremysanders | 2008-11-08 23:37:34 +0000 (Sat, 08 Nov 2008) | 2 lines
+
+Reuse code for margins in moving labels
+
+------------------------------------------------------------------------
+r814 | jeremysanders | 2008-11-08 23:05:13 +0000 (Sat, 08 Nov 2008) | 2 lines
+
+Fix to use the same pen for all control graphs
+
+------------------------------------------------------------------------
+r813 | jeremysanders | 2008-11-08 22:32:36 +0000 (Sat, 08 Nov 2008) | 3 lines
+
+Stop graphs being moved out of allowed area and allow grids to be 
+resized
+
+------------------------------------------------------------------------
+r812 | jeremysanders | 2008-11-08 19:54:52 +0000 (Sat, 08 Nov 2008) | 2 lines
+
+Allow page size to be interactively resized
+
+------------------------------------------------------------------------
+r811 | jeremysanders | 2008-11-08 12:00:48 +0000 (Sat, 08 Nov 2008) | 3 lines
+
+Fix positioning of documents after printing or export - before the 
+control graphs would become overwritten after these operations
+
+------------------------------------------------------------------------
+r810 | jeremysanders | 2008-11-08 11:40:36 +0000 (Sat, 08 Nov 2008) | 2 lines
+
+Store old position in cgi rather than widget
+
+------------------------------------------------------------------------
+r809 | jeremysanders | 2008-11-07 22:29:50 +0000 (Fri, 07 Nov 2008) | 2 lines
+
+Allow graph/grid widgets to be moved
+
+------------------------------------------------------------------------
+r808 | jeremysanders | 2008-11-07 09:31:58 +0000 (Fri, 07 Nov 2008) | 2 lines
+
+Make sure control box is above plot
+
+------------------------------------------------------------------------
+r807 | jeremysanders | 2008-11-06 21:01:23 +0000 (Thu, 06 Nov 2008) | 2 lines
+
+Add dynamic margin adjustment
+
+------------------------------------------------------------------------
+r805 | jeremysanders | 2008-11-05 11:42:46 +0000 (Wed, 05 Nov 2008) | 2 lines
+
+Fix bug in MacOSX - releaseButton appears to be called without pressButton
+
+------------------------------------------------------------------------
+r804 | jeremysanders | 2008-11-04 21:03:32 +0000 (Tue, 04 Nov 2008) | 2 lines
+
+Add multiple columns to key
+
+------------------------------------------------------------------------
+r803 | jeremysanders | 2008-11-04 17:47:02 +0000 (Tue, 04 Nov 2008) | 2 lines
+
+Trap inf and nan out in function autorange
+
+------------------------------------------------------------------------
+r802 | jeremysanders | 2008-11-03 21:24:13 +0000 (Mon, 03 Nov 2008) | 2 lines
+
+Tiny fix
+
+------------------------------------------------------------------------
+r801 | jeremysanders | 2008-11-03 21:19:30 +0000 (Mon, 03 Nov 2008) | 2 lines
+
+Minor updates to veusz_listen docs
+
+------------------------------------------------------------------------
+r800 | jeremysanders | 2008-11-03 21:16:32 +0000 (Mon, 03 Nov 2008) | 2 lines
+
+Sync veusz_listen commands with embed
+
+------------------------------------------------------------------------
+r799 | jeremysanders | 2008-11-03 21:02:20 +0000 (Mon, 03 Nov 2008) | 2 lines
+
+Manual updates
+
+------------------------------------------------------------------------
+r798 | jeremysanders | 2008-11-03 20:19:56 +0000 (Mon, 03 Nov 2008) | 2 lines
+
+Update manual for embedding interface
+
+------------------------------------------------------------------------
+r797 | jeremysanders | 2008-11-03 20:03:20 +0000 (Mon, 03 Nov 2008) | 3 lines
+
+Add embed commands to resize window, zoom to page, width or height,
+change page and open up second view onto document
+
+------------------------------------------------------------------------
+r796 | jeremysanders | 2008-11-03 10:10:27 +0000 (Mon, 03 Nov 2008) | 2 lines
+
+Use pipes rather than stdin, stdout for subprocess in embed
+
+------------------------------------------------------------------------
+r795 | jeremysanders | 2008-11-02 22:28:58 +0000 (Sun, 02 Nov 2008) | 2 lines
+
+Fix remote closing if last window closes
+
+------------------------------------------------------------------------
+r794 | jeremysanders | 2008-11-02 22:22:56 +0000 (Sun, 02 Nov 2008) | 2 lines
+
+Pass exceptions back to embed.py
+
+------------------------------------------------------------------------
+r793 | jeremysanders | 2008-11-02 22:21:34 +0000 (Sun, 02 Nov 2008) | 4 lines
+
+More robust embedding interface, which uses a remote app to open 
+windows.
+Also fixes GetPoint in embedding interface and EnableToolbar
+
+------------------------------------------------------------------------
+r792 | jeremysanders | 2008-11-01 23:48:20 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Rearrange imports for splash screen
+
+------------------------------------------------------------------------
+r791 | jeremysanders | 2008-11-01 23:30:24 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Make console hidden by default
+
+------------------------------------------------------------------------
+r790 | jeremysanders | 2008-11-01 23:18:09 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Add splash screen
+
+------------------------------------------------------------------------
+r789 | jeremysanders | 2008-11-01 22:04:53 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Move some axis settings to formatting
+
+------------------------------------------------------------------------
+r788 | jeremysanders | 2008-11-01 19:34:27 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Auto show console if it is hidden and output appears
+
+------------------------------------------------------------------------
+r787 | jeremysanders | 2008-11-01 19:18:00 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Do not show actions in formatting dock
+
+------------------------------------------------------------------------
+r786 | jeremysanders | 2008-11-01 19:03:33 +0000 (Sat, 01 Nov 2008) | 2 lines
+
+Implement filename dialog for image selection
+
+------------------------------------------------------------------------
+r783 | jeremysanders | 2008-10-27 09:23:23 +0000 (Mon, 27 Oct 2008) | 2 lines
+
+Update version number
+
+------------------------------------------------------------------------
+r782 | jeremysanders | 2008-10-26 10:31:53 +0000 (Sun, 26 Oct 2008) | 2 lines
+
+Fix incorrect import
+
+------------------------------------------------------------------------
+r781 | jeremysanders | 2008-10-25 17:56:41 +0100 (Sat, 25 Oct 2008) | 2 lines
+
+Create a blank graph initially and make an inital widget selection
+
+------------------------------------------------------------------------
+r780 | jeremysanders | 2008-10-25 16:48:08 +0100 (Sat, 25 Oct 2008) | 2 lines
+
+Make default arrow look more like an arow
+
+------------------------------------------------------------------------
+r779 | jeremysanders | 2008-10-25 16:27:19 +0100 (Sat, 25 Oct 2008) | 2 lines
+
+FIx arrows
+
+------------------------------------------------------------------------
+r778 | jeremysanders | 2008-10-25 12:41:45 +0100 (Sat, 25 Oct 2008) | 2 lines
+
+If no widget is clicked on, select the page
+
+------------------------------------------------------------------------
+r777 | jeremysanders | 2008-10-24 09:50:21 +0100 (Fri, 24 Oct 2008) | 2 lines
+
+Trap out case where there are widgets which depend on an axis which doesn't exist
+
+------------------------------------------------------------------------
+r776 | jeremysanders | 2008-10-23 10:24:36 +0100 (Thu, 23 Oct 2008) | 2 lines
+
+Fix FITS in import dialog
+
+------------------------------------------------------------------------
+r775 | jeremysanders | 2008-10-22 20:59:52 +0100 (Wed, 22 Oct 2008) | 2 lines
+
+Add moveable lines
+
+------------------------------------------------------------------------
+r774 | jeremysanders | 2008-10-22 20:16:02 +0100 (Wed, 22 Oct 2008) | 2 lines
+
+Stop combobox resizing with contents in settings
+
+------------------------------------------------------------------------
+r773 | jeremysanders | 2008-10-22 20:02:30 +0100 (Wed, 22 Oct 2008) | 2 lines
+
+Fix so after deletion next widget is selected
+
+------------------------------------------------------------------------
+r772 | jeremysanders | 2008-10-22 19:09:27 +0100 (Wed, 22 Oct 2008) | 2 lines
+
+Fix button width for datasets
+
+------------------------------------------------------------------------
+r771 | jeremysanders | 2008-10-22 17:48:02 +0100 (Wed, 22 Oct 2008) | 2 lines
+
+Try to get rid of problems with setting notification
+
+------------------------------------------------------------------------
+r770 | jeremysanders | 2008-10-22 16:17:35 +0100 (Wed, 22 Oct 2008) | 2 lines
+
+Try to get rid of errors about C++ object being deleted (caused by double-adding widgets)
+
+------------------------------------------------------------------------
+r769 | jeremysanders | 2008-10-21 13:06:48 +0100 (Tue, 21 Oct 2008) | 2 lines
+
+Fix multiple sets for zooming into axes
+
+------------------------------------------------------------------------
+r768 | jeremysanders | 2008-10-21 10:12:16 +0100 (Tue, 21 Oct 2008) | 2 lines
+
+Fix PDF output by including trailing spaces in xref
+
+------------------------------------------------------------------------
+r767 | jeremysanders | 2008-10-20 21:54:35 +0100 (Mon, 20 Oct 2008) | 2 lines
+
+Fix PDF export: we need to do a better job of reconstucting PDF index
+
+------------------------------------------------------------------------
+r766 | jeremysanders | 2008-10-20 19:42:27 +0100 (Mon, 20 Oct 2008) | 2 lines
+
+Fix bug if image file exists but is not a real file
+
+------------------------------------------------------------------------
+r765 | jeremysanders | 2008-10-20 10:40:36 +0100 (Mon, 20 Oct 2008) | 2 lines
+
+Old reference to numarray removed in exception dialog
+
+------------------------------------------------------------------------
+r764 | jeremysanders | 2008-10-19 17:27:42 +0100 (Sun, 19 Oct 2008) | 2 lines
+
+Add arrow heads on lines
+
+------------------------------------------------------------------------
+r763 | jeremysanders | 2008-10-19 16:22:42 +0100 (Sun, 19 Oct 2008) | 2 lines
+
+Add triangleleft and triangleright markers
+
+------------------------------------------------------------------------
+r762 | jeremysanders | 2008-10-19 15:55:38 +0100 (Sun, 19 Oct 2008) | 2 lines
+
+Basic line support
+
+------------------------------------------------------------------------
+r761 | jeremysanders | 2008-10-18 20:03:58 +0100 (Sat, 18 Oct 2008) | 2 lines
+
+Fix lack of rotation for shapes
+
+------------------------------------------------------------------------
+r760 | jeremysanders | 2008-10-18 20:03:45 +0100 (Sat, 18 Oct 2008) | 2 lines
+
+Fix "0." syntax for data lists
+
+------------------------------------------------------------------------
+r759 | jeremysanders | 2008-10-18 19:12:18 +0100 (Sat, 18 Oct 2008) | 2 lines
+
+Add ImageFile widget
+
+------------------------------------------------------------------------
+r758 | jeremysanders | 2008-10-18 16:03:30 +0100 (Sat, 18 Oct 2008) | 2 lines
+
+Add ability to control box-like shapes with mouse
+
+------------------------------------------------------------------------
+r757 | jeremysanders | 2008-10-17 10:08:22 +0100 (Fri, 17 Oct 2008) | 2 lines
+
+Improve import dialog text
+
+------------------------------------------------------------------------
+r756 | jeremysanders | 2008-10-08 20:57:05 +0100 (Wed, 08 Oct 2008) | 2 lines
+
+Get ellipse/rect mostly done
+
+------------------------------------------------------------------------
+r755 | jeremysanders | 2008-10-08 10:21:23 +0100 (Wed, 08 Oct 2008) | 2 lines
+
+Get rid of extra unneeded icon
+
+------------------------------------------------------------------------
+r754 | jeremysanders | 2008-10-07 22:29:02 +0100 (Tue, 07 Oct 2008) | 2 lines
+
+Add initial support for drawing shapes
+
+------------------------------------------------------------------------
+r753 | jeremysanders | 2008-10-06 20:45:02 +0100 (Mon, 06 Oct 2008) | 2 lines
+
+Fix background colour for edit on error
+
+------------------------------------------------------------------------
+r752 | jeremysanders | 2008-10-06 16:25:49 +0100 (Mon, 06 Oct 2008) | 2 lines
+
+Make sure plotting function always works for constant values
+
+------------------------------------------------------------------------
+r748 | jeremysanders | 2008-10-01 20:49:35 +0100 (Wed, 01 Oct 2008) | 2 lines
+
+Update for v1.1
+
+------------------------------------------------------------------------
 r747 | jeremysanders | 2008-09-30 19:58:47 +0100 (Tue, 30 Sep 2008) | 2 lines
 
 Enable axis range autoplotting
