@@ -1,4 +1,46 @@
 ------------------------------------------------------------------------
+r835 | jeremysanders | 2008-11-23 17:57:34 +0000 (Sun, 23 Nov 2008) | 2 lines
+
+Update changelog
+
+------------------------------------------------------------------------
+r834 | jeremysanders | 2008-11-23 17:55:22 +0000 (Sun, 23 Nov 2008) | 2 lines
+
+Update csv example to have barends error bars
+
+------------------------------------------------------------------------
+r833 | jeremysanders | 2008-11-23 13:08:35 +0000 (Sun, 23 Nov 2008) | 2 lines
+
+Add shapes example
+
+------------------------------------------------------------------------
+r832 | jeremysanders | 2008-11-22 20:37:06 +0000 (Sat, 22 Nov 2008) | 2 lines
+
+Update icon
+
+------------------------------------------------------------------------
+r831 | jeremysanders | 2008-11-22 16:54:50 +0000 (Sat, 22 Nov 2008) | 2 lines
+
+Draw logo over white in about dialog
+
+------------------------------------------------------------------------
+r830 | jeremysanders | 2008-11-22 16:40:50 +0000 (Sat, 22 Nov 2008) | 2 lines
+
+Remake veusz logo, add multiple icon sizes and create icns file
+
+------------------------------------------------------------------------
+r829 | jeremysanders | 2008-11-19 20:56:19 +0000 (Wed, 19 Nov 2008) | 2 lines
+
+More updates to README
+
+------------------------------------------------------------------------
+r828 | jeremysanders | 2008-11-19 20:35:12 +0000 (Wed, 19 Nov 2008) | 4 lines
+
+Move to new ControlItem interface to make behaviour more reliable. Split 
+apart the classes holding the details and the QGraphicsItems 
+representing the widget.
+
+------------------------------------------------------------------------
 r827 | jeremysanders | 2008-11-19 09:48:32 +0000 (Wed, 19 Nov 2008) | 2 lines
 
 Fix embedding if subprocess is not available
