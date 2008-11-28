@@ -21,25 +21,13 @@ Optional requirements:
  TrueType fonts). 
   see            http://corefonts.sourceforge.net/
 
-Linux binary
-============
-
-If you do not have the requirements, you can use the Linux binary
-instead (if available). Note that this is not guaranteed to work due
-to glibc/library incompatibilities. You need to simply unpack the tar
-file and run the main executable:
-
-# tar xzf veusz-linux-i386-1.2.tar.gz     [change version here]
-# cd veusz-linux-i386-1.2
-# ./veusz
-
 Simple source use (if requirements installed)
 =============================================
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-1.2.tar.gz                [change version here]
-# cd veusz-1.2
+# tar xzf veusz-1.2.1.tar.gz                [change version here]
+# cd veusz-1.2.1
 # ./veusz_main.py
 
 However certain features (currently contours) require C modules to be
@@ -49,24 +37,6 @@ this without installing by doing:
 # python setup.py build
 # cp build/*/veusz/helpers/*.so helpers/
 
-Installing/upgrading from rpm
-=============================
-(RPMs are not available yet)
-
-For rpm based distributions, download the rpm for your distribution
-(if it is available), and install as root:
-# rpm -Uvh veusz-1.2-1.i386.rpm
-(use correct name of rpm here)
-
-If there is no rpm available for your distribution, download the source
-rpm and rebuild
-# rpmbuild --rebuild veusz-1.2-1.src.rpm
-then install it from the location given when that command completes.
-# rpm -Uvh /usr/src/redhat/RPMS/noarch/veusz-1.2-1.i386.rpm
-
-If this doesn't work, see below for how to create an rpm from the source.
-A "veusz" command is installed into your path to run the program.
-
 Full installation with distutils
 ================================
 There are a number of ways to install programs using distutils. I will
@@ -75,47 +45,47 @@ list a few of the possible method here:
 To install to the standard location on the hard disk (it's better to use
 rpms if you have an rpm-based linux distibution)
 ------------------------------------------------------------------------
-# cd veusz-1.2
+# cd veusz-1.2.1
 # python setup.py build
 # su
 [enter root password]
 # python setup.py install 
 # exit
 
-To make an rpm from the distribution
-------------------------------------
+Linux binary
+============
+If you do not have the requirements, you can use the Linux binary
+instead (if available). Note that this may not work on all
+distributions due to glibc/library incompatibilities. You need to
+simply unpack the tar file and run the main executable:
 
-# cd veusz-1.2
-# python setup.py bdist_rpm
-
-An rpm should be generated in the dist subdirectory, so...
-
-# su
-[enter password]
-# rpm -Uvh dist/veusz-*-1.noarch.rpm
-# exit
-
-A veusz script is installed into your default binary location, so run veusz
-using the "veusz command"
+# tar xzf veusz-linux-i386-1.2.1.tar.gz     [change version here]
+# cd veusz-linux-i386-1.2.1
+# ./veusz
 
 Installing in Windows
 =====================
-Simply run the setup.exe binary installer.
-Use control panel add/remove programs to remove.
-
-For other ways of installing see http://docs.python.org/inst/inst.html
+Simply run the setup.exe binary installer. This does not provide the
+embedding interface, however.
 
 Installing on Mac OS X
 ======================
-Veusz can be installed on Mac OS X. The requirements can be obtained
-using a system such as MacPorts. You can install them with MacPorts
-using:
+A binary is available for Mac OS X. It does not provide the embedding
+interface. Simply drag the Veusz application into your Applications
+directory.
+
+Veusz can also be installed from source on Mac OS X. The requirements
+can be obtained using a system such as MacPorts. You can install them
+with MacPorts using:
 
 $ sudo port install qt4-mac
 $ sudo port install py-numpy
 
 Once these have successfully built and installed, you can unpack veusz
 and install as above.
+
+Qt is available from TrollTech as a binary, but SIP and PyQt are not
+available as a binary.
 
 -------------------------------------------------------------------------------
 $Id$
