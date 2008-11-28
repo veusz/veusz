@@ -1,0 +1,64 @@
+# Veusz saved document (version 0.4)
+# User: jss
+# Date: Sun, 13 Mar 2005 18:05:32 +0000
+
+ImportString('y','''
+0.000000e+00
+4.067366e-01
+7.431448e-01
+9.510565e-01
+9.945219e-01
+8.660254e-01
+5.877853e-01
+2.079117e-01
+-2.079117e-01
+-5.877853e-01
+-8.660254e-01
+-9.945219e-01
+-9.510565e-01
+-7.431448e-01
+-4.067366e-01
+-2.449213e-16
+''')
+ImportString('x','''
+0.000000e+00
+4.188790e-01
+8.377580e-01
+1.256637e+00
+1.675516e+00
+2.094395e+00
+2.513274e+00
+2.932153e+00
+3.351032e+00
+3.769911e+00
+4.188790e+00
+4.607669e+00
+5.026548e+00
+5.445427e+00
+5.864306e+00
+6.283185e+00
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', '\\italic{x}')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', 'sin \\italic{x}')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('MarkerFill/color', 'cyan')
+To('..')
+Add('function', name='function1', autoadd=False)
+To('function1')
+Set('function', 'sin(x)')
+Set('Line/color', 'red')
+To('..')
+To('..')
+To('..')

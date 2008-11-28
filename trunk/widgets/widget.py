@@ -1,0 +1,411 @@
+# widget.py
+# fundamental graph plotting widget
+
+#    Copyright (C) 2004 Jeremy S. Sanders
+#    Email: Jeremy Sanders <jeremy@jeremysanders.net>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+##############################################################################
+
+# $Id$
+
+import itertools
+
+import veusz.qtall as qt4
+import veusz.document as document
+import veusz.utils as utils
+import veusz.setting as setting
+
+class Action(object):
+    """A class to wrap functions operating on widgets.
+
+    Attributes:
+    name: name of action
+    function: function to call with no arguments
+    descr: description of action
+    usertext: name of action to display to user
+    """
+
+    def __init__(self, name, function, descr='', usertext=''):
+        """Initialise Action
+
+        Name of action is name
+        Calls function function() on invocation
+        Action has description descr
+        Usertext is short form of name to display to user."""
+
+        self.name = name
+        self.function = function
+        self.descr = descr
+        self.usertext = usertext
+
+class Widget(object):
+    """ Fundamental plotting widget interface."""
+
+    typename = 'generic'
+    allowusercreation = False
+
+    # list of allowed types this can have as a parent
+    allowedparenttypes = []
+
+    def __init__(self, parent, name=None):
+        """Initialise a blank widget."""
+
+        # save parent widget for later
+        self.parent = parent
+
+        if not self.isAllowedParent(parent):
+            raise RuntimeError, "Widget parent is of incorrect type"
+
+        if name is None:
+            name = self.chooseName()
+        self.name = name
+
+        # propagate document
+        if parent is not None:
+            self.document = parent.document
+            parent.addChild(self)
+
+        # store child widgets
+        self.children = []
+        
+        # position of this widget on its parent
+        self.position = (0., 0., 1., 1.)
+
+        # settings for widget
+        self.settings = setting.Settings( 'Widget_' + self.typename )
+        self.settings.parent = self
+
+        self.settings.add( setting.Bool('hide', False,
+                                        descr = 'Hide object',
+                                        usertext = 'Hide',
+                                        formatting = True) )
+
+        # hook up settings to modify document flag if they are modified
+        self.settings.setOnModified(self.slotSettingModified)
+        
+        # actions for widget
+        self.actions = []
+
+        # pts user can move around
+        self.controlgraphitems = []
+
+    def isWidget(self):
+        """Is this object a widget?"""
+        return True
+
+    def rename(self, name):
+        """Change name of self."""
+
+        if self.parent is None:
+            raise ValueError, 'Cannot rename root widget'
+
+        if name.find('/') != -1:
+            raise ValueError, 'Names cannot contain "/"'
+
+        # check whether name already exists in siblings
+        for i in self.parent.children:
+            if i != self and i.name == name:
+                raise ValueError, 'New name "%s" already exists' % name
+
+        self.name = name
+        self.document.setModified()
+
+    def addDefaultSubWidgets(self):
+        '''Add default sub widgets to widget, if any'''
+        pass
+
+    def addAction(self, action):
+        """Assign name to operation.
+        action is action class above
+        """
+        self.actions.append( action )
+
+    def getAction(self, name):
+        """Get action associated with name."""
+        for a in self.actions:
+            if a.name == name:
+                return a
+        return None
+
+    def isAllowedParent(self, parent):
+        """Is the parent a suitable type?"""
+        ap = self.allowedparenttypes 
+        if parent is None and len(ap)>0 and ap[0] is None:
+            return True
+        
+        for p in ap:
+            if isinstance(parent, p):
+                return True
+        return False      
+
+    def willAllowParent(cls, parent):
+        """Is the parent of an allowed type to have this type as a child?"""
+
+        # allow base widget to have no parent
+        ap = cls.allowedparenttypes 
+        if parent is None and len(ap) > 0 and ap[0] is None:
+            return True
+        
+        for p in ap:
+            if isinstance(parent, p):
+                return True
+        return False
+    willAllowParent = classmethod(willAllowParent)
+
+    def addChild(self, child, index=9999999):
+        """Add child to list.
+        
+        index is a position to place the new child
+        """
+        self.children.insert(index, child)
+
+    def createUniqueName(self, prefix):
+        """Create a name using the prefix which hasn't been used before."""
+        names = [c.name for c in self.children]
+
+        i = 1
+        while "%s%i" % (prefix, i) in names:
+            i += 1
+        return "%s%i" % (prefix, i)
+
+    def chooseName(self):
+        """Make a name for widget if not specified."""
+
+        if self.parent is None:
+            return '/'
+        else:
+            return self.parent.createUniqueName(self.typename)
+
+    def _getUserDescription(self):
+        """Return a user-friendly description of what
+        this is (e.g. function)."""
+        return ''
+    userdescription = property(_getUserDescription)
+
+    def prefLookup(self, name):
+        """Get the value of a preference in the form foo/bar/baz"""
+
+        if len(name) > 0 and name[0] == '/':
+            obj = self.document.basewidget
+            name = name[1:]
+        else:
+            obj = self
+
+        parts = name.split('/')
+        noparts = len(parts)
+
+        # this could be recursive, but why bother
+        # loop while we iterate through the family
+        i = 0
+        while i < noparts and obj.hasChild( parts[i] ):
+            obj = obj.getChild( parts[i] )
+            i += 1
+
+        if i == noparts:
+            raise ValueError, "Specified an widget, not a setting"
+        else:
+            return obj.settings.getFromPath( parts[i:] )
+
+    def getChild(self, name):
+        """Return a child with a name."""
+        for i in self.children:
+            if i.name == name:
+                return i
+        return None
+
+    def hasChild(self, name):
+        """Return whether there is a child with a name."""
+        return self.getChild(name) is not None
+
+    def _getChildNames(self):
+        """Return the child names."""
+        return [i.name for i in self.children]
+    childnames = property(_getChildNames)
+
+    def removeChild(self, name):
+        """Remove a child."""
+
+        i = 0
+        nc = len(self.children)
+        while i < nc and self.children[i].name != name:
+            i += 1
+
+        if i < nc:
+            self.children.pop(i)
+        else:
+            raise ValueError, \
+                  "Cannot remove graph '%s' - does not exist" % name
+
+    def _getPath(self):
+        """Returns a path for the object, e.g. /plot1/x."""
+
+        obj = self
+        build = ''
+        while obj.parent is not None:
+            build = '/' + obj.name + build
+            obj = obj.parent
+
+        if len(build) == 0:
+            build = '/'
+
+        return build
+    path = property(_getPath)
+
+    def computeBounds(self, parentposn, painter, margins = (0., 0., 0., 0.)):
+        """Compute a bounds array, giving the bounding box for the widget."""
+
+        # get parent's position
+        x1, y1, x2, y2 = parentposn
+        dx, dy = x2-x1, y2-y1
+
+        # get our position
+        px1, py1, px2, py2 = self.position
+        x1, y1, x2, y2 = ( x1+dx*px1, y1+dy*py1, x1+dx*px2, y1+dy*py2 )
+        dx1, dy1, dx2, dy2 = margins
+        return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
+
+    def draw(self, parentposn, painter, outerbounds = None):
+        """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
+
+        painter is the widget.Painter to draw on
+        outerbounds contains "ultimate" bounds we don't go outside
+        """
+
+        bounds = self.computeBounds(parentposn, painter)
+
+        if not self.settings.hide:
+
+            # iterate over children in reverse order
+            for i in utils.reverse(self.children):
+                i.draw(bounds, painter, outerbounds=outerbounds)
+ 
+        # return our final bounds
+        return bounds
+
+    def getSaveText(self, saveall = False):
+        """Return text to restore object
+
+        If saveall is true, save everything, including defaults."""
+
+        # set everything first
+        text = self.settings.saveText(saveall)
+
+        # now go throught the subwidgets
+        for c in self.children:
+            text += ( "Add('%s', name='%s', autoadd=False)\n" %
+                      (c.typename, c.name) )
+
+            # if we need to go to the child, go there
+            ctext = c.getSaveText(saveall)
+            if ctext != '':
+                text += ("To('%s')\n"
+                         "%s"
+                         "To('..')\n") % (c.name, ctext)
+
+        return text
+
+    def slotSettingModified(self, ismodified):
+        """Called when settings is modified."""
+
+        if ismodified and self.document:
+            self.document.setModified(True)
+
+    def readDefaults(self):
+        """Read the default settings."""
+
+        self.settings.readDefaults('', self.name)
+
+    def buildFlatWidgetList(self, thelist):
+        """Return a built up list of the widgets in the tree."""
+
+        thelist.append(self)
+        for child in self.children:
+            child.buildFlatWidgetList(thelist)
+
+    def _recursiveBuildSlots(self, slots):
+        """Build up a flat representation of the places where widgets
+        can be placed
+
+        The list consists of (parent, index) tuples
+        """
+
+        slots.append( (self, 0) )
+
+        for child, index in itertools.izip(self.children, itertools.count(1)):
+            child._recursiveBuildSlots(slots)
+            slots.append( (self, index) )
+
+    def moveChild(self, w, direction):
+        """Move the child widget w up in the hierarchy in the direction.
+        direction is -1 for 'up' or +1 for 'down'
+
+        Returns True if succeeded
+        """
+
+        # find position of child in self
+        c = self.children
+        oldindex = c.index(w)
+
+        # remove the widget from its current location
+        c.pop(oldindex)
+
+        # build a list of places widgets can be placed (slots)
+        slots = []
+        self.document.basewidget._recursiveBuildSlots(slots)
+
+        # find self list - must be a better way to do this -
+        # probably doesn't matter too much, however
+        ourslot = (self, oldindex)
+        ourindex = 0
+        while ourindex < len(slots) and slots[ourindex] != ourslot:
+            ourindex += 1
+
+        # should never happen
+        assert ourindex < len(slots)
+
+        # move up or down the list until we find a suitable parent
+        ourindex += direction
+
+        while ( ourindex >= 0 and ourindex < len(slots) and
+                not w.isAllowedParent(slots[ourindex][0]) ):
+            ourindex += direction
+
+        # we failed to find a new parent
+        if ourindex < 0 or ourindex >= len(slots):
+            c.insert(oldindex, w)
+            return False
+        else:
+            newparent, newindex = slots[ourindex]
+            existingname = w.name in newparent.childnames
+            newparent.children.insert(newindex, w)
+            w.parent = newparent
+
+            # require a new name because of a clash
+            if existingname:
+                w.name = w.chooseName()
+
+            self.document.setModified(True)
+            return True
+
+    def updateControlItem(self, controlitem, pos):
+        """Update the widget's control point.
+        
+        controlitem is the control item in question."""
+
+        pass
+
+# allow the factory to instantiate a generic widget
+document.thefactory.register( Widget )

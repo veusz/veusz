@@ -1,0 +1,75 @@
+# Example stacked plot
+
+# Load in datasets x, y1, y2 and y3+symerrors
+ImportString('x y1 y2 y3,+-','''
+0.0  -8.627642e-01  7.356253e-01  1.537872e+00 0.3 
+1.0   1.213047e+00  2.187511e+00  2.879103e-01 0.3 
+2.0  -1.682870e+00  9.680102e-01  7.127184e+00 0.3 
+3.0   2.540669e+00 -7.393343e-01  5.775675e+00 0.3 
+4.0   9.385744e-04  1.071199e+00  3.390224e+00 0.3 
+5.0  -6.966657e-01  1.763134e+00  2.470264e+00 0.3 
+6.0  -8.769203e-01  1.589872e+00  1.019945e+00 0.3 
+7.0  -6.930465e-01  2.015283e+00 -5.690097e-01 0.3
+8.0  -2.456379e-01  7.102356e-01  4.276276e+00 0.3 
+9.0  -6.419765e-01  1.808795e+00 -4.449537e+00 0.3
+10.0 -1.485679e+00  8.750188e-01 -7.127589e-02 0.3
+11.0 -7.142200e-01  1.477934e+00 -9.531333e-01 0.3
+12.0  8.639527e-02  3.591239e-02 -1.129021e+00 0.3
+13.0 -1.155861e+00  3.046406e+00  2.561764e+00 0.3 
+14.0 -9.576156e-01  3.515513e+00 -1.763882e+00 0.3
+15.0  6.018372e-02  7.194178e-01 -3.791216e-01 0.3
+16.0 -1.027861e+00  3.498590e+00  2.752641e-02 0.3 
+17.0  2.953903e-01  4.465251e+00 -1.044617e+00 0.3
+18.0 -3.615840e-01  1.638100e+00  2.075609e+00 0.3 
+19.0  2.474292e-01  3.577523e+00 -7.859457e-01 0.3
+''')
+
+To(Add('page'))
+
+# grid container holds sets of plots
+To(Add('grid'))
+Set('rows', 3)
+Set('columns', 1)
+
+# x axis is shared by all graphs in grid
+Add('axis', name='x')
+Set('x/label', 'Traffic police')
+
+# add the first graph in the grid
+To(Add('graph'))
+Set('y/label', 'Valkyries')
+To(Add('xy'))
+Set('yData', 'y1')
+To('../..')
+
+# add 2nd
+To(Add('graph'))
+Set('y/label', 'Swindon')
+To(Add('xy'))
+Set('yData', 'y2')
+Set('marker', 'diamond')
+Set('PlotLine/style', 'dotted')
+Set('MarkerFill/color', 'red')
+To('../..')
+
+# add 3rd
+To(Add('graph'))
+Set('y/label', 'Discworld')
+To(Add('xy'))
+Set('yData', 'y3')
+Set('marker', 'square')
+Set('PlotLine/style', 'dashed')
+Set('MarkerFill/color', 'blue')
+To('../..')
+
+# this puts the label at the side of the plot, so
+# all the labels line up
+# of course, this seems a silly way to do it, but it's just
+# an example
+for i in GetChildren():
+   if 'y' in GetChildren(i):
+      Set('%s/y/Label/atEdge' % i, True)
+
+# collapse margins of all the items in the grid
+Action('zeroMargins')
+To('/')

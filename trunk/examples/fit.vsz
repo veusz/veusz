@@ -1,0 +1,75 @@
+# Veusz saved document (version 0.4)
+# User: jss
+# Date: Sun, 13 Mar 2005 20:22:08 +0000
+
+ImportString('y,+-','''
+2.051912e+00 1.000000e+00
+8.445439e-01 1.000000e+00
+3.071220e+00 1.000000e+00
+3.570666e-01 1.000000e+00
+4.607197e+00 1.000000e+00
+5.686059e+00 1.000000e+00
+6.768538e+00 1.000000e+00
+6.120451e+00 1.000000e+00
+8.245063e+00 1.000000e+00
+8.996650e+00 1.000000e+00
+1.106673e+01 1.000000e+00
+1.167119e+01 1.000000e+00
+1.352823e+01 1.000000e+00
+1.212483e+01 1.000000e+00
+1.528200e+01 1.000000e+00
+1.613522e+01 1.000000e+00
+1.563430e+01 1.000000e+00
+1.673132e+01 1.000000e+00
+1.914110e+01 1.000000e+00
+1.954017e+01 1.000000e+00
+''')
+ImportString('x','''
+1.000000e+00
+2.000000e+00
+3.000000e+00
+4.000000e+00
+5.000000e+00
+6.000000e+00
+7.000000e+00
+8.000000e+00
+9.000000e+00
+1.000000e+01
+1.100000e+01
+1.200000e+01
+1.300000e+01
+1.400000e+01
+1.500000e+01
+1.600000e+01
+1.700000e+01
+1.800000e+01
+1.900000e+01
+2.000000e+01
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', 'A wonderful \\emph{x} axis')
+Set('log', True)
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', 'A dubious \\emph{y} axis')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('key', 'data')
+Set('PlotLine/hide', True)
+Set('MarkerFill/color', 'red')
+To('..')
+Add('fit', name='fit1', autoadd=False)
+To('fit1')
+Set('key', 'fit')
+To('..')
+Add('key', name='key1', autoadd=False)
+To('..')
+To('..')

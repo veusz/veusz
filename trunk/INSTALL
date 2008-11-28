@@ -1,0 +1,91 @@
+Veusz Installation
+==================
+
+Veusz uses distutils for its installation. See below for how to use
+it.
+
+Requirements:
+ python >= 2.3   http://www.python.org/
+ PyQt >= 4.3     http://www.riverbankcomputing.co.uk/pyqt/
+ numpy >= 1.0    http://numpy.scipy.org/
+
+(PyQt requires
+ Qt4             http://www.trolltech.com/products/qt/ (free version)
+                 version >= 4.2.2 recommended
+ SIP             http://www.riverbankcomputing.co.uk/sip/   )
+
+Optional requirements:
+ PyFITS>=1.1     http://www.stsci.edu/resources/software_hardware/pyfits
+
+ Veusz works much better with Microsoft's corefonts installed (or other good
+ TrueType fonts). 
+  see            http://corefonts.sourceforge.net/
+
+Simple source use (if requirements installed)
+=============================================
+If you don't want to bother installing veusz fully, it can be run from
+its own directory (at the moment). Simply do:
+
+# tar xzf veusz-1.2.1.tar.gz                [change version here]
+# cd veusz-1.2.1
+# ./veusz_main.py
+
+However certain features (currently contours) require C modules to be
+built. Currently only contour support requires this. You can build
+this without installing by doing:
+
+# python setup.py build
+# cp build/*/veusz/helpers/*.so helpers/
+
+Full installation with distutils
+================================
+There are a number of ways to install programs using distutils. I will
+list a few of the possible method here:
+
+To install to the standard location on the hard disk (it's better to use
+rpms if you have an rpm-based linux distibution)
+------------------------------------------------------------------------
+# cd veusz-1.2.1
+# python setup.py build
+# su
+[enter root password]
+# python setup.py install 
+# exit
+
+Linux binary
+============
+If you do not have the requirements, you can use the Linux binary
+instead (if available). Note that this may not work on all
+distributions due to glibc/library incompatibilities. You need to
+simply unpack the tar file and run the main executable:
+
+# tar xzf veusz-linux-i386-1.2.1.tar.gz     [change version here]
+# cd veusz-linux-i386-1.2.1
+# ./veusz
+
+Installing in Windows
+=====================
+Simply run the setup.exe binary installer. This does not provide the
+embedding interface, however.
+
+Installing on Mac OS X
+======================
+A binary is available for Mac OS X. It does not provide the embedding
+interface. Simply drag the Veusz application into your Applications
+directory.
+
+Veusz can also be installed from source on Mac OS X. The requirements
+can be obtained using a system such as MacPorts. You can install them
+with MacPorts using:
+
+$ sudo port install qt4-mac
+$ sudo port install py-numpy
+
+Once these have successfully built and installed, you can unpack veusz
+and install as above.
+
+Qt is available from TrollTech as a binary, but SIP and PyQt are not
+available as a binary.
+
+-------------------------------------------------------------------------------
+$Id$

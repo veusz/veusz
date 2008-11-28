@@ -1,0 +1,33 @@
+# Veusz saved document (version 0.99.0)
+# User: jss
+# Date: Tue, 09 Oct 2007 11:04:05 +0000
+
+SetDataExpression(u'y', u'x_0.5**2', linked=True)
+ImportString(u'x_0.5(numeric)','''
+0.000000e+00
+1.000000e+00
+2.000000e+00
+3.000000e+00
+4.000000e+00
+5.000000e+00
+6.000000e+00
+7.000000e+00
+8.000000e+00
+9.000000e+00
+1.000000e+01
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('xData', u'x_0.5')
+To('..')
+To('..')
+To('..')
