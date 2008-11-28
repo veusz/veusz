@@ -1,5 +1,5 @@
-Veusz 1.2
----------
+Veusz 1.2.1
+-----------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
@@ -16,6 +16,9 @@ consistent and powerful.
 Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
+
+Change in 1.2.1:
+ * Fix crash when adding a key without any key text defined.
 
 Changes in 1.2:
  * Boxes, ellipses, lines, arrows and image files can now be added to
