@@ -126,7 +126,7 @@ class Key(widget.Widget):
 
         # get number of columns
         count = len(keywidgets)
-        numcols = min(s.columns, count)
+        numcols = min(s.columns, max(count, 1))
         numrows = count / numcols
         if count % numcols != 0:
             numrows += 1
