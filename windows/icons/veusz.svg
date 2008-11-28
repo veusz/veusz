@@ -14,14 +14,52 @@
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.46"
-   sodipodi:docname="logo_v.svg"
+   sodipodi:docname="veusz.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
-   inkscape:export-filename="/home/jss/logo_v_16.png"
-   inkscape:export-xdpi="10.08"
-   inkscape:export-ydpi="10.08">
+   inkscape:export-filename="/data/jss/veusz/code/veusz/windows/icons/veusz_128.png"
+   inkscape:export-xdpi="78.826752"
+   inkscape:export-ydpi="78.826752">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient2462">
+      <stop
+         id="stop2464"
+         offset="0"
+         style="stop-color:#006000;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:1;"
+         offset="0.34307605"
+         id="stop2466" />
+      <stop
+         id="stop2468"
+         offset="0.47447211"
+         style="stop-color:#0000d5;stop-opacity:1;" />
+      <stop
+         id="stop2470"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2452">
+      <stop
+         id="stop2454"
+         offset="0"
+         style="stop-color:#008200;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0.34689936"
+         id="stop2456" />
+      <stop
+         id="stop2458"
+         offset="0.4584063"
+         style="stop-color:#2828ff;stop-opacity:1;" />
+      <stop
+         id="stop2460"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:1;" />
+    </linearGradient>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient3838">
@@ -147,6 +185,15 @@
        y1="250.86049"
        x2="280.66611"
        y2="116.93126" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2452"
+       id="linearGradient3303"
+       gradientUnits="userSpaceOnUse"
+       x1="289.79581"
+       y1="240.02806"
+       x2="278.40268"
+       y2="112.30112" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3638"
@@ -346,15 +393,6 @@
        y1="195.38275"
        x2="160.44493"
        y2="139.44722" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3225"
-       id="linearGradient3924"
-       gradientUnits="userSpaceOnUse"
-       x1="296.11389"
-       y1="244.2401"
-       x2="278.40268"
-       y2="112.30112" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -367,15 +405,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4244857"
-     inkscape:cx="209.47845"
+     inkscape:cx="172.23957"
      inkscape:cy="72.305528"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="708"
-     inkscape:window-x="-5"
-     inkscape:window-y="-3"
+     inkscape:window-x="2051"
+     inkscape:window-y="218"
      inkscape:snap-global="false"
      borderlayer="false" />
   <metadata
@@ -406,10 +444,13 @@
        d="M 124.98317,135.40866 L 124.98317,281.107 L 125.01025,281.107 L 125.01025,281.14304 L 130.90741,279.65386 L 129.41822,276.35469 L 126.71643,278.83666 L 126.71643,135.40866 L 124.98317,135.40866 z"
        id="rect3437"
        sodipodi:nodetypes="ccccccccc" />
-    <path
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;fill:url(#linearGradient3924);fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       d="M 221.9894,135.52347 L 135.46596,280.93362 L 109.68471,280.93362 L 90.34877,135.52347 L 110.46596,135.52347 L 126.38393,263.25784 L 201.38393,135.52347 L 221.9894,135.52347"
-       id="text2383" />
+    <g
+       id="g3305">
+      <path
+         id="text2383"
+         d="M 221.9894,135.52347 L 135.46596,280.93362 L 109.68471,280.93362 L 90.34877,135.52347 L 110.46596,135.52347 L 126.38393,263.25784 L 201.38393,135.52347 L 221.9894,135.52347"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;fill:url(#linearGradient3303);fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans" />
+    </g>
     <path
        sodipodi:type="star"
        style="fill:url(#linearGradient3678);fill-opacity:1;stroke:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"

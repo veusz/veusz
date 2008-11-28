@@ -23,6 +23,44 @@
   <defs
      id="defs4">
     <linearGradient
+       id="linearGradient2462">
+      <stop
+         id="stop2464"
+         offset="0"
+         style="stop-color:#006000;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:1;"
+         offset="0.34307605"
+         id="stop2466" />
+      <stop
+         id="stop2468"
+         offset="0.47447211"
+         style="stop-color:#0000d5;stop-opacity:1;" />
+      <stop
+         id="stop2470"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2452">
+      <stop
+         id="stop2454"
+         offset="0"
+         style="stop-color:#008200;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0.34689936"
+         id="stop2456" />
+      <stop
+         id="stop2458"
+         offset="0.4584063"
+         style="stop-color:#2828ff;stop-opacity:1;" />
+      <stop
+         id="stop2460"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
        inkscape:collect="always"
        id="linearGradient3862">
       <stop
@@ -161,21 +199,21 @@
        y2="116.93126" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3225"
+       xlink:href="#linearGradient2452"
        id="linearGradient3300"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.9885213,0,0,0.9851396,0.958248,-2.8924958)"
-       x1="298.58298"
-       y1="250.86049"
+       x1="292.19153"
+       y1="246.58492"
        x2="280.66611"
        y2="116.93126" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3225"
+       xlink:href="#linearGradient2452"
        id="linearGradient3303"
        gradientUnits="userSpaceOnUse"
-       x1="296.11389"
-       y1="244.2401"
+       x1="289.79581"
+       y1="240.02806"
        x2="278.40268"
        y2="112.30112" />
     <linearGradient
@@ -398,15 +436,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4244857"
-     inkscape:cx="209.47845"
+     inkscape:cx="172.23957"
      inkscape:cy="72.305528"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="708"
-     inkscape:window-x="-5"
-     inkscape:window-y="-3"
+     inkscape:window-x="2051"
+     inkscape:window-y="218"
      inkscape:snap-global="false"
      borderlayer="false" />
   <metadata
