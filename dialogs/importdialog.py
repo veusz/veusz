@@ -75,6 +75,10 @@ class ImportDialog2(qt4.QDialog):
                   self.twod_yminedit, self.twod_ymaxedit):
             i.setValidator(dval)
 
+        # change to tab last used
+        self.methodtab.setCurrentIndex(
+            setting.settingdb.get('import_lasttab', 0))
+
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
@@ -111,8 +115,12 @@ class ImportDialog2(qt4.QDialog):
         else:
             assert False
 
+        # enable import button if it looks okay
         if okay is not None:
             self.importbutton.setEnabled(okay)
+
+        # save so we can restore later
+        setting.settingdb['import_lasttab'] = tab
 
     def doPreviewStandard(self, filename):
         """Standard preview - show start of text."""

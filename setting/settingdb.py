@@ -110,6 +110,10 @@ class _SettingDB(object):
             if unicode(key) not in cleankeys:
                 s.remove(key)
 
+    def get(self, key, defaultval=None):
+        """Return key if it is in database, else defaultval."""
+        return self.database.get(key, defaultval)
+
     def __getitem__(self, key):
         """Get the item from the database."""
         return self.database[key]
