@@ -187,10 +187,6 @@ class Line(widget.Widget):
     def updateControlItem(self, cgi, pt1, pt2):
         """If control items are moved, update line."""
         s = self.settings
-        try:
-            cgiindex = self.controlgraphitems.index(cgi)
-        except ValueError:
-            return
 
         # calculate new position coordinate for item
         if s.positioning == 'axes':
@@ -218,10 +214,10 @@ class Line(widget.Widget):
 
         x, y = list(s.xPos), list(s.yPos)
         l, a = list(s.length), list(s.angle)
-        x[cgiindex] = xpos
-        y[cgiindex] = ypos
-        l[min(cgiindex, len(l)-1)] = length
-        a[min(cgiindex, len(a)-1)] = angle
+        x[cgi.index] = xpos
+        y[cgi.index] = ypos
+        l[min(cgi.index, len(l)-1)] = length
+        a[min(cgi.index, len(a)-1)] = angle
 
         operations = (
             document.OperationSettingSet(s.get('xPos'), x),

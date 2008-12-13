@@ -186,10 +186,6 @@ class BoxShape(Shape):
     def updateControlItem(self, cgi):
         """If control item is moved or resized, this is called."""
         s = self.settings
-        try:
-            cgiindex = self.controlgraphitems.index(cgi)
-        except ValueError:
-            return
 
         # calculate new position coordinate for item
         if s.positioning == 'axes':
@@ -216,11 +212,11 @@ class BoxShape(Shape):
         # actually do the adjustment on the document
         xp, yp = list(s.xPos), list(s.yPos)
         w, h, r = list(s.width), list(s.height), list(s.rotate)
-        xp[cgiindex] = xpos
-        yp[cgiindex] = ypos
-        w[min(cgiindex, len(w)-1)] = xw
-        h[min(cgiindex, len(h)-1)] = yw
-        r[min(cgiindex, len(r)-1)] = cgi.angle
+        xp[cgi.index] = xpos
+        yp[cgi.index] = ypos
+        w[min(cgi.index, len(w)-1)] = xw
+        h[min(cgi.index, len(h)-1)] = yw
+        r[min(cgi.index, len(r)-1)] = cgi.angle
 
         operations = (
             document.OperationSettingSet(s.get('xPos'), xp),
