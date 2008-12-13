@@ -731,11 +731,26 @@ class MainWindow(qt4.QMainWindow):
         self.document.enableUpdates()
         self.document.setModified(False)
 
+        # remember file for recent list
+        self.addRecentFile(filename)
+
         # let the main window know
         self.filename = filename
         self.updateTitlebar()
         self.updateStatusbar("Opened %s" % filename)
         qt4.QApplication.restoreOverrideCursor()
+
+    def addRecentFile(self, filename):
+        """Add a file to the recent files list."""
+
+        recent = setting.settingdb['main_recentfiles']
+        filename = os.path.abspath(filename)
+
+        if filename in recent:
+            del recent[recent.index(filename)]
+        recent.insert(0, filename)
+        setting.settingdb['main_recentfiles'] = recent[:10]
+        self.populateRecentFiles()
 
     def slotFileOpen(self):
         """Open an existing file in a new window."""
@@ -750,14 +765,14 @@ class MainWindow(qt4.QMainWindow):
 
         menu = self.menus["file.filerecent"]
         menu.clear()
+
         newMenuItems = []
         if setting.settingdb['main_recentfiles']:
             files = setting.settingdb['main_recentfiles']
-            files = files[:10]
             self._openRecentFunctions = []
             for i, path in enumerate(files):
 
-                #Surely there is an easier way to do this?
+                # Surely there is an easier way to do this?
                 def fileOpenerFunction(filename):
                     path=filename
                     def f():
@@ -772,12 +787,10 @@ class MainWindow(qt4.QMainWindow):
                                      '', False, ''))
 
             menu.setEnabled(True)
-            self.recentFileActions = utils.populateMenuToolbars(newMenuItems,
-                                                                self.maintoolbar,
-                                                                 self.menus)
+            self.recentFileActions = utils.populateMenuToolbars(
+                newMenuItems, self.maintoolbar, self.menus)
         else:
             menu.setEnabled(False)
-                
     
     def slotFileExport(self):
         """Export the graph."""
