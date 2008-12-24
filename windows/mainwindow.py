@@ -730,6 +730,7 @@ class MainWindow(qt4.QMainWindow):
         # document is loaded
         self.document.enableUpdates()
         self.document.setModified(False)
+        self.document.clearHistory()
 
         # remember file for recent list
         self.addRecentFile(filename)
