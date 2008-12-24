@@ -28,6 +28,127 @@ import veusz.utils as utils
 import plotters
 import widget
 import graph
+import controlgraph
+
+#############################################################################
+# classes for controlling key position interactively
+
+class ControlKey(object):
+    """Control the position of a key on a plot."""
+
+    def __init__( self, widget, parentposn,
+                  boxposn, boxdims,
+                  textheight ):
+        """widget is widget to adjust
+        parentposn: posn of parent on plot
+        xpos, ypos: position of key
+        width. height: size of key
+        textheight: 
+        """
+        self.widget = widget
+        self.parentposn = tuple(parentposn)
+        self.posn = tuple(boxposn)
+        self.dims = tuple(boxdims)
+        self.textheight = textheight
+
+    def createGraphicsItem(self):
+        return _GraphControlKey(self)
+
+class _GraphControlKey(qt4.QGraphicsRectItem):
+    """The graphical rectangle which is dragged around to reposition
+    the key."""
+
+    def __init__(self, params):
+        qt4.QGraphicsRectItem.__init__(self,
+                                       params.posn[0], params.posn[1],
+                                       params.dims[0], params.dims[1])
+        self.params = params
+
+        self.setCursor(qt4.Qt.SizeAllCursor)
+        self.setZValue(1.)
+        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
+        self.highlightpen = qt4.QPen(qt4.Qt.red, 2, qt4.Qt.DotLine)
+
+        pposn, dims = params.parentposn, params.dims
+        th = params.textheight
+
+        # special places on the plot
+        xposn = {
+            'left':   pposn[0] + th,
+            'centre': pposn[0] + 0.5*(pposn[2]-pposn[0]-dims[0]),
+            'right':  pposn[2] - th - dims[0]
+            }
+        yposn = {
+            'top':    pposn[1] + th,
+            'centre': pposn[1] + 0.5*(pposn[3]-pposn[1]-dims[1]),
+            'bottom': pposn[3] - th - dims[1]
+            }
+
+        # these are special places where the key is aligned
+        self.highlightpoints = {}
+        for xname, xval in xposn.iteritems():
+            for yname, yval in yposn.iteritems():
+                self.highlightpoints[(xname, yname)] = qt4.QPointF(xval, yval)
+
+        self.updatePen()
+
+    def checkHighlight(self):
+        """Check to see whether box is over hightlight area.
+        Returns (x, y) name or None if not."""
+
+        rect = self.rect()
+        rect.translate(self.pos())
+
+        highlight = None
+        highlightrect = qt4.QRectF(rect.left()-10, rect.top()-10, 20, 20)
+        for name, point in self.highlightpoints.iteritems():
+            if highlightrect.contains(point):
+                highlight = name
+                break
+        return highlight
+
+    def updatePen(self):
+        """Update color of rectangle if it is over a hightlight area."""
+        if self.checkHighlight():
+            self.setPen(self.highlightpen)
+        else:
+            self.setPen(controlgraph.dottedlinepen)
+
+    def mouseMoveEvent(self, event):
+        """Set correct pen for box."""
+        qt4.QGraphicsRectItem.mouseMoveEvent(self, event)
+        self.updatePen()
+
+    def mouseReleaseEvent(self, event):
+        """Update widget with position."""
+        qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
+        highlight = self.checkHighlight()
+        if highlight:
+            # in a highlight zone so use highlight zone name to set position
+            hp, vp = highlight
+            hm, vm = 0., 0.
+        else:
+            # calculate the position of the box to work out Manual fractions
+            rect = self.rect()
+            rect.translate(self.pos())
+            pposn = self.params.parentposn
+
+            hp, vp = 'manual', 'manual'
+            hm = (rect.left() - pposn[0]) / (pposn[2] - pposn[0])
+            vm = (pposn[3] - rect.bottom()) / (pposn[3] - pposn[1])
+
+        # update widget with positions
+        s = self.params.widget.settings
+        operations = (
+            document.OperationSettingSet(s.get('horzPosn'), hp),
+            document.OperationSettingSet(s.get('vertPosn'), vp),
+            document.OperationSettingSet(s.get('horzManual'), hm),
+            document.OperationSettingSet(s.get('vertManual'), vm),
+            )
+        self.params.widget.document.applyOperation(
+            document.OperationMultiple(operations, descr='move key'))
+
+############################################################################
 
 class Key(widget.Widget):
     """Key on graph."""
@@ -160,10 +281,14 @@ class Key(widget.Widget):
             y = parentposn[3] - totalheight - height
         elif v == 'centre':
             y = ( parentposn[1] +
-                  0.5*(parentposn[3] - parentposn[1]) - 0.5*totalheight)
+                  0.5*(parentposn[3] - parentposn[1] - totalheight) )
         elif v == 'manual':
             y = ( parentposn[3] -
                   (parentposn[3]-parentposn[1])*s.vertManual - totalheight )
+
+        # for controlgraph
+        boxposn = (x, y)
+        boxdims = (totalwidth, totalheight)
 
         # draw surrounding box
         if not s.Background.hide:
@@ -197,6 +322,10 @@ class Key(widget.Widget):
                                ypos,
                                plotter.settings.key,
                                -1, 1).render()
+
+        self.controlgraphitems = [
+            ControlKey(self, parentposn, boxposn, boxdims, height)
+            ]
 
         painter.restore()
         painter.endPaintingWidget()
