@@ -68,7 +68,9 @@ class Line(Settings):
                                usertext='Hide') )
         
     def makeQPen(self, painter):
-        '''Make a QPen from the description'''
+        '''Make a QPen from the description.
+        This currently ignores the hide attribute
+        '''
 
         color = qt4.QColor(self.color)
         color.setAlphaF( (100-self.transparency) / 100.)
@@ -80,6 +82,13 @@ class Line(Settings):
             pen.setDashPattern(dashpattern)
 
         return pen
+
+    def makeQPenWHide(self, painter):
+        """Make a pen, taking account of hide attribute."""
+        if self.hide:
+            return qt4.QPen(qt4.Qt.NoPen)
+        else:
+            return self.makeQPen(painter)
         
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
@@ -135,6 +144,13 @@ class Brush(Settings):
         color.setAlphaF( (100-self.transparency) / 100.)
         return qt4.QBrush( color, self.get('style').qtStyle() )
     
+    def makeQBrushWHide(self):
+        """Make a brush, taking account of hide attribute."""
+        if self.hide:
+            return qt4.QBrush()
+        else:
+            return self.makeQBrush()
+
 class KeyBrush(Brush):
     '''Fill used for back of key.'''
 
