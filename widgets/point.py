@@ -65,9 +65,11 @@ class PointPlotter(GenericPlotter):
                                           descr = 'Dataset containing x data or list of values',
                                           usertext='X data'), 0 )
         s.add( setting.Choice('errorStyle',
-                              ['bar', 'barends', 'box', 'diamond', 'curve',
+                              ['none',
+                               'bar', 'barends', 'box', 'diamond', 'curve',
                                'barbox', 'bardiamond', 'barcurve',
-                               'fillvert', 'fillhorz'],
+                               'fillvert', 'fillhorz',
+                               'linevert', 'linehorz'],
                               'bar',
                               descr='Style of error bars to plot',
                               usertext='Error style', formatting=True) )
@@ -92,13 +94,13 @@ class PointPlotter(GenericPlotter):
                                     descr = 'Error bar line settings',
                                     usertext = 'Error bar line'),
                pixmap = 'ploterrorline' )
-        s.add( setting.PlotterFill('FillBelow',
-                                   descr = 'Fill below plot line',
-                                   usertext = 'Fill below'),
+        s.add( setting.PointFill('FillBelow',
+                                 descr = 'Fill below plot line',
+                                 usertext = 'Fill below'),
                pixmap = 'plotfillbelow' )
-        s.add( setting.PlotterFill('FillAbove',
-                                   descr = 'Fill above plot line',
-                                   usertext = 'Fill above'),
+        s.add( setting.PointFill('FillAbove',
+                                 descr = 'Fill above plot line',
+                                 usertext = 'Fill above'),
                pixmap = 'plotfillabove' )
         s.add( setting.PointLabel('Label',
                                   descr = 'Label settings',
@@ -257,7 +259,8 @@ class PointPlotter(GenericPlotter):
                                                (xmx-xp)*2+1, (ymn-yp)*2+1),
                                     4320, 1440)
 
-            elif style in {'fillvert': True, 'fillhorz': True}:
+            elif style in {'fillvert': True, 'fillhorz': True,
+                           'linevert': True, 'linehorz': True}:
                 if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
                     # construct points for error bar regions
                     retnpts = qt4.QPolygonF()
@@ -266,26 +269,32 @@ class PointPlotter(GenericPlotter):
 
                     ptsabove = qt4.QPolygonF()
                     ptsbelow = qt4.QPolygonF()
-                    if style == 'fillvert':
+                    if style == 'fillvert' or style == 'linevert':
+                        # lines above/below points
                         for x, y in itertools.izip(xplotter, ymin):
                             ptsbelow.append(qt4.QPointF(x, y))
                         for x, y in itertools.izip(xplotter, ymax):
                             ptsabove.append(qt4.QPointF(x, y))
-                    else: # fillhorz
+                    else:
+                        # lines left/right points
                         for x, y in itertools.izip(xmin, yplotter):
                             ptsbelow.append(qt4.QPointF(x, y))
                         for x, y in itertools.izip(xmax, yplotter):
                             ptsabove.append(qt4.QPointF(x, y))
 
                     # draw filled regions above/left and below/right
-                    painter.setPen( qt4.Qt.NoPen )
-                    painter.setBrush( s.FillBelow.makeQBrush() )
-                    painter.drawPolygon( ptsbelow + retnpts )
-                    painter.setBrush( s.FillAbove.makeQBrush() )
-                    painter.drawPolygon( ptsabove + retnpts )
+                    if style == 'fillvert' or style == 'fillhorz':
+                        painter.save()
+                        painter.setPen( qt4.Qt.NoPen )
+                        if not s.FillBelow.hideerror:
+                            painter.setBrush( s.FillBelow.makeQBrush() )
+                            painter.drawPolygon( ptsbelow + retnpts )
+                        if not s.FillAbove.hideerror:
+                            painter.setBrush( s.FillAbove.makeQBrush() )
+                            painter.drawPolygon( ptsabove + retnpts )
+                        painter.restore()
 
                     # draw optional line
-                    painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
                     painter.drawPolyline( ptsabove )
                     painter.drawPolyline( ptsbelow )
 

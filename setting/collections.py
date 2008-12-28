@@ -175,6 +175,24 @@ class PlotterFill(Brush):
 
         self.get('hide').newDefault(True)
 
+class PointFill(Brush):
+    '''Filling used for filling above/below line or inside error region for xy-point
+    plotters.
+    '''
+
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
+
+        hide = self.get('hide')
+        hide.newDefault(True)
+        hide.usertext = 'Hide edge fill'
+        hide.descr = 'Hide the filled region to the edge of the plot'
+        self.get('color').newDefault('grey')
+
+        self.add( setting.Bool( 'hideerror', False,
+                                descr = 'Hide the filled region inside the error bars',
+                                usertext='Hide error fill') )
+
 class ShapeFill(Brush):
     '''Filling used for filling shapes.'''
 
