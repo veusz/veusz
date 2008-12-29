@@ -153,11 +153,16 @@ def _plotPolygonSymbols(painter, name, xpos, ypos, size):
     path = qt4.QPainterPath()
     _addPolyPath(path, N.array(_polygons[name])*size)
 
+    # optimise by looking up functions first
+    t = painter.translate
+    d = painter.drawPath
+    r = painter.resetTransform
+
     painter.save()
     for x, y in itertools.izip(xpos, ypos):
-        painter.translate(x, y)
-        painter.drawPath(path)
-        painter.resetTransform()
+        t(x, y)
+        d(path)
+        r()
     painter.restore()
 
 #######################################################################
@@ -243,11 +248,16 @@ def _plotPathSymbols(painter, name, xpos, ypos, size):
     path = qt4.QPainterPath()
     _pathsymbols[name](painter, path, size)
 
+    # optimise by looking up functions first
+    t = painter.translate
+    d = painter.drawPath
+    r = painter.resetTransform
+
     painter.save()
     for x, y in itertools.izip(xpos, ypos):
-        painter.translate(x, y)
-        painter.drawPath(path)
-        painter.resetTransform()
+        t(x, y)
+        d(path)
+        r()
     painter.restore()
 
 #######################################################################
