@@ -78,11 +78,7 @@ class MainWindow(qt4.QMainWindow):
 
         # icon and different size variations
         d = utils.imagedir
-        icon = qt4.QIcon()
-        for size in (16, 32, 48, 64, 128):
-            icon.addFile(os.path.join(d, 'veusz_%i.png' % size),
-                                      qt4.QSize(size, size))
-        self.setWindowIcon(icon)
+        self.setWindowIcon( utils.getIcon('veusz.svg') )
 
         # master documenent
         self.document = document.Document()

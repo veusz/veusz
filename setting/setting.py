@@ -1401,3 +1401,27 @@ class Filename(Str):
         """Make specialised lineset control."""
         return controls.Filename(self, *args)
     
+class ErrorStyle(Choice):
+    """Error bar style.
+    The allowed values are below in _errorstyles.
+    """
+
+    _errorstyles = (
+        'none',
+        'bar', 'barends', 'box', 'diamond', 'curve',
+        'barbox', 'bardiamond', 'barcurve',
+        'fillvert', 'fillhorz',
+        'linevert', 'linehorz',
+        )
+
+    controls.ErrorStyle._errorstyles  = _errorstyles
+
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, self._errorstyles, value, **args)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+                              
+    def makeControl(self, *args):
+        return controls.ErrorStyle(self, *args)

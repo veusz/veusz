@@ -1255,3 +1255,23 @@ class Filename(qt4.QWidget):
     def onModified(self, mod):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
+
+class ErrorStyle(Choice):
+    """Choose different error bar styles."""
+    
+    _icons = None         # generated icons
+    _errorstyles = None   # copied in by setting.py
+    
+    def __init__(self, setting, parent):
+        if self._icons is None:
+            self._generateIcons()
+
+        Choice.__init__(self, setting, False,
+                        self._errorstyles, parent,
+                        icons=self._icons)
+
+    def _generateIcons(cls):
+        """Generate a list of pixmaps for drop down menu."""
+        cls._icons = []
+        for errstyle in cls._errorstyles:
+            cls._icons.append( utils.getIcon('error_%s.svg' % errstyle) )

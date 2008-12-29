@@ -64,15 +64,10 @@ class PointPlotter(GenericPlotter):
         s.add( setting.DatasetOrFloatList('xData', 'x',
                                           descr = 'Dataset containing x data or list of values',
                                           usertext='X data'), 0 )
-        s.add( setting.Choice('errorStyle',
-                              ['none',
-                               'bar', 'barends', 'box', 'diamond', 'curve',
-                               'barbox', 'bardiamond', 'barcurve',
-                               'fillvert', 'fillhorz',
-                               'linevert', 'linehorz'],
-                              'bar',
-                              descr='Style of error bars to plot',
-                              usertext='Error style', formatting=True) )
+        s.add( setting.ErrorStyle('errorStyle',
+                                  'bar',
+                                  descr='Style of error bars to plot',
+                                  usertext='Error style', formatting=True) )
 
         s.add( setting.DatasetOrStr('labels', '',
                                     descr='Dataset or string to label points',

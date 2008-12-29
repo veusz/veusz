@@ -41,8 +41,7 @@ _iconcache = {}
 def getIcon(icon):
     """Return a cached QIconSet for the filename in the icons directory."""
     if icon not in _iconcache:
-        pixmap = getPixmap(icon)
-        _iconcache[icon] = qt4.QIcon(pixmap)
+        _iconcache[icon] = qt4.QIcon(os.path.join(imagedir, icon))
     return _iconcache[icon]
 
 def populateMenuToolbars(items, toolbar, menus):
