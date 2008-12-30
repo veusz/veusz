@@ -334,7 +334,7 @@ class MainWindow(qt4.QMainWindow):
              'Suggestions and bugs', 'help', self.slotHelpBug, '', False, ''),
             ('help', ),
             ('helpabout', 'Displays information about the program', 'About...',
-             'help', self.slotHelpAbout, '', False, '')
+             'help', self.slotHelpAbout, 'veusz.svg', False, '')
             )
             
         self.actions = utils.populateMenuToolbars(items, self.maintoolbar,
