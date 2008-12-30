@@ -688,7 +688,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         edititems = (
             ('cut', 'Cut the selected item', 'Cu&t', 'edit',
-             self.slotWidgetCut, 'kde-edit-cut.svg', True, 'Ctrl+X'),
+             self.slotWidgetCut, 'veusz-edit-cut.svg', True, 'Ctrl+X'),
             ('copy', 'Copy the selected item', '&Copy', 'edit',
              self.slotWidgetCopy, 'kde-edit-copy.svg', True, 'Ctrl+C'),
             ('paste', 'Paste item from the clipboard', '&Paste', 'edit',

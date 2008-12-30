@@ -22,13 +22,13 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <sodipodi:namedview
      inkscape:current-layer="svg1"
-     inkscape:window-y="0"
-     inkscape:window-x="250"
+     inkscape:window-y="36"
+     inkscape:window-x="263"
      inkscape:window-height="691"
      inkscape:window-width="1020"
-     inkscape:cy="42.34131"
-     inkscape:cx="35.369251"
-     inkscape:zoom="9.8238824"
+     inkscape:cy="27.369885"
+     inkscape:cx="-14.151849"
+     inkscape:zoom="3.4732669"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -153,8 +153,8 @@
      d="M 40.385068,24.648355 C 40.385068,33.322298 33.345346,40.362020 24.671403,40.362020 C 15.997450,40.362020 8.9577310,33.322298 8.9577320,24.648355 C 8.9577310,15.974412 15.997450,8.9346881 24.671403,8.9346881 C 33.345346,8.9346881 40.385068,15.974412 40.385068,24.648355 z "
      style="stroke-opacity:1.0000000;stroke-linejoin:round;stroke-linecap:round;stroke-width:2.4992261;stroke:#000000;fill-rule:evenodd;fill-opacity:1.0000000;fill:#c0b8db;font-size:12.000000" />
   <g
-     id="g3205"
-     transform="matrix(0,1,-1,0,49.362659,-0.2104115)">
+     id="g3189"
+     transform="matrix(0,1,-1,0,49.074746,-0.210412)">
     <path
        id="path2409"
        d="M 13.945607,24.576123 L 35.52567,24.576123"
@@ -162,12 +162,12 @@
     <path
        sodipodi:nodetypes="cccc"
        id="path3181"
-       d="M 12.724094,24.576123 L 16.999389,19.181108 L 16.999389,29.971139 L 12.724094,24.576123 z"
+       d="M 10.708701,24.62102 L 18.72687,17.543422 L 18.72687,31.698619 L 10.708701,24.62102 z"
        style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cccc"
        id="path3183"
-       d="M 36.848976,24.576123 L 32.573681,19.181108 L 32.573681,29.971139 L 36.848976,24.576123 z"
+       d="M 38.576457,24.243313 L 29.694548,17.165715 L 29.694548,31.320913 L 38.576457,24.243313 z"
        style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>
