@@ -309,7 +309,7 @@ class ImageFile(BoxShape):
 
         # if no pixmap, then use default image
         if not pixmap or pixmap.width() == 0 or pixmap.height() == 0:
-            pixmap = utils.getPixmap('button_imagefile.png')
+            pixmap = utils.getIcon('button_imagefile.svg').pixmap(64, 64)
         
         # pixmap rectangle
         prect = qt4.QRectF(pixmap.rect())
