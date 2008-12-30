@@ -255,16 +255,16 @@ def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet."""
     families = [ unicode(name) for name in qt4.QFontDatabase().families() ]
     
-    default = None
-    for i in ['Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
-              'Serif']:
-        if i in families:
-            default = unicode(i)
+    deffont = None
+    for f in ('Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
+              'Serif'):
+        if f in families:
+            deffont = unicode(f)
             break
             
-    if default is None:
+    if deffont is None:
         print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
-        default = unicode(_fontfamilies[0])
+        deffont = unicode(_fontfamilies[0])
 
     class StylesheetText(Settings):
         """Hold properties of default text font."""
@@ -277,8 +277,8 @@ def _registerFontStyleSheet():
             self.defaultfamily = defaultfamily
             self.families = families
 
-            self.add( setting.ChoiceOrMore('font', families, default,
-                                           descr='Font name', usertext='Font'))
+            self.add( setting.FontFamily('font', deffont,
+                                         descr='Font name', usertext='Font'))
             self.add( setting.Distance('size', '14pt',
                                        descr='Default font size', usertext='Size'))
             self.add( setting.Color('color', 'black', descr='Default font color',
@@ -291,8 +291,8 @@ def _registerFontStyleSheet():
             c.families = self.families
             return c
 
-    StyleSheet.register(StylesheetText(default, families))
-    Text.defaultfamily = default
+    StyleSheet.register(StylesheetText(deffont, families))
+    Text.defaultfamily = deffont
     Text.families = families
 
 Application.startupfunctions.append(_registerFontStyleSheet)
@@ -308,10 +308,10 @@ class Text(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.ChoiceOrMore('font', Text.families,
-                                       setting.Reference('/StyleSheet/Font/font'),
-                                       descr = 'Font name',
-                                       usertext='Font') )
+        self.add( setting.FontFamily('font',
+                                     setting.Reference('/StyleSheet/Font/font'),
+                                     descr = 'Font name',
+                                     usertext='Font') )
         self.add( setting.Distance('size', setting.Reference('/StyleSheet/Font/size'),
                   descr = 'Font size', usertext='Size' ) )
         self.add( setting.Color( 'color', setting.Reference('/StyleSheet/Font/color'),

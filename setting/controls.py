@@ -1256,6 +1256,44 @@ class Filename(qt4.QWidget):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
 
+class FontFamily(qt4.QFontComboBox):
+    """List the font families, showing each font."""
+
+    def __init__(self, setting, parent):
+        """Create the combobox."""
+
+        qt4.QFontComboBox.__init__(self, parent)
+        self.setting = setting
+        self.setFontFilters( qt4.QFontComboBox.ScalableFonts )
+        
+        # set initial value
+        self.onModified(True)
+
+        # stops combobox readjusting in size to fit contents
+        self.setSizeAdjustPolicy(
+            qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+
+        self.setting.setOnModified(self.onModified)
+
+        # if a different item is selected
+        self.connect( self, qt4.SIGNAL('activated(const QString&)'),
+                      self.slotActivated )
+
+    def focusOutEvent(self, *args):
+        """Allows us to check the contents of the widget."""
+        qt4.QFontComboBox.focusOutEvent(self, *args)
+        self.slotActivated('')
+
+    def slotActivated(self, val):
+        """Update setting if a different item is chosen."""
+        newval = unicode(self.currentText())
+        if self.setting.val != newval:
+            self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, newval)
+
+    def onModified(self, mod):
+        """Make control reflect chosen setting."""
+        self.setCurrentFont( qt4.QFont(self.setting.toText()) )
+
 class ErrorStyle(Choice):
     """Choose different error bar styles."""
     

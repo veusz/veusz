@@ -1393,14 +1393,19 @@ class FillSet(Setting):
             return b
     
 class Filename(Str):
-    """Represents a filename setting.
-
-    TODO: Add control to select files."""
+    """Represents a filename setting."""
 
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.Filename(self, *args)
     
+class FontFamily(Str):
+    """Represents a font family."""
+
+    def makeControl(self, *args):
+        """Make a special font combobox."""
+        return controls.FontFamily(self, *args)
+
 class ErrorStyle(Choice):
     """Error bar style.
     The allowed values are below in _errorstyles.
