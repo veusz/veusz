@@ -245,37 +245,38 @@ class PlotWindow( qt4.QGraphicsView ):
 
         self.viewtoolbar = qt4.QToolBar("View toolbar - Veusz", parent)
         self.viewtoolbar.setObjectName('veuszviewtoolbar')
+        self.viewtoolbar.setIconSize(qt4.QSize(22,22))
         self.viewtoolbar.hide()
         parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
 
         items = [
             ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
-             self.slotViewZoomIn, 'stock-zoom-in.png', False, 'Ctrl++'),
+             self.slotViewZoomIn, 'kde-zoom-in.svg', False, 'Ctrl++'),
             ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
-             self.slotViewZoomOut, 'stock-zoom-out.png', False, 'Ctrl+-'),
+             self.slotViewZoomOut, 'kde-zoom-out.svg', False, 'Ctrl+-'),
             ('viewzoom11', 'Restore plot to natural size', 'Zoom 1:1', 'view',
-             self.slotViewZoom11, 'stock-zoom-100.png', False, 'Ctrl+1'),
+             self.slotViewZoom11, 'kde-zoom-1-veuszedit.svg', False, 'Ctrl+1'),
             ('viewzoomwidth', 'Zoom plot to show whole width',
              'Zoom to width', 'view', self.slotViewZoomWidth,
-             'stock_zoom-page-width.png', False, ''),
+             'kde-zoom-width-veuszedit.svg', False, ''),
             ('viewzoomheight', 'Zoom plot to show whole height',
              'Zoom to height', 'view', self.slotViewZoomHeight,
-             'stock_zoom-page-height.png', False, ''),
+             'kde-zoom-height-veuszedit.svg', False, ''),
             ('viewzoompage', 'Zoom plot to show whole page',
              'Zoom to page', 'view', self.slotViewZoomPage,
-             'stock_zoom-page.png', False, ''),
+             'kde-zoom-page-veuszedit.svg', False, ''),
             ('view',),
             ('viewprevpage', 'Move to the previous page', '&Previous page',
-             'view', self.slotViewPreviousPage, 'stock_previous-page.png',
+             'view', self.slotViewPreviousPage, 'kde-go-previous.svg',
              True, 'Ctrl+PgUp'),
             ('viewnextpage', 'Move to the next page', '&Next page',
-             'view', self.slotViewNextPage, 'stock_next-page.png',
+             'view', self.slotViewNextPage, 'kde-go-next.svg',
              True, 'Ctrl+PgDown'),
             ('viewselect', 'Select items from the graph or scroll',
              'Select items or scroll', 'view', None,
-             'pointer.png', True, ''),
+             'kde-mouse-pointer.svg', True, ''),
             ('viewzoomgraph', 'Zoom into graph', 'Zoom graph',
-             'view', None, 'zoom_graph.png',
+             'view', None, 'veusz-zoom-graph.svg',
              True, '')
             ]
 
@@ -289,7 +290,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # a button for the zoom icon
         zoomtb = qt4.QToolButton(self.viewtoolbar)
-        zoomtb.setIcon( utils.getIcon('zoom-options.png') )
+        zoomtb.setIcon( utils.getIcon('kde-zoom-veuszedit.svg') )
         zoomtb.setToolTip("Zoom in or out of the page")
 
         # drop down zoom button on toolbar

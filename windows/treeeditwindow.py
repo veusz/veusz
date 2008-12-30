@@ -74,7 +74,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         elif role == qt4.Qt.DecorationRole:
             # return icon for first column
             if column == 0:
-                filename = 'button_%s.png' % obj.typename
+                filename = 'button_%s.svg' % obj.typename
                 if utils.pixmapExists(filename):
                     return qt4.QVariant(utils.getIcon(filename))
 
@@ -627,7 +627,7 @@ class TreeEditDock(qt4.QDockWidget):
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
-        self.toolbar.setIconSize( qt4.QSize(16, 16) )
+        self.toolbar.setIconSize( qt4.QSize(24, 24) )
 
         self.addslots = {}
         actions = {}
@@ -644,7 +644,7 @@ class TreeEditDock(qt4.QDockWidget):
             val = ( 'add%s' % widgettype, wc.description,
                     'Add %s' % widgettype, 'insert',
                     slot,
-                    'button_%s.png' % widgettype,
+                    'button_%s.svg' % widgettype,
                     True, '')
             actions[widgettype] = val
 
@@ -659,7 +659,8 @@ class TreeEditDock(qt4.QDockWidget):
 
         # create shape toolbar button
         shapetb = qt4.QToolButton()
-        shapetb.setIcon( utils.getIcon('veusz-shape-menu.png') )
+        shapeicon = utils.getIcon('veusz-shape-menu.svg')
+        shapetb.setIcon(shapeicon)
         shapetb.setToolTip("Draw shapes on plot or page")
 
         shapepop = qt4.QMenu(shapetb)
@@ -668,7 +669,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         # create menu item for shapes
         shapemenu = qt4.QMenu('Add shape', self.parent.menus['insert'])
-        shapemenu.setIcon( utils.getIcon('veusz-shape-menu.png') )
+        shapemenu.setIcon(shapeicon)
         self.parent.menus['insert'].addMenu(shapemenu)
 
         # add shape items to menu and toolbar button
@@ -687,21 +688,21 @@ class TreeEditDock(qt4.QDockWidget):
 
         edititems = (
             ('cut', 'Cut the selected item', 'Cu&t', 'edit',
-             self.slotWidgetCut, 'stock-cut.png', True, 'Ctrl+X'),
+             self.slotWidgetCut, 'kde-edit-cut.svg', True, 'Ctrl+X'),
             ('copy', 'Copy the selected item', '&Copy', 'edit',
-             self.slotWidgetCopy, 'stock-copy.png', True, 'Ctrl+C'),
+             self.slotWidgetCopy, 'kde-edit-copy.svg', True, 'Ctrl+C'),
             ('paste', 'Paste item from the clipboard', '&Paste', 'edit',
-             self.slotWidgetPaste, 'stock-paste.png', True, 'Ctrl+V'),
+             self.slotWidgetPaste, 'kde-edit-paste.svg', True, 'Ctrl+V'),
             ('moveup', 'Move the selected item up', 'Move &up', 'edit',
-             moveup, 'stock-go-up.png',
+             moveup, 'kde-go-up.svg',
              True, ''),
             ('movedown', 'Move the selected item down', 'Move d&own', 'edit',
-             movedown, 'stock-go-down.png',
+             movedown, 'kde-go-down.svg',
              True, ''),
             ('delete', 'Remove the selected item', '&Delete', 'edit',
-             self.slotWidgetDelete, 'stock-delete.png', True, ''),
+             self.slotWidgetDelete, 'kde-edit-delete.svg', True, ''),
             ('rename', 'Renames the selected item', '&Rename', 'edit',
-             self.slotWidgetRename, 'icon-rename.png', False, '')
+             self.slotWidgetRename, 'kde-edit-rename.svg', False, '')
             )
         self.editactions = utils.populateMenuToolbars(edititems, self.toolbar,
                                                       self.parent.menus)

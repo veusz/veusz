@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docbase="/home/danny/work/icons/primary/scalable/actions"
+   sodipodi:docname="button_cancel.svg"
+   inkscape:version="0.41"
+   sodipodi:version="0.32"
+   id="svg1"
+   x="0"
+   y="0"
+   version="1.0"
+   _SVGFile__filename="oldscale/actions/cancel.svg"
+   width="60"
+   height="60">
+  <sodipodi:namedview
+     inkscape:current-layer="svg1"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="691"
+     inkscape:window-width="1020"
+     inkscape:cy="21.949584"
+     inkscape:cx="25.766902"
+     inkscape:zoom="9.2407072"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <defs
+     id="defs3" />
+  <metadata
+     id="metadata5">
+    <RDF
+       id="RDF6">
+      <Work
+         id="Work7"
+         about="">
+        <title
+           id="title8">Part of the Flat Icon Collection (Thu Aug 26 14:38:01 2004)</title>
+        <description
+           id="description10" />
+        <subject
+           id="subject11">
+          <Bag
+             id="Bag12">
+            <li
+               id="li13" />
+          </Bag>
+        </subject>
+        <publisher
+           id="publisher14">
+          <Agent
+             id="Agent15"
+             about="">
+            <title
+               id="title16" />
+          </Agent>
+        </publisher>
+        <creator
+           id="creator17">
+          <Agent
+             id="Agent18"
+             about="">
+            <title
+               id="title19">Danny Allen</title>
+          </Agent>
+        </creator>
+        <rights
+           id="rights21">
+          <Agent
+             id="Agent22"
+             about="">
+            <title
+               id="title23">Danny Allen</title>
+          </Agent>
+        </rights>
+        <date
+           id="date25" />
+        <format
+           id="format26">image/svg+xml</format>
+        <type
+           resource="http://purl.org/dc/dcmitype/StillImage"
+           id="type28" />
+        <license
+           resource="http://creativecommons.org/licenses/LGPL/2.1/"
+           id="license29">
+          <date
+             id="date30" />
+        </license>
+        <language
+           id="language31">en</language>
+      </Work>
+    </RDF>
+    <rdf:RDF
+       id="RDF33">
+      <cc:Work
+         id="Work34"
+         rdf:about="">
+        <dc:format
+           id="format35">image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+           id="type37" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     id="path1709"
+     d="M 6.5289660,4.6929655 C 5.8974720,4.6679667 5.4240570,4.8396876 5.1064160,5.1646031 C 2.8632360,7.4591284 9.9131040,18.124378 20.999736,30.019836 C 9.9131040,41.915305 2.8632360,52.580554 5.1064160,54.875077 C 7.3567630,57.176944 18.027919,50.105130 29.976524,38.980936 C 41.925132,50.105130 52.645340,57.176944 54.895680,54.875077 C 57.138870,52.580554 50.039950,41.915305 38.953314,30.019836 C 50.039950,18.124378 57.138870,7.4591284 54.895680,5.1646031 C 52.645340,2.8627436 41.925132,9.9345543 29.976524,21.058747 C 19.714493,11.504755 10.371313,4.8450779 6.5289660,4.6929655 z "
+     style="font-size:12.000000;fill:none;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.1250000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000;" />
+  <path
+     id="path1602"
+     d="M 6.5289664,4.6929655 C 5.8974721,4.6679667 5.4240574,4.8396876 5.1064160,5.1646031 C 2.8632357,7.4591284 9.9131036,18.124378 20.999736,30.019836 C 9.9131036,41.915305 2.8632357,52.580554 5.1064160,54.875077 C 7.3567629,57.176944 18.027919,50.105130 29.976524,38.980936 C 41.925132,50.105130 52.645340,57.176944 54.895684,54.875077 C 57.138871,52.580554 50.039946,41.915305 38.953314,30.019836 C 50.039946,18.124378 57.138871,7.4591284 54.895684,5.1646031 C 52.645340,2.8627436 41.925132,9.9345543 29.976524,21.058747 C 19.714493,11.504755 10.371313,4.8450779 6.5289664,4.6929655 z "
+     style="font-size:12.000000;fill:#e71c02;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#e71c02;stroke-width:3.1250005;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0000000" />
+</svg>

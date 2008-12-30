@@ -229,6 +229,7 @@ class MainWindow(qt4.QMainWindow):
 
         # create toolbar
         self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
+        self.maintoolbar.setIconSize(qt4.QSize(22, 22))
         self.maintoolbar.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, self.maintoolbar)
 
@@ -256,23 +257,23 @@ class MainWindow(qt4.QMainWindow):
         # menuid.itemid
         items = (
             ('filenew', 'New document', '&New', 'file',
-             self.slotFileNew, 'stock-new.png', True, 'Ctrl+N'),
+             self.slotFileNew, 'kde-document-new.svg', True, 'Ctrl+N'),
             ('fileopen', 'Open a document', '&Open...', 'file',
-             self.slotFileOpen, 'stock-open.png', True, 'Ctrl+O'),
+             self.slotFileOpen, 'kde-document-open.svg', True, 'Ctrl+O'),
             #If we were looking for HIG goodness, there wouldn't be a submenu here
             ('filerecent', 'Open a recently edited document',
              'Open &Recent', 'file', [], '', False, ''),
             ('file', ),
             ('filesave', 'Save the document', '&Save', 'file',
-             self.slotFileSave, 'stock-save.png', True, 'Ctrl+S'),
+             self.slotFileSave, 'kde-document-save.svg', True, 'Ctrl+S'),
             ('filesaveas', 'Save the current graph under a new name',
-             'Save &As...', 'file', self.slotFileSaveAs, 'stock-save-as.png',
-             False, ''),
+             'Save &As...', 'file', self.slotFileSaveAs,
+             'kde-document-save-as.svg', False, ''),
             ('file', ),
             ('fileprint', 'Print the document', '&Print...', 'file',
-             self.slotFilePrint, 'stock-print.png', True, 'Ctrl+P'),
+             self.slotFilePrint, 'kde-document-print.svg', True, 'Ctrl+P'),
             ('fileexport', 'Export the current page', '&Export...', 'file',
-             self.slotFileExport, 'stock-export.png', True, ''),
+             self.slotFileExport, 'kde-document-export.svg', True, ''),
             ('fileexportstylesheet', 'Export stylesheet to file', 'Export stylesheet...', 'file',
              self.slotFileExportStyleSheet, '', False, ''), 
             ('fileimportstylesheet', 'Import stylesheet from file', 'Import stylesheet...', 'file',
@@ -280,14 +281,15 @@ class MainWindow(qt4.QMainWindow):
  
             ('file', ),
             ('fileclose', 'Close current window', 'Close Window', 'file',
-             self.slotFileClose, '', False, 'Ctrl+W'),
+             self.slotFileClose, 'kde-window-close.svg', False, 'Ctrl+W'),
             ('filequit', 'Exit the program', '&Quit', 'file',
-             self.slotFileQuit, 'stock-quit.png', False, 'Ctrl+Q'),
+             self.slotFileQuit, 'kde-application-exit.svg',
+             False, 'Ctrl+Q'),
 
             ('editundo', 'Undo the previous operation', 'Undo', 'edit',
-             self.slotEditUndo, '', False,  'Ctrl+Z'),
+             self.slotEditUndo, 'kde-edit-undo.svg', False,  'Ctrl+Z'),
             ('editredo', 'Redo the previous operation', 'Redo', 'edit',
-             self.slotEditRedo, '', False, 'Ctrl+Shift+Z'),
+             self.slotEditRedo, 'kde-edit-redo.svg', False, 'Ctrl+Shift+Z'),
             ('edit', ),
             ('editprefs', 'Edit preferences', 'Preferences...', 'edit',
              self.slotEditPreferences, '', False, ''),
@@ -313,15 +315,15 @@ class MainWindow(qt4.QMainWindow):
             ('view', ),
             
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
-             self.slotDataImport, 'stock-import.png', False, ''),
+             self.slotDataImport, 'kde-document-import.svg', False, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
-             self.slotDataEdit, 'stock-edit.png', False, ''),
+             self.slotDataEdit, 'kde-edit.svg', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
-             self.slotDataCreate, 'stock-new.png', False, ''),
+             self.slotDataCreate, 'kde-document-new.svg', False, ''),
             ('datacreate2d', 'Create new 2D datasets', 'Create &2D...', 'data',
-             self.slotDataCreate2D, 'stock-new.png', False, ''),
+             self.slotDataCreate2D, 'kde-document-new.svg', False, ''),
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
-             self.slotDataReload, 'stock-refresh.png', False, ''),
+             self.slotDataReload, 'kde-view-refresh.svg', False, ''),
 
             ('helphome', 'Go to the Veusz home page on the internet',
              'Home page', 'help', self.slotHelpHomepage, '', False, ''),
