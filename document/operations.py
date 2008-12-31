@@ -28,10 +28,6 @@ Operations store paths to objects to be modified rather than object references
 because some operations cannot restore references (e.g. add object)
 """
 
-# FIXME:
-# need operations for the following:
-#  paste widget
-
 import os.path
 
 import numpy as N
