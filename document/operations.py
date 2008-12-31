@@ -491,7 +491,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         # calculate for each of the dataset components
         vals = {}
         for key, expr in self.parts.iteritems():
-            errors = utils.checkCode(expr)
+            errors = utils.checkCode(expr, securityonly=True)
             if errors is not None:
                 raise CreateDatasetException("Will not create dataset\n"
                                              "Unsafe code in expression '%s'\n" % expr)

@@ -665,8 +665,8 @@ class MainWindow(qt4.QMainWindow):
         # check code for any security issues
         ignore_unsafe = setting.transient_settings['unsafe_mode']
         if not ignore_unsafe:
-            errors = utils.checkCode(script)
-            if errors is not None:
+            errors = utils.checkCode(script, securityonly=True)
+            if errors:
                 qt4.QApplication.restoreOverrideCursor()
                 if self._unsafeCmdMsgBox(self, filename).exec_() == \
                    qt4.QMessageBox.No:

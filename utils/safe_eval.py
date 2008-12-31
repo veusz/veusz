@@ -314,19 +314,31 @@ for name, val in N.__dict__.iteritems():
 veusz_eval_context['os_path_join'] = os.path.join
 veusz_eval_context['os_path_dirname'] = os.path.dirname
 
-def checkCode(code):
-    """Check code, returning errors (if any) or None if okay"""
+def _filterExceptions(errs, securityonly):
+    """Remove python exceptions from error list."""
+    if securityonly:
+        errs = [e for e in errs if (isinstance(e, SafeEvalException) or
+                                    isinstance(e, SafeEvalError))]
+    if errs:
+        return errs
+    else:
+        return None
+
+def checkCode(code, securityonly=False):
+    """Check code, returning errors (if any) or None if okay.
+
+    if securityonly is set, then don't return errors from Python
+    exceptions.
+    """
     
     try:
         ast = compiler.parse(code)
     except SyntaxError, e:
-        return [e]
-    checker = SafeEvalVisitor()
+        return _filterExceptions([e], securityonly)
 
-    if checker.walk(ast):
-        return None
-    else:
-        return checker.errors
+    checker = SafeEvalVisitor()
+    checker.walk(ast)
+    return _filterExceptions(checker.errors, securityonly)
 
 #----------------------------------------------------------------------
 # Safe 'eval' replacement.

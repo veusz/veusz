@@ -770,9 +770,11 @@ class DatasetExpression(Dataset):
 
                 # check expression for nasties if it has changed
                 if self.cachedexpr.get(part) != expr:
-                    if ((not setting.transient_settings['unsafe_mode']) and
-                        (utils.checkCode(expr) is not None)):
-                        raise DatasetExpressionException("Unsafe expression '%s' in %s part of dataset" % (self.expr[part], part))
+                    if ( not setting.transient_settings['unsafe_mode'] and
+                         utils.checkCode(expr, securityonly=True) ):
+                        raise DatasetExpressionException(
+                            "Unsafe expression '%s' in %s part of dataset" % (
+                                self.expr[part], part))
                     self.cachedexpr[part] = expr
 
                 # actually evaluate the expression
@@ -871,7 +873,7 @@ class Dataset2DXYZExpression(DatasetBase):
         self.cacheddata = None
         
         for expr in exprx, expry, exprz:
-            if utils.checkCode(expr) is not None:
+            if utils.checkCode(expr, securityonly=True) is not None:
                 raise DatasetExpressionException("Unsafe expression '%s'" % expr)
 
         self.environment = utils.veusz_eval_context.copy()
@@ -986,7 +988,7 @@ class Dataset2DXYFunc(DatasetBase):
         self.ystep = ystep
         self.expr = expr
 
-        if utils.checkCode(expr) is not None:
+        if utils.checkCode(expr, securityonly=True) is not None:
             raise DatasetExpressionException("Unsafe expression '%s'" % expr)
         
         self.environment = utils.veusz_eval_context.copy()

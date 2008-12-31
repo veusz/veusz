@@ -252,7 +252,7 @@ class FunctionPlotter(GenericPlotter):
         if self.cachedfunc != fn or self.cachedvar != s.variable:
             checked = utils.checkCode(fn)
             if checked is not None:
-                return None, None
+                return False
             self.cachedfunc = fn
             self.cachedvar = s.variable
 
@@ -272,7 +272,7 @@ class FunctionPlotter(GenericPlotter):
         x1, y1, x2, y2 = posn
 
         if not self._checkCachedFunction():
-            return
+            return None, None
 
         env = self.initEnviron()
         if s.variable == 'x':
