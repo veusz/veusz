@@ -40,6 +40,7 @@ from veusz.dialogs.datacreate import DataCreateDialog
 from veusz.dialogs.datacreate2d import DataCreate2DDialog
 from veusz.dialogs.preferences import PreferencesDialog
 from veusz.dialogs.errorloading import ErrorLoadingDialog
+from veusz.dialogs.capturedialog import CaptureDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -322,6 +323,8 @@ class MainWindow(qt4.QMainWindow):
              self.slotDataCreate, 'kde-document-new.svg', False, ''),
             ('datacreate2d', 'Create new 2D datasets', 'Create &2D...', 'data',
              self.slotDataCreate2D, 'kde-document-new.svg', False, ''),
+            ('datacapture', 'Capture remote data', 'Ca&pture...', 'data',
+             self.slotDataCapture, '', False, ''),
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
              self.slotDataReload, 'kde-view-refresh.svg', False, ''),
 
@@ -398,6 +401,11 @@ class MainWindow(qt4.QMainWindow):
         """Create new datasets."""
         dialog = DataCreate2DDialog(self, self.document)
         self.dialogs.append(dialog)
+        dialog.show()
+
+    def slotDataCapture(self):
+        """Capture remote data."""
+        dialog = CaptureDialog(self.document, self)
         dialog.show()
 
     def slotDataReload(self):
