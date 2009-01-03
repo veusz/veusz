@@ -114,8 +114,7 @@ def guessDataType(val):
     # assume string otherwise
     return 'string'
 
-
-class _DescriptorPart:
+class _DescriptorPart(object):
     """Represents part of a descriptor, e.g. 'x,+,-'
     """
 
@@ -324,8 +323,7 @@ class _DescriptorPart:
 
         return names
 
-class FileStream:
-    """Class to read in the data from the file-like object."""
+class Stream(object):
                                     
     # this regular expression is for splitting up the stream into words
     # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
@@ -338,11 +336,9 @@ class FileStream:
     [^ \t\n#!%;]+   # match normal space/tab separated items
     ''', re.VERBOSE )
 
-    def __init__(self, file):
-        """File can be any iterator-like object."""
-        
+    def __init__(self):
+        """Initialise stream object."""
         self.remainingline = []
-        self.file = file
 
     def nextColumn(self):
         """Return value of next column of line."""
@@ -359,13 +355,18 @@ class FileStream:
         """Forget the rest of the line."""
         self.remainingline = []
 
+    def readLine(self):
+        """Read the next line of the data source.
+        StopIteration is raised if there is no more data."""
+        pass
+
     def newLine(self):
         """Read in, and split the next line."""
 
         while True:
             # get next line from data source
             try:
-                line = self.file.next()
+                line = self.readLine()
             except StopIteration:
                 # end of file
                 return False
@@ -380,6 +381,19 @@ class FileStream:
             else:
                 return True
 
+class FileStream(Stream):
+    """A stream based on a python-style file (or iterable)."""
+
+    def __init__(self, file):
+        """File can be any iterator-like object."""
+        Stream.__init__(self)
+        self.file = file
+
+    def readLine(self):
+        """Read the next line of the data source.
+        StopIteration is raised if there is no more data."""
+        return self.file.next()
+
 class StringStream(FileStream):
     '''For reading data from a string.'''
     
@@ -388,7 +402,7 @@ class StringStream(FileStream):
         
         FileStream.__init__( self, cStringIO.StringIO(text) )
 
-class SimpleRead:
+class SimpleRead(object):
     '''Class to read in datasets from a stream.
 
     The descriptor specifies the format of data to read from the stream
@@ -479,6 +493,15 @@ class SimpleRead:
             out[p.name] = p.errorcount
         return out
 
+    def getDatasetCounts(self):
+        """Get a dict of the datasets read (main data part) and number
+        of entries read."""
+        out = {}
+        for name, data in self.datasets.iteritems():
+            if name[-5:] == '\0DATA':
+                out[name[:-5]] = len(data)
+        return out
+
     def setInDocument(self, document, linkedfile=None):
         """Set the data in the document.
 
@@ -505,7 +528,7 @@ class SimpleRead:
 class Read2DError(ValueError):
     pass
 
-class SimpleRead2D:
+class SimpleRead2D(object):
     def __init__(self, name):
         """Read dataset with name given."""
         self.name = name

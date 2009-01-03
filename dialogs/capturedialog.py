@@ -24,6 +24,7 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.utils as utils
+import veusz.document as document
 
 class CaptureDialog(qt4.QDialog):
     """Capture dialog."""
@@ -61,12 +62,19 @@ class CaptureDialog(qt4.QDialog):
                      self.slotStopChanged)
         self.slotStopChanged(0)
 
+        # user starts capture
+        self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
+                     self.slotCaptureClicked)
+        # filename browse button clicked
+        self.connect(self.browseButton, qt4.SIGNAL('clicked()'),
+                     self.slotBrowseClicked)
+
     def slotMethodChanged(self, buttonid):
         """Enable/disable correct controls in methodBG."""
         # enable correct buttons
         fc = buttonid==0
         self.filenameEdit.setEnabled(fc)
-        self.filenameButton.setEnabled(fc)
+        self.browseButton.setEnabled(fc)
 
         ic = buttonid==1
         self.hostEdit.setEnabled(ic)
@@ -83,3 +91,102 @@ class CaptureDialog(qt4.QDialog):
 
         ts = buttonid == 2
         self.timeStopEdit.setEnabled(ts)
+
+    def slotBrowseClicked(self):
+        """Browse for a data file."""
+
+        fd = qt4.QFileDialog(self, 'Browse data file or socket')
+        fd.setFileMode( qt4.QFileDialog.ExistingFile )
+
+        # update filename if changed
+        if fd.exec_() == qt4.QDialog.Accepted:
+            self.filenameEdit.setText( fd.selectedFiles()[0] )
+
+    def slotCaptureClicked(self):
+        """User requested capture."""
+
+        # object to interpret data from stream
+        descriptor = unicode( self.descriptorEdit.text() )
+        simpleread = document.SimpleRead(descriptor)
+
+        method = self.methodBG.checkedId()
+        try:
+            # create stream
+            if method == 0:
+                # file/socket
+                stream = document.FileCaptureStream(
+                    unicode(self.filenameEdit.text()) )
+            elif method == 1:
+                # internet socket
+                pass
+            elif method == 2:
+                # external program
+                pass
+        except Exception, e:
+            # problem opening stream
+            qt4.QMessageBox("Cannot open input",
+                            "Cannot open input:\n"
+                            " %s (error %i)" % (e.strerror, e.errno),
+                            qt4.QMessageBox.Critical, qt4.QMessageBox.Ok,
+                            qt4.QMessageBox.NoButton, qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
+
+        cd = CapturingDialog(self.document, simpleread, stream, self)
+        cd.show()
+
+class CapturingDialog(qt4.QDialog):
+    """In progress of capturing data dialog."""
+
+    def __init__(self, document, simpleread, stream, *args):
+        qt4.QDialog.__init__(self, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'capturing.ui'),
+                   self)
+
+        self.document = document
+        self.simpleread = simpleread
+        self.stream = stream
+
+        # timer which governs reading from source
+        self.readtimer = qt4.QTimer(self)
+        self.connect( self.readtimer, qt4.SIGNAL('timeout()'),
+                      self.slotReadTimer )
+
+        # recored when time started
+        self.starttime = qt4.QTime()
+        self.starttime.start()
+
+        # timer for updating display
+        self.displaytimer = qt4.QTimer(self)
+        self.connect( self.displaytimer, qt4.SIGNAL('timeout()'),
+                      self.slotDisplayTimer )
+        self.sourceLabel.setText( unicode(self.sourceLabel.text()) %
+                                  stream.name )
+        self.txt_statusLabel = unicode(self.statusLabel.text())
+        self.slotDisplayTimer() # initialise label
+
+        # start timers
+        self.displaytimer.start(1000)
+        self.readtimer.start(10)
+
+    def slotReadTimer(self):
+        """Time to read more data."""
+        self.simpleread.readData(self.stream)
+
+    def slotDisplayTimer(self):
+        """Time to update information about data source."""
+        self.statusLabel.setText( self.txt_statusLabel %
+                                  (self.stream.bytesread,
+                                   self.starttime.elapsed() // 1000) )
+
+        tree = self.datasetTreeWidget
+        cts = self.simpleread.getDatasetCounts()
+        for name in sorted(cts.keys()):
+            length = str( cts[name] )
+            find = tree.findItems(name, qt4.Qt.MatchExactly, 0)
+            if find:
+                find[0].setText(1, length)
+            else:
+                self.datasetTreeWidget.addTopLevelItem(
+                    qt4.QTreeWidgetItem([name, length]) )

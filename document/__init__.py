@@ -27,3 +27,4 @@ from commandinterface import *
 from commandinterpreter import *
 from simpleread import *
 from operations import *
+from capture import *

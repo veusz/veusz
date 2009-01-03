@@ -61,7 +61,7 @@
         <item>
          <widget class="QLabel" name="label_2" >
           <property name="text" >
-           <string>&amp;Filename:</string>
+           <string>File&amp;name:</string>
           </property>
           <property name="buddy" >
            <cstring>filenameEdit</cstring>
@@ -72,7 +72,7 @@
          <widget class="QLineEdit" name="filenameEdit" />
         </item>
         <item>
-         <widget class="QPushButton" name="filenameButton" >
+         <widget class="QPushButton" name="browseButton" >
           <property name="sizePolicy" >
            <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
             <horstretch>0</horstretch>
@@ -140,7 +140,10 @@
         <item>
          <widget class="QLabel" name="label_6" >
           <property name="text" >
-           <string>Command line:</string>
+           <string>Command &amp;line:</string>
+          </property>
+          <property name="buddy" >
+           <cstring>commandLineEdit</cstring>
           </property>
          </widget>
         </item>
