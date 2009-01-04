@@ -21,6 +21,7 @@
 import os
 import fcntl
 import errno
+import select
 
 import simpleread
 
@@ -107,11 +108,15 @@ class CommandCaptureStream(CaptureStream):
         CaptureStream.__init__(self)
 
         self.name = commandline
-        self.file = os.popen(commandline, 'r', 1)
+        self.file = os.popen(commandline, 'r', 0)
 
     def getMoreData(self):
         """Read data from the command."""
-        return self.file.read(1024)
+        i, o, e = select.select([self.file.fileno()], [], [], 0)
+        if i:
+            return os.read(i[0], 1024)
+        else:
+            return ''
 
     def close(self):
         """Close file."""
