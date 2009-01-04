@@ -64,7 +64,8 @@ class CaptureDialog(qt4.QDialog):
         self.methodBG.addButton( self.captureProgramButton, 2 )
         self.connect(self.methodBG, qt4.SIGNAL('buttonClicked(int)'),
                      self.slotMethodChanged)
-        self.slotMethodChanged(0)
+        # restore previously clicked button
+        self.methodBG.button( d.get('capture_method', 0) ).click()
 
         # get notification of change of stop method
         self.stopBG = qt4.QButtonGroup(self)
@@ -73,7 +74,7 @@ class CaptureDialog(qt4.QDialog):
         self.stopBG.addButton( self.timeStopButton, 2 )
         self.connect(self.stopBG, qt4.SIGNAL('buttonClicked(int)'),
                      self.slotStopChanged)
-        self.slotStopChanged(0)
+        self.stopBG.button( d.get('capture_stop', 0) ).click()
 
         # user starts capture
         self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
@@ -86,7 +87,7 @@ class CaptureDialog(qt4.QDialog):
         """Dialog is closed."""
         qt4.QDialog.done(self, r)
 
-        # record default values next time dialog is opened
+        # record values for next time dialog is opened
         d = setting.settingdb
         d['capture_descriptor'] = unicode( self.descriptorEdit.text() )
         d['capture_filename'] = unicode( self.filenameEdit.text() )
@@ -95,6 +96,8 @@ class CaptureDialog(qt4.QDialog):
         d['capture_commandline'] = unicode( self.commandLineEdit.text() )
         d['capture_numptsstop'] = unicode( self.numPtsStopEdit.text() )
         d['capture_timestop'] = unicode( self.timeStopEdit.text() )
+        d['capture_method'] = self.methodBG.checkedId()
+        d['capture_stop'] = self.stopBG.checkedId()
 
     def slotMethodChanged(self, buttonid):
         """Enable/disable correct controls in methodBG."""
@@ -148,8 +151,9 @@ class CaptureDialog(qt4.QDialog):
                 pass
             elif method == 2:
                 # external program
-                pass
-        except Exception, e:
+                stream = document.CommandCaptureStream(
+                    unicode(self.commandLineEdit.text()) )
+        except EnvironmentError, e:
             # problem opening stream
             qt4.QMessageBox("Cannot open input",
                             "Cannot open input:\n"
@@ -192,6 +196,9 @@ class CapturingDialog(qt4.QDialog):
         # record time capture started
         self.starttime = qt4.QTime()
         self.starttime.start()
+
+        # sort tree by dataset name
+        self.datasetTreeWidget.sortItems(0, qt4.Qt.AscendingOrder)
 
         # timer for updating display
         self.displaytimer = qt4.QTimer(self)
