@@ -25,9 +25,12 @@ import os.path
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
+import veusz.setting as setting
 
 class CaptureDialog(qt4.QDialog):
-    """Capture dialog."""
+    """Capture dialog.
+
+    This allows the user to set the various capture options."""
 
     def __init__(self, document, *args):
         qt4.QDialog.__init__(self, *args)
@@ -36,6 +39,16 @@ class CaptureDialog(qt4.QDialog):
                    self)
 
         self.document = document
+
+        # set values of edit controls from previous invocation (if any)
+        d = setting.settingdb
+        self.descriptorEdit.setText( d.get('capture_descriptor', '') )
+        self.filenameEdit.setText( d.get('capture_filename', '') )
+        self.hostEdit.setText( d.get('capture_host', 'localhost') )
+        self.portEdit.setText( d.get('capture_port', '10000') )
+        self.commandLineEdit.setText( d.get('capture_commandline', '') )
+        self.numPtsStopEdit.setText( d.get('capture_numptsstop', '1000') )
+        self.timeStopEdit.setText( d.get('capture_timestop', '60') )
 
         # validate edit controls
         validator = qt4.QIntValidator(1, 65535, self)
@@ -68,6 +81,20 @@ class CaptureDialog(qt4.QDialog):
         # filename browse button clicked
         self.connect(self.browseButton, qt4.SIGNAL('clicked()'),
                      self.slotBrowseClicked)
+
+    def done(self, r):
+        """Dialog is closed."""
+        qt4.QDialog.done(self, r)
+
+        # record default values next time dialog is opened
+        d = setting.settingdb
+        d['capture_descriptor'] = unicode( self.descriptorEdit.text() )
+        d['capture_filename'] = unicode( self.filenameEdit.text() )
+        d['capture_host'] = unicode( self.hostEdit.text() )
+        d['capture_port'] = unicode( self.portEdit.text() )
+        d['capture_commandline'] = unicode( self.commandLineEdit.text() )
+        d['capture_numptsstop'] = unicode( self.numPtsStopEdit.text() )
+        d['capture_timestop'] = unicode( self.timeStopEdit.text() )
 
     def slotMethodChanged(self, buttonid):
         """Enable/disable correct controls in methodBG."""
@@ -135,8 +162,11 @@ class CaptureDialog(qt4.QDialog):
         cd = CapturingDialog(self.document, simpleread, stream, self)
         cd.show()
 
+########################################################################
+
 class CapturingDialog(qt4.QDialog):
-    """In progress of capturing data dialog."""
+    """Capturing data dialog.
+    Shows progress to user."""
 
     def __init__(self, document, simpleread, stream, *args):
         qt4.QDialog.__init__(self, *args)
@@ -148,12 +178,18 @@ class CapturingDialog(qt4.QDialog):
         self.simpleread = simpleread
         self.stream = stream
 
+        # connect buttons
+        self.connect( self.finishButton, qt4.SIGNAL('clicked()'),
+                      self.slotFinish )
+        self.connect( self.cancelButton, qt4.SIGNAL('clicked()'),
+                      self.slotCancel )
+
         # timer which governs reading from source
         self.readtimer = qt4.QTimer(self)
         self.connect( self.readtimer, qt4.SIGNAL('timeout()'),
                       self.slotReadTimer )
 
-        # recored when time started
+        # record time capture started
         self.starttime = qt4.QTime()
         self.starttime.start()
 
@@ -182,11 +218,33 @@ class CapturingDialog(qt4.QDialog):
 
         tree = self.datasetTreeWidget
         cts = self.simpleread.getDatasetCounts()
-        for name in sorted(cts.keys()):
-            length = str( cts[name] )
+
+        # iterate over each dataset
+        for name, length in cts.iteritems():
             find = tree.findItems(name, qt4.Qt.MatchExactly, 0)
             if find:
-                find[0].setText(1, length)
+                # if already in tree, update number of counts
+                find[0].setText(1, str(length))
             else:
-                self.datasetTreeWidget.addTopLevelItem(
-                    qt4.QTreeWidgetItem([name, length]) )
+                # add new item
+                tree.addTopLevelItem( qt4.QTreeWidgetItem([name, str(length)]))
+
+    def _finishUp(self):
+        """Some cleanups."""
+        # stop reading
+        self.readtimer.stop()
+        self.displaytimer.stop()
+        # close the stream
+        self.stream.close()
+        # close the dialog
+        self.close()
+
+    def slotFinish(self):
+        """Finish capturing and save the results."""
+        self.simpleread.setInDocument(self.document)
+        self._finishUp()
+
+    def slotCancel(self):
+        """Cancel capturing."""
+        self._finishUp()
+ 
