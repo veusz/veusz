@@ -60,7 +60,7 @@ Features of package:
  * Text, CSV and FITS importing
 
 Requirements:
- Python (2.3 or greater required)
+ Python (2.4 or greater required)
    http://www.python.org/
  Qt >= 4.3 (free edition)
    http://www.trolltech.com/products/qt/  

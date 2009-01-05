@@ -50,14 +50,7 @@ import new
 import cPickle
 import socket
 import random
-
-# check for subprocess
-try:
-    import subprocess
-    have_subprocess = True
-except ImportError:
-    import popen2
-    have_subprocess = False
+import subprocess
 
 def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
@@ -115,9 +108,7 @@ class Embedded(object):
         Returns string to send to remote process
         """
 
-        if ( have_subprocess and
-             hasattr(socket, 'AF_UNIX') and hasattr(socket, 'socketpair') ):
-
+        if ( hasattr(socket, 'AF_UNIX') and hasattr(socket, 'socketpair') ):
             # convenient interface
             cls.sockfamily = socket.AF_UNIX
             sock, socket2 = socket.socketpair(cls.sockfamily,
@@ -129,8 +120,6 @@ class Embedded(object):
         else:
             # otherwise mess around with internet sockets
             # * This is required for windows, which doesn't have AF_UNIX
-            # * It is required for old Pythons that does not have subprocess
-            #    as unix sockets are not passed by popen2
             # * It is required where socketpair is not supported
             cls.sockfamily = socket.AF_INET
             sock = socket.socket(cls.sockfamily, socket.SOCK_STREAM)
@@ -151,19 +140,12 @@ class Embedded(object):
         remotecmd = os.path.join( os.path.dirname(os.path.abspath(__file__)),
                                   'embed_remote.py' )
 
-        if have_subprocess:
-            # start remote process (using subprocess if it is available)
-            cmdline = [ sys.executable, remotecmd, 'RunFromEmbed' ]
-            cls.remote = subprocess.Popen(cmdline, shell=False, bufsize=0,
-                                          close_fds=False,
-                                          stdin=subprocess.PIPE)
-            stdin = cls.remote.stdin
-
-        else:
-            # have to resort to popen2 (hoping this quoting works)
-            cmdline = '"%s" "%s" RunFromEmbed' % (sys.executable, remotecmd)
-            cls.stdout, cls.stdin = popen2.popen2(cmdline, 0)
-            stdin = cls.stdin
+        # start remote process using subprocess
+        cmdline = [ sys.executable, remotecmd, 'RunFromEmbed' ]
+        cls.remote = subprocess.Popen(cmdline, shell=False, bufsize=0,
+                                      close_fds=False,
+                                      stdin=subprocess.PIPE)
+        stdin = cls.remote.stdin
 
         # send socket number over pipe
         stdin.write( sendtext )
