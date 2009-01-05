@@ -165,9 +165,7 @@ class PointPlotter(GenericPlotter):
             return
 
         # draw normal error bars
-        if style in { 'bar': True, 'bardiamond': True,
-                      'barcurve': True, 'barbox': True,
-                      'barends': True }:
+        if style in frozenset(('bar', 'bardiamond', 'barcurve', 'barbox', 'barends')):
             # list of output lines
             pts = []
 
@@ -206,7 +204,7 @@ class PointPlotter(GenericPlotter):
              xmax is not None ):
 
             # draw boxes
-            if style in { 'box': True, 'barbox': True }:
+            if style in frozenset(('box', 'barbox')):
 
                 # non-filling brush
                 painter.setBrush( qt4.QBrush() )
@@ -218,7 +216,7 @@ class PointPlotter(GenericPlotter):
                                          qt4.QPointF(xmx, ymx), qt4.QPointF(xmn, ymx) )
 
             # draw diamonds
-            elif style in {'diamond':True, 'bardiamond':True}:
+            elif style in frozenset(('diamond', 'bardiamond')):
 
                 # non-filling brush
                 painter.setBrush( qt4.QBrush() )
@@ -230,7 +228,7 @@ class PointPlotter(GenericPlotter):
                                          qt4.QPointF(xmx, yp), qt4.QPointF(xp, ymn) )
 
             # draw curved errors
-            elif style in {'curve': True, 'barcurve': True}:
+            elif style in frozenset(('curve', 'barcurve')):
 
                 # non-filling brush
                 painter.setBrush( qt4.QBrush() )
@@ -254,8 +252,8 @@ class PointPlotter(GenericPlotter):
                                                (xmx-xp)*2+1, (ymn-yp)*2+1),
                                     4320, 1440)
 
-            elif style in {'fillvert': True, 'fillhorz': True,
-                           'linevert': True, 'linehorz': True}:
+            elif style in frozenset(('fillvert', 'fillhorz', 
+                                     'linevert', 'linehorz')):
                 if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
                     # construct points for error bar regions
                     retnpts = qt4.QPolygonF()
