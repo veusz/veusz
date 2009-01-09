@@ -32,7 +32,7 @@
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_y="6.1230318e-14 : 1000 : 0"
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
@@ -47,7 +47,7 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="10.297243"
+     inkscape:zoom="20.594486"
      inkscape:cx="9.1426776"
      inkscape:cy="8.4607504"
      inkscape:document-units="px"
@@ -158,18 +158,19 @@
        transform="matrix(1.5384615,0,0,1.5384615,3.5576101,-5.8818092)" />
     <path
        sodipodi:type="arc"
-       style="fill:#eb20ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#eb20ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4216"
        sodipodi:cx="6.1459227"
        sodipodi:cy="6.0772533"
        sodipodi:rx="0.44635195"
        sodipodi:ry="0.44635195"
        d="M 6.5922746,6.0772533 A 0.44635195,0.44635195 0 1 1 5.6995707,6.0772533 A 0.44635195,0.44635195 0 1 1 6.5922746,6.0772533 z"
-       transform="matrix(1.5384615,0,0,1.5384615,-6.742819,2.5988775)" />
+       transform="matrix(1.5384615,0,0,1.5384615,-6.5485922,1.6277437)" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#187e29;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 1.0987124,14.695279 L 13.184549,1.9914163 L 13.184549,1.9914163 L 13.184549,1.9914163"
-       id="path4200" />
+       d="M 1.0987124,14.986619 L 13.184549,1.9914163 L 13.184549,1.9914163 L 13.184549,1.9914163"
+       id="path4200"
+       sodipodi:nodetypes="cccc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 1.1168038,0.65608633 L 1.1168038,14.98031 L 15.004017,14.98031"
