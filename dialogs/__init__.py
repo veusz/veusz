@@ -19,3 +19,9 @@
 # $Id$
 
 """Veusz dialogs module."""
+
+# insert history combo into the list of modules so that it can be found
+# by loadUi - yuck
+import sys
+import historycombo
+sys.modules['historycombo'] = historycombo

@@ -42,19 +42,12 @@ class CaptureDialog(qt4.QDialog):
 
         # set values of edit controls from previous invocation (if any)
         d = setting.settingdb
-        self.descriptorEdit.setText( d.get('capture_descriptor', '') )
-        self.filenameEdit.setText( d.get('capture_filename', '') )
-        self.hostEdit.setText( d.get('capture_host', 'localhost') )
-        self.portEdit.setText( d.get('capture_port', '10000') )
-        self.commandLineEdit.setText( d.get('capture_commandline', '') )
-        self.numPtsStopEdit.setText( d.get('capture_numptsstop', '1000') )
-        self.timeStopEdit.setText( d.get('capture_timestop', '60') )
 
-        # validate edit controls
+        # Validate edit controls
         validator = qt4.QIntValidator(1, 65535, self)
         self.portEdit.setValidator(validator)
         validator = qt4.QIntValidator(1, 1000000000, self)
-        self.numPtsStopEdit.setValidator(validator)
+        self.numLinesStopEdit.setValidator(validator)
         self.timeStopEdit.setValidator(validator)
 
         # get notification of change of capture method
@@ -65,16 +58,16 @@ class CaptureDialog(qt4.QDialog):
         self.connect(self.methodBG, qt4.SIGNAL('buttonClicked(int)'),
                      self.slotMethodChanged)
         # restore previously clicked button
-        self.methodBG.button( d.get('capture_method', 0) ).click()
+        self.methodBG.button( d.get('CaptureDialog_method', 0) ).click()
 
         # get notification of change of stop method
         self.stopBG = qt4.QButtonGroup(self)
         self.stopBG.addButton( self.clickingStopButton, 0 )
-        self.stopBG.addButton( self.numPtsStopButton, 1 )
+        self.stopBG.addButton( self.numLinesStopButton, 1 )
         self.stopBG.addButton( self.timeStopButton, 2 )
         self.connect(self.stopBG, qt4.SIGNAL('buttonClicked(int)'),
                      self.slotStopChanged)
-        self.stopBG.button( d.get('capture_stop', 0) ).click()
+        self.stopBG.button( d.get('CaptureDialog_stop', 0) ).click()
 
         # user starts capture
         self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
@@ -89,15 +82,8 @@ class CaptureDialog(qt4.QDialog):
 
         # record values for next time dialog is opened
         d = setting.settingdb
-        d['capture_descriptor'] = unicode( self.descriptorEdit.text() )
-        d['capture_filename'] = unicode( self.filenameEdit.text() )
-        d['capture_host'] = unicode( self.hostEdit.text() )
-        d['capture_port'] = unicode( self.portEdit.text() )
-        d['capture_commandline'] = unicode( self.commandLineEdit.text() )
-        d['capture_numptsstop'] = unicode( self.numPtsStopEdit.text() )
-        d['capture_timestop'] = unicode( self.timeStopEdit.text() )
-        d['capture_method'] = self.methodBG.checkedId()
-        d['capture_stop'] = self.stopBG.checkedId()
+        d['CaptureDialog_method'] = self.methodBG.checkedId()
+        d['CaptureDialog_stop'] = self.stopBG.checkedId()
 
     def slotMethodChanged(self, buttonid):
         """Enable/disable correct controls in methodBG."""
@@ -117,7 +103,7 @@ class CaptureDialog(qt4.QDialog):
         """Enable/disable correct controls in stopBG."""
 
         ns = buttonid == 1
-        self.numPtsStopEdit.setEnabled(ns)
+        self.numLinesStopEdit.setEnabled(ns)
 
         ts = buttonid == 2
         self.timeStopEdit.setEnabled(ts)

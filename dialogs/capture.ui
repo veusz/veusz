@@ -26,7 +26,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="descriptorEdit" />
+      <widget class="HistoryCombo" name="descriptorEdit" />
      </item>
     </layout>
    </item>
@@ -69,7 +69,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="filenameEdit" />
+         <widget class="HistoryCombo" name="filenameEdit" />
         </item>
         <item>
          <widget class="QPushButton" name="browseButton" >
@@ -109,7 +109,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="hostEdit" >
+         <widget class="HistoryCombo" name="hostEdit" >
           <property name="text" >
            <string/>
           </property>
@@ -123,7 +123,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="portEdit" >
+         <widget class="HistoryCombo" name="portEdit" >
           <property name="toolTip" >
            <string>TCP port to connect to</string>
           </property>
@@ -154,7 +154,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="commandLineEdit" />
+         <widget class="HistoryCombo" name="commandLineEdit" />
         </item>
        </layout>
       </item>
@@ -178,16 +178,16 @@
        </widget>
       </item>
       <item row="1" column="1" >
-       <widget class="QLineEdit" name="numPtsStopEdit" >
+       <widget class="HistoryCombo" name="numLinesStopEdit" >
         <property name="text" >
          <string/>
         </property>
        </widget>
       </item>
       <item row="1" column="0" >
-       <widget class="QRadioButton" name="numPtsStopButton" >
+       <widget class="QRadioButton" name="numLinesStopButton" >
         <property name="text" >
-         <string>Number of d&amp;atapoints</string>
+         <string>Number of input &amp;lines</string>
         </property>
        </widget>
       </item>
@@ -199,7 +199,7 @@
        </widget>
       </item>
       <item row="2" column="1" >
-       <widget class="QLineEdit" name="timeStopEdit" >
+       <widget class="HistoryCombo" name="timeStopEdit" >
         <property name="text" >
          <string/>
         </property>
@@ -241,6 +241,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HistoryCombo</class>
+   <extends>QComboBox</extends>
+   <header>historycombo.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
