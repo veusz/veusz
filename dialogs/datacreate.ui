@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog" >
+ <class>DataCreateDialog</class>
+ <widget class="QDialog" name="DataCreateDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -38,7 +38,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="nameedit" />
+      <widget class="HistoryCombo" name="nameedit" />
      </item>
     </layout>
    </item>
@@ -83,7 +83,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="numstepsedit" />
+         <widget class="HistoryCombo" name="numstepsedit" />
         </item>
        </layout>
       </item>
@@ -110,7 +110,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="tstartedit" />
+         <widget class="HistoryCombo" name="tstartedit" />
         </item>
         <item>
          <widget class="QLabel" name="label_4" >
@@ -120,7 +120,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="tendedit" />
+         <widget class="HistoryCombo" name="tendedit" />
         </item>
         <item>
          <widget class="QLabel" name="label_5" >
@@ -130,7 +130,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="tstepsedit" />
+         <widget class="HistoryCombo" name="tstepsedit" />
         </item>
         <item>
          <widget class="QLabel" name="label_6" >
@@ -182,13 +182,13 @@
          <number>6</number>
         </property>
         <item row="1" column="1" >
-         <widget class="QLineEdit" name="symerroredit" />
+         <widget class="HistoryCombo" name="symerroredit" />
         </item>
         <item row="3" column="1" >
-         <widget class="QLineEdit" name="negerroredit" />
+         <widget class="HistoryCombo" name="negerroredit" />
         </item>
         <item row="0" column="1" >
-         <widget class="QLineEdit" name="valueedit" />
+         <widget class="HistoryCombo" name="valueedit" />
         </item>
         <item row="3" column="0" >
          <widget class="QLabel" name="label_11" >
@@ -231,7 +231,7 @@
          </widget>
         </item>
         <item row="2" column="1" >
-         <widget class="QLineEdit" name="poserroredit" />
+         <widget class="HistoryCombo" name="poserroredit" />
         </item>
        </layout>
       </item>
@@ -294,6 +294,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HistoryCombo</class>
+   <extends>QComboBox</extends>
+   <header>historycombo.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>nameedit</tabstop>
   <tabstop>valueradio</tabstop>
@@ -316,7 +323,7 @@
   <connection>
    <sender>closebutton</sender>
    <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>DataCreateDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >

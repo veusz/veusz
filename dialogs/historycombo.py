@@ -55,6 +55,11 @@ class HistoryCombo(qt4.QComboBox):
         - gives same interface as QLineEdit."""
         self.lineEdit().setText(text)
 
+    def hasAcceptableInput(self):
+        """Input valid?
+        - gives same interface as QLineEdit."""
+        return self.lineEdit().hasAcceptableInput()
+
     def getSettingName(self):
         """Get name for saving in settings."""
 
