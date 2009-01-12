@@ -406,6 +406,7 @@ class MainWindow(qt4.QMainWindow):
     def slotDataCapture(self):
         """Capture remote data."""
         dialog = CaptureDialog(self.document, self)
+        self.dialogs.append(dialog)
         dialog.show()
 
     def slotDataReload(self):

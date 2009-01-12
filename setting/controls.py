@@ -1189,7 +1189,12 @@ class FillSet(ListSet):
         return [wfillstyle, wcolor, whide]
 
 class Filename(qt4.QWidget):
+    """A widget for selecting a filename with a browse button."""
+
     def __init__(self, setting, parent):
+        """Construct widget as combination of LineEdit and PushButton
+        for browsing."""
+
         qt4.QWidget.__init__(self, parent)
         self.setting = setting
 
@@ -1198,23 +1203,32 @@ class Filename(qt4.QWidget):
         layout.setMargin(0)
         self.setLayout(layout)
 
+        # the actual edit control
         self.edit = qt4.QLineEdit()
+        self.edit.setText( setting.toText() )
         layout.addWidget(self.edit)
-
+        self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
+        
+        # get a sensible shape for the button - yawn
         b = self.button = qt4.QPushButton('..')
         layout.addWidget(b)
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumWidth(16)
 
-        self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
-        
-        self.edit.setText( setting.toText() )
-
+        # connect up signals
         self.connect(self.edit, qt4.SIGNAL('editingFinished()'),
                      self.validateAndSet)
         self.connect(b, qt4.SIGNAL('clicked()'),
                      self.buttonClicked)
 
+        # add completion if we have support (qt >= 4.3)
+        if hasattr(qt4, 'QDirModel'):
+            c = self.filenamecompleter = qt4.QCompleter(self)
+            model = qt4.QDirModel(c)
+            c.setModel(model)
+            self.edit.setCompleter(c)
+
+        # for read only filernames
         if setting.readonly:
             self.edit.setReadOnly(True)
 

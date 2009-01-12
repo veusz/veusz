@@ -50,6 +50,14 @@ class CaptureDialog(qt4.QDialog):
         self.numLinesStopEdit.setValidator(validator)
         self.timeStopEdit.setValidator(validator)
 
+        # add completion for filename if there is support in version of qt
+        # (requires qt >= 4.3)
+        if hasattr(qt4, 'QDirModel'):
+            c = self.filenamecompleter = qt4.QCompleter(self)
+            model = qt4.QDirModel(c)
+            c.setModel(model)
+            self.filenameEdit.setCompleter(c)
+
         # get notification of change of capture method
         self.methodBG = qt4.QButtonGroup(self)
         self.methodBG.addButton( self.captureFileButton, 0 )
