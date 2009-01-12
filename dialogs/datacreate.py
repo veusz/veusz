@@ -63,7 +63,7 @@ class DataCreateDialog(qt4.QDialog):
         for i in (self.numstepsedit, self.tstartedit, self.tendedit,
                   self.tstepsedit, self.nameedit,
                   self.valueedit):
-            self.connect( i, qt4.SIGNAL('textChanged(const QString &)'),
+            self.connect( i, qt4.SIGNAL('editTextChanged(const QString &)'),
                           self.editsEditSlot )
 
         # edit controls for dataset

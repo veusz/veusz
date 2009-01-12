@@ -124,7 +124,7 @@ class CaptureDialog(qt4.QDialog):
 
         # update filename if changed
         if fd.exec_() == qt4.QDialog.Accepted:
-            self.filenameEdit.setText( fd.selectedFiles()[0] )
+            self.filenameEdit.replaceAndAddHistory( fd.selectedFiles()[0] )
 
     def slotCaptureClicked(self):
         """User requested capture."""

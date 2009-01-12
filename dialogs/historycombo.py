@@ -60,6 +60,20 @@ class HistoryCombo(qt4.QComboBox):
         - gives same interface as QLineEdit."""
         return self.lineEdit().hasAcceptableInput()
 
+    def replaceAndAddHistory(self, item):
+        """Replace the text and place item at top of history."""
+
+        self.lineEdit().setText(item)
+        index = self.findText(item)  # lookup for existing item (if any)
+        if index != -1:
+            # remove any old items matching this
+            self.removeItem(index)
+            
+        # put new item in
+        self.insertItem(0, item)
+        # set selected item in drop down list match current item
+        self.setCurrentIndex(0)
+    
     def getSettingName(self):
         """Get name for saving in settings."""
 

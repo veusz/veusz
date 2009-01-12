@@ -49,7 +49,7 @@ class ImportDialog2(qt4.QDialog):
                      self.slotBrowseClicked)
 
         self.connect( self.filenameedit,
-                      qt4.SIGNAL('textChanged(const QString&)'),
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
                       self.slotUpdatePreview )
 
         self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
@@ -105,7 +105,7 @@ class ImportDialog2(qt4.QDialog):
         # update filename if changed
         if fd.exec_() == qt4.QDialog.Accepted:
             ImportDialog2.dirname = fd.directory().absolutePath()
-            self.filenameedit.setText( fd.selectedFiles()[0] )
+            self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
 
     def slotUpdatePreview(self, *args):
         """Update preview window when filename or tab changed."""
