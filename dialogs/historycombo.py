@@ -45,6 +45,10 @@ class HistoryCombo(qt4.QComboBox):
         self.setSizePolicy( qt4.QSizePolicy(qt4.QSizePolicy.MinimumExpanding,
                                             qt4.QSizePolicy.Fixed) )
 
+        # stops combobox readjusting in size to fit contents
+        self.setSizeAdjustPolicy(
+            qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+
     def text(self):
         """Get text in combobox
         - this gives it the same interface as QLineEdit."""
