@@ -18,12 +18,17 @@
 
 # $Id$
 
-import os
 import fcntl
 import errno
 import select
+import subprocess
+import os
 
+import veusz.qtall as qt4
 import simpleread
+
+class CaptureFinishException(Exception):
+    """An exception to say when a stream has been finished."""
 
 class CaptureStream(simpleread.Stream):
     """A special stream for capturing data."""
@@ -35,6 +40,20 @@ class CaptureStream(simpleread.Stream):
         self.buffer = ''
         self.continuousreads = 0
         self.bytesread = 0
+        self.linesread = 0
+        self.maxlines = None
+        self.timedout = False
+
+    def _setTimeout(self, timeout):
+        """Setter for setting timeout property."""
+        if timeout:
+            self.timer = qt4.QTimer.singleShot(timeout*1000,
+                                               self._timedOut)
+    timeout = property(None, _setTimeout, None,
+                       "Time interval to stop in (seconds) or None")
+            
+    def _timedOut(self):
+        self.timedout = True
 
     def getMoreData(self):
         """Override this to return more data from the source without
@@ -49,6 +68,12 @@ class CaptureStream(simpleread.Stream):
         have been read."""
 
         while True:
+            # we've reached the limit of lines or a timeout has occurred
+            if self.linesread == self.maxlines:
+                raise CaptureFinishException("Maximum number of lines read")
+            if self.timedout:
+                raise CaptureFinishException("Maximum time period occurred")
+
             # stop reading continous data greater than this many lines
             if self.continuousreads == 100:
                 self.continuousreads = 0
@@ -59,6 +84,7 @@ class CaptureStream(simpleread.Stream):
                 # is there a line in the buffer?
                 retn = self.buffer[:index]
                 self.buffer = self.buffer[index+1:]
+                self.linesread += 1
                 self.continuousreads += 1
                 return retn
             else:
@@ -95,7 +121,7 @@ class FileCaptureStream(CaptureStream):
                 return ''
             else:
                 # raise exception to be caught above
-                raise e
+                raise CaptureFinishException("OSError: %s" % unicode(e))
 
     def close(self):
         """Close file."""
@@ -108,18 +134,28 @@ class CommandCaptureStream(CaptureStream):
         CaptureStream.__init__(self)
 
         self.name = commandline
-        self.file = os.popen(commandline, 'r', 0)
+        self.popen = subprocess.Popen(commandline, shell=True,
+                                      bufsize=0, stdout=subprocess.PIPE)
 
     def getMoreData(self):
         """Read data from the command."""
-        i, o, e = select.select([self.file.fileno()], [], [], 0)
+
+        i, o, e = select.select([self.popen.stdout.fileno()], [], [], 0)
         if i:
-            return os.read(i[0], 1024)
+            retn = os.read(i[0], 1024)
         else:
-            return ''
+            retn = ''
+
+        if not retn:
+            poll = self.popen.poll()
+            if poll is not None:
+                # process has ended
+                raise CaptureFinishException("Process ended (status code %i)" %
+                                             poll)
+        return retn
 
     def close(self):
         """Close file."""
-        self.file.close()
+        self.popen.stdout.close()
 
 

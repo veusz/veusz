@@ -133,6 +133,15 @@ class CaptureDialog(qt4.QDialog):
         descriptor = unicode( self.descriptorEdit.text() )
         simpleread = document.SimpleRead(descriptor)
 
+        # get stopping method
+        stop = self.stopBG.checkedId()
+        maxlines = None
+        timeout = None
+        if stop == 1:  # number of lines
+            maxlines = int( self.numLinesStopEdit.text() )
+        elif stop == 2:  # timeout
+            timeout = int( self.timeStopEdit.text() )
+
         method = self.methodBG.checkedId()
         try:
             # create stream
@@ -157,6 +166,8 @@ class CaptureDialog(qt4.QDialog):
                             self).exec_()
             return
 
+        stream.maxlines = maxlines
+        stream.timeout = timeout
         cd = CapturingDialog(self.document, simpleread, stream, self)
         cd.show()
 
@@ -166,8 +177,9 @@ class CapturingDialog(qt4.QDialog):
     """Capturing data dialog.
     Shows progress to user."""
 
-    def __init__(self, document, simpleread, stream, *args):
-        qt4.QDialog.__init__(self, *args)
+    def __init__(self, document, simpleread, stream, parent,
+                 timeout=None):
+        qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'capturing.ui'),
                    self)
@@ -209,7 +221,11 @@ class CapturingDialog(qt4.QDialog):
 
     def slotReadTimer(self):
         """Time to read more data."""
-        self.simpleread.readData(self.stream)
+        try:
+            self.simpleread.readData(self.stream)
+        except document.CaptureFinishException, e:
+            # stream tells us it's time to finish
+            self.streamCaptureFinished( unicode(e) )
 
     def slotDisplayTimer(self):
         """Time to update information about data source."""
@@ -230,6 +246,16 @@ class CapturingDialog(qt4.QDialog):
                 # add new item
                 tree.addTopLevelItem( qt4.QTreeWidgetItem([name, str(length)]))
 
+    def streamCaptureFinished(self, message):
+        """Stream said capture had finished."""
+        # stop reading / displaying
+        self.readtimer.stop()
+        self.displaytimer.stop()
+        # updates stats
+        self.slotDisplayTimer()
+        # show message from stream
+        self.statusLabel.setText(message)
+
     def _finishUp(self):
         """Some cleanups."""
         # stop reading
@@ -242,7 +268,8 @@ class CapturingDialog(qt4.QDialog):
 
     def slotFinish(self):
         """Finish capturing and save the results."""
-        self.simpleread.setInDocument(self.document)
+        op = document.OperationDataCaptureSet(self.simpleread)
+        self.document.applyOperation(op)
         self._finishUp()
 
     def slotCancel(self):

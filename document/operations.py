@@ -43,7 +43,7 @@ import veusz.utils as utils
 ###############################################################################
 # Setting operations
 
-class OperationSettingSet:
+class OperationSettingSet(object):
     """Set a variable to a value."""
 
     descr = 'change setting'
@@ -70,7 +70,7 @@ class OperationSettingSet:
         setting = document.resolveFullSettingPath(self.settingpath)
         setting.set(self.oldvalue)
 
-class OperationSettingPropagate:
+class OperationSettingPropagate(object):
     """Propagate setting to other widgets."""
     
     descr = 'propagate setting'
@@ -161,7 +161,7 @@ class OperationSettingPropagate:
 ###############################################################################
 # Widget operations
         
-class OperationWidgetRename:
+class OperationWidgetRename(object):
     """Rename widget."""
     
     descr = 'rename'
@@ -186,7 +186,7 @@ class OperationWidgetRename:
         widget = document.resolveFullWidgetPath(self.newpath)
         widget.rename(self.oldname)
         
-class OperationWidgetDelete:
+class OperationWidgetDelete(object):
     """Delete widget."""
     
     descr = 'delete'
@@ -211,7 +211,7 @@ class OperationWidgetDelete:
         oldparent = document.resolveFullWidgetPath(self.oldparentpath)
         oldparent.addChild(self.oldwidget, index=self.oldindex)
                 
-class OperationWidgetMove:
+class OperationWidgetMove(object):
     """Move a widget up or down in the hierarchy."""
 
     descr = 'move'
@@ -240,7 +240,7 @@ class OperationWidgetMove:
             parent = widget.parent
             parent.moveChild(widget, -self.direction)
             
-class OperationWidgetAdd:
+class OperationWidgetAdd(object):
     """Add a widget of specified type to parent."""
 
     descr = 'add'
@@ -284,7 +284,7 @@ class OperationWidgetAdd:
 ###############################################################################
 # Dataset operations
     
-class OperationDatasetSet:
+class OperationDatasetSet(object):
     """Set a dataset to that specified."""
     
     descr = 'set dataset'
@@ -310,7 +310,7 @@ class OperationDatasetSet:
         if self.olddata is not None:
             document.setData(self.datasetname, self.olddata)
     
-class OperationDatasetDelete:
+class OperationDatasetDelete(object):
     """Delete a dateset."""
     
     descr = 'delete dataset'
@@ -327,7 +327,7 @@ class OperationDatasetDelete:
         """Put dataset back"""
         document.setData(self.datasetname, self.olddata)
     
-class OperationDatasetRename:
+class OperationDatasetRename(object):
     """Rename the dataset.
     
     Assumes newname doesn't already exist
@@ -349,7 +349,7 @@ class OperationDatasetRename:
         
         document.renameDataset(self.newname, self.oldname)
         
-class OperationDatasetDuplicate:
+class OperationDatasetDuplicate(object):
     """Duplicate a dataset.
     
     Assumes duplicate name doesn't already exist
@@ -370,7 +370,7 @@ class OperationDatasetDuplicate:
         
         del document.data[self.duplname]
         
-class OperationDatasetUnlink:
+class OperationDatasetUnlink(object):
     """Remove association between dataset and file, or dataset and
     another dataset.
     """
@@ -405,7 +405,7 @@ class OperationDatasetUnlink:
         else:
             assert False
         
-class OperationDatasetCreate:
+class OperationDatasetCreate(object):
     """Create dataset base class."""
     
     def __init__(self, datasetname):
@@ -552,7 +552,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         document.setData(self.datasetname, ds)
         return ds
 
-class OperationDataset2DCreateExpressionXYZ:
+class OperationDataset2DCreateExpressionXYZ(object):
     descr = 'create 2D dataset from x, y and z expressions'
     
     def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
@@ -593,7 +593,7 @@ class OperationDataset2DCreateExpressionXYZ:
         if self.olddataset:
             document.setData(self.datasetname, self.olddataset)
         
-class OperationDataset2DXYFunc:
+class OperationDataset2DXYFunc(object):
     descr = 'create 2D dataset from function of x and y'
 
     def __init__(self, datasetname, xstep, ystep, expr, link):
@@ -632,7 +632,7 @@ class OperationDataset2DXYFunc:
 ###############################################################################
 # Import datasets
         
-class OperationDataImport:
+class OperationDataImport(object):
     """Import 1D data from text files."""
     
     descr = 'import data'
@@ -697,7 +697,7 @@ class OperationDataImport:
         # restore old datasets
         document.data = self.olddatasets
 
-class OperationDataImportCSV:
+class OperationDataImportCSV(object):
     """Import data from a CSV file."""
 
     descr = 'import CSV data'
@@ -742,7 +742,7 @@ class OperationDataImportCSV:
         # restore old datasets
         document.data = self.olddatasets
         
-class OperationDataImport2D:
+class OperationDataImport2D(object):
     """Import a 2D matrix from a file."""
     
     descr = 'import 2d data'
@@ -827,7 +827,7 @@ class OperationDataImport2D:
         # restore old datasets
         document.data = self.olddatasets
     
-class OperationDataImportFITS:
+class OperationDataImportFITS(object):
     """Import 1d or 2d data from a fits file."""
 
     descr = 'import FITS file'
@@ -952,10 +952,48 @@ class OperationDataImportFITS:
         if self.olddataset is not None:
             document.setData(self.dsname, self.olddataset)
         
+class OperationDataCaptureSet(object):
+    """An operation for setting the results from a SimpleRead into the
+    docunment's data from a data capture.
+
+    This is a bit primative, but it is not obvious how to isolate the capturing
+    functionality elsewhere."""
+
+    descr = 'data capture'
+
+    def __init__(self, simplereadobject):
+        """Takes a simpleread object containing the data to be set."""
+        self.simplereadobject = simplereadobject
+
+    def do(self, document):
+        """Set the data in the document."""
+        # before replacing data, get a backup of document's data
+        databackup = dict(document.data)
+        
+        # set the data to the document and keep a list of what's changed
+        self.nameschanged = self.simplereadobject.setInDocument(document)
+
+        # keep a copy of datasets which have changed from backup
+        self.olddata = {}
+        for name in self.nameschanged:
+            if name in databackup:
+                self.olddata[name] = databackup[name]
+
+    def undo(self, document):
+        """Undo the results of the capture."""
+
+        for name in self.nameschanged:
+            if name in self.olddata:
+                # replace datasets with what was there previously
+                document.data[name] = self.olddata[name]
+            else:
+                # or delete datasets that weren't there before
+                del document.data[name]
+
 ###############################################################################
 # Alter dataset
 
-class OperationDatasetAddColumn:
+class OperationDatasetAddColumn(object):
     """Add a column to a dataset, blanked to zero."""
     
     descr = 'add dataset column'
@@ -981,7 +1019,7 @@ class OperationDatasetAddColumn:
         setattr(ds, self.columnname, None)
         document.setData(self.datasetname, ds)
         
-class OperationDatasetSetVal:
+class OperationDatasetSetVal(object):
     """Set a value in the dataset."""
 
     descr = 'change dataset value'
@@ -1011,7 +1049,7 @@ class OperationDatasetSetVal:
 ###############################################################################
 # Misc operations
         
-class OperationMultiple:
+class OperationMultiple(object):
     """Multiple operations batched into one."""
     
     def __init__(self, operations, descr='change'):
