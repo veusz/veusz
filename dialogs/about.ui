@@ -1,23 +1,15 @@
 <ui version="4.0" >
  <class>AboutDialog</class>
  <widget class="QDialog" name="AboutDialog" >
-  <property name="geometry" >
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>510</width>
-    <height>368</height>
-   </rect>
-  </property>
   <property name="windowTitle" >
    <string>About Veusz</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="margin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="QFrame" name="frame" >
@@ -28,11 +20,11 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
+      </property>
+      <property name="margin" >
+       <number>9</number>
       </property>
       <item>
        <widget class="QLabel" name="logolabel" >
@@ -50,11 +42,12 @@
    <item>
     <widget class="QLabel" name="copyrightlabel" >
      <property name="text" >
-      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
+&lt;/style>&lt;/head>&lt;body>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#800080;">Veusz %(version)s&lt;/span>&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#800080;">&lt;span style=" font-weight:400; color:#000000;">Copyright © 2003-2008 Jeremy Sanders &lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#800080;">&lt;span style=" font-weight:400; color:#000000;">Copyright © 2003-2009 Jeremy Sanders &lt;/span>&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#000000;">http://www.gna.org/veusz/&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Authors:&lt;/p>
@@ -73,18 +66,18 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <property name="spacing" >
       <number>6</number>
+     </property>
+     <property name="margin" >
+      <number>0</number>
      </property>
      <item>
       <spacer>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0" >
         <size>
          <width>131</width>
          <height>31</height>
