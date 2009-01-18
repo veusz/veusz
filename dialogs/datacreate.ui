@@ -152,9 +152,26 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" >
       <item>
+       <widget class="QLabel" name="parametrichelperlabel" >
+        <property name="text" >
+         <string>Enter expressions as a function of t, or leave blank</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="valuehelperlabel" >
         <property name="text" >
-         <string>Enter values, ranges or expressions below</string>
+         <string>Enter constant values here, leave blank if appropriate, or enter an inclusive range, e.g. 1:10</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="expressionhelperlabel" >
+        <property name="text" >
+         <string>Enter expressions as a function of other datasets. Append suffixes _data, _serr, _nerr and _perr to access different parts of datasets.</string>
         </property>
         <property name="wordWrap" >
          <bool>true</bool>
@@ -163,16 +180,6 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout" >
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_8" >
-          <property name="text" >
-           <string>V&amp;alue</string>
-          </property>
-          <property name="buddy" >
-           <cstring>valueedit</cstring>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1" >
          <widget class="HistoryCombo" name="valueedit" />
         </item>
@@ -214,6 +221,16 @@
         </item>
         <item row="3" column="1" >
          <widget class="HistoryCombo" name="negerroredit" />
+        </item>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label_8" >
+          <property name="text" >
+           <string>V&amp;alue</string>
+          </property>
+          <property name="buddy" >
+           <cstring>valueedit</cstring>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

@@ -24,6 +24,7 @@ import os.path
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
+import veusz.setting as setting
 
 class _DSException(RuntimeError):
     """A class to handle errors while trying to create datasets."""
@@ -40,20 +41,23 @@ class DataCreateDialog(qt4.QDialog):
                    self)
         self.document = document
 
-        # connect everything up
-        self.connect( self.valueradio, qt4.SIGNAL('toggled(bool)'),
-                      self.valueToggledSlot )
-        self.connect( self.parametricradio, qt4.SIGNAL('toggled(bool)'),
-                      self.parametricToggledSlot )
-        self.connect( self.expressionradio, qt4.SIGNAL('toggled(bool)'),
-                      self.expressionToggledSlot )
+        # create button group to get notification of changes
+        self.methodBG = qt4.QButtonGroup(self)
+        self.methodBG.addButton(self.valueradio, 0)
+        self.methodBG.addButton(self.parametricradio, 1)
+        self.methodBG.addButton(self.expressionradio, 2)
+        self.connect(self.methodBG, qt4.SIGNAL('buttonClicked(int)'),
+                     self.slotMethodChanged)
 
+        # connect create button
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
                       self.createButtonClickedSlot )
 
+        # connect notification of document change
         self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.modifiedDocSlot )
 
+        # set validators for edit controls
         self.numstepsedit.setValidator( qt4.QIntValidator(1, 99999999, self) )
         self.tstartedit.setValidator( qt4.QDoubleValidator(self) )
         self.tendedit.setValidator( qt4.QDoubleValidator(self) )
@@ -71,54 +75,41 @@ class DataCreateDialog(qt4.QDialog):
                          'perr': self.poserroredit, 'nerr': self.negerroredit }
         
         # set initial state
-        self.valueradio.toggle()
+        self.methodBG.button( setting.settingdb.get('DataCreateDialog_method',
+                                                    0) ).click()
         self.editsEditSlot('')
 
-    def valueToggledSlot(self, pressed):
-        """Enable/disable correct edit controls."""
-        self.setRadioState('value',
-                           'Enter constant values here, leave blank if appropriate, '
-                           'or enter an inclusive range, e.g. 1:10',
-                           False)
+    def done(self, r):
+        """Dialog is closed."""
+        qt4.QDialog.done(self, r)
 
-    def parametricToggledSlot(self, pressed):
-        """Enable/disable correct edit controls."""
-        self.setRadioState('parametric',
-                           'Enter expressions as a function of t, or leave blank',
-                           False)
+        # record values for next time dialog is opened
+        d = setting.settingdb
+        d['DataCreateDialog_method'] = self.methodBG.checkedId()
 
-    def expressionToggledSlot(self, pressed):
-        """Enable/disable correct edit controls."""
-        self.setRadioState('expression',
-                           'Enter expressions as a function of other datasets.'
-                           ' Append suffixes _data, _serr, _nerr and _perr to '
-                           'use different parts of datasets.',
-                           True)
+    def slotMethodChanged(self, buttonid):
+        """Called when a new data creation method is used."""
 
-    def setRadioState(self, radio, helper, allowlink):
-        """Enable/disable edit controls for radio button."""
-
-        # enable/disable radio buttons
-        isvalue = (radio == 'value')
+        # enable and disable correct widgets depending on method
+        isvalue = buttonid == 0
+        self.valuehelperlabel.setVisible(isvalue)
         self.numstepsedit.setEnabled(isvalue)
 
-        isparametric = (radio == 'parametric')
+        isparametric = buttonid == 1
+        self.parametrichelperlabel.setVisible(isparametric)
         self.tstartedit.setEnabled(isparametric)
         self.tendedit.setEnabled(isparametric)
         self.tstepsedit.setEnabled(isparametric)
 
-        # set some help text
-        self.valuehelperlabel.setText(helper)
+        isfunction = buttonid == 2
+        self.expressionhelperlabel.setVisible(isfunction)
+        self.linkcheckbox.setEnabled(isfunction)
 
-        self.linkcheckbox.setEnabled(allowlink)
-
-        # keep track of state
-        self.radiostate = radio
-
-        # update button
+        # enable/disable create button
         self.editsEditSlot('')
 
     def modifiedDocSlot(self):
+        """Update create button if document changes."""
         self.editsEditSlot('')
 
     def editsEditSlot(self, dummytext):
@@ -130,13 +121,17 @@ class DataCreateDialog(qt4.QDialog):
         dsexists = dstext in self.document.data
 
         # check other edit controls
-        if self.radiostate == 'value':
+        method = self.methodBG.checkedId()
+        if method == 0:
+            # value
             editsokay = self.numstepsedit.hasAcceptableInput()
-        elif self.radiostate == 'parametric':
+        elif method == 1:
+            # parametric
             editsokay = (self.tstartedit.hasAcceptableInput() and
                          self.tendedit.hasAcceptableInput() and
                          self.tstepsedit.hasAcceptableInput())
         else:
+            # function
             editsokay = True
 
         # we needs some input on the value
@@ -151,9 +146,9 @@ class DataCreateDialog(qt4.QDialog):
         try:
             name = unicode( self.nameedit.text() )
             
-            fn = { 'value': self.createFromRange,
-                   'parametric': self.createParametric,
-                   'expression': self.createFromExpression } [self.radiostate]
+            fn = [ self.createFromRange,
+                   self.createParametric,
+                   self.createFromExpression ][self.methodBG.checkedId()]
 
             # make a new dataset from the returned data
             fn(name)
