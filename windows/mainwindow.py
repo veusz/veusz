@@ -316,7 +316,7 @@ class MainWindow(qt4.QMainWindow):
             ('view', ),
             
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
-             self.slotDataImport, 'kde-document-import.svg', False, ''),
+             self.slotDataImport, 'kde-vzdata-import.svg', True, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
              self.slotDataEdit, 'kde-edit.svg', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
@@ -324,7 +324,7 @@ class MainWindow(qt4.QMainWindow):
             ('datacreate2d', 'Create new 2D datasets', 'Create &2D...', 'data',
              self.slotDataCreate2D, 'kde-document-new.svg', False, ''),
             ('datacapture', 'Capture remote data', 'Ca&pture...', 'data',
-             self.slotDataCapture, '', False, ''),
+             self.slotDataCapture, 'veusz-capture-data.svg', False, ''),
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
              self.slotDataReload, 'kde-view-refresh.svg', False, ''),
 

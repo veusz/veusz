@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="60"
+   width="60"
+   _SVGFile__filename="oldscale/actions/fileexport.svg"
+   version="1.0"
+   y="0"
+   x="0"
+   id="svg1"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="kde-vzdata-import.svg"
+   sodipodi:docbase="/home/danny/work/icons/primary/scalable/actions"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0000000"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.6723498"
+     inkscape:cx="20.751853"
+     inkscape:cy="31.846568"
+     inkscape:window-width="1020"
+     inkscape:window-height="691"
+     inkscape:window-x="187"
+     inkscape:window-y="180"
+     inkscape:current-layer="svg1"
+     showgrid="false" />
+  <defs
+     id="defs3">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 30 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="60 : 30 : 1"
+       inkscape:persp3d-origin="30 : 20 : 1"
+       id="perspective39" />
+  </defs>
+  <metadata
+     id="metadata10">
+    <RDF
+       id="RDF11">
+      <Work
+         about=""
+         id="Work12">
+        <title
+           id="title13">Part of the Flat Icon Collection (Thu Aug 26 14:38:01 2004)</title>
+        <description
+           id="description15" />
+        <subject
+           id="subject16">
+          <Bag
+             id="Bag17">
+            <li
+               id="li18" />
+          </Bag>
+        </subject>
+        <publisher
+           id="publisher19">
+          <Agent
+             about=""
+             id="Agent20">
+            <title
+               id="title21" />
+          </Agent>
+        </publisher>
+        <creator
+           id="creator22">
+          <Agent
+             about=""
+             id="Agent23">
+            <title
+               id="title24">Danny Allen</title>
+          </Agent>
+        </creator>
+        <rights
+           id="rights26">
+          <Agent
+             about=""
+             id="Agent27">
+            <title
+               id="title28">Danny Allen</title>
+          </Agent>
+        </rights>
+        <date
+           id="date30" />
+        <format
+           id="format31">image/svg+xml</format>
+        <type
+           id="type33"
+           resource="http://purl.org/dc/dcmitype/StillImage" />
+        <license
+           id="license34"
+           resource="http://creativecommons.org/licenses/LGPL/2.1/">
+          <date
+             id="date35" />
+        </license>
+        <language
+           id="language36">en</language>
+      </Work>
+    </RDF>
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     id="path1140"
+     style="font-size:12.000000;fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.1249990;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000"
+     d="M 16.674598,4.6874993 C 15.724566,4.6874993 14.959739,5.4523261 14.959739,6.4023577 L 14.959739,44.852698 C 14.959739,45.802730 15.724566,46.567557 16.674598,46.567557 L 53.597642,46.567557 C 54.547674,46.567557 55.312501,45.802730 55.312501,44.852698 L 55.312501,10.341173 L 49.632032,4.6874993 L 16.674598,4.6874993 z " />
+  <path
+     d="M 16.677021,4.6875043 C 15.727049,4.6875043 14.962271,5.452283 14.962271,6.4022549 L 14.962271,44.850178 C 14.962271,45.80015 15.727049,46.564929 16.677021,46.564929 L 53.597745,46.564929 C 54.547717,46.564929 55.312496,45.80015 55.312496,44.850178 L 55.312496,10.340823 L 49.632384,4.6875043 L 16.677021,4.6875043 z"
+     style="font-size:12px;fill:#93aca7;fill-opacity:1;fill-rule:evenodd;stroke-width:1;stroke-linecap:round;stroke-linejoin:round"
+     id="path646" />
+  <g
+     transform="matrix(-0.827148,0,0,0.827148,57.777331,0.81177)"
+     id="g1372">
+    <path
+       transform="matrix(0.978453,0,0,0.978453,0.43127,0.251887)"
+       id="path655"
+       d="M 15.91356,4.659213 L 15.91356,17.90113 C 15.91356,19.25417 17.10233,20.34344 18.57897,20.34344 L 36.48718,20.34344 C 37.96382,20.34344 39.15259,19.25417 39.15259,17.90113 L 39.15259,4.659213"
+       style="font-size:12px;fill:#babec3;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3.08899069;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    <path
+       transform="matrix(0.978453,0,0,0.978453,0.43127,0.251887)"
+       id="rect656"
+       d="M 20.91564,7.980784 C 20.14051,7.980784 19.51649,8.604805 19.51649,9.379934 L 19.51649,15.62272 C 19.51649,16.39785 20.14051,17.02187 20.91564,17.02187 L 24.70442,17.02187 C 25.47955,17.02187 26.10357,16.39785 26.10357,15.62272 L 26.10357,9.379934 C 26.10357,8.604805 25.47955,7.980784 24.70442,7.980784 L 20.91564,7.980784 z"
+       style="font-size:12px;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round" />
+  </g>
+  <path
+     d="M 16.677021,4.6875043 C 15.727049,4.6875043 14.962271,5.452283 14.962271,6.4022549 L 14.962271,44.850178 C 14.962271,45.80015 15.727049,46.564929 16.677021,46.564929 L 53.597745,46.564929 C 54.547717,46.564929 55.312496,45.80015 55.312496,44.850178 L 55.312496,10.340823 L 49.632384,4.6875043 L 16.677021,4.6875043 z"
+     style="font-size:12px;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:3.12499905;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     id="path659" />
+  <path
+     sodipodi:nodetypes="ccccccccc"
+     id="rect731"
+     d="M 21.89783,22.1718 C 21.047847,22.1718 20.363555,22.856089 20.363555,23.70608 L 20.363555,40.281727 C 20.363555,41.131719 21.047847,41.816008 21.89783,41.816008 L 48.376923,41.816008 C 49.226915,41.816008 49.911205,41.131719 49.911205,40.281727 L 49.911205,23.70608 C 49.911205,22.856089 49.226915,22.1718 48.376923,22.1718 L 21.89783,22.1718 z"
+     style="font-size:12px;fill:#d9dddf;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.49999905;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1" />
+  <path
+     sodipodi:nodetypes="ccccccc"
+     id="path1789"
+     d="M 34.689813,40.111172 C 32.45587,59.834857 12.071275,51.732851 10.969789,51.629259 L 10.969789,57.528249 L 2.3414131,48.987918 L 10.969789,40.4652 L 10.969789,46.293757 C 12.264931,46.445873 27.62283,54.437728 34.689813,40.111172 z"
+     style="font-size:12px;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  <path
+     sodipodi:nodetypes="ccccccc"
+     id="path993"
+     d="M 34.689813,40.111172 C 32.45587,59.834857 12.071275,51.732851 10.969789,51.629259 L 10.969789,57.528249 L 2.341413,48.987918 L 10.969789,40.4652 L 10.969789,46.293757 C 12.264931,46.445873 27.62283,54.437728 34.689813,40.111172 z"
+     style="font-size:12px;fill:#3d0a5a;fill-opacity:1;fill-rule:evenodd;stroke:#3d0a5a;stroke-width:3.12500000000000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1" />
+  <path
+     style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black"
+     d="M 28.389587,26.8681 L 28.389587,37.060483 L 25.573181,37.060483 L 25.573181,30.381772 C 25.117448,30.728132 24.675391,31.008405 24.247009,31.222592 C 23.823179,31.43679 23.289976,31.641868 22.6474,31.837826 L 22.6474,29.554623 C 23.595314,29.249293 24.331316,28.882431 24.855408,28.454037 C 25.379492,28.025661 25.789648,27.497016 26.085876,26.8681 L 28.389587,26.8681 M 31.431579,32.008725 C 31.431579,30.103784 31.773375,28.770777 32.45697,28.009701 C 33.145119,27.248644 34.191016,26.86811 35.594665,26.8681 C 36.269139,26.86811 36.82285,26.95242 37.255798,27.12103 C 37.688734,27.285102 38.041924,27.501573 38.315369,27.770444 C 38.588798,28.034776 38.802991,28.315049 38.957947,28.611264 C 39.117444,28.902939 39.245048,29.244735 39.340759,29.636655 C 39.527599,30.384057 39.621024,31.163353 39.621033,31.974545 C 39.621024,33.792908 39.313407,35.123636 38.698181,35.966733 C 38.082939,36.809832 37.02337,37.231381 35.51947,37.231381 C 34.676367,37.231381 33.995053,37.096941 33.475525,36.828061 C 32.955991,36.559181 32.529885,36.164976 32.197204,35.645444 C 31.955667,35.276305 31.76654,34.772725 31.629822,34.134701 C 31.49766,33.492127 31.431579,32.783469 31.431579,32.008725 M 34.193298,32.015561 C 34.193295,33.291606 34.304948,34.164327 34.528259,34.633725 C 34.75612,35.098571 35.084245,35.330992 35.512634,35.330991 C 35.795181,35.330992 36.038996,35.233011 36.244079,35.037045 C 36.453709,34.836527 36.606378,34.522074 36.702087,34.093686 C 36.802342,33.665304 36.852472,32.997661 36.852478,32.090756 C 36.852472,30.760033 36.73854,29.866805 36.510681,29.411069 C 36.287368,28.95079 35.950129,28.720647 35.498962,28.720639 C 35.038672,28.720647 34.70599,28.955348 34.500915,29.424741 C 34.295834,29.889591 34.193295,30.753197 34.193298,32.015561 M 47.092712,26.8681 L 47.092712,37.060483 L 44.276306,37.060483 L 44.276306,30.381772 C 43.820573,30.728132 43.378516,31.008405 42.950134,31.222592 C 42.526304,31.43679 41.993101,31.641868 41.350525,31.837826 L 41.350525,29.554623 C 42.298439,29.249293 43.034441,28.882431 43.558533,28.454037 C 44.082617,28.025661 44.492773,27.497016 44.789001,26.8681 L 47.092712,26.8681"
+     id="text3214" />
+</svg>
