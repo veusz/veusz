@@ -177,7 +177,9 @@ class CaptureDialog(qt4.QDialog):
                     unicode(self.filenameEdit.text()) )
             elif method == 1:
                 # internet socket
-                pass
+                stream = document.SocketCaptureStream(
+                    unicode(self.hostEdit.text()),
+                    int(self.portEdit.text()) )
             elif method == 2:
                 # external program
                 stream = document.CommandCaptureStream(

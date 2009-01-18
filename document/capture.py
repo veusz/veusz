@@ -18,11 +18,11 @@
 
 # $Id$
 
-import fcntl
 import errno
 import select
 import subprocess
 import os
+import socket
 
 import veusz.qtall as qt4
 import simpleread
@@ -131,6 +131,7 @@ class CommandCaptureStream(CaptureStream):
     """Capture from an external program."""
 
     def __init__(self, commandline):
+        """Capture from commandline - this is passed to the shell."""
         CaptureStream.__init__(self)
 
         self.name = commandline
@@ -158,4 +159,58 @@ class CommandCaptureStream(CaptureStream):
         """Close file."""
         self.popen.stdout.close()
 
+class SocketCaptureStream(CaptureStream):
+    """Capture from an internet host."""
 
+    def __init__(self, host, port):
+        """Connect to host and port specified."""
+        CaptureStream.__init__(self)
+
+        self.name = '%s:%i' % (host, port)
+        try:
+            self.socket = socket.socket( socket.AF_INET,
+                                          socket.SOCK_STREAM )
+            self.socket.connect( (host, port) )
+        except socket.error, e:
+            self._handleSocketError(e)
+
+    def _handleSocketError(self, e):
+        """Special function to reraise exceptions
+        because socket exceptions have changed in python 2.6 and
+        behave differently on some platforms.
+        """
+
+        # clean up
+        self.socket.close()
+
+        if isinstance(e, EnvironmentError):   # python 2.6
+            raise e
+
+        ee = EnvironmentError()
+        if isinstance(e, basestring):         # windows?
+            ee.strerror = unicode(e)
+            ee.errno = -1
+        else:                                 # unix
+            ee.strerror = e[1]
+            ee.errno = e[0]
+        raise ee
+
+    def getMoreData(self):
+        """Read data from the socket."""
+        
+        # see whether there is data to be read
+        i, o, e = select.select([self.socket], [], [], 0)
+        if i:
+            try:
+                retn = self.socket.recv(1024)
+            except socket.error, e:
+                self._handleSocketError(e)
+            if len(retn) == 0:
+                raise CaptureFinishException("Remote socket closed")
+            return retn
+        else:
+            return ''
+
+    def close(self):
+        """Close the socket."""
+        self.socket.close()
