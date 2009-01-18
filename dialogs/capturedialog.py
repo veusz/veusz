@@ -49,6 +49,7 @@ class CaptureDialog(qt4.QDialog):
         validator = qt4.QIntValidator(1, 1000000000, self)
         self.numLinesStopEdit.setValidator(validator)
         self.timeStopEdit.setValidator(validator)
+        self.updateIntervalsEdit.setValidator(validator)
 
         # add completion for filename if there is support in version of qt
         # (requires qt >= 4.3)
@@ -77,6 +78,14 @@ class CaptureDialog(qt4.QDialog):
                      self.slotStopChanged)
         self.stopBG.button( d.get('CaptureDialog_stop', 0) ).click()
 
+        # update interval
+        self.connect(self.updateIntervalsCheck,
+                     qt4.SIGNAL('toggled(bool)'),
+                     self.updateIntervalsEdit.setEnabled)
+        c = d.get('CaptureDialog_updateintervalcheck', False)
+        self.updateIntervalsCheck.setChecked(c)
+        self.updateIntervalsEdit.setEnabled(c)
+
         # user starts capture
         self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
                      self.slotCaptureClicked)
@@ -92,6 +101,8 @@ class CaptureDialog(qt4.QDialog):
         d = setting.settingdb
         d['CaptureDialog_method'] = self.methodBG.checkedId()
         d['CaptureDialog_stop'] = self.stopBG.checkedId()
+        d['CaptureDialog_updateintervalcheck'] = (
+            self.updateIntervalsCheck.isChecked())
 
     def slotMethodChanged(self, buttonid):
         """Enable/disable correct controls in methodBG."""
@@ -133,15 +144,30 @@ class CaptureDialog(qt4.QDialog):
         descriptor = unicode( self.descriptorEdit.text() )
         simpleread = document.SimpleRead(descriptor)
 
-        # get stopping method
-        stop = self.stopBG.checkedId()
         maxlines = None
         timeout = None
-        if stop == 1:  # number of lines
-            maxlines = int( self.numLinesStopEdit.text() )
-        elif stop == 2:  # timeout
-            timeout = int( self.timeStopEdit.text() )
+        updateinterval = None
+        try:
+            stop = self.stopBG.checkedId()
+            if stop == 1:
+                # number of lines to read before stopping
+                maxlines = int( self.numLinesStopEdit.text() )
+            elif stop == 2:
+                # maximum time period before stopping
+                timeout = int( self.timeStopEdit.text() )
 
+            # whether to do an update periodically
+            if self.updateIntervalsCheck.isChecked():
+                updateinterval = int( self.updateIntervalsEdit.text() )
+
+        except ValueError:
+            qt4.QMessageBox("Invalid number", "Invalid number",
+                            qt4.QMessageBox.Critical, qt4.QMessageBox.Ok,
+                            qt4.QMessageBox.NoButton, qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
+            
+        # get method of getting data
         method = self.methodBG.checkedId()
         try:
             # create stream
@@ -168,7 +194,8 @@ class CaptureDialog(qt4.QDialog):
 
         stream.maxlines = maxlines
         stream.timeout = timeout
-        cd = CapturingDialog(self.document, simpleread, stream, self)
+        cd = CapturingDialog(self.document, simpleread, stream, self,
+                             updateinterval=updateinterval)
         cd.show()
 
 ########################################################################
@@ -178,7 +205,14 @@ class CapturingDialog(qt4.QDialog):
     Shows progress to user."""
 
     def __init__(self, document, simpleread, stream, parent,
-                 timeout=None):
+                 updateinterval = None):
+        """Initialse capture dialog:
+        document: document to send data to
+        simpleread: object to interpret data
+        stream: capturestream to read data from
+        parent: parent widget
+        updateinterval: if set, interval of seconds to update data in doc."""
+
         qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'capturing.ui'),
@@ -215,7 +249,15 @@ class CapturingDialog(qt4.QDialog):
         self.txt_statusLabel = unicode(self.statusLabel.text())
         self.slotDisplayTimer() # initialise label
 
-        # start timers
+        # timer to update document
+        self.updatetimer = qt4.QTimer(self)
+        self.updateoperation = None
+        if updateinterval:
+            self.connect( self.updatetimer, qt4.SIGNAL('timeout()'),
+                          self.slotUpdateTimer )
+            self.updatetimer.start(updateinterval*1000)
+
+        # start display and read timers
         self.displaytimer.start(1000)
         self.readtimer.start(10)
 
@@ -246,33 +288,67 @@ class CapturingDialog(qt4.QDialog):
                 # add new item
                 tree.addTopLevelItem( qt4.QTreeWidgetItem([name, str(length)]))
 
+    def slotUpdateTimer(self):
+        """Called to update document while data is being captured."""
+
+        # undo any previous update
+        if self.updateoperation:
+            self.updateoperation.undo(self.document)
+
+        # create new one
+        self.updateoperation = document.OperationDataCaptureSet(
+            self.simpleread)
+
+        # apply it (bypass history here - urgh)
+        self.updateoperation.do(self.document)
+        self.document.setModified()
+
     def streamCaptureFinished(self, message):
-        """Stream said capture had finished."""
+        """Stop timers, close stream and display message
+        about finished stream."""
+
         # stop reading / displaying
         self.readtimer.stop()
         self.displaytimer.stop()
-        # updates stats
-        self.slotDisplayTimer()
+        self.updatetimer.stop()
+        if self.stream:
+            # update stats
+            self.slotDisplayTimer()
+            # close stream
+            self.stream.close()
+            self.stream = None
         # show message from stream
         self.statusLabel.setText(message)
 
-    def _finishUp(self):
-        """Some cleanups."""
-        # stop reading
-        self.readtimer.stop()
-        self.displaytimer.stop()
-        # close the stream
-        self.stream.close()
-        # close the dialog
-        self.close()
-
     def slotFinish(self):
         """Finish capturing and save the results."""
+
+        # close down timers
+        self.streamCaptureFinished('')
+
+        # undo any in-progress update
+        if self.updateoperation:
+            self.updateoperation.undo(self.document)
+
+        # apply real document operation update
         op = document.OperationDataCaptureSet(self.simpleread)
         self.document.applyOperation(op)
-        self._finishUp()
+
+        # close dialog
+        self.close()
 
     def slotCancel(self):
         """Cancel capturing."""
-        self._finishUp()
+
+        # close down timers
+        self.streamCaptureFinished('')
+
+        # undo any in-progress update
+        if self.updateoperation:
+            self.updateoperation.undo(self.document)
+            self.document.setModified()
+
+        # close dialog
+        self.close()
+
  
