@@ -166,8 +166,7 @@ class Page(widget.Widget):
         """Initialise object."""
 
         widget.Widget.__init__(self, parent, name=name)
-        #self.axisrangehelper = _AxisRangeHelper(self)
-
+ 
     def draw(self, parentposn, painter, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
 
@@ -179,10 +178,13 @@ class Page(widget.Widget):
         # document should pass us the page bounds
         x1, y1, x2, y2 = parentposn
 
-        #self.axisrangehelper.findPlotters()
+        # find ranges of axes
         axisdependhelper = _AxisDependHelper(self)
         axisdependhelper.findPlotters()
         axisdependhelper.findAxisRanges()
+
+        # page size is stored in painter
+        painter.veusz_page_size = (x2-x1, y2-y1)
 
         if self.settings.hide:
             bounds = self.computeBounds(parentposn, painter)
@@ -190,9 +192,6 @@ class Page(widget.Widget):
 
         painter.beginPaintingWidget(self, parentposn)
         painter.save()
-
-        # page size is stored in painter
-        painter.veusz_page_size = (x2-x1, y2-y1)
 
         # clip to page
         painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
