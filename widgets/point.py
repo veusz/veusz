@@ -30,6 +30,163 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
+# functions for plotting error bars
+# different styles are made up of combinations of these functions
+# each function takes the same arguments
+def _errorBarsBar(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                  s, painter):
+    """Draw bar style error lines."""
+    # list of output lines
+    pts = []
+
+    # vertical error bars
+    if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
+        for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
+            pts.append( qt4.QLineF(x, y1, x, y2) )
+
+    # horizontal error bars
+    if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
+        for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
+            pts.append( qt4.QLineF(x1, y, x2, y) )
+    if pts:
+        painter.drawLines(pts)
+
+def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                   s, painter):
+    """Draw perpendiclar ends on error bars."""
+    size = s.get('markerSize').convert(painter)
+    lines = []
+    if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
+        for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
+            lines.append( qt4.QLineF(x-size, y1, x+size, y1) )
+            lines.append( qt4.QLineF(x-size, y2, x+size, y2) )
+
+    if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
+        for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
+            lines.append( qt4.QLineF(x1, y-size, x1, y+size) )
+            lines.append( qt4.QLineF(x2, y-size, x2, y+size) )
+    if lines:
+        painter.drawLines(lines)
+
+def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                  s, painter):
+    """Draw box around error region."""
+    if None not in (xmin, xmax, ymin, ymax):
+        painter.setBrush( qt4.QBrush() )
+
+        for xmn, ymn, xmx, ymx in itertools.izip(xmin, ymin, xmax, ymax):
+            painter.drawPolygon( qt4.QPointF(xmn, ymn), qt4.QPointF(xmx, ymn),
+                                 qt4.QPointF(xmx, ymx), qt4.QPointF(xmn, ymx) )
+
+def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                      s, painter):
+    """Draw diamond around error region."""
+    if None not in (xmin, xmax, ymin, ymax):
+        painter.setBrush( qt4.QBrush() )
+
+        for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
+            xplotter, yplotter, xmin, ymin, xmax, ymax):
+
+            painter.drawPolygon( qt4.QPointF(xmn, yp), qt4.QPointF(xp, ymx),
+                                 qt4.QPointF(xmx, yp), qt4.QPointF(xp, ymn) )
+
+def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                    s, painter):
+    """Draw curve around error region."""
+    if None not in (xmin, xmax, ymin, ymax):
+        # non-filling brush
+        painter.setBrush( qt4.QBrush() )
+
+        for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
+            xplotter, yplotter, xmin, ymin, xmax, ymax):
+
+            # break up curve into four arcs (for asym error bars)
+            # qt geometry means we have to calculate lots
+            # the big numbers are in 1/16 degrees
+            painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
+                                       (xmx-xp)*2+1, (yp-ymx)*2+1),
+                            0, 1440)
+            painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
+                                       (xp-xmn)*2+1, (yp-ymx)*2+1),
+                            1440, 1440)
+            painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
+                                       (xp-xmn)*2+1, (ymn-yp)*2+1),
+                            2880, 1440)
+            painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
+                                       (xmx-xp)*2+1, (ymn-yp)*2+1),
+                            4320, 1440)
+
+def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                     s, painter):
+    """Draw filled region as error region."""
+
+    ptsabove = qt4.QPolygonF()
+    ptsbelow = qt4.QPolygonF()
+
+    hidevert = True  # keep track of what's shown
+    hidehorz = True
+    if ( (style == 'fillvert' or style == 'linevert') and
+         (ymin is not None and ymax is not None) and
+         not s.ErrorBarLine.hideVert ):
+        hidevert = False
+        # lines above/below points
+        for x, y in itertools.izip(xplotter, ymin):
+            ptsbelow.append(qt4.QPointF(x, y))
+        for x, y in itertools.izip(xplotter, ymax):
+            ptsabove.append(qt4.QPointF(x, y))
+
+    elif ( (style == 'fillhorz' or style == 'linehorz') and
+           (xmin is not None and xmax is not None) and
+           not s.ErrorBarLine.hideHorz ):
+        hidehorz = False
+        # lines left/right points
+        for x, y in itertools.izip(xmin, yplotter):
+            ptsbelow.append(qt4.QPointF(x, y))
+        for x, y in itertools.izip(xmax, yplotter):
+            ptsabove.append(qt4.QPointF(x, y))
+
+    # draw filled regions above/left and below/right
+    if ( (style == 'fillvert' or style == 'fillhorz') and
+         not (hidehorz and hidevert) ):
+        # construct points for error bar regions
+        retnpts = qt4.QPolygonF()
+        for x, y in itertools.izip(xplotter[::-1], yplotter[::-1]):
+            retnpts.append(qt4.QPointF(x, y))
+
+        # polygons consist of lines joining the points and continuing
+        # back along the plot line (retnpts)
+        painter.save()
+        painter.setPen( qt4.Qt.NoPen )
+        if not s.FillBelow.hideerror:
+            painter.setBrush( s.FillBelow.makeQBrush() )
+            painter.drawPolygon( ptsbelow + retnpts )
+        if not s.FillAbove.hideerror:
+            painter.setBrush( s.FillAbove.makeQBrush() )
+            painter.drawPolygon( ptsabove + retnpts )
+        painter.restore()
+
+    # draw optional line (on top of fill)
+    painter.drawPolyline( ptsabove )
+    painter.drawPolyline( ptsbelow )
+
+# map error bar names to lists of functions (above)
+_errorBarFunctionMap = {
+    'none': (),
+    'bar': (_errorBarsBar,),
+    'bardiamond': (_errorBarsBar, _errorBarsDiamond,),
+    'barcurve': (_errorBarsBar, _errorBarsCurve,),
+    'barbox': (_errorBarsBar, _errorBarsBox,),
+    'barends': (_errorBarsBar, _errorBarsEnds,),
+    'box':  (_errorBarsBox,),
+    'diamond':  (_errorBarsDiamond,),
+    'curve': (_errorBarsCurve,),
+    'fillhorz': (_errorBarsFilled,),
+    'fillvert': (_errorBarsFilled,),
+    'linehorz': (_errorBarsFilled,),
+    'linevert': (_errorBarsFilled,),
+    }
+
+
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
@@ -115,23 +272,25 @@ class PointPlotter(GenericPlotter):
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
                     axes, xdata, ydata):
-        """Plot error bars (horizontal and vertical)."""
+        """Plot error bars (horizontal and vertical).
+        """
 
         s = self.settings
         style = s.errorStyle
-
-        # hide if not drawing lines
-        painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
+        if style == 'none':
+            return
 
         # distances for clipping - we make them larger than the
         # real width, to help get gradients and so on correct
         xwc = abs(posn[2]-posn[0])*4
         ywc = abs(posn[3]-posn[1])*4
+        # default is no error bars
+        xmin = xmax = ymin = ymax = None
 
         # draw horizontal error bars
         if xdata.hasErrors():
             xmin, xmax = xdata.getPointRanges()
-                    
+
             # convert xmin and xmax to graph coordinates
             xmin = axes[0].graphToPlotterCoords(posn, xmin)
             xmax = axes[0].graphToPlotterCoords(posn, xmax)
@@ -139,10 +298,6 @@ class PointPlotter(GenericPlotter):
             # clip... (avoids problems with INFs, etc)
             xmin = N.clip(xmin, posn[0]-xwc, posn[2]+xwc)
             xmax = N.clip(xmax, posn[0]-xwc, posn[2]+xwc)
-
-            # draw lines between each of the points
-        else:
-            xmin = xmax = None
 
         # draw vertical error bars
         if ydata.hasErrors():
@@ -156,141 +311,16 @@ class PointPlotter(GenericPlotter):
             ymin = N.clip(ymin, posn[1]-ywc, posn[3]+ywc)
             ymax = N.clip(ymax, posn[1]-ywc, posn[3]+ywc)
 
-            # draw lines between each of the points
-        else:
-            ymin = ymax = None
-
-        # no error bars
+        # no error bars - break out of processing below
         if ymin is None and ymax is None and xmin is None and xmax is None:
             return
-
-        # draw normal error bars
-        if style in frozenset(('bar', 'bardiamond', 'barcurve', 'barbox', 'barends')):
-            # list of output lines
-            pts = []
-
-            # vertical error bars
-            if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-                for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
-                    pts.append(qt4.QPointF(x, y1))
-                    pts.append(qt4.QPointF(x, y2))
-
-            # horizontal error bars
-            if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-                for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
-                    pts.append(qt4.QPointF(x1, y))
-                    pts.append(qt4.QPointF(x2, y))
-            if pts:
-                painter.drawLines(pts)
-
-        # draw "ends" on error bars if requested
-        if style == 'barends':
-            size = s.get('markerSize').convert(painter)
-            lines = []
-            if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-                for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
-                    lines.append( qt4.QLineF(x-size, y1, x+size, y1) )
-                    lines.append( qt4.QLineF(x-size, y2, x+size, y2) )
- 
-            if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-                for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
-                    lines.append( qt4.QLineF(x1, y-size, x1, y+size) )
-                    lines.append( qt4.QLineF(x2, y-size, x2, y+size) )
-            if lines:
-                painter.drawLines(lines)
-
-        # special error bars (only works with proper x and y errors)
-        if ( ymin is not None and ymax is not None and xmin is not None and
-             xmax is not None ):
-
-            # draw boxes
-            if style in frozenset(('box', 'barbox')):
-
-                # non-filling brush
-                painter.setBrush( qt4.QBrush() )
-
-                for xmn, ymn, xmx, ymx in (
-                    itertools.izip(xmin, ymin, xmax, ymax)):
-
-                    painter.drawPolygon( qt4.QPointF(xmn, ymn), qt4.QPointF(xmx, ymn),
-                                         qt4.QPointF(xmx, ymx), qt4.QPointF(xmn, ymx) )
-
-            # draw diamonds
-            elif style in frozenset(('diamond', 'bardiamond')):
-
-                # non-filling brush
-                painter.setBrush( qt4.QBrush() )
-
-                for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
-                    xplotter, yplotter, xmin, ymin, xmax, ymax):
-
-                    painter.drawPolygon( qt4.QPointF(xmn, yp), qt4.QPointF(xp, ymx),
-                                         qt4.QPointF(xmx, yp), qt4.QPointF(xp, ymn) )
-
-            # draw curved errors
-            elif style in frozenset(('curve', 'barcurve')):
-
-                # non-filling brush
-                painter.setBrush( qt4.QBrush() )
-
-                for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
-                    xplotter, yplotter, xmin, ymin, xmax, ymax):
-
-                    # break up curve into four arcs (for asym error bars)
-                    # qt geometry means we have to calculate lots
-                    # the big numbers are in 1/16 degrees
-                    painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
-                                               (xmx-xp)*2+1, (yp-ymx)*2+1),
-                                    0, 1440)
-                    painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
-                                               (xp-xmn)*2+1, (yp-ymx)*2+1),
-                                    1440, 1440)
-                    painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
-                                               (xp-xmn)*2+1, (ymn-yp)*2+1),
-                                    2880, 1440)
-                    painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
-                                               (xmx-xp)*2+1, (ymn-yp)*2+1),
-                                    4320, 1440)
-
-            elif style in frozenset(('fillvert', 'fillhorz', 
-                                     'linevert', 'linehorz')):
-                if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-                    # construct points for error bar regions
-                    retnpts = qt4.QPolygonF()
-                    for x, y in itertools.izip(xplotter[::-1], yplotter[::-1]):
-                        retnpts.append(qt4.QPointF(x, y))
-
-                    ptsabove = qt4.QPolygonF()
-                    ptsbelow = qt4.QPolygonF()
-                    if style == 'fillvert' or style == 'linevert':
-                        # lines above/below points
-                        for x, y in itertools.izip(xplotter, ymin):
-                            ptsbelow.append(qt4.QPointF(x, y))
-                        for x, y in itertools.izip(xplotter, ymax):
-                            ptsabove.append(qt4.QPointF(x, y))
-                    else:
-                        # lines left/right points
-                        for x, y in itertools.izip(xmin, yplotter):
-                            ptsbelow.append(qt4.QPointF(x, y))
-                        for x, y in itertools.izip(xmax, yplotter):
-                            ptsabove.append(qt4.QPointF(x, y))
-
-                    # draw filled regions above/left and below/right
-                    if style == 'fillvert' or style == 'fillhorz':
-                        painter.save()
-                        painter.setPen( qt4.Qt.NoPen )
-                        if not s.FillBelow.hideerror:
-                            painter.setBrush( s.FillBelow.makeQBrush() )
-                            painter.drawPolygon( ptsbelow + retnpts )
-                        if not s.FillAbove.hideerror:
-                            painter.setBrush( s.FillAbove.makeQBrush() )
-                            painter.drawPolygon( ptsabove + retnpts )
-                        painter.restore()
-
-                    # draw optional line
-                    painter.drawPolyline( ptsabove )
-                    painter.drawPolyline( ptsbelow )
-
+        
+        # iterate to call the error bars functions required to draw style
+        painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
+        for function in _errorBarFunctionMap[style]:
+            function(style, xmin, xmax, ymin, ymax,
+                     xplotter, yplotter, s, painter)
+            
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""
         s = self.settings
