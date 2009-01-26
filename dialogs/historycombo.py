@@ -103,11 +103,11 @@ class HistoryCombo(qt4.QComboBox):
         history = [ unicode(self.itemText(i)) for i in xrange(self.count()) ]
         history.insert(0, unicode(self.currentText()))
 
-        # remove dups and blanks
+        # remove dups
         histout = []
         histset = set()
         for item in history:
-            if item and item not in histset:
+            if item not in histset:
                 histout.append(item)
                 histset.add(item)
 
