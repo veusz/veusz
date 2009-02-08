@@ -23,6 +23,9 @@ import select
 import subprocess
 import os
 import socket
+import platform
+import signal
+import sys
 
 import veusz.qtall as qt4
 import veusz.utils as utils
@@ -162,6 +165,17 @@ class CommandCaptureStream(CaptureStream):
 
     def close(self):
         """Close file."""
+
+        if self.popen.poll() is None:
+            # need to kill process if it is still running
+            if platform.system() == 'Windows':
+                # awful code (for windows)
+                # use this to not have a ctypes dependency
+                os.system('TASKKILL /PID %i /F' % self.popen.pid)
+            else:
+                # unix
+                os.kill(self.popen.pid, signal.SIGTERM)
+
         self.popen.stdout.close()
 
 class SocketCaptureStream(CaptureStream):

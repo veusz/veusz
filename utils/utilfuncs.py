@@ -461,7 +461,7 @@ class NonBlockingReaderThread(threading.Thread):
       if done: break
 
     This is used mainly because windows doesn't properly support
-    non-blocking threads.
+    non-blocking pipes as files.
     """
 
     def __init__(self, fileobject):
