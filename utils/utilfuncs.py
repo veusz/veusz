@@ -27,6 +27,7 @@ import weakref
 import re
 import time
 import os.path
+import threading
 
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
@@ -447,3 +448,67 @@ def lazy(func, resultclass):
         return __proxy__(args, kw)
             
     return __wrapper__
+
+class NonBlockingReaderThread(threading.Thread):
+    """A class to read blocking file objects and return the result.
+
+    Usage:
+     r = ReadThread(myfile)
+     r.start()
+     while True:
+      newdata, done = r.getNewData()
+      print newdata
+      if done: break
+
+    This is used mainly because windows doesn't properly support
+    non-blocking threads.
+    """
+
+    def __init__(self, fileobject):
+        """Create the thread object."""
+        threading.Thread.__init__(self)
+        self.fileobject = fileobject
+        self.lock = threading.Lock()
+        self.data = ''
+        self.done = False
+
+    def getNewData(self):
+        """Get any data waiting to be read, and whether
+        the reading is finished.
+
+        Returns (data, done)
+        """
+        self.lock.acquire()
+        data = self.data
+        done = self.done
+        self.data = ''
+        self.lock.release()
+        if isinstance(data, Exception):
+            # if the reader errored somewhere
+            raise data
+        else:
+            return data, done
+
+    def run(self):
+        """Do the reading from the file object."""
+
+        while True:
+            try:
+                data = self.fileobject.readline()
+            except Exception, e:
+                # error in reading
+                self.lock.acquire()
+                self.data = e
+                self.lock.release()
+                break
+
+            # no more data: end of file
+            if len(data) == 0:
+                self.lock.acquire()
+                self.done = True
+                self.lock.release()
+                break
+
+            self.lock.acquire()
+            self.data += data
+            self.lock.release()

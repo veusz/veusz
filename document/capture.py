@@ -25,6 +25,7 @@ import os
 import socket
 
 import veusz.qtall as qt4
+import veusz.utils as utils
 import simpleread
 
 class CaptureFinishException(Exception):
@@ -107,25 +108,28 @@ class FileCaptureStream(CaptureStream):
     def __init__(self, filename):
         CaptureStream.__init__(self)
 
-        # open file without any blocking
-        self.fd = os.open(filename, os.O_RDONLY | os.O_NDELAY)
+        # open file
+        self.fileobj = open(filename, 'rU')
+
+        # make new thread to read file
+        self.readerthread = utils.NonBlockingReaderThread(self.fileobj)
+        self.readerthread.start()
+
         self.name = filename
 
     def getMoreData(self):
         """Read data from the file."""
         try:
-            return os.read(self.fd, 1024)
+            data, done = self.readerthread.getNewData()
+            if len(data) == 0 and done:
+                raise CaptureFinishException("End of file")
+            return data
         except OSError, e:
-            if e.errno == errno.EAGAIN:
-                # no data available
-                return ''
-            else:
-                # raise exception to be caught above
-                raise CaptureFinishException("OSError: %s" % unicode(e))
+            raise CaptureFinishException("OSError: %s" % unicode(e))
 
     def close(self):
         """Close file."""
-        os.close(self.fd)
+        self.fileobj.close()
 
 class CommandCaptureStream(CaptureStream):
     """Capture from an external program."""
@@ -136,16 +140,17 @@ class CommandCaptureStream(CaptureStream):
 
         self.name = commandline
         self.popen = subprocess.Popen(commandline, shell=True,
-                                      bufsize=0, stdout=subprocess.PIPE)
+                                      bufsize=0, stdout=subprocess.PIPE,
+                                      universal_newlines=True)
+
+        # make new thread to read stdout
+        self.readerthread = utils.NonBlockingReaderThread(self.popen.stdout)
+        self.readerthread.start()
 
     def getMoreData(self):
         """Read data from the command."""
 
-        i, o, e = select.select([self.popen.stdout.fileno()], [], [], 0)
-        if i:
-            retn = os.read(i[0], 1024)
-        else:
-            retn = ''
+        retn, done = self.readerthread.getNewData()
 
         if not retn:
             poll = self.popen.poll()
