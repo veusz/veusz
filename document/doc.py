@@ -437,7 +437,7 @@ class Document( qt4.QObject ):
             if ext == '.eps':
                 # adjust bounding box
                 for line in fin:
-                    if line[:14] == '%%BoundingBox:' and ext == '.eps':
+                    if line[:14] == '%%BoundingBox:':
                         # replace bounding box line by calculated one
                         parts = line.split()
                         widthfactor = float(parts[3]) / printer.width()
@@ -482,6 +482,15 @@ class Document( qt4.QObject ):
         self.basewidget.draw( painter, page )
         painter.end()
 
+    def _exportPIC(self, filename, page):
+        """Export document as SVG"""
+
+        pic = qt4.QPicture()
+        painter = Painter(pic)
+        self.basewidget.draw( painter, page )
+        painter.end()
+        pic.save(filename)
+
     def export(self, filename, pagenumber, color=True, dpi=100,
                antialias=True, quality=85):
         """Export the figure to the filename."""
@@ -497,6 +506,9 @@ class Document( qt4.QObject ):
 
         elif ext == '.svg':
             self._exportSVG(filename, pagenumber)
+
+        elif ext == '.pic':
+            self._exportPIC(filename, pagenumber)
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext

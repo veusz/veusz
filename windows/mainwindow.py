@@ -820,7 +820,9 @@ class MainWindow(qt4.QMainWindow):
                    (["jpg"], "Jpeg bitmap format"),
                    (["bmp"], "Windows bitmap format"),
                    (["pdf"], "Portable Document Format"),
-                   (["svg"], "Scalable Vector Graphics")]
+                   (["svg"], "Scalable Vector Graphics"),
+                   #(["pic"], "QT Pic format"),
+                   ]
 
         fd = qt4.QFileDialog(self, 'Export page')
         if not self.exportDir:
