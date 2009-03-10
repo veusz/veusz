@@ -166,10 +166,11 @@ class Line(widget.Widget):
                                          itertools.cycle(length),
                                          itertools.cycle(angle)):
 
-            utils.plotLineArrow(painter, x, y, l*dx, a,
-                                arrowsize=arrowsize,
-                                arrowleft=s.arrowleft,
-                                arrowright=s.arrowright)
+            if N.isfinite(x) and N.isfinite(y) and N.isfinite(a):
+                utils.plotLineArrow(painter, x, y, l*dx, a,
+                                    arrowsize=arrowsize,
+                                    arrowleft=s.arrowleft,
+                                    arrowright=s.arrowright)
 
             if isnotdataset:
                 cgi = controlgraph.ControlLine(
