@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>645</width>
-    <height>535</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -72,12 +72,6 @@
        </item>
        <item>
         <widget class="QTextEdit" name="previewedit" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Maximum" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="lineWrapMode" >
           <enum>QTextEdit::NoWrap</enum>
          </property>
