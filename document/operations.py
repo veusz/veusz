@@ -665,7 +665,7 @@ class OperationDataImport(object):
         
         # open stream to import data from
         if self.filename is not None:
-            stream = simpleread.FileStream( open(self.filename) )
+            stream = simpleread.FileStream( open(self.filename,  'rU') )
         elif self.datastr is not None:
             stream = simpleread.StringStream(self.datastr)
         else:

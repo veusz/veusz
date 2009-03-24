@@ -134,7 +134,7 @@ class ImportDialog2(qt4.QDialog):
         """Standard preview - show start of text."""
 
         try:
-            ifile = open(filename, 'r')
+            ifile = open(filename, 'rU')
         except IOError:
             self.previewedit.setPlainText('')
             return False
@@ -154,7 +154,7 @@ class ImportDialog2(qt4.QDialog):
         t.setColumnCount(0)
         t.setRowCount(0)
         try:
-            ifile = open(filename, 'r')
+            ifile = open(filename, 'rU')
 
             # construct list of rows from input file
             reader = csv.reader(ifile)
@@ -209,7 +209,7 @@ class ImportDialog2(qt4.QDialog):
         
         # try to identify fits file
         try:
-            ifile = open(filename)
+            ifile = open(filename,  'rU')
             line = ifile.readline()
             # is this a hack?
             if line.find('SIMPLE  =                    T') == -1:
@@ -226,7 +226,7 @@ class ImportDialog2(qt4.QDialog):
         """Preview 2d dataset files."""
         
         try:
-            ifile = open(filename, 'r')
+            ifile = open(filename, 'rU')
         except IOError:
             self.twod_previewedit.setPlainText('')
             return False

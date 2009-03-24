@@ -657,7 +657,7 @@ class MainWindow(qt4.QMainWindow):
 
         # read script
         try:
-            script = open(filename, 'r').read()
+            script = open(filename, 'rU').read()
         except IOError, e:
             qt4.QApplication.restoreOverrideCursor()
             qt4.QMessageBox("Cannot open document",

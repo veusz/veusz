@@ -122,7 +122,7 @@ class LinkedFile(LinkedFileBase):
         
         tempdoc = doc.Document()
         sr = simpleread.SimpleRead(self.descriptor)
-        sr.readData( simpleread.FileStream(open(self.filename)),
+        sr.readData( simpleread.FileStream(open(self.filename,  'rU')),
                      useblocks=self.useblocks )
         sr.setInDocument(tempdoc, linkedfile=self)
 

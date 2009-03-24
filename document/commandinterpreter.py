@@ -171,7 +171,7 @@ class CommandInterpreter:
         # FIXME: should update filename in main window
         # This gives the document a __file__ variable so it
         # knows what it is
-        f = open(filename, 'r')
+        f = open(filename, 'rU')
         self.document.wipe()
         self.interface.To('/')
         oldfile = self.globals['__file__']
