@@ -33,6 +33,14 @@ import veusz.utils as utils
 
 pyfits = None
 
+class ImportStandardHelpDialog(qt4.QDialog):
+    """Class to load help for standard veusz import."""
+    def __init__(self, parent, *args):
+        qt4.QDialog.__init__(self, parent, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'importhelp.ui'),
+                   self)
+
 class ImportDialog2(qt4.QDialog):
 
     dirname = '.'
@@ -54,6 +62,10 @@ class ImportDialog2(qt4.QDialog):
 
         self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
                       self.slotImport)
+
+        # user wants help about standard import
+        self.connect( self.helpbutton, qt4.SIGNAL('clicked()'),
+                      self.slotHelp )
 
         # notification tab has changed
         self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
@@ -106,6 +118,11 @@ class ImportDialog2(qt4.QDialog):
         if fd.exec_() == qt4.QDialog.Accepted:
             ImportDialog2.dirname = fd.directory().absolutePath()
             self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
+
+    def slotHelp(self):
+        """Asked for help for standard import."""
+        self.helpdialog = ImportStandardHelpDialog(self)
+        self.helpdialog.show()
 
     def slotUpdatePreview(self, *args):
         """Update preview window when filename or tab changed."""
@@ -377,12 +394,22 @@ class ImportDialog2(qt4.QDialog):
         # convert controls to values
         descriptor = unicode( self.descriptoredit.text() )
         useblocks = self.blockcheckbox.isChecked()
-        
+        ignoretext = self.ignoretextcheckbox.isChecked()
+
+        # substitute filename if required
+        f = utils.escapeDatasetName( os.path.basename(filename) )
+        prefix = unicode( self.prefixcombo.lineEdit().text() )
+        prefix = prefix.replace('$FILENAME', f)
+        suffix = unicode( self.suffixcombo.lineEdit().text() )
+        suffix = suffix.replace('$FILENAME', f)
+
         try:
             # construct operation. this checks the descriptor.
             op = document.OperationDataImport(descriptor, filename=filename,
                                               useblocks=useblocks, 
-                                              linked=linked)
+                                              linked=linked,
+                                              prefix=prefix, suffix=suffix,
+                                              ignoretext=ignoretext)
 
         except document.DescriptorError:
             mb = qt4.QMessageBox("Veusz",

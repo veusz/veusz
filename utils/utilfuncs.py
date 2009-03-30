@@ -55,6 +55,16 @@ def validateWidgetName(name):
     """Validate widget name is okay."""
     return dsname_re.match(name) is not None
 
+def escapeDatasetName(name):
+    """Make string into a valid dataset name."""
+    # replace invalid characters
+    out = re.sub('[^0-9A-Za-z]', '_', name)
+    # add underscores for leading numbers
+    if re.match('^[0-9]', out):
+        return '_' + out
+    else:
+        return out
+
 class WeakBoundMethod:
     """A weak reference to a bound method.
 

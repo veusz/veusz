@@ -26,6 +26,8 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
+import numpy as N
+
 import veusz.qtall as qt4
 
 import datasets
@@ -356,7 +358,8 @@ class CommandInterface(qt4.QObject):
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasetnames))
 
-    def ImportFile(self, filename, descriptor, useblocks=False, linked=False):
+    def ImportFile(self, filename, descriptor, useblocks=False, linked=False,
+                   prefix='', suffix='', ignoretext=False):
         """Read data from file with filename using descriptor.
         If linked is True, the data won't be saved in a saved document,
         the data will be reread from the file.
@@ -365,6 +368,10 @@ class CommandInterface(qt4.QObject):
         to split the data into blocks. Dataset names are appended with an
         underscore and the block number (starting from 1).
 
+        If prefix is set, prefix is prepended to each dataset name
+        Suffix is added to each dataset name
+        ignoretext ignores lines of text in the file
+
         Returned is a tuple (datasets, errors)
          where datasets is a list of datasets read
          errors is a dict of the datasets with the number of errors while
@@ -372,7 +379,9 @@ class CommandInterface(qt4.QObject):
         """
 
         op = operations.OperationDataImport(descriptor, filename=filename,
-                                            useblocks=useblocks, linked=linked)
+                                            useblocks=useblocks, linked=linked,
+                                            prefix=prefix, suffix=suffix,
+                                            ignoretext=ignoretext)
         dsnames = self.document.applyOperation(op)
         errors = op.simpleread.getInvalidConversions()
             

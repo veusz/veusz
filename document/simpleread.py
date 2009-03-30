@@ -70,6 +70,9 @@ string_re = re.compile( r'''
 $
 ''', re.VERBOSE )
 
+# a line starting with text
+text_start_re = re.compile( r'^[A-Za-z]' )
+
 # convert data type strings in descriptor to internal datatype
 datatype_name_convert = {
     'float': 'float',
@@ -282,7 +285,9 @@ class _DescriptorPart(object):
                 # add data into dataset
                 dataset.append(dat)
 
-    def setInDocument(self, thedatasets, document, block=None, linkedfile=None):
+    def setInDocument(self, thedatasets, document, block=None,
+                      linkedfile=None,
+                      prefix='', suffix=''):
         """Set the read-in data in the document."""
 
         names = []
@@ -295,6 +300,7 @@ class _DescriptorPart(object):
             if block is not None:
                 name += '_%i' % block
 
+            # does the dataset exist?
             if name+'\0DATA' in thedatasets:
                 vals = thedatasets[name+'\0DATA']
                 pos = neg = sym = None
@@ -316,8 +322,9 @@ class _DescriptorPart(object):
                     ds = datasets.DatasetText( data=vals,
                                                linked = linkedfile )
 
-                document.setData( name, ds )
-                names.append(name)
+                finalname = prefix + name + suffix
+                document.setData( finalname, ds )
+                names.append(finalname)
             else:
                 break
 
@@ -423,7 +430,7 @@ class SimpleRead(object):
 
         self.parts = [_DescriptorPart(p) for p in descriptor.split()]
 
-    def readData(self, stream, useblocks=False):
+    def readData(self, stream, useblocks=False, ignoretext=False):
         """Read in the data from the stream.
 
         If useblocks is True, data are read as separate blocks.
@@ -431,24 +438,31 @@ class SimpleRead(object):
         number if set.
         """
 
+        self.ignoretext = ignoretext
         if useblocks:
-            self._readDataBlocked(stream)
+            self._readDataBlocked(stream, ignoretext)
         else:
-            self._readDataUnblocked(stream)
+            self._readDataUnblocked(stream, ignoretext)
 
-    def _readDataUnblocked(self, stream):
+    def _readDataUnblocked(self, stream, ignoretext):
         """Read in that data from the stream."""
 
         allparts = self.parts
 
         # loop over lines
         while stream.newLine():
-
             if stream.remainingline[:1] == ['descriptor']:
                 # a change descriptor statement
                 descriptor =  ' '.join(stream.remainingline[1:])
                 self._parseDescriptor(descriptor)
                 allparts += self.parts
+            elif ( self.ignoretext and len(stream.remainingline) > 0 and 
+                   text_start_re.match(stream.remainingline[0]) and
+                   len(self.parts) > 0 and
+                   self.parts[0].datatype != 'string' ):
+                # ignore the line if it is text and ignore text is on
+                # and first column is not text
+                pass
             else:
                 # normal text
                 for p in self.parts:
@@ -458,7 +472,7 @@ class SimpleRead(object):
         self.parts = allparts
         self.blocks = None
 
-    def _readDataBlocked(self, stream):
+    def _readDataBlocked(self, stream, ignoretext):
         """Read in the data, using blocks."""
 
         blocks = {}
@@ -502,7 +516,8 @@ class SimpleRead(object):
                 out[name[:-5]] = len(data)
         return out
 
-    def setInDocument(self, document, linkedfile=None):
+    def setInDocument(self, document, linkedfile=None,
+                      prefix='', suffix=''):
         """Set the data in the document.
 
         Returns list of variable names read.
@@ -515,10 +530,12 @@ class SimpleRead(object):
             blocks = self.blocks
 
         names = []
-        for b in blocks:
-            for p in self.parts:
-                names += p.setInDocument(self.datasets, document,
-                                         block=b, linkedfile=linkedfile)
+        for block in blocks:
+            for part in self.parts:
+                names += part.setInDocument(self.datasets, document,
+                                            block=block,
+                                            linkedfile=linkedfile,
+                                            prefix=prefix, suffix=suffix)
 
         return names
 

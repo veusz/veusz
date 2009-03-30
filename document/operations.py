@@ -638,7 +638,8 @@ class OperationDataImport(object):
     descr = 'import data'
     
     def __init__(self, descriptor, useblocks=False, linked=False,
-                 filename=None, datastr=None):
+                 filename=None, datastr=None,
+                 prefix="", suffix="", ignoretext=False):
         """Setup operation.
         
         descriptor is descriptor for import
@@ -656,6 +657,9 @@ class OperationDataImport(object):
         self.linked = linked
         self.filename = filename
         self.datastr = datastr
+        self.prefix = prefix
+        self.suffix = suffix
+        self.ignoretext = ignoretext
         
     def do(self, document):
         """Import data.
@@ -673,13 +677,16 @@ class OperationDataImport(object):
         
         # do the import
         self.simpleread.clearState()
-        self.simpleread.readData(stream, useblocks=self.useblocks)
+        self.simpleread.readData(stream, useblocks=self.useblocks,
+                                 ignoretext=self.ignoretext)
         
         # associate file
         if self.linked:
             assert self.filename is not None
             LF = datasets.LinkedFile(self.filename, self.descriptor,
-                                     useblocks=self.useblocks)
+                                     useblocks=self.useblocks,
+                                     prefix=self.prefix, suffix=self.suffix,
+                                     ignoretext=self.ignoretext)
         else:
             LF = None
 
@@ -688,7 +695,9 @@ class OperationDataImport(object):
         self.olddatasets = dict(document.data)
         
         # actually set the data in the document
-        names = self.simpleread.setInDocument(document, linkedfile=LF)
+        names = self.simpleread.setInDocument(document, linkedfile=LF,
+                                              prefix=self.prefix,
+                                              suffix=self.suffix)
         return names
         
     def undo(self, document):

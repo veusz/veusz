@@ -90,21 +90,31 @@ class LinkedFile(LinkedFileBase):
     This class is used to store a link filename with the descriptor
     '''
 
-    def __init__(self, filename, descriptor, useblocks=False):
+    def __init__(self, filename, descriptor, useblocks=False,
+                 prefix='', suffix='', ignoretext=False):
         '''Set up the linked file with the descriptor given.'''
         self.filename = filename
         self.descriptor = descriptor
         self.useblocks = useblocks
+        self.prefix = prefix
+        self.suffix = suffix
+        self.ignoretext = ignoretext
 
     def saveToFile(self, file):
         '''Save the link to the document file.'''
 
         params = [ repr(self.filename),
                    repr(self.descriptor),
-                   'linked=True' ]
+                   'linked=True',
+                   'ignoretext=%s' % repr(self.ignoretext)]
 
         if self.useblocks:
             params.append('useblocks=True')
+
+        if self.prefix:
+            params.append('prefix=%s' % repr(self.prefix))
+        if self.prefix:
+            params.append('suffix=%s' % repr(self.suffix))
 
         file.write('ImportFile(%s)\n' % (', '.join(params)))
 
