@@ -102,6 +102,11 @@ class ImportDialog2(qt4.QDialog):
         # defaults for prefix and suffix
         self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
 
+        # default state for check boxes
+        self.linkcheckbox.default = True
+        self.blockcheckbox.default = False
+        self.ignoretextcheckbox.default = True
+
     def slotBrowseClicked(self):
         """Browse for a data file."""
 

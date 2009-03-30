@@ -24,4 +24,6 @@
 # by loadUi - yuck
 import sys
 import historycombo
+import historycheck
 sys.modules['historycombo'] = historycombo
+sys.modules['historycheck'] = historycheck
