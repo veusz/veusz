@@ -49,6 +49,8 @@ class HistoryCombo(qt4.QComboBox):
         self.setSizeAdjustPolicy(
             qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
+        self.default = []
+
     def text(self):
         """Get text in combobox
         - this gives it the same interface as QLineEdit."""
@@ -93,7 +95,7 @@ class HistoryCombo(qt4.QComboBox):
     def loadHistory(self):
         """Load contents of history combo from settings."""
         self.clear()
-        history = setting.settingdb.get(self.getSettingName(), [])
+        history = setting.settingdb.get(self.getSettingName(), self.default)
         self.insertItems(0, history)
 
     def saveHistory(self):

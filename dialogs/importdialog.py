@@ -99,6 +99,9 @@ class ImportDialog2(qt4.QDialog):
             c.setModel(model)
             self.filenameedit.setCompleter(c)
 
+        # defaults for prefix and suffix
+        self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
+
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
