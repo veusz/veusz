@@ -367,13 +367,8 @@ class DataEditDialog(qt4.QDialog):
 
     def slotDatasetImport(self):
         """Show import dialog."""
-
-        impd = importdialog.ImportDialog2(self.parent(), self.document)
-        impd.show()
+        self.parent().slotDataImport()
 
     def slotDatasetCreate(self):
         """Show dataset creation dialog."""
-
-        crd = datacreate.DataCreateDialog(self.parent(), self.document)
-        crd.show()
-        
+        self.parent().slotDataCreate()
