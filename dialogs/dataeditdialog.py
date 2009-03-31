@@ -242,8 +242,8 @@ class DataEditDialog(qt4.QDialog):
         # set up dataset list
         self.dslistmodel = DatasetListModel(self, document)
         self.datasetlistview.setModel(self.dslistmodel)
-        self.splitter.setStretchFactor(0, 0)
-        self.splitter.setStretchFactor(1, 1)
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 3)
 
         # document changes
         self.connect(document, qt4.SIGNAL('sigModified'),
