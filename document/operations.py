@@ -416,11 +416,14 @@ class OperationDatasetCreate(object):
         self.parts[part] = val
         
     def do(self, document):
-        pass
+        """Record old dataset if it exists."""
+        self.olddataset = document.data.get(self.datasetname, None)
         
     def undo(self, document):
         """Delete the created dataset."""
         del document.data[self.datasetname]
+        if self.olddataset is not None:
+            document.data[self.datasetname] = self.olddataset
         
 class OperationDatasetCreateRange(OperationDatasetCreate):
     """Create a dataset in a specfied range."""
@@ -440,6 +443,7 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
     def do(self, document):
         """Create dataset using range."""
         
+        OperationDatasetCreate.do(self, document)
         vals = {}
         for partname, therange in self.parts.iteritems():
             minval, maxval = therange
@@ -450,7 +454,6 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
                 vals[partname] = N.arange(self.numsteps)*delta + minval
 
         ds = datasets.Dataset(**vals)
-        assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
         return ds
         
@@ -477,6 +480,9 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         self.parts = parts
         
     def do(self, document):
+        """Create the dataset."""
+        OperationDatasetCreate.do(self, document)
+
         deltat = (self.t1 - self.t0) / (self.numsteps-1)
         t = N.arange(self.numsteps)*deltat + self.t0
         
@@ -499,7 +505,6 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
                                              "Error: '%s'" % (expr, str(e)) )
 
         ds = datasets.Dataset(**vals)
-        assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
         return ds
         
@@ -535,11 +540,11 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
             
         except datasets.DatasetExpressionException, e:
             raise CreateDatasetException(str(e))
-
         
     def do(self, document):
         """Create the dataset."""
-        
+        OperationDatasetCreate.do(self, document)
+
         ds = datasets.DatasetExpression(**self.parts)
         ds.document = document
 
@@ -548,7 +553,6 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
             ds = datasets.Dataset(data=ds.data, serr=ds.serr,
                                   perr=ds.perr, nerr=ds.nerr)
         
-        assert self.datasetname not in document.data
         document.setData(self.datasetname, ds)
         return ds
 

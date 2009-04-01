@@ -62,6 +62,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="editbutton" >
+           <property name="text" >
+            <string>Edit</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="unlinkbutton" >
            <property name="sizePolicy" >
             <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
@@ -156,7 +163,6 @@
    </item>
   </layout>
  </widget>
- <includes/>
  <resources/>
  <connections>
   <connection>

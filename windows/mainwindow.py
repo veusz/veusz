@@ -384,30 +384,35 @@ class MainWindow(qt4.QMainWindow):
         dialog = importdialog.ImportDialog2(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
+        return dialog
 
     def slotDataEdit(self):
         """Edit existing datasets."""
         dialog = dataeditdialog.DataEditDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
+        return dialog
 
     def slotDataCreate(self):
         """Create new datasets."""
         dialog = DataCreateDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
+        return dialog
 
     def slotDataCreate2D(self):
         """Create new datasets."""
         dialog = DataCreate2DDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
+        return dialog
 
     def slotDataCapture(self):
         """Capture remote data."""
         dialog = CaptureDialog(self.document, self)
         self.dialogs.append(dialog)
         dialog.show()
+        return dialog
 
     def slotDataReload(self):
         """Reload linked datasets."""

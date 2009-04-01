@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>567</width>
-    <height>564</height>
+    <height>568</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -279,6 +279,13 @@
       <widget class="QPushButton" name="createbutton" >
        <property name="text" >
         <string>C&amp;reate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="replacebutton" >
+       <property name="text" >
+        <string>&amp;Replace</string>
        </property>
       </widget>
      </item>

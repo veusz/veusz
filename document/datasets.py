@@ -303,6 +303,7 @@ class DatasetBase(object):
     datatype = 'numeric'
     columns = ()
     column_descriptions = ()
+    recreatable_dataset = False  # can recreate in create dialog
 
     def saveLinksToSavedDoc(self, file, savedlinks):
         '''Save the link to the saved document, if this dataset is linked.
@@ -725,6 +726,8 @@ def _evaluateDataset(datasets, dsname, dspart):
 
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
+
+    recreatable_dataset = True
 
     def __init__(self, data=None, serr=None, nerr=None, perr=None):
         """Initialise the dataset with the expressions given."""

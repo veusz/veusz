@@ -21,6 +21,7 @@
 """Dataset creation dialog."""
 
 import os.path
+
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
@@ -31,6 +32,10 @@ class _DSException(RuntimeError):
     pass
 
 class DataCreateDialog(qt4.QDialog):
+    """Dialog to create datasets.
+
+    They can be created from numerical ranges, parametrically or from
+    expressions involving other dataset."""
 
     def __init__(self, parent, document, *args):
         """Initialise dialog with document."""
@@ -52,6 +57,8 @@ class DataCreateDialog(qt4.QDialog):
         # connect create button
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
                       self.createButtonClickedSlot )
+        self.connect( self.replacebutton, qt4.SIGNAL('clicked()'),
+                      self.createButtonClickedSlot )
 
         # connect notification of document change
         self.connect( self.document, qt4.SIGNAL("sigModified"),
@@ -64,11 +71,14 @@ class DataCreateDialog(qt4.QDialog):
         self.tstepsedit.setValidator( qt4.QIntValidator(1, 99999999, self) )
 
         # connect up edit control to update create button status
-        for i in (self.numstepsedit, self.tstartedit, self.tendedit,
-                  self.tstepsedit, self.nameedit,
-                  self.valueedit):
-            self.connect( i, qt4.SIGNAL('editTextChanged(const QString &)'),
+        for edit in (self.numstepsedit, self.tstartedit, self.tendedit,
+                     self.tstepsedit, self.nameedit,
+                     self.valueedit):
+            self.connect( edit, qt4.SIGNAL('editTextChanged(const QString &)'),
                           self.editsEditSlot )
+
+        self.connect( self.nameedit, qt4.SIGNAL('currentIndexChanged(int)'),
+                      self.datasetSelected )
 
         # edit controls for dataset
         self.dsedits = { 'data': self.valueedit, 'serr': self.symerroredit,
@@ -112,6 +122,31 @@ class DataCreateDialog(qt4.QDialog):
         """Update create button if document changes."""
         self.editsEditSlot('')
 
+    def datasetSelected(self, index):
+        """If dataset is selected from drop down box, reload entries
+        for editing."""
+
+        if index >= 0:
+            dsname = unicode( self.nameedit.text() )
+            self.reEditDataset(dsname)
+
+    def reEditDataset(self, dsname):
+        """Given a dataset name, allow it to be edited again
+        (if it is editable)."""
+
+        ds = self.document.data[dsname]
+        if isinstance(ds, document.DatasetExpression): 
+            # change selected method
+            self.methodBG.button(2).click()
+            # make sure name is set
+            self.nameedit.setText(dsname)
+            # set expressions
+            for part in self.dsedits.iterkeys():
+                text = ds.expr[part]
+                if text is None:
+                    text = ''
+                self.dsedits[part].setText(text)
+
     def editsEditSlot(self, dummytext):
         """Enable/disable createbutton."""
 
@@ -138,27 +173,47 @@ class DataCreateDialog(qt4.QDialog):
         if len(unicode(self.valueedit.text())) == 0:
             editsokay = False
 
-        self.createbutton.setEnabled(dsvalid and (not dsexists) and editsokay)
+        # hide / show create button depending whether dataset exists
+        self.createbutton.setVisible(not dsexists)
+        self.replacebutton.setVisible(dsexists)
+        
+        # enable buttons if expressions valid
+        enabled = dsvalid and editsokay
+        self.createbutton.setEnabled(enabled)
+        self.replacebutton.setEnabled(enabled)
 
     def createButtonClickedSlot(self):
         """Create button pressed."""
         
+        dsname = unicode( self.nameedit.text() )
+        dsexists = dsname in self.document.data
+
         try:
-            name = unicode( self.nameedit.text() )
-            
-            fn = [ self.createFromRange,
-                   self.createParametric,
-                   self.createFromExpression ][self.methodBG.checkedId()]
+            # select function to create dataset with
+            createfn = [
+                self.createFromRange,
+                self.createParametric,
+                self.createFromExpression ][self.methodBG.checkedId()]
 
-            # make a new dataset from the returned data
-            fn(name)
+            # make a new dataset using method
+            op = createfn(dsname)
+            self.document.applyOperation(op)
 
-            self.statuslabel.setText("Created dataset '%s'" % name)
+            if dsexists:
+                status = "Replaced dataset '%s'" % dsname
+            else:
+                status = "Created dataset '%s'" % dsname
+            self.statuslabel.setText(status)
 
         except (document.CreateDatasetException,
                 document.DatasetException, _DSException), e:
+
             # all bad roads lead here - take exception string and tell user
-            self.statuslabel.setText("Creation failed")
+            if dsexists:
+                status = "Replacement failed"
+            else:
+                status = "Creation failed"
+            self.statuslabel.setText(status)
             qt4.QMessageBox("Veusz",
                            unicode(e),
                            qt4.QMessageBox.Warning,
@@ -204,8 +259,7 @@ class DataCreateDialog(qt4.QDialog):
                 
             vals[key] = (minval, maxval)
             
-        op = document.OperationDatasetCreateRange(name, numsteps, vals)
-        self.document.applyOperation(op)
+        return document.OperationDatasetCreateRange(name, numsteps, vals)
 
     def createParametric(self, name):
         """Use a parametric form to create the dataset.
@@ -223,9 +277,9 @@ class DataCreateDialog(qt4.QDialog):
             if text:
                 vals[key] = text
            
-        op = document.OperationDatasetCreateParameteric(name, t0, t1, numsteps,
-                                                        vals)
-        self.document.applyOperation(op)
+        return document.OperationDatasetCreateParameteric(name,
+                                                          t0, t1, numsteps,
+                                                          vals)
       
     def createFromExpression(self, name):
         """Create a dataset based on the expressions given."""
@@ -240,4 +294,4 @@ class DataCreateDialog(qt4.QDialog):
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
         op = document.OperationDatasetCreateExpression(name, vals, link)
         op.validateExpression(self.document)
-        self.document.applyOperation(op)
+        return op

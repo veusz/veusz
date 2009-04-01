@@ -271,6 +271,8 @@ class DataEditDialog(qt4.QDialog):
                      self.slotDatasetImport)
         self.connect(self.createbutton, qt4.SIGNAL('clicked()'),
                      self.slotDatasetCreate)
+        self.connect(self.editbutton, qt4.SIGNAL('clicked()'),
+                     self.slotDatasetEdit)
 
     def slotDatasetSelected(self, current, deselected):
         """Called when a new dataset is selected."""
@@ -308,7 +310,7 @@ class DataEditDialog(qt4.QDialog):
             fn = ds.linked.filename
             unlink = True
         text = 'Linked file: %s' % fn
-        
+
         if isinstance(ds, document.DatasetExpression):
             # for datasets linked by expressions
             items = ['Linked expression dataset:']
@@ -320,6 +322,7 @@ class DataEditDialog(qt4.QDialog):
             unlink = True
             readonly = True
             
+        self.editbutton.setVisible( ds.recreatable_dataset )
         self.unlinkbutton.setEnabled(unlink)
         self.linkedlabel.setText(text)
 
@@ -341,8 +344,6 @@ class DataEditDialog(qt4.QDialog):
         datasetname = self.getSelectedDataset()
         if datasetname is not None:
             self.document.applyOperation(document.OperationDatasetDelete(datasetname))
-        print self.getSelectedDataset()
-        
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
@@ -372,3 +373,11 @@ class DataEditDialog(qt4.QDialog):
     def slotDatasetCreate(self):
         """Show dataset creation dialog."""
         self.parent().slotDataCreate()
+
+    def slotDatasetEdit(self):
+        """Reload dataset into dataset create dialog."""
+        dsname = unicode(self.getSelectedDataset())
+        if dsname:
+            dialog = self.parent().slotDataCreate()
+            dialog.reEditDataset(dsname)
+
