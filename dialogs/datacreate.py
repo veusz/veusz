@@ -134,7 +134,10 @@ class DataCreateDialog(qt4.QDialog):
         """Given a dataset name, allow it to be edited again
         (if it is editable)."""
 
-        ds = self.document.data[dsname]
+        try:
+            ds = self.document.data[dsname]
+        except KeyError:
+            return
         if isinstance(ds, document.DatasetExpression): 
             # change selected method
             self.methodBG.button(2).click()
