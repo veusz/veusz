@@ -246,7 +246,9 @@ class Document( qt4.QObject ):
         if newname in self.data:
             raise ValueError, "Dataset %s already exists" % newname
 
-        self.data[newname] = self.data[name].duplicate()
+        duplicate = self.data[name].duplicate()
+        duplicate.document = self
+        self.data[newname] = duplicate
         self.setModified()
 
     def getData(self, name):
