@@ -22,7 +22,6 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
-import re
 import itertools
 import os.path
 
@@ -43,6 +42,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.slotDocumentModified)
 
     def rowCount(self, parent):
         """Return number of rows."""
@@ -52,6 +53,10 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         except (KeyError, AttributeError):
             return 0
         
+    def slotDocumentModified(self):
+        """Called when document modified."""
+        self.emit( qt4.SIGNAL('layoutChanged()') )
+
     def columnCount(self, parent):
         ds = self.document.data[self.dsname]
         return len( ds.column_descriptions )
@@ -73,7 +78,10 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
-                ds = self.document.data[self.dsname]
+                try:
+                    ds = self.document.data[self.dsname]
+                except KeyError:
+                    return qt4.QVariant()
                 return qt4.QVariant( ds.column_descriptions[section] )
             else:
                 # return row numbers
@@ -89,6 +97,16 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         else:
             return qt4.QAbstractTableModel.flags(self, index) | qt4.Qt.ItemIsEditable
 
+    def removeRows(self, row, count):
+        """Remove rows."""
+        self.document.applyOperation(
+            document.OperationDatasetDeleteRow(self.dsname, row, count))
+
+    def insertRows(self, row, count):
+        """Remove rows."""
+        self.document.applyOperation(
+            document.OperationDatasetInsertRow(self.dsname, row, count))
+
     def setData(self, index, value, role):
         """Called to set the data."""
 
@@ -100,8 +118,9 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
             # add new column if necessary
             if data is None:
-                self.document.applyOperation( document.OperationDatasetAddColumn(self.dsname,
-                                                                                 ds.columns[column]) )
+                self.document.applyOperation(
+                    document.OperationDatasetAddColumn(self.dsname,
+                                                       ds.columns[column]) )
 
 
             # update if conversion okay
@@ -216,11 +235,12 @@ class DatasetListModel(qt4.QAbstractListModel):
         if index.isValid() and role == qt4.Qt.EditRole:
             name = self.datasetName(index)
             newname = unicode( value.toString() )
-            if not re.match(r'^[A-za-z][^ +-,]+$', newname):
+            if not utils.validateDatasetName(newname):
                 return False
 
             self.datasets[index.row()] = newname
-            self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &'), index, index)
+            self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &'),
+                      index, index)
 
             self.document.applyOperation(document.OperationDatasetRename(name, newname))
             return True
@@ -242,6 +262,18 @@ class DataEditDialog(qt4.QDialog):
         # set up dataset list
         self.dslistmodel = DatasetListModel(self, document)
         self.datasetlistview.setModel(self.dslistmodel)
+
+        # actions for data table
+        for text, slot in (
+            ('Delete row', self.slotDeleteRow),
+            ('Insert row', self.slotInsertRow),
+            ):
+            act = qt4.QAction(text, self)
+            self.connect(act, qt4.SIGNAL('triggered()'), slot)
+            self.datatableview.addAction(act)
+        self.datatableview.setContextMenuPolicy( qt4.Qt.ActionsContextMenu )
+
+        # layout edit dialog improvement
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 3)
 
@@ -364,7 +396,8 @@ class DataEditDialog(qt4.QDialog):
                 newname = '%s_copy_%i' % (datasetname, index)
                 index += 1
 
-            self.document.applyOperation(document.OperationDatasetDuplicate(datasetname, newname))
+            self.document.applyOperation(
+                document.OperationDatasetDuplicate(datasetname, newname))
 
     def slotDatasetImport(self):
         """Show import dialog."""
@@ -381,3 +414,12 @@ class DataEditDialog(qt4.QDialog):
             dialog = self.parent().slotDataCreate()
             dialog.reEditDataset(dsname)
 
+    def slotDeleteRow(self):
+        """Delete the current row."""
+        self.datatableview.model().removeRows(
+            self.datatableview.currentIndex().row(), 1)
+
+    def slotInsertRow(self):
+        """Insert a new row."""
+        self.datatableview.model().insertRows(
+            self.datatableview.currentIndex().row(), 1)

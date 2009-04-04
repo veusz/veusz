@@ -353,6 +353,18 @@ class DatasetBase(object):
 
         return len(self.data)
     
+    def deleteRows(self, row, numrows):
+        """Delete numrows rows starting from row.
+        Returns deleted rows as a dict of {column:data, ...}
+        """
+        pass
+
+    def insertRows(self, row, numrows, rowdata):
+        """Insert numrows rows starting from row.
+        rowdata is a dict of {column: data}.
+        """
+        pass
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -572,6 +584,31 @@ class Dataset(DatasetBase):
         """Return a value cast to this dataset data type."""
         return float(val)
 
+    def deleteRows(self, row, numrows):
+        """Delete numrows rows starting from row.
+        Returns deleted rows as a dict of {column:data, ...}
+        """
+        retn = {}
+        for col in self.columns:
+            coldata = getattr(self, col)
+            if coldata is not None:
+                retn[col] = coldata[row:row+numrows]
+                setattr(self, col, N.delete( coldata, N.s_[row:row+numrows] ))
+        
+        return retn
+
+    def insertRows(self, row, numrows, rowdata):
+        """Insert numrows rows starting from row.
+        rowdata is a dict of {column: data}.
+        """
+        for col in self.columns:
+           coldata = getattr(self, col)
+           data = N.zeros(numrows)
+           if col in rowdata:
+               data[:len(rowdata[col])] = N.array(rowdata[col])
+           if coldata is not None:
+               setattr(self, col, N.insert(coldata, [row]*numrows, data))
+
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
@@ -596,7 +633,7 @@ class DatasetText(DatasetBase):
         return DatasetText(data=self.data) # data is copied by this constructor
 
     def changeValues(self, type, vals):
-        if type == 'vals':
+        if type == 'data':
             self.data = list(vals)
         else:
             raise ValueError, 'type does not contain an allowed value'
@@ -622,6 +659,24 @@ class DatasetText(DatasetBase):
             r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
             file.write(r)
         file.write( "''')\n" )
+
+    def deleteRows(self, row, numrows):
+        """Delete numrows rows starting from row.
+        Returns deleted rows as a dict of {column:data, ...}
+        """
+        retn = {'data': self.data[row:row+numrows]}
+        del self.data[row:row+numrows]
+        return retn
+
+    def insertRows(self, row, numrows, rowdata):
+        """Insert numrows rows starting from row.
+        rowdata is a dict of {column: data}.
+        """
+        data = rowdata.get('data', [])
+
+        insdata = data + (['']*(numrows-len(data)))
+        for d in insdata[::-1]:
+            self.data.insert(row, d)
 
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
@@ -837,6 +892,12 @@ class DatasetExpression(Dataset):
                 args[col] = array[key]
         
         return Dataset(**args)
+
+    def deleteRows(self, row, numrows):
+        pass
+
+    def insertRows(self, row, numrows, rowdata):
+        pass
 
 def getSpacing(data):
     """Given a set of values, get minimum, maximum, step size

@@ -46,7 +46,7 @@ def reverse(data):
     for index in xrange(len(data)-1, -1, -1):
         yield data[index]
 
-dsname_re = re.compile('[A-Za-z][A-Za-z0-9_]*')
+dsname_re = re.compile('^[A-Za-z][A-Za-z0-9_]*$')
 def validateDatasetName(name):
     """Validate dataset name is okay."""
     return dsname_re.match(name) is not None

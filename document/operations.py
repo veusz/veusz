@@ -1059,6 +1059,48 @@ class OperationDatasetSetVal(object):
         datacol[self.row] = self.oldval
         ds.changeValues(self.columnname, datacol)
     
+class OperationDatasetDeleteRow(object):
+    """Delete a row or several in the dataset."""
+
+    descr = 'delete dataset row'
+    
+    def __init__(self, datasetname, row, numrows=1):
+        """Delete a row in a dataset."""
+        self.datasetname = datasetname
+        self.row = row
+        self.numrows = numrows
+        
+    def do(self, document):
+        """Set the value."""
+        ds = document.data[self.datasetname]
+        self.saveddata = ds.deleteRows(self.row, self.numrows)
+
+    def undo(self, document):
+        """Restore the value."""
+        ds = document.data[self.datasetname]
+        ds.insertRows(self.row, self.numrows, self.saveddata)
+
+class OperationDatasetInsertRow(object):
+    """Insert a row or several in the dataset."""
+
+    descr = 'insert dataset row'
+    
+    def __init__(self, datasetname, row, numrows=1):
+        """Delete a row in a dataset."""
+        self.datasetname = datasetname
+        self.row = row
+        self.numrows = numrows
+        
+    def do(self, document):
+        """Set the value."""
+        ds = document.data[self.datasetname]
+        ds.insertRows(self.row, self.numrows, {})
+
+    def undo(self, document):
+        """Restore the value."""
+        ds = document.data[self.datasetname]
+        ds.deleteRows(self.row, self.numrows)
+
 ###############################################################################
 # Misc operations
         
