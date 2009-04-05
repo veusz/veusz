@@ -113,7 +113,7 @@ class LinkedFile(LinkedFileBase):
 
         if self.prefix:
             params.append('prefix=%s' % repr(self.prefix))
-        if self.prefix:
+        if self.suffix:
             params.append('suffix=%s' % repr(self.suffix))
 
         file.write('ImportFile(%s)\n' % (', '.join(params)))
@@ -133,8 +133,10 @@ class LinkedFile(LinkedFileBase):
         tempdoc = doc.Document()
         sr = simpleread.SimpleRead(self.descriptor)
         sr.readData( simpleread.FileStream(open(self.filename,  'rU')),
-                     useblocks=self.useblocks )
-        sr.setInDocument(tempdoc, linkedfile=self)
+                     useblocks=self.useblocks,
+                     ignoretext=self.ignoretext)
+        sr.setInDocument(tempdoc, linkedfile=self,
+                         prefix=self.prefix, suffix=self.suffix)
 
         errors = sr.getInvalidConversions()
 
@@ -248,7 +250,7 @@ class LinkedFITSFile(LinkedFileBase):
 class LinkedCSVFile(LinkedFileBase):
     """A CSV file linked to datasets."""
 
-    def __init__(self, filename, readrows=False, prefix=None):
+    def __init__(self, filename, readrows=False, prefix='', suffix=''):
         """Read CSV data from filename
 
         Read across rather than down if readrows
@@ -258,6 +260,7 @@ class LinkedCSVFile(LinkedFileBase):
         self.filename = filename
         self.readrows = readrows
         self.prefix = prefix
+        self.suffix = suffix
 
     def saveToFile(self, file):
         """Save the link to the document file."""
@@ -265,7 +268,9 @@ class LinkedCSVFile(LinkedFileBase):
         params = [repr(self.filename),
                   'linked=True']
         if self.prefix:
-            params.append('prefix=%s' % repr(self.prefix))
+            params.append('dsprefix=%s' % repr(self.prefix))
+        if self.suffix:
+            params.append('dssuffix=%s' % repr(self.suffix))
         if self.readrows:
             params.append('readrows=True')
 
@@ -279,7 +284,7 @@ class LinkedCSVFile(LinkedFileBase):
 
         tempdoc = doc.Document()
         csv = readcsv.ReadCSV(self.filename, readrows=self.readrows,
-                              prefix=self.prefix)
+                              prefix=self.prefix, suffix=self.suffix)
         csv.readData()
         csv.setData(tempdoc, linkedfile=self)
 

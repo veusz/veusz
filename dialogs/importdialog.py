@@ -396,6 +396,15 @@ class ImportDialog2(qt4.QDialog):
 
         return lines
 
+    def getPrefixSuffix(self, filename):
+        """Get prefix and suffix values."""
+        f = utils.escapeDatasetName( os.path.basename(filename) )
+        prefix = unicode( self.prefixcombo.lineEdit().text() )
+        prefix = prefix.replace('$FILENAME', f)
+        suffix = unicode( self.suffixcombo.lineEdit().text() )
+        suffix = suffix.replace('$FILENAME', f)
+        return prefix, suffix
+
     def importStandard(self, filename, linked):
         """Standard Veusz importing."""
 
@@ -405,11 +414,7 @@ class ImportDialog2(qt4.QDialog):
         ignoretext = self.ignoretextcheckbox.isChecked()
 
         # substitute filename if required
-        f = utils.escapeDatasetName( os.path.basename(filename) )
-        prefix = unicode( self.prefixcombo.lineEdit().text() )
-        prefix = prefix.replace('$FILENAME', f)
-        suffix = unicode( self.suffixcombo.lineEdit().text() )
-        suffix = suffix.replace('$FILENAME', f)
+        prefix, suffix = self.getPrefixSuffix(filename)
 
         try:
             # construct operation. this checks the descriptor.
@@ -458,12 +463,11 @@ class ImportDialog2(qt4.QDialog):
 
         # get various values
         inrows = self.directioncombo.currentIndex() == 1
-        prefix = unicode( self.prefixedit.text() )
-        if len(prefix.strip()) == 0:
-            prefix = None
+        prefix, suffix = self.getPrefixSuffix(filename)
 
         op = document.OperationDataImportCSV(filename, readrows=inrows,
-                                             prefix=prefix, linked=linked)
+                                             prefix=prefix, suffix=suffix,
+                                             linked=linked)
         
         # show a busy cursor
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )

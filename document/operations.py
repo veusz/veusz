@@ -715,7 +715,8 @@ class OperationDataImportCSV(object):
 
     descr = 'import CSV data'
 
-    def __init__(self, filename, readrows=False, prefix=None, linked=False):
+    def __init__(self, filename, readrows=False, prefix='', suffix='',
+                 linked=False):
         """Import CSV data from filename
 
         If readrows, then read in rows rather than columns.
@@ -726,18 +727,19 @@ class OperationDataImportCSV(object):
         self.filename = filename
         self.readrows = readrows
         self.prefix = prefix
+        self.suffix = suffix
         self.linked = linked
 
     def do(self, document):
         """Do the data import."""
         
         csvr = readcsv.ReadCSV(self.filename, readrows=self.readrows,
-                               prefix=self.prefix)
+                               prefix=self.prefix, suffix=self.suffix)
         csvr.readData()
 
         if self.linked:
             LF = datasets.LinkedCSVFile(self.filename, readrows=self.readrows,
-                                        prefix=self.prefix)
+                                        prefix=self.prefix, suffix=self.suffix)
         else:
             LF = None
 

@@ -25,7 +25,7 @@ import csv
 
 import datasets
 
-class _FileReaderCols:
+class _FileReaderCols(object):
     """Read a CSV file in rows. This acts as an iterator.
 
     This is a very simple wrapper around the csv module
@@ -38,7 +38,7 @@ class _FileReaderCols:
         """Return next row."""
         return self.csvreader.next()
 
-class _FileReaderRows:
+class _FileReaderRows(object):
     """Read a CSV file in columns. This acts as an iterator.
 
     This means we have to read the whole file in, then return cols :-(
@@ -71,10 +71,10 @@ class _FileReaderRows:
         self.counter += 1
         return retn
 
-class ReadCSV:
+class ReadCSV(object):
     """A class to import data from CSV files."""
 
-    def __init__(self, filename, readrows=False, prefix=None):
+    def __init__(self, filename, readrows=False, prefix='', suffix=''):
         """Initialise the reader to import data from filename.
 
         If readrows is True, then data are read from columns, rather than
@@ -86,6 +86,7 @@ class ReadCSV:
         self.filename = filename
         self.readrows = readrows
         self.prefix = prefix
+        self.suffix = suffix
 
         # datasets. Each name is associated with a list
         self.data = {}
@@ -97,9 +98,7 @@ class ReadCSV:
         else:
             prefix = 'col'
 
-        name = '%s%i' % (prefix, column+1)
-        if self.prefix is not None:
-            name = '%s_%s' % (self.prefix, name)
+        name = '%s%s%i%s' % (self.prefix, prefix, column+1, self.suffix)
         return name
 
     def readData(self):
@@ -162,9 +161,8 @@ class ReadCSV:
                             name = self._generateName(colnum)
 
                     else:
-                        # add on prefix if reqd
-                        if self.prefix is not None:
-                            name = '%s_%s' % (self.prefix, name)
+                        # add on prefix/suffix
+                        name = '%s%s%s' % (self.prefix, name, self.suffix)
 
                     # check whether a text column
                     if name.split()[-1] == '(text)':

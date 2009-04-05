@@ -393,16 +393,26 @@ class CommandInterface(qt4.QObject):
         return (dsnames, errors)
 
     def ImportFileCSV(self, filename, readrows=False, prefix=None,
+                      dsprefix='', dssuffix='',
                       linked=False):
         """Read data from a comma separated file (CSV).
 
         Data are read from filename
         If readrows is True, then data are read across rather than down
-        Variable names are prepended with prefix if set
+        
+        Dataset names are prepended and appended, by dsprefix and dssuffix,
+        respectively
+         (prefix is backware compatibility only, it adds an underscore
+          relative to dsprefix)
+
         If linked is True the data are linked with the file."""
 
+        if prefix:
+            dsprefix = prefix + '_'
+
         op = operations.OperationDataImportCSV(filename, readrows=readrows,
-                                               prefix=prefix, linked=linked)
+                                               prefix=dsprefix, suffix=dssuffix,
+                                               linked=linked)
         dsnames = self.document.applyOperation(op)
             
         if self.verbose:
