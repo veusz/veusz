@@ -418,6 +418,7 @@ class DataEditDialog(qt4.QDialog):
     def slotCopy(self):
         """Copy text from selection."""
 
+        # get list of selected rows and columns
         selmodel = self.datatableview.selectionModel()
         model = self.datatableview.model()
         indices = []
@@ -425,12 +426,14 @@ class DataEditDialog(qt4.QDialog):
             indices.append( (index.row(), index.column()) )
         indices.sort()
 
+        # build up text stream for copying to clipboard
         lines = []
         rowitems = []
         lastrow = -1
         for row, column in indices:
             if row != lastrow:
                 if rowitems:
+                    # items are tab separated
                     lines.append( '\t'.join(rowitems) )
                     rowitems = []
                 lastrow = row
@@ -438,8 +441,11 @@ class DataEditDialog(qt4.QDialog):
                 model.createIndex(row, column).data().toString()) )
         if rowitems:
             lines.append( '\t'.join(rowitems) )
+        lines.append('')  # blank line at end
         lines = '\n'.join(lines)
-        print lines
+
+        # put text on clipboard
+        qt4.QApplication.clipboard().setText(lines)
 
     def slotDeleteRow(self):
         """Delete the current row."""
