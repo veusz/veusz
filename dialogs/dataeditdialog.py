@@ -265,6 +265,7 @@ class DataEditDialog(qt4.QDialog):
 
         # actions for data table
         for text, slot in (
+            ('Copy', self.slotCopy),
             ('Delete row', self.slotDeleteRow),
             ('Insert row', self.slotInsertRow),
             ):
@@ -413,6 +414,32 @@ class DataEditDialog(qt4.QDialog):
         if dsname:
             dialog = self.parent().slotDataCreate()
             dialog.reEditDataset(dsname)
+
+    def slotCopy(self):
+        """Copy text from selection."""
+
+        selmodel = self.datatableview.selectionModel()
+        model = self.datatableview.model()
+        indices = []
+        for index in selmodel.selectedIndexes():
+            indices.append( (index.row(), index.column()) )
+        indices.sort()
+
+        lines = []
+        rowitems = []
+        lastrow = -1
+        for row, column in indices:
+            if row != lastrow:
+                if rowitems:
+                    lines.append( '\t'.join(rowitems) )
+                    rowitems = []
+                lastrow = row
+            rowitems.append( unicode(
+                model.createIndex(row, column).data().toString()) )
+        if rowitems:
+            lines.append( '\t'.join(rowitems) )
+        lines = '\n'.join(lines)
+        print lines
 
     def slotDeleteRow(self):
         """Delete the current row."""
