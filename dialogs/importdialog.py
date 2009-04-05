@@ -501,6 +501,9 @@ class ImportDialog2(qt4.QDialog):
         data = self.fitsitemdata[hdunum]
 
         name = unicode(self.fitsdatasetname.text())
+        # get values of prefix and suffix set in dialog
+        prefix, suffix = self.getPrefixSuffix(filename)
+        name = prefix + name + suffix
 
         if data[0] == 'table':
             # get list of appropriate columns
@@ -520,6 +523,7 @@ class ImportDialog2(qt4.QDialog):
             # item is an image, so no columns
             cols = [None]*4
 
+        # construct operation to import fits
         op = document.OperationDataImportFITS(name, filename, hdunum,
                                               datacol=cols[0],
                                               symerrcol=cols[1],
