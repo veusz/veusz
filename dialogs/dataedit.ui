@@ -59,10 +59,19 @@
            <property name="text" >
             <string>Linked file: None</string>
            </property>
+           <property name="wordWrap" >
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="editbutton" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text" >
             <string>Edit</string>
            </property>
@@ -71,7 +80,7 @@
          <item>
           <widget class="QPushButton" name="unlinkbutton" >
            <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
