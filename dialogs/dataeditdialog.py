@@ -47,7 +47,6 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def rowCount(self, parent):
         """Return number of rows."""
-
         try:
             return len(self.document.data[self.dsname].data)
         except (KeyError, AttributeError):
@@ -58,10 +57,15 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         self.emit( qt4.SIGNAL('layoutChanged()') )
 
     def columnCount(self, parent):
-        ds = self.document.data[self.dsname]
+        """Return number of columns."""
+        try:
+            ds = self.document.data[self.dsname]
+        except KeyError:
+            return 0
         return len( ds.column_descriptions )
 
     def data(self, index, role):
+        """Return data associated with column given."""
         if role == qt4.Qt.DisplayRole:
             # select correct part of dataset
             ds = self.document.data[self.dsname]
