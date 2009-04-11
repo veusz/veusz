@@ -95,6 +95,7 @@ class HistoryCombo(qt4.QComboBox):
     def loadHistory(self):
         """Load contents of history combo from settings."""
         self.clear()
+        print self.getSettingName()
         history = setting.settingdb.get(self.getSettingName(), self.default)
         self.insertItems(0, history)
 

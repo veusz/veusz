@@ -287,7 +287,7 @@ class _DescriptorPart(object):
 
     def setInDocument(self, thedatasets, document, block=None,
                       linkedfile=None,
-                      prefix='', suffix=''):
+                      prefix="", suffix=""):
         """Set the read-in data in the document."""
 
         names = []
@@ -661,7 +661,8 @@ class SimpleRead2D(object):
         if self.transpose:
             self.data = N.transpose(self.data).copy()
 
-    def setInDocument(self, document, linkedfile=None):
+    def setInDocument(self, document, linkedfile=None,
+                      prefix="", suffix=""):
         """Set the data in the document.
 
         Returns list containing name of dataset read
@@ -671,7 +672,8 @@ class SimpleRead2D(object):
                                 yrange=self.yrange)
         ds.linked = linkedfile
 
-        document.setData(self.name, ds)
+        fullname = prefix + self.name + suffix
+        document.setData(fullname, ds)
         
-        return [self.name]
+        return [fullname]
 

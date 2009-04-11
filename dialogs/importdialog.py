@@ -554,7 +554,7 @@ class ImportDialog2(qt4.QDialog):
         datasets = re.split('[, ]+', datasets)
 
         # strip out blank items
-        datasets = [i for i in datasets if i != '']
+        datasets = [d for d in datasets if d != '']
 
         # an obvious error...
         if len(datasets) == 0:
@@ -575,16 +575,19 @@ class ImportDialog2(qt4.QDialog):
             ranges.append(r)
 
         # propagate settings from dialog to reader
-        xrange = None
-        yrange = None
+        rangex = None
+        rangey = None
         if ranges[0] is not None and ranges[1] is not None:
-            xrange = (ranges[0], ranges[1])
+            rangex = (ranges[0], ranges[1])
         if ranges[2] is not None and ranges[3] is not None:
-            yrange = (ranges[2], ranges[3])
+            rangey = (ranges[2], ranges[3])
 
         invertrows = self.twod_invertrowscheck.isChecked()
         invertcols = self.twod_invertcolscheck.isChecked()
         transpose = self.twod_transposecheck.isChecked()
+
+        # substitute filename if required
+        prefix, suffix = self.getPrefixSuffix(filename)
 
         # show a busy cursor
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
@@ -592,10 +595,11 @@ class ImportDialog2(qt4.QDialog):
         # loop over datasets and read...
         try:
             op = document.OperationDataImport2D(datasets, filename=filename,
-                                                xrange=xrange, yrange=yrange,
+                                                xrange=rangex, yrange=rangey,
                                                 invertrows=invertrows,
                                                 invertcols=invertcols,
                                                 transpose=transpose,
+                                                prefix=prefix, suffix=suffix,
                                                 linked=linked)
             readds = self.document.applyOperation(op)
 

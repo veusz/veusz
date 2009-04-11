@@ -159,14 +159,17 @@ class Linked2DFile(LinkedFileBase):
         self.invertrows = None
         self.invertcols = None
         self.transpose = None
+        self.prefix = ''
+        self.suffix = ''
 
     def saveToFile(self, file):
         '''Save the link to the document file.'''
 
         args = [repr(self.filename), repr(self.datasets)]
-        for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose'):
+        for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose',
+                  'prefix', 'suffix'):
             v = getattr(self, p)
-            if v is not None:
+            if (v is not None) and (v != ''):
                 args.append( '%s=%s' % (p, repr(v)) )
         args.append('linked=True')
 
@@ -185,7 +188,9 @@ class Linked2DFile(LinkedFileBase):
                                                   yrange=self.yrange,
                                                   invertrows=self.invertrows,
                                                   invertcols=self.invertcols,
-                                                  transpose=self.transpose)
+                                                  transpose=self.transpose,
+                                                  prefix=self.prefix,
+                                                  suffix=self.suffix)
             tempdoc.applyOperation(op)
         except simpleread.Read2DError:
             errors = {}

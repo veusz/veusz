@@ -332,6 +332,7 @@ class CommandInterface(qt4.QObject):
 
     def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
                      invertrows=None, invertcols=None, transpose=None,
+                     prefix="", suffix="",
                      linked=False):
         """Import two-dimensional data from a file.
         filename is the name of the file to read
@@ -344,6 +345,8 @@ class CommandInterface(qt4.QObject):
         if invertcols=True, then cols are inverted when read
         if transpose=True, then rows and columns are swapped
 
+        prefix and suffix are prepended and appended to dataset names
+
         if linked=True then the dataset is linked to the file
         """
 
@@ -353,6 +356,7 @@ class CommandInterface(qt4.QObject):
         op = operations.OperationDataImport2D(datasetnames, filename=filename, xrange=xrange,
                                               yrange=yrange, invertrows=invertrows,
                                               invertcols=invertcols, transpose=transpose,
+                                              prefix=prefix, suffix=suffix,
                                               linked=linked)
         self.document.applyOperation(op)
         if self.verbose:

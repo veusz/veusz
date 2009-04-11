@@ -651,7 +651,9 @@ class OperationDataImport(object):
         if reading from a file, linked specfies whether linked
         filename is the filename if reading from a file
         datastr is a string to read from if reading from a string
-        
+
+        prefix and suffix are strings to add before and after dataset names
+
         filename and datastr are exclusive
         """
         
@@ -766,6 +768,7 @@ class OperationDataImport2D(object):
                  filename=None, datastr=None,
                  xrange=None, yrange=None,
                  invertrows=None, invertcols=None, transpose=None,
+                 prefix="", suffix="",
                  linked=False):
         """Import two-dimensional data from a file.
         filename is the name of the file to read,
@@ -779,6 +782,8 @@ class OperationDataImport2D(object):
         if invertcols=True, then cols are inverted when read
         if transpose=True, then rows and columns are swapped
 
+        prefix and suffix are strings to add before and after dataset names
+
         if linked=True then the dataset is linked to the file
         """
 
@@ -790,6 +795,8 @@ class OperationDataImport2D(object):
         self.invertrows = invertrows
         self.invertcols = invertcols
         self.transpose = transpose
+        self.prefix = prefix
+        self.suffix = suffix
         self.linked = linked
         
     def do(self, document):
@@ -798,7 +805,7 @@ class OperationDataImport2D(object):
         Returns list of datasets read."""
         
         if self.filename is not None:
-            stream = simpleread.FileStream( open(self.filename) )
+            stream = simpleread.FileStream( open(self.filename, 'rU') )
         elif self.datastr is not None:
             stream = simpleread.StringStream(self.datastr)
         else:
@@ -812,6 +819,8 @@ class OperationDataImport2D(object):
             LF.invertrows = self.invertrows
             LF.invertcols = self.invertcols
             LF.transpose = self.transpose
+            LF.prefix = self.prefix
+            LF.suffix = self.suffix
         else:
             LF = None
 
@@ -833,7 +842,9 @@ class OperationDataImport2D(object):
                 sr.transpose = self.transpose
 
             sr.readData(stream)
-            readds += sr.setInDocument(document, linkedfile=LF)
+            readds += sr.setInDocument(document, linkedfile=LF,
+                                       prefix=self.prefix,
+                                       suffix=self.suffix)
         return readds
 
     def undo(self, document):
