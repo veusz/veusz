@@ -164,7 +164,11 @@ class ImportDialog2(qt4.QDialog):
             self.previewedit.setPlainText('')
             return False
 
-        text = ifile.read(2048)+'\n...\n'
+        text = ifile.read(4096)+'\n'
+        if len(ifile.read(1)) != 0:
+            # if there is remaining data add ...
+            text += '...\n'
+
         self.previewedit.setPlainText(text)
         return True
 
@@ -256,7 +260,10 @@ class ImportDialog2(qt4.QDialog):
             self.twod_previewedit.setPlainText('')
             return False
 
-        text = ifile.read(2048) + '\n...\n'
+        text = ifile.read(4096)+'\n'
+        if len(ifile.read(1)) != 0:
+            # if there is remaining data add ...
+            text += '...\n'
         self.twod_previewedit.setPlainText(text)
         return True
 
