@@ -50,6 +50,7 @@ class HistoryCombo(qt4.QComboBox):
             qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
         self.default = []
+        self.hasshown = False
 
     def text(self):
         """Get text in combobox
@@ -95,12 +96,17 @@ class HistoryCombo(qt4.QComboBox):
     def loadHistory(self):
         """Load contents of history combo from settings."""
         self.clear()
-        print self.getSettingName()
         history = setting.settingdb.get(self.getSettingName(), self.default)
         self.insertItems(0, history)
 
+        self.hasshown = True
+
     def saveHistory(self):
         """Save contents of history combo to settings."""
+
+        # only save history if it has been loaded
+        if not self.hasshown:
+            return
 
         # collect current items
         history = [ unicode(self.itemText(i)) for i in xrange(self.count()) ]
