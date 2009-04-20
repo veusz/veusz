@@ -45,19 +45,12 @@ import cStringIO
 
 import numpy as N
 
+import veusz.utils as utils
 import datasets
 
 class DescriptorError(ValueError):
     """Used to indicate an error with the descriptor."""
     pass
-
-# date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
-# date and time part are optional (check we have at least one!)
-date_re = re.compile( r'''
-^
-([0-9]{4}-[0-9]{2}-[0-9]{2})? T? ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)?
-$
-''', re.VERBOSE )
 
 # this is a regular expression to match properly quoted strings
 # hopefully a matching expression can be passed to eval
@@ -110,8 +103,7 @@ def guessDataType(val):
         return 'string'
 
     # date
-    m = date_re.match(val)
-    if m and (m.group(1) is not None or m.group(2) is not None):
+    if utils.isDateTime(val):
         return 'date'
 
     # assume string otherwise
@@ -267,20 +259,7 @@ class _DescriptorPart(object):
                         dat = val
                         
                 elif self.datatype == 'date':
-                    m = date_re.match(val)
-                    if m:
-                        # break up into bits
-                        # FIXME
-                        date, time = m.groups()
-                        if date and time:
-                            pass
-                        elif date:
-                            pass
-                        else:
-                            pass
-                    else:
-                        # bad date
-                        dat = N.nan
+                    dat = utils.dateStringToDate(val)
 
                 # add data into dataset
                 dataset.append(dat)

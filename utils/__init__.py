@@ -27,4 +27,5 @@ from version import *
 from fitlm import *
 from action import *
 from pdf import *
+from dates import *
 from safe_eval import veusz_eval_context, checkCode
