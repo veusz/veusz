@@ -114,13 +114,17 @@ symbols = {
 
 class RenderState:
     """Holds the state of the rendering."""
-    def __init__(self, font, painter, x, y,
+    def __init__(self, font, painter, x, y, alignhorz,
                  actually_render=True):
         self.font = font
         self.painter = painter
-        self.x = x
-        self.y = y
+        self.x = x     # current x position
+        self.y = y     # current y position
+        self.maxx = x  # maximum x position 
+        self.maxy = y  # maximum y position
+        self.alignhorz = alignhorz
         self.actually_render = actually_render
+        self.xwidth = 0
 
 class Part:
     """Represents a part of the text to be rendered, made up of smaller parts."""
@@ -148,6 +152,51 @@ class PartText(Part):
             
         # move along, nothing to see
         state.x += width
+        state.maxx = max(state.maxx, state.x)
+
+class PartLines(Part):
+    """Render multiple lines."""
+
+    def render(self, state):
+        """Render multiple lines."""
+        # record widths of individual lines
+        if not state.actually_render:
+            self.widths = []
+
+        height = qt4.QFontMetricsF(state.font, state.painter.device()).height()
+        inity = state.y
+        initx = state.x
+
+        state.y -= height*(len(self.children)-1)
+
+        # iterate over lines (reverse as we draw from bottom up)
+        for i, part in enumerate(self.children):
+            if state.actually_render and self.widths:
+                # if we're rendering, use max width to justify line
+                if state.alignhorz < 0:
+                    # left alignment
+                    state.x = initx
+                elif state.alignhorz == 0:
+                    # centre alignment
+                    state.x = initx + (state.xwidth - self.widths[i])*0.5
+                elif state.alignhorz > 0:
+                    # right alignment
+                    state.x = initx + (state.xwidth - self.widths[i])
+            else:
+                # if not, just left justify to get widths
+                state.x = initx
+
+            # render the line itself
+            part.render(state)
+
+            # record width if we're not rendering
+            if not state.actually_render:
+                self.widths.append( state.x - initx )
+            # move up a line
+            state.y += height
+
+        # reset height
+        state.y = inity
 
 class PartSuperScript(Part):
     """Represents superscripted part."""
@@ -365,12 +414,16 @@ def makePartList(text):
 def makePartTree(partlist):
     """Make a tree of parts from the part list."""
 
+    lines = []
     itemlist = []
     length = len(partlist)
     i = 0
     while i < length:
         p = partlist[i]
-        if isinstance(p, basestring):
+        if p == r'\\':
+            lines.append( Part(itemlist) )
+            itemlist = []
+        elif isinstance(p, basestring):
             if p in part_commands:
                 klass, numargs = part_commands[p]
                 partargs = [makePartTree(k) for k in partlist[i+1:i+numargs+1]]
@@ -381,20 +434,25 @@ def makePartTree(partlist):
         else:
             itemlist.append( makePartTree(p) )
         i += 1
+    # if we have remaining items
+    if itemlist:
+        lines.append( Part(itemlist) )
 
-    if len(itemlist) == 1:
-        # try to flatten any excess layers
-        return itemlist[0]
+    if len(lines) == 1:
+        # single line, so optimize (itemlist == lines[0] still)
+        if len(itemlist) == 1:
+            # try to flatten any excess layers
+            return itemlist[0]
+        else:
+            return lines[0]
     else:
-        return Part(itemlist)
+        return PartLines(lines)
 
 class Renderer:
     """A class for rendering text.
 
     The class emulates latex-like formatting, allows rotated text, and alignment
     """
-
-
 
     def __init__(self, painter, font, x, y, text,
                  alignhorz = -1, alignvert = -1, angle = 0,
@@ -408,7 +466,7 @@ class Renderer:
         alignvert = (-1, 0, 1) for (above, centre, below) alignment
         angle is the angle to draw the text at
         usefullheight means include descenders in calculation of height
-          of thext
+          of text
 
         alignment is in the painter frame, not the text frame
         """
@@ -416,12 +474,14 @@ class Renderer:
         # save things we'll need later
         self.painter = painter
         self.font = font
+        self.height = qt4.QFontMetricsF(font, painter.device()).height()
         self.alignhorz = alignhorz
         self.alignvert = alignvert
         self.angle = angle
         self.usefullheight = usefullheight
 
         partlist = makePartList(text)
+        self.numlines = len( [p for p in partlist if p == r'\\'] )+1
         self.parttree = makePartTree(partlist)
 
         self.x = x
@@ -433,13 +493,6 @@ class Renderer:
 
         if self.calcbounds is not None:
             return self.calcbounds
-
-        # no text
-        #if len(self.parts) == 2:
-        #    self.xi = self.x
-        #    self.yi = self.y
-        #    self.calcbounds = [self.x, self.y, self.x, self.y]
-        #    return self.calcbounds
 
         # work out total width and height
         self.painter.setFont(self.font)
@@ -462,12 +515,14 @@ class Renderer:
                 # if top/bottom alignment, better to use maximum letter height
                 totalheight = fm.ascent()
             dy = 0
+        totalheight += self.height*(self.numlines-1)
 
         # work out width
         state = RenderState(self.font, self.painter, 0, 0,
+                            self.alignhorz,
                             actually_render = False)
         self.parttree.render(state)
-        totalwidth = state.x
+        totalwidth = state.maxx
 
         # in order to work out text position, we rotate a bounding box
         # in fact we add two extra points to account for descent if reqd
@@ -570,7 +625,9 @@ class Renderer:
             self.getBounds()
 
         state = RenderState(self.font, self.painter,
-                            self.xi, self.yi)
+                            self.xi, self.yi,
+                            self.alignhorz)
+        state.xwidth = self.calcbounds[2]-self.calcbounds[0]
 
         # if the text is rotated, change the coordinate frame
         if self.angle != 0:
