@@ -130,8 +130,9 @@ class ExceptionDialog(qt4.QDialog):
         self.errortextedit.setPlainText(backtrace)
 
         # set critical pixmap to left of dialog
-        self.erroriconlabel.setPixmap( qt4.qApp.style().standardPixmap(
-            qt4.QStyle.SP_MessageBoxCritical) )
+        icon = qt4.qApp.style().standardIcon(qt4.QStyle.SP_MessageBoxCritical,
+                                             None, self)
+        self.erroriconlabel.setPixmap(icon.pixmap(32))
 
         self.backtrace = backtrace
         
