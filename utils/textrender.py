@@ -120,11 +120,9 @@ class RenderState:
         self.painter = painter
         self.x = x     # current x position
         self.y = y     # current y position
-        self.maxx = x  # maximum x position 
-        self.maxy = y  # maximum y position
         self.alignhorz = alignhorz
         self.actually_render = actually_render
-        self.xwidth = 0
+        self.maxlines = 1 # maximim number of lines drawn
 
 class Part:
     """Represents a part of the text to be rendered, made up of smaller parts."""
@@ -152,10 +150,13 @@ class PartText(Part):
             
         # move along, nothing to see
         state.x += width
-        state.maxx = max(state.maxx, state.x)
 
 class PartLines(Part):
     """Render multiple lines."""
+
+    def __init__(self, children):
+        Part.__init__(self, children)
+        self.widths = []
 
     def render(self, state):
         """Render multiple lines."""
@@ -172,16 +173,17 @@ class PartLines(Part):
         # iterate over lines (reverse as we draw from bottom up)
         for i, part in enumerate(self.children):
             if state.actually_render and self.widths:
+                xwidth = max(self.widths)
                 # if we're rendering, use max width to justify line
                 if state.alignhorz < 0:
                     # left alignment
                     state.x = initx
                 elif state.alignhorz == 0:
                     # centre alignment
-                    state.x = initx + (state.xwidth - self.widths[i])*0.5
+                    state.x = initx + (xwidth - self.widths[i])*0.5
                 elif state.alignhorz > 0:
                     # right alignment
-                    state.x = initx + (state.xwidth - self.widths[i])
+                    state.x = initx + (xwidth - self.widths[i])
             else:
                 # if not, just left justify to get widths
                 state.x = initx
@@ -195,8 +197,14 @@ class PartLines(Part):
             # move up a line
             state.y += height
 
-        # reset height
+        # move on x posn
+        if self.widths:
+            state.x = initx+max(self.widths)
+        else:
+            state.x = initx
         state.y = inity
+        # keep track of number of lines rendered
+        state.maxlines = max(state.maxlines, len(self.children))
 
 class PartSuperScript(Part):
     """Represents superscripted part."""
@@ -434,9 +442,8 @@ def makePartTree(partlist):
         else:
             itemlist.append( makePartTree(p) )
         i += 1
-    # if we have remaining items
-    if itemlist:
-        lines.append( Part(itemlist) )
+    # remaining items
+    lines.append( Part(itemlist) )
 
     if len(lines) == 1:
         # single line, so optimize (itemlist == lines[0] still)
@@ -481,7 +488,6 @@ class Renderer:
         self.usefullheight = usefullheight
 
         partlist = makePartList(text)
-        self.numlines = len( [p for p in partlist if p == r'\\'] )+1
         self.parttree = makePartTree(partlist)
 
         self.x = x
@@ -515,14 +521,14 @@ class Renderer:
                 # if top/bottom alignment, better to use maximum letter height
                 totalheight = fm.ascent()
             dy = 0
-        totalheight += self.height*(self.numlines-1)
 
         # work out width
         state = RenderState(self.font, self.painter, 0, 0,
                             self.alignhorz,
                             actually_render = False)
         self.parttree.render(state)
-        totalwidth = state.maxx
+        totalwidth = state.x
+        totalheight += self.height*(state.maxlines-1)
 
         # in order to work out text position, we rotate a bounding box
         # in fact we add two extra points to account for descent if reqd
@@ -627,7 +633,6 @@ class Renderer:
         state = RenderState(self.font, self.painter,
                             self.xi, self.yi,
                             self.alignhorz)
-        state.xwidth = self.calcbounds[2]-self.calcbounds[0]
 
         # if the text is rotated, change the coordinate frame
         if self.angle != 0:
