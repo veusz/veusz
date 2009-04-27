@@ -209,12 +209,19 @@ class PointPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, name=name)
         s = self.settings
 
+        s.add( setting.Int('thinfactor', 1,
+                           minval=1,
+                           descr='Thin number of markers plotted'
+                           ' for each datapoint by this factor',
+                           usertext='Thin markers',
+                           formatting=True), 0 )
         s.add( setting.Distance('markerSize', '3pt',
                                 descr = 'Size of marker to plot',
                                 usertext='Marker size', formatting=True), 0 )
         s.add( setting.Marker('marker', 'circle',
                               descr = 'Type of marker to plot',
                               usertext='Marker', formatting=True), 0 )
+
         s.add( setting.DatasetOrFloatList('yData', 'y',
                                           descr = 'Dataset containing y data or list of values',
                                           usertext='Y data'), 0 )
@@ -608,9 +615,16 @@ class PointPlotter(GenericPlotter):
                     # invisible pen
                     painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
-                utils.plotMarkers(painter, xplotter, yplotter, s.marker,
-                                  markersize)
+                # thin datapoints as required
+                if s.thinfactor <= 1:
+                    xplt, yplt = xplotter, yplotter
+                else:
+                    xplt, yplt = xplotter[::s.thinfactor], yplotter[::s.thinfactor]
 
+                # actually plot datapoints
+                utils.plotMarkers(painter, xplt, yplt, s.marker,
+                                  markersize)
+                    
             # finally plot any labels
             if tvals and not s.Label.hide:
                 self.drawLabels(painter, xplotter, yplotter, tvals, markersize)
