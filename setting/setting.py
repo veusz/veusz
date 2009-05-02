@@ -1038,7 +1038,8 @@ class DatasetOrFloatList(Dataset):
         """Return veusz dataset"""
         if isinstance(self.val, basestring):
             d = doc.data.get(self.val)
-            if ( d and d.datatype == self.datatype and
+            if ( d is not None and
+                 d.datatype == self.datatype and
                  d.dimensions == self.dimensions ):
                 return d
             return None
