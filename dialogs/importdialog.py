@@ -25,11 +25,13 @@
 import os.path
 import re
 import csv
+import sys
 
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
+import exceptiondialog
 
 pyfits = None
 
@@ -41,7 +43,7 @@ class ImportStandardHelpDialog(qt4.QDialog):
                                 'importhelp.ui'),
                    self)
 
-class ImportDialog2(qt4.QDialog):
+class ImportDialog(qt4.QDialog):
 
     dirname = '.'
 
@@ -76,10 +78,10 @@ class ImportDialog2(qt4.QDialog):
                       self.slotFitsUpdateCombos )
         self.connect( self.fitsdatasetname,
                       qt4.SIGNAL('textChanged(const QString&)'),
-                      self.slotFitsCheckValid )
+                      self.enableDisableImport )
         self.connect( self.fitsdatacolumn,
                       qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.slotFitsCheckValid )
+                      self.enableDisableImport )
 
         # set up some validators for 2d edits
         dval = qt4.QDoubleValidator(self)
@@ -99,6 +101,9 @@ class ImportDialog2(qt4.QDialog):
             c.setModel(model)
             self.filenameedit.setCompleter(c)
 
+        # whether file import looks likely to work
+        self.filepreviewokay = False
+
         # defaults for prefix and suffix
         self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
 
@@ -116,15 +121,15 @@ class ImportDialog2(qt4.QDialog):
         # use filename to guess a path if possible
         filename = unicode(self.filenameedit.text())
         if os.path.isdir(filename):
-            ImportDialog2.dirname = filename
+            ImportDialog.dirname = filename
         elif os.path.isdir( os.path.dirname(filename) ):
-            ImportDialog2.dirname = os.path.dirname(filename)
+            ImportDialog.dirname = os.path.dirname(filename)
 
-        fd.setDirectory(ImportDialog2.dirname)
+        fd.setDirectory(ImportDialog.dirname)
 
         # update filename if changed
         if fd.exec_() == qt4.QDialog.Accepted:
-            ImportDialog2.dirname = fd.directory().absolutePath()
+            ImportDialog.dirname = fd.directory().absolutePath()
             self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
 
     def slotHelp(self):
@@ -135,42 +140,37 @@ class ImportDialog2(qt4.QDialog):
     def slotUpdatePreview(self, *args):
         """Update preview window when filename or tab changed."""
 
-        filename = unicode(self.filenameedit.text())
-        tab = self.methodtab.currentIndex()
-        if tab == 0:
-            okay = self.doPreviewStandard(filename)
-        elif tab == 1:
-            okay = self.doPreviewCSV(filename)
-        elif tab == 2:
-            okay = self.doPreviewFITS(filename)
-        elif tab == 3:
-            okay = self.doPreviewTwoD(filename)
-        else:
-            assert False
-
-        # enable import button if it looks okay
-        if okay is not None:
-            self.importbutton.setEnabled(okay)
-
         # save so we can restore later
+        tab = self.methodtab.currentIndex()
         setting.settingdb['import_lasttab'] = tab
+        filename = unicode(self.filenameedit.text())
+
+        # do correct preview
+        self.filepreviewokay = (
+            self.doPreviewStandard,
+            self.doPreviewCSV,
+            self.doPreviewFITS,
+            self.doPreviewTwoD)[tab](filename)
+
+        # enable or disable import button
+        self.enableDisableImport()
 
     def doPreviewStandard(self, filename):
         """Standard preview - show start of text."""
 
         try:
             ifile = open(filename, 'rU')
+            text = ifile.read(4096)+'\n'
+            if len(ifile.read(1)) != 0:
+                # if there is remaining data add ...
+                text += '...\n'
+
+            self.previewedit.setPlainText(text)
+            return True
+
         except IOError:
             self.previewedit.setPlainText('')
             return False
-
-        text = ifile.read(4096)+'\n'
-        if len(ifile.read(1)) != 0:
-            # if there is remaining data add ...
-            text += '...\n'
-
-        self.previewedit.setPlainText(text)
-        return True
 
     def doPreviewCSV(self, filename):
         """CSV preview - show first few rows"""
@@ -230,10 +230,10 @@ class ImportDialog2(qt4.QDialog):
 
         # if it isn't
         if pyfits is None:
-            self.fitslabel.setText('FITS file support requires that PyFITS is installed.'
-                                   ' You can download it from'
-                                   ' http://www.stsci.edu/resources/software_hardware/pyfits')
-            self.importbutton.setEnabled(False)
+            self.fitslabel.setText(
+                'FITS file support requires that PyFITS is installed.'
+                ' You can download it from'
+                ' http://www.stsci.edu/resources/software_hardware/pyfits')
             return False
         
         # try to identify fits file
@@ -248,24 +248,23 @@ class ImportDialog2(qt4.QDialog):
             return False
 
         self.updateFITSView(filename)
-
-        return None
+        return True
 
     def doPreviewTwoD(self, filename):
         """Preview 2d dataset files."""
         
         try:
             ifile = open(filename, 'rU')
+            text = ifile.read(4096)+'\n'
+            if len(ifile.read(1)) != 0:
+                # if there is remaining data add ...
+                text += '...\n'
+            self.twod_previewedit.setPlainText(text)
+            return True
+
         except IOError:
             self.twod_previewedit.setPlainText('')
             return False
-
-        text = ifile.read(4096)+'\n'
-        if len(ifile.read(1)) != 0:
-            # if there is remaining data add ...
-            text += '...\n'
-        self.twod_previewedit.setPlainText(text)
-        return True
 
     def updateFITSView(self, filename):
         """Update the fits file details in the import dialog."""
@@ -291,15 +290,19 @@ class ImportDialog2(qt4.QDialog):
 
             except AttributeError:
                 # this is an image
-                data = ['image']
                 naxis = header['NAXIS']
+                if naxis ==2:
+                    data = ['image']
+                else:
+                    data = ['invalidimage']
                 dims = [str(header['NAXIS%i' % (i+1)]) for i in xrange(naxis)]
                 dims = '*'.join(dims)
-                descr = '%iD image (%s)' % (naxis, dims)
+                if dims:
+                    dims = '(%s)' % dims
+                descr = '%iD image %s' % (naxis, dims)
 
             hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
             items.append(hduitem)
-            #items.insert(0, hduitem)
             self.fitsitemdata.append(data)
 
         if items:
@@ -333,33 +336,41 @@ class ImportDialog2(qt4.QDialog):
             cntrl.clear()
             cntrl.addItems(cols)
 
-        # update enable icon as appropriate
-        self.slotFitsCheckValid()
+        self.enableDisableImport()
 
-    def slotFitsCheckValid(self, *args):
+    def checkFitsEnable(self):
         """Check validity of Fits import."""
-
-        enableimport = True
 
         items = self.fitshdulist.selectedItems()
         if len(items) != 0:
-            enableimport = True
             item = items[0]
             hdunum = int( str(item.text(0)) )
 
             # any name for the dataset?
-            if unicode(self.fitsdatasetname.text()) == '':
-                enableimport = False
+            if not unicode(self.fitsdatasetname.text()):
+                return False
 
             # if a table, need selected item
             data = self.fitsitemdata[hdunum]
-            if data[0] == 'table' and self.fitsdatacolumn.currentIndex() == 0:
-                enableimport = False
+            if data[0] != 'image' and self.fitsdatacolumn.currentIndex() == 0:
+                return False
+            
+            return True
+        return False
 
-        else:
-            enableimport = False
+    def enableDisableImport(self, *args):
+        """Disable or enable import button if allowed."""
 
-        self.importbutton.setEnabled(enableimport)
+        enabled = self.filepreviewokay
+
+        # checks specific to import mode
+        if enabled:
+            tabindex = self.methodtab.currentIndex()
+            if tabindex == 2:  # fits
+                enabled = self.checkFitsEnable()
+
+        # actually enable or disable import button
+        self.importbutton.setEnabled(enabled)
 
     def slotImport(self):
         """Do the importing"""
@@ -370,22 +381,24 @@ class ImportDialog2(qt4.QDialog):
         linked = self.linkcheckbox.isChecked()
 
         # import according to tab selected
-        if tabindex == 0:
-            self.importStandard(filename, linked)
-        elif tabindex == 1:
-            self.importCSV(filename, linked)
-        elif tabindex == 2:
-            self.importFits(filename, linked)
-        elif tabindex == 3:
-            self.importTwoD(filename, linked)
-        else:
-            assert False
+        try:
+            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+            (self.importStandard,
+             self.importCSV,
+             self.importFits,
+             self.importTwoD)[tabindex](filename, linked)
+            qt4.QApplication.restoreOverrideCursor()
+        except Exception:
+            qt4.QApplication.restoreOverrideCursor()
+
+            # show exception dialog
+            d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
+            d.exec_()
 
     def _retnDatasetInfo(self, dsnames):
         """Return a list of information for the dataset names given."""
         
-        lines = []
-        lines.append('Imported data for datasets:')
+        lines = ['Imported data for datasets:']
         dsnames.sort()
         for name in dsnames:
             ds = self.document.getData(name)
@@ -442,15 +455,9 @@ class ImportDialog2(qt4.QDialog):
             mb.exec_()
             return
 
-        # show a busy cursor
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
         # actually import the data
         dsnames = self.document.applyOperation(op)
         
-        # restore the cursor
-        qt4.QApplication.restoreOverrideCursor()
-
         # tell the user what happened
         # failures in conversion
         lines = []
@@ -476,15 +483,9 @@ class ImportDialog2(qt4.QDialog):
                                              prefix=prefix, suffix=suffix,
                                              linked=linked)
         
-        # show a busy cursor
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
         # actually import the data
         dsnames = self.document.applyOperation(op)
         
-        # restore the cursor
-        qt4.QApplication.restoreOverrideCursor()
-
         # what datasets were imported
         lines = self._retnDatasetInfo(dsnames)
 
@@ -538,14 +539,8 @@ class ImportDialog2(qt4.QDialog):
                                               negerrcol=cols[3],
                                               linked=linked)
 
-        # show a busy cursor
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
         # actually do the import
         self.document.applyOperation(op)
-        
-        # restore the cursor
-        qt4.QApplication.restoreOverrideCursor()
 
         # inform user
         self.fitsimportstatus.setText("Imported dataset '%s'" % name)
@@ -596,9 +591,6 @@ class ImportDialog2(qt4.QDialog):
         # substitute filename if required
         prefix, suffix = self.getPrefixSuffix(filename)
 
-        # show a busy cursor
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
         # loop over datasets and read...
         try:
             op = document.OperationDataImport2D(datasets, filename=filename,
@@ -618,9 +610,6 @@ class ImportDialog2(qt4.QDialog):
         except document.Read2DError, e:
             output = 'Error importing datasets:\n %s' % str(e)
                 
-        # restore the cursor
-        qt4.QApplication.restoreOverrideCursor()
-
         # show status in preview box
         self.twod_previewedit.setPlainText(output)
  
