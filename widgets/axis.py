@@ -1,4 +1,4 @@
-#    Copyright (C) 2003-2007 Jeremy S. Sanders
+#    Copyright (C) 2003-2009 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -79,7 +79,7 @@ class Axis(widget.Widget):
                             ' of axis',
                             usertext='Reflect',
                             formatting=True) )
-        s.add( setting.Float('scale', 1.,
+        s.add( setting.Float('datascale', 1.,
                              descr='Scale data plotted by this factor',
                              usertext='Scale') )
 
@@ -161,7 +161,7 @@ class Axis(widget.Widget):
         """Set the automatic range of this axis (called from page helper)."""
 
         if autorange:
-            scale = self.settings.scale
+            scale = self.settings.datascale
             self.autorange = ar = [x*scale for x in autorange]
             if self.settings.log:
                 ar[0] = max(1e-99, ar[0])
@@ -318,7 +318,7 @@ class Axis(widget.Widget):
             self._computePlottedRange()
 
         self._updatePlotRange(posn)
-        return self._graphToPlotter(data*self.settings.scale)
+        return self._graphToPlotter(data*self.settings.datascale)
     
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
@@ -345,7 +345,9 @@ class Axis(widget.Widget):
             return self.linearConvertFromPlotter(frac)
         
     def plotterToDataCoords(self, bounds, vals):
-        return self.plotterToGraphCoords(bounds, vals)*(1./self.settings.scale)
+        """Convert plotter coordinates to data, removing scaling."""
+        return (1./self.settings.datascale *
+                self.plotterToGraphCoords(bounds, vals))
 
     def linearConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for linear scale.
