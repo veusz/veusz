@@ -346,22 +346,23 @@ class Axis(widget.Widget):
         
     def plotterToDataCoords(self, bounds, vals):
         """Convert plotter coordinates to data, removing scaling."""
-        scale = self.settings.datascale
-        if abs(scale) < 1e-99:
-            scale = 1e-99
-        return 1./scale * self.plotterToGraphCoords(bounds, vals)
+        try:
+            scale = 1./self.settings.datascale
+        except ZeroDivisionError:
+            scale = 0.
+        return scale * self.plotterToGraphCoords(bounds, vals)
 
     def linearConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for linear scale.
         """
-        return ( ( v - self.plottedrange[0] ) /
-                 ( self.plottedrange[1]-self.plottedrange[0] ) )
+        return ( (v - self.plottedrange[0]) /
+                 (self.plottedrange[1] - self.plottedrange[0]) )
     
     def linearConvertFromPlotter(self, v):
         """Convert from (fractional) plotter coords to graph coords.
         """
         return ( self.plottedrange[0] + v *
-                 (self.plottedrange[1]-self.plottedrange[0] ) )
+                 (self.plottedrange[1]-self.plottedrange[0]) )
     
     def logConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for log10 scale.
@@ -369,7 +370,7 @@ class Axis(widget.Widget):
 
         log1 = N.log(self.plottedrange[0])
         log2 = N.log(self.plottedrange[1])
-        return ( N.log( N.clip(v, 1e-99, 1e99) ) - log1 )/( log2 - log1 )
+        return ( N.log( N.clip(v, 1e-99, 1e99) ) - log1 )/(log2 - log1)
     
     def logConvertFromPlotter(self, v):
         """Convert from fraction plotter coords to graph coords with log scale.
@@ -400,7 +401,7 @@ class Axis(widget.Widget):
                     return 1
     
     def swapline(self, painter, a1, b1, a2, b2):
-        """ Draw line, but swap x & y coordinates if vertical axis."""
+        """Draw line, but swap x & y coordinates if vertical axis."""
         if self.settings.direction == 'horizontal':
             painter.drawLine(qt4.QPointF(a1, b1), qt4.QPointF(a2, b2))
         else:
@@ -566,16 +567,13 @@ class Axis(widget.Widget):
 
         horz = s.direction == 'horizontal'
         if not horz:
-            ax = 1
-            ay = 0
+            ax, ay = 1, 0
         else:
-            ax = 0
-            ay = 1
+            ax, ay = 0, 1
 
         reflected = self._reflected()
         if reflected:
-            ax = -ax
-            ay = -ay
+            ax, ay = -ax, -ay
 
         # angle of text
         if ( (horz and not sl.rotate) or
@@ -587,7 +585,7 @@ class Axis(widget.Widget):
             else:
                 angle = 270
 
-        x = ( self.coordParr1 + self.coordParr2 ) / 2
+        x = 0.5*(self.coordParr1 + self.coordParr2)
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
         if not horz:
             x, y = y, x
