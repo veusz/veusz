@@ -346,8 +346,10 @@ class Axis(widget.Widget):
         
     def plotterToDataCoords(self, bounds, vals):
         """Convert plotter coordinates to data, removing scaling."""
-        return (1./self.settings.datascale *
-                self.plotterToGraphCoords(bounds, vals))
+        scale = self.settings.datascale
+        if abs(scale) < 1e-99:
+            scale = 1e-99
+        return 1./scale * self.plotterToGraphCoords(bounds, vals)
 
     def linearConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for linear scale.
