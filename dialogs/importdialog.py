@@ -43,7 +43,7 @@ class ImportStandardHelpDialog(qt4.QDialog):
                                 'importhelp.ui'),
                    self)
 
-class ImportDialog2(qt4.QDialog):
+class ImportDialog(qt4.QDialog):
 
     dirname = '.'
 
@@ -121,15 +121,15 @@ class ImportDialog2(qt4.QDialog):
         # use filename to guess a path if possible
         filename = unicode(self.filenameedit.text())
         if os.path.isdir(filename):
-            ImportDialog2.dirname = filename
+            ImportDialog.dirname = filename
         elif os.path.isdir( os.path.dirname(filename) ):
-            ImportDialog2.dirname = os.path.dirname(filename)
+            ImportDialog.dirname = os.path.dirname(filename)
 
-        fd.setDirectory(ImportDialog2.dirname)
+        fd.setDirectory(ImportDialog.dirname)
 
         # update filename if changed
         if fd.exec_() == qt4.QDialog.Accepted:
-            ImportDialog2.dirname = fd.directory().absolutePath()
+            ImportDialog.dirname = fd.directory().absolutePath()
             self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
 
     def slotHelp(self):

@@ -381,7 +381,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataImport(self):
         """Display the import data dialog."""
-        dialog = importdialog.ImportDialog2(self, self.document)
+        dialog = importdialog.ImportDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
         return dialog
