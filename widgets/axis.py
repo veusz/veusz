@@ -79,6 +79,9 @@ class Axis(widget.Widget):
                             ' of axis',
                             usertext='Reflect',
                             formatting=True) )
+        s.add( setting.Float('scale', 1.,
+                             descr='Scale data plotted by this factor',
+                             usertext='Scale') )
 
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
@@ -158,7 +161,8 @@ class Axis(widget.Widget):
         """Set the automatic range of this axis (called from page helper)."""
 
         if autorange:
-            self.autorange = ar = list(autorange)
+            scale = self.settings.scale
+            self.autorange = ar = [x*scale for x in autorange]
             if self.settings.log:
                 ar[0] = max(1e-99, ar[0])
         else:
@@ -301,11 +305,20 @@ class Axis(widget.Widget):
         
         # work out fractional posistions, then convert to pixels
         if self.settings.log:
-            fracposns = self.logConvertToPlotter( vals )
+            fracposns = self.logConvertToPlotter(vals)
         else:
-            fracposns = self.linearConvertToPlotter( vals )
+            fracposns = self.linearConvertToPlotter(vals)
 
         return self.coordParr1 + fracposns*(self.coordParr2-self.coordParr1)
+
+    def dataToPlotterCoords(self, posn, data):
+        """Convert data values to plotter coordinates, scaling if necessary."""
+        # if the doc was modified, recompute the range
+        if self.docchangeset != self.document.changeset:
+            self._computePlottedRange()
+
+        self._updatePlotRange(posn)
+        return self._graphToPlotter(data*self.settings.scale)
     
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
@@ -322,15 +335,18 @@ class Axis(widget.Widget):
         self._updatePlotRange( bounds )
 
         # work out fractional positions of the plotter coords
-        frac = ( ( vals.astype('float64') - self.coordParr1 ) /
-                 ( self.coordParr2 - self.coordParr1 ) )
+        frac = ( (vals.astype('float64') - self.coordParr1) /
+                 (self.coordParr2 - self.coordParr1) )
 
-        # scaling...
+        # convert from fractional to graph
         if self.settings.log:
-            return self.logConvertFromPlotter( frac )
+            return self.logConvertFromPlotter(frac)
         else:
-            return self.linearConvertFromPlotter( frac )
+            return self.linearConvertFromPlotter(frac)
         
+    def plotterToDataCoords(self, bounds, vals):
+        return self.plotterToGraphCoords(bounds, vals)*(1./self.settings.scale)
+
     def linearConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for linear scale.
         """

@@ -56,6 +56,7 @@ class ColorBar(axis.Axis):
                              usertext = 'Image'), 0 )
 
         s.get('log').readonly = True
+        s.get('scale').readonly = True
 
         s.add( setting.Choice( 'horzPosn',
                                ('left', 'centre', 'right', 'manual'),
@@ -175,8 +176,8 @@ class ColorBar(axis.Axis):
             return bounds
 
         # update image if necessary with new settings
-        minval, maxval, axisscale, img = \
-                imgwidget.makeColorbarImage(s.direction)
+        (minval, maxval,
+         axisscale, img) = imgwidget.makeColorbarImage(s.direction)
         self.setAutoRange([minval, maxval])
 
         s.get('log').setSilent(axisscale == 'log')            

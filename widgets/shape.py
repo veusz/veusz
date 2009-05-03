@@ -30,18 +30,14 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-import widget
-import page
-import graph
 import controlgraph
+import plotters
 
-class Shape(widget.Widget):
+class Shape(plotters.FreePlotter):
     """A shape on a page/graph."""
 
-    allowedparenttypes = [graph.Graph, page.Page]
-
     def __init__(self, parent, name=None):
-        widget.Widget.__init__(self, parent, name=name)
+        plotters.FreePlotter.__init__(self, parent, name=name)
         s = self.settings
 
         s.add( setting.ShapeFill('Fill',
@@ -61,44 +57,22 @@ class BoxShape(Shape):
 
         s = self.settings
 
-        s.add( setting.DatasetOrFloatList('xPos', 0.5,
-                                          descr='List of fractional X '
-                                          'coordinates or dataset',
-                                          usertext='X positions',
-                                          formatting=False) )
-        s.add( setting.DatasetOrFloatList('yPos', 0.5,
-                                          descr='List of fractional Y '
-                                          'coordinates or dataset',
-                                          usertext='Y positions',
-                                          formatting=False) )
         s.add( setting.DatasetOrFloatList('width', 0.1,
                                           descr='List of fractional '
                                           'widths or dataset',
                                           usertext='Widths',
-                                          formatting=False) )
+                                          formatting=False), 3 )
         s.add( setting.DatasetOrFloatList('height', 0.1,
                                           descr='List of fractional '
                                           'heights or dataset',
                                           usertext='Heights',
-                                          formatting=False) )
+                                          formatting=False), 4 )
         s.add( setting.DatasetOrFloatList('rotate', 0.,
                                           descr='Rotation angles of '
                                           'shape or dataset',
                                           usertext='Rotate',
-                                          formatting=False) )
+                                          formatting=False), 5 )
 
-        s.add( setting.Choice('positioning',
-                              ['axes', 'relative'], 'relative',
-                              descr='Use axes or fractional '
-                              'position to place label',
-                              usertext='Position mode',
-                              formatting=False) )
-        s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = 'Name of X-axis to use',
-                            usertext='X axis') )
-        s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = 'Name of Y-axis to use',
-                            usertext='Y axis') )
 
     def drawShape(self, painter, rect):
         pass
@@ -112,29 +86,17 @@ class BoxShape(Shape):
             return
 
         # get positions of shapes
-        xpos = s.get('xPos').getFloatArray(d)
-        ypos = s.get('yPos').getFloatArray(d)
         width = s.get('width').getFloatArray(d)
         height = s.get('height').getFloatArray(d)
         rotate = s.get('rotate').getFloatArray(d)
-
-        if (xpos is None or ypos is None or width is None or height is None
-            or rotate is None):
+        if width is None or height is None or rotate is None:
             return
 
         # translate coordinates from axes or relative values
-        if s.positioning == 'axes':
-            if hasattr(self.parent, 'getAxes'):
-                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-            else:
-                return
-            if None in axes:
-                return
-            xpos = axes[0].graphToPlotterCoords(posn, xpos)
-            ypos = axes[1].graphToPlotterCoords(posn, ypos)
-        else:
-            xpos = posn[0] + (posn[2]-posn[0])*xpos
-            ypos = posn[3] - (posn[3]-posn[1])*ypos
+        xpos, ypos = self._getPlotterCoords(posn)
+        if xpos is None or ypos is None:
+            # we can't calculate coordinates
+            return
 
         # if a dataset is used, we can't use control items
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
@@ -188,23 +150,10 @@ class BoxShape(Shape):
         s = self.settings
 
         # calculate new position coordinate for item
-        if s.positioning == 'axes':
-            if hasattr(self.parent, 'getAxes'):
-                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-            else:
-                return
-            if None in axes:
-                return
-            
-            xpos = axes[0].plotterToGraphCoords(cgi.widgetposn,
-                                                N.array(cgi.posn[0]))
-            ypos = axes[1].plotterToGraphCoords(cgi.widgetposn,
-                                                N.array(cgi.posn[1]))
-        else:
-            xpos = ((cgi.posn[0] - cgi.widgetposn[0]) /
-                    (cgi.widgetposn[2]-cgi.widgetposn[0]))
-            ypos = ((cgi.posn[1] - cgi.widgetposn[3]) /
-                    (cgi.widgetposn[1]-cgi.widgetposn[3]))
+        xpos, ypos = self._getGraphCoords(cgi.widgetposn,
+                                          cgi.posn[0], cgi.posn[1])
+        if xpos is None or ypos is None:
+            return
 
         xw = abs(cgi.dims[0] / (cgi.widgetposn[2]-cgi.widgetposn[0]))
         yw = abs(cgi.dims[1] / (cgi.widgetposn[1]-cgi.widgetposn[3]))

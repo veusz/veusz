@@ -24,15 +24,13 @@
 """A generic plotter widget which is inherited by function and point."""
 
 import veusz.qtall as qt4
-import itertools
 import numpy as N
 
-import veusz.document as document
 import veusz.setting as setting
-import veusz.utils as utils
 
 import widget
 import graph
+import page
 
 class GenericPlotter(widget.Widget):
     """Generic plotter."""
@@ -100,8 +98,8 @@ class GenericPlotter(widget.Widget):
         """Clip painter to start and stop values of axis."""
 
         # update cached coordinates of axes
-        axes[0].plotterToGraphCoords(bounds, N.array([]))
-        axes[1].plotterToGraphCoords(bounds, N.array([]))
+        axes[0].plotterToDataCoords(bounds, N.array([]))
+        axes[1].plotterToDataCoords(bounds, N.array([]))
 
         # get range
         x1 = axes[0].coordParr1
@@ -111,3 +109,79 @@ class GenericPlotter(widget.Widget):
 
         # actually clip the data
         painter.setClipRect( qt4.QRectF(x1, y2, x2-x1, y1-y2) )
+
+class FreePlotter(widget.Widget):
+    """A plotter which can be plotted on the page or in a graph."""
+
+    allowedparenttypes = [graph.Graph, page.Page]
+    def __init__(self, parent, name=None):
+        """Initialise object, setting axes."""
+        widget.Widget.__init__(self, parent, name=name)
+
+        s = self.settings
+        s.add( setting.DatasetOrFloatList('xPos', 0.5,
+                                          descr='List of fractional X '
+                                          'coordinates or dataset',
+                                          usertext='X positions',
+                                          formatting=False) )
+        s.add( setting.DatasetOrFloatList('yPos', 0.5,
+                                          descr='List of fractional Y '
+                                          'coordinates or dataset',
+                                          usertext='Y positions',
+                                          formatting=False) )
+        s.add( setting.Choice('positioning',
+                              ['axes', 'relative'], 'relative',
+                              descr='Use axes or fractional '
+                              'position to place label',
+                              usertext='Position mode',
+                              formatting=False) )
+        s.add( setting.Axis('xAxis', 'x', 'horizontal',
+                            descr = 'Name of X-axis to use',
+                            usertext='X axis') )
+        s.add( setting.Axis('yAxis', 'y', 'vertical',
+                            descr = 'Name of Y-axis to use',
+                            usertext='Y axis') )
+
+    def _getPlotterCoords(self, posn):
+        """Calculate coordinates from relative or axis positioning."""
+
+        s = self.settings
+        xpos = s.get('xPos').getFloatArray(self.document)
+        ypos = s.get('yPos').getFloatArray(self.document)
+        if xpos is None or ypos is None:
+            return None, None
+        if s.positioning == 'axes':
+
+            if hasattr(self.parent, 'getAxes'):
+                axes = self.parent.getAxes( (s.xAxis,
+                                             s.yAxis) )
+            else:
+                return None, None
+            if None in axes:
+                return None, None
+
+            xpos = axes[0].dataToPlotterCoords(posn, xpos)
+            ypos = axes[1].dataToPlotterCoords(posn, ypos)
+        else:
+            xpos = posn[0] + (posn[2]-posn[0])*xpos
+            ypos = posn[3] - (posn[3]-posn[1])*ypos
+        return xpos, ypos
+
+    def _getGraphCoords(self, posn, xplt, yplt):
+        """Calculate graph coodinates given plot coordinates xplt, yplt."""
+
+        s = self.settings
+        if s.positioning == 'axes':
+            if hasattr(self.parent, 'getAxes'):
+                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+            else:
+                return None, None
+            if None in axes:
+                return None, None
+            
+            xpos = axes[0].plotterToDataCoords(posn, N.array(xplt))
+            ypos = axes[1].plotterToDataCoords(posn, N.array(yplt))
+        else:
+            xpos = (xplt - posn[0]) / (posn[2]-posn[0])
+            ypos = (yplt - posn[3]) / (posn[1]-posn[3])
+        return xpos, ypos

@@ -389,15 +389,13 @@ class Contour(plotters.GenericPlotter):
             # iterate over each complete line of the contour
             for curve in linelist:
                 # convert coordinates from graph to plotter
-                xplt = axes[0].graphToPlotterCoords(posn, curve[:,0])
-                yplt = axes[1].graphToPlotterCoords(posn, curve[:,1])
-
+                xplt = axes[0].dataToPlotterCoords(posn, curve[:,0])
+                yplt = axes[1].dataToPlotterCoords(posn, curve[:,1])
                     
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
                 for x, y in itertools.izip(xplt, yplt):
                     pts.append( qt4.QPointF(x, y) )
-
 
                 if showlabels:
                     self.plotContourLabel(painter, s.levelsOut[num], xplt, yplt)
@@ -432,8 +430,8 @@ class Contour(plotters.GenericPlotter):
             # iterate over each complete line of the contour
             for poly in polylist:
                 # convert coordinates from graph to plotter
-                xplt = axes[0].graphToPlotterCoords(posn, poly[:,0])
-                yplt = axes[1].graphToPlotterCoords(posn, poly[:,1])
+                xplt = axes[0].dataToPlotterCoords(posn, poly[:,0])
+                yplt = axes[1].dataToPlotterCoords(posn, poly[:,1])
 
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()

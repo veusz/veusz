@@ -472,8 +472,8 @@ class Image(plotters.GenericPlotter):
         rangex, rangey = data.getDataRanges()
 
         # translate coordinates to plotter coordinates
-        coordsx = axes[0].graphToPlotterCoords(posn, N.array(rangex))
-        coordsy = axes[1].graphToPlotterCoords(posn, N.array(rangey))
+        coordsx = axes[0].dataToPlotterCoords(posn, N.array(rangex))
+        coordsy = axes[1].dataToPlotterCoords(posn, N.array(rangey))
 
         # truncate image down if necessary
         # This assumes linear pixels!

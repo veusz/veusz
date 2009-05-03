@@ -29,14 +29,11 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-import widget
-import page
-import graph
 import controlgraph
+import plotters
 
-class Line(widget.Widget):
+class Line(plotters.FreePlotter):
     """A line on the plot/graph."""
-    allowedparenttypes = [graph.Graph, page.Page]
     typename='line'
     description='Line or arrow'
 
@@ -48,28 +45,18 @@ class Line(widget.Widget):
                 '../Line/color') )
     
     def __init__(self, parent, name=None):
-        widget.Widget.__init__(self, parent, name=name)
+        plotters.FreePlotter.__init__(self, parent, name=name)
         s = self.settings
-        s.add( setting.DatasetOrFloatList('xPos', 0.5,
-                                          descr='List of fractional X '
-                                          'coordinates or dataset',
-                                          usertext='X positions',
-                                          formatting=False) )
-        s.add( setting.DatasetOrFloatList('yPos', 0.5,
-                                          descr='List of fractional Y '
-                                          'coordinates or dataset',
-                                          usertext='Y positions',
-                                          formatting=False) )
         s.add( setting.DatasetOrFloatList('length', 0.2,
                                           descr='List of fractional '
                                           'lengths or dataset',
                                           usertext='Lengths',
-                                          formatting=False) )
+                                          formatting=False), 3 )
         s.add( setting.DatasetOrFloatList('angle', 0.,
                                           descr='Angle of lines or '
                                           'dataset',
                                           usertext='Angles',
-                                          formatting=False) )
+                                          formatting=False), 4 )
 
         s.add( setting.Line('Line',
                             descr = 'Line style',
@@ -79,19 +66,6 @@ class Line(widget.Widget):
                                    descr = 'Arrow fill settings',
                                    usertext = 'Arrow fill'),
                pixmap = 'plotmarkerfill' )
-
-        s.add( setting.Choice('positioning',
-                              ['axes', 'relative'], 'relative',
-                              descr='Use axes or fractional '
-                              'position to place label',
-                              usertext='Position mode',
-                              formatting=False) )
-        s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = 'Name of X-axis to use',
-                            usertext='X axis') )
-        s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = 'Name of Y-axis to use',
-                            usertext='Y axis') )
 
         s.add( setting.Distance('arrowSize', '5pt',
                                 descr = 'Size of arrow to plot',
@@ -112,28 +86,17 @@ class Line(widget.Widget):
         if s.hide:
             return
 
-        # get positions of shapes
-        xpos = s.get('xPos').getFloatArray(d)
-        ypos = s.get('yPos').getFloatArray(d)
+        # get lengths and angles of lines
         length = s.get('length').getFloatArray(d)
         angle = s.get('angle').getFloatArray(d)
-
-        if (xpos is None or ypos is None or length is None or angle is None):
+        if length is None or angle is None:
             return
 
         # translate coordinates from axes or relative values
-        if s.positioning == 'axes':
-            if hasattr(self.parent, 'getAxes'):
-                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-            else:
-                return
-            if None in axes:
-                return
-            xpos = axes[0].graphToPlotterCoords(posn, xpos)
-            ypos = axes[1].graphToPlotterCoords(posn, ypos)
-        else:
-            xpos = posn[0] + (posn[2]-posn[0])*xpos
-            ypos = posn[3] - (posn[3]-posn[1])*ypos
+        xpos, ypos = self._getPlotterCoords(posn)
+        if xpos is None or ypos is None:
+            # we can't calculate coordinates
+            return
 
         # if a dataset is used, we can't use control items
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
@@ -190,23 +153,10 @@ class Line(widget.Widget):
         s = self.settings
 
         # calculate new position coordinate for item
-        if s.positioning == 'axes':
-            if hasattr(self.parent, 'getAxes'):
-                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-            else:
-                return
-            if None in axes:
-                return
-            
-            xpos = axes[0].plotterToGraphCoords(cgi.widgetposn,
-                                                N.array(pt1[0]))
-            ypos = axes[1].plotterToGraphCoords(cgi.widgetposn,
-                                                N.array(pt1[1]))
-        else:
-            xpos = ((pt1[0] - cgi.widgetposn[0]) /
-                    (cgi.widgetposn[2]-cgi.widgetposn[0]))
-            ypos = ((pt1[1] - cgi.widgetposn[3]) /
-                    (cgi.widgetposn[1]-cgi.widgetposn[3]))
+        xpos, ypos = self._getGraphCoords(cgi.widgetposn,
+                                          pt1[0], pt1[1])
+        if xpos is None or ypos is None:
+            return
 
         length = ( math.sqrt( (pt2[0]-pt1[0])**2 + (pt2[1]-pt1[1])**2 ) /
                    (cgi.widgetposn[2]-cgi.widgetposn[0]) )

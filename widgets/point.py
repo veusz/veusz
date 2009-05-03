@@ -299,8 +299,8 @@ class PointPlotter(GenericPlotter):
             xmin, xmax = xdata.getPointRanges()
 
             # convert xmin and xmax to graph coordinates
-            xmin = axes[0].graphToPlotterCoords(posn, xmin)
-            xmax = axes[0].graphToPlotterCoords(posn, xmax)
+            xmin = axes[0].dataToPlotterCoords(posn, xmin)
+            xmax = axes[0].dataToPlotterCoords(posn, xmax)
 
             # clip... (avoids problems with INFs, etc)
             xmin = N.clip(xmin, posn[0]-xwc, posn[2]+xwc)
@@ -311,8 +311,8 @@ class PointPlotter(GenericPlotter):
             ymin, ymax = ydata.getPointRanges()
 
             # convert ymin and ymax to graph coordinates
-            ymin = axes[1].graphToPlotterCoords(posn, ymin)
-            ymax = axes[1].graphToPlotterCoords(posn, ymax)
+            ymin = axes[1].dataToPlotterCoords(posn, ymin)
+            ymax = axes[1].dataToPlotterCoords(posn, ymax)
 
             # clip...
             ymin = N.clip(ymin, posn[1]-ywc, posn[3]+ywc)
@@ -384,8 +384,8 @@ class PointPlotter(GenericPlotter):
 
                 # this is duplicated from drawing error bars: bad
                 # convert xmin and xmax to graph coordinates
-                xmin = axes[0].graphToPlotterCoords(posn, xmin)
-                xmax = axes[0].graphToPlotterCoords(posn, xmax)
+                xmin = axes[0].dataToPlotterCoords(posn, xmin)
+                xmax = axes[0].dataToPlotterCoords(posn, xmax)
                 xmin = N.clip(xmin, -32767, 32767)
                 xmax = N.clip(xmax, -32767, 32767)
 
@@ -577,8 +577,8 @@ class PointPlotter(GenericPlotter):
 
             #print "Calculating coordinates"
             # calc plotter coords of x and y points
-            xplotter = axes[0].graphToPlotterCoords(posn, xvals.data)
-            yplotter = axes[1].graphToPlotterCoords(posn, yvals.data)
+            xplotter = axes[0].dataToPlotterCoords(posn, xvals.data)
+            yplotter = axes[1].dataToPlotterCoords(posn, yvals.data)
 
             # need to remove silly points as these stuff up output
             xplotter = N.clip(xplotter, -32767, 32767)
