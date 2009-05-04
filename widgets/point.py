@@ -104,16 +104,16 @@ def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
             # qt geometry means we have to calculate lots
             # the big numbers are in 1/16 degrees
             painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
-                                       (xmx-xp)*2+1, (yp-ymx)*2+1),
+                                       (xmx-xp)*2, (yp-ymx)*2),
                             0, 1440)
             painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
-                                       (xp-xmn)*2+1, (yp-ymx)*2+1),
+                                       (xp-xmn)*2, (yp-ymx)*2),
                             1440, 1440)
             painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
-                                       (xp-xmn)*2+1, (ymn-yp)*2+1),
+                                       (xp-xmn)*2, (ymn-yp)*2),
                             2880, 1440)
             painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
-                                       (xmx-xp)*2+1, (ymn-yp)*2+1),
+                                       (xmx-xp)*2, (ymn-yp)*2),
                             4320, 1440)
 
 def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
@@ -445,9 +445,36 @@ class PointPlotter(GenericPlotter):
 
     def drawKeySymbol(self, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
+        painter.save()
+        painter.setClipRect(
+            qt4.QRectF(qt4.QPointF(x, y), qt4.QPointF(x+width, y+height)) )
 
+        # draw sample error bar
         s = self.settings
+        size = s.get('markerSize').convert(painter)
+        style = s.errorStyle
+
+        # make some fake error bar data to plot
+        xv = s.get('xData').getData(self.document)
+        yv = s.get('yData').getData(self.document)
         yp = y + height/2
+        xpts = [x-width, x+width/2, x+2*width]
+        ypts = [yp, yp, yp]
+        if xv and xv.hasErrors():
+            xneg = [x-width, x+width/2-size*2, x+2*width]
+            xpos = [x-width, x+width/2+size*2, x+2*width]
+        else:
+            xneg = xpos = xpts
+        if yv and yv.hasErrors():
+            yneg = [yp-size*2, yp-size*2, yp-size*2]
+            ypos = [yp+size*2, yp+size*2, yp+size*2]
+        else:
+            yneg = ypos = ypts
+
+        # plot error bar
+        painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
+        for function in _errorBarFunctionMap[style]:
+            function(style, xneg, xpos, yneg, ypos, xpts, ypts, s, painter)
 
         # draw line
         if not s.PlotLine.hide:
@@ -456,8 +483,6 @@ class PointPlotter(GenericPlotter):
 
         # draw marker
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            size = s.get('markerSize').convert(painter)
-
             if not s.MarkerFill.hide:
                 painter.setBrush( s.MarkerFill.makeQBrush() )
 
@@ -467,6 +492,8 @@ class PointPlotter(GenericPlotter):
                 painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
                 
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
+
+        painter.restore()
 
     def generateValidDatasetParts(self, *datasets):
         """Generator to return array of valid parts of datasets."""
