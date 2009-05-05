@@ -44,5 +44,6 @@ class ErrorLoadingDialog(qt4.QDialog):
         self.errortextedit.setPlainText(traceback)
 
         # set warning pixmap to left of dialog
-        self.iconlabel.setPixmap( qt4.qApp.style().standardPixmap(
-            qt4.QStyle.SP_MessageBoxWarning) )
+        icon = qt4.qApp.style().standardIcon(qt4.QStyle.SP_MessageBoxWarning,
+                                             None, self)
+        self.iconlabel.setPixmap(icon.pixmap(32))
