@@ -1014,7 +1014,7 @@ SetData('x', data[0]*0.1, *data[1:])
 	<title><anchor id="Command.ImportFile" />ImportFile</title>
 	
 	<para><command>ImportFile('filename',
-	'descriptor' [, linked=False, prefix='', suffix=''], )</command></para>
+	'descriptor', linked=False, prefix='', suffix='')</command></para>
 	
 	<para>Imports data from a file. The arguments are the filename
 	to load data from and the descriptor.</para>
@@ -1045,7 +1045,8 @@ SetData('x', data[0]*0.1, *data[1:])
 	
 	<para><command>ImportFile2D('filename', datasets,
 xrange=(a,b), yrange=(c,d), invertrows=True/False,
-invertcols=True/False, transpose=True/False, linked=True/False)</command></para>
+invertcols=True/False, transpose=True/False,
+prefix='', suffix='', linked=False)</command></para>
 	
 	<para>Imports two-dimensional data from a file. The required
 	arguments are the filename to load data from and the dataset
@@ -1065,6 +1066,9 @@ invertcols=True/False, transpose=True/False, linked=True/False)</command></para>
 	<para>invertrows and invertcols if set to True, invert the
 	rows and columns respectively after they are read by
 	Veusz. transpose swaps the rows and columns.</para>
+
+	<para>If prefix and/or suffix are set, they are prepended or
+	appended to imported dataset names.</para>
 
 	<para>If the linked parameter is True, then the datasets are
 	linked to the imported file, and are not saved within a saved
@@ -1096,14 +1100,16 @@ invertcols=True/False, transpose=True/False, linked=True/False)</command></para>
 	<title><anchor id="Command.ImportFileCSV" />ImportFileCSV</title>
 	
 	<para><command>ImportFileCSV('filename', readrows=False,
-	prefix=None, linked=False)</command></para>
+	dsprefix='', dssuffix='', linked=False)</command></para>
 
 	<para>This command imports data from a CSV format file. Data
 	are read from the file using the dataset names given at the
 	top of the files in columns. Please see the reading data
-	section of this manual for more information. prefix is
-	prepended to each dataset name, and linked specifies whether
-	the data will be linked.
+	section of this manual for more information. dsprefix is
+	prepended to each dataset name and dssuffix is added (the
+	prefix option is deprecated and also addeds an underscore to
+	the dataset name). linked specifies whether the data will be
+	linked to the file.
 	</para>
 
 	</section>
