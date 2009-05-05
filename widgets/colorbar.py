@@ -56,7 +56,7 @@ class ColorBar(axis.Axis):
                              usertext = 'Image'), 0 )
 
         s.get('log').readonly = True
-        s.get('scale').readonly = True
+        s.get('datascale').readonly = True
 
         s.add( setting.Choice( 'horzPosn',
                                ('left', 'centre', 'right', 'manual'),
