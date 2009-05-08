@@ -283,6 +283,69 @@ class PartSuperScript(Part):
         font.setPointSizeF(size)
         painter.setFont(font)
 
+class PartFrac(Part):
+    """"A fraction, do latex \frac{a}{b}."""
+
+    def render(self, state):
+        font = state.font
+        painter = state.painter
+
+        # make font half size
+        size = font.pointSizeF()
+        font.setPointSizeF(size*0.5)
+        painter.setFont(font)
+
+        # keep track of width above and below line
+        if not state.actually_render:
+            self.widths = []
+
+        initx = state.x
+        inity = state.y
+
+        # render bottom of fraction
+        if state.actually_render and len(self.widths) == 2:
+            # centre line
+            state.x = initx + (max(self.widths) - self.widths[0])*0.5
+        self.children[1].render(state)
+        if not state.actually_render:
+            # get width if not rendering
+            self.widths.append(state.x - initx)
+
+        # render top of fraction
+        m = qt4.QFontMetricsF(font, painter.device())
+        state.y -= (m.ascent() + m.descent())
+        if state.actually_render and len(self.widths) == 2:
+            # centre line
+            state.x = initx + (max(self.widths) - self.widths[1])*0.5
+        else:
+            state.x = initx
+        self.children[0].render(state)
+        if not state.actually_render:
+            self.widths.append(state.x - initx)
+
+        state.x = initx + max(self.widths)
+        state.y = inity
+
+        # restore font
+        font.setPointSizeF(size)
+        painter.setFont(font)
+        height = qt4.QFontMetricsF(font, painter.device()).ascent()
+
+        # draw line between lines with 1pt thickness
+        painter.save()
+        pixperpt = painter.device().logicalDpiY() / 72.
+        pen = painter.pen()
+        oldwidth = pen.widthF()
+        pen.setWidthF(pixperpt)
+        painter.setPen(pen)
+
+        painter.drawLine(qt4.QPointF(initx,
+                                     inity-height/2.),
+                         qt4.QPointF(initx+max(self.widths),
+                                     inity-height/2))
+
+        painter.restore()
+
 class PartSubScript(Part):
     """Represents subscripted part."""
     def render(self, state):
@@ -419,7 +482,8 @@ part_commands = {
     r'\textbf': (PartBold, 1),
     r'\textit': (PartItalic, 1),
     r'\font': (PartFont, 2),
-    r'\size': (PartSize, 2)
+    r'\size': (PartSize, 2),
+    r'\frac': (PartFrac, 2)
     }
 
 # split up latex expression into bits
