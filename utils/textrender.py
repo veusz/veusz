@@ -95,8 +95,6 @@ symbols = {
     r'\sqsupset': u'\u2290',
     r'\sqsubseteq': u'\u2291',
     r'\sqsupseteq': u'\u2292',
-    r'\parallel': u'\u2225',
-    r'\umid': u'\u2223',
     r'\in': u'\u2208',
     r'\ni': u'\u220b',
     r'\equiv': u'\u2261',
@@ -104,6 +102,13 @@ symbols = {
     r'\succ': u'\u227b',
     r'\preceq': u'\u227c',
     r'\succeq': u'\u227d',
+    r'\bowtie': u'\u22c8',
+    r'\vdash': u'\u22a2',
+    r'\dashv': u'\u22a3',
+    r'\models': u'\u22a7',
+    r'\perp': u'\u22a5',
+    r'\parallel': u'\u2225',
+    r'\umid': u'\u2223',
 
     # lower case greek letters
     r'\alpha': u'\u03b1',
