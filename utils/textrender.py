@@ -287,6 +287,9 @@ class PartFrac(Part):
     """"A fraction, do latex \frac{a}{b}."""
 
     def render(self, state):
+        if len(self.children) != 2:
+            return
+
         font = state.font
         painter = state.painter
 
