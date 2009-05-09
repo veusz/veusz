@@ -30,6 +30,7 @@ s.fromText('42')
 
 import re
 import math
+import sys
 
 import numpy as N
 import veusz.qtall as qt4
@@ -872,13 +873,13 @@ class FloatList(Setting):
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
 
-        p = self.list_re.split(text.strip())
-
-        try:
-            out = [float(i) for i in p if i]
-        except ValueError:
-            raise InvalidType
-
+        out = []
+        for x in self.list_re.split(text.strip()):
+            if x:
+                try:
+                    out.append(float(x))
+                except ValueError:
+                    out.append( safeEvalHelper(x) )
         return out
 
     def makeControl(self, *args):
@@ -1019,13 +1020,15 @@ class DatasetOrFloatList(Dataset):
 
     def fromText(self, text):
         text = text.strip()
-        if text and self.numbers_re.match(text + ' '):
-            p = FloatList.list_re.split(text)
-            try:
-                return [float(x) for x in p if x]
-            except ValueError:
-                raise InvalidType
-        else:
+        try:
+            out = []
+            for x in FloatList.list_re.split(text):
+                try:
+                    out.append(float(x))
+                except ValueError:
+                    out.append( safeEvalHelper(x) )
+            return out
+        except InvalidType:
             return text
 
     def getFloatArray(self, doc):
