@@ -423,6 +423,16 @@ class Int(Setting):
     def makeControl(self, *args):
         return controls.Edit(self, *args)
 
+_safe_environ = utils.veusz_eval_context.copy()
+def safeEvalHelper(text):
+    """Evaluate an expression, catching naughtiness."""
+    if utils.checkCode(text) is not None:
+        raise InvalidType
+    try:
+        return float( eval(text, _safe_environ) )
+    except:
+        raise InvalidType
+
 # for storing floats
 class Float(Setting):
     """Float settings."""
@@ -439,7 +449,8 @@ class Float(Setting):
         try:
             return float(text)
         except ValueError:
-            raise InvalidType
+            # try to evaluate
+            return safeEvalHelper(text)
 
     def makeControl(self, *args):
         return controls.Edit(self, *args)
@@ -474,7 +485,8 @@ class FloatOrAuto(Setting):
             try:
                 return float(text)
             except ValueError:
-                raise InvalidType
+                # try to evaluate
+                return safeEvalHelper(text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
