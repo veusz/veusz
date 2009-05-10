@@ -43,6 +43,7 @@ except ImportError:
 import veusz.qtall as qt4
 from veusz.application import Application
 import veusz.utils as utils
+import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.setting
 
 copyr='''Veusz %s
@@ -85,10 +86,19 @@ def makeSplashLogo():
     p.end()
     return pix
 
+def excepthook(excepttype, exceptvalue, tracebackobj):
+    """Show exception dialog if one occurs."""
+
+    d = exceptiondialog.ExceptionDialog((excepttype, exceptvalue,
+                                         tracebackobj),
+                                        None)
+    d.exec_()
+
 def run():
     '''Run the main application.'''
 
     app = Application(sys.argv)
+    sys.excepthook = excepthook
 
     splash = qt4.QSplashScreen(makeSplashLogo())
     splash.show()
