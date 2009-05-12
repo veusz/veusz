@@ -219,6 +219,8 @@ class Axis(widget.Widget):
                 self.plottedrange[0] = 1e-99
             if self.plottedrange[1] <= 0.:
                 self.plottedrange[1] = 1e-99
+            if self.plottedrange[0] == self.plottedrange[1]:
+                self.plottedrange[1] = self.plottedrange[0]*2
 
         # work out tick values and expand axes if necessary
         axs = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
