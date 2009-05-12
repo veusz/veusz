@@ -220,8 +220,11 @@ class DatasetListModel(qt4.QAbstractListModel):
         return self.datasets[index.row()]
 
     def data(self, index, role):
-        if role == qt4.Qt.DisplayRole:
-            return qt4.QVariant(self.datasets[index.row()])
+        try:
+            if role == qt4.Qt.DisplayRole:
+                return qt4.QVariant(self.datasets[index.row()])
+        except IndexError:
+            pass
 
         # return nothing otherwise
         return qt4.QVariant()
