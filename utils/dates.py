@@ -66,3 +66,76 @@ def dateStringToDate(datestr):
             pass
 
     return val
+
+def floatToDateTime(f):
+    """Convert float to datetime."""
+    days = int(f/24/60/60)
+    frac, sec = math.modf(f - days*24*60*60)
+    return datetime.timedelta(days,  sec,  frac*1e6) + offsetdate
+    
+def datetimeToTuple(dt):
+    """Return tuple (year,month,day,hour,minute,second,microsecond) from
+    datetime object."""
+    return (dt.year, dt.month, dt.day, dt.hour, dt.minute,
+            dt.second, dt.microsecond)
+
+def datetimeToFloat(dt):
+    """Convert datetime to float"""
+    delta = dt - offsetdate
+    # convert offset into a delta
+    val = (delta.days*24*60*60 + (delta.seconds +
+           delta.microseconds*1e-6))
+    return val
+
+def tupleToFloatTime(t):
+    """Convert a tuple interval to a float style datetime"""
+    dt = datetime.datetime(*t)
+    return datetimeToFloat(dt)
+
+def tupleToDateTime(t):
+    """Convert a tuple to a datetime"""
+    return datetime.datetime(*t)
+
+def addTimeTupleToDateTime(dt,  tt):
+    """Add a time tuple in the form (yr,mn,dy,h,m,s,us) to a datetime.
+    Returns datetime
+    """
+
+    # add on most of the time intervals
+    dt = dt + datetime.timedelta(days=tt[2], hours=tt[3], 
+                                 minutes=tt[4], seconds=tt[5], 
+                                 microseconds=tt[6])
+
+    # add on years
+    dt = dt.replace(year=dt.year + tt[0])
+    
+    # add on months - this could be much simpler
+    if tt[1] > 0:
+        for i in xrange(tt[1]):
+            # find interval between this month and next...
+            m, y = dt.month + 1, dt.year
+            if m == 13:
+                m = 1
+                y += 1          
+        dt = dt.replace(year=y, month=m)
+    elif tt[1] < 0:
+        for i in xrange(abs(tt[1])):
+            # find interval between this month and next...
+            m, y = dt.month - 1, dt.year
+            if m == 0:
+                m = 12
+                y -= 1          
+        dt = dt.replace(year=y, month=m)
+        
+    return dt
+
+def roundDownToTimeTuple(dt,  tt):
+    timein = list(datetimeToTuple(dt))
+    i = 6
+    while i >= 0 and tt[i] == 0:
+        timein[i] = 0
+        i -= 1
+    # round to nearest interval
+    timein[i] = (timein[i] // tt[i])*tt[i]
+    return tuple(timein)
+    

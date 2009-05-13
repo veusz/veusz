@@ -137,10 +137,10 @@ unallowed_builtins = (
     )
 
 # checks there are no obvious mistakes above
-for ast_name in unallowed_ast_nodes:
-    assert ast_name in all_ast_nodes
-for name in unallowed_builtins:
-    assert name in all_builtins
+#for ast_name in unallowed_ast_nodes:
+#    assert ast_name in all_ast_nodes
+#for name in unallowed_builtins:
+#    assert name in all_builtins
 
 # faster lookup
 unallowed_ast_nodes = dict( (i, True) for i in unallowed_ast_nodes )

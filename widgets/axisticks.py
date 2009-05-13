@@ -22,8 +22,9 @@
 # $Id$
 
 import math
-
 import numpy as N
+
+import veusz.utils as utils
 
 """Algorithms for working with axis ticks.
 
@@ -35,7 +36,36 @@ by looking though a list of allowable interval values (after taking
 account of what power of 10 the coordinates are in).
 """
 
-class AxisTicks:
+class AxisTicksBase(object):
+    """Base class of axis ticks classes."""
+
+    def __init__( self, minval, maxval, numticks, numminorticks,
+                  logaxis = False, prefermore = True,
+                  extendbounds = True, extendzero = True ):
+        """Initialise the class.
+
+        minval and maxval are the range of the data to be plotted
+        numticks number of major ticks to aim for
+        logaxis: axis logarithmic?
+        prefermore: prefer more ticks rather than fewer
+        extendbounds: extend minval and maxval to nearest tick if okay
+        extendzero: extend one end to zero if it is okay"""
+
+        self.minval = minval
+        self.maxval = maxval
+        self.numticks = numticks
+        self.numminorticks = numminorticks
+        self.logaxis = logaxis
+        self.prefermore = prefermore
+        self.extendbounds = extendbounds
+        self.extendzero = extendzero
+
+    def getTicks( self ):
+        """Calculate and return the position of the major ticks.
+
+        Returns a tuple (minval, maxval, majorticks, minorticks)"""
+
+class AxisTicks(AxisTicksBase):
     """Class to work out at what values axis major ticks should appear."""
 
     # the allowed values we allow ticks to increase by
@@ -58,27 +88,6 @@ class AxisTicks:
 
     # how much we should allow axes to extend to zero or intervals
     max_extend_factor = 0.15
-
-    def __init__( self, minval, maxval, noticks, nominorticks,
-                  logaxis = False, prefermore = True,
-                  extendbounds = True, extendzero = True ):
-        """Initialise the class.
-
-        minval and maxval are the range of the data to be plotted
-        noticks number of major ticks to aim for
-        logaxis: axis logarithmic?
-        prefermore: prefer more ticks rather than fewer
-        extendbounds: extend minval and maxval to nearest tick if okay
-        extendzero: extend one end to zero if it is okay"""
-
-        self.minval = minval
-        self.maxval = maxval
-        self.noticks = noticks
-        self.nominorticks = nominorticks
-        self.logaxis = logaxis
-        self.prefermore = prefermore
-        self.extendbounds = extendbounds
-        self.extendzero = extendzero
 
     def _calcTickValues( self, minval, maxval, delta ):
         """Compute the tick values, given minval, maxval and delta."""
@@ -146,26 +155,26 @@ class AxisTicks:
 
         # iterate over allowed minor intervals
         best = -1
-        best_noticks = -1
+        best_numticks = -1
         best_delta = 1000000
         mult = 10.**logstep
 
         # iterate over allowed minor intervals
         for minint in allowedintervals:
 
-            noticks = self._tickNums(minval, maxval, minint*mult)
-            d = abs( self.nominorticks - noticks )
+            numticks = self._tickNums(minval, maxval, minint*mult)
+            d = abs( self.numminorticks - numticks )
 
             # if this is a better match to the number of ticks
             # we want, choose this
-            if (d < best_delta ) or \
-               (d == best_delta and
-                (self.prefermore and noticks > best_noticks) or
-                (not self.prefermore and noticks < best_noticks)):
+            if ((d < best_delta ) or
+                (d == best_delta and
+                (self.prefermore and numticks > best_numticks) or
+                (not self.prefermore and numticks < best_numticks)) ):
 
                 best = minint
                 best_delta = d
-                best_noticks = noticks
+                best_numticks = numticks
 
         # use best value to return tick values
         return self._calcTickValues(minval, maxval, best*mult)
@@ -181,10 +190,10 @@ class AxisTicks:
 
         ticks = []
         # iterate over range in log space
-        for i in range(alpha, beta+1):
+        for i in xrange(alpha, beta+1):
             power = 10.**i
             # add ticks for values in correct range
-            for j in range(2, 10):
+            for j in xrange(2, 10):
                 v = power*j
                 # blah log conversions mean we have to use 'fuzzy logic'
                 if ( math.fabs(v - minval)/v < 1e-6 or v > minval ) and \
@@ -216,7 +225,7 @@ class AxisTicks:
 
                 largestno = max(largestno, no)
 
-            if largestno > self.noticks*2:
+            if largestno > self.numticks*2:
                 break
 
             logstep -= 1
@@ -234,7 +243,7 @@ class AxisTicks:
         # find the best set of tick labels
         for s in selection:
             # difference between what we want and what we have
-            delta = s[0] - self.noticks
+            delta = s[0] - self.numticks
             absdelta = abs(delta)
 
             # if it matches better choose this
@@ -267,7 +276,7 @@ class AxisTicks:
     def getTicks( self ):
         """Calculate and return the position of the major ticks.
 
-        Returns a tuple (minval, maxval, ticks)"""
+        Returns a tuple (minval, maxval, majorticks, minorticks)"""
 
         if self.logaxis:
             # which intervals we'll accept for major ticks
@@ -333,3 +342,124 @@ class AxisTicks:
             tickvals = 10.**tickvals
             
         return (minval, maxval, tickvals, minorticks)
+
+class DateTicks(AxisTicksBase):
+    """For formatting dates. We want something that chooses appropriate
+    intervals
+    So we want to choose most apropriate interval depending on number of
+    ticks requested
+    """
+    
+    # possible intervals for a time/date axis
+    # tuples of   y, m, d, h, m, s, msec
+    intervals = (
+                 (200, 0, 0, 0, 0, 0, 0), 
+                 (100, 0, 0, 0, 0, 0, 0), 
+                 (50, 0, 0, 0, 0, 0, 0), 
+                 (20, 0, 0, 0, 0, 0, 0), 
+                 (10, 0, 0, 0, 0, 0, 0), 
+                 (5, 0, 0, 0, 0, 0, 0), 
+                 (2, 0, 0, 0, 0, 0, 0), 
+                 (1, 0, 0, 0, 0, 0, 0), 
+                 (0, 6, 0, 0, 0, 0, 0), 
+                 (0, 4, 0, 0, 0, 0, 0), 
+                 (0, 3, 0, 0, 0, 0, 0),  
+                 (0, 2, 0, 0, 0, 0, 0),
+                 (0, 1, 0, 0, 0, 0, 0), 
+                 (0, 0, 28, 0, 0, 0, 0), 
+                 (0, 0, 14, 0, 0, 0, 0), 
+                 (0, 0, 7, 0, 0, 0, 0), 
+                 (0, 0, 2, 0, 0, 0, 0), 
+                 (0, 0, 1, 0, 0, 0, 0), 
+                 (0, 0, 0, 12, 0, 0, 0), 
+                 (0, 0, 0, 6, 0, 0, 0), 
+                 (0, 0, 0, 4, 0, 0, 0), 
+                 (0, 0, 0, 3, 0, 0, 0), 
+                 (0, 0, 0, 2, 0, 0, 0), 
+                 (0, 0, 0, 1, 0, 0, 0), 
+                 (0, 0, 0, 0, 30, 0, 0), 
+                 (0, 0, 0, 0, 15, 0, 0), 
+                 (0, 0, 0, 0, 10, 0, 0), 
+                 (0, 0, 0, 0, 5, 0, 0), 
+                 (0, 0, 0, 0, 2, 0, 0), 
+                 (0, 0, 0, 0, 1, 0, 0),
+                 (0, 0, 0, 0, 0, 30, 0), 
+                 (0, 0, 0, 0, 0, 15, 0), 
+                 (0, 0, 0, 0, 0, 10, 0), 
+                 (0, 0, 0, 0, 0, 5, 0), 
+                 (0, 0, 0, 0, 0, 2, 0), 
+                 (0, 0, 0, 0, 0, 1, 0), 
+                 (0, 0, 0, 0, 0, 0, 500000), 
+                 (0, 0, 0, 0, 0, 0, 200000), 
+                 (0, 0, 0, 0, 0, 0, 100000), 
+                 (0, 0, 0, 0, 0, 0, 50000), 
+                 (0, 0, 0, 0, 0, 0, 10000), 
+                 (0, 0, 0, 0, 0, 0, 10000), 
+                 (0, 0, 0, 0, 0, 0, 50000), 
+                 (0, 0, 0, 0, 0, 0, 100000), 
+                 (0, 0, 0, 0, 0, 0, 200000), 
+                 (0, 0, 0, 0, 0, 0, 500000), 
+                 )
+    
+    intervals_sec = N.array([(ms*1e-6+s+mi*60+hr*60*60+dy*24*60*60+
+                              mn*(365/52.)*24*60*60+
+                              yr*365*24*60*60)
+                             for (yr, mn, dy, hr, mi, s, ms) in intervals])
+    
+    def getTicks(self):
+        """Calculate and return the position of the major ticks.
+
+        Returns a tuple (minval, maxval, majorticks, minorticks)"""
+
+        delta = self.maxval - self.minval
+
+        # iterate over different intervals and find one closest to what we want
+        estimated = delta / self.intervals_sec
+
+        tick1 = max(estimated.searchsorted(self.numticks)-1, 0)
+        tick2 = min(tick1+1, len(estimated)-1)
+        
+        del1 = abs(estimated[tick1] - self.numticks)
+        del2 = abs(estimated[tick2] - self.numticks)
+        
+        if del1 < del2:
+            best = tick1
+        else:
+            best = tick2
+        besttt = self.intervals[best]
+
+        mindate = utils.floatToDateTime(self.minval)
+        maxdate = utils.floatToDateTime(self.maxval)
+
+        # round min and max to nearest
+        minround = utils.tupleToDateTime(utils.roundDownToTimeTuple(mindate, besttt))
+        maxround = utils.tupleToDateTime(utils.roundDownToTimeTuple(maxdate, besttt))
+        
+        if minround == mindate:
+            mintick = minround
+        else:
+            # rounded down, so move on to next tick
+            mintick = utils.addTimeTupleToDateTime(minround, besttt)
+        maxtick = maxround
+
+        # extend bounds if requested
+        deltamin = utils.datetimeToFloat(mindate)-utils.datetimeToFloat(mintick)
+        if self.extendbounds and (deltamin != 0. and deltamin < delta*0.15):
+            mindate = utils.addTimeTupleToDateTime(mindround, [-x for x in besttt])
+            mintick = mindate
+        deltamax = utils.datetimeToFloat(maxdate)-utils.datetimeToFloat(maxtick)
+        if self.extendbounds and (deltamax != 0. and deltamax < delta*0.15):
+            maxdate = utils.addTimeTupleToDateTime(maxtick, besttt)
+            maxtick = maxdate
+        
+        # make ticks
+        ticks = []
+        dt = mintick
+        while dt <= maxtick:
+            ticks.append( utils.datetimeToFloat(dt))
+            dt = utils.addTimeTupleToDateTime(dt, besttt)
+
+        return (utils.datetimeToFloat(mindate), 
+                utils.datetimeToFloat(maxdate), 
+                N.array(ticks),  N.array([]))
+                
