@@ -16,6 +16,7 @@ T?
 $
 ''', re.VERBOSE )
 
+# we store dates as intervals in sec from this date as a float
 offsetdate = datetime.datetime(2009, 01, 01, 0, 0, 0, 0)
 
 def isDateTime(datestr):
@@ -130,12 +131,25 @@ def addTimeTupleToDateTime(dt,  tt):
     return dt
 
 def roundDownToTimeTuple(dt,  tt):
+    """Take a datetime, and round down using the (yr,mn,dy,h,m,s,ms) tuple.
+    Returns a tuple."""
+
+    #print "round down",  dt,  tt
     timein = list(datetimeToTuple(dt))
     i = 6
     while i >= 0 and tt[i] == 0:
-        timein[i] = 0
+        if i == 1 or i == 2: # month, day
+            timein[i] = 1
+        else:
+            timein[i] = 0
         i -= 1
     # round to nearest interval
-    timein[i] = (timein[i] // tt[i])*tt[i]
+    if (i == 1 or i == 2): # month, day
+        timein[i] == ((timein[i]-1) // tt[i])*tt[i] + 1
+    else:
+        timein[i] = (timein[i] // tt[i])*tt[i]
+        
+    #print "rounded",  timein
     return tuple(timein)
+    
     

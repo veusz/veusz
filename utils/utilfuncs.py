@@ -28,6 +28,7 @@ import re
 import time
 import os.path
 import threading
+import dates
 
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
@@ -211,7 +212,7 @@ def formatGeneral(num, fmtarg):
         except:
             return _formaterror
 
-_formatRE = re.compile(r'%([^A-Za-z]*)(VD.|V.|[A-Za-z])')
+_formatRE = re.compile(r'%([^A-Za-z]*)(VDVS|VD.|V.|[A-Za-z])')
 
 def formatNumber(num, format):
     """ Format a number in different ways.
@@ -242,11 +243,17 @@ def formatNumber(num, format):
             elif ftype == 'Vg':
                 out = formatGeneral(num, farg)
             elif ftype[:2] == 'VD':
+                d = dates.floatToDateTime(num)
                 # date formatting (seconds since start of epoch)
-                try:
-                    out = time.strftime('%'+ftype[2:], time.gmtime(num))
-                except ValueError:
-                    out = _formaterror
+                if ftype[:4] == 'VDVS':
+                    # special seconds operator
+                    out = ('%'+ftype[4:]+'g') % (d.second+d.microsecond*1e-6)
+                else:
+                    # use date formatting
+                    try:
+                        out = d.strftime('%'+ftype[2:])
+                    except ValueError:
+                        out = _formaterror
             else:
                 out = _formaterror
 

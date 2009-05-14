@@ -61,6 +61,10 @@ class Axis(widget.Widget):
         s.add( setting.Bool('log', False,
                             descr = 'Whether axis is logarithmic',
                             usertext='Log') )
+        s.add( setting.Choice('mode', ('numeric', 'datetime'),  'numeric', 
+                              descr = 'Type of ticks to show on on axis', 
+                              usertext='Mode') )
+                            
         s.add( setting.Bool('autoExtend', True,
                             descr = 'Extend axis to nearest major tick',
                             usertext='Auto extend',
@@ -223,14 +227,20 @@ class Axis(widget.Widget):
                 self.plottedrange[1] = self.plottedrange[0]*2
 
         # work out tick values and expand axes if necessary
-        axs = axisticks.AxisTicks( self.plottedrange[0], self.plottedrange[1],
-                                   s.MajorTicks.number, s.MinorTicks.number,
-                                   extendbounds = s.autoExtend,
-                                   extendzero = s.autoExtendZero,
-                                   logaxis = s.log )
+        if s.mode == 'numeric':
+            tickclass = axisticks.AxisTicks
+        else:
+            tickclass = axisticks.DateTicks
+        
+        axs = tickclass(self.plottedrange[0], self.plottedrange[1],
+                        s.MajorTicks.number, s.MinorTicks.number,
+                        extendbounds = s.autoExtend,
+                        extendzero = s.autoExtendZero,
+                        logaxis = s.log )
 
         (self.plottedrange[0],self.plottedrange[1],
-         self.majortickscalc, self.minortickscalc) =  axs.getTicks()
+         self.majortickscalc, self.minortickscalc, 
+         self.autoformat) =  axs.getTicks()
 
         # override values if requested
         if len(s.MajorTicks.manualTicks) > 0:
@@ -516,10 +526,13 @@ class Axis(widget.Widget):
             ax = -ax
             ay = -ay
 
-        # plot numbers
+        # use format or automatic one from axisticks
         format = s.TickLabels.format
+        if format.lower() == 'auto':
+            format = self.autoformat
         maxdim = 0
 
+        # plot numbers
         b = self.coordPerp + sign*(self._delta_axis+tl_spacing)
         tl = s.get('TickLabels')
         scale = tl.scale

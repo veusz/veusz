@@ -341,7 +341,7 @@ class AxisTicks(AxisTicksBase):
             maxval = 10.**maxval
             tickvals = 10.**tickvals
             
-        return (minval, maxval, tickvals, minorticks)
+        return (minval, maxval, tickvals, minorticks,  '%Vg')
 
 class DateTicks(AxisTicksBase):
     """For formatting dates. We want something that chooses appropriate
@@ -351,60 +351,55 @@ class DateTicks(AxisTicksBase):
     """
     
     # possible intervals for a time/date axis
-    # tuples of   y, m, d, h, m, s, msec
+    # tuples of ((y, m, d, h, m, s, msec), autoformat)
     intervals = (
-                 (200, 0, 0, 0, 0, 0, 0), 
-                 (100, 0, 0, 0, 0, 0, 0), 
-                 (50, 0, 0, 0, 0, 0, 0), 
-                 (20, 0, 0, 0, 0, 0, 0), 
-                 (10, 0, 0, 0, 0, 0, 0), 
-                 (5, 0, 0, 0, 0, 0, 0), 
-                 (2, 0, 0, 0, 0, 0, 0), 
-                 (1, 0, 0, 0, 0, 0, 0), 
-                 (0, 6, 0, 0, 0, 0, 0), 
-                 (0, 4, 0, 0, 0, 0, 0), 
-                 (0, 3, 0, 0, 0, 0, 0),  
-                 (0, 2, 0, 0, 0, 0, 0),
-                 (0, 1, 0, 0, 0, 0, 0), 
-                 (0, 0, 28, 0, 0, 0, 0), 
-                 (0, 0, 14, 0, 0, 0, 0), 
-                 (0, 0, 7, 0, 0, 0, 0), 
-                 (0, 0, 2, 0, 0, 0, 0), 
-                 (0, 0, 1, 0, 0, 0, 0), 
-                 (0, 0, 0, 12, 0, 0, 0), 
-                 (0, 0, 0, 6, 0, 0, 0), 
-                 (0, 0, 0, 4, 0, 0, 0), 
-                 (0, 0, 0, 3, 0, 0, 0), 
-                 (0, 0, 0, 2, 0, 0, 0), 
-                 (0, 0, 0, 1, 0, 0, 0), 
-                 (0, 0, 0, 0, 30, 0, 0), 
-                 (0, 0, 0, 0, 15, 0, 0), 
-                 (0, 0, 0, 0, 10, 0, 0), 
-                 (0, 0, 0, 0, 5, 0, 0), 
-                 (0, 0, 0, 0, 2, 0, 0), 
-                 (0, 0, 0, 0, 1, 0, 0),
-                 (0, 0, 0, 0, 0, 30, 0), 
-                 (0, 0, 0, 0, 0, 15, 0), 
-                 (0, 0, 0, 0, 0, 10, 0), 
-                 (0, 0, 0, 0, 0, 5, 0), 
-                 (0, 0, 0, 0, 0, 2, 0), 
-                 (0, 0, 0, 0, 0, 1, 0), 
-                 (0, 0, 0, 0, 0, 0, 500000), 
-                 (0, 0, 0, 0, 0, 0, 200000), 
-                 (0, 0, 0, 0, 0, 0, 100000), 
-                 (0, 0, 0, 0, 0, 0, 50000), 
-                 (0, 0, 0, 0, 0, 0, 10000), 
-                 (0, 0, 0, 0, 0, 0, 10000), 
-                 (0, 0, 0, 0, 0, 0, 50000), 
-                 (0, 0, 0, 0, 0, 0, 100000), 
-                 (0, 0, 0, 0, 0, 0, 200000), 
-                 (0, 0, 0, 0, 0, 0, 500000), 
+                 ((200, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((100, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((50, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((20, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((10, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((5, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((2, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((1, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((0, 6, 0, 0, 0, 0, 0), '%VDY-%VDm'), 
+                 ((0, 4, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+                 ((0, 3, 0, 0, 0, 0, 0), '%VDY-%VDm'),  
+                 ((0, 2, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+                 ((0, 1, 0, 0, 0, 0, 0), '%VDY-%VDm'), 
+                 ((0, 0, 28, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
+                 ((0, 0, 14, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
+                 ((0, 0, 7, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
+                 ((0, 0, 2, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
+                 ((0, 0, 1, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
+                 ((0, 0, 0, 12, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
+                 ((0, 0, 0, 6, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
+                 ((0, 0, 0, 4, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
+                 ((0, 0, 0, 3, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
+                 ((0, 0, 0, 2, 0, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 1, 0, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 0, 30, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 0, 15, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 0, 10, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 0, 5, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 0, 2, 0, 0), '%VDH:%VDM'), 
+                 ((0, 0, 0, 0, 1, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 0, 0, 30, 0), '%VDH:%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 15, 0), '%VDH:%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 10, 0), '%VDH:%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 5, 0), '%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 2, 0), '%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 1, 0), '%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 0, 500000), '%VDM:%VDVS'), 
+                 ((0, 0, 0, 0, 0, 0, 200000), '%VDVS'), 
+                 ((0, 0, 0, 0, 0, 0, 100000), '%VDVS'), 
+                 ((0, 0, 0, 0, 0, 0, 50000), '%VDVS'), 
+                 ((0, 0, 0, 0, 0, 0, 10000), '%VDVS'), 
                  )
     
     intervals_sec = N.array([(ms*1e-6+s+mi*60+hr*60*60+dy*24*60*60+
                               mn*(365/52.)*24*60*60+
                               yr*365*24*60*60)
-                             for (yr, mn, dy, hr, mi, s, ms) in intervals])
+                             for (yr, mn, dy, hr, mi, s, ms), fmt in intervals])
     
     def getTicks(self):
         """Calculate and return the position of the major ticks.
@@ -426,7 +421,7 @@ class DateTicks(AxisTicksBase):
             best = tick1
         else:
             best = tick2
-        besttt = self.intervals[best]
+        besttt = self.intervals[best][0]
 
         mindate = utils.floatToDateTime(self.minval)
         maxdate = utils.floatToDateTime(self.maxval)
@@ -445,7 +440,7 @@ class DateTicks(AxisTicksBase):
         # extend bounds if requested
         deltamin = utils.datetimeToFloat(mindate)-utils.datetimeToFloat(mintick)
         if self.extendbounds and (deltamin != 0. and deltamin < delta*0.15):
-            mindate = utils.addTimeTupleToDateTime(mindround, [-x for x in besttt])
+            mindate = utils.addTimeTupleToDateTime(minround, [-x for x in besttt])
             mintick = mindate
         deltamax = utils.datetimeToFloat(maxdate)-utils.datetimeToFloat(maxtick)
         if self.extendbounds and (deltamax != 0. and deltamax < delta*0.15):
@@ -459,7 +454,8 @@ class DateTicks(AxisTicksBase):
             ticks.append( utils.datetimeToFloat(dt))
             dt = utils.addTimeTupleToDateTime(dt, besttt)
 
+        #print self.intervals[best]
         return (utils.datetimeToFloat(mindate), 
                 utils.datetimeToFloat(maxdate), 
-                N.array(ticks),  N.array([]))
+                N.array(ticks),  N.array([]), self.intervals[best][1])
                 

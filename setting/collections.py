@@ -372,7 +372,7 @@ class TickLabel(Text):
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )
-        self.add( setting.Str( 'format', '%Vg',
+        self.add( setting.Str( 'format', 'Auto',
                                descr = 'Format of the tick labels',
                                usertext='Format') )
 
