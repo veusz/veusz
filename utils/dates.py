@@ -118,7 +118,7 @@ def addTimeTupleToDateTime(dt,  tt):
             if m == 13:
                 m = 1
                 y += 1          
-        dt = dt.replace(year=y, month=m)
+            dt = dt.replace(year=y, month=m)
     elif tt[1] < 0:
         for i in xrange(abs(tt[1])):
             # find interval between this month and next...
@@ -126,7 +126,7 @@ def addTimeTupleToDateTime(dt,  tt):
             if m == 0:
                 m = 12
                 y -= 1          
-        dt = dt.replace(year=y, month=m)
+            dt = dt.replace(year=y, month=m)
         
     return dt
 

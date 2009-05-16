@@ -386,10 +386,10 @@ class DateTicks(AxisTicksBase):
                  ((0, 0, 0, 0, 0, 30, 0), '%VDH:%VDM:%VDS'), 
                  ((0, 0, 0, 0, 0, 15, 0), '%VDH:%VDM:%VDS'), 
                  ((0, 0, 0, 0, 0, 10, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 5, 0), '%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 2, 0), '%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 1, 0), '%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 0, 500000), '%VDM:%VDVS'), 
+                 ((0, 0, 0, 0, 0, 5, 0), '%VDH:%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 2, 0), '%VDH:%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 1, 0), '%VDH:%VDM:%VDS'), 
+                 ((0, 0, 0, 0, 0, 0, 500000), '%VDH:%VDM:%VDVS'), 
                  ((0, 0, 0, 0, 0, 0, 200000), '%VDVS'), 
                  ((0, 0, 0, 0, 0, 0, 100000), '%VDVS'), 
                  ((0, 0, 0, 0, 0, 0, 50000), '%VDVS'), 
@@ -397,34 +397,37 @@ class DateTicks(AxisTicksBase):
                  )
     
     intervals_sec = N.array([(ms*1e-6+s+mi*60+hr*60*60+dy*24*60*60+
-                              mn*(365/52.)*24*60*60+
+                              mn*(365/12.)*24*60*60+
                               yr*365*24*60*60)
                              for (yr, mn, dy, hr, mi, s, ms), fmt in intervals])
     
-    def getTicks(self):
-        """Calculate and return the position of the major ticks.
+    def bestTickFinder(self, minval, maxval, numticks, extendbounds,
+                       intervals, intervals_sec):
+        """Try to find best choice of numticks ticks between minval and maxval
+        intervals is an array similar to self.intervals
+        intervals_sec is an array similar to self.intervals_sec
 
-        Returns a tuple (minval, maxval, majorticks, minorticks)"""
+        Returns a tuple (minval, maxval, estimatedsize, ticks, textformat)"""
 
-        delta = self.maxval - self.minval
+        delta = maxval - minval
 
         # iterate over different intervals and find one closest to what we want
-        estimated = delta / self.intervals_sec
+        estimated = delta / intervals_sec
 
-        tick1 = max(estimated.searchsorted(self.numticks)-1, 0)
+        tick1 = max(estimated.searchsorted(numticks)-1, 0)
         tick2 = min(tick1+1, len(estimated)-1)
         
-        del1 = abs(estimated[tick1] - self.numticks)
-        del2 = abs(estimated[tick2] - self.numticks)
+        del1 = abs(estimated[tick1] - numticks)
+        del2 = abs(estimated[tick2] - numticks)
         
         if del1 < del2:
             best = tick1
         else:
             best = tick2
-        besttt = self.intervals[best][0]
+        besttt, format = intervals[best]
 
-        mindate = utils.floatToDateTime(self.minval)
-        maxdate = utils.floatToDateTime(self.maxval)
+        mindate = utils.floatToDateTime(minval)
+        maxdate = utils.floatToDateTime(maxval)
 
         # round min and max to nearest
         minround = utils.tupleToDateTime(utils.roundDownToTimeTuple(mindate, besttt))
@@ -439,11 +442,12 @@ class DateTicks(AxisTicksBase):
 
         # extend bounds if requested
         deltamin = utils.datetimeToFloat(mindate)-utils.datetimeToFloat(mintick)
-        if self.extendbounds and (deltamin != 0. and deltamin < delta*0.15):
-            mindate = utils.addTimeTupleToDateTime(minround, [-x for x in besttt])
+        if extendbounds and (deltamin != 0. and deltamin < delta*0.15):
+            mindate = utils.addTimeTupleToDateTime(minround,
+                                                   [-x for x in besttt])
             mintick = mindate
         deltamax = utils.datetimeToFloat(maxdate)-utils.datetimeToFloat(maxtick)
-        if self.extendbounds and (deltamax != 0. and deltamax < delta*0.15):
+        if extendbounds and (deltamax != 0. and deltamax < delta*0.15):
             maxdate = utils.addTimeTupleToDateTime(maxtick, besttt)
             maxtick = maxdate
         
@@ -454,8 +458,39 @@ class DateTicks(AxisTicksBase):
             ticks.append( utils.datetimeToFloat(dt))
             dt = utils.addTimeTupleToDateTime(dt, besttt)
 
-        #print self.intervals[best]
-        return (utils.datetimeToFloat(mindate), 
-                utils.datetimeToFloat(maxdate), 
-                N.array(ticks),  N.array([]), self.intervals[best][1])
-                
+        return ( utils.datetimeToFloat(mindate), 
+                 utils.datetimeToFloat(maxdate),
+                 intervals_sec[best], 
+                 N.array(ticks), format )
+    
+    def filterIntervals(self, estint):
+        """Filter intervals and intervals_sec to be
+        multiples of estint seconds."""
+        intervals = []
+        intervals_sec = []
+        for i, inter in enumerate(self.intervals_sec):
+            ratio = estint / inter
+            if abs(ratio-int(ratio)) < ratio*.01:
+                intervals.append(self.intervals[i])
+                intervals_sec.append(inter)
+        return intervals, N.array(intervals_sec)
+
+    def getTicks(self):
+        """Calculate and return the position of the major ticks.
+
+        Returns a tuple (minval, maxval, majorticks, minorticks, format)"""
+
+        # find minor ticks
+        mindate, maxdate, est,  ticks, format = self.bestTickFinder(
+            self.minval, self.maxval, self.numticks, self.extendbounds, 
+            self.intervals, self.intervals_sec)
+
+        # try to make minor ticks divide evenly into major ticks
+        intervals, intervals_sec = self.filterIntervals(est)
+        # get minor ticks
+        ig, ig, ig, minorticks, ig = self.bestTickFinder(
+            mindate, maxdate, self.numminorticks, False, 
+            intervals, intervals_sec)
+
+        return (mindate,  maxdate,  ticks, minorticks, format) 
+        
