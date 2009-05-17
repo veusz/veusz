@@ -1188,6 +1188,99 @@ class FillSet(ListSet):
         # return widgets
         return [wfillstyle, wcolor, whide]
 
+class Datasets(qt4.QWidget):
+    """A control for editing a list of datasets."""
+
+    def __init__(self, setting, doc, dims, datatype, parent):
+        """Construct widget as combination of LineEdit and PushButton
+        for browsing."""
+
+        qt4.QWidget.__init__(self, parent)
+        self.setting = setting
+
+        self.grid = layout = qt4.QGridLayout()
+        layout.setHorizontalSpacing(0)
+        self.setLayout(layout)
+
+        self.controls = []
+        self.last = ()
+        # force updating to initialise
+        self.onModified(True)
+        self.setting.setOnModified(self.onModified)
+
+    def makeRow(self):
+        """Make new row at end"""
+        combo = qt4.QComboBox()
+        combo.setEditable(True)
+        addbutton = qt4.QPushButton('+')
+        addbutton.setFixedWidth(24)
+        subbutton = qt4.QPushButton('-')
+        subbutton.setFixedWidth(24)
+        self.controls.append((combo, addbutton, subbutton))
+        row = len(self.controls)-1
+
+        self.grid.addWidget(combo, row, 0)
+        self.grid.addWidget(addbutton, row, 1)
+        self.grid.addWidget(subbutton, row, 2)
+
+        self.connect(combo.lineEdit(), qt4.SIGNAL('editingFinished()'), 
+                     lambda: self.datasetChanged(row))
+        self.connect(addbutton, qt4.SIGNAL('clicked()'),
+                     lambda: self.addPressed(row))
+        self.connect(subbutton, qt4.SIGNAL('clicked()'),
+                     lambda: self.subPressed(row))
+
+        if len(self.controls) == 2:
+            # enable first subtraction button
+            self.controls[0][2].setEnabled(True)
+        elif len(self.controls) == 1:
+            # or disable
+            self.controls[0][2].setEnabled(False)
+
+    def deleteRow(self):
+        """Remove last row"""
+        for w in self.controls[-1]:
+            self.grid.removeWidget(w)
+        self.controls.pop(-1)
+
+        # disable first subtraction button
+        if len(self.controls) == 1:
+            self.controls[0][2].setEnabled(False)
+
+    def addPressed(self, row):
+        """User adds a new row."""
+        val = list(self.setting.val)
+        val.insert(row+1, '')
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
+
+    def subPressed(self, row):
+        """User deletes a row."""
+        val = list(self.setting.val)
+        val.pop(row)
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
+
+    def datasetChanged(self, row):
+        """User enters some text."""
+        val = list(self.setting.val)
+        val[row] = unicode(self.controls[row][0].lineEdit().text())
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
+
+    def onModified(self, mod):
+        """Called when the setting is changed remotely, or when control is opened"""
+
+        s = self.setting
+        if self.last == s.val:
+            return
+        self.last = s.val
+        
+        while len(s.val) > len(self.controls):
+            self.makeRow()
+        while len(s.val) < len(self.controls):
+            self.deleteRow()
+
+        for cntrls, val in itertools.izip(self.controls, s.val):
+            cntrls[0].lineEdit().setText(val)
+
 class Filename(qt4.QWidget):
     """A widget for selecting a filename with a browse button."""
 

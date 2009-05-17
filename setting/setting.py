@@ -18,7 +18,7 @@
 
 # $Id$
 
-"""Module for holding set values.
+"""Module for holding setting values.
 
 e.g.
 
@@ -989,6 +989,49 @@ class Dataset(Str):
         """Allow user to choose between the datasets."""
         return controls.Dataset(self, self.getDocument(), self.dimensions,
                                 self.datatype, *args)
+
+class Datasets(Setting):
+    """A setting to choose one or more of the possible datasets."""
+
+    def __init__(self, name, val, dimensions=1, datatype='numeric',
+                 **args):
+        """
+        dimensions is the number of dimensions the dataset needs
+        """
+
+        Setting.__init__(self, name, val, **args)
+        self.dimensions = dimensions
+        self.datatype = datatype
+
+    def convertTo(self, val):
+        """Takes a tuple/list of strings:
+        ('ds1','ds2'...)
+        """
+
+        if isinstance(val, basestring):
+            return (val, )
+
+        if type(val) not in (list, tuple):
+            raise InvalidType
+
+        # check each entry in the list is appropriate
+        for ds in val:
+            if not isinstance(ds, basestring):
+                raise InvalidType
+
+        return tuple(val)
+
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        return self._copyHelper((), (),
+                                {'dimensions': self.dimensions,
+                                 'datatype': self.datatype})
+        
+    def makeControl(self, *args):
+        """Allow user to choose between the datasets."""
+        return controls.Datasets(self, self.getDocument(), self.dimensions,
+                                 self.datatype, *args)
+
 
 class DatasetOrFloatList(Dataset):
     """Choose a dataset or specify a list of float values."""
