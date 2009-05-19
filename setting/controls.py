@@ -1214,7 +1214,9 @@ class Datasets(qt4.QWidget):
         combo.setEditable(True)
         addbutton = qt4.QPushButton('+')
         addbutton.setFixedWidth(24)
+        addbutton.setToolTip('Add another dataset')
         subbutton = qt4.QPushButton('-')
+        subbutton.setToolTip('Remove dataset')
         subbutton.setFixedWidth(24)
         self.controls.append((combo, addbutton, subbutton))
         row = len(self.controls)-1

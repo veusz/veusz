@@ -990,6 +990,14 @@ class Dataset(Str):
         return controls.Dataset(self, self.getDocument(), self.dimensions,
                                 self.datatype, *args)
 
+    def getData(self, doc):
+        """Return a list of datasets entered."""
+        d = doc.data.get(self.val)
+        if ( d is not None and
+             d.datatype == self.datatype and
+             d.dimensions == self.dimensions ):
+                 return d
+
 class Datasets(Setting):
     """A setting to choose one or more of the possible datasets."""
 
@@ -1032,6 +1040,16 @@ class Datasets(Setting):
         return controls.Datasets(self, self.getDocument(), self.dimensions,
                                  self.datatype, *args)
 
+    def getData(self, doc):
+        """Return a list of datasets entered."""
+        out = []
+        for name in self.val:
+            d = doc.data.get(name)
+            if ( d is not None and
+                 d.datatype == self.datatype and
+                 d.dimensions == self.dimensions ):
+                out.append(d)
+        return out
 
 class DatasetOrFloatList(Dataset):
     """Choose a dataset or specify a list of float values."""

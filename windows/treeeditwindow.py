@@ -632,7 +632,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.addslots = {}
         actions = {}
         for widgettype in ('page', 'grid', 'graph', 'axis',
-                           'xy', 'fit', 'function',
+                           'xy', 'bar', 'fit', 'function',
                            'image', 'contour',
                            'key', 'label', 'colorbar',
                            'rect', 'ellipse', 'imagefile',
@@ -652,7 +652,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.addactions = utils.populateMenuToolbars(
             [actions[wt] for wt in
              ('page', 'grid', 'graph', 'axis',
-              'xy', 'fit', 'function',
+              'xy', 'bar', 'fit', 'function',
               'image', 'contour',
               'key', 'label', 'colorbar')],
             self.toolbar, self.parent.menus)
