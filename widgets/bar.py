@@ -130,7 +130,7 @@ class BarPlotter(GenericPlotter):
             # get vertical axis if horz, and vice-versa
             axis = axes[ishorz]
             posns = axis.dataToPlotterCoords(posn, positions.data)
-            if len(posns) == 1:
+            if len(posns) <= 1:
                 if ishorz:
                     maxwidth = posn[2]-posn[0]
                 else:
@@ -140,18 +140,51 @@ class BarPlotter(GenericPlotter):
         else:
             # equally space bars
             if ishorz:
-                minv, maxv = posn[0], posn[2]
-            else:
                 minv, maxv = posn[1], posn[3]
+            else:
+                minv, maxv = posn[0], posn[2]
             # get number of bars
             numbars = max([len(x.data) for x in lengths])
+            print minv, maxv
             posns = N.arange(1, numbars) * ((1./numbars) * (maxv-minv)) + minv
+            print posns
             maxwidth = (maxv-minv)*1./numbars
 
         return posns,  maxwidth
 
-    def barDrawGroup(self, lengths, positions, axes, posn):
+    def barDrawGroup(self, painter, lengths, positions, axes, gposn):
         """Draw groups of bars."""
+
+        s = self.settings
+        numbars = len(lengths)
+        lengthdata = [d.data for d in lengths]
+
+        # get positions of groups of bars
+        posns,  maxwidth = self.findBarPositions(lengths, positions,
+                                                 axes, gposn)
+        bardelta = maxwidth / float(numbars)
+        barwidth = bardelta*0.75
+
+        ishorz = s.direction == 'horizontal'
+        zeropt = axes[not ishorz].dataToPlotterCoords(gposn, N.array([0.]))
+
+        for datapoints, posn in izip(izip(*lengthdata), posns):
+            plotcoord = axes[not ishorz].dataToPlotterCoords(gposn,
+                                                             N.array(datapoints))
+            for i, dp in enumerate(plotcoord):
+                if not N.isfinite(dp):
+                    continue
+                
+                p1 = posn - maxwidth*0.5 + bardelta*(i+0.5) + (bardelta-
+                                                               barwidth)*0.5
+                p2 = p1 + barwidth
+                # swap bar round as appropriate
+                if ishorz:
+                    painter.drawRect( qt4.QRectF(qt4.QPointF(zeropt, p1),
+                                                 qt4.QPointF(dp, p2) ) )
+                else:
+                    painter.drawRect( qt4.QRectF(qt4.QPointF(p1, zeropt),
+                                                 qt4.QPointF(p2, dp) ) )
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
@@ -188,9 +221,9 @@ class BarPlotter(GenericPlotter):
         self.clipAxesBounds(painter, axes, posn)
 
         if s.mode == 'single':
-            self.barDrawSingle(lengths, positions, axes, posn)
+            self.barDrawSingle(painter, lengths, positions, axes, posn)
         else:
-            self.barDrawGroup(lengths, positions, axes, posn)
+            self.barDrawGroup(painter, lengths, positions, axes, posn)
 
         painter.restore()
         painter.endPaintingWidget()
