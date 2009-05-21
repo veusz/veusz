@@ -30,6 +30,23 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
+class BarFill(setting.Settings):
+    '''Filling of bars.'''
+    def __init__(self, name, **args):
+        setting.Settings.__init__(self, name, **args)
+        self.add( setting.FillSet('fills', [('solid', 'black', False)],
+                                  descr = 'Fill styles for dataset bars',
+                                  usertext='Fill styles') )
+
+class BarLine(setting.Settings):
+    '''Edges of bars.'''
+    def __init__(self, name, **args):
+        setting.Settings.__init__(self, name, **args)
+        self.add( setting.LineSet('lines',
+                                  [('solid', '1pt', 'black', False)],
+                                  descr = 'Line styles for dataset bars', 
+                                  usertext='Line styles') )
+
 class BarPlotter(GenericPlotter):
     """Plot bar charts."""
 
@@ -43,8 +60,8 @@ class BarPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, name=name)
         s = self.settings
 
-        s.add( setting.Choice('mode', ('grouping', 'singlebar'), 
-                              'grouping', 
+        s.add( setting.Choice('mode', ('grouped', 'stacked'), 
+                              'grouped', 
                               descr='Show datasets grouped '
                               'together or as a single bar', 
                               usertext='Mode'), 0)
@@ -59,6 +76,11 @@ class BarPlotter(GenericPlotter):
         s.add( setting.Datasets('lengths', ('y',),
                                 descr = 'Datasets containing lengths of bars',
                                 usertext='Lengths'), 0 )
+
+        s.add(BarFill('BarFill', descr='Bar fill', usertext='Fill'),
+              pixmap='bgfill')
+        s.add(BarLine('BarLine', descr='Bar line', usertext='Line'),
+              pixmap='border')
 
         if type(self) == BarPlotter:
             self.readDefaults()
@@ -107,16 +129,22 @@ class BarPlotter(GenericPlotter):
                     axrange[0] = min(axrange[0], minv)
                     axrange[1] = max(axrange[1], maxv)
         else:
-            # use positions
             if s.posn:
+                # use given positions
                 data = s.get('posn').getData(self.document)
                 if data:
                     drange = data.getRange()
                     axrange[0] = min(axrange[0], drange[0])
                     axrange[1] = max(axrange[1], drange[1])
+            else:
+                # count bars
+                maxlen = max([len(d) for d in
+                              s.get('lengths').getData(self.document)])
+                axrange[0] = min(1-0.5, axrange[0])
+                axrange[1] = max(maxlen+0.5,  axrange[1])
 
-    def barDrawSingle(self, lengths, positions, axes, posn):
-        """Draw each dataset as a single bar."""
+    def barDrawStacked(self, lengths, positions, axes, posn):
+        """Draw each dataset in a single bar."""
 
         if positions is None:
             x = posn[2]
@@ -125,66 +153,63 @@ class BarPlotter(GenericPlotter):
         """Work out centres of bar / bar groups and maximum width."""
 
         ishorz = self.settings.direction == 'horizontal'
-        if positions is not None:
-            # work out positions of bars
-            # get vertical axis if horz, and vice-versa
-            axis = axes[ishorz]
-            posns = axis.dataToPlotterCoords(posn, positions.data)
-            if len(posns) <= 1:
-                if ishorz:
-                    maxwidth = posn[2]-posn[0]
-                else:
-                    maxwidth = posn[3]-posn[1]
-            else:
-                maxwidth = N.nanmin(posns[1:]-posns[:-1])
+
+        if positions is None:
+            p = N.arange( max([len(d.data) for d in lengths]) )+1.
         else:
-            # equally space bars
+            p = positions.data
+
+        # work out positions of bars
+        # get vertical axis if horz, and vice-versa
+        axis = axes[ishorz]
+        posns = axis.dataToPlotterCoords(posn, p)
+        if len(posns) <= 1:
             if ishorz:
-                minv, maxv = posn[1], posn[3]
+                maxwidth = posn[2]-posn[0]
             else:
-                minv, maxv = posn[0], posn[2]
-            # get number of bars
-            numbars = max([len(x.data) for x in lengths])
-            print minv, maxv
-            posns = N.arange(1, numbars) * ((1./numbars) * (maxv-minv)) + minv
-            print posns
-            maxwidth = (maxv-minv)*1./numbars
+                maxwidth = posn[3]-posn[1]
+        else:
+            maxwidth = N.nanmin(posns[1:]-posns[:-1])
 
         return posns,  maxwidth
 
-    def barDrawGroup(self, painter, lengths, positions, axes, gposn):
+    def barDrawGroup(self, painter, lengths, positions, axes, widgetposn):
         """Draw groups of bars."""
 
         s = self.settings
-        numbars = len(lengths)
-        lengthdata = [d.data for d in lengths]
+        numgroups = len(lengths)
 
         # get positions of groups of bars
         posns,  maxwidth = self.findBarPositions(lengths, positions,
-                                                 axes, gposn)
-        bardelta = maxwidth / float(numbars)
+                                                 axes, widgetposn)
+        bardelta = maxwidth / float(numgroups)
         barwidth = bardelta*0.75
 
         ishorz = s.direction == 'horizontal'
-        zeropt = axes[not ishorz].dataToPlotterCoords(gposn, N.array([0.]))
-
-        for datapoints, posn in izip(izip(*lengthdata), posns):
-            plotcoord = axes[not ishorz].dataToPlotterCoords(gposn,
-                                                             N.array(datapoints))
-            for i, dp in enumerate(plotcoord):
-                if not N.isfinite(dp):
-                    continue
-                
-                p1 = posn - maxwidth*0.5 + bardelta*(i+0.5) + (bardelta-
-                                                               barwidth)*0.5
-                p2 = p1 + barwidth
-                # swap bar round as appropriate
-                if ishorz:
-                    painter.drawRect( qt4.QRectF(qt4.QPointF(zeropt, p1),
-                                                 qt4.QPointF(dp, p2) ) )
-                else:
-                    painter.drawRect( qt4.QRectF(qt4.QPointF(p1, zeropt),
-                                                 qt4.QPointF(p2, dp) ) )
+        # bar extends from this coordinate
+        zeropt = axes[not ishorz].dataToPlotterCoords(widgetposn, N.array([0.]))
+    
+        for dsnum, dataset in enumerate(lengths):
+            # set correct attributes for datasets
+            painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
+            painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
+            
+            lengthcoord = axes[not ishorz].dataToPlotterCoords(
+                widgetposn, N.array(dataset.data))
+ 
+            for length,  posn in izip(lengthcoord, posns):
+                if N.isfinite(length) and N.isfinite(posn):
+                    # work out positions of bar perpendicular to bar length
+                    p1 = posn - maxwidth*0.5 + bardelta*dsnum + (bardelta-
+                                                                 barwidth)*0.5
+                    p2 = p1 + barwidth
+                    # draw bar from zero point
+                    if ishorz:
+                        painter.drawRect( qt4.QRectF(qt4.QPointF(zeropt, p1),
+                                                     qt4.QPointF(length, p2) ) )
+                    else:
+                        painter.drawRect( qt4.QRectF(qt4.QPointF(p1, zeropt),
+                                                     qt4.QPointF(p2, length) ) )
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
@@ -220,8 +245,8 @@ class BarPlotter(GenericPlotter):
         painter.save()
         self.clipAxesBounds(painter, axes, posn)
 
-        if s.mode == 'single':
-            self.barDrawSingle(painter, lengths, positions, axes, posn)
+        if s.mode == 'stacked':
+            self.barDrawStacked(painter, lengths, positions, axes, posn)
         else:
             self.barDrawGroup(painter, lengths, positions, axes, posn)
 
