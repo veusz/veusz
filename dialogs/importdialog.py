@@ -268,7 +268,7 @@ class ImportDialog(qt4.QDialog):
 
     def updateFITSView(self, filename):
         """Update the fits file details in the import dialog."""
-        f = pyfits.open(filename, 'readonly')
+        f = pyfits.open(str(filename), 'readonly')
         l = self.fitshdulist
         l.clear()
 
