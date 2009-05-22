@@ -138,10 +138,11 @@ class BarPlotter(GenericPlotter):
                     axrange[1] = max(axrange[1], drange[1])
             else:
                 # count bars
-                maxlen = max([len(d) for d in
-                              s.get('lengths').getData(self.document)])
-                axrange[0] = min(1-0.5, axrange[0])
-                axrange[1] = max(maxlen+0.5,  axrange[1])
+                data = s.get('lengths').getData(self.document)
+                if data:
+                    maxlen = max([len(d) for d in data])
+                    axrange[0] = min(1-0.5, axrange[0])
+                    axrange[1] = max(maxlen+0.5,  axrange[1])
 
     def barDrawStacked(self, lengths, positions, axes, posn):
         """Draw each dataset in a single bar."""
