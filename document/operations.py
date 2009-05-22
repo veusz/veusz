@@ -944,7 +944,7 @@ class OperationDataImportFITS(object):
             raise RuntimeError, ( 'PyFITS is required to import '
                                   'data from FITS files' )
 
-        f = pyfits.open(self.filename, 'readonly')
+        f = pyfits.open( str(self.filename), 'readonly')
         hdu = f[self.hdu]
         data = hdu.data
 
