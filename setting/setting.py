@@ -385,7 +385,6 @@ class Int(Setting):
 
         minval is minimum possible value of setting
         maxval is maximum possible value of setting
-        descr is a description of the setting
         """
 
         self.minval = minval
@@ -438,9 +437,32 @@ def safeEvalHelper(text):
 class Float(Setting):
     """Float settings."""
 
-    def convertTo(self, val):
-        if type(val) in (float, int):
-            return float(val)
+    def __init__(self, name, value, minval=-1e200, maxval=1e200,
+                 **args):
+        """Initialise the values.
+
+        minval is minimum possible value of setting
+        maxval is maximum possible value of setting
+        """
+
+        self.minval = minval
+        self.maxval = maxval
+        Setting.__init__(self, name, value, **args)
+
+    def copy(self):
+        """Make a setting which has its values copied from this one.
+
+        This needs to be overridden if the constructor changes
+        """
+        return self._copyHelper((), (), {'minval': self.minval,
+                                         'maxval': self.maxval})
+
+    def convertTo(self, val):       
+        if isinstance(val, int) or isinstance(val, float):
+            if val >= self.minval and val <= self.maxval:
+                return float(val)
+            else:
+                raise InvalidType, 'Out of range allowed'
         raise InvalidType
 
     def toText(self):
@@ -448,10 +470,11 @@ class Float(Setting):
 
     def fromText(self, text):
         try:
-            return float(text)
+            f = float(text)
         except ValueError:
             # try to evaluate
-            return safeEvalHelper(text)
+            f = safeEvalHelper(text)
+        return self.convertTo(f)
 
     def makeControl(self, *args):
         return controls.Edit(self, *args)

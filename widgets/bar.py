@@ -77,6 +77,19 @@ class BarPlotter(GenericPlotter):
                                 descr = 'Datasets containing lengths of bars',
                                 usertext='Lengths'), 0 )
 
+        s.add( setting.Float('barfill', 0.75,
+                             minval = 0., maxval = 1.,
+                             descr = 'Filling fraction of bars'
+                             ' (between 0 and 1)',
+                             usertext='Bar fill',
+                             formatting=True) )
+        s.add( setting.Float('groupfill', 0.9,
+                             minval = 0., maxval = 1.,
+                             descr = 'Filling fraction of groups of bars'
+                             ' (between 0 and 1)',
+                             usertext='Group fill',
+                             formatting=True) )
+
         s.add(BarFill('BarFill', descr='Bar fill', usertext='Fill'),
               pixmap='bgfill')
         s.add(BarLine('BarLine', descr='Bar line', usertext='Line'),
@@ -175,36 +188,50 @@ class BarPlotter(GenericPlotter):
         numgroups = len(lengths)
 
         # get positions of groups of bars
-        posns,  maxwidth = self.findBarPositions(lengths, positions,
-                                                 axes, widgetposn)
-        bardelta = maxwidth / float(numgroups)
-        barwidth = bardelta*0.75
+        posns, maxwidth = self.findBarPositions(lengths, positions,
+                                                axes, widgetposn)
+
+        # calculate bar and group widths
+        groupwidth = maxwidth
+        usablewidth = groupwidth * s.groupfill
+        bardelta = usablewidth / float(numgroups)
+        barwidth = bardelta * s.barfill
 
         ishorz = s.direction == 'horizontal'
-        # bar extends from this coordinate
-        zeropt = axes[not ishorz].dataToPlotterCoords(widgetposn, N.array([0.]))
-    
+
+        # trim datasets to minimum lengths
+        datasets = [l.data for l in lengths]
+        minlen = min([len(d) for d in datasets])
+        datasets = [d[:minlen] for d in datasets]
+        posns = posns[:minlen]
+
+        # bar extends from these coordinates
+        zeropts = axes[not ishorz].dataToPlotterCoords(widgetposn,
+                                                       N.zeros(minlen))
+
         for dsnum, dataset in enumerate(lengths):
             # set correct attributes for datasets
             painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
             painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
             
+            # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, N.array(dataset.data))
  
-            for length, posn in izip(lengthcoord, posns):
-                if N.isfinite(length) and N.isfinite(posn):
-                    # work out positions of bar perpendicular to bar length
-                    p1 = posn - maxwidth*0.5 + bardelta*dsnum + (bardelta-
-                                                                 barwidth)*0.5
-                    p2 = p1 + barwidth
-                    # draw bar from zero point
-                    if ishorz:
-                        painter.drawRect( qt4.QRectF(qt4.QPointF(zeropt, p1),
-                                                     qt4.QPointF(length, p2) ) )
-                    else:
-                        painter.drawRect( qt4.QRectF(qt4.QPointF(p1, zeropt),
-                                                     qt4.QPointF(p2, length) ) )
+            # these are the coordinates perpendicular to the bar
+            posns1 = posns + (-usablewidth*0.5 + bardelta*dsnum +
+                              (bardelta-barwidth)*0.5)
+            posns2 = posns1 + barwidth
+
+            if ishorz:
+                coords = (zeropts, lengthcoord, posns1, posns2)
+            else:
+                coords = (posns1, posns2, zeropts, lengthcoord)
+
+            # iterate over coordinates to plot bars
+            for x1, x2, y1, y2 in N.nan_to_num(N.column_stack(coords)):
+                painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
+                                             qt4.QPointF(x2, y2) ) )
 
     def barDrawStacked(self, painter, lengths, positions, axes, widgetposn):
         """Draw each dataset in a single bar."""
@@ -214,7 +241,7 @@ class BarPlotter(GenericPlotter):
         # get positions of groups of bars
         posns,  maxwidth = self.findBarPositions(lengths, positions,
                                                  axes, widgetposn)
-        barwidth = maxwidth*0.75
+        barwidth = maxwidth * s.barfill
 
         ishorz = s.direction == 'horizontal'
 
@@ -295,6 +322,7 @@ class BarPlotter(GenericPlotter):
         painter.save()
         self.clipAxesBounds(painter, axes, posn)
 
+        # actually do the drawing
         if s.mode == 'stacked':
             self.barDrawStacked(painter, lengths, positions, axes, posn)
         else:
