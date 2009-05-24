@@ -1203,6 +1203,7 @@ class Datasets(qt4.QWidget):
 
         self.grid = layout = qt4.QGridLayout()
         layout.setHorizontalSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
         self.controls = []
