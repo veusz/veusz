@@ -229,6 +229,8 @@ class BarPlotter(GenericPlotter):
                 coords = (posns1, posns2, zeropts, lengthcoord)
 
             # iterate over coordinates to plot bars
+            # column_stack is actually much slower than izip!
+            # hopefully we won't get many bars to draw, however
             for x1, x2, y1, y2 in N.nan_to_num(N.column_stack(coords)):
                 painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
                                              qt4.QPointF(x2, y2) ) )
