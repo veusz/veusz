@@ -209,14 +209,14 @@ class BarPlotter(GenericPlotter):
         zeropts = axes[not ishorz].dataToPlotterCoords(widgetposn,
                                                        N.zeros(minlen))
 
-        for dsnum, dataset in enumerate(lengths):
+        for dsnum, dataset in enumerate(datasets):
             # set correct attributes for datasets
             painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
             painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
             
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
-                widgetposn, N.array(dataset.data))
+                widgetposn, N.array(dataset))
  
             # these are the coordinates perpendicular to the bar
             posns1 = posns + (-usablewidth*0.5 + bardelta*dsnum +
@@ -250,6 +250,7 @@ class BarPlotter(GenericPlotter):
         # trim data to minimum length
         datasets = [l.data for l in lengths]
         minlen = min([len(d) for d in datasets])
+
         datasets = [d[:minlen] for d in datasets]
         posns = posns[:minlen]
 
