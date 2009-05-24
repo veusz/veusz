@@ -1231,6 +1231,10 @@ class Datasets(qt4.QWidget):
 
         self.connect(combo.lineEdit(), qt4.SIGNAL('editingFinished()'), 
                      lambda: self.datasetChanged(row))
+        # if a different item is selected
+        self.connect(combo, qt4.SIGNAL('activated(const QString&)'),
+                     lambda x: self.datasetChanged(row))
+
         self.connect(addbutton, qt4.SIGNAL('clicked()'),
                      lambda: self.addPressed(row))
         self.connect(subbutton, qt4.SIGNAL('clicked()'),
