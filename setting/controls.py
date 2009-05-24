@@ -1191,12 +1191,15 @@ class FillSet(ListSet):
 class Datasets(qt4.QWidget):
     """A control for editing a list of datasets."""
 
-    def __init__(self, setting, doc, dims, datatype, parent):
+    def __init__(self, setting, doc, dimensions, datatype, parent):
         """Construct widget as combination of LineEdit and PushButton
         for browsing."""
 
         qt4.QWidget.__init__(self, parent)
         self.setting = setting
+        self.document = doc
+        self.dimensions = dimensions
+        self.datatype = datatype
 
         self.grid = layout = qt4.QGridLayout()
         layout.setHorizontalSpacing(0)
@@ -1204,6 +1207,7 @@ class Datasets(qt4.QWidget):
 
         self.controls = []
         self.last = ()
+        self.lastdatasets = []
         # force updating to initialise
         self.onModified(True)
         self.setting.setOnModified(self.onModified)
@@ -1267,13 +1271,26 @@ class Datasets(qt4.QWidget):
         val[row] = unicode(self.controls[row][0].lineEdit().text())
         self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
 
+    def getDatasets(self):
+        """Get applicable datasets (sorted)."""
+        datasets = []
+        for name, ds in self.document.data.iteritems():
+            if (ds.dimensions == self.dimensions and
+                ds.datatype == self.datatype):
+                datasets.append(name)
+        datasets.sort()
+        return datasets
+
     def onModified(self, mod):
         """Called when the setting is changed remotely, or when control is opened"""
 
         s = self.setting
-        if self.last == s.val:
+        datasets = self.getDatasets()
+
+        if self.last == s.val and self.lastdatasets == datasets:
             return
         self.last = s.val
+        self.lastdatasets = datasets
         
         while len(s.val) > len(self.controls):
             self.makeRow()
@@ -1282,6 +1299,7 @@ class Datasets(qt4.QWidget):
 
         for cntrls, val in itertools.izip(self.controls, s.val):
             cntrls[0].lineEdit().setText(val)
+            populateCombo(cntrls[0], datasets)
 
 class Filename(qt4.QWidget):
     """A widget for selecting a filename with a browse button."""
