@@ -36,7 +36,7 @@ defaultValues = {
     'export_quality': 85,
 
     # plot options
-    'plot_updateinterval': 1000,
+    'plot_updateinterval': 500,
     'plot_antialias': True,
 
     # recent files list
