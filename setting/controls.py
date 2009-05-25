@@ -1188,53 +1188,42 @@ class FillSet(ListSet):
         # return widgets
         return [wfillstyle, wcolor, whide]
 
-class Datasets(qt4.QWidget):
-    """A control for editing a list of datasets."""
+class MultiSettingWidget(qt4.QWidget):
+    """A widget for storing multiple values in a tuple,
+    with + and - signs by each entry."""
 
-    def __init__(self, setting, doc, dimensions, datatype, parent):
+    def __init__(self, setting, doc, parent):
         """Construct widget as combination of LineEdit and PushButton
         for browsing."""
 
         qt4.QWidget.__init__(self, parent)
         self.setting = setting
         self.document = doc
-        self.dimensions = dimensions
-        self.datatype = datatype
 
         self.grid = layout = qt4.QGridLayout()
         layout.setHorizontalSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-        self.controls = []
         self.last = ()
-        self.lastdatasets = []
-        # force updating to initialise
-        self.onModified(True)
+        self.controls = []
         self.setting.setOnModified(self.onModified)
-
+        
     def makeRow(self):
         """Make new row at end"""
-        combo = qt4.QComboBox()
-        combo.setEditable(True)
+        row = len(self.controls)
+        cntrl = self.makeControl(row)
         addbutton = qt4.QPushButton('+')
         addbutton.setFixedWidth(24)
-        addbutton.setToolTip('Add another dataset')
+        addbutton.setToolTip('Add another item')
         subbutton = qt4.QPushButton('-')
-        subbutton.setToolTip('Remove dataset')
+        subbutton.setToolTip('Remove item')
         subbutton.setFixedWidth(24)
-        self.controls.append((combo, addbutton, subbutton))
-        row = len(self.controls)-1
+        self.controls.append((cntrl, addbutton, subbutton))
 
-        self.grid.addWidget(combo, row, 0)
+        self.grid.addWidget(cntrl, row, 0)
         self.grid.addWidget(addbutton, row, 1)
         self.grid.addWidget(subbutton, row, 2)
-
-        self.connect(combo.lineEdit(), qt4.SIGNAL('editingFinished()'), 
-                     lambda: self.datasetChanged(row))
-        # if a different item is selected
-        self.connect(combo, qt4.SIGNAL('activated(const QString&)'),
-                     lambda x: self.datasetChanged(row))
 
         self.connect(addbutton, qt4.SIGNAL('clicked()'),
                      lambda: self.addPressed(row))
@@ -1262,19 +1251,75 @@ class Datasets(qt4.QWidget):
         """User adds a new row."""
         val = list(self.setting.val)
         val.insert(row+1, '')
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                   tuple(val) )
 
     def subPressed(self, row):
         """User deletes a row."""
         val = list(self.setting.val)
         val.pop(row)
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                   tuple(val) )
+
+    def onModified(self, mod):
+        """Called when the setting is changed remotely,
+        or when control is opened"""
+
+        s = self.setting
+
+        if self.last == s.val:
+            return
+        self.last = s.val
+
+        # update number of rows
+        while len(self.setting.val) > len(self.controls):
+            self.makeRow()
+        while len(self.setting.val) < len(self.controls):
+            self.deleteRow()
+
+        # update values
+        self.updateControls()
+
+    def makeControl(self, row):
+        """Override this to make an editing widget."""
+        return None
+
+    def updateControls():
+        """Override this to update values in controls."""
+        pass
+
+class Datasets(MultiSettingWidget):
+    """A control for editing a list of datasets."""
+
+    def __init__(self, setting, doc, dimensions, datatype, parent):
+        """Contruct set of comboboxes"""
+
+        MultiSettingWidget.__init__(self, setting, doc, parent)
+        self.dimensions = dimensions
+        self.datatype = datatype
+
+        self.lastdatasets = []
+        # force updating to initialise
+        self.onModified(True)
+
+    def makeControl(self, row):
+        """Make QComboBox edit widget."""
+        combo = qt4.QComboBox()
+        combo.setEditable(True)
+        self.connect(combo.lineEdit(), qt4.SIGNAL('editingFinished()'), 
+                     lambda: self.datasetChanged(row))
+        # if a different item is selected
+        self.connect(combo, qt4.SIGNAL('activated(const QString&)'),
+                     lambda x: self.datasetChanged(row))
+        populateCombo(combo, self.getDatasets())
+        return combo
 
     def datasetChanged(self, row):
         """User enters some text."""
         val = list(self.setting.val)
         val[row] = unicode(self.controls[row][0].lineEdit().text())
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, tuple(val) )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                   tuple(val) )
 
     def getDatasets(self):
         """Get applicable datasets (sorted)."""
@@ -1286,25 +1331,56 @@ class Datasets(qt4.QWidget):
         datasets.sort()
         return datasets
 
+    def updateControls(self):
+        """Set values of controls."""
+        for cntrls, val in itertools.izip(self.controls, self.setting.val):
+            cntrls[0].lineEdit().setText(val)
+
     def onModified(self, mod):
-        """Called when the setting is changed remotely, or when control is opened"""
+        """Called when the setting is changed remotely,
+        or when control is opened"""
+
+        MultiSettingWidget.onModified(self, mod)
 
         s = self.setting
         datasets = self.getDatasets()
 
-        if self.last == s.val and self.lastdatasets == datasets:
+        if self.lastdatasets == datasets:
             return
-        self.last = s.val
         self.lastdatasets = datasets
-        
-        while len(s.val) > len(self.controls):
-            self.makeRow()
-        while len(s.val) < len(self.controls):
-            self.deleteRow()
 
-        for cntrls, val in itertools.izip(self.controls, s.val):
-            cntrls[0].lineEdit().setText(val)
+        # update list of datasets
+        for cntrls in self.controls:
             populateCombo(cntrls[0], datasets)
+
+class Strings(MultiSettingWidget):
+    """A list of strings."""
+
+    def __init__(self, setting, doc, parent):
+        """Construct widget as combination of LineEdit and PushButton
+        for browsing."""
+
+        MultiSettingWidget.__init__(self, setting, doc, parent)
+        self.onModified(True)
+
+    def makeControl(self, row):
+        """Make edit widget."""
+        lineedit = qt4.QLineEdit()
+        self.connect(lineedit, qt4.SIGNAL('editingFinished()'), 
+                     lambda: self.textChanged(row))
+        return lineedit
+
+    def textChanged(self, row):
+        """User enters some text."""
+        val = list(self.setting.val)
+        val[row] = unicode(self.controls[row][0].text())
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                   tuple(val) )
+
+    def updateControls(self):
+        """Set values of controls."""
+        for cntrls, val in itertools.izip(self.controls, self.setting.val):
+            cntrls[0].setText(val)        
 
 class Filename(qt4.QWidget):
     """A widget for selecting a filename with a browse button."""

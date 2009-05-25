@@ -1021,6 +1021,31 @@ class Dataset(Str):
              d.dimensions == self.dimensions ):
                  return d
 
+class Strings(Setting):
+    """A multiple set of strings."""
+
+    def convertTo(self, val):
+        """Takes a tuple/list of strings:
+        ('ds1','ds2'...)
+        """
+
+        if isinstance(val, basestring):
+            return (val, )
+
+        if type(val) not in (list, tuple):
+            raise InvalidType
+
+        # check each entry in the list is appropriate
+        for ds in val:
+            if not isinstance(ds, basestring):
+                raise InvalidType
+
+        return tuple(val)
+        
+    def makeControl(self, *args):
+        """Allow user to choose between the datasets."""
+        return controls.Strings(self, self.getDocument(), *args)
+
 class Datasets(Setting):
     """A setting to choose one or more of the possible datasets."""
 

@@ -60,6 +60,13 @@ class BarPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, name=name)
         s = self.settings
 
+        # get rid of default key setting
+        s.remove('key')
+
+        s.add( setting.Strings('keys', (''),
+                               descr='Key text for each dataset',
+                               usertext='Key text'), 0)
+
         s.add( setting.Choice('mode', ('grouped', 'stacked'), 
                               'grouped', 
                               descr='Show datasets grouped '
