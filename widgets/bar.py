@@ -298,6 +298,27 @@ class BarPlotter(GenericPlotter):
                 painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
                                              qt4.QPointF(x2, y2)) )
 
+    def getNumberKeys(self):
+        """Return maximum number of keys."""
+        lengths = self.settings.get('lengths').getData(self.document)
+        if not lengths:
+            return 0
+        return min( len(self.settings.keys), len(lengths) )
+
+    def getKeyText(self, number):
+        """Get key entry."""
+        return self.settings.keys[number]
+
+    def drawKeySymbol(self, number, painter, x, y, width, height):
+        """Draw a fill rectangle for key entry."""
+
+        s = self.settings
+        painter.setBrush( s.BarFill.get('fills').makeBrush(number) )
+        painter.setPen( s.BarLine.get('lines').makePen(painter, number) )
+        painter.drawRect( qt4.QRectF(qt4.QPointF(x, y+height*0.1),
+                                     qt4.QPointF(x+width, y+height*0.8)) )
+
+
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
 
