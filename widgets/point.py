@@ -443,7 +443,7 @@ class PointPlotter(GenericPlotter):
                 painter.setPen( s.PlotLine.makeQPen(painter) )
                 painter.drawPolyline(pts)
 
-    def drawKeySymbol(self, painter, x, y, width, height):
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
         painter.save()
         painter.setClipRect(

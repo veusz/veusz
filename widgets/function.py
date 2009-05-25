@@ -229,7 +229,7 @@ class FunctionPlotter(GenericPlotter):
         # actually do the filling
         painter.drawPolygon(pts)
 
-    def drawKeySymbol(self, painter, x, y, width, height):
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
 
         s = self.settings

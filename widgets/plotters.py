@@ -87,7 +87,18 @@ class GenericPlotter(widget.Widget):
         """Update range variable for axis with dependency name given."""
         pass
 
-    def drawKeySymbol(self, painter, x, y, width, height):
+    def getNumberKeys(self):
+        """Return number of key entries."""
+        if self.settings.key:
+            return 1
+        else:
+            return 0
+
+    def getKeyText(self, number):
+        """Get key entry."""
+        return self.settings.key
+
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line at (x,y) in a box width*height.
 
         This is used to plot a key

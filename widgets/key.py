@@ -235,18 +235,25 @@ class Key(widget.Widget):
         # maximum width of text required
         maxwidth = 1
 
+        entries = []
         # iterate over children and find widgets which are suitable
         for c in self.parent.children:
-            childset = c.settings
-            if childset.isSetting('key') and childset.key and not childset.hide:
-                keywidgets.append(c)
-                if showtext:
-                    w, h = utils.Renderer(painter, font, 0, 0,
-                                          childset.key).getDimensions()
-                    maxwidth = max(maxwidth, w)
+            try:
+                num = c.getNumberKeys()
+            except AttributeError:
+                continue
+            if not c.settings.hide:
+                # add an entry for each key entry for each widget
+                for i in xrange(num):
+                    entries.append( (c, i) )
+
+                    if showtext:
+                        w, h = utils.Renderer(painter, font, 0, 0,
+                                              c.getKeyText(i)).getDimensions()
+                        maxwidth = max(maxwidth, w)
 
         # get number of columns
-        count = len(keywidgets)
+        count = len(entries)
         numcols = min(s.columns, max(count, 1))
         numrows = count / numcols
         if count % numcols != 0:
@@ -303,14 +310,14 @@ class Key(widget.Widget):
         textpen = s.get('Text').makeQPen()
 
         # plot dataset entries
-        for index, plotter in enumerate(keywidgets):
+        for index, (plotter, num) in enumerate(entries):
             xp, yp = index / numrows, index % numrows
             xpos = x + xp*(maxwidth+2*height+symbolwidth)
             ypos = y + yp*height
 
             # plot key symbol
             painter.save()
-            plotter.drawKeySymbol(painter, xpos, ypos,
+            plotter.drawKeySymbol(num, painter, xpos, ypos,
                                   symbolwidth, height)
             painter.restore()
 
@@ -318,9 +325,8 @@ class Key(widget.Widget):
             if showtext:
                 painter.setPen(textpen)
                 utils.Renderer(painter, font,
-                               xpos + height + symbolwidth,
-                               ypos,
-                               plotter.settings.key,
+                               xpos + height + symbolwidth, ypos,
+                               plotter.getKeyText(num),
                                -1, 1).render()
 
         self.controlgraphitems = [
