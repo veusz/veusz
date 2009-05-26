@@ -43,7 +43,7 @@ class BarLine(setting.Settings):
     def __init__(self, name, **args):
         setting.Settings.__init__(self, name, **args)
         self.add( setting.LineSet('lines',
-                                  [('solid', '1pt', 'black', False)],
+                                  [('solid', '0.5pt', 'black', False)],
                                   descr = 'Line styles for dataset bars', 
                                   usertext='Line styles') )
 
@@ -97,10 +97,21 @@ class BarPlotter(GenericPlotter):
                              usertext='Group fill',
                              formatting=True) )
 
+        s.add( setting.Choice('errorstyle', ('none', 'bar', 'barends'), 
+                              'bar', 
+                              descr='Error bar style to show', 
+                              usertext='Error style',
+                              formatting=True) )
+
         s.add(BarFill('BarFill', descr='Bar fill', usertext='Fill'),
               pixmap='bgfill')
         s.add(BarLine('BarLine', descr='Bar line', usertext='Line'),
               pixmap='border')
+
+        s.add( setting.ErrorBarLine('ErrorBarLine',
+                                    descr = 'Error bar line settings',
+                                    usertext = 'Error bar line'),
+               pixmap = 'ploterrorline' )
 
         if type(self) == BarPlotter:
             self.readDefaults()
@@ -188,6 +199,69 @@ class BarPlotter(GenericPlotter):
 
         return posns,  maxwidth
 
+    def calculateErrorBars(self, dataset, vals):
+        """Get values for error bars."""
+        minval = None
+        maxval = None
+        length = len(vals)
+        if dataset.serr is not None:
+            minval = vals - dataset.serr[:length]
+            maxval = vals + dataset.serr[:length]
+        else:
+            if dataset.nerr is not None:
+                minval = vals + dataset.nerr[:length]
+            if dataset.perr is not None:
+                maxval = vals + dataset.perr[:length]
+        return minval, maxval
+
+    def drawErrorBars(self, painter, posns, barwidth,
+                      yvals, dataset, axes, widgetposn):
+        """Draw (optional) error bars on bars."""
+        s = self.settings
+        if s.errorstyle == 'none':
+            return
+
+        minval, maxval = self.calculateErrorBars(dataset, yvals)
+        if minval is None and maxval is None:
+            return
+
+        # handle one sided errors
+        if minval is None:
+            minval = yvals
+        if maxval is None:
+            maxval = yvals
+
+        # convert errors to coordinates
+        ishorz = s.direction == 'horizontal'
+        mincoord = axes[not ishorz].dataToPlotterCoords(widgetposn, minval)
+        maxcoord = axes[not ishorz].dataToPlotterCoords(widgetposn, maxval)
+
+        # draw error bars
+        painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(painter) )
+        pts = []
+        w = barwidth*0.25
+        if ishorz:
+            for x1, x2, y in izip(mincoord, maxcoord, posns):
+                pts.append( qt4.QPointF(x1, y) )
+                pts.append( qt4.QPointF(x2, y) )
+            if s.errorstyle == 'barends':
+                for x1, x2, y in izip(mincoord, maxcoord, posns):
+                    pts.append( qt4.QPointF(x1, y-w) )
+                    pts.append( qt4.QPointF(x1, y+w) )
+                    pts.append( qt4.QPointF(x2, y-w) )
+                    pts.append( qt4.QPointF(x2, y+w) )
+        else:
+            for y1, y2, x in izip(mincoord, maxcoord, posns):
+                pts.append( qt4.QPointF(x, y1) )
+                pts.append( qt4.QPointF(x, y2) )
+            if s.errorstyle == 'barends':
+                for y1, y2, x in izip(mincoord, maxcoord, posns):
+                    pts.append( qt4.QPointF(x-w, y1) )
+                    pts.append( qt4.QPointF(x+w, y1) )
+                    pts.append( qt4.QPointF(x-w, y2) )
+                    pts.append( qt4.QPointF(x+w, y2) )
+        painter.drawLines(pts)
+
     def barDrawGroup(self, painter, lengths, positions, axes, widgetposn):
         """Draw groups of bars."""
 
@@ -223,7 +297,7 @@ class BarPlotter(GenericPlotter):
             
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
-                widgetposn, N.array(dataset))
+                widgetposn, dataset)
  
             # these are the coordinates perpendicular to the bar
             posns1 = posns + (-usablewidth*0.5 + bardelta*dsnum +
@@ -241,6 +315,11 @@ class BarPlotter(GenericPlotter):
             for x1, x2, y1, y2 in N.nan_to_num(N.column_stack(coords)):
                 painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
                                              qt4.QPointF(x2, y2) ) )
+
+            # draw error bars
+            self.drawErrorBars(painter, posns2-barwidth*0.5, barwidth,
+                               dataset, lengths[dsnum],
+                               axes, widgetposn)
 
     def barDrawStacked(self, painter, lengths, positions, axes, widgetposn):
         """Draw each dataset in a single bar."""
@@ -263,7 +342,9 @@ class BarPlotter(GenericPlotter):
         # keep track of last most negative or most positive values in bars
         lastneg = N.zeros(minlen)
         lastpos = N.zeros(minlen)
-    
+
+        # keep track of bars for error bars
+        barvals = []
         for dsnum, data in enumerate(datasets):
             # set correct attributes for datasets
             painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
@@ -293,20 +374,28 @@ class BarPlotter(GenericPlotter):
             else:
                 coords = (posns1, posns2, lastplt, newplt)
 
+            # draw bars
             for x1, x2, y1, y2 in N.nan_to_num(N.column_stack(coords)):
                 painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
                                              qt4.QPointF(x2, y2)) )
+            barvals.append(new)
+
+        for dsnum, data in enumerate(datasets):
+            # draw error bars
+            self.drawErrorBars(painter, posns, barwidth,
+                               barvals[dsnum], lengths[dsnum],
+                               axes, widgetposn)
 
     def getNumberKeys(self):
         """Return maximum number of keys."""
         lengths = self.settings.get('lengths').getData(self.document)
         if not lengths:
             return 0
-        return min( len(self.settings.keys), len(lengths) )
+        return min( len([k for k in self.settings.keys if k]), len(lengths) )
 
     def getKeyText(self, number):
         """Get key entry."""
-        return self.settings.keys[number]
+        return [k for k in self.settings.keys if k][number]
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw a fill rectangle for key entry."""
