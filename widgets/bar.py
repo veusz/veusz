@@ -208,7 +208,7 @@ class BarPlotter(GenericPlotter):
 
         # trim datasets to minimum lengths
         datasets = [l.data for l in lengths]
-        minlen = min([len(d) for d in datasets])
+        minlen = min([len(d) for d in datasets] + [len(posns)])
         datasets = [d[:minlen] for d in datasets]
         posns = posns[:minlen]
 
@@ -256,8 +256,7 @@ class BarPlotter(GenericPlotter):
 
         # trim data to minimum length
         datasets = [l.data for l in lengths]
-        minlen = min([len(d) for d in datasets])
-
+        minlen = min([len(d) for d in datasets] + [len(posns)])
         datasets = [d[:minlen] for d in datasets]
         posns = posns[:minlen]
 
