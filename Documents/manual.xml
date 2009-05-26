@@ -235,6 +235,22 @@
 	      </listitem>
 
 	      <listitem>
+		<para><command>bar</command> - a bar chart which plots
+		sets of data as horizontal or vertical bars. Multiple
+		datasets are supported. In "grouped" mode the bars are
+		placed side-by-side for each dataset. In "stacked"
+		mode the bars are placed on top of each other (in the
+		appropriate direction according to the sign of the
+		dataset). Bars are placed on coordinates given, or in
+		integer values from 1 upward if none are given. Error
+		bars are plotted for each of the datasets.</para>
+
+		<para>Different fill styles can be given for each
+		dataset given. A separate key value can be given for
+		each dataset.</para>
+	      </listitem>
+
+	      <listitem>
 		<para><command>key</command> - a box which describes
 		  the data plotted. If a key is added to a plot, the
 		  key looks for "key" settings of the other data
@@ -351,16 +367,29 @@
 	supports superscripts ("^"), subscripts ("_"), brackets for
 	grouping attributes are "{" and "}".</para>
 
-	 <para>Special symbols include greek letters ("\alpha" to
-	"\omega" and "\Alpha" to "\Omega"). Also included are symbols
-	"\times", "\pm", "\deg", "\divide", "\dagger", "\ddagger",
-	"\bullet", "\AA", "\sqrt", "\propto", "\infty", "\int",
-	"\sim", "\odot", "\leftarrow", "\uparrow", "\rightarrow",
-	"\downarrow" and "\circ". Please request additional characters
-	if they are required (and exist in the unicode character
-	set). Special symbols can be included directly from a
-	character map.</para>
+	<para>Supported LaTeX symbols include: \AA, \Alpha, \Beta,
+ \Chi, \Delta, \Epsilon, \Eta, \Gamma, \Iota, \Kappa, \Lambda, \Mu,
+ \Nu, \Omega, \Omicron, \Phi, \Pi, \Psi, \Rho, \Sigma, \Tau, \Theta,
+ \Upsilon, \Xi, \Zeta, \alpha, \approx, \ast, \asymp, \beta, \bowtie,
+ \bullet, \cap, \chi, \circ, \cup, \dagger, \dashv, \ddagger, \deg,
+ \delta, \diamond, \divide, \doteq, \downarrow, \epsilon, \equiv,
+ \eta, \gamma, \ge, \gg, \in, \infty, \int, \iota, \kappa, \lambda,
+ \le, \leftarrow, \lhd, \ll, \models, \mp, \mu, \neq, \ni, \nu, \odot,
+ \omega, \omicron, \ominus, \oplus, \oslash, \otimes, \parallel,
+ \perp, \phi, \pi, \pm, \prec, \preceq, \propto, \psi, \rhd, \rho,
+ \rightarrow, \sigma, \sim, \simeq, \sqrt, \sqsubset, \sqsubseteq,
+ \sqsupset, \sqsupseteq, \star, \stigma, \subset, \subseteq, \succ,
+ \succeq, \supset, \supseteq, \tau, \theta, \times, \umid, \unlhd,
+ \unrhd, \uparrow, \uplus, \upsilon, \vdash, \vee, \wedge, \xi, \zeta.
+ Please request additional characters if they are required (and exist
+ in the unicode character set). Special symbols can be included
+ directly from a character map.</para>
 
+	 <para>Other LaTeX commands are supported. "\\" breaks a
+	 line. This can be used for simple tables. For example "{a\\b}
+	 {c\\d}" shows "a c" over "b d". The command "\frac{a}{b}"
+	 shows a vertical fraction a/b.</para>
+	 
 	<para>Also supported are commands to change font. The command
 	"\font{name}{text}" changes the font text is written in to
 	name. This may be useful if a symbol is missing from the
