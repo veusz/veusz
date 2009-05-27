@@ -126,19 +126,13 @@ class Graph(widget.Widget):
 
         painter.beginPaintingWidget(self, bounds)
 
-        # if there's a background
-        if not s.Background.hide:
-            brush = s.get('Background').makeQBrush()
-            painter.fillRect( qt4.QRectF(bounds[0], bounds[1],
-                                         bounds[2]-bounds[0],
-                                         bounds[3]-bounds[1]), brush )
+        # set graph rectangle attributes
+        painter.setBrush( s.get('Background').makeQBrushWHide() )
+        painter.setPen( s.get('Border').makeQPenWHide(painter) )
 
-        # if there's a border
-        if not s.Border.hide:
-            painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
-                                         bounds[2]-bounds[0],
-                                         bounds[3]-bounds[1]) )
+        # draw graph rectangle
+        painter.drawRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
+                                     qt4.QPointF(bounds[2], bounds[3])) )
 
         # work out outer bounds
         ob = list(parentposn)
