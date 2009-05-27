@@ -1,4 +1,4 @@
-Veusz 1.3
+Veusz 1.4
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -17,29 +17,30 @@ Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Changes in 1.3:
- * Add data capture from sockets, files and external programs
- * Remembers previous entries in dialog boxes
- * Add shaded regions or lines error bar style
- * Plot keys can be dragged around with the mouse
- * New clearer scalable icons
- * Now requires Python >= 2.4
+Changes in 1.4:
+ * Dates can be plotted on axes
+ * Bar graph component, support bars in groups and stacked bars
+   with error bars
+ * Improved import
+   - text lines can be ignored in imported files
+   - prefix and suffix can be added to dataset names
+   - more robust import dialog
+ * Markers can be "thinned" for large datasets
+ * Further LaTeX support, including \frac for fractions and \\
+   for line breaks.
+ * Keys show error bars on datasets with errors
+ * Axes can scale plotted data by a factor
 
- * minor changes
-  - Add filename completion in several places
-  - Remember import dialog tab selection
-  - Use font drop-down to select font
-  - Add icons for error bar styles
-  - Error bar code rewritten and simplified
-  - Add import dialog to toolbar
- 
- * bug fixes:
-  - Fix incorrect "security errors" when loading invalid documents
-  - Fix dragging around of shapes and lines problems
-  - Fix address of FSF in license
-  - Fix appearance of dialog box fonts on some systems
-  - Fix recent files menu
-  - Fix hiding of pages and graphs
+More minor changes
+ * Mathematical expressions can be entered in many places where
+   numbers are entered (e.g. axis minima)
+ * Many more latex symbols
+ * Text labels can also be placed outside graphs directly on pages
+ * Dataset expressions can be edited
+ * Data can be copied out of data edit dialog. Rows can be inserted or
+   deleted.
+ * Mac format line terminators are allowed in import files
+ * Preview window resizes properly in import dialog
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -47,6 +48,8 @@ Features of package:
  * Contour plots
  * Images (with colour mappings and colorbars)
  * Stepped plots (for histograms)
+ * Bar graphs
+ * Plotting dates
  * Fitting functions to data
  * Stacked plots and arrays of plots
  * Plot keys

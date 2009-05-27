@@ -1,4 +1,417 @@
 ------------------------------------------------------------------------
+r999 | jeremysanders | 2009-05-27 22:06:37 +0100 (Wed, 27 May 2009) | 2 lines
+
+Add new examples
+
+------------------------------------------------------------------------
+r998 | jeremysanders | 2009-05-27 21:37:02 +0100 (Wed, 27 May 2009) | 2 lines
+
+Add details about axis formatting and date import to manual
+
+------------------------------------------------------------------------
+r993 | jeremysanders | 2009-05-27 10:23:01 +0100 (Wed, 27 May 2009) | 2 lines
+
+Get coordinates of graph border and fill exactly correct
+
+------------------------------------------------------------------------
+r992 | jeremysanders | 2009-05-26 21:05:14 +0100 (Tue, 26 May 2009) | 2 lines
+
+Add bar description and more latex info to manual.
+
+------------------------------------------------------------------------
+r991 | jeremysanders | 2009-05-26 20:32:18 +0100 (Tue, 26 May 2009) | 2 lines
+
+Implement error bars on bar graphs
+
+------------------------------------------------------------------------
+r990 | jeremysanders | 2009-05-26 14:15:19 +0100 (Tue, 26 May 2009) | 2 lines
+
+Catch error in bar plotting if position array is smaller than length arrays
+
+------------------------------------------------------------------------
+r989 | jeremysanders | 2009-05-25 20:45:43 +0100 (Mon, 25 May 2009) | 2 lines
+
+Add keys for bar graphs
+
+------------------------------------------------------------------------
+r988 | jeremysanders | 2009-05-25 20:33:22 +0100 (Mon, 25 May 2009) | 2 lines
+
+Allow widgets to have more that one key entry
+
+------------------------------------------------------------------------
+r987 | jeremysanders | 2009-05-25 20:12:39 +0100 (Mon, 25 May 2009) | 2 lines
+
+Add a multiple strings setting
+
+------------------------------------------------------------------------
+r986 | jeremysanders | 2009-05-24 22:59:33 +0100 (Sun, 24 May 2009) | 2 lines
+
+Put correct margins around dataset list
+
+------------------------------------------------------------------------
+r985 | jeremysanders | 2009-05-24 22:49:57 +0100 (Sun, 24 May 2009) | 2 lines
+
+When user chooses dataset from list, update setting
+
+------------------------------------------------------------------------
+r984 | jeremysanders | 2009-05-24 22:40:15 +0100 (Sun, 24 May 2009) | 2 lines
+
+Fix grouped bars with unequal lengths
+
+------------------------------------------------------------------------
+r983 | jeremysanders | 2009-05-24 17:44:51 +0100 (Sun, 24 May 2009) | 2 lines
+
+Comment about column_stack being slow
+
+------------------------------------------------------------------------
+r982 | jeremysanders | 2009-05-24 17:39:49 +0100 (Sun, 24 May 2009) | 2 lines
+
+Add bar and group fill settings for controlling spacing of bars
+
+------------------------------------------------------------------------
+r981 | jeremysanders | 2009-05-24 16:55:54 +0100 (Sun, 24 May 2009) | 2 lines
+
+Make default update interval 0.5s
+
+------------------------------------------------------------------------
+r980 | jeremysanders | 2009-05-24 16:54:19 +0100 (Sun, 24 May 2009) | 2 lines
+
+Make combobox give list of datasets in Datasets setting control
+
+------------------------------------------------------------------------
+r979 | jeremysanders | 2009-05-23 18:34:21 +0100 (Sat, 23 May 2009) | 2 lines
+
+Make stacked bar charts work
+
+------------------------------------------------------------------------
+r978 | jeremysanders | 2009-05-22 17:19:12 +0100 (Fri, 22 May 2009) | 2 lines
+
+Work around problem with pyfits and unicode filenames
+
+------------------------------------------------------------------------
+r977 | jeremysanders | 2009-05-22 14:16:51 +0100 (Fri, 22 May 2009) | 2 lines
+
+Pyfits doesn't like unicode filenames, so convert them to strings
+
+------------------------------------------------------------------------
+r976 | jeremysanders | 2009-05-22 12:16:48 +0100 (Fri, 22 May 2009) | 2 lines
+
+Fix crash where datasets do not exist
+
+------------------------------------------------------------------------
+r975 | jeremysanders | 2009-05-21 22:47:48 +0100 (Thu, 21 May 2009) | 1 line
+
+Implement bar fills. Get positions of bars correct.
+------------------------------------------------------------------------
+r974 | jeremysanders | 2009-05-20 21:44:10 +0100 (Wed, 20 May 2009) | 2 lines
+
+Further basic bar work
+
+------------------------------------------------------------------------
+r973 | jeremysanders | 2009-05-19 23:20:10 +0100 (Tue, 19 May 2009) | 2 lines
+
+Further work on plotting bar graphs
+
+------------------------------------------------------------------------
+r972 | jeremysanders | 2009-05-17 21:58:13 +0100 (Sun, 17 May 2009) | 2 lines
+
+Add bar widget icon
+
+------------------------------------------------------------------------
+r971 | jeremysanders | 2009-05-17 18:23:06 +0100 (Sun, 17 May 2009) | 2 lines
+
+Some initial work for a bar graph widget
+
+------------------------------------------------------------------------
+r970 | jeremysanders | 2009-05-16 13:17:24 +0100 (Sat, 16 May 2009) | 1 line
+
+Bug fixes and improvements to date axes
+------------------------------------------------------------------------
+r969 | jeremysanders | 2009-05-14 21:59:53 +0100 (Thu, 14 May 2009) | 1 line
+
+Most of support for date axes implemented. Now has mode switch on axis widget.
+------------------------------------------------------------------------
+r968 | jeremysanders | 2009-05-13 22:57:36 +0100 (Wed, 13 May 2009) | 1 line
+
+Preliminary work to show dates on axes. This patch adds a class to make ticks on an axis with date intervals.
+------------------------------------------------------------------------
+r967 | jeremysanders | 2009-05-12 12:16:01 +0100 (Tue, 12 May 2009) | 2 lines
+
+Resolve problem where negative values are plotted on log scale
+
+------------------------------------------------------------------------
+r966 | jeremysanders | 2009-05-12 10:43:15 +0100 (Tue, 12 May 2009) | 2 lines
+
+Catch error if dataset deleted in dataeditdialog
+
+------------------------------------------------------------------------
+r965 | jeremysanders | 2009-05-10 12:51:08 +0100 (Sun, 10 May 2009) | 2 lines
+
+Make exception dialog universal to catch any non-rendering errors
+
+------------------------------------------------------------------------
+r964 | jeremysanders | 2009-05-10 12:26:12 +0100 (Sun, 10 May 2009) | 2 lines
+
+Add missing licenses
+
+------------------------------------------------------------------------
+r963 | jeremysanders | 2009-05-10 12:24:41 +0100 (Sun, 10 May 2009) | 2 lines
+
+Add script to test all examples
+
+------------------------------------------------------------------------
+r962 | jeremysanders | 2009-05-09 15:36:12 +0100 (Sat, 09 May 2009) | 2 lines
+
+Allow mathematical expressions in lists of numbers
+
+------------------------------------------------------------------------
+r961 | jeremysanders | 2009-05-09 15:20:58 +0100 (Sat, 09 May 2009) | 2 lines
+
+Allow numerical expressions to be used where floats can be entered (e.g. axis min and max)
+
+------------------------------------------------------------------------
+r960 | jeremysanders | 2009-05-09 14:43:58 +0100 (Sat, 09 May 2009) | 2 lines
+
+Check fraction has two parameters
+
+------------------------------------------------------------------------
+r959 | jeremysanders | 2009-05-08 20:34:19 +0100 (Fri, 08 May 2009) | 2 lines
+
+Implement \frac in latex renderer
+
+------------------------------------------------------------------------
+r958 | jeremysanders | 2009-05-08 19:40:55 +0100 (Fri, 08 May 2009) | 2 lines
+
+A few more latex symbols implemented
+
+------------------------------------------------------------------------
+r957 | jeremysanders | 2009-05-07 22:28:39 +0100 (Thu, 07 May 2009) | 2 lines
+
+Add some more latex symboles
+
+------------------------------------------------------------------------
+r956 | jeremysanders | 2009-05-05 20:43:36 +0100 (Tue, 05 May 2009) | 2 lines
+
+Add a file which loads all examples as a test of functionality
+
+------------------------------------------------------------------------
+r955 | jeremysanders | 2009-05-05 20:41:42 +0100 (Tue, 05 May 2009) | 2 lines
+
+Document prefix and suffix options
+
+------------------------------------------------------------------------
+r954 | jeremysanders | 2009-05-05 20:34:13 +0100 (Tue, 05 May 2009) | 2 lines
+
+Document prefix and suffix import
+
+------------------------------------------------------------------------
+r953 | jeremysanders | 2009-05-05 20:06:53 +0100 (Tue, 05 May 2009) | 2 lines
+
+Fix misnamed setting in colorbar
+
+------------------------------------------------------------------------
+r952 | jeremysanders | 2009-05-05 20:02:18 +0100 (Tue, 05 May 2009) | 2 lines
+
+Fix error loading dialog on ubuntu
+
+------------------------------------------------------------------------
+r951 | jeremysanders | 2009-05-04 21:44:20 +0100 (Mon, 04 May 2009) | 2 lines
+
+Show error bars of data in key. Fix positioning of curve error bars.
+
+------------------------------------------------------------------------
+r950 | jeremysanders | 2009-05-03 18:18:57 +0100 (Sun, 03 May 2009) | 2 lines
+
+Minor code cleanups in axis
+
+------------------------------------------------------------------------
+r949 | jeremysanders | 2009-05-03 18:08:18 +0100 (Sun, 03 May 2009) | 2 lines
+
+Trap case where scale == 0
+
+------------------------------------------------------------------------
+r948 | jeremysanders | 2009-05-03 18:04:02 +0100 (Sun, 03 May 2009) | 2 lines
+
+Rename scale to datascale in axis to make it more obvious what it does
+
+------------------------------------------------------------------------
+r947 | jeremysanders | 2009-05-03 17:58:54 +0100 (Sun, 03 May 2009) | 2 lines
+
+Add scale setting in axis to scale data plotted by factor given. Reuse axis scaling code in textlabels, shapes and lines. Allow textlabels to be placed directly on page.
+
+------------------------------------------------------------------------
+r946 | jeremysanders | 2009-05-03 12:13:15 +0100 (Sun, 03 May 2009) | 2 lines
+
+Revert chane 944 as there was no problem to fix
+
+------------------------------------------------------------------------
+r945 | jeremysanders | 2009-05-02 14:29:20 +0100 (Sat, 02 May 2009) | 2 lines
+
+Catch an exception when renaming datasets
+
+------------------------------------------------------------------------
+r944 | jeremysanders | 2009-05-02 14:10:29 +0100 (Sat, 02 May 2009) | 2 lines
+
+Make ImportDialog class ImportDialog2 again so that saved preferences won't be lost
+
+------------------------------------------------------------------------
+r943 | jeremysanders | 2009-05-02 12:23:24 +0100 (Sat, 02 May 2009) | 2 lines
+
+Better error checking on import dialog. Use exception dialog to catch import exceptions.
+
+------------------------------------------------------------------------
+r942 | jeremysanders | 2009-04-27 21:18:12 +0100 (Mon, 27 Apr 2009) | 2 lines
+
+Add ability to thin down plotted markers when plotting data
+
+------------------------------------------------------------------------
+r941 | jeremysanders | 2009-04-26 12:32:27 +0100 (Sun, 26 Apr 2009) | 2 lines
+
+Further improvements to rendering multiple lines with \\
+
+------------------------------------------------------------------------
+r940 | jeremysanders | 2009-04-25 23:07:17 +0100 (Sat, 25 Apr 2009) | 2 lines
+
+Support multiple lines in text render (using \\ like in latex)
+
+------------------------------------------------------------------------
+r939 | jeremysanders | 2009-04-25 21:48:19 +0100 (Sat, 25 Apr 2009) | 2 lines
+
+Fix icon in exception dialog
+
+------------------------------------------------------------------------
+r938 | jeremysanders | 2009-04-20 21:17:37 +0100 (Mon, 20 Apr 2009) | 2 lines
+
+Add basic date/time reading support
+
+------------------------------------------------------------------------
+r937 | jeremysanders | 2009-04-12 18:03:19 +0100 (Sun, 12 Apr 2009) | 2 lines
+
+Remove ... from previews of short files in import dialog
+
+------------------------------------------------------------------------
+r936 | jeremysanders | 2009-04-12 18:02:40 +0100 (Sun, 12 Apr 2009) | 2 lines
+
+Fix combo box history in different tabs
+
+------------------------------------------------------------------------
+r935 | jeremysanders | 2009-04-11 17:16:30 +0100 (Sat, 11 Apr 2009) | 2 lines
+
+Add prefix and suffix support for 2d editing
+
+------------------------------------------------------------------------
+r934 | jeremysanders | 2009-04-06 17:57:59 +0100 (Mon, 06 Apr 2009) | 2 lines
+
+Get rid of exception when deleting dataset in data edit dialog. Still needs to be fundamentally fixed, however.
+
+------------------------------------------------------------------------
+r933 | jeremysanders | 2009-04-06 17:57:23 +0100 (Mon, 06 Apr 2009) | 2 lines
+
+Try to make auto resizing of data edit more sane
+
+------------------------------------------------------------------------
+r932 | jeremysanders | 2009-04-05 17:29:40 +0100 (Sun, 05 Apr 2009) | 2 lines
+
+Support suffix and prefix for fits file import
+
+------------------------------------------------------------------------
+r931 | jeremysanders | 2009-04-05 17:22:25 +0100 (Sun, 05 Apr 2009) | 3 lines
+
+Allow prefix and suffix settings for CSV files. Fix reload of data with 
+prefix, suffix or ignoretext.
+
+------------------------------------------------------------------------
+r930 | jeremysanders | 2009-04-05 16:24:57 +0100 (Sun, 05 Apr 2009) | 2 lines
+
+Finish implementing copy text from data edit dialog
+
+------------------------------------------------------------------------
+r929 | jeremysanders | 2009-04-05 12:53:35 +0100 (Sun, 05 Apr 2009) | 2 lines
+
+Add copy to edit dialog
+
+------------------------------------------------------------------------
+r928 | jeremysanders | 2009-04-04 21:23:25 +0100 (Sat, 04 Apr 2009) | 3 lines
+
+Data edit dialog changes. Add remove row or insert row context menu. Fix modification for 
+text data sets. Fix updating of dialog when document changes.
+
+------------------------------------------------------------------------
+r927 | jeremysanders | 2009-04-03 17:53:52 +0100 (Fri, 03 Apr 2009) | 2 lines
+
+Bump copyright year to 2009
+
+------------------------------------------------------------------------
+r926 | jeremysanders | 2009-04-03 17:38:01 +0100 (Fri, 03 Apr 2009) | 2 lines
+
+Avoid error about missing dataset when opening file create dialog
+
+------------------------------------------------------------------------
+r925 | jeremysanders | 2009-04-03 17:35:50 +0100 (Fri, 03 Apr 2009) | 2 lines
+
+Set document when duplicating dataset
+
+------------------------------------------------------------------------
+r924 | jeremysanders | 2009-04-01 21:46:41 +0100 (Wed, 01 Apr 2009) | 2 lines
+
+Allow dataset expressions to be edited
+
+------------------------------------------------------------------------
+r923 | jeremysanders | 2009-03-31 21:35:43 +0100 (Tue, 31 Mar 2009) | 2 lines
+
+Fix sizing of subwindows in data edit dialog
+
+------------------------------------------------------------------------
+r922 | jeremysanders | 2009-03-31 21:09:42 +0100 (Tue, 31 Mar 2009) | 2 lines
+
+Fix data create and import buttons in data edit dialog
+
+------------------------------------------------------------------------
+r921 | jeremysanders | 2009-03-30 22:20:00 +0100 (Mon, 30 Mar 2009) | 2 lines
+
+Remember checkbox in import dialog by introducing HistoryCheck widget
+
+------------------------------------------------------------------------
+r920 | jeremysanders | 2009-03-30 21:05:50 +0100 (Mon, 30 Mar 2009) | 2 lines
+
+Import dialog improvements
+
+------------------------------------------------------------------------
+r919 | jeremysanders | 2009-03-30 20:25:02 +0100 (Mon, 30 Mar 2009) | 2 lines
+
+Add import fixes to ignore lines with text or add a prefix and suffix to dataset names.
+
+------------------------------------------------------------------------
+r918 | jeremysanders | 2009-03-24 19:47:16 +0000 (Tue, 24 Mar 2009) | 2 lines
+
+Make preview window resizable with import dialog. Patch from Bryan Harris.
+
+------------------------------------------------------------------------
+r917 | jeremysanders | 2009-03-24 19:36:48 +0000 (Tue, 24 Mar 2009) | 2 lines
+
+Allow Veusz to read files with Mac format line terminators. Patch from Byran Harris.
+
+------------------------------------------------------------------------
+r916 | jeremysanders | 2009-03-10 11:06:02 +0000 (Tue, 10 Mar 2009) | 2 lines
+
+Handle NaNs in datasets for arrows
+
+------------------------------------------------------------------------
+r915 | jeremysanders | 2009-03-06 17:10:16 +0000 (Fri, 06 Mar 2009) | 2 lines
+
+Add Qt PIC format (not currently accessible in UI)
+
+------------------------------------------------------------------------
+r910 | jeremysanders | 2009-02-11 08:25:32 +0000 (Wed, 11 Feb 2009) | 2 lines
+
+Add svg files to installed files
+
+------------------------------------------------------------------------
+r909 | jeremysanders | 2009-02-09 17:58:17 +0000 (Mon, 09 Feb 2009) | 2 lines
+
+Get ready for 1.3 release
+
+------------------------------------------------------------------------
 r908 | jeremysanders | 2009-02-08 19:21:24 +0000 (Sun, 08 Feb 2009) | 2 lines
 
 Add some nasty code to kill captured processes when finishing
