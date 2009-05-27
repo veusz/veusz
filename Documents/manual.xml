@@ -17,7 +17,7 @@
     </author>
 
     <copyright>
-      <year>2008</year>
+      <year>2009</year>
     </copyright>
 
     <legalnotice>
@@ -64,7 +64,7 @@
       <para>Furthermore, Veusz can be embedded within other Python
       programs, with plots in their own windows, or it can be
       controlled from any other application.</para>
-    </section>
+   </section>
 
     <section>
       <title>Terminology</title>
@@ -413,6 +413,51 @@
 	url="http://corefonts.sourceforge.net/" />).</para>
       </section>
 
+      <section>
+	<title>Axis numbers</title>
+	
+	<para>The way numbers are shown on axes is chosen
+	automatically. For standard numerical axes, values are shown
+	with the "%Vg" formatting (see below). For date axes, an
+	appropriate date formatting is used so that the interval shown
+	is correct. A format can be given for an axis in the axis
+	number formatting panel can be given to explicitly choose a
+	format.</para>
+
+	<para>C-style number formatting is used with a few Veusz
+	specific extensions. Text can be mixed with format specifiers,
+	which start with a "%" sign. Examples of C-style formatting
+	include: "%.2f" (decimal number with two decimal places,
+	e.g. 2.01), "%.3e" (scientific formatting with three decimal
+	places, e.g. 2.123e-02), "%g" (general formatting, switching
+	between "%f" and "%e" as appropriate). See
+	<ulink url="http://opengroup.org/onlinepubs/007908799/xsh/fprintf.html"
+	/> for details.</para>
+
+	<para>Veusz extensions include "%Ve", which is like "%e"
+	except it displays scientific notation as written,
+	e.g. 1.2x10^23, rather than 1.2e+23. "%Vg" switches between
+	standard numbers and Veusz scientific notation for large and
+	small numbers.</para>
+
+	<para>Veusz allows dates and times to be formatted using
+	"%VDX" where "X" is one of the formatting characters for
+	strftime (see
+	<ulink url="http://opengroup.org/onlinepubs/007908799/xsh/strftime.html"
+	/> for details). These include "a" for an abbreviated weekday
+	name, "A" for full weekday name, "b" for abbreviated month
+	name, "B" for full month name, "c" date and time
+	representaiton, "d" day of month 01..31, "H" hour as 00..23,
+	"I" hour as 01..12, "j" as day of year 001..366, "m" as month
+	01..12, "M" minute as 00..59, "p" AM/PM, "S" second 00..61,
+	"U" week number of year 00..53 (Sunday as first day of week),
+	"w" weekday as decimal number 0..6, "W" week number of year
+	(Monday as first day of week), "x" date representation, "X"
+	time representation, "y" year without century 00..99 and "Y"
+	year. "%VDVS" is a special Veusz addon format which shows
+	seconds and fractions of seconds (e.g. 12.2).</para>
+      </section>
+
     </section>
 
     <section>
@@ -583,7 +628,7 @@
     to be embedded in a Python script). Alternatively, a user may read
     the data themselves using a Python script, and import it into the
     program with the <link linkend="Command.SetData">SetData</link>
-    command.</para>
+    command. Dates and times can also be given in the same files.</para>
     
       <mediaobject>
 	<imageobject>
@@ -691,14 +736,25 @@
       dataset.</para>
 
       <para>A text column does not need quotation unless it contains
-      space characters or escape characters. Quotation marks are
-      recommended if you wish to avoid ambiguity. Text is quoted
-      according to the Python rules for text. Double or single
-      quotation marks can be used, e.g. "A 'test'", 'A second
-      "test"'. Quotes can be escaped by prefixing them with a
-      backslash, e.g. "A new \"test\"". If the data are generated from
-      a Python script, the repr function provides the text in a
-      suitable form.</para>
+      space characters or escape characters. However make sure you
+      deselect the "ignore text" option in the import dialog. This
+      ignores lines of text to ease the import of data from other
+      applications.  Quotation marks are recommended around text if
+      you wish to avoid ambiguity. Text is quoted according to the
+      Python rules for text. Double or single quotation marks can be
+      used, e.g. "A 'test'", 'A second "test"'. Quotes can be escaped
+      by prefixing them with a backslash, e.g. "A new \"test\"". If
+      the data are generated from a Python script, the repr function
+      provides the text in a suitable form.</para>
+
+      <para>Dates and times are also supported with the syntax
+      "dataset(date)". Dates must be in ISO format YYYY-MM-DD. Times
+      are in 24 hour format hh:mm:ss.ss. Dates with times are written
+      YYYY-MM-DDThh:mm:ss.ss (this is a standard ISO format, see
+      <ulink url="http://www.w3.org/TR/NOTE-datetime" />). Dates are
+      stored within Veusz as a number which is the number of seconds
+      since the start of January 1st 2009.
+      </para>
 
       <para>Data may be optionally split into "blocks" of data
       separated by blank lines (or the word "no" on a line, for
@@ -741,7 +797,7 @@ descriptor alpha beta gamma
     </section>
 
     <section>
-      <title>Reading other sorts of data</title>
+      <title>Reading other data formats</title>
       
       <para>As mentioned above, a user may write some Python code to
       read a data file or set of data files. This is convenient if the
