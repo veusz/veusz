@@ -245,7 +245,8 @@ class LinkedFITSFile(LinkedFileBase):
                                                 datacol = self.columns[0],
                                                 symerrcol = self.columns[1],
                                                 poserrcol = self.columns[2],
-                                                negerrcol = self.columns[3])
+                                                negerrcol = self.columns[3],
+                                                linked=True)
 
         # don't use applyoperation interface as we don't want this to be undoable
         op.do(document)
