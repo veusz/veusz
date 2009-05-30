@@ -245,9 +245,9 @@ class BarPlotter(GenericPlotter):
         # convert errors to coordinates
         ishorz = s.direction == 'horizontal'
         mincoord = axes[not ishorz].dataToPlotterCoords(widgetposn, minval)
-        N.clip(mincoord, -32767, 32767, out=mincoord)
+        mincoord = N.clip(mincoord, -32767, 32767)
         maxcoord = axes[not ishorz].dataToPlotterCoords(widgetposn, maxval)
-        N.clip(maxcoord, -32767, 32767, out=maxcoord)
+        maxcoord = N.clip(maxcoord, -32767, 32767)
 
         # draw error bars
         painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(painter) )
@@ -302,7 +302,7 @@ class BarPlotter(GenericPlotter):
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, dataset['data'])
-            N.clip(lengthcoord, -32767, 32767, out=lengthcoord)
+            lengthcoord = N.clip(lengthcoord, -32767, 32767)
  
             # these are the coordinates perpendicular to the bar
             posns1 = posns + (-usablewidth*0.5 + bardelta*dsnum +
@@ -359,10 +359,10 @@ class BarPlotter(GenericPlotter):
             # convert values to plotter coordinates
             lastplt = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, last)
-            N.clip(lastplt, -32767, 32767, out=lastplt)
+            lastplt = N.clip(lastplt, -32767, 32767)
             newplt = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, new)
-            N.clip(newplt, -32767, 32767, out=newplt)
+            newplt = N.clip(newplt, -32767, 32767)
 
             # positions of bar perpendicular to bar direction
             posns1 = posns - barwidth*0.5
