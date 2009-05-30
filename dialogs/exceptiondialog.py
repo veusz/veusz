@@ -117,6 +117,8 @@ class ExceptionSendDialog(qt4.QDialog):
 class ExceptionDialog(qt4.QDialog):
     """Choose an exception to send to developers."""
     
+    ignore_exceptions = set()
+
     def __init__(self, exception, *args):
 
         # load up UI
@@ -126,20 +128,30 @@ class ExceptionDialog(qt4.QDialog):
                    self)
 
         # create backtrace text from exception, and add to list
-        backtrace = ''.join(traceback.format_exception(*exception)).strip()
-        self.errortextedit.setPlainText(backtrace)
+        self.backtrace = ''.join(traceback.format_exception(*exception)).strip()
+        self.errortextedit.setPlainText(self.backtrace)
 
         # set critical pixmap to left of dialog
         icon = qt4.qApp.style().standardIcon(qt4.QStyle.SP_MessageBoxCritical,
                                              None, self)
         self.erroriconlabel.setPixmap(icon.pixmap(32))
 
-        self.backtrace = backtrace
+        self.connect(self.ignoreSessionButton, qt4.SIGNAL('clicked()'),
+                     self.ignoreSessionSlot)
         
     def accept(self):
         """Accept by opening send dialog."""
-
         d = ExceptionSendDialog(self.backtrace, self)
         if d.exec_() == qt4.QDialog.Accepted:
             qt4.QDialog.accept(self)
         
+    def ignoreSessionSlot(self):
+        """Ignore exception for session."""
+        ExceptionDialog.ignore_exceptions.add(self.backtrace)
+        self.reject()
+
+    def exec_(self):
+        """Exec dialog if exception is not ignored."""
+        if self.backtrace not in ExceptionDialog.ignore_exceptions:
+            qt4.QDialog.exec_(self)
+
