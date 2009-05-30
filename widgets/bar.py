@@ -245,7 +245,9 @@ class BarPlotter(GenericPlotter):
         # convert errors to coordinates
         ishorz = s.direction == 'horizontal'
         mincoord = axes[not ishorz].dataToPlotterCoords(widgetposn, minval)
+        N.clip(mincoord, -32767, 32767, out=mincoord)
         maxcoord = axes[not ishorz].dataToPlotterCoords(widgetposn, maxval)
+        N.clip(maxcoord, -32767, 32767, out=maxcoord)
 
         # draw error bars
         painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(painter) )
