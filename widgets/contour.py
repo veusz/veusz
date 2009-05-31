@@ -231,7 +231,6 @@ class Contour(plotters.GenericPlotter):
 
         posn = plotters.GenericPlotter.draw(self, parentposn, painter,
                                             outerbounds = outerbounds)
-        x1, y1, x2, y2 = posn
         s = self.settings
         d = self.document
 
@@ -368,7 +367,6 @@ class Contour(plotters.GenericPlotter):
         """Plot the traced contours on the painter."""
 
         s = self.settings
-        x1, y1, x2, y2 = posn
 
         # no lines cached as no line styles
         if self._cachedcontours is None:
@@ -376,7 +374,7 @@ class Contour(plotters.GenericPlotter):
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
+        self.clipAxesBounds(painter, axes, posn)
 
         showlabels = not s.ContourLabels.hide
 
@@ -410,7 +408,6 @@ class Contour(plotters.GenericPlotter):
         """Plot the traced contours on the painter."""
 
         s = self.settings
-        x1, y1, x2, y2 = posn
 
         # don't draw if there are no cached polygons
         if self._cachedpolygons is None:
@@ -418,7 +415,7 @@ class Contour(plotters.GenericPlotter):
 
         # ensure plotting of contours does not go outside the area
         painter.save()
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
+        self.clipAxesBounds(painter, axes, posn)
         painter.setPen(qt4.QPen(qt4.Qt.NoPen))
 
         # iterate over each level, and list of lines

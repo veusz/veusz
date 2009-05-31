@@ -193,12 +193,12 @@ class ColorBar(axis.Axis):
         else:
             c = [ bounds[0], maxpix, bounds[2], minpix ]
         r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
-        
         painter.drawImage(r, img)
 
         # if there's a border
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
+            painter.setBrush( qt4.QBrush() )
             painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
                                          bounds[2]-bounds[0],
                                          bounds[3]-bounds[1]) )

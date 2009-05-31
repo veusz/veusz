@@ -776,8 +776,8 @@ class Axis(widget.Widget):
         drawntext = qt4.QPainterPath()
         for r, pen in texttorender:
             bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0]+1,
-                              bounds[3]-bounds[1]+1)
+            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
+                              bounds[3]-bounds[1])
 
             if not drawntext.intersects(rect):
                 painter.setPen(pen)

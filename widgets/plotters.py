@@ -115,11 +115,15 @@ class GenericPlotter(widget.Widget):
         # get range
         x1 = axes[0].coordParr1
         x2 = axes[0].coordParr2
-        y1 = axes[1].coordParr1
-        y2 = axes[1].coordParr2
+        y1 = axes[1].coordParr2
+        y2 = axes[1].coordParr1
+        if x1 > x2:
+            x1, x2 = x2, x1
+        if y1 > y2:
+            y1, y2 = y2, y1
 
         # actually clip the data
-        painter.setClipRect( qt4.QRectF(x1, y2, x2-x1, y1-y2) )
+        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
 
 class FreePlotter(widget.Widget):
     """A plotter which can be plotted on the page or in a graph."""

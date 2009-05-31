@@ -488,7 +488,7 @@ class Image(plotters.GenericPlotter):
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
+        self.clipAxesBounds(painter, axes, posn)
 
         # now draw pixmap
         painter.drawImage( qt4.QRectF(coordsx[0], coordsy[1],

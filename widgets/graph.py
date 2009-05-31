@@ -143,6 +143,11 @@ class Graph(widget.Widget):
                     ob[i] = outerbounds[i]
 
         painter.endPaintingWidget()
+
+        # set default pen/brush
+        # this is probably sticking plaster
+        painter.setPen( qt4.QPen() )
+        painter.setBrush( qt4.QBrush() )
         
         # do normal drawing of children
         # iterate over children in reverse order
