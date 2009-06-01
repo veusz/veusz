@@ -1,4 +1,44 @@
 ------------------------------------------------------------------------
+r1007 | jeremysanders | 2009-05-31 21:16:20 +0100 (Sun, 31 May 2009) | 2 lines
+
+Fix colorbar issue and clean up a few references to clipping
+
+------------------------------------------------------------------------
+r1006 | jeremysanders | 2009-05-30 23:38:30 +0100 (Sat, 30 May 2009) | 2 lines
+
+Add windows installer files
+
+------------------------------------------------------------------------
+r1005 | jeremysanders | 2009-05-30 23:18:18 +0100 (Sat, 30 May 2009) | 2 lines
+
+Don't use clip out parameter as this doesn't work on old numpy versions
+
+------------------------------------------------------------------------
+r1004 | jeremysanders | 2009-05-30 22:25:46 +0100 (Sat, 30 May 2009) | 2 lines
+
+Allow user to ignore a particular exception until end of session
+
+------------------------------------------------------------------------
+r1003 | jeremysanders | 2009-05-30 21:39:50 +0100 (Sat, 30 May 2009) | 2 lines
+
+Clip error bar coordinates
+
+------------------------------------------------------------------------
+r1002 | jeremysanders | 2009-05-30 21:36:08 +0100 (Sat, 30 May 2009) | 2 lines
+
+Make bar widget draw bars to the maximum length of each dataset, instead of the minimum length of all the datasets
+
+------------------------------------------------------------------------
+r1001 | jeremysanders | 2009-05-29 14:10:24 +0100 (Fri, 29 May 2009) | 2 lines
+
+Fixes problem where reloading fits dataset destroys link to file
+
+------------------------------------------------------------------------
+r1000 | jeremysanders | 2009-05-27 22:30:28 +0100 (Wed, 27 May 2009) | 2 lines
+
+Get ready for 1.4
+
+------------------------------------------------------------------------
 r999 | jeremysanders | 2009-05-27 22:06:37 +0100 (Wed, 27 May 2009) | 2 lines
 
 Add new examples
