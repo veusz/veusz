@@ -221,6 +221,13 @@ class PointPlotter(GenericPlotter):
         s.add( setting.Marker('marker', 'circle',
                               descr = 'Type of marker to plot',
                               usertext='Marker', formatting=True), 0 )
+        s.add( setting.DatasetOrStr('labels', '',
+                                    descr='Dataset or string to label points',
+                                    usertext='Labels', datatype='text'), 5 )
+        s.add( setting.DatasetOrFloatList(
+                'scalePoints', '',
+                descr = 'Scale size of plotted points by this dataset or'
+                ' list of values', usertext='Scale size'), 6 )
 
         s.add( setting.DatasetOrFloatList('yData', 'y',
                                           descr = 'Dataset containing y data or list of values',
@@ -232,10 +239,6 @@ class PointPlotter(GenericPlotter):
                                   'bar',
                                   descr='Style of error bars to plot',
                                   usertext='Error style', formatting=True) )
-
-        s.add( setting.DatasetOrStr('labels', '',
-                                    descr='Dataset or string to label points',
-                                    usertext='Labels', datatype='text') )
 
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings',
@@ -495,7 +498,8 @@ class PointPlotter(GenericPlotter):
 
         painter.restore()
 
-    def generateValidDatasetParts(self, *datasets):
+    @staticmethod
+    def generateValidDatasetParts(*datasets):
         """Generator to return array of valid parts of datasets."""
 
         # find NaNs and INFs in input dataset
@@ -575,6 +579,7 @@ class PointPlotter(GenericPlotter):
         xv = s.get('xData').getData(doc)
         yv = s.get('yData').getData(doc)
         text = s.get('labels').getData(doc, checknull=True)
+        scalepoints = s.get('scalePoints').getData(doc)
 
         if not xv or not yv:
             return
@@ -600,7 +605,8 @@ class PointPlotter(GenericPlotter):
         self.clipAxesBounds(painter, axes, posn)
 
         # loop over chopped up values
-        for xvals, yvals, tvals in self.generateValidDatasetParts(xv, yv, text):
+        for xvals, yvals, tvals, ptvals in self.generateValidDatasetParts(
+            xv, yv, text, scalepoints):
 
             #print "Calculating coordinates"
             # calc plotter coords of x and y points
@@ -648,10 +654,15 @@ class PointPlotter(GenericPlotter):
                 else:
                     xplt, yplt = xplotter[::s.thinfactor], yplotter[::s.thinfactor]
 
+                # whether to scale markers
+                scaling = None
+                if ptvals:
+                    scaling = ptvals.data
+
                 # actually plot datapoints
-                utils.plotMarkers(painter, xplt, yplt, s.marker,
-                                  markersize)
-                    
+                utils.plotMarkers(painter, xplt, yplt, s.marker, markersize,
+                                  scaling=scaling)
+
             # finally plot any labels
             if tvals and not s.Label.hide:
                 self.drawLabels(painter, xplotter, yplotter, tvals, markersize)
