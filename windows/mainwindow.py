@@ -48,6 +48,7 @@ class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
     windows = []
+    @classmethod
     def CreateWindow(cls, filename=None):
         """Window factory function.
 
@@ -70,8 +71,6 @@ class MainWindow(qt4.QMainWindow):
             
         cls.windows.append(win)
         return win
-
-    CreateWindow = classmethod(CreateWindow)
 
     def __init__(self, *args):
         qt4.QMainWindow.__init__(self, *args)
@@ -682,8 +681,8 @@ class MainWindow(qt4.QMainWindow):
             errors = utils.checkCode(script, securityonly=True)
             if errors:
                 qt4.QApplication.restoreOverrideCursor()
-                if self._unsafeCmdMsgBox(self, filename).exec_() == \
-                   qt4.QMessageBox.No:
+                if ( self._unsafeCmdMsgBox(self, filename).exec_() ==
+                     qt4.QMessageBox.No ):
                     return
                 ignore_unsafe = True # allow unsafe veusz commands below
 
@@ -701,8 +700,8 @@ class MainWindow(qt4.QMainWindow):
             def wrapped(*args, **argsk):
                 if not safenow[0]:
                     qt4.QApplication.restoreOverrideCursor()
-                    if self._unsafeVeuszCmdMsgBox(self).exec_() == \
-                           qt4.QMessageBox.No:
+                    if ( self._unsafeVeuszCmdMsgBox(self).exec_() ==
+                         qt4.QMessageBox.No ):
                         return
                 safenow[0] = True
                 func(*args, **argsk)
@@ -720,6 +719,10 @@ class MainWindow(qt4.QMainWindow):
         self.document.wipe()
         self.document.suspendUpdates()
 
+        # change directory to location of filename
+        olddir = os.getcwd()
+        os.chdir( os.path.dirname(os.path.abspath(filename)) )
+
         try:
             # actually run script text
             exec script in env
@@ -729,6 +732,7 @@ class MainWindow(qt4.QMainWindow):
             
             # display error dialog if there is an error loading
             qt4.QApplication.restoreOverrideCursor()
+            os.chdir(olddir)
             self.document.enableUpdates()
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
@@ -743,6 +747,9 @@ class MainWindow(qt4.QMainWindow):
         self.document.enableUpdates()
         self.document.setModified(False)
         self.document.clearHistory()
+
+        # switch back to old directory
+        os.chdir(olddir)
 
         # remember file for recent list
         self.addRecentFile(filename)
