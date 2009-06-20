@@ -66,6 +66,32 @@ def escapeDatasetName(name):
     else:
         return out
 
+def relpath(filename, dirname):
+    """Make filename a relative filename relative to dirname."""
+
+    # spit up paths into components
+    filename = os.path.abspath(filename)
+    fileparts = filename.split(os.path.sep)
+    dirparts = os.path.abspath(dirname).split(os.path.sep)
+
+    # if first non empty part is non equal, return original
+    i = 0
+    while not fileparts[i] and not dirparts[i]:
+        i += 1
+    if fileparts[i] != dirparts[i]:
+        return filename
+
+    # remove equal bits at start
+    while fileparts and dirparts and fileparts[0] == dirparts[0]:
+        fileparts.pop(0)
+        dirparts.pop(0)
+
+    # add on right number of .. to get back up
+    fileparts = [os.path.pardir]*len([d for d in dirparts if d]) + fileparts
+
+    # join parts back together
+    return os.path.sep.join(fileparts)
+
 class WeakBoundMethod:
     """A weak reference to a bound method.
 

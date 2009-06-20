@@ -53,9 +53,18 @@ class LinkedFileBase(object):
 
     # filename is member
 
-    def saveToFile(self, file):
+    def saveToFile(self, file, relpath=None):
         '''Save the link to the document file.'''
         pass
+
+    def _getSaveFilename(self, relpath):
+        """Get filename to write to save file.
+        If relpath is a string, write relative to path given
+        """
+        if relpath:
+            return utils.relpath(self.filename, relpath)
+        else:
+            return self.filename
 
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.'''
@@ -100,10 +109,12 @@ class LinkedFile(LinkedFileBase):
         self.suffix = suffix
         self.ignoretext = ignoretext
 
-    def saveToFile(self, file):
-        '''Save the link to the document file.'''
+    def saveToFile(self, fileobj, relpath=None):
+        '''Save the link to the document file.
+        If relpath is set, save links relative to path given
+        '''
 
-        params = [ repr(self.filename),
+        params = [ repr(self._getSaveFilename(relpath)),
                    repr(self.descriptor),
                    'linked=True',
                    'ignoretext=%s' % repr(self.ignoretext)]
@@ -116,7 +127,7 @@ class LinkedFile(LinkedFileBase):
         if self.suffix:
             params.append('suffix=%s' % repr(self.suffix))
 
-        file.write('ImportFile(%s)\n' % (', '.join(params)))
+        fileobj.write('ImportFile(%s)\n' % (', '.join(params)))
 
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.
@@ -132,6 +143,7 @@ class LinkedFile(LinkedFileBase):
         
         tempdoc = doc.Document()
         sr = simpleread.SimpleRead(self.descriptor)
+
         sr.readData( simpleread.FileStream(open(self.filename,  'rU')),
                      useblocks=self.useblocks,
                      ignoretext=self.ignoretext)
@@ -162,10 +174,10 @@ class Linked2DFile(LinkedFileBase):
         self.prefix = ''
         self.suffix = ''
 
-    def saveToFile(self, file):
+    def saveToFile(self, fileobj, relpath=None):
         '''Save the link to the document file.'''
 
-        args = [repr(self.filename), repr(self.datasets)]
+        args = [repr(self._getSaveFilename(relpath)), repr(self.datasets)]
         for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose',
                   'prefix', 'suffix'):
             v = getattr(self, p)
@@ -223,10 +235,10 @@ class LinkedFITSFile(LinkedFileBase):
         self.hdu = hdu
         self.columns = columns
 
-    def saveToFile(self, file):
+    def saveToFile(self, file, relpath=None):
         '''Save the link to the document file.'''
 
-        args = [self.dsname, self.filename, self.hdu]
+        args = [self.dsname, self._getSaveFilename(relpath), self.hdu]
         args = [repr(i) for i in args]
         for c, a in itertools.izip(self.columns,
                                    ('datacol', 'symerrcol',
@@ -268,10 +280,10 @@ class LinkedCSVFile(LinkedFileBase):
         self.prefix = prefix
         self.suffix = suffix
 
-    def saveToFile(self, file):
+    def saveToFile(self, file, relpath=None):
         """Save the link to the document file."""
 
-        params = [repr(self.filename),
+        params = [repr(self._getSaveFilename(relpath)),
                   'linked=True']
         if self.prefix:
             params.append('dsprefix=%s' % repr(self.prefix))
@@ -316,17 +328,19 @@ class DatasetBase(object):
     column_descriptions = ()
     recreatable_dataset = False  # can recreate in create dialog
 
-    def saveLinksToSavedDoc(self, file, savedlinks):
+    def saveLinksToSavedDoc(self, file, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 
         savedlinks is a dict containing any linked files which have
         already been written
+
+        relpath is a directory to save linked files relative to
         '''
 
         # links should only be saved once
         if self.linked is not None and self.linked not in savedlinks:
             savedlinks[self.linked] = True
-            self.linked.saveToFile(file)
+            self.linked.saveToFile(file, relpath=relpath)
 
     def name(self):
         """Get dataset name."""

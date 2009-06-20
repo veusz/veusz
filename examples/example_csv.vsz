@@ -1,9 +1,6 @@
 # Veusz saved document (version 0.10)
 
-# this code is so that the document can find its data
-# file
-filename = os_path_join(os_path_dirname(__file__), 'example_csv.csv')
-ImportFileCSV(filename, linked=True)
+ImportFileCSV('example_csv.csv', linked=True)
 
 Add('page', name='page1', autoadd=False)
 To('page1')

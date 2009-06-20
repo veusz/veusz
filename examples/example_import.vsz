@@ -2,12 +2,8 @@
 # User: jss
 # Date: Sat, 17 Jun 2006 16:23:25 +0000
 
-dirname = os_path_dirname(__file__)
-f1 = os_path_join(dirname, 'example_import_1.dat')
-f2 = os_path_join(dirname, 'example_import_2.dat')
-
-ImportFile(f1, 'x1 y1,+-', linked=True, useblocks=True)
-ImportFile(f2, '', linked=True)
+ImportFile('example_import_1.dat', 'x1 y1,+-', linked=True, useblocks=True)
+ImportFile('example_import_2.dat', '', linked=True)
 Set('width', u'10cm')
 Add('page', name='page1', autoadd=False)
 To('page1')

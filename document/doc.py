@@ -54,6 +54,9 @@ class Document( qt4.QObject ):
         self.clearHistory()
         self.wipe()
 
+        # directories to examine when importing
+        self.importpath = []
+
     def suspendUpdates(self):
         """Holds sending update messages. This speeds up modification of the document."""
         assert not self.suspendupdates
@@ -315,42 +318,52 @@ class Document( qt4.QObject ):
         """Return widget for page."""
         return self.basewidget.children[pagenumber]
 
-    def _writeFileHeader(self, file, type):
+    def _writeFileHeader(self, fileobj, type):
         """Write a header to a saved file of type."""
-        file.write('# Veusz %s (version %s)\n' % (type, utils.version()))
+
+        fileobj.write('# Veusz %s (version %s)\n' % (type, utils.version()))
         try:
-            file.write('# User: %s\n' % os.environ['LOGNAME'] )
+            fileobj.write('# User: %s\n' % os.environ['LOGNAME'] )
         except KeyError:
             pass
-        file.write('# Date: %s\n\n' % time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) )
+        fileobj.write('# Date: %s\n\n' %
+                      time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                                    time.gmtime()) )
         
-    def saveToFile(self, file):
+    def saveToFile(self, fileobj):
         """Save the text representing a document to a file."""
 
-        self._writeFileHeader(file, 'saved document')
+        self._writeFileHeader(fileobj, 'saved document')
         
+        # add file directory to import path if we know it
+        reldirname = None
+        if getattr(fileobj, 'name', False):
+            reldirname = os.path.dirname( os.path.abspath(fileobj.name) )
+            fileobj.write('AddImportPath(%s)\n' % repr(reldirname))
+
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
         for name, dataset in self.data.items():
-            dataset.saveLinksToSavedDoc(file, savedlinks)
+            dataset.saveLinksToSavedDoc(fileobj, savedlinks,
+                                        relpath=reldirname)
 
         # save the remaining datasets
         for name, dataset in self.data.items():
-            dataset.saveToFile(file, name)
+            dataset.saveToFile(fileobj, name)
 
         # save the actual tree structure
-        file.write(self.basewidget.getSaveText())
+        fileobj.write(self.basewidget.getSaveText())
         
         self.setModified(False)
 
-    def exportStyleSheet(self, file):
+    def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
 
-        self._writeFileHeader(file, 'exported stylesheet')
+        self._writeFileHeader(fileobj, 'exported stylesheet')
         stylesheet = self.basewidget.settings.StyleSheet
 
-        file.write( stylesheet.saveText(True, rootname='') )
+        fileobj.write( stylesheet.saveText(True, rootname='') )
 
     def _exportBitmap(self, filename, pagenumber, dpi=100, antialias=True,
                       quality=85):

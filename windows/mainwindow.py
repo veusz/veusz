@@ -719,9 +719,8 @@ class MainWindow(qt4.QMainWindow):
         self.document.wipe()
         self.document.suspendUpdates()
 
-        # change directory to location of filename
-        olddir = os.getcwd()
-        os.chdir( os.path.dirname(os.path.abspath(filename)) )
+        # allow import to happen relative to loaded file
+        interface.AddImportPath( os.path.dirname(os.path.abspath(filename)) )
 
         try:
             # actually run script text
@@ -732,7 +731,6 @@ class MainWindow(qt4.QMainWindow):
             
             # display error dialog if there is an error loading
             qt4.QApplication.restoreOverrideCursor()
-            os.chdir(olddir)
             self.document.enableUpdates()
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
@@ -747,9 +745,6 @@ class MainWindow(qt4.QMainWindow):
         self.document.enableUpdates()
         self.document.setModified(False)
         self.document.clearHistory()
-
-        # switch back to old directory
-        os.chdir(olddir)
 
         # remember file for recent list
         self.addRecentFile(filename)

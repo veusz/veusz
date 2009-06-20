@@ -26,6 +26,8 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
+import os.path
+
 import numpy as N
 
 import veusz.qtall as qt4
@@ -40,6 +42,7 @@ class CommandInterface(qt4.QObject):
     safe_commands = (
         'Action',
         'Add',
+        'AddImportPath',
         'Get',
         'GetChildren',
         'GetData',
@@ -78,6 +81,7 @@ class CommandInterface(qt4.QObject):
         self.document = document
         self.currentwidget = self.document.basewidget
         self.verbose = False
+        self.importpath = []
 
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotWipedDoc )
@@ -85,6 +89,20 @@ class CommandInterface(qt4.QObject):
     def slotWipedDoc(self):
         """When the document is wiped, we change to the root widget."""
         self.To('/')
+
+    def findFileOnImportPath(self, filename):
+        """Find file on path, returning filename, or original if not found."""
+        for path in self.importpath:
+            fname = os.path.join(path, filename)
+            try:
+                # try to open file to make sure we have access to it and
+                # it exists
+                opened = open(fname)
+                opened.close()
+                return fname
+            except IOError:
+                pass
+        return filename
 
     def SetVerbose(self, v=True):
         """Specify whether we want verbose output after operations."""
@@ -100,6 +118,11 @@ class CommandInterface(qt4.QObject):
             print "Added a graph of type '%s' (%s)" % (type, w.userdescription)
 
         return w.name
+
+    def AddImportPath(self, directory):
+        """Add directory to import file path."""
+        assert isinstance(directory, basestring)
+        self.importpath.append(directory)
 
     def Remove(self, name):
         """Remove a graph from the dataset."""
@@ -323,9 +346,10 @@ class CommandInterface(qt4.QObject):
         if type(datasetnames) in (str, unicode):
             datasetnames = [datasetnames]
 
-        op = operations.OperationDataImport2D(datasetnames, datastr=string, xrange=xrange,
-                                              yrange=yrange, invertrows=invertrows,
-                                              invertcols=invertcols, transpose=transpose)
+        op = operations.OperationDataImport2D(
+            datasetnames, datastr=string, xrange=xrange,
+            yrange=yrange, invertrows=invertrows,
+            invertcols=invertcols, transpose=transpose)
         self.document.applyOperation(op)
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasetnames))
@@ -350,14 +374,18 @@ class CommandInterface(qt4.QObject):
         if linked=True then the dataset is linked to the file
         """
 
+        # look up filename on path
+        realfilename = self.findFileOnImportPath(filename)
+
         if type(datasetnames) in (str, unicode):
             datasetnames = [datasetnames]
 
-        op = operations.OperationDataImport2D(datasetnames, filename=filename, xrange=xrange,
-                                              yrange=yrange, invertrows=invertrows,
-                                              invertcols=invertcols, transpose=transpose,
-                                              prefix=prefix, suffix=suffix,
-                                              linked=linked)
+        op = operations.OperationDataImport2D(
+            datasetnames, filename=realfilename, xrange=xrange,
+            yrange=yrange, invertrows=invertrows,
+            invertcols=invertcols, transpose=transpose,
+            prefix=prefix, suffix=suffix,
+            linked=linked)
         self.document.applyOperation(op)
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasetnames))
@@ -382,10 +410,13 @@ class CommandInterface(qt4.QObject):
          converting the data
         """
 
-        op = operations.OperationDataImport(descriptor, filename=filename,
-                                            useblocks=useblocks, linked=linked,
-                                            prefix=prefix, suffix=suffix,
-                                            ignoretext=ignoretext)
+        realfilename = self.findFileOnImportPath(filename)
+
+        op = operations.OperationDataImport(
+            descriptor, filename=realfilename,
+            useblocks=useblocks, linked=linked,
+            prefix=prefix, suffix=suffix,
+            ignoretext=ignoretext)
         dsnames = self.document.applyOperation(op)
         errors = op.simpleread.getInvalidConversions()
             
@@ -411,12 +442,17 @@ class CommandInterface(qt4.QObject):
 
         If linked is True the data are linked with the file."""
 
+        # backward compatibility
         if prefix:
             dsprefix = prefix + '_'
 
-        op = operations.OperationDataImportCSV(filename, readrows=readrows,
-                                               prefix=dsprefix, suffix=dssuffix,
-                                               linked=linked)
+        # lookup filename
+        realfilename = self.findFileOnImportPath(filename)
+
+        op = operations.OperationDataImportCSV(
+            realfilename, readrows=readrows,
+            prefix=dsprefix, suffix=dssuffix,
+            linked=linked)
         dsnames = self.document.applyOperation(op)
             
         if self.verbose:
@@ -441,10 +477,14 @@ class CommandInterface(qt4.QObject):
         linked specfies that the dataset is linked to the file
         """
 
-        op = operations.OperationDataImportFITS(dsname, filename, hdu,
-                                                datacol=datacol, symerrcol=symerrcol,
-                                                poserrcol=poserrcol, negerrcol=negerrcol,
-                                                linked=linked)
+        # lookup filename
+        realfilename = self.findFileOnImportPath(filename)
+
+        op = operations.OperationDataImportFITS(
+            dsname, realfilename, hdu,
+            datacol=datacol, symerrcol=symerrcol,
+            poserrcol=poserrcol, negerrcol=negerrcol,
+            linked=linked)
         self.document.applyOperation(op)
 
     def ReloadData(self):

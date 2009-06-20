@@ -2,10 +2,7 @@
 # User: jss
 # Date: Sat, 27 Oct 2007 14:31:12 +0000
 
-dirname = os_path_dirname(__file__)
-filename = os_path_join(dirname, 'labels.dat')
-
-ImportFile(filename, u'x y label', linked=True)
+ImportFile('labels.dat', u'x y label', linked=True)
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)

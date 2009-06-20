@@ -2,9 +2,7 @@
 # User: jss
 # Date: Wed, 27 May 2009 19:46:06 +0000
 
-dirname = os_path_dirname(__file__)
-f = os_path_join(dirname, 'datebar.dat')
-ImportFile(f, '', linked=True, ignoretext=True)
+ImportFile('datebar.dat', '', linked=True, ignoretext=True)
 
 Set('StyleSheet/Line/color', u'#005500')
 Set('StyleSheet/Font/font', u'Verdana')
