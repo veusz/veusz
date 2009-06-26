@@ -21,7 +21,6 @@
 """Widget that represents a page in the document."""
 
 import veusz.qtall as qt4
-
 import veusz.document as document
 
 import widget
@@ -49,6 +48,7 @@ class _AxisDependHelper(object):
         self.root = root
         self.nodes = {}
         self.axes = []
+        self.axis_plotter_map = {}
 
     def recursivePlotterSearch(self, widget):
         """Find a list of plotters below widget.
@@ -61,17 +61,27 @@ class _AxisDependHelper(object):
         if hasattr(widget, 'isplotter'):
             nodes = self.nodes
 
+            # keep track of which widgets depend on which axes
+            widgetaxes = {}
+            for axname in widget.getAxesNames():
+                axis = widget.lookupAxis(axname)
+                widgetaxes[axname] = axis
+                if axis not in self.axis_plotter_map:
+                    self.axis_plotter_map[axis] = []
+                self.axis_plotter_map[axis].append(widget)
+
             # if the widget is a plotter, find which axes the plotter can
             # provide range information about
             for axname, depname in widget.providesAxesDependency():
-                axis = widget.lookupAxis(axname)
+                axis = widgetaxes[axname]
                 axdep = (axis, None)
                 if axdep not in nodes:
                     nodes[axdep] = []
                 nodes[axdep].append( (widget, depname) )
+
             # find which axes the plotter needs information from
             for depname, axname in widget.requiresAxesDependency():
-                axis = widget.lookupAxis(axname)
+                axis = widgetaxes[axname]
                 widdep = (widget, depname)
                 if widdep not in nodes:
                     nodes[widdep] = []
@@ -88,6 +98,13 @@ class _AxisDependHelper(object):
                 self.recursivePlotterSearch(c)
 
     def findPlotters(self):
+        """Construct a list of plotters associated with each axis.
+        Returns nodes:
+
+        {axisobject: [plotterobject, plotter2...]),
+         ...}
+        """
+
         self.recursivePlotterSearch(self.root)
         self.ranges = dict( [(a, list(defaultrange)) for a in self.axes] )
 
@@ -182,6 +199,9 @@ class Page(widget.Widget):
         axisdependhelper = _AxisDependHelper(self)
         axisdependhelper.findPlotters()
         axisdependhelper.findAxisRanges()
+
+        # store axis->plotter mappings in painter too (is this nasty?)
+        painter.veusz_axis_plotter_map = axisdependhelper.axis_plotter_map
 
         # page size is stored in painter
         painter.veusz_page_size = (x2-x1, y2-y1)

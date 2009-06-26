@@ -561,6 +561,21 @@ class PointPlotter(GenericPlotter):
             utils.Renderer( painter, font, x, y, t,
                             alignhorz, alignvert, angle ).render()
 
+    def getAxisLabels(self, direction):
+        """Get labels for axis if using a label axis."""
+
+        s = self.settings
+        doc = self.document
+        text = s.get('labels').getData(doc, checknull=True)
+        xv = s.get('xData').getData(doc)
+        yv = s.get('yData').getData(doc)
+        if None in (text, xv, yv):
+            return (None, None)
+        if direction == 'horizontal':
+            return (text, xv.data)
+        else:
+            return (text, yv.data)
+
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
 

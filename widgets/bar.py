@@ -77,6 +77,10 @@ class BarPlotter(GenericPlotter):
                                descr='Key text for each dataset',
                                usertext='Key text'), 0)
 
+        s.add( setting.DatasetOrStr('labels', '',
+                                    descr='Dataset or string to label bars',
+                                    usertext='Labels', datatype='text'), 5 )
+
         s.add( setting.Choice('mode', ('grouped', 'stacked'), 
                               'grouped', 
                               descr='Show datasets grouped '
@@ -138,6 +142,28 @@ class BarPlotter(GenericPlotter):
         """This widget provides range information about these axes."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
+
+    def getAxisLabels(self, direction):
+        """Get labels for bar for appropriate axis."""
+        s = self.settings
+        if s.direction != direction:
+            # if horizontal bars, want labels on vertical axis and vice versa
+            doc = self.document
+
+            labels = s.get('labels').getData(doc, checknull=True)
+            positions = s.get('posn').getData(doc)
+            if positions is None:
+                lengths = s.get('lengths').getData(doc)
+                if lengths is None:
+                    return (None, None)
+                p = N.arange( max([len(d.data) for d in lengths]) )+1.
+            else:
+                p = positions
+            
+            return (labels, p)
+
+        else:
+            return (None, None)
 
     def singleBarDataRange(self, datasets):
         """For single bars where multiple datasets are added,

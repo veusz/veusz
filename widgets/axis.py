@@ -21,9 +21,10 @@
 """Widget to plot axes, and to handle conversion of coordinates to plot
 positions."""
 
-import veusz.qtall as qt4
+from itertools import izip
 import numpy as N
 
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
@@ -32,7 +33,6 @@ import widget
 import axisticks
 import graph
 import containers
-import itertools
 import controlgraph
 
 class Axis(widget.Widget):
@@ -61,7 +61,9 @@ class Axis(widget.Widget):
         s.add( setting.Bool('log', False,
                             descr = 'Whether axis is logarithmic',
                             usertext='Log') )
-        s.add( setting.Choice('mode', ('numeric', 'datetime'),  'numeric', 
+        s.add( setting.Choice('mode',
+                              ('numeric', 'datetime', 'labels'), 
+                              'numeric', 
                               descr = 'Type of ticks to show on on axis', 
                               usertext='Mode') )
                             
@@ -227,7 +229,7 @@ class Axis(widget.Widget):
                 self.plottedrange[1] = self.plottedrange[0]*2
 
         # work out tick values and expand axes if necessary
-        if s.mode == 'numeric':
+        if s.mode in ('numeric', 'labels'):
             tickclass = axisticks.AxisTicks
         else:
             tickclass = axisticks.DateTicks
@@ -347,7 +349,7 @@ class Axis(widget.Widget):
         self._updatePlotRange( bounds )
 
         # work out fractional positions of the plotter coords
-        frac = ( (vals.astype('float64') - self.coordParr1) /
+        frac = ( (vals.astype(N.float64) - self.coordParr1) /
                  (self.coordParr2 - self.coordParr1) )
 
         # convert from fractional to graph
@@ -487,6 +489,28 @@ class Axis(widget.Widget):
         if startdelta < 0:
             self._delta_axis += abs(delta)
 
+    def generateLabelLabels(self, painter):
+        """Generate list of positions and labels from widgets using this
+        axis."""
+        try:
+            plotters = painter.veusz_axis_plotter_map[self]
+        except AttributeError:
+            return
+
+        dir = self.settings.direction
+        minval, maxval = self.plottedrange
+        for plotter in plotters:
+            # get label and label coordinates from plotter (if any)
+            labels, coords = plotter.getAxisLabels(dir)
+            if None not in (labels, coords):
+                # convert coordinates to plotter coordinates
+                pcoords = self._graphToPlotter(coords)
+                for coord, pcoord, lab in izip(coords, pcoords, labels):
+                    # return labels that are within the plotted range
+                    # of coordinates
+                    if N.isfinite(coord) and (minval <= coord <= maxval):
+                        yield pcoord, lab
+
     def _drawTickLabels(self, painter, coordticks, sign, texttorender):
         """Draw tick labels on the plot.
 
@@ -514,44 +538,58 @@ class Axis(widget.Widget):
             # limit tick labels to be directly below/besides axis
             bounds = { 'miny': min(self.coordParr1, self.coordParr2),
                        'maxy': max(self.coordParr1, self.coordParr2) }
-            ax = 1
-            ay = 0
+            ax, ay = 1, 0
         else:
             bounds = { 'minx': min(self.coordParr1, self.coordParr2),
                        'maxx': max(self.coordParr1, self.coordParr2) }
-            ax = 0
-            ay = 1
+            ax, ay = 0, 1
 
         if self._reflected():
-            ax = -ax
-            ay = -ay
+            ax, ay = -ax, -ay
 
-        # use format or automatic one from axisticks
-        format = s.TickLabels.format
-        if format.lower() == 'auto':
-            format = self.autoformat
-        maxdim = 0
-
-        # plot numbers
-        b = self.coordPerp + sign*(self._delta_axis+tl_spacing)
+        # get information about text scales
         tl = s.get('TickLabels')
         scale = tl.scale
         pen = tl.makeQPen()
-        for a, num in itertools.izip(coordticks, self.majortickscalc):
+
+        def generateTickLabels():
+            """Return plotter position of labels and label text."""
+            # get format for labels
+            format = s.TickLabels.format
+            if format.lower() == 'auto':
+                format = self.autoformat
+
+            # generate positions and labels
+            for posn, tickval in izip(coordticks, self.majortickscalc):
+                text = utils.formatNumber(tickval*scale, format)
+                yield posn, text
+
+        # position of label perpendicular to axis
+        perpposn = self.coordPerp + sign*(self._delta_axis+tl_spacing)
+
+        # use generator function to get labels and positions
+        if s.mode == 'labels':
+            ticklabels = self.generateLabelLabels(painter)
+        else:
+            ticklabels = generateTickLabels()
+
+        # iterate over each label
+        maxdim = 0
+        for parlposn, text in ticklabels:
 
             # x and y round other way if vertical
             if vertical:
-                x, y = b, a
+                x, y = perpposn, parlposn
             else:
-                x, y = a, b
+                x, y = parlposn, perpposn
 
-            num = utils.formatNumber(num*scale, format)
-            r = utils.Renderer(painter, font, x, y, num, alignhorz=ax,
+            r = utils.Renderer(painter, font, x, y, text, alignhorz=ax,
                                alignvert=ay, angle=angle)
             r.ensureInBox(extraspace=True, **bounds)
             bnd = r.getBounds()
             texttorender.append( (r, pen) )
 
+            # keep track of maximum extent of label perpendicular to axis
             if vertical:
                 maxdim = max(maxdim, bnd[2] - bnd[0])
             else:
@@ -560,8 +598,7 @@ class Axis(widget.Widget):
         # keep track of where we are
         self._delta_axis += 2*tl_spacing + maxdim
 
-    def _drawAxisLabel(self, painter, sign, outerbounds,
-                       texttorender):
+    def _drawAxisLabel(self, painter, sign, outerbounds, texttorender):
         """Draw an axis label on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -678,20 +715,12 @@ class Axis(widget.Widget):
         s.get('otherPosition').setSilent(other)
 
     def chooseName(self):
-        """Axis are called x and y."""
+        """Get default name for axis. Make x and y axes, then axisN."""
 
-        checks = {'x': False, 'y': False}
-
-        # avoid choosing name which already exists
-        for i in self.parent.children:
-            if i.name in checks:
-                checks[i.name] = True
-
-        if not checks['x']:
-            return 'x'
-        if not checks['y']:
-            return 'y'
-
+        widgets = set(self.parent.childnames)
+        for name in ('x', 'y'):
+            if name not in widgets:
+                return name
         return widget.Widget.chooseName(self)
 
     def draw(self, parentposn, painter, suppresstext=False, outerbounds=None):
@@ -759,13 +788,11 @@ class Axis(widget.Widget):
 
         # plot tick labels
         if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(painter, coordticks, sign,
-                                 texttorender)
+            self._drawTickLabels(painter, coordticks, sign, texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
-            self._drawAxisLabel(painter, sign, outerbounds,
-                                texttorender)
+            self._drawAxisLabel(painter, sign, outerbounds, texttorender)
 
         # mirror axis at other side of plot
         if s.autoMirror:

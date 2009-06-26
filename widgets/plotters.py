@@ -125,6 +125,14 @@ class GenericPlotter(widget.Widget):
         # actually clip the data
         painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
 
+    def getAxisLabels(self, direction):
+        """Get labels for datapoints and coordinates, or None if none.
+        direction is 'horizontal' or 'vertical'
+
+        return (labels, coordinates)
+        """
+        return (None, None)
+
 class FreePlotter(widget.Widget):
     """A plotter which can be plotted on the page or in a graph."""
 
