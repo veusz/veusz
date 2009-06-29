@@ -49,7 +49,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="linkedlabel" >
+          <widget class="QTextEdit" name="linkedlabel" >
            <property name="sizePolicy" >
             <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
              <horstretch>0</horstretch>
@@ -59,7 +59,7 @@
            <property name="text" >
             <string>Linked file: None</string>
            </property>
-           <property name="wordWrap" >
+           <property name="readOnly" >
             <bool>true</bool>
            </property>
           </widget>

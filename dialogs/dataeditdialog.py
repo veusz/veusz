@@ -285,6 +285,10 @@ class DataEditDialog(qt4.QDialog):
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 3)
 
+        # don't want text to look editable or special
+        self.linkedlabel.setFrameShape(qt4.QFrame.NoFrame)
+        self.linkedlabel.viewport().setBackgroundRole(qt4.QPalette.Window)
+
         # document changes
         self.connect(document, qt4.SIGNAL('sigModified'),
                      self.slotDocumentModified)
@@ -424,7 +428,6 @@ class DataEditDialog(qt4.QDialog):
 
     def slotCopy(self):
         """Copy text from selection."""
-
         # get list of selected rows and columns
         selmodel = self.datatableview.selectionModel()
         model = self.datatableview.model()
