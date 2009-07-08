@@ -185,7 +185,7 @@ class Linked2DFile(LinkedFileBase):
                 args.append( '%s=%s' % (p, repr(v)) )
         args.append('linked=True')
 
-        file.write('ImportFile2D(%s)\n' % ', '.join(args))
+        fileobj.write('ImportFile2D(%s)\n' % ', '.join(args))
 
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.
