@@ -160,7 +160,7 @@ class Document( qt4.QObject ):
         
     def resolveFullSettingPath(self, path):
         """Translate setting path into setting object."""
-        
+
         # find appropriate widget
         widget = self.basewidget
         parts = [i for i in path.split('/') if i != '']

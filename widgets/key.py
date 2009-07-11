@@ -161,34 +161,40 @@ class Key(widget.Widget):
     def __init__(self, parent, name=None):
         widget.Widget.__init__(self, parent, name=name)
 
-        s = self.settings
+        if type(self) == Key:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        widget.Widget.addSettings(s)
+
         s.add( setting.Text('Text',
                             descr = 'Text settings',
                             usertext='Text'),
-               pixmap = 'axislabel' )
+               pixmap = 'settings_axislabel' )
         s.add( setting.KeyBrush('Background',
                                 descr = 'Key background fill',
                                 usertext='Background'),
-               pixmap = 'bgfill' )
+               pixmap = 'settings_bgfill' )
         s.add( setting.Line('Border',
                             descr = 'Key border line',
                             usertext='Border'),
-               pixmap = 'border' )
+               pixmap = 'settings_border' )
 
-        s.add( setting.Choice( 'horzPosn',
-                               ('left', 'centre', 'right', 'manual'),
-                               'right',
-                               descr = 'Horizontal key position',
-                               usertext='Horz posn',
-                               formatting=True) )
-        s.add( setting.Choice( 'vertPosn',
-                               ('top', 'centre', 'bottom', 'manual'),
-                               'bottom',
-                               descr = 'Vertical key position',
-                               usertext='Vert posn',
-                               formatting=True) )
+        s.add( setting.AlignHorzWManual( 'horzPosn',
+                                         'right',
+                                         descr = 'Horizontal key position',
+                                         usertext='Horz posn',
+                                         formatting=True) )
+        s.add( setting.AlignVertWManual( 'vertPosn',
+                                         'bottom',
+                                         descr = 'Vertical key position',
+                                         usertext='Vert posn',
+                                         formatting=True) )
                                
-        s.add( setting.Distance('keyLength', '1cm',
+        s.add( setting.Distance('keyLength',
+                                '1cm',
                                 descr = 'Length of line to show in sample',
                                 usertext='Key length',
                                 formatting=True) )
@@ -204,15 +210,13 @@ class Key(widget.Widget):
                               usertext='Vert manual',
                               formatting=True) )
 
-        s.add( setting.Int( 'columns', 1,
+        s.add( setting.Int( 'columns',
+                            1,
                             descr = 'Number of columns in key',
                             usertext = 'Columns',
                             minval = 1,
                             maxval = 100,
                             formatting = True) )
-
-        if type(self) == Key:
-            self.readDefaults()
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""

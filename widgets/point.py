@@ -207,7 +207,13 @@ class PointPlotter(GenericPlotter):
         xdata and ydata are strings specifying the data in the document"""
         
         GenericPlotter.__init__(self, parent, name=name)
-        s = self.settings
+        if type(self) == PointPlotter:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        GenericPlotter.addSettings(s)
 
         s.add( setting.Int('thinfactor', 1,
                            minval=1,
@@ -215,10 +221,12 @@ class PointPlotter(GenericPlotter):
                            ' for each datapoint by this factor',
                            usertext='Thin markers',
                            formatting=True), 0 )
-        s.add( setting.Distance('markerSize', '3pt',
+        s.add( setting.Distance('markerSize',
+                                '3pt',
                                 descr = 'Size of marker to plot',
                                 usertext='Marker size', formatting=True), 0 )
-        s.add( setting.Marker('marker', 'circle',
+        s.add( setting.Marker('marker',
+                              'circle',
                               descr = 'Type of marker to plot',
                               usertext='Marker', formatting=True), 0 )
         s.add( setting.DatasetOrStr('labels', '',
@@ -226,14 +234,14 @@ class PointPlotter(GenericPlotter):
                                     usertext='Labels', datatype='text'), 5 )
         s.add( setting.DatasetOrFloatList(
                 'scalePoints', '',
-                descr = 'Scale size of plotted points by this dataset or'
-                ' list of values', usertext='Scale size'), 6 )
+                descr = 'Scale size of plotted markers by this dataset or'
+                ' list of values', usertext='Scale markers'), 6 )
 
         s.add( setting.DatasetOrFloatList('yData', 'y',
-                                          descr = 'Dataset containing y data or list of values',
+                                          descr='Dataset containing y data or list of values',
                                           usertext='Y data'), 0 )
         s.add( setting.DatasetOrFloatList('xData', 'x',
-                                          descr = 'Dataset containing x data or list of values',
+                                          descr='Dataset containing x data or list of values',
                                           usertext='X data'), 0 )
         s.add( setting.ErrorStyle('errorStyle',
                                   'bar',
@@ -243,34 +251,31 @@ class PointPlotter(GenericPlotter):
         s.add( setting.XYPlotLine('PlotLine',
                                   descr = 'Plot line settings',
                                   usertext = 'Plot line'),
-               pixmap = 'plotline' )
+               pixmap = 'settings_plotline' )
         s.add( setting.Line('MarkerLine',
                             descr = 'Line around the marker settings',
                             usertext = 'Marker border'),
-               pixmap = 'plotmarkerline' )
+               pixmap = 'settings_plotmarkerline' )
         s.add( PointPlotter.MarkerFillBrush('MarkerFill',
                                             descr = 'Marker fill settings',
                                             usertext = 'Marker fill'),
-               pixmap = 'plotmarkerfill' )
+               pixmap = 'settings_plotmarkerfill' )
         s.add( setting.ErrorBarLine('ErrorBarLine',
                                     descr = 'Error bar line settings',
                                     usertext = 'Error bar line'),
-               pixmap = 'ploterrorline' )
+               pixmap = 'settings_ploterrorline' )
         s.add( setting.PointFill('FillBelow',
                                  descr = 'Fill below plot line',
                                  usertext = 'Fill below'),
-               pixmap = 'plotfillbelow' )
+               pixmap = 'settings_plotfillbelow' )
         s.add( setting.PointFill('FillAbove',
                                  descr = 'Fill above plot line',
                                  usertext = 'Fill above'),
-               pixmap = 'plotfillabove' )
+               pixmap = 'settings_plotfillabove' )
         s.add( setting.PointLabel('Label',
                                   descr = 'Label settings',
                                   usertext='Label'),
-               pixmap = 'axislabel' )
-
-        if type(self) == PointPlotter:
-            self.readDefaults()
+               pixmap = 'settings_axislabel' )
 
     def _getUserDescription(self):
         """User-friendly description."""

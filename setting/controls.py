@@ -1520,4 +1520,4 @@ class ErrorStyle(Choice):
         """Generate a list of pixmaps for drop down menu."""
         cls._icons = []
         for errstyle in cls._errorstyles:
-            cls._icons.append( utils.getIcon('error_%s.svg' % errstyle) )
+            cls._icons.append( utils.getIcon('error_%s' % errstyle) )

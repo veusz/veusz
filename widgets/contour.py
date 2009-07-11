@@ -59,8 +59,22 @@ class Contour(plotters.GenericPlotter):
                                 'Contour support is disabled')
             
         self.Cntr = Cntr
+        # keep track of settings so we recalculate when necessary
+        self.lastdataset = None
+        self.contsettings = None
 
-        s = self.settings
+        # cached traced contours
+        self._cachedcontours = None
+        self._cachedpolygons = None
+
+        if type(self) == Contour:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        plotters.GenericPlotter.addSettings(s)
+
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
                                descr = 'Dataset to plot',
@@ -112,15 +126,7 @@ class Contour(plotters.GenericPlotter):
         s.add( setting.ContourLabel('ContourLabels',
                                     descr = 'Contour label settings',
                                     usertext = 'Contour labels'),
-               pixmap = 'axisticklabels' )
-
-         # keep track of settings so we recalculate when necessary
-        self.lastdataset = None
-        self.contsettings = None
-
-        # cached traced contours
-        self._cachedcontours = None
-        self._cachedpolygons = None
+               pixmap = 'settings_axisticklabels' )
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -129,7 +135,8 @@ class Contour(plotters.GenericPlotter):
         if s.data:
             out.append( s.data )
         if s.scaling == 'manual':
-            out.append('manual levels (%s)' %  (', '.join([str(i) for i in s.manualLevels])))
+            out.append('manual levels (%s)' %  (
+                    ', '.join([str(i) for i in s.manualLevels])))
         else:
             out.append('%(numLevels)i %(scaling)s levels (%(min)s to %(max)s)' % s)
         return ', '.join(out)

@@ -44,6 +44,12 @@ class GenericPlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         s = self.settings
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        widget.Widget.addSettings(s)
+
         s.add( setting.Str('key', '',
                            descr = 'Description of the plotted data to appear in key',
                            usertext='Key text') )

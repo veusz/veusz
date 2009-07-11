@@ -38,61 +38,13 @@ import veusz.qtall as qt4
 import controls
 import settings
 from settingdb import settingdb
+from reference import Reference
 
 import veusz.utils as utils
 
 # if invalid type passed to set
 class InvalidType(Exception):
     pass
-
-class Reference(object):
-    """A value a setting can have to point to another setting.
-    
-    Formats of a reference are like
-    /foo/bar/setting or
-    ../Line/width
-    
-    alternatively style sheets can be used with the format, e.g.
-    /StyleSheet/linewidth
-    """
-    
-    def __init__(self, value):
-        self.value = value
-    
-    def resolve(self, thissetting):
-        """Return the setting object associated with the reference."""
-
-        item = thissetting.parent
-        parts = self.value.split('/')
-        if parts[0] == '':
-            # need root widget if begins with slash
-            while item.parent is not None:
-                item = item.parent
-            parts = parts[1:]
-        
-        # do an iterative lookup of the setting
-        for p in parts:
-            if p == '..':
-                if item.parent is not None:
-                    item = item.parent
-            elif p == '':
-                pass
-            else:
-                if item.isWidget():
-                    child = item.getChild(p)
-                    if not child:
-                        item = item.settings.get(p)
-                    else:
-                        item = child
-                elif isinstance(item, settings.Settings):
-                    item = item.get(p)
-                else:
-                    assert not "Invalid item in tree"
-                    
-        assert isinstance(item, Setting)
-        assert item != thissetting
-        assert isinstance(item, thissetting.__class__)
-        return item
         
 class Setting(object):
     def __init__(self, name, value, descr='', usertext='',
@@ -129,7 +81,13 @@ class Setting(object):
         after are arguments after val
         optinal as optional arguments
         """
-        args = (self.name,) + before + (self.val,) + after
+
+        if isinstance(self._val, Reference):
+            val = self._val
+        else:
+            val = self.val
+
+        args = (self.name,) + before + (val,) + after
         opt = optional.copy()
         opt['descr'] = self.descr
         opt['usertext'] = self.usertext
@@ -163,8 +121,6 @@ class Setting(object):
             # this also removes the linked value if there is one set
             self._val = self.convertTo(v)
 
-        # iterate over weakly referenced objects
-        # delete those which cannot be called
         self.onmodified.emit(qt4.SIGNAL("onModified"), True)
 
     val = property(get, set, None,
@@ -178,6 +134,21 @@ class Setting(object):
         """Return the reference object."""
         assert isinstance(self._val, Reference)
         return self._val
+
+    def getStylesheetLink(self):
+        """Get text that this setting should default to linked to the
+        stylesheet."""
+        path = []
+        obj = self
+        while not obj.parent.isWidget():
+            path.insert(0, obj.name)
+            obj = obj.parent
+        path = ['', 'StyleSheet', obj.parent.typename] + path
+        return '/'.join(path)
+
+    def linkToStylesheet(self):
+        """Make this setting link to stylesheet setting, if possible."""
+        self.set( Reference(self.getStylesheetLink()) )
                
     def _path(self):
         """Return full path of setting."""
@@ -281,6 +252,11 @@ class Setting(object):
         self.onmodified.connect(self.onmodified,
                                 qt4.SIGNAL("onModified"), fn)
 
+        if isinstance(self._val, Reference):
+            # make reference pointed to also call this onModified
+            r = self._val.resolve(self)
+            r.setOnModified(fn)
+
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
         self.onmodified.disconnect(self.onmodified, 0, fn, 0)
@@ -291,11 +267,26 @@ class Setting(object):
         self.val = value
 
     def isDefault(self):
-        """Is the current value a default?"""
-        if isinstance(self._val, Reference) and self._val == self.default:
-            return True
+        """Is the current value a default?
+        This also returns true if it is linked to the appropriate stylesheet
+        """
+        if isinstance(self._val, Reference):
+            # default reference
+            if self._val == self.default:
+                return True
+            # whether setting is linked directly to stylesheet
+            if self._val.value == self.getStylesheetLink():
+                return True
+            return False
         else:
+            # default value
             return self.val == self.default
+
+    def isDefaultLink(self):
+        """Is this a link to the default spreadsheet value."""
+
+        return ( isinstance(self._val, Reference) and
+                 self._val.value == self.getStylesheetLink() )
 
     def setSilent(self, val):
         """Set the setting, without propagating modified flags.
@@ -325,7 +316,7 @@ class Setting(object):
         """Return document."""
         p = self.parent
         while p:
-            if hasattr(p, 'document'):
+            if p.isWidget():
                 return p.document
             p = p.parent
         return None
@@ -649,7 +640,8 @@ class Distance(Setting):
           _distFrac,
           _distInvPerc ),
         ]
-    
+
+    @classmethod
     def isDist(kls, dist):
         """Is the text a valid distance measure?"""
         
@@ -659,7 +651,6 @@ class Distance(Setting):
                 return True
             
         return False
-    isDist = classmethod(isDist)
 
     def convertTo(self, val):
         if self.isDist(val):
@@ -679,6 +670,7 @@ class Distance(Setting):
     def makeControl(self, *args):
         return controls.Distance(self, *args)
 
+    @classmethod
     def convertDistance(kls, painter, distance):
         '''Convert a distance to plotter units.
 
@@ -712,8 +704,6 @@ class Distance(Setting):
         # none of the regexps match
         raise ValueError( "Cannot convert distance in form '%s'" %
                           dist )
-
-    convertDistance = classmethod(convertDistance)
 
     def convert(self, painter):
         """Convert this setting's distance as above"""
@@ -1322,6 +1312,7 @@ class Axis(Str):
 class Image(Str):
     """Hold the name of a child image."""
 
+    @staticmethod
     def buildImageList(level, widget, outdict):
         """A recursive helper to build up a list of possible image widgets.
 
@@ -1338,8 +1329,6 @@ class Image(Str):
                     outdict[child.name] = (child, level)
             else:
                 Image.buildImageList(level+1, child, outdict)
-
-    buildImageList = staticmethod(buildImageList)
 
     def getImageList(self):
         """Return a dict of valid image names and the corresponding objects."""
@@ -1555,3 +1544,37 @@ class ErrorStyle(Choice):
                               
     def makeControl(self, *args):
         return controls.ErrorStyle(self, *args)
+
+class AlignHorz(Choice):
+    """Alignment horizontally."""
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, ['left', 'centre', 'right'], value, **args)
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+class AlignVert(Choice):
+    """Alignment vertically."""
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, ['top', 'centre', 'bottom'], value, **args)
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+class AlignHorzWManual(Choice):
+    """Alignment horizontally."""
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, ['left', 'centre', 'right', 'manual'],
+                        value, **args)
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+class AlignVertWManual(Choice):
+    """Alignment vertically."""
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, ['top', 'centre', 'bottom', 'manual'],
+                        value, **args)
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})

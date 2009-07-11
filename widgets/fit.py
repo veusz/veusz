@@ -43,7 +43,18 @@ class Fit(FunctionPlotter):
     def __init__(self, parent, name=None):
         FunctionPlotter.__init__(self, parent, name=name)
 
-        s = self.settings
+        if type(self) == Fit:
+            self.readDefaults()
+
+        self.addAction( widget.Action('fit', self.actionFit,
+                                      descr = 'Fit function',
+                                      usertext = 'Fit function') )
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        FunctionPlotter.addSettings(s)
+
         s.add( setting.FloatDict('values',
                                  {'a': 0.0, 'b': 1.0},
                                  descr = 'Variables and fit values',
@@ -84,15 +95,6 @@ class Fit(FunctionPlotter):
         # modify description
         s.get('min').usertext='Min. fit range'
         s.get('max').usertext='Max. fit range'
-
-        if type(self) == Fit:
-            self.readDefaults()
-
-        self.addAction( widget.Action('fit', self.actionFit,
-                                      descr = 'Fit function',
-                                      usertext = 'Fit function') )
-
-
 
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""

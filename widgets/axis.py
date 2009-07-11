@@ -35,6 +35,93 @@ import graph
 import containers
 import controlgraph
 
+###############################################################################
+
+class MajorTick(setting.Line):
+    '''Major tick settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+        self.add( setting.Distance( 'length',
+                                    '6pt',
+                                    descr = 'Length of major ticks',
+                                    usertext='Length') )
+        self.add( setting.Int( 'number',
+                               6,
+                               descr = 'Number of major ticks to aim for',
+                               usertext='Number') )
+        self.add( setting.FloatList('manualTicks',
+                                    [],
+                                    descr = 'List of tick values'
+                                    ' overriding defaults',
+                                    usertext='Manual ticks') )
+
+    def getLength(self, painter):
+        '''Return tick length in painter coordinates'''
+        
+        return self.get('length').convert(painter)
+    
+class MinorTick(setting.Line):
+    '''Minor tick settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+        self.add( setting.Distance( 'length',
+                                    '3pt',
+                                    descr = 'Length of minor ticks',
+                                    usertext='Length') )
+        self.add( setting.Int( 'number',
+                               20,
+                               descr = 'Number of minor ticks to aim for',
+                               usertext='Number') )
+
+    def getLength(self, painter):
+        '''Return tick length in painter coordinates'''
+        
+        return self.get('length').convert(painter)
+    
+class GridLine(setting.Line):
+    '''Grid line settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+
+        self.get('color').newDefault( 'grey' )
+        self.get('hide').newDefault( True )
+        self.get('style').newDefault( 'dotted' )
+
+class AxisLabel(setting.Text):
+    """For axis labels."""
+
+    def __init__(self, name, **args):
+        setting.Text.__init__(self, name, **args)
+        self.add( setting.Bool( 'atEdge', False,
+                                descr = 'Place axis label close to edge'
+                                ' of graph',
+                                usertext='At edge') )
+        self.add( setting.Bool( 'rotate', False,
+                                descr = 'Rotate the label by 90 degrees',
+                                usertext='Rotate') )
+
+class TickLabel(setting.Text):
+    """For tick labels on axes."""
+
+    def __init__(self, name, **args):
+        setting.Text.__init__(self, name, **args)
+        self.add( setting.Bool( 'rotate', False,
+                                descr = 'Rotate the label by 90 degrees',
+                                usertext='Rotate') )
+        self.add( setting.Str( 'format', 'Auto',
+                               descr = 'Format of the tick labels',
+                               usertext='Format') )
+
+        self.add( setting.Float('scale', 1.,
+                                descr='A scale factor to apply to the values '
+                                'of the tick labels',
+                                usertext='Scale') )
+
+###############################################################################
+
 class Axis(widget.Widget):
     """Manages and draws an axis."""
 
@@ -49,6 +136,28 @@ class Axis(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
+
+        if type(self) == Axis:
+            self.readDefaults()
+
+        if self.name == 'y':
+            s.direction = 'vertical'
+        elif self.name == 'x':
+            s.direction = 'horizontal'
+
+        self.minorticks = None
+        self.majorticks = None
+
+        # automatic range 
+        self.setAutoRange(None)
+
+        # document updates change set variable when things need recalculating
+        self.docchangeset = -1
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        widget.Widget.addSettings(s)
         s.add( setting.Str('label', '',
                            descr='Axis label text',
                            usertext='Label') )
@@ -117,44 +226,27 @@ class Axis(widget.Widget):
         s.add( setting.Line('Line',
                             descr = 'Axis line settings',
                             usertext = 'Axis line'),
-               pixmap = 'axisline' )
-        s.add( setting.AxisLabel('Label',
-                                 descr = 'Axis label settings',
-                                 usertext = 'Axis label'),
-               pixmap = 'axislabel' )
-        s.add( setting.TickLabel('TickLabels',
-                                 descr = 'Tick label settings',
-                                 usertext = 'Tick labels'),
-               pixmap = 'axisticklabels' )
-        s.add( setting.MajorTick('MajorTicks',
-                                 descr = 'Major tick line settings',
-                                 usertext = 'Major ticks'),
-               pixmap = 'axismajorticks' )
-        s.add( setting.MinorTick('MinorTicks',
-                                 descr = 'Minor tick line settings',
-                                 usertext = 'Minor ticks'),
-               pixmap = 'axisminorticks' )
-        s.add( setting.GridLine('GridLines',
-                                descr = 'Grid line settings',
-                                usertext = 'Grid lines'),
-               pixmap = 'axisgridlines' )
-
-        if type(self) == Axis:
-            self.readDefaults()
-
-        if self.name == 'y':
-            s.direction = 'vertical'
-        elif self.name == 'x':
-            s.direction = 'horizontal'
-
-        self.minorticks = None
-        self.majorticks = None
-
-        # automatic range 
-        self.setAutoRange(None)
-
-        # document updates change set variable when things need recalculating
-        self.docchangeset = -1
+               pixmap='settings_axisline' )
+        s.add( AxisLabel('Label',
+                         descr = 'Axis label settings',
+                         usertext = 'Axis label'),
+               pixmap='settings_axislabel' )
+        s.add( TickLabel('TickLabels',
+                         descr = 'Tick label settings',
+                         usertext = 'Tick labels'),
+               pixmap='settings_axisticklabels' )
+        s.add( MajorTick('MajorTicks',
+                         descr = 'Major tick line settings',
+                         usertext = 'Major ticks'),
+               pixmap='settings_axismajorticks' )
+        s.add( MinorTick('MinorTicks',
+                         descr = 'Minor tick line settings',
+                         usertext = 'Minor ticks'),
+               pixmap='settings_axisminorticks' )
+        s.add( GridLine('GridLines',
+                        descr = 'Grid line settings',
+                        usertext = 'Grid lines'),
+               pixmap='settings_axisgridlines' )
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -717,7 +809,10 @@ class Axis(widget.Widget):
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""
 
-        widgets = set(self.parent.childnames)
+        try:
+            widgets = set(self.parent.childnames)
+        except AttributeError:
+            widgets = set()
         for name in ('x', 'y'):
             if name not in widgets:
                 return name

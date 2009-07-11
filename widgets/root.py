@@ -41,24 +41,32 @@ class Root(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
+        self.document = document
 
         # don't want user to be able to hide entire document
-        s.remove('hide')
-
-        s.add( setting.Distance('width', '15cm',
-                                descr='Width of the pages',
-                                usertext='Page width',
-                                formatting=True) )
-        s.add( setting.Distance('height', '15cm',
-                                descr='Height of the pages',
-                                usertext='Page height',
-                                formatting=True) )
-        s.add( setting.StyleSheet(descr='Master settings for document',
-                                  usertext='Style sheet') )
-        self.document = document
+        stylesheet = setting.StyleSheet(descr='Master settings for document',
+                                        usertext='Style sheet')
+        s.add(stylesheet)
+        self.fillStylesheet(stylesheet)
 
         if type(self) == Root:
             self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        widget.Widget.addSettings(s)
+        s.remove('hide')
+
+        s.add( setting.Distance('width',
+                                '15cm',
+                                descr='Width of the pages',
+                                usertext='Page width',
+                                formatting=True) )
+        s.add( setting.Distance('height',
+                                '15cm',
+                                descr='Height of the pages',
+                                usertext='Page height',
+                                formatting=True) )    
             
     def getSize(self, painter):
         """Get dimensions of widget in painter coordinates."""
@@ -110,6 +118,32 @@ class Root(widget.Widget):
             )
         self.document.applyOperation(
             document.OperationMultiple(operations, descr='change page size'))
+
+    def fillStylesheet(self, stylesheet):
+        """Register widgets with stylesheet."""
+
+        for widgetname in document.thefactory.listWidgets():
+            klass = document.thefactory.getWidgetClass(widgetname)
+            if klass.allowusercreation or klass == Root:
+                newsett = setting.Settings(name=klass.typename,
+                                           usertext = klass.typename,
+                                           pixmap="button_%s" % klass.typename)
+                classset = setting.Settings('temp')
+                klass.addSettings(classset)
+
+                # copy formatting settings to stylesheet
+                for name in classset.setnames:
+                    # might become recursive
+                    if name == 'StyleSheet':
+                        continue
+
+                    sett = classset.setdict[name]
+                    # skip non formatting settings
+                    #if hasattr(sett, 'formatting') and not sett.formatting:
+                    #    continue
+                    newsett.add( sett.copy() )
+            
+                stylesheet.add(newsett)
 
 # allow the factory to instantiate this
 document.thefactory.register( Root )

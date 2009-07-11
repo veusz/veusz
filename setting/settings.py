@@ -20,6 +20,8 @@
 
 """Module for holding collections of settings."""
 
+from reference import Reference
+
 class Settings:
     """A class for holding collections of settings."""
 
@@ -32,9 +34,6 @@ class Settings:
         self.pixmap = pixmap
         self.usertext = usertext
         self.setnames = []  # a list of names
-        self.modified = False
-        self.onmodified = [] # fns to call on modification
-        self.changeset = 0
         self.parent = None
 
     def copy(self):
@@ -80,7 +79,6 @@ class Settings:
             self.setnames.append(name)
         else:
             self.setnames.insert(posn, name)
-        setting.setOnModified( self.setModified )
         setting.parent = self
         
         if pixmap:
@@ -88,21 +86,6 @@ class Settings:
 
         if readonly:
             setting.readonly = True
-
-    def setModified(self, modified = True):
-        """Set the modification flag."""
-        self.modified = modified
-        self.changeset += 1
-        for i in self.onmodified:
-            i(modified)
-        
-    def isModified(self):
-        """Get the modification flag."""
-        return self.modified
-
-    def setOnModified(self, fn):
-        """Set the function to be called on modification (passing True)."""
-        self.onmodified.append(fn)
         
     def remove(self, name):
         """Remove name from the list of settings."""
@@ -119,7 +102,7 @@ class Settings:
         d = self.__dict__['setdict']
         if name in d:
             d[name].val = val
-            self.setModified()
+            #self.setModified()
         else:
             self.__dict__[name] = val
 
@@ -223,24 +206,34 @@ class Settings:
         for s in self.setdict.values():
             s.readDefaults(root, widgetname)
 
-class StyleSheet(Settings):
-    """A class for handling default values of settings.
-    
-    Settings are registered to be added to the stylesheet."""
+    def linkToStyleSheet(self, _root=None):
+        """Link the settings within this Settings to a stylesheet.
+        
+        _root is an internal parameter as this function is recursive."""
 
-    registeredsettings = []
+        # build up root part of pathname to reference
+        if _root is None:
+            path = []
+            obj = self
+            while not obj.parent.isWidget():
+                path.insert(0, obj.name)
+                obj = obj.parent
+            path = ['', 'StyleSheet', obj.parent.typename] + path + ['']
+            _root = '/'.join(path)
 
-    def register(kls, settings):
-        """Register a settings object with the stylesheet.
-        This settings object is copied for each new document.
-        """
-        kls.registeredsettings.append(settings)
-    register = classmethod(register)
+        # iterate over subsettings
+        for name, setn in self.setdict.iteritems():
+            thispath = _root + name
+            if isinstance(setn, Settings):
+                # call recursively if this is a Settings
+                setn.linkToStyleSheet(_root=thispath+'/')
+            else:
+                ref = Reference(thispath)
+                try:
+                    # if the reference resolves, then set it
+                    ref.resolve(setn)
+                    setn.set(ref)
+                except Reference.ResolveException:
+                    pass
 
-    def __init__(self, **args):
-        """Create the default settings."""
-        Settings.__init__(self, 'StyleSheet', **args)
-        self.pixmap = 'stylesheet'
 
-        for subset in self.registeredsettings:
-            self.add( subset.copy() )

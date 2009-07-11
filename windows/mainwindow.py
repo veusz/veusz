@@ -41,6 +41,7 @@ from veusz.dialogs.datacreate2d import DataCreate2DDialog
 from veusz.dialogs.preferences import PreferencesDialog
 from veusz.dialogs.errorloading import ErrorLoadingDialog
 from veusz.dialogs.capturedialog import CaptureDialog
+from veusz.dialogs.stylesheet import StylesheetDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -78,7 +79,7 @@ class MainWindow(qt4.QMainWindow):
 
         # icon and different size variations
         d = utils.imagedir
-        self.setWindowIcon( utils.getIcon('veusz.svg') )
+        self.setWindowIcon( utils.getIcon('veusz') )
 
         # master documenent
         self.document = document.Document()
@@ -223,6 +224,12 @@ class MainWindow(qt4.QMainWindow):
     def slotEditPreferences(self):
         dialog = PreferencesDialog(self)
         dialog.exec_()
+
+    def slotEditStylesheet(self):
+        dialog = StylesheetDialog(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
+        return dialog
         
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
@@ -257,23 +264,23 @@ class MainWindow(qt4.QMainWindow):
         # menuid.itemid
         items = (
             ('filenew', 'New document', '&New', 'file',
-             self.slotFileNew, 'kde-document-new.svg', True, 'Ctrl+N'),
+             self.slotFileNew, 'kde-document-new', True, 'Ctrl+N'),
             ('fileopen', 'Open a document', '&Open...', 'file',
-             self.slotFileOpen, 'kde-document-open.svg', True, 'Ctrl+O'),
+             self.slotFileOpen, 'kde-document-open', True, 'Ctrl+O'),
             #If we were looking for HIG goodness, there wouldn't be a submenu here
             ('filerecent', 'Open a recently edited document',
              'Open &Recent', 'file', [], '', False, ''),
             ('file', ),
             ('filesave', 'Save the document', '&Save', 'file',
-             self.slotFileSave, 'kde-document-save.svg', True, 'Ctrl+S'),
+             self.slotFileSave, 'kde-document-save', True, 'Ctrl+S'),
             ('filesaveas', 'Save the current graph under a new name',
              'Save &As...', 'file', self.slotFileSaveAs,
-             'kde-document-save-as.svg', False, ''),
+             'kde-document-save-as', False, ''),
             ('file', ),
             ('fileprint', 'Print the document', '&Print...', 'file',
-             self.slotFilePrint, 'kde-document-print.svg', True, 'Ctrl+P'),
+             self.slotFilePrint, 'kde-document-print', True, 'Ctrl+P'),
             ('fileexport', 'Export the current page', '&Export...', 'file',
-             self.slotFileExport, 'kde-document-export.svg', True, ''),
+             self.slotFileExport, 'kde-document-export', True, ''),
             ('fileexportstylesheet', 'Export stylesheet to file', 'Export stylesheet...', 'file',
              self.slotFileExportStyleSheet, '', False, ''), 
             ('fileimportstylesheet', 'Import stylesheet from file', 'Import stylesheet...', 'file',
@@ -281,18 +288,22 @@ class MainWindow(qt4.QMainWindow):
  
             ('file', ),
             ('fileclose', 'Close current window', 'Close Window', 'file',
-             self.slotFileClose, 'kde-window-close.svg', False, 'Ctrl+W'),
+             self.slotFileClose, 'kde-window-close', False, 'Ctrl+W'),
             ('filequit', 'Exit the program', '&Quit', 'file',
-             self.slotFileQuit, 'kde-application-exit.svg',
+             self.slotFileQuit, 'kde-application-exit',
              False, 'Ctrl+Q'),
 
             ('editundo', 'Undo the previous operation', 'Undo', 'edit',
-             self.slotEditUndo, 'kde-edit-undo.svg', False,  'Ctrl+Z'),
+             self.slotEditUndo, 'kde-edit-undo', False,  'Ctrl+Z'),
             ('editredo', 'Redo the previous operation', 'Redo', 'edit',
-             self.slotEditRedo, 'kde-edit-redo.svg', False, 'Ctrl+Shift+Z'),
+             self.slotEditRedo, 'kde-edit-redo', False, 'Ctrl+Shift+Z'),
             ('edit', ),
             ('editprefs', 'Edit preferences', 'Preferences...', 'edit',
              self.slotEditPreferences, '', False, ''),
+            ('editstylesheet',
+             'Edit stylesheet to change default widget settings',
+             'Stylesheet...', 'edit',
+             self.slotEditStylesheet, 'settings_stylesheet', False, ''),
             ('edit', ),
 
             ('viewwindows', 'Show or hide windows or toolbars',
@@ -315,17 +326,17 @@ class MainWindow(qt4.QMainWindow):
             ('view', ),
             
             ('dataimport', 'Import data into Veusz', '&Import...', 'data',
-             self.slotDataImport, 'kde-vzdata-import.svg', True, ''),
+             self.slotDataImport, 'kde-vzdata-import', True, ''),
             ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
-             self.slotDataEdit, 'kde-edit.svg', False, ''),
+             self.slotDataEdit, 'kde-edit', False, ''),
             ('datacreate', 'Create new datasets', '&Create...', 'data',
-             self.slotDataCreate, 'kde-document-new.svg', False, ''),
+             self.slotDataCreate, 'kde-document-new', False, ''),
             ('datacreate2d', 'Create new 2D datasets', 'Create &2D...', 'data',
-             self.slotDataCreate2D, 'kde-document-new.svg', False, ''),
+             self.slotDataCreate2D, 'kde-document-new', False, ''),
             ('datacapture', 'Capture remote data', 'Ca&pture...', 'data',
-             self.slotDataCapture, 'veusz-capture-data.svg', False, ''),
+             self.slotDataCapture, 'veusz-capture-data', False, ''),
             ('datareload', 'Reload linked datasets', '&Reload', 'data',
-             self.slotDataReload, 'kde-view-refresh.svg', False, ''),
+             self.slotDataReload, 'kde-view-refresh', False, ''),
 
             ('helphome', 'Go to the Veusz home page on the internet',
              'Home page', 'help', self.slotHelpHomepage, '', False, ''),
@@ -336,7 +347,7 @@ class MainWindow(qt4.QMainWindow):
              'Suggestions and bugs', 'help', self.slotHelpBug, '', False, ''),
             ('help', ),
             ('helpabout', 'Displays information about the program', 'About...',
-             'help', self.slotHelpAbout, 'veusz.svg', False, '')
+             'help', self.slotHelpAbout, 'veusz', False, '')
             )
             
         self.actions = utils.populateMenuToolbars(items, self.maintoolbar,

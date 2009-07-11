@@ -49,7 +49,13 @@ class ColorBar(axis.Axis):
         """Initialise object and create axes."""
 
         axis.Axis.__init__(self, parent, name=name)
-        s = self.settings
+        if type(self) == ColorBar:
+            self.readDefaults()
+        
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        axis.Axis.addSettings(s)
 
         s.add( setting.Image('image', '',
                              descr = 'Corresponding image',
@@ -58,18 +64,16 @@ class ColorBar(axis.Axis):
         s.get('log').readonly = True
         s.get('datascale').readonly = True
 
-        s.add( setting.Choice( 'horzPosn',
-                               ('left', 'centre', 'right', 'manual'),
-                               'right',
-                               descr = 'Horizontal key position',
-                               usertext='Horz posn',
-                               formatting=True) )
-        s.add( setting.Choice( 'vertPosn',
-                               ('top', 'centre', 'bottom', 'manual'),
-                               'bottom',
-                               descr = 'Vertical key position',
-                               usertext='Vert posn',
-                               formatting=True) )
+        s.add( setting.AlignHorzWManual( 'horzPosn',
+                                         'right',
+                                         descr = 'Horizontal position',
+                                         usertext='Horz posn',
+                                         formatting=True) )
+        s.add( setting.AlignVertWManual( 'vertPosn',
+                                         'bottom',
+                                         descr = 'Vertical position',
+                                         usertext='Vert posn',
+                                         formatting=True) )
         s.add( setting.DistanceOrAuto('width', 'Auto',
                                       descr = 'Width of colorbar',
                                       usertext='Width',
@@ -91,11 +95,9 @@ class ColorBar(axis.Axis):
                               formatting=True) )
 
         s.add( setting.Line('Border', descr = 'Colorbar border line',
-                            usertext='Border'), pixmap='border')
+                            usertext='Border'),
+               pixmap='settings_border')
 
-        if type(self) == ColorBar:
-            self.readDefaults()
-        
     def chooseName(self):
         """Get name of widget."""
 

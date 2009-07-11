@@ -38,16 +38,20 @@ class Shape(plotters.FreePlotter):
 
     def __init__(self, parent, name=None):
         plotters.FreePlotter.__init__(self, parent, name=name)
-        s = self.settings
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        plotters.FreePlotter.addSettings(s)
 
         s.add( setting.ShapeFill('Fill',
                                  descr = 'Shape fill',
                                  usertext='Fill'),
-               pixmap = 'bgfill' )
+               pixmap = 'settings_bgfill' )
         s.add( setting.Line('Border',
                             descr = 'Shape border',
                             usertext='Border'),
-               pixmap = 'border' )
+               pixmap = 'settings_border' )
 
 class BoxShape(Shape):
     """For drawing box-like shapes."""
@@ -55,19 +59,22 @@ class BoxShape(Shape):
     def __init__(self, parent, name=None):
         Shape.__init__(self, parent, name=name)
 
-        s = self.settings
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        Shape.addSettings(s)
 
-        s.add( setting.DatasetOrFloatList('width', 0.1,
+        s.add( setting.DatasetOrFloatList('width', [0.1],
                                           descr='List of fractional '
                                           'widths or dataset',
                                           usertext='Widths',
                                           formatting=False), 3 )
-        s.add( setting.DatasetOrFloatList('height', 0.1,
+        s.add( setting.DatasetOrFloatList('height', [0.1],
                                           descr='List of fractional '
                                           'heights or dataset',
                                           usertext='Heights',
                                           formatting=False), 4 )
-        s.add( setting.DatasetOrFloatList('rotate', 0.,
+        s.add( setting.DatasetOrFloatList('rotate', [0.],
                                           descr='Rotation angles of '
                                           'shape or dataset',
                                           usertext='Rotate',
@@ -185,11 +192,19 @@ class Rectangle(BoxShape):
 
     def __init__(self, parent, name=None):
         BoxShape.__init__(self, parent, name=name)
-        self.settings.add( setting.Int('rounding', 0,
-                                       minval=0, maxval=100,
-                                       descr='Round corners with this percentage',
-                                       usertext='Rounding corners',
-                                       formatting=True) )
+        if type(self) == Rectangle:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        BoxShape.addSettings(s)
+
+        s.add( setting.Int('rounding', 0,
+                           minval=0, maxval=100,
+                           descr='Round corners with this percentage',
+                           usertext='Rounding corners',
+                           formatting=True) )
 
     def drawShape(self, painter, rect):
         s = self.settings
@@ -205,6 +220,11 @@ class Ellipse(BoxShape):
     description = 'Ellipse'
     allowusercreation = True
 
+    def __init__(self, parent, name=None):
+        BoxShape.__init__(self, parent, name=name)
+        if type(self) == Ellipse:
+            self.readDefaults()
+
     def drawShape(self, painter, rect):
         painter.drawEllipse(rect)
 
@@ -217,21 +237,29 @@ class ImageFile(BoxShape):
 
     def __init__(self, parent, name=None):
         BoxShape.__init__(self, parent, name=name)
-        self.settings.add( setting.Filename('filename', '',
-                                            descr='Image filename',
-                                            usertext='Filename',
-                                            formatting=False),
-                           posn=0 )
-        self.settings.add( setting.Bool('aspect', True,
-                                        descr='Preserve aspect ratio',
-                                        usertext='Preserve aspect',
-                                        formatting=True),
-                           posn=0 )
-        self.settings.Border.get('hide').newDefault(True)
+        if type(self) == ImageFile:
+            self.readDefaults()
 
         self.cachepixmap = None
         self.cachefilename = None
         self.cachestat = None
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        BoxShape.addSettings(s)
+
+        s.add( setting.Filename('filename', '',
+                                descr='Image filename',
+                                usertext='Filename',
+                                formatting=False),
+               posn=0 )
+        s.add( setting.Bool('aspect', True,
+                            descr='Preserve aspect ratio',
+                            usertext='Preserve aspect',
+                            formatting=True),
+               posn=0 )
+        s.Border.get('hide').newDefault(True)
 
     def updateCachedPixmap(self):
         """Update cache."""
@@ -258,7 +286,7 @@ class ImageFile(BoxShape):
 
         # if no pixmap, then use default image
         if not pixmap or pixmap.width() == 0 or pixmap.height() == 0:
-            pixmap = utils.getIcon('button_imagefile.svg').pixmap(64, 64)
+            pixmap = utils.getIcon('button_imagefile').pixmap(64, 64)
         
         # pixmap rectangle
         prect = qt4.QRectF(pixmap.rect())

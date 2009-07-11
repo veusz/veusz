@@ -94,11 +94,26 @@ class Image(plotters.GenericPlotter):
 
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
-        # lazy read of colormap file (Let's help startup times)
-        if Image.colormaps is None:
-            Image.readColorMaps()
+        self.lastcolormap = None
+        self.lastdataset = None
+        self.schangeset = -1
 
-        s = self.settings
+        # this is the range of data plotted, computed when plot is changed
+        # the ColorBar object needs this later
+        self.cacheddatarange = (0, 1)
+
+        if type(self) == Image:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        plotters.GenericPlotter.addSettings(s)
+
+        # lazy read of colormap file (Let's help startup times)
+        if klass.colormaps is None:
+            klass.readColorMaps()
+
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
                                descr = 'Dataset to plot',
@@ -137,14 +152,6 @@ class Image(plotters.GenericPlotter):
                             maxval = 100,
                             formatting=True),
                6 )
-
-        self.lastcolormap = None
-        self.lastdataset = None
-        self.schangeset = -1
-
-        # this is the range of data plotted, computed when plot is changed
-        # the ColorBar object needs this later
-        self.cacheddatarange = (0, 1)
 
     def _getUserDescription(self):
         """User friendly description."""

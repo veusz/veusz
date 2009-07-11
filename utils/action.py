@@ -41,7 +41,13 @@ _iconcache = {}
 def getIcon(icon):
     """Return a cached QIconSet for the filename in the icons directory."""
     if icon not in _iconcache:
-        _iconcache[icon] = qt4.QIcon( os.path.join(imagedir, icon) )
+        svg = os.path.join(imagedir, icon+'.svg')
+        if os.path.exists(svg):
+            filename = svg
+        else:
+            filename = os.path.join(imagedir, icon+'.png')
+
+        _iconcache[icon] = qt4.QIcon(filename)
     return _iconcache[icon]
 
 def populateMenuToolbars(items, toolbar, menus):

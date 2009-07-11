@@ -66,14 +66,19 @@ class BarPlotter(GenericPlotter):
 
     def __init__(self, parent, name=None):
         """Initialise bar chart."""
-        
         GenericPlotter.__init__(self, parent, name=name)
-        s = self.settings
+        if type(self) == BarPlotter:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        GenericPlotter.addSettings(s)
 
         # get rid of default key setting
         s.remove('key')
 
-        s.add( setting.Strings('keys', (''),
+        s.add( setting.Strings('keys', ('',),
                                descr='Key text for each dataset',
                                usertext='Key text'), 0)
 
@@ -118,17 +123,14 @@ class BarPlotter(GenericPlotter):
                               formatting=True) )
 
         s.add(BarFill('BarFill', descr='Bar fill', usertext='Fill'),
-              pixmap='bgfill')
+              pixmap = 'settings_bgfill')
         s.add(BarLine('BarLine', descr='Bar line', usertext='Line'),
-              pixmap='border')
+              pixmap = 'settings_border')
 
         s.add( setting.ErrorBarLine('ErrorBarLine',
                                     descr = 'Error bar line settings',
                                     usertext = 'Error bar line'),
-               pixmap = 'ploterrorline' )
-
-        if type(self) == BarPlotter:
-            self.readDefaults()
+               pixmap = 'settings_ploterrorline' )
 
     def _getUserDescription(self):
         """User-friendly description."""

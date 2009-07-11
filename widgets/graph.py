@@ -44,34 +44,41 @@ class Graph(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
-        s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
-                                 'Distance from left of graph to '
-                                 'edge of page',
+        self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        widget.Widget.addSettings(s)
+
+        s.add( setting.Distance( 'leftMargin',
+                                 '1.7cm',
+                                 descr='Distance from left of graph to edge',
                                  usertext='Left margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
-                                 'Distance from right of graph to '
-                                 'edge of page',
+        s.add( setting.Distance( 'rightMargin',
+                                 '0.1cm',
+                                 descr='Distance from right of graph to edge',
                                  usertext='Right margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
-                                 'Distance from top of graph to '
-                                 'edge of page',
+        s.add( setting.Distance( 'topMargin',
+                                 '0.1cm',
+                                 descr='Distance from top of graph to edge',
                                  usertext='Top margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
-                                 'Distance from bottom of graph'
-                                 'to edge of page',
+        s.add( setting.Distance( 'bottomMargin',
+                                 '1.7cm',
+                                 descr='Distance from bottom of graph to edge',
                                  usertext='Bottom margin',
                                  formatting=True) )
         s.add( setting.GraphBrush( 'Background',
                                    descr = 'Background plot fill',
-                                   usertext='Background'), pixmap='bgfill' )
+                                   usertext='Background'),
+               pixmap='settings_bgfill' )
         s.add( setting.Line('Border', descr = 'Graph border line',
-                            usertext='Border'), pixmap='border')
+                            usertext='Border'),
+               pixmap='settings_border')
         
-        self.readDefaults()
-
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 

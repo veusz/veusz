@@ -23,25 +23,7 @@
 import veusz.qtall as qt4
 
 import setting
-from settings import Settings, StyleSheet
-
-from veusz.utils import formatNumber
-from veusz.application import Application
-
-class StylesheetLine(Settings):
-    """Hold the properties of the default line."""
-    def __init__(self):
-        Settings.__init__(self, 'Line', pixmap='plotline',
-                          descr='Default line style for document',
-                          usertext='Line')
-        self.add( setting.Distance('width', '0.5pt',
-                                   descr='Default line width',
-                                   usertext='Width') )
-        self.add( setting.Color('color', 'black',
-                               descr='Default line color',
-                               usertext='Color') )
-# register these properties with the stylesheet
-StyleSheet.register(StylesheetLine())
+from settings import Settings
 
 class Line(Settings):
     '''For holding properities of a line.'''
@@ -49,10 +31,12 @@ class Line(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.Color('color', setting.Reference('/StyleSheet/Line/color'),
+        self.add( setting.Color('color',
+                                setting.Reference('/StyleSheet/Line/color'),
                                 descr = 'Color of line',
                                 usertext='Color') )
-        self.add( setting.Distance('width', setting.Reference('/StyleSheet/Line/width'),
+        self.add( setting.Distance('width',
+                                   setting.Reference('/StyleSheet/Line/width'),
                                    descr = 'Width of line',
                                    usertext='Width') )
         self.add( setting.LineStyle('style', 'solid',
@@ -202,101 +186,6 @@ class ShapeFill(Brush):
         self.get('hide').newDefault(True)
         self.get('color').newDefault('white')
 
-class MajorTick(Line):
-    '''Major tick settings.'''
-
-    def __init__(self, name, **args):
-        Line.__init__(self, name, **args)
-        self.add( setting.Distance( 'length', '6pt',
-                                    descr = 'Length of ticks',
-                                    usertext='Length') )
-        self.add( setting.Int( 'number', 5,
-                               descr = 'Number of major ticks to aim for',
-                               usertext='Number') )
-        self.add( setting.FloatList('manualTicks',
-                                    [],
-                                    descr = 'List of tick values'
-                                    ' overriding defaults',
-                                    usertext='Manual ticks') )
-
-    def getLength(self, painter):
-        '''Return tick length in painter coordinates'''
-        
-        return self.get('length').convert(painter)
-    
-class MinorTick(Line):
-    '''Minor tick settings.'''
-
-    def __init__(self, name, **args):
-        Line.__init__(self, name, **args)
-        self.add( setting.Distance( 'length', '3pt',
-                                    descr = 'Length of ticks',
-                                    usertext='Length') )
-        self.add( setting.Int( 'number', 20,
-                               descr = 'Number of minor ticks to aim for',
-                               usertext='Number') )
-
-    def getLength(self, painter):
-        '''Return tick length in painter coordinates'''
-        
-        return self.get('length').convert(painter)
-    
-class GridLine(Line):
-    '''Grid line settings.'''
-
-    def __init__(self, name, **args):
-        Line.__init__(self, name, **args)
-
-        self.get('color').newDefault('grey')
-        self.get('hide').newDefault(True)
-        self.get('style').newDefault('dotted')
-
-def _registerFontStyleSheet():
-    """Get fonts, and register default with StyleSheet."""
-    families = [ unicode(name) for name in qt4.QFontDatabase().families() ]
-    
-    deffont = None
-    for f in ('Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
-              'Serif'):
-        if f in families:
-            deffont = unicode(f)
-            break
-            
-    if deffont is None:
-        print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
-        deffont = unicode(_fontfamilies[0])
-
-    class StylesheetText(Settings):
-        """Hold properties of default text font."""
-
-        def __init__(self, defaultfamily, families):
-            """Initialise with default font family and list of families."""
-            Settings.__init__(self, 'Font', pixmap='axislabel',
-                              descr='Default font for document',
-                              usertext='Font')
-            self.defaultfamily = defaultfamily
-            self.families = families
-
-            self.add( setting.FontFamily('font', deffont,
-                                         descr='Font name', usertext='Font'))
-            self.add( setting.Distance('size', '14pt',
-                                       descr='Default font size', usertext='Size'))
-            self.add( setting.Color('color', 'black', descr='Default font color',
-                                    usertext='Color'))
-
-        def copy(self):
-            """Make copy of settings."""
-            c = Settings.copy(self)
-            c.defaultfamily = self.defaultfamily
-            c.families = self.families
-            return c
-
-    StyleSheet.register(StylesheetText(deffont, families))
-    Text.defaultfamily = deffont
-    Text.families = families
-
-Application.startupfunctions.append(_registerFontStyleSheet)
-
 class Text(Settings):
     '''Text settings.'''
 
@@ -312,9 +201,11 @@ class Text(Settings):
                                      setting.Reference('/StyleSheet/Font/font'),
                                      descr = 'Font name',
                                      usertext='Font') )
-        self.add( setting.Distance('size', setting.Reference('/StyleSheet/Font/size'),
-                  descr = 'Font size', usertext='Size' ) )
-        self.add( setting.Color( 'color', setting.Reference('/StyleSheet/Font/color'),
+        self.add( setting.Distance('size',
+                                   setting.Reference('/StyleSheet/Font/size'),
+                                   descr = 'Font size', usertext='Size' ) )
+        self.add( setting.Color( 'color',
+                                 setting.Reference('/StyleSheet/Font/color'),
                                  descr = 'Font color', usertext='Color' ) )
         self.add( setting.Bool( 'italic', False,
                                 descr = 'Italic font', usertext='Italic' ) )
@@ -351,35 +242,6 @@ class Text(Settings):
         """ Return a qt4.QPen object for the font pen """
         return qt4.QPen(qt4.QColor(self.color))
         
-class AxisLabel(Text):
-    """For axis labels."""
-
-    def __init__(self, name, **args):
-        Text.__init__(self, name, **args)
-        self.add( setting.Bool( 'atEdge', False,
-                                descr = 'Place axis label close to edge'
-                                ' of graph',
-                                usertext='At edge') )
-        self.add( setting.Bool( 'rotate', False,
-                                descr = 'Rotate the label by 90 degrees',
-                                usertext='Rotate') )
-
-class TickLabel(Text):
-    """For tick labels on axes."""
-
-    def __init__(self, name, **args):
-        Text.__init__(self, name, **args)
-        self.add( setting.Bool( 'rotate', False,
-                                descr = 'Rotate the label by 90 degrees',
-                                usertext='Rotate') )
-        self.add( setting.Str( 'format', 'Auto',
-                               descr = 'Format of the tick labels',
-                               usertext='Format') )
-
-        self.add( setting.Float('scale', 1.,
-                                descr='A scale factor to apply to the values '
-                                'of the tick labels',
-                                usertext='Scale') )
 
 class ContourLabel(Text):
     """For tick labels on axes."""
@@ -406,13 +268,13 @@ class PointLabel(Text):
                                 descr='Angle of the labels in degrees',
                                 usertext='Angle',
                                 formatting=True), 0 )
-        self.add( setting.Choice('posnVert',
-                                 ['top', 'centre', 'bottom'], 'centre',
-                                 descr='Vertical position of label',
-                                 usertext='Vert position',
-                                 formatting=True), 0 )
-        self.add( setting.Choice('posnHorz',
-                                 ['left', 'centre', 'right'], 'right',
-                                 descr="Horizontal position of label",
-                                 usertext='Horz position',
-                                 formatting=True), 0 )
+        self.add( setting.AlignVert('posnVert',
+                                    'centre',
+                                    descr='Vertical position of label',
+                                    usertext='Vert position',
+                                    formatting=True), 0 )
+        self.add( setting.AlignHorz('posnHorz',
+                                    'right',
+                                    descr="Horizontal position of label",
+                                    usertext='Horz position',
+                                    formatting=True), 0 )

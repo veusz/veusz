@@ -21,7 +21,7 @@
 
 # $Id$
 
-class WidgetFactory:
+class WidgetFactory(object):
     """Class to help produce any type of widget you want by name."""
 
     def __init__(self):

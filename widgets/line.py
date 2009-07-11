@@ -36,6 +36,7 @@ class Line(plotters.FreePlotter):
     """A line on the plot/graph."""
     typename='line'
     description='Line or arrow'
+    allowusercreation = True
 
     class ArrowFillBrush(setting.Brush):
         def __init__(self, name, **args):
@@ -45,14 +46,22 @@ class Line(plotters.FreePlotter):
                 '../Line/color') )
     
     def __init__(self, parent, name=None):
+        """Construct plotter."""
         plotters.FreePlotter.__init__(self, parent, name=name)
-        s = self.settings
-        s.add( setting.DatasetOrFloatList('length', 0.2,
+        if type(self) == Line:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        plotters.FreePlotter.addSettings(s)
+
+        s.add( setting.DatasetOrFloatList('length', [0.2],
                                           descr='List of fractional '
                                           'lengths or dataset',
                                           usertext='Lengths',
                                           formatting=False), 3 )
-        s.add( setting.DatasetOrFloatList('angle', 0.,
+        s.add( setting.DatasetOrFloatList('angle', [0.],
                                           descr='Angle of lines or '
                                           'dataset',
                                           usertext='Angles',
@@ -61,11 +70,11 @@ class Line(plotters.FreePlotter):
         s.add( setting.Line('Line',
                             descr = 'Line style',
                             usertext = 'Line'),
-               pixmap = 'plotline' )
+               pixmap = 'settings_plotline' )
         s.add( Line.ArrowFillBrush('Fill',
                                    descr = 'Arrow fill settings',
                                    usertext = 'Arrow fill'),
-               pixmap = 'plotmarkerfill' )
+               pixmap = 'settings_plotmarkerfill' )
 
         s.add( setting.Distance('arrowSize', '5pt',
                                 descr = 'Size of arrow to plot',

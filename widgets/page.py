@@ -181,8 +181,9 @@ class Page(widget.Widget):
 
     def __init__(self, parent, name=None):
         """Initialise object."""
-
         widget.Widget.__init__(self, parent, name=name)
+        if type(self) == Page:
+            self.readDefaults()
  
     def draw(self, parentposn, painter, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""

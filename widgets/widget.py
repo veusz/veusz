@@ -65,6 +65,7 @@ class Widget(object):
 
         # save parent widget for later
         self.parent = parent
+        self.document = None
 
         if not self.isAllowedParent(parent):
             raise RuntimeError, "Widget parent is of incorrect type"
@@ -88,19 +89,21 @@ class Widget(object):
         self.settings = setting.Settings( 'Widget_' + self.typename )
         self.settings.parent = self
 
-        self.settings.add( setting.Bool('hide', False,
-                                        descr = 'Hide object',
-                                        usertext = 'Hide',
-                                        formatting = True) )
+        self.addSettings(self.settings)
 
-        # hook up settings to modify document flag if they are modified
-        self.settings.setOnModified(self.slotSettingModified)
-        
         # actions for widget
         self.actions = []
 
         # pts user can move around
         self.controlgraphitems = []
+
+    @classmethod
+    def addSettings(klass, s):
+        """Add items to settings s."""
+        s.add( setting.Bool('hide', False,
+                            descr = 'Hide object',
+                            usertext = 'Hide',
+                            formatting = True) )
 
     def isWidget(self):
         """Is this object a widget?"""
@@ -143,7 +146,7 @@ class Widget(object):
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
         ap = self.allowedparenttypes 
-        if parent is None and len(ap)>0 and ap[0] is None:
+        if parent is None:# and len(ap)>0 and ap[0] is None:
             return True
         
         for p in ap:
@@ -174,7 +177,7 @@ class Widget(object):
 
     def createUniqueName(self, prefix):
         """Create a name using the prefix which hasn't been used before."""
-        names = [c.name for c in self.children]
+        names = self.childnames
 
         i = 1
         while "%s%i" % (prefix, i) in names:
@@ -317,16 +320,13 @@ class Widget(object):
 
         return text
 
-    def slotSettingModified(self, ismodified):
-        """Called when settings is modified."""
-
-        if ismodified and self.document:
-            self.document.setModified(True)
-
     def readDefaults(self):
-        """Read the default settings."""
+        """Read the default settings.
+        Also set settings to stylesheet
+        """
 
         self.settings.readDefaults('', self.name)
+        self.settings.linkToStyleSheet()
 
     def buildFlatWidgetList(self, thelist):
         """Return a built up list of the widgets in the tree."""

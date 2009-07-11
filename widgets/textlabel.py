@@ -42,22 +42,29 @@ class TextLabel(plotters.FreePlotter):
 
     def __init__(self, parent, name=None):
         plotters.FreePlotter.__init__(self, parent, name=name)
-        s = self.settings
+
+        if type(self) == TextLabel:
+            self.readDefaults()
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        plotters.FreePlotter.addSettings(s)
 
         s.add( setting.DatasetOrStr('label', '',
                                     descr='Text to show or text dataset',
                                     usertext='Label', datatype='text'), 0 )
 
-        s.add( setting.Choice('alignHorz',
-                              ['left', 'centre', 'right'], 'left',
-                              descr="Horizontal alignment of label",
-                              usertext='Horz alignment',
-                              formatting=True), 7)
-        s.add( setting.Choice('alignVert',
-                              ['top', 'centre', 'bottom'], 'bottom',
-                              descr='Vertical alignment of label',
-                              usertext='Vert alignment',
-                              formatting=True), 8)
+        s.add( setting.AlignHorz('alignHorz',
+                                 'left',
+                                 descr="Horizontal alignment of label",
+                                 usertext='Horz alignment',
+                                 formatting=True), 7)
+        s.add( setting.AlignVert('alignVert',
+                                 'bottom',
+                                 descr='Vertical alignment of label',
+                                 usertext='Vert alignment',
+                                 formatting=True), 8)
 
         s.add( setting.Float('angle', 0.,
                              descr='Angle of the label in degrees',
@@ -67,10 +74,7 @@ class TextLabel(plotters.FreePlotter):
         s.add( setting.Text('Text',
                             descr = 'Text settings',
                             usertext='Text'),
-               pixmap = 'axislabel' )
-
-        if type(self) == TextLabel:
-            self.readDefaults()
+               pixmap = 'settings_axislabel' )
 
     # convert text to alignments used by Renderer
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }

@@ -1,4 +1,4 @@
-#    Copyright (C) 2004-2006 Jeremy S. Sanders
+#    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -20,8 +20,6 @@
 
 """Edit the document using a tree and properties.
 """
-
-import os
 
 import veusz.qtall as qt4
 
@@ -74,9 +72,8 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         elif role == qt4.Qt.DecorationRole:
             # return icon for first column
             if column == 0:
-                filename = 'button_%s.svg' % obj.typename
-                if utils.pixmapExists(filename):
-                    return qt4.QVariant(utils.getIcon(filename))
+                filename = 'button_%s' % obj.typename
+                return qt4.QVariant(utils.getIcon(filename))
 
         elif role == qt4.Qt.ToolTipRole:
             # provide tool tip showing description
@@ -246,7 +243,8 @@ class PropertyList(qt4.QWidget):
         
         self.childlist = []
 
-    def updateProperties(self, settings, title=False, showformatting=True):
+    def updateProperties(self, settings, title=None, showformatting=True,
+                         onlyformatting=False):
         """Update the list of controls with new ones for the settings."""
 
         # delete all child widgets
@@ -263,11 +261,11 @@ class PropertyList(qt4.QWidget):
         self.layout.setEnabled(False)
 
         # add a title if requested
-        if title:
-            lab = qt4.QLabel(settings.usertext)
+        if title is not None:
+            lab = qt4.QLabel(title[0])
             lab.setFrameShape(qt4.QFrame.Panel)
             lab.setFrameShadow(qt4.QFrame.Sunken)
-            lab.setToolTip(settings.descr)
+            lab.setToolTip(title[1])
             self.layout.addWidget(lab, row, 0, 1, -1)
             row += 1
 
@@ -295,30 +293,33 @@ class PropertyList(qt4.QWidget):
 
                 row += 1
 
-        # add subsettings if necessary
         if settings.getSettingsList() and self.showsubsettings:
-            tabbed = TabbedFormatting(self.document, settings, None)
+            # if we have subsettings, use tabs
+            tabbed = TabbedFormatting(self.document, settings)
             self.layout.addWidget(tabbed, row, 1, 1, 2)
             row += 1
             self.childlist.append(tabbed)
+        else:
+            # else add settings proper as a list
+            for setn in settings.getSettingList():
+                # skip if not to show formatting
+                if not showformatting and setn.formatting:
+                    continue
+                # skip if only to show formatting and not formatting
+                if onlyformatting and not setn.formatting:
+                    continue
 
-        # add settings proper
-        for setn in settings.getSettingList():
-            # skip if not to show formatting
-            if not showformatting and setn.formatting:
-                continue
+                lab = SettingLabel(self.document, setn, None)
+                self.layout.addWidget(lab, row, 0)
+                self.childlist.append(lab)
 
-            lab = SettingLabel(self.document, setn, None)
-            self.layout.addWidget(lab, row, 0)
-            self.childlist.append(lab)
+                cntrl = setn.makeControl(None)
+                self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                             self.slotSettingChanged)
+                self.layout.addWidget(cntrl, row, 1)
+                self.childlist.append(cntrl)
 
-            cntrl = setn.makeControl(None)
-            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                         self.slotSettingChanged)
-            self.layout.addWidget(cntrl, row, 1)
-            self.childlist.append(cntrl)
-
-            row += 1
+                row += 1
 
         # add empty widget to take rest of space
         w = qt4.QWidget()
@@ -353,26 +354,26 @@ class PropertyList(qt4.QWidget):
 class TabbedFormatting(qt4.QTabWidget):
     """Class to have tabbed set of settings."""
 
-    def __init__(self, document, settings, *args):
-        qt4.QTabWidget.__init__(self, *args)
+    def __init__(self, document, settings, shownames=False):
+        qt4.QTabWidget.__init__(self)
 
         if settings is None:
             return
 
+        # get list of settings
         setnslist = settings.getSettingsList()
 
-        # make a temporary list of formatting settings
-        formatters = setting.Settings('Basic', descr='Basic formatting options',
-                                      usertext='Basic', pixmap='main')
-        formatters.parent = settings.parent
-        for setn in settings.getSettingList():
-            if setn.formatting:
-                formatters.add(setn)
-        if formatters.getSettingList():
-            setnslist.insert(0, formatters)
+        # add formatting settings if necessary
+        numformat = len( [setn for setn in settings.getSettingList()
+                          if setn.formatting] )
+        if numformat > 0:
+            # add on a formatting tab
+            setnslist.insert(0, settings)
 
         # add tab for each subsettings
         for subset in setnslist:
+            if subset.name == 'StyleSheet':
+                continue
 
             # create tab
             tab = qt4.QWidget()
@@ -385,22 +386,35 @@ class TabbedFormatting(qt4.QTabWidget):
             layout.addWidget(scroll)
             scroll.setWidgetResizable(True)
 
+            # details of tab
+            mainsettings = (subset == settings)
+            if mainsettings:
+                # main tab formatting, so this is special
+                pixmap = 'settings_main'
+                tabname = title = 'Main'
+                tooltip = 'Main formatting'
+            else:
+                # others
+                if hasattr(subset, 'pixmap'):
+                    pixmap = subset.pixmap
+                else:
+                    pixmap = None
+                tabname = subset.name
+                tooltip = title = subset.usertext
+                
             # create list of properties
-            plist = PropertyList(document)
-            plist.updateProperties(subset, title=True)
+            plist = PropertyList(document, showsubsettings=not mainsettings)
+            plist.updateProperties(subset, title=(title, tooltip),
+                                   onlyformatting=mainsettings)
             scroll.setWidget(plist)
             plist.show()
 
-            # add tab to widget
-            if hasattr(subset, 'pixmap'):
-                icon = utils.getIcon('settings_%s.png' % subset.pixmap)
-                indx = self.addTab(tab, icon, '')
-                text = subset.usertext
-                if not subset.usertext:
-                    text = subset.name
-                self.setTabToolTip(indx, text)
-            else:
-                self.addTab(tab, subset.name)
+            # hide name in tab
+            if not shownames:
+                tabname = ''
+
+            indx = self.addTab(tab, utils.getIcon(pixmap), tabname)
+            self.setTabToolTip(indx, tooltip)
 
 class FormatDock(qt4.QDockWidget):
     """A window for formatting the current widget.
@@ -441,7 +455,7 @@ class FormatDock(qt4.QDockWidget):
         if widget is not None:
             settings = widget.settings
 
-        self.tabwidget = TabbedFormatting(self.document, settings, self)
+        self.tabwidget = TabbedFormatting(self.document, settings)
         self.setWidget(self.tabwidget)
 
         # wrap tab from zero to max number
@@ -644,7 +658,7 @@ class TreeEditDock(qt4.QDockWidget):
             val = ( 'add%s' % widgettype, wc.description,
                     'Add %s' % widgettype, 'insert',
                     slot,
-                    'button_%s.svg' % widgettype,
+                    'button_%s' % widgettype,
                     True, '')
             actions[widgettype] = val
 
@@ -659,7 +673,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         # create shape toolbar button
         shapetb = qt4.QToolButton()
-        shapeicon = utils.getIcon('veusz-shape-menu.svg')
+        shapeicon = utils.getIcon('veusz-shape-menu')
         shapetb.setIcon(shapeicon)
         shapetb.setToolTip("Draw shapes on plot or page")
 
@@ -688,21 +702,21 @@ class TreeEditDock(qt4.QDockWidget):
 
         edititems = (
             ('cut', 'Cut the selected item', 'Cu&t', 'edit',
-             self.slotWidgetCut, 'veusz-edit-cut.svg', True, 'Ctrl+X'),
+             self.slotWidgetCut, 'veusz-edit-cut', True, 'Ctrl+X'),
             ('copy', 'Copy the selected item', '&Copy', 'edit',
-             self.slotWidgetCopy, 'kde-edit-copy.svg', True, 'Ctrl+C'),
+             self.slotWidgetCopy, 'kde-edit-copy', True, 'Ctrl+C'),
             ('paste', 'Paste item from the clipboard', '&Paste', 'edit',
-             self.slotWidgetPaste, 'kde-edit-paste.svg', True, 'Ctrl+V'),
+             self.slotWidgetPaste, 'kde-edit-paste', True, 'Ctrl+V'),
             ('moveup', 'Move the selected item up', 'Move &up', 'edit',
-             moveup, 'kde-go-up.svg',
+             moveup, 'kde-go-up',
              True, ''),
             ('movedown', 'Move the selected item down', 'Move d&own', 'edit',
-             movedown, 'kde-go-down.svg',
+             movedown, 'kde-go-down',
              True, ''),
             ('delete', 'Remove the selected item', '&Delete', 'edit',
-             self.slotWidgetDelete, 'kde-edit-delete.svg', True, ''),
+             self.slotWidgetDelete, 'kde-edit-delete', True, ''),
             ('rename', 'Renames the selected item', '&Rename', 'edit',
-             self.slotWidgetRename, 'kde-edit-rename.svg', False, '')
+             self.slotWidgetRename, 'kde-edit-rename', False, '')
             )
         self.editactions = utils.populateMenuToolbars(edititems, self.toolbar,
                                                       self.parent.menus)
@@ -996,12 +1010,18 @@ class SettingLabel(qt4.QWidget):
                         self.setting.getReference().resolve(self.setting).path)
         self.setToolTip(tooltip)
 
+        # if not default, make label bold
+        bold = not self.setting.isDefaultLink()
+        f = qt4.QFont(self.labelicon.font())
+        f.setBold(bold)
+        self.labelicon.setFont(f)
+
     def updateHighlight(self):
         """Show drop down arrow if item has focus."""
         if self.inmouse or self.infocus or self.inmenu:
             pixmap = 'downarrow.png'
         else:
-            if self.setting.isReference():
+            if self.setting.isReference() and not self.setting.isDefault():
                 pixmap = 'link.png'
             else:
                 pixmap = 'downarrow_blank.png'
@@ -1071,9 +1091,6 @@ class SettingLabel(qt4.QWidget):
         if self.setting.isReference():
             popup.addSeparator()
             popup.addAction('Unlink setting', self.actionUnlinkSetting)
-            #popup.addAction('Edit linked setting',
-            #                self.actionEditLinkedSetting)
-
 
         self.inmenu = True
         self.updateHighlight()
@@ -1084,7 +1101,9 @@ class SettingLabel(qt4.QWidget):
     def actionResetDefault(self):
         """Reset setting to default."""
         self.document.applyOperation(
-            document.OperationSettingSet(self.setting, self.setting.default) )
+            document.OperationSettingSet(
+                self.setting,
+                setting.Reference(self.setting.getStylesheetLink()) ))
 
     def actionCopyTypedWidgets(self):
         """Copy setting to widgets of same type."""

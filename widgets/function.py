@@ -42,8 +42,20 @@ class FunctionPlotter(GenericPlotter):
 
         GenericPlotter.__init__(self, parent, name=name)
 
-        s = self.settings
-        s.add( setting.Int('steps', 50,
+        if type(self) == FunctionPlotter:
+            self.readDefaults()
+
+        self.cachedfunc = None
+        self.cachedvar = None
+        self.cachedcomp = None
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        GenericPlotter.addSettings(s)
+
+        s.add( setting.Int('steps',
+                           50,
                            descr = 'Number of steps to evaluate the function'
                            ' over', usertext='Steps', formatting=True), 0 )
         s.add( setting.Choice('variable', ['x', 'y'], 'x',
@@ -65,25 +77,18 @@ class FunctionPlotter(GenericPlotter):
         s.add( setting.Line('Line',
                             descr = 'Function line settings',
                             usertext = 'Plot line'),
-               pixmap = 'plotline' )
+               pixmap = 'settings_plotline' )
 
         s.add( setting.PlotterFill('FillBelow',
                                    descr = 'Fill below function',
                                    usertext = 'Fill below'),
-               pixmap = 'plotfillbelow' )
+               pixmap = 'settings_plotfillbelow' )
         
         s.add( setting.PlotterFill('FillAbove',
                                    descr = 'Fill above function',
                                    usertext = 'Fill above'),
-               pixmap = 'plotfillabove' )
+               pixmap = 'settings_plotfillabove' )
 
-        if type(self) == FunctionPlotter:
-            self.readDefaults()
-
-        self.cachedfunc = None
-        self.cachedvar = None
-        self.cachedcomp = None
-        
     def _getUserDescription(self):
         """User-friendly description."""
         return "%(variable)s = %(function)s" % self.settings

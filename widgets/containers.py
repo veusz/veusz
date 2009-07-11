@@ -169,7 +169,28 @@ class Grid(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
 
-        s = self.settings
+        # we're not descended from
+        if type(self) == Grid:
+            self.readDefaults()
+
+        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
+                                      descr = 'Zero margins of graphs in grid',
+                                      usertext = 'Zero margins') )
+
+        # calculated positions for children
+        self.childpositions = {}
+
+        # watch for changes to these variables to decide whether to
+        # recalculate positions
+        self.lastdimensions = None
+        self.lastscalings = None
+        self.lastchildren = None
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        widget.Widget.addSettings(s)
+
         s.add(setting.Int('rows', 2,
                           descr = 'Number of rows in grid',
                           usertext='Number of rows') )
@@ -210,23 +231,6 @@ class Grid(widget.Widget):
                                  'to edge of page',
                                  usertext='Bottom margin',
                                  formatting=True) )
-
-        # we're not descended from
-        if type(self) == Grid:
-            self.readDefaults()
-
-        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
-                                      descr = 'Zero margins of graphs in grid',
-                                      usertext = 'Zero margins') )
-
-        # calculated positions for children
-        self.childpositions = {}
-
-        # watch for changes to these variables to decide whether to
-        # recalculate positions
-        self.lastdimensions = None
-        self.lastscalings = None
-        self.lastchildren = None
 
     def _getUserDescription(self):
         """User friendly description."""

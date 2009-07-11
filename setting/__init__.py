@@ -19,6 +19,8 @@
 # $Id$
 
 from settingdb import *
+from reference import Reference
 from setting import *
 from settings import *
 from collections import *
+from stylesheet import *
