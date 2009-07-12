@@ -22,6 +22,7 @@ import os.path
 
 import veusz.utils as utils
 import veusz.qtall as qt4
+import veusz.document as document
 from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList
 
 class StylesheetDialog(qt4.QDialog):
@@ -37,9 +38,6 @@ class StylesheetDialog(qt4.QDialog):
         self.document = document
         self.stylesheet = document.basewidget.settings.StyleSheet
 
-        self.formattingLayout = qt4.QVBoxLayout()
-        self.formattingGroup.setLayout(self.formattingLayout)
-
         self.stylesListWidget.setMinimumWidth(100)
 
         # initial properties widget
@@ -52,6 +50,26 @@ class StylesheetDialog(qt4.QDialog):
                      qt4.SIGNAL(
                 'currentItemChanged(QListWidgetItem *,QListWidgetItem *)'),
                      self.slotStyleItemChanged)
+
+        self.stylesListWidget.setCurrentRow(0)
+
+        close = self.buttonBox.button(qt4.QDialogButtonBox.Close)
+        close.setDefault(False)
+        close.setAutoDefault(False)
+
+        exportButton = qt4.QPushButton("Export...")
+        exportButton.setDefault(False)
+        exportButton.setAutoDefault(False)
+        self.buttonBox.addButton(exportButton, qt4.QDialogButtonBox.ActionRole)
+        self.connect(exportButton, qt4.SIGNAL('clicked()'),
+                     self.slotExportStyleSheet)
+
+        importButton = qt4.QPushButton("Import...")
+        importButton.setDefault(False)
+        importButton.setAutoDefault(False)
+        self.buttonBox.addButton(importButton, qt4.QDialogButtonBox.ActionRole)
+        self.connect(importButton, qt4.SIGNAL('clicked()'),
+                     self.slotImportStyleSheet)
 
     def fillStyleList(self):
         """Fill list of styles."""
@@ -72,14 +90,41 @@ class StylesheetDialog(qt4.QDialog):
             self.properties.deleteLater()
 
         style = str(current.text())
-        settings = current.VZsettings#self.stylesheet.get(style)
+        settings = current.VZsettings
 
         # update formatting properties
         self.tabformat = TabbedFormatting(self.document, settings)
-        self.formattingLayout.addWidget(self.tabformat)
+        self.formattingGroup.layout().addWidget(self.tabformat)
 
         # update properties
         self.properties = PropertyList(self.document, showsubsettings=False)
         self.properties.updateProperties(settings, showformatting=False)
         self.propertiesScrollArea.setWidget(self.properties)
 
+    def slotExportStyleSheet(self):
+        """Export stylesheet as a file."""
+    
+        filename = self.parent()._fileSaveDialog(
+            'vst', 'Veusz stylesheet', 'Export stylesheet')
+        if filename:
+            try:
+                f = open(filename, 'w')
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Cannot export stylesheet as '%s'" % filename,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+                return
+            
+            self.document.exportStyleSheet(f)
+            
+    def slotImportStyleSheet(self):
+        """Import a style sheet."""
+        filename = self.parent()._fileOpenDialog(
+            'vst', 'Veusz stylesheet', 'Import stylesheet')
+        if filename:
+            self.document.applyOperation(
+                document.OperationImportStyleSheet(filename) )

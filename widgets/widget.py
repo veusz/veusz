@@ -324,9 +324,8 @@ class Widget(object):
         """Read the default settings.
         Also set settings to stylesheet
         """
-
         self.settings.readDefaults('', self.name)
-        self.settings.linkToStyleSheet()
+        self.settings.linkToStylesheet()
 
     def buildFlatWidgetList(self, thelist):
         """Return a built up list of the widgets in the tree."""

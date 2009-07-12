@@ -1011,7 +1011,7 @@ class SettingLabel(qt4.QWidget):
         self.setToolTip(tooltip)
 
         # if not default, make label bold
-        bold = not self.setting.isDefaultLink()
+        bold = not self.setting.isDefault()
         f = qt4.QFont(self.labelicon.font())
         f.setBold(bold)
         self.labelicon.setFont(f)
@@ -1103,7 +1103,7 @@ class SettingLabel(qt4.QWidget):
         self.document.applyOperation(
             document.OperationSettingSet(
                 self.setting,
-                setting.Reference(self.setting.getStylesheetLink()) ))
+                self.setting.default))
 
     def actionCopyTypedWidgets(self):
         """Copy setting to widgets of same type."""

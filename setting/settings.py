@@ -206,7 +206,7 @@ class Settings:
         for s in self.setdict.values():
             s.readDefaults(root, widgetname)
 
-    def linkToStyleSheet(self, _root=None):
+    def linkToStylesheet(self, _root=None):
         """Link the settings within this Settings to a stylesheet.
         
         _root is an internal parameter as this function is recursive."""
@@ -226,13 +226,14 @@ class Settings:
             thispath = _root + name
             if isinstance(setn, Settings):
                 # call recursively if this is a Settings
-                setn.linkToStyleSheet(_root=thispath+'/')
+                setn.linkToStylesheet(_root=thispath+'/')
             else:
                 ref = Reference(thispath)
                 try:
                     # if the reference resolves, then set it
                     ref.resolve(setn)
                     setn.set(ref)
+                    setn.default = ref
                 except Reference.ResolveException:
                     pass
 

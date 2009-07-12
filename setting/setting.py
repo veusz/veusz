@@ -271,13 +271,7 @@ class Setting(object):
         This also returns true if it is linked to the appropriate stylesheet
         """
         if isinstance(self._val, Reference):
-            # default reference
-            if self._val == self.default:
-                return True
-            # whether setting is linked directly to stylesheet
-            if self._val.value == self.getStylesheetLink():
-                return True
-            return False
+            return self._val == self.default
         else:
             # default value
             return self.val == self.default

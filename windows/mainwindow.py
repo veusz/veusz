@@ -302,7 +302,7 @@ class MainWindow(qt4.QMainWindow):
              self.slotEditPreferences, '', False, ''),
             ('editstylesheet',
              'Edit stylesheet to change default widget settings',
-             'Stylesheet...', 'edit',
+             'Default styles...', 'edit',
              self.slotEditStylesheet, 'settings_stylesheet', False, ''),
             ('edit', ),
 
