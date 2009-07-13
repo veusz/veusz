@@ -31,6 +31,7 @@ import os.path
 import numpy as N
 
 import veusz.qtall as qt4
+import veusz.setting as setting
 
 import datasets
 import operations
@@ -58,6 +59,7 @@ class CommandInterface(qt4.QObject):
         'Remove',
         'Rename',
         'Set',
+        'SetToReference',
         'SetData',
         'SetData2D',
         'SetData2DExpressionXYZ',
@@ -179,6 +181,17 @@ class CommandInterface(qt4.QObject):
         pref = self.currentwidget.prefLookup(var)
 
         op = operations.OperationSettingSet(pref, val)
+        self.document.applyOperation(op)
+        
+        if self.verbose:
+            print ( "Set setting '%s' to %s" %
+                    (var, repr(pref.get())) )
+
+    def SetToReference(self, var, val):
+        """Set setting to a reference value."""
+
+        pref = self.currentwidget.prefLookup(var)
+        op = operations.OperationSettingSet(pref, setting.Reference(val))
         self.document.applyOperation(op)
         
         if self.verbose:

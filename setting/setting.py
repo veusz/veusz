@@ -242,8 +242,12 @@ class Setting(object):
         """Return text to restore the value of this setting."""
 
         if (saveall or not self.isDefault()) and not self.readonly:
-            return "Set('%s%s', %s)\n" % ( rootname, self.name,
-                                           repr(self.val) )
+            if isinstance(self._val, Reference):
+                return "SetToReference('%s%s', %s)\n" % (rootname, self.name,
+                                                         repr(self._val.value))
+            else:
+                return "Set('%s%s', %s)\n" % ( rootname, self.name,
+                                               repr(self.val) )
         else:
             return ''
 
@@ -270,10 +274,10 @@ class Setting(object):
         """Is the current value a default?
         This also returns true if it is linked to the appropriate stylesheet
         """
-        if isinstance(self._val, Reference):
-            return self._val == self.default
+        if ( isinstance(self._val, Reference) and
+             isinstance(self.default, Reference) ):
+            return self._val.value == self.default.value
         else:
-            # default value
             return self.val == self.default
 
     def isDefaultLink(self):

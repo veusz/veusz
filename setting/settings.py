@@ -174,7 +174,6 @@ class Settings:
         else:
             raise ValueError, '"%s" is not a setting' % name
 
-
     def saveText(self, saveall, rootname = None):
         """Return the text which would reload the settings.
 
