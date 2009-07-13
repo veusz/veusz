@@ -444,10 +444,10 @@ class Image(plotters.GenericPlotter):
 
         # recompute data
         if data.dimensions == 2:
-            if data != self.lastdataset or self.schangeset != s.changeset:
+            if data != self.lastdataset or self.schangeset != d.changeset:
                 self.updateImage()
                 self.lastdataset = data
-                self.schangeset = s.changeset
+                self.schangeset = d.changeset
             return data
         else:
             return None
