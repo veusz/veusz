@@ -36,6 +36,15 @@ import veusz.utils as utils
 
 import plotters
 
+def finitePoly(poly):
+    """Remove non-finite coordinates from numpy arrays of coordinates."""
+    out = []
+    for line in poly:
+        finite = N.isfinite(line)
+        validrows = N.logical_and(finite[:,0], finite[:,1])
+        out.append( line[validrows] )
+    return out
+
 class Contour(plotters.GenericPlotter):
     """A class which plots contours on a graph with a specified
     coordinate system."""
@@ -314,14 +323,14 @@ class Contour(plotters.GenericPlotter):
                 self._cachedcontours = []
                 for level in levels:
                     linelist = c.trace(level)
-                    self._cachedcontours.append(linelist)
+                    self._cachedcontours.append( finitePoly(linelist) )
 
             # trace the polygons between the contours
             if len(s.fills) != 0 and len(levels) > 1:
                 self._cachedpolygons = []
                 for level1, level2 in itertools.izip(levels[:-1], levels[1:]):
                     linelist = c.trace(level1, level2)
-                    self._cachedpolygons.append(linelist)
+                    self._cachedpolygons.append( finitePoly(linelist) )
 
     def plotContourLabel(self, painter, number, xplt, yplt):
         s = self.settings
