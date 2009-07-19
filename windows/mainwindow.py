@@ -281,10 +281,6 @@ class MainWindow(qt4.QMainWindow):
              self.slotFilePrint, 'kde-document-print', True, 'Ctrl+P'),
             ('fileexport', 'Export the current page', '&Export...', 'file',
              self.slotFileExport, 'kde-document-export', True, ''),
-            ('fileexportstylesheet', 'Export stylesheet to file', 'Export stylesheet...', 'file',
-             self.slotFileExportStyleSheet, '', False, ''), 
-            ('fileimportstylesheet', 'Import stylesheet from file', 'Import stylesheet...', 'file',
-             self.slotFileImportStyleSheet, '', False, ''), 
  
             ('file', ),
             ('fileclose', 'Close current window', 'Close Window', 'file',
@@ -997,29 +993,3 @@ class MainWindow(qt4.QMainWindow):
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
             self.axisvalueslabel.setText('No position')
-
-    def slotFileExportStyleSheet(self):
-        """Export stylesheet as a file."""
-    
-        filename = self._fileSaveDialog('vst', 'Veusz stylesheet', 'Export stylesheet')
-        if filename:
-            try:
-                f = open(filename, 'w')
-            except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Cannot export stylesheet as '%s'" % filename,
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
-                return
-            
-            self.document.exportStyleSheet(f)
-            
-    def slotFileImportStyleSheet(self):
-        """Import a style sheet."""
-        filename = self._fileOpenDialog('vst', 'Veusz stylesheet', 'Import stylesheet')
-        if filename:
-            self.document.applyOperation( document.OperationImportStyleSheet(filename) )
-            
