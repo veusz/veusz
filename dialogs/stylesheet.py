@@ -23,7 +23,24 @@ import os.path
 import veusz.utils as utils
 import veusz.qtall as qt4
 import veusz.document as document
+import veusz.setting as setting
 from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList
+
+def removeBadRecents(itemlist):
+    """Remove duplicates from list and bad entries."""
+    previous = set()
+    i = 0
+    while i < len(itemlist):
+        if itemlist[i] in previous:
+            del itemlist[i]
+        elif not os.path.exits(itemlist[i]):
+            del itemlist[i]
+        else:
+            previous.add(itemlist[i])
+            i += 1
+
+    # trim list
+    del itemlist[10:]
 
 class StylesheetDialog(qt4.QDialog):
     """This is a dialog box to edit stylesheets.
@@ -53,23 +70,41 @@ class StylesheetDialog(qt4.QDialog):
 
         self.stylesListWidget.setCurrentRow(0)
 
+        # we disable default buttons as they keep grabbing the enter key
         close = self.buttonBox.button(qt4.QDialogButtonBox.Close)
         close.setDefault(False)
         close.setAutoDefault(False)
 
         exportButton = qt4.QPushButton("Export...")
-        exportButton.setDefault(False)
-        exportButton.setAutoDefault(False)
-        self.buttonBox.addButton(exportButton, qt4.QDialogButtonBox.ActionRole)
         self.connect(exportButton, qt4.SIGNAL('clicked()'),
                      self.slotExportStyleSheet)
 
         importButton = qt4.QPushButton("Import...")
-        importButton.setDefault(False)
-        importButton.setAutoDefault(False)
-        self.buttonBox.addButton(importButton, qt4.QDialogButtonBox.ActionRole)
         self.connect(importButton, qt4.SIGNAL('clicked()'),
                      self.slotImportStyleSheet)
+
+        self.recentMenu = qt4.QMenu()
+        recentButton = qt4.QPushButton("Recent")
+        recentButton.setMenu(self.recentMenu)
+        self.fillRecentMenu()
+
+        for b in exportButton, importButton, recentButton:
+            self.buttonBox.addButton(b, qt4.QDialogButtonBox.ActionRole)
+            b.setDefault(False)
+            b.setAutoDefault(False)
+
+    def fillRecentMenu(self):
+        """Fill recent menu with recent file loads."""
+        self.recentMenu.clear()
+        recent = setting.settingdb.get('stylesheetdialog_recent', [])
+        for filename in recent:
+            if os.path.exists(filename):
+                act = self.recentMenu.addAction( os.path.basename(filename) )
+                def loadRecentFile(filename=filename):
+                    self.document.applyOperation(
+                        document.OperationImportStyleSheet(filename) )
+                self.connect( act, qt4.SIGNAL('triggered()'),
+                              loadRecentFile )
 
     def fillStyleList(self):
         """Fill list of styles."""
@@ -120,7 +155,7 @@ class StylesheetDialog(qt4.QDialog):
                 return
             
             self.document.exportStyleSheet(f)
-            
+
     def slotImportStyleSheet(self):
         """Import a style sheet."""
         filename = self.parent()._fileOpenDialog(
@@ -128,3 +163,11 @@ class StylesheetDialog(qt4.QDialog):
         if filename:
             self.document.applyOperation(
                 document.OperationImportStyleSheet(filename) )
+
+            # add to recent file list
+            recent = setting.settingdb.get('stylesheetdialog_recent', [])
+            recent.insert(0, os.path.abspath(filename))
+            removeBadRecents(recent)
+            setting.settingdb['stylesheetdialog_recent'] = recent
+
+            self.fillRecentMenu()
