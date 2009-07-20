@@ -153,6 +153,8 @@ class ClickPainter(document.Painter):
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
+    intervals = [0, 100, 250, 500, 1000, 2000, 5000, 10000]
+
     def __init__(self, document, parent, menu=None):
         """Initialise the window.
 
@@ -661,16 +663,15 @@ class PlotWindow( qt4.QGraphicsView ):
         submenu = menu.addMenu('Updates')
         intgrp = qt4.QActionGroup(self)
 
-        intervals = [0, 100, 250, 500, 1000, 2000, 5000, 10000]
         inttext = ['Disable']
-        for intv in intervals[1:]:
+        for intv in self.intervals[1:]:
             inttext.append('Every %gs' % (intv * 0.001))
 
         # need to keep copies of bound objects otherwise they are collected
         self._intfuncs = []
 
         # bind interval options to actions
-        for intv, text in itertools.izip(intervals, inttext):
+        for intv, text in itertools.izip(self.intervals, inttext):
             act = intgrp.addAction(text)
             act.setCheckable(True)
             fn = utils.BoundCaller(self.actionSetTimeout, intv)
@@ -685,7 +686,13 @@ class PlotWindow( qt4.QGraphicsView ):
         act = menu.addAction('Antialias', self.actionAntialias)
         act.setCheckable(True)
         act.setChecked(self.antialias)
-        
+
+    def updatePlotSettings(self):
+        """Update plot window settings from settings."""
+        self.setTimeout(setting.settingdb['plot_updateinterval'])
+        self.antialias = setting.settingdb['plot_antialias']
+        self.actionForceUpdate()
+
     def contextMenuEvent(self, event):
         """Show context menu."""
         self.contextmenu.exec_(qt4.QCursor.pos())

@@ -25,6 +25,34 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <widget class="QWidget" name="View">
+      <attribute name="title">
+       <string>View</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QCheckBox" name="antialiasCheck">
+         <property name="text">
+          <string>Antialiasing</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Update interval</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="intervalCombo"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="Export">
       <attribute name="title">
        <string>Export</string>

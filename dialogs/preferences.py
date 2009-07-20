@@ -33,11 +33,25 @@ class PreferencesDialog(qt4.QDialog):
                                 'preferences.ui'),
                    self)
 
+        win = self
+        while not hasattr(win, 'plot'):
+            win = win.parent()
+        self.plotwindow = win.plot
+
+        # view settings
+        self.antialiasCheck.setChecked( setting.settingdb['plot_antialias'] )
+        self.intervalCombo.addItem('Disabled')
+        for intv in self.plotwindow.intervals[1:]:
+            self.intervalCombo.addItem('%gs' % (intv * 0.001))
+        index = self.plotwindow.intervals.index(
+            setting.settingdb['plot_updateinterval'])
+        self.intervalCombo.setCurrentIndex(index)
+
         # set export dpi
         self.exportDPI.setValidator( qt4.QIntValidator(10, 10000, self) )
         self.exportDPI.setEditText( str(setting.settingdb['export_DPI']) )
 
-        # set antialias
+        # set export antialias
         self.exportAntialias.setChecked( setting.settingdb['export_antialias'])
 
         # quality of jpeg export
@@ -57,6 +71,12 @@ class PreferencesDialog(qt4.QDialog):
         """Keep settings if okay pressed."""
         
         qt4.QDialog.accept(self)
+
+        # view settings
+        setting.settingdb['plot_updateinterval'] = (
+            self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
+        setting.settingdb['plot_antialias'] = self.antialiasCheck.isChecked()
+        self.plotwindow.updatePlotSettings()
 
         # update dpi if possible
         try:
