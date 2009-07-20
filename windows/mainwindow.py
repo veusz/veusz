@@ -66,6 +66,8 @@ class MainWindow(qt4.QMainWindow):
         else:
             # add page and default graph
             win.document.makeDefaultDoc()
+            # load the default stylesheet too
+            win.loadDefaultStylesheet()
 
         # try to select first graph of first page
         win.treeedit.doInitialWidgetSelect()
@@ -191,6 +193,27 @@ class MainWindow(qt4.QMainWindow):
             urls = [unicode(u.path()) for u in mime.urls()]
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
+
+    def loadDefaultStylesheet(self):
+        """Loads the default stylesheet for the new document."""
+        filename = setting.settingdb['stylesheet_default']
+        if filename:
+            try:
+                self.document.applyOperation(
+                    document.OperationImportStyleSheet(filename) )
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Unable to load default stylesheet '%s'" %
+                                filename,
+                                qt4.QMessageBox.Warning,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+            else:
+                # reset any modified flag
+                self.document.setModified(False)
+                self.document.changeset = 0
 
     def slotAboutToShowEdit(self):
         """Enable/disable undo/redo menu items."""

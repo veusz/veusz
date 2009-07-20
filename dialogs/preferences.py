@@ -47,6 +47,12 @@ class PreferencesDialog(qt4.QDialog):
         self.exportColor.setCurrentIndex(
             {True:0, False:1}[setting.settingdb['export_color']])
 
+        # default stylesheet
+        self.styleLineEdit.setText(setting.settingdb['stylesheet_default'])
+
+        self.connect( self.styleBrowseButton, qt4.SIGNAL('clicked()'),
+                      self.styleBrowseClicked )
+
     def accept(self):
         """Keep settings if okay pressed."""
         
@@ -64,3 +70,12 @@ class PreferencesDialog(qt4.QDialog):
 
         setting.settingdb['export_color'] = {0: True, 1: False}[self.exportColor.currentIndex()]
         
+        setting.settingdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
+
+    def styleBrowseClicked(self):
+        """Browse for a stylesheet."""
+        filename = self.parent()._fileOpenDialog(
+            'vst', 'Veusz stylesheet', 'Import stylesheet')
+        if filename:
+            self.styleLineEdit.setText(filename)
+

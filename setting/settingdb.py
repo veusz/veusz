@@ -40,7 +40,10 @@ defaultValues = {
     'plot_antialias': True,
 
     # recent files list
-    'main_recentfiles': []
+    'main_recentfiles': [],
+
+    # default stylesheet
+    'stylesheet_default': '',
     }
 
 class _SettingDB(object):

@@ -33,7 +33,7 @@ def removeBadRecents(itemlist):
     while i < len(itemlist):
         if itemlist[i] in previous:
             del itemlist[i]
-        elif not os.path.exits(itemlist[i]):
+        elif not os.path.exists(itemlist[i]):
             del itemlist[i]
         else:
             previous.add(itemlist[i])
@@ -97,6 +97,9 @@ class StylesheetDialog(qt4.QDialog):
         """Fill recent menu with recent file loads."""
         self.recentMenu.clear()
         recent = setting.settingdb.get('stylesheetdialog_recent', [])
+        removeBadRecents(recent)
+        setting.settingdb['stylesheetdialog_recent'] = recent
+
         for filename in recent:
             if os.path.exists(filename):
                 act = self.recentMenu.addAction( os.path.basename(filename) )
@@ -161,13 +164,20 @@ class StylesheetDialog(qt4.QDialog):
         filename = self.parent()._fileOpenDialog(
             'vst', 'Veusz stylesheet', 'Import stylesheet')
         if filename:
-            self.document.applyOperation(
-                document.OperationImportStyleSheet(filename) )
-
-            # add to recent file list
-            recent = setting.settingdb.get('stylesheetdialog_recent', [])
-            recent.insert(0, os.path.abspath(filename))
-            removeBadRecents(recent)
-            setting.settingdb['stylesheetdialog_recent'] = recent
-
-            self.fillRecentMenu()
+            try:
+                self.document.applyOperation(
+                    document.OperationImportStyleSheet(filename) )
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Cannot load stylesheet '%s'" % filename,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+            else:
+                # add to recent file list
+                recent = setting.settingdb.get('stylesheetdialog_recent', [])
+                recent.insert(0, os.path.abspath(filename))
+                setting.settingdb['stylesheetdialog_recent'] = recent
+                self.fillRecentMenu()
