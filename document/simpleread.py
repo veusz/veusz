@@ -438,7 +438,8 @@ class SimpleRead(object):
             elif ( self.ignoretext and len(stream.remainingline) > 0 and 
                    text_start_re.match(stream.remainingline[0]) and
                    len(self.parts) > 0 and
-                   self.parts[0].datatype != 'string' ):
+                   self.parts[0].datatype != 'string' and
+                   stream.remainingline[0] not in ('inf', 'nan') ):
                 # ignore the line if it is text and ignore text is on
                 # and first column is not text
                 pass
