@@ -96,7 +96,8 @@ class Edit(qt4.QLineEdit):
                 #self.setting.val = val
 
         except setting.InvalidType:
-            self.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
+            self.palette().setColor(qt4.QPalette.Base,
+                                    setting.settingdb.color('error'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -256,7 +257,8 @@ class String(qt4.QWidget):
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val)
 
         except setting.InvalidType:
-            self.edit.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
+            self.edit.palette().setColor(qt4.QPalette.Base,
+                                         setting.settingdb.color('error'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -357,7 +359,8 @@ class Choice(qt4.QComboBox):
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
-            highcntrl.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
+            highcntrl.palette().setColor(qt4.QPalette.Base,
+                                         setting.settingdb.color('error'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -404,7 +407,8 @@ class MultiLine(qt4.QTextEdit):
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
-            self.palette().setColor(qt4.QPalette.Window, qt4.QColor('red'))
+            self.palette().setColor(qt4.QPalette.Window,
+                                    setting.settingdb.color('error'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -1156,7 +1160,8 @@ class LineSet(ListSet):
             self._updateRowCol(row, col, text)
         else:
             # invalid distance
-            sender.palette().setColor(qt4.QPalette.Window, qt4.QColor('red'))
+            sender.palette().setColor(qt4.QPalette.Window,
+                                      setting.settingdb.color('error'))
 
 class FillSet(ListSet):
     """A list of fill settings."""
@@ -1458,7 +1463,8 @@ class Filename(qt4.QWidget):
                            val )
 
         except setting.InvalidType:
-            self.edit.palette().setColor(qt4.QPalette.Base, qt4.QColor('red'))
+            self.edit.palette().setColor(qt4.QPalette.Base,
+                                         setting.settingdb.color('error'))
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""

@@ -354,7 +354,7 @@ class FunctionPlotter(GenericPlotter):
         # draw the function line
         if pxpts is None or pypts is None:
             # not sure how to deal with errors here
-            painter.setPen( qt4.QColor('red') )
+            painter.setPen( setting.settingdb.color('error') )
             f = qt4.QFont()
             f.setPointSize(20)
             painter.setFont(f)

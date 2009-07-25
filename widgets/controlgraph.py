@@ -30,6 +30,7 @@ import itertools
 
 import veusz.qtall as qt4
 import veusz.document as document
+import veusz.setting as setting
 
 ##############################################################################
 
@@ -38,10 +39,10 @@ class _ShapeCorner(qt4.QGraphicsRectItem):
     def __init__(self, parent, rotator=False):
         qt4.QGraphicsRectItem.__init__(self, parent)
         if rotator:
-            self.setBrush(qt4.QBrush(qt4.Qt.blue))
+            self.setBrush( qt4.QBrush(setting.settingdb.color('cntrlline')) )
             self.setRect(-3, -3, 6, 6)
         else:
-            self.setBrush(qt4.QBrush(qt4.Qt.black))
+            self.setBrush(qt4.QBrush(setting.settingdb.color('cntrlcorner')) )
             self.setRect(-5, -5, 10, 10)
         self.setPen(qt4.QPen(qt4.Qt.NoPen))
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
@@ -59,13 +60,15 @@ class _ShapeCorner(qt4.QGraphicsRectItem):
 
 ##############################################################################
 
-dottedlinepen = qt4.QPen(qt4.Qt.blue, 2, qt4.Qt.DotLine)
+def controlLinePen():
+    """Get pen for lines around shapes."""
+    return qt4.QPen(setting.settingdb.color('cntrlline'), 2, qt4.Qt.DotLine)
 
 class _EdgeLine(qt4.QGraphicsLineItem):
     """Line used for edges of resizing box."""
     def __init__(self, parent, ismovable = True):
         qt4.QGraphicsLineItem.__init__(self, parent)
-        self.setPen(dottedlinepen)
+        self.setPen(controlLinePen())
         self.setZValue(2.)
         if ismovable:
             self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
@@ -323,7 +326,7 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setZValue(1.)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.setPen(dottedlinepen)
+        self.setPen(controlLinePen())
         self.setBrush( qt4.QBrush() )
 
         # create child graphicsitem for each corner
@@ -468,7 +471,7 @@ class _GraphLine(qt4.QGraphicsLineItem):
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
         self.setZValue(1.)
-        self.setPen(dottedlinepen)
+        self.setPen(controlLinePen())
         self.pts = [_ShapeCorner(self, rotator=True),
                     _ShapeCorner(self, rotator=True)]
         self.pts[0].setPos(params.line[0], params.line[1])
@@ -504,7 +507,7 @@ class _AxisGraphicsLineItem(qt4.QGraphicsLineItem):
         qt4.QGraphicsLineItem.__init__(self, parent)
         self.parent = parent
 
-        self.setPen(dottedlinepen)
+        self.setPen(controlLinePen())
         self.setZValue(2.)
         self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
 

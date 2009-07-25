@@ -594,7 +594,7 @@ class PlotWindow( qt4.QGraphicsView ):
             self.setOutputSize()
             
             # fill pixmap with proper background colour
-            self.bufferpixmap.fill( self.palette().color(qt4.QPalette.Base) )
+            self.bufferpixmap.fill( setting.settingdb.color('page') )
 
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )

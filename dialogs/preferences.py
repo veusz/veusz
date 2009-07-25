@@ -67,6 +67,61 @@ class PreferencesDialog(qt4.QDialog):
         self.connect( self.styleBrowseButton, qt4.SIGNAL('clicked()'),
                       self.styleBrowseClicked )
 
+        # initialise color tab
+        # this makes a grid of controls for each color
+        # consisting of label, isdefault check and change color button
+        self.chosencolors = {}
+        self.colorbutton = {}
+        self.colordefaultcheck = {}
+        layout = qt4.QGridLayout()
+        for row, colname in enumerate(setting.settingdb.colors):
+            isdefault, colval = setting.settingdb['color_%s' %
+                                                  colname]
+            self.chosencolors[colname] = qt4.QColor(colval)
+
+            # label
+            name, tooltip = setting.settingdb.color_names[colname]
+            label = qt4.QLabel(name)
+            label.setToolTip(tooltip)
+            layout.addWidget(label, row, 0)
+
+            # is default check
+            defcheck = qt4.QCheckBox("Default")
+            defcheck.setToolTip(
+                "Use the default color instead of the one chosen here")
+            layout.addWidget(defcheck, row, 1)
+            self.colordefaultcheck[colname] = defcheck
+            defcheck.setChecked(isdefault)
+
+            # button
+            button = qt4.QPushButton()
+
+            # connect button to method to change color
+            def clicked(color=colname):
+                self.colorButtonClickedSlot(color)
+            self.connect(button, qt4.SIGNAL('clicked()'),
+                         clicked)
+            layout.addWidget(button, row, 2)
+            self.colorbutton[colname] = button
+
+        self.colorGroup.setLayout(layout)
+
+        self.updateButtonColors()
+
+    def colorButtonClickedSlot(self, color):
+        """Open color dialog if color button clicked."""
+        retcolor = qt4.QColorDialog.getColor( self.chosencolors[color], self )
+        if retcolor.isValid():
+            self.chosencolors[color] = retcolor
+            self.updateButtonColors()
+
+    def updateButtonColors(self):
+        """Update color icons on color buttons."""
+        for name, val in self.chosencolors.iteritems():
+            pixmap = qt4.QPixmap(16, 16)
+            pixmap.fill(val)
+            self.colorbutton[name].setIcon( qt4.QIcon(pixmap) )
+
     def accept(self):
         """Keep settings if okay pressed."""
         
@@ -76,7 +131,6 @@ class PreferencesDialog(qt4.QDialog):
         setting.settingdb['plot_updateinterval'] = (
             self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
         setting.settingdb['plot_antialias'] = self.antialiasCheck.isChecked()
-        self.plotwindow.updatePlotSettings()
 
         # update dpi if possible
         try:
@@ -91,6 +145,14 @@ class PreferencesDialog(qt4.QDialog):
         setting.settingdb['export_color'] = {0: True, 1: False}[self.exportColor.currentIndex()]
         
         setting.settingdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
+
+        # colors
+        for name, color in self.chosencolors.iteritems():
+            isdefault = self.colordefaultcheck[name].isChecked()
+            colorname = unicode(color.name())
+            setting.settingdb["color_"+name] = (isdefault, colorname)
+
+        self.plotwindow.updatePlotSettings()
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""

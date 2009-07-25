@@ -44,6 +44,13 @@ defaultValues = {
 
     # default stylesheet
     'stylesheet_default': '',
+
+    # colors (isdefault, 'notdefaultcolor')
+    'color_page': (True, 'white'),
+    'color_error': (True, 'red'),
+    'color_command': (True, 'blue'),
+    'color_cntrlline': (True, 'blue'),
+    'color_cntrlcorner': (True, 'black'),
     }
 
 class _SettingDB(object):
@@ -51,6 +58,25 @@ class _SettingDB(object):
     
     Items are accesses as a dict, with items as key=value
     """
+
+    # list of colors
+    colors = ('page', 'error', 'command', 'cntrlline', 'cntrlcorner')
+    # names for display of colors and a longer description
+    color_names = {
+        'page': ('Page', 'Page background color'),
+        'error': ('Error', 'Color for errors'),
+        'command': ('Console command', 'Commands in the console window color'),
+        'cntrlline': ('Control line', 'Color of lines controlling widgets'),
+        'cntrlcorner': ('Control corner', 'Color of corners controlling widgets'),
+        }
+    # default colors if isdefault is set in the setting
+    color_defaults = {
+        'page': 'LightBase',
+        'error': 'red',
+        'command': 'blue',
+        'cntrlline': 'blue',
+        'cntrlcorner': 'black',
+        }
 
     def __init__(self):
         """Initialise the object, reading the settings."""
@@ -63,6 +89,22 @@ class _SettingDB(object):
 
         # read settings using QSettings
         self.readSettings()
+
+    def color(self, name):
+        """Get a color setting as a QColor."""
+
+        val = self.database['color_' + name]
+        if val[0]:
+            default = self.color_defaults[name]
+            if default == 'LightBase':
+                base = qt4.qApp.palette().color(qt4.QPalette.Base)
+                if base.value() < 127:
+                    base = qt4.Qt.white
+                return base
+
+            return qt4.QColor(default)
+        else:
+            return qt4.QColor(val[1])
 
     def readSettings(self):
         """Read the settings using QSettings.

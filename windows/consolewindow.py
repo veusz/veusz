@@ -29,10 +29,11 @@ import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.utils as utils
+import veusz.setting as setting
 
 # TODO - command line completion
 
-class _Writer:
+class _Writer(object):
     """ Class to behave like an output stream. Pipes input back to
     the specified function."""
 
@@ -226,11 +227,11 @@ class ConsoleWindow(qt4.QDockWidget):
         """ Write text in stderr font to the log."""
         self.checkVisible()
 
-        # insert text as red
-        oldcol = self._outputdisplay.textColor()
-        self._outputdisplay.setTextColor(qt4.QColor("red"))
+        # insert text as bright error color
+        self._outputdisplay.setTextColor( setting.settingdb.color('error') )
         self._outputdisplay.insertPlainText(text)
-        self._outputdisplay.setTextColor(oldcol)
+        self._outputdisplay.setTextColor(
+            qt4.qApp.palette().color(qt4.QPalette.Text) )
         self._outputdisplay.ensureCursorVisible()
 
     def insertTextInOutput(self, text):
@@ -257,10 +258,11 @@ class ConsoleWindow(qt4.QDockWidget):
             prompt = '...'
 
         # output the command in the log pane
-        oldcol = self._outputdisplay.textColor()
-        self._outputdisplay.setTextColor(qt4.QColor("blue"))
+        self._outputdisplay.setTextColor( setting.settingdb.color('command') )
         self._outputdisplay.insertPlainText('%s %s\n' % (prompt, command))
-        self._outputdisplay.setTextColor(oldcol)
+        self._outputdisplay.setTextColor(
+            qt4.qApp.palette().color(qt4.QPalette.Text) )
+
         self._outputdisplay.ensureCursorVisible()
 
         # are we ready to run this?
