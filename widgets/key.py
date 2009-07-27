@@ -112,7 +112,7 @@ class _GraphControlKey(qt4.QGraphicsRectItem):
         if self.checkHighlight():
             self.setPen(self.highlightpen)
         else:
-            self.setPen(controlgraph.dottedlinepen)
+            self.setPen(controlgraph.controlLinePen())
 
     def mouseMoveEvent(self, event):
         """Set correct pen for box."""
