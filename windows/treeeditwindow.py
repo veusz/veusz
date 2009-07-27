@@ -200,7 +200,10 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         else:
             # lookup parent in grandparent's children
             grandparentchildren = self._getChildren(parentobj.parent)
-            parentrow = grandparentchildren.index(parentobj)
+            try:
+                parentrow = grandparentchildren.index(parentobj)
+            except ValueError:
+                return qt4.QModelIndex()
 
             return self.createIndex(parentrow, 0, parentobj)
 
