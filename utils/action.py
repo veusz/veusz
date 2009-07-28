@@ -50,6 +50,59 @@ def getIcon(icon):
         _iconcache[icon] = qt4.QIcon(filename)
     return _iconcache[icon]
 
+def makeAction(parent, descr, menutext, slot, icon=None, key=None,
+               checkable=False):
+    """A quick way to set up an QAction object."""
+    a = qt4.QAction(parent)
+    a.setText(menutext)
+    a.setStatusTip(descr)
+    a.setToolTip(descr)
+    if slot:
+        parent.connect(a, qt4.SIGNAL('triggered()'), slot)
+    if icon:
+        a.setIcon(getIcon(icon))
+    if key:
+        a.setShortcut( qt4.QKeySequence(key) )
+    if checkable:
+        a.setCheckable(True)
+    return a
+
+def addToolbarActions(toolbar, actions, which):
+    """Add actions listed in "which" from dict "actions" to toolbar "toolbar".
+    """
+    for w in which:
+        toolbar.addAction(actions[w])
+
+def constructMenus(rootobject, menuout, menutree, actions):
+    """Add menus to the output dict from the tree, listing actions
+    from actions.
+
+    rootobject: QMenu or QMenuBar to add menus to
+    menuout: dict to store menus
+    menutree: tree structure to create menus from
+    actions: dict of actions to assign to menu items
+    """
+
+    for menuid, menutext, actlist in menutree:
+        # make a new menu if necessary
+        if menuid not in menuout:
+            menu = rootobject.addMenu(menutext)
+            menuout[menuid] = menu
+        else:
+            menu = menuout[menuid]
+
+        # add actions to the menu
+        for action in actlist:
+            if hasattr(action, '__iter__'):
+                # recurse for submenus
+                constructMenus(menu, menuout, [action], actions)
+            elif action == '':
+                # blank means separator
+                menu.addSeparator()
+            else:
+                # normal action
+                menu.addAction(actions[action])
+
 def populateMenuToolbars(items, toolbar, menus):
     """Construct the menus and toolbar from the list of items.
     toolbar is a QToolbar object

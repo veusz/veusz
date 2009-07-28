@@ -45,6 +45,7 @@ from veusz.dialogs.stylesheet import StylesheetDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
+
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
@@ -263,114 +264,171 @@ class MainWindow(qt4.QMainWindow):
         self.maintoolbar.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, self.maintoolbar)
 
-        # add main menus
+        # these are actions for main menu toolbars and menus
+        a = utils.makeAction
+        self.actions = {
+            'filenew':
+                a(self, 'New document', '&New',
+                  self.slotFileNew,
+                  icon='kde-document-new', key='Ctrl+N'),
+            'fileopen':
+                a(self, 'Open a document', '&Open...',
+                  self.slotFileOpen,
+                  icon='kde-document-open', key='Ctrl+O'),
+            'filesave':
+                a(self, 'Save the document', '&Save',
+                  self.slotFileSave,
+                  icon='kde-document-save', key='Ctrl+S'),
+            'filesaveas':
+                a(self, 'Save the current graph under a new name',
+                  'Save &As...', self.slotFileSaveAs,
+                  icon='kde-document-save-as'),
+            'fileprint':
+                a(self, 'Print the document', '&Print...',
+                  self.slotFilePrint,
+                  icon='kde-document-print', key='Ctrl+P'),
+            'fileexport':
+                a(self, 'Export the current page', '&Export...',
+                  self.slotFileExport,
+                  icon='kde-document-export'),
+            'fileclose':
+                a(self, 'Close current window', 'Close Window',
+                  self.slotFileClose,
+                  icon='kde-window-close', key='Ctrl+W'),
+            'filequit':
+                a(self, 'Exit the program', '&Quit',
+                  self.slotFileQuit,
+                  icon='kde-application-exit', key='Ctrl+Q'),
+            
+            'editundo':
+                a(self, 'Undo the previous operation', 'Undo',
+                  self.slotEditUndo,
+                  icon='kde-edit-undo',  key='Ctrl+Z'),
+            'editredo':
+                a(self, 'Redo the previous operation', 'Redo',
+                  self.slotEditRedo,
+                  icon='kde-edit-redo', key='Ctrl+Shift+Z'),
+            'editprefs':
+                a(self, 'Edit preferences', 'Preferences...',
+                  self.slotEditPreferences),
+            'editstylesheet':
+                a(self,
+                  'Edit stylesheet to change default widget settings',
+                  'Default styles...',
+                  self.slotEditStylesheet, icon='settings_stylesheet'),
+
+            'viewedit':
+                a(self, 'Show or hide edit window', 'Edit window',
+                  None, checkable=True),
+            'viewprops':
+                a(self, 'Show or hide property window', 'Properties window',
+                  None, checkable=True),
+            'viewformat':
+                a(self, 'Show or hide formatting window', 'Formatting window',
+                  None, checkable=True),
+            'viewconsole':
+                a(self, 'Show or hide console window', 'Console window',
+                  None, checkable=True),
+            'viewmaintool':
+                a(self, 'Show or hide main toolbar', 'Main toolbar',
+                  None, checkable=True),
+            'viewviewtool':
+                a(self, 'Show or hide view toolbar', 'View toolbar',
+                  None, checkable=True),
+            'viewedittool':
+                a(self, 'Show or hide editing toolbar', 'Editing toolbar',
+                  None, checkable=True),
+            
+            'dataimport':
+                a(self, 'Import data into Veusz', '&Import...',
+                  self.slotDataImport, icon='kde-vzdata-import'),
+            'dataedit':
+                a(self, 'Edit existing datasets', '&Edit...',
+                  self.slotDataEdit, icon='kde-edit'),
+            'datacreate':
+                a(self, 'Create new datasets', '&Create...',
+                  self.slotDataCreate, icon='kde-document-new'),
+            'datacreate2d':
+                a(self, 'Create new 2D datasets', 'Create &2D...',
+                  self.slotDataCreate2D, icon='kde-document-new'),
+            'datacapture':
+                a(self, 'Capture remote data', 'Ca&pture...',
+                  self.slotDataCapture, icon='veusz-capture-data'),
+            'datareload':
+                a(self, 'Reload linked datasets', '&Reload',
+                  self.slotDataReload, icon='kde-view-refresh'),
+
+            'helphome':
+                a(self, 'Go to the Veusz home page on the internet',
+                  'Home page', self.slotHelpHomepage),
+            'helpproject':
+                a(self, 'Go to the Veusz project page on the internet',
+                  'GNA Project page', self.slotHelpProjectPage),
+            'helpbug':
+                a(self, 'Report a bug on the internet',
+                  'Suggestions and bugs', self.slotHelpBug),
+            'helpabout':
+                a(self, 'Displays information about the program', 'About...',
+                  self.slotHelpAbout, icon='veusz')
+            }
+
+        toolbaractions = ('filenew', 'fileopen', 'filesave',
+                          'fileprint', 'fileexport',
+                          'dataimport')
+        utils.addToolbarActions(self.maintoolbar, self.actions, toolbaractions)
+
+        # menu structure
+        filemenu = [
+            'filenew', 'fileopen',
+            ['file.filerecent', 'Open &Recent', []],
+            '',
+            'filesave', 'filesaveas',
+            '',
+            'fileprint', 'fileexport',
+            '',
+            'fileclose', 'filequit'
+            ]
+        editmenu = [
+            'editundo', 'editredo',
+            '',
+            'editprefs', 'editstylesheet',
+            ''
+            ]
+        viewwindowsmenu = [
+            'viewedit', 'viewprops', 'viewformat',
+            'viewconsole',
+            '',
+            'viewmaintool', 'viewviewtool',
+            'viewedittool'
+            ]
+        viewmenu = [
+            ['view.viewwindows', '&Windows', viewwindowsmenu],
+            ''
+            ]
+        insertmenu = [
+            ]
+        datamenu = [
+            'dataimport', 'dataedit', 'datacreate',
+            'datacreate2d', 'datacapture', 'datareload'
+            ]
+        helpmenu = [
+            'helphome', 'helpproject', 'helpbug',
+            '',
+            'helpabout'
+            ]
+
         menus = [
-            ('file', '&File'),
-            ('edit', '&Edit'),
-            ('view', '&View'),
-            ('insert', '&Insert'),
-            ('data', '&Data'),
-            ('help', '&Help')
+            ['file', '&File', filemenu],
+            ['edit', '&Edit', editmenu],
+            ['view', '&View', viewmenu],
+            ['insert', '&Insert', insertmenu],
+            ['data', '&Data', datamenu],
+            ['help', '&Help', helpmenu],
             ]
 
         self.menus = {}
-        for menuid, text in menus:
-            menu = self.menuBar().addMenu(text)
-            self.menus[menuid] = menu
+        utils.constructMenus(self.menuBar(), self.menus, menus, self.actions)
 
-        # items for main menus
-        # Items are: Lookup id, description, menu text, which menu,
-        #  Slot, Icon (or ''), whether to add to toolbar,
-        #  Keyboard shortcut (or '')
-        # For menus wih submenus slot should be replaced by a list of
-        # submenus items of the dame form where the menu will be of the form
-        # menuid.itemid
-        items = (
-            ('filenew', 'New document', '&New', 'file',
-             self.slotFileNew, 'kde-document-new', True, 'Ctrl+N'),
-            ('fileopen', 'Open a document', '&Open...', 'file',
-             self.slotFileOpen, 'kde-document-open', True, 'Ctrl+O'),
-            #If we were looking for HIG goodness, there wouldn't be a submenu here
-            ('filerecent', 'Open a recently edited document',
-             'Open &Recent', 'file', [], '', False, ''),
-            ('file', ),
-            ('filesave', 'Save the document', '&Save', 'file',
-             self.slotFileSave, 'kde-document-save', True, 'Ctrl+S'),
-            ('filesaveas', 'Save the current graph under a new name',
-             'Save &As...', 'file', self.slotFileSaveAs,
-             'kde-document-save-as', False, ''),
-            ('file', ),
-            ('fileprint', 'Print the document', '&Print...', 'file',
-             self.slotFilePrint, 'kde-document-print', True, 'Ctrl+P'),
-            ('fileexport', 'Export the current page', '&Export...', 'file',
-             self.slotFileExport, 'kde-document-export', True, ''),
- 
-            ('file', ),
-            ('fileclose', 'Close current window', 'Close Window', 'file',
-             self.slotFileClose, 'kde-window-close', False, 'Ctrl+W'),
-            ('filequit', 'Exit the program', '&Quit', 'file',
-             self.slotFileQuit, 'kde-application-exit',
-             False, 'Ctrl+Q'),
-
-            ('editundo', 'Undo the previous operation', 'Undo', 'edit',
-             self.slotEditUndo, 'kde-edit-undo', False,  'Ctrl+Z'),
-            ('editredo', 'Redo the previous operation', 'Redo', 'edit',
-             self.slotEditRedo, 'kde-edit-redo', False, 'Ctrl+Shift+Z'),
-            ('edit', ),
-            ('editprefs', 'Edit preferences', 'Preferences...', 'edit',
-             self.slotEditPreferences, '', False, ''),
-            ('editstylesheet',
-             'Edit stylesheet to change default widget settings',
-             'Default styles...', 'edit',
-             self.slotEditStylesheet, 'settings_stylesheet', False, ''),
-            ('edit', ),
-
-            ('viewwindows', 'Show or hide windows or toolbars',
-             'Windows', 'view', [], '', False, ''),
-            ('viewedit', 'Show or hide edit window', 'Edit window',
-             'view.viewwindows', None, '', False, ''),
-            ('viewprops', 'Show or hide property window', 'Properties window',
-             'view.viewwindows', None, '', False, ''),
-            ('viewformat', 'Show or hide formatting window', 'Formatting window',
-             'view.viewwindows', None, '', False, ''),
-            ('viewconsole', 'Show or hide console window', 'Console window',
-             'view.viewwindows', None, '', False, ''),
-            ('view.viewwindows', ),
-            ('viewmaintool', 'Show or hide main toolbar', 'Main toolbar',
-             'view.viewwindows', None, '', False, ''),
-            ('viewviewtool', 'Show or hide view toolbar', 'View toolbar',
-             'view.viewwindows', None, '', False, ''),
-            ('viewedittool', 'Show or hide editing toolbar', 'Editing toolbar',
-             'view.viewwindows', None, '', False, ''),
-            ('view', ),
-            
-            ('dataimport', 'Import data into Veusz', '&Import...', 'data',
-             self.slotDataImport, 'kde-vzdata-import', True, ''),
-            ('dataedit', 'Edit existing datasets', '&Edit...', 'data',
-             self.slotDataEdit, 'kde-edit', False, ''),
-            ('datacreate', 'Create new datasets', '&Create...', 'data',
-             self.slotDataCreate, 'kde-document-new', False, ''),
-            ('datacreate2d', 'Create new 2D datasets', 'Create &2D...', 'data',
-             self.slotDataCreate2D, 'kde-document-new', False, ''),
-            ('datacapture', 'Capture remote data', 'Ca&pture...', 'data',
-             self.slotDataCapture, 'veusz-capture-data', False, ''),
-            ('datareload', 'Reload linked datasets', '&Reload', 'data',
-             self.slotDataReload, 'kde-view-refresh', False, ''),
-
-            ('helphome', 'Go to the Veusz home page on the internet',
-             'Home page', 'help', self.slotHelpHomepage, '', False, ''),
-            ('helpproject', 'Go to the Veusz project page on the internet',
-             'GNA Project page', 'help', self.slotHelpProjectPage, '',
-             False, ''),
-            ('helpbug', 'Report a bug on the internet',
-             'Suggestions and bugs', 'help', self.slotHelpBug, '', False, ''),
-            ('help', ),
-            ('helpabout', 'Displays information about the program', 'About...',
-             'help', self.slotHelpAbout, 'veusz', False, '')
-            )
-            
-        self.actions = utils.populateMenuToolbars(items, self.maintoolbar,
-                                                  self.menus)
     def defineViewWindowMenu(self):
         """Setup View -> Window menu."""
 
@@ -392,7 +450,6 @@ class MainWindow(qt4.QMainWindow):
                          (self.plot.viewtoolbar, 'viewviewtool')):
 
             a = self.actions[act]
-            a.setCheckable(True)
             fn = viewHideWindow(win)
             self.viewwinfns.append( (win, a, fn) )
             self.connect(a, qt4.SIGNAL('triggered()'), fn)
