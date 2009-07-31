@@ -585,9 +585,10 @@ class TreeEditDock(qt4.QDockWidget):
         """Bring up context menu."""
 
         m = qt4.QMenu(self)
-        for act in ('cut', 'copy', 'paste',
-                    'moveup', 'movedown', 'delete', 'rename'):
-            m.addAction(self.editactions[act])
+        for act in ('edit.cut', 'edit.copy', 'edit.paste',
+                    'edit.moveup', 'edit.movedown', 'edit.delete',
+                    'edit.rename'):
+            m.addAction(self.actions[act])
 
         # allow show or hides of selected widget
         if self.selwidget and 'hide' in self.selwidget.settings:
@@ -625,19 +626,19 @@ class TreeEditDock(qt4.QDockWidget):
         # check whether each button can have this widget
         # (or a parent) as parent
 
-        menu = self.parent.menus['insert']
         for wc, action in self.addslots.iteritems():
             w = selw
             while w is not None and not wc.willAllowParent(w):
                 w = w.parent
 
-            self.addactions['add%s' % wc.typename].setEnabled(w is not None)
+            self.actions['add.%s' % wc.typename].setEnabled(w is not None)
 
         # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
 
-        for act in ('cut', 'copy', 'delete', 'moveup', 'movedown', 'rename'):
-            self.editactions[act].setEnabled(isnotroot)
+        for act in ('edit.cut', 'edit.copy', 'edit.delete',
+                    'edit.moveup', 'edit.movedown', 'edit.rename'):
+            self.actions[act].setEnabled(isnotroot)
 
         self.updatePasteButton()
 
@@ -647,7 +648,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.toolbar.setIconSize( qt4.QSize(24, 24) )
 
         self.addslots = {}
-        actions = {}
+        self.actions = actions = self.parent.actions
         for widgettype in ('page', 'grid', 'graph', 'axis',
                            'xy', 'bar', 'fit', 'function',
                            'image', 'contour',
@@ -658,71 +659,86 @@ class TreeEditDock(qt4.QDockWidget):
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
             self.addslots[wc] = slot
-            val = ( 'add%s' % widgettype, wc.description,
-                    'Add %s' % widgettype, 'insert',
-                    slot,
-                    'button_%s' % widgettype,
-                    True, '')
-            actions[widgettype] = val
+            
+            actionname = 'add.' + widgettype
+            actions[actionname] = utils.makeAction(
+                self,
+                wc.description, 'Add %s' % widgettype,
+                slot,
+                icon='button_%s' % widgettype)
 
-        # add non-shape widgets to toolbar and menu
-        self.addactions = utils.populateMenuToolbars(
-            [actions[wt] for wt in
-             ('page', 'grid', 'graph', 'axis',
-              'xy', 'bar', 'fit', 'function',
-              'image', 'contour',
-              'key', 'label', 'colorbar')],
-            self.toolbar, self.parent.menus)
+        a = utils.makeAction
+        actions.update({
+                'edit.cut':
+                    a(self, 'Cut the selected item', 'Cu&t',
+                      self.slotWidgetCut,
+                      icon='veusz-edit-cut', key='Ctrl+X'),
+                'edit.copy':
+                    a(self, 'Copy the selected item', '&Copy',
+                      self.slotWidgetCopy,
+                      icon='kde-edit-copy', key='Ctrl+C'),
+                'edit.paste':
+                    a(self, 'Paste item from the clipboard', '&Paste',
+                      self.slotWidgetPaste,
+                      icon='kde-edit-paste', key='Ctrl+V'),
+                'edit.moveup':
+                    a(self, 'Move the selected item up', 'Move &up',
+                      utils.BoundCaller(self.slotWidgetMove, -1),
+                      icon='kde-go-up'),
+                'edit.movedown':
+                    a(self, 'Move the selected item down', 'Move d&own',
+                      utils.BoundCaller(self.slotWidgetMove, 1),
+                      icon='kde-go-down'),
+                'edit.delete':
+                    a(self, 'Remove the selected item', '&Delete',
+                      self.slotWidgetDelete,
+                      icon='kde-edit-delete'),
+                'edit.rename':
+                    a(self, 'Renames the selected item', '&Rename',
+                      self.slotWidgetRename,
+                      icon='kde-edit-rename')
+                })
+
+        # add actions to toolbar to create widgets
+        addact = [('add.'+w) for w in 
+                  ('page', 'grid', 'graph', 'axis',
+                   'xy', 'bar', 'fit', 'function',
+                   'image', 'contour',
+                   'key', 'label', 'colorbar')]
+        utils.addToolbarActions(self.toolbar, actions, addact)
+
+        # add actions to menus for adding widgets and editing
+        menuitems = [
+            ('insert', '', addact + [
+                    ['insert.shape', 'Add shape',
+                     ['add.rect', 'add.ellipse', 'add.line', 'add.imagefile']
+                     ]]),
+            ('edit', '', [
+                    'edit.cut', 'edit.copy', 'edit.paste',
+                    'edit.moveup', 'edit.movedown',
+                    'edit.delete', 'edit.rename'
+                    ]),
+            ]            
+        utils.constructMenus( self.parent.menuBar(),
+                              self.parent.menus,
+                              menuitems,
+                              actions )
 
         # create shape toolbar button
         shapetb = qt4.QToolButton()
-        shapeicon = utils.getIcon('veusz-shape-menu')
-        shapetb.setIcon(shapeicon)
+        shapetb.setIcon( utils.getIcon("veusz-shape-menu") )
         shapetb.setToolTip("Draw shapes on plot or page")
-
-        shapepop = qt4.QMenu(shapetb)
         shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
+        # attach menu to insert shape button
+        shapetb.setMenu(self.parent.menus['insert.shape'])
         self.toolbar.addWidget(shapetb)
-
-        # create menu item for shapes
-        shapemenu = qt4.QMenu('Add shape', self.parent.menus['insert'])
-        shapemenu.setIcon(shapeicon)
-        self.parent.menus['insert'].addMenu(shapemenu)
-
-        # add shape items to menu and toolbar button
-        shapeacts = utils.populateMenuToolbars(
-            [actions[wt] for wt in
-             ('rect', 'ellipse', 'line', 'imagefile')],
-            shapetb, {'insert': shapemenu})
-        self.addactions.update(shapeacts)
-
         self.toolbar.addSeparator()
 
-        # make buttons and menu items for the various item editing ops
-        moveup = utils.BoundCaller(self.slotWidgetMove, -1)
-        movedown = utils.BoundCaller(self.slotWidgetMove, 1)
-        self.editslots = [moveup, movedown]
-
-        edititems = (
-            ('cut', 'Cut the selected item', 'Cu&t', 'edit',
-             self.slotWidgetCut, 'veusz-edit-cut', True, 'Ctrl+X'),
-            ('copy', 'Copy the selected item', '&Copy', 'edit',
-             self.slotWidgetCopy, 'kde-edit-copy', True, 'Ctrl+C'),
-            ('paste', 'Paste item from the clipboard', '&Paste', 'edit',
-             self.slotWidgetPaste, 'kde-edit-paste', True, 'Ctrl+V'),
-            ('moveup', 'Move the selected item up', 'Move &up', 'edit',
-             moveup, 'kde-go-up',
-             True, ''),
-            ('movedown', 'Move the selected item down', 'Move d&own', 'edit',
-             movedown, 'kde-go-down',
-             True, ''),
-            ('delete', 'Remove the selected item', '&Delete', 'edit',
-             self.slotWidgetDelete, 'kde-edit-delete', True, ''),
-            ('rename', 'Renames the selected item', '&Rename', 'edit',
-             self.slotWidgetRename, 'kde-edit-rename', False, '')
-            )
-        self.editactions = utils.populateMenuToolbars(edititems, self.toolbar,
-                                                      self.parent.menus)
+        # add action to toolbar for editing
+        utils.addToolbarActions(self.toolbar,  actions,
+                                ('edit.cut', 'edit.copy', 'edit.paste',
+                                 'edit.moveup', 'edit.movedown',
+                                 'edit.delete', 'edit.rename'))
 
     def slotMakeWidgetButton(self, wc):
         """User clicks button to make widget."""
@@ -746,8 +762,9 @@ class TreeEditDock(qt4.QDockWidget):
             name = None
         
         # make the new widget and update the document
-        w = self.document.applyOperation( document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
-                                                                      name=name) )
+        w = self.document.applyOperation(
+            document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
+                                        name=name) )
 
         # select the widget
         self.selectWidget(w)
@@ -820,7 +837,7 @@ class TreeEditDock(qt4.QDockWidget):
             if self.getSuitableParent(widgettype, self.selwidget):
                 show = True
 
-        self.editactions['paste'].setEnabled(show)
+        self.actions['edit.paste'].setEnabled(show)
 
     def doInitialWidgetSelect(self):
         """Select a sensible initial widget."""

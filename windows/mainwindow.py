@@ -225,15 +225,15 @@ class MainWindow(qt4.QMainWindow):
         undotext = 'Undo'
         if canundo:
             undotext = "%s %s" % (undotext, self.document.historyundo[-1].descr)
-        self.actions['editundo'].setText(undotext)
-        self.actions['editundo'].setEnabled(canundo)
+        self.actions['edit.undo'].setText(undotext)
+        self.actions['edit.undo'].setEnabled(canundo)
         
         canredo = self.document.canRedo()
         redotext = 'Redo'
         if canredo:
             redotext = "%s %s" % (redotext, self.document.historyredo[-1].descr)
-        self.actions['editredo'].setText(redotext)
-        self.actions['editredo'].setEnabled(canredo)
+        self.actions['edit.redo'].setText(redotext)
+        self.actions['edit.redo'].setEnabled(canredo)
         
     def slotEditUndo(self):
         """Undo the previous operation"""
@@ -267,139 +267,139 @@ class MainWindow(qt4.QMainWindow):
         # these are actions for main menu toolbars and menus
         a = utils.makeAction
         self.actions = {
-            'filenew':
+            'file.new':
                 a(self, 'New document', '&New',
                   self.slotFileNew,
                   icon='kde-document-new', key='Ctrl+N'),
-            'fileopen':
+            'file.open':
                 a(self, 'Open a document', '&Open...',
                   self.slotFileOpen,
                   icon='kde-document-open', key='Ctrl+O'),
-            'filesave':
+            'file.save':
                 a(self, 'Save the document', '&Save',
                   self.slotFileSave,
                   icon='kde-document-save', key='Ctrl+S'),
-            'filesaveas':
+            'file.saveas':
                 a(self, 'Save the current graph under a new name',
                   'Save &As...', self.slotFileSaveAs,
                   icon='kde-document-save-as'),
-            'fileprint':
+            'file.print':
                 a(self, 'Print the document', '&Print...',
                   self.slotFilePrint,
                   icon='kde-document-print', key='Ctrl+P'),
-            'fileexport':
+            'file.export':
                 a(self, 'Export the current page', '&Export...',
                   self.slotFileExport,
                   icon='kde-document-export'),
-            'fileclose':
+            'file.close':
                 a(self, 'Close current window', 'Close Window',
                   self.slotFileClose,
                   icon='kde-window-close', key='Ctrl+W'),
-            'filequit':
+            'file.quit':
                 a(self, 'Exit the program', '&Quit',
                   self.slotFileQuit,
                   icon='kde-application-exit', key='Ctrl+Q'),
             
-            'editundo':
+            'edit.undo':
                 a(self, 'Undo the previous operation', 'Undo',
                   self.slotEditUndo,
                   icon='kde-edit-undo',  key='Ctrl+Z'),
-            'editredo':
+            'edit.redo':
                 a(self, 'Redo the previous operation', 'Redo',
                   self.slotEditRedo,
                   icon='kde-edit-redo', key='Ctrl+Shift+Z'),
-            'editprefs':
+            'edit.prefs':
                 a(self, 'Edit preferences', 'Preferences...',
                   self.slotEditPreferences),
-            'editstylesheet':
+            'edit.stylesheet':
                 a(self,
                   'Edit stylesheet to change default widget settings',
                   'Default styles...',
                   self.slotEditStylesheet, icon='settings_stylesheet'),
 
-            'viewedit':
+            'view.edit':
                 a(self, 'Show or hide edit window', 'Edit window',
                   None, checkable=True),
-            'viewprops':
+            'view.props':
                 a(self, 'Show or hide property window', 'Properties window',
                   None, checkable=True),
-            'viewformat':
+            'view.format':
                 a(self, 'Show or hide formatting window', 'Formatting window',
                   None, checkable=True),
-            'viewconsole':
+            'view.console':
                 a(self, 'Show or hide console window', 'Console window',
                   None, checkable=True),
-            'viewmaintool':
+            'view.maintool':
                 a(self, 'Show or hide main toolbar', 'Main toolbar',
                   None, checkable=True),
-            'viewviewtool':
+            'view.viewtool':
                 a(self, 'Show or hide view toolbar', 'View toolbar',
                   None, checkable=True),
-            'viewedittool':
+            'view.edittool':
                 a(self, 'Show or hide editing toolbar', 'Editing toolbar',
                   None, checkable=True),
             
-            'dataimport':
+            'data.import':
                 a(self, 'Import data into Veusz', '&Import...',
                   self.slotDataImport, icon='kde-vzdata-import'),
-            'dataedit':
+            'data.edit':
                 a(self, 'Edit existing datasets', '&Edit...',
                   self.slotDataEdit, icon='kde-edit'),
-            'datacreate':
+            'data.create':
                 a(self, 'Create new datasets', '&Create...',
                   self.slotDataCreate, icon='kde-document-new'),
-            'datacreate2d':
+            'data.create2d':
                 a(self, 'Create new 2D datasets', 'Create &2D...',
                   self.slotDataCreate2D, icon='kde-document-new'),
-            'datacapture':
+            'data.capture':
                 a(self, 'Capture remote data', 'Ca&pture...',
                   self.slotDataCapture, icon='veusz-capture-data'),
-            'datareload':
+            'data.reload':
                 a(self, 'Reload linked datasets', '&Reload',
                   self.slotDataReload, icon='kde-view-refresh'),
 
-            'helphome':
+            'help.home':
                 a(self, 'Go to the Veusz home page on the internet',
                   'Home page', self.slotHelpHomepage),
-            'helpproject':
+            'help.project':
                 a(self, 'Go to the Veusz project page on the internet',
                   'GNA Project page', self.slotHelpProjectPage),
-            'helpbug':
+            'help.bug':
                 a(self, 'Report a bug on the internet',
                   'Suggestions and bugs', self.slotHelpBug),
-            'helpabout':
+            'help.about':
                 a(self, 'Displays information about the program', 'About...',
                   self.slotHelpAbout, icon='veusz')
             }
 
-        toolbaractions = ('filenew', 'fileopen', 'filesave',
-                          'fileprint', 'fileexport',
-                          'dataimport')
+        toolbaractions = ('file.new', 'file.open', 'file.save',
+                          'file.print', 'file.export',
+                          'data.import')
         utils.addToolbarActions(self.maintoolbar, self.actions, toolbaractions)
 
         # menu structure
         filemenu = [
-            'filenew', 'fileopen',
+            'file.new', 'file.open',
             ['file.filerecent', 'Open &Recent', []],
             '',
-            'filesave', 'filesaveas',
+            'file.save', 'file.saveas',
             '',
-            'fileprint', 'fileexport',
+            'file.print', 'file.export',
             '',
-            'fileclose', 'filequit'
+            'file.close', 'file.quit'
             ]
         editmenu = [
-            'editundo', 'editredo',
+            'edit.undo', 'edit.redo',
             '',
-            'editprefs', 'editstylesheet',
+            'edit.prefs', 'edit.stylesheet',
             ''
             ]
         viewwindowsmenu = [
-            'viewedit', 'viewprops', 'viewformat',
-            'viewconsole',
+            'view.edit', 'view.props', 'view.format',
+            'view.console',
             '',
-            'viewmaintool', 'viewviewtool',
-            'viewedittool'
+            'view.maintool', 'view.viewtool',
+            'view.edittool'
             ]
         viewmenu = [
             ['view.viewwindows', '&Windows', viewwindowsmenu],
@@ -408,13 +408,13 @@ class MainWindow(qt4.QMainWindow):
         insertmenu = [
             ]
         datamenu = [
-            'dataimport', 'dataedit', 'datacreate',
-            'datacreate2d', 'datacapture', 'datareload'
+            'data.import', 'data.edit', 'data.create',
+            'data.create2d', 'data.capture', 'data.reload'
             ]
         helpmenu = [
-            'helphome', 'helpproject', 'helpbug',
+            'help.home', 'help.project', 'help.bug',
             '',
-            'helpabout'
+            'help.about'
             ]
 
         menus = [
@@ -441,13 +441,13 @@ class MainWindow(qt4.QMainWindow):
 
         # set whether windows are visible and connect up to toggle windows
         self.viewwinfns = []
-        for win, act in ((self.treeedit, 'viewedit'),
-                         (self.propdock, 'viewprops'),
-                         (self.formatdock, 'viewformat'),
-                         (self.console, 'viewconsole'),
-                         (self.maintoolbar, 'viewmaintool'),
-                         (self.treeedit.toolbar, 'viewedittool'),
-                         (self.plot.viewtoolbar, 'viewviewtool')):
+        for win, act in ((self.treeedit, 'view.edit'),
+                         (self.propdock, 'view.props'),
+                         (self.formatdock, 'view.format'),
+                         (self.console, 'view.console'),
+                         (self.maintoolbar, 'view.maintool'),
+                         (self.treeedit.toolbar, 'view.edittool'),
+                         (self.plot.viewtoolbar, 'view.viewtool')):
 
             a = self.actions[act]
             fn = viewHideWindow(win)
@@ -1042,7 +1042,7 @@ class MainWindow(qt4.QMainWindow):
         """Disable certain actions if document is not modified."""
 
         # enable/disable file, save menu item
-        self.actions['filesave'].setEnabled(ismodified)
+        self.actions['file.save'].setEnabled(ismodified)
 
     def slotFileClose(self):
         """File close window chosen."""
