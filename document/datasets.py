@@ -843,10 +843,49 @@ class DatasetExpression(Dataset):
         """
         return _evaluateDataset(self.document.data, dsname, dspart)
                     
-    def _propValues(self, part):
-        """Check whether expressions need reevaluating, and recalculate if necessary."""
+    def _evaluatePart(self, expr, part):
+        """Evaluate expression expr for part part."""
+        # replace dataset names with calls (ugly hack)
+        # but necessary for Python 2.3 as we can't replace
+        # dict in eval by subclass
+        expr = _substituteDatasets(self.document.data, expr, part)
 
-        assert self.document is not None
+        # check expression for nasties if it has changed
+        if self.cachedexpr.get(part) != expr:
+            if ( not setting.transient_settings['unsafe_mode'] and
+                 utils.checkCode(expr, securityonly=True) ):
+                raise DatasetExpressionException(
+                    "Unsafe expression '%s' in %s part of dataset" % (
+                        self.expr[part], part))
+            self.cachedexpr[part] = expr
+
+        # actually evaluate the expression
+        try:
+            e = self.evaluated[part] = N.array(
+                eval(expr, self.environment),
+                N.float64)
+        except Exception, ex:
+            raise DatasetExpressionException(
+                "Error evaluating expession: %s\n"
+                "Error: %s" % (self.expr[part], str(ex)) )
+
+        # make evaluated error expression have same shape as data
+        if part != 'data':
+            data = getattr(self, 'data')
+            if data.shape != e.shape:
+                try:
+                    # 1-dimensional - make it right size and trim
+                    oldsize = len(e)
+                    e = N.resize(e, data.shape)
+                    e[oldsize:] = N.nan
+                except TypeError:
+                    # 0-dimensional - just make it repeat
+                    e = N.resize(e, data.shape)
+                self.evaluated[part] = e
+
+    def _propValues(self, part):
+        """Check whether expressions need reevaluating,
+        and recalculate if necessary."""
 
         # if document has been modified since the last invocation
         if self.docchangeset[part] != self.document.changeset:
@@ -856,26 +895,7 @@ class DatasetExpression(Dataset):
             self.evaluated[part] = None
 
             if expr is not None and expr != '':
-                # replace dataset names with calls (ugly hack)
-                # but necessary for Python 2.3 as we can't replace
-                # dict in eval by subclass
-                expr = _substituteDatasets(self.document.data, expr, part)
-
-                # check expression for nasties if it has changed
-                if self.cachedexpr.get(part) != expr:
-                    if ( not setting.transient_settings['unsafe_mode'] and
-                         utils.checkCode(expr, securityonly=True) ):
-                        raise DatasetExpressionException(
-                            "Unsafe expression '%s' in %s part of dataset" % (
-                                self.expr[part], part))
-                    self.cachedexpr[part] = expr
-
-                # actually evaluate the expression
-                try:
-                    self.evaluated[part] = eval(expr, self.environment)
-                except Exception, e:
-                    raise DatasetExpressionException("Error evaluating expession: %s\n"
-                                                     "Error: %s" % (self.expr[part], str(e)) )
+                self._evaluatePart(expr, part)
 
         # return the evaluated form of the expression
         return self.evaluated[part]

@@ -21,11 +21,8 @@
 
 # $Id$
 
-import os
-import os.path
 import sys
 import itertools
-import math
 
 import veusz.qtall as qt4
 import numpy as N
