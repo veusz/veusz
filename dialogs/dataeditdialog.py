@@ -153,18 +153,25 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
     def rowCount(self, parent):
         ds = self.document.data[self.dsname].data
-        return ds.shape[0]
+        if ds is not None:
+            return ds.shape[0]
+        else:
+            return 0
 
     def columnCount(self, parent):
         ds = self.document.data[self.dsname].data
-        return ds.shape[1]
+        if ds is not None:
+            return ds.shape[1]
+        else:
+            return 0
 
     def data(self, index, role):
         if role == qt4.Qt.DisplayRole:
             # get data (note y is reversed, sigh)
             ds = self.document.data[self.dsname].data
-            num = ds[ds.shape[0]-index.row()-1, index.column()]
-            return qt4.QVariant(num)
+            if ds is not None:
+                num = ds[ds.shape[0]-index.row()-1, index.column()]
+                return qt4.QVariant(num)
 
         return qt4.QVariant()
 
@@ -174,16 +181,17 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         if role == qt4.Qt.DisplayRole:
             ds = self.document.data[self.dsname]
 
-            # return a number for the top left of the cell
-            if orientation == qt4.Qt.Horizontal:
-                r = ds.xrange
-                num = ds.data.shape[1]
-            else:
-                r = ds.yrange
-                r = (r[1], r[0]) # swap (as y reversed)
-                num = ds.data.shape[0]
-            val = (r[1]-r[0])/num*(section+0.5)+r[0]
-            return qt4.QVariant( '%g' % val )
+            if ds is not None:
+                # return a number for the top left of the cell
+                if orientation == qt4.Qt.Horizontal:
+                    r = ds.xrange
+                    num = ds.data.shape[1]
+                else:
+                    r = ds.yrange
+                    r = (r[1], r[0]) # swap (as y reversed)
+                    num = ds.data.shape[0]
+                val = (r[1]-r[0])/num*(section+0.5)+r[0]
+                return qt4.QVariant( '%g' % val )
 
         return qt4.QVariant()
 
@@ -387,7 +395,25 @@ class DataEditDialog(qt4.QDialog):
 
         datasetname = self.getSelectedDataset()
         if datasetname is not None:
-            self.document.applyOperation(document.OperationDatasetDelete(datasetname))
+            row = self.datasetlistview.selectionModel(
+                ).selection().indexes()[0].row()
+
+            self.document.applyOperation(
+                document.OperationDatasetDelete(datasetname))
+
+            # select new item in list
+            model = self.datasetlistview.model()
+            row = min(model.rowCount(None)-1, row)
+            if row >= 0:
+                # select new row
+                newindex = model.index(row)
+                self.datasetlistview.selectionModel().select(
+                    newindex, qt4.QItemSelectionModel.ClearAndSelect)
+                self.slotDatasetSelected(
+                    self.datasetlistview.selectionModel().selection(), None)
+            else:
+                # clear model
+                self.datatableview.setModel(None)
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
