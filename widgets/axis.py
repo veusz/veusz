@@ -140,9 +140,9 @@ class Axis(widget.Widget):
         if type(self) == Axis:
             self.readDefaults()
 
-        if self.name == 'y':
+        if self.name == 'y' and s.direction != 'vertical':
             s.direction = 'vertical'
-        elif self.name == 'x':
+        elif self.name == 'x' and s.direction != 'horizontal':
             s.direction = 'horizontal'
 
         self.minorticks = None
@@ -363,21 +363,23 @@ class Axis(widget.Widget):
             self._computePlottedRange()
         return (self.plottedrange[0], self.plottedrange[1])
 
-    def _updatePlotRange(self, bounds):
+    def _updatePlotRange(self, bounds, otherposition=None):
         """Calculate coordinates on plotter of axis."""
 
         s = self.settings
         x1, y1, x2, y2 = bounds
         dx = x2 - x1
         dy = y2 - y1
-        p1, p2, pp = s.lowerPosition, s.upperPosition, s.otherPosition
+        p1, p2 = s.lowerPosition, s.upperPosition
+        if otherposition is None:
+            otherposition = s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
             self.coordParr1 = x1 + dx*p1
             self.coordParr2 = x1 + dx*p2
 
             # other axis coordinates
-            self.coordPerp  = y2 - dy*pp
+            self.coordPerp  = y2 - dy*otherposition
             self.coordPerp1 = y2 - dy*p1
             self.coordPerp2 = y2 - dy*p2
 
@@ -386,9 +388,15 @@ class Axis(widget.Widget):
             self.coordParr2 = y2 - dy*p2
 
             # other axis coordinates
-            self.coordPerp  = x1 + dx*pp
+            self.coordPerp  = x1 + dx*otherposition
             self.coordPerp1 = x1 + dx*p1
             self.coordPerp2 = x1 + dx*p2
+
+        # is this axis reflected
+        if otherposition > 0.5:
+            self.coordReflected = not s.reflect
+        else:
+            self.coordReflected = s.reflect
      
     def graphToPlotterCoords(self, bounds, vals):
         """Convert graph coordinates to plotter coordinates on this axis.
@@ -530,15 +538,6 @@ class Axis(widget.Widget):
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
 
-    def _reflected(self):
-        """Is the axis reflected?"""
-
-        s = self.settings
-        if s.otherPosition > 0.5:
-            return not s.reflect
-        else:
-            return s.reflect
-
     def _drawMinorTicks(self, painter):
         """Draw minor ticks on plot."""
 
@@ -553,7 +552,7 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self._reflected():
+        if self.coordReflected:
             delta *= -1
         for t in minorticks:
             self.swapline( painter,
@@ -570,7 +569,7 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self._reflected():
+        if self.coordReflected:
             delta *= -1
         for t in tickcoords:
             self.swapline( painter,
@@ -619,7 +618,7 @@ class Axis(widget.Widget):
 
         # work out font alignment
         if s.TickLabels.rotate:
-            if self._reflected():
+            if self.coordReflected:
                 angle = 90
             else:
                 angle = 270
@@ -636,7 +635,7 @@ class Axis(widget.Widget):
                        'maxx': max(self.coordParr1, self.coordParr2) }
             ax, ay = 0, 1
 
-        if self._reflected():
+        if self.coordReflected:
             ax, ay = -ax, -ay
 
         # get information about text scales
@@ -715,7 +714,7 @@ class Axis(widget.Widget):
         else:
             ax, ay = 0, 1
 
-        reflected = self._reflected()
+        reflected = self.coordReflected
         if reflected:
             ax, ay = -ax, -ay
 
@@ -785,26 +784,19 @@ class Axis(widget.Widget):
             return
 
         # swap axis to other side
-        other = s.otherPosition
-        if other < 0.5:
-            next = 1.
+        if s.otherPosition < 0.5:
+            otheredge = 1.
         else:
-            next = 0.
+            otheredge = 0.
 
-        # temporarily change position of axis
-        # ** FIXME: this is a horrible kludge **
-        s.get('otherPosition').setSilent(next)
-
-        self._updatePlotRange(posn)
+        # temporarily change position of axis to other side for drawing
+        self._updatePlotRange(posn, otherposition=otheredge)
         if not s.Line.hide:
             self._drawAxisLine(painter)
         if not s.MinorTicks.hide:
             self._drawMinorTicks(painter)
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
-
-        # put axis back
-        s.get('otherPosition').setSilent(other)
 
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""
@@ -859,7 +851,7 @@ class Axis(widget.Widget):
         sign = 1
         if s.direction == 'vertical':
             sign *= -1
-        if self._reflected():
+        if self.coordReflected:
             sign *= -1
 
         # plot gridlines
