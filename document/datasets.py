@@ -969,7 +969,7 @@ def getSpacing(data):
             elif N.fabs(mindelta-delta) > sigfactor:
                 # new delta - check is multiple of old delta
                 ratio = delta/mindelta
-                if N.fabs(int(ratio)-ratio) > 1e-10:
+                if N.fabs(int(ratio)-ratio) > 1e-3:
                     raise DatasetExpressionException('Variable spacings not yet supported in constructing 2D datasets')
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
