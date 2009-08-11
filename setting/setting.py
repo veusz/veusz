@@ -319,6 +319,13 @@ class Setting(object):
             p = p.parent
         return None
 
+    def getWidget(self):
+        """Return associated widget."""
+        w = self.parent
+        while not w.isWidget():
+            w = w.parent
+        return w
+
 # Store strings
 class Str(Setting):
     """String setting."""

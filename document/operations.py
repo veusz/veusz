@@ -49,9 +49,14 @@ class OperationSettingSet(object):
     descr = 'change setting'
     
     def __init__(self, setting, value):
-        """Set the setting to value."""
+        """Set the setting to value.
+        Setting may be a widget path
+        """
         
-        self.settingpath = setting.path
+        if isinstance(setting, basestring):
+            self.settingpath = setting
+        else:
+            self.settingpath = setting.path
         self.value = value
         
     def do(self, document):

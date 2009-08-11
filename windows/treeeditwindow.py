@@ -1071,6 +1071,41 @@ class SettingLabel(qt4.QWidget):
         self.updateHighlight()
         return qt4.QWidget.focusOutEvent(self, event)
 
+    def addCopyToWidgets(self, menu):
+        """Make a menu with list of other widgets in it."""
+
+        def getWidgetsOfType(widget, widgettype, widgets=[]):
+            """Recursively build up a list of widgets of the type given."""
+            for w in widget.children:
+                if w.typename == widgettype:
+                    widgets.append(w)
+                getWidgetsOfType(w, widgettype, widgets)
+        
+        # get list of widget paths to copy setting to
+        # this is all widgets of same type
+        widgets = []
+        setwidget = self.setting.getWidget()
+        getWidgetsOfType(self.document.basewidget,
+                         setwidget.typename, widgets)
+        widgets = [w.path for w in widgets if w != setwidget]
+        widgets.sort()
+
+        # chop off widget part of setting path
+        # this is so we can add on a different widget path
+        setpath = self.setting.path
+        wpath = self.setting.getWidget().path
+        setpath = setpath[len(wpath)+1:]
+
+        for widget in widgets:
+            action = menu.addAction(widget)
+            def modify(widget=widget):
+                """Modify the setting for the widget given."""
+                wpath = widget + setpath
+                self.document.applyOperation(
+                    document.OperationSettingSet(wpath, self.setting.get()))
+
+            menu.connect(action, qt4.SIGNAL('triggered()'), modify)
+
     def settingMenu(self, pos):
         """Pop up menu for each setting."""
 
@@ -1089,23 +1124,21 @@ class SettingLabel(qt4.QWidget):
         name = widget.name
 
         popup = qt4.QMenu(self)
-        popup.addAction('Reset %s to default' % self.setting.name,
+        popup.addAction('Reset to default',
                         self.actionResetDefault)
-        popup.addSeparator()
-        popup.addAction('Copy to "%s" widgets' % wtype,
-                        self.actionCopyTypedWidgets)
-        popup.addAction('Copy to "%s" siblings' % wtype,
-                        self.actionCopyTypedSiblings)
-        popup.addAction('Copy to "%s" widgets called "%s"' % (wtype, name),
-                        self.actionCopyTypedNamedWidgets)
-        popup.addSeparator()
-        popup.addAction('Make default for "%s" widgets' % wtype,
-                        self.actionDefaultTyped)
-        popup.addAction('Make default for "%s" widgets called "%s"' %
-                        (wtype, name),
-                        self.actionDefaultTypedNamed)
-        popup.addAction('Forget this default setting',
-                        self.actionDefaultForget)
+
+        copyto = popup.addMenu('Copy to')
+        copyto.addAction("all '%s' widgets" % wtype,
+                         self.actionCopyTypedWidgets)
+        copyto.addAction("'%s' siblings" % wtype,
+                         self.actionCopyTypedSiblings)
+        copyto.addAction("'%s' widgets called '%s'" % (wtype, name),
+                         self.actionCopyTypedNamedWidgets)
+        copyto.addSeparator()
+        self.addCopyToWidgets(copyto)
+
+        popup.addAction('Use as default style',
+                        self.actionSetStyleSheet)
 
         # special actions for references
         if self.setting.isReference():
@@ -1174,3 +1207,18 @@ class SettingLabel(qt4.QWidget):
         while not hasattr(window, 'treeedit'):
             window = window.parent()
         window.treeedit.selectWidget(widget)
+
+    def actionSetStyleSheet(self):
+        """Use the setting as the default in the stylesheet."""
+
+        # get name of stylesheet setting
+        sslink = self.setting.getStylesheetLink()
+        # apply operation to change it
+        self.document.applyOperation(
+            document.OperationMultiple(
+                [ document.OperationSettingSet(sslink, self.setting.get()),
+                  document.OperationSettingSet(self.setting,
+                                               self.setting.default) ],
+                descr="make default style")
+            )
+
