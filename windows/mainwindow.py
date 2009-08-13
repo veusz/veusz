@@ -338,6 +338,9 @@ class MainWindow(qt4.QMainWindow):
             'view.edittool':
                 a(self, 'Show or hide editing toolbar', 'Editing toolbar',
                   None, checkable=True),
+            'view.addtool':
+                a(self, 'Show or hide insert toolbar', 'Insert toolbar',
+                  None, checkable=True),
             
             'data.import':
                 a(self, 'Import data into Veusz', '&Import...',
@@ -399,7 +402,7 @@ class MainWindow(qt4.QMainWindow):
             'view.console',
             '',
             'view.maintool', 'view.viewtool',
-            'view.edittool'
+            'view.addtool', 'view.edittool'
             ]
         viewmenu = [
             ['view.viewwindows', '&Windows', viewwindowsmenu],
@@ -446,7 +449,8 @@ class MainWindow(qt4.QMainWindow):
                          (self.formatdock, 'view.format'),
                          (self.console, 'view.console'),
                          (self.maintoolbar, 'view.maintool'),
-                         (self.treeedit.toolbar, 'view.edittool'),
+                         (self.treeedit.edittoolbar, 'view.edittool'),
+                         (self.treeedit.addtoolbar, 'view.addtool'),
                          (self.plot.viewtoolbar, 'view.viewtool')):
 
             a = self.actions[act]

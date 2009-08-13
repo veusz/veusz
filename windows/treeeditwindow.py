@@ -539,14 +539,21 @@ class TreeEditDock(qt4.QDockWidget):
         # set tree as main widget
         self.setWidget(self.treeview)
 
-        # toolbar to create widgets, etc
-        self.toolbar = qt4.QToolBar("Editing toolbar - Veusz",
-                                    parent)
-        self.toolbar.setObjectName("veuszeditingtoolbar")
-        self.toolbar.setOrientation(qt4.Qt.Vertical)
+        # toolbar to create widgets
+        self.addtoolbar = qt4.QToolBar("Insert toolbar - Veusz",
+                                       parent)
+        # note wrong description!: backwards compatibility
+        self.addtoolbar.setObjectName("veuszeditingtoolbar")
+
+        # toolbar for editting widgets
+        self.edittoolbar = qt4.QToolBar("Edit toolbar - Veusz",
+                                        parent)
+        self.edittoolbar.setObjectName("veuszedittoolbar")
+
         self._constructToolbarMenu()
         parent.addToolBarBreak(qt4.Qt.TopToolBarArea)
-        parent.addToolBar(qt4.Qt.TopToolBarArea, self.toolbar)
+        parent.addToolBar(qt4.Qt.TopToolBarArea, self.addtoolbar)
+        parent.addToolBar(qt4.Qt.TopToolBarArea, self.edittoolbar)
 
         # this sets various things up
         self.selectWidget(document.basewidget)
@@ -645,7 +652,8 @@ class TreeEditDock(qt4.QDockWidget):
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
-        self.toolbar.setIconSize( qt4.QSize(24, 24) )
+        self.addtoolbar.setIconSize( qt4.QSize(24, 24) )
+        self.edittoolbar.setIconSize( qt4.QSize(24, 24) )
 
         self.addslots = {}
         self.actions = actions = self.parent.actions
@@ -705,7 +713,7 @@ class TreeEditDock(qt4.QDockWidget):
                    'xy', 'bar', 'fit', 'function',
                    'image', 'contour',
                    'key', 'label', 'colorbar')]
-        utils.addToolbarActions(self.toolbar, actions, addact)
+        utils.addToolbarActions(self.addtoolbar, actions, addact)
 
         # add actions to menus for adding widgets and editing
         menuitems = [
@@ -731,11 +739,10 @@ class TreeEditDock(qt4.QDockWidget):
         shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
         # attach menu to insert shape button
         shapetb.setMenu(self.parent.menus['insert.shape'])
-        self.toolbar.addWidget(shapetb)
-        self.toolbar.addSeparator()
+        self.addtoolbar.addWidget(shapetb)
 
         # add action to toolbar for editing
-        utils.addToolbarActions(self.toolbar,  actions,
+        utils.addToolbarActions(self.edittoolbar,  actions,
                                 ('edit.cut', 'edit.copy', 'edit.paste',
                                  'edit.moveup', 'edit.movedown',
                                  'edit.delete', 'edit.rename'))
