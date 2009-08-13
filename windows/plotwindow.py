@@ -22,7 +22,7 @@
 # $Id$
 
 import sys
-import itertools
+from itertools import izip
 
 import veusz.qtall as qt4
 import numpy as N
@@ -248,44 +248,77 @@ class PlotWindow( qt4.QGraphicsView ):
         self.viewtoolbar.hide()
         parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
 
-        items = [
-            ('viewzoomin', 'Zoom into the plot', 'Zoom &In', 'view',
-             self.slotViewZoomIn, 'kde-zoom-in', False, 'Ctrl++'),
-            ('viewzoomout', 'Zoom out of the plot', 'Zoom &Out', 'view',
-             self.slotViewZoomOut, 'kde-zoom-out', False, 'Ctrl+-'),
-            ('viewzoom11', 'Restore plot to natural size', 'Zoom 1:1', 'view',
-             self.slotViewZoom11, 'kde-zoom-1-veuszedit', False, 'Ctrl+1'),
-            ('viewzoomwidth', 'Zoom plot to show whole width',
-             'Zoom to width', 'view', self.slotViewZoomWidth,
-             'kde-zoom-width-veuszedit', False, ''),
-            ('viewzoomheight', 'Zoom plot to show whole height',
-             'Zoom to height', 'view', self.slotViewZoomHeight,
-             'kde-zoom-height-veuszedit', False, ''),
-            ('viewzoompage', 'Zoom plot to show whole page',
-             'Zoom to page', 'view', self.slotViewZoomPage,
-             'kde-zoom-page-veuszedit', False, ''),
-            ('view',),
-            ('viewprevpage', 'Move to the previous page', '&Previous page',
-             'view', self.slotViewPreviousPage, 'kde-go-previous',
-             True, 'Ctrl+PgUp'),
-            ('viewnextpage', 'Move to the next page', '&Next page',
-             'view', self.slotViewNextPage, 'kde-go-next',
-             True, 'Ctrl+PgDown'),
-            ('viewselect', 'Select items from the graph or scroll',
-             'Select items or scroll', 'view', None,
-             'kde-mouse-pointer', True, ''),
-            ('viewzoomgraph', 'Zoom into graph', 'Zoom graph',
-             'view', None, 'veusz-zoom-graph',
-             True, '')
-            ]
+        if hasattr(parent, 'actions'):
+            # share actions with parent if possible
+            # as plot windows can be isolated from mainwindows, we need this
+            self.actions = actions = parent.actions
+        else:
+            self.actions = actions = {}
 
-        menus = None
-        if menu is not None:
-            menus = {}
-            menus['view'] = menu
+        a = utils.makeAction
+        self.actions.update({
+                'view.zoomin':
+                    a(self, 'Zoom into the plot', 'Zoom &In',
+                      self.slotViewZoomIn,
+                      icon='kde-zoom-in', key='Ctrl++'),
+                'view.zoomout':
+                    a(self, 'Zoom out of the plot', 'Zoom &Out',
+                      self.slotViewZoomOut,
+                      icon='kde-zoom-out', key='Ctrl+-'),
+                'view.zoom11':
+                    a(self, 'Restore plot to natural size', 'Zoom 1:1',
+                      self.slotViewZoom11,
+                      icon='kde-zoom-1-veuszedit', key='Ctrl+1'),
+                'view.zoomwidth':
+                    a(self, 'Zoom plot to show whole width', 'Zoom to width',
+                      self.slotViewZoomWidth,
+                      icon='kde-zoom-width-veuszedit'),
+                'view.zoomheight':
+                    a(self, 'Zoom plot to show whole height', 'Zoom to height',
+                      self.slotViewZoomHeight,
+                      icon='kde-zoom-height-veuszedit'),
+                'view.zoompage':
+                    a(self, 'Zoom plot to show whole page', 'Zoom to page',
+                      self.slotViewZoomPage,
+                      icon='kde-zoom-page-veuszedit'),
+                'view.prevpage':
+                    a(self, 'Move to the previous page', '&Previous page',
+                      self.slotViewPreviousPage,
+                      icon='kde-go-previous', key='Ctrl+PgUp'),
+                'view.nextpage':
+                    a(self, 'Move to the next page', '&Next page',
+                      self.slotViewNextPage,
+                      icon='kde-go-next', key='Ctrl+PgDown'),
+                'view.select':
+                    a(self, 'Select items from the graph or scroll',
+                      'Select items or scroll',
+                      None,
+                      icon='kde-mouse-pointer'),
+                'view.zoomgraph':
+                    a(self, 'Zoom into graph', 'Zoom graph',
+                      None,
+                      icon='veusz-zoom-graph'),
+                })
 
-        self.viewactions = utils.populateMenuToolbars(items, self.viewtoolbar,
-                                                      menus)
+        if menu:
+            # only construct menu if required
+            menuitems = [
+                ('view', '', [
+                        'view.zoomin', 'view.zoomout',
+                        'view.zoom11', 'view.zoomwidth',
+                        'view.zoomheight', 'view.zoompage',
+                        '',
+                        'view.prevpage', 'view.nextpage',
+                        'view.select', 'view.zoomgraph',
+                        ]),
+                ]
+            utils.constructMenus(menu, {'view': menu}, menuitems,
+                                 actions)
+
+        # add items to toolbar
+        utils.addToolbarActions(self.viewtoolbar, actions,
+                                ('view.prevpage', 'view.nextpage',
+                                 'view.select', 'view.zoomgraph'))
 
         # a button for the zoom icon
         zoomtb = qt4.QToolButton(self.viewtoolbar)
@@ -294,22 +327,22 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # drop down zoom button on toolbar
         zoompop = qt4.QMenu(zoomtb)
-        for act in ('viewzoomin', 'viewzoomout', 'viewzoom11',
-                    'viewzoomwidth', 'viewzoomheight', 'viewzoompage'):
-            zoompop.addAction(self.viewactions[act])
+        for act in ('view.zoomin', 'view.zoomout', 'view.zoom11',
+                    'view.zoomwidth', 'view.zoomheight', 'view.zoompage'):
+            zoompop.addAction(actions[act])
         zoomtb.setMenu(zoompop)
         zoomtb.setPopupMode(qt4.QToolButton.InstantPopup)
         self.viewtoolbar.addWidget(zoomtb)
 
         # define action group for various different selection models
-        g = self.selectactiongrp = qt4.QActionGroup(self)
-        g.setExclusive(True)
-        for a in [self.viewactions[i] for i in
-                  ('viewselect', 'viewzoomgraph')]:
-            a.setActionGroup(g)
-            a.setCheckable(True)
-        self.viewactions['viewselect'].setChecked(True)
-        self.connect(g, qt4.SIGNAL('triggered(QAction*)'), self.slotSelectMode)
+        grp = self.selectactiongrp = qt4.QActionGroup(self)
+        grp.setExclusive(True)
+        for a in ('view.select', 'view.zoomgraph'):
+            actions[a].setActionGroup(grp)
+            actions[a].setCheckable(True)
+        actions['view.select'].setChecked(True)
+        self.connect( grp, qt4.SIGNAL('triggered(QAction*)'),
+                      self.slotSelectMode )
 
         return self.viewtoolbar
 
@@ -646,11 +679,11 @@ class PlotWindow( qt4.QGraphicsView ):
         menu = self.contextmenu = qt4.QMenu(self)
 
         # add some useful entries
-        menu.addAction( self.viewactions['viewzoomin'] )
-        menu.addAction( self.viewactions['viewzoomout'] )
+        menu.addAction( self.actions['view.zoomin'] )
+        menu.addAction( self.actions['view.zoomout'] )
         menu.addSeparator()
-        menu.addAction( self.viewactions['viewprevpage'] )
-        menu.addAction( self.viewactions['viewnextpage'] )
+        menu.addAction( self.actions['view.prevpage'] )
+        menu.addAction( self.actions['view.nextpage'] )
         menu.addSeparator()
 
         # update NOW!
@@ -668,7 +701,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self._intfuncs = []
 
         # bind interval options to actions
-        for intv, text in itertools.izip(self.intervals, inttext):
+        for intv, text in izip(self.intervals, inttext):
             act = intgrp.addAction(text)
             act.setCheckable(True)
             fn = utils.BoundCaller(self.actionSetTimeout, intv)
@@ -803,16 +836,16 @@ class PlotWindow( qt4.QGraphicsView ):
         """Update page number when the plot window says so."""
 
         # disable previous and next page actions
-        if self.viewactions is not None:
+        if self.actions is not None:
             np = self.document.getNumberPages()
-            self.viewactions['viewprevpage'].setEnabled(self.pagenumber != 0)
-            self.viewactions['viewnextpage'].setEnabled(self.pagenumber < np-1)
+            self.actions['view.prevpage'].setEnabled(self.pagenumber != 0)
+            self.actions['view.nextpage'].setEnabled(self.pagenumber < np-1)
 
     def slotSelectMode(self, action):
         """Called when the selection mode has changed."""
 
-        modecnvt = { self.viewactions['viewselect'] : 'select',
-                     self.viewactions['viewzoomgraph'] : 'graphzoom' }
+        modecnvt = { self.actions['view.select'] : 'select',
+                     self.actions['view.zoomgraph'] : 'graphzoom' }
         
         # convert action into clicking mode
         self.clickmode = modecnvt[action]
