@@ -225,15 +225,15 @@ class MainWindow(qt4.QMainWindow):
         undotext = 'Undo'
         if canundo:
             undotext = "%s %s" % (undotext, self.document.historyundo[-1].descr)
-        self.actions['edit.undo'].setText(undotext)
-        self.actions['edit.undo'].setEnabled(canundo)
+        self.vzactions['edit.undo'].setText(undotext)
+        self.vzactions['edit.undo'].setEnabled(canundo)
         
         canredo = self.document.canRedo()
         redotext = 'Redo'
         if canredo:
             redotext = "%s %s" % (redotext, self.document.historyredo[-1].descr)
-        self.actions['edit.redo'].setText(redotext)
-        self.actions['edit.redo'].setEnabled(canredo)
+        self.vzactions['edit.redo'].setText(redotext)
+        self.vzactions['edit.redo'].setEnabled(canredo)
         
     def slotEditUndo(self):
         """Undo the previous operation"""
@@ -266,7 +266,7 @@ class MainWindow(qt4.QMainWindow):
 
         # these are actions for main menu toolbars and menus
         a = utils.makeAction
-        self.actions = {
+        self.vzactions = {
             'file.new':
                 a(self, 'New document', '&New',
                   self.slotFileNew,
@@ -378,7 +378,8 @@ class MainWindow(qt4.QMainWindow):
         toolbaractions = ('file.new', 'file.open', 'file.save',
                           'file.print', 'file.export',
                           'data.import')
-        utils.addToolbarActions(self.maintoolbar, self.actions, toolbaractions)
+        utils.addToolbarActions(self.maintoolbar, self.vzactions,
+                                toolbaractions)
 
         # menu structure
         filemenu = [
@@ -430,7 +431,7 @@ class MainWindow(qt4.QMainWindow):
             ]
 
         self.menus = {}
-        utils.constructMenus(self.menuBar(), self.menus, menus, self.actions)
+        utils.constructMenus(self.menuBar(), self.menus, menus, self.vzactions)
 
     def defineViewWindowMenu(self):
         """Setup View -> Window menu."""
@@ -453,7 +454,7 @@ class MainWindow(qt4.QMainWindow):
                          (self.treeedit.addtoolbar, 'view.addtool'),
                          (self.plot.viewtoolbar, 'view.viewtool')):
 
-            a = self.actions[act]
+            a = self.vzactions[act]
             fn = viewHideWindow(win)
             self.viewwinfns.append( (win, a, fn) )
             self.connect(a, qt4.SIGNAL('triggered()'), fn)
@@ -1046,7 +1047,7 @@ class MainWindow(qt4.QMainWindow):
         """Disable certain actions if document is not modified."""
 
         # enable/disable file, save menu item
-        self.actions['file.save'].setEnabled(ismodified)
+        self.vzactions['file.save'].setEnabled(ismodified)
 
     def slotFileClose(self):
         """File close window chosen."""

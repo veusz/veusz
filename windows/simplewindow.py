@@ -32,6 +32,7 @@ class SimpleWindow(qt4.QMainWindow):
 
     def __init__(self, title, doc=None):
         qt4.QMainWindow.__init__(self)
+
         self.setWindowTitle(title)
 
         self.document = doc

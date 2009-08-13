@@ -168,6 +168,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.controlgraphs = []
         self.widgetcontrolgraphs = {}
         self.selwidget = None
+        self.vzactions = None
 
         # zoom rectangle for zooming into graph (not shown normally)
         self.zoomrect = self.scene.addRect( 0, 0, 100, 100,
@@ -248,15 +249,15 @@ class PlotWindow( qt4.QGraphicsView ):
         self.viewtoolbar.hide()
         parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
 
-        if hasattr(parent, 'actions'):
+        if hasattr(parent, 'vzactions'):
             # share actions with parent if possible
             # as plot windows can be isolated from mainwindows, we need this
-            self.actions = actions = parent.actions
+            self.vzactions = actions = parent.vzactions
         else:
-            self.actions = actions = {}
+            self.vzactions = actions = {}
 
         a = utils.makeAction
-        self.actions.update({
+        actions.update({
                 'view.zoomin':
                     a(self, 'Zoom into the plot', 'Zoom &In',
                       self.slotViewZoomIn,
@@ -679,11 +680,11 @@ class PlotWindow( qt4.QGraphicsView ):
         menu = self.contextmenu = qt4.QMenu(self)
 
         # add some useful entries
-        menu.addAction( self.actions['view.zoomin'] )
-        menu.addAction( self.actions['view.zoomout'] )
+        menu.addAction( self.vzactions['view.zoomin'] )
+        menu.addAction( self.vzactions['view.zoomout'] )
         menu.addSeparator()
-        menu.addAction( self.actions['view.prevpage'] )
-        menu.addAction( self.actions['view.nextpage'] )
+        menu.addAction( self.vzactions['view.prevpage'] )
+        menu.addAction( self.vzactions['view.nextpage'] )
         menu.addSeparator()
 
         # update NOW!
@@ -836,16 +837,16 @@ class PlotWindow( qt4.QGraphicsView ):
         """Update page number when the plot window says so."""
 
         # disable previous and next page actions
-        if self.actions is not None:
+        if self.vzactions is not None:
             np = self.document.getNumberPages()
-            self.actions['view.prevpage'].setEnabled(self.pagenumber != 0)
-            self.actions['view.nextpage'].setEnabled(self.pagenumber < np-1)
+            self.vzactions['view.prevpage'].setEnabled(self.pagenumber != 0)
+            self.vzactions['view.nextpage'].setEnabled(self.pagenumber < np-1)
 
     def slotSelectMode(self, action):
         """Called when the selection mode has changed."""
 
-        modecnvt = { self.actions['view.select'] : 'select',
-                     self.actions['view.zoomgraph'] : 'graphzoom' }
+        modecnvt = { self.vzactions['view.select'] : 'select',
+                     self.vzactions['view.zoomgraph'] : 'graphzoom' }
         
         # convert action into clicking mode
         self.clickmode = modecnvt[action]

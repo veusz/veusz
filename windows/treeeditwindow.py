@@ -595,7 +595,7 @@ class TreeEditDock(qt4.QDockWidget):
         for act in ('edit.cut', 'edit.copy', 'edit.paste',
                     'edit.moveup', 'edit.movedown', 'edit.delete',
                     'edit.rename'):
-            m.addAction(self.actions[act])
+            m.addAction(self.vzactions[act])
 
         # allow show or hides of selected widget
         if self.selwidget and 'hide' in self.selwidget.settings:
@@ -638,14 +638,14 @@ class TreeEditDock(qt4.QDockWidget):
             while w is not None and not wc.willAllowParent(w):
                 w = w.parent
 
-            self.actions['add.%s' % wc.typename].setEnabled(w is not None)
+            self.vzactions['add.%s' % wc.typename].setEnabled(w is not None)
 
         # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
 
         for act in ('edit.cut', 'edit.copy', 'edit.delete',
                     'edit.moveup', 'edit.movedown', 'edit.rename'):
-            self.actions[act].setEnabled(isnotroot)
+            self.vzactions[act].setEnabled(isnotroot)
 
         self.updatePasteButton()
 
@@ -656,7 +656,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.edittoolbar.setIconSize( qt4.QSize(24, 24) )
 
         self.addslots = {}
-        self.actions = actions = self.parent.actions
+        self.vzactions = actions = self.parent.vzactions
         for widgettype in ('page', 'grid', 'graph', 'axis',
                            'xy', 'bar', 'fit', 'function',
                            'image', 'contour',
@@ -844,7 +844,7 @@ class TreeEditDock(qt4.QDockWidget):
             if self.getSuitableParent(widgettype, self.selwidget):
                 show = True
 
-        self.actions['edit.paste'].setEnabled(show)
+        self.vzactions['edit.paste'].setEnabled(show)
 
     def doInitialWidgetSelect(self):
         """Select a sensible initial widget."""
