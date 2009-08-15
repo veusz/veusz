@@ -283,7 +283,7 @@ class PlotWindow( qt4.QGraphicsView ):
                       self.slotViewZoomPage,
                       icon='kde-zoom-page-veuszedit'),
                 'view.zoommenu':
-                    a(self, 'Zoom functions menu', 'Zoom functions',
+                    a(self, 'Zoom functions menu', 'Zoom',
                       self.doZoomMenuButton,
                       icon='kde-zoom-veuszedit'),
                 'view.prevpage':
@@ -702,8 +702,7 @@ class PlotWindow( qt4.QGraphicsView ):
         menu = self.contextmenu = qt4.QMenu(self)
 
         # add some useful entries
-        menu.addAction( self.vzactions['view.zoomin'] )
-        menu.addAction( self.vzactions['view.zoomout'] )
+        menu.addAction( self.vzactions['view.zoommenu'] )
         menu.addSeparator()
         menu.addAction( self.vzactions['view.prevpage'] )
         menu.addAction( self.vzactions['view.nextpage'] )

@@ -704,18 +704,21 @@ class TreeEditDock(qt4.QDockWidget):
                 'edit.rename':
                     a(self, 'Renames the selected item', '&Rename',
                       self.slotWidgetRename,
-                      icon='kde-edit-rename')
+                      icon='kde-edit-rename'),
+
+                'add.shapemenu':
+                    a(self, 'Add a shape to the plot', 'Shape',
+                      self.slotShowShapeMenu,
+                      icon='veusz-shape-menu'),
                 })
 
-        # add actions to toolbar to create widgets
+        # add actions to menus for adding widgets and editing
         addact = [('add.'+w) for w in 
                   ('page', 'grid', 'graph', 'axis',
                    'xy', 'bar', 'fit', 'function',
                    'image', 'contour',
                    'key', 'label', 'colorbar')]
-        utils.addToolbarActions(self.addtoolbar, actions, addact)
 
-        # add actions to menus for adding widgets and editing
         menuitems = [
             ('insert', '', addact + [
                     ['insert.shape', 'Add shape',
@@ -733,13 +736,12 @@ class TreeEditDock(qt4.QDockWidget):
                               actions )
 
         # create shape toolbar button
-        shapetb = qt4.QToolButton()
-        shapetb.setIcon( utils.getIcon("veusz-shape-menu") )
-        shapetb.setToolTip("Draw shapes on plot or page")
-        shapetb.setPopupMode(qt4.QToolButton.InstantPopup)
         # attach menu to insert shape button
-        shapetb.setMenu(self.parent.menus['insert.shape'])
-        self.addtoolbar.addWidget(shapetb)
+        actions['add.shapemenu'].setMenu(self.parent.menus['insert.shape'])
+
+        # add actions to toolbar to create widgets
+        utils.addToolbarActions(self.addtoolbar, actions,
+                                addact + ['add.shapemenu'])
 
         # add action to toolbar for editing
         utils.addToolbarActions(self.edittoolbar,  actions,
@@ -750,6 +752,10 @@ class TreeEditDock(qt4.QDockWidget):
     def slotMakeWidgetButton(self, wc):
         """User clicks button to make widget."""
         self.makeWidget(wc.typename)
+
+    def slotShowShapeMenu(self):
+        a = self.vzactions['add.shapemenu']
+        a.menu().popup( qt4.QCursor.pos() )
 
     def makeWidget(self, widgettype, autoadd=True, name=None):
         """Called when an add widget button is clicked.
