@@ -282,6 +282,10 @@ class PlotWindow( qt4.QGraphicsView ):
                     a(self, 'Zoom plot to show whole page', 'Zoom to page',
                       self.slotViewZoomPage,
                       icon='kde-zoom-page-veuszedit'),
+                'view.zoommenu':
+                    a(self, 'Zoom functions menu', 'Zoom functions',
+                      self.doZoomMenuButton,
+                      icon='kde-zoom-veuszedit'),
                 'view.prevpage':
                     a(self, 'Move to the previous page', '&Previous page',
                       self.slotViewPreviousPage,
@@ -316,24 +320,27 @@ class PlotWindow( qt4.QGraphicsView ):
             utils.constructMenus(menu, {'view': menu}, menuitems,
                                  actions)
 
+        # populate menu on zoom menu toolbar icon
+        zoommenu = qt4.QMenu(self)
+        zoomag = qt4.QActionGroup(self)
+        for act in ('view.zoomin', 'view.zoomout', 'view.zoom11',
+                    'view.zoomwidth', 'view.zoomheight', 'view.zoompage'):
+            a = actions[act]
+            zoommenu.addAction(a)
+            zoomag.addAction(a)
+            a.vzname = act
+        actions['view.zoommenu'].setMenu(zoommenu)
+        self.connect(zoomag, qt4.SIGNAL('triggered(QAction*)'),
+                     self.zoomActionTriggered)
+
+        lastzoom = setting.settingdb.get('view_defaultzoom', 'view.zoompage')
+        self.updateZoomMenuButton(actions[lastzoom])
+
         # add items to toolbar
         utils.addToolbarActions(self.viewtoolbar, actions,
                                 ('view.prevpage', 'view.nextpage',
-                                 'view.select', 'view.zoomgraph'))
-
-        # a button for the zoom icon
-        zoomtb = qt4.QToolButton(self.viewtoolbar)
-        zoomtb.setIcon( utils.getIcon('kde-zoom-veuszedit') )
-        zoomtb.setToolTip("Zoom in or out of the page")
-
-        # drop down zoom button on toolbar
-        zoompop = qt4.QMenu(zoomtb)
-        for act in ('view.zoomin', 'view.zoomout', 'view.zoom11',
-                    'view.zoomwidth', 'view.zoomheight', 'view.zoompage'):
-            zoompop.addAction(actions[act])
-        zoomtb.setMenu(zoompop)
-        zoomtb.setPopupMode(qt4.QToolButton.InstantPopup)
-        self.viewtoolbar.addWidget(zoomtb)
+                                 'view.select', 'view.zoomgraph',
+                                 'view.zoommenu'))
 
         # define action group for various different selection models
         grp = self.selectactiongrp = qt4.QActionGroup(self)
@@ -346,6 +353,21 @@ class PlotWindow( qt4.QGraphicsView ):
                       self.slotSelectMode )
 
         return self.viewtoolbar
+
+    def zoomActionTriggered(self, action):
+        """Keep track of the last zoom action selected."""
+        setting.settingdb['view_defaultzoom'] = action.vzname
+        self.updateZoomMenuButton(action)
+
+    def updateZoomMenuButton(self, action):
+        """Make zoom button call default zoom action and change icon."""
+        menuact = self.vzactions['view.zoommenu']
+        setting.settingdb['view_defaultzoom'] = action.vzname
+        menuact.setIcon( action.icon() )
+
+    def doZoomMenuButton(self):
+        act = self.vzactions[setting.settingdb['view_defaultzoom']]
+        act.emit(qt4.SIGNAL('triggered()'))
 
     def doZoomRect(self, endpos):
         """Take the zoom rectangle drawn by the user and do the zooming.
