@@ -374,7 +374,8 @@ class MainWindow(qt4.QMainWindow):
 
         # create main toolbar
         tb = self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
-        tb.setIconSize(qt4.QSize(22, 22))
+        iconsize = setting.settingdb['toolbar_size']
+        tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
         utils.addToolbarActions(tb, self.vzactions, 
@@ -383,7 +384,7 @@ class MainWindow(qt4.QMainWindow):
 
         # data toolbar
         tb = self.datatoolbar = qt4.QToolBar("Data toolbar - Veusz", self)
-        tb.setIconSize(qt4.QSize(22, 22))
+        tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszdatatoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
         utils.addToolbarActions(tb, self.vzactions,

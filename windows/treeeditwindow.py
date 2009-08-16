@@ -652,8 +652,9 @@ class TreeEditDock(qt4.QDockWidget):
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
-        self.addtoolbar.setIconSize( qt4.QSize(24, 24) )
-        self.edittoolbar.setIconSize( qt4.QSize(24, 24) )
+        iconsize = setting.settingdb['toolbar_size']
+        self.addtoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
+        self.edittoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
 
         self.addslots = {}
         self.vzactions = actions = self.parent.vzactions

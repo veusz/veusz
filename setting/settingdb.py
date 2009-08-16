@@ -51,6 +51,9 @@ defaultValues = {
     'color_command': (True, 'blue'),
     'color_cntrlline': (True, 'blue'),
     'color_cntrlcorner': (True, 'black'),
+
+    # further ui options
+    'toolbar_size': 24,
     }
 
 class _SettingDB(object):

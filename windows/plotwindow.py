@@ -245,7 +245,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
         self.viewtoolbar = qt4.QToolBar("View toolbar - Veusz", parent)
         self.viewtoolbar.setObjectName('veuszviewtoolbar')
-        self.viewtoolbar.setIconSize(qt4.QSize(22,22))
+        iconsize = setting.settingdb['toolbar_size']
+        self.viewtoolbar.setIconSize(qt4.QSize(iconsize, iconsize))
         self.viewtoolbar.hide()
         parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
 

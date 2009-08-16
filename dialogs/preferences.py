@@ -47,6 +47,11 @@ class PreferencesDialog(qt4.QDialog):
             setting.settingdb['plot_updateinterval'])
         self.intervalCombo.setCurrentIndex(index)
 
+        # set icon size
+        self.iconSizeCombo.setCurrentIndex(
+            self.iconSizeCombo.findText(
+                str(setting.settingdb['toolbar_size'])))
+
         # set export dpi
         self.exportDPI.setValidator( qt4.QIntValidator(10, 10000, self) )
         self.exportDPI.setEditText( str(setting.settingdb['export_DPI']) )
@@ -131,6 +136,14 @@ class PreferencesDialog(qt4.QDialog):
         setting.settingdb['plot_updateinterval'] = (
             self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
         setting.settingdb['plot_antialias'] = self.antialiasCheck.isChecked()
+
+        # update icon size if necessary
+        iconsize = int( self.iconSizeCombo.currentText() )
+        if iconsize != setting.settingdb['toolbar_size']:
+            setting.settingdb['toolbar_size'] = iconsize
+            for widget in self.parent().children(): # find toolbars
+                if isinstance(widget, qt4.QToolBar):
+                    widget.setIconSize( qt4.QSize(iconsize, iconsize) )
 
         # update dpi if possible
         try:
