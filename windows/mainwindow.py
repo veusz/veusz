@@ -258,12 +258,6 @@ class MainWindow(qt4.QMainWindow):
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
 
-        # create toolbar
-        self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
-        self.maintoolbar.setIconSize(qt4.QSize(22, 22))
-        self.maintoolbar.setObjectName('veuszmaintoolbar')
-        self.addToolBar(qt4.Qt.TopToolBarArea, self.maintoolbar)
-
         # these are actions for main menu toolbars and menus
         a = utils.makeAction
         self.vzactions = {
@@ -332,6 +326,9 @@ class MainWindow(qt4.QMainWindow):
             'view.maintool':
                 a(self, 'Show or hide main toolbar', 'Main toolbar',
                   None, checkable=True),
+            'view.datatool':
+                a(self, 'Show or hide data toolbar', 'Data toolbar',
+                  None, checkable=True),
             'view.viewtool':
                 a(self, 'Show or hide view toolbar', 'View toolbar',
                   None, checkable=True),
@@ -347,13 +344,13 @@ class MainWindow(qt4.QMainWindow):
                   self.slotDataImport, icon='kde-vzdata-import'),
             'data.edit':
                 a(self, 'Edit existing datasets', '&Edit...',
-                  self.slotDataEdit, icon='kde-edit'),
+                  self.slotDataEdit, icon='kde-edit-veuszedit'),
             'data.create':
                 a(self, 'Create new datasets', '&Create...',
-                  self.slotDataCreate, icon='kde-document-new'),
+                  self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
             'data.create2d':
                 a(self, 'Create new 2D datasets', 'Create &2D...',
-                  self.slotDataCreate2D, icon='kde-document-new'),
+                  self.slotDataCreate2D, icon='kde-dataset2d-new-veuszedit'),
             'data.capture':
                 a(self, 'Capture remote data', 'Ca&pture...',
                   self.slotDataCapture, icon='veusz-capture-data'),
@@ -375,11 +372,24 @@ class MainWindow(qt4.QMainWindow):
                   self.slotHelpAbout, icon='veusz')
             }
 
-        toolbaractions = ('file.new', 'file.open', 'file.save',
-                          'file.print', 'file.export',
-                          'data.import')
-        utils.addToolbarActions(self.maintoolbar, self.vzactions,
-                                toolbaractions)
+        # create main toolbar
+        tb = self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
+        tb.setIconSize(qt4.QSize(22, 22))
+        tb.setObjectName('veuszmaintoolbar')
+        self.addToolBar(qt4.Qt.TopToolBarArea, tb)
+        utils.addToolbarActions(tb, self.vzactions, 
+                                ('file.new', 'file.open', 'file.save',
+                                 'file.print', 'file.export'))
+
+        # data toolbar
+        tb = self.datatoolbar = qt4.QToolBar("Data toolbar - Veusz", self)
+        tb.setIconSize(qt4.QSize(22, 22))
+        tb.setObjectName('veuszdatatoolbar')
+        self.addToolBar(qt4.Qt.TopToolBarArea, tb)
+        utils.addToolbarActions(tb, self.vzactions,
+                                ('data.import', 'data.edit',
+                                 'data.create', 'data.capture',
+                                 'data.reload'))
 
         # menu structure
         filemenu = [
@@ -450,6 +460,7 @@ class MainWindow(qt4.QMainWindow):
                          (self.formatdock, 'view.format'),
                          (self.console, 'view.console'),
                          (self.maintoolbar, 'view.maintool'),
+                         (self.datatoolbar, 'view.datatool'),
                          (self.treeedit.edittoolbar, 'view.edittool'),
                          (self.treeedit.addtoolbar, 'view.addtool'),
                          (self.plot.viewtoolbar, 'view.viewtool')):
