@@ -468,14 +468,19 @@ class PointPlotter(GenericPlotter):
         yp = y + height/2
         xpts = [x-width, x+width/2, x+2*width]
         ypts = [yp, yp, yp]
+
+        # size of error bars in key
+        errorsize = height*0.4
+
+        # make points for error bars (if any)
         if xv and xv.hasErrors():
-            xneg = [x-width, x+width/2-size*2, x+2*width]
-            xpos = [x-width, x+width/2+size*2, x+2*width]
+            xneg = [x-width, x+width/2-errorsize, x+2*width]
+            xpos = [x-width, x+width/2+errorsize, x+2*width]
         else:
             xneg = xpos = xpts
         if yv and yv.hasErrors():
-            yneg = [yp-size*2, yp-size*2, yp-size*2]
-            ypos = [yp+size*2, yp+size*2, yp+size*2]
+            yneg = [yp-errorsize, yp-errorsize, yp-errorsize]
+            ypos = [yp+errorsize, yp+errorsize, yp+errorsize]
         else:
             yneg = ypos = ypts
 
