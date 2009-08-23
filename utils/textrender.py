@@ -185,6 +185,16 @@ class Part:
         for p in self.children:
             p.render(state)
 
+    def getPixelsPerPt(self, state):
+        """Return number of pixels per point in the rendering."""
+        painter = state.painter
+        pixperpt = painter.device().logicalDpiY() / 72.
+        try:
+            pixperpt *= painter.veusz_scaling
+        except AttributeError:
+            pass
+        return pixperpt
+
 class PartText(Part):
     """Fundamental bit of text to be rendered: some text."""
     def __init__(self, text):
@@ -334,11 +344,11 @@ class PartFrac(Part):
         painter.setFont(font)
         height = qt4.QFontMetricsF(font, painter.device()).ascent()
 
-        # draw line between lines with 1pt thickness
+        # draw line between lines with 0.5pt thickness
         painter.save()
-        pixperpt = painter.device().logicalDpiY() / 72.
         pen = painter.pen()
-        pen.setWidthF(pixperpt)
+        painter.setPen( qt4.QPen(painter.pen().brush(),
+                                 self.getPixelsPerPt(state)*0.5) )
         painter.setPen(pen)
 
         painter.drawLine(qt4.QPointF(initx,
@@ -481,20 +491,43 @@ class PartBar(Part):
         # draw material under bar
         Part.render(self, state)
 
-        # draw line over text with 1pt thickness
+        # draw line over text with 0.5pt thickness
         painter = state.painter
-        m = qt4.QFontMetricsF(state.font, painter.device())
-        height = m.ascent()
+        height = qt4.QFontMetricsF(state.font, painter.device()).ascent()
 
         painter.save()
-        pixperpt = painter.device().logicalDpiY() / 72.
         pen = painter.pen()
-        pen.setWidthF(pixperpt)
-        painter.setPen(pen)
+        penw = self.getPixelsPerPt(state)*0.5
+        painter.setPen( qt4.QPen(painter.pen().brush(), penw) )
         painter.drawLine(qt4.QPointF(initx,
-                                     state.y-height),
+                                     state.y-height+penw),
                          qt4.QPointF(state.x,
-                                     state.y-height))
+                                     state.y-height+penw))
+        painter.restore()
+
+class PartDot(Part):
+    """Draw a dot over text."""
+
+    def render(self, state):
+        initx = state.x
+
+        # draw material under bar
+        Part.render(self, state)
+
+        # draw circle over text with 1pt radius
+        painter = state.painter
+        height = qt4.QFontMetricsF(state.font, painter.device()).ascent()
+
+        painter.save()
+        circsize = self.getPixelsPerPt(state)
+        painter.setBrush( qt4.QBrush(painter.pen().color()) )
+        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+
+        x = 0.5*(initx + state.x)
+        y = state.y-height + circsize
+        painter.drawEllipse( qt4.QRectF(
+                qt4.QPointF(x-circsize,y-circsize),
+                qt4.QPointF(x+circsize,y+circsize)) )
         painter.restore()
 
 # a dict of latex commands, the part object they correspond to,
@@ -512,6 +545,7 @@ part_commands = {
     r'\size': (PartSize, 2),
     r'\frac': (PartFrac, 2),
     r'\bar': (PartBar, 1),
+    r'\dot': (PartDot, 1),
     }
 
 # split up latex expression into bits
