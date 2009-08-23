@@ -338,7 +338,6 @@ class PartFrac(Part):
         painter.save()
         pixperpt = painter.device().logicalDpiY() / 72.
         pen = painter.pen()
-        oldwidth = pen.widthF()
         pen.setWidthF(pixperpt)
         painter.setPen(pen)
 
@@ -473,6 +472,31 @@ class PartSize(Part):
         font.setPointSizeF(oldsize)
         state.painter.setFont(font)
 
+class PartBar(Part):
+    """Draw a bar over text."""
+
+    def render(self, state):
+        initx = state.x
+
+        # draw material under bar
+        Part.render(self, state)
+
+        # draw line over text with 1pt thickness
+        painter = state.painter
+        m = qt4.QFontMetricsF(state.font, painter.device())
+        height = m.ascent()
+
+        painter.save()
+        pixperpt = painter.device().logicalDpiY() / 72.
+        pen = painter.pen()
+        pen.setWidthF(pixperpt)
+        painter.setPen(pen)
+        painter.drawLine(qt4.QPointF(initx,
+                                     state.y-height),
+                         qt4.QPointF(state.x,
+                                     state.y-height))
+        painter.restore()
+
 # a dict of latex commands, the part object they correspond to,
 # and the number of arguments
 part_commands = {
@@ -486,7 +510,8 @@ part_commands = {
     r'\textit': (PartItalic, 1),
     r'\font': (PartFont, 2),
     r'\size': (PartSize, 2),
-    r'\frac': (PartFrac, 2)
+    r'\frac': (PartFrac, 2),
+    r'\bar': (PartBar, 1),
     }
 
 # split up latex expression into bits
