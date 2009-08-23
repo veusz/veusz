@@ -148,12 +148,12 @@ class FreePlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         s = self.settings
-        s.add( setting.DatasetOrFloatList('xPos', 0.5,
+        s.add( setting.DatasetOrFloatList('xPos', [0.5],
                                           descr='List of fractional X '
                                           'coordinates or dataset',
                                           usertext='X positions',
                                           formatting=False) )
-        s.add( setting.DatasetOrFloatList('yPos', 0.5,
+        s.add( setting.DatasetOrFloatList('yPos', [0.5],
                                           descr='List of fractional Y '
                                           'coordinates or dataset',
                                           usertext='Y positions',
