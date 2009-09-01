@@ -29,6 +29,8 @@ import time
 import os.path
 import threading
 import dates
+import codecs
+import csv
 
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
@@ -555,3 +557,67 @@ class NonBlockingReaderThread(threading.Thread):
             self.lock.acquire()
             self.data += data
             self.lock.release()
+
+# standard python encodings
+encodings = [
+    'ascii', 'big5hkscs', 'big5', 'charmap', 'cp037', 'cp424',
+    'cp437', 'cp500', 'cp737', 'cp775', 'cp850', 'cp852', 'cp855',
+    'cp856', 'cp857', 'cp860', 'cp861', 'cp862', 'cp863', 'cp864',
+    'cp865', 'cp866', 'cp869', 'cp874', 'cp875', 'cp932', 'cp949',
+    'cp950', 'cp1006', 'cp1026', 'cp1140','cp1250', 'cp1251', 'cp1252',
+    'cp1253', 'cp1254', 'cp1255', 'cp1256', 'cp1257', 'cp1258',
+    'euc_jis_2004', 'euc_jisx0213', 'euc_jp', 'euc_kr', 'gb18030', 'gb2312',
+    'gbk', 'hp_roman8', 'hz', 'iso2022_jp_1', 'iso2022_jp_2004',
+    'iso2022_jp_2', 'iso2022_jp_3', 'iso2022_jp_ext', 'iso2022_jp',
+    'iso2022_kr', 'iso8859_10', 'iso8859_11', 'iso8859_13', 'iso8859_14',
+    'iso8859_15', 'iso8859_16', 'iso8859_1', 'iso8859_2', 'iso8859_3',
+    'iso8859_4', 'iso8859_5', 'iso8859_6', 'iso8859_7', 'iso8859_8',
+    'iso8859_9', 'johab', 'koi8_r', 'koi8_u', 'latin_1', 'mac_arabic',
+    'mac_centeuro', 'mac_croatian', 'mac_cyrillic', 'mac_farsi', 'mac_greek',
+    'mac_iceland', 'mac_latin2', 'mac_romanian', 'mac_roman', 'mac_turkish',
+    'ptcp154', 'shift_jis_2004', 'shift_jis', 'shift_jisx0213',
+    'tis_620','utf_16_be', 'utf_16_le', 'utf_16',
+    'utf_32_be', 'utf_32_le', 'utf_32', 'utf_7', 'utf_8', 'utf_8_sig'
+    ]
+
+def openEncoding(filename, encoding, mode='r'):
+    """Convenience function for opening file with encoding given."""
+    return codecs.open(filename, mode, encoding, 'ignore')
+
+
+# The following two classes are adapted from the Python documentation
+# they are modified to turn off encoding errors
+
+class UTF8Recoder:
+    """
+    Iterator that reads an encoded stream and reencodes the input to UTF-8
+    """
+    def __init__(self, f, encoding):
+        self.reader = codecs.getreader(encoding)(f, errors='ignore')
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        line = self.reader.next()
+        return line.encode("utf-8")
+
+class UnicodeCSVReader:
+    """
+    A CSV reader which will iterate over lines in the CSV file "f",
+    which is encoded in the given encoding.
+    """
+
+    def __init__(self, f, dialect=csv.excel, encoding='utf-8', **kwds):
+        f = UTF8Recoder(f, encoding)
+        self.reader = csv.reader(f, dialect=dialect, **kwds)
+
+    def next(self):
+        row = self.reader.next()
+        return [unicode(s, 'utf-8') for s in row]
+
+    def __iter__(self):
+        return self
+
+# End python doc classes
+

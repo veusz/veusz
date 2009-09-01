@@ -36,7 +36,6 @@ import numpy as N
 import veusz.qtall as qt4
 
 import controls
-import settings
 from settingdb import settingdb
 from reference import Reference
 
@@ -45,7 +44,7 @@ import veusz.utils as utils
 # if invalid type passed to set
 class InvalidType(Exception):
     pass
-        
+
 class Setting(object):
     def __init__(self, name, value, descr='', usertext='',
                  formatting=False, hidden=False):

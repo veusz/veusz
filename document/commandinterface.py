@@ -369,7 +369,7 @@ class CommandInterface(qt4.QObject):
 
     def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
                      invertrows=None, invertcols=None, transpose=None,
-                     prefix="", suffix="",
+                     prefix="", suffix="", encoding='utf_8',
                      linked=False):
         """Import two-dimensional data from a file.
         filename is the name of the file to read
@@ -383,6 +383,8 @@ class CommandInterface(qt4.QObject):
         if transpose=True, then rows and columns are swapped
 
         prefix and suffix are prepended and appended to dataset names
+
+        encoding is encoding character set
 
         if linked=True then the dataset is linked to the file
         """
@@ -404,7 +406,7 @@ class CommandInterface(qt4.QObject):
             print "Imported datasets %s" % (', '.join(datasetnames))
 
     def ImportFile(self, filename, descriptor, useblocks=False, linked=False,
-                   prefix='', suffix='', ignoretext=False):
+                   prefix='', suffix='', ignoretext=False, encoding='utf_8'):
         """Read data from file with filename using descriptor.
         If linked is True, the data won't be saved in a saved document,
         the data will be reread from the file.
@@ -441,6 +443,8 @@ class CommandInterface(qt4.QObject):
         return (dsnames, errors)
 
     def ImportFileCSV(self, filename, readrows=False, prefix=None,
+                      delimiter=',', textdelimiter='"',
+                      encoding='utf_8',
                       dsprefix='', dssuffix='',
                       linked=False):
         """Read data from a comma separated file (CSV).
@@ -453,6 +457,10 @@ class CommandInterface(qt4.QObject):
          (prefix is backware compatibility only, it adds an underscore
           relative to dsprefix)
 
+        delimiter is the character for delimiting data (usually ',')
+        textdelimiter is the character surrounding text (usually '"')
+        encoding is the encoding used in the file
+
         If linked is True the data are linked with the file."""
 
         # backward compatibility
@@ -464,6 +472,8 @@ class CommandInterface(qt4.QObject):
 
         op = operations.OperationDataImportCSV(
             realfilename, readrows=readrows,
+            delimiter=delimiter, textdelimiter=textdelimiter,
+            encoding=encoding,
             prefix=dsprefix, suffix=dssuffix,
             linked=linked)
         dsnames = self.document.applyOperation(op)

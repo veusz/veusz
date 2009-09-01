@@ -648,7 +648,8 @@ class OperationDataImport(object):
     
     def __init__(self, descriptor, useblocks=False, linked=False,
                  filename=None, datastr=None,
-                 prefix="", suffix="", ignoretext=False):
+                 prefix="", suffix="", ignoretext=False,
+                 encoding="utf_8"):
         """Setup operation.
         
         descriptor is descriptor for import
@@ -658,6 +659,8 @@ class OperationDataImport(object):
         datastr is a string to read from if reading from a string
 
         prefix and suffix are strings to add before and after dataset names
+
+        encoding is file encoding character set
 
         filename and datastr are exclusive
         """
@@ -671,6 +674,7 @@ class OperationDataImport(object):
         self.prefix = prefix
         self.suffix = suffix
         self.ignoretext = ignoretext
+        self.encoding = encoding
         
     def do(self, document):
         """Import data.
@@ -680,7 +684,8 @@ class OperationDataImport(object):
         
         # open stream to import data from
         if self.filename is not None:
-            stream = simpleread.FileStream( open(self.filename,  'rU') )
+            stream = simpleread.FileStream(
+                utils.openEncoding(self.filename, self.encoding))
         elif self.datastr is not None:
             stream = simpleread.StringStream(self.datastr)
         else:
@@ -697,7 +702,8 @@ class OperationDataImport(object):
             LF = datasets.LinkedFile(self.filename, self.descriptor,
                                      useblocks=self.useblocks,
                                      prefix=self.prefix, suffix=self.suffix,
-                                     ignoretext=self.ignoretext)
+                                     ignoretext=self.ignoretext,
+                                     encoding=self.encoding)
         else:
             LF = None
 
@@ -722,7 +728,10 @@ class OperationDataImportCSV(object):
 
     descr = 'import CSV data'
 
-    def __init__(self, filename, readrows=False, prefix='', suffix='',
+    def __init__(self, filename, readrows=False,
+                 delimiter=',', textdelimiter='"',
+                 encoding='utf_8',
+                 prefix='', suffix='',
                  linked=False):
         """Import CSV data from filename
 
@@ -733,6 +742,9 @@ class OperationDataImportCSV(object):
 
         self.filename = filename
         self.readrows = readrows
+        self.delimiter = delimiter
+        self.textdelimiter = textdelimiter
+        self.encoding = encoding
         self.prefix = prefix
         self.suffix = suffix
         self.linked = linked
@@ -741,11 +753,17 @@ class OperationDataImportCSV(object):
         """Do the data import."""
         
         csvr = readcsv.ReadCSV(self.filename, readrows=self.readrows,
+                               delimiter=self.delimiter,
+                               textdelimiter=self.textdelimiter,
+                               encoding=self.encoding,
                                prefix=self.prefix, suffix=self.suffix)
         csvr.readData()
 
         if self.linked:
             LF = datasets.LinkedCSVFile(self.filename, readrows=self.readrows,
+                                        delimiter=self.delimiter,
+                                        textdelimiter=self.textdelimiter,
+                                        encoding=self.encoding,
                                         prefix=self.prefix, suffix=self.suffix)
         else:
             LF = None
@@ -773,7 +791,7 @@ class OperationDataImport2D(object):
                  filename=None, datastr=None,
                  xrange=None, yrange=None,
                  invertrows=None, invertcols=None, transpose=None,
-                 prefix="", suffix="",
+                 prefix="", suffix="", encoding='utf_8',
                  linked=False):
         """Import two-dimensional data from a file.
         filename is the name of the file to read,
@@ -789,6 +807,8 @@ class OperationDataImport2D(object):
 
         prefix and suffix are strings to add before and after dataset names
 
+        encoding is character encoding
+
         if linked=True then the dataset is linked to the file
         """
 
@@ -803,14 +823,16 @@ class OperationDataImport2D(object):
         self.prefix = prefix
         self.suffix = suffix
         self.linked = linked
-        
+        self.encoding = encoding
+
     def do(self, document):
         """Import data
         
         Returns list of datasets read."""
         
         if self.filename is not None:
-            stream = simpleread.FileStream( open(self.filename, 'rU') )
+            stream = simpleread.FileStream(
+                utils.openEncoding(self.filename, self.encoding) )
         elif self.datastr is not None:
             stream = simpleread.StringStream(self.datastr)
         else:
@@ -826,6 +848,7 @@ class OperationDataImport2D(object):
             LF.transpose = self.transpose
             LF.prefix = self.prefix
             LF.suffix = self.suffix
+            LF.encoding = self.encoding
         else:
             LF = None
 

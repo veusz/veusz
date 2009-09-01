@@ -21,9 +21,8 @@
 """This module contains routines for importing CSV data files
 in an easy-to-use manner."""
 
-import csv
-
 import datasets
+import veusz.utils as utils
 
 class _FileReaderCols(object):
     """Read a CSV file in rows. This acts as an iterator.
@@ -74,7 +73,10 @@ class _FileReaderRows(object):
 class ReadCSV(object):
     """A class to import data from CSV files."""
 
-    def __init__(self, filename, readrows=False, prefix='', suffix=''):
+    def __init__(self, filename, readrows=False, 
+                 delimiter=',', textdelimiter='"',
+                 encoding='utf_8',
+                 prefix='', suffix=''):
         """Initialise the reader to import data from filename.
 
         If readrows is True, then data are read from columns, rather than
@@ -85,6 +87,9 @@ class ReadCSV(object):
 
         self.filename = filename
         self.readrows = readrows
+        self.delimiter = delimiter
+        self.textdelimiter = textdelimiter
+        self.encoding = encoding
         self.prefix = prefix
         self.suffix = suffix
 
@@ -105,8 +110,10 @@ class ReadCSV(object):
         """Read the data into the document."""
 
         # open the csv file
-        f = open(self.filename)
-        csvf = csv.reader(f)
+        csvf = utils.UnicodeCSVReader( open(self.filename),
+                                       delimiter=self.delimiter,
+                                       quotechar=self.textdelimiter,
+                                       encoding=self.encoding )
 
         # make in iterator for the file
         if self.readrows:

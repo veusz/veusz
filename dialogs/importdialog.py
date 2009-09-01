@@ -43,7 +43,16 @@ class ImportStandardHelpDialog(qt4.QDialog):
                                 'importhelp.ui'),
                    self)
 
+class ImportCSVHelpDialog(qt4.QDialog):
+    """Class to load help for csv veusz import."""
+    def __init__(self, parent, *args):
+        qt4.QDialog.__init__(self, parent, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'importhelpcsv.ui'),
+                   self)
+
 class ImportDialog(qt4.QDialog):
+    """Dialog box for importing data."""
 
     dirname = '.'
 
@@ -65,12 +74,23 @@ class ImportDialog(qt4.QDialog):
         self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
                       self.slotImport)
 
-        # user wants help about standard import
+        # user wants help about import
         self.connect( self.helpbutton, qt4.SIGNAL('clicked()'),
                       self.slotHelp )
+        self.connect( self.csvhelpbutton, qt4.SIGNAL('clicked()'),
+                      self.slotCSVHelp )
 
         # notification tab has changed
         self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
+                      self.slotUpdatePreview )
+        self.connect( self.encodingcombo,
+                      qt4.SIGNAL('currentIndexChanged(int)'),
+                      self.slotUpdatePreview )
+        self.connect( self.csvdelimitercombo,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
+                      self.slotUpdatePreview )
+        self.connect( self.csvtextdelimitercombo,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
                       self.slotUpdatePreview )
 
         # if different items are selected in fits tab
@@ -112,6 +132,13 @@ class ImportDialog(qt4.QDialog):
         self.blockcheckbox.default = False
         self.ignoretextcheckbox.default = True
 
+        # further defaults
+        self.encodingcombo.defaultlist = utils.encodings
+        self.encodingcombo.defaultval = 'utf_8'
+        self.csvdelimitercombo.default = [',', '{tab}', '{space}', '|',
+                                          ':', ';']
+        self.csvtextdelimitercombo.default = ['"', "'"]
+
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
@@ -137,6 +164,11 @@ class ImportDialog(qt4.QDialog):
         self.helpdialog = ImportStandardHelpDialog(self)
         self.helpdialog.show()
 
+    def slotCSVHelp(self):
+        """Asked help for CSV import."""
+        self.helpdialog = ImportCSVHelpDialog(self)
+        self.helpdialog.show()
+
     def slotUpdatePreview(self, *args):
         """Update preview window when filename or tab changed."""
 
@@ -155,11 +187,23 @@ class ImportDialog(qt4.QDialog):
         # enable or disable import button
         self.enableDisableImport()
 
+    def getCSVDelimiter(self):
+        """Get CSV delimiter, converting friendly names."""
+        delim = str( self.csvdelimitercombo.text() )
+        if delim == '{space}':
+            delim = ' '
+        elif delim == '{tab}':
+            delim = '\t'
+        return delim
+
     def doPreviewStandard(self, filename):
         """Standard preview - show start of text."""
 
+        encoding = str(self.encodingcombo.currentText())
+        if not encoding:
+            return False
         try:
-            ifile = open(filename, 'rU')
+            ifile = utils.openEncoding(filename, encoding)
             text = ifile.read(4096)+'\n'
             if len(ifile.read(1)) != 0:
                 # if there is remaining data add ...
@@ -167,7 +211,9 @@ class ImportDialog(qt4.QDialog):
 
             self.previewedit.setPlainText(text)
             return True
-
+        except UnicodeError:
+            self.previewedit.setPlainText('')
+            return False
         except IOError:
             self.previewedit.setPlainText('')
             return False
@@ -182,11 +228,26 @@ class ImportDialog(qt4.QDialog):
         t.clear()
         t.setColumnCount(0)
         t.setRowCount(0)
-        try:
-            ifile = open(filename, 'rU')
 
-            # construct list of rows from input file
-            reader = csv.reader(ifile)
+        encoding = str(self.encodingcombo.currentText())
+        if not encoding:
+            return False
+        try:
+            delimiter = self.getCSVDelimiter()
+            textdelimiter = str(self.csvtextdelimitercombo.currentText())
+        except UnicodeEncodeError:
+            # need to be real str not unicode
+            return False
+        # need to be single character
+        if len(delimiter) != 1 or len(textdelimiter) != 1:
+            return False
+
+        try:
+            reader = utils.UnicodeCSVReader( open(filename),
+                                             delimiter=delimiter,
+                                             quotechar=textdelimiter,
+                                             encoding=encoding )
+            # construct list of rows
             rows = []
             numcols = 0
             try:
@@ -202,6 +263,8 @@ class ImportDialog(qt4.QDialog):
 
         except IOError:
             return False
+        except UnicodeError:
+            return False
         except csv.Error:
             return False
 
@@ -211,7 +274,7 @@ class ImportDialog(qt4.QDialog):
         for r in xrange(numrows):
             for c in xrange(numcols):
                 if c < len(rows[r]):
-                    item = qt4.QTableWidgetItem(str(rows[r][c]))
+                    item = qt4.QTableWidgetItem(unicode(rows[r][c]))
                     t.setItem(r, c, item)
 
         return True
@@ -253,8 +316,11 @@ class ImportDialog(qt4.QDialog):
     def doPreviewTwoD(self, filename):
         """Preview 2d dataset files."""
         
+        encoding = str(self.encodingcombo.currentText())
+        if not encoding:
+            return False
         try:
-            ifile = open(filename, 'rU')
+            ifile = utils.openEncoding(filename, encoding)
             text = ifile.read(4096)+'\n'
             if len(ifile.read(1)) != 0:
                 # if there is remaining data add ...
@@ -262,6 +328,9 @@ class ImportDialog(qt4.QDialog):
             self.twod_previewedit.setPlainText(text)
             return True
 
+        except UnicodeError:
+            self.twod_previewedit.setPlainText('')
+            return False
         except IOError:
             self.twod_previewedit.setPlainText('')
             return False
@@ -379,6 +448,7 @@ class ImportDialog(qt4.QDialog):
         filename = unicode( self.filenameedit.text() )
         filename = os.path.abspath(filename)
         linked = self.linkcheckbox.isChecked()
+        encoding = str(self.encodingcombo.currentText())
 
         # import according to tab selected
         try:
@@ -386,7 +456,7 @@ class ImportDialog(qt4.QDialog):
             (self.importStandard,
              self.importCSV,
              self.importFits,
-             self.importTwoD)[tabindex](filename, linked)
+             self.importTwoD)[tabindex](filename, linked, encoding)
             qt4.QApplication.restoreOverrideCursor()
         except Exception:
             qt4.QApplication.restoreOverrideCursor()
@@ -425,7 +495,7 @@ class ImportDialog(qt4.QDialog):
         suffix = suffix.replace('$FILENAME', f)
         return prefix, suffix
 
-    def importStandard(self, filename, linked):
+    def importStandard(self, filename, linked, encoding):
         """Standard Veusz importing."""
 
         # convert controls to values
@@ -442,7 +512,8 @@ class ImportDialog(qt4.QDialog):
                                               useblocks=useblocks, 
                                               linked=linked,
                                               prefix=prefix, suffix=suffix,
-                                              ignoretext=ignoretext)
+                                              ignoretext=ignoretext,
+                                              encoding=encoding)
 
         except document.DescriptorError:
             mb = qt4.QMessageBox("Veusz",
@@ -472,16 +543,25 @@ class ImportDialog(qt4.QDialog):
 
         self.previewedit.setPlainText( '\n'.join(lines) )
 
-    def importCSV(self, filename, linked):
+    def importCSV(self, filename, linked, encoding):
         """Import from CSV file."""
 
         # get various values
         inrows = self.directioncombo.currentIndex() == 1
         prefix, suffix = self.getPrefixSuffix(filename)
 
+        try:
+            delimiter = self.getCSVDelimiter()
+            textdelimiter = str(self.csvtextdelimitercombo.currentText())
+        except UnicodeEncodeError:
+            return
+
         op = document.OperationDataImportCSV(filename, readrows=inrows,
                                              prefix=prefix, suffix=suffix,
-                                             linked=linked)
+                                             linked=linked,
+                                             delimiter=delimiter,
+                                             textdelimiter=textdelimiter,
+                                             encoding=encoding)
         
         # actually import the data
         dsnames = self.document.applyOperation(op)
@@ -501,7 +581,7 @@ class ImportDialog(qt4.QDialog):
             item = qt4.QTableWidgetItem(l)
             t.setItem(i, 0, item)
 
-    def importFits(self, filename, linked):
+    def importFits(self, filename, linked, encoding):
         """Import fits file."""
         
         item = self.fitshdulist.selectedItems()[0]
@@ -546,7 +626,7 @@ class ImportDialog(qt4.QDialog):
         self.fitsimportstatus.setText("Imported dataset '%s'" % name)
         qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
 
-    def importTwoD(self, filename, linked):
+    def importTwoD(self, filename, linked, encoding):
         """Import from 2D file."""
 
         # this really needs improvement...
@@ -599,7 +679,8 @@ class ImportDialog(qt4.QDialog):
                                                 invertcols=invertcols,
                                                 transpose=transpose,
                                                 prefix=prefix, suffix=suffix,
-                                                linked=linked)
+                                                linked=linked,
+                                                encoding=encoding)
             readds = self.document.applyOperation(op)
 
             output = ['Successfully read datasets:']

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>importdialog</class>
- <widget class="QDialog" name="importdialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="importdialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,38 +10,38 @@
     <height>640</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Import data - Veusz</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" >
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
+    <layout class="QHBoxLayout">
+     <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin" >
+     <property name="margin">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="label" >
-       <property name="text" >
+      <widget class="QLabel" name="label">
+       <property name="text">
         <string>&amp;Filename</string>
        </property>
-       <property name="buddy" >
+       <property name="buddy">
         <cstring>filenameedit</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="HistoryCombo" name="filenameedit" >
-       <property name="toolTip" >
+      <widget class="HistoryCombo" name="filenameedit">
+       <property name="toolTip">
         <string>Enter the filename to be imported here</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="browsebutton" >
-       <property name="text" >
+      <widget class="QPushButton" name="browsebutton">
+       <property name="text">
         <string>&amp;Browse...</string>
        </property>
       </widget>
@@ -48,60 +49,60 @@
     </layout>
    </item>
    <item>
-    <widget class="QTabWidget" name="methodtab" >
-     <property name="currentIndex" >
+    <widget class="QTabWidget" name="methodtab">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="standardtab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="standardtab">
+      <attribute name="title">
        <string>&amp;Standard</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5" >
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
+        <widget class="QLabel" name="label_7">
+         <property name="text">
           <string>File preview:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="previewedit" >
-         <property name="lineWrapMode" >
+        <widget class="QTextEdit" name="previewedit">
+         <property name="lineWrapMode">
           <enum>QTextEdit::NoWrap</enum>
          </property>
-         <property name="readOnly" >
+         <property name="readOnly">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="margin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
+          <widget class="QLabel" name="label_2">
+           <property name="text">
             <string>Dataset &amp;names</string>
            </property>
-           <property name="buddy" >
+           <property name="buddy">
             <cstring>descriptoredit</cstring>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="HistoryCombo" name="descriptoredit" >
-           <property name="toolTip" >
-            <string>The import descriptor, consisting of the dataset names used during import, e.g. "x y" or "a[:]"</string>
+          <widget class="HistoryCombo" name="descriptoredit">
+           <property name="toolTip">
+            <string>The import descriptor, consisting of the dataset names used during import, e.g. &quot;x y&quot; or &quot;a[:]&quot;</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="helpbutton" >
-           <property name="text" >
+          <widget class="QPushButton" name="helpbutton">
+           <property name="text">
             <string>Help</string>
            </property>
           </widget>
@@ -109,38 +110,38 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="HistoryCheck" name="ignoretextcheckbox" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+          <widget class="HistoryCheck" name="ignoretextcheckbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolTip" >
+           <property name="toolTip">
             <string>Ignores lines consisting of text when importing the data</string>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>I&amp;gnore text lines</string>
            </property>
-           <property name="checked" >
+           <property name="checked">
             <bool>true</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="HistoryCheck" name="blockcheckbox" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+          <widget class="HistoryCheck" name="blockcheckbox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this is selected, blank lines or the word "no" are used to separate the file into blocks. An underscore followed by the block number is added to the dataset names&lt;/p>&lt;/body>&lt;/html></string>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If this is selected, blank lines or the word &quot;no&quot; are used to separate the file into blocks. An underscore followed by the block number is added to the dataset names&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Read data in bloc&amp;ks</string>
            </property>
           </widget>
@@ -149,75 +150,98 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="csvtab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="csvtab">
+      <attribute name="title">
        <string>CS&amp;V</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" >
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QLabel" name="label_8" >
-         <property name="text" >
+        <widget class="QLabel" name="label_8">
+         <property name="text">
           <string>File preview:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="previewtablecsv" >
-         <property name="editTriggers" >
+        <widget class="QTableWidget" name="previewtablecsv">
+         <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
-         <property name="tabKeyNavigation" >
+         <property name="tabKeyNavigation">
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_6" >
-         <property name="text" >
-          <string>Comma Separated Value (CSV) files are often used to export data from applications such as Excel and OpenOffice. Veusz can read data from these files. At the top of each column of data, a dataset name can be given for the data below. Multiple datasets can be placed below each other if new names are given.
-
-To import error bars, columns with the names "+", "-" or "+-" should be given in columns immediately to the right of the dataset, for positive, negative or symmetric errors.
-
-Veusz can also read data organised in rows rather than columns.
-</string>
-         </property>
-         <property name="wordWrap" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item row="0" column="1" >
-          <widget class="QComboBox" name="directioncombo" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Are the data arranged in columns or rows?&lt;/p>&lt;/body>&lt;/html></string>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Delimiter</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="HistoryCombo" name="csvdelimitercombo">
+           <property name="toolTip">
+            <string>Delimiter between fields. This is usually a comma.</string>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Text delimiter</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="HistoryCombo" name="csvtextdelimitercombo">
+           <property name="toolTip">
+            <string>Character to delimit text, usually a quote (&quot;).</string>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>&amp;Direction</string>
+           </property>
+           <property name="buddy">
+            <cstring>directioncombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="directioncombo">
+           <property name="toolTip">
+            <string>Are the data arranged in columns or rows?</string>
            </property>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Columns</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Rows</string>
             </property>
            </item>
           </widget>
          </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_4" >
-           <property name="text" >
-            <string>&amp;Direction</string>
+         <item row="2" column="3">
+          <widget class="QPushButton" name="csvhelpbutton">
+           <property name="toolTip">
+            <string>Help on how CSV files should be formatted</string>
            </property>
-           <property name="buddy" >
-            <cstring>directioncombo</cstring>
+           <property name="text">
+            <string>Help</string>
            </property>
           </widget>
          </item>
@@ -225,35 +249,35 @@ Veusz can also read data organised in rows rather than columns.
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="fitstab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="fitstab">
+      <attribute name="title">
        <string>FI&amp;TS</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2" >
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="margin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="fitslabel" >
-           <property name="text" >
+          <widget class="QLabel" name="fitslabel">
+           <property name="text">
             <string>List of HDUs in FITS file:</string>
            </property>
-           <property name="wordWrap" >
+           <property name="wordWrap">
             <bool>true</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="fitsimportstatus" >
-           <property name="text" >
+          <widget class="QLabel" name="fitsimportstatus">
+           <property name="text">
             <string/>
            </property>
-           <property name="alignment" >
+           <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
@@ -261,110 +285,110 @@ Veusz can also read data organised in rows rather than columns.
         </layout>
        </item>
        <item>
-        <widget class="QTreeWidget" name="fitshdulist" >
-         <property name="rootIsDecorated" >
+        <widget class="QTreeWidget" name="fitshdulist">
+         <property name="rootIsDecorated">
           <bool>false</bool>
          </property>
-         <property name="columnCount" >
+         <property name="columnCount">
           <number>3</number>
          </property>
          <column>
-          <property name="text" >
+          <property name="text">
            <string>HDU</string>
           </property>
          </column>
          <column>
-          <property name="text" >
+          <property name="text">
            <string>Name</string>
           </property>
          </column>
          <column>
-          <property name="text" >
+          <property name="text">
            <string>Type</string>
           </property>
          </column>
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="gridLayout_2" >
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_10" >
-           <property name="text" >
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
             <string>Dataset name to use:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="HistoryCombo" name="fitsdatasetname" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column or image specified is imported using the name given here&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="0" column="1">
+          <widget class="HistoryCombo" name="fitsdatasetname">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Column or image specified is imported using the name given here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_11" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
             <string>Data FITS column:</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QComboBox" name="fitsdatacolumn" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If importing a table, this is the column used to provide the main data&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="fitsdatacolumn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If importing a table, this is the column used to provide the main data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="editable" >
+           <property name="editable">
             <bool>false</bool>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="label_12" >
-           <property name="text" >
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
             <string>Symmetric error FITS column:</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1" >
-          <widget class="QComboBox" name="fitssymcolumn" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column used for symmetric errors, if appropriate&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="fitssymcolumn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Column used for symmetric errors, if appropriate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="editable" >
+           <property name="editable">
             <bool>false</bool>
            </property>
           </widget>
          </item>
-         <item row="3" column="0" >
-          <widget class="QLabel" name="label_13" >
-           <property name="text" >
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
             <string>Positive error FITS column:</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1" >
-          <widget class="QComboBox" name="fitsposcolumn" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column used for positive errors, if appropriate&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="fitsposcolumn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Column used for positive errors, if appropriate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="editable" >
+           <property name="editable">
             <bool>false</bool>
            </property>
           </widget>
          </item>
-         <item row="4" column="0" >
-          <widget class="QLabel" name="label_14" >
-           <property name="text" >
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_14">
+           <property name="text">
             <string>Negative error FITS column:</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1" >
-          <widget class="QComboBox" name="fitsnegcolumn" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Column used for negative errors, if appropriate&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="fitsnegcolumn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Column used for negative errors, if appropriate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="editable" >
+           <property name="editable">
             <bool>false</bool>
            </property>
           </widget>
@@ -373,146 +397,146 @@ Veusz can also read data organised in rows rather than columns.
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab2d" >
-      <attribute name="title" >
+     <widget class="QWidget" name="tab2d">
+      <attribute name="title">
        <string>&amp;2D</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" >
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLabel" name="label_9" >
-         <property name="text" >
+        <widget class="QLabel" name="label_9">
+         <property name="text">
           <string>File preview:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="twod_previewedit" >
-         <property name="lineWrapMode" >
+        <widget class="QTextEdit" name="twod_previewedit">
+         <property name="lineWrapMode">
           <enum>QTextEdit::NoWrap</enum>
          </property>
-         <property name="readOnly" >
+         <property name="readOnly">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="margin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_20" >
-           <property name="text" >
+          <widget class="QLabel" name="label_20">
+           <property name="text">
             <string>Datasets:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="HistoryCombo" name="twod_datasetsedit" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">A space separated list of dataset names to import from the file&lt;/p>&lt;/body>&lt;/html></string>
+          <widget class="HistoryCombo" name="twod_datasetsedit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;A space separated list of dataset names to import from the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QGridLayout" name="gridLayout" >
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_15" >
-           <property name="text" >
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_15">
+           <property name="text">
             <string>Range of &amp;X:</string>
            </property>
-           <property name="buddy" >
+           <property name="buddy">
             <cstring>twod_xminedit</cstring>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="HistoryCombo" name="twod_xminedit" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a number for the minimum coordinate of the X axis (default 0)&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="0" column="1">
+          <widget class="HistoryCombo" name="twod_xminedit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Enter a number for the minimum coordinate of the X axis (default 0)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2" >
-          <widget class="QLabel" name="label_16" >
-           <property name="text" >
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
             <string>to</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="3" >
-          <widget class="HistoryCombo" name="twod_xmaxedit" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a value for a maximum coordinate of the X axis (default is number of columns in file)&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="0" column="3">
+          <widget class="HistoryCombo" name="twod_xmaxedit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Enter a value for a maximum coordinate of the X axis (default is number of columns in file)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_18" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
             <string>Range of &amp;Y:</string>
            </property>
-           <property name="buddy" >
+           <property name="buddy">
             <cstring>twod_yminedit</cstring>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="HistoryCombo" name="twod_yminedit" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a number for the minimum coordinate of the Y axis (default 0)&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="1" column="1">
+          <widget class="HistoryCombo" name="twod_yminedit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Enter a number for the minimum coordinate of the Y axis (default 0)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="2" >
-          <widget class="QLabel" name="label_17" >
-           <property name="text" >
+         <item row="1" column="2">
+          <widget class="QLabel" name="label_17">
+           <property name="text">
             <string>to</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="3" >
-          <widget class="HistoryCombo" name="twod_ymaxedit" >
-           <property name="toolTip" >
-            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Enter a number for the maximum coordinate of the Y axis (default number of rows in file)&lt;/p>&lt;/body>&lt;/html></string>
+         <item row="1" column="3">
+          <widget class="HistoryCombo" name="twod_ymaxedit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Enter a number for the maximum coordinate of the Y axis (default number of rows in file)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="twod_invertrowscheck" >
-         <property name="text" >
+        <widget class="QCheckBox" name="twod_invertrowscheck">
+         <property name="text">
           <string>Invert &amp;rows when reading</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="twod_invertcolscheck" >
-         <property name="text" >
+        <widget class="QCheckBox" name="twod_invertcolscheck">
+         <property name="text">
           <string>Invert colu&amp;mns when reading</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="twod_transposecheck" >
-         <property name="text" >
+        <widget class="QCheckBox" name="twod_transposecheck">
+         <property name="text">
           <string>Trans&amp;pose rows and columns</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_19" >
-         <property name="text" >
+        <widget class="QLabel" name="label_19">
+         <property name="text">
           <string>Data are read as a 2D matrix from the file.  X is read from left to right, Y from bottom to top, by default. These parameters listed here can be altered by including xrange A B, yrange A B, invertrows, invertcols and transpose as lines in the data file. Multiple datasets can be included by separating with blank lines.
 </string>
          </property>
-         <property name="wordWrap" >
+         <property name="wordWrap">
           <bool>true</bool>
          </property>
         </widget>
@@ -522,84 +546,94 @@ Veusz can also read data organised in rows rather than columns.
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>General options</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4" >
-      <item row="0" column="0" >
-       <widget class="HistoryCheck" name="linkcheckbox" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Data imported are not stored in the Veusz saved file, but are reloaded each time the Veusz file is opened, or Data-&amp;gt;Reload is selected on the menu.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string>&amp;Link datasets to file</string>
-        </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <layout class="QHBoxLayout" name="horizontalLayout_4" >
-        <item>
-         <widget class="QLabel" name="label_21" >
-          <property name="text" >
-           <string>&amp;Prefix</string>
-          </property>
-          <property name="buddy" >
-           <cstring>prefixcombo</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="HistoryCombo" name="prefixcombo" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="HistoryCheck" name="linkcheckbox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="toolTip" >
-           <string>Prefix to prepend to each dataset name imported, or enter $FILENAME to have filename prepended</string>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Data imported are not stored in the Veusz saved file, but are reloaded each time the Veusz file is opened, or Data-&amp;gt;Reload is selected on the menu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-          <property name="editable" >
+          <property name="text">
+           <string>&amp;Link datasets to file</string>
+          </property>
+          <property name="checked">
            <bool>true</bool>
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item row="1" column="1" >
-       <layout class="QHBoxLayout" name="horizontalLayout" >
-        <item>
-         <widget class="QLabel" name="label_22" >
-          <property name="text" >
-           <string>Suffi&amp;x</string>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>&amp;Prefix</string>
           </property>
-          <property name="buddy" >
-           <cstring>suffixcombo</cstring>
+          <property name="buddy">
+           <cstring>prefixcombo</cstring>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="HistoryCombo" name="suffixcombo" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <item row="0" column="3">
+         <widget class="HistoryCombo" name="prefixcombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="toolTip" >
+          <property name="toolTip">
+           <string>Prefix to prepend to each dataset name imported, or enter $FILENAME to have filename prepended</string>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Character encoding</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="HistoryValueCombo" name="encodingcombo">
+          <property name="toolTip">
+           <string>Character encoding of input file</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string>Suffi&amp;x</string>
+          </property>
+          <property name="buddy">
+           <cstring>suffixcombo</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="HistoryCombo" name="suffixcombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
            <string>Suffix to append to each dataset name imported, or enter $FILENAME to have filename appended</string>
           </property>
-          <property name="editable" >
+          <property name="editable">
            <bool>true</bool>
           </property>
          </widget>
@@ -607,29 +641,26 @@ Veusz can also read data organised in rows rather than columns.
        </layout>
       </item>
      </layout>
-     <zorder>prefixcombo</zorder>
      <zorder></zorder>
-     <zorder></zorder>
-     <zorder>linkcheckbox</zorder>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
+    <layout class="QHBoxLayout">
+     <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin" >
+     <property name="margin">
       <number>0</number>
      </property>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeType" >
+       <property name="sizeType">
         <enum>QSizePolicy::Expanding</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -638,24 +669,24 @@ Veusz can also read data organised in rows rather than columns.
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="importbutton" >
-       <property name="enabled" >
+      <widget class="QPushButton" name="importbutton">
+       <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>&amp;Import</string>
        </property>
-       <property name="shortcut" >
+       <property name="shortcut">
         <string>Alt+I</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="closebutton" >
-       <property name="text" >
+      <widget class="QPushButton" name="closebutton">
+       <property name="text">
         <string>&amp;Close</string>
        </property>
-       <property name="shortcut" >
+       <property name="shortcut">
         <string>Alt+C</string>
        </property>
       </widget>
@@ -664,7 +695,7 @@ Veusz can also read data organised in rows rather than columns.
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
@@ -677,6 +708,11 @@ Veusz can also read data organised in rows rather than columns.
    <extends>QCheckBox</extends>
    <header>historycheck.h</header>
   </customwidget>
+  <customwidget>
+   <class>HistoryValueCombo</class>
+   <extends>QComboBox</extends>
+   <header>historyvaluecombo.h</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -686,11 +722,11 @@ Veusz can also read data organised in rows rather than columns.
    <receiver>importdialog</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>634</x>
      <y>524</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>318</x>
      <y>0</y>
     </hint>

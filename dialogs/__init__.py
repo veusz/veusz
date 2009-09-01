@@ -25,5 +25,8 @@
 import sys
 import historycombo
 import historycheck
+import historyvaluecombo
+
 sys.modules['historycombo'] = historycombo
 sys.modules['historycheck'] = historycheck
+sys.modules['historyvaluecombo'] = historyvaluecombo

@@ -100,7 +100,8 @@ class LinkedFile(LinkedFileBase):
     '''
 
     def __init__(self, filename, descriptor, useblocks=False,
-                 prefix='', suffix='', ignoretext=False):
+                 prefix='', suffix='', ignoretext=False,
+                 encoding='utf_8'):
         '''Set up the linked file with the descriptor given.'''
         self.filename = filename
         self.descriptor = descriptor
@@ -108,6 +109,7 @@ class LinkedFile(LinkedFileBase):
         self.prefix = prefix
         self.suffix = suffix
         self.ignoretext = ignoretext
+        self.encoding = encoding
 
     def saveToFile(self, fileobj, relpath=None):
         '''Save the link to the document file.
@@ -117,15 +119,16 @@ class LinkedFile(LinkedFileBase):
         params = [ repr(self._getSaveFilename(relpath)),
                    repr(self.descriptor),
                    'linked=True',
-                   'ignoretext=%s' % repr(self.ignoretext)]
+                   'ignoretext=' + repr(self.ignoretext) ]
 
+        if self.encoding != 'utf_8':
+            params.append('encoding=' + repr(self.encoding))
         if self.useblocks:
             params.append('useblocks=True')
-
         if self.prefix:
-            params.append('prefix=%s' % repr(self.prefix))
+            params.append('prefix=' + repr(self.prefix))
         if self.suffix:
-            params.append('suffix=%s' % repr(self.suffix))
+            params.append('suffix=' + repr(self.suffix))
 
         fileobj.write('ImportFile(%s)\n' % (', '.join(params)))
 
@@ -143,10 +146,13 @@ class LinkedFile(LinkedFileBase):
         
         tempdoc = doc.Document()
         sr = simpleread.SimpleRead(self.descriptor)
+        
+        stream = simpleread.FileStream(
+            utils.openEncoding(self.filename, self.encoding))
 
-        sr.readData( simpleread.FileStream(open(self.filename,  'rU')),
-                     useblocks=self.useblocks,
-                     ignoretext=self.ignoretext)
+        sr.readData(stream,
+                    useblocks=self.useblocks,
+                    ignoretext=self.ignoretext)
         sr.setInDocument(tempdoc, linkedfile=self,
                          prefix=self.prefix, suffix=self.suffix)
 
@@ -173,13 +179,14 @@ class Linked2DFile(LinkedFileBase):
         self.transpose = None
         self.prefix = ''
         self.suffix = ''
+        self.encoding = 'utf_8'
 
     def saveToFile(self, fileobj, relpath=None):
         '''Save the link to the document file.'''
 
         args = [repr(self._getSaveFilename(relpath)), repr(self.datasets)]
         for p in ('xrange', 'yrange', 'invertrows', 'invertcols', 'transpose',
-                  'prefix', 'suffix'):
+                  'prefix', 'suffix', 'encoding'):
             v = getattr(self, p)
             if (v is not None) and (v != ''):
                 args.append( '%s=%s' % (p, repr(v)) )
@@ -202,7 +209,8 @@ class Linked2DFile(LinkedFileBase):
                                                   invertcols=self.invertcols,
                                                   transpose=self.transpose,
                                                   prefix=self.prefix,
-                                                  suffix=self.suffix)
+                                                  suffix=self.suffix,
+                                                  encoding=self.encoding)
             tempdoc.applyOperation(op)
         except simpleread.Read2DError:
             errors = {}
@@ -268,7 +276,10 @@ class LinkedFITSFile(LinkedFileBase):
 class LinkedCSVFile(LinkedFileBase):
     """A CSV file linked to datasets."""
 
-    def __init__(self, filename, readrows=False, prefix='', suffix=''):
+    def __init__(self, filename, readrows=False,
+                 delimiter=',', textdelimiter='"',
+                 encoding='utf_8',
+                 prefix='', suffix=''):
         """Read CSV data from filename
 
         Read across rather than down if readrows
@@ -277,6 +288,9 @@ class LinkedCSVFile(LinkedFileBase):
 
         self.filename = filename
         self.readrows = readrows
+        self.delimiter = delimiter
+        self.textdelimiter = textdelimiter
+        self.encoding = encoding
         self.prefix = prefix
         self.suffix = suffix
 
@@ -286,11 +300,17 @@ class LinkedCSVFile(LinkedFileBase):
         params = [repr(self._getSaveFilename(relpath)),
                   'linked=True']
         if self.prefix:
-            params.append('dsprefix=%s' % repr(self.prefix))
+            params.append('dsprefix=' + repr(self.prefix))
         if self.suffix:
-            params.append('dssuffix=%s' % repr(self.suffix))
+            params.append('dssuffix=' + repr(self.suffix))
         if self.readrows:
             params.append('readrows=True')
+        if self.encoding != 'utf_8':
+            params.append('encoding=' + repr(self.encoding))
+        if self.delimiter != ',':
+            params.append('delimiter=' + repr(self.delimiter))
+        if self.textdelimiter != '"':
+            params.append('textdelimiter=' + repr(self.textdelimiter))
 
         file.write('ImportFileCSV(%s)\n' % (', '.join(params)))
         
@@ -302,6 +322,9 @@ class LinkedCSVFile(LinkedFileBase):
 
         tempdoc = doc.Document()
         csv = readcsv.ReadCSV(self.filename, readrows=self.readrows,
+                              delimiter=self.delimiter,
+                              textdelimiter=self.textdelimiter,
+                              encoding=self.encoding,
                               prefix=self.prefix, suffix=self.suffix)
         csv.readData()
         csv.setData(tempdoc, linkedfile=self)
