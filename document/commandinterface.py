@@ -65,6 +65,7 @@ class CommandInterface(qt4.QObject):
         'SetData2DExpressionXYZ',
         'SetData2DXYFunc',
         'SetDataExpression',
+        'SetDataText',
         'SetVerbose',
         'To',
         )
@@ -293,12 +294,26 @@ class CommandInterface(qt4.QObject):
         if self.verbose:
             print "Set 2d dataset '%s'" % name
 
+    def SetDataText(self, name, val):
+        """Create a text dataset."""
+
+        data = datasets.DatasetText(val)
+        op = operations.OperationDatasetSet(name, data)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Set text dataset '%s'" % name
+            print " Values = %s" % str(data.data)
+
     def GetData(self, name):
         """Return the data with the name.
 
         Returns a tuple containing:
+            (data, serr, nerr, perr)
+        if 'name' is a Dataset, and 
+            data
+        if 'name' is a DatasetText, where data is a list.
 
-        (data, serr, nerr, perr)
         Values not defined are set to None
 
         Return copies, so that the original data can't be indirectly modified
@@ -306,16 +321,20 @@ class CommandInterface(qt4.QObject):
 
         d = self.document.getData(name)
         data = serr = nerr = perr = None
-        if d.data is not None:
-            data = d.data.copy()
-        if d.serr is not None:
-            serr = d.serr.copy()
-        if d.nerr is not None:
-            nerr = d.nerr.copy()
-        if d.perr is not None:
-            perr = d.perr.copy()
+        if isinstance(d, datasets.DatasetText):
+            return d.data[:]
+        else:
 
-        return (data, serr, nerr, perr)
+            if d.data is not None:
+                data = d.data.copy()
+            if d.serr is not None:
+                serr = d.serr.copy()
+            if d.nerr is not None:
+                nerr = d.nerr.copy()
+            if d.perr is not None:
+                perr = d.perr.copy()
+
+            return (data, serr, nerr, perr)
 
     def ImportString(self, descriptor, string, useblocks=False):
         """Read data from the string using a descriptor.

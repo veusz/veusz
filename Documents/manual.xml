@@ -1062,12 +1062,13 @@ SetData('y', y)
 	<title><anchor id="Command.GetData" />GetData</title>
 	<para><command>GetData(name)</command></para>
 
-	<para>Returns: A tuple containing the datasets with the name
-      given. The tuple is (data, symerr, negerr, poserr), with each a
-      numpy array of the same size or None. data are the values of the
-      dataset, symerr are the symmetric errors (if set), negerr and
-      poserr and negative and positive asymmetric errors (if
-      set).</para>
+	<para>Returns: A tuple containing the dataset with the name
+	  given. If <command>name</command> refers to numpy array data, the tuple is 
+	  (data, symerr, negerr, poserr), with each a numpy array of the same size or 
+	  None. data are the values of the dataset, symerr are the symmetric errors 
+	  (if set), negerr and poserr and negative and positive asymmetric errors 
+	  (if set). If <command>name</command> refers to a text dataset, a list
+	  of text elements is returned.</para>
 
 	<informalexample>
 	  <programlisting>
@@ -1450,6 +1451,22 @@ Set('page1/graph1/x/min', -10.)
 	be modified and the data are stored in the saved file.</para>
       </section>
 
+      <section>
+	<title><anchor id="Command.SetDataText" />SetDataText</title>
+	
+	<para><command>SetDataText(name, val)</command></para>
+
+	<para>Set the text dataset name with the values given.
+	  <command>val</command> must be a type that can be converted into a
+	  Python list.</para>
+
+	<informalexample>
+	  <programlisting>
+SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
+</programlisting>
+	</informalexample>
+      </section>
+      
       <section>
 	<title><anchor id="Command.SetUpdateInterval"
 	/>SetUpdateInterval</title>
