@@ -25,7 +25,6 @@ import cPickle
 import socket
 
 import veusz.qtall as qt4
-from veusz.application import Application
 from veusz.windows.simplewindow import SimpleWindow
 import veusz.document as document
 
@@ -114,7 +113,7 @@ class EmbeddedClient(object):
         """
         self.plot.setPageNumber(pagenum-1)
 
-class EmbedApplication(Application):
+class EmbedApplication(qt4.QApplication):
     """Application to run remote end of embed connection.
 
     Commands are sent over stdin, with responses sent to stdout
@@ -124,7 +123,7 @@ class EmbedApplication(Application):
     cmdlenlen = len(struct.pack('L', 0))
 
     def __init__(self, socket, args):
-        Application.__init__(self, args)
+        qt4.QApplication.__init__(self, args)
         self.socket = socket
 
         self.notifier = qt4.QSocketNotifier(self.socket.fileno(),

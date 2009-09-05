@@ -48,7 +48,6 @@ import veusz.qtall as qt4
 
 from veusz.windows.simplewindow import SimpleWindow
 import veusz.document as document
-from veusz.application import Application
 
 class InputListener(qt4.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
@@ -134,7 +133,7 @@ class InputListener(qt4.QObject):
 
 def run():
     '''Actually run the program.'''
-    app = Application(sys.argv)
+    app = qt4.QApplication(sys.argv)
 
     if len(sys.argv) > 1:
         name = sys.argv[1]

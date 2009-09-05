@@ -16,14 +16,13 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id: $
+# $Id$
 
 from settings import Settings
 import setting
 import collections
 
 import veusz.qtall as qt4
-from veusz.application import Application
 
 class StyleSheet(Settings):
     """A class for handling default values of settings.
@@ -33,14 +32,14 @@ class StyleSheet(Settings):
     registeredsettings = []
 
     @classmethod
-    def register(kls, settings, posn=None):
+    def register(kls, settingskls, posn=None):
         """Register a settings object with the stylesheet.
         This settings object is copied for each new document.
         """
         if posn is None:
-            kls.registeredsettings.append(settings)
+            kls.registeredsettings.append(settingskls)
         else:
-            kls.registeredsettings.insert(posn, settings)
+            kls.registeredsettings.insert(posn, settingskls)
 
     def __init__(self, **args):
         """Create the default settings."""
@@ -48,7 +47,7 @@ class StyleSheet(Settings):
         self.pixmap = 'settings_stylesheet'
 
         for subset in self.registeredsettings:
-            self.add( subset.copy() )
+            self.add( subset() )
 
 class StylesheetLine(Settings):
     """Hold the properties of the default line."""
@@ -65,10 +64,10 @@ class StylesheetLine(Settings):
                                 usertext='Color',
                                 formatting=True) )
 # register these properties with the stylesheet
-StyleSheet.register(StylesheetLine())
+StyleSheet.register(StylesheetLine)
 
 def _registerFontStyleSheet():
-    """Get fonts, and register default with StyleSheet."""
+    """Get fonts, and register default with StyleSheet and Text class."""
     families = [ unicode(name) for name in qt4.QFontDatabase().families() ]
     
     deffont = None
@@ -82,38 +81,35 @@ def _registerFontStyleSheet():
         print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
         deffont = unicode(_fontfamilies[0])
 
-    class StylesheetText(Settings):
-        """Hold properties of default text font."""
-
-        def __init__(self, defaultfamily, families):
-            """Initialise with default font family and list of families."""
-            Settings.__init__(self, 'Font', pixmap='settings_axislabel',
-                              descr='Default font for document',
-                              usertext='Font')
-            self.defaultfamily = defaultfamily
-            self.families = families
-
-            self.add( setting.FontFamily('font', deffont,
-                                         descr='Font name', usertext='Font',
-                                         formatting=True))
-            self.add( setting.Distance('size', '14pt',
-                                       descr='Default font size',
-                                       usertext='Size',
-                                       formatting=True))
-            self.add( setting.Color('color', 'black',
-                                    descr='Default font color',
-                                    usertext='Color',
-                                    formatting=True))
-
-        def copy(self):
-            """Make copy of settings."""
-            c = Settings.copy(self)
-            c.defaultfamily = self.defaultfamily
-            c.families = self.families
-            return c
-
-    StyleSheet.register(StylesheetText(deffont, families), posn=1)
     collections.Text.defaultfamily = deffont
     collections.Text.families = families
+    StylesheetText.defaultfamily = deffont
+    StylesheetText.families = families
 
-Application.startupfunctions.append(_registerFontStyleSheet)
+class StylesheetText(Settings):
+    """Hold properties of default text font."""
+
+    defaultfamily = None
+    families = None
+
+    def __init__(self):
+        """Initialise with default font family and list of families."""
+        Settings.__init__(self, 'Font', pixmap='settings_axislabel',
+                          descr='Default font for document',
+                          usertext='Font')
+
+        if StylesheetText.defaultfamily is None:
+            _registerFontStyleSheet()
+
+        self.add( setting.FontFamily('font', StylesheetText.defaultfamily,
+                                     descr='Font name', usertext='Font',
+                                     formatting=True))
+        self.add( setting.Distance('size', '14pt',
+                                   descr='Default font size',
+                                   usertext='Size',
+                                   formatting=True))
+        self.add( setting.Color('color', 'black',
+                                descr='Default font color',
+                                usertext='Color',
+                                formatting=True))
+StyleSheet.register(StylesheetText)

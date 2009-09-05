@@ -16,7 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id: setting.py 987 2009-05-25 19:12:39Z jeremysanders $
+# $Id$
 
 class Reference(object):
     """A value a setting can have to point to another setting.

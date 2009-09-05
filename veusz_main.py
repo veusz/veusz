@@ -41,7 +41,6 @@ except ImportError:
     sys.modules['veusz'] = veusz
 
 import veusz.qtall as qt4
-from veusz.application import Application
 import veusz.utils as utils
 import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.setting
@@ -97,7 +96,7 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
 def run():
     '''Run the main application.'''
 
-    app = Application(sys.argv)
+    app = qt4.QApplication(sys.argv)
     sys.excepthook = excepthook
 
     splash = qt4.QSplashScreen(makeSplashLogo())

@@ -16,7 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id: historycombo.py 936 2009-04-12 17:02:40Z jeremysanders $
+# $Id$
 
 """A combobox which remembers previous setting
 """
