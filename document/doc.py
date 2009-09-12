@@ -38,6 +38,12 @@ import datasets
 import veusz.utils as utils
 import veusz.setting as setting
 
+try:
+    import emf_export
+    hasemf = True
+except ImportError:
+    hasemf = False
+
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
@@ -506,6 +512,21 @@ class Document( qt4.QObject ):
         painter.end()
         pic.save(filename)
 
+    def _exportEMF(self, filename, page):
+        """Export document as EMF."""
+        pixmap = qt4.QPixmap(1,1)
+        dpi=75.
+        painter = Painter(pixmap, scaling=1., dpi=dpi)
+        width, height = self.basewidget.getSize(painter)
+        painter.end()
+
+        paintdev = emf_export.EMFPaintDevice(width/dpi, height/dpi,
+                                             dpi=dpi)
+        painter = Painter(paintdev)
+        self.basewidget.draw( painter, page )
+        painter.end()
+        paintdev.paintEngine().saveFile(filename)
+
     def export(self, filename, pagenumber, color=True, dpi=100,
                antialias=True, quality=85):
         """Export the figure to the filename."""
@@ -524,6 +545,9 @@ class Document( qt4.QObject ):
 
         elif ext == '.pic':
             self._exportPIC(filename, pagenumber)
+
+        elif ext == '.emf' and hasemf:
+            self._exportEMF(filename, pagenumber)
 
         else:
             raise RuntimeError, "File type '%s' not supported" % ext

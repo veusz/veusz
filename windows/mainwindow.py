@@ -932,6 +932,7 @@ class MainWindow(qt4.QMainWindow):
                    (["bmp"], "Windows bitmap format"),
                    (["pdf"], "Portable Document Format"),
                    (["svg"], "Scalable Vector Graphics"),
+                   (["emf"], "Windows Metafile Format"),
                    #(["pic"], "QT Pic format"),
                    ]
 
