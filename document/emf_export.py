@@ -38,6 +38,49 @@ def isStockObject(obj):
      """Is this a stock windows object."""
      return (obj & 0x80000000) != 0
 
+class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
+     """Extended pen creation record with custom line style."""
+     
+     emr_typedef=[
+          ('i','handle',0),
+          ('i','offBmi',0),
+          ('i','cbBmi',0),
+          ('i','offBits',0),
+          ('i','cbBits',0),
+          ('i','style'),
+          ('i','penwidth'),
+          ('i','brushstyle'),
+          ('i','color'),
+          ('i','brushhatch',0),
+          ('i','numstyleentries')]
+
+     def __init__(self, style=pyemf.PS_SOLID, width=1, color=0,
+                  styleentries=[]):
+          """Create pen.
+          styleentries is a list of dash and space lengths."""
+          
+          pyemf._EMR._EXTCREATEPEN.__init__(self)
+          self.style = style
+          self.penwidth = width
+          self.color = pyemf._normalizeColor(color)
+          self.brushstyle = 0x0  # solid
+
+          if style & pyemf.PS_USERSTYLE == 0:
+               self.styleentries = []
+          else:
+               self.styleentries = styleentries
+
+          self.numstyleentries = len(self.styleentries)
+
+     def sizeExtra(self):
+          return struct.calcsize("i")*len(self.styleentries)
+
+     def serializeExtra(self, fh):
+          self.serializeList(fh, "i", self.styleentries)
+
+     def hasHandle(self):
+          return True
+
 class EMFPaintEngine(qt4.QPaintEngine):
      "Custom EMF paint engine."""
 
@@ -199,31 +242,47 @@ class EMFPaintEngine(qt4.QPaintEngine):
      def _updatePen(self, pen):
           """Update the pen to the currently selected one."""
 
+          # line style
           style = {qt4.Qt.NoPen: pyemf.PS_NULL,
                    qt4.Qt.SolidLine: pyemf.PS_SOLID,
                    qt4.Qt.DashLine: pyemf.PS_DASH,
                    qt4.Qt.DotLine: pyemf.PS_DOT,
                    qt4.Qt.DashDotLine: pyemf.PS_DASHDOT,
                    qt4.Qt.DashDotDotLine: pyemf.PS_DASHDOTDOT,
-                   qt4.Qt.CustomDashLine: pyemf.PS_SOLID}[pen.style()]
+                   qt4.Qt.CustomDashLine: pyemf.PS_USERSTYLE}[pen.style()]
 
+          # set cap style
           style |= {qt4.Qt.FlatCap: pyemf.PS_ENDCAP_FLAT,
                     qt4.Qt.SquareCap: pyemf.PS_ENDCAP_SQUARE,
                     qt4.Qt.RoundCap: pyemf.PS_ENDCAP_ROUND}[pen.capStyle()]
 
+          # set join style
           style |= {qt4.Qt.MiterJoin: pyemf.PS_JOIN_MITER,
                     qt4.Qt.BevelJoin: pyemf.PS_JOIN_BEVEL,
                     qt4.Qt.RoundJoin: pyemf.PS_JOIN_ROUND,
                     qt4.Qt.SvgMiterJoin: pyemf.PS_JOIN_MITER}[pen.joinStyle()]
 
+          # use proper widths of lines
+          style |= pyemf.PS_GEOMETRIC
+
           width = pen.widthF()*scale
           qc = pen.color()
           color = (qc.red(), qc.green(), qc.blue())
           self.pencolor = color
-          # print "pen", color
-          newpen = self.emf.CreatePen(style, width, color)
+
+          if pen.style() & qt4.Qt.CustomDashLine:
+               # make an extended pen if we need a custom dash pattern
+               dash = [width*f for f in pen.dashPattern()]
+               newpen = self.emf._appendHandle(
+                    _EXTCREATEPEN(style,
+                                  width=width, color=color,
+                                  styleentries=dash))
+          else:
+               # use a standard create pen
+               newpen = self.emf.CreatePen(style, width, color)
           self.emf.SelectObject(newpen)
 
+          # delete old pen if it is not a stock object
           if not isStockObject(self.pen):
                self.emf.DeleteObject(self.pen)
           self.pen = newpen
@@ -251,7 +310,8 @@ class EMFPaintEngine(qt4.QPaintEngine):
                except KeyError:
                     newbrush = self.emf.CreateSolidBrush(color)
                else:
-                    newbrush = CreateHatchBrush(hatch, color)
+                    print "here"
+                    newbrush = self.emf.CreateHatchBrush(hatch, color)
           self.emf.SelectObject(newbrush)
 
           if not isStockObject(self.brush):
@@ -316,6 +376,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
                qt4.QPaintEngine.PainterPaths,
                qt4.QPaintEngine.PrimitiveTransform,
                qt4.QPaintEngine.PaintOutsidePaintEvent,
+               qt4.QPaintEngine.PatternBrush,
                )
 
 class EMFPaintDevice(qt4.QPaintDevice):
@@ -385,28 +446,35 @@ def main():
 
      device = EMFPaintDevice(5,5)
      p = qt4.QPainter(device)
+
+     pen = qt4.QPen(qt4.Qt.CustomDashLine)
+     pen.setWidth(2)
+     pen.setColor(qt4.Qt.red)
+     pen.setDashPattern([1,6])
+     p.setPen(pen)
+
      p.drawLines( [qt4.QLineF(0, 0, 100, 100), qt4.QLineF(100,100,200,200)] )
      p.drawLine( qt4.QLineF(200,200,300,300))
 
-     p.setBrush(qt4.QBrush(qt4.Qt.red))
-     p.setPen(qt4.QPen(qt4.QBrush(qt4.Qt.green), 3.))
-     p.save()
-     p.setClipRect( qt4.QRectF( qt4.QPointF(0,0), qt4.QPointF(70,70)))
-     p.drawPolygon(qt4.QPolygonF([qt4.QPointF(0,0), qt4.QPointF(100,0),
-                                  qt4.QPointF(0,100), qt4.QPointF(100,100)]))
-     p.setBrush(qt4.QBrush(qt4.Qt.blue))
-     p.drawEllipse(qt4.QRectF(200,200,50,50))
-     p.restore()
+#      p.setBrush(qt4.QBrush(qt4.Qt.red))
+#      p.setPen(qt4.QPen(qt4.QBrush(qt4.Qt.green), 3.))
+#      p.save()
+#      p.setClipRect( qt4.QRectF( qt4.QPointF(0,0), qt4.QPointF(70,70)))
+#      p.drawPolygon(qt4.QPolygonF([qt4.QPointF(0,0), qt4.QPointF(100,0),
+#                                   qt4.QPointF(0,100), qt4.QPointF(100,100)]))
+#      p.setBrush(qt4.QBrush(qt4.Qt.blue))
+#      p.drawEllipse(qt4.QRectF(200,200,50,50))
+#      p.restore()
 
-     p.setPen(qt4.QPen(qt4.Qt.blue))
-     p.setFont(qt4.QFont("Arial", 60))
-     p.drawText(100, 100, "Hi there")
+#      p.setPen(qt4.QPen(qt4.Qt.blue))
+#      p.setFont(qt4.QFont("Arial", 60))
+#      p.drawText(100, 100, "Hi there")
 
-     x = qt4.QPixmap(10,10)
-     x.fill(qt4.Qt.red)
-     p.drawPixmap(50,50,100,100,x)
-     p.setPen(qt4.QPen(qt4.QBrush(qt4.Qt.black), 1.))
-     p.drawRect(50,50,100,100)
+#      x = qt4.QPixmap(10,10)
+#      x.fill(qt4.Qt.red)
+#      p.drawPixmap(50,50,100,100,x)
+#      p.setPen(qt4.QPen(qt4.QBrush(qt4.Qt.black), 1.))
+#      p.drawRect(50,50,100,100)
 
      p.end()
 
