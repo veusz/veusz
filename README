@@ -1,4 +1,4 @@
-Veusz 1.4
+Veusz 1.5
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -17,30 +17,42 @@ Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
 manipulation and editing of datasets.
 
-Changes in 1.4:
- * Dates can be plotted on axes
- * Bar graph component, support bars in groups and stacked bars
-   with error bars
- * Improved import
-   - text lines can be ignored in imported files
-   - prefix and suffix can be added to dataset names
-   - more robust import dialog
- * Markers can be "thinned" for large datasets
- * Further LaTeX support, including \frac for fractions and \\
-   for line breaks.
- * Keys show error bars on datasets with errors
- * Axes can scale plotted data by a factor
+Changes in 1.5:
+ * EMF export (requires pyemf and PyQt snapshot)
+ * Character encodings supported in data import
+ * Rewritten stylesheet handling. User can now set defaults in document
+   for all settings. This is now under the Edit->Default Styles dialog.
+ * A default stylesheet can be loaded for all new documents (set in
+   preferences dialog)
+ * Linked datasets saved in documents now use relative filename paths
+   (with absolute paths as fallback)
+ * Axes can now have text labels of points plotted along them (choose
+   "labels" as axis mode)
+ * Dataset points can be scaled to different sizes according to another
+   dataset (this is the "Scale markers" option for point plotters)
 
 More minor changes
- * Mathematical expressions can be entered in many places where
-   numbers are entered (e.g. axis minima)
- * Many more latex symbols
- * Text labels can also be placed outside graphs directly on pages
- * Dataset expressions can be edited
- * Data can be copied out of data edit dialog. Rows can be inserted or
-   deleted.
- * Mac format line terminators are allowed in import files
- * Preview window resizes properly in import dialog
+ * Add SetDataText and support text in GetData in command API
+ * \dot and \bar added to LaTeX renderer
+ * Option to change icon sizes displayed
+ * Rearrange toolbar icons and create data and widget operation toolbars
+ * Zoom button remembers previous usage
+ * Conversion from 1D->2D datasets more robust
+ * Expression datasets can now be a constant value
+ * Uses colors form theme better and allow user to change some UI colors
+   in preferences
+ * Fix contours if coordinates can be infinite (e.g. log scaling with zero
+   value)
+ * nan/inf are no longer ignored when the ignore text option is selected in
+   import dialog
+
+ * Several other minor UI changes and bugfixes
+
+Important note
+ * As the way defaults are used has been rewritten, default values are
+   no longer saved on a per-user basis but are saved in a stylesheet and
+   is saved in the document. You cannot currently set defaults on a widget-
+   name basis.
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -56,7 +68,7 @@ Features of package:
  * Plot labels
  * Shapes and arrows on plots
  * LaTeX-like formatting for text
- * EPS/PDF/PNG/SVG export
+ * EPS/PDF/PNG/SVG/EMF export
  * Scripting interface
  * Dataset creation/manipulation
  * Embed Veusz within other programs
@@ -78,6 +90,10 @@ Optional:
    http://corefonts.sourceforge.net/
  PyFITS >= 1.1 (optional for FITS import)
    http://www.stsci.edu/resources/software_hardware/pyfits
+ pyemf >= 2.0.0 (optional for EMF export)
+   http://pyemf.sourceforge.net/
+ For EMF export, PyQt-x11-gpl-4.6-snapshot-20090906 or better is
+   required, to fix a bug in the C++ wrapping
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in pdf, html and text format (generated from docbook).
@@ -85,16 +101,16 @@ manual is in pdf, html and text format (generated from docbook).
 Issues with the current version:
 
  * Due to Qt, hatched regions sometimes look rather poor when exported
-   to PostScript or PDF.
+   to PostScript, PDF or SVG.
+
+ * Clipping of data does not work in the SVG export as Qt currently
+   does not support this.
 
  * Due to a bug in Qt, some long lines, or using log scales, can lead
    to very slow plot times under X11. This problem is seen with
    dashed/dotted lines. It is fixed by upgrading to Qt-4.5.1 (the
-   Veusz binary version includes this Qt version).
-
- * Can be very slow to plot large datasets if antialiasing is enabled.
-   Right click on graph and disable antialias to speed up output. This
-   is mostly a problem with older Qt versions, however.
+   Veusz binary version includes this Qt version). Switching off
+   antialiasing in the options may help this.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
 the mailing lists at

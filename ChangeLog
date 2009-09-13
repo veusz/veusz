@@ -1,4 +1,225 @@
 ------------------------------------------------------------------------
+r1058 | jeremysanders | 2009-09-12 18:58:33 +0100 (Sat, 12 Sep 2009) | 2 lines
+
+Implement user line styles in EMF export
+
+------------------------------------------------------------------------
+r1057 | jeremysanders | 2009-09-12 15:52:15 +0100 (Sat, 12 Sep 2009) | 2 lines
+
+Mostly working emf export support
+
+------------------------------------------------------------------------
+r1056 | jeremysanders | 2009-09-05 17:51:59 +0100 (Sat, 05 Sep 2009) | 2 lines
+
+Get rid of Application class. Move font initialization code into StyleSheet startup. Mark end-of-line svn property and tag files correctly.
+
+------------------------------------------------------------------------
+r1055 | jeremysanders | 2009-09-03 20:30:44 +0100 (Thu, 03 Sep 2009) | 2 lines
+
+Add CommandInterface enhancements from Matt McCormick for SetDataText and GetData
+
+------------------------------------------------------------------------
+r1054 | jeremysanders | 2009-09-01 20:17:28 +0100 (Tue, 01 Sep 2009) | 2 lines
+
+A major patch to add character encoding options to data import
+
+------------------------------------------------------------------------
+r1053 | jeremysanders | 2009-08-23 17:22:16 +0100 (Sun, 23 Aug 2009) | 2 lines
+
+Use list in freeplotter positions so default is not changed immediately
+
+------------------------------------------------------------------------
+r1052 | jeremysanders | 2009-08-23 16:57:29 +0100 (Sun, 23 Aug 2009) | 2 lines
+
+Add \dot to latex renderer and fix line widths in \frac and \bar
+
+------------------------------------------------------------------------
+r1051 | jeremysanders | 2009-08-23 14:53:21 +0100 (Sun, 23 Aug 2009) | 2 lines
+
+Add \bar to textrender
+
+------------------------------------------------------------------------
+r1050 | jeremysanders | 2009-08-21 16:43:29 +0100 (Fri, 21 Aug 2009) | 2 lines
+
+Make size of error bars in key proportional to height of lines in key rather than marker size
+
+------------------------------------------------------------------------
+r1049 | jeremysanders | 2009-08-16 18:22:17 +0100 (Sun, 16 Aug 2009) | 2 lines
+
+Add option for icon size in toolbars and add to preferences dialog
+
+------------------------------------------------------------------------
+r1048 | jeremysanders | 2009-08-16 17:54:09 +0100 (Sun, 16 Aug 2009) | 2 lines
+
+Add data toolbar
+
+------------------------------------------------------------------------
+r1047 | jeremysanders | 2009-08-15 13:08:31 +0100 (Sat, 15 Aug 2009) | 2 lines
+
+Use shape action menu for adding shapes
+
+------------------------------------------------------------------------
+r1046 | jeremysanders | 2009-08-15 12:49:55 +0100 (Sat, 15 Aug 2009) | 2 lines
+
+Make zoom toolbar button use an action and make it do the previous zoom action
+
+------------------------------------------------------------------------
+r1045 | jeremysanders | 2009-08-13 20:53:59 +0100 (Thu, 13 Aug 2009) | 2 lines
+
+Rename action variables to vzaction to avoid a clash with a built-in name
+
+------------------------------------------------------------------------
+r1044 | jeremysanders | 2009-08-13 20:39:18 +0100 (Thu, 13 Aug 2009) | 2 lines
+
+Update actions in plot window to new format
+
+------------------------------------------------------------------------
+r1043 | jeremysanders | 2009-08-13 20:04:01 +0100 (Thu, 13 Aug 2009) | 2 lines
+
+Move widget editing operations to a separate toolbar
+
+------------------------------------------------------------------------
+r1042 | jeremysanders | 2009-08-11 22:00:13 +0100 (Tue, 11 Aug 2009) | 2 lines
+
+Remove menu items to do with defaults from setting label. Add item to make setting default style. Add item to copy to specific widgets.
+
+------------------------------------------------------------------------
+r1041 | jeremysanders | 2009-08-10 20:58:39 +0100 (Mon, 10 Aug 2009) | 2 lines
+
+Avoid temporary changing of setting while rendering axis
+
+------------------------------------------------------------------------
+r1040 | jeremysanders | 2009-08-10 10:33:13 +0100 (Mon, 10 Aug 2009) | 2 lines
+
+Make 1D->2D dataset conversion more tolerant of rounding errors in X and Y coordinates
+
+------------------------------------------------------------------------
+r1039 | jeremysanders | 2009-08-02 17:50:22 +0100 (Sun, 02 Aug 2009) | 2 lines
+
+When deleting a dataset in dataeditdialog, select next dataset
+
+------------------------------------------------------------------------
+r1038 | jeremysanders | 2009-07-31 20:22:29 +0100 (Fri, 31 Jul 2009) | 2 lines
+
+Fix case with expression datasets where a constant is used for an error value. This patch also makes the parts of the dataset have the same length.
+
+------------------------------------------------------------------------
+r1037 | jeremysanders | 2009-07-31 19:32:38 +0100 (Fri, 31 Jul 2009) | 2 lines
+
+Convert more windows to use action-based menus
+
+------------------------------------------------------------------------
+r1036 | jeremysanders | 2009-07-28 20:41:03 +0100 (Tue, 28 Jul 2009) | 2 lines
+
+Use a cleaner way to initialise the main menu
+
+------------------------------------------------------------------------
+r1035 | jeremysanders | 2009-07-27 12:37:00 +0100 (Mon, 27 Jul 2009) | 2 lines
+
+Use function to get controlgraph pen instead of global variable
+
+------------------------------------------------------------------------
+r1034 | jeremysanders | 2009-07-27 12:33:32 +0100 (Mon, 27 Jul 2009) | 2 lines
+
+Avoid exception in treeeditwindow when loading new document
+
+------------------------------------------------------------------------
+r1033 | jeremysanders | 2009-07-25 13:19:19 +0100 (Sat, 25 Jul 2009) | 2 lines
+
+Implement color preferences for fixed colors in Veusz
+
+------------------------------------------------------------------------
+r1032 | jeremysanders | 2009-07-21 20:22:04 +0100 (Tue, 21 Jul 2009) | 2 lines
+
+Do not ignore nan and inf as text lines
+
+------------------------------------------------------------------------
+r1031 | jeremysanders | 2009-07-20 20:31:36 +0100 (Mon, 20 Jul 2009) | 2 lines
+
+Add plot settings to preferences dialog
+
+------------------------------------------------------------------------
+r1030 | jeremysanders | 2009-07-20 19:49:03 +0100 (Mon, 20 Jul 2009) | 2 lines
+
+Have a preference for a default stylesheet
+
+------------------------------------------------------------------------
+r1029 | jeremysanders | 2009-07-19 17:42:10 +0100 (Sun, 19 Jul 2009) | 2 lines
+
+Add recent files list to styles dialog
+
+------------------------------------------------------------------------
+r1028 | jeremysanders | 2009-07-19 14:27:44 +0100 (Sun, 19 Jul 2009) | 2 lines
+
+Remove import and export stylesheet from main window as these are now in the default styles dialog
+
+------------------------------------------------------------------------
+r1027 | jeremysanders | 2009-07-16 16:19:37 +0100 (Thu, 16 Jul 2009) | 2 lines
+
+Fix for filled contours with non finite coordinates
+
+------------------------------------------------------------------------
+r1026 | jeremysanders | 2009-07-13 20:41:19 +0100 (Mon, 13 Jul 2009) | 2 lines
+
+Implement setting references in command interface and properly save references in settings
+
+------------------------------------------------------------------------
+r1025 | jeremysanders | 2009-07-13 16:12:25 +0100 (Mon, 13 Jul 2009) | 2 lines
+
+settions no longer contains changeset, so use document changeset
+
+------------------------------------------------------------------------
+r1024 | jeremysanders | 2009-07-12 18:17:38 +0100 (Sun, 12 Jul 2009) | 2 lines
+
+Further improvements into new settings arrangement
+
+------------------------------------------------------------------------
+r1023 | jeremysanders | 2009-07-11 18:52:27 +0100 (Sat, 11 Jul 2009) | 3 lines
+
+Major change in way settings are handled.
+All settings are now by default a link to a special stylesheet setting for that widget and setting.
+
+------------------------------------------------------------------------
+r1022 | jeremysanders | 2009-07-08 14:31:02 +0100 (Wed, 08 Jul 2009) | 2 lines
+
+Fix bug in saving 2D dataset links
+
+------------------------------------------------------------------------
+r1021 | jeremysanders | 2009-06-29 16:23:38 +0100 (Mon, 29 Jun 2009) | 2 lines
+
+Use textedit control to show dataset links so word wrapping works better
+
+------------------------------------------------------------------------
+r1020 | jeremysanders | 2009-06-26 20:51:35 +0100 (Fri, 26 Jun 2009) | 2 lines
+
+Implement label axes, where text labels can be plotted on axes
+
+------------------------------------------------------------------------
+r1019 | jeremysanders | 2009-06-20 18:57:45 +0100 (Sat, 20 Jun 2009) | 2 lines
+
+Save filename links in documents as relative links. Documents will try to load data from the same directory as the document and then the original save path (specified with AddImportPath in the saved file).
+
+------------------------------------------------------------------------
+r1018 | jeremysanders | 2009-06-20 12:00:53 +0100 (Sat, 20 Jun 2009) | 2 lines
+
+Run document in current working directory of location of document
+
+------------------------------------------------------------------------
+r1017 | jeremysanders | 2009-06-19 22:47:26 +0100 (Fri, 19 Jun 2009) | 2 lines
+
+Add option to plot symbols with different sizes according to dataset
+
+------------------------------------------------------------------------
+r1009 | jeremysanders | 2009-06-01 19:43:17 +0100 (Mon, 01 Jun 2009) | 2 lines
+
+Improve README for release
+
+------------------------------------------------------------------------
+r1008 | jeremysanders | 2009-06-01 09:43:21 +0100 (Mon, 01 Jun 2009) | 2 lines
+
+Update changelog prior to release
+
+------------------------------------------------------------------------
 r1007 | jeremysanders | 2009-05-31 21:16:20 +0100 (Sun, 31 May 2009) | 2 lines
 
 Fix colorbar issue and clean up a few references to clipping
