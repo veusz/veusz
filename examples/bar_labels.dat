@@ -1,0 +1,4 @@
+descriptor name spring,+,- summer,+-
+"Red"   2 0.2 -0.2      4   0.3
+"Green" 3 0.1 -0.1      2.5 0.1
+"Blue"  5 0.3 -0.2      3   0.2
