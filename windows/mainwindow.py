@@ -926,16 +926,6 @@ class MainWindow(qt4.QMainWindow):
                 return
 
         # File types we can export to in the form ([extensions], Name)
-        formats = [(["eps"], "Encapsulated Postscript"),
-                   (["png"], "Portable Network Graphics"),
-                   (["jpg"], "Jpeg bitmap format"),
-                   (["bmp"], "Windows bitmap format"),
-                   (["pdf"], "Portable Document Format"),
-                   (["svg"], "Scalable Vector Graphics"),
-                   (["emf"], "Windows Metafile Format"),
-                   #(["pic"], "QT Pic format"),
-                   ]
-
         fd = qt4.QFileDialog(self, 'Export page')
         if not self.exportDir:
             fd.setDirectory( self.dirname )
@@ -950,6 +940,7 @@ class MainWindow(qt4.QMainWindow):
         filters = []
         # a list of extensions which are allowed
         validextns = []
+        formats = self.document.getExportFormats()
         for extns, name in formats:
             extensions = " ".join(["*." + item for item in extns])
             # join eveything together to make a filter string

@@ -552,6 +552,25 @@ class Document( qt4.QObject ):
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
             
+    def getExportFormats(self):
+        """Get list of export formats:
+        [
+        (['ext'], 'Filename type'),
+        ...
+        ]
+        """
+        formats = [(["eps"], "Encapsulated Postscript"),
+                   (["png"], "Portable Network Graphics"),
+                   (["jpg"], "Jpeg bitmap"),
+                   (["bmp"], "Windows bitmap"),
+                   (["pdf"], "Portable Document Format"),
+                   (["svg"], "Scalable Vector Graphics"),
+                   #(["pic"], "QT Pic format"),
+                   ]
+        if hasemf:
+            formats.append( (["emf"], "Windows Enhanced Metafile") )
+        return formats
+
     def resolve(self, fromwidget, where):
         """Resolve graph relative to the widget fromwidget
 
