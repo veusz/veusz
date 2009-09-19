@@ -18,14 +18,12 @@
 
 # $Id$
 
-import errno
 import select
 import subprocess
 import os
 import socket
 import platform
 import signal
-import sys
 
 import veusz.qtall as qt4
 import veusz.utils as utils

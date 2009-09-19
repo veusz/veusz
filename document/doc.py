@@ -23,17 +23,13 @@
 
 """A class to represent Veusz documents, with dataset classes."""
 
-import os
 import os.path
 import time
 import random
-import string
 
 import veusz.qtall as qt4
 
 import widgetfactory
-import simpleread
-import datasets
 
 import veusz.utils as utils
 import veusz.setting as setting

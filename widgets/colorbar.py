@@ -29,8 +29,6 @@ import veusz.setting as setting
 
 import graph
 import containers
-import image
-import axis
 import widget
 import axis
 

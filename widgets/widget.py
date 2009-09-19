@@ -23,7 +23,6 @@
 
 import itertools
 
-import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting

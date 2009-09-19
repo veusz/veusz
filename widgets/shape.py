@@ -22,8 +22,6 @@
 
 import itertools
 import os
-import math
-import numpy as N
 
 import veusz.qtall as qt4
 import veusz.setting as setting

@@ -25,14 +25,10 @@
 import itertools
 import os.path
 
-import numpy as N
 import veusz.qtall as qt4
 
-import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
-import importdialog
-import datacreate
 
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""

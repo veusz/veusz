@@ -27,13 +27,10 @@ Classes include
  Grid: Class to plot a grid of plots
 """
 
-import itertools
-
 import veusz.document as document
 import veusz.setting as setting
 
 import widget
-import axis
 import page
 import graph
 import controlgraph

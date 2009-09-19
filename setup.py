@@ -25,8 +25,6 @@ Veusz distutils setup script
 see the file INSTALL for details on how to install Veusz
 """
 
-import sys
-import os.path
 import glob
 import numpy
 

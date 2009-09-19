@@ -22,7 +22,6 @@
 This allows the user to send a bug report in via email.'''
 
 import sys
-import os
 import os.path
 import time
 import traceback
@@ -105,10 +104,10 @@ class ExceptionSendDialog(qt4.QDialog):
             # something went wrong...
             mb = qt4.QMessageBox("Veusz",
                                  "Failed to send message",
-                                 qt.QMessageBox.Critical,
-                                 qt.QMessageBox.Ok | qt.QMessageBox.Default,
-                                 qt.QMessageBox.NoButton,
-                                 qt.QMessageBox.NoButton)
+                                 qt4.QMessageBox.Critical,
+                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                 qt4.QMessageBox.NoButton,
+                                 qt4.QMessageBox.NoButton)
             mb.exec_loop()
             return
 

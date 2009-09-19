@@ -59,10 +59,10 @@ class Contour(plotters.GenericPlotter):
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
         # try to import contour helpers here
+        Cntr = None
         try:
             from veusz.helpers._nc_cntr import Cntr
         except ImportError:
-            Cntr = None
             print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'
                                 'Please run python setup.py build\n'
                                 'Contour support is disabled')

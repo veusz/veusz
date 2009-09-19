@@ -29,7 +29,6 @@ import numpy as N
 
 import veusz.setting as setting
 import veusz.dialogs.exceptiondialog as exceptiondialog
-import veusz.widgets as widgets
 import veusz.document as document
 import veusz.utils as utils
 import veusz.widgets as widgets

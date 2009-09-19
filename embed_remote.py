@@ -19,7 +19,6 @@
 # $Id$
 
 import sys
-import os
 import struct
 import cPickle
 import socket

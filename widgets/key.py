@@ -25,7 +25,6 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import plotters
 import widget
 import graph
 import controlgraph

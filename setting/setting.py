@@ -29,8 +29,6 @@ s.fromText('42')
 """
 
 import re
-import math
-import sys
 
 import numpy as N
 import veusz.qtall as qt4

@@ -18,6 +18,8 @@
 
 # $Id$
 
+import sys
+
 from settings import Settings
 import setting
 import collections
@@ -79,7 +81,7 @@ def _registerFontStyleSheet():
             
     if deffont is None:
         print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
-        deffont = unicode(_fontfamilies[0])
+        deffont = unicode(families[0])
 
     collections.Text.defaultfamily = deffont
     collections.Text.families = families

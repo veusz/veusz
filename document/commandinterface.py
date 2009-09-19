@@ -28,8 +28,6 @@ external programs.
 
 import os.path
 
-import numpy as N
-
 import veusz.qtall as qt4
 import veusz.setting as setting
 

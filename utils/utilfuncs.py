@@ -25,7 +25,6 @@ import sys
 import string
 import weakref
 import re
-import time
 import os.path
 import threading
 import dates

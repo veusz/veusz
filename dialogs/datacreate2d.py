@@ -21,7 +21,6 @@
 """Dataset creation dialog for 2d data."""
 
 import os.path
-import re
 
 import veusz.qtall as qt4
 import veusz.utils as utils

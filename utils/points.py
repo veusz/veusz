@@ -239,7 +239,7 @@ def getPainterPath(painter, name, size):
     elif name == 'none':
         return qt4.QPainterPath(), True
     else:
-        raise ValueError, "Invalid marker name %s" % markername
+        raise ValueError, "Invalid marker name %s" % name
 
 #######################################################################
 ## external interfaces

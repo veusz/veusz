@@ -32,7 +32,6 @@ I have removed the timeout checking as this probably isn't a serious
 problem for veusz documents
 """
 
-import parser
 import inspect, compiler.ast
 import thread, time
 import __builtin__

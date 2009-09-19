@@ -43,7 +43,6 @@ More than one embedded window can be opened at once
 
 import atexit
 import sys
-import os
 import os.path
 import struct
 import new

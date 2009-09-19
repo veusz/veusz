@@ -21,8 +21,6 @@
 """A database for default values of settings."""
 
 import sys
-import os
-import os.path
 import atexit
 
 import veusz.qtall as qt4

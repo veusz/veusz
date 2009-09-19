@@ -40,7 +40,6 @@ The first 3 mean the same thing, the last means read from 1 to 5
 """
 
 import re
-import sys
 import cStringIO
 
 import numpy as N
