@@ -916,14 +916,14 @@ class MainWindow(qt4.QMainWindow):
 
         # check there is a page
         if self.document.getNumberPages() == 0:
-                qt4.QMessageBox("Veusz",
-                                "No pages to export",
-                                qt4.QMessageBox.Warning,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
-                return
+            qt4.QMessageBox("Veusz",
+                            "No pages to export",
+                            qt4.QMessageBox.Warning,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
 
         # File types we can export to in the form ([extensions], Name)
         fd = qt4.QFileDialog(self, 'Export page')
@@ -1006,14 +1006,14 @@ class MainWindow(qt4.QMainWindow):
         """Print the document."""
 
         if self.document.getNumberPages() == 0:
-                qt4.QMessageBox("Veusz",
-                                "No pages to print",
-                                qt4.QMessageBox.Warning,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
-                return
+            qt4.QMessageBox("Veusz",
+                            "No pages to print",
+                            qt4.QMessageBox.Warning,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
 
         prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
         prnt.setColorMode(qt4.QPrinter.Color)

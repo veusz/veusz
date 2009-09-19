@@ -650,12 +650,12 @@ class Dataset(DatasetBase):
         rowdata is a dict of {column: data}.
         """
         for col in self.columns:
-           coldata = getattr(self, col)
-           data = N.zeros(numrows)
-           if col in rowdata:
-               data[:len(rowdata[col])] = N.array(rowdata[col])
-           if coldata is not None:
-               setattr(self, col, N.insert(coldata, [row]*numrows, data))
+            coldata = getattr(self, col)
+            data = N.zeros(numrows)
+            if col in rowdata:
+                data[:len(rowdata[col])] = N.array(rowdata[col])
+            if coldata is not None:
+                setattr(self, col, N.insert(coldata, [row]*numrows, data))
 
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""

@@ -40,7 +40,7 @@ def isStockObject(obj):
 
 class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
      """Extended pen creation record with custom line style."""
-     
+
      emr_typedef=[
           ('i','handle',0),
           ('i','offBmi',0),
@@ -58,7 +58,7 @@ class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
                   styleentries=[]):
           """Create pen.
           styleentries is a list of dash and space lengths."""
-          
+
           pyemf._EMR._EXTCREATEPEN.__init__(self)
           self.style = style
           self.penwidth = width
@@ -95,7 +95,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
           self.pen = self.emf.GetStockObject(pyemf.BLACK_PEN)
           self.pencolor = (0, 0, 0)
           self.brush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
-          
+
           self.paintdevice = paintdevice
           return True
 
@@ -140,7 +140,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
           for pt in points:
                x, y = (pt.x()-0.5)*scale, (pt.y()-0.5)*scale
                self.emf.Pie( x, y,
-                             (pt.x()+0.5)*scale, (pt.y()+0.5)*scale, 
+                             (pt.x()+0.5)*scale, (pt.y()+0.5)*scale,
                              x, y, x, y )
 
      def drawPixmap(self, r, pixmap, sr):
@@ -172,7 +172,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
           epix.ySrc = sr.top()
           epix.cxSrc = sr.width()
           epix.cySrc = sr.height()
-   
+
           epix.dwRop = 0xcc0020 # SRCCOPY
           epix.offBmiSrc = epix.serializeOffset()
           epix.cbBmiSrc = hdrsize
