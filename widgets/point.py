@@ -75,8 +75,28 @@ def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
         painter.setBrush( qt4.QBrush() )
 
         for xmn, ymn, xmx, ymx in itertools.izip(xmin, ymin, xmax, ymax):
-            painter.drawPolygon( qt4.QPointF(xmn, ymn), qt4.QPointF(xmx, ymn),
-                                 qt4.QPointF(xmx, ymx), qt4.QPointF(xmn, ymx) )
+            painter.drawRect( qt4.QRectF(qt4.QPointF(xmn, ymn), qt4.QPointF(xmx, ymx)) )
+
+def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                        s, painter):
+    """Draw box filled region inside error bars."""
+    if None not in (xmin, xmax, ymin, ymax):
+        painter.save()
+        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+        # filled region below
+        if not s.FillBelow.hideerror:
+            painter.setBrush( s.FillBelow.makeQBrush() )
+            for xmn, ymn, xmx, yplt in itertools.izip(xmin, ymin, xmax, yplotter):
+                painter.drawRect( qt4.QRectF(qt4.QPointF(xmn, ymn),
+                                             qt4.QPointF(xmx, yplt)) )
+
+        # filled region above
+        if not s.FillAbove.hideerror:
+            painter.setBrush( s.FillAbove.makeQBrush() )
+            for xmn, yplt, xmx, ymx in itertools.izip(xmin, yplotter, xmax, ymax):
+                painter.drawRect( qt4.QRectF(qt4.QPointF(xmn, yplt),
+                                             qt4.QPointF(xmx, ymx)) )
+        painter.restore()
 
 def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                       s, painter):
@@ -178,6 +198,7 @@ _errorBarFunctionMap = {
     'barbox': (_errorBarsBar, _errorBarsBox,),
     'barends': (_errorBarsBar, _errorBarsEnds,),
     'box':  (_errorBarsBox,),
+    'boxfill': (_errorBarsBoxFilled, _errorBarsBox,),
     'diamond':  (_errorBarsDiamond,),
     'curve': (_errorBarsCurve,),
     'fillhorz': (_errorBarsFilled,),

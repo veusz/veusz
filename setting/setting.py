@@ -1531,6 +1531,7 @@ class ErrorStyle(Choice):
         'none',
         'bar', 'barends', 'box', 'diamond', 'curve',
         'barbox', 'bardiamond', 'barcurve',
+        'boxfill',
         'fillvert', 'fillhorz',
         'linevert', 'linehorz',
         )
