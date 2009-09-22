@@ -32,6 +32,7 @@ Changes in 1.5:
    dataset (this is the "Scale markers" option for point plotters)
 
 More minor changes
+ * Custom delimiter support in CSV data importer
  * Add SetDataText and support text in GetData in command API
  * \dot and \bar added to LaTeX renderer
  * Option to change icon sizes displayed
