@@ -27,9 +27,12 @@ see the file INSTALL for details on how to install Veusz
 
 import glob
 import numpy
+import PyQt4
+import os.path
 
 from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
+import pyqtdistutils
 
 # use py2exe if available
 try:
@@ -50,6 +53,8 @@ class smart_install_data(install_data):
         self.install_dir = getattr(install_cmd, 'install_lib')
         return install_data.run(self)
 
+qtcfg = PyQt4.pyqtconfig.Configuration()
+
 descr = '''Veusz is a scientific plotting package, designed to create
 publication-ready Postscript output. It features GUI, command-line,
 and scripting interfaces. Graphs are constructed from "widgets",
@@ -65,7 +70,6 @@ setup(name = 'veusz',
       author_email = 'jeremy@jeremysanders.net',
       url = 'http://home.gna.org/veusz/',
       license = 'GPL',
-      cmdclass = { 'install_data': smart_install_data },
       classifiers = ['Programming Language :: Python',
                      'Development Status :: 4 - Beta',
                      'Environment :: X11 Applications :: Qt',
@@ -99,5 +103,25 @@ setup(name = 'veusz',
                   'veusz.windows'],
       ext_modules = [ Extension('veusz.helpers._nc_cntr',
                                 ['helpers/src/_nc_cntr.c'],
-                                include_dirs=[numpy.get_include()]) ]
+                                include_dirs=[numpy.get_include()]),
+
+                      # helper module
+                      Extension('veusz.helpers.qtloops',
+                                ['helpers/src/qtloops.cpp',
+                                 'helpers/src/qtloops_helpers.cpp',
+                                 'helpers/src/qtloops.sip'],
+                                language="c++",
+                                include_dirs=['/helpers/src',
+                                              os.path.join(qtcfg.qt_inc_dir, 'QtCore'),
+                                              os.path.join(qtcfg.qt_inc_dir, 'QtGui'),
+                                              qtcfg.qt_inc_dir],
+                                library_dirs = [qtcfg.qt_lib_dir],
+                                libraries = ['QtGui', 'QtCore'],
+                                ),
+                      ],
+                                
+
+      cmdclass = {'build_ext': pyqtdistutils.build_ext,
+                  'install_data': smart_install_data },
+
       )

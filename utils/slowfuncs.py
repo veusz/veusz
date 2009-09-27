@@ -1,6 +1,4 @@
-# __init__.py file for utils
-  
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2009 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -16,23 +14,21 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-###############################################################################
+##############################################################################
 
 # $Id$
 
-from utilfuncs import *
-from textrender import *
-from points import *
-from version import *
-from fitlm import *
-from action import *
-from pdf import *
-from dates import *
-from safe_eval import veusz_eval_context, checkCode
+"""
+These are slow versions of routines also implemented in C++
+"""
 
-try:
-    from veusz.helpers.qtloops import addNumpyToPolygonF
-except ImportError:
-    print "Warning: Using slow substitutes for some functions"
-    print "Compile helpers to avoid this warning"
-    from slowfuncs import addNumpyToPolygonF
+import veusz.qtall as qt4
+
+def addNumpyToPolygonF(poly, *args):
+    """Add a set of numpy arrays to a QPolygonF."""
+
+    for row in xrange(len(args[0])):
+        for col in xrange(0, len(args), 2):
+            x = args[col][row]
+            y = args[col+1][row]
+            poly.append( qt4.QPointF(x, y) )

@@ -367,8 +367,7 @@ class Contour(plotters.GenericPlotter):
 
         # draw lines
         pts = qt4.QPolygonF()
-        for x, y in itertools.izip(xplt, yplt):
-            pts.append( qt4.QPointF(x, y) )
+        utils.addNumpyToPolygonF(pts, xplt, yplt)
         painter.drawPolyline(pts)
 
         # actually plot the label
@@ -408,8 +407,7 @@ class Contour(plotters.GenericPlotter):
                     
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
-                for x, y in itertools.izip(xplt, yplt):
-                    pts.append( qt4.QPointF(x, y) )
+                utils.addNumpyToPolygonF(pts, xplt, yplt)
 
                 if showlabels:
                     self.plotContourLabel(painter, s.levelsOut[num], xplt, yplt)
@@ -448,8 +446,7 @@ class Contour(plotters.GenericPlotter):
 
                 # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
-                for x, y in itertools.izip(xplt, yplt):
-                    pts.append( qt4.QPointF(x, y) )
+                utils.addNumpyToPolygonF(pts, xplt, yplt)
 
                 # actually draw the curve to the plotter
                 painter.drawPolygon(pts)

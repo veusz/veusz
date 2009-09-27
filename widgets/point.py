@@ -381,24 +381,23 @@ class PointPlotter(GenericPlotter):
 
         # simple continuous line
         if steps == 'off':
-            for xpt, ypt in itertools.izip(xvals, yvals):
-                pts.append(qt4.QPointF(xpt, ypt))
+            utils.addNumpyToPolygonF(pts, xvals, yvals)
 
         # stepped line, with points on left
         elif steps == 'left':
-            for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
-                                                 yvals[:-1], yvals[1:]):
-                pts.append(qt4.QPointF(x1, y1))
-                pts.append(qt4.QPointF(x2, y1))
-                pts.append(qt4.QPointF(x2, y2))
+            x1 = xvals[:-1]
+            x2 = xvals[1:]
+            y1 = yvals[:-1]
+            y2 = yvals[1:]
+            utils.addNumpyToPolygonF(pts, x1, y1, x2, y1, x2, y2)
 
         # stepped line, with points on right
         elif steps == 'right':
-            for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
-                                                 yvals[:-1], yvals[1:]):
-                pts.append(qt4.QPointF(x1, y1))
-                pts.append(qt4.QPointF(x1, y2))
-                pts.append(qt4.QPointF(x2, y2))
+            x1 = xvals[:-1]
+            x2 = xvals[1:]
+            y1 = yvals[:-1]
+            y2 = yvals[1:]
+            utils.addNumpyToPolygonF(pts, x1, y1, x1, y2, x2, y2)
             
         # stepped line, with points in centre
         # this is complex as we can't use the mean of the plotter coords,
@@ -417,20 +416,17 @@ class PointPlotter(GenericPlotter):
                 xmax = axes[0].dataToPlotterCoords(posn, xmax)
                 xmin = N.clip(xmin, -32767, 32767)
                 xmax = N.clip(xmax, -32767, 32767)
-
-                for xmn, xmx, y in itertools.izip(xmin, xmax, yvals):
-                    pts.append( qt4.QPointF(xmn, y) )
-                    pts.append( qt4.QPointF(xmx, y) )
+                utils.addNumpyToPolygonF(pts, xmn, y, xmx, y)
 
             else:
                 # we put the bin edges half way between the points
                 # we assume this is the correct thing to do even in log space
-                for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
-                                                     yvals[:-1], yvals[1:]):
-                    xc = 0.5*(x1+x2)
-                    pts.append(qt4.QPointF(x1, y1))
-                    pts.append(qt4.QPointF(xc, y1))
-                    pts.append(qt4.QPointF(xc, y2))
+                x1 = xvals[:-1]
+                x2 = xvals[1:]
+                y1 = yvals[:-1]
+                y2 = yvals[1:]
+                xc = 0.5*(x1+x2)
+                utils.addNumpyToPolygonF(pts, x1, y1, xc, y1, xc, y2)
 
                 if len(xvals) > 0:
                     pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
