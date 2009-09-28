@@ -22,6 +22,7 @@
 These are slow versions of routines also implemented in C++
 """
 
+from itertools import izip
 import veusz.qtall as qt4
 
 def addNumpyToPolygonF(poly, *args):
@@ -32,3 +33,11 @@ def addNumpyToPolygonF(poly, *args):
             x = args[col][row]
             y = args[col+1][row]
             poly.append( qt4.QPointF(x, y) )
+
+def plotPathsToPainter(painter, path, x, y):
+    """Plot array of x, y points."""
+
+    for xp, yp for izip(x, y):
+        painter.translate(xp, yp)
+        painter.drawPath(path)
+        painter.translate(-xp, -yp)

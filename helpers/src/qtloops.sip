@@ -47,3 +47,12 @@ void addNumpyToPolygonF(QPolygonF*, ...);
    addNumpyToPolygonF(a0, t.data);
    }
 %End
+
+void plotPathsToPainter(QPainter*, QPainterPath*, SIP_PYOBJECT, SIP_PYOBJECT);
+%MethodCode
+   {
+   NumpyInValarray x(a2);
+   NumpyInValarray y(a3);
+   plotPathsToPainter(a0, a1, x.data, y.data);
+   }
+%End

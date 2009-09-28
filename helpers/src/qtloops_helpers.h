@@ -47,4 +47,18 @@ private:
   std::vector<double*> _convdata;
 };
 
+// class for converting numpy array to a valarray
+class NumpyInValarray
+{
+ public:
+  NumpyInValarray(PyObject* array);
+  ~NumpyInValarray();
+
+  doublearray* data;
+
+ private:
+  PyObject* _convitem;
+  double* _convdata;
+};
+
 #endif

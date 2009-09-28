@@ -23,6 +23,8 @@
 #include <vector>
 #include <valarray>
 #include <QtGui/QPolygonF>
+#include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
 
 class QtLoops {
 public:
@@ -31,5 +33,8 @@ public:
 
 void addNumpyToPolygonF(QPolygonF* poly,
 			const doublearray_ptr_vec &v);
+
+void plotPathsToPainter(QPainter* painter, QPainterPath* path,
+			const doublearray* x, const doublearray* y);
 
 #endif

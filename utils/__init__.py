@@ -31,8 +31,8 @@ from dates import *
 from safe_eval import veusz_eval_context, checkCode
 
 try:
-    from veusz.helpers.qtloops import addNumpyToPolygonF
+    from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter
 except ImportError:
     print "Warning: Using slow substitutes for some functions"
     print "Compile helpers to avoid this warning"
-    from slowfuncs import addNumpyToPolygonF
+    from slowfuncs import addNumpyToPolygonF, plotPathsToPainter

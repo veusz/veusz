@@ -20,6 +20,7 @@
 
 #include <QPointF>
 #include <vector>
+#include <algorithm>
 
 void addNumpyToPolygonF(QPolygonF *poly,
 			const doublearray_ptr_vec &d)
@@ -49,3 +50,21 @@ void addNumpyToPolygonF(QPolygonF *poly,
 	break;
     }
 }
+
+void plotPathsToPainter(QPainter* painter, QPainterPath* path,
+			const doublearray* x, const doublearray* y)
+{
+  const double* xi = & x->operator[](0);
+  const double* yi = & y->operator[](0);
+  const double* const xend = xi + x->size();
+  const double* const yend = yi + y->size();
+
+  for( ; xi != xend && yi != yend; ++xi, ++yi)
+    {
+      painter->translate(*xi, *yi);
+      painter->drawPath(*path);
+      painter->translate(-*xi, -*yi);
+    }
+
+}
+

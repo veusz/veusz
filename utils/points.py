@@ -25,6 +25,11 @@ from itertools import izip
 import veusz.qtall as qt4
 import numpy as N
 
+try:
+    from veusz.helpers.qtloops import plotPathsToPainter
+except ImportError:
+    from slowfuncs import plotPathsToPainter
+
 """This is the symbol plotting part of Veusz
 
 There are actually several different ways symbols are plotted.
@@ -297,11 +302,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
 
     # split up into two loops as this is a critical path
     if scaling is None:
-        # actually plot the markers (with no scaling)
-        for x, y in izip(xpos, ypos):
-            t(x, y)
-            d(path)
-            r()
+        plotPathsToPainter(painter, path, xpos, ypos)
     else:
         # plot markers, scaling each one
         s = painter.scale

@@ -65,3 +65,28 @@ TupleInValarray::~TupleInValarray()
       PyArray_Free(_convitems[i], _convdata[i]);
     }
 }
+
+NumpyInValarray::NumpyInValarray(PyObject* array)
+  : data(0), _convdata(0)
+{
+  _convitem = array;
+
+  npy_intp dims = -1;
+  if( PyArray_AsCArray(&_convitem, &_convdata, &dims, 1,
+		       PyArray_DescrFromType(NPY_DOUBLE)) )
+    {
+      throw "Cannot convert items to floating point data";
+    }
+
+  data = new doublearray(_convdata, dims);
+}
+
+NumpyInValarray::~NumpyInValarray()
+{
+  delete data;
+  
+  if( _convdata )
+    {
+      PyArray_Free(_convitem, _convdata);
+    }
+}
