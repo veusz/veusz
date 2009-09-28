@@ -34,7 +34,7 @@ TupleInValarray::TupleInValarray(PyObject* tuple)
     {
       // access python tuple item
       PyObject* obj = PyTuple_GetItem(tuple, i);
-      int dims = -1;
+      npy_intp dims = -1;
       double* objdata = 0;
 
       // convert to C array (stored in objdata)
