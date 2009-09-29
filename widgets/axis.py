@@ -533,7 +533,9 @@ class Axis(widget.Widget):
     def _drawAxisLine(self, painter):
         """Draw the line of the axis."""
 
-        painter.setPen( self.settings.get('Line').makeQPen(painter) )
+        pen = self.settings.get('Line').makeQPen(painter)
+        pen.setCapStyle(qt4.Qt.FlatCap)
+        painter.setPen(pen)
         self.swapline( painter,
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
@@ -543,7 +545,9 @@ class Axis(widget.Widget):
 
         s = self.settings
         mt = s.get('MinorTicks')
-        painter.setPen( mt.makeQPen(painter) )
+        pen = mt.makeQPen(painter)
+        pen.setCapStyle(qt4.Qt.FlatCap)
+        painter.setPen(pen)
         delta = mt.getLength(painter)
         if len(self.minortickscalc):
             minorticks = self._graphToPlotter(self.minortickscalc)
@@ -563,8 +567,11 @@ class Axis(widget.Widget):
         """Draw major ticks on the plot."""
 
         s = self.settings
-        painter.setPen( s.get('MajorTicks').makeQPen(painter) )
-        startdelta = s.get('MajorTicks').getLength(painter)
+        mt = s.get('MajorTicks')
+        pen = mt.makeQPen(painter)
+        pen.setCapStyle(qt4.Qt.FlatCap)
+        painter.setPen(pen)
+        startdelta = mt.getLength(painter)
         delta = startdelta
 
         if s.direction == 'vertical':
