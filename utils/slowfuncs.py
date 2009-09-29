@@ -37,7 +37,14 @@ def addNumpyToPolygonF(poly, *args):
 def plotPathsToPainter(painter, path, x, y):
     """Plot array of x, y points."""
 
-    for xp, yp for izip(x, y):
+    for xp, yp in izip(x, y):
         painter.translate(xp, yp)
         painter.drawPath(path)
         painter.translate(-xp, -yp)
+
+def plotLinesToPainter(painter, x1, y1, x2, y2):
+    """Plot lines given in numpy arrays to painter."""
+    lines = []
+    for p in izip(x1, y1, x2, y2):
+        lines.append( qt4.QLineF(*p) )
+    painter.drawLines(lines)

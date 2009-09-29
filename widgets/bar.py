@@ -26,6 +26,7 @@ import numpy as N
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
+import veusz.utils as utils
 
 from plotters import GenericPlotter
 
@@ -278,29 +279,23 @@ class BarPlotter(GenericPlotter):
 
         # draw error bars
         painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(painter) )
-        pts = []
         w = barwidth*0.25
         if ishorz:
-            for x1, x2, y in izip(mincoord, maxcoord, posns):
-                pts.append( qt4.QPointF(x1, y) )
-                pts.append( qt4.QPointF(x2, y) )
+            utils.plotLinesToPainter(painter, mincoord, posns,
+                                     maxcoord, posns)
             if s.errorstyle == 'barends':
-                for x1, x2, y in izip(mincoord, maxcoord, posns):
-                    pts.append( qt4.QPointF(x1, y-w) )
-                    pts.append( qt4.QPointF(x1, y+w) )
-                    pts.append( qt4.QPointF(x2, y-w) )
-                    pts.append( qt4.QPointF(x2, y+w) )
+                utils.plotLinesToPainter(painter, mincoord, posns-w,
+                                         mincoord, posns+w)
+                utils.plotLinesToPainter(painter, maxcoord, posns-w,
+                                         maxcoord, posns+w)
         else:
-            for y1, y2, x in izip(mincoord, maxcoord, posns):
-                pts.append( qt4.QPointF(x, y1) )
-                pts.append( qt4.QPointF(x, y2) )
+            utils.plotLinesToPainter(painter, posns, mincoord,
+                                     posns, maxcoord)
             if s.errorstyle == 'barends':
-                for y1, y2, x in izip(mincoord, maxcoord, posns):
-                    pts.append( qt4.QPointF(x-w, y1) )
-                    pts.append( qt4.QPointF(x+w, y1) )
-                    pts.append( qt4.QPointF(x-w, y2) )
-                    pts.append( qt4.QPointF(x+w, y2) )
-        painter.drawLines(pts)
+                utils.plotLinesToPainter(painter, posns-w, mincoord,
+                                         posns+w, mincoord)
+                utils.plotLinesToPainter(painter, posns-w, maxcoord,
+                                         posns+w, maxcoord)
 
     def barDrawGroup(self, painter, posns, maxwidth, dsvals,
                      axes, widgetposn):

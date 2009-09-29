@@ -19,6 +19,9 @@
 #include "qtloops.h"
 
 #include <QPointF>
+#include <QVector>
+#include <QLineF>
+
 #include <vector>
 #include <algorithm>
 
@@ -68,3 +71,27 @@ void plotPathsToPainter(QPainter* painter, QPainterPath* path,
 
 }
 
+void plotLinesToPainter(QPainter* painter,
+			const doublearray* x1, const doublearray* y1,
+			const doublearray* x2, const doublearray* y2)
+{
+  const size_t maxsize = std::min( std::min(x1->size(), y1->size()),
+				   std::min(x2->size(), y2->size()) );
+
+  if( maxsize != 0 )
+    {
+      QVector<QLineF> lines;
+
+      const double* x1p = &((*x1)[0]);
+      const double* x2p = &((*x2)[0]);
+      const double* y1p = &((*y1)[0]);
+      const double* y2p = &((*y2)[0]);
+      for( size_t i = 0; i != maxsize; ++i)
+	{
+	  lines << QLineF(*x1p, *y1p, *x2p, *y2p);
+	  ++x1p; ++x2p; ++y1p; ++y2p;
+	}
+      
+      painter->drawLines(lines);
+    }
+}

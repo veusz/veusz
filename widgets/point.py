@@ -36,37 +36,30 @@ from plotters import GenericPlotter
 def _errorBarsBar(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                   s, painter):
     """Draw bar style error lines."""
-    # list of output lines
-    pts = []
-
     # vertical error bars
     if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-        for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
-            pts.append( qt4.QLineF(x, y1, x, y2) )
+        utils.plotLinesToPainter(painter, xplotter, ymin, xplotter, ymax)
 
     # horizontal error bars
     if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-        for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
-            pts.append( qt4.QLineF(x1, y, x2, y) )
-    if pts:
-        painter.drawLines(pts)
+        utils.plotLinesToPainter(painter, xmin, yplotter, xmax, yplotter)
 
 def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                    s, painter):
     """Draw perpendiclar ends on error bars."""
     size = s.get('markerSize').convert(painter)
-    lines = []
+
     if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-        for x, y1, y2 in itertools.izip(xplotter, ymin, ymax):
-            lines.append( qt4.QLineF(x-size, y1, x+size, y1) )
-            lines.append( qt4.QLineF(x-size, y2, x+size, y2) )
+        utils.plotLinesToPainter(painter, xplotter-size, ymin,
+                                 xplotter+size, ymin)
+        utils.plotLinesToPainter(painter, xplotter-size, ymax,
+                                 xplotter+size, ymax)
 
     if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-        for x1, x2, y in itertools.izip(xmin, xmax, yplotter):
-            lines.append( qt4.QLineF(x1, y-size, x1, y+size) )
-            lines.append( qt4.QLineF(x2, y-size, x2, y+size) )
-    if lines:
-        painter.drawLines(lines)
+        utils.plotLinesToPainter(painter, xmin, yplotter-size,
+                                 xmin, yplotter+size)
+        utils.plotLinesToPainter(painter, xmax, yplotter-size,
+                                 xmax, yplotter+size)
 
 def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                   s, painter):
@@ -486,21 +479,21 @@ class PointPlotter(GenericPlotter):
         xv = s.get('xData').getData(self.document)
         yv = s.get('yData').getData(self.document)
         yp = y + height/2
-        xpts = [x-width, x+width/2, x+2*width]
-        ypts = [yp, yp, yp]
+        xpts = N.array([x-width, x+width/2, x+2*width])
+        ypts = N.array([yp, yp, yp])
 
         # size of error bars in key
         errorsize = height*0.4
 
         # make points for error bars (if any)
         if xv and xv.hasErrors():
-            xneg = [x-width, x+width/2-errorsize, x+2*width]
-            xpos = [x-width, x+width/2+errorsize, x+2*width]
+            xneg = N.array([x-width, x+width/2-errorsize, x+2*width])
+            xpos = N.array([x-width, x+width/2+errorsize, x+2*width])
         else:
             xneg = xpos = xpts
         if yv and yv.hasErrors():
-            yneg = [yp-errorsize, yp-errorsize, yp-errorsize]
-            ypos = [yp+errorsize, yp+errorsize, yp+errorsize]
+            yneg = N.array([yp-errorsize, yp-errorsize, yp-errorsize])
+            ypos = N.array([yp+errorsize, yp+errorsize, yp+errorsize])
         else:
             yneg = ypos = ypts
 

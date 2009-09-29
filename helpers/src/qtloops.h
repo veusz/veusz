@@ -37,4 +37,8 @@ void addNumpyToPolygonF(QPolygonF* poly,
 void plotPathsToPainter(QPainter* painter, QPainterPath* path,
 			const doublearray* x, const doublearray* y);
 
+void plotLinesToPainter(QPainter* painter,
+			const doublearray* x1, const doublearray* y1,
+			const doublearray* x2, const doublearray* y2);
+
 #endif

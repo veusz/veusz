@@ -56,3 +56,18 @@ void plotPathsToPainter(QPainter*, QPainterPath*, SIP_PYOBJECT, SIP_PYOBJECT);
    plotPathsToPainter(a0, a1, x.data, y.data);
    }
 %End
+
+void plotLinesToPainter(QPainter* painter,
+			SIP_PYOBJECT, SIP_PYOBJECT,
+			SIP_PYOBJECT, SIP_PYOBJECT);
+%MethodCode
+   {
+   NumpyInValarray x1(a1);
+   NumpyInValarray y1(a2);
+   NumpyInValarray x2(a3);
+   NumpyInValarray y2(a4);
+   plotLinesToPainter(a0, x1.data, y1.data, x2.data, y2.data);
+   }
+
+%End
+
