@@ -416,7 +416,7 @@ class PointPlotter(GenericPlotter):
                 xmax = axes[0].dataToPlotterCoords(posn, xmax)
                 xmin = N.clip(xmin, -32767, 32767)
                 xmax = N.clip(xmax, -32767, 32767)
-                utils.addNumpyToPolygonF(pts, xmn, y, xmx, y)
+                utils.addNumpyToPolygonF(pts, xmin, yvals, xmax, yvals)
 
             else:
                 # we put the bin edges half way between the points
