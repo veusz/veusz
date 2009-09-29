@@ -224,7 +224,7 @@ class Image(plotters.GenericPlotter):
         """
 
         cmap = N.array(cmap)
-        if not struct.pack("h", 1) == "\000\001":
+        if struct.pack("h", 1) == "\000\001":
             # have to swap colors for big endian architectures
             cmap2 = N.array(cmap)
             cmap2[:,0] = cmap[:,3]
