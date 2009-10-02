@@ -955,7 +955,7 @@ class MainWindow(qt4.QMainWindow):
             filt = setting.settingdb['export_lastformat']
             fd.selectFilter(filt)
             extn = formats[filters.index(filt)][0][0]
-        except KeyError:
+        except (KeyError, IndexError):
             extn = 'eps'
 
         if self.filename:
