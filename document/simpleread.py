@@ -55,10 +55,10 @@ class DescriptorError(ValueError):
 # hopefully a matching expression can be passed to eval
 string_re = re.compile( r'''
 ^
-"" |            # match empty double-quoted string
-".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
-'' |            # match empty single-quoted string
-'.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
+u?"" |            # match empty double-quoted string
+u?".*?[^\\]" |    # match double-quoted string, ignoring escaped quotes
+u?'' |            # match empty single-quoted string
+u?'.*?[^\\]'      # match single-quoted string, ignoring escaped quotes
 $
 ''', re.VERBOSE )
 
