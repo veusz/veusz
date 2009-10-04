@@ -43,8 +43,6 @@ class GenericPlotter(widget.Widget):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
 
-        s = self.settings
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
@@ -147,7 +145,11 @@ class FreePlotter(widget.Widget):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
 
-        s = self.settings
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        widget.Widget.addSettings(s)
+
         s.add( setting.DatasetOrFloatList('xPos', [0.5],
                                           descr='List of fractional X '
                                           'coordinates or dataset',
