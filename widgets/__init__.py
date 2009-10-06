@@ -38,3 +38,4 @@ from colorbar import *
 from shape import *
 from line import *
 from bar import *
+from polygon import *

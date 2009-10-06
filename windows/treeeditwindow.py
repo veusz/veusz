@@ -663,7 +663,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'image', 'contour',
                            'key', 'label', 'colorbar',
                            'rect', 'ellipse', 'imagefile',
-                           'line'):
+                           'line', 'polygon'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
@@ -723,7 +723,8 @@ class TreeEditDock(qt4.QDockWidget):
         menuitems = [
             ('insert', '', addact + [
                     ['insert.shape', 'Add shape',
-                     ['add.rect', 'add.ellipse', 'add.line', 'add.imagefile']
+                     ['add.rect', 'add.ellipse', 'add.line', 'add.imagefile',
+                      'add.polygon']
                      ]]),
             ('edit', '', [
                     'edit.cut', 'edit.copy', 'edit.paste',

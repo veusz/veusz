@@ -48,6 +48,48 @@ def _convertNumpy(a):
         else:
             return a
 
+def generateValidDatasetParts(*datasets):
+    """Generator to return array of valid parts of datasets.
+
+    Yields new datasets between rows which are invalid
+    """
+
+    # find NaNs and INFs in input dataset
+    invalid = datasets[0].invalidDataPoints()
+    minlen = invalid.shape[0]
+    for ds in datasets[1:]:
+        try:
+            nextinvalid = ds.invalidDataPoints()
+            minlen = min(nextinvalid.shape[0], minlen)
+            invalid = N.logical_or(invalid[:minlen], nextinvalid[:minlen])
+        except AttributeError:
+            # if not a dataset
+            pass
+
+    # get indexes of invalid pounts
+    indexes = invalid.nonzero()[0].tolist()
+
+    # no bad points: optimisation
+    if not indexes:
+        yield datasets
+        return
+
+    # add on shortest length of datasets
+    indexes.append( minlen )
+
+    lastindex = 0
+    for index in indexes:
+        if index != lastindex:
+            retn = []
+            for ds in datasets:
+                if ds is not None:
+                    retn.append( ds[lastindex:index] )
+                else:
+                    retn.append( None )
+            yield retn
+        lastindex = index+1
+
+
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
 
