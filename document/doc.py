@@ -26,6 +26,7 @@
 import os.path
 import time
 import random
+import math
 
 import veusz.qtall as qt4
 
@@ -458,10 +459,12 @@ class Document( qt4.QObject ):
                         # replace bounding box line by calculated one
                         parts = line.split()
                         widthfactor = float(parts[3]) / printer.width()
+                        origheight = float(parts[4])
                         line = "%s %i %i %i %i\n" % (
                             parts[0], 0,
-                            int(float(parts[4])-widthfactor*height),
-                            int(widthfactor*width), int(float(parts[4])) )
+                            int(math.floor(origheight-widthfactor*height)),
+                            int(math.ceil(widthfactor*width)),
+                            int(math.ceil(origheight)) )
                     fout.write(line)
 
             elif ext == '.pdf':
