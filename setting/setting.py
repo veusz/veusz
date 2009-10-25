@@ -416,15 +416,14 @@ class Int(Setting):
     def makeControl(self, *args):
         return controls.Edit(self, *args)
 
-_safe_environ = utils.veusz_eval_context.copy()
-def safeEvalHelper(text):
-    """Evaluate an expression, catching naughtiness."""
-    if utils.checkCode(text) is not None:
-        raise InvalidType
-    try:
-        return float( eval(text, _safe_environ) )
-    except:
-        raise InvalidType
+    def safeEvalHelper(self, text):
+        """Evaluate an expression, catching naughtiness."""
+        if utils.checkCode(text) is not None:
+            raise InvalidType
+        try:
+            return float( eval(text, self.getDocument().eval_context) )
+        except:
+            raise InvalidType
 
 # for storing floats
 class Float(Setting):

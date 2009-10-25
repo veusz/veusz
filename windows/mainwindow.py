@@ -42,9 +42,9 @@ from veusz.dialogs.preferences import PreferencesDialog
 from veusz.dialogs.errorloading import ErrorLoadingDialog
 from veusz.dialogs.capturedialog import CaptureDialog
 from veusz.dialogs.stylesheet import StylesheetDialog
+from veusz.dialogs.custom import CustomDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
-
 
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
@@ -255,6 +255,12 @@ class MainWindow(qt4.QMainWindow):
         dialog.show()
         return dialog
         
+    def slotEditCustom(self):
+        dialog = CustomDialog(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
+        return dialog
+
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
 
@@ -305,6 +311,11 @@ class MainWindow(qt4.QMainWindow):
             'edit.prefs':
                 a(self, 'Edit preferences', 'Preferences...',
                   self.slotEditPreferences),
+            'edit.custom':
+                a(self, 'Edit custom functions and constants',
+                  'Custom definitions...',
+                  self.slotEditCustom),
+
             'edit.stylesheet':
                 a(self,
                   'Edit stylesheet to change default widget settings',
@@ -406,7 +417,7 @@ class MainWindow(qt4.QMainWindow):
         editmenu = [
             'edit.undo', 'edit.redo',
             '',
-            'edit.prefs', 'edit.stylesheet',
+            'edit.prefs', 'edit.stylesheet', 'edit.custom',
             ''
             ]
         viewwindowsmenu = [
@@ -791,7 +802,7 @@ class MainWindow(qt4.QMainWindow):
                 ignore_unsafe = True # allow unsafe veusz commands below
 
         # set up environment to run script
-        env = utils.veusz_eval_context.copy()
+        env = self.document.eval_context.copy()
         interface = document.CommandInterface(self.document)
 
         # allow safe commands as-is

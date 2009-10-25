@@ -248,7 +248,7 @@ class FunctionPlotter(GenericPlotter):
 
     def initEnviron(self):
         """Set up function environment."""
-        return utils.veusz_eval_context.copy()
+        return self.document.eval_context.copy()
        
     def _checkCachedFunction(self):
         """check function doesn't contain dangerous code."""

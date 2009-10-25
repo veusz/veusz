@@ -28,6 +28,8 @@ import time
 import random
 import math
 
+import numpy as N
+
 import veusz.qtall as qt4
 
 import widgetfactory
@@ -59,6 +61,13 @@ class Document( qt4.QObject ):
 
         # directories to examine when importing
         self.importpath = []
+
+        # store custom functions and constants
+        # these dicts map names to values
+        # call updateEvalContext after modification
+        self.custom_constants = {}
+        self.custom_functions = {}
+        self.updateEvalContext()
 
     def suspendUpdates(self):
         """Holds sending update messages. This speeds up modification of the document."""
@@ -605,6 +614,36 @@ class Document( qt4.QObject ):
 
         # return widget
         return obj
+
+    def updateEvalContext(self):
+        """To be called after custom constants or functions are changed.
+        This sets up a safe environment where things can be evaluated
+        """
+        
+        self.eval_context = c = {}
+
+        # add numpy things
+        # we try to avoid various bits and pieces for safety
+        for name, val in N.__dict__.iteritems():
+            if ( (callable(val) or type(val)==float) and
+                 name not in __builtins__ and
+                 name[:1] != '_' and name[-1:] != '_' ):
+                c[name] = val
+        
+        # safe functions
+        c['os_path_join'] = os.path.join
+        c['os_path_dirname'] = os.path.dirname
+
+        # add custom constants
+        c.update(self.custom_constants)
+
+        # add custom functions
+        for name, (args, code) in self.custom_functions:
+            defn = 'lambda %s: %s' % (args, code)
+            checked = utils.checkCode(defn)
+            if not checked:
+                raise ValueError, "Unsafe commands in function definition."""
+            c[name] = eval(defn)
 
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is

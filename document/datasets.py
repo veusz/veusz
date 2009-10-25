@@ -894,12 +894,6 @@ class DatasetExpression(Dataset):
                               'perr': None, 'nerr': None }
         self.evaluated = {}
 
-        # set up a default environment
-        self.environment = utils.veusz_eval_context.copy()
-
-        # this fn gets called to return the value of a dataset
-        self.environment['_DS_'] = self.evaluateDataset
-
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
         
@@ -924,10 +918,16 @@ class DatasetExpression(Dataset):
                         self.expr[part], part))
             self.cachedexpr[part] = expr
 
+        # set up environment to evaluate expressions in
+        environment = self.document.eval_context.copy()
+
+        # this fn gets called to return the value of a dataset
+        environment['_DS_'] = self.evaluateDataset
+
         # actually evaluate the expression
         try:
             e = self.evaluated[part] = N.array(
-                eval(expr, self.environment),
+                eval(expr, environment),
                 N.float64)
         except Exception, ex:
             raise DatasetExpressionException(
@@ -1060,10 +1060,6 @@ class Dataset2DXYZExpression(DatasetBase):
             if utils.checkCode(expr, securityonly=True) is not None:
                 raise DatasetExpressionException("Unsafe expression '%s'" % expr)
 
-        self.environment = utils.veusz_eval_context.copy()
-        # this fn gets called to return the value of a dataset
-        self.environment['_DS_'] = self.evaluateDataset
-
         # copy parameters
         self.exprx = exprx
         self.expry = expry
@@ -1088,13 +1084,16 @@ class Dataset2DXYZExpression(DatasetBase):
 
         evaluated = {}
 
+        environment = self.document.eval_context.copy()
+        environment['_DS_'] = self.evaluateDataset
+
         # evaluate the x, y and z expressions
         for name in ('exprx', 'expry', 'exprz'):
             expr = _substituteDatasets(self.document.data, getattr(self, name),
                                        'data')
 
             try:
-                evaluated[name] = eval(expr, self.environment)
+                evaluated[name] = eval(expr, environment)
             except Exception, e:
                 raise DatasetExpressionException("Error evaluating expession: %s\n"
                                                  "Error: %s" % (expr, str(e)) )
@@ -1175,20 +1174,21 @@ class Dataset2DXYFunc(DatasetBase):
         if utils.checkCode(expr, securityonly=True) is not None:
             raise DatasetExpressionException("Unsafe expression '%s'" % expr)
         
-        self.environment = utils.veusz_eval_context.copy()
+        self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
+                       self.xstep[1] + self.xstep[2]*0.5)
+        self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
+                       self.ystep[1] + self.ystep[2]*0.5)
 
-        self._create2DData()
-
-    def _create2DData(self):
+    @property
+    def data(self):
         """Make the 2d dataset."""
 
-        env = self.environment
+        env = self.document.eval_context.copy()
 
         xarange = N.arange(self.xstep[0], self.xstep[1]+self.xstep[2],
                            self.xstep[2])
         yarange = N.arange(self.ystep[0], self.ystep[1]+self.ystep[2],
                            self.ystep[2])
-
         ystep, xstep = N.indices( (len(yarange), len(xarange)) )
         xstep = xarange[xstep]
         ystep = yarange[ystep]
@@ -1199,14 +1199,8 @@ class Dataset2DXYFunc(DatasetBase):
             data = eval(self.expr, env)
         except Exception, e:
             raise DatasetExpressionException("Error evaluating expession: %s\n"
-                                             "Error: %s" % (self.expr,
-                                                            str(e)) )
-        self.data = data
-        # points are defined in centres
-        self.xrange = (xarange[0]-self.xstep[2]*0.5,
-                       xarange[-1]+self.xstep[2]*0.5)
-        self.yrange = (yarange[0]-self.ystep[2]*0.5,
-                       yarange[-1]+self.ystep[2]*0.5)
+                                             "Error: %s" % (self.expr, str(e)) )
+        return data
 
     def getDataRanges(self):
         return (self.xrange, self.yrange)
@@ -1214,7 +1208,6 @@ class Dataset2DXYFunc(DatasetBase):
     def saveToFile(self, file, name):
         '''Save expressions to file.
         '''
-
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
         file.write(s)
