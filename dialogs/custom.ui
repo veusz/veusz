@@ -50,7 +50,16 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QListWidget" name="definitionList"/>
+       <widget class="QTreeWidget" name="definitionTree">
+        <property name="rootIsDecorated">
+         <bool>false</bool>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">

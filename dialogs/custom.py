@@ -26,11 +26,17 @@ import veusz.utils as utils
 class CustomDialog(qt4.QDialog):
     """Class to load help for standard veusz import."""
     def __init__(self, parent, document):
-        qt4.QDialog.__init__(self, parent, *args)
+        qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'custom.ui'),
                    self)
         self.document = document
+
+        # setup table
+        self.definitionTree.setColumnCount(2)
+        self.connect(self.definitionTree,
+                     qt4.SIGNAL('currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)'),
+                     self.slotItemChanged)
 
         # connect different types of radio
         self.connect(self.functionsRadio, qt4.SIGNAL('clicked()'),
@@ -47,14 +53,42 @@ class CustomDialog(qt4.QDialog):
         self.connect(self.saveButton, qt4.SIGNAL('clicked()'), self.slotSave)
         self.connect(self.loadButton, qt4.SIGNAL('clicked()'), self.slotLoad)
 
+    def updateList(self):
+        """Update list of items in list."""
+
+        self.definitionTree.clear()
+        self.definitionTree.setHeaderLabels( ['Name', 'Value'] )
+
+        items = self.itemlist
+        items = {'a': 'foo', 'b': 'bar', 'c': 'xxx'}
+
+        keys = items.keys()
+        keys.sort()
+
+        for name in keys:
+            self.definitionTree.addTopLevelItem(
+                qt4.QTreeWidgetItem([name, items[name]]) )
+
     def slotFunctionsClicked(self):
         """Functions definitions radio clicked."""
-
-        print "functions"
+        self.mode = 'functions'
+        self.itemlist = self.document.custom_functions
+        self.updateList()
 
     def slotConstantsClicked(self):
         """Constant definitions radio clicked."""
-        print "constants"
+        self.mode = 'constants'
+        self.itemlist = self.document.custom_constants
+        self.updateList()
+
+    def slotItemChanged(self, current, previous):
+        """Item clicked on in box."""
+        if current is None:
+            name, defn = '', ''
+        else:
+            name, defn = current.text(0), current.text(1)
+        self.nameEdit.setText(name)
+        self.definitionEdit.setText(defn)
 
     def slotAdd(self):
         """Add an entry."""
