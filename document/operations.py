@@ -1143,6 +1143,33 @@ class OperationDatasetInsertRow(object):
         ds.deleteRows(self.row, self.numrows)
 
 ###############################################################################
+# Custom setting operations
+
+class OperationSetCustom(object):
+    """Set custom objects, such as constants."""
+
+    descr = 'set a custom definition'
+
+    def __init__(self, customtype, customval):
+        """customtype is the type of custom object to set:
+        eg functions, constants
+        customval is a dict of the values."""
+
+        self.customtype = customtype
+        self.customval = dict(customval)
+
+    def do(self, document):
+        """Set the custom object."""
+        self.oldval = dict( getattr(document, 'custom_' + self.customtype) )
+        setattr(document, 'custom_' + self.customtype, self.customval)
+        document.updateEvalContext()
+        
+    def undo(self, document):
+        """Restore custom object."""
+        setattr(document, 'custom_' + self.customtype, self.oldval)
+        document.updateEvalContext()
+
+###############################################################################
 # Misc operations
         
 class OperationMultiple(object):

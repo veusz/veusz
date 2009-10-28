@@ -41,6 +41,7 @@ class CommandInterface(qt4.QObject):
     safe_commands = (
         'Action',
         'Add',
+        'AddCustom',
         'AddImportPath',
         'Get',
         'GetChildren',
@@ -119,6 +120,18 @@ class CommandInterface(qt4.QObject):
             print "Added a graph of type '%s' (%s)" % (type, w.userdescription)
 
         return w.name
+
+    def AddCustom(self, section, name, val):
+        """Add a custom definition for evaluation of expressions.
+
+        section is 'constants' or 'functions'
+        name is name of constant, or function(params)
+        val is definition."""
+
+        vals = dict( getattr(self.document, 'custom_' + section) )
+        vals[name] = val
+        op = operations.OperationSetCustom(section, vals)
+        self.document.applyOperation(op)
 
     def AddImportPath(self, directory):
         """Add directory to import file path."""

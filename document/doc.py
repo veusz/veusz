@@ -27,6 +27,7 @@ import os.path
 import time
 import random
 import math
+import re
 
 import numpy as N
 
@@ -342,6 +343,15 @@ class Document( qt4.QObject ):
                       time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                                     time.gmtime()) )
         
+    def saveCustomDefinitions(self, fileobj):
+        """Save custom constants and functions."""
+
+        for section, items in ( ('constants', self.custom_constants),
+                                ('functions', self.custom_functions) ):
+            for name in sorted(items.keys()):
+                fileobj.write('AddCustom(%s, %s, %s)\n' % (
+                        repr(section), repr(name), repr(items[name]) ))
+
     def saveToFile(self, fileobj):
         """Save the text representing a document to a file."""
 
@@ -352,6 +362,9 @@ class Document( qt4.QObject ):
         if getattr(fileobj, 'name', False):
             reldirname = os.path.dirname( os.path.abspath(fileobj.name) )
             fileobj.write('AddImportPath(%s)\n' % repr(reldirname))
+
+        # add custom definitions
+        self.saveCustomDefinitions(fileobj)
 
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
@@ -638,12 +651,17 @@ class Document( qt4.QObject ):
         c.update(self.custom_constants)
 
         # add custom functions
-        for name, (args, code) in self.custom_functions:
+        for name, code in self.custom_functions.iteritems():
+            m = re.match('([A-Za-z_][A-Za-z0-9]*)[ ]*\((.+)\)', name.strip())
+            if not m:
+                raise ValueError, "Invalid custom function definition"
+            funcname = m.group(1)
+            args = m.group(2)
             defn = 'lambda %s: %s' % (args, code)
             checked = utils.checkCode(defn)
-            if not checked:
+            if checked is not None:
                 raise ValueError, "Unsafe commands in function definition."""
-            c[name] = eval(defn)
+            c[funcname] = eval(defn, c)
 
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is

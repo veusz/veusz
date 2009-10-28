@@ -21,6 +21,16 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>This dialog is for entering custom functions or constants which can be used when plotting functions, creating new datasets and fitting data. These are saved with the document.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="functionsRadio">
         <property name="toolTip">
          <string>Edit function definitions</string>

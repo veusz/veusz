@@ -19,9 +19,11 @@
 # $Id$
 
 import os.path
+import re
 
 import veusz.qtall as qt4
 import veusz.utils as utils
+import veusz.document as document
 
 class CustomDialog(qt4.QDialog):
     """Class to load help for standard veusz import."""
@@ -37,6 +39,18 @@ class CustomDialog(qt4.QDialog):
         self.connect(self.definitionTree,
                      qt4.SIGNAL('currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)'),
                      self.slotItemChanged)
+
+        # connect notification of document change
+        self.connect( self.document, qt4.SIGNAL('sigModified'),
+                      self.updateList )
+
+        # keep track of what's in edit boxes
+        self.connect(self.nameEdit,
+                     qt4.SIGNAL('textChanged(const QString&)'),
+                     self.validateAddRemove)
+        self.connect(self.definitionEdit,
+                     qt4.SIGNAL('textChanged(const QString&)'),
+                     self.validateAddRemove)
 
         # connect different types of radio
         self.connect(self.functionsRadio, qt4.SIGNAL('clicked()'),
@@ -56,29 +70,28 @@ class CustomDialog(qt4.QDialog):
     def updateList(self):
         """Update list of items in list."""
 
+        self.itemlist = dict( getattr(self.document, 'custom_'+self.mode) )
         self.definitionTree.clear()
         self.definitionTree.setHeaderLabels( ['Name', 'Value'] )
 
         items = self.itemlist
-        items = {'a': 'foo', 'b': 'bar', 'c': 'xxx'}
-
         keys = items.keys()
         keys.sort()
 
         for name in keys:
             self.definitionTree.addTopLevelItem(
-                qt4.QTreeWidgetItem([name, items[name]]) )
+                qt4.QTreeWidgetItem([name, unicode(items[name])]) )
+
+        self.validateAddRemove()
 
     def slotFunctionsClicked(self):
         """Functions definitions radio clicked."""
         self.mode = 'functions'
-        self.itemlist = self.document.custom_functions
         self.updateList()
 
     def slotConstantsClicked(self):
         """Constant definitions radio clicked."""
         self.mode = 'constants'
-        self.itemlist = self.document.custom_constants
         self.updateList()
 
     def slotItemChanged(self, current, previous):
@@ -90,13 +103,51 @@ class CustomDialog(qt4.QDialog):
         self.nameEdit.setText(name)
         self.definitionEdit.setText(defn)
 
+    def validateAddRemove(self, text=None):
+        """Text changed in edit boxes."""
+        name = unicode(self.nameEdit.text()).strip()
+
+        if self.mode == 'constants':
+            # check name is valid before allowing it to be added
+            valid = re.match(r'[A-Za-z_][A-Za-z0-9_]*', name) is not None
+        elif self.mode == 'functions':
+            # check func(a,b,c...)
+            valid = re.match(r'[A-Za-z_][A-Za-z0-9_]*'
+                             r'\('
+                             r'([A-Za-z_][A-Za-z0-9_]*)'
+                             r'(,[ ]*[A-Za-z_][A-Za-z0-9_]*)*'
+                             r'\)', name) is not None
+
+        self.addButton.setEnabled(valid)
+
+        # only allow existing entries to be removed
+        self.removeButton.setEnabled(name in self.itemlist)
+
     def slotAdd(self):
         """Add an entry."""
-        pass
+
+        name = unicode(self.nameEdit.text())
+        val = unicode(self.definitionEdit.text())
+
+        if self.mode == 'constants':
+            try:
+                # try to make a float if possible
+                val = float(val)
+            except ValueError:
+                pass
+
+        self.itemlist[name] = val
+        self.document.applyOperation( document.OperationSetCustom(
+                self.mode, self.itemlist) )
+        self.updateList()
     
     def slotRemove(self):
         """Remove an entry."""
-        pass
+
+        name = unicode(self.nameEdit.text())
+        del self.itemlist[name]
+        self.document.applyOperation( document.OperationSetCustom(
+                self.mode, self.itemlist) )
 
     def slotSave(self):
         """Save entries."""
