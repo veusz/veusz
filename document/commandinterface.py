@@ -121,16 +121,16 @@ class CommandInterface(qt4.QObject):
 
         return w.name
 
-    def AddCustom(self, section, name, val):
+    def AddCustom(self, name, ctype, val):
         """Add a custom definition for evaluation of expressions.
 
-        section is 'constants' or 'functions'
         name is name of constant, or function(params)
+        ctype is constant or function
         val is definition."""
 
-        vals = dict( getattr(self.document, 'custom_' + section) )
-        vals[name] = val
-        op = operations.OperationSetCustom(section, vals)
+        vals = list( self.document.customs )
+        vals.append( [name, ctype, val] )
+        op = operations.OperationSetCustom(vals)
         self.document.applyOperation(op)
 
     def AddImportPath(self, directory):

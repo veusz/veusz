@@ -1150,23 +1150,22 @@ class OperationSetCustom(object):
 
     descr = 'set a custom definition'
 
-    def __init__(self, customtype, customval):
+    def __init__(self, vals):
         """customtype is the type of custom object to set:
         eg functions, constants
         customval is a dict of the values."""
 
-        self.customtype = customtype
-        self.customval = dict(customval)
+        self.customvals = list(vals)
 
     def do(self, document):
         """Set the custom object."""
-        self.oldval = dict( getattr(document, 'custom_' + self.customtype) )
-        setattr(document, 'custom_' + self.customtype, self.customval)
+        self.oldval = list(document.customs)
+        document.customs = self.customvals
         document.updateEvalContext()
         
     def undo(self, document):
         """Restore custom object."""
-        setattr(document, 'custom_' + self.customtype, self.oldval)
+        document.customs = self.oldval
         document.updateEvalContext()
 
 ###############################################################################

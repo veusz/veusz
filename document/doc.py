@@ -64,10 +64,9 @@ class Document( qt4.QObject ):
         self.importpath = []
 
         # store custom functions and constants
-        # these dicts map names to values
-        # call updateEvalContext after modification
-        self.custom_constants = {}
-        self.custom_functions = {}
+        # consists of tuples of (name, type, value)
+        # type is constant or function
+        self.customs = []
         self.updateEvalContext()
 
     def suspendUpdates(self):
@@ -346,11 +345,9 @@ class Document( qt4.QObject ):
     def saveCustomDefinitions(self, fileobj):
         """Save custom constants and functions."""
 
-        for section, items in ( ('constants', self.custom_constants),
-                                ('functions', self.custom_functions) ):
-            for name in sorted(items.keys()):
-                fileobj.write('AddCustom(%s, %s, %s)\n' % (
-                        repr(section), repr(name), repr(items[name]) ))
+        for name, ctype, value in self.customs:
+            fileobj.write('AddCustom(%s, %s, %s)\n' % (
+                    repr(name), repr(ctype), repr(value)) )
 
     def saveToFile(self, fileobj):
         """Save the text representing a document to a file."""
@@ -647,21 +644,32 @@ class Document( qt4.QObject ):
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
 
-        # add custom constants
-        c.update(self.custom_constants)
+        for name, ctype, val in self.customs:
+            name = name.strip()
+            if ctype == 'constant':
+                if not re.match('[A-Za-z_][A-Za-z0-9_]*', name):
+                    continue
+                    #raise ValueError, 'Invalid constant name'
+                defn = val
+            elif ctype == 'function':
+                m = re.match('([A-Za-z_][A-Za-z0-9_]*)[ ]*\((.*)\)', name)
+                if not m:
+                    continue
+                    #raise ValueError, 'Invalid custom function definition'
+                name = funcname = m.group(1)
+                args = m.group(2)
+                defn = 'lambda %s: %s' % (args, val)
+            else:
+                raise ValueError, 'Invalid custom type'
 
-        # add custom functions
-        for name, code in self.custom_functions.iteritems():
-            m = re.match('([A-Za-z_][A-Za-z0-9]*)[ ]*\((.+)\)', name.strip())
-            if not m:
-                raise ValueError, "Invalid custom function definition"
-            funcname = m.group(1)
-            args = m.group(2)
-            defn = 'lambda %s: %s' % (args, code)
             checked = utils.checkCode(defn)
             if checked is not None:
-                raise ValueError, "Unsafe commands in function definition."""
-            c[funcname] = eval(defn, c)
+                continue
+                #raise ValueError, "Unsafe commands in function definition."""
+            try:
+                c[name] = eval(defn, c)
+            except:
+                pass
 
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is
