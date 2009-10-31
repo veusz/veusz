@@ -349,6 +349,12 @@ class Document( qt4.QObject ):
             fileobj.write('AddCustom(%s, %s, %s)\n' % (
                     repr(name), repr(ctype), repr(value)) )
 
+    def saveCustomFile(self, fileobj):
+        """Export the custom settings to a file."""
+
+        self._writeFileHeader(fileobj, 'custom definitions')
+        self.saveCustomDefinitions(fileobj)
+
     def saveToFile(self, fileobj):
         """Save the text representing a document to a file."""
 

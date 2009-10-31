@@ -1180,7 +1180,8 @@ class OperationMultiple(object):
         Optional argument descr gives a description of the combined operation
         """
         self.operations = operations
-        self.descr = descr
+        if descr:
+            self.descr = descr
         
     def addOperation(self, op):
         """Add an operation to the list of operations."""
@@ -1198,12 +1199,14 @@ class OperationMultiple(object):
         for op in utils.reverse(self.operations):
             op.undo(document)
 
-class OperationImportStyleSheet(OperationMultiple):
-    """An operation to import a stylesheet."""
+class OperationLoadStyleSheet(OperationMultiple):
+    """An operation to load a stylesheet."""
     
+    descr = 'load stylesheet'
+
     def __init__(self, filename):
-        """Import stylesheet with filename."""
-        OperationMultiple.__init__(self, [], descr='import stylesheet')
+        """Load stylesheet with filename."""
+        OperationMultiple.__init__(self, [], descr=None)
         self.filename = os.path.abspath(filename)
         
     def do(self, document):
@@ -1223,3 +1226,6 @@ class OperationImportStyleSheet(OperationMultiple):
         if e:
             raise e
         
+class OperationLoadCustom(OperationLoadStyleSheet):
+    descr = 'load custom definitions'
+

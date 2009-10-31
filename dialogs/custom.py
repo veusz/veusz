@@ -28,7 +28,8 @@ import veusz.document as document
 class CustomItemModel(qt4.QAbstractTableModel):
     """A model for editing custom items."""
 
-    name_re = re.compile('[A-Za-z_][A-Z-a-z0-9_]*')
+    # python identifier regular expression
+    name_re = re.compile('^[A-Za-z_][A-Z-a-z0-9_]*$')
 
     def __init__(self, parent, document):
         qt4.QAbstractTableModel.__init__(self, parent)
@@ -45,15 +46,23 @@ class CustomItemModel(qt4.QAbstractTableModel):
         return 3
 
     def data(self, index, role):
+        """Lookup data in document customs list."""
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             return qt4.QVariant( self.document.customs[index.row()][index.column()] )
+        elif role == qt4.Qt.ToolTipRole:
+            return ('Name for constant or function(arg1, arg2...)',
+                    'Choose constant or function',
+                    'Definition expression')[index.column()]
+
         return qt4.QVariant()
 
     def flags(self, index):
+        """Items are editable"""
         return ( qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsEditable |
                  qt4.Qt.ItemIsEnabled )
 
     def headerData(self, section, orientation, role):
+        """Return the headers at the top of the view."""
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
                 return qt4.QVariant( ('Name', 'Type', 'Definition')[section] )
@@ -149,7 +158,9 @@ class ComboTypeDeligate(qt4.QItemDelegate):
         editor.setGeometry(option.rect)
 
 class CustomDialog(qt4.QDialog):
-    """Class to load help for standard veusz import."""
+    """A dialog to create or edit custom constant and function
+    definitions."""
+
     def __init__(self, parent, document):
         qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
@@ -172,6 +183,16 @@ class CustomDialog(qt4.QDialog):
 
         self.connect(self.saveButton, qt4.SIGNAL('clicked()'), self.slotSave)
         self.connect(self.loadButton, qt4.SIGNAL('clicked()'), self.slotLoad)
+
+        # recent button shows list of recently used files for loading
+        self.connect(self.recentButton, qt4.SIGNAL('filechosen'),
+                     self.loadFile)
+        self.recentButton.setSetting('customdialog_recent')
+
+    def loadFile(self, filename):
+        """Load the given file."""
+        self.document.applyOperation(
+            document.OperationLoadCustom(filename) )
 
     def slotAdd(self):
         """Add an entry."""
@@ -197,8 +218,40 @@ class CustomDialog(qt4.QDialog):
 
     def slotSave(self):
         """Save entries."""
-        pass
+        filename = self.parent()._fileSaveDialog(
+            'vsz', 'Veusz document', 'Save custom definitions')
+        if filename:
+            try:
+                f = open(filename, 'w')
+                self.document.saveCustomFile(f)
+                f.close()
+                self.recentButton.addFile(filename)
+
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Cannot save as '%s'" % filename,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
 
     def slotLoad(self):
         """Load entries."""
-        pass
+
+        filename = self.parent()._fileOpenDialog(
+            'vsz', 'Veusz document', 'Load custom definitions')
+        if filename:
+            try:
+                self.loadFile(filename)
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Cannot load custom definitions '%s'" % filename,
+                                qt4.QMessageBox.Critical,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+            else:
+                # add to recent file list
+                self.recentButton.addFile(filename)
