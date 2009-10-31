@@ -44,6 +44,17 @@ try:
 except ImportError:
     hasemf = False
 
+# python identifier
+identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+
+# function(arg1, arg2...) for custom functions
+# not quite correct as doesn't check for commas in correct places
+function_re = re.compile(r'''
+^([A-Za-z_][A-Za-z0-9_]*)[ ]*  # identifier
+\((                            # begin args
+(?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )* # args
+)\)$                           # endargs''', re.VERBOSE)
+
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
@@ -345,9 +356,9 @@ class Document( qt4.QObject ):
     def saveCustomDefinitions(self, fileobj):
         """Save custom constants and functions."""
 
-        for name, ctype, value in self.customs:
-            fileobj.write('AddCustom(%s, %s, %s)\n' % (
-                    repr(name), repr(ctype), repr(value)) )
+        for vals in self.customs:
+            fileobj.write('AddCustom(%s, %s, %s)\n' %
+                          tuple([repr(x) for x in vals]))
 
     def saveCustomFile(self, fileobj):
         """Export the custom settings to a file."""
@@ -650,18 +661,16 @@ class Document( qt4.QObject ):
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
 
-        for name, ctype, val in self.customs:
+        for ctype, name, val in self.customs:
             name = name.strip()
             if ctype == 'constant':
-                if not re.match('[A-Za-z_][A-Za-z0-9_]*', name):
+                if not identifier_re.match(name):
                     continue
-                    #raise ValueError, 'Invalid constant name'
                 defn = val
             elif ctype == 'function':
-                m = re.match('([A-Za-z_][A-Za-z0-9_]*)[ ]*\((.*)\)', name)
+                m = function_re.match(name)
                 if not m:
                     continue
-                    #raise ValueError, 'Invalid custom function definition'
                 name = funcname = m.group(1)
                 args = m.group(2)
                 defn = 'lambda %s: %s' % (args, val)

@@ -19,7 +19,6 @@
 # $Id$
 
 import os.path
-import re
 
 import veusz.qtall as qt4
 import veusz.utils as utils
@@ -27,9 +26,6 @@ import veusz.document as document
 
 class CustomItemModel(qt4.QAbstractTableModel):
     """A model for editing custom items."""
-
-    # python identifier regular expression
-    name_re = re.compile('^[A-Za-z_][A-Z-a-z0-9_]*$')
 
     def __init__(self, parent, document):
         qt4.QAbstractTableModel.__init__(self, parent)
@@ -48,10 +44,11 @@ class CustomItemModel(qt4.QAbstractTableModel):
     def data(self, index, role):
         """Lookup data in document customs list."""
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
-            return qt4.QVariant( self.document.customs[index.row()][index.column()] )
+            d = self.document.customs[index.row()][index.column()]
+            return qt4.QVariant(d)
         elif role == qt4.Qt.ToolTipRole:
-            return ('Name for constant or function(arg1, arg2...)',
-                    'Choose constant or function',
+            return ('Constant or function',
+                    'Name for constant or function(arg1, arg2...)',
                     'Definition expression')[index.column()]
 
         return qt4.QVariant()
@@ -65,7 +62,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
         """Return the headers at the top of the view."""
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
-                return qt4.QVariant( ('Name', 'Type', 'Definition')[section] )
+                return qt4.QVariant( ('Type', 'Name', 'Definition')[section] )
             else:
                 return qt4.QVariant(str(section+1))
         return qt4.QVariant()
@@ -77,7 +74,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
     def addNewEntry(self):
         """Add a new row to the list of custom items."""
         newcustom = list(self.document.customs)
-        newcustom.append( ['name', 'constant', 'None'] )
+        newcustom.append( ['constant', 'name', 'None'] )
         self.document.applyOperation( document.OperationSetCustom(newcustom) )
 
     def deleteEntry(self, num):
@@ -114,9 +111,13 @@ class CustomItemModel(qt4.QAbstractTableModel):
             value = unicode(value.toString())
 
             if col == 0:
-                ok = self.name_re.match(value) is not None
-            elif col == 1:
                 ok = value in ('constant', 'function')
+            elif col == 1:
+                dtype = self.document.customs[row][0]
+                if dtype == 'constant':
+                    ok = document.identifier_re.match(value) is not None
+                elif dtype == 'function':
+                    ok = document.function_re.match(value) is not None
             else:
                 ok = True
             if not ok:
@@ -172,7 +173,7 @@ class CustomDialog(qt4.QDialog):
         self.definitionView.setModel(self.model)
 
         self.combodeligate = ComboTypeDeligate(self)
-        self.definitionView.setItemDelegateForColumn(1, self.combodeligate)
+        self.definitionView.setItemDelegateForColumn(0, self.combodeligate)
 
         # connect buttons to slots
         self.connect(self.addButton, qt4.SIGNAL('clicked()'), self.slotAdd)
