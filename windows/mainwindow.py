@@ -333,7 +333,8 @@ class MainWindow(qt4.QMainWindow):
                   icon='kde-edit-redo', key='Ctrl+Shift+Z'),
             'edit.prefs':
                 a(self, 'Edit preferences', 'Preferences...',
-                  self.slotEditPreferences),
+                  self.slotEditPreferences,
+                  icon='veusz-edit-prefs'),
             'edit.custom':
                 a(self, 'Edit custom functions and constants',
                   'Custom definitions...',
