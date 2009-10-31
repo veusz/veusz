@@ -338,7 +338,8 @@ class MainWindow(qt4.QMainWindow):
             'edit.custom':
                 a(self, 'Edit custom functions and constants',
                   'Custom definitions...',
-                  self.slotEditCustom),
+                  self.slotEditCustom,
+                  icon='veusz-edit-custom'),
 
             'edit.stylesheet':
                 a(self,
