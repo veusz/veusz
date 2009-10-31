@@ -67,8 +67,10 @@ class MainWindow(qt4.QMainWindow):
         else:
             # add page and default graph
             win.document.makeDefaultDoc()
-            # load the default stylesheet too
+
+            # load defaults if set
             win.loadDefaultStylesheet()
+            win.loadDefaultCustomDefinitions()
 
         # try to select first graph of first page
         win.treeedit.doInitialWidgetSelect()
@@ -201,10 +203,31 @@ class MainWindow(qt4.QMainWindow):
         if filename:
             try:
                 self.document.applyOperation(
-                    document.OperationImportStyleSheet(filename) )
+                    document.OperationLoadStyleSheet(filename) )
             except IOError:
                 qt4.QMessageBox("Veusz",
                                 "Unable to load default stylesheet '%s'" %
+                                filename,
+                                qt4.QMessageBox.Warning,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+            else:
+                # reset any modified flag
+                self.document.setModified(False)
+                self.document.changeset = 0
+
+    def loadDefaultCustomDefinitions(self):
+        """Loads the custom definitions for the new document."""
+        filename = setting.settingdb['custom_default']
+        if filename:
+            try:
+                self.document.applyOperation(
+                    document.OperationLoadCustom(filename) )
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Unable to load default custom definitons '%s'" %
                                 filename,
                                 qt4.QMessageBox.Warning,
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,

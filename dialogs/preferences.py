@@ -28,6 +28,7 @@ class PreferencesDialog(qt4.QDialog):
     """Preferences dialog."""
 
     def __init__(self, *args):
+        """Setup dialog."""
         qt4.QDialog.__init__(self, *args)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'preferences.ui'),
@@ -68,13 +69,21 @@ class PreferencesDialog(qt4.QDialog):
 
         # default stylesheet
         self.styleLineEdit.setText(setting.settingdb['stylesheet_default'])
-
         self.connect( self.styleBrowseButton, qt4.SIGNAL('clicked()'),
                       self.styleBrowseClicked )
 
-        # initialise color tab
-        # this makes a grid of controls for each color
-        # consisting of label, isdefault check and change color button
+        # default custom settings
+        self.customLineEdit.setText(setting.settingdb['custom_default'])
+        self.connect( self.customBrowseButton, qt4.SIGNAL('clicked()'),
+                      self.customBrowseClicked )
+
+        self.setupColorTab()
+
+    def setupColorTab(self):
+        """Initialise color tab
+        this makes a grid of controls for each color
+        consisting of label, isdefault check and change color button."""
+
         self.chosencolors = {}
         self.colorbutton = {}
         self.colordefaultcheck = {}
@@ -151,26 +160,35 @@ class PreferencesDialog(qt4.QDialog):
         except ValueError:
             pass
 
-        # other settings
+        # export settings
         setting.settingdb['export_antialias'] = self.exportAntialias.isChecked()
         setting.settingdb['export_quality'] = self.exportQuality.value()
 
         setting.settingdb['export_color'] = {0: True, 1: False}[self.exportColor.currentIndex()]
         
+        # new document settings
         setting.settingdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
+        setting.settingdb['custom_default'] = unicode(self.customLineEdit.text())
 
         # colors
         for name, color in self.chosencolors.iteritems():
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = unicode(color.name())
-            setting.settingdb["color_"+name] = (isdefault, colorname)
+            setting.settingdb['color_' + name] = (isdefault, colorname)
 
         self.plotwindow.updatePlotSettings()
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""
         filename = self.parent()._fileOpenDialog(
-            'vst', 'Veusz stylesheet', 'Import stylesheet')
+            'vst', 'Veusz stylesheet', 'Choose stylesheet')
         if filename:
             self.styleLineEdit.setText(filename)
+
+    def customBrowseClicked(self):
+        """Browse for a custom definitons."""
+        filename = self.parent()._fileOpenDialog(
+            'vsz', 'Veusz documents', 'Choose custom definitons')
+        if filename:
+            self.customLineEdit.setText(filename)
 
