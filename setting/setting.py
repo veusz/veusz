@@ -323,6 +323,15 @@ class Setting(object):
             w = w.parent
         return w
 
+    def safeEvalHelper(self, text):
+        """Evaluate an expression, catching naughtiness."""
+        if utils.checkCode(text) is not None:
+            raise InvalidType
+        try:
+            return float( eval(text, self.getDocument().eval_context) )
+        except:
+            raise InvalidType
+
 # Store strings
 class Str(Setting):
     """String setting."""
@@ -416,15 +425,6 @@ class Int(Setting):
     def makeControl(self, *args):
         return controls.Edit(self, *args)
 
-    def safeEvalHelper(self, text):
-        """Evaluate an expression, catching naughtiness."""
-        if utils.checkCode(text) is not None:
-            raise InvalidType
-        try:
-            return float( eval(text, self.getDocument().eval_context) )
-        except:
-            raise InvalidType
-
 # for storing floats
 class Float(Setting):
     """Float settings."""
@@ -465,7 +465,7 @@ class Float(Setting):
             f = float(text)
         except ValueError:
             # try to evaluate
-            f = safeEvalHelper(text)
+            f = self.safeEvalHelper(text)
         return self.convertTo(f)
 
     def makeControl(self, *args):
@@ -502,7 +502,7 @@ class FloatOrAuto(Setting):
                 return float(text)
             except ValueError:
                 # try to evaluate
-                return safeEvalHelper(text)
+                return self.safeEvalHelper(text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
@@ -893,7 +893,7 @@ class FloatList(Setting):
                 try:
                     out.append(float(x))
                 except ValueError:
-                    out.append( safeEvalHelper(x) )
+                    out.append( self.safeEvalHelper(x) )
         return out
 
     def makeControl(self, *args):
@@ -1126,7 +1126,7 @@ class DatasetOrFloatList(Dataset):
                 try:
                     out.append(float(x))
                 except ValueError:
-                    out.append( safeEvalHelper(x) )
+                    out.append( self.safeEvalHelper(x) )
             return out
         except InvalidType:
             return text
