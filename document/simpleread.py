@@ -265,7 +265,7 @@ class _DescriptorPart(object):
 
     def setInDocument(self, thedatasets, document, block=None,
                       linkedfile=None,
-                      prefix="", suffix=""):
+                      prefix="", suffix="", tail=None):
         """Set the read-in data in the document."""
 
         names = []
@@ -284,12 +284,16 @@ class _DescriptorPart(object):
                 pos = neg = sym = None
 
                 # retrieve the data for this dataset
-                if name+'\0POS' in thedatasets:
-                    pos = thedatasets[name+'\0POS']
-                if name+'\0NEG' in thedatasets:
-                    neg = thedatasets[name+'\0NEG']
-                if name+'\0SYM' in thedatasets:
-                    sym = thedatasets[name+'\0SYM']
+                if name+'\0POS' in thedatasets: pos = thedatasets[name+'\0POS']
+                if name+'\0NEG' in thedatasets: neg = thedatasets[name+'\0NEG']
+                if name+'\0SYM' in thedatasets: sym = thedatasets[name+'\0SYM']
+
+                # only remember last N values
+                if tail is not None:
+                    vals = vals[-tail:]
+                    if sym is not None: sym = sym[-tail:]
+                    if pos is not None: pos = pos[-tail:]
+                    if neg is not None: neg = neg[-tail:]
 
                 # create the dataset
                 if self.datatype in ('float', 'date'):
@@ -392,6 +396,8 @@ class SimpleRead(object):
 
     The descriptor specifies the format of data to read from the stream
     Read the docstring for this module for information
+
+    tail attribute if set says to only use last tail data points when setting
     '''
     
     def __init__(self, descriptor):
@@ -402,6 +408,7 @@ class SimpleRead(object):
         """Start reading from scratch."""
         self.datasets = {}
         self.blocks = None
+        self.tail = None
         
     def _parseDescriptor(self, descriptor):
         """Take a descriptor, and parse it into its individual parts."""
@@ -514,7 +521,8 @@ class SimpleRead(object):
                 names += part.setInDocument(self.datasets, document,
                                             block=block,
                                             linkedfile=linkedfile,
-                                            prefix=prefix, suffix=suffix)
+                                            prefix=prefix, suffix=suffix,
+                                            tail=self.tail)
 
         return names
 

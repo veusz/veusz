@@ -50,6 +50,7 @@ class CaptureDialog(qt4.QDialog):
         self.numLinesStopEdit.setValidator(validator)
         self.timeStopEdit.setValidator(validator)
         self.updateIntervalsEdit.setValidator(validator)
+        self.tailEdit.setValidator(validator)
 
         # add completion for filename if there is support in version of qt
         # (requires qt >= 4.3)
@@ -82,9 +83,10 @@ class CaptureDialog(qt4.QDialog):
         self.connect(self.updateIntervalsCheck,
                      qt4.SIGNAL('toggled(bool)'),
                      self.updateIntervalsEdit.setEnabled)
-        c = d.get('CaptureDialog_updateintervalcheck', False)
-        self.updateIntervalsCheck.setChecked(c)
-        self.updateIntervalsEdit.setEnabled(c)
+
+        # tail data
+        self.connect(self.tailCheck, qt4.SIGNAL('toggled(bool)'),
+                     self.tailEdit.setEnabled)
 
         # user starts capture
         self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
@@ -101,8 +103,6 @@ class CaptureDialog(qt4.QDialog):
         d = setting.settingdb
         d['CaptureDialog_method'] = self.methodBG.checkedId()
         d['CaptureDialog_stop'] = self.stopBG.checkedId()
-        d['CaptureDialog_updateintervalcheck'] = (
-            self.updateIntervalsCheck.isChecked())
 
     def slotMethodChanged(self, buttonid):
         """Enable/disable correct controls in methodBG."""
@@ -147,6 +147,7 @@ class CaptureDialog(qt4.QDialog):
         maxlines = None
         timeout = None
         updateinterval = None
+        tail = None
         try:
             stop = self.stopBG.checkedId()
             if stop == 1:
@@ -159,6 +160,10 @@ class CaptureDialog(qt4.QDialog):
             # whether to do an update periodically
             if self.updateIntervalsCheck.isChecked():
                 updateinterval = int( self.updateIntervalsEdit.text() )
+
+            # whether to only retain N values
+            if self.tailCheck.isChecked():
+                tail = int( self.tailEdit.text() )
 
         except ValueError:
             qt4.QMessageBox("Invalid number", "Invalid number",
@@ -196,6 +201,7 @@ class CaptureDialog(qt4.QDialog):
 
         stream.maxlines = maxlines
         stream.timeout = timeout
+        simpleread.tail = tail
         cd = CapturingDialog(self.document, simpleread, stream, self,
                              updateinterval=updateinterval)
         cd.show()
@@ -213,7 +219,8 @@ class CapturingDialog(qt4.QDialog):
         simpleread: object to interpret data
         stream: capturestream to read data from
         parent: parent widget
-        updateinterval: if set, interval of seconds to update data in doc."""
+        updateinterval: if set, interval of seconds to update data in doc
+        """
 
         qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',

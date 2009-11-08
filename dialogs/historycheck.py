@@ -43,6 +43,8 @@ class HistoryCheck(qt4.QCheckBox):
     def loadHistory(self):
         """Load contents of HistoryCheck from settings."""
         checked = setting.settingdb.get(self.getSettingName(), self.default)
+        # this is to ensure toggled() signals get sent
+        self.setChecked(not checked)
         self.setChecked(checked)
 
     def saveHistory(self):

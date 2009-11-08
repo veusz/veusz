@@ -174,7 +174,11 @@ class CommandCaptureStream(CaptureStream):
                 # unix
                 os.kill(self.popen.pid, signal.SIGTERM)
 
-        self.popen.stdout.close()
+        try:
+            self.popen.stdout.close()
+        except IOError:
+            # problems closing stdout for some reason
+            pass
 
 class SocketCaptureStream(CaptureStream):
     """Capture from an internet host."""
