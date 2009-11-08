@@ -28,6 +28,7 @@ import time
 import random
 import math
 import re
+from collections import defaultdict
 
 import numpy as N
 
@@ -642,6 +643,55 @@ class Document( qt4.QObject ):
         # return widget
         return obj
 
+    def _processSafeImports(self, module, symbols):
+        """Check what symbols are safe to import."""
+
+        # do import anyway
+        if setting.transient_settings['unsafe_mode']:
+            return symbols
+
+        # two-pass to ask user whether they want to import symbol
+        for thepass in xrange(2):
+            # remembered during session
+            a = 'import_allowed'
+            if a not in setting.transient_settings:
+                setting.transient_settings[a] = defaultdict(set)
+            allowed = setting.transient_settings[a][module]
+
+            # not allowed during session
+            a = 'import_notallowed'
+            if a not in setting.transient_settings:
+                setting.transient_settings[a] = defaultdict(set)
+            notallowed = setting.transient_settings[a][module]
+
+            # remembered in setting file
+            a = 'import_allowed'
+            if a not in setting.settingdb:
+                setting.settingdb[a] = {}
+            if module not in setting.settingdb[a]:
+                setting.settingdb[a][module] = {}
+            allowed_always = setting.settingdb[a][module]
+
+            # collect up
+            toimport = []
+            possibleimport = []
+            for symbol in symbols:
+                if symbol in allowed or symbol in allowed_always:
+                    toimport.append(symbol)
+                elif symbol not in notallowed:
+                    possibleimport.append(symbol)
+
+            # nothing to do, so leave
+            if not possibleimport:
+                break
+
+            # only ask the user the first time
+            if thepass == 0:
+                self.emit(qt4.SIGNAL('check_allowed_imports'), module,
+                          possibleimport)
+
+        return toimport
+
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
@@ -661,30 +711,48 @@ class Document( qt4.QObject ):
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
 
+        # custom definitions
         for ctype, name, val in self.customs:
             name = name.strip()
-            if ctype == 'constant':
-                if not identifier_re.match(name):
+            val = val.strip()
+
+            if ctype in ('constant', 'function'):
+                if ctype == 'constant':
+                    if not identifier_re.match(name):
+                        continue
+                    defn = val
+                elif ctype == 'function':
+                    m = function_re.match(name)
+                    if not m:
+                        continue
+                    name = funcname = m.group(1)
+                    args = m.group(2)
+                    defn = 'lambda %s: %s' % (args, val)
+
+                # evaluate, but we ignore any unsafe commands or exceptions
+                checked = utils.checkCode(defn)
+                if checked is not None:
                     continue
-                defn = val
-            elif ctype == 'function':
-                m = function_re.match(name)
-                if not m:
-                    continue
-                name = funcname = m.group(1)
-                args = m.group(2)
-                defn = 'lambda %s: %s' % (args, val)
+                try:
+                    c[name] = eval(defn, c)
+                except:
+                    pass
+
+            elif ctype == 'import':
+                module = name
+                symbols = identifier_re.findall(val)
+                if identifier_re.match(module) and symbols:
+                    # work out what is safe to import
+                    symbols = self._processSafeImports(module, symbols)
+                    if symbols:
+                        defn = 'from %s import %s' % (module,
+                                                      ', '.join(symbols))
+                        try:
+                            exec defn in c
+                        except:
+                            pass
             else:
                 raise ValueError, 'Invalid custom type'
-
-            checked = utils.checkCode(defn)
-            if checked is not None:
-                continue
-                #raise ValueError, "Unsafe commands in function definition."""
-            try:
-                c[name] = eval(defn, c)
-            except:
-                pass
 
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is

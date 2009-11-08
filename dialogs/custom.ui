@@ -23,7 +23,9 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Enter custom functions or constants which can be used when plotting functions, creating new datasets and fitting data. These are saved with the document. Functions and constants are evaluated from the top down, in order.</string>
+         <string>A list of custom functions, constants or symbols imported from external Python modules. These can be used when plotting functions, creating new datasets and fitting data.
+
+Definitions are saved with the document and  evaluated from the top down, in order. A file with default custom settings can be specified in the preferences dialog.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

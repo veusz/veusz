@@ -43,6 +43,7 @@ from veusz.dialogs.errorloading import ErrorLoadingDialog
 from veusz.dialogs.capturedialog import CaptureDialog
 from veusz.dialogs.stylesheet import StylesheetDialog
 from veusz.dialogs.custom import CustomDialog
+from veusz.dialogs.safetyimport import SafetyImportDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -161,6 +162,10 @@ class MainWindow(qt4.QMainWindow):
         self.populateRecentFiles()
         self.setupWindowGeometry()
         self.defineViewWindowMenu()
+
+        # if document requests it, ask whether an allowed import
+        self.connect(self.document, qt4.SIGNAL('check_allowed_imports'),
+                     self.slotAllowedImportsDoc)
 
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
@@ -1118,3 +1123,9 @@ class MainWindow(qt4.QMainWindow):
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
             self.axisvalueslabel.setText('No position')
+
+    def slotAllowedImportsDoc(self, module, names):
+        """Are allowed imports?"""
+
+        d = SafetyImportDialog(self, module, names)
+        d.exec_()

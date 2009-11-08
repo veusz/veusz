@@ -47,9 +47,10 @@ class CustomItemModel(qt4.QAbstractTableModel):
             d = self.document.customs[index.row()][index.column()]
             return qt4.QVariant(d)
         elif role == qt4.Qt.ToolTipRole:
-            return ('Constant or function',
-                    'Name for constant or function(arg1, arg2...)',
-                    'Definition expression')[index.column()]
+            return ('Constant, function or import',
+                    'Name for constant, function(arg1, arg2...) or module name',
+                    'Expression defining constant or function, '
+                    'or list of symbols to import from module')[index.column()]
 
         return qt4.QVariant()
 
@@ -111,13 +112,15 @@ class CustomItemModel(qt4.QAbstractTableModel):
             value = unicode(value.toString())
 
             if col == 0:
-                ok = value in ('constant', 'function')
+                ok = value in ('constant', 'function', 'import')
             elif col == 1:
                 dtype = self.document.customs[row][0]
                 if dtype == 'constant':
                     ok = document.identifier_re.match(value) is not None
                 elif dtype == 'function':
                     ok = document.function_re.match(value) is not None
+                elif dtype == 'import':
+                    ok = True
             else:
                 ok = True
             if not ok:
@@ -140,7 +143,7 @@ class ComboTypeDeligate(qt4.QItemDelegate):
     def createEditor(self, parent, option, index):
         """Create combobox for editing type."""
         w = qt4.QComboBox(parent)
-        w.addItems(['constant', 'function'])
+        w.addItems(['constant', 'function', 'import'])
         w.setFocusPolicy( qt4.Qt.StrongFocus )
         return w
 
