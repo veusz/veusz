@@ -122,6 +122,26 @@ polygons = {
     'lozengehorz': ( (0, 0.707), (1.414, 0), (0, -0.707), (-1.414, 0) ),
     'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) ),
 
+    'star4': ( (0.000, 1.000), (-0.354, 0.354), (-1.000, 0.000),
+               (-0.354, -0.354), (0.000, -1.000), (0.354, -0.354),
+               (1.000, -0.000), (0.354, 0.354), ),
+    'star6': ( (0.000, 1.000), (-0.250, 0.433), (-0.866, 0.500),
+               (-0.500, 0.000), (-0.866, -0.500), (-0.250, -0.433),
+               (-0.000, -1.000), (0.250, -0.433), (0.866, -0.500),
+               (0.500, 0.000), (0.866, 0.500), (0.250, 0.433), ),
+    'star8': ( (0.000, 1.000), (-0.191, 0.462), (-0.707, 0.707),
+               (-0.462, 0.191), (-1.000, 0.000), (-0.462, -0.191),
+               (-0.707, -0.707), (-0.191, -0.462), (0.000, -1.000),
+               (0.191, -0.462), (0.707, -0.707), (0.462, -0.191),
+               (1.000, -0.000), (0.462, 0.191), (0.707, 0.707),
+               (0.191, 0.462), ),
+    'hexagon': ( (0, 1), (0.866, 0.5), (0.866, -0.5),
+                 (0, -1), (-0.866, -0.5), (-0.866, 0.5), ),
+    'starinvert': ( (0, 1.2), (-0.27, 0.3708), (-1.1412, 0.3708),
+                    (-0.4356, -0.1416), (-0.7056, -0.9708), (0, -0.4584),
+                    (0.7056, -0.9708), (0.4356, -0.1416), (1.1412, 0.3708),
+                    (0.27, 0.3708) ),
+
     # special arrow symbols
     '_arrow': ( (0, 0), (-1.8, 1), (-1.4, 0), (-1.8, -1) ),
     '_arrowtriangle': ( (0, 0), (-1.8, 1), (-1.8, -1) ),
@@ -154,6 +174,33 @@ def circlePath(painter, path, size):
     """Circle path of size given."""
     path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
 
+def circlePlusPath(painter, path, size):
+    """Circle path with plus."""
+    path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.moveTo(0, -size)
+    path.lineTo(0, size)
+    path.moveTo(-size, 0)
+    path.lineTo(size, 0)
+
+def circleCrossPath(painter, path, size):
+    """Circle path with cross."""
+    path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
+    m = N.sqrt(2.)*size*0.5
+    path.moveTo(-m, -m)
+    path.lineTo(m, m)
+    path.moveTo(-m, m)
+    path.lineTo(m, -m)
+
+def circlePairPathHorz(painter, path, size):
+    """2 circles next to each other (horizontal)."""
+    path.addEllipse( qt4.QRectF(-size, -size*0.5, size, size) )
+    path.addEllipse( qt4.QRectF(0,  -size*0.5, size, size) )
+
+def circlePairPathVert(painter, path, size):
+    """2 circles next to each other (vertical)."""
+    path.addEllipse( qt4.QRectF(-size*0.5, -size, size, size) )
+    path.addEllipse( qt4.QRectF(-size*0.5, 0, size, size) )
+
 def ellipseHorzPath(painter, path, size):
     """Horizontal ellipse path."""
     path.addEllipse( qt4.QRectF(-size, -size*0.5, size*2, size) )
@@ -166,6 +213,22 @@ def circleHolePath(painter, path, size):
     """Circle with centre missing."""
     circlePath(painter, path, size)
     circlePath(painter, path, size*0.5)
+
+def squarePlusPath(painter, path, size):
+    """Square with plus sign."""
+    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.moveTo(0, -size)
+    path.lineTo(0, size)
+    path.moveTo(-size, 0)
+    path.lineTo(size, 0)
+
+def squareCrossPath(painter, path, size):
+    """Square with cross sign."""
+    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.moveTo(-size, -size)
+    path.lineTo(size, size)
+    path.moveTo(-size, size)
+    path.lineTo(size, -size)
 
 def squareHolePath(painter, path, size):
     """Square with centre missing."""
@@ -208,9 +271,15 @@ def circleDotPath(painter, path, size):
 pathsymbols = {
     'square': squarePath,
     'circle': circlePath,
+    'circleplus': circlePlusPath,
+    'circlecross': circleCrossPath,
+    'circlepairhorz': circlePairPathHorz,
+    'circlepairvert': circlePairPathVert,
     'ellipsehorz': ellipseHorzPath,
     'ellipsevert': ellipseVertPath,
     'circlehole': circleHolePath,
+    'squareplus': squarePlusPath,
+    'squarecross': squareCrossPath,
     'squarehole': squareHolePath,
     'diamondhole': diamondHolePath,
     'pentagonhole': pentagonHolePath,
@@ -250,13 +319,16 @@ MarkerCodes = (
     'circle', 'diamond', 'square',
     'cross', 'plus', 'star',
     'barhorz', 'barvert',
-    'octogon', 'pentagon', 'tievert', 'tiehorz',
+    'pentagon', 'hexagon', 'octogon', 'tievert', 'tiehorz',
     'triangle', 'triangledown', 'triangleleft', 'triangleright',
     'dot', 'circledot', 'bullseye',
     'circlehole', 'squarehole', 'diamondhole', 'pentagonhole',
     'squarerounded',
     'ellipsehorz', 'ellipsevert',
     'lozengehorz', 'lozengevert',
+    'circleplus', 'circlecross', 'squareplus', 'squarecross',
+    'star4', 'star6', 'star8', 'starinvert',
+    'circlepairhorz', 'circlepairvert',
     'asterisk',
     'lineplus', 'linecross',
     'linevert', 'linehorz',
