@@ -352,7 +352,10 @@ class PointPlotter(GenericPlotter):
             return
         
         # iterate to call the error bars functions required to draw style
-        painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
+        pen = s.ErrorBarLine.makeQPenWHide(painter)
+        pen.setCapStyle(qt4.Qt.FlatCap)
+
+        painter.setPen(pen)
         for function in _errorBarFunctionMap[style]:
             function(style, xmin, xmax, ymin, ymax,
                      xplotter, yplotter, s, painter)
