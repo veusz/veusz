@@ -22,6 +22,7 @@ from itertools import izip
 
 import veusz.document as document
 import veusz.setting as setting
+import veusz.utils as utils
 import veusz.qtall as qt4
 
 import plotters
@@ -81,9 +82,7 @@ class Polygon(plotters.FreePlotter):
 
             # construct polygon
             poly = qt4.QPolygonF()
-            xd, yd = xvals.data, yvals.data
-            for x, y in izip(xd, yd):
-                poly.append(qt4.QPointF(x, y))
+            utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)
             # draw it
             painter.drawPolygon(poly)
 
