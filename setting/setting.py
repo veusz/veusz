@@ -1261,7 +1261,10 @@ class LineStyle(Choice):
     # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
                    'dash-dot', 'dash-dot-dot', 'dotted-fine',
-                   'dashed-fine', 'dash-dot-fine']
+                   'dashed-fine', 'dash-dot-fine',
+                   'dot1', 'dot2', 'dot3', 'dot4',
+                   'dash1', 'dash2', 'dash3', 'dash4', 'dash5',
+                   'dashdot1', 'dashdot2', 'dashdot3']
 
     # convert from line styles to Qt constants and a custom pattern (if any)
     _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
@@ -1271,7 +1274,20 @@ class LineStyle(Choice):
                   'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
                   'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]),
                   'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]),
-                  'dash-dot-fine': (qt4.Qt.CustomDashLine, [8, 4, 2, 4])}
+                  'dash-dot-fine': (qt4.Qt.CustomDashLine, [8, 4, 2, 4]),
+                  'dot1': (qt4.Qt.CustomDashLine, [0.1, 2]),
+                  'dot2': (qt4.Qt.CustomDashLine, [0.1, 4]),
+                  'dot3': (qt4.Qt.CustomDashLine, [0.1, 6]),
+                  'dot4': (qt4.Qt.CustomDashLine, [0.1, 8]),
+                  'dash1': (qt4.Qt.CustomDashLine, [4, 4]),
+                  'dash2': (qt4.Qt.CustomDashLine, [4, 8]),
+                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]), 
+                  'dash4': (qt4.Qt.CustomDashLine, [16, 8]),
+                  'dash5': (qt4.Qt.CustomDashLine, [16, 16]),
+                  'dashdot1': (qt4.Qt.CustomDashLine, [0.1, 4, 4, 4]),
+                  'dashdot2': (qt4.Qt.CustomDashLine, [0.1, 4, 8, 4]),
+                  'dashdot3': (qt4.Qt.CustomDashLine, [0.1, 2, 4, 2]),
+                 }
     
     controls.LineStyle._lines = _linestyles
     
