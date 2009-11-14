@@ -323,6 +323,15 @@ class Setting(object):
             w = w.parent
         return w
 
+    def safeEvalHelper(self, text):
+        """Evaluate an expression, catching naughtiness."""
+        if utils.checkCode(text) is not None:
+            raise InvalidType
+        try:
+            return float( eval(text, self.getDocument().eval_context) )
+        except:
+            raise InvalidType
+
 # Store strings
 class Str(Setting):
     """String setting."""
@@ -416,16 +425,6 @@ class Int(Setting):
     def makeControl(self, *args):
         return controls.Edit(self, *args)
 
-_safe_environ = utils.veusz_eval_context.copy()
-def safeEvalHelper(text):
-    """Evaluate an expression, catching naughtiness."""
-    if utils.checkCode(text) is not None:
-        raise InvalidType
-    try:
-        return float( eval(text, _safe_environ) )
-    except:
-        raise InvalidType
-
 # for storing floats
 class Float(Setting):
     """Float settings."""
@@ -466,7 +465,7 @@ class Float(Setting):
             f = float(text)
         except ValueError:
             # try to evaluate
-            f = safeEvalHelper(text)
+            f = self.safeEvalHelper(text)
         return self.convertTo(f)
 
     def makeControl(self, *args):
@@ -503,7 +502,7 @@ class FloatOrAuto(Setting):
                 return float(text)
             except ValueError:
                 # try to evaluate
-                return safeEvalHelper(text)
+                return self.safeEvalHelper(text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
@@ -894,7 +893,7 @@ class FloatList(Setting):
                 try:
                     out.append(float(x))
                 except ValueError:
-                    out.append( safeEvalHelper(x) )
+                    out.append( self.safeEvalHelper(x) )
         return out
 
     def makeControl(self, *args):
@@ -1127,7 +1126,7 @@ class DatasetOrFloatList(Dataset):
                 try:
                     out.append(float(x))
                 except ValueError:
-                    out.append( safeEvalHelper(x) )
+                    out.append( self.safeEvalHelper(x) )
             return out
         except InvalidType:
             return text
@@ -1262,7 +1261,10 @@ class LineStyle(Choice):
     # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
                    'dash-dot', 'dash-dot-dot', 'dotted-fine',
-                   'dashed-fine', 'dash-dot-fine']
+                   'dashed-fine', 'dash-dot-fine',
+                   'dot1', 'dot2', 'dot3', 'dot4',
+                   'dash1', 'dash2', 'dash3', 'dash4', 'dash5',
+                   'dashdot1', 'dashdot2', 'dashdot3']
 
     # convert from line styles to Qt constants and a custom pattern (if any)
     _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
@@ -1272,7 +1274,20 @@ class LineStyle(Choice):
                   'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
                   'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]),
                   'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]),
-                  'dash-dot-fine': (qt4.Qt.CustomDashLine, [8, 4, 2, 4])}
+                  'dash-dot-fine': (qt4.Qt.CustomDashLine, [8, 4, 2, 4]),
+                  'dot1': (qt4.Qt.CustomDashLine, [0.1, 2]),
+                  'dot2': (qt4.Qt.CustomDashLine, [0.1, 4]),
+                  'dot3': (qt4.Qt.CustomDashLine, [0.1, 6]),
+                  'dot4': (qt4.Qt.CustomDashLine, [0.1, 8]),
+                  'dash1': (qt4.Qt.CustomDashLine, [4, 4]),
+                  'dash2': (qt4.Qt.CustomDashLine, [4, 8]),
+                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]), 
+                  'dash4': (qt4.Qt.CustomDashLine, [16, 8]),
+                  'dash5': (qt4.Qt.CustomDashLine, [16, 16]),
+                  'dashdot1': (qt4.Qt.CustomDashLine, [0.1, 4, 4, 4]),
+                  'dashdot2': (qt4.Qt.CustomDashLine, [0.1, 4, 8, 4]),
+                  'dashdot3': (qt4.Qt.CustomDashLine, [0.1, 2, 4, 2]),
+                 }
     
     controls.LineStyle._lines = _linestyles
     

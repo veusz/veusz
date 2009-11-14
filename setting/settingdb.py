@@ -42,6 +42,8 @@ defaultValues = {
 
     # default stylesheet
     'stylesheet_default': '',
+    # default custom definitons
+    'custom_default': '',
 
     # colors (isdefault, 'notdefaultcolor')
     'color_page': (True, 'white'),

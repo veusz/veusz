@@ -26,6 +26,11 @@
 import os.path
 import time
 import random
+import math
+import re
+from collections import defaultdict
+
+import numpy as N
 
 import veusz.qtall as qt4
 
@@ -39,6 +44,17 @@ try:
     hasemf = True
 except ImportError:
     hasemf = False
+
+# python identifier
+identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+
+# function(arg1, arg2...) for custom functions
+# not quite correct as doesn't check for commas in correct places
+function_re = re.compile(r'''
+^([A-Za-z_][A-Za-z0-9_]*)[ ]*  # identifier
+\((                            # begin args
+(?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )* # args
+)\)$                           # endargs''', re.VERBOSE)
 
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
@@ -58,6 +74,12 @@ class Document( qt4.QObject ):
 
         # directories to examine when importing
         self.importpath = []
+
+        # store custom functions and constants
+        # consists of tuples of (name, type, value)
+        # type is constant or function
+        self.customs = []
+        self.updateEvalContext()
 
     def suspendUpdates(self):
         """Holds sending update messages. This speeds up modification of the document."""
@@ -332,6 +354,19 @@ class Document( qt4.QObject ):
                       time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                                     time.gmtime()) )
         
+    def saveCustomDefinitions(self, fileobj):
+        """Save custom constants and functions."""
+
+        for vals in self.customs:
+            fileobj.write('AddCustom(%s, %s, %s)\n' %
+                          tuple([repr(x) for x in vals]))
+
+    def saveCustomFile(self, fileobj):
+        """Export the custom settings to a file."""
+
+        self._writeFileHeader(fileobj, 'custom definitions')
+        self.saveCustomDefinitions(fileobj)
+
     def saveToFile(self, fileobj):
         """Save the text representing a document to a file."""
 
@@ -342,6 +377,9 @@ class Document( qt4.QObject ):
         if getattr(fileobj, 'name', False):
             reldirname = os.path.dirname( os.path.abspath(fileobj.name) )
             fileobj.write('AddImportPath(%s)\n' % repr(reldirname))
+
+        # add custom definitions
+        self.saveCustomDefinitions(fileobj)
 
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
@@ -458,10 +496,12 @@ class Document( qt4.QObject ):
                         # replace bounding box line by calculated one
                         parts = line.split()
                         widthfactor = float(parts[3]) / printer.width()
+                        origheight = float(parts[4])
                         line = "%s %i %i %i %i\n" % (
                             parts[0], 0,
-                            int(float(parts[4])-widthfactor*height),
-                            int(widthfactor*width), int(float(parts[4])) )
+                            int(math.floor(origheight-widthfactor*height)),
+                            int(math.ceil(widthfactor*width)),
+                            int(math.ceil(origheight)) )
                     fout.write(line)
 
             elif ext == '.pdf':
@@ -602,6 +642,117 @@ class Document( qt4.QObject ):
 
         # return widget
         return obj
+
+    def _processSafeImports(self, module, symbols):
+        """Check what symbols are safe to import."""
+
+        # do import anyway
+        if setting.transient_settings['unsafe_mode']:
+            return symbols
+
+        # two-pass to ask user whether they want to import symbol
+        for thepass in xrange(2):
+            # remembered during session
+            a = 'import_allowed'
+            if a not in setting.transient_settings:
+                setting.transient_settings[a] = defaultdict(set)
+            allowed = setting.transient_settings[a][module]
+
+            # not allowed during session
+            a = 'import_notallowed'
+            if a not in setting.transient_settings:
+                setting.transient_settings[a] = defaultdict(set)
+            notallowed = setting.transient_settings[a][module]
+
+            # remembered in setting file
+            a = 'import_allowed'
+            if a not in setting.settingdb:
+                setting.settingdb[a] = {}
+            if module not in setting.settingdb[a]:
+                setting.settingdb[a][module] = {}
+            allowed_always = setting.settingdb[a][module]
+
+            # collect up
+            toimport = []
+            possibleimport = []
+            for symbol in symbols:
+                if symbol in allowed or symbol in allowed_always:
+                    toimport.append(symbol)
+                elif symbol not in notallowed:
+                    possibleimport.append(symbol)
+
+            # nothing to do, so leave
+            if not possibleimport:
+                break
+
+            # only ask the user the first time
+            if thepass == 0:
+                self.emit(qt4.SIGNAL('check_allowed_imports'), module,
+                          possibleimport)
+
+        return toimport
+
+    def updateEvalContext(self):
+        """To be called after custom constants or functions are changed.
+        This sets up a safe environment where things can be evaluated
+        """
+        
+        self.eval_context = c = {}
+
+        # add numpy things
+        # we try to avoid various bits and pieces for safety
+        for name, val in N.__dict__.iteritems():
+            if ( (callable(val) or type(val)==float) and
+                 name not in __builtins__ and
+                 name[:1] != '_' and name[-1:] != '_' ):
+                c[name] = val
+        
+        # safe functions
+        c['os_path_join'] = os.path.join
+        c['os_path_dirname'] = os.path.dirname
+
+        # custom definitions
+        for ctype, name, val in self.customs:
+            name = name.strip()
+            val = val.strip()
+
+            if ctype in ('constant', 'function'):
+                if ctype == 'constant':
+                    if not identifier_re.match(name):
+                        continue
+                    defn = val
+                elif ctype == 'function':
+                    m = function_re.match(name)
+                    if not m:
+                        continue
+                    name = funcname = m.group(1)
+                    args = m.group(2)
+                    defn = 'lambda %s: %s' % (args, val)
+
+                # evaluate, but we ignore any unsafe commands or exceptions
+                checked = utils.checkCode(defn)
+                if checked is not None:
+                    continue
+                try:
+                    c[name] = eval(defn, c)
+                except:
+                    pass
+
+            elif ctype == 'import':
+                module = name
+                symbols = identifier_re.findall(val)
+                if identifier_re.match(module) and symbols:
+                    # work out what is safe to import
+                    symbols = self._processSafeImports(module, symbols)
+                    if symbols:
+                        defn = 'from %s import %s' % (module,
+                                                      ', '.join(symbols))
+                        try:
+                            exec defn in c
+                        except:
+                            pass
+            else:
+                raise ValueError, 'Invalid custom type'
 
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is

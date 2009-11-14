@@ -28,7 +28,7 @@ from fitlm import *
 from action import *
 from pdf import *
 from dates import *
-from safe_eval import veusz_eval_context, checkCode
+from safe_eval import checkCode
 
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, plotLinesToPainter

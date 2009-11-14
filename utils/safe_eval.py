@@ -299,19 +299,19 @@ def checkContextOkay(context):
     if ctx_errors:
         raise SafeEvalContextException(ctx_errkeys, ctx_errors)
 
-# set up environment in dict
-veusz_eval_context = {}
+# # set up environment in dict
+# veusz_eval_context = {}
 
-# add callables (not modules) and floats which don't override builtins
-for name, val in N.__dict__.iteritems():
-    if ( (callable(val) or type(val)==float) and
-         name not in __builtins__ and
-         name[:1] != '_' and name[-1:] != '_' ):
-        veusz_eval_context[name] = val
+# # add callables (not modules) and floats which don't override builtins
+# for name, val in N.__dict__.iteritems():
+#     if ( (callable(val) or type(val)==float) and
+#          name not in __builtins__ and
+#          name[:1] != '_' and name[-1:] != '_' ):
+#         veusz_eval_context[name] = val
 
-# useful safe functions
-veusz_eval_context['os_path_join'] = os.path.join
-veusz_eval_context['os_path_dirname'] = os.path.dirname
+# # useful safe functions
+# veusz_eval_context['os_path_join'] = os.path.join
+# veusz_eval_context['os_path_dirname'] = os.path.dirname
 
 def _filterExceptions(errs, securityonly):
     """Remove python exceptions from error list."""

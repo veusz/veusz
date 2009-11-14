@@ -22,6 +22,7 @@
 
 import string
 import os.path
+import struct
 
 import veusz.qtall as qt4
 import numpy as N
@@ -221,6 +222,16 @@ class Image(plotters.GenericPlotter):
         transparency is a number from 0 to 100
         Returns a QImage
         """
+
+        cmap = N.array(cmap)
+        if struct.pack("h", 1) == "\000\001":
+            # have to swap colors for big endian architectures
+            cmap2 = N.array(cmap)
+            cmap2[:,0] = cmap[:,3]
+            cmap2[:,1] = cmap[:,2]
+            cmap2[:,2] = cmap[:,1]
+            cmap2[:,3] = cmap[:,0]
+            cmap = N.array(cmap2)
 
         # invert colour map if min and max are swapped
         if minval > maxval:

@@ -492,7 +492,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         t = N.arange(self.numsteps)*deltat + self.t0
         
         # define environment to evaluate
-        fnenviron = utils.veusz_eval_context.copy()
+        fnenviron = document.eval_context.copy()
         fnenviron['t'] = t
 
         # calculate for each of the dataset components
@@ -1143,6 +1143,32 @@ class OperationDatasetInsertRow(object):
         ds.deleteRows(self.row, self.numrows)
 
 ###############################################################################
+# Custom setting operations
+
+class OperationSetCustom(object):
+    """Set custom objects, such as constants."""
+
+    descr = 'set a custom definition'
+
+    def __init__(self, vals):
+        """customtype is the type of custom object to set:
+        eg functions, constants
+        customval is a dict of the values."""
+
+        self.customvals = list(vals)
+
+    def do(self, document):
+        """Set the custom object."""
+        self.oldval = list(document.customs)
+        document.customs = self.customvals
+        document.updateEvalContext()
+        
+    def undo(self, document):
+        """Restore custom object."""
+        document.customs = self.oldval
+        document.updateEvalContext()
+
+###############################################################################
 # Misc operations
         
 class OperationMultiple(object):
@@ -1154,7 +1180,8 @@ class OperationMultiple(object):
         Optional argument descr gives a description of the combined operation
         """
         self.operations = operations
-        self.descr = descr
+        if descr:
+            self.descr = descr
         
     def addOperation(self, op):
         """Add an operation to the list of operations."""
@@ -1172,12 +1199,14 @@ class OperationMultiple(object):
         for op in utils.reverse(self.operations):
             op.undo(document)
 
-class OperationImportStyleSheet(OperationMultiple):
-    """An operation to import a stylesheet."""
+class OperationLoadStyleSheet(OperationMultiple):
+    """An operation to load a stylesheet."""
     
+    descr = 'load stylesheet'
+
     def __init__(self, filename):
-        """Import stylesheet with filename."""
-        OperationMultiple.__init__(self, [], descr='import stylesheet')
+        """Load stylesheet with filename."""
+        OperationMultiple.__init__(self, [], descr=None)
         self.filename = os.path.abspath(filename)
         
     def do(self, document):
@@ -1197,3 +1226,6 @@ class OperationImportStyleSheet(OperationMultiple):
         if e:
             raise e
         
+class OperationLoadCustom(OperationLoadStyleSheet):
+    descr = 'load custom definitions'
+

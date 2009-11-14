@@ -116,7 +116,7 @@ class Fit(FunctionPlotter):
 
     def initEnviron(self):
         """Copy data into environment."""
-        env = utils.veusz_eval_context.copy()
+        env = self.document.eval_context.copy()
         env.update( self.settings.values )
         return env
 

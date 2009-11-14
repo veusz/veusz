@@ -26,7 +26,9 @@ import sys
 import historycombo
 import historycheck
 import historyvaluecombo
+import recentfilesbutton
 
 sys.modules['historycombo'] = historycombo
 sys.modules['historycheck'] = historycheck
 sys.modules['historyvaluecombo'] = historyvaluecombo
+sys.modules['recentfilesbutton'] = recentfilesbutton

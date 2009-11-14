@@ -42,9 +42,10 @@ from veusz.dialogs.preferences import PreferencesDialog
 from veusz.dialogs.errorloading import ErrorLoadingDialog
 from veusz.dialogs.capturedialog import CaptureDialog
 from veusz.dialogs.stylesheet import StylesheetDialog
+from veusz.dialogs.custom import CustomDialog
+from veusz.dialogs.safetyimport import SafetyImportDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
-
 
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
@@ -67,8 +68,10 @@ class MainWindow(qt4.QMainWindow):
         else:
             # add page and default graph
             win.document.makeDefaultDoc()
-            # load the default stylesheet too
+
+            # load defaults if set
             win.loadDefaultStylesheet()
+            win.loadDefaultCustomDefinitions()
 
         # try to select first graph of first page
         win.treeedit.doInitialWidgetSelect()
@@ -160,6 +163,10 @@ class MainWindow(qt4.QMainWindow):
         self.setupWindowGeometry()
         self.defineViewWindowMenu()
 
+        # if document requests it, ask whether an allowed import
+        self.connect(self.document, qt4.SIGNAL('check_allowed_imports'),
+                     self.slotAllowedImportsDoc)
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().showMessage(text, 2000)
@@ -201,10 +208,31 @@ class MainWindow(qt4.QMainWindow):
         if filename:
             try:
                 self.document.applyOperation(
-                    document.OperationImportStyleSheet(filename) )
+                    document.OperationLoadStyleSheet(filename) )
             except IOError:
                 qt4.QMessageBox("Veusz",
                                 "Unable to load default stylesheet '%s'" %
+                                filename,
+                                qt4.QMessageBox.Warning,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self).exec_()
+            else:
+                # reset any modified flag
+                self.document.setModified(False)
+                self.document.changeset = 0
+
+    def loadDefaultCustomDefinitions(self):
+        """Loads the custom definitions for the new document."""
+        filename = setting.settingdb['custom_default']
+        if filename:
+            try:
+                self.document.applyOperation(
+                    document.OperationLoadCustom(filename) )
+            except IOError:
+                qt4.QMessageBox("Veusz",
+                                "Unable to load default custom definitons '%s'" %
                                 filename,
                                 qt4.QMessageBox.Warning,
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
@@ -255,6 +283,12 @@ class MainWindow(qt4.QMainWindow):
         dialog.show()
         return dialog
         
+    def slotEditCustom(self):
+        dialog = CustomDialog(self, self.document)
+        self.dialogs.append(dialog)
+        dialog.show()
+        return dialog
+
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
 
@@ -304,7 +338,14 @@ class MainWindow(qt4.QMainWindow):
                   icon='kde-edit-redo', key='Ctrl+Shift+Z'),
             'edit.prefs':
                 a(self, 'Edit preferences', 'Preferences...',
-                  self.slotEditPreferences),
+                  self.slotEditPreferences,
+                  icon='veusz-edit-prefs'),
+            'edit.custom':
+                a(self, 'Edit custom functions and constants',
+                  'Custom definitions...',
+                  self.slotEditCustom,
+                  icon='veusz-edit-custom'),
+
             'edit.stylesheet':
                 a(self,
                   'Edit stylesheet to change default widget settings',
@@ -406,7 +447,7 @@ class MainWindow(qt4.QMainWindow):
         editmenu = [
             'edit.undo', 'edit.redo',
             '',
-            'edit.prefs', 'edit.stylesheet',
+            'edit.prefs', 'edit.stylesheet', 'edit.custom',
             ''
             ]
         viewwindowsmenu = [
@@ -791,7 +832,7 @@ class MainWindow(qt4.QMainWindow):
                 ignore_unsafe = True # allow unsafe veusz commands below
 
         # set up environment to run script
-        env = utils.veusz_eval_context.copy()
+        env = self.document.eval_context.copy()
         interface = document.CommandInterface(self.document)
 
         # allow safe commands as-is
@@ -955,7 +996,7 @@ class MainWindow(qt4.QMainWindow):
             filt = setting.settingdb['export_lastformat']
             fd.selectFilter(filt)
             extn = formats[filters.index(filt)][0][0]
-        except KeyError:
+        except (KeyError, IndexError, ValueError):
             extn = 'eps'
 
         if self.filename:
@@ -1082,3 +1123,9 @@ class MainWindow(qt4.QMainWindow):
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
             self.axisvalueslabel.setText('No position')
+
+    def slotAllowedImportsDoc(self, module, names):
+        """Are allowed imports?"""
+
+        d = SafetyImportDialog(self, module, names)
+        d.exec_()
