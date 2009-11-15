@@ -886,8 +886,12 @@ class DatasetExpression(Dataset):
 
     recreatable_dataset = True
 
-    def __init__(self, data=None, serr=None, nerr=None, perr=None):
-        """Initialise the dataset with the expressions given."""
+    def __init__(self, data=None, serr=None, nerr=None, perr=None,
+                 parametric=None):
+        """Initialise the dataset with the expressions given.
+
+        parametric is option and can be (minval, maxval, steps) or None
+        """
 
         self.document = None
         self.linked = None
@@ -899,6 +903,7 @@ class DatasetExpression(Dataset):
         self.expr['serr'] = serr
         self.expr['nerr'] = nerr
         self.expr['perr'] = perr
+        self.parametric = parametric
 
         self.cachedexpr = {}
 
@@ -932,6 +937,16 @@ class DatasetExpression(Dataset):
 
         # set up environment to evaluate expressions in
         environment = self.document.eval_context.copy()
+
+        # create dataset using parametric expression
+        if self.parametric:
+            p = self.parametric
+            if p[2] >= 2:
+                deltat = (p[1]-p[0]) / (p[2]-1)
+                t = N.arange(p[2])*deltat + p[0]
+            else:
+                t = N.array([p[0]])
+            environment['t'] = t
 
         # this fn gets called to return the value of a dataset
         environment['_DS_'] = self.evaluateDataset
@@ -988,6 +1003,9 @@ class DatasetExpression(Dataset):
             parts.append('negerr=%s' % repr(self.expr['nerr']))
         if self.expr['perr']:
             parts.append('poserr=%s' % repr(self.expr['perr']))
+        if self.parametric is not None:
+            parts.append('parametric=%s' % repr(self.parametric))
+
         parts.append('linked=True')
 
         s = 'SetDataExpression(%s)\n' % ', '.join(parts)
@@ -1027,11 +1045,19 @@ class DatasetExpression(Dataset):
 
     def linkedInformation(self):
         """Return information about linking."""
-        text = ['Linked expression dataset']
+        text = []
+        if self.parametric:
+            text.append('Linked parametric dataset')
+        else:
+            text.append('Linked expression dataset')
         for label, part in itertools.izip(self.column_descriptions,
                                           self.columns):
             if self.expr[part]:
                 text.append('%s: %s' % (label, self.expr[part]))
+
+        if self.parametric:
+            text.append("where t goes from %g:%g in %i steps" % self.parametric)
+
         return '\n'.join(text)
 
 class DatasetRange(Dataset):

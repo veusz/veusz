@@ -113,7 +113,6 @@ class DataCreateDialog(qt4.QDialog):
 
         isfunction = buttonid == 2
         self.expressionhelperlabel.setVisible(isfunction)
-        self.linkcheckbox.setEnabled(isfunction or isvalue)
 
         # enable/disable create button
         self.editsEditSlot('')
@@ -140,7 +139,17 @@ class DataCreateDialog(qt4.QDialog):
             return
         if isinstance(ds, document.DatasetExpression): 
             # change selected method
-            self.methodBG.button(2).click()
+            if ds.parametric is None:
+                # standard expression
+                self.methodBG.button(2).click()
+            else:
+                # parametric dataset
+                self.methodBG.button(1).click()
+                p = ds.parametric
+                self.tstartedit.setText( '%g' % p[0] )
+                self.tendedit.setText( '%g' % p[1] )
+                self.tstepsedit.setText( str(p[2]) )
+
             # make sure name is set
             self.nameedit.setText(dsname)
             # set expressions
@@ -295,9 +304,10 @@ class DataCreateDialog(qt4.QDialog):
             if text:
                 vals[key] = text
            
+        linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
         return document.OperationDatasetCreateParameteric(name,
                                                           t0, t1, numsteps,
-                                                          vals)
+                                                          vals, linked=linked)
       
     def createFromExpression(self, name):
         """Create a dataset based on the expressions given."""

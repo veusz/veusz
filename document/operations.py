@@ -475,7 +475,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
     
     descr = 'create parametric dataset'
     
-    def __init__(self, datasetname, t0, t1, numsteps, parts):
+    def __init__(self, datasetname, t0, t1, numsteps, parts, linked=False):
         """Create a parametric dataset.
         
         Variable t goes from t0 to t1 in numsteps.
@@ -487,51 +487,43 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         self.t0 = t0
         self.t1 = t1
         self.parts = parts
-        
+        self.linked = linked
+
     def do(self, document):
         """Create the dataset."""
         OperationDatasetCreate.do(self, document)
 
-        deltat = (self.t1 - self.t0) / (self.numsteps-1)
-        t = N.arange(self.numsteps)*deltat + self.t0
+        p = self.parts.copy()
+        p['parametric'] = (self.t0, self.t1, self.numsteps)
+        ds = datasets.DatasetExpression(**p)
+        ds.document = document
+
+        if not self.linked:
+            # copy these values if we don't want to link
+            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
+                                  perr=ds.perr, nerr=ds.nerr)
         
-        # define environment to evaluate
-        fnenviron = document.eval_context.copy()
-        fnenviron['t'] = t
-
-        # calculate for each of the dataset components
-        vals = {}
-        for key, expr in self.parts.iteritems():
-            errors = utils.checkCode(expr, securityonly=True)
-            if errors is not None:
-                raise CreateDatasetException("Will not create dataset\n"
-                                             "Unsafe code in expression '%s'\n" % expr)
-                
-            try:
-                vals[key] = eval( expr, fnenviron ) + t*0.
-            except Exception, e:
-                raise CreateDatasetException("Error evaluating expession '%s'\n"
-                                             "Error: '%s'" % (expr, str(e)) )
-
-        ds = datasets.Dataset(**vals)
         document.setData(self.datasetname, ds)
         return ds
         
 class OperationDatasetCreateExpression(OperationDatasetCreate):
     descr = 'create dataset from expression'
 
-    def __init__(self, datasetname, parts, link):
+    def __init__(self, datasetname, parts, link, parametric=None):
         """Create a dataset from existing dataset using expressions.
         
         parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
         The values are expressions for evaluating.
         
         If link is True, then the dataset is linked to the expressions
+        Parametric is a tuple (min, max, numitems) if creating parametric
+        datasets.
         """
         
         OperationDatasetCreate.__init__(self, datasetname)
         self.parts = parts
         self.link = link
+        self.parametric = parametric
 
     def validateExpression(self, document):
         """Validate the expression is okay.
@@ -539,7 +531,9 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         """
 
         try:
-            ds = datasets.DatasetExpression(**self.parts)
+            p = self.parts.copy()
+            p['parametric'] = self.parametric
+            ds = datasets.DatasetExpression(**p)
             ds.document = document
             
             # we force an evaluation of the dataset for the first time, to
@@ -554,7 +548,9 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         """Create the dataset."""
         OperationDatasetCreate.do(self, document)
 
-        ds = datasets.DatasetExpression(**self.parts)
+        p = self.parts.copy()
+        p['parametric'] = self.parametric
+        ds = datasets.DatasetExpression(**p)
         ds.document = document
 
         if not self.link:
