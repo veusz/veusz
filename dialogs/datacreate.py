@@ -113,7 +113,7 @@ class DataCreateDialog(qt4.QDialog):
 
         isfunction = buttonid == 2
         self.expressionhelperlabel.setVisible(isfunction)
-        self.linkcheckbox.setEnabled(isfunction)
+        self.linkcheckbox.setEnabled(isfunction or isvalue)
 
         # enable/disable create button
         self.editsEditSlot('')
@@ -148,6 +148,19 @@ class DataCreateDialog(qt4.QDialog):
                 text = ds.expr[part]
                 if text is None:
                     text = ''
+                self.dsedits[part].setText(text)
+        elif isinstance(ds, document.DatasetRange):
+            # change selected method
+            self.methodBG.button(0).click()
+            # make sure name is set
+            self.nameedit.setText(dsname)
+            # set expressions
+            for part in self.dsedits.iterkeys():
+                data = getattr(ds, 'range_%s' % part)
+                if data is None:
+                    text = ''
+                else:
+                    text = '%g:%g' % data
                 self.dsedits[part].setText(text)
 
     def editsEditSlot(self, dummytext):
@@ -262,7 +275,9 @@ class DataCreateDialog(qt4.QDialog):
                 
             vals[key] = (minval, maxval)
             
-        return document.OperationDatasetCreateRange(name, numsteps, vals)
+        linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
+        return document.OperationDatasetCreateRange(name, numsteps, vals,
+                                                    linked=linked)
 
     def createParametric(self, name):
         """Use a parametric form to create the dataset.

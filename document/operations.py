@@ -388,7 +388,8 @@ class OperationDatasetUnlink(object):
     def do(self, document):
         dataset = document.data[self.datasetname]
         
-        if isinstance(dataset, datasets.DatasetExpression):
+        if ( isinstance(dataset, datasets.DatasetExpression) or
+             isinstance(dataset, datasets.DatasetRange) ):
             # if it's an expression, unlink from other dataset
             self.mode = 'expr'
             self.olddataset = dataset
@@ -435,7 +436,7 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
     
     descr = 'create dataset from range'
     
-    def __init__(self, datasetname, numsteps, parts):
+    def __init__(self, datasetname, numsteps, parts, linked=False):
         """Create a dataset with numsteps values.
         
         parts is a dict containing keys 'data', 'serr', 'perr' and/or 'nerr'. The values
@@ -444,21 +445,24 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         OperationDatasetCreate.__init__(self, datasetname)
         self.numsteps = numsteps
         self.parts = parts
+        self.linked = linked
         
     def do(self, document):
         """Create dataset using range."""
         
         OperationDatasetCreate.do(self, document)
-        vals = {}
-        for partname, therange in self.parts.iteritems():
-            minval, maxval = therange
-            if self.numsteps == 1:
-                vals[partname] = N.array( [minval] )
-            else:
-                delta = (maxval - minval) / (self.numsteps-1)
-                vals[partname] = N.arange(self.numsteps)*delta + minval
+        data = self.parts['data']
+        serr = self.parts.get('serr', None)
+        perr = self.parts.get('perr', None)
+        nerr = self.parts.get('nerr', None)
+        
+        ds = datasets.DatasetRange(self.numsteps, data, serr=serr,
+                                   perr=perr, nerr=nerr)
+        if not self.linked:
+            # copy these values if we don't want to link
+            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
+                                  perr=ds.perr, nerr=ds.nerr)
 
-        ds = datasets.Dataset(**vals)
         document.setData(self.datasetname, ds)
         return ds
         

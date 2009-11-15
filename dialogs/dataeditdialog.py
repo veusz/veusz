@@ -350,29 +350,11 @@ class DataEditDialog(qt4.QDialog):
             return
 
         # linked dataset
-        readonly = False
-        if ds.linked is None:
-            fn = 'None'
-            unlink = False
-        else:
-            fn = ds.linked.filename
-            unlink = True
-        text = 'Linked file: %s' % fn
-
-        if isinstance(ds, document.DatasetExpression):
-            # for datasets linked by expressions
-            items = ['Linked expression dataset:']
-            for label, part in itertools.izip(ds.column_descriptions,
-                                              ds.columns):
-                if ds.expr[part]:
-                    items.append('%s: %s' % (label, ds.expr[part]))
-            text = '\n'.join(items)
-            unlink = True
-            readonly = True
-            
+        unlink = ds.canUnlink()
+        readonly = not unlink
         self.editbutton.setVisible( ds.recreatable_dataset )
         self.unlinkbutton.setEnabled(unlink)
-        self.linkedlabel.setText(text)
+        self.linkedlabel.setText( ds.linkedInformation() )
 
     def slotDocumentModified(self):
         """Set unlink status when document modified."""
