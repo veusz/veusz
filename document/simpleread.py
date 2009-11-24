@@ -73,7 +73,7 @@ datatype_name_convert = {
     'text': 'string',
     'string': 'string',
     'date': 'date',
-    'time': 'time'
+    'time': 'date'
     }
 
 def guessDataType(val):
