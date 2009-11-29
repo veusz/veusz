@@ -48,6 +48,26 @@ def _convertNumpy(a):
         else:
             return a
 
+def _convertNumpyAbs(a):
+    """Convert to numpy 64 bit positive values, if possible."""
+    if a is None:
+        return None
+    if not isinstance(a, N.ndarray):
+        a = N.array(a, dtype='float64')
+    elif a.dtype != N.dtype('float64'):
+        a = a.astype('float64')
+    return N.abs(a)
+
+def _convertNumpyNegAbs(a):
+    """Convert to numpy 64 bit negative values, if possible."""
+    if a is None:
+        return None
+    if not isinstance(a, N.ndarray):
+        a = N.array(a, dtype='float64')
+    elif a.dtype != N.dtype('float64'):
+        a = a.astype('float64')
+    return -N.abs(a)
+
 def generateValidDatasetParts(*datasets):
     """Generator to return array of valid parts of datasets.
 
@@ -547,9 +567,9 @@ class Dataset(DatasetBase):
         self.document = None
         self._invalidpoints = None
         self.data = _convertNumpy(data)
-        self.serr = _convertNumpy(serr)
-        self.perr = _convertNumpy(perr)
-        self.nerr = _convertNumpy(nerr)
+        self.serr = _convertNumpyAbs(serr)
+        self.perr = _convertNumpyAbs(perr)
+        self.nerr = _convertNumpyNegAbs(nerr)
         self.linked = linked
 
         # check the sizes of things match up
