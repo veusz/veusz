@@ -194,6 +194,11 @@ class Axis(widget.Widget):
                             ' of axis',
                             usertext='Reflect',
                             formatting=True) )
+        s.add( setting.Bool('outerticks', False,
+                            descr = 'Place ticks on outside of graph',
+                            usertext='Outer ticks',
+                            formatting=True) )
+
         s.add( setting.Float('datascale', 1.,
                              descr='Scale data plotted by this factor',
                              usertext='Scale') )
@@ -556,7 +561,7 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self.coordReflected:
+        if self.coordReflected or s.outerticks:
             delta *= -1
         for t in minorticks:
             self.swapline( painter,
@@ -576,7 +581,7 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self.coordReflected:
+        if self.coordReflected or s.outerticks:
             delta *= -1
         for t in tickcoords:
             self.swapline( painter,
@@ -584,7 +589,7 @@ class Axis(widget.Widget):
                            t, self.coordPerp - delta )
 
         # account for ticks if they are in the direction of the label
-        if startdelta < 0:
+        if s.outerticks and not self.coordReflected:
             self._delta_axis += abs(delta)
 
     def generateLabelLabels(self, painter):
