@@ -135,24 +135,31 @@ class Image(plotters.GenericPlotter):
                               usertext='Scaling'),
                3 )
 
+        s.add( setting.Dataset('transparencyData', '',
+                               dimensions = 2,
+                               descr = 'Dataset to use for transparency '
+                               '(0 to 1)',
+                               usertext='Transparent data'),
+               4 )
+
         s.add( ColormapSetting('colorMap',
                                'grey',
                                descr = 'Set of colors to plot data with',
                                usertext='Colormap',
                                formatting=True),
-               4 )
+               5 )
         s.add( setting.Bool('colorInvert', False,
                             descr = 'Invert color map',
                             usertext='Invert colormap',
                             formatting=True),
-               5 )
+               6 )
         s.add( setting.Int( 'transparency', 0,
                             descr = 'Transparency percentage',
                             usertext = 'Transparency',
                             minval = 0,
                             maxval = 100,
                             formatting=True),
-               6 )
+               7 )
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -212,7 +219,7 @@ class Image(plotters.GenericPlotter):
     readColorMaps = classmethod(readColorMaps)
 
     def applyColorMap(self, cmap, scaling, datain, minval, maxval,
-                      transparency):
+                      transparency, transparencyimg=None):
         """Apply a colour map to the 2d data given.
 
         cmap is the color map (numpy of BGRalpha quads)
@@ -263,12 +270,18 @@ class Image(plotters.GenericPlotter):
         quads = (deltafracs*cmap[bands+1] +
                  (1.-deltafracs)*cmap[bands]).astype('uint8')
 
+        # apply transparency if a transparency image is set
+        if transparencyimg is not None and transparencyimg.shape == datain.shape:
+            quads[:,3] = ( N.clip(N.ravel(transparencyimg), 0., 1.) *
+                           quads[:,3] ).astype('uint8')
+
         # convert 32bit quads to a Qt QImage
         # FIXME: Does this assume C-style array layout??
         s = quads.tostring()
 
         fmt = qt4.QImage.Format_RGB32
-        if N.any(cmap[:,3] != 255): # any transparency
+        if N.any(cmap[:,3] != 255) or transparencyimg is not None:
+            # any transparency
             fmt = qt4.QImage.Format_ARGB32
         
         img = qt4.QImage(s, datain.shape[1], datain.shape[0], fmt)
@@ -289,6 +302,10 @@ class Image(plotters.GenericPlotter):
         d = self.document
         data = d.data[s.data]
 
+        transimg = None
+        if s.transparencyData in d.data:
+            transimg = d.data[s.transparencyData].data
+
         minval = s.min
         if minval == 'Auto':
             minval = N.nanmin(data.data)
@@ -305,7 +322,8 @@ class Image(plotters.GenericPlotter):
 
         self.image = self.applyColorMap(cmap, s.colorScaling,
                                         data.data,
-                                        minval, maxval, s.transparency)
+                                        minval, maxval, s.transparency,
+                                        transparencyimg=transimg)
 
     def providesAxesDependency(self):
         """Range information provided by widget."""
