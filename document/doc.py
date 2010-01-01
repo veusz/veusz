@@ -45,6 +45,8 @@ try:
 except ImportError:
     hasemf = False
 
+import svg_export
+
 # python identifier
 identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 
@@ -520,6 +522,21 @@ class Document( qt4.QObject ):
 
     def _exportSVG(self, filename, page):
         """Export document as SVG"""
+
+        pixmap = qt4.QPixmap(1,1)
+        dpi=90.
+        painter = Painter(pixmap, scaling=1., dpi=dpi)
+        width, height = self.basewidget.getSize(painter)
+        painter.end()
+
+        f = open(filename, 'w')
+        paintdev = svg_export.SVGPaintDevice(f, width/dpi, height/dpi)
+        painter = Painter(paintdev)
+        self.basewidget.draw( painter, page )
+        painter.end()
+        f.close()
+        return
+
 
         import PyQt4.QtSvg
 
