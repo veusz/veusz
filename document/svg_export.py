@@ -27,6 +27,12 @@ import veusz.qtall as qt4
 dpi = 90.
 inch_mm = 25.4
 
+def fltStr(v):
+    """Change a float to a string, using a maximum number of decimal places
+    but removing trailing zeros."""
+
+    return ('%.2f' % v).rstrip('0')
+
 def createPath(path, scale):
     """Convert qt path to svg path.
 
@@ -41,18 +47,18 @@ def createPath(path, scale):
         e = path.elementAt(i)
         nx, ny = e.x*scale, e.y*scale
         if e.type == qt4.QPainterPath.MoveToElement:
-            p.append( 'm%g,%g' % (nx-ox, ny-oy) )
+            p.append( 'm%s,%s' % (fltStr(nx-ox), fltStr(ny-oy)) )
             ox, oy = nx, ny
         elif e.type == qt4.QPainterPath.LineToElement:
-            p.append( 'l%g,%g' % (nx-ox, ny-oy) )
+            p.append( 'l%s,%s' % (fltStr(nx-ox), fltStr(ny-oy)) )
             ox, oy = nx, ny
         elif e.type == qt4.QPainterPath.CurveToElement:
             e1 = path.elementAt(i+1)
             e2 = path.elementAt(i+2)
-            p.append( 'c%g,%g,%g,%g,%g,%g' % (
-                    nx-ox, ny-oy,
-                    e1.x*scale-ox, e1.y*scale-oy,
-                    e2.x*scale-ox, e2.y*scale-oy) )
+            p.append( 'c%s,%s,%s,%s,%s,%s' % (
+                    fltStr(nx-ox), fltStr(ny-oy),
+                    fltStr(e1.x*scale-ox), fltStr(e1.y*scale-oy),
+                    fltStr(e2.x*scale-ox), fltStr(e2.y*scale-oy)) )
             ox, oy = e2.x*scale, e2.y*scale
             i += 2
         else:
@@ -100,11 +106,11 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.fileobj.write('''<?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="%gpx" height="%gpx" version="1.1"
+<svg width="%spx" height="%spx" version="1.1"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
-''' % (self.width*dpi, self.height*dpi))
+''' % (fltStr(self.width*dpi), fltStr(self.height*dpi)))
         return True
 
     def end(self):
@@ -190,7 +196,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         # think width == 0 is equivalent to no pen drawn
         if p.style() == qt4.Qt.NoPen:
             w = 0
-        vals['stroke-width'] = '%g' % w
+        vals['stroke-width'] = fltStr(w)
 
         # - line style
         if p.style() not in (qt4.Qt.SolidLine, qt4.Qt.NoPen):
@@ -212,10 +218,11 @@ class SVGPaintEngine(qt4.QPaintEngine):
             m = self.matrix
             dx, dy = m.dx(), m.dy()
             if (m.m11(), m.m12(), m.m21(), m.m22()) == (1., 0., 0., 1):
-                vals['transform'] = 'translate(%g, %g)' % (dx, dy)
+                vals['transform'] = 'translate(%s, %s)' % (fltStr(dx),
+                                                           fltStr(dy))
             else:
-                vals['transform'] = 'matrix(%g %g %g %g %g %g)' % (
-                    m.m11(), m.m12(), m.m21(), m.m22(), dx, dy)
+                vals['transform'] = 'matrix(%g %g %g %g %s %s)' % (
+                    m.m11(), m.m12(), m.m21(), m.m22(), fltStr(dx), fltStr(dy))
 
         # build up group for state
         t = ['<g']
@@ -296,16 +303,16 @@ class SVGPaintEngine(qt4.QPaintEngine):
         """Draw multiple lines."""
         self.doStateUpdate()
         for line in lines:
-            self.fileobj.write('<line x1="%g" y1="%g" x2="%g" y2="%g" />\n' %
-                               (line.x1(), line.y1(),
-                                line.x2(), line.y2()))
+            self.fileobj.write( '<line x1="%s" y1="%s" x2="%s" y2="%s" />\n' %
+                                (fltStr(line.x1()), fltStr(line.y1()),
+                                 fltStr(line.x2()), fltStr(line.y2())) )
 
     def drawPolygon(self, points, mode):
         """Draw polygon on output."""
         self.doStateUpdate()
         pts = []
         for p in points:
-            pts.append('%g,%g' % (p.x(), p.y()))
+            pts.append( '%s,%s' % (fltStr(p.x()), fltStr(p.y())) )
 
         if mode == qt4.QPaintEngine.PolylineMode:
             self.fileobj.write('<polyline fill="none" points="%s" />\n' %
@@ -318,18 +325,18 @@ class SVGPaintEngine(qt4.QPaintEngine):
     def drawEllipse(self, rect):
         """Draw an ellipse to the svg file."""
         self.doStateUpdate()
-        self.fileobj.write('<ellipse cx="%g" cy="%g" rx="%g" ry="%g" />\n' %
-                           (rect.center().x(), rect.center().y(),
-                            rect.width()*0.5, rect.height()*0.5))
+        self.fileobj.write('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" />\n' %
+                           (fltStr(rect.center().x()), fltStr(rect.center().y()),
+                            fltStr(rect.width()*0.5), fltStr(rect.height()*0.5)))
 
     def drawPoints(self, points):
         """Draw points."""
         self.doStateUpdate()
         for pt in points:
-            self.fileobj.write('<line x1="%g" y1="%g" x2="%g" y2="%g" '
-                               'stroke-linecap="round" />\n' %
-                               pt.x(), pt.y(),
-                               pt.x(), pt.y())
+            self.fileobj.write( '<line x1="%s" y1="%s" x2="%s" y2="%s" '
+                                'stroke-linecap="round" />\n' %
+                                fltStr(pt.x()), fltStr(pt.y()),
+                                fltStr(pt.x()), fltStr(pt.y()) )
 
     def drawPixmap(self, r, pixmap, sr):
         """Draw pixmap to file.
@@ -338,8 +345,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
         """
 
         self.doStateUpdate()
-        self.fileobj.write('<image x="%g" y="%g" width="%g" height="%g" ' %
-                           (r.x(), r.y(), r.width(), r.height()))
+        self.fileobj.write( '<image x="%s" y="%s" width="%s" height="%s" ' %
+                            (fltStr(r.x()), fltStr(r.y()),
+                             fltStr(r.width()), fltStr(r.height())) )
         data = qt4.QByteArray()
         buf = qt4.QBuffer(data)
         buf.open(qt4.QBuffer.ReadWrite)
