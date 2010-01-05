@@ -31,7 +31,7 @@ def fltStr(v):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
-    return ('%.2f' % v).rstrip('0')
+    return ('%.2f' % v).rstrip('0').rstrip('.')
 
 def createPath(path, scale):
     """Convert qt path to svg path.
@@ -193,13 +193,12 @@ class SVGPaintEngine(qt4.QPaintEngine):
         # width 0 is device width for qt
         if w == 0.:
             w = 1
-        # think width == 0 is equivalent to no pen drawn
-        if p.style() == qt4.Qt.NoPen:
-            w = 0
         vals['stroke-width'] = fltStr(w)
 
         # - line style
-        if p.style() not in (qt4.Qt.SolidLine, qt4.Qt.NoPen):
+        if p.style() == qt4.Qt.NoPen:
+            vals['stroke'] = 'none'
+        elif p.style() not in (qt4.Qt.SolidLine, qt4.Qt.NoPen):
             # convert from pen width fractions to pts
             nums = [str(w*x) for x in p.dashPattern()]
             vals['stroke-dasharray'] = ','.join(nums)
@@ -228,8 +227,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         t = ['<g']
         for name, val in vals.iteritems():
             t.append('%s="%s"' % (name, val))
-        t.append('>\n')
-        state = ' '.join(t)
+        state = ' '.join(t)+'>\n'
         return state
 
     def getClipState(self):
@@ -243,7 +241,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         if path in self.existingclips:
             url = 'url(#c%i)' % self.existingclips[path]
         else:
-            clippath = '<clipPath id="c%i"><path d="%s" /></clipPath>\n' % (
+            clippath = '<clipPath id="c%i"><path d="%s"/></clipPath>\n' % (
                 self.clipnum, path)
 
             self.defs.append(clippath)
@@ -286,7 +284,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         """Draw a path on the output."""
         self.doStateUpdate()
         p = createPath(path, 1.)
-        self.fileobj.write('<path d="%s" />\n' % p)
+        self.fileobj.write('<path d="%s"/>\n' % p)
 
     def drawTextItem(self, pt, textitem):
         """Convert text to a path and draw it.
@@ -296,16 +294,20 @@ class SVGPaintEngine(qt4.QPaintEngine):
         path.addText(pt, textitem.font(), textitem.text())
         p = createPath(path, 1.)
         self.fileobj.write('<path d="%s" fill="%s" stroke="none" '
-                           'fill-opacity="%.3g" />\n' % (
+                           'fill-opacity="%.3g"/>\n' % (
                 p, self.pen.color().name(), self.pen.color().alphaF() ))
 
     def drawLines(self, lines):
         """Draw multiple lines."""
         self.doStateUpdate()
+        paths = []
         for line in lines:
-            self.fileobj.write( '<line x1="%s" y1="%s" x2="%s" y2="%s" />\n' %
-                                (fltStr(line.x1()), fltStr(line.y1()),
-                                 fltStr(line.x2()), fltStr(line.y2())) )
+            path = 'M%s,%sl%s,%s' % (
+                fltStr(line.x1()), fltStr(line.y1()),
+                fltStr(line.x2()-line.x1()),
+                fltStr(line.y2()-line.y1()))
+            paths.append(path)
+        self.fileobj.write('<path d="%s"/>\n' % (''.join(paths)))
 
     def drawPolygon(self, points, mode):
         """Draw polygon on output."""
@@ -315,17 +317,17 @@ class SVGPaintEngine(qt4.QPaintEngine):
             pts.append( '%s,%s' % (fltStr(p.x()), fltStr(p.y())) )
 
         if mode == qt4.QPaintEngine.PolylineMode:
-            self.fileobj.write('<polyline fill="none" points="%s" />\n' %
+            self.fileobj.write('<polyline fill="none" points="%s"/>\n' %
                                ' '.join(pts))
 
         else:
-            self.fileobj.write('<polygon points="%s" />\n' %
+            self.fileobj.write('<polygon points="%s"/>\n' %
                                ' '.join(pts))
 
     def drawEllipse(self, rect):
         """Draw an ellipse to the svg file."""
         self.doStateUpdate()
-        self.fileobj.write('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" />\n' %
+        self.fileobj.write('<ellipse cx="%s" cy="%s" rx="%s" ry="%s"/>\n' %
                            (fltStr(rect.center().x()), fltStr(rect.center().y()),
                             fltStr(rect.width()*0.5), fltStr(rect.height()*0.5)))
 
@@ -334,7 +336,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.doStateUpdate()
         for pt in points:
             self.fileobj.write( '<line x1="%s" y1="%s" x2="%s" y2="%s" '
-                                'stroke-linecap="round" />\n' %
+                                'stroke-linecap="round"/>\n' %
                                 fltStr(pt.x()), fltStr(pt.y()),
                                 fltStr(pt.x()), fltStr(pt.y()) )
 
@@ -356,7 +358,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
 
         self.fileobj.write('xlink:href="data:image/png;base64,')
         self.fileobj.write(data.toBase64())
-        self.fileobj.write('" preserveAspectRatio="none" />\n')
+        self.fileobj.write('" preserveAspectRatio="none"/>\n')
 
 class SVGPaintDevice(qt4.QPaintDevice):
      """Paint device for SVG paint engine."""

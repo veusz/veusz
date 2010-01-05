@@ -526,14 +526,26 @@ class Axis(widget.Widget):
         else:
             painter.drawLine(qt4.QPointF(b1, a1), qt4.QPointF(b2, a2))
 
+    def swaplines(self, painter, a1, b1, a2, b2):
+        """Multiline version of swapline where a1, b1, a2, b2 are arrays."""
+        if self.settings.direction == 'horizontal':
+            arrays = (a1, b1, a2, b2)
+        else:
+            arrays = (b1, a1, b2, a2)
+
+        lines = []
+        for x1, y1, x2, y2 in izip(*arrays):
+            lines.append(qt4.QLineF(x1, y1, x2, y2))
+
+        painter.drawLines(lines)
+
     def _drawGridLines(self, painter, coordticks):
         """Draw grid lines on the plot."""
         
         painter.setPen( self.settings.get('GridLines').makeQPen(painter) )
-        for t in coordticks:
-            self.swapline( painter,
-                           t, self.coordPerp1,
-                           t, self.coordPerp2 )
+        self.swaplines(painter,
+                       coordticks, coordticks*0.+self.coordPerp1,
+                       coordticks, coordticks*0.+self.coordPerp2)
 
     def _drawAxisLine(self, painter):
         """Draw the line of the axis."""
@@ -563,10 +575,11 @@ class Axis(widget.Widget):
             delta *= -1
         if self.coordReflected or s.outerticks:
             delta *= -1
-        for t in minorticks:
-            self.swapline( painter,
-                           t, self.coordPerp,
-                           t, self.coordPerp - delta )
+        
+        y = minorticks*0.+self.coordPerp
+        self.swaplines(painter,
+                       minorticks, y,
+                       minorticks, y-delta)
 
     def _drawMajorTicks(self, painter, tickcoords):
         """Draw major ticks on the plot."""
@@ -583,10 +596,11 @@ class Axis(widget.Widget):
             delta *= -1
         if self.coordReflected or s.outerticks:
             delta *= -1
-        for t in tickcoords:
-            self.swapline( painter,
-                           t, self.coordPerp,
-                           t, self.coordPerp - delta )
+
+        y = tickcoords*0.+self.coordPerp
+        self.swaplines(painter,
+                       tickcoords, y,
+                       tickcoords, y-delta)
 
         # account for ticks if they are in the direction of the label
         if s.outerticks and not self.coordReflected:
