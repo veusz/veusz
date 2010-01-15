@@ -858,7 +858,10 @@ class DatasetExpressionException(DatasetException):
 #             # revert to old behaviour
 #             return dict.__getitem__(self, item)
 
-dataexpr_split_re = re.compile(r'([\.+\-*/\(\)\[\],<>=!|%^~& ])')
+# split expression on python operators or $TEXT$
+dataexpr_split_re = re.compile(r'(\$.*?\$|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
+# identify whether string is a quoted identifier
+dataexpr_quote_re = re.compile(r'^\$.*\$$')
 dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
 
 def _substituteDatasets(datasets, expression, thispart):
@@ -875,6 +878,11 @@ def _substituteDatasets(datasets, expression, thispart):
     for i, bit in enumerate(bits):
         # test whether there's an _data, _serr or such at the end of the name
         part = thispart
+
+        if dataexpr_quote_re.match(bit):
+            # quoted text, so remove "quotes"
+            bit = bit[1:-1]
+
         bitbits = bit.split('_')
         if len(bitbits) > 1:
             if bitbits[-1] in dataexpr_columns:
