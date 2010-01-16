@@ -325,9 +325,9 @@ class Setting(object):
 
     def safeEvalHelper(self, text):
         """Evaluate an expression, catching naughtiness."""
-        if utils.checkCode(text) is not None:
-            raise InvalidType
         try:
+            if utils.checkCode(text) is not None:
+                raise InvalidType
             return float( eval(text, self.getDocument().eval_context) )
         except:
             raise InvalidType

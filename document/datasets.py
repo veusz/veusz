@@ -109,6 +109,12 @@ def generateValidDatasetParts(*datasets):
             yield retn
         lastindex = index+1
 
+def datasetNameToDescriptorName(name):
+    """Return descriptor name for dataset."""
+    if re.match('^[0-9A-Za-z_]+$', name):
+        return name
+    else:
+        return '`%s`' % name
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
@@ -681,7 +687,8 @@ class Dataset(DatasetBase):
 
         # build up descriptor
         datasets = [self.data]
-        descriptor = "%s(numeric)" % name
+
+        descriptor = datasetNameToDescriptorName(name) + '(numeric)'
         if self.serr is not None:
             descriptor += ',+-'
             datasets.append(self.serr)
@@ -774,7 +781,7 @@ class DatasetText(DatasetBase):
         if self.linked is not None:
             return
 
-        descriptor = '%s(text)' % name
+        descriptor = datasetNameToDescriptorName(name) + '(text)'
         fileobj.write( "ImportString(%s,r'''\n" % repr(descriptor) )
         for line in self.data:
             # need to "escape" ''' marks in text
@@ -858,10 +865,10 @@ class DatasetExpressionException(DatasetException):
 #             # revert to old behaviour
 #             return dict.__getitem__(self, item)
 
-# split expression on python operators or $TEXT$
-dataexpr_split_re = re.compile(r'(\$.*?\$|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
+# split expression on python operators or quoted `DATASET`
+dataexpr_split_re = re.compile(r'(`.*?`|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
 # identify whether string is a quoted identifier
-dataexpr_quote_re = re.compile(r'^\$.*\$$')
+dataexpr_quote_re = re.compile(r'^`.*`$')
 dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
 
 def _substituteDatasets(datasets, expression, thispart):
@@ -880,7 +887,7 @@ def _substituteDatasets(datasets, expression, thispart):
         part = thispart
 
         if dataexpr_quote_re.match(bit):
-            # quoted text, so remove "quotes"
+            # quoted text, so remove backtick-"quotes"
             bit = bit[1:-1]
 
         bitbits = bit.split('_')

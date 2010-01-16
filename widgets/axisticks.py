@@ -492,5 +492,5 @@ class DateTicks(AxisTicksBase):
             mindate, maxdate, self.numminorticks, False, 
             intervals, intervals_sec)
 
-        return (mindate,  maxdate,  ticks, minorticks, format) 
+        return (mindate,  maxdate, ticks, minorticks, format) 
         

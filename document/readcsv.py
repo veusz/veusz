@@ -72,6 +72,17 @@ class _FileReaderRows(object):
         self.counter += 1
         return retn
 
+# list of codes which can be added to column descriptors
+typecodes = (
+    ('(string)', 'string'),
+    ('(text)', 'string'),
+    ('(date)', 'date'),
+    ('(time)', 'date'),
+    ('(float)', 'float'),
+    ('(numeric)', 'float'),
+    ('(number)', 'float'),
+    )
+
 class ReadCSV(object):
     """A class to import data from CSV files."""
 
@@ -111,10 +122,7 @@ class ReadCSV(object):
     def _getNameAndColType(self, colnum, colval):
         """Get column name and type."""
 
-        s = colval.strip().split()
-        name = s[0]
-        coltype = s[-1]
-
+        name = colval.strip()
         if name in ('+', '-', '+-'):
             # loop to find previous valid column
             prevcol = colnum - 1
@@ -128,13 +136,16 @@ class ReadCSV(object):
                 # did not find anything
                 name = self._generateName(colnum)
 
-        if coltype == '(string)' or coltype == '(text)':
-            t = 'string'
-        elif coltype == '(date)' or coltype == '(time)':
-            t = 'date'
-        else:
-            t = 'float'
-        return t, self.prefix + name + self.suffix
+        # examine whether object type is at end of name
+        # convert, and remove, if is
+        type = 'float'
+        for codename, codetype in typecodes:
+            if name[-len(codename):] == codename:
+                type = codetype
+                name = name[:-len(codename)].strip()
+                break
+
+        return type, self.prefix + name + self.suffix
 
     def _setNameAndType(self, colnum, colname, coltype):
         """Set a name for column number given column name and type."""
