@@ -1,4 +1,4 @@
-Veusz 1.5
+Veusz 1.6
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -10,50 +10,39 @@ Licenced under the GPL (version 2 or greater).
 Veusz is a Qt4 based scientific plotting package. It is written in
 Python, using PyQt4 for display and user-interfaces, and numpy for
 handling the numeric data. Veusz is designed to produce
-publication-ready Postscript/PDF output. The user interface aims to be
-simple, consistent and powerful.
+publication-ready Postscript/PDF/SVG output. The user interface aims
+to be simple, consistent and powerful.
 
 Veusz provides a GUI, command line, embedding and scripting interface
 (based on Python) to its plotting facilities. It also allows for
-manipulation and editing of datasets.
+manipulation and editing of datasets. Data can be captured from
+external sources such as internet sockets or other programs.
 
-Changes in 1.5:
- * EMF export (requires pyemf and PyQt snapshot)
- * Character encodings supported in data import
- * Rewritten stylesheet handling. User can now set defaults in document
-   for all settings. This is now under the Edit->Default Styles dialog.
- * A default stylesheet can be loaded for all new documents (set in
-   preferences dialog)
- * Linked datasets saved in documents now use relative filename paths
-   (with absolute paths as fallback)
- * Axes can now have text labels of points plotted along them (choose
-   "labels" as axis mode)
- * Dataset points can be scaled to different sizes according to another
-   dataset (this is the "Scale markers" option for point plotters)
+Changes in 1.6:
+ * User defined constants, functions or external Python imports can be
+   defined for use when evaluating expressions.
+ * Import descriptor is much more tolerant of syntax, e.g. "x,+- y,+,-" can
+   now be specified as "x +- y + -".
+ * New SVG export (PyQt >= 4.6). Supports clipping and exports text
+   as paths for full WYSIWYG.
+ * Dataset names can now contain any character except "`". Names containing
+   non-alphanumeric characters can be quoted in expressions `like so`*1.23
+ * Widget names can contain any character except "/"
+ * A transparency dataset can be provided to specify the per-pixel
+   transparency of the image widget.
+ * A polygon widget has been added.
+ * There is a new option to place axis ticks outside the plot (outer ticks
+   setting on axis widget)
+ * Several new line styles have been added.
+ * Several new plotting markers have been added.
+ * The capture dialog can optionally retain the last N values captured.
 
-More minor changes
- * Custom delimiter support in CSV data importer
- * Add SetDataText and support text in GetData in command API
- * \dot and \bar added to LaTeX renderer
- * Option to change icon sizes displayed
- * Rearrange toolbar icons and create data and widget operation toolbars
- * Zoom button remembers previous usage
- * Conversion from 1D->2D datasets more robust
- * Expression datasets can now be a constant value
- * Uses colors form theme better and allow user to change some UI colors
-   in preferences
- * Fix contours if coordinates can be infinite (e.g. log scaling with zero
-   value)
- * nan/inf are no longer ignored when the ignore text option is selected in
-   import dialog
-
- * Several other minor UI changes and bugfixes
-
-Important note
- * As the way defaults are used has been rewritten, default values are
-   no longer saved on a per-user basis but are saved in a stylesheet and
-   is saved in the document. You cannot currently set defaults on a widget-
-   name basis.
+Minor changes:
+ * Use of flat cap line style for plotting error bars for exactness.
+ * Add fixes for saving imported unicode text.
+ * Fix image colors for big endian systems (e.g. Mac PPC).
+ * Add boxfill error bar style, plotting errors as filled boxes.
+ * Positive and negative error bars are forced to have the correct sign.
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -74,8 +63,9 @@ Features of package:
  * Dataset creation/manipulation
  * Embed Veusz within other programs
  * Text, CSV and FITS importing
+ * Data can be captured from external sources
 
-Requirements:
+Requirements for source install:
  Python (2.4 or greater required)
    http://www.python.org/
  Qt >= 4.3 (free edition)
@@ -93,25 +83,22 @@ Optional:
    http://www.stsci.edu/resources/software_hardware/pyfits
  pyemf >= 2.0.0 (optional for EMF export)
    http://pyemf.sourceforge.net/
- For EMF export, PyQt-x11-gpl-4.6-snapshot-20090906 or better is
+ For EMF and better SVG export, PyQt >= 4.6 or better is
    required, to fix a bug in the C++ wrapping
 
 For documentation on using Veusz, see the "Documents" directory. The
-manual is in pdf, html and text format (generated from docbook).
+manual is in PDF, HTML and text format (generated from docbook). The
+examples are also useful documentation.
 
 Issues with the current version:
 
  * Due to Qt, hatched regions sometimes look rather poor when exported
    to PostScript, PDF or SVG.
 
- * Clipping of data does not work in the SVG export as Qt currently
-   does not support this.
-
  * Due to a bug in Qt, some long lines, or using log scales, can lead
-   to very slow plot times under X11. This problem is seen with
-   dashed/dotted lines. It is fixed by upgrading to Qt-4.5.1 (the
-   Veusz binary version includes this Qt version). Switching off
-   antialiasing in the options may help this.
+   to very slow plot times under X11. It is fixed by upgrading to
+   Qt-4.5.1 (or using a binary). Switching off antialiasing in the options
+   may help.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
 the mailing lists at
