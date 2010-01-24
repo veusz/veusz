@@ -111,6 +111,13 @@ class SVGPaintEngine(qt4.QPaintEngine):
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
 ''' % (fltStr(self.width*dpi), fltStr(self.height*dpi)))
+
+        # as defaults use qt defaults
+        self.fileobj.write('<g stroke-linejoin="bevel" '
+                           'stroke-linecap="square" '
+                           'stroke="#000000" '
+                           'fill-rule="evenodd">\n')
+
         return True
 
     def end(self):
@@ -120,6 +127,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
         if self.lastclip is not None:
             self.fileobj.write('</g>\n')
 
+        # close defaults
+        self.fileobj.write('</g>\n')
+            
         # write any defined objects
         if self.defs:
             self.fileobj.write('<defs>\n')
@@ -169,12 +179,14 @@ class SVGPaintEngine(qt4.QPaintEngine):
         # PEN UPDATE
         p = self.pen
         # - color
-        vals['stroke'] = p.color().name()
+        color = p.color().name()
+        if color != '#000000':
+            vals['stroke'] = p.color().name()
         # - opacity
         if p.color().alphaF() != 1.:
             vals['stroke-opacity'] = '%.3g' % p.color().alphaF()
         # - join style
-        if p.joinStyle() != qt4.Qt.MiterJoin:
+        if p.joinStyle() != qt4.Qt.BevelJoin:
             vals['stroke-linejoin'] = {
                 qt4.Qt.MiterJoin: 'miter',
                 qt4.Qt.SvgMiterJoin: 'miter',
@@ -182,7 +194,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 qt4.Qt.BevelJoin: 'bevel'
                 }[p.joinStyle()]
         # - cap style
-        if p.capStyle() != qt4.Qt.FlatCap:
+        if p.capStyle() != qt4.Qt.SquareCap:
             vals['stroke-linecap'] = {
                 qt4.Qt.FlatCap: 'butt',
                 qt4.Qt.SquareCap: 'square',
@@ -284,7 +296,11 @@ class SVGPaintEngine(qt4.QPaintEngine):
         """Draw a path on the output."""
         self.doStateUpdate()
         p = createPath(path, 1.)
-        self.fileobj.write('<path d="%s"/>\n' % p)
+
+        self.fileobj.write('<path d="%s"' % p)
+        if path.fillRule() == qt4.Qt.WindingFill:
+            self.fileobj.write(' fill-rule="nonzero"')
+        self.fileobj.write('/>\n')
 
     def drawTextItem(self, pt, textitem):
         """Convert text to a path and draw it.
@@ -321,8 +337,11 @@ class SVGPaintEngine(qt4.QPaintEngine):
                                ' '.join(pts))
 
         else:
-            self.fileobj.write('<polygon points="%s"/>\n' %
+            self.fileobj.write('<polygon points="%s"' %
                                ' '.join(pts))
+            if mode == qt4.Qt.WindingFill:
+                self.fileobj.write(' fill-rule="nonzero"')
+            self.fileobj.write('/>\n')
 
     def drawEllipse(self, rect):
         """Draw an ellipse to the svg file."""
