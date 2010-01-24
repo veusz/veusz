@@ -1,0 +1,88 @@
+# Veusz saved document (version 1.6)
+# User: jss
+# Date: Tue, 19 Jan 2010 21:30:02 +0000
+
+AddImportPath(u'/home/jss/code/veusz')
+SetDataExpression(u'stary_offset', u'stary+0.1', linked=True)
+SetDataExpression(u'starx_offset', u'starx+0.1', linked=True)
+
+# star shape for polygon
+ImportString(u'stary(numeric)','''
+-1.200000e+00
+-3.708000e-01
+-3.708000e-01
+1.416000e-01
+9.708000e-01
+4.584000e-01
+9.708000e-01
+1.416000e-01
+-3.708000e-01
+-3.708000e-01
+''')
+ImportString(u'starx(numeric)','''
+0.000000e+00
+-2.700000e-01
+-1.141200e+00
+-4.356000e-01
+-7.056000e-01
+0.000000e+00
+7.056000e-01
+4.356000e-01
+1.141200e+00
+2.700000e-01
+''')
+
+Set('StyleSheet/xy/markerSize', u'5pt')
+Set('StyleSheet/xy/MarkerFill/color', u'#aaaaff')
+Set('StyleSheet/xy/PlotLine/color', 'grey')
+
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', u'Outward ticks on this x axis')
+Set('min', -2.0)
+Set('max', 2.0)
+Set('outerticks', True)
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Outward ticks on this y axis')
+Set('min', -2.0)
+Set('max', 2.0)
+Set('outerticks', True)
+Set('direction', 'vertical')
+To('..')
+Add('polygon', name='polygon2', autoadd=False)
+To('polygon2')
+Set('xPos', u'starx')
+Set('yPos', u'stary')
+Set('positioning', u'axes')
+Set('Line/hide', True)
+Set('Fill/color', u'cyan')
+Set('Fill/transparency', 10)
+To('..')
+Add('polygon', name='polygon1', autoadd=False)
+To('polygon1')
+Set('xPos', u'starx_offset')
+Set('yPos', u'stary_offset')
+Set('positioning', u'axes')
+Set('Line/hide', True)
+Set('Fill/color', u'blue')
+To('..')
+
+colours = ['blue', 'cyan', 'lightgreen', 'purple', 'pink']
+
+# add plot symbols for each type of plot symbol
+codes = veusz_markercodes
+for i, mcode in enumerate(codes):
+    r = 1.6 + 0.2 * sin(16*pi/len(codes)*i)
+    x = r*sin(2*pi/len(codes)*i)
+    y = r*cos(2*pi/len(codes)*i)
+    Add('xy', name=mcode, marker=mcode, xData=[x,x*1.2], yData=[y,y*1.2],
+        MarkerFill__color=colours[i % len(colours)])
+
+To('..')
+To('..')

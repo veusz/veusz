@@ -730,6 +730,7 @@ class Document( qt4.QObject ):
         # safe functions
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
+        c['veusz_markercodes'] = tuple(utils.MarkerCodes)
 
         # custom definitions
         for ctype, name, val in self.customs:
