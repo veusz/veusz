@@ -72,16 +72,16 @@
 
       <section>
 	<title>Part</title>
-	<para>A document and its graphs are built up from
-	  parts. These parts can often by placed within each
-	  other, depending on the type of the part. A part has
-	  children, those parts placed within it, and its
-	  parent. The parts have a number of different settings
-	  which modify their behaviour. These include the font to be
-	  used, the line thickness, and whether an axis is
-	  logarithmic. In addition they have actions, which perform
-	  some sort of activity on the part or its children, like
-	  "fit" for a fit part.</para>
+	<para>A document and its graphs are built up from parts
+	  (othewise known as widgets). These parts can often by placed
+	  within each other, depending on the type of the part. A part
+	  has children, those parts placed within it, and its
+	  parent. The parts have a number of different settings which
+	  modify their behaviour. These include the font to be used,
+	  the line thickness, and whether an axis is logarithmic. In
+	  addition they have actions, which perform some sort of
+	  activity on the part or its children, like "fit" for a fit
+	  part.</para>
 	
 	<para>Parts are specified with a "path", like a file in Unix
 	or Windows. These can be relative to the current part (do
@@ -322,6 +322,15 @@
 		</para>
 	      </listitem>
 
+	      <listitem>
+		<para><command>polygon</command> - plot x and y points
+		from datasets as a polygon. The polygon can be placed
+		directly on the page or within a graph. Coordinates
+		are either plotted using the axis or as fractions of
+		the width and height of the containing part.
+		</para>
+	      </listitem>
+
 	    </orderedlist>
 
 	  </listitem>
@@ -355,6 +364,19 @@
 	<para>In the GUI, the current page is replotted if a setting
 	is changed when enter is pressed or the user moves to another
 	setting.</para>
+
+	<para>The settings are split up into formatting settings,
+	controlling the appearance of the plot, or properties,
+	controlling what is plotted and how it is plotted.</para>
+
+	<para>Default settings, including the default font and line
+	style, and the default settings for any graph part, can be
+	modified in the "Default styles" dialog box under the "Edit"
+	menu. Default settings are set on a per-document basis, but
+	can be saved into a separate file and loaded. A default
+	default settings file can be given to use for new documents
+	(set in the preferences dialog).</para>
+
       </section>
 
       <section>
@@ -514,9 +536,9 @@
       to "float" by themselves on the screen.</para>
 
       <para>To the bottom of the window is the console. This window is
-      not shown in recent versions of Veusz by default, but can be
-      enabled in the View menu. The console is a Veusz and Python
-      command line console. To read about the commands available
+      not shown by default, but can be enabled in the View menu. The
+      console is a Veusz and Python command line console. To read
+      about the commands available
       see <link linkend="Commands">Commands</link>. As this is a
       Python console, you can enter mathematical expressions
       (e.g. "1+2.0*cos(pi/4)") here and they will be evaluated when
@@ -592,10 +614,12 @@
       "Import". Type the filename into the filename box, or use the
       "Browse..." button to search for the file. You will see a
       preview of the data pop up in the box below. Enter "x,+,- y,+-"
-      into the descriptors edit box. This describes the format of the
-      data which describes dataset "x" plus its asymmetric errors,
-      and "y" with its symmetric errors. If you now click "Import",
-      you will see it has imported datasets "x" and "y".</para>
+      into the descriptors edit box (note that commas and spaces in
+      the descriptor are almost interchangeable in Veusz 1.6 or
+      newer). This describes the format of the data which describes
+      dataset "x" plus its asymmetric errors, and "y" with its
+      symmetric errors. If you now click "Import", you will see it has
+      imported datasets "x" and "y".</para>
 
       <para>To plot the data you should now click on "graph1" in the
       tree window. You are now able to click on the "xy" button (which
@@ -662,7 +686,7 @@
 	describe how the data are formatted in the import file. The
 	descriptor at its simplest is a list of the names of the
 	datasets to import (which are columns in the
-	file). Additionally modifiers are added if errors are also
+	file). Additionally modifiers are added if error bars are also
 	read in. Examples of descriptors are below:</para>
       
       <orderedlist>
@@ -672,13 +696,14 @@
 	</listitem>
 	
 	<listitem>
-	  <para><command>x,+- y,+,-</command> two datasets are in the
-	    file. Dataset "x" consists of the first two columns. The
-	    first column are the values and the second are the
-	    symmetric errors. "y" consists of three columns (note the
-	    comma between + and -). The first column are the values,
-	    the second positive asymmetric errors, and the third
-	    negative asymmetric errors.</para>
+	  <para><command>x,+- y,+,-</command> or <command>x +- y +
+	    -</command> two datasets are in the file. Dataset "x"
+	    consists of the first two columns. The first column are
+	    the values and the second are the symmetric errors. "y"
+	    consists of three columns (note the comma between + and
+	    -). The first column are the values, the second positive
+	    asymmetric errors, and the third negative asymmetric
+	    errors.</para>
 
 	  <para>Suppose the input file contains:</para>
 	  <informalexample>
@@ -707,13 +732,29 @@
 	</listitem>
 
 	<listitem>
-	  <para><command>x,,+-</command>  read the first column as
-	  the x dataset, skip a column, and read the third column as
+	  <para><command>foo,,+-</command>  read the first column as
+	  the foo dataset, skip a column, and read the third column as
 	  its symmetric error.</para>
 	</listitem>
       </orderedlist>
-      
-      <para>When reading in data, Veusz just uses whitespace for
+
+      <para>The dataset names given here x and y, are just
+      representative. Dataset names can contain virtually any
+      character, even unicode characters. If the name contains non
+      alpha-numeric characters (characters outside of A-Z, a-z and
+      0-9), then the dataset name should be contained within back-tick
+      characters. An example descriptor is <command>`length data
+      (m)`,+- `speed (mps)`,+,-</command>, for two datasets with
+      spaces and brackets in their names.</para>
+
+      <para>The special
+      names <command>+-</command>, <command>+</command>
+      or <command>-</command> specify that the datasets before are
+      followed by columns containing symmetric, positive or negative
+      errors. The signs on positive or negative errors are
+      automatically set to be correct.</para>
+
+      <para>When reading in data, Veusz treats any whitespace as
 	separating columns. The columns do not actually need to be in
 	columns! Furthermore a "\" symbol can be placed at the end of
 	a line to mark a continuation. Veusz will read the next line
@@ -723,17 +764,16 @@
 	line. The special value "nan" can be used to specify a break
 	in a dataset.</para>
 
-      <para>Veusz now has support for reading in other types of data
-      other than numbers. The type of data can be added in round
-      brackets after the name. Veusz will try to guess the type of
-      data based on the first value, so you should specify it if there
-      is any form of ambiguity (e.g. is 3 text or a number). Supported
-      types are numbers (use numeric in brackets) and text (use text
-      in brackets). An example descriptor would be "x(numeric),+-
-      y(numeric),+,- label(text)" for an x dataset followed by its
-      symmetric errors, a y dataset followed by two columns of
-      asymmetric errors, and a final column of text for the label
-      dataset.</para>
+      <para>Veusz supports reading in other types of data. The type of
+      data can be added in round brackets after the name. Veusz will
+      try to guess the type of data based on the first value, so you
+      should specify it if there is any form of ambiguity (e.g. is 3
+      text or a number). Supported types are numbers (use numeric in
+      brackets) and text (use text in brackets). An example descriptor
+      would be "x(numeric) +- y(numeric) + - label(text)" for an x
+      dataset followed by its symmetric errors, a y dataset followed
+      by two columns of asymmetric errors, and a final column of text
+      for the label dataset.</para>
 
       <para>A text column does not need quotation unless it contains
       space characters or escape characters. However make sure you
@@ -797,6 +837,48 @@ descriptor alpha beta gamma
     </section>
 
     <section>
+    <title>Reading CSV files</title>
+
+    <para>CVS (comma separated variable) files are often written from
+    other programs, such as spreadsheets, including Excel and
+    Gnumeric. Veusz supports reading from these files.</para>
+
+    <para>In the import dialog choose "CSV", then choose a filename to
+    import from. In the CSV file the user should place the data in
+    either rows or columns. Veusz will use a name above a column or to
+    the left of a row to specify what the dataset name should be. The
+    user can use new names further down in columns or right in rows to
+    specify a different dataset name. Names do not have to be used,
+    and Veusz will assign default "col" and "row" names if not
+    given. You can also specify a prefix which is prepended to each
+    dataset name read from the file.</para>
+
+    <para>To specify symmetric errors for a column, put "+-" as the
+    dataset name in the next column or row. Asymmetric errors can be
+    stated with "+" and "-" in the columns.</para>
+
+    <para>The data can be linked with the CSV file so that it can be
+    updated when the file changes. See the example CSV import for
+    details.</para>
+
+    <para>Text datasets are not yet autodetected for CSV files. You
+    can specify a text dataset by using "(text)" after the name of the
+    dataset at the top of the column. A future release show allow a
+    more general method for autodetecting data or specifying, as the
+    standard Veusz file format currently does.</para>
+
+    </section>
+
+    <section>
+      <title>Reading FITS files</title>
+      <para>
+	1D or 2D data can be read from FITS files. 1D data, with
+	optional errors bars, can be read from table extensions, and
+	2D data from image or primary extensions.
+      </para>
+    </section>
+
+    <section>
       <title>Reading other data formats</title>
       
       <para>As mentioned above, a user may write some Python code to
@@ -838,39 +920,6 @@ SetData('y', y)
     </section>
 
     <section>
-    <title>Reading CSV files</title>
-
-    <para>CVS (comma separated variable) files are often written from
-    other programs, such as spreadsheets, including Excel and
-    Gnumeric. Veusz supports reading from these files.</para>
-
-    <para>In the import dialog choose "CSV", then choose a filename to
-    import from. In the CSV file the user should place the data in
-    either rows or columns. Veusz will use a name above a column or to
-    the left of a row to specify what the dataset name should be. The
-    user can use new names further down in columns or right in rows to
-    specify a different dataset name. Names do not have to be used,
-    and Veusz will assign default "col" and "row" names if not
-    given. You can also specify a prefix which is prepended to each
-    dataset name read from the file.</para>
-
-    <para>To specify symmetric errors for a column, put "+-" as the
-    dataset name in the next column or row. Asymmetric errors can be
-    stated with "+" and "-" in the columns.</para>
-
-    <para>The data can be linked with the CSV file so that it can be
-    updated when the file changes. See the example CSV import for
-    details.</para>
-
-    <para>Text datasets are not yet autodetected for CSV files. You
-    can specify a text dataset by using "(text)" after the name of the
-    dataset at the top of the column. A future release show allow a
-    more general method for autodetecting data or specifying, as the
-    standard Veusz file format currently does.</para>
-
-    </section>
-
-    <section>
       <title>Manipulating datasets</title>
 
       <para>Imported datasets can easily be modified in the Edit data
@@ -884,28 +933,58 @@ SetData('y', y)
       range, from expressions based on a parametric expression, or
       from expressions based on existing datasets.</para>
 
+      <section>
+	<title>Using expressions to create new datasets</title>
       <para>For instance, if the user has already imported dataset d,
       then they can create d2 which consists of d**2. Expressions are
-      in Python syntax and can include the usual mathematical
-      functions. Error bars can also be given as expressions of other
-      datasets. By appending _data, _serr, _perr or _nerr to the name
-      of the dataset in the expression, the user can base their
-      expression on particular parts of the given dataset (the main
-      data, symmetric errors, positive errors or negative
-      errors). Otherwise the program uses the same parts as is
-      currently being specified.</para>
+      in Python numpy syntax and can include the usual mathematical
+      functions.</para>
 
+      <para>Expressions for error bars can also be given. By appending
+      <command>_data</command>, <command>_serr</command>, <command>_perr</command>
+      or <command>_nerr</command> to the name of the dataset in the
+      expression, the user can base their expression on particular
+      parts of the given dataset (the main data, symmetric errors,
+      positive errors or negative errors). Otherwise the program uses
+      the same parts as is currently being specified.</para>
+
+      <para>If a dataset name contains non alphanumeric characters,
+      its name should be quoted in the expression in back-tick
+      characters, e.g. <command>`length (cm)`*2</command>.</para>
+      </section>
+
+      <section>
+	<title>Linking datasets to expressions</title>
       <para>A particularly useful feature is to be able to link a
       dataset to an expression, so if the expression changes the
       dataset changes with it, like in a spreadsheet.</para>
+      </section>
+      
+      <section>
+	<title>Splitting data</title>
+	<para>Data can also be chopped in this method, for example
+      using the expression <command>x[10:20]</command>, which makes a
+      dataset based on the 11th to 20th item in the x dataset (the
+      ranges are Python syntax, and are zero-based). Negative indices
+      count backwards from the end of the dataset. Data can be skipped
+      using expressions such as
+	  <command>data[::2]</command>, which skips every other element</para>
+      </section>
 
-      <para>Data can also be chopped in this method, for example using
-      the expression x[10:20], which makes a dataset based on the 11th
-      to 20th item in the x dataset (the ranges are Python syntax, and
-      are zero-based). Negative indices count backwards from the end
-      of the dataset.</para>
+      <section>
+	<title>Defining new constants or functions</title>
+	<para>User defined constants or functions can be defined in
+	the "Custom definitions" dialog box under the edit
+	menu. Functions can also be imported from external python
+	modules.</para>
 
-      </section>      
+	<para>Custom definitions are defined on a per-document basis,
+	but can be saved or loaded into a file. A default custom
+	definitions file can be set in the preferences dialog
+	box.</para>
+      </section>
+
+      </section>
 
   </chapter>
 
@@ -1404,6 +1483,42 @@ Set('page1/graph1/x/min', -10.)
       data, symerr are the symmetric errors, negerr and poserr and the
       getative and positive asymmetric errors. The data can be given
       as lists or numpys.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetDataExpression" />SetDataExpression</title>
+	
+	<para><command>SetDataExpression(name, val, symerr=None, negerr=None,
+      poserr=None, linked=False, parametric=None)</command></para>
+
+	<para>Create a new dataset based on the expressions given. The
+	expressions are Python syntax expressions based on existing
+	datasets.
+</para>
+
+	<para>If linked is True, the dataset will change as the
+	datasets in the expressions change.</para>
+
+	<para>Parametric can be set to a tuple of (minval, maxval,
+	numitems). <command>t</command> in the expression will iterate
+	from minval to maxval in numitems values.</para>
+
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetDataRange" />SetDataRange</title>
+
+	<para><command>SetDataRange(name, numsteps, val, symerr=None,
+	    negerr=None, poserr=None, linked=False)</command></para>
+
+	<para>Set dataset to be a range of values with numsteps
+	steps. val is tuple made up of (minimum value, maximum
+	value). symerr, negerr and poserr are optional tuples for the
+	error bars.</para>
+
+	<para>If linked is True, the dataset can be saved in a
+	document as a SetDataRange, otherwise it is expanded to the
+	values which would make it up.</para>
       </section>
       
       <section>
