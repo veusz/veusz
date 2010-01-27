@@ -125,10 +125,11 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if not index.isValid():
             return qt4.Qt.ItemIsEnabled
 
-        flags = qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
+        flags = qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsDropEnabled
         if index.internalPointer() is not self.document.basewidget and index.column() == 0:
-            # allow items other than root to be edited
-            flags |= qt4.Qt.ItemIsEditable
+            # allow items other than root to be edited and dragged
+            flags |= qt4.Qt.ItemIsEditable | qt4.Qt.ItemIsDragEnabled
+
         return flags
 
     def headerData(self, section, orientation, role):
@@ -220,15 +221,25 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def getSettings(self, index):
         """Return the settings for the index selected."""
-
         obj = index.internalPointer()
         return obj.settings
 
     def getWidget(self, index):
         """Get associated widget for index selected."""
-        obj = index.internalPointer()
+        return index.internalPointer()
 
-        return obj
+    def supportedDropActions(self):
+        """Supported drag and drop actions."""
+        return qt4.Qt.MoveAction
+
+    def mimeData(self, indexes):
+        """Get mime data for indexes."""
+        widgets = [idx.internalPointer() for idx in indexes]
+        return document.generateWidgetsMime(widgets)
+
+    def mimeTypes(self):
+        """Accepted mime types."""
+        return [document.widgetmime]
 
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
@@ -503,7 +514,6 @@ class TreeEditDock(qt4.QDockWidget):
     """A window for editing the document as a tree."""
 
     # mime type when widgets are stored on the clipboard
-    widgetmime = 'text/x-vnd.veusz2-clipboard'
 
     def __init__(self, document, parent):
         qt4.QDockWidget.__init__(self, parent)
@@ -520,16 +530,18 @@ class TreeEditDock(qt4.QDockWidget):
         self.treemodel = WidgetTreeModel(document)
         self.treeview = qt4.QTreeView()
         self.treeview.setModel(self.treemodel)
-        try:
-            self.treeview.expandAll()
-        except AttributeError: # only in Qt-4.2
-            pass
+        self.treeview.expandAll()
 
         # make 1st column stretch
         hdr = self.treeview.header()
         hdr.setStretchLastSection(False)
         hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
         hdr.setResizeMode(1, qt4.QHeaderView.Custom)
+
+        self.treeview.setSelectionMode(qt4.QAbstractItemView.SingleSelection)
+        self.treeview.setDragEnabled(True)
+        self.treeview.viewport().setAcceptDrops(True)
+        self.treeview.setDropIndicatorShown(True)
 
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
@@ -769,7 +781,7 @@ class TreeEditDock(qt4.QDockWidget):
         # if no widget selected, bomb out
         if self.selwidget is None:
             return
-        parent = self.getSuitableParent(widgettype)
+        parent = document.getSuitableParent(widgettype, self.selwidget)
 
         assert parent is not None
 
@@ -784,23 +796,6 @@ class TreeEditDock(qt4.QDockWidget):
         # select the widget
         self.selectWidget(w)
 
-    def getSuitableParent(self, widgettype, initialParent = None):
-        """Find the nearest relevant parent for the widgettype given."""
-
-        # get the widget to act as the parent
-        if not initialParent:
-            parent = self.selwidget
-        else:
-            parent  = initialParent
-        
-        # find the parent to add the child to, we go up the tree looking
-        # for possible parents
-        wc = document.thefactory.getWidgetClass(widgettype)
-        while parent is not None and not wc.willAllowParent(parent):
-            parent = parent.parent
-
-        return parent
-
     def slotWidgetCut(self):
         """Cut the selected widget"""
         self.slotWidgetCopy()
@@ -809,49 +804,17 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetCopy(self):
         """Copy selected widget to the clipboard."""
 
-        mimedata = self._makeMimeData(self.selwidget)
-        if mimedata:
+        if self.selwidget:
+            mimedata = document.generateWidgetsMime([self.selwidget])
             clipboard = qt4.QApplication.clipboard()
             clipboard.setMimeData(mimedata)
-
-    def _makeMimeData(self, widget):
-        """Make a QMimeData object representing the subtree with the
-        current selection at the root"""
-
-        if widget:
-            mimedata = qt4.QMimeData()
-            text = str('\n'.join((widget.typename,
-                                  widget.name,
-                                  widget.getSaveText())))
-            self.mimedata = qt4.QByteArray(text)
-            mimedata.setData(self.widgetmime, self.mimedata)
-            return mimedata
-        else:
-            return None
-
-    def getClipboardData(self):
-        """Return the clipboard data if it is in the correct format."""
-
-        mimedata = qt4.QApplication.clipboard().mimeData()
-        if self.widgetmime in mimedata.formats():
-            data = unicode(mimedata.data(self.widgetmime)).split('\n')
-            return data
-        else:
-            return None
 
     def updatePasteButton(self):
         """Is the data on the clipboard a valid paste at the currently
         selected widget? If so, enable paste button"""
 
-        data = self.getClipboardData()
-        show = False
-        if data:
-            # The first line of the clipboard data is the widget type
-            widgettype = data[0]
-            # Check if we can paste into the current widget or a parent
-            if self.getSuitableParent(widgettype, self.selwidget):
-                show = True
-
+        data = document.getClipboardWidgetMime()
+        show = document.isMimePastable(self.selwidget, data)
         self.vzactions['edit.paste'].setEnabled(show)
 
     def doInitialWidgetSelect(self):
@@ -869,38 +832,12 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetPaste(self):
         """Paste something from the clipboard"""
 
-        data = self.getClipboardData()
+        data = document.getClipboardWidgetMime()
         if data:
-            # The first line of the clipboard data is the widget type
-            widgettype = data[0]
-            # The second is the original name
-            widgetname = data[1]
+            widgets = document.pasteMime(self.selwidget, data)
+            if widgets:
+                self.selectWidget(widgets[0])
 
-            # make the document enter batch mode
-            # This is so that the user can undo this in one step
-            op = document.OperationMultiple([], descr='paste')
-            self.document.applyOperation(op)
-            self.document.batchHistory(op)
-            
-            # Add the first widget being pasted
-            self.makeWidget(widgettype, autoadd=False, name=widgetname)
-            
-            interpreter = self.parent.interpreter
-        
-            # Select the current widget in the interpreter
-            tmpCurrentwidget = interpreter.interface.currentwidget
-            interpreter.interface.currentwidget = self.selwidget
-
-            # Use the command interface to create the subwidgets
-            for command in data[2:]:
-                interpreter.run(command)
-                
-            # stop the history batching
-            self.document.batchHistory(None)
-                
-            # reset the interpreter widget
-            interpreter.interface.currentwidget = tmpCurrentwidget
-            
     def slotWidgetDelete(self):
         """Delete the widget selected."""
 

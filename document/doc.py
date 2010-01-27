@@ -58,6 +58,17 @@ function_re = re.compile(r'''
 (?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )* # args
 )\)$                           # endargs''', re.VERBOSE)
 
+def getSuitableParent(widgettype, initialwidget):
+    """Find the nearest relevant parent for the widgettype given."""
+
+    # find the parent to add the child to, we go up the tree looking
+    # for possible parents
+    parent = initialwidget
+    wc = widgetfactory.thefactory.getWidgetClass(widgettype)
+    while parent is not None and not wc.willAllowParent(parent):
+        parent = parent.parent
+    return parent
+            
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
@@ -208,7 +219,7 @@ class Document( qt4.QObject ):
             
         assert isinstance(s, setting.Setting)
         return s
-            
+
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}

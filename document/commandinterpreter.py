@@ -51,7 +51,7 @@ import os.path
 from commandinterface import CommandInterface
 import veusz.utils as utils
 
-class CommandInterpreter:
+class CommandInterpreter(object):
     """Class for executing commands in the Veusz command line language."""
 
     def __init__(self, document):
