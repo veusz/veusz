@@ -574,6 +574,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.connect(qt4.QApplication.clipboard(),
                      qt4.SIGNAL('dataChanged()'),
                      self.updatePasteButton)
+        self.updatePasteButton()
 
     def slotDocumentWiped(self):
         """If the document is wiped, reselect root widget."""
