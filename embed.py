@@ -102,6 +102,7 @@ class Embedded(object):
         """
         return Embedded(name=name, copyof=self)
 
+    @classmethod
     def makeSockets(cls):
         """Make socket(s) to communicate with remote process.
         Returns string to send to remote process
@@ -129,21 +130,37 @@ class Embedded(object):
             waitaccept = True
 
         return (sock, sendtext, waitaccept)
-    makeSockets = classmethod(makeSockets)
 
+    @classmethod
+    def makeRemoteProcess(cls):
+        """Try to find veusz process for remote program."""
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        remoteembed = os.path.join(thisdir, 'embed_remote.py')
+        veuszex = os.path.join(thisdir, 'veusz')
+
+        # try embed_remote.py in this directory, veusz in this directory
+        # or veusz on the path in order
+        for shell, cmd in ( (False, [sys.executable, remoteembed]),
+                            (False, [veuszex]),
+                            (True, ['veusz']), ):
+            try:
+                cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
+                                              shell=shell, bufsize=0,
+                                              close_fds=False,
+                                              stdin=subprocess.PIPE)
+                return
+            except OSError:
+                pass
+
+        sys.stderr.write('Unable to find a Veusz executable. Exiting.\n')
+        sys.exit(1)
+        
+    @classmethod
     def startRemote(cls):
         """Start remote process."""
         cls.serv_socket, sendtext, waitaccept = cls.makeSockets()
 
-        # command line to run remote process
-        remotecmd = os.path.join( os.path.dirname(os.path.abspath(__file__)),
-                                  'embed_remote.py' )
-
-        # start remote process using subprocess
-        cmdline = [ sys.executable, remotecmd, 'RunFromEmbed' ]
-        cls.remote = subprocess.Popen(cmdline, shell=False, bufsize=0,
-                                      close_fds=False,
-                                      stdin=subprocess.PIPE)
+        cls.makeRemoteProcess()
         stdin = cls.remote.stdin
 
         # send socket number over pipe
@@ -168,51 +185,49 @@ class Embedded(object):
         # packet length for command bytes
         cls.cmdlen = len(struct.pack('L', 0))
         atexit.register(cls.exitQt)
-    startRemote = classmethod(startRemote)
 
+    @staticmethod
     def readLenFromSocket(socket, length):
         """Read length bytes from socket."""
         s = ''
         while len(s) < length:
             s += socket.recv(length-len(s))
         return s
-    readLenFromSocket = staticmethod(readLenFromSocket)
 
+    @staticmethod
     def writeToSocket(socket, data):
         count = 0
         while count < len(data):
             count += socket.send(data[count:])
-    writeToSocket = staticmethod(writeToSocket)
 
-    def sendCommand(kls, cmd):
+    @classmethod
+    def sendCommand(cls, cmd):
         """Send the command to the remote process."""
 
         outs = cPickle.dumps(cmd)
 
-        kls.writeToSocket( kls.serv_socket, struct.pack('L', len(outs)) )
-        kls.writeToSocket( kls.serv_socket, outs )
+        cls.writeToSocket( cls.serv_socket, struct.pack('L', len(outs)) )
+        cls.writeToSocket( cls.serv_socket, outs )
 
-        backlen = struct.unpack('L', kls.readLenFromSocket(kls.serv_socket,
-                                                           kls.cmdlen))[0]
-        rets = kls.readLenFromSocket( kls.serv_socket, backlen )
+        backlen = struct.unpack('L', cls.readLenFromSocket(cls.serv_socket,
+                                                           cls.cmdlen))[0]
+        rets = cls.readLenFromSocket( cls.serv_socket, backlen )
         retobj = cPickle.loads(rets)
         if isinstance(retobj, Exception):
             raise retobj
         else:
             return retobj
-    sendCommand = classmethod(sendCommand)
 
     def runCommand(self, cmd, *args, **args2):
         """Execute the given function in the Qt thread with the arguments
         given."""
         return self.sendCommand( (self.winno, cmd, args[1:], args2) )
 
-    def exitQt(kls):
+    @classmethod
+    def exitQt(cls):
         """Exit the Qt thread."""
-        kls.sendCommand( (-1, '_Quit', (), {}) )
-        kls.serv_socket.shutdown(socket.SHUT_RDWR)
-        kls.serv_socket.close()
-        kls.serv_socket, kls.from_pipe = -1, -1
-
-    exitQt = classmethod(exitQt)
+        cls.sendCommand( (-1, '_Quit', (), {}) )
+        cls.serv_socket.shutdown(socket.SHUT_RDWR)
+        cls.serv_socket.close()
+        cls.serv_socket, cls.from_pipe = -1, -1
 

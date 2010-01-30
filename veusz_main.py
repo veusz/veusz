@@ -44,6 +44,7 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.setting
+import veusz.embed_remote as remote
 
 copyr='''Veusz %s
 
@@ -95,6 +96,11 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
 
 def run():
     '''Run the main application.'''
+
+    # special mode to run embedding server
+    if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
+        remote.main()
+        return
 
     app = qt4.QApplication(sys.argv)
     sys.excepthook = excepthook
