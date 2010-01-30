@@ -250,13 +250,15 @@ class OperationWidgetAdd(object):
 
     descr = 'add'
     
-    def __init__(self, parent, type, autoadd=True, name=None, **defaultvals):
+    def __init__(self, parent, type, autoadd=True, name=None,
+                 index=-1, **defaultvals):
         """Add a widget of type given
         
         parent is the parent widget
         type is the type to add (string)
         autoadd adds children automatically for some widgets
         name is the (optional) name of the new widget
+        index is position in parent to add the widget
         settings can be passed to the created widgets as optional arguments
         """
         
@@ -264,6 +266,7 @@ class OperationWidgetAdd(object):
         self.type = type
         self.autoadd = autoadd
         self.name = name
+        self.index = index
         self.defaultvals = defaultvals
         
     def do(self, document):
@@ -276,6 +279,7 @@ class OperationWidgetAdd(object):
         w = widgetfactory.thefactory.makeWidget(self.type, parent,
                                                 autoadd=self.autoadd,
                                                 name=self.name,
+                                                index=self.index,
                                                 **self.defaultvals)
         self.createdname = w.name
         return w

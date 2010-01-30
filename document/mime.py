@@ -25,9 +25,10 @@ import veusz.qtall as qt4
 import doc
 import operations
 import commandinterpreter
+import widgetfactory
 
 # mime type for copy and paste
-widgetmime = 'text/x-vnd.veusz-3'
+widgetmime = 'text/x-vnd.veusz-widget-3'
 
 def generateWidgetsMime(widgets):
     """Create mime data describing widget and children.
@@ -84,8 +85,23 @@ def isMimePastable(parentwidget, mimedata):
             return False
     return True
 
-def pasteMime(parentwidget, mimedata):
-    """Paste mime data at parent widget.
+def isMimeDropable(parentwidget, mimedata):
+    """Can parent have this data pasted directly inside?"""
+    if mimedata is None or parentwidget is None:
+        return False
+    types = getMimeWidgetTypes(mimedata)
+    for type in types:
+        wc = widgetfactory.thefactory.getWidgetClass(type)
+        if not wc.willAllowParent(parentwidget):
+            return False
+    return True
+
+def getMimeWidgetCount(mimedata):
+    """Get number of widgets in mimedata."""
+    return int( mimedata[:mimedata.find('\n')] )
+
+def pasteMime(parentwidget, mimedata, index=-1):
+    """Paste mime data at parent widget, starting at index childindex
 
     Returns list of created widgets
     """
@@ -122,13 +138,16 @@ def pasteMime(parentwidget, mimedata):
         # make new widget
         widget = document.applyOperation(
             operations.OperationWidgetAdd(thisparent, wtype, autoadd=False,
-                                          name=name) )
+                                          name=name, index=index) )
         newwidgets.append(widget)
 
         # run generating commands
         interpreter.interface.currentwidget = widget
         for line in lines[widgetline:widgetline+numline]:
             interpreter.run(line)
+
+        if index >= 0:
+            index += 1
 
         # move to next widget
         widgetline += numline

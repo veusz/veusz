@@ -44,9 +44,14 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotDocumentModified )
 
+        # suspend signals to the view that the model has changed
+        self.suspendmodified = False
+
     def slotDocumentModified(self):
         """The document has been changed."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        if not self.suspendmodified:
+            # needs to be suspended within insert/delete row operations
+            self.emit( qt4.SIGNAL('layoutChanged()') )
 
     def columnCount(self, parent):
         """Return number of columns of data."""
@@ -228,6 +233,27 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """Get associated widget for index selected."""
         return index.internalPointer()
 
+    def removeRows(self, row, count, parentindex):
+        """Remove widgets from parent."""
+
+        if not parentindex.isValid():
+            return
+
+        parent = self.getWidget(parentindex)
+        self.suspendmodified = True
+        self.beginRemoveRows(parentindex, row, row+count-1)
+
+        # construct an operation for deleting the rows
+        deleteops = []
+        for w in parent.children[row:row+count]:
+            deleteops.append( document.OperationWidgetDelete(w) )
+        op = document.OperationMultiple(deleteops, descr="remove widget(s)")
+        self.document.applyOperation(op)
+
+        self.endRemoveRows()
+        self.suspendmodified = False
+        return True
+
     def supportedDropActions(self):
         """Supported drag and drop actions."""
         return qt4.Qt.MoveAction
@@ -240,6 +266,43 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
     def mimeTypes(self):
         """Accepted mime types."""
         return [document.widgetmime]
+
+    def dropMimeData(self, mimedata, action, row, column, parentindex):
+        """User drags and drops widget."""
+
+        if action == qt4.Qt.IgnoreAction:
+            return True
+        if not mimedata.hasFormat(document.widgetmime):
+            return False
+
+        data = str(mimedata.data(document.widgetmime))
+        if parentindex.isValid():
+            parent = self.getWidget(parentindex)
+        else:
+            parent = self.document.basewidget
+
+        # check parent supports child
+        if not document.isMimeDropable(parent, data):
+            return False
+
+        # work out where row will be pasted
+        startrow = row
+        if row == -1:
+            startrow = len(parent.children)
+
+        # need to tell qt that these rows are being inserted, so that the
+        # right number of rows are removed afterwards
+        self.suspendmodified = True
+        self.beginInsertRows(parentindex, startrow,
+                             startrow+document.getMimeWidgetCount(data)-1)
+        document.pasteMime(parent, data, index=startrow)
+        self.endInsertRows()
+        self.suspendmodified = False
+
+        return True
+
+##############################################################################
+# Widgets start here
 
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""

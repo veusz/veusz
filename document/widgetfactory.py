@@ -33,7 +33,7 @@ class WidgetFactory(object):
         self.regwidgets[classobj.typename] = classobj
 
     def makeWidget(self, widgetname, parent, name=None, autoadd=True,
-                   **optargs):
+                   index=-1, **optargs):
         """Make a new widget of the appropriate type."""
 
         # check for / in name of widget
@@ -51,6 +51,11 @@ class WidgetFactory(object):
 
         if autoadd:
             w.addDefaultSubWidgets()
+
+        # move around child afterwards, yuck
+        if index != -1:
+            del parent.children[-1]
+            parent.children.insert(index, w)
 
         return w
 
