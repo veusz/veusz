@@ -36,6 +36,7 @@ def generateWidgetsMime(widgets):
      numberofwidgets
      widgettype1
      widgetname1
+     widgetpath1
      numberoflines1
      ...
      texttoreproducewidget
@@ -47,6 +48,7 @@ def generateWidgetsMime(widgets):
     for widget in widgets:
         header.append(widget.typename)
         header.append(repr(widget.name))
+        header.append(repr(widget.path))
         save = widget.getSaveText()
         header.append( str(save.count('\n')) )
         savetext.append(save)
@@ -71,7 +73,7 @@ def getMimeWidgetTypes(data):
     lines = data.split('\n')
 
     numwidgets = int(lines[0])
-    types = lines[1:1+2*numwidgets:3]
+    types = lines[1:1+4*numwidgets:4]
     return types
 
 def isMimePastable(parentwidget, mimedata):
@@ -112,10 +114,11 @@ def pasteMime(parentwidget, mimedata, index=-1):
     numwidgets = int(lines[0])
 
     # get types, names and number of lines for widgets
-    types = lines[1:1+3*numwidgets:3]
-    names = lines[2:2+3*numwidgets:3]
+    types = lines[1:1+4*numwidgets:4]
+    names = lines[2:2+4*numwidgets:4]
     names = [eval(name) for name in names]
-    widgetslines = lines[3:3+3*numwidgets:3]
+    # paths = lines[3:3+4*numwidgets:4] (not required here)
+    widgetslines = lines[4:4+4*numwidgets:4]
     widgetslines = [int(x) for x in widgetslines]
 
     # start batching changes to document
