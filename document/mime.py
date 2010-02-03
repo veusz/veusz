@@ -117,7 +117,7 @@ def pasteMime(parentwidget, mimedata, index=-1):
     types = lines[1:1+4*numwidgets:4]
     names = lines[2:2+4*numwidgets:4]
     names = [eval(name) for name in names]
-    # paths = lines[3:3+4*numwidgets:4] (not required here)
+    paths = lines[3:3+4*numwidgets:4] # (not required here)
     widgetslines = lines[4:4+4*numwidgets:4]
     widgetslines = [int(x) for x in widgetslines]
 
@@ -130,7 +130,7 @@ def pasteMime(parentwidget, mimedata, index=-1):
     interpreter = commandinterpreter.CommandInterpreter(document)
 
     newwidgets = []
-    widgetline = 1+3*numwidgets
+    widgetline = 1+4*numwidgets
     for wtype, name, numline in izip(types, names, widgetslines):
         thisparent = doc.getSuitableParent(wtype, parentwidget)
 
