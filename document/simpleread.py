@@ -303,6 +303,15 @@ class DescriptorPart(object):
                 if name+'\0-' in thedatasets: neg = thedatasets[name+'\0-']
                 if name+'\0+-' in thedatasets: sym = thedatasets[name+'\0+-']
 
+                # make sure components are the same length
+                minlength = 99999999999999
+                for ds in vals, pos, neg, sym:
+                    if ds is not None and len(ds) < minlength:
+                        minlength = len(ds)
+                for ds in vals, pos, neg, sym:
+                    if ds is not None and len(ds) != minlength:
+                        ds = ds[:minlength]
+
                 # only remember last N values
                 if tail is not None:
                     vals = vals[-tail:]
