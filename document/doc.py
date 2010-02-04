@@ -397,12 +397,12 @@ class Document( qt4.QObject ):
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
-        for name, dataset in self.data.items():
+        for name, dataset in sorted(self.data.items()):
             dataset.saveLinksToSavedDoc(fileobj, savedlinks,
                                         relpath=reldirname)
 
         # save the remaining datasets
-        for name, dataset in self.data.items():
+        for name, dataset in sorted(self.data.items()):
             dataset.saveToFile(fileobj, name)
 
         # save the actual tree structure
