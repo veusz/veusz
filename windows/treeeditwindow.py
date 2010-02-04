@@ -674,7 +674,7 @@ class TreeEditDock(qt4.QDockWidget):
         
         # actually move the widget
         self.document.applyOperation(
-            document.OperationWidgetMove(w, direction) )
+            document.OperationWidgetMoveUpDown(w, direction) )
 
         # rehilight moved widget
         self.selectWidget(w)

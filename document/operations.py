@@ -216,7 +216,7 @@ class OperationWidgetDelete(object):
         oldparent = document.resolveFullWidgetPath(self.oldparentpath)
         oldparent.addChild(self.oldwidget, index=self.oldindex)
                 
-class OperationWidgetMove(object):
+class OperationWidgetMoveUpDown(object):
     """Move a widget up or down in the hierarchy."""
 
     descr = 'move'
@@ -245,6 +245,56 @@ class OperationWidgetMove(object):
             parent = widget.parent
             parent.moveChild(widget, -self.direction)
             
+class OperationWidgetMove(object):
+    """Move a widget arbitrarily in the hierarchy."""
+
+    descr = 'move'
+
+    def __init__(self, oldchildpath, newparentpath, newindex):
+        """Move widget with path oldchildpath to be a child of
+        newparentpath and with index newindex."""
+        self.oldchildpath = oldchildpath
+        self.newparentpath = newparentpath
+        self.newindex = newindex
+
+    def do(self, document):
+        """Move widget."""
+
+        child = document.resolveFullWidgetPath(self.oldchildpath)
+        oldparent = child.parent
+
+        # record previous parent and position
+        self.oldparent = oldparent.path
+        self.oldchildindex = oldparent.children.index(child)
+
+        # move into new parent and position
+        newparent = document.resolveFullWidgetPath(self.newparentpath)
+        newparent.children.insert(self.newindex, child)
+
+        # remove from old parent
+        del self.oldparent.children[self.oldchildindex]
+
+        # reparent child
+        child.parent = newparent
+        self.newchildpath = child.path
+        self.newchildindex = newparent.index(child)
+
+    def undo(self, document):
+        """Undo move."""
+
+        child = document.resolveFullWidgetPath(self.newchildpath)
+        newparent = child.parent
+
+        # delete child from new parent
+        del newparent.children[self.newchildindex]
+
+        # insert into old parent
+        oldparent = document.resolveFullWidgetPath(self.oldparent)
+        oldparent.children.insert(self.oldchildindex, child)
+
+        # reparent back to old parent
+        child.parent = oldparent
+
 class OperationWidgetAdd(object):
     """Add a widget of specified type to parent."""
 

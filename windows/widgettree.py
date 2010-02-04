@@ -330,18 +330,34 @@ class WidgetTreeView(qt4.QTreeView):
         else:
             e.setDropAction(qt4.Qt.MoveAction)
 
+    def handleInternalMove(self, event):
+        """Handle a move inside treeview."""
+        if not self.viewport().rect().contains(event.pos()):
+            return
+
+        # get widget at event position
+        index = self.indexAt(event.pos())
+        if not index.isValid():
+            index = self.rootIndex()
+
+        # adjust according to drop indicator position
+        row = -1
+        posn = self.dropIndicatorPosition()
+        if posn == qt4.QAbstractItemView.AboveItem:
+            row = index.row()
+            index = index.parent()
+        elif posn == qt4.QAbstractItemView.BelowItem:
+            row = index.row() + 1
+            index = index.parent()
+        
+        print index.internalPointer(), row
+
     def dropEvent(self, e):
         """When an object is dropped on the view."""
         self.testModifier(e)
 
         if e.source() is self and e.dropAction() == qt4.Qt.MoveAction:
-            # internal
-            print "internal move!"
-            vals = e.mimeData().data(document.widgetmime)
-            print vals
-        #else:
-        #    # from another tree view
-        #    qt4.QTreeView.dropEvent(self, e)
+            self.handleInternalMove(e)
 
         qt4.QTreeView.dropEvent(self, e)
 
