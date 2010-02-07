@@ -1203,14 +1203,17 @@ class Dataset2DXYZExpression(DatasetBase):
         self.lastchangeset = -1
         self.cacheddata = None
         
-        for expr in exprx, expry, exprz:
-            if utils.checkCode(expr, securityonly=True) is not None:
-                raise DatasetExpressionException("Unsafe expression '%s'" % expr)
+#         for expr in exprx, expry, exprz:
+#             if utils.checkCode(expr, securityonly=True) is not None:
+#                 raise DatasetExpressionException("Unsafe expression '%s'" % expr)
 
         # copy parameters
         self.exprx = exprx
         self.expry = expry
         self.exprz = exprz
+
+        # cache x y and z expressions
+        self.cachedexpr = {}
 
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
@@ -1238,6 +1241,15 @@ class Dataset2DXYZExpression(DatasetBase):
         for name in ('exprx', 'expry', 'exprz'):
             expr = _substituteDatasets(self.document.data, getattr(self, name),
                                        'data')
+
+            # check expression if not checked before
+            if self.cachedexpr.get(name) != expr:
+                if ( not setting.transient_settings['unsafe_mode'] and
+                     utils.checkCode(expr, securityonly=True) ):
+                    raise DatasetExpressionException(
+                        "Unsafe expression '%s'" % (
+                            expr))
+                self.cachedexpr[name] = expr
 
             try:
                 evaluated[name] = eval(expr, environment)

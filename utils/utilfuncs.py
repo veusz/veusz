@@ -48,6 +48,11 @@ def reverse(data):
     for index in xrange(len(data)-1, -1, -1):
         yield data[index]
 
+id_re = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
+def validPythonIdentifier(name):
+    """Is this a valid python identifier?"""
+    return id_re.match(name) is not None
+
 def validateDatasetName(name):
     """Validate dataset name is okay.
     Dataset names can contain anything except back ticks!
