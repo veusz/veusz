@@ -341,6 +341,9 @@ class Stream(object):
     # this regular expression is for splitting up the stream into words
     # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
     split_re = re.compile( r'''
+    `.+?`[^ \t\n#!%;]* | # match dataset name quoted in back-ticks
+                         # we also need to match following characters to catch
+                         # corner cases in the descriptor
     u?"" |          # match empty double-quoted string
     u?".*?[^\\]" |  # match double-quoted string, ignoring escaped quotes
     u?'' |          # match empty single-quoted string
