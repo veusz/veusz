@@ -307,7 +307,6 @@ class WidgetTreeView(qt4.QTreeView):
 
     def __init__(self, model, *args):
         qt4.QTreeView.__init__(self, *args)
-        self.model = model
         self.setModel(model)
         self.expandAll()
 
@@ -349,8 +348,25 @@ class WidgetTreeView(qt4.QTreeView):
         elif posn == qt4.QAbstractItemView.BelowItem:
             row = index.row() + 1
             index = index.parent()
-        
-        print index.internalPointer(), row
+
+        if index.isValid():
+            parent = self.model().getWidget(index)
+            data = str(event.mimeData().data(document.widgetmime))
+            if document.isMimeDropable(parent, data):
+                # move the widget!
+                parentpath = parent.path
+                widgetpaths = document.getMimeWidgetPaths(data)
+                ops = []
+                r = row
+                for path in widgetpaths:
+                    ops.append(
+                        document.OperationWidgetMove(path, parentpath, r) )
+                    if r >= 0:
+                        r += 1
+
+                self.model().document.applyOperation(
+                    document.OperationMultiple(ops, descr='move'))
+                event.ignore()
 
     def dropEvent(self, e):
         """When an object is dropped on the view."""
@@ -358,6 +374,7 @@ class WidgetTreeView(qt4.QTreeView):
 
         if e.source() is self and e.dropAction() == qt4.Qt.MoveAction:
             self.handleInternalMove(e)
+            return
 
         qt4.QTreeView.dropEvent(self, e)
 

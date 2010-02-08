@@ -76,6 +76,14 @@ def getMimeWidgetTypes(data):
     types = lines[1:1+4*numwidgets:4]
     return types
 
+def getMimeWidgetPaths(data):
+    """Get list of widget paths in the mime data."""
+    lines = data.split('\n')
+
+    numwidgets = int(lines[0])
+    paths = [eval(x) for x in lines[3:3+4*numwidgets:4]]
+    return paths
+
 def isMimePastable(parentwidget, mimedata):
     """Is mime data suitable to paste at parentwidget?"""
 

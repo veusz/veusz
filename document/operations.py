@@ -262,37 +262,41 @@ class OperationWidgetMove(object):
 
         child = document.resolveFullWidgetPath(self.oldchildpath)
         oldparent = child.parent
-
-        # record previous parent and position
-        self.oldparent = oldparent.path
-        self.oldchildindex = oldparent.children.index(child)
-
-        # move into new parent and position
         newparent = document.resolveFullWidgetPath(self.newparentpath)
-        newparent.children.insert(self.newindex, child)
+        self.oldchildindex = oldparent.children.index(child)
+        self.oldparentpath = oldparent.path
 
-        # remove from old parent
-        del self.oldparent.children[self.oldchildindex]
+        if self.newindex < 0:
+            # convert negative index to normal index
+            self.newindex = len(newparent.children)
 
-        # reparent child
-        child.parent = newparent
+        if oldparent == newparent:
+            # moving within same parent
+            self.movemode = 'sameparent'
+            del oldparent.children[self.oldchildindex]
+            if self.newindex > self.oldchildindex:
+                self.newindex -= 1
+            oldparent.children.insert(self.newindex, child)
+        else:
+            # moving to different parent
+            self.movemode = 'differentparent'
+            # record previous parent and position
+
+            del oldparent.children[self.oldchildindex]
+            newparent.children.insert(self.newindex, child)
+            child.parent = newparent
+
         self.newchildpath = child.path
-        self.newchildindex = newparent.index(child)
 
     def undo(self, document):
         """Undo move."""
 
+        newparent = document.resolveFullWidgetPath(self.newparentpath)
         child = document.resolveFullWidgetPath(self.newchildpath)
-        newparent = child.parent
+        oldparent = document.resolveFullWidgetPath(self.oldparentpath)
 
-        # delete child from new parent
-        del newparent.children[self.newchildindex]
-
-        # insert into old parent
-        oldparent = document.resolveFullWidgetPath(self.oldparent)
+        del newparent.children[self.newindex]
         oldparent.children.insert(self.oldchildindex, child)
-
-        # reparent back to old parent
         child.parent = oldparent
 
 class OperationWidgetAdd(object):
