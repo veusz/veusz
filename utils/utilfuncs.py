@@ -63,7 +63,8 @@ def validateWidgetName(name):
     """Validate widget name is okay.
     Widget names are valid if no surrounding whitespace and do not contain /
     """
-    return len(name) > 0 and name.strip() == name and name.find('/') == -1
+    return ( len(name) > 0 and name.strip() == name and name.find('/') == -1
+             and name != '.' and name != '..' )
 
 def cleanDatasetName(name):
     """Make string into a valid dataset name."""
