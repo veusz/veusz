@@ -331,6 +331,11 @@ class WidgetTreeView(qt4.QTreeView):
 
     def handleInternalMove(self, event):
         """Handle a move inside treeview."""
+
+        # make sure qt doesn't handle this
+        event.setDropAction(qt4.Qt.IgnoreAction)
+        event.ignore()
+
         if not self.viewport().rect().contains(event.pos()):
             return
 
@@ -366,7 +371,6 @@ class WidgetTreeView(qt4.QTreeView):
 
                 self.model().document.applyOperation(
                     document.OperationMultiple(ops, descr='move'))
-                event.setDropAction(qt4.Qt.IgnoreAction)
                 event.ignore()
 
     def dropEvent(self, e):
@@ -375,7 +379,6 @@ class WidgetTreeView(qt4.QTreeView):
 
         if e.source() is self and e.dropAction() == qt4.Qt.MoveAction:
             self.handleInternalMove(e)
-            return
 
         qt4.QTreeView.dropEvent(self, e)
 
