@@ -270,7 +270,7 @@ class OperationWidgetMove(object):
             # convert negative index to normal index
             self.newindex = len(newparent.children)
 
-        if oldparent == newparent:
+        if oldparent is newparent:
             # moving within same parent
             self.movemode = 'sameparent'
             del oldparent.children[self.oldchildindex]

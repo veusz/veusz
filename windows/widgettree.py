@@ -366,6 +366,7 @@ class WidgetTreeView(qt4.QTreeView):
 
                 self.model().document.applyOperation(
                     document.OperationMultiple(ops, descr='move'))
+                event.setDropAction(qt4.Qt.IgnoreAction)
                 event.ignore()
 
     def dropEvent(self, e):
