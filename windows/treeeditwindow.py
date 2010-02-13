@@ -112,17 +112,18 @@ class PropertyList(qt4.QWidget):
                 if onlyformatting and not setn.formatting:
                     continue
 
-                lab = SettingLabel(self.document, setn, None)
-                self.layout.addWidget(lab, row, 0)
-                self.childlist.append(lab)
-
                 cntrl = setn.makeControl(None)
-                self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                             self.slotSettingChanged)
-                self.layout.addWidget(cntrl, row, 1)
-                self.childlist.append(cntrl)
+                if cntrl:
+                    lab = SettingLabel(self.document, setn, None)
+                    self.layout.addWidget(lab, row, 0)
+                    self.childlist.append(lab)
 
-                row += 1
+                    self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                                 self.slotSettingChanged)
+                    self.layout.addWidget(cntrl, row, 1)
+                    self.childlist.append(cntrl)
+                    
+                    row += 1
 
         # add empty widget to take rest of space
         w = qt4.QWidget()

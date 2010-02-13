@@ -217,7 +217,7 @@ class Widget(object):
             i += 1
 
         if i == noparts:
-            raise ValueError, "Specified an widget, not a setting"
+            raise ValueError, "Specified a widget, not a setting"
         else:
             return obj.settings.getFromPath( parts[i:] )
 

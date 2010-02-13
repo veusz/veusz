@@ -31,6 +31,8 @@ import dates
 import codecs
 import csv
 
+import veusz.qtall as qt4
+
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
 
@@ -96,6 +98,24 @@ def relpath(filename, dirname):
 
     # join parts back together
     return os.path.sep.join(fileparts)
+
+# handle and extended #RRGGBBAA color
+extendedcolor_re = re.compile('^#[0-9A-Fa-f]{8}$')
+def extendedColorToQColor(s):
+    if extendedcolor_re.match(s):
+        col = qt4.QColor(s[:-2])
+        col.setAlpha( int(s[-2:], 16) )
+        return col
+    else:
+        return qt4.QColor(s)
+
+def extendedColorFromQColor(col):
+    """Make an extended color #RRGGBBAAA or #RRGGBB string."""
+    if col.alpha() == 255:
+        return col.name()
+    else:
+        return '#%02x%02x%02x%02x' % (col.red(), col.green(), col.blue(),
+                                      col.alpha())
 
 class WeakBoundMethod:
     """A weak reference to a bound method.

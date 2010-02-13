@@ -85,10 +85,12 @@ class Setting(object):
             val = self.val
 
         args = (self.name,) + before + (val,) + after
+
         opt = optional.copy()
         opt['descr'] = self.descr
         opt['usertext'] = self.usertext
         opt['formatting'] = self.formatting
+
         obj = self.__class__(*args, **opt)
         obj.readonly = self.readonly
         obj.default = self.default
@@ -278,7 +280,7 @@ class Setting(object):
             return self.val == self.default
 
     def isDefaultLink(self):
-        """Is this a link to the default spreadsheet value."""
+        """Is this a link to the default stylesheet value."""
 
         return ( isinstance(self._val, Reference) and
                  self._val.value == self.getStylesheetLink() )
@@ -331,6 +333,57 @@ class Setting(object):
             return float( eval(text, self.getDocument().eval_context) )
         except:
             raise InvalidType
+
+# forward setting to another setting
+class SettingBackwardCompat(Setting):
+    """Forward setting requests to another setting.
+
+    This is used for backward-compatibility.
+    """
+
+    def __init__(self, name, newrelpath, val, **args):
+        """Point this setting to another.
+        newrelpath is a path relative to this setting's parent
+        """
+        Setting.__init__(self, name, val, **args)
+        self.relpath = newrelpath.split('/')
+
+    def getForward(self):
+        """Get setting this setting forwards to."""
+        return self.parent.getFromPath(self.relpath)
+
+    def convertTo(self, val):
+        if self.parent is not None:
+            return self.getForward().convertTo(val)
+
+    def toText(self):
+        return self.getForward().toText()
+
+    def fromText(self, val):
+        return self.getForward().fromText(val)
+
+    def set(self, val):
+        if self.parent is not None and not isinstance(val, Reference):
+            self.getForward().set(val)
+
+    def isDefault(self):
+        return self.getForward().isDefault()
+
+    def get(self):
+        return self.getForward().get()
+
+    def copy(self):
+        return self._copyHelper(('/'.join(self.relpath),), (), {})
+
+    def makeControl(self, *args):
+        return None
+
+    def saveText(self, saveall, rootname = ''):
+        return ''
+
+    def linkToStylesheet(self):
+        """Do nothing for backward compatibility settings."""
+        pass
 
 # Store strings
 class Str(Setting):
@@ -1423,9 +1476,10 @@ class LineSet(Setting):
 
     def convertTo(self, val):
         """Takes a tuple/list of tuples:
-        [('dotted', '1pt', 'color', False), ...]
+        [('dotted', '1pt', 'color', <trans>, False), ...]
 
-        These are style, width, color, and hide.
+        These are style, width, color, and hide or
+        style, widget, color, transparency, hide
         """
 
         if type(val) not in (list, tuple):
@@ -1460,10 +1514,12 @@ class LineSet(Setting):
             return qt4.QPen(qt4.Qt.NoPen)
         else:
             row = row % len(self.val)
-            style, width, color, hide = self.val[row]
+            v = self.val[row]
+            style, width, color, hide = v
             width = Distance.convertDistance(painter, width)
             style, dashpattern = LineStyle._linecnvt[style]
-            pen = qt4.QPen(qt4.QColor(color), width, style)
+            col = utils.extendedColorToQColor(color)
+            pen = qt4.QPen(col, width, style)
 
             if dashpattern:
                 pen.setDashPattern(dashpattern)
@@ -1482,7 +1538,8 @@ class FillSet(Setting):
         """Takes a tuple/list of tuples:
         [('solid', 'color', False), ...]
 
-        These are color, fill style, and hide.
+        These are color, fill style, and hide or
+        color, fill style, transparency and hide
         """
 
         if type(val) not in (list, tuple):
@@ -1517,8 +1574,8 @@ class FillSet(Setting):
         else:
             row = row % len(self.val)
             style, color, hide = self.val[row]
-            b = qt4.QBrush( qt4.QColor(color),
-                            FillStyle._fillcnvt[style] )
+            col = utils.extendedColorToQColor(color)
+            b = qt4.QBrush(col, FillStyle._fillcnvt[style])
             if hide:
                 b.setStyle(qt4.Qt.NoBrush)
             return b
