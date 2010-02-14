@@ -70,9 +70,29 @@ class ContourLines(setting.Settings):
                 'using', usertext='Line styles',
                 formatting=True) )
         self.add( setting.Bool('hide', False,
-                               descr = 'Hide fills',
+                               descr = 'Hide lines',
                                usertext = 'Hide',
                                formatting = True) )
+
+class SubContourLines(setting.Settings):
+    """Sub-dividing contour line settings."""
+    def __init__(self, name, **args):
+        setting.Settings.__init__(self, name, **args)
+        self.add( setting.LineSet(
+                'lines',
+                [('dot2', '1pt', 'black', False)],
+                descr = 'Line styles used for sub-contours',
+                usertext='Line styles',
+                formatting=True) )
+        self.add( setting.Int('numLevels', 5,
+                              minval=2,
+                              descr='Number of sub-levels to plot between '
+                              'each contour',
+                              usertext='Levels') )
+        self.add( setting.Bool('hide', True,
+                               descr='Hide lines',
+                               usertext='Hide',
+                               formatting=True) )
 
 class Contour(plotters.GenericPlotter):
     """A class which plots contours on a graph with a specified
@@ -104,6 +124,7 @@ class Contour(plotters.GenericPlotter):
         # cached traced contours
         self._cachedcontours = None
         self._cachedpolygons = None
+        self._cachedsubcontours = None
 
         if type(self) == Contour:
             self.readDefaults()
@@ -156,12 +177,17 @@ class Contour(plotters.GenericPlotter):
         s.add( ContourLines('Lines',
                             descr='Contour lines',
                             usertext='Contour lines'),
-               pixmap = 'settings_plotline' )
+               pixmap = 'settings_contourline' )
 
         s.add( ContourFills('Fills',
                             descr='Fill within contours',
                             usertext='Contour fills'),
-               pixmap = 'settings_plotfillbelow' )
+               pixmap = 'settings_contourfill' )
+
+        s.add( SubContourLines('SubLines',
+                               descr='Sub-contour lines',
+                               usertext='Sub-contour lines'),
+               pixmap = 'settings_subcontourline' )
 
         s.add( setting.SettingBackwardCompat('lines', 'Lines/lines', None) )
         s.add( setting.SettingBackwardCompat('fills', 'Fills/fills', None) )
@@ -180,7 +206,7 @@ class Contour(plotters.GenericPlotter):
         return ', '.join(out)
     userdescription = property(_getUserDescription)
 
-    def _calculateLevels(self):
+    def calculateLevels(self):
         """Calculate contour levels from data and settings.
 
         Returns levels as 1d numpy
@@ -240,6 +266,36 @@ class Contour(plotters.GenericPlotter):
         s.levelsOut = [float(i) for i in levels]
 
         return levels
+
+    def calculateSubLevels(self, levels):
+        """Calculate sublevels between contours."""
+        s = self.settings
+        num = s.SubLines.numLevels
+        if s.SubLines.hide or len(s.SubLines.lines) == 0:
+            return N.array([])
+
+        scaling = s.scaling
+        # iterate over pairs of contours
+        out = []
+        for conmin, conmax in izip(levels[:-1], levels[1:]):
+            drange = N.arange(1, num)
+            if scaling == 'linear' or scaling == 'manual':
+                delta = (conmax-conmin) / num
+                slev = conmin + drange*delta
+            elif scaling == 'sqrt':
+                delta = N.sqrt(conmax-conmin) / num
+                slev = conmin + (drange*delta)**2
+            elif scaling == 'log':
+                delta = N.log(conmax-conmin) / num
+                slev = conmin + N.exp(drange*delta)
+            elif scaling == 'squared':
+                delta = (conmax-conmin)**2 / num
+                slev = conmin + N.sqrt(drange*delta)
+            out.append(slev)
+
+        if len(out) == 0:
+            out.append([])
+        return N.hstack(out)
 
     def providesAxesDependency(self):
         """Range information provided by widget."""
@@ -305,18 +361,25 @@ class Contour(plotters.GenericPlotter):
         # recalculate contours if image has changed
         # we also recalculate if the user has switched on fills
         contsettings = ( s.min, s.max, s.numLevels, s.scaling,
+                         len(s.Fills.fills) == 0 or s.Fills.hide,
+                         len(s.SubLines.lines) == 0 or s.SubLines.hide,
                          tuple(s.manualLevels) )
 
-        if (data != self.lastdataset or contsettings != self.contsettings or
-            (self._cachedpolygons is None and len(s.Fills.fills) != 0)):
+        if data is self.lastdataset or contsettings != self.contsettings:
             self.updateContours()
             self.lastdataset = data
             self.contsettings = contsettings
 
         # plot the precalculated contours
         painter.beginPaintingWidget(self, posn)
+        painter.save()
+        self.clipAxesBounds(painter, axes, posn)
+
         self.plotContourFills(painter, posn, axes)
         self.plotContours(painter, posn, axes)
+        self.plotSubContours(painter, posn, axes)
+
+        painter.restore()
         painter.endPaintingWidget()
 
     def updateContours(self):
@@ -325,7 +388,8 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         d = self.document
 
-        levels = self._calculateLevels()
+        levels = self.calculateLevels()
+        sublevels = self.calculateSubLevels(levels)
 
         # find coordinates of image coordinate bounds
         data = d.data[s.data]
@@ -343,6 +407,7 @@ class Contour(plotters.GenericPlotter):
         # iterate over the levels and trace the contours
         self._cachedcontours = None
         self._cachedpolygons = None
+        self._cachedsubcontours = None
 
         if self.Cntr is not None:
             c = self.Cntr(xpts, ypts, data.data)
@@ -355,13 +420,20 @@ class Contour(plotters.GenericPlotter):
                     self._cachedcontours.append( finitePoly(linelist) )
 
             # trace the polygons between the contours
-            if len(s.Fills.fills) != 0 and len(levels) > 1:
+            if len(s.Fills.fills) != 0 and len(levels) > 1 and not s.Fills.hide:
                 self._cachedpolygons = []
                 for level1, level2 in izip(levels[:-1], levels[1:]):
                     linelist = c.trace(level1, level2)
                     self._cachedpolygons.append( finitePoly(linelist) )
 
-    def plotContourLabel(self, painter, number, xplt, yplt):
+            # trace sub-levels
+            if len(sublevels) > 0:
+                self._cachedsubcontours = []
+                for level in sublevels:
+                    linelist = c.trace(level)
+                    self._cachedsubcontours.append( finitePoly(linelist) )
+
+    def plotContourLabel(self, painter, number, xplt, yplt, showline):
         s = self.settings
         cl = s.get('ContourLabels')
 
@@ -395,10 +467,11 @@ class Contour(plotters.GenericPlotter):
             painter.setClipRegion(cr)
 
         # draw lines
-        pts = qt4.QPolygonF()
-        for x, y in izip(xplt, yplt):
-            pts.append( qt4.QPointF(x, y) )
-        painter.drawPolyline(pts)
+        if showline:
+            pts = qt4.QPolygonF()
+            for x, y in izip(xplt, yplt):
+                pts.append( qt4.QPointF(x, y) )
+            painter.drawPolyline(pts)
 
         # actually plot the label
         if showtext:
@@ -408,26 +481,22 @@ class Contour(plotters.GenericPlotter):
 
         painter.restore()
 
-    def plotContours(self, painter, posn, axes):
-        """Plot the traced contours on the painter."""
+    def _plotContours(self, painter, posn, axes, linestyles, contours,
+                      showlabels, hidelines):
+        """Plot a set of contours.
+        """
 
         s = self.settings
 
         # no lines cached as no line styles
-        if self._cachedcontours is None:
+        if contours is None:
             return
 
-        # ensure plotting of contours does not go outside the area
-        painter.save()
-        self.clipAxesBounds(painter, axes, posn)
-
-        showlabels = not s.ContourLabels.hide
-
         # iterate over each level, and list of lines
-        for num, linelist in enumerate(self._cachedcontours):
+        for num, linelist in enumerate(contours):
 
             # move to the next line style
-            painter.setPen(s.Lines.get('lines').makePen(painter, num))
+            painter.setPen(linestyles.makePen(painter, num))
                 
             # iterate over each complete line of the contour
             for curve in linelist:
@@ -441,14 +510,26 @@ class Contour(plotters.GenericPlotter):
                     pts.append( qt4.QPointF(x, y) )
 
                 if showlabels:
-                    self.plotContourLabel(painter, s.levelsOut[num], xplt, yplt)
+                    self.plotContourLabel(painter, s.levelsOut[num], xplt, yplt,
+                                          not hidelines)
                 else:
                     # actually draw the curve to the plotter
-                    if not s.Lines.hide:
+                    if not hidelines:
                         painter.drawPolyline(pts)
 
-        # remove clip region
-        painter.restore()
+    def plotContours(self, painter, posn, axes):
+        """Plot the traced contours on the painter."""
+        s = self.settings
+        self._plotContours(painter, posn, axes, s.Lines.get('lines'),
+                           self._cachedcontours,
+                           not s.ContourLabels.hide, s.Lines.hide)
+
+    def plotSubContours(self, painter, posn, axes):
+        """Plot sub contours on painter."""
+        s = self.settings
+        self._plotContours(painter, posn, axes, s.SubLines.get('lines'),
+                           self._cachedsubcontours,
+                           False, s.SubLines.hide)
 
     def plotContourFills(self, painter, posn, axes):
         """Plot the traced contours on the painter."""
@@ -456,12 +537,10 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
 
         # don't draw if there are no cached polygons
-        if self._cachedpolygons is None:
+        if self._cachedpolygons is None and not s.Fills.hide:
             return
 
         # ensure plotting of contours does not go outside the area
-        painter.save()
-        self.clipAxesBounds(painter, axes, posn)
         painter.setPen(qt4.QPen(qt4.Qt.NoPen))
 
         # iterate over each level, and list of lines
@@ -476,17 +555,10 @@ class Contour(plotters.GenericPlotter):
                 xplt = axes[0].dataToPlotterCoords(posn, poly[:,0])
                 yplt = axes[1].dataToPlotterCoords(posn, poly[:,1])
 
-                # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
                 for x, y in izip(xplt, yplt):
                     pts.append( qt4.QPointF(x, y) )
-
-                # actually draw the curve to the plotter
-                if not s.Fills.hide:
-                    painter.drawPolygon(pts)
-
-        # remove clip region
-        painter.restore()
+                painter.drawPolygon(pts)
 
 # allow the factory to instantiate a contour
 document.thefactory.register( Contour )
