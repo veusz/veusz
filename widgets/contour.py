@@ -265,37 +265,42 @@ class Contour(plotters.GenericPlotter):
         # we do this to convert array to list of floats
         s.levelsOut = [float(i) for i in levels]
 
-        return levels
+        return minval, maxval, levels
 
-    def calculateSubLevels(self, levels):
+    def calculateSubLevels(self, minval, maxval, levels):
         """Calculate sublevels between contours."""
         s = self.settings
         num = s.SubLines.numLevels
         if s.SubLines.hide or len(s.SubLines.lines) == 0:
             return N.array([])
 
-        scaling = s.scaling
-        # iterate over pairs of contours
-        out = []
-        for conmin, conmax in izip(levels[:-1], levels[1:]):
-            drange = N.arange(1, num)
-            if scaling == 'linear' or scaling == 'manual':
-                delta = (conmax-conmin) / num
-                slev = conmin + drange*delta
-            elif scaling == 'sqrt':
-                delta = N.sqrt(conmax-conmin) / num
-                slev = conmin + (drange*delta)**2
-            elif scaling == 'log':
-                delta = N.log(conmax-conmin) / num
-                slev = conmin + N.exp(drange*delta)
-            elif scaling == 'squared':
-                delta = (conmax-conmin)**2 / num
-                slev = conmin + N.sqrt(drange*delta)
-            out.append(slev)
+        # indices where contour levels should be placed
+        indices = N.arange(len(levels)*num)
+        indices = indices[indices % num != 0]
 
-        if len(out) == 0:
-            out.append([])
-        return N.hstack(out)
+        numcont = (len(levels)-1) * num
+        scaling = s.scaling
+        if scaling == 'linear':
+            delta = (maxval-minval) / numcont
+            slev = indices*delta + minval
+        elif scaling == 'log':
+            delta = N.log( maxval-minval ) / numcont
+            slev = minval + N.exp(indices*delta)
+        elif scaling == 'sqrt':
+            delta = N.sqrt( maxval-minval ) / numcont
+            slev = minval + (indices*delta)**2
+        elif scaling == 'squared':
+            delta = (maxval-minval)**2 / numcont
+            slev = minval + N.sqrt(indices*delta)
+        elif scaling == 'manual':
+            drange = N.arange(1, num)
+            out = [[]]
+            for conmin, conmax in izip(levels[:-1], levels[1:]):
+                delta = (conmax-conmin) / num
+                out.append( conmin+drange*delta )
+            slev = N.hstack(out)
+
+        return slev
 
     def providesAxesDependency(self):
         """Range information provided by widget."""
@@ -388,8 +393,8 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         d = self.document
 
-        levels = self.calculateLevels()
-        sublevels = self.calculateSubLevels(levels)
+        minval, maxval, levels = self.calculateLevels()
+        sublevels = self.calculateSubLevels(minval, maxval, levels)
 
         # find coordinates of image coordinate bounds
         data = d.data[s.data]
