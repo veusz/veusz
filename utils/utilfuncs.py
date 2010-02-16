@@ -110,9 +110,9 @@ def extendedColorToQColor(s):
         return qt4.QColor(s)
 
 def extendedColorFromQColor(col):
-    """Make an extended color #RRGGBBAAA or #RRGGBB string."""
+    """Make an extended color #RRGGBBAA or #RRGGBB string."""
     if col.alpha() == 255:
-        return col.name()
+        return str(col.name())
     else:
         return '#%02x%02x%02x%02x' % (col.red(), col.green(), col.blue(),
                                       col.alpha())
