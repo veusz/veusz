@@ -242,22 +242,6 @@ class Text(Settings):
         """ Return a qt4.QPen object for the font pen """
         return qt4.QPen(qt4.QColor(self.color))
         
-
-class ContourLabel(Text):
-    """For tick labels on axes."""
-
-    def __init__(self, name, **args):
-        Text.__init__(self, name, **args)
-        self.add( setting.Str( 'format', '%Vg',
-                               descr = 'Format of the tick labels',
-                               usertext='Format') )
-        self.add( setting.Float('scale', 1.,
-                                descr='A scale factor to apply to the values '
-                                'of the tick labels',
-                                usertext='Scale') )
-
-        self.get('hide').newDefault(True)
-
 class PointLabel(Text):
     """For labelling points on plots."""
 

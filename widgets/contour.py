@@ -94,6 +94,21 @@ class SubContourLines(setting.Settings):
                                usertext='Hide',
                                formatting=True) )
 
+class ContourLabel(setting.Text):
+    """For tick labels on axes."""
+
+    def __init__(self, name, **args):
+        setting.Text.__init__(self, name, **args)
+        self.add( setting.Str( 'format', '%.3Vg',
+                               descr = 'Format of the tick labels',
+                               usertext='Format') )
+        self.add( setting.Float('scale', 1.,
+                                descr='A scale factor to apply to the values '
+                                'of the tick labels',
+                                usertext='Scale') )
+
+        self.get('hide').newDefault(True)
+
 class Contour(plotters.GenericPlotter):
     """A class which plots contours on a graph with a specified
     coordinate system."""
@@ -169,9 +184,9 @@ class Contour(plotters.GenericPlotter):
                                  usertext='Output levels'),
                6, readonly=True )
 
-        s.add( setting.ContourLabel('ContourLabels',
-                                    descr = 'Contour label settings',
-                                    usertext = 'Contour labels'),
+        s.add( ContourLabel('ContourLabels',
+                            descr = 'Contour label settings',
+                            usertext = 'Contour labels'),
                pixmap = 'settings_axisticklabels' )
 
         s.add( ContourLines('Lines',
@@ -370,7 +385,7 @@ class Contour(plotters.GenericPlotter):
                          len(s.SubLines.lines) == 0 or s.SubLines.hide,
                          tuple(s.manualLevels) )
 
-        if data is self.lastdataset or contsettings != self.contsettings:
+        if data is not self.lastdataset or contsettings != self.contsettings:
             self.updateContours()
             self.lastdataset = data
             self.contsettings = contsettings
