@@ -23,8 +23,6 @@ import struct
 import cPickle
 import socket
 
-sys.path.insert(0, '/data/jss/veusz/code')
-
 import veusz.qtall as qt4
 from veusz.windows.simplewindow import SimpleWindow
 import veusz.document as document
