@@ -557,7 +557,7 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
 
         # don't draw if there are no cached polygons
-        if self._cachedpolygons is None and not s.Fills.hide:
+        if self._cachedpolygons is None or s.Fills.hide:
             return
 
         # ensure plotting of contours does not go outside the area
