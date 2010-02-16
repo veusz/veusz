@@ -31,9 +31,9 @@ void addNumpyToPolygonF(QPolygonF *poly,
   // get sizes of objects first
   const int numcols = d.size();
   std::vector<int> sizes;
-  for(int i=0; i<numcols; i++)
+  for(int i = 0; i != numcols; ++i)
     sizes.push_back(d[i]->size());
-  
+
   // iterate over rows until none left
   for(int row=0 ; ; ++row)
     {
@@ -57,18 +57,13 @@ void addNumpyToPolygonF(QPolygonF *poly,
 void plotPathsToPainter(QPainter* painter, QPainterPath* path,
 			const doublearray* x, const doublearray* y)
 {
-  const double* xi = & x->operator[](0);
-  const double* yi = & y->operator[](0);
-  const double* const xend = xi + x->size();
-  const double* const yend = yi + y->size();
-
-  for( ; xi != xend && yi != yend; ++xi, ++yi)
+  const size_t size = std::min(x->size(), y->size());
+  for(size_t i = 0; i != size; ++i)
     {
-      painter->translate(*xi, *yi);
+      painter->translate((*x)[i], (*y)[i]);
       painter->drawPath(*path);
-      painter->translate(-*xi, -*yi);
+      painter->translate(-(*x)[i], -(*y)[i]);
     }
-
 }
 
 void plotLinesToPainter(QPainter* painter,
@@ -81,17 +76,11 @@ void plotLinesToPainter(QPainter* painter,
   if( maxsize != 0 )
     {
       QVector<QLineF> lines;
-
-      const double* x1p = &((*x1)[0]);
-      const double* x2p = &((*x2)[0]);
-      const double* y1p = &((*y1)[0]);
-      const double* y2p = &((*y2)[0]);
-      for( size_t i = 0; i != maxsize; ++i)
+      for(size_t i = 0; i != maxsize; ++i)
 	{
-	  lines << QLineF(*x1p, *y1p, *x2p, *y2p);
-	  ++x1p; ++x2p; ++y1p; ++y2p;
+	  lines << QLineF((*x1)[i], (*y1)[i], (*x2)[i], (*y2)[i]);
 	}
-      
+
       painter->drawLines(lines);
     }
 }
