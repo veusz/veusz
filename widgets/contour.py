@@ -80,7 +80,7 @@ class SubContourLines(setting.Settings):
         setting.Settings.__init__(self, name, **args)
         self.add( setting.LineSet(
                 'lines',
-                [('dot2', '1pt', 'black', False)],
+                [('dot1', '1pt', 'black', False)],
                 descr = 'Line styles used for sub-contours',
                 usertext='Line styles',
                 formatting=True) )
@@ -252,8 +252,8 @@ class Contour(plotters.GenericPlotter):
                 delta = N.sqrt(maxval - minval) / (numlevels-1)
                 levels = minval + (N.arange(numlevels)*delta)**2
             elif scaling == 'log':
-                delta = N.log(maxval - minval) / (numlevels-1)
-                levels = minval + N.exp(N.arange(numlevels)*delta)
+                delta = N.log(maxval/minval) / (numlevels-1)
+                levels = N.exp(N.arange(numlevels)*delta)*minval
             elif scaling == 'squared':
                 delta = (maxval - minval)**2 / (numlevels-1)
                 levels = minval + N.sqrt(N.arange(numlevels)*delta)
@@ -275,17 +275,17 @@ class Contour(plotters.GenericPlotter):
             return N.array([])
 
         # indices where contour levels should be placed
-        indices = N.arange(len(levels)*num)
+        numcont = (len(levels)-1) * num
+        indices = N.arange(numcont)
         indices = indices[indices % num != 0]
 
-        numcont = (len(levels)-1) * num
         scaling = s.scaling
         if scaling == 'linear':
             delta = (maxval-minval) / numcont
             slev = indices*delta + minval
         elif scaling == 'log':
-            delta = N.log( maxval-minval ) / numcont
-            slev = minval + N.exp(indices*delta)
+            delta = N.log( maxval/minval ) / numcont
+            slev = N.exp(indices*delta) * minval
         elif scaling == 'sqrt':
             delta = N.sqrt( maxval-minval ) / numcont
             slev = minval + (indices*delta)**2
