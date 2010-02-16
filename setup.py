@@ -26,9 +26,11 @@ see the file INSTALL for details on how to install Veusz
 """
 
 import glob
+import os.path
+import sys
+
 import numpy
 import PyQt4
-import os.path
 
 from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
@@ -52,6 +54,12 @@ class smart_install_data(install_data):
         install_cmd = self.get_finalized_command('install')
         self.install_dir = getattr(install_cmd, 'install_lib')
         return install_data.run(self)
+
+# libraries to link extension against
+if sys.platform == 'win32':
+    ext_libs = ['QtGui4', 'QtCore4']
+else:
+    ext_libs = ['QtGui', 'QtCore']
 
 qtcfg = PyQt4.pyqtconfig.Configuration()
 
@@ -117,7 +125,7 @@ setup(name = 'veusz',
                                               qtcfg.qt_inc_dir,
                                               numpy.get_include()],
                                 library_dirs = [qtcfg.qt_lib_dir],
-                                libraries = ['QtGui', 'QtCore'],
+                                libraries = ext_libs,
                                 ),
                       ],
                                 
