@@ -178,11 +178,16 @@ class Contour(plotters.GenericPlotter):
                                  descr = 'Levels to use for manual scaling',
                                  usertext='Manual levels'),
                5 )
+
+        s.add( setting.Bool('keyLevels', False, descr='Show levels in key',
+                            usertext='Levels in key'),
+               6 )
+
         s.add( setting.FloatList('levelsOut',
                                  [],
                                  descr = 'Levels used in the plot',
                                  usertext='Output levels'),
-               6, readonly=True )
+               7, readonly=True )
 
         s.add( ContourLabel('ContourLabels',
                             descr = 'Contour label settings',
@@ -206,6 +211,8 @@ class Contour(plotters.GenericPlotter):
 
         s.add( setting.SettingBackwardCompat('lines', 'Lines/lines', None) )
         s.add( setting.SettingBackwardCompat('fills', 'Fills/fills', None) )
+
+        s.remove('key')
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -329,13 +336,9 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         d = self.document
 
-        # return if no data
-        if s.data not in d.data:
-            return
-
-        # return if the dataset isn't two dimensional
-        data = d.data[s.data]
-        if data.dimensions != 2:
+        # return if no data or if the dataset isn't two dimensional
+        data = d.data.get(s.data, None)
+        if data is None or data.dimensions != 2:
             return
 
         if depname == 'sx':
@@ -347,13 +350,63 @@ class Contour(plotters.GenericPlotter):
             axrange[0] = min( axrange[0], dyrange[0] )
             axrange[1] = max( axrange[1], dyrange[1] )
 
+    def getNumberKeys(self):
+        """How many keys to show."""
+        self.checkContoursUpToDate()
+        if self.settings.keyLevels:
+            return len( self.settings.levelsOut )
+        else:
+            return 0
+
+    def getKeyText(self, number):
+        """Get key entry."""
+        s = self.settings
+        if s.keyLevels:
+            cl = s.get('ContourLabels')
+            return utils.formatNumber( s.levelsOut[number] * cl.scale,
+                                       cl.format )
+        else:
+            return ''
+
+    def drawKeySymbol(self, number, painter, x, y, width, height):
+        """Draw key for contour level."""
+        painter.setPen(
+            self.settings.Lines.get('lines').makePen(painter, number))
+        painter.drawLine(x, y+height/2, x+width, y+height/2)
+
+    def checkContoursUpToDate(self):
+        """Update contours if necessary.
+        Returns True if okay to plot contours, False if error
+        """
+
+        s = self.settings
+        d = self.document
+
+        # return if no data or if the dataset isn't two dimensional
+        data = d.data.get(s.data, None)
+        if data is None or data.dimensions != 2:
+            self.contsettings = self.lastdataset = None
+            s.levelsOut = []
+            return False
+
+        contsettings = ( s.min, s.max, s.numLevels, s.scaling,
+                         len(s.Fills.fills) == 0 or s.Fills.hide,
+                         len(s.SubLines.lines) == 0 or s.SubLines.hide,
+                         tuple(s.manualLevels) )
+
+        if data is not self.lastdataset or contsettings != self.contsettings:
+            self.updateContours()
+            self.lastdataset = data
+            self.contsettings = contsettings
+
+        return True
+
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the contours."""
 
         posn = plotters.GenericPlotter.draw(self, parentposn, painter,
                                             outerbounds = outerbounds)
         s = self.settings
-        d = self.document
 
         # do not paint if hidden
         if s.hide:
@@ -365,30 +418,12 @@ class Contour(plotters.GenericPlotter):
         # return if there's no proper axes
         if ( None in axes or
              axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' or
-             s.data not in d.data ):
+             axes[1].settings.direction != 'vertical' ):
             return
 
-        # return if the dataset isn't two dimensional
-        data = d.data[s.data]
-        if data.dimensions != 2:
+        # update contours if necessary
+        if not self.checkContoursUpToDate():
             return
-
-        # delete cached polygons if no filling
-        if len(s.Fills.fills) == 0:
-            self._cachedpolygons = None
-
-        # recalculate contours if image has changed
-        # we also recalculate if the user has switched on fills
-        contsettings = ( s.min, s.max, s.numLevels, s.scaling,
-                         len(s.Fills.fills) == 0 or s.Fills.hide,
-                         len(s.SubLines.lines) == 0 or s.SubLines.hide,
-                         tuple(s.manualLevels) )
-
-        if data is not self.lastdataset or contsettings != self.contsettings:
-            self.updateContours()
-            self.lastdataset = data
-            self.contsettings = contsettings
 
         # plot the precalculated contours
         painter.beginPaintingWidget(self, posn)
@@ -460,8 +495,7 @@ class Contour(plotters.GenericPlotter):
         painter.save()
 
         # get text and font
-        text = utils.formatNumber(number * cl.scale,
-                                  s.ContourLabels.format)
+        text = utils.formatNumber(number * cl.scale, cl.format)
         font = cl.makeQFont(painter)
         descent = qt4.QFontMetrics(font).descent()
 
