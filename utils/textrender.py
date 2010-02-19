@@ -672,6 +672,9 @@ class Renderer:
         self.y = y
         self.calcbounds = None
 
+        # debug position
+        #self.painter.drawPoint( qt4.QPointF(self.x, self.y) )
+
     def getBounds(self):
         """Get bounds of text on screen."""
 
