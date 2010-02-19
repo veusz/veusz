@@ -1,4 +1,4 @@
-#    Copyright (C) 2003-2009 Jeremy S. Sanders
+#    Copyright (C) 2003 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -573,7 +573,9 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self.coordReflected or s.outerticks:
+        if self.coordReflected:
+            delta *= -1
+        if s.outerticks:
             delta *= -1
         
         y = minorticks*0.+self.coordPerp
@@ -594,7 +596,9 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self.coordReflected or s.outerticks:
+        if self.coordReflected:
+            delta *= -1
+        if s.outerticks:
             delta *= -1
 
         y = tickcoords*0.+self.coordPerp
@@ -628,7 +632,8 @@ class Axis(widget.Widget):
                     if N.isfinite(coord) and (minval <= coord <= maxval):
                         yield pcoord, lab
 
-    def _drawTickLabels(self, painter, coordticks, sign, texttorender):
+    def _drawTickLabels(self, painter, coordticks, sign, outerbounds,
+                        texttorender):
         """Draw tick labels on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -702,7 +707,15 @@ class Axis(widget.Widget):
 
             r = utils.Renderer(painter, font, x, y, text, alignhorz=ax,
                                alignvert=ay, angle=angle)
-            r.ensureInBox(extraspace=True, **bounds)
+            if outerbounds is not None:
+                # make sure ticks are within plot
+                if vertical:
+                    r.ensureInBox(miny=outerbounds[1], maxy=outerbounds[3],
+                                  extraspace=True)
+                else:
+                    r.ensureInBox(minx=outerbounds[0], maxx=outerbounds[2],
+                                  extraspace=True)
+
             bnd = r.getBounds()
             texttorender.append( (r, pen) )
 
@@ -901,7 +914,8 @@ class Axis(widget.Widget):
 
         # plot tick labels
         if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(painter, coordticks, sign, texttorender)
+            self._drawTickLabels(painter, coordticks, sign, outerbounds,
+                                 texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:

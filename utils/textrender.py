@@ -665,6 +665,7 @@ class Renderer:
         self.angle = angle
         self.usefullheight = usefullheight
 
+        #self.text = text
         partlist = makePartList(text)
         self.parttree = makePartTree(partlist)
 
@@ -696,9 +697,8 @@ class Renderer:
             if self.alignvert == 0:
                 # if want vertical centering, better to centre around middle
                 # of typical letter (i.e. where strike position is)
-                totalheight = fm.strikeOutPos()*2
-                #totalheight = fm.boundingRect(qt4.QChar('0')).height()
-
+                #totalheight = fm.strikeOutPos()*2
+                totalheight = fm.boundingRect(qt4.QChar('0')).height()
             else:
                 # if top/bottom alignment, better to use maximum letter height
                 totalheight = fm.ascent()
@@ -746,7 +746,7 @@ class Renderer:
             yr = ( self.y + (newbound[1]-newbound[3]), self.y )
             self.yi = self.y + (newy[0] - newbound[3])
         elif self.alignvert > 0:
-            yr = ( self.y, self.y + (newbound[3]-newbound[1]))
+            yr = ( self.y, self.y + (newbound[3]-newbound[1]) )
             self.yi = self.y + (newy[0] - newbound[1])
         else:
             yr = ( self.y+newbound[1], self.y+newbound[3] )
@@ -767,7 +767,7 @@ class Renderer:
         # add a small amount of extra room if requested
         if extraspace:
             self.painter.setFont(self.font)
-            l = qt4.QFontMetricsF(self.font, self.painter.device()).leading()
+            l = qt4.QFontMetricsF(self.font, self.painter.device()).height()*0.1
             minx += l
             maxx -= l
             miny += l
