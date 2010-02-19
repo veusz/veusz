@@ -35,8 +35,11 @@ x(text) y(date) z(number),+-
 
 z+-[1:5] means read z_1+- z_2+- ... z_5+-
 
-Indicices can be unspecified, [], [:], [1:], [:5]
+Indicices can be unspecified, [:], [1:], [:5]
 The first 3 mean the same thing, the last means read from 1 to 5
+
+Commas are now optional in 1.6, so descriptors can look like
+x +- y + -
 """
 
 import re
@@ -46,6 +49,91 @@ import numpy as N
 
 import veusz.utils as utils
 import datasets
+
+# a regular expression for splitting descriptor into tokens
+descrtokens_split_re = re.compile(r'''
+(
+ `[^`]*`       |  # quoted name
+ [ ,]          |  # comma or space
+ \([a-z]+?\)   |  # data type
+ \+- | \+ | -  |  # error bars
+ \[.*?\]          # indices
+)
+''', re.VERBOSE)
+
+range_re = re.compile(r'''^
+ \[
+ (-?[0-9]+)? 
+ :
+ (-?[0-9]+)? 
+ \]
+$''', re.VERBOSE)
+
+def interpretDescriptor(descr):
+    """Get a descriptor and create a set of descriptor objects."""
+
+    parts = []
+
+    split = descrtokens_split_re.split(descr.strip())
+    tokens = [x for x in split if x != '']
+    # make sure that last dataset is added
+    tokens += ['DUMMY']
+
+    name = datatype = idxrange = None
+    columns = []
+    for tokenindex, token in enumerate(tokens):
+        # skip spaces
+        if token == ' ':
+            if tokenindex > 0 and tokens[tokenindex-1] == ',':
+                columns.append(',')
+            continue
+
+        # ignore column
+        if token == ',':
+            if tokenindex == 0 or ( tokens[tokenindex-1] == ',' or
+                                    tokens[tokenindex-1] == ' ' ):
+                columns.append(',')
+            continue
+
+        # does token match datatype name?
+        if ( token[0] == '(' and token[-1] == ')' and
+             token[1:-1] in datatype_name_convert ):
+            datatype = datatype_name_convert[token[1:-1]]
+            continue
+
+        # match error bars
+        if token in ('+', '-', '+-'):
+            columns.append(token)
+            continue
+
+        # does token match a range?
+        m = range_re.match(token)
+        if m:
+            if m.group(1):
+                startindex = int(m.group(1))
+            else:
+                startindex = 1
+            if m.group(2):
+                stopindex = int(m.group(2))
+            else:
+                stopindex = 999999999
+            idxrange = (startindex, stopindex)
+            continue
+
+        # quoted dataset name, so remove quotes
+        if token[0] == '`' and token[-1] == '`':
+            token = token[1:-1]
+
+        # add previous entry
+        if name is not None:
+            parts.append( DescriptorPart(name, datatype, columns, idxrange) )
+            name = datatype = idxrange = None
+            columns = []
+
+        columns.append('D')
+        name = token
+
+    return parts
 
 class DescriptorError(ValueError):
     """Used to indicate an error with the descriptor."""
@@ -73,7 +161,7 @@ datatype_name_convert = {
     'text': 'string',
     'string': 'string',
     'date': 'date',
-    'time': 'time'
+    'time': 'date'
     }
 
 def guessDataType(val):
@@ -108,101 +196,28 @@ def guessDataType(val):
     # assume string otherwise
     return 'string'
 
-class _DescriptorPart(object):
-    """Represents part of a descriptor, e.g. 'x,+,-'
-    """
+class DescriptorPart(object):
+    """Represents part of a descriptor."""
 
-    # split up descriptor name into bits
-    partsplitter_re = re.compile( r'''
-    (
-     \+- |                      # +- error
-     \+  |                      # + error
-     -   |                      # - error
-     [\.a-zA-Z0-9_]+         |  # name
-     \[[\-0-9]*[:][\-0-9]*\] |  # bracket brange
-     ,   |                      # separator
-     \([a-zA-Z]+\)              # data type
-    )
-    ''', re.VERBOSE)
+    def __init__(self, name, datatype, columns, idxrange):
+        """Construct DescriptorPart
+        name is dataset name
+        datatype is None or one of the possible options
+        columns is a list of the columns '+', '-', '+-', ',' or 'D'
+         for errors, ignoring a column or a data column
+        idxrange is None or a tuple (minidx, maxidx)
+        """
+        self.name = name
+        self.datatype = datatype
+        self.columns = tuple(columns)
 
-    def __init__(self, text):
-        """Initialise descriptor for 1 variable plus errors."""
-
-        self.name = None
         self.errorcount = 0
-        self.columns = []
-
-        # for ranges
-        self.startindex = None
-        self.stopindex = None
-
-        # type of data
-        self.datatype = None
-
-        # split up the expression into its components (removing blank parts)
-        parts = self.partsplitter_re.split(text)
-        parts = [p for p in parts if p != ""]
-
-        for count, part in enumerate(parts):
-            if part == '+-':
-                self.columns.append('SYM')
-            elif part == '+':
-                self.columns.append('POS')
-            elif part == '-':
-                self.columns.append('NEG')
-
-            # there's no match on this part
-            elif self.partsplitter_re.match(part) is None:
-                raise DescriptorError, ( 'Cannot understand descriptor '
-                                         'syntax "%s"' % part )
-
-            # column indicator
-            elif part[0] == '[':
-                # remove brackets
-                part = part[1:-1]
-
-                # retrieve start and stop values if specified
-                colon = part.find(':')
-                if colon >= 0:
-                    startindex = part[:colon]
-                    stopindex = part[colon+1:]
-
-                    if len(startindex) > 0:
-                        self.startindex = int(startindex)
-                    else:
-                        self.startindex = 1
-                    if len(stopindex) > 0:
-                        self.stopindex = int(stopindex)
-                    else:
-                        self.stopindex = 999999
-
-            elif part == ',':
-                # multiple commas skip columns
-                if count == len(parts)-1 or parts[count+1] == ',':
-                    self.columns.append('SKIP')
-
-            elif part[0] == '(':
-                dtype = part[1:-1]
-                try:
-                    # lookup datatype conversion
-                    self.datatype = datatype_name_convert[dtype]
-                except KeyError:
-                    raise DescriptorError, \
-                          'Invalid data type "%s" in descriptor' % dtype
-
-            # must be variable name
-            else:
-                self.columns.append('DATA')
-                self.name = part
-
-        if self.name is None:
-            raise DescriptorError, 'Value name missing in "%s"' % text
-
-        # Calculate indicies for looping over values
-        self.single = self.startindex is None and self.stopindex is None
+        
+        self.single = idxrange is None
         if self.single:
-            # one value only
             self.startindex = self.stopindex = 1
+        else:
+            self.startindex, self.stopindex = idxrange
 
     def readFromStream(self, stream, thedatasets, block=None):
         """Read data from stream, and write to thedatasets."""
@@ -279,14 +294,23 @@ class _DescriptorPart(object):
                 name += '_%i' % block
 
             # does the dataset exist?
-            if name+'\0DATA' in thedatasets:
-                vals = thedatasets[name+'\0DATA']
+            if name+'\0D' in thedatasets:
+                vals = thedatasets[name+'\0D']
                 pos = neg = sym = None
 
                 # retrieve the data for this dataset
-                if name+'\0POS' in thedatasets: pos = thedatasets[name+'\0POS']
-                if name+'\0NEG' in thedatasets: neg = thedatasets[name+'\0NEG']
-                if name+'\0SYM' in thedatasets: sym = thedatasets[name+'\0SYM']
+                if name+'\0+' in thedatasets: pos = thedatasets[name+'\0+']
+                if name+'\0-' in thedatasets: neg = thedatasets[name+'\0-']
+                if name+'\0+-' in thedatasets: sym = thedatasets[name+'\0+-']
+
+                # make sure components are the same length
+                minlength = 99999999999999
+                for ds in vals, pos, neg, sym:
+                    if ds is not None and len(ds) < minlength:
+                        minlength = len(ds)
+                for ds in vals, pos, neg, sym:
+                    if ds is not None and len(ds) != minlength:
+                        ds = ds[:minlength]
 
                 # only remember last N values
                 if tail is not None:
@@ -317,6 +341,9 @@ class Stream(object):
     # this regular expression is for splitting up the stream into words
     # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
     split_re = re.compile( r'''
+    `.+?`[^ \t\n#!%;]* | # match dataset name quoted in back-ticks
+                         # we also need to match following characters to catch
+                         # corner cases in the descriptor
     u?"" |          # match empty double-quoted string
     u?".*?[^\\]" |  # match double-quoted string, ignoring escaped quotes
     u?'' |          # match empty single-quoted string
@@ -413,7 +440,7 @@ class SimpleRead(object):
     def _parseDescriptor(self, descriptor):
         """Take a descriptor, and parse it into its individual parts."""
 
-        self.parts = [_DescriptorPart(p) for p in descriptor.split()]
+        self.parts = interpretDescriptor(descriptor)
 
     def readData(self, stream, useblocks=False, ignoretext=False):
         """Read in the data from the stream.
@@ -498,8 +525,8 @@ class SimpleRead(object):
         of entries read."""
         out = {}
         for name, data in self.datasets.iteritems():
-            if name[-5:] == '\0DATA':
-                out[name[:-5]] = len(data)
+            if name[-2:] == '\0D':
+                out[name[:-2]] = len(data)
         return out
 
     def setInDocument(self, document, linkedfile=None,

@@ -71,25 +71,25 @@
       <para>Here I define some terminology for future use.</para>
 
       <section>
-	<title>Part</title>
-	<para>A document and its graphs are built up from
-	  parts. These parts can often by placed within each
-	  other, depending on the type of the part. A part has
-	  children, those parts placed within it, and its
-	  parent. The parts have a number of different settings
-	  which modify their behaviour. These include the font to be
-	  used, the line thickness, and whether an axis is
-	  logarithmic. In addition they have actions, which perform
-	  some sort of activity on the part or its children, like
-	  "fit" for a fit part.</para>
+	<title>Widget</title>
+	<para>A document and its graphs are built up from widgets.
+	   These widgets can often by placed within each other,
+	   depending on the type of the widget. A widget has children,
+	   those widgets placed within it, and its parent. The widgets
+	   have a number of different settings which modify their
+	   behaviour. These include the font to be used, the line
+	   thickness, and whether an axis is logarithmic. In addition
+	   they have actions, which perform some sort of activity on
+	   the widget or its children, like "fit" for a fit
+	   widget.</para>
 	
-	<para>Parts are specified with a "path", like a file in Unix
-	or Windows. These can be relative to the current part (do
+	<para>Widgets are specified with a "path", like a file in Unix
+	or Windows. These can be relative to the current widget (do
 	not start with a slash), or absolute (do not start with a
 	slash). Examples of paths include, "/page1/graph1/x", "x" and
 	".".</para>
 
-	<para>The part types include</para>
+	<para>The widget types include</para>
 	
 	<orderedlist>
 	  <listitem>
@@ -111,12 +111,12 @@
 	      grid. Contained within the graph are its axes and
 	      plotters. A graph can be given a background fill and a
 	      border if required. It also has a margin, which
-	      specifies how far away from the edge of its parent part
+	      specifies how far away from the edge of its parent widget
 	      to plot the body of the graph.</para>
 
 	    <para>A graph can contain several axes, at any position
 	      on the plot. In addition a graph can use axes defined in
-	      parent parts, shared with other graphs.</para>
+	      parent widgets, shared with other graphs.</para>
 
 	    <para>More than one graph can be placed within in a
 	      page. The margins can be adjusted so that they lie
@@ -151,9 +151,9 @@
 	  </listitem>
 
 	  <listitem>
-	    <para>plotters - types of parts which plot data or add
+	    <para>plotters - types of widgets which plot data or add
 	      other things on a graph. There is no actual plotter
-	      part which can be added, but several types of plotters
+	      widget which can be added, but several types of plotters
 	      listed below. Plotters typically take an axis as a
 	      setting, which is the axis used to plot the data on the
 	      graph (default x and y).</para>
@@ -189,7 +189,7 @@
 		  (note that it doesn't yet do the binning of the
 		  data).</para>
 
-		<para>The settings for the xy part are the various
+		<para>The settings for the xy widget are the various
 		  attibutes for the points, line and error bars, the
 		  datasets to plot, and the axes to plot on.</para>
 
@@ -207,7 +207,7 @@
 		  data. This plotter is a like the function plotter,
 		  but allows fitting of the function to data. This is
 		  achived by clicking on a "fit" button, or using the
-		  "fit" action of the part. The fitter takes a
+		  "fit" action of the widget. The fitter takes a
 		  function to fit containing the unknowns,
 		  e.g. "a*x**2 + b*x + c", and initial values for the
 		  variables (here a, b and c). It then fits the data
@@ -222,7 +222,7 @@
 		  everywhere, or symmetrises asymmetric errors.</para>
 
 		<para>Note that more work is required in this
-		  part, as if a parameter is not well defined by the
+		  widget, as if a parameter is not well defined by the
 		  data, the matrix inversion in the fit will fail. In
 		  addition Veusz does not supply estimates for the
 		  errors or the final chi-squared in a machine
@@ -256,15 +256,15 @@
 		  key looks for "key" settings of the other data
 		  plotted within a graph. If there any it builds up a
 		  box containing the symbol and line for the plotter,
-		  and the text in the "key" setting of the part. This
+		  and the text in the "key" setting of the widget. This
 		  allows a key to be very easily added to a
 		  plot.</para>
 
 		<para>The key may be placed in any of the corners of
 		  the plot, in the centre, or manually
-		  placed. Depending on the ordering of the parts,
+		  placed. Depending on the ordering of the widgets,
 		  the key will be placed behind or on top of the
-		  part. The key can be filled and surrounded by a
+		  widget. The key can be filled and surrounded by a
 		  box, or not filled or surrounded.</para>
 	      </listitem>
 
@@ -322,6 +322,15 @@
 		</para>
 	      </listitem>
 
+	      <listitem>
+		<para><command>polygon</command> - plot x and y points
+		from datasets as a polygon. The polygon can be placed
+		directly on the page or within a graph. Coordinates
+		are either plotted using the axis or as fractions of
+		the width and height of the containing widget.
+		</para>
+	      </listitem>
+
 	    </orderedlist>
 
 	  </listitem>
@@ -342,7 +351,7 @@
       <section>
 	<title>Settings</title>
 
-	<para>The various settings of the parts come in a number of
+	<para>The various settings of the widgets come in a number of
 	types, including integers (e.g. 10), floats (e.g. 3.14), text
 	("hi there!"), distances (see above), options ("horizontal" or
 	"vertical" for axes).</para>
@@ -355,6 +364,19 @@
 	<para>In the GUI, the current page is replotted if a setting
 	is changed when enter is pressed or the user moves to another
 	setting.</para>
+
+	<para>The settings are split up into formatting settings,
+	controlling the appearance of the plot, or properties,
+	controlling what is plotted and how it is plotted.</para>
+
+	<para>Default settings, including the default font and line
+	style, and the default settings for any graph widget, can be
+	modified in the "Default styles" dialog box under the "Edit"
+	menu. Default settings are set on a per-document basis, but
+	can be saved into a separate file and loaded. A default
+	default settings file can be given to use for new documents
+	(set in the preferences dialog).</para>
+
       </section>
 
       <section>
@@ -488,9 +510,9 @@
       explanation for what it does called a "tool tip".</para>
 
       <para>Below the main toolbar is a second toolbar for
-      constructing the graph by adding parts (on the left), and some
-      editing buttons. The add part buttons add the request part to
-      the currently selected part in the selection window. The parts
+      constructing the graph by adding widgets (on the left), and some
+      editing buttons. The add widget buttons add the request widget to
+      the currently selected widget in the selection window. The widgets
       are arranged in a tree-like structure.</para>
 
       <para>Below these toolbars and to the right is the plot
@@ -504,19 +526,19 @@
 
       <para>To the left of the plot window is the selection window,
       and the properties and formatting windows. The properties window
-      lets you edit various aspects of the selected part (such as the
+      lets you edit various aspects of the selected widget (such as the
       minimum and maximum values on an axis). Changing these values
       should update the plot. The formatting lets you modify the
-      appearance of the selected part. There are a series of tabs for
+      appearance of the selected widget. There are a series of tabs for
       choosing what aspect to modify.</para>
 
       <para>The various windows can be "dragged" from the main window
       to "float" by themselves on the screen.</para>
 
       <para>To the bottom of the window is the console. This window is
-      not shown in recent versions of Veusz by default, but can be
-      enabled in the View menu. The console is a Veusz and Python
-      command line console. To read about the commands available
+      not shown by default, but can be enabled in the View menu. The
+      console is a Veusz and Python command line console. To read
+      about the commands available
       see <link linkend="Commands">Commands</link>. As this is a
       Python console, you can enter mathematical expressions
       (e.g. "1+2.0*cos(pi/4)") here and they will be evaluated when
@@ -534,8 +556,8 @@
       <para>After opening Veusz, on the left of the main window, you
       will see a Document, containing a Page, which contains a Graph
       with its axes. The Graph is selected in the selection
-      window. The toolbar above adds a new part to the selected
-      part. If a part cannot be added to a selected widget it is
+      window. The toolbar above adds a new widget to the selected
+      widget. If a widget cannot be added to a selected widget it is
       disabled. On opening a new document Veusz automatically adds a
       new Page and Graph (with axes) to the document.
 </para>
@@ -592,10 +614,12 @@
       "Import". Type the filename into the filename box, or use the
       "Browse..." button to search for the file. You will see a
       preview of the data pop up in the box below. Enter "x,+,- y,+-"
-      into the descriptors edit box. This describes the format of the
-      data which describes dataset "x" plus its asymmetric errors,
-      and "y" with its symmetric errors. If you now click "Import",
-      you will see it has imported datasets "x" and "y".</para>
+      into the descriptors edit box (note that commas and spaces in
+      the descriptor are almost interchangeable in Veusz 1.6 or
+      newer). This describes the format of the data which describes
+      dataset "x" plus its asymmetric errors, and "y" with its
+      symmetric errors. If you now click "Import", you will see it has
+      imported datasets "x" and "y".</para>
 
       <para>To plot the data you should now click on "graph1" in the
       tree window. You are now able to click on the "xy" button (which
@@ -662,7 +686,7 @@
 	describe how the data are formatted in the import file. The
 	descriptor at its simplest is a list of the names of the
 	datasets to import (which are columns in the
-	file). Additionally modifiers are added if errors are also
+	file). Additionally modifiers are added if error bars are also
 	read in. Examples of descriptors are below:</para>
       
       <orderedlist>
@@ -672,13 +696,14 @@
 	</listitem>
 	
 	<listitem>
-	  <para><command>x,+- y,+,-</command> two datasets are in the
-	    file. Dataset "x" consists of the first two columns. The
-	    first column are the values and the second are the
-	    symmetric errors. "y" consists of three columns (note the
-	    comma between + and -). The first column are the values,
-	    the second positive asymmetric errors, and the third
-	    negative asymmetric errors.</para>
+	  <para><command>x,+- y,+,-</command> or <command>x +- y +
+	    -</command> two datasets are in the file. Dataset "x"
+	    consists of the first two columns. The first column are
+	    the values and the second are the symmetric errors. "y"
+	    consists of three columns (note the comma between + and
+	    -). The first column are the values, the second positive
+	    asymmetric errors, and the third negative asymmetric
+	    errors.</para>
 
 	  <para>Suppose the input file contains:</para>
 	  <informalexample>
@@ -707,13 +732,29 @@
 	</listitem>
 
 	<listitem>
-	  <para><command>x,,+-</command>  read the first column as
-	  the x dataset, skip a column, and read the third column as
+	  <para><command>foo,,+-</command>  read the first column as
+	  the foo dataset, skip a column, and read the third column as
 	  its symmetric error.</para>
 	</listitem>
       </orderedlist>
-      
-      <para>When reading in data, Veusz just uses whitespace for
+
+      <para>The dataset names given here x and y, are just
+      representative. Dataset names can contain virtually any
+      character, even unicode characters. If the name contains non
+      alpha-numeric characters (characters outside of A-Z, a-z and
+      0-9), then the dataset name should be contained within back-tick
+      characters. An example descriptor is <command>`length data
+      (m)`,+- `speed (mps)`,+,-</command>, for two datasets with
+      spaces and brackets in their names.</para>
+
+      <para>The special
+      names <command>+-</command>, <command>+</command>
+      or <command>-</command> specify that the datasets before are
+      followed by columns containing symmetric, positive or negative
+      errors. The signs on positive or negative errors are
+      automatically set to be correct.</para>
+
+      <para>When reading in data, Veusz treats any whitespace as
 	separating columns. The columns do not actually need to be in
 	columns! Furthermore a "\" symbol can be placed at the end of
 	a line to mark a continuation. Veusz will read the next line
@@ -723,17 +764,16 @@
 	line. The special value "nan" can be used to specify a break
 	in a dataset.</para>
 
-      <para>Veusz now has support for reading in other types of data
-      other than numbers. The type of data can be added in round
-      brackets after the name. Veusz will try to guess the type of
-      data based on the first value, so you should specify it if there
-      is any form of ambiguity (e.g. is 3 text or a number). Supported
-      types are numbers (use numeric in brackets) and text (use text
-      in brackets). An example descriptor would be "x(numeric),+-
-      y(numeric),+,- label(text)" for an x dataset followed by its
-      symmetric errors, a y dataset followed by two columns of
-      asymmetric errors, and a final column of text for the label
-      dataset.</para>
+      <para>Veusz supports reading in other types of data. The type of
+      data can be added in round brackets after the name. Veusz will
+      try to guess the type of data based on the first value, so you
+      should specify it if there is any form of ambiguity (e.g. is 3
+      text or a number). Supported types are numbers (use numeric in
+      brackets) and text (use text in brackets). An example descriptor
+      would be "x(numeric) +- y(numeric) + - label(text)" for an x
+      dataset followed by its symmetric errors, a y dataset followed
+      by two columns of asymmetric errors, and a final column of text
+      for the label dataset.</para>
 
       <para>A text column does not need quotation unless it contains
       space characters or escape characters. However make sure you
@@ -797,6 +837,48 @@ descriptor alpha beta gamma
     </section>
 
     <section>
+    <title>Reading CSV files</title>
+
+    <para>CVS (comma separated variable) files are often written from
+    other programs, such as spreadsheets, including Excel and
+    Gnumeric. Veusz supports reading from these files.</para>
+
+    <para>In the import dialog choose "CSV", then choose a filename to
+    import from. In the CSV file the user should place the data in
+    either rows or columns. Veusz will use a name above a column or to
+    the left of a row to specify what the dataset name should be. The
+    user can use new names further down in columns or right in rows to
+    specify a different dataset name. Names do not have to be used,
+    and Veusz will assign default "col" and "row" names if not
+    given. You can also specify a prefix which is prepended to each
+    dataset name read from the file.</para>
+
+    <para>To specify symmetric errors for a column, put "+-" as the
+    dataset name in the next column or row. Asymmetric errors can be
+    stated with "+" and "-" in the columns.</para>
+
+    <para>The data can be linked with the CSV file so that it can be
+    updated when the file changes. See the example CSV import for
+    details.</para>
+
+    <para>Text datasets are not yet autodetected for CSV files. You
+    can specify a text dataset by using "(text)" after the name of the
+    dataset at the top of the column. A future release show allow a
+    more general method for autodetecting data or specifying, as the
+    standard Veusz file format currently does.</para>
+
+    </section>
+
+    <section>
+      <title>Reading FITS files</title>
+      <para>
+	1D or 2D data can be read from FITS files. 1D data, with
+	optional errors bars, can be read from table extensions, and
+	2D data from image or primary extensions.
+      </para>
+    </section>
+
+    <section>
       <title>Reading other data formats</title>
       
       <para>As mentioned above, a user may write some Python code to
@@ -838,39 +920,6 @@ SetData('y', y)
     </section>
 
     <section>
-    <title>Reading CSV files</title>
-
-    <para>CVS (comma separated variable) files are often written from
-    other programs, such as spreadsheets, including Excel and
-    Gnumeric. Veusz supports reading from these files.</para>
-
-    <para>In the import dialog choose "CSV", then choose a filename to
-    import from. In the CSV file the user should place the data in
-    either rows or columns. Veusz will use a name above a column or to
-    the left of a row to specify what the dataset name should be. The
-    user can use new names further down in columns or right in rows to
-    specify a different dataset name. Names do not have to be used,
-    and Veusz will assign default "col" and "row" names if not
-    given. You can also specify a prefix which is prepended to each
-    dataset name read from the file.</para>
-
-    <para>To specify symmetric errors for a column, put "+-" as the
-    dataset name in the next column or row. Asymmetric errors can be
-    stated with "+" and "-" in the columns.</para>
-
-    <para>The data can be linked with the CSV file so that it can be
-    updated when the file changes. See the example CSV import for
-    details.</para>
-
-    <para>Text datasets are not yet autodetected for CSV files. You
-    can specify a text dataset by using "(text)" after the name of the
-    dataset at the top of the column. A future release show allow a
-    more general method for autodetecting data or specifying, as the
-    standard Veusz file format currently does.</para>
-
-    </section>
-
-    <section>
       <title>Manipulating datasets</title>
 
       <para>Imported datasets can easily be modified in the Edit data
@@ -884,28 +933,71 @@ SetData('y', y)
       range, from expressions based on a parametric expression, or
       from expressions based on existing datasets.</para>
 
+      <section>
+	<title>Using expressions to create new datasets</title>
       <para>For instance, if the user has already imported dataset d,
       then they can create d2 which consists of d**2. Expressions are
-      in Python syntax and can include the usual mathematical
-      functions. Error bars can also be given as expressions of other
-      datasets. By appending _data, _serr, _perr or _nerr to the name
+      in Python numpy syntax and can include the usual mathematical
+      functions.</para>
+
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="manimages/createdataset.png" format="PNG" />
+	</imageobject>
+      </mediaobject>
+
+      <para>Expressions for error bars can also be given. By appending
+      <command>_data</command>, <command>_serr</command>,
+      <command>_perr</command> or <command>_nerr</command> to the name
       of the dataset in the expression, the user can base their
       expression on particular parts of the given dataset (the main
       data, symmetric errors, positive errors or negative
       errors). Otherwise the program uses the same parts as is
       currently being specified.</para>
 
+      <para>If a dataset name contains non alphanumeric characters,
+      its name should be quoted in the expression in back-tick
+      characters, e.g. <command>`length (cm)`*2</command>.</para>
+      </section>
+
+      <section>
+	<title>Linking datasets to expressions</title>
       <para>A particularly useful feature is to be able to link a
       dataset to an expression, so if the expression changes the
       dataset changes with it, like in a spreadsheet.</para>
+      </section>
+      
+      <section>
+	<title>Splitting data</title>
+	<para>Data can also be chopped in this method, for example
+      using the expression <command>x[10:20]</command>, which makes a
+      dataset based on the 11th to 20th item in the x dataset (the
+      ranges are Python syntax, and are zero-based). Negative indices
+      count backwards from the end of the dataset. Data can be skipped
+      using expressions such as
+	  <command>data[::2]</command>, which skips every other element</para>
+      </section>
 
-      <para>Data can also be chopped in this method, for example using
-      the expression x[10:20], which makes a dataset based on the 11th
-      to 20th item in the x dataset (the ranges are Python syntax, and
-      are zero-based). Negative indices count backwards from the end
-      of the dataset.</para>
+      <section>
+	<title>Defining new constants or functions</title>
+	<para>User defined constants or functions can be defined in
+	the "Custom definitions" dialog box under the edit
+	menu. Functions can also be imported from external python
+	modules.</para>
 
-      </section>      
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="manimages/customdefinition.png" format="PNG" />
+	  </imageobject>
+	</mediaobject>
+
+	<para>Custom definitions are defined on a per-document basis,
+	but can be saved or loaded into a file. A default custom
+	definitions file can be set in the preferences dialog
+	box.</para>
+      </section>
+
+      </section>
 
   </chapter>
 
@@ -949,28 +1041,28 @@ SetData('y', y)
 	<para><command>Action('actionname',
 	componentpath='.')</command></para>
 	
-	<para>Initiates the specified action on the part (component)
+	<para>Initiates the specified action on the widget (component)
 	given the action name. Actions perform certain automated
-	routines. These include "fit" on a fit part, and
+	routines. These include "fit" on a fit widget, and
 	"zeroMargins" on grids.</para> </section>
 
       <section>
 	<title><anchor id="Command.Add" />Add</title>
 	
-	<para><command>Add('parttype', name='nameforpart',
+	<para><command>Add('widgettype', name='nameforwidget',
         autoadd=True, optionalargs)</command></para>
 	
-	<para>The Add command adds a graph into the current part
+	<para>The Add command adds a graph into the current widget
         (See the <link linkend="Command.To">To</link> command to change
         the current position).</para>
 	
-	<para>The first argument is the type of part to add. These
+	<para>The first argument is the type of widget to add. These
         include "graph", "page", "axis", "xy" and
-        "grid". <command>name</command> is the name of the new part
+        "grid". <command>name</command> is the name of the new widget
         (if not given, it will be generated from the type of the
-        part plus a number). The <command>autoadd</command>
-        parameter if set, constructs the default sub-parts this
-        part has (for example, axes in a graph).</para>
+        widget plus a number). The <command>autoadd</command>
+        parameter if set, constructs the default sub-widgets this
+        widget has (for example, axes in a graph).</para>
 	
 	<para>Optionally, default values for the graph settings may be
         given, for example <command>Add('axis', name='y',
@@ -980,7 +1072,7 @@ SetData('y', y)
 	example <command>Add('xy',
 	MarkerFill__color='red', ErrorBarLine__hide=True)</command>.</para>
 
-	<para>Returns: Name of part added.</para>
+	<para>Returns: Name of widget added.</para>
       </section>
 
       <section>
@@ -1040,7 +1132,7 @@ SetData('y', y)
 
 	<para><command>GetChildren(where='.')</command></para>
 
-	<para>Returns: The names of the parts which are children of
+	<para>Returns: The names of the widgets which are children of
       the path given</para>
       </section>
 
@@ -1288,8 +1380,8 @@ ImportString('x y', '''
 	
 	<para><command>List(where='.')</command></para>
 	
-	<para>List the parts which are contained within the part
-      with the path given, the type of parts, and a brief
+	<para>List the widgets which are contained within the widget
+      with the path given, the type of widgets, and a brief
       description.</para>
       </section>
 
@@ -1335,20 +1427,20 @@ ImportString('x y', '''
       <section>
 	<title><anchor id="Command.Rename" />Rename</title>
 	
-	<para><command>Remove('partpath', 'newname')</command></para>
+	<para><command>Remove('widgetpath', 'newname')</command></para>
 	
-	<para>Rename the part at the path given to a new name. This
-	command does not move parts.  See <link
+	<para>Rename the widget at the path given to a new name. This
+	command does not move widgets.  See <link
 	linkend="Command.To">To</link> for a description of the path
-	syntax. '.' can be used to select the current part.</para>
+	syntax. '.' can be used to select the current widget.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.Remove" />Remove</title>
 	
-	<para><command>Remove('partpath')</command></para>
+	<para><command>Remove('widgetpath')</command></para>
 	
-	<para>Remove the part selected using the path. See <link
+	<para>Remove the widget selected using the path. See <link
 	linkend="Command.To">To</link> for a description of the path
 	syntax.</para>
       </section>
@@ -1381,7 +1473,7 @@ ImportString('x y', '''
 	<para>Set the setting given by the path to the value given. If
 	the type of <command>val</command> is incorrect, an
 	<command>InvalidType</command> exception is thrown. The path
-	to the setting is the optional path to the part the setting
+	to the setting is the optional path to the widget the setting
 	is contained within, an optional subsetting specifier, and the
 	setting itself.</para>
 
@@ -1404,6 +1496,42 @@ Set('page1/graph1/x/min', -10.)
       data, symerr are the symmetric errors, negerr and poserr and the
       getative and positive asymmetric errors. The data can be given
       as lists or numpys.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetDataExpression" />SetDataExpression</title>
+	
+	<para><command>SetDataExpression(name, val, symerr=None, negerr=None,
+      poserr=None, linked=False, parametric=None)</command></para>
+
+	<para>Create a new dataset based on the expressions given. The
+	expressions are Python syntax expressions based on existing
+	datasets.
+</para>
+
+	<para>If linked is True, the dataset will change as the
+	datasets in the expressions change.</para>
+
+	<para>Parametric can be set to a tuple of (minval, maxval,
+	numitems). <command>t</command> in the expression will iterate
+	from minval to maxval in numitems values.</para>
+
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetDataRange" />SetDataRange</title>
+
+	<para><command>SetDataRange(name, numsteps, val, symerr=None,
+	    negerr=None, poserr=None, linked=False)</command></para>
+
+	<para>Set dataset to be a range of values with numsteps
+	steps. val is tuple made up of (minimum value, maximum
+	value). symerr, negerr and poserr are optional tuples for the
+	error bars.</para>
+
+	<para>If linked is True, the dataset can be saved in a
+	document as a SetDataRange, otherwise it is expanded to the
+	values which would make it up.</para>
       </section>
       
       <section>
@@ -1510,13 +1638,13 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
       <section>
 	<title><anchor id="Command.To" />To</title>
 	
-	<para><command>To('partpath')</command></para>
+	<para><command>To('widgetpath')</command></para>
 	
-	<para>The To command takes a path to a part and moves to
-        that part. For example, this may be "/", the root part,
+	<para>The To command takes a path to a widget and moves to
+        that widget. For example, this may be "/", the root widget,
         "graph1", "/page1/graph1/x", "../x". The syntax is designed to
-        mimic Unix paths for files. "/" represents the base part
-        (where the pages reside), and ".." represents the part next
+        mimic Unix paths for files. "/" represents the base widget
+        (where the pages reside), and ".." represents the widget next
         up the tree.</para>
 	
       </section>

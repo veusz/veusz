@@ -488,7 +488,7 @@ class ImportDialog(qt4.QDialog):
 
     def getPrefixSuffix(self, filename):
         """Get prefix and suffix values."""
-        f = utils.escapeDatasetName( os.path.basename(filename) )
+        f = utils.cleanDatasetName( os.path.basename(filename) )
         prefix = unicode( self.prefixcombo.lineEdit().text() )
         prefix = prefix.replace('$FILENAME', f)
         suffix = unicode( self.suffixcombo.lineEdit().text() )

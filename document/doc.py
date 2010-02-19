@@ -45,6 +45,8 @@ try:
 except ImportError:
     hasemf = False
 
+import svg_export
+
 # python identifier
 identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 
@@ -56,6 +58,17 @@ function_re = re.compile(r'''
 (?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )* # args
 )\)$                           # endargs''', re.VERBOSE)
 
+def getSuitableParent(widgettype, initialwidget):
+    """Find the nearest relevant parent for the widgettype given."""
+
+    # find the parent to add the child to, we go up the tree looking
+    # for possible parents
+    parent = initialwidget
+    wc = widgetfactory.thefactory.getWidgetClass(widgettype)
+    while parent is not None and not wc.willAllowParent(parent):
+        parent = parent.parent
+    return parent
+            
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
@@ -206,7 +219,7 @@ class Document( qt4.QObject ):
             
         assert isinstance(s, setting.Setting)
         return s
-            
+
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}
@@ -384,12 +397,12 @@ class Document( qt4.QObject ):
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
-        for name, dataset in self.data.items():
+        for name, dataset in sorted(self.data.items()):
             dataset.saveLinksToSavedDoc(fileobj, savedlinks,
                                         relpath=reldirname)
 
         # save the remaining datasets
-        for name, dataset in self.data.items():
+        for name, dataset in sorted(self.data.items()):
             dataset.saveToFile(fileobj, name)
 
         # save the actual tree structure
@@ -521,23 +534,41 @@ class Document( qt4.QObject ):
     def _exportSVG(self, filename, page):
         """Export document as SVG"""
 
-        import PyQt4.QtSvg
+        if qt4.PYQT_VERSION >= 0x40600:
+            # custom paint devices don't work in old PyQt versions
+            pixmap = qt4.QPixmap(1,1)
+            dpi=90.
+            painter = Painter(pixmap, scaling=1., dpi=dpi)
+            width, height = self.basewidget.getSize(painter)
+            painter.end()
 
-        # we have to make a temporary painter first to get the document size
-        # this is because setSize needs to come before begin
-        temprend =  PyQt4.QtSvg.QSvgGenerator()
-        temprend.setFileName(filename)
-        p = Painter(temprend)
-        width, height = self.basewidget.getSize(p)
-        p.end()
+            f = open(filename, 'w')
+            paintdev = svg_export.SVGPaintDevice(f, width/dpi, height/dpi)
+            painter = Painter(paintdev)
+            self.basewidget.draw(painter, page)
+            painter.end()
+            f.close()
 
-        # actually paint the image
-        rend = PyQt4.QtSvg.QSvgGenerator()
-        rend.setFileName(filename)
-        rend.setSize( qt4.QSize(int(width), int(height)) )
-        painter = Painter(rend)
-        self.basewidget.draw( painter, page )
-        painter.end()
+        else:
+            # use built-in svg generation, which doesn't work very well
+            # (no clipping, font size problems)
+            import PyQt4.QtSvg
+
+            # we have to make a temporary painter first to get the document size
+            # this is because setSize needs to come before begin
+            temprend =  PyQt4.QtSvg.QSvgGenerator()
+            temprend.setFileName(filename)
+            p = Painter(temprend)
+            width, height = self.basewidget.getSize(p)
+            p.end()
+
+            # actually paint the image
+            rend = PyQt4.QtSvg.QSvgGenerator()
+            rend.setFileName(filename)
+            rend.setSize( qt4.QSize(int(width), int(height)) )
+            painter = Painter(rend)
+            self.basewidget.draw(painter, page)
+            painter.end()
 
     def _exportPIC(self, filename, page):
         """Export document as SVG"""
@@ -710,6 +741,7 @@ class Document( qt4.QObject ):
         # safe functions
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
+        c['veusz_markercodes'] = tuple(utils.MarkerCodes)
 
         # custom definitions
         for ctype, name, val in self.customs:

@@ -217,7 +217,7 @@ class EmbedApplication(qt4.QApplication):
         self.notifier.setEnabled(True)
 
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] != 'RunFromEmbed':
+    if len(sys.argv) != 2 or sys.argv[1] != '--embed-remote':
         print >>sys.stderr, ("This program must be run from "
                              "the Veusz embedding module")
         sys.exit(1)

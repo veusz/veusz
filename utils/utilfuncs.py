@@ -31,6 +31,8 @@ import dates
 import codecs
 import csv
 
+import veusz.qtall as qt4
+
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
 
@@ -48,24 +50,28 @@ def reverse(data):
     for index in xrange(len(data)-1, -1, -1):
         yield data[index]
 
-dsname_re = re.compile('^[A-Za-z][A-Za-z0-9_]*$')
+id_re = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
+def validPythonIdentifier(name):
+    """Is this a valid python identifier?"""
+    return id_re.match(name) is not None
+
 def validateDatasetName(name):
-    """Validate dataset name is okay."""
-    return dsname_re.match(name) is not None
+    """Validate dataset name is okay.
+    Dataset names can contain anything except back ticks!
+    """
+    return len(name) > 0 and name.find('`') == -1
 
 def validateWidgetName(name):
-    """Validate widget name is okay."""
-    return dsname_re.match(name) is not None
+    """Validate widget name is okay.
+    Widget names are valid if no surrounding whitespace and do not contain /
+    """
+    return ( len(name) > 0 and name.strip() == name and name.find('/') == -1
+             and name != '.' and name != '..' )
 
-def escapeDatasetName(name):
+def cleanDatasetName(name):
     """Make string into a valid dataset name."""
-    # replace invalid characters
-    out = re.sub('[^0-9A-Za-z]', '_', name)
-    # add underscores for leading numbers
-    if re.match('^[0-9]', out):
-        return '_' + out
-    else:
-        return out
+    # replace backticks and get rid of whitespace at ends
+    return name.replace('`', '_').strip()
 
 def relpath(filename, dirname):
     """Make filename a relative filename relative to dirname."""
@@ -92,6 +98,24 @@ def relpath(filename, dirname):
 
     # join parts back together
     return os.path.sep.join(fileparts)
+
+# handle and extended #RRGGBBAA color
+extendedcolor_re = re.compile('^#[0-9A-Fa-f]{8}$')
+def extendedColorToQColor(s):
+    if extendedcolor_re.match(s):
+        col = qt4.QColor(s[:-2])
+        col.setAlpha( int(s[-2:], 16) )
+        return col
+    else:
+        return qt4.QColor(s)
+
+def extendedColorFromQColor(col):
+    """Make an extended color #RRGGBBAA or #RRGGBB string."""
+    if col.alpha() == 255:
+        return str(col.name())
+    else:
+        return '#%02x%02x%02x%02x' % (col.red(), col.green(), col.blue(),
+                                      col.alpha())
 
 class WeakBoundMethod:
     """A weak reference to a bound method.

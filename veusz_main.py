@@ -44,15 +44,16 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.setting
+import veusz.embed_remote as remote
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2009 <jeremy@jeremysanders.net>
+Copyright (C) Jeremy Sanders 2003-2010 <jeremy@jeremysanders.net>
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2009<br>
+Copyright (C) Jeremy Sanders 2003-2010<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
@@ -95,6 +96,11 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
 
 def run():
     '''Run the main application.'''
+
+    # special mode to run embedding server
+    if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
+        remote.main()
+        return
 
     app = qt4.QApplication(sys.argv)
     sys.excepthook = excepthook

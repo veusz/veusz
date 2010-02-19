@@ -1,4 +1,278 @@
 ------------------------------------------------------------------------
+r1129 | jeremysanders | 2010-01-24 20:24:53 +0000 (Sun, 24 Jan 2010) | 2 lines
+
+Update shapes svg example
+
+------------------------------------------------------------------------
+r1127 | jeremysanders | 2010-01-24 19:55:43 +0000 (Sun, 24 Jan 2010) | 2 lines
+
+Add a default group to the top of SVG files to make the Qt defaults the defaults. Fix polygon fill modes to be correct.
+
+------------------------------------------------------------------------
+r1125 | jeremysanders | 2010-01-24 15:24:04 +0000 (Sun, 24 Jan 2010) | 2 lines
+
+Add markerspolygon.vsz example
+
+------------------------------------------------------------------------
+r1124 | jeremysanders | 2010-01-19 21:18:48 +0000 (Tue, 19 Jan 2010) | 2 lines
+
+Update shapes.svg to use new svg engine
+
+------------------------------------------------------------------------
+r1123 | jeremysanders | 2010-01-19 21:17:19 +0000 (Tue, 19 Jan 2010) | 2 lines
+
+Update year to 2010 and add link to about dialog
+
+------------------------------------------------------------------------
+r1122 | jeremysanders | 2010-01-17 16:14:23 +0000 (Sun, 17 Jan 2010) | 2 lines
+
+Update README and ChangeLog
+
+------------------------------------------------------------------------
+r1121 | jeremysanders | 2010-01-17 15:55:34 +0000 (Sun, 17 Jan 2010) | 2 lines
+
+Bump version number to 1.6. Previous update also allowed widget names to contain any character except "/"
+
+------------------------------------------------------------------------
+r1120 | jeremysanders | 2010-01-16 22:34:31 +0000 (Sat, 16 Jan 2010) | 2 lines
+
+Change from using $ to ` to quote dataset names in expressions. SimpleRead has been substantially changed to allow commas to be dropped in import descriptors. Non alpha-numeric dataset names can be quoted in import descriptors. csv im=mports can also use non alpha-numeric dataset names.
+
+------------------------------------------------------------------------
+r1119 | jeremysanders | 2010-01-15 16:28:15 +0000 (Fri, 15 Jan 2010) | 2 lines
+
+Allow dataset names to be quoted in expressions with dollar signs, like $name$
+
+------------------------------------------------------------------------
+r1118 | jeremysanders | 2010-01-05 19:32:51 +0000 (Tue, 05 Jan 2010) | 2 lines
+
+Minor updates to shrink svg export size
+
+------------------------------------------------------------------------
+r1117 | jeremysanders | 2010-01-04 20:23:42 +0000 (Mon, 04 Jan 2010) | 1 line
+
+Space save in file by writing coords to 2 decimals
+------------------------------------------------------------------------
+r1116 | jeremysanders | 2010-01-01 18:14:43 +0000 (Fri, 01 Jan 2010) | 2 lines
+
+Fallback to old SVG generation for PyQt < 4.6
+
+------------------------------------------------------------------------
+r1115 | jeremysanders | 2010-01-01 13:43:35 +0000 (Fri, 01 Jan 2010) | 2 lines
+
+add new svg export paint engine
+
+------------------------------------------------------------------------
+r1114 | jeremysanders | 2009-12-08 19:59:57 +0000 (Tue, 08 Dec 2009) | 2 lines
+
+A dataset can be given to supply transparency for the image widget
+
+------------------------------------------------------------------------
+r1113 | jeremysanders | 2009-12-06 16:16:44 +0000 (Sun, 06 Dec 2009) | 2 lines
+
+Add option to place axis ticks on outside of graph
+
+------------------------------------------------------------------------
+r1112 | jeremysanders | 2009-11-29 15:57:22 +0000 (Sun, 29 Nov 2009) | 2 lines
+
+Force positive and symmetric errors to be positive and negative errors to be negative
+
+------------------------------------------------------------------------
+r1111 | jeremysanders | 2009-11-24 22:15:06 +0000 (Tue, 24 Nov 2009) | 2 lines
+
+Make CSV data import more robust and support date/time import
+
+------------------------------------------------------------------------
+r1110 | jeremysanders | 2009-11-15 16:40:41 +0000 (Sun, 15 Nov 2009) | 2 lines
+
+Make parametric datasets use DatasetExpressions and allow reediting
+
+------------------------------------------------------------------------
+r1109 | jeremysanders | 2009-11-15 15:53:38 +0000 (Sun, 15 Nov 2009) | 2 lines
+
+Data create dialog now creates ranges as a special dataset type which is saved as a single line in document and can be edited
+
+------------------------------------------------------------------------
+r1108 | jeremysanders | 2009-11-14 17:23:30 +0000 (Sat, 14 Nov 2009) | 2 lines
+
+Merge changes from speedups branch (r1077-1078) using flat style caps on lines for error bars and axes
+
+------------------------------------------------------------------------
+r1105 | jeremysanders | 2009-11-14 16:32:23 +0000 (Sat, 14 Nov 2009) | 2 lines
+
+Add several new custom line styles
+
+------------------------------------------------------------------------
+r1104 | jeremysanders | 2009-11-14 16:05:10 +0000 (Sat, 14 Nov 2009) | 2 lines
+
+Add squashbox, crossnarrow and plusnarrow plot markers
+
+------------------------------------------------------------------------
+r1103 | jeremysanders | 2009-11-14 11:07:33 +0000 (Sat, 14 Nov 2009) | 2 lines
+
+Add star3, plushair, crosshair, asteriskhair, linevertgap, linehorzgap symbols
+
+------------------------------------------------------------------------
+r1102 | jeremysanders | 2009-11-12 21:30:00 +0000 (Thu, 12 Nov 2009) | 2 lines
+
+Add markers: squareplus, squarecross, hexagon, circleplus, circlecross, star4, star6, star8, starinvert, circlepairhorz, circlepairvert
+
+------------------------------------------------------------------------
+r1101 | jeremysanders | 2009-11-08 17:10:07 +0000 (Sun, 08 Nov 2009) | 2 lines
+
+Add option to capture dialog to only retain last N lines when capturing data. Capture exception when closing popen objects.
+
+------------------------------------------------------------------------
+r1100 | jeremysanders | 2009-11-08 16:20:19 +0000 (Sun, 08 Nov 2009) | 2 lines
+
+Add custom imports. This required a safety feature to tell the user that an import has been requested. May be a problem if the file is loaded into the embedding interface rather than the main window.
+
+------------------------------------------------------------------------
+r1099 | jeremysanders | 2009-11-06 12:00:26 +0000 (Fri, 06 Nov 2009) | 2 lines
+
+Fix exception due to unrecognised file type
+
+------------------------------------------------------------------------
+r1098 | jeremysanders | 2009-11-02 10:44:58 +0000 (Mon, 02 Nov 2009) | 2 lines
+
+Fix safeEvalHelper calls
+
+------------------------------------------------------------------------
+r1097 | jeremysanders | 2009-10-31 20:40:12 +0000 (Sat, 31 Oct 2009) | 2 lines
+
+Add icon for custom dialog
+
+------------------------------------------------------------------------
+r1096 | jeremysanders | 2009-10-31 20:26:03 +0000 (Sat, 31 Oct 2009) | 2 lines
+
+Swap round custom type and name when saving. Fix regular expressions when defining custom names.
+
+------------------------------------------------------------------------
+r1095 | jeremysanders | 2009-10-31 20:24:07 +0000 (Sat, 31 Oct 2009) | 2 lines
+
+Add icon for preferences dialog
+
+------------------------------------------------------------------------
+r1094 | jeremysanders | 2009-10-31 17:45:56 +0000 (Sat, 31 Oct 2009) | 2 lines
+
+Add default custom setting definition file in preferences
+
+------------------------------------------------------------------------
+r1093 | jeremysanders | 2009-10-31 11:42:51 +0000 (Sat, 31 Oct 2009) | 2 lines
+
+Allow saving and loading for custom definitons. Move recent files button to separate custom control file.
+
+------------------------------------------------------------------------
+r1092 | jeremysanders | 2009-10-30 21:43:24 +0000 (Fri, 30 Oct 2009) | 2 lines
+
+Reimplement custom functions and constants. Now stored in a single list. Dialog box uses model to display custom settings.
+
+------------------------------------------------------------------------
+r1091 | jeremysanders | 2009-10-28 22:17:50 +0000 (Wed, 28 Oct 2009) | 2 lines
+
+Get custom function and constants mostly working. This adds an AddCustom command to the command interface to allow the definitions to be saved. Documents now save custom definitions.
+
+------------------------------------------------------------------------
+r1090 | jeremysanders | 2009-10-26 20:40:37 +0000 (Mon, 26 Oct 2009) | 2 lines
+
+Further work on custom definitions dialog
+
+------------------------------------------------------------------------
+r1089 | jeremysanders | 2009-10-25 17:59:57 +0000 (Sun, 25 Oct 2009) | 2 lines
+
+Move evalutation environment into document and add (currently) non-functioning custom definition dialog.
+
+------------------------------------------------------------------------
+r1088 | jeremysanders | 2009-10-10 17:37:52 +0100 (Sat, 10 Oct 2009) | 2 lines
+
+Get rounding to integers correct for postscript bounding box
+
+------------------------------------------------------------------------
+r1087 | jeremysanders | 2009-10-06 19:44:36 +0100 (Tue, 06 Oct 2009) | 2 lines
+
+Add polygon plotter
+
+------------------------------------------------------------------------
+r1086 | jeremysanders | 2009-10-05 11:47:44 +0100 (Mon, 05 Oct 2009) | 2 lines
+
+Fix importing strings with unicode markers (2nd patch)
+
+------------------------------------------------------------------------
+r1085 | jeremysanders | 2009-10-04 16:03:14 +0100 (Sun, 04 Oct 2009) | 2 lines
+
+Fix position of settings in freeplotter
+
+------------------------------------------------------------------------
+r1084 | jeremysanders | 2009-10-04 15:52:36 +0100 (Sun, 04 Oct 2009) | 2 lines
+
+Match unicode strings in standard document format
+
+------------------------------------------------------------------------
+r1083 | jeremysanders | 2009-10-02 16:41:53 +0100 (Fri, 02 Oct 2009) | 2 lines
+
+Catch exception reported in windows version of veusz in export
+
+------------------------------------------------------------------------
+r1081 | jeremysanders | 2009-09-29 22:51:02 +0100 (Tue, 29 Sep 2009) | 2 lines
+
+Fix my test case
+
+------------------------------------------------------------------------
+r1080 | jeremysanders | 2009-09-29 22:45:51 +0100 (Tue, 29 Sep 2009) | 2 lines
+
+Fix colors in images for big endian machines
+
+------------------------------------------------------------------------
+r1068 | jeremysanders | 2009-09-22 09:49:37 +0100 (Tue, 22 Sep 2009) | 2 lines
+
+Add delimiter support in README
+
+------------------------------------------------------------------------
+r1067 | jeremysanders | 2009-09-21 11:06:37 +0100 (Mon, 21 Sep 2009) | 2 lines
+
+Add icon for boxfill error style
+
+------------------------------------------------------------------------
+r1066 | jeremysanders | 2009-09-21 11:05:25 +0100 (Mon, 21 Sep 2009) | 2 lines
+
+Add boxfill error bar style
+
+------------------------------------------------------------------------
+r1065 | jeremysanders | 2009-09-19 20:33:50 +0100 (Sat, 19 Sep 2009) | 2 lines
+
+Minor whitespacee cleanups
+
+------------------------------------------------------------------------
+r1064 | jeremysanders | 2009-09-19 20:05:01 +0100 (Sat, 19 Sep 2009) | 2 lines
+
+Fixes for problems found with pychecker. These are mostly imports that aren't required, but there were a couple of real problems fixed.
+
+------------------------------------------------------------------------
+r1063 | jeremysanders | 2009-09-17 20:39:37 +0100 (Thu, 17 Sep 2009) | 2 lines
+
+Use strikeOutPos for centreing text in text renderer
+
+------------------------------------------------------------------------
+r1062 | jeremysanders | 2009-09-15 21:53:54 +0100 (Tue, 15 Sep 2009) | 2 lines
+
+Move list of export types to document class, so we can adjust list of supported types based on what is available
+
+------------------------------------------------------------------------
+r1061 | jeremysanders | 2009-09-13 22:43:59 +0100 (Sun, 13 Sep 2009) | 2 lines
+
+Add bar with labels example plot
+
+------------------------------------------------------------------------
+r1060 | jeremysanders | 2009-09-13 14:52:09 +0100 (Sun, 13 Sep 2009) | 2 lines
+
+Update release notes
+
+------------------------------------------------------------------------
+r1059 | jeremysanders | 2009-09-13 14:27:09 +0100 (Sun, 13 Sep 2009) | 2 lines
+
+Update version to 1.5
+
+------------------------------------------------------------------------
 r1058 | jeremysanders | 2009-09-12 18:58:33 +0100 (Sat, 12 Sep 2009) | 2 lines
 
 Implement user line styles in EMF export

@@ -48,6 +48,26 @@ def _convertNumpy(a):
         else:
             return a
 
+def _convertNumpyAbs(a):
+    """Convert to numpy 64 bit positive values, if possible."""
+    if a is None:
+        return None
+    if not isinstance(a, N.ndarray):
+        a = N.array(a, dtype='float64')
+    elif a.dtype != N.dtype('float64'):
+        a = a.astype('float64')
+    return N.abs(a)
+
+def _convertNumpyNegAbs(a):
+    """Convert to numpy 64 bit negative values, if possible."""
+    if a is None:
+        return None
+    if not isinstance(a, N.ndarray):
+        a = N.array(a, dtype='float64')
+    elif a.dtype != N.dtype('float64'):
+        a = a.astype('float64')
+    return -N.abs(a)
+
 def generateValidDatasetParts(*datasets):
     """Generator to return array of valid parts of datasets.
 
@@ -89,13 +109,19 @@ def generateValidDatasetParts(*datasets):
             yield retn
         lastindex = index+1
 
+def datasetNameToDescriptorName(name):
+    """Return descriptor name for dataset."""
+    if re.match('^[0-9A-Za-z_]+$', name):
+        return name
+    else:
+        return '`%s`' % name
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
 
     # filename is member
 
-    def saveToFile(self, file, relpath=None):
+    def saveToFile(self, fileobj, relpath=None):
         '''Save the link to the document file.'''
         pass
 
@@ -285,7 +311,7 @@ class LinkedFITSFile(LinkedFileBase):
         self.hdu = hdu
         self.columns = columns
 
-    def saveToFile(self, file, relpath=None):
+    def saveToFile(self, fileobj, relpath=None):
         '''Save the link to the document file.'''
 
         args = [self.dsname, self._getSaveFilename(relpath), self.hdu]
@@ -297,7 +323,7 @@ class LinkedFITSFile(LinkedFileBase):
                 args.append('%s=%s' % (a, repr(c)))
         args.append('linked=True')
 
-        file.write('ImportFITSFile(%s)\n' % ', '.join(args))
+        fileobj.write('ImportFITSFile(%s)\n' % ', '.join(args))
 
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.'''
@@ -336,7 +362,7 @@ class LinkedCSVFile(LinkedFileBase):
         self.prefix = prefix
         self.suffix = suffix
 
-    def saveToFile(self, file, relpath=None):
+    def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
         params = [repr(self._getSaveFilename(relpath)),
@@ -354,7 +380,7 @@ class LinkedCSVFile(LinkedFileBase):
         if self.textdelimiter != '"':
             params.append('textdelimiter=' + repr(self.textdelimiter))
 
-        file.write('ImportFileCSV(%s)\n' % (', '.join(params)))
+        fileobj.write('ImportFileCSV(%s)\n' % (', '.join(params)))
         
     def reloadLinks(self, document):
         """Reload any linked data from the CSV file."""
@@ -393,7 +419,7 @@ class DatasetBase(object):
     column_descriptions = ()
     recreatable_dataset = False  # can recreate in create dialog
 
-    def saveLinksToSavedDoc(self, file, savedlinks, relpath=None):
+    def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 
         savedlinks is a dict containing any linked files which have
@@ -405,7 +431,7 @@ class DatasetBase(object):
         # links should only be saved once
         if self.linked is not None and self.linked not in savedlinks:
             savedlinks[self.linked] = True
-            self.linked.saveToFile(file, relpath=relpath)
+            self.linked.saveToFile(fileobj, relpath=relpath)
 
     def name(self):
         """Get dataset name."""
@@ -455,6 +481,18 @@ class DatasetBase(object):
         """
         pass
 
+    def canUnlink(self):
+        """Can dataset be unlinked?"""
+        return self.linked is not None
+
+    def linkedInformation(self):
+        """Return information about any linking for the user."""
+        if self.linked is not None:
+            name = self.linked.filename
+        else:
+            name = 'None'
+        return 'Linked file: %s' % name
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -484,23 +522,23 @@ class Dataset2D(DatasetBase):
     def getDataRanges(self):
         return self.xrange, self.yrange
 
-    def saveToFile(self, file, name):
+    def saveToFile(self, fileobj, name):
         """Write the 2d dataset to the file given."""
 
         # return if there is a link
         if self.linked is not None:
             return
 
-        file.write("ImportString2D(%s, '''\n" % repr(name))
-        file.write("xrange %e %e\n" % self.xrange)
-        file.write("yrange %e %e\n" % self.yrange)
+        fileobj.write("ImportString2D(%s, '''\n" % repr(name))
+        fileobj.write("xrange %e %e\n" % self.xrange)
+        fileobj.write("yrange %e %e\n" % self.yrange)
 
         # write rows backwards, so lowest y comes first
         for row in self.data[::-1]:
             s = ('%e ' * len(row)) % tuple(row)
-            file.write("%s\n" % (s[:-1],))
+            fileobj.write("%s\n" % (s[:-1],))
 
-        file.write("''')\n")
+        fileobj.write("''')\n")
 
     def description(self, showlinked=True):
         """Get description of dataset."""
@@ -535,9 +573,9 @@ class Dataset(DatasetBase):
         self.document = None
         self._invalidpoints = None
         self.data = _convertNumpy(data)
-        self.serr = _convertNumpy(serr)
-        self.perr = _convertNumpy(perr)
-        self.nerr = _convertNumpy(nerr)
+        self.serr = _convertNumpyAbs(serr)
+        self.perr = _convertNumpyAbs(perr)
+        self.nerr = _convertNumpyNegAbs(nerr)
         self.linked = linked
 
         # check the sizes of things match up
@@ -639,7 +677,7 @@ class Dataset(DatasetBase):
 
         self.document.setModified(True)
 
-    def saveToFile(self, file, name):
+    def saveToFile(self, fileobj, name):
         '''Save data to file.
         '''
 
@@ -649,7 +687,8 @@ class Dataset(DatasetBase):
 
         # build up descriptor
         datasets = [self.data]
-        descriptor = "%s(numeric)" % name
+
+        descriptor = datasetNameToDescriptorName(name) + '(numeric)'
         if self.serr is not None:
             descriptor += ',+-'
             datasets.append(self.serr)
@@ -660,15 +699,15 @@ class Dataset(DatasetBase):
             descriptor += ',-'
             datasets.append(self.nerr)
 
-        file.write( "ImportString(%s,'''\n" % repr(descriptor) )
+        fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
 
         # write line line-by-line
         format = '%e ' * len(datasets)
         format = format[:-1] + '\n'
         for line in itertools.izip( *datasets ):
-            file.write( format % line )
+            fileobj.write( format % line )
 
-        file.write( "''')\n" )
+        fileobj.write( "''')\n" )
 
     def convertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
@@ -734,7 +773,7 @@ class DatasetText(DatasetBase):
         """Return a value cast to this dataset data type."""
         return unicode(val)
 
-    def saveToFile(self, file, name):
+    def saveToFile(self, fileobj, name):
         '''Save data to file.
         '''
 
@@ -742,13 +781,13 @@ class DatasetText(DatasetBase):
         if self.linked is not None:
             return
 
-        descriptor = '%s(text)' % name
-        file.write( "ImportString(%s,r'''\n" % repr(descriptor) )
+        descriptor = datasetNameToDescriptorName(name) + '(text)'
+        fileobj.write( "ImportString(%s,r'''\n" % repr(descriptor) )
         for line in self.data:
             # need to "escape" ''' marks in text
             r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
-            file.write(r)
-        file.write( "''')\n" )
+            fileobj.write(r)
+        fileobj.write( "''')\n" )
 
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
@@ -826,7 +865,10 @@ class DatasetExpressionException(DatasetException):
 #             # revert to old behaviour
 #             return dict.__getitem__(self, item)
 
-dataexpr_split_re = re.compile(r'([\.+\-*/\(\)\[\],<>=!|%^~& ])')
+# split expression on python operators or quoted `DATASET`
+dataexpr_split_re = re.compile(r'(`.*?`|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
+# identify whether string is a quoted identifier
+dataexpr_quote_re = re.compile(r'^`.*`$')
 dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
 
 def _substituteDatasets(datasets, expression, thispart):
@@ -843,6 +885,11 @@ def _substituteDatasets(datasets, expression, thispart):
     for i, bit in enumerate(bits):
         # test whether there's an _data, _serr or such at the end of the name
         part = thispart
+
+        if dataexpr_quote_re.match(bit):
+            # quoted text, so remove backtick-"quotes"
+            bit = bit[1:-1]
+
         bitbits = bit.split('_')
         if len(bitbits) > 1:
             if bitbits[-1] in dataexpr_columns:
@@ -874,8 +921,12 @@ class DatasetExpression(Dataset):
 
     recreatable_dataset = True
 
-    def __init__(self, data=None, serr=None, nerr=None, perr=None):
-        """Initialise the dataset with the expressions given."""
+    def __init__(self, data=None, serr=None, nerr=None, perr=None,
+                 parametric=None):
+        """Initialise the dataset with the expressions given.
+
+        parametric is option and can be (minval, maxval, steps) or None
+        """
 
         self.document = None
         self.linked = None
@@ -887,6 +938,7 @@ class DatasetExpression(Dataset):
         self.expr['serr'] = serr
         self.expr['nerr'] = nerr
         self.expr['perr'] = perr
+        self.parametric = parametric
 
         self.cachedexpr = {}
 
@@ -920,6 +972,16 @@ class DatasetExpression(Dataset):
 
         # set up environment to evaluate expressions in
         environment = self.document.eval_context.copy()
+
+        # create dataset using parametric expression
+        if self.parametric:
+            p = self.parametric
+            if p[2] >= 2:
+                deltat = (p[1]-p[0]) / (p[2]-1)
+                t = N.arange(p[2])*deltat + p[0]
+            else:
+                t = N.array([p[0]])
+            environment['t'] = t
 
         # this fn gets called to return the value of a dataset
         environment['_DS_'] = self.evaluateDataset
@@ -965,7 +1027,7 @@ class DatasetExpression(Dataset):
         # return the evaluated form of the expression
         return self.evaluated[part]
 
-    def saveToFile(self, file, name):
+    def saveToFile(self, fileobj, name):
         '''Save data to file.
         '''
 
@@ -976,10 +1038,13 @@ class DatasetExpression(Dataset):
             parts.append('negerr=%s' % repr(self.expr['nerr']))
         if self.expr['perr']:
             parts.append('poserr=%s' % repr(self.expr['perr']))
+        if self.parametric is not None:
+            parts.append('parametric=%s' % repr(self.parametric))
+
         parts.append('linked=True')
 
         s = 'SetDataExpression(%s)\n' % ', '.join(parts)
-        file.write(s)
+        fileobj.write(s)
         
     # expose evaluated data as properties
     # this allows us to recalculate the expressions on the fly
@@ -1008,6 +1073,88 @@ class DatasetExpression(Dataset):
 
     def insertRows(self, row, numrows, rowdata):
         pass
+
+    def canUnlink(self):
+        """Whether dataset can be unlinked."""
+        return True
+
+    def linkedInformation(self):
+        """Return information about linking."""
+        text = []
+        if self.parametric:
+            text.append('Linked parametric dataset')
+        else:
+            text.append('Linked expression dataset')
+        for label, part in itertools.izip(self.column_descriptions,
+                                          self.columns):
+            if self.expr[part]:
+                text.append('%s: %s' % (label, self.expr[part]))
+
+        if self.parametric:
+            text.append("where t goes from %g:%g in %i steps" % self.parametric)
+
+        return '\n'.join(text)
+
+class DatasetRange(Dataset):
+    """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
+
+    recreatable_dataset = True
+
+    def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
+        """Construct dataset.
+
+        numsteps: number of steps in range
+        data, serr, perr and nerr are tuples containing (start, stop) values."""
+        self.range_data = data
+        self.range_serr = serr
+        self.range_perr = perr
+        self.range_nerr = nerr
+        self.numsteps = numsteps
+
+        for name in ('data', 'serr', 'perr', 'nerr'):
+            val = getattr(self, 'range_%s' % name)
+            if val is not None:
+                minval, maxval = val
+                if numsteps == 1:
+                    vals = N.array( [minval] )
+                else:
+                    delta = (maxval - minval) / (numsteps-1)
+                    vals = N.arange(numsteps)*delta + minval
+            else:
+                vals = None
+            setattr(self, name, vals)
+
+        self.document = None
+        self.linked = None
+        self._invalidpoints = None
+
+    def saveToFile(self, fileobj, name):
+        """Save dataset to file."""
+
+        parts = [repr(name), repr(self.numsteps), repr(self.range_data)]
+        if self.range_serr is not None:
+            parts.append('symerr=%s' % repr(self.range_serr))
+        if self.range_perr is not None:
+            parts.append('poserr=%s' % repr(self.range_perr))
+        if self.range_nerr is not None:
+            parts.append('negerr=%s' % repr(self.range_nerr))
+        parts.append('linked=True')
+
+        s = 'SetDataRange(%s)\n' % ', '.join(parts)
+        fileobj.write(s)
+
+    def canUnlink(self):
+        return True
+
+    def linkedInformation(self):
+        """Return information about linking."""
+        text = ['Linked range dataset']
+        for label, part in itertools.izip(self.column_descriptions,
+                                          self.columns):
+            val = getattr(self, 'range_%s' % part)
+            if val:
+                text.append('%s: %g:%g' % (label, val[0], val[1]))
+        return '\n'.join(text)
 
 def getSpacing(data):
     """Given a set of values, get minimum, maximum, step size
@@ -1056,14 +1203,17 @@ class Dataset2DXYZExpression(DatasetBase):
         self.lastchangeset = -1
         self.cacheddata = None
         
-        for expr in exprx, expry, exprz:
-            if utils.checkCode(expr, securityonly=True) is not None:
-                raise DatasetExpressionException("Unsafe expression '%s'" % expr)
+#         for expr in exprx, expry, exprz:
+#             if utils.checkCode(expr, securityonly=True) is not None:
+#                 raise DatasetExpressionException("Unsafe expression '%s'" % expr)
 
         # copy parameters
         self.exprx = exprx
         self.expry = expry
         self.exprz = exprz
+
+        # cache x y and z expressions
+        self.cachedexpr = {}
 
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
@@ -1091,6 +1241,15 @@ class Dataset2DXYZExpression(DatasetBase):
         for name in ('exprx', 'expry', 'exprz'):
             expr = _substituteDatasets(self.document.data, getattr(self, name),
                                        'data')
+
+            # check expression if not checked before
+            if self.cachedexpr.get(name) != expr:
+                if ( not setting.transient_settings['unsafe_mode'] and
+                     utils.checkCode(expr, securityonly=True) ):
+                    raise DatasetExpressionException(
+                        "Unsafe expression '%s'" % (
+                            expr))
+                self.cachedexpr[name] = expr
 
             try:
                 evaluated[name] = eval(expr, environment)
@@ -1135,13 +1294,13 @@ class Dataset2DXYZExpression(DatasetBase):
         text += ', x=%g->%g' % tuple(self.xrange)
         text += ', y=%g->%g' % tuple(self.yrange)
 
-    def saveToFile(self, file, name):
+    def saveToFile(self, fileobj, name):
         '''Save expressions to file.
         '''
 
         s = 'SetData2DExpressionXYZ(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
-        file.write(s)
+        fileobj.write(s)
 
     data = property(evalDataset)
     xrange = property(getXrange)
@@ -1205,9 +1364,9 @@ class Dataset2DXYFunc(DatasetBase):
     def getDataRanges(self):
         return (self.xrange, self.yrange)
 
-    def saveToFile(self, file, name):
+    def saveToFile(self, fileobj, name):
         '''Save expressions to file.
         '''
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
-        file.write(s)
+        fileobj.write(s)

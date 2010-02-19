@@ -21,6 +21,8 @@
 """This module contains routines for importing CSV data files
 in an easy-to-use manner."""
 
+import numpy as N
+
 import datasets
 import veusz.utils as utils
 
@@ -70,6 +72,17 @@ class _FileReaderRows(object):
         self.counter += 1
         return retn
 
+# list of codes which can be added to column descriptors
+typecodes = (
+    ('(string)', 'string'),
+    ('(text)', 'string'),
+    ('(date)', 'date'),
+    ('(time)', 'date'),
+    ('(float)', 'float'),
+    ('(numeric)', 'float'),
+    ('(number)', 'float'),
+    )
+
 class ReadCSV(object):
     """A class to import data from CSV files."""
 
@@ -106,9 +119,48 @@ class ReadCSV(object):
         name = '%s%s%i%s' % (self.prefix, prefix, column+1, self.suffix)
         return name
 
+    def _getNameAndColType(self, colnum, colval):
+        """Get column name and type."""
+
+        name = colval.strip()
+        if name in ('+', '-', '+-'):
+            # loop to find previous valid column
+            prevcol = colnum - 1
+            while prevcol >= 0:
+                n = self.colnames[prevcol]
+                if len(n) > 0 and n[-1] not in "+-":
+                    name = n + name
+                    return self.coltypes[prevcol], name
+                prevcol -= 1
+            else:
+                # did not find anything
+                name = self._generateName(colnum)
+
+        # examine whether object type is at end of name
+        # convert, and remove, if is
+        type = 'float'
+        for codename, codetype in typecodes:
+            if name[-len(codename):] == codename:
+                type = codetype
+                name = name[:-len(codename)].strip()
+                break
+
+        return type, self.prefix + name + self.suffix
+
+    def _setNameAndType(self, colnum, colname, coltype):
+        """Set a name for column number given column name and type."""
+        while colnum >= len(self.coltypes):
+            self.coltypes.append('')
+        self.coltypes[colnum] = coltype
+        self.nametypes[colname] = coltype
+        self.colnames[colnum] = colname
+        if colname not in self.data:
+            self.data[colname] = []
+
     def readData(self):
         """Read the data into the document."""
 
+        # FIXME: this is far too long
         # open the csv file
         csvf = utils.UnicodeCSVReader( open(self.filename),
                                        delimiter=self.delimiter,
@@ -122,10 +174,12 @@ class ReadCSV(object):
             it = _FileReaderCols(csvf)
 
         # dataset names for each column
-        colnames = {}
-        # whether is a text column (ignore name changes below)
-        textcol = {}
-        self.nameistextcol = {}
+        self.colnames = {}
+
+        # type of column (float, string or date)
+        self.coltypes = []
+        # type of names of columns
+        self.nametypes = {}
 
         # iterate over each line (or column)
         while True:
@@ -136,65 +190,41 @@ class ReadCSV(object):
 
             # iterate over items on line
             for colnum, col in enumerate(line):
+
+                if colnum >= len(self.coltypes) or self.coltypes[colnum] == '':
+                    ctype = 'float'
+                else:
+                    ctype = self.coltypes[colnum]
+
                 try:
-                    # try to convert to a float
-                    if colnum not in textcol:
-                        # floating point column
+                    # do any necessary conversion
+                    if ctype == 'float':
                         v = float(col)
-                    else:
-                        # text column
+                    elif ctype == 'date':
+                        v = utils.dateStringToDate(col)
+                    elif ctype == 'string':
                         v = col
 
                 except ValueError:
                     # not a number, so generate a dataset name
 
                     # skip blanks
+                    col = col.strip()
                     if col == '':
                         continue
 
-                    # append on suffix to previous name if an error
-                    name = col
-                    if col in ('+', '-', '+-'):
-                        # loop to find previous valid column
-                        prevcol = colnum - 1
-                        while colnum > 0:
-                            n = colnames[prevcol]
-                            if len(n) > 0 and n[-1] not in "+-":
-                                name = n + col
-                                break
-                            prevcol -= 1
-                        else:
-                            # did not find anything
-                            name = self._generateName(colnum)
+                    coltype, name = self._getNameAndColType(colnum, col)
+                    self._setNameAndType(colnum, name, coltype)
 
-                    else:
-                        # add on prefix/suffix
-                        name = '%s%s%s' % (self.prefix, name, self.suffix)
-
-                    # check whether a text column
-                    if name.split()[-1] == '(text)':
-                        textcol[colnum] = True
-                        # strip off (text)
-                        name = ' '.join(name.split()[:-1])
-                        self.nameistextcol[name] = True
-
-                    # add on dataset
-                    colnames[colnum] = name
-                    if name not in self.data:
-                        self.data[name] = []
-                    
                 else:
-                    # it was a number
+                    # generate a name if required
+                    if colnum not in self.colnames:
+                        self._setNameAndType(colnum, self._generateName(colnum),
+                                             'float')
 
-                    # add on more columns if necessary
-                    if colnum not in colnames:
-                        name = self._generateName(colnum)
-                        colnames[colnum] = name
-                        if name not in self.data:
-                            self.data[name] = []
-
+                    # conversion okay
                     # append number to data
-                    coldata = self.data[colnames[colnum]]
+                    coldata = self.data[self.colnames[colnum]]
                     coldata.append(v)
 
     def setData(self, document, linkedfile=None):
@@ -215,9 +245,9 @@ class ReadCSV(object):
             serr = self.data.get(name+'+-', None)
             perr = self.data.get(name+'+', None)
             nerr = self.data.get(name+'-', None)
-                                
+
             # normal dataset
-            if name in self.nameistextcol:
+            if self.nametypes[name] == 'string':
                 ds = datasets.DatasetText(data=data, linked=linkedfile)
             else:
                 ds = datasets.Dataset(data=data, serr=serr, perr=perr,
@@ -226,7 +256,3 @@ class ReadCSV(object):
 
         dsnames.sort()
         return dsnames
-
-#r = ReadCSV('../test2.csv', prefix='foo', readrows=True)
-#r.readData()
-#print r.data

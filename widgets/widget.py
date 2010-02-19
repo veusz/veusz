@@ -217,7 +217,7 @@ class Widget(object):
             i += 1
 
         if i == noparts:
-            raise ValueError, "Specified an widget, not a setting"
+            raise ValueError, "Specified a widget, not a setting"
         else:
             return obj.settings.getFromPath( parts[i:] )
 
@@ -307,15 +307,15 @@ class Widget(object):
 
         # now go throught the subwidgets
         for c in self.children:
-            text += ( "Add('%s', name='%s', autoadd=False)\n" %
-                      (c.typename, c.name) )
+            text += ( "Add('%s', name=%s, autoadd=False)\n" %
+                      (c.typename, repr(c.name)) )
 
             # if we need to go to the child, go there
             ctext = c.getSaveText(saveall)
             if ctext != '':
-                text += ("To('%s')\n"
+                text += ("To(%s)\n"
                          "%s"
-                         "To('..')\n") % (c.name, ctext)
+                         "To('..')\n") % (repr(c.name), ctext)
 
         return text
 

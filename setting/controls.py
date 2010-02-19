@@ -1028,7 +1028,7 @@ class ListSet(qt4.QFrame):
         self.layout.addWidget(wcolor, row, col)
         wcolor.setMaximumWidth(wcolor.height())
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
-        pix.fill( qt4.QColor(color) )
+        pix.fill( utils.extendedColorToQColor(color) )
         wcolor.setIcon( qt4.QIcon(pix) )
         wcolor.setToolTip(tooltip)
         wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
@@ -1095,18 +1095,21 @@ class ListSet(qt4.QFrame):
         row, col = self.identifyPosn(sender)
 
         rows = self.setting.val
-        color = qt4.QColorDialog.getColor( qt4.QColor(rows[row][col]),
-                                          self )
+        color = qt4.QColorDialog.getColor(
+            utils.extendedColorToQColor(rows[row][col]),
+            self,
+            "Choose color",
+            qt4.QColorDialog.ShowAlphaChannel )
         if color.isValid():
             # change setting
             # this is a bit irritating, as have to do lots of
             # tedious conversions
-            color = unicode(color.name())
+            color = utils.extendedColorFromQColor(color)
             self._updateRowCol(row, col, color)
 
             # change the color
             pix = qt4.QPixmap(self.pixsize, self.pixsize)
-            pix.fill(qt4.QColor(color))
+            pix.fill( utils.extendedColorToQColor(color) )
             sender.setIcon( qt4.QIcon(pix) )
             
 class LineSet(ListSet):

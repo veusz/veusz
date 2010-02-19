@@ -64,6 +64,7 @@ class CommandInterface(qt4.QObject):
         'SetData2DExpressionXYZ',
         'SetData2DXYFunc',
         'SetDataExpression',
+        'SetDataRange',
         'SetDataText',
         'SetVerbose',
         'To',
@@ -225,7 +226,7 @@ class CommandInterface(qt4.QObject):
             print " Positive errors = %s" % str( data.perr )
 
     def SetDataExpression(self, name, val, symerr=None, negerr=None, poserr=None,
-                          linked=False):
+                          linked=False, parametric=None):
         """Create a dataset based on text expressions.
 
         Expressions are functions of existing datasets.
@@ -236,10 +237,15 @@ class CommandInterface(qt4.QObject):
         
         If linked is True then the expressions are reevaluated if the document
         is modified
+
+        parametric: tuple of (minval, maxval, numitems) for creating parametric
+                    datasets. t set to this range when evaluating expressions.
+
         """
 
         expr = {'data': val, 'serr': symerr, 'nerr': negerr, 'perr': poserr}
-        op = operations.OperationDatasetCreateExpression(name, expr, linked)
+        op = operations.OperationDatasetCreateExpression(name, expr, linked,
+                                                         parametric=parametric)
 
         data = self.document.applyOperation(op)
         
@@ -249,7 +255,32 @@ class CommandInterface(qt4.QObject):
             print " Symmetric errors = %s" % str( data.serr )
             print " Negative errors = %s" % str( data.nerr )
             print " Positive errors = %s" % str( data.perr )
+            if parametric:
+                print " Where t goes form %g:%g in %i steps" % parametric
             print " linked to expression = %s" % repr(linked)
+
+    def SetDataRange(self, name, numsteps, val, symerr=None, negerr=None,
+                     poserr=None, linked=False):
+        """Create dataset based on ranges of values, e.g. 1 to 10 in 10 steps
+
+        name: name of dataset
+        numsteps: number of steps to create
+        val: range in form of tuple (minval, maxval)
+        symerr, negerr & poserr: ranges for errors (optional)
+        """
+
+        parts = {'data': val, 'serr': symerr, 'nerr': negerr, 'perr': poserr}
+        op = operations.OperationDatasetCreateRange(name, numsteps, parts,
+                                                    linked)
+        self.document.applyOperation(op)
+        
+        if self.verbose:
+            print "Set variable '%s' based on range:" % name
+            print " Number of steps = %i" % numsteps
+            print " Range of data = %s" % repr(val)
+            print " Range of symmetric error = %s" % repr(symerr)
+            print " Range of positive error = %s" % repr(poserr)
+            print " Range of negative error = %s" % repr(negerr)
 
     def SetData2DExpressionXYZ(self, name, xexpr, yexpr, zexpr, linked=False):
         """Create a 2D dataset based on expressions in x, y and z

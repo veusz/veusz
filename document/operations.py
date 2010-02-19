@@ -216,7 +216,7 @@ class OperationWidgetDelete(object):
         oldparent = document.resolveFullWidgetPath(self.oldparentpath)
         oldparent.addChild(self.oldwidget, index=self.oldindex)
                 
-class OperationWidgetMove(object):
+class OperationWidgetMoveUpDown(object):
     """Move a widget up or down in the hierarchy."""
 
     descr = 'move'
@@ -245,18 +245,74 @@ class OperationWidgetMove(object):
             parent = widget.parent
             parent.moveChild(widget, -self.direction)
             
+class OperationWidgetMove(object):
+    """Move a widget arbitrarily in the hierarchy."""
+
+    descr = 'move'
+
+    def __init__(self, oldchildpath, newparentpath, newindex):
+        """Move widget with path oldchildpath to be a child of
+        newparentpath and with index newindex."""
+        self.oldchildpath = oldchildpath
+        self.newparentpath = newparentpath
+        self.newindex = newindex
+
+    def do(self, document):
+        """Move widget."""
+
+        child = document.resolveFullWidgetPath(self.oldchildpath)
+        oldparent = child.parent
+        newparent = document.resolveFullWidgetPath(self.newparentpath)
+        self.oldchildindex = oldparent.children.index(child)
+        self.oldparentpath = oldparent.path
+
+        if self.newindex < 0:
+            # convert negative index to normal index
+            self.newindex = len(newparent.children)
+
+        if oldparent is newparent:
+            # moving within same parent
+            self.movemode = 'sameparent'
+            del oldparent.children[self.oldchildindex]
+            if self.newindex > self.oldchildindex:
+                self.newindex -= 1
+            oldparent.children.insert(self.newindex, child)
+        else:
+            # moving to different parent
+            self.movemode = 'differentparent'
+            # record previous parent and position
+
+            del oldparent.children[self.oldchildindex]
+            newparent.children.insert(self.newindex, child)
+            child.parent = newparent
+
+        self.newchildpath = child.path
+
+    def undo(self, document):
+        """Undo move."""
+
+        newparent = document.resolveFullWidgetPath(self.newparentpath)
+        child = document.resolveFullWidgetPath(self.newchildpath)
+        oldparent = document.resolveFullWidgetPath(self.oldparentpath)
+
+        del newparent.children[self.newindex]
+        oldparent.children.insert(self.oldchildindex, child)
+        child.parent = oldparent
+
 class OperationWidgetAdd(object):
     """Add a widget of specified type to parent."""
 
     descr = 'add'
     
-    def __init__(self, parent, type, autoadd=True, name=None, **defaultvals):
+    def __init__(self, parent, type, autoadd=True, name=None,
+                 index=-1, **defaultvals):
         """Add a widget of type given
         
         parent is the parent widget
         type is the type to add (string)
         autoadd adds children automatically for some widgets
         name is the (optional) name of the new widget
+        index is position in parent to add the widget
         settings can be passed to the created widgets as optional arguments
         """
         
@@ -264,6 +320,7 @@ class OperationWidgetAdd(object):
         self.type = type
         self.autoadd = autoadd
         self.name = name
+        self.index = index
         self.defaultvals = defaultvals
         
     def do(self, document):
@@ -276,6 +333,7 @@ class OperationWidgetAdd(object):
         w = widgetfactory.thefactory.makeWidget(self.type, parent,
                                                 autoadd=self.autoadd,
                                                 name=self.name,
+                                                index=self.index,
                                                 **self.defaultvals)
         self.createdname = w.name
         return w
@@ -388,7 +446,8 @@ class OperationDatasetUnlink(object):
     def do(self, document):
         dataset = document.data[self.datasetname]
         
-        if isinstance(dataset, datasets.DatasetExpression):
+        if ( isinstance(dataset, datasets.DatasetExpression) or
+             isinstance(dataset, datasets.DatasetRange) ):
             # if it's an expression, unlink from other dataset
             self.mode = 'expr'
             self.olddataset = dataset
@@ -435,7 +494,7 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
     
     descr = 'create dataset from range'
     
-    def __init__(self, datasetname, numsteps, parts):
+    def __init__(self, datasetname, numsteps, parts, linked=False):
         """Create a dataset with numsteps values.
         
         parts is a dict containing keys 'data', 'serr', 'perr' and/or 'nerr'. The values
@@ -444,21 +503,24 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         OperationDatasetCreate.__init__(self, datasetname)
         self.numsteps = numsteps
         self.parts = parts
+        self.linked = linked
         
     def do(self, document):
         """Create dataset using range."""
         
         OperationDatasetCreate.do(self, document)
-        vals = {}
-        for partname, therange in self.parts.iteritems():
-            minval, maxval = therange
-            if self.numsteps == 1:
-                vals[partname] = N.array( [minval] )
-            else:
-                delta = (maxval - minval) / (self.numsteps-1)
-                vals[partname] = N.arange(self.numsteps)*delta + minval
+        data = self.parts['data']
+        serr = self.parts.get('serr', None)
+        perr = self.parts.get('perr', None)
+        nerr = self.parts.get('nerr', None)
+        
+        ds = datasets.DatasetRange(self.numsteps, data, serr=serr,
+                                   perr=perr, nerr=nerr)
+        if not self.linked:
+            # copy these values if we don't want to link
+            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
+                                  perr=ds.perr, nerr=ds.nerr)
 
-        ds = datasets.Dataset(**vals)
         document.setData(self.datasetname, ds)
         return ds
         
@@ -471,7 +533,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
     
     descr = 'create parametric dataset'
     
-    def __init__(self, datasetname, t0, t1, numsteps, parts):
+    def __init__(self, datasetname, t0, t1, numsteps, parts, linked=False):
         """Create a parametric dataset.
         
         Variable t goes from t0 to t1 in numsteps.
@@ -483,51 +545,43 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         self.t0 = t0
         self.t1 = t1
         self.parts = parts
-        
+        self.linked = linked
+
     def do(self, document):
         """Create the dataset."""
         OperationDatasetCreate.do(self, document)
 
-        deltat = (self.t1 - self.t0) / (self.numsteps-1)
-        t = N.arange(self.numsteps)*deltat + self.t0
+        p = self.parts.copy()
+        p['parametric'] = (self.t0, self.t1, self.numsteps)
+        ds = datasets.DatasetExpression(**p)
+        ds.document = document
+
+        if not self.linked:
+            # copy these values if we don't want to link
+            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
+                                  perr=ds.perr, nerr=ds.nerr)
         
-        # define environment to evaluate
-        fnenviron = document.eval_context.copy()
-        fnenviron['t'] = t
-
-        # calculate for each of the dataset components
-        vals = {}
-        for key, expr in self.parts.iteritems():
-            errors = utils.checkCode(expr, securityonly=True)
-            if errors is not None:
-                raise CreateDatasetException("Will not create dataset\n"
-                                             "Unsafe code in expression '%s'\n" % expr)
-                
-            try:
-                vals[key] = eval( expr, fnenviron ) + t*0.
-            except Exception, e:
-                raise CreateDatasetException("Error evaluating expession '%s'\n"
-                                             "Error: '%s'" % (expr, str(e)) )
-
-        ds = datasets.Dataset(**vals)
         document.setData(self.datasetname, ds)
         return ds
         
 class OperationDatasetCreateExpression(OperationDatasetCreate):
     descr = 'create dataset from expression'
 
-    def __init__(self, datasetname, parts, link):
+    def __init__(self, datasetname, parts, link, parametric=None):
         """Create a dataset from existing dataset using expressions.
         
         parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
         The values are expressions for evaluating.
         
         If link is True, then the dataset is linked to the expressions
+        Parametric is a tuple (min, max, numitems) if creating parametric
+        datasets.
         """
         
         OperationDatasetCreate.__init__(self, datasetname)
         self.parts = parts
         self.link = link
+        self.parametric = parametric
 
     def validateExpression(self, document):
         """Validate the expression is okay.
@@ -535,7 +589,9 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         """
 
         try:
-            ds = datasets.DatasetExpression(**self.parts)
+            p = self.parts.copy()
+            p['parametric'] = self.parametric
+            ds = datasets.DatasetExpression(**p)
             ds.document = document
             
             # we force an evaluation of the dataset for the first time, to
@@ -550,7 +606,9 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         """Create the dataset."""
         OperationDatasetCreate.do(self, document)
 
-        ds = datasets.DatasetExpression(**self.parts)
+        p = self.parts.copy()
+        p['parametric'] = self.parametric
+        ds = datasets.DatasetExpression(**p)
         ds.document = document
 
         if not self.link:

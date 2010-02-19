@@ -85,6 +85,13 @@ class DataCreate2DDialog(qt4.QDialog):
         self.mode = '2dexpr'
         if checked: self.updateDatasetLists()
 
+    def escapeDatasets(self, dsnames):
+        """Escape dataset names if they are not typical python ones."""
+
+        for i in xrange(len(dsnames)):
+            if not utils.validPythonIdentifier(dsnames[i]):
+                dsnames[i] = '`%s`' % dsnames[i]
+
     def updateDatasetLists(self):
         """Update controls depending on selected mode."""
 
@@ -95,6 +102,10 @@ class DataCreate2DDialog(qt4.QDialog):
                 datasets[ds.dimensions-1].append(name)
         datasets[0].sort()
         datasets[1].sort()        
+
+        # make sure names are escaped if they have funny characters
+        self.escapeDatasets(datasets[0])
+        self.escapeDatasets(datasets[1])
 
         # help the user by listing existing datasets
         populateCombo(self.namecombo, datasets[0])
