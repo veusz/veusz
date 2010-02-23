@@ -90,9 +90,15 @@ class GridLine(setting.Line):
         self.get('hide').newDefault( True )
         self.get('style').newDefault( 'dotted' )
 
-        self.add( setting.Bool( 'minorLines', False,
-                                descr = 'Show grid lines for minor ticks',
-                                usertext='Minor lines') )
+class MinorGridLine(setting.Line):
+    '''Grid line settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+
+        self.get('color').newDefault( 'lightgrey' )
+        self.get('hide').newDefault( True )
+        self.get('style').newDefault( 'dotted' )
 
 class AxisLabel(setting.Text):
     """For axis labels."""
@@ -256,6 +262,10 @@ class Axis(widget.Widget):
                         descr = 'Grid line settings',
                         usertext = 'Grid lines'),
                pixmap='settings_axisgridlines' )
+        s.add( MinorGridLine('MinorGridLines',
+                             descr = 'Minor grid line settings',
+                             usertext = 'Grid lines for minor ticks'),
+               pixmap='settings_axisminorgridlines' )
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -543,22 +553,12 @@ class Axis(widget.Widget):
 
         painter.drawLines(lines)
 
-    def _drawGridLines(self, painter, coordticks, coordminorticks):
+    def _drawGridLines(self, subset, painter, coordticks):
         """Draw grid lines on the plot."""
-        
-        gl = self.settings.get('GridLines')
-        painter.setPen( gl.makeQPen(painter) )
-
-        # draw grid lines for major ticks
+        painter.setPen( self.settings.get(subset).makeQPen(painter) )
         self.swaplines(painter,
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
-
-        # optionally draw grid lines for minor ticks
-        if gl.minorLines:
-            self.swaplines(painter,
-                           coordminorticks, coordminorticks*0.+self.coordPerp1,
-                           coordminorticks, coordminorticks*0.+self.coordPerp2)
 
     def _drawAxisLine(self, painter):
         """Draw the line of the axis."""
@@ -904,8 +904,10 @@ class Axis(widget.Widget):
             sign *= -1
 
         # plot gridlines
+        if not s.MinorGridLines.hide:
+            self._drawGridLines('MinorGridLines', painter, coordminorticks)
         if not s.GridLines.hide:
-            self._drawGridLines(painter, coordticks, coordminorticks)
+            self._drawGridLines('GridLines', painter, coordticks)
 
         # plot the line along the axis
         if not s.Line.hide:
