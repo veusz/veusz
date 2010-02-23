@@ -90,6 +90,10 @@ class GridLine(setting.Line):
         self.get('hide').newDefault( True )
         self.get('style').newDefault( 'dotted' )
 
+        self.add( setting.Bool( 'minorLines', False,
+                                descr = 'Show grid lines for minor ticks',
+                                usertext='Minor lines') )
+
 class AxisLabel(setting.Text):
     """For axis labels."""
 
@@ -539,13 +543,22 @@ class Axis(widget.Widget):
 
         painter.drawLines(lines)
 
-    def _drawGridLines(self, painter, coordticks):
+    def _drawGridLines(self, painter, coordticks, coordminorticks):
         """Draw grid lines on the plot."""
         
-        painter.setPen( self.settings.get('GridLines').makeQPen(painter) )
+        gl = self.settings.get('GridLines')
+        painter.setPen( gl.makeQPen(painter) )
+
+        # draw grid lines for major ticks
         self.swaplines(painter,
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
+
+        # optionally draw grid lines for minor ticks
+        if gl.minorLines:
+            self.swaplines(painter,
+                           coordminorticks, coordminorticks*0.+self.coordPerp1,
+                           coordminorticks, coordminorticks*0.+self.coordPerp2)
 
     def _drawAxisLine(self, painter):
         """Draw the line of the axis."""
@@ -557,7 +570,7 @@ class Axis(widget.Widget):
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
 
-    def _drawMinorTicks(self, painter):
+    def _drawMinorTicks(self, painter, coordminorticks):
         """Draw minor ticks on plot."""
 
         s = self.settings
@@ -566,10 +579,6 @@ class Axis(widget.Widget):
         pen.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(pen)
         delta = mt.getLength(painter)
-        if len(self.minortickscalc):
-            minorticks = self._graphToPlotter(self.minortickscalc)
-        else:
-            minorticks = []
 
         if s.direction == 'vertical':
             delta *= -1
@@ -578,10 +587,10 @@ class Axis(widget.Widget):
         if s.outerticks:
             delta *= -1
         
-        y = minorticks*0.+self.coordPerp
+        y = coordminorticks*0.+self.coordPerp
         self.swaplines(painter,
-                       minorticks, y,
-                       minorticks, y-delta)
+                       coordminorticks, y,
+                       coordminorticks, y-delta)
 
     def _drawMajorTicks(self, painter, tickcoords):
         """Draw major ticks on the plot."""
@@ -801,7 +810,7 @@ class Axis(widget.Widget):
 
         texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
-    def _autoMirrorDraw(self, posn, painter, coordticks):
+    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
         """Mirror axis to opposite side of graph if there isn't
         an axis there already."""
 
@@ -833,7 +842,7 @@ class Axis(widget.Widget):
         if not s.Line.hide:
             self._drawAxisLine(painter)
         if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter)
+            self._drawMinorTicks(painter, coordminorticks)
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
 
@@ -875,6 +884,7 @@ class Axis(widget.Widget):
 
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
+        coordminorticks = self._graphToPlotter(self.minortickscalc)
 
         # exit if axis is hidden
         if s.hide:
@@ -895,7 +905,7 @@ class Axis(widget.Widget):
 
         # plot gridlines
         if not s.GridLines.hide:
-            self._drawGridLines(painter, coordticks)
+            self._drawGridLines(painter, coordticks, coordminorticks)
 
         # plot the line along the axis
         if not s.Line.hide:
@@ -903,7 +913,7 @@ class Axis(widget.Widget):
 
         # plot minor ticks
         if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter)
+            self._drawMinorTicks(painter, coordminorticks)
 
         # keep track of distance from axis
         self._delta_axis = 0
@@ -923,7 +933,7 @@ class Axis(widget.Widget):
 
         # mirror axis at other side of plot
         if s.autoMirror:
-            self._autoMirrorDraw(posn, painter, coordticks)
+            self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
         # all the text is drawn at the end so that
         # we can check it doesn't overlap
