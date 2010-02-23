@@ -91,7 +91,7 @@ class GridLine(setting.Line):
         self.get('style').newDefault( 'dotted' )
 
 class MinorGridLine(setting.Line):
-    '''Grid line settings.'''
+    '''Minor tick grid line settings.'''
 
     def __init__(self, name, **args):
         setting.Line.__init__(self, name, **args)
@@ -858,7 +858,32 @@ class Axis(widget.Widget):
                 return name
         return widget.Widget.chooseName(self)
 
-    def draw(self, parentposn, painter, suppresstext=False, outerbounds=None):
+    def _suppressText(self, painter, parentposn, outerbounds):
+        """Whether to suppress drawing text on this axis because it
+        is too close to the edge of its parent bounding box.
+
+        If the edge of the plot is within textheight then suppress text
+        """
+        s = self.settings
+        height = qt4.QFontMetricsF( s.get('Label').makeQFont(painter),
+                                    painter.device()).height()
+        otherposition = s.otherPosition
+
+        if s.direction == 'vertical':
+            if ( ( otherposition < 0.01 and
+                   abs(parentposn[0]-outerbounds[0]) < height) or
+                 ( otherposition > 0.99 and
+                   abs(parentposn[2]-outerbounds[2]) < height) ):
+                return True
+        else:
+            if ( ( otherposition < 0.01 and
+                   abs(parentposn[3]-outerbounds[3]) < height) or
+                 ( otherposition > 0.99 and
+                   abs(parentposn[1]-outerbounds[1]) < height) ):
+                return True
+        return False
+
+    def draw(self, parentposn, painter, outerbounds=None):
         """Plot the axis on the painter.
 
         if suppresstext is True, then we don't number or label the axis
@@ -924,7 +949,16 @@ class Axis(widget.Widget):
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
 
+        # debugging
+        #painter.save()
+        #painter.setPen(qt4.QPen(qt4.Qt.blue))
+        #painter.drawRect(
+        #    qt4.QRectF(qt4.QPointF(outerbounds[0], outerbounds[1]),
+        #               qt4.QPointF(outerbounds[2], outerbounds[3])) )
+        #painter.restore()
+
         # plot tick labels
+        suppresstext = self._suppressText(painter, parentposn, outerbounds)
         if not s.TickLabels.hide and not suppresstext:
             self._drawTickLabels(painter, coordticks, sign, outerbounds,
                                  texttorender)

@@ -137,14 +137,6 @@ class Graph(widget.Widget):
         painter.drawRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
                                      qt4.QPointF(bounds[2], bounds[3])) )
 
-        # work out outer bounds
-        ob = list(parentposn)
-        if outerbounds is not None:
-            # see whether margin, is zero, and borrow from above if so
-            for i in xrange(4):
-                if margins[i] == 0.:
-                    ob[i] = outerbounds[i]
-
         painter.endPaintingWidget()
 
         # set default pen/brush
@@ -168,33 +160,13 @@ class Graph(widget.Widget):
             except AttributeError:
                 pass
 
-        # FIXME: this code is terrible - find a better way to do this
         axestodraw = axestodraw - childrennames
-        # if there are any 
         if axestodraw:
             # now redraw all these axes if they aren't children of us
-
-            # nasty, as we have to work out whether we're on the edge of
-            # a collection
-            edgezero = [ abs(a-b)<2 for a, b in izip(bounds, parentposn) ]
-
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:
-                if w is None:
-                    continue
-                    
-                # find which side the axis is against
-                edge = w.againstWhichEdge()
-
-                # if it's in the middle of the plot (edges is None)
-                # or the distance to the edge is not zero,
-                # and the margin is zero, suppress text
-                
-                showtext = ( edge is None or edgezero[edge] or
-                             margins[edge] != 0 )
-                
-                w.draw( bounds, painter, suppresstext = not showtext,
-                        outerbounds=ob )
+                if w is not None:
+                    w.draw(bounds, painter, outerbounds=outerbounds)
 
         return bounds
 
