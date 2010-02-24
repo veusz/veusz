@@ -32,7 +32,7 @@ import veusz.utils as utils
 import widget
 import axisticks
 import graph
-import containers
+import grid
 import controlgraph
 
 ###############################################################################
@@ -136,7 +136,7 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = [graph.Graph, containers.Grid]
+    allowedparenttypes = [graph.Graph, grid.Grid]
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
     isaxis = True

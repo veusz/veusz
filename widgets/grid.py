@@ -1,6 +1,3 @@
-# containers.py
-# plot containers, for holding other plotting elements
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -21,10 +18,8 @@
 
 # $Id$
 
-"""Module containing container widget classes.
-
-Classes include
- Grid: Class to plot a grid of plots
+"""The grid class allows graphs to be arranged in a regular grid.
+The graphs may share axes if they are stored in the grid widget.
 """
 
 import veusz.document as document
@@ -156,13 +151,7 @@ class Grid(widget.Widget):
     allowedparenttypes=[page.Page]
 
     def __init__(self, parent, name=None):
-        """Initialise the container.
-
-        Specify rows to grow horizontal, but fill vertically
-        Specify columnss to grow vertically, but fill horizontally
-
-        By default columns will be 1.
-        If both are specified then we ignore rows
+        """Initialise the grid.
         """
 
         widget.Widget.__init__(self, parent, name=name)

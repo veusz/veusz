@@ -28,7 +28,7 @@ import veusz.document as document
 import veusz.setting as setting
 
 import graph
-import containers
+import grid
 import widget
 import axis
 
@@ -39,7 +39,7 @@ class ColorBar(axis.Axis):
     """
 
     typename='colorbar'
-    allowedparenttypes = [graph.Graph, containers.Grid]
+    allowedparenttypes = [graph.Graph, grid.Grid]
     allowusercreation = True
     description = 'Image color bar'
 

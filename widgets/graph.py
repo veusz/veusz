@@ -30,14 +30,14 @@ import veusz.document as document
 import widget
 import axis
 import page
-import containers
+import grid
 import controlgraph
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = [page.Page, containers.Grid]
+    allowedparenttypes = [page.Page, grid.Grid]
     allowusercreation = True
     description = 'Base graph'
 

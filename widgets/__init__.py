@@ -1,5 +1,3 @@
-# widgets __init__.py file
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -20,22 +18,24 @@
 
 # $Id$
 
-from widget import *
-from axis import *
-from graph import *
-from containers import *
-from plotters import *
-from point import *
-from function import *
-from textlabel import *
-from page import *
-from root import *
-from key import *
-from fit import *
-from image import *
-from contour import *
-from colorbar import *
-from shape import *
-from line import *
-from bar import *
-from polygon import *
+"""Widgets are defined in this module."""
+
+from widget import Widget, Action
+from axis import Axis
+from graph import Graph
+from grid import Grid
+from plotters import GenericPlotter, FreePlotter
+from point import PointPlotter
+from function import FunctionPlotter
+from textlabel import TextLabel
+from page import Page
+from root import Root
+from key import Key
+from fit import Fit
+from image import Image
+from contour import Contour
+from colorbar import ColorBar
+from shape import Shape, BoxShape, Rectangle, Ellipse, ImageFile
+from line import Line
+from bar import BarPlotter
+from polygon import Polygon
