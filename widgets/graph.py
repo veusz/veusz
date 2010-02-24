@@ -59,12 +59,12 @@ class Graph(widget.Widget):
                                  usertext='Left margin',
                                  formatting=True) )
         s.add( setting.Distance( 'rightMargin',
-                                 '0.1cm',
+                                 '0.2cm',
                                  descr='Distance from right of graph to edge',
                                  usertext='Right margin',
                                  formatting=True) )
         s.add( setting.Distance( 'topMargin',
-                                 '0.1cm',
+                                 '0.2cm',
                                  descr='Distance from top of graph to edge',
                                  usertext='Top margin',
                                  formatting=True) )

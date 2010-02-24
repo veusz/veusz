@@ -767,11 +767,9 @@ class Renderer:
         # add a small amount of extra room if requested
         if extraspace:
             self.painter.setFont(self.font)
-            l = qt4.QFontMetricsF(self.font, self.painter.device()).height()*0.2
-            minx += l
-            maxx -= l
+            l = qt4.QFontMetricsF(self.font,
+                                  self.painter.device()).height()*0.2
             miny += l
-            maxy -= l
 
         # twiddle positions and bounds
         if cb[2] > maxx:

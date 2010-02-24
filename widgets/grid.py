@@ -203,12 +203,12 @@ class Grid(widget.Widget):
                                  'edge of page',
                                  usertext='Left margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
+        s.add( setting.Distance( 'rightMargin', '0.2cm', descr=
                                  'Distance from right of grid to '
                                  'edge of page',
                                  usertext='Right margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
+        s.add( setting.Distance( 'topMargin', '0.2cm', descr=
                                  'Distance from top of grid to '
                                  'edge of page',
                                  usertext='Top margin',
