@@ -323,13 +323,13 @@ class Grid(widget.Widget):
 
             # work out bounds for graph in box
             # FIXME: should consider case if no graphs to side
-            if cpos[0] == 0.:
+            if abs(cpos[0]) < 1e-3:
                 coutbound[0] = parentposn[0]
-            if cpos[1] == 0.:
+            if abs(cpos[1]) < 1e-3:
                 coutbound[1] = parentposn[1]
-            if cpos[2] == 1.:
+            if abs(cpos[2]-1) < 1e-3:
                 coutbound[2] = parentposn[2]
-            if cpos[3] == 1.:
+            if abs(cpos[3]-1) < 1e-3:
                 coutbound[3] = parentposn[3]
 
         # draw widget
