@@ -240,7 +240,7 @@ def formatSciNotation(num, formatargs=''):
         leader = ''
     else:
         # the unicode string is a small space, multiply and small space
-        leader += u'\u200a\u00d7\u200a'
+        leader += u'\u00d7'
 
     return '%s10^{%i}' % (leader, int(exponent))
 
@@ -310,7 +310,7 @@ def formatNumber(num, format):
                 out = _formaterror
 
             # replace hyphen with true - and small space
-            out = out.replace('-', u'\u2212\u200a')
+            out = out.replace('-', u'\u2212')
 
         else:
             # standard C formatting
