@@ -20,8 +20,8 @@
 
 """Classes to represent datasets."""
 
-import itertools
 import re
+from itertools import izip
 
 import numpy as N
 
@@ -316,9 +316,9 @@ class LinkedFITSFile(LinkedFileBase):
 
         args = [self.dsname, self._getSaveFilename(relpath), self.hdu]
         args = [repr(i) for i in args]
-        for c, a in itertools.izip(self.columns,
-                                   ('datacol', 'symerrcol',
-                                    'poserrcol', 'negerrcol')):
+        for c, a in izip(self.columns,
+                         ('datacol', 'symerrcol',
+                          'poserrcol', 'negerrcol')):
             if c is not None:
                 args.append('%s=%s' % (a, repr(c)))
         args.append('linked=True')
@@ -336,7 +336,7 @@ class LinkedFITSFile(LinkedFileBase):
                                                 negerrcol = self.columns[3],
                                                 linked=True)
 
-        # don't use applyoperation interface as we don't want this to be undoable
+        # don't use applyoperation interface as we don't want to be undoable
         op.do(document)
         
         return ([self.dsname], {self.dsname: 0})
@@ -466,7 +466,6 @@ class DatasetBase(object):
 
     def __len__(self):
         """Return length of dataset."""
-
         return len(self.data)
     
     def deleteRows(self, row, numrows):
@@ -704,7 +703,7 @@ class Dataset(DatasetBase):
         # write line line-by-line
         format = '%e ' * len(datasets)
         format = format[:-1] + '\n'
-        for line in itertools.izip( *datasets ):
+        for line in izip( *datasets ):
             fileobj.write( format % line )
 
         fileobj.write( "''')\n" )
@@ -811,60 +810,6 @@ class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
     pass
 
-# This code requires Python 2.4
-# class _ExprDict(dict):
-#     """A subclass of a dict which help evaluate expressions on the fly.
-
-#     We do this because there's not an easy way to work out what order
-#     the expressions should be evaluated in if there is interdependence
-
-#     This is a subclass of dict so we can grab values from the document
-#     if they match dataset names
-
-#     part should be set to the part currently being evaluated
-#     """
-
-#     # allowed extensions to dataset names
-#     _validextn = {'data': True, 'serr': True, 'nerr': True, 'perr': True}
-
-#     def __init__(self, oldenvironment, document, part):
-#         """Evaluate expressions in environment of document.
-
-#         document is the document to look for data in
-#         oldenvironment is a globals environment or suchlike
-#         part is the part of the dataset to use by default (e.g. 'serr')
-#         """
-
-#         # copy environment from existing environment
-#         self.update(oldenvironment)
-#         self.document = document
-#         self.part = part
-
-#     def __getitem__(self, item):
-#         """Return the value corresponding to key item from the dict
-
-#         This works by checking for the dataset in the document first, and
-#         returning that if it exists
-#         """
-
-#         # make a copy as we might change it if it contains an extn
-#         i = item
-
-#         # look for a valid extension to the dataset name
-#         part = self.part
-#         p = item.split('_')
-#         if len(p) > 1:
-#             if p[-1] in _ExprDict._validextn:
-#                 part = p[-1]
-#             i = '_'.join(p[:-1])
-
-#         print "**", i, "**"
-#         if i in self.document.data:
-#             return getattr(self.document.data[i], part)
-#         else:
-#             # revert to old behaviour
-#             return dict.__getitem__(self, item)
-
 # split expression on python operators or quoted `DATASET`
 dataexpr_split_re = re.compile(r'(`.*?`|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
 # identify whether string is a quoted identifier
@@ -911,10 +856,12 @@ def _evaluateDataset(datasets, dsname, dspart):
     if dspart in dataexpr_columns:
         val = getattr(datasets[dsname], dspart)
         if val is None:
-            raise DatasetExpressionException("Dataset '%s' does not have part '%s'" % (dsname, dspart))
+            raise DatasetExpressionException(
+                "Dataset '%s' does not have part '%s'" % (dsname, dspart))
         return val
     else:
-        raise DatasetExpressionException('Internal error - invalid dataset part')
+        raise DatasetExpressionException(
+            'Internal error - invalid dataset part')
 
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
@@ -942,8 +889,7 @@ class DatasetExpression(Dataset):
 
         self.cachedexpr = {}
 
-        self.docchangeset = { 'data': None, 'serr': None,
-                              'perr': None, 'nerr': None }
+        self.docchangeset = -1
         self.evaluated = {}
 
     def evaluateDataset(self, dsname, dspart):
@@ -956,9 +902,7 @@ class DatasetExpression(Dataset):
                     
     def _evaluatePart(self, expr, part):
         """Evaluate expression expr for part part."""
-        # replace dataset names with calls (ugly hack)
-        # but necessary for Python 2.3 as we can't replace
-        # dict in eval by subclass
+        # replace dataset names with calls
         expr = _substituteDatasets(self.document.data, expr, part)
 
         # check expression for nasties if it has changed
@@ -988,9 +932,8 @@ class DatasetExpression(Dataset):
 
         # actually evaluate the expression
         try:
-            e = self.evaluated[part] = N.array(
-                eval(expr, environment),
-                N.float64)
+            evalout = N.array(eval(expr, environment), N.float64)
+            self.evaluated[part] = evalout
         except Exception, ex:
             raise DatasetExpressionException(
                 "Error evaluating expession: %s\n"
@@ -998,34 +941,55 @@ class DatasetExpression(Dataset):
 
         # make evaluated error expression have same shape as data
         if part != 'data':
-            data = getattr(self, 'data')
-            if data.shape != e.shape:
+            data = self.evaluated['data']
+            if data.shape != evalout.shape:
                 try:
                     # 1-dimensional - make it right size and trim
-                    oldsize = len(e)
-                    e = N.resize(e, data.shape)
-                    e[oldsize:] = N.nan
+                    oldsize = evalout.shape[0]
+                    evalout = N.resize(evalout, data.shape)
+                    evalout[oldsize:] = N.nan
                 except TypeError:
                     # 0-dimensional - just make it repeat
-                    e = N.resize(e, data.shape)
-                self.evaluated[part] = e
+                    evalout = N.resize(evalout, data.shape)
+                self.evaluated[part] = evalout
+
+    def updateEvaluation(self):
+        """Update evaluation of parts of dataset.
+        Throws DatasetExpressionException if error
+        """
+        if self.docchangeset != self.document.changeset:
+            # avoid infinite recursion!
+            self.docchangeset = self.document.changeset
+
+            # zero out previous values
+            for part in self.columns:
+                self.evaluated[part] = None
+
+            # update all parts
+            for part in self.columns:
+                expr = self.expr[part]
+                if expr is not None and expr.strip() != '':
+                    self._evaluatePart(expr, part)
 
     def _propValues(self, part):
         """Check whether expressions need reevaluating,
         and recalculate if necessary."""
+        try:
+            self.updateEvaluation()
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
 
-        # if document has been modified since the last invocation
-        if self.docchangeset[part] != self.document.changeset:
-            # avoid infinite recursion!
-            self.docchangeset[part] = self.document.changeset
-            expr = self.expr[part]
-            self.evaluated[part] = None
-
-            if expr is not None and expr != '':
-                self._evaluatePart(expr, part)
-
-        # return the evaluated form of the expression
+        # catch case where error in setting data, need to return "real" data
+        if self.evaluated['data'] is None:
+            self.evaluated['data'] = N.array([])
         return self.evaluated[part]
+
+    # expose evaluated data as properties
+    # this allows us to recalculate the expressions on the fly
+    data = property(lambda self: self._propValues('data'))
+    serr = property(lambda self: self._propValues('serr'))
+    perr = property(lambda self: self._propValues('perr'))
+    nerr = property(lambda self: self._propValues('nerr'))
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
@@ -1046,13 +1010,6 @@ class DatasetExpression(Dataset):
         s = 'SetDataExpression(%s)\n' % ', '.join(parts)
         fileobj.write(s)
         
-    # expose evaluated data as properties
-    # this allows us to recalculate the expressions on the fly
-    data = property(lambda self: self._propValues('data'))
-    serr = property(lambda self: self._propValues('serr'))
-    perr = property(lambda self: self._propValues('perr'))
-    nerr = property(lambda self: self._propValues('nerr'))
-
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
@@ -1085,8 +1042,8 @@ class DatasetExpression(Dataset):
             text.append('Linked parametric dataset')
         else:
             text.append('Linked expression dataset')
-        for label, part in itertools.izip(self.column_descriptions,
-                                          self.columns):
+        for label, part in izip(self.column_descriptions,
+                                self.columns):
             if self.expr[part]:
                 text.append('%s: %s' % (label, self.expr[part]))
 
@@ -1149,8 +1106,8 @@ class DatasetRange(Dataset):
     def linkedInformation(self):
         """Return information about linking."""
         text = ['Linked range dataset']
-        for label, part in itertools.izip(self.column_descriptions,
-                                          self.columns):
+        for label, part in izip(self.column_descriptions,
+                                self.columns):
             val = getattr(self, 'range_%s' % part)
             if val:
                 text.append('%s: %g:%g' % (label, val[0], val[1]))
@@ -1182,7 +1139,9 @@ def getSpacing(data):
                 # new delta - check is multiple of old delta
                 ratio = delta/mindelta
                 if N.fabs(int(ratio)-ratio) > 1e-3:
-                    raise DatasetExpressionException('Variable spacings not yet supported in constructing 2D datasets')
+                    raise DatasetExpressionException(
+                        'Variable spacings not yet supported '
+                        'in constructing 2D datasets')
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 
@@ -1203,10 +1162,6 @@ class Dataset2DXYZExpression(DatasetBase):
         self.lastchangeset = -1
         self.cacheddata = None
         
-#         for expr in exprx, expry, exprz:
-#             if utils.checkCode(expr, securityonly=True) is not None:
-#                 raise DatasetExpressionException("Unsafe expression '%s'" % expr)
-
         # copy parameters
         self.exprx = exprx
         self.expry = expry
@@ -1254,8 +1209,9 @@ class Dataset2DXYZExpression(DatasetBase):
             try:
                 evaluated[name] = eval(expr, environment)
             except Exception, e:
-                raise DatasetExpressionException("Error evaluating expession: %s\n"
-                                                 "Error: %s" % (expr, str(e)) )
+                raise DatasetExpressionException(
+                    "Error evaluating expession: %s\n"
+                    "Error: %s" % (expr, str(e)) )
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
         miny, maxy, stepy, stepsy = getSpacing(evaluated['expry'])

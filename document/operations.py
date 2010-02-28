@@ -588,19 +588,17 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         A CreateDatasetException is raised if not
         """
 
+        p = self.parts.copy()
+        p['parametric'] = self.parametric
+        ds = datasets.DatasetExpression(**p)
+        ds.document = document
         try:
-            p = self.parts.copy()
-            p['parametric'] = self.parametric
-            ds = datasets.DatasetExpression(**p)
-            ds.document = document
-            
             # we force an evaluation of the dataset for the first time, to
             # check for errors in the expressions
-            for i in self.parts.iterkeys():
-                getattr(ds, i)
+            ds.updateEvaluation()
             
         except datasets.DatasetExpressionException, e:
-            raise CreateDatasetException(str(e))
+            raise CreateDatasetException(unicode(e))
         
     def do(self, document):
         """Create the dataset."""
