@@ -487,11 +487,7 @@ class Document( qt4.QObject ):
         if ext == '.pdf':
             f = qt4.QPrinter.PdfFormat
         else:
-            try:
-                f = qt4.QPrinter.PostScriptFormat
-            except AttributeError:
-                # < qt4.2 bah
-                f = qt4.QPrinter.NativeFormat
+            f = qt4.QPrinter.PostScriptFormat
         printer.setOutputFormat(f)
         printer.setOutputFileName(filename)
         printer.setCreator('Veusz %s' % utils.version())
