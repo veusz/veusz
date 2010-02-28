@@ -112,6 +112,10 @@ class FunctionPlotter(GenericPlotter):
         """Adjust the range of the axis depending on the values plotted."""
         s = self.settings
 
+        # ignore empty function
+        if s.function.strip() == '':
+            return
+
         # ignore if function isn't sensible
         if not self._checkCachedFunction():
             return
@@ -344,8 +348,8 @@ class FunctionPlotter(GenericPlotter):
         x1, y1, x2, y2 = posn
         s = self.settings
 
-        # exit if hidden
-        if s.hide:
+        # exit if hidden or function blank
+        if s.hide or s.function.strip() == '':
             return
 
         # get axes widgets
