@@ -142,6 +142,7 @@ class Embedded(object):
         # or veusz on the path in order
         for shell, cmd in ( (False, [sys.executable, remoteembed]),
                             (False, [veuszex]),
+                            (False, ['veusz']),
                             (True, ['veusz']), ):
             try:
                 cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
