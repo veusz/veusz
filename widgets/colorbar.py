@@ -208,7 +208,7 @@ class ColorBar(axis.Axis):
         # will mess up range if called twice
         savedposition = self.position
         self.position = (0., 0., 1., 1.)
-        axis.Axis.draw(self, bounds, painter)
+        axis.Axis.draw(self, bounds, painter, outerbounds=outerbounds)
         self.position = savedposition
 
         painter.endPaintingWidget()
