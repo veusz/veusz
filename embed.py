@@ -140,13 +140,17 @@ class Embedded(object):
 
         # try embed_remote.py in this directory, veusz in this directory
         # or veusz on the path in order
-        for shell, cmd in ( (False, [sys.executable, remoteembed]),
-                            (False, [veuszex]),
-                            (False, ['veusz']),
-                            (True, ['veusz']), ):
+        for withpath, cmd in ( (False, [sys.executable, remoteembed]),
+                               (False, [veuszex]),
+                               (True, ['veusz']), ):
+            # windows doesn't seem to think an exception should be raised
+            # if there is an error running the command
+            if not withpath and False in [os.path.exists(c) for c in cmd]:
+                continue
+
             try:
                 cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
-                                              shell=shell, bufsize=0,
+                                              shell=False, bufsize=0,
                                               close_fds=False,
                                               stdin=subprocess.PIPE)
                 return
