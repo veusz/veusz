@@ -43,6 +43,7 @@ More than one embedded window can be opened at once
 
 import atexit
 import sys
+import os
 import os.path
 import struct
 import new
@@ -59,6 +60,16 @@ def Bind1st(function, arg):
         return function( arg, *args, **args2 )
 
     return runner
+
+def findOnPath(cmd):
+    """Find a command on the system path, or None if does not exist."""
+    path = os.getenv('PATH', os.path.defpath)
+    pathparts = path.split(os.path.pathsep)
+    for dirname in pathparts:
+        cmdtry = os.path.join(dirname, cmd)
+        if os.path.isfile(cmdtry):
+            return cmdtry
+    return None
 
 class Embedded(object):
     """An embedded instance of Veusz.
@@ -135,30 +146,28 @@ class Embedded(object):
     def makeRemoteProcess(cls):
         """Try to find veusz process for remote program."""
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        remoteembed = os.path.join(thisdir, 'embed_remote.py')
-        veuszex = os.path.join(thisdir, 'veusz')
 
         # try embed_remote.py in this directory, veusz in this directory
-        # or veusz on the path in order
-        for withpath, cmd in ( (False, [sys.executable, remoteembed]),
-                               (False, [veuszex]),
-                               (True, ['veusz']), ):
-            # windows doesn't seem to think an exception should be raised
-            # if there is an error running the command
-            if not withpath and False in [os.path.exists(c) for c in cmd]:
-                continue
+        # or veusz on the path in order (also try veusz.exe for windows)
+        for cmd in ( [sys.executable, os.path.join(thisdir, 'embed_remote.py')],
+                     [os.path.join(thisdir, 'veusz')],
+                     [findOnPath('veusz')],
+                     [findOnPath('veusz.exe')] ):
 
-            try:
-                cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
-                                              shell=False, bufsize=0,
-                                              close_fds=False,
-                                              stdin=subprocess.PIPE)
-                return
-            except OSError:
-                pass
+            # only try to run commands that exist as error handling
+            # does not work well when interfacing with OS (especially Windows)
+            if ( None not in cmd and
+                 False not in [os.path.isfile(c) for c in cmd] ):
+                try:
+                    cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
+                                                  shell=False, bufsize=0,
+                                                  close_fds=False,
+                                                  stdin=subprocess.PIPE)
+                    return
+                except OSError:
+                    pass
 
-        sys.stderr.write('Unable to find a Veusz executable. Exiting.\n')
-        sys.exit(1)
+        raise RuntimeError('Unable to find a veusz executable on system path')
         
     @classmethod
     def startRemote(cls):
