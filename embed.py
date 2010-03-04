@@ -159,17 +159,17 @@ class Embedded(object):
         if sys.platform == 'win32':
             findexe = findOnPath('veusz.exe')
             if findexe:
-                possiblecommands += [ findexe ]
+                possiblecommands += [ [findexe] ]
             else:
-                possiblecommands += [ os.path.join( os.environ['ProgramFiles'],
-                                                    'Veusz', 'veusz.exe' ) ]
+                possiblecommands += [ [os.path.join( os.environ['ProgramFiles'],
+                                                     'Veusz', 'veusz.exe' )] ]
         elif sys.platform == 'darwin':
             findbundle = findOnPath('Veusz.app')
             if findbundle:
-                possiblecommands += [ findbundle+'/Contents/MacOS/Veusz' ]
+                possiblecommands += [ [findbundle+'/Contents/MacOS/Veusz'] ]
             else:
-                possiblecommands += [
-                    '/Applications/Veusz.app/Contents/MacOS/Veusz' ]
+                possiblecommands += [[
+                    '/Applications/Veusz.app/Contents/MacOS/Veusz' ]]
 
         for cmd in possiblecommands:
             # only try to run commands that exist as error handling

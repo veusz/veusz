@@ -15,10 +15,10 @@ import sys
 if sys.platform == 'win32':
     # windows
     name = r'buildveusz_pyinst\veusz.exe'
-    thisdir = r'c:\source\veusz'
+    thisdir = r'c:\src\veusz'
     console = 0
     aargs = {'icon': os.path.join(thisdir,'windows/icons/veusz.ico')}
-    upx = True
+    upx = False
     strip = False
 else:
     # unix
