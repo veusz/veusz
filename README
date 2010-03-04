@@ -1,4 +1,4 @@
-Veusz 1.6
+Veusz 1.7
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -18,31 +18,28 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.6:
- * User defined constants, functions or external Python imports can be
-   defined for use when evaluating expressions.
- * Import descriptor is much more tolerant of syntax, e.g. "x,+- y,+,-" can
-   now be specified as "x +- y + -".
- * New SVG export (PyQt >= 4.6). Supports clipping and exports text
-   as paths for full WYSIWYG.
- * Dataset names can now contain any character except "`". Names containing
-   non-alphanumeric characters can be quoted in expressions `like so`*1.23
- * Widget names can contain any character except "/"
- * A transparency dataset can be provided to specify the per-pixel
-   transparency of the image widget.
- * A polygon widget has been added.
- * There is a new option to place axis ticks outside the plot (outer ticks
-   setting on axis widget)
- * Several new line styles have been added.
- * Several new plotting markers have been added.
- * The capture dialog can optionally retain the last N values captured.
+Changes in 1.7:
+ * Widgets can be dragged and dropped in the widget tree, or copied
+   by holding down Ctrl
+ * Axis labels are centred if possible at the start and ends of axes
+ * Axis labelling bugs fixed when putting graphs in grids
+ * Ship embedding module in binary versions
+ * Grid lines can be drawn on axis minor ticks
+ * Contour widget can draw minor (dotted) contours between main contours
+ * Get log contour values correct
+ * Fixes for widget names and dataset names with Unicode characters, including
+   copy and paste
+ * Optional smoothing in image widget
 
 Minor changes:
- * Use of flat cap line style for plotting error bars for exactness.
- * Add fixes for saving imported unicode text.
- * Fix image colors for big endian systems (e.g. Mac PPC).
- * Add boxfill error bar style, plotting errors as filled boxes.
- * Positive and negative error bars are forced to have the correct sign.
+ * Errors in evaluating expressions are logged in the console window, and
+   do not show exceptions
+ * Fix problems when importing multiple symbols from python modules in the
+   custom import dialog
+ * Use minus sign for negative numbers, rather than hyphens
+ * Contour widget lines can have transparency
+ * Datasets are sorted by name when writing to saved document
+ * Use correct status for paste button when starting application
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -64,6 +61,7 @@ Features of package:
  * Embed Veusz within other programs
  * Text, CSV and FITS importing
  * Data can be captured from external sources
+ * User defined functions, constants and can import external Python functions
 
 Requirements for source install:
  Python (2.4 or greater required)
