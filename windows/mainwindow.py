@@ -728,7 +728,8 @@ class MainWindow(qt4.QMainWindow):
                 open(filename)
             except IOError, e:
                 qt4.QMessageBox("Unable to open file",
-                                "Unable to open file '%s'\n'%s'" % (filename, str(e)),
+                                "Unable to open file '%s'\n'%s'" %
+                                (filename, unicode(e)),
                                 qt4.QMessageBox.Critical,
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                                 qt4.QMessageBox.NoButton,
@@ -990,11 +991,20 @@ class MainWindow(qt4.QMainWindow):
             filters.append(filterstr)
             validextns += extns
 
-        fd.setFilters(filters)
+        try:
+            # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
+            fd.setNameFilters(filters)
+        except AttributeError:
+            fd.setFilters(filters)
+
         # restore last format if possible
         try:
             filt = setting.settingdb['export_lastformat']
-            fd.selectFilter(filt)
+            try:
+                # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
+                fd.setNameFilter(filt)
+            except AttributeError:
+                fd.selectFilter(filt)
             extn = formats[filters.index(filt)][0][0]
         except (KeyError, IndexError, ValueError):
             extn = 'eps'
