@@ -148,12 +148,30 @@ class Embedded(object):
         thisdir = os.path.dirname(os.path.abspath(__file__))
 
         # try embed_remote.py in this directory, veusz in this directory
-        # or veusz on the path in order (also try veusz.exe for windows)
-        for cmd in ( [sys.executable, os.path.join(thisdir, 'embed_remote.py')],
-                     [os.path.join(thisdir, 'veusz')],
-                     [findOnPath('veusz')],
-                     [findOnPath('veusz.exe')] ):
+        # or veusz on the path in order
+        possiblecommands = [ [sys.executable,
+                              os.path.join(thisdir, 'embed_remote.py')],
+                             [os.path.join(thisdir, 'veusz')],
+                             [findOnPath('veusz')] ]
 
+        # it's hard to find Veusz on Win/MacOS so cheat: check path and
+        # look in likely places
+        if sys.platform == 'win32':
+            findexe = findOnPath('veusz.exe')
+            if findexe:
+                possiblecommands += [ findexe ]
+            else:
+                possiblecommands += [ os.path.join( os.environ['ProgramFiles'],
+                                                    'Veusz', 'veusz.exe' ) ]
+        elif sys.platform == 'darwin':
+            findbundle = findOnPath('Veusz.app')
+            if findbundle:
+                possiblecommands += [ findbundle+'/Contents/MacOS/Veusz' ]
+            else:
+                possiblecommands += [
+                    '/Applications/Veusz.app/Contents/MacOS/Veusz' ]
+
+        for cmd in possiblecommands:
             # only try to run commands that exist as error handling
             # does not work well when interfacing with OS (especially Windows)
             if ( None not in cmd and
@@ -168,7 +186,7 @@ class Embedded(object):
                     pass
 
         raise RuntimeError('Unable to find a veusz executable on system path')
-        
+
     @classmethod
     def startRemote(cls):
         """Start remote process."""
@@ -244,4 +262,3 @@ class Embedded(object):
         cls.serv_socket.shutdown(socket.SHUT_RDWR)
         cls.serv_socket.close()
         cls.serv_socket, cls.from_pipe = -1, -1
-
