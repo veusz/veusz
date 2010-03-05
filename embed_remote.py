@@ -119,7 +119,7 @@ class EmbedApplication(qt4.QApplication):
     """
 
     # lengths of lengths sent to application
-    cmdlenlen = len(struct.pack('L', 0))
+    cmdlenlen = struct.calcsize('<I')
 
     def __init__(self, socket, args):
         qt4.QApplication.__init__(self, args)
@@ -149,7 +149,7 @@ class EmbedApplication(qt4.QApplication):
 
     def readCommand(socket):
         # get length of packet
-        length = struct.unpack('L', EmbedApplication.readLenFromSocket(
+        length = struct.unpack('<I', EmbedApplication.readLenFromSocket(
                 socket, EmbedApplication.cmdlenlen))[0]
         # unpickle command and arguments
         return cPickle.loads(
@@ -204,7 +204,7 @@ class EmbedApplication(qt4.QApplication):
         outstr = cPickle.dumps(retval)
 
         # send return data to stdout
-        self.writeToSocket( self.socket, struct.pack('L', len(outstr)) )
+        self.writeToSocket( self.socket, struct.pack('<I', len(outstr)) )
         self.writeToSocket( self.socket, outstr )
 
         # do quit after if requested

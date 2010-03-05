@@ -215,7 +215,7 @@ class Embedded(object):
         assert secret == secretback
 
         # packet length for command bytes
-        cls.cmdlen = len(struct.pack('L', 0))
+        cls.cmdlen = struct.calcsize('<I')
         atexit.register(cls.exitQt)
 
     @staticmethod
@@ -238,11 +238,11 @@ class Embedded(object):
 
         outs = cPickle.dumps(cmd)
 
-        cls.writeToSocket( cls.serv_socket, struct.pack('L', len(outs)) )
+        cls.writeToSocket( cls.serv_socket, struct.pack('<I', len(outs)) )
         cls.writeToSocket( cls.serv_socket, outs )
 
-        backlen = struct.unpack('L', cls.readLenFromSocket(cls.serv_socket,
-                                                           cls.cmdlen))[0]
+        backlen = struct.unpack('<I', cls.readLenFromSocket(cls.serv_socket,
+                                                            cls.cmdlen))[0]
         rets = cls.readLenFromSocket( cls.serv_socket, backlen )
         retobj = cPickle.loads(rets)
         if isinstance(retobj, Exception):
