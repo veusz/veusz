@@ -1002,7 +1002,7 @@ class MainWindow(qt4.QMainWindow):
             filt = setting.settingdb['export_lastformat']
             try:
                 # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
-                fd.setNameFilter(filt)
+                fd.selectNameFilter(filt)
             except AttributeError:
                 fd.selectFilter(filt)
             extn = formats[filters.index(filt)][0][0]
