@@ -390,6 +390,7 @@ class Contour(plotters.GenericPlotter):
             return False
 
         contsettings = ( s.min, s.max, s.numLevels, s.scaling,
+                         s.SubLines.numLevels,
                          len(s.Fills.fills) == 0 or s.Fills.hide,
                          len(s.SubLines.lines) == 0 or s.SubLines.hide,
                          tuple(s.manualLevels) )
