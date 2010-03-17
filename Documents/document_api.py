@@ -91,8 +91,8 @@ def processWidgetType(root, name):
     thesettings = setting.Settings('')
     klass.addSettings(thesettings)
 
-    for s in thesettings.getSettingList():
-        processSetting(widgetxml, s)
+    #for s in thesettings.getSettingList():
+    processSettings(widgetxml, thesettings)
     for s in thesettings.getSettingsList():
         processSettings(widgetxml, s)
 
@@ -112,6 +112,15 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+def addXSL(filename):
+    f = open(filename)
+    l = f.readlines()
+    f.close()
+    l.insert(1, '<?xml-stylesheet type="text/xsl" href="widget_doc.xsl"?>\n')
+    f = open(filename, 'w')
+    f.writelines(l)
+    f.close()
+
 def main():
     widgettypes = document.thefactory.listWidgets()
 
@@ -120,10 +129,9 @@ def main():
         processWidgetType(root, wt)
 
     tree = ET.ElementTree(root)
-#    tree.append( ET.ProcessingInstruction('xml-stylesheet',
-#                                          'href="file:///test.xsl" type="text/xsl"') )
     indent(root)
-    tree.write('widgets.xml', encoding="utf8")
+    tree.write('widget_doc.xml', encoding="utf8")
+    addXSL('widget_doc.xml')
 
 if __name__ == '__main__':
     main()
