@@ -633,7 +633,7 @@ class OperationDataset2DCreateExpressionXYZ(object):
             ds = datasets.Dataset2DXYZExpression(self.xexpr, self.yexpr,
                                                  self.zexpr)
             ds.document = document
-            temp = ds.data
+            ds.evalDataset()
             
         except datasets.DatasetExpressionException, e:
             raise CreateDatasetException(str(e))
@@ -674,6 +674,16 @@ class OperationDataset2DXYFunc(object):
         self.ystep = ystep
         self.expr = expr
         self.link = link
+
+    def validateExpression(self, document):
+        """Check dataset is okay."""
+        try:
+            ds = datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
+            ds.document = document
+            ds.evalDataset()
+            
+        except datasets.DatasetExpressionException, e:
+            raise CreateDatasetException(str(e))
         
     def do(self, document):
         # keep backup

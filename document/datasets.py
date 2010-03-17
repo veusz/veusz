@@ -1184,9 +1184,6 @@ class Dataset2DXYZExpression(DatasetBase):
         if self.document.changeset == self.lastchangeset:
             return self.cacheddata
 
-        # update changeset
-        self.lastchangeset = self.document.changeset
-
         evaluated = {}
 
         environment = self.document.eval_context.copy()
@@ -1227,21 +1224,38 @@ class Dataset2DXYZExpression(DatasetBase):
 
         # this is ugly - is this really the way to do it?
         self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
+
+        # update changeset
+        self.lastchangeset = self.document.changeset
+
         return self.cacheddata
 
-    def getXrange(self):
+    @property
+    def yrange(self):
         """Get x range of data as a tuple (min, max)."""
-        self.evalDataset()
-        return self._xrange
+        return self.getDataRanges()[0]
     
-    def getYrange(self):
+    @property
+    def xrange(self):
         """Get y range of data as a tuple (min, max)."""
-        self.evalDataset()
-        return self._yrange
+        return self.getDataRanges()[1]
         
     def getDataRanges(self):
-        self.evalDataset()
-        return (self._xrange, self._yrange)
+        """Get both ranges of axis."""
+        try:
+            self.evalDataset()
+            return (self._xrange, self._yrange)
+        except DatasetExpressionException:
+            return ( (0., 1.), (0., 1.) )
+        
+    @property
+    def data(self):
+        """Get data, or none if error."""
+        try:
+            return self.evalDataset()
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return N.array( [[]] )
 
     def description(self, showlinked=True):
         # FIXME: dataeditdialog descriptions should be taken from here somewhere
@@ -1257,10 +1271,6 @@ class Dataset2DXYZExpression(DatasetBase):
         s = 'SetData2DExpressionXYZ(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
         fileobj.write(s)
-
-    data = property(evalDataset)
-    xrange = property(getXrange)
-    yrange = property(getYrange)
 
 class Dataset2DXYFunc(DatasetBase):
     """Given a range of x and y, this is a dataset which is a function of
@@ -1294,9 +1304,22 @@ class Dataset2DXYFunc(DatasetBase):
         self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
                        self.ystep[1] + self.ystep[2]*0.5)
 
+        self.lastchangeset = -1
+
     @property
     def data(self):
-        """Make the 2d dataset."""
+        """Return data, or empty array if error."""
+        try:
+            return self.evalDataset()
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return N.array([[]])
+
+    def evalDataset(self):
+        """Evaluate the 2d dataset."""
+
+        if self.document.changeset == self.lastchangeset:
+            return self.cacheddata
 
         env = self.document.eval_context.copy()
 
@@ -1315,6 +1338,9 @@ class Dataset2DXYFunc(DatasetBase):
         except Exception, e:
             raise DatasetExpressionException("Error evaluating expession: %s\n"
                                              "Error: %s" % (self.expr, str(e)) )
+
+        self.cacheddata = data
+        self.lastchangeset = self.document.changeset
         return data
 
     def getDataRanges(self):

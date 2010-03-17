@@ -196,6 +196,9 @@ class DataCreate2DDialog(qt4.QDialog):
 
         # apply operation, catching evaluation errors
         try:
+            # check expression is okay
+            op.validateExpression(self.document)
+
             # try to make dataset
             self.document.applyOperation(op)
             # forces an evaluation
