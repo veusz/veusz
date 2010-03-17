@@ -175,7 +175,14 @@ class DataCreate2DDialog(qt4.QDialog):
                 link)
 
         elif self.mode == '2dexpr':
-            pass
+            qt4.QMessageBox("Veusz",
+                            'Not implemented',
+                            qt4.QMessageBox.Warning,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
 
         elif self.mode == 'xyfunc':
             xstep = checkGetStep(text['xexpr'])
