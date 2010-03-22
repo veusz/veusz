@@ -112,6 +112,11 @@ class AxisLabel(setting.Text):
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )
+        self.add( setting.Distance( 'offset',
+                                    '0pt',
+                                    descr = 'Additional offset of axis label'
+                                    ' from axis tick labels',
+                                    usertext='Label offset') )
 
 class TickLabel(setting.Text):
     """For tick labels on axes."""
@@ -129,6 +134,12 @@ class TickLabel(setting.Text):
                                 descr='A scale factor to apply to the values '
                                 'of the tick labels',
                                 usertext='Scale') )
+
+        self.add( setting.Distance( 'offset',
+                                    '0pt',
+                                    descr = 'Additional offset of axis tick '
+                                    'labels from axis',
+                                    usertext='Tick offset') )
 
 ###############################################################################
 
@@ -683,6 +694,9 @@ class Axis(widget.Widget):
         scale = tl.scale
         pen = tl.makeQPen()
 
+        # an extra offset if required
+        self._delta_axis += tl.get('offset').convert(painter)
+
         def generateTickLabels():
             """Return plotter position of labels and label text."""
             # get format for labels
@@ -746,10 +760,14 @@ class Axis(widget.Widget):
 
         s = self.settings
         sl = s.Label
-        font = s.get('Label').makeQFont(painter)
+        label = s.get('Label')
+        font = label.makeQFont(painter)
         painter.setFont(font)
         al_spacing = ( painter.fontMetrics().leading() +
                        painter.fontMetrics().descent() )
+
+        # an extra offset if required
+        self._delta_axis += label.get('offset').convert(painter)
 
         text = s.label
         # avoid adding blank text to plot
