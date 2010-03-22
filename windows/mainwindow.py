@@ -1040,7 +1040,8 @@ class MainWindow(qt4.QMainWindow):
                                      dpi=setting.settingdb['export_DPI'],
                                      antialias=setting.settingdb['export_antialias'],
                                      color=setting.settingdb['export_color'],
-                                     quality=setting.settingdb['export_quality'])
+                                     quality=setting.settingdb['export_quality'],
+                                     backcolor=setting.settingdb['export_background'])
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox("Veusz",
                                 "Error exporting file:\n%s" % inst,

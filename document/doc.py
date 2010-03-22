@@ -428,7 +428,7 @@ class Document( qt4.QObject ):
         fileobj.write( stylesheet.saveText(True, rootname='') )
 
     def _exportBitmap(self, filename, pagenumber, dpi=100, antialias=True,
-                      quality=85):
+                      quality=85, backcolor='#ffffff00'):
         """Export the pagenumber to the requested bitmap filename."""
 
         # firstly have to convert dpi to image size
@@ -450,12 +450,11 @@ class Document( qt4.QObject ):
 
         # create real output image
         pixmap = qt4.QPixmap(int(width*scaling), int(height*scaling))
-        if format == 'png':
-            # allows transparent
-            pixmap.fill( qt4.Qt.transparent )
-        else:
-            # fill white
-            pixmap.fill()        
+        backqcolor = utils.extendedColorToQColor(backcolor)
+        if format != 'png':
+            # not transparent
+            backqcolor.setAlpha(255)
+        pixmap.fill(backqcolor)
 
         # paint to the image
         painter = Painter(pixmap)
@@ -600,7 +599,7 @@ class Document( qt4.QObject ):
         paintdev.paintEngine().saveFile(filename)
 
     def export(self, filename, pagenumber, color=True, dpi=100,
-               antialias=True, quality=85):
+               antialias=True, quality=85, backcolor='#ffffff00'):
         """Export the figure to the filename."""
 
         ext = os.path.splitext(filename)[1]
@@ -610,7 +609,8 @@ class Document( qt4.QObject ):
 
         elif ext in ('.png', '.jpg', '.jpeg', '.bmp'):
             self._exportBitmap(filename, pagenumber, dpi=dpi,
-                               antialias=antialias, quality=quality)
+                               antialias=antialias, quality=quality,
+                               backcolor=backcolor)
 
         elif ext == '.svg':
             self._exportSVG(filename, pagenumber)

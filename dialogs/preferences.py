@@ -63,6 +63,11 @@ class PreferencesDialog(qt4.QDialog):
         # quality of jpeg export
         self.exportQuality.setValue( setting.settingdb['export_quality'] )
 
+        # changing background color of bitmaps
+        self.connect( self.exportBackgroundButton, qt4.SIGNAL('clicked()'),
+                      self.slotExportBackgroundChanged )
+        self.updateExportBackground(setting.settingdb['export_background'])
+
         # set color setting
         self.exportColor.setCurrentIndex(
             {True:0, False:1}[setting.settingdb['export_color']])
@@ -136,6 +141,27 @@ class PreferencesDialog(qt4.QDialog):
             pixmap.fill(val)
             self.colorbutton[name].setIcon( qt4.QIcon(pixmap) )
 
+    def updateExportBackground(self, colorname):
+        """Update color on export background."""
+        pixmap = qt4.QPixmap(16, 16)
+        col = utils.extendedColorToQColor(colorname)
+        pixmap.fill(col)
+
+        # update button (storing color in button itself - what fun!)
+        self.exportBackgroundButton.setIcon(qt4.QIcon(pixmap))
+        self.exportBackgroundButton.iconcolor = colorname
+
+    def slotExportBackgroundChanged(self):
+        """Button clicked to change background."""
+
+        color = qt4.QColorDialog.getColor(
+            utils.extendedColorToQColor(self.exportBackgroundButton.iconcolor),
+            self,
+            "Choose color",
+            qt4.QColorDialog.ShowAlphaChannel )
+        if color.isValid():
+            self.updateExportBackground( utils.extendedColorFromQColor(color) )
+
     def accept(self):
         """Keep settings if okay pressed."""
         
@@ -165,7 +191,8 @@ class PreferencesDialog(qt4.QDialog):
         setting.settingdb['export_quality'] = self.exportQuality.value()
 
         setting.settingdb['export_color'] = {0: True, 1: False}[self.exportColor.currentIndex()]
-        
+        setting.settingdb['export_background'] = self.exportBackgroundButton.iconcolor
+
         # new document settings
         setting.settingdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
         setting.settingdb['custom_default'] = unicode(self.customLineEdit.text())

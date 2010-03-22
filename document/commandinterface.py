@@ -599,10 +599,22 @@ class CommandInterface(qt4.QObject):
             self.document.printTo( p,
                                    range(self.document.getNumberPages()) )
             
-    def Export(self, filename, color=True, page=0):
-        """Export plot to filename."""
+    def Export(self, filename, color=True, page=0, dpi=100,
+               antialias=True, quality=85, backcolor='#ffffff00'):
+        """Export plot to filename.
+
+        color is True or False if color is requested in output file
+        page is the pagenumber to export
+        dpi is the number of dots per inch for bitmap output files
+        antialias antialiases output if True
+        quality is a quality parameter for jpeg output
+        backcolor is the background color for bitmap files, which is a name or
+         a #RRGGBBAA value (red, green, blue, alpha)
+        """
         
-        self.document.export(filename, page, color=color)
+        self.document.export(filename, page, color=color,
+                             dpi=dpi, antialias=antialias,
+                             quality=quality, backcolor=backcolor)
             
     def Rename(self, widget, newname):
         """Rename the widget with the path given to the new name.
