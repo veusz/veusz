@@ -19,24 +19,25 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
 Changes in 1.7:
- * Widgets can be dragged and dropped in the widget tree, or copied
-   by holding down Ctrl
- * Axis labels are centred if possible at the start and ends of axes
- * Axis labelling bugs fixed when putting graphs in grids
- * Ship embedding module in binary versions
+ * Widgets can be moved by dragged and dropped in the widget tree, or copied
+   by holding down ctrl at the same time
+ * Tick labels are centred if possible at the start and ends of axes
+ * When putting graphs in grid, axis labels and tick labels are placed
+   in much better positions
+ * Embedding module is shipped in binary versions
  * Grid lines can be drawn on axis minor ticks
  * Contour widget can draw minor (dotted) contours between main contours
- * Get log contour values correct
+ * Logarithmic contours have proper logarithmic spacing
  * Fixes for widget names and dataset names with Unicode characters, including
    copy and paste
- * Optional smoothing in image widget
+ * Optional smoothing in the image widget
 
 Minor changes:
  * Errors in evaluating expressions are logged in the console window, and
    do not show exceptions
  * Fix problems when importing multiple symbols from python modules in the
    custom import dialog
- * Use minus sign for negative numbers, rather than hyphens
+ * Use minus sign for negative numbers in tick labels, rather than hyphens
  * Contour widget lines can have transparency
  * Datasets are sorted by name when writing to saved document
  * Use correct status for paste button when starting application
