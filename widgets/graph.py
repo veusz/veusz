@@ -103,6 +103,12 @@ class Graph(widget.Widget):
                     widgets[name] = c
             w = w.parent
 
+        # didn't find everything...
+        if w is None:
+            for name in axesnames:
+                if name not in widgets:
+                    widgets[name] = None
+
         # return list of found widgets
         return [widgets[n] for n in axesnames]
 
