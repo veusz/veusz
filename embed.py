@@ -51,6 +51,7 @@ import cPickle
 import socket
 import random
 import subprocess
+import time
 
 def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
@@ -113,6 +114,14 @@ class Embedded(object):
         """
         return Embedded(name=name, copyof=self)
 
+    def WaitForClose(self):
+        """Wait for the window to close."""
+
+        # this is messy, polling for closure, but cleaner than doing
+        # it in the remote client
+        while not self.IsClosed():
+            time.sleep(0.1)
+
     @classmethod
     def makeSockets(cls):
         """Make socket(s) to communicate with remote process.
@@ -157,12 +166,25 @@ class Embedded(object):
         # it's hard to find Veusz on Win/MacOS so cheat: check path and
         # look in likely places
         if sys.platform == 'win32':
+            # look for the python windows interpreter
+            findpython = findOnPath('pythonw.exe')
+            if findpython:
+                possiblecommands.insert(0, [findpython,
+                                            os.path.join(thisdir,
+                                                         'embed_remote.py')])
+            # look for veusz executable
             findexe = findOnPath('veusz.exe')
             if findexe:
-                possiblecommands += [ [findexe] ]
+                possiblecommands.insert(0, [findexe])
             else:
-                possiblecommands += [ [os.path.join( os.environ['ProgramFiles'],
-                                                     'Veusz', 'veusz.exe' )] ]
+                try:
+                    # add the usual place as a guess :-(
+                    possiblecommands.insert(0, [os.path.join(
+                                os.environ['ProgramFiles'],
+                                'Veusz', 'veusz.exe' )] )
+                except KeyError:
+                    pass
+
         elif sys.platform == 'darwin':
             findbundle = findOnPath('Veusz.app')
             if findbundle:

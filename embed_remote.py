@@ -30,8 +30,11 @@ import veusz.document as document
 """Program to be run by embedding interface to run Veusz commands."""
 
 class EmbeddedClient(object):
+    """An object for each instance of embedded window with document."""
 
     def __init__(self, title, doc=None):
+        """Construct window with title given."""
+
         self.window = SimpleWindow(title, doc=doc)
         self.window.show()
         self.document = self.window.document
@@ -44,6 +47,7 @@ class EmbeddedClient(object):
         self.ci.addCommand('ResizeWindow', self.cmdResizeWindow)
         self.ci.addCommand('SetUpdateInterval', self.cmdSetUpdateInterval)
         self.ci.addCommand('MoveToPage', self.cmdMoveToPage)
+        self.ci.addCommand('IsClosed', self.cmdIsClosed)
 
     def cmdClose(self):
         """Close()
@@ -55,6 +59,12 @@ class EmbeddedClient(object):
         self.window = None
         self.plot = None
         self.ci = None
+
+    def cmdIsClosed(self):
+        """IsClosed()
+
+        Return whether window is still open."""
+        return not self.window.isVisible()
 
     def cmdZoom(self, zoom):
         """Zoom(zoom)
@@ -142,6 +152,7 @@ class EmbedApplication(qt4.QApplication):
     readLenFromSocket = staticmethod(readLenFromSocket)
 
     def writeToSocket(thesocket, data):
+        """Write to socket until all data written."""
         count = 0
         while count < len(data):
             count += thesocket.send(data[count:])
@@ -169,6 +180,15 @@ class EmbedApplication(qt4.QApplication):
         self.clientcounter += 1
         return retval
 
+    def writeOutput(self, output):
+        """Send output back to embed process."""
+        # format return data
+        outstr = cPickle.dumps(output)
+
+        # send return data to stdout
+        self.writeToSocket( self.socket, struct.pack('<I', len(outstr)) )
+        self.writeToSocket( self.socket, outstr )
+
     def slotDataToRead(self, socketfd):
         self.notifier.setEnabled(False)
         self.socket.setblocking(1)
@@ -176,12 +196,10 @@ class EmbedApplication(qt4.QApplication):
         # unpickle command and arguments
         window, cmd, args, argsv = self.readCommand(self.socket)
 
-        doquit = False
         if cmd == '_NewWindow':
             retval = self.makeNewClient(args[0])
         elif cmd == '_Quit':
-            # exits client
-            doquit = True
+            # exit client
             retval = None
         elif cmd == '_NewWindowCopy':
             # sets the document of this window to be the same as the
@@ -199,16 +217,11 @@ class EmbedApplication(qt4.QApplication):
                 retval = interpreter.cmds[cmd](*args, **argsv)
             except Exception, e:
                 retval = e
-        
-        # format return data
-        outstr = cPickle.dumps(retval)
 
-        # send return data to stdout
-        self.writeToSocket( self.socket, struct.pack('<I', len(outstr)) )
-        self.writeToSocket( self.socket, outstr )
+        self.writeOutput(retval)
 
         # do quit after if requested
-        if doquit:
+        if cmd == '_Quit':
             self.socket.shutdown(socket.SHUT_RDWR)
             self.closeAllWindows()
             self.quit()
