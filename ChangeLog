@@ -1,4 +1,58 @@
 ------------------------------------------------------------------------
+r1203 | jeremysanders | 2010-03-23 19:46:36 +0000 (Tue, 23 Mar 2010) | 1 line
+
+Fix crash if axis does not exist
+------------------------------------------------------------------------
+r1202 | jeremysanders | 2010-03-22 22:29:08 +0000 (Mon, 22 Mar 2010) | 1 line
+
+Add a bitmap export background color preference and add extra paramters to the Export commandline command to control various options (background color, jpeg quality, dpi)
+------------------------------------------------------------------------
+r1201 | jeremysanders | 2010-03-22 21:46:15 +0000 (Mon, 22 Mar 2010) | 1 line
+
+Add offset parameters for tick labels and axis labels
+------------------------------------------------------------------------
+r1200 | jeremysanders | 2010-03-22 21:34:00 +0000 (Mon, 22 Mar 2010) | 1 line
+
+Make readme read better
+------------------------------------------------------------------------
+r1199 | jeremysanders | 2010-03-17 20:57:36 +0000 (Wed, 17 Mar 2010) | 1 line
+
+Better error handling in evaluation of 2D dataset expressions
+------------------------------------------------------------------------
+r1198 | jeremysanders | 2010-03-17 20:07:04 +0000 (Wed, 17 Mar 2010) | 1 line
+
+2d dataset expression not implemented, so write message
+------------------------------------------------------------------------
+r1197 | jeremysanders | 2010-03-17 20:04:57 +0000 (Wed, 17 Mar 2010) | 1 line
+
+Add changes to widget documenting
+------------------------------------------------------------------------
+r1196 | jeremysanders | 2010-03-14 20:42:44 +0000 (Sun, 14 Mar 2010) | 2 lines
+
+If number of sub contours is updated, update plot
+
+------------------------------------------------------------------------
+r1195 | jeremysanders | 2010-03-11 11:00:18 +0000 (Thu, 11 Mar 2010) | 2 lines
+
+Fix file type list in export dialog. Note remembering previous type broken in KDE 4.4.
+
+------------------------------------------------------------------------
+r1194 | jeremysanders | 2010-03-05 12:51:43 +0000 (Fri, 05 Mar 2010) | 1 line
+
+Use unsigned ints for passing message size in embedding interface so that i386 and x86-64 can talk with each other
+------------------------------------------------------------------------
+r1193 | jeremysanders | 2010-03-04 20:09:12 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Updates for win32 installer
+------------------------------------------------------------------------
+r1192 | jeremysanders | 2010-03-04 19:21:15 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Some updates for 1.7 release
+------------------------------------------------------------------------
+r1191 | jeremysanders | 2010-03-04 19:18:25 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Get embedding interface to look for Windows and Mac OS veusz binaries
+------------------------------------------------------------------------
 r1190 | jeremysanders | 2010-03-04 10:04:27 +0000 (Thu, 04 Mar 2010) | 1 line
 
 Workaround for filter selection problems with KDE replacement file dialog in KDE 4.4

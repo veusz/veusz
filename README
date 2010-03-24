@@ -41,6 +41,8 @@ Minor changes:
  * Contour widget lines can have transparency
  * Datasets are sorted by name when writing to saved document
  * Use correct status for paste button when starting application
+ * Add option for extra space between axes and tick labels, and axis labels
+ * Preference added for background color of exported bitmaps
 
 Features of package:
  * X-Y plots (with errorbars)
