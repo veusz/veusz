@@ -110,6 +110,16 @@ class Embedded(object):
             method = new.instancemethod(func, Embedded)
             setattr(self, name, method) # assign to self
 
+        # check API version is same
+        try:
+            remotever = self._apiVersion()
+        except AttributeError:
+            remotever = 0
+        if remotever != API_VERSION:
+            raise RuntimeError("Remote Veusz instance reports version %i of"
+                               " API. This embed.py supports version %i." %
+                               (remotever, API_VERSION))
+
     def StartSecondView(self, name = 'Veusz'):
         """Provides a second view onto the document of this window.
 
@@ -242,12 +252,6 @@ class Embedded(object):
         # packet length for command bytes
         cls.cmdlen = struct.calcsize('<I')
         atexit.register(cls.exitQt)
-
-        # check that there isn't an API mismatch
-        retn = struct.unpack('<I', cls.readLenFromSocket(cls.serv_socket, cls.cmdlen))[0]
-        if retn != API_VERSION:
-            raise RuntimeError("Remote Veusz instance reports version %i of API. This embed.py "
-                               "supports version %i." % (retn, API_VERSION))
 
     @staticmethod
     def readLenFromSocket(socket, length):

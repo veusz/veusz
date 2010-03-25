@@ -51,6 +51,7 @@ class EmbeddedClient(object):
         self.ci.addCommand('SetUpdateInterval', self.cmdSetUpdateInterval)
         self.ci.addCommand('MoveToPage', self.cmdMoveToPage)
         self.ci.addCommand('IsClosed', self.cmdIsClosed)
+        self.ci.addCommand('_apiVersion', self.cmd_apiVersion)
 
     def cmdClose(self):
         """Close()
@@ -68,6 +69,10 @@ class EmbeddedClient(object):
 
         Return whether window is still open."""
         return not self.window.isVisible()
+
+    def cmd_apiVersion(self):
+        """Get internal API version."""
+        return API_VERSION
 
     def cmdZoom(self, zoom):
         """Zoom(zoom)
@@ -137,9 +142,6 @@ class EmbedApplication(qt4.QApplication):
     def __init__(self, socket, args):
         qt4.QApplication.__init__(self, args)
         self.socket = socket
-
-        # return API version
-        self.writeToSocket(self.socket, struct.pack('<I', API_VERSION))
 
         # listen to commands on the socket
         self.notifier = qt4.QSocketNotifier(self.socket.fileno(),
