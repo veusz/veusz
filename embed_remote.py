@@ -29,6 +29,9 @@ import veusz.document as document
 
 """Program to be run by embedding interface to run Veusz commands."""
 
+# embed.py module checks this is the same as its version number
+API_VERSION = 1
+
 class EmbeddedClient(object):
     """An object for each instance of embedded window with document."""
 
@@ -135,11 +138,16 @@ class EmbedApplication(qt4.QApplication):
         qt4.QApplication.__init__(self, args)
         self.socket = socket
 
+        # return API version
+        self.writeToSocket(self.socket, struct.pack('<I', API_VERSION))
+
+        # listen to commands on the socket
         self.notifier = qt4.QSocketNotifier(self.socket.fileno(),
                                             qt4.QSocketNotifier.Read)
         self.connect(self.notifier, qt4.SIGNAL('activated(int)'),
                      self.slotDataToRead)
 
+        # keep track of clients (separate veusz documents)
         self.clients = {}
         self.clientcounter = 0
 

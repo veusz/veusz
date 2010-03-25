@@ -53,6 +53,9 @@ import random
 import subprocess
 import time
 
+# check remote process has this API version
+API_VERSION = 1
+
 def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
     parameter."""
@@ -239,6 +242,12 @@ class Embedded(object):
         # packet length for command bytes
         cls.cmdlen = struct.calcsize('<I')
         atexit.register(cls.exitQt)
+
+        # check that there isn't an API mismatch
+        retn = struct.unpack('<I', cls.readLenFromSocket(cls.serv_socket, cls.cmdlen))[0]
+        if retn != API_VERSION:
+            raise RuntimeError("Remote Veusz instance reports version %i of API. This embed.py "
+                               "supports version %i." % (retn, API_VERSION))
 
     @staticmethod
     def readLenFromSocket(socket, length):
