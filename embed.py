@@ -167,38 +167,47 @@ class Embedded(object):
     @classmethod
     def makeRemoteProcess(cls):
         """Try to find veusz process for remote program."""
+        
+        # here's where to look for embed_remote.py
         thisdir = os.path.dirname(os.path.abspath(__file__))
 
-        # try embed_remote.py in this directory, veusz in this directory
-        # or veusz on the path in order
-        possiblecommands = [ [sys.executable,
-                              os.path.join(thisdir, 'embed_remote.py')],
-                             [os.path.join(thisdir, 'veusz')],
-                             [findOnPath('veusz')] ]
-
-        # it's hard to find Veusz on Win/MacOS so cheat: check path and
-        # look in likely places
+        # build up a list of possible command lines to start the remote veusz
         if sys.platform == 'win32':
-            # look for the python windows interpreter
+            # windows is a special case
+            # we need to run embed_remote.py under pythonw.exe, not python.exe
+
+            # look for the python windows interpreter on path
             findpython = findOnPath('pythonw.exe')
-            if findpython:
-                possiblecommands.insert(0, [findpython,
-                                            os.path.join(thisdir,
-                                                         'embed_remote.py')])
-            # look for veusz executable
+            if not findpython:
+                # if it wasn't on the path, use sys.prefix instead
+                findpython = os.path.join(sys.prefix, 'pythonw.exe')
+
+            # look for veusz executable on path
             findexe = findOnPath('veusz.exe')
-            if findexe:
-                possiblecommands.insert(0, [findexe])
-            else:
+            if not findexe:
                 try:
                     # add the usual place as a guess :-(
-                    possiblecommands.insert(0, [os.path.join(
-                                os.environ['ProgramFiles'],
-                                'Veusz', 'veusz.exe' )] )
+                    findexe = os.path.join(os.environ['ProgramFiles'],
+                                           'Veusz', 'veusz.exe')
                 except KeyError:
                     pass
 
-        elif sys.platform == 'darwin':
+            # here is the list of commands to try
+            possiblecommands = [
+                [findpython, os.path.join(thisdir, 'embed_remote.py')],
+                [findexe] ]
+
+        else:
+            # try embed_remote.py in this directory, veusz in this directory
+            # or veusz on the path in order
+            possiblecommands = [ [sys.executable,
+                                  os.path.join(thisdir, 'embed_remote.py')],
+                                 [os.path.join(thisdir, 'veusz')],
+                                 [findOnPath('veusz')] ]
+
+        # cheat and look for Veusz app for MacOS under the standard application
+        # directory. I don't know how else to find it :-(
+        if sys.platform == 'darwin':
             findbundle = findOnPath('Veusz.app')
             if findbundle:
                 possiblecommands += [ [findbundle+'/Contents/MacOS/Veusz'] ]
@@ -212,10 +221,13 @@ class Embedded(object):
             if ( None not in cmd and
                  False not in [os.path.isfile(c) for c in cmd] ):
                 try:
+                    # we don't use stdout below, but works around windows bug
+                    # http://bugs.python.org/issue1124861
                     cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
                                                   shell=False, bufsize=0,
                                                   close_fds=False,
-                                                  stdin=subprocess.PIPE)
+                                                  stdin=subprocess.PIPE,
+                                                  stdout=subprocess.PIPE)
                     return
                 except OSError:
                     pass
