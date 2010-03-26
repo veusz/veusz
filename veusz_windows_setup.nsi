@@ -9,7 +9,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Veusz"
-!define PRODUCT_VERSION "1.6.0.3"
+!define PRODUCT_VERSION "1.7"
 !define PRODUCT_PUBLISHER "Jeremy Sanders"
 !define PRODUCT_WEB_SITE "http://home.gna.org/veusz/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\veusz.exe"
