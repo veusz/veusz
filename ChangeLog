@@ -1,4 +1,36 @@
 ------------------------------------------------------------------------
+r1211 | jeremysanders | 2010-03-26 22:29:48 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Documentation updates
+------------------------------------------------------------------------
+r1210 | jeremysanders | 2010-03-26 17:49:53 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Fix messed up pyinst.spec file
+------------------------------------------------------------------------
+r1209 | jeremysanders | 2010-03-26 17:47:29 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Updates to windows install files
+------------------------------------------------------------------------
+r1208 | jeremysanders | 2010-03-26 17:29:40 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Cleanup for trying to find veusz executable under windows and fix subprocess bug
+------------------------------------------------------------------------
+r1207 | jeremysanders | 2010-03-25 19:30:09 +0000 (Thu, 25 Mar 2010) | 1 line
+
+Make api version check not hang for old veusz versions
+------------------------------------------------------------------------
+r1206 | jeremysanders | 2010-03-25 17:17:14 +0000 (Thu, 25 Mar 2010) | 1 line
+
+Add internal version number to veusz api
+------------------------------------------------------------------------
+r1205 | jeremysanders | 2010-03-24 20:19:44 +0000 (Wed, 24 Mar 2010) | 1 line
+
+Add embedding commands IsClosed and WaitForClose to check whether window is closed or to wait until it is closed. Also try to start remote veusz process with pythonw.exe to avoid starting a command window up.
+------------------------------------------------------------------------
+r1204 | jeremysanders | 2010-03-24 14:58:51 +0000 (Wed, 24 Mar 2010) | 1 line
+
+Bump version number for 1.7 release
+------------------------------------------------------------------------
 r1203 | jeremysanders | 2010-03-23 19:46:36 +0000 (Tue, 23 Mar 2010) | 1 line
 
 Fix crash if axis does not exist
