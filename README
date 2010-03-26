@@ -43,6 +43,8 @@ Minor changes:
  * Use correct status for paste button when starting application
  * Add option for extra space between axes and tick labels, and axis labels
  * Preference added for background color of exported bitmaps
+ * Add IsClosed() and WaitForClose() embedding functions to check whether plot
+   window is closed, or to wait for closing of plot window.
 
 Features of package:
  * X-Y plots (with errorbars)

@@ -1028,6 +1028,11 @@ SetData('y', y)
 
       <para>The command prompt supports history (use the up and down cursor
       keys to recall previous commands). </para>
+
+      <para>Most of the commands listed below can be used in the
+      in-program command line interface, using the embedding interface
+      or using veusz_listen. Commands specific to particular modes are
+      documented as such.</para>
     </section>
 
     <section>
@@ -1376,6 +1381,19 @@ ImportString('x y', '''
       </section>
 
       <section>
+	<title><anchor id="Command.IsClosed" />IsClosed</title>
+	
+	<para><command>IsClosed()</command></para>
+
+	<para>Returns a boolean value telling the caller whether the
+	plotting window has been closed.
+	</para>
+
+	<para>Note: this command is only supported in the embedding
+	interface.</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.List" />List</title>
 	
 	<para><command>List(where='.')</command></para>
@@ -1656,6 +1674,18 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 	
 	<para>Quits Veusz. This is only supported in
 	veusz_listen.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.WaitForClose" />WaitForClose</title>
+	
+	<para><command>WaitForClose()</command></para>
+
+	<para>Wait until the plotting window has been closed.
+	</para>
+
+	<para>Note: this command is only supported in the embedding
+	interface.</para>
       </section>
 
       <section>
