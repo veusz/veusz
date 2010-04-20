@@ -68,7 +68,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             data = getattr(ds, ds.columns[index.column()])
 
             if data is not None:
-                return qt4.QVariant( data[index.row()] )
+                return qt4.QVariant( float(data[index.row()]) )
 
         # return nothing otherwise
         return qt4.QVariant()
@@ -167,7 +167,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             ds = self.document.data[self.dsname].data
             if ds is not None:
                 num = ds[ds.shape[0]-index.row()-1, index.column()]
-                return qt4.QVariant(num)
+                return qt4.QVariant( float(num) )
 
         return qt4.QVariant()
 
