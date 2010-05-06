@@ -460,7 +460,8 @@
 	except it displays scientific notation as written,
 	e.g. 1.2x10^23, rather than 1.2e+23. "%Vg" switches between
 	standard numbers and Veusz scientific notation for large and
-	small numbers.</para>
+	small numbers. "%VE" using engineering SI suffixes to
+	represent large or small numbers (e.g. 1000 is 1k).</para>
 
 	<para>Veusz allows dates and times to be formatted using
 	"%VDX" where "X" is one of the formatting characters for

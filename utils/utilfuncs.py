@@ -30,6 +30,7 @@ import threading
 import dates
 import codecs
 import csv
+import math
 
 import veusz.qtall as qt4
 
@@ -264,6 +265,33 @@ def formatGeneral(num, fmtarg):
         except:
             return _formaterror
 
+engsuffixes = ( 'y', 'z', 'a', 'f', 'p', 'n',
+                u'\u03bc', 'm', '', 'k', 'M', 'G',
+                'T', 'P', 'E', 'Z', 'Y' )
+
+def formatEngineering(num, fmtarg):
+    """Engineering suffix format notation using SI suffixes."""
+
+    if num != 0.:
+        logindex = math.log10( abs(num) ) / 3.
+
+        # for numbers < 1 round down suffix
+        if logindex < 0. and (int(logindex)-logindex) > 1e-6:
+            logindex -= 1
+
+        # make sure we don't go out of bounds
+        logindex = min( max(logindex, -8),
+                        len(engsuffixes) - 9 )
+
+        suffix = engsuffixes[ int(logindex) + 8 ]
+        val = num / 10**( int(logindex) *3)
+    else:
+        suffix = ''
+        val = num
+
+    text = ('%' + fmtarg + 'g%s') % (val, suffix)
+    return text
+
 _formatRE = re.compile(r'%([^A-Za-z]*)(VDVS|VD.|V.|[A-Za-z])')
 
 def formatNumber(num, format):
@@ -272,6 +300,7 @@ def formatNumber(num, format):
     format is a standard C format string, with some additions:
      %Ve    scientific notation X \times 10^{Y}
      %Vg    switches from normal notation to scientific outside 10^-2 to 10^4
+     %VE    engineering suffix option
 
      %VDx   date formatting, where x is one of the arguments in 
             http://docs.python.org/lib/module-time.html in the function
@@ -294,6 +323,8 @@ def formatNumber(num, format):
                 out = formatSciNotation(num, farg)
             elif ftype == 'Vg':
                 out = formatGeneral(num, farg)
+            elif ftype == 'VE':
+                out = formatEngineering(num, farg)
             elif ftype[:2] == 'VD':
                 d = dates.floatToDateTime(num)
                 # date formatting (seconds since start of epoch)
