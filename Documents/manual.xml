@@ -1505,6 +1505,15 @@ Set('page1/graph1/x/min', -10.)
       </section>
 
       <section>
+	<title><anchor id="Command.SetAntiAliasing" />SetAntiAliasing</title>
+	
+	<para><command>SetAntiAliasing(on)</command></para>
+	
+	<para>Enable or disable anti aliasing in the plot
+	window, replotting the image.</para>
+      </section>
+      
+      <section>
 	<title><anchor id="Command.SetData" />SetData</title>
 	
 	<para><command>SetData(name, val, symerr=None, negerr=None,

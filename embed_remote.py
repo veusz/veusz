@@ -51,6 +51,7 @@ class EmbeddedClient(object):
         self.ci.addCommand('SetUpdateInterval', self.cmdSetUpdateInterval)
         self.ci.addCommand('MoveToPage', self.cmdMoveToPage)
         self.ci.addCommand('IsClosed', self.cmdIsClosed)
+        self.ci.addCommand('SetAntiAliasing', self.cmdSetAntiAliasing)
         self.ci.addCommand('_apiVersion', self.cmd_apiVersion)
 
     def cmdClose(self):
@@ -84,6 +85,13 @@ class EmbeddedClient(object):
         'height': zoom to fit height
         """
         self.window.setZoom(zoom)
+
+    def cmdSetAntiAliasing(self, ison):
+        """SetAntiAliasing(zoom)
+
+        Enables or disables anti aliasing.
+        """
+        self.window.setAntiAliasing(ison)
 
     def cmdEnableToolbar(self, enable=True):
         """EnableToolbar(enable=True)
