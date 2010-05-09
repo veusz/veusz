@@ -38,7 +38,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="HistoryGroupBox" name="methodGroup">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -306,6 +306,12 @@
    <class>HistoryCombo</class>
    <extends>QComboBox</extends>
    <header>historycombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistoryGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>historygroupbox.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -47,12 +47,8 @@ class DataCreateDialog(qt4.QDialog):
         self.document = document
 
         # create button group to get notification of changes
-        self.methodBG = qt4.QButtonGroup(self)
-        self.methodBG.addButton(self.valueradio, 0)
-        self.methodBG.addButton(self.parametricradio, 1)
-        self.methodBG.addButton(self.expressionradio, 2)
-        self.connect(self.methodBG, qt4.SIGNAL('buttonClicked(int)'),
-                     self.slotMethodChanged)
+        self.connect( self.methodGroup, qt4.SIGNAL('radioClicked'),
+                      self.slotMethodChanged )
 
         # connect create button
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
@@ -84,34 +80,24 @@ class DataCreateDialog(qt4.QDialog):
         self.dsedits = { 'data': self.valueedit, 'serr': self.symerroredit,
                          'perr': self.poserroredit, 'nerr': self.negerroredit }
         
-        # set initial state
-        self.methodBG.button( setting.settingdb.get('DataCreateDialog_method',
-                                                    0) ).click()
+        # update button state
         self.editsEditSlot('')
 
-    def done(self, r):
-        """Dialog is closed."""
-        qt4.QDialog.done(self, r)
-
-        # record values for next time dialog is opened
-        d = setting.settingdb
-        d['DataCreateDialog_method'] = self.methodBG.checkedId()
-
-    def slotMethodChanged(self, buttonid):
+    def slotMethodChanged(self, button):
         """Called when a new data creation method is used."""
 
         # enable and disable correct widgets depending on method
-        isvalue = buttonid == 0
+        isvalue = button is self.valueradio
         self.valuehelperlabel.setVisible(isvalue)
         self.numstepsedit.setEnabled(isvalue)
 
-        isparametric = buttonid == 1
+        isparametric = button is self.parametricradio
         self.parametrichelperlabel.setVisible(isparametric)
         self.tstartedit.setEnabled(isparametric)
         self.tendedit.setEnabled(isparametric)
         self.tstepsedit.setEnabled(isparametric)
 
-        isfunction = buttonid == 2
+        isfunction = button is self.expressionradio
         self.expressionhelperlabel.setVisible(isfunction)
 
         # enable/disable create button
@@ -141,10 +127,10 @@ class DataCreateDialog(qt4.QDialog):
             # change selected method
             if ds.parametric is None:
                 # standard expression
-                self.methodBG.button(2).click()
+                self.expressionradio.click()
             else:
                 # parametric dataset
-                self.methodBG.button(1).click()
+                self.parametricradio.click()
                 p = ds.parametric
                 self.tstartedit.setText( '%g' % p[0] )
                 self.tendedit.setText( '%g' % p[1] )
@@ -160,7 +146,7 @@ class DataCreateDialog(qt4.QDialog):
                 self.dsedits[part].setText(text)
         elif isinstance(ds, document.DatasetRange):
             # change selected method
-            self.methodBG.button(0).click()
+            self.valueradio.click()
             # make sure name is set
             self.nameedit.setText(dsname)
             # set expressions
@@ -181,11 +167,11 @@ class DataCreateDialog(qt4.QDialog):
         dsexists = dstext in self.document.data
 
         # check other edit controls
-        method = self.methodBG.checkedId()
-        if method == 0:
+        method = self.methodGroup.getRadioChecked()
+        if method is self.valueradio:
             # value
             editsokay = self.numstepsedit.hasAcceptableInput()
-        elif method == 1:
+        elif method is self.parametricradio:
             # parametric
             editsokay = (self.tstartedit.hasAcceptableInput() and
                          self.tendedit.hasAcceptableInput() and
@@ -215,10 +201,11 @@ class DataCreateDialog(qt4.QDialog):
 
         try:
             # select function to create dataset with
-            createfn = [
-                self.createFromRange,
-                self.createParametric,
-                self.createFromExpression ][self.methodBG.checkedId()]
+            createfn = {
+                self.valueradio: self.createFromRange,
+                self.parametricradio: self.createParametric,
+                self.expressionradio: self.createFromExpression }[
+                self.methodGroup.getRadioChecked()]
 
             # make a new dataset using method
             op = createfn(dsname)

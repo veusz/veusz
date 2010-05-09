@@ -1,4 +1,4 @@
-#    Copyright (C) 2009 Jeremy S. Sanders
+#    Copyright (C) 2010 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,10 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 
 class HistoryGroupBox(qt4.QGroupBox):
-    """Group box remembers settings of radio buttons inside it."""
+    """Group box remembers settings of radio buttons inside it.
+
+    emits radioClicked(radiowidget) when clicked
+    """
 
     def getSettingName(self):
         """Get name for saving in settings."""
@@ -36,28 +39,36 @@ class HistoryGroupBox(qt4.QGroupBox):
                                          self.objectName() )
 
     def loadHistory(self):
-        """Load contents of HistoryCheck from settings."""
-        checked = setting.settingdb.get(self.getSettingName(), "")
+        """Load from settings."""
+        # connect up radio buttons to emit clicked signal
+        for w in self.children():
+            if isinstance(w, qt4.QRadioButton):
+                def doemit(w=w):
+                    self.emit(qt4.SIGNAL("radioClicked"), w)
+                self.connect( w, qt4.SIGNAL('clicked()'), doemit)
 
         # set item to be checked
+        checked = setting.settingdb.get(self.getSettingName(), "")
         for w in self.children():
-            if w.objectName() == checked:
-                w.setChecked(True)
+            if isinstance(w, qt4.QRadioButton) and (
+                w.objectName() == checked or checked == ""):
+                w.click()
                 return
 
     def getRadioChecked(self):
         """Get name of radio button checked."""
         for w in self.children():
             if isinstance(w, qt4.QRadioButton) and w.isChecked():
-                return unicode( w.objectName() )
+                return w
         return None
 
     def saveHistory(self):
-        """Save contents of HistoryCheck to settings."""
-        setting.settingdb[self.getSettingName()] = self.getRadioChecked()
+        """Save to settings."""
+        name = unicode(self.getRadioChecked().objectName())
+        setting.settingdb[self.getSettingName()] = name
 
     def showEvent(self, event):
-        """Show HistoryCheck and load history."""
+        """Show and load history."""
         qt4.QGroupBox.showEvent(self, event)
         self.loadHistory()
 
