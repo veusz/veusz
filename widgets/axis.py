@@ -310,7 +310,10 @@ class Axis(widget.Widget):
         if s.match != '':
             # locate widget we're matching
             # this is ensured to be an Axis
-            widget = s.get('match').getWidget()
+            try:
+                widget = s.get('match').getWidget()
+            except setting.InvalidType:
+                widget = None
 
             # this looks valid + sanity checks
             if (widget is not None and widget != self and

@@ -977,20 +977,6 @@ class WidgetPath(Str):
                                 {'relativetoparent': self.relativetoparent,
                                  'allowedwidgets': self.allowedwidgets})
 
-    def convertTo(self, val):
-        """Validate the text is a name of a widget relative to
-        this one."""
-
-        if not isinstance(val, basestring):
-            raise InvalidType
-
-        # InvalidType will get raised in getWidget if it is incorrect
-        w = self.getWidget(val)
-        if w is None:
-            return ''
-        else:
-            return val
-
     def getWidget(self, val = None):
         """Get the widget referred to. We double-check here to make sure
         it's the one.
