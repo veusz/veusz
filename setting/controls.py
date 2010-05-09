@@ -59,6 +59,15 @@ def populateCombo(combo, items):
     # set index to current value
     combo.setCurrentIndex(index)
 
+def styleClear(widget):
+    """Return widget to default"""
+    widget.setStyleSheet("")
+
+def styleError(widget):
+    """Show error state on widget."""
+    widget.setStyleSheet("background-color: " +
+                         setting.settingdb.color('error').name() )
+
 class Edit(qt4.QLineEdit):
     """Main control for editing settings which are text."""
 
@@ -67,8 +76,6 @@ class Edit(qt4.QLineEdit):
 
         qt4.QLineEdit.__init__(self, parent)
         self.setting = setting
-        self.bgcolor = self.palette().color(qt4.QPalette.Base)
-        #self.bgcolor = self.paletteBackgroundColor()
 
         # set the text of the widget to the 
         self.setText( setting.toText() )
@@ -87,17 +94,15 @@ class Edit(qt4.QLineEdit):
         text = unicode(self.text())
         try:
             val = self.setting.fromText(text)
-            self.palette().setColor(qt4.QPalette.Base, self.bgcolor)
+            styleClear(self)
 
             # value has changed
             if self.setting.val != val:
                 self.emit( qt4.SIGNAL('settingChanged'),
                            self, self.setting, val )
-                #self.setting.val = val
 
         except setting.InvalidType:
-            self.palette().setColor(qt4.QPalette.Base,
-                                    setting.settingdb.color('error'))
+            styleError(self)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -205,8 +210,6 @@ class String(qt4.QWidget):
         b.setMaximumWidth(16)
         b.setCheckable(True)
 
-        self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
-        
         # set the text of the widget to the 
         self.edit.setText( setting.toText() )
 
@@ -250,15 +253,14 @@ class String(qt4.QWidget):
         text = unicode(self.edit.text())
         try:
             val = self.setting.fromText(text)
-            self.edit.palette().setColor(qt4.QPalette.Base, self.bgcolor)
+            styleClear(self.edit)
 
             # value has changed
             if self.setting.val != val:
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val)
 
         except setting.InvalidType:
-            self.edit.palette().setColor(qt4.QPalette.Base,
-                                         setting.settingdb.color('error'))
+            styleError(self.edit)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -297,7 +299,6 @@ class Choice(qt4.QComboBox):
         qt4.QComboBox.__init__(self, parent)
 
         self.setting = setting
-        self.bgcolor = None
 
         self.setEditable(iseditable)
 
@@ -340,27 +341,17 @@ class Choice(qt4.QComboBox):
     def slotActivated(self, val):
         """If a different item is chosen."""
 
-        # control to highlight if there are problems
-        highcntrl = self.lineEdit()
-        if highcntrl is None:
-            highcntrl = self
-
-        # keep track of original background
-        if self.bgcolor is None:
-            self.bgcolor = highcntrl.palette().color(qt4.QPalette.Base)
-
         text = unicode(self.currentText())
         try:
             val = self.setting.fromText(text)
-            highcntrl.palette().setColor(qt4.QPalette.Base, self.bgcolor)
+            styleClear(self)
             
             # value has changed
             if self.setting.val != val:
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
-            highcntrl.palette().setColor(qt4.QPalette.Base,
-                                         setting.settingdb.color('error'))
+            styleError(self)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -379,7 +370,6 @@ class MultiLine(qt4.QTextEdit):
         """Initialise the widget."""
 
         qt4.QTextEdit.__init__(self, parent)
-        self.bgcolor = self.palette().color(qt4.QPalette.Window)
         self.setting = setting
 
         self.setWordWrapMode(qt4.QTextOption.NoWrap)
@@ -400,15 +390,14 @@ class MultiLine(qt4.QTextEdit):
         text = unicode(self.toPlainText())
         try:
             val = self.setting.fromText(text)
-            self.palette().setColor(qt4.QPalette.Window, self.bgcolor)
+            styleClear(self)
             
             # value has changed
             if self.setting.val != val:
                 self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
-            self.palette().setColor(qt4.QPalette.Window,
-                                    setting.settingdb.color('error'))
+            styleError(self)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
@@ -530,8 +519,6 @@ class DatasetOrString(qt4.QWidget):
         layout.setMargin(0)
         layout.addWidget(self.datachoose)
         layout.addWidget(b)
-
-        self.bgcolor = self.datachoose.palette().color(qt4.QPalette.Base)
 
         self.connect(b, qt4.SIGNAL('toggled(bool)'),
                      self.buttonToggled)
@@ -1139,7 +1126,6 @@ class LineSet(ListSet):
         wwidth.setToolTip('Line width')
         self.connect(wwidth, qt4.SIGNAL('editingFinished()'),
                      self.onWidthChanged)
-        self.bgcolor = wwidth.palette().color(qt4.QPalette.Window)
 
         # make color selector button
         wcolor = self.addColorButton(row, 2, 'Line color')
@@ -1159,12 +1145,11 @@ class LineSet(ListSet):
         text = unicode(sender.text())
         if setting.Distance.isDist(text):
             # valid distance
-            sender.palette().setColor(qt4.QPalette.Window, self.bgcolor)
+            styleClear(sender)
             self._updateRowCol(row, col, text)
         else:
             # invalid distance
-            sender.palette().setColor(qt4.QPalette.Window,
-                                      setting.settingdb.color('error'))
+            styleError(sender)
 
 class FillSet(ListSet):
     """A list of fill settings."""
@@ -1409,7 +1394,6 @@ class Filename(qt4.QWidget):
         self.edit = qt4.QLineEdit()
         self.edit.setText( setting.toText() )
         layout.addWidget(self.edit)
-        self.bgcolor = self.edit.palette().color(qt4.QPalette.Base)
         
         # get a sensible shape for the button - yawn
         b = self.button = qt4.QPushButton('..')
@@ -1458,7 +1442,7 @@ class Filename(qt4.QWidget):
         text = unicode(self.edit.text())
         try:
             val = self.setting.fromText(text)
-            self.edit.palette().setColor(qt4.QPalette.Base, self.bgcolor)
+            styleClear(self.edit)
 
             # value has changed
             if self.setting.val != val:
@@ -1466,8 +1450,7 @@ class Filename(qt4.QWidget):
                            val )
 
         except setting.InvalidType:
-            self.edit.palette().setColor(qt4.QPalette.Base,
-                                         setting.settingdb.color('error'))
+            styleError(self.edit)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
