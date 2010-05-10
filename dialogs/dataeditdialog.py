@@ -68,7 +68,13 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             data = getattr(ds, ds.columns[index.column()])
 
             if data is not None:
-                return qt4.QVariant( float(data[index.row()]) )
+                d = data[index.row()]
+                if isinstance(d, basestring):
+                    return qt4.QVariant(d)
+                else:
+                    # value needs converting to float as QVariant doesn't
+                    # support numpy numeric types
+                    return qt4.QVariant(float(d))
 
         # return nothing otherwise
         return qt4.QVariant()
