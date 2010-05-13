@@ -44,6 +44,7 @@ from veusz.dialogs.capturedialog import CaptureDialog
 from veusz.dialogs.stylesheet import StylesheetDialog
 from veusz.dialogs.custom import CustomDialog
 from veusz.dialogs.safetyimport import SafetyImportDialog
+from veusz.dialogs.histodata import HistoDataDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -395,6 +396,9 @@ class MainWindow(qt4.QMainWindow):
             'data.capture':
                 a(self, 'Capture remote data', 'Ca&pture...',
                   self.slotDataCapture, icon='veusz-capture-data'),
+            'data.histogram':
+                a(self, 'Histogram data', '&Histogram...',
+                  self.slotDataHistogram),
             'data.reload':
                 a(self, 'Reload linked datasets', '&Reload',
                   self.slotDataReload, icon='kde-view-refresh'),
@@ -465,7 +469,8 @@ class MainWindow(qt4.QMainWindow):
             ]
         datamenu = [
             'data.import', 'data.edit', 'data.create',
-            'data.create2d', 'data.capture', 'data.reload'
+            'data.create2d', 'data.capture', 'data.histogram',
+            'data.reload'
             ]
         helpmenu = [
             'help.home', 'help.project', 'help.bug',
@@ -554,6 +559,13 @@ class MainWindow(qt4.QMainWindow):
     def slotDataCapture(self):
         """Capture remote data."""
         dialog = CaptureDialog(self.document, self)
+        self.dialogs.append(dialog)
+        dialog.show()
+        return dialog
+
+    def slotDataHistogram(self):
+        """Histogram data."""
+        dialog = HistoDataDialog(self.document, self)
         self.dialogs.append(dialog)
         dialog.show()
         return dialog

@@ -863,6 +863,28 @@ def _evaluateDataset(datasets, dsname, dspart):
         raise DatasetExpressionException(
             'Internal error - invalid dataset part')
 
+def simpleEvalExpression(doc, expr):
+    """Evaluate expression and return data."""
+
+    expr = _substituteDatasets(doc.data, expr, 'data')
+
+    if ( not setting.transient_settings['unsafe_mode'] and
+         utils.checkCode(expr, securityonly=True) ):
+        self.document.log("Unsafe expression: %s\n" % expr)
+        return N.array([])
+
+    env = doc.eval_context.copy()
+    def evaluateDataset(dsname, dspart):
+        return _evaluateDataset(doc.data, dsname, dspart)
+
+    env['_DS_'] = evaluateDataset
+    try:
+        evalout = N.array(eval(expr, env), N.float64)
+    except Exception, ex:
+        self.document.log(unicode(ex))
+        return N.array([])
+    return evalout
+
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
