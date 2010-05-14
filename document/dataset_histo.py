@@ -81,7 +81,7 @@ class DatasetHistoBins(DatasetBase):
     def __init__(self, generator):
         self.generator = generator
 
-    data = property(lambda self: return self.generator.getBinLocations()[:-1])
+    data = property(lambda self: self.generator.getBinLocations()[:-1])
     serr = perr = nerr = N.array([])
 
 class DatasetHistoValues(DatasetBase):
@@ -89,5 +89,5 @@ class DatasetHistoValues(DatasetBase):
     def __init__(self, generator):
         self.generator = generator
 
-    data = property(lambda self: return self.generator.getBinVals())
+    data = property(lambda self: self.generator.getBinVals())
     serr = perr = nerr = N.array([])
