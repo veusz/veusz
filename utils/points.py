@@ -393,6 +393,11 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
     
     painter.save()
 
+    # get sharper angles and more exact positions using these settings
+    pen = painter.pen()
+    pen.setJoinStyle( qt4.Qt.MiterJoin )
+    painter.setPen(pen)
+
     # get path to draw and whether to fill
     path, fill = getPainterPath(painter, markername, markersize)
     if not fill:
