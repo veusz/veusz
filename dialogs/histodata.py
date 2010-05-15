@@ -28,6 +28,30 @@ from veusz.setting.controls import populateCombo
 
 import numpy as N
 
+class ManualBinModel(qt4.QAbstractListModel):
+    """Model to store a list of floating point values in a list."""
+    def __init__(self, data):
+        qt4.QAbstractListModel.__init__(self)
+        self.data = data
+    def data(self, index, role):
+        if role == qt4.Qt.DisplayRole and index.isValid():
+            return qt4.QVariant(float(self.data[index.row()]))
+        return qt4.QVariant()
+    def rowCount(self, parent):
+        return len(self.data)
+    def flags(self, index):
+        return ( qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsEnabled |
+                 qt4.Qt.ItemIsEditable )
+    def setData(self, index, value, role):
+        if role == qt4.Qt.EditRole:
+            val, ok = value.toDouble()
+            if ok:
+                self.data[ index.row() ] = val
+                self.emit( qt4.SIGNAL("dataChanged(const QModelIndex &,"
+                                      " const QModelIndex &)"), index, index)
+                return True
+        return False
+
 class HistoDataDialog(qt4.QDialog):
     """Preferences dialog."""
 
@@ -41,12 +65,20 @@ class HistoDataDialog(qt4.QDialog):
         self.document = document
 
         self.minval.default = self.maxval.default = ['Auto']
-        regexp = qt4.QRegExp("[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?|Auto")
+        regexp = qt4.QRegExp("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?|Auto$")
         validator = qt4.QRegExpValidator(regexp, self)
         self.minval.setValidator(validator)
         self.maxval.setValidator(validator)
+        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
+                      qt4.SIGNAL("clicked()"), self.applyClicked )
+        self.connect( self.bingenerate, qt4.SIGNAL('clicked()'),
+                      self.generateBins )
 
-        self.connect(document, qt4.SIGNAL('sigModified'),
+        self.bindata = []
+        self.binmodel = ManualBinModel(self.bindata)
+        self.binmanuals.setModel(self.binmodel)
+
+        self.connect(document, qt4.SIGNAL("sigModified"),
                      self.updateDatasetLists)
         self.updateDatasetLists()
 
@@ -72,3 +104,52 @@ class HistoDataDialog(qt4.QDialog):
         # help the user by listing existing datasets
         populateCombo(self.indataset, datasets)
 
+    def datasetExprChanged(self):
+        """Validate expression."""
+        text = self.indataset.text()
+        res = document.simpleEvalExpression(self.document, unicode(text))
+        print res
+
+    class Params(object):
+        def __init__(self, dialog):
+            self.numbins = dialog.numbins.value()
+            self.minval = dialog.minval.text()
+            if self.minval != 'Auto':
+                self.minval = float(self.minval)
+            self.maxval = dialog.maxval.text()
+            if self.maxval != 'Auto':
+                self.maxval = float(self.maxval)
+
+            self.expr = unicode( dialog.indataset.currentText() )
+            self.outdataset = unicode( dialog.outdataset.currentText() )
+            self.outbins = unicode( dialog.outbins.currentText() )
+            self.method = unicode( dialog.methodGroup.getRadioChecked().
+                                   objectName() )
+            self.islog = dialog.logarithmic.isChecked()
+            self.manualbins = []
+
+        def getGenerator(self, doc):
+            return document.DatasetHistoGenerator(
+                doc, self.expr, binexpr=(self.numbins, self.minval,
+                                         self.maxval, self.islog),
+                method=self.method )
+
+    def applyClicked(self):
+
+        try:
+            p = HistoDataDialog.Params(self)
+            gen = p.getGenerator(self.document)
+
+            print gen.getBinLocations()
+            print gen.getBinVals()
+
+        except RuntimeError, ex:
+            pass
+
+    def generateBins(self):
+        p = HistoDataDialog.Params(self)
+        p.manualbins = []
+        gen = p.getGenerator(self.document)
+
+        self.bindata[:] = list(gen.binLocations())
+        self.binmodel.reset()

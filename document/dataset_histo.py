@@ -41,12 +41,14 @@ class DatasetHistoGenerator(object):
         self.method = method
 
     def getData(self):
+        """Get data from input expression, caching result."""
         if self.document.changeset != self.changeset:
             self._cacheddata = simpleEvalExpression(self.document, self.inexpr)
             self.changeset = self.document.changeset
         return self._cacheddata
 
-    def getBinLocations(self):
+    def binLocations(self):
+        """Compute locations of bins edges, giving N+1 items."""
         if self.binmanual is not None:
             return N.array(self.binmanual)
         else:
@@ -60,12 +62,37 @@ class DatasetHistoGenerator(object):
                     minval = N.nanmin(data)
                 if maxval == 'Auto':
                     maxval = N.nanmax(data)
-                    
-            delta = (maxval - minval) / (numbins-1)
-            return N.arange(minval, maxval+delta, delta)
+
+            if not islog:
+                delta = (maxval - minval) / numbins
+                return N.arange(minval, maxval+delta, delta)
+            else:
+                if minval < 0. or maxval < 0.:
+                    minval, maxval = 0.01, 100.
+                lmin, lmax = N.log(minval), N.log(maxval)
+                delta = (lmax - lmin) / numbins
+                return N.exp( N.arange(lmin, lmax+delta, delta) )
+
+    def getBinLocations(self):
+        """Return bin centre, -ve bin width, +ve bin width."""
+        binlocs = self.binLocations()
+
+        if self.binexpr and self.binexpr[3]:
+            # log bins
+            lbin = N.log(binlocs)
+            data = N.exp( 0.5*(lbin[:-1] + lbin[1:]) )
+        else:
+            # otherwise linear bins
+            data = 0.5*(binlocs[:-1] + binlocs[1:])
+
+        # error bars
+        nerr = binlocs[:-1] - data
+        perr = binlocs[1:] - data
+        return data, nerr, perr
 
     def getBinVals(self):
-        binlocs = self.getBinLocations()
+        """Return results for each bin."""
+        binlocs = self.binLocations()
         if len(binlocs) == 0:
             return N.array([])
         data = self.getData()
@@ -76,18 +103,43 @@ class DatasetHistoGenerator(object):
             hist *= (1./len(data));
         return hist
 
+    def getBinDataset(self):
+        return DatasetHistoBins(self)
+    def getValueDataset(self):
+        return DatasetHistoValues(self)
+
 class DatasetHistoBins(DatasetBase):
+    """A dataset for getting the bin positions for the histogram."""
 
     def __init__(self, generator):
         self.generator = generator
+        self.changeset = -1
 
-    data = property(lambda self: self.generator.getBinLocations()[:-1])
-    serr = perr = nerr = N.array([])
+    def getData(self):
+        """Get bin positions, caching results."""
+        if self.changeset != self.generator.document.changeset:
+            self.datacache = self.generator.getBinLocations()
+            self.changeset = self.generator.document.changeset
+        return self.datacache
+
+    data = property(lambda self: self.getData[0])
+    nerr = property(lambda self: self.getData[1])
+    perr = property(lambda self: self.getData[2])
+    serr = None
 
 class DatasetHistoValues(DatasetBase):
+    """A dataset for getting the height of the bins in a histogram."""
 
     def __init__(self, generator):
         self.generator = generator
+        self.changeset = -1
 
-    data = property(lambda self: self.generator.getBinVals())
-    serr = perr = nerr = N.array([])
+    def getData(self):
+        """Get bin heights, caching results."""
+        if self.changeset != self.generator.document.changeset:
+            self.datacache = self.generator.getBinVals()
+            self.changeset = self.generator.document.changeset
+        return self.datacache
+
+    data = property(lambda self: self.getData())
+    serr = perr = nerr = None

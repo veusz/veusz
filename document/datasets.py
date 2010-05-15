@@ -881,7 +881,7 @@ def simpleEvalExpression(doc, expr):
     try:
         evalout = N.array(eval(expr, env), N.float64)
     except Exception, ex:
-        self.document.log(unicode(ex))
+        doc.log(unicode(ex))
         return N.array([])
     return evalout
 

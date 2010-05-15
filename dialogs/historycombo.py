@@ -134,4 +134,3 @@ class HistoryCombo(qt4.QComboBox):
         """Save history as widget is hidden."""
         qt4.QComboBox.hideEvent(self, event)
         self.saveHistory()
-
