@@ -398,7 +398,7 @@ class MainWindow(qt4.QMainWindow):
                   self.slotDataCapture, icon='veusz-capture-data'),
             'data.histogram':
                 a(self, 'Histogram data', '&Histogram...',
-                  self.slotDataHistogram),
+                  self.slotDataHistogram, icon='button_bar'),
             'data.reload':
                 a(self, 'Reload linked datasets', '&Reload',
                   self.slotDataReload, icon='kde-view-refresh'),

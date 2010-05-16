@@ -437,10 +437,8 @@ class DatasetBase(object):
         """Get dataset name."""
         for name, ds in self.document.data.iteritems():
             if ds == self:
-                break
-        else:
-            raise ValueError('Could not find self in document.data')
-        return name
+                return name
+        raise ValueError('Could not find self in document.data')
 
     def description(self, showlinked=True):
         """Get description of database."""

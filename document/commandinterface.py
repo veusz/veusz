@@ -33,6 +33,7 @@ import veusz.setting as setting
 
 import datasets
 import operations
+import dataset_histo
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
@@ -43,6 +44,7 @@ class CommandInterface(qt4.QObject):
         'Add',
         'AddCustom',
         'AddImportPath',
+        'CreateHistogram',
         'Get',
         'GetChildren',
         'GetData',
@@ -139,11 +141,33 @@ class CommandInterface(qt4.QObject):
         assert isinstance(directory, basestring)
         self.importpath.append(directory)
 
+    def CreateHistogram(self, inexpr, outbinsds, outvalsds, binparams=None,
+                        binmanual=None, method='counts'):
+        """Histogram an input expression.
+
+        inexpr is input expression
+        outbinds is the name of the dataset to create giving bin positions
+        outvalsds is name of dataset for bin values
+        binparams is None or (numbins, minval, maxval, islogbins)
+        binmanual is None or a list of bin values
+        method is 'counts', 'density', or 'fractions'
+        """
+        op = dataset_histo.OperationDatasetHistogram(
+            inexpr, outbinsds, outvalsds, binparams=binparams,
+            binmanual=binmanual, method=method)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print ('Constructed histogram of "%s", creating datasets'
+                   ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds)
+
     def Remove(self, name):
         """Remove a graph from the dataset."""
         w = self.document.resolve(self.currentwidget, name)
         op = operations.OperationWidgetDelete(w)
         self.document.applyOperation(op)
+        if self.verbose:
+            print "Removed widget '%s'" % name
 
     def To(self, where):
         """Change to a graph within the current graph."""

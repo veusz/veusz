@@ -72,7 +72,7 @@ class HistoDataDialog(qt4.QDialog):
         self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
                       qt4.SIGNAL("clicked()"), self.applyClicked )
         self.connect( self.bingenerate, qt4.SIGNAL('clicked()'),
-                      self.generateBins )
+                      self.generateManualBins )
 
         self.bindata = []
         self.binmodel = ManualBinModel(self.bindata)
@@ -111,45 +111,66 @@ class HistoDataDialog(qt4.QDialog):
         print res
 
     class Params(object):
+        """Parameters to creation of histogram."""
         def __init__(self, dialog):
-            self.numbins = dialog.numbins.value()
-            self.minval = dialog.minval.text()
-            if self.minval != 'Auto':
-                self.minval = float(self.minval)
-            self.maxval = dialog.maxval.text()
-            if self.maxval != 'Auto':
-                self.maxval = float(self.maxval)
+            """Initialise parameters from dialog."""
+            numbins = dialog.numbins.value()
+            minval = dialog.minval.text()
+            if minval != 'Auto':
+                minval = float(minval)
+            maxval = dialog.maxval.text()
+            if maxval != 'Auto':
+                maxval = float(maxval)
+            islog = dialog.logarithmic.isChecked()
+            self.binparams = (numbins, minval, maxval, islog)
 
             self.expr = unicode( dialog.indataset.currentText() )
             self.outdataset = unicode( dialog.outdataset.currentText() )
             self.outbins = unicode( dialog.outbins.currentText() )
             self.method = unicode( dialog.methodGroup.getRadioChecked().
                                    objectName() )
-            self.islog = dialog.logarithmic.isChecked()
-            self.manualbins = []
+            self.manualbins = list( dialog.bindata )
+            self.manualbins.sort()
+            if len(self.manualbins) == 0:
+                self.manualbins = None
 
         def getGenerator(self, doc):
+            """Return dataset generator."""
             return document.DatasetHistoGenerator(
-                doc, self.expr, binexpr=(self.numbins, self.minval,
-                                         self.maxval, self.islog),
-                method=self.method )
+                doc, self.expr, binparams = self.binparams,
+                binmanual = self.manualbins, method = self.method )
+
+        def getOperation(self):
+            """Get operation to make histogram."""
+            return document.OperationDatasetHistogram(
+                self.expr, self.outbins, self.outdataset,
+                binparams = self.binparams,
+                binmanual = self.manualbins,
+                method = self.method )
+
+    def generateManualBins(self):
+        """Generate manual bins."""
+        p = HistoDataDialog.Params(self)
+        if p.expr != '':
+            p.manualbins = []
+            gen = p.getGenerator(self.document)
+            self.bindata[:] = list(gen.binLocations())
+        else:
+            del self.bindata[:]
+        self.binmodel.reset()
 
     def applyClicked(self):
+        """Create histogram."""
 
-        try:
-            p = HistoDataDialog.Params(self)
-            gen = p.getGenerator(self.document)
-
-            print gen.getBinLocations()
-            print gen.getBinVals()
-
-        except RuntimeError, ex:
-            pass
-
-    def generateBins(self):
         p = HistoDataDialog.Params(self)
-        p.manualbins = []
-        gen = p.getGenerator(self.document)
+        op = p.getOperation()
+        self.document.applyOperation(op)
 
-        self.bindata[:] = list(gen.binLocations())
-        self.binmodel.reset()
+        self.statuslabel.setText(
+            'Created datasets "%s" and "%s"' % (p.outbins,
+                                                p.outdataset) )
+
+        def clearlabel(self=self):
+            self.statuslabel.setText("")
+
+        qt4.QTimer.singleShot(2000, clearlabel)

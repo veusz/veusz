@@ -35,7 +35,6 @@ import numpy as N
 import datasets
 import widgetfactory
 import simpleread
-import commandinterpreter
 import readcsv
 
 import veusz.utils as utils
@@ -1277,6 +1276,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         
     def do(self, document):
         """Do the import."""
+
+        import commandinterpreter
 
         # get document to keep track of changes for undo/redo
         document.batchHistory(self)

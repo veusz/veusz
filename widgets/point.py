@@ -409,7 +409,6 @@ class PointPlotter(GenericPlotter):
         elif steps == 'centre':
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
-            print "Here"
             if xdata.hasErrors():
                 # Special case if error bars on x points:
                 # here we use the error bars to define the steps
@@ -427,7 +426,6 @@ class PointPlotter(GenericPlotter):
                     pts.append( qt4.QPointF(xmx, y) )
 
             else:
-                print "Doing points"
                 # we put the bin edges half way between the points
                 # we assume this is the correct thing to do even in log space
                 for x1, x2, y1, y2 in itertools.izip(xvals[:-1], xvals[1:],
@@ -437,7 +435,6 @@ class PointPlotter(GenericPlotter):
                     pts.append(qt4.QPointF(xc, y1))
                     pts.append(qt4.QPointF(xc, y2))
 
-                print "done points"
                 if len(xvals) > 0:
                     pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
 
@@ -475,16 +472,8 @@ class PointPlotter(GenericPlotter):
 
             # draw line between points
             if not s.PlotLine.hide:
-                print "actually drawing line"
                 painter.setPen( s.PlotLine.makeQPen(painter) )
-
-                f = open('test.dat', 'w')
-                for p in pts:
-                    print >>f, '%20.6f %20.6f' % (p.x(), p.y())
-                f.close()
-
                 painter.drawPolyline(pts)
-                print "done"
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
