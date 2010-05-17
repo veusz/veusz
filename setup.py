@@ -69,8 +69,8 @@ setup(name = 'veusz',
       classifiers = ['Programming Language :: Python',
                      'Development Status :: 4 - Beta',
                      'Environment :: X11 Applications :: Qt',
-                     'Intended Audiance :: Advanced End Users',
-                     'Licence :: OSI Approved :: '
+                     'Intended Audience :: Science/Research',
+                     'License :: OSI Approved :: '
                      'GNU General Public License (GPL)',
                      'Topic :: Scientific/Engineering :: Visualization'],
       package_dir = { 'veusz': '',
