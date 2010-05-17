@@ -28,6 +28,12 @@ from veusz.setting.controls import populateCombo
 
 import numpy as N
 
+def checkValidator(combo):
+    """Is this validator ok?"""
+    valid = combo.validator()
+    state, x = valid.validate( combo.currentText(), 0 )
+    return state == qt4.QValidator.Acceptable
+
 class ManualBinModel(qt4.QAbstractListModel):
     """Model to store a list of floating point values in a list."""
     def __init__(self, data):
@@ -73,6 +79,9 @@ class HistoDataDialog(qt4.QDialog):
                       qt4.SIGNAL("clicked()"), self.applyClicked )
         self.connect( self.bingenerate, qt4.SIGNAL('clicked()'),
                       self.generateManualBins )
+        self.connect( self.binadd, qt4.SIGNAL('clicked()'), self.addManualBins )
+        self.connect( self.binremove, qt4.SIGNAL('clicked()'),
+                      self.removeManualBins )
 
         self.bindata = []
         self.binmodel = ManualBinModel(self.bindata)
@@ -112,15 +121,23 @@ class HistoDataDialog(qt4.QDialog):
 
     class Params(object):
         """Parameters to creation of histogram."""
+
         def __init__(self, dialog):
             """Initialise parameters from dialog."""
             numbins = dialog.numbins.value()
+
+            if not checkValidator(dialog.minval):
+                raise RuntimeError("Invalid minimum value")
             minval = dialog.minval.text()
             if minval != 'Auto':
                 minval = float(minval)
+
+            if not checkValidator(dialog.maxval):
+                raise RuntimeError("Invalid maximum value")
             maxval = dialog.maxval.text()
             if maxval != 'Auto':
                 maxval = float(maxval)
+
             islog = dialog.logarithmic.isChecked()
             self.binparams = (numbins, minval, maxval, islog)
 
@@ -150,7 +167,13 @@ class HistoDataDialog(qt4.QDialog):
 
     def generateManualBins(self):
         """Generate manual bins."""
-        p = HistoDataDialog.Params(self)
+
+        try:
+            p = HistoDataDialog.Params(self)
+        except RuntimeError, ex:
+            qt4.QMessageBox.warning(self, "Invalid parameters", unicode(ex))
+            return
+
         if p.expr != '':
             p.manualbins = []
             gen = p.getGenerator(self.document)
@@ -159,10 +182,27 @@ class HistoDataDialog(qt4.QDialog):
             del self.bindata[:]
         self.binmodel.reset()
 
+    def addManualBins(self):
+        """Add an extra bin to the manual list."""
+        self.bindata.insert(0, 0.)
+        self.binmodel.reset()
+
+    def removeManualBins(self):
+        """Remove selected bins."""
+        indexes = self.binmanuals.selectionModel().selectedIndexes()
+        if indexes:
+            del self.bindata[ indexes[0].row() ]
+            self.binmodel.reset()
+
     def applyClicked(self):
         """Create histogram."""
 
-        p = HistoDataDialog.Params(self)
+        try:
+            p = HistoDataDialog.Params(self)
+        except RuntimeError, ex:
+            qt4.QMessageBox.warning(self, "Invalid parameters", unicode(ex))
+            return
+
         op = p.getOperation()
         self.document.applyOperation(op)
 
