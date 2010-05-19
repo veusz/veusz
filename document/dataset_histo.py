@@ -24,12 +24,16 @@ from datasets import Dataset, simpleEvalExpression
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
                  binmanual = None, binparams = None,
-                 method = 'counts'):
+                 method = 'counts',
+                 cumulative = 'none',
+                 errors=False):
         """
         inexpr = ds expression
         binmanual = None / [1,2,3,4,5]
         binparams = None / (num, minval, maxval, islog)
         method = ('counts', 'density', or 'fractions')
+        cumulative = ('none', 'smalltolarge', 'largetosmall')
+        errors = True/False
         """
 
         self.changeset = -1
@@ -39,6 +43,8 @@ class DatasetHistoGenerator(object):
         self.binmanual = binmanual
         self.binparams = binparams
         self.method = method
+        self.cumulative = cumulative
+        self.errors = errors
 
     def getData(self):
         """Get data from input expression, caching result."""
@@ -92,18 +98,56 @@ class DatasetHistoGenerator(object):
         perr = binlocs[1:] - data
         return data, nerr, perr
 
+    def getErrors(self, data, binlocs):
+        """Compute error bars if requried."""
+
+        hist, edges = N.histogram(data, bins=binlocs)
+
+        # calculate scaling values for error bars
+        if self.method == 'density':
+            ratio = 1. / (hist.size*(edges[1]-edges[0]))
+        elif self.method == 'fractions':
+            ratio = 1. / data.size
+        else:
+            ratio = 1.
+
+        # compute cumulative values (errors correlated)
+        if self.cumulative == 'smalltolarge':
+            hist = N.cumsum(hist)
+        elif self.cumulative == 'largetosmall':
+            hist = N.cumsum(hist[::-1])[::-1]
+
+        # Gehrels 1986 ApJ 303 336
+        perr = 1. + N.sqrt(hist + 0.75)
+        nerr = N.where(hist > 0, N.sqrt(hist - 0.25), 0.)
+
+        return -nerr*ratio, perr*ratio
+
     def getBinVals(self):
         """Return results for each bin."""
         binlocs = self.binLocations()
-        if len(binlocs) == 0:
+        if binlocs.size == 0:
             return N.array([])
         data = self.getData()
 
         normed = self.method == 'density'
         hist, edges = N.histogram(data, bins=binlocs, normed=normed)
+        
         if self.method == 'fractions':
-            hist = hist * (1./len(data))
-        return hist
+            hist = hist * (1./data.size)
+
+        # if cumulative wanted
+        if self.cumulative == 'smalltolarge':
+            hist = N.cumsum(hist)
+        elif self.cumulative == 'largetosmall':
+            hist = N.cumsum(hist[::-1])[::-1]
+
+        if self.errors:
+            nerr, perr = self.getErrors(data, binlocs)
+        else:
+            nerr, perr = None, None
+
+        return hist, nerr, perr
 
     def getBinDataset(self):
         self.bindataset = DatasetHistoBins(self, self.document)
@@ -124,10 +168,12 @@ class DatasetHistoGenerator(object):
             valname = ''
 
         fileobj.write( ("CreateHistogram(%s, %s, %s, binparams=%s, "
-                        "binmanual=%s, method=%s)\n") %
+                        "binmanual=%s, method=%s, "
+                        "cumulative=%s, errors=%s)\n") %
                        (repr(self.inexpr), repr(binname), repr(valname),
                         repr(self.binparams), repr(self.binmanual),
-                        repr(self.method)) )
+                        repr(self.method), repr(self.cumulative),
+                        repr(self.errors)) )
 
 class DatasetHistoBins(Dataset):
     """A dataset for getting the bin positions for the histogram."""
@@ -176,8 +222,10 @@ class DatasetHistoValues(Dataset):
         """Save dataset and its counterpart to a file."""
         self.generator.saveToFile(fileobj)
 
-    data = property(lambda self: self.getData())
-    serr = perr = nerr = None
+    data = property(lambda self: self.getData()[0])
+    nerr = property(lambda self: self.getData()[1])
+    perr = property(lambda self: self.getData()[2])
+    serr = None
 
 class OperationDatasetHistogram(object):
     """Operation to make histogram from data."""
@@ -185,7 +233,9 @@ class OperationDatasetHistogram(object):
     descr = 'make histogram'
 
     def __init__(self, expr, outposns, outvalues,
-                 binparams=None, binmanual=None, method='counts'):
+                 binparams=None, binmanual=None, method='counts',
+                 cumulative = 'none',
+                 errors=False):
         """
         inexpr = input dataset expression
         outposns = name of dataset for bin positions
@@ -193,6 +243,8 @@ class OperationDatasetHistogram(object):
         binparams = None / (num, minval, maxval, islog)
         binmanual = None / [1,2,3,4,5]
         method = ('counts', 'density', or 'fractions')
+        cumulative = ('none', 'smalltolarge', 'largetosmall')
+        errors = True/False
         """
 
         self.expr = expr
@@ -201,6 +253,8 @@ class OperationDatasetHistogram(object):
         self.binparams = binparams
         self.binmanual = binmanual
         self.method = method
+        self.cumulative = cumulative
+        self.errors = errors
 
     def do(self, document):
         """Create histogram datasets."""
@@ -208,7 +262,9 @@ class OperationDatasetHistogram(object):
         gen = DatasetHistoGenerator(
             document, self.expr, binparams=self.binparams,
             binmanual=self.binmanual,
-            method=self.method )
+            method=self.method,
+            cumulative=self.cumulative,
+            errors=self.errors)
 
         if self.outvalues != '':
             self.oldvaluesds = document.data.get(self.outvalues, None)

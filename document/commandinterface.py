@@ -142,7 +142,8 @@ class CommandInterface(qt4.QObject):
         self.importpath.append(directory)
 
     def CreateHistogram(self, inexpr, outbinsds, outvalsds, binparams=None,
-                        binmanual=None, method='counts'):
+                        binmanual=None, method='counts',
+                        cumulative = 'none', errors=False):
         """Histogram an input expression.
 
         inexpr is input expression
@@ -151,10 +152,14 @@ class CommandInterface(qt4.QObject):
         binparams is None or (numbins, minval, maxval, islogbins)
         binmanual is None or a list of bin values
         method is 'counts', 'density', or 'fractions'
+        cumulative is to calculate cumulative distributions which is
+          'none', 'smalltolarge' or 'largetosmall'
+        errors is to calculate Poisson error bars
         """
         op = dataset_histo.OperationDatasetHistogram(
             inexpr, outbinsds, outvalsds, binparams=binparams,
-            binmanual=binmanual, method=method)
+            binmanual=binmanual, method=method,
+            cumulative=cumulative, errors=errors)
         self.document.applyOperation(op)
 
         if self.verbose:

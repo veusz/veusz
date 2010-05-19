@@ -151,11 +151,20 @@ class HistoDataDialog(qt4.QDialog):
             if len(self.manualbins) == 0:
                 self.manualbins = None
 
+            self.errors = dialog.errorBars.isChecked()
+            cuml = dialog.cumlGroup.getRadioChecked().objectName()
+            self.cumulative = 'none'
+            if cuml == 'cumlStoL':
+                self.cumulative = 'smalltolarge'
+            elif cuml == 'cumlLtoS':
+                self.cumulative = 'largetosmall'
+
         def getGenerator(self, doc):
             """Return dataset generator."""
             return document.DatasetHistoGenerator(
                 doc, self.expr, binparams = self.binparams,
-                binmanual = self.manualbins, method = self.method )
+                binmanual = self.manualbins, method = self.method,
+                cumulative = self.cumulative, errors = self.errors)
 
         def getOperation(self):
             """Get operation to make histogram."""
@@ -163,7 +172,9 @@ class HistoDataDialog(qt4.QDialog):
                 self.expr, self.outbins, self.outdataset,
                 binparams = self.binparams,
                 binmanual = self.manualbins,
-                method = self.method )
+                method = self.method,
+                cumulative = self.cumulative,
+                errors = self.errors)
 
     def generateManualBins(self):
         """Generate manual bins."""
