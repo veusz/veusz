@@ -68,6 +68,15 @@ def _convertNumpyNegAbs(a):
         a = a.astype('float64')
     return -N.abs(a)
 
+def _copyOrNone(a):
+    """Return a copy if not None, or None."""
+    if a is None:
+        return None
+    elif isinstance(a, N.ndarray):
+        return N.array(a)
+    elif isinstance(a, list):
+        return list(a)
+
 def generateValidDatasetParts(*datasets):
     """Generator to return array of valid parts of datasets.
 
@@ -490,6 +499,10 @@ class DatasetBase(object):
             name = 'None'
         return 'Linked file: %s' % name
 
+    def returnCopy(self):
+        """Return an unlinked copy of self."""
+        pass
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -551,6 +564,9 @@ class Dataset2D(DatasetBase):
         """Return a value cast to this dataset data type."""
         return float(val)
 
+    def returnCopy(self):
+        return Dataset2D( N.array(self.data), self.xrange, self.yrange)
+
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
 
@@ -596,16 +612,6 @@ class Dataset(DatasetBase):
         if self.linked and showlinked:
             text += ' linked to %s' % self.linked.filename
         return text
-
-    def duplicate(self):
-        """Return new dataset based on this one."""
-        attrs = {}
-        for attr in ('data', 'serr', 'nerr', 'perr'):
-            data = getattr(self, attr)
-            if data is not None:
-                attrs[attr] = data.copy()
-        
-        return Dataset(**attrs)
 
     def invalidDataPoints(self):
         """Return a numpy bool detailing which datapoints are invalid."""
@@ -735,6 +741,13 @@ class Dataset(DatasetBase):
             if coldata is not None:
                 setattr(self, col, N.insert(coldata, [row]*numrows, data))
 
+    def returnCopy(self):
+        """Return version of dataset with no linking."""
+        return Dataset(data = _copyOrNone(self.data),
+                       serr = _copyOrNone(self.serr),
+                       perr = _copyOrNone(self.perr),
+                       nerr = _copyOrNone(self.nerr))
+
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
@@ -754,9 +767,6 @@ class DatasetText(DatasetBase):
         if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
-
-    def duplicate(self):
-        return DatasetText(data=self.data) # data is copied by this constructor
 
     def changeValues(self, type, vals):
         if type == 'data':
@@ -803,6 +813,10 @@ class DatasetText(DatasetBase):
         insdata = data + (['']*(numrows-len(data)))
         for d in insdata[::-1]:
             self.data.insert(row, d)
+
+    def returnCopy(self):
+        """Returns version of dataset with no linking."""
+        return DatasetText(self.data)
 
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
@@ -1292,6 +1306,20 @@ class Dataset2DXYZExpression(DatasetBase):
             repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
         fileobj.write(s)
 
+    def returnCopy(self):
+        """Return unlinked copy of self."""
+        return Dataset2D( N.array(self.data),
+                          xrange=self.xrange, yrange=self.yrange)
+
+    def canUnlink(self):
+        """Can relationship be unlinked?"""
+        return True
+
+    def linkedInformation(self):
+        """Return linking information."""
+        return 'Linked 2D function: x=%s, y=%s, z=%s' % (
+            self.exprx, self.expry, self.exprz)
+
 class Dataset2DXYFunc(DatasetBase):
     """Given a range of x and y, this is a dataset which is a function of
     this.
@@ -1372,3 +1400,17 @@ class Dataset2DXYFunc(DatasetBase):
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
         fileobj.write(s)
+
+    def returnCopy(self):
+        """Return unlinked copy of self."""
+        return Dataset2D( N.array(self.data),
+                          xrange=self.xrange, yrange=self.yrange)
+
+    def canUnlink(self):
+        """Can relationship be unlinked?"""
+        return True
+
+    def linkedInformation(self):
+        """Return linking information."""
+        return 'Linked 2D function: x=%g:%g:%g, y=%g:%g:%g, z=%s' % tuple(
+            list(self.xstep) + list(self.ystep) + [self.expr])

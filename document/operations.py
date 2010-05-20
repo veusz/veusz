@@ -425,12 +425,19 @@ class OperationDatasetDuplicate(object):
         
     def do(self, document):
         """Make the duplicate"""
-        document.duplicateDataset(self.origname, self.duplname)
+        self.olddata = document.data.get(self.duplname, None)
+
+        dataset = document.data[self.origname]
+        duplicate = dataset.returnCopy()
+        document.setData(self.duplname, duplicate)
         
     def undo(self, document):
         """Delete the duplicate"""
         
-        del document.data[self.duplname]
+        if self.olddata is None:
+            del document.data[self.duplname]
+        else:
+            document.data[self.duplname] = self.olddata
         
 class OperationDatasetUnlinkFile(object):
     """Remove association between dataset and file."""
@@ -460,8 +467,7 @@ class OperationDatasetUnlinkRelation(object):
     def do(self, document):
         dataset = document.data[self.datasetname]
         self.olddataset = dataset
-        ds = datasets.Dataset(data=dataset.data, serr=dataset.serr,
-                              perr=dataset.perr, nerr=dataset.nerr)
+        ds = dataset.returnCopy()
         document.setData(self.datasetname, ds)
         
     def undo(self, document):
