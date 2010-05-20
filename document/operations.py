@@ -432,9 +432,24 @@ class OperationDatasetDuplicate(object):
         
         del document.data[self.duplname]
         
-class OperationDatasetUnlink(object):
-    """Remove association between dataset and file, or dataset and
-    another dataset.
+class OperationDatasetUnlinkFile(object):
+    """Remove association between dataset and file."""
+    descr = 'unlink dataset'
+    
+    def __init__(self, datasetname):
+        self.datasetname = datasetname
+        
+    def do(self, document):
+        dataset = document.data[self.datasetname]
+        self.oldfilelink = dataset.linked
+        dataset.linked = None
+        
+    def undo(self, document):
+        dataset = document.data[self.datasetname]
+        dataset.linked = self.oldfilelink
+
+class OperationDatasetUnlinkRelation(object):
+    """Remove association between dataset and another dataset.
     """
     
     descr = 'unlink dataset'
@@ -444,29 +459,13 @@ class OperationDatasetUnlink(object):
         
     def do(self, document):
         dataset = document.data[self.datasetname]
-        
-        if ( isinstance(dataset, datasets.DatasetExpression) or
-             isinstance(dataset, datasets.DatasetRange) ):
-            # if it's an expression, unlink from other dataset
-            self.mode = 'expr'
-            self.olddataset = dataset
-            ds = datasets.Dataset(data=dataset.data, serr=dataset.serr,
-                                  perr=dataset.perr, nerr=dataset.nerr)
-            document.setData(self.datasetname, ds)
-        else:
-            # unlink from file
-            self.mode = 'file'
-            self.oldfilelink = dataset.linked
-            dataset.linked = None
+        self.olddataset = dataset
+        ds = datasets.Dataset(data=dataset.data, serr=dataset.serr,
+                              perr=dataset.perr, nerr=dataset.nerr)
+        document.setData(self.datasetname, ds)
         
     def undo(self, document):
-        if self.mode == 'file':
-            dataset = document.data[self.datasetname]
-            dataset.linked = self.oldfilelink
-        elif self.mode == 'expr':
-            document.setData(self.datasetname, self.olddataset)
-        else:
-            assert False
+        document.setData(self.datasetname, self.olddataset)
         
 class OperationDatasetCreate(object):
     """Create dataset base class."""

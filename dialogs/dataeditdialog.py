@@ -404,7 +404,12 @@ class DataEditDialog(qt4.QDialog):
 
         datasetname = self.getSelectedDataset()
         if datasetname is not None:
-            self.document.applyOperation( document.OperationDatasetUnlink(datasetname) )
+            d = self.document.data[datasetname]
+            if d.linked is not None:
+                op = document.OperationDatasetUnlinkFile(datasetname)
+            else:
+                op = document.OperationDatasetUnlinkRelation(datasetname)
+            self.document.applyOperation(op)
 
     def slotDatasetDuplicate(self):
         """Duplicate selected dataset."""
