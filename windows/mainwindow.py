@@ -528,6 +528,11 @@ class MainWindow(qt4.QMainWindow):
         for win, act, fn in self.viewwinfns:
             act.setChecked(not win.isHidden())
 
+    def showDialog(self, dialog):
+        """Show dialog given."""
+        self.dialogs.append(dialog)
+        dialog.show()
+
     def slotDataImport(self):
         """Display the import data dialog."""
         dialog = importdialog.ImportDialog(self, self.document)

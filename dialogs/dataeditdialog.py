@@ -30,6 +30,9 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
 
+# register dialog type to recreate dataset
+recreate_register = {}
+
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
 
@@ -438,8 +441,10 @@ class DataEditDialog(qt4.QDialog):
         """Reload dataset into dataset create dialog."""
         dsname = unicode(self.getSelectedDataset())
         if dsname:
-            dialog = self.parent().slotDataCreate()
-            dialog.reEditDataset(dsname)
+            dataset = self.document.data[dsname]
+            dialog = recreate_register[type(dataset)](self.parent(),
+                                                      self.document)
+            self.parent().showDialog(dialog)
 
     def slotCopy(self):
         """Copy text from selection."""

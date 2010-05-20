@@ -27,6 +27,8 @@ import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
 
+import dataeditdialog
+
 class _DSException(RuntimeError):
     """A class to handle errors while trying to create datasets."""
     pass
@@ -310,3 +312,6 @@ class DataCreateDialog(qt4.QDialog):
         op = document.OperationDatasetCreateExpression(name, vals, link)
         op.validateExpression(self.document)
         return op
+
+dataeditdialog.recreate_register[document.DatasetExpression] = DataCreateDialog
+dataeditdialog.recreate_register[document.DatasetRange] = DataCreateDialog
