@@ -31,161 +31,164 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
+import veusz.plugins as plugins
 import exceptiondialog
 
-pyfits = None
+class ImportTab(qt4.QWidget):
+    """Tab for a particular import type."""
 
-class ImportStandardHelpDialog(qt4.QDialog):
-    """Class to load help for standard veusz import."""
-    def __init__(self, parent, *args):
-        qt4.QDialog.__init__(self, parent, *args)
+    resource = ''
+
+    def __init__(self, importdialog, *args):
+        """Initialise dialog. importdialog is the import dialog itself."""
+        qt4.QWidget.__init__(self, *args)
+        self.dialog = importdialog
+        self.uiloaded = False
+
+    def loadUi(self):
+        """Load up UI file."""
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'importhelp.ui'),
-                   self)
+                                self.resource), self)
+        self.uiloaded = True
 
-class ImportCSVHelpDialog(qt4.QDialog):
-    """Class to load help for csv veusz import."""
-    def __init__(self, parent, *args):
-        qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'importhelpcsv.ui'),
-                   self)
+    def reset(self):
+        """Reset controls to initial conditions."""
+        pass
 
-class ImportDialog(qt4.QDialog):
-    """Dialog box for importing data."""
+    def doPreview(self, filename, encoding):
+        """Update the preview window, returning whether import
+        should be attempted."""
+        pass
 
-    dirname = '.'
+    def doImport(self, filename, linked, encoding, prefix, suffix):
+        """Do the import iteself."""
+        pass
 
-    def __init__(self, parent, document, *args):
+    def okToImport(self):
+        """Secondary check (after preview) for enabling import button."""
+        return True
 
-        qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'import.ui'),
-                   self)
-        self.document = document
+class ImportTabStandard(ImportTab):
+    """Standard import format tab."""
 
-        self.connect(self.browsebutton, qt4.SIGNAL('clicked()'),
-                     self.slotBrowseClicked)
+    resource = 'import_standard.ui'
 
-        self.connect( self.filenameedit,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.slotUpdatePreview )
-
-        self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
-                      self.slotImport)
-
-        # user wants help about import
+    def loadUi(self):
+        """Load widget and setup controls."""
+        ImportTab.loadUi(self)
         self.connect( self.helpbutton, qt4.SIGNAL('clicked()'),
                       self.slotHelp )
-        self.connect( self.csvhelpbutton, qt4.SIGNAL('clicked()'),
-                      self.slotCSVHelp )
-
-        # notification tab has changed
-        self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
-                      self.slotUpdatePreview )
-        self.connect( self.encodingcombo,
-                      qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.slotUpdatePreview )
-        self.connect( self.csvdelimitercombo,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.slotUpdatePreview )
-        self.connect( self.csvtextdelimitercombo,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.slotUpdatePreview )
-
-        # if different items are selected in fits tab
-        self.connect( self.fitshdulist, qt4.SIGNAL('itemSelectionChanged()'),
-                      self.slotFitsUpdateCombos )
-        self.connect( self.fitsdatasetname,
-                      qt4.SIGNAL('textChanged(const QString&)'),
-                      self.enableDisableImport )
-        self.connect( self.fitsdatacolumn,
-                      qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.enableDisableImport )
-
-        # set up some validators for 2d edits
-        dval = qt4.QDoubleValidator(self)
-        for i in (self.twod_xminedit, self.twod_xmaxedit,
-                  self.twod_yminedit, self.twod_ymaxedit):
-            i.setValidator(dval)
-
-        # change to tab last used
-        self.methodtab.setCurrentIndex(
-            setting.settingdb.get('import_lasttab', 0))
-
-        # add completion for filename if there is support in version of qt
-        # (requires qt >= 4.3)
-        if hasattr(qt4, 'QDirModel'):
-            c = self.filenamecompleter = qt4.QCompleter(self)
-            model = qt4.QDirModel(c)
-            c.setModel(model)
-            self.filenameedit.setCompleter(c)
-
-        # whether file import looks likely to work
-        self.filepreviewokay = False
-
-        # defaults for prefix and suffix
-        self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
-
-        # default state for check boxes
-        self.linkcheckbox.default = True
         self.blockcheckbox.default = False
         self.ignoretextcheckbox.default = True
 
-        # further defaults
-        self.encodingcombo.defaultlist = utils.encodings
-        self.encodingcombo.defaultval = 'utf_8'
-        self.csvdelimitercombo.default = [',', '{tab}', '{space}', '|',
-                                          ':', ';']
-        self.csvtextdelimitercombo.default = ['"', "'"]
-
-    def slotBrowseClicked(self):
-        """Browse for a data file."""
-
-        fd = qt4.QFileDialog(self, 'Browse data file')
-        fd.setFileMode( qt4.QFileDialog.ExistingFile )
-
-        # use filename to guess a path if possible
-        filename = unicode(self.filenameedit.text())
-        if os.path.isdir(filename):
-            ImportDialog.dirname = filename
-        elif os.path.isdir( os.path.dirname(filename) ):
-            ImportDialog.dirname = os.path.dirname(filename)
-
-        fd.setDirectory(ImportDialog.dirname)
-
-        # update filename if changed
-        if fd.exec_() == qt4.QDialog.Accepted:
-            ImportDialog.dirname = fd.directory().absolutePath()
-            self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
+    def reset(self):
+        """Reset controls."""
+        self.blockcheckbox.setChecked(False)
+        self.ignoretextcheckbox.setChecked(True)
+        self.descriptoredit.setEditText("")
 
     def slotHelp(self):
-        """Asked for help for standard import."""
-        self.helpdialog = ImportStandardHelpDialog(self)
+        """Asked for help."""
+        self.helpdialog = qt4.QDialog(self)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'importhelp.ui'),
+                   self.helpdialog)
         self.helpdialog.show()
 
-    def slotCSVHelp(self):
-        """Asked help for CSV import."""
-        self.helpdialog = ImportCSVHelpDialog(self)
+    def doPreview(self, filename, encoding):
+        """Standard preview - show start of text."""
+
+        try:
+            ifile = utils.openEncoding(filename, encoding)
+            text = ifile.read(4096)+'\n'
+            if len(ifile.read(1)) != 0:
+                # if there is remaining data add ...
+                text += '...\n'
+
+            self.previewedit.setPlainText(text)
+            return True
+        except (UnicodeError, IOError):
+            self.previewedit.setPlainText('')
+            return False
+
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+        """Standard Veusz importing."""
+
+        # convert controls to values
+        descriptor = unicode( self.descriptoredit.text() )
+        useblocks = self.blockcheckbox.isChecked()
+        ignoretext = self.ignoretextcheckbox.isChecked()
+
+        try:
+            # construct operation. this checks the descriptor.
+            op = document.OperationDataImport(descriptor, filename=filename,
+                                              useblocks=useblocks, 
+                                              linked=linked,
+                                              prefix=prefix, suffix=suffix,
+                                              ignoretext=ignoretext,
+                                              encoding=encoding)
+
+        except document.DescriptorError:
+            mb = qt4.QMessageBox("Veusz",
+                                "Cannot interpret descriptor",
+                                qt4.QMessageBox.Warning,
+                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                                qt4.QMessageBox.NoButton,
+                                qt4.QMessageBox.NoButton,
+                                self)
+            mb.exec_()
+            return
+
+        # actually import the data
+        dsnames = doc.applyOperation(op)
+        
+        # tell the user what happened
+        # failures in conversion
+        lines = []
+        for var, count in op.simpleread.getInvalidConversions().iteritems():
+            if count != 0:
+                lines.append('%i conversions failed for dataset "%s"' %
+                             (count, var))
+        if len(lines) != 0:
+            lines.append('')
+            
+        lines += self.dialog.retnDatasetInfo(dsnames)
+
+        self.previewedit.setPlainText( '\n'.join(lines) )
+
+class ImportTabCSV(ImportTab):
+    """For importing data from CSV files."""
+
+    resource = 'import_csv.ui'
+
+    def loadUi(self):
+        """Load user interface and setup panel."""
+        ImportTab.loadUi(self)
+        self.connect( self.csvhelpbutton, qt4.SIGNAL('clicked()'),
+                      self.slotHelp )
+        self.connect( self.csvdelimitercombo,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
+                      self.dialog.slotUpdatePreview )
+        self.connect( self.csvtextdelimitercombo,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
+                      self.dialog.slotUpdatePreview )
+        self.csvdelimitercombo.default = [
+            ',', '{tab}', '{space}', '|', ':', ';']
+        self.csvtextdelimitercombo.default = ['"', "'"]
+
+    def reset(self):
+        """Reset controls."""
+        self.csvdelimitercombo.setEditText(",")
+        self.csvtextdelimitercombo.setEditText('"')
+        self.directioncombo.setCurrentIndex(0)
+
+    def slotHelp(self):
+        """Asked for help."""
+        self.helpdialog = qt4.QDialog(self)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'importhelpcsv.ui'),
+                   self.helpdialog)
         self.helpdialog.show()
-
-    def slotUpdatePreview(self, *args):
-        """Update preview window when filename or tab changed."""
-
-        # save so we can restore later
-        tab = self.methodtab.currentIndex()
-        setting.settingdb['import_lasttab'] = tab
-        filename = unicode(self.filenameedit.text())
-
-        # do correct preview
-        self.filepreviewokay = (
-            self.doPreviewStandard,
-            self.doPreviewCSV,
-            self.doPreviewFITS,
-            self.doPreviewTwoD)[tab](filename)
-
-        # enable or disable import button
-        self.enableDisableImport()
 
     def getCSVDelimiter(self):
         """Get CSV delimiter, converting friendly names."""
@@ -196,29 +199,7 @@ class ImportDialog(qt4.QDialog):
             delim = '\t'
         return delim
 
-    def doPreviewStandard(self, filename):
-        """Standard preview - show start of text."""
-
-        encoding = str(self.encodingcombo.currentText())
-        if not encoding:
-            return False
-        try:
-            ifile = utils.openEncoding(filename, encoding)
-            text = ifile.read(4096)+'\n'
-            if len(ifile.read(1)) != 0:
-                # if there is remaining data add ...
-                text += '...\n'
-
-            self.previewedit.setPlainText(text)
-            return True
-        except UnicodeError:
-            self.previewedit.setPlainText('')
-            return False
-        except IOError:
-            self.previewedit.setPlainText('')
-            return False
-
-    def doPreviewCSV(self, filename):
+    def doPreview(self, filename, encoding):
         """CSV preview - show first few rows"""
 
         t = self.previewtablecsv
@@ -229,15 +210,13 @@ class ImportDialog(qt4.QDialog):
         t.setColumnCount(0)
         t.setRowCount(0)
 
-        encoding = str(self.encodingcombo.currentText())
-        if not encoding:
-            return False
         try:
             delimiter = self.getCSVDelimiter()
             textdelimiter = str(self.csvtextdelimitercombo.currentText())
         except UnicodeEncodeError:
             # need to be real str not unicode
             return False
+
         # need to be single character
         if len(delimiter) != 1 or len(textdelimiter) != 1:
             return False
@@ -261,11 +240,7 @@ class ImportDialog(qt4.QDialog):
                 pass
             numrows = len(rows)
 
-        except IOError:
-            return False
-        except UnicodeError:
-            return False
-        except csv.Error:
+        except (IOError, UnicodeError, csv.Error):
             return False
 
         # fill up table
@@ -279,276 +254,11 @@ class ImportDialog(qt4.QDialog):
 
         return True
 
-    def doPreviewFITS(self, filename):
-        """Set up controls for FITS file."""
-
-        # load pyfits if available
-        global pyfits
-        if pyfits is None:
-            try:
-                import pyfits as PF
-                pyfits = PF
-            except ImportError:
-                pyfits = None
-
-        # if it isn't
-        if pyfits is None:
-            self.fitslabel.setText(
-                'FITS file support requires that PyFITS is installed.'
-                ' You can download it from'
-                ' http://www.stsci.edu/resources/software_hardware/pyfits')
-            return False
-        
-        # try to identify fits file
-        try:
-            ifile = open(filename,  'rU')
-            line = ifile.readline()
-            # is this a hack?
-            if line.find('SIMPLE  =                    T') == -1:
-                raise IOError
-            ifile.close()
-        except IOError:
-            return False
-
-        self.updateFITSView(filename)
-        return True
-
-    def doPreviewTwoD(self, filename):
-        """Preview 2d dataset files."""
-        
-        encoding = str(self.encodingcombo.currentText())
-        if not encoding:
-            return False
-        try:
-            ifile = utils.openEncoding(filename, encoding)
-            text = ifile.read(4096)+'\n'
-            if len(ifile.read(1)) != 0:
-                # if there is remaining data add ...
-                text += '...\n'
-            self.twod_previewedit.setPlainText(text)
-            return True
-
-        except UnicodeError:
-            self.twod_previewedit.setPlainText('')
-            return False
-        except IOError:
-            self.twod_previewedit.setPlainText('')
-            return False
-
-    def updateFITSView(self, filename):
-        """Update the fits file details in the import dialog."""
-        f = pyfits.open(str(filename), 'readonly')
-        l = self.fitshdulist
-        l.clear()
-
-        # this is so we can lookup item attributes later
-        self.fitsitemdata = []
-        items = []
-        for hdunum, hdu in enumerate(f):
-            header = hdu.header
-            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name])
-            data = []
-            try:
-                # if this fails, show an image
-                cols = hdu.get_coldefs()
-
-                # it's a table
-                data = ['table', cols]
-                rows = header['NAXIS2']
-                descr = 'Table (%i rows)' % rows
-
-            except AttributeError:
-                # this is an image
-                naxis = header['NAXIS']
-                if naxis ==2:
-                    data = ['image']
-                else:
-                    data = ['invalidimage']
-                dims = [str(header['NAXIS%i' % (i+1)]) for i in xrange(naxis)]
-                dims = '*'.join(dims)
-                if dims:
-                    dims = '(%s)' % dims
-                descr = '%iD image %s' % (naxis, dims)
-
-            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
-            items.append(hduitem)
-            self.fitsitemdata.append(data)
-
-        if items:
-            l.addTopLevelItems(items)
-            l.setCurrentItem(items[0])
-
-    def slotFitsUpdateCombos(self):
-        """Update list of fits columns when new item is selected."""
-        
-        items = self.fitshdulist.selectedItems()
-        if len(items) != 0:
-            item = items[0]
-            hdunum = int( str(item.text(0)) )
-        else:
-            item = None
-            hdunum = -1
-
-        cols = ['N/A']
-        enablecolumns = False
-        if hdunum >= 0:
-            data = self.fitsitemdata[hdunum]
-            if data[0] == 'table':
-                enablecolumns = True
-                cols = ['None']
-                cols += ['%s (%s)' %
-                         (i.name, i.format) for i in data[1]]
-        
-        for c in ('data', 'sym', 'pos', 'neg'):
-            cntrl = getattr(self, 'fits%scolumn' % c)
-            cntrl.setEnabled(enablecolumns)
-            cntrl.clear()
-            cntrl.addItems(cols)
-
-        self.enableDisableImport()
-
-    def checkFitsEnable(self):
-        """Check validity of Fits import."""
-
-        items = self.fitshdulist.selectedItems()
-        if len(items) != 0:
-            item = items[0]
-            hdunum = int( str(item.text(0)) )
-
-            # any name for the dataset?
-            if not unicode(self.fitsdatasetname.text()):
-                return False
-
-            # if a table, need selected item
-            data = self.fitsitemdata[hdunum]
-            if data[0] != 'image' and self.fitsdatacolumn.currentIndex() == 0:
-                return False
-            
-            return True
-        return False
-
-    def enableDisableImport(self, *args):
-        """Disable or enable import button if allowed."""
-
-        enabled = self.filepreviewokay
-
-        # checks specific to import mode
-        if enabled:
-            tabindex = self.methodtab.currentIndex()
-            if tabindex == 2:  # fits
-                enabled = self.checkFitsEnable()
-
-        # actually enable or disable import button
-        self.importbutton.setEnabled(enabled)
-
-    def slotImport(self):
-        """Do the importing"""
-
-        tabindex = self.methodtab.currentIndex()
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
-        linked = self.linkcheckbox.isChecked()
-        encoding = str(self.encodingcombo.currentText())
-
-        # import according to tab selected
-        try:
-            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-            (self.importStandard,
-             self.importCSV,
-             self.importFits,
-             self.importTwoD)[tabindex](filename, linked, encoding)
-            qt4.QApplication.restoreOverrideCursor()
-        except Exception:
-            qt4.QApplication.restoreOverrideCursor()
-
-            # show exception dialog
-            d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
-            d.exec_()
-
-    def _retnDatasetInfo(self, dsnames):
-        """Return a list of information for the dataset names given."""
-        
-        lines = ['Imported data for datasets:']
-        dsnames.sort()
-        for name in dsnames:
-            ds = self.document.getData(name)
-            # build up description
-            lines.append( ' %s' % ds.description(showlinked=False) )
-
-        linked = self.linkcheckbox.isChecked()
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
-
-        # whether the data were linked
-        if linked:
-            lines.append('')
-            lines.append('Datasets were linked to file "%s"' % filename)
-
-        return lines
-
-    def getPrefixSuffix(self, filename):
-        """Get prefix and suffix values."""
-        f = utils.cleanDatasetName( os.path.basename(filename) )
-        prefix = unicode( self.prefixcombo.lineEdit().text() )
-        prefix = prefix.replace('$FILENAME', f)
-        suffix = unicode( self.suffixcombo.lineEdit().text() )
-        suffix = suffix.replace('$FILENAME', f)
-        return prefix, suffix
-
-    def importStandard(self, filename, linked, encoding):
-        """Standard Veusz importing."""
-
-        # convert controls to values
-        descriptor = unicode( self.descriptoredit.text() )
-        useblocks = self.blockcheckbox.isChecked()
-        ignoretext = self.ignoretextcheckbox.isChecked()
-
-        # substitute filename if required
-        prefix, suffix = self.getPrefixSuffix(filename)
-
-        try:
-            # construct operation. this checks the descriptor.
-            op = document.OperationDataImport(descriptor, filename=filename,
-                                              useblocks=useblocks, 
-                                              linked=linked,
-                                              prefix=prefix, suffix=suffix,
-                                              ignoretext=ignoretext,
-                                              encoding=encoding)
-
-        except document.DescriptorError:
-            mb = qt4.QMessageBox("Veusz",
-                                "Cannot interpret descriptor",
-                                qt4.QMessageBox.Warning,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self)
-            mb.exec_()
-            return
-
-        # actually import the data
-        dsnames = self.document.applyOperation(op)
-        
-        # tell the user what happened
-        # failures in conversion
-        lines = []
-        for var, count in op.simpleread.getInvalidConversions().iteritems():
-            if count != 0:
-                lines.append('%i conversions failed for dataset "%s"' %
-                             (count, var))
-        if len(lines) != 0:
-            lines.append('')
-            
-        lines += self._retnDatasetInfo(dsnames)
-
-        self.previewedit.setPlainText( '\n'.join(lines) )
-
-    def importCSV(self, filename, linked, encoding):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
         """Import from CSV file."""
 
         # get various values
         inrows = self.directioncombo.currentIndex() == 1
-        prefix, suffix = self.getPrefixSuffix(filename)
 
         try:
             delimiter = self.getCSVDelimiter()
@@ -564,10 +274,10 @@ class ImportDialog(qt4.QDialog):
                                              encoding=encoding)
         
         # actually import the data
-        dsnames = self.document.applyOperation(op)
+        dsnames = doc.applyOperation(op)
         
         # what datasets were imported
-        lines = self._retnDatasetInfo(dsnames)
+        lines = self.dialog.retnDatasetInfo(dsnames)
 
         t = self.previewtablecsv
         t.verticalHeader().hide()
@@ -581,52 +291,47 @@ class ImportDialog(qt4.QDialog):
             item = qt4.QTableWidgetItem(l)
             t.setItem(i, 0, item)
 
-    def importFits(self, filename, linked, encoding):
-        """Import fits file."""
+class ImportTab2D(ImportTab):
+    """Tab for importing from a 2D data file."""
+
+    resource = 'import_2d.ui'
+
+    def loadUi(self):
+        """Load user interface and set up validators."""
+        ImportTab.loadUi(self)
+        # set up some validators for 2d edits
+        dval = qt4.QDoubleValidator(self)
+        for i in (self.twod_xminedit, self.twod_xmaxedit,
+                  self.twod_yminedit, self.twod_ymaxedit):
+            i.setValidator(dval)
+
+    def reset(self):
+        """Reset controls."""
+        for combo in (self.twod_xminedit, self.twod_xmaxedit,
+                      self.twod_yminedit, self.twod_ymaxedit,
+                      self.twod_datasetsedit):
+            combo.setEditText("")
+        for check in (self.twod_invertrowscheck, self.twod_invertcolscheck,
+                      self.twod_transposecheck):
+            check.setChecked(False)
+
+    def doPreview(self, filename, encoding):
+        """Preview 2d dataset files."""
         
-        item = self.fitshdulist.selectedItems()[0]
-        hdunum = int( str(item.text(0)) )
-        data = self.fitsitemdata[hdunum]
+        try:
+            ifile = utils.openEncoding(filename, encoding)
+            text = ifile.read(4096)+'\n'
+            if len(ifile.read(1)) != 0:
+                # if there is remaining data add ...
+                text += '...\n'
+            self.twod_previewedit.setPlainText(text)
+            return True
 
-        name = unicode(self.fitsdatasetname.text())
-        # get values of prefix and suffix set in dialog
-        prefix, suffix = self.getPrefixSuffix(filename)
-        name = prefix + name + suffix
+        except (UnicodeError, IOError):
+            self.twod_previewedit.setPlainText('')
+            return False
 
-        if data[0] == 'table':
-            # get list of appropriate columns
-            cols = []
-
-            # get data from controls
-            for c in ('data', 'sym', 'pos', 'neg'):
-                cntrl = getattr(self, 'fits%scolumn' % c)
-                
-                i = cntrl.currentIndex()
-                if i == 0:
-                    cols.append(None)
-                else:
-                    cols.append(data[1][i-1].name)
-                    
-        else:
-            # item is an image, so no columns
-            cols = [None]*4
-
-        # construct operation to import fits
-        op = document.OperationDataImportFITS(name, filename, hdunum,
-                                              datacol=cols[0],
-                                              symerrcol=cols[1],
-                                              poserrcol=cols[2],
-                                              negerrcol=cols[3],
-                                              linked=linked)
-
-        # actually do the import
-        self.document.applyOperation(op)
-
-        # inform user
-        self.fitsimportstatus.setText("Imported dataset '%s'" % name)
-        qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
-
-    def importTwoD(self, filename, linked, encoding):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
         """Import from 2D file."""
 
         # this really needs improvement...
@@ -668,9 +373,6 @@ class ImportDialog(qt4.QDialog):
         invertcols = self.twod_invertcolscheck.isChecked()
         transpose = self.twod_transposecheck.isChecked()
 
-        # substitute filename if required
-        prefix, suffix = self.getPrefixSuffix(filename)
-
         # loop over datasets and read...
         try:
             op = document.OperationDataImport2D(datasets, filename=filename,
@@ -681,11 +383,12 @@ class ImportDialog(qt4.QDialog):
                                                 prefix=prefix, suffix=suffix,
                                                 linked=linked,
                                                 encoding=encoding)
-            readds = self.document.applyOperation(op)
+            readds = doc.applyOperation(op)
 
             output = ['Successfully read datasets:']
             for ds in readds:
-                output.append(' %s' % self.document.data[ds].description(showlinked=False))
+                output.append(' %s' % doc.data[ds].description(
+                        showlinked=False))
             
             output = '\n'.join(output)
         except document.Read2DError, e:
@@ -693,4 +396,453 @@ class ImportDialog(qt4.QDialog):
                 
         # show status in preview box
         self.twod_previewedit.setPlainText(output)
- 
+
+pyfits = None
+class ImportTabFITS(ImportTab):
+    """Tab for importing from a FITS file."""
+
+    resource = 'import_fits.ui'
+
+    def loadUi(self):
+        ImportTab.loadUi(self)
+        # if different items are selected in fits tab
+        self.connect( self.fitshdulist, qt4.SIGNAL('itemSelectionChanged()'),
+                      self.slotFitsUpdateCombos )
+        self.connect( self.fitsdatasetname,
+                      qt4.SIGNAL('textChanged(const QString&)'),
+                      self.dialog.enableDisableImport )
+        self.connect( self.fitsdatacolumn,
+                      qt4.SIGNAL('currentIndexChanged(int)'),
+                      self.dialog.enableDisableImport )
+
+    def reset(self):
+        """Reset controls."""
+        self.fitsdatasetname.setEditText("")
+        for c in ('data', 'sym', 'pos', 'neg'):
+            cntrl = getattr(self, 'fits%scolumn' % c)
+            cntrl.setCurrentIndex(0)
+            
+    def doPreview(self, filename, encoding):
+        """Set up controls for FITS file."""
+
+        # load pyfits if available
+        global pyfits
+        if pyfits is None:
+            try:
+                import pyfits as PF
+                pyfits = PF
+            except ImportError:
+                pyfits = None
+
+        # if it isn't
+        if pyfits is None:
+            self.fitslabel.setText(
+                'FITS file support requires that PyFITS is installed.'
+                ' You can download it from'
+                ' http://www.stsci.edu/resources/software_hardware/pyfits')
+            return False
+        
+        # try to identify fits file
+        try:
+            ifile = open(filename,  'rU')
+            line = ifile.readline()
+            # is this a hack?
+            if line.find('SIMPLE  =                    T') == -1:
+                raise IOError
+            ifile.close()
+        except IOError:
+            self.clearFITSView()
+            return False
+
+        self.updateFITSView(filename)
+        return True
+
+    def clearFITSView(self):
+        """If invalid filename, clear fits preview."""
+        self.fitshdulist.clear()
+        for c in ('data', 'sym', 'pos', 'neg'):
+            cntrl = getattr(self, 'fits%scolumn' % c)
+            cntrl.clear()
+            cntrl.setEnabled(False)
+
+    def updateFITSView(self, filename):
+        """Update the fits file details in the import dialog."""
+        f = pyfits.open(str(filename), 'readonly')
+        l = self.fitshdulist
+        l.clear()
+
+        # this is so we can lookup item attributes later
+        self.fitsitemdata = []
+        items = []
+        for hdunum, hdu in enumerate(f):
+            header = hdu.header
+            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name])
+            data = []
+            try:
+                # if this fails, show an image
+                cols = hdu.get_coldefs()
+
+                # it's a table
+                data = ['table', cols]
+                rows = header['NAXIS2']
+                descr = 'Table (%i rows)' % rows
+
+            except AttributeError:
+                # this is an image
+                naxis = header['NAXIS']
+                if naxis ==2:
+                    data = ['image']
+                else:
+                    data = ['invalidimage']
+                dims = [ str(header['NAXIS%i' % (i+1)])
+                         for i in xrange(naxis) ]
+                dims = '*'.join(dims)
+                if dims:
+                    dims = '(%s)' % dims
+                descr = '%iD image %s' % (naxis, dims)
+
+            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
+            items.append(hduitem)
+            self.fitsitemdata.append(data)
+
+        if items:
+            l.addTopLevelItems(items)
+            l.setCurrentItem(items[0])
+
+    def slotFitsUpdateCombos(self):
+        """Update list of fits columns when new item is selected."""
+        
+        items = self.fitshdulist.selectedItems()
+        if len(items) != 0:
+            item = items[0]
+            hdunum = int( str(item.text(0)) )
+        else:
+            item = None
+            hdunum = -1
+
+        cols = ['N/A']
+        enablecolumns = False
+        if hdunum >= 0:
+            data = self.fitsitemdata[hdunum]
+            if data[0] == 'table':
+                enablecolumns = True
+                cols = ['None']
+                cols += ['%s (%s)' %
+                         (i.name, i.format) for i in data[1]]
+        
+        for c in ('data', 'sym', 'pos', 'neg'):
+            cntrl = getattr(self, 'fits%scolumn' % c)
+            cntrl.setEnabled(enablecolumns)
+            cntrl.clear()
+            cntrl.addItems(cols)
+
+        self.dialog.enableDisableImport()
+
+    def okToImport(self):
+        """Check validity of Fits import."""
+
+        items = self.fitshdulist.selectedItems()
+        if len(items) != 0:
+            item = items[0]
+            hdunum = int( str(item.text(0)) )
+
+            # any name for the dataset?
+            if not unicode(self.fitsdatasetname.text()):
+                return False
+
+            # if a table, need selected item
+            data = self.fitsitemdata[hdunum]
+            if data[0] != 'image' and self.fitsdatacolumn.currentIndex() == 0:
+                return False
+            
+            return True
+        return False
+
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+        """Import fits file."""
+        
+        item = self.fitshdulist.selectedItems()[0]
+        hdunum = int( str(item.text(0)) )
+        data = self.fitsitemdata[hdunum]
+
+        name = prefix + unicode(self.fitsdatasetname.text()) + suffix
+
+        if data[0] == 'table':
+            # get list of appropriate columns
+            cols = []
+
+            # get data from controls
+            for c in ('data', 'sym', 'pos', 'neg'):
+                cntrl = getattr(self, 'fits%scolumn' % c)
+                
+                i = cntrl.currentIndex()
+                if i == 0:
+                    cols.append(None)
+                else:
+                    cols.append(data[1][i-1].name)
+                    
+        else:
+            # item is an image, so no columns
+            cols = [None]*4
+
+        # construct operation to import fits
+        op = document.OperationDataImportFITS(name, filename, hdunum,
+                                              datacol=cols[0],
+                                              symerrcol=cols[1],
+                                              poserrcol=cols[2],
+                                              negerrcol=cols[3],
+                                              linked=linked)
+
+        # actually do the import
+        doc.applyOperation(op)
+
+        # inform user
+        self.fitsimportstatus.setText("Imported dataset '%s'" % name)
+        qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
+
+class ImportTabPlugins(ImportTab):
+    """Tab for importing using a plugin."""
+
+    resource = 'import_plugins.ui'
+
+    def loadUi(self):
+        """Load the user interface."""
+        ImportTab.loadUi(self)
+
+        # fill plugin combo
+        names = sorted([p.name for p in plugins.importpluginregistry])
+        self.pluginType.addItems(names)
+
+    def getPluginParameters(self):
+        """Fill and return plugin parameters class."""
+        encoding = str(self.dialog.encodingcombo.currentText())
+        filename = unicode( self.dialog.filenameedit.text() )
+        results = {}
+        return plugins.ImportPluginParams(filename, encoding, results)
+
+    def getSelectedPlugin(self):
+        """Get instance selected plugin or none."""
+        selname = unicode(self.pluginType.currentText())
+        names = [p.name for p in plugins.importpluginregistry]
+        try:
+            idx = names.index(selname)
+        except ValueError:
+            return None
+        return plugins.importpluginregistry[idx]
+
+    def doPreview(self, filename, encoding):
+        """Preview using plugin."""
+
+        # check file exists
+        try:
+            f = open(filename, 'r')
+            f.close()
+        except IOError:
+            self.pluginPreview.setPlainText('')
+            return False
+
+        # get the plugin selected
+        plugin = self.getSelectedPlugin()
+        if plugin is None:
+            self.pluginPreview.setPlainText('')
+            return False
+
+        # ask the plugin for text
+        params = self.getPluginParameters()
+        try:
+            text, ok = plugin.getPreview(params)
+        except Exception, ex:
+            text = unicode(ex)
+            ok = False
+        self.pluginPreview.setPlainText(text)
+        return bool(ok)
+
+class ImportDialog(qt4.QDialog):
+    """Dialog box for importing data.
+    See ImportTab classes above which actually do the work of importing
+    """
+
+    dirname = '.'
+
+    def __init__(self, parent, document, *args):
+
+        qt4.QDialog.__init__(self, parent, *args)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+                                'import.ui'),
+                   self)
+        self.document = document
+
+        # whether file import looks likely to work
+        self.filepreviewokay = False
+
+        # tabs loaded currently in dialog
+        self.tabs = {}
+        for tabname, tabclass in (
+            ('&Standard', ImportTabStandard),
+            ('CS&V', ImportTabCSV),
+            ('FI&TS', ImportTabFITS),
+            ('&2D', ImportTab2D),
+            ('Plugins', ImportTabPlugins),
+            ):
+            w = tabclass(self)
+            self.methodtab.addTab(w, tabname)
+        self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
+                      self.slotUpdatePreview )
+
+        self.connect(self.browsebutton, qt4.SIGNAL('clicked()'),
+                     self.slotBrowseClicked)
+
+        self.connect( self.filenameedit,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
+                      self.slotUpdatePreview )
+
+        self.importbutton = self.buttonBox.addButton("&Import",
+                                                     qt4.QDialogButtonBox.ApplyRole)
+        self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
+                      self.slotImport)
+
+        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
+                      qt4.SIGNAL('clicked()'), self.slotReset )
+
+        self.connect( self.encodingcombo,
+                      qt4.SIGNAL('currentIndexChanged(int)'),
+                      self.slotUpdatePreview )
+
+        # change to tab last used
+        self.methodtab.setCurrentIndex(
+            setting.settingdb.get('import_lasttab', 0))
+
+        # add completion for filename if there is support in version of qt
+        # (requires qt >= 4.3)
+        if hasattr(qt4, 'QDirModel'):
+            c = self.filenamecompleter = qt4.QCompleter(self)
+            model = qt4.QDirModel(c)
+            c.setModel(model)
+            self.filenameedit.setCompleter(c)
+
+        # defaults for prefix and suffix
+        self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
+
+        # default state for check boxes
+        self.linkcheckbox.default = True
+
+        # further defaults
+        self.encodingcombo.defaultlist = utils.encodings
+        self.encodingcombo.defaultval = 'utf_8'
+
+    def slotBrowseClicked(self):
+        """Browse for a data file."""
+
+        fd = qt4.QFileDialog(self, 'Browse data file')
+        fd.setFileMode( qt4.QFileDialog.ExistingFile )
+
+        # use filename to guess a path if possible
+        filename = unicode(self.filenameedit.text())
+        if os.path.isdir(filename):
+            ImportDialog.dirname = filename
+        elif os.path.isdir( os.path.dirname(filename) ):
+            ImportDialog.dirname = os.path.dirname(filename)
+
+        fd.setDirectory(ImportDialog.dirname)
+
+        # update filename if changed
+        if fd.exec_() == qt4.QDialog.Accepted:
+            ImportDialog.dirname = fd.directory().absolutePath()
+            self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
+
+    def slotUpdatePreview(self, *args):
+        """Update preview window when filename or tab changed."""
+
+        # save so we can restore later
+        tab = self.methodtab.currentIndex()
+        setting.settingdb['import_lasttab'] = tab
+        filename = unicode(self.filenameedit.text())
+        encoding = str(self.encodingcombo.currentText())
+        importtab = self.methodtab.currentWidget()
+
+        if encoding == '':
+            return
+
+        if isinstance(importtab, ImportTab):
+            if not importtab.uiloaded:
+                importtab.loadUi()
+            self.filepreviewokay = importtab.doPreview(
+                filename, encoding)
+
+        # enable or disable import button
+        self.enableDisableImport()
+
+    def enableDisableImport(self, *args):
+        """Disable or enable import button if allowed."""
+
+        importtab = self.methodtab.currentWidget()
+        enabled = self.filepreviewokay and importtab.okToImport()
+
+        # actually enable or disable import button
+        self.importbutton.setEnabled( enabled )
+
+    def slotImport(self):
+        """Do the importing"""
+
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+        linked = self.linkcheckbox.isChecked()
+        encoding = str(self.encodingcombo.currentText())
+
+        # import according to tab selected
+        importtab = self.methodtab.currentWidget()
+        prefix, suffix = self.getPrefixSuffix(filename)
+        try:
+            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+            importtab.doImport(self.document, filename, linked, encoding,
+                               prefix, suffix)
+            qt4.QApplication.restoreOverrideCursor()
+        except Exception:
+            qt4.QApplication.restoreOverrideCursor()
+
+            # show exception dialog
+            d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
+            d.exec_()
+
+    def retnDatasetInfo(self, dsnames):
+        """Return a list of information for the dataset names given."""
+        
+        lines = ['Imported data for datasets:']
+        dsnames.sort()
+        for name in dsnames:
+            ds = self.document.getData(name)
+            # build up description
+            lines.append( ' %s' % ds.description(showlinked=False) )
+
+        linked = self.linkcheckbox.isChecked()
+        filename = unicode( self.filenameedit.text() )
+        filename = os.path.abspath(filename)
+
+        # whether the data were linked
+        if linked:
+            lines.append('')
+            lines.append('Datasets were linked to file "%s"' % filename)
+
+        return lines
+
+    def getPrefixSuffix(self, filename):
+        """Get prefix and suffix values."""
+        f = utils.cleanDatasetName( os.path.basename(filename) )
+        prefix = unicode( self.prefixcombo.lineEdit().text() )
+        prefix = prefix.replace('$FILENAME', f)
+        suffix = unicode( self.suffixcombo.lineEdit().text() )
+        suffix = suffix.replace('$FILENAME', f)
+        return prefix, suffix
+
+    def slotReset(self):
+        """Reset input fields."""
+
+        self.filenameedit.setText("")
+        self.encodingcombo.setCurrentIndex(
+            self.encodingcombo.findText("utf_8"))
+        self.linkcheckbox.setChecked(True)
+        self.prefixcombo.setEditText("")
+        self.suffixcombo.setEditText("")
+
+        importtab = self.methodtab.currentWidget()
+        importtab.reset()
