@@ -38,6 +38,7 @@ import simpleread
 import readcsv
 
 import veusz.utils as utils
+import veusz.plugins as plugins
     
 ###############################################################################
 # Setting operations
@@ -1075,7 +1076,85 @@ class OperationDataImportFITS(object):
             
         if self.olddataset is not None:
             document.setData(self.dsname, self.olddataset)
-        
+
+class OperationDataImportPlugin(object):
+    """Import data using a plugin."""
+
+    def __init__(self, pluginname, filename, **params):
+        """Setup operation loading data from plugin.
+
+        optional arguments:
+        prefix: add to start of dataset name (default '')
+        suffix: add to end of dataset name (default '')
+        linked: link import to file (default False)
+        encoding: file encoding (may not be used, default 'utf_8')
+        plus arguments to plugin
+        """
+
+        self.pluginname = pluginname
+        self.filename = filename
+        self.encoding = params.get('encoding', 'utf_8')
+        self.prefix = params.get('prefix', '')
+        self.suffix = params.get('suffix', '')
+        self.linked = params.get('linked', False)
+        self.params = dict(params)
+
+        # remove excess parameters
+        for k in ('encoding', 'prefix', 'suffix', 'linked'):
+            try:
+                del self.params[k]
+            except KeyError:
+                pass
+
+    def do(self, document):
+        """Do import."""
+
+        names = [p.name for p in plugins.importpluginregistry]
+        plugin = plugins.importpluginregistry[names.index(self.pluginname)]
+        plugparams = plugins.ImportPluginParams(self.filename, self.encoding,
+                                                self.params)
+
+        results = plugin.doImport(plugparams)
+
+        # save for undoing
+        self.olddata = {}
+
+        # convert results to real datasets
+        for d in results:
+            if isinstance(d, plugins.ImportDataset1D):
+                ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
+                                      nerr=d.nerr)
+            elif isinstance(d, plugins.ImportDataset2D):
+                ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
+                                        yrange=d.rangey)
+            else:
+                raise RuntimeError("Invalid data set in plugin results")
+
+            if self.linked:
+                ds.linked = datasets.LinkedFilePlugin(
+                    self.pluginname, self.filename, self.params,
+                    encoding=self.encoding, prefix=self.prefix,
+                    suffix=self.suffix)
+
+            # save old dataset for undo
+            d.name = self.prefix + d.name + self.suffix
+            if d.name in document.data:
+                self.olddata[d.name] = document.data[d.name]
+
+            # actually make dataset
+            document.setData(d.name, ds)
+
+        self.datasetnames = [d.name for d in results]
+        return self.datasetnames
+
+    def undo(self, document):
+        """Undo import."""
+
+        for name in self.datasetnames:
+            del document.data[name]
+        for name, dataset in self.olddata.iteritems():
+            document.setData(name, dataset)
+
 class OperationDataCaptureSet(object):
     """An operation for setting the results from a SimpleRead into the
     docunment's data from a data capture.

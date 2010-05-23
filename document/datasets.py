@@ -168,6 +168,30 @@ class LinkedFileBase(object):
         document.setModified(True)
         return read
 
+    def _reloadViaOperation(self, document, op):
+        """Reload links using a supplied operation, op."""
+        tempdoc = doc.Document()
+
+        try:
+            tempdoc.applyOperation(op)
+        except Exception, ex:
+            # if something breaks, record an error and return nothing
+            document.log(unicode(ex))
+            errors = {}
+            for i in self.datasets:
+                errors[i] = 1
+            return ([], errors)            
+            
+        # delete datasets which are linked and imported here
+        self._deleteLinkedDatasets(document)
+        # move datasets into document
+        read = self._moveReadDatasets(tempdoc, document)
+
+        # return zero errors
+        errors = dict( [(ds, 0) for ds in read] )
+
+        return (read, errors)
+
 class LinkedFile(LinkedFileBase):
     '''Instead of reading data from a string, data can be read from
     a "linked file". This means the same document can be reloaded, and
@@ -272,36 +296,15 @@ class Linked2DFile(LinkedFileBase):
         fileobj.write('ImportFile2D(%s)\n' % ', '.join(args))
 
     def reloadLinks(self, document):
-        '''Reload datasets linked to this file.
-        '''
+        """Reload datasets linked to this file."""
 
-        # put data in a temporary document as above
-        tempdoc = doc.Document()
-        try:
-            op = operations.OperationDataImport2D(self.datasets,
-                                                  filename=self.filename,
-                                                  xrange=self.xrange,
-                                                  yrange=self.yrange,
-                                                  invertrows=self.invertrows,
-                                                  invertcols=self.invertcols,
-                                                  transpose=self.transpose,
-                                                  prefix=self.prefix,
-                                                  suffix=self.suffix,
-                                                  encoding=self.encoding)
-            tempdoc.applyOperation(op)
-        except simpleread.Read2DError:
-            errors = {}
-            for i in self.datasets:
-                errors[i] = 1
-            return ([], errors)
-
-        self._deleteLinkedDatasets(document)
-        read = self._moveReadDatasets(tempdoc, document)
-
-        # zero errors
-        errors = dict( [(ds, 0) for ds in read] )
-
-        return (read, errors)
+        op = operations.OperationDataImport2D(
+            self.datasets, filename=self.filename,
+            xrange=self.xrange, yrange=self.yrange,
+            transpose=self.transpose,
+            invertrows=self.invertrows, invertcols=self.invertcols,
+            prefix=self.prefix, suffix=self.suffix, encoding=self.encoding)
+        return self._reloadViaOperation(document, op)
 
 class LinkedFITSFile(LinkedFileBase):
     """Links a FITS file to the data."""
@@ -337,13 +340,11 @@ class LinkedFITSFile(LinkedFileBase):
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.'''
 
-        op = operations.OperationDataImportFITS(self.dsname, self.filename,
-                                                self.hdu,
-                                                datacol = self.columns[0],
-                                                symerrcol = self.columns[1],
-                                                poserrcol = self.columns[2],
-                                                negerrcol = self.columns[3],
-                                                linked=True)
+        op = operations.OperationDataImportFITS(
+            self.dsname, self.filename, self.hdu,
+            datacol = self.columns[0], symerrcol = self.columns[1],
+            poserrcol = self.columns[2], negerrcol = self.columns[3],
+            linked=True )
 
         # don't use applyoperation interface as we don't want to be undoable
         op.do(document)
@@ -397,22 +398,52 @@ class LinkedCSVFile(LinkedFileBase):
         # again, this is messy as we have to make sure we don't
         # overwrite any non-linked data
 
-        tempdoc = doc.Document()
-        csv = readcsv.ReadCSV(self.filename, readrows=self.readrows,
-                              delimiter=self.delimiter,
-                              textdelimiter=self.textdelimiter,
-                              encoding=self.encoding,
-                              prefix=self.prefix, suffix=self.suffix)
-        csv.readData()
-        csv.setData(tempdoc, linkedfile=self)
+        op = operations.OperationDataImportCSV(
+            self.filename, readrows=self.readrows,
+            delimiter=self.delimiter,
+            textdelimiter=self.textdelimiter,
+            encoding=self.encoding,
+            prefix=self.prefix, suffix=self.suffix )
+        return self._reloadViaOperation(document, op)
 
-        self._deleteLinkedDatasets(document)
-        read = self._moveReadDatasets(tempdoc, document)
+class LinkedFilePlugin(LinkedFileBase):
+    """Represent a file linked using an import plugin."""
 
-        # zero errors
-        errors = dict( [(ds, 0) for ds in read] )
+    def __init__(self, plugin, filename, pluginparams, encoding='utf_8',
+                 prefix='', suffix=''):
+        """Setup the link with the plugin-read file."""
+        self.plugin = plugin
+        self.filename = filename
+        self.encoding = encoding
+        self.prefix = prefix
+        self.suffix = suffix
+        self.pluginparams = pluginparams
 
-        return (read, errors)
+    def saveToFile(self, fileobj, relpath=None):
+        """Save the link to the vsz document file."""
+
+        params = [repr(self.plugin),
+                  repr(self._getSaveFilename(relpath)),
+                  'linked=True']
+        if self.encoding != 'utf_8':
+            params.append('encoding=' + repr(self.encoding))
+        if self.prefix:
+            params.append('prefix=' + repr(self.prefix))
+        if self.suffix:
+            params.append('suffix=' + repr(self.suffix))
+        for name, val in self.pluginparams.iteritems():
+            params.append('%s=%s' % (name, repr(val)))
+
+        fileobj.write('ImportFilePlugin(%s)\n' % (', '.join(params)))
+
+    def reloadLinks(self, document):
+        """Reload data from file."""
+
+        op = operations.OperationDataImportPlugin(
+            self.plugin, self.filename, 
+            encoding=self.encoding, prefix=self.prefix, suffix=self.suffix,
+            **self.pluginparams)
+        return self._reloadViaOperation(document, op)
         
 class DatasetException(Exception):
     """Raised with dataset errors."""

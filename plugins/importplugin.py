@@ -20,6 +20,7 @@
 
 """Import plugin base class and helpers."""
 
+import veusz.qtall as qt4
 import veusz.utils as utils
 
 # add an instance of your class to this list to get it registered
@@ -52,11 +53,39 @@ class ImportField(object):
             self.descr = name
         self.default = default
 
+    def makeControl(self):
+        """Create a set of controls for field."""
+        return None
+
+    def getControlResults(self, cntrls):
+        """Get result from created contrls."""
+        return None
+
 class ImportFieldCheck(ImportField):
     """A check box on the dialog."""
 
+    def makeControl(self):
+        l = qt4.QLabel(self.descr)
+        c = qt4.QCheckBox()
+        if self.default:
+            c.setChecked(True)
+        return (l, c)
+
+    def getControlResults(self, cntrls):
+        return cntrls[1].isChecked()
+
 class ImportFieldText(ImportField):
     """Text entry on the dialog."""
+
+    def makeControl(self):
+        l = qt4.QLabel(self.descr)
+        e = qt4.QLineEdit()
+        if self.default:
+            e.setText(self.default)
+        return (l, e)
+
+    def getControlResults(self, cntrls):
+        return unicode( cntrls[1].text() )
 
 class ImportFieldCombo(ImportField):
     """Drop-down combobox on dialog."""
@@ -71,6 +100,42 @@ class ImportFieldCombo(ImportField):
         self.items = items
         self.editable = editable
 
+    def makeControl(self):
+        l = qt4.QLabel(self.descr)
+        c = qt4.QComboBox()
+        c.addItems(self.items)
+        c.setEditable(bool(self.editable))
+
+        if self.default:
+            if self.editable:
+                c.setEditText(self.default)
+            else:
+                c.setCurrentIndex(c.findText(self.default))
+
+        return (l, c)
+
+    def getControlResults(self, cntrls):
+        return unicode( cntrls[1].currentText() )
+
+class ImportDataset1D(object):
+    """Return 1D dataset."""
+    def __init__(self, name, data=None, serr=None, perr=None, nerr=None):
+        """1D dataset."""
+        self.name = name
+        self.data = data
+        self.serr = serr
+        self.perr = perr
+        self.nerr = nerr
+
+class ImportDataset2D(object):
+    """Return 2D dataset."""
+    def __init__(self, name, data, rangex=None, rangey=None):
+        """2D dataset."""
+        self.name = name
+        self.data = data
+        self.rangex = rangex
+        self.rangey = rangey
+
 class ImportPlugin(object):
     """Define a plugin to read data in a particular format."""
 
@@ -78,8 +143,9 @@ class ImportPlugin(object):
     author = ''
     description = ''
 
-    # a list of ImportField objects to display
-    fields = []
+    def __init__(self):
+        # a list of ImportField objects to display
+        self.fields = []
 
     def getPreview(self, params):
         """Get data to show in a text box to show a preview.
@@ -90,8 +156,10 @@ class ImportPlugin(object):
 
     def doImport(self, params):
         """Actually import data
-        params is a ImportPluginParams object."""
-        pass
+        params is a ImportPluginParams object.
+        Return a list of ImportDataset1D, ImportDataset2D objects
+        """
+        return []
 
 #################################################################
 
@@ -100,8 +168,44 @@ class ImportPluginExample(ImportPlugin):
     author = 'Jeremy Sanders'
     description = 'Reads a list of numbers in a text file'
 
+    def __init__(self):
+        self.fields = [
+            ImportFieldCheck('test', descr="test example"),
+            ImportFieldText('exampletext', descr='Enter text', default="foo"),
+            ImportFieldCombo('test2', items=('1', 'red', 'green'),
+                             editable=False, default='green')
+            ]
+
     def getPreview(self, params):
         f = params.openFileWithEncoding()
         return f.read(4096), True
 
+    def doImport(self, params):
+        """Actually import data
+        params is a ImportPluginParams object.
+        Return a list of ImportDataset1D, ImportDataset2D objects
+        """
+        f = params.openFileWithEncoding()
+        data = []
+        mult = float(params.field_results['exampletext'])
+        for line in f:
+            data += [float(x)*mult for x in line.split()]
+
+        return [ImportDataset1D('example', data)]
+
 importpluginregistry.append(ImportPluginExample())
+
+class ImportPluginExample2(ImportPlugin):
+    name = 'Example plugin 2'
+    author = 'Jeremy Sanders'
+    description = 'Reads a list of numbers in a text file'
+
+    def __init__(self):
+        self.fields = [
+            ]
+
+    def getPreview(self, params):
+        f = params.openFileWithEncoding()
+        return f.read(4096)[::-1], True
+
+importpluginregistry.append(ImportPluginExample2())

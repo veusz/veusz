@@ -613,12 +613,19 @@ class ImportTabPlugins(ImportTab):
         names = sorted([p.name for p in plugins.importpluginregistry])
         self.pluginType.addItems(names)
 
-    def getPluginParameters(self):
-        """Fill and return plugin parameters class."""
-        encoding = str(self.dialog.encodingcombo.currentText())
-        filename = unicode( self.dialog.filenameedit.text() )
+        self.connect(self.pluginType, qt4.SIGNAL('currentIndexChanged(int)'),
+                     self.pluginChanged)
+
+        self.fields = []
+        self.pluginChanged(-1)
+
+    def getPluginFields(self):
+        """Return a dict of the fields given."""
         results = {}
-        return plugins.ImportPluginParams(filename, encoding, results)
+        plugin = self.getSelectedPlugin()
+        for field, cntrls in zip(plugin.fields, self.fields):
+            results[field.name] = field.getControlResults(cntrls)
+        return results
 
     def getSelectedPlugin(self):
         """Get instance selected plugin or none."""
@@ -629,6 +636,32 @@ class ImportTabPlugins(ImportTab):
         except ValueError:
             return None
         return plugins.importpluginregistry[idx]
+
+    def pluginChanged(self, index):
+        """Update controls based on index."""
+        plugin = self.getSelectedPlugin()
+
+        # delete old controls
+        layout = self.pluginParams.layout()
+        for line in self.fields:
+            for cntrl in line:
+                layout.removeWidget(cntrl)
+                cntrl.deleteLater()
+        del self.fields[:]
+
+        # make new controls
+        for row, field in enumerate(plugin.fields):
+            cntrls = field.makeControl()
+            layout.addWidget(cntrls[0], row, 0)
+            layout.addWidget(cntrls[1], row, 1)
+            self.fields.append(cntrls)
+
+        # update label
+        self.pluginDescr.setText("%s (%s)\n%s" %
+                                 (plugin.name, plugin.author,
+                                  plugin.description))
+
+        self.dialog.slotUpdatePreview()
 
     def doPreview(self, filename, encoding):
         """Preview using plugin."""
@@ -648,14 +681,32 @@ class ImportTabPlugins(ImportTab):
             return False
 
         # ask the plugin for text
-        params = self.getPluginParameters()
+        params = plugins.ImportPluginParams(filename, encoding,
+                                            self.getPluginFields())
         try:
             text, ok = plugin.getPreview(params)
-        except Exception, ex:
+        except plugins.ImportPluginException, ex:
             text = unicode(ex)
             ok = False
         self.pluginPreview.setPlainText(text)
         return bool(ok)
+
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+        """Import using plugin."""
+        
+        params = self.getPluginFields()
+        op = document.OperationDataImportPlugin(
+            unicode(self.pluginType.currentText()),
+            filename, linked=linked, encoding=encoding,
+            prefix=prefix, suffix=suffix, **params)
+        try:
+            results = doc.applyOperation(op)
+        except plugins.ImportPluginException, ex:
+            self.pluginPreview.setPlainText( unicode(ex) )
+            return
+
+        self.pluginPreview.setPlainText('Imported data for datasets:\n' +
+                                        ('\n'.join(results)))
 
 class ImportDialog(qt4.QDialog):
     """Dialog box for importing data.

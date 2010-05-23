@@ -53,6 +53,7 @@ class CommandInterface(qt4.QObject):
         'ImportFile',
         'ImportFile2D',
         'ImportFileCSV',
+        'ImportFilePlugin',
         'ImportString',
         'ImportString2D',
         'List',
@@ -599,6 +600,25 @@ class CommandInterface(qt4.QObject):
             poserrcol=poserrcol, negerrcol=negerrcol,
             linked=linked)
         self.document.applyOperation(op)
+
+    def ImportFilePlugin(self, plugin, filename, **args):
+        """Import file using a plugin.
+
+        optional arguments:
+        prefix: add to start of dataset name (default '')
+        suffix: add to end of dataset name (default '')
+        linked: link import to file (default False)
+        encoding: file encoding (may not be used, default 'utf_8')
+        plus arguments to plugin
+        """
+
+        realfilename = self.findFileOnImportPath(filename)
+        op = operations.OperationDataImportPlugin(plugin, realfilename,
+                                                  **args)
+        try:
+            self.document.applyOperation(op)
+        except Exception, ex:
+            self.document.log(unicode(ex))
 
     def ReloadData(self):
         """Reload any linked datasets.
