@@ -82,6 +82,16 @@ class PreferencesDialog(qt4.QDialog):
         self.connect( self.customBrowseButton, qt4.SIGNAL('clicked()'),
                       self.customBrowseClicked )
 
+        # for plugins
+        plugins = list( setting.settingdb.get('plugins', []) )
+        self.pluginmodel = qt4.QStringListModel(plugins)
+        self.pluginList.setModel(self.pluginmodel)
+        self.connect( self.pluginAddButton, qt4.SIGNAL('clicked()'),
+                      self.pluginAddClicked )
+        self.connect( self.pluginRemoveButton, qt4.SIGNAL('clicked()'),
+                      self.pluginRemoveClicked )
+
+        # specifics for color tab
         self.setupColorTab()
 
     def setupColorTab(self):
@@ -203,6 +213,10 @@ class PreferencesDialog(qt4.QDialog):
             colorname = unicode(color.name())
             setting.settingdb['color_' + name] = (isdefault, colorname)
 
+        # plugins
+        plugins = [unicode(x) for x in self.pluginmodel.stringList()]
+        setting.settingdb['plugins'] = plugins
+
         self.plotwindow.updatePlotSettings()
 
     def styleBrowseClicked(self):
@@ -219,3 +233,17 @@ class PreferencesDialog(qt4.QDialog):
         if filename:
             self.customLineEdit.setText(filename)
 
+    def pluginAddClicked(self):
+        """Add a new plugin."""
+        filename = self.parent()._fileOpenDialog(
+            'py', 'Python scripts', 'Choose plugin')
+        if filename:
+            self.pluginmodel.insertRows(0, 1)
+            self.pluginmodel.setData( self.pluginmodel.index(0),
+                                      qt4.QVariant(filename) )
+
+    def pluginRemoveClicked(self):
+        """Remove selected plugin."""
+        sel = self.pluginList.selectionModel().currentIndex()
+        if sel.isValid():
+            self.pluginmodel.removeRow( sel.row() )
