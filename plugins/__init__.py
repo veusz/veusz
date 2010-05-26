@@ -19,4 +19,3 @@
 # $Id$
 
 from importplugin import *
-

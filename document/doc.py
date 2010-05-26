@@ -825,3 +825,7 @@ class Painter(qt4.QPainter):
         """Widget is now finished."""
         pass
     
+# load plugins
+plugins = setting.settingdb.get('plugins', [])
+for plugin in plugins:
+    execfile(plugin)

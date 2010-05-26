@@ -618,7 +618,7 @@ class CommandInterface(qt4.QObject):
         try:
             self.document.applyOperation(op)
         except Exception, ex:
-            self.document.log(unicode(ex))
+            self.document.log("Error in plugin %s: %s" % (plugin, unicode(ex)))
 
     def ReloadData(self):
         """Reload any linked datasets.

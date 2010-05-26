@@ -610,13 +610,22 @@ class ImportTabPlugins(ImportTab):
         ImportTab.loadUi(self)
 
         # fill plugin combo
-        names = sorted([p.name for p in plugins.importpluginregistry])
+        names = list(sorted([p.name for p in plugins.importpluginregistry]))
         self.pluginType.addItems(names)
 
         self.connect(self.pluginType, qt4.SIGNAL('currentIndexChanged(int)'),
                      self.pluginChanged)
 
         self.fields = []
+
+        # load previous plugin
+        if 'import_plugin' in setting.settingdb:
+            try:
+                idx = names.index(setting.settingdb['import_plugin'])
+                self.pluginType.setCurrentIndex(idx)
+            except ValueError:
+                pass
+
         self.pluginChanged(-1)
 
     def getPluginFields(self):
@@ -640,6 +649,7 @@ class ImportTabPlugins(ImportTab):
     def pluginChanged(self, index):
         """Update controls based on index."""
         plugin = self.getSelectedPlugin()
+        setting.settingdb['import_plugin'] = plugin.name
 
         # delete old controls
         layout = self.pluginParams.layout()
@@ -695,9 +705,9 @@ class ImportTabPlugins(ImportTab):
         """Import using plugin."""
         
         params = self.getPluginFields()
+        plugin = unicode(self.pluginType.currentText())
         op = document.OperationDataImportPlugin(
-            unicode(self.pluginType.currentText()),
-            filename, linked=linked, encoding=encoding,
+            plugin, filename, linked=linked, encoding=encoding,
             prefix=prefix, suffix=suffix, **params)
         try:
             results = doc.applyOperation(op)
@@ -705,8 +715,11 @@ class ImportTabPlugins(ImportTab):
             self.pluginPreview.setPlainText( unicode(ex) )
             return
 
-        self.pluginPreview.setPlainText('Imported data for datasets:\n' +
-                                        ('\n'.join(results)))
+        out = ['Imported data for datasets:']
+        for ds in results:
+            out.append( doc.data[ds].description(showlinked=False) )
+
+        self.pluginPreview.setPlainText('\n'.join(out))
 
 class ImportDialog(qt4.QDialog):
     """Dialog box for importing data.

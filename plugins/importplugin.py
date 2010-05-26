@@ -87,6 +87,23 @@ class ImportFieldText(ImportField):
     def getControlResults(self, cntrls):
         return unicode( cntrls[1].text() )
 
+class ImportFieldFloat(ImportField):
+    """Enter a floating point number."""
+
+    def makeControl(self):
+        l = qt4.QLabel(self.descr)
+        e = qt4.QLineEdit()
+        e.setValidator( qt4.QDoubleValidator(e) )
+        if self.default is not None:
+            e.setText( str(self.default) )
+        return (l, e)
+
+    def getControlResults(self, cntrls):
+        try:
+            return float( cntrls[1].text() )
+        except:
+            return None
+
 class ImportFieldCombo(ImportField):
     """Drop-down combobox on dialog."""
     def __init__(self, name, descr=None, default=None, items=(),
@@ -152,7 +169,8 @@ class ImportPlugin(object):
         params is a ImportPluginParams object.
         Returns (text, okaytoimport)
         """
-        return '', False
+        f = params.openFileWithEncoding()
+        return f.read(4096), True
 
     def doImport(self, params):
         """Actually import data
@@ -164,21 +182,21 @@ class ImportPlugin(object):
 #################################################################
 
 class ImportPluginExample(ImportPlugin):
-    name = 'Example plugin'
-    author = 'Jeremy Sanders'
-    description = 'Reads a list of numbers in a text file'
+    """An example plugin for reading a set of unformatted numbers
+    from a file."""
+
+    name = "Example plugin"
+    author = "Jeremy Sanders"
+    description = "Reads a list of numbers in a text file"
 
     def __init__(self):
         self.fields = [
-            ImportFieldCheck('test', descr="test example"),
-            ImportFieldText('exampletext', descr='Enter text', default="foo"),
-            ImportFieldCombo('test2', items=('1', 'red', 'green'),
-                             editable=False, default='green')
+            ImportFieldText("name", descr="Dataset name", default="name"),
+            ImportFieldCheck("invert", descr="invert values"),
+            ImportFieldFloat("mult", descr="Multiplication factor", default=1),
+            ImportFieldCombo("subtract", items=("0", "1", "2"),
+                             editable=False, default="0")
             ]
-
-    def getPreview(self, params):
-        f = params.openFileWithEncoding()
-        return f.read(4096), True
 
     def doImport(self, params):
         """Actually import data
@@ -187,25 +205,13 @@ class ImportPluginExample(ImportPlugin):
         """
         f = params.openFileWithEncoding()
         data = []
-        mult = float(params.field_results['exampletext'])
+        mult = params.field_results["mult"]
+        sub = float(params.field_results["subtract"])
+        if params.field_results["invert"]:
+            mult *= -1
         for line in f:
-            data += [float(x)*mult for x in line.split()]
+            data += [float(x)*mult-sub for x in line.split()]
 
-        return [ImportDataset1D('example', data)]
+        return [ImportDataset1D(params.field_results["name"], data)]
 
 importpluginregistry.append(ImportPluginExample())
-
-class ImportPluginExample2(ImportPlugin):
-    name = 'Example plugin 2'
-    author = 'Jeremy Sanders'
-    description = 'Reads a list of numbers in a text file'
-
-    def __init__(self):
-        self.fields = [
-            ]
-
-    def getPreview(self, params):
-        f = params.openFileWithEncoding()
-        return f.read(4096)[::-1], True
-
-importpluginregistry.append(ImportPluginExample2())
