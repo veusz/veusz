@@ -137,7 +137,17 @@ class ImportFieldCombo(ImportField):
 class ImportDataset1D(object):
     """Return 1D dataset."""
     def __init__(self, name, data=None, serr=None, perr=None, nerr=None):
-        """1D dataset."""
+        """1D dataset
+        name: name of dataset
+        data: data in dataset: list of floats or numpy 1D array
+        serr: (optional) symmetric errors on data: list or numpy array
+        perr: (optional) positive errors on data: list or numpy array
+        nerr: (optional) negative errors on data: list or numpy array
+
+        If errors are returned for data implement serr or nerr and perr.
+        nerr should be negative values if used.
+        perr should be positive values if used.
+        """
         self.name = name
         self.data = data
         self.serr = serr
@@ -147,7 +157,12 @@ class ImportDataset1D(object):
 class ImportDataset2D(object):
     """Return 2D dataset."""
     def __init__(self, name, data, rangex=None, rangey=None):
-        """2D dataset."""
+        """2D dataset.
+        name: name of dataset
+        data: 2D numpy array of values or list of lists of floats
+        rangex: optional tuple with X range of data (min, max)
+        rangey: optional tuple with Y range of data (min, max)
+        """
         self.name = name
         self.data = data
         self.rangex = rangex
