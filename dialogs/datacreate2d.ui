@@ -1,39 +1,40 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>Dialog</class>
- <widget class="QDialog" name="Dialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>638</width>
-    <height>400</height>
+    <height>396</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Create 2D dataset</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QLabel" name="label" >
-       <property name="text" >
+      <widget class="QLabel" name="label">
+       <property name="text">
         <string>&amp;Name</string>
        </property>
-       <property name="buddy" >
+       <property name="buddy">
         <cstring>namecombo</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="namecombo" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+      <widget class="QComboBox" name="namecombo">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="editable" >
+       <property name="editable">
         <bool>true</bool>
        </property>
       </widget>
@@ -41,28 +42,28 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Method of creating dataset</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout">
       <item>
-       <widget class="QRadioButton" name="fromxyfunc" >
-        <property name="text" >
+       <widget class="QRadioButton" name="fromxyfunc">
+        <property name="text">
          <string>From &amp;function of x and y</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="fromxyzexpr" >
-        <property name="text" >
+       <widget class="QRadioButton" name="fromxyzexpr">
+        <property name="text">
          <string>From x, y and z values based on &amp;1D datasets or expressions</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="from2dexpr" >
-        <property name="text" >
+       <widget class="QRadioButton" name="from2dexpr">
+        <property name="text">
          <string>From expression based on &amp;2D dataset</string>
         </property>
        </widget>
@@ -71,85 +72,85 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Values</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout">
       <item>
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
+       <widget class="QLabel" name="label_8">
+        <property name="text">
          <string>Enter range of values in form min:max:step or expression</string>
         </property>
        </widget>
       </item>
       <item>
-       <layout class="QGridLayout" >
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
+       <layout class="QGridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
            <string>&amp;X expression or range</string>
           </property>
-          <property name="buddy" >
+          <property name="buddy">
            <cstring>xexprcombo</cstring>
           </property>
          </widget>
         </item>
-        <item row="0" column="1" >
-         <widget class="QComboBox" name="xexprcombo" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <item row="0" column="1">
+         <widget class="QComboBox" name="xexprcombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="editable" >
+          <property name="editable">
            <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label_3" >
-          <property name="text" >
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
            <string>&amp;Y expression or range</string>
           </property>
-          <property name="buddy" >
+          <property name="buddy">
            <cstring>yexprcombo</cstring>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" >
-         <widget class="QComboBox" name="yexprcombo" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <item row="1" column="1">
+         <widget class="QComboBox" name="yexprcombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="editable" >
+          <property name="editable">
            <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_4" >
-          <property name="text" >
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
            <string>&amp;Z expression</string>
           </property>
-          <property name="buddy" >
+          <property name="buddy">
            <cstring>zexprcombo</cstring>
           </property>
          </widget>
         </item>
-        <item row="2" column="1" >
-         <widget class="QComboBox" name="zexprcombo" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <item row="2" column="1">
+         <widget class="QComboBox" name="zexprcombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="editable" >
+          <property name="editable">
            <bool>true</bool>
           </property>
          </widget>
@@ -157,11 +158,11 @@
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="linkcheckbox" >
-        <property name="text" >
+       <widget class="QCheckBox" name="linkcheckbox">
+        <property name="text">
          <string>&amp;Link this dataset to these expressions</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
@@ -170,73 +171,34 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>6</number>
+    <widget class="QLabel" name="notifylabel">
+     <property name="text">
+      <string/>
      </property>
-     <property name="leftMargin" >
-      <number>0</number>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
      </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="notifylabel" >
-       <property name="text" >
-        <string> </string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>131</width>
-         <height>31</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="createbutton" >
-       <property name="text" >
-        <string>C&amp;reate</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="closebutton" >
-       <property name="text" >
-        <string>&amp;Close</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    </widget>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>closebutton</sender>
-   <signal>clicked()</signal>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
    <receiver>Dialog</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
-     <x>590</x>
-     <y>374</y>
+    <hint type="sourcelabel">
+     <x>318</x>
+     <y>383</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>318</x>
      <y>199</y>
     </hint>
