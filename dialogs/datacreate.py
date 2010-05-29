@@ -53,6 +53,11 @@ class DataCreateDialog(qt4.QDialog):
                       self.slotMethodChanged )
 
         # connect create button
+        self.createbutton = self.buttonBox.addButton(
+            "C&reate", qt4.QDialogButtonBox.ApplyRole )
+        self.replacebutton = self.buttonBox.addButton(
+            "&Replace", qt4.QDialogButtonBox.ApplyRole )
+
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
                       self.createButtonClickedSlot )
         self.connect( self.replacebutton, qt4.SIGNAL('clicked()'),
