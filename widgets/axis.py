@@ -121,14 +121,27 @@ class AxisLabel(setting.Text):
 class TickLabel(setting.Text):
     """For tick labels on axes."""
 
+    formatchoices = ('Auto', '%Vg', '%Ve', '%VE',
+                     '%g', '%e', '%.2f')
+    descriptions = ('Automatic',
+                    'General numerical format',
+                    'Scientific notation',
+                    'Engineering suffix notation',
+                    'C-style general format',
+                    'C-style scientific notation',
+                    '2 decimal places always shown')
+
     def __init__(self, name, **args):
         setting.Text.__init__(self, name, **args)
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )
-        self.add( setting.Str( 'format', 'Auto',
-                               descr = 'Format of the tick labels',
-                               usertext='Format') )
+        self.add( setting.ChoiceOrMore( 'format',
+                                        TickLabel.formatchoices,
+                                        'Auto',
+                                        descr = 'Format of the tick labels',
+                                        descriptions=TickLabel.descriptions,
+                                        usertext='Format') )
 
         self.add( setting.Float('scale', 1.,
                                 descr='A scale factor to apply to the values '

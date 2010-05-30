@@ -295,7 +295,8 @@ class Bool(qt4.QCheckBox):
 class Choice(qt4.QComboBox):
     """For choosing between a set of values."""
 
-    def __init__(self, setting, iseditable, vallist, parent, icons=None):
+    def __init__(self, setting, iseditable, vallist, parent, icons=None,
+                 descriptions=None):
         qt4.QComboBox.__init__(self, parent)
 
         self.setting = setting
@@ -313,6 +314,11 @@ class Choice(qt4.QComboBox):
             # add pixmaps and text to list
             for icon, text in izip(icons, vallist):
                 self.addItem(icon, text)
+
+        # use tooltip descriptions if requested
+        if descriptions is not None:
+            for i, descr in enumerate(descriptions):
+                self.setItemData(i, qt4.QVariant(descr), qt4.Qt.ToolTipRole)
 
         # choose the correct setting
         try:

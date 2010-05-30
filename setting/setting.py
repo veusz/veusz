@@ -844,9 +844,16 @@ class ChoiceOrMore(Setting):
     # maybe should be implemented as a dict to speed up checks
 
     def __init__(self, name, vallist, val, **args):
-        """Setting has val must be in vallist."""
+        """Setting has val must be in vallist.
+        descriptions is an optional addon to put a tooltip on each item
+        in the control
+        """
         
         self.vallist = vallist
+        self.descriptions = args.get('descriptions', None)
+        if self.descriptions:
+            del args['descriptions']
+
         Setting.__init__(self, name, val, **args)
 
     def copy(self):
@@ -863,7 +870,8 @@ class ChoiceOrMore(Setting):
         return text
 
     def makeControl(self, *args):
-        return controls.Choice(self, True, self.vallist, *args)
+        return controls.Choice(self, True, self.vallist, *args,
+                               descriptions=self.descriptions)
 
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
