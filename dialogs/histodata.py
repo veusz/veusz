@@ -26,6 +26,8 @@ import veusz.utils as utils
 import veusz.document as document
 from veusz.setting.controls import populateCombo
 
+import dataeditdialog
+
 import numpy as N
 
 def checkValidator(combo):
@@ -61,9 +63,9 @@ class ManualBinModel(qt4.QAbstractListModel):
 class HistoDataDialog(qt4.QDialog):
     """Preferences dialog."""
 
-    def __init__(self, document, *args):
+    def __init__(self, parent, document):
         """Setup dialog."""
-        qt4.QDialog.__init__(self, *args)
+        qt4.QDialog.__init__(self, parent)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
                                 'histodata.ui'),
                    self)
@@ -131,13 +133,13 @@ class HistoDataDialog(qt4.QDialog):
 
             if not checkValidator(dialog.minval):
                 raise RuntimeError("Invalid minimum value")
-            minval = dialog.minval.text()
+            minval = unicode( dialog.minval.text() )
             if minval != 'Auto':
                 minval = float(minval)
 
             if not checkValidator(dialog.maxval):
                 raise RuntimeError("Invalid maximum value")
-            maxval = dialog.maxval.text()
+            maxval = unicode( dialog.maxval.text() )
             if maxval != 'Auto':
                 maxval = float(maxval)
 
@@ -214,9 +216,9 @@ class HistoDataDialog(qt4.QDialog):
         for cntrl in (self.indataset, self.outdataset, self.outbins):
             cntrl.setEditText("")
 
+        self.numbins.setValue(10)
         self.minval.setEditText("Auto")
         self.maxval.setEditText("Auto")
-        self.numbins.setValue(10)
         self.logarithmic.setChecked(False)
 
         del self.bindata[:]
@@ -225,6 +227,51 @@ class HistoDataDialog(qt4.QDialog):
         self.errorBars.setChecked(False)
         self.counts.click()
         self.cumlOff.click()
+
+    def reEditDataset(self, dsname):
+        """Re-edit dataset."""
+
+        try:
+            ds = self.document.data[dsname]
+        except KeyError:
+            return
+        gen = ds.generator
+
+        self.indataset.setEditText(gen.inexpr)
+
+        # need to map backwards to get dataset names
+        revds = dict( (a,b) for b,a in self.document.data.iteritems() )
+        self.outdataset.setEditText( revds[gen.valuedataset] )
+        self.outbins.setEditText( revds[gen.bindataset] )
+
+        # if there are parameters
+        if gen.binparams:
+            p = gen.binparams
+            self.numbins.setValue( p[0] )
+            self.minval.setEditText( unicode(p[1]) )
+            self.maxval.setEditText( unicode(p[2]) )
+            self.logarithmic.setChecked( bool(p[3]) )
+        else:
+            self.numbins.setValue(10)
+            self.minval.setEditText("Auto")
+            self.maxval.setEditText("Auto")
+            self.logarithmic.setChecked(False)
+
+        # if there is a manual list of bins
+        if gen.binmanual:
+            self.bindata[:] = list(gen.binmanual)
+            self.binmodel.reset()
+
+        # select correct method
+        {'counts': self.counts, 'density': self.density,
+         'fractions': self.fractions}[gen.method].click()
+        
+        # select if cumulative
+        {'none': self.cumlOff, 'smalltolarge': self.cumlStoL,
+         'largetosmall': self.cumlLtoS}[gen.cumulative].click()
+
+        # if error bars
+        self.errorBars.setChecked( bool(gen.errors) )
 
     def applyClicked(self):
         """Create histogram."""
@@ -246,3 +293,6 @@ class HistoDataDialog(qt4.QDialog):
             self.statuslabel.setText("")
 
         qt4.QTimer.singleShot(2000, clearlabel)
+
+dataeditdialog.recreate_register[document.DatasetHistoValues] = HistoDataDialog
+dataeditdialog.recreate_register[document.DatasetHistoBins] = HistoDataDialog

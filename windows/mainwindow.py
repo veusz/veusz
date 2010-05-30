@@ -570,7 +570,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataHistogram(self):
         """Histogram data."""
-        dialog = HistoDataDialog(self.document, self)
+        dialog = HistoDataDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
         return dialog

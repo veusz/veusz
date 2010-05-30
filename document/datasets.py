@@ -457,7 +457,6 @@ class DatasetBase(object):
     datatype = 'numeric'
     columns = ()
     column_descriptions = ()
-    recreatable_dataset = False  # can recreate in create dialog
 
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
@@ -931,8 +930,6 @@ def simpleEvalExpression(doc, expr):
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
-    recreatable_dataset = True
-
     def __init__(self, data=None, serr=None, nerr=None, perr=None,
                  parametric=None):
         """Initialise the dataset with the expressions given.
@@ -1119,8 +1116,6 @@ class DatasetExpression(Dataset):
 
 class DatasetRange(Dataset):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
-
-    recreatable_dataset = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
         """Construct dataset.

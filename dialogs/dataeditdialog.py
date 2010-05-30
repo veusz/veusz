@@ -361,7 +361,8 @@ class DataEditDialog(qt4.QDialog):
         # linked dataset
         unlink = ds.canUnlink()
         readonly = not unlink
-        self.editbutton.setVisible( ds.recreatable_dataset )
+
+        self.editbutton.setVisible(type(ds) in recreate_register)
         self.unlinkbutton.setEnabled(unlink)
         self.linkedlabel.setText( ds.linkedInformation() )
 
