@@ -77,11 +77,14 @@ class HistoDataDialog(qt4.QDialog):
         self.maxval.setValidator(validator)
         self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
                       qt4.SIGNAL("clicked()"), self.applyClicked )
+        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
+                      qt4.SIGNAL('clicked()'), self.resetClicked )
         self.connect( self.bingenerate, qt4.SIGNAL('clicked()'),
                       self.generateManualBins )
         self.connect( self.binadd, qt4.SIGNAL('clicked()'), self.addManualBins )
         self.connect( self.binremove, qt4.SIGNAL('clicked()'),
                       self.removeManualBins )
+
 
         self.bindata = []
         self.binmodel = ManualBinModel(self.bindata)
@@ -204,6 +207,24 @@ class HistoDataDialog(qt4.QDialog):
         if indexes:
             del self.bindata[ indexes[0].row() ]
             self.binmodel.reset()
+
+    def resetClicked(self):
+        """Reset button clicked."""
+
+        for cntrl in (self.indataset, self.outdataset, self.outbins):
+            cntrl.setEditText("")
+
+        self.minval.setEditText("Auto")
+        self.maxval.setEditText("Auto")
+        self.numbins.setValue(10)
+        self.logarithmic.setChecked(False)
+
+        del self.bindata[:]
+        self.binmodel.reset()
+
+        self.errorBars.setChecked(False)
+        self.counts.click()
+        self.cumlOff.click()
 
     def applyClicked(self):
         """Create histogram."""
