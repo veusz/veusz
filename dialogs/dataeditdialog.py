@@ -445,6 +445,7 @@ class DataEditDialog(qt4.QDialog):
             dialog = recreate_register[type(dataset)](self.parent(),
                                                       self.document)
             self.parent().showDialog(dialog)
+            dialog.reEditDataset(dsname)
 
     def slotCopy(self):
         """Copy text from selection."""

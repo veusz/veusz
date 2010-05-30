@@ -58,10 +58,13 @@ class DataCreateDialog(qt4.QDialog):
         self.replacebutton = self.buttonBox.addButton(
             "&Replace", qt4.QDialogButtonBox.ApplyRole )
 
+        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
+                      qt4.SIGNAL('clicked()'), self.resetButtonClicked )
+
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClickedSlot )
+                      self.createButtonClicked )
         self.connect( self.replacebutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClickedSlot )
+                      self.createButtonClicked )
 
         # connect notification of document change
         self.connect( self.document, qt4.SIGNAL("sigModified"),
@@ -200,7 +203,19 @@ class DataCreateDialog(qt4.QDialog):
         self.createbutton.setEnabled(enabled)
         self.replacebutton.setEnabled(enabled)
 
-    def createButtonClickedSlot(self):
+    def resetButtonClicked(self):
+        """Reset button clicked - reset dialog."""
+
+        for cntrl in (self.valueedit, self.symerroredit, self.poserroredit,
+                      self.negerroredit, self.numstepsedit,
+                      self.tstartedit, self.tendedit, self.tstepsedit,
+                      self.nameedit):
+            cntrl.setEditText("")
+                      
+        self.linkcheckbox.setChecked(True)
+        self.valueradio.click()
+
+    def createButtonClicked(self):
         """Create button pressed."""
         
         dsname = unicode( self.nameedit.text() )
@@ -240,7 +255,7 @@ class DataCreateDialog(qt4.QDialog):
                            qt4.QMessageBox.NoButton,
                            qt4.QMessageBox.NoButton,
                            self).exec_()
-
+            
     def createFromRange(self, name):
         """Make dataset from a range or constant.
         name is the name of the dataset
