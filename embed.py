@@ -43,6 +43,7 @@ More than one embedded window can be opened at once
 
 import atexit
 import sys
+import os
 import os.path
 import struct
 import new
@@ -50,6 +51,10 @@ import cPickle
 import socket
 import random
 import subprocess
+import time
+
+# check remote process has this API version
+API_VERSION = 1
 
 def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
@@ -59,6 +64,16 @@ def Bind1st(function, arg):
         return function( arg, *args, **args2 )
 
     return runner
+
+def findOnPath(cmd):
+    """Find a command on the system path, or None if does not exist."""
+    path = os.getenv('PATH', os.path.defpath)
+    pathparts = path.split(os.path.pathsep)
+    for dirname in pathparts:
+        cmdtry = os.path.join(dirname, cmd)
+        if os.path.isfile(cmdtry):
+            return cmdtry
+    return None
 
 class Embedded(object):
     """An embedded instance of Veusz.
@@ -95,12 +110,30 @@ class Embedded(object):
             method = new.instancemethod(func, Embedded)
             setattr(self, name, method) # assign to self
 
+        # check API version is same
+        try:
+            remotever = self._apiVersion()
+        except AttributeError:
+            remotever = 0
+        if remotever != API_VERSION:
+            raise RuntimeError("Remote Veusz instance reports version %i of"
+                               " API. This embed.py supports version %i." %
+                               (remotever, API_VERSION))
+
     def StartSecondView(self, name = 'Veusz'):
         """Provides a second view onto the document of this window.
 
         Returns an Embedded instance
         """
         return Embedded(name=name, copyof=self)
+
+    def WaitForClose(self):
+        """Wait for the window to close."""
+
+        # this is messy, polling for closure, but cleaner than doing
+        # it in the remote client
+        while not self.IsClosed():
+            time.sleep(0.1)
 
     @classmethod
     def makeSockets(cls):
@@ -134,27 +167,73 @@ class Embedded(object):
     @classmethod
     def makeRemoteProcess(cls):
         """Try to find veusz process for remote program."""
-        thisdir = os.path.dirname(os.path.abspath(__file__))
-        remoteembed = os.path.join(thisdir, 'embed_remote.py')
-        veuszex = os.path.join(thisdir, 'veusz')
-
-        # try embed_remote.py in this directory, veusz in this directory
-        # or veusz on the path in order
-        for shell, cmd in ( (False, [sys.executable, remoteembed]),
-                            (False, [veuszex]),
-                            (True, ['veusz']), ):
-            try:
-                cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
-                                              shell=shell, bufsize=0,
-                                              close_fds=False,
-                                              stdin=subprocess.PIPE)
-                return
-            except OSError:
-                pass
-
-        sys.stderr.write('Unable to find a Veusz executable. Exiting.\n')
-        sys.exit(1)
         
+        # here's where to look for embed_remote.py
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+
+        # build up a list of possible command lines to start the remote veusz
+        if sys.platform == 'win32':
+            # windows is a special case
+            # we need to run embed_remote.py under pythonw.exe, not python.exe
+
+            # look for the python windows interpreter on path
+            findpython = findOnPath('pythonw.exe')
+            if not findpython:
+                # if it wasn't on the path, use sys.prefix instead
+                findpython = os.path.join(sys.prefix, 'pythonw.exe')
+
+            # look for veusz executable on path
+            findexe = findOnPath('veusz.exe')
+            if not findexe:
+                try:
+                    # add the usual place as a guess :-(
+                    findexe = os.path.join(os.environ['ProgramFiles'],
+                                           'Veusz', 'veusz.exe')
+                except KeyError:
+                    pass
+
+            # here is the list of commands to try
+            possiblecommands = [
+                [findpython, os.path.join(thisdir, 'embed_remote.py')],
+                [findexe] ]
+
+        else:
+            # try embed_remote.py in this directory, veusz in this directory
+            # or veusz on the path in order
+            possiblecommands = [ [sys.executable,
+                                  os.path.join(thisdir, 'embed_remote.py')],
+                                 [os.path.join(thisdir, 'veusz')],
+                                 [findOnPath('veusz')] ]
+
+        # cheat and look for Veusz app for MacOS under the standard application
+        # directory. I don't know how else to find it :-(
+        if sys.platform == 'darwin':
+            findbundle = findOnPath('Veusz.app')
+            if findbundle:
+                possiblecommands += [ [findbundle+'/Contents/MacOS/Veusz'] ]
+            else:
+                possiblecommands += [[
+                    '/Applications/Veusz.app/Contents/MacOS/Veusz' ]]
+
+        for cmd in possiblecommands:
+            # only try to run commands that exist as error handling
+            # does not work well when interfacing with OS (especially Windows)
+            if ( None not in cmd and
+                 False not in [os.path.isfile(c) for c in cmd] ):
+                try:
+                    # we don't use stdout below, but works around windows bug
+                    # http://bugs.python.org/issue1124861
+                    cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
+                                                  shell=False, bufsize=0,
+                                                  close_fds=False,
+                                                  stdin=subprocess.PIPE,
+                                                  stdout=subprocess.PIPE)
+                    return
+                except OSError:
+                    pass
+
+        raise RuntimeError('Unable to find a veusz executable on system path')
+
     @classmethod
     def startRemote(cls):
         """Start remote process."""
@@ -183,7 +262,7 @@ class Embedded(object):
         assert secret == secretback
 
         # packet length for command bytes
-        cls.cmdlen = len(struct.pack('L', 0))
+        cls.cmdlen = struct.calcsize('<I')
         atexit.register(cls.exitQt)
 
     @staticmethod
@@ -206,11 +285,11 @@ class Embedded(object):
 
         outs = cPickle.dumps(cmd)
 
-        cls.writeToSocket( cls.serv_socket, struct.pack('L', len(outs)) )
+        cls.writeToSocket( cls.serv_socket, struct.pack('<I', len(outs)) )
         cls.writeToSocket( cls.serv_socket, outs )
 
-        backlen = struct.unpack('L', cls.readLenFromSocket(cls.serv_socket,
-                                                           cls.cmdlen))[0]
+        backlen = struct.unpack('<I', cls.readLenFromSocket(cls.serv_socket,
+                                                            cls.cmdlen))[0]
         rets = cls.readLenFromSocket( cls.serv_socket, backlen )
         retobj = cPickle.loads(rets)
         if isinstance(retobj, Exception):
@@ -230,4 +309,3 @@ class Embedded(object):
         cls.serv_socket.shutdown(socket.SHUT_RDWR)
         cls.serv_socket.close()
         cls.serv_socket, cls.from_pipe = -1, -1
-

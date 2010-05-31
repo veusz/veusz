@@ -61,4 +61,20 @@ class NumpyInValarray
   double* _convdata;
 };
 
+// class for converting a 2D numpy array to a valarray
+class NumpyIn2DValarray
+{
+ public:
+  NumpyIn2DValarray(PyObject* array);
+  ~NumpyIn2DValarray();
+
+  doublearray* data;
+  int dims[2];
+
+ private:
+  PyObject* _convitem;
+  double* _convdata;
+};
+
+
 #endif

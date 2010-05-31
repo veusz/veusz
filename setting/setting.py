@@ -844,9 +844,16 @@ class ChoiceOrMore(Setting):
     # maybe should be implemented as a dict to speed up checks
 
     def __init__(self, name, vallist, val, **args):
-        """Setting has val must be in vallist."""
+        """Setting has val must be in vallist.
+        descriptions is an optional addon to put a tooltip on each item
+        in the control
+        """
         
         self.vallist = vallist
+        self.descriptions = args.get('descriptions', None)
+        if self.descriptions:
+            del args['descriptions']
+
         Setting.__init__(self, name, val, **args)
 
     def copy(self):
@@ -863,7 +870,8 @@ class ChoiceOrMore(Setting):
         return text
 
     def makeControl(self, *args):
-        return controls.Choice(self, True, self.vallist, *args)
+        return controls.Choice(self, True, self.vallist, *args,
+                               descriptions=self.descriptions)
 
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
@@ -976,20 +984,6 @@ class WidgetPath(Str):
         return self._copyHelper((), (),
                                 {'relativetoparent': self.relativetoparent,
                                  'allowedwidgets': self.allowedwidgets})
-
-    def convertTo(self, val):
-        """Validate the text is a name of a widget relative to
-        this one."""
-
-        if not isinstance(val, basestring):
-            raise InvalidType
-
-        # InvalidType will get raised in getWidget if it is incorrect
-        w = self.getWidget(val)
-        if w is None:
-            return ''
-        else:
-            return val
 
     def getWidget(self, val = None):
         """Get the widget referred to. We double-check here to make sure

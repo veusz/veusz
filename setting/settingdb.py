@@ -32,6 +32,7 @@ defaultValues = {
     'export_color': True,
     'export_antialias': True,
     'export_quality': 85,
+    'export_background': '#ffffff00',
 
     # plot options
     'plot_updateinterval': 500,

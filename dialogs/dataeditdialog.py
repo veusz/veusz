@@ -30,6 +30,9 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
 
+# register dialog type to recreate dataset
+recreate_register = {}
+
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
 
@@ -68,7 +71,13 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             data = getattr(ds, ds.columns[index.column()])
 
             if data is not None:
-                return qt4.QVariant( data[index.row()] )
+                d = data[index.row()]
+                if isinstance(d, basestring):
+                    return qt4.QVariant(d)
+                else:
+                    # value needs converting to float as QVariant doesn't
+                    # support numpy numeric types
+                    return qt4.QVariant(float(d))
 
         # return nothing otherwise
         return qt4.QVariant()
@@ -167,7 +176,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             ds = self.document.data[self.dsname].data
             if ds is not None:
                 num = ds[ds.shape[0]-index.row()-1, index.column()]
-                return qt4.QVariant(num)
+                return qt4.QVariant( float(num) )
 
         return qt4.QVariant()
 
@@ -352,7 +361,8 @@ class DataEditDialog(qt4.QDialog):
         # linked dataset
         unlink = ds.canUnlink()
         readonly = not unlink
-        self.editbutton.setVisible( ds.recreatable_dataset )
+
+        self.editbutton.setVisible(type(ds) in recreate_register)
         self.unlinkbutton.setEnabled(unlink)
         self.linkedlabel.setText( ds.linkedInformation() )
 
@@ -398,7 +408,12 @@ class DataEditDialog(qt4.QDialog):
 
         datasetname = self.getSelectedDataset()
         if datasetname is not None:
-            self.document.applyOperation( document.OperationDatasetUnlink(datasetname) )
+            d = self.document.data[datasetname]
+            if d.linked is not None:
+                op = document.OperationDatasetUnlinkFile(datasetname)
+            else:
+                op = document.OperationDatasetUnlinkRelation(datasetname)
+            self.document.applyOperation(op)
 
     def slotDatasetDuplicate(self):
         """Duplicate selected dataset."""
@@ -427,7 +442,10 @@ class DataEditDialog(qt4.QDialog):
         """Reload dataset into dataset create dialog."""
         dsname = unicode(self.getSelectedDataset())
         if dsname:
-            dialog = self.parent().slotDataCreate()
+            dataset = self.document.data[dsname]
+            dialog = recreate_register[type(dataset)](self.parent(),
+                                                      self.document)
+            self.parent().showDialog(dialog)
             dialog.reEditDataset(dsname)
 
     def slotCopy(self):

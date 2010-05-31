@@ -43,7 +43,7 @@ class SafetyImportDialog(qt4.QMessageBox):
                      " %s\nbe loaded from Python module '%s'.\n\n"
                      "This could be unsafe if the document comes from "
                      "an untrusted source." % (
-                module, ', '.join(names)))
+                ', '.join(names), module))
         self.allow = self.addButton("Allow", qt4.QMessageBox.YesRole)
         self.allow.setToolTip("Allow use of symbol in module during session")
         self.allowalways = self.addButton("Allow always",

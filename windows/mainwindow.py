@@ -44,6 +44,7 @@ from veusz.dialogs.capturedialog import CaptureDialog
 from veusz.dialogs.stylesheet import StylesheetDialog
 from veusz.dialogs.custom import CustomDialog
 from veusz.dialogs.safetyimport import SafetyImportDialog
+from veusz.dialogs.histodata import HistoDataDialog
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -395,6 +396,9 @@ class MainWindow(qt4.QMainWindow):
             'data.capture':
                 a(self, 'Capture remote data', 'Ca&pture...',
                   self.slotDataCapture, icon='veusz-capture-data'),
+            'data.histogram':
+                a(self, 'Histogram data', '&Histogram...',
+                  self.slotDataHistogram, icon='button_bar'),
             'data.reload':
                 a(self, 'Reload linked datasets', '&Reload',
                   self.slotDataReload, icon='kde-view-refresh'),
@@ -465,7 +469,8 @@ class MainWindow(qt4.QMainWindow):
             ]
         datamenu = [
             'data.import', 'data.edit', 'data.create',
-            'data.create2d', 'data.capture', 'data.reload'
+            'data.create2d', 'data.capture', 'data.histogram',
+            'data.reload'
             ]
         helpmenu = [
             'help.home', 'help.project', 'help.bug',
@@ -523,6 +528,11 @@ class MainWindow(qt4.QMainWindow):
         for win, act, fn in self.viewwinfns:
             act.setChecked(not win.isHidden())
 
+    def showDialog(self, dialog):
+        """Show dialog given."""
+        self.dialogs.append(dialog)
+        dialog.show()
+
     def slotDataImport(self):
         """Display the import data dialog."""
         dialog = importdialog.ImportDialog(self, self.document)
@@ -554,6 +564,13 @@ class MainWindow(qt4.QMainWindow):
     def slotDataCapture(self):
         """Capture remote data."""
         dialog = CaptureDialog(self.document, self)
+        self.dialogs.append(dialog)
+        dialog.show()
+        return dialog
+
+    def slotDataHistogram(self):
+        """Histogram data."""
+        dialog = HistoDataDialog(self, self.document)
         self.dialogs.append(dialog)
         dialog.show()
         return dialog
@@ -728,7 +745,8 @@ class MainWindow(qt4.QMainWindow):
                 open(filename)
             except IOError, e:
                 qt4.QMessageBox("Unable to open file",
-                                "Unable to open file '%s'\n'%s'" % (filename, str(e)),
+                                "Unable to open file '%s'\n'%s'" %
+                                (filename, unicode(e)),
                                 qt4.QMessageBox.Critical,
                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
                                 qt4.QMessageBox.NoButton,
@@ -990,11 +1008,20 @@ class MainWindow(qt4.QMainWindow):
             filters.append(filterstr)
             validextns += extns
 
-        fd.setFilters(filters)
+        try:
+            # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
+            fd.setNameFilters(filters)
+        except AttributeError:
+            fd.setFilters(filters)
+
         # restore last format if possible
         try:
             filt = setting.settingdb['export_lastformat']
-            fd.selectFilter(filt)
+            try:
+                # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
+                fd.selectNameFilter(filt)
+            except AttributeError:
+                fd.selectFilter(filt)
             extn = formats[filters.index(filt)][0][0]
         except (KeyError, IndexError, ValueError):
             extn = 'eps'
@@ -1030,7 +1057,8 @@ class MainWindow(qt4.QMainWindow):
                                      dpi=setting.settingdb['export_DPI'],
                                      antialias=setting.settingdb['export_antialias'],
                                      color=setting.settingdb['export_color'],
-                                     quality=setting.settingdb['export_quality'])
+                                     quality=setting.settingdb['export_quality'],
+                                     backcolor=setting.settingdb['export_background'])
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox("Veusz",
                                 "Error exporting file:\n%s" % inst,

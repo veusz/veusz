@@ -20,8 +20,8 @@
 
 """Classes to represent datasets."""
 
-import itertools
 import re
+from itertools import izip
 
 import numpy as N
 
@@ -67,6 +67,15 @@ def _convertNumpyNegAbs(a):
     elif a.dtype != N.dtype('float64'):
         a = a.astype('float64')
     return -N.abs(a)
+
+def _copyOrNone(a):
+    """Return a copy if not None, or None."""
+    if a is None:
+        return None
+    elif isinstance(a, N.ndarray):
+        return N.array(a)
+    elif isinstance(a, list):
+        return list(a)
 
 def generateValidDatasetParts(*datasets):
     """Generator to return array of valid parts of datasets.
@@ -158,6 +167,30 @@ class LinkedFileBase(object):
                 ds.linked = self
         document.setModified(True)
         return read
+
+    def _reloadViaOperation(self, document, op):
+        """Reload links using a supplied operation, op."""
+        tempdoc = doc.Document()
+
+        try:
+            tempdoc.applyOperation(op)
+        except Exception, ex:
+            # if something breaks, record an error and return nothing
+            document.log(unicode(ex))
+            errors = {}
+            for i in self.datasets:
+                errors[i] = 1
+            return ([], errors)            
+            
+        # delete datasets which are linked and imported here
+        self._deleteLinkedDatasets(document)
+        # move datasets into document
+        read = self._moveReadDatasets(tempdoc, document)
+
+        # return zero errors
+        errors = dict( [(ds, 0) for ds in read] )
+
+        return (read, errors)
 
 class LinkedFile(LinkedFileBase):
     '''Instead of reading data from a string, data can be read from
@@ -263,36 +296,15 @@ class Linked2DFile(LinkedFileBase):
         fileobj.write('ImportFile2D(%s)\n' % ', '.join(args))
 
     def reloadLinks(self, document):
-        '''Reload datasets linked to this file.
-        '''
+        """Reload datasets linked to this file."""
 
-        # put data in a temporary document as above
-        tempdoc = doc.Document()
-        try:
-            op = operations.OperationDataImport2D(self.datasets,
-                                                  filename=self.filename,
-                                                  xrange=self.xrange,
-                                                  yrange=self.yrange,
-                                                  invertrows=self.invertrows,
-                                                  invertcols=self.invertcols,
-                                                  transpose=self.transpose,
-                                                  prefix=self.prefix,
-                                                  suffix=self.suffix,
-                                                  encoding=self.encoding)
-            tempdoc.applyOperation(op)
-        except simpleread.Read2DError:
-            errors = {}
-            for i in self.datasets:
-                errors[i] = 1
-            return ([], errors)
-
-        self._deleteLinkedDatasets(document)
-        read = self._moveReadDatasets(tempdoc, document)
-
-        # zero errors
-        errors = dict( [(ds, 0) for ds in read] )
-
-        return (read, errors)
+        op = operations.OperationDataImport2D(
+            self.datasets, filename=self.filename,
+            xrange=self.xrange, yrange=self.yrange,
+            transpose=self.transpose,
+            invertrows=self.invertrows, invertcols=self.invertcols,
+            prefix=self.prefix, suffix=self.suffix, encoding=self.encoding)
+        return self._reloadViaOperation(document, op)
 
 class LinkedFITSFile(LinkedFileBase):
     """Links a FITS file to the data."""
@@ -316,9 +328,9 @@ class LinkedFITSFile(LinkedFileBase):
 
         args = [self.dsname, self._getSaveFilename(relpath), self.hdu]
         args = [repr(i) for i in args]
-        for c, a in itertools.izip(self.columns,
-                                   ('datacol', 'symerrcol',
-                                    'poserrcol', 'negerrcol')):
+        for c, a in izip(self.columns,
+                         ('datacol', 'symerrcol',
+                          'poserrcol', 'negerrcol')):
             if c is not None:
                 args.append('%s=%s' % (a, repr(c)))
         args.append('linked=True')
@@ -328,15 +340,13 @@ class LinkedFITSFile(LinkedFileBase):
     def reloadLinks(self, document):
         '''Reload datasets linked to this file.'''
 
-        op = operations.OperationDataImportFITS(self.dsname, self.filename,
-                                                self.hdu,
-                                                datacol = self.columns[0],
-                                                symerrcol = self.columns[1],
-                                                poserrcol = self.columns[2],
-                                                negerrcol = self.columns[3],
-                                                linked=True)
+        op = operations.OperationDataImportFITS(
+            self.dsname, self.filename, self.hdu,
+            datacol = self.columns[0], symerrcol = self.columns[1],
+            poserrcol = self.columns[2], negerrcol = self.columns[3],
+            linked=True )
 
-        # don't use applyoperation interface as we don't want this to be undoable
+        # don't use applyoperation interface as we don't want to be undoable
         op.do(document)
         
         return ([self.dsname], {self.dsname: 0})
@@ -388,22 +398,52 @@ class LinkedCSVFile(LinkedFileBase):
         # again, this is messy as we have to make sure we don't
         # overwrite any non-linked data
 
-        tempdoc = doc.Document()
-        csv = readcsv.ReadCSV(self.filename, readrows=self.readrows,
-                              delimiter=self.delimiter,
-                              textdelimiter=self.textdelimiter,
-                              encoding=self.encoding,
-                              prefix=self.prefix, suffix=self.suffix)
-        csv.readData()
-        csv.setData(tempdoc, linkedfile=self)
+        op = operations.OperationDataImportCSV(
+            self.filename, readrows=self.readrows,
+            delimiter=self.delimiter,
+            textdelimiter=self.textdelimiter,
+            encoding=self.encoding,
+            prefix=self.prefix, suffix=self.suffix )
+        return self._reloadViaOperation(document, op)
 
-        self._deleteLinkedDatasets(document)
-        read = self._moveReadDatasets(tempdoc, document)
+class LinkedFilePlugin(LinkedFileBase):
+    """Represent a file linked using an import plugin."""
 
-        # zero errors
-        errors = dict( [(ds, 0) for ds in read] )
+    def __init__(self, plugin, filename, pluginparams, encoding='utf_8',
+                 prefix='', suffix=''):
+        """Setup the link with the plugin-read file."""
+        self.plugin = plugin
+        self.filename = filename
+        self.encoding = encoding
+        self.prefix = prefix
+        self.suffix = suffix
+        self.pluginparams = pluginparams
 
-        return (read, errors)
+    def saveToFile(self, fileobj, relpath=None):
+        """Save the link to the vsz document file."""
+
+        params = [repr(self.plugin),
+                  repr(self._getSaveFilename(relpath)),
+                  'linked=True']
+        if self.encoding != 'utf_8':
+            params.append('encoding=' + repr(self.encoding))
+        if self.prefix:
+            params.append('prefix=' + repr(self.prefix))
+        if self.suffix:
+            params.append('suffix=' + repr(self.suffix))
+        for name, val in self.pluginparams.iteritems():
+            params.append('%s=%s' % (name, repr(val)))
+
+        fileobj.write('ImportFilePlugin(%s)\n' % (', '.join(params)))
+
+    def reloadLinks(self, document):
+        """Reload data from file."""
+
+        op = operations.OperationDataImportPlugin(
+            self.plugin, self.filename, 
+            encoding=self.encoding, prefix=self.prefix, suffix=self.suffix,
+            **self.pluginparams)
+        return self._reloadViaOperation(document, op)
         
 class DatasetException(Exception):
     """Raised with dataset errors."""
@@ -417,7 +457,6 @@ class DatasetBase(object):
     datatype = 'numeric'
     columns = ()
     column_descriptions = ()
-    recreatable_dataset = False  # can recreate in create dialog
 
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
@@ -437,10 +476,8 @@ class DatasetBase(object):
         """Get dataset name."""
         for name, ds in self.document.data.iteritems():
             if ds == self:
-                break
-        else:
-            raise ValueError('Could not find self in document.data')
-        return name
+                return name
+        raise ValueError('Could not find self in document.data')
 
     def description(self, showlinked=True):
         """Get description of database."""
@@ -466,7 +503,6 @@ class DatasetBase(object):
 
     def __len__(self):
         """Return length of dataset."""
-
         return len(self.data)
     
     def deleteRows(self, row, numrows):
@@ -492,6 +528,10 @@ class DatasetBase(object):
         else:
             name = 'None'
         return 'Linked file: %s' % name
+
+    def returnCopy(self):
+        """Return an unlinked copy of self."""
+        pass
 
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
@@ -554,6 +594,9 @@ class Dataset2D(DatasetBase):
         """Return a value cast to this dataset data type."""
         return float(val)
 
+    def returnCopy(self):
+        return Dataset2D( N.array(self.data), self.xrange, self.yrange)
+
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
 
@@ -599,16 +642,6 @@ class Dataset(DatasetBase):
         if self.linked and showlinked:
             text += ' linked to %s' % self.linked.filename
         return text
-
-    def duplicate(self):
-        """Return new dataset based on this one."""
-        attrs = {}
-        for attr in ('data', 'serr', 'nerr', 'perr'):
-            data = getattr(self, attr)
-            if data is not None:
-                attrs[attr] = data.copy()
-        
-        return Dataset(**attrs)
 
     def invalidDataPoints(self):
         """Return a numpy bool detailing which datapoints are invalid."""
@@ -704,7 +737,7 @@ class Dataset(DatasetBase):
         # write line line-by-line
         format = '%e ' * len(datasets)
         format = format[:-1] + '\n'
-        for line in itertools.izip( *datasets ):
+        for line in izip( *datasets ):
             fileobj.write( format % line )
 
         fileobj.write( "''')\n" )
@@ -738,6 +771,13 @@ class Dataset(DatasetBase):
             if coldata is not None:
                 setattr(self, col, N.insert(coldata, [row]*numrows, data))
 
+    def returnCopy(self):
+        """Return version of dataset with no linking."""
+        return Dataset(data = _copyOrNone(self.data),
+                       serr = _copyOrNone(self.serr),
+                       perr = _copyOrNone(self.perr),
+                       nerr = _copyOrNone(self.nerr))
+
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
@@ -757,9 +797,6 @@ class DatasetText(DatasetBase):
         if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
-
-    def duplicate(self):
-        return DatasetText(data=self.data) # data is copied by this constructor
 
     def changeValues(self, type, vals):
         if type == 'data':
@@ -807,63 +844,13 @@ class DatasetText(DatasetBase):
         for d in insdata[::-1]:
             self.data.insert(row, d)
 
+    def returnCopy(self):
+        """Returns version of dataset with no linking."""
+        return DatasetText(self.data)
+
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
     pass
-
-# This code requires Python 2.4
-# class _ExprDict(dict):
-#     """A subclass of a dict which help evaluate expressions on the fly.
-
-#     We do this because there's not an easy way to work out what order
-#     the expressions should be evaluated in if there is interdependence
-
-#     This is a subclass of dict so we can grab values from the document
-#     if they match dataset names
-
-#     part should be set to the part currently being evaluated
-#     """
-
-#     # allowed extensions to dataset names
-#     _validextn = {'data': True, 'serr': True, 'nerr': True, 'perr': True}
-
-#     def __init__(self, oldenvironment, document, part):
-#         """Evaluate expressions in environment of document.
-
-#         document is the document to look for data in
-#         oldenvironment is a globals environment or suchlike
-#         part is the part of the dataset to use by default (e.g. 'serr')
-#         """
-
-#         # copy environment from existing environment
-#         self.update(oldenvironment)
-#         self.document = document
-#         self.part = part
-
-#     def __getitem__(self, item):
-#         """Return the value corresponding to key item from the dict
-
-#         This works by checking for the dataset in the document first, and
-#         returning that if it exists
-#         """
-
-#         # make a copy as we might change it if it contains an extn
-#         i = item
-
-#         # look for a valid extension to the dataset name
-#         part = self.part
-#         p = item.split('_')
-#         if len(p) > 1:
-#             if p[-1] in _ExprDict._validextn:
-#                 part = p[-1]
-#             i = '_'.join(p[:-1])
-
-#         print "**", i, "**"
-#         if i in self.document.data:
-#             return getattr(self.document.data[i], part)
-#         else:
-#             # revert to old behaviour
-#             return dict.__getitem__(self, item)
 
 # split expression on python operators or quoted `DATASET`
 dataexpr_split_re = re.compile(r'(`.*?`|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
@@ -911,15 +898,37 @@ def _evaluateDataset(datasets, dsname, dspart):
     if dspart in dataexpr_columns:
         val = getattr(datasets[dsname], dspart)
         if val is None:
-            raise DatasetExpressionException("Dataset '%s' does not have part '%s'" % (dsname, dspart))
+            raise DatasetExpressionException(
+                "Dataset '%s' does not have part '%s'" % (dsname, dspart))
         return val
     else:
-        raise DatasetExpressionException('Internal error - invalid dataset part')
+        raise DatasetExpressionException(
+            'Internal error - invalid dataset part')
+
+def simpleEvalExpression(doc, expr):
+    """Evaluate expression and return data."""
+
+    expr = _substituteDatasets(doc.data, expr, 'data')
+
+    if ( not setting.transient_settings['unsafe_mode'] and
+         utils.checkCode(expr, securityonly=True) ):
+        self.document.log("Unsafe expression: %s\n" % expr)
+        return N.array([])
+
+    env = doc.eval_context.copy()
+    def evaluateDataset(dsname, dspart):
+        return _evaluateDataset(doc.data, dsname, dspart)
+
+    env['_DS_'] = evaluateDataset
+    try:
+        evalout = N.array(eval(expr, env), N.float64)
+    except Exception, ex:
+        doc.log(unicode(ex))
+        return N.array([])
+    return evalout
 
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
-
-    recreatable_dataset = True
 
     def __init__(self, data=None, serr=None, nerr=None, perr=None,
                  parametric=None):
@@ -942,8 +951,7 @@ class DatasetExpression(Dataset):
 
         self.cachedexpr = {}
 
-        self.docchangeset = { 'data': None, 'serr': None,
-                              'perr': None, 'nerr': None }
+        self.docchangeset = -1
         self.evaluated = {}
 
     def evaluateDataset(self, dsname, dspart):
@@ -956,9 +964,7 @@ class DatasetExpression(Dataset):
                     
     def _evaluatePart(self, expr, part):
         """Evaluate expression expr for part part."""
-        # replace dataset names with calls (ugly hack)
-        # but necessary for Python 2.3 as we can't replace
-        # dict in eval by subclass
+        # replace dataset names with calls
         expr = _substituteDatasets(self.document.data, expr, part)
 
         # check expression for nasties if it has changed
@@ -988,9 +994,8 @@ class DatasetExpression(Dataset):
 
         # actually evaluate the expression
         try:
-            e = self.evaluated[part] = N.array(
-                eval(expr, environment),
-                N.float64)
+            evalout = N.array(eval(expr, environment), N.float64)
+            self.evaluated[part] = evalout
         except Exception, ex:
             raise DatasetExpressionException(
                 "Error evaluating expession: %s\n"
@@ -998,34 +1003,55 @@ class DatasetExpression(Dataset):
 
         # make evaluated error expression have same shape as data
         if part != 'data':
-            data = getattr(self, 'data')
-            if data.shape != e.shape:
+            data = self.evaluated['data']
+            if data.shape != evalout.shape:
                 try:
                     # 1-dimensional - make it right size and trim
-                    oldsize = len(e)
-                    e = N.resize(e, data.shape)
-                    e[oldsize:] = N.nan
+                    oldsize = evalout.shape[0]
+                    evalout = N.resize(evalout, data.shape)
+                    evalout[oldsize:] = N.nan
                 except TypeError:
                     # 0-dimensional - just make it repeat
-                    e = N.resize(e, data.shape)
-                self.evaluated[part] = e
+                    evalout = N.resize(evalout, data.shape)
+                self.evaluated[part] = evalout
+
+    def updateEvaluation(self):
+        """Update evaluation of parts of dataset.
+        Throws DatasetExpressionException if error
+        """
+        if self.docchangeset != self.document.changeset:
+            # avoid infinite recursion!
+            self.docchangeset = self.document.changeset
+
+            # zero out previous values
+            for part in self.columns:
+                self.evaluated[part] = None
+
+            # update all parts
+            for part in self.columns:
+                expr = self.expr[part]
+                if expr is not None and expr.strip() != '':
+                    self._evaluatePart(expr, part)
 
     def _propValues(self, part):
         """Check whether expressions need reevaluating,
         and recalculate if necessary."""
+        try:
+            self.updateEvaluation()
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
 
-        # if document has been modified since the last invocation
-        if self.docchangeset[part] != self.document.changeset:
-            # avoid infinite recursion!
-            self.docchangeset[part] = self.document.changeset
-            expr = self.expr[part]
-            self.evaluated[part] = None
-
-            if expr is not None and expr != '':
-                self._evaluatePart(expr, part)
-
-        # return the evaluated form of the expression
+        # catch case where error in setting data, need to return "real" data
+        if self.evaluated['data'] is None:
+            self.evaluated['data'] = N.array([])
         return self.evaluated[part]
+
+    # expose evaluated data as properties
+    # this allows us to recalculate the expressions on the fly
+    data = property(lambda self: self._propValues('data'))
+    serr = property(lambda self: self._propValues('serr'))
+    perr = property(lambda self: self._propValues('perr'))
+    nerr = property(lambda self: self._propValues('nerr'))
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
@@ -1046,13 +1072,6 @@ class DatasetExpression(Dataset):
         s = 'SetDataExpression(%s)\n' % ', '.join(parts)
         fileobj.write(s)
         
-    # expose evaluated data as properties
-    # this allows us to recalculate the expressions on the fly
-    data = property(lambda self: self._propValues('data'))
-    serr = property(lambda self: self._propValues('serr'))
-    perr = property(lambda self: self._propValues('perr'))
-    nerr = property(lambda self: self._propValues('nerr'))
-
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
@@ -1085,8 +1104,8 @@ class DatasetExpression(Dataset):
             text.append('Linked parametric dataset')
         else:
             text.append('Linked expression dataset')
-        for label, part in itertools.izip(self.column_descriptions,
-                                          self.columns):
+        for label, part in izip(self.column_descriptions,
+                                self.columns):
             if self.expr[part]:
                 text.append('%s: %s' % (label, self.expr[part]))
 
@@ -1097,8 +1116,6 @@ class DatasetExpression(Dataset):
 
 class DatasetRange(Dataset):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
-
-    recreatable_dataset = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
         """Construct dataset.
@@ -1149,8 +1166,8 @@ class DatasetRange(Dataset):
     def linkedInformation(self):
         """Return information about linking."""
         text = ['Linked range dataset']
-        for label, part in itertools.izip(self.column_descriptions,
-                                          self.columns):
+        for label, part in izip(self.column_descriptions,
+                                self.columns):
             val = getattr(self, 'range_%s' % part)
             if val:
                 text.append('%s: %g:%g' % (label, val[0], val[1]))
@@ -1182,7 +1199,9 @@ def getSpacing(data):
                 # new delta - check is multiple of old delta
                 ratio = delta/mindelta
                 if N.fabs(int(ratio)-ratio) > 1e-3:
-                    raise DatasetExpressionException('Variable spacings not yet supported in constructing 2D datasets')
+                    raise DatasetExpressionException(
+                        'Variable spacings not yet supported '
+                        'in constructing 2D datasets')
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 
@@ -1203,10 +1222,6 @@ class Dataset2DXYZExpression(DatasetBase):
         self.lastchangeset = -1
         self.cacheddata = None
         
-#         for expr in exprx, expry, exprz:
-#             if utils.checkCode(expr, securityonly=True) is not None:
-#                 raise DatasetExpressionException("Unsafe expression '%s'" % expr)
-
         # copy parameters
         self.exprx = exprx
         self.expry = expry
@@ -1228,9 +1243,6 @@ class Dataset2DXYZExpression(DatasetBase):
         # return cached data if document unchanged
         if self.document.changeset == self.lastchangeset:
             return self.cacheddata
-
-        # update changeset
-        self.lastchangeset = self.document.changeset
 
         evaluated = {}
 
@@ -1254,8 +1266,9 @@ class Dataset2DXYZExpression(DatasetBase):
             try:
                 evaluated[name] = eval(expr, environment)
             except Exception, e:
-                raise DatasetExpressionException("Error evaluating expession: %s\n"
-                                                 "Error: %s" % (expr, str(e)) )
+                raise DatasetExpressionException(
+                    "Error evaluating expession: %s\n"
+                    "Error: %s" % (expr, str(e)) )
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
         miny, maxy, stepy, stepsy = getSpacing(evaluated['expry'])
@@ -1271,21 +1284,38 @@ class Dataset2DXYZExpression(DatasetBase):
 
         # this is ugly - is this really the way to do it?
         self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
+
+        # update changeset
+        self.lastchangeset = self.document.changeset
+
         return self.cacheddata
 
-    def getXrange(self):
+    @property
+    def yrange(self):
         """Get x range of data as a tuple (min, max)."""
-        self.evalDataset()
-        return self._xrange
+        return self.getDataRanges()[0]
     
-    def getYrange(self):
+    @property
+    def xrange(self):
         """Get y range of data as a tuple (min, max)."""
-        self.evalDataset()
-        return self._yrange
+        return self.getDataRanges()[1]
         
     def getDataRanges(self):
-        self.evalDataset()
-        return (self._xrange, self._yrange)
+        """Get both ranges of axis."""
+        try:
+            self.evalDataset()
+            return (self._xrange, self._yrange)
+        except DatasetExpressionException:
+            return ( (0., 1.), (0., 1.) )
+        
+    @property
+    def data(self):
+        """Get data, or none if error."""
+        try:
+            return self.evalDataset()
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return N.array( [[]] )
 
     def description(self, showlinked=True):
         # FIXME: dataeditdialog descriptions should be taken from here somewhere
@@ -1302,9 +1332,19 @@ class Dataset2DXYZExpression(DatasetBase):
             repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
         fileobj.write(s)
 
-    data = property(evalDataset)
-    xrange = property(getXrange)
-    yrange = property(getYrange)
+    def returnCopy(self):
+        """Return unlinked copy of self."""
+        return Dataset2D( N.array(self.data),
+                          xrange=self.xrange, yrange=self.yrange)
+
+    def canUnlink(self):
+        """Can relationship be unlinked?"""
+        return True
+
+    def linkedInformation(self):
+        """Return linking information."""
+        return 'Linked 2D function: x=%s, y=%s, z=%s' % (
+            self.exprx, self.expry, self.exprz)
 
 class Dataset2DXYFunc(DatasetBase):
     """Given a range of x and y, this is a dataset which is a function of
@@ -1338,9 +1378,22 @@ class Dataset2DXYFunc(DatasetBase):
         self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
                        self.ystep[1] + self.ystep[2]*0.5)
 
+        self.lastchangeset = -1
+
     @property
     def data(self):
-        """Make the 2d dataset."""
+        """Return data, or empty array if error."""
+        try:
+            return self.evalDataset()
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return N.array([[]])
+
+    def evalDataset(self):
+        """Evaluate the 2d dataset."""
+
+        if self.document.changeset == self.lastchangeset:
+            return self.cacheddata
 
         env = self.document.eval_context.copy()
 
@@ -1359,6 +1412,9 @@ class Dataset2DXYFunc(DatasetBase):
         except Exception, e:
             raise DatasetExpressionException("Error evaluating expession: %s\n"
                                              "Error: %s" % (self.expr, str(e)) )
+
+        self.cacheddata = data
+        self.lastchangeset = self.document.changeset
         return data
 
     def getDataRanges(self):
@@ -1370,3 +1426,17 @@ class Dataset2DXYFunc(DatasetBase):
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
         fileobj.write(s)
+
+    def returnCopy(self):
+        """Return unlinked copy of self."""
+        return Dataset2D( N.array(self.data),
+                          xrange=self.xrange, yrange=self.yrange)
+
+    def canUnlink(self):
+        """Can relationship be unlinked?"""
+        return True
+
+    def linkedInformation(self):
+        """Return linking information."""
+        return 'Linked 2D function: x=%g:%g:%g, y=%g:%g:%g, z=%s' % tuple(
+            list(self.xstep) + list(self.ystep) + [self.expr])

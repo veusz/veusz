@@ -1,4 +1,4 @@
-#    Copyright (C) 2003-2009 Jeremy S. Sanders
+#    Copyright (C) 2003 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import veusz.utils as utils
 import widget
 import axisticks
 import graph
-import containers
+import grid
 import controlgraph
 
 ###############################################################################
@@ -90,6 +90,16 @@ class GridLine(setting.Line):
         self.get('hide').newDefault( True )
         self.get('style').newDefault( 'dotted' )
 
+class MinorGridLine(setting.Line):
+    '''Minor tick grid line settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+
+        self.get('color').newDefault( 'lightgrey' )
+        self.get('hide').newDefault( True )
+        self.get('style').newDefault( 'dotted' )
+
 class AxisLabel(setting.Text):
     """For axis labels."""
 
@@ -102,23 +112,47 @@ class AxisLabel(setting.Text):
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )
+        self.add( setting.Distance( 'offset',
+                                    '0pt',
+                                    descr = 'Additional offset of axis label'
+                                    ' from axis tick labels',
+                                    usertext='Label offset') )
 
 class TickLabel(setting.Text):
     """For tick labels on axes."""
+
+    formatchoices = ('Auto', '%Vg', '%Ve', '%VE',
+                     '%g', '%e', '%.2f')
+    descriptions = ('Automatic',
+                    'General numerical format',
+                    'Scientific notation',
+                    'Engineering suffix notation',
+                    'C-style general format',
+                    'C-style scientific notation',
+                    '2 decimal places always shown')
 
     def __init__(self, name, **args):
         setting.Text.__init__(self, name, **args)
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )
-        self.add( setting.Str( 'format', 'Auto',
-                               descr = 'Format of the tick labels',
-                               usertext='Format') )
+        self.add( setting.ChoiceOrMore( 'format',
+                                        TickLabel.formatchoices,
+                                        'Auto',
+                                        descr = 'Format of the tick labels',
+                                        descriptions=TickLabel.descriptions,
+                                        usertext='Format') )
 
         self.add( setting.Float('scale', 1.,
                                 descr='A scale factor to apply to the values '
                                 'of the tick labels',
                                 usertext='Scale') )
+
+        self.add( setting.Distance( 'offset',
+                                    '0pt',
+                                    descr = 'Additional offset of axis tick '
+                                    'labels from axis',
+                                    usertext='Tick offset') )
 
 ###############################################################################
 
@@ -126,7 +160,7 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = [graph.Graph, containers.Grid]
+    allowedparenttypes = [graph.Graph, grid.Grid]
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
     isaxis = True
@@ -252,6 +286,10 @@ class Axis(widget.Widget):
                         descr = 'Grid line settings',
                         usertext = 'Grid lines'),
                pixmap='settings_axisgridlines' )
+        s.add( MinorGridLine('MinorGridLines',
+                             descr = 'Minor grid line settings',
+                             usertext = 'Grid lines for minor ticks'),
+               pixmap='settings_axisminorgridlines' )
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -285,7 +323,10 @@ class Axis(widget.Widget):
         if s.match != '':
             # locate widget we're matching
             # this is ensured to be an Axis
-            widget = s.get('match').getWidget()
+            try:
+                widget = s.get('match').getWidget()
+            except setting.InvalidType:
+                widget = None
 
             # this looks valid + sanity checks
             if (widget is not None and widget != self and
@@ -539,10 +580,9 @@ class Axis(widget.Widget):
 
         painter.drawLines(lines)
 
-    def _drawGridLines(self, painter, coordticks):
+    def _drawGridLines(self, subset, painter, coordticks):
         """Draw grid lines on the plot."""
-        
-        painter.setPen( self.settings.get('GridLines').makeQPen(painter) )
+        painter.setPen( self.settings.get(subset).makeQPen(painter) )
         self.swaplines(painter,
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
@@ -557,7 +597,7 @@ class Axis(widget.Widget):
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
 
-    def _drawMinorTicks(self, painter):
+    def _drawMinorTicks(self, painter, coordminorticks):
         """Draw minor ticks on plot."""
 
         s = self.settings
@@ -566,20 +606,18 @@ class Axis(widget.Widget):
         pen.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(pen)
         delta = mt.getLength(painter)
-        if len(self.minortickscalc):
-            minorticks = self._graphToPlotter(self.minortickscalc)
-        else:
-            minorticks = []
 
         if s.direction == 'vertical':
             delta *= -1
-        if self.coordReflected or s.outerticks:
+        if self.coordReflected:
+            delta *= -1
+        if s.outerticks:
             delta *= -1
         
-        y = minorticks*0.+self.coordPerp
+        y = coordminorticks*0.+self.coordPerp
         self.swaplines(painter,
-                       minorticks, y,
-                       minorticks, y-delta)
+                       coordminorticks, y,
+                       coordminorticks, y-delta)
 
     def _drawMajorTicks(self, painter, tickcoords):
         """Draw major ticks on the plot."""
@@ -594,7 +632,9 @@ class Axis(widget.Widget):
 
         if s.direction == 'vertical':
             delta *= -1
-        if self.coordReflected or s.outerticks:
+        if self.coordReflected:
+            delta *= -1
+        if s.outerticks:
             delta *= -1
 
         y = tickcoords*0.+self.coordPerp
@@ -628,7 +668,8 @@ class Axis(widget.Widget):
                     if N.isfinite(coord) and (minval <= coord <= maxval):
                         yield pcoord, lab
 
-    def _drawTickLabels(self, painter, coordticks, sign, texttorender):
+    def _drawTickLabels(self, painter, coordticks, sign, outerbounds,
+                        texttorender):
         """Draw tick labels on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -669,6 +710,9 @@ class Axis(widget.Widget):
         scale = tl.scale
         pen = tl.makeQPen()
 
+        # an extra offset if required
+        self._delta_axis += tl.get('offset').convert(painter)
+
         def generateTickLabels():
             """Return plotter position of labels and label text."""
             # get format for labels
@@ -702,7 +746,15 @@ class Axis(widget.Widget):
 
             r = utils.Renderer(painter, font, x, y, text, alignhorz=ax,
                                alignvert=ay, angle=angle)
-            r.ensureInBox(extraspace=True, **bounds)
+            if outerbounds is not None:
+                # make sure ticks are within plot
+                if vertical:
+                    r.ensureInBox(miny=outerbounds[1], maxy=outerbounds[3],
+                                  extraspace=True)
+                else:
+                    r.ensureInBox(minx=outerbounds[0], maxx=outerbounds[2],
+                                  extraspace=True)
+
             bnd = r.getBounds()
             texttorender.append( (r, pen) )
 
@@ -724,10 +776,14 @@ class Axis(widget.Widget):
 
         s = self.settings
         sl = s.Label
-        font = s.get('Label').makeQFont(painter)
+        label = s.get('Label')
+        font = label.makeQFont(painter)
         painter.setFont(font)
         al_spacing = ( painter.fontMetrics().leading() +
                        painter.fontMetrics().descent() )
+
+        # an extra offset if required
+        self._delta_axis += label.get('offset').convert(painter)
 
         text = s.label
         # avoid adding blank text to plot
@@ -788,7 +844,7 @@ class Axis(widget.Widget):
 
         texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
-    def _autoMirrorDraw(self, posn, painter, coordticks):
+    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
         """Mirror axis to opposite side of graph if there isn't
         an axis there already."""
 
@@ -820,7 +876,7 @@ class Axis(widget.Widget):
         if not s.Line.hide:
             self._drawAxisLine(painter)
         if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter)
+            self._drawMinorTicks(painter, coordminorticks)
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
 
@@ -836,7 +892,32 @@ class Axis(widget.Widget):
                 return name
         return widget.Widget.chooseName(self)
 
-    def draw(self, parentposn, painter, suppresstext=False, outerbounds=None):
+    def _suppressText(self, painter, parentposn, outerbounds):
+        """Whether to suppress drawing text on this axis because it
+        is too close to the edge of its parent bounding box.
+
+        If the edge of the plot is within textheight then suppress text
+        """
+        s = self.settings
+        height = qt4.QFontMetricsF( s.get('Label').makeQFont(painter),
+                                    painter.device()).height()
+        otherposition = s.otherPosition
+
+        if s.direction == 'vertical':
+            if ( ( otherposition < 0.01 and
+                   abs(parentposn[0]-outerbounds[0]) < height) or
+                 ( otherposition > 0.99 and
+                   abs(parentposn[2]-outerbounds[2]) < height) ):
+                return True
+        else:
+            if ( ( otherposition < 0.01 and
+                   abs(parentposn[3]-outerbounds[3]) < height) or
+                 ( otherposition > 0.99 and
+                   abs(parentposn[1]-outerbounds[1]) < height) ):
+                return True
+        return False
+
+    def draw(self, parentposn, painter, outerbounds=None):
         """Plot the axis on the painter.
 
         if suppresstext is True, then we don't number or label the axis
@@ -862,6 +943,7 @@ class Axis(widget.Widget):
 
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
+        coordminorticks = self._graphToPlotter(self.minortickscalc)
 
         # exit if axis is hidden
         if s.hide:
@@ -881,8 +963,10 @@ class Axis(widget.Widget):
             sign *= -1
 
         # plot gridlines
+        if not s.MinorGridLines.hide:
+            self._drawGridLines('MinorGridLines', painter, coordminorticks)
         if not s.GridLines.hide:
-            self._drawGridLines(painter, coordticks)
+            self._drawGridLines('GridLines', painter, coordticks)
 
         # plot the line along the axis
         if not s.Line.hide:
@@ -890,7 +974,7 @@ class Axis(widget.Widget):
 
         # plot minor ticks
         if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter)
+            self._drawMinorTicks(painter, coordminorticks)
 
         # keep track of distance from axis
         self._delta_axis = 0
@@ -899,9 +983,19 @@ class Axis(widget.Widget):
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
 
+        # debugging
+        #painter.save()
+        #painter.setPen(qt4.QPen(qt4.Qt.blue))
+        #painter.drawRect(
+        #    qt4.QRectF(qt4.QPointF(outerbounds[0], outerbounds[1]),
+        #               qt4.QPointF(outerbounds[2], outerbounds[3])) )
+        #painter.restore()
+
         # plot tick labels
+        suppresstext = self._suppressText(painter, parentposn, outerbounds)
         if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(painter, coordticks, sign, texttorender)
+            self._drawTickLabels(painter, coordticks, sign, outerbounds,
+                                 texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
@@ -909,7 +1003,7 @@ class Axis(widget.Widget):
 
         # mirror axis at other side of plot
         if s.autoMirror:
-            self._autoMirrorDraw(posn, painter, coordticks)
+            self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
         # all the text is drawn at the end so that
         # we can check it doesn't overlap

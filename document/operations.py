@@ -35,10 +35,10 @@ import numpy as N
 import datasets
 import widgetfactory
 import simpleread
-import commandinterpreter
 import readcsv
 
 import veusz.utils as utils
+import veusz.plugins as plugins
     
 ###############################################################################
 # Setting operations
@@ -426,16 +426,38 @@ class OperationDatasetDuplicate(object):
         
     def do(self, document):
         """Make the duplicate"""
-        document.duplicateDataset(self.origname, self.duplname)
+        self.olddata = document.data.get(self.duplname, None)
+
+        dataset = document.data[self.origname]
+        duplicate = dataset.returnCopy()
+        document.setData(self.duplname, duplicate)
         
     def undo(self, document):
         """Delete the duplicate"""
         
-        del document.data[self.duplname]
+        if self.olddata is None:
+            del document.data[self.duplname]
+        else:
+            document.data[self.duplname] = self.olddata
         
-class OperationDatasetUnlink(object):
-    """Remove association between dataset and file, or dataset and
-    another dataset.
+class OperationDatasetUnlinkFile(object):
+    """Remove association between dataset and file."""
+    descr = 'unlink dataset'
+    
+    def __init__(self, datasetname):
+        self.datasetname = datasetname
+        
+    def do(self, document):
+        dataset = document.data[self.datasetname]
+        self.oldfilelink = dataset.linked
+        dataset.linked = None
+        
+    def undo(self, document):
+        dataset = document.data[self.datasetname]
+        dataset.linked = self.oldfilelink
+
+class OperationDatasetUnlinkRelation(object):
+    """Remove association between dataset and another dataset.
     """
     
     descr = 'unlink dataset'
@@ -445,29 +467,12 @@ class OperationDatasetUnlink(object):
         
     def do(self, document):
         dataset = document.data[self.datasetname]
-        
-        if ( isinstance(dataset, datasets.DatasetExpression) or
-             isinstance(dataset, datasets.DatasetRange) ):
-            # if it's an expression, unlink from other dataset
-            self.mode = 'expr'
-            self.olddataset = dataset
-            ds = datasets.Dataset(data=dataset.data, serr=dataset.serr,
-                                  perr=dataset.perr, nerr=dataset.nerr)
-            document.setData(self.datasetname, ds)
-        else:
-            # unlink from file
-            self.mode = 'file'
-            self.oldfilelink = dataset.linked
-            dataset.linked = None
+        self.olddataset = dataset
+        ds = dataset.returnCopy()
+        document.setData(self.datasetname, ds)
         
     def undo(self, document):
-        if self.mode == 'file':
-            dataset = document.data[self.datasetname]
-            dataset.linked = self.oldfilelink
-        elif self.mode == 'expr':
-            document.setData(self.datasetname, self.olddataset)
-        else:
-            assert False
+        document.setData(self.datasetname, self.olddataset)
         
 class OperationDatasetCreate(object):
     """Create dataset base class."""
@@ -588,19 +593,17 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         A CreateDatasetException is raised if not
         """
 
+        p = self.parts.copy()
+        p['parametric'] = self.parametric
+        ds = datasets.DatasetExpression(**p)
+        ds.document = document
         try:
-            p = self.parts.copy()
-            p['parametric'] = self.parametric
-            ds = datasets.DatasetExpression(**p)
-            ds.document = document
-            
             # we force an evaluation of the dataset for the first time, to
             # check for errors in the expressions
-            for i in self.parts.iterkeys():
-                getattr(ds, i)
+            ds.updateEvaluation()
             
         except datasets.DatasetExpressionException, e:
-            raise CreateDatasetException(str(e))
+            raise CreateDatasetException(unicode(e))
         
     def do(self, document):
         """Create the dataset."""
@@ -635,7 +638,7 @@ class OperationDataset2DCreateExpressionXYZ(object):
             ds = datasets.Dataset2DXYZExpression(self.xexpr, self.yexpr,
                                                  self.zexpr)
             ds.document = document
-            temp = ds.data
+            ds.evalDataset()
             
         except datasets.DatasetExpressionException, e:
             raise CreateDatasetException(str(e))
@@ -676,6 +679,16 @@ class OperationDataset2DXYFunc(object):
         self.ystep = ystep
         self.expr = expr
         self.link = link
+
+    def validateExpression(self, document):
+        """Check dataset is okay."""
+        try:
+            ds = datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
+            ds.document = document
+            ds.evalDataset()
+            
+        except datasets.DatasetExpressionException, e:
+            raise CreateDatasetException(str(e))
         
     def do(self, document):
         # keep backup
@@ -1063,7 +1076,85 @@ class OperationDataImportFITS(object):
             
         if self.olddataset is not None:
             document.setData(self.dsname, self.olddataset)
-        
+
+class OperationDataImportPlugin(object):
+    """Import data using a plugin."""
+
+    def __init__(self, pluginname, filename, **params):
+        """Setup operation loading data from plugin.
+
+        optional arguments:
+        prefix: add to start of dataset name (default '')
+        suffix: add to end of dataset name (default '')
+        linked: link import to file (default False)
+        encoding: file encoding (may not be used, default 'utf_8')
+        plus arguments to plugin
+        """
+
+        self.pluginname = pluginname
+        self.filename = filename
+        self.encoding = params.get('encoding', 'utf_8')
+        self.prefix = params.get('prefix', '')
+        self.suffix = params.get('suffix', '')
+        self.linked = params.get('linked', False)
+        self.params = dict(params)
+
+        # remove excess parameters
+        for k in ('encoding', 'prefix', 'suffix', 'linked'):
+            try:
+                del self.params[k]
+            except KeyError:
+                pass
+
+    def do(self, document):
+        """Do import."""
+
+        names = [p.name for p in plugins.importpluginregistry]
+        plugin = plugins.importpluginregistry[names.index(self.pluginname)]
+        plugparams = plugins.ImportPluginParams(self.filename, self.encoding,
+                                                self.params)
+
+        results = plugin.doImport(plugparams)
+
+        # save for undoing
+        self.olddata = {}
+
+        # convert results to real datasets
+        for d in results:
+            if isinstance(d, plugins.ImportDataset1D):
+                ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
+                                      nerr=d.nerr)
+            elif isinstance(d, plugins.ImportDataset2D):
+                ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
+                                        yrange=d.rangey)
+            else:
+                raise RuntimeError("Invalid data set in plugin results")
+
+            if self.linked:
+                ds.linked = datasets.LinkedFilePlugin(
+                    self.pluginname, self.filename, self.params,
+                    encoding=self.encoding, prefix=self.prefix,
+                    suffix=self.suffix)
+
+            # save old dataset for undo
+            d.name = self.prefix + d.name + self.suffix
+            if d.name in document.data:
+                self.olddata[d.name] = document.data[d.name]
+
+            # actually make dataset
+            document.setData(d.name, ds)
+
+        self.datasetnames = [d.name for d in results]
+        return self.datasetnames
+
+    def undo(self, document):
+        """Undo import."""
+
+        for name in self.datasetnames:
+            del document.data[name]
+        for name, dataset in self.olddata.iteritems():
+            document.setData(name, dataset)
+
 class OperationDataCaptureSet(object):
     """An operation for setting the results from a SimpleRead into the
     docunment's data from a data capture.
@@ -1269,6 +1360,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         
     def do(self, document):
         """Do the import."""
+
+        import commandinterpreter
 
         # get document to keep track of changes for undo/redo
         document.batchHistory(self)

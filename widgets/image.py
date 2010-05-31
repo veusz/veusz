@@ -161,6 +161,11 @@ class Image(plotters.GenericPlotter):
                             formatting=True),
                7 )
 
+        s.add( setting.Bool( 'smooth', False,
+                             descr = 'Smooth image to display resolution',
+                             usertext = 'Smooth',
+                             formatting = True ) )
+
     def _getUserDescription(self):
         """User friendly description."""
         s = self.settings
@@ -526,12 +531,17 @@ class Image(plotters.GenericPlotter):
         painter.save()
         self.clipAxesBounds(painter, axes, posn)
 
+        # optionally smooth images before displaying
+        if s.smooth:
+            image = image.scaled( coordsx[1]-coordsx[0], coordsy[0]-coordsy[1],
+                                  qt4.Qt.IgnoreAspectRatio,
+                                  qt4.Qt.SmoothTransformation )
+
         # now draw pixmap
         painter.drawImage( qt4.QRectF(coordsx[0], coordsy[1],
                                       coordsx[1]-coordsx[0],
                                       coordsy[0]-coordsy[1]),
                            image )
-
         painter.restore()
         painter.endPaintingWidget()
 

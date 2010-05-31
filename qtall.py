@@ -18,7 +18,13 @@
 
 # $Id$
 
-"""A convenience module to import both the QtCore and QtGui symbols from."""
+"""A convenience module to import both the used Qt symbols from."""
+
+import sys
+import os
+# disable KDE specific dialog boxes as they are currently broken
+if sys.platform != 'win32' and sys.platform != 'darwin':
+    os.environ['QT_PLATFORM_PLUGIN'] = 'none'
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

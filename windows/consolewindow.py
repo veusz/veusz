@@ -173,8 +173,11 @@ class ConsoleWindow(qt4.QDockWidget):
         self.command_build = ''
 
         # get called if enter is pressed in the input control
-        qt4.QObject.connect( self._inputedit, qt4.SIGNAL("sigEnter"),
-                             self.slotEnter )
+        self.connect( self._inputedit, qt4.SIGNAL("sigEnter"),
+                      self.slotEnter )
+        # called if document logs something
+        self.connect( thedocument, qt4.SIGNAL("sigLog"),
+                      self.slotDocumentLog )
 
     def runFunction(self, func):
         """Execute the function within the console window, trapping
@@ -280,3 +283,6 @@ class ConsoleWindow(qt4.QDockWidget):
             # modify the prompt
             self._prompt.setText( '>>>' )
 
+    def slotDocumentLog(self, text):
+        """Output information if the document logs something."""
+        self.output_stderr(text + '\n')

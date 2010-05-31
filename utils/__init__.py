@@ -20,15 +20,16 @@
 
 # $Id$
 
+from version import version
+from textrender import Renderer
+from safe_eval import checkCode
+from fitlm import fitLM
+
 from utilfuncs import *
-from textrender import *
 from points import *
-from version import *
-from fitlm import *
 from action import *
 from pdf import *
 from dates import *
-from safe_eval import checkCode
 
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, plotLinesToPainter

@@ -172,6 +172,15 @@ polygons = {
                      (0.566, -0.849), (0, -0.283), (-0.566, -0.849),
                      (-0.849, -0.566), (-0.283, 0), (-0.849, 0.566) ),
 
+    'limitupperaway2': ( (-1, 0), (0, 0), (0, -1), (-1, -1), (0, -2),
+                         (1, -1), (0, -1), (0, 0), (1, 0) ),
+    'limitloweraway2': ( (-1, 0), (0, 0), (0, 1), (-1, 1), (0, 2),
+                         (1, 1), (0, 1), (0, 0), (1, 0) ),
+    'limitleftaway2':  ( (0, -1), (0, 0) , (-1, 0), (-1, -1), (-2, 0),
+                         (-1, 1), (-1, 0), (0, 0), (0, 1) ),
+    'limitrightaway2': ( (0, -1), (0, 0), (1, 0), (1, -1), (2, 0),
+                         (1, 1), (1, 0), (0, 0), (0, 1) ),
+
     # special arrow symbols
     '_arrow': ( (0, 0), (-1.8, 1), (-1.4, 0), (-1.8, -1) ),
     '_arrowtriangle': ( (0, 0), (-1.8, 1), (-1.8, -1) ),
@@ -369,6 +378,8 @@ MarkerCodes = (
     'limitupper', 'limitlower', 'limitleft', 'limitright',
     'limitupperaway', 'limitloweraway',
     'limitleftaway', 'limitrightaway',
+    'limitupperaway2', 'limitloweraway2',
+    'limitleftaway2', 'limitrightaway2',
     )
 
 def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
@@ -386,6 +397,11 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
         return
     
     painter.save()
+
+    # get sharper angles and more exact positions using these settings
+    pen = painter.pen()
+    pen.setJoinStyle( qt4.Qt.MiterJoin )
+    painter.setPen(pen)
 
     # get path to draw and whether to fill
     path, fill = getPainterPath(painter, markername, markersize)

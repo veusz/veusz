@@ -75,13 +75,40 @@ NumpyInValarray::NumpyInValarray(PyObject* array)
   if( PyArray_AsCArray(&_convitem, &_convdata, &dims, 1,
 		       PyArray_DescrFromType(NPY_DOUBLE)) )
     {
-      throw "Cannot convert items to floating point data";
+      throw "Cannot convert to floating point data";
     }
 
   data = new doublearray(_convdata, dims);
 }
 
 NumpyInValarray::~NumpyInValarray()
+{
+  delete data;
+  
+  if( _convdata )
+    {
+      PyArray_Free(_convitem, _convdata);
+    }
+}
+
+NumpyIn2DValarray::NumpyIn2DValarray(PyObject* array)
+  : data(0), _convdata(0)
+{
+  _convitem = array;
+
+  npy_intp tdims[2];
+  if( PyArray_AsCArray(&_convitem, &_convdata, tdims, 2,
+		       PyArray_DescrFromType(NPY_DOUBLE)) )
+    {
+      throw "Cannot convert to floating point data";
+    }
+
+  data = new doublearray(_convdata, tdims[0]*tdims[1]);
+  dims[0] = tdims[0];
+  dims[1] = tdims[1];
+}
+
+NumpyIn2DValarray::~NumpyIn2DValarray()
 {
   delete data;
   

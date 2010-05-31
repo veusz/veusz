@@ -52,6 +52,8 @@ class DataCreate2DDialog(qt4.QDialog):
                    self)
         self.document = document
 
+        self.createbutton = self.buttonBox.addButton(
+            "C&reate", qt4.QDialogButtonBox.ApplyRole )
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
                       self.createButtonClickedSlot )
 
@@ -175,7 +177,14 @@ class DataCreate2DDialog(qt4.QDialog):
                 link)
 
         elif self.mode == '2dexpr':
-            pass
+            qt4.QMessageBox("Veusz",
+                            'Not implemented',
+                            qt4.QMessageBox.Warning,
+                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
+                            qt4.QMessageBox.NoButton,
+                            qt4.QMessageBox.NoButton,
+                            self).exec_()
+            return
 
         elif self.mode == 'xyfunc':
             xstep = checkGetStep(text['xexpr'])
@@ -189,6 +198,9 @@ class DataCreate2DDialog(qt4.QDialog):
 
         # apply operation, catching evaluation errors
         try:
+            # check expression is okay
+            op.validateExpression(self.document)
+
             # try to make dataset
             self.document.applyOperation(op)
             # forces an evaluation

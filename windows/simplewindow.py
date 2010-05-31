@@ -72,3 +72,11 @@ class SimpleWindow(qt4.QMainWindow):
             self.plot.slotViewZoomHeight()
         else:
             self.plot.setZoomFactor(zoom)
+
+    def setAntiAliasing(self, ison):
+        """AntiAliasing(ison)
+
+        Switches on or off anti aliasing in the plot."""
+
+        self.plot.antialias = ison
+        self.plot.actionForceUpdate()

@@ -49,6 +49,11 @@ import svg_export
 
 # python identifier
 identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+# for splitting
+identifier_split_re = re.compile(r'[A-Za-z_][A-Za-z0-9_]*')
+
+# python module
+module_re = re.compile(r'^[A-Za-z_\.]+$')
 
 # function(arg1, arg2...) for custom functions
 # not quite correct as doesn't check for commas in correct places
@@ -114,6 +119,10 @@ class Document( qt4.QObject ):
         self.suspendupdates = False
         if self.suspendchangeset != self.changeset:
             self.setModified()
+
+    def log(self, message):
+        """Log a message - this is emitted as a signal."""
+        self.emit( qt4.SIGNAL("sigLog"), message )
 
     def applyOperation(self, operation):
         """Apply operation to the document.
@@ -280,17 +289,6 @@ class Document( qt4.QObject ):
 
         self.setModified()
 
-    def duplicateDataset(self, name, newname):
-        """Duplicate the dataset to the newname."""
-
-        if newname in self.data:
-            raise ValueError, "Dataset %s already exists" % newname
-
-        duplicate = self.data[name].duplicate()
-        duplicate.document = self
-        self.data[newname] = duplicate
-        self.setModified()
-
     def getData(self, name):
         """Get data with name"""
         return self.data[name]
@@ -419,7 +417,7 @@ class Document( qt4.QObject ):
         fileobj.write( stylesheet.saveText(True, rootname='') )
 
     def _exportBitmap(self, filename, pagenumber, dpi=100, antialias=True,
-                      quality=85):
+                      quality=85, backcolor='#ffffff00'):
         """Export the pagenumber to the requested bitmap filename."""
 
         # firstly have to convert dpi to image size
@@ -441,12 +439,11 @@ class Document( qt4.QObject ):
 
         # create real output image
         pixmap = qt4.QPixmap(int(width*scaling), int(height*scaling))
-        if format == 'png':
-            # allows transparent
-            pixmap.fill( qt4.Qt.transparent )
-        else:
-            # fill white
-            pixmap.fill()        
+        backqcolor = utils.extendedColorToQColor(backcolor)
+        if format != 'png':
+            # not transparent
+            backqcolor.setAlpha(255)
+        pixmap.fill(backqcolor)
 
         # paint to the image
         painter = Painter(pixmap)
@@ -478,11 +475,7 @@ class Document( qt4.QObject ):
         if ext == '.pdf':
             f = qt4.QPrinter.PdfFormat
         else:
-            try:
-                f = qt4.QPrinter.PostScriptFormat
-            except AttributeError:
-                # < qt4.2 bah
-                f = qt4.QPrinter.NativeFormat
+            f = qt4.QPrinter.PostScriptFormat
         printer.setOutputFormat(f)
         printer.setOutputFileName(filename)
         printer.setCreator('Veusz %s' % utils.version())
@@ -595,7 +588,7 @@ class Document( qt4.QObject ):
         paintdev.paintEngine().saveFile(filename)
 
     def export(self, filename, pagenumber, color=True, dpi=100,
-               antialias=True, quality=85):
+               antialias=True, quality=85, backcolor='#ffffff00'):
         """Export the figure to the filename."""
 
         ext = os.path.splitext(filename)[1]
@@ -605,7 +598,8 @@ class Document( qt4.QObject ):
 
         elif ext in ('.png', '.jpg', '.jpeg', '.bmp'):
             self._exportBitmap(filename, pagenumber, dpi=dpi,
-                               antialias=antialias, quality=quality)
+                               antialias=antialias, quality=quality,
+                               backcolor=backcolor)
 
         elif ext == '.svg':
             self._exportSVG(filename, pagenumber)
@@ -677,6 +671,10 @@ class Document( qt4.QObject ):
     def _processSafeImports(self, module, symbols):
         """Check what symbols are safe to import."""
 
+        # empty list
+        if not symbols:
+            return symbols
+
         # do import anyway
         if setting.transient_settings['unsafe_mode']:
             return symbols
@@ -723,6 +721,60 @@ class Document( qt4.QObject ):
 
         return toimport
 
+    def _updateEvalContextImport(self, module, val):
+        """Add an import statement to the eval function context."""
+        if module_re.match(module):
+            # work out what is safe to import
+            symbols = identifier_split_re.findall(val)
+            toimport = self._processSafeImports(module, symbols)
+            if toimport:
+                defn = 'from %s import %s' % (module,
+                                              ', '.join(toimport))
+                try:
+                    exec defn in self.eval_context
+                except Exception:
+                    self.log("Failed to import '%s' from "
+                             "module '%s'" % (', '.join(toimport),
+                                              module))
+                    return
+
+            delta = set(symbols)-set(toimport)
+            if delta:
+                self.log("Did not import '%s' from module '%s'" %
+                         (', '.join(list(delta)), module))
+
+        else:
+            self.log( "Invalid module name '%s'" % module )
+
+    def _updateEvalContextFuncOrConst(self, ctype, name, val):
+        """Update a function or constant in eval function context."""
+
+        if ctype == 'constant':
+            if not identifier_re.match(name):
+                self.log( "Invalid constant name '%s'" % name )
+                return
+            defn = val
+        elif ctype == 'function':
+            m = function_re.match(name)
+            if not m:
+                self.log( "Invalid function specification '%s'" % name )
+                return
+            name = funcname = m.group(1)
+            args = m.group(2)
+            defn = 'lambda %s: %s' % (args, val)
+
+        # evaluate, but we ignore any unsafe commands or exceptions
+        checked = utils.checkCode(defn)
+        if checked is not None:
+            self.log( "Expression '%s' failed safe code test" %
+                      defn )
+            return
+        try:
+            self.eval_context[name] = eval(defn, self.eval_context)
+        except Exception, e:
+            self.log( "Error evaluating '%s': '%s'" %
+                      (name, unicode(e)) )
+
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
@@ -747,42 +799,10 @@ class Document( qt4.QObject ):
         for ctype, name, val in self.customs:
             name = name.strip()
             val = val.strip()
-
-            if ctype in ('constant', 'function'):
-                if ctype == 'constant':
-                    if not identifier_re.match(name):
-                        continue
-                    defn = val
-                elif ctype == 'function':
-                    m = function_re.match(name)
-                    if not m:
-                        continue
-                    name = funcname = m.group(1)
-                    args = m.group(2)
-                    defn = 'lambda %s: %s' % (args, val)
-
-                # evaluate, but we ignore any unsafe commands or exceptions
-                checked = utils.checkCode(defn)
-                if checked is not None:
-                    continue
-                try:
-                    c[name] = eval(defn, c)
-                except:
-                    pass
-
+            if ctype == 'constant' or ctype == 'function':
+                self._updateEvalContextFuncOrConst(ctype, name, val)
             elif ctype == 'import':
-                module = name
-                symbols = identifier_re.findall(val)
-                if identifier_re.match(module) and symbols:
-                    # work out what is safe to import
-                    symbols = self._processSafeImports(module, symbols)
-                    if symbols:
-                        defn = 'from %s import %s' % (module,
-                                                      ', '.join(symbols))
-                        try:
-                            exec defn in c
-                        except:
-                            pass
+                self._updateEvalContextImport(name, val)
             else:
                 raise ValueError, 'Invalid custom type'
 
@@ -805,3 +825,7 @@ class Painter(qt4.QPainter):
         """Widget is now finished."""
         pass
     
+# load plugins
+plugins = setting.settingdb.get('plugins', [])
+for plugin in plugins:
+    execfile(plugin)

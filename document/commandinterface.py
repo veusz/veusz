@@ -33,6 +33,7 @@ import veusz.setting as setting
 
 import datasets
 import operations
+import dataset_histo
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
@@ -43,6 +44,7 @@ class CommandInterface(qt4.QObject):
         'Add',
         'AddCustom',
         'AddImportPath',
+        'CreateHistogram',
         'Get',
         'GetChildren',
         'GetData',
@@ -51,6 +53,7 @@ class CommandInterface(qt4.QObject):
         'ImportFile',
         'ImportFile2D',
         'ImportFileCSV',
+        'ImportFilePlugin',
         'ImportString',
         'ImportString2D',
         'List',
@@ -139,11 +142,38 @@ class CommandInterface(qt4.QObject):
         assert isinstance(directory, basestring)
         self.importpath.append(directory)
 
+    def CreateHistogram(self, inexpr, outbinsds, outvalsds, binparams=None,
+                        binmanual=None, method='counts',
+                        cumulative = 'none', errors=False):
+        """Histogram an input expression.
+
+        inexpr is input expression
+        outbinds is the name of the dataset to create giving bin positions
+        outvalsds is name of dataset for bin values
+        binparams is None or (numbins, minval, maxval, islogbins)
+        binmanual is None or a list of bin values
+        method is 'counts', 'density', or 'fractions'
+        cumulative is to calculate cumulative distributions which is
+          'none', 'smalltolarge' or 'largetosmall'
+        errors is to calculate Poisson error bars
+        """
+        op = dataset_histo.OperationDatasetHistogram(
+            inexpr, outbinsds, outvalsds, binparams=binparams,
+            binmanual=binmanual, method=method,
+            cumulative=cumulative, errors=errors)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print ('Constructed histogram of "%s", creating datasets'
+                   ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds)
+
     def Remove(self, name):
         """Remove a graph from the dataset."""
         w = self.document.resolve(self.currentwidget, name)
         op = operations.OperationWidgetDelete(w)
         self.document.applyOperation(op)
+        if self.verbose:
+            print "Removed widget '%s'" % name
 
     def To(self, where):
         """Change to a graph within the current graph."""
@@ -571,6 +601,25 @@ class CommandInterface(qt4.QObject):
             linked=linked)
         self.document.applyOperation(op)
 
+    def ImportFilePlugin(self, plugin, filename, **args):
+        """Import file using a plugin.
+
+        optional arguments:
+        prefix: add to start of dataset name (default '')
+        suffix: add to end of dataset name (default '')
+        linked: link import to file (default False)
+        encoding: file encoding (may not be used, default 'utf_8')
+        plus arguments to plugin
+        """
+
+        realfilename = self.findFileOnImportPath(filename)
+        op = operations.OperationDataImportPlugin(plugin, realfilename,
+                                                  **args)
+        try:
+            self.document.applyOperation(op)
+        except Exception, ex:
+            self.document.log("Error in plugin %s: %s" % (plugin, unicode(ex)))
+
     def ReloadData(self):
         """Reload any linked datasets.
 
@@ -599,10 +648,22 @@ class CommandInterface(qt4.QObject):
             self.document.printTo( p,
                                    range(self.document.getNumberPages()) )
             
-    def Export(self, filename, color=True, page=0):
-        """Export plot to filename."""
+    def Export(self, filename, color=True, page=0, dpi=100,
+               antialias=True, quality=85, backcolor='#ffffff00'):
+        """Export plot to filename.
+
+        color is True or False if color is requested in output file
+        page is the pagenumber to export
+        dpi is the number of dots per inch for bitmap output files
+        antialias antialiases output if True
+        quality is a quality parameter for jpeg output
+        backcolor is the background color for bitmap files, which is a name or
+         a #RRGGBBAA value (red, green, blue, alpha)
+        """
         
-        self.document.export(filename, page, color=color)
+        self.document.export(filename, page, color=color,
+                             dpi=dpi, antialias=antialias,
+                             quality=quality, backcolor=backcolor)
             
     def Rename(self, widget, newname):
         """Rename the widget with the path given to the new name.

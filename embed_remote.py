@@ -29,9 +29,15 @@ import veusz.document as document
 
 """Program to be run by embedding interface to run Veusz commands."""
 
+# embed.py module checks this is the same as its version number
+API_VERSION = 1
+
 class EmbeddedClient(object):
+    """An object for each instance of embedded window with document."""
 
     def __init__(self, title, doc=None):
+        """Construct window with title given."""
+
         self.window = SimpleWindow(title, doc=doc)
         self.window.show()
         self.document = self.window.document
@@ -44,6 +50,9 @@ class EmbeddedClient(object):
         self.ci.addCommand('ResizeWindow', self.cmdResizeWindow)
         self.ci.addCommand('SetUpdateInterval', self.cmdSetUpdateInterval)
         self.ci.addCommand('MoveToPage', self.cmdMoveToPage)
+        self.ci.addCommand('IsClosed', self.cmdIsClosed)
+        self.ci.addCommand('SetAntiAliasing', self.cmdSetAntiAliasing)
+        self.ci.addCommand('_apiVersion', self.cmd_apiVersion)
 
     def cmdClose(self):
         """Close()
@@ -56,6 +65,16 @@ class EmbeddedClient(object):
         self.plot = None
         self.ci = None
 
+    def cmdIsClosed(self):
+        """IsClosed()
+
+        Return whether window is still open."""
+        return not self.window.isVisible()
+
+    def cmd_apiVersion(self):
+        """Get internal API version."""
+        return API_VERSION
+
     def cmdZoom(self, zoom):
         """Zoom(zoom)
 
@@ -66,6 +85,13 @@ class EmbeddedClient(object):
         'height': zoom to fit height
         """
         self.window.setZoom(zoom)
+
+    def cmdSetAntiAliasing(self, ison):
+        """SetAntiAliasing(zoom)
+
+        Enables or disables anti aliasing.
+        """
+        self.window.setAntiAliasing(ison)
 
     def cmdEnableToolbar(self, enable=True):
         """EnableToolbar(enable=True)
@@ -119,17 +145,19 @@ class EmbedApplication(qt4.QApplication):
     """
 
     # lengths of lengths sent to application
-    cmdlenlen = len(struct.pack('L', 0))
+    cmdlenlen = struct.calcsize('<I')
 
     def __init__(self, socket, args):
         qt4.QApplication.__init__(self, args)
         self.socket = socket
 
+        # listen to commands on the socket
         self.notifier = qt4.QSocketNotifier(self.socket.fileno(),
                                             qt4.QSocketNotifier.Read)
         self.connect(self.notifier, qt4.SIGNAL('activated(int)'),
                      self.slotDataToRead)
 
+        # keep track of clients (separate veusz documents)
         self.clients = {}
         self.clientcounter = 0
 
@@ -142,6 +170,7 @@ class EmbedApplication(qt4.QApplication):
     readLenFromSocket = staticmethod(readLenFromSocket)
 
     def writeToSocket(thesocket, data):
+        """Write to socket until all data written."""
         count = 0
         while count < len(data):
             count += thesocket.send(data[count:])
@@ -149,7 +178,7 @@ class EmbedApplication(qt4.QApplication):
 
     def readCommand(socket):
         # get length of packet
-        length = struct.unpack('L', EmbedApplication.readLenFromSocket(
+        length = struct.unpack('<I', EmbedApplication.readLenFromSocket(
                 socket, EmbedApplication.cmdlenlen))[0]
         # unpickle command and arguments
         return cPickle.loads(
@@ -169,6 +198,15 @@ class EmbedApplication(qt4.QApplication):
         self.clientcounter += 1
         return retval
 
+    def writeOutput(self, output):
+        """Send output back to embed process."""
+        # format return data
+        outstr = cPickle.dumps(output)
+
+        # send return data to stdout
+        self.writeToSocket( self.socket, struct.pack('<I', len(outstr)) )
+        self.writeToSocket( self.socket, outstr )
+
     def slotDataToRead(self, socketfd):
         self.notifier.setEnabled(False)
         self.socket.setblocking(1)
@@ -176,12 +214,10 @@ class EmbedApplication(qt4.QApplication):
         # unpickle command and arguments
         window, cmd, args, argsv = self.readCommand(self.socket)
 
-        doquit = False
         if cmd == '_NewWindow':
             retval = self.makeNewClient(args[0])
         elif cmd == '_Quit':
-            # exits client
-            doquit = True
+            # exit client
             retval = None
         elif cmd == '_NewWindowCopy':
             # sets the document of this window to be the same as the
@@ -199,16 +235,11 @@ class EmbedApplication(qt4.QApplication):
                 retval = interpreter.cmds[cmd](*args, **argsv)
             except Exception, e:
                 retval = e
-        
-        # format return data
-        outstr = cPickle.dumps(retval)
 
-        # send return data to stdout
-        self.writeToSocket( self.socket, struct.pack('L', len(outstr)) )
-        self.writeToSocket( self.socket, outstr )
+        self.writeOutput(retval)
 
         # do quit after if requested
-        if doquit:
+        if cmd == '_Quit':
             self.socket.shutdown(socket.SHUT_RDWR)
             self.closeAllWindows()
             self.quit()

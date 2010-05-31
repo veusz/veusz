@@ -1,6 +1,3 @@
-# containers.py
-# plot containers, for holding other plotting elements
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -21,14 +18,13 @@
 
 # $Id$
 
-"""Module containing container widget classes.
-
-Classes include
- Grid: Class to plot a grid of plots
+"""The grid class allows graphs to be arranged in a regular grid.
+The graphs may share axes if they are stored in the grid widget.
 """
 
 import veusz.document as document
 import veusz.setting as setting
+import veusz.qtall as qt4
 
 import widget
 import page
@@ -155,13 +151,7 @@ class Grid(widget.Widget):
     allowedparenttypes=[page.Page]
 
     def __init__(self, parent, name=None):
-        """Initialise the container.
-
-        Specify rows to grow horizontal, but fill vertically
-        Specify columnss to grow vertically, but fill horizontally
-
-        By default columns will be 1.
-        If both are specified then we ignore rows
+        """Initialise the grid.
         """
 
         widget.Widget.__init__(self, parent, name=name)
@@ -213,12 +203,12 @@ class Grid(widget.Widget):
                                  'edge of page',
                                  usertext='Left margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'rightMargin', '0.1cm', descr=
+        s.add( setting.Distance( 'rightMargin', '0.2cm', descr=
                                  'Distance from right of grid to '
                                  'edge of page',
                                  usertext='Right margin',
                                  formatting=True) )
-        s.add( setting.Distance( 'topMargin', '0.1cm', descr=
+        s.add( setting.Distance( 'topMargin', '0.2cm', descr=
                                  'Distance from top of grid to '
                                  'edge of page',
                                  usertext='Top margin',
@@ -296,10 +286,51 @@ class Grid(widget.Widget):
         for c in self.children:
             if isinstance(c, graph.Graph):
                 s = c.settings
-                for v in ('leftMargin', 'topMargin', 'rightMargin', 'bottomMargin'):
-                    operations.append( document.OperationSettingSet(s.get(v), '0cm') )
+                for v in ('leftMargin', 'topMargin', 'rightMargin',
+                          'bottomMargin'):
+                    operations.append(
+                        document.OperationSettingSet(s.get(v), '0cm') )
                     
-        self.document.applyOperation( document.OperationMultiple(operations, descr='zero margins') )
+        self.document.applyOperation(
+            document.OperationMultiple(operations, descr='zero margins') )
+
+    def _drawChild(self, painter, child, bounds, parentposn):
+        """Draw child at correct position, with correct bounds."""
+
+        # save old position, then update with calculated
+        oldposn = child.position
+        coutbound = parentposn
+
+        if child in self.childpositions:
+            cpos = self.childpositions[child]
+            child.position = cpos
+
+            # outer bounds for child
+            dx, dy = bounds[2]-bounds[0], bounds[3]-bounds[1]
+            coutbound = [ bounds[0]+dx*cpos[0],  bounds[1]+dy*cpos[1],
+                          bounds[0]+dx*cpos[2],  bounds[1]+dy*cpos[3] ]
+
+            # work out bounds for graph in box
+            # FIXME: should consider case if no graphs to side
+            if abs(cpos[0]) < 1e-3:
+                coutbound[0] = parentposn[0]
+            if abs(cpos[1]) < 1e-3:
+                coutbound[1] = parentposn[1]
+            if abs(cpos[2]-1) < 1e-3:
+                coutbound[2] = parentposn[2]
+            if abs(cpos[3]-1) < 1e-3:
+                coutbound[3] = parentposn[3]
+
+        # draw widget
+        child.draw(bounds, painter, outerbounds=coutbound)
+
+        # debugging
+        #painter.setPen(qt4.QPen(qt4.Qt.red))
+        #painter.drawRect( qt4.QRectF(qt4.QPointF(coutbound[0], coutbound[1]),
+        #                             qt4.QPointF(coutbound[2], coutbound[3])))
+
+        # restore position
+        child.position = oldposn
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Draws the widget's children."""
@@ -334,18 +365,12 @@ class Grid(widget.Widget):
             controlgraph.ControlMarginBox(self, bounds, maxbounds, painter)
             ]
 
-        for c in self.children:
-            if c.typename != 'axis':
-                # save old position, then update with calculated
-                oldposn = c.position
-                if c in self.childpositions:
-                    c.position = self.childpositions[c]
-                # draw widget
-                c.draw(bounds, painter, outerbounds=parentposn)
-                # restore position
-                c.position = oldposn
+        for child in self.children:
+            if child.typename != 'axis':
+                self._drawChild(painter, child, bounds, parentposn)
 
         # do not call widget.Widget.draw
+        pass
 
     def updateControlItem(self, cgi):
         """Grid resized or moved - call helper routine to move self."""

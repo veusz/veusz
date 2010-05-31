@@ -89,8 +89,11 @@ class CaptureDialog(qt4.QDialog):
                      self.tailEdit.setEnabled)
 
         # user starts capture
+        self.captureButton = self.buttonBox.addButton(
+            "Ca&pture", qt4.QDialogButtonBox.ApplyRole )
         self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
                      self.slotCaptureClicked)
+
         # filename browse button clicked
         self.connect(self.browseButton, qt4.SIGNAL('clicked()'),
                      self.slotBrowseClicked)

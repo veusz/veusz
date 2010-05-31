@@ -1,4 +1,319 @@
 ------------------------------------------------------------------------
+r1211 | jeremysanders | 2010-03-26 22:29:48 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Documentation updates
+------------------------------------------------------------------------
+r1210 | jeremysanders | 2010-03-26 17:49:53 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Fix messed up pyinst.spec file
+------------------------------------------------------------------------
+r1209 | jeremysanders | 2010-03-26 17:47:29 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Updates to windows install files
+------------------------------------------------------------------------
+r1208 | jeremysanders | 2010-03-26 17:29:40 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Cleanup for trying to find veusz executable under windows and fix subprocess bug
+------------------------------------------------------------------------
+r1207 | jeremysanders | 2010-03-25 19:30:09 +0000 (Thu, 25 Mar 2010) | 1 line
+
+Make api version check not hang for old veusz versions
+------------------------------------------------------------------------
+r1206 | jeremysanders | 2010-03-25 17:17:14 +0000 (Thu, 25 Mar 2010) | 1 line
+
+Add internal version number to veusz api
+------------------------------------------------------------------------
+r1205 | jeremysanders | 2010-03-24 20:19:44 +0000 (Wed, 24 Mar 2010) | 1 line
+
+Add embedding commands IsClosed and WaitForClose to check whether window is closed or to wait until it is closed. Also try to start remote veusz process with pythonw.exe to avoid starting a command window up.
+------------------------------------------------------------------------
+r1204 | jeremysanders | 2010-03-24 14:58:51 +0000 (Wed, 24 Mar 2010) | 1 line
+
+Bump version number for 1.7 release
+------------------------------------------------------------------------
+r1203 | jeremysanders | 2010-03-23 19:46:36 +0000 (Tue, 23 Mar 2010) | 1 line
+
+Fix crash if axis does not exist
+------------------------------------------------------------------------
+r1202 | jeremysanders | 2010-03-22 22:29:08 +0000 (Mon, 22 Mar 2010) | 1 line
+
+Add a bitmap export background color preference and add extra paramters to the Export commandline command to control various options (background color, jpeg quality, dpi)
+------------------------------------------------------------------------
+r1201 | jeremysanders | 2010-03-22 21:46:15 +0000 (Mon, 22 Mar 2010) | 1 line
+
+Add offset parameters for tick labels and axis labels
+------------------------------------------------------------------------
+r1200 | jeremysanders | 2010-03-22 21:34:00 +0000 (Mon, 22 Mar 2010) | 1 line
+
+Make readme read better
+------------------------------------------------------------------------
+r1199 | jeremysanders | 2010-03-17 20:57:36 +0000 (Wed, 17 Mar 2010) | 1 line
+
+Better error handling in evaluation of 2D dataset expressions
+------------------------------------------------------------------------
+r1198 | jeremysanders | 2010-03-17 20:07:04 +0000 (Wed, 17 Mar 2010) | 1 line
+
+2d dataset expression not implemented, so write message
+------------------------------------------------------------------------
+r1197 | jeremysanders | 2010-03-17 20:04:57 +0000 (Wed, 17 Mar 2010) | 1 line
+
+Add changes to widget documenting
+------------------------------------------------------------------------
+r1196 | jeremysanders | 2010-03-14 20:42:44 +0000 (Sun, 14 Mar 2010) | 2 lines
+
+If number of sub contours is updated, update plot
+
+------------------------------------------------------------------------
+r1195 | jeremysanders | 2010-03-11 11:00:18 +0000 (Thu, 11 Mar 2010) | 2 lines
+
+Fix file type list in export dialog. Note remembering previous type broken in KDE 4.4.
+
+------------------------------------------------------------------------
+r1194 | jeremysanders | 2010-03-05 12:51:43 +0000 (Fri, 05 Mar 2010) | 1 line
+
+Use unsigned ints for passing message size in embedding interface so that i386 and x86-64 can talk with each other
+------------------------------------------------------------------------
+r1193 | jeremysanders | 2010-03-04 20:09:12 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Updates for win32 installer
+------------------------------------------------------------------------
+r1192 | jeremysanders | 2010-03-04 19:21:15 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Some updates for 1.7 release
+------------------------------------------------------------------------
+r1191 | jeremysanders | 2010-03-04 19:18:25 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Get embedding interface to look for Windows and Mac OS veusz binaries
+------------------------------------------------------------------------
+r1190 | jeremysanders | 2010-03-04 10:04:27 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Workaround for filter selection problems with KDE replacement file dialog in KDE 4.4
+------------------------------------------------------------------------
+r1189 | jeremysanders | 2010-03-04 09:25:26 +0000 (Thu, 04 Mar 2010) | 1 line
+
+Look on system path for veusz when using embedding module
+------------------------------------------------------------------------
+r1188 | jeremysanders | 2010-03-01 15:23:47 +0000 (Mon, 01 Mar 2010) | 1 line
+
+Check veusz executables exist in embedding interface
+------------------------------------------------------------------------
+r1187 | jeremysanders | 2010-03-01 15:23:29 +0000 (Mon, 01 Mar 2010) | 1 line
+
+Add smoothing option for image widget
+------------------------------------------------------------------------
+r1186 | jeremysanders | 2010-03-01 15:22:10 +0000 (Mon, 01 Mar 2010) | 1 line
+
+Fix colorbar with new axis labelling
+------------------------------------------------------------------------
+r1185 | jeremysanders | 2010-02-28 16:44:11 +0000 (Sun, 28 Feb 2010) | 1 line
+
+Help embedding interface to work when only supplying binary
+------------------------------------------------------------------------
+r1184 | jeremysanders | 2010-02-28 16:26:29 +0000 (Sun, 28 Feb 2010) | 1 line
+
+Remove qt 4.2 backward compatibility in ps export
+------------------------------------------------------------------------
+r1183 | jeremysanders | 2010-02-28 14:16:35 +0000 (Sun, 28 Feb 2010) | 1 line
+
+Do not throw exception in main program if there is an error evaluating an expression dataset
+------------------------------------------------------------------------
+r1182 | jeremysanders | 2010-02-28 14:15:50 +0000 (Sun, 28 Feb 2010) | 1 line
+
+Do not plot function in function widget if blank
+------------------------------------------------------------------------
+r1181 | jeremysanders | 2010-02-27 18:15:10 +0000 (Sat, 27 Feb 2010) | 1 line
+
+Add logging of error messages when evaluation functions in function plotter
+------------------------------------------------------------------------
+r1180 | jeremysanders | 2010-02-27 18:03:13 +0000 (Sat, 27 Feb 2010) | 1 line
+
+Fix multiple imports in custom imports. Fix order in import permissions dialog. Add document.log function to log error messages.
+------------------------------------------------------------------------
+r1179 | jeremysanders | 2010-02-26 20:17:44 +0000 (Fri, 26 Feb 2010) | 1 line
+
+Get rid of small spaces as these show up as bars on Win XP
+------------------------------------------------------------------------
+r1178 | jeremysanders | 2010-02-25 08:52:33 +0000 (Thu, 25 Feb 2010) | 1 line
+
+Add program to document veusz api
+------------------------------------------------------------------------
+r1177 | jeremysanders | 2010-02-24 20:30:08 +0000 (Wed, 24 Feb 2010) | 1 line
+
+Remove output files from examples
+------------------------------------------------------------------------
+r1176 | jeremysanders | 2010-02-24 20:24:45 +0000 (Wed, 24 Feb 2010) | 1 line
+
+Tweaks to positioning of text. Change default right and top margins to be larger to make layout look better
+------------------------------------------------------------------------
+r1175 | jeremysanders | 2010-02-24 20:03:54 +0000 (Wed, 24 Feb 2010) | 1 line
+
+Rename containers to grid, clean up widget imports
+------------------------------------------------------------------------
+r1174 | jeremysanders | 2010-02-24 17:07:31 +0000 (Wed, 24 Feb 2010) | 1 line
+
+Account for floating point inaccuracy when deciding whether plot is at edge
+------------------------------------------------------------------------
+r1173 | jeremysanders | 2010-02-23 22:24:45 +0000 (Tue, 23 Feb 2010) | 1 line
+
+Much improved code for working out how whether to write labels in axes when drawing graphs in grids
+------------------------------------------------------------------------
+r1172 | jeremysanders | 2010-02-23 20:11:19 +0000 (Tue, 23 Feb 2010) | 2 lines
+
+Add subsetting for grid lines for minor ticks
+
+------------------------------------------------------------------------
+r1171 | jeremysanders | 2010-02-23 10:53:55 +0000 (Tue, 23 Feb 2010) | 1 line
+
+Add option for grid lines on minor ticks
+------------------------------------------------------------------------
+r1170 | jeremysanders | 2010-02-21 21:58:37 +0000 (Sun, 21 Feb 2010) | 1 line
+
+graph widget code cleanup
+------------------------------------------------------------------------
+r1169 | jeremysanders | 2010-02-19 21:35:22 +0000 (Fri, 19 Feb 2010) | 2 lines
+
+Changes to the position of axis numbers to make them more centred around the ticks, but inside the plot
+
+------------------------------------------------------------------------
+r1168 | jeremysanders | 2010-02-19 21:34:29 +0000 (Fri, 19 Feb 2010) | 2 lines
+
+Use small spaces around multiply sign in exponential
+
+------------------------------------------------------------------------
+r1167 | jeremysanders | 2010-02-19 20:09:59 +0000 (Fri, 19 Feb 2010) | 2 lines
+
+Use minus sign for negative numbers rather than hyphen
+
+------------------------------------------------------------------------
+r1166 | jeremysanders | 2010-02-19 17:32:42 +0000 (Fri, 19 Feb 2010) | 1 line
+
+Remove old nsi installer script
+------------------------------------------------------------------------
+r1164 | jeremysanders | 2010-02-17 21:38:35 +0000 (Wed, 17 Feb 2010) | 1 line
+
+Add option to contour widget to allow contour limits to be shown in key.
+------------------------------------------------------------------------
+r1163 | jeremysanders | 2010-02-16 22:14:49 +0000 (Tue, 16 Feb 2010) | 1 line
+
+Fix bug if contour fills are hidden
+------------------------------------------------------------------------
+r1162 | jeremysanders | 2010-02-16 22:10:38 +0000 (Tue, 16 Feb 2010) | 1 line
+
+Revert accidential hard code of path
+------------------------------------------------------------------------
+r1161 | jeremysanders | 2010-02-16 22:09:44 +0000 (Tue, 16 Feb 2010) | 1 line
+
+Fix type of colors in setting property list
+------------------------------------------------------------------------
+r1160 | jeremysanders | 2010-02-16 22:01:59 +0000 (Tue, 16 Feb 2010) | 1 line
+
+Fix contour not updating with new data and make contour labels have 3 significant figures by default
+------------------------------------------------------------------------
+r1159 | jeremysanders | 2010-02-16 21:49:59 +0000 (Tue, 16 Feb 2010) | 1 line
+
+get log contour scalings correct
+------------------------------------------------------------------------
+r1158 | jeremysanders | 2010-02-16 21:32:11 +0000 (Tue, 16 Feb 2010) | 2 lines
+
+Fix spacing for sub-contours
+
+------------------------------------------------------------------------
+r1155 | jeremysanders | 2010-02-14 22:17:30 +0000 (Sun, 14 Feb 2010) | 2 lines
+
+Move from deprecated numpy functions in contour helper
+
+------------------------------------------------------------------------
+r1154 | jeremysanders | 2010-02-14 21:57:20 +0000 (Sun, 14 Feb 2010) | 2 lines
+
+Add sub-contours to contour widget between main contours
+
+------------------------------------------------------------------------
+r1153 | jeremysanders | 2010-02-13 17:37:46 +0000 (Sat, 13 Feb 2010) | 2 lines
+
+Extend colors in contour widget to include transparency as #RRGGBBAA. Move lines and fills contour setting to subsetting, and include a forward setting for backward compatibility. Add hide options for contour fills and lines.
+
+------------------------------------------------------------------------
+r1152 | jeremysanders | 2010-02-11 21:37:20 +0000 (Thu, 11 Feb 2010) | 1 line
+
+Further windows D&D fix
+------------------------------------------------------------------------
+r1151 | jeremysanders | 2010-02-11 21:33:40 +0000 (Thu, 11 Feb 2010) | 1 line
+
+Fix drag and drop in windows
+------------------------------------------------------------------------
+r1150 | jeremysanders | 2010-02-10 17:27:40 +0000 (Wed, 10 Feb 2010) | 2 lines
+
+Widget names should not by . or ..
+
+------------------------------------------------------------------------
+r1149 | jeremysanders | 2010-02-08 20:51:37 +0000 (Mon, 08 Feb 2010) | 2 lines
+
+Make dragged and dropped widgets within a document move properly without renaming
+
+------------------------------------------------------------------------
+r1148 | jeremysanders | 2010-02-07 21:24:31 +0000 (Sun, 07 Feb 2010) | 2 lines
+
+Allow comment characters in descriptor dataset names in backticks
+
+------------------------------------------------------------------------
+r1147 | jeremysanders | 2010-02-07 19:24:37 +0000 (Sun, 07 Feb 2010) | 2 lines
+
+Allow datasets with names with funny characters to be used for creating 2D datasets
+
+------------------------------------------------------------------------
+r1146 | jeremysanders | 2010-02-04 23:04:49 +0000 (Thu, 04 Feb 2010) | 2 lines
+
+Add preliminary code for moving widgets around inside document
+
+------------------------------------------------------------------------
+r1145 | jeremysanders | 2010-02-04 20:06:30 +0000 (Thu, 04 Feb 2010) | 1 line
+
+Sort datasets by name before writing them to a saved document
+------------------------------------------------------------------------
+r1144 | jeremysanders | 2010-02-03 17:03:04 +0000 (Wed, 03 Feb 2010) | 2 lines
+
+Fix datasets with different number of points in data and error bars
+
+------------------------------------------------------------------------
+r1143 | jeremysanders | 2010-02-03 17:02:03 +0000 (Wed, 03 Feb 2010) | 2 lines
+
+Fix paste command which was not properly pasting all setting lines
+
+------------------------------------------------------------------------
+r1142 | jeremysanders | 2010-02-02 21:13:34 +0000 (Tue, 02 Feb 2010) | 2 lines
+
+Make ctrl copy widgets when dragging. Move tree widget code to a new source file.
+
+------------------------------------------------------------------------
+r1141 | jeremysanders | 2010-01-30 14:16:15 +0000 (Sat, 30 Jan 2010) | 2 lines
+
+Allow embedding interface to use main veusz executable to act as the veusz remote instance. This now allows binary distributions of veusz to support the embedding interface.
+
+------------------------------------------------------------------------
+r1140 | jeremysanders | 2010-01-30 11:58:36 +0000 (Sat, 30 Jan 2010) | 2 lines
+
+Basic drag and drop of widgets in tree working
+
+------------------------------------------------------------------------
+r1139 | jeremysanders | 2010-01-30 10:42:42 +0000 (Sat, 30 Jan 2010) | 1 line
+
+Update paste button on starting application
+------------------------------------------------------------------------
+r1138 | jeremysanders | 2010-01-27 22:10:35 +0000 (Wed, 27 Jan 2010) | 2 lines
+
+Fix copy/paste for widgets with unicode chars. Move mime functions to another file. Basic work to get drag/drop working on widget tree.
+
+------------------------------------------------------------------------
+r1131 | jeremysanders | 2010-01-24 22:40:26 +0000 (Sun, 24 Jan 2010) | 2 lines
+
+Manual updates, and bump changelog
+
+------------------------------------------------------------------------
+r1130 | jeremysanders | 2010-01-24 21:32:31 +0000 (Sun, 24 Jan 2010) | 2 lines
+
+Updates to manual
+
+------------------------------------------------------------------------
 r1129 | jeremysanders | 2010-01-24 20:24:53 +0000 (Sun, 24 Jan 2010) | 2 lines
 
 Update shapes svg example

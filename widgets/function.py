@@ -112,6 +112,10 @@ class FunctionPlotter(GenericPlotter):
         """Adjust the range of the axis depending on the values plotted."""
         s = self.settings
 
+        # ignore empty function
+        if s.function.strip() == '':
+            return
+
         # ignore if function isn't sensible
         if not self._checkCachedFunction():
             return
@@ -250,6 +254,12 @@ class FunctionPlotter(GenericPlotter):
         """Set up function environment."""
         return self.document.eval_context.copy()
        
+    def _errorFunctionEval(self, e):
+        """Write error message to document log for exception e."""
+        self.document.log("Error evaluating expression in function"
+                          " widget '%s': '%s'" % (
+                self.name, unicode(e)))
+
     def _checkCachedFunction(self):
         """check function doesn't contain dangerous code."""
         s = self.settings
@@ -257,6 +267,11 @@ class FunctionPlotter(GenericPlotter):
         if self.cachedfunc != fn or self.cachedvar != s.variable:
             checked = utils.checkCode(fn)
             if checked is not None:
+                try:
+                    msg = checked[0][0]
+                except Exception:
+                    msg = ''
+                self._errorFunctionEval(msg)
                 return False
             self.cachedfunc = fn
             self.cachedvar = s.variable
@@ -264,8 +279,9 @@ class FunctionPlotter(GenericPlotter):
             try:
                 # compile code
                 self.cachedcomp = compile(fn, '<string>', 'eval')
-            except:
+            except Exception, e:
                 # return nothing
+                self._errorFunctionEval(e)
                 return False
         return True
      
@@ -295,7 +311,8 @@ class FunctionPlotter(GenericPlotter):
             env['x'] = x
             try:
                 y = eval(self.cachedcomp, env)
-            except:
+            except Exception, e:
+                self._errorFunctionEval(e)
                 pypts = None
             else:
                 pypts = axes[1].dataToPlotterCoords(posn, y+x*0.)
@@ -315,7 +332,8 @@ class FunctionPlotter(GenericPlotter):
             env['y'] = y
             try:
                 x = eval(self.cachedcomp, env)
-            except:
+            except Exception, e:
+                self._errorFunctionEval(e)
                 pxpts = None
             else:
                 pxpts = axes[0].dataToPlotterCoords(posn, x+y*0.)
@@ -330,8 +348,8 @@ class FunctionPlotter(GenericPlotter):
         x1, y1, x2, y2 = posn
         s = self.settings
 
-        # exit if hidden
-        if s.hide:
+        # exit if hidden or function blank
+        if s.hide or s.function.strip() == '':
             return
 
         # get axes widgets
