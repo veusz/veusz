@@ -24,8 +24,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define DEBUG 0
-
 typedef struct
 {
   float x, y;
@@ -50,222 +48,86 @@ typedef struct
   int outindex;
 } State;
 
-static void clipLeftPoint(Point pt, State* state);
-static void clipRightPoint(Point pt, State* state);
-static void clipTopPoint(Point pt, State* state);
-static void clipBottomPoint(Point pt, State* state);
-static void clipWritePoint(Point pt, State* state);
-
 /* makes calculations of intercept of line and edge easier */
 /* vara = x and varb = y if calculating a x value, and vice versa */
 #define INTERCEPT(pt, lastpt, edgeval, vara, varb) \
   (edgeval - pt.vara) * (lastpt.varb - pt.varb) / \
   (lastpt.vara - pt.vara) + pt.varb
 
-static void clipLeftPoint(Point pt, State* state)
-{
-  #if DEBUG
-  printf(" left: %.1f %.1f\n", pt.x, pt.y);
-  #endif
-
-  if( state->leftis1st )
-    {
-      /* do nothing */
-      state->left1st = pt;
-      state->leftis1st = 0;
-    }
-  else
-    {
-      if( pt.x >= state->clipleft )
-	{
-	  if( state->leftlast.x < state->clipleft )
-	    {
-	      /* this point inside and last point outside */
-	      Point newpt = {
-		state->clipleft,
-		INTERCEPT(pt, state->leftlast, state->clipleft, x, y)
-	      };
-	      clipRightPoint(newpt, state);
-	    }
-	  clipRightPoint(pt, state);
-	}
-      else
-	{
-	  if( state->leftlast.x >= state->clipleft )
-	    {
-	      /* this point outside and last point inside */
-	      Point newpt = {
-		state->clipleft,
-		INTERCEPT(pt, state->leftlast, state->clipleft, x, y)
-	      };
-	      clipRightPoint(newpt, state);
-	    }
-	  /* else do nothing if both outside */
-	}
-    }
-
-  state->leftlast = pt;
-  #if DEBUG
-  printf(" returning\n");
-  #endif
-}
-
-static void clipRightPoint(Point pt, State* state)
-{
-  #if DEBUG
-  printf(" right: %.1f %.1f\n", pt.x, pt.y);
-  #endif
-
-  if( state->rightis1st )
-    {
-      /* do nothing */
-      state->right1st = pt;
-      state->rightis1st = 0;
-    }
-  else
-    {
-      if( pt.x <= state->clipright )
-	{
-	  if( state->rightlast.x > state->clipright )
-	    {
-	      /* this point inside and last point outside */
-	      Point newpt = {
-		state->clipright,
-		INTERCEPT(pt, state->rightlast, state->clipright, x, y)
-	      };
-	      clipTopPoint(newpt, state);
-	    }
-	  clipTopPoint(pt, state);
-	}
-      else
-	{
-	  /* this point outside and last point inside */
-	  if( state->rightlast.x <= state->clipright )
-	    {
-	      Point newpt = {
-		state->clipright,
-		INTERCEPT(pt, state->rightlast, state->clipright, x, y)
-	      };
-	      clipTopPoint(newpt, state);
-	    }
-	  /* else do nothing if both outside */
-	}
-    }
-
-  state->rightlast = pt;
-  #if DEBUG
-  printf(" returning\n");
-  #endif
-}
-
-static void clipTopPoint(Point pt, State* state)
-{
-  #if DEBUG
-  printf(" top: %.1f %.1f\n", pt.x, pt.y);
-  #endif
-
-  if( state->topis1st )
-    {
-      /* do nothing */
-      state->top1st = pt;
-      state->topis1st = 0;
-    }
-  else
-    {
-      if( pt.y >= state->cliptop )
-	{
-	  if( state->toplast.y < state->cliptop )
-	    {
-	      /* this point inside and last point outside */
-	      Point newpt = {
-		INTERCEPT(pt, state->toplast, state->cliptop, y, x),
-		state->cliptop
-	      };
-	      clipBottomPoint(newpt, state);
-	    }
-	  clipBottomPoint(pt, state);
-	}
-      else
-	{
-	  /* this point outside */
-	  if( state->toplast.y >= state->cliptop )
-	    {
-	      /* & last point inside */
-	      Point newpt = {
-		INTERCEPT(pt, state->toplast, state->cliptop, y, x),
-		state->cliptop
-	      };
-	      clipBottomPoint(newpt, state);
-	    }
-	  /* else do nothing if both outside */
-	}
-    }
-
-  state->toplast = pt;
-  #if DEBUG
-  printf(" returning\n");
-  #endif
-}
-
-static void clipBottomPoint(Point pt, State* state)
-{
-  #if DEBUG
-  printf(" bottom: %.1f %.1f\n", pt.x, pt.y);
-  #endif
-
-  if( state->bottomis1st )
-    {
-      /* do nothing */
-      state->bottom1st = pt;
-      state->bottomis1st = 0;
-    }
-  else
-    {
-      if( pt.y <= state->clipbottom )
-	{
-	  if( state->bottomlast.y > state->clipbottom )
-	    {
-	      /* this point inside and last point outside */
-	      Point newpt = {
-		INTERCEPT(pt, state->bottomlast, state->clipbottom, y, x),
-		state->clipbottom
-	      };
-	      clipWritePoint(newpt, state);
-	    }
-	  clipWritePoint(pt, state);
-	}
-      else
-	{
-	  if( state->bottomlast.y <= state->clipbottom )
-	    {
-	      /* this point outside and last point inside */
-	      Point newpt = {
-		INTERCEPT(pt, state->bottomlast, state->clipbottom, y, x),
-		state->clipbottom
-	      };
-	      clipWritePoint(newpt, state);
-	    }
-	  /* else do nothing if both outside */
-	}
-    }
-
-  state->bottomlast = pt;
-  #if DEBUG
-  printf(" returning\n");
-  #endif
-}
+/* macro to clip point against edge
+   - edge: name of edge for clipping
+   - isinside: f(pt) to return whether point is inside edge
+   - interceptx: value of x for new point when line intercepts edge
+   - intercepty: value of y for new point when line intercepts edge
+   - next: function to call next to clip point
+*/
+#define CLIPEDGE(edge, isinside, interceptx, intercepty, next)		\
+  static void edge##ClipPoint(Point pt, State* state)			\
+  {									\
+    if( state->edge##is1st )						\
+      {									\
+	/* do nothing */						\
+	state->edge##1st = pt;						\
+	state->edge##is1st = 0;						\
+      }									\
+    else								\
+      {									\
+	if( isinside(pt) )						\
+	  {								\
+	    if( ! isinside(state->edge##last) )				\
+	      {								\
+		/* this point inside and last point outside */		\
+		Point newpt = {interceptx, intercepty};			\
+		next(newpt, state);					\
+	      }								\
+	    next(pt, state);						\
+	  }								\
+	else								\
+	  {								\
+	    if( isinside(state->edge##last) )				\
+	      {								\
+		/* this point outside and last point inside */		\
+		Point newpt = {interceptx, intercepty};			\
+		next(newpt, state);					\
+	      }								\
+	    /* else do nothing if both outside */			\
+	  }								\
+      }									\
+    									\
+    state->edge##last = pt;						\
+  }
 
 /* add a point to output */
-static void clipWritePoint(Point pt, State* state)
+static void writeClipPoint(Point pt, State* state)
 {
-  #if DEBUG
-  printf("Writing: %.1f %.1f\n", pt.x, pt.y);
-  #endif
-
   state->output[state->outindex*2] = pt.x;
   state->output[state->outindex*2 + 1] = pt.y;
   state->outindex++;
 }
+
+#define INSIDEBOTTOM(pt) (pt.y <= state->clipbottom)
+CLIPEDGE(bottom, INSIDEBOTTOM,
+	 INTERCEPT(pt, state->bottomlast, state->clipbottom, y, x),
+	 state->clipbottom,
+	 writeClipPoint)
+
+#define INSIDETOP(pt) (pt.y >= state->cliptop)
+CLIPEDGE(top, INSIDETOP,
+	 INTERCEPT(pt, state->toplast, state->cliptop, y, x),
+	 state->cliptop,
+	 bottomClipPoint)
+
+#define INSIDERIGHT(pt) (pt.x <= state->clipright)
+CLIPEDGE(right, INSIDERIGHT,
+	 state->clipright,
+	 INTERCEPT(pt, state->rightlast, state->clipright, x, y),
+	 topClipPoint)
+
+#define INSIDELEFT(pt) (pt.x >= state->clipleft)
+CLIPEDGE(left, INSIDELEFT,
+	 state->clipleft,
+	 INTERCEPT(pt, state->leftlast, state->clipleft, x, y),
+	 rightClipPoint)
 
 static void doClipping(const float* pts, const int numpts,
 		       const float x1, const float y1,
@@ -286,12 +148,12 @@ static void doClipping(const float* pts, const int numpts,
   for(i = 0; i < numpts; ++i)
     {
       Point pt = {pts[i*2], pts[i*2+1]};
-      clipLeftPoint(pt, &state);
+      leftClipPoint(pt, &state);
     }
-  clipLeftPoint(state.left1st, &state);
-  clipRightPoint(state.right1st, &state);
-  clipTopPoint(state.top1st, &state);
-  clipBottomPoint(state.bottom1st, &state);
+  leftClipPoint(state.left1st, &state);
+  rightClipPoint(state.right1st, &state);
+  topClipPoint(state.top1st, &state);
+  bottomClipPoint(state.bottom1st, &state);
 
   /* return number of points */
   *numoutput = state.outindex;
