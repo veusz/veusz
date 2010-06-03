@@ -21,18 +21,25 @@
  see http://www.codeguru.com/Cpp/misc/misc/graphics/article.php/c8965/
 */
 
+#include <Python.h>
+#include <numpy/arrayobject.h>
+
 #include <stdlib.h>
-#include <stdio.h>
+
+#define MIN(a,b)  ((a) < (b) ? (a) : (b))
+#define MAX(a,b)  ((a) > (b) ? (a) : (b))
+
+typedef double FloatData;
 
 typedef struct
 {
-  float x, y;
+  FloatData x, y;
 } Point;
 
 typedef struct
 {
   /* location of corners of clip rectangle */
-  float clipleft, clipright, cliptop, clipbottom;
+  FloatData clipleft, clipright, cliptop, clipbottom;
 
   /* last points added */
   Point leftlast, rightlast, toplast, bottomlast;
@@ -44,7 +51,7 @@ typedef struct
   int leftis1st, rightis1st, topis1st, bottomis1st;
 
   /* output points are added here */
-  float* output;
+  FloatData* output;
   int outindex;
 } State;
 
@@ -129,17 +136,21 @@ CLIPEDGE(left, INSIDELEFT,
 	 INTERCEPT(pt, state->leftlast, state->clipleft, x, y),
 	 rightClipPoint)
 
-static void doClipping(const float* pts, const int numpts,
-		       const float x1, const float y1,
-		       const float x2, const float y2,
-		       float *output, int* numoutput)
+static void doClipping(const FloatData* xdata,
+		       const FloatData* ydata,
+		       const int numpts,
+		       const FloatData x1, const FloatData y1,
+		       const FloatData x2, const FloatData y2,
+		       FloatData *output, int* numoutput)
 {
   int i;
 
   /* construct initial state */
   State state;
-  state.clipleft = x1; state.clipright = x2;
-  state.cliptop = y1; state.clipbottom = y2;
+  state.clipleft = MIN(x1, x2);
+  state.clipright = MAX(x1, x2);
+  state.cliptop = MIN(y1, y2);
+  state.clipbottom = MAX(y1, y2);
   state.leftis1st = state.rightis1st = state.topis1st = state.bottomis1st = 1;
   state.output = output;
   state.outindex = 0;
@@ -147,7 +158,7 @@ static void doClipping(const float* pts, const int numpts,
   /* do the clipping */
   for(i = 0; i < numpts; ++i)
     {
-      Point pt = {pts[i*2], pts[i*2+1]};
+      Point pt = {xdata[i], ydata[i]};
       leftClipPoint(pt, &state);
     }
   leftClipPoint(state.left1st, &state);
@@ -159,22 +170,73 @@ static void doClipping(const float* pts, const int numpts,
   *numoutput = state.outindex;
 }
 
-int main()
+static PyObject *
+python_clip(PyObject *self, PyObject *args)
 {
-  int i;
+  double x1, y1, x2, y2;
+  npy_intp dimsx, dimsy, retdims[2];
 
-  float pts[8] = { 250, 0, 0, 250, 250, 500, 500, 250 };
+  int numitems;
+  PyObject *xarray, *yarray;
+  PyArrayObject *retarray;
+  PyArray_Dims dims;
 
-  float out[100];
-  int numout;
+  double *xdata, *ydata, *retdata;
 
-  doClipping(pts, 4, 100, 100, 400, 400, out, &numout);
-  printf("%i\n", numout);
+  if (!PyArg_ParseTuple(args, "ddddOO", &x1, &y1, &x2, &y2,
+			&xarray, &yarray))
+    return NULL;
 
-  for(i=0; i<numout; ++i)
+  if( PyArray_AsCArray(&xarray, &xdata, &dimsx, 1,
+		       PyArray_DescrFromType(NPY_DOUBLE)) )
     {
-      printf("%g %g\n", out[i*2], out[i*2+1]);
+      PyErr_SetString(PyExc_TypeError, "Cannot convert X data to C array");
+      return NULL;
     }
 
-  return 0;
+  if( PyArray_AsCArray(&yarray, &ydata, &dimsy, 1,
+		       PyArray_DescrFromType(NPY_DOUBLE)) )
+    {
+      PyArray_Free(xarray, xdata);
+      PyErr_SetString(PyExc_TypeError, "Cannot convert Y data to C array");
+      return NULL;
+    }
+  
+  retdims[0] = MIN(dimsx, dimsy) * 2;
+  retdims[1] = 2;
+
+  retarray = (PyArrayObject*) PyArray_SimpleNew(2, retdims, NPY_DOUBLE);
+  retdata = (double*)(retarray->data);
+   
+  doClipping(xdata, ydata, MIN(dimsx, dimsy),
+	     x1, y1, x2, y2, retdata, &numitems);
+
+  retdims[0] = numitems;
+  dims.ptr = retdims;
+  dims.len = 2;
+  PyArray_Resize(retarray, &dims, 1, NPY_CORDER);
+
+  PyArray_Free(xarray, xdata);
+  PyArray_Free(yarray, ydata);
+
+  return PyArray_Return(retarray);
+}
+
+static PyMethodDef ClipMethods[] =
+  {
+    {"clippolygon",  python_clip, METH_VARARGS,
+     "Clip a polygon to a box."},
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+  };
+
+PyMODINIT_FUNC
+initclip(void)
+{
+  PyObject *m;
+  
+  m = Py_InitModule("clip", ClipMethods);
+  if (m == NULL)
+    return;
+
+  import_array();
 }
