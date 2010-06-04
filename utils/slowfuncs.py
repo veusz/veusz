@@ -24,27 +24,43 @@ These are slow versions of routines also implemented in C++
 
 from itertools import izip
 import veusz.qtall as qt4
+import numpy as N
 
 def addNumpyToPolygonF(poly, *args):
-    """Add a set of numpy arrays to a QPolygonF."""
+    """Add a set of numpy arrays to a QPolygonF.
 
-    for row in xrange(len(args[0])):
-        for col in xrange(0, len(args), 2):
-            x = args[col][row]
-            y = args[col+1][row]
-            poly.append( qt4.QPointF(x, y) )
+    The first argument is the QPolygonF to add to
+    Subsequent arguments should be pairs of x and y coordinate arrays
+    """
+    
+    # we stick the datasets next to each other horizontally, then
+    # reshape it into an array of x, y pairs
+    minlen = min([x.shape[0] for x in args])
+    cols = N.hstack([N.reshape(x[:minlen], (minlen, 1)) for x in args])
+    points = N.reshape(cols, (minlen*len(args)/2, 2))
+
+    # finally draw the points
+    pappend = poly.append
+    qpointf = qt4.QPointF
+    for p in points:
+        pappend( qpointf(*p) )
 
 def plotPathsToPainter(painter, path, x, y):
     """Plot array of x, y points."""
 
+    # more copying things into local variables
+    t = painter.translate
+    d = painter.drawPath
     for xp, yp in izip(x, y):
-        painter.translate(xp, yp)
-        painter.drawPath(path)
-        painter.translate(-xp, -yp)
+        t(xp, yp)
+        d(path)
+        t(-xp, -yp)
 
 def plotLinesToPainter(painter, x1, y1, x2, y2):
     """Plot lines given in numpy arrays to painter."""
     lines = []
+    lappend = lines.append
+    qlinef = qt4.QLineF
     for p in izip(x1, y1, x2, y2):
-        lines.append( qt4.QLineF(*p) )
+        lappend( qlinef(*p) )
     painter.drawLines(lines)
