@@ -34,6 +34,7 @@ class QtLoops
 
 %TypeHeaderCode
 #include <qtloops.h>
+#include <polygonclip.h>
 %End
 
 public:
@@ -68,6 +69,8 @@ void plotLinesToPainter(QPainter* painter,
    NumpyInValarray y2(a4);
    plotLinesToPainter(a0, x1.data, y1.data, x2.data, y2.data);
    }
-
 %End
 
+void polygonClip(const QPolygonF& inpoly,
+		 const QRectF& cliprect,
+		 QPolygonF& outpoly);
