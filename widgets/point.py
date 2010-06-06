@@ -30,8 +30,6 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
-import helpers.qtloops
-
 # functions for plotting error bars
 # different styles are made up of combinations of these functions
 # each function takes the same arguments
@@ -304,7 +302,7 @@ class PointPlotter(GenericPlotter):
     userdescription = property(_getUserDescription)
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
-                    axes, xdata, ydata):
+                    axes, xdata, ydata, cliprect):
         """Plot error bars (horizontal and vertical).
         """
 
@@ -313,12 +311,6 @@ class PointPlotter(GenericPlotter):
         if style == 'none':
             return
 
-        # distances for clipping - we make them larger than the
-        # real width, to help get gradients and so on correct
-        xwc = abs(posn[2]-posn[0])*4
-        ywc = abs(posn[3]-posn[1])*4
-        cliprect = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
-                               qt4.QPointF(posn[2], posn[3]) )
         # default is no error bars
         xmin = xmax = ymin = ymax = None
 
@@ -330,10 +322,6 @@ class PointPlotter(GenericPlotter):
             xmin = axes[0].dataToPlotterCoords(posn, xmin)
             xmax = axes[0].dataToPlotterCoords(posn, xmax)
 
-            # clip... (avoids problems with INFs, etc)
-            xmin = N.clip(xmin, posn[0]-xwc, posn[2]+xwc)
-            xmax = N.clip(xmax, posn[0]-xwc, posn[2]+xwc)
-
         # draw vertical error bars
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
@@ -341,10 +329,6 @@ class PointPlotter(GenericPlotter):
             # convert ymin and ymax to graph coordinates
             ymin = axes[1].dataToPlotterCoords(posn, ymin)
             ymax = axes[1].dataToPlotterCoords(posn, ymax)
-
-            # clip...
-            ymin = N.clip(ymin, posn[1]-ywc, posn[3]+ywc)
-            ymax = N.clip(ymax, posn[1]-ywc, posn[3]+ywc)
 
         # no error bars - break out of processing below
         if ymin is None and ymax is None and xmin is None and xmax is None:
@@ -436,14 +420,12 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
-    def _drawPlotLine( self, painter, xvals, yvals, posn, xdata, ydata ):
+    def _drawPlotLine( self, painter, xvals, yvals, posn, xdata, ydata,
+                       cliprect ):
         """Draw the line connecting the points."""
 
         s = self.settings
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
-
-        cliprect = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
-                               qt4.QPointF(posn[2], posn[3]) )
 
         if len(pts) >= 2:
             if not s.FillBelow.hide:
@@ -612,10 +594,7 @@ class PointPlotter(GenericPlotter):
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        self.clipAxesBounds(painter, axes, posn)
-
-        cliprect = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
-                               qt4.QPointF(posn[2], posn[3]) )
+        cliprect = self.clipAxesBounds(painter, axes, posn)
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals in document.generateValidDatasetParts(
@@ -629,13 +608,13 @@ class PointPlotter(GenericPlotter):
             #print "Painting error bars"
             # plot errors bars
             self._plotErrors(posn, painter, xplotter, yplotter,
-                             axes, xvals, yvals)
+                             axes, xvals, yvals, cliprect)
 
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
                 self._drawPlotLine( painter, xplotter, yplotter, posn,
-                                    xvals, yvals )
+                                    xvals, yvals, cliprect )
 
             # plot the points (we do this last so they are on top)
             markersize = s.get('markerSize').convert(painter)
