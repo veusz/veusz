@@ -382,7 +382,8 @@ MarkerCodes = (
     'limitleftaway2', 'limitrightaway2',
     )
 
-def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
+def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
+                clip=None):
     """Funtion to plot an array of markers on a painter.
 
     painter: QPainter
@@ -390,6 +391,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
     markername: name of marker from MarkerCodes
     markersize: size of marker to plot
     scaling: scale size of markers by array, or don't in None
+    clip: rectangle if clipping wanted
     """
 
     # minor optimization
@@ -416,7 +418,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
 
     # split up into two loops as this is a critical path
     if scaling is None:
-        plotPathsToPainter(painter, path, xpos, ypos)
+        plotPathsToPainter(painter, path, xpos, ypos, clip)
     else:
         # plot markers, scaling each one
         s = painter.scale

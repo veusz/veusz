@@ -21,9 +21,12 @@
 #include <QPointF>
 #include <QVector>
 #include <QLineF>
+#include <QPen>
 
 #include <vector>
 #include <algorithm>
+
+#include <polylineclip.h>
 
 void addNumpyToPolygonF(QPolygonF *poly,
 			const doublearray_ptr_vec &d)
@@ -55,30 +58,66 @@ void addNumpyToPolygonF(QPolygonF *poly,
 }
 
 void plotPathsToPainter(QPainter* painter, QPainterPath* path,
-			const doublearray* x, const doublearray* y)
+			const doublearray* x, const doublearray* y,
+			const QRectF* clip)
 {
+  QRectF cliprect( QPointF(-32767,-32767), QPointF(32767,32767) );
+  if( clip != 0 )
+    {
+      qreal x1, y1, x2, y2;
+      clip->getCoords(&x1, &y1, &x2, &y2);
+      cliprect.setCoords(x1, y1, x2, y2);
+    }
+  QRectF pathbox = path->boundingRect();
+  cliprect.adjust(pathbox.left(), pathbox.top(),
+		  pathbox.bottom(), pathbox.right());
+
   const size_t size = std::min(x->size(), y->size());
   for(size_t i = 0; i != size; ++i)
     {
-      painter->translate((*x)[i], (*y)[i]);
-      painter->drawPath(*path);
-      painter->translate(-(*x)[i], -(*y)[i]);
+      const QPointF pt((*x)[i], (*y)[i]);
+      if( cliprect.contains(pt) )
+	{
+	  painter->translate(pt);
+	  painter->drawPath(*path);
+	  painter->translate(-pt);
+	}
     }
 }
 
 void plotLinesToPainter(QPainter* painter,
 			const doublearray* x1, const doublearray* y1,
-			const doublearray* x2, const doublearray* y2)
+			const doublearray* x2, const doublearray* y2,
+			const QRectF* clip, bool autoexpand)
 {
   const size_t maxsize = std::min( std::min(x1->size(), y1->size()),
 				   std::min(x2->size(), y2->size()) );
+
+  // if autoexpand, expand rectangle by line width
+  QRectF clipcopy;
+  if ( clip != 0 and autoexpand )
+    {
+      const qreal lw = painter->pen().widthF();
+      qreal x1, y1, x2, y2;
+      clip->getCoords(&x1, &y1, &x2, &y2);
+      clipcopy.setCoords(x1, y1, x2, y2);
+      clipcopy.adjust(-lw, -lw, lw, lw);
+    }
 
   if( maxsize != 0 )
     {
       QVector<QLineF> lines;
       for(size_t i = 0; i != maxsize; ++i)
 	{
-	  lines << QLineF((*x1)[i], (*y1)[i], (*x2)[i], (*y2)[i]);
+	  QPointF pt1((*x1)[i], (*y1)[i]);
+	  QPointF pt2((*x2)[i], (*y2)[i]);
+	  if( clip != 0 )
+	    {
+	      if( clipLine(clipcopy, pt1, pt2) )
+		lines << QLineF(pt1, pt2);
+	    }
+	  else
+	    lines << QLineF(pt1, pt2);
 	}
 
       painter->drawLines(lines);

@@ -147,19 +147,19 @@ void polygonClip(const QPolygonF& inpoly,
   state.bottomClipPoint(state.bottom1st);
 }
 
-// #include <stdio.h>
-// int main()
-// {
-//   QPolygonF in;
-//   in << QPointF(100, 100) << QPointF(200, 100)
-//      << QPointF(200, 200) << QPointF(100, 200);
-//   QPolygonF out;
- 
-//   polygonClip(in, QRectF(QPointF(0,0),QPointF(1000,1000)), out);
+void plotClippedPolygon(QPainter& painter,
+			QRectF rect,
+			const QPolygonF& inpoly,
+			bool autoexpand)
+{
+  if ( autoexpand )
+    {
+      const qreal lw = painter.pen().widthF();
+      if( painter.pen().style() != Qt::NoPen )
+	rect.adjust(-lw, -lw, lw, lw);
+    }
 
-//   for(QPolygonF::const_iterator i = out.begin(); i != out.end(); ++i)
-//     printf("%g %g\n", i->x(), i->y());
-
-
-//   return 0;
-// }
+  QPolygonF plt;
+  polygonClip(inpoly, rect, plt);
+  painter.drawPolygon(plt);
+}

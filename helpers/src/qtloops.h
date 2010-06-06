@@ -22,9 +22,10 @@
 #include "qtloops_helpers.h"
 #include <vector>
 #include <valarray>
-#include <QtGui/QPolygonF>
-#include <QtGui/QPainter>
-#include <QtGui/QPainterPath>
+#include <QPolygonF>
+#include <QPainter>
+#include <QPainterPath>
+#include <QRectF>
 
 class QtLoops {
 public:
@@ -35,10 +36,12 @@ void addNumpyToPolygonF(QPolygonF* poly,
 			const doublearray_ptr_vec &v);
 
 void plotPathsToPainter(QPainter* painter, QPainterPath* path,
-			const doublearray* x, const doublearray* y);
+			const doublearray* x, const doublearray* y,
+			const QRectF* clip = 0);
 
 void plotLinesToPainter(QPainter* painter,
 			const doublearray* x1, const doublearray* y1,
-			const doublearray* x2, const doublearray* y2);
+			const doublearray* x2, const doublearray* y2,
+			const QRectF* clip = 0, bool autoexpand = true);
 
 #endif

@@ -56,7 +56,7 @@ def plotPathsToPainter(painter, path, x, y):
         d(path)
         t(-xp, -yp)
 
-def plotLinesToPainter(painter, x1, y1, x2, y2):
+def plotLinesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
     """Plot lines given in numpy arrays to painter."""
     lines = []
     lappend = lines.append
@@ -64,3 +64,35 @@ def plotLinesToPainter(painter, x1, y1, x2, y2):
     for p in izip(x1, y1, x2, y2):
         lappend( qlinef(*p) )
     painter.drawLines(lines)
+
+def plotClippedPolyline(painter, cliprect, pts, autoexpand=True):
+    """Draw a polyline, trying to clip the points.
+    
+    The python version does nothing really as it would be too hard.
+    """
+
+    ptsout = qt4.QPolygonF()
+    for p in pts:
+        x = max( min(p.x(), 32767.), -32767.)
+        y = max( min(p.y(), 32767.), -32767.)
+        ptsout.append( qt4.QPointF(x, y) )
+        
+    painter.drawPolyline(ptsout)
+
+def polygonClip(inpoly, rect, outpoly):
+    """Clip a polygon to the rectangle given, writing to outpoly
+    
+    The python version does nothing really as it would be too hard.
+    """
+
+    for p in inpoly:
+        x = max( min(p.x(), 32767.), -32767.)
+        y = max( min(p.y(), 32767.), -32767.)
+        outpoly.append( qt4.QPointF(x, y) )
+
+def plotClippedPolygon(painter, inrect, inpoly, autoexpand=True):
+    """Plot a polygon, clipping if necessary."""
+
+    outpoly = qt4.QPolygonF()
+    polygonClip(inpoly, inrect, outpoly)
+    painter.drawPolygon(outpoly)

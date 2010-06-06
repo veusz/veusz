@@ -35,6 +35,7 @@ class QtLoops
 %TypeHeaderCode
 #include <qtloops.h>
 #include <polygonclip.h>
+#include <polylineclip.h>
 %End
 
 public:
@@ -49,28 +50,41 @@ void addNumpyToPolygonF(QPolygonF*, ...);
    }
 %End
 
-void plotPathsToPainter(QPainter*, QPainterPath*, SIP_PYOBJECT, SIP_PYOBJECT);
+void plotPathsToPainter(QPainter*, QPainterPath*, SIP_PYOBJECT, SIP_PYOBJECT,
+     const QRectF* clip=0);
 %MethodCode
    {
    NumpyInValarray x(a2);
    NumpyInValarray y(a3);
-   plotPathsToPainter(a0, a1, x.data, y.data);
+   plotPathsToPainter(a0, a1, x.data, y.data, a4);
    }
 %End
 
 void plotLinesToPainter(QPainter* painter,
 			SIP_PYOBJECT, SIP_PYOBJECT,
-			SIP_PYOBJECT, SIP_PYOBJECT);
+			SIP_PYOBJECT, SIP_PYOBJECT,
+			const QRectF* clip = 0,
+			bool autoexpand = true);
 %MethodCode
    {
    NumpyInValarray x1(a1);
    NumpyInValarray y1(a2);
    NumpyInValarray x2(a3);
    NumpyInValarray y2(a4);
-   plotLinesToPainter(a0, x1.data, y1.data, x2.data, y2.data);
+   plotLinesToPainter(a0, x1.data, y1.data, x2.data, y2.data, a5, a6);
    }
 %End
 
 void polygonClip(const QPolygonF& inpoly,
 		 const QRectF& cliprect,
 		 QPolygonF& outpoly);
+
+void plotClippedPolygon(QPainter& painter,
+			QRectF rect,
+			const QPolygonF& inpoly,
+			bool autoexpand = true);
+
+void plotClippedPolyline(QPainter& painter,
+			 QRectF clip,
+			 const QPolygonF& poly,
+			 bool autoexpand = true);

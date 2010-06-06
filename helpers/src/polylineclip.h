@@ -14,23 +14,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef POLYGONCLIP_HH
-#define POLYGONCLIP_HH
+#ifndef POLYLINECLIP_HH
+#define POLYLINECLIP_HH
 
-#include <QPointF>
 #include <QRectF>
-#include <QPolygonF>
 #include <QPainter>
+#include <QPolygonF>
 
-// clip input polygon to clipping rectangle, filling outpoly
-void polygonClip(const QPolygonF& inpoly,
-		 const QRectF& cliprect,
-		 QPolygonF& outpoly);
+// plot a polyline poly on the painter, clipping by the rectangle given
+// if autoexpand is true, then the rectangle is expanded by the line width
+void plotClippedPolyline(QPainter& painter,
+			 QRectF clip,
+			 const QPolygonF& poly,
+			 bool autoexpand = true);
 
-// plot a clipped polygon to painter
-void plotClippedPolygon(QPainter& painter,
-			QRectF rect,
-			const QPolygonF& inpoly,
-			bool autoexpand = true);
+// clip a line made up of the points given, returning true
+// if is in region or false if not
+bool clipLine(const QRectF& clip, QPointF& pt1, QPointF& pt2);
 
 #endif
