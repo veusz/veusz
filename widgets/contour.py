@@ -429,11 +429,11 @@ class Contour(plotters.GenericPlotter):
         # plot the precalculated contours
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        self.clipAxesBounds(painter, axes, posn)
+        clip = self.clipAxesBounds(painter, axes, posn)
 
-        self.plotContourFills(painter, posn, axes)
-        self.plotContours(painter, posn, axes)
-        self.plotSubContours(painter, posn, axes)
+        self.plotContourFills(painter, posn, axes, clip)
+        self.plotContours(painter, posn, axes, clip)
+        self.plotSubContours(painter, posn, axes, clip)
 
         painter.restore()
         painter.endPaintingWidget()
@@ -536,7 +536,7 @@ class Contour(plotters.GenericPlotter):
         painter.restore()
 
     def _plotContours(self, painter, posn, axes, linestyles, contours,
-                      showlabels, hidelines):
+                      showlabels, hidelines, clip):
         """Plot a set of contours.
         """
 
@@ -558,7 +558,6 @@ class Contour(plotters.GenericPlotter):
                 xplt = axes[0].dataToPlotterCoords(posn, curve[:,0])
                 yplt = axes[1].dataToPlotterCoords(posn, curve[:,1])
                     
-                # there should be a nice itertools way of doing this
                 pts = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
 
@@ -568,23 +567,23 @@ class Contour(plotters.GenericPlotter):
                 else:
                     # actually draw the curve to the plotter
                     if not hidelines:
-                        painter.drawPolyline(pts)
+                        utils.plotClippedPolyline(painter, clip, pts)
 
-    def plotContours(self, painter, posn, axes):
+    def plotContours(self, painter, posn, axes, clip):
         """Plot the traced contours on the painter."""
         s = self.settings
         self._plotContours(painter, posn, axes, s.Lines.get('lines'),
                            self._cachedcontours,
-                           not s.ContourLabels.hide, s.Lines.hide)
+                           not s.ContourLabels.hide, s.Lines.hide, clip)
 
-    def plotSubContours(self, painter, posn, axes):
+    def plotSubContours(self, painter, posn, axes, clip):
         """Plot sub contours on painter."""
         s = self.settings
         self._plotContours(painter, posn, axes, s.SubLines.get('lines'),
                            self._cachedsubcontours,
-                           False, s.SubLines.hide)
+                           False, s.SubLines.hide, clip)
 
-    def plotContourFills(self, painter, posn, axes):
+    def plotContourFills(self, painter, posn, axes, clip):
         """Plot the traced contours on the painter."""
 
         s = self.settings
@@ -610,7 +609,7 @@ class Contour(plotters.GenericPlotter):
 
                 pts = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
-                painter.drawPolygon(pts)
+                utils.plotClippedPolygon(painter, clip, pts)
 
 # allow the factory to instantiate a contour
 document.thefactory.register( Contour )
