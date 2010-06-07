@@ -870,9 +870,9 @@ class ChoiceOrMore(Setting):
         return text
 
     def makeControl(self, *args):
-        return controls.Choice(self, True, self.vallist, *args,
-                               descriptions=self.descriptions)
-
+        argsv = {'descriptions': self.descriptions}
+        return controls.Choice(self, True, self.vallist, *args, **argsv)
+    
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
 
