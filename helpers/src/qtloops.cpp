@@ -123,3 +123,39 @@ void plotLinesToPainter(QPainter* painter,
       painter->drawLines(lines);
     }
 }
+
+void plotBoxesToPainter(QPainter* painter,
+			const doublearray* x1, const doublearray* y1,
+			const doublearray* x2, const doublearray* y2,
+			const QRectF* clip, bool autoexpand)
+{
+  // if autoexpand, expand rectangle by line width
+  QRectF clipcopy(QPointF(-32767,-32767), QPointF(32767,32767));
+  if ( clip != 0 and autoexpand )
+    {
+      const qreal lw = painter->pen().widthF();
+      qreal x1, y1, x2, y2;
+      clip->getCoords(&x1, &y1, &x2, &y2);
+      clipcopy.setCoords(x1, y1, x2, y2);
+      clipcopy.adjust(-lw, -lw, lw, lw);
+    }
+
+  const size_t maxsize = std::min( std::min(x1->size(), y1->size()),
+				   std::min(x2->size(), y2->size()) );
+
+  QVector<QRectF> rects;
+  for(size_t i = 0; i != maxsize; ++i)
+    {
+      const QPointF pt1((*x1)[i], (*y1)[i]);
+      const QPointF pt2((*x2)[i], (*y2)[i]);
+      const QRectF rect(pt1, pt2);
+
+      if( clipcopy.intersects(rect) )
+	{
+	  rects << clipcopy.intersected(rect);
+	}
+    }
+
+  if( ! rects.isEmpty() )
+    painter->drawRects(rects);
+}

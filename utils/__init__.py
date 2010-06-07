@@ -34,11 +34,12 @@ from dates import *
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon
+        plotClippedPolygon, plotBoxesToPainter
 except ImportError:
     print "Warning: Using slow substitutes for some functions"
     print "Compile helpers to avoid this warning"
     from slowfuncs import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon
+        plotClippedPolygon, plotBoxesToPainter
+
 

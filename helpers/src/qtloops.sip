@@ -75,6 +75,21 @@ void plotLinesToPainter(QPainter* painter,
    }
 %End
 
+void plotBoxesToPainter(QPainter* painter,
+			SIP_PYOBJECT, SIP_PYOBJECT,
+			SIP_PYOBJECT, SIP_PYOBJECT,
+			const QRectF* clip = 0,
+			bool autoexpand = true);
+%MethodCode
+   {
+   NumpyInValarray x1(a1);
+   NumpyInValarray y1(a2);
+   NumpyInValarray x2(a3);
+   NumpyInValarray y2(a4);
+   plotBoxesToPainter(a0, x1.data, y1.data, x2.data, y2.data, a5, a6);
+   }
+%End
+
 void polygonClip(const QPolygonF& inpoly,
 		 const QRectF& cliprect,
 		 QPolygonF& outpoly);

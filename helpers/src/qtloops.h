@@ -44,4 +44,9 @@ void plotLinesToPainter(QPainter* painter,
 			const doublearray* x2, const doublearray* y2,
 			const QRectF* clip = 0, bool autoexpand = true);
 
+void plotBoxesToPainter(QPainter* painter,
+			const doublearray* x1, const doublearray* y1,
+			const doublearray* x2, const doublearray* y2,
+			const QRectF* clip = 0, bool autoexpand = true);
+
 #endif
