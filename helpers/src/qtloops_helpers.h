@@ -25,6 +25,7 @@
 #include <vector>
 
 typedef std::valarray<double> doublearray;
+typedef std::valarray<int> intarray;
 typedef std::vector<const doublearray*> doublearray_ptr_vec;
 
 void do_numpy_init_package();
@@ -58,7 +59,6 @@ class NumpyInValarray
 
  private:
   PyObject* _convitem;
-  double* _convdata;
 };
 
 // class for converting a 2D numpy array to a valarray
@@ -73,7 +73,20 @@ class NumpyIn2DValarray
 
  private:
   PyObject* _convitem;
-  double* _convdata;
+};
+
+// class for converting a 2D numpy array to an integer valarray
+class NumpyIn2DIntValarray
+{
+ public:
+  NumpyIn2DIntValarray(PyObject* array);
+  ~NumpyIn2DIntValarray();
+
+  intarray* data;
+  int dims[2];
+
+ private:
+  PyObject* _convitem;
 };
 
 

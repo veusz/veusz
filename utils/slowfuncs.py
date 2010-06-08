@@ -23,6 +23,8 @@ These are slow versions of routines also implemented in C++
 """
 
 from itertools import izip
+import struct
+
 import veusz.qtall as qt4
 import numpy as N
 
@@ -96,3 +98,4 @@ def plotClippedPolygon(painter, inrect, inpoly, autoexpand=True):
     outpoly = qt4.QPolygonF()
     polygonClip(inpoly, inrect, outpoly)
     painter.drawPolygon(outpoly)
+

@@ -34,20 +34,17 @@ TupleInValarray::TupleInValarray(PyObject* tuple)
     {
       // access python tuple item
       PyObject* obj = PyTuple_GetItem(tuple, i);
-      npy_intp dims = -1;
-      double* objdata = 0;
 
       // convert to C array (stored in objdata)
-      if( PyArray_AsCArray(&obj, &objdata, &dims, 1,
-			   PyArray_DescrFromType(NPY_DOUBLE)) )
+      PyArrayObject *array = (PyArrayObject*)
+	PyArray_ContiguousFromObject(obj, PyArray_DOUBLE, 1, 1);
+      if( array == NULL )
 	{
-	  throw "Cannot convert items to floating point data";
+	  throw "Cannot covert item";
 	}
-      
-      // store corresponding valarray
-      data.push_back(new doublearray(objdata, dims));
-      _convitems.push_back(obj);
-      _convdata.push_back(objdata);
+      data.push_back( new doublearray( (double*)(array->data),
+				       array->dimensions[0]) );
+      _convitems.push_back( (PyObject*)array);
     }
 }
 
@@ -59,61 +56,90 @@ TupleInValarray::~TupleInValarray()
       delete data[i];
     }
 
-  // delete any space used in PyArray_AsCArray
+  // delete array objects
   for(size_t i=0; i != _convitems.size(); ++i)
     {
-      PyArray_Free(_convitems[i], _convdata[i]);
+      Py_DECREF(_convitems[i]);
     }
 }
 
 NumpyInValarray::NumpyInValarray(PyObject* array)
-  : data(0), _convdata(0)
+  : data(0), _convitem(0)
 {
-  _convitem = array;
-
-  npy_intp dims = -1;
-  if( PyArray_AsCArray(&_convitem, &_convdata, &dims, 1,
-		       PyArray_DescrFromType(NPY_DOUBLE)) )
+  PyArrayObject *arrayobj = (PyArrayObject*)
+    PyArray_ContiguousFromObject(array, PyArray_DOUBLE, 1, 1);
+  if( arrayobj == NULL )
     {
-      throw "Cannot convert to floating point data";
+      throw "Cannot covert item";
     }
 
-  data = new doublearray(_convdata, dims);
+  data = new doublearray((double*)(arrayobj->data), arrayobj->dimensions[0]);
+
+  _convitem = (PyObject*)array;
 }
 
 NumpyInValarray::~NumpyInValarray()
 {
   delete data;
-  
-  if( _convdata )
+  if( _convitem )
     {
-      PyArray_Free(_convitem, _convdata);
+      Py_DECREF(_convitem);
     }
 }
 
-NumpyIn2DValarray::NumpyIn2DValarray(PyObject* array)
-  : data(0), _convdata(0)
-{
-  _convitem = array;
 
-  npy_intp tdims[2];
-  if( PyArray_AsCArray(&_convitem, &_convdata, tdims, 2,
-		       PyArray_DescrFromType(NPY_DOUBLE)) )
+NumpyIn2DValarray::NumpyIn2DValarray(PyObject* array)
+  : data(0), _convitem(0)
+{
+  PyArrayObject *arrayobj = (PyArrayObject*)
+    PyArray_ContiguousFromObject(array, PyArray_DOUBLE, 2, 2);
+
+  if( arrayobj == NULL )
     {
       throw "Cannot convert to floating point data";
     }
 
-  data = new doublearray(_convdata, tdims[0]*tdims[1]);
-  dims[0] = tdims[0];
-  dims[1] = tdims[1];
+  dims[0] = arrayobj->dimensions[0];
+  dims[1] = arrayobj->dimensions[1];
+
+  data = new doublearray((double*)(arrayobj->data), dims[0]*dims[1]);
+  _convitem = (PyObject*)arrayobj;
 }
 
 NumpyIn2DValarray::~NumpyIn2DValarray()
 {
   delete data;
-  
-  if( _convdata )
+  if( _convitem )
     {
-      PyArray_Free(_convitem, _convdata);
+      Py_DECREF(_convitem);
     }
 }
+
+
+NumpyIn2DIntValarray::NumpyIn2DIntValarray(PyObject* array)
+  : data(0), _convitem(0)
+{
+  PyArrayObject *arrayobj = (PyArrayObject*)
+    PyArray_ContiguousFromObject(array, PyArray_INT, 2, 2);
+
+  if( arrayobj == NULL )
+    {
+      throw "Cannot convert to to an integer array";
+    }
+
+  dims[0] = arrayobj->dimensions[0];
+  dims[1] = arrayobj->dimensions[1];
+
+  data = new intarray((int*)(arrayobj->data), dims[0]*dims[1]);
+  _convitem = (PyObject*)arrayobj;
+}
+
+NumpyIn2DIntValarray::~NumpyIn2DIntValarray()
+{
+  delete data;
+  if( _convitem )
+    {
+      Py_DECREF(_convitem);
+    }
+}
+

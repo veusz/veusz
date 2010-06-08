@@ -90,6 +90,27 @@ void plotBoxesToPainter(QPainter* painter,
    }
 %End
 
+QImage numpyToQImage(SIP_PYOBJECT, SIP_PYOBJECT, bool forcetrans = false);
+%MethodCode
+  {
+  NumpyIn2DValarray data(a0);
+  NumpyIn2DIntValarray colors(a1);
+  QImage *img = new QImage( numpyToQImage(*(data.data),
+					  data.dims[1], data.dims[0],
+					  *(colors.data), colors.dims[0],
+					  a2) );
+  sipRes = img;
+  }
+%End
+
+void applyImageTransparancy(QImage& img, SIP_PYOBJECT);
+%MethodCode
+  {
+  NumpyIn2DValarray data(a1);
+  applyImageTransparancy(*a0, *(data.data), data.dims[1], data.dims[0]);
+  }
+%End
+
 void polygonClip(const QPolygonF& inpoly,
 		 const QRectF& cliprect,
 		 QPolygonF& outpoly);

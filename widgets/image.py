@@ -33,6 +33,12 @@ import veusz.utils as utils
 
 import plotters
 
+slowfuncs = False
+try:
+    from veusz.helpers.qtloops import numpyToQImage, applyImageTransparancyx
+except ImportError:
+    slowfuncs = True
+
 def applyScaling(data, mode, minval, maxval):
     """Apply a scaling transformation on the data.
 
@@ -78,6 +84,62 @@ def applyScaling(data, mode, minval, maxval):
         raise RuntimeError, 'Invalid scaling mode "%s"' % mode
 
     return data
+
+def slowNumpyToQImage(img, cmap, transparencyimg):
+    """Slow version of routine to convert numpy array to QImage
+    This is hard work in Python, but it was like this originally.
+
+    img: numpy array to convert to QImage
+    cmap: 2D array of colors (BGRA rows)
+    forcetrans: force image to have alpha component."""
+
+    if struct.pack("h", 1) == "\000\001":
+        # have to swap colors for big endian architectures
+        cmap2 = cmap.copy()
+        cmap2[:,0] = cmap[:,3]
+        cmap2[:,1] = cmap[:,2]
+        cmap2[:,2] = cmap[:,1]
+        cmap2[:,3] = cmap[:,0]
+        cmap = cmap2
+
+    fracs = N.clip(N.ravel(img), 0., 1.)
+
+    # Work out which is the minimum colour map. Assumes we have <255 bands.
+    numbands = cmap.shape[0]-1
+    bands = (fracs*numbands).astype('uint8')
+    bands = N.clip(bands, 0, numbands-1)
+
+    # work out fractional difference of data from band to next band
+    deltafracs = (fracs - bands * (1./numbands)) * numbands
+
+    # need to make a 2-dimensional array to multiply against triplets
+    deltafracs.shape = (deltafracs.shape[0], 1)
+
+    # calculate BGRalpha quadruplets
+    # this is a linear interpolation between the band and the next band
+    quads = (deltafracs*cmap[bands+1] +
+             (1.-deltafracs)*cmap[bands]).astype('uint8')
+
+    # apply transparency if a transparency image is set
+    if transparencyimg is not None and transparencyimg.shape == img.shape:
+        quads[:,3] = ( N.clip(N.ravel(transparencyimg), 0., 1.) *
+                       quads[:,3] ).astype('uint8')
+
+    # convert 32bit quads to a Qt QImage
+    # FIXME: Does this assume C-style array layout??
+    s = quads.tostring()
+
+    fmt = qt4.QImage.Format_RGB32
+    if N.any(cmap[:,3] != 255) or transparencyimg is not None:
+        # any transparency
+        fmt = qt4.QImage.Format_ARGB32
+
+    img = qt4.QImage(s, img.shape[1], img.shape[0], fmt)
+    img = img.mirrored()
+
+    # hack to ensure string isn't freed before QImage
+    img.veusz_string = s
+    return img
 
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
@@ -203,7 +265,7 @@ class Image(plotters.GenericPlotter):
             elif p[0][0] not in string.digits:
                 # new colormap follows
                 if name != '':
-                    cls.colormaps[name] = N.array(vals).astype('uint8')
+                    cls.colormaps[name] = N.array(vals).astype(N.int)
                 name = p[0]
                 vals = []
             else:
@@ -214,7 +276,7 @@ class Image(plotters.GenericPlotter):
 
         # add on final colormap
         if name != '':
-            cls.colormaps[name] = N.array(vals).astype('uint8')
+            cls.colormaps[name] = N.array(vals).astype(N.int)
 
         # collect names and sort alphabetically
         names = cls.colormaps.keys()
@@ -235,15 +297,7 @@ class Image(plotters.GenericPlotter):
         Returns a QImage
         """
 
-        cmap = N.array(cmap)
-        if struct.pack("h", 1) == "\000\001":
-            # have to swap colors for big endian architectures
-            cmap2 = N.array(cmap)
-            cmap2[:,0] = cmap[:,3]
-            cmap2[:,1] = cmap[:,2]
-            cmap2[:,2] = cmap[:,1]
-            cmap2[:,3] = cmap[:,0]
-            cmap = N.array(cmap2)
+        cmap = cmap.copy()
 
         # invert colour map if min and max are swapped
         if minval > maxval:
@@ -253,49 +307,18 @@ class Image(plotters.GenericPlotter):
         # apply transparency
         if transparency != 0:
             cmap = cmap.copy()
-            cmap[:,3] = (cmap[:,3].astype('float32') * (100-transparency) / 100.).astype('uint8')
+            cmap[:,3] = (cmap[:,3].astype('float32') * (100-transparency) /
+                         100.).astype(N.int)
         
         # apply scaling of data
         fracs = applyScaling(datain, scaling, minval, maxval)
-        fracs = N.clip(N.ravel(fracs), 0., 1.)
 
-        # Work out which is the minimum colour map. Assumes we have <255 bands.
-        numbands = cmap.shape[0]-1
-        bands = (fracs*numbands).astype('uint8')
-        bands = N.clip(bands, 0, numbands-1)
-
-        # work out fractional difference of data from band to next band
-        deltafracs = (fracs - bands * (1./numbands)) * numbands
-
-        # need to make a 2-dimensional array to multiply against triplets
-        deltafracs.shape = (deltafracs.shape[0], 1)
-
-        # calculate BGRalpha quadruplets
-        # this is a linear interpolation between the band and the next band
-        quads = (deltafracs*cmap[bands+1] +
-                 (1.-deltafracs)*cmap[bands]).astype('uint8')
-
-        # apply transparency if a transparency image is set
-        if transparencyimg is not None and transparencyimg.shape == datain.shape:
-            quads[:,3] = ( N.clip(N.ravel(transparencyimg), 0., 1.) *
-                           quads[:,3] ).astype('uint8')
-
-        # convert 32bit quads to a Qt QImage
-        # FIXME: Does this assume C-style array layout??
-        s = quads.tostring()
-
-        fmt = qt4.QImage.Format_RGB32
-        if N.any(cmap[:,3] != 255) or transparencyimg is not None:
-            # any transparency
-            fmt = qt4.QImage.Format_ARGB32
-        
-        img = qt4.QImage(s, datain.shape[1], datain.shape[0], fmt)
-        img = img.mirrored()
-
-        # hack to ensure string isn't freed before QImage
-        img.veusz_string = s
-
-        # done!
+        if not slowfuncs:
+            img = numpyToQImage(fracs, cmap, transparencyimg != None)
+            if transparencyimg is not None:
+                applyImageTransparancy(img, transparencyimg)
+        else:
+            img = slowNumpyToQImage(fracs, cmap, transparencyimg)
         return img
 
     applyColorMap = classmethod(applyColorMap)

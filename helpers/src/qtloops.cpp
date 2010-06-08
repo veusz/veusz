@@ -17,6 +17,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "qtloops.h"
+#include "isnan.h"
+#include "polylineclip.h"
 
 #include <QPointF>
 #include <QVector>
@@ -25,8 +27,6 @@
 
 #include <vector>
 #include <algorithm>
-
-#include <polylineclip.h>
 
 void addNumpyToPolygonF(QPolygonF *poly,
 			const doublearray_ptr_vec &d)
@@ -158,4 +158,86 @@ void plotBoxesToPainter(QPainter* painter,
 
   if( ! rects.isEmpty() )
     painter->drawRects(rects);
+}
+
+QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
+		     const intarray& colors, const int numcolors,
+		     bool forcetrans)
+{
+  // make format use alpha transparency if required
+  QImage::Format format = QImage::Format_RGB32;
+  if( forcetrans )
+    format = QImage::Format_ARGB32;
+  else
+    {
+      for(int i = 0; i < numcolors; ++i)
+	if( colors[i*4+3] != 255 )
+	  format = QImage::Format_ARGB32;
+    }
+
+  // make image
+  QImage img(xw, yw, format);
+
+  const int numbands = numcolors-1;
+
+  // iterate over input pixels
+  for(int y=0; y<yw; ++y)
+    {
+      // direction of images is different for qt and numpy image
+      QRgb* scanline = reinterpret_cast<QRgb*>(img.scanLine(yw-y-1));
+      for(int x=0; x<xw; ++x)
+	{
+	  double val = data[y*xw+x];
+	  if( ! isFinite(val) )
+	    {
+	      // transparent
+	      *(scanline+x) = qRgba(0, 0, 0, 0);
+	    }
+	  else
+	    {
+	      // do linear interpolation between bands
+	      // make sure between 0 and 1
+	      val = std::max(std::min(1., val), 0.);
+	      const int band = std::max(std::min(int(val*numbands),
+						 numbands-1), 0);
+	      const double delta = val*numbands - band;
+
+	      // ensure we don't read beyond where we should
+	      const int band2 = std::min(band + 1, numcolors-1);
+	      const double delta1 = 1.-delta;
+
+	      const int b = int(delta1*colors[band*4+0] +
+				delta *colors[band2*4+0]);
+	      const int g = int(delta1*colors[band*4+1] +
+				delta *colors[band2*4+1]);
+	      const int r = int(delta1*colors[band*4+2] +
+				delta *colors[band2*4+2]);
+	      const int a = int(delta1*colors[band*4+3] +
+				delta *colors[band2*4+3]);
+	      
+	      *(scanline+x) = qRgba(r, g, b, a);
+	    }
+	}
+    }
+  return img;
+}
+
+void applyImageTransparancy(QImage& img, const doublearray& data,
+			    const int xw, const int yw)
+{
+  for(int y=0; y<yw; ++y)
+    {
+      // direction of images is different for qt and numpy image
+      QRgb* scanline = reinterpret_cast<QRgb*>(img.scanLine(yw-y-1));
+      for(int x=0; x<xw; ++x)
+	{
+	  const double val = std::max(std::min(data[y*xw+x], 1.), 0.);
+	  const QRgb col = *(scanline+x);
+
+	  // update pixel alpha component
+	  QRgb newcol = qRgba( qRed(col), qGreen(col), qBlue(col),
+			       int(qAlpha(col)*val) );
+	  *(scanline+x) = newcol;
+	}
+    }
 }

@@ -26,6 +26,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QRectF>
+#include <QImage>
 
 class QtLoops {
 public:
@@ -48,5 +49,12 @@ void plotBoxesToPainter(QPainter* painter,
 			const doublearray* x1, const doublearray* y1,
 			const doublearray* x2, const doublearray* y2,
 			const QRectF* clip = 0, bool autoexpand = true);
+
+QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
+		     const intarray& colors, const int numcolors,
+		     bool forcetrans = false);
+
+void applyImageTransparancy(QImage& img, const doublearray& data,
+			    const int xw, const int yw);
 
 #endif
