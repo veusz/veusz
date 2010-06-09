@@ -20,8 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "qtloops_helpers.h"
-#include <vector>
-#include <valarray>
+
 #include <QPolygonF>
 #include <QPainter>
 #include <QPainterPath>

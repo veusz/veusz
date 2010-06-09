@@ -25,7 +25,6 @@
 #include <QLineF>
 #include <QPen>
 
-#include <vector>
 #include <algorithm>
 
 void addNumpyToPolygonF(QPolygonF& poly, const Tuple2Ptrs& d)
@@ -224,7 +223,7 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 {
   const int xw = std::min(data.dims[0], img.width());
-  const int yw = std::max(data.dims[1], img.height());
+  const int yw = std::min(data.dims[1], img.height());
   
   for(int y=0; y<yw; ++y)
     {
