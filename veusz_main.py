@@ -155,7 +155,7 @@ def run():
 
 # if ran as a program
 if __name__ == '__main__':
-    import cProfile
-    cProfile.run('run()', 'outprofile.dat')
-    #run()
+    #import cProfile
+    #cProfile.run('run()', 'outprofile.dat')
+    run()
 
