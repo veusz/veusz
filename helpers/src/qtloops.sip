@@ -42,72 +42,111 @@ public:
    QtLoops();
 };
 
-void addNumpyToPolygonF(QPolygonF*, ...);
+void addNumpyToPolygonF(QPolygonF&, ...);
 %MethodCode
    {
-   TupleInValarray t(a1);
-   addNumpyToPolygonF(a0, t.data);
+   try
+     {
+       Tuple2Ptrs t(a1);
+       addNumpyToPolygonF(*a0, t);
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
    }
 %End
 
-void plotPathsToPainter(QPainter*, QPainterPath*, SIP_PYOBJECT, SIP_PYOBJECT,
+void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
      const QRectF* clip=0);
 %MethodCode
    {
-   NumpyInValarray x(a2);
-   NumpyInValarray y(a3);
-   plotPathsToPainter(a0, a1, x.data, y.data, a4);
+   try
+     {
+       Numpy1DObj x(a2);
+       Numpy1DObj y(a3);
+       plotPathsToPainter(*a0, *a1, x, y, a4);
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
    }
 %End
 
-void plotLinesToPainter(QPainter* painter,
+void plotLinesToPainter(QPainter& painter,
 			SIP_PYOBJECT, SIP_PYOBJECT,
 			SIP_PYOBJECT, SIP_PYOBJECT,
 			const QRectF* clip = 0,
 			bool autoexpand = true);
 %MethodCode
    {
-   NumpyInValarray x1(a1);
-   NumpyInValarray y1(a2);
-   NumpyInValarray x2(a3);
-   NumpyInValarray y2(a4);
-   plotLinesToPainter(a0, x1.data, y1.data, x2.data, y2.data, a5, a6);
+   try
+     {
+       Numpy1DObj x1(a1);
+       Numpy1DObj y1(a2);
+       Numpy1DObj x2(a3);
+       Numpy1DObj y2(a4);
+       plotLinesToPainter(*a0, x1, y1, x2, y2, a5, a6);
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
    }
 %End
 
-void plotBoxesToPainter(QPainter* painter,
+void plotBoxesToPainter(QPainter& painter,
 			SIP_PYOBJECT, SIP_PYOBJECT,
 			SIP_PYOBJECT, SIP_PYOBJECT,
 			const QRectF* clip = 0,
 			bool autoexpand = true);
 %MethodCode
    {
-   NumpyInValarray x1(a1);
-   NumpyInValarray y1(a2);
-   NumpyInValarray x2(a3);
-   NumpyInValarray y2(a4);
-   plotBoxesToPainter(a0, x1.data, y1.data, x2.data, y2.data, a5, a6);
+   try
+     {
+       Numpy1DObj x1(a1);
+       Numpy1DObj y1(a2);
+       Numpy1DObj x2(a3);
+       Numpy1DObj y2(a4);
+       plotBoxesToPainter(*a0, x1, y1, x2, y2, a5, a6);
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
    }
 %End
 
 QImage numpyToQImage(SIP_PYOBJECT, SIP_PYOBJECT, bool forcetrans = false);
 %MethodCode
   {
-  NumpyIn2DValarray data(a0);
-  NumpyIn2DIntValarray colors(a1);
-  QImage *img = new QImage( numpyToQImage(*(data.data),
-					  data.dims[1], data.dims[0],
-					  *(colors.data), colors.dims[0],
-					  a2) );
-  sipRes = img;
+   try
+     {
+       Numpy2DObj data(a0);
+       Numpy2DIntObj colors(a1);
+       QImage *img = new QImage( numpyToQImage(data, colors, a2) );
+       sipRes = img;
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
   }
 %End
 
 void applyImageTransparancy(QImage& img, SIP_PYOBJECT);
 %MethodCode
   {
-  NumpyIn2DValarray data(a1);
-  applyImageTransparancy(*a0, *(data.data), data.dims[1], data.dims[0]);
+   try
+     {
+       Numpy2DObj data(a1);
+       applyImageTransparancy(*a0, data);
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
   }
 %End
 

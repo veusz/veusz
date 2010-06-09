@@ -28,16 +28,10 @@
 #include <vector>
 #include <algorithm>
 
-void addNumpyToPolygonF(QPolygonF *poly,
-			const doublearray_ptr_vec &d)
+void addNumpyToPolygonF(QPolygonF& poly, const Tuple2Ptrs& d)
 {
-  // get sizes of objects first
-  const int numcols = d.size();
-  std::vector<int> sizes;
-  for(int i = 0; i != numcols; ++i)
-    sizes.push_back(d[i]->size());
-
   // iterate over rows until none left
+  const int numcols = d.data.size();
   for(int row=0 ; ; ++row)
     {
       bool ifany = false;
@@ -45,20 +39,21 @@ void addNumpyToPolygonF(QPolygonF *poly,
       for(int col=0; col < (numcols-1); col += 2)
 	{
 	  // add point if point in two columns
-	  if( row < sizes[col] && row < sizes[col+1] )
+	  if( row < d.dims[col] && row < d.dims[col+1] )
 	    {
-	      (*poly) << QPointF( (*d[col])[row], (*d[col+1])[row] );
+	      poly << QPointF( d.data[col][row],
+			       d.data[col+1][row] );
 	      ifany = true;
 	    }
-	 }
+	}
       // exit loop if no more columns
       if(! ifany )
 	break;
     }
 }
 
-void plotPathsToPainter(QPainter* painter, QPainterPath* path,
-			const doublearray* x, const doublearray* y,
+void plotPathsToPainter(QPainter& painter, QPainterPath& path,
+			const Numpy1DObj& x, const Numpy1DObj& y,
 			const QRectF* clip)
 {
   QRectF cliprect( QPointF(-32767,-32767), QPointF(32767,32767) );
@@ -68,36 +63,36 @@ void plotPathsToPainter(QPainter* painter, QPainterPath* path,
       clip->getCoords(&x1, &y1, &x2, &y2);
       cliprect.setCoords(x1, y1, x2, y2);
     }
-  QRectF pathbox = path->boundingRect();
+  QRectF pathbox = path.boundingRect();
   cliprect.adjust(pathbox.left(), pathbox.top(),
 		  pathbox.bottom(), pathbox.right());
 
-  const size_t size = std::min(x->size(), y->size());
+  const size_t size = std::min(x.dim, y.dim);
   for(size_t i = 0; i != size; ++i)
     {
-      const QPointF pt((*x)[i], (*y)[i]);
+      const QPointF pt(x(i), y(i));
       if( cliprect.contains(pt) )
 	{
-	  painter->translate(pt);
-	  painter->drawPath(*path);
-	  painter->translate(-pt);
+	  painter.translate(pt);
+	  painter.drawPath(path);
+	  painter.translate(-pt);
 	}
     }
 }
 
-void plotLinesToPainter(QPainter* painter,
-			const doublearray* x1, const doublearray* y1,
-			const doublearray* x2, const doublearray* y2,
+void plotLinesToPainter(QPainter& painter,
+			const Numpy1DObj& x1, const Numpy1DObj& y1,
+			const Numpy1DObj& x2, const Numpy1DObj& y2,
 			const QRectF* clip, bool autoexpand)
 {
-  const size_t maxsize = std::min( std::min(x1->size(), y1->size()),
-				   std::min(x2->size(), y2->size()) );
+  const int maxsize = std::min( std::min(x1.dim, x2.dim),
+				std::min(y1.dim, y2.dim) );
 
   // if autoexpand, expand rectangle by line width
   QRectF clipcopy;
   if ( clip != 0 and autoexpand )
     {
-      const qreal lw = painter->pen().widthF();
+      const qreal lw = painter.pen().widthF();
       qreal x1, y1, x2, y2;
       clip->getCoords(&x1, &y1, &x2, &y2);
       clipcopy.setCoords(x1, y1, x2, y2);
@@ -107,10 +102,10 @@ void plotLinesToPainter(QPainter* painter,
   if( maxsize != 0 )
     {
       QVector<QLineF> lines;
-      for(size_t i = 0; i != maxsize; ++i)
+      for(int i = 0; i < maxsize; ++i)
 	{
-	  QPointF pt1((*x1)[i], (*y1)[i]);
-	  QPointF pt2((*x2)[i], (*y2)[i]);
+	  QPointF pt1(x1(i), y1(i));
+	  QPointF pt2(x2(i), y2(i));
 	  if( clip != 0 )
 	    {
 	      if( clipLine(clipcopy, pt1, pt2) )
@@ -120,34 +115,34 @@ void plotLinesToPainter(QPainter* painter,
 	    lines << QLineF(pt1, pt2);
 	}
 
-      painter->drawLines(lines);
+      painter.drawLines(lines);
     }
 }
 
-void plotBoxesToPainter(QPainter* painter,
-			const doublearray* x1, const doublearray* y1,
-			const doublearray* x2, const doublearray* y2,
+void plotBoxesToPainter(QPainter& painter,
+			const Numpy1DObj& x1, const Numpy1DObj& y1,
+			const Numpy1DObj& x2, const Numpy1DObj& y2,
 			const QRectF* clip, bool autoexpand)
 {
   // if autoexpand, expand rectangle by line width
   QRectF clipcopy(QPointF(-32767,-32767), QPointF(32767,32767));
   if ( clip != 0 and autoexpand )
     {
-      const qreal lw = painter->pen().widthF();
+      const qreal lw = painter.pen().widthF();
       qreal x1, y1, x2, y2;
       clip->getCoords(&x1, &y1, &x2, &y2);
       clipcopy.setCoords(x1, y1, x2, y2);
       clipcopy.adjust(-lw, -lw, lw, lw);
     }
 
-  const size_t maxsize = std::min( std::min(x1->size(), y1->size()),
-				   std::min(x2->size(), y2->size()) );
+  const int maxsize = std::min( std::min(x1.dim, x2.dim),
+				std::min(y1.dim, y2.dim) );
 
   QVector<QRectF> rects;
-  for(size_t i = 0; i != maxsize; ++i)
+  for(int i = 0; i < maxsize; ++i)
     {
-      const QPointF pt1((*x1)[i], (*y1)[i]);
-      const QPointF pt2((*x2)[i], (*y2)[i]);
+      QPointF pt1(x1(i), y1(i));
+      QPointF pt2(x2(i), y2(i));
       const QRectF rect(pt1, pt2);
 
       if( clipcopy.intersects(rect) )
@@ -157,28 +152,32 @@ void plotBoxesToPainter(QPainter* painter,
     }
 
   if( ! rects.isEmpty() )
-    painter->drawRects(rects);
+    painter.drawRects(rects);
 }
 
-QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
-		     const intarray& colors, const int numcolors,
+QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 		     bool forcetrans)
 {
   // make format use alpha transparency if required
+  const int numcolors = colors.dims[0];
+  if ( colors.dims[1] != 4 )
+    throw "4 columns required in colors array";
+  const int numbands = numcolors-1;
+  const int xw = imgdata.dims[0];
+  const int yw = imgdata.dims[1];
+
   QImage::Format format = QImage::Format_RGB32;
   if( forcetrans )
     format = QImage::Format_ARGB32;
   else
     {
       for(int i = 0; i < numcolors; ++i)
-	if( colors[i*4+3] != 255 )
+	if( colors(i, 3) != 255 )
 	  format = QImage::Format_ARGB32;
     }
 
   // make image
   QImage img(xw, yw, format);
-
-  const int numbands = numcolors-1;
 
   // iterate over input pixels
   for(int y=0; y<yw; ++y)
@@ -187,7 +186,7 @@ QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
       QRgb* scanline = reinterpret_cast<QRgb*>(img.scanLine(yw-y-1));
       for(int x=0; x<xw; ++x)
 	{
-	  double val = data[y*xw+x];
+	  double val = imgdata(x, y);
 	  if( ! isFinite(val) )
 	    {
 	      // transparent
@@ -203,17 +202,17 @@ QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
 	      const double delta = val*numbands - band;
 
 	      // ensure we don't read beyond where we should
-	      const int band2 = std::min(band + 1, numcolors-1);
+	      const int band2 = std::min(band + 1, numbands);
 	      const double delta1 = 1.-delta;
 
-	      const int b = int(delta1*colors[band*4+0] +
-				delta *colors[band2*4+0]);
-	      const int g = int(delta1*colors[band*4+1] +
-				delta *colors[band2*4+1]);
-	      const int r = int(delta1*colors[band*4+2] +
-				delta *colors[band2*4+2]);
-	      const int a = int(delta1*colors[band*4+3] +
-				delta *colors[band2*4+3]);
+	      const int b = int(delta1*colors(band, 0) +
+				delta *colors(band2,0));
+	      const int g = int(delta1*colors(band, 1) +
+				delta *colors(band2,1));
+	      const int r = int(delta1*colors(band, 2) +
+				delta *colors(band2,2));
+	      const int a = int(delta1*colors(band, 3) +
+				delta *colors(band2,3));
 	      
 	      *(scanline+x) = qRgba(r, g, b, a);
 	    }
@@ -222,16 +221,18 @@ QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
   return img;
 }
 
-void applyImageTransparancy(QImage& img, const doublearray& data,
-			    const int xw, const int yw)
+void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 {
+  const int xw = std::min(data.dims[0], img.width());
+  const int yw = std::max(data.dims[1], img.height());
+  
   for(int y=0; y<yw; ++y)
     {
       // direction of images is different for qt and numpy image
       QRgb* scanline = reinterpret_cast<QRgb*>(img.scanLine(yw-y-1));
       for(int x=0; x<xw; ++x)
 	{
-	  const double val = std::max(std::min(data[y*xw+x], 1.), 0.);
+	  const double val = std::max(std::min(data(x,y), 1.), 0.);
 	  const QRgb col = *(scanline+x);
 
 	  // update pixel alpha component

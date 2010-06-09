@@ -21,72 +21,90 @@
 
 #include "Python.h"
 
-#include <valarray>
 #include <vector>
 
-typedef std::valarray<double> doublearray;
-typedef std::valarray<int> intarray;
-typedef std::vector<const doublearray*> doublearray_ptr_vec;
+#define DEBUG false
 
 void do_numpy_init_package();
 
-// class for converting tuples of numpy arrays to a vector of valarrays
+// class for converting tuples to objects which clean themselves up
 // throws const char* if conversion failed
-class TupleInValarray
+class Tuple2Ptrs
 {
 public:
-  TupleInValarray(PyObject* tuple);
-  ~TupleInValarray();
+  Tuple2Ptrs(PyObject* tuple);
+  ~Tuple2Ptrs();
 
   // data in tuple are stored here
-  doublearray_ptr_vec data;
+  std::vector<const double*> data;
+  std::vector<int> dims;
 
 private:
   // these are the python objects made by PyArray_AsCArray
-  std::vector<PyObject*> _convitems;
-  // corresponding pointers to data
-  std::vector<double*> _convdata;
+  std::vector<PyObject*> _arrays;
 };
 
 // class for converting numpy array to a valarray
-class NumpyInValarray
+class Numpy1DObj
 {
  public:
-  NumpyInValarray(PyObject* array);
-  ~NumpyInValarray();
+  Numpy1DObj(PyObject* array);
+  ~Numpy1DObj();
 
-  doublearray* data;
+  const double* data;
+  int dim;
+
+  inline double operator()(const int x) const
+  {
+    if( DEBUG and (x < 0 or x >= dim) )
+	throw "Invalid index in array";
+    return data[x];
+  }
 
  private:
-  PyObject* _convitem;
+  PyObject* _array;
 };
 
 // class for converting a 2D numpy array to a valarray
-class NumpyIn2DValarray
+class Numpy2DObj
 {
  public:
-  NumpyIn2DValarray(PyObject* array);
-  ~NumpyIn2DValarray();
+  Numpy2DObj(PyObject* array);
+  ~Numpy2DObj();
 
-  doublearray* data;
+  const double* data;
   int dims[2];
 
+  inline double operator()(const int x, const int y) const
+  {
+    if( DEBUG and (x < 0 or x >= dims[0] or y < 0 or y >= dims[1]) )
+      throw "Invalid index in array";
+    return data[x+y*dims[0]];
+  }
+
  private:
-  PyObject* _convitem;
+  PyObject* _array;
 };
 
 // class for converting a 2D numpy array to an integer valarray
-class NumpyIn2DIntValarray
+class Numpy2DIntObj
 {
  public:
-  NumpyIn2DIntValarray(PyObject* array);
-  ~NumpyIn2DIntValarray();
+  Numpy2DIntObj(PyObject* array);
+  ~Numpy2DIntObj();
 
-  intarray* data;
+  const int* data;
   int dims[2];
 
+  inline int operator()(const int x, const int y) const
+  {
+    if( DEBUG and (x < 0 or x >= dims[0] or y < 0 or y >= dims[1]) )
+      throw "Invalid index in array";
+    return data[x+y*dims[1]];
+  }
+
  private:
-  PyObject* _convitem;
+  PyObject* _array;
 };
 
 

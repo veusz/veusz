@@ -26,7 +26,7 @@ void do_numpy_init_package()
   import_array();
 }
 
-TupleInValarray::TupleInValarray(PyObject* tuple)
+Tuple2Ptrs::Tuple2Ptrs(PyObject* tuple)
 {
   const size_t numitems = PyTuple_Size(tuple);
 
@@ -40,106 +40,93 @@ TupleInValarray::TupleInValarray(PyObject* tuple)
 	PyArray_ContiguousFromObject(obj, PyArray_DOUBLE, 1, 1);
       if( array == NULL )
 	{
-	  throw "Cannot covert item";
+	  throw "Cannot covert parameter to 1D numpy array";
 	}
-      data.push_back( new doublearray( (double*)(array->data),
-				       array->dimensions[0]) );
-      _convitems.push_back( (PyObject*)array);
+      data.push_back( (double*)(array->data) );
+      dims.push_back( array->dimensions[0] );
+      _arrays.push_back( (PyObject*)array );
     }
 }
 
-TupleInValarray::~TupleInValarray()
+Tuple2Ptrs::~Tuple2Ptrs()
 {
-  // delete constructed valarrays
-  for(size_t i=0; i != data.size(); ++i)
-    {
-      delete data[i];
-    }
-
   // delete array objects
-  for(size_t i=0; i != _convitems.size(); ++i)
+  for(size_t i=0; i != _arrays.size(); ++i)
     {
-      Py_DECREF(_convitems[i]);
+      Py_DECREF(_arrays[i]);
+      _arrays[i] = 0;
+      data[i] = 0;
     }
 }
 
-NumpyInValarray::NumpyInValarray(PyObject* array)
-  : data(0), _convitem(0)
+Numpy1DObj::Numpy1DObj(PyObject* array)
+  : data(0), _array(0)
 {
   PyArrayObject *arrayobj = (PyArrayObject*)
     PyArray_ContiguousFromObject(array, PyArray_DOUBLE, 1, 1);
   if( arrayobj == NULL )
     {
-      throw "Cannot covert item";
+      throw "Cannot covert item to 1D numpy array";
     }
 
-  data = new doublearray((double*)(arrayobj->data), arrayobj->dimensions[0]);
-
-  _convitem = (PyObject*)array;
+  data = (double*)(arrayobj->data);
+  dim = arrayobj->dimensions[0];
+  _array = (PyObject*)arrayobj;
 }
 
-NumpyInValarray::~NumpyInValarray()
+Numpy1DObj::~Numpy1DObj()
 {
-  delete data;
-  if( _convitem )
-    {
-      Py_DECREF(_convitem);
-    }
+  Py_XDECREF(_array);
+  _array = 0;
+  data = 0;
 }
 
 
-NumpyIn2DValarray::NumpyIn2DValarray(PyObject* array)
-  : data(0), _convitem(0)
+Numpy2DObj::Numpy2DObj(PyObject* array)
+  : data(0), _array(0)
 {
   PyArrayObject *arrayobj = (PyArrayObject*)
     PyArray_ContiguousFromObject(array, PyArray_DOUBLE, 2, 2);
 
   if( arrayobj == NULL )
     {
-      throw "Cannot convert to floating point data";
+      throw "Cannot convert to 2D numpy array";
     }
 
+  data = (double*)(arrayobj->data);
   dims[0] = arrayobj->dimensions[0];
   dims[1] = arrayobj->dimensions[1];
-
-  data = new doublearray((double*)(arrayobj->data), dims[0]*dims[1]);
-  _convitem = (PyObject*)arrayobj;
+  _array = (PyObject*)arrayobj;
 }
 
-NumpyIn2DValarray::~NumpyIn2DValarray()
+Numpy2DObj::~Numpy2DObj()
 {
-  delete data;
-  if( _convitem )
-    {
-      Py_DECREF(_convitem);
-    }
+  Py_XDECREF(_array);
+  _array = 0;
+  data = 0;
 }
 
-
-NumpyIn2DIntValarray::NumpyIn2DIntValarray(PyObject* array)
-  : data(0), _convitem(0)
+Numpy2DIntObj::Numpy2DIntObj(PyObject* array)
+  : data(0), _array(0)
 {
   PyArrayObject *arrayobj = (PyArrayObject*)
     PyArray_ContiguousFromObject(array, PyArray_INT, 2, 2);
 
   if( arrayobj == NULL )
     {
-      throw "Cannot convert to to an integer array";
+      throw "Cannot convert to 1D numpy array";
     }
 
+  data = (int*)(arrayobj->data);
   dims[0] = arrayobj->dimensions[0];
   dims[1] = arrayobj->dimensions[1];
-
-  data = new intarray((int*)(arrayobj->data), dims[0]*dims[1]);
-  _convitem = (PyObject*)arrayobj;
+  _array = (PyObject*)arrayobj;
 }
 
-NumpyIn2DIntValarray::~NumpyIn2DIntValarray()
+Numpy2DIntObj::~Numpy2DIntObj()
 {
-  delete data;
-  if( _convitem )
-    {
-      Py_DECREF(_convitem);
-    }
+  Py_XDECREF(_array);
+  _array = 0;
+  data = 0;
 }
 

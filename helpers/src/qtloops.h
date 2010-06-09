@@ -33,28 +33,26 @@ public:
   QtLoops() {};
 };
 
-void addNumpyToPolygonF(QPolygonF* poly,
-			const doublearray_ptr_vec &v);
+void addNumpyToPolygonF(QPolygonF& poly,
+			const Tuple2Ptrs& v);
 
-void plotPathsToPainter(QPainter* painter, QPainterPath* path,
-			const doublearray* x, const doublearray* y,
+void plotPathsToPainter(QPainter& painter, QPainterPath& path,
+			const Numpy1DObj& x, const Numpy1DObj& y,
 			const QRectF* clip = 0);
 
-void plotLinesToPainter(QPainter* painter,
-			const doublearray* x1, const doublearray* y1,
-			const doublearray* x2, const doublearray* y2,
+void plotLinesToPainter(QPainter& painter,
+			const Numpy1DObj& x1, const Numpy1DObj& y1,
+			const Numpy1DObj& x2, const Numpy1DObj& y2,
 			const QRectF* clip = 0, bool autoexpand = true);
 
-void plotBoxesToPainter(QPainter* painter,
-			const doublearray* x1, const doublearray* y1,
-			const doublearray* x2, const doublearray* y2,
+void plotBoxesToPainter(QPainter& painter,
+			const Numpy1DObj& x1, const Numpy1DObj& y1,
+			const Numpy1DObj& x2, const Numpy1DObj& y2,
 			const QRectF* clip = 0, bool autoexpand = true);
 
-QImage numpyToQImage(const doublearray& data, const int xw, const int yw,
-		     const intarray& colors, const int numcolors,
+QImage numpyToQImage(const Numpy2DObj& data, const Numpy2DIntObj &colors,
 		     bool forcetrans = false);
 
-void applyImageTransparancy(QImage& img, const doublearray& data,
-			    const int xw, const int yw);
+void applyImageTransparancy(QImage& img, const Numpy2DObj& data);
 
 #endif
