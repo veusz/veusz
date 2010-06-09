@@ -334,7 +334,7 @@ def formatNumber(num, format):
                 else:
                     # use date formatting
                     try:
-                        out = d.strftime('%'+ftype[2:])
+                        out = d.strftime(str('%'+ftype[2:]))
                     except ValueError:
                         out = _formaterror
             else:
