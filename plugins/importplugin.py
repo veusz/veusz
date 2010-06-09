@@ -104,6 +104,22 @@ class ImportFieldFloat(ImportField):
         except:
             return None
 
+class ImportFieldInt(ImportField):
+    """Enter an integer number."""
+
+    def makeControl(self):
+        l = qt4.QLabel(self.descr)
+        e = qt4.QSpinBox()
+        if self.default is not None:
+            e.setValue( self.default )
+        return (l, e)
+
+    def getControlResults(self, cntrls):
+        try:
+            return cntrls[1].value()
+        except:
+            return None
+
 class ImportFieldCombo(ImportField):
     """Drop-down combobox on dialog."""
     def __init__(self, name, descr=None, default=None, items=(),
@@ -209,6 +225,8 @@ class ImportPluginExample(ImportPlugin):
             ImportFieldText("name", descr="Dataset name", default="name"),
             ImportFieldCheck("invert", descr="invert values"),
             ImportFieldFloat("mult", descr="Multiplication factor", default=1),
+            ImportFieldInt("skip", descr="Skip N lines",
+                           default=0),
             ImportFieldCombo("subtract", items=("0", "1", "2"),
                              editable=False, default="0")
             ]
@@ -224,6 +242,8 @@ class ImportPluginExample(ImportPlugin):
         sub = float(params.field_results["subtract"])
         if params.field_results["invert"]:
             mult *= -1
+        for i in xrange(params.field_results["skip"]):
+            f.readline()
         for line in f:
             data += [float(x)*mult-sub for x in line.split()]
 
