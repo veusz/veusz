@@ -411,17 +411,15 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
         # turn off brush
         painter.setBrush( qt4.QBrush() )
 
-    # optimize loop
-    t = painter.translate
-    d = painter.drawPath
-    r = painter.resetTransform
-
     # split up into two loops as this is a critical path
     if scaling is None:
         plotPathsToPainter(painter, path, xpos, ypos, clip)
     else:
         # plot markers, scaling each one
         s = painter.scale
+        t = painter.translate
+        d = painter.drawPath
+        r = painter.resetTransform
         for x, y, sc in izip(xpos, ypos, scaling):
             t(x, y)
             s(sc, sc)

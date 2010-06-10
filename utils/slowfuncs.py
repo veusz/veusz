@@ -47,16 +47,26 @@ def addNumpyToPolygonF(poly, *args):
     for p in points:
         pappend( qpointf(*p) )
 
-def plotPathsToPainter(painter, path, x, y):
+def plotPathsToPainter(painter, path, x, y, clip=None):
     """Plot array of x, y points."""
 
-    # more copying things into local variables
-    t = painter.translate
-    d = painter.drawPath
+    if clip is None:
+        clip = qt4.QRectF(qt4.QPointF(-32767,-32767),qt4.QPointF(32767,32767))
+    else:
+        clip = qt4.QRectF(clip)
+
+    # adjust bounding box by size of path
+    pathbox = path.boundingRect()
+    clip.adjust(pathbox.left(), pathbox.top(),
+                pathbox.bottom(), pathbox.right())
+
+    # draw the paths
     for xp, yp in izip(x, y):
-        t(xp, yp)
-        d(path)
-        t(-xp, -yp)
+        pt = qt4.QPointF(xp, yp)
+        if clip.contains(pt):
+            painter.translate(pt)
+            painter.drawPath(path)
+            painter.translate(-pt)
 
 def plotLinesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
     """Plot lines given in numpy arrays to painter."""
@@ -99,3 +109,24 @@ def plotClippedPolygon(painter, inrect, inpoly, autoexpand=True):
     polygonClip(inpoly, inrect, outpoly)
     painter.drawPolygon(outpoly)
 
+def plotBoxesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
+    """Plot a set of rectangles."""
+    if clip is None:
+        clip = qt4.QRectF(qt4.QPointF(-32767,-32767), qt4.QPointF(32767,32767))
+
+    # expand clip by line width
+    if autoexpand:
+        clip = qt4.QRectF(clip)
+        lw = painter.pen().widthF()
+        clip.adjust(-lw, -lw, lw, lw)
+
+    # construct rectangle list
+    rects = []
+    for ix1, iy1, ix2, iy2 in izip(x1, y1, x2, y2):
+        rect = qt4.QRectF( qt4.QPointF(ix1, iy1), qt4.QPointF(ix2, iy2) )
+        if clip.intersects(rect):
+            rects.append(clip.intersected(rect))
+
+    # paint it
+    if rects:
+        painter.drawRects(rects)
