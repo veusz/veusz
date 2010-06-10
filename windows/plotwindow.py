@@ -366,8 +366,9 @@ class PlotWindow( qt4.QGraphicsView ):
         menuact.setIcon( action.icon() )
 
     def doZoomMenuButton(self):
+        """Select previous zoom option when clicking on zoom menu."""
         act = self.vzactions[setting.settingdb['view_defaultzoom']]
-        act.emit(qt4.SIGNAL('triggered()'))
+        act.trigger()
 
     def doZoomRect(self, endpos):
         """Take the zoom rectangle drawn by the user and do the zooming.
