@@ -42,21 +42,24 @@ def populateCombo(combo, items):
     # existing setting
     currenttext = unicode(combo.currentText())
 
-    # get rid of existing items in list (clear doesn't work here)
-    for i in xrange(combo.count()):
-        combo.removeItem(0)
-
-    # get index for value, or add value if not set
-    try:
-        index = items.index(currenttext)
-    except ValueError:
-        items.append(currenttext)
-        index = len(items)-1
+    # add to list if not included
+    if currenttext not in items:
+        items = items + [currenttext]
 
     # put in new entries
-    combo.addItems(items)
-    
-    # set index to current value
+    for i, val in enumerate(items):
+        if i >= combo.count():
+            combo.addItem(val)
+        else:
+            if combo.itemText(i) != val:
+                combo.insertItem(i, val)
+
+    # remove any extra items
+    while combo.count() > len(items):
+        combo.removeItem( combo.count()-1 )
+
+    # get index for current value
+    index = combo.findText(currenttext)
     combo.setCurrentIndex(index)
 
 def styleClear(widget):
@@ -361,7 +364,6 @@ class Choice(qt4.QComboBox):
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
-
         text = self.setting.toText()
         index = self.findText(text)
         if index >= 0:
@@ -485,9 +487,9 @@ class Dataset(Choice):
         self.document = document
         self.dimensions = dimensions
         self.datatype = datatype
+        self.lastdatasets = None
         self._populateEntries()
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotModified)
+        self.connect(document, qt4.SIGNAL('sigModified'), self.slotModified)
 
     def _populateEntries(self):
         """Put the list of datasets into the combobox."""
@@ -499,12 +501,14 @@ class Dataset(Choice):
                 datasets.append(name)
         datasets.sort()
 
-        populateCombo(self, datasets)
+        if datasets != self.lastdatasets:
+            populateCombo(self, datasets)
+            self.lastdatasets = datasets
 
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
         self._populateEntries()
-        
+
 class DatasetOrString(qt4.QWidget):
     """Allow use to choose a dataset or enter some text."""
 
