@@ -1,4 +1,4 @@
-Veusz 1.7
+Veusz 1.8
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -18,33 +18,35 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.7:
- * Widgets can be moved by dragged and dropped in the widget tree, or copied
-   by holding down ctrl at the same time
- * Tick labels are centred if possible at the start and ends of axes
- * When putting graphs in grid, axis labels and tick labels are placed
-   in much better positions
- * Embedding module is shipped in binary versions
- * Grid lines can be drawn on axis minor ticks
- * Contour widget can draw minor (dotted) contours between main contours
- * Logarithmic contours have proper logarithmic spacing
- * Fixes for widget names and dataset names with Unicode characters, including
-   copy and paste
- * Optional smoothing in the image widget
+Changes in 1.8:
+ * Rewritten several inner loops in C++ giving speedups for large datasets
+ * Lines, points and shapes are clipped before plotting, which speeds up
+   plotting with some Qt backends and reduces file sizes
+ * Data histogram feature added for calculating histograms of datasets,
+   including cumulative histograms
+ * Data import plugins allow the user to add support for importing any 
+   file type - see Veusz wiki for details
 
-Minor changes:
- * Errors in evaluating expressions are logged in the console window, and
-   do not show exceptions
- * Fix problems when importing multiple symbols from python modules in the
-   custom import dialog
- * Use minus sign for negative numbers in tick labels, rather than hyphens
- * Contour widget lines can have transparency
- * Datasets are sorted by name when writing to saved document
- * Use correct status for paste button when starting application
- * Add option for extra space between axes and tick labels, and axis labels
- * Preference added for background color of exported bitmaps
- * Add IsClosed() and WaitForClose() embedding functions to check whether plot
-   window is closed, or to wait for closing of plot window.
+Minor changes in 1.8:
+ * Fix zoom button default action
+ * Speed up user interface when handling large numbers of datasets
+ * Reset buttons added to several dialog boxes
+ * Add engineering number formatting for axes: %VE giving e.g. 1k or 50m
+ * Add drop down list of number formatting option to axis tick labels
+ * Force Qt dialog boxes to be used instead of KDE ones, as KDE ones are
+   currently broken
+ * Use miter joins for plotting data points for sharper appearance
+ * Add SetAntiAliasing command to command interface to toggle anti aliasing
+ * Fix highlighting of errors when entering settings
+ * Fix conversion of numpy to QVariants for new versions of PyQt
+ * New point styles added for showing limits
+ * Reworked internals of import dialog substantially
+ * Several other minor bug fixes
+
+Note for people building from source and package builders:
+ * Veusz now contains C++ code, dependent for building on the development
+   libraries of SIP, PyQt4 and Qt4. Note that Veusz will still work (but
+   more slowly) without this helper library.
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -64,7 +66,7 @@ Features of package:
  * Scripting interface
  * Dataset creation/manipulation
  * Embed Veusz within other programs
- * Text, CSV and FITS importing
+ * Text, CSV, FITS and user-plugin importing
  * Data can be captured from external sources
  * User defined functions, constants and can import external Python functions
 
@@ -91,17 +93,18 @@ Optional:
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
-examples are also useful documentation.
+examples are also useful documentation. Please also see and contribute
+to the Veusz wiki: http://barmag.net/veusz-wiki/
 
 Issues with the current version:
 
- * Due to Qt, hatched regions sometimes look rather poor when exported
-   to PostScript, PDF or SVG.
+ * Plots can sometimes be slow using antialiasing. Go to the
+   preferences dialog or right click on the plot to disable
+   antialiasing.
 
- * Due to a bug in Qt, some long lines, or using log scales, can lead
-   to very slow plot times under X11. It is fixed by upgrading to
-   Qt-4.5.1 (or using a binary). Switching off antialiasing in the options
-   may help.
+ * Some recent versions of PyQt/SIP will causes crashes when exporting
+   SVG files. Update to 4.7.4 (if released) or a recent snapshot to
+   solve this problem.
 
 If you enjoy using Veusz, I would love to hear from you. Please join
 the mailing lists at

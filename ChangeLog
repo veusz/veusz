@@ -1,4 +1,202 @@
 ------------------------------------------------------------------------
+r1280 | jeremysanders | 2010-06-13 15:53:17 +0100 (Sun, 13 Jun 2010) | 1 line
+
+Merge speedups banch to trunk
+------------------------------------------------------------------------
+r1278 | jeremysanders | 2010-06-13 11:39:17 +0100 (Sun, 13 Jun 2010) | 1 line
+
+Add better error checking to histograms. Show information about histogram in data edit dialog.
+------------------------------------------------------------------------
+r1274 | jeremysanders | 2010-06-10 20:00:47 +0100 (Thu, 10 Jun 2010) | 1 line
+
+Fix default action when clicking on zoom button
+------------------------------------------------------------------------
+r1273 | jeremysanders | 2010-06-10 19:53:54 +0100 (Thu, 10 Jun 2010) | 1 line
+
+Only update dataset lists if they change
+------------------------------------------------------------------------
+r1269 | jeremysanders | 2010-06-09 10:14:20 +0100 (Wed, 09 Jun 2010) | 1 line
+
+strftime argument must be str, not unicode
+------------------------------------------------------------------------
+r1267 | jeremysanders | 2010-06-09 08:28:48 +0100 (Wed, 09 Jun 2010) | 1 line
+
+Add plugins directory to setup.py (thanks to Bryan Harris)
+------------------------------------------------------------------------
+r1265 | jeremysanders | 2010-06-08 15:45:10 +0100 (Tue, 08 Jun 2010) | 1 line
+
+Add integer input field for plugins and add a skip option to the example plugin
+------------------------------------------------------------------------
+r1264 | jeremysanders | 2010-06-07 19:04:43 +0100 (Mon, 07 Jun 2010) | 1 line
+
+Fix compatibility in Python2.5
+------------------------------------------------------------------------
+r1254 | jeremysanders | 2010-06-03 21:11:16 +0100 (Thu, 03 Jun 2010) | 1 line
+
+Add python api to clip
+------------------------------------------------------------------------
+r1253 | jeremysanders | 2010-06-03 07:43:08 +0100 (Thu, 03 Jun 2010) | 1 line
+
+Move very similar functions in clip routine to a macro
+------------------------------------------------------------------------
+r1252 | jeremysanders | 2010-06-02 22:05:26 +0100 (Wed, 02 Jun 2010) | 2 lines
+
+Add start of python module to clip points to a rectangle
+
+------------------------------------------------------------------------
+r1250 | jeremysanders | 2010-05-30 22:38:32 +0100 (Sun, 30 May 2010) | 1 line
+
+Allow histogram datasets to be reedited
+------------------------------------------------------------------------
+r1249 | jeremysanders | 2010-05-30 22:08:12 +0100 (Sun, 30 May 2010) | 1 line
+
+Add reset button to histogram dialog
+------------------------------------------------------------------------
+r1248 | jeremysanders | 2010-05-30 21:57:01 +0100 (Sun, 30 May 2010) | 1 line
+
+Add reset button to data create dialog.
+------------------------------------------------------------------------
+r1247 | jeremysanders | 2010-05-30 18:45:14 +0100 (Sun, 30 May 2010) | 1 line
+
+For axis number formatting, add a list of suggested values and tooltips describing them. Add to Choice control and ChoiceOrMore setting option to give descriptions for each value.
+------------------------------------------------------------------------
+r1246 | jeremysanders | 2010-05-29 15:23:09 +0100 (Sat, 29 May 2010) | 1 line
+
+Use buttonbox in capture dialog box
+------------------------------------------------------------------------
+r1245 | jeremysanders | 2010-05-29 15:17:56 +0100 (Sat, 29 May 2010) | 1 line
+
+Use button box in data create 2d dialog box
+------------------------------------------------------------------------
+r1244 | jeremysanders | 2010-05-29 15:01:36 +0100 (Sat, 29 May 2010) | 1 line
+
+Use buttonBox in create dialog
+------------------------------------------------------------------------
+r1243 | jeremysanders | 2010-05-29 14:35:43 +0100 (Sat, 29 May 2010) | 1 line
+
+Force use of built in Qt dialog boxes on linux to avoid broken KDE ones
+------------------------------------------------------------------------
+r1241 | jeremysanders | 2010-05-26 22:28:50 +0100 (Wed, 26 May 2010) | 1 line
+
+Add some api docs to plugin
+------------------------------------------------------------------------
+r1240 | jeremysanders | 2010-05-26 21:19:47 +0100 (Wed, 26 May 2010) | 1 line
+
+Load plugins on startup. Add Float field type for plugins. Remember previous plugin in import dialog.
+------------------------------------------------------------------------
+r1239 | jeremysanders | 2010-05-24 22:30:36 +0100 (Mon, 24 May 2010) | 1 line
+
+Add plugin configration to preferences dialog
+------------------------------------------------------------------------
+r1238 | jeremysanders | 2010-05-23 18:18:03 +0100 (Sun, 23 May 2010) | 1 line
+
+Implement import plugins, allowing the user to define plugins to load data
+------------------------------------------------------------------------
+r1237 | jeremysanders | 2010-05-22 22:39:44 +0100 (Sat, 22 May 2010) | 1 line
+
+Remove extra file
+------------------------------------------------------------------------
+r1236 | jeremysanders | 2010-05-22 22:37:08 +0100 (Sat, 22 May 2010) | 1 line
+
+Rework import dialog by splitting it up into separate classes, and using separate ui files for each tab.
+------------------------------------------------------------------------
+r1235 | jeremysanders | 2010-05-20 21:06:28 +0100 (Thu, 20 May 2010) | 1 line
+
+Create register for recreating datasets
+------------------------------------------------------------------------
+r1234 | jeremysanders | 2010-05-20 20:54:35 +0100 (Thu, 20 May 2010) | 1 line
+
+Clean up dataset duplication and unlinking
+------------------------------------------------------------------------
+r1233 | jeremysanders | 2010-05-20 20:15:00 +0100 (Thu, 20 May 2010) | 1 line
+
+Split unlinking into two Operations for files and datasets
+------------------------------------------------------------------------
+r1232 | jeremysanders | 2010-05-19 21:50:13 +0100 (Wed, 19 May 2010) | 1 line
+
+Add cumulative option to histogram and also allow Poission error bars to be computed
+------------------------------------------------------------------------
+r1231 | jeremysanders | 2010-05-17 22:09:17 +0100 (Mon, 17 May 2010) | 1 line
+
+Fix typos in classifiers
+------------------------------------------------------------------------
+r1230 | jeremysanders | 2010-05-17 20:32:06 +0100 (Mon, 17 May 2010) | 1 line
+
+Cleanups for histogram dialog
+------------------------------------------------------------------------
+r1229 | jeremysanders | 2010-05-16 22:33:24 +0100 (Sun, 16 May 2010) | 1 line
+
+Implement generation of histograms
+------------------------------------------------------------------------
+r1228 | jeremysanders | 2010-05-15 23:03:15 +0100 (Sat, 15 May 2010) | 1 line
+
+Further updates to histogram dialog
+------------------------------------------------------------------------
+r1227 | jeremysanders | 2010-05-14 17:42:48 +0100 (Fri, 14 May 2010) | 1 line
+
+Use miter joins for plotting data points
+------------------------------------------------------------------------
+r1226 | jeremysanders | 2010-05-14 14:56:27 +0100 (Fri, 14 May 2010) | 1 line
+
+Add solid limit points
+------------------------------------------------------------------------
+r1225 | jeremysanders | 2010-05-14 14:17:59 +0100 (Fri, 14 May 2010) | 1 line
+
+Remove syntax error
+------------------------------------------------------------------------
+r1224 | jeremysanders | 2010-05-13 22:00:22 +0100 (Thu, 13 May 2010) | 2 lines
+
+Start of histogram dialog
+
+------------------------------------------------------------------------
+r1223 | jeremysanders | 2010-05-10 16:23:37 +0100 (Mon, 10 May 2010) | 2 lines
+
+Fix displaying strings in data edit dialog
+
+------------------------------------------------------------------------
+r1222 | jeremysanders | 2010-05-09 22:35:19 +0100 (Sun, 09 May 2010) | 1 line
+
+Add SetAntiAliasing command to embedding interface
+------------------------------------------------------------------------
+r1221 | jeremysanders | 2010-05-09 17:49:49 +0100 (Sun, 09 May 2010) | 1 line
+
+Make data create dialog use historygroupbox
+------------------------------------------------------------------------
+r1220 | jeremysanders | 2010-05-09 16:41:08 +0100 (Sun, 09 May 2010) | 1 line
+
+Add group box which can remember which item was selected
+------------------------------------------------------------------------
+r1219 | jeremysanders | 2010-05-09 15:59:47 +0100 (Sun, 09 May 2010) | 1 line
+
+Add non standard colors to color combo box when used
+------------------------------------------------------------------------
+r1218 | jeremysanders | 2010-05-09 11:56:59 +0100 (Sun, 09 May 2010) | 2 lines
+
+Use stylesheets to indicate error condition when editing settings
+
+------------------------------------------------------------------------
+r1217 | jeremysanders | 2010-05-09 11:52:31 +0100 (Sun, 09 May 2010) | 2 lines
+
+Fix error handling when choosing widgets in axis match setting
+
+------------------------------------------------------------------------
+r1216 | jeremysanders | 2010-05-06 21:17:33 +0100 (Thu, 06 May 2010) | 2 lines
+
+Add engineering suffix formatting "%VE"
+
+------------------------------------------------------------------------
+r1215 | jeremysanders | 2010-04-20 22:37:14 +0100 (Tue, 20 Apr 2010) | 1 line
+
+PyQt no longer allows numpy numbers to directly convert to QVariants - working around by casting
+------------------------------------------------------------------------
+r1213 | jeremysanders | 2010-03-26 22:33:04 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Update manifest.in
+------------------------------------------------------------------------
+r1212 | jeremysanders | 2010-03-26 22:30:50 +0000 (Fri, 26 Mar 2010) | 1 line
+
+Update changelog for 1.7
+------------------------------------------------------------------------
 r1211 | jeremysanders | 2010-03-26 22:29:48 +0000 (Fri, 26 Mar 2010) | 1 line
 
 Documentation updates
