@@ -260,7 +260,8 @@ struct Csite
     double *xcp, *ycp;          /* output contour points */
 };
 
-void print_Csite(Csite *Csite)
+#if 0
+static void print_Csite(Csite *Csite)
 {
     Cdata *data = Csite->data;
     int i, j, ij;
@@ -282,6 +283,7 @@ void print_Csite(Csite *Csite)
     }
     printf("\n");
 }
+#endif
 
 /* triangle only takes values of -1, 0, 1, so it could be a signed char. */
 /* most or all of the longs probably could be converted to ints with no loss */
@@ -1246,7 +1248,7 @@ data_init (Csite * site, int region, long nchunk)
    zones, not points.  All four zones sharing a bad
    point must be marked as not existing.
 */
-void
+static void
 mask_zones (long iMax, long jMax, char *mask, char *reg)
 {
     long i, j, ij;
@@ -1341,7 +1343,7 @@ cntr_init(Csite *site, long iMax, long jMax, double *x, double *y,
     return 0;
 }
 
-void cntr_del(Csite *site)
+static void cntr_del(Csite *site)
 {
     PyMem_Free(site->triangle);
     PyMem_Free(site->reg);
@@ -1382,6 +1384,7 @@ build_cntr_list_p(long *np, double *xp, double *yp, int nparts, long ntotal)
 }
 
 /* Build a list of tuples (X, Y), where X and Y are 1-D arrays. */
+#if 0
 static PyObject *
 build_cntr_list_v(long *np, double *xp, double *yp, int nparts, long ntotal)
 {
@@ -1416,12 +1419,13 @@ build_cntr_list_v(long *np, double *xp, double *yp, int nparts, long ntotal)
     Py_XDECREF(all_contours);
     return NULL;
 }
+#endif
 
 /* Build a list of XY 2-D arrays, shape (N,2) */
 static PyObject *
 build_cntr_list_v2(long *np, double *xp, double *yp, int nparts, long ntotal)
 {
-    PyObject *point, *all_contours;
+    PyObject *all_contours;
     PyArrayObject *xyv;
     npy_intp dims[2];
     int i;
@@ -1460,7 +1464,7 @@ build_cntr_list_v2(long *np, double *xp, double *yp, int nparts, long ntotal)
    of points; otherwise, as a list of tuples of vectors.
 */
 
-PyObject *
+static PyObject *
 cntr_trace(Csite *site, double levels[], int nlevels, int points, long nchunk)
 {
     PyObject *c_list;

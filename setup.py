@@ -26,10 +26,14 @@ see the file INSTALL for details on how to install Veusz
 """
 
 import glob
+import os.path
+import sys
+
 import numpy
 
 from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
+import pyqtdistutils
 
 # use py2exe if available
 try:
@@ -51,10 +55,10 @@ class smart_install_data(install_data):
         return install_data.run(self)
 
 descr = '''Veusz is a scientific plotting package, designed to create
-publication-ready Postscript output. It features GUI, command-line,
-and scripting interfaces. Graphs are constructed from "widgets",
-allowing complex layouts to be designed. Veusz supports plotting
-functions, data with errors, keys, labels, stacked plots,
+publication-ready Postscript and PDF output. It features GUI,
+command-line, and scripting interfaces. Graphs are constructed from
+"widgets", allowing complex layouts to be designed. Veusz supports
+plotting functions, data with errors, keys, labels, stacked plots,
 multiple plots, and fitting data.'''
 
 setup(name = 'veusz',
@@ -65,9 +69,8 @@ setup(name = 'veusz',
       author_email = 'jeremy@jeremysanders.net',
       url = 'http://home.gna.org/veusz/',
       license = 'GPL',
-      cmdclass = { 'install_data': smart_install_data },
       classifiers = ['Programming Language :: Python',
-                     'Development Status :: 4 - Beta',
+                     'Development Status :: 5 - Production/Stable',
                      'Environment :: X11 Applications :: Qt',
                      'Intended Audience :: Science/Research',
                      'License :: OSI Approved :: '
@@ -102,5 +105,22 @@ setup(name = 'veusz',
                   ],
       ext_modules = [ Extension('veusz.helpers._nc_cntr',
                                 ['helpers/src/_nc_cntr.c'],
-                                include_dirs=[numpy.get_include()]) ]
+                                include_dirs=[numpy.get_include()]),
+
+                      # helper module
+                      Extension('veusz.helpers.qtloops',
+                                ['helpers/src/qtloops.cpp',
+                                 'helpers/src/qtloops_helpers.cpp',
+                                 'helpers/src/polygonclip.cpp',
+                                 'helpers/src/polylineclip.cpp',
+                                 'helpers/src/qtloops.sip'],
+                                language="c++",
+                                include_dirs=['/helpers/src',
+                                              numpy.get_include()],
+                                ),
+                      ],
+                                
+      cmdclass = {'build_ext': pyqtdistutils.build_ext,
+                  'install_data': smart_install_data },
+
       )

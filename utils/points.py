@@ -25,6 +25,11 @@ from itertools import izip
 import veusz.qtall as qt4
 import numpy as N
 
+try:
+    from veusz.helpers.qtloops import plotPathsToPainter
+except ImportError:
+    from slowfuncs import plotPathsToPainter
+
 """This is the symbol plotting part of Veusz
 
 There are actually several different ways symbols are plotted.
@@ -377,7 +382,8 @@ MarkerCodes = (
     'limitleftaway2', 'limitrightaway2',
     )
 
-def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
+def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
+                clip=None):
     """Funtion to plot an array of markers on a painter.
 
     painter: QPainter
@@ -385,6 +391,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
     markername: name of marker from MarkerCodes
     markersize: size of marker to plot
     scaling: scale size of markers by array, or don't in None
+    clip: rectangle if clipping wanted
     """
 
     # minor optimization
@@ -404,21 +411,15 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None):
         # turn off brush
         painter.setBrush( qt4.QBrush() )
 
-    # optimize loop
-    t = painter.translate
-    d = painter.drawPath
-    r = painter.resetTransform
-
     # split up into two loops as this is a critical path
     if scaling is None:
-        # actually plot the markers (with no scaling)
-        for x, y in izip(xpos, ypos):
-            t(x, y)
-            d(path)
-            r()
+        plotPathsToPainter(painter, path, xpos, ypos, clip)
     else:
         # plot markers, scaling each one
         s = painter.scale
+        t = painter.translate
+        d = painter.drawPath
+        r = painter.resetTransform
         for x, y, sc in izip(xpos, ypos, scaling):
             t(x, y)
             s(sc, sc)

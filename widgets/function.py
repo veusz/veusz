@@ -162,7 +162,7 @@ class FunctionPlotter(GenericPlotter):
         axrange[0] = min(N.min(finitevals), axrange[0])
         axrange[1] = max(N.max(finitevals), axrange[1])
 
-    def _plotLine(self, painter, xpts, ypts, bounds):
+    def _plotLine(self, painter, xpts, ypts, bounds, clip):
         """ Plot the points in xpts, ypts."""
         x1, y1, x2, y2 = bounds
 
@@ -178,7 +178,7 @@ class FunctionPlotter(GenericPlotter):
             # ignore point if it outside sensible bounds
             if x < -32767 or y < -32767 or x > 32767 or y > 32767:
                 if len(pts) >= 2:
-                    painter.drawPolyline(pts)
+                    utils.plotClippedPolyline(painter, clip, pts)
                     pts.clear()
             else:
                 # if the jump wasn't too large, add the point to the points
@@ -187,7 +187,7 @@ class FunctionPlotter(GenericPlotter):
                 else:
                     # draw what we have until now, and start a new line
                     if len(pts) >= 2:
-                        painter.drawPolyline(pts)
+                        utils.plotClippedPolyline(painter, clip, pts)
                     pts.clear()
                     pts.append( qt4.QPointF(x, y) )
 
@@ -196,9 +196,9 @@ class FunctionPlotter(GenericPlotter):
 
         # draw remaining points
         if len(pts) >= 2:
-            painter.drawPolyline(pts)
+            utils.plotClippedPolyline(painter, clip, pts)
 
-    def _fillRegion(self, painter, pxpts, pypts, bounds, belowleft):
+    def _fillRegion(self, painter, pxpts, pypts, bounds, belowleft, clip):
         """Fill the region above/below or left/right of the points.
 
         belowleft fills below if the variable is 'x', or left if 'y'
@@ -224,19 +224,14 @@ class FunctionPlotter(GenericPlotter):
                 pts.append(qt4.QPointF(x2, pypts[0]))
                 endpt = qt4.QPointF(x2, pypts[-1])
 
-        # add the points between (clipped to the bounds*2 - helps edges)
-        xw = abs(x2-x1)
-        xclip = N.clip(pxpts, x1-xw-1, x2+xw+1)
-        yw = abs(y2-y1)
-        yclip = N.clip(pypts, y1-yw-1, y2+yw+1)
-        for x, y in itertools.izip(xclip, yclip):
-            pts.append( qt4.QPointF(x, y) )
+        # add the points between
+        utils.addNumpyToPolygonF(pts, pxpts, pypts)
 
         # stick on the ending point
         pts.append(endpt)
 
         # actually do the filling
-        painter.drawPolygon(pts)
+        utils.plotClippedPolygon(painter, clip, pts)
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -364,7 +359,7 @@ class FunctionPlotter(GenericPlotter):
         # clip data within bounds of plotter
         painter.beginPaintingWidget(self, posn)
         painter.save()
-        self.clipAxesBounds(painter, axes, posn)
+        cliprect = self.clipAxesBounds(painter, axes, posn)
 
         # get the points to plot by evaluating the function
         pxpts, pypts = self._calcFunctionPoints(axes, posn)
@@ -383,17 +378,17 @@ class FunctionPlotter(GenericPlotter):
             if not s.FillBelow.hide:
                 painter.setBrush( s.FillBelow.makeQBrush() )
                 painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                self._fillRegion(painter, pxpts, pypts, posn, True)
+                self._fillRegion(painter, pxpts, pypts, posn, True, cliprect)
 
             if not s.FillAbove.hide:
                 painter.setBrush( s.FillAbove.makeQBrush() )
                 painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                self._fillRegion(painter, pxpts, pypts, posn, False)
+                self._fillRegion(painter, pxpts, pypts, posn, False, cliprect)
 
             if not s.Line.hide:
                 painter.setBrush( qt4.QBrush() )
                 painter.setPen( s.Line.makeQPen(painter) )
-                self._plotLine(painter, pxpts, pypts, posn)
+                self._plotLine(painter, pxpts, pypts, posn, cliprect)
 
         painter.restore()
         painter.endPaintingWidget()

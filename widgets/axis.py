@@ -570,15 +570,10 @@ class Axis(widget.Widget):
     def swaplines(self, painter, a1, b1, a2, b2):
         """Multiline version of swapline where a1, b1, a2, b2 are arrays."""
         if self.settings.direction == 'horizontal':
-            arrays = (a1, b1, a2, b2)
+            a = (a1, b1, a2, b2)
         else:
-            arrays = (b1, a1, b2, a2)
-
-        lines = []
-        for x1, y1, x2, y2 in izip(*arrays):
-            lines.append(qt4.QLineF(x1, y1, x2, y2))
-
-        painter.drawLines(lines)
+            a = (b1, a1, b2, a2)
+        utils.plotLinesToPainter(painter, a[0], a[1], a[2], a[3])
 
     def _drawGridLines(self, subset, painter, coordticks):
         """Draw grid lines on the plot."""

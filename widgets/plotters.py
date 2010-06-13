@@ -110,24 +110,26 @@ class GenericPlotter(widget.Widget):
         pass
 
     def clipAxesBounds(self, painter, axes, bounds):
-        """Clip painter to start and stop values of axis."""
+        """Clip painter to start and stop values of axis.
+        Returns clipping rectangle
+        """
 
         # update cached coordinates of axes
         axes[0].plotterToDataCoords(bounds, N.array([]))
         axes[1].plotterToDataCoords(bounds, N.array([]))
 
         # get range
-        x1 = axes[0].coordParr1
-        x2 = axes[0].coordParr2
-        y1 = axes[1].coordParr2
-        y2 = axes[1].coordParr1
+        x1, x2 = axes[0].coordParr1, axes[0].coordParr2
         if x1 > x2:
             x1, x2 = x2, x1
+        y1, y2 = axes[1].coordParr2, axes[1].coordParr1
         if y1 > y2:
             y1, y2 = y2, y1
 
         # actually clip the data
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
+        cliprect = qt4.QRectF(qt4.QPointF(x1, y1), qt4.QPointF(x2, y2))
+        painter.setClipRect(cliprect)
+        return cliprect
 
     def getAxisLabels(self, direction):
         """Get labels for datapoints and coordinates, or None if none.
