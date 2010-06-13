@@ -83,6 +83,10 @@ class DatasetHistoGenerator(object):
 
     def getBinLocations(self):
         """Return bin centre, -ve bin width, +ve bin width."""
+
+        if len(self.getData()) == 0:
+            return (N.array([]), None, None)
+
         binlocs = self.binLocations()
 
         if self.binparams and self.binparams[3]:
@@ -125,12 +129,13 @@ class DatasetHistoGenerator(object):
 
     def getBinVals(self):
         """Return results for each bin."""
-        binlocs = self.binLocations()
-        if binlocs.size == 0:
-            return N.array([])
+
         data = self.getData()
+        if len(data) == 0:
+            return (N.array([]), None, None)
 
         normed = self.method == 'density'
+        binlocs = self.binLocations()
         hist, edges = N.histogram(data, bins=binlocs, normed=normed)
         
         if self.method == 'fractions':
@@ -175,6 +180,18 @@ class DatasetHistoGenerator(object):
                         repr(self.method), repr(self.cumulative),
                         repr(self.errors)) )
 
+    def linkedInformation(self):
+        """Informating about linking."""
+
+        if self.binmanual:
+            bins = 'manual bins'
+        else:
+            bins = '%i bins from %s to %s' % (self.binparams[0],
+                                              self.binparams[1],
+                                              self.binparams[2])
+
+        return "Histogram of '%s' with %s" % (self.inexpr, bins)
+
 class DatasetHistoBins(Dataset):
     """A dataset for getting the bin positions for the histogram."""
 
@@ -195,6 +212,10 @@ class DatasetHistoBins(Dataset):
     def saveToFile(self, fileobj, name):
         """Save dataset (counterpart does this)."""
         pass
+
+    def linkedInformation(self):
+        """Informating about linking."""
+        return self.generator.linkedInformation() + " (bin positions)"
 
     data = property(lambda self: self.getData()[0])
     nerr = property(lambda self: self.getData()[1])
@@ -221,6 +242,10 @@ class DatasetHistoValues(Dataset):
     def saveToFile(self, fileobj, name):
         """Save dataset and its counterpart to a file."""
         self.generator.saveToFile(fileobj)
+
+    def linkedInformation(self):
+        """Informating about linking."""
+        return self.generator.linkedInformation() + " (bin values)"
 
     data = property(lambda self: self.getData()[0])
     nerr = property(lambda self: self.getData()[1])
