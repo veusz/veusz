@@ -21,7 +21,7 @@
 
 #include "Python.h"
 
-#include <vector>
+#include <QVector>
 
 #define DEBUG false
 
@@ -36,12 +36,12 @@ public:
   ~Tuple2Ptrs();
 
   // data in tuple are stored here
-  std::vector<const double*> data;
-  std::vector<int> dims;
+  QVector<const double*> data;
+  QVector<int> dims;
 
 private:
   // these are the python objects made by PyArray_AsCArray
-  std::vector<PyObject*> _arrays;
+  QVector<PyObject*> _arrays;
 };
 
 // class for converting numpy array to a valarray

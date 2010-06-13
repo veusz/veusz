@@ -51,7 +51,7 @@ Tuple2Ptrs::Tuple2Ptrs(PyObject* tuple)
 Tuple2Ptrs::~Tuple2Ptrs()
 {
   // delete array objects
-  for(size_t i=0; i != _arrays.size(); ++i)
+  for(int i=0; i < _arrays.size(); ++i)
     {
       Py_DECREF(_arrays[i]);
       _arrays[i] = 0;

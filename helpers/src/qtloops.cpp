@@ -20,17 +20,45 @@
 #include "isnan.h"
 #include "polylineclip.h"
 
+#include <math.h>
+
 #include <QPointF>
 #include <QVector>
 #include <QLineF>
 #include <QPen>
 
-#include <algorithm>
+namespace
+{
+  // is difference between points very small?
+  inline bool smallDelta(const QPointF& pt1, const QPointF& pt2)
+  {
+    return fabs(pt1.x() - pt2.x()) < 0.01 and
+      fabs(pt1.y()- pt2.y()) < 0.01;
+  }
+
+  template <class T> inline T min(T a, T b)
+  {
+    return (a<b) ? a : b;
+  }
+
+  template <class T> inline T min(T a, T b, T c, T d)
+  {
+    return min( min(a, b), min(c, d) );
+  }
+
+  template <class T> inline T clipval(T val, T minv, T maxv)
+  {
+    if( val < minv ) return minv;
+    if( val > maxv ) return maxv;
+    return val;
+  }
+}
 
 void addNumpyToPolygonF(QPolygonF& poly, const Tuple2Ptrs& d)
 {
   // iterate over rows until none left
   const int numcols = d.data.size();
+  QPointF lastpt(-1e6, -1e6);
   for(int row=0 ; ; ++row)
     {
       bool ifany = false;
@@ -40,8 +68,12 @@ void addNumpyToPolygonF(QPolygonF& poly, const Tuple2Ptrs& d)
 	  // add point if point in two columns
 	  if( row < d.dims[col] && row < d.dims[col+1] )
 	    {
-	      poly << QPointF( d.data[col][row],
-			       d.data[col+1][row] );
+	      const QPointF pt(d.data[col][row], d.data[col+1][row]);
+	      if( not smallDelta(pt, lastpt) )
+		{
+		  poly << pt;
+		  lastpt = pt;
+		}
 	      ifany = true;
 	    }
 	}
@@ -66,15 +98,17 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
   cliprect.adjust(pathbox.left(), pathbox.top(),
 		  pathbox.bottom(), pathbox.right());
 
-  const size_t size = std::min(x.dim, y.dim);
-  for(size_t i = 0; i != size; ++i)
+  const int size = min(x.dim, y.dim);
+  QPointF lastpt(-1e6, -1e6);
+  for(int i = 0; i < size; ++i)
     {
       const QPointF pt(x(i), y(i));
-      if( cliprect.contains(pt) )
+      if( cliprect.contains(pt) and not smallDelta(lastpt, pt) )
 	{
 	  painter.translate(pt);
 	  painter.drawPath(path);
 	  painter.translate(-pt);
+	  lastpt = pt;
 	}
     }
 }
@@ -84,8 +118,7 @@ void plotLinesToPainter(QPainter& painter,
 			const Numpy1DObj& x2, const Numpy1DObj& y2,
 			const QRectF* clip, bool autoexpand)
 {
-  const int maxsize = std::min( std::min(x1.dim, x2.dim),
-				std::min(y1.dim, y2.dim) );
+  const int maxsize = min(x1.dim, x2.dim, y1.dim, y2.dim);
 
   // if autoexpand, expand rectangle by line width
   QRectF clipcopy;
@@ -134,8 +167,7 @@ void plotBoxesToPainter(QPainter& painter,
       clipcopy.adjust(-lw, -lw, lw, lw);
     }
 
-  const int maxsize = std::min( std::min(x1.dim, x2.dim),
-				std::min(y1.dim, y2.dim) );
+  const int maxsize = min(x1.dim, x2.dim, y1.dim, y2.dim);
 
   QVector<QRectF> rects;
   for(int i = 0; i < maxsize; ++i)
@@ -195,13 +227,12 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 	    {
 	      // do linear interpolation between bands
 	      // make sure between 0 and 1
-	      val = std::max(std::min(1., val), 0.);
-	      const int band = std::max(std::min(int(val*numbands),
-						 numbands-1), 0);
+	      val = clipval(val, 0., 1.);
+	      const int band = clipval(int(val*numbands), 0, numbands-1);
 	      const double delta = val*numbands - band;
 
 	      // ensure we don't read beyond where we should
-	      const int band2 = std::min(band + 1, numbands);
+	      const int band2 = min(band + 1, numbands);
 	      const double delta1 = 1.-delta;
 
 	      const int b = int(delta1*colors(band, 0) +
@@ -222,8 +253,8 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 {
-  const int xw = std::min(data.dims[0], img.width());
-  const int yw = std::min(data.dims[1], img.height());
+  const int xw = min(data.dims[0], img.width());
+  const int yw = min(data.dims[1], img.height());
   
   for(int y=0; y<yw; ++y)
     {
@@ -231,7 +262,7 @@ void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
       QRgb* scanline = reinterpret_cast<QRgb*>(img.scanLine(yw-y-1));
       for(int x=0; x<xw; ++x)
 	{
-	  const double val = std::max(std::min(data(x,y), 1.), 0.);
+	  const double val = clipval(data(x, y), 0., 1.);
 	  const QRgb col = *(scanline+x);
 
 	  // update pixel alpha component
