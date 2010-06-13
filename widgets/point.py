@@ -30,6 +30,8 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
+import helpers.qtloops as qtloops
+
 # functions for plotting error bars
 # different styles are made up of combinations of these functions
 # each function takes the same arguments
@@ -413,41 +415,82 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
+    def _getBezierLine(self, poly):
+        """Try to draw a bezier line connecting the points."""
+
+        npts = qtloops.bezier_fit_cubic_multi(poly, 0.1, len(poly)+1)
+        i = 0
+        path = qt4.QPainterPath()
+        lastpt = qt4.QPointF(-999999,-999999)
+        while i < len(npts):
+            if lastpt != npts[i]:
+                path.moveTo(npts[i])
+            path.cubicTo(npts[i+1], npts[i+2], npts[i+3])
+            lastpt = npts[i+3]
+            i += 4
+        return path
+        painter.strokePath(p, painter.pen())
+
+    def _drawBezierLine( self, painter, xvals, yvals, posn, xdata, ydata):
+        """Handle bezier lines and fills."""
+
+        pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
+        if len(pts) < 2:
+            return
+        path = self._getBezierLine(pts)
+        s = self.settings
+
+        if not s.FillBelow.hide:
+            temppath = qt4.QPainterPath(path)
+            temppath.lineTo(pts[-1].x(), posn[3])
+            temppath.lineTo(pts[0].x(), posn[3])
+            painter.fillPath(temppath, s.FillBelow.makeQBrush() )
+
+        if not s.FillAbove.hide:
+            temppath = qt4.QPainterPath(path)
+            temppath.lineTo(pts[-1].x(), posn[1])
+            temppath.lineTo(pts[0].x(), posn[1])
+            painter.fillPath(temppath, s.FillAbove.makeQBrush() )
+
+        if not s.PlotLine.hide:
+            painter.strokePath(path, s.PlotLine.makeQPen(painter))
+
     def _drawPlotLine( self, painter, xvals, yvals, posn, xdata, ydata,
                        cliprect ):
         """Draw the line connecting the points."""
 
-        s = self.settings
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
+        if len(pts) < 2:
+            return
+        s = self.settings
 
-        if len(pts) >= 2:
-            if not s.FillBelow.hide:
-                # empty pen (line gets drawn below)
-                painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-                painter.setBrush( s.FillBelow.makeQBrush() )
+        if not s.FillBelow.hide:
+            # empty pen (line gets drawn below)
+            painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
+            painter.setBrush( s.FillBelow.makeQBrush() )
 
-                # construct polygon to draw filled region
-                polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[3])])
-                polypts += pts
-                polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[3]))
+            # construct polygon to draw filled region
+            polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[3])])
+            polypts += pts
+            polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[3]))
 
-                # clip polygon and paint
-                utils.plotClippedPolygon(painter, cliprect, polypts)
+            # clip polygon and paint
+            utils.plotClippedPolygon(painter, cliprect, polypts)
 
-            if not s.FillAbove.hide:
-                painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-                painter.setBrush( s.FillAbove.makeQBrush() )
+        if not s.FillAbove.hide:
+            painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
+            painter.setBrush( s.FillAbove.makeQBrush() )
 
-                polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[1])])
-                polypts += pts
-                polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[1]))
+            polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[1])])
+            polypts += pts
+            polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[1]))
 
-                utils.plotClippedPolygon(painter, cliprect, polypts)
+            utils.plotClippedPolygon(painter, cliprect, polypts)
 
-            # draw line between points
-            if not s.PlotLine.hide:
-                painter.setPen( s.PlotLine.makeQPen(painter) )
-                utils.plotClippedPolyline(painter, cliprect, pts)
+        # draw line between points
+        if not s.PlotLine.hide:
+            painter.setPen( s.PlotLine.makeQPen(painter) )
+            utils.plotClippedPolyline(painter, cliprect, pts)
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -606,8 +649,12 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                self._drawPlotLine( painter, xplotter, yplotter, posn,
-                                    xvals, yvals, cliprect )
+                if s.PlotLine.bezierJoin:
+                    self._drawBezierLine( painter, xplotter, yplotter, posn,
+                                          xvals, yvals )
+                else:
+                    self._drawPlotLine( painter, xplotter, yplotter, posn,
+                                        xvals, yvals, cliprect )
 
             # plot the points (we do this last so they are on top)
             markersize = s.get('markerSize').convert(painter)

@@ -86,6 +86,9 @@ class XYPlotLine(Line):
                                  descr='Plot horizontal steps '
                                  'instead of a line',
                                  usertext='Steps'), 0 )
+        self.add( setting.Bool('bezierJoin', False,
+                               descr='Connect points with a cubic Bezier curve',
+                               usertext='Bezier join'), 1 )
 
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''

@@ -36,6 +36,7 @@ class QtLoops
 #include <qtloops.h>
 #include <polygonclip.h>
 #include <polylineclip.h>
+#include <beziers_qtwrap.h>
 %End
 
 public:
@@ -163,3 +164,8 @@ void plotClippedPolyline(QPainter& painter,
 			 QRectF clip,
 			 const QPolygonF& poly,
 			 bool autoexpand = true);
+
+QPolygonF bezier_fit_cubic_single(const QPolygonF& data, double error);
+
+QPolygonF bezier_fit_cubic_multi(const QPolygonF& data, double error,
+				 unsigned max_beziers);
