@@ -912,7 +912,7 @@ def simpleEvalExpression(doc, expr):
 
     if ( not setting.transient_settings['unsafe_mode'] and
          utils.checkCode(expr, securityonly=True) ):
-        self.document.log("Unsafe expression: %s\n" % expr)
+        doc.log("Unsafe expression: %s\n" % expr)
         return N.array([])
 
     env = doc.eval_context.copy()
@@ -921,7 +921,8 @@ def simpleEvalExpression(doc, expr):
 
     env['_DS_'] = evaluateDataset
     try:
-        evalout = N.array(eval(expr, env), N.float64)
+        vals = eval(expr, env)
+        evalout = N.array(vals, N.float64)
     except Exception, ex:
         doc.log(unicode(ex))
         return N.array([])

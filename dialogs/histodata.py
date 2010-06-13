@@ -276,23 +276,26 @@ class HistoDataDialog(qt4.QDialog):
     def applyClicked(self):
         """Create histogram."""
 
+        def clearlabel(self=self):
+            self.statuslabel.setText("")
+        qt4.QTimer.singleShot(4000, clearlabel)
+
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError, ex:
-            qt4.QMessageBox.warning(self, "Invalid parameters", unicode(ex))
+            self.statuslabel.setText("Invalid parameters: %s" % unicode(ex))
+            return
+
+        exprresult = document.simpleEvalExpression(self.document, p.expr)
+        if len(exprresult) == 0:
+            self.statuslabel.setText("Invalid expression")
             return
 
         op = p.getOperation()
         self.document.applyOperation(op)
 
         self.statuslabel.setText(
-            'Created datasets "%s" and "%s"' % (p.outbins,
-                                                p.outdataset) )
-
-        def clearlabel(self=self):
-            self.statuslabel.setText("")
-
-        qt4.QTimer.singleShot(2000, clearlabel)
+            'Created datasets "%s" and "%s"' % (p.outbins, p.outdataset))
 
 dataeditdialog.recreate_register[document.DatasetHistoValues] = HistoDataDialog
 dataeditdialog.recreate_register[document.DatasetHistoBins] = HistoDataDialog
