@@ -1,3 +1,5 @@
+// -*- mode: C++; -*-
+
 #ifndef QTLOOPS_HELPERS_H
 #define QTLOOPS_HELPERS_H
 

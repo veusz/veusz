@@ -1,3 +1,5 @@
+// -*- mode: C++; -*-
+
 #ifndef __ISNAN_H__
 #define __ISNAN_H__
 

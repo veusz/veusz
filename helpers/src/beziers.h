@@ -1,3 +1,5 @@
+// -*- mode: C++; -*-
+
 #ifndef SP_BEZIERS_H
 #define SP_BEZIERS_H
 
