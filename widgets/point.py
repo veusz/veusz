@@ -30,7 +30,7 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
-import helpers.qtloops as qtloops
+import veusz.helpers.qtloops as qtloops
 
 # functions for plotting error bars
 # different styles are made up of combinations of these functions
