@@ -28,19 +28,20 @@ see the file INSTALL for details on how to install Veusz
 import glob
 import os.path
 import sys
-
 import numpy
-
-from distutils.core import setup, Extension
 from distutils.command.install_data import install_data
 import pyqtdistutils
 
-# use py2exe if available
+# try to get py2app if it exists
 try:
-    import py2exe
+    import py2app
+    from setuptools import setup, Extension
+    py2app = True
 except ImportError:
-    pass
+    from distutils.core import setup, Extension
+    py2app = False
 
+# get version
 version = open('VERSION').read().strip()
 
 # Pete Shinner's distutils data file fix... from distutils-sig
@@ -55,11 +56,41 @@ class smart_install_data(install_data):
         return install_data.run(self)
 
 descr = '''Veusz is a scientific plotting package, designed to create
-publication-ready Postscript and PDF output. It features GUI,
+publication-ready Postscript, PDF and SVG output. It features GUI,
 command-line, and scripting interfaces. Graphs are constructed from
 "widgets", allowing complex layouts to be designed. Veusz supports
 plotting functions, data with errors, keys, labels, stacked plots,
 multiple plots, and fitting data.'''
+
+if py2app and sys.platform == 'darwin':
+    # extra arguments for mac py2app to associate files
+    plist = {
+        'CFBundleName': 'Veusz',
+        'CFBundleShortVersionString': version,
+        'CFBundleIdentifier': 'org.python.veusz',
+        'CFBundleDocumentTypes': [{
+                'CFBundleTypeExtensions': ['vsz'],
+                'CFBundleTypeName': 'Veusz document',
+                'CFBundleTypeRole': 'Editor',
+                }]
+        }
+    
+    extraoptions = {
+        'setup_requires': ['py2app'],
+        'app': ['veusz_main.py'],
+        'options': { 'py2app': {'argv_emulation': True,
+                                'includes': ('veusz.helpers._nc_cntr',
+                                             'veusz.helpers.qtloops'),
+                                'plist': plist,
+                                'iconfile': 'windows/icons/veusz.icns',
+                                }
+                     }
+	}
+else:
+    # otherwise package scripts
+    extraoptions = {
+        'scripts': ['scripts/veusz', 'scripts/veusz_listen']
+        }
 
 setup(name = 'veusz',
       version = version,
@@ -69,13 +100,13 @@ setup(name = 'veusz',
       author_email = 'jeremy@jeremysanders.net',
       url = 'http://home.gna.org/veusz/',
       license = 'GPL',
-      classifiers = ['Programming Language :: Python',
-                     'Development Status :: 5 - Production/Stable',
-                     'Environment :: X11 Applications :: Qt',
-                     'Intended Audience :: Science/Research',
-                     'License :: OSI Approved :: '
-                     'GNU General Public License (GPL)',
-                     'Topic :: Scientific/Engineering :: Visualization'],
+      classifiers = [ 'Programming Language :: Python',
+                      'Development Status :: 5 - Production/Stable',
+                      'Environment :: X11 Applications :: Qt',
+                      'Intended Audience :: Science/Research',
+                      'License :: OSI Approved :: '
+                      'GNU General Public License (GPL)',
+                      'Topic :: Scientific/Engineering :: Visualization' ],
       package_dir = { 'veusz': '',
                       'veusz.dialogs': 'dialogs',
                       'veusz.document': 'document',
@@ -92,37 +123,40 @@ setup(name = 'veusz',
                      ('veusz/windows/icons',
                       glob.glob('windows/icons/*.png')+
                       glob.glob('windows/icons/*.svg')) ],
-      scripts = ['scripts/veusz', 'scripts/veusz_listen'],
-      packages = ['veusz',
-                  'veusz.dialogs',
-                  'veusz.document',
-                  'veusz.setting',
-                  'veusz.utils',
-                  'veusz.widgets',
-                  'veusz.helpers',
-                  'veusz.windows',
-                  'veusz.plugins',
-                  ],
-      ext_modules = [ Extension('veusz.helpers._nc_cntr',
-                                ['helpers/src/_nc_cntr.c'],
-                                include_dirs=[numpy.get_include()]),
+      packages = [ 'veusz',
+                   'veusz.dialogs',
+                   'veusz.document',
+                   'veusz.setting',
+                   'veusz.utils',
+                   'veusz.widgets',
+                   'veusz.helpers',
+                   'veusz.windows',
+                   'veusz.plugins',
+                   ],
 
-                      # helper module
-                      Extension('veusz.helpers.qtloops',
-                                ['helpers/src/qtloops.cpp',
-                                 'helpers/src/qtloops_helpers.cpp',
-                                 'helpers/src/polygonclip.cpp',
-                                 'helpers/src/polylineclip.cpp',
-                                 'helpers/src/beziers.cpp',
-                                 'helpers/src/beziers_qtwrap.cpp',
-                                 'helpers/src/qtloops.sip'],
-                                language="c++",
-                                include_dirs=['/helpers/src',
-                                              numpy.get_include()],
-                                ),
-                      ],
+      ext_modules = [
+        # contour plotting library
+        Extension('veusz.helpers._nc_cntr',
+                  ['helpers/src/_nc_cntr.c'],
+                  include_dirs=[numpy.get_include()]),
+
+        # qt helper module
+        Extension('veusz.helpers.qtloops',
+                  ['helpers/src/qtloops.cpp',
+                   'helpers/src/qtloops_helpers.cpp',
+                   'helpers/src/polygonclip.cpp',
+                   'helpers/src/polylineclip.cpp',
+                   'helpers/src/beziers.cpp',
+                   'helpers/src/beziers_qtwrap.cpp',
+                   'helpers/src/qtloops.sip'],
+                  language="c++",
+                  include_dirs=['/helpers/src',
+                                numpy.get_include()],
+                  ),
+        ],
                                 
       cmdclass = {'build_ext': pyqtdistutils.build_ext,
                   'install_data': smart_install_data },
 
+      **extraoptions
       )

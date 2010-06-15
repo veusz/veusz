@@ -42,6 +42,16 @@ class build_ext (distutils.command.build_ext.build_ext):
         cfg = PyQt4.pyqtconfig.Configuration()
         return cfg.sip_inc_dir
 
+    def get_includes(self, cfg):
+        incdirs = []
+        for mod in ('QtCore', 'QtGui'):
+            if cfg.qt_framework:
+                incdirs.append( os.path.join(cfg.qt_lib_dir,
+                                             mod + '.framework', 'Headers') )
+            else:
+                incdirs.append( os.path.join(cfg.qt_inc_dir, mod) )
+        return incdirs
+
     def swig_sources (self, sources, extension=None):
         if not self.extensions:
             return
@@ -55,12 +65,13 @@ class build_ext (distutils.command.build_ext.build_ext):
         extension.include_dirs += [
             cfg.sip_inc_dir,
             cfg.qt_inc_dir,
-            os.path.join(cfg.qt_inc_dir, 'QtCore'),
-            os.path.join(cfg.qt_inc_dir, 'QtGui'),
-            ] + indirs
+            ] + self.get_includes(cfg) + indirs
 
         # link against libraries
-        if sys.platform == 'win32':
+        if cfg.qt_framework:
+            extension.extra_link_args = ['-framework', 'QtGui',
+                                         '-framework', 'QtCore']
+        elif sys.platform == 'win32':
             extension.libraries = ['QtGui4', 'QtCore4']
         else:
             extension.libraries = ['QtGui', 'QtCore']
