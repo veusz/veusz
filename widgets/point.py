@@ -30,7 +30,11 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
-import veusz.helpers.qtloops as qtloops
+try:
+    import veusz.helpers.qtloops as qtloops
+    hasqtloops = True
+except ImportError:
+    hasqtloops = False
 
 # functions for plotting error bars
 # different styles are made up of combinations of these functions
@@ -649,7 +653,7 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                if s.PlotLine.bezierJoin:
+                if s.PlotLine.bezierJoin and hasqtloops:
                     self._drawBezierLine( painter, xplotter, yplotter, posn,
                                           xvals, yvals )
                 else:

@@ -23,10 +23,16 @@ These are slow versions of routines also implemented in C++
 """
 
 from itertools import izip
+import sys
 import struct
 
 import veusz.qtall as qt4
 import numpy as N
+
+sys.stderr.write("Warning: Using slow substitutes for some functions. "
+                 "Bezier curves are disabled.\n"
+                 "Compile helpers to avoid this warning - "
+                 "see INSTALL document\n")
 
 def addNumpyToPolygonF(poly, *args):
     """Add a set of numpy arrays to a QPolygonF.
