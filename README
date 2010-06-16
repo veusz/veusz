@@ -26,6 +26,7 @@ Changes in 1.8:
    including cumulative histograms
  * Data import plugins allow the user to add support for importing any 
    file type - see Veusz wiki for details
+ * Experimental Bezier curve option for joining data points
 
 Minor changes in 1.8:
  * Fix zoom button default action
