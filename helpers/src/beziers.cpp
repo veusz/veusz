@@ -114,10 +114,22 @@ static QPointF const unconstrained_tangent(0, 0);
  *  B0, B1, B2, B3 : Bezier multipliers
  */
 
-#define B0(u) ( ( 1.0 - u )  *  ( 1.0 - u )  *  ( 1.0 - u ) )
-#define B1(u) ( 3 * u  *  ( 1.0 - u )  *  ( 1.0 - u ) )
-#define B2(u) ( 3 * u * u  *  ( 1.0 - u ) )
-#define B3(u) ( u * u * u )
+static inline double B0(double u)
+{
+  return ( ( 1.0 - u )  *  ( 1.0 - u )  *  ( 1.0 - u ) );
+}
+static inline double B1(double u)
+{
+  return ( 3 * u  *  ( 1.0 - u )  *  ( 1.0 - u ) );
+}
+static inline double B2(double u)
+{
+  return ( 3 * u * u  *  ( 1.0 - u ) );
+}
+static inline double B3(double u)
+{
+  return ( u * u * u );
+}
 
 #ifdef BEZIER_DEBUG
 # define DOUBLE_ASSERT(x) g_assert( ( (x) > -SP_HUGE ) && ( (x) < SP_HUGE ) )
@@ -1000,7 +1012,9 @@ compute_hook(QPointF const &a, QPointF const &b, double const u, BezierCurve con
   if (dist < tolerance) {
     return 0;
   }
-  double const allowed = L2(b - a) + tolerance;
+
+  // factor of 0.1 introduced by JSS to stop more hooks
+  double const allowed = L2(b - a)*0.1 + tolerance;
   return dist / allowed;
   /** \todo 
    * effic: Hooks are very rare.  We could start by comparing 
