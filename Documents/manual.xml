@@ -1082,6 +1082,37 @@ SetData('y', y)
       </section>
 
       <section>
+	<title><anchor id="Command.AddCustom" />AddCustom</title>
+	
+	<para><command>AddCustom(name, type, value)</command></para>
+	
+	<para>Add a custom function or value for evaluating
+	expressions, or import external python functions.</para>
+
+	<para>For a constant value name should be the name of the
+	constant. type should be 'constant'. value is the value of the
+	constant.</para>
+
+	<para>For a function, name should be of the format
+	'functionname(x,y,z)' where x, y and z are its arguments. type
+	should be 'function'. value is the definition of the function,
+	e.g. 'x+y+z'.</para>
+
+	<para>For a Python import, name should be the module to import
+	from. type is 'import'. value is the name of the symbol to
+	import.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.AddImportPath" />AddImportPath</title>
+	
+	<para><command>AddImportPath(directory)</command></para>
+
+	<para>Add a directory to the list of directories to try to
+	import data from.</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.Close" />Close</title>
 	
 	<para><command>Close()</command></para>
@@ -1089,6 +1120,28 @@ SetData('y', y)
 	<para>Closes the plotwindow. This is only supported in
 	embedded mode.</para>
       </section>
+
+      <section>
+	<title><anchor id="Command.CreateHistogram" />CreateHistogram</title>
+	
+	<para><command>CreateHistogram(inexpr, outbinsds,
+                        outvalsds, binparams=None, binmanual=None,
+                        method='counts', cumulative = 'none',
+                        errors=False)</command></para>
+	
+	<para>
+	  istogram an input expression.  inexpr is input expression.
+        outbinds is the name of the dataset to create giving bin
+        positions.  outvalsds is name of dataset for bin values.
+        binparams is None or (numbins, minval, maxval, islogbins).
+        binmanual is None or a list of bin values.  method is
+        'counts', 'density', or 'fractions'.  cumulative is to
+        calculate cumulative distributions which is 'none',
+        'smalltolarge' or 'largetosmall'.  errors is to calculate
+        Poisson error bars.
+	</para>
+      </section>
+
 
       <section>
 	<title><anchor id="Command.EnableToolbar"
@@ -1197,8 +1250,9 @@ SetData('x', data[0]*0.1, *data[1:])
       <section>
 	<title><anchor id="Command.ImportFile" />ImportFile</title>
 	
-	<para><command>ImportFile('filename',
-	'descriptor', linked=False, prefix='', suffix='')</command></para>
+	<para><command>ImportFile('filename', 'descriptor',
+	    linked=False, prefix='', suffix='',
+	    encoding='utf_8')</command></para>
 	
 	<para>Imports data from a file. The arguments are the filename
 	to load data from and the descriptor.</para>
@@ -1230,7 +1284,8 @@ SetData('x', data[0]*0.1, *data[1:])
 	<para><command>ImportFile2D('filename', datasets,
 xrange=(a,b), yrange=(c,d), invertrows=True/False,
 invertcols=True/False, transpose=True/False,
-prefix='', suffix='', linked=False)</command></para>
+prefix='', suffix='', linked=False,
+encoding='utf8')</command></para>
 	
 	<para>Imports two-dimensional data from a file. The required
 	arguments are the filename to load data from and the dataset
@@ -1284,19 +1339,36 @@ prefix='', suffix='', linked=False)</command></para>
 	<title><anchor id="Command.ImportFileCSV" />ImportFileCSV</title>
 	
 	<para><command>ImportFileCSV('filename', readrows=False,
-	dsprefix='', dssuffix='', linked=False)</command></para>
+	    dsprefix='', dssuffix='', linked=False, encoding='utf_8')
+	</command></para>
 
 	<para>This command imports data from a CSV format file. Data
-	are read from the file using the dataset names given at the
-	top of the files in columns. Please see the reading data
-	section of this manual for more information. dsprefix is
-	prepended to each dataset name and dssuffix is added (the
-	prefix option is deprecated and also addeds an underscore to
-	the dataset name). linked specifies whether the data will be
-	linked to the file.
+	  are read from the file using the dataset names given at the
+	  top of the files in columns. Please see the reading data
+	  section of this manual for more information. dsprefix is
+	  prepended to each dataset name and dssuffix is added (the
+	  prefix option is deprecated and also addeds an underscore to
+	  the dataset name). linked specifies whether the data will be
+	  linked to the file.
 	</para>
 
-	</section>
+      </section>
+
+      <section>
+	<title><anchor id="Command.ImportFilePlugin" />ImportFilePlugin</title>
+	
+	<para><command>ImportFilePlugin('pluginname', 'filename', 
+	    **pluginargs, linked=False, encoding='utf_8',
+	    prefix='', suffix='')</command></para>
+
+	<para>
+	  Import data from file using import plugin 'pluginname'. The
+	  arguments to the plugin are given, plus optionally a text
+	  encoding, and prefix and suffix to prepend or append to
+	  dataset names.
+	</para>
+
+      </section>
 
       <section>
 	<title><anchor id="Command.ImportFITSFile" />
@@ -1623,6 +1695,15 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 	</informalexample>
       </section>
       
+      <section>
+	<title><anchor id="Command.SetToReference" />SetToReference</title>
+	
+	<para><command>SetToReference(setting, refval)</command></para>
+	
+	<para>Set setting to match other setting refval
+	always..</para>
+      </section>
+
       <section>
 	<title><anchor id="Command.SetUpdateInterval"
 	/>SetUpdateInterval</title>
