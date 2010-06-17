@@ -1,0 +1,329 @@
+# Veusz saved document (version 1.8)
+# User: jss
+# Date: Thu, 17 Jun 2010 19:05:07 +0000
+
+ImportString(u'XMM_T(numeric),+,-','''
+5.628000e+00 4.444000e-02 -4.377000e-02
+7.894300e+00 9.637000e-02 -9.432000e-02
+8.572800e+00 1.505600e-01 -1.452800e-01
+8.935100e+00 2.016700e-01 -1.921900e-01
+8.812300e+00 2.500800e-01 -2.317200e-01
+9.093300e+00 3.304300e-01 -3.117300e-01
+8.778200e+00 3.833500e-01 -3.486300e-01
+9.014000e+00 5.364900e-01 -4.666900e-01
+8.116000e+00 6.585900e-01 -5.105600e-01
+7.009700e+00 6.368200e-01 -4.733100e-01
+7.267300e+00 7.396100e-01 -6.892600e-01
+7.608800e+00 1.070300e+00 -7.781600e-01
+6.167300e+00 9.326400e-01 -7.295500e-01
+4.853700e+00 8.235500e-01 -5.775300e-01
+5.289800e+00 1.210600e+00 -6.668300e-01
+''')
+ImportString(u'XMM_r(numeric),+,-','''
+4.079410e+01 4.079410e+01 -4.079410e+01
+1.223820e+02 4.079420e+01 -4.079420e+01
+2.039710e+02 4.079410e+01 -4.079410e+01
+2.855590e+02 4.079410e+01 -4.079410e+01
+3.671470e+02 4.079420e+01 -4.079420e+01
+4.487360e+02 4.079410e+01 -4.079410e+01
+5.303240e+02 4.079410e+01 -4.079410e+01
+6.119120e+02 4.079420e+01 -4.079420e+01
+6.935010e+02 4.079410e+01 -4.079410e+01
+7.750890e+02 4.079410e+01 -4.079410e+01
+8.566770e+02 4.079420e+01 -4.079420e+01
+9.382660e+02 4.079410e+01 -4.079410e+01
+1.019850e+03 4.079410e+01 -4.079410e+01
+1.101440e+03 4.079420e+01 -4.079420e+01
+1.183030e+03 4.079410e+01 -4.079410e+01
+''')
+ImportString(u'join_T(numeric),+,-','''
+2.848300e+00 2.038400e-01 -1.924600e-01
+3.486000e+00 2.454100e-01 -2.203600e-01
+4.130900e+00 2.842800e-01 -2.521200e-01
+5.275100e+00 5.145600e-01 -4.345200e-01
+5.181000e+00 5.605500e-01 -4.667900e-01
+5.945600e+00 1.172900e+00 -8.520800e-01
+5.172900e+00 7.715200e-01 -6.454600e-01
+8.381900e+00 2.117600e+00 -1.484000e+00
+9.151200e+00 2.933500e+00 -1.821600e+00
+8.095900e+00 1.144400e+00 -9.110800e-01
+6.760900e+00 7.825600e-01 -6.630700e-01
+7.512700e+00 1.078900e+00 -8.886900e-01
+8.290300e+00 1.508700e+00 -1.175700e+00
+8.545500e+00 1.509800e+00 -1.083000e+00
+1.002600e+01 2.347800e+00 -1.586200e+00
+8.040800e+00 1.518800e+00 -1.075000e+00
+8.924100e+00 1.402500e+00 -1.070000e+00
+8.500300e+00 1.747800e+00 -1.243100e+00
+1.193400e+01 2.563800e+00 -1.914100e+00
+7.966200e+00 1.015300e+00 -8.143500e-01
+1.115500e+01 1.851900e+00 -1.732100e+00
+8.335400e+00 9.302900e-01 -8.166900e-01
+1.087300e+01 2.340300e+00 -1.582200e+00
+9.084100e+00 3.011000e+00 -1.691800e+00
+5.619500e+00 2.557100e+00 -1.645100e+00
+4.188800e+00 5.971800e-01 -5.137700e-01
+''')
+ImportString(u'join_Tcool(numeric)','''
+4.866533e+08
+6.460709e+08
+8.457038e+08
+1.309789e+09
+1.646014e+09
+2.438356e+09
+2.569063e+09
+3.818538e+09
+4.713869e+09
+5.285466e+09
+5.610075e+09
+8.007782e+09
+1.066876e+10
+1.256449e+10
+1.707578e+10
+1.696616e+10
+2.241039e+10
+2.815604e+10
+4.075918e+10
+4.094509e+10
+7.030750e+10
+8.146804e+10
+1.612034e+11
+2.300251e+11
+2.865877e+11
+2.415128e+11
+''')
+ImportString(u'join_ne(numeric),+,-','''
+1.013051e-01 3.885018e-03 -3.855963e-03
+8.459975e-02 2.732787e-03 -2.742314e-03
+7.253090e-02 1.800797e-03 -1.736446e-03
+5.611583e-02 1.295804e-03 -1.302452e-03
+4.173251e-02 1.210027e-03 -1.232160e-03
+3.347415e-02 1.139675e-03 -1.112957e-03
+2.727904e-02 1.157072e-03 -1.168092e-03
+2.577121e-02 8.503261e-04 -8.617833e-04
+2.115231e-02 8.235903e-04 -8.098673e-04
+1.808490e-02 3.904686e-04 -3.737143e-04
+1.425932e-02 3.416427e-04 -3.560778e-04
+1.145005e-02 2.591201e-04 -2.492951e-04
+8.995093e-03 3.524567e-04 -2.439155e-04
+7.476746e-03 1.812584e-04 -1.850032e-04
+6.574554e-03 1.239572e-04 -1.802632e-04
+5.492044e-03 1.489112e-04 -1.482904e-04
+4.334784e-03 9.548168e-05 -9.709612e-05
+3.633731e-03 7.439211e-05 -8.608619e-05
+2.939645e-03 7.883378e-05 -7.137054e-05
+2.261917e-03 4.206105e-05 -4.172175e-05
+1.721952e-03 2.050454e-05 -3.562590e-05
+1.240906e-03 1.624617e-05 -2.028029e-05
+6.830295e-04 1.871479e-05 -1.764928e-05
+4.394545e-04 1.473820e-05 -1.445650e-05
+2.567464e-04 2.377862e-05 -2.075020e-05
+2.581937e-04 9.016915e-06 -9.065599e-06
+''')
+ImportString(u'join_proj_T(numeric),+,-','''
+3.921200e+00 8.241000e-02 -7.806000e-02
+4.463200e+00 1.025400e-01 -1.001800e-01
+5.158200e+00 1.329200e-01 -1.324300e-01
+5.936800e+00 1.843800e-01 -1.741000e-01
+6.327500e+00 2.304300e-01 -2.105600e-01
+6.879600e+00 2.833800e-01 -2.641800e-01
+7.067100e+00 3.068400e-01 -2.814800e-01
+8.386500e+00 4.438700e-01 -4.020400e-01
+8.368100e+00 4.678800e-01 -4.193100e-01
+7.987900e+00 3.082700e-01 -2.867900e-01
+7.755000e+00 3.112900e-01 -2.885900e-01
+8.491100e+00 3.669700e-01 -3.308300e-01
+8.926800e+00 4.274000e-01 -3.907600e-01
+9.433600e+00 4.752000e-01 -4.266000e-01
+9.448900e+00 4.931200e-01 -4.461500e-01
+8.913100e+00 4.832100e-01 -4.371800e-01
+9.483900e+00 4.748600e-01 -4.375600e-01
+9.535400e+00 5.495100e-01 -4.887600e-01
+9.956600e+00 5.910000e-01 -5.276500e-01
+8.940600e+00 4.640400e-01 -4.203600e-01
+9.809900e+00 6.470500e-01 -5.633500e-01
+9.168100e+00 5.598600e-01 -4.978400e-01
+9.803500e+00 8.398200e-01 -7.446100e-01
+7.418000e+00 7.233800e-01 -5.940900e-01
+5.493000e+00 6.999100e-01 -5.576600e-01
+4.669900e+00 8.224700e-01 -5.288900e-01
+''')
+ImportString(u'join_r(numeric),+,-','''
+1.166880e+01 5.838770e+00 -5.838770e+00
+2.140010e+01 3.892510e+00 -3.892510e+00
+2.918510e+01 3.892510e+00 -3.892510e+00
+3.697010e+01 3.892510e+00 -3.892510e+00
+4.475520e+01 3.892510e+00 -3.892510e+00
+5.254020e+01 3.892510e+00 -3.892510e+00
+6.032520e+01 3.892510e+00 -3.892510e+00
+6.811020e+01 3.892510e+00 -3.892510e+00
+7.589530e+01 3.892510e+00 -3.892510e+00
+8.757280e+01 7.785030e+00 -7.785030e+00
+1.031430e+02 7.785030e+00 -7.785030e+00
+1.206590e+02 9.731290e+00 -9.731290e+00
+1.401220e+02 9.731290e+00 -9.731290e+00
+1.615310e+02 1.167750e+01 -1.167750e+01
+1.848860e+02 1.167750e+01 -1.167750e+01
+2.082410e+02 1.167750e+01 -1.167750e+01
+2.374350e+02 1.751630e+01 -1.751630e+01
+2.724670e+02 1.751630e+01 -1.751630e+01
+3.113920e+02 2.140880e+01 -2.140880e+01
+3.639410e+02 3.114010e+01 -3.114010e+01
+4.320600e+02 3.697890e+01 -3.697890e+01
+5.247020e+02 5.830020e+01 -5.830020e+01
+6.607350e+02 7.773360e+01 -7.773360e+01
+8.356360e+02 9.716700e+01 -9.716700e+01
+1.029970e+03 9.716700e+01 -9.716700e+01
+1.272890e+03 1.457500e+02 -1.457500e+02
+''')
+Set('width', '15.9cm')
+Set('height', '11.8cm')
+Set('StyleSheet/Font/font', u'Verdana')
+Set('StyleSheet/axis/Label/atEdge', True)
+Set('StyleSheet/graph/leftMargin', '0cm')
+Set('StyleSheet/graph/rightMargin', '0cm')
+Set('StyleSheet/graph/bottomMargin', '0cm')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('grid', name='grid1', autoadd=False)
+To('grid1')
+Set('columns', 1)
+Set('leftMargin', '1.83cm')
+Set('rightMargin', '1.77cm')
+Set('topMargin', '0cm')
+Set('bottomMargin', '1.23cm')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', u'Radius (kpc)')
+Set('min', 8.0)
+Set('log', True)
+To('..')
+Add('graph', name='T', autoadd=False)
+To('T')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Temperature (keV)')
+Set('log', True)
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='deproj', autoadd=False)
+To('deproj')
+Set('xData', u'join_r')
+Set('yData', u'join_T')
+Set('marker', u'square')
+Set('markerSize', u'1pt')
+Set('key', u'Chandra deprojected')
+Set('errorStyle', u'diamond')
+Set('PlotLine/hide', True)
+Set('MarkerLine/hide', True)
+Set('MarkerFill/color', u'magenta')
+Set('ErrorBarLine/color', u'grey')
+To('..')
+Add('xy', name='proj', autoadd=False)
+To('proj')
+Set('xData', u'join_r')
+Set('yData', u'join_proj_T')
+Set('marker', u'diamond')
+Set('markerSize', u'2.5pt')
+Set('key', u'Chandra projected')
+Set('errorStyle', u'barends')
+Set('PlotLine/hide', True)
+Set('MarkerFill/color', u'cyan')
+Set('ErrorBarLine/color', u'blue')
+Set('ErrorBarLine/width', '0.5pt')
+To('..')
+Add('xy', name='xmm', autoadd=False)
+To('xmm')
+Set('xData', u'XMM_r')
+Set('yData', u'XMM_T')
+Set('marker', u'star')
+Set('markerSize', u'3pt')
+Set('key', u'XMM projected')
+Set('errorStyle', u'curve')
+Set('PlotLine/hide', True)
+Set('MarkerLine/hide', True)
+Set('MarkerFill/color', u'#ff0000')
+Set('ErrorBarLine/color', u'red')
+Set('ErrorBarLine/width', '0.5pt')
+To('..')
+Add('key', name='key1', autoadd=False)
+To('key1')
+Set('Text/size', u'12pt')
+Set('Border/hide', True)
+Set('horzPosn', 'manual')
+Set('vertPosn', 'manual')
+Set('keyLength', u'0.5cm')
+Set('horzManual', 0.44233856029204632)
+Set('vertManual', 0.028242379921377202)
+To('..')
+To('..')
+Add('graph', name='ne', autoadd=False)
+To('ne')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Electron density (cm^{-3})')
+Set('max', 0.20000000000000001)
+Set('log', True)
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='deproj', autoadd=False)
+To('deproj')
+Set('xData', u'join_r')
+Set('yData', u'join_ne')
+Set('marker', u'square')
+Set('markerSize', u'1pt')
+Set('key', u'Chandra deproj. density')
+Set('errorStyle', u'diamond')
+Set('PlotLine/hide', True)
+Set('MarkerLine/hide', True)
+Set('MarkerFill/color', u'magenta')
+Set('ErrorBarLine/color', u'grey')
+Set('ErrorBarLine/width', '0.5pt')
+To('..')
+Add('xy', name='tcool', autoadd=False)
+To('tcool')
+Set('xData', u'join_r')
+Set('yData', u'join_Tcool')
+Set('marker', u'linecross')
+Set('markerSize', u'3pt')
+Set('key', u'Chandra cooling time')
+Set('yAxis', u'y2')
+Set('errorStyle', u'bar')
+Set('PlotLine/hide', True)
+Set('MarkerLine/hide', False)
+Set('MarkerFill/color', u'magenta')
+Set('ErrorBarLine/color', u'grey')
+Set('ErrorBarLine/width', '0.5pt')
+To('..')
+Add('axis', name='y2', autoadd=False)
+To('y2')
+Set('label', u'Cooling time (yr)')
+Set('min', 100000000.0)
+Set('max', 1000000000000.0)
+Set('log', True)
+Set('reflect', False)
+Set('direction', u'vertical')
+Set('lowerPosition', 0.0)
+Set('upperPosition', 1.0)
+Set('otherPosition', 1.0)
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', u'Cooling time')
+Set('xPos', [0.22084923837100287])
+Set('yPos', [0.29071858444521959])
+Set('angle', 340.0)
+Set('Text/size', u'14pt')
+To('..')
+Add('label', name='label2', autoadd=False)
+To('label2')
+Set('label', u'Density')
+Set('xPos', [0.43108631326520735])
+Set('yPos', [0.65525239745398034])
+Set('angle', 22.0)
+Set('Text/size', u'14pt')
+Set('Text/color', u'magenta')
+To('..')
+To('..')
+To('..')
+To('..')
