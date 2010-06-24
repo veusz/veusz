@@ -946,22 +946,20 @@ class MainWindow(qt4.QMainWindow):
 
         newMenuItems = []
         if setting.settingdb['main_recentfiles']:
-            files = setting.settingdb['main_recentfiles']
+            files = [f for f in setting.settingdb['main_recentfiles']
+                     if os.path.isfile(f)]
             self._openRecentFunctions = []
+
+            # add each recent file to menu
             for i, path in enumerate(files):
 
-                # Surely there is an easier way to do this?
-                def fileOpenerFunction(filename):
-                    path=filename
-                    def f():
-                        self.openFile(path)
-                    return f
-                f = fileOpenerFunction(path)
-                self._openRecentFunctions.append(f)
-                
-                newMenuItems.append(('filerecent%i'%i, 'Open File %s'%path,
+                def fileOpener(filename=path):
+                    self.openFile(filename)
+
+                self._openRecentFunctions.append(fileOpener)
+                newMenuItems.append(('filerecent%i' % i, 'Open File %s' % path,
                                      os.path.basename(path),
-                                     'file.filerecent', f,
+                                     'file.filerecent', fileOpener,
                                      '', False, ''))
 
             menu.setEnabled(True)
