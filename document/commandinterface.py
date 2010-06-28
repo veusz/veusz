@@ -57,6 +57,8 @@ class CommandInterface(qt4.QObject):
         'ImportString',
         'ImportString2D',
         'List',
+        'NodeChildren',
+        'NodeType',
         'ReloadData',
         'Remove',
         'Rename',
@@ -114,10 +116,21 @@ class CommandInterface(qt4.QObject):
         """Specify whether we want verbose output after operations."""
         self.verbose = v
 
-    def Add(self, type, *args, **args_opt):
-        """Add a graph to the plotset."""
+    def Add(self, widgettype, *args, **args_opt):
+        """Add a graph to the graph with the type given.
 
-        op = operations.OperationWidgetAdd(self.currentwidget, type, *args, **args_opt)
+        optional argument:
+          widget: widget path to place widget in
+
+        The optional arguments are sent to construct the widget.
+        """
+
+        at = self.currentwidget
+        if 'widget' in args_opt:
+            at = self.document.resolve(self.currentwidget, args_opt['widget'])
+            del args_opt['widget']
+
+        op = operations.OperationWidgetAdd(at, widgettype, *args, **args_opt)
         w = self.document.applyOperation(op)
 
         if self.verbose:
@@ -674,3 +687,37 @@ class CommandInterface(qt4.QObject):
         w = self.document.resolve(self.currentwidget, widget)
         op = operations.OperationWidgetRename(w, newname)
         self.document.applyOperation(op)
+
+    def NodeType(self, path):
+        """This function treats the set of objects in the widget and
+        setting tree as a set of nodes.
+
+        Returns type of node given.
+        Return values are: 'widget', 'settings' or 'setting'
+        """
+        item = self.document.resolveItem(self.currentwidget, path)
+
+        if hasattr(item, 'isWidget') and item.isWidget():
+            return 'widget'
+        elif isinstance(item, setting.Settings):
+            return 'settings'
+        else:
+            return 'setting'
+
+    def NodeChildren(self, path):
+        """This function treats the set of objects in the widget and
+        setting tree as a set of nodes.
+
+        Returns a list of the names of the children of this node."""
+
+        item = self.document.resolveItem(self.currentwidget, path)
+
+        if hasattr(item, 'isWidget') and item.isWidget():
+            return ( item.childnames + 
+                     [s.name for s in item.settings.getSettingList()] +
+                     [s.name for s in item.settings.getSettingsList()] )
+        elif isinstance(item, setting.Settings):
+            return ( [s.name for s in item.getSettingList()] +
+                     [s.name for s in item.getSettingsList()] )
+        else:
+            return []

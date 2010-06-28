@@ -20,8 +20,14 @@
 
 """Import plugin base class and helpers."""
 
-import veusz.qtall as qt4
 import veusz.utils as utils
+
+from field import Field as ImportField
+from field import FieldCheck as ImportFieldCheck
+from field import FieldText as ImportFieldText
+from field import FieldFloat as ImportFieldFloat
+from field import FieldInt as ImportFieldInt
+from field import FieldCombo as ImportFieldCombo
 
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
@@ -39,116 +45,6 @@ class ImportPluginParams(object):
 
 class ImportPluginException(RuntimeError):
     """An exception to return errors about importing or previewing data."""
-
-class ImportField(object):
-    """A class to represent an input field on the dialog or command line."""
-    def __init__(self, name, descr=None, default=None):
-        """name: name of field
-        descr: description to show to user
-        default: default value."""
-        self.name = name
-        if descr:
-            self.descr = descr
-        else:
-            self.descr = name
-        self.default = default
-
-    def makeControl(self):
-        """Create a set of controls for field."""
-        return None
-
-    def getControlResults(self, cntrls):
-        """Get result from created contrls."""
-        return None
-
-class ImportFieldCheck(ImportField):
-    """A check box on the dialog."""
-
-    def makeControl(self):
-        l = qt4.QLabel(self.descr)
-        c = qt4.QCheckBox()
-        if self.default:
-            c.setChecked(True)
-        return (l, c)
-
-    def getControlResults(self, cntrls):
-        return cntrls[1].isChecked()
-
-class ImportFieldText(ImportField):
-    """Text entry on the dialog."""
-
-    def makeControl(self):
-        l = qt4.QLabel(self.descr)
-        e = qt4.QLineEdit()
-        if self.default:
-            e.setText(self.default)
-        return (l, e)
-
-    def getControlResults(self, cntrls):
-        return unicode( cntrls[1].text() )
-
-class ImportFieldFloat(ImportField):
-    """Enter a floating point number."""
-
-    def makeControl(self):
-        l = qt4.QLabel(self.descr)
-        e = qt4.QLineEdit()
-        e.setValidator( qt4.QDoubleValidator(e) )
-        if self.default is not None:
-            e.setText( str(self.default) )
-        return (l, e)
-
-    def getControlResults(self, cntrls):
-        try:
-            return float( cntrls[1].text() )
-        except:
-            return None
-
-class ImportFieldInt(ImportField):
-    """Enter an integer number."""
-
-    def makeControl(self):
-        l = qt4.QLabel(self.descr)
-        e = qt4.QSpinBox()
-        if self.default is not None:
-            e.setValue( self.default )
-        return (l, e)
-
-    def getControlResults(self, cntrls):
-        try:
-            return cntrls[1].value()
-        except:
-            return None
-
-class ImportFieldCombo(ImportField):
-    """Drop-down combobox on dialog."""
-    def __init__(self, name, descr=None, default=None, items=(),
-                 editable=True):
-        """name: name of field
-        descr: description to show to user
-        default: default value
-        items: items in drop-down box
-        editable: whether user can enter their own value."""
-        ImportField.__init__(self, name, descr=descr, default=default)
-        self.items = items
-        self.editable = editable
-
-    def makeControl(self):
-        l = qt4.QLabel(self.descr)
-        c = qt4.QComboBox()
-        c.addItems(self.items)
-        c.setEditable(bool(self.editable))
-
-        if self.default:
-            if self.editable:
-                c.setEditText(self.default)
-            else:
-                c.setCurrentIndex(c.findText(self.default))
-
-        return (l, c)
-
-    def getControlResults(self, cntrls):
-        return unicode( cntrls[1].currentText() )
 
 class ImportDataset1D(object):
     """Return 1D dataset."""
@@ -185,13 +81,18 @@ class ImportDataset2D(object):
         self.rangey = rangey
 
 class ImportPlugin(object):
-    """Define a plugin to read data in a particular format."""
+    """Define a plugin to read data in a particular format.
+    
+    override doImport and optionally getPreview to define a new plugin
+    register the class by adding to the importpluginregistry list
+    """
 
     name = 'Import plugin'
     author = ''
     description = ''
 
     def __init__(self):
+        """Override this to declare a list of input fields if required."""
         # a list of ImportField objects to display
         self.fields = []
 

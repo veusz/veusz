@@ -53,6 +53,8 @@ import random
 import subprocess
 import time
 
+import embed_tree
+
 # check remote process has this API version
 API_VERSION = 1
 
@@ -119,6 +121,8 @@ class Embedded(object):
             raise RuntimeError("Remote Veusz instance reports version %i of"
                                " API. This embed.py supports version %i." %
                                (remotever, API_VERSION))
+        # define root object
+        self.Root = embed_tree.Node(self, '/')
 
     def StartSecondView(self, name = 'Veusz'):
         """Provides a second view onto the document of this window.

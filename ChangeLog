@@ -1,4 +1,48 @@
 ------------------------------------------------------------------------
+r1295 | jeremysanders | 2010-06-17 22:30:49 +0100 (Thu, 17 Jun 2010) | 1 line
+
+Add some more API docs
+------------------------------------------------------------------------
+r1291 | jeremysanders | 2010-06-17 20:11:54 +0100 (Thu, 17 Jun 2010) | 1 line
+
+Add spectrum and profile examples
+------------------------------------------------------------------------
+r1289 | jeremysanders | 2010-06-16 17:57:55 +0100 (Wed, 16 Jun 2010) | 1 line
+
+Change macros to inline functions
+------------------------------------------------------------------------
+r1288 | jeremysanders | 2010-06-16 17:57:33 +0100 (Wed, 16 Jun 2010) | 1 line
+
+Update README
+------------------------------------------------------------------------
+r1287 | jeremysanders | 2010-06-16 16:16:33 +0100 (Wed, 16 Jun 2010) | 1 line
+
+Update pyinstall spec to support plugins and embedding
+------------------------------------------------------------------------
+r1286 | jeremysanders | 2010-06-16 10:44:53 +0100 (Wed, 16 Jun 2010) | 1 line
+
+Fix problem with qtloops is not built
+------------------------------------------------------------------------
+r1285 | jeremysanders | 2010-06-15 21:50:10 +0100 (Tue, 15 Jun 2010) | 1 line
+
+Merge py2app setup into main setup. Fix distutils support to handle mac frameworks
+------------------------------------------------------------------------
+r1284 | jeremysanders | 2010-06-15 20:49:22 +0100 (Tue, 15 Jun 2010) | 1 line
+
+Fix import path for qtloops
+------------------------------------------------------------------------
+r1283 | jeremysanders | 2010-06-14 09:38:44 +0100 (Mon, 14 Jun 2010) | 1 line
+
+Add missing header for beziers_qtwrap
+------------------------------------------------------------------------
+r1282 | jeremysanders | 2010-06-13 21:40:08 +0100 (Sun, 13 Jun 2010) | 1 line
+
+Add option to connect points with Bezier line
+------------------------------------------------------------------------
+r1281 | jeremysanders | 2010-06-13 16:52:07 +0100 (Sun, 13 Jun 2010) | 1 line
+
+Update README, INSTALL, ChangeLog for 1.8
+------------------------------------------------------------------------
 r1280 | jeremysanders | 2010-06-13 15:53:17 +0100 (Sun, 13 Jun 2010) | 1 line
 
 Merge speedups banch to trunk

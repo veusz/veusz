@@ -632,6 +632,50 @@ class Document( qt4.QObject ):
             formats.append( (["emf"], "Windows Enhanced Metafile") )
         return formats
 
+    def resolveItem(self, fromwidget, where):
+        """Resolve item relative to fromwidget.
+        Returns a widget, setting or settings as appropriate.
+        """
+        parts = where.split('/')
+
+        if where[:1] == '/':
+            # relative to base directory
+            obj = self.basewidget
+        else:
+            # relative to here
+            obj = fromwidget
+
+        # iterate over parts in string
+        for p in parts:
+            if p == '..':
+                p = obj.parent
+                if p is None:
+                    raise ValueError, "Base graph has no parent"
+                obj = p
+            elif p == '.' or len(p) == 0:
+                pass
+            else:
+                if obj.isWidget():
+                    child = obj.getChild(p)
+                    if child is not None:
+                        obj = child
+                    else:
+                        if p in obj.settings:
+                            obj = obj.settings[p]
+                        else:
+                            raise ValueError, "Widget has no child %s" % p
+                else:
+                    if isinstance(obj, setting.Settings):
+                        try:
+                            obj = obj.get(p)
+                        except KeyError:
+                            raise ValueError, "Settings has no child %s" % p
+                    else:
+                        raise ValueError, "Item has no children"
+
+        # return widget
+        return obj
+
     def resolve(self, fromwidget, where):
         """Resolve graph relative to the widget fromwidget
 

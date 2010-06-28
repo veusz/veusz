@@ -102,7 +102,6 @@ class Settings:
         d = self.__dict__['setdict']
         if name in d:
             d[name].val = val
-            #self.setModified()
         else:
             self.__dict__[name] = val
 

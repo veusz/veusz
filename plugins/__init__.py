@@ -19,3 +19,4 @@
 # $Id$
 
 from importplugin import *
+from field import *
