@@ -122,7 +122,7 @@ class Embedded(object):
                                " API. This embed.py supports version %i." %
                                (remotever, API_VERSION))
         # define root object
-        self.Root = embed_tree.Node(self, '/')
+        self.Root = embed_tree.WidgetNode(self, 'widget', '/')
 
     def StartSecondView(self, name = 'Veusz'):
         """Provides a second view onto the document of this window.

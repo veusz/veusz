@@ -181,7 +181,7 @@ class CommandInterface(qt4.QObject):
                    ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds)
 
     def Remove(self, name):
-        """Remove a graph from the dataset."""
+        """Remove a widget from the dataset."""
         w = self.document.resolve(self.currentwidget, name)
         op = operations.OperationWidgetDelete(w)
         self.document.applyOperation(op)
@@ -700,7 +700,7 @@ class CommandInterface(qt4.QObject):
         if hasattr(item, 'isWidget') and item.isWidget():
             return 'widget'
         elif isinstance(item, setting.Settings):
-            return 'settings'
+            return 'settinggroup'
         else:
             return 'setting'
 
