@@ -73,6 +73,7 @@ class CommandInterface(qt4.QObject):
         'SetDataText',
         'SetVerbose',
         'To',
+        'WidgetType',
         )
 
     # commands which can modify disk, etc
@@ -704,7 +705,7 @@ class CommandInterface(qt4.QObject):
         else:
             return 'setting'
 
-    def NodeChildren(self, path):
+    def NodeChildren(self, path, types='all'):
         """This function treats the set of objects in the widget and
         setting tree as a set of nodes.
 
@@ -712,12 +713,28 @@ class CommandInterface(qt4.QObject):
 
         item = self.document.resolveItem(self.currentwidget, path)
 
+        out = []
         if hasattr(item, 'isWidget') and item.isWidget():
-            return ( item.childnames + 
-                     [s.name for s in item.settings.getSettingList()] +
-                     [s.name for s in item.settings.getSettingsList()] )
+            if types == 'all' or types == 'widget':
+                out += item.childnames
+            if types == 'all' or types == 'settinggroup':
+                out += [s.name for s in item.settings.getSettingsList()]
+            if types == 'all' or types == 'setting':
+                out += [s.name for s in item.settings.getSettingList()]
         elif isinstance(item, setting.Settings):
-            return ( [s.name for s in item.getSettingList()] +
-                     [s.name for s in item.getSettingsList()] )
+            if types == 'all' or types == 'settinggroup':
+                out += [s.name for s in item.getSettingsList()]
+            if types == 'all' or types == 'setting':
+                out += [s.name for s in item.getSettingList()]
+        return out
+
+    def WidgetType(self, path):
+        """Get the Veusz widget type for a widget with path given.
+
+        Raises a ValueError if the path doesn't point to a widget."""
+
+        item = self.document.resolveItem(self.currentwidget, path)
+        if hasattr(item, 'isWidget') and item.isWidget():
+            return item.typename
         else:
-            return []
+            raise ValueError, "Path '%s' is not a widget" % path

@@ -53,8 +53,6 @@ import random
 import subprocess
 import time
 
-import embed_tree
-
 # check remote process has this API version
 API_VERSION = 1
 
@@ -313,3 +311,191 @@ class Embedded(object):
         cls.serv_socket.shutdown(socket.SHUT_RDWR)
         cls.serv_socket.close()
         cls.serv_socket, cls.from_pipe = -1, -1
+
+############################################################################
+# Tree-based interface to Veusz widget tree below
+
+class Node(object):
+    """Represents an element in the Veusz widget-settinggroup-setting tree."""
+
+    def __init__(self, ci, wtype, path):
+        self._ci = ci
+        self._type = wtype
+        self._path = path
+
+    @staticmethod
+    def _makeNode(ci, path):
+        """Make correct class for type of object."""
+        wtype = ci.NodeType(path)
+        if wtype == 'widget':
+            return WidgetNode(ci, wtype, path)
+        elif wtype == 'setting':
+            return SettingNode(ci, wtype, path)
+        else:
+            return SettingGroupNode(ci, wtype, path)
+
+    @property
+    def path(self):
+        """Veusz full path to node"""
+        return self._path
+
+    @property
+    def type(self):
+        """Type of node: 'widget', 'settinggroup', or 'setting'"""
+        return self._type
+
+    def _joinPath(self, child):
+        """Return new path of child."""
+        if self._path == '/':
+            return '/' + child
+        else:
+            return self._path + '/' + child
+
+    def __getitem__(self, key):
+        """Return a child widget, settinggroup or setting."""
+
+        if self._type != 'setting':
+            try:
+                return self._makeNode(self._ci, self._joinPath(key))
+            except ValueError:
+                pass
+
+        raise KeyError, "%s does not have key or child '%s'" % (
+            self.__class__.__name__, key)
+
+    def __getattr__(self, attr):
+        """Return a child widget, settinggroup or setting."""
+
+        if self._type == 'setting':
+            pass
+        elif attr[:2] != '__':
+            try:
+                return self._makeNode(self._ci, self._joinPath(attr))
+            except ValueError:
+                pass
+
+        raise AttributeError, "%s does not have attribute or child '%s'" % (
+            self.__class__.__name__, attr)
+
+    # boring ways to get children of nodes
+    @property
+    def children(self):
+        """Generator to get children as Nodes."""
+        for c in self._ci.NodeChildren(self._path):
+            yield self._makeNode(self._ci, self._joinPath(c))
+    @property
+    def children_widgets(self):
+        """Generator to get child widgets as Nodes."""
+        for c in self._ci.NodeChildren(self._path, types='widget'):
+            yield self._makeNode(self._ci, self._joinPath(c))
+    @property
+    def children_settings(self):
+        """Generator to get child settings as Nodes."""
+        for c in self._ci.NodeChildren(self._path, types='setting'):
+            yield self._makeNode(self._ci, self._joinPath(c))
+    @property
+    def children_settinggroups(self):
+        """Generator to get child settingsgroups as Nodes."""
+        for c in self._ci.NodeChildren(self._path, types='settinggroup'):
+            yield self._makeNode(self._ci, self._joinPath(c))
+
+    @property
+    def childnames(self):
+        """Get names of children."""
+        return self._ci.NodeChildren(self._path)
+    @property
+    def childnames_widgets(self):
+        """Get names of children widgets."""
+        return self._ci.NodeChildren(self._path, types='widget')
+    @property
+    def childnames_settings(self):
+        """Get names of child settings."""
+        return self._ci.NodeChildren(self._path, types='setting')
+    @property
+    def childnames_settinggroups(self):
+        """Get names of child setting groups"""
+        return self._ci.NodeChildren(self._path, types='settinggroup')
+
+    @property
+    def parent(self):
+        """Return parent of node."""
+        if self._path == '/':
+            raise TypeError, "Cannot get parent node of root node"""
+        p = self._path.split('/')[:-1]
+        if p == ['']:
+            newpath = '/'
+        else:
+            newpath = '/'.join(p)
+        return self._makeNode(self._ci, newpath)
+
+    @property
+    def name(self):
+        """Get name of node."""
+        if self._path == '/':
+            return self._path
+        else:
+            return self._path.split('/')[-1]
+
+class SettingNode(Node):
+    """A node which is a setting."""
+
+    def _getVal(self):
+        """The value of a setting."""
+        if self._type == 'setting':
+            return self._ci.Get(self._path)
+        raise TypeError, "Cannot get value unless is a setting"""
+
+    def _setVal(self, val):
+        if self._type == 'setting':
+            self._ci.Set(self._path, val)
+        else:
+            raise TypeError, "Cannot set value unless is a setting."""
+
+    val = property(_getVal, _setVal)
+
+class SettingGroupNode(Node):
+    """A node containing a group of settings."""
+
+    pass
+
+class WidgetNode(Node):
+    """A node pointing to a widget."""
+
+    def WalkWidgets(self, widgettype=None):
+        """Generator to walk widget tree and get widgets below this
+        WidgetNode of type given.
+
+        widgettype is a Veusz widget type name or None to get all
+        widgets."""
+
+        for widget in self.children_widgets:
+            if widgettype is None or (
+                self._ci.WidgetType(widget.path) == widgettype):
+                yield widget
+            for w in widget.walkWidgets(widgettype=widgettype):
+                yield w
+
+    def Add(self, widgettype, *args, **args_opt):
+        """Add a widget of the type given, returning the Node instance.
+        """
+
+        args_opt['widget'] = self._path
+        name = self._ci.Add(widgettype, *args, **args_opt)
+        return WidgetNode( self._ci, 'widget', self._joinPath(name) )
+
+    def Rename(self, newname):
+        """Renames widget to name given."""
+
+        if self._path == '/':
+            raise RuntimeError, "Cannot rename root widget"
+
+        self._ci.Rename(self._path, newname)
+        self._path = '/'.join( self._path.split('/')[:-1] + [newname] )
+        
+    def Action(self, action):
+        """Applies action on widget."""
+        self._ci.Action(action, widget=self._path)
+
+    def Remove(self):
+        """Removes a widget and its children."""
+        self._ci.Remove(self._path)

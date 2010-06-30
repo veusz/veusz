@@ -50,6 +50,7 @@ import os.path
 
 from commandinterface import CommandInterface
 import veusz.utils as utils
+import veusz.embed as embed
 
 class CommandInterpreter(object):
     """Class for executing commands in the Veusz command line language."""
@@ -71,15 +72,19 @@ class CommandInterpreter(object):
         # import numpy into the environment
         exec "from numpy import *" in self.globals
 
+        # define root object
+        self.globals['Root'] = embed.WidgetNode(self.interface,
+                                                'widget', '/')
+
         # shortcut
-        i = self.interface
+        ifc = self.interface
 
         # define commands for interface
         self.cmds = {}
         for cmd in CommandInterface.safe_commands:
-            self.cmds[cmd] = getattr(i, cmd)
+            self.cmds[cmd] = getattr(ifc, cmd)
         for cmd in CommandInterface.unsafe_commands:
-            self.cmds[cmd] = getattr(i, cmd)
+            self.cmds[cmd] = getattr(ifc, cmd)
         self.cmds['GPL'] = self.GPL
         self.cmds['Load'] = self.Load
 
