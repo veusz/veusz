@@ -323,6 +323,19 @@ class Node(object):
         self._type = wtype
         self._path = path
 
+    def __eq__(self, other):
+        """Is this the same node?"""
+        return self._ci is other._ci and self._path == other._path
+
+    def __ne__(self, other):
+        """Is this a different node?"""
+        return self._ci is not other._ci or self._path != other._path
+        
+    def __repr__(self):
+        """Text description"""
+        return "<%s at %s (type %s)>" % (self.__class__.__name__,
+                                         self._path, self._type)
+
     @staticmethod
     def _makeNode(ci, path):
         """Make correct class for type of object."""

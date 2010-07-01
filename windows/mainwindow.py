@@ -29,6 +29,7 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting
+import veusz.embed as embed
 
 import consolewindow
 import plotwindow
@@ -856,6 +857,9 @@ class MainWindow(qt4.QMainWindow):
         # allow safe commands as-is
         for cmd in interface.safe_commands:
             env[cmd] = getattr(interface, cmd)
+
+        # define root node
+        env['Root'] = embed.WidgetNode(interface, 'widget', '/')
 
         # wrap "unsafe" commands with a message box to check the user
         safenow = [ignore_unsafe]
