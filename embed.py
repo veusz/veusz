@@ -336,16 +336,15 @@ class Node(object):
         return "<%s at %s (type %s)>" % (self.__class__.__name__,
                                          self._path, self._type)
 
-    @staticmethod
-    def _makeNode(ci, path):
-        """Make correct class for type of object."""
-        wtype = ci.NodeType(path)
+    def fromPath(self, path):
+        """Return a new Node for the path given."""
+        wtype = self._ci.NodeType(path)
         if wtype == 'widget':
-            return WidgetNode(ci, wtype, path)
+            return WidgetNode(self._ci, wtype, path)
         elif wtype == 'setting':
-            return SettingNode(ci, wtype, path)
+            return SettingNode(self._ci, wtype, path)
         else:
-            return SettingGroupNode(ci, wtype, path)
+            return SettingGroupNode(self._ci, wtype, path)
 
     @property
     def path(self):
@@ -369,7 +368,7 @@ class Node(object):
 
         if self._type != 'setting':
             try:
-                return self._makeNode(self._ci, self._joinPath(key))
+                return self.fromPath(self._joinPath(key))
             except ValueError:
                 pass
 
@@ -383,7 +382,7 @@ class Node(object):
             pass
         elif attr[:2] != '__':
             try:
-                return self._makeNode(self._ci, self._joinPath(attr))
+                return self.fromPath(self._joinPath(attr))
             except ValueError:
                 pass
 
@@ -395,22 +394,22 @@ class Node(object):
     def children(self):
         """Generator to get children as Nodes."""
         for c in self._ci.NodeChildren(self._path):
-            yield self._makeNode(self._ci, self._joinPath(c))
+            yield self.fromPath(self._joinPath(c))
     @property
     def children_widgets(self):
         """Generator to get child widgets as Nodes."""
         for c in self._ci.NodeChildren(self._path, types='widget'):
-            yield self._makeNode(self._ci, self._joinPath(c))
+            yield self.fromPath(self._joinPath(c))
     @property
     def children_settings(self):
         """Generator to get child settings as Nodes."""
         for c in self._ci.NodeChildren(self._path, types='setting'):
-            yield self._makeNode(self._ci, self._joinPath(c))
+            yield self.fromPath(self._joinPath(c))
     @property
     def children_settinggroups(self):
         """Generator to get child settingsgroups as Nodes."""
         for c in self._ci.NodeChildren(self._path, types='settinggroup'):
-            yield self._makeNode(self._ci, self._joinPath(c))
+            yield self.fromPath(self._joinPath(c))
 
     @property
     def childnames(self):
@@ -439,7 +438,7 @@ class Node(object):
             newpath = '/'
         else:
             newpath = '/'.join(p)
-        return self._makeNode(self._ci, newpath)
+        return self.fromPath(newpath)
 
     @property
     def name(self):
@@ -473,6 +472,11 @@ class SettingGroupNode(Node):
 
 class WidgetNode(Node):
     """A node pointing to a widget."""
+
+    @property
+    def widgettype(self):
+        """Get Veusz type of widget."""
+        return self._ci.WidgetType(self.path)
 
     def WalkWidgets(self, widgettype=None):
         """Generator to walk widget tree and get widgets below this
