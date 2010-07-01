@@ -472,7 +472,7 @@ class WidgetNode(Node):
             if widgettype is None or (
                 self._ci.WidgetType(widget.path) == widgettype):
                 yield widget
-            for w in widget.walkWidgets(widgettype=widgettype):
+            for w in widget.WalkWidgets(widgettype=widgettype):
                 yield w
 
     def Add(self, widgettype, *args, **args_opt):
