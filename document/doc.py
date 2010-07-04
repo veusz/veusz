@@ -155,7 +155,7 @@ class Document( qt4.QObject ):
         """Enable/disable batch history mode.
         
         In this mode further operations are added to the OperationMultiple specified,
-        untile batchHistory is called with None.
+        until batchHistory is called with None.
         
         The objects are pushed into a list and popped off
         

@@ -72,10 +72,23 @@ class FieldText(Field):
 class FieldFloat(Field):
     """Enter a floating point number."""
 
+    def __init__(self, name, descr=None, default=None,
+                 minval=-1e99, maxval=1e99):
+        """name: name of field
+        descr: description to show to user
+        default: default value.
+        minval and maxval: minimum and maximum values
+        """
+        Field.__init__(self, name, descr=descr, default=default)
+        self.range = (minval, maxval)
+
     def makeControl(self):
         l = qt4.QLabel(self.descr)
         e = qt4.QLineEdit()
-        e.setValidator( qt4.QDoubleValidator(e) )
+        v = qt4.QDoubleValidator(e)
+        v.setBottom(self.range[0])
+        v.setTop(self.range[1])
+        e.setValidator(v)
         if self.default is not None:
             e.setText( str(self.default) )
         return (l, e)
@@ -89,9 +102,21 @@ class FieldFloat(Field):
 class FieldInt(Field):
     """Enter an integer number."""
 
+    def __init__(self, name, descr=None, default=None,
+                 minval=-9999999, maxval=9999999):
+        """name: name of field
+        descr: description to show to user
+        default: default value.
+        minval and maxval: minimum and maximum integers
+        """
+        Field.__init__(self, name, descr=descr, default=default)
+        self.range = (minval, maxval)
+
     def makeControl(self):
         l = qt4.QLabel(self.descr)
         e = qt4.QSpinBox()
+        e.setMinimum(self.range[0])
+        e.setMaximum(self.range[1])
         if self.default is not None:
             e.setValue( self.default )
         return (l, e)

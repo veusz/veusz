@@ -50,7 +50,6 @@ import os.path
 
 from commandinterface import CommandInterface
 import veusz.utils as utils
-import veusz.embed as embed
 
 class CommandInterpreter(object):
     """Class for executing commands in the Veusz command line language."""
@@ -73,8 +72,7 @@ class CommandInterpreter(object):
         exec "from numpy import *" in self.globals
 
         # define root object
-        self.globals['Root'] = embed.WidgetNode(self.interface,
-                                                'widget', '/')
+        self.globals['Root'] = self.interface.Root
 
         # shortcut
         ifc = self.interface

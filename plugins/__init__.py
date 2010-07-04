@@ -19,4 +19,5 @@
 # $Id$
 
 from importplugin import *
+from workerplugin import *
 from field import *

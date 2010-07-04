@@ -30,6 +30,7 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.setting as setting
+import veusz.embed as embed
 
 import datasets
 import operations
@@ -94,6 +95,8 @@ class CommandInterface(qt4.QObject):
 
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotWipedDoc )
+
+        self.Root = embed.Node(self, 'widget', '/')
 
     def slotWipedDoc(self):
         """When the document is wiped, we change to the root widget."""

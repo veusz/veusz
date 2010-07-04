@@ -1345,7 +1345,7 @@ class OperationMultiple(object):
         """Undo the multiple operations."""
         
         # operations need to undone in reverse order
-        for op in utils.reverse(self.operations):
+        for op in self.operations[::-1]:
             op.undo(document)
 
 class OperationLoadStyleSheet(OperationMultiple):
@@ -1380,3 +1380,29 @@ class OperationLoadStyleSheet(OperationMultiple):
 class OperationLoadCustom(OperationLoadStyleSheet):
     descr = 'load custom definitions'
 
+class OperationWorkerPlugin(OperationMultiple):
+    """An operation to load a stylesheet."""
+    
+    def __init__(self, plugin, fields):
+        """Use worker plugin, passing fields."""
+        OperationMultiple.__init__(self, [], descr=None)
+        self.plugin = plugin
+        self.fields = fields
+        self.descr = plugin.name
+        
+    def do(self, document):
+        """Use the plugin."""
+
+        import commandinterface
+
+        # get document to keep track of changes for undo/redo
+        document.batchHistory(self)
+
+        # fire up interpreter to read file
+        ifc = commandinterface.CommandInterface(document)
+        try:
+            self.plugin.apply(ifc, self.fields)
+        except Exception:
+            document.batchHistory(None)
+            raise
+        document.batchHistory(None)

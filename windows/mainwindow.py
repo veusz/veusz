@@ -29,7 +29,7 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
 import veusz.setting as setting
-import veusz.embed as embed
+import veusz.plugins as plugins
 
 import consolewindow
 import plotwindow
@@ -46,6 +46,7 @@ from veusz.dialogs.stylesheet import StylesheetDialog
 from veusz.dialogs.custom import CustomDialog
 from veusz.dialogs.safetyimport import SafetyImportDialog
 from veusz.dialogs.histodata import HistoDataDialog
+from veusz.dialogs.workerplugin import handleWorkerPlugin
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -291,6 +292,44 @@ class MainWindow(qt4.QMainWindow):
         dialog.show()
         return dialog
 
+    def defineWorkerPlugins(self, actions):
+        """Create menu items and actions for worker plugins."""
+
+        menu = []
+        for plugin in plugins.workerpluginregistry:
+            def loadOpDialog(plugin=plugin):
+                """Load plugin dialog"""
+                handleWorkerPlugin(self, self.document, plugin)
+
+            actname = 'operation.' + '.'.join(plugin.name)
+            text = plugin.menu[-1]
+            if plugin.fields:
+                text += '...'
+            actions[actname] = utils.makeAction(
+                self,
+                plugin.description_short,
+                text,
+                loadOpDialog)
+
+            # build up menu from tuple of names
+            menulook = menu
+            namebuild = ['operation']
+            for cmpt in plugin.menu[:-1]:
+                namebuild.append(cmpt)
+                name = '.'.join(namebuild)
+
+                for c in menulook:
+                    if c[0] == name:
+                        menulook = c[2]
+                        break
+                else:
+                    menulook.append( [name, cmpt, []] )
+                    menulook = menulook[-1][2]
+
+            menulook.append(actname)
+
+        return menu
+
     def _defineMenus(self):
         """Initialise the menus and toolbar."""
 
@@ -479,12 +518,15 @@ class MainWindow(qt4.QMainWindow):
             'help.about'
             ]
 
+        operationmenu = self.defineWorkerPlugins(self.vzactions)
+
         menus = [
             ['file', '&File', filemenu],
             ['edit', '&Edit', editmenu],
             ['view', '&View', viewmenu],
             ['insert', '&Insert', insertmenu],
             ['data', '&Data', datamenu],
+            ['operation', '&Operation', operationmenu],
             ['help', '&Help', helpmenu],
             ]
 
@@ -859,7 +901,7 @@ class MainWindow(qt4.QMainWindow):
             env[cmd] = getattr(interface, cmd)
 
         # define root node
-        env['Root'] = embed.WidgetNode(interface, 'widget', '/')
+        env['Root'] = interface.Root
 
         # wrap "unsafe" commands with a message box to check the user
         safenow = [ignore_unsafe]
