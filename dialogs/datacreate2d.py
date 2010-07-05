@@ -25,7 +25,6 @@ import os.path
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
-from veusz.setting.controls import populateCombo
 
 def checkGetStep(text):
     """Check step syntax is okay.
@@ -110,28 +109,28 @@ class DataCreate2DDialog(qt4.QDialog):
         self.escapeDatasets(datasets[1])
 
         # help the user by listing existing datasets
-        populateCombo(self.namecombo, datasets[0])
+        utils.populateCombo(self.namecombo, datasets[0])
 
         if self.mode == 'xyzexpr':
             # enable everything
             for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
                 combo.setDisabled(False)
-                populateCombo(combo, datasets[0])
+                utils.populateCombo(combo, datasets[0])
         elif self.mode == '2dexpr':
             # only enable the z expression button
             self.xexprcombo.setDisabled(True)
             self.yexprcombo.setDisabled(True)
             self.zexprcombo.setDisabled(False)
-            populateCombo(self.zexprcombo, datasets[1])
+            utils.populateCombo(self.zexprcombo, datasets[1])
         else:
             # enable everything
             for combo in self.xexprcombo, self.yexprcombo, self.zexprcombo:
                 combo.setDisabled(False)
 
             # put in some examples to help the the user
-            populateCombo(self.xexprcombo, ['0:10:0.1'])
-            populateCombo(self.yexprcombo, ['0:10:0.1'])
-            populateCombo(self.zexprcombo, ['x+y'])
+            utils.populateCombo(self.xexprcombo, ['0:10:0.1'])
+            utils.populateCombo(self.yexprcombo, ['0:10:0.1'])
+            utils.populateCombo(self.zexprcombo, ['x+y'])
 
     def enableDisableCreate(self):
         """Enable or disable create button."""

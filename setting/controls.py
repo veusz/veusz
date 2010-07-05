@@ -33,35 +33,6 @@ import veusz.qtall as qt4
 import setting
 import veusz.utils as utils
 
-def populateCombo(combo, items):
-    """Populate the combo with the list of items given.
-
-    This also makes sure the currently entered text persists
-    """
-
-    # existing setting
-    currenttext = unicode(combo.currentText())
-
-    # add to list if not included
-    if currenttext not in items:
-        items = items + [currenttext]
-
-    # put in new entries
-    for i, val in enumerate(items):
-        if i >= combo.count():
-            combo.addItem(val)
-        else:
-            if combo.itemText(i) != val:
-                combo.insertItem(i, val)
-
-    # remove any extra items
-    while combo.count() > len(items):
-        combo.removeItem( combo.count()-1 )
-
-    # get index for current value
-    index = combo.findText(currenttext)
-    combo.setCurrentIndex(index)
-
 def styleClear(widget):
     """Return widget to default"""
     widget.setStyleSheet("")
@@ -502,7 +473,7 @@ class Dataset(Choice):
         datasets.sort()
 
         if datasets != self.lastdatasets:
-            populateCombo(self, datasets)
+            utils.populateCombo(self, datasets)
             self.lastdatasets = datasets
 
     def slotModified(self, modified):
@@ -849,7 +820,7 @@ class Image(WidgetSelector):
         names = images.keys()
         names.sort()
 
-        populateCombo(self, names)
+        utils.populateCombo(self, names)
 
 class Axis(WidgetSelector):
     """Choose an axis to plot against."""
@@ -884,7 +855,7 @@ class Axis(WidgetSelector):
         names = axes.keys()
         names.sort()
 
-        populateCombo(self, names)
+        utils.populateCombo(self, names)
 
 class ListSet(qt4.QFrame):
     """A widget for constructing settings which are lists of other
@@ -1306,7 +1277,7 @@ class Datasets(MultiSettingWidget):
         # if a different item is selected
         self.connect(combo, qt4.SIGNAL('activated(const QString&)'),
                      lambda x: self.datasetChanged(row))
-        populateCombo(combo, self.getDatasets())
+        utils.populateCombo(combo, self.getDatasets())
         return combo
 
     def datasetChanged(self, row):
@@ -1346,7 +1317,7 @@ class Datasets(MultiSettingWidget):
 
         # update list of datasets
         for cntrls in self.controls:
-            populateCombo(cntrls[0], datasets)
+            utils.populateCombo(cntrls[0], datasets)
 
 class Strings(MultiSettingWidget):
     """A list of strings."""

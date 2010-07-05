@@ -354,117 +354,6 @@ def formatNumber(num, format):
 
     return format
 
-def clipper(xpts, ypts, bounds):
-    """ Clip points that are safe to remove.
-
-    Takes points in xpts, ypts.
-    If any are clippable by the bounds and they lie between clipped points
-    then those points are remove.
-
-       -1,-1 | 0,-1  | 1,-1
-       ---------------------
-       -1,0  | 0, 0  | 1, 0
-       ---------------------
-       -1,1  | 0, 1  | 1, 1
-       
-    Data are returned in an array in the form (x1,y1, x2, y2...)
-    """
-
-    x1, y1, x2, y2 = bounds
-
-    clipx = []
-    clipy = []
-
-    # find out whether points are clippable
-    for x, y in zip(xpts, ypts):
-
-        # is clippable?
-        xclip = 0
-        yclip = 0
-
-        if   x<x1: xclip = -1
-        elif x>x2: xclip = 1
-        if   y<y1: yclip = -1
-        elif y>y2: yclip = 1
-
-        clipx.append(xclip)
-        clipy.append(yclip)
-
-    outx = []
-    outy = []
-
-    # now go through and collect the points we need...
-    nopts = len(xpts)
-    for i in xrange(nopts):
-        cx = clipx[i]
-        cy = clipy[i]
-
-        # unclipped
-        if cx == 0 and cy == 0:
-            outx.append( xpts[i] )
-            outy.append( ypts[i] )
-            
-        else:
-            dx = abs( clipx[i+1] - cx )
-            dy = abs( clipy[i+1] - cy )
-
-            # set if it may be true we may see this pt
-            visible = True
-            if (dx == 0 and dy == 0) or \
-               (dx == 0 and cx != 0) or \
-               (dy == 0 and cy != 0):
-                visible = False
-
-##     lastclip = False
-##     firstpass = True
-##     for x,y in zip(xpts,ypts):
-
-
-##         if xclip == 0 and yclip == 0:
-##             if lastclip:
-##                 pts.append(lastclippedx)
-##                 pts.append(lastclippedy)
-##                 lastclip = False
-##             pts.append(x)
-##             pts.append(y)
-##         else:
-##             if not lastclip:
-##                 pts.append(x)
-##                 pts.append(y)
-##                 lastclip = True
-##                 oldxclip = xclip
-                
-##             else:
-
-##             deltax = abs( xclip - oldxclip )
-##             deltay = abs( yclip - oldyclip )
-
-
-##             if (deltax != 0 and deltay == 0) or \
-##                (deltax == 0 and deltay != 0):
-
-##         if x<x1 or x>x2 or y<y1 or y>y2:
-##             lastx = x
-##             lasty = y
-##             if not lastclip and not firstpass:
-##                 pts.append(x)
-##                 pts.append(y)
-##             lastclip = True
-##         else:
-##             # non-clippable:
-##             # put back the last clipped point
-##             if lastclip:
-##                 if len(pts) < 2 or pts[-2] != lastx or pts[-1] != lasty:
-##                     pts.append(lastx)
-##                     pts.append(lasty)
-##                 lastclip = False
-##             # add the point
-##             pts.append(x)
-##             pts.append(y)
-##         firstpass = False
-
-##     return pts
-
 # This is Tim Peter's <tim_one@msn.com> topological sort
 # see http://www.python.org/tim_one/000332.html
 # adapted to use later python features
@@ -679,3 +568,31 @@ class UnicodeCSVReader:
 
 # End python doc classes
 
+def populateCombo(combo, items):
+    """Populate the combo with the list of items given.
+
+    This also makes sure the currently entered text persists
+    """
+
+    # existing setting
+    currenttext = unicode(combo.currentText())
+
+    # add to list if not included
+    if currenttext not in items:
+        items = items + [currenttext]
+
+    # put in new entries
+    for i, val in enumerate(items):
+        if i >= combo.count():
+            combo.addItem(val)
+        else:
+            if combo.itemText(i) != val:
+                combo.insertItem(i, val)
+
+    # remove any extra items
+    while combo.count() > len(items):
+        combo.removeItem( combo.count()-1 )
+
+    # get index for current value
+    index = combo.findText(currenttext)
+    combo.setCurrentIndex(index)

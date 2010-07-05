@@ -479,17 +479,16 @@ class WidgetNode(Node):
         return self._ci.WidgetType(self.path)
 
     def WalkWidgets(self, widgettype=None):
-        """Generator to walk widget tree and get widgets below this
-        WidgetNode of type given.
+        """Generator to walk widget tree and get this widget and the
+        widgets below this WidgetNode of type given.
 
         widgettype is a Veusz widget type name or None to get all
         widgets."""
 
-        for widget in self.children_widgets:
-            if widgettype is None or (
-                self._ci.WidgetType(widget.path) == widgettype):
-                yield widget
-            for w in widget.WalkWidgets(widgettype=widgettype):
+        if widgettype is None or self._ci.WidgetType(self._path) == widgettype:
+            yield self
+        for child in self.children_widgets:
+            for w in child.WalkWidgets(widgettype=widgettype):
                 yield w
 
     def Add(self, widgettype, *args, **args_opt):

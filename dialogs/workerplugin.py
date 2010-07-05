@@ -94,6 +94,7 @@ class WorkerPluginDialog(qt4.QDialog):
                  '\n Author: ' + self.plugin.author)
         self.descriptionLabel.setText(descr)
 
+        self.fieldcntrls = []
         self.fields = []
         self.addFields()
 
@@ -101,17 +102,26 @@ class WorkerPluginDialog(qt4.QDialog):
         """Add any fields, removing existing ones if required."""
         layout = self.fieldGroup.layout()
 
-        for line in self.fields:
+        for line in self.fieldcntrls:
             for cntrl in line:
                 layout.removeWidget(cntrl)
                 cntrl.deleteLater()
-        del self.fields[:]
+        del self.fieldcntrls[:]
 
         for row, field in enumerate(self.plugin.fields):
-            cntrls = field.makeControl()
-            layout.addWidget(cntrls[0], row, 0)
-            layout.addWidget(cntrls[1], row, 1)
-            self.fields.append(cntrls)
+            if isinstance(field, list) or isinstance(field, tuple):
+                for c, f in enumerate(field):
+                    cntrls = f.makeControl(doc=self.document)
+                    layout.addWidget(cntrls[0], row, c*2)
+                    layout.addWidget(cntrls[1], row, c*2+1)
+                    self.fieldcntrls.append(cntrls)
+                    self.fields.append(f)
+            else:
+                cntrls = field.makeControl(doc=self.document)
+                layout.addWidget(cntrls[0], row, 0)
+                layout.addWidget(cntrls[1], row, 1)
+                self.fieldcntrls.append(cntrls)
+                self.fields.append(field)
 
     def slotReset(self):
         """Reset fields to defaults."""
@@ -124,7 +134,7 @@ class WorkerPluginDialog(qt4.QDialog):
         fields = {'currentwidget': self.mainwindow.treeedit.selwidget.path}
 
         # read values from controls
-        for field, cntrls in zip(self.plugin.fields, self.fields):
+        for field, cntrls in zip(self.fields, self.fieldcntrls):
             fields[field.name] = field.getControlResults(cntrls)
 
         runPlugin(self, self.document, self.plugin, fields)

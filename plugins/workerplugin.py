@@ -71,22 +71,24 @@ class RandomizePlotColors(WorkerPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
+            field.FieldWidget("widget", descr="Start from widget",
+                              default="/"),
             field.FieldCheck("randxy", descr="Randomize xy plotters",
                              default=True),
             field.FieldCheck("randfunc", descr="Randomize function plotters",
                              default=True),
-            field.FieldFloat("minhue", descr="Minimum hue (0-1)",
-                             default=0.),
-            field.FieldFloat("maxhue", descr="Maximum hue (0-1)",
-                             default=1.),
-            field.FieldFloat("minsat", descr="Minimum saturation (0-1)",
-                             default=0.),
-            field.FieldFloat("maxsat", descr="Maximum saturation (0-1)",
-                             default=1.),
-            field.FieldFloat("minval", descr="Minimum value (0-1)",
-                             default=0.),
-            field.FieldFloat("maxval", descr="Maximum value (0-1)",
-                             default=1.),
+            [ field.FieldFloat("minhue", descr="Hue range (0-1)",
+                               default=0.),
+              field.FieldFloat("maxhue", descr=" ",
+                               default=1.) ],
+            [ field.FieldFloat("minsat", descr="Saturation range (0-1)",
+                               default=0.3),
+              field.FieldFloat("maxsat", descr=" ",
+                               default=1.) ],
+            [ field.FieldFloat("minval", descr="Value range (0-1)",
+                               default=0.3),
+              field.FieldFloat("maxval", descr=" ",
+                               default=1.) ]
             ]
 
     def getRandomColor(self, fields):
@@ -99,10 +101,19 @@ class RandomizePlotColors(WorkerPlugin):
 
     def apply(self, ifc, fields):
         """Do the randomizing."""
-        ifc.Root.width.val = '2cm'
-        ifc.Root.height.val = '2cm'
-        for i in xrange(10):
-            print self.getRandomColor(fields)
+
+        fromwidget = ifc.Root.fromPath(fields['widget'])
+
+        if fields['randxy']:
+            for node in fromwidget.WalkWidgets(widgettype='xy'):
+                col = self.getRandomColor(fields)
+                node.PlotLine.color.val = col
+                node.MarkerFill.color.val = col
+                node.ErrorBarLine.color.val = col
+
+        if fields['randfunc']:
+            for node in fromwidget.WalkWidgets(widgettype='function'):
+                node.Line.color.val = self.getRandomColor(fields)
 
 workerpluginregistry.append(RandomizePlotColors())
 

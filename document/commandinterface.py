@@ -96,7 +96,7 @@ class CommandInterface(qt4.QObject):
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotWipedDoc )
 
-        self.Root = embed.Node(self, 'widget', '/')
+        self.Root = embed.WidgetNode(self, 'widget', '/')
 
     def slotWipedDoc(self):
         """When the document is wiped, we change to the root widget."""

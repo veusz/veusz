@@ -24,7 +24,6 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
-from veusz.setting.controls import populateCombo
 
 import dataeditdialog
 
@@ -116,7 +115,7 @@ class HistoDataDialog(qt4.QDialog):
         self.escapeDatasets(datasets)
 
         # help the user by listing existing datasets
-        populateCombo(self.indataset, datasets)
+        utils.populateCombo(self.indataset, datasets)
 
     def datasetExprChanged(self):
         """Validate expression."""
