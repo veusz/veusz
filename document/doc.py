@@ -28,6 +28,7 @@ import time
 import random
 import math
 import re
+import traceback
 from collections import defaultdict
 
 import numpy as N
@@ -81,9 +82,15 @@ class Document( qt4.QObject ):
            sigWiped when document is wiped
     """
 
+    pluginsloaded = False
+
     def __init__(self):
         """Initialise the document."""
         qt4.QObject.__init__( self )
+
+        if not Document.pluginsloaded:
+            Document.loadPlugins()
+            Document.pluginsloaded = True
 
         self.changeset = 0          # increased when the document changes
         self.suspendupdates = False # if True then do not notify listeners of updates
@@ -313,7 +320,19 @@ class Document( qt4.QObject ):
     def isModified(self):
         """Return whether modified flag set."""
         return self.modified
-    
+
+    @classmethod
+    def loadPlugins(kls):
+        """Load plugins and catch exceptions."""
+        for plugin in setting.settingdb.get('plugins', []):
+            try:
+                execfile(plugin, dict())
+            except Exception, ex:
+                err = ('Error loading plugin ' + plugin + '\n\n' +
+                       traceback.format_exc())
+                qt4.QMessageBox.critical(None, "Error loading plugin",
+                                         err)
+
     def printTo(self, printer, pages, scaling = 1., dpi = None,
                 antialias = False):
         """Print onto printing device."""
@@ -868,8 +887,4 @@ class Painter(qt4.QPainter):
     def endPaintingWidget(self):
         """Widget is now finished."""
         pass
-    
-# load plugins
-plugins = setting.settingdb.get('plugins', [])
-for plugin in plugins:
-    execfile(plugin)
+

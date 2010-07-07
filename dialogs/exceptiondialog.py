@@ -54,7 +54,6 @@ What the user was doing before the crash:
 '''
 
 _to_address = 'veusz-exception-reports@gna.org'
-#_to_address = 'jss@ast.cam.ac.uk'
 
 class ExceptionSendDialog(qt4.QDialog):
     """Dialog to send debugging report."""
