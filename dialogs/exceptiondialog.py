@@ -25,8 +25,8 @@ import sys
 import os.path
 import time
 import traceback
-import smtplib
-import email.MIMEText
+import urllib2
+import base64
 
 import numpy
 
@@ -36,24 +36,24 @@ import veusz.utils as utils
 _reportformat='''
 Veusz version: %s
 Python version: %s
+Python platform: %s
 Numpy version: %s
 Date: %s
 
 %s
 '''
 
-_emailformat = '''
-Veusz exception report
-----------------------
+_sendformat = '''
+Email: %s
 
+Error report
+------------
 %s
 
------------------------------------------
-What the user was doing before the crash:
+What the user was doing before the crash
+----------------------------------------
 %s
 '''
-
-_to_address = 'veusz-exception-reports@gna.org'
 
 class ExceptionSendDialog(qt4.QDialog):
     """Dialog to send debugging report."""
@@ -70,6 +70,7 @@ class ExceptionSendDialog(qt4.QDialog):
         self.text = _reportformat % (
             utils.version(),
             sys.version,
+            sys.platform,
             numpy.__version__,
             time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
             exception
@@ -79,35 +80,24 @@ class ExceptionSendDialog(qt4.QDialog):
     def accept(self):
         """Send text."""
         # build up the text of the message
-        text = _emailformat % (
-            self.text,
-            unicode(self.detailsedit.toPlainText())
-            )
-
-        fromaddress = unicode(self.emailedit.text())
-
-        # construct the message object
-        msg = email.MIMEText.MIMEText(text)
-        msg['Subject'] = 'Veusz exception report'
-        msg['From'] = fromaddress
-        msg['To'] = _to_address
-        msg['X-Veusz-Exception'] = 'Yes'
-
-        # send the message
+        text = ( _sendformat % (
+                unicode(self.emailedit.text()),
+                self.text,
+                unicode(self.detailsedit.toPlainText())
+                )).encode('utf-8')
+        text = base64.b64encode(text)
+        
         try:
-            s = smtplib.SMTP()
-            s.connect()
-            s.sendmail(fromaddress, [_to_address], msg.as_string())
-            s.close()
-        except smtplib.SMTPException:
+            # send the message
+            urllib2.urlopen('http://barmag.net/veusz-mail.php',
+                            'message=%s' % text)
+
+        except urllib2.URLError:
             # something went wrong...
-            mb = qt4.QMessageBox("Veusz",
-                                 "Failed to send message",
-                                 qt4.QMessageBox.Critical,
-                                 qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                 qt4.QMessageBox.NoButton,
-                                 qt4.QMessageBox.NoButton)
-            mb.exec_loop()
+            qt4.QMessageBox.critical(None, "Veusz",
+                                     "Failed to connect to error server "
+                                     "to send report. Is your internet "
+                                     "connected?")
             return
 
         qt4.QDialog.accept(self)
