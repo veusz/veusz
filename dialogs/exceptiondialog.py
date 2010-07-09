@@ -26,25 +26,28 @@ import os.path
 import time
 import traceback
 import urllib2
-import base64
+import sip
 
 import numpy
 
 import veusz.qtall as qt4
 import veusz.utils as utils
 
-_reportformat='''
-Veusz version: %s
+_reportformat = \
+'''Veusz version: %s
 Python version: %s
 Python platform: %s
 Numpy version: %s
+Qt version: %s
+PyQt version: %s
+SIP version: %s
 Date: %s
 
 %s
 '''
 
-_sendformat = '''
-Email: %s
+_sendformat = \
+'''Email: %s
 
 Error report
 ------------
@@ -72,6 +75,9 @@ class ExceptionSendDialog(qt4.QDialog):
             sys.version,
             sys.platform,
             numpy.__version__,
+            qt4.qVersion(),
+            qt4.PYQT_VERSION_STR,
+            sip.SIP_VERSION_STR,
             time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
             exception
             )
@@ -84,9 +90,11 @@ class ExceptionSendDialog(qt4.QDialog):
                 unicode(self.emailedit.text()),
                 self.text,
                 unicode(self.detailsedit.toPlainText())
-                )).encode('utf-8')
-        text = base64.b64encode(text)
-        
+                ))
+
+        # send the message as base-64 encoded utf-8
+        text = str( qt4.QString(text).toUtf8().toBase64() )
+
         try:
             # send the message
             urllib2.urlopen('http://barmag.net/veusz-mail.php',
