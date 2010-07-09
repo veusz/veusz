@@ -55,6 +55,9 @@ defaultValues = {
 
     # further ui options
     'toolbar_size': 24,
+
+    # use cwd as starting directory
+    'dirname_usecwd': False,
     }
 
 class _SettingDB(object):

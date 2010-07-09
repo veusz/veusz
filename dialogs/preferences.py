@@ -39,51 +39,57 @@ class PreferencesDialog(qt4.QDialog):
             win = win.parent()
         self.plotwindow = win.plot
 
+        # for ease of use
+        setdb = setting.settingdb
+
         # view settings
-        self.antialiasCheck.setChecked( setting.settingdb['plot_antialias'] )
+        self.antialiasCheck.setChecked( setdb['plot_antialias'] )
         self.intervalCombo.addItem('Disabled')
         for intv in self.plotwindow.intervals[1:]:
             self.intervalCombo.addItem('%gs' % (intv * 0.001))
         index = self.plotwindow.intervals.index(
-            setting.settingdb['plot_updateinterval'])
+            setdb['plot_updateinterval'])
         self.intervalCombo.setCurrentIndex(index)
+
+        # use cwd for file dialogs
+        self.cwdCheck.setChecked( setdb['dirname_usecwd'] )
 
         # set icon size
         self.iconSizeCombo.setCurrentIndex(
             self.iconSizeCombo.findText(
-                str(setting.settingdb['toolbar_size'])))
+                str(setdb['toolbar_size'])))
 
         # set export dpi
         self.exportDPI.setValidator( qt4.QIntValidator(10, 10000, self) )
-        self.exportDPI.setEditText( str(setting.settingdb['export_DPI']) )
+        self.exportDPI.setEditText( str(setdb['export_DPI']) )
 
         # set export antialias
-        self.exportAntialias.setChecked( setting.settingdb['export_antialias'])
+        self.exportAntialias.setChecked( setdb['export_antialias'])
 
         # quality of jpeg export
-        self.exportQuality.setValue( setting.settingdb['export_quality'] )
+        self.exportQuality.setValue( setdb['export_quality'] )
 
         # changing background color of bitmaps
         self.connect( self.exportBackgroundButton, qt4.SIGNAL('clicked()'),
                       self.slotExportBackgroundChanged )
-        self.updateExportBackground(setting.settingdb['export_background'])
+        self.updateExportBackground(setdb['export_background'])
 
         # set color setting
         self.exportColor.setCurrentIndex(
-            {True:0, False:1}[setting.settingdb['export_color']])
+            {True:0, False:1}[setdb['export_color']])
 
         # default stylesheet
-        self.styleLineEdit.setText(setting.settingdb['stylesheet_default'])
+        self.styleLineEdit.setText(setdb['stylesheet_default'])
         self.connect( self.styleBrowseButton, qt4.SIGNAL('clicked()'),
                       self.styleBrowseClicked )
 
         # default custom settings
-        self.customLineEdit.setText(setting.settingdb['custom_default'])
+        self.customLineEdit.setText(setdb['custom_default'])
         self.connect( self.customBrowseButton, qt4.SIGNAL('clicked()'),
                       self.customBrowseClicked )
 
         # for plugins
-        plugins = list( setting.settingdb.get('plugins', []) )
+        plugins = list( setdb.get('plugins', []) )
         self.pluginmodel = qt4.QStringListModel(plugins)
         self.pluginList.setModel(self.pluginmodel)
         self.connect( self.pluginAddButton, qt4.SIGNAL('clicked()'),
@@ -103,13 +109,14 @@ class PreferencesDialog(qt4.QDialog):
         self.colorbutton = {}
         self.colordefaultcheck = {}
         layout = qt4.QGridLayout()
-        for row, colname in enumerate(setting.settingdb.colors):
+        setdb = setting.settingdb
+        for row, colname in enumerate(setdb.colors):
             isdefault, colval = setting.settingdb['color_%s' %
                                                   colname]
             self.chosencolors[colname] = qt4.QColor(colval)
 
             # label
-            name, tooltip = setting.settingdb.color_names[colname]
+            name, tooltip = setdb.color_names[colname]
             label = qt4.QLabel(name)
             label.setToolTip(tooltip)
             layout.addWidget(label, row, 0)
@@ -178,46 +185,54 @@ class PreferencesDialog(qt4.QDialog):
         qt4.QDialog.accept(self)
 
         # view settings
-        setting.settingdb['plot_updateinterval'] = (
+        setdb = setting.settingdb
+        setdb['plot_updateinterval'] = (
             self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
-        setting.settingdb['plot_antialias'] = self.antialiasCheck.isChecked()
+        setdb['plot_antialias'] = self.antialiasCheck.isChecked()
+
+        # use cwd
+        setdb['dirname_usecwd'] = self.cwdCheck.isChecked()
 
         # update icon size if necessary
         iconsize = int( self.iconSizeCombo.currentText() )
-        if iconsize != setting.settingdb['toolbar_size']:
-            setting.settingdb['toolbar_size'] = iconsize
+        if iconsize != setdb['toolbar_size']:
+            setdb['toolbar_size'] = iconsize
             for widget in self.parent().children(): # find toolbars
                 if isinstance(widget, qt4.QToolBar):
                     widget.setIconSize( qt4.QSize(iconsize, iconsize) )
 
         # update dpi if possible
         try:
-            setting.settingdb['export_DPI'] = int(self.exportDPI.currentText())
+            setdb['export_DPI'] = int(self.exportDPI.currentText())
         except ValueError:
             pass
 
         # export settings
-        setting.settingdb['export_antialias'] = self.exportAntialias.isChecked()
-        setting.settingdb['export_quality'] = self.exportQuality.value()
+        setdb['export_antialias'] = self.exportAntialias.isChecked()
+        setdb['export_quality'] = self.exportQuality.value()
 
-        setting.settingdb['export_color'] = {0: True, 1: False}[self.exportColor.currentIndex()]
-        setting.settingdb['export_background'] = self.exportBackgroundButton.iconcolor
+        setdb['export_color'] = {0: True, 1: False}[
+            self.exportColor.currentIndex()]
+        setdb['export_background'] = self.exportBackgroundButton.iconcolor
 
         # new document settings
-        setting.settingdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
-        setting.settingdb['custom_default'] = unicode(self.customLineEdit.text())
+        setdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
+        setdb['custom_default'] = unicode(self.customLineEdit.text())
 
         # colors
         for name, color in self.chosencolors.iteritems():
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = unicode(color.name())
-            setting.settingdb['color_' + name] = (isdefault, colorname)
+            setdb['color_' + name] = (isdefault, colorname)
 
         # plugins
         plugins = [unicode(x) for x in self.pluginmodel.stringList()]
-        setting.settingdb['plugins'] = plugins
+        setdb['plugins'] = plugins
 
         self.plotwindow.updatePlotSettings()
+
+        # write settings out now, rather than wait until the end
+        setdb.writeSettings()
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""

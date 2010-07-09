@@ -88,6 +88,23 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="File">
+      <attribute name="title">
+       <string>File</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QCheckBox" name="cwdCheck">
+         <property name="toolTip">
+          <string>File dialogs will open in the current working directory of Veusz, rather than the one used by Veusz when it was last run</string>
+         </property>
+         <property name="text">
+          <string>Open file dialog in current working directory</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="Export">
       <attribute name="title">
        <string>Export</string>

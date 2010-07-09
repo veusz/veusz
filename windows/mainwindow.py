@@ -50,6 +50,9 @@ from veusz.dialogs.workerplugin import handleWorkerPlugin
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
+# shortcut to this
+setdb = setting.settingdb
+
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
@@ -136,9 +139,13 @@ class MainWindow(qt4.QMainWindow):
         statusbar.addWidget(self.axisvalueslabel)
         self.axisvalueslabel.show()
 
-        self.dirname = os.getcwd()
-        self.exportDir = os.getcwd()
-        
+        # working directory - use previous one
+        self.dirname = setdb.get('dirname', qt4.QDir.homePath())
+        self.dirname_export = setdb.get('dirname_export', self.dirname)
+        if setdb['dirname_usecwd']:
+            self.dirname = self.dirname_export = os.getcwd()
+
+        # connect plot signals to main window
         self.connect( self.plot, qt4.SIGNAL("sigUpdatePage"),
                       self.slotUpdatePage )
         self.connect( self.plot, qt4.SIGNAL("sigAxisValuesFromMouse"),
@@ -207,7 +214,7 @@ class MainWindow(qt4.QMainWindow):
 
     def loadDefaultStylesheet(self):
         """Loads the default stylesheet for the new document."""
-        filename = setting.settingdb['stylesheet_default']
+        filename = setdb['stylesheet_default']
         if filename:
             try:
                 self.document.applyOperation(
@@ -223,7 +230,7 @@ class MainWindow(qt4.QMainWindow):
 
     def loadDefaultCustomDefinitions(self):
         """Loads the custom definitions for the new document."""
-        filename = setting.settingdb['custom_default']
+        filename = setdb['custom_default']
         if filename:
             try:
                 self.document.applyOperation(
@@ -449,7 +456,7 @@ class MainWindow(qt4.QMainWindow):
 
         # create main toolbar
         tb = self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
-        iconsize = setting.settingdb['toolbar_size']
+        iconsize = setdb['toolbar_size']
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
@@ -668,13 +675,17 @@ class MainWindow(qt4.QMainWindow):
             elif v == qt4.QMessageBox.Yes:
                 self.slotFileSave()
 
+        # store working directory
+        setdb['dirname'] = self.dirname
+        setdb['dirname_export'] = self.dirname_export
+
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )
-        setting.settingdb['geometry_mainwindow'] = geometry
+        setdb['geometry_mainwindow'] = geometry
 
         # store docked windows
         data = str(self.saveState())
-        setting.settingdb['geometry_mainwindowstate'] = data
+        setdb['geometry_mainwindowstate'] = data
 
         event.accept()
 
@@ -688,15 +699,15 @@ class MainWindow(qt4.QMainWindow):
                 nummain += 1
 
         # if we can restore the geometry, do so
-        if 'geometry_mainwindow' in setting.settingdb:
-            geometry = setting.settingdb['geometry_mainwindow']
+        if 'geometry_mainwindow' in setdb:
+            geometry = setdb['geometry_mainwindow']
             self.resize( qt4.QSize(geometry[2], geometry[3]) )
             if nummain <= 1:
                 self.move( qt4.QPoint(geometry[0], geometry[1]) )
 
         # restore docked window geometry
-        if 'geometry_mainwindowstate' in setting.settingdb:
-            b = qt4.QByteArray(setting.settingdb['geometry_mainwindowstate'])
+        if 'geometry_mainwindowstate' in setdb:
+            b = qt4.QByteArray(setdb['geometry_mainwindowstate'])
             self.restoreState(b)
 
     def slotFileNew(self):
@@ -937,18 +948,24 @@ class MainWindow(qt4.QMainWindow):
         self.filename = filename
         self.updateTitlebar()
         self.updateStatusbar("Opened %s" % filename)
+
+        # use current directory of file if not using cwd mode
+        if not setdb['dirname_usecwd']:
+            self.dirname = os.path.dirname( os.path.abspath(filename) )
+            self.dirname_export = self.dirname
+
         qt4.QApplication.restoreOverrideCursor()
 
     def addRecentFile(self, filename):
         """Add a file to the recent files list."""
 
-        recent = setting.settingdb['main_recentfiles']
+        recent = setdb['main_recentfiles']
         filename = os.path.abspath(filename)
 
         if filename in recent:
             del recent[recent.index(filename)]
         recent.insert(0, filename)
-        setting.settingdb['main_recentfiles'] = recent[:10]
+        setdb['main_recentfiles'] = recent[:10]
         self.populateRecentFiles()
 
     def slotFileOpen(self):
@@ -966,8 +983,8 @@ class MainWindow(qt4.QMainWindow):
         menu.clear()
 
         newMenuItems = []
-        if setting.settingdb['main_recentfiles']:
-            files = [f for f in setting.settingdb['main_recentfiles']
+        if setdb['main_recentfiles']:
+            files = [f for f in setdb['main_recentfiles']
                      if os.path.isfile(f)]
             self._openRecentFunctions = []
 
@@ -1000,10 +1017,7 @@ class MainWindow(qt4.QMainWindow):
 
         # File types we can export to in the form ([extensions], Name)
         fd = qt4.QFileDialog(self, 'Export page')
-        if not self.exportDir:
-            fd.setDirectory( self.dirname )
-        else:
-            fd.setDirectory( self.exportDir )
+        fd.setDirectory( self.dirname_export )
             
         fd.setFileMode( qt4.QFileDialog.AnyFile )
         fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
@@ -1030,7 +1044,7 @@ class MainWindow(qt4.QMainWindow):
 
         # restore last format if possible
         try:
-            filt = setting.settingdb['export_lastformat']
+            filt = setdb['export_lastformat']
             try:
                 # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
                 fd.selectNameFilter(filt)
@@ -1048,10 +1062,10 @@ class MainWindow(qt4.QMainWindow):
         
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
-            self.exportDir = unicode(fd.directory().absolutePath())
+            self.dirname_export = unicode(fd.directory().absolutePath())
 
             filterused = str(fd.selectedFilter())
-            setting.settingdb['export_lastformat'] = filterused
+            setdb['export_lastformat'] = filterused
 
             chosenextns = filtertoext[filterused]
             
@@ -1068,11 +1082,11 @@ class MainWindow(qt4.QMainWindow):
 
             try:
                 self.document.export(filename, self.plot.getPageNumber(),
-                                     dpi=setting.settingdb['export_DPI'],
-                                     antialias=setting.settingdb['export_antialias'],
-                                     color=setting.settingdb['export_color'],
-                                     quality=setting.settingdb['export_quality'],
-                                     backcolor=setting.settingdb['export_background'])
+                                     dpi=setdb['export_DPI'],
+                                     antialias=setdb['export_antialias'],
+                                     color=setdb['export_color'],
+                                     quality=setdb['export_quality'],
+                                     backcolor=setdb['export_background'])
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox.critical(self, "Veusz",
                                          "Error exporting file:\n%s" % inst)
