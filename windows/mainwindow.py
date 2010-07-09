@@ -213,14 +213,9 @@ class MainWindow(qt4.QMainWindow):
                 self.document.applyOperation(
                     document.OperationLoadStyleSheet(filename) )
             except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Unable to load default stylesheet '%s'" %
-                                filename,
-                                qt4.QMessageBox.Warning,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.warning(self, "Veusz",
+                                        "Unable to load default "
+                                        "stylesheet '%s'" % filename)
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -234,14 +229,9 @@ class MainWindow(qt4.QMainWindow):
                 self.document.applyOperation(
                     document.OperationLoadCustom(filename) )
             except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Unable to load default custom definitons '%s'" %
-                                filename,
-                                qt4.QMessageBox.Warning,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.warning(self, "Veusz",
+                                        "Unable to load default custom "
+                                        "definitons '%s'" % filename)
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -727,15 +717,10 @@ class MainWindow(qt4.QMainWindow):
                 self.updateStatusbar("Saved to %s" % self.filename)
             except IOError, e:
                 qt4.QApplication.restoreOverrideCursor()
-                qt4.QMessageBox("Cannot save document",
-                                "Cannot save document as '%s'\n"
-                                "\n%s (error %i)" % (self.filename,
-                                                     e.strerror, e.errno),
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Cannot save document",
+                                         "Cannot save document as '%s'\n"
+                                         "\n%s (error %i)" %
+                                         (self.filename,  e.strerror, e.errno))
             else:
                 # restore the cursor
                 qt4.QApplication.restoreOverrideCursor()
@@ -787,14 +772,9 @@ class MainWindow(qt4.QMainWindow):
             try:
                 open(filename)
             except IOError, e:
-                qt4.QMessageBox("Unable to open file",
-                                "Unable to open file '%s'\n'%s'" %
-                                (filename, unicode(e)),
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Unable to open file",
+                                         "Unable to open file '%s'\n'%s'" %
+                                         (filename, unicode(e)))
                 return None
             return filename
         return None
@@ -870,15 +850,10 @@ class MainWindow(qt4.QMainWindow):
             script = open(filename, 'rU').read()
         except IOError, e:
             qt4.QApplication.restoreOverrideCursor()
-            qt4.QMessageBox("Cannot open document",
-                            "Cannot open the document '%s'\n"
-                            "\n%s (error %i)" % (filename,
-                                                 e.strerror, e.errno),
-                            qt4.QMessageBox.Warning,
-                            qt4.QMessageBox.Ok,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.warning(self, "Cannot open document",
+                                    "Cannot open the document '%s'\n"
+                                    "\n%s (error %i)" % (filename,
+                                                         e.strerror, e.errno))
             return
 
         # check code for any security issues
@@ -1019,13 +994,8 @@ class MainWindow(qt4.QMainWindow):
 
         # check there is a page
         if self.document.getNumberPages() == 0:
-            qt4.QMessageBox("Veusz",
-                            "No pages to export",
-                            qt4.QMessageBox.Warning,
-                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.warning(self, "Veusz",
+                                    "No pages to export")
             return
 
         # File types we can export to in the form ([extensions], Name)
@@ -1104,13 +1074,8 @@ class MainWindow(qt4.QMainWindow):
                                      quality=setting.settingdb['export_quality'],
                                      backcolor=setting.settingdb['export_background'])
             except (IOError, RuntimeError), inst:
-                qt4.QMessageBox("Veusz",
-                                "Error exporting file:\n%s" % inst,
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Veusz",
+                                         "Error exporting file:\n%s" % inst)
                 
             # restore the cursor
             qt4.QApplication.restoreOverrideCursor()
@@ -1119,13 +1084,8 @@ class MainWindow(qt4.QMainWindow):
         """Print the document."""
 
         if self.document.getNumberPages() == 0:
-            qt4.QMessageBox("Veusz",
-                            "No pages to print",
-                            qt4.QMessageBox.Warning,
-                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.warning(self, "Veusz",
+                                    "No pages to print")
             return
 
         prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
