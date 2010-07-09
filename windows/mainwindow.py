@@ -622,18 +622,16 @@ class MainWindow(qt4.QMainWindow):
 
     def slotHelpHomepage(self):
         """Go to the veusz homepage."""
-        import webbrowser
-        webbrowser.open('http://home.gna.org/veusz/')
+        qt4.QDesktopServices.openUrl(qt4.QUrl('http://home.gna.org/veusz/'))
 
     def slotHelpProjectPage(self):
         """Go to the veusz project page."""
-        import webbrowser
-        webbrowser.open('http://gna.org/projects/veusz/')
+        qt4.QDesktopServices.openUrl(qt4.QUrl('http://gna.org/projects/veusz/'))
 
     def slotHelpBug(self):
         """Go to the veusz bug page."""
-        import webbrowser
-        webbrowser.open('https://gna.org/bugs/?group=veusz')
+        qt4.QDesktopServices.openUrl(
+            qt4.QUrl('https://gna.org/bugs/?group=veusz') )
 
     def slotHelpAbout(self):
         """Show about dialog."""
