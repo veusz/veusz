@@ -248,13 +248,7 @@ class DataCreateDialog(qt4.QDialog):
             else:
                 status = "Creation failed"
             self.statuslabel.setText(status)
-            qt4.QMessageBox("Veusz",
-                           unicode(e),
-                           qt4.QMessageBox.Warning,
-                           qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                           qt4.QMessageBox.NoButton,
-                           qt4.QMessageBox.NoButton,
-                           self).exec_()
+            qt4.QMessageBox.warning(self, "Veusz", unicode(e))
             
     def createFromRange(self, name):
         """Make dataset from a range or constant.

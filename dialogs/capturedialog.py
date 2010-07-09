@@ -169,10 +169,7 @@ class CaptureDialog(qt4.QDialog):
                 tail = int( self.tailEdit.text() )
 
         except ValueError:
-            qt4.QMessageBox("Invalid number", "Invalid number",
-                            qt4.QMessageBox.Critical, qt4.QMessageBox.Ok,
-                            qt4.QMessageBox.NoButton, qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.critical(self, "Invalid number", "Invalid number")
             return
             
         # get method of getting data
@@ -194,12 +191,9 @@ class CaptureDialog(qt4.QDialog):
                     unicode(self.commandLineEdit.text()) )
         except EnvironmentError, e:
             # problem opening stream
-            qt4.QMessageBox("Cannot open input",
-                            "Cannot open input:\n"
-                            " %s (error %i)" % (e.strerror, e.errno),
-                            qt4.QMessageBox.Critical, qt4.QMessageBox.Ok,
-                            qt4.QMessageBox.NoButton, qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.critical(self, "Cannot open input",
+                                     "Cannot open input:\n"
+                                     " %s (error %i)" % (e.strerror, e.errno))
             return
 
         stream.maxlines = maxlines

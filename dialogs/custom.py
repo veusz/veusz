@@ -232,13 +232,8 @@ class CustomDialog(qt4.QDialog):
                 self.recentButton.addFile(filename)
 
             except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Cannot save as '%s'" % filename,
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Veusz",
+                                         "Cannot save as '%s'" % filename)
 
     def slotLoad(self):
         """Load entries."""
@@ -249,13 +244,9 @@ class CustomDialog(qt4.QDialog):
             try:
                 self.loadFile(filename)
             except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Cannot load custom definitions '%s'" % filename,
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Veusz",
+                                         "Cannot load custom definitions '%s'"
+                                         % filename)
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

@@ -129,14 +129,8 @@ class ImportTabStandard(ImportTab):
                                               encoding=encoding)
 
         except document.DescriptorError:
-            mb = qt4.QMessageBox("Veusz",
-                                "Cannot interpret descriptor",
-                                qt4.QMessageBox.Warning,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self)
-            mb.exec_()
+            qt4.QMessageBox.warning(self, "Veusz",
+                                    "Cannot interpret descriptor")
             return
 
         # actually import the data

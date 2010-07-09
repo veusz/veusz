@@ -117,13 +117,9 @@ class StylesheetDialog(qt4.QDialog):
                 self.recentButton.addFile(filename)
 
             except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Cannot export stylesheet as '%s'" % filename,
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Veusz",
+                                         "Cannot export stylesheet as '%s'" %
+                                         filename)
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
@@ -133,13 +129,9 @@ class StylesheetDialog(qt4.QDialog):
             try:
                 self.loadStyleSheet(filename)
             except IOError:
-                qt4.QMessageBox("Veusz",
-                                "Cannot load stylesheet '%s'" % filename,
-                                qt4.QMessageBox.Critical,
-                                qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                                qt4.QMessageBox.NoButton,
-                                qt4.QMessageBox.NoButton,
-                                self).exec_()
+                qt4.QMessageBox.critical(self, "Veusz",
+                                         "Cannot load stylesheet '%s'" %
+                                         filename)
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

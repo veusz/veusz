@@ -176,13 +176,7 @@ class DataCreate2DDialog(qt4.QDialog):
                 link)
 
         elif self.mode == '2dexpr':
-            qt4.QMessageBox("Veusz",
-                            'Not implemented',
-                            qt4.QMessageBox.Warning,
-                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.warning(self, "Veusz", 'Not implemented')
             return
 
         elif self.mode == 'xyfunc':
@@ -207,13 +201,8 @@ class DataCreate2DDialog(qt4.QDialog):
         except (document.CreateDatasetException,
                 document.DatasetException), e:
             # error in evaluation or something
-            qt4.QMessageBox("Veusz",
-                            'Dataset creation failed: %s' % unicode(e),
-                            qt4.QMessageBox.Warning,
-                            qt4.QMessageBox.Ok | qt4.QMessageBox.Default,
-                            qt4.QMessageBox.NoButton,
-                            qt4.QMessageBox.NoButton,
-                            self).exec_()
+            qt4.QMessageBox.warning(self, "Veusz",
+                                    'Dataset creation failed: %s' % unicode(e))
             msg = "Failed to create dataset '%s'" % text['name']
         else:
             msg = "Created dataset '%s'" % text['name']
