@@ -240,6 +240,31 @@ class String(qt4.QWidget):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
 
+class Int(qt4.QSpinBox):
+    """A control for changing an integer."""
+
+    def __init__(self, setting, parent):
+        qt4.QSpinBox.__init__(self, parent)
+
+        self.setting = setting
+        self.setMinimum(setting.minval)
+        self.setMaximum(setting.maxval)
+        self.setValue(setting.val)
+
+        self.connect(self, qt4.SIGNAL('valueChanged(int)'), self.slotChanged)
+        self.setting.setOnModified(self.onModified)
+
+        if setting.readonly:
+            self.setEnabled(False)            
+
+    def slotChanged(self, value):
+        """If check box changes."""
+        self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, value)
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        self.setValue( self.setting.val )
+
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""
     
@@ -1207,6 +1232,7 @@ class MultiSettingWidget(qt4.QWidget):
         """Remove last row"""
         for w in self.controls[-1]:
             self.grid.removeWidget(w)
+            w.deleteLater()
         self.controls.pop(-1)
 
         # disable first subtraction button
@@ -1351,11 +1377,15 @@ class Strings(MultiSettingWidget):
 class Filename(qt4.QWidget):
     """A widget for selecting a filename with a browse button."""
 
-    def __init__(self, setting, parent):
+    def __init__(self, setting, mode, parent):
         """Construct widget as combination of LineEdit and PushButton
-        for browsing."""
+        for browsing.
+
+        mode is 'image' or 'file'
+        """
 
         qt4.QWidget.__init__(self, parent)
+        self.mode = mode
         self.setting = setting
 
         layout = qt4.QHBoxLayout()
@@ -1387,7 +1417,7 @@ class Filename(qt4.QWidget):
             c.setModel(model)
             self.edit.setCompleter(c)
 
-        # for read only filernames
+        # for read only filenames
         if setting.readonly:
             self.edit.setReadOnly(True)
 
@@ -1396,13 +1426,16 @@ class Filename(qt4.QWidget):
     def buttonClicked(self):
         """Button clicked - show file open dialog."""
 
+        title = 'Choose file'
+        filefilter = "All files (*)"
+        if self.mode == 'image':
+            title = 'Choose image'
+            filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
+                          "*.gif *.xbm *.xpm);;" + filefilter)
+
         filename = qt4.QFileDialog.getOpenFileName(
-            self,
-            "Choose image",
-            self.edit.text(),
-            "Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
-            "*.gif *.xbm *.xpm);;"
-            "All files (*)")
+            self, title, self.edit.text(), filefilter)
+
         if filename:
             val = unicode(filename)
             if self.setting.val != val:

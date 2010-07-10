@@ -25,14 +25,14 @@ import veusz.qtall as qt4
 import field
 
 # add an instance of your class to this list to be registered
-workerpluginregistry = []
+toolspluginregistry = []
 
-class WorkerPluginException(RuntimeError):
+class ToolsPluginException(RuntimeError):
     """Raise this to report an error doing what was requested.
     """
     pass
 
-class WorkerPlugin(object):
+class ToolsPlugin(object):
     # the plugin will get inserted into the menu in a hierarchy based on
     # the elements of this tuple
     menu = ('Base plugin',)
@@ -41,6 +41,9 @@ class WorkerPlugin(object):
     author = ''
     description_short = ''
     description_full = ''
+
+    # if the plugin takes no parameters, set this to False
+    has_parameters = True
 
     def __init__(self):
         """Override this to declare a list of input fields if required."""
@@ -54,12 +57,12 @@ class WorkerPlugin(object):
         * fieldresults is a dict containing the values of the fields plus
         'currentwidget' which is the path to the current widget
 
-        * Raise an WorkerPluginException(str) to report a problem to the user
+        * Raise an ToolsPluginException(str) to report a problem to the user
         """
 
 #########################################################################
 
-class RandomizePlotColors(WorkerPlugin):
+class RandomizePlotColors(ToolsPlugin):
     """Randomize the colors used in plotting."""
 
     menu = ('Colors', 'Randomize')
@@ -73,10 +76,10 @@ class RandomizePlotColors(WorkerPlugin):
         self.fields = [
             field.FieldWidget("widget", descr="Start from widget",
                               default="/"),
-            field.FieldCheck("randxy", descr="Randomize xy plotters",
-                             default=True),
-            field.FieldCheck("randfunc", descr="Randomize function plotters",
-                             default=True),
+            field.FieldBool("randxy", descr="Randomize xy plotters",
+                            default=True),
+            field.FieldBool("randfunc", descr="Randomize function plotters",
+                            default=True),
             [ field.FieldFloat("minhue", descr="Hue range (0-1)",
                                default=0.),
               field.FieldFloat("maxhue", descr=" ",
@@ -115,9 +118,9 @@ class RandomizePlotColors(WorkerPlugin):
             for node in fromwidget.WalkWidgets(widgettype='function'):
                 node.Line.color.val = self.getRandomColor(fields)
 
-workerpluginregistry.append(RandomizePlotColors())
+toolspluginregistry.append(RandomizePlotColors)
 
-class Test(WorkerPlugin):
+class Test(ToolsPlugin):
     """Randomize the colors used in plotting."""
 
     menu = ('test',)
@@ -126,11 +129,21 @@ class Test(WorkerPlugin):
     description_short = 'test'
     description_full = 'test'
 
+    def __init__(self):
+        """Construct plugin."""
+        self.fields = [
+            field.FieldDataset('dataset', descr="Enter dataset"),
+            field.FieldColor('mycolor', descr='A nice color'),
+            field.FieldMarker('mymarker', descr='A marker'),
+            field.FieldDistance('dist', descr='distance'),
+            field.FieldDatasetMulti('lines', descr='foo',
+                                    default=('x', 'y')),
+            field.FieldLineStyle('line'),
+            field.FieldErrorStyle('errorbar'),
+            ]
+
     def apply(self, ifc, fieldresults):
         """Do the randomizing."""
         print fieldresults
-        ifc.Root.width.val = '2cm'
-        ifc.Root.height.val = '2cm'
-        raise WorkerPluginException, "hello there"
 
-workerpluginregistry.append(Test())
+toolspluginregistry.append(Test)

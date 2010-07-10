@@ -247,10 +247,10 @@ class ImageFile(BoxShape):
         """Construct list of settings."""
         BoxShape.addSettings(s)
 
-        s.add( setting.Filename('filename', '',
-                                descr='Image filename',
-                                usertext='Filename',
-                                formatting=False),
+        s.add( setting.ImageFilename('filename', '',
+                                     descr='Image filename',
+                                     usertext='Filename',
+                                     formatting=False),
                posn=0 )
         s.add( setting.Bool('aspect', True,
                             descr='Preserve aspect ratio',

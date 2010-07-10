@@ -1380,11 +1380,11 @@ class OperationLoadStyleSheet(OperationMultiple):
 class OperationLoadCustom(OperationLoadStyleSheet):
     descr = 'load custom definitions'
 
-class OperationWorkerPlugin(OperationMultiple):
-    """An operation to load a stylesheet."""
+class OperationToolsPlugin(OperationMultiple):
+    """An operation to represent what a tools plugin does."""
     
     def __init__(self, plugin, fields):
-        """Use worker plugin, passing fields."""
+        """Use tools plugin, passing fields."""
         OperationMultiple.__init__(self, [], descr=None)
         self.plugin = plugin
         self.fields = fields

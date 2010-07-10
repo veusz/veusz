@@ -313,7 +313,7 @@ class Setting(object):
         """Return document."""
         p = self.parent
         while p:
-            if p.isWidget():
+            if hasattr(p, 'document'):
                 return p.document
             p = p.parent
         return None
@@ -476,7 +476,7 @@ class Int(Setting):
             raise InvalidType
 
     def makeControl(self, *args):
-        return controls.Edit(self, *args)
+        return controls.Int(self, *args)
 
 # for storing floats
 class Float(Setting):
@@ -1574,12 +1574,17 @@ class FillSet(Setting):
                 b.setStyle(qt4.Qt.NoBrush)
             return b
     
+class ImageFilename(Str):
+    """Represents an image filename setting."""
+
+    def makeControl(self, *args):
+        return controls.Filename(self, 'image', *args)
+    
 class Filename(Str):
     """Represents a filename setting."""
 
     def makeControl(self, *args):
-        """Make specialised lineset control."""
-        return controls.Filename(self, *args)
+        return controls.Filename(self, 'file', *args)
     
 class FontFamily(Str):
     """Represents a font family."""

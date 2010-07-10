@@ -46,11 +46,6 @@ def _getVeuszDirectory():
 
 veuszDirectory = _getVeuszDirectory()
 
-def reverse(data):
-    """For iterating over a sequence in reverse."""
-    for index in xrange(len(data)-1, -1, -1):
-        yield data[index]
-
 id_re = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 def validPythonIdentifier(name):
     """Is this a valid python identifier?"""
@@ -571,7 +566,8 @@ class UnicodeCSVReader:
 def populateCombo(combo, items):
     """Populate the combo with the list of items given.
 
-    This also makes sure the currently entered text persists
+    This also makes sure the currently entered text persists,
+    or if currenttext is set, use this
     """
 
     # existing setting

@@ -106,11 +106,33 @@ class Document( qt4.QObject ):
         self.customs = []
         self.updateEvalContext()
 
+    def wipe(self):
+        """Wipe out any stored data."""
+        self.data = {}
+        self.basewidget = widgetfactory.thefactory.makeWidget(
+            'document', None, None)
+        self.basewidget.document = self
+        self.setModified(False)
+        self.emit( qt4.SIGNAL("sigWiped") )
+
+    def clearHistory(self):
+        """Clear any history."""
+        self.historybatch = []
+        self.historyundo = []
+        self.historyredo = []
+        
     def suspendUpdates(self):
         """Holds sending update messages. This speeds up modification of the document."""
         assert not self.suspendupdates
         self.suspendchangeset = self.changeset
         self.suspendupdates = True
+
+    def enableUpdates(self):
+        """Reenables document updates."""
+        assert self.suspendupdates
+        self.suspendupdates = False
+        if self.suspendchangeset != self.changeset:
+            self.setModified()
 
     def makeDefaultDoc(self):
         """Add default widgets to create document."""
@@ -119,13 +141,6 @@ class Document( qt4.QObject ):
         self.setModified()
         self.setModified(False)
         self.changeset = 0
-
-    def enableUpdates(self):
-        """Reenables document updates."""
-        assert self.suspendupdates
-        self.suspendupdates = False
-        if self.suspendchangeset != self.changeset:
-            self.setModified()
 
     def log(self, message):
         """Log a message - this is emitted as a signal."""
@@ -151,13 +166,6 @@ class Document( qt4.QObject ):
         self.setModified()
         return retn
 
-    def clearHistory(self):
-        """Clear any history."""
-        
-        self.historybatch = []
-        self.historyundo = []
-        self.historyredo = []
-        
     def batchHistory(self, batch):
         """Enable/disable batch history mode.
         
@@ -235,15 +243,6 @@ class Document( qt4.QObject ):
             
         assert isinstance(s, setting.Setting)
         return s
-
-    def wipe(self):
-        """Wipe out any stored data."""
-        self.data = {}
-        self.basewidget = widgetfactory.thefactory.makeWidget(
-            'document', None, None)
-        self.basewidget.document = self
-        self.setModified(False)
-        self.emit( qt4.SIGNAL("sigWiped") )
 
     def isBlank(self):
         """Does the document contain widgets and no data"""

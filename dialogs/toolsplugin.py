@@ -18,7 +18,7 @@
 
 # $Id$
 
-"""Dialog boxes for worker plugins."""
+"""Dialog boxes for tools plugins."""
 
 import os.path
 import sys
@@ -29,12 +29,13 @@ import veusz.document as document
 import veusz.plugins as plugins
 import exceptiondialog
 
-def handleWorkerPlugin(mainwindow, doc, plugin):
-    """Show worker plugin dialog or directly execute (if contains
-    no fields)."""
+def handleToolsPlugin(mainwindow, doc, pluginkls):
+    """Show tools plugin dialog or directly execute
+    (if it takes no parameters)."""
 
-    if plugin.fields:
-        d = WorkerPluginDialog(mainwindow, doc, plugin)
+    plugin = pluginkls()
+    if plugin.has_parameters:
+        d = ToolsPluginDialog(mainwindow, doc, plugin)
         mainwindow.showDialog(d)
     else:
         fields = {'currentwidget': mainwindow.treeedit.selwidget.path}
@@ -47,13 +48,13 @@ def runPlugin(window, doc, plugin, fields):
     plugin - plugin object."""
     
     # keep track of all changes in this
-    op = document.OperationWorkerPlugin(plugin, fields)
+    op = document.OperationToolsPlugin(plugin, fields)
 
     qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
     try:
         doc.applyOperation(op)
 
-    except plugins.WorkerPluginException, ex:
+    except plugins.ToolspluginException, ex:
         # unwind operations
         op.undo(doc)
         qt4.QApplication.restoreOverrideCursor()
@@ -71,13 +72,13 @@ def runPlugin(window, doc, plugin, fields):
     else:
         qt4.QApplication.restoreOverrideCursor()
 
-class WorkerPluginDialog(qt4.QDialog):
-    """Dialog box for worker plugins."""
+class ToolsPluginDialog(qt4.QDialog):
+    """Dialog box for tools plugins."""
 
     def __init__(self, mainwindow, doc, plugin):
         qt4.QDialog.__init__(self, mainwindow)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'workerplugin.ui'),
+                                'toolsplugin.ui'),
                    self)
 
         self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
@@ -89,8 +90,8 @@ class WorkerPluginDialog(qt4.QDialog):
         self.mainwindow = mainwindow
         self.document = doc
 
-        self.setWindowTitle(self.plugin.name)
-        descr = (self.plugin.description_full +
+        self.setWindowTitle(plugin.name)
+        descr = (plugin.description_full +
                  '\n Author: ' + self.plugin.author)
         self.descriptionLabel.setText(descr)
 

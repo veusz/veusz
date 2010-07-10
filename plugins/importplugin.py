@@ -23,7 +23,7 @@
 import veusz.utils as utils
 
 from field import Field as ImportField
-from field import FieldCheck as ImportFieldCheck
+from field import FieldBool as ImportFieldCheck
 from field import FieldText as ImportFieldText
 from field import FieldFloat as ImportFieldFloat
 from field import FieldInt as ImportFieldInt
@@ -127,7 +127,7 @@ class ImportPluginExample(ImportPlugin):
             ImportFieldCheck("invert", descr="invert values"),
             ImportFieldFloat("mult", descr="Multiplication factor", default=1),
             ImportFieldInt("skip", descr="Skip N lines",
-                           default=0),
+                           default=0, minval=0),
             ImportFieldCombo("subtract", items=("0", "1", "2"),
                              editable=False, default="0")
             ]

@@ -46,7 +46,7 @@ from veusz.dialogs.stylesheet import StylesheetDialog
 from veusz.dialogs.custom import CustomDialog
 from veusz.dialogs.safetyimport import SafetyImportDialog
 from veusz.dialogs.histodata import HistoDataDialog
-from veusz.dialogs.workerplugin import handleWorkerPlugin
+from veusz.dialogs.toolsplugin import handleToolsPlugin
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -289,29 +289,29 @@ class MainWindow(qt4.QMainWindow):
         dialog.show()
         return dialog
 
-    def defineWorkerPlugins(self, actions):
+    def defineToolsPlugins(self, actions):
         """Create menu items and actions for worker plugins."""
 
         menu = []
-        for plugin in plugins.workerpluginregistry:
-            def loadOpDialog(plugin=plugin):
+        for pluginkls in plugins.toolspluginregistry:
+            def loadOpDialog(pluginkls=pluginkls):
                 """Load plugin dialog"""
-                handleWorkerPlugin(self, self.document, plugin)
+                handleToolsPlugin(self, self.document, pluginkls)
 
-            actname = 'operation.' + '.'.join(plugin.name)
-            text = plugin.menu[-1]
-            if plugin.fields:
+            actname = 'tools.' + '.'.join(pluginkls.name)
+            text = pluginkls.menu[-1]
+            if pluginkls.has_parameters:
                 text += '...'
             actions[actname] = utils.makeAction(
                 self,
-                plugin.description_short,
+                pluginkls.description_short,
                 text,
                 loadOpDialog)
 
             # build up menu from tuple of names
             menulook = menu
-            namebuild = ['operation']
-            for cmpt in plugin.menu[:-1]:
+            namebuild = ['tools']
+            for cmpt in pluginkls.menu[:-1]:
                 namebuild.append(cmpt)
                 name = '.'.join(namebuild)
 
@@ -515,7 +515,7 @@ class MainWindow(qt4.QMainWindow):
             'help.about'
             ]
 
-        operationmenu = self.defineWorkerPlugins(self.vzactions)
+        operationmenu = self.defineToolsPlugins(self.vzactions)
 
         menus = [
             ['file', '&File', filemenu],
@@ -523,7 +523,7 @@ class MainWindow(qt4.QMainWindow):
             ['view', '&View', viewmenu],
             ['insert', '&Insert', insertmenu],
             ['data', '&Data', datamenu],
-            ['operation', '&Operation', operationmenu],
+            ['tools', '&Tools', operationmenu],
             ['help', '&Help', helpmenu],
             ]
 

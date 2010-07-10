@@ -291,8 +291,8 @@ class Widget(object):
         if not self.settings.hide:
 
             # iterate over children in reverse order
-            for i in utils.reverse(self.children):
-                i.draw(bounds, painter, outerbounds=outerbounds)
+            for c in reversed(self.children):
+                c.draw(bounds, painter, outerbounds=outerbounds)
  
         # return our final bounds
         return bounds

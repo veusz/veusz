@@ -152,7 +152,7 @@ class Graph(widget.Widget):
         
         # do normal drawing of children
         # iterate over children in reverse order
-        for c in utils.reverse(self.children):
+        for c in reversed(self.children):
             c.draw(bounds, painter, outerbounds=outerbounds)
 
         # now need to find axes which aren't children, and draw those again
