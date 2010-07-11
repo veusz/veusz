@@ -151,7 +151,7 @@ class ColorsReplace(ToolsPlugin):
 
         def walkNodes(node):
             """Walk nodes, changing values."""
-            if node.type == 'setting' and node.name == 'color':
+            if node.type == 'setting' and node.settingtype == 'color':
                 # only follow references if requested
                 if node.isreference:
                     if fields['follow']:

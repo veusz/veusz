@@ -73,6 +73,7 @@ class CommandInterface(qt4.QObject):
         'SetDataExpression',
         'SetDataRange',
         'SetDataText',
+        'SettingType',
         'SetVerbose',
         'To',
         'WidgetType',
@@ -756,3 +757,12 @@ class CommandInterface(qt4.QObject):
             return item.typename
         else:
             raise ValueError, "Path '%s' is not a widget" % path
+
+    def SettingType(self, path):
+        """Get the type of setting (a string) for the path given.
+
+        Raise a ValueError if path is not a setting
+        """
+
+        setn = self.currentwidget.prefLookup(path)
+        return setn.typename

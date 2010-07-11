@@ -497,6 +497,11 @@ class SettingNode(Node):
 
         self._ci.SetToReference(self._path, othernode._path)
 
+    @property
+    def settingtype(self):
+        """Get the type of setting, which is a string."""
+        return self._ci.SettingType(self._path)
+
 class SettingGroupNode(Node):
     """A node containing a group of settings."""
 

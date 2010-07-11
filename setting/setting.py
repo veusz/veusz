@@ -44,6 +44,8 @@ class InvalidType(Exception):
     pass
 
 class Setting(object):
+    typename = 'setting'
+
     def __init__(self, name, value, descr='', usertext='',
                  formatting=False, hidden=False):
         """Initialise the values.
@@ -346,6 +348,8 @@ class SettingBackwardCompat(Setting):
     This is used for backward-compatibility.
     """
 
+    typename = 'backward-compat'
+
     def __init__(self, name, newrelpath, val, **args):
         """Point this setting to another.
         newrelpath is a path relative to this setting's parent
@@ -394,6 +398,8 @@ class SettingBackwardCompat(Setting):
 class Str(Setting):
     """String setting."""
 
+    typename = 'str'
+
     def convertTo(self, val):
         if isinstance(val, basestring):
             return val
@@ -411,6 +417,8 @@ class Str(Setting):
 # Store bools
 class Bool(Setting):
     """Bool setting."""
+
+    typename = 'bool'
 
     def convertTo(self, val):
         if type(val) in (bool, int):
@@ -438,6 +446,8 @@ class Bool(Setting):
 # Storing integers
 class Int(Setting):
     """Integer settings."""
+
+    typename = 'int'
 
     def __init__(self, name, value, minval=-1000000, maxval=1000000,
                  **args):
@@ -487,6 +497,8 @@ class Int(Setting):
 class Float(Setting):
     """Float settings."""
 
+    typename = 'float'
+
     def __init__(self, name, value, minval=-1e200, maxval=1e200,
                  **args):
         """Initialise the values.
@@ -532,6 +544,8 @@ class Float(Setting):
 class FloatOrAuto(Setting):
     """Save a float or text auto."""
 
+    typename = 'float-or-auto'
+
     def convertTo(self, val):
         if type(val) in (int, float):
             return float(val)
@@ -567,6 +581,8 @@ class FloatOrAuto(Setting):
             
 class IntOrAuto(Setting):
     """Save an int or text auto."""
+
+    typename = 'int-or-auto'
 
     def convertTo(self, val):
         if isinstance(val, int):
@@ -649,6 +665,8 @@ def _distRatio(match, painter, maxsize):
 
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
+
+    typename = 'distance'
 
     # mappings from regular expressions to function to convert distance
     # the recipient function takes regexp match,
@@ -801,6 +819,8 @@ class Distance(Setting):
 class DistanceOrAuto(Distance):
     """A distance or the value Auto"""
 
+    typename = 'distance-or-auto'
+
     distregexp = Distance.distregexp + [(re.compile('^Auto$'), None, None)]
     
     def isAuto(self):
@@ -813,6 +833,8 @@ class Choice(Setting):
     """One out of a list of strings."""
 
     # maybe should be implemented as a dict to speed up checks
+
+    typename = 'choice'
 
     def __init__(self, name, vallist, val, **args):
         """Setting val must be in vallist."""
@@ -848,6 +870,8 @@ class ChoiceOrMore(Setting):
 
     # maybe should be implemented as a dict to speed up checks
 
+    typename = 'choice-or-more'
+
     def __init__(self, name, vallist, val, **args):
         """Setting has val must be in vallist.
         descriptions is an optional addon to put a tooltip on each item
@@ -880,6 +904,8 @@ class ChoiceOrMore(Setting):
     
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
+
+    typename = 'float-dict'
 
     def convertTo(self, val):
         if type(val) != dict:
@@ -931,6 +957,8 @@ class FloatDict(Setting):
 class FloatList(Setting):
     """A list of float values."""
 
+    typename = 'float-list'
+
     list_re = re.compile(r'[\t\n, ]+')
 
     def convertTo(self, val):
@@ -967,6 +995,8 @@ class FloatList(Setting):
 
 class WidgetPath(Str):
     """A setting holding a path to a widget. This is checked for validity."""
+
+    typename = 'widget-path'
 
     def __init__(self, name, val, relativetoparent=True,
                  allowedwidgets = None,
@@ -1035,6 +1065,8 @@ class WidgetPath(Str):
 class Dataset(Str):
     """A setting to choose from the possible datasets."""
 
+    typename = 'dataset'
+
     def __init__(self, name, val, dimensions=1, datatype='numeric',
                  **args):
         """
@@ -1067,6 +1099,8 @@ class Dataset(Str):
 class Strings(Setting):
     """A multiple set of strings."""
 
+    typename = 'str-multi'
+
     def convertTo(self, val):
         """Takes a tuple/list of strings:
         ('ds1','ds2'...)
@@ -1091,6 +1125,8 @@ class Strings(Setting):
 
 class Datasets(Setting):
     """A setting to choose one or more of the possible datasets."""
+
+    typename = 'dataset-multi'
 
     def __init__(self, name, val, dimensions=1, datatype='numeric',
                  **args):
@@ -1144,6 +1180,8 @@ class Datasets(Setting):
 
 class DatasetOrFloatList(Dataset):
     """Choose a dataset or specify a list of float values."""
+
+    typename = 'dataset-or-floatlist'
 
     # a list of numbers separated by spaces or tabs
     # (requires number at end of line)
@@ -1218,6 +1256,8 @@ class DatasetOrFloatList(Dataset):
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
 
+    typename = 'dataset-or-str'
+
     def getData(self, doc, checknull=False):
         """Return either a list of strings, a single item list.
         If checknull then None is returned if blank
@@ -1240,6 +1280,8 @@ class DatasetOrStr(Dataset):
 
 class Color(ChoiceOrMore):
     """A color setting."""
+
+    typename = 'color'
 
     _colors = [ 'white', 'black', 'red', 'green', 'blue',
                 'cyan', 'magenta', 'yellow',
@@ -1269,6 +1311,8 @@ class Color(ChoiceOrMore):
 class FillStyle(Choice):
     """A setting for the different fill styles provided by Qt."""
     
+    typename = 'fill-style'
+
     _fillstyles = [ 'solid', 'horizontal', 'vertical', 'cross',
                     'forward diagonals', 'backward diagonals',
                     'diagonal cross',
@@ -1309,6 +1353,8 @@ class FillStyle(Choice):
 
 class LineStyle(Choice):
     """A setting choosing a particular line style."""
+
+    typename = 'line-style'
 
     # list of allowed line styles
     _linestyles = ['solid', 'dashed', 'dotted',
@@ -1360,6 +1406,8 @@ class LineStyle(Choice):
 class Axis(Str):
     """A setting to hold the name of an axis."""
 
+    typename = 'axis'
+
     def __init__(self, name, val, direction, **args):
         """Initialise using the document, so we can get the axes later.
         
@@ -1380,6 +1428,8 @@ class Axis(Str):
 
 class Image(Str):
     """Hold the name of a child image."""
+
+    typename = 'image-widget'
 
     @staticmethod
     def buildImageList(level, widget, outdict):
@@ -1446,6 +1496,8 @@ class Image(Str):
 class Marker(Choice):
     """Choose a marker type from one allowable."""
 
+    typename = 'marker'
+
     def __init__(self, name, value, **args):
         Choice.__init__(self, name, utils.MarkerCodes, value, **args)
 
@@ -1458,6 +1510,8 @@ class Marker(Choice):
     
 class Arrow(Choice):
     """Choose an arrow type from one allowable."""
+
+    typename = 'arrow'
 
     def __init__(self, name, value, **args):
         Choice.__init__(self, name, utils.ArrowCodes, value, **args)
@@ -1472,6 +1526,8 @@ class Arrow(Choice):
 class LineSet(Setting):
     """A setting which corresponds to a set of lines.
     """
+
+    typename='line-multi'
 
     def convertTo(self, val):
         """Takes a tuple/list of tuples:
@@ -1533,6 +1589,8 @@ class FillSet(Setting):
     This setting keeps an internal array of LineSettings.
     """
 
+    typename = 'fill-multi'
+
     def convertTo(self, val):
         """Takes a tuple/list of tuples:
         [('solid', 'color', False), ...]
@@ -1582,17 +1640,23 @@ class FillSet(Setting):
 class ImageFilename(Str):
     """Represents an image filename setting."""
 
+    typename = 'filename-image'
+
     def makeControl(self, *args):
         return controls.Filename(self, 'image', *args)
     
 class Filename(Str):
     """Represents a filename setting."""
 
+    typename = 'filename'
+
     def makeControl(self, *args):
         return controls.Filename(self, 'file', *args)
     
 class FontFamily(Str):
     """Represents a font family."""
+
+    typename = 'font-family'
 
     def makeControl(self, *args):
         """Make a special font combobox."""
@@ -1602,6 +1666,8 @@ class ErrorStyle(Choice):
     """Error bar style.
     The allowed values are below in _errorstyles.
     """
+
+    typename = 'errorbar-style'
 
     _errorstyles = (
         'none',
@@ -1626,6 +1692,9 @@ class ErrorStyle(Choice):
 
 class AlignHorz(Choice):
     """Alignment horizontally."""
+
+    typename = 'align-horz'
+
     def __init__(self, name, value, **args):
         Choice.__init__(self, name, ['left', 'centre', 'right'], value, **args)
     def copy(self):
@@ -1634,6 +1703,9 @@ class AlignHorz(Choice):
 
 class AlignVert(Choice):
     """Alignment vertically."""
+
+    typename = 'align-vert'
+
     def __init__(self, name, value, **args):
         Choice.__init__(self, name, ['top', 'centre', 'bottom'], value, **args)
     def copy(self):
@@ -1642,6 +1714,9 @@ class AlignVert(Choice):
 
 class AlignHorzWManual(Choice):
     """Alignment horizontally."""
+
+    typename = 'align-horz-+manual'
+
     def __init__(self, name, value, **args):
         Choice.__init__(self, name, ['left', 'centre', 'right', 'manual'],
                         value, **args)
@@ -1651,6 +1726,9 @@ class AlignHorzWManual(Choice):
 
 class AlignVertWManual(Choice):
     """Alignment vertically."""
+
+    typename = 'align-vert-+manual'
+
     def __init__(self, name, value, **args):
         Choice.__init__(self, name, ['top', 'centre', 'bottom', 'manual'],
                         value, **args)
