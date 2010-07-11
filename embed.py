@@ -465,6 +465,38 @@ class SettingNode(Node):
 
     val = property(_getVal, _setVal)
 
+    @property
+    def isreference(self):
+        """Is this setting set to a reference to another setting?."""
+        ref = self._ci.ResolveReference(self._path)
+        return bool(ref)
+
+    def resolveReference(self):
+        """If this is set to a reference to a setting, return a new
+        SettingNode to the original setting.
+
+        If there are a chain of references, follow them to the target.
+        Returns None if this setting is not set to a reference.
+        """
+
+        real = self._ci.ResolveReference(self._path)
+        if not real:
+            return None
+        return self.fromPath(real)
+
+    def setToReference(self, othernode):
+        """Make this setting point to another setting, by creating a
+        reference.
+
+        References can be chained. Note that the absolute path is used
+        to specify a reference, so moving affected widgets around will
+        destroy the link."""
+
+        if not isinstance(othernode, SettingNode):
+            raise ValueError, "othernode is not a SettingNode"
+
+        self._ci.SetToReference(self._path, othernode._path)
+
 class SettingGroupNode(Node):
     """A node containing a group of settings."""
 

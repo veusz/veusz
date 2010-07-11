@@ -24,13 +24,12 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
 
-class Field(qt4.QObject):
+class Field(object):
     """A class to represent an input field on the dialog or command line."""
     def __init__(self, name, descr=None, default=None):
         """name: name of field
         descr: description to show to user
         default: default value."""
-        qt4.QObject.__init__(self)
         self.name = name
         if descr:
             self.descr = descr
@@ -174,7 +173,7 @@ class _FieldSetting(Field):
             setn.set(val)
 
         # if control changes setting, update setting
-        self.connect(c, qt4.SIGNAL('settingChanged'), updateval)
+        c.connect(c, qt4.SIGNAL('settingChanged'), updateval)
 
         return (l, c)
 

@@ -54,7 +54,7 @@ def runPlugin(window, doc, plugin, fields):
     try:
         doc.applyOperation(op)
 
-    except plugins.ToolspluginException, ex:
+    except plugins.ToolsPluginException, ex:
         # unwind operations
         op.undo(doc)
         qt4.QApplication.restoreOverrideCursor()

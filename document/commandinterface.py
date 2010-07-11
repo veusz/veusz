@@ -63,6 +63,7 @@ class CommandInterface(qt4.QObject):
         'ReloadData',
         'Remove',
         'Rename',
+        'ResolveReference',
         'Set',
         'SetToReference',
         'SetData',
@@ -230,6 +231,20 @@ class CommandInterface(qt4.QObject):
         ds = self.document.data.keys()
         ds.sort()
         return ds
+
+    def ResolveReference(self, setn):
+        """If the setting is set to a reference, follow the chain of
+        references to return the absolute path to the real setting.
+
+        If it is not a reference return None.
+        """
+
+        pref = self.currentwidget.prefLookup(setn)
+        if pref.isReference():
+            real = pref.getReference().resolve(pref)
+            return real.path
+        else:
+            return None
 
     def Save(self, filename):
         """Save the state to a file."""

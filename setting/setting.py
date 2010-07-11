@@ -130,9 +130,11 @@ class Setting(object):
         return isinstance(self._val, Reference)
 
     def getReference(self):
-        """Return the reference object."""
-        assert isinstance(self._val, Reference)
-        return self._val
+        """Return the reference object. Raise ValueError if not a reference"""
+        if isinstance(self._val, Reference):
+            return self._val
+        else:
+            raise ValueError, "Setting is not a reference"
 
     def getStylesheetLink(self):
         """Get text that this setting should default to linked to the
@@ -159,7 +161,10 @@ class Setting(object):
             if not obj.isWidget() and obj.parent.isWidget():
                 pass
             else:
-                path.insert(0, obj.name)
+                if obj.name == '/':
+                    path.insert(0, '')
+                else:
+                    path.insert(0, obj.name)
             obj = obj.parent
         return '/'.join(path)
         
