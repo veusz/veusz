@@ -108,6 +108,12 @@ class Widget(object):
         """Is this object a widget?"""
         return True
 
+    def getDocument(self):
+        """Return document.
+        Unfortunately we need this as document is shadowed in StyleSheet,
+        sigh."""
+        return self.document
+
     def rename(self, name):
         """Change name of self."""
 

@@ -177,6 +177,10 @@ class _FieldSetting(Field):
 
         return (l, c)
 
+    def getDocument(self):
+        """This is used by settings to get their document."""
+        return self.document
+
     def getControlResults(self, cntrls):
         """Get result from setting."""
         return self.setn.get()

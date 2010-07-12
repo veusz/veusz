@@ -22,7 +22,7 @@
 
 from reference import Reference
 
-class Settings:
+class Settings(object):
     """A class for holding collections of settings."""
 
     def __init__(self, name, descr = '', usertext='', pixmap=''):
@@ -111,16 +111,16 @@ class Settings:
         print foo.setname
         """
 
-        d = self.__dict__['setdict']
         try:
-            if name in d:
-                s = d[name]
-                if isinstance(s, Settings):
-                    return s
-                else:
-                    return s.val
-            else:
-                return self.__dict__[name]
+            s = self.__dict__['setdict'][name]
+            if isinstance(s, Settings):
+                return s
+            return s.val
+        except KeyError:
+            pass
+
+        try:
+            return self.__dict__[name]
         except KeyError:
             raise AttributeError, "'%s' is not a setting" % name
 

@@ -320,8 +320,10 @@ class Setting(object):
         """Return document."""
         p = self.parent
         while p:
-            if hasattr(p, 'document'):
-                return p.document
+            try:
+                return p.getDocument()
+            except AttributeError:
+                pass
             p = p.parent
         return None
 
