@@ -80,6 +80,16 @@ class ImportDataset2D(object):
         self.rangex = rangex
         self.rangey = rangey
 
+class ImportDatasetText(object):
+    """Return a text dataset."""
+    def __init__(self, name, data):
+        """A text dataset
+        name: name of dataset
+        data: data in dataset: list of strings
+        """
+        self.name = name
+        self.data = data
+
 class ImportPlugin(object):
     """Define a plugin to read data in a particular format.
     

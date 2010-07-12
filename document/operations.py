@@ -1127,6 +1127,8 @@ class OperationDataImportPlugin(object):
             elif isinstance(d, plugins.ImportDataset2D):
                 ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
                                         yrange=d.rangey)
+            elif isinstance(d, plugins.ImportDatasetText):
+                ds = datasets.DatasetText(data=d.data)
             else:
                 raise RuntimeError("Invalid data set in plugin results")
 
