@@ -674,8 +674,8 @@ class MainWindow(qt4.QMainWindow):
                 self.slotFileSave()
 
         # store working directory
-        setdb['dirname'] = self.dirname
-        setdb['dirname_export'] = self.dirname_export
+        setdb['dirname'] = unicode(self.dirname)
+        setdb['dirname_export'] = unicode(self.dirname_export)
 
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )
