@@ -54,7 +54,10 @@ class PropertyList(qt4.QWidget):
         self.setUpdatesEnabled(False)
 
         while len(self.childlist) > 0:
-            self.childlist.pop().deleteLater()
+            c = self.childlist.pop()
+            self.layout.removeWidget(c)
+            c.deleteLater()
+            del c
 
         if settings is None:
             self.setUpdatesEnabled(True)

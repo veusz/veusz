@@ -715,6 +715,7 @@ class Color(qt4.QWidget):
 
     _icons = None
     _colors = None
+    _qobj = None
 
     def __init__(self, setting,  parent):
         qt4.QWidget.__init__(self, parent)
@@ -723,7 +724,7 @@ class Color(qt4.QWidget):
             self._generateIcons()
 
         self.setting = setting
-
+ 
         # combo box
         c = self.combo = qt4.QComboBox()
         c.setEditable(True)
@@ -731,6 +732,9 @@ class Color(qt4.QWidget):
             c.addItem(self._icons[color], color)
         self.connect(c, qt4.SIGNAL('activated(const QString&)'),
                      self.slotActivated )
+
+        # add color if a color is added by a different combo box
+        self.connect(Color._qobj, qt4.SIGNAL('addcolor'), self.addcolorSlot)
 
         # button for selecting colors
         b = self.button = qt4.QPushButton()
@@ -753,6 +757,10 @@ class Color(qt4.QWidget):
         self.setLayout(layout)
         self.setting.setOnModified(self.onModified)
 
+    def addcolorSlot(self, color):
+        """When another Color combo adds a color, add one to this one"""
+        self.combo.addItem(self._icons[color], color)
+
     @classmethod
     def _generateIcons(cls):
         """Generate a list of icons for drop down menu.
@@ -769,6 +777,12 @@ class Color(qt4.QWidget):
                 pix = qt4.QPixmap(size, size)
                 pix.fill( qt4.QColor(c) )
                 icons[c] = qt4.QIcon(pix)
+                if cls._qobj is not None:
+                    # tell other combo boxes a color has been added
+                    cls._qobj.emit(qt4.SIGNAL('addcolor'), c)
+
+        if cls._qobj is None:
+            cls._qobj = qt4.QObject()
     
     def slotButtonClicked(self):
         """Open dialog to edit color."""
@@ -794,14 +808,15 @@ class Color(qt4.QWidget):
     def setColor(self, color):
         """Update control with color given."""
 
-        # add color if not there
+        # construct color icon if not there
         if color not in Color._icons:
             Color._colors.append(color)
             Color._generateIcons()
-            self.combo.addItem(Color._icons[color], color)
+        
+        # add text to combo if not there
+        index = self.combo.findText(color)
 
         # set correct index in combobox
-        index = Color._colors.index(color)
         self.combo.setCurrentIndex(index)
         self.button.setIcon( self.combo.itemIcon(index) )
 
