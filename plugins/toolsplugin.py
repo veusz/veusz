@@ -22,6 +22,7 @@
 
 import random
 import veusz.qtall as qt4
+import veusz.setting as setting
 import field
 
 # add an instance of your class to this list to be registered
@@ -67,7 +68,6 @@ class ColorsRandomize(ToolsPlugin):
 
     menu = ('Colors', 'Randomize')
     name = 'Randomize colors'
-    author = 'Jeremy Sanders'
     description_short = 'Randomize the colors used in plotting'
     description_full = 'Randomize the colors used in plotting markers, lines or error bars. Random colors in hue, saturation and luminosity (HSV) are chosen between the two colors given.'
 
@@ -127,7 +127,6 @@ class ColorsReplace(ToolsPlugin):
 
     menu = ('Colors', 'Replace')
     name = 'Replace colors'
-    author = 'Jeremy Sanders'
     description_short = 'Search and replace colors'
     description_full = 'Searches for a color and replaces it with a different color'
 
@@ -145,7 +144,7 @@ class ColorsReplace(ToolsPlugin):
             ]
 
     def apply(self, ifc, fields):
-        """Do the randomizing."""
+        """Do the color search and replace."""
 
         fromcol = qt4.QColor(fields['color1'])
 
@@ -170,3 +169,60 @@ class ColorsReplace(ToolsPlugin):
         walkNodes(fromwidget)
 
 toolspluginregistry.append(ColorsReplace)
+
+class TextReplace(ToolsPlugin):
+    """Randomize the colors used in plotting."""
+
+    menu = ('General', 'Replace text')
+    name = 'Replace text'
+    description_short = 'Search and replace text in settings'
+    description_full = 'Searches for text in a setting and replaces it'
+
+    def __init__(self):
+        """Construct plugin."""
+        self.fields = [
+            field.FieldWidget("widget", descr="Start from widget",
+                              default="/"),
+            field.FieldBool("follow", descr="Change references and defaults",
+                            default=True),
+            field.FieldBool("onlystr", descr="Change only textual data",
+                            default=False),
+            field.FieldText('text1', descr="Text to change",
+                            default=''),
+            field.FieldText('text2', descr="Replacement text",
+                            default=''),
+            ]
+
+    def apply(self, ifc, fields):
+        """Do the search and replace."""
+
+        def walkNodes(node):
+            """Walk nodes, changing values."""
+            if node.type == 'setting':
+                # only follow references if requested
+                if node.isreference:
+                    if fields['follow']:
+                        node = node.resolveReference()
+                    else:
+                        return
+
+                val = node.val
+                # try to change if a string, and not only strings or type is string
+                if isinstance(val, basestring) and (not fields['onlystr'] or
+                                                    node.settingtype == 'str'):
+                    # update text if it changes
+                    val2 = val.replace(fields['text1'], fields['text2'])
+                    if val != val2:
+                        try:
+                            node.val = val2
+                        except setting.InvalidType:
+                            pass
+            else:
+                for c in node.children:
+                    walkNodes(c)
+
+        fromwidget = ifc.Root.fromPath(fields['widget'])
+        walkNodes(fromwidget)
+
+toolspluginregistry.append(TextReplace)
+

@@ -91,8 +91,9 @@ class ToolsPluginDialog(qt4.QDialog):
         self.document = doc
 
         self.setWindowTitle(plugin.name)
-        descr = (plugin.description_full +
-                 '\n Author: ' + self.plugin.author)
+        descr = plugin.description_full
+        if self.plugin.author:
+            descr += '\n Author: ' + self.plugin.author
         self.descriptionLabel.setText(descr)
 
         self.fieldcntrls = []
