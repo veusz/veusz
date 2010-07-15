@@ -552,3 +552,12 @@ class WidgetNode(Node):
     def Remove(self):
         """Removes a widget and its children."""
         self._ci.Remove(self._path)
+
+    def Clone(self, newparent, newname=None):
+        """Clone widget, placing at newparent. Uses newname if given.
+
+        Returns new node."""
+        path = self._ci.CloneWidget(self._path, newparent._path,
+                                    newname=newname)
+        return WidgetNode( self._ci, 'widget', path )
+

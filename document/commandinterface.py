@@ -163,14 +163,20 @@ class CommandInterface(qt4.QObject):
         assert isinstance(directory, basestring)
         self.importpath.append(directory)
 
-    def CloneWidget(self, widget, newparent, newname):
+    def CloneWidget(self, widget, newparent, newname=None):
         """Clone the widget given, placing the copy in newparent and
-        the name given."""
+        the name given.
+        
+        newname is an optional new name to give it
+
+        Returns new widget path
+        """
 
         widget = self.document.resolve(self.currentwidget, widget)
         newparent = self.document.resolve(self.currentwidget, newparent)
         op = mime.OperationWidgetClone(widget, newparent, newname)
-        self.document.applyOperation(op)
+        w = self.document.applyOperation(op)
+        return w.path
 
     def CreateHistogram(self, inexpr, outbinsds, outvalsds, binparams=None,
                         binmanual=None, method='counts',
