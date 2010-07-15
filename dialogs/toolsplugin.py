@@ -110,16 +110,17 @@ class ToolsPluginDialog(qt4.QDialog):
                 cntrl.deleteLater()
         del self.fieldcntrls[:]
 
+        currentwidget = self.mainwindow.treeedit.selwidget.path
         for row, field in enumerate(self.plugin.fields):
             if isinstance(field, list) or isinstance(field, tuple):
                 for c, f in enumerate(field):
-                    cntrls = f.makeControl(doc=self.document)
+                    cntrls = f.makeControl(self.document, currentwidget)
                     layout.addWidget(cntrls[0], row, c*2)
                     layout.addWidget(cntrls[1], row, c*2+1)
                     self.fieldcntrls.append(cntrls)
                     self.fields.append(f)
             else:
-                cntrls = field.makeControl(doc=self.document)
+                cntrls = field.makeControl(self.document, currentwidget)
                 layout.addWidget(cntrls[0], row, 0)
                 layout.addWidget(cntrls[1], row, 1)
                 self.fieldcntrls.append(cntrls)

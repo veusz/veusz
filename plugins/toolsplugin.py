@@ -226,3 +226,30 @@ class TextReplace(ToolsPlugin):
 
 toolspluginregistry.append(TextReplace)
 
+class WidgetsClone(ToolsPlugin):
+    """Take a widget and children and clone them."""
+
+    menu = ('Widgets', 'Clone for datasets')
+    name = 'Clone widgets for datasets'
+    description_short = 'Clones a widget and its children for datasets'
+    description_full = 'Take a widget and its children and clone it, plotting different sets of data in each clone.\nHint: Use a "*" in the name of a replacement dataset to match multiple datasets, e.g. x_*'
+
+    def __init__(self):
+        """Construct plugin."""
+        self.fields = [
+            field.FieldWidget("widget", descr="Clone widget",
+                              default=""),
+            field.FieldDataset('ds1', descr="Dataset 1 to change",
+                               default=''),
+            field.FieldDatasetMulti('ds1repl',
+                                    descr="Replacement(s) for dataset 1"),
+            field.FieldDataset('ds2', descr="Dataset 2 to change (optional)",
+                               default=''),
+            field.FieldDatasetMulti('ds2repl',
+                                    descr="Replacement(s) for dataset 2"),
+            ]
+
+    def apply(self, ifc, fields):
+        """Do the cloning."""
+
+toolspluginregistry.append(WidgetsClone)

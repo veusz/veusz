@@ -296,7 +296,10 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.suspendmodified = True
         self.beginInsertRows(parentindex, startrow,
                              startrow+document.getMimeWidgetCount(data)-1)
-        document.pasteMime(parent, data, index=startrow)
+
+        op = document.OperationWidgetPaste(parent, data, index=startrow)
+        self.document.applyOperation(op)
+
         self.endInsertRows()
         self.suspendmodified = False
 

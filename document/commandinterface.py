@@ -35,6 +35,7 @@ import veusz.embed as embed
 import datasets
 import operations
 import dataset_histo
+import mime
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
@@ -45,6 +46,7 @@ class CommandInterface(qt4.QObject):
         'Add',
         'AddCustom',
         'AddImportPath',
+        'CloneWidget',
         'CreateHistogram',
         'Get',
         'GetChildren',
@@ -160,6 +162,15 @@ class CommandInterface(qt4.QObject):
         """Add directory to import file path."""
         assert isinstance(directory, basestring)
         self.importpath.append(directory)
+
+    def CloneWidget(self, widget, newparent, newname):
+        """Clone the widget given, placing the copy in newparent and
+        the name given."""
+
+        widget = self.document.resolve(self.currentwidget, widget)
+        newparent = self.document.resolve(self.currentwidget, newparent)
+        op = mime.OperationWidgetClone(widget, newparent, newname)
+        self.document.applyOperation(op)
 
     def CreateHistogram(self, inexpr, outbinsds, outvalsds, binparams=None,
                         binmanual=None, method='counts',

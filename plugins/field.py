@@ -37,7 +37,7 @@ class Field(object):
             self.descr = name
         self.default = default
 
-    def makeControl(self, doc=None):
+    def makeControl(self, doc, currentwidget):
         """Create a set of controls for field."""
         return None
 
@@ -48,7 +48,7 @@ class Field(object):
 class FieldText(Field):
     """Text entry on the dialog."""
 
-    def makeControl(self, doc=None):
+    def makeControl(self, doc, currentwidget):
         l = qt4.QLabel(self.descr)
         e = qt4.QLineEdit()
         if self.default:
@@ -71,7 +71,7 @@ class FieldCombo(Field):
         self.items = items
         self.editable = editable
 
-    def makeControl(self, doc=None):
+    def makeControl(self, doc, currentwidget):
         l = qt4.QLabel(self.descr)
         c = qt4.QComboBox()
         c.addItems(self.items)
@@ -138,13 +138,18 @@ class FieldWidget(Field):
     def __init__(self, name, descr=None, default='/', widgettypes=set()):
         """name: name of field
         descr: description to show to user
-        default: default value."""
+        default: default value - set to '' to get current widget."""
+
         Field.__init__(self, name, descr=descr, default=default)
         self.widgettypes = widgettypes
 
-    def makeControl(self, doc=None):
+    def makeControl(self, doc, currentwidget):
+        default = self.default
+        if default == '':
+            default = currentwidget
+
         l = qt4.QLabel(self.descr)
-        c = _WidgetCombo(doc, self.widgettypes, self.default)
+        c = _WidgetCombo(doc, self.widgettypes, default)
         return (l, c)
 
     def getControlResults(self, cntrls):
@@ -160,7 +165,7 @@ class _FieldSetting(Field):
         self.default = default
         self.setn = settingkls(name, default, **setnparams)
 
-    def makeControl(self, doc=None):
+    def makeControl(self, doc, currentwidget):
         """Use setting makeControl method to make control."""
         self.setn.parent = self # setting looks to parent for document
         self.setn.set(self.default)

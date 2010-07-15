@@ -24,7 +24,6 @@ import veusz.qtall as qt4
 
 import doc
 import operations
-import commandinterpreter
 import widgetfactory
 
 # mime type for copy and paste
@@ -110,59 +109,95 @@ def getMimeWidgetCount(mimedata):
     """Get number of widgets in mimedata."""
     return int( mimedata[:mimedata.find('\n')] )
 
-def pasteMime(parentwidget, mimedata, index=-1):
-    """Paste mime data at parent widget, starting at index childindex
+class OperationWidgetPaste(operations.OperationMultiple):
+    """Paste a widget from mime data."""
 
-    Returns list of created widgets
-    """
+    descr= 'paste widget'
 
-    document = parentwidget.document
+    def __init__(self, parent, mimedata, index=-1, newnames=None):
+        """Paste widget into parent widget from mimedata.
 
-    lines = mimedata.split('\n')
-    numwidgets = int(lines[0])
+        newnames is a list of new names for pasting, if given."""
 
-    # get types, names and number of lines for widgets
-    types = lines[1:1+4*numwidgets:4]
-    names = lines[2:2+4*numwidgets:4]
-    names = [eval(name) for name in names]
-    paths = lines[3:3+4*numwidgets:4] # (not required here)
-    widgetslines = lines[4:4+4*numwidgets:4]
-    widgetslines = [int(x) for x in widgetslines]
+        operations.OperationMultiple.__init__(self, [], descr=None)
+        self.parentpath = parent.path
+        self.mimedata = mimedata
+        self.index = index
+        self.newnames = newnames
 
-    # start batching changes to document
-    op = operations.OperationMultiple([], descr='paste')
-    document.applyOperation(op)
-    document.batchHistory(op)
+    def do(self, document):
+        """Do the import."""
 
-    # create an interpreter to put the paste commands into
-    interpreter = commandinterpreter.CommandInterpreter(document)
+        import commandinterpreter
 
-    newwidgets = []
-    widgetline = 1+4*numwidgets
-    for wtype, name, numline in izip(types, names, widgetslines):
-        thisparent = doc.getSuitableParent(wtype, parentwidget)
+        index = self.index
 
-        # override name if it exists already
-        if name in thisparent.childnames:
-            name = None
+        # get document to keep track of changes for undo/redo
+        document.batchHistory(self)
 
-        # make new widget
-        widget = document.applyOperation(
-            operations.OperationWidgetAdd(thisparent, wtype, autoadd=False,
-                                          name=name, index=index) )
-        newwidgets.append(widget)
+        # fire up interpreter to read file
+        interpreter = commandinterpreter.CommandInterpreter(document)
+        parentwidget = document.resolveFullWidgetPath(self.parentpath)
 
-        # run generating commands
-        interpreter.interface.currentwidget = widget
-        for line in lines[widgetline:widgetline+numline]:
-            interpreter.run(line)
+        lines = self.mimedata.split('\n')
+        numwidgets = int(lines[0])
 
-        if index >= 0:
-            index += 1
+        # get types, names and number of lines for widgets
+        types = lines[1:1+4*numwidgets:4]
+        names = lines[2:2+4*numwidgets:4]
+        names = [eval(name) for name in names]
+        if self.newnames is not None:
+            names = self.newnames
+        paths = lines[3:3+4*numwidgets:4] # (not required here)
+        widgetslines = lines[4:4+4*numwidgets:4]
+        widgetslines = [int(x) for x in widgetslines]
 
-        # move to next widget
-        widgetline += numline
+        newwidgets = []
+        widgetline = 1+4*numwidgets
+        try:
+            for wtype, name, numline in izip(types, names, widgetslines):
+                thisparent = doc.getSuitableParent(wtype, parentwidget)
 
-    # stop batching changes
-    document.batchHistory(None)
-    return newwidgets
+                if thisparent is None:
+                    raise RuntimeError, "Cannot find suitable parent for pasting"
+
+                # override name if it exists already
+                if name in thisparent.childnames:
+                    name = None
+
+                # make new widget
+                widget = document.applyOperation(
+                    operations.OperationWidgetAdd(
+                        thisparent, wtype, autoadd=False,
+                        name=name, index=index) )
+                newwidgets.append(widget)
+
+                # run generating commands
+                interpreter.interface.currentwidget = widget
+                for line in lines[widgetline:widgetline+numline]:
+                    interpreter.run(line)
+
+                if index >= 0:
+                    index += 1
+
+                # move to next widget
+                widgetline += numline
+
+        except Exception:
+            document.batchHistory(None)
+            raise
+
+        # stop batching changes
+        document.batchHistory(None)
+        return newwidgets
+
+class OperationWidgetClone(OperationWidgetPaste):
+    """Clone a widget."""
+
+    descr = 'clone widget'
+
+    def __init__(self, widget, newparent, newname):
+        mime = generateWidgetsMime([widget])
+        mime = str(mime.data(widgetmime))
+        OperationWidgetPaste.__init__(self, newparent, mime,
+                                      newnames=[newname])

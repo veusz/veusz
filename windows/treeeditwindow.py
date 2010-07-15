@@ -615,7 +615,8 @@ class TreeEditDock(qt4.QDockWidget):
 
         data = document.getClipboardWidgetMime()
         if data:
-            widgets = document.pasteMime(self.selwidget, data)
+            op = document.OperationWidgetPaste(self.selwidget, data)
+            widgets = self.document.applyOperation(op)
             if widgets:
                 self.selectWidget(widgets[0])
 
