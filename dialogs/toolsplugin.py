@@ -81,8 +81,10 @@ class ToolsPluginDialog(qt4.QDialog):
                                 'toolsplugin.ui'),
                    self)
 
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
-                      qt4.SIGNAL('clicked()'), self.slotReset )
+        reset = self.buttonBox.button(qt4.QDialogButtonBox.Reset)
+        reset.setAutoDefault(False)
+        reset.setDefault(False)
+        self.connect(reset, qt4.SIGNAL('clicked()'), self.slotReset)
         self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
                       qt4.SIGNAL('clicked()'), self.slotApply )
 

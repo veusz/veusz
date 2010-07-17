@@ -655,7 +655,7 @@ class ImportTabPlugins(ImportTab):
 
         # make new controls
         for row, field in enumerate(plugin.fields):
-            cntrls = field.makeControl()
+            cntrls = field.makeControl(None, None)
             layout.addWidget(cntrls[0], row, 0)
             layout.addWidget(cntrls[1], row, 1)
             self.fields.append(cntrls)

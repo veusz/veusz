@@ -1219,6 +1219,7 @@ class MultiSettingWidget(qt4.QWidget):
         """Make new row at end"""
         row = len(self.controls)
         cntrl = self.makeControl(row)
+        cntrl.installEventFilter(self)
         addbutton = qt4.QPushButton('+')
         addbutton.setFixedWidth(24)
         addbutton.setToolTip('Add another item')
@@ -1242,6 +1243,15 @@ class MultiSettingWidget(qt4.QWidget):
         elif len(self.controls) == 1:
             # or disable
             self.controls[0][2].setEnabled(False)
+
+    def eventFilter(self, obj, event):
+        """Capture loss of focus by controls."""
+        if event.type() == qt4.QEvent.FocusOut:
+            for row, c in enumerate(self.controls):
+                if c[0] is obj:
+                    self.dataChanged(row)
+                    break
+        return qt4.QWidget.eventFilter(self, obj, event)
 
     def deleteRow(self):
         """Remove last row"""
@@ -1295,6 +1305,17 @@ class MultiSettingWidget(qt4.QWidget):
         """Override this to update values in controls."""
         pass
 
+    def readControl(self, cntrl):
+        """Read value from control."""
+        return None
+
+    def dataChanged(self, row):
+        """Update row of setitng with new data"""
+        val = list(self.setting.val)
+        val[row] = self.readControl( self.controls[row][0] )
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
+                   tuple(val) )
+
 class Datasets(MultiSettingWidget):
     """A control for editing a list of datasets."""
 
@@ -1314,19 +1335,16 @@ class Datasets(MultiSettingWidget):
         combo = qt4.QComboBox()
         combo.setEditable(True)
         self.connect(combo.lineEdit(), qt4.SIGNAL('editingFinished()'), 
-                     lambda: self.datasetChanged(row))
+                     lambda: self.dataChanged(row))
         # if a different item is selected
         self.connect(combo, qt4.SIGNAL('activated(const QString&)'),
-                     lambda x: self.datasetChanged(row))
+                     lambda x: self.dataChanged(row))
         utils.populateCombo(combo, self.getDatasets())
         return combo
 
-    def datasetChanged(self, row):
-        """User enters some text."""
-        val = list(self.setting.val)
-        val[row] = unicode(self.controls[row][0].lineEdit().text())
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                   tuple(val) )
+    def readControl(self, control):
+        """Get text for control."""
+        return unicode( control.lineEdit().text() )
 
     def getDatasets(self):
         """Get applicable datasets (sorted)."""
@@ -1374,15 +1392,12 @@ class Strings(MultiSettingWidget):
         """Make edit widget."""
         lineedit = qt4.QLineEdit()
         self.connect(lineedit, qt4.SIGNAL('editingFinished()'), 
-                     lambda: self.textChanged(row))
+                     lambda: self.dataChanged(row))
         return lineedit
 
-    def textChanged(self, row):
-        """User enters some text."""
-        val = list(self.setting.val)
-        val[row] = unicode(self.controls[row][0].text())
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                   tuple(val) )
+    def readControl(self, control):
+        """Get text for control."""
+        return unicode( control.text() )
 
     def updateControls(self):
         """Set values of controls."""

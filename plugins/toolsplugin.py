@@ -25,6 +25,8 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import field
 
+import fnmatch
+
 # add an instance of your class to this list to be registered
 toolspluginregistry = []
 
@@ -247,9 +249,89 @@ class WidgetsClone(ToolsPlugin):
                                default=''),
             field.FieldDatasetMulti('ds2repl',
                                     descr="Replacement(s) for dataset 2"),
+            field.FieldBool("names", descr="Build new names from datasets",
+                            default=True),
             ]
 
     def apply(self, ifc, fields):
         """Do the cloning."""
+
+        def expanddatasets(dslist):
+            """Expand * and ? in dataset names."""
+            datasets = []
+            for ds in dslist:
+                if ds.find('*') == -1 and ds.find('?') == -1:
+                    datasets.append(ds)
+                else:
+                    dlist = fnmatch.filter(ifc.GetDatasets(), ds)
+                    dlist.sort()
+                    datasets += dlist
+            return datasets
+
+        def chainpairs(dslist1, dslist2):
+            """Return pairs of datasets, repeating if necessary."""
+            if not dslist1:
+                dslist1 = ['']
+            if not dslist2:
+                dslist2 = ['']
+
+            end1 = end2 = False
+            idx1 = idx2 = 0
+            while True:
+                if idx1 >= len(ds1repl):
+                    idx1 = 0
+                    end1 = True
+                if idx2 >= len(ds2repl):
+                    idx2 = 0
+                    end2 = True
+                if end1 and end2:
+                    break
+
+                yield dslist1[idx1], dslist2[idx2]
+                idx1 += 1
+                idx2 += 1
+
+        def walkNodes(node, dsname, dsrepl):
+            """Walk nodes, changing datasets."""
+            if node.type == 'setting':
+                if node.settingtype in (
+                    'dataset', 'dataset-or-floatlist', 'dataset-or-str'):
+                    # handle single datasets
+                    if node.val == dsname:
+                        node.val = dsrepl
+                elif node.settingtype == 'dataset-multi':
+                    # settings with multiple datasets
+                    out = list(node.val)
+                    for i, v in enumerate(out):
+                        if v == dsname:
+                            out[i] = dsrepl
+                    if tuple(out) != node.val:
+                        node.val = out
+            else:
+                for c in node.children:
+                    walkNodes(c, dsname, dsrepl)
+
+        # get names of replacement datasets
+        ds1repl = expanddatasets(fields['ds1repl'])
+        ds2repl = expanddatasets(fields['ds2repl'])
+
+        # make copies of widget and children for each pair of datasets
+        widget = ifc.Root.fromPath(fields['widget'])
+        for ds1r, ds2r in chainpairs(ds1repl, ds2repl):
+            # construct a name
+            newname = None
+            if fields['names']:
+                newname = widget.name
+                if ds1r: newname += ' ' + ds1r
+                if ds2r: newname += ' ' + ds2r
+
+            # make the new widget (and children)
+            newwidget = widget.Clone(widget.parent, newname=newname)
+
+            # do replacement of datasets
+            if fields['ds1']:
+                walkNodes(newwidget, fields['ds1'], ds1r)
+            if fields['ds2']:
+                walkNodes(newwidget, fields['ds2'], ds2r)
 
 toolspluginregistry.append(WidgetsClone)
