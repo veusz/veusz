@@ -18,6 +18,7 @@
 
 # $Id$
 
+from field import *
+from datasetplugin import *
 from importplugin import *
 from toolsplugin import *
-from field import *

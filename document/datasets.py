@@ -32,6 +32,7 @@ import readcsv
 
 import veusz.utils as utils
 import veusz.setting as setting
+import veusz.plugins as plugins
 
 def _convertNumpy(a):
     """Convert to a numpy double if possible."""
@@ -1441,3 +1442,27 @@ class Dataset2DXYFunc(DatasetBase):
         """Return linking information."""
         return 'Linked 2D function: x=%g:%g:%g, y=%g:%g:%g, z=%s' % tuple(
             list(self.xstep) + list(self.ystep) + [self.expr])
+
+class Dataset1DPlugin(Dataset):
+    """Return 1D dataset from a plugin."""
+
+    def __init__(self, plugin, sync, ds):
+        self.document = None
+        self.plugin = self.plugin
+        self.sync = self.sync
+
+        self.ds = ds
+
+    def description(self, showlinked=True):
+        """Get description of dataset."""
+        self.sync.checkUpToDate()
+        return 
+
+    def _dsAttr(self, attr):
+        self.sync.checkUpToDate()
+        return getattr(self.ds, attr)
+
+    data = property( lambda self: self._dsAttr('data') )
+    serr = property( lambda self: self._dsAttr('serr') )
+    perr = property( lambda self: self._dsAttr('perr') )
+    nerr = property( lambda self: self._dsAttr('nerr') )

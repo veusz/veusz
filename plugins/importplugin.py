@@ -29,6 +29,10 @@ from field import FieldFloat as ImportFieldFloat
 from field import FieldInt as ImportFieldInt
 from field import FieldCombo as ImportFieldCombo
 
+from datasetplugin import Dataset1D as ImportDataset1D
+from datasetplugin import Dataset2D as ImportDataset2D
+from datasetplugin import DatasetText as ImportDatasetText
+
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
 
@@ -45,50 +49,6 @@ class ImportPluginParams(object):
 
 class ImportPluginException(RuntimeError):
     """An exception to return errors about importing or previewing data."""
-
-class ImportDataset1D(object):
-    """Return 1D dataset."""
-    def __init__(self, name, data=None, serr=None, perr=None, nerr=None):
-        """1D dataset
-        name: name of dataset
-        data: data in dataset: list of floats or numpy 1D array
-        serr: (optional) symmetric errors on data: list or numpy array
-        perr: (optional) positive errors on data: list or numpy array
-        nerr: (optional) negative errors on data: list or numpy array
-
-        If errors are returned for data implement serr or nerr and perr.
-        nerr should be negative values if used.
-        perr should be positive values if used.
-        """
-        self.name = name
-        self.data = data
-        self.serr = serr
-        self.perr = perr
-        self.nerr = nerr
-
-class ImportDataset2D(object):
-    """Return 2D dataset."""
-    def __init__(self, name, data, rangex=None, rangey=None):
-        """2D dataset.
-        name: name of dataset
-        data: 2D numpy array of values or list of lists of floats
-        rangex: optional tuple with X range of data (min, max)
-        rangey: optional tuple with Y range of data (min, max)
-        """
-        self.name = name
-        self.data = data
-        self.rangex = rangex
-        self.rangey = rangey
-
-class ImportDatasetText(object):
-    """Return a text dataset."""
-    def __init__(self, name, data):
-        """A text dataset
-        name: name of dataset
-        data: data in dataset: list of strings
-        """
-        self.name = name
-        self.data = data
 
 class ImportPlugin(object):
     """Define a plugin to read data in a particular format.
