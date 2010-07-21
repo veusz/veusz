@@ -107,6 +107,10 @@ class VectorField(plotters.GenericPlotter):
         s = self.settings
         d = self.document
 
+        # hide if hidden!
+        if s.hide:
+            return
+
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
