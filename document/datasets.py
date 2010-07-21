@@ -560,6 +560,16 @@ class Dataset2D(DatasetBase):
         if not self.yrange:
             self.yrange = (0, data.shape[0])
 
+    def indexToPoint(self, xidx, yidx):
+        """Convert a set of indices to pixels in integers to
+        floating point vals using xrange and yrange."""
+
+        xfracpix = (xidx+0.5) * (1./self.data.shape[1])
+        xfloat = xfracpix * (self.xrange[1] - self.xrange[0]) + self.xrange[0]
+        yfracpix = (yidx+0.5) * (1./self.data.shape[0])
+        yfloat = yfracpix * (self.yrange[1] - self.yrange[0]) + self.yrange[0]
+        return xfloat, yfloat
+
     def getDataRanges(self):
         return self.xrange, self.yrange
 
@@ -1348,13 +1358,10 @@ class Dataset2DXYZExpression(DatasetBase):
         return 'Linked 2D function: x=%s, y=%s, z=%s' % (
             self.exprx, self.expry, self.exprz)
 
-class Dataset2DXYFunc(DatasetBase):
+class Dataset2DXYFunc(Dataset2D):
     """Given a range of x and y, this is a dataset which is a function of
     this.
     """
-
-    # number of dimensions the dataset holds
-    dimensions = 2
 
     def __init__(self, xstep, ystep, expr):
         """Create 2d dataset:
@@ -1415,12 +1422,12 @@ class Dataset2DXYFunc(DatasetBase):
             raise DatasetExpressionException("Error evaluating expession: %s\n"
                                              "Error: %s" % (self.expr, str(e)) )
 
+        # ensure we get an array out of this (in case expr is scalar)
+        data = data + xstep*0
+
         self.cacheddata = data
         self.lastchangeset = self.document.changeset
         return data
-
-    def getDataRanges(self):
-        return (self.xrange, self.yrange)
 
     def saveToFile(self, fileobj, name):
         '''Save expressions to file.
@@ -1428,11 +1435,6 @@ class Dataset2DXYFunc(DatasetBase):
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
         fileobj.write(s)
-
-    def returnCopy(self):
-        """Return unlinked copy of self."""
-        return Dataset2D( N.array(self.data),
-                          xrange=self.xrange, yrange=self.yrange)
 
     def canUnlink(self):
         """Can relationship be unlinked?"""
