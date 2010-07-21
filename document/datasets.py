@@ -1217,11 +1217,8 @@ def getSpacing(data):
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 
-class Dataset2DXYZExpression(DatasetBase):
+class Dataset2DXYZExpression(Dataset2D):
     '''A 2d dataset with expressions for x, y and z.'''
-
-    # number of dimensions the dataset holds
-    dimensions = 2
 
     def __init__(self, exprx, expry, exprz):
         """Initialise dataset.
@@ -1343,11 +1340,6 @@ class Dataset2DXYZExpression(DatasetBase):
         s = 'SetData2DExpressionXYZ(%s, %s, %s, %s, linked=True)\n' % (
             repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
         fileobj.write(s)
-
-    def returnCopy(self):
-        """Return unlinked copy of self."""
-        return Dataset2D( N.array(self.data),
-                          xrange=self.xrange, yrange=self.yrange)
 
     def canUnlink(self):
         """Can relationship be unlinked?"""
