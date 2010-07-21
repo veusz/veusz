@@ -189,6 +189,14 @@ class ShapeFill(Brush):
         self.get('hide').newDefault(True)
         self.get('color').newDefault('white')
 
+class ArrowFill(Brush):
+    """Brush for filling arrow heads"""
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
+        
+        self.get('color').newDefault( setting.Reference(
+                '../Line/color') )
+    
 class Text(Settings):
     '''Text settings.'''
 

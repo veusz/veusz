@@ -456,7 +456,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'image', 'contour',
                            'key', 'label', 'colorbar',
                            'rect', 'ellipse', 'imagefile',
-                           'line', 'polygon'):
+                           'line', 'polygon', 'vectorfield'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
@@ -511,7 +511,7 @@ class TreeEditDock(qt4.QDockWidget):
                   ('page', 'grid', 'graph', 'axis',
                    'xy', 'bar', 'fit', 'function',
                    'image', 'contour',
-                   'key', 'label', 'colorbar')]
+                   'key', 'label', 'colorbar', 'vectorfield')]
 
         menuitems = [
             ('insert', '', addact + [
