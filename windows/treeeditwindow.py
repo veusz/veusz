@@ -453,10 +453,10 @@ class TreeEditDock(qt4.QDockWidget):
         self.vzactions = actions = self.parent.vzactions
         for widgettype in ('page', 'grid', 'graph', 'axis',
                            'xy', 'bar', 'fit', 'function',
-                           'image', 'contour',
+                           'image', 'contour', 'vectorfield',
                            'key', 'label', 'colorbar',
                            'rect', 'ellipse', 'imagefile',
-                           'line', 'polygon', 'vectorfield'):
+                           'line', 'polygon'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
@@ -510,8 +510,8 @@ class TreeEditDock(qt4.QDockWidget):
         addact = [('add.'+w) for w in 
                   ('page', 'grid', 'graph', 'axis',
                    'xy', 'bar', 'fit', 'function',
-                   'image', 'contour',
-                   'key', 'label', 'colorbar', 'vectorfield')]
+                   'image', 'contour', 'vectorfield',
+                   'key', 'label', 'colorbar')]
 
         menuitems = [
             ('insert', '', addact + [
