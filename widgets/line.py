@@ -37,13 +37,6 @@ class Line(plotters.FreePlotter):
     typename='line'
     description='Line or arrow'
     allowusercreation = True
-
-    class ArrowFillBrush(setting.Brush):
-        def __init__(self, name, **args):
-            setting.Brush.__init__(self, name, **args)
-
-            self.get('color').newDefault( setting.Reference(
-                '../Line/color') )
     
     def __init__(self, parent, name=None):
         """Construct plotter."""
@@ -71,9 +64,9 @@ class Line(plotters.FreePlotter):
                             descr = 'Line style',
                             usertext = 'Line'),
                pixmap = 'settings_plotline' )
-        s.add( Line.ArrowFillBrush('Fill',
-                                   descr = 'Arrow fill settings',
-                                   usertext = 'Arrow fill'),
+        s.add( setting.ArrowFill('Fill',
+                                 descr = 'Arrow fill settings',
+                                 usertext = 'Arrow fill'),
                pixmap = 'settings_plotmarkerfill' )
 
         s.add( setting.Distance('arrowSize', '5pt',

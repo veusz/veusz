@@ -39,3 +39,4 @@ from shape import Shape, BoxShape, Rectangle, Ellipse, ImageFile
 from line import Line
 from bar import BarPlotter
 from polygon import Polygon
+from vectorfield import VectorField
