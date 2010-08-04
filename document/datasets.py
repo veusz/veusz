@@ -534,6 +534,10 @@ class DatasetBase(object):
         """Return an unlinked copy of self."""
         pass
 
+    def renameable(self):
+        """Is it possible to rename this dataset?"""
+        return self.linked is None
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -555,9 +559,9 @@ class Dataset2D(DatasetBase):
         self.xrange = xrange
         self.yrange = yrange
 
-        if not self.xrange:
+        if not xrange:
             self.xrange = (0, data.shape[1])
-        if not self.yrange:
+        if not yrange:
             self.yrange = (0, data.shape[0])
 
     def indexToPoint(self, xidx, yidx):
@@ -624,19 +628,26 @@ class Dataset(DatasetBase):
         linked optionally specifies a LinkedFile to link the dataset to
         '''
         
-        self.document = None
-        self._invalidpoints = None
-        self.data = _convertNumpy(data)
-        self.serr = _convertNumpyAbs(serr)
-        self.perr = _convertNumpyAbs(perr)
-        self.nerr = _convertNumpyNegAbs(nerr)
-        self.linked = linked
+        # convert data to numpy arrays
+        data = _convertNumpy(data)
+        serr = _convertNumpyAbs(serr)
+        perr = _convertNumpyAbs(perr)
+        nerr = _convertNumpyNegAbs(nerr)
 
         # check the sizes of things match up
-        s = self.data.shape
-        for i in (self.serr, self.nerr, self.perr):
-            if i is not None and i.shape != s:
+        s = data.shape
+        for x in (serr, nerr, perr):
+            if x is not None and x.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
+
+        # finally assign data
+        self.document = None
+        self._invalidpoints = None
+        self.linked = linked
+        self.data = data
+        self.serr = serr
+        self.perr = perr
+        self.nerr = nerr
 
     def description(self, showlinked=True):
         """Get description of dataset."""
@@ -1440,23 +1451,55 @@ class Dataset2DXYFunc(Dataset2D):
 class Dataset1DPlugin(Dataset):
     """Return 1D dataset from a plugin."""
 
-    def __init__(self, plugin, sync, ds):
-        self.document = None
-        self.plugin = self.plugin
-        self.sync = self.sync
+    def __init__(self, manager, ds):
+        self.pluginmanager = manager
+        self.pluginds = ds
+        Dataset.__init__(self, data=[])
 
-        self.ds = ds
+    def getPluginData(self, attr):
+        self.pluginmanager.update()
+        return getattr(self.pluginds, attr)
 
-    def description(self, showlinked=True):
-        """Get description of dataset."""
-        self.sync.checkUpToDate()
-        return 
+    # parent class sets these attributes, so override setattr to do nothing
+    data = property( lambda self: self.getPluginData('data'),
+                     lambda self, val: None )
+    serr = property( lambda self: self.getPluginData('serr'),
+                     lambda self, val: None )
+    nerr = property( lambda self: self.getPluginData('nerr'),
+                     lambda self, val: None )
+    perr = property( lambda self: self.getPluginData('perr'),
+                     lambda self, val: None )
 
-    def _dsAttr(self, attr):
-        self.sync.checkUpToDate()
-        return getattr(self.ds, attr)
+class Dataset2DPlugin(Dataset2D):
+    """Return 2D dataset from a plugin."""
 
-    data = property( lambda self: self._dsAttr('data') )
-    serr = property( lambda self: self._dsAttr('serr') )
-    perr = property( lambda self: self._dsAttr('perr') )
-    nerr = property( lambda self: self._dsAttr('nerr') )
+    def __init__(self, manager, ds):
+        self.pluginmanager = manager
+        self.pluginds = ds
+        Dataset2D.__init__(self, [[]])
+        
+    def getPluginData(self, attr):
+        self.pluginmanager.update()
+        return getattr(self.pluginds, attr)
+
+    data   = property( lambda self: self.getPluginData('data'),
+                       lambda self, val: None )
+    xrange = property( lambda self: self.getPluginData('rangex'),
+                       lambda self, val: None )
+    yrange = property( lambda self: self.getPluginData('rangey'),
+                       lambda self, val: None )
+
+class DatasetTextPlugin(DatasetText):
+    """Return text dataset from a plugin."""
+
+    def __init__(self, manager, ds):
+        self.pluginmanager = manager
+        self.pluginds = ds
+        DatasetText.__init__(self, [])
+
+    def getPluginData(self, attr):
+        self.pluginmanager.update()
+        return getattr(self.pluginds, attr)
+
+    data = property( lambda self: self.getPluginData('data'),
+                     lambda self, val: None )

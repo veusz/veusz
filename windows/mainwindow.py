@@ -46,7 +46,7 @@ from veusz.dialogs.stylesheet import StylesheetDialog
 from veusz.dialogs.custom import CustomDialog
 from veusz.dialogs.safetyimport import SafetyImportDialog
 from veusz.dialogs.histodata import HistoDataDialog
-from veusz.dialogs.toolsplugin import handleToolsPlugin
+from veusz.dialogs.plugin import handlePlugin
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
@@ -289,16 +289,21 @@ class MainWindow(qt4.QMainWindow):
         dialog.show()
         return dialog
 
-    def defineToolsPlugins(self, actions):
-        """Create menu items and actions for worker plugins."""
+    def definePlugins(self, pluginlist, actions, menuname):
+        """Create menu items and actions for plugins.
+
+        pluginlist: list of plugin classes
+        actions: dict of actions to add new actions to
+        menuname: string giving prefix for new menu entries (inside actions)
+        """
 
         menu = []
-        for pluginkls in plugins.toolspluginregistry:
-            def loadOpDialog(pluginkls=pluginkls):
+        for pluginkls in pluginlist:
+            def loaddialog(pluginkls=pluginkls):
                 """Load plugin dialog"""
-                handleToolsPlugin(self, self.document, pluginkls)
+                handlePlugin(self, self.document, pluginkls)
 
-            actname = 'tools.' + '.'.join(pluginkls.name)
+            actname = menuname + '.' + '.'.join(pluginkls.name)
             text = pluginkls.menu[-1]
             if pluginkls.has_parameters:
                 text += '...'
@@ -306,11 +311,11 @@ class MainWindow(qt4.QMainWindow):
                 self,
                 pluginkls.description_short,
                 text,
-                loadOpDialog)
+                loaddialog)
 
             # build up menu from tuple of names
             menulook = menu
-            namebuild = ['tools']
+            namebuild = [menuname]
             for cmpt in pluginkls.menu[:-1]:
                 namebuild.append(cmpt)
                 name = '.'.join(namebuild)
@@ -504,10 +509,16 @@ class MainWindow(qt4.QMainWindow):
             ]
         insertmenu = [
             ]
+
+        # load dataset plugins and create menu
+        datapluginsmenu = self.definePlugins( plugins.datasetpluginregistry,
+                                              self.vzactions, 'data.ops' )
+
         datamenu = [
+            ['data.ops', '&Operations', datapluginsmenu],
             'data.import', 'data.edit', 'data.create',
             'data.create2d', 'data.capture', 'data.histogram',
-            'data.reload'
+            'data.reload',
             ]
         helpmenu = [
             'help.home', 'help.project', 'help.bug',
@@ -515,7 +526,9 @@ class MainWindow(qt4.QMainWindow):
             'help.about'
             ]
 
-        operationmenu = self.defineToolsPlugins(self.vzactions)
+        # load tools plugins and create menu
+        toolsmenu = self.definePlugins( plugins.toolspluginregistry,
+                                        self.vzactions, 'tools' )
 
         menus = [
             ['file', '&File', filemenu],
@@ -523,7 +536,7 @@ class MainWindow(qt4.QMainWindow):
             ['view', '&View', viewmenu],
             ['insert', '&Insert', insertmenu],
             ['data', '&Data', datamenu],
-            ['tools', '&Tools', operationmenu],
+            ['tools', '&Tools', toolsmenu],
             ['help', '&Help', helpmenu],
             ]
 

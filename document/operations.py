@@ -29,6 +29,7 @@ because some operations cannot restore references (e.g. add object)
 """
 
 import os.path
+from itertools import izip
 
 import numpy as N
 
@@ -1408,3 +1409,43 @@ class OperationToolsPlugin(OperationMultiple):
             document.batchHistory(None)
             raise
         document.batchHistory(None)
+
+class OperationDatasetPlugin(object):
+    """An operation to activate a dataset plugin."""
+    
+    def __init__(self, plugin, fields):
+        """Use dataset plugin, passing fields."""
+        self.plugin = plugin
+        self.fields = fields
+        self.descr = plugin.name
+        
+    def do(self, document):
+        """Use the plugin."""
+
+        self.datasetnames = []
+        self.olddata = {}
+
+        manager = plugins.DatasetPluginManager(self.plugin,
+                                               document, self.fields)
+        manager.initialConstruct()
+
+        self.datasetnames = manager.datasetnames
+
+        # preserve old datasets
+        for name in self.datasetnames:
+            if name in document.data:
+                self.olddata[name] = document.data[name]
+
+        # add new datasets to document
+        for name, ds in izip(self.datasetnames, manager.datasets):
+            document.data[name] = ds
+
+    def undo(self, document):
+        """Undo dataset plugin."""
+
+        # delete datasets which were created
+        for name in self.datasetnames:
+            del document.data[name]
+
+        # put back old datasets
+        document.data.update(self.olddata)

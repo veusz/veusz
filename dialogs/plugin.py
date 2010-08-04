@@ -18,7 +18,7 @@
 
 # $Id$
 
-"""Dialog boxes for tools plugins."""
+"""Dialog boxes for tools and dataset plugins."""
 
 import os.path
 import sys
@@ -29,56 +29,24 @@ import veusz.document as document
 import veusz.plugins as plugins
 import exceptiondialog
 
-def handleToolsPlugin(mainwindow, doc, pluginkls):
-    """Show tools plugin dialog or directly execute
-    (if it takes no parameters)."""
+def handlePlugin(mainwindow, doc, pluginkls):
+    """Show plugin dialog or directly execute (if it takes no parameters)."""
 
     plugin = pluginkls()
     if plugin.has_parameters:
-        d = ToolsPluginDialog(mainwindow, doc, plugin)
+        d = PluginDialog(mainwindow, doc, plugin)
         mainwindow.showDialog(d)
     else:
         fields = {'currentwidget': mainwindow.treeedit.selwidget.path}
         runPlugin(mainwindow, doc, plugin, fields)
 
-def runPlugin(window, doc, plugin, fields):
-    """Run plugin.
-    window - parent window
-    doc - veusz document
-    plugin - plugin object."""
-    
-    # keep track of all changes in this
-    op = document.OperationToolsPlugin(plugin, fields)
-
-    qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-    try:
-        doc.applyOperation(op)
-
-    except plugins.ToolsPluginException, ex:
-        # unwind operations
-        op.undo(doc)
-        qt4.QApplication.restoreOverrideCursor()
-
-        qt4.QMessageBox.warning(
-            window, "Error in %s" % plugin.name, unicode(ex))
-
-    except Exception:
-        op.undo(doc)
-        qt4.QApplication.restoreOverrideCursor()
-
-        # show exception dialog
-        exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec_()
-
-    else:
-        qt4.QApplication.restoreOverrideCursor()
-
-class ToolsPluginDialog(qt4.QDialog):
-    """Dialog box for tools plugins."""
+class PluginDialog(qt4.QDialog):
+    """Dialog box class for plugins."""
 
     def __init__(self, mainwindow, doc, plugin):
         qt4.QDialog.__init__(self, mainwindow)
         qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'toolsplugin.ui'),
+                                'plugin.ui'),
                    self)
 
         reset = self.buttonBox.button(qt4.QDialogButtonBox.Reset)
@@ -143,3 +111,39 @@ class ToolsPluginDialog(qt4.QDialog):
             fields[field.name] = field.getControlResults(cntrls)
 
         runPlugin(self, self.document, self.plugin, fields)
+
+def runPlugin(window, doc, plugin, fields):
+    """Execute a plugin.
+    window - parent window
+    doc - veusz document
+    plugin - plugin object."""
+
+    # use correct operation class for different plugin types
+    if isinstance(plugin, plugins.ToolsPlugin):
+        op = document.OperationToolsPlugin(plugin, fields)
+    elif isinstance(plugin, plugins.DatasetPlugin):
+        op = document.OperationDatasetPlugin(plugin, fields)
+    else:
+        raise RuntimeError("Invalid plugin class")
+
+    qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+    try:
+        doc.applyOperation(op)
+
+    except (plugins.ToolsPluginException, plugins.DatasetPluginException), ex:
+        # unwind operations
+        op.undo(doc)
+        qt4.QApplication.restoreOverrideCursor()
+
+        qt4.QMessageBox.warning(
+            window, "Error in %s" % plugin.name, unicode(ex))
+
+    except Exception:
+        op.undo(doc)
+        qt4.QApplication.restoreOverrideCursor()
+
+        # show exception dialog
+        exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec_()
+
+    else:
+        qt4.QApplication.restoreOverrideCursor()
