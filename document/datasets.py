@@ -1448,17 +1448,58 @@ class Dataset2DXYFunc(Dataset2D):
         return 'Linked 2D function: x=%g:%g:%g, y=%g:%g:%g, z=%s' % tuple(
             list(self.xstep) + list(self.ystep) + [self.expr])
 
-class Dataset1DPlugin(Dataset):
-    """Return 1D dataset from a plugin."""
+class _DatasetPlugin(object):
+    """Shared methods for dataset plugins."""
 
     def __init__(self, manager, ds):
         self.pluginmanager = manager
         self.pluginds = ds
-        Dataset.__init__(self, data=[])
 
     def getPluginData(self, attr):
         self.pluginmanager.update()
         return getattr(self.pluginds, attr)
+
+    def linkedInformation(self):
+        """Return information about how this dataset was created."""
+
+        fields = []
+        for name, val in self.pluginmanager.params.fields.iteritems():
+            fields.append('%s: %s' % (unicode(name), unicode(val)))
+
+        return '%s plugin dataset (fields %s)' % (
+            self.pluginmanager.plugin.name,
+            ', '.join(fields) )
+
+    def canUnlink(self):
+        """Can relationship be unlinked?"""
+        return True
+
+    def deleteRows(self, row, numrows):
+        pass
+
+    def insertRows(self, row, numrows, rowdata):
+        pass
+
+    def saveToFile(self, fileobj, name):
+        """Save plugin to file, if this is the first one."""
+
+        # only try to save if this is the 1st dataset of this plugin
+        # manager in the document, so that we don't save more than once
+        docdatasets = set( self.document.data.values() )
+
+        for ds in self.pluginmanager.datasets:
+            if ds in docdatasets:
+                if ds is self:
+                    # is 1st dataset
+                    self.pluginmanager.saveToFile(fileobj)
+                return
+
+class Dataset1DPlugin(_DatasetPlugin, Dataset):
+    """Return 1D dataset from a plugin."""
+
+    def __init__(self, manager, ds):
+        _DatasetPlugin.__init__(self, manager, ds)
+        Dataset.__init__(self, data=[])
 
     # parent class sets these attributes, so override setattr to do nothing
     data = property( lambda self: self.getPluginData('data'),
@@ -1470,18 +1511,13 @@ class Dataset1DPlugin(Dataset):
     perr = property( lambda self: self.getPluginData('perr'),
                      lambda self, val: None )
 
-class Dataset2DPlugin(Dataset2D):
+class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
     """Return 2D dataset from a plugin."""
 
     def __init__(self, manager, ds):
-        self.pluginmanager = manager
-        self.pluginds = ds
+        _DatasetPlugin.__init__(self, manager, ds)
         Dataset2D.__init__(self, [[]])
         
-    def getPluginData(self, attr):
-        self.pluginmanager.update()
-        return getattr(self.pluginds, attr)
-
     data   = property( lambda self: self.getPluginData('data'),
                        lambda self, val: None )
     xrange = property( lambda self: self.getPluginData('rangex'),
@@ -1489,17 +1525,12 @@ class Dataset2DPlugin(Dataset2D):
     yrange = property( lambda self: self.getPluginData('rangey'),
                        lambda self, val: None )
 
-class DatasetTextPlugin(DatasetText):
+class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     """Return text dataset from a plugin."""
 
     def __init__(self, manager, ds):
-        self.pluginmanager = manager
-        self.pluginds = ds
+        _DatasetPlugin.__init__(self, manager, ds)
         DatasetText.__init__(self, [])
-
-    def getPluginData(self, attr):
-        self.pluginmanager.update()
-        return getattr(self.pluginds, attr)
 
     data = property( lambda self: self.getPluginData('data'),
                      lambda self, val: None )

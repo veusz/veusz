@@ -31,6 +31,7 @@ import os.path
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.embed as embed
+import veusz.plugins as plugins
 
 import datasets
 import operations
@@ -48,6 +49,7 @@ class CommandInterface(qt4.QObject):
         'AddImportPath',
         'CloneWidget',
         'CreateHistogram',
+        'DatasetPlugin',
         'Get',
         'GetChildren',
         'GetData',
@@ -202,6 +204,32 @@ class CommandInterface(qt4.QObject):
         if self.verbose:
             print ('Constructed histogram of "%s", creating datasets'
                    ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds)
+
+    def DatasetPlugin(self, pluginname, fields, datasetnames={}):
+        """Use a dataset plugin.
+
+        pluginname: name of plugin to use
+        fields: dict of input values to plugin
+        datasetnames: dict mapping old names to new names of datasets
+        if they are renamed. The new name None means dataset is deleted."""
+
+        # lookup plugin (urgh)
+        plugin = None
+        for pkls in plugins.datasetpluginregistry:
+            if pkls.name == pluginname:
+                plugin = pkls()
+                break
+        if plugin is None:
+            raise RuntimeError, "Cannot find dataset plugin '%s'" % pluginname
+
+        # do the work
+        op = operations.OperationDatasetPlugin(plugin, fields,
+                                               datasetnames=datasetnames)
+        datasets = self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Used dataset plugin %s to make datasets %s" % (
+                pluginname, ', '.join(datasets))
 
     def Remove(self, name):
         """Remove a widget from the dataset."""

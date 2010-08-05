@@ -122,6 +122,8 @@ def runPlugin(window, doc, plugin, fields):
     if isinstance(plugin, plugins.ToolsPlugin):
         op = document.OperationToolsPlugin(plugin, fields)
     elif isinstance(plugin, plugins.DatasetPlugin):
+        # a bit of a hack as we don't give currentwidget to this plugin
+        del fields['currentwidget']
         op = document.OperationDatasetPlugin(plugin, fields)
     else:
         raise RuntimeError("Invalid plugin class")

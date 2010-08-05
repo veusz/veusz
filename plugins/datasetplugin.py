@@ -191,7 +191,9 @@ class DatasetPluginManager(object):
         self.datasets = []
         for ds in self.plugin.update(self.params):
             self.datasetnames.append(ds.name)
-            self.datasets.append(ds._makeRealDataset(self))
+            realds = ds._makeRealDataset(self)
+            realds.document = self.document
+            self.datasets.append(realds)
 
         self.changeset = self.document.changeset        
 
@@ -199,6 +201,28 @@ class DatasetPluginManager(object):
         """Clear out contents of datasets."""
         for ds in self.datasets:
             ds.pluginds._null()
+
+    def saveToFile(self, fileobj):
+        """Save command to load in plugin and parameters."""
+
+        args = [ repr(self.plugin.name), repr(self.params.fields) ]
+
+        # look for renamed or deleted datasets
+        names = {}
+        for ds, dsname in izip( self.datasets, self.datasetnames ):
+            try:
+                currentname = self.document.datasetName(ds)
+            except ValueError:
+                # deleted
+                currentname = None
+
+            if currentname != dsname:
+                names[dsname] = currentname
+
+        if names:
+            args.append( "datasetnames="+repr(names) )
+
+        fileobj.write( 'DatasetPlugin(%s)\n' % (', '.join(args)) )
 
     def update(self):
         """Update created datasets."""

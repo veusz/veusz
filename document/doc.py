@@ -282,6 +282,13 @@ class Document( qt4.QObject ):
         read.sort()
         return (read, errors)
 
+    def datasetName(self, dataset):
+        """Find name for given dataset, raising ValueError if missing."""
+        for name, ds in self.data.iteritems():
+            if ds is dataset:
+                return name
+        raise ValueError, "Cannot find dataset"
+
     def deleteDataset(self, name):
         """Remove the selected dataset."""
         del self.data[name]

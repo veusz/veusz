@@ -1413,11 +1413,12 @@ class OperationToolsPlugin(OperationMultiple):
 class OperationDatasetPlugin(object):
     """An operation to activate a dataset plugin."""
     
-    def __init__(self, plugin, fields):
+    def __init__(self, plugin, fields, datasetnames={}):
         """Use dataset plugin, passing fields."""
         self.plugin = plugin
         self.fields = fields
         self.descr = plugin.name
+        self.names = datasetnames
         
     def do(self, document):
         """Use the plugin."""
@@ -1429,23 +1430,32 @@ class OperationDatasetPlugin(object):
                                                document, self.fields)
         manager.initialConstruct()
 
-        self.datasetnames = manager.datasetnames
+        names = self.datasetnames = list(manager.datasetnames)
+
+        # rename if requested
+        for i in xrange(len(names)):
+            if names[i] in self.names:
+                names[i] = self.names[names[i]]
 
         # preserve old datasets
-        for name in self.datasetnames:
+        for name in names:
             if name in document.data:
                 self.olddata[name] = document.data[name]
 
         # add new datasets to document
-        for name, ds in izip(self.datasetnames, manager.datasets):
-            document.data[name] = ds
+        for name, ds in izip(names, manager.datasets):
+            if name is not None:
+                document.data[name] = ds
+
+        return names
 
     def undo(self, document):
         """Undo dataset plugin."""
 
         # delete datasets which were created
         for name in self.datasetnames:
-            del document.data[name]
+            if name is not None:
+                del document.data[name]
 
         # put back old datasets
         document.data.update(self.olddata)
