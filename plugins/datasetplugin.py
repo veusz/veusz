@@ -486,18 +486,16 @@ class MeanDatasets(DatasetPlugin):
             num[:len(f)] += f.astype(N.int)
         data = tot / num
 
-        def averageError(attr):
+        def averageError(attr, attr2=None):
             """Get average for an error value."""
             tot = N.zeros(maxlength, dtype=N.float64)
             num = N.zeros(maxlength, dtype=N.int)
             for d in inds:
                 vals = getattr(d, attr)
 
-                # this hack falls over from nerr/perr to serr if missing
-                if attr == 'nerr' and vals is None:
-                    vals = getattr(d, 'serr')
-                elif attr == 'perr' and vals is None:
-                    vals = getattr(d, 'serr')
+                # failover if 1st attribute not found
+                if vals is None and attr2 is not None:
+                    vals = getattr(d, attr2)
 
                 # add values if not missing
                 if vals is not None:
@@ -514,8 +512,8 @@ class MeanDatasets(DatasetPlugin):
         if symerr and not asymerr:
             serr = averageError('serr')
         elif asymerr:
-            perr = averageError('perr')
-            nerr = averageError('nerr')
+            perr = averageError('perr', attr2='serr')
+            nerr = averageError('nerr', attr2='serr')
 
         return [ Dataset1D(ds_out, data=data, serr=serr, perr=perr, nerr=nerr) ]
 
