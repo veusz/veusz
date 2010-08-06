@@ -1466,9 +1466,10 @@ class _DatasetPlugin(object):
         for name, val in self.pluginmanager.params.fields.iteritems():
             fields.append('%s: %s' % (unicode(name), unicode(val)))
 
-        return '%s plugin dataset (fields %s)' % (
+        return '%s plugin dataset (fields %s), size %i' % (
             self.pluginmanager.plugin.name,
-            ', '.join(fields) )
+            ', '.join(fields),
+            self.data.shape[0])
 
     def canUnlink(self):
         """Can relationship be unlinked?"""

@@ -289,7 +289,7 @@ class ScaleDatasetPlugin(DatasetPlugin):
         ds_in = params.getDataset(params.fields['ds_in'])
         f = params.fields['factor']
 
-        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.serr
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
         data = data * f
         if serr is not None: serr = serr * f
         if perr is not None: perr = perr * f
@@ -409,8 +409,47 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
         # return concatentated datasets
         return [ self.doConcat(dsout, ds) ]
 
+class SplitDatasetPlugin(DatasetPlugin):
+    """Dataset plugin to split datasets."""
+
+    menu = ('Split',)
+    name = 'Split'
+    description_short = 'Split datasets'
+    description_filter = ('Split out a section of a dataset. Give starting '
+                          'index of data and number of datapoints to take.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldInt('start', 'Starting index (from 1)', default=1),
+            field.FieldInt('num', 'Maximum number of datapoints', default=1),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def update(self, params):
+        """Do scaling of dataset."""
+
+        ds_in = params.getDataset(params.fields['ds_in'])
+        ds_out = params.fields['ds_out']
+        if ds_out == '':
+            raise DatasetPluginException('Invalid output dataset name')
+        start = params.fields['start']
+        num = params.fields['num']
+
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+
+        # chop the data
+        data = data[start-1:start-1+num]
+        if serr is not None: serr = serr[start-1:start-1+num]
+        if perr is not None: perr = perr[start-1:start-1+num]
+        if nerr is not None: nerr = nerr[start-1:start-1+num]
+
+        return [ Dataset1D(ds_out, data=data, serr=serr, perr=perr, nerr=nerr) ]
+
 datasetpluginregistry += [
     ScaleDatasetPlugin,
     ShiftDatasetPlugin,
     ConcatenateDatasetPlugin,
+    SplitDatasetPlugin,
     ]
