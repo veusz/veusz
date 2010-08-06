@@ -271,7 +271,7 @@ class ScaleDatasetPlugin(DatasetPlugin):
 
     menu = ('Scale',)
     name = 'Scale'
-    description_short = 'Scale a dataset'
+    description_short = 'Scale dataset by factor'
     description_full = ('Scale a dataset by a factor. '
                         'Error bars are also scaled.')
     
@@ -306,7 +306,7 @@ class ShiftDatasetPlugin(DatasetPlugin):
 
     menu = ('Shift',)
     name = 'Shift'
-    description_short = 'Shift a dataset'
+    description_short = 'Shift dataset by value'
     description_full = ('Shift a dataset by adding a value. '
                         'Error bars remain the same.')
     
@@ -337,7 +337,7 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
     menu = ('Concatenate',)
     name = 'Concatenate'
     description_short = 'Concatenate datasets'
-    description_filter = ('Concatenate datasets into single datasets. '
+    description_filter = ('Concatenate datasets into single dataset. '
                           'Error bars are merged.')
 
     def __init__(self):
@@ -351,12 +351,10 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
         """Concatentate datasets, returning parts."""
 
         # what sort of error bars do we need?
-        symerr, asymerr = False, False
+        symerr = asymerr = False
         for d in ds:
-            if d.serr is not None:
-                symerr = True
-            if d.perr is not None or d.nerr is not None:
-                asymerr = True
+            if d.serr is not None: symerr = True
+            if d.perr is not None or d.nerr is not None: asymerr = True
                 
         # concatenate main data
         dstack = N.hstack([d.data for d in ds])
@@ -409,13 +407,13 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
         # return concatentated datasets
         return [ self.doConcat(dsout, ds) ]
 
-class SplitDatasetPlugin(DatasetPlugin):
-    """Dataset plugin to split datasets."""
+class ChopDatasetPlugin(DatasetPlugin):
+    """Dataset plugin to chop datasets."""
 
-    menu = ('Split',)
-    name = 'Split'
-    description_short = 'Split datasets'
-    description_filter = ('Split out a section of a dataset. Give starting '
+    menu = ('Chop',)
+    name = 'Chop'
+    description_short = 'Chop dataset part into new dataset'
+    description_filter = ('Chop out a section of a dataset. Give starting '
                           'index of data and number of datapoints to take.')
 
     def __init__(self):
@@ -447,9 +445,84 @@ class SplitDatasetPlugin(DatasetPlugin):
 
         return [ Dataset1D(ds_out, data=data, serr=serr, perr=perr, nerr=nerr) ]
 
+class MeanDatasets(DatasetPlugin):
+    """Dataset plugin to mean datasets together."""
+
+    menu = ('Compute mean',)
+    name = 'Mean'
+    description_short = 'Compute mean of datasets'
+    description_filter = ('Compute mean of multiple datasets to create '
+                          'single dataset.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDatasetMulti('ds_in', 'Input datasets'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def update(self, params):
+        """Do scaling of dataset."""
+
+        ds_out = params.fields['ds_out']
+        if ds_out == '':
+            raise DatasetPluginException('Invalid output dataset name')
+
+        inds = [ params.getDataset(d) for d in params.fields['ds_in'] ]
+        maxlength = max( [d.data.shape[0] for d in inds] )
+
+        # what sort of error bars do we have?
+        symerr = asymerr = False
+        for d in inds:
+            if d.serr is not None: symerr = True
+            if d.perr is not None or d.nerr is not None: asymerr = True
+
+        # mean data (only use finite values)
+        tot = N.zeros(maxlength, dtype=N.float64)
+        num = N.zeros(maxlength, dtype=N.int)
+        for d in inds:
+            f = N.isfinite(d.data)
+            tot[:len(f)] += N.where(f, d.data, 0.)
+            num[:len(f)] += f.astype(N.int)
+        data = tot / num
+
+        def averageError(attr):
+            """Get average for an error value."""
+            tot = N.zeros(maxlength, dtype=N.float64)
+            num = N.zeros(maxlength, dtype=N.int)
+            for d in inds:
+                vals = getattr(d, attr)
+
+                # this hack falls over from nerr/perr to serr if missing
+                if attr == 'nerr' and vals is None:
+                    vals = getattr(d, 'serr')
+                elif attr == 'perr' and vals is None:
+                    vals = getattr(d, 'serr')
+
+                # add values if not missing
+                if vals is not None:
+                    f = N.isfinite(vals)
+                    tot[:len(f)] += N.where(f, vals**2, 0.)
+                    num[:len(f)] += f.astype(N.int)
+                else:
+                    # treat as zero errors if missing errors
+                    num[:len(d.data)] += 1
+            return N.sqrt(tot) / num
+
+        # do error bar handling
+        serr = perr = nerr = None
+        if symerr and not asymerr:
+            serr = averageError('serr')
+        elif asymerr:
+            perr = averageError('perr')
+            nerr = averageError('nerr')
+
+        return [ Dataset1D(ds_out, data=data, serr=serr, perr=perr, nerr=nerr) ]
+
 datasetpluginregistry += [
     ScaleDatasetPlugin,
     ShiftDatasetPlugin,
     ConcatenateDatasetPlugin,
-    SplitDatasetPlugin,
+    ChopDatasetPlugin,
+    MeanDatasets,
     ]
