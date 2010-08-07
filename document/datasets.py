@@ -41,11 +41,11 @@ def _convertNumpy(a):
         return None
     elif not isinstance(a, N.ndarray):
         # convert to numpy array
-        return N.array(a, dtype='float64')
+        return N.array(a, dtype=N.float64)
     else:
         # make conversion if numpy type is not correct
-        if a.dtype != N.dtype('float64'):
-            return a.astype('float64')
+        if a.dtype != N.float64:
+            return a.astype(N.float64)
         else:
             return a
 
@@ -54,9 +54,9 @@ def _convertNumpyAbs(a):
     if a is None:
         return None
     if not isinstance(a, N.ndarray):
-        a = N.array(a, dtype='float64')
-    elif a.dtype != N.dtype('float64'):
-        a = a.astype('float64')
+        a = N.array(a, dtype=N.float64)
+    elif a.dtype != N.float64:
+        a = a.astype(N.float64)
     return N.abs(a)
 
 def _convertNumpyNegAbs(a):
@@ -64,9 +64,9 @@ def _convertNumpyNegAbs(a):
     if a is None:
         return None
     if not isinstance(a, N.ndarray):
-        a = N.array(a, dtype='float64')
-    elif a.dtype != N.dtype('float64'):
-        a = a.astype('float64')
+        a = N.array(a, dtype=N.float64)
+    elif a.dtype != N.float64:
+        a = a.astype(N.float64)
     return -N.abs(a)
 
 def _copyOrNone(a):
@@ -1463,7 +1463,7 @@ class _DatasetPlugin(object):
         """Return information about how this dataset was created."""
 
         fields = []
-        for name, val in self.pluginmanager.params.fields.iteritems():
+        for name, val in self.pluginmanager.fields.iteritems():
             fields.append('%s: %s' % (unicode(name), unicode(val)))
 
         return '%s plugin dataset (fields %s), size %i' % (
@@ -1488,7 +1488,7 @@ class _DatasetPlugin(object):
         # manager in the document, so that we don't save more than once
         docdatasets = set( self.document.data.values() )
 
-        for ds in self.pluginmanager.datasets:
+        for ds in self.pluginmanager.veuszdatasets:
             if ds in docdatasets:
                 if ds is self:
                     # is 1st dataset

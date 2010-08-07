@@ -1421,14 +1421,14 @@ class OperationDatasetPlugin(object):
         self.names = datasetnames
         
     def do(self, document):
-        """Use the plugin."""
+        """Use the plugin.
+        """
 
         self.datasetnames = []
         self.olddata = {}
 
-        manager = plugins.DatasetPluginManager(self.plugin,
-                                               document, self.fields)
-        manager.initialConstruct()
+        manager = self.manager = plugins.DatasetPluginManager(
+            self.plugin, document, self.fields)
 
         names = self.datasetnames = list(manager.datasetnames)
 
@@ -1443,11 +1443,15 @@ class OperationDatasetPlugin(object):
                 self.olddata[name] = document.data[name]
 
         # add new datasets to document
-        for name, ds in izip(names, manager.datasets):
+        for name, ds in izip(names, manager.veuszdatasets):
             if name is not None:
                 document.data[name] = ds
 
         return names
+
+    def validate(self):
+        """Check that the plugin works the first time."""
+        self.manager.update(raiseerrors=True)
 
     def undo(self, document):
         """Undo dataset plugin."""

@@ -20,6 +20,8 @@
 
 """Plugins for creating datasets."""
 
+import fnmatch
+
 import numpy as N
 from itertools import izip
 import field
@@ -32,10 +34,17 @@ class DatasetPluginException(RuntimeError):
     """
     pass
 
+def numpyCopyOrNone(data):
+    """If data is None return None
+    Otherwise return a numpy array corresponding to data."""
+    if data is None:
+        return None
+    return N.array(data, dtype=N.float64)
+
 # these classes are returned from dataset plugins
 class Dataset1D(object):
     """1D dataset for ImportPlugin or DatasetPlugin."""
-    def __init__(self, name, data=None, serr=None, perr=None, nerr=None):
+    def __init__(self, name, data=[], serr=None, perr=None, nerr=None):
         """1D dataset
         name: name of dataset
         data: data in dataset: list of floats or numpy 1D array
@@ -48,17 +57,21 @@ class Dataset1D(object):
         perr should be positive values if used.
         """
         self.name = name
-        self.data = data
-        self.serr = serr
-        self.perr = perr
-        self.nerr = nerr
+        self.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
+    def update(self, data=[], serr=None, perr=None, nerr=None):
+        """Update values to those given."""
+        self.data = numpyCopyOrNone(data)
+        self.serr = numpyCopyOrNone(serr)
+        self.perr = numpyCopyOrNone(perr)
+        self.nerr = numpyCopyOrNone(nerr)
 
     def _null(self):
         """Empty data contents."""
         self.data = N.array([])
         self.serr = self.perr = self.nerr = None
 
-    def _makeRealDataset(self, manager):
+    def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
         # need to do the import here as otherwise we get a loop
         import veusz.document as document
@@ -66,7 +79,7 @@ class Dataset1D(object):
 
 class Dataset2D(object):
     """2D dataset for ImportPlugin or DatasetPlugin."""
-    def __init__(self, name, data, rangex=None, rangey=None):
+    def __init__(self, name, data=[[]], rangex=None, rangey=None):
         """2D dataset.
         name: name of dataset
         data: 2D numpy array of values or list of lists of floats
@@ -74,7 +87,10 @@ class Dataset2D(object):
         rangey: optional tuple with Y range of data (min, max)
         """
         self.name = name
-        self.data = data
+        self.update(data=data, rangex=rangex, rangey=rangey)
+
+    def update(self, data=[[]], rangex=None, rangey=None):
+        self.data = N.array(data, dtype=N.float64)
         self.rangex = rangex
         self.rangey = rangey
 
@@ -83,68 +99,77 @@ class Dataset2D(object):
         self.data = N.array([[]])
         self.rangex = self.rangey = (0, 1)
 
-    def _makeRealDataset(self, manager):
+    def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
         import veusz.document as document
         return document.Dataset2DPlugin(manager, self)
 
 class DatasetText(object):
     """Text dataset for ImportPlugin or DatasetPlugin."""
-    def __init__(self, name, data):
+    def __init__(self, name, data=[]):
         """A text dataset
         name: name of dataset
         data: data in dataset: list of strings
         """
         self.name = name
-        self.data = data
+        self.update(data=data)
+
+    def update(self, data=[]):
+        self.data = list(data)
 
     def _null(self):
         """Empty data contents."""
         self.data = []
 
-    def _makeRealDataset(self, manager):
+    def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
         import veusz.document as document
         return document.DatasetTextPlugin(manager, self)
 
 # class to pass to plugin to give parameters
-class DatasetPluginParams(object):
-    """Set of parameters to be passed to plugin, and helpers to get
-    existing datasets."""
+class DatasetPluginHelper(object):
+    """Helpers to get existing datasets for plugins."""
     
-    def __init__(self, fields, _doc):
-        """Construct parameter object to pass to DatasetPlugins."""
-        self.fields = fields
-        self._doc = _doc
+    def __init__(self, doc):
+        """Construct helper object to pass to DatasetPlugins."""
+        self._doc = doc
 
     @property
     def datasets1d(self):
         """Return list of existing 1D numeric datasets"""
-        return [name for name, ds in self._doc.datasets if
+        return [name for name, ds in self._doc.data.iteritems() if
                 (ds.dimensions == 1 and ds.datatype == 'numeric')]
 
     @property
     def datasets2d(self):
         """Return list of existing 2D numeric datasets"""
-        return [name for name, ds in self._doc.datasets if
+        return [name for name, ds in self._doc.data.iteritems() if
                 (ds.dimensions == 2 and ds.datatype == 'numeric')]
 
     @property
     def datasetstext(self):
         """Return list of existing 1D text datasets"""
-        return [name for name, ds in self._doc.datasets if
+        return [name for name, ds in self._doc.data.iteritems() if
                 (ds.dimensions == 1 and ds.datatype == 'text')]
 
-    def getDataset(self, name):
+    def getDataset(self, name, dimensions=1):
         """Return dataset object for name given.
         Make sure that dataset data are not modified.
 
-        if name is not found, raise a DatasetPluginException
+        name: name of dataset
+        dimensions: number of dimensions dataset requires
+
+        name not found: raise a DatasetPluginException
+        dimensions not right: raise a DatasetPluginException
         """
         try:
             ds = self._doc.data[name]
         except KeyError:
             raise DatasetPluginException("Unknown dataset '%s'" % name)
+        if ds.dimensions != dimensions:
+            raise DatasetPluginException(
+                "Dataset '%s' does not have %i dimensions" % (name, dimensions))
+
         if ds.dimensions == 1 and ds.datatype == 'numeric':
             return Dataset1D(name, data=ds.data, serr=ds.serr, 
                              perr=ds.perr, nerr=ds.nerr)
@@ -155,6 +180,10 @@ class DatasetPluginParams(object):
             return DatasetText(name, ds.data)
         else:
             raise RuntimeError("Failed to work out dataset type")
+
+    def getDatasets(self, names, dimensions=1):
+        """Get a list of datasets."""
+        return [ self.getDataset(n, dimensions=dimensions) for n in names ]
 
 # internal object to synchronise datasets created by a plugin
 class DatasetPluginManager(object):
@@ -170,34 +199,38 @@ class DatasetPluginManager(object):
         
         self.plugin = plugin
         self.document = doc
-        self.params = DatasetPluginParams(fields, doc)
+        self.helper = DatasetPluginHelper(doc)
+        self.fields = fields
+        self.changeset = -1
 
-    def initialConstruct(self):
+        self.setupDatasets()
+
+    def setupDatasets(self):
         """Do initial construction of datasets."""
 
         self.datasetnames = []
         self.datasets = []
-        for ds in self.plugin.update(self.params):
+        self.veuszdatasets = []
+        self.datasets = self.plugin.getDatasets(self.fields)
+        for ds in self.datasets:
             self.datasetnames.append(ds.name)
-            realds = ds._makeRealDataset(self)
-            realds.document = self.document
-            self.datasets.append(realds)
-
-        self.changeset = self.document.changeset        
+            veuszds = ds._makeVeuszDataset(self)
+            veuszds.document = self.document
+            self.veuszdatasets.append(veuszds)
 
     def nullDatasets(self):
         """Clear out contents of datasets."""
         for ds in self.datasets:
-            ds.pluginds._null()
+            ds._null()
 
     def saveToFile(self, fileobj):
         """Save command to load in plugin and parameters."""
 
-        args = [ repr(self.plugin.name), repr(self.params.fields) ]
+        args = [ repr(self.plugin.name), repr(self.fields) ]
 
         # look for renamed or deleted datasets
         names = {}
-        for ds, dsname in izip( self.datasets, self.datasetnames ):
+        for ds, dsname in izip( self.veuszdatasets, self.datasetnames ):
             try:
                 currentname = self.document.datasetName(ds)
             except ValueError:
@@ -212,8 +245,12 @@ class DatasetPluginManager(object):
 
         fileobj.write( 'DatasetPlugin(%s)\n' % (', '.join(args)) )
 
-    def update(self):
-        """Update created datasets."""
+    def update(self, raiseerrors=False):
+        """Update created datasets.
+
+        if raiseerrors is True, raise an exception if there is an exeception
+        when updating the dataset
+        """
 
         if self.document.changeset == self.changeset:
             return
@@ -221,23 +258,15 @@ class DatasetPluginManager(object):
 
         # run the plugin with its parameters
         try:
-            datasets = self.plugin.update(self.params)
+            self.plugin.updateDatasets(self.fields, self.helper)
         except DatasetPluginException, ex:
-            # if there's an error, then log and null out outputs
+            # this is for immediate notification
+            if raiseerrors:
+                raise
+
+            # otherwise if there's an error, then log and null outputs
             self.document.log( unicode(ex) )
             self.nullDatasets()
-            return
-
-        if len(datasets) != len(self.datasets):
-            self.document.log(
-                "Dataset plugin error (%s) -" % self.plugin.name +
-                " number of created datasets changed" )
-            self.nullDatasets()
-            return
-
-        # update datasets
-        for dataset, pluginds in izip(self.datasets, datasets):
-            dataset.pluginds = pluginds
 
 class DatasetPlugin(object):
     """Base class for defining dataset plugins."""
@@ -258,15 +287,42 @@ class DatasetPlugin(object):
         """Override this to declare a list of input fields if required."""
         self.fields = []
 
-    def update(self, params):
-        """Override this to return a list of datasets.
+    def getDatasets(self, fields):
+        """Override this to return a list of (empty) Dataset1D,
+        Dataset2D and DatasetText objects to provide the initial names
+        and type of datasets.
 
-        params is a DatasetPluginParams object, containing a field
-        attribute, and routines to get existing datasets in the document
+        These should be saved for updating in updateDatasets.
+
+        fields: dict of results to the field objects given in self.fields
+        raise a DatasetPluginException if there is a problem with fields
         """
         return []
 
-class ScaleDatasetPlugin(DatasetPlugin):
+    def updateDatasets(self, fields, helper):
+        """Override this to update the dataset objects provided by this plugin.
+
+        fields: dict of field results (also provided to setup)
+        helper: DatasetPluginHelper object, to get other datasets in document
+
+        raise a DatasetPluginException if there is a problem
+        """
+
+class _OneParPlugin(DatasetPlugin):
+    """Code reuse for plugins which create one output dataset with
+    field 'ds_out'."""
+
+    def getDatasets(self, fields):
+        """Returns single output dataset (self.dsout)."""
+        if fields['ds_out'] == '':
+            raise DatasetPluginException('Invalid output dataset name')
+        self.dsout = Dataset1D(fields['ds_out'])
+        return [self.dsout]
+
+###########################################################################
+## Real plugins are below
+
+class ScaleDatasetPlugin(_OneParPlugin):
     """Dataset plugin to scale a dataset."""
 
     menu = ('Scale',)
@@ -283,11 +339,11 @@ class ScaleDatasetPlugin(DatasetPlugin):
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
-    def update(self, params):
+    def updateDatasets(self, fields, helper):
         """Do scaling of dataset."""
 
-        ds_in = params.getDataset(params.fields['ds_in'])
-        f = params.fields['factor']
+        ds_in = helper.getDataset(fields['ds_in'])
+        f = fields['factor']
 
         data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
         data = data * f
@@ -295,13 +351,9 @@ class ScaleDatasetPlugin(DatasetPlugin):
         if perr is not None: perr = perr * f
         if nerr is not None: nerr = nerr * f
 
-        if params.fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-        return [ Dataset1D(params.fields['ds_out'],
-                           data=data, serr=serr, perr=perr, nerr=nerr) ]
-
-class ShiftDatasetPlugin(DatasetPlugin):
+class ShiftDatasetPlugin(_OneParPlugin):
     """Dataset plugin to shift a dataset."""
 
     menu = ('Shift',)
@@ -318,27 +370,20 @@ class ShiftDatasetPlugin(DatasetPlugin):
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
-    def update(self, params):
+    def updateDatasets(self, fields, helper):
         """Do shifting of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        self.dsout.update(data = ds_in.data + fields['value'],
+                          serr=ds_in.serr, perr=ds_in.perr, nerr=ds_in.nerr)
 
-        ds_in = params.getDataset(params.fields['ds_in'])
-        value = params.fields['value']
-
-        if params.fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
-
-        return [ Dataset1D(params.fields['ds_out'],
-                           data = ds_in.data + value,
-                           serr=ds_in.serr, perr=ds_in.perr, nerr=ds_in.nerr) ]
-
-class ConcatenateDatasetPlugin(DatasetPlugin):
+class ConcatenateDatasetPlugin(_OneParPlugin):
     """Dataset plugin to concatenate datasets."""
 
     menu = ('Concatenate',)
     name = 'Concatenate'
     description_short = 'Concatenate datasets'
-    description_filter = ('Concatenate datasets into single dataset. '
-                          'Error bars are merged.')
+    description_full = ('Concatenate datasets into single dataset.\n'
+                        'Error bars are merged.')
 
     def __init__(self):
         """Define fields."""
@@ -347,17 +392,21 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
-    def doConcat(self, name, ds):
-        """Concatentate datasets, returning parts."""
+    def updateDatasets(self, fields, helper):
+        """Do concatenation of dataset."""
+
+        dsin = helper.getDatasets(fields['ds_in'])
+        if len(dsin) == 0:
+            raise DatasetPluginException("Requires one or more input datasets")
 
         # what sort of error bars do we need?
         symerr = asymerr = False
-        for d in ds:
+        for d in dsin:
             if d.serr is not None: symerr = True
             if d.perr is not None or d.nerr is not None: asymerr = True
                 
         # concatenate main data
-        dstack = N.hstack([d.data for d in ds])
+        dstack = N.hstack([d.data for d in dsin])
         sstack = pstack = nstack = None
 
         if not symerr and not asymerr:
@@ -366,7 +415,7 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
         elif symerr and not asymerr:
             # symmetric and not asymmetric error bars
             sstack = []
-            for d in ds:
+            for d in dsin:
                 if d.serr is not None:
                     sstack.append(d.serr)
                 else:
@@ -376,7 +425,7 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
             # asymmetric error bars
             pstack = []
             nstack = []
-            for d in ds:
+            for d in dsin:
                 p = n = N.zeros(d.data.shape, dtype=N.float64)
                 if d.serr is not None:
                     p, n = d.serr, -d.serr
@@ -388,33 +437,16 @@ class ConcatenateDatasetPlugin(DatasetPlugin):
             pstack = N.hstack(pstack)
             nstack = N.hstack(nstack)
 
-        return Dataset1D(name, data=dstack, serr=sstack, perr=pstack, nerr=nstack)
+        self.dsout.update(data=dstack, serr=sstack, perr=pstack, nerr=nstack)
 
-    def update(self, params):
-        """Do shifting of dataset."""
-
-        dsin = params.fields['ds_in']
-        dsout = params.fields['ds_out']
-
-        if len(dsin) == 0:
-            raise DatasetPluginException("Requires one or more input datasets")
-        if dsout == '':
-            raise DatasetPluginException('Invalid output dataset name')
-
-        # get datasets
-        ds = [params.getDataset(d) for d in dsin]
-
-        # return concatentated datasets
-        return [ self.doConcat(dsout, ds) ]
-
-class ChopDatasetPlugin(DatasetPlugin):
+class ChopDatasetPlugin(_OneParPlugin):
     """Dataset plugin to chop datasets."""
 
     menu = ('Chop',)
     name = 'Chop'
     description_short = 'Chop dataset part into new dataset'
-    description_filter = ('Chop out a section of a dataset. Give starting '
-                          'index of data and number of datapoints to take.')
+    description_full = ('Chop out a section of a dataset. Give starting '
+                        'index of data and number of datapoints to take.')
 
     def __init__(self):
         """Define fields."""
@@ -425,15 +457,12 @@ class ChopDatasetPlugin(DatasetPlugin):
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
-    def update(self, params):
-        """Do scaling of dataset."""
+    def updateDatasets(self, fields, helper):
+        """Do chopping of dataset."""
 
-        ds_in = params.getDataset(params.fields['ds_in'])
-        ds_out = params.fields['ds_out']
-        if ds_out == '':
-            raise DatasetPluginException('Invalid output dataset name')
-        start = params.fields['start']
-        num = params.fields['num']
+        ds_in = helper.getDataset(fields['ds_in'])
+        start = fields['start']
+        num = fields['num']
 
         data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
 
@@ -443,16 +472,16 @@ class ChopDatasetPlugin(DatasetPlugin):
         if perr is not None: perr = perr[start-1:start-1+num]
         if nerr is not None: nerr = nerr[start-1:start-1+num]
 
-        return [ Dataset1D(ds_out, data=data, serr=serr, perr=perr, nerr=nerr) ]
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-class MeanDatasets(DatasetPlugin):
+class MeanDatasetPlugin(_OneParPlugin):
     """Dataset plugin to mean datasets together."""
 
     menu = ('Compute mean',)
     name = 'Mean'
     description_short = 'Compute mean of datasets'
-    description_filter = ('Compute mean of multiple datasets to create '
-                          'single dataset.')
+    description_full = ('Compute mean of multiple datasets to create '
+                        'a single dataset.')
 
     def __init__(self):
         """Define fields."""
@@ -461,15 +490,13 @@ class MeanDatasets(DatasetPlugin):
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
-    def update(self, params):
-        """Do scaling of dataset."""
+    def updateDatasets(self, fields, helper):
+        """Compute means of dataset."""
 
-        ds_out = params.fields['ds_out']
-        if ds_out == '':
-            raise DatasetPluginException('Invalid output dataset name')
-
-        inds = [ params.getDataset(d) for d in params.fields['ds_in'] ]
-        maxlength = max( [d.data.shape[0] for d in inds] )
+        inds = helper.getDatasets(fields['ds_in'])
+        if len(inds) == 0:
+            raise DatasetPluginException("Requires one or more input datasets")
+        maxlength = max( [len(d.data) for d in inds] )
 
         # what sort of error bars do we have?
         symerr = asymerr = False
@@ -482,8 +509,8 @@ class MeanDatasets(DatasetPlugin):
         num = N.zeros(maxlength, dtype=N.int)
         for d in inds:
             f = N.isfinite(d.data)
-            tot[:len(f)] += N.where(f, d.data, 0.)
-            num[:len(f)] += f.astype(N.int)
+            tot[f] += d.data[f]
+            num[f] += 1
         data = tot / num
 
         def averageError(attr, attr2=None):
@@ -500,8 +527,8 @@ class MeanDatasets(DatasetPlugin):
                 # add values if not missing
                 if vals is not None:
                     f = N.isfinite(vals)
-                    tot[:len(f)] += N.where(f, vals**2, 0.)
-                    num[:len(f)] += f.astype(N.int)
+                    tot[f] += (vals[f]) ** 2
+                    num[f] += 1
                 else:
                     # treat as zero errors if missing errors
                     num[:len(d.data)] += 1
@@ -513,14 +540,95 @@ class MeanDatasets(DatasetPlugin):
             serr = averageError('serr')
         elif asymerr:
             perr = averageError('perr', attr2='serr')
-            nerr = averageError('nerr', attr2='serr')
+            nerr = -averageError('nerr', attr2='serr')
 
-        return [ Dataset1D(ds_out, data=data, serr=serr, perr=perr, nerr=nerr) ]
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
+class ExtremesDatasetPlugin(DatasetPlugin):
+    """Dataset plugin to get extremes of dataset."""
+
+    menu = ('Data extremes',)
+    name = 'DataExtremes'
+    description_short = 'Compute extreme values of input datasets'
+    description_long = ('Compute extreme values of input datasets. Creates '
+                        'minimum and maximum datasets.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDatasetMulti('ds_in', 'Input datasets'),
+            field.FieldBool('errorbars', 'Include error bars'),
+            field.FieldDataset('ds_min', 'Output minimum dataset (optional)'),
+            field.FieldDataset('ds_max', 'Output maximum dataset (optional)'),
+            field.FieldDataset('ds_errorbar',
+                               'Output range as error bars in dataset (optional)'),
+            ]
+
+    def getDatasets(self, fields):
+        """Returns output dataset."""
+        dsout = []
+        self.dsmin = self.dsmax = self.dserror = None
+        if fields['ds_min'] != '':
+            self.dsmin = Dataset1D(fields['ds_min'])
+            dsout.append(self.dsmin)
+        if fields['ds_max'] != '':
+            self.dsmax = Dataset1D(fields['ds_max'])
+            dsout.append(self.dsmax)
+        if fields['ds_errorbar'] != '':
+            self.dserror = Dataset1D(fields['ds_errorbar'])
+            dsout.append(self.dserror)
+        if not dsout:
+            raise DatasetPluginException('Provide at least one output dataset')
+        return dsout
+
+    def updateDatasets(self, fields, helper):
+        """Compute extremes of datasets."""
+
+        names = fields['ds_in']
+        inds = [ helper.getDataset(d) for d in names ]
+        maxlength = max( [d.data.shape[0] for d in inds] )
+
+        minvals = N.zeros(maxlength, dtype=N.float64) + 1e100
+        maxvals = N.zeros(maxlength, dtype=N.float64) - 1e100
+        for d in inds:
+            f = N.isfinite(d.data)
+
+            v = d.data
+            if fields['errorbars']:
+                if d.serr is not None:
+                    v = v - d.serr
+                elif d.nerr is not None:
+                    v = v + d.nerr
+            minvals[f] = N.min( (minvals[f], v[f]), axis=0 )
+
+            v = d.data
+            if fields['errorbars']:
+                if d.serr is not None:
+                    v = v + d.serr
+                elif d.perr is not None:
+                    v = v + d.perr
+            maxvals[f] = N.max( (maxvals[f], v[f]), axis=0 )
+
+        if self.dsmin is not None:
+            self.dsmin.update(data=minvals)
+        if self.dsmax is not None:
+            self.dsmax.update(data=maxvals)
+        if self.dserror is not None:
+            # compute mean and look at differences from it
+            tot = N.zeros(maxlength, dtype=N.float64)
+            num = N.zeros(maxlength, dtype=N.int)
+            for d in inds:
+                f = N.isfinite(d.data)
+                tot[f] += d.data[f]
+                num[f] += 1
+            mean = tot / num
+            self.dserror.update(data=mean, nerr=minvals-mean, perr=maxvals-mean)
 
 datasetpluginregistry += [
     ScaleDatasetPlugin,
     ShiftDatasetPlugin,
     ConcatenateDatasetPlugin,
     ChopDatasetPlugin,
-    MeanDatasets,
+    MeanDatasetPlugin,
+    ExtremesDatasetPlugin,
     ]

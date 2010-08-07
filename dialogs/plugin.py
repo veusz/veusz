@@ -118,19 +118,28 @@ def runPlugin(window, doc, plugin, fields):
     doc - veusz document
     plugin - plugin object."""
 
-    # use correct operation class for different plugin types
     if isinstance(plugin, plugins.ToolsPlugin):
-        op = document.OperationToolsPlugin(plugin, fields)
+        mode = 'tools'
     elif isinstance(plugin, plugins.DatasetPlugin):
-        # a bit of a hack as we don't give currentwidget to this plugin
-        del fields['currentwidget']
-        op = document.OperationDatasetPlugin(plugin, fields)
+        mode = 'dataset'
     else:
         raise RuntimeError("Invalid plugin class")
 
+    # use correct operation class for different plugin types
+    if mode == 'tools':
+        op = document.OperationToolsPlugin(plugin, fields)
+    elif mode == 'dataset':
+        # a bit of a hack as we don't give currentwidget to this plugin
+        del fields['currentwidget']
+        op = document.OperationDatasetPlugin(plugin, fields)
+
     qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
     try:
-        doc.applyOperation(op)
+        results = doc.applyOperation(op)
+
+        # evaluate datasets using plugin to check it works
+        if mode == 'dataset':
+            op.validate()
 
     except (plugins.ToolsPluginException, plugins.DatasetPluginException), ex:
         # unwind operations
