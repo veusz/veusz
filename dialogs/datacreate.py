@@ -123,16 +123,12 @@ class DataCreateDialog(qt4.QDialog):
 
         if index >= 0:
             dsname = unicode( self.nameedit.text() )
-            self.reEditDataset(dsname)
+            self.reEditDataset(self.document.data[dsname], dsname)
 
-    def reEditDataset(self, dsname):
+    def reEditDataset(self, ds, dsname):
         """Given a dataset name, allow it to be edited again
         (if it is editable)."""
 
-        try:
-            ds = self.document.data[dsname]
-        except KeyError:
-            return
         if isinstance(ds, document.DatasetExpression): 
             # change selected method
             if ds.parametric is None:
@@ -154,6 +150,7 @@ class DataCreateDialog(qt4.QDialog):
                 if text is None:
                     text = ''
                 self.dsedits[part].setText(text)
+
         elif isinstance(ds, document.DatasetRange):
             # change selected method
             self.valueradio.click()
@@ -327,5 +324,11 @@ class DataCreateDialog(qt4.QDialog):
         op.validateExpression(self.document)
         return op
 
-dataeditdialog.recreate_register[document.DatasetExpression] = DataCreateDialog
-dataeditdialog.recreate_register[document.DatasetRange] = DataCreateDialog
+def recreateDataset(mainwindow, document, dataset, datasetname):
+    """Open dialog to recreate a DatasetExpression / DatasetRange."""
+    dialog = DataCreateDialog(mainwindow, document)
+    mainwindow.showDialog(dialog)
+    dialog.reEditDataset(dataset, datasetname)
+
+dataeditdialog.recreate_register[document.DatasetExpression] = recreateDataset
+dataeditdialog.recreate_register[document.DatasetRange] = recreateDataset

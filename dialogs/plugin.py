@@ -22,12 +22,14 @@
 
 import os.path
 import sys
+from itertools import izip
 
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 import veusz.plugins as plugins
 import exceptiondialog
+import dataeditdialog
 
 def handlePlugin(mainwindow, doc, pluginkls):
     """Show plugin dialog or directly execute (if it takes no parameters)."""
@@ -100,6 +102,13 @@ class PluginDialog(qt4.QDialog):
         """Reset fields to defaults."""
         self.addFields()
 
+    def reEditDataset(self, ds, dsname):
+        """Open up dataset in dialog for editing."""
+
+        oldfields = ds.pluginmanager.fields
+        for field, cntrl in izip(self.fields, self.fieldcntrls):
+            field.setControlVal(cntrl, oldfields[field.name])
+
     def slotApply(self):
         """Use the plugin with the inputted data."""
 
@@ -107,7 +116,7 @@ class PluginDialog(qt4.QDialog):
         fields = {'currentwidget': self.mainwindow.treeedit.selwidget.path}
 
         # read values from controls
-        for field, cntrls in zip(self.fields, self.fieldcntrls):
+        for field, cntrls in izip(self.fields, self.fieldcntrls):
             fields[field.name] = field.getControlResults(cntrls)
 
         # run plugin
@@ -169,3 +178,17 @@ def runPlugin(window, doc, plugin, fields):
         qt4.QApplication.restoreOverrideCursor()
 
     return resultstext
+
+def recreateDataset(mainwindow, document, dataset, datasetname):
+    """Open dialog to recreate plugin dataset(s)."""
+
+    # make a new instance of the plugin class
+    newplugin = dataset.pluginmanager.plugin.__class__()
+
+    dialog = PluginDialog(mainwindow, document, newplugin)
+    mainwindow.showDialog(dialog)
+    dialog.reEditDataset(dataset, datasetname)
+
+dataeditdialog.recreate_register[document.Dataset1DPlugin] = recreateDataset
+dataeditdialog.recreate_register[document.Dataset2DPlugin] = recreateDataset
+dataeditdialog.recreate_register[document.DatasetTextPlugin] = recreateDataset

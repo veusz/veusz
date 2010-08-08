@@ -227,13 +227,9 @@ class HistoDataDialog(qt4.QDialog):
         self.counts.click()
         self.cumlOff.click()
 
-    def reEditDataset(self, dsname):
+    def reEditDataset(self, ds, dsname):
         """Re-edit dataset."""
 
-        try:
-            ds = self.document.data[dsname]
-        except KeyError:
-            return
         gen = ds.generator
 
         self.indataset.setEditText(gen.inexpr)
@@ -296,5 +292,11 @@ class HistoDataDialog(qt4.QDialog):
         self.statuslabel.setText(
             'Created datasets "%s" and "%s"' % (p.outbins, p.outdataset))
 
-dataeditdialog.recreate_register[document.DatasetHistoValues] = HistoDataDialog
-dataeditdialog.recreate_register[document.DatasetHistoBins] = HistoDataDialog
+def recreateDataset(mainwindow, document, dataset, datasetname):
+    """Open dialog to recreate histogram."""
+    dialog = HistoDataDialog(mainwindow, document)
+    mainwindow.showDialog(dialog)
+    dialog.reEditDataset(dataset, datasetname)
+
+dataeditdialog.recreate_register[document.DatasetHistoValues] = recreateDataset
+dataeditdialog.recreate_register[document.DatasetHistoBins] = recreateDataset

@@ -41,6 +41,10 @@ class Field(object):
         """Create a set of controls for field."""
         return None
 
+    def setControlVal(self, controls, val):
+        """Update control's value to val."""
+        pass
+
     def getControlResults(self, cntrls):
         """Get result from created contrls."""
         return None
@@ -54,6 +58,9 @@ class FieldText(Field):
         if self.default:
             e.setText(self.default)
         return (l, e)
+
+    def setControlVal(self, controls, val):
+        e.setText(val)
 
     def getControlResults(self, cntrls):
         return unicode( cntrls[1].text() )
@@ -78,12 +85,16 @@ class FieldCombo(Field):
         c.setEditable(bool(self.editable))
 
         if self.default:
-            if self.editable:
-                c.setEditText(self.default)
-            else:
-                c.setCurrentIndex(c.findText(self.default))
+            self.setControlVal((l, c), self.default)
 
         return (l, c)
+
+    def setControlVal(self, controls, val):
+        """Update value to val."""
+        if self.editable:
+            controls[1].setEditText(v)
+        else:
+            controls[1].setCurrentIndex(c.findText(v))
 
     def getControlResults(self, cntrls):
         return unicode( cntrls[1].currentText() )
@@ -152,6 +163,9 @@ class FieldWidget(Field):
         c = _WidgetCombo(doc, self.widgettypes, default)
         return (l, c)
 
+    def setControlVal(self, cntrls, val):
+        controls[1].setCurrentIndex(c.findText(val))
+
     def getControlResults(self, cntrls):
         return cntrls[1].getWidgetPath()
 
@@ -181,6 +195,9 @@ class _FieldSetting(Field):
         c.connect(c, qt4.SIGNAL('settingChanged'), updateval)
 
         return (l, c)
+
+    def setControlVal(self, cntrls, val):
+        self.setn.set(val)
 
     def getDocument(self):
         """This is used by settings to get their document."""
