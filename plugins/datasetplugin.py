@@ -337,7 +337,7 @@ def errorBarType(ds):
 class ScaleDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to scale a dataset."""
 
-    menu = ('Scale',)
+    menu = ('Scale dataset',)
     name = 'Scale'
     description_short = 'Scale dataset by factor'
     description_full = ('Scale a dataset by a factor. '
@@ -368,7 +368,7 @@ class ScaleDatasetPlugin(_OneOutputDatasetPlugin):
 class ShiftDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to shift a dataset."""
 
-    menu = ('Shift',)
+    menu = ('Shift dataset',)
     name = 'Shift'
     description_short = 'Shift dataset by value'
     description_full = ('Shift a dataset by adding a value. '
@@ -391,7 +391,7 @@ class ShiftDatasetPlugin(_OneOutputDatasetPlugin):
 class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to concatenate datasets."""
 
-    menu = ('Concatenate',)
+    menu = ('Concatenate datasets',)
     name = 'Concatenate'
     description_short = 'Concatenate datasets'
     description_full = ('Concatenate datasets into single dataset.\n'
@@ -447,7 +447,7 @@ class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
 class ChopDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to chop datasets."""
 
-    menu = ('Chop',)
+    menu = ('Chop dataset',)
     name = 'Chop'
     description_short = 'Chop dataset part into new dataset'
     description_full = ('Chop out a section of a dataset. Give starting '
@@ -596,6 +596,59 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
         # update output dataset
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class DifferenceDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to subtract two datasets."""
+
+    menu = ('Compute difference',)
+    name = 'Difference'
+    description_short = 'Compute difference between two datasets'
+    description_full = ('Compute difference between two datasets. '
+                        'Error bars are also combined.')
+    
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in1', 'Input dataset 1'),
+            field.FieldDataset('ds_in2', 'Input dataset 2'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do scaling of dataset."""
+
+        dsin1 = helper.getDataset(fields['ds_in1'])
+        dsin2 = helper.getDataset(fields['ds_in2'])
+
+        minlength = min( len(dsin1.data), len(dsin2.data) )
+        data = dsin1.data[:minlength] - dsin2.data[:minlength]
+
+        # computing error bars is non trivial!
+        serr = perr = nerr = None
+        errortype = errorBarType([dsin1, dsin2])
+        if errortype == 'symmetric':
+            serr1 = serr2 = 0
+            if dsin1.serr is not None:
+                serr1 = dsin1.serr[:minlength]
+            if dsin2.serr is not None:
+                serr2 = dsin2.serr[:minlength]
+            serr = N.sqrt(serr1**2 + serr2**2)
+        elif errortype == 'asymmetric':
+            perr1 = perr2 = nerr1 = nerr2 = 0
+            if dsin1.serr is not None:
+                perr1 = nerr1 = dsin1.serr[:minlength]
+            else:
+                if dsin1.perr is not None: perr1 = dsin1.perr[:minlength]
+                if dsin1.nerr is not None: nerr1 = dsin1.nerr[:minlength]
+            if dsin2.serr is not None:
+                perr2 = nerr2 = dsin2.serr[:minlength]
+            else:
+                if dsin2.perr is not None: perr2 = dsin2.perr[:minlength]
+                if dsin2.nerr is not None: nerr2 = dsin2.nerr[:minlength]
+            perr = N.sqrt(perr1**2 + nerr2**2)
+            nerr = -N.sqrt(nerr1**2 + perr2**2)
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 class ExtremesDatasetPlugin(DatasetPlugin):
     """Dataset plugin to get extremes of dataset."""
 
@@ -683,5 +736,6 @@ datasetpluginregistry += [
     ChopDatasetPlugin,
     MeanDatasetPlugin,
     AddDatasetPlugin,
+    DifferenceDatasetPlugin,
     ExtremesDatasetPlugin,
     ]
