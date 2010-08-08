@@ -110,7 +110,12 @@ class PluginDialog(qt4.QDialog):
         for field, cntrls in zip(self.fields, self.fieldcntrls):
             fields[field.name] = field.getControlResults(cntrls)
 
-        runPlugin(self, self.document, self.plugin, fields)
+        # run plugin
+        statustext = runPlugin(self, self.document, self.plugin, fields)
+
+        # show any results
+        self.notifyLabel.setText(statustext)
+        qt4.QTimer.singleShot(3000, lambda: self.notifyLabel.clear())
 
 def runPlugin(window, doc, plugin, fields):
     """Execute a plugin.
@@ -133,6 +138,7 @@ def runPlugin(window, doc, plugin, fields):
         del fields['currentwidget']
         op = document.OperationDatasetPlugin(plugin, fields)
 
+    resultstext = ''
     qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
     try:
         results = doc.applyOperation(op)
@@ -140,6 +146,9 @@ def runPlugin(window, doc, plugin, fields):
         # evaluate datasets using plugin to check it works
         if mode == 'dataset':
             op.validate()
+            resultstext = 'Created datasets: ' + ', '.join(results)
+        else:
+            resultstext = 'Done'
 
     except (plugins.ToolsPluginException, plugins.DatasetPluginException), ex:
         # unwind operations
@@ -158,3 +167,5 @@ def runPlugin(window, doc, plugin, fields):
 
     else:
         qt4.QApplication.restoreOverrideCursor()
+
+    return resultstext
