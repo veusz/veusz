@@ -20,8 +20,6 @@
 
 """Plugins for creating datasets."""
 
-import fnmatch
-
 import numpy as N
 from itertools import izip
 import field
@@ -308,9 +306,8 @@ class DatasetPlugin(object):
         raise a DatasetPluginException if there is a problem
         """
 
-class _OneParPlugin(DatasetPlugin):
-    """Code reuse for plugins which create one output dataset with
-    field 'ds_out'."""
+class _OneOutputDatasetPlugin(DatasetPlugin):
+    """Simplify plugins which create one output with field ds_out."""
 
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
@@ -319,10 +316,25 @@ class _OneParPlugin(DatasetPlugin):
         self.dsout = Dataset1D(fields['ds_out'])
         return [self.dsout]
 
+def errorBarType(ds):
+    """Return type of error bars in list of datasets.
+    'none', 'symmetric', 'asymmetric'
+    """
+
+    symerr = False
+    for d in ds:
+        if d.serr is not None:
+            symerr = True
+        elif d.perr is not None or d.nerr is not None:
+            return 'asymmetric'
+    if symerr:
+        return 'symmetric'
+    return 'none'
+
 ###########################################################################
 ## Real plugins are below
 
-class ScaleDatasetPlugin(_OneParPlugin):
+class ScaleDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to scale a dataset."""
 
     menu = ('Scale',)
@@ -353,7 +365,7 @@ class ScaleDatasetPlugin(_OneParPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-class ShiftDatasetPlugin(_OneParPlugin):
+class ShiftDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to shift a dataset."""
 
     menu = ('Shift',)
@@ -376,7 +388,7 @@ class ShiftDatasetPlugin(_OneParPlugin):
         self.dsout.update(data = ds_in.data + fields['value'],
                           serr=ds_in.serr, perr=ds_in.perr, nerr=ds_in.nerr)
 
-class ConcatenateDatasetPlugin(_OneParPlugin):
+class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to concatenate datasets."""
 
     menu = ('Concatenate',)
@@ -399,20 +411,13 @@ class ConcatenateDatasetPlugin(_OneParPlugin):
         if len(dsin) == 0:
             raise DatasetPluginException("Requires one or more input datasets")
 
-        # what sort of error bars do we need?
-        symerr = asymerr = False
-        for d in dsin:
-            if d.serr is not None: symerr = True
-            if d.perr is not None or d.nerr is not None: asymerr = True
-                
         # concatenate main data
         dstack = N.hstack([d.data for d in dsin])
         sstack = pstack = nstack = None
 
-        if not symerr and not asymerr:
-            # no error bars
-            pass
-        elif symerr and not asymerr:
+        # what sort of error bars do we need?
+        errortype = errorBarType(dsin)
+        if errortype == 'symmetric':
             # symmetric and not asymmetric error bars
             sstack = []
             for d in dsin:
@@ -421,7 +426,7 @@ class ConcatenateDatasetPlugin(_OneParPlugin):
                 else:
                     sstack.append(N.zeros(d.data.shape, dtype=N.float64))
             sstack = N.hstack(sstack)
-        else:
+        elif errortype == 'asymmetric':
             # asymmetric error bars
             pstack = []
             nstack = []
@@ -439,7 +444,7 @@ class ConcatenateDatasetPlugin(_OneParPlugin):
 
         self.dsout.update(data=dstack, serr=sstack, perr=pstack, nerr=nstack)
 
-class ChopDatasetPlugin(_OneParPlugin):
+class ChopDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to chop datasets."""
 
     menu = ('Chop',)
@@ -474,7 +479,7 @@ class ChopDatasetPlugin(_OneParPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-class MeanDatasetPlugin(_OneParPlugin):
+class MeanDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
     menu = ('Compute mean',)
@@ -498,12 +503,6 @@ class MeanDatasetPlugin(_OneParPlugin):
             raise DatasetPluginException("Requires one or more input datasets")
         maxlength = max( [len(d.data) for d in inds] )
 
-        # what sort of error bars do we have?
-        symerr = asymerr = False
-        for d in inds:
-            if d.serr is not None: symerr = True
-            if d.perr is not None or d.nerr is not None: asymerr = True
-
         # mean data (only use finite values)
         tot = N.zeros(maxlength, dtype=N.float64)
         num = N.zeros(maxlength, dtype=N.int)
@@ -513,16 +512,14 @@ class MeanDatasetPlugin(_OneParPlugin):
             num[f] += 1
         data = tot / num
 
-        def averageError(attr, attr2=None):
+        def averageError(errtype, fallback=None):
             """Get average for an error value."""
             tot = N.zeros(maxlength, dtype=N.float64)
             num = N.zeros(maxlength, dtype=N.int)
             for d in inds:
-                vals = getattr(d, attr)
-
-                # failover if 1st attribute not found
-                if vals is None and attr2 is not None:
-                    vals = getattr(d, attr2)
+                vals = getattr(d, errtype)
+                if vals is None and fallback:
+                    vals = getattr(d, fallback)
 
                 # add values if not missing
                 if vals is not None:
@@ -536,12 +533,67 @@ class MeanDatasetPlugin(_OneParPlugin):
 
         # do error bar handling
         serr = perr = nerr = None
-        if symerr and not asymerr:
+        errortype = errorBarType(inds)
+        if errortype == 'symmetric':
             serr = averageError('serr')
-        elif asymerr:
-            perr = averageError('perr', attr2='serr')
-            nerr = -averageError('nerr', attr2='serr')
+        elif errortype == 'asymmetric':
+            perr = averageError('perr', fallback='serr')
+            nerr = -averageError('nerr', fallback='serr')
 
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
+class AddDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to mean datasets together."""
+
+    menu = ('Add datasets',)
+    name = 'Add'
+    description_short = 'Add datasets together'
+    description_full = ('Add datasets together to make a single dataset. '
+                        'Error bars are combined.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDatasetMulti('ds_in', 'Input datasets'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Compute means of dataset."""
+
+        inds = helper.getDatasets(fields['ds_in'])
+        if len(inds) == 0:
+            raise DatasetPluginException("Requires one or more input datasets")
+        maxlength = max( [len(d.data) for d in inds] )
+
+        # add data where finite
+        data = N.zeros(maxlength, dtype=N.float64)
+        for d in inds:
+            f = N.isfinite(d.data)
+            data[f] += d.data[f]
+
+        # do error bar handling
+        def computeError(errortype, fallback=None):
+            """Add together error bars in quadrature."""
+            toterrsqd = N.zeros(maxlength, dtype=N.float64)
+            for d in inds:
+                v = getattr(d, errortype)
+                if v is None and fallback:
+                    v = getattr(d, fallback)
+                if v is not None:
+                    f = N.isfinite(v)
+                    toterrsqd[f] += (v[f])**2
+            return N.sqrt(toterrsqd)
+
+        serr = perr = nerr = None
+        errortype = errorBarType(inds)
+        if errortype == 'symmetric':
+            serr = computeError('serr')
+        elif errortype == 'asymmetric':
+            perr = computeError('perr', fallback='serr')
+            nerr = -computeError('nerr', fallback='serr')
+
+        # update output dataset
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
 class ExtremesDatasetPlugin(DatasetPlugin):
@@ -560,8 +612,8 @@ class ExtremesDatasetPlugin(DatasetPlugin):
             field.FieldBool('errorbars', 'Include error bars'),
             field.FieldDataset('ds_min', 'Output minimum dataset (optional)'),
             field.FieldDataset('ds_max', 'Output maximum dataset (optional)'),
-            field.FieldDataset('ds_errorbar',
-                               'Output range as error bars in dataset (optional)'),
+            field.FieldDataset('ds_errorbar', 'Output range as error bars '
+                               'in dataset (optional)'),
             ]
 
     def getDatasets(self, fields):
@@ -630,5 +682,6 @@ datasetpluginregistry += [
     ConcatenateDatasetPlugin,
     ChopDatasetPlugin,
     MeanDatasetPlugin,
+    AddDatasetPlugin,
     ExtremesDatasetPlugin,
     ]
