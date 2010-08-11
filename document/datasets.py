@@ -1287,7 +1287,7 @@ class Dataset2DXYZExpression(Dataset2D):
                 evaluated[name] = eval(expr, environment)
             except Exception, e:
                 raise DatasetExpressionException(
-                    "Error evaluating expession: %s\n"
+                    "Error evaluating expression: %s\n"
                     "Error: %s" % (expr, str(e)) )
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
@@ -1422,7 +1422,7 @@ class Dataset2DXYFunc(Dataset2D):
         try:
             data = eval(self.expr, env)
         except Exception, e:
-            raise DatasetExpressionException("Error evaluating expession: %s\n"
+            raise DatasetExpressionException("Error evaluating expression: %s\n"
                                              "Error: %s" % (self.expr, str(e)) )
 
         # ensure we get an array out of this (in case expr is scalar)
