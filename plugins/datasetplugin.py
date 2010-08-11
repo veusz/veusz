@@ -331,23 +331,87 @@ def errorBarType(ds):
         return 'symmetric'
     return 'none'
 
+def combineAddedErrors(inds, length):
+    """Combine error bars from list of input dataset, adding
+    errors squared (suitable for adding/subtracting)."""
+
+    errortype = errorBarType(inds)
+    serr = perr = nerr = None
+    if errortype == 'symmetric':
+        serr = N.zeros(length, dtype=N.float64)
+    elif errortype == 'asymmetric':
+        perr = N.zeros(length, dtype=N.float64)
+        nerr = N.zeros(length, dtype=N.float64)
+
+    for d in inds:
+        f = N.isfinite(d.data)
+
+        if errortype == 'symmetric' and d.serr is not None:
+            serr[f] += d.serr[f]**2 
+        elif errortype == 'asymmetric':
+            if d.serr is not None:
+                v = (d.serr[f])**2
+                perr[f] += v
+                nerr[f] += v
+            if d.perr is not None:
+                perr[f] += (d.perr[f])**2
+            if d.nerr is not None:
+                nerr[f] += (d.nerr[f])**2
+
+    if serr is not None: serr = N.sqrt(serr)
+    if perr is not None: perr = N.sqrt(perr)
+    if nerr is not None: nerr = -N.sqrt(nerr)
+    return serr, perr, nerr
+
+def combineMulipliedErrors(inds, length, data):
+    """Combine error bars from list of input dataset, adding
+    fractional errors squared (suitable for multipling/dividing)."""
+
+    errortype = errorBarType(inds)
+    serr = perr = nerr = None
+    if errortype == 'symmetric':
+        serr = N.zeros(length, dtype=N.float64)
+    elif errortype == 'asymmetric':
+        perr = N.zeros(length, dtype=N.float64)
+        nerr = N.zeros(length, dtype=N.float64)
+
+    for d in inds:
+        f = N.isfinite(d.data)
+
+        if errortype == 'symmetric' and d.serr is not None:
+            serr[f] += (d.serr[f]/d.data[f])**2 
+        elif errortype == 'asymmetric':
+            if d.serr is not None:
+                v = (d.serr[f]/d.data[f])**2
+                perr[f] += v
+                nerr[f] += v
+            if d.perr is not None:
+                perr[f] += (d.perr[f]/d.data[f])**2
+            if d.nerr is not None:
+                nerr[f] += (d.nerr[f]/d.data[f])**2
+
+    if serr is not None: serr = N.abs(N.sqrt(serr) * data)
+    if perr is not None: perr = N.abs(N.sqrt(perr) * data)
+    if nerr is not None: nerr = -N.abs(N.sqrt(nerr) * data)
+    return serr, perr, nerr
+
 ###########################################################################
 ## Real plugins are below
 
-class ScaleDatasetPlugin(_OneOutputDatasetPlugin):
+class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to scale a dataset."""
 
-    menu = ('Scale dataset',)
-    name = 'Scale'
-    description_short = 'Scale dataset by factor'
-    description_full = ('Scale a dataset by a factor. '
+    menu = ('Multiply by constant',)
+    name = 'Multiply'
+    description_short = 'Multiply dataset by a constant'
+    description_full = ('Multiply a dataset by a factor. '
                         'Error bars are also scaled.')
     
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', 'Input dataset'),
-            field.FieldFloat('factor', 'Scale factor', default=1.),
+            field.FieldFloat('factor', 'Factor', default=1.),
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
@@ -365,20 +429,20 @@ class ScaleDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-class ShiftDatasetPlugin(_OneOutputDatasetPlugin):
-    """Dataset plugin to shift a dataset."""
+class AddDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to add a constant to a dataset."""
 
-    menu = ('Shift dataset',)
-    name = 'Shift'
-    description_short = 'Shift dataset by value'
-    description_full = ('Shift a dataset by adding a value. '
+    menu = ('Add constant',)
+    name = 'Add'
+    description_short = 'Add a constant to a dataset'
+    description_full = ('Add a dataset by adding a value. '
                         'Error bars remain the same.')
     
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', 'Input dataset'),
-            field.FieldFloat('value', 'Shift value', default=0.),
+            field.FieldFloat('value', 'Add value', default=0.),
             field.FieldDataset('ds_out', 'Output dataset name'),
             ]
 
@@ -482,7 +546,7 @@ class ChopDatasetPlugin(_OneOutputDatasetPlugin):
 class MeanDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
-    menu = ('Compute mean',)
+    menu = ('Mean of datasets',)
     name = 'Mean'
     description_short = 'Compute mean of datasets'
     description_full = ('Compute mean of multiple datasets to create '
@@ -542,12 +606,12 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-class AddDatasetPlugin(_OneOutputDatasetPlugin):
+class AddDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
     menu = ('Add datasets',)
-    name = 'Add'
-    description_short = 'Add datasets together'
+    name = 'Add Datasets'
+    description_short = 'Add two or more datasets together'
     description_full = ('Add datasets together to make a single dataset. '
                         'Error bars are combined.')
 
@@ -568,42 +632,27 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
 
         # add data where finite
         data = N.zeros(maxlength, dtype=N.float64)
+        anyfinite = N.zeros(maxlength, dtype=N.bool)
         for d in inds:
             f = N.isfinite(d.data)
             data[f] += d.data[f]
+            anyfinite[f] = True
+        data[N.logical_not(anyfinite)] = N.nan
 
-        # do error bar handling
-        def computeError(errortype, fallback=None):
-            """Add together error bars in quadrature."""
-            toterrsqd = N.zeros(maxlength, dtype=N.float64)
-            for d in inds:
-                v = getattr(d, errortype)
-                if v is None and fallback:
-                    v = getattr(d, fallback)
-                if v is not None:
-                    f = N.isfinite(v)
-                    toterrsqd[f] += (v[f])**2
-            return N.sqrt(toterrsqd)
-
-        serr = perr = nerr = None
-        errortype = errorBarType(inds)
-        if errortype == 'symmetric':
-            serr = computeError('serr')
-        elif errortype == 'asymmetric':
-            perr = computeError('perr', fallback='serr')
-            nerr = -computeError('nerr', fallback='serr')
+        # handle error bars
+        serr, perr, nerr = combineAddedErrors(inds, maxlength)
 
         # update output dataset
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
-class DifferenceDatasetPlugin(_OneOutputDatasetPlugin):
+class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to subtract two datasets."""
 
-    menu = ('Compute difference',)
-    name = 'Difference'
-    description_short = 'Compute difference between two datasets'
-    description_full = ('Compute difference between two datasets. '
-                        'Error bars are also combined.')
+    menu = ('Subtract datasets',)
+    name = 'Subtract Datasets'
+    description_short = 'Subtract two datasets'
+    description_full = ('Subtract two datasets. '
+                        'Combined error bars are also calculated.')
     
     def __init__(self):
         """Define fields."""
@@ -649,11 +698,50 @@ class DifferenceDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to multiply two or more datasets."""
+
+    menu = ('Multiply datasets',)
+    name = 'Multiply Datasets'
+    description_short = 'Multiply two or more datasets'
+    description_full = ('Multiply two or more datasets. '
+                        'Combined error bars are also calculated.')
+    
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDatasetMulti('ds_in', 'Input datasets'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do scaling of dataset."""
+
+        names = fields['ds_in']
+        inds = [ helper.getDataset(d) for d in names ]
+        maxlength = max( [d.data.shape[0] for d in inds] )
+
+        # output data and where data is finite
+        data = N.ones(maxlength, dtype=N.float64)
+        anyfinite = N.zeros(maxlength, dtype=N.bool)
+        for d in inds:
+            f = N.isfinite(d.data)
+            anyfinite[f] = True
+            data[f] *= d.data[f]
+
+        # where always NaN, make NaN
+        data[N.logical_not(anyfinite)] = N.nan
+
+        # get error bars
+        serr, perr, nerr = combineMultipliedErrrors(inds, maxlength, data)
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 class ExtremesDatasetPlugin(DatasetPlugin):
     """Dataset plugin to get extremes of dataset."""
 
-    menu = ('Data extremes',)
-    name = 'DataExtremes'
+    menu = ('Dataset extremes',)
+    name = 'Extremes'
     description_short = 'Compute extreme values of input datasets'
     description_long = ('Compute extreme values of input datasets. Creates '
                         'minimum and maximum datasets.')
@@ -695,8 +783,10 @@ class ExtremesDatasetPlugin(DatasetPlugin):
 
         minvals = N.zeros(maxlength, dtype=N.float64) + 1e100
         maxvals = N.zeros(maxlength, dtype=N.float64) - 1e100
+        anyfinite = N.zeros(maxlength, dtype=N.bool)
         for d in inds:
             f = N.isfinite(d.data)
+            anyfinite[f] = True
 
             v = d.data
             if fields['errorbars']:
@@ -714,6 +804,9 @@ class ExtremesDatasetPlugin(DatasetPlugin):
                     v = v + d.perr
             maxvals[f] = N.max( (maxvals[f], v[f]), axis=0 )
 
+        minvals[N.logical_not(anyfinite)] = N.nan
+        maxvals[N.logical_not(anyfinite)] = N.nan
+
         if self.dsmin is not None:
             self.dsmin.update(data=minvals)
         if self.dsmax is not None:
@@ -730,12 +823,13 @@ class ExtremesDatasetPlugin(DatasetPlugin):
             self.dserror.update(data=mean, nerr=minvals-mean, perr=maxvals-mean)
 
 datasetpluginregistry += [
-    ScaleDatasetPlugin,
-    ShiftDatasetPlugin,
-    ConcatenateDatasetPlugin,
-    ChopDatasetPlugin,
-    MeanDatasetPlugin,
+    MultiplyDatasetPlugin,
     AddDatasetPlugin,
-    DifferenceDatasetPlugin,
+    ChopDatasetPlugin,
+    ConcatenateDatasetPlugin,
+    MeanDatasetPlugin,
+    AddDatasetsPlugin,
+    SubtractDatasetPlugin,
+    MultiplyDatasetsPlugin,
     ExtremesDatasetPlugin,
     ]

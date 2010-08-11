@@ -459,6 +459,9 @@ class DatasetBase(object):
     columns = ()
     column_descriptions = ()
 
+    # class for representing part of this dataset
+    subsetclass = None
+
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 
@@ -487,20 +490,22 @@ class DatasetBase(object):
     def convertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         return None
+    
+    def _getItemHelper(self, key):
+        """Help get arguments to constructor."""
+        args = {}
+        for col in self.columns:
+            array = getattr(self, col)
+            if array is not None:
+                args[col] = array[key]
+        return args
 
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
         e.g. dataset[5:100] - make a dataset based on items 5 to 99 inclusive
         """
-
-        args = {}
-        for col in self.columns:
-            array = getattr(self, col)
-            if array is not None:
-                args[col] = array[key]
-        
-        return type(self)(**args)
+        return type(self)(**self._getItemHelper(key))
 
     def __len__(self):
         """Return length of dataset."""
@@ -1101,14 +1106,7 @@ class DatasetExpression(Dataset):
         We override this from DatasetBase as it would return a
         DatsetExpression otherwise, not chopped sets of data.
         """
-
-        args = {}
-        for col in self.columns:
-            array = getattr(self, col)
-            if array is not None:
-                args[col] = array[key]
-        
-        return Dataset(**args)
+        return Dataset(**self._getItemHelper(key))
 
     def deleteRows(self, row, numrows):
         pass
@@ -1502,6 +1500,9 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset.__init__(self, data=[])
 
+    def __getitem__(self, key):
+        return Dataset(**self._getItemHelper(key))
+
     # parent class sets these attributes, so override setattr to do nothing
     data = property( lambda self: self.getPluginData('data'),
                      lambda self, val: None )
@@ -1518,6 +1519,9 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset2D.__init__(self, [[]])
+
+    def __getitem__(self, key):
+        return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange)
         
     data   = property( lambda self: self.getPluginData('data'),
                        lambda self, val: None )
@@ -1532,6 +1536,9 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetText.__init__(self, [])
+
+    def __getitem__(self, key):
+        return DatasetText(self.data[key])
 
     data = property( lambda self: self.getPluginData('data'),
                      lambda self, val: None )
