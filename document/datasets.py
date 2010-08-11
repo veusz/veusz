@@ -1021,7 +1021,7 @@ class DatasetExpression(Dataset):
             self.evaluated[part] = evalout
         except Exception, ex:
             raise DatasetExpressionException(
-                "Error evaluating expession: %s\n"
+                "Error evaluating expression: %s\n"
                 "Error: %s" % (self.expr[part], str(ex)) )
 
         # make evaluated error expression have same shape as data
