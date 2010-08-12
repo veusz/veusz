@@ -283,6 +283,10 @@ class DescriptorPart(object):
                       prefix="", suffix="", tail=None):
         """Set the read-in data in the document."""
 
+        # we didn't read any data
+        if self.datatype is None:
+            return []
+
         names = []
         for index in xrange(self.startindex, self.stopindex+1):
             # name for variable
@@ -327,6 +331,8 @@ class DescriptorPart(object):
                 elif self.datatype == 'string':
                     ds = datasets.DatasetText( data=vals,
                                                linked = linkedfile )
+                else:
+                    raise RuntimeError, "Invalid data type"
 
                 finalname = prefix + name + suffix
                 document.setData( finalname, ds )
