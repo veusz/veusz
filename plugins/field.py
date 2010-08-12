@@ -92,9 +92,9 @@ class FieldCombo(Field):
     def setControlVal(self, controls, val):
         """Update value to val."""
         if self.editable:
-            controls[1].setEditText(v)
+            controls[1].setEditText(val)
         else:
-            controls[1].setCurrentIndex(c.findText(v))
+            controls[1].setCurrentIndex(controls[1].findText(val))
 
     def getControlResults(self, cntrls):
         return unicode( cntrls[1].currentText() )
