@@ -363,7 +363,7 @@ def combineAddedErrors(inds, length):
     if nerr is not None: nerr = -N.sqrt(nerr)
     return serr, perr, nerr
 
-def combineMulipliedErrors(inds, length, data):
+def combineMultipliedErrors(inds, length, data):
     """Combine error bars from list of input dataset, adding
     fractional errors squared (suitable for multipling/dividing)."""
 
@@ -733,7 +733,7 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
         data[N.logical_not(anyfinite)] = N.nan
 
         # get error bars
-        serr, perr, nerr = combineMultipliedErrrors(inds, maxlength, data)
+        serr, perr, nerr = combineMultipliedErrors(inds, maxlength, data)
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
@@ -743,7 +743,7 @@ class ExtremesDatasetPlugin(DatasetPlugin):
     menu = ('Dataset extremes',)
     name = 'Extremes'
     description_short = 'Compute extreme values of input datasets'
-    description_long = ('Compute extreme values of input datasets. Creates '
+    description_full = ('Compute extreme values of input datasets. Creates '
                         'minimum and maximum datasets.')
 
     def __init__(self):
