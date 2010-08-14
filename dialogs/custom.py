@@ -18,11 +18,10 @@
 
 # $Id$
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
+from veuszdialog import VeuszDialog
 
 class CustomItemModel(qt4.QAbstractTableModel):
     """A model for editing custom items."""
@@ -161,15 +160,12 @@ class ComboTypeDeligate(qt4.QItemDelegate):
         """Update editor geometry."""
         editor.setGeometry(option.rect)
 
-class CustomDialog(qt4.QDialog):
+class CustomDialog(VeuszDialog):
     """A dialog to create or edit custom constant and function
     definitions."""
 
     def __init__(self, parent, document):
-        qt4.QDialog.__init__(self, parent)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'custom.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'custom.ui')
         self.document = document
 
         self.model = CustomItemModel(self, document)

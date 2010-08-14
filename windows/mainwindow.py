@@ -279,14 +279,12 @@ class MainWindow(qt4.QMainWindow):
 
     def slotEditStylesheet(self):
         dialog = StylesheetDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
         
     def slotEditCustom(self):
         dialog = CustomDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def definePlugins(self, pluginlist, actions, menuname):
@@ -583,49 +581,52 @@ class MainWindow(qt4.QMainWindow):
 
     def showDialog(self, dialog):
         """Show dialog given."""
+        self.connect(dialog, qt4.SIGNAL('dialogFinished'), self.deleteDialog)
         self.dialogs.append(dialog)
         dialog.show()
+
+    def deleteDialog(self, dialog):
+        """Remove dialog from list of dialogs."""
+        try:
+            idx = self.dialogs.index(dialog)
+            del self.dialogs[idx]
+        except ValueError:
+            pass
 
     def slotDataImport(self):
         """Display the import data dialog."""
         dialog = importdialog.ImportDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def slotDataEdit(self):
         """Edit existing datasets."""
         dialog = dataeditdialog.DataEditDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def slotDataCreate(self):
         """Create new datasets."""
         dialog = DataCreateDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def slotDataCreate2D(self):
         """Create new datasets."""
         dialog = DataCreate2DDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def slotDataCapture(self):
         """Capture remote data."""
         dialog = CaptureDialog(self.document, self)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def slotDataHistogram(self):
         """Histogram data."""
         dialog = HistoDataDialog(self, self.document)
-        self.dialogs.append(dialog)
-        dialog.show()
+        self.showDialog(dialog)
         return dialog
 
     def slotDataReload(self):
@@ -648,8 +649,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotHelpAbout(self):
         """Show about dialog."""
-        d = AboutDialog(self)
-        d.exec_()
+        AboutDialog(self).exec_()
 
     def queryOverwrite(self):
         """Do you want to overwrite the current document.

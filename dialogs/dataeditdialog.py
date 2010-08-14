@@ -22,13 +22,11 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
-import itertools
-import os.path
-
 import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.utils as utils
+from veuszdialog import VeuszDialog
 
 # register function to dataset class to edit dataset
 recreate_register = {}
@@ -267,16 +265,11 @@ class DatasetListModel(qt4.QAbstractListModel):
 
         return False
     
-class DataEditDialog(qt4.QDialog):
+class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
     
-    def __init__(self, parent, document, *args):
-
-        # load up UI
-        qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'dataedit.ui'),
-                   self)
+    def __init__(self, parent, document):
+        VeuszDialog.__init__(self, parent, 'dataedit.ui')
         self.document = document
 
         # set up dataset list
@@ -432,18 +425,18 @@ class DataEditDialog(qt4.QDialog):
 
     def slotDatasetImport(self):
         """Show import dialog."""
-        self.parent().slotDataImport()
+        self.mainwindow.slotDataImport()
 
     def slotDatasetCreate(self):
         """Show dataset creation dialog."""
-        self.parent().slotDataCreate()
+        self.mainwindow.slotDataCreate()
 
     def slotDatasetEdit(self):
         """Reload dataset into dataset creation dialog."""
         dsname = unicode(self.getSelectedDataset())
         if dsname:
             dataset = self.document.data[dsname]
-            recreate_register[type(dataset)](self.parent(), self.document,
+            recreate_register[type(dataset)](self.mainwindow, self.document,
                                              dataset, dsname)
 
     def slotCopy(self):

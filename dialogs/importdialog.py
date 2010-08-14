@@ -33,6 +33,7 @@ import veusz.setting as setting
 import veusz.utils as utils
 import veusz.plugins as plugins
 import exceptiondialog
+from veuszdialog import VeuszDialog
 
 class ImportTab(qt4.QWidget):
     """Tab for a particular import type."""
@@ -89,11 +90,8 @@ class ImportTabStandard(ImportTab):
 
     def slotHelp(self):
         """Asked for help."""
-        self.helpdialog = qt4.QDialog(self)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'importhelp.ui'),
-                   self.helpdialog)
-        self.helpdialog.show()
+        d = VeuszDialog(self.dialog.mainwindow, 'importhelp.ui')
+        self.dialog.mainwindow.showDialog(d)
 
     def doPreview(self, filename, encoding):
         """Standard preview - show start of text."""
@@ -178,11 +176,8 @@ class ImportTabCSV(ImportTab):
 
     def slotHelp(self):
         """Asked for help."""
-        self.helpdialog = qt4.QDialog(self)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'importhelpcsv.ui'),
-                   self.helpdialog)
-        self.helpdialog.show()
+        d = VeuszDialog(self.dialog.mainwindow, 'importhelpcsv.ui')
+        self.dialog.mainwindow.showDialog(d)
 
     def getCSVDelimiter(self):
         """Get CSV delimiter, converting friendly names."""
@@ -715,19 +710,16 @@ class ImportTabPlugins(ImportTab):
 
         self.pluginPreview.setPlainText('\n'.join(out))
 
-class ImportDialog(qt4.QDialog):
+class ImportDialog(VeuszDialog):
     """Dialog box for importing data.
     See ImportTab classes above which actually do the work of importing
     """
 
     dirname = '.'
 
-    def __init__(self, parent, document, *args):
+    def __init__(self, parent, document):
 
-        qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'import.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'import.ui')
         self.document = document
 
         # whether file import looks likely to work

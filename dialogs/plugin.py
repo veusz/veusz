@@ -20,7 +20,6 @@
 
 """Dialog boxes for tools and dataset plugins."""
 
-import os.path
 import sys
 from itertools import izip
 
@@ -30,6 +29,7 @@ import veusz.document as document
 import veusz.plugins as plugins
 import exceptiondialog
 import dataeditdialog
+from veuszdialog import VeuszDialog
 
 def handlePlugin(mainwindow, doc, pluginkls):
     """Show plugin dialog or directly execute (if it takes no parameters)."""
@@ -42,14 +42,11 @@ def handlePlugin(mainwindow, doc, pluginkls):
         fields = {'currentwidget': mainwindow.treeedit.selwidget.path}
         runPlugin(mainwindow, doc, plugin, fields)
 
-class PluginDialog(qt4.QDialog):
+class PluginDialog(VeuszDialog):
     """Dialog box class for plugins."""
 
     def __init__(self, mainwindow, doc, plugin):
-        qt4.QDialog.__init__(self, mainwindow)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'plugin.ui'),
-                   self)
+        VeuszDialog.__init__(self, mainwindow, 'plugin.ui')
 
         reset = self.buttonBox.button(qt4.QDialogButtonBox.Reset)
         reset.setAutoDefault(False)
@@ -59,7 +56,6 @@ class PluginDialog(qt4.QDialog):
                       qt4.SIGNAL('clicked()'), self.slotApply )
 
         self.plugin = plugin
-        self.mainwindow = mainwindow
         self.document = doc
 
         self.setWindowTitle(plugin.name)
@@ -124,7 +120,7 @@ class PluginDialog(qt4.QDialog):
 
         # show any results
         self.notifyLabel.setText(statustext)
-        qt4.QTimer.singleShot(3000, lambda: self.notifyLabel.clear())
+        qt4.QTimer.singleShot(3000, self.notifyLabel.clear)
 
 def runPlugin(window, doc, plugin, fields):
     """Execute a plugin.

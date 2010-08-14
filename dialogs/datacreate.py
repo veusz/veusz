@@ -20,12 +20,11 @@
 
 """Dataset creation dialog."""
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
+from veuszdialog import VeuszDialog
 
 import dataeditdialog
 
@@ -33,19 +32,16 @@ class _DSException(RuntimeError):
     """A class to handle errors while trying to create datasets."""
     pass
 
-class DataCreateDialog(qt4.QDialog):
+class DataCreateDialog(VeuszDialog):
     """Dialog to create datasets.
 
     They can be created from numerical ranges, parametrically or from
     expressions involving other dataset."""
 
-    def __init__(self, parent, document, *args):
+    def __init__(self, parent, document):
         """Initialise dialog with document."""
 
-        qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'datacreate.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'datacreate.ui')
         self.document = document
 
         # create button group to get notification of changes
@@ -123,7 +119,8 @@ class DataCreateDialog(qt4.QDialog):
 
         if index >= 0:
             dsname = unicode( self.nameedit.text() )
-            self.reEditDataset(self.document.data[dsname], dsname)
+            if dsname in self.document.data:
+                self.reEditDataset(self.document.data[dsname], dsname)
 
     def reEditDataset(self, ds, dsname):
         """Given a dataset name, allow it to be edited again

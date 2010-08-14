@@ -18,26 +18,19 @@
 
 # $Id$
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
+from veuszdialog import VeuszDialog
 
-class PreferencesDialog(qt4.QDialog):
+class PreferencesDialog(VeuszDialog):
     """Preferences dialog."""
 
-    def __init__(self, *args):
+    def __init__(self, mainwindow):
         """Setup dialog."""
-        qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'preferences.ui'),
-                   self)
+        VeuszDialog.__init__(self, mainwindow, 'preferences.ui')
 
-        win = self
-        while not hasattr(win, 'plot'):
-            win = win.parent()
-        self.plotwindow = win.plot
+        self.plotwindow = mainwindow.plot
 
         # for ease of use
         setdb = setting.settingdb

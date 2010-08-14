@@ -20,11 +20,10 @@
 
 """Dataset creation dialog for 2d data."""
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
+from veuszdialog import VeuszDialog
 
 def checkGetStep(text):
     """Check step syntax is okay.
@@ -40,15 +39,12 @@ def checkGetStep(text):
             pass
     return None
 
-class DataCreate2DDialog(qt4.QDialog):
+class DataCreate2DDialog(VeuszDialog):
 
-    def __init__(self, parent, document, *args):
+    def __init__(self, parent, document):
         """Initialise dialog with document."""
 
-        qt4.QDialog.__init__(self, parent, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'datacreate2d.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'datacreate2d.ui')
         self.document = document
 
         self.createbutton = self.buttonBox.addButton(
@@ -208,8 +204,5 @@ class DataCreate2DDialog(qt4.QDialog):
             msg = "Created dataset '%s'" % text['name']
 
         self.notifylabel.setText(msg)
-        qt4.QTimer.singleShot(4000, self.clearNotifySlot)
-
-    def clearNotifySlot(self):
-        self.notifylabel.setText("")
+        qt4.QTimer.singleShot(4000, self.notifylabel.clear)
         

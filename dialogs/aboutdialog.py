@@ -27,15 +27,13 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.utils as utils
+from veuszdialog import VeuszDialog
 
-class AboutDialog(qt4.QDialog):
+class AboutDialog(VeuszDialog):
     """About dialog."""
 
-    def __init__(self, *args):
-        qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'about.ui'),
-                   self)
+    def __init__(self, mainwindow):
+        VeuszDialog.__init__(self, mainwindow, 'about.ui')
 
         # draw logo in dialog
         self.frame.setBackgroundRole(qt4.QPalette.Base)
@@ -52,18 +50,13 @@ class AboutDialog(qt4.QDialog):
 
     def licenseClicked(self):
         """Show the license."""
-
-        d = LicenseDialog(self)
-        d.exec_()
+        LicenseDialog(self).exec_()
         
-class LicenseDialog(qt4.QDialog):
+class LicenseDialog(VeuszDialog):
     """About license dialog."""
 
-    def __init__(self, *args):
-        qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'license.ui'),
-                   self)
+    def __init__(self, parent):
+        VeuszDialog.__init__(self, parent, 'license.ui')
 
         try:
             f = open(os.path.join(utils.veuszDirectory, 'COPYING'), 'rU')
@@ -72,4 +65,3 @@ class LicenseDialog(qt4.QDialog):
             text = 'Could not open the license file.'
 
         self.licenseEdit.setPlainText(text)
-    

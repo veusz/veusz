@@ -18,13 +18,12 @@
 
 # $Id$
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
 
+from veuszdialog import VeuszDialog
 import dataeditdialog
 
 import numpy as N
@@ -59,16 +58,12 @@ class ManualBinModel(qt4.QAbstractListModel):
                 return True
         return False
 
-class HistoDataDialog(qt4.QDialog):
+class HistoDataDialog(VeuszDialog):
     """Preferences dialog."""
 
     def __init__(self, parent, document):
         """Setup dialog."""
-        qt4.QDialog.__init__(self, parent)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'histodata.ui'),
-                   self)
-
+        VeuszDialog.__init__(self, parent, 'histodata.ui')
         self.document = document
 
         self.minval.default = self.maxval.default = ['Auto']
@@ -85,7 +80,6 @@ class HistoDataDialog(qt4.QDialog):
         self.connect( self.binadd, qt4.SIGNAL('clicked()'), self.addManualBins )
         self.connect( self.binremove, qt4.SIGNAL('clicked()'),
                       self.removeManualBins )
-
 
         self.bindata = []
         self.binmodel = ManualBinModel(self.bindata)
@@ -271,10 +265,7 @@ class HistoDataDialog(qt4.QDialog):
     def applyClicked(self):
         """Create histogram."""
 
-        def clearlabel(self=self):
-            self.statuslabel.setText("")
-        qt4.QTimer.singleShot(4000, clearlabel)
-
+        qt4.QTimer.singleShot(4000, self.statuslabel.clear)
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError, ex:

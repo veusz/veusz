@@ -18,24 +18,20 @@
 
 # $Id$
 
-import os.path
-
 import veusz.utils as utils
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList
+from veuszdialog import VeuszDialog
 
-class StylesheetDialog(qt4.QDialog):
+class StylesheetDialog(VeuszDialog):
     """This is a dialog box to edit stylesheets.
     Most of the work is done elsewhere, so this doesn't do a great deal
     """
 
     def __init__(self, parent, document):
-        qt4.QDialog.__init__(self, parent)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'stylesheet.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'stylesheet.ui')
         self.document = document
         self.stylesheet = document.basewidget.settings.StyleSheet
 

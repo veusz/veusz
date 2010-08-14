@@ -1,4 +1,4 @@
-#    Copyright (C) 2006 Jeremy S. Sanders
+#    Copyright (C) 2010 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -18,28 +18,33 @@
 
 # $Id$
 
-"""Dialog to show if there is an error loading."""
+"""Define a base dialog class cleans up self after being hidden."""
+
+import os.path
 
 import veusz.qtall as qt4
 import veusz.utils as utils
-from veuszdialog import VeuszDialog
 
-class ErrorLoadingDialog(VeuszDialog):
-    """Dialog when error loading."""
+class VeuszDialog(qt4.QDialog):
+    """Base dialog class.
+    - Loads self from ui file.
+    - Deletes self on closing.
+    - Emits dialogFinished when dialog is done
+    """
 
-    def __init__(self, parent, filename, error, traceback):
-        VeuszDialog.__init__(self, parent, 'errorloading.ui')
+    def __init__(self, mainwindow, uifile):
+        """Initialise dialog given Veusz mainwindow and uifile for dialog."""
 
-        # insert filename into label
-        text = unicode(self.errorlabel.text())
-        text = text % filename
-        self.errorlabel.setText(text)
-        self.errormessagelabel.setText(error)
+        qt4.QDialog.__init__(self, mainwindow)
+        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
 
-        # put backtrace into error edit box
-        self.errortextedit.setPlainText(traceback)
+        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs', uifile),
+                   self)
 
-        # set warning pixmap to left of dialog
-        icon = qt4.qApp.style().standardIcon(qt4.QStyle.SP_MessageBoxWarning,
-                                             None, self)
-        self.iconlabel.setPixmap(icon.pixmap(32))
+        self.mainwindow = mainwindow
+
+    def hideEvent(self, event):
+        """Emits dialogFinished if hidden."""
+        if not event.spontaneous():
+            self.emit( qt4.SIGNAL('dialogFinished'), self )
+        return qt4.QDialog.hideEvent(self, event)

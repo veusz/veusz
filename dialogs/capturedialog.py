@@ -20,24 +20,19 @@
 
 """Veusz data capture dialog."""
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
+from veuszdialog import VeuszDialog
 
-class CaptureDialog(qt4.QDialog):
+class CaptureDialog(VeuszDialog):
     """Capture dialog.
 
     This allows the user to set the various capture options."""
 
-    def __init__(self, document, *args):
-        qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'capture.ui'),
-                   self)
-
+    def __init__(self, document, mainwindow):
+        VeuszDialog.__init__(self, mainwindow, 'capture.ui')
         self.document = document
 
         # set values of edit controls from previous invocation (if any)
@@ -100,7 +95,7 @@ class CaptureDialog(qt4.QDialog):
 
     def done(self, r):
         """Dialog is closed."""
-        qt4.QDialog.done(self, r)
+        VeuszDialog.done(self, r)
 
         # record values for next time dialog is opened
         d = setting.settingdb
@@ -201,11 +196,11 @@ class CaptureDialog(qt4.QDialog):
         simpleread.tail = tail
         cd = CapturingDialog(self.document, simpleread, stream, self,
                              updateinterval=updateinterval)
-        cd.show()
+        self.mainwindow.showDialog(cd)
 
 ########################################################################
 
-class CapturingDialog(qt4.QDialog):
+class CapturingDialog(VeuszDialog):
     """Capturing data dialog.
     Shows progress to user."""
 
@@ -219,10 +214,7 @@ class CapturingDialog(qt4.QDialog):
         updateinterval: if set, interval of seconds to update data in doc
         """
 
-        qt4.QDialog.__init__(self, parent)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'capturing.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'capturing.ui')
 
         self.document = document
         self.simpleread = simpleread
