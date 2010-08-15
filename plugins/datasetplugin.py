@@ -151,8 +151,8 @@ class DatasetPluginHelper(object):
                 (ds.dimensions == 1 and ds.datatype == 'text')]
 
     def getDataset(self, name, dimensions=1):
-        """Return dataset object for name given.
-        Make sure that dataset data are not modified.
+        """Return numerical dataset object for name given.
+        Please make sure that dataset data are not modified.
 
         name: name of dataset
         dimensions: number of dimensions dataset requires
@@ -164,24 +164,41 @@ class DatasetPluginHelper(object):
             ds = self._doc.data[name]
         except KeyError:
             raise DatasetPluginException("Unknown dataset '%s'" % name)
+
         if ds.dimensions != dimensions:
             raise DatasetPluginException(
                 "Dataset '%s' does not have %i dimensions" % (name, dimensions))
+        if ds.datatype != 'numeric':
+            raise DatasetPluginException(
+                "Dataset '%s' is not a numerical dataset" % name)
 
-        if ds.dimensions == 1 and ds.datatype == 'numeric':
+        if ds.dimensions == 1:
             return Dataset1D(name, data=ds.data, serr=ds.serr, 
                              perr=ds.perr, nerr=ds.nerr)
-        elif ds.dimensions == 2 and ds.datatype == 'numeric':
+        elif ds.dimensions == 2:
             return Dataset2D(name, ds.data,
                              rangex=ds.xrange, rangey=ds.yrange)
-        elif ds.dimensions == 1 and ds.datatype == 'text':
-            return DatasetText(name, ds.data)
         else:
-            raise RuntimeError("Failed to work out dataset type")
+            raise RuntimeError("Invalid number of dimensions in dataset")
 
     def getDatasets(self, names, dimensions=1):
-        """Get a list of datasets."""
+        """Get a list of numerical datasets (of the dimension given)."""
         return [ self.getDataset(n, dimensions=dimensions) for n in names ]
+
+    def getTextDataset(self, name):
+        """Return a text dataset with name given.
+        Do not modify this dataset.
+
+        name not found: raise a DatasetPluginException
+        """
+
+        try:
+            ds = self._doc.data[name]
+        except KeyError:
+            raise DatasetPluginException("Unknown dataset '%s'" % name)
+        if ds.datatype == 'text':
+            return DatasetText(name, ds.data)
+        raise DatasetPluginException("Dataset '%s' is not a text datset" % name)
 
 # internal object to synchronise datasets created by a plugin
 class DatasetPluginManager(object):
