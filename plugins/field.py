@@ -114,21 +114,26 @@ class _WidgetCombo(qt4.QComboBox):
         self.updateWidgets()
         self.connect(doc, qt4.SIGNAL("sigModified"), self.updateWidgets)
 
+    def _iterateWidgets(self, comboitems, paths, widget, level):
+        """Walk widget tree recursively.
+
+        Adds name onto a list of strings (comboitems)
+        Adds path to widget onto list of paths (paths)
+        """
+
+        if not self.widgettypes or widget.typename in self.widgettypes:
+            comboitems.append('  '*level + widget.name)
+            paths.append(widget.path)
+        for w in widget.children:
+            self._iterateWidgets(comboitems, paths, w, level+1)
+
     def updateWidgets(self):
         """Update combo with new widgets."""
 
         self.paths = []    # veusz widget paths of items
         comboitems = []    # names of items (with tree spacing)
+        self._iterateWidgets(comboitems, self.paths, self.doc.basewidget, 0)
 
-        def iterateWidgets(widget, level):
-            """Walk tree recursively."""
-            if not self.widgettypes or widget.typename in self.widgettypes:
-                comboitems.append('  '*level + widget.name)
-                self.paths.append(widget.path)
-            for w in widget.children:
-                iterateWidgets(w, level+1)
-
-        iterateWidgets(self.doc.basewidget, 0)
         if self.count() == 0:
             # first time around add default to get it selected, yuck :-(
             try:
