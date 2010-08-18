@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #    Copyright (C) 2010 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -839,6 +841,93 @@ class ExtremesDatasetPlugin(DatasetPlugin):
             mean = tot / num
             self.dserror.update(data=mean, nerr=minvals-mean, perr=maxvals-mean)
 
+class DemultiplexPlugin(DatasetPlugin):
+    """Dataset plugin to split a dataset into multiple datasets, element-by-element."""
+
+    menu = ('Demultiplex dataset',)
+    name = 'Demultiplex'
+    description_short = 'Split dataset into multiple datasets element-by-element'
+    description_full = ('Split dataset into multiple datasets on an element-by-element basis.\n'
+                        'e.g. 1, 2, 3, 4, 5, 6 could be converted to 1, 3, 5 and 2, 4, 6.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldDatasetMulti('ds_out', 'Output datasets'),
+            ]
+
+    def getDatasets(self, fields):
+        """Returns demuxed output datasets."""
+        names = [n.strip() for n in fields['ds_out'] if n.strip() != '']
+        if len(names) == 0:
+            raise DatasetPluginException('Requires at least one output dataset')
+
+        self.ds_out = [ Dataset1D(n) for n in names ]
+        return self.ds_out
+
+    def updateDatasets(self, fields, helper):
+        """Compute means of dataset."""
+
+        ds_in = helper.getDataset( fields['ds_in'] )
+
+        num = len(self.ds_out)
+        for i, ds in enumerate(self.ds_out):
+            data = ds_in.data[i::num]
+            serr = nerr = perr = None
+            if ds_in.serr is not None:
+                serr = ds_in.serr[i::num]
+            if ds_in.perr is not None:
+                perr = ds_in.perr[i::num]
+            if ds_in.nerr is not None:
+                nerr = ds_in.nerr[i::num]
+            ds.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
+class PolarToCartesianPlugin(DatasetPlugin):
+    """Convert from r,theta to x,y coordinates."""
+
+    menu = ('Polar to Cartesian',)
+    name = 'PolarToCartesian'
+    description_short = u'Convert r,θ coordinates to x,y coordinates'
+    description_full = (u'Convert r,θ coordinates to x,y coordinates.\n'
+                        u'Error bars are ignored.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('r_in', 'Input dataset (r)'),
+            field.FieldDataset('theta_in', u'Input dataset (θ)'),
+            field.FieldCombo('units', 'Angular units',
+                             items=('radians', 'degrees'),
+                             editable=False),
+            field.FieldDataset('x_out', 'Output dataset (x)'),
+            field.FieldDataset('y_out', 'Output dataset (y)'),
+            ]
+
+    def getDatasets(self, fields):
+        """Returns x and y output datasets."""
+        if fields['x_out'] == '':
+            raise DatasetPluginException('Invalid output x dataset name')
+        if fields['y_out'] == '':
+            raise DatasetPluginException('Invalid output y dataset name')
+        self.x_out = Dataset1D(fields['x_out'])
+        self.y_out = Dataset1D(fields['y_out'])
+        return [self.x_out, self.y_out]
+
+    def updateDatasets(self, fields, helper):
+        """Compute means of dataset."""
+
+        ds_r = helper.getDataset( fields['r_in'] ).data
+        ds_theta = helper.getDataset( fields['theta_in'] ).data
+        if fields['units'] == 'degrees':
+            # convert to radians
+            ds_theta = ds_theta * (N.pi / 180.)
+
+        x = ds_r * N.cos(ds_theta)
+        y = ds_r * N.sin(ds_theta)
+        self.x_out.update(data=x)
+        self.y_out.update(data=y)
+
 datasetpluginregistry += [
     MultiplyDatasetPlugin,
     AddDatasetPlugin,
@@ -849,4 +938,6 @@ datasetpluginregistry += [
     SubtractDatasetPlugin,
     MultiplyDatasetsPlugin,
     ExtremesDatasetPlugin,
+    DemultiplexPlugin,
+    PolarToCartesianPlugin,
     ]
