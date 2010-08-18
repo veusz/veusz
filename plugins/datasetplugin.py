@@ -396,6 +396,8 @@ def combineMultipliedErrors(inds, length, data):
 
     for d in inds:
         f = N.isfinite(d.data)
+        if len(f) > length:
+            f = f[:length]
 
         if errortype == 'symmetric' and d.serr is not None:
             serr[f] += (d.serr[f]/d.data[f])**2 
@@ -420,7 +422,7 @@ def combineMultipliedErrors(inds, length, data):
 class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to scale a dataset."""
 
-    menu = ('Multiply by constant',)
+    menu = ('Compute', 'Multiply by constant',)
     name = 'Multiply'
     description_short = 'Multiply dataset by a constant'
     description_full = ('Multiply a dataset by a factor. '
@@ -451,7 +453,7 @@ class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
 class AddDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to add a constant to a dataset."""
 
-    menu = ('Add constant',)
+    menu = ('Compute', 'Add constant',)
     name = 'Add'
     description_short = 'Add a constant to a dataset'
     description_full = ('Add a dataset by adding a value. '
@@ -474,7 +476,7 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
 class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to concatenate datasets."""
 
-    menu = ('Concatenate datasets',)
+    menu = ('Join', 'Concatenate',)
     name = 'Concatenate'
     description_short = 'Concatenate datasets'
     description_full = ('Concatenate datasets into single dataset.\n'
@@ -530,7 +532,7 @@ class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
 class ChopDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to chop datasets."""
 
-    menu = ('Chop dataset',)
+    menu = ('Split', 'Chop',)
     name = 'Chop'
     description_short = 'Chop dataset part into new dataset'
     description_full = ('Chop out a section of a dataset. Give starting '
@@ -565,7 +567,7 @@ class ChopDatasetPlugin(_OneOutputDatasetPlugin):
 class MeanDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
-    menu = ('Mean of datasets',)
+    menu = ('Compute', 'Mean of datasets',)
     name = 'Mean'
     description_short = 'Compute mean of datasets'
     description_full = ('Compute mean of multiple datasets to create '
@@ -628,7 +630,7 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
 class AddDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
-    menu = ('Add datasets',)
+    menu = ('Compute', 'Add datasets',)
     name = 'Add Datasets'
     description_short = 'Add two or more datasets together'
     description_full = ('Add datasets together to make a single dataset. '
@@ -667,7 +669,7 @@ class AddDatasetsPlugin(_OneOutputDatasetPlugin):
 class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to subtract two datasets."""
 
-    menu = ('Subtract datasets',)
+    menu = ('Compute', 'Subtract datasets',)
     name = 'Subtract Datasets'
     description_short = 'Subtract two datasets'
     description_full = ('Subtract two datasets. '
@@ -720,7 +722,7 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
 
-    menu = ('Multiply datasets',)
+    menu = ('Compute', 'Multiply datasets',)
     name = 'Multiply Datasets'
     description_short = 'Multiply two or more datasets'
     description_full = ('Multiply two or more datasets. '
@@ -734,7 +736,7 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do scaling of dataset."""
+        """Multiply the datasets."""
 
         names = fields['ds_in']
         inds = [ helper.getDataset(d) for d in names ]
@@ -756,10 +758,49 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class DivideDatasetsPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to divide two datasets."""
+
+    menu = ('Compute', 'Divide datasets',)
+    name = 'Divide Datasets'
+    description_short = ('Compute ratio or fractional difference'
+                         ' between two datasets')
+    description_full = ('Divide or compute fractional difference'
+                         ' between two datasets')
+    
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in1', 'Input dataset 1'),
+            field.FieldDataset('ds_in2', 'Input dataset 2'),
+            field.FieldBool('frac', 'Compute fractional difference',
+                            default=False),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Compute ratio."""
+
+        inds1 = helper.getDataset( fields['ds_in1'] )
+        inds2 = helper.getDataset( fields['ds_in2'] )
+        length = min( len(inds1.data), len(inds2.data) )
+
+        # compute ratio
+        data = inds1.data[:length] / inds2.data[:length]
+
+        # get error bars
+        serr, perr, nerr = combineMultipliedErrors([inds1, inds2], length, data)
+
+        # convert to fractional difference (if reqd)
+        if fields['frac']:
+            data -= 1
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 class ExtremesDatasetPlugin(DatasetPlugin):
     """Dataset plugin to get extremes of dataset."""
 
-    menu = ('Dataset extremes',)
+    menu = ('Compute', 'Dataset extremes',)
     name = 'Extremes'
     description_short = 'Compute extreme values of input datasets'
     description_full = ('Compute extreme values of input datasets. Creates '
@@ -844,11 +885,13 @@ class ExtremesDatasetPlugin(DatasetPlugin):
 class DemultiplexPlugin(DatasetPlugin):
     """Dataset plugin to split a dataset into multiple datasets, element-by-element."""
 
-    menu = ('Demultiplex dataset',)
+    menu = ('Split', 'Element by element',)
     name = 'Demultiplex'
     description_short = 'Split dataset into multiple datasets element-by-element'
-    description_full = ('Split dataset into multiple datasets on an element-by-element basis.\n'
-                        'e.g. 1, 2, 3, 4, 5, 6 could be converted to 1, 3, 5 and 2, 4, 6.')
+    description_full = ('Split dataset into multiple datasets on an '
+                        'element-by-element basis.\n'
+                        'e.g. 1, 2, 3, 4, 5, 6 could be converted to '
+                        '1, 3, 5 and 2, 4, 6.')
 
     def __init__(self):
         """Define fields."""
@@ -886,7 +929,7 @@ class DemultiplexPlugin(DatasetPlugin):
 class PolarToCartesianPlugin(DatasetPlugin):
     """Convert from r,theta to x,y coordinates."""
 
-    menu = ('Polar to Cartesian',)
+    menu = ('Convert', 'Polar to Cartesian',)
     name = 'PolarToCartesian'
     description_short = u'Convert r,θ coordinates to x,y coordinates'
     description_full = (u'Convert r,θ coordinates to x,y coordinates.\n'
@@ -929,15 +972,19 @@ class PolarToCartesianPlugin(DatasetPlugin):
         self.y_out.update(data=y)
 
 datasetpluginregistry += [
-    MultiplyDatasetPlugin,
     AddDatasetPlugin,
-    ChopDatasetPlugin,
-    ConcatenateDatasetPlugin,
-    MeanDatasetPlugin,
     AddDatasetsPlugin,
     SubtractDatasetPlugin,
+    MeanDatasetPlugin,
+    MultiplyDatasetPlugin,
     MultiplyDatasetsPlugin,
+    DivideDatasetsPlugin,
     ExtremesDatasetPlugin,
+
+    ConcatenateDatasetPlugin,
+
+    ChopDatasetPlugin,
     DemultiplexPlugin,
+
     PolarToCartesianPlugin,
     ]
