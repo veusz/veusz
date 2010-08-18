@@ -42,6 +42,20 @@ def handlePlugin(mainwindow, doc, pluginkls):
         fields = {'currentwidget': mainwindow.treeedit.selwidget.path}
         runPlugin(mainwindow, doc, plugin, fields)
 
+def wordwrap(text, linelength=80):
+    """Wrap on a word boundary."""
+    out = []
+    l = 0
+    for w in text.split(' '):
+        if w.find('\n') >= 0:
+            l = 0
+        if l + len(w) > linelength:
+            out.append('\n')
+            l = 0
+        out.append(w)
+        l += len(w)
+    return ' '.join(out)
+
 class PluginDialog(VeuszDialog):
     """Dialog box class for plugins."""
 
@@ -58,11 +72,12 @@ class PluginDialog(VeuszDialog):
         self.plugin = plugin
         self.document = doc
 
-        self.setWindowTitle(plugin.name)
+        title = ': '.join(list(plugin.menu))
+        self.setWindowTitle(title)
         descr = plugin.description_full
         if self.plugin.author:
             descr += '\n Author: ' + self.plugin.author
-        self.descriptionLabel.setText(descr)
+        self.descriptionLabel.setText( wordwrap(descr) )
 
         self.fieldcntrls = []
         self.fields = []
