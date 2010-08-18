@@ -529,6 +529,81 @@ class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=dstack, serr=sstack, perr=pstack, nerr=nstack)
 
+class InterleaveDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to interleave datasets."""
+
+    menu = ('Join', 'Element by element',)
+    name = 'Interleave'
+    description_short = 'Join datasets, interleaving element by element'
+    description_full = ('Join datasets, interleaving element by element.\n'
+                        'Error bars are merged.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDatasetMulti('ds_in', 'Input datasets'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do concatenation of dataset."""
+
+        dsin = helper.getDatasets(fields['ds_in'])
+        if len(dsin) == 0:
+            raise DatasetPluginException("Requires one or more input datasets")
+
+        maxlength = max( [len(d.data) for d in dsin] )
+
+        def interleave(datasets):
+            """This is complex to account for different length datasets."""
+            # stick in columns
+            ds = [ N.hstack( (d, N.zeros(maxlength-len(d))) )
+                   for d in datasets ]
+            # which elements are valid
+            good = [ N.hstack( (N.ones(len(d), dtype=N.bool),
+                                N.zeros(maxlength-len(d), dtype=N.bool)) )
+                     for d in datasets ]
+
+            intl = N.column_stack(ds).reshape(maxlength*len(datasets))
+            goodintl = N.column_stack(good).reshape(maxlength*len(datasets))
+            return intl[goodintl]
+
+        # do interleaving
+        data = interleave([d.data for d in dsin])
+
+        # interleave error bars
+        errortype = errorBarType(dsin)
+        serr = perr = nerr = None
+        if errortype == 'symmetric':
+            slist = []
+            for ds in dsin:
+                if ds.serr is None:
+                    slist.append(N.zeros_like(ds.data))
+                else:
+                    slist.append(ds.serr)
+            serr = interleave(slist)
+        elif errortype == 'asymmetric':
+            plist = []
+            nlist = []
+            for ds in dsin:
+                if ds.serr is not None:
+                    plist.append(ds.serr)
+                    nlist.append(-ds.serr)
+                else:
+                    if ds.perr is not None:
+                        plist.append(ds.perr)
+                    else:
+                        plist.append(N.zeros_like(ds.data))
+                    if ds.nerr is not None:
+                        nlist.append(ds.nerr)
+                    else:
+                        nlist.append(N.zeros_like(ds.data))
+            perr = interleave(plist)
+            nerr = interleave(nlist)
+
+        # finally update
+        self.dsout.update(data=data, serr=serr, nerr=nerr, perr=perr)
+
 class ChopDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to chop datasets."""
 
@@ -982,6 +1057,7 @@ datasetpluginregistry += [
     ExtremesDatasetPlugin,
 
     ConcatenateDatasetPlugin,
+    InterleaveDatasetPlugin,
 
     ChopDatasetPlugin,
     DemultiplexPlugin,
