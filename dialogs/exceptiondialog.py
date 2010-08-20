@@ -32,6 +32,7 @@ import numpy
 
 import veusz.qtall as qt4
 import veusz.utils as utils
+from veuszdialog import VeuszDialog
 
 _reportformat = \
 '''Veusz version: %s
@@ -58,16 +59,12 @@ What the user was doing before the crash
 %s
 '''
 
-class ExceptionSendDialog(qt4.QDialog):
+class ExceptionSendDialog(VeuszDialog):
     """Dialog to send debugging report."""
     
-    def __init__(self, exception, *args):
+    def __init__(self, exception, parent):
 
-        # load up UI
-        qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'exceptionsend.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'exceptionsend.ui')
 
         # debugging report text
         self.text = _reportformat % (
@@ -82,7 +79,7 @@ class ExceptionSendDialog(qt4.QDialog):
             exception
             )
         self.detailstosend.setPlainText(self.text)
-        
+
     def accept(self):
         """Send text."""
         # build up the text of the message
@@ -108,20 +105,20 @@ class ExceptionSendDialog(qt4.QDialog):
                                      "connected?")
             return
 
-        qt4.QDialog.accept(self)
+        VeuszDialog.accept(self)
 
-class ExceptionDialog(qt4.QDialog):
+def _raiseIgnoreException():
+    """Ignore this exception to clear out stack frame of previous exception."""
+    raise utils.IgnoreException()
+
+class ExceptionDialog(VeuszDialog):
     """Choose an exception to send to developers."""
     
     ignore_exceptions = set()
 
-    def __init__(self, exception, *args):
+    def __init__(self, exception, parent):
 
-        # load up UI
-        qt4.QDialog.__init__(self, *args)
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
-                                'exceptionlist.ui'),
-                   self)
+        VeuszDialog.__init__(self, parent, 'exceptionlist.ui')
 
         # create backtrace text from exception, and add to list
         self.backtrace = ''.join(traceback.format_exception(*exception)).strip()
@@ -134,12 +131,12 @@ class ExceptionDialog(qt4.QDialog):
 
         self.connect(self.ignoreSessionButton, qt4.SIGNAL('clicked()'),
                      self.ignoreSessionSlot)
-        
+       
     def accept(self):
         """Accept by opening send dialog."""
         d = ExceptionSendDialog(self.backtrace, self)
         if d.exec_() == qt4.QDialog.Accepted:
-            qt4.QDialog.accept(self)
+            VeuszDialog.accept(self)
         
     def ignoreSessionSlot(self):
         """Ignore exception for session."""
@@ -149,5 +146,8 @@ class ExceptionDialog(qt4.QDialog):
     def exec_(self):
         """Exec dialog if exception is not ignored."""
         if self.backtrace not in ExceptionDialog.ignore_exceptions:
-            qt4.QDialog.exec_(self)
+            VeuszDialog.exec_(self)
 
+        # send another exception shortly - this clears out the current one
+        # so the stack frame of the current exception is released
+        qt4.QTimer.singleShot(0, _raiseIgnoreException)

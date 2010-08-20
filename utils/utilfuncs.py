@@ -34,6 +34,9 @@ import math
 
 import veusz.qtall as qt4
 
+class IgnoreException(Exception):
+    """A special exception class to be ignored by the exception handler."""
+
 def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
 

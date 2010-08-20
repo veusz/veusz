@@ -89,9 +89,13 @@ def makeSplashLogo():
 def excepthook(excepttype, exceptvalue, tracebackobj):
     """Show exception dialog if one occurs."""
 
-    d = exceptiondialog.ExceptionDialog((excepttype, exceptvalue,
-                                         tracebackobj),
-                                        None)
+    if isinstance(exceptvalue, utils.IgnoreException):
+        # this exception is ignored to clear out the stack frame of the
+        # previous exception - yuck
+        return
+
+    d = exceptiondialog.ExceptionDialog(
+        (excepttype, exceptvalue, tracebackobj), None)
     d.exec_()
 
 def run():
