@@ -194,8 +194,8 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
   if ( colors.dims[1] != 4 )
     throw "4 columns required in colors array";
   const int numbands = numcolors-1;
-  const int xw = imgdata.dims[0];
-  const int yw = imgdata.dims[1];
+  const int xw = imgdata.dims[1];
+  const int yw = imgdata.dims[0];
 
   QImage::Format format = QImage::Format_RGB32;
   if( forcetrans )
@@ -203,8 +203,10 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
   else
     {
       for(int i = 0; i < numcolors; ++i)
-	if( colors(i, 3) != 255 )
-	  format = QImage::Format_ARGB32;
+	{
+	  if( colors(i, 3) != 255 )
+	    format = QImage::Format_ARGB32;
+	}
     }
 
   // make image
@@ -235,14 +237,14 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 	      const int band2 = min(band + 1, numbands);
 	      const double delta1 = 1.-delta;
 
-	      const int b = int(delta1*colors(band, 0) +
-				delta *colors(band2,0));
-	      const int g = int(delta1*colors(band, 1) +
-				delta *colors(band2,1));
-	      const int r = int(delta1*colors(band, 2) +
-				delta *colors(band2,2));
-	      const int a = int(delta1*colors(band, 3) +
-				delta *colors(band2,3));
+	      const int b = int(delta1*colors(0, band) +
+				delta *colors(0, band2));
+	      const int g = int(delta1*colors(1, band) +
+				delta *colors(1, band2));
+	      const int r = int(delta1*colors(2, band) +
+				delta *colors(2, band2));
+	      const int a = int(delta1*colors(3, band) +
+				delta *colors(3, band2));
 	      
 	      *(scanline+x) = qRgba(r, g, b, a);
 	    }

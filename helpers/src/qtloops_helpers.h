@@ -81,7 +81,7 @@ class Numpy2DObj
   {
     if( DEBUG and (x < 0 or x >= dims[0] or y < 0 or y >= dims[1]) )
       throw "Invalid index in array";
-    return data[x+y*dims[0]];
+    return data[x+y*dims[1]];
   }
 
  private:

@@ -81,7 +81,6 @@ Numpy1DObj::~Numpy1DObj()
   data = 0;
 }
 
-
 Numpy2DObj::Numpy2DObj(PyObject* array)
   : data(0), _array(0)
 {
@@ -114,7 +113,7 @@ Numpy2DIntObj::Numpy2DIntObj(PyObject* array)
 
   if( arrayobj == NULL )
     {
-      throw "Cannot convert to 1D numpy array";
+      throw "Cannot convert to 2D numpy integer array";
     }
 
   data = (int*)(arrayobj->data);

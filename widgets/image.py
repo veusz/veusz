@@ -35,7 +35,7 @@ import plotters
 
 slowfuncs = False
 try:
-    from veusz.helpers.qtloops import numpyToQImage, applyImageTransparancyx
+    from veusz.helpers.qtloops import numpyToQImage, applyImageTransparancy
 except ImportError:
     slowfuncs = True
 
@@ -286,14 +286,15 @@ class Image(plotters.GenericPlotter):
     readColorMaps = classmethod(readColorMaps)
 
     def applyColorMap(self, cmap, scaling, datain, minval, maxval,
-                      transparency, transparencyimg=None):
+                      trans, transimg=None):
         """Apply a colour map to the 2d data given.
 
         cmap is the color map (numpy of BGRalpha quads)
         scaling is scaling mode => 'linear', 'sqrt', 'log' or 'squared'
         data are the imaging data
         minval and maxval are the extremes of the data for the colormap
-        transparency is a number from 0 to 100
+        trans is a number from 0 to 100
+        transimg is an optional image to apply transparency from
         Returns a QImage
         """
 
@@ -305,20 +306,20 @@ class Image(plotters.GenericPlotter):
             cmap = cmap[::-1]
 
         # apply transparency
-        if transparency != 0:
+        if trans != 0:
             cmap = cmap.copy()
-            cmap[:,3] = (cmap[:,3].astype('float32') * (100-transparency) /
+            cmap[:,3] = (cmap[:,3].astype('float32') * (100-trans) /
                          100.).astype(N.int)
         
         # apply scaling of data
         fracs = applyScaling(datain, scaling, minval, maxval)
 
         if not slowfuncs:
-            img = numpyToQImage(fracs, cmap, transparencyimg != None)
-            if transparencyimg is not None:
-                applyImageTransparancy(img, transparencyimg)
+            img = numpyToQImage(fracs, cmap, transimg is not None)
+            if transimg is not None:
+                applyImageTransparancy(img, transimg)
         else:
-            img = slowNumpyToQImage(fracs, cmap, transparencyimg)
+            img = slowNumpyToQImage(fracs, cmap, transimg)
         return img
 
     applyColorMap = classmethod(applyColorMap)
@@ -351,7 +352,7 @@ class Image(plotters.GenericPlotter):
         self.image = self.applyColorMap(cmap, s.colorScaling,
                                         data.data,
                                         minval, maxval, s.transparency,
-                                        transparencyimg=transimg)
+                                        transimg=transimg)
 
     def providesAxesDependency(self):
         """Range information provided by widget."""
