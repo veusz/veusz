@@ -1145,6 +1145,9 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_in', 'Input dataset'),
             field.FieldText('filter', 'Filter expression'),
+            field.FieldBool('replacenan', 'Replace excluded points by NaN\n'
+                            '(indicate missing points)',
+                            default=False),
             field.FieldDataset('ds_out', 'Output dataset'),
             ]
 
@@ -1155,10 +1158,16 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
         data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
 
         try:
-            data = data[filt]
-            if serr is not None: serr = serr[filt]
-            if perr is not None: perr = perr[filt]
-            if nerr is not None: nerr = nerr[filt]
+            if fields['replacenan']:
+                # replace bad points with nan
+                data = data.copy()
+                data[N.logical_not(filt)] = N.nan
+            else:
+                # just select good points
+                data = data[filt]
+                if serr is not None: serr = serr[filt]
+                if perr is not None: perr = perr[filt]
+                if nerr is not None: nerr = nerr[filt]
         except:
             raise DatasetPluginException("Error filtering dataset")
 
