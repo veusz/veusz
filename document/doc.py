@@ -36,6 +36,7 @@ import numpy as N
 import veusz.qtall as qt4
 
 import widgetfactory
+import datasets
 
 import veusz.utils as utils
 import veusz.setting as setting
@@ -874,6 +875,13 @@ class Document( qt4.QObject ):
                 self._updateEvalContextImport(name, val)
             else:
                 raise ValueError, 'Invalid custom type'
+
+    def evalDatasetExpression(self, expr, part='data'):
+        """Return results of evaluating a 1D dataset expression.
+        part is 'data', 'serr', 'perr' or 'nerr' - these are the
+        dataset parts which are evaluated by the expression
+        """
+        return datasets.simpleEvalExpression(self, expr, part=part)
 
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is

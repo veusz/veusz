@@ -115,7 +115,6 @@ class HistoDataDialog(VeuszDialog):
         """Validate expression."""
         text = self.indataset.text()
         res = document.simpleEvalExpression(self.document, unicode(text))
-        print res
 
     class Params(object):
         """Parameters to creation of histogram."""
@@ -272,7 +271,9 @@ class HistoDataDialog(VeuszDialog):
             self.statuslabel.setText("Invalid parameters: %s" % unicode(ex))
             return
 
-        exprresult = document.simpleEvalExpression(self.document, p.expr)
+        exprresult = N.array(
+            document.simpleEvalExpression(self.document, p.expr),
+            dtype=N.float64)
         if len(exprresult) == 0:
             self.statuslabel.setText("Invalid expression")
             return

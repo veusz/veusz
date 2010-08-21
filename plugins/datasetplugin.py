@@ -152,6 +152,13 @@ class DatasetPluginHelper(object):
         return [name for name, ds in self._doc.data.iteritems() if
                 (ds.dimensions == 1 and ds.datatype == 'text')]
 
+    def evaluateExpression(self, expr, part='data'):
+        """Return results of evaluating a 1D dataset expression.
+        part is 'data', 'serr', 'perr' or 'nerr' - these are the
+        dataset parts which are evaluated by the expression
+        """
+        return self._doc.evalDatasetExpression(expr, part=part)
+
     def getDataset(self, name, dimensions=1):
         """Return numerical dataset object for name given.
         Please make sure that dataset data are not modified.
@@ -1124,6 +1131,39 @@ class PolarToCartesianPlugin(DatasetPlugin):
         self.x_out.update(data=x)
         self.y_out.update(data=y)
 
+class FilterDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to add a constant to a dataset."""
+
+    menu = ('Expression', 'Filter',)
+    name = 'Filter'
+    description_short = 'Filter a dataset using an expression'
+    description_full = ('Filter a dataset using an expression, '
+                        'e.g. "x>10" or "(x>1) & (y<2)"')
+    
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldText('filter', 'Filter expression'),
+            field.FieldDataset('ds_out', 'Output dataset'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do shifting of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        filt = helper.evaluateExpression(fields['filter'])
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+
+        try:
+            data = data[filt]
+            if serr is not None: serr = serr[filt]
+            if perr is not None: perr = perr[filt]
+            if nerr is not None: nerr = nerr[filt]
+        except:
+            raise DatasetPluginException("Error filtering dataset")
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1143,4 +1183,6 @@ datasetpluginregistry += [
     ThinDatasetPlugin,
 
     PolarToCartesianPlugin,
+
+    FilterDatasetPlugin,
     ]

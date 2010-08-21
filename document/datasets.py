@@ -25,7 +25,6 @@ from itertools import izip
 
 import numpy as N
 
-import doc
 import simpleread
 import operations
 import readcsv
@@ -171,7 +170,7 @@ class LinkedFileBase(object):
 
     def _reloadViaOperation(self, document, op):
         """Reload links using a supplied operation, op."""
-        tempdoc = doc.Document()
+        tempdoc = document.__class__()
 
         try:
             tempdoc.applyOperation(op)
@@ -246,7 +245,7 @@ class LinkedFile(LinkedFileBase):
         # to make sure we do not overwrited non-linked data (which may
         # be specified in the descriptor)
         
-        tempdoc = doc.Document()
+        tempdoc = document.__class__()
         sr = simpleread.SimpleRead(self.descriptor)
         
         stream = simpleread.FileStream(
@@ -932,15 +931,24 @@ def _evaluateDataset(datasets, dsname, dspart):
         raise DatasetExpressionException(
             'Internal error - invalid dataset part')
 
-def simpleEvalExpression(doc, expr):
-    """Evaluate expression and return data."""
+_safeexpr = set()
+def simpleEvalExpression(doc, expr, part='data'):
+    """Evaluate expression and return data.
 
-    expr = _substituteDatasets(doc.data, expr, 'data')
+    part is 'data', 'serr', 'perr' or 'nerr' - these are the
+    dataset parts which are evaluated by the expression
+    """
 
-    if ( not setting.transient_settings['unsafe_mode'] and
-         utils.checkCode(expr, securityonly=True) ):
-        doc.log("Unsafe expression: %s\n" % expr)
-        return N.array([])
+    expr = _substituteDatasets(doc.data, expr, part)
+
+    if expr not in _safeexpr:
+        if ( not setting.transient_settings['unsafe_mode'] and
+             utils.checkCode(expr, securityonly=True) ):
+            doc.log("Unsafe expression: %s\n" % expr)
+            return N.array([])
+
+    # for speed, track safe expressions
+    _safeexpr.add(expr)
 
     env = doc.eval_context.copy()
     def evaluateDataset(dsname, dspart):
@@ -948,8 +956,7 @@ def simpleEvalExpression(doc, expr):
 
     env['_DS_'] = evaluateDataset
     try:
-        vals = eval(expr, env)
-        evalout = N.array(vals, N.float64)
+        evalout = eval(expr, env)
     except Exception, ex:
         doc.log(unicode(ex))
         return N.array([])
