@@ -106,7 +106,7 @@ def slowNumpyToQImage(img, cmap, transparencyimg):
 
     # Work out which is the minimum colour map. Assumes we have <255 bands.
     numbands = cmap.shape[0]-1
-    bands = (fracs*numbands).astype('uint8')
+    bands = (fracs*numbands).astype(N.uint8)
     bands = N.clip(bands, 0, numbands-1)
 
     # work out fractional difference of data from band to next band
@@ -118,15 +118,14 @@ def slowNumpyToQImage(img, cmap, transparencyimg):
     # calculate BGRalpha quadruplets
     # this is a linear interpolation between the band and the next band
     quads = (deltafracs*cmap[bands+1] +
-             (1.-deltafracs)*cmap[bands]).astype('uint8')
+             (1.-deltafracs)*cmap[bands]).astype(N.uint8)
 
     # apply transparency if a transparency image is set
     if transparencyimg is not None and transparencyimg.shape == img.shape:
         quads[:,3] = ( N.clip(N.ravel(transparencyimg), 0., 1.) *
-                       quads[:,3] ).astype('uint8')
+                       quads[:,3] ).astype(N.uint8)
 
     # convert 32bit quads to a Qt QImage
-    # FIXME: Does this assume C-style array layout??
     s = quads.tostring()
 
     fmt = qt4.QImage.Format_RGB32
@@ -265,7 +264,7 @@ class Image(plotters.GenericPlotter):
             elif p[0][0] not in string.digits:
                 # new colormap follows
                 if name != '':
-                    cls.colormaps[name] = N.array(vals).astype(N.int)
+                    cls.colormaps[name] = N.array(vals).astype(N.intc)
                 name = p[0]
                 vals = []
             else:
@@ -276,7 +275,7 @@ class Image(plotters.GenericPlotter):
 
         # add on final colormap
         if name != '':
-            cls.colormaps[name] = N.array(vals).astype(N.int)
+            cls.colormaps[name] = N.array(vals).astype(N.intc)
 
         # collect names and sort alphabetically
         names = cls.colormaps.keys()
@@ -298,8 +297,6 @@ class Image(plotters.GenericPlotter):
         Returns a QImage
         """
 
-        cmap = cmap.copy()
-
         # invert colour map if min and max are swapped
         if minval > maxval:
             minval, maxval = maxval, minval
@@ -308,8 +305,8 @@ class Image(plotters.GenericPlotter):
         # apply transparency
         if trans != 0:
             cmap = cmap.copy()
-            cmap[:,3] = (cmap[:,3].astype('float32') * (100-trans) /
-                         100.).astype(N.int)
+            cmap[:,3] = (cmap[:,3].astype(N.float32) * (100-trans) /
+                         100.).astype(N.intc)
         
         # apply scaling of data
         fracs = applyScaling(datain, scaling, minval, maxval)

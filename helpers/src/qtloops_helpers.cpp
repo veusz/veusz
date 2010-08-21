@@ -113,7 +113,8 @@ Numpy2DIntObj::Numpy2DIntObj(PyObject* array)
 
   if( arrayobj == NULL )
     {
-      throw "Cannot convert to 2D numpy integer array";
+      throw "Cannot convert to 2D numpy integer array. "
+	"Requires numpy.intc argument.";
     }
 
   data = (int*)(arrayobj->data);
