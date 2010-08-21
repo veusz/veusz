@@ -662,6 +662,9 @@ class PartsDatasetPlugin(DatasetPlugin):
         for d in fields['ds_out']:
             if d.strip() != '':
                 self.dsout.append( Dataset1D(d.strip()) )
+        if len(self.dsout) == 0:
+            raise DatasetPluginException("Needs at least one output dataset")
+
         return self.dsout
 
     def updateDatasets(self, fields, helper):
@@ -679,6 +682,40 @@ class PartsDatasetPlugin(DatasetPlugin):
             if perr is not None: pperr = perr[minv:maxv]
             if nerr is not None: pnerr = nerr[minv:maxv]
             ds.update(data=pdata, serr=pserr, perr=pperr, nerr=pnerr)
+
+class ThinDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to thin datasets."""
+
+    menu = ('Split', 'Thin',)
+    name = 'Thin'
+    description_short = 'Select data points at intervals from dataset'
+    description_full = ('Select data points at intervals from dataset '
+                        'to create new dataset')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldInt('start', 'Starting index (from 1)', default=1),
+            field.FieldInt('interval', 'Interval between data points', default=1),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do thinning of dataset."""
+
+        ds_in = helper.getDataset(fields['ds_in'])
+        start = fields['start']
+        interval = fields['interval']
+
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+
+        data = data[start-1::interval]
+        if serr is not None: serr = serr[start-1::interval]
+        if perr is not None: perr = perr[start-1::interval]
+        if nerr is not None: nerr = nerr[start-1::interval]
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
 class MeanDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
@@ -1103,6 +1140,7 @@ datasetpluginregistry += [
     ChopDatasetPlugin,
     PartsDatasetPlugin,
     DemultiplexPlugin,
+    ThinDatasetPlugin,
 
     PolarToCartesianPlugin,
     ]
