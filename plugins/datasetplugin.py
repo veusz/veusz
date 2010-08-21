@@ -639,6 +639,47 @@ class ChopDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class PartsDatasetPlugin(DatasetPlugin):
+    """Dataset plugin to split datasets into parts."""
+
+    menu = ('Split', 'Parts',)
+    name = 'Parts'
+    description_short = 'Split dataset into equal-size parts'
+    description_full = ('Split dataset into equal-size parts. '
+                        'The parts will differ in size if the dataset '
+                        'cannot be split equally.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldDatasetMulti('ds_out', 'Output datasets'),
+            ]
+
+    def getDatasets(self, fields):
+        """Get output datasets."""
+        self.dsout = []
+        for d in fields['ds_out']:
+            if d.strip() != '':
+                self.dsout.append( Dataset1D(d.strip()) )
+        return self.dsout
+
+    def updateDatasets(self, fields, helper):
+        """Do chopping of dataset."""
+
+        ds_in = helper.getDataset(fields['ds_in'])
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+
+        plen = float(len(data)) / len(self.dsout)
+        for i, ds in enumerate(self.dsout):
+            minv, maxv = int(plen*i), int(plen*(i+1))
+            pserr = pperr = pnerr = None
+            pdata = data[minv:maxv]
+            if serr is not None: pserr = serr[minv:maxv]
+            if perr is not None: pperr = perr[minv:maxv]
+            if nerr is not None: pnerr = nerr[minv:maxv]
+            ds.update(data=pdata, serr=pserr, perr=pperr, nerr=pnerr)
+
 class MeanDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
@@ -1060,6 +1101,7 @@ datasetpluginregistry += [
     InterleaveDatasetPlugin,
 
     ChopDatasetPlugin,
+    PartsDatasetPlugin,
     DemultiplexPlugin,
 
     PolarToCartesianPlugin,
