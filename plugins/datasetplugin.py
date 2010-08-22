@@ -1134,8 +1134,8 @@ class PolarToCartesianPlugin(DatasetPlugin):
 class FilterDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to add a constant to a dataset."""
 
-    menu = ('Expression', 'Filter',)
-    name = 'Filter'
+    menu = ('Filter', 'Expression',)
+    name = 'FilterExpression'
     description_short = 'Filter a dataset using an expression'
     description_full = ('Filter a dataset using an expression, '
                         'e.g. "x>10" or "(x>1) & (y<2)"')
