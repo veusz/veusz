@@ -1029,26 +1029,30 @@ class DatasetExpression(Dataset):
 
         # actually evaluate the expression
         try:
-            evalout = N.array(eval(expr, environment), N.float64)
-            self.evaluated[part] = evalout
+            evalout = eval(expr, environment)
         except Exception, ex:
             raise DatasetExpressionException(
                 "Error evaluating expression: %s\n"
                 "Error: %s" % (self.expr[part], str(ex)) )
+        evalout = N.array(evalout, N.float64)
 
         # make evaluated error expression have same shape as data
         if part != 'data':
             data = self.evaluated['data']
-            if data.shape != evalout.shape:
-                try:
-                    # 1-dimensional - make it right size and trim
-                    oldsize = evalout.shape[0]
-                    evalout = N.resize(evalout, data.shape)
-                    evalout[oldsize:] = N.nan
-                except TypeError:
-                    # 0-dimensional - just make it repeat
-                    evalout = N.resize(evalout, data.shape)
-                self.evaluated[part] = evalout
+            if evalout.shape == ():
+                # zero dimensional - expand to data shape
+                evalout = N.resize(evalout, data.shape)
+            else:
+                # 1-dimensional - make it right size and trim
+                oldsize = evalout.shape[0]
+                evalout = N.resize(evalout, data.shape)
+                evalout[oldsize:] = N.nan
+        else:
+            if evalout.shape == ():
+                # zero dimensional - make a single point
+                evalout = N.resize(evalout, 1)
+
+        self.evaluated[part] = evalout
 
     def updateEvaluation(self):
         """Update evaluation of parts of dataset.
