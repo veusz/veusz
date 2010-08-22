@@ -24,8 +24,8 @@ Simple source use (if requirements installed)
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-1.8.tar.gz                [change version here]
-# cd veusz-1.8
+# tar xzf veusz-1.9.tar.gz                [change version here]
+# cd veusz-1.9
 # ./veusz_main.py
 
 Certain features will be disabled if you do this. You will not be able
@@ -45,7 +45,7 @@ list a few of the possible method here:
 To install to the standard location on the hard disk (it's better to use
 rpms if you have an rpm-based linux distibution)
 ------------------------------------------------------------------------
-# cd veusz-1.8
+# cd veusz-1.9
 # python setup.py build
 # su
 [enter root password]
@@ -59,8 +59,8 @@ instead (if available). Note that this may not work on all
 distributions due to glibc/library incompatibilities. You need to
 simply unpack the tar file and run the main executable:
 
-# tar xzf veusz-linux-i386-1.8.tar.gz     [change version here]
-# cd veusz-linux-i386-1.8
+# tar xzf veusz-linux-i386-1.9.tar.gz     [change version here]
+# cd veusz-linux-i386-1.9
 # ./veusz
 
 Installing in Windows

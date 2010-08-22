@@ -1,4 +1,4 @@
-Veusz 1.8
+Veusz 1.9
 ---------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -18,36 +18,49 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.8:
- * Rewritten several inner loops in C++ giving speedups for large datasets
- * Lines, points and shapes are clipped before plotting, which speeds up
-   plotting with some Qt backends and reduces file sizes
- * Data histogram feature added for calculating histograms of datasets,
-   including cumulative histograms
- * Data import plugins allow the user to add support for importing any 
-   file type - see Veusz wiki for details
- * Experimental Bezier curve option for joining data points
+Changes in 1.9:
+ * Added "Dataset plugins" to easily allow the user to write or load Python
+   code to make new datasets, optionally linked to existing datasets.
+   Includes plugins as standard for
+    - Adding and multiplying constants or datasets
+    - Dividing datasets
+    - Computing means of datasets
+    - Computing extremes of datasets
+    - Joining or combining datasets as parts or element by element
+    - Thinning points from datasets
+    - Converting from polar to Cartesian coordinates
+    - Filtering datasets using expressions
+   See here for details: http://barmag.net/veusz-wiki/DatasetPlugins
+ * Added "Tools plugins" which allow the user to write Veusz macros
+   in Python which can take parameters and be added to the menu.
+   Includes plugins for
+    - Randomizing or replacing colors
+    - Finding and replacing text
+    - Cloning widgets for different datasets
+   See here for details: http://barmag.net/veusz-wiki/ToolsPlugins
+ * C++ code added to speed up data to image conversion
+ * Add vector field plot type
+ * Add text dataset support for Import plugins
+ * Add "Node" embedding interface to easily allow manipulation of the
+   widget/setting tree. See http://barmag.net/veusz-wiki/EmbeddingPython
+ * Veusz now starts in home directory or previous directory used. This
+   can be switched off in the preferences dialog to use current directory.
 
-Minor changes in 1.8:
- * Fix zoom button default action
- * Speed up user interface when handling large numbers of datasets
- * Reset buttons added to several dialog boxes
- * Add engineering number formatting for axes: %VE giving e.g. 1k or 50m
- * Add drop down list of number formatting option to axis tick labels
- * Force Qt dialog boxes to be used instead of KDE ones, as KDE ones are
-   currently broken
- * Use miter joins for plotting data points for sharper appearance
- * Add SetAntiAliasing command to command interface to toggle anti aliasing
- * Fix highlighting of errors when entering settings
- * Fix conversion of numpy to QVariants for new versions of PyQt
- * New point styles added for showing limits
- * Reworked internals of import dialog substantially
- * Several other minor bug fixes
+Minor features added:
+ * Color selectors are updated if new colors added to other color selectors
+ * Exception dialog box uses web to send data rather than email, so no
+   mail transfer agent is required.
 
-Note for people building from source and package builders:
- * Veusz now contains C++ code, dependent for building on the development
-   libraries of SIP, PyQt4 and Qt4. Note that Veusz will still work (but
-   more slowly) without this helper library.
+Bug fixes:
+ * Fixed dataset expressions for zero-dimension expressions
+ * Dialog boxes are properly destroyed on closing to stop memory leaks
+ * Do not give error if same dataset defined in dataset dialog and
+   descriptor in data file
+ * Fix license on some C++ files
+ * Use correct web browser when clicking on links in menus
+ * Exceptions are caught and user notified when loading plugins
+ * Missing recent files are removed from recent files menu
+ * Non finite values ignored when fitting data
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -56,6 +69,7 @@ Features of package:
  * Images (with colour mappings and colorbars)
  * Stepped plots (for histograms)
  * Bar graphs
+ * Vector field plots
  * Plotting dates
  * Fitting functions to data
  * Stacked plots and arrays of plots
@@ -70,6 +84,10 @@ Features of package:
  * Text, CSV, FITS and user-plugin importing
  * Data can be captured from external sources
  * User defined functions, constants and can import external Python functions
+ * Plugin interface to allow user to write or load code to
+    - import data using new formats
+    - make new datasets, optionally linked to existing datasets
+    - arbitrarily manipulate the document
 
 Requirements for source install:
  Python (2.4 or greater required)
