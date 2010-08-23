@@ -21,11 +21,12 @@
 """Plugins for general operations."""
 
 import random
+import re
+import fnmatch
+
 import veusz.qtall as qt4
 import veusz.setting as setting
 import field
-
-import fnmatch
 
 # add an instance of your class to this list to be registered
 toolspluginregistry = []
@@ -122,8 +123,6 @@ class ColorsRandomize(ToolsPlugin):
             for node in fromwidget.WalkWidgets(widgettype='function'):
                 node.Line.color.val = self.getRandomColor(col1, col2)
 
-toolspluginregistry.append(ColorsRandomize)
-
 class ColorsReplace(ToolsPlugin):
     """Randomize the colors used in plotting."""
 
@@ -169,8 +168,6 @@ class ColorsReplace(ToolsPlugin):
 
         fromwidget = ifc.Root.fromPath(fields['widget'])
         walkNodes(fromwidget)
-
-toolspluginregistry.append(ColorsReplace)
 
 class TextReplace(ToolsPlugin):
     """Randomize the colors used in plotting."""
@@ -225,8 +222,6 @@ class TextReplace(ToolsPlugin):
 
         fromwidget = ifc.Root.fromPath(fields['widget'])
         walkNodes(fromwidget)
-
-toolspluginregistry.append(TextReplace)
 
 class WidgetsClone(ToolsPlugin):
     """Take a widget and children and clone them."""
@@ -334,4 +329,88 @@ class WidgetsClone(ToolsPlugin):
             if fields['ds2']:
                 walkNodes(newwidget, fields['ds2'], ds2r)
 
-toolspluginregistry.append(WidgetsClone)
+class FontSize(ToolsPlugin):
+    """Increase or decrease the font size."""
+
+    def __init__(self, dirn):
+        """Construct plugin.
+        dirn == 1: increase sizes
+        dirn == -1: decrease sizes
+        """
+        self.dirn = dirn
+        self.fields = [
+            field.FieldWidget("widget", descr="Start from widget",
+                              default="/"),
+            field.FieldBool("follow", descr="Change references and defaults",
+                            default=True),
+            field.FieldFloat("delta", descr="Change by value",
+                             default=2),
+            ]
+
+    def apply(self, ifc, fields):
+        """Do the search and replace."""
+
+        pt_re = re.compile(r'^([\d.]+)[ ]*pt$')
+        delta = fields['delta']
+        changed = set()
+
+        def walkNodes(node):
+            """Walk nodes, changing values."""
+            if node.type == 'setting':
+                if node.name == 'size':
+                    # find size setting with sibling font (improve this)
+                    if not hasattr(node.parent, 'font'):
+                        return
+
+                    # only follow references if requested
+                    if node.isreference:
+                        if fields['follow']:
+                            node = node.resolveReference()
+                        else:
+                            return
+
+                    # avoid doing things more than once
+                    p = node.path
+                    if p in changed:
+                        return
+                    changed.add(p)
+
+                    # change point size if requested
+                    m = pt_re.match(node.val)
+                    if m:
+                        pt = float(m.group(1)) + delta*self.dirn
+                        if pt < 0: pt = 0.1
+                        node.val = '%gpt' % pt
+            else:
+                for c in node.children:
+                    walkNodes(c)
+
+        fromwidget = ifc.Root.fromPath(fields['widget'])
+        walkNodes(fromwidget)
+
+class FontSizeIncrease(FontSize):
+    menu = ('General', 'Increase font sizes')
+    name = 'Increase font sizes'
+    description_short = 'Increase font sizes'
+    description_full = 'Increase font sizes by number of points given'
+
+    def __init__(self):
+        FontSize.__init__(self, 1)
+
+class FontSizeDecrease(FontSize):
+    menu = ('General', 'Decrease font sizes')
+    name = 'Decrease font sizes'
+    description_short = 'Decrease font sizes'
+    description_full = 'Decrease font sizes by number of points given'
+
+    def __init__(self):
+        FontSize.__init__(self, -1)
+
+toolspluginregistry += [
+    ColorsRandomize,
+    ColorsReplace,
+    TextReplace,
+    WidgetsClone,
+    FontSizeIncrease,
+    FontSizeDecrease,
+    ]
