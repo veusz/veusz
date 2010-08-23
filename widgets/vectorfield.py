@@ -97,7 +97,31 @@ class VectorField(plotters.GenericPlotter):
                                  descr = 'Arrow fill settings',
                                  usertext = 'Arrow fill'),
                pixmap = 'settings_plotmarkerfill' )
+
+    def providesAxesDependency(self):
+        """Range information provided by widget."""
+        s = self.settings
+        return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
         
+    def updateAxisRange(self, axis, depname, axrange):
+        """Automatically determine the ranges of variable on the axes."""
+
+        for name in (self.settings.data1, self.settings.data2):
+            try:
+                data = self.document.data[name]
+            except KeyError:
+                continue
+
+            if data.dimensions == 2:
+                if depname == 'sx':
+                    dxrange = data.xrange
+                    axrange[0] = min( axrange[0], dxrange[0] )
+                    axrange[1] = max( axrange[1], dxrange[1] )
+                elif depname == 'sy':
+                    dyrange = data.yrange
+                    axrange[0] = min( axrange[0], dyrange[0] )
+                    axrange[1] = max( axrange[1], dyrange[1] )
+
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the widget."""
 
@@ -179,10 +203,11 @@ class VectorField(plotters.GenericPlotter):
             angle = 180 - N.arctan2(dy, dx) * (180./N.pi)
             length = N.sqrt(dx**2+dy**2) * 2
             for x, y, l, a in itertools.izip(x2, y2, length, angle):
-                utils.plotLineArrow(painter, x, y, l, a,
-                                    size,
-                                    arrowleft=s.arrowfront,
-                                    arrowright=s.arrowback)
+                if abs(l) > 0.01:
+                    utils.plotLineArrow(painter, x, y, l, a,
+                                        size,
+                                        arrowleft=s.arrowfront,
+                                        arrowright=s.arrowback)
 
         painter.restore()
         painter.endPaintingWidget()
