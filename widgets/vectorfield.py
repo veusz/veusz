@@ -79,15 +79,19 @@ class VectorField(plotters.GenericPlotter):
                                 usertext = "Arrow size",
                                 formatting=True),
                1 )
+        s.add( setting.Bool('scalearrow', True,
+                            descr = 'Scale arrow head by length',
+                            usertext = 'Scale arrow',
+                            formatting=True),
+               2 )
         s.add( setting.Arrow('arrowfront', 'none',
                              descr = 'Arrow in front direction',
                              usertext='Arrow front', formatting=True),
-               2)
+               3)
         s.add( setting.Arrow('arrowback', 'none',
                              descr = 'Arrow in back direction',
                              usertext='Arrow back', formatting=True),
-               3)
-
+               4)
 
         s.add( setting.Line('Line',
                             descr = 'Line style',
@@ -160,7 +164,7 @@ class VectorField(plotters.GenericPlotter):
         painter.save()
         cliprect = self.clipAxesBounds(painter, axes, posn)
 
-        length = s.get('baselength').convert(painter)
+        baselength = s.get('baselength').convert(painter)
 
         # try to be nice if the datasets don't match
         data1st, data2nd = data1.data, data2.data
@@ -180,11 +184,11 @@ class VectorField(plotters.GenericPlotter):
         painter.setPen(pen)
 
         if s.mode == 'cartesian':
-            dx = (data1st[:yw, :xw] * length).ravel()
-            dy = (data2nd[:yw, :xw] * length).ravel()
+            dx = (data1st[:yw, :xw] * baselength).ravel()
+            dy = (data2nd[:yw, :xw] * baselength).ravel()
 
         elif s.mode == 'polar':
-            r = data1st[:yw, :xw].ravel() * length
+            r = data1st[:yw, :xw].ravel() * baselength
             theta = data2nd[:yw, :xw].ravel()
             dx = r * N.cos(theta)
             dy = r * N.sin(theta)
@@ -196,18 +200,24 @@ class VectorField(plotters.GenericPlotter):
             utils.plotLinesToPainter(painter, x1, y1, x2, y2,
                                      cliprect)
         else:
-            size = s.get('arrowsize').convert(painter)
+            arrowsize = s.get('arrowsize').convert(painter)
             painter.setBrush( s.get('Fill').makeQBrushWHide() )
 
             # this is backward - have to convert from dx, dy to angle, length
-            angle = 180 - N.arctan2(dy, dx) * (180./N.pi)
-            length = N.sqrt(dx**2+dy**2) * 2
-            for x, y, l, a in itertools.izip(x2, y2, length, angle):
-                if abs(l) > 0.01:
-                    utils.plotLineArrow(painter, x, y, l, a,
-                                        size,
-                                        arrowleft=s.arrowfront,
-                                        arrowright=s.arrowback)
+            angles = 180 - N.arctan2(dy, dx) * (180./N.pi)
+            lengths = N.sqrt(dx**2+dy**2) * 2
+            
+            # scale arrow heads by arrow length if requested
+            if s.scalearrow:
+                arrowsizes = (arrowsize/baselength/2) * lengths
+            else:
+                arrowsizes = N.zeros(lengths.shape) + arrowsize
+
+            for x, y, l, a, asize in itertools.izip(x2, y2, lengths, angles,
+                                                    arrowsizes):
+                utils.plotLineArrow(painter, x, y, l, a, asize,
+                                    arrowleft=s.arrowfront,
+                                    arrowright=s.arrowback)
 
         painter.restore()
         painter.endPaintingWidget()
