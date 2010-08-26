@@ -36,6 +36,7 @@ Changes in 1.9:
    Includes plugins for
     - Randomizing or replacing colors
     - Finding and replacing text
+    - Increasing / decreasing font sizes
     - Cloning widgets for different datasets
    See here for details: http://barmag.net/veusz-wiki/ToolsPlugins
  * C++ code added to speed up data to image conversion
