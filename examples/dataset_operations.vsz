@@ -1,0 +1,209 @@
+# Veusz saved document (version 1.8.99)
+# User: jss
+# Date: Thu, 26 Aug 2010 20:55:46 +0000
+
+AddImportPath('/home/jss/code/veusz/examples')
+ImportString('x(numeric)','''
+0.000000e+00
+1.000000e+00
+2.000000e+00
+3.000000e+00
+4.000000e+00
+5.000000e+00
+6.000000e+00
+7.000000e+00
+8.000000e+00
+9.000000e+00
+1.000000e+01
+1.100000e+01
+1.200000e+01
+1.300000e+01
+1.400000e+01
+1.500000e+01
+1.600000e+01
+1.700000e+01
+1.800000e+01
+1.900000e+01
+''')
+DatasetPlugin('Thin', {'ds_out': u'xthin', 'start': 1, 'interval': 2, 'ds_in': u'x'})
+ImportString('y1(numeric)','''
+-8.627642e-01
+1.213047e+00
+-1.682870e+00
+2.540669e+00
+9.385744e-04
+-6.966657e-01
+-8.769203e-01
+-6.930465e-01
+-2.456379e-01
+-6.419765e-01
+-1.485679e+00
+-7.142200e-01
+8.639527e-02
+-1.155861e+00
+-9.576156e-01
+6.018372e-02
+-1.027861e+00
+2.953903e-01
+-3.615840e-01
+2.474292e-01
+''')
+DatasetPlugin('Add Datasets', {'ds_out': u'y1plusy2', 'ds_in': (u'y1', u'y2')})
+ImportString('y2(numeric)','''
+7.356253e-01
+2.187511e+00
+9.680102e-01
+-7.393343e-01
+1.071199e+00
+1.763134e+00
+1.589872e+00
+2.015283e+00
+7.102356e-01
+1.808795e+00
+8.750188e-01
+1.477934e+00
+3.591239e-02
+3.046406e+00
+3.515513e+00
+7.194178e-01
+3.498590e+00
+4.465251e+00
+1.638100e+00
+3.577523e+00
+''')
+ImportString('y3(numeric),+-','''
+1.537872e+00 3.000000e-01
+2.879103e-01 3.000000e-01
+7.127184e+00 3.000000e-01
+5.775675e+00 3.000000e-01
+3.390224e+00 3.000000e-01
+2.470264e+00 3.000000e-01
+1.019945e+00 3.000000e-01
+-5.690097e-01 3.000000e-01
+4.276276e+00 3.000000e-01
+-4.449537e+00 3.000000e-01
+-7.127589e-02 3.000000e-01
+-9.531333e-01 3.000000e-01
+-1.129021e+00 3.000000e-01
+2.561764e+00 3.000000e-01
+-1.763882e+00 3.000000e-01
+-3.791216e-01 3.000000e-01
+2.752641e-02 3.000000e-01
+-1.044617e+00 3.000000e-01
+2.075609e+00 3.000000e-01
+-7.859457e-01 3.000000e-01
+''')
+DatasetPlugin('Add', {'ds_out': u'yadd', 'ds_in': u'y1', 'value': 2.0})
+DatasetPlugin('Extremes', {'ds_min': '', 'ds_max': '', 'ds_errorbar': u'yextreme', 'errorbars': False, 'ds_in': (u'ysub', u'y1')})
+DatasetPlugin('Mean', {'ds_out': u'ymean', 'ds_in': (u'yadd', u'y1plusy2', u'y1', u'y2')})
+DatasetPlugin('Multiply', {'ds_out': u'yscale', 'ds_in': u'ymean', 'factor': 0.5})
+DatasetPlugin('Subtract Datasets', {'ds_out': u'ysub', 'ds_in2': u'ymean', 'ds_in1': u'y1'})
+DatasetPlugin('Thin', {'ds_out': u'ythin', 'start': 1, 'interval': 2, 'ds_in': u'yadd'})
+Set('width', '18cm')
+Set('height', '15cm')
+Set('StyleSheet/Font/font', u'Verdana')
+Add('page', name=u'page1', autoadd=False)
+To(u'page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Set('Background/color', u'#f9faff')
+Add('axis', name='x', autoadd=False)
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name=u'y1', autoadd=False)
+To(u'y1')
+Set('yData', u'y1')
+Set('marker', u'plus')
+Set('key', u'data')
+Set('PlotLine/bezierJoin', False)
+Set('PlotLine/color', '#659f23')
+Set('MarkerFill/color', '#659f23')
+Set('ErrorBarLine/color', '#659f23')
+To('..')
+Add('xy', name=u'add', autoadd=False)
+To(u'add')
+Set('yData', u'yadd')
+Set('key', u'add')
+Set('PlotLine/color', '#de9578')
+Set('MarkerFill/color', '#de9578')
+Set('ErrorBarLine/color', '#de9578')
+To('..')
+Add('xy', name=u'plus', autoadd=False)
+To(u'plus')
+Set('yData', u'y1plusy2')
+Set('key', u'plus')
+Set('PlotLine/bezierJoin', False)
+Set('PlotLine/color', '#d02bf1')
+Set('MarkerFill/color', '#d02bf1')
+Set('ErrorBarLine/color', '#d02bf1')
+To('..')
+Add('xy', name=u'ymean', autoadd=False)
+To(u'ymean')
+Set('yData', u'ymean')
+Set('marker', u'square')
+Set('key', u'mean')
+Set('PlotLine/color', '#00a2b7')
+Set('MarkerFill/color', '#00a2b7')
+Set('ErrorBarLine/color', '#00a2b7')
+To('..')
+Add('xy', name=u'ysub', autoadd=False)
+To(u'ysub')
+Set('xData', u'x')
+Set('yData', u'ysub')
+Set('marker', u'diamond')
+Set('key', u'sub')
+Set('PlotLine/color', '#696b69')
+Set('MarkerFill/color', '#696b69')
+Set('ErrorBarLine/color', '#696b69')
+To('..')
+Add('xy', name=u'yscale', autoadd=False)
+To(u'yscale')
+Set('yData', u'yscale')
+Set('marker', u'squashbox')
+Set('key', u'scale')
+Set('PlotLine/color', '#684f5f')
+Set('MarkerFill/color', u'#cf9ebe')
+Set('ErrorBarLine/color', '#684f5f')
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', u'Using data operations to combine datasets')
+Set('xPos', [0.5])
+Set('yPos', [-0.097615808953379762])
+Set('alignHorz', u'centre')
+Set('Text/size', u'15pt')
+To('..')
+Add('xy', name=u'extremes', autoadd=False)
+To(u'extremes')
+Set('yData', u'yextreme')
+Set('marker', u'star6')
+Set('markerSize', u'5pt')
+Set('key', u'extremes')
+Set('errorStyle', u'fillvert')
+Set('MarkerFill/color', u'#bcfff2')
+Set('ErrorBarLine/color', u'grey')
+Set('FillBelow/color', u'#dbe0ed')
+Set('FillAbove/color', u'#dbe0ed')
+To('..')
+Add('key', name='key1', autoadd=False)
+To('key1')
+Set('Background/hide', True)
+Set('Border/hide', True)
+Set('horzPosn', 'centre')
+Set('vertPosn', 'top')
+Set('horzManual', 0.0)
+Set('vertManual', 0.0)
+Set('columns', 2)
+To('..')
+Add('xy', name=u'thin', autoadd=False)
+To(u'thin')
+Set('xData', u'xthin')
+Set('yData', u'ythin')
+Set('markerSize', u'6pt')
+Set('key', u'thin')
+Set('MarkerFill/color', u'#c7b266')
+To('..')
+To('..')
+To('..')
