@@ -179,10 +179,11 @@ class String(qt4.QWidget):
         layout.addWidget(self.edit)
 
         b = self.button = qt4.QPushButton('..')
-        layout.addWidget(b)
+        b.setFlat(True)
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumWidth(16)
         b.setCheckable(True)
+        layout.addWidget(b)
 
         # set the text of the widget to the 
         self.edit.setText( setting.toText() )
@@ -514,6 +515,7 @@ class DatasetOrString(qt4.QWidget):
                                   None)
         
         b = self.button = qt4.QPushButton('..')
+        b.setFlat(True)
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumHeight(self.datachoose.height())
         b.setMaximumWidth(16)
@@ -738,6 +740,7 @@ class Color(qt4.QWidget):
 
         # button for selecting colors
         b = self.button = qt4.QPushButton()
+        b.setFlat(True)
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumHeight(24)
         b.setMaximumWidth(24)
@@ -1222,10 +1225,13 @@ class MultiSettingWidget(qt4.QWidget):
         cntrl.installEventFilter(self)
         addbutton = qt4.QPushButton('+')
         addbutton.setFixedWidth(24)
+        addbutton.setFlat(True)
         addbutton.setToolTip('Add another item')
         subbutton = qt4.QPushButton('-')
         subbutton.setToolTip('Remove item')
         subbutton.setFixedWidth(24)
+        subbutton.setFlat(True)
+
         self.controls.append((cntrl, addbutton, subbutton))
 
         self.grid.addWidget(cntrl, row, 0)
@@ -1430,6 +1436,7 @@ class Filename(qt4.QWidget):
         
         # get a sensible shape for the button - yawn
         b = self.button = qt4.QPushButton('..')
+        b.setFlat(True)
         layout.addWidget(b)
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumWidth(16)
