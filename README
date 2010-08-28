@@ -51,6 +51,8 @@ Minor features added:
  * Color selectors are updated if new colors added to other color selectors
  * Exception dialog box uses web to send data rather than email, so no
    mail transfer agent is required.
+ * Text entry box brought up with '..' goes away when clicking outside it
+ * Improvements to appearance of buttons in Mac OS X
 
 Bug fixes:
  * Fixed dataset expressions for zero-dimension expressions

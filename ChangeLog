@@ -1,5 +1,41 @@
-SVN ChangeLog since Veusz 1.8
+Changes between 1.8 and 1.9
 
+------------------------------------------------------------------------
+r1383 | jeremysanders | 2010-08-28 10:02:23 +0100 (Sat, 28 Aug 2010) | 1 line
+
+Make text entry boxes marked by .. go away by clicking outside frame.
+------------------------------------------------------------------------
+r1382 | jeremysanders | 2010-08-27 21:48:15 +0100 (Fri, 27 Aug 2010) | 1 line
+
+Use flat buttons for setting controls - looks better on mac os
+------------------------------------------------------------------------
+r1381 | jeremysanders | 2010-08-26 22:00:09 +0100 (Thu, 26 Aug 2010) | 1 line
+
+Bump version number to 1.9
+------------------------------------------------------------------------
+r1380 | jeremysanders | 2010-08-26 21:56:02 +0100 (Thu, 26 Aug 2010) | 1 line
+
+Add dataset operations example plot
+------------------------------------------------------------------------
+r1379 | jeremysanders | 2010-08-26 21:31:07 +0100 (Thu, 26 Aug 2010) | 1 line
+
+Scale arrow heads by vector length by default in vector field. Add vectorfield example.
+------------------------------------------------------------------------
+r1378 | jeremysanders | 2010-08-26 13:46:27 +0100 (Thu, 26 Aug 2010) | 1 line
+
+Bump version number for RC
+------------------------------------------------------------------------
+r1377 | jeremysanders | 2010-08-23 22:33:55 +0100 (Mon, 23 Aug 2010) | 1 line
+
+Add tools plugins to increase/decrease font sizes
+------------------------------------------------------------------------
+r1376 | jeremysanders | 2010-08-23 21:34:10 +0100 (Mon, 23 Aug 2010) | 1 line
+
+Update axis range when doing vector plot. Do not plot arrows for very short lines
+------------------------------------------------------------------------
+r1375 | jeremysanders | 2010-08-22 20:14:45 +0100 (Sun, 22 Aug 2010) | 1 line
+
+Updates for 1.9 release
 ------------------------------------------------------------------------
 r1374 | jeremysanders | 2010-08-22 19:44:07 +0100 (Sun, 22 Aug 2010) | 1 line
 
