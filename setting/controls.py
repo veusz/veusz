@@ -93,6 +93,7 @@ class _EditBox(qt4.QTextEdit):
 
         qt4.QTextEdit.__init__(self, parent)
         self.setWindowFlags(qt4.Qt.Popup)
+        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
 
         self.spacing = self.fontMetrics().height()
 
@@ -107,6 +108,18 @@ class _EditBox(qt4.QTextEdit):
             self.setReadOnly(True)
 
         self.positionSelf(parent)
+
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        """Grab clicks outside this window to close it."""
+        if ( isinstance(event, qt4.QMouseEvent) and
+             event.buttons() != qt4.Qt.NoButton ):
+            frame = qt4.QRect(0, 0, self.width(), self.height())
+            if not frame.contains(event.pos()):
+                self.close()
+                return True
+        return qt4.QTextEdit.eventFilter(self, obj, event)
 
     def keyPressEvent(self, event):
         """Close if escape or return is pressed."""
