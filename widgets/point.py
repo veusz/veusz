@@ -234,10 +234,10 @@ class PointPlotter(GenericPlotter):
                            ' for each datapoint by this factor',
                            usertext='Thin markers',
                            formatting=True), 0 )
-        s.add( setting.Distance('markerSize',
-                                '3pt',
-                                descr = 'Size of marker to plot',
-                                usertext='Marker size', formatting=True), 0 )
+        s.add( setting.DistancePt('markerSize',
+                                  '3pt',
+                                  descr = 'Size of marker to plot',
+                                  usertext='Marker size', formatting=True), 0 )
         s.add( setting.Marker('marker',
                               'circle',
                               descr = 'Type of marker to plot',

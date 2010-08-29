@@ -818,6 +818,12 @@ class Distance(Setting):
         # do inverse mapping
         return inversefn(distpix, painter, maxsize)
 
+class DistancePt(Distance):
+    """For a distance in points."""
+
+    def makeControl(self, *args):
+        return controls.DistancePt(self, *args)
+
 class DistanceOrAuto(Distance):
     """A distance or the value Auto"""
 

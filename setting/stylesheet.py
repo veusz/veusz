@@ -57,10 +57,10 @@ class StylesheetLine(Settings):
         Settings.__init__(self, 'Line', pixmap='settings_plotline',
                           descr='Default line style for document',
                           usertext='Line')
-        self.add( setting.Distance('width', '0.5pt',
-                                   descr='Default line width',
-                                   usertext='Width',
-                                   formatting=True) )
+        self.add( setting.DistancePt('width', '0.5pt',
+                                     descr='Default line width',
+                                     usertext='Width',
+                                     formatting=True) )
         self.add( setting.Color('color', 'black',
                                 descr='Default line color',
                                 usertext='Color',
@@ -106,10 +106,10 @@ class StylesheetText(Settings):
         self.add( setting.FontFamily('font', StylesheetText.defaultfamily,
                                      descr='Font name', usertext='Font',
                                      formatting=True))
-        self.add( setting.Distance('size', '14pt',
-                                   descr='Default font size',
-                                   usertext='Size',
-                                   formatting=True))
+        self.add( setting.DistancePt('size', '14pt',
+                                     descr='Default font size',
+                                     usertext='Size',
+                                     formatting=True))
         self.add( setting.Color('color', 'black',
                                 descr='Default font color',
                                 usertext='Color',

@@ -69,15 +69,15 @@ class VectorField(plotters.GenericPlotter):
                2 )
 
         # formatting
-        s.add( setting.Distance('baselength', '10pt',
-                                descr = "Base length of unit vector",
-                                usertext = "Base length",
-                                formatting=True),
+        s.add( setting.DistancePt('baselength', '10pt',
+                                  descr = "Base length of unit vector",
+                                  usertext = "Base length",
+                                  formatting=True),
                0 )
-        s.add( setting.Distance('arrowsize', '2pt',
-                                descr = "Size of any arrows",
-                                usertext = "Arrow size",
-                                formatting=True),
+        s.add( setting.DistancePt('arrowsize', '2pt',
+                                  descr = "Size of any arrows",
+                                  usertext = "Arrow size",
+                                  formatting=True),
                1 )
         s.add( setting.Bool('scalearrow', True,
                             descr = 'Scale arrow head by length',

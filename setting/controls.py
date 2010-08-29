@@ -483,6 +483,20 @@ class Distance(Choice):
         self.updateComboList()
         Choice.slotActivated(self, val)
 
+class DistancePt(Choice):
+    """For editing distances with defaults in points."""
+
+    points = (
+        '0pt', '0.25pt', '0.5pt', '1pt', '1.5pt', '2pt', '3pt',
+        '4pt', '5pt', '6pt', '8pt', '10pt', '12pt', '14pt', '16pt',
+        '18pt', '20pt', '22pt', '24pt', '26pt', '28pt', '30pt',
+        '34pt', '40pt', '44pt', '50pt', '60pt', '70pt'
+        )
+    
+    def __init__(self, setting, parent, allowauto=False):
+        '''Initialise with blank list, then populate with sensible units.'''
+        Choice.__init__(self, setting, True, DistancePt.points, parent)
+        
 class Dataset(Choice):
     """Allow the user to choose between the possible datasets."""
 

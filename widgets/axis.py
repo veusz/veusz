@@ -42,10 +42,10 @@ class MajorTick(setting.Line):
 
     def __init__(self, name, **args):
         setting.Line.__init__(self, name, **args)
-        self.add( setting.Distance( 'length',
-                                    '6pt',
-                                    descr = 'Length of major ticks',
-                                    usertext='Length') )
+        self.add( setting.DistancePt( 'length',
+                                      '6pt',
+                                      descr = 'Length of major ticks',
+                                      usertext='Length') )
         self.add( setting.Int( 'number',
                                6,
                                descr = 'Number of major ticks to aim for',
@@ -66,10 +66,10 @@ class MinorTick(setting.Line):
 
     def __init__(self, name, **args):
         setting.Line.__init__(self, name, **args)
-        self.add( setting.Distance( 'length',
-                                    '3pt',
-                                    descr = 'Length of minor ticks',
-                                    usertext='Length') )
+        self.add( setting.DistancePt( 'length',
+                                      '3pt',
+                                      descr = 'Length of minor ticks',
+                                      usertext='Length') )
         self.add( setting.Int( 'number',
                                20,
                                descr = 'Number of minor ticks to aim for',
@@ -112,11 +112,11 @@ class AxisLabel(setting.Text):
         self.add( setting.Bool( 'rotate', False,
                                 descr = 'Rotate the label by 90 degrees',
                                 usertext='Rotate') )
-        self.add( setting.Distance( 'offset',
-                                    '0pt',
-                                    descr = 'Additional offset of axis label'
-                                    ' from axis tick labels',
-                                    usertext='Label offset') )
+        self.add( setting.DistancePt( 'offset',
+                                      '0pt',
+                                      descr = 'Additional offset of axis label'
+                                      ' from axis tick labels',
+                                      usertext='Label offset') )
 
 class TickLabel(setting.Text):
     """For tick labels on axes."""
@@ -148,11 +148,11 @@ class TickLabel(setting.Text):
                                 'of the tick labels',
                                 usertext='Scale') )
 
-        self.add( setting.Distance( 'offset',
-                                    '0pt',
-                                    descr = 'Additional offset of axis tick '
-                                    'labels from axis',
-                                    usertext='Tick offset') )
+        self.add( setting.DistancePt( 'offset',
+                                      '0pt',
+                                      descr = 'Additional offset of axis tick '
+                                      'labels from axis',
+                                      usertext='Tick offset') )
 
 ###############################################################################
 

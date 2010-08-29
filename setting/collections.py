@@ -35,10 +35,10 @@ class Line(Settings):
                                 setting.Reference('/StyleSheet/Line/color'),
                                 descr = 'Color of line',
                                 usertext='Color') )
-        self.add( setting.Distance('width',
-                                   setting.Reference('/StyleSheet/Line/width'),
-                                   descr = 'Width of line',
-                                   usertext='Width') )
+        self.add( setting.DistancePt('width',
+                                     setting.Reference('/StyleSheet/Line/width'),
+                                     descr = 'Width of line',
+                                     usertext='Width') )
         self.add( setting.LineStyle('style', 'solid',
                                     descr = 'Line style',
                                     usertext='Style') )
@@ -212,9 +212,9 @@ class Text(Settings):
                                      setting.Reference('/StyleSheet/Font/font'),
                                      descr = 'Font name',
                                      usertext='Font') )
-        self.add( setting.Distance('size',
-                                   setting.Reference('/StyleSheet/Font/size'),
-                                   descr = 'Font size', usertext='Size' ) )
+        self.add( setting.DistancePt('size',
+                                     setting.Reference('/StyleSheet/Font/size'),
+                                     descr = 'Font size', usertext='Size' ) )
         self.add( setting.Color( 'color',
                                  setting.Reference('/StyleSheet/Font/color'),
                                  descr = 'Font color', usertext='Color' ) )

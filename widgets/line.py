@@ -69,9 +69,9 @@ class Line(plotters.FreePlotter):
                                  usertext = 'Arrow fill'),
                pixmap = 'settings_plotmarkerfill' )
 
-        s.add( setting.Distance('arrowSize', '5pt',
-                                descr = 'Size of arrow to plot',
-                                usertext='Arrow size', formatting=True), 0)
+        s.add( setting.DistancePt('arrowSize', '5pt',
+                                  descr = 'Size of arrow to plot',
+                                  usertext='Arrow size', formatting=True), 0)
         s.add( setting.Arrow('arrowright', 'none',
                              descr = 'Arrow to plot on right side',
                              usertext='Arrow right', formatting=True), 0)
