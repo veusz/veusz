@@ -160,16 +160,33 @@ class Fit(FunctionPlotter):
         if s.fitRange:
             # get ranges for axes
             if s.variable == 'x':
-                range = self.parent.getAxes((s.xAxis,))[0].getPlottedRange()
-                mask = N.logical_and(xvals >= range[0], xvals <= range[1])
+                drange = self.parent.getAxes((s.xAxis,))[0].getPlottedRange()
+                mask = N.logical_and(xvals >= drange[0], xvals <= drange[1])
             else:
-                range = self.parent.getAxes((s.yAxis,))[0].getPlottedRange()
-                mask = N.logical_and(yvals >= range[0], yvals <= range[1])
-            xvals = xvals[mask]
-            yvals = yvals[mask]
-            yserr = yserr[mask]
+                drange = self.parent.getAxes((s.yAxis,))[0].getPlottedRange()
+                mask = N.logical_and(yvals >= drange[0], yvals <= drange[1])
+            xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
             print "Fitting %s from %g to %g" % (s.variable,
-                                                range[0], range[1])
+                                                drange[0], drange[1])
+
+        # minimum set for fitting
+        if s.min != 'Auto':
+            if s.variable == 'x':
+                mask = xvals >= s.min
+            else:
+                mask = yvals >= s.min
+            xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
+
+        # maximum set for fitting
+        if s.max != 'Auto':
+            if s.variable == 'x':
+                mask = xvals <= s.max
+            else:
+                mask = yvals <= s.max
+            xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
+
+        if s.min != 'Auto' or s.max != 'Auto':
+            print "Fitting %s between %g and %g" % (s.variable, s.min, s.max)
 
         # various error checks
         if len(xvals) == 0:
