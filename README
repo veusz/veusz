@@ -64,6 +64,7 @@ Bug fixes:
  * Exceptions are caught and user notified when loading plugins
  * Missing recent files are removed from recent files menu
  * Non finite values ignored when fitting data
+ * When fitting data min and max properties used if set
 
 Features of package:
  * X-Y plots (with errorbars)

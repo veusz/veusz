@@ -1,6 +1,14 @@
 Changes between 1.8 and 1.9
 
 ------------------------------------------------------------------------
+r1385 | jeremysanders | 2010-08-29 15:47:12 +0100 (Sun, 29 Aug 2010) | 1 line
+
+Support min and max properties when fitting with Fit widget
+------------------------------------------------------------------------
+r1384 | jeremysanders | 2010-08-28 10:10:08 +0100 (Sat, 28 Aug 2010) | 1 line
+
+Update README/ChangeLog
+------------------------------------------------------------------------
 r1383 | jeremysanders | 2010-08-28 10:02:23 +0100 (Sat, 28 Aug 2010) | 1 line
 
 Make text entry boxes marked by .. go away by clicking outside frame.
