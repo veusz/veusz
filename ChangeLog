@@ -1,6 +1,14 @@
 Changes between 1.8 and 1.9
 
 ------------------------------------------------------------------------
+r1387 | jeremysanders | 2010-08-29 16:24:57 +0100 (Sun, 29 Aug 2010) | 1 line
+
+Use combo box with list of common point sizes for distances usually specified in points. This makes it much easier to increase/decrease point sizes.
+------------------------------------------------------------------------
+r1386 | jeremysanders | 2010-08-29 15:49:55 +0100 (Sun, 29 Aug 2010) | 1 line
+
+Update README/ChangeLog
+------------------------------------------------------------------------
 r1385 | jeremysanders | 2010-08-29 15:47:12 +0100 (Sun, 29 Aug 2010) | 1 line
 
 Support min and max properties when fitting with Fit widget

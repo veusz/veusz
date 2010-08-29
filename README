@@ -46,6 +46,8 @@ Changes in 1.9:
    widget/setting tree. See http://barmag.net/veusz-wiki/EmbeddingPython
  * Veusz now starts in home directory or previous directory used. This
    can be switched off in the preferences dialog to use current directory.
+ * Distances specified in points now show drop down box with common point
+   sizes to make increasing/decreasing sizes much easier.
 
 Minor features added:
  * Color selectors are updated if new colors added to other color selectors
