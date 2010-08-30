@@ -186,7 +186,7 @@ class Fit(FunctionPlotter):
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
         if s.min != 'Auto' or s.max != 'Auto':
-            print "Fitting %s between %g and %g" % (s.variable, s.min, s.max)
+            print "Fitting %s between %s and %s" % (s.variable, s.min, s.max)
 
         # various error checks
         if len(xvals) == 0:
