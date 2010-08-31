@@ -825,9 +825,10 @@ class SettingLabel(qt4.QWidget):
 
         # chop off widget part of setting path
         # this is so we can add on a different widget path
+        # note setpath needs to include Settings part of path too
         setpath = self.setting.path
         wpath = self.setting.getWidget().path
-        setpath = setpath[len(wpath)+1:]
+        setpath = setpath[len(wpath):]  # includes /
 
         for widget in widgets:
             action = menu.addAction(widget)
