@@ -27,6 +27,10 @@ import re
 import numpy as N
 import veusz.qtall as qt4
 
+# this definition is monkey-patched when veusz is running in self-test
+# mode as we need to hack the metrics - urgh
+FontMetrics = qt4.QFontMetricsF
+
 # lookup table for special symbols
 symbols = {
     # escaped characters
@@ -164,19 +168,24 @@ symbols = {
     r'\Omega': u'\u03a9'
     }
 
-class RenderState:
+class RenderState(object):
     """Holds the state of the rendering."""
     def __init__(self, font, painter, x, y, alignhorz,
                  actually_render=True):
         self.font = font
         self.painter = painter
+        self.device = painter.device()
         self.x = x     # current x position
         self.y = y     # current y position
         self.alignhorz = alignhorz
         self.actually_render = actually_render
         self.maxlines = 1 # maximim number of lines drawn
 
-class Part:
+    def fontMetrics(self):
+        """Returns font metrics object."""
+        return FontMetrics(self.font, self.device)
+
+class Part(object):
     """Represents a part of the text to be rendered, made up of smaller parts."""
     def __init__(self, children):
         self.children = children
@@ -203,8 +212,7 @@ class PartText(Part):
     def render(self, state):
         """Render some text."""
 
-        width = qt4.QFontMetricsF(state.font,
-                                  state.painter.device()).width(self.text)
+        width = state.fontMetrics().width(self.text)
 
         # actually write the text if requested
         if state.actually_render:
@@ -226,7 +234,7 @@ class PartLines(Part):
         if not state.actually_render:
             self.widths = []
 
-        height = qt4.QFontMetricsF(state.font, state.painter.device()).height()
+        height = state.fontMetrics().height()
         inity = state.y
         initx = state.x
 
@@ -261,7 +269,7 @@ class PartLines(Part):
 
         # move on x posn
         if self.widths:
-            state.x = initx+max(self.widths)
+            state.x = initx + max(self.widths)
         else:
             state.x = initx
         state.y = inity
@@ -275,15 +283,14 @@ class PartSuperScript(Part):
         painter = state.painter
 
         # change text height
-        oldheight = qt4.QFontMetricsF(font, painter.device()).height()
+        oldheight = state.fontMetrics().height()
         size = font.pointSizeF()
         font.setPointSizeF(size*0.6)
         painter.setFont(font)
 
         # set position
         oldy = state.y
-        state.y -= ( oldheight -
-                     qt4.QFontMetricsF(font, painter.device()).height() )
+        state.y -= oldheight*0.4
 
         # draw children
         Part.render(self, state)
@@ -325,7 +332,7 @@ class PartFrac(Part):
             self.widths.append(state.x - initx)
 
         # render top of fraction
-        m = qt4.QFontMetricsF(font, painter.device())
+        m = state.fontMetrics()
         state.y -= (m.ascent() + m.descent())
         if state.actually_render and len(self.widths) == 2:
             # centre line
@@ -342,7 +349,7 @@ class PartFrac(Part):
         # restore font
         font.setPointSizeF(size)
         painter.setFont(font)
-        height = qt4.QFontMetricsF(font, painter.device()).ascent()
+        height = state.fontMetrics().ascent()
 
         # draw line between lines with 0.5pt thickness
         painter.save()
@@ -362,16 +369,15 @@ class PartSubScript(Part):
     """Represents subscripted part."""
     def render(self, state):
         font = state.font
-        painter = state.painter
 
         # change text height
         size = font.pointSizeF()
         font.setPointSizeF(size*0.6)
-        painter.setFont(font)
+        state.painter.setFont(font)
 
         # set position
         oldy = state.y
-        state.y += qt4.QFontMetricsF(font, state.painter.device()).descent()
+        state.y += state.fontMetrics().descent()
 
         # draw children
         Part.render(self, state)
@@ -379,13 +385,12 @@ class PartSubScript(Part):
         # restore font and position
         state.y = oldy
         font.setPointSizeF(size)
-        painter.setFont(font)
+        state.painter.setFont(font)
 
 class PartItalic(Part):
     """Represents italic part."""
     def render(self, state):
         font = state.font
-        painter = state.painter
 
         font.setItalic( not font.italic() )
         state.painter.setFont(font)
@@ -399,7 +404,6 @@ class PartBold(Part):
     """Represents bold part."""
     def render(self, state):
         font = state.font
-        painter = state.painter
 
         font.setBold( not font.bold() )
         state.painter.setFont(font)
@@ -413,7 +417,6 @@ class PartUnderline(Part):
     """Represents underlined part."""
     def render(self, state):
         font = state.font
-        painter = state.painter
 
         font.setUnderline( not font.underline() )
         state.painter.setFont(font)
@@ -493,7 +496,7 @@ class PartBar(Part):
 
         # draw line over text with 0.5pt thickness
         painter = state.painter
-        height = qt4.QFontMetricsF(state.font, painter.device()).ascent()
+        height = state.fontMetrics().ascent()
 
         painter.save()
         pen = painter.pen()
@@ -516,7 +519,7 @@ class PartDot(Part):
 
         # draw circle over text with 1pt radius
         painter = state.painter
-        height = qt4.QFontMetricsF(state.font, painter.device()).ascent()
+        height = state.fontMetrics().ascent()
 
         painter.save()
         circsize = self.getPixelsPerPt(state)
@@ -633,7 +636,7 @@ def makePartTree(partlist):
     else:
         return PartLines(lines)
 
-class Renderer:
+class Renderer(object):
     """A class for rendering text.
 
     The class emulates latex-like formatting, allows rotated text, and alignment
@@ -659,7 +662,6 @@ class Renderer:
         # save things we'll need later
         self.painter = painter
         self.font = font
-        self.height = qt4.QFontMetricsF(font, painter.device()).height()
         self.alignhorz = alignhorz
         self.alignvert = alignvert
         self.angle = angle
@@ -688,7 +690,10 @@ class Renderer:
         # work out height of box, and
         # make the bounding box a bit bigger if we want to include descents
 
-        fm = qt4.QFontMetricsF(self.font, self.painter.device())
+        state = RenderState(self.font, self.painter, 0, 0,
+                            self.alignhorz,
+                            actually_render = False)
+        fm = state.fontMetrics()
         
         if self.usefullheight:
             totalheight = fm.ascent()
@@ -705,12 +710,9 @@ class Renderer:
             dy = 0
 
         # work out width
-        state = RenderState(self.font, self.painter, 0, 0,
-                            self.alignhorz,
-                            actually_render = False)
         self.parttree.render(state)
         totalwidth = state.x
-        totalheight += self.height*(state.maxlines-1)
+        totalheight += fm.height()*(state.maxlines-1)
 
         # in order to work out text position, we rotate a bounding box
         # in fact we add two extra points to account for descent if reqd
@@ -767,8 +769,8 @@ class Renderer:
         # add a small amount of extra room if requested
         if extraspace:
             self.painter.setFont(self.font)
-            l = qt4.QFontMetricsF(self.font,
-                                  self.painter.device()).height()*0.2
+            l = FontMetrics(self.font,
+                            self.painter.device()).height()*0.2
             miny += l
 
         # twiddle positions and bounds
