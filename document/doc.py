@@ -48,6 +48,7 @@ except ImportError:
     hasemf = False
 
 import svg_export
+import selftest_export
 
 # python identifier
 identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
@@ -550,16 +551,22 @@ class Document( qt4.QObject ):
             os.remove(filename)
             os.rename(tmpfile, filename)
 
+    def _getDocSize(self, dpi):
+        """Get size of document in pixels given dpi."""
+        pixmap = qt4.QPixmap(1, 1)
+        painter = Painter(pixmap, scaling=1., dpi=dpi)
+        width, height = self.basewidget.getSize(painter)
+        painter.end()
+        return width, height
+
     def _exportSVG(self, filename, page):
         """Export document as SVG"""
 
+        dpi = 90.
+        width, height = self._getDocSize(dpi)
+
         if qt4.PYQT_VERSION >= 0x40600:
             # custom paint devices don't work in old PyQt versions
-            pixmap = qt4.QPixmap(1,1)
-            dpi=90.
-            painter = Painter(pixmap, scaling=1., dpi=dpi)
-            width, height = self.basewidget.getSize(painter)
-            painter.end()
 
             f = open(filename, 'w')
             paintdev = svg_export.SVGPaintDevice(f, width/dpi, height/dpi)
@@ -573,21 +580,27 @@ class Document( qt4.QObject ):
             # (no clipping, font size problems)
             import PyQt4.QtSvg
 
-            # we have to make a temporary painter first to get the document size
-            # this is because setSize needs to come before begin
-            temprend =  PyQt4.QtSvg.QSvgGenerator()
-            temprend.setFileName(filename)
-            p = Painter(temprend)
-            width, height = self.basewidget.getSize(p)
-            p.end()
-
             # actually paint the image
-            rend = PyQt4.QtSvg.QSvgGenerator()
-            rend.setFileName(filename)
-            rend.setSize( qt4.QSize(int(width), int(height)) )
-            painter = Painter(rend)
+            gen = PyQt4.QtSvg.QSvgGenerator()
+            gen.setFileName(filename)
+            gen.setResolution(dpi)
+            gen.setSize( qt4.QSize(int(width), int(height)) )
+            painter = Painter(gen)
             self.basewidget.draw(painter, page)
             painter.end()
+
+    def _exportSelfTest(self, filename, page):
+        """Export document for testing"""
+
+        dpi = 90.
+        width, height = self._getDocSize(dpi)
+
+        f = open(filename, 'w')
+        paintdev = selftest_export.SelfTestPaintDevice(f, width/dpi, height/dpi)
+        painter = Painter(paintdev)
+        self.basewidget.draw(painter, page)
+        painter.end()
+        f.close()
 
     def _exportPIC(self, filename, page):
         """Export document as SVG"""
@@ -600,11 +613,9 @@ class Document( qt4.QObject ):
 
     def _exportEMF(self, filename, page):
         """Export document as EMF."""
-        pixmap = qt4.QPixmap(1,1)
-        dpi=75.
-        painter = Painter(pixmap, scaling=1., dpi=dpi)
-        width, height = self.basewidget.getSize(painter)
-        painter.end()
+
+        dpi = 90.
+        width, height = self._getDocSize(dpi)
 
         paintdev = emf_export.EMFPaintDevice(width/dpi, height/dpi,
                                              dpi=dpi)
@@ -629,6 +640,9 @@ class Document( qt4.QObject ):
 
         elif ext == '.svg':
             self._exportSVG(filename, pagenumber)
+
+        elif ext == '.selftest':
+            self._exportSelfTest(filename, pagenumber)
 
         elif ext == '.pic':
             self._exportPIC(filename, pagenumber)
