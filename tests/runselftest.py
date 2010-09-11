@@ -8,6 +8,11 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.windows.mainwindow
 
+excluded_tests = set([
+        # the 2pi x in the axis gives different positions depending on font
+        'inside.vsz', 
+    ])
+
 class StupidFontMetrics(object):
     """This is a fake font metrics device which should return the same
     results on all systems with any font."""
@@ -57,40 +62,61 @@ def renderAllTests():
     thisdir = os.path.dirname(__file__)
     exampledir = os.path.join(thisdir, '..', 'examples' )
     for vsz in glob.glob( os.path.join(exampledir, '*.vsz') ):
-        print os.path.basename(vsz)
+        base = os.path.basename(vsz)
+        if base in excluded_tests:
+            continue
+        print base
 
-        outfile = os.path.join(thisdir, 'comparison',
-                               os.path.basename(vsz) + '.selftest')
+        outfile = os.path.join(thisdir, 'comparison', base + '.selftest')
         renderTest(vsz, outfile)
 
 def runTests():
     print "Testing output"
 
+    fails = 0
+    passes = 0
+
     thisdir = os.path.dirname(__file__)
     exampledir = os.path.join(thisdir, '..', 'examples' )
     for vsz in glob.glob( os.path.join(exampledir, '*.vsz') ):
-        print os.path.basename(vsz)
+        base = os.path.basename(vsz)
+        if base in excluded_tests:
+            continue
+        print base
 
-        outfile = os.path.join(thisdir,
-                               os.path.basename(vsz) + '.temp.selftest')
+        outfile = os.path.join(thisdir, base + '.temp.selftest')
         renderTest(vsz, outfile)
 
-        comparfile = os.path.join(thisdir, 'comparison',
-                                  os.path.basename(vsz) + '.selftest')
+        comparfile = os.path.join(thisdir, 'comparison', base + '.selftest')
 
         t1 = open(outfile, 'rU').read()
         t2 = open(comparfile, 'rU').read()
         if t1 != t2:
-            print " FAILED: results differed"
+            print " FAIL: results differed"
+            fails += 1
         else:
-            print " SUCCESS"
+            print " PASS"
+            passes += 1
+            os.unlink(outfile)
+
+    if fails == 0:
+        print "All tests %i/%i PASSED" % (passes, passes)
+        sys.exit(0)
+    else:
+        print "%i/%i tests FAILED" % (fails, passes+fails)
+        sys.exit(1)
 
 if __name__ == '__main__':
     app = qt4.QApplication([])
 
     veusz.setting.transient_settings['unsafe_mode'] = True
+
+    # hack metrics object to always return same metrics
     veusz.utils.textrender.FontMetrics = StupidFontMetrics
     veusz.utils.FontMetrics = StupidFontMetrics
+
+    # nasty hack to remove underlining
+    del veusz.utils.textrender.part_commands[r'\underline']
 
     if len(sys.argv) == 1:
         runTests()

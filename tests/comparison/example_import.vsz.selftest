@@ -571,13 +571,9 @@
 <path d="M64.02,362.77l0,7.5M133.37,362.77l0,7.5M202.73,362.77l0,7.5M272.08,362.77l0,7.5M341.43,362.77l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="150.22" y="483.47" font-size="14pt" fill="#000000">Final </text>
-<text x="202.72" y="483.47" font-size="14pt" fill="#000000">x axis</text>
-</g>
-<g stroke-width="1" stroke-linecap="butt" fill="none">
-<path d="M202.72,486.47l40,0"/>
-</g>
-<g stroke-width="1" fill="none">
+<text x="106.47" y="483.47" font-size="14pt" fill="#000000">Final </text>
+<text x="158.97" y="483.47" font-size="14pt" fill="#000000">\underline</text>
+<text x="246.47" y="483.47" font-size="14pt" fill="#000000">x axis</text>
 <text x="59.64" y="474.72" font-size="14pt" fill="#000000">0</text>
 <text x="128.98" y="474.72" font-size="14pt" fill="#000000">5</text>
 <text x="193.97" y="474.72" font-size="14pt" fill="#000000">10</text>
