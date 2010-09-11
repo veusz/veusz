@@ -11,18 +11,18 @@
 <path d="m39.12,14.23l218.73,0l0,218.73l-218.73,0l0,-218.73"/>
 </g>
 <g stroke-width="0.62" fill="#0055ff">
-<path d="m194.08,187.44l17.78,0l0,14l-17.78,0l0,-14"/>
+<path d="m194.08,192.19l17.78,0l0,12.25l-17.78,0l0,-12.25"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="231.86" y="187.19" font-size="14pt" fill="#000000">a</text>
+<text x="229.36" y="192.19" font-size="14pt" fill="#000000">a</text>
 </g>
 <g stroke-width="0.62" fill="#ff557f">
-<path d="m194.08,207.44l17.78,0l0,14l-17.78,0l0,-14"/>
+<path d="m194.08,209.69l17.78,0l0,12.25l-17.78,0l0,-12.25"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="231.86" y="207.19" font-size="14pt" fill="#000000">b</text>
-<text x="87.23" y="45.93" font-size="14pt" fill="#000000">stacked</text>
-<text x="113.48" y="63.43" font-size="14pt" fill="#000000">mode</text>
+<text x="229.36" y="209.69" font-size="14pt" fill="#000000">b</text>
+<text x="117.86" y="45.93" font-size="14pt" fill="#000000">stacked</text>
+<text x="130.98" y="63.43" font-size="14pt" fill="#000000">mode</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
@@ -85,13 +85,13 @@
 <path d="M257.85,232.96l-7.5,0M257.85,196.5l-7.5,0M257.85,160.05l-7.5,0M257.85,123.59l-7.5,0M257.85,87.14l-7.5,0M257.85,50.68l-7.5,0M257.85,14.23l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="-33.88" y="241.71" font-size="14pt" fill="#000000">?1.5</text>
-<text x="1.11" y="205.25" font-size="14pt" fill="#000000">?1</text>
-<text x="-33.88" y="168.8" font-size="14pt" fill="#000000">?0.5</text>
-<text x="18.61" y="132.34" font-size="14pt" fill="#000000">0</text>
-<text x="-16.38" y="95.89" font-size="14pt" fill="#000000">0.5</text>
-<text x="18.61" y="59.43" font-size="14pt" fill="#000000">1</text>
-<text x="-16.38" y="22.98" font-size="14pt" fill="#000000">1.5</text>
+<text x="0.61" y="241.71" font-size="14pt" fill="#000000">?1.5</text>
+<text x="18.11" y="205.25" font-size="14pt" fill="#000000">?1</text>
+<text x="0.61" y="168.8" font-size="14pt" fill="#000000">?0.5</text>
+<text x="26.86" y="132.34" font-size="14pt" fill="#000000">0</text>
+<text x="9.36" y="95.89" font-size="14pt" fill="#000000">0.5</text>
+<text x="26.86" y="59.43" font-size="14pt" fill="#000000">1</text>
+<text x="9.36" y="22.98" font-size="14pt" fill="#000000">1.5</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M39.12,232.96l218.73,0"/>
@@ -102,18 +102,18 @@
 <path d="M39.12,14.23l0,7.5M89.99,14.23l0,7.5M140.86,14.23l0,7.5M191.73,14.23l0,7.5M242.59,14.23l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="30.36" y="237.71" font-size="14pt" fill="#000000">0</text>
-<text x="81.23" y="237.71" font-size="14pt" fill="#000000">5</text>
-<text x="123.34" y="237.71" font-size="14pt" fill="#000000">10</text>
-<text x="174.22" y="237.71" font-size="14pt" fill="#000000">15</text>
-<text x="225.08" y="237.71" font-size="14pt" fill="#000000">20</text>
+<text x="34.73" y="238.21" font-size="14pt" fill="#000000">0</text>
+<text x="85.61" y="238.21" font-size="14pt" fill="#000000">5</text>
+<text x="132.09" y="238.21" font-size="14pt" fill="#000000">10</text>
+<text x="182.97" y="238.21" font-size="14pt" fill="#000000">15</text>
+<text x="233.83" y="238.21" font-size="14pt" fill="#000000">20</text>
 </g>
 <g stroke-width="0.62" fill="#ffffff">
 <path d="m300.53,14.23l218.73,0l0,218.73l-218.73,0l0,-218.73"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="348.64" y="45.93" font-size="14pt" fill="#000000">grouped</text>
-<text x="374.89" y="63.43" font-size="14pt" fill="#000000">mode</text>
+<text x="379.27" y="45.93" font-size="14pt" fill="#000000">grouped</text>
+<text x="392.39" y="63.43" font-size="14pt" fill="#000000">mode</text>
 </g>
 </g>
 <g clip-path="url(#c2)">
@@ -173,11 +173,11 @@
 <path d="M519.26,232.96l-7.5,0M519.26,178.27l-7.5,0M519.26,123.59l-7.5,0M519.26,68.91l-7.5,0M519.26,14.23l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="262.53" y="241.71" font-size="14pt" fill="#000000">?1</text>
-<text x="227.53" y="187.02" font-size="14pt" fill="#000000">?0.5</text>
-<text x="280.03" y="132.34" font-size="14pt" fill="#000000">0</text>
-<text x="245.03" y="77.66" font-size="14pt" fill="#000000">0.5</text>
-<text x="280.03" y="22.98" font-size="14pt" fill="#000000">1</text>
+<text x="279.53" y="241.71" font-size="14pt" fill="#000000">?1</text>
+<text x="262.03" y="187.02" font-size="14pt" fill="#000000">?0.5</text>
+<text x="288.28" y="132.34" font-size="14pt" fill="#000000">0</text>
+<text x="270.78" y="77.66" font-size="14pt" fill="#000000">0.5</text>
+<text x="288.28" y="22.98" font-size="14pt" fill="#000000">1</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M300.53,232.96l218.73,0"/>
@@ -188,17 +188,17 @@
 <path d="M300.53,14.23l0,7.5M351.4,14.23l0,7.5M402.27,14.23l0,7.5M453.13,14.23l0,7.5M504,14.23l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="291.78" y="237.71" font-size="14pt" fill="#000000">0</text>
-<text x="342.64" y="237.71" font-size="14pt" fill="#000000">5</text>
-<text x="384.77" y="237.71" font-size="14pt" fill="#000000">10</text>
-<text x="435.62" y="237.71" font-size="14pt" fill="#000000">15</text>
-<text x="486.5" y="237.71" font-size="14pt" fill="#000000">20</text>
+<text x="296.16" y="238.21" font-size="14pt" fill="#000000">0</text>
+<text x="347.02" y="238.21" font-size="14pt" fill="#000000">5</text>
+<text x="393.52" y="238.21" font-size="14pt" fill="#000000">10</text>
+<text x="444.38" y="238.21" font-size="14pt" fill="#000000">15</text>
+<text x="495.25" y="238.21" font-size="14pt" fill="#000000">20</text>
 </g>
 <g stroke-width="0.62" fill="#ffffff">
 <path d="m39.12,275.64l218.73,0l0,218.73l-218.73,0l0,-218.73"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="60.98" y="297.51" font-size="14pt" fill="#000000">error bars</text>
+<text x="104.73" y="297.51" font-size="14pt" fill="#000000">error bars</text>
 </g>
 </g>
 <g clip-path="url(#c3)">
@@ -239,11 +239,11 @@
 <path d="M257.85,484.59l-7.5,0M257.85,434.84l-7.5,0M257.85,385.09l-7.5,0M257.85,335.34l-7.5,0M257.85,285.59l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="1.11" y="493.34" font-size="14pt" fill="#000000">?1</text>
-<text x="-33.88" y="443.59" font-size="14pt" fill="#000000">?0.5</text>
-<text x="18.61" y="393.84" font-size="14pt" fill="#000000">0</text>
-<text x="-16.38" y="344.09" font-size="14pt" fill="#000000">0.5</text>
-<text x="18.61" y="294.34" font-size="14pt" fill="#000000">1</text>
+<text x="18.11" y="493.34" font-size="14pt" fill="#000000">?1</text>
+<text x="0.61" y="443.59" font-size="14pt" fill="#000000">?0.5</text>
+<text x="26.86" y="393.84" font-size="14pt" fill="#000000">0</text>
+<text x="9.36" y="344.09" font-size="14pt" fill="#000000">0.5</text>
+<text x="26.86" y="294.34" font-size="14pt" fill="#000000">1</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M39.12,494.37l218.73,0"/>
@@ -254,11 +254,11 @@
 <path d="M39.12,275.64l0,7.5M89.99,275.64l0,7.5M140.86,275.64l0,7.5M191.73,275.64l0,7.5M242.59,275.64l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="30.36" y="499.12" font-size="14pt" fill="#000000">0</text>
-<text x="81.23" y="499.12" font-size="14pt" fill="#000000">5</text>
-<text x="123.34" y="499.12" font-size="14pt" fill="#000000">10</text>
-<text x="174.22" y="499.12" font-size="14pt" fill="#000000">15</text>
-<text x="225.08" y="499.12" font-size="14pt" fill="#000000">20</text>
+<text x="34.73" y="499.62" font-size="14pt" fill="#000000">0</text>
+<text x="85.61" y="499.62" font-size="14pt" fill="#000000">5</text>
+<text x="132.09" y="499.62" font-size="14pt" fill="#000000">10</text>
+<text x="182.97" y="499.62" font-size="14pt" fill="#000000">15</text>
+<text x="233.83" y="499.62" font-size="14pt" fill="#000000">20</text>
 </g>
 <g stroke-width="0.62" fill="#ffffff">
 <path d="m300.53,275.64l218.73,0l0,218.73l-218.73,0l0,-218.73"/>
@@ -309,12 +309,12 @@
 <path d="M519.26,494.37l-7.5,0M519.26,421.46l-7.5,0M519.26,348.55l-7.5,0M519.26,275.64l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="280.03" y="503.12" font-size="14pt" fill="#000000">1</text>
-<text x="227.53" y="430.21" font-size="14pt" fill="#000000">1000</text>
-<text x="252.03" y="357.3" font-size="14pt" fill="#000000">10</text>
-<text x="287.03" y="350.3" font-size="8pt" fill="#000000">6</text>
-<text x="252.03" y="289.52" font-size="14pt" fill="#000000">10</text>
-<text x="287.03" y="282.52" font-size="8pt" fill="#000000">9</text>
+<text x="288.28" y="503.12" font-size="14pt" fill="#000000">1</text>
+<text x="262.03" y="430.21" font-size="14pt" fill="#000000">1000</text>
+<text x="274.28" y="357.3" font-size="14pt" fill="#000000">10</text>
+<text x="291.78" y="350.3" font-size="8pt" fill="#000000">6</text>
+<text x="274.28" y="289.52" font-size="14pt" fill="#000000">10</text>
+<text x="291.78" y="282.52" font-size="8pt" fill="#000000">9</text>
 </g>
 <g stroke="#808080" stroke-width="0.62" stroke-dasharray="1.25,2.5" fill="none">
 <path d="M300.53,494.37l0,-218.73M355.21,494.37l0,-218.73M409.9,494.37l0,-218.73M464.58,494.37l0,-218.73M519.26,494.37l0,-218.73"/>
@@ -328,11 +328,11 @@
 <path d="M300.53,275.64l0,7.5M355.21,275.64l0,7.5M409.9,275.64l0,7.5M464.58,275.64l0,7.5M519.26,275.64l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="283.03" y="499.12" font-size="14pt" fill="#000000">?1</text>
-<text x="320.2" y="499.12" font-size="14pt" fill="#000000">?0.5</text>
-<text x="401.14" y="499.12" font-size="14pt" fill="#000000">0</text>
-<text x="438.33" y="499.12" font-size="14pt" fill="#000000">0.5</text>
-<text x="510.5" y="499.12" font-size="14pt" fill="#000000">1</text>
+<text x="291.78" y="499.62" font-size="14pt" fill="#000000">?1</text>
+<text x="337.7" y="499.62" font-size="14pt" fill="#000000">?0.5</text>
+<text x="405.52" y="499.62" font-size="14pt" fill="#000000">0</text>
+<text x="451.45" y="499.62" font-size="14pt" fill="#000000">0.5</text>
+<text x="514.88" y="499.62" font-size="14pt" fill="#000000">1</text>
 </g>
 </g>
 </g>

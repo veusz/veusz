@@ -229,7 +229,7 @@ class Key(widget.Widget):
 
         font = s.get('Text').makeQFont(painter)
         painter.setFont(font)
-        height = painter.fontMetrics().height()
+        height = utils.FontMetrics(font, painter.device()).height()
 
         showtext = not s.Text.hide
 

@@ -1234,14 +1234,15 @@
 <path d="M526.38,473.03l-3.75,0M526.38,449.73l-3.75,0M526.38,426.44l-3.75,0M526.38,403.14l-3.75,0M526.38,379.84l-3.75,0M526.38,356.55l-3.75,0M526.38,333.25l-3.75,0M526.38,309.96l-3.75,0M526.38,286.66l-3.75,0M526.38,263.37l-3.75,0M526.38,240.07l-3.75,0M526.38,216.77l-3.75,0M526.38,193.48l-3.75,0M526.38,170.18l-3.75,0M526.38,146.89l-3.75,0M526.38,123.59l-3.75,0M526.38,100.3l-3.75,0M526.38,77l-3.75,0M526.38,53.7l-3.75,0M526.38,30.41l-3.75,0M526.38,7.11l-3.75,0"/>
 <path d="M526.38,473.03l-7.5,0M526.38,356.55l-7.5,0M526.38,240.07l-7.5,0M526.38,123.59l-7.5,0M526.38,7.11l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 353.82)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 13.21 296.95)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Funky chicken</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="22.45" y="481.78" font-size="14pt" fill="#000000">?1</text>
-<text x="39.95" y="248.82" font-size="14pt" fill="#000000">0</text>
-<text x="4.95" y="132.34" font-size="14pt" fill="#000000">0.5</text>
-<text x="39.95" y="21" font-size="14pt" fill="#000000">1</text>
+<text x="39.45" y="481.78" font-size="14pt" fill="#000000">?1</text>
+<text x="21.95" y="365.3" font-size="14pt" fill="#000000">?0.5</text>
+<text x="48.2" y="248.82" font-size="14pt" fill="#000000">0</text>
+<text x="30.7" y="132.34" font-size="14pt" fill="#000000">0.5</text>
+<text x="48.2" y="21" font-size="14pt" fill="#000000">1</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
@@ -1252,12 +1253,12 @@
 <path d="M60.46,7.11l0,7.5M176.94,7.11l0,7.5M293.42,7.11l0,7.5M409.9,7.11l0,7.5M526.38,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="0" y="485.53" font-size="14pt" fill="#000000">Experiments with linked datasets</text>
-<text x="42.95" y="477.78" font-size="14pt" fill="#000000">?1</text>
-<text x="141.94" y="477.78" font-size="14pt" fill="#000000">?0.5</text>
-<text x="284.66" y="477.78" font-size="14pt" fill="#000000">0</text>
-<text x="383.64" y="477.78" font-size="14pt" fill="#000000">0.5</text>
-<text x="515.98" y="477.78" font-size="14pt" fill="#000000">1</text>
+<text x="153.41" y="487.03" font-size="14pt" fill="#000000">Experiments with linked datasets</text>
+<text x="51.7" y="478.28" font-size="14pt" fill="#000000">?1</text>
+<text x="159.44" y="478.28" font-size="14pt" fill="#000000">?0.5</text>
+<text x="289.03" y="478.28" font-size="14pt" fill="#000000">0</text>
+<text x="396.77" y="478.28" font-size="14pt" fill="#000000">0.5</text>
+<text x="522" y="478.28" font-size="14pt" fill="#000000">1</text>
 </g>
 </g>
 </g>

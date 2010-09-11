@@ -11,43 +11,43 @@
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
 <g stroke="none" stroke-width="1" fill="#ffffff">
-<path d="m292.31,413.03l214.07,0l0,40l-214.07,0l0,-40"/>
+<path d="m376.06,420.53l132.82,0l0,35l-132.82,0l0,-35"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
 <g stroke-width="0.62" fill="none">
-<path d="M310.09,415.03l0,16"/>
-<path d="M310.09,423.03l0,0"/>
-<path d="M306.34,415.03l7.5,0"/>
-<path d="M306.34,431.03l7.5,0"/>
-<path d="M310.09,419.28l0,7.5"/>
-<path d="M310.09,419.28l0,7.5"/>
-<path d="M292.31,423.03l35.57,0"/>
+<path d="M393.84,422.28l0,14"/>
+<path d="M393.84,429.28l0,0"/>
+<path d="M390.09,422.28l7.5,0"/>
+<path d="M390.09,436.28l7.5,0"/>
+<path d="M393.84,425.53l0,7.5"/>
+<path d="M393.84,425.53l0,7.5"/>
+<path d="M376.06,429.28l35.57,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(310.09, 423.03)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(393.84, 429.28)" fill="#000000">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="347.88" y="414.78" font-size="14pt" fill="#000000">Line plot</text>
+<text x="429.12" y="422.28" font-size="14pt" fill="#000000">Line plot</text>
 </g>
 </g>
 <g clip-path="url(#c2)">
 <g stroke="#ff0000" stroke-width="0.62" fill="none">
-<path d="M310.09,435.03l0,16"/>
-<path d="M310.09,443.03l0,0"/>
+<path d="M393.84,439.78l0,14"/>
+<path d="M393.84,446.78l0,0"/>
 </g>
 <g stroke-width="0.62" stroke-dasharray="0.625,1.25" fill="none">
-<path d="M292.31,443.03l35.57,0"/>
+<path d="M376.06,446.78l35.57,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(310.09, 443.03)" fill="#ff0000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(393.84, 446.78)" fill="#ff0000">
 <path d="m-3.75,-3.75l7.5,0l0,7.5l-7.5,0l0,-7.5"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="347.88" y="434.78" font-size="14pt" fill="#000000">Histogram</text>
+<text x="429.12" y="439.78" font-size="14pt" fill="#000000">Histogram</text>
 </g>
 </g>
 <g clip-path="url(#c3)">
@@ -120,18 +120,18 @@
 <path d="M526.38,473.03l-3.75,0M526.38,439.75l-3.75,0M526.38,406.47l-3.75,0M526.38,373.19l-3.75,0M526.38,339.91l-3.75,0M526.38,306.63l-3.75,0M526.38,273.35l-3.75,0M526.38,240.07l-3.75,0M526.38,206.79l-3.75,0M526.38,173.51l-3.75,0M526.38,140.23l-3.75,0M526.38,106.95l-3.75,0M526.38,73.67l-3.75,0M526.38,40.39l-3.75,0M526.38,7.11l-3.75,0"/>
 <path d="M526.38,473.03l-7.5,0M526.38,406.47l-7.5,0M526.38,339.91l-7.5,0M526.38,273.35l-7.5,0M526.38,206.79l-7.5,0M526.38,140.23l-7.5,0M526.38,73.67l-7.5,0M526.38,7.11l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 32.21 441.32)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 39.46 340.7)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Data read into from CSV</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.95" y="481.78" font-size="14pt" fill="#000000">0</text>
-<text x="39.95" y="415.22" font-size="14pt" fill="#000000">1</text>
-<text x="39.95" y="348.66" font-size="14pt" fill="#000000">2</text>
-<text x="39.95" y="282.1" font-size="14pt" fill="#000000">3</text>
-<text x="39.95" y="215.54" font-size="14pt" fill="#000000">4</text>
-<text x="39.95" y="148.98" font-size="14pt" fill="#000000">5</text>
-<text x="39.95" y="82.42" font-size="14pt" fill="#000000">6</text>
-<text x="39.95" y="21" font-size="14pt" fill="#000000">7</text>
+<text x="48.2" y="481.78" font-size="14pt" fill="#000000">0</text>
+<text x="48.2" y="415.22" font-size="14pt" fill="#000000">1</text>
+<text x="48.2" y="348.66" font-size="14pt" fill="#000000">2</text>
+<text x="48.2" y="282.1" font-size="14pt" fill="#000000">3</text>
+<text x="48.2" y="215.54" font-size="14pt" fill="#000000">4</text>
+<text x="48.2" y="148.98" font-size="14pt" fill="#000000">5</text>
+<text x="48.2" y="82.42" font-size="14pt" fill="#000000">6</text>
+<text x="48.2" y="21" font-size="14pt" fill="#000000">7</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
@@ -142,19 +142,19 @@
 <path d="M60.46,7.11l0,7.5M176.94,7.11l0,7.5M293.42,7.11l0,7.5M409.9,7.11l0,7.5M526.38,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="74.66" y="485.53" font-size="14pt" fill="#000000">Imported CSV file example</text>
-<text x="51.7" y="477.78" font-size="14pt" fill="#000000">0</text>
-<text x="168.19" y="477.78" font-size="14pt" fill="#000000">2</text>
-<text x="284.66" y="477.78" font-size="14pt" fill="#000000">4</text>
-<text x="401.14" y="477.78" font-size="14pt" fill="#000000">6</text>
-<text x="515.98" y="477.78" font-size="14pt" fill="#000000">8</text>
+<text x="184.03" y="487.03" font-size="14pt" fill="#000000">Imported CSV file example</text>
+<text x="56.08" y="478.28" font-size="14pt" fill="#000000">0</text>
+<text x="172.56" y="478.28" font-size="14pt" fill="#000000">2</text>
+<text x="289.03" y="478.28" font-size="14pt" fill="#000000">4</text>
+<text x="405.52" y="478.28" font-size="14pt" fill="#000000">6</text>
+<text x="522" y="478.28" font-size="14pt" fill="#000000">8</text>
 </g>
 </g>
 </g>
 <defs>
 <clipPath id="c0"><path d="m0,0l533.49,0l0,533.49l-533.49,0l0,-533.49"/></clipPath>
-<clipPath id="c1"><path d="m292.31,413.03l35.57,0l0,20l-35.57,0l0,-20"/></clipPath>
-<clipPath id="c2"><path d="m292.31,433.03l35.57,0l0,20l-35.57,0l0,-20"/></clipPath>
+<clipPath id="c1"><path d="m376.06,420.53l35.57,0l0,17.5l-35.57,0l0,-17.5"/></clipPath>
+<clipPath id="c2"><path d="m376.06,438.03l35.57,0l0,17.5l-35.57,0l0,-17.5"/></clipPath>
 <clipPath id="c3"><path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/></clipPath>
 </defs>
 </svg>

@@ -11,19 +11,19 @@
 <path d="m60.46,7.11l252.52,0l0,252.52l-252.52,0l0,-252.52"/>
 </g>
 <g stroke="none" stroke-width="1" fill="#ffffff">
-<path d="m80.46,27.11l161.57,0l0,40l-161.57,0l0,-40"/>
+<path d="m77.96,24.61l106.57,0l0,35l-106.57,0l0,-35"/>
 </g>
 <g stroke-width="0.62" fill="#aaffff">
-<path d="m80.46,29.11l35.57,0l0,14l-35.57,0l0,-14"/>
+<path d="m77.96,26.36l35.57,0l0,12.25l-35.57,0l0,-12.25"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="136.02" y="28.86" font-size="14pt" fill="#000000">Spring</text>
+<text x="131.02" y="26.36" font-size="14pt" fill="#000000">Spring</text>
 </g>
 <g stroke-width="0.62" fill="#00aaff">
-<path d="m80.46,49.11l35.57,0l0,14l-35.57,0l0,-14"/>
+<path d="m77.96,43.86l35.57,0l0,12.25l-35.57,0l0,-12.25"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="136.02" y="48.86" font-size="14pt" fill="#000000">Summer</text>
+<text x="131.02" y="43.86" font-size="14pt" fill="#000000">Summer</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
@@ -57,17 +57,17 @@
 <path d="M312.98,259.63l-3.75,0M312.98,238.59l-3.75,0M312.98,217.55l-3.75,0M312.98,196.5l-3.75,0M312.98,175.46l-3.75,0M312.98,154.42l-3.75,0M312.98,133.37l-3.75,0M312.98,112.33l-3.75,0M312.98,91.29l-3.75,0M312.98,70.24l-3.75,0M312.98,49.2l-3.75,0M312.98,28.16l-3.75,0M312.98,7.11l-3.75,0"/>
 <path d="M312.98,259.63l-7.5,0M312.98,217.55l-7.5,0M312.98,175.46l-7.5,0M312.98,133.37l-7.5,0M312.98,91.29l-7.5,0M312.98,49.2l-7.5,0M312.98,7.11l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 315)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 212.12)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Number of balloons</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.95" y="268.38" font-size="14pt" fill="#000000">0</text>
-<text x="39.95" y="226.3" font-size="14pt" fill="#000000">1</text>
-<text x="39.95" y="184.21" font-size="14pt" fill="#000000">2</text>
-<text x="39.95" y="142.12" font-size="14pt" fill="#000000">3</text>
-<text x="39.95" y="100.04" font-size="14pt" fill="#000000">4</text>
-<text x="39.95" y="57.95" font-size="14pt" fill="#000000">5</text>
-<text x="39.95" y="21" font-size="14pt" fill="#000000">6</text>
+<text x="48.2" y="268.38" font-size="14pt" fill="#000000">0</text>
+<text x="48.2" y="226.3" font-size="14pt" fill="#000000">1</text>
+<text x="48.2" y="184.21" font-size="14pt" fill="#000000">2</text>
+<text x="48.2" y="142.12" font-size="14pt" fill="#000000">3</text>
+<text x="48.2" y="100.04" font-size="14pt" fill="#000000">4</text>
+<text x="48.2" y="57.95" font-size="14pt" fill="#000000">5</text>
+<text x="48.2" y="21" font-size="14pt" fill="#000000">6</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,259.63l252.52,0"/>
@@ -78,10 +78,10 @@
 <path d="M60.46,7.11l0,7.5M102.55,7.11l0,7.5M144.63,7.11l0,7.5M186.72,7.11l0,7.5M228.81,7.11l0,7.5M270.89,7.11l0,7.5M312.98,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="134.22" y="272.13" font-size="14pt" fill="#000000">Colour</text>
-<text x="76.3" y="264.38" font-size="14pt" fill="#000000">Red</text>
-<text x="142.97" y="264.38" font-size="14pt" fill="#000000">Green</text>
-<text x="235.89" y="264.38" font-size="14pt" fill="#000000">Blue</text>
+<text x="160.47" y="273.63" font-size="14pt" fill="#000000">Colour</text>
+<text x="89.42" y="264.88" font-size="14pt" fill="#000000">Red</text>
+<text x="164.84" y="264.88" font-size="14pt" fill="#000000">Green</text>
+<text x="253.39" y="264.88" font-size="14pt" fill="#000000">Blue</text>
 </g>
 <g stroke-width="0.62" fill="#ffffff">
 <path d="m60.46,334.32l252.52,0l0,181.39l-252.52,0l0,-181.39"/>
@@ -92,9 +92,9 @@
 <path d="M312.98,507.07l-7.5,0M312.98,463.88l-7.5,0M312.98,420.69l-7.5,0M312.98,377.51l-7.5,0M312.98,334.32l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="315.97" y="386.26" font-size="14pt" fill="#000000">Red</text>
-<text x="315.97" y="515.82" font-size="14pt" fill="#000000">Green</text>
-<text x="315.97" y="472.63" font-size="14pt" fill="#000000">Blue</text>
+<text x="316.47" y="386.26" font-size="14pt" fill="#000000">Red</text>
+<text x="316.47" y="515.82" font-size="14pt" fill="#000000">Green</text>
+<text x="316.47" y="472.63" font-size="14pt" fill="#000000">Blue</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,334.32l252.52,0"/>
@@ -127,15 +127,15 @@
 <path d="M60.46,515.71l3.75,0M60.46,507.07l3.75,0M60.46,498.43l3.75,0M60.46,489.79l3.75,0M60.46,481.16l3.75,0M60.46,472.52l3.75,0M60.46,463.88l3.75,0M60.46,455.24l3.75,0M60.46,446.61l3.75,0M60.46,437.97l3.75,0M60.46,429.33l3.75,0M60.46,420.69l3.75,0M60.46,412.06l3.75,0M60.46,403.42l3.75,0M60.46,394.78l3.75,0M60.46,386.14l3.75,0M60.46,377.51l3.75,0M60.46,368.87l3.75,0M60.46,360.23l3.75,0M60.46,351.59l3.75,0M60.46,342.96l3.75,0M60.46,334.32l3.75,0"/>
 <path d="M60.46,507.07l7.5,0M60.46,463.88l7.5,0M60.46,420.69l7.5,0M60.46,377.51l7.5,0M60.46,334.32l7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 477.51)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 451.26)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Summer</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="4.95" y="515.82" font-size="14pt" fill="#000000">2.5</text>
-<text x="39.95" y="472.63" font-size="14pt" fill="#000000">3</text>
-<text x="4.95" y="429.44" font-size="14pt" fill="#000000">3.5</text>
-<text x="39.95" y="386.26" font-size="14pt" fill="#000000">4</text>
-<text x="4.95" y="343.07" font-size="14pt" fill="#000000">4.5</text>
+<text x="30.7" y="515.82" font-size="14pt" fill="#000000">2.5</text>
+<text x="48.2" y="472.63" font-size="14pt" fill="#000000">3</text>
+<text x="30.7" y="429.44" font-size="14pt" fill="#000000">3.5</text>
+<text x="48.2" y="386.26" font-size="14pt" fill="#000000">4</text>
+<text x="30.7" y="343.07" font-size="14pt" fill="#000000">4.5</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,515.71l252.52,0"/>
@@ -143,11 +143,11 @@
 <path d="M74.89,515.71l0,-7.5M147.04,515.71l0,-7.5M219.19,515.71l0,-7.5M291.34,515.71l0,-7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="134.22" y="528.21" font-size="14pt" fill="#000000">Spring</text>
-<text x="66.14" y="520.46" font-size="14pt" fill="#000000">2</text>
-<text x="138.28" y="520.46" font-size="14pt" fill="#000000">3</text>
-<text x="210.44" y="520.46" font-size="14pt" fill="#000000">4</text>
-<text x="282.58" y="520.46" font-size="14pt" fill="#000000">5</text>
+<text x="160.47" y="529.71" font-size="14pt" fill="#000000">Spring</text>
+<text x="70.52" y="520.96" font-size="14pt" fill="#000000">2</text>
+<text x="142.66" y="520.96" font-size="14pt" fill="#000000">3</text>
+<text x="214.81" y="520.96" font-size="14pt" fill="#000000">4</text>
+<text x="286.95" y="520.96" font-size="14pt" fill="#000000">5</text>
 </g>
 </g>
 </g>

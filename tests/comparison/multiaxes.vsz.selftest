@@ -11,83 +11,84 @@
 <path d="m60.46,7.11l590.39,0l0,465.91l-590.39,0l0,-465.91"/>
 </g>
 <g stroke="none" stroke-width="1" fill="#ffffff">
-<path d="m80.46,353.03l511.57,0l0,100l-511.57,0l0,-100"/>
+<path d="m77.96,368.03l281.57,0l0,87.5l-281.57,0l0,-87.5"/>
 </g>
 <g stroke="#ff0000" stroke-width="0.62" fill="none">
-<path d="M80.46,363.03l35.57,0"/>
+<path d="M77.96,376.78l35.57,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="136.02" y="354.78" font-size="14pt" fill="#000000">Optical surface brightness</text>
+<text x="131.02" y="369.78" font-size="14pt" fill="#000000">Optical surface brightness</text>
 </g>
 <g stroke-width="0.62" stroke-dasharray="2.5,1.25" fill="none">
-<path d="M80.46,383.03l35.57,0"/>
+<path d="M77.96,394.28l35.57,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="136.02" y="374.78" font-size="14pt" fill="#000000">Electron density</text>
+<text x="131.02" y="387.28" font-size="14pt" fill="#000000">Electron density</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
 <g stroke-width="0.62" fill="none">
-<path d="M98.25,395.03l0,16"/>
-<path d="M90.25,403.03l16,0"/>
-<path d="M80.46,403.03l35.57,0"/>
+<path d="M95.75,404.78l0,14"/>
+<path d="M88.75,411.78l14,0"/>
+<path d="M77.96,411.78l35.57,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(98.25, 403.03)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(95.75, 411.78)" fill="#0000ff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="136.02" y="394.78" font-size="14pt" fill="#000000">Iron </text>
-<text x="223.52" y="394.78" font-size="14pt" fill="#000000">Chandra</text>
-<text x="346.02" y="394.78" font-size="14pt" fill="#000000"> Western</text>
+<text x="131.02" y="404.78" font-size="14pt" fill="#000000">Iron </text>
+<text x="174.77" y="404.78" font-size="14pt" fill="#000000">Chandra</text>
+<text x="236.02" y="404.78" font-size="14pt" fill="#000000"> Western</text>
 </g>
 </g>
 <g clip-path="url(#c2)">
 <g stroke-width="0.62" fill="none">
-<path d="M98.25,415.03l0,16"/>
-<path d="M90.25,423.03l16,0"/>
-<path d="M80.46,423.03l35.57,0"/>
+<path d="M95.75,422.28l0,14"/>
+<path d="M88.75,429.28l14,0"/>
+<path d="M77.96,429.28l35.57,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(98.25, 423.03)" fill="#808080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(95.75, 429.28)" fill="#808080">
 <path d="m-2.23,4.14l2.23,-2.23l2.23,2.23l1.91,-1.91l-2.23,-2.23l2.23,-2.23l-1.91,-1.91l-2.23,2.23l-2.23,-2.23l-1.91,1.91l2.23,2.23l-2.23,2.23l1.91,1.91"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="136.02" y="414.78" font-size="14pt" fill="#000000">Iron </text>
-<text x="223.52" y="414.78" font-size="14pt" fill="#000000">Chandra</text>
-<text x="346.02" y="414.78" font-size="14pt" fill="#000000"> Eastern</text>
+<text x="131.02" y="422.28" font-size="14pt" fill="#000000">Iron </text>
+<text x="174.77" y="422.28" font-size="14pt" fill="#000000">Chandra</text>
+<text x="236.02" y="422.28" font-size="14pt" fill="#000000"> Eastern</text>
 </g>
 </g>
 <g clip-path="url(#c3)">
 <g stroke-width="0.62" fill="none">
-<path d="M98.25,435.03l0,16"/>
-<path d="M90.25,443.03l16,0"/>
-<path d="M80.46,443.03l35.57,0"/>
+<path d="M95.75,439.78l0,14"/>
+<path d="M88.75,446.78l14,0"/>
+<path d="M77.96,446.78l35.57,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(98.25, 443.03)" fill="#ffffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(95.75, 446.78)" fill="#ffffff">
 <path d="m-3.75,-3.75l7.5,0l0,7.5l-7.5,0l0,-7.5"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="136.02" y="434.78" font-size="14pt" fill="#000000">Iron </text>
-<text x="223.52" y="434.78" font-size="14pt" fill="#000000">XMM</text>
+<text x="131.02" y="439.78" font-size="14pt" fill="#000000">Iron </text>
+<text x="174.77" y="439.78" font-size="14pt" fill="#000000">XMM</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M650.86,473.03l0,-465.91"/>
 <path d="M650.86,378.08l-3.75,0M650.86,322.53l-3.75,0M650.86,283.13l-3.75,0M650.86,252.56l-3.75,0M650.86,227.58l-3.75,0M650.86,206.47l-3.75,0M650.86,188.17l-3.75,0M650.86,172.04l-3.75,0M650.86,62.66l-3.75,0M650.86,7.11l-3.75,0"/>
 <path d="M650.86,473.03l-7.5,0M650.86,157.61l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 1 -1 0 709.57 45.82)" fill="none">
+<g stroke-width="1" transform="matrix(0 1 -1 0 698.11 142.95)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Electron density (cm</text>
-<text x="350" y="-7" font-size="8pt" fill="#000000">-3</text>
-<text x="371" y="0" font-size="14pt" fill="#000000">)</text>
+<text x="175" y="-7" font-size="8pt" fill="#000000">-3</text>
+<text x="185.5" y="0" font-size="14pt" fill="#000000">)</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="653.84" y="481.78" font-size="14pt" fill="#000000">10</text>
-<text x="688.84" y="474.78" font-size="8pt" fill="#000000">?3</text>
+<text x="654.34" y="481.78" font-size="14pt" fill="#000000">10</text>
+<text x="671.84" y="474.78" font-size="8pt" fill="#000000">?3</text>
+<text x="654.34" y="166.36" font-size="14pt" fill="#000000">0.01</text>
 </g>
 </g>
 <g clip-path="url(#c4)">
@@ -123,18 +124,18 @@
 <path d="M532.78,473.03l-3.75,0M532.78,443.91l-3.75,0M532.78,414.79l-3.75,0M532.78,385.67l-3.75,0M532.78,356.55l-3.75,0M532.78,327.43l-3.75,0M532.78,298.31l-3.75,0M532.78,269.19l-3.75,0M532.78,240.07l-3.75,0M532.78,210.95l-3.75,0M532.78,181.83l-3.75,0M532.78,152.71l-3.75,0M532.78,123.59l-3.75,0M532.78,94.47l-3.75,0M532.78,65.35l-3.75,0M532.78,36.23l-3.75,0"/>
 <path d="M532.78,443.91l-7.5,0M532.78,385.67l-7.5,0M532.78,327.43l-7.5,0M532.78,269.19l-7.5,0M532.78,210.95l-7.5,0M532.78,152.71l-7.5,0M532.78,94.47l-7.5,0M532.78,36.23l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 1 -1 0 596.03 0)" fill="none">
+<g stroke-width="1" transform="matrix(0 1 -1 0 571.28 108.82)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Iron metallicity (solar units)</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="535.77" y="452.66" font-size="14pt" fill="#000000">0.4</text>
-<text x="535.77" y="394.42" font-size="14pt" fill="#000000">0.6</text>
-<text x="535.77" y="336.18" font-size="14pt" fill="#000000">0.8</text>
-<text x="535.77" y="277.94" font-size="14pt" fill="#000000">1</text>
-<text x="535.77" y="219.7" font-size="14pt" fill="#000000">1.2</text>
-<text x="535.77" y="161.46" font-size="14pt" fill="#000000">1.4</text>
-<text x="535.77" y="103.22" font-size="14pt" fill="#000000">1.6</text>
-<text x="535.77" y="44.98" font-size="14pt" fill="#000000">1.8</text>
+<text x="536.27" y="452.66" font-size="14pt" fill="#000000">0.4</text>
+<text x="536.27" y="394.42" font-size="14pt" fill="#000000">0.6</text>
+<text x="536.27" y="336.18" font-size="14pt" fill="#000000">0.8</text>
+<text x="536.27" y="277.94" font-size="14pt" fill="#000000">1</text>
+<text x="536.27" y="219.7" font-size="14pt" fill="#000000">1.2</text>
+<text x="536.27" y="161.46" font-size="14pt" fill="#000000">1.4</text>
+<text x="536.27" y="103.22" font-size="14pt" fill="#000000">1.6</text>
+<text x="536.27" y="44.98" font-size="14pt" fill="#000000">1.8</text>
 </g>
 </g>
 <g clip-path="url(#c4)">
@@ -234,17 +235,17 @@
 <path d="M60.46,7.11l3.75,0M60.46,33l3.75,0M60.46,58.88l3.75,0M60.46,84.77l3.75,0M60.46,110.65l3.75,0M60.46,136.53l3.75,0M60.46,162.42l3.75,0M60.46,188.3l3.75,0M60.46,214.19l3.75,0M60.46,240.07l3.75,0M60.46,265.95l3.75,0M60.46,291.84l3.75,0M60.46,317.72l3.75,0M60.46,343.61l3.75,0M60.46,369.49l3.75,0M60.46,395.37l3.75,0M60.46,421.26l3.75,0M60.46,447.14l3.75,0M60.46,473.03l3.75,0"/>
 <path d="M60.46,7.11l7.5,0M60.46,110.65l7.5,0M60.46,214.19l7.5,0M60.46,317.72l7.5,0M60.46,421.26l7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 14.71 703.5)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 30.71 415.95)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Optical surface brightness (mag arcsec</text>
-<text x="665" y="-7" font-size="8pt" fill="#000000">-2</text>
-<text x="686" y="0" font-size="14pt" fill="#000000">)</text>
+<text x="332.5" y="-7" font-size="8pt" fill="#000000">-2</text>
+<text x="343" y="0" font-size="14pt" fill="#000000">)</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="22.45" y="21" font-size="14pt" fill="#000000">22</text>
-<text x="22.45" y="119.4" font-size="14pt" fill="#000000">24</text>
-<text x="22.45" y="222.94" font-size="14pt" fill="#000000">26</text>
-<text x="22.45" y="326.47" font-size="14pt" fill="#000000">28</text>
-<text x="22.45" y="430.01" font-size="14pt" fill="#000000">30</text>
+<text x="39.45" y="21" font-size="14pt" fill="#000000">22</text>
+<text x="39.45" y="119.4" font-size="14pt" fill="#000000">24</text>
+<text x="39.45" y="222.94" font-size="14pt" fill="#000000">26</text>
+<text x="39.45" y="326.47" font-size="14pt" fill="#000000">28</text>
+<text x="39.45" y="430.01" font-size="14pt" fill="#000000">30</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l590.39,0"/>
@@ -255,17 +256,17 @@
 <path d="M106.37,7.11l0,7.5M580.07,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="250.66" y="485.53" font-size="14pt" fill="#000000">Radius (kpc)</text>
-<text x="88.86" y="477.78" font-size="14pt" fill="#000000">10</text>
-<text x="553.81" y="477.78" font-size="14pt" fill="#000000">100</text>
+<text x="303.16" y="487.03" font-size="14pt" fill="#000000">Radius (kpc)</text>
+<text x="97.61" y="478.28" font-size="14pt" fill="#000000">10</text>
+<text x="566.94" y="478.28" font-size="14pt" fill="#000000">100</text>
 </g>
 </g>
 </g>
 <defs>
 <clipPath id="c0"><path d="m0,0l711.32,0l0,533.49l-711.32,0l0,-533.49"/></clipPath>
-<clipPath id="c1"><path d="m80.46,393.03l35.57,0l0,20l-35.57,0l0,-20"/></clipPath>
-<clipPath id="c2"><path d="m80.46,413.03l35.57,0l0,20l-35.57,0l0,-20"/></clipPath>
-<clipPath id="c3"><path d="m80.46,433.03l35.57,0l0,20l-35.57,0l0,-20"/></clipPath>
+<clipPath id="c1"><path d="m77.96,403.03l35.57,0l0,17.5l-35.57,0l0,-17.5"/></clipPath>
+<clipPath id="c2"><path d="m77.96,420.53l35.57,0l0,17.5l-35.57,0l0,-17.5"/></clipPath>
+<clipPath id="c3"><path d="m77.96,438.03l35.57,0l0,17.5l-35.57,0l0,-17.5"/></clipPath>
 <clipPath id="c4"><path d="m60.46,7.11l590.39,0l0,465.91l-590.39,0l0,-465.91"/></clipPath>
 </defs>
 </svg>

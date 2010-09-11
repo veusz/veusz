@@ -26,15 +26,17 @@
 <path d="M473.03,402.9l-3.75,0M473.03,361.88l-3.75,0M473.03,332.77l-3.75,0M473.03,310.2l-3.75,0M473.03,291.75l-3.75,0M473.03,276.16l-3.75,0M473.03,262.65l-3.75,0M473.03,250.73l-3.75,0M473.03,169.94l-3.75,0M473.03,128.92l-3.75,0M473.03,99.82l-3.75,0M473.03,77.24l-3.75,0M473.03,58.79l-3.75,0M473.03,43.2l-3.75,0M473.03,29.69l-3.75,0M473.03,17.77l-3.75,0"/>
 <path d="M473.03,473.03l-7.5,0M473.03,240.07l-7.5,0M473.03,7.11l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 1 -1 0 531.74 135.07)" fill="none">
+<g stroke-width="1" transform="matrix(0 1 -1 0 513.28 187.57)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Another axis</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="476.02" y="481.78" font-size="14pt" fill="#000000">10</text>
-<text x="511.02" y="474.78" font-size="8pt" fill="#000000">?2</text>
-<text x="476.02" y="21" font-size="14pt" fill="#000000">10</text>
-<text x="511.02" y="14" font-size="8pt" fill="#000000">0</text>
-<text x="339.77" y="42.91" font-size="100pt" fill="#000000">?</text>
+<text x="476.52" y="481.78" font-size="14pt" fill="#000000">10</text>
+<text x="494.02" y="474.78" font-size="8pt" fill="#000000">?2</text>
+<text x="476.52" y="248.82" font-size="14pt" fill="#000000">10</text>
+<text x="494.02" y="241.82" font-size="8pt" fill="#000000">?1</text>
+<text x="476.52" y="21" font-size="14pt" fill="#000000">10</text>
+<text x="494.02" y="14" font-size="8pt" fill="#000000">0</text>
+<text x="402.27" y="42.91" font-size="100pt" fill="#000000">?</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
@@ -60,17 +62,17 @@
 <path d="M60.46,473.03l3.75,0M60.46,434.2l3.75,0M60.46,395.37l3.75,0M60.46,356.55l3.75,0M60.46,317.72l3.75,0M60.46,278.9l3.75,0M60.46,240.07l3.75,0M60.46,201.24l3.75,0M60.46,162.42l3.75,0M60.46,123.59l3.75,0M60.46,84.77l3.75,0M60.46,45.94l3.75,0M60.46,7.11l3.75,0"/>
 <path d="M60.46,473.03l7.5,0M60.46,395.37l7.5,0M60.46,317.72l7.5,0M60.46,240.07l7.5,0M60.46,162.42l7.5,0M60.46,84.77l7.5,0M60.46,7.11l7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 14.71 318.82)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 30.71 279.45)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Left axis</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.95" y="481.78" font-size="14pt" fill="#000000">0</text>
-<text x="39.95" y="404.12" font-size="14pt" fill="#000000">5</text>
-<text x="22.45" y="326.47" font-size="14pt" fill="#000000">10</text>
-<text x="22.45" y="248.82" font-size="14pt" fill="#000000">15</text>
-<text x="22.45" y="171.17" font-size="14pt" fill="#000000">20</text>
-<text x="22.45" y="93.52" font-size="14pt" fill="#000000">25</text>
-<text x="22.45" y="21" font-size="14pt" fill="#000000">30</text>
+<text x="48.2" y="481.78" font-size="14pt" fill="#000000">0</text>
+<text x="48.2" y="404.12" font-size="14pt" fill="#000000">5</text>
+<text x="39.45" y="326.47" font-size="14pt" fill="#000000">10</text>
+<text x="39.45" y="248.82" font-size="14pt" fill="#000000">15</text>
+<text x="39.45" y="171.17" font-size="14pt" fill="#000000">20</text>
+<text x="39.45" y="93.52" font-size="14pt" fill="#000000">25</text>
+<text x="39.45" y="21" font-size="14pt" fill="#000000">30</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l412.56,0"/>
@@ -81,15 +83,15 @@
 <path d="M60.46,7.11l0,7.5M129.22,7.11l0,7.5M197.98,7.11l0,7.5M266.74,7.11l0,7.5M335.51,7.11l0,7.5M404.27,7.11l0,7.5M473.03,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="214.23" y="485.53" font-size="14pt" fill="#000000">x</text>
-<text x="231.73" y="485.53" font-size="14pt" fill="#000000"> axis</text>
-<text x="25.45" y="477.78" font-size="14pt" fill="#000000">?1.5</text>
-<text x="111.72" y="477.78" font-size="14pt" fill="#000000">?1</text>
-<text x="162.97" y="477.78" font-size="14pt" fill="#000000">?0.5</text>
-<text x="257.98" y="477.78" font-size="14pt" fill="#000000">0</text>
-<text x="309.25" y="477.78" font-size="14pt" fill="#000000">0.5</text>
-<text x="395.52" y="477.78" font-size="14pt" fill="#000000">1</text>
-<text x="446.77" y="477.78" font-size="14pt" fill="#000000">1.5</text>
+<text x="240.48" y="487.03" font-size="14pt" fill="#000000">x</text>
+<text x="249.23" y="487.03" font-size="14pt" fill="#000000"> axis</text>
+<text x="42.95" y="478.28" font-size="14pt" fill="#000000">?1.5</text>
+<text x="120.47" y="478.28" font-size="14pt" fill="#000000">?1</text>
+<text x="180.47" y="478.28" font-size="14pt" fill="#000000">?0.5</text>
+<text x="262.36" y="478.28" font-size="14pt" fill="#000000">0</text>
+<text x="322.38" y="478.28" font-size="14pt" fill="#000000">0.5</text>
+<text x="399.89" y="478.28" font-size="14pt" fill="#000000">1</text>
+<text x="459.89" y="478.28" font-size="14pt" fill="#000000">1.5</text>
 </g>
 </g>
 </g>

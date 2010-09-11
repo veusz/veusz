@@ -21,7 +21,7 @@
 # $Id$
 
 from version import version
-from textrender import Renderer
+from textrender import Renderer, FontMetrics
 from safe_eval import checkCode
 from fitlm import fitLM
 

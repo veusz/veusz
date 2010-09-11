@@ -26,6 +26,7 @@ import numpy as N
 
 import veusz.document as document
 import veusz.setting as setting
+import veusz.utils as utils
 
 import graph
 import grid
@@ -114,7 +115,7 @@ class ColorBar(axis.Axis):
         # get height of label font
         font = s.get('Label').makeQFont(painter)
         painter.setFont(font)
-        fontheight = painter.fontMetrics().height()
+        fontheight = utils.FontMetrics(font, painter.device()).height()
 
         bounds = self.computeBounds(parentposn, painter)
         horz = s.direction == 'horizontal'

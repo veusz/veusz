@@ -70,12 +70,12 @@
 <path d="M526.38,473.03l-7.5,0M526.38,379.84l-7.5,0M526.38,286.66l-7.5,0M526.38,193.48l-7.5,0M526.38,100.3l-7.5,0M526.38,7.11l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.95" y="481.78" font-size="14pt" fill="#000000">0</text>
-<text x="22.45" y="388.59" font-size="14pt" fill="#000000">20</text>
-<text x="22.45" y="295.41" font-size="14pt" fill="#000000">40</text>
-<text x="22.45" y="202.23" font-size="14pt" fill="#000000">60</text>
-<text x="22.45" y="109.05" font-size="14pt" fill="#000000">80</text>
-<text x="4.95" y="21" font-size="14pt" fill="#000000">100</text>
+<text x="48.2" y="481.78" font-size="14pt" fill="#000000">0</text>
+<text x="39.45" y="388.59" font-size="14pt" fill="#000000">20</text>
+<text x="39.45" y="295.41" font-size="14pt" fill="#000000">40</text>
+<text x="39.45" y="202.23" font-size="14pt" fill="#000000">60</text>
+<text x="39.45" y="109.05" font-size="14pt" fill="#000000">80</text>
+<text x="30.7" y="21" font-size="14pt" fill="#000000">100</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
@@ -86,12 +86,12 @@
 <path d="M60.46,7.11l0,7.5M153.64,7.11l0,7.5M246.83,7.11l0,7.5M340.01,7.11l0,7.5M433.19,7.11l0,7.5M526.38,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="51.7" y="477.78" font-size="14pt" fill="#000000">0</text>
-<text x="136.14" y="477.78" font-size="14pt" fill="#000000">20</text>
-<text x="229.31" y="477.78" font-size="14pt" fill="#000000">40</text>
-<text x="322.5" y="477.78" font-size="14pt" fill="#000000">60</text>
-<text x="415.69" y="477.78" font-size="14pt" fill="#000000">80</text>
-<text x="480.98" y="477.78" font-size="14pt" fill="#000000">100</text>
+<text x="56.08" y="478.28" font-size="14pt" fill="#000000">0</text>
+<text x="144.89" y="478.28" font-size="14pt" fill="#000000">20</text>
+<text x="238.06" y="478.28" font-size="14pt" fill="#000000">40</text>
+<text x="331.25" y="478.28" font-size="14pt" fill="#000000">60</text>
+<text x="424.44" y="478.28" font-size="14pt" fill="#000000">80</text>
+<text x="507.23" y="478.28" font-size="14pt" fill="#000000">100</text>
 </g>
 </g>
 </g>

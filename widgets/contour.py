@@ -498,7 +498,7 @@ class Contour(plotters.GenericPlotter):
         # get text and font
         text = utils.formatNumber(number * cl.scale, cl.format)
         font = cl.makeQFont(painter)
-        descent = qt4.QFontMetrics(font).descent()
+        descent = utils.FontMetrics(font, painter.device()).descent()
 
         # work out where text lies
         half = len(xplt)/2

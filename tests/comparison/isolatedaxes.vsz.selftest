@@ -24,16 +24,16 @@
 </g>
 <g stroke-width="1" fill="none">
 <text x="0" y="142.98" font-size="14pt" fill="#000000">y</text>
-<text x="17.5" y="142.98" font-size="14pt" fill="#000000">-axis</text>
-<text x="14" y="160.48" font-size="14pt" fill="#000000">(cm</text>
-<text x="66.5" y="153.48" font-size="8pt" fill="#000000">-3</text>
-<text x="87.5" y="160.48" font-size="14pt" fill="#000000">)</text>
-<text x="66.25" y="284.98" font-size="14pt" fill="#000000">0</text>
-<text x="31.25" y="234.83" font-size="14pt" fill="#000000">0.2</text>
-<text x="31.25" y="184.68" font-size="14pt" fill="#000000">0.4</text>
-<text x="31.25" y="134.53" font-size="14pt" fill="#000000">0.6</text>
-<text x="31.25" y="84.38" font-size="14pt" fill="#000000">0.8</text>
-<text x="66.25" y="34.23" font-size="14pt" fill="#000000">1</text>
+<text x="8.75" y="142.98" font-size="14pt" fill="#000000">-axis</text>
+<text x="7" y="160.48" font-size="14pt" fill="#000000">(cm</text>
+<text x="33.25" y="153.48" font-size="8pt" fill="#000000">-3</text>
+<text x="43.75" y="160.48" font-size="14pt" fill="#000000">)</text>
+<text x="74.5" y="284.98" font-size="14pt" fill="#000000">0</text>
+<text x="57" y="234.83" font-size="14pt" fill="#000000">0.2</text>
+<text x="57" y="184.68" font-size="14pt" fill="#000000">0.4</text>
+<text x="57" y="134.53" font-size="14pt" fill="#000000">0.6</text>
+<text x="57" y="84.38" font-size="14pt" fill="#000000">0.8</text>
+<text x="74.5" y="34.23" font-size="14pt" fill="#000000">1</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M110.02,153.84l212.78,0"/>
@@ -41,12 +41,12 @@
 <path d="M110.02,153.84l0,-7.5M216.41,153.84l0,-7.5M322.8,153.84l0,-7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="163.91" y="166.34" font-size="14pt" fill="#000000">x</text>
-<text x="181.41" y="166.34" font-size="14pt" fill="#000000">-axis</text>
-<text x="172.66" y="183.84" font-size="14pt" fill="#000000">(erg)</text>
-<text x="75.02" y="158.59" font-size="14pt" fill="#000000">0.01</text>
-<text x="190.16" y="158.59" font-size="14pt" fill="#000000">0.1</text>
-<text x="314.05" y="158.59" font-size="14pt" fill="#000000">1</text>
+<text x="190.16" y="167.84" font-size="14pt" fill="#000000">x</text>
+<text x="198.91" y="167.84" font-size="14pt" fill="#000000">-axis</text>
+<text x="194.53" y="185.34" font-size="14pt" fill="#000000">(erg)</text>
+<text x="92.52" y="159.09" font-size="14pt" fill="#000000">0.01</text>
+<text x="203.28" y="159.09" font-size="14pt" fill="#000000">0.1</text>
+<text x="318.42" y="159.09" font-size="14pt" fill="#000000">1</text>
 </g>
 </g>
 </g>

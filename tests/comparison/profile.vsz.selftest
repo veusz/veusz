@@ -11,62 +11,62 @@
 <path d="m65.09,7.11l437.46,0l0,180.85l-437.46,0l0,-180.85"/>
 </g>
 <g stroke="none" stroke-width="1" fill="#ffffff">
-<path d="m258.59,122.86l323.78,0l0,60l-323.78,0l0,-60"/>
+<path d="m258.59,137.86l176.28,0l0,45l-176.28,0l0,-45"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
 <g stroke="#808080" stroke-width="0.62" fill="none">
-<polygon points="259.48,132.86 267.48,140.86 275.48,132.86 267.48,124.86"/>
+<polygon points="261.48,145.36 267.48,151.36 273.48,145.36 267.48,139.36"/>
 </g>
-<g stroke-linejoin="miter" stroke="none" stroke-width="1" transform="translate(267.48, 132.86)" fill="#ff00ff">
+<g stroke-linejoin="miter" stroke="none" stroke-width="1" transform="translate(267.48, 145.36)" fill="#ff00ff">
 <path d="m-1.25,-1.25l2.5,0l0,2.5l-2.5,0l0,-2.5"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="296.36" y="124.36" font-size="12pt" fill="#000000">Chandra deprojected</text>
+<text x="291.36" y="139.36" font-size="12pt" fill="#000000">Chandra deprojected</text>
 </g>
 </g>
 <g clip-path="url(#c2)">
 <g stroke="#0000ff" stroke-width="0.62" fill="none">
-<path d="M267.48,144.86l0,16"/>
-<path d="M259.48,152.86l16,0"/>
-<path d="M264.36,144.86l6.25,0"/>
-<path d="M264.36,160.86l6.25,0"/>
-<path d="M259.48,149.73l0,6.25"/>
-<path d="M275.48,149.73l0,6.25"/>
+<path d="M267.48,154.36l0,12"/>
+<path d="M261.48,160.36l12,0"/>
+<path d="M264.36,154.36l6.25,0"/>
+<path d="M264.36,166.36l6.25,0"/>
+<path d="M261.48,157.23l0,6.25"/>
+<path d="M273.48,157.23l0,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(267.48, 152.86)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(267.48, 160.36)" fill="#00ffff">
 <path d="m0,4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="296.36" y="144.36" font-size="12pt" fill="#000000">Chandra projected</text>
+<text x="291.36" y="154.36" font-size="12pt" fill="#000000">Chandra projected</text>
 </g>
 </g>
 <g clip-path="url(#c3)">
 <g stroke="#ff0000" stroke-width="0.62" fill="none">
-<path d="m240.81,172.86c0,-4.42,0,-8,0,-8"/>
-<path d="m240.81,164.86c0,0,0,3.58,0,8"/>
-<path d="m240.81,172.86c0,4.42,0,8,0,8"/>
-<path d="m240.81,180.86c0,0,0,-3.58,0,-8"/>
-<path d="m275.48,172.86c0,-4.42,-3.58,-8,-8,-8"/>
-<path d="m267.48,164.86c-4.42,0,-8,3.58,-8,8"/>
-<path d="m259.48,172.86c0,4.42,3.58,8,8,8"/>
-<path d="m267.48,180.86c4.42,0,8,-3.58,8,-8"/>
-<path d="m294.16,172.86c0,-4.42,0,-8,0,-8"/>
-<path d="m294.16,164.86c0,0,0,3.58,0,8"/>
-<path d="m294.16,172.86c0,4.42,0,8,0,8"/>
-<path d="m294.16,180.86c0,0,0,-3.58,0,-8"/>
+<path d="m240.81,175.36c0,-3.31,0,-6,0,-6"/>
+<path d="m240.81,169.36c0,0,0,2.69,0,6"/>
+<path d="m240.81,175.36c0,3.31,0,6,0,6"/>
+<path d="m240.81,181.36c0,0,0,-2.69,0,-6"/>
+<path d="m273.48,175.36c0,-3.31,-2.69,-6,-6,-6"/>
+<path d="m267.48,169.36c-3.31,0,-6,2.69,-6,6"/>
+<path d="m261.48,175.36c0,3.31,2.69,6,6,6"/>
+<path d="m267.48,181.36c3.31,0,6,-2.69,6,-6"/>
+<path d="m294.16,175.36c0,-3.31,0,-6,0,-6"/>
+<path d="m294.16,169.36c0,0,0,2.69,0,6"/>
+<path d="m294.16,175.36c0,3.31,0,6,0,6"/>
+<path d="m294.16,181.36c0,0,0,-2.69,0,-6"/>
 </g>
-<g stroke-linejoin="miter" stroke="none" stroke-width="1" transform="translate(267.48, 172.86)" fill="#ff0000">
+<g stroke-linejoin="miter" stroke="none" stroke-width="1" transform="translate(267.48, 175.36)" fill="#ff0000">
 <path d="m0,-4.5l-1.01,3.11l-3.27,0l2.65,1.92l-1.01,3.11l2.65,-1.92l2.65,1.92l-1.01,-3.11l2.65,-1.92l-3.27,0l-1.01,-3.11"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="296.36" y="164.36" font-size="12pt" fill="#000000">XMM projected</text>
+<text x="291.36" y="169.36" font-size="12pt" fill="#000000">XMM projected</text>
 </g>
 </g>
 <g clip-path="url(#c4)">
@@ -379,12 +379,12 @@
 <path d="M502.55,174.98l-3.75,0M502.55,144.33l-3.75,0M502.55,120.55l-3.75,0M502.55,101.12l-3.75,0M502.55,84.7l-3.75,0M502.55,70.47l-3.75,0M502.55,57.92l-3.75,0"/>
 <path d="M502.55,46.69l-7.5,0M502.55,120.55l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 297.5)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 171.91)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Temperature (keV)</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="28.08" y="55.44" font-size="14pt" fill="#000000">10</text>
-<text x="45.58" y="129.3" font-size="14pt" fill="#000000">5</text>
+<text x="44.08" y="55.44" font-size="14pt" fill="#000000">10</text>
+<text x="52.83" y="129.3" font-size="14pt" fill="#000000">5</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M65.09,187.97l437.46,0"/>
@@ -397,7 +397,7 @@
 <g stroke-width="0.62" fill="#ffffff">
 <path d="m65.09,195.08l437.46,0l0,180.85l-437.46,0l0,-180.85"/>
 </g>
-<g stroke="#ff00ff" stroke-width="1" transform="matrix(0.927184 0.374607 -0.374607 0.927184 253.67 211.54)" fill="none">
+<g stroke="#ff00ff" stroke-width="1" transform="matrix(0.927184 0.374607 -0.374607 0.927184 253.67 234.48)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#ff00ff">Density</text>
 </g>
 <g stroke-width="1" transform="matrix(0.939693 -0.34202 0.34202 0.939693 162.3 323.35)" fill="none">
@@ -408,20 +408,20 @@
 <path d="M502.55,362.32l-3.75,0M502.55,354.36l-3.75,0M502.55,348.71l-3.75,0M502.55,344.33l-3.75,0M502.55,340.75l-3.75,0M502.55,337.72l-3.75,0M502.55,335.1l-3.75,0M502.55,332.79l-3.75,0M502.55,317.11l-3.75,0M502.55,309.15l-3.75,0M502.55,303.5l-3.75,0M502.55,299.12l-3.75,0M502.55,295.54l-3.75,0M502.55,292.51l-3.75,0M502.55,289.89l-3.75,0M502.55,287.57l-3.75,0M502.55,271.9l-3.75,0M502.55,263.93l-3.75,0M502.55,258.28l-3.75,0M502.55,253.9l-3.75,0M502.55,250.32l-3.75,0M502.55,247.3l-3.75,0M502.55,244.67l-3.75,0M502.55,242.36l-3.75,0M502.55,226.68l-3.75,0M502.55,218.72l-3.75,0M502.55,213.07l-3.75,0M502.55,208.69l-3.75,0M502.55,205.11l-3.75,0M502.55,202.08l-3.75,0M502.55,199.46l-3.75,0M502.55,197.15l-3.75,0"/>
 <path d="M502.55,375.93l-7.5,0M502.55,330.72l-7.5,0M502.55,285.51l-7.5,0M502.55,240.29l-7.5,0M502.55,195.08l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 1 -1 0 563.75 187.97)" fill="none">
+<g stroke-width="1" transform="matrix(0 1 -1 0 563.75 211.13)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Cooling time (yr)</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="504.53" y="384.68" font-size="14pt" fill="#000000">10</text>
-<text x="539.53" y="377.68" font-size="8pt" fill="#000000">8</text>
-<text x="504.53" y="339.47" font-size="14pt" fill="#000000">10</text>
-<text x="539.53" y="332.47" font-size="8pt" fill="#000000">9</text>
-<text x="504.53" y="294.26" font-size="14pt" fill="#000000">10</text>
-<text x="539.53" y="287.26" font-size="8pt" fill="#000000">10</text>
-<text x="504.53" y="249.04" font-size="14pt" fill="#000000">10</text>
-<text x="539.53" y="242.04" font-size="8pt" fill="#000000">11</text>
-<text x="504.53" y="208.97" font-size="14pt" fill="#000000">10</text>
-<text x="539.53" y="201.97" font-size="8pt" fill="#000000">12</text>
+<text x="506.03" y="384.68" font-size="14pt" fill="#000000">10</text>
+<text x="523.53" y="377.68" font-size="8pt" fill="#000000">8</text>
+<text x="506.03" y="339.47" font-size="14pt" fill="#000000">10</text>
+<text x="523.53" y="332.47" font-size="8pt" fill="#000000">9</text>
+<text x="506.03" y="294.26" font-size="14pt" fill="#000000">10</text>
+<text x="523.53" y="287.26" font-size="8pt" fill="#000000">10</text>
+<text x="506.03" y="249.04" font-size="14pt" fill="#000000">10</text>
+<text x="523.53" y="242.04" font-size="8pt" fill="#000000">11</text>
+<text x="506.03" y="208.97" font-size="14pt" fill="#000000">10</text>
+<text x="523.53" y="201.97" font-size="8pt" fill="#000000">12</text>
 </g>
 </g>
 <g clip-path="url(#c5)">
@@ -619,17 +619,18 @@
 <path d="M65.09,359.44l3.75,0M65.09,349.79l3.75,0M65.09,342.95l3.75,0M65.09,337.64l3.75,0M65.09,333.3l3.75,0M65.09,329.63l3.75,0M65.09,326.45l3.75,0M65.09,323.65l3.75,0M65.09,304.65l3.75,0M65.09,295.01l3.75,0M65.09,288.16l3.75,0M65.09,282.85l3.75,0M65.09,278.51l3.75,0M65.09,274.85l3.75,0M65.09,271.67l3.75,0M65.09,268.87l3.75,0M65.09,249.87l3.75,0M65.09,240.22l3.75,0M65.09,233.37l3.75,0M65.09,228.06l3.75,0M65.09,223.73l3.75,0M65.09,220.06l3.75,0M65.09,216.88l3.75,0M65.09,214.08l3.75,0M65.09,195.08l3.75,0"/>
 <path d="M65.09,375.93l7.5,0M65.09,321.15l7.5,0M65.09,266.36l7.5,0M65.09,211.57l7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 576.47)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 382.63)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Electron density (cm</text>
-<text x="350" y="-7" font-size="8pt" fill="#000000">-3</text>
-<text x="371" y="0" font-size="14pt" fill="#000000">)</text>
+<text x="175" y="-7" font-size="8pt" fill="#000000">-3</text>
+<text x="185.5" y="0" font-size="14pt" fill="#000000">)</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="7.08" y="384.68" font-size="14pt" fill="#000000">10</text>
-<text x="42.08" y="377.68" font-size="8pt" fill="#000000">?4</text>
-<text x="7.08" y="329.9" font-size="14pt" fill="#000000">10</text>
-<text x="42.08" y="322.9" font-size="8pt" fill="#000000">?3</text>
-<text x="10.58" y="220.32" font-size="14pt" fill="#000000">0.1</text>
+<text x="33.58" y="384.68" font-size="14pt" fill="#000000">10</text>
+<text x="51.08" y="377.68" font-size="8pt" fill="#000000">?4</text>
+<text x="33.58" y="329.9" font-size="14pt" fill="#000000">10</text>
+<text x="51.08" y="322.9" font-size="8pt" fill="#000000">?3</text>
+<text x="26.58" y="275.11" font-size="14pt" fill="#000000">0.01</text>
+<text x="35.33" y="220.32" font-size="14pt" fill="#000000">0.1</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M65.09,375.93l437.46,0"/>
@@ -640,18 +641,18 @@
 <path d="M83.94,195.08l0,7.5M278.47,195.08l0,7.5M473,195.08l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="178.81" y="417.93" font-size="14pt" fill="#000000">Radius (kpc)</text>
-<text x="66.44" y="379.68" font-size="14pt" fill="#000000">10</text>
-<text x="252.22" y="379.68" font-size="14pt" fill="#000000">100</text>
-<text x="438" y="379.68" font-size="14pt" fill="#000000">1000</text>
+<text x="231.31" y="417.93" font-size="14pt" fill="#000000">Radius (kpc)</text>
+<text x="75.19" y="381.18" font-size="14pt" fill="#000000">10</text>
+<text x="265.34" y="381.18" font-size="14pt" fill="#000000">100</text>
+<text x="455.5" y="381.18" font-size="14pt" fill="#000000">1000</text>
 </g>
 </g>
 </g>
 <defs>
 <clipPath id="c0"><path d="m0,0l565.5,0l0,419.68l-565.5,0l0,-419.68"/></clipPath>
-<clipPath id="c1"><path d="m258.59,122.86l17.78,0l0,20l-17.78,0l0,-20"/></clipPath>
-<clipPath id="c2"><path d="m258.59,142.86l17.78,0l0,20l-17.78,0l0,-20"/></clipPath>
-<clipPath id="c3"><path d="m258.59,162.86l17.78,0l0,20l-17.78,0l0,-20"/></clipPath>
+<clipPath id="c1"><path d="m258.59,137.86l17.78,0l0,15l-17.78,0l0,-15"/></clipPath>
+<clipPath id="c2"><path d="m258.59,152.86l17.78,0l0,15l-17.78,0l0,-15"/></clipPath>
+<clipPath id="c3"><path d="m258.59,167.86l17.78,0l0,15l-17.78,0l0,-15"/></clipPath>
 <clipPath id="c4"><path d="m65.09,7.11l437.46,0l0,180.85l-437.46,0l0,-180.85"/></clipPath>
 <clipPath id="c5"><path d="m65.09,195.08l437.46,0l0,180.85l-437.46,0l0,-180.85"/></clipPath>
 </defs>

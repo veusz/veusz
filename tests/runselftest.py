@@ -1,5 +1,6 @@
 import glob
 import os.path
+import sys
 
 import veusz.qtall as qt4
 import veusz.utils.textrender
@@ -18,7 +19,7 @@ class StupidFontMetrics(object):
         return self.device.logicalDpiY() * (self.font.pointSizeF()/72.)
 
     def width(self, text):
-        return len(text)*self.height()
+        return len(text)*self.height()*0.5
 
     def ascent(self):
         return 0.1*self.height()
@@ -26,10 +27,11 @@ class StupidFontMetrics(object):
     def descent(self):
         return 0.1*self.height()
 
-    def boundingRect(self, c):
-        return qt4.QRectF(0, 0, self.height(), self.height())
+    def leading(self):
+        return 0.1*self.height()
 
-veusz.utils.textrender.FontMetrics = StupidFontMetrics
+    def boundingRect(self, c):
+        return qt4.QRectF(0, 0, self.height()*0.5, self.height())
 
 def renderTest(invsz, outfile):
     """Render vsz document to create outfile."""
@@ -53,7 +55,6 @@ def renderAllTests():
     print "Regenerating all test output"
 
     thisdir = os.path.dirname(__file__)
-
     exampledir = os.path.join(thisdir, '..', 'examples' )
     for vsz in glob.glob( os.path.join(exampledir, '*.vsz') ):
         print os.path.basename(vsz)
@@ -62,7 +63,39 @@ def renderAllTests():
                                os.path.basename(vsz) + '.selftest')
         renderTest(vsz, outfile)
 
-app = qt4.QApplication([])
-veusz.setting.transient_settings['unsafe_mode'] = True
+def runTests():
+    print "Testing output"
 
-renderAllTests()
+    thisdir = os.path.dirname(__file__)
+    exampledir = os.path.join(thisdir, '..', 'examples' )
+    for vsz in glob.glob( os.path.join(exampledir, '*.vsz') ):
+        print os.path.basename(vsz)
+
+        outfile = os.path.join(thisdir,
+                               os.path.basename(vsz) + '.temp.selftest')
+        renderTest(vsz, outfile)
+
+        comparfile = os.path.join(thisdir, 'comparison',
+                                  os.path.basename(vsz) + '.selftest')
+
+        t1 = open(outfile, 'rU').read()
+        t2 = open(comparfile, 'rU').read()
+        if t1 != t2:
+            print " FAILED: results differed"
+        else:
+            print " SUCCESS"
+
+if __name__ == '__main__':
+    app = qt4.QApplication([])
+
+    veusz.setting.transient_settings['unsafe_mode'] = True
+    veusz.utils.textrender.FontMetrics = StupidFontMetrics
+    veusz.utils.FontMetrics = StupidFontMetrics
+
+    if len(sys.argv) == 1:
+        runTests()
+    else:
+        if len(sys.argv) != 2 or sys.argv[1] != 'regenerate':
+            print >>sys.stderr, "Usage: %s [regenerate]" % sys.argv[0]
+            sys.exit(1)
+        renderAllTests()

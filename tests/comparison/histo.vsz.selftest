@@ -10,9 +10,9 @@
 <g stroke-width="0.62" fill="#ffffff">
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
-<g stroke-width="1" transform="matrix(0 1 -1 0 456.49 -131.8)" fill="none">
+<g stroke-width="1" transform="matrix(0 1 -1 0 456.49 54.13)" fill="none">
 <text x="0" y="0" font-size="35pt" fill="#000000">Example </text>
-<text x="350" y="0" font-size="35pt" fill="#000000">histogram</text>
+<text x="175" y="0" font-size="35pt" fill="#000000">histogram</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
@@ -28,30 +28,30 @@
 </g>
 <g clip-path="url(#c0)">
 <g stroke="none" stroke-width="1" fill="#ffffff">
-<path d="m78.46,25.11l330.57,0l0,54l-330.57,0l0,-54"/>
+<path d="m75.46,22.11l201.57,0l0,45l-201.57,0l0,-45"/>
 </g>
 <g stroke-width="0.62" fill="none">
-<path d="m78.46,25.11l330.57,0l0,54l-330.57,0l0,-54"/>
+<path d="m75.46,22.11l201.57,0l0,45l-201.57,0l0,-45"/>
 </g>
 <g stroke="#0000ff" stroke-width="0.62" fill="none">
-<path d="M96.46,43.11l35.57,0"/>
+<path d="M90.46,37.11l35.57,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="150.02" y="35.61" font-size="12pt" fill="#000000">Fit to histogram</text>
+<text x="141.02" y="31.11" font-size="12pt" fill="#000000">Fit to histogram</text>
 </g>
 </g>
 <g clip-path="url(#c2)">
 <g stroke="none" stroke-width="1" fill="none">
-<path d="M114.25,53.91l0,14.4"/>
-<path d="M114.25,61.11l0,0"/>
+<path d="M108.25,46.11l0,12"/>
+<path d="M108.25,52.11l0,0"/>
 </g>
 <g stroke-width="0.62" fill="none">
-<path d="M96.46,61.11l35.57,0"/>
+<path d="M90.46,52.11l35.57,0"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="150.02" y="53.61" font-size="12pt" fill="#000000">Histogram</text>
+<text x="141.02" y="46.11" font-size="12pt" fill="#000000">Histogram</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
@@ -68,16 +68,16 @@
 <path d="M526.38,472.1l-3.75,0M526.38,453.5l-3.75,0M526.38,434.9l-3.75,0M526.38,416.3l-3.75,0M526.38,397.7l-3.75,0M526.38,379.1l-3.75,0M526.38,360.5l-3.75,0M526.38,341.9l-3.75,0M526.38,323.3l-3.75,0M526.38,304.7l-3.75,0M526.38,286.1l-3.75,0M526.38,267.5l-3.75,0M526.38,248.9l-3.75,0M526.38,230.31l-3.75,0M526.38,211.71l-3.75,0M526.38,193.11l-3.75,0M526.38,174.51l-3.75,0M526.38,155.91l-3.75,0M526.38,137.31l-3.75,0M526.38,118.71l-3.75,0M526.38,100.11l-3.75,0M526.38,81.51l-3.75,0M526.38,62.91l-3.75,0M526.38,44.31l-3.75,0M526.38,25.71l-3.75,0M526.38,7.11l-3.75,0"/>
 <path d="M526.38,472.1l-7.5,0M526.38,379.1l-7.5,0M526.38,286.1l-7.5,0M526.38,193.11l-7.5,0M526.38,100.11l-7.5,0M526.38,7.11l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 301.32)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 21.96 270.7)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Dragons</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.95" y="480.85" font-size="14pt" fill="#000000">0</text>
-<text x="4.95" y="387.85" font-size="14pt" fill="#000000">100</text>
-<text x="4.95" y="294.85" font-size="14pt" fill="#000000">200</text>
-<text x="4.95" y="201.86" font-size="14pt" fill="#000000">300</text>
-<text x="4.95" y="108.86" font-size="14pt" fill="#000000">400</text>
-<text x="4.95" y="21" font-size="14pt" fill="#000000">500</text>
+<text x="48.2" y="480.85" font-size="14pt" fill="#000000">0</text>
+<text x="30.7" y="387.85" font-size="14pt" fill="#000000">100</text>
+<text x="30.7" y="294.85" font-size="14pt" fill="#000000">200</text>
+<text x="30.7" y="201.86" font-size="14pt" fill="#000000">300</text>
+<text x="30.7" y="108.86" font-size="14pt" fill="#000000">400</text>
+<text x="30.7" y="21" font-size="14pt" fill="#000000">500</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
@@ -88,18 +88,18 @@
 <path d="M60.46,7.11l0,7.5M176.94,7.11l0,7.5M293.42,7.11l0,7.5M409.9,7.11l0,7.5M526.38,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="188.41" y="485.53" font-size="14pt" fill="#000000">Wingspan (m)</text>
-<text x="51.7" y="477.78" font-size="14pt" fill="#000000">0</text>
-<text x="159.44" y="477.78" font-size="14pt" fill="#000000">50</text>
-<text x="267.16" y="477.78" font-size="14pt" fill="#000000">100</text>
-<text x="383.64" y="477.78" font-size="14pt" fill="#000000">150</text>
-<text x="480.98" y="477.78" font-size="14pt" fill="#000000">200</text>
+<text x="240.91" y="487.03" font-size="14pt" fill="#000000">Wingspan (m)</text>
+<text x="56.08" y="478.28" font-size="14pt" fill="#000000">0</text>
+<text x="168.19" y="478.28" font-size="14pt" fill="#000000">50</text>
+<text x="280.28" y="478.28" font-size="14pt" fill="#000000">100</text>
+<text x="396.77" y="478.28" font-size="14pt" fill="#000000">150</text>
+<text x="507.23" y="478.28" font-size="14pt" fill="#000000">200</text>
 </g>
 </g>
 </g>
 <defs>
 <clipPath id="c0"><path d="m0,0l533.49,0l0,533.49l-533.49,0l0,-533.49"/></clipPath>
 <clipPath id="c1"><path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/></clipPath>
-<clipPath id="c2"><path d="m96.46,52.11l35.57,0l0,18l-35.57,0l0,-18"/></clipPath>
+<clipPath id="c2"><path d="m90.46,44.61l35.57,0l0,15l-35.57,0l0,-15"/></clipPath>
 </defs>
 </svg>

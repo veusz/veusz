@@ -8,7 +8,7 @@
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
 <g stroke="#00557f" stroke-width="1" fill="none">
-<text x="22.98" y="14.42" font-size="30pt" fill="#00557f">A graph title</text>
+<text x="144.86" y="14.42" font-size="30pt" fill="#00557f">A graph title</text>
 </g>
 <g stroke="#005500" stroke-width="0.62" fill="#f5ffcd">
 <path d="m56.55,75.04l462.14,0l0,315.47l-462.14,0l0,-315.47"/>
@@ -22,7 +22,7 @@
 <g stroke-linejoin="miter" stroke="#005500" stroke-width="0.62" transform="matrix(-0.701309 -0.712857 -0.712857 0.701309 196.68 191.53)" fill="none">
 <path d="m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0.642788 0.766044 -0.766044 0.642788 119.11 94.97)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0.642788 0.766044 -0.766044 0.642788 159.28 142.85)" fill="none">
 <text x="0" y="0" font-size="20pt" fill="#00557f">Look!</text>
 </g>
 </g>
@@ -55,15 +55,15 @@
 <path d="M518.69,390.51l-3.75,0M518.69,375.49l-3.75,0M518.69,360.47l-3.75,0M518.69,345.45l-3.75,0M518.69,330.42l-3.75,0M518.69,315.4l-3.75,0M518.69,300.38l-3.75,0M518.69,285.36l-3.75,0M518.69,270.34l-3.75,0M518.69,255.31l-3.75,0M518.69,240.29l-3.75,0M518.69,225.27l-3.75,0M518.69,210.25l-3.75,0M518.69,195.22l-3.75,0M518.69,180.2l-3.75,0M518.69,165.18l-3.75,0M518.69,150.16l-3.75,0M518.69,135.13l-3.75,0M518.69,120.11l-3.75,0M518.69,105.09l-3.75,0M518.69,90.07l-3.75,0M518.69,75.04l-3.75,0"/>
 <path d="M518.69,390.51l-7.5,0M518.69,315.4l-7.5,0M518.69,240.29l-7.5,0M518.69,165.18l-7.5,0M518.69,90.07l-7.5,0"/>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 31.3 364.03)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 35.55 298.4)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">Crazy bar value</text>
 </g>
 <g stroke="#00557f" stroke-width="1" fill="none">
-<text x="37.05" y="399.26" font-size="14pt" fill="#00557f">0</text>
-<text x="37.05" y="324.15" font-size="14pt" fill="#00557f">1</text>
-<text x="37.05" y="249.04" font-size="14pt" fill="#00557f">2</text>
-<text x="37.05" y="173.93" font-size="14pt" fill="#00557f">3</text>
-<text x="37.05" y="98.82" font-size="14pt" fill="#00557f">4</text>
+<text x="44.3" y="399.26" font-size="14pt" fill="#00557f">0</text>
+<text x="44.3" y="324.15" font-size="14pt" fill="#00557f">1</text>
+<text x="44.3" y="249.04" font-size="14pt" fill="#00557f">2</text>
+<text x="44.3" y="173.93" font-size="14pt" fill="#00557f">3</text>
+<text x="44.3" y="98.82" font-size="14pt" fill="#00557f">4</text>
 </g>
 <g stroke-width="0.62" stroke="#005500" stroke-linecap="butt" fill="none">
 <path d="M56.55,390.51l462.14,0"/>
@@ -74,24 +74,27 @@
 <path d="M56.55,75.04l0,7.5M133.57,75.04l0,7.5M210.6,75.04l0,7.5M287.62,75.04l0,7.5M364.65,75.04l0,7.5M441.67,75.04l0,7.5M518.69,75.04l0,7.5"/>
 </g>
 <g stroke="#00557f" stroke-width="1" fill="none">
-<text x="252.61" y="531.74" font-size="14pt" fill="#00557f">Date</text>
+<text x="270.11" y="490.26" font-size="14pt" fill="#00557f">Date</text>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 57.42 567.51)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 57.42 481.51)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-10</text>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 134.45 567.51)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 134.45 481.51)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-11</text>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 211.47 567.51)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 211.47 481.51)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-12</text>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 365.52 567.51)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 288.5 481.51)" fill="none">
+<text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-13</text>
+</g>
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 365.52 481.51)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-14</text>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 442.54 567.51)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 442.54 481.51)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-15</text>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 519.57 567.51)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0 -1 1 0 519.57 481.51)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#00557f">2009-03-16</text>
 </g>
 </g>

@@ -675,8 +675,8 @@ class Axis(widget.Widget):
         vertical = s.direction == 'vertical'
         font = s.get('TickLabels').makeQFont(painter)
         painter.setFont(font)
-        tl_spacing = ( painter.fontMetrics().leading() +
-                       painter.fontMetrics().descent() )
+        fm = utils.FontMetrics(font, painter.device())
+        tl_spacing = fm.leading() + fm.descent()
 
         # work out font alignment
         if s.TickLabels.rotate:
@@ -774,8 +774,8 @@ class Axis(widget.Widget):
         label = s.get('Label')
         font = label.makeQFont(painter)
         painter.setFont(font)
-        al_spacing = ( painter.fontMetrics().leading() +
-                       painter.fontMetrics().descent() )
+        fm = utils.FontMetrics(font, painter.device())
+        al_spacing = fm.leading() + fm.descent()
 
         # an extra offset if required
         self._delta_axis += label.get('offset').convert(painter)
@@ -894,7 +894,7 @@ class Axis(widget.Widget):
         If the edge of the plot is within textheight then suppress text
         """
         s = self.settings
-        height = qt4.QFontMetricsF( s.get('Label').makeQFont(painter),
+        height = utils.FontMetrics( s.get('Label').makeQFont(painter),
                                     painter.device()).height()
         otherposition = s.otherPosition
 

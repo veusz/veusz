@@ -30,7 +30,7 @@
 </g>
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
-<text x="78.27" y="74.23" font-size="30pt" fill="#000000">Some shapes</text>
+<text x="181.39" y="74.23" font-size="30pt" fill="#000000">Some shapes</text>
 <text x="170.55" y="336.86" font-size="20pt" fill="#000000">?</text>
 </g>
 </g>
@@ -79,13 +79,13 @@
 <path d="M526.38,490.81l-7.5,0M526.38,410.19l-7.5,0M526.38,329.58l-7.5,0M526.38,248.96l-7.5,0M526.38,168.35l-7.5,0M526.38,87.73l-7.5,0M526.38,7.11l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="22.17" y="499.56" font-size="14pt" fill="#000000">0</text>
-<text x="-30.31" y="418.94" font-size="14pt" fill="#000000">0.25</text>
-<text x="-12.81" y="338.33" font-size="14pt" fill="#000000">0.5</text>
-<text x="-30.31" y="257.71" font-size="14pt" fill="#000000">0.75</text>
-<text x="22.17" y="177.1" font-size="14pt" fill="#000000">1</text>
-<text x="-30.31" y="96.48" font-size="14pt" fill="#000000">1.25</text>
-<text x="-12.81" y="21" font-size="14pt" fill="#000000">1.5</text>
+<text x="30.42" y="499.56" font-size="14pt" fill="#000000">0</text>
+<text x="4.17" y="418.94" font-size="14pt" fill="#000000">0.25</text>
+<text x="12.92" y="338.33" font-size="14pt" fill="#000000">0.5</text>
+<text x="4.17" y="257.71" font-size="14pt" fill="#000000">0.75</text>
+<text x="30.42" y="177.1" font-size="14pt" fill="#000000">1</text>
+<text x="4.17" y="96.48" font-size="14pt" fill="#000000">1.25</text>
+<text x="12.92" y="21" font-size="14pt" fill="#000000">1.5</text>
 </g>
 <g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M42.68,490.81l483.7,0"/>
@@ -96,12 +96,12 @@
 <path d="M42.68,7.11l0,7.5M139.42,7.11l0,7.5M236.16,7.11l0,7.5M332.9,7.11l0,7.5M429.64,7.11l0,7.5M526.38,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="33.92" y="495.56" font-size="14pt" fill="#000000">0</text>
-<text x="113.16" y="495.56" font-size="14pt" fill="#000000">0.2</text>
-<text x="209.91" y="495.56" font-size="14pt" fill="#000000">0.4</text>
-<text x="306.64" y="495.56" font-size="14pt" fill="#000000">0.6</text>
-<text x="403.38" y="495.56" font-size="14pt" fill="#000000">0.8</text>
-<text x="515.98" y="495.56" font-size="14pt" fill="#000000">1</text>
+<text x="38.3" y="496.06" font-size="14pt" fill="#000000">0</text>
+<text x="126.28" y="496.06" font-size="14pt" fill="#000000">0.2</text>
+<text x="223.03" y="496.06" font-size="14pt" fill="#000000">0.4</text>
+<text x="319.77" y="496.06" font-size="14pt" fill="#000000">0.6</text>
+<text x="416.5" y="496.06" font-size="14pt" fill="#000000">0.8</text>
+<text x="522" y="496.06" font-size="14pt" fill="#000000">1</text>
 </g>
 </g>
 </g>
