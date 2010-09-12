@@ -28,6 +28,13 @@ import svg_export
 class SelfTestPaintEngine(svg_export.SVGPaintEngine):
     """Paint engine class for self testing output."""
 
+    def __init__(self, width_in, height_in):
+        """Create the class, using width and height as size of canvas
+        in inches."""
+
+        svg_export.SVGPaintEngine.__init__(self, width_in, height_in)
+        self.imageformat = 'bmp'
+
     def drawTextItem(self, pt, textitem):
         """Convert text to a path and draw it.
         """

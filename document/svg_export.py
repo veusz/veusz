@@ -27,11 +27,11 @@ import veusz.qtall as qt4
 dpi = 90.
 inch_mm = 25.4
 
-def fltStr(v):
+def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
-    return ('%.2f' % round(v, 2)).rstrip('0').rstrip('.')
+    return ( ('%.'+str(prec)+'f') % round(v, prec)).rstrip('0').rstrip('.')
 
 def createPath(path, scale):
     """Convert qt path to svg path.
@@ -85,6 +85,8 @@ class SVGPaintEngine(qt4.QPaintEngine):
         
         self.width = width_in
         self.height = height_in
+
+        self.imageformat = 'png'
 
     def begin(self, paintdevice):
         """Start painting."""
@@ -232,8 +234,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 vals['transform'] = 'translate(%s, %s)' % (fltStr(dx),
                                                            fltStr(dy))
             else:
-                vals['transform'] = 'matrix(%.4g %.4g %.4g %.4g %s %s)' % (
-                    m.m11(), m.m12(), m.m21(), m.m22(), fltStr(dx), fltStr(dy))
+                vals['transform'] = 'matrix(%s %s %s %s %s %s)' % (
+                    fltStr(m.m11(), 4), fltStr(m.m12(), 4),
+                    fltStr(m.m21(), 4), fltStr(m.m22(), 4),
+                    fltStr(dx), fltStr(dy) )
 
         # build up group for state
         t = ['<g']
@@ -372,10 +376,11 @@ class SVGPaintEngine(qt4.QPaintEngine):
         data = qt4.QByteArray()
         buf = qt4.QBuffer(data)
         buf.open(qt4.QBuffer.ReadWrite)
-        pixmap.save(buf, "PNG", 0)
+        pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 
-        self.fileobj.write('xlink:href="data:image/png;base64,')
+        self.fileobj.write('xlink:href="data:image/%s;base64,' %
+                           self.imageformat)
         self.fileobj.write(data.toBase64())
         self.fileobj.write('" preserveAspectRatio="none"/>\n')
 
