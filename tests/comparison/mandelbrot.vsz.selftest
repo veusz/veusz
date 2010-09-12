@@ -7,7 +7,7 @@
 <desc>Veusz output document</desc>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke-width="0.62" fill="#ffffff">
+<g stroke-width="0.63" fill="#ffffff">
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
 </g>
@@ -20,10 +20,10 @@
 <g stroke-width="1" fill="none">
 <image x="491.38" y="24.61" width="17.5" height="430.91" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACACAIAAABFm5SjAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAcklEQVQYlbWNyxLDMAgDpQXq/P8P04PzcKbN9NQDI0tosSSpJF4P8+9dWZCGhCjON3VpJB8ZycyPLA0Fseuakb53l3+cQtFzcmofPhafX7KFuzPzZv9gFI1cSBvyQBrYG9JAi1pj38+ez/4zd/lHTt39BqZ9KusHCkNXAAAAAElFTkSuQmCC" preserveAspectRatio="none"/>
 </g>
-<g stroke-width="0.62" fill="none">
+<g stroke-width="0.63" fill="none">
 <path d="m491.38,24.61l17.5,0l0,430.91l-17.5,0l0,-430.91"/>
 </g>
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g stroke-width="0.63" stroke-linecap="butt" fill="none">
 <path d="M491.38,455.53l0,-430.91"/>
 <path d="M491.38,355.82l3.75,0M491.38,297.5l3.75,0M491.38,256.12l3.75,0M491.38,224.02l3.75,0M491.38,197.8l3.75,0M491.38,175.62l3.75,0M491.38,156.41l3.75,0M491.38,139.47l3.75,0M491.38,24.61l3.75,0"/>
 <path d="M491.38,455.53l7.5,0M491.38,124.32l7.5,0"/>
@@ -32,11 +32,11 @@
 <path d="M508.88,455.53l-7.5,0M508.88,124.32l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="479.12" y="464.28" font-size="14pt" fill="#000000">1</text>
+<text x="479.13" y="464.28" font-size="14pt" fill="#000000">1</text>
 <text x="470.38" y="133.07" font-size="14pt" fill="#000000">10</text>
 <text x="124.66" y="34.16" font-size="30pt" fill="#000000">The Mandelbrot Set</text>
 </g>
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g stroke-width="0.63" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l0,-465.91"/>
 <path d="M60.46,473.03l3.75,0M60.46,459.72l3.75,0M60.46,446.4l3.75,0M60.46,433.09l3.75,0M60.46,419.78l3.75,0M60.46,406.47l3.75,0M60.46,393.16l3.75,0M60.46,379.84l3.75,0M60.46,366.53l3.75,0M60.46,353.22l3.75,0M60.46,339.91l3.75,0M60.46,326.6l3.75,0M60.46,313.29l3.75,0M60.46,299.97l3.75,0M60.46,286.66l3.75,0M60.46,273.35l3.75,0M60.46,260.04l3.75,0M60.46,246.73l3.75,0M60.46,233.41l3.75,0M60.46,220.1l3.75,0M60.46,206.79l3.75,0M60.46,193.48l3.75,0M60.46,180.17l3.75,0M60.46,166.86l3.75,0M60.46,153.54l3.75,0M60.46,140.23l3.75,0M60.46,126.92l3.75,0M60.46,113.61l3.75,0M60.46,100.3l3.75,0M60.46,86.98l3.75,0M60.46,73.67l3.75,0M60.46,60.36l3.75,0M60.46,47.05l3.75,0M60.46,33.74l3.75,0M60.46,20.43l3.75,0M60.46,7.11l3.75,0"/>
 <path d="M60.46,473.03l7.5,0M60.46,406.47l7.5,0M60.46,339.91l7.5,0M60.46,273.35l7.5,0M60.46,206.79l7.5,0M60.46,140.23l7.5,0M60.46,73.67l7.5,0M60.46,7.11l7.5,0"/>
@@ -54,7 +54,7 @@
 <text x="21.95" y="82.42" font-size="14pt" fill="#000000">1.75</text>
 <text x="48.2" y="21" font-size="14pt" fill="#000000">2</text>
 </g>
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g stroke-width="0.63" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
 <path d="M60.46,473.03l0,-3.75M87.87,473.03l0,-3.75M115.28,473.03l0,-3.75M142.68,473.03l0,-3.75M170.09,473.03l0,-3.75M197.5,473.03l0,-3.75M224.9,473.03l0,-3.75M252.31,473.03l0,-3.75M279.72,473.03l0,-3.75M307.12,473.03l0,-3.75M334.53,473.03l0,-3.75M361.94,473.03l0,-3.75M389.34,473.03l0,-3.75M416.75,473.03l0,-3.75M444.16,473.03l0,-3.75M471.56,473.03l0,-3.75M498.97,473.03l0,-3.75"/>
 <path d="M87.87,473.03l0,-7.5M224.9,473.03l0,-7.5M361.94,473.03l0,-7.5M498.97,473.03l0,-7.5"/>

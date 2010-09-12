@@ -7,7 +7,7 @@
 <desc>Veusz output document</desc>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke-width="0.62" fill="#ffffff">
+<g stroke-width="0.63" fill="#ffffff">
 <path d="m35.57,17.78l480.14,0l0,480.14l-480.14,0l0,-480.14"/>
 </g>
 </g>
@@ -409,7 +409,7 @@
 <path d="M0,0l42.5,0"/>
 </g>
 <g stroke-linejoin="miter" stroke="#ffffff" stroke-width="1.25" transform="matrix(-0.470588 0.882353 0.882353 0.470588 73.58 444.65)" fill="#ffffff">
-<path d="m0,0l-11.47,6.38l2.55,-6.38l-2.55,-6.38l11.47,6.38"/>
+<path d="m0,0l-11.48,6.38l2.55,-6.38l-2.55,-6.38l11.48,6.38"/>
 </g>
 <g stroke="#ffffff" stroke-width="1.25" transform="matrix(0.447214 -0.894427 0.894427 0.447214 98.84 443.4)" fill="#ffffff">
 <path d="M0,0l39.13,0"/>
@@ -907,7 +907,7 @@
 <path d="M0,0l37.5,0"/>
 </g>
 <g stroke-linejoin="miter" stroke="#ffffff" stroke-width="1.25" transform="matrix(-0.6 0.8 0.8 0.6 48.32 344.87)" fill="#ffffff">
-<path d="m0,0l-10.12,5.62l2.25,-5.62l-2.25,-5.62l10.12,5.62"/>
+<path d="m0,0l-10.13,5.63l2.25,-5.63l-2.25,-5.63l10.13,5.63"/>
 </g>
 <g stroke="#ffffff" stroke-width="1.25" transform="matrix(0.588172 -0.808736 0.808736 0.588172 73.58 343.62)" fill="#ffffff">
 <path d="M0,0l34,0"/>
@@ -2179,7 +2179,7 @@
 <path d="M0,0l17.5,0"/>
 </g>
 <g stroke-linejoin="miter" stroke="#ffffff" stroke-width="1.25" transform="matrix(-1 -2.44921e-16 2.44921e-16 1 98.84 89.8)" fill="#ffffff">
-<path d="m0,0l-4.73,2.62l1.05,-2.62l-1.05,-2.62l4.73,2.62"/>
+<path d="m0,0l-4.73,2.63l1.05,-2.63l-1.05,-2.63l4.73,2.63"/>
 </g>
 <g stroke="#ffffff" stroke-width="1.25" transform="matrix(0.986394 0.164399 -0.164399 0.986394 124.09 88.55)" fill="#ffffff">
 <path d="M0,0l15.21,0"/>
@@ -2663,7 +2663,7 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g stroke-width="0.63" stroke-linecap="butt" fill="none">
 <path d="M35.57,497.92l0,-480.14"/>
 <path d="M35.57,497.92l3.75,0M35.57,473.92l3.75,0M35.57,449.91l3.75,0M35.57,425.9l3.75,0M35.57,401.9l3.75,0M35.57,377.89l3.75,0M35.57,353.88l3.75,0M35.57,329.87l3.75,0M35.57,305.87l3.75,0M35.57,281.86l3.75,0M35.57,257.85l3.75,0M35.57,233.85l3.75,0M35.57,209.84l3.75,0M35.57,185.83l3.75,0M35.57,161.83l3.75,0M35.57,137.82l3.75,0M35.57,113.81l3.75,0M35.57,89.8l3.75,0M35.57,65.8l3.75,0M35.57,41.79l3.75,0M35.57,17.78l3.75,0"/>
 <path d="M35.57,497.92l7.5,0M35.57,377.89l7.5,0M35.57,257.85l7.5,0M35.57,137.82l7.5,0M35.57,17.78l7.5,0"/>
@@ -2678,7 +2678,7 @@
 <text x="5.81" y="146.57" font-size="14pt" fill="#000000">0.5</text>
 <text x="23.31" y="26.53" font-size="14pt" fill="#000000">1</text>
 </g>
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g stroke-width="0.63" stroke-linecap="butt" fill="none">
 <path d="M35.57,497.92l480.14,0"/>
 <path d="M35.57,497.92l0,-3.75M59.57,497.92l0,-3.75M83.58,497.92l0,-3.75M107.59,497.92l0,-3.75M131.59,497.92l0,-3.75M155.6,497.92l0,-3.75M179.61,497.92l0,-3.75M203.62,497.92l0,-3.75M227.62,497.92l0,-3.75M251.63,497.92l0,-3.75M275.64,497.92l0,-3.75M299.64,497.92l0,-3.75M323.65,497.92l0,-3.75M347.66,497.92l0,-3.75M371.66,497.92l0,-3.75M395.67,497.92l0,-3.75M419.68,497.92l0,-3.75M443.69,497.92l0,-3.75M467.69,497.92l0,-3.75M491.7,497.92l0,-3.75M515.71,497.92l0,-3.75"/>
 <path d="M35.57,497.92l0,-7.5M155.6,497.92l0,-7.5M275.64,497.92l0,-7.5M395.67,497.92l0,-7.5M515.71,497.92l0,-7.5"/>

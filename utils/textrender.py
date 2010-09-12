@@ -185,6 +185,16 @@ class RenderState(object):
         """Returns font metrics object."""
         return FontMetrics(self.font, self.device)
 
+    def getPixelsPerPt(self):
+        """Return number of pixels per point in the rendering."""
+        painter = self.painter
+        pixperpt = painter.device().logicalDpiY() / 72.
+        try:
+            pixperpt *= painter.veusz_scaling
+        except AttributeError:
+            pass
+        return pixperpt
+
 class Part(object):
     """Represents a part of the text to be rendered, made up of smaller parts."""
     def __init__(self, children):
@@ -193,16 +203,6 @@ class Part(object):
     def render(self, state):
         for p in self.children:
             p.render(state)
-
-    def getPixelsPerPt(self, state):
-        """Return number of pixels per point in the rendering."""
-        painter = state.painter
-        pixperpt = painter.device().logicalDpiY() / 72.
-        try:
-            pixperpt *= painter.veusz_scaling
-        except AttributeError:
-            pass
-        return pixperpt
 
 class PartText(Part):
     """Fundamental bit of text to be rendered: some text."""
@@ -355,7 +355,7 @@ class PartFrac(Part):
         painter.save()
         pen = painter.pen()
         painter.setPen( qt4.QPen(painter.pen().brush(),
-                                 self.getPixelsPerPt(state)*0.5) )
+                                 state.getPixelsPerPt()*0.5) )
         painter.setPen(pen)
 
         painter.drawLine(qt4.QPointF(initx,
@@ -500,7 +500,7 @@ class PartBar(Part):
 
         painter.save()
         pen = painter.pen()
-        penw = self.getPixelsPerPt(state)*0.5
+        penw = state.getPixelsPerPt()*0.5
         painter.setPen( qt4.QPen(painter.pen().brush(), penw) )
         painter.drawLine(qt4.QPointF(initx,
                                      state.y-height+penw),
@@ -522,7 +522,7 @@ class PartDot(Part):
         height = state.fontMetrics().ascent()
 
         painter.save()
-        circsize = self.getPixelsPerPt(state)
+        circsize = state.getPixelsPerPt()
         painter.setBrush( qt4.QBrush(painter.pen().color()) )
         painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
