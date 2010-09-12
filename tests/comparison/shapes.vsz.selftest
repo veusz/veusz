@@ -13,13 +13,13 @@
 <g stroke-width="0.63" stroke-dasharray="0.625,1.25" transform="translate(284.53, 60.32)" fill="#aaff7f">
 <path d="m-120.92,-24.18l241.85,0l0,48.37l-241.85,0l0,-48.37"/>
 </g>
-<g stroke="#0000ff" stroke-width="0.63" transform="matrix(-0.00822667 0.999966 -0.999966 -0.00822667 238.81 103.85)" fill="#000000">
+<g stroke="#0000ff" stroke-width="0.63" transform="matrix(-0.008227 1 -1 -0.008227 238.81 103.85)" fill="#000000">
 <path d="M0,0l96.74,0"/>
 </g>
-<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.63" transform="matrix(-0.00822667 0.999966 -0.999966 -0.00822667 238.01 200.59)" fill="#000000">
+<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.63" transform="matrix(-0.008227 1 -1 -0.008227 238.01 200.59)" fill="#000000">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.63" transform="matrix(0.00822667 -0.999966 -0.999966 -0.00822667 238.81 103.85)" fill="#000000">
+<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.63" transform="matrix(0.008227 -1 -1 -0.008227 238.81 103.85)" fill="#000000">
 <path d="m0,0l11.25,6.25l-2.5,-6.25l2.5,-6.25l-11.25,6.25"/>
 </g>
 </g>
@@ -55,19 +55,19 @@
 <g fill-opacity="0.5" stroke-width="0.63" transform="translate(407.2, 145.61)" fill="#0000ff">
 <ellipse cx="0" cy="0" rx="24.18" ry="24.18"/>
 </g>
-<g stroke-width="0.63" transform="matrix(0.707107 -0.707107 0.707107 0.707107 123.22 406.4)" fill="#000000">
+<g stroke-width="0.63" transform="matrix(0.7071 -0.7071 0.7071 0.7071 123.22 406.4)" fill="#000000">
 <path d="M0,0l159.93,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="matrix(0.707107 -0.707107 0.707107 0.707107 236.31 293.32)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.63" transform="matrix(0.7071 -0.7071 0.7071 0.7071 236.31 293.32)" fill="#000000">
 <path d="m0,0l-11.25,6.25l2.5,-6.25l-2.5,-6.25l11.25,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="matrix(-0.707107 0.707107 0.707107 0.707107 123.22 406.4)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.63" transform="matrix(-0.7071 0.7071 0.7071 0.7071 123.22 406.4)" fill="#000000">
 <path d="m0,0l-11.25,6.25l2.5,-6.25l-2.5,-6.25l11.25,6.25"/>
 </g>
-<g fill-opacity="0.5" stroke-width="0.63" transform="matrix(0.707107 0.707107 -0.707107 0.707107 91.05 442.44)" fill="#ffffff">
+<g fill-opacity="0.5" stroke-width="0.63" transform="matrix(0.7071 0.7071 -0.7071 0.7071 91.05 442.44)" fill="#ffffff">
 <path d="m-24.18,-24.18l48.37,0l0,48.37l-48.37,0l0,-48.37"/>
 </g>
-<g fill-opacity="0.5" stroke-width="0.63" transform="matrix(0.707107 0.707107 -0.707107 0.707107 284.53 248.96)" fill="#ffffff">
+<g fill-opacity="0.5" stroke-width="0.63" transform="matrix(0.7071 0.7071 -0.7071 0.7071 284.53 248.96)" fill="#ffffff">
 <path d="m-48.37,-48.37l96.74,0l0,96.74l-96.74,0l0,-96.74"/>
 </g>
 <g stroke-width="0.63" stroke-linecap="butt" fill="none">

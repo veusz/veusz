@@ -232,7 +232,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 vals['transform'] = 'translate(%s, %s)' % (fltStr(dx),
                                                            fltStr(dy))
             else:
-                vals['transform'] = 'matrix(%g %g %g %g %s %s)' % (
+                vals['transform'] = 'matrix(%.4g %.4g %.4g %.4g %s %s)' % (
                     m.m11(), m.m12(), m.m21(), m.m22(), fltStr(dx), fltStr(dy))
 
         # build up group for state
@@ -372,7 +372,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         data = qt4.QByteArray()
         buf = qt4.QBuffer(data)
         buf.open(qt4.QBuffer.ReadWrite)
-        pixmap.save(buf, "PNG")
+        pixmap.save(buf, "PNG", 0)
         buf.close()
 
         self.fileobj.write('xlink:href="data:image/png;base64,')

@@ -397,10 +397,10 @@
 <g stroke-width="0.63" fill="#ffffff">
 <path d="m65.09,195.08l437.46,0l0,180.85l-437.46,0l0,-180.85"/>
 </g>
-<g stroke="#ff00ff" stroke-width="1" transform="matrix(0.927184 0.374607 -0.374607 0.927184 253.67 234.48)" fill="none">
+<g stroke="#ff00ff" stroke-width="1" transform="matrix(0.9272 0.3746 -0.3746 0.9272 253.67 234.48)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#ff00ff">Density</text>
 </g>
-<g stroke-width="1" transform="matrix(0.939693 -0.34202 0.34202 0.939693 162.3 323.35)" fill="none">
+<g stroke-width="1" transform="matrix(0.9397 -0.342 0.342 0.9397 162.3 323.35)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Cooling time</text>
 </g>
 <g stroke-width="0.63" stroke-linecap="butt" fill="none">

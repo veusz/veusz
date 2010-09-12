@@ -13,16 +13,16 @@
 <g stroke="#005500" stroke-width="0.63" fill="#f5ffcd">
 <path d="m56.55,75.04l462.14,0l0,315.47l-462.14,0l0,-315.47"/>
 </g>
-<g stroke="#005500" stroke-width="0.63" transform="matrix(0.701309 0.712857 -0.712857 0.701309 196.68 191.53)" fill="#005500">
+<g stroke="#005500" stroke-width="0.63" transform="matrix(0.7013 0.7129 -0.7129 0.7013 196.68 191.53)" fill="#005500">
 <path d="M0,0l114.42,0"/>
 </g>
-<g stroke-linejoin="miter" stroke="#005500" stroke-width="0.63" transform="matrix(0.701309 0.712857 -0.712857 0.701309 276.93 273.09)" fill="#005500">
+<g stroke-linejoin="miter" stroke="#005500" stroke-width="0.63" transform="matrix(0.7013 0.7129 -0.7129 0.7013 276.93 273.09)" fill="#005500">
 <path d="m0,0l-11.25,6.25l2.5,-6.25l-2.5,-6.25l11.25,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke="#005500" stroke-width="0.63" transform="matrix(-0.701309 -0.712857 -0.712857 0.701309 196.68 191.53)" fill="none">
+<g stroke-linejoin="miter" stroke="#005500" stroke-width="0.63" transform="matrix(-0.7013 -0.7129 -0.7129 0.7013 196.68 191.53)" fill="none">
 <path d="m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#00557f" stroke-width="1" transform="matrix(0.642788 0.766044 -0.766044 0.642788 159.28 142.85)" fill="none">
+<g stroke="#00557f" stroke-width="1" transform="matrix(0.6428 0.766 -0.766 0.6428 159.28 142.85)" fill="none">
 <text x="0" y="0" font-size="20pt" fill="#00557f">Look!</text>
 </g>
 </g>
