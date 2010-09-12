@@ -31,7 +31,13 @@ def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
-    return ( ('%.'+str(prec)+'f') % round(v, prec)).rstrip('0').rstrip('.')
+    val = ('%.'+str(prec)+'f') % round(v, prec)
+    # drop any trailing zeros
+    val = val.rstrip('0').rstrip('.')
+    # get rid of -0s (platform differences here)
+    if val == '-0':
+        val = '0'
+    return val
 
 def createPath(path, scale):
     """Convert qt path to svg path.
