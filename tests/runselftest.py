@@ -12,7 +12,7 @@ excluded_tests = set([
         # the 2pi x in the axis gives different positions depending on font
         'inside.vsz', 
         # for some reason more points in polyline: clipping issue?
-        'histogram.vsz',
+        'histo.vsz',
     ])
 
 class StupidFontMetrics(object):
