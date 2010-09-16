@@ -123,6 +123,65 @@ class ColorsRandomize(ToolsPlugin):
             for node in fromwidget.WalkWidgets(widgettype='function'):
                 node.Line.color.val = self.getRandomColor(col1, col2)
 
+class ColorsSequence(ToolsPlugin):
+    """Color plotters in sequence."""
+
+    menu = ('Colors', 'Sequence')
+    name = 'Create color sequence'
+    description_short = 'Make widgets use sequence of colors'
+    description_full = 'Give new colors to each widget in a sequence between the two colors given.'
+
+    def __init__(self):
+        """Construct plugin."""
+        self.fields = [
+            field.FieldWidget("widget", descr="Start from widget",
+                              default="/"),
+            field.FieldBool("randxy", descr="Color xy plotters",
+                            default=True),
+            field.FieldBool("randfunc", descr="Color function plotters",
+                            default=True),
+            field.FieldColor('color1', descr="Start of color range",
+                             default='#ff0000'),
+            field.FieldColor('color2', descr="End of color range",
+                             default='#4000ff'),
+            ]
+
+    def apply(self, ifc, fields):
+        """Do the randomizing."""
+
+        fromwidget = ifc.Root.fromPath(fields['widget'])
+
+        col1 = qt4.QColor(fields['color1'])
+        col2 = qt4.QColor(fields['color2'])
+        H1, H2 = col1.hue(), col2.hue()
+        S1, S2 = col1.saturation(), col2.saturation()
+        V1, V2 = col1.value(), col2.value()
+
+        # add up total number of widgets
+        numwidgets = ( len( list(fromwidget.WalkWidgets(widgettype='xy')) ) +
+                       len( list(fromwidget.WalkWidgets(widgettype='function')) ) )
+
+        def colatidx(i):
+            """Get color in range 0...numwidgets-1."""
+            H = i * (H2-H1) / float(numwidgets-1) + H1
+            S = i * (S2-S1) / float(numwidgets-1) + S1
+            V = i * (V2-V1) / float(numwidgets-1) + V1
+            return str(qt4.QColor.fromHsv(H, S, V).name())
+
+        idx = 0
+        for node in fromwidget.WalkWidgets():
+            t = node.widgettype
+            if fields['randxy'] and t == 'xy':
+                col = colatidx(idx)
+                idx += 1
+                node.PlotLine.color.val = col
+                node.MarkerFill.color.val = col
+                node.ErrorBarLine.color.val = col
+
+            if fields['randfunc'] and t == 'function':
+                node.Line.color.val = colatidx(idx)
+                idx += 1
+
 class ColorsReplace(ToolsPlugin):
     """Randomize the colors used in plotting."""
 
@@ -408,6 +467,7 @@ class FontSizeDecrease(FontSize):
 
 toolspluginregistry += [
     ColorsRandomize,
+    ColorsSequence,
     ColorsReplace,
     TextReplace,
     WidgetsClone,
