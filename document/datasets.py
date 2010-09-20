@@ -1320,12 +1320,12 @@ class Dataset2DXYZExpression(Dataset2D):
         return self.cacheddata
 
     @property
-    def yrange(self):
+    def xrange(self):
         """Get x range of data as a tuple (min, max)."""
         return self.getDataRanges()[0]
     
     @property
-    def xrange(self):
+    def yrange(self):
         """Get y range of data as a tuple (min, max)."""
         return self.getDataRanges()[1]
         
