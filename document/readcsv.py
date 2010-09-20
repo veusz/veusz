@@ -160,7 +160,6 @@ class ReadCSV(object):
     def readData(self):
         """Read the data into the document."""
 
-        # FIXME: this is far too long
         # open the csv file
         csvf = utils.UnicodeCSVReader( open(self.filename),
                                        delimiter=self.delimiter,
@@ -175,7 +174,6 @@ class ReadCSV(object):
 
         # dataset names for each column
         self.colnames = {}
-
         # type of column (float, string or date)
         self.coltypes = []
         # type of names of columns
@@ -204,17 +202,22 @@ class ReadCSV(object):
                         v = utils.dateStringToDate(col)
                     elif ctype == 'string':
                         v = col
+                    else:
+                        raise RuntimeError, "Invalid type in CSV reader"
 
                 except ValueError:
-                    # not a number, so generate a dataset name
-
                     # skip blanks
-                    col = col.strip()
-                    if col == '':
+                    if col.strip() == '':
                         continue
-
-                    coltype, name = self._getNameAndColType(colnum, col)
-                    self._setNameAndType(colnum, name, coltype)
+                    if ( colnum in self.colnames and
+                         len(self.data[self.colnames[colnum]]) == 0 ):
+                        # if dataset is empty, convert to a string dataset
+                        self._setNameAndType(colnum, self.colnames[colnum], 'string')
+                        self.data[self.colnames[colnum]].append(col)
+                    else:
+                        # start a new dataset if conversion failed
+                        coltype, name = self._getNameAndColType(colnum, col)
+                        self._setNameAndType(colnum, name.strip(), coltype)
 
                 else:
                     # generate a name if required
