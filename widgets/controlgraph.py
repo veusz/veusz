@@ -351,8 +351,8 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
         par = self.params
         if corner in self.corners:
             # compute size from corner position
-            par.dims[0] = corner.pos().x()*2
-            par.dims[1] = corner.pos().y()*2
+            par.dims[0] = abs(corner.pos().x()*2)
+            par.dims[1] = abs(corner.pos().y()*2)
         elif corner == self.rotator:
             # work out angle relative to centre of widget
             delta = event.scenePos() - self.scenePos()
