@@ -433,7 +433,7 @@ class DataEditDialog(VeuszDialog):
 
     def slotDatasetEdit(self):
         """Reload dataset into dataset creation dialog."""
-        dsname = unicode(self.getSelectedDataset())
+        dsname = self.getSelectedDataset()
         if dsname:
             dataset = self.document.data[dsname]
             recreate_register[type(dataset)](self.mainwindow, self.document,
