@@ -646,7 +646,7 @@ class Axis(widget.Widget):
         axis."""
         try:
             plotters = painter.veusz_axis_plotter_map[self]
-        except AttributeError:
+        except (AttributeError, KeyError):
             return
 
         dir = self.settings.direction
