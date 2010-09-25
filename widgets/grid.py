@@ -249,6 +249,8 @@ class Grid(widget.Widget):
         scalecols = list(self.settings.scaleCols[:nocols])
         scalecols += [1.]*(nocols-len(scalecols))
         totscalecols = sum(scalecols)
+        if totscalecols == 0.:
+            totscalecols = 1.
 
         # fractional starting positions of columns
         last = 0.
@@ -261,6 +263,8 @@ class Grid(widget.Widget):
         scalerows = list(self.settings.scaleRows[:norows])
         scalerows += [1.]*(norows-len(scalerows))
         totscalerows = sum(scalerows)
+        if totscalerows == 0.:
+            totscalerows = 1.
 
         # fractional starting positions of rows
         last = 0.
