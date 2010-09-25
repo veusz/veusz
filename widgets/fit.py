@@ -103,13 +103,10 @@ class Fit(FunctionPlotter):
 
     def updateAxisRange(self, axis, depname, axrange):
         """Update range with range of data."""
-        if depname == 'sx':
-            dataname = self.settings.xData
-        else:
-            dataname = self.settings.yData
-
-        if self.document.hasData(dataname):
-            drange = self.document.getData(dataname).getRange()
+        dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
+        data = self.settings.get(dataname).getData(self.document)
+        if data:
+            drange = data.getRange()
             if drange:
                 axrange[0] = min(axrange[0], drange[0])
                 axrange[1] = max(axrange[1], drange[1])
