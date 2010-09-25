@@ -99,7 +99,8 @@ class Graph(widget.Widget):
         while w is not None and len(widgets) < len(axesnames):
             for c in w.children:
                 name = c.name
-                if name in axesnames and name not in widgets:
+                if ( name in axesnames and name not in widgets and
+                     isinstance(c, axis.Axis) ):
                     widgets[name] = c
             w = w.parent
 
