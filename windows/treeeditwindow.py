@@ -818,6 +818,8 @@ class SettingLabel(qt4.QWidget):
         # this is all widgets of same type
         widgets = []
         setwidget = self.setting.getWidget()
+        if setwidget is None:
+            return
         getWidgetsOfType(self.document.basewidget,
                          setwidget.typename, widgets)
         widgets = [w.path for w in widgets if w != setwidget]
