@@ -290,13 +290,12 @@ class FunctionPlotter(GenericPlotter):
 
         # get axes function is plotted along and on and
         # plot coordinates along axis function plotted along
-        plotbox = list(posn)
         if s.variable == 'x':
             axis1, axis2 = axes[0], axes[1]
-            minval, maxval = plotbox[0], plotbox[2]
+            minval, maxval = posn[0], posn[2]
         else:
             axis1, axis2 = axes[1], axes[0]
-            minval, maxval = plotbox[1], plotbox[3]
+            minval, maxval = posn[1], posn[3]
 
         # get equally spaced coordinates along axis in plotter coords
         plotpts = N.arange(s.steps) * ((maxval-minval) / (s.steps-1)) + minval
