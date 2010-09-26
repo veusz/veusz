@@ -285,55 +285,48 @@ class FunctionPlotter(GenericPlotter):
         returns (pxpts, pypts)."""
 
         s = self.settings
-        x1, y1, x2, y2 = posn
-
         if not self._checkCachedFunction():
             return None, None
 
-        env = self.initEnviron()
+        # get axes function is plotted along and on and
+        # plot coordinates along axis function plotted along
+        plotbox = list(posn)
         if s.variable == 'x':
-            # x function
-            if s.min != 'Auto' and s.min > axes[0].getPlottedRange()[0]:
-                x_min = N.array([s.min])
-                x1 = axes[0].dataToPlotterCoords(posn, x_min)[0]
-            if s.max != 'Auto' and s.max < axes[0].getPlottedRange()[1]:
-                x_max = N.array([s.max])
-                x2 = axes[0].dataToPlotterCoords(posn, x_max)[0]
-                
-            delta = (x2 - x1) / float(s.steps)
-            pxpts = N.arange(x1, x2+delta, delta)
-            x = axes[0].plotterToDataCoords(posn, pxpts)
-            env['x'] = x
-            try:
-                y = eval(self.cachedcomp, env)
-            except Exception, e:
-                self._errorFunctionEval(e)
-                pypts = None
-            else:
-                pypts = axes[1].dataToPlotterCoords(posn, y+x*0.)
-
+            axis1, axis2 = axes[0], axes[1]
+            minval, maxval = plotbox[0], plotbox[2]
         else:
-            # y function
-            if not(s.min == 'Auto') and s.min > axes[1].getPlottedRange()[0]:
-                y_min = N.array([s.min])
-                y2 = axes[1].dataToPlotterCoords(posn, y_min)[0]
-            if not(s.max == 'Auto') and s.max < axes[1].getPlottedRange()[1]:
-                y_max = N.array([s.max])
-                y1 = axes[1].dataToPlotterCoords(posn, y_max)[0]
-            
-            delta = (y2 - y1) / float(s.steps)
-            pypts = N.arange(y1, y2+delta, delta)
-            y = axes[1].plotterToDataCoords(posn, pypts)
-            env['y'] = y
-            try:
-                x = eval(self.cachedcomp, env)
-            except Exception, e:
-                self._errorFunctionEval(e)
-                pxpts = None
-            else:
-                pxpts = axes[0].dataToPlotterCoords(posn, x+y*0.)
+            axis1, axis2 = axes[1], axes[0]
+            minval, maxval = plotbox[1], plotbox[3]
 
-        return pxpts, pypts
+        # get equally spaced coordinates along axis in plotter coords
+        plotpts = N.arange(s.steps) * ((maxval-minval) / (s.steps-1)) + minval
+        # convert to axis coordinates
+        axispts = axis1.plotterToDataCoords(posn, plotpts)
+
+        # trim according to min and max. have to convert back to plotter too.
+        if s.min != 'Auto':
+            axispts = axispts[ axispts >= s.min ]
+            plotpts = axis1.dataToPlotterCoords(posn, axispts)
+        if s.max != 'Auto':
+            axispts = axispts[ axispts <= s.max ]
+            plotpts = axis1.dataToPlotterCoords(posn, axispts)
+
+        # evaluate function
+        env = self.initEnviron()
+        env[s.variable] = axispts
+        try:
+            results = eval(self.cachedcomp, env)
+            resultpts = axis2.dataToPlotterCoords(
+                posn, results + N.zeros(axispts.shape))
+        except Exception, e:
+            self._errorFunctionEval(e)
+            resultpts = None
+
+        # return x and y coordinates for plot
+        if s.variable == 'x':
+            return plotpts, resultpts
+        else:
+            return resultpts, plotpts
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the function."""
