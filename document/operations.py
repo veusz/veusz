@@ -1081,6 +1081,8 @@ class OperationDataImportFITS(object):
 class OperationDataImportPlugin(object):
     """Import data using a plugin."""
 
+    descr = 'import using plugin'
+
     def __init__(self, pluginname, filename, **params):
         """Setup operation loading data from plugin.
 
@@ -1120,6 +1122,14 @@ class OperationDataImportPlugin(object):
         # save for undoing
         self.olddata = {}
 
+        # make link for file
+        linked = None
+        if self.linked:
+            linked = datasets.LinkedFilePlugin(
+                self.pluginname, self.filename, self.params,
+                encoding=self.encoding, prefix=self.prefix,
+                suffix=self.suffix)
+            
         # convert results to real datasets
         for d in results:
             if isinstance(d, plugins.ImportDataset1D):
@@ -1133,11 +1143,9 @@ class OperationDataImportPlugin(object):
             else:
                 raise RuntimeError("Invalid data set in plugin results")
 
-            if self.linked:
-                ds.linked = datasets.LinkedFilePlugin(
-                    self.pluginname, self.filename, self.params,
-                    encoding=self.encoding, prefix=self.prefix,
-                    suffix=self.suffix)
+            # set any linking
+            if linked:
+                ds.linked = linked
 
             # save old dataset for undo
             d.name = self.prefix + d.name + self.suffix
