@@ -20,6 +20,7 @@
 
 """Import plugin base class and helpers."""
 
+import numpy as N
 import veusz.utils as utils
 
 from field import Field as ImportField
@@ -28,6 +29,7 @@ from field import FieldText as ImportFieldText
 from field import FieldFloat as ImportFieldFloat
 from field import FieldInt as ImportFieldInt
 from field import FieldCombo as ImportFieldCombo
+import field
 
 from datasetplugin import Dataset1D as ImportDataset1D
 from datasetplugin import Dataset2D as ImportDataset2D
@@ -120,4 +122,200 @@ class ImportPluginExample(ImportPlugin):
 
         return [ImportDataset1D(params.field_results["name"], data)]
 
-importpluginregistry.append(ImportPluginExample())
+class QdpFile(object):
+    """Handle reading of a Qdp file."""
+
+    def __init__(self, colnames):
+        self.colmodes = {}
+        self.skipmode = 'none'
+        self.retndata = []
+        self.data = []
+        self.dataindex = 1
+        self.colnames = colnames
+
+    def handleRead(self, p):
+        """Handle read command."""
+        try:
+            mode = {'t': 'terr', 's': 'serr'}[p[1][:1]]
+        except (IndexError, KeyError):
+            raise ImportPluginException("read command takes terr/serr")
+        try:
+            cols = [int(x) for x in p[2:]]
+        except ValueError:
+            raise ImportPluginException("read command takes list of columns separated by spaces")
+        for c in cols:
+            self.colmodes[c] = mode
+
+    def handleSkip(self, p):
+        """Handle skip command."""
+        try:
+            self.skipmode = {'o': 'off', 's': 'single', 'd': 'double'}[p[1][:1]]
+        except (IndexError, KeyError):
+            raise ImportPluginException("skip command takes single/double/off")
+
+    def handleNO(self, p, lastp):
+        """Handle no command, meaning no data."""
+        if self.skipmode == 'none':
+            self.addNans( len(p) )
+        elif self.skipmode == 'single':
+            self.pushData()
+            self.dataindex += 1
+        elif self.skipmode == 'double':
+            if lastp[0] == 'no':
+                self.pushData()
+                self.dataindex += 1
+            else:
+                self.addNans( len(p) )
+
+    def addNans(self, num):
+        """Add a blank set of data to output."""
+        col = 0
+        ds = 0
+        while col < num or ds < len(self.data):
+            if ds >= len(self.data):
+                self.data.append([])
+            m = self.colmodes.get(ds+1)
+            if m == 'serr':
+                self.data[ds].append( (N.nan, N.nan) )
+                col += 2
+            elif m == 'terr':
+                self.data[ds].append( (N.nan, N.nan, N.nan) )
+                col += 3
+            else:
+                self.data[ds].append( N.nan )
+                col += 1
+            ds += 1
+
+    def pushData(self):
+        """Add data to output array."""
+
+        for i in xrange(len(self.data)):
+            # get dataset name
+            if i < len(self.colnames):
+                name = self.colnames[i]
+            else:
+                name = 'vec%i' % (i+1)
+            if self.skipmode == 'single' or self.skipmode == 'double':
+                name = name + '_' + str(self.dataindex)
+
+            # convert data
+            a = N.array(self.data[i])
+            if len(a.shape) == 1:
+                # no error bars
+                ds = ImportDataset1D(name, data=a)
+            elif a.shape[1] == 2:
+                # serr
+                ds = ImportDataset1D(name, data=a[:,0], serr=a[:,1])
+            elif a.shape[1] == 3:
+                # perr/nerr
+                ds = ImportDataset1D(name, data=a[:,0], perr=a[:,1], nerr=a[:,2])
+            else:
+                raise RuntimeError
+
+            self.retndata.append(ds)
+        self.data = []
+
+    def handleNum(self, p):
+        """Handle set of numbers."""
+        
+        try:
+            nums = [float(x) for x in p]
+        except ValueError:
+            raise ImportPluginException("Cannot convert '%s' to numbers" %
+                                        (' '.join(p)))
+        col = 0
+        ds = 0
+        while col < len(nums):
+            if ds >= len(self.data):
+                self.data.append([])
+            m = self.colmodes.get(ds+1)
+            if m == 'serr':
+                self.data[ds].append( (nums[col], nums[col+1]) )
+                col += 2
+            elif m == 'terr':
+                self.data[ds].append( (nums[col], nums[col+1], nums[col+2]) )
+                col += 3
+            else:
+                self.data[ds].append( nums[col] )
+                col += 1
+
+            ds += 1
+
+    def importFile(self, fileobj):
+        """Read data from file object."""
+
+        contline = None
+        lastp = []
+        for line in fileobj:
+            # strip comments
+            if line.find("!") >= 0:
+                line = line[:line.find("!")]
+            if line[:1] == '@':
+                # read another file - we don't do this
+                continue
+            
+            p = [x.lower() for x in line.split()]
+
+            if contline:
+                # add on previous continuation if existed
+                p = contline + p
+                contline = None
+
+            if len(p) > 0 and p[-1][-1] == '-':
+                # continuation
+                p[-1] = p[-1][:-1]
+                contline = p
+                continue
+
+            if len(p) == 0:
+                # nothing
+                continue
+
+            if p[0] == 'read':
+                self.handleRead(p)
+            elif p[0][:2] == 'sk':
+                self.handleSkip(p)
+            elif p[0] == 'no':
+                self.handleNO(p, lastp)
+            elif p[0][0] in '0123456789-.':
+                self.handleNum(p)
+            else:
+                # skip everything else (for now)
+                pass
+
+            lastp = p
+
+        self.pushData()
+
+class ImportPluginQdp(ImportPlugin):
+    """An example plugin for reading data from QDP files."""
+
+    name = "QDP import"
+    author = "Jeremy Sanders"
+    description = "Reads datasets from QDP files"
+
+    def __init__(self):
+        self.fields = [
+            field.FieldTextMulti("names", descr="Column name list ",
+                                 default=['']),
+            ]
+
+    def doImport(self, params):
+        """Actually import data
+        params is a ImportPluginParams object.
+        Return a list of ImportDataset1D, ImportDataset2D objects
+        """
+        names = [x.strip() for x in params.field_results["names"]
+                 if x.strip()]
+
+        f = params.openFileWithEncoding()
+        rqdp = QdpFile(names)
+        rqdp.importFile(f)
+        f.close()
+
+        return rqdp.retndata
+
+importpluginregistry += [
+    ImportPluginQdp(),
+    ImportPluginExample(),
+    ]
