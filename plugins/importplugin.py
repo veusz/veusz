@@ -208,7 +208,10 @@ class QdpFile(object):
                 ds = ImportDataset1D(name, data=a[:,0], serr=a[:,1])
             elif a.shape[1] == 3:
                 # perr/nerr
-                ds = ImportDataset1D(name, data=a[:,0], perr=a[:,1], nerr=a[:,2])
+                p = N.where(a[:,1] < a[:,2], a[:,2], a[:,1])
+                n = N.where(a[:,1] < a[:,2], a[:,1], a[:,2])
+
+                ds = ImportDataset1D(name, data=a[:,0], perr=p, nerr=n)
             else:
                 raise RuntimeError
 
@@ -296,7 +299,7 @@ class ImportPluginQdp(ImportPlugin):
 
     def __init__(self):
         self.fields = [
-            field.FieldTextMulti("names", descr="Column name list ",
+            field.FieldTextMulti("names", descr="Vector name list ",
                                  default=['']),
             ]
 
