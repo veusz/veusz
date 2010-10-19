@@ -132,13 +132,13 @@ class BarPlotter(GenericPlotter):
                                     usertext = 'Error bar line'),
                pixmap = 'settings_ploterrorline' )
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User-friendly description."""
 
         s = self.settings
         return "lengths='%s', position='%s'" % (', '.join(s.lengths), 
                                                 s.posn)
-    userdescription = property(_getUserDescription)
 
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""
@@ -446,7 +446,7 @@ class BarPlotter(GenericPlotter):
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
-        # return if there's no proper axes
+        # return if there are no proper axes
         if ( None in axes or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):

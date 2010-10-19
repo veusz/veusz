@@ -40,3 +40,4 @@ from line import Line
 from bar import BarPlotter
 from polygon import Polygon
 from vectorfield import VectorField
+from boxplot import BoxPlot

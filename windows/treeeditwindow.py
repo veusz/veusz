@@ -452,7 +452,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.addslots = {}
         self.vzactions = actions = self.parent.vzactions
         for widgettype in ('page', 'grid', 'graph', 'axis',
-                           'xy', 'bar', 'fit', 'function',
+                           'xy', 'bar', 'fit', 'function', 'boxplot',
                            'image', 'contour', 'vectorfield',
                            'key', 'label', 'colorbar',
                            'rect', 'ellipse', 'imagefile',
@@ -509,7 +509,7 @@ class TreeEditDock(qt4.QDockWidget):
         # add actions to menus for adding widgets and editing
         addact = [('add.'+w) for w in 
                   ('page', 'grid', 'graph', 'axis',
-                   'xy', 'bar', 'fit', 'function',
+                   'xy', 'bar', 'fit', 'function', 'boxplot',
                    'image', 'contour', 'vectorfield',
                    'key', 'label', 'colorbar')]
 
