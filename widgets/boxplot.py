@@ -78,6 +78,7 @@ class BoxPlot(GenericPlotter):
         """Construct list of settings."""
         GenericPlotter.addSettings(s)
 
+        s.remove('key')
         s.add( setting.Choice('whiskermode', 
                               ('min/max',
                                '1.5IQR',
@@ -175,6 +176,22 @@ class BoxPlot(GenericPlotter):
                 
             axrange[0] = min(axrange[0], N.nanmin(positions)-0.5)
             axrange[1] = max(axrange[1], N.nanmax(positions)+0.5)
+
+    def getAxisLabels(self, direction):
+        """Get labels for axis if using a label axis."""
+
+        s = self.settings
+        doc = self.document
+        text = s.get('labels').getData(doc, checknull=True)
+        values = s.get('values').getData(doc)
+        if text is None or values is None:
+            return (None, None)
+        positions = s.get('posn').getData(doc)
+        if positions is None:
+            positions = N.arange(1, len(values)+1)
+        else:
+            positions = positions.data
+        return (text, positions)
 
     def plotBox(self, painter, axes, data, boxposn, posn, width, clip):
         """Plot a box, given data, posn and width."""
