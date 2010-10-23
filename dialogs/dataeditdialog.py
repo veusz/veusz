@@ -22,6 +22,8 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
+import bisect
+
 import veusz.qtall as qt4
 
 import veusz.document as document
@@ -85,14 +87,18 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """Return headers at top."""
 
+        try:
+            ds = self.document.data[self.dsname]
+        except KeyError:
+            return qt4.QVariant()
+
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
-                try:
-                    ds = self.document.data[self.dsname]
-                except KeyError:
-                    return qt4.QVariant()
+                # column names
                 return qt4.QVariant( ds.column_descriptions[section] )
             else:
+                if section == len(ds.data):
+                    return "+"
                 # return row numbers
                 return qt4.QVariant(section+1)
 
@@ -205,69 +211,60 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         return qt4.QVariant()
 
-class DatasetListModel(qt4.QAbstractListModel):
-    """A model to allow the list of datasets to be viewed."""
-
+class DatasetListModel(qt4.QStringListModel):
     def __init__(self, parent, document):
-        qt4.QAbstractListModel.__init__(self, parent)
-        self.document = document
-
+        dsnames = document.data.keys()
+        dsnames.sort()
+        qt4.QStringListModel.__init__(self, dsnames, parent)
         self.connect(document, qt4.SIGNAL('sigModified'),
                      self.slotDocumentModified)
-
-        # initial variable state
-        self._changeset = -1
-
-    def _getDSList(self):
-        """A cached copy of a list of datasets, which updates if doc changes."""
-        if self._changeset != self.document.changeset:
-            self._changeset = self.document.changeset
-            self._realDSList = self.document.data.keys()
-            self._realDSList.sort()
-        return self._realDSList
-    datasets = property(_getDSList)
-
-    def slotDocumentModified(self):
-        """Called when document modified."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
-
-    def rowCount(self, parent):
-        return len(self.datasets)
+        self.document = document
 
     def datasetName(self, index):
-        return self.datasets[index.row()]
-
-    def data(self, index, role):
-        try:
-            if role == qt4.Qt.DisplayRole:
-                return qt4.QVariant(self.datasets[index.row()])
-        except IndexError:
-            pass
-
-        # return nothing otherwise
-        return qt4.QVariant()
-
-    def flags(self, index):
-        """Return flags for items."""
-        if not index.isValid():
-            return qt4.Qt.ItemIsEnabled
+        """Get name at index."""
+        return unicode(self.stringList()[index.row()])
         
-        return qt4.QAbstractListModel.flags(self, index) | qt4.Qt.ItemIsEditable
+    @property
+    def datasets(self):
+        """Get list of datasets."""
+        return [unicode(x) for x in self.stringList()]
 
-    def setData(self, index, value, role):
+    def slotDocumentModified(self):
+        """Update list when document modified."""
+        dslist = self.datasets
+        old = set(dslist)
+        new = set(self.document.data.keys())
+
+        # dslist used to keep track of changes
+        # add new entries in appropriate (sorted) place
+        for a in new-old:
+            i = bisect.bisect_left(dslist, a)
+            dslist.insert(i, a)
+            self.insertRows(i, 1)
+            qt4.QStringListModel.setData(
+                self, self.index(i, 0), qt4.QVariant(a) )
+
+        # remove entries no longer there
+        for d in old-new:
+            i = dslist.index(d)
+            del dslist[i]
+            self.removeRows(i, 1)
+
+    def setData(self, index, value, role=qt4.Qt.EditRole):
         """Called to rename a dataset."""
 
         if index.isValid() and role == qt4.Qt.EditRole:
             name = self.datasetName(index)
             newname = unicode( value.toString() )
+
             if not utils.validateDatasetName(newname):
                 return False
 
-            self.datasets[index.row()] = newname
-            self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &'),
+            self.document.applyOperation(
+                document.OperationDatasetRename(name, newname))
+            self.emit(qt4.SIGNAL(
+                    'dataChanged(const QModelIndex &, const QModelIndex &'),
                       index, index)
-
-            self.document.applyOperation(document.OperationDatasetRename(name, newname))
             return True
 
         return False
@@ -281,6 +278,11 @@ class DataEditDialog(VeuszDialog):
 
         # set up dataset list
         self.dslistmodel = DatasetListModel(self, document)
+
+        #self.modelproxy = qt4.QSortFilterProxyModel(self)
+        #self.modelproxy.setSourceModel(self.dslistmodel)
+        #self.modelproxy.setDynamicSortFilter(True)
+
         self.datasetlistview.setModel(self.dslistmodel)
 
         # actions for data table
@@ -312,31 +314,39 @@ class DataEditDialog(VeuszDialog):
                      self.slotDatasetSelected)
 
         # select first item (phew)
-        if self.dslistmodel.rowCount(None) > 0:
+        if self.dslistmodel.rowCount() > 0:
             self.datasetlistview.selectionModel().select(
                 self.dslistmodel.createIndex(0, 0),
                 qt4.QItemSelectionModel.Select)
 
         # connect buttons
-        self.connect(self.deletebutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetDelete)
-        self.connect(self.unlinkbutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetUnlink)
-        self.connect(self.duplicatebutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetDuplicate)
-        self.connect(self.importbutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetImport)
-        self.connect(self.createbutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetCreate)
-        self.connect(self.editbutton, qt4.SIGNAL('clicked()'),
-                     self.slotDatasetEdit)
+        for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
+                           (self.unlinkbutton, self.slotDatasetUnlink),
+                           (self.duplicatebutton, self.slotDatasetDuplicate),
+                           (self.importbutton, self.slotDatasetImport),
+                           (self.createbutton, self.slotDatasetCreate),
+                           (self.editbutton, self.slotDatasetEdit),
+                           ):
+            self.connect(btn, qt4.SIGNAL('clicked()'), slot)
+
+        # menu for new button
+        self.newmenu = qt4.QMenu()
+        for text, slot in ( ('Numerical dataset', self.slotNewNumericalDataset),
+                            ('Text dataset', self.slotNewTextDataset) ):
+            a = self.newmenu.addAction(text)
+            self.connect(a, qt4.SIGNAL('activated()'), slot)
+        self.newbutton.setMenu(self.newmenu)
 
     def slotDatasetSelected(self, current, deselected):
         """Called when a new dataset is selected."""
 
         # FIXME: Make readonly models readonly!!
-        index = current.indexes()[0]
-        name = self.dslistmodel.datasetName(index)
+        indexes = current.indexes()
+        if len(indexes) == 0:
+            self.datatableview.setModel(None)
+            return
+
+        name = self.dslistmodel.datasetName(indexes[0])
         ds = self.document.data[name]
 
         if ds.dimensions == 1:
@@ -388,20 +398,6 @@ class DataEditDialog(VeuszDialog):
 
             self.document.applyOperation(
                 document.OperationDatasetDelete(datasetname))
-
-            # select new item in list
-            model = self.datasetlistview.model()
-            row = min(model.rowCount(None)-1, row)
-            if row >= 0:
-                # select new row
-                newindex = model.index(row)
-                self.datasetlistview.selectionModel().select(
-                    newindex, qt4.QItemSelectionModel.ClearAndSelect)
-                self.slotDatasetSelected(
-                    self.datasetlistview.selectionModel().selection(), None)
-            else:
-                # clear model
-                self.datatableview.setModel(None)
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
@@ -486,3 +482,25 @@ class DataEditDialog(VeuszDialog):
         """Insert a new row."""
         self.datatableview.model().insertRows(
             self.datatableview.currentIndex().row(), 1)
+
+    def slotNewNumericalDataset(self):
+        """Add new value dataset."""
+        self.newDataset( document.Dataset(data=[0.]) )
+
+    def slotNewTextDataset(self):
+        """Add new value dataset."""
+        self.newDataset( document.DatasetText(data=['']) )
+
+    def newDataset(self, ds):
+        """Add new dataset to document."""
+        # get a name for dataset
+        name = 'new dataset'
+        if name in self.document.data:
+            count = 1
+            while name in self.document.data:
+                name = 'new dataset %i' % count
+                count += 1
+
+        # add new dataset
+        self.document.applyOperation(
+            document.OperationDatasetSet(name, ds))
