@@ -45,7 +45,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
     def rowCount(self, parent):
         """Return number of rows."""
         try:
-            return len(self.document.data[self.dsname].data)
+            return len(self.document.data[self.dsname].data)+1
         except (KeyError, AttributeError):
             return 0
         
@@ -63,21 +63,23 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def data(self, index, role):
         """Return data associated with column given."""
-        if role == qt4.Qt.DisplayRole:
+        # get dataset
+        ds = self.document.data[self.dsname]
+        if ds is not None:
             # select correct part of dataset
-            ds = self.document.data[self.dsname]
             data = getattr(ds, ds.columns[index.column()])
+        if ds is not None and data is not None and role == qt4.Qt.DisplayRole:
+            # blank row at end of data
+            if index.row() == len(data):
+                return qt4.QVariant()
 
-            if data is not None:
-                d = data[index.row()]
-                if isinstance(d, basestring):
-                    return qt4.QVariant(d)
-                else:
-                    # value needs converting to float as QVariant doesn't
-                    # support numpy numeric types
-                    return qt4.QVariant(float(d))
-
-        # return nothing otherwise
+            d = data[index.row()]
+            if isinstance(d, basestring):
+                return qt4.QVariant(d)
+            else:
+                # value needs converting to float as QVariant doesn't
+                # support numpy numeric types
+                return qt4.QVariant(float(d))
         return qt4.QVariant()
 
     def headerData(self, section, orientation, role):
@@ -117,33 +119,38 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
     def setData(self, index, value, role):
         """Called to set the data."""
 
-        if index.isValid() and role == qt4.Qt.EditRole:
-            row = index.row()
-            column = index.column()
-            ds = self.document.data[self.dsname]
-            data = getattr(ds, ds.columns[index.column()])
-
-            # add new column if necessary
-            if data is None:
-                self.document.applyOperation(
-                    document.OperationDatasetAddColumn(self.dsname,
-                                                       ds.columns[column]) )
-
-
-            # update if conversion okay
-            try:
-                val = ds.convertToDataItem( value.toString() )
-            except ValueError:
-                return False
-            
-            op = document.OperationDatasetSetVal(self.dsname,
-                                                 ds.columns[column],
-                                                 row, val)
-            self.document.applyOperation(op)
-            return True
-
-        else:
+        if not index.isValid() or role != qt4.Qt.EditRole:
             return False
+
+        row = index.row()
+        column = index.column()
+        ds = self.document.data[self.dsname]
+        data = getattr(ds, ds.columns[index.column()])
+
+        # add new column if necessary
+        ops = document.OperationMultiple([], descr='add value')
+        if data is None:
+            ops.addOperation(
+                document.OperationDatasetAddColumn(self.dsname,
+                                                   ds.columns[column]))
+
+        # add a row if necessary
+        if row == len(ds.data):
+            ops.addOperation(
+                document.OperationDatasetInsertRow(self.dsname, row, 1))
+
+        # update if conversion okay
+        try:
+            val = ds.convertToDataItem( value.toString() )
+        except ValueError:
+            return False
+
+        ops.addOperation(
+            document.OperationDatasetSetVal(self.dsname,
+                                            ds.columns[column],
+                                            row, val))
+        self.document.applyOperation(ops)
+        return True
 
 class DatasetTableModel2D(qt4.QAbstractTableModel):
     """A 2D dataset model."""
