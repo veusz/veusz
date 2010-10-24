@@ -177,9 +177,11 @@ class LinkedFileBase(object):
         except Exception, ex:
             # if something breaks, record an error and return nothing
             document.log(unicode(ex))
-            errors = {}
-            for i in self.datasets:
-                errors[i] = 1
+
+            # find datasets which are linked using this link object
+            # return errors for them
+            errors = dict([(name, 1) for name, ds in document.data.iteritems()
+                           if ds.linked is self])
             return ([], errors)            
             
         # delete datasets which are linked and imported here
