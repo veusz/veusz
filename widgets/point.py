@@ -200,6 +200,13 @@ _errorBarFunctionMap = {
     }
 
 
+class MarkerFillBrush(setting.Brush):
+    def __init__(self, name, **args):
+        setting.Brush.__init__(self, name, **args)
+
+        self.get('color').newDefault( setting.Reference(
+            '../PlotLine/color') )
+    
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
@@ -207,13 +214,6 @@ class PointPlotter(GenericPlotter):
     allowusercreation=True
     description='Plot points with lines and errorbars'
 
-    class MarkerFillBrush(setting.Brush):
-        def __init__(self, name, **args):
-            setting.Brush.__init__(self, name, **args)
-
-            self.get('color').newDefault( setting.Reference(
-                '../PlotLine/color') )
-    
     def __init__(self, parent, name=None):
         """Initialise XY plotter plotting (xdata, ydata).
         
@@ -271,9 +271,9 @@ class PointPlotter(GenericPlotter):
                             descr = 'Line around the marker settings',
                             usertext = 'Marker border'),
                pixmap = 'settings_plotmarkerline' )
-        s.add( PointPlotter.MarkerFillBrush('MarkerFill',
-                                            descr = 'Marker fill settings',
-                                            usertext = 'Marker fill'),
+        s.add( MarkerFillBrush('MarkerFill',
+                               descr = 'Marker fill settings',
+                               usertext = 'Marker fill'),
                pixmap = 'settings_plotmarkerfill' )
         s.add( setting.ErrorBarLine('ErrorBarLine',
                                     descr = 'Error bar line settings',
