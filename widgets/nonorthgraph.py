@@ -5,21 +5,6 @@ from grid import Grid
 
 import veusz.setting as setting
 
-class Tick(setting.Line):
-    '''Tick settings.'''
-
-    def __init__(self, name, **args):
-        setting.Line.__init__(self, name, **args)
-        self.add( setting.DistancePt( 'length',
-                                      '6pt',
-                                      descr = 'Length of major ticks',
-                                      usertext='Length') )
-
-    def getLength(self, painter):
-        '''Return tick length in painter coordinates'''
-        
-        return self.get('length').convert(painter)
-
 class NonOrthGraph(Widget):
     '''Non-orthogonal graph base widget.'''
 
@@ -57,9 +42,6 @@ class NonOrthGraph(Widget):
         s.add( setting.Line('Border', descr = 'Graph border line',
                             usertext='Border'),
                pixmap='settings_border')
-        s.add( Tick('Tick', descr = 'Tick line',
-                    usertext='Tick'),
-               pixmap='settings_axismajorticks' )
 
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert graph to plotting coordinates.
@@ -80,7 +62,6 @@ class NonOrthGraph(Widget):
         drange = [1e199, -1e199, 1e199, -1e199]
         for c in self.children:
             c.updateDataRanges(drange)
-        print drange
         return drange
             
     def draw(self, parentposn, painter, outerbounds=None):
@@ -108,6 +89,7 @@ class NonOrthGraph(Widget):
         painter.beginPaintingWidget(self, bounds)
         datarange = self.getDataRange()
         self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
+        painter.endPaintingWidget()
 
         # paint children
         painter.save()
@@ -117,8 +99,8 @@ class NonOrthGraph(Widget):
         painter.restore()
 
         # draw axes
+        painter.beginPaintingWidget(self, bounds)
         self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
-
         painter.endPaintingWidget()
 
         return bounds

@@ -89,13 +89,15 @@ class NonOrthPoint(Widget):
         d2 = self.settings.get('data2').getData(self.document)
         if not d1 or not d2:
             return
+        d1d = d1.data
+        d2d = d2.data
+        minlen = min(d1d.shape[0], d2d.shape[0])
+        d1d, d2d = d1d[:minlen], d2d[:minlen]
 
         painter.beginPaintingWidget(self, posn)
         painter.save()
 
-        plta, pltb = self.parent.graphToPlotCoords(d1.data, d2.data)
-        print plta
-        print pltb
+        plta, pltb = self.parent.graphToPlotCoords(d1d, d2d)
         self.plotMarkers(painter, plta, pltb)
 
         painter.restore()
