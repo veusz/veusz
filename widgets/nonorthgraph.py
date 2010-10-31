@@ -1,3 +1,25 @@
+#    Copyright (C) 2010 Jeremy S. Sanders
+#    Email: Jeremy Sanders <jeremy@jeremysanders.net>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc.,
+#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##############################################################################
+
+# $Id$
+
+"""Non orthogonal graph root."""
+
 import controlgraph
 from widget import Widget
 from page import Page
@@ -89,6 +111,7 @@ class NonOrthGraph(Widget):
         painter.beginPaintingWidget(self, bounds)
         datarange = self.getDataRange()
         self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
+        self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
         painter.endPaintingWidget()
 
         # paint children
@@ -97,11 +120,6 @@ class NonOrthGraph(Widget):
         for c in reversed(self.children):
             c.draw(bounds, painter, outerbounds=outerbounds)
         painter.restore()
-
-        # draw axes
-        painter.beginPaintingWidget(self, bounds)
-        self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
-        painter.endPaintingWidget()
 
         return bounds
 

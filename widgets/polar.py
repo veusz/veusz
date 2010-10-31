@@ -1,3 +1,27 @@
+# -*- coding: utf-8 -*-
+
+#    Copyright (C) 2010 Jeremy S. Sanders
+#    Email: Jeremy Sanders <jeremy@jeremysanders.net>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc.,
+#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##############################################################################
+
+# $Id$
+
+"""Polar plot widget."""
+
 import qtall as qt4
 import numpy as N
 
@@ -10,7 +34,7 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 class Tick(setting.Line):
-    '''Tick settings.'''
+    '''Polar tick settings.'''
 
     def __init__(self, name, **args):
         setting.Line.__init__(self, name, **args)
@@ -35,10 +59,17 @@ class Tick(setting.Line):
         return self.get('length').convert(painter)
 
 class Polar(NonOrthGraph):
+    '''Polar plotter.'''
 
     typename='polar'
     allowusercreation = True
     description = 'Polar graph'
+
+    def __init__(self, parent, name=None):
+        '''Initialise polar plot.'''
+        NonOrthGraph.__init__(self, parent, name=name)
+        if type(self) == NonOrthGraph:
+            self.readDefaults()
 
     @classmethod
     def addSettings(klass, s):
@@ -48,17 +79,21 @@ class Polar(NonOrthGraph):
         s.add( setting.FloatOrAuto('maxradius', 'Auto',
                                    descr='Maximum value of radius',
                                    usertext='Max radius') )
-        s.add( setting.Choice('dataunits',
+        s.add( setting.Choice('units',
                               ('degrees', 'radians'), 
                               'degrees', 
-                              descr = 'Angular units of data',
-                              usertext='Data units') )
+                              descr = 'Angular units',
+                              usertext='Units') )
         s.add( setting.Choice('direction',
                               ('clockwise', 'anticlockwise'),
-                              'clockwise',
+                              'anticlockwise',
                               descr = 'Angle direction',
                               usertext = 'Direction') )
-
+        s.add( setting.Choice('position0',
+                              ('right', 'top', 'left', 'bottom'),
+                              'right',
+                              descr = 'Direction of 0 angle',
+                              usertext = u'Position of 0°') )
 
         s.add( TickLabel('TickLabels', descr = 'Tick labels',
                     usertext='Tick labels'),
@@ -67,13 +102,27 @@ class Polar(NonOrthGraph):
                     usertext='Tick'),
                pixmap='settings_axismajorticks' )
 
+        s.get('leftMargin').newDefault('1cm')
+        s.get('rightMargin').newDefault('1cm')
+        s.get('topMargin').newDefault('1cm')
+        s.get('bottomMargin').newDefault('1cm')
+
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert coordinates in r, theta to x, y.'''
 
+        s = self.settings
         cb = coordb
-        if self.settings.dataunits == 'degrees':
+        if s.units == 'degrees':
             cb = coordb * (N.pi/180.)
         ca = coorda / self._maxradius
+
+        # change direction
+        if s.direction == 'anticlockwise':
+            cb = -cb
+
+        # add offset
+        cb -= {'right': 0, 'top': 0.5*N.pi, 'left': N.pi,
+               'bottom': 1.5*N.pi}[s.position0]
 
         x = self._xc + ca * N.cos(cb) * self._xscale
         y = self._yc + ca * N.sin(cb) * self._yscale
@@ -97,7 +146,6 @@ class Polar(NonOrthGraph):
         painter.setBrush( s.Background.makeQBrushWHide() )
         painter.drawEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
                                          qt4.QPointF(bounds[2], bounds[3]) ) )
-
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
@@ -129,12 +177,15 @@ class Polar(NonOrthGraph):
                         qt4.QPointF( self._xc + radius*self._xscale,
                                      self._yc + radius*self._yscale ) ))
 
+        # setup axes plot
         tl = s.TickLabels
         scale, format = tl.scale, tl.format
         if format == 'Auto':
             format = tickformat
         painter.setPen( tl.makeQPen() )
         font = tl.makeQFont(painter)
+
+        # draw radial axis
         for tick in majtick[1:]:
             num = utils.formatNumber(tick*scale, format)
             x = tick / self._maxradius * self._xscale + self._xc
@@ -142,8 +193,37 @@ class Polar(NonOrthGraph):
                                alignvert=-1, usefullheight=True)
             r.render()
 
+        if s.units == 'degrees':
+            angles = [ u'0°', u'30°', u'60°', u'90°', u'120°', u'150°',
+                       u'180°', u'210°', u'240°', u'270°', u'300°', u'330°' ]
+        else:
+            angles = ['0', u'π/6', u'π/3', u'π/2', u'2π/3', u'5π/6',
+                       u'π', u'7π/6', u'4π/3', u'3π/2', u'5π/3', u'11π/6' ]
+
+        align = [ (-1, 0), (-1, 1), (-1, 1), (0, 1), (1, 1), (1, 1),
+                  (1, 0), (1, -1), (1, -1), (0, -1), (-1, -1), (-1, -1) ]
+
+        if s.direction == 'anticlockwise':
+            angles = angles[0:1] + angles[1:][::-1]
+        
+        if s.position0 == 'top':
+            pass
+
+        for i in xrange(12):
+            angle = 2 * N.pi / 12
+            x = self._xc +  N.cos(angle*i) * self._xscale
+            y = self._yc +  N.sin(angle*i) * self._yscale
+            r = utils.Renderer(painter, font, x, y, angles[i],
+                               alignhorz=align[i][0],
+                               alignvert=align[i][1],
+                               usefullheight=True)
+            r.render()
+            
+
         # draw spokes
         if not t.hidespokes:
+            painter.setPen( s.Tick.makeQPenWHide(painter) )
+            painter.setBrush( qt4.QBrush() )      
             angle = 2 * N.pi / 12
             lines = []
             for i in xrange(12):
