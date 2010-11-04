@@ -32,7 +32,7 @@ from point import MarkerFillBrush
 
 class NonOrthPoint(Widget):
 
-    typename = 'NOxy'
+    typename = 'nonorthxy'
     allowusercreation = True
     description = 'Plot points on graphs with non-orthogonal axes.'
 

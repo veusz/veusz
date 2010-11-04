@@ -52,6 +52,7 @@ class Tick(setting.Line):
         self.add( setting.Bool('hideannuli', False,
                                descr = 'Hide annuli',
                                usertext = 'Hide annuli') )
+        self.get('color').newDefault('grey')
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -159,6 +160,10 @@ class Polar(NonOrthGraph):
 
         s = self.settings
         t = s.Tick
+
+        if self._maxradius <= 0.:
+            self._maxradius = 1.
+
         atick = AxisTicks(0, self._maxradius, t.number,
                           t.number*4,
                           extendbounds=False,  extendzero=False)
@@ -197,18 +202,24 @@ class Polar(NonOrthGraph):
             angles = [ u'0°', u'30°', u'60°', u'90°', u'120°', u'150°',
                        u'180°', u'210°', u'240°', u'270°', u'300°', u'330°' ]
         else:
-            angles = ['0', u'π/6', u'π/3', u'π/2', u'2π/3', u'5π/6',
+            angles = [ '0', u'π/6', u'π/3', u'π/2', u'2π/3', u'5π/6',
                        u'π', u'7π/6', u'4π/3', u'3π/2', u'5π/3', u'11π/6' ]
 
-        align = [ (-1, 0), (-1, 1), (-1, 1), (0, 1), (1, 1), (1, 1),
+        align = [ (-1, 1), (-1, 1), (-1, 1), (0, 1), (1, 1), (1, 1),
                   (1, 0), (1, -1), (1, -1), (0, -1), (-1, -1), (-1, -1) ]
 
         if s.direction == 'anticlockwise':
             angles = angles[0:1] + angles[1:][::-1]
         
+        # rotate labels if zero not at right
         if s.position0 == 'top':
-            pass
+            angles = angles[3:] + angles[:4]
+        elif s.position0 == 'left':
+            angles = angles[6:] + angles[:7]
+        elif s.position0 == 'bottom':
+            angles = angles[9:] + angles[:10]
 
+        # draw labels around plot
         for i in xrange(12):
             angle = 2 * N.pi / 12
             x = self._xc +  N.cos(angle*i) * self._xscale
@@ -219,7 +230,6 @@ class Polar(NonOrthGraph):
                                usefullheight=True)
             r.render()
             
-
         # draw spokes
         if not t.hidespokes:
             painter.setPen( s.Tick.makeQPenWHide(painter) )
@@ -232,6 +242,5 @@ class Polar(NonOrthGraph):
                 lines.append( qt4.QLineF(qt4.QPointF(self._xc, self._yc),
                                          qt4.QPointF(x, y)) )
             painter.drawLines(lines)
-
 
 document.thefactory.register(Polar)
