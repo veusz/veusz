@@ -60,7 +60,7 @@ class FieldText(Field):
         return (l, e)
 
     def setControlVal(self, controls, val):
-        e.setText(val)
+        controls[1].setText(val)
 
     def getControlResults(self, cntrls):
         return unicode( cntrls[1].text() )
