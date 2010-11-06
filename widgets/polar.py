@@ -27,7 +27,7 @@ import numpy as N
 
 from nonorthgraph import NonOrthGraph
 from axisticks import AxisTicks
-from axis import TickLabel
+import axis
 
 import veusz.document as document
 import veusz.setting as setting
@@ -58,6 +58,20 @@ class Tick(setting.Line):
         '''Return tick length in painter coordinates'''
         
         return self.get('length').convert(painter)
+
+class TickLabel(axis.TickLabel):
+    """For tick label."""
+    def __init__(self, *args, **argsv):
+        axis.TickLabel.__init__(self, *args, **argsv)
+        self.remove('offset')
+        self.remove('rotate')
+        self.remove('hide')
+        self.add( setting.Bool('hideradial', False,
+                               descr = 'Hide radial labels',
+                               usertext='Hide radial') )
+        self.add( setting.Bool('hidetangential', False,
+                               descr = 'Hide tangential labels',
+                               usertext='Hide tangent') )
 
 class Polar(NonOrthGraph):
     '''Polar plotter.'''
@@ -191,12 +205,14 @@ class Polar(NonOrthGraph):
         font = tl.makeQFont(painter)
 
         # draw radial axis
-        for tick in majtick[1:]:
-            num = utils.formatNumber(tick*scale, format)
-            x = tick / self._maxradius * self._xscale + self._xc
-            r = utils.Renderer(painter, font, x, self._yc, num, alignhorz=-1,
-                               alignvert=-1, usefullheight=True)
-            r.render()
+        if not s.TickLabels.hideradial:
+            for tick in majtick[1:]:
+                num = utils.formatNumber(tick*scale, format)
+                x = tick / self._maxradius * self._xscale + self._xc
+                r = utils.Renderer(painter, font, x, self._yc, num,
+                                   alignhorz=-1,
+                                   alignvert=-1, usefullheight=True)
+                r.render()
 
         if s.units == 'degrees':
             angles = [ u'0°', u'30°', u'60°', u'90°', u'120°', u'150°',
@@ -220,15 +236,16 @@ class Polar(NonOrthGraph):
             angles = angles[9:] + angles[:10]
 
         # draw labels around plot
-        for i in xrange(12):
-            angle = 2 * N.pi / 12
-            x = self._xc +  N.cos(angle*i) * self._xscale
-            y = self._yc +  N.sin(angle*i) * self._yscale
-            r = utils.Renderer(painter, font, x, y, angles[i],
-                               alignhorz=align[i][0],
-                               alignvert=align[i][1],
-                               usefullheight=True)
-            r.render()
+        if not s.TickLabels.hidetangential:
+            for i in xrange(12):
+                angle = 2 * N.pi / 12
+                x = self._xc +  N.cos(angle*i) * self._xscale
+                y = self._yc +  N.sin(angle*i) * self._yscale
+                r = utils.Renderer(painter, font, x, y, angles[i],
+                                   alignhorz=align[i][0],
+                                   alignvert=align[i][1],
+                                   usefullheight=True)
+                r.render()
             
         # draw spokes
         if not t.hidespokes:
