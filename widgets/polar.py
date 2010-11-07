@@ -122,26 +122,49 @@ class Polar(NonOrthGraph):
         s.get('topMargin').newDefault('1cm')
         s.get('bottomMargin').newDefault('1cm')
 
+    def toPlotAngle(self, angles):
+        """Convert one or more angles to angle on plot."""
+        s = self.settings
+
+        # unit conversion
+        if s.units == 'degrees':
+            angles = angles * (N.pi/180.)
+        # change direction
+        if self.settings.direction == 'anticlockwise':
+            angles = -angles
+        # add offset
+        angles -= {'right': 0, 'top': 0.5*N.pi, 'left': N.pi,
+                   'bottom': 1.5*N.pi}[self.settings.position0]
+        return angles
+        
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert coordinates in r, theta to x, y.'''
 
         s = self.settings
-        cb = coordb
-        if s.units == 'degrees':
-            cb = coordb * (N.pi/180.)
         ca = coorda / self._maxradius
-
-        # change direction
-        if s.direction == 'anticlockwise':
-            cb = -cb
-
-        # add offset
-        cb -= {'right': 0, 'top': 0.5*N.pi, 'left': N.pi,
-               'bottom': 1.5*N.pi}[s.position0]
+        cb = self.toPlotAngle(coordb)
 
         x = self._xc + ca * N.cos(cb) * self._xscale
         y = self._yc + ca * N.sin(cb) * self._yscale
         return x, y
+
+    def drawFillPts(self, painter, cliprect, coorda, coordb, ptsx, ptsy,
+                    filltype):
+        '''Draw points for plotting a fill.'''
+        pts = qt4.QPolygonF()
+        utils.addNumpyToPolygonF(pts, ptsx, ptsy)
+
+        if filltype == 'center':
+            pts.append( qt4.QPointF(self._xc, self._yc) )
+            utils.plotClippedPolygon(painter, cliprect, pts)
+        elif filltype == 'outside':
+            pp = qt4.QPainterPath()
+            pp.addPolygon(pts)
+
+            a0,a1 = self.toPlotAngle(N.array([coordb[0],coordb[-1]]))*180/N.pi
+            pp.arcTo(cliprect, a1, a1-a0)
+            pp.closeSubpath()
+            painter.fillPath(pp, painter.brush())
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''

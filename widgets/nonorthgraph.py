@@ -27,6 +27,8 @@ from grid import Grid
 
 import veusz.setting as setting
 
+filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right')
+
 class NonOrthGraph(Widget):
     '''Non-orthogonal graph base widget.'''
 
@@ -68,6 +70,15 @@ class NonOrthGraph(Widget):
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert graph to plotting coordinates.
         Returns (plta, pltb) coordinates
+        '''
+
+    def drawFillPts(self, painter, bounds, coorda, coordb, ptsx, ptsy,
+                    filltype):
+        '''Draw set of points for filling.
+        bounds: usual tuple (minx, miny, maxx, maxy)
+        coorda, coordb: untranslated graph coordinates
+        ptsx, ptsy: translated plotter coordinates
+        filltype: one of filloptions
         '''
     
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):

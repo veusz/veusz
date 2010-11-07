@@ -27,11 +27,21 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-from nonorthgraph import NonOrthGraph
+from nonorthgraph import NonOrthGraph, filloptions
 from widget import Widget
 from point import MarkerFillBrush
 
+class FillBrush(setting.Brush):
+    '''Brush for filling point region.'''
+    def __init__(self, *args, **argsv):
+        setting.Brush.__init__(self, *args, **argsv)
+        self.add( setting.Choice('filltype', filloptions, 'center',
+                                 descr='Fill to this edge/position',
+                                 usertext='Fill type') )
+        self.get('hide').newDefault(True)
+
 class NonOrthPoint(Widget):
+    '''Widget for plotting points in a non-orthogonal plot.'''
 
     typename = 'nonorthpoint'
     allowusercreation = True
@@ -77,6 +87,14 @@ class NonOrthPoint(Widget):
                                descr = 'Marker fill settings',
                                usertext = 'Marker fill'),
                pixmap = 'settings_plotmarkerfill' )
+        s.add( FillBrush('Fill1',
+                         descr = 'Fill settings (1)',
+                         usertext = 'Area fill 1'),
+               pixmap = 'settings_plotfillbelow' )
+        s.add( FillBrush('Fill2',
+                         descr = 'Fill settings (2)',
+                         usertext = 'Area fill 2'),
+               pixmap = 'settings_plotfillbelow' )
 
     def updateDataRanges(self, inrange):
         '''Extend inrange to range of data.'''
@@ -91,7 +109,7 @@ class NonOrthPoint(Widget):
             inrange[3] = max( N.nanmax(d2.data), inrange[3] )
 
     def plotMarkers(self, painter, plta, pltb, scaling, clip):
-        # draw marker
+        '''Draw markers in widget.'''
         s = self.settings
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
             painter.setBrush( s.MarkerFill.makeQBrushWHide() )
@@ -130,7 +148,15 @@ class NonOrthPoint(Widget):
             # convert data (chopping down length)
             v1d, v2d = v1.data, v2.data
             minlen = min(v1d.shape[0], v2d.shape[0])
-            px, py = self.parent.graphToPlotCoords(v1d[:minlen], v2d[:minlen])
+            v1d, v2d = v1d[:minlen], v2d[:minlen]
+            px, py = self.parent.graphToPlotCoords(v1d, v2d)
+
+            # do fill1 (if any)
+            if not s.Fill1.hide:
+                painter.setBrush( s.Fill1.makeQBrush() )
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+                self.parent.drawFillPts(painter, cliprect, v1d, v2d, px, py,
+                                        s.Fill1.filltype)
 
             # plot line
             if not s.PlotLine.hide:
