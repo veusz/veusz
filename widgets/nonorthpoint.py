@@ -33,9 +33,9 @@ from point import MarkerFillBrush
 
 class NonOrthPoint(Widget):
 
-    typename = 'nonorthxy'
+    typename = 'nonorthpoint'
     allowusercreation = True
-    description = 'Plot points on graphs with non-orthogonal axes.'
+    description = 'Plot points on graphs with non-orthogonal axes'
 
     allowedparenttypes = [NonOrthGraph]
 
