@@ -46,12 +46,12 @@ class NonOrthPoint(Widget):
 
         s.add( setting.DatasetOrFloatList(
                 'data1', 'x',
-                descr='Dataset containing 2nd dataset or list of values',
-                usertext='Dataset 2') )
-        s.add( setting.DatasetOrFloatList(
-                'data2', 'y',
                 descr='Dataset containing 1st dataset or list of values',
                 usertext='Dataset 1') )
+        s.add( setting.DatasetOrFloatList(
+                'data2', 'y',
+                descr='Dataset containing 2nd dataset or list of values',
+                usertext='Dataset 2') )
         s.add( setting.DatasetOrFloatList(
                 'scalePoints', '',
                 descr = 'Scale size of plotted markers by this dataset or'
@@ -127,7 +127,10 @@ class NonOrthPoint(Widget):
 
         # split parts separated by NaNs
         for v1, v2, vs in document.generateValidDatasetParts(d1, d2, dscale):
-            px, py = self.parent.graphToPlotCoords(v1.data, v2.data)
+            # convert data (chopping down length)
+            v1d, v2d = v1.data, v2.data
+            minlen = min(v1d.shape[0], v2d.shape[0])
+            px, py = self.parent.graphToPlotCoords(v1d[:minlen], v2d[:minlen])
 
             # plot line
             if not s.PlotLine.hide:
