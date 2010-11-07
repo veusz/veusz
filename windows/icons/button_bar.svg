@@ -17,37 +17,6 @@
    version="1.0"
    sodipodi:docname="button_bar.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
-  <defs
-     id="defs4">
-    <linearGradient
-       id="linearGradient3490">
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="0"
-         id="stop3492" />
-      <stop
-         style="stop-color:#bebebe;stop-opacity:1;"
-         offset="1"
-         id="stop3494" />
-    </linearGradient>
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective10" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3490"
-       id="linearGradient3496"
-       x1="8.3337603"
-       y1="8.429863"
-       x2="3.1587982"
-       y2="3.3648069"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0203025,0,0,1.0409558,-0.2260154,-0.2749194)" />
-  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
