@@ -7,17 +7,18 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="16"
    height="16"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.0 r9654"
    version="1.0"
    sodipodi:docname="button_vectorfield.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs16" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"

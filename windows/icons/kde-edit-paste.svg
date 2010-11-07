@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docbase="/home/danny/work/icons/primary/scalable/actions"
-   sodipodi:docname="paste.svg"
-   inkscape:version="0.41"
+   sodipodi:docname="kde-edit-paste.svg"
+   inkscape:version="0.48.0 r9654"
    sodipodi:version="0.32"
    id="svg1"
    x="0"
@@ -35,34 +33,7 @@
      pagecolor="#ffffff"
      id="base" />
   <defs
-     id="defs3">
-    <linearGradient
-       id="linearGradient900">
-      <stop
-         offset="0"
-         id="stop901"
-         style="stop-color: #000000;stop-opacity: 1.0;" />
-      <stop
-         offset="1"
-         id="stop902"
-         style="stop-color:#ffffff;stop-opacity:1;" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient903"
-       xlink:href="#linearGradient900" />
-    <linearGradient
-       id="linearGradient904"
-       xlink:href="#linearGradient900" />
-    <linearGradient
-       id="linearGradient905"
-       xlink:href="#linearGradient900" />
-    <linearGradient
-       id="linearGradient906"
-       xlink:href="#linearGradient900" />
-    <linearGradient
-       id="linearGradient907"
-       xlink:href="#linearGradient900" />
-  </defs>
+     id="defs3" />
   <metadata
      id="metadata16">
     <RDF
@@ -126,16 +97,12 @@
            id="language42">en</language>
       </Work>
     </RDF>
-    <rdf:RDF
-       id="RDF44">
+    <rdf:RDF>
       <cc:Work
-         id="Work45"
          rdf:about="">
-        <dc:format
-           id="format46">image/svg+xml</dc:format>
+        <dc:format>image/svg+xml</dc:format>
         <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage"
-           id="type48" />
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
       </cc:Work>
     </rdf:RDF>
   </metadata>
