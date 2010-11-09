@@ -159,11 +159,9 @@ class Polar(NonOrthGraph):
             utils.plotClippedPolygon(painter, cliprect, pts)
         elif filltype == 'outside':
             pp = qt4.QPainterPath()
+            pp.moveTo(self._xc, self._yc)
+            pp.arcTo(cliprect, 0, 360)
             pp.addPolygon(pts)
-
-            a0,a1 = self.toPlotAngle(N.array([coordb[0],coordb[-1]]))*180/N.pi
-            pp.arcTo(cliprect, a1, a1-a0)
-            pp.closeSubpath()
             painter.fillPath(pp, painter.brush())
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
