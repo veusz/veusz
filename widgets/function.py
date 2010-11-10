@@ -37,16 +37,14 @@ class FunctionChecker(object):
         self.cachedvar = None
         self.compiled = None
 
-    def check(self, settings, doc):
+    def check(self, fn, var):
         """check function doesn't contain dangerous code.
-        settings: settings.function contains function
-                  settings.variable contains variable function is of
-        doc:      document
+        fn:  function
+        var: function is a variable of this
         
         raises a RuntimeError(msg) if a problem
         """
-        fn = settings.function.strip()
-        var = settings.variable
+        fn = fn.strip()
         if self.cachedfunc != fn or self.cachedvar != var:
             checked = utils.checkCode(fn)
             if checked is not None:
@@ -157,7 +155,7 @@ class FunctionPlotter(GenericPlotter):
 
         # ignore if function isn't sensible
         try:
-            self.checker.check(s, self.document)
+            self.checker.check(s.function, s.variable)
         except RuntimeError, e:
             self.logEvalError(e)
             return
@@ -297,7 +295,7 @@ class FunctionPlotter(GenericPlotter):
 
         s = self.settings
         try:
-            self.checker.check(s, self.document)
+            self.checker.check(s.function, s.variable)
         except RuntimeError, e:
             self.logEvalError(e)
             return None, None
