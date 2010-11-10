@@ -122,6 +122,12 @@ class Polar(NonOrthGraph):
         s.get('topMargin').newDefault('1cm')
         s.get('bottomMargin').newDefault('1cm')
 
+    def coordRanges(self):
+        '''Get ranges of coordinates.'''
+        if self.settings.units == 'degrees':
+            return [[0., self._maxradius], [0., 360.]]
+        return [[0., self._maxradius], [0., 2.*N.pi]]
+
     def toPlotAngle(self, angles):
         """Convert one or more angles to angle on plot."""
         s = self.settings

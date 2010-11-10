@@ -71,7 +71,7 @@ class FunctionPlotter(GenericPlotter):
     description='Plot a function'
     
     def __init__(self, parent, name=None):
-        """Initialise plotter with axes."""
+        """Initialise plotter."""
 
         GenericPlotter.__init__(self, parent, name=name)
 

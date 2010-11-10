@@ -27,27 +27,24 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-from nonorthgraph import NonOrthGraph, filloptions
+from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
 from point import MarkerFillBrush
-
-class FillBrush(setting.Brush):
-    '''Brush for filling point region.'''
-    def __init__(self, *args, **argsv):
-        setting.Brush.__init__(self, *args, **argsv)
-        self.add( setting.Choice('filltype', filloptions, 'center',
-                                 descr='Fill to this edge/position',
-                                 usertext='Fill type') )
-        self.get('hide').newDefault(True)
 
 class NonOrthPoint(Widget):
     '''Widget for plotting points in a non-orthogonal plot.'''
 
     typename = 'nonorthpoint'
     allowusercreation = True
-    description = 'Plot points on graphs with non-orthogonal axes'
+    description = 'Plot points on a graph with non-orthogonal axes'
 
     allowedparenttypes = [NonOrthGraph]
+
+    def __init__(self, parent, name=None):
+        """Initialise plotter."""
+        Widget.__init__(self, parent, name=name)
+        if type(self) == NonOrthPoint:
+            self.readDefaults()
 
     @classmethod
     def addSettings(klass, s):

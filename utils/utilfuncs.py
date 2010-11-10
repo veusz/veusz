@@ -33,6 +33,7 @@ import csv
 import math
 
 import veusz.qtall as qt4
+import numpy as N
 
 class IgnoreException(Exception):
     """A special exception class to be ignored by the exception handler."""
@@ -351,6 +352,23 @@ def formatNumber(num, format):
         format = format[:m.start()] + out + format[m.end():]
 
     return format
+
+def validLinePoints(x, y):
+    """Take x and y points and split into sets of points which
+    don't have invalid points.
+    This is a generator.
+    """
+    xvalid = N.logical_not( N.isfinite(x) ).nonzero()[0]
+    yvalid = N.logical_not( N.isfinite(y) ).nonzero()[0]
+    invalid = N.concatenate((xvalid, yvalid))
+    invalid.sort()
+    last = 0
+    for valid in invalid:
+        if valid > last:
+            yield x[last:valid], y[last:valid]
+        last = valid + 1
+    if last < x.shape[0]-1:
+        yield x[last:], y[last:]
 
 # This is Tim Peter's <tim_one@msn.com> topological sort
 # see http://www.python.org/tim_one/000332.html

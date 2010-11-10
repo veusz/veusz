@@ -439,6 +439,8 @@ class TreeEditDock(qt4.QDockWidget):
         nonorth = self.vzactions['add.nonorthpoint'].isEnabled()
         self.vzactions['add.nonorthpoint'].setVisible(nonorth)
         self.vzactions['add.xy'].setVisible(not nonorth)
+        self.vzactions['add.nonorthfunc'].setVisible(nonorth)
+        self.vzactions['add.function'].setVisible(not nonorth)
 
         # certain actions shouldn't allow root to be deleted
         isnotroot = not isinstance(selw, widgets.Root)
@@ -463,7 +465,8 @@ class TreeEditDock(qt4.QDockWidget):
                            'image', 'contour', 'vectorfield',
                            'key', 'label', 'colorbar',
                            'rect', 'ellipse', 'imagefile',
-                           'line', 'polygon', 'polar', 'nonorthpoint'):
+                           'line', 'polygon', 'polar',
+                           'nonorthpoint', 'nonorthfunc'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
@@ -516,7 +519,8 @@ class TreeEditDock(qt4.QDockWidget):
         # add actions to menus for adding widgets and editing
         addact = [('add.'+w) for w in 
                   ('page', 'grid', 'graph', 'axis',
-                   'xy', 'nonorthpoint', 'bar', 'fit', 'function', 'boxplot',
+                   'xy', 'nonorthpoint', 'bar', 'fit',
+                   'function', 'nonorthfunc', 'boxplot',
                    'image', 'contour', 'vectorfield',
                    'key', 'label', 'colorbar', 'polar')]
 

@@ -28,6 +28,14 @@ from grid import Grid
 import veusz.setting as setting
 
 filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right')
+class FillBrush(setting.Brush):
+    '''Brush for filling point region.'''
+    def __init__(self, *args, **argsv):
+        setting.Brush.__init__(self, *args, **argsv)
+        self.add( setting.Choice('filltype', filloptions, 'center',
+                                 descr='Fill to this edge/position',
+                                 usertext='Fill type') )
+        self.get('hide').newDefault(True)
 
 class NonOrthGraph(Widget):
     '''Non-orthogonal graph base widget.'''
@@ -71,6 +79,10 @@ class NonOrthGraph(Widget):
         '''Convert graph to plotting coordinates.
         Returns (plta, pltb) coordinates
         '''
+
+    def coordRanges(self):
+        '''Return coordinate ranges of plot.
+        This is in the form [[mina, maxa], [minb, maxb]].'''
 
     def drawFillPts(self, painter, bounds, coorda, coordb, ptsx, ptsy,
                     filltype):
