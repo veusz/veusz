@@ -18,7 +18,7 @@
 
 # $Id$
 
-"""Non orthogonal function plotting."""
+'''Non orthogonal function plotting.'''
 
 import numpy as N
 
@@ -41,7 +41,7 @@ class NonOrthFunction(Widget):
     allowedparenttypes = [NonOrthGraph]
 
     def __init__(self, parent, name=None):
-        """Initialise plotter."""
+        '''Initialise plotter.'''
         Widget.__init__(self, parent, name=name)
         if type(self) == NonOrthFunction:
             self.readDefaults()
@@ -85,15 +85,12 @@ class NonOrthFunction(Widget):
                            descr = 'Number of steps to evaluate the function'
                            ' over', usertext='Steps', formatting=True), 0 )
 
-    def updateDataRanges(self, inrange):
-        pass
-
     def initEnviron(self):
-        """Set up function environment."""
+        '''Set up function environment.'''
         return self.document.eval_context.copy()
        
     def logEvalError(self, ex):
-        """Write error message to document log for exception ex."""
+        '''Write error message to document log for exception ex.'''
         self.document.log(
             "Error evaluating expression in function widget '%s': '%s'" % (
                 self.name, unicode(ex)))
@@ -130,6 +127,9 @@ class NonOrthFunction(Widget):
         else:
             return vals, invals
 
+    def updateDataRanges(self, inrange):
+        '''Update ranges of data given function.'''
+
     def draw(self, parentposn, painter, outerbounds=None):
         '''Plot the function on a plotter.'''
 
@@ -158,14 +158,26 @@ class NonOrthFunction(Widget):
         apts, bpts = self.getFunctionPoints()
         px, py = self.parent.graphToPlotCoords(apts, bpts)
 
-        # draw line segments
+        # plot line
         painter.setBrush(qt4.QBrush())
         painter.setPen( s.PlotLine.makeQPenWHide(painter) )
-
         for x, y in utils.validLinePoints(px, py):
-            p = qt4.QPolygonF()
-            utils.addNumpyToPolygonF(p, x, y)
-            utils.plotClippedPolyline(painter, cliprect, p)
+            if not s.Fill1.hide:
+                painter.setBrush( s.Fill1.makeQBrush() )
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+                self.parent.drawFillPts(painter, cliprect, x, y,
+                                        s.Fill1.filltype)
+            if not s.Fill2.hide:
+                painter.setBrush( s.Fill2.makeQBrush() )
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+                self.parent.drawFillPts(painter, cliprect, x, y,
+                                        s.Fill2.filltype)
+            if not s.PlotLine.hide:
+                p = qt4.QPolygonF()
+                utils.addNumpyToPolygonF(p, x, y)
+                painter.setBrush(qt4.QBrush())
+                painter.setPen( s.PlotLine.makeQPen(painter) )
+                utils.plotClippedPolyline(painter, cliprect, p)
 
         painter.restore()
         painter.endPaintingWidget()

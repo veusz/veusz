@@ -154,8 +154,7 @@ class Polar(NonOrthGraph):
         y = self._yc + ca * N.sin(cb) * self._yscale
         return x, y
 
-    def drawFillPts(self, painter, cliprect, coorda, coordb, ptsx, ptsy,
-                    filltype):
+    def drawFillPts(self, painter, cliprect, ptsx, ptsy, filltype):
         '''Draw points for plotting a fill.'''
         pts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)

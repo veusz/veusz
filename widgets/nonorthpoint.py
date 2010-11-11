@@ -152,13 +152,13 @@ class NonOrthPoint(Widget):
             if not s.Fill1.hide:
                 painter.setBrush( s.Fill1.makeQBrush() )
                 painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                self.parent.drawFillPts(painter, cliprect, v1d, v2d, px, py,
+                self.parent.drawFillPts(painter, cliprect, px, py,
                                         s.Fill1.filltype)
             # do fill2
             if not s.Fill2.hide:
                 painter.setBrush( s.Fill2.makeQBrush() )
                 painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                self.parent.drawFillPts(painter, cliprect, v1d, v2d, px, py,
+                self.parent.drawFillPts(painter, cliprect, px, py,
                                         s.Fill2.filltype)
 
             # plot line
