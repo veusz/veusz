@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    height="60"
    width="60"
@@ -15,9 +15,8 @@
    x="0"
    id="svg1"
    sodipodi:version="0.32"
-   inkscape:version="0.41"
-   sodipodi:docname="editcopy.svg"
-   sodipodi:docbase="/home/danny/work/icons/primary/scalable/actions">
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="kde-edit-copy.svg">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -98,15 +97,11 @@
            id="language33">en</language>
       </Work>
     </RDF>
-    <rdf:RDF
-       id="RDF36">
+    <rdf:RDF>
       <cc:Work
-         rdf:about=""
-         id="Work37">
-        <dc:format
-           id="format38">image/svg+xml</dc:format>
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
         <dc:type
-           id="type40"
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
       </cc:Work>
     </rdf:RDF>

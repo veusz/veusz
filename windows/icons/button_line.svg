@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,57 +13,12 @@
    height="16"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.48.0 r9654"
    version="1.0"
    sodipodi:docname="button_line.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs4">
-    <linearGradient
-       id="linearGradient6104">
-      <stop
-         style="stop-color:#2609ff;stop-opacity:1;"
-         offset="0"
-         id="stop6106" />
-      <stop
-         id="stop6112"
-         offset="0.5"
-         style="stop-color:#09ff3d;stop-opacity:1;" />
-      <stop
-         style="stop-color:#ff0909;stop-opacity:1;"
-         offset="1"
-         id="stop6108" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient5475">
-      <stop
-         style="stop-color:#1200af;stop-opacity:1;"
-         offset="0"
-         id="stop5477" />
-      <stop
-         style="stop-color:#eb20ff;stop-opacity:0;"
-         offset="1"
-         id="stop5479" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3490">
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="0"
-         id="stop3492" />
-      <stop
-         style="stop-color:#bebebe;stop-opacity:1;"
-         offset="1"
-         id="stop3494" />
-    </linearGradient>
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective10" />
-  </defs>
+     id="defs8" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"

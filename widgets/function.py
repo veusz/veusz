@@ -30,6 +30,39 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
+class FunctionChecker(object):
+    """Help check function is valid."""
+    def __init__(self):
+        self.cachedfunc = None
+        self.cachedvar = None
+        self.compiled = None
+
+    def check(self, fn, var):
+        """check function doesn't contain dangerous code.
+        fn:  function
+        var: function is a variable of this
+        
+        raises a RuntimeError(msg) if a problem
+        """
+        fn = fn.strip()
+        if self.cachedfunc != fn or self.cachedvar != var:
+            checked = utils.checkCode(fn)
+            if checked is not None:
+                try:
+                    msg = checked[0][0]
+                except Exception:
+                    msg = ''
+                raise RuntimeError(msg)
+
+            self.cachedfunc = fn
+            self.cachedvar = var
+
+            try:
+                # compile code
+                self.compiled = compile(fn, '<string>', 'eval')
+            except Exception, e:
+                raise RuntimeError(e)
+
 class FunctionPlotter(GenericPlotter):
     """Function plotting class."""
 
@@ -38,16 +71,14 @@ class FunctionPlotter(GenericPlotter):
     description='Plot a function'
     
     def __init__(self, parent, name=None):
-        """Initialise plotter with axes."""
+        """Initialise plotter."""
 
         GenericPlotter.__init__(self, parent, name=name)
 
         if type(self) == FunctionPlotter:
             self.readDefaults()
 
-        self.cachedfunc = None
-        self.cachedvar = None
-        self.cachedcomp = None
+        self.checker = FunctionChecker()
 
     @classmethod
     def addSettings(klass, s):
@@ -89,10 +120,16 @@ class FunctionPlotter(GenericPlotter):
                                    usertext = 'Fill above'),
                pixmap = 'settings_plotfillabove' )
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User-friendly description."""
         return "%(variable)s = %(function)s" % self.settings
-    userdescription = property(_getUserDescription)
+
+    def logEvalError(self, ex):
+        """Write error message to document log for exception ex."""
+        self.document.log(
+            "Error evaluating expression in function widget '%s': '%s'" % (
+                self.name, unicode(ex)))
 
     def providesAxesDependency(self):
         s = self.settings
@@ -117,7 +154,10 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # ignore if function isn't sensible
-        if not self._checkCachedFunction():
+        try:
+            self.checker.check(s.function, s.variable)
+        except RuntimeError, e:
+            self.logEvalError(e)
             return
 
         # find axis to find variable range over
@@ -150,7 +190,7 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = points
         try:
-            vals = eval(self.cachedcomp, env) + points*0.
+            vals = eval(self.checker.compiled, env) + points*0.
         except:
             # something wrong in the evaluation
             return
@@ -249,43 +289,15 @@ class FunctionPlotter(GenericPlotter):
         """Set up function environment."""
         return self.document.eval_context.copy()
        
-    def _errorFunctionEval(self, e):
-        """Write error message to document log for exception e."""
-        self.document.log("Error evaluating expression in function"
-                          " widget '%s': '%s'" % (
-                self.name, unicode(e)))
-
-    def _checkCachedFunction(self):
-        """check function doesn't contain dangerous code."""
-        s = self.settings
-        fn = s.function.strip()
-        if self.cachedfunc != fn or self.cachedvar != s.variable:
-            checked = utils.checkCode(fn)
-            if checked is not None:
-                try:
-                    msg = checked[0][0]
-                except Exception:
-                    msg = ''
-                self._errorFunctionEval(msg)
-                return False
-            self.cachedfunc = fn
-            self.cachedvar = s.variable
-
-            try:
-                # compile code
-                self.cachedcomp = compile(fn, '<string>', 'eval')
-            except Exception, e:
-                # return nothing
-                self._errorFunctionEval(e)
-                return False
-        return True
-     
-    def _calcFunctionPoints(self, axes, posn):
+    def calcFunctionPoints(self, axes, posn):
         """Calculate the pixels to plot for the function
         returns (pxpts, pypts)."""
 
         s = self.settings
-        if not self._checkCachedFunction():
+        try:
+            self.checker.check(s.function, s.variable)
+        except RuntimeError, e:
+            self.logEvalError(e)
             return None, None
 
         # get axes function is plotted along and on and
@@ -314,11 +326,11 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = axispts
         try:
-            results = eval(self.cachedcomp, env)
+            results = eval(self.checker.compiled, env)
             resultpts = axis2.dataToPlotterCoords(
                 posn, results + N.zeros(axispts.shape))
         except Exception, e:
-            self._errorFunctionEval(e)
+            self.logEvalError(e)
             resultpts = None
 
         # return x and y coordinates for plot
@@ -354,7 +366,7 @@ class FunctionPlotter(GenericPlotter):
         cliprect = self.clipAxesBounds(painter, axes, posn)
 
         # get the points to plot by evaluating the function
-        pxpts, pypts = self._calcFunctionPoints(axes, posn)
+        pxpts, pypts = self.calcFunctionPoints(axes, posn)
 
         # draw the function line
         if pxpts is None or pypts is None:
