@@ -36,7 +36,7 @@ def handlePlugin(mainwindow, doc, pluginkls):
 
     plugin = pluginkls()
     if plugin.has_parameters:
-        d = PluginDialog(mainwindow, doc, plugin)
+        d = PluginDialog(mainwindow, doc, plugin, pluginkls)
         mainwindow.showDialog(d)
     else:
         fields = {'currentwidget': mainwindow.treeedit.selwidget.path}
@@ -59,7 +59,7 @@ def wordwrap(text, linelength=80):
 class PluginDialog(VeuszDialog):
     """Dialog box class for plugins."""
 
-    def __init__(self, mainwindow, doc, plugin):
+    def __init__(self, mainwindow, doc, plugininst, pluginkls):
         VeuszDialog.__init__(self, mainwindow, 'plugin.ui')
 
         reset = self.buttonBox.button(qt4.QDialogButtonBox.Reset)
@@ -69,14 +69,15 @@ class PluginDialog(VeuszDialog):
         self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
                       qt4.SIGNAL('clicked()'), self.slotApply )
 
-        self.plugin = plugin
+        self.pluginkls = pluginkls
+        self.plugininst = plugininst
         self.document = doc
 
-        title = ': '.join(list(plugin.menu))
+        title = ': '.join(list(plugininst.menu))
         self.setWindowTitle(title)
-        descr = plugin.description_full
-        if self.plugin.author:
-            descr += '\n Author: ' + self.plugin.author
+        descr = plugininst.description_full
+        if plugininst.author:
+            descr += '\n Author: ' + plugininst.author
         self.descriptionLabel.setText( wordwrap(descr) )
 
         self.fieldcntrls = []
@@ -94,7 +95,7 @@ class PluginDialog(VeuszDialog):
         del self.fieldcntrls[:]
 
         currentwidget = self.mainwindow.treeedit.selwidget.path
-        for row, field in enumerate(self.plugin.fields):
+        for row, field in enumerate(self.plugininst.fields):
             if isinstance(field, list) or isinstance(field, tuple):
                 for c, f in enumerate(field):
                     cntrls = f.makeControl(self.document, currentwidget)
@@ -131,7 +132,8 @@ class PluginDialog(VeuszDialog):
             fields[field.name] = field.getControlResults(cntrls)
 
         # run plugin
-        statustext = runPlugin(self, self.document, self.plugin, fields)
+        plugin = self.pluginkls()
+        statustext = runPlugin(self, self.document, plugin, fields)
 
         # show any results
         self.notifyLabel.setText(statustext)
@@ -194,9 +196,10 @@ def recreateDataset(mainwindow, document, dataset, datasetname):
     """Open dialog to recreate plugin dataset(s)."""
 
     # make a new instance of the plugin class
-    newplugin = dataset.pluginmanager.plugin.__class__()
+    kls = dataset.pluginmanager.plugin.__class__
+    newplugin = kls()
 
-    dialog = PluginDialog(mainwindow, document, newplugin)
+    dialog = PluginDialog(mainwindow, document, newplugin, kls)
     mainwindow.showDialog(dialog)
     dialog.reEditDataset(dataset, datasetname)
 
