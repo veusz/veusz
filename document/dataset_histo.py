@@ -165,11 +165,11 @@ class DatasetHistoGenerator(object):
         """Save two datasets to file."""
         try:
             binname = self.bindataset.name()
-        except ValueError:
+        except (ValueError, AttributeError):
             binname = ''
         try:
             valname = self.valuedataset.name()
-        except ValueError:
+        except (ValueError, AttributeError):
             valname = ''
 
         fileobj.write( ("CreateHistogram(%s, %s, %s, binparams=%s, "

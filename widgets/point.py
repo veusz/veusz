@@ -53,7 +53,8 @@ def _errorBarsBar(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                    s, painter, clip):
     """Draw perpendiclar ends on error bars."""
-    size = s.get('markerSize').convert(painter)
+    size = ( s.get('markerSize').convert(painter) * 
+             s.ErrorBarLine.endsize )
 
     if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
         utils.plotLinesToPainter(painter, xplotter-size, ymin,

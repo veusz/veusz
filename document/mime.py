@@ -70,8 +70,10 @@ def getClipboardWidgetMime():
 def getMimeWidgetTypes(data):
     """Get list of widget types in the mime data."""
     lines = data.split('\n')
-
-    numwidgets = int(lines[0])
+    try:
+        numwidgets = int(lines[0])
+    except ValueError:
+        return []
     types = lines[1:1+4*numwidgets:4]
     return types
 

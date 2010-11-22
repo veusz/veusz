@@ -96,6 +96,10 @@ class ErrorBarLine(Line):
     def __init__(self, name, **args):
         Line.__init__(self, name, **args)
 
+        self.add( setting.Float('endsize', 1.0,
+                                minval = 0.,
+                                descr='Scale ends of error bars by this factor',
+                                usertext = 'End size') )
         self.add( setting.Bool('hideHorz', False,
                                descr = 'Hide horizontal errors',
                                usertext='Hide horz.') )

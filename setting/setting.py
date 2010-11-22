@@ -626,7 +626,9 @@ def _calcPixPerPt(painter):
 
     This is stored in the variable veusz_pixperpt."""
 
-    painter.veusz_pixperpt = painter.device().logicalDpiY() / 72.
+    dpi = painter.device().logicalDpiY()
+    if dpi == 0: dpi = 72
+    painter.veusz_pixperpt = dpi / 72.
 
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""

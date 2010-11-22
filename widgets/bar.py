@@ -190,8 +190,9 @@ class BarPlotter(GenericPlotter):
                     # update range from individual datasets
                     for d in data:
                         drange = d.getRange()
-                        axrange[0] = min(axrange[0], drange[0])
-                        axrange[1] = max(axrange[1], drange[1])
+                        if drange is not None:
+                            axrange[0] = min(axrange[0], drange[0])
+                            axrange[1] = max(axrange[1], drange[1])
                 else:
                     # update range from sum of datasets
                     minv, maxv = self.singleBarDataRange(data)
@@ -203,8 +204,9 @@ class BarPlotter(GenericPlotter):
                 data = s.get('posn').getData(self.document)
                 if data:
                     drange = data.getRange()
-                    axrange[0] = min(axrange[0], drange[0])
-                    axrange[1] = max(axrange[1], drange[1])
+                    if drange is not None:
+                        axrange[0] = min(axrange[0], drange[0])
+                        axrange[1] = max(axrange[1], drange[1])
             else:
                 # count bars
                 data = s.get('lengths').getData(self.document)

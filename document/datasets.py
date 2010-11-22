@@ -1031,12 +1031,12 @@ class DatasetExpression(Dataset):
 
         # actually evaluate the expression
         try:
-            evalout = eval(expr, environment)
+            result = eval(expr, environment)
+            evalout = N.array(result, N.float64)
         except Exception, ex:
             raise DatasetExpressionException(
                 "Error evaluating expression: %s\n"
-                "Error: %s" % (self.expr[part], str(ex)) )
-        evalout = N.array(evalout, N.float64)
+                "Error: %s" % (self.expr[part], unicode(ex)) )
 
         # make evaluated error expression have same shape as data
         if part != 'data':

@@ -87,6 +87,7 @@ class FunctionPlotter(GenericPlotter):
 
         s.add( setting.Int('steps',
                            50,
+                           minval = 3,
                            descr = 'Number of steps to evaluate the function'
                            ' over', usertext='Steps', formatting=True), 0 )
         s.add( setting.Choice('variable', ['x', 'y'], 'x',

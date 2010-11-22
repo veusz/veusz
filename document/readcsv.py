@@ -244,17 +244,24 @@ class ReadCSV(object):
             dsnames.append(name)
 
             # get data and errors (if any)
-            data = self.data[name]
-            serr = self.data.get(name+'+-', None)
-            perr = self.data.get(name+'+', None)
-            nerr = self.data.get(name+'-', None)
+            data = []
+            for k in (name, name+'+-', name+'+', name+'-'):
+                data.append( self.data.get(k, None) )
 
-            # normal dataset
+            # make them have a maximum length by adding NaNs
+            maxlen = max([len(x) for x in data if x is not None])
+            for i in range(len(data)):
+                if data[i] is not None and len(data[i]) < maxlen:
+                    data[i] = N.concatenate(
+                        ( data[i], N.zeros(maxlen-len(data[i]))*N.nan ) )
+
+            # create dataset
             if self.nametypes[name] == 'string':
-                ds = datasets.DatasetText(data=data, linked=linkedfile)
+                ds = datasets.DatasetText(data=data[0], linked=linkedfile)
             else:
-                ds = datasets.Dataset(data=data, serr=serr, perr=perr,
-                                      nerr=nerr, linked=linkedfile)
+                ds = datasets.Dataset(data=data[0], serr=data[1],
+                                      perr=data[2], nerr=data[3],
+                                      linked=linkedfile)
             document.setData(name, ds)
 
         dsnames.sort()
