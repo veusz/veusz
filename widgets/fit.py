@@ -122,6 +122,13 @@ class Fit(FunctionPlotter):
 
         s = self.settings
 
+        # update function for fitting
+        try:
+            self.checker.check(s.function, s.variable)
+        except RuntimeError, e:
+            self.logEvalError(e)
+            return
+
         # populate the input parameters
         names = s.values.keys()
         names.sort()
@@ -241,7 +248,7 @@ class Fit(FunctionPlotter):
             env[name] = val
 
         try:
-            return eval(self.cachedcomp, env) + xvals*0.
+            return eval(self.checker.compiled, env) + xvals*0.
         except:
             return N.nan
 
