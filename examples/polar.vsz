@@ -1,0 +1,99 @@
+# Veusz saved document (version 1.9)
+# User: jss
+# Date: Thu, 25 Nov 2010 22:18:36 +0000
+
+ImportString(u'r(numeric)','''
+2.029732e+00
+2.688856e+00
+2.708923e+00
+2.711315e+00
+2.640299e+00
+2.735022e+00
+2.407293e+00
+2.130543e+00
+2.007767e+00
+2.792255e+00
+2.070002e+00
+2.555355e+00
+2.644494e+00
+2.639505e+00
+2.372546e+00
+2.595538e+00
+2.646493e+00
+2.698109e+00
+''')
+ImportString(u'theta(numeric)','''
+0.000000e+00
+2.000000e+01
+4.000000e+01
+6.000000e+01
+8.000000e+01
+1.000000e+02
+1.200000e+02
+1.400000e+02
+1.600000e+02
+1.800000e+02
+2.000000e+02
+2.200000e+02
+2.400000e+02
+2.600000e+02
+2.800000e+02
+3.000000e+02
+3.200000e+02
+3.400000e+02
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Set('leftMargin', '0.848cm')
+Set('rightMargin', '10.3cm')
+Set('topMargin', '0.467cm')
+Set('bottomMargin', '11.1cm')
+Add('axis', name='x', autoadd=False)
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('xData', u'r')
+Set('yData', u'theta')
+To('..')
+To('..')
+Add('polar', name='polar1', autoadd=False)
+To('polar1')
+Set('leftMargin', '3.33cm')
+Set('rightMargin', '0.674cm')
+Set('topMargin', '3.25cm')
+Set('bottomMargin', '0.755cm')
+Set('maxradius', 3.0)
+Add('nonorthfunc', name='nonorthfunc1', autoadd=False)
+To('nonorthfunc1')
+Set('function', u'1+cos(b/180*pi)')
+Set('variable', u'b')
+Set('PlotLine/color', u'blue')
+Set('PlotLine/width', u'1pt')
+Set('Fill1/color', u'blue')
+Set('Fill1/transparency', 80)
+Set('Fill1/hide', False)
+To('..')
+Add('nonorthfunc', name='nonorthfunc2', autoadd=False)
+To('nonorthfunc2')
+Set('function', u'2+sin(b/180*pi)*cos(b/180*pi)')
+Set('variable', u'b')
+Set('PlotLine/color', u'red')
+Set('PlotLine/width', u'1pt')
+Set('Fill1/color', u'red')
+Set('Fill1/transparency', 80)
+Set('Fill1/hide', False)
+To('..')
+Add('nonorthpoint', name='nonorthpoint1', autoadd=False)
+To('nonorthpoint1')
+Set('marker', u'cross')
+Set('data1', u'r')
+Set('data2', u'theta')
+Set('PlotLine/hide', False)
+To('..')
+To('..')
+To('..')
