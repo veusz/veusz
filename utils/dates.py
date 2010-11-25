@@ -10,7 +10,7 @@ date_re = re.compile( r'''
 ^
 # match date YYYY-MM-DD
 ([0-9]{4}-[0-9]{1,2}-[0-9]{1,2})?
-T?
+[ ,A-Za-z]?
 # match time HH:MM:SS
 ([0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}(\.[0-9]+)?)?
 $
@@ -25,10 +25,10 @@ def isDateTime(datestr):
 
     return match and (match.group(1) is not None or match.group(2) is not None)
 
-def dateStringToDate(datestr):
-    """Interpret a date string and return a Veusz-format date value."""
-    val = N.nan
+def _isoDataStringToDate(datestr):
+    """Convert ISO format date time to a datetime object."""
     match = date_re.match(datestr)
+    val = None
     if match:
         try:
             dategrp, timegrp = match.group(1), match.group(2)
@@ -50,23 +50,35 @@ def dateStringToDate(datestr):
             else:
                 timeval = [0, 0, 0, 0]
 
-            # convert date to delta from offset
-            dt = datetime.datetime( *(dateval+timeval) )
-            delta = dt - offsetdate
-
-            if not dategrp and not timegrp:
-                # catch case when neither time nor date
-                val = N.nan
-            else:
-                # convert offset into a delta
-                val = (delta.days*24*60*60 + delta.seconds +
-                       delta.microseconds*1e-6)
+            # either worked so return a datetime object
+            if dategrp or timegrp:
+                val = datetime.datetime( *(dateval+timeval) )
 
         except ValueError:
-            # conversion failed, return nan
+            # conversion failed, return nothing
             pass
 
     return val
+
+def dateStringToDate(datestr):
+    """Interpret a date string and return a Veusz-format date value."""
+    dt = _isoDataStringToDate(datestr)
+    if dt is None:
+        # try local conversions (time, date and variations)
+        # if ISO formats don't match
+        for fmt in ('%X %x', '%x %X', '%x', '%X'):
+            try:
+                dt = datetime.datetime.strptime(datestr, fmt)
+                break
+            except ValueError:
+                pass
+
+    if dt is not None:
+        delta = dt - offsetdate
+        return (delta.days*24*60*60 + delta.seconds +
+                delta.microseconds*1e-6)
+    else:
+        return N.nan
 
 def floatToDateTime(f):
     """Convert float to datetime."""
