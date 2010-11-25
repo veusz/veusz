@@ -209,6 +209,13 @@ class Key(widget.Widget):
                               usertext='Vert manual',
                               formatting=True) )
 
+        s.add( setting.Float( 'marginSize',
+                              1.,
+                              minval = 0.,
+                              descr = 'Width of margin in characters',
+                              usertext='Margin size',
+                              formatting=True) )
+
         s.add( setting.Int( 'columns',
                             1,
                             descr = 'Number of columns in key',
@@ -267,9 +274,10 @@ class Key(widget.Widget):
         totalwidth = ( (maxwidth + height + symbolwidth)*numcols +
                        height*(numcols-1) )
         totalheight = numrows * height
+        margin = s.marginSize * height
         if not s.Border.hide:
-            totalwidth += 2*height
-            totalheight += height
+            totalwidth += 2*margin
+            totalheight += margin
 
         # work out horizontal position
         h = s.horzPosn
@@ -307,8 +315,8 @@ class Key(widget.Widget):
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
             painter.drawRect( qt4.QRectF(x, y, totalwidth, totalheight) )
-            x += height
-            y += height*0.5
+            x += margin
+            y += margin*0.5
 
         textpen = s.get('Text').makeQPen()
 
