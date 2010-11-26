@@ -28,6 +28,7 @@ Changes in 1.10:
  * Add color sequence plugin for making a range of widget colors
  * Import plugin for QDP files added
  * Date and times can be also written in local formats
+ * Reload data dialog box is now non-modal and can reload at intervals
 
 Minor changes:
  * Option to change size of ends of error bars

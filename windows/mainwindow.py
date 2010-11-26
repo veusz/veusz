@@ -631,8 +631,9 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataReload(self):
         """Reload linked datasets."""
-        d = ReloadData(self.document, self)
-        d.exec_()
+        dialog = ReloadData(self.document, self)
+        self.showDialog(dialog)
+        return dialog
 
     def slotHelpHomepage(self):
         """Go to the veusz homepage."""

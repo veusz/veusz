@@ -36,8 +36,35 @@ class ReloadData(VeuszDialog):
         VeuszDialog.__init__(self, parent, 'reloaddata.ui')
         self.document = document
 
+        # update on reloading
+        self.reloadct = 1
+
         # actually reload the data (and show the user)
         self.reloadData()
+
+        # if interval changed or enabled update timer
+        self.connect(self.intervalCheck, qt4.SIGNAL('clicked()'),
+                     self.intervalUpdate)
+        self.connect(self.intervalTime, qt4.SIGNAL('valueChanged(int)'),
+                     self.intervalUpdate)
+
+        # timer to reload data
+        self.intervalTimer = qt4.QTimer()
+        self.connect(self.intervalTimer, qt4.SIGNAL('timeout()'),
+                     self.reloadData)
+
+        # manual reload
+        self.reloadbutton = self.buttonBox.addButton(
+            "&Reload again", qt4.QDialogButtonBox.ApplyRole)
+        self.connect(self.reloadbutton, qt4.SIGNAL('clicked()'),
+                     self.reloadData)
+
+    def intervalUpdate(self, *args):
+        """Reload at intervals option toggled."""
+        if self.intervalCheck.isChecked():
+            self.intervalTimer.start( self.intervalTime.value()*1000 )
+        else:
+            self.intervalTimer.stop()
 
     def reloadData(self):
         """Reload linked data. Show the user what was done."""
@@ -55,7 +82,8 @@ class ReloadData(VeuszDialog):
 
             # show successes
             if len(datasets) != 0:
-                text += 'Reloaded\n'
+                text += 'Reloaded (%i)\n' % self.reloadct
+                self.reloadct += 1
                 for var in datasets:
                     descr = self.document.data[var].description()
                     if descr:
