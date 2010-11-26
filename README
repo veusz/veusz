@@ -1,5 +1,5 @@
-Veusz 1.9
----------
+Veusz 1.10
+----------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
@@ -18,55 +18,30 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.9:
- * Added "Dataset plugins" to easily allow the user to write or load Python
-   code to make new datasets, optionally linked to existing datasets.
-   Includes plugins as standard for
-    - Adding and multiplying constants or datasets
-    - Dividing datasets
-    - Computing means of datasets
-    - Computing extremes of datasets
-    - Joining or combining datasets as parts or element by element
-    - Thinning points from datasets
-    - Converting from polar to Cartesian coordinates
-    - Filtering datasets using expressions
-   See here for details: http://barmag.net/veusz-wiki/DatasetPlugins
- * Added "Tools plugins" which allow the user to write Veusz macros
-   in Python which can take parameters and be added to the menu.
-   Includes plugins for
-    - Randomizing or replacing colors
-    - Finding and replacing text
-    - Increasing / decreasing font sizes
-    - Cloning widgets for different datasets
-   See here for details: http://barmag.net/veusz-wiki/ToolsPlugins
- * C++ code added to speed up data to image conversion
- * Add vector field plot type
- * Add text dataset support for Import plugins
- * Add "Node" embedding interface to easily allow manipulation of the
-   widget/setting tree. See http://barmag.net/veusz-wiki/EmbeddingPython
- * Veusz now starts in home directory or previous directory used. This
-   can be switched off in the preferences dialog to use current directory.
- * Distances specified in points now show drop down box with common point
-   sizes to make increasing/decreasing sizes much easier.
+Changes in 1.10:
+ * Box plot widget added
+ * Polar plot widget added
+ * Datasets are now easy to construct and enter in the Data->Edit
+   dialog box
+ * CSV reader will assume a text dataset if it cannot convert first item
+   to a number
+ * Add color sequence plugin for making a range of widget colors
+ * Import plugin for QDP files added
+ * Date and times can be also written in local formats
 
-Minor features added:
- * Color selectors are updated if new colors added to other color selectors
- * Exception dialog box uses web to send data rather than email, so no
-   mail transfer agent is required.
- * Text entry box brought up with '..' goes away when clicking outside it
- * Improvements to appearance of buttons in Mac OS X
+Minor changes:
+ * Option to change size of ends of error bars
+ * Margin size option added for key widget
 
 Bug fixes:
- * Fixed dataset expressions for zero-dimension expressions
- * Dialog boxes are properly destroyed on closing to stop memory leaks
- * Do not give error if same dataset defined in dataset dialog and
-   descriptor in data file
- * Fix license on some C++ files
- * Use correct web browser when clicking on links in menus
- * Exceptions are caught and user notified when loading plugins
- * Missing recent files are removed from recent files menu
- * Non finite values ignored when fitting data
- * When fitting data min and max properties used if set
+ * Multiple datasets can now be properly created from dataset plugin dialog
+ * X and Y ranges of 2D datasets are now correct when converted from
+   X,Y,Z 1D datasets
+ * Bounding boxes of resizing rectangles, ellipses and images are fixed
+ * min and max coordinate range now works for plotting functions of y
+ * Remove duplicate linked files when using import plugins
+ * Several crash reports fixed
+ * More robust code in data->edit dialog box
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -76,6 +51,8 @@ Features of package:
  * Stepped plots (for histograms)
  * Bar graphs
  * Vector field plots
+ * Box plots
+ * Polar plots
  * Plotting dates
  * Fitting functions to data
  * Stacked plots and arrays of plots
