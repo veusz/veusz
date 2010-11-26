@@ -59,6 +59,9 @@ class ReloadData(VeuszDialog):
         self.connect(self.reloadbutton, qt4.SIGNAL('clicked()'),
                      self.reloadData)
 
+        # close by default, not reload
+        self.buttonBox.button(qt4.QDialogButtonBox.Close).setDefault(True)
+
     def intervalUpdate(self, *args):
         """Reload at intervals option toggled."""
         if self.intervalCheck.isChecked():
