@@ -39,7 +39,7 @@
      <item>
       <widget class="QCheckBox" name="intervalCheck">
        <property name="text">
-        <string>Reload every</string>
+        <string>Reload if files change every</string>
        </property>
       </widget>
      </item>
@@ -58,7 +58,7 @@
         <number>99999</number>
        </property>
        <property name="value">
-        <number>10</number>
+        <number>5</number>
        </property>
       </widget>
      </item>

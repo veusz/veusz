@@ -22,6 +22,8 @@
 
 """Dialog for reloading linked data."""
 
+import os
+
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.utils as utils
@@ -39,6 +41,9 @@ class ReloadData(VeuszDialog):
         # update on reloading
         self.reloadct = 1
 
+        # get a record of names, dates and sizes of files linked
+        self.filestats = self.statLinkedFiles()
+
         # actually reload the data (and show the user)
         self.reloadData()
 
@@ -51,7 +56,7 @@ class ReloadData(VeuszDialog):
         # timer to reload data
         self.intervalTimer = qt4.QTimer()
         self.connect(self.intervalTimer, qt4.SIGNAL('timeout()'),
-                     self.reloadData)
+                     self.reloadIfChanged)
 
         # manual reload
         self.reloadbutton = self.buttonBox.addButton(
@@ -62,12 +67,35 @@ class ReloadData(VeuszDialog):
         # close by default, not reload
         self.buttonBox.button(qt4.QDialogButtonBox.Close).setDefault(True)
 
+    def statLinkedFiles(self):
+        """Stat linked files.
+        Returns a list of (filename, mtime, size)
+        """
+
+        files = []
+        for lf in self.document.getLinkedFiles():
+            filename = lf.filename
+            try:
+                s = os.stat(filename)
+                files.append( (filename, s.st_mtime, s.st_size) )
+            except OSError:
+                pass
+        files.sort()
+        return files
+
     def intervalUpdate(self, *args):
         """Reload at intervals option toggled."""
         if self.intervalCheck.isChecked():
             self.intervalTimer.start( self.intervalTime.value()*1000 )
         else:
             self.intervalTimer.stop()
+
+    def reloadIfChanged(self):
+        """Reload linked data if it has changed."""
+        newstat = self.statLinkedFiles()
+        if newstat != self.filestats:
+            self.filestats = newstat
+            self.reloadData()
 
     def reloadData(self):
         """Reload linked data. Show the user what was done."""
