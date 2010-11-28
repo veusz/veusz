@@ -72,6 +72,7 @@ class CommandInterface(qt4.QObject):
         'SetToReference',
         'SetData',
         'SetData2D',
+        'SetData2DExpression',
         'SetData2DExpressionXYZ',
         'SetData2DXYFunc',
         'SetDataExpression',
@@ -389,6 +390,24 @@ class CommandInterface(qt4.QObject):
             print " Range of symmetric error = %s" % repr(symerr)
             print " Range of positive error = %s" % repr(poserr)
             print " Range of negative error = %s" % repr(negerr)
+
+    def SetData2DExpression(self, name, expr, linked=False):
+        """Create a 2D dataset based on expressions
+
+        name is the new dataset name
+        expr is an expression which should return a 2D array
+        linked specifies whether to permanently link the dataset to the expressions
+        """
+
+        op = operations.OperationDataset2DCreateExpression(name, expr, linked)
+        data = self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Set 2D dataset '%s' based on expressions" % name
+            print " expression = %s" % repr(expr)
+            print " linked to expression = %s" % repr(linked)
+            print " Made a dataset (%i x %i)" % (data.data.shape[0],
+                                                 data.data.shape[1])
 
     def SetData2DExpressionXYZ(self, name, xexpr, yexpr, zexpr, linked=False):
         """Create a 2D dataset based on expressions in x, y and z

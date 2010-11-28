@@ -623,34 +623,31 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         document.setData(self.datasetname, ds)
         return ds
 
-class OperationDataset2DCreateExpressionXYZ(object):
-    descr = 'create 2D dataset from x, y and z expressions'
-    
-    def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
-        self.datasetname = datasetname
-        self.xexpr = xexpr
-        self.yexpr = yexpr
-        self.zexpr = zexpr
-        self.link = link
+class OperationDataset2DBase(object):
+    """Operation as base for 2D dataset creation operations."""
 
+    def __init__(self, name, link):
+        """Setup operation."""
+        self.datasetname = name
+        self.link = link
+    
     def validateExpression(self, document):
         """Validate expression is okay."""
         try:
-            ds = datasets.Dataset2DXYZExpression(self.xexpr, self.yexpr,
-                                                 self.zexpr)
+            ds = self.makeDSClass()
             ds.document = document
             ds.evalDataset()
             
         except datasets.DatasetExpressionException, e:
-            raise CreateDatasetException(str(e))
+            raise CreateDatasetException(unicode(e))
 
     def do(self, document):
-        # keep backup
+        """Make new dataset."""
+        # keep backup of old if exists
         self.olddataset = document.data.get(self.datasetname, None)
 
         # make new dataset
-        ds = datasets.Dataset2DXYZExpression(self.xexpr, self.yexpr,
-                                             self.zexpr)
+        ds = self.makeDSClass()
         ds.document = document
         if not self.link:
             # unlink if necessary
@@ -660,11 +657,35 @@ class OperationDataset2DCreateExpressionXYZ(object):
         return ds
 
     def undo(self, document):
+        """Undo dataset creation."""
         del document.data[self.datasetname]
         if self.olddataset:
             document.setData(self.datasetname, self.olddataset)
-        
-class OperationDataset2DXYFunc(object):
+
+class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
+    descr = 'create 2D dataset from x, y and z expressions'
+    
+    def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
+        OperationDataset2DBase.__init__(self, datasetname, link)
+        self.xexpr = xexpr
+        self.yexpr = yexpr
+        self.zexpr = zexpr
+
+    def makeDSClass(self):
+        return datasets.Dataset2DXYZExpression(
+            self.xexpr, self.yexpr, self.zexpr)
+
+class OperationDataset2DCreateExpression(OperationDataset2DBase):
+    descr = 'create 2D dataset from expression'
+    
+    def __init__(self, datasetname, expr, link):
+        OperationDataset2DBase.__init__(self, datasetname, link)
+        self.expr = expr
+
+    def makeDSClass(self):
+        return datasets.Dataset2DExpression(self.expr)
+
+class OperationDataset2DXYFunc(OperationDataset2DBase):
     descr = 'create 2D dataset from function of x and y'
 
     def __init__(self, datasetname, xstep, ystep, expr, link):
@@ -675,40 +696,13 @@ class OperationDataset2DXYFunc(object):
         expr: expression of x and y
         link: whether to link to this expression
         """
-        self.datasetname = datasetname
+        OperationDataset2DBase.__init__(self, datasetname, link)
         self.xstep = xstep
         self.ystep = ystep
         self.expr = expr
-        self.link = link
 
-    def validateExpression(self, document):
-        """Check dataset is okay."""
-        try:
-            ds = datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
-            ds.document = document
-            ds.evalDataset()
-            
-        except datasets.DatasetExpressionException, e:
-            raise CreateDatasetException(str(e))
-        
-    def do(self, document):
-        # keep backup
-        self.olddataset = document.data.get(self.datasetname, None)
-
-        # make new dataset
-        ds = datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
-        ds.document = document
-        if not self.link:
-            # unlink if necessary
-            ds = datasets.Dataset2D(ds.data, xrange=ds.xrange,
-                                    yrange=ds.yrange)
-        document.setData(self.datasetname, ds)
-        return ds
-
-    def undo(self, document):
-        del document.data[self.datasetname]
-        if self.olddataset:
-            document.setData(self.datasetname, self.olddataset)
+    def makeDSClass(self):
+        return datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
 
 ###############################################################################
 # Import datasets

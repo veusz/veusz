@@ -29,6 +29,7 @@ Changes in 1.10:
  * Import plugin for QDP files added
  * Date and times can be also written in local formats
  * Reload data dialog box can reload at intervals and is now non-modal
+ * 2D datasets can be created based on expressions of other 2D datasets
 
 Minor changes:
  * Option to change size of ends of error bars

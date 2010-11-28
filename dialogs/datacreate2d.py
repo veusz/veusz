@@ -171,9 +171,9 @@ class DataCreate2DDialog(VeuszDialog):
                 text['xexpr'], text['yexpr'], text['zexpr'],
                 link)
 
-        elif self.mode == '2dexpr':
-            qt4.QMessageBox.warning(self, "Veusz", 'Not implemented')
-            return
+        elif self.mode == '2dexpr': 
+            op = document.OperationDataset2DCreateExpression(
+                text['name'], text['zexpr'], link)
 
         elif self.mode == 'xyfunc':
             xstep = checkGetStep(text['xexpr'])

@@ -887,8 +887,10 @@ dataexpr_quote_re = re.compile(r'^`.*`$')
 dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
 
 def _substituteDatasets(datasets, expression, thispart):
-    """Subsitiute the names of datasets with calls to a function which will
+    """Substitute the names of datasets with calls to a function which will
     evaluate them.
+
+    Returns (new expression, list of substituted datasets)
 
     This is horribly hacky, but python-2.3 can't use eval with dict subclass
     """
@@ -897,6 +899,7 @@ def _substituteDatasets(datasets, expression, thispart):
     # re could be compiled if this gets slow
     bits = dataexpr_split_re.split(expression)
 
+    dslist = []
     for i, bit in enumerate(bits):
         # test whether there's an _data, _serr or such at the end of the name
         part = thispart
@@ -914,8 +917,9 @@ def _substituteDatasets(datasets, expression, thispart):
         if bit in datasets:
             # replace name with a function to call
             bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
+            dslist.append(bit)
 
-    return ''.join(bits)
+    return ''.join(bits), dslist
 
 def _evaluateDataset(datasets, dsname, dspart):
     """Return the dataset given.
@@ -941,7 +945,7 @@ def simpleEvalExpression(doc, expr, part='data'):
     dataset parts which are evaluated by the expression
     """
 
-    expr = _substituteDatasets(doc.data, expr, part)
+    expr = _substituteDatasets(doc.data, expr, part)[0]
 
     if expr not in _safeexpr:
         if ( not setting.transient_settings['unsafe_mode'] and
@@ -1002,7 +1006,7 @@ class DatasetExpression(Dataset):
     def _evaluatePart(self, expr, part):
         """Evaluate expression expr for part part."""
         # replace dataset names with calls
-        expr = _substituteDatasets(self.document.data, expr, part)
+        expr = _substituteDatasets(self.document.data, expr, part)[0]
 
         # check expression for nasties if it has changed
         if self.cachedexpr.get(part) != expr:
@@ -1283,7 +1287,7 @@ class Dataset2DXYZExpression(Dataset2D):
         # evaluate the x, y and z expressions
         for name in ('exprx', 'expry', 'exprz'):
             expr = _substituteDatasets(self.document.data, getattr(self, name),
-                                       'data')
+                                       'data')[0]
 
             # check expression if not checked before
             if self.cachedexpr.get(name) != expr:
@@ -1371,6 +1375,116 @@ class Dataset2DXYZExpression(Dataset2D):
         """Return linking information."""
         return 'Linked 2D function: x=%s, y=%s, z=%s' % (
             self.exprx, self.expry, self.exprz)
+
+class Dataset2DExpression(Dataset2D):
+    """Evaluate an expression of 2d datasets."""
+
+    def __init__(self, expr):
+        """Create 2d expression dataset."""
+        self.document = None
+        self.linked = None
+        self.expr = expr
+        self.lastchangeset = -1
+        self.cachedexpr = None
+
+        if utils.checkCode(expr, securityonly=True) is not None:
+            raise DatasetExpressionException("Unsafe expression '%s'" % expr)
+        
+    @property
+    def data(self):
+        """Return data, or empty array if error."""
+        try:
+            return self.evalDataset()[0]
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return N.array([[]])
+
+    @property
+    def xrange(self):
+        """Return x range."""
+        try:
+            return self.evalDataset()[1]
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return [0., 1.]
+
+    @property
+    def yrange(self):
+        """Return y range."""
+        try:
+            return self.evalDataset()[2]
+        except DatasetExpressionException, ex:
+            self.document.log(unicode(ex))
+            return [0., 1.]
+
+    def evalDataset(self):
+        """Do actual evaluation."""
+
+        if self.document.changeset == self.lastchangeset:
+            return self._cacheddata
+
+        environment = self.document.eval_context.copy()
+
+        def getdataset(dsname, dspart):
+            """Return the dataset given in document."""
+            return _evaluateDataset(self.document.data, dsname, dspart)
+        environment['_DS_'] = getdataset
+
+        # substituted expression
+        expr, datasets = _substituteDatasets(self.document.data, self.expr,
+                                             'data')
+
+        # check expression if not checked before
+        if self.cachedexpr != expr:
+            if ( not setting.transient_settings['unsafe_mode'] and
+                 utils.checkCode(expr, securityonly=True) ):
+                raise DatasetExpressionException(
+                    "Unsafe expression '%s'" % (
+                        expr))
+            self.cachedexpr = expr
+
+        # do evaluation
+        try:
+            evaluated = eval(expr, environment)
+        except Exception, e:
+            raise DatasetExpressionException(
+                "Error evaluating expression: %s\n"
+                "Error: %s" % (expr, str(e)) )
+
+        # find 2d dataset dimensions
+        dsdim = None
+        for ds in datasets:
+            d = self.document.data[ds]
+            if d.dimensions == 2:
+                dsdim = d
+                break
+
+        if dsdim is None:
+            # use default if none found
+            rangex = rangey = [0., 1.]
+        else:
+            # use 1st dataset otherwise
+            rangex = dsdim.xrange
+            rangey = dsdim.yrange
+
+        self.lastchangeset = self.document.changeset
+        self._cacheddata = evaluated, rangex, rangey
+        return self._cacheddata
+
+    def saveToFile(self, fileobj, name):
+        '''Save expression to file.'''
+        s = 'SetData2DExpression(%s, %s, linked=True)\n' % (
+            repr(name), repr(self.expr) )
+        fileobj.write(s)
+
+    def canUnlink(self):
+        """Can relationship be unlinked?"""
+        return True
+
+    def linkedInformation(self):
+        """Return linking information."""
+        return 'Linked 2D expression: %s' % self.expr
+
 
 class Dataset2DXYFunc(Dataset2D):
     """Given a range of x and y, this is a dataset which is a function of

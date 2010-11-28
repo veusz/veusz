@@ -48,13 +48,6 @@
      </property>
      <layout class="QVBoxLayout">
       <item>
-       <widget class="QRadioButton" name="fromxyfunc">
-        <property name="text">
-         <string>From &amp;function of x and y</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QRadioButton" name="fromxyzexpr">
         <property name="text">
          <string>From x, y and z values based on &amp;1D datasets or expressions</string>
@@ -64,7 +57,14 @@
       <item>
        <widget class="QRadioButton" name="from2dexpr">
         <property name="text">
-         <string>From expression based on &amp;2D dataset</string>
+         <string>From expression based on existing &amp;2D dataset(s)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="fromxyfunc">
+        <property name="text">
+         <string>From &amp;function of x and y</string>
         </property>
        </widget>
       </item>
