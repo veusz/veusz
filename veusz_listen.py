@@ -131,7 +131,7 @@ class InputListener(qt4.QObject):
         else:
             self.ci.run(line)
 
-def openWindow(args):
+def openWindow(args, quiet=False):
     '''Opening listening window.
     args is a list of arguments to the program
     '''
@@ -144,7 +144,8 @@ def openWindow(args):
         name = 'Veusz output'
 
     _win = SimpleWindow(name)
-    _win.show()
+    if not quiet:
+        _win.show()
     _listen = InputListener(_win)
 
 def run():

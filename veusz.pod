@@ -1,0 +1,85 @@
+=head1 NAME
+
+Veusz - a scientific plotting and graphing application.
+
+=head1 SYNOPSIS
+
+veusz [I<options>] [F<document.vsz>]...
+
+=head1 DESCRIPTION
+
+B<Veusz> is a scientific plotting and graphing package. It is designed
+to create publication-ready output in a variety of different output
+formats. Graphs are built-up combining plotting widgets. Veusz has a
+GUI user interface (started with the C<veusz> command), a Python
+module interface and a scripting interface.
+
+If started without command line arguments, B<Veusz> will open up with
+a new empty document. The program will otherwise open the listed
+documents.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--unsafe-mode>
+
+Do not check opened scripts for the presence of unsafe Python
+commands. This allows you to create or open complete Python scripts
+with Veusz commands if they come from a trusted source.
+
+=item B<--listen>
+
+Read Veusz commands from stdin, executing them, then writing the
+results to stdout. This option is intended to replace the veusz_listen
+standalone program.
+
+In this mode Veusz does not read any input documents, but will use the
+first argument to the program as the window title, if given.
+
+=item B<--quiet>
+
+If in listening mode, do not open a window before running commands,
+but execute them quietly.
+
+=item B<--export>=I<FILE>
+
+Export the next Veusz document file on the command line to the
+graphics file I<FILE>. Supported file types include EPS, PDF, SVG,
+PNG, BMP and JPG. The extension of the output file is used to
+determine the output file format. There should be as many export
+options specified as input Veusz documents on the command line.
+
+=item B<--help>
+
+Displays the options to the program and exits.
+
+=item B<--version>
+
+Displays information about the currently installed version and exits.
+
+=back
+
+=head1 BUGS
+
+Please report bugs at https://gna.org/bugs/?group=veusz
+
+=head1 AUTHORS
+
+B<Veusz> was written by Jeremy Sanders <jeremy@jeremysanders.net>.
+
+This manual page was written by Jeremy Sanders <jeremy@jeremysanders.net>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2010 Jeremy Sanders <jeremy@jeremysanders.net>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
+later version.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+
+=cut

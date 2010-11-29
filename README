@@ -34,6 +34,9 @@ Changes in 1.10:
 Minor changes:
  * Option to change size of ends of error bars
  * Margin size option added for key widget
+ * Add --listen option to veusz command to replace veusz_listen.
+ * Add --quiet option to run commands without displaying a window
+ * Add --export option to export documents to graphics files and exit
 
 Bug fixes:
  * Multiple datasets can now be properly created from dataset plugin dialog

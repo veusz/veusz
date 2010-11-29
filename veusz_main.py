@@ -97,10 +97,10 @@ def embedremote():
     from veusz.embed_remote import remote
     remote.main()
 
-def listen(args):
+def listen(args, quiet):
     '''For running with --listen option.'''
     from veusz.veusz_listen import openWindow
-    openWindow(args)
+    openWindow(args, quiet=quiet)
 
 def export(exports, args):
     '''A shortcut to load a set of files and export them.'''
@@ -147,6 +147,9 @@ def run():
     parser.add_option('--listen', action='store_true',
                       help='read and execute Veusz commands from stdin,'
                       ' replacing veusz_listen')
+    parser.add_option('--quiet', action='store_true',
+                      help='if in listening mode, do not open a window but'
+                      ' execute commands quietly')
     parser.add_option('--export', action='append', metavar='FILE',
                       help='export the next document to this'
                       ' output image file, exiting when finished')
@@ -175,7 +178,7 @@ def run():
     if options.embed_remote:
         embedremote()
     elif options.listen:
-        listen(args)
+        listen(args, quiet=options.quiet)
     elif options.export:
         if len(options.export) != len(args)-1:
             parser.error(
