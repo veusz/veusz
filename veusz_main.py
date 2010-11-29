@@ -42,9 +42,6 @@ except ImportError:
 
 import veusz.qtall as qt4
 import veusz.utils as utils
-import veusz.dialogs.exceptiondialog as exceptiondialog
-import veusz.setting
-import veusz.embed_remote as remote
 
 copyr='''Veusz %s
 
@@ -87,74 +84,112 @@ def makeSplashLogo():
     return pix
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
-    """Show exception dialog if one occurs."""
-
-    if isinstance(exceptvalue, utils.IgnoreException):
-        # this exception is ignored to clear out the stack frame of the
+    """Show exception dialog if an exception occurs."""
+    from veusz.dialogs.exceptiondialog import ExceptionDialog
+    if not isinstance(exceptvalue, utils.IgnoreException):
+        # next exception is ignored to clear out the stack frame of the
         # previous exception - yuck
-        return
+        d = ExceptionDialog((excepttype, exceptvalue, tracebackobj), None)
+        d.exec_()
 
-    d = exceptiondialog.ExceptionDialog(
-        (excepttype, exceptvalue, tracebackobj), None)
-    d.exec_()
+def embedremote():
+    '''For running with --remote-embed option.'''
+    from veusz.embed_remote import remote
+    remote.main()
 
-def run():
-    '''Run the main application.'''
+def listen(args):
+    '''For running with --listen option.'''
+    from veusz.veusz_listen import openWindow
+    openWindow(args)
 
-    # special mode to run embedding server
-    if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
-        remote.main()
-        return
+def export(exports, args):
+    '''A shortcut to load a set of files and export them.'''
+    import veusz.document as document
+    for expfn, vsz in zip(exports, args[1:]):
+        doc = document.Document()
+        ci = document.CommandInterpreter(doc)
+        ci.Load(vsz)
+        ci.run('Export(%s)' % repr(expfn))
 
-    app = qt4.QApplication(sys.argv)
-    sys.excepthook = excepthook
-
-    splash = qt4.QSplashScreen(makeSplashLogo())
-    splash.show()
-    app.processEvents()
-
-    # import these after showing splash screen so we don't
-    # have too long a wait before
+def mainwindow(args):
+    '''Open the main window with any loaded files.'''
     from veusz.windows.mainwindow import MainWindow
-    import veusz.widgets
-
-    # register a signal handler to catch ctrl+c
-    signal.signal(signal.SIGINT, handleIntSignal)
-
-    # handle arguments
-    if app.argv():
-
-        parser = optparse.OptionParser(
-            usage="%prog [options] filename.vsz ...",
-            version=copyr % utils.version())
-        parser.add_option('--unsafe-mode', action='store_true',
-                          dest='unsafe_mode',
-                          help='disable safety checks when running documents'
-                          ' or scripts')
-
-        options, args = parser.parse_args( app.argv() )
-
-        # for people who want to run any old script
-        veusz.setting.transient_settings['unsafe_mode'] = bool(
-            options.unsafe_mode)
-
-        filelist = args[1:]
- 
-        # load in filename given
-        if filelist:
-            for filename in filelist:
-                MainWindow.CreateWindow(filename)
-        else:
-            # create blank window
-            MainWindow.CreateWindow()
+    if len(args) > 1:
+        # load in filenames given
+        for filename in args[1:]:
+            MainWindow.CreateWindow(filename)
     else:
         # create blank window
         MainWindow.CreateWindow()
 
+def run():
+    '''Run the main application.'''
+
+    # this function is spaghetti-like and has nasty code paths.
+    # the idea is to postpone the imports until the splash screen
+    # is shown
+
+    app = qt4.QApplication(sys.argv)
     app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
                 app, qt4.SLOT("quit()"))
+    sys.excepthook = excepthook
 
-    splash.finish(app.topLevelWidgets()[0])
+    # register a signal handler to catch ctrl+C
+    signal.signal(signal.SIGINT, handleIntSignal)
+
+    # parse command line options
+    parser = optparse.OptionParser(
+        usage="%prog [options] filename.vsz ...",
+        version=copyr % utils.version())
+    parser.add_option('--unsafe-mode', action='store_true',
+                      help='disable safety checks when running documents'
+                      ' or scripts')
+    parser.add_option('--listen', action='store_true',
+                      help='read and execute Veusz commands from stdin,'
+                      ' replacing veusz_listen')
+    parser.add_option('--export', action='append', metavar='FILE',
+                      help='export the next document to this'
+                      ' output image file, exiting when finished')
+    parser.add_option('--embed-remote', action='store_true',
+                      help=optparse.SUPPRESS_HELP)
+
+    options, args = parser.parse_args( app.argv() )
+
+    # show splash in normal mode
+    splash = None
+    if not options.embed_remote and not options.listen and not options.export:
+        splash = qt4.QSplashScreen(makeSplashLogo())
+        splash.show()
+        app.processEvents()
+
+    # import these after showing splash screen so we don't
+    # have too long a wait before it shows
+    import veusz.setting
+    import veusz.widgets
+
+    # for people who want to run any old script
+    veusz.setting.transient_settings['unsafe_mode'] = bool(
+        options.unsafe_mode)
+
+    # these are the different modes
+    if options.embed_remote:
+        embedremote()
+    elif options.listen:
+        listen(args)
+    elif options.export:
+        if len(options.export) != len(args)-1:
+            parser.error(
+                'export option needs same number of documents and output files')
+        export(options.export, args)
+        return
+    else:
+        mainwindow(args)
+
+    # clear splash when startup done
+    if splash is not None:
+        splash.finish(app.topLevelWidgets()[0])
+
+    # wait for application to exit
     app.exec_()
 
 # if ran as a program

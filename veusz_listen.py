@@ -131,22 +131,26 @@ class InputListener(qt4.QObject):
         else:
             self.ci.run(line)
 
+def openWindow(args):
+    '''Opening listening window.
+    args is a list of arguments to the program
+    '''
+    global _win
+    global _listen
+
+    if len(args) > 1:
+        name = args[1]
+    else:
+        name = 'Veusz output'
+
+    _win = SimpleWindow(name)
+    _win.show()
+    _listen = InputListener(_win)
+
 def run():
     '''Actually run the program.'''
     app = qt4.QApplication(sys.argv)
-
-    if len(sys.argv) > 1:
-        name = sys.argv[1]
-    else:
-        name = 'Veusz output'
-        
-    win = SimpleWindow(name)
-    win.show()
-    app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
-                app, qt4.SLOT("quit()"))
-
-    l = InputListener(win)
-
+    openWindow(sys.argv)
     app.exec_()
 
 # if ran as a program
