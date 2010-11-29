@@ -1,0 +1,64 @@
+# Veusz saved document (version 1.10)
+# User: jss
+# Date: Mon, 29 Nov 2010 21:44:13 +0000
+
+AddImportPath(u'/home/jss/code/veusz/examples')
+ImportString(u'd1(numeric)','''
+1.503414e+01
+1.771985e+01
+1.603614e+01
+1.697182e+01
+1.408432e+01
+1.375135e+01
+1.290579e+01
+1.474151e+01
+1.383836e+01
+1.370710e+01
+''')
+ImportString(u'd2(numeric)','''
+1.298826e+01
+4.121945e+00
+4.666195e+00
+7.293386e+00
+1.682599e+00
+1.611030e+01
+1.834109e+01
+1.385013e+01
+6.923665e+00
+1.859132e+01
+''')
+ImportString(u'label(text)',r'''
+u'Bees'
+u'Butterflys'
+''')
+Set('width', '14.5cm')
+Set('height', '12cm')
+Set('StyleSheet/Font/font', u'Arial')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Set('leftMargin', u'1.3cm')
+Set('rightMargin', '0.2cm')
+Set('topMargin', '0.2cm')
+Set('bottomMargin', u'1.3cm')
+Set('Background/color', u'#fffeea')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('mode', u'labels')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Number of insects')
+Set('direction', 'vertical')
+To('..')
+Add('boxplot', name='boxplot1', autoadd=False)
+To('boxplot1')
+Set('values', (u'd1', u'd2'))
+Set('labels', u'label')
+Set('whiskermode', u'9/91 percentile')
+Set('fillfraction', 0.5)
+Set('Fill/color', u'white')
+To('..')
+To('..')
+To('..')
