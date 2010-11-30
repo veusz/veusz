@@ -1,8 +1,7 @@
 # Veusz saved document (version 1.10)
 # User: jss
-# Date: Mon, 29 Nov 2010 21:44:13 +0000
+# Date: Tue, 30 Nov 2010 09:35:39 +0000
 
-AddImportPath(u'/home/jss/code/veusz/examples')
 ImportString(u'd1(numeric)','''
 1.503414e+01
 1.771985e+01
@@ -15,6 +14,7 @@ ImportString(u'd1(numeric)','''
 1.383836e+01
 1.370710e+01
 ''')
+SetDataExpression(u'd1_x', u'd1*0+0.6', linked=True)
 ImportString(u'd2(numeric)','''
 1.298826e+01
 4.121945e+00
@@ -27,6 +27,7 @@ ImportString(u'd2(numeric)','''
 6.923665e+00
 1.859132e+01
 ''')
+SetDataExpression(u'd2_x', u'd2*0+2.4', linked=True)
 ImportString(u'label(text)',r'''
 u'Bees'
 u'Butterflys'
@@ -46,6 +47,7 @@ Set('Background/color', u'#fffeea')
 Add('axis', name='x', autoadd=False)
 To('x')
 Set('mode', u'labels')
+Set('TickLabels/size', u'18pt')
 To('..')
 Add('axis', name='y', autoadd=False)
 To('y')
@@ -59,6 +61,23 @@ Set('labels', u'label')
 Set('whiskermode', u'9/91 percentile')
 Set('fillfraction', 0.5)
 Set('Fill/color', u'white')
+To('..')
+Add('xy', name=u'd2vals', autoadd=False)
+To(u'd2vals')
+Set('xData', u'd2_x')
+Set('yData', u'd2')
+Set('marker', u'cross')
+Set('PlotLine/hide', True)
+Set('MarkerLine/hide', True)
+Set('MarkerFill/color', u'blue')
+To('..')
+Add('xy', name=u'd1vals', autoadd=False)
+To(u'd1vals')
+Set('xData', u'd1_x')
+Set('yData', u'd1')
+Set('PlotLine/hide', True)
+Set('MarkerLine/hide', True)
+Set('MarkerFill/color', u'magenta')
 To('..')
 To('..')
 To('..')
