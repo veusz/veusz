@@ -49,6 +49,21 @@ import veusz.qtall as qt4
 from veusz.windows.simplewindow import SimpleWindow
 import veusz.document as document
 
+class ReadingThread(qt4.QThread):
+    """Stdin reading thread. Emits newline signals with new data.
+
+    We could use a QSocketNotifier on Unix, but this doesn't work on
+    Windows as its stdin is a weird object
+    """
+
+    def run(self):
+        """Emit lines read from stdin."""
+        while True:
+            line = sys.stdin.readline()
+            if line == '':
+                break
+            self.emit(qt4.SIGNAL("newline"), line)
+
 class InputListener(qt4.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
 
@@ -73,12 +88,11 @@ class InputListener(qt4.QObject):
         self.ci.addCommand('SetUpdateInterval', self.setUpdateInterval)
         self.ci.addCommand('MoveToPage', self.moveToPage)
 
-        self.notifier = qt4.QSocketNotifier( sys.stdin.fileno(),
-                                             qt4.QSocketNotifier.Read )
-        self.connect( self.notifier, qt4.SIGNAL('activated(int)'),
-                      self.dataReceived )
-        self.notifier.setEnabled(True)
-
+        # reading is done in a separate thread so as not to block
+        self.readthread = ReadingThread(self)
+        self.connect(self.readthread, qt4.SIGNAL("newline"), self.processLine)
+        self.readthread.start()
+        
     def resizeWindow(self, width, height):
         """ResizeWindow(width, height)
 
@@ -117,11 +131,8 @@ class InputListener(qt4.QObject):
         """Enable/disable pickling of commands to/data from veusz"""
         self.pickle = on
 
-    def dataReceived(self):
-        """When a command is received, interpret it."""
-
-        line = sys.stdin.readline()
-
+    def processLine(self, line):
+        """Process inputted line."""
         if self.pickle:
             # line is repr form of pickled string get get rid of \n
             retn = self.ci.runPickle( eval(line.strip()) )
