@@ -1,6 +1,6 @@
-# Veusz saved document (version 1.10)
+# Veusz saved document (version 1.9.99)
 # User: jss
-# Date: Tue, 30 Nov 2010 09:35:39 +0000
+# Date: Thu, 02 Dec 2010 19:28:57 +0000
 
 ImportString(u'd1(numeric)','''
 1.503414e+01
@@ -35,6 +35,9 @@ u'Butterflys'
 Set('width', '14.5cm')
 Set('height', '12cm')
 Set('StyleSheet/Font/font', u'Arial')
+Set('StyleSheet/boxplot/Border/width', u'1pt')
+Set('StyleSheet/boxplot/Whisker/width', u'1pt')
+Set('StyleSheet/boxplot/MarkersLine/width', u'1pt')
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)
