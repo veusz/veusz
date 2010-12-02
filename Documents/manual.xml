@@ -17,7 +17,7 @@
     </author>
 
     <copyright>
-      <year>2009</year>
+      <year>2010</year>
     </copyright>
 
     <legalnotice>
@@ -331,9 +331,15 @@
 		</para>
 	      </listitem>
 
+	      <listitem>
+		<para><command>boxplot</command> - plot distribution
+		of points in a dataset.</para>
+	      </listitem>
+
 	    </orderedlist>
 
 	  </listitem>
+
 	</orderedlist>
 
       </section>
@@ -643,17 +649,17 @@
   <chapter>
     <title>Reading data</title>
 
-    <para>Currently Veusz supports reading data from a text file (a
-    qdp-alike interface is also planned), FITS format files or from
-    CSV files. Reading data is supported using the "Data, Import"
-    dialog, or using the <link
-    linkend="Command.ImportFile">ImportFile</link> and <link
-    linkend="Command.ImportString">ImportString</link> commands which
-    read data from files or an existing Python string (allowing data
-    to be embedded in a Python script). Alternatively, a user may read
-    the data themselves using a Python script, and import it into the
-    program with the <link linkend="Command.SetData">SetData</link>
-    command. Dates and times can also be given in the same files.</para>
+    <para>Currently Veusz supports reading data from a text file, FITS
+    format files or from CSV files. Reading data is supported using
+    the "Data, Import" dialog, or using
+    the <link linkend="Command.ImportFile">ImportFile</link>
+    and <link linkend="Command.ImportString">ImportString</link>
+    commands which read data from files or an existing Python string
+    (allowing data to be embedded in a Python script).  In addition,
+    the user can load or write plugins in Python which load data into
+    Veusz in an arbitrary format. At the moment QDP files are
+    supported with this method.
+    </para>
     
       <mediaobject>
 	<imageobject>
@@ -794,7 +800,9 @@
       YYYY-MM-DDThh:mm:ss.ss (this is a standard ISO format, see
       <ulink url="http://www.w3.org/TR/NOTE-datetime" />). Dates are
       stored within Veusz as a number which is the number of seconds
-      since the start of January 1st 2009.
+      since the start of January 1st 2009. Veusz also supports dates
+      and times in the local format, though take note that the same
+      file and data may not work on a system in a different location.
       </para>
 
       <para>Data may be optionally split into "blocks" of data
@@ -883,11 +891,14 @@ descriptor alpha beta gamma
       <title>Reading other data formats</title>
       
       <para>As mentioned above, a user may write some Python code to
-      read a data file or set of data files. This is convenient if the
-      data data are not ordered in trivial columns.</para>
+      read a data file or set of data files. To write a plugin which
+      is incorportated into Veusz, see
+      <ulink url="http://barmag.net/veusz-wiki/ImportPlugins"
+      /></para>
 
-      <para>Suppose an input file "in.dat" contains the following
-      data:</para>
+      <para>You can also include Python code in an input file to read
+      data, which we describe here. Suppose an input file "in.dat"
+      contains the following data:</para>
       <informalexample>
 	<programlisting>
 1   2
@@ -933,6 +944,18 @@ SetData('y', y)
       whether to make a dataset consisting of a single value or over a
       range, from expressions based on a parametric expression, or
       from expressions based on existing datasets.</para>
+
+
+      <section>
+	<title>Using dataset plugins</title>
+	<para>Dataset plugins can be used to perform arbitrary
+	manipulation of datasets. Veusz includes several plugins for
+	mathematical operation of data and other dataset
+	manipulations, such as concatenation or splitting. If you wish
+	to write your own plugins look at
+	<ulink url="http://barmag.net/veusz-wiki/DatasetPlugins"
+	/>.</para>
+      </section>
 
       <section>
 	<title>Using expressions to create new datasets</title>
@@ -1034,6 +1057,11 @@ SetData('y', y)
       in-program command line interface, using the embedding interface
       or using veusz_listen. Commands specific to particular modes are
       documented as such.</para>
+
+      <para>Veusz also includes a new object-oriented version of the
+      interface, which is documented at
+      <ulink url="http://barmag.net/veusz-wiki/EmbeddingPython"
+      />.</para>
     </section>
 
     <section>
@@ -1113,6 +1141,17 @@ SetData('y', y)
       </section>
 
       <section>
+	<title><anchor id="Command.CloneWidget" />CloneWidget</title>
+	
+	<para><command>CloneWidget(widget, newparent,
+	newname=None)</command></para>
+	
+	<para>Clone the widget given, placing the copy in newparent
+        and the name given.  newname is an optional new name to give
+        it Returns new widget path.</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.Close" />Close</title>
 	
 	<para><command>Close()</command></para>
@@ -1130,7 +1169,7 @@ SetData('y', y)
                         errors=False)</command></para>
 	
 	<para>
-	  istogram an input expression.  inexpr is input expression.
+	  Histogram an input expression.  inexpr is input expression.
         outbinds is the name of the dataset to create giving bin
         positions.  outvalsds is name of dataset for bin values.
         binparams is None or (numbins, minval, maxval, islogbins).
@@ -1142,6 +1181,19 @@ SetData('y', y)
 	</para>
       </section>
 
+      <section>
+	<title><anchor id="Command.DatasetPlugin" />DatasetPlugin</title>
+	
+	<para><command>DatasetPlugin(pluginname, fields,
+	datasetnames={})></command></para>
+
+	<para>
+	  Use a dataset plugin.  pluginname: name of plugin to use
+        fields: dict of input values to plugin datasetnames: dict
+        mapping old names to new names of datasets if they are
+        renamed. The new name None means dataset is deleted
+	  </para>
+      </section>
 
       <section>
 	<title><anchor id="Command.EnableToolbar"
@@ -1647,6 +1699,17 @@ Set('page1/graph1/x/min', -10.)
 
 	<para>xrange and yrange are optional tuples giving the
 	inclusive range of the X and Y coordinates of the data.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetData2DExpression" />SetData2DExpression</title>
+	
+	<para><command>SetData2D('name', expr, linked=False)</command></para>
+
+	<para>Create a 2D dataset based on expressions.  name is the
+        new dataset name expr is an expression which should return a
+        2D array linked specifies whether to permanently link the
+        dataset to the expressions.</para>
       </section>
 
       <section>
