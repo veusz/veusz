@@ -488,8 +488,16 @@ class Document( qt4.QObject ):
         # write image to disk
         writer = qt4.QImageWriter()
         writer.setFormat(qt4.QByteArray(format))
+
         writer.setFileName(filename)
-        writer.setQuality(quality)
+
+        if format == 'png':
+            # min quality for png as it makes no difference to output
+            # and makes file size smaller
+            writer.setQuality(0)
+        else:
+            writer.setQuality(quality)
+
         writer.write( pixmap.toImage() )
         
     def _exportPS(self, filename, page, color=True):

@@ -37,6 +37,7 @@ Minor changes:
  * Add --listen option to veusz command to replace veusz_listen.
  * Add --quiet option to run commands without displaying a window
  * Add --export option to export documents to graphics files and exit
+ * PNG export compression increased
 
 Bug fixes:
  * Multiple datasets can now be properly created from dataset plugin dialog
@@ -47,6 +48,7 @@ Bug fixes:
  * Remove duplicate linked files when using import plugins
  * Several crash reports fixed
  * More robust code in data->edit dialog box
+ * veusz_listen now works in Windows
 
 Features of package:
  * X-Y plots (with errorbars)
