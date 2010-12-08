@@ -445,6 +445,7 @@ class Bool(Setting):
     def makeControl(self, *args):
         return controls.Bool(self, *args)
 
+
 # Storing integers
 class Int(Setting):
     """Integer settings."""
@@ -1745,3 +1746,25 @@ class AlignVertWManual(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
+
+# Bool which shows/hides other settings
+class BoolSwitch(Bool):
+    """Bool switching setting."""
+
+    def __init__(self, name, value, settingsfalse=[], settingstrue=[],
+                 **args):
+        """Enables/disables a set of settings if True or False
+        settingsfalse and settingstrue are lists of names of settings
+        which are hidden/shown to user
+        """
+
+        self.sfalse = settingsfalse
+        self.strue = settingstrue
+        Bool.__init__(self, name, value, **args)
+
+    def makeControl(self, *args):
+        return controls.BoolSwitch(self, *args)
+
+    def copy(self):
+        return self._copyHelper((), (), {'settingsfalse': self.sfalse,
+                                         'settingstrue': self.strue})

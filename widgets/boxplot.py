@@ -60,6 +60,44 @@ def swapbox(painter, x1, y1, x2, y2, swap):
         painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
                                      qt4.QPointF(x2, y2)) )
 
+class _Stats(object):
+    """Store statistics about box."""
+
+    def calculate(self, data, whiskermode):
+        """Calculate statistics for data."""
+        cleaned = data[ N.isfinite(data) ]
+        cleaned.sort()
+
+        self.median = percentile(cleaned, 50)
+        self.botquart = percentile(cleaned, 25)
+        self.topquart = percentile(cleaned, 75)
+        self.mean = N.mean(cleaned)
+        
+        if whiskermode == 'min/max':
+            self.botwhisker = cleaned.min()
+            self.topwhisker = cleaned.max()
+        elif whiskermode == '1.5IQR':
+            iqr = self.topquart - self.botquart
+            eltop = N.searchsorted(cleaned, self.topquart+1.5*iqr)-1
+            self.topwhisker = cleaned[eltop]
+            elbot = max(N.searchsorted(cleaned, self.botquart-1.5*iqr)-1, 0)
+            self.botwhisker = cleaned[elbot]
+        elif whiskermode == '1 stddev':
+            stddev = N.std(cleaned)
+            self.topwhisker = self.mean+stddev
+            self.botwhisker = self.mean-stddev
+        elif whiskermode == '9/91 percentile':
+            self.topwhisker = percentile(cleaned, 91)
+            self.botwhisker = percentile(cleaned, 9)
+        elif whiskermode == '2/98 percentile':
+            self.topwhisker = percentile(cleaned, 98)
+            self.botwhisker = percentile(cleaned, 2)
+        else:
+            raise RuntimeError, "Invalid whisker mode"
+
+        self.outliers = cleaned[ (cleaned < self.botwhisker) |
+                                 (cleaned > self.topwhisker) ]
+
 class BoxPlot(GenericPlotter):
     """Plot bar charts."""
 
@@ -100,10 +138,50 @@ class BoxPlot(GenericPlotter):
                 'posn', '',
                 descr = 'Dataset or list of values giving '
                 'positions of boxes (optional)', usertext='Positions'), 0 )
-        s.add( setting.Datasets('values', ('data',),
-                                descr = 'Datasets containing box values',
-                                usertext='Values'), 0 )
 
+        # calculate statistics from these datasets
+        s.add( setting.Datasets('values', ('data',),
+                                descr = 'Datasets containing values to '
+                                'calculate statistics for',
+                                usertext='Datasets'), 0 )
+
+        # alternate mode where data are provided for boxes
+        s.add( setting.DatasetOrFloatList(
+                'whiskermax', '',
+                descr='Dataset with whisker maxima or list of values',
+                usertext='Whisker max'), 0 )
+        s.add( setting.DatasetOrFloatList(
+                'whiskermin', '',
+                descr='Dataset with whisker minima or list of values',
+                usertext='Whisker min'), 0 )
+        s.add( setting.DatasetOrFloatList(
+                'boxmax', '',
+                descr='Dataset with box maxima or list of values',
+                usertext='Box max'), 0 )
+        s.add( setting.DatasetOrFloatList(
+                'boxmin', '',
+                descr='Dataset with box minima or list of values',
+                usertext='Box min'), 0 )
+        s.add( setting.DatasetOrFloatList(
+                'median', '',
+                descr='Dataset with medians or list of values',
+                usertext='Median'), 0 )
+        s.add( setting.DatasetOrFloatList(
+                'mean', '',
+                descr='Dataset with means or list of values',
+                usertext='Mean'), 0 )
+
+        # switch between different modes
+        s.add( setting.BoolSwitch('calculate', True,
+                                  descr = 'Calculate statistics from datasets'
+                                  ' rather than given manually',
+                                  usertext = 'Calculate',
+                                  settingstrue=('whiskermode', 'values'),
+                                  settingsfalse=('boxmin', 'whiskermin',
+                                                 'boxmax', 'whiskermax',
+                                                 'mean', 'median')), 0 )
+
+        # formatting options
         s.add( setting.Float('fillfraction', 0.75,
                              descr = 'Fill fraction of boxes',
                              usertext='Fill fraction', formatting=True) )
@@ -151,31 +229,71 @@ class BoxPlot(GenericPlotter):
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
+    def rangeManual(self):
+        """For updating range in manual mode."""
+        s = self.settings
+        ds = []
+        for name in ('whiskermin', 'whiskermax', 'boxmin', 'boxmax',
+                     'mean', 'median'):
+            ds.append( s.get(name).getData(self.document) )
+        r = [N.inf, -N.inf]
+        if None not in ds:
+            concat = N.concatenate([d.data for d in ds])
+            r[0] = N.nanmin(concat)
+            r[1] = N.nanmax(concat)
+        return r
+
+    def getPosns(self):
+        """Get values of positions of bars."""
+
+        s = self.settings
+        doc = self.document
+
+        posns = s.get('posn').getData(doc)
+        if posns is not None:
+            # manual positions
+            return posns.data
+        else:
+            if s.calculate:
+                # number of datasets
+                vals = s.get('values').getData(doc)
+            else:
+                # length of mean array
+                vals = s.get('mean').getData(doc)
+                if vals:
+                    vals = vals.data
+
+            if vals is None:
+                return N.array([])
+            else:
+                return N.arange(1, len(vals)+1, dtype=N.float64)
+
     def updateAxisRange(self, axis, depname, axrange):
         """Update axis range from data."""
 
         s = self.settings
         doc = self.document
-        values = s.get('values').getData(doc)
-        if not values:
-            return
 
         if ( (depname == 'sx' and s.direction == 'horizontal') or
              (depname == 'sy' and s.direction == 'vertical') ):
             # update axis in direction of data
-            for v in values:
-                axrange[0] = min(axrange[0], N.nanmin(v.data))
-                axrange[1] = max(axrange[1], N.nanmax(v.data))
+            if s.calculate:
+                # update from values
+                values = s.get('values').getData(doc)
+                if values:
+                    for v in values:
+                        axrange[0] = min(axrange[0], N.nanmin(v.data))
+                        axrange[1] = max(axrange[1], N.nanmax(v.data))
+            else:
+                # update from manual entries
+                drange = self.rangeManual()
+                axrange[0] = min(axrange[0], drange[0])
+                axrange[1] = max(axrange[1], drange[1])
         else:
             # update axis in direction of datasets
-            positions = s.get('posn').getData(doc)
-            if positions is None:
-                positions = N.arange(1, len(values)+1)
-            else:
-                positions = positions.data
-                
-            axrange[0] = min(axrange[0], N.nanmin(positions)-0.5)
-            axrange[1] = max(axrange[1], N.nanmax(positions)+0.5)
+            posns = self.getPosns()
+            axrange[0] = min(axrange[0], N.nanmin(posns)-0.5)
+            axrange[1] = max(axrange[1], N.nanmax(posns)+0.5)
 
     def getAxisLabels(self, direction):
         """Get labels for axis if using a label axis."""
@@ -186,56 +304,26 @@ class BoxPlot(GenericPlotter):
         values = s.get('values').getData(doc)
         if text is None or values is None:
             return (None, None)
-        positions = s.get('posn').getData(doc)
-        if positions is None:
-            positions = N.arange(1, len(values)+1)
-        else:
-            positions = positions.data
+        positions = self.getPosns()
         return (text, positions)
 
-    def plotBox(self, painter, axes, data, boxposn, posn, width, clip):
-        """Plot a box, given data, posn and width."""
+    def calcStats(self, data):
+        """Calculate statistics for data."""
+
+        stats = _Stats()
+
+    def plotBox(self, painter, axes, boxposn, posn, width, clip, stats):
+        """Draw box for dataset."""
 
         s = self.settings
-        cleaned = data[ N.isfinite(data) ]
-        cleaned.sort()
-
-        median = percentile(cleaned, 50)
-        botquart = percentile(cleaned, 25)
-        topquart = percentile(cleaned, 75)
-        mean = N.mean(cleaned)
-        
-        whiskermode = s.whiskermode
-        if whiskermode == 'min/max':
-            botwhisker = cleaned.min()
-            topwhisker = cleaned.max()
-        elif whiskermode == '1.5IQR':
-            iqr = topquart - botquart
-            eltop = N.searchsorted(cleaned, topquart+1.5*iqr)-1
-            topwhisker = cleaned[eltop]
-            elbot = max(N.searchsorted(cleaned, botquart-1.5*iqr)-1, 0)
-            botwhisker = cleaned[elbot]
-        elif whiskermode == '1 stddev':
-            stddev = N.std(cleaned)
-            topwhisker = mean+stddev
-            botwhisker = mean-stddev
-        elif whiskermode == '9/91 percentile':
-            topwhisker = percentile(cleaned, 91)
-            botwhisker = percentile(cleaned, 9)
-        elif whiskermode == '2/98 percentile':
-            topwhisker = percentile(cleaned, 98)
-            botwhisker = percentile(cleaned, 2)
-        else:
-            raise RuntimeError, "Invalid whisker mode"
-
         horz = (s.direction == 'horizontal')
 
         # convert quartiles, top and bottom whiskers to plotter
         medplt, botplt, topplt, botwhisplt, topwhisplt = tuple(
             axes[not horz].dataToPlotterCoords(
                 posn,
-                N.array([ median, botquart, topquart,
-                          botwhisker, topwhisker ]))
+                N.array([ stats.median, stats.botquart, stats.topquart,
+                          stats.botwhisker, stats.topwhisker ]))
             )
 
         # draw whisker top to bottom
@@ -273,9 +361,8 @@ class BoxPlot(GenericPlotter):
         painter.setPen( s.MarkersLine.makeQPenWHide(painter) )
         painter.setBrush( s.MarkersFill.makeQBrushWHide() )
         markersize = s.get('markerSize').convert(painter)
-        outliers = cleaned[ (cleaned < botwhisker) | (cleaned > topwhisker) ]
-        if outliers.shape[0] != 0:
-            pltvals = axes[not horz].dataToPlotterCoords(posn, outliers)
+        if stats.outliers.shape[0] != 0:
+            pltvals = axes[not horz].dataToPlotterCoords(posn, stats.outliers)
             otherpos = N.zeros(pltvals.shape) + boxposn
             if horz:
                 x, y = pltvals, otherpos
@@ -286,7 +373,8 @@ class BoxPlot(GenericPlotter):
                                markersize, clip=clip )
 
         # draw mean
-        meanplt = axes[not horz].dataToPlotterCoords(posn, N.array([mean]))[0]
+        meanplt = axes[not horz].dataToPlotterCoords(posn,
+                                                     N.array([stats.mean]))[0]
         if horz:
             x, y = meanplt, boxposn
         else:
@@ -306,14 +394,19 @@ class BoxPlot(GenericPlotter):
 
         # get data
         doc = self.document
-        positions = s.get('posn').getData(doc)
-        values = s.get('values').getData(doc)
-        if not values:
-            return
-        if positions is None:
-            positions = N.arange(1, len(values)+1)
+        positions = self.getPosns()
+        if s.calculate:
+            # calculate from data
+            values = s.get('values').getData(doc)
+            if values is None:
+                return
         else:
-            positions = positions.data
+            # use manual datasets
+            datasets = [ s.get(x).getData(doc) for x in
+                         ('whiskermin', 'whiskermax', 'boxmin',
+                          'boxmax', 'mean', 'median') ]
+            if None in datasets:
+                return
 
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
@@ -351,14 +444,31 @@ class BoxPlot(GenericPlotter):
         # adjust width
         width = width * s.fillfraction
 
-        # actually plot the boxes
-        for vals, plotpos in izip(values, plotposns):
-            self.plotBox(painter, axes, vals.data, plotpos, widgetposn,
-                         width, clip)
+        if s.calculate:
+            # calculated boxes
+            for vals, plotpos in izip(values, plotposns):
+                stats = _Stats()
+                stats.calculate(vals.data, s.whiskermode)
+                self.plotBox(painter, axes, plotpos, widgetposn, width,
+                             clip, stats)
+        else:
+            # manually given boxes
+            vals = [d.data for d in datasets] + [plotposns]
+            lens = [len(d) for d in vals]
+            for i in xrange(min(lens)):
+                stats = _Stats()
+                stats.topwhisker = vals[0][i]
+                stats.botwhisker = vals[1][i]
+                stats.botquart = vals[2][i]
+                stats.topquart = vals[3][i]
+                stats.mean = vals[4][i]
+                stats.median = vals[5][i]
+                stats.outliers = N.array([])
+                self.plotBox(painter, axes, vals[6][i], widgetposn,
+                             width, clip, stats)
 
         painter.restore()
         painter.endPaintingWidget()
-
 
 # allow the factory to instantiate a boxplot
 document.thefactory.register( BoxPlot )

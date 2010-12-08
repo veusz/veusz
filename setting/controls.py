@@ -305,6 +305,28 @@ class Bool(qt4.QCheckBox):
         """called when the setting is changed remotely"""
         self.setChecked( self.setting.val )
 
+class BoolSwitch(Bool):
+    """Bool for switching off/on other settings."""
+
+    def showEvent(self, event):
+        Bool.showEvent(self, event)
+        self.updateState()
+
+    def slotToggled(self, state):
+        Bool.slotToggled(self, state)
+        self.updateState()
+
+    def updateState(self):
+        """Set hidden state of settings."""
+        s1, s2 = self.setting.strue, self.setting.sfalse
+        if self.setting.val:
+            show, hide = s1, s2
+        else:
+            show, hide = s2, s1
+
+        if hasattr(self.parent(), 'showHideSettings'):
+            self.parent().showHideSettings(show, hide)
+
 class Choice(qt4.QComboBox):
     """For choosing between a set of values."""
 

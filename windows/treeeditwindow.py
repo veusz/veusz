@@ -45,6 +45,7 @@ class PropertyList(qt4.QWidget):
         self.layout.setMargin(4)
         
         self.childlist = []
+        self.setncntrls = {}     # map setting name to controls
 
     def updateProperties(self, settings, title=None, showformatting=True,
                          onlyformatting=False):
@@ -64,6 +65,7 @@ class PropertyList(qt4.QWidget):
             return
 
         row = 0
+        self.setncntrls = {}
         self.layout.setEnabled(False)
 
         # add a title if requested
@@ -125,6 +127,7 @@ class PropertyList(qt4.QWidget):
                                  self.slotSettingChanged)
                     self.layout.addWidget(cntrl, row, 1)
                     self.childlist.append(cntrl)
+                    self.setncntrls[setn.name] = (lab, cntrl)
                     
                     row += 1
 
@@ -137,6 +140,14 @@ class PropertyList(qt4.QWidget):
 
         self.setUpdatesEnabled(True)
         self.layout.setEnabled(True)
+
+    def showHideSettings(self, setnshow, setnhide):
+        """Show or hide controls for settings."""
+        for vis, setns in ( (True, setnshow), (False, setnhide) ):
+            for setn in setns:
+                if setn in self.setncntrls:
+                    for cntrl in self.setncntrls[setn]:
+                        cntrl.setVisible(vis)
  
     def slotSettingChanged(self, widget, setting, val):
         """Called when a setting is changed by the user.
