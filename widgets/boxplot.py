@@ -292,8 +292,9 @@ class BoxPlot(GenericPlotter):
         else:
             # update axis in direction of datasets
             posns = self.getPosns()
-            axrange[0] = min(axrange[0], N.nanmin(posns)-0.5)
-            axrange[1] = max(axrange[1], N.nanmax(posns)+0.5)
+            if len(posns) > 0:
+                axrange[0] = min(axrange[0], N.nanmin(posns)-0.5)
+                axrange[1] = max(axrange[1], N.nanmax(posns)+0.5)
 
     def getAxisLabels(self, direction):
         """Get labels for axis if using a label axis."""
