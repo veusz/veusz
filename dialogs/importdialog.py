@@ -172,7 +172,8 @@ class ImportTabCSV(ImportTab):
         """Reset controls."""
         self.csvdelimitercombo.setEditText(",")
         self.csvtextdelimitercombo.setEditText('"')
-        self.directioncombo.setCurrentIndex(0)
+        self.csvdirectioncombo.setCurrentIndex(0)
+        self.csvignorehdrspin.setValue(0)
 
     def slotHelp(self):
         """Asked for help."""
@@ -247,7 +248,7 @@ class ImportTabCSV(ImportTab):
         """Import from CSV file."""
 
         # get various values
-        inrows = self.directioncombo.currentIndex() == 1
+        inrows = self.csvdirectioncombo.currentIndex() == 1
 
         try:
             delimiter = self.getCSVDelimiter()
@@ -255,11 +256,13 @@ class ImportTabCSV(ImportTab):
         except UnicodeEncodeError:
             return
 
+        headerignore = self.csvignorehdrspin.value()
         op = document.OperationDataImportCSV(filename, readrows=inrows,
                                              prefix=prefix, suffix=suffix,
                                              linked=linked,
                                              delimiter=delimiter,
                                              textdelimiter=textdelimiter,
+                                             headerignore=headerignore,
                                              encoding=encoding)
         
         # actually import the data

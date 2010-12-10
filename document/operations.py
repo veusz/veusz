@@ -798,6 +798,7 @@ class OperationDataImportCSV(object):
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
                  prefix='', suffix='',
+                 headerignore=0,
                  linked=False):
         """Import CSV data from filename
 
@@ -813,6 +814,7 @@ class OperationDataImportCSV(object):
         self.encoding = encoding
         self.prefix = prefix
         self.suffix = suffix
+        self.headerignore = headerignore
         self.linked = linked
 
     def do(self, document):
@@ -822,6 +824,7 @@ class OperationDataImportCSV(object):
                                delimiter=self.delimiter,
                                textdelimiter=self.textdelimiter,
                                encoding=self.encoding,
+                               headerignore=self.headerignore,
                                prefix=self.prefix, suffix=self.suffix)
         csvr.readData()
 
@@ -830,6 +833,7 @@ class OperationDataImportCSV(object):
                                         delimiter=self.delimiter,
                                         textdelimiter=self.textdelimiter,
                                         encoding=self.encoding,
+                                        headerignore=self.headerignore,
                                         prefix=self.prefix, suffix=self.suffix)
         else:
             LF = None

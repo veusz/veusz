@@ -89,11 +89,14 @@ class ReadCSV(object):
     def __init__(self, filename, readrows=False, 
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
+                 headerignore=0,
                  prefix='', suffix=''):
         """Initialise the reader to import data from filename.
 
         If readrows is True, then data are read from columns, rather than
         rows
+
+        headerignore is number of lines to ignore after headers
 
         prefix is a prefix to prepend to the name of datasets from this file
         """
@@ -103,6 +106,7 @@ class ReadCSV(object):
         self.delimiter = delimiter
         self.textdelimiter = textdelimiter
         self.encoding = encoding
+        self.headerignore = headerignore
         self.prefix = prefix
         self.suffix = suffix
 
@@ -154,6 +158,7 @@ class ReadCSV(object):
         self.coltypes[colnum] = coltype
         self.nametypes[colname] = coltype
         self.colnames[colnum] = colname
+        self.colignore[colnum] = self.headerignore
         if colname not in self.data:
             self.data[colname] = []
 
@@ -178,6 +183,8 @@ class ReadCSV(object):
         self.coltypes = []
         # type of names of columns
         self.nametypes = {}
+        # ignore lines after headers
+        self.colignore = {}
 
         # iterate over each line (or column)
         while True:
@@ -193,6 +200,11 @@ class ReadCSV(object):
                     ctype = 'float'
                 else:
                     ctype = self.coltypes[colnum]
+
+                # ignore lines after headers
+                if colnum < len(self.coltypes) and self.colignore[colnum] > 0:
+                    self.colignore[colnum] -= 1
+                    continue
 
                 try:
                     # do any necessary conversion

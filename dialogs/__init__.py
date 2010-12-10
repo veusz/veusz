@@ -27,10 +27,12 @@ import historycombo
 import historycheck
 import historyvaluecombo
 import historygroupbox
+import historyspinbox
 import recentfilesbutton
 
 sys.modules['historycombo'] = historycombo
 sys.modules['historycheck'] = historycheck
 sys.modules['historyvaluecombo'] = historyvaluecombo
 sys.modules['historygroupbox'] = historygroupbox
+sys.modules['historyspinbox'] = historyspinbox
 sys.modules['recentfilesbutton'] = recentfilesbutton

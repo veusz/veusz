@@ -359,6 +359,7 @@ class LinkedCSVFile(LinkedFileBase):
     def __init__(self, filename, readrows=False,
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
+                 headerignore=0,
                  prefix='', suffix=''):
         """Read CSV data from filename
 
@@ -371,6 +372,7 @@ class LinkedCSVFile(LinkedFileBase):
         self.delimiter = delimiter
         self.textdelimiter = textdelimiter
         self.encoding = encoding
+        self.headerignore = headerignore
         self.prefix = prefix
         self.suffix = suffix
 
@@ -391,6 +393,8 @@ class LinkedCSVFile(LinkedFileBase):
             params.append('delimiter=' + repr(self.delimiter))
         if self.textdelimiter != '"':
             params.append('textdelimiter=' + repr(self.textdelimiter))
+        if self.headerignore > 0:
+            params.append('headerignore=' + repr(self.headerignore))
 
         fileobj.write('ImportFileCSV(%s)\n' % (', '.join(params)))
         
@@ -405,6 +409,7 @@ class LinkedCSVFile(LinkedFileBase):
             delimiter=self.delimiter,
             textdelimiter=self.textdelimiter,
             encoding=self.encoding,
+            headerignore=self.headerignore,
             prefix=self.prefix, suffix=self.suffix )
         return self._reloadViaOperation(document, op)
 

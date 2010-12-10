@@ -633,6 +633,7 @@ class CommandInterface(qt4.QObject):
     def ImportFileCSV(self, filename, readrows=False, prefix=None,
                       delimiter=',', textdelimiter='"',
                       encoding='utf_8',
+                      headerignore=0,
                       dsprefix='', dssuffix='',
                       linked=False):
         """Read data from a comma separated file (CSV).
@@ -648,6 +649,7 @@ class CommandInterface(qt4.QObject):
         delimiter is the character for delimiting data (usually ',')
         textdelimiter is the character surrounding text (usually '"')
         encoding is the encoding used in the file
+        headerignore is number of lines to ignore after header text
 
         If linked is True the data are linked with the file."""
 
@@ -662,6 +664,7 @@ class CommandInterface(qt4.QObject):
             realfilename, readrows=readrows,
             delimiter=delimiter, textdelimiter=textdelimiter,
             encoding=encoding,
+            headerignore=headerignore,
             prefix=dsprefix, suffix=dssuffix,
             linked=linked)
         dsnames = self.document.applyOperation(op)

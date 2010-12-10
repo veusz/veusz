@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>276</height>
+    <width>380</width>
+    <height>274</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -70,12 +70,12 @@
         <string>&amp;Direction</string>
        </property>
        <property name="buddy">
-        <cstring>directioncombo</cstring>
+        <cstring>csvdirectioncombo</cstring>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QComboBox" name="directioncombo">
+      <widget class="QComboBox" name="csvdirectioncombo">
        <property name="toolTip">
         <string>Are the data arranged in columns or rows?</string>
        </property>
@@ -91,13 +91,27 @@
        </item>
       </widget>
      </item>
-     <item row="2" column="3">
+     <item row="3" column="3">
       <widget class="QPushButton" name="csvhelpbutton">
        <property name="toolTip">
         <string>Help on how CSV files should be formatted</string>
        </property>
        <property name="text">
         <string>Help</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Ignore lines after headers</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="HistorySpinBox" name="csvignorehdrspin">
+       <property name="toolTip">
+        <string>After reading a header item, Veusz will ignore the following number of lines in that column</string>
        </property>
       </widget>
      </item>
@@ -110,6 +124,11 @@
    <class>HistoryCombo</class>
    <extends>QComboBox</extends>
    <header>historycombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistorySpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>historyspinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
