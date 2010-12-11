@@ -19,9 +19,10 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
 Changes in 1.10:
- * Box plot widget added
+ * Box plot widget added, which can be given statistics to plot or
+   calculated from datasets
  * Polar plot widget added
- * Datasets are now easy to construct and enter in the Data->Edit
+ * Datasets are now easier to construct and edit in the Data->Edit
    dialog box
  * CSV reader will assume a text dataset if it cannot convert first item
    to a number
@@ -38,6 +39,7 @@ Minor changes:
  * Add --quiet option to run commands without displaying a window
  * Add --export option to export documents to graphics files and exit
  * PNG export compression increased
+ * Add option to ignore number of lines after headers in CSV files
 
 Bug fixes:
  * Multiple datasets can now be properly created from dataset plugin dialog
@@ -48,7 +50,7 @@ Bug fixes:
  * Remove duplicate linked files when using import plugins
  * Several crash reports fixed
  * More robust code in data->edit dialog box
- * veusz_listen now works in Windows
+ * veusz_listen now works in Windows (not in binary package yet)
 
 Features of package:
  * X-Y plots (with errorbars)

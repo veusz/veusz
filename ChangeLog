@@ -1,347 +1,240 @@
-Changes between 1.8 and 1.9
+Changes from 1.9 to 1.10 are shown below.
+Please see the README file for an easier to read version of this ChangeLog.
 
 ------------------------------------------------------------------------
-r1387 | jeremysanders | 2010-08-29 16:24:57 +0100 (Sun, 29 Aug 2010) | 1 line
+r1471 | jeremysanders | 2010-12-10 22:18:24 +0000 (Fri, 10 Dec 2010) | 1 line
 
-Use combo box with list of common point sizes for distances usually specified in points. This makes it much easier to increase/decrease point sizes.
+Add option to ignore N lines after headers in CSV files
 ------------------------------------------------------------------------
-r1386 | jeremysanders | 2010-08-29 15:49:55 +0100 (Sun, 29 Aug 2010) | 1 line
+r1470 | jeremysanders | 2010-12-09 09:39:12 +0000 (Thu, 09 Dec 2010) | 1 line
 
-Update README/ChangeLog
+Avoid error in axis range if no data given
 ------------------------------------------------------------------------
-r1385 | jeremysanders | 2010-08-29 15:47:12 +0100 (Sun, 29 Aug 2010) | 1 line
+r1469 | jeremysanders | 2010-12-08 22:15:00 +0000 (Wed, 08 Dec 2010) | 1 line
 
-Support min and max properties when fitting with Fit widget
+Provide manual mode for box plots
 ------------------------------------------------------------------------
-r1384 | jeremysanders | 2010-08-28 10:10:08 +0100 (Sat, 28 Aug 2010) | 1 line
+r1468 | jeremysanders | 2010-12-02 19:56:44 +0000 (Thu, 02 Dec 2010) | 1 line
 
-Update README/ChangeLog
+Documentation updates
 ------------------------------------------------------------------------
-r1383 | jeremysanders | 2010-08-28 10:02:23 +0100 (Sat, 28 Aug 2010) | 1 line
+r1467 | jeremysanders | 2010-12-02 19:29:44 +0000 (Thu, 02 Dec 2010) | 1 line
 
-Make text entry boxes marked by .. go away by clicking outside frame.
+Increase line width in box plot example
 ------------------------------------------------------------------------
-r1382 | jeremysanders | 2010-08-27 21:48:15 +0100 (Fri, 27 Aug 2010) | 1 line
+r1466 | jeremysanders | 2010-12-02 13:58:20 +0000 (Thu, 02 Dec 2010) | 1 line
 
-Use flat buttons for setting controls - looks better on mac os
+Make compression larger for PNG export
 ------------------------------------------------------------------------
-r1381 | jeremysanders | 2010-08-26 22:00:09 +0100 (Thu, 26 Aug 2010) | 1 line
+r1465 | jeremysanders | 2010-12-01 17:20:48 +0000 (Wed, 01 Dec 2010) | 1 line
 
-Bump version number to 1.9
+Add man page generation to generate_manual script
 ------------------------------------------------------------------------
-r1380 | jeremysanders | 2010-08-26 21:56:02 +0100 (Thu, 26 Aug 2010) | 1 line
+r1464 | jeremysanders | 2010-12-01 17:17:37 +0000 (Wed, 01 Dec 2010) | 1 line
 
-Add dataset operations example plot
+Move pod manual to Documents
 ------------------------------------------------------------------------
-r1379 | jeremysanders | 2010-08-26 21:31:07 +0100 (Thu, 26 Aug 2010) | 1 line
+r1463 | jeremysanders | 2010-12-01 17:06:14 +0000 (Wed, 01 Dec 2010) | 1 line
 
-Scale arrow heads by vector length by default in vector field. Add vectorfield example.
+Use separate reading thread for veusz_listen to make it compatible with Windows
 ------------------------------------------------------------------------
-r1378 | jeremysanders | 2010-08-26 13:46:27 +0100 (Thu, 26 Aug 2010) | 1 line
+r1462 | jeremysanders | 2010-11-30 09:36:37 +0000 (Tue, 30 Nov 2010) | 1 line
 
-Bump version number for RC
+Update boxplot and change version to beta
 ------------------------------------------------------------------------
-r1377 | jeremysanders | 2010-08-23 22:33:55 +0100 (Mon, 23 Aug 2010) | 1 line
+r1461 | jeremysanders | 2010-11-29 21:44:43 +0000 (Mon, 29 Nov 2010) | 1 line
 
-Add tools plugins to increase/decrease font sizes
+Add box plot example
 ------------------------------------------------------------------------
-r1376 | jeremysanders | 2010-08-23 21:34:10 +0100 (Mon, 23 Aug 2010) | 1 line
+r1460 | jeremysanders | 2010-11-29 21:32:08 +0000 (Mon, 29 Nov 2010) | 1 line
 
-Update axis range when doing vector plot. Do not plot arrows for very short lines
+Add man pages for veusz and veusz_listen. Add --quiet option for executing commands without opening a window.
 ------------------------------------------------------------------------
-r1375 | jeremysanders | 2010-08-22 20:14:45 +0100 (Sun, 22 Aug 2010) | 1 line
+r1459 | jeremysanders | 2010-11-29 20:45:15 +0000 (Mon, 29 Nov 2010) | 1 line
 
-Updates for 1.9 release
+Rework main program. Add --listen option to act as veusz_listen. Add --export option to export document to graphics files and exit
 ------------------------------------------------------------------------
-r1374 | jeremysanders | 2010-08-22 19:44:07 +0100 (Sun, 22 Aug 2010) | 1 line
+r1458 | jeremysanders | 2010-11-28 12:34:37 +0000 (Sun, 28 Nov 2010) | 1 line
 
-Fix dataset expressions with zero-dimensional expressions
+Implement 2d dataset creation based on expressions of other 2D datasets
 ------------------------------------------------------------------------
-r1373 | jeremysanders | 2010-08-22 19:43:32 +0100 (Sun, 22 Aug 2010) | 1 line
+r1457 | jeremysanders | 2010-11-28 11:25:22 +0000 (Sun, 28 Nov 2010) | 1 line
 
-Move Expression->Filter to Filter->Expression
+Check if files have changed before reloading data
 ------------------------------------------------------------------------
-r1372 | jeremysanders | 2010-08-21 19:56:17 +0100 (Sat, 21 Aug 2010) | 1 line
+r1456 | jeremysanders | 2010-11-26 22:43:04 +0000 (Fri, 26 Nov 2010) | 1 line
 
-Add option to replace missing points by NaN in filter dataset plugin
+Increase reload max time and make dialog close by default
 ------------------------------------------------------------------------
-r1371 | jeremysanders | 2010-08-21 19:30:13 +0100 (Sat, 21 Aug 2010) | 1 line
+r1455 | jeremysanders | 2010-11-26 22:35:03 +0000 (Fri, 26 Nov 2010) | 1 line
 
-Add dataset plugin to filter data. Add evaluateExpression to dataset plugin helper interface.
+Make reload data dialog box non modal. Add option to reload at intervals or manually if button pressed.
 ------------------------------------------------------------------------
-r1370 | jeremysanders | 2010-08-21 18:04:34 +0100 (Sat, 21 Aug 2010) | 1 line
+r1454 | jeremysanders | 2010-11-26 20:01:51 +0000 (Fri, 26 Nov 2010) | 1 line
 
-Add thin dataset plugin
+Update README and bump version number to 1.10
 ------------------------------------------------------------------------
-r1369 | jeremysanders | 2010-08-21 17:52:57 +0100 (Sat, 21 Aug 2010) | 1 line
+r1453 | jeremysanders | 2010-11-25 22:19:02 +0000 (Thu, 25 Nov 2010) | 1 line
 
-Add dataset plugin to split dataset into equal-sized parts.
+Add polar example
 ------------------------------------------------------------------------
-r1368 | jeremysanders | 2010-08-21 12:12:13 +0100 (Sat, 21 Aug 2010) | 1 line
+r1452 | jeremysanders | 2010-11-25 21:58:24 +0000 (Thu, 25 Nov 2010) | 1 line
 
-Use intc for colormaps to fix numpy->QImage conversion
+If ISO date/time conversion fails, try local date time conversion
 ------------------------------------------------------------------------
-r1367 | jeremysanders | 2010-08-20 22:21:01 +0100 (Fri, 20 Aug 2010) | 1 line
+r1451 | jeremysanders | 2010-11-25 21:25:41 +0000 (Thu, 25 Nov 2010) | 1 line
 
-Fix C++ 2D numpy to QImage conversion
+Add margin size setting to key widget
 ------------------------------------------------------------------------
-r1366 | jeremysanders | 2010-08-20 19:24:33 +0100 (Fri, 20 Aug 2010) | 1 line
+r1450 | jeremysanders | 2010-11-24 15:56:05 +0000 (Wed, 24 Nov 2010) | 1 line
 
-Avoid stack frame hanging around holding references after an exception
+Fix fitting after changes to function widget
 ------------------------------------------------------------------------
-r1365 | jeremysanders | 2010-08-18 22:04:47 +0100 (Wed, 18 Aug 2010) | 1 line
+r1449 | jeremysanders | 2010-11-22 09:26:58 +0000 (Mon, 22 Nov 2010) | 10 lines
 
-Use menu in plugin window titles and word wrap descriptions
-------------------------------------------------------------------------
-r1364 | jeremysanders | 2010-08-18 21:36:33 +0100 (Wed, 18 Aug 2010) | 1 line
-
-Add Interleave dataset plugin
-------------------------------------------------------------------------
-r1363 | jeremysanders | 2010-08-18 20:48:14 +0100 (Wed, 18 Aug 2010) | 1 line
-
-Add Divide datasets plugin. Put plugins in submenus.
-------------------------------------------------------------------------
-r1362 | jeremysanders | 2010-08-18 17:55:41 +0100 (Wed, 18 Aug 2010) | 1 line
-
-Add Demultiplex and PolarToCartesian dataset plugins
-------------------------------------------------------------------------
-r1361 | jeremysanders | 2010-08-17 20:58:34 +0100 (Tue, 17 Aug 2010) | 1 line
-
-Using wordwrap on label causes layout problems. http://doc.qt.nokia.com/4.6/layout.html#layout-issues in plugin dialog
-------------------------------------------------------------------------
-r1360 | jeremysanders | 2010-08-16 19:32:58 +0100 (Mon, 16 Aug 2010) | 1 line
-
-Move widget iteration ouside of widget field to avoid C++ object deletion bug
-------------------------------------------------------------------------
-r1359 | jeremysanders | 2010-08-15 15:43:18 +0100 (Sun, 15 Aug 2010) | 1 line
-
-Make getDataset part of dataset plugin helper only return numeric datasets. Add getTextDataset method to return text datasets
-------------------------------------------------------------------------
-r1358 | jeremysanders | 2010-08-14 17:40:46 +0100 (Sat, 14 Aug 2010) | 1 line
-
-Make most dialogs children of VeuszDialog class which organises deleting of resources on closing to avoid memory leaks. Fix some timers which hold implicit references to the dialog via a lambda.
-------------------------------------------------------------------------
-r1357 | jeremysanders | 2010-08-13 20:20:20 +0100 (Fri, 13 Aug 2010) | 1 line
-
-Fix typos
-------------------------------------------------------------------------
-r1356 | jeremysanders | 2010-08-12 20:38:25 +0100 (Thu, 12 Aug 2010) | 1 line
-
-Minor fix for fields
-------------------------------------------------------------------------
-r1355 | jeremysanders | 2010-08-12 20:38:13 +0100 (Thu, 12 Aug 2010) | 1 line
-
-If datasets defined in descriptor and import dialog don't give error
-------------------------------------------------------------------------
-r1354 | jeremysanders | 2010-08-11 21:07:43 +0100 (Wed, 11 Aug 2010) | 1 line
-
-Add multiply dataset plugin and handle error bars better
-------------------------------------------------------------------------
-r1353 | jeremysanders | 2010-08-11 16:05:44 +0100 (Wed, 11 Aug 2010) | 1 line
-
-Fix the typo in two other places
-------------------------------------------------------------------------
-r1352 | jeremysanders | 2010-08-11 16:00:59 +0100 (Wed, 11 Aug 2010) | 1 line
-
-Fix typo
-------------------------------------------------------------------------
-r1351 | jeremysanders | 2010-08-08 18:44:43 +0100 (Sun, 08 Aug 2010) | 1 line
-
-Enable editing of dataset plugins
-------------------------------------------------------------------------
-r1350 | jeremysanders | 2010-08-08 13:17:11 +0100 (Sun, 08 Aug 2010) | 1 line
-
-Show results from running plugins in plugin dialog
-------------------------------------------------------------------------
-r1349 | jeremysanders | 2010-08-08 13:01:56 +0100 (Sun, 08 Aug 2010) | 1 line
-
-Add Difference dataset plugin
-------------------------------------------------------------------------
-r1348 | jeremysanders | 2010-08-08 12:31:40 +0100 (Sun, 08 Aug 2010) | 1 line
-
-Add 'Add' dataset plugin
-------------------------------------------------------------------------
-r1347 | jeremysanders | 2010-08-07 18:28:04 +0100 (Sat, 07 Aug 2010) | 1 line
-
-Use new API for dataset plugins to avoid dependency issues
-------------------------------------------------------------------------
-r1346 | jeremysanders | 2010-08-06 17:44:41 +0100 (Fri, 06 Aug 2010) | 1 line
-
-Minor simplification of code
-------------------------------------------------------------------------
-r1345 | jeremysanders | 2010-08-06 17:41:22 +0100 (Fri, 06 Aug 2010) | 1 line
-
-Add compute mean dataset plugin. Rename split plugin to chop plugin.
-------------------------------------------------------------------------
-r1344 | jeremysanders | 2010-08-06 15:12:01 +0100 (Fri, 06 Aug 2010) | 1 line
-
-Add split dataset plugin
-------------------------------------------------------------------------
-r1343 | jeremysanders | 2010-08-06 14:47:19 +0100 (Fri, 06 Aug 2010) | 1 line
-
-Add scale, shift and concatenate dataset plugins
-------------------------------------------------------------------------
-r1342 | jeremysanders | 2010-08-05 15:43:08 +0100 (Thu, 05 Aug 2010) | 1 line
-
-Allow dataset plugin datasets to be saved. Add ability to rename or delete dataset plugin datasets
-------------------------------------------------------------------------
-r1341 | jeremysanders | 2010-08-04 15:46:58 +0100 (Wed, 04 Aug 2010) | 1 line
-
-Add initial Dataset Plugins support
-------------------------------------------------------------------------
-r1340 | jeremysanders | 2010-07-21 22:15:41 +0100 (Wed, 21 Jul 2010) | 1 line
+Fixed error report Tue, 28 Sep 2010 16:16:45 +0000: zero division in function widget from number of steps
+Fixed error report Fri, 15 Oct 2010 12:05:12 +0000: force parts of CSV datasets o have same length by adding NaNs if they are too short
+Fixed error report Mon, 25 Oct 2010 08:27:04 +0000: zero division - if DPI is 0, fix to 72
+Fixed error report Fri, 05 Nov 2010 23:36:38 +0000: catch exceptions from conversion of expression evaluation result to numpy array for function plotting
+Fixed error report Mon, 08 Nov 2010 22:28:28 +0000: allow saving of histogram datasets where one of the output datasets is not used
+Fixed error report Thu, 11 Nov 2010 23:55:59 +0000: somehow veusz data on clipboard is invalid: catch invalid integers in paste: FIXME How does this happen?
+Fixed error report Sat, 13 Nov 2010 03:58:11 +0000: catch invalid data ranges for datasets in bar axis ranging
 
-Base Dataset2DXYZExpression on Dataset2D
-------------------------------------------------------------------------
-r1339 | jeremysanders | 2010-07-21 22:10:28 +0100 (Wed, 21 Jul 2010) | 1 line
-
-Implement hide for vectorfield
-------------------------------------------------------------------------
-r1338 | jeremysanders | 2010-07-21 22:06:54 +0100 (Wed, 21 Jul 2010) | 1 line
-
-Add vector field icon
-------------------------------------------------------------------------
-r1337 | jeremysanders | 2010-07-21 21:47:49 +0100 (Wed, 21 Jul 2010) | 1 line
-
-More stuff for vector field
-------------------------------------------------------------------------
-r1336 | jeremysanders | 2010-07-21 21:47:34 +0100 (Wed, 21 Jul 2010) | 1 line
+Added endsize setting to error bar line which scales the ends of error bars by this factor
 
-Base Dataset2DXYFunc on Dataset2D
 ------------------------------------------------------------------------
-r1335 | jeremysanders | 2010-07-21 21:46:56 +0100 (Wed, 21 Jul 2010) | 1 line
+r1448 | jeremysanders | 2010-11-13 20:07:34 +0000 (Sat, 13 Nov 2010) | 1 line
 
-Add mostly working vector field support
+Use separate instance of plugin when applying in plugin dialog, to avoid shared plugin confusion
 ------------------------------------------------------------------------
-r1334 | jeremysanders | 2010-07-19 21:25:08 +0100 (Mon, 19 Jul 2010) | 1 line
+r1447 | jeremysanders | 2010-11-11 20:35:25 +0000 (Thu, 11 Nov 2010) | 1 line
 
-Start of work on dataset plugins
+Merge nonorthogonal branch 1429:1446 to trunk
 ------------------------------------------------------------------------
-r1333 | jeremysanders | 2010-07-17 22:13:44 +0100 (Sat, 17 Jul 2010) | 1 line
+r1433 | jeremysanders | 2010-11-04 19:12:00 +0000 (Thu, 04 Nov 2010) | 1 line
 
-Fix license for helper files to be GPLv2
+Fix bug when editing dataset plugins
 ------------------------------------------------------------------------
-r1332 | jeremysanders | 2010-07-17 22:07:17 +0100 (Sat, 17 Jul 2010) | 1 line
+r1428 | jeremysanders | 2010-10-24 12:00:37 +0100 (Sun, 24 Oct 2010) | 1 line
 
-Make clone widget plugin work. Fix control for Strings and Datasets widgets save value when losing focus.
+Fix error handling for linked datasets which reload using reloadViaOperation. Automatic bug report Tue, 12 Oct 2010 13:39:41 +0000.
 ------------------------------------------------------------------------
-r1331 | jeremysanders | 2010-07-15 21:08:41 +0100 (Thu, 15 Jul 2010) | 1 line
+r1427 | jeremysanders | 2010-10-23 22:03:33 +0100 (Sat, 23 Oct 2010) | 1 line
 
-Add Clone method to WidgetNode interface
+Rewrite dataset list model in data edit dialog to be more robust. Add button to create new datasets.
 ------------------------------------------------------------------------
-r1330 | jeremysanders | 2010-07-15 20:57:32 +0100 (Thu, 15 Jul 2010) | 1 line
+r1426 | jeremysanders | 2010-10-23 17:52:11 +0100 (Sat, 23 Oct 2010) | 1 line
 
-Add CloneWidget commandinterface command, and move widget pasting to an Operation
+Add blank row at end of dataset in edit dialog to insert new data
 ------------------------------------------------------------------------
-r1329 | jeremysanders | 2010-07-15 19:33:53 +0100 (Thu, 15 Jul 2010) | 1 line
+r1425 | jeremysanders | 2010-10-23 17:17:28 +0100 (Sat, 23 Oct 2010) | 1 line
 
-Add search and replace text plugin
+Implement label axes for boxplots
 ------------------------------------------------------------------------
-r1328 | jeremysanders | 2010-07-13 22:36:26 +0100 (Tue, 13 Jul 2010) | 1 line
+r1423 | jeremysanders | 2010-10-19 20:30:44 +0100 (Tue, 19 Oct 2010) | 1 line
 
-Update color combo boxes when other comboboxes get new color entries
+Start of box plot implementation
 ------------------------------------------------------------------------
-r1327 | jeremysanders | 2010-07-12 22:43:08 +0100 (Mon, 12 Jul 2010) | 1 line
+r1422 | jeremysanders | 2010-09-28 10:15:27 +0100 (Tue, 28 Sep 2010) | 1 line
 
-Add ImportDatasetText for importing text datasets with an import plugin
+make read terr in qdp import plugin get error bars round the right way
 ------------------------------------------------------------------------
-r1326 | jeremysanders | 2010-07-12 17:26:39 +0100 (Mon, 12 Jul 2010) | 1 line
+r1421 | jeremysanders | 2010-09-27 18:03:07 +0100 (Mon, 27 Sep 2010) | 1 line
 
-Convert QString to Python string before saving
+Add initial QDP import plugin
 ------------------------------------------------------------------------
-r1325 | jeremysanders | 2010-07-12 14:04:13 +0100 (Mon, 12 Jul 2010) | 1 line
+r1420 | jeremysanders | 2010-09-27 18:02:45 +0100 (Mon, 27 Sep 2010) | 1 line
 
-document attributes of settings objects might not be Document objects. Add getDocument method to widget to fix this.
+Make multiple datasets imported by plugins use same linking, if appropriate. Fix description of operation using dataset plugins.
 ------------------------------------------------------------------------
-r1324 | jeremysanders | 2010-07-11 18:45:23 +0100 (Sun, 11 Jul 2010) | 1 line
+r1419 | jeremysanders | 2010-09-26 16:43:42 +0100 (Sun, 26 Sep 2010) | 1 line
 
-Add a setting typename to each Setting. Add SettingType command interface method. Add settingtype property to SettingNode in node interface.
+Remove extra copy of posn variable
 ------------------------------------------------------------------------
-r1323 | jeremysanders | 2010-07-11 18:29:24 +0100 (Sun, 11 Jul 2010) | 1 line
+r1418 | jeremysanders | 2010-09-26 16:40:57 +0100 (Sun, 26 Sep 2010) | 1 line
 
-Make randomize color tool use color values rather than HSV. Add search and replace tool for colors.
+Fix bug report Sun, 26 Sep 2010 06:35:58 -0600. Cleanup function plotting evaluation. Fix setting min and max values for plotting functions of y.
 ------------------------------------------------------------------------
-r1322 | jeremysanders | 2010-07-10 21:32:38 +0100 (Sat, 10 Jul 2010) | 1 line
+r1417 | jeremysanders | 2010-09-26 15:44:55 +0100 (Sun, 26 Sep 2010) | 1 line
 
-Rename OperationPlugins to ToolsPlugins. Create a whole new set of field types (internally using veusz settings).
+Fix error report Sun, 26 Sep 2010 06:27:36 -0600
 ------------------------------------------------------------------------
-r1321 | jeremysanders | 2010-07-09 22:27:32 +0100 (Fri, 09 Jul 2010) | 1 line
+r1416 | jeremysanders | 2010-09-25 10:14:16 +0100 (Sat, 25 Sep 2010) | 1 line
 
-Use Qt desktop services to open external links, rather than python service
+Fix problem report Sun,  2 May 2010 09:42:41 -0400
 ------------------------------------------------------------------------
-r1320 | jeremysanders | 2010-07-09 22:18:52 +0100 (Fri, 09 Jul 2010) | 1 line
+r1415 | jeremysanders | 2010-09-25 10:05:25 +0100 (Sat, 25 Sep 2010) | 1 line
 
-Veusz now starts in user home directory. It remembers directories between runs. It will use directory of opened file as directory. Add option in preferences to use old behaviour, which uses cwd when starting.
+Fix error report Tue, 21 Sep 2010 06:25:43 -0600
 ------------------------------------------------------------------------
-r1319 | jeremysanders | 2010-07-09 19:43:26 +0100 (Fri, 09 Jul 2010) | 1 line
+r1414 | jeremysanders | 2010-09-25 09:56:43 +0100 (Sat, 25 Sep 2010) | 1 line
 
-More cleanups of QMessageBox
+Fix error report Thu, 16 Sep 2010 14:20:26 -0600
 ------------------------------------------------------------------------
-r1318 | jeremysanders | 2010-07-09 19:30:19 +0100 (Fri, 09 Jul 2010) | 1 line
+r1413 | jeremysanders | 2010-09-25 09:48:02 +0100 (Sat, 25 Sep 2010) | 1 line
 
-Use shorter QMessageBox static functions where possible
+Fix error report Sun, 12 Sep 2010 23:56:57 -0600
 ------------------------------------------------------------------------
-r1317 | jeremysanders | 2010-07-09 09:50:28 +0100 (Fri, 09 Jul 2010) | 1 line
+r1412 | jeremysanders | 2010-09-25 09:42:01 +0100 (Sat, 25 Sep 2010) | 1 line
 
-Send extra information in exception dialog and use Qt to base64 encode it
+Fix error report Sat, 11 Sep 2010 06:06:13 -0600
 ------------------------------------------------------------------------
-r1316 | jeremysanders | 2010-07-07 22:33:29 +0100 (Wed, 07 Jul 2010) | 1 line
+r1411 | jeremysanders | 2010-09-25 09:38:27 +0100 (Sat, 25 Sep 2010) | 1 line
 
-Convert exception dialog to send messages to PHP script on server rather than email
+Fix bounding box appearance when resizing rectangles, ellipses and image files
 ------------------------------------------------------------------------
-r1315 | jeremysanders | 2010-07-07 20:14:31 +0100 (Wed, 07 Jul 2010) | 1 line
+r1410 | jeremysanders | 2010-09-20 22:41:18 +0100 (Mon, 20 Sep 2010) | 1 line
 
-Catch errors in loading plugins and move into Document class
+Make X and Y ranges of 1D->2D datasets correct
 ------------------------------------------------------------------------
-r1314 | jeremysanders | 2010-07-05 20:00:36 +0100 (Mon, 05 Jul 2010) | 1 line
+r1409 | jeremysanders | 2010-09-20 20:07:36 +0100 (Mon, 20 Sep 2010) | 1 line
 
-Make randomizecolor plugin work. Add FieldWidget to plugin interface. Fix WalkWidgets to return original widget too.
+CSV reader will now assume a dataset is a text dataset if it cannot convert the first item of a column/row to a number
 ------------------------------------------------------------------------
-r1313 | jeremysanders | 2010-07-04 17:37:16 +0100 (Sun, 04 Jul 2010) | 1 line
+r1408 | jeremysanders | 2010-09-16 20:33:07 +0100 (Thu, 16 Sep 2010) | 1 line
 
-Add worker plugins to menu, add minimum and maximum support to FieldFloat and FieldInt
+Add colors sequence plugin
 ------------------------------------------------------------------------
-r1312 | jeremysanders | 2010-07-01 22:20:06 +0100 (Thu, 01 Jul 2010) | 1 line
+r1407 | jeremysanders | 2010-09-12 15:38:24 +0100 (Sun, 12 Sep 2010) | 1 line
 
-Add fromPath() and widgettype property in embedding
+Drop histo test as there is a subtle clipping issue
 ------------------------------------------------------------------------
-r1311 | jeremysanders | 2010-07-01 21:19:59 +0100 (Thu, 01 Jul 2010) | 1 line
+r1406 | jeremysanders | 2010-09-12 15:35:03 +0100 (Sun, 12 Sep 2010) | 1 line
 
-Enable Root object in document files. Add == and != operators. Add repr text description.
+Solve -0 issues in self tests
 ------------------------------------------------------------------------
-r1310 | jeremysanders | 2010-07-01 21:01:46 +0100 (Thu, 01 Jul 2010) | 1 line
+r1405 | jeremysanders | 2010-09-12 15:26:35 +0100 (Sun, 12 Sep 2010) | 1 line
 
-embed_tree no longer exists
+Use bmp file format for self test - hopefully should be same between platforms
 ------------------------------------------------------------------------
-r1309 | jeremysanders | 2010-07-01 09:35:58 +0100 (Thu, 01 Jul 2010) | 1 line
+r1404 | jeremysanders | 2010-09-12 15:12:15 +0100 (Sun, 12 Sep 2010) | 1 line
 
-Fix typo
+More attempts to get same output for tests between windows/unix
 ------------------------------------------------------------------------
-r1308 | jeremysanders | 2010-06-30 22:27:38 +0100 (Wed, 30 Jun 2010) | 1 line
+r1403 | jeremysanders | 2010-09-12 14:44:35 +0100 (Sun, 12 Sep 2010) | 1 line
 
-Move tree embedding into embed.py. Add Root interface to command interface
+Round svg coordinates and sizes to 2dp to get consistent behaviour on different platforms
 ------------------------------------------------------------------------
-r1307 | jeremysanders | 2010-06-29 23:04:18 +0100 (Tue, 29 Jun 2010) | 1 line
+r1402 | jeremysanders | 2010-09-11 11:19:33 +0100 (Sat, 11 Sep 2010) | 1 line
 
-More work on tree embedding interface.
+More fixes for self testing. Return exit code if tests failed
 ------------------------------------------------------------------------
-r1306 | jeremysanders | 2010-06-29 22:33:27 +0100 (Tue, 29 Jun 2010) | 1 line
+r1401 | jeremysanders | 2010-09-11 10:28:00 +0100 (Sat, 11 Sep 2010) | 1 line
 
-Add initial operation plugin file.
+Fix other usages of metrics to get the same self test output
 ------------------------------------------------------------------------
-r1305 | jeremysanders | 2010-06-29 22:30:21 +0100 (Tue, 29 Jun 2010) | 2 lines
-
-Move field to separate file
+r1400 | jeremysanders | 2010-09-10 22:08:10 +0100 (Fri, 10 Sep 2010) | 1 line
 
+Add start of self test routines
 ------------------------------------------------------------------------
-r1304 | jeremysanders | 2010-06-28 23:08:57 +0100 (Mon, 28 Jun 2010) | 1 line
+r1399 | jeremysanders | 2010-09-08 22:26:12 +0100 (Wed, 08 Sep 2010) | 1 line
 
-Start of tree embedding interface
+Cleanups in text renderer
 ------------------------------------------------------------------------
-r1303 | jeremysanders | 2010-06-24 16:37:21 +0100 (Thu, 24 Jun 2010) | 1 line
+r1391 | jeremysanders | 2010-08-31 22:22:32 +0100 (Tue, 31 Aug 2010) | 1 line
 
-Do not show missing files on recent files menu
+Fix propagation of settings to specific widgets
 ------------------------------------------------------------------------
-r1302 | jeremysanders | 2010-06-24 16:36:54 +0100 (Thu, 24 Jun 2010) | 1 line
+r1389 | jeremysanders | 2010-08-30 17:13:49 +0100 (Mon, 30 Aug 2010) | 1 line
 
-Ignore non finite values when fitting
+Fix if both min and max in fit are set
