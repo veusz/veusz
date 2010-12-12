@@ -22,13 +22,13 @@
 
 """Polar plot widget."""
 
-import qtall as qt4
 import numpy as N
 
 from nonorthgraph import NonOrthGraph
 from axisticks import AxisTicks
 import axis
 
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
