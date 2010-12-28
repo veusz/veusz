@@ -387,6 +387,21 @@ class PartSubScript(Part):
         font.setPointSizeF(size)
         state.painter.setFont(font)
 
+class PartMultiScript(Part):
+    """Represents multiple parts with the same starting x, e.g. a combination of
+       super- and subscript parts."""
+    def render(self, state):
+        oldx = state.x
+        newx = oldx
+        for p in self.children:
+            state.x = oldx
+            p.render(state)
+            newx = max([state.x, newx])
+        state.x = newx
+    
+    def append(p):
+        self.children.append(p)
+
 class PartItalic(Part):
     """Represents italic part."""
     def render(self, state):
@@ -616,7 +631,23 @@ def makePartTree(partlist):
             if p in part_commands:
                 klass, numargs = part_commands[p]
                 partargs = [makePartTree(k) for k in partlist[i+1:i+numargs+1]]
-                itemlist.append( klass(partargs) )
+                if (p == '^' or p == '_'):
+                    if len(itemlist) > 0 and (
+                        isinstance(itemlist[-1], PartSubScript) or
+                        isinstance(itemlist[-1], PartSuperScript) or
+                        isinstance(itemlist[-1], PartMultiScript)):
+                        # combine sequences of multiple sub-/superscript parts into
+                        # a MultiScript item so that a single text item can have 
+                        # both super and subscript indicies
+                        # e.g. X^{(q)}_{i}
+                        if isinstance(itemlist[-1], PartMultiScript):
+                            itemlist[-1].append( klass(partargs) )
+                        else:
+                            itemlist[-1] = PartMultiScript([itemlist[-1], klass(partargs)])
+                    else:
+                        itemlist.append( klass(partargs) )
+                else:
+                    itemlist.append( klass(partargs) )
                 i += numargs
             else:
                 itemlist.append( PartText(p) )
