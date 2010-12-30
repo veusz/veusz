@@ -233,7 +233,8 @@ class Polar(NonOrthGraph):
         # draw radial axis
         if not s.TickLabels.hideradial:
             for tick in majtick[1:]:
-                num = utils.formatNumber(tick*scale, format)
+                num = utils.formatNumber(tick*scale, format,
+                                         locale=self.document.locale)
                 x = tick / self._maxradius * self._xscale + self._xc
                 r = utils.Renderer(painter, font, x, self._yc, num,
                                    alignhorz=-1,

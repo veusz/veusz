@@ -364,7 +364,8 @@ class Contour(plotters.GenericPlotter):
         if s.keyLevels:
             cl = s.get('ContourLabels')
             return utils.formatNumber( s.levelsOut[number] * cl.scale,
-                                       cl.format )
+                                       cl.format,
+                                       locale=self.document.locale )
         else:
             return ''
 
@@ -496,7 +497,8 @@ class Contour(plotters.GenericPlotter):
         painter.save()
 
         # get text and font
-        text = utils.formatNumber(number * cl.scale, cl.format)
+        text = utils.formatNumber(number * cl.scale, cl.format,
+                                  locale=self.document.locale)
         font = cl.makeQFont(painter)
         descent = utils.FontMetrics(font, painter.device()).descent()
 

@@ -717,7 +717,8 @@ class Axis(widget.Widget):
 
             # generate positions and labels
             for posn, tickval in izip(coordticks, self.majortickscalc):
-                text = utils.formatNumber(tickval*scale, format)
+                text = utils.formatNumber(tickval*scale, format,
+                                          locale=self.document.locale)
                 yield posn, text
 
         # position of label perpendicular to axis

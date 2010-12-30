@@ -30,6 +30,7 @@ from points import *
 from action import *
 from pdf import *
 from dates import *
+from formatting import *
 
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \

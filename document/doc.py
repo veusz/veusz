@@ -96,6 +96,8 @@ class Document( qt4.QObject ):
 
         self.changeset = 0          # increased when the document changes
         self.suspendupdates = False # if True then do not notify listeners of updates
+        self.locale = qt4.QLocale()
+
         self.clearHistory()
         self.wipe()
 
