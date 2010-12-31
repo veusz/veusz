@@ -34,7 +34,7 @@ import numpy as N
 import veusz.qtall as qt4
 
 import controls
-from settingdb import settingdb
+from settingdb import settingdb, uilocale
 from reference import Reference
 
 import veusz.utils as utils
@@ -445,7 +445,6 @@ class Bool(Setting):
     def makeControl(self, *args):
         return controls.Bool(self, *args)
 
-
 # Storing integers
 class Int(Setting):
     """Integer settings."""
@@ -481,17 +480,17 @@ class Int(Setting):
         raise InvalidType
 
     def toText(self):
-        return str(self.val)
+        return unicode( uilocale.toString(self.val) )
 
     def fromText(self, text):
-        try:
-            i = int(text)
-            if i >= self.minval and i <= self.maxval:
-                return i
-            else:
-                raise InvalidType, 'Out of range allowed'
-        except ValueError:
-            raise InvalidType
+        i, ok = uilocale.toLongLong(text)
+        if not ok:
+            raise ValueError
+
+        if i >= self.minval and i <= self.maxval:
+            return i
+        else:
+            raise InvalidType, 'Out of range allowed'
 
     def makeControl(self, *args):
         return controls.Int(self, *args)
@@ -531,12 +530,11 @@ class Float(Setting):
         raise InvalidType
 
     def toText(self):
-        return str(self.val)
+        return unicode(uilocale.toString(self.val))
 
     def fromText(self, text):
-        try:
-            f = float(text)
-        except ValueError:
+        f, ok = uilocale.toDouble(text)
+        if not ok:
             # try to evaluate
             f = self.safeEvalHelper(text)
         return self.convertTo(f)
@@ -564,18 +562,20 @@ class FloatOrAuto(Setting):
             return val
 
     def toText(self):
-        if self.val is None:
+        if self.val is None or (isinstance(self.val, basestring) and
+                                self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return str(self.val)
+            return unicode(uilocale.toString(self.val))
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
-            try:
-                return float(text)
-            except ValueError:
+            f, ok = uilocale.toDouble(text)
+            if ok:
+                return f
+            else:
                 # try to evaluate
                 return self.safeEvalHelper(text)
 
@@ -602,19 +602,20 @@ class IntOrAuto(Setting):
             return val
 
     def toText(self):
-        if self.val is None:
+        if self.val is None or (isinstance(self.val, basestring) and
+                                self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return str(self.val)
+            return unicode( uilocale.toString(self.val) )
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
-            try:
-                return int(text)
-            except ValueError:
+            i, ok = uilocale.toLongLong(text)
+            if not ok:
                 raise InvalidType
+            return i
             
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
@@ -741,9 +742,13 @@ class Distance(Setting):
             raise InvalidType
 
     def toText(self):
-        return self.val
+        # convert decimal point to display locale
+        return self.val.replace('.', qt4.QString(uilocale.decimalPoint()))
 
     def fromText(self, text):
+        # convert decimal point from display locale
+        text = text.replace(qt4.QString(uilocale.decimalPoint()), '.')
+
         if self.isDist(text):
             return text
         else:
@@ -935,7 +940,7 @@ class FloatDict(Setting):
         keys = self.val.keys()
         keys.sort()
         
-        text = ['%s = %g' % (key, self.val[key]) for key in keys]
+        text = ['%s = %s' % (k, uilocale.toString(self.val[k])) for k in keys]
         return '\n'.join(text)
 
     def fromText(self, text):
@@ -954,9 +959,8 @@ class FloatDict(Setting):
             if len(p) != 2:
                 raise InvalidType
 
-            try:
-                v = float(p[1])
-            except ValueError:
+            v, ok = uilocale.toDouble(p[1])
+            if not ok:
                 raise InvalidType
 
             out[ p[0].strip() ] = v
@@ -969,8 +973,6 @@ class FloatList(Setting):
     """A list of float values."""
 
     typename = 'float-list'
-
-    list_re = re.compile(r'[\t\n, ]+')
 
     def convertTo(self, val):
         if type(val) not in (list, tuple):
@@ -987,17 +989,28 @@ class FloatList(Setting):
 
     def toText(self):
         """Make a string a, b, c."""
-        return ', '.join( [str(i) for i in self.val] )
+        # can't use the comma for splitting if used as a decimal point
+
+        join = ', '
+        if uilocale.decimalPoint() == qt4.QChar(','):
+            join = '; '
+        return join.join( [unicode(uilocale.toString(x)) for x in self.val] )
 
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
 
+        # don't use commas if it is the decimal separator
+        splitre = r'[\t\n, ]+'
+        if uilocale.decimalPoint() == qt4.QChar(','):
+            splitre = r'[\t\n; ]+'
+
         out = []
-        for x in self.list_re.split(text.strip()):
+        for x in re.split(splitre, text.strip()):
             if x:
-                try:
-                    out.append(float(x))
-                except ValueError:
+                f, ok = uilocale.toDouble(x)
+                if ok:
+                    out.append(f)
+                else:
                     out.append( self.safeEvalHelper(x) )
         return out
 
@@ -1194,10 +1207,6 @@ class DatasetOrFloatList(Dataset):
 
     typename = 'dataset-or-floatlist'
 
-    # a list of numbers separated by spaces or tabs
-    # (requires number at end of line)
-    numbers_re = re.compile(r'^([-+]?[0-9]*\.?[0-9]*([eE][-+]?[0-9]+)?[ \t,$]+)+$')
-
     def convertTo(self, val):
         """Check is a string (dataset name) or a list of floats (numbers).
 
@@ -1217,20 +1226,27 @@ class DatasetOrFloatList(Dataset):
         if isinstance(self.val, basestring):
             return self.val
         else:
-            return ', '.join( [str(x) for x in self.val] )
+            join = ', '
+            if uilocale.decimalPoint() == qt4.QChar(','):
+                join = '; '
+            return join.join( [ unicode(uilocale.toString(x))
+                                for x in self.val ] )
 
     def fromText(self, text):
-        text = text.strip()
-        try:
-            out = []
-            for x in FloatList.list_re.split(text):
-                try:
-                    out.append(float(x))
-                except ValueError:
-                    out.append( self.safeEvalHelper(x) )
-            return out
-        except InvalidType:
-            return text
+        splitre = r'[\t\n, ]+'
+        if uilocale.decimalPoint() == qt4.QChar(','):
+            splitre = r'[\t\n; ]+'
+
+        out = []
+        for x in re.split(splitre, text.strip()):
+            if x:
+                f, ok = uilocale.toDouble(x)
+                if ok:
+                    out.append(f)
+                else:
+                    # fail conversion, so exit with text
+                    return text
+        return out
 
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""

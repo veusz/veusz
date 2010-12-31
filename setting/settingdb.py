@@ -191,3 +191,6 @@ transient_settings = {}
 
 # write out settings at exit
 atexit.register(settingdb.writeSettings)
+
+# locale of UI
+uilocale = qt4.QLocale()

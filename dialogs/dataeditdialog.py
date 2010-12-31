@@ -147,7 +147,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         # update if conversion okay
         try:
-            val = ds.convertToDataItem( value.toString() )
+            val = ds.uiConvertToDataItem( value.toString() )
         except ValueError:
             return False
 

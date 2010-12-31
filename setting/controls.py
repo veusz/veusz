@@ -448,7 +448,7 @@ class Distance(Choice):
 
     # used to remove non-numerics from the string
     # we also remove X/ from X/num
-    stripnumre = re.compile(r"[0-9]*/|[^0-9.]")
+    stripnumre = re.compile(r"[0-9]*/|[^0-9.,]")
 
     # remove spaces
     stripspcre = re.compile(r"\s")

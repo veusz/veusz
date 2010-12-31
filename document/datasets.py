@@ -29,6 +29,7 @@ import simpleread
 import operations
 import readcsv
 
+import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
 import veusz.plugins as plugins
@@ -493,7 +494,7 @@ class DatasetBase(object):
         """Get description of database."""
         return ""
 
-    def convertToDataItem(self, val):
+    def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         return None
     
@@ -616,8 +617,12 @@ class Dataset2D(DatasetBase):
             text += ', linked to %s' % self.linked.filename
         return text
 
-    def convertToDataItem(self, val):
+    def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
+        if isinstance(val, basestring) or isinstance(val, qt4.QString):
+            val, ok = setting.uilocale.toDouble(val)
+            if ok: return val
+            raise ValueError, "Invalid floating point number"
         return float(val)
 
     def returnCopy(self):
@@ -775,8 +780,12 @@ class Dataset(DatasetBase):
 
         fileobj.write( "''')\n" )
 
-    def convertToDataItem(self, val):
+    def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
+        if isinstance(val, basestring) or isinstance(val, qt4.QString):
+            val, ok = setting.uilocale.toDouble(val)
+            if ok: return val
+            raise ValueError, "Invalid floating point number"
         return float(val)
 
     def deleteRows(self, row, numrows):
@@ -839,7 +848,7 @@ class DatasetText(DatasetBase):
 
         self.document.setModified(True)
     
-    def convertToDataItem(self, val):
+    def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         return unicode(val)
 
