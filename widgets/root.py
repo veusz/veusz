@@ -52,6 +52,8 @@ class Root(widget.Widget):
         if type(self) == Root:
             self.readDefaults()
 
+        s.get('englishlocale').setOnModified(self.changeLocale)
+
     @classmethod
     def addSettings(klass, s):
         widget.Widget.addSettings(s)
@@ -67,12 +69,25 @@ class Root(widget.Widget):
                                 descr='Height of the pages',
                                 usertext='Page height',
                                 formatting=True) )    
+        s.add( setting.Bool('englishlocale', False,
+                            descr='Use US/English number formatting for '
+                            'document',
+                            usertext='English locale',
+                            formatting=True) )
             
+    def changeLocale(self):
+        """Update locale of document if changed by user."""
+
+        if self.settings.englishlocale:
+            self.document.locale = qt4.QLocale.c()
+        else:
+            self.document.locale = qt4.QLocale()
+
     def getSize(self, painter):
         """Get dimensions of widget in painter coordinates."""
         return ( self.settings.get('width').convert(painter),
                  self.settings.get('height').convert(painter) )
-            
+
     def draw(self, painter, pagenum):
         """Draw the page requested on the painter."""
 
