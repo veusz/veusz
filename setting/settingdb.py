@@ -56,6 +56,9 @@ defaultValues = {
     # further ui options
     'toolbar_size': 24,
 
+    # if set to true, do UI formatting in US/English
+    'ui_english': False,
+
     # use cwd as starting directory
     'dirname_usecwd': False,
     }
@@ -192,5 +195,15 @@ transient_settings = {}
 # write out settings at exit
 atexit.register(settingdb.writeSettings)
 
-# locale of UI
-uilocale = qt4.QLocale()
+def updateUILocale():
+    """Update locale to one given in preferences."""
+    global uilocale
+
+    if settingdb['ui_english']:
+        uilocale = qt4.QLocale.c()
+    else:
+        uilocale = qt4.QLocale.system()
+
+    qt4.QLocale.setDefault(uilocale)
+
+updateUILocale()

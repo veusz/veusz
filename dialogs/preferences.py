@@ -37,6 +37,7 @@ class PreferencesDialog(VeuszDialog):
 
         # view settings
         self.antialiasCheck.setChecked( setdb['plot_antialias'] )
+        self.englishCheck.setChecked( setdb['ui_english'] )
         self.intervalCombo.addItem('Disabled')
         for intv in self.plotwindow.intervals[1:]:
             self.intervalCombo.addItem('%gs' % (intv * 0.001))
@@ -182,6 +183,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['plot_updateinterval'] = (
             self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
         setdb['plot_antialias'] = self.antialiasCheck.isChecked()
+        setdb['ui_english'] = self.englishCheck.isChecked()
 
         # use cwd
         setdb['dirname_usecwd'] = self.cwdCheck.isChecked()
