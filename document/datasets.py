@@ -360,11 +360,13 @@ class LinkedCSVFile(LinkedFileBase):
     def __init__(self, filename, readrows=False,
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
-                 headerignore=0,
+                 headerignore=0, blanksaredata=False,
                  prefix='', suffix=''):
         """Read CSV data from filename
 
         Read across rather than down if readrows
+        headerignore is number of lines to ignore after each header
+        blanksaredata treats blank cells as NaN values or empty strings
         Prepend prefix to dataset names if set.
         """
 
@@ -374,6 +376,7 @@ class LinkedCSVFile(LinkedFileBase):
         self.textdelimiter = textdelimiter
         self.encoding = encoding
         self.headerignore = headerignore
+        self.blanksaredata = blanksaredata
         self.prefix = prefix
         self.suffix = suffix
 
@@ -396,6 +399,8 @@ class LinkedCSVFile(LinkedFileBase):
             params.append('textdelimiter=' + repr(self.textdelimiter))
         if self.headerignore > 0:
             params.append('headerignore=' + repr(self.headerignore))
+        if self.blanksaredata:
+            params.append('blanksaredata=True')
 
         fileobj.write('ImportFileCSV(%s)\n' % (', '.join(params)))
         
@@ -411,6 +416,7 @@ class LinkedCSVFile(LinkedFileBase):
             textdelimiter=self.textdelimiter,
             encoding=self.encoding,
             headerignore=self.headerignore,
+            blanksaredata=self.blanksaredata,
             prefix=self.prefix, suffix=self.suffix )
         return self._reloadViaOperation(document, op)
 

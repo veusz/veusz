@@ -798,12 +798,14 @@ class OperationDataImportCSV(object):
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
                  prefix='', suffix='',
-                 headerignore=0,
+                 headerignore=0, blanksaredata=False,
                  linked=False):
         """Import CSV data from filename
 
         If readrows, then read in rows rather than columns.
         Prefix is appended to each dataset name.
+        headerignore is number of lines to ignore after each header
+        blanksaredata treats blank cells as NaN values or empty strings
         Data are linked to file if linked is True.
         """
 
@@ -815,6 +817,7 @@ class OperationDataImportCSV(object):
         self.prefix = prefix
         self.suffix = suffix
         self.headerignore = headerignore
+        self.blanksaredata = blanksaredata
         self.linked = linked
 
     def do(self, document):
@@ -825,6 +828,7 @@ class OperationDataImportCSV(object):
                                textdelimiter=self.textdelimiter,
                                encoding=self.encoding,
                                headerignore=self.headerignore,
+                               blanksaredata=self.blanksaredata,
                                prefix=self.prefix, suffix=self.suffix)
         csvr.readData()
 
@@ -834,6 +838,7 @@ class OperationDataImportCSV(object):
                                         textdelimiter=self.textdelimiter,
                                         encoding=self.encoding,
                                         headerignore=self.headerignore,
+                                        blanksaredata=self.blanksaredata,
                                         prefix=self.prefix, suffix=self.suffix)
         else:
             LF = None

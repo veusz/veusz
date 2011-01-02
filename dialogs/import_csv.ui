@@ -115,6 +115,13 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="1">
+      <widget class="HistoryCheck" name="csvblanksdatacheck">
+       <property name="text">
+        <string>Treat blanks as data values</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
@@ -129,6 +136,11 @@
    <class>HistorySpinBox</class>
    <extends>QSpinBox</extends>
    <header>historyspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistoryCheck</class>
+   <extends>QCheckBox</extends>
+   <header>historycheck.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

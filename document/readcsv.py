@@ -21,6 +21,7 @@
 """This module contains routines for importing CSV data files
 in an easy-to-use manner."""
 
+from collections import defaultdict
 import numpy as N
 
 import datasets
@@ -89,7 +90,7 @@ class ReadCSV(object):
     def __init__(self, filename, readrows=False, 
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
-                 headerignore=0,
+                 headerignore=0, blanksaredata=False,
                  prefix='', suffix=''):
         """Initialise the reader to import data from filename.
 
@@ -97,6 +98,7 @@ class ReadCSV(object):
         rows
 
         headerignore is number of lines to ignore after headers
+        if blanksaredata is true, treat blank entries as nans
 
         prefix is a prefix to prepend to the name of datasets from this file
         """
@@ -107,6 +109,7 @@ class ReadCSV(object):
         self.textdelimiter = textdelimiter
         self.encoding = encoding
         self.headerignore = headerignore
+        self.blanksaredata = blanksaredata
         self.prefix = prefix
         self.suffix = suffix
 
@@ -184,7 +187,7 @@ class ReadCSV(object):
         # type of names of columns
         self.nametypes = {}
         # ignore lines after headers
-        self.colignore = {}
+        self.colignore = defaultdict(lambda: int(self.headerignore))
 
         # iterate over each line (or column)
         while True:
@@ -218,10 +221,12 @@ class ReadCSV(object):
                         raise RuntimeError, "Invalid type in CSV reader"
 
                 except ValueError:
-                    # skip blanks
                     if col.strip() == '':
-                        continue
-                    if ( colnum in self.colnames and
+                        # skip blanks unless blanksaredata is set
+                        if self.blanksaredata and colnum < len(self.colnames):
+                            # assumes a numeric data type
+                            self.data[self.colnames[colnum]].append(N.nan)
+                    elif ( colnum in self.colnames and
                          len(self.data[self.colnames[colnum]]) == 0 ):
                         # if dataset is empty, convert to a string dataset
                         self._setNameAndType(colnum, self.colnames[colnum], 'string')

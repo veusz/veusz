@@ -174,6 +174,7 @@ class ImportTabCSV(ImportTab):
         self.csvtextdelimitercombo.setEditText('"')
         self.csvdirectioncombo.setCurrentIndex(0)
         self.csvignorehdrspin.setValue(0)
+        self.csvblanksdatacheck.setChecked(False)
 
     def slotHelp(self):
         """Asked for help."""
@@ -257,12 +258,14 @@ class ImportTabCSV(ImportTab):
             return
 
         headerignore = self.csvignorehdrspin.value()
+        blanksaredata = self.csvblanksdatacheck.isChecked()
         op = document.OperationDataImportCSV(filename, readrows=inrows,
                                              prefix=prefix, suffix=suffix,
                                              linked=linked,
                                              delimiter=delimiter,
                                              textdelimiter=textdelimiter,
                                              headerignore=headerignore,
+                                             blanksaredata=blanksaredata,
                                              encoding=encoding)
         
         # actually import the data
