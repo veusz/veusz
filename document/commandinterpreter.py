@@ -171,15 +171,16 @@ class CommandInterpreter(object):
     def Load(self, filename):
         """Replace the document with a new one from the filename."""
 
-        # FIXME: should update filename in main window
-        # This gives the document a __file__ variable so it
-        # knows what it is
         f = open(filename, 'rU')
         self.document.wipe()
         self.interface.To('/')
         oldfile = self.globals['__file__']
         self.globals['__file__'] = os.path.abspath(filename)
+
+        self.interface.importpath.append(
+            os.path.dirname(os.path.abspath(filename)))
         self.runFile(f)
+        self.interface.importpath.pop()
         self.globals['__file__'] = oldfile
         self.document.setModified()
         self.document.setModified(False)
