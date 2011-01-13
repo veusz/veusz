@@ -33,6 +33,58 @@ import veusz.utils as utils
 from function import FunctionPlotter
 import widget
 
+try:
+    import minuit
+except ImportError:
+    minuit = None
+
+def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
+    """Do fitting with minuit (if installed)."""
+
+    def chi2(params):
+        """generate a lambda function to impedance-match between PyMinuit's
+        use of multiple parameters versus our use of a single numpy vector."""
+        c = ((evalfunc(params, xvals) - yvals)**2 / yserr**2).sum()
+        if chi2.runningFit:
+            chi2.iters += 1
+            p = [chi2.iters, c] + params.tolist()
+            str = ("%5i " + "%8g " * (len(params)+1)) % tuple(p)
+            print str
+
+        return c
+
+    namestr = ', '.join(names)
+    fnstr = 'lambda %s: chi2(N.array([%s]))' % (namestr, namestr)
+
+    # this is safe because the only user-controlled variable is len(names)
+    fn = eval(fnstr, {'chi2' : chi2, 'N' : N})
+
+    print 'Fitting via Minuit:'
+    m = minuit.Minuit(fn, fix_x=True, **values)
+
+    # run the fit
+    chi2.runningFit = True
+    chi2.iters = 0
+    m.migrad()
+
+    # do some error analysis
+    chi2.runningFit = False
+    m.hesse()
+    m.minos()
+
+    # print the results
+    retchi2 = m.fval
+    dof = len(yvals) - len(params)
+    redchi2 = retchi2 / dof
+
+    print 'Fit results:\n', "\n".join([
+        u"    %s = %g \u00b1 %g (+%g / -%g)"
+            % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)], m.merrors[(n, -1.0)]) for n in names])
+    print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2)
+
+    vals = m.values
+    return vals, retchi2, dof
+
 class Fit(FunctionPlotter):
     """A plotter to fit a function to data."""
 
@@ -203,18 +255,25 @@ class Fit(FunctionPlotter):
             sys.stderr.write('No degrees of freedom for fit. Not fitting\n')
             return
 
-        # actually do the fit
-        retn, chi2, dof = utils.fitLM(self.evalfunc, params,
-                                      xvals,
-                                      yvals, yserr)
+        # actually do the fit, either via Minuit or our own LM fitter
+        chi2 = 1
+        dof = 1
+
+        if minuit is not None:
+            vals, chi2, dof = minuitFit(self.evalfunc, params, names, s.values, xvals, yvals, yserr)
+        else:
+            print 'Minuit not available, falling back to simple L-M fitting:'
+            retn, chi2, dof = utils.fitLM(self.evalfunc, params,
+                                          xvals,
+                                          yvals, yserr)
+            vals = {}
+            for i, v in zip(names, retn):
+                vals[i] = float(v)
 
         # list of operations do we can undo the changes
         operations = []
                                       
         # populate the return parameters
-        vals = {}
-        for i, v in zip(names, retn):
-            vals[i] = float(v)
         operations.append( document.OperationSettingSet(s.get('values'), vals) )
 
         # populate the read-only fit quality params
