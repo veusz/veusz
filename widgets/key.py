@@ -29,6 +29,8 @@ import widget
 import graph
 import controlgraph
 
+import math
+
 #############################################################################
 # classes for controlling key position interactively
 
@@ -197,6 +199,12 @@ class Key(widget.Widget):
                                 descr = 'Length of line to show in sample',
                                 usertext='Key length',
                                 formatting=True) )
+        
+        s.add( setting.AlignVert( 'keyAlign',
+                                  'top',
+                                  descr = 'Alignment of key symbols relative to text',
+                                  usertext = 'Key alignment',
+                                  formatting = True) )
 
         s.add( setting.Float( 'horzManual',
                               0.,
@@ -223,7 +231,94 @@ class Key(widget.Widget):
                             minval = 1,
                             maxval = 100,
                             formatting = True) )
-
+    
+    @staticmethod
+    def _layoutChunk(entries, start, dims):
+        """Layout the entries into the given box, starting at start"""
+        row, col = start
+        numrows, numcols = dims
+        colstats = [0] * numcols
+        layout = []
+        for (plotter, num, lines) in entries:
+            if row+lines > numrows:
+                # this item doesn't fit in this column, so move to the next
+                col += 1
+                row = 0
+            if col >= numcols:
+                # this layout failed, suggest expanding the box by 1 row
+                return ([], [], numrows+1)
+            if lines > numrows:
+                # this layout failed, suggest expanding the box to |lines|
+                return ([], [], lines)
+            
+            # col -> yp, row -> xp
+            layout.append( (plotter, num, col, row, lines) )
+            row += lines
+            colstats[col] += 1
+        
+        return (layout, colstats, numrows)
+    
+    def _layout(self, entries, totallines):
+        """Layout the items, trying to keep the box as small as possible
+        while still filling the columns"""
+        
+        maxcols = self.settings.columns
+        numcols = min(maxcols, max(len(entries), 1))
+        
+        if not entries:
+            return (list(), (0, 0))
+        
+        # start with evenly-sized rows and expand to fit
+        numrows = totallines / numcols
+        layout = []
+        
+        while not layout:
+            # try to do a first cut of the layout, and expand the box until
+            # everything fits
+            (layout, colstats, newrows) = self._layoutChunk(entries, (0, 0), (numrows, numcols))
+            if not layout:
+                numrows = newrows
+            
+        # ok, we've got a layout where everything fits, now pull items right
+        # to fill the remaining columns, if need be
+        while colstats[-1] == 0:
+            # shift 1 item to the right, up to the first column that has
+            # excess items
+            meanoccupation = max(1, sum(colstats)/float(numcols))
+            
+            # loop until we find a victim item which can be safely moved
+            victimcol = numcols
+            while True:
+                # find the right-most column with excess occupation number
+                for i in reversed(xrange(victimcol)):
+                    if colstats[i] > meanoccupation:
+                        victimcol = i
+                        break
+                
+                # find the last item in the victim column
+                victim = 0
+                for i in reversed(xrange(len(layout))):
+                    if layout[i][2] == victimcol:
+                        victim = i
+                        break
+                
+                # try to relayout with the victim item shoved to the next column
+                (newlayout, newcolstats, newrows) = self._layoutChunk(entries[victim:],
+                                                        (0, victimcol+1), (numrows, numcols))
+                if newlayout:
+                    # the relayout worked, so accept it
+                    layout = layout[0:victim] + newlayout
+                    colstats[victimcol] -= 1
+                    del colstats[victimcol+1:]
+                    colstats += newcolstats[victimcol+1:]
+                    break
+                
+                # if we've run out of potential victims, just return what we have
+                if victimcol == 0:
+                    return (layout, (numrows, numcols))
+        
+        return (layout, (numrows, numcols))
+    
     def draw(self, parentposn, painter, outerbounds = None):
         """Plot the key on a plotter."""
 
@@ -240,10 +335,10 @@ class Key(widget.Widget):
 
         showtext = not s.Text.hide
 
-        # keep track of widgets to place
-        keywidgets = []
         # maximum width of text required
         maxwidth = 1
+        # total number of layout lines required
+        totallines = 0
 
         entries = []
         # iterate over children and find widgets which are suitable
@@ -255,19 +350,19 @@ class Key(widget.Widget):
             if not c.settings.hide:
                 # add an entry for each key entry for each widget
                 for i in xrange(num):
-                    entries.append( (c, i) )
-
+                    lines = 1
                     if showtext:
                         w, h = utils.Renderer(painter, font, 0, 0,
                                               c.getKeyText(i)).getDimensions()
                         maxwidth = max(maxwidth, w)
+                        lines = max(1, math.ceil(float(h)/float(height)))
+                    
+                    totallines += lines
+                    entries.append( (c, i, lines) )
 
-        # get number of columns
-        count = len(entries)
-        numcols = min(s.columns, max(count, 1))
-        numrows = count / numcols
-        if count % numcols != 0:
-            numrows += 1
+
+        # layout the box
+        layout, (numrows, numcols) = self._layout(entries, totallines)
 
         # total size of box
         symbolwidth = s.get('keyLength').convert(painter)
@@ -321,14 +416,19 @@ class Key(widget.Widget):
         textpen = s.get('Text').makeQPen()
 
         # plot dataset entries
-        for index, (plotter, num) in enumerate(entries):
-            xp, yp = index / numrows, index % numrows
+        for (plotter, num, xp, yp, lines) in layout:
             xpos = x + xp*(maxwidth+2*height+symbolwidth)
             ypos = y + yp*height
 
             # plot key symbol
             painter.save()
-            plotter.drawKeySymbol(num, painter, xpos, ypos,
+            keyoffset = 0
+            if s.keyAlign == 'centre':
+                keyoffset = (lines-1)*height/2.0
+            elif s.keyAlign == 'bottom':
+                keyoffset = (lines-1)*height
+            
+            plotter.drawKeySymbol(num, painter, xpos, ypos+keyoffset,
                                   symbolwidth, height)
             painter.restore()
 
