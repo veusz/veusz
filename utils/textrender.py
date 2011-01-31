@@ -40,6 +40,7 @@ symbols = {
     r'\}': '}',
     r'\[': '[',
     r'\]': ']',
+    r'\backslash' : u'\u005c',
 
     # operators
     r'\pm': u'\u00b1',
@@ -208,6 +209,9 @@ class PartText(Part):
     """Fundamental bit of text to be rendered: some text."""
     def __init__(self, text):
         self.text = text
+    
+    def addText(self, text):
+        self.text += text
     
     def render(self, state):
         """Render some text."""
@@ -570,8 +574,7 @@ part_commands = {
 splitter_re = re.compile(r'''
 (
 \\[A-Za-z]+[ ]* |   # normal latex command
-\\\{ | \\\} |       # escaped {} brackets
-\\\[ | \\\] |       # escaped [] brackets
+\\[\[\]{}_^] |      # escaped special characters
 \\\\ |              # line end
 \{ |                # begin block
 \} |                # end block
@@ -595,14 +598,12 @@ def makePartList(text):
             # we may need to drop excess spaces after \foo commands
             ps = p.rstrip()
             if ps in symbols:
-                # convert to symbol if possible
-                text = symbols[ps]
+                # it will become a symbol, so preserve whitespace
+                doAdd(ps)
                 if ps != p:
-                    # add back spacing
-                    text += p[len(ps)-len(p):]
-                doAdd(text)
+                    doAdd(p[len(ps)-len(p):])
             else:
-                # add as possible command
+                # add as possible command, so drop excess whitespace
                 doAdd(ps)
         elif p == '{':
             # add a new level
@@ -621,6 +622,14 @@ def makePartTree(partlist):
     lines = []
     itemlist = []
     length = len(partlist)
+    
+    def addText(text):
+        """Try to merge consecutive text items for better rendering."""
+        if itemlist and isinstance(itemlist[-1], PartText):
+            itemlist[-1].addText(text)
+        else:
+            itemlist.append( PartText(text) )
+    
     i = 0
     while i < length:
         p = partlist[i]
@@ -628,9 +637,18 @@ def makePartTree(partlist):
             lines.append( Part(itemlist) )
             itemlist = []
         elif isinstance(p, basestring):
-            if p in part_commands:
+            if p in symbols:
+                addText(symbols[p])
+            elif p in part_commands:
                 klass, numargs = part_commands[p]
-                partargs = [makePartTree(k) for k in partlist[i+1:i+numargs+1]]
+                if numargs == 1 and len(partlist) > i+1 and isinstance(partlist[i+1], basestring):
+                    # coerce a single argument to a partlist so that things
+                    # like "A^\dagger" render correctly without needing
+                    # curly brackets
+                    partargs = [makePartTree([partlist[i+1]])]
+                else:
+                    partargs = [makePartTree(k) for k in partlist[i+1:i+numargs+1]]
+                
                 if (p == '^' or p == '_'):
                     if len(itemlist) > 0 and (
                         isinstance(itemlist[-1], PartSubScript) or
@@ -650,7 +668,7 @@ def makePartTree(partlist):
                     itemlist.append( klass(partargs) )
                 i += numargs
             else:
-                itemlist.append( PartText(p) )
+                addText(p)
         else:
             itemlist.append( makePartTree(p) )
         i += 1
