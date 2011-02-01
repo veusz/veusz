@@ -89,8 +89,8 @@
 <text x="0" y="0" font-size="14pt" fill="#000000">Valkyries</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.45" y="162.42" font-size="14pt" fill="#000000">?2</text>
-<text x="39.45" y="140.11" font-size="14pt" fill="#000000">?1</text>
+<text x="39.45" y="162.42" font-size="14pt" fill="#000000">−2</text>
+<text x="39.45" y="140.11" font-size="14pt" fill="#000000">−1</text>
 <text x="48.2" y="109.05" font-size="14pt" fill="#000000">0</text>
 <text x="48.2" y="77.99" font-size="14pt" fill="#000000">1</text>
 <text x="48.2" y="46.92" font-size="14pt" fill="#000000">2</text>
@@ -186,7 +186,7 @@
 <text x="0" y="0" font-size="14pt" fill="#000000">Swindon</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.45" y="317.72" font-size="14pt" fill="#000000">?1</text>
+<text x="39.45" y="317.72" font-size="14pt" fill="#000000">−1</text>
 <text x="48.2" y="274.7" font-size="14pt" fill="#000000">1</text>
 <text x="48.2" y="248.82" font-size="14pt" fill="#000000">2</text>
 <text x="48.2" y="222.94" font-size="14pt" fill="#000000">3</text>
@@ -285,8 +285,8 @@
 <text x="0" y="0" font-size="14pt" fill="#000000">Discworld</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.45" y="481.78" font-size="14pt" fill="#000000">?5</text>
-<text x="21.95" y="450.72" font-size="14pt" fill="#000000">?2.5</text>
+<text x="39.45" y="481.78" font-size="14pt" fill="#000000">−5</text>
+<text x="21.95" y="450.72" font-size="14pt" fill="#000000">−2.5</text>
 <text x="48.2" y="419.66" font-size="14pt" fill="#000000">0</text>
 <text x="30.7" y="388.59" font-size="14pt" fill="#000000">2.5</text>
 <text x="48.2" y="357.53" font-size="14pt" fill="#000000">5</text>

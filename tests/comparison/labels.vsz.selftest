@@ -47,11 +47,11 @@
 <text x="252.44" y="234.45" font-size="16pt" fill="#000000">test2</text>
 <text x="345.63" y="234.45" font-size="16pt" fill="#000000">A</text>
 <text x="355.63" y="226.45" font-size="10pt" fill="#000000">200</text>
-<text x="438.81" y="117.97" font-size="16pt" fill="#000000">?</text>
+<text x="438.81" y="117.97" font-size="16pt" fill="#000000">α</text>
 <text x="448.81" y="117.97" font-size="16pt" fill="#000000"> </text>
-<text x="458.81" y="117.97" font-size="16pt" fill="#000000">?</text>
-<text x="468.81" y="117.97" font-size="16pt" fill="#000000"> </text>
-<text x="478.81" y="117.97" font-size="16pt" fill="#000000">?</text>
+<text x="453.81" y="117.97" font-size="16pt" fill="#000000">β</text>
+<text x="463.81" y="117.97" font-size="16pt" fill="#000000"> </text>
+<text x="468.81" y="117.97" font-size="16pt" fill="#000000">γ</text>
 </g>
 </g>
 <g clip-path="url(#c0)">

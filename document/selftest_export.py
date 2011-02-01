@@ -40,13 +40,15 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
         """
         self.doStateUpdate()
         self.fileobj.write(
-            '<text x="%s" y="%s" font-size="%gpt" fill="%s">%s</text>\n' % (
+            '<text x="%s" y="%s" font-size="%gpt" fill="%s">' % (
                 svg_export.fltStr(pt.x()),
                 svg_export.fltStr(pt.y()),
                 textitem.font().pointSize(),
-                self.pen.color().name(),
-                textitem.text().toLatin1())
+                self.pen.color().name()
+                )
             )
+        self.fileobj.write( textitem.text().toUtf8() )
+        self.fileobj.write('</text>\n')
 
 class SelfTestPaintDevice(svg_export.SVGPaintDevice):
      """Paint device for SVG paint engine."""

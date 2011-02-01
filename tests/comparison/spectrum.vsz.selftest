@@ -196,7 +196,7 @@
 <text x="178.5" y="0" font-size="14pt" fill="#000000"> s</text>
 <text x="196" y="-7" font-size="8pt" fill="#000000">-1</text>
 <text x="206.5" y="0" font-size="14pt" fill="#000000"> </text>
-<text x="215.25" y="0" font-size="14pt" fill="#000000">?</text>
+<text x="211.5" y="0" font-size="14pt" fill="#000000">Å</text>
 <text x="224" y="-7" font-size="8pt" fill="#000000">-1</text>
 <text x="234.5" y="0" font-size="14pt" fill="#000000">)</text>
 </g>
@@ -316,8 +316,8 @@
 </g>
 <g stroke-width="1" fill="none">
 <text x="404.66" y="526.15" font-size="14pt" fill="#000000">Wavelength (</text>
-<text x="509.66" y="526.15" font-size="14pt" fill="#000000">?</text>
-<text x="518.41" y="526.15" font-size="14pt" fill="#000000">)</text>
+<text x="509.66" y="526.15" font-size="14pt" fill="#000000">Å</text>
+<text x="522.66" y="526.15" font-size="14pt" fill="#000000">)</text>
 <text x="56.08" y="517.4" font-size="14pt" fill="#000000">6</text>
 <text x="96.63" y="517.4" font-size="14pt" fill="#000000">7</text>
 <text x="137.17" y="517.4" font-size="14pt" fill="#000000">8</text>

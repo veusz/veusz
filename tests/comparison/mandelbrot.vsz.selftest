@@ -63,8 +63,8 @@
 <path d="M87.87,7.11l0,7.5M224.9,7.11l0,7.5M361.94,7.11l0,7.5M498.97,7.11l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="79.11" y="478.28" font-size="14pt" fill="#000000">?2</text>
-<text x="216.14" y="478.28" font-size="14pt" fill="#000000">?1</text>
+<text x="79.11" y="478.28" font-size="14pt" fill="#000000">−2</text>
+<text x="216.14" y="478.28" font-size="14pt" fill="#000000">−1</text>
 <text x="357.55" y="478.28" font-size="14pt" fill="#000000">0</text>
 <text x="494.59" y="478.28" font-size="14pt" fill="#000000">1</text>
 </g>

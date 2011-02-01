@@ -85,9 +85,9 @@
 <path d="M257.85,232.96l-7.5,0M257.85,196.5l-7.5,0M257.85,160.05l-7.5,0M257.85,123.59l-7.5,0M257.85,87.14l-7.5,0M257.85,50.68l-7.5,0M257.85,14.23l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="0.61" y="241.71" font-size="14pt" fill="#000000">?1.5</text>
-<text x="18.11" y="205.25" font-size="14pt" fill="#000000">?1</text>
-<text x="0.61" y="168.8" font-size="14pt" fill="#000000">?0.5</text>
+<text x="0.61" y="241.71" font-size="14pt" fill="#000000">−1.5</text>
+<text x="18.11" y="205.25" font-size="14pt" fill="#000000">−1</text>
+<text x="0.61" y="168.8" font-size="14pt" fill="#000000">−0.5</text>
 <text x="26.86" y="132.34" font-size="14pt" fill="#000000">0</text>
 <text x="9.36" y="95.89" font-size="14pt" fill="#000000">0.5</text>
 <text x="26.86" y="59.43" font-size="14pt" fill="#000000">1</text>
@@ -173,8 +173,8 @@
 <path d="M519.26,232.96l-7.5,0M519.26,178.27l-7.5,0M519.26,123.59l-7.5,0M519.26,68.91l-7.5,0M519.26,14.23l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="279.53" y="241.71" font-size="14pt" fill="#000000">?1</text>
-<text x="262.03" y="187.02" font-size="14pt" fill="#000000">?0.5</text>
+<text x="279.53" y="241.71" font-size="14pt" fill="#000000">−1</text>
+<text x="262.03" y="187.02" font-size="14pt" fill="#000000">−0.5</text>
 <text x="288.28" y="132.34" font-size="14pt" fill="#000000">0</text>
 <text x="270.78" y="77.66" font-size="14pt" fill="#000000">0.5</text>
 <text x="288.28" y="22.98" font-size="14pt" fill="#000000">1</text>
@@ -239,8 +239,8 @@
 <path d="M257.85,484.59l-7.5,0M257.85,434.84l-7.5,0M257.85,385.09l-7.5,0M257.85,335.34l-7.5,0M257.85,285.59l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="18.11" y="493.34" font-size="14pt" fill="#000000">?1</text>
-<text x="0.61" y="443.59" font-size="14pt" fill="#000000">?0.5</text>
+<text x="18.11" y="493.34" font-size="14pt" fill="#000000">−1</text>
+<text x="0.61" y="443.59" font-size="14pt" fill="#000000">−0.5</text>
 <text x="26.86" y="393.84" font-size="14pt" fill="#000000">0</text>
 <text x="9.36" y="344.09" font-size="14pt" fill="#000000">0.5</text>
 <text x="26.86" y="294.34" font-size="14pt" fill="#000000">1</text>
@@ -328,8 +328,8 @@
 <path d="M300.53,275.64l0,7.5M355.21,275.64l0,7.5M409.9,275.64l0,7.5M464.58,275.64l0,7.5M519.26,275.64l0,7.5"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="291.78" y="499.62" font-size="14pt" fill="#000000">?1</text>
-<text x="337.7" y="499.62" font-size="14pt" fill="#000000">?0.5</text>
+<text x="291.78" y="499.62" font-size="14pt" fill="#000000">−1</text>
+<text x="337.7" y="499.62" font-size="14pt" fill="#000000">−0.5</text>
 <text x="405.52" y="499.62" font-size="14pt" fill="#000000">0</text>
 <text x="451.45" y="499.62" font-size="14pt" fill="#000000">0.5</text>
 <text x="514.88" y="499.62" font-size="14pt" fill="#000000">1</text>
