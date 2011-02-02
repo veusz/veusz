@@ -40,6 +40,18 @@ class StupidFontMetrics(object):
     def boundingRect(self, c):
         return qt4.QRectF(0, 0, self.height()*0.5, self.height())
 
+class AsciiRenderer(veusz.utils.textrender.Renderer):
+    """Text renderer which replaces text with text with only ascii.
+    Mac OS likes to split up writing characters otherwise
+    """
+
+    def __init__(self, *args, **argsv):
+        # replace text with utf8 encoded version
+        newargs = list(args)
+        # replace text with unicode encoded
+        newargs[4] = unicode(args[4]).encode('ascii', 'xmlcharrefreplace')
+        veusz.utils.textrender.Renderer.__init__(self, *newargs, **argsv)
+
 def renderTest(invsz, outfile):
     """Render vsz document to create outfile."""
 
@@ -66,7 +78,8 @@ def renderAllTests():
     for vsz in glob.glob( os.path.join(exampledir, '*.vsz') ):
         base = os.path.basename(vsz)
         if base in excluded_tests:
-            continue
+            pass
+            #continue
         print base
 
         outfile = os.path.join(thisdir, 'comparison', base + '.selftest')
@@ -114,8 +127,10 @@ if __name__ == '__main__':
     veusz.setting.transient_settings['unsafe_mode'] = True
 
     # hack metrics object to always return same metrics
+    # and replace text renderer with one that encodes unicode symbols
     veusz.utils.textrender.FontMetrics = StupidFontMetrics
     veusz.utils.FontMetrics = StupidFontMetrics
+    veusz.utils.Renderer = AsciiRenderer
 
     # nasty hack to remove underlining
     del veusz.utils.textrender.part_commands[r'\underline']

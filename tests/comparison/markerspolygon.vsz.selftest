@@ -7,639 +7,639 @@
 <desc>Veusz output document</desc>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" fill="#ffffff">
+<g stroke-width="0.62" fill="#ffffff">
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="278.86,68.96 275.94,34.74"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(278.86, 68.96)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(278.86, 68.96)" fill="#800080">
 <path d="m0,-6.25l0,6.25l6.25,0l0,-6.25l6.25,6.25l-6.25,6.25l0,-6.25l-6.25,0l0,6.25l0,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(275.94, 34.74)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(275.94, 34.74)" fill="#800080">
 <path d="m0,-6.25l0,6.25l6.25,0l0,-6.25l6.25,6.25l-6.25,6.25l0,-6.25l-6.25,0l0,6.25l0,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="265.77,78.83 260.24,46.58"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(265.77, 78.83)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(265.77, 78.83)" fill="#90ee90">
 <path d="m0,-6.25l0,6.25l-6.25,0l0,-6.25l-6.25,6.25l6.25,6.25l0,-6.25l6.25,0l0,6.25l0,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(260.24, 46.58)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(260.24, 46.58)" fill="#90ee90">
 <path d="m0,-6.25l0,6.25l-6.25,0l0,-6.25l-6.25,6.25l6.25,6.25l0,-6.25l6.25,0l0,6.25l0,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="251.7,79.85 243.36,47.8"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(251.7, 79.85)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(251.7, 79.85)" fill="#00ffff">
 <path d="m-6.25,0l6.25,0l0,6.25l-6.25,0l6.25,6.25l6.25,-6.25l-6.25,0l0,-6.25l6.25,0l-12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(243.36, 47.8)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(243.36, 47.8)" fill="#00ffff">
 <path d="m-6.25,0l6.25,0l0,6.25l-6.25,0l6.25,6.25l6.25,-6.25l-6.25,0l0,-6.25l6.25,0l-12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="234.53,73.4 222.75,40.06"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(234.53, 73.4)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(234.53, 73.4)" fill="#0000ff">
 <path d="m-6.25,0l6.25,0l0,-6.25l-6.25,0l6.25,-6.25l6.25,6.25l-6.25,0l0,6.25l6.25,0l-12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(222.75, 40.06)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(222.75, 40.06)" fill="#0000ff">
 <path d="m-6.25,0l6.25,0l0,-6.25l-6.25,0l6.25,-6.25l6.25,6.25l-6.25,0l0,6.25l6.25,0l-12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="214.24,64.9 198.4,29.87"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(214.24, 64.9)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(214.24, 64.9)" fill="none">
 <path d="m6.25,-6.25l6.25,6.25l-6.25,6.25m6.25,-6.25l-12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(198.4, 29.87)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(198.4, 29.87)" fill="none">
 <path d="m6.25,-6.25l6.25,6.25l-6.25,6.25m6.25,-6.25l-12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="193.4,61.02 173.39,25.21"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(193.4, 61.02)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(193.4, 61.02)" fill="none">
 <path d="m-6.25,-6.25l-6.25,6.25l6.25,6.25m-6.25,-6.25l12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(173.39, 25.21)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(173.39, 25.21)" fill="none">
 <path d="m-6.25,-6.25l-6.25,6.25l6.25,6.25m-6.25,-6.25l12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="176.03,66.38 152.55,31.64"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(176.03, 66.38)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(176.03, 66.38)" fill="none">
 <path d="m-6.25,6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5m-6.25,-12.5l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(152.55, 31.64)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(152.55, 31.64)" fill="none">
 <path d="m-6.25,6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5m-6.25,-12.5l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="165.35,81.47 139.74,49.74"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(165.35, 81.47)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(165.35, 81.47)" fill="none">
 <path d="m-6.25,-6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5m-6.25,12.5l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(139.74, 49.74)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(139.74, 49.74)" fill="none">
 <path d="m-6.25,-6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5m-6.25,12.5l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="161.74,102.68 135.41,75.2"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(161.74, 102.68)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(161.74, 102.68)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l-6.25,6.25m-6.25,-6.25l12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(135.41, 75.2)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(135.41, 75.2)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l-6.25,6.25m-6.25,-6.25l12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="162.05,124.45 135.77,101.32"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(162.05, 124.45)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(162.05, 124.45)" fill="none">
 <path d="m6.25,-6.25l-6.25,6.25l6.25,6.25m6.25,-6.25l-12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(135.77, 101.32)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(135.77, 101.32)" fill="none">
 <path d="m6.25,-6.25l-6.25,6.25l6.25,6.25m6.25,-6.25l-12.5,0m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="160.96,142.1 134.47,122.51"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(160.96, 142.1)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(160.96, 142.1)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5m-6.25,0l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(134.47, 122.51)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(134.47, 122.51)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5m-6.25,0l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="153.69,154.04 125.75,136.83"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(153.69, 154.04)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(153.69, 154.04)" fill="none">
 <path d="m-6.25,6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5m-6.25,0l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(125.75, 136.83)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(125.75, 136.83)" fill="none">
 <path d="m-6.25,6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5m-6.25,0l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="138.66,162.04 107.7,146.43"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(138.66, 162.04)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(138.66, 162.04)" fill="none">
 <path d="m-6.25,6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(107.7, 146.43)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(107.7, 146.43)" fill="none">
 <path d="m-6.25,6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="118.66,169.85 83.71,155.8"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(118.66, 169.85)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(118.66, 169.85)" fill="none">
 <path d="m-6.25,-6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(83.71, 155.8)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(83.71, 155.8)" fill="none">
 <path d="m-6.25,-6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="99.81,180.78 61.09,168.92"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(99.81, 180.78)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(99.81, 180.78)" fill="none">
 <path d="m6.25,-6.25l6.25,6.25l-6.25,6.25m6.25,-6.25l-12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(61.09, 168.92)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(61.09, 168.92)" fill="none">
 <path d="m6.25,-6.25l6.25,6.25l-6.25,6.25m6.25,-6.25l-12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="88.65,195.94 59.84,189.73"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(88.65, 195.94)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(88.65, 195.94)" fill="none">
 <path d="m-6.25,-6.25l-6.25,6.25l6.25,6.25m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="88.89,213.88 59.84,210.16"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(88.89, 213.88)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(88.89, 213.88)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="99.47,231.83 60.68,230.18"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(99.47, 231.83)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(99.47, 231.83)" fill="none">
 <path d="m-6.25,6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(60.68, 230.18)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(60.68, 230.18)" fill="none">
 <path d="m-6.25,6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="114.98,247.65 79.29,249.17"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(114.98, 247.65)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(114.98, 247.65)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l-6.25,6.25m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(79.29, 249.17)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(79.29, 249.17)" fill="none">
 <path d="m-6.25,-6.25l6.25,6.25l-6.25,6.25m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="128.24,261.22 95.2,265.45"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(128.24, 261.22)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(128.24, 261.22)" fill="none">
 <path d="m6.25,-6.25l-6.25,6.25l6.25,6.25m6.25,-6.25l-12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(95.2, 265.45)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(95.2, 265.45)" fill="none">
 <path d="m6.25,-6.25l-6.25,6.25l6.25,6.25m6.25,-6.25l-12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="133.82,274.47 101.91,281.34"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(133.82, 274.47)" fill="none">
-<path d="m-6.25,0l3.13,0m9.38,0l-3.13,0"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(133.82, 274.47)" fill="none">
+<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(101.91, 281.34)" fill="none">
-<path d="m-6.25,0l3.13,0m9.38,0l-3.13,0"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(101.91, 281.34)" fill="none">
+<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="130.64,289.92 98.08,299.89"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(130.64, 289.92)" fill="none">
-<path d="m0,-6.25l0,3.13m0,9.38l0,-3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(130.64, 289.92)" fill="none">
+<path d="m0,-6.25l0,3.12m0,9.38l0,-3.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(98.08, 299.89)" fill="none">
-<path d="m0,-6.25l0,3.13m0,9.38l0,-3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(98.08, 299.89)" fill="none">
+<path d="m0,-6.25l0,3.12m0,9.38l0,-3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="122.33,308.82 88.11,322.57"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(122.33, 308.82)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(122.33, 308.82)" fill="none">
 <path d="m-6.25,0l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(88.11, 322.57)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(88.11, 322.57)" fill="none">
 <path d="m-6.25,0l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="115.36,329.85 79.75,347.8"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(115.36, 329.85)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(115.36, 329.85)" fill="none">
 <path d="m0,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(79.75, 347.8)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(79.75, 347.8)" fill="none">
 <path d="m0,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="115.76,349.46 80.22,371.34"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(115.76, 349.46)" fill="none">
-<path d="m-6.25,0l3.13,0m9.38,0l-3.13,0m-3.13,-6.25l0,3.13m0,9.38l0,-3.13m-4.42,-7.54l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(115.76, 349.46)" fill="none">
+<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0m-3.12,-6.25l0,3.12m0,9.38l0,-3.12m-4.42,-7.54l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(80.22, 371.34)" fill="none">
-<path d="m-6.25,0l3.13,0m9.38,0l-3.13,0m-3.13,-6.25l0,3.13m0,9.38l0,-3.13m-4.42,-7.54l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(80.22, 371.34)" fill="none">
+<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0m-3.12,-6.25l0,3.12m0,9.38l0,-3.12m-4.42,-7.54l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="126.2,363.74 92.76,388.48"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(126.2, 363.74)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(126.2, 363.74)" fill="none">
 <path d="m-4.42,-4.42l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(92.76, 388.48)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(92.76, 388.48)" fill="none">
 <path d="m-4.42,-4.42l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="144.99,370.7 115.31,396.83"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(144.99, 370.7)" fill="none">
-<path d="m-6.25,0l3.13,0m9.38,0l-3.13,0m-3.13,-6.25l0,3.13m0,9.38l0,-3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(144.99, 370.7)" fill="none">
+<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0m-3.12,-6.25l0,3.12m0,9.38l0,-3.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(115.31, 396.83)" fill="none">
-<path d="m-6.25,0l3.13,0m9.38,0l-3.13,0m-3.13,-6.25l0,3.13m0,9.38l0,-3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(115.31, 396.83)" fill="none">
+<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0m-3.12,-6.25l0,3.12m0,9.38l0,-3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="167.19,371.78 141.94,398.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(167.19, 371.78)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(167.19, 371.78)" fill="none">
 <path d="m-4.42,-4.42l8.84,8.84m-8.84,0l8.84,-8.84"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(141.94, 398.12)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(141.94, 398.12)" fill="none">
 <path d="m-4.42,-4.42l8.84,8.84m-8.84,0l8.84,-8.84"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="187.33,371.46 166.11,397.74"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(187.33, 371.46)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(187.33, 371.46)" fill="none">
 <path d="m-6.25,0l12.5,0m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(166.11, 397.74)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(166.11, 397.74)" fill="none">
 <path d="m-6.25,0l12.5,0m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="202.09,375.19 183.83,402.22"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(202.09, 375.19)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(202.09, 375.19)" fill="none">
 <path d="m-4.42,-4.42l8.84,8.84m-8.84,0l8.84,-8.84m-10.67,4.42l12.5,0m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(183.83, 402.22)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(183.83, 402.22)" fill="none">
 <path d="m-4.42,-4.42l8.84,8.84m-8.84,0l8.84,-8.84m-10.67,4.42l12.5,0m-6.25,-6.25l0,12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="211.66,386.42 195.31,415.69"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(211.66, 386.42)" fill="#800080">
-<path d="m3.13,-3.13c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13m0,6.25c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(211.66, 386.42)" fill="#800080">
+<path d="m3.12,-3.12c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12m0,6.25c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(195.31, 415.69)" fill="#800080">
-<path d="m3.13,-3.13c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13m0,6.25c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(195.31, 415.69)" fill="#800080">
+<path d="m3.12,-3.12c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12m0,6.25c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="219.07,404.54 204.2,437.44"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(219.07, 404.54)" fill="#90ee90">
-<path d="m0,0c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13m6.25,0c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(219.07, 404.54)" fill="#90ee90">
+<path d="m0,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12m6.25,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(204.2, 437.44)" fill="#90ee90">
-<path d="m0,0c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13m6.25,0c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(204.2, 437.44)" fill="#90ee90">
+<path d="m0,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12m6.25,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="228.14,424.84 215.08,461.79"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(228.14, 424.84)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(228.14, 424.84)" fill="#00ffff">
 <path d="m0,7.5l-1.69,-5.18l-5.45,0l4.41,-3.2l-1.69,-5.18l4.41,3.2l4.41,-3.2l-1.69,5.18l4.41,3.2l-5.45,0l-1.69,5.18"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(215.08, 461.79)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(215.08, 461.79)" fill="#00ffff">
 <path d="m0,7.5l-1.69,-5.18l-5.45,0l4.41,-3.2l-1.69,-5.18l4.41,3.2l4.41,-3.2l-1.69,5.18l4.41,3.2l-5.45,0l-1.69,5.18"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="241.22,440.55 232.6,473.65"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(241.22, 440.55)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(241.22, 440.55)" fill="#0000ff">
 <path d="m0,6.25l-1.19,-3.36l-3.23,1.53l1.53,-3.23l-3.36,-1.19l3.36,-1.19l-1.53,-3.23l3.23,1.53l1.19,-3.36l1.19,3.36l3.23,-1.53l-1.53,3.23l3.36,1.19l-3.36,1.19l1.53,3.23l-3.23,-1.53l-1.19,3.36"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="258.07,446.2 253.37,473.65"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(258.07, 446.2)" fill="#ffc0cb">
-<path d="m0,6.25l-1.56,-3.54l-3.85,0.42l2.29,-3.13l-2.29,-3.13l3.85,0.42l1.56,-3.54l1.56,3.54l3.85,-0.42l-2.29,3.13l2.29,3.13l-3.85,-0.42l-1.56,3.54"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(258.07, 446.2)" fill="#ffc0cb">
+<path d="m0,6.25l-1.56,-3.54l-3.85,0.42l2.29,-3.12l-2.29,-3.12l3.85,0.42l1.56,-3.54l1.56,3.54l3.85,-0.42l-2.29,3.12l2.29,3.12l-3.85,-0.42l-1.56,3.54"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="276.37,440.35 273.54,473.65"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(276.37, 440.35)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(276.37, 440.35)" fill="#800080">
 <path d="m0,6.25l-2.21,-4.04l-4.04,-2.21l4.04,-2.21l2.21,-4.04l2.21,4.04l4.04,2.21l-4.04,2.21l-2.21,4.04"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="293.42,426.44 293.42,463.71"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(293.42, 426.44)" fill="#90ee90">
-<path d="m0,-6.25l1.08,5.63l4.33,3.75l-5.41,-1.88l-5.41,1.88l4.33,-3.75l1.08,-5.63"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(293.42, 426.44)" fill="#90ee90">
+<path d="m0,-6.25l1.08,5.62l4.33,3.75l-5.41,-1.88l-5.41,1.88l4.33,-3.75l1.08,-5.62"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(293.42, 463.71)" fill="#90ee90">
-<path d="m0,-6.25l1.08,5.63l4.33,3.75l-5.41,-1.88l-5.41,1.88l4.33,-3.75l1.08,-5.63"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(293.42, 463.71)" fill="#90ee90">
+<path d="m0,-6.25l1.08,5.62l4.33,3.75l-5.41,-1.88l-5.41,1.88l4.33,-3.75l1.08,-5.62"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="307.98,411.18 310.9,445.4"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(307.98, 411.18)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(307.98, 411.18)" fill="#00ffff">
 <path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m0,0l12.5,12.5m-12.5,0l12.5,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(310.9, 445.4)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(310.9, 445.4)" fill="#00ffff">
 <path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m0,0l12.5,12.5m-12.5,0l12.5,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="321.07,401.31 326.6,433.56"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(321.07, 401.31)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(321.07, 401.31)" fill="#0000ff">
 <path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m6.25,0l0,12.5m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(326.6, 433.56)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(326.6, 433.56)" fill="#0000ff">
 <path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m6.25,0l0,12.5m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="335.14,400.29 343.48,432.34"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(335.14, 400.29)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(335.14, 400.29)" fill="#ffc0cb">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-10.67,-4.42l8.84,8.84m-8.84,0l8.84,-8.84"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(343.48, 432.34)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(343.48, 432.34)" fill="#ffc0cb">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-10.67,-4.42l8.84,8.84m-8.84,0l8.84,-8.84"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="352.31,406.74 364.09,440.08"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(352.31, 406.74)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(352.31, 406.74)" fill="#800080">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-6.25,-6.25l0,12.5m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(364.09, 440.08)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(364.09, 440.08)" fill="#800080">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-6.25,-6.25l0,12.5m-6.25,-6.25l12.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="372.6,415.24 388.44,450.27"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(372.6, 415.24)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(372.6, 415.24)" fill="#90ee90">
 <path d="m-3.54,5.31l3.54,-3.54l3.54,3.54l1.77,-1.77l-3.54,-3.54l3.54,-3.54l-1.77,-1.77l-3.54,3.54l-3.54,-3.54l-1.77,1.77l3.54,3.54l-3.54,3.54l1.77,1.77"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(388.44, 450.27)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(388.44, 450.27)" fill="#90ee90">
 <path d="m-3.54,5.31l3.54,-3.54l3.54,3.54l1.77,-1.77l-3.54,-3.54l3.54,-3.54l-1.77,-1.77l-3.54,3.54l-3.54,-3.54l-1.77,1.77l3.54,3.54l-3.54,3.54l1.77,1.77"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="393.44,419.12 413.45,454.93"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(393.44, 419.12)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(393.44, 419.12)" fill="#00ffff">
 <path d="m1.25,6.25l0,-5l5,0l0,-2.5l-5,0l0,-5l-2.5,0l0,5l-5,0l0,2.5l5,0l0,5l2.5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(413.45, 454.93)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(413.45, 454.93)" fill="#00ffff">
 <path d="m1.25,6.25l0,-5l5,0l0,-2.5l-5,0l0,-5l-2.5,0l0,5l-5,0l0,2.5l5,0l0,5l2.5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="410.81,413.76 434.29,448.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(410.81, 413.76)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(410.81, 413.76)" fill="#0000ff">
 <path d="m0,8.84l4.42,-8.84l-4.42,-8.84l-4.42,8.84l4.42,8.84"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(434.29, 448.5)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(434.29, 448.5)" fill="#0000ff">
 <path d="m0,8.84l4.42,-8.84l-4.42,-8.84l-4.42,8.84l4.42,8.84"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="421.48,398.68 447.1,430.4"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(421.48, 398.68)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(421.48, 398.68)" fill="#ffc0cb">
 <path d="m0,4.42l8.84,-4.42l-8.84,-4.42l-8.84,4.42l8.84,4.42"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(447.1, 430.4)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(447.1, 430.4)" fill="#ffc0cb">
 <path d="m0,4.42l8.84,-4.42l-8.84,-4.42l-8.84,4.42l8.84,4.42"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="425.1,377.46 451.43,404.94"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(425.1, 377.46)" fill="#800080">
-<path d="m3.13,0c0,3.45,-1.4,6.25,-3.13,6.25c-1.73,0,-3.13,-2.8,-3.13,-6.25c0,-3.45,1.4,-6.25,3.13,-6.25c1.73,0,3.13,2.8,3.13,6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(425.1, 377.46)" fill="#800080">
+<path d="m3.12,0c0,3.45,-1.4,6.25,-3.12,6.25c-1.73,0,-3.12,-2.8,-3.12,-6.25c0,-3.45,1.4,-6.25,3.12,-6.25c1.73,0,3.12,2.8,3.12,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(451.43, 404.94)" fill="#800080">
-<path d="m3.13,0c0,3.45,-1.4,6.25,-3.13,6.25c-1.73,0,-3.13,-2.8,-3.13,-6.25c0,-3.45,1.4,-6.25,3.13,-6.25c1.73,0,3.13,2.8,3.13,6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(451.43, 404.94)" fill="#800080">
+<path d="m3.12,0c0,3.45,-1.4,6.25,-3.12,6.25c-1.73,0,-3.12,-2.8,-3.12,-6.25c0,-3.45,1.4,-6.25,3.12,-6.25c1.73,0,3.12,2.8,3.12,6.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="424.79,355.69 451.06,378.82"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(424.79, 355.69)" fill="#90ee90">
-<path d="m6.25,0c0,1.73,-2.8,3.13,-6.25,3.13c-3.45,0,-6.25,-1.4,-6.25,-3.13c0,-1.73,2.8,-3.13,6.25,-3.13c3.45,0,6.25,1.4,6.25,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(424.79, 355.69)" fill="#90ee90">
+<path d="m6.25,0c0,1.73,-2.8,3.12,-6.25,3.12c-3.45,0,-6.25,-1.4,-6.25,-3.12c0,-1.73,2.8,-3.12,6.25,-3.12c3.45,0,6.25,1.4,6.25,3.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(451.06, 378.82)" fill="#90ee90">
-<path d="m6.25,0c0,1.73,-2.8,3.13,-6.25,3.13c-3.45,0,-6.25,-1.4,-6.25,-3.13c0,-1.73,2.8,-3.13,6.25,-3.13c3.45,0,6.25,1.4,6.25,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(451.06, 378.82)" fill="#90ee90">
+<path d="m6.25,0c0,1.73,-2.8,3.12,-6.25,3.12c-3.45,0,-6.25,-1.4,-6.25,-3.12c0,-1.73,2.8,-3.12,6.25,-3.12c3.45,0,6.25,1.4,6.25,3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="425.88,338.04 452.37,357.63"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(425.88, 338.04)" fill="#00ffff">
-<path d="m-6.25,6.25l6.25,-3.13l6.25,3.13l-3.13,-6.25l3.13,-6.25l-6.25,3.13l-6.25,-3.13l3.13,6.25l-3.13,6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(425.88, 338.04)" fill="#00ffff">
+<path d="m-6.25,6.25l6.25,-3.12l6.25,3.12l-3.12,-6.25l3.12,-6.25l-6.25,3.12l-6.25,-3.12l3.12,6.25l-3.12,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(452.37, 357.63)" fill="#00ffff">
-<path d="m-6.25,6.25l6.25,-3.13l6.25,3.13l-3.13,-6.25l3.13,-6.25l-6.25,3.13l-6.25,-3.13l3.13,6.25l-3.13,6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(452.37, 357.63)" fill="#00ffff">
+<path d="m-6.25,6.25l6.25,-3.12l6.25,3.12l-3.12,-6.25l3.12,-6.25l-6.25,3.12l-6.25,-3.12l3.12,6.25l-3.12,6.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="433.15,326.1 461.09,343.31"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(433.15, 326.1)" fill="#0000ff">
-<path d="m-6.25,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13l6.25,0c1.73,0,3.13,1.4,3.13,3.13l0,6.25c0,1.73,-1.4,3.13,-3.13,3.13l-6.25,0c-1.73,0,-3.13,-1.4,-3.13,-3.13l0,-6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(433.15, 326.1)" fill="#0000ff">
+<path d="m-6.25,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12l6.25,0c1.73,0,3.12,1.4,3.12,3.12l0,6.25c0,1.73,-1.4,3.12,-3.12,3.12l-6.25,0c-1.73,0,-3.12,-1.4,-3.12,-3.12l0,-6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(461.09, 343.31)" fill="#0000ff">
-<path d="m-6.25,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13l6.25,0c1.73,0,3.13,1.4,3.13,3.13l0,6.25c0,1.73,-1.4,3.13,-3.13,3.13l-6.25,0c-1.73,0,-3.13,-1.4,-3.13,-3.13l0,-6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(461.09, 343.31)" fill="#0000ff">
+<path d="m-6.25,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12l6.25,0c1.73,0,3.12,1.4,3.12,3.12l0,6.25c0,1.73,-1.4,3.12,-3.12,3.12l-6.25,0c-1.73,0,-3.12,-1.4,-3.12,-3.12l0,-6.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="448.18,318.1 479.13,333.71"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(448.18, 318.1)" fill="#ffc0cb">
-<path d="m0,-7.5l7.13,5.18l-2.8,8.39l-8.67,0l-2.8,-8.39l7.13,-5.18m0,3.75l3.57,2.59l-1.4,4.19l-4.34,0l-1.4,-4.19l3.57,-2.59"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(448.18, 318.1)" fill="#ffc0cb">
+<path d="m0,-7.5l7.13,5.18l-2.8,8.38l-8.67,0l-2.8,-8.38l7.13,-5.18m0,3.75l3.57,2.59l-1.4,4.19l-4.33,0l-1.4,-4.19l3.57,-2.59"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(479.13, 333.71)" fill="#ffc0cb">
-<path d="m0,-7.5l7.13,5.18l-2.8,8.39l-8.67,0l-2.8,-8.39l7.13,-5.18m0,3.75l3.57,2.59l-1.4,4.19l-4.34,0l-1.4,-4.19l3.57,-2.59"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(479.13, 333.71)" fill="#ffc0cb">
+<path d="m0,-7.5l7.13,5.18l-2.8,8.38l-8.67,0l-2.8,-8.38l7.13,-5.18m0,3.75l3.57,2.59l-1.4,4.19l-4.33,0l-1.4,-4.19l3.57,-2.59"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="468.18,310.29 503.13,324.34"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(468.18, 310.29)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(468.18, 310.29)" fill="#800080">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(503.13, 324.34)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(503.13, 324.34)" fill="#800080">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="487.03,299.36 525.75,311.22"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(487.03, 299.36)" fill="#90ee90">
-<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m3.13,3.13l6.25,0l0,6.25l-6.25,0l0,-6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(487.03, 299.36)" fill="#90ee90">
+<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m3.12,3.12l6.25,0l0,6.25l-6.25,0l0,-6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(525.75, 311.22)" fill="#90ee90">
-<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m3.13,3.13l6.25,0l0,6.25l-6.25,0l0,-6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(525.75, 311.22)" fill="#90ee90">
+<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m3.12,3.12l6.25,0l0,6.25l-6.25,0l0,-6.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="498.19,284.2 527,290.41"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(498.19, 284.2)" fill="#00ffff">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.13,0c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(498.19, 284.2)" fill="#00ffff">
+<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.12,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="497.95,266.26 527,269.98"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(497.95, 266.26)" fill="#0000ff">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.13,0c0,1.73,-1.4,3.13,-3.13,3.13c-1.73,0,-3.13,-1.4,-3.13,-3.13c0,-1.73,1.4,-3.13,3.13,-3.13c1.73,0,3.13,1.4,3.13,3.13" fill-rule="nonzero"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(497.95, 266.26)" fill="#0000ff">
+<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.12,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12" fill-rule="nonzero"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="487.37,248.31 526.16,249.96"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(487.37, 248.31)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(487.37, 248.31)" fill="#ffc0cb">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-5.94,0c0,0.17,-0.14,0.31,-0.31,0.31c-0.17,0,-0.31,-0.14,-0.31,-0.31c0,-0.17,0.14,-0.31,0.31,-0.31c0.17,0,0.31,0.14,0.31,0.31" fill-rule="nonzero"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(526.16, 249.96)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(526.16, 249.96)" fill="#ffc0cb">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-5.94,0c0,0.17,-0.14,0.31,-0.31,0.31c-0.17,0,-0.31,-0.14,-0.31,-0.31c0,-0.17,0.14,-0.31,0.31,-0.31c0.17,0,0.31,0.14,0.31,0.31" fill-rule="nonzero"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="471.86,232.49 507.55,230.97"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(471.86, 232.49)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(471.86, 232.49)" fill="#800080">
 <path d="m0.31,0c0,0.17,-0.14,0.31,-0.31,0.31c-0.17,0,-0.31,-0.14,-0.31,-0.31c0,-0.17,0.14,-0.31,0.31,-0.31c0.17,0,0.31,0.14,0.31,0.31"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(507.55, 230.97)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(507.55, 230.97)" fill="#800080">
 <path d="m0.31,0c0,0.17,-0.14,0.31,-0.31,0.31c-0.17,0,-0.31,-0.14,-0.31,-0.31c0,-0.17,0.14,-0.31,0.31,-0.31c0.17,0,0.31,0.14,0.31,0.31"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="458.6,218.92 491.63,214.69"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(458.6, 218.92)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(458.6, 218.92)" fill="#90ee90">
 <path d="m7.5,0l-11.25,6.49l0,-12.99l11.25,6.49"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(491.63, 214.69)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(491.63, 214.69)" fill="#90ee90">
 <path d="m7.5,0l-11.25,6.49l0,-12.99l11.25,6.49"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="453.01,205.67 484.93,198.8"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(453.01, 205.67)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(453.01, 205.67)" fill="#00ffff">
 <path d="m-7.5,0l11.25,6.49l0,-12.99l-11.25,6.49"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(484.93, 198.8)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(484.93, 198.8)" fill="#00ffff">
 <path d="m-7.5,0l11.25,6.49l0,-12.99l-11.25,6.49"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="456.2,190.22 488.76,180.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(456.2, 190.22)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(456.2, 190.22)" fill="#0000ff">
 <path d="m0,7.5l6.49,-11.25l-12.99,0l6.49,11.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(488.76, 180.25)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(488.76, 180.25)" fill="#0000ff">
 <path d="m0,7.5l6.49,-11.25l-12.99,0l6.49,11.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="464.51,171.32 498.73,157.57"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(464.51, 171.32)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(464.51, 171.32)" fill="#ffc0cb">
 <path d="m0,-7.5l6.49,11.25l-12.99,0l6.49,-11.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(498.73, 157.57)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(498.73, 157.57)" fill="#ffc0cb">
 <path d="m0,-7.5l6.49,11.25l-12.99,0l6.49,-11.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="471.48,150.29 507.09,132.34"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(471.48, 150.29)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(471.48, 150.29)" fill="#800080">
 <path d="m-6.25,-6.25l0,12.5l12.5,-12.5l0,12.5l-12.5,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(507.09, 132.34)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(507.09, 132.34)" fill="#800080">
 <path d="m-6.25,-6.25l0,12.5l12.5,-12.5l0,12.5l-12.5,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="471.08,130.68 506.61,108.8"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(471.08, 130.68)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(471.08, 130.68)" fill="#90ee90">
 <path d="m-6.25,-6.25l12.5,0l-12.5,12.5l12.5,0l-12.5,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(506.61, 108.8)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(506.61, 108.8)" fill="#90ee90">
 <path d="m-6.25,-6.25l12.5,0l-12.5,12.5l12.5,0l-12.5,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="460.64,116.4 494.08,91.66"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(460.64, 116.4)" fill="#00ffff">
-<path d="m2.59,6.25l3.66,-3.66l0,-5.18l-3.66,-3.66l-5.18,0l-3.66,3.66l0,5.18l3.66,3.66l5.18,0"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(460.64, 116.4)" fill="#00ffff">
+<path d="m2.59,6.25l3.66,-3.66l0,-5.17l-3.66,-3.66l-5.17,0l-3.66,3.66l0,5.17l3.66,3.66l5.17,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(494.08, 91.66)" fill="#00ffff">
-<path d="m2.59,6.25l3.66,-3.66l0,-5.18l-3.66,-3.66l-5.18,0l-3.66,3.66l0,5.18l3.66,3.66l5.18,0"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(494.08, 91.66)" fill="#00ffff">
+<path d="m2.59,6.25l3.66,-3.66l0,-5.17l-3.66,-3.66l-5.17,0l-3.66,3.66l0,5.17l3.66,3.66l5.17,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="441.85,109.44 471.53,83.31"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(441.85, 109.44)" fill="#0000ff">
-<path d="m0,6.25l5.41,-3.13l0,-6.25l-5.41,-3.13l-5.41,3.13l0,6.25l5.41,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(441.85, 109.44)" fill="#0000ff">
+<path d="m0,6.25l5.41,-3.12l0,-6.25l-5.41,-3.12l-5.41,3.12l0,6.25l5.41,3.12"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(471.53, 83.31)" fill="#0000ff">
-<path d="m0,6.25l5.41,-3.13l0,-6.25l-5.41,-3.13l-5.41,3.13l0,6.25l5.41,3.13"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(471.53, 83.31)" fill="#0000ff">
+<path d="m0,6.25l5.41,-3.12l0,-6.25l-5.41,-3.12l-5.41,3.12l0,6.25l5.41,3.12"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="419.65,108.36 444.89,82.02"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(419.65, 108.36)" fill="#ffc0cb">
-<path d="m0,-7.5l7.13,5.18l-2.8,8.39l-8.67,0l-2.8,-8.39l7.13,-5.18"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(419.65, 108.36)" fill="#ffc0cb">
+<path d="m0,-7.5l7.13,5.18l-2.8,8.38l-8.67,0l-2.8,-8.38l7.13,-5.18"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(444.89, 82.02)" fill="#ffc0cb">
-<path d="m0,-7.5l7.13,5.18l-2.8,8.39l-8.67,0l-2.8,-8.39l7.13,-5.18"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(444.89, 82.02)" fill="#ffc0cb">
+<path d="m0,-7.5l7.13,5.18l-2.8,8.38l-8.67,0l-2.8,-8.38l7.13,-5.18"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="399.51,108.68 420.73,82.4"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(399.51, 108.68)" fill="#800080">
-<path d="m-3.13,-6.25l6.25,0l0,12.5l-6.25,0l0,-12.5"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(399.51, 108.68)" fill="#800080">
+<path d="m-3.12,-6.25l6.25,0l0,12.5l-6.25,0l0,-12.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(420.73, 82.4)" fill="#800080">
-<path d="m-3.13,-6.25l6.25,0l0,12.5l-6.25,0l0,-12.5"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(420.73, 82.4)" fill="#800080">
+<path d="m-3.12,-6.25l6.25,0l0,12.5l-6.25,0l0,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="384.75,104.95 403.01,77.92"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(384.75, 104.95)" fill="#90ee90">
-<path d="m-6.25,-3.13l12.5,0l0,6.25l-12.5,0l0,-6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(384.75, 104.95)" fill="#90ee90">
+<path d="m-6.25,-3.12l12.5,0l0,6.25l-12.5,0l0,-6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(403.01, 77.92)" fill="#90ee90">
-<path d="m-6.25,-3.13l12.5,0l0,6.25l-12.5,0l0,-6.25"/>
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(403.01, 77.92)" fill="#90ee90">
+<path d="m-6.25,-3.12l12.5,0l0,6.25l-12.5,0l0,-6.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="375.17,93.72 391.53,64.45"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(375.17, 93.72)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(375.17, 93.72)" fill="#00ffff">
 <path d="m0,-7.5l-1.69,5.18l-5.45,0l4.41,3.2l-1.69,5.18l4.41,-3.2l4.41,3.2l-1.69,-5.18l4.41,-3.2l-5.45,0l-1.69,-5.18"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(391.53, 64.45)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(391.53, 64.45)" fill="#00ffff">
 <path d="m0,-7.5l-1.69,5.18l-5.45,0l4.41,3.2l-1.69,5.18l4.41,-3.2l4.41,3.2l-1.69,-5.18l4.41,-3.2l-5.45,0l-1.69,-5.18"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="367.77,75.6 382.63,42.7"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(367.77, 75.6)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(367.77, 75.6)" fill="#0000ff">
 <path d="m2.5,6.25l0,-3.75l3.75,0l0,-5l-3.75,0l0,-3.75l-5,0l0,3.75l-3.75,0l0,5l3.75,0l0,3.75l5,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(382.63, 42.7)" fill="#0000ff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(382.63, 42.7)" fill="#0000ff">
 <path d="m2.5,6.25l0,-3.75l3.75,0l0,-5l-3.75,0l0,-3.75l-5,0l0,3.75l-3.75,0l0,5l3.75,0l0,3.75l5,0"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="358.7,55.3 371.76,18.35"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(358.7, 55.3)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(358.7, 55.3)" fill="#ffc0cb">
 <path d="m-3.71,6.89l3.71,-3.71l3.71,3.71l3.18,-3.18l-3.71,-3.71l3.71,-3.71l-3.18,-3.18l-3.71,3.71l-3.71,-3.71l-3.18,3.18l3.71,3.71l-3.71,3.71l3.18,3.18"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(371.76, 18.35)" fill="#ffc0cb">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(371.76, 18.35)" fill="#ffc0cb">
 <path d="m-3.71,6.89l3.71,-3.71l3.71,3.71l3.18,-3.18l-3.71,-3.71l3.71,-3.71l-3.18,-3.18l-3.71,3.71l-3.71,-3.71l-3.18,3.18l3.71,3.71l-3.71,3.71l3.18,3.18"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="345.62,39.59 354.24,6.49"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(345.62, 39.59)" fill="#800080">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(345.62, 39.59)" fill="#800080">
 <path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="328.76,33.94 333.47,6.49"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(328.76, 33.94)" fill="#90ee90">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(328.76, 33.94)" fill="#90ee90">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="310.47,39.79 313.3,6.49"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(310.47, 39.79)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(310.47, 39.79)" fill="#00ffff">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25"/>
 </g>
-<g stroke="#808080" stroke-width="0.63" fill="none">
+<g stroke="#808080" stroke-width="0.62" fill="none">
 <polyline fill="none" points="293.42,53.7 293.42,16.43"/>
 </g>
 <g stroke="none" stroke-width="1" fill="#0000ff">
@@ -650,7 +650,7 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l0,-465.91"/>
 <path d="M60.46,473.03l-3.75,0M60.46,449.73l-3.75,0M60.46,426.44l-3.75,0M60.46,403.14l-3.75,0M60.46,379.84l-3.75,0M60.46,356.55l-3.75,0M60.46,333.25l-3.75,0M60.46,309.96l-3.75,0M60.46,286.66l-3.75,0M60.46,263.37l-3.75,0M60.46,240.07l-3.75,0M60.46,216.77l-3.75,0M60.46,193.48l-3.75,0M60.46,170.18l-3.75,0M60.46,146.89l-3.75,0M60.46,123.59l-3.75,0M60.46,100.3l-3.75,0M60.46,77l-3.75,0M60.46,53.7l-3.75,0M60.46,30.41l-3.75,0M60.46,7.11l-3.75,0"/>
 <path d="M60.46,473.03l-7.5,0M60.46,356.55l-7.5,0M60.46,240.07l-7.5,0M60.46,123.59l-7.5,0M60.46,7.11l-7.5,0"/>
@@ -658,17 +658,16 @@
 <path d="M526.38,473.03l3.75,0M526.38,449.73l3.75,0M526.38,426.44l3.75,0M526.38,403.14l3.75,0M526.38,379.84l3.75,0M526.38,356.55l3.75,0M526.38,333.25l3.75,0M526.38,309.96l3.75,0M526.38,286.66l3.75,0M526.38,263.37l3.75,0M526.38,240.07l3.75,0M526.38,216.77l3.75,0M526.38,193.48l3.75,0M526.38,170.18l3.75,0M526.38,146.89l3.75,0M526.38,123.59l3.75,0M526.38,100.3l3.75,0M526.38,77l3.75,0M526.38,53.7l3.75,0M526.38,30.41l3.75,0M526.38,7.11l3.75,0"/>
 <path d="M526.38,473.03l7.5,0M526.38,356.55l7.5,0M526.38,240.07l7.5,0M526.38,123.59l7.5,0M526.38,7.11l7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 23.21 362.57)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 362.57)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">Outward ticks on this y axis</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="31.95" y="481.78" font-size="14pt" fill="#000000">−2</text>
-<text x="31.95" y="365.3" font-size="14pt" fill="#000000">−1</text>
+<text x="-20.53" y="481.78" font-size="14pt" fill="#000000">&#8722;2</text>
 <text x="40.7" y="248.82" font-size="14pt" fill="#000000">0</text>
 <text x="40.7" y="132.34" font-size="14pt" fill="#000000">1</text>
 <text x="40.7" y="21" font-size="14pt" fill="#000000">2</text>
 </g>
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
 <path d="M60.46,473.03l0,3.75M83.76,473.03l0,3.75M107.05,473.03l0,3.75M130.35,473.03l0,3.75M153.64,473.03l0,3.75M176.94,473.03l0,3.75M200.24,473.03l0,3.75M223.53,473.03l0,3.75M246.83,473.03l0,3.75M270.12,473.03l0,3.75M293.42,473.03l0,3.75M316.71,473.03l0,3.75M340.01,473.03l0,3.75M363.31,473.03l0,3.75M386.6,473.03l0,3.75M409.9,473.03l0,3.75M433.19,473.03l0,3.75M456.49,473.03l0,3.75M479.78,473.03l0,3.75M503.08,473.03l0,3.75M526.38,473.03l0,3.75"/>
 <path d="M60.46,473.03l0,7.5M176.94,473.03l0,7.5M293.42,473.03l0,7.5M409.9,473.03l0,7.5M526.38,473.03l0,7.5"/>
@@ -678,8 +677,8 @@
 </g>
 <g stroke-width="1" fill="none">
 <text x="170.91" y="494.53" font-size="14pt" fill="#000000">Outward ticks on this x axis</text>
-<text x="51.7" y="485.78" font-size="14pt" fill="#000000">−2</text>
-<text x="168.19" y="485.78" font-size="14pt" fill="#000000">−1</text>
+<text x="25.45" y="485.78" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="141.94" y="485.78" font-size="14pt" fill="#000000">&#8722;1</text>
 <text x="289.03" y="485.78" font-size="14pt" fill="#000000">0</text>
 <text x="405.52" y="485.78" font-size="14pt" fill="#000000">1</text>
 <text x="522" y="485.78" font-size="14pt" fill="#000000">2</text>

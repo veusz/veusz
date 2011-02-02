@@ -31,7 +31,7 @@ def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
-    val = ('%.'+str(prec)+'f') % round(v, prec)
+    val = ('%.'+str(prec)+'f') % v
     # drop any trailing zeros
     val = val.rstrip('0').rstrip('.')
     # get rid of -0s (platform differences here)
@@ -379,6 +379,8 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.fileobj.write( '<image x="%s" y="%s" width="%s" height="%s" ' %
                             (fltStr(r.x()), fltStr(r.y()),
                              fltStr(r.width()), fltStr(r.height())) )
+
+        # convert pixmap to textual data
         data = qt4.QByteArray()
         buf = qt4.QBuffer(data)
         buf.open(qt4.QBuffer.ReadWrite)
@@ -387,7 +389,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
 
         self.fileobj.write('xlink:href="data:image/%s;base64,' %
                            self.imageformat)
-        self.fileobj.write(data.toBase64())
+        self.fileobj.write( data.toBase64() )
         self.fileobj.write('" preserveAspectRatio="none"/>\n')
 
 class SVGPaintDevice(qt4.QPaintDevice):

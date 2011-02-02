@@ -21,6 +21,7 @@
 """A paint engine for doing self-tests."""
 
 import sys
+import struct
 import veusz.qtall as qt4
 
 import svg_export
@@ -33,11 +34,11 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
         in inches."""
 
         svg_export.SVGPaintEngine.__init__(self, width_in, height_in)
-        self.imageformat = 'bmp'
+        # ppm images are simple and should be same on all platforms
+        self.imageformat = 'ppm'
 
     def drawTextItem(self, pt, textitem):
-        """Convert text to a path and draw it.
-        """
+        """Write text directly in self test mode."""
         self.doStateUpdate()
         self.fileobj.write(
             '<text x="%s" y="%s" font-size="%gpt" fill="%s">' % (
@@ -47,7 +48,10 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
                 self.pen.color().name()
                 )
             )
-        self.fileobj.write( textitem.text().toUtf8() )
+
+        # fix up any unicode characters coming from renderer
+        text = unicode(textitem.text()).encode('ascii', 'xmlcharrefreplace')
+        self.fileobj.write(text)
         self.fileobj.write('</text>\n')
 
 class SelfTestPaintDevice(svg_export.SVGPaintDevice):

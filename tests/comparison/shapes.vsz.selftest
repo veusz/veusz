@@ -7,19 +7,19 @@
 <desc>Veusz output document</desc>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" fill="#ffffff">
+<g stroke-width="0.62" fill="#ffffff">
 <path d="m42.68,7.11l483.7,0l0,483.7l-483.7,0l0,-483.7"/>
 </g>
-<g stroke-width="0.63" stroke-dasharray="0.625,1.25" transform="translate(284.53, 60.32)" fill="#aaff7f">
+<g stroke-width="0.62" stroke-dasharray="0.625,1.25" transform="translate(284.53, 60.32)" fill="#aaff7f">
 <path d="m-120.92,-24.18l241.85,0l0,48.37l-241.85,0l0,-48.37"/>
 </g>
-<g stroke="#0000ff" stroke-width="0.63" transform="matrix(-0.0082 1 -1 -0.0082 238.81 103.85)" fill="#000000">
+<g stroke="#0000ff" stroke-width="0.62" transform="matrix(-0.0082 1 -1 -0.0082 238.81 103.85)" fill="#000000">
 <path d="M0,0l96.74,0"/>
 </g>
-<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.63" transform="matrix(-0.0082 1 -1 -0.0082 238.01 200.59)" fill="#000000">
+<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.62" transform="matrix(-0.0082 1 -1 -0.0082 238.01 200.59)" fill="#000000">
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.63" transform="matrix(0.0082 -1 -1 -0.0082 238.81 103.85)" fill="#000000">
+<g stroke-linejoin="miter" stroke="#0000ff" stroke-width="0.62" transform="matrix(0.0082 -1 -1 -0.0082 238.81 103.85)" fill="#000000">
 <path d="m0,0l11.25,6.25l-2.5,-6.25l2.5,-6.25l-11.25,6.25"/>
 </g>
 </g>
@@ -31,46 +31,46 @@
 <g clip-path="url(#c0)">
 <g stroke-width="1" fill="none">
 <text x="181.39" y="74.23" font-size="30pt" fill="#000000">Some shapes</text>
-<text x="170.55" y="336.86" font-size="20pt" fill="#000000">α</text>
+<text x="170.55" y="336.86" font-size="20pt" fill="#000000">&#945;</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g stroke-width="0.63" fill="none">
+<g stroke-width="0.62" fill="none">
 <polyline fill="none" points="91.05,442.44 139.42,426.32 284.53,329.58 284.53,248.96"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(91.05, 442.44)" fill="#ff0000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(91.05, 442.44)" fill="#ff0000">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(139.42, 426.32)" fill="#ff0000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(139.42, 426.32)" fill="#ff0000">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(284.53, 329.58)" fill="#ff0000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(284.53, 329.58)" fill="#ff0000">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(284.53, 248.96)" fill="#ff0000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(284.53, 248.96)" fill="#ff0000">
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g fill-opacity="0.5" stroke-width="0.63" transform="translate(407.2, 145.61)" fill="#0000ff">
+<g fill-opacity="0.5" stroke-width="0.62" transform="translate(407.2, 145.61)" fill="#0000ff">
 <ellipse cx="0" cy="0" rx="24.18" ry="24.18"/>
 </g>
-<g stroke-width="0.63" transform="matrix(0.7071 -0.7071 0.7071 0.7071 123.22 406.4)" fill="#000000">
+<g stroke-width="0.62" transform="matrix(0.7071 -0.7071 0.7071 0.7071 123.22 406.4)" fill="#000000">
 <path d="M0,0l159.93,0"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="matrix(0.7071 -0.7071 0.7071 0.7071 236.31 293.32)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="matrix(0.7071 -0.7071 0.7071 0.7071 236.31 293.32)" fill="#000000">
 <path d="m0,0l-11.25,6.25l2.5,-6.25l-2.5,-6.25l11.25,6.25"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="matrix(-0.7071 0.7071 0.7071 0.7071 123.22 406.4)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="matrix(-0.7071 0.7071 0.7071 0.7071 123.22 406.4)" fill="#000000">
 <path d="m0,0l-11.25,6.25l2.5,-6.25l-2.5,-6.25l11.25,6.25"/>
 </g>
-<g fill-opacity="0.5" stroke-width="0.63" transform="matrix(0.7071 0.7071 -0.7071 0.7071 91.05 442.44)" fill="#ffffff">
+<g fill-opacity="0.5" stroke-width="0.62" transform="matrix(0.7071 0.7071 -0.7071 0.7071 91.05 442.44)" fill="#ffffff">
 <path d="m-24.18,-24.18l48.37,0l0,48.37l-48.37,0l0,-48.37"/>
 </g>
-<g fill-opacity="0.5" stroke-width="0.63" transform="matrix(0.7071 0.7071 -0.7071 0.7071 284.53 248.96)" fill="#ffffff">
+<g fill-opacity="0.5" stroke-width="0.62" transform="matrix(0.7071 0.7071 -0.7071 0.7071 284.53 248.96)" fill="#ffffff">
 <path d="m-48.37,-48.37l96.74,0l0,96.74l-96.74,0l0,-96.74"/>
 </g>
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M42.68,490.81l0,-483.7"/>
 <path d="M42.68,490.81l3.75,0M42.68,474.69l3.75,0M42.68,458.56l3.75,0M42.68,442.44l3.75,0M42.68,426.32l3.75,0M42.68,410.19l3.75,0M42.68,394.07l3.75,0M42.68,377.95l3.75,0M42.68,361.82l3.75,0M42.68,345.7l3.75,0M42.68,329.58l3.75,0M42.68,313.45l3.75,0M42.68,297.33l3.75,0M42.68,281.21l3.75,0M42.68,265.08l3.75,0M42.68,248.96l3.75,0M42.68,232.84l3.75,0M42.68,216.72l3.75,0M42.68,200.59l3.75,0M42.68,184.47l3.75,0M42.68,168.35l3.75,0M42.68,152.22l3.75,0M42.68,136.1l3.75,0M42.68,119.98l3.75,0M42.68,103.85l3.75,0M42.68,87.73l3.75,0M42.68,71.61l3.75,0M42.68,55.48l3.75,0M42.68,39.36l3.75,0M42.68,23.24l3.75,0M42.68,7.11l3.75,0"/>
 <path d="M42.68,490.81l7.5,0M42.68,410.19l7.5,0M42.68,329.58l7.5,0M42.68,248.96l7.5,0M42.68,168.35l7.5,0M42.68,87.73l7.5,0M42.68,7.11l7.5,0"/>
@@ -87,7 +87,7 @@
 <text x="4.17" y="96.48" font-size="14pt" fill="#000000">1.25</text>
 <text x="12.92" y="21" font-size="14pt" fill="#000000">1.5</text>
 </g>
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M42.68,490.81l483.7,0"/>
 <path d="M42.68,490.81l0,-3.75M66.86,490.81l0,-3.75M91.05,490.81l0,-3.75M115.23,490.81l0,-3.75M139.42,490.81l0,-3.75M163.6,490.81l0,-3.75M187.79,490.81l0,-3.75M211.97,490.81l0,-3.75M236.16,490.81l0,-3.75M260.34,490.81l0,-3.75M284.53,490.81l0,-3.75M308.71,490.81l0,-3.75M332.9,490.81l0,-3.75M357.08,490.81l0,-3.75M381.27,490.81l0,-3.75M405.45,490.81l0,-3.75M429.64,490.81l0,-3.75M453.82,490.81l0,-3.75M478.01,490.81l0,-3.75M502.19,490.81l0,-3.75M526.38,490.81l0,-3.75"/>
 <path d="M42.68,490.81l0,-7.5M139.42,490.81l0,-7.5M236.16,490.81l0,-7.5M332.9,490.81l0,-7.5M429.64,490.81l0,-7.5M526.38,490.81l0,-7.5"/>

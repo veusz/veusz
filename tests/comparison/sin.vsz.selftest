@@ -7,68 +7,68 @@
 <desc>Veusz output document</desc>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" fill="#ffffff">
+<g stroke-width="0.62" fill="#ffffff">
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g stroke="#ff0000" stroke-width="0.63" fill="none">
+<g stroke="#ff0000" stroke-width="0.62" fill="none">
 <polyline fill="none" points="60.46,240.07 69.97,206.9 79.48,174.41 88.99,143.26 98.5,114.08 108,87.47 117.51,63.96 127.02,44.04 136.53,28.12 146.04,16.52 155.55,9.47 165.06,7.11 174.56,9.51 184.07,16.6 193.58,28.24 203.09,44.2 212.6,64.15 222.11,87.69 231.61,114.33 241.12,143.53 250.63,174.7 260.14,207.2 269.65,240.36 279.16,273.53 288.66,306.01 298.17,337.15 307.68,366.31 317.19,392.9 326.7,416.37 336.21,436.26 345.72,452.14 355.22,463.71 364.73,470.72 374.24,473.03 383.75,470.59 393.26,463.46 402.77,451.77 412.27,435.78 421.78,415.79 431.29,392.23 440.8,365.57 450.31,336.34 459.82,305.16 469.33,272.65 478.83,239.48 488.34,206.32 497.85,173.85 507.36,142.72 516.87,113.58 526.38,87.02"/>
 </g>
-<g stroke-width="0.63" fill="none">
+<g stroke-width="0.62" fill="none">
 <polyline fill="none" points="60.46,240.07 88.34,145.32 116.22,66.95 144.1,18.51 171.98,8.39 199.86,38.32 227.74,103.14 255.62,191.64 283.5,288.5 311.38,377 339.26,441.82 367.14,471.75 395.02,461.63 422.9,413.19 450.79,334.82 478.67,240.07"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(60.46, 240.07)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(60.46, 240.07)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(88.34, 145.32)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(88.34, 145.32)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(116.22, 66.95)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(116.22, 66.95)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(144.1, 18.51)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(144.1, 18.51)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(171.98, 8.39)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(171.98, 8.39)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(199.86, 38.32)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(199.86, 38.32)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(227.74, 103.14)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(227.74, 103.14)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(255.62, 191.64)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(255.62, 191.64)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(283.5, 288.5)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(283.5, 288.5)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(311.38, 377)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(311.38, 377)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(339.26, 441.82)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(339.26, 441.82)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(367.14, 471.75)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(367.14, 471.75)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(395.02, 461.63)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(395.02, 461.63)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(422.9, 413.19)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(422.9, 413.19)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(450.79, 334.82)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(450.79, 334.82)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(478.67, 240.07)" fill="#00ffff">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(478.67, 240.07)" fill="#00ffff">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l0,-465.91"/>
 <path d="M60.46,473.03l3.75,0M60.46,449.73l3.75,0M60.46,426.44l3.75,0M60.46,403.14l3.75,0M60.46,379.84l3.75,0M60.46,356.55l3.75,0M60.46,333.25l3.75,0M60.46,309.96l3.75,0M60.46,286.66l3.75,0M60.46,263.37l3.75,0M60.46,240.07l3.75,0M60.46,216.77l3.75,0M60.46,193.48l3.75,0M60.46,170.18l3.75,0M60.46,146.89l3.75,0M60.46,123.59l3.75,0M60.46,100.3l3.75,0M60.46,77l3.75,0M60.46,53.7l3.75,0M60.46,30.41l3.75,0M60.46,7.11l3.75,0"/>
 <path d="M60.46,473.03l7.5,0M60.46,356.55l7.5,0M60.46,240.07l7.5,0M60.46,123.59l7.5,0M60.46,7.11l7.5,0"/>
@@ -76,18 +76,18 @@
 <path d="M526.38,473.03l-3.75,0M526.38,449.73l-3.75,0M526.38,426.44l-3.75,0M526.38,403.14l-3.75,0M526.38,379.84l-3.75,0M526.38,356.55l-3.75,0M526.38,333.25l-3.75,0M526.38,309.96l-3.75,0M526.38,286.66l-3.75,0M526.38,263.37l-3.75,0M526.38,240.07l-3.75,0M526.38,216.77l-3.75,0M526.38,193.48l-3.75,0M526.38,170.18l-3.75,0M526.38,146.89l-3.75,0M526.38,123.59l-3.75,0M526.38,100.3l-3.75,0M526.38,77l-3.75,0M526.38,53.7l-3.75,0M526.38,30.41l-3.75,0M526.38,7.11l-3.75,0"/>
 <path d="M526.38,473.03l-7.5,0M526.38,356.55l-7.5,0M526.38,240.07l-7.5,0M526.38,123.59l-7.5,0M526.38,7.11l-7.5,0"/>
 </g>
-<g stroke-width="1" transform="matrix(0 -1 1 0 13.21 261.95)" fill="none">
+<g stroke-width="1" transform="matrix(0 -1 1 0 1.75 261.95)" fill="none">
 <text x="0" y="0" font-size="14pt" fill="#000000">sin </text>
 <text x="35" y="0" font-size="14pt" fill="#000000">x</text>
 </g>
 <g stroke-width="1" fill="none">
-<text x="39.45" y="481.78" font-size="14pt" fill="#000000">−1</text>
-<text x="21.95" y="365.3" font-size="14pt" fill="#000000">−0.5</text>
+<text x="-13.03" y="481.78" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="-30.53" y="365.3" font-size="14pt" fill="#000000">&#8722;0.5</text>
 <text x="48.2" y="248.82" font-size="14pt" fill="#000000">0</text>
 <text x="30.7" y="132.34" font-size="14pt" fill="#000000">0.5</text>
 <text x="48.2" y="21" font-size="14pt" fill="#000000">1</text>
 </g>
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
 <path d="M60.46,473.03l0,-3.75M93.74,473.03l0,-3.75M127.02,473.03l0,-3.75M160.3,473.03l0,-3.75M193.58,473.03l0,-3.75M226.86,473.03l0,-3.75M260.14,473.03l0,-3.75M293.42,473.03l0,-3.75M326.7,473.03l0,-3.75M359.98,473.03l0,-3.75M393.26,473.03l0,-3.75M426.54,473.03l0,-3.75M459.82,473.03l0,-3.75M493.1,473.03l0,-3.75M526.38,473.03l0,-3.75"/>
 <path d="M60.46,473.03l0,-7.5M127.02,473.03l0,-7.5M193.58,473.03l0,-7.5M260.14,473.03l0,-7.5M326.7,473.03l0,-7.5M393.26,473.03l0,-7.5M459.82,473.03l0,-7.5M526.38,473.03l0,-7.5"/>

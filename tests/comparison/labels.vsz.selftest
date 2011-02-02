@@ -7,18 +7,18 @@
 <desc>Veusz output document</desc>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" fill="#ffffff">
+<g stroke-width="0.62" fill="#ffffff">
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(107.05, 467.2)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(107.05, 467.2)" fill="none">
 <path d="m-3.75,-3.75l7.5,0l0,7.5l-7.5,0l0,-7.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(256.15, 467.2)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(256.15, 467.2)" fill="none">
 <path d="m-3.75,-3.75l7.5,0l0,7.5l-7.5,0l0,-7.5"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(442.51, 292.49)" fill="none">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(442.51, 292.49)" fill="none">
 <path d="m-3.75,-3.75l7.5,0l0,7.5l-7.5,0l0,-7.5"/>
 </g>
 <g stroke="#ff0000" stroke-width="1" transform="matrix(0 1 -1 0 106.05 371.58)" fill="none">
@@ -30,32 +30,32 @@
 <g stroke="#ff0000" stroke-width="1" transform="matrix(0 1 -1 0 441.51 196.86)" fill="none">
 <text x="0" y="0" font-size="16pt" fill="#ff0000">dataset 2</text>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(153.64, 414.79)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(153.64, 414.79)" fill="#000000">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(246.83, 240.07)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(246.83, 240.07)" fill="#000000">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(340.01, 240.07)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(340.01, 240.07)" fill="#000000">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
-<g stroke-linejoin="miter" stroke-width="0.63" transform="translate(433.19, 123.59)" fill="#000000">
+<g stroke-linejoin="miter" stroke-width="0.62" transform="translate(433.19, 123.59)" fill="#000000">
 <path d="m3.75,0c0,2.07,-1.68,3.75,-3.75,3.75c-2.07,0,-3.75,-1.68,-3.75,-3.75c0,-2.07,1.68,-3.75,3.75,-3.75c2.07,0,3.75,1.68,3.75,3.75"/>
 </g>
 <g stroke-width="1" fill="#000000">
 <text x="159.27" y="409.16" font-size="16pt" fill="#000000">A test</text>
 <text x="252.44" y="234.45" font-size="16pt" fill="#000000">test2</text>
-<text x="345.63" y="234.45" font-size="16pt" fill="#000000">A</text>
-<text x="355.63" y="226.45" font-size="10pt" fill="#000000">200</text>
-<text x="438.81" y="117.97" font-size="16pt" fill="#000000">α</text>
+<text x="345.62" y="234.45" font-size="16pt" fill="#000000">A</text>
+<text x="355.62" y="226.45" font-size="10pt" fill="#000000">200</text>
+<text x="438.81" y="117.97" font-size="16pt" fill="#000000">&#945;</text>
 <text x="448.81" y="117.97" font-size="16pt" fill="#000000"> </text>
-<text x="453.81" y="117.97" font-size="16pt" fill="#000000">β</text>
+<text x="453.81" y="117.97" font-size="16pt" fill="#000000">&#946;</text>
 <text x="463.81" y="117.97" font-size="16pt" fill="#000000"> </text>
-<text x="468.81" y="117.97" font-size="16pt" fill="#000000">γ</text>
+<text x="468.81" y="117.97" font-size="16pt" fill="#000000">&#947;</text>
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l0,-465.91"/>
 <path d="M60.46,473.03l3.75,0M60.46,443.91l3.75,0M60.46,414.79l3.75,0M60.46,385.67l3.75,0M60.46,356.55l3.75,0M60.46,327.43l3.75,0M60.46,298.31l3.75,0M60.46,269.19l3.75,0M60.46,240.07l3.75,0M60.46,210.95l3.75,0M60.46,181.83l3.75,0M60.46,152.71l3.75,0M60.46,123.59l3.75,0M60.46,94.47l3.75,0M60.46,65.35l3.75,0M60.46,36.23l3.75,0M60.46,7.11l3.75,0"/>
 <path d="M60.46,473.03l7.5,0M60.46,356.55l7.5,0M60.46,240.07l7.5,0M60.46,123.59l7.5,0M60.46,7.11l7.5,0"/>
@@ -73,7 +73,7 @@
 <text x="48.2" y="132.34" font-size="14pt" fill="#000000">6</text>
 <text x="48.2" y="21" font-size="14pt" fill="#000000">8</text>
 </g>
-<g stroke-width="0.63" stroke-linecap="butt" fill="none">
+<g stroke-width="0.62" stroke-linecap="butt" fill="none">
 <path d="M60.46,473.03l465.91,0"/>
 <path d="M60.46,473.03l0,-3.75M79.1,473.03l0,-3.75M97.74,473.03l0,-3.75M116.37,473.03l0,-3.75M135.01,473.03l0,-3.75M153.64,473.03l0,-3.75M172.28,473.03l0,-3.75M190.92,473.03l0,-3.75M209.55,473.03l0,-3.75M228.19,473.03l0,-3.75M246.83,473.03l0,-3.75M265.46,473.03l0,-3.75M284.1,473.03l0,-3.75M302.74,473.03l0,-3.75M321.37,473.03l0,-3.75M340.01,473.03l0,-3.75M358.65,473.03l0,-3.75M377.28,473.03l0,-3.75M395.92,473.03l0,-3.75M414.56,473.03l0,-3.75M433.19,473.03l0,-3.75M451.83,473.03l0,-3.75M470.47,473.03l0,-3.75M489.1,473.03l0,-3.75M507.74,473.03l0,-3.75M526.38,473.03l0,-3.75"/>
 <path d="M60.46,473.03l0,-7.5M153.64,473.03l0,-7.5M246.83,473.03l0,-7.5M340.01,473.03l0,-7.5M433.19,473.03l0,-7.5M526.38,473.03l0,-7.5"/>
@@ -86,7 +86,7 @@
 <text x="56.08" y="478.28" font-size="14pt" fill="#000000">0</text>
 <text x="149.27" y="478.28" font-size="14pt" fill="#000000">1</text>
 <text x="242.44" y="478.28" font-size="14pt" fill="#000000">2</text>
-<text x="335.63" y="478.28" font-size="14pt" fill="#000000">3</text>
+<text x="335.62" y="478.28" font-size="14pt" fill="#000000">3</text>
 <text x="428.81" y="478.28" font-size="14pt" fill="#000000">4</text>
 <text x="522" y="478.28" font-size="14pt" fill="#000000">5</text>
 </g>
