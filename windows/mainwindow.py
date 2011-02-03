@@ -1217,7 +1217,7 @@ class MainWindow(qt4.QMainWindow):
         xn, yn = info.labels
         ix = str(info.index)
         if ix:
-            ix = '[' + ']'
+            ix = '[' + ix + ']'
         t = '%s: %s%s = %0.5g, %s%s = %0.5g' % (
                 info.widget.name, xn, ix, xv, yn, ix, yv)
         self.pickerlabel.setText(t)
