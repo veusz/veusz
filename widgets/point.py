@@ -609,22 +609,22 @@ class PointPlotter(GenericPlotter):
 
         return axes
 
-    def _mapper(self):
+    def _pickable(self, bounds):
         axes = self._fetchAxes()
 
-        if not axes:
-            return None
+        if axes is None:
+            map_fn = None
+        else:
+            map_fn = lambda x, y: ( axes[0].dataToPlotterCoords(bounds, x),
+                                    axes[1].dataToPlotterCoords(bounds, y) )
 
-        return lambda xv, yv, bounds: (axes[0].dataToPlotterCoords(bounds, xv),
-            axes[1].dataToPlotterCoords(bounds, yv))
+        return pickable.DiscretePickable(self, 'xData', 'yData', map_fn)
 
     def pickPoint(self, x0, y0, bounds, distance = 'radial'):
-        p = pickable.DiscretePickable(self, 'xData', 'yData', self._mapper())
-        return p.pickPoint(x0, y0, bounds, distance)
+        return self._pickable(bounds).pickPoint(x0, y0, bounds, distance)
 
     def pickIndex(self, oldindex, direction, bounds):
-        p = pickable.DiscretePickable(self, 'xData', 'yData', self._mapper())
-        return p.pickIndex(oldindex, direction, bounds)
+        return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""

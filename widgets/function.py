@@ -28,6 +28,7 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
+import pickable
 from plotters import GenericPlotter
 
 class FunctionChecker(object):
@@ -289,16 +290,15 @@ class FunctionPlotter(GenericPlotter):
     def initEnviron(self):
         """Set up function environment."""
         return self.document.eval_context.copy()
-       
-    def calcFunctionPoints(self, axes, posn):
-        """Calculate the pixels to plot for the function
-        returns (pxpts, pypts)."""
+
+    def getIndependentPoints(self, axes, posn):
+        """Calculate the real and screen points to plot for the independent axis"""
 
         s = self.settings
-        try:
-            self.checker.check(s.function, s.variable)
-        except RuntimeError, e:
-            self.logEvalError(e)
+
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' ):
             return None, None
 
         # get axes function is plotted along and on and
@@ -323,6 +323,29 @@ class FunctionPlotter(GenericPlotter):
             axispts = axispts[ axispts <= s.max ]
             plotpts = axis1.dataToPlotterCoords(posn, axispts)
 
+        return axispts, plotpts
+
+    def calcDependentPoints(self, axispts, axes, posn):
+        """Calculate the real and screen points to plot for the dependent axis"""
+
+        s = self.settings
+
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' ):
+            return None, None
+
+        if axispts is None:
+            return None, None
+
+        try:
+            self.checker.check(s.function, s.variable)
+        except RuntimeError, e:
+            self.logEvalError(e)
+            return None, None
+
+        axis2 = axes[1] if s.variable == 'x' else axes[0]
+
         # evaluate function
         env = self.initEnviron()
         env[s.variable] = axispts
@@ -332,13 +355,33 @@ class FunctionPlotter(GenericPlotter):
                 posn, results + N.zeros(axispts.shape))
         except Exception, e:
             self.logEvalError(e)
+            results = None
             resultpts = None
 
-        # return x and y coordinates for plot
+        return results, resultpts
+
+    def _pickable(self, posn):
+        s = self.settings
+
+        axisnames = [s.xAxis, s.yAxis]
+        axes = self.parent.getAxes(axisnames)
+
         if s.variable == 'x':
-            return plotpts, resultpts
+            axisnames[1] = axisnames[1] + '(' + axisnames[0] + ')'
         else:
-            return resultpts, plotpts
+            axisnames[0] = axisnames[0] + '(' + axisnames[1] + ')'
+
+        xpts, pxpts = self.getIndependentPoints(axes, posn)
+        ypts, pypts = self.calcDependentPoints(xpts, axes, posn)
+
+        return pickable.GenericPickable(
+                    self, axisnames, (xpts, ypts), (pxpts, pypts) )
+
+    def pickPoint(self, x0, y0, bounds, distance='radial'):
+        return self._pickable(bounds).pickPoint(x0, y0, bounds, distance)
+
+    def pickIndex(self, oldindex, direction, bounds):
+        return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
     def draw(self, parentposn, painter, outerbounds = None):
         """Draw the function."""
@@ -367,7 +410,8 @@ class FunctionPlotter(GenericPlotter):
         cliprect = self.clipAxesBounds(painter, axes, posn)
 
         # get the points to plot by evaluating the function
-        pxpts, pypts = self.calcFunctionPoints(axes, posn)
+        xpts, pxpts = self.getIndependentPoints(axes, posn)
+        ypts, pypts = self.calcDependentPoints(xpts, axes, posn)
 
         # draw the function line
         if pxpts is None or pypts is None:

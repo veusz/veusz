@@ -109,12 +109,12 @@ class NonOrthPoint(Widget):
 
     def pickPoint(self, x0, y0, bounds, distance = 'radial'):
         p = pickable.DiscretePickable(self, 'data1', 'data2',
-                lambda v1, v2, b: self.parent.graphToPlotCoords(v1, v2))
+                lambda v1, v2: self.parent.graphToPlotCoords(v1, v2))
         return p.pickPoint(x0, y0, bounds, distance)
 
     def pickIndex(self, oldindex, direction, bounds):
         p = pickable.DiscretePickable(self, 'data1', 'data2',
-                lambda v1, v2, b: self.parent.graphToPlotCoords(v1, v2))
+                lambda v1, v2: self.parent.graphToPlotCoords(v1, v2))
         return p.pickIndex(oldindex, direction, bounds)
 
     def plotMarkers(self, painter, plta, pltb, scaling, clip):

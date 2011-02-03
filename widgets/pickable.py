@@ -44,13 +44,22 @@ class PickInfo:
             return True
         return False
 
-class DiscreteIndex:
-    def __init__(self, value, sign=0):
-        self.value = value
+class Index:
+    """A class containing all the state a GenericPickable needs to find the
+       next or previous point"""
+    def __init__(self, ivar, index, sign):
+        self.ivar = ivar
+        self.index = index
         self.sign = sign
 
+        # default to not trusting the actual index to be meaningful
+        self.useindex = False
+
     def __str__(self):
-        return str(self.value)
+        if not self.useindex:
+            return ''
+        else:
+            return str(self.index)
 
 def _chooseOrderingSign(m, c, p):
     """Figures out whether p or m is visually right of c"""
@@ -77,18 +86,30 @@ def _chooseOrderingSign(m, c, p):
     else:
         assert m is not None or p is not None
 
-class DiscretePickable:
+class GenericPickable:
     """Utility class which abstracts the math of picking the closest point out
-       of a widget which has a list of points"""
-    def __init__(self, widget, xdata_propname, ydata_propname, mapdata_fn):
-        self.widget = widget
-        self.map_fn = mapdata_fn
+       of a list of points"""
 
-        s = widget.settings
-        doc = widget.document
-        self.xdata = s.get(xdata_propname).getData(doc)
-        self.ydata = s.get(ydata_propname).getData(doc)
-        self.labels = s.__getattr__(xdata_propname), s.__getattr__(ydata_propname)
+    def __init__(self, widget, labels, vals, screenvals):
+        self.widget = widget
+        self.labels = labels
+        self.xvals, self.yvals = vals
+        self.xscreen, self.yscreen = screenvals
+
+    def _pickSign(self, i):
+        if i == 0:
+            m = None
+        else:
+            m = self.xscreen[i-1], self.yscreen[i-1]
+
+        c = self.xscreen[i], self.yscreen[i]
+
+        if i+1 == len(self.xscreen):
+            p = None
+        else:
+            p = self.xscreen[i+1], self.yscreen[i+1]
+
+        return _chooseOrderingSign(m, c, p)
 
     def pickPoint(self, x0, y0, bounds, distance_direction):
         info = PickInfo(self.widget, labels=self.labels)
@@ -96,52 +117,39 @@ class DiscretePickable:
         if self.widget.settings.hide:
             return info
 
-        if not self.xdata or not self.ydata or not self.map_fn:
+        if None in (self.xvals, self.yvals):
             return info
 
-        # loop over all valid data and look for the closest point
-        offset = 0
-        import document
-        for xvals, yvals in document.generateValidDatasetParts(self.xdata, self.ydata):
-            xplotter, yplotter = self.map_fn(xvals.data, yvals.data, bounds)
+        # calculate distances
+        if distance_direction == 'vertical':
+            # measure distance along y
+            dist = N.abs(self.yscreen - y0)
+        elif distance_direction == 'horizontal':
+            # measure distance along x
+            dist = N.abs(self.xscreen - x0)
+        elif distance_direction == 'radial':
+            # measure radial distance
+            dist = N.sqrt((self.xscreen - x0)**2 + (self.yscreen - y0)**2)
+        else:
+            # programming error
+            assert (distance_direction == 'radial' or
+                    distance_direction == 'vertical' or
+                    distance_direction == 'horizontal')
 
-            if len(xplotter) != len(yplotter):
-                l = min(len(xplotter), len(yplotter))
-                xplotter = xplotter[0:l]
-                yplotter = yplotter[0:l]
+        # ignore points which are offscreen
+        outofbounds = ( (self.xscreen < bounds[0]) | (self.xscreen > bounds[2]) |
+                        (self.yscreen < bounds[1]) | (self.yscreen > bounds[3]) )
+        dist[outofbounds] = float('inf')
 
-            if distance_direction == 'vertical':
-                # measure distance along y
-                dist = N.abs(yplotter - y0)
-            elif distance_direction == 'horizontal':
-                # measure distance along x
-                dist = N.abs(xplotter - x0)
-            elif distance_direction == 'radial':
-                # measure radial distance
-                dist = N.sqrt((xplotter - x0)**2 + (yplotter - y0)**2)
-            else:
-                # programming error
-                assert (distance_direction == 'radial' or
-                        distance_direction == 'vertical' or
-                        distance_direction == 'horizontal')
+        m = N.min(dist)
+        # if there are multiple equidistant points, arbitrarily take
+        # the first one
+        i = N.nonzero(dist == m)[0][0]
 
-            # ignore points which are offscreen
-            outofbounds = ( (xplotter < bounds[0]) | (xplotter > bounds[2]) |
-                            (yplotter < bounds[1]) | (yplotter > bounds[3]) )
-            dist[outofbounds] = float('inf')
-
-            m = N.min(dist)
-            if m < info.distance:
-                # if there are multiple equidistant points, arbitrarily take
-                # the first one
-                i = N.nonzero(dist == m)[0][0]
-
-                info.screenpos = xplotter[i], yplotter[i]
-                info.coords = xvals.data[i], yvals.data[i]
-                info.distance = m
-                info.index = DiscreteIndex(i + offset)
-
-            offset += len(xplotter)
+        info.screenpos = self.xscreen[i], self.yscreen[i]
+        info.coords = self.xvals[i], self.yvals[i]
+        info.distance = m
+        info.index = Index(self.xvals[i], i, self._pickSign(i))
 
         return info
 
@@ -151,62 +159,91 @@ class DiscretePickable:
         if self.widget.settings.hide:
             return info
 
-        if not self.xdata or not self.ydata or not self.map_fn:
+        if None in (self.xvals, self.yvals):
             return info
 
-        centerindex = oldindex.value
-        # try to map one to each side of the current position
-        mapped = { centerindex - 1 : [None], centerindex: [None], centerindex + 1: [None] }
+        if oldindex.index is None:
+            # no explicit index, so find the closest location to the previous
+            # independent variable value
+            i = N.logical_not( N.logical_or(
+                    self.xvals < oldindex.ivar, self.xvals > oldindex.ivar) )
 
-        # iterate over only valid data to do the subscripting
-        offset = 0
-        for xvals, yvals in document.generateValidDatasetParts(self.xdata, self.ydata):
+            # and pick the next
+            if oldindex.sign == 1:
+                i = max(N.nonzero(i)[0])
+            else:
+                i = min(N.nonzero(i)[0])
+        else:
+            i = oldindex.index
+
+        if direction == 'right':
+            incr = oldindex.sign
+        elif direction == 'left':
+            incr = -oldindex.sign
+        else:
+            assert direction == 'right' or direction == 'left'
+
+        i += incr
+
+        # skip points that are outside of the bounds
+        while ( i >= 0 and i < len(self.xscreen) and
+            (self.xscreen[i] < bounds[0] or self.xscreen[i] > bounds[2] or
+             self.yscreen[i] < bounds[1] or self.yscreen[i] > bounds[3]) ):
+            i += incr
+
+        if i < 0 or i >= len(self.xscreen):
+            return info
+
+        info.screenpos = self.xscreen[i], self.yscreen[i]
+        info.coords = self.xvals[i], self.yvals[i]
+        info.index = Index(self.xvals[i], i, oldindex.sign)
+
+        return info
+
+class DiscretePickable(GenericPickable):
+    """A specialization of GenericPickable that knows how to deal with widgets
+       with axes and data sets"""
+    def __init__(self, widget, xdata_propname, ydata_propname, mapdata_fn):
+        s = widget.settings
+        doc = widget.document
+        xdata = s.get(xdata_propname).getData(doc)
+        ydata = s.get(ydata_propname).getData(doc)
+        labels = s.__getattr__(xdata_propname), s.__getattr__(ydata_propname)
+
+        if not xdata or not ydata or not mapdata_fn:
+            GenericPickable.__init__( self, widget, labels, (None, None), (None, None) )
+            return
+
+        # map all the valid data
+        x, y = N.array([]), N.array([])
+        xs, ys = N.array([]), N.array([])
+        for xvals, yvals in document.generateValidDatasetParts(xdata, ydata):
             chunklen = min(len(xvals.data), len(yvals.data))
 
-            if oldindex < offset:
-                break
+            x = N.append(x, xvals.data[:chunklen])
+            y = N.append(y, yvals.data[:chunklen])
 
-            index = centerindex - offset
-            for i in index-1, index, index+1:
-                if i < 0:
-                    continue
+        xs, ys = mapdata_fn(x, y)
 
-                if i < chunklen:
-                    x, y = xvals.data[i], yvals.data[i]
-                    xs, ys = self.map_fn(N.array(x), N.array(y), bounds)
+        # and set us up with the mapped data
+        GenericPickable.__init__( self, widget, labels, (x, y), (xs, ys) )
 
-                    # don't go outside the current plot window
-                    if ( (xs < bounds[0]) or (xs > bounds[2]) or
-                         (ys < bounds[1]) or (ys > bounds[3]) ):
-                        continue
+    def pickPoint(self, x0, y0, bounds, distance_direction):
+        info = GenericPickable.pickPoint(self, x0, y0, bounds, distance_direction)
 
-                    mapped[i + offset] = ((xs, ys), (x, y))
-
-            offset += chunklen
-
-        if ( mapped[centerindex][0] is None or
-             (mapped[centerindex-1][0] is None and mapped[centerindex+1][0] is None) ):
+        if not info:
             return info
 
-        if oldindex.sign == 0:
-            sign = _chooseOrderingSign(mapped[centerindex-1][0],
-                                       mapped[centerindex][0],
-                                       mapped[centerindex+1][0])
-        else:
-            sign = oldindex.sign
+        # indicies are persistent
+        info.index.useindex = True
+        return info
 
-        # we've now know which way is left and which way is right
-        if direction == 'right':
-            index = oldindex.value + sign
-        elif direction == 'left':
-            index = oldindex.value - sign
-        else:
-            # programming error
-            assert direction == 'left' or direction == 'right'
+    def pickIndex(self, oldindex, direction, bounds):
+        info = GenericPickable.pickIndex(self, oldindex, direction, bounds)
 
-        info.index = DiscreteIndex(index, sign)
-        if mapped[index][0] is not None:
-            info.screenpos = mapped[index][0]
-            info.coords = mapped[index][1]
+        if not info:
+            return info
 
+        # indicies are persistent
+        info.index.useindex = True
         return info
