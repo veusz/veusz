@@ -27,6 +27,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
+import pickable
+
 from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
 from point import MarkerFillBrush
@@ -104,6 +106,16 @@ class NonOrthPoint(Widget):
         if d2:
             inrange[2] = min( N.nanmin(d2.data), inrange[2] )
             inrange[3] = max( N.nanmax(d2.data), inrange[3] )
+
+    def pickPoint(self, x0, y0, bounds, distance = 'radial'):
+        p = pickable.DiscretePickable(self, 'data1', 'data2',
+                lambda v1, v2, b: self.parent.graphToPlotCoords(v1, v2))
+        return p.pickPoint(x0, y0, bounds, distance)
+
+    def pickIndex(self, oldindex, direction, bounds):
+        p = pickable.DiscretePickable(self, 'data1', 'data2',
+                lambda v1, v2, b: self.parent.graphToPlotCoords(v1, v2))
+        return p.pickIndex(oldindex, direction, bounds)
 
     def plotMarkers(self, painter, plta, pltb, scaling, clip):
         '''Draw markers in widget.'''
