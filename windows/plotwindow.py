@@ -162,6 +162,14 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
         self.setBrush(qt4.QBrush(qt4.Qt.black))
         self.setFlags(self.flags() | qt4.QGraphicsItem.ItemIsFocusable)
 
+    def paint(self, painter, option, widget):
+        """Override this to enforce the global antialiasing setting"""
+        aa = setting.settingdb['plot_antialias']
+        painter.save()
+        painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
+        qt4.QGraphicsPathItem.paint(self, painter, option, widget)
+        painter.restore()
+
     def focusOutEvent(self, event):
         qt4.QGraphicsPathItem.focusOutEvent(self, event)
         self.hide()
