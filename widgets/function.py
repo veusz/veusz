@@ -360,6 +360,15 @@ class FunctionPlotter(GenericPlotter):
 
         return results, resultpts
 
+    def calcFunctionPoints(self, axes, posn):
+        ipts, pipts = self.getIndependentPoints(axes, posn)
+        dpts, pdpts = self.calcDependentPoints(ipts, axes, posn)
+        
+        if self.settings.variable == 'x':
+            return (ipts, dpts), (pipts, pdpts)
+        else:
+            return (dpts, ipts), (pdpts, pipts)
+
     def _pickable(self, posn):
         s = self.settings
 
@@ -371,8 +380,7 @@ class FunctionPlotter(GenericPlotter):
         else:
             axisnames[0] = axisnames[0] + '(' + axisnames[1] + ')'
 
-        xpts, pxpts = self.getIndependentPoints(axes, posn)
-        ypts, pypts = self.calcDependentPoints(xpts, axes, posn)
+        (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
 
         return pickable.GenericPickable(
                     self, axisnames, (xpts, ypts), (pxpts, pypts) )
@@ -410,8 +418,7 @@ class FunctionPlotter(GenericPlotter):
         cliprect = self.clipAxesBounds(painter, axes, posn)
 
         # get the points to plot by evaluating the function
-        xpts, pxpts = self.getIndependentPoints(axes, posn)
-        ypts, pypts = self.calcDependentPoints(xpts, axes, posn)
+        (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
 
         # draw the function line
         if pxpts is None or pypts is None:
