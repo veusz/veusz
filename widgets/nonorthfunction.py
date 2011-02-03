@@ -27,6 +27,7 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
+import pickable
 from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
 from function import FunctionChecker
@@ -129,6 +130,23 @@ class NonOrthFunction(Widget):
 
     def updateDataRanges(self, inrange):
         '''Update ranges of data given function.'''
+
+    def _pickable(self):
+        apts, bpts = self.getFunctionPoints()
+        px, py = self.parent.graphToPlotCoords(apts, bpts)
+
+        if self.settings.variable == 'a':
+            labels = ('a', 'b(a)')
+        else:
+            labels = ('a(b)', 'b')
+
+        return pickable.GenericPickable( self, labels, (apts, bpts), (px, py) )
+
+    def pickPoint(self, x0, y0, bounds, distance='radial'):
+        return self._pickable().pickPoint(x0, y0, bounds, distance)
+
+    def pickIndex(self, oldindex, direction, bounds):
+        return self._pickable().pickIndex(oldindex, direction, bounds)
 
     def draw(self, parentposn, painter, outerbounds=None):
         '''Plot the function on a plotter.'''
