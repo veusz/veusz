@@ -146,6 +146,26 @@ class ClickPainter(document.Painter):
         else:
             return None
 
+class PickerCrosshairItem( qt4.QGraphicsPathItem ):
+    """The picker cross widget: it moves from point to point and curve to curve
+       with the arrow keys, and hides itself when it looses focus"""
+    def __init__(self, parent=None):
+        path = qt4.QPainterPath()
+        path.addRect(-4, -4, 8, 8)
+        path.addRect(-5, -5, 10, 10)
+        path.moveTo(-8, 0)
+        path.lineTo(8, 0)
+        path.moveTo(0, -8)
+        path.lineTo(0, 8)
+
+        qt4.QGraphicsPathItem.__init__(self, path, parent)
+        self.setBrush(qt4.QBrush(qt4.Qt.black))
+        self.setFlags(self.flags() | qt4.QGraphicsItem.ItemIsFocusable)
+
+    def focusOutEvent(self, event):
+        qt4.QGraphicsPathItem.focusOutEvent(self, event)
+        self.hide()
+
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
@@ -174,6 +194,18 @@ class PlotWindow( qt4.QGraphicsView ):
                                             qt4.QPen(qt4.Qt.DotLine) )
         self.zoomrect.setZValue(2.)
         self.zoomrect.hide()
+
+        # picker graphicsitem for marking the picked point
+        self.pickeritem = PickerCrosshairItem()
+        self.scene.addItem(self.pickeritem)
+        self.pickeritem.setZValue(2.)
+        self.pickeritem.hide()
+
+        # all the widgets that picker key-navigation might cycle through
+        self.pickerwidgets = []
+
+        # the picker state
+        self.pickerinfo = widgets.PickInfo()
 
         # set up so if document is modified we are notified
         self.document = document
@@ -299,6 +331,11 @@ class PlotWindow( qt4.QGraphicsView ):
                       'Select items or scroll',
                       None,
                       icon='kde-mouse-pointer'),
+                'view.pick':
+                    a(self, 'Read data points on the graph',
+                      'Read data points',
+                      None,
+                      icon='veusz-pick-data'),
                 'view.zoomgraph':
                     a(self, 'Zoom into graph', 'Zoom graph',
                       None,
@@ -314,7 +351,7 @@ class PlotWindow( qt4.QGraphicsView ):
                         'view.zoomheight', 'view.zoompage',
                         '',
                         'view.prevpage', 'view.nextpage',
-                        'view.select', 'view.zoomgraph',
+                        'view.select', 'view.pick', 'view.zoomgraph',
                         ]),
                 ]
             utils.constructMenus(menu, {'view': menu}, menuitems,
@@ -339,13 +376,13 @@ class PlotWindow( qt4.QGraphicsView ):
         # add items to toolbar
         utils.addToolbarActions(self.viewtoolbar, actions,
                                 ('view.prevpage', 'view.nextpage',
-                                 'view.select', 'view.zoomgraph',
-                                 'view.zoommenu'))
+                                 'view.select', 'view.pick',
+                                 'view.zoomgraph', 'view.zoommenu'))
 
         # define action group for various different selection models
         grp = self.selectactiongrp = qt4.QActionGroup(self)
         grp.setExclusive(True)
-        for a in ('view.select', 'view.zoomgraph'):
+        for a in ('view.select', 'view.pick', 'view.zoomgraph'):
             actions[a].setActionGroup(grp)
             actions[a].setCheckable(True)
         actions['view.select'].setChecked(True)
@@ -457,7 +494,65 @@ class PlotWindow( qt4.QGraphicsView ):
         # finally change the axes
         self.document.applyOperation(
             document.OperationMultiple(operations,descr='zoom axes') )
-                    
+
+    def axesForPoint(self, mousepos):
+        """Find all the axes which contain the given mouse position"""
+        pos = self.mapToScene(mousepos)
+        px, py = pos.x(), pos.y()
+
+        axes = []
+        for widget, bounds in self.widgetpositions:
+            # if widget is axis, and point lies within bounds
+            if ( isinstance(widget, widgets.Axis) and
+                 px>=bounds[0] and px<=bounds[2] and
+                 py>=bounds[1] and py<=bounds[3] ):
+
+                # convert correct pointer position
+                if widget.settings.direction == 'horizontal':
+                    val = px
+                else:
+                    val = py
+                coords=widget.plotterToGraphCoords(bounds, N.array([val]))
+                axes.append( (widget, coords[0]) )
+
+        return axes
+
+    def emitPicked(self, pickinfo):
+        """Report that a new point has been picked"""
+
+        self.pickerinfo = pickinfo
+        self.pickeritem.setPos(pickinfo.screenpos[0], pickinfo.screenpos[1])
+        self.emit(qt4.SIGNAL("sigPointPicked"), pickinfo)
+
+    def doPick(self, mousepos):
+        """Find the point on any plot-like widget closest to the cursor"""
+
+        self.pickerwidgets = []
+
+        pickinfo = widgets.PickInfo()
+        pos = self.mapToScene(mousepos)
+
+        for w, bounds in self.widgetpositions:
+            try:
+                # ask the widget for its (visually) closest point to the cursor
+                info = w.pickPoint(pos.x(), pos.y(), bounds)
+
+                # this is a pickable widget, so remember it for future key navigation
+                self.pickerwidgets.append(w)
+
+                if info.distance < pickinfo.distance:
+                    # and remember the overall closest
+                    pickinfo = info
+            except AttributeError:
+                # ignore widgets that don't support axes or picking
+                continue
+
+        if not pickinfo:
+            self.pickeritem.hide()
+            return
+
+        self.emitPicked(pickinfo)
+
     def slotBecomeScrollClick(self):
         """If the click is still down when this timer is reached then
         we turn the click into a scrolling click."""
@@ -486,6 +581,11 @@ class PlotWindow( qt4.QGraphicsView ):
                 # scroll clicks drag the window around, and selecting clicks
                 # select widgets!
                 self.scrolltimer.start(400)
+
+            elif self.clickmode == 'pick':
+                self.pickeritem.show()
+                self.pickeritem.setFocus(qt4.Qt.MouseFocusReason)
+                self.doPick(event.pos())
 
             elif self.clickmode == 'scroll':
                 qt4.QApplication.setOverrideCursor(
@@ -528,27 +628,16 @@ class PlotWindow( qt4.QGraphicsView ):
             self.zoomrect.setRect( r.x(), r.y(), pos.x()-r.x(),
                                    pos.y()-r.y() )
 
-        elif self.clickmode == 'select':
+        elif self.clickmode == 'select' or self.clickmode == 'pick':
             # find axes which map to this position
-            pos = self.mapToScene(event.pos())
-            px, py = pos.x(), pos.y()
-
-            vals = {}
-            for widget, bounds in self.widgetpositions:
-                # if widget is axis, and point lies within bounds
-                if ( isinstance(widget, widgets.Axis) and
-                     px>=bounds[0] and px<=bounds[2] and
-                     py>=bounds[1] and py<=bounds[3] ):
-
-                    # convert correct pointer position
-                    if widget.settings.direction == 'horizontal':
-                        val = px
-                    else:
-                        val = py
-                    coords=widget.plotterToGraphCoords(bounds, N.array([val]))
-                    vals[widget.name] = coords[0]
+            axes = self.axesForPoint(event.pos())
+            vals = dict([ (a[0].name, a[1]) for a in axes ])
 
             self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
+
+            if self.currentclickmode == 'pick':
+                # drag the picker around
+                self.doPick(event.pos())
 
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
@@ -573,6 +662,61 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.grabpos = None
             elif self.currentclickmode == 'viewgetclick':
                 self.clickmode = 'select'
+            elif self.currentclickmode == 'pick':
+                self.currentclickmode = None
+
+    def keyPressEvent(self, event):
+        """Keypad motion moves the picker if it has focus"""
+        if self.pickeritem.hasFocus():
+            event.accept()
+            k = event.key()
+            if k == qt4.Qt.Key_Left or k == qt4.Qt.Key_Right:
+                # navigate to the previous or next point on the curve
+                dir = 'right' if k == qt4.Qt.Key_Right else 'left'
+                ix = self.pickerinfo.index
+                pickinfo = self.pickerinfo.widget.pickIndex(ix, dir,
+                                self.widgetpositionslookup[self.pickerinfo.widget])
+                if not pickinfo:
+                    # no more points visible in this direction
+                    return
+
+                self.emitPicked(pickinfo)
+            elif k == qt4.Qt.Key_Up or k == qt4.Qt.Key_Down:
+                # navigate to the next plot up or down on the screen
+                p = self.pickeritem.pos()
+
+                oldw = self.pickerinfo.widget
+                pickinfo = widgets.PickInfo()
+
+                dist = float('inf')
+                for w in self.pickerwidgets:
+                    if w == oldw:
+                        continue
+
+                    # ask the widgets to pick their point which is closest horizontally
+                    # to the last (screen) x value picked
+                    pi = w.pickPoint(self.pickerinfo.screenpos[0], p.y(),
+                                     self.widgetpositionslookup[w],
+                                     distance='horizontal')
+                    if not pi:
+                        continue
+
+                    dy = p.y() - pi.screenpos[1]
+
+                    # take the new point which is closest vertically to the current
+                    # one and either above or below it as appropriate
+                    if abs(dy) < dist and ( (k == qt4.Qt.Key_Up and dy > 0)
+                            or (k == qt4.Qt.Key_Down and dy < 0) ):
+                        pickinfo = pi
+                        dist = abs(dy)
+
+                if pickinfo:
+                    oldx = self.pickerinfo.screenpos[0]
+                    self.emitPicked(pickinfo)
+
+                    # restore the previous x-position, so that vertical navigation
+                    # stays repeatable
+                    pickinfo.screenpos = (oldx, pickinfo.screenpos[1])
 
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
@@ -868,17 +1012,25 @@ class PlotWindow( qt4.QGraphicsView ):
         """Called when the selection mode has changed."""
 
         modecnvt = { self.vzactions['view.select'] : 'select',
+                     self.vzactions['view.pick'] : 'pick',
                      self.vzactions['view.zoomgraph'] : 'graphzoom' }
         
+        # close the current picker
+        self.pickeritem.hide()
+        self.emit(qt4.SIGNAL('sigPickerEnabled'), False)
+
         # convert action into clicking mode
         self.clickmode = modecnvt[action]
 
         if self.clickmode == 'select':
-            pass
+            self.pixmapitem.unsetCursor()
             #self.label.setCursor(qt4.Qt.ArrowCursor)
         elif self.clickmode == 'graphzoom':
-            pass
+            self.pixmapitem.unsetCursor()
             #self.label.setCursor(qt4.Qt.CrossCursor)
+        elif self.clickmode == 'pick':
+            self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
+            self.emit(qt4.SIGNAL('sigPickerEnabled'), True)
         
     def getClick(self):
         """Return a click point from the graph."""

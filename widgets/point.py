@@ -28,6 +28,7 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
+import pickable
 from plotters import GenericPlotter
 
 try:
@@ -594,6 +595,37 @@ class PointPlotter(GenericPlotter):
         else:
             return (text, yv.data)
 
+    def _fetchAxes(self):
+        """Returns the axes for this widget"""
+
+        s = self.settings
+        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+
+        # fail if we don't have good axes
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' ):
+            return None
+
+        return axes
+
+    def _mapper(self):
+        axes = self._fetchAxes()
+
+        if not axes:
+            return None
+
+        return lambda xv, yv, bounds: (axes[0].dataToPlotterCoords(bounds, xv),
+            axes[1].dataToPlotterCoords(bounds, yv))
+
+    def pickPoint(self, x0, y0, bounds, distance = 'radial'):
+        p = pickable.DiscretePickable(self, 'xData', 'yData', self._mapper())
+        return p.pickPoint(x0, y0, bounds, distance)
+
+    def pickIndex(self, oldindex, direction, bounds):
+        p = pickable.DiscretePickable(self, 'xData', 'yData', self._mapper())
+        return p.pickIndex(oldindex, direction, bounds)
+
     def draw(self, parentposn, painter, outerbounds=None):
         """Plot the data on a plotter."""
 
@@ -624,12 +656,8 @@ class PointPlotter(GenericPlotter):
             text = text*(length / len(text)) + text[:length % len(text)]
 
         # get axes widgets
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # return if there's no proper axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
+        axes = self._fetchAxes()
+        if not axes:
             return
 
         # clip data within bounds of plotter

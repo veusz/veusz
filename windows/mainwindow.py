@@ -129,15 +129,27 @@ class MainWindow(qt4.QMainWindow):
         self.interpreter = self.console.interpreter
         self.addDockWidget(qt4.Qt.BottomDockWidgetArea, self.console)
 
-        # keep page number up to date
+        # assemble the statusbar
         statusbar = self.statusbar = qt4.QStatusBar(self)
         self.setStatusBar(statusbar)
         self.updateStatusbar('Ready')
-        self.pagelabel = qt4.QLabel(statusbar)
-        statusbar.addWidget(self.pagelabel)
+
+        # a label for the picker readout
+        self.pickerlabel = qt4.QLabel(statusbar)
+        self._setPickerFont(self.pickerlabel)
+        statusbar.addPermanentWidget(self.pickerlabel)
+        self.pickerlabel.hide()
+
+        # a label for the cursor position readout
         self.axisvalueslabel = qt4.QLabel(statusbar)
-        statusbar.addWidget(self.axisvalueslabel)
+        statusbar.addPermanentWidget(self.axisvalueslabel)
         self.axisvalueslabel.show()
+        self.slotUpdateAxisValues(None)
+
+        # a label for the page number readout
+        self.pagelabel = qt4.QLabel(statusbar)
+        statusbar.addPermanentWidget(self.pagelabel)
+        self.pagelabel.show()
 
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt4.QDir.homePath())
@@ -150,7 +162,11 @@ class MainWindow(qt4.QMainWindow):
                       self.slotUpdatePage )
         self.connect( self.plot, qt4.SIGNAL("sigAxisValuesFromMouse"),
                       self.slotUpdateAxisValues )
-        
+        self.connect( self.plot, qt4.SIGNAL("sigPickerEnabled"),
+                      self.slotPickerEnabled )
+        self.connect( self.plot, qt4.SIGNAL("sigPointPicked"),
+                      self.slotUpdatePickerLabel )
+
         # disable save if already saved
         self.connect( self.document, qt4.SIGNAL("sigModified"),
                       self.slotModifiedDoc )
@@ -540,6 +556,12 @@ class MainWindow(qt4.QMainWindow):
 
         self.menus = {}
         utils.constructMenus(self.menuBar(), self.menus, menus, self.vzactions)
+
+    def _setPickerFont(self, label):
+        f = label.font()
+        f.setBold(True)
+        f.setPointSizeF(f.pointSizeF() * 1.2)
+        label.setFont(f)
 
     def defineViewWindowMenu(self):
         """Setup View -> Window menu."""
@@ -1181,6 +1203,24 @@ class MainWindow(qt4.QMainWindow):
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
             self.axisvalueslabel.setText('No position')
+
+    def slotPickerEnabled(self, enabled):
+        if enabled:
+            self.pickerlabel.setText('No point selected')
+            self.pickerlabel.show()
+        else:
+            self.pickerlabel.hide()
+
+    def slotUpdatePickerLabel(self, info):
+        """Display the picked point"""
+        xv, yv = info.coords
+        xn, yn = info.labels
+        ix = str(info.index)
+        if ix:
+            ix = '[' + ']'
+        t = '%s: %s%s = %0.5g, %s%s = %0.5g' % (
+                info.widget.name, xn, ix, xv, yn, ix, yv)
+        self.pickerlabel.setText(t)
 
     def slotAllowedImportsDoc(self, module, names):
         """Are allowed imports?"""
