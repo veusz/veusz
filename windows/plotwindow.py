@@ -797,6 +797,7 @@ class PlotWindow( qt4.QGraphicsView ):
              self.document.changeset != self.docchangeset or
              self.forceupdate ):
 
+            self.pickeritem.hide()
             self.setOutputSize()
             
             # fill pixmap with proper background colour
