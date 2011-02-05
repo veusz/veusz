@@ -329,7 +329,9 @@ def checkCode(code, securityonly=False):
     if securityonly is set, then don't return errors from Python
     exceptions.
     """
-    
+
+    # compiler can't parse strings with unicode
+    code = code.encode('utf8')
     try:
         ast = compiler.parse(code)
     except SyntaxError, e:
