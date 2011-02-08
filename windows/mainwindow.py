@@ -34,6 +34,7 @@ import veusz.plugins as plugins
 import consolewindow
 import plotwindow
 import treeeditwindow
+from datanav import DataNavigatorWindow
 
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData
@@ -121,6 +122,8 @@ class MainWindow(qt4.QMainWindow):
         self.formatdock = treeeditwindow.FormatDock(self.document,
                                                     self.treeedit, self)
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.formatdock)
+        self.datadock = DataNavigatorWindow(self.document, self)
+        self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.datadock)
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
@@ -710,8 +713,8 @@ class MainWindow(qt4.QMainWindow):
                 self.slotFileSave()
 
         # store working directory
-        setdb['dirname'] = unicode(self.dirname)
-        setdb['dirname_export'] = unicode(self.dirname_export)
+        setdb['dirname'] = self.dirname
+        setdb['dirname_export'] = self.dirname_export
 
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )

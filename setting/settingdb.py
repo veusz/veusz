@@ -157,6 +157,11 @@ class _SettingDB(object):
         for key, value in self.database.iteritems():
             cleankey = key.replace('/', self.sepchars)
             cleankeys.append(cleankey)
+
+            # repr doesn't work on QStrings
+            if isinstance(value, qt4.QObject):
+                value = unicode(value)
+
             s.setValue(cleankey, qt4.QVariant(repr(value)))
 
         # now remove all the values which have been removed
