@@ -44,6 +44,11 @@ class InvalidType(Exception):
     pass
 
 class Setting(object):
+    """A class to store a value with a particular type."""
+
+    # differentiate widgets, settings and setting
+    nodetype = 'setting'
+
     typename = 'setting'
 
     def __init__(self, name, value, descr='', usertext='',

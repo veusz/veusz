@@ -25,6 +25,9 @@ from reference import Reference
 class Settings(object):
     """A class for holding collections of settings."""
 
+    # differentiate widgets, settings and setting
+    nodetype = 'settings'
+
     def __init__(self, name, descr = '', usertext='', pixmap=''):
         """A new Settings with a name."""
 

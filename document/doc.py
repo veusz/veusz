@@ -911,6 +911,41 @@ class Document( qt4.QObject ):
         """
         return datasets.simpleEvalExpression(self, expr, part=part)
 
+    def walkNodes(self, tocall, root=None,
+                  nodetypes=('widget', 'setting', 'settings'),
+                  _path=None):
+        """Walk the widget/settings/setting nodes in the document.
+        For each one call tocall(path, node).
+        nodetypes is tuple of possible node types
+        """
+
+        if root is None:
+            root = self.basewidget
+        if _path is None:
+            _path = root.path
+
+        if root.nodetype in nodetypes:
+            tocall(_path, root)
+
+        if root.nodetype == 'widget':
+            # get rid of // at start of path
+            if _path == '/':
+                _path = ''
+
+            # do the widget's children
+            for w in root.children:
+                self.walkNodes(tocall, root=w, nodetypes=nodetypes,
+                               _path = _path + '/' + w.name)
+            # then do the widget's settings
+            self.walkNodes(tocall, root=root.settings,
+                           nodetypes=nodetypes, _path=_path)
+        elif root.nodetype == 'settings':
+            # do the settings of the settings
+            for name, s in sorted(root.setdict.iteritems()):
+                self.walkNodes(tocall, root=s, nodetypes=nodetypes,
+                               _path = _path + '/' + s.name)
+        # elif root.nodetype == 'setting': pass
+
 class Painter(qt4.QPainter):
     """A painter which allows the program to know which widget it is
     currently drawing."""

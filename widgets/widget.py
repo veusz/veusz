@@ -53,6 +53,9 @@ class Action(object):
 class Widget(object):
     """ Fundamental plotting widget interface."""
 
+    # differentiate widgets, settings and setting
+    nodetype = 'widget'
+
     typename = 'generic'
     allowusercreation = False
 
