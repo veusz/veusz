@@ -123,7 +123,8 @@ the mailing lists at
 https://gna.org/mail/?group=veusz
 
 to discuss new features or if you'd like to contribute code. The
-latest code can always be found in the SVN repository.
+latest code can always be found in the Git repository
+at https://github.com/jeremysanders/veusz.git.
 
 Jeremy Sanders
 

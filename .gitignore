@@ -1,0 +1,7 @@
+# files Git should always ignore
+
+*.pyc
+build/
+helpers/*.pyd
+helpers/*.so
+
