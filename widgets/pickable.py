@@ -97,6 +97,10 @@ class GenericPickable:
         self.xscreen, self.yscreen = screenvals
 
     def _pickSign(self, i):
+        if len(self.xscreen) <= 1:
+            # we only have one element, so it doesn't matter anyways
+            return 1
+        
         if i == 0:
             m = None
         else:
