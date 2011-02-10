@@ -31,9 +31,22 @@ def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
-    val = ('%.'+str(prec)+'f') % v
+    # this is to get consistent rounding to get the self test correct... yuck
+    # decimal would work, but that drags in loads of code
+    # convert float to string with prec decimal places
+
+    fmt = '% 10.' + str(prec) + 'f'
+    v1 = fmt % (v-1e-6)
+    v2 = fmt % (v+1e-6)
+
+    # always round down
+    if v1 < v2:
+        val = v1
+    else:
+        val = v2
+
     # drop any trailing zeros
-    val = val.rstrip('0').rstrip('.')
+    val = val.rstrip('0').lstrip(' ').rstrip('.')
     # get rid of -0s (platform differences here)
     if val == '-0':
         val = '0'

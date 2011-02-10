@@ -85,9 +85,9 @@
 <path d="M257.85,232.96l-7.5,0M257.85,196.5l-7.5,0M257.85,160.05l-7.5,0M257.85,123.59l-7.5,0M257.85,87.14l-7.5,0M257.85,50.68l-7.5,0M257.85,14.23l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="-51.88" y="241.71" font-size="14pt" fill="#000000">&#8722;1.5</text>
-<text x="-34.38" y="205.25" font-size="14pt" fill="#000000">&#8722;1</text>
-<text x="-51.88" y="168.8" font-size="14pt" fill="#000000">&#8722;0.5</text>
+<text x="-51.87" y="241.71" font-size="14pt" fill="#000000">&#8722;1.5</text>
+<text x="-34.37" y="205.25" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="-51.87" y="168.8" font-size="14pt" fill="#000000">&#8722;0.5</text>
 <text x="26.86" y="132.34" font-size="14pt" fill="#000000">0</text>
 <text x="9.36" y="95.89" font-size="14pt" fill="#000000">0.5</text>
 <text x="26.86" y="59.43" font-size="14pt" fill="#000000">1</text>
@@ -191,7 +191,7 @@
 <text x="296.16" y="238.21" font-size="14pt" fill="#000000">0</text>
 <text x="347.02" y="238.21" font-size="14pt" fill="#000000">5</text>
 <text x="393.52" y="238.21" font-size="14pt" fill="#000000">10</text>
-<text x="444.38" y="238.21" font-size="14pt" fill="#000000">15</text>
+<text x="444.37" y="238.21" font-size="14pt" fill="#000000">15</text>
 <text x="495.25" y="238.21" font-size="14pt" fill="#000000">20</text>
 </g>
 <g stroke-width="0.62" fill="#ffffff">
@@ -239,8 +239,8 @@
 <path d="M257.85,484.59l-7.5,0M257.85,434.84l-7.5,0M257.85,385.09l-7.5,0M257.85,335.34l-7.5,0M257.85,285.59l-7.5,0"/>
 </g>
 <g stroke-width="1" fill="none">
-<text x="-34.38" y="493.34" font-size="14pt" fill="#000000">&#8722;1</text>
-<text x="-51.88" y="443.59" font-size="14pt" fill="#000000">&#8722;0.5</text>
+<text x="-34.37" y="493.34" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="-51.87" y="443.59" font-size="14pt" fill="#000000">&#8722;0.5</text>
 <text x="26.86" y="393.84" font-size="14pt" fill="#000000">0</text>
 <text x="9.36" y="344.09" font-size="14pt" fill="#000000">0.5</text>
 <text x="26.86" y="294.34" font-size="14pt" fill="#000000">1</text>
@@ -331,7 +331,7 @@
 <text x="265.53" y="499.62" font-size="14pt" fill="#000000">&#8722;1</text>
 <text x="405.52" y="499.62" font-size="14pt" fill="#000000">0</text>
 <text x="451.45" y="499.62" font-size="14pt" fill="#000000">0.5</text>
-<text x="514.88" y="499.62" font-size="14pt" fill="#000000">1</text>
+<text x="514.87" y="499.62" font-size="14pt" fill="#000000">1</text>
 </g>
 </g>
 </g>

@@ -47,11 +47,10 @@
 <text x="252.44" y="234.45" font-size="16pt" fill="#000000">test2</text>
 <text x="345.62" y="234.45" font-size="16pt" fill="#000000">A</text>
 <text x="355.62" y="226.45" font-size="10pt" fill="#000000">200</text>
-<text x="438.81" y="117.97" font-size="16pt" fill="#000000">&#945;</text>
-<text x="448.81" y="117.97" font-size="16pt" fill="#000000"> </text>
-<text x="453.81" y="117.97" font-size="16pt" fill="#000000">&#946;</text>
-<text x="463.81" y="117.97" font-size="16pt" fill="#000000"> </text>
-<text x="468.81" y="117.97" font-size="16pt" fill="#000000">&#947;</text>
+<text x="438.81" y="117.97" font-size="16pt" fill="#000000">&#945; </text>
+<text x="503.81" y="117.97" font-size="16pt" fill="#000000">&#946;</text>
+<text x="513.81" y="117.97" font-size="16pt" fill="#000000"> </text>
+<text x="518.81" y="117.97" font-size="16pt" fill="#000000">&#947;</text>
 </g>
 </g>
 <g clip-path="url(#c0)">
