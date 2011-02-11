@@ -314,7 +314,7 @@ class DescriptorPart(object):
                         minlength = len(ds)
                 for ds in vals, pos, neg, sym:
                     if ds is not None and len(ds) != minlength:
-                        ds = ds[:minlength]
+                        del ds[minlength:]
 
                 # only remember last N values
                 if tail is not None:
