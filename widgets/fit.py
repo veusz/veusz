@@ -78,7 +78,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     redchi2 = retchi2 / dof
 
     print 'Fit results:\n', "\n".join([
-        u"    %s = %g \u00b1 %g (+%g / -%g)"
+        u"    %s = %g \u00b1 %g (+%g / %g)"
             % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)], m.merrors[(n, -1.0)]) for n in names])
     print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2)
 
