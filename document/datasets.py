@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    Copyright (C) 2006 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -15,8 +16,6 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
-
-# $Id$
 
 """Classes to represent datasets."""
 
@@ -496,6 +495,15 @@ class DatasetBase(object):
                 return name
         raise ValueError('Could not find self in document.data')
 
+    def userSize(self):
+        """Return dimensions of dataset for user."""
+        return ""
+
+    def userPreview(self):
+        """Return a small preview of the dataset for the user, e.g.
+        1, 2, 3, ..., 4, 5, 6."""
+        return None
+
     def description(self, showlinked=True):
         """Get description of database."""
         return ""
@@ -613,10 +621,18 @@ class Dataset2D(DatasetBase):
 
         fileobj.write("''')\n")
 
+    def userSize(self):
+        """Return dimensions of dataset for user."""
+        return u'%i×%i' % self.data.shape
+
+    def userPreview(self):
+        """Return preview of data."""
+        return dsPreviewHelper(self.data.flatten())
+
     def description(self, showlinked=True):
         """Get description of dataset."""
         text = self.name()
-        text += ' (%ix%i)' % self.data.shape
+        text += u' (%i×%i)' % self.data.shape
         text += ', x=%g->%g' % tuple(self.xrange)
         text += ', y=%g->%g' % tuple(self.yrange)
         if self.linked and showlinked:
@@ -633,6 +649,20 @@ class Dataset2D(DatasetBase):
 
     def returnCopy(self):
         return Dataset2D( N.array(self.data), self.xrange, self.yrange)
+
+def dsPreviewHelper(d):
+    """Get preview of numpy data d."""
+    if d.shape[0] <= 6:
+        line1 = ', '.join( ['%.3g' % x for x in d] )
+    else:
+        line1 = ', '.join( ['%.3g' % x for x in d[:3]] +
+                           [ '...' ] +
+                           ['%.3g' % x for x in d[-3:]] )
+    line2 = 'mean: %.3g, min: %.3g, max: %.3g' % (
+        N.nansum(d) / N.isfinite(d).sum(),
+        N.nanmin(d),
+        N.nanmax(d))
+    return line1 + '\n' + line2
 
 class Dataset(DatasetBase):
     '''Represents a dataset.'''
@@ -670,6 +700,14 @@ class Dataset(DatasetBase):
         self.serr = serr
         self.perr = perr
         self.nerr = nerr
+
+    def userSize(self):
+        """Size of dataset."""
+        return str( self.data.shape[0] )
+
+    def userPreview(self):
+        """Preview of data."""
+        return dsPreviewHelper(self.data)
 
     def description(self, showlinked=True):
         """Get description of dataset."""
@@ -845,6 +883,10 @@ class DatasetText(DatasetBase):
         if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
+
+    def userSize(self):
+        """Size of dataset."""
+        return str( len(self.data) )
 
     def changeValues(self, type, vals):
         if type == 'data':
@@ -1202,6 +1244,10 @@ class DatasetRange(Dataset):
         self.document = None
         self.linked = None
         self._invalidpoints = None
+
+    def userSize(self):
+        """Size of dataset."""
+        return str( self.numsteps )
 
     def saveToFile(self, fileobj, name):
         """Save dataset to file."""
@@ -1649,6 +1695,10 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
 
     def __getitem__(self, key):
         return Dataset(**self._getItemHelper(key))
+
+    def userSize(self):
+        """Size of dataset."""
+        return str( self.data.shape[0] )
 
     # parent class sets these attributes, so override setattr to do nothing
     data = property( lambda self: self.getPluginData('data'),
