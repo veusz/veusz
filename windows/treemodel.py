@@ -33,7 +33,7 @@ class TMNode(object):
         self.parent = parent
         self.childnodes = []
 
-    def getTooltip(self, column):
+    def toolTip(self, column):
         """Return tooltip for column, if any."""
         return qt4.QVariant()
 
@@ -47,7 +47,7 @@ class TMNode(object):
         """Delete this node from its parent."""
         del self.parent.childnodes[self.parent.childnodes.index(self)]
 
-    def getData(self, idx):
+    def nodeData(self, idx):
         """Get data with index given."""
         try:
             return qt4.QVariant(self.data[idx])
@@ -92,10 +92,10 @@ class TreeModel(qt4.QAbstractItemModel):
         if index.isValid():
             if role == qt4.Qt.DisplayRole:
                 item = index.internalPointer()
-                return item.getData(index.column())
+                return item.nodeData(index.column())
             elif role == qt4.Qt.ToolTipRole:
                 item = index.internalPointer()
-                return item.getTooltip(index.column())
+                return item.toolTip(index.column())
 
         return qt4.QVariant()
 
@@ -106,7 +106,7 @@ class TreeModel(qt4.QAbstractItemModel):
 
     def headerData(self, section, orientation, role):
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
-            return self.root.getData(section)
+            return self.root.nodeData(section)
         return qt4.QVariant()
 
     def index(self, row, column, parent):

@@ -33,7 +33,7 @@ class DatasetNode(TMNode):
         TMNode.__init__(self, data, parent)
         self.doc = doc
 
-    def getTooltip(self, column):
+    def toolTip(self, column):
         try:
             ds = self.doc.data[self.data[0]]
         except KeyError:
@@ -44,6 +44,17 @@ class DatasetNode(TMNode):
             return qt4.QVariant( ds.userPreview() )
         return qt4.QVariant()
 
+    def dataset(self):
+        """Get associated dataset."""
+        try:
+            return self.doc.data[self.data[0]]
+        except KeyError:
+            return None
+
+    def datasetName(self):
+        """Get dataset name."""
+        return self.data[0]
+
     def cloneTo(self, newroot):
         """Make a clone of self at the root given."""
         return self.__class__(self.doc, self.data, newroot)
@@ -51,7 +62,7 @@ class DatasetNode(TMNode):
 class FilenameNode(TMNode):
     """A special node for holding filenames of files."""
 
-    def getData(self, column):
+    def nodeData(self, column):
         """basename of filename for data."""
         if column == 0:
             if self.data[0] == '/':
@@ -60,7 +71,7 @@ class FilenameNode(TMNode):
                 return qt4.QVariant(os.path.basename(self.data[0]))
         return qt4.QVariant()
 
-    def getTooltip(self, column):
+    def toolTip(self, column):
         """Full filename for tooltip."""
         if column == 0:
             return qt4.QVariant(self.data[0])
@@ -124,18 +135,34 @@ class DatasetsNavigator(qt4.QTreeView):
                      self.showContextMenu)
 
     def showContextMenu(self, pt):
-        return
-        node=self.model().data(self.currentIndex(), role='data')
+
+        idx = self.currentIndex()
+        if not idx.isValid():
+            return
+
+        node = idx.internalPointer()
         menu = qt4.QMenu(self)
-        if node in self.model().heads:
-            menu.addAction('Table View', self.viewFile)
-            menu.addAction('Reload', self.reload)
-            menu.addAction('Close', self.closeFile)
-        else:
-            menu.addAction('Edit', self.editData)
-            menu.addAction('Delete', self.deleteData)
+        if isinstance(node, DatasetNode):
+            dataset = node.dataset()
+            dsname = node.datasetName()
+
+            def _delete():
+                self.doc.applyOperation(document.OperationDatasetDelete(dsname))
+            def _unlink():
+                if dataset.linked is not None:
+                    op = document.OperationDatasetUnlinkFile(dsname)
+                else:
+                    op = document.OperationDatasetUnlinkRelation(dsname)
+                self.doc.applyOperation(op)
+
+            menu.addAction("Delete", _delete)
+            if dataset.canUnlink():
+                menu.addAction("Unlink", _unlink)
+
             useasmenu = menu.addMenu('Use as')
-            self.getMenuUseAs(useasmenu, node)
+            if dataset is not None:
+                self.getMenuUseAs(useasmenu, dataset)
+
         menu.popup(self.mapToGlobal(pt))
 
     def getMenuUseAs(self, menu, dataset):
@@ -154,31 +181,6 @@ class DatasetsNavigator(qt4.QTreeView):
                 menu.addAction(path, _setdataset)
 
         self.doc.walkNodes(addifdatasetsetting, nodetypes=('setting',))
-
-    #def refresh(self):
-    #    self.model().refresh()
-
-    #def viewFile(self):
-    #    node=self.model().data(self.currentIndex(), role='data')
-    #    # Tabular view of data?
-
-    #def reload(self):
-    #    node=self.model().data(self.currentIndex(), role='data')
-    #    node.reloadLinks()
-
-    #def closeFile(self):
-    #    node=self.model().data(self.currentIndex(), role='data')
-    #    for ds in self.model().relations[node]:
-    #        self.doc.deleteDataset(self.doc.datasetName(ds))
-    #    self.refresh()
-
-    #def editData(self):
-    #    pass
-
-    # Redirect to dataset edit window?
-    #def deleteData(self):
-    #    node=self.model().data(self.currentIndex(), role='data')
-    #    self.doc.deleteDataset(self.doc.datasetName(ds))
         
 class DataNavigatorWindow(qt4.QDockWidget):
     def __init__(self, thedocument, *args):
