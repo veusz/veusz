@@ -179,6 +179,31 @@ class ConsoleWindow(qt4.QDockWidget):
         self.connect( thedocument, qt4.SIGNAL("sigLog"),
                       self.slotDocumentLog )
 
+    def _makeTextFormat(self, cursor, color):
+        fmt = cursor.charFormat()
+        
+        if color is not None:
+            brush = qt4.QBrush(color)
+            fmt.setForeground(brush)
+        else:
+            # use the default foreground color
+            fmt.clearForeground()
+
+        return fmt
+
+    def appendOutput(self, text, style):
+        """Add text to the tail of the error log, with a specified style"""
+        if style == 'error':
+            color = setting.settingdb.color('error')
+        elif style == 'command':
+            color = setting.settingdb.color('command')
+        else:
+            color = None
+
+        cursor = self._outputdisplay.textCursor()
+        cursor.movePosition(qt4.QTextCursor.End)
+        cursor.insertText(text, self._makeTextFormat(cursor, color))
+
     def runFunction(self, func):
         """Execute the function within the console window, trapping
         exceptions."""
@@ -223,23 +248,18 @@ class ConsoleWindow(qt4.QDockWidget):
     def output_stdout(self, text):
         """ Write text in stdout font to the log."""
         self.checkVisible()
-        self._outputdisplay.insertPlainText(text)
-        self._outputdisplay.ensureCursorVisible()
+        self.appendOutput(text, 'normal')
 
     def output_stderr(self, text):
         """ Write text in stderr font to the log."""
         self.checkVisible()
 
-        # insert text as bright error color
-        self._outputdisplay.setTextColor( setting.settingdb.color('error') )
-        self._outputdisplay.insertPlainText(text)
-        self._outputdisplay.setTextColor(
-            qt4.qApp.palette().color(qt4.QPalette.Text) )
+        self.appendOutput(text, 'error')
         self._outputdisplay.ensureCursorVisible()
 
     def insertTextInOutput(self, text):
         """ Inserts the text into the log."""
-        self._outputdisplay.append( text )
+        self.appendOutput(text, 'normal')
         self._outputdisplay.ensureCursorVisible()
 
     def slotEnter(self, command):
@@ -261,11 +281,7 @@ class ConsoleWindow(qt4.QDockWidget):
             prompt = '...'
 
         # output the command in the log pane
-        self._outputdisplay.setTextColor( setting.settingdb.color('command') )
-        self._outputdisplay.insertPlainText('%s %s\n' % (prompt, command))
-        self._outputdisplay.setTextColor(
-            qt4.qApp.palette().color(qt4.QPalette.Text) )
-
+        self.appendOutput('%s %s\n' % (prompt, command), 'command')
         self._outputdisplay.ensureCursorVisible()
 
         # are we ready to run this?
