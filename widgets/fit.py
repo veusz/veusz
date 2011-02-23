@@ -68,18 +68,30 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     m.migrad()
 
     # do some error analysis
-    chi2.runningFit = False
-    m.hesse()
-    m.minos()
+    try:
+        chi2.runningFit = False
+        m.hesse()
+        m.minos()
+        have_err = True
+    except MinuitError as e:
+        if str(e).startswith('Discovered a new minimum'):
+            # the initial fit really failed
+            raise
+        have_err = False
 
     # print the results
     retchi2 = m.fval
     dof = len(yvals) - len(params)
     redchi2 = retchi2 / dof
 
-    print 'Fit results:\n', "\n".join([
-        u"    %s = %g \u00b1 %g (+%g / %g)"
-            % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)], m.merrors[(n, -1.0)]) for n in names])
+    if have_err:
+        print 'Fit results:\n', "\n".join([
+            u"    %s = %g \u00b1 %g (+%g / %g)"
+                % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)], m.merrors[(n, -1.0)]) for n in names])
+    else:
+        print 'Fit results:\n', "\n".join(['    %s = %g' % (n, m.values[n]) for n in names])
+        print 'No error analysis available: fit probably bad'
+
     print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2)
 
     vals = m.values
