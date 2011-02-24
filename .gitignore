@@ -4,4 +4,4 @@
 build/
 helpers/*.pyd
 helpers/*.so
-
+*~

@@ -122,7 +122,7 @@ class MainWindow(qt4.QMainWindow):
         self.formatdock = treeeditwindow.FormatDock(self.document,
                                                     self.treeedit, self)
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.formatdock)
-        self.datadock = DataNavigatorWindow(self.document, self)
+        self.datadock = DataNavigatorWindow(self.document, self, self)
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.datadock)
 
         # make the console window a dock
@@ -424,6 +424,10 @@ class MainWindow(qt4.QMainWindow):
             'view.console':
                 a(self, 'Show or hide console window', 'Console window',
                   None, checkable=True),
+            'view.datanav':
+                a(self, 'Show or hide data navigator window', 'Data navigator window',
+                  None, checkable=True),
+
             'view.maintool':
                 a(self, 'Show or hide main toolbar', 'Main toolbar',
                   None, checkable=True),
@@ -515,7 +519,7 @@ class MainWindow(qt4.QMainWindow):
             ]
         viewwindowsmenu = [
             'view.edit', 'view.props', 'view.format',
-            'view.console',
+            'view.console', 'view.datanav',
             '',
             'view.maintool', 'view.viewtool',
             'view.addtool', 'view.edittool'
@@ -582,6 +586,7 @@ class MainWindow(qt4.QMainWindow):
                          (self.propdock, 'view.props'),
                          (self.formatdock, 'view.format'),
                          (self.console, 'view.console'),
+                         (self.datadock, 'view.datanav'),
                          (self.maintoolbar, 'view.maintool'),
                          (self.datatoolbar, 'view.datatool'),
                          (self.treeedit.edittoolbar, 'view.edittool'),
@@ -624,10 +629,15 @@ class MainWindow(qt4.QMainWindow):
         self.showDialog(dialog)
         return dialog
 
-    def slotDataEdit(self):
-        """Edit existing datasets."""
+    def slotDataEdit(self, editdataset=None):
+        """Edit existing datasets.
+
+        If editdataset is set to a dataset name, edit this dataset
+        """
         dialog = dataeditdialog.DataEditDialog(self, self.document)
         self.showDialog(dialog)
+        if editdataset is not None:
+            dialog.selectDataset(editdataset)
         return dialog
 
     def slotDataCreate(self):

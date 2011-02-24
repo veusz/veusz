@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """Module for implementing dialog box for viewing/editing data."""
 
 import bisect
@@ -250,6 +248,14 @@ class DatasetListModel(qt4.QStringListModel):
             del dslist[i]
             self.removeRows(i, 1)
 
+    def getDatasetIndex(self, dsname):
+        """Get index of dataset."""
+        try:
+            row = self.datasets.index(dsname)
+        except ValueError:
+            return qt4.QModelIndex()
+        return self.index(row, 0, qt4.QModelIndex())
+
     def setData(self, index, value, role=qt4.Qt.EditRole):
         """Called to rename a dataset."""
 
@@ -278,10 +284,6 @@ class DataEditDialog(VeuszDialog):
 
         # set up dataset list
         self.dslistmodel = DatasetListModel(self, document)
-
-        #self.modelproxy = qt4.QSortFilterProxyModel(self)
-        #self.modelproxy.setSourceModel(self.dslistmodel)
-        #self.modelproxy.setDynamicSortFilter(True)
 
         self.datasetlistview.setModel(self.dslistmodel)
 
@@ -387,7 +389,14 @@ class DataEditDialog(VeuszDialog):
             return self.dslistmodel.datasetName(selitems[0])
         else:
             return None
-        
+
+    def selectDataset(self, dsname):
+        """Select dataset with name given."""
+        smodel = self.datasetlistview.selectionModel()
+        idx = self.dslistmodel.getDatasetIndex(dsname)
+        smodel.select(idx, qt4.QItemSelectionModel.ClearAndSelect)
+        self.datasetlistview.setCurrentIndex(idx)
+
     def slotDatasetDelete(self):
         """Delete selected dataset."""
 

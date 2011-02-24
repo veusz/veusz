@@ -26,6 +26,8 @@ import veusz.document as document
 
 from treemodel import TMNode, TreeModel
 
+import veusz.dialogs.dataeditdialog as dataeditdialog
+
 class DatasetNode(TMNode):
     """Node for a dataset."""
 
@@ -80,7 +82,7 @@ class FilenameNode(TMNode):
 class DatasetRelationModel(TreeModel):
     """A model to show how the datasets are related to each file."""
     def __init__(self, doc):
-        TreeModel.__init__(self, ('Dataset', 'size') )
+        TreeModel.__init__(self, ('Dataset', 'Size', 'Type') )
         self.doc = doc
         self.linkednodes = {}
 
@@ -101,7 +103,7 @@ class DatasetRelationModel(TreeModel):
                     lname = '/'
                 node = FilenameNode( (lname, ''), self.root )
                 linknodes[ds.linked] = node
-            child = DatasetNode( self.doc, (name, ds.userSize()), None )
+            child = DatasetNode( self.doc, (name, ds.userSize(), ds.dstype), None )
             linknodes[ds.linked].insertChildSorted( child )
         
         # make tree
@@ -110,6 +112,24 @@ class DatasetRelationModel(TreeModel):
             tree.insertChildSorted( linknodes[name] )
 
         return tree
+
+    def flags(self, idx):
+        """Return model flags for index."""
+        f = TreeModel.flags(self, idx)
+        # allow dataset names to be edited
+        if idx.isValid() and isinstance(idx.internalPointer(), DatasetNode):
+            f |= qt4.Qt.ItemIsEditable
+        return f
+
+    def setData(self, idx, data, role):
+        """Rename dataset."""
+        dsnode = idx.internalPointer()
+        newname = unicode(data.toString())
+        self.doc.applyOperation(
+            document.OperationDatasetRename(dsnode.data[0], newname))
+        self.emit( qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &)'),
+                   idx, idx)
+        return True
 
     def refresh(self):
         """Update tree of datasets when document changes."""
@@ -123,9 +143,11 @@ class DatasetRelationModel(TreeModel):
         
 class DatasetsNavigator(qt4.QTreeView):
     """List of currently opened Misura4 Tests and reference to datasets names"""
-    def __init__(self, doc, parent=None):
+    def __init__(self, doc, mainwin, parent=None):
+        """Initialise the dataset viewer."""
         qt4.QTreeView.__init__(self, parent)
         self.doc = doc
+        self.mainwindow = mainwin
         self.setModel(DatasetRelationModel(doc))
         self.selection = qt4.QItemSelectionModel(self.model())
         self.setSelectionBehavior(qt4.QTreeView.SelectItems)
@@ -135,35 +157,57 @@ class DatasetsNavigator(qt4.QTreeView):
                      self.showContextMenu)
 
     def showContextMenu(self, pt):
-
+        """Context menu for nodes."""
         idx = self.currentIndex()
         if not idx.isValid():
             return
 
         node = idx.internalPointer()
-        menu = qt4.QMenu(self)
+        menu = None
         if isinstance(node, DatasetNode):
-            dataset = node.dataset()
-            dsname = node.datasetName()
+            menu = self.datasetContextMenu(node, pt)
+        if menu is not None:
+            menu.exec_(self.mapToGlobal(pt))
 
-            def _delete():
-                self.doc.applyOperation(document.OperationDatasetDelete(dsname))
-            def _unlink():
-                if dataset.linked is not None:
-                    op = document.OperationDatasetUnlinkFile(dsname)
-                else:
-                    op = document.OperationDatasetUnlinkRelation(dsname)
-                self.doc.applyOperation(op)
+    def datasetContextMenu(self, dsnode, pt):
+        """Return context menu for datasets."""
+        dataset = dsnode.dataset()
+        dsname = dsnode.datasetName()
 
-            menu.addAction("Delete", _delete)
-            if dataset.canUnlink():
-                menu.addAction("Unlink", _unlink)
+        def _edit():
+            """Open up dialog box to recreate dataset."""
+            dataeditdialog.recreate_register[type(dataset)](
+                self.mainwindow, self.doc, dataset, dsname)
+        def _edit_data():
+            """Open up data edit dialog."""
+            dialog = self.mainwindow.slotDataEdit(editdataset=dsname)
+        def _delete():
+            """Simply delete dataset."""
+            self.doc.applyOperation(document.OperationDatasetDelete(dsname))
+        def _unlink_file():
+            """Unlink dataset from file."""
+            self.doc.applyOperation(document.OperationDatasetUnlinkFile(dsname))
+        def _unlink_relation():
+            """Unlink dataset from relation."""
+            self.doc.applyOperation(document.OperationDatasetUnlinkRelation(dsname))
 
-            useasmenu = menu.addMenu('Use as')
-            if dataset is not None:
-                self.getMenuUseAs(useasmenu, dataset)
+        menu = qt4.QMenu()
+        if type(dataset) in dataeditdialog.recreate_register:
+            menu.addAction("Edit", _edit)
+        else:
+            menu.addAction("Edit data", _edit_data)
 
-        menu.popup(self.mapToGlobal(pt))
+        menu.addAction("Delete", _delete)
+        if dataset.canUnlink():
+            if dataset.linked:
+                menu.addAction("Unlink file", _unlink_file)
+            else:
+                menu.addAction("Unlink relation", _unlink_relation)
+
+        useasmenu = menu.addMenu('Use as')
+        if dataset is not None:
+            self.getMenuUseAs(useasmenu, dataset)
+        return menu
 
     def getMenuUseAs(self, menu, dataset):
         """Build up menu of widget settings to use dataset in."""
@@ -183,10 +227,10 @@ class DatasetsNavigator(qt4.QTreeView):
         self.doc.walkNodes(addifdatasetsetting, nodetypes=('setting',))
         
 class DataNavigatorWindow(qt4.QDockWidget):
-    def __init__(self, thedocument, *args):
+    def __init__(self, thedocument, mainwin, *args):
         qt4.QDockWidget.__init__(self, *args)
         self.setWindowTitle("Data - Veusz")
         self.setObjectName("veuszdatawindow")
 
-        self.nav = DatasetsNavigator(thedocument, parent=self)
+        self.nav = DatasetsNavigator(thedocument, mainwin, parent=self)
         self.setWidget(self.nav)

@@ -474,6 +474,9 @@ class DatasetBase(object):
     # class for representing part of this dataset
     subsetclass = None
 
+    # dataset type
+    dstype = 'Dataset'
+
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 
@@ -569,6 +572,9 @@ class Dataset2D(DatasetBase):
 
     # number of dimensions the dataset holds
     dimensions = 2
+
+    # dataset type
+    dstype = '2D'
 
     def __init__(self, data, xrange=None, yrange=None):
         '''Create a two dimensional dataset based on data.
@@ -671,6 +677,7 @@ class Dataset(DatasetBase):
     dimensions = 1
     columns = ('data', 'serr', 'nerr', 'perr')
     column_descriptions = ('Data', 'Sym. errors', 'Neg. errors', 'Pos. errors')
+    dstype = '1D'
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
@@ -871,6 +878,7 @@ class DatasetText(DatasetBase):
     datatype = 'text'
     columns = ('data',)
     column_descriptions = ('Data',)
+    dstype = 'Text'
 
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
@@ -1032,6 +1040,8 @@ def simpleEvalExpression(doc, expr, part='data'):
 
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
+
+    dstype = 'Expression'
 
     def __init__(self, data=None, serr=None, nerr=None, perr=None,
                  parametric=None):
@@ -1217,6 +1227,8 @@ class DatasetExpression(Dataset):
 class DatasetRange(Dataset):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
 
+    dstype = 'Range'
+
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
         """Construct dataset.
 
@@ -1311,6 +1323,8 @@ def getSpacing(data):
 
 class Dataset2DXYZExpression(Dataset2D):
     '''A 2d dataset with expressions for x, y and z.'''
+
+    dstype = '2D XYZ'
 
     def __init__(self, exprx, expry, exprz):
         """Initialise dataset.
@@ -1445,6 +1459,8 @@ class Dataset2DXYZExpression(Dataset2D):
 class Dataset2DExpression(Dataset2D):
     """Evaluate an expression of 2d datasets."""
 
+    dstype = '2D Expr'
+
     def __init__(self, expr):
         """Create 2d expression dataset."""
         self.document = None
@@ -1556,6 +1572,8 @@ class Dataset2DXYFunc(Dataset2D):
     """Given a range of x and y, this is a dataset which is a function of
     this.
     """
+
+    dstype = '2D f(x,y)'
 
     def __init__(self, xstep, ystep, expr):
         """Create 2d dataset:
@@ -1689,6 +1707,8 @@ class _DatasetPlugin(object):
 class Dataset1DPlugin(_DatasetPlugin, Dataset):
     """Return 1D dataset from a plugin."""
 
+    dstype = '1D plugin'
+
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset.__init__(self, data=[])
@@ -1713,6 +1733,8 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
 class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
     """Return 2D dataset from a plugin."""
 
+    dstype = '2D plugin'
+
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset2D.__init__(self, [[]])
@@ -1729,6 +1751,8 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     """Return text dataset from a plugin."""
+
+    dstype = 'Text plugin'
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
