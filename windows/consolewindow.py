@@ -60,6 +60,7 @@ class _CommandEdit(qt4.QLineEdit):
         qt4.QLineEdit.__init__(self, *args)
         self.history = []
         self.history_posn = 0
+        self.entered_text = ''
 
         qt4.QObject.connect( self, qt4.SIGNAL("returnPressed()"),
                              self.slotReturnPressed )
@@ -73,9 +74,10 @@ class _CommandEdit(qt4.QLineEdit):
         command = unicode( self.text() )
         self.setText("")
 
-        # keep the command for history (and move back to top)
+        # keep the command for history
         self.history.append( command )
-        self.history_posn = 0
+        self.history_posn = len(self.history)
+        self.entered_text = ''
 
         # tell the console we have a command
         self.emit( qt4.SIGNAL("sigEnter"), command)
@@ -91,25 +93,46 @@ class _CommandEdit(qt4.QLineEdit):
         # check whether one of the "history keys" has been pressed
         if code in _CommandEdit.historykeys:
 
-            # move up or down in the history list
-            if code == qt4.Qt.Key_Up:
-                self.history_posn += 1
-            elif code == qt4.Qt.Key_Down:
-                self.history_posn -= 1
+            # look for the next or previous history item which our current text
+            # is a prefix of
+            if self.isModified():
+                text = unicode(self.text())
+                self.history_posn = len(self.history)
+            else:
+                text = self.entered_text
 
-            # make sure counter is within bounds
-            self.history_posn = max(self.history_posn, 0)
-            self.history_posn = min(self.history_posn, len(self.history))
+            if code == qt4.Qt.Key_Up:
+                step = -1
+            elif code == qt4.Qt.Key_Down:
+                step = 1
+
+            newpos = self.history_posn + step
+
+            while True:
+                if newpos >= len(self.history):
+                    break
+                if newpos < 0:
+                    return
+                if self.history[newpos].startswith(text):
+                    break
+
+                newpos += step
+
+            if newpos >= len(self.history):
+                # go back to whatever the user had typed in
+                self.history_posn = len(self.history)
+                self.setText(self.entered_text)
+                return
+
+            # found a relevant history item
+            self.history_posn = newpos
 
             # user has modified text since last set
             if self.isModified():
-                self.history.append( unicode(self.text()) )
-                self.history_posn += 1
+                self.entered_text = text
 
             # replace the text in the control
-            text = ''
-            if self.history_posn > 0:
-                text = self.history[ -self.history_posn ]
+            text = self.history[ self.history_posn ]
             self.setText(text)
 
 introtext=u'''Welcome to <b><font color="purple">Veusz</font></b> --- a scientific plotting application.<br>
@@ -179,6 +202,31 @@ class ConsoleWindow(qt4.QDockWidget):
         self.connect( thedocument, qt4.SIGNAL("sigLog"),
                       self.slotDocumentLog )
 
+    def _makeTextFormat(self, cursor, color):
+        fmt = cursor.charFormat()
+        
+        if color is not None:
+            brush = qt4.QBrush(color)
+            fmt.setForeground(brush)
+        else:
+            # use the default foreground color
+            fmt.clearForeground()
+
+        return fmt
+
+    def appendOutput(self, text, style):
+        """Add text to the tail of the error log, with a specified style"""
+        if style == 'error':
+            color = setting.settingdb.color('error')
+        elif style == 'command':
+            color = setting.settingdb.color('command')
+        else:
+            color = None
+
+        cursor = self._outputdisplay.textCursor()
+        cursor.movePosition(qt4.QTextCursor.End)
+        cursor.insertText(text, self._makeTextFormat(cursor, color))
+
     def runFunction(self, func):
         """Execute the function within the console window, trapping
         exceptions."""
@@ -223,23 +271,18 @@ class ConsoleWindow(qt4.QDockWidget):
     def output_stdout(self, text):
         """ Write text in stdout font to the log."""
         self.checkVisible()
-        self._outputdisplay.insertPlainText(text)
-        self._outputdisplay.ensureCursorVisible()
+        self.appendOutput(text, 'normal')
 
     def output_stderr(self, text):
         """ Write text in stderr font to the log."""
         self.checkVisible()
 
-        # insert text as bright error color
-        self._outputdisplay.setTextColor( setting.settingdb.color('error') )
-        self._outputdisplay.insertPlainText(text)
-        self._outputdisplay.setTextColor(
-            qt4.qApp.palette().color(qt4.QPalette.Text) )
+        self.appendOutput(text, 'error')
         self._outputdisplay.ensureCursorVisible()
 
     def insertTextInOutput(self, text):
         """ Inserts the text into the log."""
-        self._outputdisplay.append( text )
+        self.appendOutput(text, 'normal')
         self._outputdisplay.ensureCursorVisible()
 
     def slotEnter(self, command):
@@ -261,11 +304,7 @@ class ConsoleWindow(qt4.QDockWidget):
             prompt = '...'
 
         # output the command in the log pane
-        self._outputdisplay.setTextColor( setting.settingdb.color('command') )
-        self._outputdisplay.insertPlainText('%s %s\n' % (prompt, command))
-        self._outputdisplay.setTextColor(
-            qt4.qApp.palette().color(qt4.QPalette.Text) )
-
+        self.appendOutput('%s %s\n' % (prompt, command), 'command')
         self._outputdisplay.ensureCursorVisible()
 
         # are we ready to run this?
