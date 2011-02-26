@@ -208,4 +208,11 @@ class TreeModel(qt4.QAbstractItemModel):
                 syncbranch(myindex, c[i], newroot.childnodes[i])
                 i += 1
         
+        toreset = self.root.data != newroot.data
+        if toreset:
+            # header changed, so do reset
+            self.beginResetModel()
         syncbranch( qt4.QModelIndex(), self.root, newroot )
+        if toreset:
+            self.root.data = newroot.data
+            self.endResetModel()
