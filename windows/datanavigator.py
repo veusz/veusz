@@ -18,32 +18,58 @@
 ###############################################################################
 
 import os.path
-from collections import defaultdict
 
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.document as document
+import veusz.utils as utils
+
+import veusz.dialogs.dataeditdialog as dataeditdialog
+from veusz.qtwidgets.lineeditwithclear import LineEditWithClear
 
 from treemodel import TMNode, TreeModel
 
-import veusz.dialogs.dataeditdialog as dataeditdialog
+def datasetLinkFile(ds):
+    """Get a linked filename from a dataset."""
+    if ds.linked is None:
+        return '/'
+    else:
+        return ds.linked.filename
 
 class DatasetNode(TMNode):
     """Node for a dataset."""
 
-    def __init__(self, doc, data, parent):
-        TMNode.__init__(self, data, parent)
+    def __init__(self, doc, dsname, cols, parent):
+        ds = doc.data[dsname]
+        data = []
+        assert cols[0] == 'name'
+        for c in cols:
+            if c == 'name':
+                data.append( dsname )
+            elif c == 'size':
+                data.append( ds.userSize() )
+            elif c == 'type':
+                data.append( ds.dstype )
+            elif c == 'linkfile':
+                data.append( os.path.basename(datasetLinkFile(ds)) )
+
+        TMNode.__init__(self, tuple(data), parent)
         self.doc = doc
+        self.cols = cols
 
     def toolTip(self, column):
         try:
             ds = self.doc.data[self.data[0]]
         except KeyError:
             return qt4.QVariant()
-        if column == 0:
+
+        c = self.cols[column]
+        if c == 'name':
             return qt4.QVariant( ds.description() )
-        elif column == 1:
+        elif c == 'size' or c == 'type':
             return qt4.QVariant( ds.userPreview() )
+        elif c == 'linkfile':
+            return qt4.QVariant( datasetLinkFile(ds) )
         return qt4.QVariant()
 
     def dataset(self):
@@ -59,7 +85,7 @@ class DatasetNode(TMNode):
 
     def cloneTo(self, newroot):
         """Make a clone of self at the root given."""
-        return self.__class__(self.doc, self.data, newroot)
+        return self.__class__(self.doc, self.data[0], self.cols, newroot)
 
 class FilenameNode(TMNode):
     """A special node for holding filenames of files."""
@@ -86,13 +112,6 @@ def treeFromList(nodelist, rootdata):
         tree.insertChildSorted(node)
     return tree
 
-def datasetLinkFile(ds):
-    """Get a linked filename from a dataset."""
-    if ds.linked is None:
-        return '/'
-    else:
-        return ds.linked.filename
-
 class DatasetRelationModel(TreeModel):
     """A model to show how the datasets are related to each file."""
     def __init__(self, doc, grouping='filename'):
@@ -100,57 +119,72 @@ class DatasetRelationModel(TreeModel):
         self.doc = doc
         self.linkednodes = {}
         self.grouping = grouping
+        self.filter = ''
         self.refresh()
 
         self.connect(doc, qt4.SIGNAL('sigModified'), self.refresh)
 
     def makeGrpTreeNone(self):
         """Make tree with no grouping."""
-        tree = TMNode( ('Dataset', 'Size', 'Type'), None )
+        tree = TMNode( ('Dataset', 'Size', 'Type', 'File'), None )
         for name, ds in self.doc.data.iteritems():
-            child = DatasetNode( self.doc, (name, ds.userSize(), ds.dstype,
-                                            ), None )
-            tree.insertChildSorted(child)
+            child = DatasetNode( self.doc, name,
+                                 ('name', 'size', 'type', 'linkfile'),
+                                 None )
+            # filter nodes if requested
+            if ( self.filter == '' or
+                 any([d.find(self.filter)>=0 for d in child.data]) ):
+                tree.insertChildSorted(child)
         return tree
         
+    def makeGrpTree(self, coltitles, colitems, grouper, GrpNodeClass):
+        """Make a tree grouping with function:
+        coltitles: tuple of titles of columns for user
+        colitems: tuple of items to lookup in DatasetNode
+        grouper: function of dataset to return text for grouping
+        GrpNodeClass: class for creating grouping nodes
+        """
+        grpnodes = {}
+        for name, ds in self.doc.data.iteritems():
+            child = DatasetNode(self.doc, name, colitems, None)
+
+            # filter if requested
+            if ( self.filter != '' and
+                 all([d.find(self.filter)<0 for d in child.data]) ):
+                continue
+
+            grp = grouper(ds)
+            if grp not in grpnodes:
+                grpnodes[grp] = GrpNodeClass( (grp,), None )
+            grpnodes[grp].insertChildSorted(child)
+        return treeFromList(grpnodes.values(), coltitles)
+
     def makeGrpTreeFilename(self):
         """Make a tree of datasets grouped by linked file."""
-        linknodes = {}
-        for name, ds in self.doc.data.iteritems():
-            filename = datasetLinkFile(ds)
-            if filename not in linknodes:
-                linknodes[filename] = FilenameNode( (filename, ), None )
-            child = DatasetNode( self.doc,
-                                 (name, ds.userSize(), ds.dstype), None )
-            linknodes[filename].insertChildSorted( child )
-
-        return treeFromList( linknodes.values(), ('Dataset', 'Size', 'Type') )
+        return self.makeGrpTree(
+            ('Dataset', 'Size', 'Type'),
+            ('name', 'size', 'type'),
+            lambda ds: datasetLinkFile(ds),
+            FilenameNode
+            )
 
     def makeGrpTreeSize(self):
         """Make a tree of datasets grouped by dataset size."""
-        sizenodes = {}
-        for name, ds in self.doc.data.iteritems():
-            size = ds.userSize()
-            if size not in sizenodes:
-                sizenodes[size] = TMNode( (size, ), None )
-            child = DatasetNode( self.doc,
-                                 (name, ds.dstype, datasetLinkFile(ds)), None )
-            sizenodes[size].insertChildSorted( child )
-        
-        return treeFromList( sizenodes.values(), ('Dataset', 'Type', 'Filename') )
+        return self.makeGrpTree(
+            ('Dataset', 'Type', 'Filename'),
+            ('name', 'type', 'linkfile'),
+            lambda ds: ds.userSize(),
+            TMNode
+            )
 
     def makeGrpTreeType(self):
         """Make a tree of datasets grouped by dataset type."""
-        typenodes = {}
-        for name, ds in self.doc.data.iteritems():
-            dstype = ds.dstype
-            if dstype not in typenodes:
-                typenodes[dstype] = TMNode( (dstype, ), None )
-            child = DatasetNode( self.doc,
-                                 (name, ds.userSize(), datasetLinkFile(ds)), None )
-            typenodes[dstype].insertChildSorted( child )
-       
-        return treeFromList( typenodes.values(), ('Dataset', 'Size', 'Filename') )
+        return self.makeGrpTree(
+            ('Dataset', 'Size', 'Filename'),
+            ('name', 'size', 'linkfile'),
+            lambda ds: ds.dstype,
+            TMNode
+            )
 
     def flags(self, idx):
         """Return model flags for index."""
@@ -166,8 +200,9 @@ class DatasetRelationModel(TreeModel):
         newname = unicode(data.toString())
         self.doc.applyOperation(
             document.OperationDatasetRename(dsnode.data[0], newname))
-        self.emit( qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &)'),
-                   idx, idx)
+        self.emit(
+            qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &)'),
+            idx, idx)
         return True
 
     def refresh(self):
@@ -204,6 +239,12 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def changeGrouping(self, grouping):
         """Change the tree grouping behaviour."""
         self.model.grouping = grouping
+        self.model.refresh()
+        self.expandAll()
+
+    def changeFilter(self, filtertext):
+        """Change filtering text."""
+        self.model.filter = filtertext
         self.model.refresh()
         self.expandAll()
 
@@ -315,24 +356,34 @@ class DatasetsNavigatorWidget(qt4.QWidget):
             if name == self.grouping:
                 a.setChecked(True)
             self.grpact.addAction(a)
-        self.connect(self.grpact, qt4.SIGNAL("triggered(QAction*)"), self.slotGrpChanged)
+        self.connect(self.grpact, qt4.SIGNAL("triggered(QAction*)"),
+                     self.slotGrpChanged)
         self.grpbutton.setMenu(self.grpmenu)
+        self.grpbutton.setToolTip("Group datasets with property given")
         self.optslayout.addWidget(self.grpbutton)
 
         # filtering
         self.optslayout.addWidget(qt4.QLabel("Filter"))
-        self.filteredit = qt4.QLineEdit()
+        self.filteredit = LineEditWithClear()
+        self.filteredit.setToolTip("Enter text here to filter datasets")
+        self.connect(self.filteredit, qt4.SIGNAL('textChanged(const QString&)'),
+                     self.slotFilterChanged)
         self.optslayout.addWidget(self.filteredit)
 
         self.layout.addLayout(self.optslayout)
 
         # the actual widget tree
-        self.navtree = DatasetsNavigatorTree(thedocument, mainwin, self.grouping, None)
+        self.navtree = DatasetsNavigatorTree(thedocument, mainwin,
+                                             self.grouping, None)
         self.layout.addWidget(self.navtree)
 
     def slotGrpChanged(self, action):
         """Grouping changed by user."""
         self.navtree.changeGrouping(action.grpname)
+
+    def slotFilterChanged(self, filtertext):
+        """Filtering changed by user."""
+        self.navtree.changeFilter(unicode(filtertext))
 
 class DataNavigatorWindow(qt4.QDockWidget):
     def __init__(self, thedocument, mainwin, *args):
