@@ -27,6 +27,7 @@ import historyvaluecombo
 import historygroupbox
 import historyspinbox
 import recentfilesbutton
+import lineeditwithclear
 
 sys.modules['historycombo'] = historycombo
 sys.modules['historycheck'] = historycheck
@@ -34,3 +35,4 @@ sys.modules['historyvaluecombo'] = historyvaluecombo
 sys.modules['historygroupbox'] = historygroupbox
 sys.modules['historyspinbox'] = historyspinbox
 sys.modules['recentfilesbutton'] = recentfilesbutton
+sys.modules['lineeditwithclear'] = lineeditwithclear
