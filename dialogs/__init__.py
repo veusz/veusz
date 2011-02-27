@@ -16,23 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """Veusz dialogs module."""
 
-# insert history combo into the list of modules so that it can be found
-# by loadUi - yuck
-import sys
-import historycombo
-import historycheck
-import historyvaluecombo
-import historygroupbox
-import historyspinbox
-import recentfilesbutton
-
-sys.modules['historycombo'] = historycombo
-sys.modules['historycheck'] = historycheck
-sys.modules['historyvaluecombo'] = historyvaluecombo
-sys.modules['historygroupbox'] = historygroupbox
-sys.modules['historyspinbox'] = historyspinbox
-sys.modules['recentfilesbutton'] = recentfilesbutton
+# load custom widgets
+import veusz.qtwidgets
