@@ -1704,10 +1704,13 @@ class _DatasetPlugin(object):
                     self.pluginmanager.saveToFile(fileobj)
                 return
 
+    @property
+    def dstype(self):
+        """Return type of plugin."""
+        return self.pluginmanager.plugin.name
+
 class Dataset1DPlugin(_DatasetPlugin, Dataset):
     """Return 1D dataset from a plugin."""
-
-    dstype = '1D plugin'
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
@@ -1733,8 +1736,6 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
 class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
     """Return 2D dataset from a plugin."""
 
-    dstype = '2D plugin'
-
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset2D.__init__(self, [[]])
@@ -1751,8 +1752,6 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     """Return text dataset from a plugin."""
-
-    dstype = 'Text plugin'
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
