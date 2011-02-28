@@ -18,6 +18,7 @@
 ###############################################################################
 
 import os.path
+import numpy as N
 
 import veusz.qtall as qt4
 import veusz.setting as setting
@@ -35,6 +36,15 @@ def datasetLinkFile(ds):
         return '/'
     else:
         return ds.linked.filename
+
+def pixmapAsHtml(pix):
+    """Get QPixmap as html image text."""
+    ba = qt4.QByteArray()
+    buf = qt4.QBuffer(ba)
+    buf.open(qt4.QIODevice.WriteOnly)
+    pix.toImage().save(buf, "PNG")
+    b64 = str(buf.data().toBase64())
+    return '<img src="data:image/png;base64,%s">' % b64
 
 class DatasetNode(TMNode):
     """Node for a dataset."""
@@ -57,7 +67,55 @@ class DatasetNode(TMNode):
         self.doc = doc
         self.cols = cols
 
+    def getPreviewPixmap(self, ds):
+        """Get a preview pixmap for a dataset."""
+        size = (140, 70)
+        if ds.dimensions != 1:
+            return None
+
+        pixmap = qt4.QPixmap(*size)
+        pixmap.fill(qt4.Qt.transparent)
+        p = qt4.QPainter(pixmap)
+        p.setRenderHint(qt4.QPainter.Antialiasing)
+
+        # calculate data points
+        if len(ds.data) < size[1]:
+            y = ds.data
+        else:
+            intvl = len(ds.data)/size[1]+1
+            y = ds.data[::intvl]
+        x = N.arange(len(y))
+        if len(y) == 0:
+            return None
+
+        # plot data points on image
+        minval, maxval = N.nanmin(y), N.nanmax(y)
+        y = (y-minval) / (maxval-minval) * size[1]
+        finite = N.isfinite(y)
+        x, y = x[finite], y[finite]
+        if len(y) == 0:
+            return None
+        x = x * (1./len(x)) * size[0]
+
+        poly = qt4.QPolygonF()
+        utils.addNumpyToPolygonF(poly, x, size[1]-y)
+        p.setPen( qt4.QPen(qt4.Qt.blue) )
+        p.drawPolyline(poly)
+
+        # draw x axis if span 0
+        p.setPen( qt4.QPen(qt4.Qt.black) )
+        if minval <= 0 and maxval > 0:
+            y0 = size[1] - (0-minval)/(maxval-minval)*size[1]
+            p.drawLine(x[0], y0, x[-1], y0)
+        else:
+            p.drawLine(x[0], size[1], x[-1], size[1])
+        p.drawLine(x[0], 0, x[0], size[1])
+
+        p.end()
+        return pixmap
+
     def toolTip(self, column):
+        """Return tooltip for column."""
         try:
             ds = self.doc.data[self.data[0]]
         except KeyError:
@@ -65,9 +123,15 @@ class DatasetNode(TMNode):
 
         c = self.cols[column]
         if c == 'name':
-            return qt4.QVariant( ds.description() )
+            return qt4.QVariant(ds.description())
         elif c == 'size' or c == 'type':
-            return qt4.QVariant( ds.userPreview() )
+            text = ds.userPreview()
+            # add preview of dataset if possible
+            pix = self.getPreviewPixmap(ds)
+            if pix:
+                text = text.replace('\n', '<br>')
+                text = '<html>%s<br>%s</html>' % (text, pixmapAsHtml(pix))
+            return qt4.QVariant(text)
         elif c == 'linkfile':
             return qt4.QVariant( datasetLinkFile(ds) )
         return qt4.QVariant()
