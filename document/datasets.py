@@ -664,10 +664,15 @@ def dsPreviewHelper(d):
         line1 = ', '.join( ['%.3g' % x for x in d[:3]] +
                            [ '...' ] +
                            ['%.3g' % x for x in d[-3:]] )
-    line2 = 'mean: %.3g, min: %.3g, max: %.3g' % (
-        N.nansum(d) / N.isfinite(d).sum(),
-        N.nanmin(d),
-        N.nanmax(d))
+
+    try:
+        line2 = 'mean: %.3g, min: %.3g, max: %.3g' % (
+            N.nansum(d) / N.isfinite(d).sum(),
+            N.nanmin(d),
+            N.nanmax(d))
+    except ValueError:
+        # nanXXX returns error if no valid data points
+        return line1
     return line1 + '\n' + line2
 
 class Dataset(DatasetBase):

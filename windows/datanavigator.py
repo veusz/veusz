@@ -79,37 +79,39 @@ class DatasetNode(TMNode):
         p.setRenderHint(qt4.QPainter.Antialiasing)
 
         # calculate data points
-        if len(ds.data) < size[1]:
-            y = ds.data
-        else:
-            intvl = len(ds.data)/size[1]+1
-            y = ds.data[::intvl]
-        x = N.arange(len(y))
-        if len(y) == 0:
+        try:
+            if len(ds.data) < size[1]:
+                y = ds.data
+            else:
+                intvl = len(ds.data)/size[1]+1
+                y = ds.data[::intvl]
+            x = N.arange(len(y))
+
+            # plot data points on image
+            minval, maxval = N.nanmin(y), N.nanmax(y)
+            y = (y-minval) / (maxval-minval) * size[1]
+            finite = N.isfinite(y)
+            x, y = x[finite], y[finite]
+            x = x * (1./len(x)) * size[0]
+
+            poly = qt4.QPolygonF()
+            utils.addNumpyToPolygonF(poly, x, size[1]-y)
+            p.setPen( qt4.QPen(qt4.Qt.blue) )
+            p.drawPolyline(poly)
+
+            # draw x axis if span 0
+            p.setPen( qt4.QPen(qt4.Qt.black) )
+            if minval <= 0 and maxval > 0:
+                y0 = size[1] - (0-minval)/(maxval-minval)*size[1]
+                p.drawLine(x[0], y0, x[-1], y0)
+            else:
+                p.drawLine(x[0], size[1], x[-1], size[1])
+            p.drawLine(x[0], 0, x[0], size[1])
+
+        except (ValueError, ZeroDivisionError):
+            # zero sized array after filtering, so return None
+            p.end()
             return None
-
-        # plot data points on image
-        minval, maxval = N.nanmin(y), N.nanmax(y)
-        y = (y-minval) / (maxval-minval) * size[1]
-        finite = N.isfinite(y)
-        x, y = x[finite], y[finite]
-        if len(y) == 0:
-            return None
-        x = x * (1./len(x)) * size[0]
-
-        poly = qt4.QPolygonF()
-        utils.addNumpyToPolygonF(poly, x, size[1]-y)
-        p.setPen( qt4.QPen(qt4.Qt.blue) )
-        p.drawPolyline(poly)
-
-        # draw x axis if span 0
-        p.setPen( qt4.QPen(qt4.Qt.black) )
-        if minval <= 0 and maxval > 0:
-            y0 = size[1] - (0-minval)/(maxval-minval)*size[1]
-            p.drawLine(x[0], y0, x[-1], y0)
-        else:
-            p.drawLine(x[0], size[1], x[-1], size[1])
-        p.drawLine(x[0], 0, x[0], size[1])
 
         p.end()
         return pixmap
