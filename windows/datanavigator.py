@@ -70,7 +70,7 @@ class DatasetNode(TMNode):
     def getPreviewPixmap(self, ds):
         """Get a preview pixmap for a dataset."""
         size = (140, 70)
-        if ds.dimensions != 1:
+        if ds.dimensions != 1 or ds.datatype != 'numeric':
             return None
 
         pixmap = qt4.QPixmap(*size)
@@ -109,7 +109,7 @@ class DatasetNode(TMNode):
             p.drawLine(x[0], 0, x[0], size[1])
 
         except (ValueError, ZeroDivisionError):
-            # zero sized array after filtering, so return None
+            # zero sized array after filtering or min == max, so return None
             p.end()
             return None
 
