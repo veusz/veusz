@@ -138,7 +138,7 @@ namespace
   // is difference between points very small?
   inline bool smallDelta(const QPointF& pt1, const QPointF& pt2)
   {
-    return fabs(pt1.x() - pt2.x()) < 0.01 and
+    return fabs(pt1.x() - pt2.x()) < 0.01 &&
       fabs(pt1.y()- pt2.y()) < 0.01;
   }
 }
@@ -183,14 +183,14 @@ void plotClippedPolyline(QPainter& painter,
 	    {
 	      // add first line
 	      pout << p1;
-	      if( not smallDelta(p1, p2) )
+	      if( ! smallDelta(p1, p2) )
 		pout << p2;
 	    }
 	  else
 	    {
 	      if( p1 == pout.last() )
 		{
-		  if( not smallDelta(p1, p2) )
+		  if( ! smallDelta(p1, p2) )
 		    // extend polyline
 		    pout << p2;
 		}
@@ -203,7 +203,7 @@ void plotClippedPolyline(QPainter& painter,
 		  // start new line
 		  pout.clear();
 		  pout << p1;
-		  if( not smallDelta(p1, p2) )
+		  if( ! smallDelta(p1, p2) )
 		    pout << p2;
 		}
 	    }

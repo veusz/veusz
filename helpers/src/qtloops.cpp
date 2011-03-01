@@ -32,7 +32,7 @@ namespace
   // is difference between points very small?
   inline bool smallDelta(const QPointF& pt1, const QPointF& pt2)
   {
-    return fabs(pt1.x() - pt2.x()) < 0.01 and
+    return fabs(pt1.x() - pt2.x()) < 0.01 &&
       fabs(pt1.y()- pt2.y()) < 0.01;
   }
 
@@ -69,7 +69,7 @@ void addNumpyToPolygonF(QPolygonF& poly, const Tuple2Ptrs& d)
 	  if( row < d.dims[col] && row < d.dims[col+1] )
 	    {
 	      const QPointF pt(d.data[col][row], d.data[col+1][row]);
-	      if( not smallDelta(pt, lastpt) )
+	      if( ! smallDelta(pt, lastpt) )
 		{
 		  poly << pt;
 		  lastpt = pt;
@@ -103,7 +103,7 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
   for(int i = 0; i < size; ++i)
     {
       const QPointF pt(x(i), y(i));
-      if( cliprect.contains(pt) and not smallDelta(lastpt, pt) )
+      if( cliprect.contains(pt) && ! smallDelta(lastpt, pt) )
 	{
 	  painter.translate(pt);
 	  painter.drawPath(path);
@@ -122,7 +122,7 @@ void plotLinesToPainter(QPainter& painter,
 
   // if autoexpand, expand rectangle by line width
   QRectF clipcopy;
-  if ( clip != 0 and autoexpand )
+  if ( clip != 0 && autoexpand )
     {
       const qreal lw = painter.pen().widthF();
       qreal x1, y1, x2, y2;
@@ -158,7 +158,7 @@ void plotBoxesToPainter(QPainter& painter,
 {
   // if autoexpand, expand rectangle by line width
   QRectF clipcopy(QPointF(-32767,-32767), QPointF(32767,32767));
-  if ( clip != 0 and autoexpand )
+  if ( clip != 0 && autoexpand )
     {
       const qreal lw = painter.pen().widthF();
       qreal x1, y1, x2, y2;

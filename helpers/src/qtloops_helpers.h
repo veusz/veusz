@@ -58,7 +58,7 @@ class Numpy1DObj
 
   inline double operator()(const int x) const
   {
-    if( DEBUG and (x < 0 or x >= dim) )
+    if( DEBUG && (x < 0 || x >= dim) )
 	throw "Invalid index in array";
     return data[x];
   }
@@ -79,7 +79,7 @@ class Numpy2DObj
 
   inline double operator()(const int x, const int y) const
   {
-    if( DEBUG and (x < 0 or x >= dims[0] or y < 0 or y >= dims[1]) )
+    if( DEBUG && (x < 0 || x >= dims[0] || y < 0 || y >= dims[1]) )
       throw "Invalid index in array";
     return data[x+y*dims[1]];
   }
@@ -100,7 +100,7 @@ class Numpy2DIntObj
 
   inline int operator()(const int x, const int y) const
   {
-    if( DEBUG and (x < 0 or x >= dims[0] or y < 0 or y >= dims[1]) )
+    if( DEBUG && (x < 0 || x >= dims[0] || y < 0 || y >= dims[1]) )
       throw "Invalid index in array";
     return data[x+y*dims[1]];
   }

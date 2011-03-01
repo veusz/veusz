@@ -22,6 +22,7 @@
  * for the code itself.
  */
 
+#include <float.h>
 #include <math.h>
 /* You might try changing the above to <cmath> if you have problems.
  * Whether you use math.h or cmath, you may need to edit the .cpp file
@@ -30,7 +31,7 @@
 
 #if defined(__isnan)
 # define isNaN(_a) (__isnan(_a))	/* MacOSX/Darwin definition < 10.4 */
-#elif defined(WIN32) || defined(_isnan)
+#elif defined(WIN32) || defined(_isnan) || defined(_MSC_VER)
 # define isNaN(_a) (_isnan(_a)) 	/* Win32 definition */
 #elif defined(isnan) || defined(__FreeBSD__) || defined(__osf__)
 # define isNaN(_a) (isnan(_a))		/* GNU definition */
@@ -45,6 +46,8 @@
 
 #if defined(__isfinite)
 # define isFinite(_a) (__isfinite(_a))	/* MacOSX/Darwin definition < 10.4 */
+#elif defined(WIN32) || defined(_finite) || defined(_MSC_VER)
+# define isFinite(_a) (_finite(_a)) 	/* Win32 definition */
 #elif defined(__sgi)
 # define isFinite(_a) (_isfinite(_a))
 #elif defined(isfinite)
