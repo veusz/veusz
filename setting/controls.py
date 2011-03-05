@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    Copyright (C) 2005 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -16,8 +17,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 """Module for creating QWidgets for the settings, to enable their values
    to be changed.
 
@@ -31,6 +30,7 @@ import re
 import veusz.qtall as qt4
 
 import setting
+
 import veusz.utils as utils
 
 def styleClear(widget):
@@ -41,6 +41,17 @@ def styleError(widget):
     """Show error state on widget."""
     widget.setStyleSheet("background-color: " +
                          setting.settingdb.color('error').name() )
+
+class DotDotButton(qt4.QPushButton):
+    """A button for opening up more complex editor."""
+    def __init__(self, tooltip=None, checkable=True):
+        qt4.QPushButton.__init__(self, "..")
+        if tooltip:
+            self.setToolTip(tooltip)
+        self.setFlat(True)
+        self.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        self.setMaximumWidth(16)
+        self.setCheckable(checkable)
 
 class Edit(qt4.QLineEdit):
     """Main control for editing settings which are text."""
@@ -107,7 +118,7 @@ class _EditBox(qt4.QTextEdit):
         if readonly:
             self.setReadOnly(True)
 
-        self.positionSelf(parent)
+        utils.positionFloatingPopup(self, parent)
 
         self.installEventFilter(self)
 
@@ -138,42 +149,13 @@ class _EditBox(qt4.QTextEdit):
         """A reasonable size for the text editor."""
         return qt4.QSize(self.spacing*40, self.spacing*3)
 
-    def positionSelf(self, widget):
-        """Open the edit box below the widget."""
-
-        pos = widget.parentWidget().mapToGlobal( widget.pos() )
-        desktop = qt4.QApplication.desktop()
-
-        # recalculates out position so that size is correct below
-        self.adjustSize()
-
-        # is there room to put this widget besides the widget?
-        if pos.y() + self.height() + 1 < desktop.height():
-            # put below
-            y = pos.y() + 1
-        else:
-            # put above
-            y = pos.y() - self.height() - 1
-        
-        # is there room to the left for us?
-        if ( (pos.x() + widget.width() + self.width() < desktop.width()) or
-             (pos.x() + widget.width() < desktop.width()/2) ):
-            # put left justified with widget
-            x = pos.x() + widget.width()
-        else:
-            # put extending to left
-            x = pos.x() - self.width() - 1
-
-        self.move(x, y)
-        self.setFocus()
-
     def closeEvent(self, event):
         """Tell the calling widget that we are closing, and provide
         the new text."""
 
         text = unicode(self.toPlainText())
         text = text.replace('\n', '')
-        self.emit( qt4.SIGNAL('closing'), text)
+        self.emit(qt4.SIGNAL('closing'), text)
         event.accept()
 
 class String(qt4.QWidget):
@@ -191,11 +173,7 @@ class String(qt4.QWidget):
         self.edit = qt4.QLineEdit()
         layout.addWidget(self.edit)
 
-        b = self.button = qt4.QPushButton('..')
-        b.setFlat(True)
-        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
-        b.setMaximumWidth(16)
-        b.setCheckable(True)
+        b = self.button = DotDotButton(tooltip="Edit text")
         layout.addWidget(b)
 
         # set the text of the widget to the 
@@ -519,7 +497,7 @@ class DistancePt(Choice):
         '''Initialise with blank list, then populate with sensible units.'''
         Choice.__init__(self, setting, True, DistancePt.points, parent)
         
-class Dataset(Choice):
+class Dataset(qt4.QWidget):
     """Allow the user to choose between the possible datasets."""
 
     def __init__(self, setting, document, dimensions, datatype, parent):
@@ -529,13 +507,33 @@ class Dataset(Choice):
 
         Changes on the document refresh the list of datasets."""
         
-        Choice.__init__(self, setting, True, [], parent)
+        qt4.QWidget.__init__(self, parent)
+
+        self.choice = Choice(setting, True, [], None)
+        self.connect( self.choice, qt4.SIGNAL("settingChanged"),
+                      self.slotSettingChanged )
+
+        b = self.button = DotDotButton(tooltip="Select using dataset browser")
+        self.connect(b, qt4.SIGNAL("toggled(bool)"),
+                     self.slotButtonToggled)
+
         self.document = document
         self.dimensions = dimensions
         self.datatype = datatype
         self.lastdatasets = None
         self._populateEntries()
-        self.connect(document, qt4.SIGNAL('sigModified'), self.slotModified)
+        self.connect(document, qt4.SIGNAL("sigModified"), self.slotModified)
+
+        layout = qt4.QHBoxLayout()
+        layout.setSpacing(0)
+        layout.setMargin(0)
+        layout.addWidget(self.choice)
+        layout.addWidget(b)
+        self.setLayout(layout)
+
+    def slotSettingChanged(self, *args):
+        """Reemit setting changed signal if combo box changes."""
+        self.emit( qt4.SIGNAL("settingChanged"), *args )
 
     def _populateEntries(self):
         """Put the list of datasets into the combobox."""
@@ -548,12 +546,33 @@ class Dataset(Choice):
         datasets.sort()
 
         if datasets != self.lastdatasets:
-            utils.populateCombo(self, datasets)
+            utils.populateCombo(self.choice, datasets)
             self.lastdatasets = datasets
 
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
         self._populateEntries()
+
+    def slotButtonToggled(self, on):
+        """Bring up list of datasets."""
+        if on:
+            from veusz.qtwidgets.datasetbrowser import DatasetBrowserPopup
+            d = DatasetBrowserPopup(self.document,
+                                    unicode(self.choice.currentText()),
+                                    self.button)
+            self.connect(d, qt4.SIGNAL("closing"), self.boxClosing)
+            self.connect(d, qt4.SIGNAL("newdataset"), self.newDataset)
+            d.show()
+
+    def boxClosing(self):
+        """Called when the popup edit box closes."""
+        self.button.setChecked(False)
+
+    def newDataset(self, dsname):
+        """New dataset selected."""
+        if dsname != self.choice.setting.val:
+            self.emit( qt4.SIGNAL("settingChanged"), self,
+                       self.choice.setting, dsname )
 
 class DatasetOrString(qt4.QWidget):
     """Allow use to choose a dataset or enter some text."""
@@ -563,11 +582,7 @@ class DatasetOrString(qt4.QWidget):
         self.datachoose = Dataset(setting, document, dimensions, datatype,
                                   None)
         
-        b = self.button = qt4.QPushButton('..')
-        b.setFlat(True)
-        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
-        b.setMaximumHeight(self.datachoose.height())
-        b.setMaximumWidth(16)
+        b = self.button = DotDotButton()
         b.setCheckable(True)
 
         layout = qt4.QHBoxLayout()
@@ -1483,12 +1498,9 @@ class Filename(qt4.QWidget):
         self.edit.setText( setting.toText() )
         layout.addWidget(self.edit)
         
-        # get a sensible shape for the button - yawn
-        b = self.button = qt4.QPushButton('..')
-        b.setFlat(True)
+        b = self.button = DotDotButton(checkable=False,
+                                       tooltip="Browse for file")
         layout.addWidget(b)
-        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
-        b.setMaximumWidth(16)
 
         # connect up signals
         self.connect(self.edit, qt4.SIGNAL('editingFinished()'),

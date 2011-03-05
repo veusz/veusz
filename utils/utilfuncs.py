@@ -353,3 +353,31 @@ def populateCombo(combo, items):
     # get index for current value
     index = combo.findText(currenttext)
     combo.setCurrentIndex(index)
+
+def positionFloatingPopup(popup, widget):
+    """Position a popped up window (popup) to side and below widget given."""
+    pos = widget.parentWidget().mapToGlobal( widget.pos() )
+    desktop = qt4.QApplication.desktop()
+
+    # recalculates out position so that size is correct below
+    popup.adjustSize()
+
+    # is there room to put this widget besides the widget?
+    if pos.y() + popup.height() + 1 < desktop.height():
+        # put below
+        y = pos.y() + 1
+    else:
+        # put above
+        y = pos.y() - popup.height() - 1
+
+    # is there room to the left for us?
+    if ( (pos.x() + widget.width() + popup.width() < desktop.width()) or
+         (pos.x() + widget.width() < desktop.width()/2) ):
+        # put left justified with widget
+        x = pos.x() + widget.width()
+    else:
+        # put extending to left
+        x = pos.x() - popup.width() - 1
+
+    popup.move(x, y)
+    popup.setFocus()

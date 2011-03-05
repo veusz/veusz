@@ -86,9 +86,11 @@ class TreeModel(qt4.QAbstractItemModel):
         self.root = TMNode(rootdata, None)
 
     def columnCount(self, parent):
+        """Use root data to get column count."""
         return len(self.root.data)
 
     def data(self, index, role):
+        """Get text or tooltip."""
         if index.isValid():
             if role == qt4.Qt.DisplayRole:
                 item = index.internalPointer()
@@ -100,16 +102,19 @@ class TreeModel(qt4.QAbstractItemModel):
         return qt4.QVariant()
 
     def flags(self, index):
+        """Return whether node is editable."""
         if not index.isValid():
             return qt4.Qt.NoItemFlags
         return qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
+        """Use root node to get headers."""
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
             return self.root.nodeData(section)
         return qt4.QVariant()
 
     def index(self, row, column, parent):
+        """Return index of node."""
         if not self.hasIndex(row, column, parent):
             return qt4.QModelIndex()
 
@@ -124,6 +129,7 @@ class TreeModel(qt4.QAbstractItemModel):
         return qt4.QModelIndex()
 
     def parent(self, index):
+        """Get parent index of index."""
         if not index.isValid():
             return qt4.QModelIndex()
 
@@ -137,6 +143,7 @@ class TreeModel(qt4.QAbstractItemModel):
         return self.createIndex(parentrow, 0, parentitem)
 
     def rowCount(self, parent):
+        """Compute row count of node."""
         if parent.column() > 0:
             return 0
 
