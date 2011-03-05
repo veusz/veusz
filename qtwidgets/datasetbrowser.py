@@ -180,16 +180,43 @@ def treeFromList(nodelist, rootdata):
 
 class DatasetRelationModel(TreeModel):
     """A model to show how the datasets are related to each file."""
-    def __init__(self, doc, grouping="filename", readonly=False):
+    def __init__(self, doc, grouping="filename", readonly=False,
+                 filterdims=None, filterdtype=None):
+        """Model parameters:
+        doc: document
+        group: how to group datasets
+        readonly: no modification of data
+        filterdims/filterdtype: filter dimensions and datatypes.
+        """
+
         TreeModel.__init__(self, ("Dataset", "Size", "Type"))
         self.doc = doc
         self.linkednodes = {}
         self.grouping = grouping
         self.filter = ""
         self.readonly = readonly
+        self.filterdims = filterdims
+        self.filterdtype = filterdtype
         self.refresh()
 
         self.connect(doc, qt4.SIGNAL("sigModified"), self.refresh)
+
+    def datasetFilterOut(self, ds, node):
+        """Should dataset be filtered out by filter options."""
+        filterout = False
+
+        # is filter text not in node text
+        if ( self.filter != "" and
+             all([d.find(self.filter)<0 for d in node.data]) ):
+            filterout = True
+        if ( self.filterdims is not None and
+             ds.dimensions not in self.filterdims ):
+            filterout = True
+        if ( self.filterdtype is not None and
+             ds.datatype not in self.filterdtype ):
+            filterout = True
+
+        return filterout
 
     def makeGrpTreeNone(self):
         """Make tree with no grouping."""
@@ -198,9 +225,9 @@ class DatasetRelationModel(TreeModel):
             child = DatasetNode( self.doc, name,
                                  ("name", "size", "type", "linkfile"),
                                  None )
-            # filter nodes if requested
-            if ( self.filter == "" or
-                 any([d.find(self.filter)>=0 for d in child.data]) ):
+
+            # add if not filtered for filtering
+            if not self.datasetFilterOut(ds, child):
                 tree.insertChildSorted(child)
         return tree
         
@@ -215,15 +242,15 @@ class DatasetRelationModel(TreeModel):
         for name, ds in self.doc.data.iteritems():
             child = DatasetNode(self.doc, name, colitems, None)
 
-            # filter if requested
-            if ( self.filter != "" and
-                 all([d.find(self.filter)<0 for d in child.data]) ):
-                continue
+            # check whether filtered out
+            if not self.datasetFilterOut(ds, child):
+                # get group
+                grp = grouper(ds)
+                if grp not in grpnodes:
+                    grpnodes[grp] = GrpNodeClass( (grp,), None )
+                # add to group
+                grpnodes[grp].insertChildSorted(child)
 
-            grp = grouper(ds)
-            if grp not in grpnodes:
-                grpnodes[grp] = GrpNodeClass( (grp,), None )
-            grpnodes[grp].insertChildSorted(child)
         return treeFromList(grpnodes.values(), coltitles)
 
     def makeGrpTreeFilename(self):
@@ -290,18 +317,22 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     """Tree view for dataset names."""
 
     def __init__(self, doc, mainwin, grouping, parent,
-                 readonly=False):
+                 readonly=False, filterdims=None, filterdtype=None):
         """Initialise the dataset tree view.
         doc: veusz document
         mainwin: veusz main window (or None if readonly)
         grouping: grouping mode of datasets
         parent: parent window or None
+        filterdims: if set, only show datasets with dimensions given
+        filterdtype: if set, only show datasets with type given
         """
 
         qt4.QTreeView.__init__(self, parent)
         self.doc = doc
         self.mainwindow = mainwin
-        self.model = DatasetRelationModel(doc, grouping)
+        self.model = DatasetRelationModel(doc, grouping, readonly=readonly,
+                                          filterdims=filterdims,
+                                          filterdtype=filterdtype)
 
         self.setModel(self.model)
         self.setSelectionBehavior(qt4.QTreeView.SelectItems)
@@ -421,12 +452,15 @@ class DatasetBrowser(qt4.QWidget):
         "size": "Size"
         }
 
-    def __init__(self, thedocument, mainwin, parent, readonly=False):
+    def __init__(self, thedocument, mainwin, parent, readonly=False,
+                 filterdims=None, filterdtype=None):
         """Initialise widget:
         thedocument: document to show
         mainwin: main window of application (or None if readonly)
         parent: parent of widget.
         readonly: for choosing datasets only
+        filterdims: if set, only show datasets with dimensions given
+        filterdtype: if set, only show datasets with type given
         """
 
         qt4.QWidget.__init__(self, parent)
@@ -436,7 +470,7 @@ class DatasetBrowser(qt4.QWidget):
         # options for navigator are in this layout
         self.optslayout = qt4.QHBoxLayout()
 
-        # grouping options - use a 
+        # grouping options - use a menu to choose the grouping
         self.grpbutton = qt4.QPushButton("Group")
         self.grpmenu = qt4.QMenu()
         self.grouping = "filename"
@@ -455,7 +489,7 @@ class DatasetBrowser(qt4.QWidget):
         self.grpbutton.setToolTip("Group datasets with property given")
         self.optslayout.addWidget(self.grpbutton)
 
-        # filtering
+        # filtering by entering text
         self.optslayout.addWidget(qt4.QLabel("Filter"))
         self.filteredit = LineEditWithClear()
         self.filteredit.setToolTip("Enter text here to filter datasets")
@@ -466,9 +500,9 @@ class DatasetBrowser(qt4.QWidget):
         self.layout.addLayout(self.optslayout)
 
         # the actual widget tree
-        self.navtree = DatasetsNavigatorTree(thedocument, mainwin,
-                                             self.grouping, None,
-                                             readonly=readonly)
+        self.navtree = DatasetsNavigatorTree(
+            thedocument, mainwin, self.grouping, None,
+            readonly=readonly, filterdims=filterdims, filterdtype=filterdtype)
         self.layout.addWidget(self.navtree)
 
     def slotGrpChanged(self, action):
@@ -484,8 +518,17 @@ class DatasetBrowserPopup(DatasetBrowser):
     This is used by setting.controls.Dataset
     """
 
-    def __init__(self, document, dsname, parent):
-        DatasetBrowser.__init__(self, document, None, parent, readonly=True)
+    def __init__(self, document, dsname, parent,
+                 filterdims=None, filterdtype=None):
+        """Open popup window for document
+        dsname: dataset name
+        parent: window parent
+        filterdims: if set, only show datasets with dimensions given
+        filterdtype: if set, only show datasets with type given
+        """
+
+        DatasetBrowser.__init__(self, document, None, parent, readonly=True,
+                                filterdims=filterdims, filterdtype=filterdtype)
         self.setWindowFlags(qt4.Qt.Popup)
         self.setAttribute(qt4.Qt.WA_DeleteOnClose)
         self.spacing = self.fontMetrics().height()
