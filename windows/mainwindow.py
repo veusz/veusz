@@ -1001,6 +1001,8 @@ class MainWindow(qt4.QMainWindow):
             self.dirname = os.path.dirname( os.path.abspath(filename) )
             self.dirname_export = self.dirname
 
+        # notify cmpts which need notification that doc has finished opening
+        self.emit(qt4.SIGNAL("documentopened"))
         qt4.QApplication.restoreOverrideCursor()
 
     def addRecentFile(self, filename):

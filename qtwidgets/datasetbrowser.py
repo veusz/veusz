@@ -344,6 +344,10 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         self.model.refresh()
         self.expandAll()
 
+        # when documents have finished opening, expand all nodes
+        if mainwin is not None:
+            self.connect(mainwin, qt4.SIGNAL("documentopened"), self.expandAll)
+
     def changeGrouping(self, grouping):
         """Change the tree grouping behaviour."""
         self.model.grouping = grouping
