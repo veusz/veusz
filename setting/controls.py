@@ -559,7 +559,9 @@ class Dataset(qt4.QWidget):
             from veusz.qtwidgets.datasetbrowser import DatasetBrowserPopup
             d = DatasetBrowserPopup(self.document,
                                     unicode(self.choice.currentText()),
-                                    self.button)
+                                    self.button,
+                                    filterdims=set((self.dimensions,)),
+                                    filterdtype=set((self.datatype,)) )
             self.connect(d, qt4.SIGNAL("closing"), self.boxClosing)
             self.connect(d, qt4.SIGNAL("newdataset"), self.newDataset)
             d.show()
