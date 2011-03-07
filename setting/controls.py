@@ -576,56 +576,40 @@ class Dataset(qt4.QWidget):
             self.emit( qt4.SIGNAL("settingChanged"), self,
                        self.choice.setting, dsname )
 
-class DatasetOrString(qt4.QWidget):
+class DatasetOrString(Dataset):
     """Allow use to choose a dataset or enter some text."""
 
     def __init__(self, setting, document, dimensions, datatype, parent):
-        qt4.QWidget.__init__(self, parent)
-        self.datachoose = Dataset(setting, document, dimensions, datatype,
-                                  None)
-        
-        b = self.button = DotDotButton()
+        Dataset.__init__(self, setting, document, dimensions, datatype, parent)
+
+        b = self.textbutton = DotDotButton()
         b.setCheckable(True)
+        self.layout().addWidget(b)
+        self.connect(b, qt4.SIGNAL('toggled(bool)'), self.textButtonToggled)
 
-        layout = qt4.QHBoxLayout()
-        self.setLayout(layout)
-        layout.setSpacing(0)
-        layout.setMargin(0)
-        layout.addWidget(self.datachoose)
-        layout.addWidget(b)
-
-        self.connect(b, qt4.SIGNAL('toggled(bool)'),
-                     self.buttonToggled)
-        self.connect(self.datachoose, qt4.SIGNAL('settingChanged'),
-                     self.slotSettingChanged)
-
-    def slotSettingChanged(self, *args):
-        """When datachoose changes, inform any listeners."""
-        self.emit( qt4.SIGNAL('settingChanged'), *args )
-        
-    def buttonToggled(self, on):
+    def textButtonToggled(self, on):
         """Button is pressed to bring popup up / down."""
 
         # if button is down and there's no existing popup, bring up a new one
         if on:
-            e = _EditBox( unicode(self.datachoose.currentText()),
-                          self.datachoose.setting.readonly, self.button)
+            e = _EditBox( unicode(self.choice.currentText()),
+                          self.choice.setting.readonly, self.textbutton)
 
             # we get notified with text when the popup closes
-            self.connect(e, qt4.SIGNAL('closing'), self.boxClosing)
+            self.connect(e, qt4.SIGNAL("closing"), self.textBoxClosing)
             e.show()
 
-    def boxClosing(self, text):
+    def textBoxClosing(self, text):
         """Called when the popup edit box closes."""
 
-        # update the text if we can
-        if not self.datachoose.setting.readonly:
-            self.datachoose.setEditText(text)
-            self.datachoose.setFocus()
-            self.parentWidget().setFocus()
-            self.datachoose.setFocus()
+        self.textbutton.setChecked(False)
 
-        self.button.setChecked(False)
+        # update the text if we can
+        if not self.choice.setting.readonly:
+            self.choice.setEditText(text)
+            self.choice.setFocus()
+            self.parentWidget().setFocus()
+            self.choice.setFocus()
 
 class FillStyle(Choice):
     """For choosing between fill styles."""
