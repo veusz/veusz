@@ -39,7 +39,7 @@ class TMNode(object):
 
     def doPrint(self, indent=0):
         """Print out tree for debugging."""
-        print " "*indent, self.data
+        print " "*indent, self.data, self
         for c in self.childnodes:
             c.doPrint(indent=indent+1)
 
@@ -154,72 +154,77 @@ class TreeModel(qt4.QAbstractItemModel):
 
         return len(parentitem.childnodes)
 
+    @staticmethod
+    def _getdata(theroot):
+        """Get a set of child node data and a mapping of data to node."""
+        lookup = {}
+        data = []
+        for c in theroot.childnodes:
+            lookup[c.data] = c
+            data.append(c.data)
+        return lookup, set(data)
+
+    def _syncbranch(self, parentidx, root, rootnew):
+        """For synchronising branches in node tree."""
+
+        # FIXME: this doesn't work if there are duplicates
+        # use LCS - longest common sequence instead
+        clookup, cdata = self._getdata(root)
+        nlookup, ndata = self._getdata(rootnew)
+        if not cdata and not ndata:
+            return
+
+        common = cdata & ndata
+
+        # items to remove (no longer in new data)
+        todelete = cdata - common
+
+        # sorted list to add (added to new data)
+        toadd = list(ndata - common)
+        toadd.sort()
+
+        # iterate over entries, adding and deleting as necessary
+        i = 0
+        c = root.childnodes
+
+        while i < len(rootnew.childnodes) or i < len(c):
+            if i < len(c):
+                k = c[i].data
+            else:
+                k = None
+
+            # one to be deleted
+            if k in todelete:
+                todelete.remove(k)
+                #print "deleting row", i, c[i].data
+                self.beginRemoveRows(parentidx, i, i)
+                #print len(c), i, k
+                del c[i]
+                self.endRemoveRows()
+                continue
+
+            # one to insert
+            if toadd and (k > toadd[0] or k is None):
+                self.beginInsertRows(parentidx, i, i)
+                c.insert(i, nlookup[toadd[0]].cloneTo(root))
+                self.endInsertRows()
+                del toadd[0]
+
+            # now recurse to update any subnodes
+            newindex = self.index(i, 0, parentidx)
+            self._syncbranch(newindex, c[i], rootnew.childnodes[i])
+
+            i += 1
+
     def syncTree(self, newroot):
         """Syncronise the displayed tree with the given tree new."""
 
-        def _getdata(theroot):
-            """Get a set of child node data and a mapping of data to node."""
-            lookup = {}
-            data = []
-            for c in theroot.childnodes:
-                lookup[c.data] = c
-                data.append(c.data)
-            return lookup, set(data)
-
-        def syncbranch(parentidx, root, newroot):
-            """Do synchronisation of branch given for nodes."""
-
-            # FIXME: this doesn't work if there are duplicates
-            # use LCS - longest common sequence instead
-            clookup, cdata = _getdata(root)
-            nlookup, ndata = _getdata(newroot)
-            if not cdata and not ndata:
-                return
-
-            common = cdata & ndata
-
-            # items to remove (no longer in new data)
-            todelete = cdata - common
-
-            # sorted list to add (added to new data)
-            toadd = list(ndata - common)
-            toadd.sort()
-
-            # iterate over entries, adding and deleting as necessary
-            i = 0
-            c = root.childnodes
-
-            while i < len(newroot.childnodes) or i < len(c):
-                try:
-                    k = c[i].data
-                except IndexError:
-                    k = None
-                # one to be deleted
-                if k in todelete:
-                    todelete.remove(k)
-                    #print "deleting row", i, c[i].data
-                    self.beginRemoveRows(parentidx, i, i)
-                    del c[i]
-                    self.endRemoveRows()
-                    continue
-                # one to insert
-                if toadd and (k > toadd[0] or k is None):
-                    #print "adding row", i, toadd[0]
-                    self.beginInsertRows(parentidx, i, i)
-                    c.insert(i, nlookup[toadd[0]].cloneTo(root))
-                    self.endInsertRows()
-                    del toadd[0]
-                
-                # now recurse to add any subnodes
-                myindex = self.index(i, 0, parentidx)
-                syncbranch(myindex, c[i], newroot.childnodes[i])
-                i += 1
-        
         toreset = self.root.data != newroot.data
         if toreset:
             # header changed, so do reset
             self.beginResetModel()
-        syncbranch( qt4.QModelIndex(), self.root, newroot )
+
+        self._syncbranch( qt4.QModelIndex(), self.root, newroot )
         if toreset:
             self.root.data = newroot.data
             self.endResetModel()

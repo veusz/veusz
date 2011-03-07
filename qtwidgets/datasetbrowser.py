@@ -440,6 +440,19 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         self.doc.walkNodes(addifdatasetsetting, nodetypes=("setting",))
 
+    def keyPressEvent(self, event):
+        """Enter key selects widget."""
+        if event.key() in (qt4.Qt.Key_Return, qt4.Qt.Key_Enter):
+            self.emit(qt4.SIGNAL("updateitem"))
+            return
+        qt4.QTreeView.keyPressEvent(self, event)
+
+    def mouseDoubleClickEvent(self, event):
+        """Emit updateitem signal if double clicked."""
+        retn = qt4.QTreeView.mouseDoubleClickEvent(self, event)
+        self.emit(qt4.SIGNAL("updateitem"))
+        return retn
+
 class DatasetBrowser(qt4.QWidget):
     """Widget which shows the document's datasets."""
 
@@ -473,7 +486,7 @@ class DatasetBrowser(qt4.QWidget):
         # grouping options - use a menu to choose the grouping
         self.grpbutton = qt4.QPushButton("Group")
         self.grpmenu = qt4.QMenu()
-        self.grouping = "filename"
+        self.grouping = setting.settingdb.get("navtree_grouping", "filename")
         self.grpact = qt4.QActionGroup(self)
         self.grpact.setExclusive(True)
         for name in self.grpnames:
@@ -508,6 +521,7 @@ class DatasetBrowser(qt4.QWidget):
     def slotGrpChanged(self, action):
         """Grouping changed by user."""
         self.navtree.changeGrouping(action.grpname)
+        setting.settingdb["navtree_grouping"] = action.grpname
 
     def slotFilterChanged(self, filtertext):
         """Filtering changed by user."""
@@ -537,9 +551,10 @@ class DatasetBrowserPopup(DatasetBrowser):
         self.selectDataset(dsname)
         self.installEventFilter(self)
 
-        self.connect(self.navtree.selectionModel(),
-                     qt4.SIGNAL('currentChanged(const QModelIndex&, const QModelIndex&)'),
-                     self.slotNewItem)
+        self.navtree.setFocus()
+
+        self.connect(self.navtree, qt4.SIGNAL("updateitem"),
+                     self.slotUpdateItem)
 
     def eventFilter(self, obj, event):
         """Grab clicks outside this window to close it."""
@@ -564,10 +579,11 @@ class DatasetBrowserPopup(DatasetBrowser):
         """Find, and if possible select dataset name."""
         self.navtree.selectDataset(dsname)
 
-    def slotNewItem(self, new, old):
+    def slotUpdateItem(self):
         """Emit new dataset signal."""
-        if new.isValid():
-            n = new.internalPointer()
+        selected = self.navtree.selectionModel().currentIndex()
+        if selected.isValid():
+            n = selected.internalPointer()
             if isinstance(n, DatasetNode):
                 self.emit(qt4.SIGNAL("newdataset"), n.data[0])
-
+                self.close()
