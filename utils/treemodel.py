@@ -19,7 +19,7 @@
 """A Qt data model show a tree of Python nodes."""
 
 import bisect
-import qtall as qt4
+import veusz.qtall as qt4
 
 class TMNode(object):
     """Object to represent nodes in TreeModel.
