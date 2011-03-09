@@ -226,6 +226,8 @@ class ConsoleWindow(qt4.QDockWidget):
         cursor = self._outputdisplay.textCursor()
         cursor.movePosition(qt4.QTextCursor.End)
         cursor.insertText(text, self._makeTextFormat(cursor, color))
+        self._outputdisplay.setTextCursor(cursor)
+        self._outputdisplay.ensureCursorVisible()
 
     def runFunction(self, func):
         """Execute the function within the console window, trapping
@@ -276,14 +278,11 @@ class ConsoleWindow(qt4.QDockWidget):
     def output_stderr(self, text):
         """ Write text in stderr font to the log."""
         self.checkVisible()
-
         self.appendOutput(text, 'error')
-        self._outputdisplay.ensureCursorVisible()
 
     def insertTextInOutput(self, text):
         """ Inserts the text into the log."""
         self.appendOutput(text, 'normal')
-        self._outputdisplay.ensureCursorVisible()
 
     def slotEnter(self, command):
         """ Called if the return key is pressed in the edit control."""
@@ -305,7 +304,6 @@ class ConsoleWindow(qt4.QDockWidget):
 
         # output the command in the log pane
         self.appendOutput('%s %s\n' % (prompt, command), 'command')
-        self._outputdisplay.ensureCursorVisible()
 
         # are we ready to run this?
         if c is None or (len(command) != 0 and
