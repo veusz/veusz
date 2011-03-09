@@ -336,7 +336,7 @@ class DataEditDialog(VeuszDialog):
         for text, slot in ( ('Numerical dataset', self.slotNewNumericalDataset),
                             ('Text dataset', self.slotNewTextDataset) ):
             a = self.newmenu.addAction(text)
-            self.connect(a, qt4.SIGNAL('activated()'), slot)
+            self.connect(a, qt4.SIGNAL('triggered()'), slot)
         self.newbutton.setMenu(self.newmenu)
 
     def slotDatasetSelected(self, current, deselected):
