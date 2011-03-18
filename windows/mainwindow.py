@@ -803,7 +803,7 @@ class MainWindow(qt4.QMainWindow):
         # okay was selected (and is okay to overwrite if it exists)
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
-            self.dirname = fd.directory()
+            self.dirname = fd.directory().absolutePath()
             # update the edit box
             filename = unicode( fd.selectedFiles()[0] )
             if os.path.splitext(filename)[1] == '':
@@ -824,7 +824,7 @@ class MainWindow(qt4.QMainWindow):
         # if the user chooses a file
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
-            self.dirname = fd.directory()
+            self.dirname = fd.directory().absolutePath()
 
             filename = unicode( fd.selectedFiles()[0] )
             try:
