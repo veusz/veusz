@@ -663,7 +663,10 @@ def _distInvPerc(pixdist, painter, maxsize):
 
 def _distFrac(match, painter, maxsize):
     """Convert from a fraction a/b of maxsize."""
-    return maxsize * float(match.group(1)) / float(match.group(2))
+    try:
+        return maxsize * float(match.group(1)) / float(match.group(2))
+    except ZeroDivisionError:
+        return 0.
 
 def _distRatio(match, painter, maxsize):
     """Convert from a simple 0.xx ratio of maxsize."""
