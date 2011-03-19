@@ -122,6 +122,19 @@ def mainwindow(args):
         # create blank window
         MainWindow.CreateWindow()
 
+def convertArgsUnicode(args):
+    '''Convert set of arguments to unicode.
+    Arguments in argv use current file system encoding
+    '''
+    out = []
+    enc = sys.getfilesystemencoding()
+    for a in args:
+        if isinstance(a, str):
+            out.append( a.decode(enc) )
+        else:
+            out.append(a)
+    return out
+
 def run():
     '''Run the main application.'''
 
@@ -157,6 +170,9 @@ def run():
                       help=optparse.SUPPRESS_HELP)
 
     options, args = parser.parse_args( app.argv() )
+
+    # convert args to unicode from filesystem strings
+    args = convertArgsUnicode(args)
 
     # show splash in normal mode
     splash = None
