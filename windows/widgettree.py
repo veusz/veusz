@@ -188,7 +188,11 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         parent = qt4.QModelIndex()
         while widgetlist:
             w = widgetlist.pop()
-            row = self._getChildren(w.parent).index(w)
+            try:
+                row = self._getChildren(w.parent).index(w)
+            except ValueError:
+                # not found w
+                return None
             parent = self.index(row, 0, parent)
 
         return parent

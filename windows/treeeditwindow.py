@@ -686,8 +686,9 @@ class TreeEditDock(qt4.QDockWidget):
         listview."""
 
         index = self.treemodel.getWidgetIndex(widget)
-        self.treeview.scrollTo(index)
-        self.treeview.setCurrentIndex(index)
+        if index is not None:
+            self.treeview.scrollTo(index)
+            self.treeview.setCurrentIndex(index)
 
     def slotWidgetMove(self, direction):
         """Move the selected widget up/down in the hierarchy.
