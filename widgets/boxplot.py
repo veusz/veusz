@@ -41,7 +41,8 @@ def percentile(sortedds, perc):
     # interpolate between indices
     frac, index = math.modf(index)
     index = int(index)
-    interpol = (1-frac)*sortedds[index] + frac*sortedds[index+1]
+    indexplus1 = min(index+1, sortedds.shape[0]-1)
+    interpol = (1-frac)*sortedds[index] + frac*sortedds[indexplus1]
     return interpol
 
 def swapline(painter, x1, y1, x2, y2, swap):
