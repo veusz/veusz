@@ -315,11 +315,13 @@ class DataEditDialog(VeuszDialog):
                      qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
                      self.slotDatasetSelected)
 
-        # select first item (phew)
+        # select first item, if any or initialise if none
         if self.dslistmodel.rowCount() > 0:
             self.datasetlistview.selectionModel().select(
                 self.dslistmodel.createIndex(0, 0),
                 qt4.QItemSelectionModel.Select)
+        else:
+            self.slotDatasetSelected(None, None)
 
         # connect buttons
         for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
@@ -343,21 +345,23 @@ class DataEditDialog(VeuszDialog):
         """Called when a new dataset is selected."""
 
         # FIXME: Make readonly models readonly!!
-        indexes = current.indexes()
-        if len(indexes) == 0:
-            self.datatableview.setModel(None)
-            return
+        model = None
+        if current is not None and len(current.indexes()) > 0:
+            # get selected dataset
+            name = self.dslistmodel.datasetName(current.indexes()[0])
+            ds = self.document.data[name]
 
-        name = self.dslistmodel.datasetName(indexes[0])
-        ds = self.document.data[name]
+            # make model for dataset
+            if ds.dimensions == 1:
+                model = DatasetTableModel1D(self, self.document, name)
+            elif ds.dimensions == 2:
+                model = DatasetTableModel2D(self, self.document, name)
 
-        if ds.dimensions == 1:
-            model = DatasetTableModel1D(self, self.document, name)
-        elif ds.dimensions == 2:
-            model = DatasetTableModel2D(self, self.document, name)
+        # disable context menu if no menu
+        for a in self.datatableview.actions():
+            a.setEnabled(model is not None)
 
-        self.datatableview.setModel(model)
-            
+        self.datatableview.setModel(model)    
         self.setUnlinkState()
 
     def setUnlinkState(self):
