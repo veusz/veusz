@@ -197,8 +197,12 @@ class PreferencesDialog(VeuszDialog):
                     widget.setIconSize( qt4.QSize(iconsize, iconsize) )
 
         # update dpi if possible
+        # FIXME: requires some sort of visual notification of validator
         try:
-            setdb['export_DPI'] = int(self.exportDPI.currentText())
+            text = self.exportDPI.currentText()
+            valid = self.exportDPI.validator().validate(text, 0)[0]
+            if valid == qt4.QValidator.Acceptable:
+                setdb['export_DPI'] = int(text)
         except ValueError:
             pass
 
