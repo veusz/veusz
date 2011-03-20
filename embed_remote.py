@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 import sys
 import struct
 import cPickle
@@ -247,12 +245,8 @@ class EmbedApplication(qt4.QApplication):
         self.socket.setblocking(0)
         self.notifier.setEnabled(True)
 
-def main():
-    if len(sys.argv) != 2 or sys.argv[1] != '--embed-remote':
-        print >>sys.stderr, ("This program must be run from "
-                             "the Veusz embedding module")
-        sys.exit(1)
-
+def runremote():
+    """Run remote end of embedding module."""
     # get connection parameters
     params = sys.stdin.readline().split()
 
@@ -277,6 +271,3 @@ def main():
     app = EmbedApplication(listensocket, [])
     app.setQuitOnLastWindowClosed(False)
     app.exec_()
-
-if __name__ == '__main__':
-    main()

@@ -196,14 +196,14 @@ class Embedded(object):
 
             # here is the list of commands to try
             possiblecommands = [
-                [findpython, os.path.join(thisdir, 'embed_remote.py')],
+                [findpython, os.path.join(thisdir, 'veusz_main.py')],
                 [findexe] ]
 
         else:
             # try embed_remote.py in this directory, veusz in this directory
             # or veusz on the path in order
             possiblecommands = [ [sys.executable,
-                                  os.path.join(thisdir, 'embed_remote.py')],
+                                  os.path.join(thisdir, 'veusz_main.py')],
                                  [os.path.join(thisdir, 'veusz')],
                                  [findOnPath('veusz')] ]
 

@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-# veusz.py
-# Main veusz program file
-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -21,7 +18,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
+"""Main Veusz executable.
+"""
 
 import sys
 import os.path
@@ -92,11 +90,6 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
         d = ExceptionDialog((excepttype, exceptvalue, tracebackobj), None)
         d.exec_()
 
-def embedremote():
-    '''For running with --remote-embed option.'''
-    from veusz.embed_remote import remote
-    remote.main()
-
 def listen(args, quiet):
     '''For running with --listen option.'''
     from veusz.veusz_listen import openWindow
@@ -138,6 +131,12 @@ def convertArgsUnicode(args):
 def run():
     '''Run the main application.'''
 
+    # jump to the embedding client entry point if required
+    if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
+        from veusz.embed_remote import runremote
+        runremote()
+        return
+
     # this function is spaghetti-like and has nasty code paths.
     # the idea is to postpone the imports until the splash screen
     # is shown
@@ -174,9 +173,11 @@ def run():
     # convert args to unicode from filesystem strings
     args = convertArgsUnicode(args)
 
-    # show splash in normal mode
     splash = None
-    if not options.embed_remote and not options.listen and not options.export:
+    if options.listen or options.export:
+        # do not show splash screen
+        spash = None
+    else:
         splash = qt4.QSplashScreen(makeSplashLogo())
         splash.show()
         app.processEvents()
@@ -190,18 +191,19 @@ def run():
     veusz.setting.transient_settings['unsafe_mode'] = bool(
         options.unsafe_mode)
 
-    # these are the different modes
-    if options.embed_remote:
-        embedremote()
-    elif options.listen:
+    # different modes
+    if options.listen:
+        # listen to incoming commands
         listen(args, quiet=options.quiet)
     elif options.export:
+        # export files to make images
         if len(options.export) != len(args)-1:
             parser.error(
                 'export option needs same number of documents and output files')
         export(options.export, args)
         return
     else:
+        # standard start main window
         mainwindow(args)
 
     # clear splash when startup done
