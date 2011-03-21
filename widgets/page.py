@@ -191,7 +191,6 @@ class Page(widget.Widget):
         # special scaling properties are stored in painter
         if not hasattr(painter, 'veusz_scaling'):
             painter.veusz_scaling = 1.
-        painter.veusz_pixperpt = painter.device().logicalDpiY() / 72.
 
         # document should pass us the page bounds
         x1, y1, x2, y2 = parentposn
