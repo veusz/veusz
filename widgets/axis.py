@@ -359,9 +359,9 @@ class Axis(widget.Widget):
 
         # make sure log axes don't blow up
         if s.log:
-            if self.plottedrange[0] <= 0.:
+            if self.plottedrange[0] < 1e-99:
                 self.plottedrange[0] = 1e-99
-            if self.plottedrange[1] <= 0.:
+            if self.plottedrange[1] < 1e-99:
                 self.plottedrange[1] = 1e-99
             if self.plottedrange[0] == self.plottedrange[1]:
                 self.plottedrange[1] = self.plottedrange[0]*2
