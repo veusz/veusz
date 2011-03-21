@@ -1059,7 +1059,7 @@ class WidgetPath(Str):
                                 {'relativetoparent': self.relativetoparent,
                                  'allowedwidgets': self.allowedwidgets})
 
-    def getWidget(self, val = None):
+    def getReferredWidget(self, val = None):
         """Get the widget referred to. We double-check here to make sure
         it's the one.
 

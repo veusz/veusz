@@ -324,7 +324,7 @@ class Axis(widget.Widget):
             # locate widget we're matching
             # this is ensured to be an Axis
             try:
-                widget = s.get('match').getWidget()
+                widget = s.get('match').getReferredWidget()
             except setting.InvalidType:
                 widget = None
 
