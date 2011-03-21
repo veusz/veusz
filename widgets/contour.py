@@ -238,15 +238,15 @@ class Contour(plotters.GenericPlotter):
         s = self.settings
         d = self.document
 
-        if s.data not in d.data:
-            # this dataset doesn't exist
-            minval = 0.
-            maxval = 1.
-        else:
+        minval, maxval = 0., 1.
+        if s.data in d.data:
             # scan data
-            data = d.data[s.data]
-            minval = data.data.min()
-            maxval = data.data.max()
+            data = d.data[s.data].data
+            minval, maxval = N.nanmin(data), N.nanmax(data)
+            if not N.isfinite(minval):
+                minval = 0.
+            if not N.isfinite(maxval):
+                maxval = 1.
 
         # override if not auto
         if s.min != 'Auto':
@@ -452,6 +452,9 @@ class Contour(plotters.GenericPlotter):
         data = d.data[s.data]
         rangex, rangey = data.getDataRanges()
         yw, xw = data.data.shape
+
+        if xw == 0 or yw == 0:
+            return
 
         # arrays containing coordinates of pixels in x and y
         xpts = N.fromfunction(lambda y,x:
