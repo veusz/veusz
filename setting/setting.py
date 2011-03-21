@@ -500,6 +500,15 @@ class Int(Setting):
     def makeControl(self, *args):
         return controls.Int(self, *args)
 
+def _finiteRangeFloat(f, minval=-1e300, maxval=1e300):
+    """Return a finite float in range or raise exception otherwise."""
+    f = float(f)
+    if not N.isfinite(f):
+        raise InvalidType, 'Finite values only allowed'
+    if f < minval or f > maxval:
+        raise InvalidType, 'Out of range allowed'
+    return f
+
 # for storing floats
 class Float(Setting):
     """Float settings."""
@@ -528,10 +537,8 @@ class Float(Setting):
 
     def convertTo(self, val):       
         if isinstance(val, int) or isinstance(val, float):
-            if val >= self.minval and val <= self.maxval:
-                return float(val)
-            else:
-                raise InvalidType, 'Out of range allowed'
+            return _finiteRangeFloat(val,
+                                     minval=self.minval, maxval=self.maxval)
         raise InvalidType
 
     def toText(self):
@@ -554,7 +561,7 @@ class FloatOrAuto(Setting):
 
     def convertTo(self, val):
         if type(val) in (int, float):
-            return float(val)
+            return _finiteRangeFloat(val)
         elif isinstance(val, basestring) and val.strip().lower() == 'auto':
             return None
         else:
@@ -579,7 +586,7 @@ class FloatOrAuto(Setting):
         else:
             f, ok = uilocale.toDouble(text)
             if ok:
-                return f
+                return self.convertTo(f)
             else:
                 # try to evaluate
                 return self.safeEvalHelper(text)
