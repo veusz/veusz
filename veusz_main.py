@@ -119,8 +119,11 @@ def convertArgsUnicode(args):
     '''Convert set of arguments to unicode.
     Arguments in argv use current file system encoding
     '''
-    out = []
     enc = sys.getfilesystemencoding()
+    # bail out if not supported
+    if enc is None:
+        return args
+    out = []
     for a in args:
         if isinstance(a, str):
             out.append( a.decode(enc) )
