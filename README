@@ -1,10 +1,12 @@
-Veusz 1.10
+Veusz 1.11
 ----------
 Velvet Ember Under Sky Zenith
 -----------------------------
 http://home.gna.org/veusz/
 
-Veusz is Copyright (C) 2003-2010 Jeremy Sanders <jeremy@jeremysanders.net>
+Copyright (C) 2003-2011 Jeremy Sanders <jeremy@jeremysanders.net>
+and contributors.
+
 Licenced under the GPL (version 2 or greater).
 
 Veusz is a Qt4 based scientific plotting package. It is written in
@@ -18,39 +20,45 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.10:
- * Box plot widget added, which can be given statistics to plot or
-   calculated from datasets
- * Polar plot widget added
- * Datasets are now easier to construct and edit in the Data->Edit
-   dialog box
- * CSV reader will assume a text dataset if it cannot convert first item
-   to a number
- * Add color sequence plugin for making a range of widget colors
- * Import plugin for QDP files added
- * Date and times can be also written in local formats
- * Reload data dialog box can reload at intervals and is now non-modal
- * 2D datasets can be created based on expressions of other 2D datasets
+Changes in 1.11:
+ * New data point picker for finding coordinates of points on plot
+   (contributed by B.K. Stuhl)
+ * New data navigator window for filtering, sorting and examining
+   dataset statistics
+ * ".." button next to dataset settings pops up data navigator for
+   choosing datasets
+ * Data fitting can now use PyMinuit, giving error estimates
+   (B.K. Stuhl)
+ * Console history now uses currently entered characters to select
+   lines from history (B.K. Stuhl)
+ * New self test script, comparing graph output with expected output
+ * Put superscripts and subscripts above each other when
+   formatting (B.K. Stuhl)
+ * Key entries can have multiple lines (using \\) (B.K. Stuhl)
+ * Option to treat blanks as data items in CSV files
+ * Locale support added for number formatting
+    - Can use current locale or US/English in documents
+    - Can use US/English or current local in user interface
 
-Minor changes:
- * Option to change size of ends of error bars
- * Margin size option added for key widget
- * Add --listen option to veusz command to replace veusz_listen.
- * Add --quiet option to run commands without displaying a window
- * Add --export option to export documents to graphics files and exit
- * PNG export compression increased
- * Add option to ignore number of lines after headers in CSV files
+ * Linux binaries are now created on a more modern system
+ * Windows binaries now use MSVC for compilation
 
 Bug fixes:
- * Multiple datasets can now be properly created from dataset plugin dialog
- * X and Y ranges of 2D datasets are now correct when converted from
-   X,Y,Z 1D datasets
- * Bounding boxes of resizing rectangles, ellipses and images are fixed
- * min and max coordinate range now works for plotting functions of y
- * Remove duplicate linked files when using import plugins
- * Several crash reports fixed
- * More robust code in data->edit dialog box
- * veusz_listen now works in Windows (not in binary package yet)
+ * CSV import with blank columns fixed
+ * Embedding module now working when using binary
+ * Remember current directory with unicode characters
+ * Extension module now compiles under MSVC in Windows
+ * Output is always appended to console (B.K. Stuhl)
+ * \r characters sometimes break data import in Windows
+ * If using --export option, add directory of script to import path
+
+Minor bug fixes:
+ * Zero sized dataset contour plot fix
+ * Fix problem on context menu for axis match setting
+ * Small values on log axis fix
+ * Disable data edit dialog context menu when no datasets
+ * Loading files with unicode filenames on command line
+ * Do not allow non finite float settings
 
 Features of package:
  * X-Y plots (with errorbars)
@@ -80,6 +88,7 @@ Features of package:
     - import data using new formats
     - make new datasets, optionally linked to existing datasets
     - arbitrarily manipulate the document
+ * Data picker
 
 Requirements for source install:
  Python (2.4 or greater required)
@@ -99,8 +108,11 @@ Optional:
    http://www.stsci.edu/resources/software_hardware/pyfits
  pyemf >= 2.0.0 (optional for EMF export)
    http://pyemf.sourceforge.net/
+ PyMinuit >= 1.1.2 (optional improved fitting)
+   http://code.google.com/p/pyminuit/
  For EMF and better SVG export, PyQt >= 4.6 or better is
    required, to fix a bug in the C++ wrapping
+   
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
@@ -109,15 +121,11 @@ to the Veusz wiki: http://barmag.net/veusz-wiki/
 
 Issues with the current version:
 
- * Plots can sometimes be slow using antialiasing. Go to the
-   preferences dialog or right click on the plot to disable
-   antialiasing.
-
  * Some recent versions of PyQt/SIP will causes crashes when exporting
    SVG files. Update to 4.7.4 (if released) or a recent snapshot to
    solve this problem.
 
-If you enjoy using Veusz, I would love to hear from you. Please join
+If you enjoy using Veusz, we would love to hear from you. Please join
 the mailing lists at
 
 https://gna.org/mail/?group=veusz
@@ -125,8 +133,3 @@ https://gna.org/mail/?group=veusz
 to discuss new features or if you'd like to contribute code. The
 latest code can always be found in the Git repository
 at https://github.com/jeremysanders/veusz.git.
-
-Jeremy Sanders
-
--------------------------------------------------------------------------------
-$Id$
