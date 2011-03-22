@@ -19,8 +19,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 import sys
 import string
 import re
@@ -39,8 +37,14 @@ def _getVeuszDirectory():
     """Get installed directory to find files relative to this one."""
 
     if hasattr(sys, 'frozen'):
-        # for py2exe compatability
-        return os.path.dirname(os.path.abspath(sys.executable))
+        # for pyinstaller/py2app compatability
+        dirname = os.path.dirname(os.path.abspath(sys.executable))
+        if sys.platform == 'darwin':
+            # py2app
+            return os.path.join(dirname, '..', 'Resources', 'veusz')
+        else:
+            # pyinstaller
+            return dirname
     else:
         # standard installation
         return os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
