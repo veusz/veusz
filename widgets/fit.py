@@ -75,7 +75,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
         have_symerr = True
         m.minos()
         have_err = True
-    except minuit.MinuitError as e:
+    except minuit.MinuitError, e:
         print e
         if str(e).startswith('Discovered a new minimum'):
             # the initial fit really failed
