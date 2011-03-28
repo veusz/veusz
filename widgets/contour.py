@@ -464,13 +464,16 @@ class Contour(plotters.GenericPlotter):
                               (y+0.5)*((rangey[1]-rangey[0])/yw) + rangey[0],
                               (yw, xw))
 
+        # only keep finite data points
+        mask = N.logical_not(N.isfinite(data.data))
+
         # iterate over the levels and trace the contours
         self._cachedcontours = None
         self._cachedpolygons = None
         self._cachedsubcontours = None
 
         if self.Cntr is not None:
-            c = self.Cntr(xpts, ypts, data.data)
+            c = self.Cntr(xpts, ypts, data.data, mask)
 
             # trace the contour levels
             if len(s.Lines.lines) != 0:
