@@ -159,7 +159,7 @@ class _SettingDB(object):
             cleankeys.append(cleankey)
 
             # repr doesn't work on QStrings
-            if isinstance(value, qt4.QObject):
+            if isinstance(value, qt4.QString):
                 value = unicode(value)
 
             s.setValue(cleankey, qt4.QVariant(repr(value)))
