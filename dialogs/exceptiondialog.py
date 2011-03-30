@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
  
-# $Id$
-
 '''Dialog to pop up if an exception occurs in Veusz.
 This allows the user to send a bug report in via email.'''
 
