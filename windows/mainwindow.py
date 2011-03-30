@@ -1111,7 +1111,7 @@ class MainWindow(qt4.QMainWindow):
         
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
-            self.dirname_export = unicode(fd.directory().absolutePath())
+            self.dirname_export = fd.directory().absolutePath()
 
             filterused = str(fd.selectedFilter())
             setdb['export_lastformat'] = filterused
