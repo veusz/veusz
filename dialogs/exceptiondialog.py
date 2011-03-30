@@ -103,6 +103,8 @@ class ExceptionSendDialog(VeuszDialog):
                                      "connected?")
             return
 
+        qt4.QMessageBox.information(self, "Submitted",
+                                    "Thank you for submitting an error report")
         VeuszDialog.accept(self)
 
 def _raiseIgnoreException():
