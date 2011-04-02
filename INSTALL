@@ -9,15 +9,16 @@ Requirements:
  PyQt >= 4.3     http://www.riverbankcomputing.co.uk/pyqt/
  numpy >= 1.0    http://numpy.scipy.org/
 
-(PyQt requires
+PyQt requires
  Qt4             http://www.trolltech.com/products/qt/ (free version)
                  version >= 4.3 recommended
- SIP             http://www.riverbankcomputing.co.uk/sip/   )
+ SIP             http://www.riverbankcomputing.co.uk/sip/
 
 Optional requirements:
  PyFITS>=1.1     http://www.stsci.edu/resources/software_hardware/pyfits
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
  Corefonts       http://corefonts.sourceforge.net/
+ PyMinuit        http://code.google.com/p/pyminuit/
 
 Simple source use (if requirements installed)
 =============================================
@@ -67,8 +68,8 @@ Linux binary
 ============
 If you do not have the requirements, you can use the Linux binary
 instead (if available). Note that this may not work on all
-distributions due to glibc/library incompatibilities. You need to
-simply unpack the tar file and run the main executable:
+distributions due to glibc/library incompatibilities. Simply unpack
+the tar file and run the main executable:
 
 # tar xzf veusz-linux-i386-1.11.tar.gz     [change version here]
 # cd veusz-linux-i386-1.11

@@ -1,240 +1,41 @@
-Changes from 1.9 to 1.10 are shown below.
-Please see the README file for an easier to read version of this ChangeLog.
+Changes in 1.11:
+ * New data point picker for finding coordinates of points on plot
+   (contributed by B.K. Stuhl)
+ * New data navigator window for filtering, sorting and examining
+   dataset statistics
+ * ".." button next to dataset settings pops up data navigator for
+   choosing datasets
+ * Data fitting can now use PyMinuit, giving error estimates
+   (B.K. Stuhl)
+ * Console history now uses currently entered characters to select
+   lines from history (B.K. Stuhl)
+ * New self test script, comparing graph output with expected output
+ * Put superscripts and subscripts above each other when
+   formatting (B.K. Stuhl)
+ * Key entries can have multiple lines (using \\) (B.K. Stuhl)
+ * Option to treat blanks as data items in CSV files
+ * Locale support added for number formatting
+    - Can use current locale or US/English in documents
+    - Can use US/English or current local in user interface
+ * Contours avoid missing (nan) values
 
-------------------------------------------------------------------------
-r1471 | jeremysanders | 2010-12-10 22:18:24 +0000 (Fri, 10 Dec 2010) | 1 line
+ * Linux binaries are now created on a more modern system
+ * Windows binaries now use MSVC for compilation
 
-Add option to ignore N lines after headers in CSV files
-------------------------------------------------------------------------
-r1470 | jeremysanders | 2010-12-09 09:39:12 +0000 (Thu, 09 Dec 2010) | 1 line
+Bug fixes:
+ * CSV import with blank columns fixed
+ * Embedding module now working when using binary
+ * Remember current directory with unicode characters
+ * Extension module now compiles under MSVC in Windows
+ * Output is always appended to console (B.K. Stuhl)
+ * \r characters sometimes break data import in Windows
+ * If using --export option, add directory of script to import path
 
-Avoid error in axis range if no data given
-------------------------------------------------------------------------
-r1469 | jeremysanders | 2010-12-08 22:15:00 +0000 (Wed, 08 Dec 2010) | 1 line
+Minor bug fixes:
+ * Zero sized dataset contour plot fix
+ * Fix problem on context menu for axis match setting
+ * Small values on log axis fix
+ * Disable data edit dialog context menu when no datasets
+ * Loading files with unicode filenames on command line
+ * Do not allow non finite float settings
 
-Provide manual mode for box plots
-------------------------------------------------------------------------
-r1468 | jeremysanders | 2010-12-02 19:56:44 +0000 (Thu, 02 Dec 2010) | 1 line
-
-Documentation updates
-------------------------------------------------------------------------
-r1467 | jeremysanders | 2010-12-02 19:29:44 +0000 (Thu, 02 Dec 2010) | 1 line
-
-Increase line width in box plot example
-------------------------------------------------------------------------
-r1466 | jeremysanders | 2010-12-02 13:58:20 +0000 (Thu, 02 Dec 2010) | 1 line
-
-Make compression larger for PNG export
-------------------------------------------------------------------------
-r1465 | jeremysanders | 2010-12-01 17:20:48 +0000 (Wed, 01 Dec 2010) | 1 line
-
-Add man page generation to generate_manual script
-------------------------------------------------------------------------
-r1464 | jeremysanders | 2010-12-01 17:17:37 +0000 (Wed, 01 Dec 2010) | 1 line
-
-Move pod manual to Documents
-------------------------------------------------------------------------
-r1463 | jeremysanders | 2010-12-01 17:06:14 +0000 (Wed, 01 Dec 2010) | 1 line
-
-Use separate reading thread for veusz_listen to make it compatible with Windows
-------------------------------------------------------------------------
-r1462 | jeremysanders | 2010-11-30 09:36:37 +0000 (Tue, 30 Nov 2010) | 1 line
-
-Update boxplot and change version to beta
-------------------------------------------------------------------------
-r1461 | jeremysanders | 2010-11-29 21:44:43 +0000 (Mon, 29 Nov 2010) | 1 line
-
-Add box plot example
-------------------------------------------------------------------------
-r1460 | jeremysanders | 2010-11-29 21:32:08 +0000 (Mon, 29 Nov 2010) | 1 line
-
-Add man pages for veusz and veusz_listen. Add --quiet option for executing commands without opening a window.
-------------------------------------------------------------------------
-r1459 | jeremysanders | 2010-11-29 20:45:15 +0000 (Mon, 29 Nov 2010) | 1 line
-
-Rework main program. Add --listen option to act as veusz_listen. Add --export option to export document to graphics files and exit
-------------------------------------------------------------------------
-r1458 | jeremysanders | 2010-11-28 12:34:37 +0000 (Sun, 28 Nov 2010) | 1 line
-
-Implement 2d dataset creation based on expressions of other 2D datasets
-------------------------------------------------------------------------
-r1457 | jeremysanders | 2010-11-28 11:25:22 +0000 (Sun, 28 Nov 2010) | 1 line
-
-Check if files have changed before reloading data
-------------------------------------------------------------------------
-r1456 | jeremysanders | 2010-11-26 22:43:04 +0000 (Fri, 26 Nov 2010) | 1 line
-
-Increase reload max time and make dialog close by default
-------------------------------------------------------------------------
-r1455 | jeremysanders | 2010-11-26 22:35:03 +0000 (Fri, 26 Nov 2010) | 1 line
-
-Make reload data dialog box non modal. Add option to reload at intervals or manually if button pressed.
-------------------------------------------------------------------------
-r1454 | jeremysanders | 2010-11-26 20:01:51 +0000 (Fri, 26 Nov 2010) | 1 line
-
-Update README and bump version number to 1.10
-------------------------------------------------------------------------
-r1453 | jeremysanders | 2010-11-25 22:19:02 +0000 (Thu, 25 Nov 2010) | 1 line
-
-Add polar example
-------------------------------------------------------------------------
-r1452 | jeremysanders | 2010-11-25 21:58:24 +0000 (Thu, 25 Nov 2010) | 1 line
-
-If ISO date/time conversion fails, try local date time conversion
-------------------------------------------------------------------------
-r1451 | jeremysanders | 2010-11-25 21:25:41 +0000 (Thu, 25 Nov 2010) | 1 line
-
-Add margin size setting to key widget
-------------------------------------------------------------------------
-r1450 | jeremysanders | 2010-11-24 15:56:05 +0000 (Wed, 24 Nov 2010) | 1 line
-
-Fix fitting after changes to function widget
-------------------------------------------------------------------------
-r1449 | jeremysanders | 2010-11-22 09:26:58 +0000 (Mon, 22 Nov 2010) | 10 lines
-
-Fixed error report Tue, 28 Sep 2010 16:16:45 +0000: zero division in function widget from number of steps
-Fixed error report Fri, 15 Oct 2010 12:05:12 +0000: force parts of CSV datasets o have same length by adding NaNs if they are too short
-Fixed error report Mon, 25 Oct 2010 08:27:04 +0000: zero division - if DPI is 0, fix to 72
-Fixed error report Fri, 05 Nov 2010 23:36:38 +0000: catch exceptions from conversion of expression evaluation result to numpy array for function plotting
-Fixed error report Mon, 08 Nov 2010 22:28:28 +0000: allow saving of histogram datasets where one of the output datasets is not used
-Fixed error report Thu, 11 Nov 2010 23:55:59 +0000: somehow veusz data on clipboard is invalid: catch invalid integers in paste: FIXME How does this happen?
-Fixed error report Sat, 13 Nov 2010 03:58:11 +0000: catch invalid data ranges for datasets in bar axis ranging
-
-Added endsize setting to error bar line which scales the ends of error bars by this factor
-
-------------------------------------------------------------------------
-r1448 | jeremysanders | 2010-11-13 20:07:34 +0000 (Sat, 13 Nov 2010) | 1 line
-
-Use separate instance of plugin when applying in plugin dialog, to avoid shared plugin confusion
-------------------------------------------------------------------------
-r1447 | jeremysanders | 2010-11-11 20:35:25 +0000 (Thu, 11 Nov 2010) | 1 line
-
-Merge nonorthogonal branch 1429:1446 to trunk
-------------------------------------------------------------------------
-r1433 | jeremysanders | 2010-11-04 19:12:00 +0000 (Thu, 04 Nov 2010) | 1 line
-
-Fix bug when editing dataset plugins
-------------------------------------------------------------------------
-r1428 | jeremysanders | 2010-10-24 12:00:37 +0100 (Sun, 24 Oct 2010) | 1 line
-
-Fix error handling for linked datasets which reload using reloadViaOperation. Automatic bug report Tue, 12 Oct 2010 13:39:41 +0000.
-------------------------------------------------------------------------
-r1427 | jeremysanders | 2010-10-23 22:03:33 +0100 (Sat, 23 Oct 2010) | 1 line
-
-Rewrite dataset list model in data edit dialog to be more robust. Add button to create new datasets.
-------------------------------------------------------------------------
-r1426 | jeremysanders | 2010-10-23 17:52:11 +0100 (Sat, 23 Oct 2010) | 1 line
-
-Add blank row at end of dataset in edit dialog to insert new data
-------------------------------------------------------------------------
-r1425 | jeremysanders | 2010-10-23 17:17:28 +0100 (Sat, 23 Oct 2010) | 1 line
-
-Implement label axes for boxplots
-------------------------------------------------------------------------
-r1423 | jeremysanders | 2010-10-19 20:30:44 +0100 (Tue, 19 Oct 2010) | 1 line
-
-Start of box plot implementation
-------------------------------------------------------------------------
-r1422 | jeremysanders | 2010-09-28 10:15:27 +0100 (Tue, 28 Sep 2010) | 1 line
-
-make read terr in qdp import plugin get error bars round the right way
-------------------------------------------------------------------------
-r1421 | jeremysanders | 2010-09-27 18:03:07 +0100 (Mon, 27 Sep 2010) | 1 line
-
-Add initial QDP import plugin
-------------------------------------------------------------------------
-r1420 | jeremysanders | 2010-09-27 18:02:45 +0100 (Mon, 27 Sep 2010) | 1 line
-
-Make multiple datasets imported by plugins use same linking, if appropriate. Fix description of operation using dataset plugins.
-------------------------------------------------------------------------
-r1419 | jeremysanders | 2010-09-26 16:43:42 +0100 (Sun, 26 Sep 2010) | 1 line
-
-Remove extra copy of posn variable
-------------------------------------------------------------------------
-r1418 | jeremysanders | 2010-09-26 16:40:57 +0100 (Sun, 26 Sep 2010) | 1 line
-
-Fix bug report Sun, 26 Sep 2010 06:35:58 -0600. Cleanup function plotting evaluation. Fix setting min and max values for plotting functions of y.
-------------------------------------------------------------------------
-r1417 | jeremysanders | 2010-09-26 15:44:55 +0100 (Sun, 26 Sep 2010) | 1 line
-
-Fix error report Sun, 26 Sep 2010 06:27:36 -0600
-------------------------------------------------------------------------
-r1416 | jeremysanders | 2010-09-25 10:14:16 +0100 (Sat, 25 Sep 2010) | 1 line
-
-Fix problem report Sun,  2 May 2010 09:42:41 -0400
-------------------------------------------------------------------------
-r1415 | jeremysanders | 2010-09-25 10:05:25 +0100 (Sat, 25 Sep 2010) | 1 line
-
-Fix error report Tue, 21 Sep 2010 06:25:43 -0600
-------------------------------------------------------------------------
-r1414 | jeremysanders | 2010-09-25 09:56:43 +0100 (Sat, 25 Sep 2010) | 1 line
-
-Fix error report Thu, 16 Sep 2010 14:20:26 -0600
-------------------------------------------------------------------------
-r1413 | jeremysanders | 2010-09-25 09:48:02 +0100 (Sat, 25 Sep 2010) | 1 line
-
-Fix error report Sun, 12 Sep 2010 23:56:57 -0600
-------------------------------------------------------------------------
-r1412 | jeremysanders | 2010-09-25 09:42:01 +0100 (Sat, 25 Sep 2010) | 1 line
-
-Fix error report Sat, 11 Sep 2010 06:06:13 -0600
-------------------------------------------------------------------------
-r1411 | jeremysanders | 2010-09-25 09:38:27 +0100 (Sat, 25 Sep 2010) | 1 line
-
-Fix bounding box appearance when resizing rectangles, ellipses and image files
-------------------------------------------------------------------------
-r1410 | jeremysanders | 2010-09-20 22:41:18 +0100 (Mon, 20 Sep 2010) | 1 line
-
-Make X and Y ranges of 1D->2D datasets correct
-------------------------------------------------------------------------
-r1409 | jeremysanders | 2010-09-20 20:07:36 +0100 (Mon, 20 Sep 2010) | 1 line
-
-CSV reader will now assume a dataset is a text dataset if it cannot convert the first item of a column/row to a number
-------------------------------------------------------------------------
-r1408 | jeremysanders | 2010-09-16 20:33:07 +0100 (Thu, 16 Sep 2010) | 1 line
-
-Add colors sequence plugin
-------------------------------------------------------------------------
-r1407 | jeremysanders | 2010-09-12 15:38:24 +0100 (Sun, 12 Sep 2010) | 1 line
-
-Drop histo test as there is a subtle clipping issue
-------------------------------------------------------------------------
-r1406 | jeremysanders | 2010-09-12 15:35:03 +0100 (Sun, 12 Sep 2010) | 1 line
-
-Solve -0 issues in self tests
-------------------------------------------------------------------------
-r1405 | jeremysanders | 2010-09-12 15:26:35 +0100 (Sun, 12 Sep 2010) | 1 line
-
-Use bmp file format for self test - hopefully should be same between platforms
-------------------------------------------------------------------------
-r1404 | jeremysanders | 2010-09-12 15:12:15 +0100 (Sun, 12 Sep 2010) | 1 line
-
-More attempts to get same output for tests between windows/unix
-------------------------------------------------------------------------
-r1403 | jeremysanders | 2010-09-12 14:44:35 +0100 (Sun, 12 Sep 2010) | 1 line
-
-Round svg coordinates and sizes to 2dp to get consistent behaviour on different platforms
-------------------------------------------------------------------------
-r1402 | jeremysanders | 2010-09-11 11:19:33 +0100 (Sat, 11 Sep 2010) | 1 line
-
-More fixes for self testing. Return exit code if tests failed
-------------------------------------------------------------------------
-r1401 | jeremysanders | 2010-09-11 10:28:00 +0100 (Sat, 11 Sep 2010) | 1 line
-
-Fix other usages of metrics to get the same self test output
-------------------------------------------------------------------------
-r1400 | jeremysanders | 2010-09-10 22:08:10 +0100 (Fri, 10 Sep 2010) | 1 line
-
-Add start of self test routines
-------------------------------------------------------------------------
-r1399 | jeremysanders | 2010-09-08 22:26:12 +0100 (Wed, 08 Sep 2010) | 1 line
-
-Cleanups in text renderer
-------------------------------------------------------------------------
-r1391 | jeremysanders | 2010-08-31 22:22:32 +0100 (Tue, 31 Aug 2010) | 1 line
-
-Fix propagation of settings to specific widgets
-------------------------------------------------------------------------
-r1389 | jeremysanders | 2010-08-30 17:13:49 +0100 (Mon, 30 Aug 2010) | 1 line
-
-Fix if both min and max in fit are set

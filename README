@@ -39,6 +39,7 @@ Changes in 1.11:
  * Locale support added for number formatting
     - Can use current locale or US/English in documents
     - Can use US/English or current local in user interface
+ * Contours avoid missing (nan) values
 
  * Linux binaries are now created on a more modern system
  * Windows binaries now use MSVC for compilation
