@@ -154,6 +154,10 @@ void plotClippedPolyline(QPainter& painter,
 			 const QPolygonF& poly,
 			 bool autoexpand)
 {
+  // exit if fewer than 2 points in polygon
+  if ( poly.size() < 2 )
+    return;
+
   // if autoexpand, expand rectangle by line width
   if ( autoexpand )
     {
