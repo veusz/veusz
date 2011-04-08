@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 from field import *
 from datasetplugin import *
 from importplugin import *

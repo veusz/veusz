@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 """Represents atomic operations to take place on a document which can be undone.
 Rather than the document modified directly, this interface should be used.
 

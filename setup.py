@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """
 Veusz distutils setup script
 see the file INSTALL for details on how to install Veusz

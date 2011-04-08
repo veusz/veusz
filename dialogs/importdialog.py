@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """Module for implementing dialog boxes for importing data in Veusz."""
 
 import os.path

@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """SimpleRead: a class for the reading of data formatted in a simple way
 
 To read the data it takes a descriptor which takes the form of

@@ -19,8 +19,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """
 A module for the execution of user 'macro' code inside a special
 environment. That way the commandline can be used to interact with

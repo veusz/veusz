@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 """Contour plotting from 2d datasets.
 
 Contour plotting requires that the veusz_helpers package is installed,

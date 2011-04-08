@@ -19,8 +19,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """A class to represent Veusz documents, with dataset classes."""
 
 import os.path

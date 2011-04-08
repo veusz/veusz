@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """
 Document veusz widget types and settings
 Creates an xml file designed to be processed into a web page using xsl

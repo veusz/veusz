@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 from version import version
 from textrender import Renderer, FontMetrics
 from safe_eval import checkCode

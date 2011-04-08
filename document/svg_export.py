@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """A home-brewed SVG paint engine for doing svg with clipping
 and exporting text as paths for WYSIWYG."""
 

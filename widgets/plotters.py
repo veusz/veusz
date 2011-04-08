@@ -19,8 +19,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 """A generic plotter widget which is inherited by function and point."""
 
 import veusz.qtall as qt4

@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """The grid class allows graphs to be arranged in a regular grid.
 The graphs may share axes if they are stored in the grid widget.
 """

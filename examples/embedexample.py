@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """An example embedding program. Veusz needs to be installed into
 the Python path for this to work (use setup.py)
 

@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-# $Id$
-
 """Contains a model and view for handling a tree of widgets."""
 
 import veusz.qtall as qt4

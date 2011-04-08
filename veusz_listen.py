@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """
 Veusz interface which listens to stdin, and receives commands.
 Results are written to stdout

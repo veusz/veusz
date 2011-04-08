@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 """A paint engine to produce EMF exports.
 
 Requires: PyQt-x11-gpl-4.6-snapshot-20090906.tar.gz
