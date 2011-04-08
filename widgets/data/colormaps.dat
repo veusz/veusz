@@ -6,8 +6,6 @@
 # name: name of colourmap
 # B G R alpha are quads for each point on map
 
-# $Id$
-
 heat
 0   0   0   255
 0   0   186 255

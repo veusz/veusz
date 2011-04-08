@@ -29,6 +29,3 @@ docbook2txt $infile
 release=$(cat ../VERSION)
 pod2man --release=${release} --center="Veusz"  veusz.pod > veusz.1
 pod2man --release=${release} --center="Veusz"  veusz_listen.pod > veusz_listen.1
-
-###################################################################
-# $Id$

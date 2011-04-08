@@ -5,8 +5,6 @@
 
 # you will need to edit the paths below to get the correct input directory
 
-# $Id$
-
 from glob import glob
 import os.path
 import sys

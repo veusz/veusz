@@ -10,8 +10,6 @@
     the entirely different framework of a Python type.  It
     was written by following the Python "Extending and Embedding"
     tutorial.
-
-  $Id$
  */
 
 /*

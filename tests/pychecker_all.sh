@@ -17,8 +17,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# $Id$
-
 # run pychecker on all script files
 
 for f in `find . -name "*.py"`; do
