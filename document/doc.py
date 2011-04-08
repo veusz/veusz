@@ -256,23 +256,27 @@ class Document( qt4.QObject ):
         dataset.document = self
         self.setModified()
 
-    def getLinkedFiles(self):
-        """Get a list of LinkedFile objects used by the document."""
+    def getLinkedFiles(self, filenames=None):
+        """Get a list of LinkedFile objects used by the document.
+        if filenames is a set, only get the objects with filenames given
+        """
         links = set()
         for ds in self.data.itervalues():
-            if ds.linked:
+            if ds.linked and (filenames is None or
+                              ds.linked.filename in filenames):
                 links.add(ds.linked)
         return list(links)
 
-    def reloadLinkedDatasets(self):
+    def reloadLinkedDatasets(self, filenames=None):
         """Reload linked datasets from their files.
+        If filenames is a set(), only reload from these filenames
 
         Returns a tuple of
         - List of datasets read
         - Dict of tuples containing dataset names and number of errors
         """
 
-        links = self.getLinkedFiles()
+        links = self.getLinkedFiles(filenames=filenames)
 
         read = []
         errors = {}

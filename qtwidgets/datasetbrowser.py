@@ -437,7 +437,16 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def filenameContextMenu(self, node):
         """Return context menu for filenames."""
 
+        from veusz.dialogs.reloaddata import ReloadData
         filename = node.filename()
+        if filename == '/':
+            # non linked filename node
+            return None
+
+        def _reload():
+            """Reload data in this file."""
+            d = ReloadData(self.doc, self.mainwindow, filenames=set([filename]))
+            self.mainwindow.showDialog(d)
         def _unlink_all():
             """Unlink all datasets associated with file."""
             self.doc.applyOperation(
@@ -448,6 +457,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                 document.OperationDatasetDeleteByFile(filename))
 
         menu = qt4.QMenu()
+        menu.addAction("Reload", _reload)
         menu.addAction("Unlink all", _unlink_all)
         menu.addAction("Delete all", _delete_all)
         return menu

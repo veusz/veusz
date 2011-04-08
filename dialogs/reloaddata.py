@@ -30,11 +30,17 @@ from veuszdialog import VeuszDialog
 class ReloadData(VeuszDialog):
     """Dialog for reloading linked datasets."""
 
-    def __init__(self, document, parent):
-        """Initialise the dialog."""
+    def __init__(self, document, parent, filenames=None):
+        """Initialise the dialog.
+
+        document: veusz document
+        parent: parent window
+        filenames: if a set() only reload from these filenames
+        """
 
         VeuszDialog.__init__(self, parent, 'reloaddata.ui')
         self.document = document
+        self.filenames = filenames
 
         # update on reloading
         self.reloadct = 1
@@ -101,7 +107,8 @@ class ReloadData(VeuszDialog):
         text = ''
         try:
             # try to reload the datasets
-            datasets, errors = self.document.reloadLinkedDatasets()
+            datasets, errors = self.document.reloadLinkedDatasets(
+                self.filenames)
 
             # show errors in read data
             for var, count in errors.items():
