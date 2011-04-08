@@ -704,6 +704,52 @@ class OperationDataset2DXYFunc(OperationDataset2DBase):
     def makeDSClass(self):
         return datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
 
+class OperationDatasetUnlinkByFile(object):
+    """Unlink all datasets associated with file."""
+
+    descr = "unlink datasets"
+
+    def __init__(self, filename):
+        """Unlink all datasets associated with filename."""
+        self.filename = filename
+
+    def do(self, document):
+        """Remove links."""
+        self.oldlinks = {}
+        for name, ds in document.data.iteritems():
+            if ds.linked is not None and ds.linked.filename == self.filename:
+                self.oldlinks[name] = ds.linked
+                ds.linked = None
+
+    def undo(self, document):
+        """Restore links."""
+        for name, link in self.oldlinks.iteritems():
+            try:
+                document.data[name].linked = link
+            except KeyError:
+                pass
+
+class OperationDatasetDeleteByFile(object):
+    """Delete all datasets associated with file."""
+
+    descr = "delete datasets"
+
+    def __init__(self, filename):
+        """Delete all datasets associated with filename."""
+        self.filename = filename
+
+    def do(self, document):
+        """Remove datasets."""
+        self.olddatasets = {}
+        for name, ds in document.data.items():
+            if ds.linked is not None and ds.linked.filename == self.filename:
+                self.olddatasets[name] = ds
+                del document.data[name]
+
+    def undo(self, document):
+        """Restore datasets."""
+        document.data.update(self.olddatasets)
+
 ###############################################################################
 # Import datasets
         

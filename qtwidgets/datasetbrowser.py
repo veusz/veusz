@@ -165,6 +165,10 @@ class FilenameNode(TMNode):
                 return qt4.QVariant(os.path.basename(self.data[0]))
         return qt4.QVariant()
 
+    def filename(self):
+        """Return filename."""
+        return self.data[0]
+
     def toolTip(self, column):
         """Full filename for tooltip."""
         if column == 0:
@@ -382,11 +386,14 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         node = idx.internalPointer()
         menu = None
         if isinstance(node, DatasetNode):
-            menu = self.datasetContextMenu(node, pt)
+            menu = self.datasetContextMenu(node)
+        elif isinstance(node, FilenameNode):
+            menu = self.filenameContextMenu(node)
+
         if menu is not None:
             menu.exec_(self.mapToGlobal(pt))
 
-    def datasetContextMenu(self, dsnode, pt):
+    def datasetContextMenu(self, dsnode):
         """Return context menu for datasets."""
         import veusz.dialogs.dataeditdialog as dataeditdialog
         dataset = dsnode.dataset()
@@ -425,6 +432,24 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         useasmenu = menu.addMenu("Use as")
         if dataset is not None:
             self.getMenuUseAs(useasmenu, dataset)
+        return menu
+
+    def filenameContextMenu(self, node):
+        """Return context menu for filenames."""
+
+        filename = node.filename()
+        def _unlink_all():
+            """Unlink all datasets associated with file."""
+            self.doc.applyOperation(
+                document.OperationDatasetUnlinkByFile(filename))
+        def _delete_all():
+            """Delete all datasets associated with file."""
+            self.doc.applyOperation(
+                document.OperationDatasetDeleteByFile(filename))
+
+        menu = qt4.QMenu()
+        menu.addAction("Unlink all", _unlink_all)
+        menu.addAction("Delete all", _delete_all)
         return menu
 
     def getMenuUseAs(self, menu, dataset):
