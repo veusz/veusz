@@ -7,3 +7,10 @@ helpers/*.so
 *~
 MANIFEST
 dist/
+
+# generated files
+Documents/manual.html
+Documents/manual.pdf
+Documents/manual.txt
+Documents/veusz.1
+Documents/veusz_listen.1
