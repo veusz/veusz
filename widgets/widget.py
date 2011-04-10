@@ -258,6 +258,13 @@ class Widget(object):
             raise ValueError, \
                   "Cannot remove graph '%s' - does not exist" % name
 
+    def widgetSiblingIndex(self):
+        """Get index of widget in its siblings."""
+        if self.parent is None:
+            return 0
+        else:
+            return self.parent.children.index(self)
+
     def _getPath(self):
         """Returns a path for the object, e.g. /plot1/x."""
 

@@ -145,87 +145,42 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         return qt4.QVariant()
 
-    def _getChildren(self, parent):
-        """Get a list of children for the parent given (None selects root)."""
-
-        if parent is None:
-            return [self.document.basewidget]
-        else:
-            return parent.children
-
     def index(self, row, column, parent):
         """Construct an index for a child of parent."""
 
-        if not parent.isValid():
-            parentobj = None
+        if parent.isValid():
+            # normal widget
+            try:
+                child = parent.internalPointer().children[row]
+            except IndexError:
+                return qt4.QModelIndex()
         else:
-            parentobj = parent.internalPointer()
-
-        children = self._getChildren(parentobj)
-
-        try:
-            c = children[row]
-        except IndexError:
-            # sometimes this function gets called with an invalid row
-            # when deleting, so we return an error result
-            return qt4.QModelIndex()
-
-        return self.createIndex(row, column, c)
+            # root widget
+            child = self.document.basewidget
+        return self.createIndex(row, column, child)
 
     def getWidgetIndex(self, widget):
         """Returns index for widget specified."""
-
-        # walk index tree back to widget from root
-        widgetlist = []
-        w = widget
-        while w is not None:
-            widgetlist.append(w)
-            w = w.parent
-
-        # now iteratively look up indices
-        parent = qt4.QModelIndex()
-        while widgetlist:
-            w = widgetlist.pop()
-            try:
-                row = self._getChildren(w.parent).index(w)
-            except ValueError:
-                # not found w
-                return None
-            parent = self.index(row, 0, parent)
-
-        return parent
+        return self.createIndex(widget.widgetSiblingIndex(), 0, widget)
     
     def parent(self, index):
         """Find the parent of the index given."""
 
-        if not index.isValid():
-            return qt4.QModelIndex()
-
-        thisobj = index.internalPointer()
-        parentobj = thisobj.parent
-
+        parentobj = index.internalPointer().parent
         if parentobj is None:
             return qt4.QModelIndex()
         else:
-            # lookup parent in grandparent's children
-            grandparentchildren = self._getChildren(parentobj.parent)
-            try:
-                parentrow = grandparentchildren.index(parentobj)
-            except ValueError:
-                return qt4.QModelIndex()
+            return self.createIndex(parentobj.widgetSiblingIndex(), 0,
+                                    parentobj)
 
-            return self.createIndex(parentrow, 0, parentobj)
+    def rowCount(self, index):
+        """Return number of rows of children of index."""
 
-    def rowCount(self, parent):
-        """Return number of rows of children."""
-
-        if not parent.isValid():
-            parentobj = None
+        if index.isValid():
+            return len(index.internalPointer().children)
         else:
-            parentobj = parent.internalPointer()
-
-        children = self._getChildren(parentobj)
-        return len(children)
+            # always 1 root node
+            return 1
 
     def getSettings(self, index):
         """Return the settings for the index selected."""
