@@ -206,6 +206,7 @@ def updateUILocale():
         uilocale = qt4.QLocale.c()
     else:
         uilocale = qt4.QLocale.system()
+    uilocale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
 
     qt4.QLocale.setDefault(uilocale)
 

@@ -80,6 +80,7 @@ class Root(widget.Widget):
             self.document.locale = qt4.QLocale.c()
         else:
             self.document.locale = qt4.QLocale()
+        self.document.locale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
 
     def getSize(self, painter):
         """Get dimensions of widget in painter coordinates."""
