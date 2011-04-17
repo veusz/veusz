@@ -235,7 +235,7 @@ class OperationWidgetsDelete(object):
         while i < len(widgetpaths):
             wp = widgetpaths[i]
             for j in xrange(i):
-                if wp[:len(widgetpaths[j])] == widgetpaths[j]:
+                if wp[:len(widgetpaths[j])+1] == widgetpaths[j]+'/':
                     del widgetpaths[i]
                     break
             else:
