@@ -338,9 +338,6 @@ class FormatDock(qt4.QDockWidget):
         self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
                      self.selectedWidgets)
 
-        # do initial selection
-        # self.selectedWidgets(treeedit.selwidgets)
-
     def selectedWidgets(self, widgets, setnsproxy):
         """Created tabbed widgets for formatting for each subsettings."""
 
@@ -452,12 +449,10 @@ class TreeEditDock(qt4.QDockWidget):
         This updates the list of properties
         """
 
-        # convert indices to widget objects
-        # we get multiple indices for the same widget here because of columns
-        widgets = set()
-        for idx in current.indexes():
-            widgets.add( self.treemodel.getWidget(idx) )
-        self.selwidgets = widgets = list(widgets)
+        # get selected widgets
+        self.selwidgets = widgets = [
+            self.treemodel.getWidget(idx)
+            for idx in self.treeview.selectionModel().selectedRows() ]
 
         setnsproxy = None
 
@@ -465,9 +460,9 @@ class TreeEditDock(qt4.QDockWidget):
             setnsproxy = SettingsProxySingle(self.document, widgets[0].settings,
                                              actions=widgets[0].actions)
         else:
-            return
             # FIXME
-            raise RuntimeError, "not supported"
+            setnsproxy = SettingsProxySingle(self.document, widgets[0].settings,
+                                             actions=widgets[0].actions)
 
         self._enableCorrectButtons()
         self._checkPageChange()
@@ -477,6 +472,10 @@ class TreeEditDock(qt4.QDockWidget):
     def contextMenuEvent(self, event):
         """Bring up context menu."""
 
+        # no widgets selected
+        if not self.selwidgets:
+            return
+
         # FIXME: update
         m = qt4.QMenu(self)
         for act in ('edit.cut', 'edit.copy', 'edit.paste',
@@ -485,9 +484,14 @@ class TreeEditDock(qt4.QDockWidget):
             m.addAction(self.vzactions[act])
 
         # allow show or hides of selected widget
-        if self.selwidget and 'hide' in self.selwidget.settings:
+        anyhide = False
+        for w in self.selwidgets:
+            if 'hide' in w.settings:
+                anyhide = True
+
+        if anyhide:
             m.addSeparator()
-            hide = self.selwidget.settings.hide
+            hide = self.selwidgets[0].settings.hide
             act = qt4.QAction( ('Hide object', 'Show object')[hide], m )
             self.connect(act, qt4.SIGNAL('triggered()'),
                          (self.slotWidgetHide, self.slotWidgetShow)[hide])
@@ -540,8 +544,9 @@ class TreeEditDock(qt4.QDockWidget):
         self.vzactions['add.nonorthfunc'].setVisible(nonorth)
         self.vzactions['add.function'].setVisible(not nonorth)
 
-        # certain actions shouldn't allow root to be deleted
-        isnotroot = not isinstance(selw, widgets.Root)
+        # certain actions shouldn't work on root
+        isnotroot = not any([isinstance(w, widgets.Root)
+                             for w in self.selwidgets])
 
         for act in ('edit.cut', 'edit.copy', 'edit.delete',
                     'edit.moveup', 'edit.movedown', 'edit.rename'):

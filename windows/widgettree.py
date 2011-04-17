@@ -170,8 +170,11 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if parentobj is None:
             return qt4.QModelIndex()
         else:
-            return self.createIndex(parentobj.widgetSiblingIndex(), 0,
-                                    parentobj)
+            try:
+                return self.createIndex(parentobj.widgetSiblingIndex(), 0,
+                                        parentobj)
+            except ValueError:
+                return qt4.QModelIndex()
 
     def rowCount(self, index):
         """Return number of rows of children of index."""
@@ -277,7 +280,7 @@ class WidgetTreeView(qt4.QTreeView):
         hdr.setResizeMode(1, qt4.QHeaderView.Custom)
 
         # setup drag and drop
-        self.setSelectionMode(qt4.QAbstractItemView.SingleSelection)
+        self.setSelectionMode(qt4.QAbstractItemView.ExtendedSelection)
         self.setDragEnabled(True)
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)

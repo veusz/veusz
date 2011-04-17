@@ -252,7 +252,7 @@ class OperationWidgetsDelete(object):
             self.oldparentpaths.append( oldparent.path )
             self.oldindexes.append( oldparent.children.index(self.oldwidgets[-1]) )
             oldparent.removeChild(self.oldwidgets[-1].name)
-        
+
     def undo(self, document):
         """Restore deleted widget."""
         
