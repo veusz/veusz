@@ -44,8 +44,8 @@ class SettingsProxy(object):
     def onSettingChanged(self, control, setting, val):
         """Called when a setting has been modified."""
 
-    def onAction(self, action):
-        """Called if action pressed."""
+    def onAction(self, action, console):
+        """Called if action pressed. Console window is given."""
 
     def name(self):
         """Return name of Settings."""
@@ -79,14 +79,8 @@ class SettingsProxySingle(SettingsProxy):
         """Change setting in document."""
         self.document.applyOperation(document.OperationSettingSet(setting, val))
 
-    def onAction(self, action):
-        # FIXME: does not work
-        # find console window, this is horrible: HACK
-        win = self
-        while not hasattr(win, 'console'):
-            win = win.parent()
-        console = win.console
-
+    def onAction(self, action, console):
+        """Run action on console."""
         console.runFunction(action.function)
 
     def name(self):
@@ -117,6 +111,13 @@ class PropertyList(qt4.QWidget):
         
         self.childlist = []
         self.setncntrls = {}     # map setting name to controls
+
+    def getConsole(self):
+        """Find console window. This is horrible: HACK."""
+        win = self
+        while not hasattr(win, 'console'):
+            win = win.parent()
+        return win.console
 
     def updateProperties(self, setnsproxy, title=None, showformatting=True,
                          onlyformatting=False):
@@ -165,7 +166,8 @@ class PropertyList(qt4.QWidget):
                 button = qt4.QPushButton(text)
                 button.setToolTip(action.descr)
                 # need to save reference to caller object
-                button.caller = utils.BoundCaller(setnsproxy.onAction, action)
+                button.caller = utils.BoundCaller(setnsproxy.onAction, action,
+                                                  self.getConsole())
                 self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
                              
                 self.layout.addWidget(button, row, 1)
@@ -220,9 +222,6 @@ class PropertyList(qt4.QWidget):
                 if setn in self.setncntrls:
                     for cntrl in self.setncntrls[setn]:
                         cntrl.setVisible(vis)
- 
-    def slotActionPressed(self, action):
-        """Activate the action."""
 
 class TabbedFormatting(qt4.QTabWidget):
     """Class to have tabbed set of settings."""
@@ -248,8 +247,7 @@ class TabbedFormatting(qt4.QTabWidget):
         self.connect( self, qt4.SIGNAL('currentChanged(int)'),
                       self.slotCurrentChanged )
 
-        # scrollwidgets and subsettings for tabs
-        self.tabscrolls = []
+        # subsettings for tabs
         self.tabsubsetns = []
 
         # collected titles and tooltips for tabs
@@ -387,9 +385,6 @@ class PropertiesDock(qt4.QDockWidget):
         self.proplist = PropertyList(document, showsubsettings=False)
         self.scroll.setWidget(self.proplist)
 
-        # do initial selection
-        # self.slotWidgetsSelected([treeedit.selwidget])
-
     def slotWidgetsSelected(self, widgets, setnsproxy):
         """Update properties when selected widgets change."""
         self.proplist.updateProperties(setnsproxy, showformatting=False)
@@ -524,7 +519,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         selw = None
         if self.selwidgets:
-            selfw = self.selwidgets[0]
+            selw = self.selwidgets[0]
 
         # has to be visible if is to be enabled (yuck)
         nonorth = self.vzactions['add.nonorthpoint'].setVisible(True)
