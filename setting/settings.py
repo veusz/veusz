@@ -67,6 +67,16 @@ class Settings(object):
         return [self.setdict[n] for n in self.setnames
                 if isinstance(self.setdict[n], Settings)]
 
+    def getSettingNames(self):
+        """Get list of setting names."""
+        return [n for n in self.setnames
+                if not isinstance(self.setdict[n], Settings)]
+
+    def getSettingsNames(self):
+        """Get list of settings names."""
+        return [n for n in self.setnames
+                if isinstance(self.setdict[n], Settings)]
+
     def isSetting(self, name):
         """Is the name a supported setting?"""
         return name in self.setdict

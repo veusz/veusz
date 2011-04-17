@@ -57,7 +57,11 @@ class SettingsProxy(object):
         """Return text for user."""
 
 class SettingsProxySingle(SettingsProxy):
+    """A proxy wrapping settings for a single widget."""
+
     def __init__(self, document, settings, actions=None):
+        """Initialise settings proxy.
+        settings is the widget settings, actions is its actions."""
         self.document = document
         self.settings = settings
         self.actions = actions
@@ -94,6 +98,100 @@ class SettingsProxySingle(SettingsProxy):
     def usertext(self):
         """Return text for user."""
         return self.settings.usertext
+
+class SettingsProxyMulti(SettingsProxy):
+    """A proxy wrapping settings for multiple widgets."""
+
+    def __init__(self, document, widgets, _root=''):
+        """Initialise settings proxy.
+        widgets is a list of widgets to proxy for."""
+        self.document = document
+        self.widgets = widgets
+        self._root = _root
+
+        self.settingsatlevel = self._settingsAtLevel()
+        self.settingsproxylist = self.settinglist = None
+
+    def _settingsAtLevel(self):
+        """Return settings of widgets at level given."""
+        if self._root:
+            levels = self._root.split('/')
+        else:
+            levels = []
+        setns = []
+        for w in self.widgets:
+            s = w.settings
+            for lev in levels:
+                s = s.get(lev)
+            setns.append(s)
+        return setns
+
+    def settingsProxyList(self):
+        """Get list of settings proxy."""
+        if self.settingsproxylist:
+            return self.settingsproxylist
+
+        setns = self.settingsatlevel
+
+        # find common Settings
+        names = setns[0].getSettingsNames()
+        sset = set(names)
+        for s in setns[1:]:
+            sset &= set(s.getSettingsNames())
+        names = [n for n in names if n in sset]
+        pl = self.settingsproxylist = []
+
+        # construct new proxy settings
+        for n in names:
+            newroot = n
+            if self._root:
+                newroot = self._root + '/' + newroot
+            sp = SettingsProxyMulti(self.document, self.widgets,
+                                    _root=newroot)
+            pl.append(sp)
+        return pl
+
+    def settingList(self):
+        if self.settinglist is not None:
+            return self.settinglist
+
+        setns = self.settingsatlevel
+
+        # find comment Setting objects
+        names = setns[0].getSettingNames()
+        sset = set(names)
+        for s in setns[1:]:
+            sset &= set(s.getSettingNames())
+        names = [n for n in names if n in sset]
+
+        self.settinglist = [setns[0].get(n) for n in names]
+        return self.settinglist
+
+    def actionsList(self):
+        return []
+
+    def onSettingChanged(self, control, setting, val):
+        """Change setting in document."""
+        ops = []
+        sname = setting.name
+        if self._root:
+            sname = self._root + '/' + sname
+        for w in self.widgets:
+            s = self.document.resolveFullSettingPath(w.path + '/' + sname)
+            ops.append(document.OperationSettingSet(s, val))
+        self.document.applyOperation(
+            document.OperationMultiple(ops, descr='change settings'))
+
+    def name(self):
+        return self.settingsatlevel[0].name
+
+    def pixmap(self):
+        """Return pixmap."""
+        return self.settingsatlevel[0].pixmap
+
+    def usertext(self):
+        """Return text for user."""
+        return self.settingsatlevel[0].usertext
 
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
@@ -153,8 +251,8 @@ class PropertyList(qt4.QWidget):
             row += 1
 
         # add actions if parent is widget
-        if setnsproxy.actions is not None and not showformatting:
-            for action in setnsproxy.actions:
+        if setnsproxy.actionsList() and not showformatting:
+            for action in setnsproxy.actionsList():
                 text = action.name
                 if action.usertext:
                     text = action.usertext
@@ -454,15 +552,13 @@ class TreeEditDock(qt4.QDockWidget):
             self.treemodel.getWidget(idx)
             for idx in self.treeview.selectionModel().selectedRows() ]
 
-        setnsproxy = None
-
-        if len(widgets) == 1:
+        if len(widgets) == 0:
+            setnsproxy = None
+        elif len(widgets) == 1:
             setnsproxy = SettingsProxySingle(self.document, widgets[0].settings,
                                              actions=widgets[0].actions)
         else:
-            # FIXME
-            setnsproxy = SettingsProxySingle(self.document, widgets[0].settings,
-                                             actions=widgets[0].actions)
+            setnsproxy = SettingsProxyMulti(self.document, widgets)
 
         self._enableCorrectButtons()
         self._checkPageChange()
@@ -811,7 +907,9 @@ class TreeEditDock(qt4.QDockWidget):
         self.selectWidget(w)
 
     def slotWidgetHideShow(self, widgets, hideshow):
-        """Hide or show selected widgets."""
+        """Hide or show selected widgets.
+        hideshow is True for hiding, False for showing
+        """
         ops = [ document.OperationSettingSet(w.settings.get('hide'), hideshow)
                 for w in widgets ]
         descr = ('show', 'hide')[hideshow]
@@ -1079,4 +1177,3 @@ class SettingLabel(qt4.QWidget):
                                                self.setting.default) ],
                 descr="make default style")
             )
-
