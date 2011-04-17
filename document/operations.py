@@ -214,7 +214,53 @@ class OperationWidgetDelete(object):
         
         oldparent = document.resolveFullWidgetPath(self.oldparentpath)
         oldparent.addChild(self.oldwidget, index=self.oldindex)
-                
+
+class OperationWidgetsDelete(object):
+    """Delete mutliple widget."""
+    
+    descr = 'delete'
+    
+    def __init__(self, widgets):
+        """Delete the widget."""
+        self.widgetpaths = [w.path for w in widgets]
+        
+    def do(self, document):
+        """Delete widget."""
+        
+        # ignore widgets which share ancestry
+        # as deleting the parent deletes the child
+        widgetpaths = list(self.widgetpaths)
+        widgetpaths.sort( cmp=lambda a, b: len(a)-len(b) )
+        i = 0
+        while i < len(widgetpaths):
+            wp = widgetpaths[i]
+            for j in xrange(i):
+                if wp[:len(widgetpaths[j])] == widgetpaths[j]:
+                    del widgetpaths[i]
+                    break
+            else:
+                i += 1
+
+        self.oldwidgets = []
+        self.oldparentpaths = []
+        self.oldindexes = []
+
+        # delete each widget keeping track of details
+        for path in widgetpaths:
+            self.oldwidgets.append( document.resolveFullWidgetPath(path) )
+            oldparent = self.oldwidgets[-1].parent
+            self.oldparentpaths.append( oldparent.path )
+            self.oldindexes.append( oldparent.children.index(self.oldwidgets[-1]) )
+            oldparent.removeChild(self.oldwidgets[-1].name)
+        
+    def undo(self, document):
+        """Restore deleted widget."""
+        
+        # put back widgets in reverse order so that indexes are corrent
+        for i in xrange(len(self.oldwidgets)-1,-1,-1):
+            oldparent = document.resolveFullWidgetPath(self.oldparentpaths[i])
+            oldparent.addChild(self.oldwidgets[i], index=self.oldindexes[i])
+        
 class OperationWidgetMoveUpDown(object):
     """Move a widget up or down in the hierarchy."""
 

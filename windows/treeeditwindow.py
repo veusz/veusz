@@ -114,7 +114,7 @@ class PropertyList(qt4.QWidget):
 
     def getConsole(self):
         """Find console window. This is horrible: HACK."""
-        win = self
+        win = self.parent()
         while not hasattr(win, 'console'):
             win = win.parent()
         return win.console
@@ -733,9 +733,8 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetDelete(self):
         """Delete the widget selected."""
 
-        # FIXME: broken
-        # no item selected, so leave
         widgets = self.selwidgets
+        # if no item selected, leave
         if not widgets:
             return
 
@@ -745,20 +744,20 @@ class TreeEditDock(qt4.QDockWidget):
         
         # find indices of widgets to be deleted - find one to select after
         indexes = [widgetlist.index(w) for w in widgets]
-        if -1 in index:
+        if -1 in indexes:
             raise RuntimeError, "Invalid widget in list of selected widgets"
-        maxindex = indexes.max()
+        minindex = min(indexes)
 
         # delete selected widget
-        self.document.applyOperation( document.OperationWidgetsDelete(widgets) )
+        self.document.applyOperation(document.OperationWidgetsDelete(widgets))
 
         # rebuild list
         widgetlist = []
         self.document.basewidget.buildFlatWidgetList(widgetlist)
 
         # find next to select
-        if widgetnum < len(widgetlist):
-            nextwidget = widgetlist[widgetnum]
+        if minindex < len(widgetlist):
+            nextwidget = widgetlist[minindex]
         else:
             nextwidget = widgetlist[-1]
 
