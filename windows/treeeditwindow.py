@@ -133,7 +133,7 @@ class SettingsProxyMulti(SettingsProxy):
 
         setns = self.settingsatlevel
 
-        # find common Settings
+        # find common Settings objects
         names = setns[0].getSettingsNames()
         sset = set(names)
         for s in setns[1:]:
@@ -141,7 +141,7 @@ class SettingsProxyMulti(SettingsProxy):
         names = [n for n in names if n in sset]
         pl = self.settingsproxylist = []
 
-        # construct new proxy settings
+        # construct new proxy settings (adding on name of root)
         for n in names:
             newroot = n
             if self._root:
@@ -152,26 +152,38 @@ class SettingsProxyMulti(SettingsProxy):
         return pl
 
     def settingList(self):
+        """Set list of common Setting objects for each widget."""
         if self.settinglist is not None:
             return self.settinglist
 
         setns = self.settingsatlevel
 
-        # find comment Setting objects
+        # find common Setting objects
         names = setns[0].getSettingNames()
         sset = set(names)
         for s in setns[1:]:
             sset &= set(s.getSettingNames())
         names = [n for n in names if n in sset]
 
+        # use setting from 1st Settings as template
         self.settinglist = [setns[0].get(n) for n in names]
         return self.settinglist
 
     def actionsList(self):
-        return []
+        """Get list of common actions."""
+        anames = None
+        for widget in self.widgets:
+            a = set([a.name for a in widget.actions])
+            if anames is None:
+                anames = a
+            else:
+                anames &= a
+        actions = [a for a in self.widgets[0].actions if a.name in anames]
+        return actions
 
     def onSettingChanged(self, control, setting, val):
         """Change setting in document."""
+        # construct list of operations to change each setting
         ops = []
         sname = setting.name
         if self._root:
@@ -179,8 +191,17 @@ class SettingsProxyMulti(SettingsProxy):
         for w in self.widgets:
             s = self.document.resolveFullSettingPath(w.path + '/' + sname)
             ops.append(document.OperationSettingSet(s, val))
+        # apply all operations
         self.document.applyOperation(
             document.OperationMultiple(ops, descr='change settings'))
+
+    def onAction(self, action, console):
+        """Run actions with same name."""
+        aname = action.name
+        for w in self.widgets:
+            for a in w.actions:
+                if a.name == aname:
+                    console.runFunction(a.function)
 
     def name(self):
         return self.settingsatlevel[0].name
@@ -800,7 +821,7 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetCopy(self):
         """Copy selected widget to the clipboard."""
 
-        if self.selwidget:
+        if self.selwidgets:
             mimedata = document.generateWidgetsMime(self.selwidgets)
             clipboard = qt4.QApplication.clipboard()
             clipboard.setMimeData(mimedata)
@@ -810,7 +831,10 @@ class TreeEditDock(qt4.QDockWidget):
         selected widget? If so, enable paste button"""
 
         data = document.getClipboardWidgetMime()
-        show = document.isMimePastable(self.selwidgets, data)
+        if len(self.selwidgets) == 0:
+            show = False
+        else:
+            show = document.isMimePastable(self.selwidgets[0], data)
         self.vzactions['edit.paste'].setEnabled(show)
 
     def doInitialWidgetSelect(self):
@@ -828,10 +852,9 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetPaste(self):
         """Paste something from the clipboard"""
 
-        # FIXME
         data = document.getClipboardWidgetMime()
         if data:
-            op = document.OperationWidgetPaste(self.selwidget, data)
+            op = document.OperationWidgetPaste(self.selwidgets[0], data)
             widgets = self.document.applyOperation(op)
             if widgets:
                 self.selectWidget(widgets[0])
