@@ -263,6 +263,7 @@ class Bool(qt4.QCheckBox):
     def __init__(self, setting, parent):
         qt4.QCheckBox.__init__(self, parent)
 
+        self.ignorechange = False
         self.setting = setting
         self.setChecked(setting.val)
 
@@ -277,11 +278,15 @@ class Bool(qt4.QCheckBox):
 
     def slotToggled(self, state):
         """Emitted when checkbox toggled."""
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, state )
+        # this is emitted by setChecked, so ignore onModified doing this
+        if not self.ignorechange:
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, state )
         
     def onModified(self, mod):
         """called when the setting is changed remotely"""
+        self.ignorechange = True
         self.setChecked( self.setting.val )
+        self.ignorechange = False
 
 class BoolSwitch(Bool):
     """Bool for switching off/on other settings."""
