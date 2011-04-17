@@ -485,20 +485,25 @@ class TreeEditDock(qt4.QDockWidget):
 
         # allow show or hides of selected widget
         anyhide = False
+        anyshow = False
         for w in self.selwidgets:
             if 'hide' in w.settings:
-                anyhide = True
+                if w.settings.hide:
+                    anyshow = True
+                else:
+                    anyhide = True
 
-        if anyhide:
-            m.addSeparator()
-            hide = self.selwidgets[0].settings.hide
-            act = qt4.QAction( ('Hide object', 'Show object')[hide], m )
-            self.connect(act, qt4.SIGNAL('triggered()'),
-                         (self.slotWidgetHide, self.slotWidgetShow)[hide])
-            m.addAction(act)
+        for (enabled, menutext, showhide) in (
+            (anyhide, 'Hide', True), (anyshow, 'Show', False) ):
+            if enabled:
+                m.addSeparator()
+                act = qt4.QAction(menutext, self)
+                self.connect(act, qt4.SIGNAL('triggered()'),
+                             utils.BoundCaller(self.slotWidgetHideShow,
+                                               self.selwidgets, showhide))
+                m.addAction(act)
 
         m.exec_(self.mapToGlobal(event.pos()))
-
         event.accept()
 
     def _checkPageChange(self):
@@ -805,16 +810,12 @@ class TreeEditDock(qt4.QDockWidget):
         # re-highlight moved widget
         self.selectWidget(w)
 
-    def slotWidgetHide(self):
-        """Hide the selected widget."""
-        self.document.applyOperation(
-            document.OperationSettingSet(self.selwidget.settings.get('hide'),
-                                         True) )
-    def slotWidgetShow(self):
-        """Show the selected widget."""
-        self.document.applyOperation(
-            document.OperationSettingSet(self.selwidget.settings.get('hide'),
-                                         False) )
+    def slotWidgetHideShow(self, widgets, hideshow):
+        """Hide or show selected widgets."""
+        ops = [ document.OperationSettingSet(w.settings.get('hide'), hideshow)
+                for w in widgets ]
+        descr = ('show', 'hide')[hideshow]
+        self.document.applyOperation(document.OperationMultiple(ops, descr=descr))
 
 class SettingLabel(qt4.QWidget):
     """A label to describe a setting.
