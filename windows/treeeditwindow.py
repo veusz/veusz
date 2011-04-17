@@ -28,6 +28,79 @@ import veusz.setting as setting
 
 from widgettree import WidgetTreeModel, WidgetTreeView
 
+class SettingsProxy(object):
+    """Object to handle communication between widget/settings
+    or sets of widgets/settings."""
+
+    def settingsProxyList(self):
+        """Return list of SettingsProxy objects for sub Settings."""
+
+    def settingList(self):
+        """Return list of Setting objects."""
+
+    def actionsList(self):
+        """Return list of Action objects."""
+
+    def onSettingChanged(self, control, setting, val):
+        """Called when a setting has been modified."""
+
+    def onAction(self, action):
+        """Called if action pressed."""
+
+    def name(self):
+        """Return name of Settings."""
+
+    def pixmap(self):
+        """Return pixmap for Settings."""
+
+    def usertext(self):
+        """Return text for user."""
+
+class SettingsProxySingle(SettingsProxy):
+    def __init__(self, document, settings, actions=None):
+        self.document = document
+        self.settings = settings
+        self.actions = actions
+
+    def settingsProxyList(self):
+        """Return list of SettingsProxy objects."""
+        return [ SettingsProxySingle(self.document, s)
+                 for s in self.settings.getSettingsList() ]
+
+    def settingList(self):
+        """Return list of Setting objects."""
+        return self.settings.getSettingList()
+
+    def actionsList(self):
+        """Return list of actions."""
+        return self.actions
+
+    def onSettingChanged(self, control, setting, val):
+        """Change setting in document."""
+        self.document.applyOperation(document.OperationSettingSet(setting, val))
+
+    def onAction(self, action):
+        # FIXME: does not work
+        # find console window, this is horrible: HACK
+        win = self
+        while not hasattr(win, 'console'):
+            win = win.parent()
+        console = win.console
+
+        console.runFunction(action.function)
+
+    def name(self):
+        """Return name."""
+        return self.settings.name
+
+    def pixmap(self):
+        """Return pixmap."""
+        return self.settings.pixmap
+
+    def usertext(self):
+        """Return text for user."""
+        return self.settings.usertext
+
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
 
@@ -45,9 +118,12 @@ class PropertyList(qt4.QWidget):
         self.childlist = []
         self.setncntrls = {}     # map setting name to controls
 
-    def updateProperties(self, settings, title=None, showformatting=True,
+    def updateProperties(self, setnsproxy, title=None, showformatting=True,
                          onlyformatting=False):
-        """Update the list of controls with new ones for the settings."""
+        """Update the list of controls with new ones for the SettingsProxy."""
+
+        # keep a reference to keep it alive
+        self._setnsproxy = setnsproxy
 
         # delete all child widgets
         self.setUpdatesEnabled(False)
@@ -58,7 +134,7 @@ class PropertyList(qt4.QWidget):
             c.deleteLater()
             del c
 
-        if settings is None:
+        if setnsproxy is None:
             self.setUpdatesEnabled(True)
             return
 
@@ -76,9 +152,8 @@ class PropertyList(qt4.QWidget):
             row += 1
 
         # add actions if parent is widget
-        if settings.parent.isWidget() and not showformatting:
-            widget = settings.parent
-            for action in widget.actions:
+        if setnsproxy.actions is not None and not showformatting:
+            for action in setnsproxy.actions:
                 text = action.name
                 if action.usertext:
                     text = action.usertext
@@ -90,8 +165,7 @@ class PropertyList(qt4.QWidget):
                 button = qt4.QPushButton(text)
                 button.setToolTip(action.descr)
                 # need to save reference to caller object
-                button.caller = utils.BoundCaller(self.slotActionPressed,
-                                                  action)
+                button.caller = utils.BoundCaller(setnsproxy.onAction, action)
                 self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
                              
                 self.layout.addWidget(button, row, 1)
@@ -99,15 +173,15 @@ class PropertyList(qt4.QWidget):
 
                 row += 1
 
-        if settings.getSettingsList() and self.showsubsettings:
+        if setnsproxy.settingsProxyList() and self.showsubsettings:
             # if we have subsettings, use tabs
-            tabbed = TabbedFormatting(self.document, settings)
+            tabbed = TabbedFormatting(self.document, setnsproxy)
             self.layout.addWidget(tabbed, row, 1, 1, 2)
             row += 1
             self.childlist.append(tabbed)
         else:
             # else add settings proper as a list
-            for setn in settings.getSettingList():
+            for setn in setnsproxy.settingList():
                 # skip if not to show formatting
                 if not showformatting and setn.formatting:
                     continue
@@ -122,7 +196,7 @@ class PropertyList(qt4.QWidget):
                     self.childlist.append(lab)
 
                     self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                                 self.slotSettingChanged)
+                                 setnsproxy.onSettingChanged)
                     self.layout.addWidget(cntrl, row, 1)
                     self.childlist.append(cntrl)
                     self.setncntrls[setn.name] = (lab, cntrl)
@@ -147,63 +221,52 @@ class PropertyList(qt4.QWidget):
                     for cntrl in self.setncntrls[setn]:
                         cntrl.setVisible(vis)
  
-    def slotSettingChanged(self, widget, setting, val):
-        """Called when a setting is changed by the user.
-        
-        This updates the setting to the value using an operation so that
-        it can be undone.
-        """
-        
-        self.document.applyOperation(document.OperationSettingSet(setting, val))
-        
     def slotActionPressed(self, action):
         """Activate the action."""
-
-        # find console window, this is horrible: HACK
-        win = self
-        while not hasattr(win, 'console'):
-            win = win.parent()
-        console = win.console
-
-        console.runFunction(action.function)
 
 class TabbedFormatting(qt4.QTabWidget):
     """Class to have tabbed set of settings."""
 
-    def __init__(self, document, settings, shownames=False):
+    def __init__(self, document, setnsproxy, shownames=False):
         qt4.QTabWidget.__init__(self)
+        self.document = document
 
-        if settings is None:
+        if setnsproxy is None:
             return
 
         # get list of settings
-        setnslist = settings.getSettingsList()
+        self.setnsproxy = setnsproxy
+        setnslist = setnsproxy.settingsProxyList()
 
         # add formatting settings if necessary
-        numformat = len( [setn for setn in settings.getSettingList()
+        numformat = len( [setn for setn in setnsproxy.settingList()
                           if setn.formatting] )
         if numformat > 0:
             # add on a formatting tab
-            setnslist.insert(0, settings)
+            setnslist.insert(0, setnsproxy)
+
+        self.connect( self, qt4.SIGNAL('currentChanged(int)'),
+                      self.slotCurrentChanged )
+
+        # scrollwidgets and subsettings for tabs
+        self.tabscrolls = []
+        self.tabsubsetns = []
+
+        # collected titles and tooltips for tabs
+        self.tabtitles = []
+        self.tabtooltips = []
+
+        # tabs which have been initialized
+        self.tabinit = set()
 
         # add tab for each subsettings
         for subset in setnslist:
-            if subset.name == 'StyleSheet':
+            if subset.name() == 'StyleSheet':
                 continue
-
-            # create tab
-            tab = qt4.QWidget()
-            layout = qt4.QVBoxLayout()
-            layout.setMargin(2)
-            tab.setLayout(layout)
-
-            # create scrollable area
-            scroll = qt4.QScrollArea(None)
-            layout.addWidget(scroll)
-            scroll.setWidgetResizable(True)
+            self.tabsubsetns.append(subset)
 
             # details of tab
-            mainsettings = (subset == settings)
+            mainsettings = (subset is setnsproxy)
             if mainsettings:
                 # main tab formatting, so this is special
                 pixmap = 'settings_main'
@@ -212,25 +275,53 @@ class TabbedFormatting(qt4.QTabWidget):
             else:
                 # others
                 if hasattr(subset, 'pixmap'):
-                    pixmap = subset.pixmap
+                    pixmap = subset.pixmap()
                 else:
                     pixmap = None
-                tabname = subset.name
-                tooltip = title = subset.usertext
+                tabname = subset.name()
+                tooltip = title = subset.usertext()
                 
-            # create list of properties
-            plist = PropertyList(document, showsubsettings=not mainsettings)
-            plist.updateProperties(subset, title=(title, tooltip),
-                                   onlyformatting=mainsettings)
-            scroll.setWidget(plist)
-            plist.show()
-
             # hide name in tab
             if not shownames:
                 tabname = ''
 
-            indx = self.addTab(tab, utils.getIcon(pixmap), tabname)
+            self.tabtitles.append(title)
+            self.tabtooltips.append(tooltip)
+
+            # create tab
+            indx = self.addTab(qt4.QWidget(), utils.getIcon(pixmap), tabname)
             self.setTabToolTip(indx, tooltip)
+
+    def slotCurrentChanged(self, tab):
+        """Lazy loading of tab when displayed."""
+        if tab in self.tabinit:
+            # already initialized
+            return
+        self.tabinit.add(tab)
+
+        # settings to show
+        subsetn = self.tabsubsetns[tab]
+        # whether these are the main settings
+        mainsettings = subsetn is self.setnsproxy
+
+        # add this property list to the scroll widget for tab
+        plist = PropertyList(self.document, showsubsettings=not mainsettings)
+        plist.updateProperties(subsetn, title=(self.tabtitles[tab],
+                                               self.tabtooltips[tab]),
+                               onlyformatting=mainsettings)
+
+        # create scrollable area
+        scroll = qt4.QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(plist)
+
+        # layout for tab widget
+        layout = qt4.QVBoxLayout()
+        layout.setMargin(2)
+        layout.addWidget(scroll)
+
+        # finally use layout containing items for tab
+        self.widget(tab).setLayout(layout)
 
 class FormatDock(qt4.QDockWidget):
     """A window for formatting the current widget.
@@ -246,14 +337,14 @@ class FormatDock(qt4.QDockWidget):
         self.tabwidget = None
 
         # update our view when the tree edit window selection changes
-        self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
-                     self.selectedWidget)
+        self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
+                     self.selectedWidgets)
 
         # do initial selection
-        self.selectedWidget(treeedit.selwidget)
+        # self.selectedWidgets(treeedit.selwidgets)
 
-    def selectedWidget(self, widget):
-        """Created tabbed widget for formatting for each subsettings."""
+    def selectedWidgets(self, widgets, setnsproxy):
+        """Created tabbed widgets for formatting for each subsettings."""
 
         # get current tab (so we can set it afterwards)
         if self.tabwidget:
@@ -266,12 +357,7 @@ class FormatDock(qt4.QDockWidget):
             self.tabwidget.deleteLater()
             self.tabwidget = None
 
-        # create new tabbed widget showing formatting
-        settings = None
-        if widget is not None:
-            settings = widget.settings
-
-        self.tabwidget = TabbedFormatting(self.document, settings)
+        self.tabwidget = TabbedFormatting(self.document, setnsproxy)
         self.setWidget(self.tabwidget)
 
         # wrap tab from zero to max number
@@ -289,8 +375,8 @@ class PropertiesDock(qt4.QDockWidget):
         self.document = document
 
         # update our view when the tree edit window selection changes
-        self.connect(treeedit, qt4.SIGNAL('widgetSelected'),
-                     self.slotWidgetSelected)
+        self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
+                     self.slotWidgetsSelected)
 
         # construct scrollable area
         self.scroll = qt4.QScrollArea()
@@ -302,27 +388,22 @@ class PropertiesDock(qt4.QDockWidget):
         self.scroll.setWidget(self.proplist)
 
         # do initial selection
-        self.slotWidgetSelected(treeedit.selwidget)
+        # self.slotWidgetsSelected([treeedit.selwidget])
 
-    def slotWidgetSelected(self, widget):
-        """Update properties when selected widget changes."""
-
-        settings = None
-        if widget is not None:
-            settings = widget.settings
-        self.proplist.updateProperties(settings, showformatting=False)
+    def slotWidgetsSelected(self, widgets, setnsproxy):
+        """Update properties when selected widgets change."""
+        self.proplist.updateProperties(setnsproxy, showformatting=False)
 
 class TreeEditDock(qt4.QDockWidget):
-    """A window for editing the document as a tree."""
-
-    # mime type when widgets are stored on the clipboard
+    """A dock window presenting widgets as a tree."""
 
     def __init__(self, document, parent):
+        """Initialise dock given document and parent widget."""
         qt4.QDockWidget.__init__(self, parent)
         self.parent = parent
         self.setWindowTitle("Editing - Veusz")
         self.setObjectName("veuszeditingwindow")
-        self.selwidget = None
+        self.selwidgets = []
 
         self.document = document
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
@@ -334,8 +415,9 @@ class TreeEditDock(qt4.QDockWidget):
 
         # receive change in selection
         self.connect(self.treeview.selectionModel(),
-                     qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
-                     self.slotTreeItemSelected)
+                     qt4.SIGNAL('selectionChanged(const QItemSelection &,'
+                                ' const QItemSelection &)'),
+                     self.slotTreeItemsSelected)
 
         # set tree as main widget
         self.setWidget(self.treeview)
@@ -369,30 +451,38 @@ class TreeEditDock(qt4.QDockWidget):
         """If the document is wiped, reselect root widget."""
         self.selectWidget(self.document.basewidget)
 
-    def slotTreeItemSelected(self, current, previous):
+    def slotTreeItemsSelected(self, current, previous):
         """New item selected in tree.
 
         This updates the list of properties
         """
 
-        indexes = current.indexes()
+        # convert indices to widget objects
+        # we get multiple indices for the same widget here because of columns
+        widgets = set()
+        for idx in current.indexes():
+            widgets.add( self.treemodel.getWidget(idx) )
+        self.selwidgets = widgets = list(widgets)
 
-        if len(indexes) > 1:
-            index = indexes[0]
-            self.selwidget = self.treemodel.getWidget(index)
-            settings = self.treemodel.getSettings(index)
+        setnsproxy = None
+
+        if len(widgets) == 1:
+            setnsproxy = SettingsProxySingle(self.document, widgets[0].settings,
+                                             actions=widgets[0].actions)
         else:
-            self.selwidget = None
-            settings = None
+            return
+            # FIXME
+            raise RuntimeError, "not supported"
 
         self._enableCorrectButtons()
         self._checkPageChange()
 
-        self.emit( qt4.SIGNAL('widgetSelected'), self.selwidget )
+        self.emit( qt4.SIGNAL('widgetsSelected'), self.selwidgets, setnsproxy )
 
     def contextMenuEvent(self, event):
         """Bring up context menu."""
 
+        # FIXME: update
         m = qt4.QMenu(self)
         for act in ('edit.cut', 'edit.copy', 'edit.paste',
                     'edit.moveup', 'edit.movedown', 'edit.delete',
@@ -415,7 +505,9 @@ class TreeEditDock(qt4.QDockWidget):
     def _checkPageChange(self):
         """Check to see whether page has changed."""
 
-        w = self.selwidget
+        w = None
+        if self.selwidgets:
+            w = self.selwidgets[0]
         while w is not None and not isinstance(w, widgets.Page):
             w = w.parent
 
@@ -430,7 +522,9 @@ class TreeEditDock(qt4.QDockWidget):
     def _enableCorrectButtons(self):
         """Make sure the create graph buttons are correctly enabled."""
 
-        selw = self.selwidget
+        selw = None
+        if self.selwidgets:
+            selfw = self.selwidgets[0]
 
         # has to be visible if is to be enabled (yuck)
         nonorth = self.vzactions['add.nonorthpoint'].setVisible(True)
@@ -580,9 +674,9 @@ class TreeEditDock(qt4.QDockWidget):
         """
 
         # if no widget selected, bomb out
-        if self.selwidget is None:
+        if not self.selwidgets:
             return
-        parent = document.getSuitableParent(widgettype, self.selwidget)
+        parent = document.getSuitableParent(widgettype, self.selwidgets[0])
 
         assert parent is not None
 
@@ -606,7 +700,7 @@ class TreeEditDock(qt4.QDockWidget):
         """Copy selected widget to the clipboard."""
 
         if self.selwidget:
-            mimedata = document.generateWidgetsMime([self.selwidget])
+            mimedata = document.generateWidgetsMime(self.selwidgets)
             clipboard = qt4.QApplication.clipboard()
             clipboard.setMimeData(mimedata)
 
@@ -615,7 +709,7 @@ class TreeEditDock(qt4.QDockWidget):
         selected widget? If so, enable paste button"""
 
         data = document.getClipboardWidgetMime()
-        show = document.isMimePastable(self.selwidget, data)
+        show = document.isMimePastable(self.selwidgets, data)
         self.vzactions['edit.paste'].setEnabled(show)
 
     def doInitialWidgetSelect(self):
@@ -633,6 +727,7 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetPaste(self):
         """Paste something from the clipboard"""
 
+        # FIXME
         data = document.getClipboardWidgetMime()
         if data:
             op = document.OperationWidgetPaste(self.selwidget, data)
@@ -643,20 +738,24 @@ class TreeEditDock(qt4.QDockWidget):
     def slotWidgetDelete(self):
         """Delete the widget selected."""
 
+        # FIXME: broken
         # no item selected, so leave
-        w = self.selwidget
-        if w is None:
+        widgets = self.selwidgets
+        if not widgets:
             return
 
         # get list of widgets in order
         widgetlist = []
         self.document.basewidget.buildFlatWidgetList(widgetlist)
         
-        widgetnum = widgetlist.index(w)
-        assert widgetnum >= 0
+        # find indices of widgets to be deleted - find one to select after
+        indexes = [widgetlist.index(w) for w in widgets]
+        if -1 in index:
+            raise RuntimeError, "Invalid widget in list of selected widgets"
+        maxindex = indexes.max()
 
         # delete selected widget
-        self.document.applyOperation( document.OperationWidgetDelete(w) )
+        self.document.applyOperation( document.OperationWidgetsDelete(widgets) )
 
         # rebuild list
         widgetlist = []
@@ -695,14 +794,16 @@ class TreeEditDock(qt4.QDockWidget):
         direction is -1 for 'up' and +1 for 'down'
         """
 
+        if not self.selwidgets:
+            return
         # widget to move
-        w = self.selwidget
+        w = self.selwidgets[0]
         
         # actually move the widget
         self.document.applyOperation(
             document.OperationWidgetMoveUpDown(w, direction) )
 
-        # rehilight moved widget
+        # re-highlight moved widget
         self.selectWidget(w)
 
     def slotWidgetHide(self):
