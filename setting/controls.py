@@ -238,6 +238,7 @@ class Int(qt4.QSpinBox):
     def __init__(self, setting, parent):
         qt4.QSpinBox.__init__(self, parent)
 
+        self.ignorechange = False
         self.setting = setting
         self.setMinimum(setting.minval)
         self.setMaximum(setting.maxval)
@@ -251,11 +252,15 @@ class Int(qt4.QSpinBox):
 
     def slotChanged(self, value):
         """If check box changes."""
-        self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, value)
+        # this is emitted by setValue, so ignore onModified doing this
+        if not self.ignorechange:
+            self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, value)
 
     def onModified(self, mod):
         """called when the setting is changed remotely"""
+        self.ignorechange = True
         self.setValue( self.setting.val )
+        self.ignorechange = False
 
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""
