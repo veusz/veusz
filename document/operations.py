@@ -308,6 +308,7 @@ class OperationWidgetMove(object):
         newparent = document.resolveFullWidgetPath(self.newparentpath)
         self.oldchildindex = oldparent.children.index(child)
         self.oldparentpath = oldparent.path
+        self.oldname = None
 
         if self.newindex < 0:
             # convert negative index to normal index
@@ -323,11 +324,21 @@ class OperationWidgetMove(object):
         else:
             # moving to different parent
             self.movemode = 'differentparent'
-            # record previous parent and position
 
+            # remove from old parent
             del oldparent.children[self.oldchildindex]
+
+            # current names of children
+            childnames = newparent.childnames
+
+            # record previous parent and position
             newparent.children.insert(self.newindex, child)
             child.parent = newparent
+
+            # set a new name, if required
+            if child.name in childnames:
+                self.oldname = child.name
+                child.name = child.chooseName()
 
         self.newchildpath = child.path
 
@@ -338,9 +349,15 @@ class OperationWidgetMove(object):
         child = document.resolveFullWidgetPath(self.newchildpath)
         oldparent = document.resolveFullWidgetPath(self.oldparentpath)
 
+        # remove from new parent
         del newparent.children[self.newindex]
+        # restore parent
         oldparent.children.insert(self.oldchildindex, child)
         child.parent = oldparent
+
+        # restore name
+        if self.oldname is not None:
+            child.name = self.oldname
 
 class OperationWidgetAdd(object):
     """Add a widget of specified type to parent."""
