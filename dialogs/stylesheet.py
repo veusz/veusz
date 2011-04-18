@@ -20,7 +20,8 @@ import veusz.utils as utils
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
-from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList
+from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList, \
+    SettingsProxySingle
 from veuszdialog import VeuszDialog
 
 class StylesheetDialog(VeuszDialog):
@@ -90,12 +91,13 @@ class StylesheetDialog(VeuszDialog):
         settings = current.VZsettings
 
         # update formatting properties
-        self.tabformat = TabbedFormatting(self.document, settings)
+        setnsproxy = SettingsProxySingle(self.document, settings)
+        self.tabformat = TabbedFormatting(self.document, setnsproxy)
         self.formattingGroup.layout().addWidget(self.tabformat)
 
         # update properties
         self.properties = PropertyList(self.document, showsubsettings=False)
-        self.properties.updateProperties(settings, showformatting=False)
+        self.properties.updateProperties(setnsproxy, showformatting=False)
         self.propertiesScrollArea.setWidget(self.properties)
 
     def slotSaveStyleSheet(self):
