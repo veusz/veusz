@@ -37,7 +37,9 @@ def handlePlugin(mainwindow, doc, pluginkls):
         d = PluginDialog(mainwindow, doc, plugin, pluginkls)
         mainwindow.showDialog(d)
     else:
-        fields = {'currentwidget': mainwindow.treeedit.selwidget.path}
+        fields = {'currentwidget': '/'}
+        if mainwindow.treeedit.selwidgets:
+            fields = {'currentwidget': mainwindow.treeedit.selwidgets[0].path}
         runPlugin(mainwindow, doc, plugin, fields)
 
 def wordwrap(text, linelength=80):
@@ -92,7 +94,9 @@ class PluginDialog(VeuszDialog):
                 cntrl.deleteLater()
         del self.fieldcntrls[:]
 
-        currentwidget = self.mainwindow.treeedit.selwidget.path
+        currentwidget = '/'
+        if self.mainwindow.treeedit.selwidgets:
+            currentwidget = self.mainwindow.treeedit.selwidgets[0].path
         for row, field in enumerate(self.plugininst.fields):
             if isinstance(field, list) or isinstance(field, tuple):
                 for c, f in enumerate(field):
@@ -123,7 +127,9 @@ class PluginDialog(VeuszDialog):
         """Use the plugin with the inputted data."""
 
         # default field
-        fields = {'currentwidget': self.mainwindow.treeedit.selwidget.path}
+        fields = {'currentwidget': '/'}
+        if mainwindow.treeedit.selwidgets:
+            fields = {'currentwidget': mainwindow.treeedit.selwidgets[0].path}
 
         # read values from controls
         for field, cntrls in izip(self.fields, self.fieldcntrls):
