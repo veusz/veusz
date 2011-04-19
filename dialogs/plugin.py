@@ -128,8 +128,8 @@ class PluginDialog(VeuszDialog):
 
         # default field
         fields = {'currentwidget': '/'}
-        if mainwindow.treeedit.selwidgets:
-            fields = {'currentwidget': mainwindow.treeedit.selwidgets[0].path}
+        if self.mainwindow.treeedit.selwidgets:
+            fields = {'currentwidget': self.mainwindow.treeedit.selwidgets[0].path}
 
         # read values from controls
         for field, cntrls in izip(self.fields, self.fieldcntrls):
