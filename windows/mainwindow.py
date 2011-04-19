@@ -178,8 +178,8 @@ class MainWindow(qt4.QMainWindow):
         # if a widget in the plot window is clicked by the user
         self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
                       self.treeedit.selectWidget )
-        self.connect( self.treeedit, qt4.SIGNAL("widgetSelected"),
-                      self.plot.selectedWidget )
+        self.connect( self.treeedit, qt4.SIGNAL("widgetsSelected"),
+                      self.plot.selectedWidgets )
 
         # enable/disable undo/redo
         self.connect(self.menus['edit'], qt4.SIGNAL('aboutToShow()'),

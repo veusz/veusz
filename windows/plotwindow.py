@@ -826,7 +826,7 @@ class PlotWindow( qt4.QGraphicsView ):
                           for w in self.widgetpositions ]) 
 
                     # update selected widget items
-                    self.selectedWidget(self.selwidget)
+                    self.selectedWidgets([self.selwidget])
                     
                 except Exception:
                     # stop updates this time round and show exception dialog
@@ -1098,10 +1098,13 @@ class PlotWindow( qt4.QGraphicsView ):
 
         return axesretn
 
-    def selectedWidget(self, widget):
+    def selectedWidgets(self, widgets):
         """Update control items on screen associated with widget."""
 
-        self.selwidget = widget
+        if not widgets:
+            self.selwidget = None
+        else:
+            self.selwidget = widgets[0]
 
         # remove old items from scene
         for item in self.controlgraphs:
@@ -1109,8 +1112,9 @@ class PlotWindow( qt4.QGraphicsView ):
         del self.controlgraphs[:]
 
         # put in new items
-        if widget is not None and widget in self.widgetcontrolgraphs:
-            for control in self.widgetcontrolgraphs[widget]:
-                graphitem = control.createGraphicsItem()
-                self.controlgraphs.append(graphitem)
-                self.scene.addItem(graphitem)
+        for widget in widgets:
+            if widget in self.widgetcontrolgraphs:
+                for control in self.widgetcontrolgraphs[widget]:
+                    graphitem = control.createGraphicsItem()
+                    self.controlgraphs.append(graphitem)
+                    self.scene.addItem(graphitem)
