@@ -80,11 +80,7 @@ class Edit(qt4.QLineEdit):
         try:
             val = self.setting.fromText(text)
             styleClear(self)
-
-            # value has changed
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'),
-                           self, self.setting, val )
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
             styleError(self)
@@ -220,10 +216,7 @@ class String(qt4.QWidget):
         try:
             val = self.setting.fromText(text)
             styleClear(self.edit)
-
-            # value has changed
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val)
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
             styleError(self.edit)
@@ -378,10 +371,7 @@ class Choice(qt4.QComboBox):
         try:
             val = self.setting.fromText(text)
             styleClear(self)
-            
-            # value has changed
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
             styleError(self)
@@ -423,10 +413,7 @@ class MultiLine(qt4.QTextEdit):
         try:
             val = self.setting.fromText(text)
             styleClear(self)
-            
-            # value has changed
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
             styleError(self)
@@ -586,9 +573,8 @@ class Dataset(qt4.QWidget):
 
     def newDataset(self, dsname):
         """New dataset selected."""
-        if dsname != self.choice.setting.val:
-            self.emit( qt4.SIGNAL("settingChanged"), self,
-                       self.choice.setting, dsname )
+        self.emit( qt4.SIGNAL("settingChanged"), self,
+                   self.choice.setting, dsname )
 
 class DatasetOrString(Dataset):
     """Allow use to choose a dataset or enter some text."""
@@ -858,19 +844,14 @@ class Color(qt4.QWidget):
         if col.isValid():
             # change setting
             val = unicode( col.name() )
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), self,
-                           self.setting, val)
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
     def slotActivated(self, val):
         """A different value is selected."""
         
         text = unicode(self.combo.currentText())
         val = self.setting.fromText(text)
-            
-        # value has changed
-        if self.setting.val != val:
-            self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, val)
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
     def setColor(self, color):
         """Update control with color given."""
@@ -1536,9 +1517,7 @@ class Filename(qt4.QWidget):
 
         if filename:
             val = unicode(filename)
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                           val )
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
@@ -1547,11 +1526,7 @@ class Filename(qt4.QWidget):
         try:
             val = self.setting.fromText(text)
             styleClear(self.edit)
-
-            # value has changed
-            if self.setting.val != val:
-                self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                           val )
+            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
         except setting.InvalidType:
             styleError(self.edit)
@@ -1591,8 +1566,7 @@ class FontFamily(qt4.QFontComboBox):
     def slotActivated(self, val):
         """Update setting if a different item is chosen."""
         newval = unicode(self.currentText())
-        if self.setting.val != newval:
-            self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, newval)
+        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, newval )
 
     def onModified(self, mod):
         """Make control reflect chosen setting."""

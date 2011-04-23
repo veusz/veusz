@@ -88,7 +88,9 @@ class SettingsProxySingle(SettingsProxy):
 
     def onSettingChanged(self, control, setting, val):
         """Change setting in document."""
-        self.document.applyOperation(document.OperationSettingSet(setting, val))
+        if setting.val != val:
+            self.document.applyOperation(
+                document.OperationSettingSet(setting, val))
 
     def onAction(self, action, console):
         """Run action on console."""
@@ -203,10 +205,12 @@ class SettingsProxyMulti(SettingsProxy):
             sname = self._root + '/' + sname
         for w in self.widgets:
             s = self.document.resolveFullSettingPath(w.path + '/' + sname)
-            ops.append(document.OperationSettingSet(s, val))
+            if s.val != val:
+                ops.append(document.OperationSettingSet(s, val))
         # apply all operations
-        self.document.applyOperation(
-            document.OperationMultiple(ops, descr='change settings'))
+        if ops:
+            self.document.applyOperation(
+                document.OperationMultiple(ops, descr='change settings'))
 
     def onAction(self, action, console):
         """Run actions with same name."""
