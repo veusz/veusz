@@ -56,6 +56,10 @@ class SettingsProxy(object):
     def usertext(self):
         """Return text for user."""
 
+    def multivalued(self, name):
+        """Is setting with name multivalued?"""
+        return False
+
 class SettingsProxySingle(SettingsProxy):
     """A proxy wrapping settings for a single widget."""
 
@@ -214,6 +218,15 @@ class SettingsProxyMulti(SettingsProxy):
         """Return text for user."""
         return self.settingsatlevel[0].usertext
 
+    def multivalued(self, name):
+        """Is setting multivalued?"""
+        slist = [s.get(name) for s in self.settingsatlevel]
+        first = slist[0].get()
+        for s in slist[1:]:
+            if s.get() != first:
+                return True
+        return False
+
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
 
@@ -312,7 +325,7 @@ class PropertyList(qt4.QWidget):
 
                 cntrl = setn.makeControl(None)
                 if cntrl:
-                    lab = SettingLabel(self.document, setn, None)
+                    lab = SettingLabel(self.document, setn, setnsproxy)
                     self.layout.addWidget(lab, row, 0)
                     self.childlist.append(lab)
 
@@ -321,7 +334,7 @@ class PropertyList(qt4.QWidget):
                     self.layout.addWidget(cntrl, row, 1)
                     self.childlist.append(cntrl)
                     self.setncntrls[setn.name] = (lab, cntrl)
-                    
+
                     row += 1
 
         # add empty widget to take rest of space
@@ -945,16 +958,17 @@ class SettingLabel(qt4.QWidget):
     access to the context menu
     """
     
-    def __init__(self, document, setting, parent):
+    def __init__(self, document, setting, setnsproxy):
         """Initialise button, passing document, setting, and parent widget."""
         
-        qt4.QWidget.__init__(self, parent)
+        qt4.QWidget.__init__(self)
         self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         self.document = document
         self.connect(document, qt4.SIGNAL('sigModified'), self.slotDocModified)
 
         self.setting = setting
+        self.setnsproxy = setnsproxy
 
         self.layout = qt4.QHBoxLayout(self)
         self.layout.setMargin(2)
@@ -1007,9 +1021,10 @@ class SettingLabel(qt4.QWidget):
         self.setToolTip(tooltip)
 
         # if not default, make label bold
-        bold = not self.setting.isDefault()
         f = qt4.QFont(self.labelicon.font())
-        f.setBold(bold)
+        multivalued = self.setnsproxy.multivalued(self.setting.name)
+        f.setBold( (not self.setting.isDefault()) or multivalued )
+        f.setItalic( multivalued )
         self.labelicon.setFont(f)
 
     def updateHighlight(self):
