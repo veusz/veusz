@@ -60,6 +60,9 @@ class SettingsProxy(object):
         """Is setting with name multivalued?"""
         return False
 
+    def resetToDefault(self, name):
+        """Reset setting to default."""
+
 class SettingsProxySingle(SettingsProxy):
     """A proxy wrapping settings for a single widget."""
 
@@ -102,6 +105,12 @@ class SettingsProxySingle(SettingsProxy):
     def usertext(self):
         """Return text for user."""
         return self.settings.usertext
+
+    def resetToDefault(self, name):
+        """Reset setting to default."""
+        setn = self.settings.get(name)
+        self.document.applyOperation(
+            document.OperationSettingSet(setn, setn.default))
 
 class SettingsProxyMulti(SettingsProxy):
     """A proxy wrapping settings for multiple widgets."""
@@ -226,6 +235,15 @@ class SettingsProxyMulti(SettingsProxy):
             if s.get() != first:
                 return True
         return False
+
+    def resetToDefault(self, name):
+        """Reset settings to default."""
+        ops = []
+        for s in self.settingsatlevel:
+            setn = s.get(name)
+            ops.append(document.OperationSettingSet(setn, setn.default))
+        self.document.applyOperation(
+            document.OperationMultiple(ops, descr="reset to default"))
 
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
@@ -1147,10 +1165,7 @@ class SettingLabel(qt4.QWidget):
 
     def actionResetDefault(self):
         """Reset setting to default."""
-        self.document.applyOperation(
-            document.OperationSettingSet(
-                self.setting,
-                self.setting.default))
+        self.setnsproxy.resetToDefault(self.setting.name)
 
     def actionCopyTypedWidgets(self):
         """Copy setting to widgets of same type."""
@@ -1171,36 +1186,10 @@ class SettingLabel(qt4.QWidget):
                                                widgetname=
                                                self._clickwidget.name) )
 
-    def actionDefaultTyped(self):
-        """Make default for widgets with the same type."""
-        self.setting.setAsDefault(False)
-
-    def actionDefaultTypedNamed(self):
-        """Make default for widgets with the same name and type."""
-        self.setting.setAsDefault(True)
-
-    def actionDefaultForget(self):
-        """Forget any default setting."""
-        self.setting.removeDefault()
-
     def actionUnlinkSetting(self):
         """Unlink the setting if it is a reference."""
         self.document.applyOperation(
             document.OperationSettingSet(self.setting, self.setting.get()) )
-
-    def actionEditLinkedSetting(self):
-        """Edit the linked setting rather than the setting."""
-        
-        realsetn = self.setting.getReference().resolve(self.setting)
-        widget = realsetn
-        while not isinstance(widget, widgets.Widget) and widget is not None:
-            widget = widget.parent
-
-        # need to select widget, so need to find treeditwindow :-(
-        window = self
-        while not hasattr(window, 'treeedit'):
-            window = window.parent()
-        window.treeedit.selectWidget(widget)
 
     def actionSetStyleSheet(self):
         """Use the setting as the default in the stylesheet."""
