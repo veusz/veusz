@@ -362,6 +362,10 @@ class Choice(qt4.QComboBox):
         if setting.readonly:
             self.setEnabled(False)
 
+        # make completion case sensitive (to help fix case typos)
+        if self.completer():
+            self.completer().setCaseSensitivity(qt4.Qt.CaseSensitive)
+
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
         qt4.QComboBox.focusOutEvent(self, *args)
