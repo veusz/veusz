@@ -126,7 +126,7 @@ class DatasetNode(TMNode):
         c = self.cols[column]
         if c == "name":
             return qt4.QVariant(ds.description())
-        elif c == "size" or c == "type":
+        elif c == "size" or (c == 'type' and 'size' not in self.cols):
             text = ds.userPreview()
             # add preview of dataset if possible
             pix = self.getPreviewPixmap(ds)
@@ -134,8 +134,8 @@ class DatasetNode(TMNode):
                 text = text.replace("\n", "<br>")
                 text = "<html>%s<br>%s</html>" % (text, pixmapAsHtml(pix))
             return qt4.QVariant(text)
-        elif c == "linkfile":
-            return qt4.QVariant( datasetLinkFile(ds) )
+        elif c == "linkfile" or c == "type":
+            return qt4.QVariant(ds.linkedInformation())
         return qt4.QVariant()
 
     def dataset(self):
