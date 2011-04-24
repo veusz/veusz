@@ -347,16 +347,28 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                          self.showContextMenu)
         self.model.refresh()
         self.expandAll()
+        self.updateWidths()
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
             self.connect(mainwin, qt4.SIGNAL("documentopened"), self.expandAll)
+
+        # keep track of selection
+        self.connect( self.selectionModel(),
+                      qt4.SIGNAL("selectionChanged(const QItemSelection&, "
+                                 "const QItemSelection&)"),
+                      self.slotNewSelection )
 
     def changeGrouping(self, grouping):
         """Change the tree grouping behaviour."""
         self.model.grouping = grouping
         self.model.refresh()
         self.expandAll()
+        self.updateWidths()
+
+    def updateWidths(self):
+        for c in xrange(self.model.columnCount(qt4.QModelIndex())):
+            self.resizeColumnToContents(c)
 
     def changeFilter(self, filtertext):
         """Change filtering text."""
@@ -491,6 +503,23 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         retn = qt4.QTreeView.mouseDoubleClickEvent(self, event)
         self.emit(qt4.SIGNAL("updateitem"))
         return retn
+
+    def slotNewSelection(self, selected, deselected):
+        """Emit selecteditem signal on new selection."""
+        self.emit(qt4.SIGNAL("selecteditem"), self.getSelectedDataset())
+
+    def getSelectedDataset(self):
+        """Return selected dataset."""
+        name = None
+        sel = self.selectionModel().selection()
+        try:
+            modelidx = sel.indexes()[0]
+            node = modelidx.internalPointer()
+            if isinstance(node, DatasetNode):
+                name = node.datasetName()
+        except IndexError:
+            pass
+        return name
 
 class DatasetBrowser(qt4.QWidget):
     """Widget which shows the document's datasets."""

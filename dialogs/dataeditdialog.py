@@ -26,6 +26,7 @@ import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.utils as utils
+from veusz.qtwidgets.datasetbrowser import DatasetBrowser
 from veuszdialog import VeuszDialog
 
 # register function to dataset class to edit dataset
@@ -208,72 +209,6 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
                 return qt4.QVariant( '%g' % val )
 
         return qt4.QVariant()
-
-class DatasetListModel(qt4.QStringListModel):
-    def __init__(self, parent, document):
-        dsnames = document.data.keys()
-        dsnames.sort()
-        qt4.QStringListModel.__init__(self, dsnames, parent)
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
-        self.document = document
-
-    def datasetName(self, index):
-        """Get name at index."""
-        return unicode(self.stringList()[index.row()])
-        
-    @property
-    def datasets(self):
-        """Get list of datasets."""
-        return [unicode(x) for x in self.stringList()]
-
-    def slotDocumentModified(self):
-        """Update list when document modified."""
-        dslist = self.datasets
-        old = set(dslist)
-        new = set(self.document.data.keys())
-
-        # dslist used to keep track of changes
-        # add new entries in appropriate (sorted) place
-        for a in new-old:
-            i = bisect.bisect_left(dslist, a)
-            dslist.insert(i, a)
-            self.insertRows(i, 1)
-            qt4.QStringListModel.setData(
-                self, self.index(i, 0), qt4.QVariant(a) )
-
-        # remove entries no longer there
-        for d in old-new:
-            i = dslist.index(d)
-            del dslist[i]
-            self.removeRows(i, 1)
-
-    def getDatasetIndex(self, dsname):
-        """Get index of dataset."""
-        try:
-            row = self.datasets.index(dsname)
-        except ValueError:
-            return qt4.QModelIndex()
-        return self.index(row, 0, qt4.QModelIndex())
-
-    def setData(self, index, value, role=qt4.Qt.EditRole):
-        """Called to rename a dataset."""
-
-        if index.isValid() and role == qt4.Qt.EditRole:
-            name = self.datasetName(index)
-            newname = unicode( value.toString() )
-
-            if not utils.validateDatasetName(newname):
-                return False
-
-            self.document.applyOperation(
-                document.OperationDatasetRename(name, newname))
-            self.emit(qt4.SIGNAL(
-                    'dataChanged(const QModelIndex &, const QModelIndex &'),
-                      index, index)
-            return True
-
-        return False
     
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
@@ -283,9 +218,8 @@ class DataEditDialog(VeuszDialog):
         self.document = document
 
         # set up dataset list
-        self.dslistmodel = DatasetListModel(self, document)
-
-        self.datasetlistview.setModel(self.dslistmodel)
+        self.dsbrowser = DatasetBrowser(document, parent, parent)
+        self.splitter.insertWidget(0, self.dsbrowser)
 
         # actions for data table
         for text, slot in (
@@ -310,18 +244,19 @@ class DataEditDialog(VeuszDialog):
         self.connect(document, qt4.SIGNAL('sigModified'),
                      self.slotDocumentModified)
 
-        # receive change in selection
-        self.connect(self.datasetlistview.selectionModel(),
-                     qt4.SIGNAL('selectionChanged(const QItemSelection &, const QItemSelection &)'),
-                     self.slotDatasetSelected)
-
         # select first item, if any or initialise if none
-        if self.dslistmodel.rowCount() > 0:
-            self.datasetlistview.selectionModel().select(
-                self.dslistmodel.createIndex(0, 0),
-                qt4.QItemSelectionModel.Select)
-        else:
-            self.slotDatasetSelected(None, None)
+        if len(self.document.data) > 0:
+            self.selectDataset( sorted(self.document.data.keys())[0] )
+
+        #if self.dslistmodel.rowCount() > 0:
+        #    self.datasetlistview.selectionModel().select(
+        #        self.dslistmodel.createIndex(0, 0),
+        #        qt4.QItemSelectionModel.Select)
+        #else:
+        #    self.slotDatasetSelected(None, None)
+
+        self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteditem"),
+                     self.slotDatasetSelected)
 
         # connect buttons
         for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
@@ -341,14 +276,13 @@ class DataEditDialog(VeuszDialog):
             self.connect(a, qt4.SIGNAL('triggered()'), slot)
         self.newbutton.setMenu(self.newmenu)
 
-    def slotDatasetSelected(self, current, deselected):
+    def slotDatasetSelected(self, name):
         """Called when a new dataset is selected."""
 
         # FIXME: Make readonly models readonly!!
         model = None
-        if current is not None and len(current.indexes()) > 0:
+        if name:
             # get selected dataset
-            name = self.dslistmodel.datasetName(current.indexes()[0])
             ds = self.document.data[name]
 
             # make model for dataset
@@ -368,19 +302,20 @@ class DataEditDialog(VeuszDialog):
         """Enable the unlink button correctly."""
         # get dataset
         dsname = self.getSelectedDataset()
-
         try:
             ds = self.document.data[dsname]
+            unlink = ds.canUnlink()
+            linkinfo = ds.linkedInformation()
         except KeyError:
-            return
-
-        # linked dataset
-        unlink = ds.canUnlink()
-        readonly = not unlink
+            ds = None
+            unlink = False
+            linkinfo = ""
 
         self.editbutton.setVisible(type(ds) in recreate_register)
         self.unlinkbutton.setEnabled(unlink)
-        self.linkedlabel.setText( ds.linkedInformation() )
+        self.linkedlabel.setText(linkinfo)
+        self.deletebutton.setEnabled(ds is not None)
+        self.duplicatebutton.setEnabled(ds is not None)
 
     def slotDocumentModified(self):
         """Set unlink status when document modified."""
@@ -388,41 +323,27 @@ class DataEditDialog(VeuszDialog):
 
     def getSelectedDataset(self):
         """Return the selected dataset."""
-        selitems = self.datasetlistview.selectionModel().selection().indexes()
-        if len(selitems) != 0:
-            return self.dslistmodel.datasetName(selitems[0])
-        else:
-            return None
+        return self.dsbrowser.navtree.getSelectedDataset()
 
     def selectDataset(self, dsname):
         """Select dataset with name given."""
-        smodel = self.datasetlistview.selectionModel()
-        idx = self.dslistmodel.getDatasetIndex(dsname)
-        smodel.select(idx, qt4.QItemSelectionModel.ClearAndSelect)
-        self.datasetlistview.setCurrentIndex(idx)
+        self.dsbrowser.navtree.selectDataset(dsname)
+        self.slotDatasetSelected(dsname)
 
     def slotDatasetDelete(self):
         """Delete selected dataset."""
-
-        datasetname = self.getSelectedDataset()
-        if datasetname is not None:
-            row = self.datasetlistview.selectionModel(
-                ).selection().indexes()[0].row()
-
-            self.document.applyOperation(
-                document.OperationDatasetDelete(datasetname))
+        self.document.applyOperation(
+            document.OperationDatasetDelete(self.getSelectedDataset()) )
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
-
         datasetname = self.getSelectedDataset()
-        if datasetname is not None:
-            d = self.document.data[datasetname]
-            if d.linked is not None:
-                op = document.OperationDatasetUnlinkFile(datasetname)
-            else:
-                op = document.OperationDatasetUnlinkRelation(datasetname)
-            self.document.applyOperation(op)
+        d = self.document.data[datasetname]
+        if d.linked is not None:
+            op = document.OperationDatasetUnlinkFile(datasetname)
+        else:
+            op = document.OperationDatasetUnlinkRelation(datasetname)
+        self.document.applyOperation(op)
 
     def slotDatasetDuplicate(self):
         """Duplicate selected dataset."""

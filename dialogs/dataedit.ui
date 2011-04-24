@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>426</height>
+    <width>691</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,6 @@
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
-     <widget class="QListView" name="datasetlistview"/>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout">
        <property name="spacing">
