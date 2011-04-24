@@ -347,7 +347,13 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                          self.showContextMenu)
         self.model.refresh()
         self.expandAll()
-        self.updateWidths()
+
+        # stretch of columns
+        hdr = self.header()
+        hdr.setStretchLastSection(False)
+        hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
+        for col in xrange(1, 4):
+            hdr.setResizeMode(col, qt4.QHeaderView.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
@@ -364,11 +370,6 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         self.model.grouping = grouping
         self.model.refresh()
         self.expandAll()
-        self.updateWidths()
-
-    def updateWidths(self):
-        for c in xrange(self.model.columnCount(qt4.QModelIndex())):
-            self.resizeColumnToContents(c)
 
     def changeFilter(self, filtertext):
         """Change filtering text."""
