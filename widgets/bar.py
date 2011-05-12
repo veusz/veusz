@@ -154,7 +154,7 @@ class BarPlotter(GenericPlotter):
             positions = s.get('posn').getData(doc)
             if positions is None:
                 lengths = s.get('lengths').getData(doc)
-                if lengths is None:
+                if not lengths:
                     return (None, None)
                 p = N.arange( max([len(d.data) for d in lengths]) )+1.
             else:
