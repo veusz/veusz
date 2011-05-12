@@ -1114,8 +1114,12 @@ class OperationDataImportFITS(object):
         # actually create the dataset
         return datasets.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
 
-    def _import2d(self, hdu):
-        """Import 2d data from hdu."""
+    def _import1dimage(self, hdu):
+        """Import 1d image data form hdu."""
+        return datasets.Dataset(data=hdu.data)
+
+    def _import2dimage(self, hdu):
+        """Import 2d image data from hdu."""
     
         if ( self.datacol is not None or self.symerrcol is not None or self.poserrcol is not None or
              self.negerrcol is not None ):
@@ -1162,8 +1166,13 @@ class OperationDataImportFITS(object):
             ds = self._import1d(hdu)
 
         except AttributeError:
-            ds = self._import2d(hdu)
-
+            naxis = hdu.header.get('NAXIS')
+            if naxis == 1:
+                ds = self._import1dimage(hdu)
+            elif naxis == 2:
+                ds = self._import2dimage(hdu)
+            else:
+                raise RuntimeError, "Cannot import images with %i dimensions" % naxis
         f.close()
             
         if self.linked:

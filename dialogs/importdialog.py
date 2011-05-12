@@ -483,7 +483,7 @@ class ImportTabFITS(ImportTab):
             except AttributeError:
                 # this is an image
                 naxis = header['NAXIS']
-                if naxis ==2:
+                if naxis == 1 or naxis == 2:
                     data = ['image']
                 else:
                     data = ['invalidimage']
