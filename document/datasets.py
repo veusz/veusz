@@ -95,7 +95,7 @@ def generateValidDatasetParts(*datasets):
             # if not a dataset
             pass
 
-    # get indexes of invalid pounts
+    # get indexes of invalid points
     indexes = invalid.nonzero()[0].tolist()
 
     # no bad points: optimisation
@@ -1262,6 +1262,14 @@ class DatasetRange(Dataset):
         self.linked = None
         self._invalidpoints = None
 
+    def __getitem__(self, key):
+        """Return a dataset based on this dataset
+
+        We override this from DatasetBase as it would return a
+        DatsetExpression otherwise, not chopped sets of data.
+        """
+        return Dataset(**self._getItemHelper(key))
+
     def userSize(self):
         """Size of dataset."""
         return str( self.numsteps )
@@ -1727,6 +1735,14 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
     def userSize(self):
         """Size of dataset."""
         return str( self.data.shape[0] )
+
+    def __getitem__(self, key):
+        """Return a dataset based on this dataset
+
+        We override this from DatasetBase as it would return a
+        DatsetExpression otherwise, not chopped sets of data.
+        """
+        return Dataset(**self._getItemHelper(key))
 
     # parent class sets these attributes, so override setattr to do nothing
     data = property( lambda self: self.getPluginData('data'),
