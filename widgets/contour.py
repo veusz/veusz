@@ -291,7 +291,7 @@ class Contour(plotters.GenericPlotter):
         """Calculate sublevels between contours."""
         s = self.settings
         num = s.SubLines.numLevels
-        if s.SubLines.hide or len(s.SubLines.lines) == 0:
+        if s.SubLines.hide or len(s.SubLines.lines) == 0 or len(levels) <= 1:
             return N.array([])
 
         # indices where contour levels should be placed
