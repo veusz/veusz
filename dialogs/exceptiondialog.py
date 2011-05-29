@@ -25,6 +25,7 @@ import time
 import traceback
 import urllib2
 import sip
+import re
 
 import numpy
 
@@ -132,6 +133,31 @@ class ExceptionDialog(VeuszDialog):
         self.connect(self.ignoreSessionButton, qt4.SIGNAL('clicked()'),
                      self.ignoreSessionSlot)
        
+        self.checkVeuszVersion()
+
+    def checkVeuszVersion(self):
+        """See whether there is a later version of veusz and inform the
+        user."""
+        try:
+            p = urllib2.urlopen('http://download.gna.org/veusz/').read()
+            versions = re.findall('veusz-([0-9.]+).tar.gz', p)
+        except urllib2.URLError:
+            msg = 'Could not check the latest Veusz version'
+        else:
+            vsort = sorted([[int(i) for i in v.split('.')] for v in versions])
+            latest = '.'.join([str(x) for x in vsort[-1]])
+
+            current = [int(i) for i in utils.version().split('.')]
+            if current == vsort[-1]:
+                msg = 'You are running the latest released Veusz version'
+            elif current > vsort[-1]:
+                msg = 'You are running an unreleased Veusz version'
+            else:
+                msg = ('<b>Your current version of Veusz is old. '
+                       'Veusz %s is available.</b>' % latest)
+
+        self.veuszversionlabel.setText(msg)
+
     def accept(self):
         """Accept by opening send dialog."""
         d = ExceptionSendDialog(self.backtrace, self)
