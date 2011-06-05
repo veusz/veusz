@@ -233,8 +233,8 @@ class DataEditDialog(VeuszDialog):
         self.datatableview.setContextMenuPolicy( qt4.Qt.ActionsContextMenu )
 
         # layout edit dialog improvement
-        self.splitter.setStretchFactor(0, 1)
-        self.splitter.setStretchFactor(1, 3)
+        self.splitter.setStretchFactor(0, 3)
+        self.splitter.setStretchFactor(1, 4)
 
         # don't want text to look editable or special
         self.linkedlabel.setFrameShape(qt4.QFrame.NoFrame)
