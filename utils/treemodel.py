@@ -33,6 +33,9 @@ class TMNode(object):
         self.parent = parent
         self.childnodes = []
 
+        # model uses these to map objects to qmodelindexes
+        # self._idx = None
+
     def toolTip(self, column):
         """Return tooltip for column, if any."""
         return qt4.QVariant()
@@ -85,6 +88,12 @@ class TreeModel(qt4.QAbstractItemModel):
         qt4.QAbstractItemModel.__init__(self, *args)
         self.root = TMNode(rootdata, None)
 
+        # the nodes are stored here when in the tree,
+        # to be looked up with node._idx
+        self.nodes = {}
+        # next index to assign in self.nodes
+        self.nodeindex = 0
+
     def columnCount(self, parent):
         """Use root data to get column count."""
         return len(self.root.data)
@@ -92,11 +101,10 @@ class TreeModel(qt4.QAbstractItemModel):
     def data(self, index, role):
         """Get text or tooltip."""
         if index.isValid():
+            item = self.objFromIndex(index)
             if role == qt4.Qt.DisplayRole:
-                item = index.internalPointer()
                 return item.nodeData(index.column())
             elif role == qt4.Qt.ToolTipRole:
-                item = index.internalPointer()
                 return item.toolTip(index.column())
 
         return qt4.QVariant()
@@ -113,19 +121,25 @@ class TreeModel(qt4.QAbstractItemModel):
             return self.root.nodeData(section)
         return qt4.QVariant()
 
+    def objFromIndex(self, idx):
+        """Given an index, return the node."""
+        if not idx.isValid():
+            obj = None
+        else:
+            return self.nodes[idx.internalId()]
+
     def index(self, row, column, parent):
         """Return index of node."""
         if not self.hasIndex(row, column, parent):
             return qt4.QModelIndex()
 
-        if not parent.isValid():
+        parentitem = self.objFromIndex(parent)
+        if parentitem is None:
             parentitem = self.root
-        else:
-            parentitem = parent.internalPointer()
 
         childitem = parentitem.childnodes[row]
         if childitem:
-            return self.createIndex(row, column, childitem)
+            return self.createIndex(row, column, childitem._idx)
         return qt4.QModelIndex()
 
     def parent(self, index):
@@ -133,14 +147,14 @@ class TreeModel(qt4.QAbstractItemModel):
         if not index.isValid():
             return qt4.QModelIndex()
 
-        childitem = index.internalPointer()
+        childitem = self.objFromIndex(index)
         parentitem = childitem.parent
 
         if parentitem is self.root:
             return qt4.QModelIndex()
 
         parentrow = parentitem.parent.childnodes.index(parentitem)
-        return self.createIndex(parentrow, 0, parentitem)
+        return self.createIndex(parentrow, 0, parentitem._idx)
 
     def rowCount(self, parent):
         """Compute row count of node."""
@@ -150,7 +164,7 @@ class TreeModel(qt4.QAbstractItemModel):
         if not parent.isValid():
             parentitem = self.root
         else:
-            parentitem = parent.internalPointer()
+            parentitem = self.objFromIndex(parent)
 
         return len(parentitem.childnodes)
 
@@ -160,8 +174,9 @@ class TreeModel(qt4.QAbstractItemModel):
         lookup = {}
         data = []
         for c in theroot.childnodes:
-            lookup[c.data] = c
-            data.append(c.data)
+            d = c.data[0]
+            lookup[d] = c
+            data.append(d)
         return lookup, set(data)
 
     def _syncbranch(self, parentidx, root, rootnew):
@@ -189,16 +204,15 @@ class TreeModel(qt4.QAbstractItemModel):
 
         while i < len(rootnew.childnodes) or i < len(c):
             if i < len(c):
-                k = c[i].data
+                k = c[i].data[0]
             else:
                 k = None
-
+                
             # one to be deleted
             if k in todelete:
                 todelete.remove(k)
-                #print "deleting row", i, c[i].data
                 self.beginRemoveRows(parentidx, i, i)
-                #print len(c), i, k
+                del self.nodes[c[i]._idx]
                 del c[i]
                 self.endRemoveRows()
                 continue
@@ -206,9 +220,28 @@ class TreeModel(qt4.QAbstractItemModel):
             # one to insert
             if toadd and (k > toadd[0] or k is None):
                 self.beginInsertRows(parentidx, i, i)
-                c.insert(i, nlookup[toadd[0]].cloneTo(root))
+                a = nlookup[toadd[0]].cloneTo(root)
+                a._idx = self.nodeindex
+                self.nodeindex += 1
+                self.nodes[a._idx] = a
+                c.insert(i, a)
                 self.endInsertRows()
                 del toadd[0]
+            else:
+                # neither delete or add
+                if clookup[k].data != nlookup[k].data:
+                    # the name is the same but data are not
+                    # swap node entry to point to new cloned node
+                    clone = nlookup[k].cloneTo(root)
+                    idx = clookup[k]._idx
+                    clone._idx = idx
+                    self.nodes[idx] = clone
+
+                    self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, '
+                                         'const QModelIndex &)'),
+                              self.index(i, 0, parentidx),
+                              self.index(i, len(c[i].data)-1,
+                                         parentidx))
 
             # now recurse to update any subnodes
             newindex = self.index(i, 0, parentidx)

@@ -288,14 +288,14 @@ class DatasetRelationModel(TreeModel):
         """Return model flags for index."""
         f = TreeModel.flags(self, idx)
         # allow dataset names to be edited
-        if ( idx.isValid() and isinstance(idx.internalPointer(), DatasetNode)
+        if ( idx.isValid() and isinstance(self.objFromIndex(idx), DatasetNode)
              and not self.readonly ):
             f |= qt4.Qt.ItemIsEditable
         return f
 
     def setData(self, idx, data, role):
         """Rename dataset."""
-        dsnode = idx.internalPointer()
+        dsnode = self.objFromIndex(idx)
         newname = unicode(data.toString())
         self.doc.applyOperation(
             document.OperationDatasetRename(dsnode.data[0], newname))
@@ -386,7 +386,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             qt4.Qt.MatchFixedString | qt4.Qt.MatchCaseSensitive |
             qt4.Qt.MatchRecursive )
         for idx in matches:
-            if isinstance(idx.internalPointer(), DatasetNode):
+            if isinstance(self.model.objFromIndex(idx), DatasetNode):
                 self.selectionModel().setCurrentIndex(
                     idx, qt4.QItemSelectionModel.SelectCurrent)
 
@@ -396,7 +396,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         if not idx.isValid():
             return
 
-        node = idx.internalPointer()
+        node = self.model.objFromIndex(idx)
         menu = None
         if isinstance(node, DatasetNode):
             menu = self.datasetContextMenu(node)
@@ -515,7 +515,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         sel = self.selectionModel().selection()
         try:
             modelidx = sel.indexes()[0]
-            node = modelidx.internalPointer()
+            node = self.model.objFromIndex(modelidx)
             if isinstance(node, DatasetNode):
                 name = node.datasetName()
         except IndexError:
@@ -625,7 +625,7 @@ class DatasetBrowserPopup(DatasetBrowser):
         self.connect(self.navtree, qt4.SIGNAL("updateitem"),
                      self.slotUpdateItem)
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, node, event):
         """Grab clicks outside this window to close it."""
         if ( isinstance(event, qt4.QMouseEvent) and
              event.buttons() != qt4.Qt.NoButton ):
@@ -633,7 +633,7 @@ class DatasetBrowserPopup(DatasetBrowser):
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt4.QTextEdit.eventFilter(self, obj, event)
+        return qt4.QTextEdit.eventFilter(self, node, event)
 
     def sizeHint(self):
         """A reasonable size for the text editor."""
@@ -652,7 +652,7 @@ class DatasetBrowserPopup(DatasetBrowser):
         """Emit new dataset signal."""
         selected = self.navtree.selectionModel().currentIndex()
         if selected.isValid():
-            n = selected.internalPointer()
+            n = self.navtree.objFromIndex(selected)
             if isinstance(n, DatasetNode):
                 self.emit(qt4.SIGNAL("newdataset"), n.data[0])
                 self.close()
