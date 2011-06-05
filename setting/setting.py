@@ -1716,6 +1716,7 @@ class ErrorStyle(Choice):
         'boxfill',
         'fillvert', 'fillhorz',
         'linevert', 'linehorz',
+        'linevertbar', 'linehorzbar'
         )
 
     controls.ErrorStyle._errorstyles  = _errorstyles

@@ -565,6 +565,7 @@ part_commands = {
     r'\size': (PartSize, 2),
     r'\frac': (PartFrac, 2),
     r'\bar': (PartBar, 1),
+    r'\overline': (PartBar, 1),
     r'\dot': (PartDot, 1),
     }
 

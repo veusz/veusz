@@ -142,7 +142,7 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
     hidevert = True  # keep track of what's shown
     hidehorz = True
-    if ( (style == 'fillvert' or style == 'linevert') and
+    if ( 'vert' in style and
          (ymin is not None and ymax is not None) and
          not s.ErrorBarLine.hideVert ):
         hidevert = False
@@ -150,7 +150,7 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
         utils.addNumpyToPolygonF(ptsbelow, xplotter, ymin)
         utils.addNumpyToPolygonF(ptsabove, xplotter, ymax)
 
-    elif ( (style == 'fillhorz' or style == 'linehorz') and
+    elif ( 'horz' in style and
            (xmin is not None and xmax is not None) and
            not s.ErrorBarLine.hideHorz ):
         hidehorz = False
@@ -159,8 +159,7 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
         utils.addNumpyToPolygonF(ptsabove, xmax, yplotter)
 
     # draw filled regions above/left and below/right
-    if ( (style == 'fillvert' or style == 'fillhorz') and
-         not (hidehorz and hidevert) ):
+    if 'fill' in style and not (hidehorz and hidevert):
         # construct points for error bar regions
         retnpts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(retnpts, xplotter[::-1], yplotter[::-1])
@@ -197,8 +196,9 @@ _errorBarFunctionMap = {
     'fillvert': (_errorBarsFilled,),
     'linehorz': (_errorBarsFilled,),
     'linevert': (_errorBarsFilled,),
+    'linehorzbar': (_errorBarsBar, _errorBarsFilled),
+    'linevertbar': (_errorBarsBar, _errorBarsFilled),
     }
-
 
 class MarkerFillBrush(setting.Brush):
     def __init__(self, name, **args):
