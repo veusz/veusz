@@ -670,7 +670,7 @@ def dsPreviewHelper(d):
             N.nansum(d) / N.isfinite(d).sum(),
             N.nanmin(d),
             N.nanmax(d))
-    except ValueError:
+    except (ValueError, ZeroDivisionError):
         # nanXXX returns error if no valid data points
         return line1
     return line1 + '\n' + line2
