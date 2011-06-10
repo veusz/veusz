@@ -606,14 +606,18 @@ class Dataset2D(DatasetBase):
 
         # we don't want these set if a inheriting class uses properties instead
         if not hasattr(self, 'data'):
-            self.data = _convertNumpy(data)
-            self.xrange = (0, data.shape[1])
-            self.yrange = (0, data.shape[0])
+            try:
+                self.data = _convertNumpy(data)
+                self.xrange = (0, data.shape[1])
+                self.yrange = (0, data.shape[0])
 
-            if xrange:
-                self.xrange = xrange
-            if yrange:
-                self.yrange = yrange
+                if xrange:
+                    self.xrange = xrange
+                if yrange:
+                    self.yrange = yrange
+            except AttributeError:
+                # for some reason hasattr doesn't always work
+                pass
 
     def indexToPoint(self, xidx, yidx):
         """Convert a set of indices to pixels in integers to
@@ -720,12 +724,15 @@ class Dataset(DatasetBase):
         # finally assign data
         self._invalidpoints = None
 
-        # we don't want these set if a inheriting class uses properties instead
-        if not hasattr(self, 'data'):
-            self.data = data
-            self.serr = serr
-            self.perr = perr
-            self.nerr = nerr
+        try:
+            if not hasattr(self, 'data'):
+                self.data = data
+                self.serr = serr
+                self.perr = perr
+                self.nerr = nerr
+        except AttributeError:
+            # we don't want these set if a inheriting class uses properties instead
+            pass
 
     def userSize(self):
         """Size of dataset."""
@@ -1400,7 +1407,7 @@ class Dataset2DXYZExpression(Dataset2D):
         """Initialise dataset.
 
         Parameters are mathematical expressions based on datasets."""
-        Dataset2D.__init__(self)
+        Dataset2D.__init__(self, [])
 
         self.lastchangeset = -1
         self.cacheddata = None
@@ -1652,7 +1659,7 @@ class Dataset2DXYFunc(Dataset2D):
         expr: expression of x and y
         """
 
-        Dataset2D.__init__(self)
+        Dataset2D.__init__(self, [])
 
         self.xstep = xstep
         self.ystep = ystep
