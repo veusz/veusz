@@ -271,12 +271,16 @@ class ReadCSV(object):
                         ( data[i], N.zeros(maxlen-len(data[i]))*N.nan ) )
 
             # create dataset
-            if self.nametypes[name] == 'string':
+            dstype = self.nametypes[name]
+            if dstype == 'string':
                 ds = datasets.DatasetText(data=data[0], linked=linkedfile)
+            elif dstype == 'date':
+                ds = datasets.DatasetDateTime(data=data[0], linked=linkedfile)
             else:
                 ds = datasets.Dataset(data=data[0], serr=data[1],
                                       perr=data[2], nerr=data[3],
                                       linked=linkedfile)
+
             document.setData(name, ds)
 
         dsnames.sort()

@@ -322,10 +322,13 @@ class DescriptorPart(object):
                     if neg is not None: neg = neg[-tail:]
 
                 # create the dataset
-                if self.datatype in ('float', 'date'):
-                    ds = datasets.Dataset(data = vals, serr = sym,
-                                          nerr = neg, perr = pos,
-                                          linked = linkedfile)
+                if self.datatype == 'float':
+                    ds = datasets.Dataset( data = vals, serr = sym,
+                                           nerr = neg, perr = pos,
+                                           linked = linkedfile )
+                elif self.datatype == 'date':
+                    ds = datasets.DatasetDateTime( data=vals,
+                                                   linked=linkedfile )
                 elif self.datatype == 'string':
                     ds = datasets.DatasetText( data=vals,
                                                linked = linkedfile )

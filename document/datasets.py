@@ -477,6 +477,14 @@ class DatasetBase(object):
     # dataset type
     dstype = 'Dataset'
 
+    def __init__(self, linked=None):
+        """Initialise common members."""
+        # document member set when this dataset is set in document
+        self.document = None
+
+        # file this dataset is linked to
+        self.linked = linked
+
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 
@@ -512,8 +520,18 @@ class DatasetBase(object):
         return ""
 
     def uiConvertToDataItem(self, val):
-        """Return a value cast to this dataset data type."""
-        return None
+        """Return a value cast to this dataset data type.
+        We assume here it is a float, so override if not
+        """
+        if isinstance(val, basestring) or isinstance(val, qt4.QString):
+            val, ok = setting.uilocale.toDouble(val)
+            if ok: return val
+            raise ValueError, "Invalid floating point number"
+        return float(val)
+
+    def uiDataItemToQVariant(self, val):
+        """Return val converted to QVariant."""
+        return qt4.QVariant(float(val))
     
     def _getItemHelper(self, key):
         """Help get arguments to constructor."""
@@ -584,17 +602,18 @@ class Dataset2D(DatasetBase):
         yrange: a tuple of (start, end) coordinates for y
         '''
 
-        self.document = None
-        self.linked = None
-        self.data = _convertNumpy(data)
+        DatasetBase.__init__(self)
 
-        self.xrange = xrange
-        self.yrange = yrange
-
-        if not xrange:
+        # we don't want these set if a inheriting class uses properties instead
+        if not hasattr(self, 'data'):
+            self.data = _convertNumpy(data)
             self.xrange = (0, data.shape[1])
-        if not yrange:
             self.yrange = (0, data.shape[0])
+
+            if xrange:
+                self.xrange = xrange
+            if yrange:
+                self.yrange = yrange
 
     def indexToPoint(self, xidx, yidx):
         """Convert a set of indices to pixels in integers to
@@ -645,14 +664,6 @@ class Dataset2D(DatasetBase):
             text += ', linked to %s' % self.linked.filename
         return text
 
-    def uiConvertToDataItem(self, val):
-        """Return a value cast to this dataset data type."""
-        if isinstance(val, basestring) or isinstance(val, qt4.QString):
-            val, ok = setting.uilocale.toDouble(val)
-            if ok: return val
-            raise ValueError, "Invalid floating point number"
-        return float(val)
-
     def returnCopy(self):
         return Dataset2D( N.array(self.data), self.xrange, self.yrange)
 
@@ -692,6 +703,8 @@ class Dataset(DatasetBase):
         linked optionally specifies a LinkedFile to link the dataset to
         '''
         
+        DatasetBase.__init__(self, linked=linked)
+
         # convert data to numpy arrays
         data = _convertNumpy(data)
         serr = _convertNumpyAbs(serr)
@@ -705,13 +718,14 @@ class Dataset(DatasetBase):
                 raise DatasetException('Lengths of error data do not match data')
 
         # finally assign data
-        self.document = None
         self._invalidpoints = None
-        self.linked = linked
-        self.data = data
-        self.serr = serr
-        self.perr = perr
-        self.nerr = nerr
+
+        # we don't want these set if a inheriting class uses properties instead
+        if not hasattr(self, 'data'):
+            self.data = data
+            self.serr = serr
+            self.perr = perr
+            self.nerr = nerr
 
     def userSize(self):
         """Size of dataset."""
@@ -836,14 +850,6 @@ class Dataset(DatasetBase):
 
         fileobj.write( "''')\n" )
 
-    def uiConvertToDataItem(self, val):
-        """Return a value cast to this dataset data type."""
-        if isinstance(val, basestring) or isinstance(val, qt4.QString):
-            val, ok = setting.uilocale.toDouble(val)
-            if ok: return val
-            raise ValueError, "Invalid floating point number"
-        return float(val)
-
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
         Returns deleted rows as a dict of {column:data, ...}
@@ -876,6 +882,56 @@ class Dataset(DatasetBase):
                        perr = _copyOrNone(self.perr),
                        nerr = _copyOrNone(self.nerr))
 
+class DatasetDateTime(Dataset):
+    """Dataset holding dates and times."""
+
+    columns = ('data',)
+    column_descriptions = ('Data',)
+
+    def __init__(self, data=None, linked=None):
+        Dataset.__init__(self, data=data, linked=linked)
+
+    def description(self, showlinked=True):
+        text = '%s (%i date/times)' % (self.name(), len(self.data))
+        if self.linked and showlinked:
+            text += ', linked to %s' % self.linked.filename
+        return text
+
+    def uiConvertToDataItem(self, val):
+        """Return a value cast to this dataset data type."""
+        if isinstance(val, basestring) or isinstance(val, qt4.QString):
+            v = utils.dateStringToDate( unicode(val) )
+            if not N.isfinite(v):
+                try:
+                    v = float(val)
+                except ValueError:
+                    pass
+            return v
+        else:
+            return N.nan
+
+    def uiDataItemToQVariant(self, val):
+        """Return val converted to QVariant."""
+        return qt4.QVariant(utils.dateFloatToString(val))
+
+    def saveToFile(self, fileobj, name):
+        '''Save data to file.
+        '''
+
+        if self.linked is not None:
+            # do not save if linked to a file
+            return
+
+        descriptor = datasetNameToDescriptorName(name) + '(date)'
+        fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
+        for val in self.data:
+            fileobj.write( utils.dateFloatToString(val) + '\n' )
+        fileobj.write( "''')\n" )
+
+    def returnCopy(self):
+        """Returns version of dataset with no linking."""
+        return DatasetDateTime(data=N.array(self.data))
+
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
@@ -888,8 +944,8 @@ class DatasetText(DatasetBase):
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
 
+        DatasetBase.__init__(self, linked=linked)
         self.data = list(data)
-        self.linked = linked
 
     def description(self, showlinked=True):
         text = '%s (%i items)' % (self.name(), len(self.data))
@@ -912,6 +968,10 @@ class DatasetText(DatasetBase):
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         return unicode(val)
+
+    def uiDataItemToQVariant(self, val):
+        """Return val converted to QVariant."""
+        return qt4.QVariant(unicode(val))
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
@@ -1055,9 +1115,7 @@ class DatasetExpression(Dataset):
         parametric is option and can be (minval, maxval, steps) or None
         """
 
-        self.document = None
-        self.linked = None
-        self._invalidpoints = None
+        Dataset.__init__(self, data=[])
 
         # store the expressions to use to generate the dataset
         self.expr = {}
@@ -1239,6 +1297,9 @@ class DatasetRange(Dataset):
 
         numsteps: number of steps in range
         data, serr, perr and nerr are tuples containing (start, stop) values."""
+
+        Dataset.__init__(self, data=[])
+
         self.range_data = data
         self.range_serr = serr
         self.range_perr = perr
@@ -1257,10 +1318,6 @@ class DatasetRange(Dataset):
             else:
                 vals = None
             setattr(self, name, vals)
-
-        self.document = None
-        self.linked = None
-        self._invalidpoints = None
 
     def __getitem__(self, key):
         """Return a dataset based on this dataset
@@ -1343,10 +1400,8 @@ class Dataset2DXYZExpression(Dataset2D):
         """Initialise dataset.
 
         Parameters are mathematical expressions based on datasets."""
+        Dataset2D.__init__(self)
 
-        self.document = None
-        self.linked = None
-        self._invalidpoints = None
         self.lastchangeset = -1
         self.cacheddata = None
         
@@ -1476,8 +1531,9 @@ class Dataset2DExpression(Dataset2D):
 
     def __init__(self, expr):
         """Create 2d expression dataset."""
-        self.document = None
-        self.linked = None
+
+        Dataset2D.__init__(self)
+
         self.expr = expr
         self.lastchangeset = -1
         self.cachedexpr = None
@@ -1596,9 +1652,7 @@ class Dataset2DXYFunc(Dataset2D):
         expr: expression of x and y
         """
 
-        self.document = None
-        self.linked = None
-        self._invalidpoints = None
+        Dataset2D.__init__(self)
 
         self.xstep = xstep
         self.ystep = ystep

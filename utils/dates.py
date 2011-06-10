@@ -86,6 +86,13 @@ def floatToDateTime(f):
     frac, sec = math.modf(f - days*24*60*60)
     return datetime.timedelta(days,  sec,  frac*1e6) + offsetdate
     
+def dateFloatToString(f):
+    """Convert date float to string."""
+    if N.isfinite(f):
+        return floatToDateTime(f).isoformat()
+    else:
+        return unicode(f)
+
 def datetimeToTuple(dt):
     """Return tuple (year,month,day,hour,minute,second,microsecond) from
     datetime object."""

@@ -74,13 +74,11 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             if index.row() == len(data):
                 return qt4.QVariant()
 
+            # convert data to QVariant
             d = data[index.row()]
-            if isinstance(d, basestring):
-                return qt4.QVariant(d)
-            else:
-                # value needs converting to float as QVariant doesn't
-                # support numpy numeric types
-                return qt4.QVariant(float(d))
+            return ds.uiDataItemToQVariant(d)
+
+        # empty entry
         return qt4.QVariant()
 
     def headerData(self, section, orientation, role):
@@ -271,7 +269,8 @@ class DataEditDialog(VeuszDialog):
         # menu for new button
         self.newmenu = qt4.QMenu()
         for text, slot in ( ('Numerical dataset', self.slotNewNumericalDataset),
-                            ('Text dataset', self.slotNewTextDataset) ):
+                            ('Text dataset', self.slotNewTextDataset),
+                            ('Date/time dataset', self.slotNewDateDataset) ):
             a = self.newmenu.addAction(text)
             self.connect(a, qt4.SIGNAL('triggered()'), slot)
         self.newbutton.setMenu(self.newmenu)
@@ -422,8 +421,12 @@ class DataEditDialog(VeuszDialog):
         self.newDataset( document.Dataset(data=[0.]) )
 
     def slotNewTextDataset(self):
-        """Add new value dataset."""
+        """Add new text dataset."""
         self.newDataset( document.DatasetText(data=['']) )
+
+    def slotNewDateDataset(self):
+        """Add new date dataset."""
+        self.newDataset( document.DatasetDateTime(data=[]) )
 
     def newDataset(self, ds):
         """Add new dataset to document."""
