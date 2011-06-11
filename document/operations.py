@@ -203,6 +203,7 @@ class OperationWidgetDelete(object):
         
         self.oldwidget = document.resolveFullWidgetPath(self.widgetpath)
         oldparent = self.oldwidget.parent
+        self.oldwidget.parent = None
         self.oldparentpath = oldparent.path
         self.oldindex = oldparent.children.index(self.oldwidget)
         oldparent.removeChild(self.oldwidget.name)
@@ -211,6 +212,7 @@ class OperationWidgetDelete(object):
         """Restore deleted widget."""
         
         oldparent = document.resolveFullWidgetPath(self.oldparentpath)
+        self.oldwidget.parent = oldparent
         oldparent.addChild(self.oldwidget, index=self.oldindex)
 
 class OperationWidgetsDelete(object):

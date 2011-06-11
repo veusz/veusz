@@ -284,6 +284,7 @@ class MainWindow(qt4.QMainWindow):
         """Undo the previous operation"""
         if self.document.canUndo():
             self.document.undoOperation()
+        self.treeedit.checkWidgetSelected()
         
     def slotEditRedo(self):
         """Redo the previous operation"""

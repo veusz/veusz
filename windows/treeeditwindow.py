@@ -628,7 +628,6 @@ class TreeEditDock(qt4.QDockWidget):
         if not self.selwidgets:
             return
 
-        # FIXME: update
         m = qt4.QMenu(self)
         for act in ('edit.cut', 'edit.copy', 'edit.paste',
                     'edit.moveup', 'edit.movedown', 'edit.delete',
@@ -972,6 +971,11 @@ class TreeEditDock(qt4.QDockWidget):
                 for w in widgets ]
         descr = ('show', 'hide')[hideshow]
         self.document.applyOperation(document.OperationMultiple(ops, descr=descr))
+
+    def checkWidgetSelected(self):
+        """Check widget is selected."""
+        if len(self.treeview.selectionModel().selectedRows()) == 0:
+            self.selectWidget(self.document.basewidget)
 
 class SettingLabel(qt4.QWidget):
     """A label to describe a setting.
