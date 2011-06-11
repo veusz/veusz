@@ -177,15 +177,19 @@ class FunctionPlotter(GenericPlotter):
             varaxrange[1] = min(s.max, varaxrange[1])
 
         # work out function in steps
-        if axis.settings.log:
-            # log spaced steps 
-            l1, l2 = N.log(varaxrange[1]), N.log(varaxrange[0])
-            delta = (l2-l1)/20.
-            points = N.exp(N.arange(l1, l2+delta, delta))
-        else:
-            # linear spaced steps
-            delta = (varaxrange[1] - varaxrange[0])/20.
-            points = N.arange(varaxrange[0], varaxrange[1]+delta, delta)
+        try:
+            if axis.settings.log:
+                # log spaced steps 
+                l1, l2 = N.log(varaxrange[1]), N.log(varaxrange[0])
+                delta = (l2-l1)/20.
+                points = N.exp(N.arange(l1, l2+delta, delta))
+            else:
+                # linear spaced steps
+                delta = (varaxrange[1] - varaxrange[0])/20.
+                points = N.arange(varaxrange[0], varaxrange[1]+delta, delta)
+        except ZeroDivisionError:
+            # delta is zero
+            return
 
         env = self.initEnviron()
         env[s.variable] = points
