@@ -665,7 +665,7 @@ def makePartTree(partlist):
                         # both super and subscript indicies
                         # e.g. X^{(q)}_{i}
                         if isinstance(itemlist[-1], PartMultiScript):
-                            itemlist[-1].append( klass(partargs) )
+                            itemlist.append( klass(partargs) )
                         else:
                             itemlist[-1] = PartMultiScript([itemlist[-1], klass(partargs)])
                     else:
