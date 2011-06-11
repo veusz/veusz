@@ -158,7 +158,7 @@ class BarPlotter(GenericPlotter):
                     return (None, None)
                 p = N.arange( max([len(d.data) for d in lengths]) )+1.
             else:
-                p = positions
+                p = positions.data
             
             return (labels, p)
 
