@@ -297,6 +297,9 @@ class DatasetRelationModel(TreeModel):
         """Rename dataset."""
         dsnode = self.objFromIndex(idx)
         newname = unicode(data.toString())
+        if not utils.validateDatasetName(newname):
+            return False
+
         self.doc.applyOperation(
             document.OperationDatasetRename(dsnode.data[0], newname))
         self.emit(

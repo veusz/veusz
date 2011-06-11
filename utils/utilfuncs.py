@@ -60,7 +60,7 @@ def validateDatasetName(name):
     """Validate dataset name is okay.
     Dataset names can contain anything except back ticks!
     """
-    return len(name) > 0 and name.find('`') == -1
+    return len(name.strip()) > 0 and name.find('`') == -1
 
 def validateWidgetName(name):
     """Validate widget name is okay.
