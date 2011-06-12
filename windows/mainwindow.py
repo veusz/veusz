@@ -513,6 +513,8 @@ class MainWindow(qt4.QMainWindow):
         editmenu = [
             'edit.undo', 'edit.redo',
             '',
+            ['edit.select', '&Select', []],
+            '',
             'edit.prefs', 'edit.stylesheet', 'edit.custom',
             ''
             ]

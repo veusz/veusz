@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -629,6 +630,12 @@ class TreeEditDock(qt4.QDockWidget):
             return
 
         m = qt4.QMenu(self)
+
+        # selection
+        m.addMenu(self.parent.menus['edit.select'])
+        m.addSeparator()
+
+        # actions on widget(s)
         for act in ('edit.cut', 'edit.copy', 'edit.paste',
                     'edit.moveup', 'edit.movedown', 'edit.delete',
                     'edit.rename'):
@@ -814,6 +821,9 @@ class TreeEditDock(qt4.QDockWidget):
                                  'edit.moveup', 'edit.movedown',
                                  'edit.delete', 'edit.rename'))
 
+        self.connect( self.parent.menus['edit.select'],
+                      qt4.SIGNAL('aboutToShow()'), self.updateSelectMenu )
+
     def slotMakeWidgetButton(self, wc):
         """User clicks button to make widget."""
         self.makeWidget(wc.typename)
@@ -976,6 +986,53 @@ class TreeEditDock(qt4.QDockWidget):
         """Check widget is selected."""
         if len(self.treeview.selectionModel().selectedRows()) == 0:
             self.selectWidget(self.document.basewidget)
+
+    def _selectWidgetsTypeAndOrName(self, wtype, wname):
+        """Select widgets with type or name given.
+        Give None if you don't care for either."""
+        def selectwidget(path, w):
+            """Select widget if of type or name given."""
+            if ( (wtype is None or w.typename == wtype) and
+                 (wname is None or w.name == wname) ):
+                idx = self.treemodel.getWidgetIndex(w)
+                self.treeview.selectionModel().select(
+                    idx, qt4.QItemSelectionModel.Select |
+                    qt4.QItemSelectionModel.Rows)
+
+        self.document.walkNodes(selectwidget, nodetypes=('widget',))
+
+    def _selectWidgetSiblings(self, w, wtype):
+        """Select siblings of widget given with type."""
+        for c in w.parent.children:
+            if c is not w and c.typename == wtype:
+                idx = self.treemodel.getWidgetIndex(c)
+                self.treeview.selectionModel().select(
+                    idx, qt4.QItemSelectionModel.Select |
+                    qt4.QItemSelectionModel.Rows)
+                
+    def updateSelectMenu(self):
+        """Update edit.select menu."""
+        menu = self.parent.menus['edit.select']
+        menu.clear()
+
+        if len(self.selwidgets) == 0:
+            return
+
+        wtype = self.selwidgets[0].typename
+        name = self.selwidgets[0].name
+
+        menu.addAction(
+            "All '%s' widgets" % wtype,
+            lambda: self._selectWidgetsTypeAndOrName(wtype, None))
+        menu.addAction(
+            "Siblings of '%s' with type '%s'" % (name, wtype),
+            lambda: self._selectWidgetSiblings(self.selwidgets[0], wtype))
+        menu.addAction(
+            "All '%s' widgets called '%s'" % (wtype, name),
+            lambda: self._selectWidgetsTypeAndOrName(wtype, name))
+        menu.addAction(
+            "All widgets called '%s'" % name,
+            lambda: self._selectWidgetsTypeAndOrName(None, name))
 
 class SettingLabel(qt4.QWidget):
     """A label to describe a setting.
