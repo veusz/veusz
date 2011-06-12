@@ -289,7 +289,7 @@ class DatasetRelationModel(TreeModel):
         f = TreeModel.flags(self, idx)
         # allow dataset names to be edited
         if ( idx.isValid() and isinstance(self.objFromIndex(idx), DatasetNode)
-             and not self.readonly ):
+             and not self.readonly and idx.column() == 0 ):
             f |= qt4.Qt.ItemIsEditable
         return f
 
@@ -342,7 +342,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                                           filterdtype=filterdtype)
 
         self.setModel(self.model)
-        self.setSelectionBehavior(qt4.QTreeView.SelectItems)
+        self.setSelectionBehavior(qt4.QTreeView.SelectRows)
         self.setUniformRowHeights(True)
         self.setContextMenuPolicy(qt4.Qt.CustomContextMenu)
         if not readonly:
@@ -391,7 +391,8 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         for idx in matches:
             if isinstance(self.model.objFromIndex(idx), DatasetNode):
                 self.selectionModel().setCurrentIndex(
-                    idx, qt4.QItemSelectionModel.SelectCurrent)
+                    idx, qt4.QItemSelectionModel.SelectCurrent |
+                    qt4.QItemSelectionModel.Rows )
 
     def showContextMenu(self, pt):
         """Context menu for nodes."""
