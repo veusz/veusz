@@ -192,25 +192,35 @@ class EMFPaintEngine(qt4.QPaintEngine):
           self.emf.BeginPath()
           count = path.elementCount()
           i = 0
+          #print "Start path"
           while i < count:
                e = path.elementAt(i)
                if e.type == qt4.QPainterPath.MoveToElement:
                     self.emf.MoveTo(e.x*scale, e.y*scale)
+                    #print "M", e.x*scale, e.y*scale
                elif e.type == qt4.QPainterPath.LineToElement:
                     self.emf.LineTo(e.x*scale, e.y*scale)
+                    #print "L", e.x*scale, e.y*scale
                elif e.type == qt4.QPainterPath.CurveToElement:
                     e1 = path.elementAt(i+1)
                     e2 = path.elementAt(i+2)
-                    self.emf.PolyBezierTo((
-                              (e.x*scale, e.y*scale),
+                    params = ((e.x*scale, e.y*scale),
                               (e1.x*scale, e1.y*scale),
-                              (e2.x*scale, e2.y*scale)))
+                              (e2.x*scale, e2.y*scale))
+                    self.emf.PolyBezierTo(params)
+                    #print "C", params
+                              
                     i += 2
                else:
                     assert False
 
                i += 1
-          self.emf.CloseFigure()
+
+          ef = path.elementAt(0)
+          el = path.elementAt(count-1)
+          if ef.x == el.x and ef.y == el.y:
+               self.emf.CloseFigure()
+               #print "closing"
           self.emf.EndPath()
 
      def drawPath(self, path):
