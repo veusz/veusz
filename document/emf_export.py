@@ -83,7 +83,12 @@ class EMFPaintEngine(qt4.QPaintEngine):
      "Custom EMF paint engine."""
 
      def __init__(self, width_in, height_in, dpi=75):
-          qt4.QPaintEngine.__init__(self)
+          qt4.QPaintEngine.__init__(self,
+                                    qt4.QPaintEngine.Antialiasing |
+                                    qt4.QPaintEngine.PainterPaths |
+                                    qt4.QPaintEngine.PrimitiveTransform |
+                                    qt4.QPaintEngine.PaintOutsidePaintEvent |
+                                    qt4.QPaintEngine.PatternBrush )
           self.width = width_in
           self.height = height_in
           self.dpi = dpi
@@ -181,8 +186,6 @@ class EMFPaintEngine(qt4.QPaintEngine):
           epix.unhandleddata = dib
 
           self.emf._append(epix)
-
-          # print "pixmap", r, pixmap, sr, pixmap.width(), pixmap.height()
 
      def _createPath(self, path):
           """Convert qt path to emf path"""
@@ -342,9 +345,6 @@ class EMFPaintEngine(qt4.QPaintEngine):
 
      def _updateTransform(self, m):
           """Update transformation."""
-          # print "transform", (m.m11(), m.m12(),
-          #                     m.m21(), m.m22(),
-          #                     m.dx(), m.dy())
           self.emf.SetWorldTransform(m.m11(), m.m12(),
                                      m.m21(), m.m22(),
                                      m.dx()*scale, m.dy()*scale)
@@ -367,15 +367,6 @@ class EMFPaintEngine(qt4.QPaintEngine):
 
      def type(self):
           return qt4.QPaintEngine.PostScript
-
-     def hasFeature(self, f):
-          return f in (
-               qt4.QPaintEngine.Antialiasing,
-               qt4.QPaintEngine.PainterPaths,
-               qt4.QPaintEngine.PrimitiveTransform,
-               qt4.QPaintEngine.PaintOutsidePaintEvent,
-               qt4.QPaintEngine.PatternBrush,
-               )
 
 class EMFPaintDevice(qt4.QPaintDevice):
      """Paint device for EMF paint engine."""
@@ -438,45 +429,3 @@ class EMFPaintDevice(qt4.QPaintDevice):
                return self.physicalDpiX()
           elif m & qt4.QPaintDevice.PdmPhysicalDpiY:
                return self.physcialDpiY()
-
-def main():
-     app = qt4.QApplication(sys.argv)
-
-     device = EMFPaintDevice(5,5)
-     p = qt4.QPainter(device)
-
-     pen = qt4.QPen(qt4.Qt.CustomDashLine)
-     pen.setWidth(2)
-     pen.setColor(qt4.Qt.red)
-     pen.setDashPattern([1,6])
-     p.setPen(pen)
-
-     p.drawLines( [qt4.QLineF(0, 0, 100, 100), qt4.QLineF(100,100,200,200)] )
-     p.drawLine( qt4.QLineF(200,200,300,300))
-
-#      p.setBrush(qt4.QBrush(qt4.Qt.red))
-#      p.setPen(qt4.QPen(qt4.QBrush(qt4.Qt.green), 3.))
-#      p.save()
-#      p.setClipRect( qt4.QRectF( qt4.QPointF(0,0), qt4.QPointF(70,70)))
-#      p.drawPolygon(qt4.QPolygonF([qt4.QPointF(0,0), qt4.QPointF(100,0),
-#                                   qt4.QPointF(0,100), qt4.QPointF(100,100)]))
-#      p.setBrush(qt4.QBrush(qt4.Qt.blue))
-#      p.drawEllipse(qt4.QRectF(200,200,50,50))
-#      p.restore()
-
-#      p.setPen(qt4.QPen(qt4.Qt.blue))
-#      p.setFont(qt4.QFont("Arial", 60))
-#      p.drawText(100, 100, "Hi there")
-
-#      x = qt4.QPixmap(10,10)
-#      x.fill(qt4.Qt.red)
-#      p.drawPixmap(50,50,100,100,x)
-#      p.setPen(qt4.QPen(qt4.QBrush(qt4.Qt.black), 1.))
-#      p.drawRect(50,50,100,100)
-
-     p.end()
-
-     device.paintEngine().saveFile("out.emf")
-
-if __name__ == '__main__':
-     main()
