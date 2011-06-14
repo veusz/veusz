@@ -262,19 +262,20 @@ class EMFPaintEngine(qt4.QPaintEngine):
                    qt4.Qt.DashDotDotLine: pyemf.PS_DASHDOTDOT,
                    qt4.Qt.CustomDashLine: pyemf.PS_USERSTYLE}[pen.style()]
 
-          # set cap style
-          style |= {qt4.Qt.FlatCap: pyemf.PS_ENDCAP_FLAT,
-                    qt4.Qt.SquareCap: pyemf.PS_ENDCAP_SQUARE,
-                    qt4.Qt.RoundCap: pyemf.PS_ENDCAP_ROUND}[pen.capStyle()]
+          if style != pyemf.PS_NULL:
+               # set cap style
+               style |= {qt4.Qt.FlatCap: pyemf.PS_ENDCAP_FLAT,
+                         qt4.Qt.SquareCap: pyemf.PS_ENDCAP_SQUARE,
+                         qt4.Qt.RoundCap: pyemf.PS_ENDCAP_ROUND}[pen.capStyle()]
 
-          # set join style
-          style |= {qt4.Qt.MiterJoin: pyemf.PS_JOIN_MITER,
-                    qt4.Qt.BevelJoin: pyemf.PS_JOIN_BEVEL,
-                    qt4.Qt.RoundJoin: pyemf.PS_JOIN_ROUND,
-                    qt4.Qt.SvgMiterJoin: pyemf.PS_JOIN_MITER}[pen.joinStyle()]
+               # set join style
+               style |= {qt4.Qt.MiterJoin: pyemf.PS_JOIN_MITER,
+                         qt4.Qt.BevelJoin: pyemf.PS_JOIN_BEVEL,
+                         qt4.Qt.RoundJoin: pyemf.PS_JOIN_ROUND,
+                         qt4.Qt.SvgMiterJoin: pyemf.PS_JOIN_MITER}[pen.joinStyle()]
 
-          # use proper widths of lines
-          style |= pyemf.PS_GEOMETRIC
+               # use proper widths of lines
+               style |= pyemf.PS_GEOMETRIC
 
           width = pen.widthF()*scale
           qc = pen.color()
