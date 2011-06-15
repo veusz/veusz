@@ -475,6 +475,10 @@ class DatasetBase(object):
 
     # dataset type
     dstype = 'Dataset'
+    
+    # whether this dataset's columns will change without updating the document's
+    # changeset
+    isstable = False
 
     def __init__(self, linked=None):
         """Initialise common members."""
@@ -596,6 +600,9 @@ class Dataset2D(DatasetBase):
 
     # dataset type
     dstype = '2D'
+    
+    # the dataset is recreated if its data changes
+    isstable = True
 
     def __init__(self, data, xrange=None, yrange=None):
         '''Create a two dimensional dataset based on data.
@@ -710,6 +717,9 @@ class Dataset(DatasetBase):
     columns = ('data', 'serr', 'nerr', 'perr')
     column_descriptions = ('Data', 'Sym. errors', 'Neg. errors', 'Pos. errors')
     dstype = '1D'
+
+    # the dataset is recreated if its data changes
+    isstable = True
 
     def __init__(self, data = None, serr = None, nerr = None, perr = None,
                  linked = None):
@@ -835,7 +845,8 @@ class Dataset(DatasetBase):
         for x in (self.serr, self.nerr, self.perr):
             assert x is None or x.shape == s
 
-        self.document.setModified(True)
+        # tell the document that we've changed
+        self.document.modifiedData(self)
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
@@ -887,6 +898,7 @@ class Dataset(DatasetBase):
                 retn[col] = coldata[row:row+numrows]
                 setattr(self, col, N.delete( coldata, N.s_[row:row+numrows] ))
         
+        self.document.modifiedData(self)
         return retn
 
     def insertRows(self, row, numrows, rowdata):
@@ -901,6 +913,8 @@ class Dataset(DatasetBase):
             if coldata is not None:
                 setattr(self, col, N.insert(coldata, [row]*numrows, data))
 
+        self.document.modifiedData(self)
+
     def returnCopy(self):
         """Return version of dataset with no linking."""
         return Dataset(data = _copyOrNone(self.data),
@@ -913,6 +927,7 @@ class DatasetDateTime(Dataset):
 
     columns = ('data',)
     column_descriptions = ('Data',)
+    isstable = True
 
     dstype = 'Date'
 
@@ -973,6 +988,7 @@ class DatasetText(DatasetBase):
     columns = ('data',)
     column_descriptions = ('Data',)
     dstype = 'Text'
+    isstable = True
 
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
@@ -996,7 +1012,7 @@ class DatasetText(DatasetBase):
         else:
             raise ValueError, 'type does not contain an allowed value'
 
-        self.document.setModified(True)
+        self.document.modifiedData(self)
     
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
@@ -1034,6 +1050,8 @@ class DatasetText(DatasetBase):
         """
         retn = {'data': self.data[row:row+numrows]}
         del self.data[row:row+numrows]
+        
+        self.document.modifiedData(self)
         return retn
 
     def insertRows(self, row, numrows, rowdata):
@@ -1045,6 +1063,8 @@ class DatasetText(DatasetBase):
         insdata = data + (['']*(numrows-len(data)))
         for d in insdata[::-1]:
             self.data.insert(row, d)
+
+        self.document.modifiedData(self)
 
     def returnCopy(self):
         """Returns version of dataset with no linking."""
@@ -1330,6 +1350,7 @@ class DatasetRange(Dataset):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
 
     dstype = 'Range'
+    isstable = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
         """Construct dataset.

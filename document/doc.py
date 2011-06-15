@@ -82,7 +82,10 @@ class Document( qt4.QObject ):
             Document.loadPlugins()
             Document.pluginsloaded = True
 
-        self.changeset = 0          # increased when the document changes
+        self.changeset = 0            # increased when the document changes
+
+        self.datachangeset = 0        # increased whan any dataset changes
+        self.datachangesets = dict()  # each dataset has an associated change se
 
         # if set, do not notify listeners of updates
         # wait under enableUpdates
@@ -265,13 +268,30 @@ class Document( qt4.QObject ):
         """Set data to val, with symmetric or negative and positive errors."""
         self.data[name] = dataset
         dataset.document = self
+        
+        # update the change tracking
+        cs = self.datachangesets.get(name, 0)
+        self.datachangesets[name] = cs + 1
+        self.datachangeset += 1
         self.setModified()
     
     def deleteData(self, name):
         """Remove a dataset"""
         if name in self.data:
             del self.data[name]
+            
+            # don't remove the changeset tracker, in case this action is later undone
+            self.datachangesets[name] += 1
+            self.datachangeset += 1
             self.setModified()
+
+    def modifiedData(self, dataset):
+        """The named dataset was modified"""
+        for name, ds in self.data.iteritems():
+            if ds is dataset:
+                self.datachangesets[name] += 1
+                self.datachangeset += 1
+                self.setModified()
 
     def getLinkedFiles(self, filenames=None):
         """Get a list of LinkedFile objects used by the document.
