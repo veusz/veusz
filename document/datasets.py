@@ -152,7 +152,7 @@ class LinkedFileBase(object):
 
         for name, ds in document.data.items():
             if ds.linked == self:
-                del document.data[name]
+                document.deleteData(name)
 
     def _moveReadDatasets(self, tempdoc, document):
         """Move datasets from tempdoc to document if they do not exist
@@ -162,10 +162,9 @@ class LinkedFileBase(object):
         for name, ds in tempdoc.data.items():
             if name not in document.data:
                 read.append(name)
-                document.data[name] = ds
+                document.setData(name, ds)
                 ds.document = document
                 ds.linked = self
-        document.setModified(True)
         return read
 
     def _reloadViaOperation(self, document, op):

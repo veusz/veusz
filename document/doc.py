@@ -266,6 +266,12 @@ class Document( qt4.QObject ):
         self.data[name] = dataset
         dataset.document = self
         self.setModified()
+    
+    def deleteData(self, name):
+        """Remove a dataset"""
+        if name in self.data:
+            del self.data[name]
+            self.setModified()
 
     def getLinkedFiles(self, filenames=None):
         """Get a list of LinkedFile objects used by the document.

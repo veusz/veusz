@@ -291,23 +291,23 @@ class OperationDatasetHistogram(object):
 
         if self.outvalues != '':
             self.oldvaluesds = document.data.get(self.outvalues, None)
-            document.data[self.outvalues] =  gen.getValueDataset()
+            document.setData(self.outvalues, gen.getValueDataset())
 
         if self.outposns != '':
             self.oldposnsds = document.data.get(self.outposns, None)
-            document.data[self.outposns] = gen.getBinDataset()
+            document.setData(self.outposns, gen.getBinDataset())
 
     def undo(self, document):
         """Undo creation of datasets."""
 
         if self.oldposnsds is not None:
             if self.outposns != '':
-                document.data[self.outposns] = self.oldposnsds
+                document.setData(self.outposns, self.oldposnsds)
         else:
-            del document.data[self.outposns]
+            document.deleteData(self.outposns)
 
         if self.oldvaluesds is not None:
             if self.outvalues != '':
-                document.data[self.outvalues] = self.oldvaluesds
+                document.setData(self.outvalues, self.oldvaluesds)
         else:
-            del document.data[self.outvalues]
+            document.deleteData(self.outvalues)
