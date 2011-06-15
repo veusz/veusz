@@ -75,7 +75,11 @@ class TextLabel(plotters.FreePlotter):
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
     cnvtalignvert = { 'top': 1, 'centre': 0, 'bottom': -1 }
 
-    def draw(self, posn, phelper, outerbounds = None):
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('xPos'), s.get('yPos'), s.get('label'))
+
+    def draw(self, posn, painter, outerbounds = None):
         """Draw the text label."""
 
         s = self.settings

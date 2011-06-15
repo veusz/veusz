@@ -100,6 +100,10 @@ class VectorField(plotters.GenericPlotter):
                                  usertext = 'Arrow fill'),
                pixmap = 'settings_plotmarkerfill' )
 
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('data1'), s.get('data2'))
+
     def providesAxesDependency(self):
         """Range information provided by widget."""
         s = self.settings

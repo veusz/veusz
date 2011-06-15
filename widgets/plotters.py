@@ -30,6 +30,8 @@ import widget
 import graph
 import page
 
+from datasetmonitor import DatasetMonitor
+
 class GenericPlotter(widget.Widget):
     """Generic plotter."""
 
@@ -40,6 +42,7 @@ class GenericPlotter(widget.Widget):
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
+        self.dsmonitor = DatasetMonitor(self.document)
 
     @classmethod
     def addSettings(klass, s):
@@ -141,6 +144,7 @@ class FreePlotter(widget.Widget):
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
+        self.dsmonitor = DatasetMonitor(self.document)
 
     @classmethod
     def addSettings(klass, s):
@@ -169,6 +173,10 @@ class FreePlotter(widget.Widget):
         s.add( setting.Axis('yAxis', 'y', 'vertical',
                             descr = 'Name of Y-axis to use',
                             usertext='Y axis') )
+
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('xPos'), s.get('yPos'))
 
     def _getPlotterCoords(self, posn):
         """Calculate coordinates from relative or axis positioning."""

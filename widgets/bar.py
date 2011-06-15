@@ -65,6 +65,7 @@ class BarPlotter(GenericPlotter):
     def __init__(self, parent, name=None):
         """Initialise bar chart."""
         GenericPlotter.__init__(self, parent, name=name)
+
         if type(self) == BarPlotter:
             self.readDefaults()
 
@@ -137,6 +138,10 @@ class BarPlotter(GenericPlotter):
         s = self.settings
         return "lengths='%s', position='%s'" % (', '.join(s.lengths), 
                                                 s.posn)
+
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('labels'), s.get('posn'), s.get('lengths'))
 
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""

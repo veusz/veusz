@@ -31,6 +31,7 @@ import pickable
 from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
 from point import MarkerFillBrush
+from datasetmonitor import DatasetMonitor
 
 class NonOrthPoint(Widget):
     '''Widget for plotting points in a non-orthogonal plot.'''
@@ -44,6 +45,7 @@ class NonOrthPoint(Widget):
     def __init__(self, parent, name=None):
         """Initialise plotter."""
         Widget.__init__(self, parent, name=name)
+        self.dsmonitor = DatasetMonitor(self.document)
         if type(self) == NonOrthPoint:
             self.readDefaults()
 
@@ -100,6 +102,10 @@ class NonOrthPoint(Widget):
                                   descr = 'Label settings',
                                   usertext='Label'),
                pixmap = 'settings_axislabel' )
+
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('data1'), s.get('data2'), s.get('scalePoints'))
 
     def updateDataRanges(self, inrange):
         '''Extend inrange to range of data.'''

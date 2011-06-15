@@ -303,6 +303,11 @@ class PointPlotter(GenericPlotter):
                                   usertext='Label'),
                pixmap = 'settings_axislabel' )
 
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('labels'), s.get('scalePoints'),
+                    s.get('yData'), s.get('xData'))
+
     def _getUserDescription(self):
         """User-friendly description."""
 

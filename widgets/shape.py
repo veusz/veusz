@@ -77,6 +77,11 @@ class BoxShape(Shape):
                                           formatting=False), 5 )
 
 
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('xPos'), s.get('yPos'),
+                    s.get('width'), s.get('height'), s.get('rotate'))
+
     def drawShape(self, painter, rect):
         pass
 

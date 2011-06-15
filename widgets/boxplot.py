@@ -216,6 +216,12 @@ class BoxPlot(GenericPlotter):
                                   usertext = 'Markers fill'),
                pixmap = 'settings_plotmarkerfill' )
 
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('labels'), s.get('posn'), s.get('values'),
+            s.get('whiskermax'), s.get('whiskermin'), s.get('boxmax'), s.get('boxmin'),
+            s.get('median'), s.get('mean'))
+
     @property
     def userdescription(self):
         """Friendly description for user."""

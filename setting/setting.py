@@ -1039,6 +1039,9 @@ class Dataset(Str):
              d.dimensions == self.dimensions ):
                  return d
 
+    def isDataset(self, doc):
+        return True
+
 class Strings(Setting):
     """A multiple set of strings."""
 
@@ -1120,6 +1123,9 @@ class Datasets(Setting):
                  d.dimensions == self.dimensions ):
                 out.append(d)
         return out
+
+    def isDataset(self, doc):
+        return True
 
 class DatasetOrFloatList(Dataset):
     """Choose a dataset or specify a list of float values."""
@@ -1211,6 +1217,13 @@ class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
 
     typename = 'dataset-or-str'
+
+    def isDataset(self, doc):
+        """Is this setting a dataset?"""
+        ds = doc.data.get(self.val)
+        if ds and ds.datatype == self.datatype:
+            return True
+        return False
 
     def getData(self, doc, checknull=False):
         """Return either a list of strings, a single item list.

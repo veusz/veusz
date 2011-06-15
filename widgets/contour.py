@@ -212,6 +212,10 @@ class Contour(plotters.GenericPlotter):
 
         s.remove('key')
 
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('data'))
+
     def _getUserDescription(self):
         """User friendly description."""
         s = self.settings

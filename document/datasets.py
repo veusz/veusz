@@ -1166,6 +1166,7 @@ class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
     dstype = 'Expression'
+    isstable = False
 
     def __init__(self, data=None, serr=None, nerr=None, perr=None,
                  parametric=None):
@@ -1456,6 +1457,7 @@ class Dataset2DXYZExpression(Dataset2D):
     '''A 2d dataset with expressions for x, y and z.'''
 
     dstype = '2D XYZ'
+    isstable = False
 
     def __init__(self, exprx, expry, exprz):
         """Initialise dataset.
@@ -1589,6 +1591,7 @@ class Dataset2DExpression(Dataset2D):
     """Evaluate an expression of 2d datasets."""
 
     dstype = '2D Expr'
+    isstable = False
 
     def __init__(self, expr):
         """Create 2d expression dataset."""
@@ -1703,6 +1706,7 @@ class Dataset2DXYFunc(Dataset2D):
     """
 
     dstype = '2D f(x,y)'
+    isstable = False
 
     def __init__(self, xstep, ystep, expr):
         """Create 2d dataset:
@@ -1838,6 +1842,8 @@ class _DatasetPlugin(object):
 
 class Dataset1DPlugin(_DatasetPlugin, Dataset):
     """Return 1D dataset from a plugin."""
+    
+    isstable = False
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
@@ -1871,6 +1877,8 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
 class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
     """Return 2D dataset from a plugin."""
 
+    isstable = False
+
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset2D.__init__(self, [[]])
@@ -1887,6 +1895,8 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     """Return text dataset from a plugin."""
+    
+    isstable = False
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)

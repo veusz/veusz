@@ -78,6 +78,10 @@ class Line(plotters.FreePlotter):
                              usertext='Arrow left', formatting=True), 0)
 
 
+    def dataHasChanged(self):
+        s = self.settings
+        return self.dsmonitor.hasChanged(s.get('length'), s.get('angle'))
+
     def draw(self, posn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
 
