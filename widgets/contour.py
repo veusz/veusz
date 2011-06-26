@@ -383,7 +383,7 @@ class Contour(plotters.GenericPlotter):
 
         # return if no data or if the dataset isn't two dimensional
         data = d.data.get(s.data, None)
-        if data is None or data.dimensions != 2:
+        if data is None or data.dimensions != 2 or data.data.size == 0:
             self.contsettings = self.lastdataset = None
             s.levelsOut = []
             return False
