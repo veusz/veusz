@@ -608,8 +608,8 @@ class Dataset2D(DatasetBase):
         if not hasattr(self, 'data'):
             try:
                 self.data = _convertNumpy(data)
-                self.xrange = (0, data.shape[1])
-                self.yrange = (0, data.shape[0])
+                self.xrange = (0, self.data.shape[1])
+                self.yrange = (0, self.data.shape[0])
 
                 if xrange:
                     self.xrange = xrange
