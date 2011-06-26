@@ -21,20 +21,20 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
 Changes in 1.12:
- * Multiple widgets can now be selected for editing properties together
+ * Multiple widgets can now be selected for editing properties
  * Add Edit->Select menu and context menu for above
  * Added context menu on dataset browser for filenames to reload,
    delete or unlink all associated datasets
  * New tree-like dataset browsing widget is shown in data edit dialog
  * Importing 1D fits images is now supported
- * Date / time data now use a new dataset type
+ * Date / time data has its own dataset type
  * The data edit dialog box can create or edit date/time data in
    human-readable form
 
 Minor improvements:
  * Add LaTeX commands \cdot, \nabla, \overline plus some arrows
  * Inform user in exception dialog if a new version is available
- * Add New linevertbar and linehorzbar error bar styles
+ * Add linevertbar and linehorzbar error bar styles
 
 Bug fixes:
  * Fix crash on filling filled error regions if no error bars
@@ -54,6 +54,7 @@ Bug fixes:
  * Do not allow dataset names to be invalid after remaining
  * Several EMF format bug fixes, including not showing hidden lines
    and not connecting points making curves
+ * Stop crash when contouring zero-sized datasets
 
 Features of package:
  * X-Y plots (with errorbars)
