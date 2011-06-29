@@ -322,7 +322,6 @@ class EMFPaintEngine(qt4.QPaintEngine):
                except KeyError:
                     newbrush = self.emf.CreateSolidBrush(color)
                else:
-                    print "here"
                     newbrush = self.emf.CreateHatchBrush(hatch, color)
           self.emf.SelectObject(newbrush)
 
