@@ -55,11 +55,16 @@ class ImportPlugin(object):
     
     override doImport and optionally getPreview to define a new plugin
     register the class by adding to the importpluginregistry list
+    if promote_tab is set to some text, put the plugin on its own tab
+     in the import dialog using that text as the tab name
     """
 
     name = 'Import plugin'
     author = ''
     description = ''
+
+    # if set to some text, use this plugin on its own tab
+    promote_tab = None
 
     def __init__(self):
         """Override this to declare a list of input fields if required."""

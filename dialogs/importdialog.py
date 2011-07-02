@@ -598,6 +598,14 @@ class ImportTabPlugins(ImportTab):
 
     resource = 'import_plugins.ui'
 
+    def __init__(self, importdialog, promote=None):
+        """Initialise dialog. importdialog is the import dialog itself.
+
+        If promote is set to a name of a plugin, it is promoted to its own tab
+        """
+        ImportTab.__init__(self, importdialog)
+        self.promote = promote
+
     def loadUi(self):
         """Load the user interface."""
         ImportTab.loadUi(self)
@@ -612,13 +620,20 @@ class ImportTabPlugins(ImportTab):
         self.fields = []
 
         # load previous plugin
-        if 'import_plugin' in setting.settingdb:
-            try:
-                idx = names.index(setting.settingdb['import_plugin'])
-                self.pluginType.setCurrentIndex(idx)
-            except ValueError:
-                pass
+        idx = -1
+        if self.promote is None:
+            if 'import_plugin' in setting.settingdb:
+                try:
+                    idx = names.index(setting.settingdb['import_plugin'])
+                except ValueError:
+                    pass
+        else:
+            idx = names.index(self.promote)
+            self.pluginchoicewidget.hide()
 
+        if idx >= 0:
+            self.pluginType.setCurrentIndex(idx)
+        
         self.pluginChanged(-1)
 
     def getPluginFields(self):
@@ -740,6 +755,13 @@ class ImportDialog(VeuszDialog):
             ):
             w = tabclass(self)
             self.methodtab.addTab(w, tabname)
+
+        # add promoted plugins
+        for p in plugins.importpluginregistry:
+            if p.promote_tab is not None:
+                w = ImportTabPlugins(self, promote=p.name)
+                self.methodtab.addTab(w, p.promote_tab)
+
         self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
                       self.slotUpdatePreview )
 
