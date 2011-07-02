@@ -326,7 +326,64 @@ class ImportPluginQdp(ImportPlugin):
 
         return rqdp.retndata
 
+class ImportPluginNpy(ImportPlugin):
+    """For reading single datasets from NPY numpy saved files."""
+
+    name = "Numpy .npy import"
+    author = "Jeremy Sanders"
+    description = "Reads a 1D/2D numeric dataset from a NPY file"
+    file_extensions = set(['.npy'])
+
+    def __init__(self):
+        self.fields = [
+            field.FieldText("name", descr="Dataset name",
+                            default=''),
+            ]
+
+    def getPreview(self, params):
+        """Get data to show in a text box to show a preview.
+        params is a ImportPluginParams object.
+        Returns (text, okaytoimport)
+        """
+        try:
+            retn = N.load(params.filename)
+        except Exception, e:
+            return "Cannot read file", False
+
+        text = 'Array shape: %s\n' % str(retn.shape)
+        text += 'Array datatype: %s (%s)\n' % (retn.dtype.str,
+                                               str(retn.dtype))
+        text += str(retn)
+        return text, True
+
+    def doImport(self, params):
+        """Actually import data.
+        """
+
+        name = params.field_results["name"].strip()
+        if not name:
+            raise ImportPluginException("Please provide a name for the dataset")
+
+        try:
+            retn = N.load(params.filename)
+        except Exception, e:
+            raise ImportPluginException("Error while reading file: %s" % unicode(e))
+
+        try:
+            retn + 0.
+            retn = retn.astype(N.float64)
+        except TypeError:
+            raise ImportPluginException("Unsupported array type")
+
+        if retn.ndim == 1:
+            return [ ImportDataset1D(name, retn) ]
+        elif retn.ndim == 2:
+            return [ ImportDataset2D(name, retn) ]
+        else:
+            raise ImportPluginException("Unsupported dataset shape")
+
 importpluginregistry += [
+    ImportPluginNpy(),
     ImportPluginQdp(),
     ImportPluginExample(),
     ]
