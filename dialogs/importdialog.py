@@ -67,6 +67,15 @@ class ImportTab(qt4.QWidget):
         """Secondary check (after preview) for enabling import button."""
         return True
 
+    def isFiletypeSupported(self, ftype):
+        """Is the filetype supported by this tab?"""
+        return False
+
+    def useFiletype(self, ftype):
+        """If the tab can do something with the selected filetype,
+        update itself."""
+        pass
+
 class ImportTabStandard(ImportTab):
     """Standard import format tab."""
 
@@ -145,6 +154,10 @@ class ImportTabStandard(ImportTab):
         lines += self.dialog.retnDatasetInfo(dsnames)
 
         self.previewedit.setPlainText( '\n'.join(lines) )
+
+    def isFiletypeSupported(self, ftype):
+        """Is the filetype supported by this tab?"""
+        return ftype in ('.dat', '.txt')
 
 class ImportTabCSV(ImportTab):
     """For importing data from CSV files."""
@@ -283,6 +296,10 @@ class ImportTabCSV(ImportTab):
         for i, l in enumerate(lines):
             item = qt4.QTableWidgetItem(l)
             t.setItem(i, 0, item)
+
+    def isFiletypeSupported(self, ftype):
+        """Is the filetype supported by this tab?"""
+        return ftype in ('.tsv', '.csv')
 
 class ImportTab2D(ImportTab):
     """Tab for importing from a 2D data file."""
@@ -593,6 +610,10 @@ class ImportTabFITS(ImportTab):
         self.fitsimportstatus.setText("Imported dataset '%s'" % name)
         qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
 
+    def isFiletypeSupported(self, ftype):
+        """Is the filetype supported by this tab?"""
+        return ftype in ('.fit', '.fits')
+
 class ImportTabPlugins(ImportTab):
     """Tab for importing using a plugin."""
 
@@ -628,7 +649,9 @@ class ImportTabPlugins(ImportTab):
                 except ValueError:
                     pass
         else:
+            # set the correct entry for the plugin
             idx = names.index(self.promote)
+            # then hide the widget so it can't be changed
             self.pluginchoicewidget.hide()
 
         if idx >= 0:
@@ -657,7 +680,8 @@ class ImportTabPlugins(ImportTab):
     def pluginChanged(self, index):
         """Update controls based on index."""
         plugin = self.getSelectedPlugin()
-        setting.settingdb['import_plugin'] = plugin.name
+        if self.promote is None:
+            setting.settingdb['import_plugin'] = plugin.name
 
         # delete old controls
         layout = self.pluginParams.layout()
@@ -728,6 +752,34 @@ class ImportTabPlugins(ImportTab):
             out.append( doc.data[ds].description(showlinked=False) )
 
         self.pluginPreview.setPlainText('\n'.join(out))
+
+    def isFiletypeSupported(self, ftype):
+        """Is the filetype supported by this tab?"""
+
+        if self.promote is None:
+            # look through list of supported plugins to check filetypes
+            inany = False
+            for p in plugins.importpluginregistry:
+                if ftype in p.file_extensions:
+                    inany = True
+            return inany
+        else:
+            # find plugin class and check filetype
+            for p in plugins.importpluginregistry:
+                if p.name == self.promote:
+                    return ftype in p.file_extensions
+
+    def useFiletype(self, ftype):
+        """Select the plugin corresponding to the filetype."""
+
+        if self.promote is None:
+            plugin = None
+            for p in plugins.importpluginregistry:
+                if ftype in p.file_extensions:
+                    plugin = p.name
+            idx = self.pluginType.findText(plugin, qt4.Qt.MatchExactly)
+            self.pluginType.setCurrentIndex(idx)
+            self.pluginChanged(-1)
 
 class ImportDialog(VeuszDialog):
     """Dialog box for importing data.
@@ -837,20 +889,17 @@ class ImportDialog(VeuszDialog):
             fname, ftype = os.path.splitext(fname)
         ftype = ftype.lower()
 
-        tab = None
-        if ftype == '.dat' or ftype == '.txt':
-            tab = ImportTabStandard
-        elif ftype == '.csv' or ftype == '.tsv':
-            tab = ImportTabCSV
-        elif ftype == '.fits' or ftype == '.fit':
-            tab = ImportTabFITS
+        # examine from left to right
+        # promoted plugins come after plugins
+        idx = -1
+        for i in xrange(self.methodtab.count()):
+            w = self.methodtab.widget(i)
+            if w.isFiletypeSupported(ftype):
+                idx = i
 
-        # select tab
-        if tab is not None:
-            for i in xrange(self.methodtab.count()):
-                w = self.methodtab.widget(i)
-                if isinstance( self.methodtab.widget(i), tab ):
-                    self.methodtab.setCurrentIndex(i)
+        if idx >= 0:
+            self.methodtab.setCurrentIndex(idx)
+            self.methodtab.widget(idx).useFiletype(ftype)
 
     def slotUpdatePreview(self, *args):
         """Update preview window when filename or tab changed."""

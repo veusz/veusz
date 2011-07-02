@@ -66,6 +66,10 @@ class ImportPlugin(object):
     # if set to some text, use this plugin on its own tab
     promote_tab = None
 
+    # set these to get focus if a file is selected with these extensions
+    # include the dot in the extension names
+    file_extensions = set()
+
     def __init__(self):
         """Override this to declare a list of input fields if required."""
         # a list of ImportField objects to display
@@ -299,6 +303,7 @@ class ImportPluginQdp(ImportPlugin):
     name = "QDP import"
     author = "Jeremy Sanders"
     description = "Reads datasets from QDP files"
+    file_extensions = set(['.qdp'])
 
     def __init__(self):
         self.fields = [
