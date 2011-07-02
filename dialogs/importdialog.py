@@ -803,6 +803,32 @@ class ImportDialog(VeuszDialog):
         if fd.exec_() == qt4.QDialog.Accepted:
             ImportDialog.dirname = fd.directory().absolutePath()
             self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
+            self.guessImportTab()
+
+    def guessImportTab(self):
+        """Guess import tab based on filename."""
+        filename = unicode( self.filenameedit.text() )
+
+        fname, ftype = os.path.splitext(filename)
+        # strip off any gz, bz2 extensions to get real extension
+        while ftype.lower() in ('gz', 'bz2'):
+            fname, ftype = os.path.splitext(fname)
+        ftype = ftype.lower()
+
+        tab = None
+        if ftype == '.dat' or ftype == '.txt':
+            tab = ImportTabStandard
+        elif ftype == '.csv' or ftype == '.tsv':
+            tab = ImportTabCSV
+        elif ftype == '.fits' or ftype == '.fit':
+            tab = ImportTabFITS
+
+        # select tab
+        if tab is not None:
+            for i in xrange(self.methodtab.count()):
+                w = self.methodtab.widget(i)
+                if isinstance( self.methodtab.widget(i), tab ):
+                    self.methodtab.setCurrentIndex(i)
 
     def slotUpdatePreview(self, *args):
         """Update preview window when filename or tab changed."""
