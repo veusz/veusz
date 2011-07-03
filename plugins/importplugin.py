@@ -330,6 +330,10 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
     """Convert a numpy array to plugin returns."""
 
     try:
+        val.shape
+    except AttributeError:
+        raise ImportPluginException("Not the correct format file")
+    try:
         val + 0.
         val = val.astype(N.float64)
     except TypeError:
@@ -356,9 +360,9 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
 class ImportPluginNpy(ImportPlugin):
     """For reading single datasets from NPY numpy saved files."""
 
-    name = "Numpy .npy import"
+    name = "Numpy NPY import"
     author = "Jeremy Sanders"
-    description = "Reads a 1D/2D numeric dataset from a NPY file"
+    description = "Reads a 1D/2D numeric dataset from a Numpy NPY file"
     file_extensions = set(['.npy'])
 
     def __init__(self):
@@ -381,11 +385,14 @@ class ImportPluginNpy(ImportPlugin):
         except Exception, e:
             return "Cannot read file", False
 
-        text = 'Array shape: %s\n' % str(retn.shape)
-        text += 'Array datatype: %s (%s)\n' % (retn.dtype.str,
-                                               str(retn.dtype))
-        text += str(retn)
-        return text, True
+        try:
+            text = 'Array shape: %s\n' % str(retn.shape)
+            text += 'Array datatype: %s (%s)\n' % (retn.dtype.str,
+                                                   str(retn.dtype))
+            text += str(retn)
+            return text, True
+        except AttributeError:
+            return "Not an NPY file", False
 
     def doImport(self, params):
         """Actually import data.
@@ -407,9 +414,9 @@ class ImportPluginNpy(ImportPlugin):
 class ImportPluginNpz(ImportPlugin):
     """For reading single datasets from NPY numpy saved files."""
 
-    name = "Numpy .npz import"
+    name = "Numpy NPZ import"
     author = "Jeremy Sanders"
-    description = "Reads datasets from a NPZ file."
+    description = "Reads datasets from a Numpy NPZ file."
     file_extensions = set(['.npz'])
 
     def __init__(self):
@@ -434,7 +441,7 @@ class ImportPluginNpz(ImportPlugin):
         try:
             retn.files
         except AttributeError:
-            return "Not a npz file", False
+            return "Not an NPZ file", False
 
         text = []
         for f in sorted(retn.files):
@@ -458,7 +465,7 @@ class ImportPluginNpz(ImportPlugin):
         try:
             retn.files
         except AttributeError:
-            raise ImportPluginException("File is not in .npz format")
+            raise ImportPluginException("File is not in NPZ format")
 
         # convert each of the imported arrays
         out = []
