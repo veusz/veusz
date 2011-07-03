@@ -326,6 +326,33 @@ class ImportPluginQdp(ImportPlugin):
 
         return rqdp.retndata
 
+def cnvtImportNumpyArray(name, val, errorsin2d=True):
+    """Convert a numpy array to plugin returns."""
+
+    try:
+        val + 0.
+        val = val.astype(N.float64)
+    except TypeError:
+        raise ImportPluginException("Unsupported array type")
+
+    if val.ndim == 1:
+        return ImportDataset1D(name, val)
+    elif val.ndim == 2:
+        if errorsin2d and val.shape[1] in (2, 3):
+            # return 1d array
+            if val.shape[1] == 2:
+                # use as symmetric errors
+                return ImportDataset1D(name, val[:,0], serr=val[:,1])
+            else:
+                # asymmetric errors
+                # unclear on ordering here...
+                return ImportDataset1D(name, val[:,0], perr=val[:,1],
+                                       nerr=val[:,2])
+        else:
+            return ImportDataset2D(name, val)
+    else:
+        raise ImportPluginException("Unsupported dataset shape")
+
 class ImportPluginNpy(ImportPlugin):
     """For reading single datasets from NPY numpy saved files."""
 
@@ -338,6 +365,10 @@ class ImportPluginNpy(ImportPlugin):
         self.fields = [
             field.FieldText("name", descr="Dataset name",
                             default=''),
+            field.FieldBool("errorsin2d",
+                            descr="Treat 2 and 3 column 2D arrays as\n"
+                            "data with error bars",
+                            default=True),
             ]
 
     def getPreview(self, params):
@@ -367,23 +398,79 @@ class ImportPluginNpy(ImportPlugin):
         try:
             retn = N.load(params.filename)
         except Exception, e:
-            raise ImportPluginException("Error while reading file: %s" % unicode(e))
+            raise ImportPluginException("Error while reading file: %s" %
+                                        unicode(e))
+
+        return [ cnvtImportNumpyArray(
+                name, retn, errorsin2d=params.field_results["errorsin2d"]) ]
+
+class ImportPluginNpz(ImportPlugin):
+    """For reading single datasets from NPY numpy saved files."""
+
+    name = "Numpy .npz import"
+    author = "Jeremy Sanders"
+    description = "Reads datasets from a NPZ file."
+    file_extensions = set(['.npz'])
+
+    def __init__(self):
+        self.fields = [
+            field.FieldBool("errorsin2d",
+                            descr="Treat 2 and 3 column 2D arrays as\n"
+                            "data with error bars",
+                            default=True),
+            ]
+
+    def getPreview(self, params):
+        """Get data to show in a text box to show a preview.
+        params is a ImportPluginParams object.
+        Returns (text, okaytoimport)
+        """
+        try:
+            retn = N.load(params.filename)
+        except Exception, e:
+            return "Cannot read file", False
+
+        # npz files should define this attribute
+        try:
+            retn.files
+        except AttributeError:
+            return "Not a npz file", False
+
+        text = []
+        for f in sorted(retn.files):
+            a = retn[f]
+            text.append('Name: %s' % f)
+            text.append(' Shape: %s' % str(a.shape))
+            text.append(' Datatype: %s (%s)' % (a.dtype.str, str(a.dtype)))
+            text.append('')
+        return '\n'.join(text), True
+
+    def doImport(self, params):
+        """Actually import data.
+        """
 
         try:
-            retn + 0.
-            retn = retn.astype(N.float64)
-        except TypeError:
-            raise ImportPluginException("Unsupported array type")
+            retn = N.load(params.filename)
+        except Exception, e:
+            raise ImportPluginException("Error while reading file: %s" %
+                                        unicode(e))
 
-        if retn.ndim == 1:
-            return [ ImportDataset1D(name, retn) ]
-        elif retn.ndim == 2:
-            return [ ImportDataset2D(name, retn) ]
-        else:
-            raise ImportPluginException("Unsupported dataset shape")
+        try:
+            retn.files
+        except AttributeError:
+            raise ImportPluginException("File is not in .npz format")
+
+        # convert each of the imported arrays
+        out = []
+        for f in sorted(retn.files):
+            out.append( cnvtImportNumpyArray(
+                    f, retn[f], errorsin2d=params.field_results["errorsin2d"]) )
+
+        return out
 
 importpluginregistry += [
     ImportPluginNpy(),
+    ImportPluginNpz(),
     ImportPluginQdp(),
     ImportPluginExample(),
     ]
