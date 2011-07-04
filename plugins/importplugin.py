@@ -540,7 +540,7 @@ class ImportPluginBinary(ImportPlugin):
             raise ImportPluginException("Please provide a name for the dataset")
 
         try:
-            f = open(params.filename)
+            f = open(params.filename, "rb")
             f.seek( params.field_results["offset"] )
             retn = f.read()
             f.close()
