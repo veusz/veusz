@@ -475,9 +475,88 @@ class ImportPluginNpz(ImportPlugin):
 
         return out
 
+class ImportPluginBinary(ImportPlugin):
+
+    name = "Binary import"
+    author = "Jeremy Sanders"
+    description = "Reads numerical binary files."
+    file_extensions = set(['.bin'])
+
+    def __init__(self):
+        self.fields = [
+            field.FieldText("name", descr="Dataset name",
+                            default=""),
+            field.FieldCombo("datatype", descr="Data type",
+                             items = ("float32", "float64",
+                                      "int8", "int16", "int32", "int64",
+                                      "uint8", "uint16", "uint32", "uint64"),
+                             default="float64", editable=False),
+            field.FieldCombo("endian", descr="Endian (byte order)",
+                             items = ("little", "big"), editable=False),
+            field.FieldInt("offset", descr="Offset (bytes)", default=0, minval=0),
+            field.FieldInt("length", descr="Length (values)", default=-1)
+            ]
+
+    def getNumpyDataType(self, params):
+        """Convert params to numpy datatype."""
+        t = N.dtype(params.field_results["datatype"])
+        return t.newbyteorder( {"little": "<", "big": ">"} [
+                params.field_results["endian"]] )
+
+    def getPreview(self, params):
+        """Preview of data files."""
+        try:
+            f = open(params.filename, "rb")
+            data = f.read()
+            f.close()
+        except IOError:
+            return "Cannot read file", False
+
+        text = ['File length: %i bytes' % len(data)]
+
+        def filtchr(c):
+            """Filtered character to ascii range."""
+            if ord(c) <= 32 or ord(c) > 127:
+                return '.'
+            else:
+                return c
+
+        # do a hex dump (like in CP/M)
+        for i in xrange(0, min(65536, len(data)), 16):
+            hdr = '%04X  ' % i
+            subset = data[i:i+16]
+            hexdata = ('%02X '*len(subset)) % tuple([ord(x) for x in subset])
+            chrdata = ''.join([filtchr(c) for c in subset])
+
+            text.append(hdr+hexdata + '  ' + chrdata)
+
+        return '\n'.join(text), True
+
+    def doImport(self, params):
+        """Import the data."""
+
+        name = params.field_results["name"].strip()
+        if not name:
+            raise ImportPluginException("Please provide a name for the dataset")
+
+        try:
+            f = open(params.filename)
+            f.seek( params.field_results["offset"] )
+            retn = f.read()
+            f.close()
+        except IOError, e:
+            raise ImportPluginException("Error while reading file: %s" %
+                                        unicode(e))
+
+        data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
+                            count=params.field_results["length"])
+        data = data.astype(N.float64)
+        return [ ImportDataset1D(name, data) ]
+
 importpluginregistry += [
     ImportPluginNpy(),
     ImportPluginNpz(),
     ImportPluginQdp(),
+    ImportPluginBinary(),
     ImportPluginExample(),
     ]
