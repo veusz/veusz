@@ -499,7 +499,7 @@ class ImportPluginBinary(ImportPlugin):
 
     def getNumpyDataType(self, params):
         """Convert params to numpy datatype."""
-        t = N.dtype(params.field_results["datatype"])
+        t = N.dtype(str(params.field_results["datatype"]))
         return t.newbyteorder( {"little": "<", "big": ">"} [
                 params.field_results["endian"]] )
 
