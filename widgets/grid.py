@@ -296,7 +296,7 @@ class Grid(widget.Widget):
         self.document.applyOperation(
             document.OperationMultiple(operations, descr='zero margins') )
 
-    def _drawChild(self, painter, child, bounds, parentposn):
+    def _drawChild(self, phelper, child, bounds, parentposn):
         """Draw child at correct position, with correct bounds."""
 
         # save old position, then update with calculated
@@ -324,7 +324,7 @@ class Grid(widget.Widget):
                 coutbound[3] = parentposn[3]
 
         # draw widget
-        child.draw(bounds, painter, outerbounds=coutbound)
+        child.draw(bounds, phelper, outerbounds=coutbound)
 
         # debugging
         #painter.setPen(qt4.QPen(qt4.Qt.red))
@@ -334,7 +334,7 @@ class Grid(widget.Widget):
         # restore position
         child.position = oldposn
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         """Draws the widget's children."""
 
         s = self.settings
@@ -351,27 +351,26 @@ class Grid(widget.Widget):
             self.lastdimensions = dimensions
             self.lastscalings = scalings
 
-        margins = ( s.get('leftMargin').convert(painter),
-                    s.get('topMargin').convert(painter),
-                    s.get('rightMargin').convert(painter),
-                    s.get('bottomMargin').convert(painter) )
+        margins = ( s.get('leftMargin').convert(phelper),
+                    s.get('topMargin').convert(phelper),
+                    s.get('rightMargin').convert(phelper),
+                    s.get('bottomMargin').convert(phelper) )
 
-        bounds = self.computeBounds(parentposn, painter, margins=margins)
-        maxbounds = self.computeBounds(parentposn, painter)
+        bounds = self.computeBounds(parentposn, phelper, margins=margins)
+        maxbounds = self.computeBounds(parentposn, phelper)
 
-        painter.beginPaintingWidget(self, bounds)
-        painter.endPaintingWidget()
+        painter = phelper.painter(self, bounds)
+        painter.end()
         
         # controls for adjusting grid margins
-        self.controlgraphitems = [
-            controlgraph.ControlMarginBox(self, bounds, maxbounds, painter)
-            ]
+        phelper.setControlGraph(self,[
+                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
         for child in self.children:
             if child.typename != 'axis':
-                self._drawChild(painter, child, bounds, parentposn)
+                self._drawChild(phelper, child, bounds, parentposn)
 
-        # do not call widget.Widget.draw
+        # do not call widget.Widget.draw, do not collect 200 pounds
         pass
 
     def updateControlItem(self, cgi):
