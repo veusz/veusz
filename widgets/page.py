@@ -206,8 +206,7 @@ class Page(widget.Widget):
 
         clip = qt4.QRectF( qt4.QPointF(parentposn[0], parentposn[1]),
                            qt4.QPointF(parentposn[2], parentposn[3]) )
-        painter = painthelper.painter(self, self.parent, parentposn,
-                                      clip=clip)
+        painter = painthelper.painter(self, parentposn, clip=clip)
 
         # clip to page
         bounds = widget.Widget.draw(self, parentposn, painthelper,

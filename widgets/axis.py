@@ -573,31 +573,31 @@ class Axis(widget.Widget):
             a = (b1, a1, b2, a2)
         utils.plotLinesToPainter(painter, a[0], a[1], a[2], a[3])
 
-    def _drawGridLines(self, subset, painter, phelper, coordticks):
+    def _drawGridLines(self, subset, phelper, coordticks):
         """Draw grid lines on the plot."""
         self.painter.setPen( s.get(subset).makeQPen(phelper) )
-        self.swaplines(painter,
+        self.swaplines(phelper.lpainter,
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
 
-    def _drawAxisLine(self, painter, phelper):
+    def _drawAxisLine(self, phelper):
         """Draw the line of the axis."""
 
         pen = self.settings.get('Line').makeQPen(phelper)
         pen.setCapStyle(qt4.Qt.FlatCap)
-        painter.setPen(pen)
-        self.swapline( painter,
+        phelper.lpainter.setPen(pen)
+        self.swapline( phelper.lpainter,
                        self.coordParr1, self.coordPerp,
                        self.coordParr2, self.coordPerp )        
 
-    def _drawMinorTicks(self, painter, phelper, coordminorticks):
+    def _drawMinorTicks(self, phelper, coordminorticks):
         """Draw minor ticks on plot."""
 
         s = self.settings
         mt = s.get('MinorTicks')
         pen = mt.makeQPen(phelper)
         pen.setCapStyle(qt4.Qt.FlatCap)
-        painter.setPen(pen)
+        phelper.lpainter.setPen(pen)
         delta = mt.getLength(phelper)
 
         if s.direction == 'vertical':
@@ -608,18 +608,18 @@ class Axis(widget.Widget):
             delta *= -1
         
         y = coordminorticks*0.+self.coordPerp
-        self.swaplines(painter,
-                       coordminorticks, y,
-                       coordminorticks, y-delta)
+        self.swaplines( phelper.lpainter,
+                        coordminorticks, y,
+                        coordminorticks, y-delta )
 
-    def _drawMajorTicks(self, painter, phelper, tickcoords):
+    def _drawMajorTicks(self, phelper, tickcoords):
         """Draw major ticks on the plot."""
 
         s = self.settings
         mt = s.get('MajorTicks')
         pen = mt.makeQPen(phelper)
         pen.setCapStyle(qt4.Qt.FlatCap)
-        painter.setPen(pen)
+        phelper.lpainter.setPen(pen)
         startdelta = mt.getLength(phelper)
         delta = startdelta
 
@@ -631,9 +631,9 @@ class Axis(widget.Widget):
             delta *= -1
 
         y = tickcoords*0.+self.coordPerp
-        self.swaplines(painter,
-                       tickcoords, y,
-                       tickcoords, y-delta)
+        self.swaplines( phelper.lpainter,
+                        tickcoords, y,
+                        tickcoords, y-delta )
 
         # account for ticks if they are in the direction of the label
         if s.outerticks and not self.coordReflected:
@@ -661,8 +661,8 @@ class Axis(widget.Widget):
                     if N.isfinite(coord) and (minval <= coord <= maxval):
                         yield pcoord, lab
 
-    def _drawTickLabels(self, painter, phelper, coordticks, sign,
-                        outerbounds, texttorender):
+    def _drawTickLabels(self, phelper, coordticks, sign, outerbounds,
+                        texttorender):
         """Draw tick labels on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -672,8 +672,8 @@ class Axis(widget.Widget):
         s = self.settings
         vertical = s.direction == 'vertical'
         font = s.get('TickLabels').makeQFont(phelper)
-        painter.setFont(font)
-        fm = utils.FontMetrics(font, painter.device())
+        phelper.lpainter.setFont(font)
+        fm = utils.FontMetrics(font, phelper.lpainter.device())
         tl_spacing = fm.leading() + fm.descent()
 
         # work out font alignment
@@ -738,7 +738,7 @@ class Axis(widget.Widget):
             else:
                 x, y = parlposn, perpposn
 
-            r = utils.Renderer(painter, font, x, y, text, alignhorz=ax,
+            r = utils.Renderer(phelper.lpainter, font, x, y, text, alignhorz=ax,
                                alignvert=ay, angle=angle)
             if outerbounds is not None:
                 # make sure ticks are within plot
@@ -761,7 +761,7 @@ class Axis(widget.Widget):
         # keep track of where we are
         self._delta_axis += 2*tl_spacing + maxdim
 
-    def _drawAxisLabel(self, painter, phelper, sign, outerbounds, texttorender):
+    def _drawAxisLabel(self, phelper, sign, outerbounds, texttorender):
         """Draw an axis label on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -772,8 +772,8 @@ class Axis(widget.Widget):
         sl = s.Label
         label = s.get('Label')
         font = label.makeQFont(phelper)
-        painter.setFont(font)
-        fm = utils.FontMetrics(font, painter.device())
+        phelper.lpainter.setFont(font)
+        fm = utils.FontMetrics(font, phelper.lpainter.device())
         al_spacing = fm.leading() + fm.descent()
 
         # an extra offset if required
@@ -827,7 +827,7 @@ class Axis(widget.Widget):
                     x = outerbounds[2]
                     ax = -ax
 
-        r = utils.Renderer(painter, font, x, y, text,
+        r = utils.Renderer(phelper.lpainter, font, x, y, text,
                            ax, ay, angle,
                            usefullheight = True)
 
@@ -838,8 +838,7 @@ class Axis(widget.Widget):
 
         texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
-    def _autoMirrorDraw(self, posn, painter, phelper,
-                        coordticks, coordminorticks):
+    def _autoMirrorDraw(self, posn, phelper, coordticks, coordminorticks):
         """Mirror axis to opposite side of graph if there isn't
         an axis there already."""
 
@@ -868,12 +867,13 @@ class Axis(widget.Widget):
 
         # temporarily change position of axis to other side for drawing
         self._updatePlotRange(posn, otherposition=otheredge)
+        painter = phelper.lpainter
         if not s.Line.hide:
-            self._drawAxisLine(painter, phelper)
+            self._drawAxisLine(phelper)
         if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter, phelper, coordminorticks)
+            self._drawMinorTicks(phelper, coordminorticks)
         if not s.MajorTicks.hide:
-            self._drawMajorTicks(painter, phelper, coordticks)
+            self._drawMajorTicks(phelper, coordticks)
 
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""
@@ -887,7 +887,7 @@ class Axis(widget.Widget):
                 return name
         return widget.Widget.chooseName(self)
 
-    def _suppressText(self, painter, phelper, parentposn, outerbounds):
+    def _suppressText(self, phelper, parentposn, outerbounds):
         """Whether to suppress drawing text on this axis because it
         is too close to the edge of its parent bounding box.
 
@@ -895,7 +895,7 @@ class Axis(widget.Widget):
         """
         s = self.settings
         height = utils.FontMetrics( s.get('Label').makeQFont(phelper),
-                                    painter.device()).height()
+                                    phelper.lpainter.device()).height()
         otherposition = s.otherPosition
 
         if s.direction == 'vertical':
@@ -928,7 +928,7 @@ class Axis(widget.Widget):
         self._updatePlotRange(posn)
 
         # save the state of the painter for later
-        painter = phelper.painter(self, self.parent, posn)
+        painter = phelper.painter(self, posn)
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
@@ -954,42 +954,38 @@ class Axis(widget.Widget):
 
         # plot gridlines
         if not s.MinorGridLines.hide:
-            self._drawGridLines('MinorGridLines', painter, phelper,
-                                coordminorticks)
+            self._drawGridLines('MinorGridLines', phelper, coordminorticks)
         if not s.GridLines.hide:
-            self._drawGridLines('GridLines', painter, phelper, coordticks)
+            self._drawGridLines('GridLines', phelper, coordticks)
 
         # plot the line along the axis
         if not s.Line.hide:
-            self._drawAxisLine(painter, phelper)
+            self._drawAxisLine(phelper)
 
         # plot minor ticks
         if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter, phelper, coordminorticks)
+            self._drawMinorTicks(phelper, coordminorticks)
 
         # keep track of distance from axis
         self._delta_axis = 0
 
         # plot major ticks
         if not s.MajorTicks.hide:
-            self._drawMajorTicks(painter, phelper, coordticks)
+            self._drawMajorTicks(phelper, coordticks)
 
         # plot tick labels
-        suppresstext = self._suppressText(painter, phelper, parentposn,
-                                          outerbounds)
+        suppresstext = self._suppressText(phelper, parentposn, outerbounds)
         if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(painter, phelper, coordticks, sign,
-                                 outerbounds, texttorender)
+            self._drawTickLabels(phelper, coordticks, sign, outerbounds,
+                                 texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
-            self._drawAxisLabel(painter, phelper, sign, outerbounds,
-                                texttorender)
+            self._drawAxisLabel(phelper, sign, outerbounds, texttorender)
 
         # mirror axis at other side of plot
         if s.autoMirror:
-            self._autoMirrorDraw(posn, painter, phelper, coordticks,
-                                 coordminorticks)
+            self._autoMirrorDraw(posn, phelper, coordticks, coordminorticks)
 
         # all the text is drawn at the end so that
         # we can check it doesn't overlap

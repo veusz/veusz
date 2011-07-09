@@ -123,7 +123,7 @@ class Graph(widget.Widget):
         maxbounds = self.computeBounds(parentposn, painthelper)
 
         # controls for adjusting graph margins
-        painter = painthelper.painter(self, self.parent, bounds)
+        painter = painthelper.painter(self, bounds)
         painthelper.setControlGraph(self, [
                 controlgraph.ControlMarginBox(self, bounds, maxbounds,
                                               painthelper) ])

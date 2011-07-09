@@ -416,7 +416,7 @@ class FunctionPlotter(GenericPlotter):
 
         # clip data within bounds of plotter
         cliprect = self.clipAxesBounds(axes, posn)
-        painter = painthelper.painter(self, self.parent, posn, clip=cliprect)
+        painter = painthelper.painter(self, posn, clip=cliprect)
 
         # get the points to plot by evaluating the function
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)

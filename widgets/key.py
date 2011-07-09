@@ -317,17 +317,16 @@ class Key(widget.Widget):
         
         return (layout, (numrows, numcols))
     
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
 
         s = self.settings
         if s.hide:
             return
 
-        painter.beginPaintingWidget(self, parentposn)
-        painter.save()
+        painter = phelper.painter(self, parentposn)
 
-        font = s.get('Text').makeQFont(painter)
+        font = s.get('Text').makeQFont(phelper)
         painter.setFont(font)
         height = utils.FontMetrics(font, painter.device()).height()
 
@@ -358,12 +357,11 @@ class Key(widget.Widget):
                     totallines += lines
                     entries.append( (c, i, lines) )
 
-
         # layout the box
         layout, (numrows, numcols) = self._layout(entries, totallines)
 
         # total size of box
-        symbolwidth = s.get('keyLength').convert(painter)
+        symbolwidth = s.get('keyLength').convert(phelper)
         totalwidth = ( (maxwidth + height + symbolwidth)*numcols +
                        height*(numcols-1) )
         totalheight = numrows * height
@@ -406,7 +404,7 @@ class Key(widget.Widget):
             brush = s.get('Background').makeQBrush()
             painter.fillRect( qt4.QRectF(x, y, totalwidth, totalheight), brush)
         if not s.Border.hide:
-            painter.setPen( s.get('Border').makeQPen(painter) )
+            painter.setPen( s.get('Border').makeQPen(phelper) )
             painter.drawRect( qt4.QRectF(x, y, totalwidth, totalheight) )
             x += margin
             y += margin*0.5
@@ -426,7 +424,7 @@ class Key(widget.Widget):
             elif s.keyAlign == 'bottom':
                 keyoffset = (lines-1)*height
             
-            plotter.drawKeySymbol(num, painter, xpos, ypos+keyoffset,
+            plotter.drawKeySymbol(num, painter, phelper, xpos, ypos+keyoffset,
                                   symbolwidth, height)
             painter.restore()
 
@@ -438,11 +436,7 @@ class Key(widget.Widget):
                                plotter.getKeyText(num),
                                -1, 1).render()
 
-        self.controlgraphitems = [
-            ControlKey(self, parentposn, boxposn, boxdims, height)
-            ]
-
-        painter.restore()
-        painter.endPaintingWidget()
+        phelper.setControlGraph(
+            self, [ControlKey(self, parentposn, boxposn, boxdims, height)] )
 
 document.thefactory.register( Key )
