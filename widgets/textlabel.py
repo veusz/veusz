@@ -75,7 +75,7 @@ class TextLabel(plotters.FreePlotter):
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
     cnvtalignvert = { 'top': 1, 'centre': 0, 'bottom': -1 }
 
-    def draw(self, posn, painter, outerbounds = None):
+    def draw(self, posn, phelper, outerbounds = None):
         """Draw the text label."""
 
         s = self.settings
@@ -92,17 +92,16 @@ class TextLabel(plotters.FreePlotter):
             # we can't calculate coordinates
             return
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
+        painter = phelper.painter(self, posn)
         textpen = s.get('Text').makeQPen()
         painter.setPen(textpen)
-        font = s.get('Text').makeQFont(painter)
+        font = s.get('Text').makeQFont(phelper)
 
         # we should only be able to move non-dataset labels
-        self.controlgraphitems = []
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
                          not s.get('yPos').isDataset(d) )
 
+        controlgraphitems = []
         for index, (x, y, t) in enumerate(itertools.izip(
                 xp, yp, itertools.cycle(text))):
             # render the text
@@ -114,15 +113,14 @@ class TextLabel(plotters.FreePlotter):
             # add cgi for adjustable positions
             if isnotdataset:
                 cgi = controlgraph.ControlMovableBox(self, tbounds,
-                                                     painter,
+                                                     phelper,
                                                      crosspos = (x, y))
                 cgi.labelpt = (x, y)
                 cgi.widgetposn = posn
                 cgi.index = index
-                self.controlgraphitems.append(cgi)
+                controlgraphitems.append(cgi)
 
-        painter.restore()
-        painter.endPaintingWidget()
+        phelper.setControlGraph(self, controlgraphitems)
 
     def updateControlItem(self, cgi):
         """Update position of point given new name and vals."""
