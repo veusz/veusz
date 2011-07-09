@@ -83,7 +83,11 @@ class PaintHelper(object):
             self.states[widget.parent].children.append(s)
 
         p = qt4.QPainter(s.picture)
+        if clip:
+            p.setClipRect(clip)
+
         self.lpainter = p
+
         return p
 
     def setControlGraph(self, widget, cgis):
@@ -99,7 +103,7 @@ class PaintHelper(object):
         """Render state to painter."""
         if state.clip:
             painter.save()
-            painter.setClipRect(state.clip)
+            #painter.setClipRect(state.clip)
 
         painter.drawPicture(0, 0, state.picture)
 

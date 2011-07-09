@@ -1567,7 +1567,7 @@ class LineSet(Setting):
         """Make specialised lineset control."""
         return controls.LineSet(self, *args)
 
-    def makePen(self, painter, row):
+    def makePen(self, phelper, row):
         """Make a pen for the painter using row.
 
         If row is outside of range, then cycle
@@ -1579,7 +1579,7 @@ class LineSet(Setting):
             row = row % len(self.val)
             v = self.val[row]
             style, width, color, hide = v
-            width = Distance.convertDistance(painter, width)
+            width = Distance.convertDistance(phelper, width)
             style, dashpattern = LineStyle._linecnvt[style]
             col = utils.extendedColorToQColor(color)
             pen = qt4.QPen(col, width, style)
