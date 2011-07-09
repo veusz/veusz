@@ -312,7 +312,7 @@ class BoxPlot(GenericPlotter):
 
         stats = _Stats()
 
-    def plotBox(self, painter, axes, boxposn, posn, width, clip, stats):
+    def plotBox(self, painter, phelper, axes, boxposn, posn, width, clip, stats):
         """Draw box for dataset."""
 
         s = self.settings
@@ -327,7 +327,7 @@ class BoxPlot(GenericPlotter):
             )
 
         # draw whisker top to bottom
-        p = s.Whisker.makeQPenWHide(painter)
+        p = s.Whisker.makeQPenWHide(phelper)
         p.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn, topwhisplt, boxposn, botwhisplt, horz)
@@ -345,22 +345,22 @@ class BoxPlot(GenericPlotter):
                 boxposn+width/2, topplt, horz)
 
         # draw line across box
-        p = s.Whisker.makeQPenWHide(painter)
+        p = s.Whisker.makeQPenWHide(phelper)
         p.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn-width/2, medplt,
                  boxposn+width/2, medplt, horz)
 
         # draw box
-        painter.setPen( s.Border.makeQPenWHide(painter) )
+        painter.setPen( s.Border.makeQPenWHide(phelper) )
         painter.setBrush( qt4.QBrush() )
         swapbox(painter, boxposn-width/2, botplt,
                 boxposn+width/2, topplt, horz)
 
         # draw outliers
-        painter.setPen( s.MarkersLine.makeQPenWHide(painter) )
+        painter.setPen( s.MarkersLine.makeQPenWHide(phelper) )
         painter.setBrush( s.MarkersFill.makeQBrushWHide() )
-        markersize = s.get('markerSize').convert(painter)
+        markersize = s.get('markerSize').convert(phelper)
         if stats.outliers.shape[0] != 0:
             pltvals = axes[not horz].dataToPlotterCoords(posn, stats.outliers)
             otherpos = N.zeros(pltvals.shape) + boxposn
@@ -373,18 +373,18 @@ class BoxPlot(GenericPlotter):
                                markersize, clip=clip )
 
         # draw mean
-        meanplt = axes[not horz].dataToPlotterCoords(posn,
-                                                     N.array([stats.mean]))[0]
+        meanplt = axes[not horz].dataToPlotterCoords(
+            posn, N.array([stats.mean]))[0]
         if horz:
             x, y = meanplt, boxposn
         else:
             x, y = boxposn, meanplt
         utils.plotMarker( painter, x, y, s.meanmarker, markersize )
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
 
-        widgetposn = GenericPlotter.draw(self, parentposn, painter,
+        widgetposn = GenericPlotter.draw(self, parentposn, phelper,
                                          outerbounds=outerbounds)
         s = self.settings
 
@@ -417,10 +417,8 @@ class BoxPlot(GenericPlotter):
              axes[1].settings.direction != 'vertical' ):
             return
 
-        # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, widgetposn)
-        painter.save()
-        clip = self.clipAxesBounds(painter, axes, widgetposn)
+        clip = self.clipAxesBounds(axes, widgetposn)
+        painter = phelper.painter(self, widgetposn, clip=clip)
 
         # get boxes visible along direction of boxes to work out width
         horz = (s.direction == 'horizontal')
@@ -449,7 +447,7 @@ class BoxPlot(GenericPlotter):
             for vals, plotpos in izip(values, plotposns):
                 stats = _Stats()
                 stats.calculate(vals.data, s.whiskermode)
-                self.plotBox(painter, axes, plotpos, widgetposn, width,
+                self.plotBox(painter, phelper, axes, plotpos, widgetposn, width,
                              clip, stats)
         else:
             # manually given boxes
@@ -464,11 +462,8 @@ class BoxPlot(GenericPlotter):
                 stats.mean = vals[4][i]
                 stats.median = vals[5][i]
                 stats.outliers = N.array([])
-                self.plotBox(painter, axes, vals[6][i], widgetposn,
+                self.plotBox(painter, phelper, axes, vals[6][i], widgetposn,
                              width, clip, stats)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate a boxplot
 document.thefactory.register( BoxPlot )
