@@ -49,7 +49,7 @@ class Polygon(plotters.FreePlotter):
                              usertext = 'Fill'),
                pixmap = 'settings_plotfillbelow' )
 
-    def draw(self, posn, painter, outerbounds=None):
+    def draw(self, posn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
 
         s = self.settings
@@ -65,12 +65,11 @@ class Polygon(plotters.FreePlotter):
             # we can't calculate coordinates
             return
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        painter.setClipRect( qt4.QRectF(posn[0], posn[1],
-                                        posn[2]-posn[0],
-                                        posn[3]-posn[1]) )
-        painter.setPen( s.Line.makeQPenWHide(painter) )
+        x1, y1, x2, y2 = posn
+        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        painter = phelper.painter(self, posn, clip=cliprect)
+
+        painter.setPen( s.Line.makeQPenWHide(phelper) )
         painter.setBrush( s.Fill.makeQBrushWHide() )
 
         # this is a hack as we generate temporary fake datasets
@@ -84,9 +83,6 @@ class Polygon(plotters.FreePlotter):
                 poly.append(qt4.QPointF(x, y))
             # draw it
             painter.drawPolygon(poly)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate this
 document.thefactory.register( Polygon )

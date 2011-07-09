@@ -505,10 +505,10 @@ class Image(plotters.GenericPlotter):
         else:
             return None
     
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, phelper, outerbounds = None):
         """Draw the image."""
 
-        posn = plotters.GenericPlotter.draw(self, parentposn, painter,
+        posn = plotters.GenericPlotter.draw(self, parentposn, phelper,
                                             outerbounds = outerbounds)
         x1, y1, x2, y2 = posn
         s = self.settings
@@ -546,9 +546,8 @@ class Image(plotters.GenericPlotter):
             image = self.image
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        self.clipAxesBounds(painter, axes, posn)
+        clip = self.clipAxesBounds(axes, posn)
+        painter = phelper.painter(self, posn, clip=clip)
 
         # optionally smooth images before displaying
         if s.smooth:
@@ -561,8 +560,6 @@ class Image(plotters.GenericPlotter):
                                       coordsx[1]-coordsx[0],
                                       coordsy[0]-coordsy[1]),
                            image )
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate an image
 document.thefactory.register( Image )

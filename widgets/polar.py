@@ -167,7 +167,7 @@ class Polar(NonOrthGraph):
             pp.addPolygon(pts)
             painter.fillPath(pp, painter.brush())
 
-    def drawGraph(self, painter, bounds, datarange, outerbounds=None):
+    def drawGraph(self, painter, phelper, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''
 
         s = self.settings
@@ -181,7 +181,7 @@ class Polar(NonOrthGraph):
         self._xc = 0.5*(bounds[0]+bounds[2])
         self._yc = 0.5*(bounds[3]+bounds[1])
 
-        painter.setPen( s.Border.makeQPenWHide(painter) )
+        painter.setPen( s.Border.makeQPenWHide(phelper) )
         painter.setBrush( s.Background.makeQBrushWHide() )
         painter.drawEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
                                          qt4.QPointF(bounds[2], bounds[3]) ) )
@@ -193,7 +193,7 @@ class Polar(NonOrthGraph):
                                   qt4.QPointF(bounds[2], bounds[3]) ) )
         painter.setClipPath(p)
 
-    def drawAxes(self, painter, bounds, datarange, outerbounds=None):
+    def drawAxes(self, painter, phelper, bounds, datarange, outerbounds=None):
         '''Plot axes.'''
 
         s = self.settings
@@ -209,7 +209,7 @@ class Polar(NonOrthGraph):
 
         # draw ticks as circles
         if not t.hideannuli:
-            painter.setPen( s.Tick.makeQPenWHide(painter) )
+            painter.setPen( s.Tick.makeQPenWHide(phelper) )
             painter.setBrush( qt4.QBrush() )      
             for tick in majtick[1:]:
                 radius = tick / self._maxradius
@@ -226,7 +226,7 @@ class Polar(NonOrthGraph):
         if format == 'Auto':
             format = tickformat
         painter.setPen( tl.makeQPen() )
-        font = tl.makeQFont(painter)
+        font = tl.makeQFont(phelper)
 
         # draw radial axis
         if not s.TickLabels.hideradial:
@@ -274,7 +274,7 @@ class Polar(NonOrthGraph):
             
         # draw spokes
         if not t.hidespokes:
-            painter.setPen( s.Tick.makeQPenWHide(painter) )
+            painter.setPen( s.Tick.makeQPenWHide(phelper) )
             painter.setBrush( qt4.QBrush() )      
             angle = 2 * N.pi / 12
             lines = []

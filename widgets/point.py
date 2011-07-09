@@ -555,7 +555,8 @@ class PointPlotter(GenericPlotter):
 
         painter.restore()
 
-    def drawLabels(self, painter, xplotter, yplotter, textvals, markersize):
+    def drawLabels(self, painter, phelper, xplotter, yplotter,
+                   textvals, markersize):
         """Draw labels for the points."""
 
         s = self.settings
@@ -570,7 +571,7 @@ class PointPlotter(GenericPlotter):
         # make font and len
         textpen = lab.makeQPen()
         painter.setPen(textpen)
-        font = lab.makeQFont(painter)
+        font = lab.makeQFont(phelper)
         angle = lab.angle
 
         # iterate over each point and plot each label
@@ -725,7 +726,8 @@ class PointPlotter(GenericPlotter):
 
             # finally plot any labels
             if tvals and not s.Label.hide:
-                self.drawLabels(painter, xplotter, yplotter, tvals, markersize)
+                self.drawLabels(painter, phelper, xplotter, yplotter,
+                                tvals, markersize)
 
 # allow the factory to instantiate an x,y plotter
 document.thefactory.register( PointPlotter )

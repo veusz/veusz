@@ -78,7 +78,7 @@ class Line(plotters.FreePlotter):
                              usertext='Arrow left', formatting=True), 0)
 
 
-    def draw(self, posn, painter, outerbounds = None):
+    def draw(self, posn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
 
         s = self.settings
@@ -103,16 +103,17 @@ class Line(plotters.FreePlotter):
                          not s.get('yPos').isDataset(d) and
                          not s.get('length').isDataset(d) and
                          not s.get('angle').isDataset(d) )
-        self.controlgraphitems = []
 
-        arrowsize = s.get('arrowSize').convert(painter)
+        # adjustable positions for the lines
+        controlgraphitems = []
+        arrowsize = s.get('arrowSize').convert(phelper)
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
+        # now do the drawing
+        painter = phelper.painter(self, posn)
 
         # drawing settings for line
         if not s.Line.hide:
-            painter.setPen( s.get('Line').makeQPen(painter) )
+            painter.setPen( s.get('Line').makeQPen(phelper) )
         else:
             painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
@@ -143,10 +144,9 @@ class Line(plotters.FreePlotter):
                 cgi.index = index
                 cgi.widgetposn = posn
                 index += 1
-                self.controlgraphitems.append(cgi)
+                controlgraphitems.append(cgi)
 
-        painter.restore()
-        painter.endPaintingWidget()
+        phelper.setControlGraph(self, controlgraphitems)
 
     def updateControlItem(self, cgi, pt1, pt2):
         """If control items are moved, update line."""

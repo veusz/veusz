@@ -78,7 +78,12 @@ class PaintHelper(object):
                           setting.Distance.convertDistance(self, pageh) )
 
     def painter(self, widget, bounds, clip=None):
-        self.states[widget] = s = DrawState(widget, bounds, clip)
+        """Return a painter for use when drawing the widget.
+        widget: widget object
+        bounds: tuple (x1, y1, x2, y2) of widget bounds
+        clip: another tuple, if set clips drawing to this rectangle
+        """
+        s = self.states[widget]  = DrawState(widget, bounds, clip)
         if widget.parent is not None:
             self.states[widget.parent].children.append(s)
 
@@ -91,6 +96,7 @@ class PaintHelper(object):
         return p
 
     def setControlGraph(self, widget, cgis):
+        """Records the control graph list for the widget given."""
         self.states[widget].cgis = cgis
 
     def renderToPainter(self, root, painter):

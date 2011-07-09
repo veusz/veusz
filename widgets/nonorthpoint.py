@@ -115,24 +115,22 @@ class NonOrthPoint(Widget):
                 lambda v1, v2: self.parent.graphToPlotCoords(v1, v2))
         return p.pickIndex(oldindex, direction, bounds)
 
-    def plotMarkers(self, painter, plta, pltb, scaling, clip):
+    def plotMarkers(self, painter, phelper, plta, pltb, scaling, clip):
         '''Draw markers in widget.'''
         s = self.settings
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
             painter.setBrush( s.MarkerFill.makeQBrushWHide() )
-            painter.setPen( s.MarkerLine.makeQPenWHide(painter) )
+            painter.setPen( s.MarkerLine.makeQPenWHide(phelper) )
                 
-            size = s.get('markerSize').convert(painter)
+            size = s.get('markerSize').convert(phelper)
             utils.plotMarkers(painter, plta, pltb, s.marker, size,
                               scaling=scaling, clip=clip)
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
 
-        posn = Widget.draw(self, parentposn, painter,
+        posn = Widget.draw(self, parentposn, phelper,
                            outerbounds=outerbounds)
-        x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
 
         s = self.settings
         d = self.document
@@ -147,8 +145,9 @@ class NonOrthPoint(Widget):
         if not d1 or not d2:
             return
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
+        x1, y1, x2, y2 = posn
+        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        painter = phelper.painter(self, posn, clip=cliprect)
 
         # split parts separated by NaNs
         for v1, v2, vs in document.generateValidDatasetParts(d1, d2, dscale):
@@ -174,7 +173,7 @@ class NonOrthPoint(Widget):
             # plot line
             if not s.PlotLine.hide:
                 painter.setBrush( qt4.QBrush() )
-                painter.setPen(s.PlotLine.makeQPen(painter))
+                painter.setPen(s.PlotLine.makeQPen(phelper))
                 pts = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(pts, px, py)
                 utils.plotClippedPolyline(painter, cliprect, pts)
@@ -183,10 +182,7 @@ class NonOrthPoint(Widget):
             pscale = None
             if vs:
                 pscale = vs.data
-            self.plotMarkers(painter, px, py, pscale, cliprect)
-
-        painter.restore()
-        painter.endPaintingWidget()
+            self.plotMarkers(painter, phelper, px, py, pscale, cliprect)
 
 # allow the factory to instantiate plotter
 document.thefactory.register( NonOrthPoint )

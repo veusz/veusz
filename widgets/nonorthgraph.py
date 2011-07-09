@@ -82,17 +82,17 @@ class NonOrthGraph(Widget):
         '''Return coordinate ranges of plot.
         This is in the form [[mina, maxa], [minb, maxb]].'''
 
-    def drawFillPts(self, painter, bounds, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, phelper, bounds, ptsx, ptsy, filltype):
         '''Draw set of points for filling.
         bounds: usual tuple (minx, miny, maxx, maxy)
         ptsx, ptsy: translated plotter coordinates
         filltype: one of filloptions
         '''
     
-    def drawGraph(self, painter, bounds, datarange, outerbounds=None):
+    def drawGraph(self, painter, phelper, bounds, datarange, outerbounds=None):
         '''Plot graph area.'''
 
-    def drawAxes(self, painter, bounds, datarange, outerbounds=None):
+    def drawAxes(self, painter, phelper, bounds, datarange, outerbounds=None):
         '''Plot axes.'''
 
     def setClip(self, painter, bounds):
@@ -105,40 +105,38 @@ class NonOrthGraph(Widget):
             c.updateDataRanges(drange)
         return drange
             
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         '''Update the margins before drawing.'''
 
         s = self.settings
 
-        margins = ( s.get('leftMargin').convert(painter),
-                    s.get('topMargin').convert(painter),
-                    s.get('rightMargin').convert(painter),
-                    s.get('bottomMargin').convert(painter) )
-        bounds = self.computeBounds(parentposn, painter, margins=margins)
-        maxbounds = self.computeBounds(parentposn, painter)
+        margins = ( s.get('leftMargin').convert(phelper),
+                    s.get('topMargin').convert(phelper),
+                    s.get('rightMargin').convert(phelper),
+                    s.get('bottomMargin').convert(phelper) )
+        bounds = self.computeBounds(parentposn, phelper, margins=margins)
+        maxbounds = self.computeBounds(parentposn, phelper)
 
-        # controls for adjusting graph margins
-        self.controlgraphitems = [
-            controlgraph.ControlMarginBox(self, bounds, maxbounds, painter)
-            ]
+        painter = phelper.painter(self, bounds)
+
+        # controls for adjusting margins
+        phelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
         # do no painting if hidden
         if s.hide:
             return bounds
 
         # plot graph
-        painter.beginPaintingWidget(self, bounds)
         datarange = self.getDataRange()
-        self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
-        self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
-        painter.endPaintingWidget()
+        self.drawGraph(painter, phelper, bounds, datarange,
+                       outerbounds=outerbounds)
+        self.drawAxes(painter, phelper, bounds, datarange,
+                      outerbounds=outerbounds)
 
         # paint children
-        painter.save()
-        self.setClip(painter, bounds)
         for c in reversed(self.children):
-            c.draw(bounds, painter, outerbounds=outerbounds)
-        painter.restore()
+            c.draw(bounds, phelper, outerbounds=outerbounds)
 
         return bounds
 

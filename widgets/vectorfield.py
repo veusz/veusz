@@ -124,10 +124,10 @@ class VectorField(plotters.GenericPlotter):
                     axrange[0] = min( axrange[0], dyrange[0] )
                     axrange[1] = max( axrange[1], dyrange[1] )
 
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, phelper, outerbounds = None):
         """Draw the widget."""
 
-        posn = plotters.GenericPlotter.draw(self, parentposn, painter,
+        posn = plotters.GenericPlotter.draw(self, parentposn, phelper,
                                             outerbounds = outerbounds)
         x1, y1, x2, y2 = posn
         s = self.settings
@@ -158,11 +158,10 @@ class VectorField(plotters.GenericPlotter):
             return
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        cliprect = self.clipAxesBounds(painter, axes, posn)
+        cliprect = self.clipAxesBounds(axes, posn)
+        painter = phelper.painter(self, posn, clip=cliprect)
 
-        baselength = s.get('baselength').convert(painter)
+        baselength = s.get('baselength').convert(phelper)
 
         # try to be nice if the datasets don't match
         data1st, data2nd = data1.data, data2.data
@@ -178,7 +177,7 @@ class VectorField(plotters.GenericPlotter):
         xplotter = axes[0].dataToPlotterCoords(posn, xdsvals)
         yplotter = axes[1].dataToPlotterCoords(posn, ydsvals)
 
-        pen = s.Line.makeQPenWHide(painter)
+        pen = s.Line.makeQPenWHide(phelper)
         painter.setPen(pen)
 
         if s.mode == 'cartesian':
@@ -198,7 +197,7 @@ class VectorField(plotters.GenericPlotter):
             utils.plotLinesToPainter(painter, x1, y1, x2, y2,
                                      cliprect)
         else:
-            arrowsize = s.get('arrowsize').convert(painter)
+            arrowsize = s.get('arrowsize').convert(phelper)
             painter.setBrush( s.get('Fill').makeQBrushWHide() )
 
             # this is backward - have to convert from dx, dy to angle, length
@@ -216,10 +215,7 @@ class VectorField(plotters.GenericPlotter):
                 utils.plotLineArrow(painter, x, y, l, a, asize,
                                     arrowleft=s.arrowfront,
                                     arrowright=s.arrowback)
-
-        painter.restore()
-        painter.endPaintingWidget()
-        
+                
 # allow the factory to instantiate a vector field
 document.thefactory.register( VectorField )
 

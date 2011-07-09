@@ -573,10 +573,10 @@ class Axis(widget.Widget):
             a = (b1, a1, b2, a2)
         utils.plotLinesToPainter(painter, a[0], a[1], a[2], a[3])
 
-    def _drawGridLines(self, subset, phelper, coordticks):
+    def _drawGridLines(self, subset, painter, phelper, coordticks):
         """Draw grid lines on the plot."""
-        self.painter.setPen( s.get(subset).makeQPen(phelper) )
-        self.swaplines(phelper.lpainter,
+        painter.setPen( self.settings.get(subset).makeQPen(phelper) )
+        self.swaplines(painter,
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
 
@@ -912,10 +912,13 @@ class Axis(widget.Widget):
                 return True
         return False
 
-    def draw(self, parentposn, phelper, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None,
+             useexistingpainter=None):
         """Plot the axis on the painter.
 
-        if suppresstext is True, then we don't number or label the axis
+        useexistingpainter is a hack so that a colorbar can reuse the
+        drawing code here. If set to a painter, it will use this rather
+        than opening a new one.
         """
 
         s = self.settings
@@ -927,8 +930,11 @@ class Axis(widget.Widget):
         posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
         self._updatePlotRange(posn)
 
-        # save the state of the painter for later
-        painter = phelper.painter(self, posn)
+        # get ready to draw
+        if useexistingpainter is not None:
+            painter = useexistingpainter
+        else:
+            painter = phelper.painter(self, posn)
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
@@ -954,9 +960,9 @@ class Axis(widget.Widget):
 
         # plot gridlines
         if not s.MinorGridLines.hide:
-            self._drawGridLines('MinorGridLines', phelper, coordminorticks)
+            self._drawGridLines('MinorGridLines', painter, phelper, coordminorticks)
         if not s.GridLines.hide:
-            self._drawGridLines('GridLines', phelper, coordticks)
+            self._drawGridLines('GridLines', painter, phelper, coordticks)
 
         # plot the line along the axis
         if not s.Line.hide:
