@@ -28,3 +28,4 @@ from operations import *
 from capture import *
 from mime import *
 from dataset_histo import *
+from painthelper import *

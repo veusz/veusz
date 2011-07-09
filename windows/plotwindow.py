@@ -217,6 +217,9 @@ class PlotWindow( qt4.QGraphicsView ):
         self.document = document
         self.docchangeset = -100
 
+        # state of last plot from painthelper
+        self.painthelper = None
+
         self.size = (1, 1)
         self.oldzoom = -1.
         self.zoomfactor = 1.
@@ -754,11 +757,10 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # convert distances into pixels
         pix = qt4.QPixmap(1, 1)
-        painter = document.Painter(pix,
+        ph = document.PaintHelper( (1, 1),
                                    scaling = self.zoomfactor,
-                                   dpi = self.widgetdpi)
-        size = self.document.basewidget.getSize(painter)
-        painter.end()
+                                   dpi = self.widgetdpi )
+        size = self.document.basewidget.getSize(ph)
 
         # make new buffer and resize widget
         if size != self.size:
@@ -807,23 +809,21 @@ class PlotWindow( qt4.QGraphicsView ):
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
                 try:
-                    painter = RecordingPainter(self.bufferpixmap)
+                    self.painthelper = phelper = document.PaintHelper(
+                        (self.bufferpixmap.width(),
+                         self.bufferpixmap.height()),
+                        dpi = self.widgetdpi, scaling = self.zoomfactor
+                        )
+                    self.document.paintTo(phelper, self.pagenumber)
+
+                    painter = qt4.QPainter(self.bufferpixmap)
                     painter.setRenderHint(qt4.QPainter.Antialiasing,
                                           self.antialias)
                     painter.setRenderHint(qt4.QPainter.TextAntialiasing,
                                           self.antialias)
-                    self.document.paintTo( painter, self.pagenumber,
-                                           scaling = self.zoomfactor,
-                                           dpi = self.widgetdpi )
+                    phelper.renderToPainter(self.document.basewidget,
+                                            painter)
                     painter.end()
-                    self.widgetpositions = painter.widgetpositions
-                    self.widgetpositionslookup = painter.widgetpositionslookup
-
-                    # collect all controlgraphs (in case these change later
-                    # from e.g. printing)
-                    self.widgetcontrolgraphs = dict(
-                        [ (w[0], w[0].controlgraphitems)
-                          for w in self.widgetpositions ]) 
 
                     # update selected widget items
                     self.selectedWidgets([self.selwidget])
@@ -1113,8 +1113,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # put in new items
         for widget in widgets:
-            if widget in self.widgetcontrolgraphs:
-                for control in self.widgetcontrolgraphs[widget]:
+            if self.painthelper and widget in self.painthelper.states:
+                for control in self.painthelper.states[widget].cgis:
                     graphitem = control.createGraphicsItem()
                     self.controlgraphs.append(graphitem)
                     self.scene.addItem(graphitem)

@@ -280,7 +280,8 @@ class Widget(object):
         return build
     path = property(_getPath)
 
-    def computeBounds(self, parentposn, painter, margins = (0., 0., 0., 0.)):
+    def computeBounds(self, parentposn, painthelper,
+                      margins = (0., 0., 0., 0.)):
         """Compute a bounds array, giving the bounding box for the widget."""
 
         # get parent's position
@@ -293,20 +294,20 @@ class Widget(object):
         dx1, dy1, dx2, dy2 = margins
         return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
 
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, painthelper, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).
 
         painter is the widget.Painter to draw on
         outerbounds contains "ultimate" bounds we don't go outside
         """
 
-        bounds = self.computeBounds(parentposn, painter)
+        bounds = self.computeBounds(parentposn, painthelper)
 
         if not self.settings.hide:
 
             # iterate over children in reverse order
             for c in reversed(self.children):
-                c.draw(bounds, painter, outerbounds=outerbounds)
+                c.draw(bounds, painthelper, outerbounds=outerbounds)
  
         # return our final bounds
         return bounds

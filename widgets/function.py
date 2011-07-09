@@ -277,7 +277,7 @@ class FunctionPlotter(GenericPlotter):
         # actually do the filling
         utils.plotClippedPolygon(painter, clip, pts)
 
-    def drawKeySymbol(self, number, painter, x, y, width, height):
+    def drawKeySymbol(self, number, painter, phelper, x, y, width, height):
         """Draw the plot symbol and/or line."""
 
         s = self.settings
@@ -286,7 +286,7 @@ class FunctionPlotter(GenericPlotter):
         # draw line
         if not s.Line.hide:
             painter.setBrush( qt4.QBrush() )
-            painter.setPen( s.Line.makeQPen(painter) )
+            painter.setPen( s.Line.makeQPen(phelper) )
             painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
 
     def initEnviron(self):
@@ -393,10 +393,10 @@ class FunctionPlotter(GenericPlotter):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, painthelper, outerbounds = None):
         """Draw the function."""
 
-        posn = GenericPlotter.draw(self, parentposn, painter,
+        posn = GenericPlotter.draw(self, parentposn, painthelper,
                                    outerbounds = outerbounds)
         x1, y1, x2, y2 = posn
         s = self.settings
@@ -415,9 +415,8 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        cliprect = self.clipAxesBounds(painter, axes, posn)
+        cliprect = self.clipAxesBounds(axes, posn)
+        painter = painthelper.painter(self, self.parent, posn, clip=cliprect)
 
         # get the points to plot by evaluating the function
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
@@ -445,11 +444,8 @@ class FunctionPlotter(GenericPlotter):
 
             if not s.Line.hide:
                 painter.setBrush( qt4.QBrush() )
-                painter.setPen( s.Line.makeQPen(painter) )
+                painter.setPen( s.Line.makeQPen(painthelper) )
                 self._plotLine(painter, pxpts, pypts, posn, cliprect)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate an function plotter
 document.thefactory.register( FunctionPlotter )

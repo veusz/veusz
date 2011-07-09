@@ -82,29 +82,28 @@ class Root(widget.Widget):
             self.document.locale = qt4.QLocale()
         self.document.locale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
 
-    def getSize(self, painter):
+    def getSize(self, painthelper):
         """Get dimensions of widget in painter coordinates."""
-        return ( self.settings.get('width').convert(painter),
-                 self.settings.get('height').convert(painter) )
+        return ( self.settings.get('width').convert(painthelper),
+                 self.settings.get('height').convert(painthelper) )
 
-    def draw(self, painter, pagenum):
+    def draw(self, painthelper, pagenum):
         """Draw the page requested on the painter."""
 
-        xw, yw = self.getSize(painter)
+        xw, yw = painthelper.pagesize
         posn = [0, 0, xw, yw]
-        painter.beginPaintingWidget(self, posn)
+        painter = painthelper.painter(self, None, posn)
+        painter.end()
         page = self.children[pagenum]
-        page.draw( posn, painter )
+        page.draw( posn, painthelper )
 
-        self.controlgraphitems = [
-            controlgraph.ControlMarginBox(self, posn,
-                                          [-10000, -10000,
-                                            10000,  10000],
-                                          painter,
-                                          ismovable = False)
-            ]
-
-        painter.endPaintingWidget()
+        painthelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, posn,
+                                              [-10000, -10000,
+                                                10000,  10000],
+                                              painthelper,
+                                              ismovable = False)
+                ] )
 
     def updateControlItem(self, cgi):
         """Graph resized or moved - call helper routine to move self."""

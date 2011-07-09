@@ -372,13 +372,9 @@ class Document( qt4.QObject ):
 
         painter.end()
 
-    def paintTo(self, painter, page, scaling = 1., dpi = None):
-        """Paint page specified to the painter."""
-        
-        painter.veusz_scaling = scaling
-        if dpi is not None:
-            painter.veusz_pixperpt = dpi / 72.
-        self.basewidget.draw(painter, page)
+    def paintTo(self, painthelper, page):
+        """Paint page specified to the paint helper."""
+        self.basewidget.draw(painthelper, page)
 
     def getNumberPages(self):
         """Return the number of pages in the document."""
