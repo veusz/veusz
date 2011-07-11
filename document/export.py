@@ -226,7 +226,7 @@ class Export(object):
     def exportSVG(self):
         """Export document as SVG"""
 
-        dpi = 90.
+        dpi = float(svg_export.dpi)
         helper = painthelper.PaintHelper( (1,1) )
         size = self.doc.basewidget.getSize(helper)
         scaling = dpi / helper.dpi

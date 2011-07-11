@@ -277,7 +277,7 @@ class FunctionPlotter(GenericPlotter):
         # actually do the filling
         utils.plotClippedPolygon(painter, clip, pts)
 
-    def drawKeySymbol(self, number, painter, phelper, x, y, width, height):
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
 
         s = self.settings
@@ -286,7 +286,7 @@ class FunctionPlotter(GenericPlotter):
         # draw line
         if not s.Line.hide:
             painter.setBrush( qt4.QBrush() )
-            painter.setPen( s.Line.makeQPen(phelper) )
+            painter.setPen( s.Line.makeQPen(painter) )
             painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
 
     def initEnviron(self):
@@ -444,7 +444,7 @@ class FunctionPlotter(GenericPlotter):
 
             if not s.Line.hide:
                 painter.setBrush( qt4.QBrush() )
-                painter.setPen( s.Line.makeQPen(painthelper) )
+                painter.setPen( s.Line.makeQPen(painter) )
                 self._plotLine(painter, pxpts, pypts, posn, cliprect)
 
 # allow the factory to instantiate an function plotter

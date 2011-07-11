@@ -128,7 +128,7 @@ class ColorBar(axis.Axis):
             else:
                 totalwidth = fontheight
         else:
-            totalwidth = w.convert(phelper)
+            totalwidth = w.convert(painter)
 
         h = s.get('height')
         if h.isAuto():
@@ -137,7 +137,7 @@ class ColorBar(axis.Axis):
             else:
                 totalheight = bounds[3] - bounds[1] - 2*fontheight
         else:
-            totalheight = h.convert(phelper)
+            totalheight = h.convert(painter)
 
         # work out horizontal position
         h = s.horzPosn
@@ -199,7 +199,7 @@ class ColorBar(axis.Axis):
 
         # if there's a border
         if not s.Border.hide:
-            painter.setPen( s.get('Border').makeQPen(phelper) )
+            painter.setPen( s.get('Border').makeQPen(painter) )
             painter.setBrush( qt4.QBrush() )
             painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
                                          bounds[2]-bounds[0],
@@ -210,9 +210,9 @@ class ColorBar(axis.Axis):
         # will mess up range if called twice
         savedposition = self.position
         self.position = (0., 0., 1., 1.)
-        # we have to give up drawing to painter so that the axis can do it (ugly)
-        painter.end()
-        axis.Axis.draw(self, bounds, phelper, outerbounds=outerbounds)
+
+        axis.Axis.draw(self, bounds, phelper, outerbounds=outerbounds,
+                       useexistingpainter=painter)
         self.position = savedposition
         
 # allow the factory to instantiate a colorbar

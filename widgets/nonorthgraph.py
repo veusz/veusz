@@ -82,17 +82,17 @@ class NonOrthGraph(Widget):
         '''Return coordinate ranges of plot.
         This is in the form [[mina, maxa], [minb, maxb]].'''
 
-    def drawFillPts(self, painter, phelper, bounds, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, bounds, ptsx, ptsy, filltype):
         '''Draw set of points for filling.
         bounds: usual tuple (minx, miny, maxx, maxy)
         ptsx, ptsy: translated plotter coordinates
         filltype: one of filloptions
         '''
     
-    def drawGraph(self, painter, phelper, bounds, datarange, outerbounds=None):
+    def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area.'''
 
-    def drawAxes(self, painter, phelper, bounds, datarange, outerbounds=None):
+    def drawAxes(self, painter, bounds, datarange, outerbounds=None):
         '''Plot axes.'''
 
     def setClip(self, painter, bounds):
@@ -129,10 +129,8 @@ class NonOrthGraph(Widget):
 
         # plot graph
         datarange = self.getDataRange()
-        self.drawGraph(painter, phelper, bounds, datarange,
-                       outerbounds=outerbounds)
-        self.drawAxes(painter, phelper, bounds, datarange,
-                      outerbounds=outerbounds)
+        self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
+        self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
 
         # paint children
         for c in reversed(self.children):

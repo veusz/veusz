@@ -50,12 +50,12 @@ class PaintHelper(object):
     Holds the scaling, dpi and size of the page.
     """
 
-    def __init__(self, pagesize, scaling=1., dpi=75):
+    def __init__(self, pagesize, scaling=1.):
         """Initialise using page size (tuple of pixelw, pixelh)."""
 
-        self.dpi = dpi
+        self.dpi = qt4.QPicture().logicalDpiY()
         self.scaling = scaling
-        self.pixperpt = dpi / 72.
+        self.pixperpt = self.dpi / 72.
         self.pagesize = pagesize
 
         # keep track of states of all widgets
@@ -69,8 +69,13 @@ class PaintHelper(object):
 
     @property
     def maxsize(self):
-        """Return maximum page dimension."""
+        """Return maximum page dimension (using PaintHelper's DPI)."""
         return max(*self.pagesize)
+
+    def sizeAtDpi(self, dpi):
+        """Return a tuple size for the page given an output device dpi."""
+        return ( int(self.pagesize[0]/self.dpi * dpi),
+                 int(self.pagesize[1]/self.dpi * dpi) )
 
     def updatePageSize(self, pagew, pageh):
         """Update page size to value given (in user text units."""
@@ -92,6 +97,10 @@ class PaintHelper(object):
             p.setClipRect(clip)
 
         self.lpainter = p
+        p.scaling = self.scaling
+        p.pixperpt = self.pixperpt
+        p.pagesize = self.pagesize
+        p.dpi = self.dpi
 
         return p
 

@@ -367,10 +367,10 @@ class Contour(plotters.GenericPlotter):
         else:
             return ''
 
-    def drawKeySymbol(self, number, painter, phelper, x, y, width, height):
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw key for contour level."""
         painter.setPen(
-            self.settings.Lines.get('lines').makePen(phelper, number))
+            self.settings.Lines.get('lines').makePen(painter, number))
         painter.drawLine(x, y+height/2, x+width, y+height/2)
 
     def checkContoursUpToDate(self):
@@ -430,8 +430,8 @@ class Contour(plotters.GenericPlotter):
         painter = phelper.painter(self, posn, clip=clip)
 
         self.plotContourFills(painter, posn, axes, clip)
-        self.plotContours(painter, phelper, posn, axes, clip)
-        self.plotSubContours(painter, phelper, posn, axes, clip)
+        self.plotContours(painter, posn, axes, clip)
+        self.plotSubContours(painter, posn, axes, clip)
 
     def updateContours(self):
         """Update calculated contours."""
@@ -490,7 +490,7 @@ class Contour(plotters.GenericPlotter):
                     linelist = c.trace(level)
                     self._cachedsubcontours.append( finitePoly(linelist) )
 
-    def plotContourLabel(self, painter, phelper, number, xplt, yplt, showline):
+    def plotContourLabel(self, painter, number, xplt, yplt, showline):
         """Draw a label on a contour.
         This clips when drawing the line, plotting the label on top.
         """
@@ -502,7 +502,7 @@ class Contour(plotters.GenericPlotter):
         # get text and font
         text = utils.formatNumber(number * cl.scale, cl.format,
                                   locale=self.document.locale)
-        font = cl.makeQFont(phelper)
+        font = cl.makeQFont(painter)
         descent = utils.FontMetrics(font, painter.device()).descent()
 
         # work out where text lies
@@ -540,7 +540,7 @@ class Contour(plotters.GenericPlotter):
 
         painter.restore()
 
-    def _plotContours(self, painter, phelper, posn, axes, linestyles,
+    def _plotContours(self, painter, posn, axes, linestyles,
                       contours, showlabels, hidelines, clip):
         """Plot a set of contours.
         """
@@ -555,7 +555,7 @@ class Contour(plotters.GenericPlotter):
         for num, linelist in enumerate(contours):
 
             # move to the next line style
-            painter.setPen(linestyles.makePen(phelper, num))
+            painter.setPen(linestyles.makePen(painter, num))
                 
             # iterate over each complete line of the contour
             for curve in linelist:
@@ -567,25 +567,24 @@ class Contour(plotters.GenericPlotter):
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
 
                 if showlabels:
-                    self.plotContourLabel(painter, phelper,
-                                          s.levelsOut[num], xplt, yplt,
-                                          not hidelines)
+                    self.plotContourLabel(painter, s.levelsOut[num],
+                                          xplt, yplt, not hidelines)
                 else:
                     # actually draw the curve to the plotter
                     if not hidelines:
                         utils.plotClippedPolyline(painter, clip, pts)
 
-    def plotContours(self, painter, phelper, posn, axes, clip):
+    def plotContours(self, painter, posn, axes, clip):
         """Plot the traced contours on the painter."""
         s = self.settings
-        self._plotContours(painter, phelper, posn, axes, s.Lines.get('lines'),
+        self._plotContours(painter, posn, axes, s.Lines.get('lines'),
                            self._cachedcontours,
                            not s.ContourLabels.hide, s.Lines.hide, clip)
 
-    def plotSubContours(self, painter, phelper, posn, axes, clip):
+    def plotSubContours(self, painter, posn, axes, clip):
         """Plot sub contours on painter."""
         s = self.settings
-        self._plotContours(painter, phelper, posn, axes, s.SubLines.get('lines'),
+        self._plotContours(painter, posn, axes, s.SubLines.get('lines'),
                            self._cachedsubcontours,
                            False, s.SubLines.hide, clip)
 

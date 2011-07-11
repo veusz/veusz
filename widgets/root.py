@@ -115,14 +115,11 @@ class Root(widget.Widget):
         height = cgi.posn[3] - cgi.posn[1]
 
         # set up fake painter containing veusz scalings
-        fakepainter = qt4.QPainter()
-        fakepainter.veusz_page_size = cgi.page_size
-        fakepainter.veusz_scaling = cgi.scaling
-        fakepainter.veusz_pixperpt = cgi.pixperpt
+        helper = document.PaintHelper(cgi.pagesize, scaling=cgi.scaling)
 
         # convert to physical units
-        width = s.get('width').convertInverse(width, fakepainter)
-        height = s.get('height').convertInverse(height, fakepainter)
+        width = s.get('width').convertInverse(width, helper)
+        height = s.get('height').convertInverse(height, helper)
 
         # modify widget margins
         operations = (

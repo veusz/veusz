@@ -113,7 +113,7 @@ class BoxShape(Shape):
 
         # drawing settings for shape
         if not s.Border.hide:
-            painter.setPen( s.get('Border').makeQPen(phelper) )
+            painter.setPen( s.get('Border').makeQPen(painter) )
         else:
             painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
         if not s.Fill.hide:

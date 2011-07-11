@@ -95,7 +95,7 @@ class TextLabel(plotters.FreePlotter):
         painter = phelper.painter(self, posn)
         textpen = s.get('Text').makeQPen()
         painter.setPen(textpen)
-        font = s.get('Text').makeQFont(phelper)
+        font = s.get('Text').makeQFont(painter)
 
         # we should only be able to move non-dataset labels
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
@@ -112,8 +112,7 @@ class TextLabel(plotters.FreePlotter):
 
             # add cgi for adjustable positions
             if isnotdataset:
-                cgi = controlgraph.ControlMovableBox(self, tbounds,
-                                                     phelper,
+                cgi = controlgraph.ControlMovableBox(self, tbounds, phelper,
                                                      crosspos = (x, y))
                 cgi.labelpt = (x, y)
                 cgi.widgetposn = posn

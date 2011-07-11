@@ -161,7 +161,7 @@ class VectorField(plotters.GenericPlotter):
         cliprect = self.clipAxesBounds(axes, posn)
         painter = phelper.painter(self, posn, clip=cliprect)
 
-        baselength = s.get('baselength').convert(phelper)
+        baselength = s.get('baselength').convert(painter)
 
         # try to be nice if the datasets don't match
         data1st, data2nd = data1.data, data2.data
@@ -177,7 +177,7 @@ class VectorField(plotters.GenericPlotter):
         xplotter = axes[0].dataToPlotterCoords(posn, xdsvals)
         yplotter = axes[1].dataToPlotterCoords(posn, ydsvals)
 
-        pen = s.Line.makeQPenWHide(phelper)
+        pen = s.Line.makeQPenWHide(painter)
         painter.setPen(pen)
 
         if s.mode == 'cartesian':
@@ -197,7 +197,7 @@ class VectorField(plotters.GenericPlotter):
             utils.plotLinesToPainter(painter, x1, y1, x2, y2,
                                      cliprect)
         else:
-            arrowsize = s.get('arrowsize').convert(phelper)
+            arrowsize = s.get('arrowsize').convert(painter)
             painter.setBrush( s.get('Fill').makeQBrushWHide() )
 
             # this is backward - have to convert from dx, dy to angle, length

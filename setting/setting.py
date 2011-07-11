@@ -633,41 +633,41 @@ class IntOrAuto(Setting):
 # these are functions used by the distance setting below.
 # they don't work as class methods
 
-def _distPhys(match, painthelper, mult):
+def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
 
-    return (painthelper.pixperpt * mult *
-            float(match.group(1)) * painthelper.scaling)
+    return (painter.pixperpt * mult *
+            float(match.group(1)) * painter.scaling)
 
-def _distInvPhys(pixdist, painthelper, mult, unit):
+def _distInvPhys(pixdist, painter, mult, unit):
     """Convert number of pixels into physical distance."""
-    dist = pixdist / (mult * painthelper.pixperpt * painthelper.scaling)
+    dist = pixdist / (mult * painter.pixperpt * painter.scaling)
     return "%.3g%s" % (dist, unit)
 
-def _distPerc(match, painthelper):
+def _distPerc(match, painter):
     """Convert from a percentage of maxsize."""
-    return painthelper.maxsize * 0.01 * float(match.group(1))
+    return painter.maxsize * 0.01 * float(match.group(1))
 
-def _distInvPerc(pixdist, painthelper):
+def _distInvPerc(pixdist, painter):
     """Convert pixel distance into percentage."""
-    perc = pixdist * 100. / painthelper.maxsize
+    perc = pixdist * 100. / painter.maxsize
     return "%.3g%%" % perc
 
-def _distFrac(match, painthelper):
+def _distFrac(match, painter):
     """Convert from a fraction a/b of maxsize."""
     try:
-        return painthelper.maxsize * float(match.group(1))/float(match.group(2))
+        return painter.maxsize * float(match.group(1))/float(match.group(2))
     except ZeroDivisionError:
         return 0.
 
-def _distRatio(match, painthelper):
+def _distRatio(match, painter):
     """Convert from a simple 0.xx ratio of maxsize."""
 
     # if it's greater than 1 then assume it's a point measurement
     if float(match.group(1)) > 1.:
-        return _distPhys(match, painthelper, 1)
+        return _distPhys(match, painter, 1)
 
-    return painthelper.maxsize * float(match.group(1))
+    return painter.maxsize * float(match.group(1))
 
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
@@ -676,37 +676,37 @@ class Distance(Setting):
 
     # mappings from regular expressions to function to convert distance
     # the recipient function takes regexp match,
-    # painthelper and maximum size of frac
+    # painter and maximum size of frac
 
     # the second function is to do the inverse calculation
     distregexp = [
         # cm distance
         ( re.compile('^([0-9\.]+) *cm$'),
-          lambda match, painthelper:
-              _distPhys(match, painthelper, 28.452756),
-          lambda pixdist, painthelper:
-              _distInvPhys(pixdist, painthelper, 28.452756, 'cm') ),
+          lambda match, painter:
+              _distPhys(match, painter, 28.452756),
+          lambda pixdist, painter:
+              _distInvPhys(pixdist, painter, 28.452756, 'cm') ),
 
         # point size
         ( re.compile('^([0-9\.]+) *pt$'),
-          lambda match, painthelper:
-              _distPhys(match, painthelper, 1.),
-          lambda pixdist, painthelper:
-              _distInvPhys(pixdist, painthelper, 1., 'pt') ),
+          lambda match, painter:
+              _distPhys(match, painter, 1.),
+          lambda pixdist, painter:
+              _distInvPhys(pixdist, painter, 1., 'pt') ),
 
         # mm distance
         ( re.compile('^([0-9\.]+) *mm$'),
-          lambda match, painthelper:
-              _distPhys(match, painthelper, 2.8452756),
-          lambda pixdist, painthelper:
-              _distInvPhys(pixdist, painthelper, 2.8452756, 'mm') ),
+          lambda match, painter:
+              _distPhys(match, painter, 2.8452756),
+          lambda pixdist, painter:
+              _distInvPhys(pixdist, painter, 2.8452756, 'mm') ),
 
         # inch distance
         ( re.compile('^([0-9\.]+) *(inch|in|")$'),
-          lambda match, painthelper:
-              _distPhys(match, painthelper, 72.27),
-          lambda pixdist, painthelper:
-              _distInvPhys(pixdist, painthelper, 72.27, 'in') ),
+          lambda match, painter:
+              _distPhys(match, painter, 72.27),
+          lambda pixdist, painter:
+              _distInvPhys(pixdist, painter, 72.27, 'in') ),
 
         # plain fraction
         ( re.compile('^([0-9\.]+)$'),
@@ -758,13 +758,13 @@ class Distance(Setting):
         return controls.Distance(self, *args)
 
     @classmethod
-    def convertDistance(kls, painthelper, dist):
+    def convertDistance(kls, painter, dist):
         '''Convert a distance to plotter units.
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
                  10pt, 1cm, 20mm, 1inch, 1in, 1" (size)
         maxsize: size fractions are relative to
-        painthelper: painthelper to get metrics to convert physical sizes
+        painter: painter to get metrics to convert physical sizes
         '''
 
         # work out maximum size
@@ -776,21 +776,21 @@ class Distance(Setting):
 
             # if there's a match, then call the appropriate conversion fn
             if m:
-                return fn(m, painthelper)
+                return fn(m, painter)
 
         # none of the regexps match
         raise ValueError( "Cannot convert distance in form '%s'" %
                           dist )
 
-    def convert(self, painthelper):
+    def convert(self, painter):
         """Convert this setting's distance as above"""
-        return self.convertDistance(painthelper, self.val)
+        return self.convertDistance(painter, self.val)
 
-    def convertPts(self, painthelper):
+    def convertPts(self, painter):
         """Get the distance in points."""
-        return self.convert(painthelper) / painthelper.pixperpt
+        return self.convert(painter) / painter.pixperpt
         
-    def convertInverse(self, distpix, painthelper):
+    def convertInverse(self, distpix, painter):
         """Convert distance in pixels into units of this distance.
         """
 
@@ -805,7 +805,7 @@ class Distance(Setting):
             inversefn = self.distregexp[0][2]
 
         # do inverse mapping
-        return inversefn(distpix, painthelper)
+        return inversefn(distpix, painter)
 
 class DistancePt(Distance):
     """For a distance in points."""
@@ -1567,7 +1567,7 @@ class LineSet(Setting):
         """Make specialised lineset control."""
         return controls.LineSet(self, *args)
 
-    def makePen(self, phelper, row):
+    def makePen(self, painter, row):
         """Make a pen for the painter using row.
 
         If row is outside of range, then cycle
@@ -1579,7 +1579,7 @@ class LineSet(Setting):
             row = row % len(self.val)
             v = self.val[row]
             style, width, color, hide = v
-            width = Distance.convertDistance(phelper, width)
+            width = Distance.convertDistance(painter, width)
             style, dashpattern = LineStyle._linecnvt[style]
             col = utils.extendedColorToQColor(color)
             pen = qt4.QPen(col, width, style)

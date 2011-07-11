@@ -312,7 +312,7 @@ class BoxPlot(GenericPlotter):
 
         stats = _Stats()
 
-    def plotBox(self, painter, phelper, axes, boxposn, posn, width, clip, stats):
+    def plotBox(self, painter, axes, boxposn, posn, width, clip, stats):
         """Draw box for dataset."""
 
         s = self.settings
@@ -327,7 +327,7 @@ class BoxPlot(GenericPlotter):
             )
 
         # draw whisker top to bottom
-        p = s.Whisker.makeQPenWHide(phelper)
+        p = s.Whisker.makeQPenWHide(painter)
         p.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn, topwhisplt, boxposn, botwhisplt, horz)
@@ -345,22 +345,22 @@ class BoxPlot(GenericPlotter):
                 boxposn+width/2, topplt, horz)
 
         # draw line across box
-        p = s.Whisker.makeQPenWHide(phelper)
+        p = s.Whisker.makeQPenWHide(painter)
         p.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn-width/2, medplt,
                  boxposn+width/2, medplt, horz)
 
         # draw box
-        painter.setPen( s.Border.makeQPenWHide(phelper) )
+        painter.setPen( s.Border.makeQPenWHide(painter) )
         painter.setBrush( qt4.QBrush() )
         swapbox(painter, boxposn-width/2, botplt,
                 boxposn+width/2, topplt, horz)
 
         # draw outliers
-        painter.setPen( s.MarkersLine.makeQPenWHide(phelper) )
+        painter.setPen( s.MarkersLine.makeQPenWHide(painter) )
         painter.setBrush( s.MarkersFill.makeQBrushWHide() )
-        markersize = s.get('markerSize').convert(phelper)
+        markersize = s.get('markerSize').convert(painter)
         if stats.outliers.shape[0] != 0:
             pltvals = axes[not horz].dataToPlotterCoords(posn, stats.outliers)
             otherpos = N.zeros(pltvals.shape) + boxposn
@@ -447,7 +447,7 @@ class BoxPlot(GenericPlotter):
             for vals, plotpos in izip(values, plotposns):
                 stats = _Stats()
                 stats.calculate(vals.data, s.whiskermode)
-                self.plotBox(painter, phelper, axes, plotpos, widgetposn, width,
+                self.plotBox(painter, axes, plotpos, widgetposn, width,
                              clip, stats)
         else:
             # manually given boxes
@@ -462,7 +462,7 @@ class BoxPlot(GenericPlotter):
                 stats.mean = vals[4][i]
                 stats.median = vals[5][i]
                 stats.outliers = N.array([])
-                self.plotBox(painter, phelper, axes, vals[6][i], widgetposn,
+                self.plotBox(painter, axes, vals[6][i], widgetposn,
                              width, clip, stats)
 
 # allow the factory to instantiate a boxplot

@@ -104,16 +104,16 @@ class Line(plotters.FreePlotter):
                          not s.get('length').isDataset(d) and
                          not s.get('angle').isDataset(d) )
 
-        # adjustable positions for the lines
-        controlgraphitems = []
-        arrowsize = s.get('arrowSize').convert(phelper)
-
         # now do the drawing
         painter = phelper.painter(self, posn)
 
+        # adjustable positions for the lines
+        controlgraphitems = []
+        arrowsize = s.get('arrowSize').convert(painter)
+
         # drawing settings for line
         if not s.Line.hide:
-            painter.setPen( s.get('Line').makeQPen(phelper) )
+            painter.setPen( s.get('Line').makeQPen(painter) )
         else:
             painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 

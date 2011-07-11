@@ -31,119 +31,6 @@ import veusz.document as document
 import veusz.utils as utils
 import veusz.widgets as widgets
 
-class RecordingPainter(document.Painter):
-    """A painter to remember where the positions of the
-    painted widgets."""
-
-    def __init__(self, device):
-        """Start painting on device."""
-        document.Painter.__init__(self)
-        self.widgetpositions = []
-        self.widgetpositionslookup = {}
-        self.begin(device)
-
-    def beginPaintingWidget(self, widget, bounds):
-        """Record the widget and position."""
-        self.widgetpositions.append( (widget, bounds) )
-        self.widgetpositionslookup[widget] = bounds
-
-class PointPainter(document.Painter):
-    """A simple painter variant which works out the last widget
-    to overlap with the point specified."""
-
-    def __init__(self, pixmap, x, y):
-        """Watch the point x, y."""
-        document.Painter.__init__(self)
-        self.x = x
-        self.y = y
-        self.widget = None
-        self.bounds = {}
-
-        self.pixmap = pixmap
-        self.begin(pixmap)
-
-    def beginPaintingWidget(self, widget, bounds):
-
-        if (isinstance(widget, widgets.Graph) and
-            bounds[0] <= self.x and bounds[1] <= self.y and
-            bounds[2] >= self.x and bounds[3] >= self.y):
-            self.widget = widget
-
-        # record bounds of each widget
-        self.bounds[widget] = bounds
-
-class ClickPainter(document.Painter):
-    """A variant of a painter which checks to see whether a certain
-    sized area is drawn over each time a widget is drawn. This allows
-    the program to identify clicks with a widget.
-
-    The painter monitors a certain sized region in the output pixmap
-    """
-
-    def __init__(self, pixmap, xmin, ymin, xw, yw):
-        """Monitor the region from (xmin, ymin) to (xmin+xw, ymin+yw).
-
-        pixmap is the region the painter monitors
-        """
-        
-        document.Painter.__init__(self)
-
-        self.pixmap = pixmap
-        self.xmin = xmin
-        self.ymin = ymin
-        self.xw = xw
-        self.yw = yw
-
-        # a stack keeping track of the widgets being painted currently
-        self.widgets = []
-        # a stack of starting state pixmaps of the widgets
-        self.pixmaps = []
-        # a list of widgets which change the region
-        self.foundwidgets = []
-
-        # we hope this color isn't actually used by the user
-        # if a pixel changes from this color, a widget has drawn something
-        self.specialcolor = qt4.QColor(254, 255, 254)
-        self.pixmap.fill(self.specialcolor)
-        self.begin(self.pixmap)
-
-    def beginPaintingWidget(self, widget, bounds):
-        self.widgets.append(widget)
-
-        # make a small pixmap of the starting state of the image
-        # we can compare this after the widget is painted
-        pixmap = self.pixmap.copy(self.xmin, self.ymin, self.xw, self.yw)
-        self.pixmaps.append(pixmap)
-
-    def endPaintingWidget(self):
-        """When a widget has finished."""
-
-        oldpixmap = self.pixmaps.pop()
-        widget = self.widgets.pop()
-
-        # compare current pixmap for region with initial contents
-        # hope this is not needed
-        #self.flush()
-        newpixmap = self.pixmap.copy(self.xmin, self.ymin, self.xw, self.yw)
-
-        if oldpixmap.toImage() != newpixmap.toImage():
-            # drawn here, so make a note
-            self.foundwidgets.append(widget)
-
-            # copy back original
-            self.drawPixmap(qt4.QRect(self.xmin, self.ymin, self.xw, self.yw),
-                            oldpixmap,
-                            qt4.QRect(0, 0, self.xw, self.yw))
-
-    def getFoundWidget(self):
-        """Return the widget lowest in the tree near the click of the mouse.
-        """
-
-        if self.foundwidgets:
-            return self.foundwidgets[-1]
-        else:
-            return None
-
 class PickerCrosshairItem( qt4.QGraphicsPathItem ):
     """The picker cross widget: it moves from point to point and curve to curve
        with the arrow keys, and hides itself when it looses focus"""
@@ -228,7 +115,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.ignoreclick = False
 
         # work out dpi
-        self.widgetdpi = self.logicalDpiY()
+        self.screendpi = self.logicalDpiY()
 
         # convert size to pixels
         self.setOutputSize()
@@ -757,10 +644,13 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # convert distances into pixels
         pix = qt4.QPixmap(1, 1)
-        ph = document.PaintHelper( (1, 1),
-                                   scaling = self.zoomfactor,
-                                   dpi = self.widgetdpi )
+        ph = document.PaintHelper( (1, 1), scaling = self.zoomfactor )
+        # this is size in PaintHelper's native pixels
         size = self.document.basewidget.getSize(ph)
+
+        # scale it according to the difference in dpi
+        ratiodpi = self.screendpi * 1. / ph.dpi
+        size = (int(ratiodpi*size[0]), int(ratiodpi*size[1]))
 
         # make new buffer and resize widget
         if size != self.size:
@@ -812,7 +702,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.painthelper = phelper = document.PaintHelper(
                         (self.bufferpixmap.width(),
                          self.bufferpixmap.height()),
-                        dpi = self.widgetdpi, scaling = self.zoomfactor
+                        scaling = self.zoomfactor
                         )
                     self.document.paintTo(phelper, self.pagenumber)
 

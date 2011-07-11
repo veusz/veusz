@@ -115,14 +115,14 @@ class NonOrthPoint(Widget):
                 lambda v1, v2: self.parent.graphToPlotCoords(v1, v2))
         return p.pickIndex(oldindex, direction, bounds)
 
-    def plotMarkers(self, painter, phelper, plta, pltb, scaling, clip):
+    def plotMarkers(self, painter, plta, pltb, scaling, clip):
         '''Draw markers in widget.'''
         s = self.settings
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
             painter.setBrush( s.MarkerFill.makeQBrushWHide() )
-            painter.setPen( s.MarkerLine.makeQPenWHide(phelper) )
+            painter.setPen( s.MarkerLine.makeQPenWHide(painter) )
                 
-            size = s.get('markerSize').convert(phelper)
+            size = s.get('markerSize').convert(painter)
             utils.plotMarkers(painter, plta, pltb, s.marker, size,
                               scaling=scaling, clip=clip)
 
@@ -173,7 +173,7 @@ class NonOrthPoint(Widget):
             # plot line
             if not s.PlotLine.hide:
                 painter.setBrush( qt4.QBrush() )
-                painter.setPen(s.PlotLine.makeQPen(phelper))
+                painter.setPen(s.PlotLine.makeQPen(painter))
                 pts = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(pts, px, py)
                 utils.plotClippedPolyline(painter, cliprect, pts)
@@ -182,7 +182,7 @@ class NonOrthPoint(Widget):
             pscale = None
             if vs:
                 pscale = vs.data
-            self.plotMarkers(painter, phelper, px, py, pscale, cliprect)
+            self.plotMarkers(painter, px, py, pscale, cliprect)
 
 # allow the factory to instantiate plotter
 document.thefactory.register( NonOrthPoint )

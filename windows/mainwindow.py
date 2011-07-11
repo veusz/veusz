@@ -1077,7 +1077,7 @@ class MainWindow(qt4.QMainWindow):
         filters = []
         # a list of extensions which are allowed
         validextns = []
-        formats = self.document.getExportFormats()
+        formats = document.Export.formats
         for extns, name in formats:
             extensions = " ".join(["*." + item for item in extns])
             # join eveything together to make a filter string
@@ -1130,13 +1130,16 @@ class MainWindow(qt4.QMainWindow):
             if (ext not in validextns) and (ext not in chosenextns):
                 filename = filename + "." + chosenextns[0]
 
+            e = document.Export( self.document,
+                                 filename,
+                                 self.plot.getPageNumber(),
+                                 bitmapdpi=setdb['export_DPI'],
+                                 antialias=setdb['export_antialias'],
+                                 color=setdb['export_color'],
+                                 quality=setdb['export_quality'],
+                                 backcolor=setdb['export_background'] )
             try:
-                self.document.export(filename, self.plot.getPageNumber(),
-                                     dpi=setdb['export_DPI'],
-                                     antialias=setdb['export_antialias'],
-                                     color=setdb['export_color'],
-                                     quality=setdb['export_quality'],
-                                     backcolor=setdb['export_background'])
+                e.export()
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox.critical(self, "Veusz",
                                          "Error exporting file:\n%s" % inst)

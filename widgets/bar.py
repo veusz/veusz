@@ -253,7 +253,7 @@ class BarPlotter(GenericPlotter):
                 maxval = vals + N.nan_to_num(dataset['perr'])
         return minval, maxval
 
-    def drawErrorBars(self, painter, phelper, posns, barwidth,
+    def drawErrorBars(self, painter, posns, barwidth,
                       yvals, dataset, axes, widgetposn):
         """Draw (optional) error bars on bars."""
         s = self.settings
@@ -278,7 +278,7 @@ class BarPlotter(GenericPlotter):
         maxcoord = N.clip(maxcoord, -32767, 32767)
 
         # draw error bars
-        painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(phelper) )
+        painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(painter) )
         w = barwidth*0.25
         if ishorz:
             utils.plotLinesToPainter(painter, mincoord, posns,
@@ -297,7 +297,7 @@ class BarPlotter(GenericPlotter):
                 utils.plotLinesToPainter(painter, posns-w, maxcoord,
                                          posns+w, maxcoord)
 
-    def barDrawGroup(self, painter, phelper, posns, maxwidth, dsvals,
+    def barDrawGroup(self, painter, posns, maxwidth, dsvals,
                      axes, widgetposn, clip):
         """Draw groups of bars."""
 
@@ -319,7 +319,7 @@ class BarPlotter(GenericPlotter):
         for dsnum, dataset in enumerate(dsvals):
             # set correct attributes for datasets
             painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
-            painter.setPen( s.BarLine.get('lines').makePen(phelper, dsnum) )
+            painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
             
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
@@ -341,11 +341,11 @@ class BarPlotter(GenericPlotter):
             utils.plotBoxesToPainter(painter, p[0], p[1], p[2], p[3], clip)
 
             # draw error bars
-            self.drawErrorBars(painter, phelper, posns2-barwidth*0.5, barwidth,
+            self.drawErrorBars(painter, posns2-barwidth*0.5, barwidth,
                                dataset['data'], dataset,
                                axes, widgetposn)
 
-    def barDrawStacked(self, painter, phelper, posns, maxwidth, dsvals,
+    def barDrawStacked(self, painter, posns, maxwidth, dsvals,
                        axes, widgetposn, clip):
         """Draw each dataset in a single bar."""
 
@@ -366,7 +366,7 @@ class BarPlotter(GenericPlotter):
         for dsnum, data in enumerate(dsvals):
             # set correct attributes for datasets
             painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
-            painter.setPen( s.BarLine.get('lines').makePen(phelper, dsnum) )
+            painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
             
             # add on value to last value in correct direction
             data = data['data']
@@ -400,7 +400,7 @@ class BarPlotter(GenericPlotter):
 
         for barval, dsval in izip(barvals, dsvals):
             # draw error bars
-            self.drawErrorBars(painter, phelper, posns, barwidth,
+            self.drawErrorBars(painter, posns, barwidth,
                                barval, dsval,
                                axes, widgetposn)
 
@@ -415,12 +415,12 @@ class BarPlotter(GenericPlotter):
         """Get key entry."""
         return [k for k in self.settings.keys if k][number]
 
-    def drawKeySymbol(self, number, painter, phelper, x, y, width, height):
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw a fill rectangle for key entry."""
 
         s = self.settings
         painter.setBrush( s.BarFill.get('fills').makeBrush(number) )
-        painter.setPen( s.BarLine.get('lines').makePen(phelper, number) )
+        painter.setPen( s.BarLine.get('lines').makePen(painter, number) )
         painter.drawRect( qt4.QRectF(qt4.QPointF(x, y+height*0.1),
                                      qt4.QPointF(x+width, y+height*0.8)) )
 
@@ -481,7 +481,7 @@ class BarPlotter(GenericPlotter):
         # actually do the drawing
         fn = {'stacked': self.barDrawStacked,
               'grouped': self.barDrawGroup}[s.mode]
-        fn(painter, phelper, barposns, maxwidth, dsvals, axes, widgetposn, clip)
+        fn(painter, barposns, maxwidth, dsvals, axes, widgetposn, clip)
 
 # allow the factory to instantiate a bar plotter
 document.thefactory.register( BarPlotter )

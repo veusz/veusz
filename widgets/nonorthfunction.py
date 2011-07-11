@@ -175,7 +175,7 @@ class NonOrthFunction(Widget):
 
         # plot line
         painter.setBrush(qt4.QBrush())
-        painter.setPen( s.PlotLine.makeQPenWHide(phelper) )
+        painter.setPen( s.PlotLine.makeQPenWHide(painter) )
         for x, y in utils.validLinePoints(px, py):
             if not s.Fill1.hide:
                 painter.setBrush( s.Fill1.makeQBrush() )
@@ -191,7 +191,7 @@ class NonOrthFunction(Widget):
                 p = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(p, x, y)
                 painter.setBrush(qt4.QBrush())
-                painter.setPen( s.PlotLine.makeQPen(phelper) )
+                painter.setPen( s.PlotLine.makeQPen(painter) )
                 utils.plotClippedPolyline(painter, cliprect, p)
 
 document.thefactory.register( NonOrthFunction )

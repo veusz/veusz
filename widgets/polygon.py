@@ -69,7 +69,7 @@ class Polygon(plotters.FreePlotter):
         cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
         painter = phelper.painter(self, posn, clip=cliprect)
 
-        painter.setPen( s.Line.makeQPenWHide(phelper) )
+        painter.setPen( s.Line.makeQPenWHide(painter) )
         painter.setBrush( s.Fill.makeQBrushWHide() )
 
         # this is a hack as we generate temporary fake datasets

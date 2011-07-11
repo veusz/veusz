@@ -134,7 +134,7 @@ class Graph(widget.Widget):
 
         # set graph rectangle attributes
         painter.setBrush( s.get('Background').makeQBrushWHide() )
-        painter.setPen( s.get('Border').makeQPenWHide(painthelper) )
+        painter.setPen( s.get('Border').makeQPenWHide(painter) )
 
         # draw graph rectangle
         painter.drawRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
