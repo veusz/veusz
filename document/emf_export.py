@@ -39,7 +39,7 @@ def isStockObject(obj):
 class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
     """Extended pen creation record with custom line style."""
 
-    emr_typedef=[
+    emr_typedef = [
         ('i','handle',0),
         ('i','offBmi',0),
         ('i','cbBmi',0),
@@ -51,7 +51,7 @@ class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
         ('i','color'),
         ('i','brushhatch',0),
         ('i','numstyleentries')]
-
+    
     def __init__(self, style=pyemf.PS_SOLID, width=1, color=0,
                  styleentries=[]):
         """Create pen.
@@ -82,301 +82,301 @@ class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
 class EMFPaintEngine(qt4.QPaintEngine):
     """Custom EMF paint engine."""
 
-        def __init__(self, width_in, height_in, dpi=75):
-            qt4.QPaintEngine.__init__(self,
-                                      qt4.QPaintEngine.Antialiasing |
-                                      qt4.QPaintEngine.PainterPaths |
-                                      qt4.QPaintEngine.PrimitiveTransform |
-                                      qt4.QPaintEngine.PaintOutsidePaintEvent |
-                                      qt4.QPaintEngine.PatternBrush )
-            self.width = width_in
-            self.height = height_in
-            self.dpi = dpi
+    def __init__(self, width_in, height_in, dpi=75):
+        qt4.QPaintEngine.__init__(self,
+                                  qt4.QPaintEngine.Antialiasing |
+                                  qt4.QPaintEngine.PainterPaths |
+                                  qt4.QPaintEngine.PrimitiveTransform |
+                                  qt4.QPaintEngine.PaintOutsidePaintEvent |
+                                  qt4.QPaintEngine.PatternBrush )
+        self.width = width_in
+        self.height = height_in
+        self.dpi = dpi
 
-        def begin(self, paintdevice):
-            self.emf = pyemf.EMF(self.width, self.height, self.dpi*scale)
-            self.pen = self.emf.GetStockObject(pyemf.BLACK_PEN)
-            self.pencolor = (0, 0, 0)
-            self.brush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
+    def begin(self, paintdevice):
+        self.emf = pyemf.EMF(self.width, self.height, self.dpi*scale)
+        self.pen = self.emf.GetStockObject(pyemf.BLACK_PEN)
+        self.pencolor = (0, 0, 0)
+        self.brush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
 
-            self.paintdevice = paintdevice
-            return True
+        self.paintdevice = paintdevice
+        return True
 
-        def drawLines(self, lines):
-            """Draw lines to emf output."""
+    def drawLines(self, lines):
+        """Draw lines to emf output."""
 
-            for line in lines:
-                self.emf.Polyline(
-                     [(line.x1()*scale, line.y1()*scale),
-                      (line.x2()*scale, line.y2()*scale)] )
+        for line in lines:
+            self.emf.Polyline(
+                 [(line.x1()*scale, line.y1()*scale),
+                  (line.x2()*scale, line.y2()*scale)] )
 
-        def drawPolygon(self, points, mode):
-            """Draw polygon on output."""
-            # print "Polygon"
-            pts = [(p.x()*scale, p.y()*scale) for p in points]
+    def drawPolygon(self, points, mode):
+        """Draw polygon on output."""
+        # print "Polygon"
+        pts = [(p.x()*scale, p.y()*scale) for p in points]
 
-            if mode == qt4.QPaintEngine.PolylineMode:
-                self.emf.Polyline(pts)
+        if mode == qt4.QPaintEngine.PolylineMode:
+            self.emf.Polyline(pts)
+        else:
+            self.emf.SetPolyFillMode( {qt4.QPaintEngine.WindingMode:
+                                            pyemf.WINDING,
+                                       qt4.QPaintEngine.OddEvenMode:
+                                            pyemf.ALTERNATE,
+                                       qt4.QPaintEngine.ConvexMode:
+                                            pyemf.WINDING} )
+            self.emf.Polygon(pts)
+
+    def drawEllipse(self, rect):
+        """Draw an ellipse."""
+        # print "ellipse"
+        args = (rect.left()*scale, rect.top()*scale,
+                rect.right()*scale, rect.bottom()*scale,
+                rect.left()*scale, rect.top()*scale,
+                rect.left()*scale, rect.top()*scale)
+        self.emf.Pie(*args)
+        self.emf.Arc(*args)
+
+    def drawPoints(self, points):
+        """Draw points."""
+        # print "points"
+
+        for pt in points:
+            x, y = (pt.x()-0.5)*scale, (pt.y()-0.5)*scale
+            self.emf.Pie( x, y,
+                          (pt.x()+0.5)*scale, (pt.y()+0.5)*scale,
+                          x, y, x, y )
+
+    def drawPixmap(self, r, pixmap, sr):
+        """Draw pixmap to display."""
+
+        # convert pixmap to BMP format
+        bytes = qt4.QByteArray()
+        buffer = qt4.QBuffer(bytes)
+        buffer.open(qt4.QIODevice.WriteOnly)
+        pixmap.save(buffer, "BMP")
+
+        # chop off bmp header to get DIB
+        bmp = str(buffer.data())
+        dib = bmp[0xe:]
+        hdrsize, = struct.unpack('<i', bmp[0xe:0x12])
+        dataindex, = struct.unpack('<i', bmp[0xa:0xe])
+        datasize, = struct.unpack('<i', bmp[0x22:0x26])
+
+        epix = pyemf._EMR._STRETCHDIBITS()
+        epix.rclBounds_left = r.left()*scale
+        epix.rclBounds_top = r.top()*scale
+        epix.rclBounds_right = r.right()*scale
+        epix.rclBounds_bottom = r.bottom()*scale
+        epix.xDest = r.left()*scale
+        epix.yDest = r.top()*scale
+        epix.cxDest = r.width()*scale
+        epix.cyDest = r.height()*scale
+        epix.xSrc = sr.left()
+        epix.ySrc = sr.top()
+        epix.cxSrc = sr.width()
+        epix.cySrc = sr.height()
+
+        epix.dwRop = 0xcc0020 # SRCCOPY
+        epix.offBmiSrc = epix.serializeOffset()
+        epix.cbBmiSrc = hdrsize
+        epix.offBitsSrc = epix.serializeOffset() + dataindex - 0xe
+        epix.cbBitsSrc = datasize
+        epix.iUsageSrc = 0x0 # DIB_RGB_COLORS
+
+        epix.unhandleddata = dib
+
+        self.emf._append(epix)
+
+    def _createPath(self, path):
+        """Convert qt path to emf path"""
+        self.emf.BeginPath()
+        count = path.elementCount()
+        i = 0
+        #print "Start path"
+        while i < count:
+            e = path.elementAt(i)
+            if e.type == qt4.QPainterPath.MoveToElement:
+                self.emf.MoveTo(e.x*scale, e.y*scale)
+                #print "M", e.x*scale, e.y*scale
+            elif e.type == qt4.QPainterPath.LineToElement:
+                self.emf.LineTo(e.x*scale, e.y*scale)
+                #print "L", e.x*scale, e.y*scale
+            elif e.type == qt4.QPainterPath.CurveToElement:
+                e1 = path.elementAt(i+1)
+                e2 = path.elementAt(i+2)
+                params = ((e.x*scale, e.y*scale),
+                          (e1.x*scale, e1.y*scale),
+                          (e2.x*scale, e2.y*scale))
+                self.emf.PolyBezierTo(params)
+                #print "C", params
+
+                i += 2
             else:
-                self.emf.SetPolyFillMode( {qt4.QPaintEngine.WindingMode:
-                                                pyemf.WINDING,
-                                           qt4.QPaintEngine.OddEvenMode:
-                                                pyemf.ALTERNATE,
-                                           qt4.QPaintEngine.ConvexMode:
-                                                pyemf.WINDING} )
-                self.emf.Polygon(pts)
+                assert False
 
-        def drawEllipse(self, rect):
-            """Draw an ellipse."""
-            # print "ellipse"
-            args = (rect.left()*scale, rect.top()*scale,
-                    rect.right()*scale, rect.bottom()*scale,
-                    rect.left()*scale, rect.top()*scale,
-                    rect.left()*scale, rect.top()*scale)
-            self.emf.Pie(*args)
-            self.emf.Arc(*args)
+            i += 1
 
-        def drawPoints(self, points):
-            """Draw points."""
-            # print "points"
+        ef = path.elementAt(0)
+        el = path.elementAt(count-1)
+        if ef.x == el.x and ef.y == el.y:
+            self.emf.CloseFigure()
+            #print "closing"
+        self.emf.EndPath()
 
-            for pt in points:
-                x, y = (pt.x()-0.5)*scale, (pt.y()-0.5)*scale
-                self.emf.Pie( x, y,
-                              (pt.x()+0.5)*scale, (pt.y()+0.5)*scale,
-                              x, y, x, y )
+    def drawPath(self, path):
+        """Draw a path on the output."""
+        # print "path"
 
-        def drawPixmap(self, r, pixmap, sr):
-            """Draw pixmap to display."""
+        self._createPath(path)
+        self.emf.StrokeAndFillPath()
 
-            # convert pixmap to BMP format
-            bytes = qt4.QByteArray()
-            buffer = qt4.QBuffer(bytes)
-            buffer.open(qt4.QIODevice.WriteOnly)
-            pixmap.save(buffer, "BMP")
+    def drawTextItem(self, pt, textitem):
+        """Convert text to a path and draw it.
+        """
+        # print "text", pt, textitem.text()
+        path = qt4.QPainterPath()
+        path.addText(pt, textitem.font(), textitem.text())
 
-            # chop off bmp header to get DIB
-            bmp = str(buffer.data())
-            dib = bmp[0xe:]
-            hdrsize, = struct.unpack('<i', bmp[0xe:0x12])
-            dataindex, = struct.unpack('<i', bmp[0xa:0xe])
-            datasize, = struct.unpack('<i', bmp[0x22:0x26])
+        fill = self.emf.CreateSolidBrush(self.pencolor)
+        self.emf.SelectObject(fill)
+        self._createPath(path)
+        self.emf.FillPath()
+        self.emf.SelectObject(self.brush)
+        self.emf.DeleteObject(fill)
 
-            epix = pyemf._EMR._STRETCHDIBITS()
-            epix.rclBounds_left = r.left()*scale
-            epix.rclBounds_top = r.top()*scale
-            epix.rclBounds_right = r.right()*scale
-            epix.rclBounds_bottom = r.bottom()*scale
-            epix.xDest = r.left()*scale
-            epix.yDest = r.top()*scale
-            epix.cxDest = r.width()*scale
-            epix.cyDest = r.height()*scale
-            epix.xSrc = sr.left()
-            epix.ySrc = sr.top()
-            epix.cxSrc = sr.width()
-            epix.cySrc = sr.height()
+    def end(self):
+        return True
 
-            epix.dwRop = 0xcc0020 # SRCCOPY
-            epix.offBmiSrc = epix.serializeOffset()
-            epix.cbBmiSrc = hdrsize
-            epix.offBitsSrc = epix.serializeOffset() + dataindex - 0xe
-            epix.cbBitsSrc = datasize
-            epix.iUsageSrc = 0x0 # DIB_RGB_COLORS
+    def saveFile(self, filename):
+        self.emf.save(filename)
 
-            epix.unhandleddata = dib
+    def _updatePen(self, pen):
+        """Update the pen to the currently selected one."""
 
-            self.emf._append(epix)
+        # line style
+        style = {qt4.Qt.NoPen: pyemf.PS_NULL,
+                 qt4.Qt.SolidLine: pyemf.PS_SOLID,
+                 qt4.Qt.DashLine: pyemf.PS_DASH,
+                 qt4.Qt.DotLine: pyemf.PS_DOT,
+                 qt4.Qt.DashDotLine: pyemf.PS_DASHDOT,
+                 qt4.Qt.DashDotDotLine: pyemf.PS_DASHDOTDOT,
+                 qt4.Qt.CustomDashLine: pyemf.PS_USERSTYLE}[pen.style()]
 
-        def _createPath(self, path):
-            """Convert qt path to emf path"""
-            self.emf.BeginPath()
-            count = path.elementCount()
-            i = 0
-            #print "Start path"
-            while i < count:
-                e = path.elementAt(i)
-                if e.type == qt4.QPainterPath.MoveToElement:
-                    self.emf.MoveTo(e.x*scale, e.y*scale)
-                    #print "M", e.x*scale, e.y*scale
-                elif e.type == qt4.QPainterPath.LineToElement:
-                    self.emf.LineTo(e.x*scale, e.y*scale)
-                    #print "L", e.x*scale, e.y*scale
-                elif e.type == qt4.QPainterPath.CurveToElement:
-                    e1 = path.elementAt(i+1)
-                    e2 = path.elementAt(i+2)
-                    params = ((e.x*scale, e.y*scale),
-                              (e1.x*scale, e1.y*scale),
-                              (e2.x*scale, e2.y*scale))
-                    self.emf.PolyBezierTo(params)
-                    #print "C", params
+        if style != pyemf.PS_NULL:
+            # set cap style
+            style |= {qt4.Qt.FlatCap: pyemf.PS_ENDCAP_FLAT,
+                      qt4.Qt.SquareCap: pyemf.PS_ENDCAP_SQUARE,
+                      qt4.Qt.RoundCap: pyemf.PS_ENDCAP_ROUND}[pen.capStyle()]
 
-                    i += 2
-                else:
-                    assert False
+            # set join style
+            style |= {qt4.Qt.MiterJoin: pyemf.PS_JOIN_MITER,
+                      qt4.Qt.BevelJoin: pyemf.PS_JOIN_BEVEL,
+                      qt4.Qt.RoundJoin: pyemf.PS_JOIN_ROUND,
+                      qt4.Qt.SvgMiterJoin: pyemf.PS_JOIN_MITER}[pen.joinStyle()]
 
-                i += 1
+            # use proper widths of lines
+            style |= pyemf.PS_GEOMETRIC
 
-            ef = path.elementAt(0)
-            el = path.elementAt(count-1)
-            if ef.x == el.x and ef.y == el.y:
-                self.emf.CloseFigure()
-                #print "closing"
-            self.emf.EndPath()
+        width = pen.widthF()*scale
+        qc = pen.color()
+        color = (qc.red(), qc.green(), qc.blue())
+        self.pencolor = color
 
-        def drawPath(self, path):
-            """Draw a path on the output."""
-            # print "path"
+        if pen.style() & qt4.Qt.CustomDashLine:
+            # make an extended pen if we need a custom dash pattern
+            dash = [width*f for f in pen.dashPattern()]
+            newpen = self.emf._appendHandle(
+                 _EXTCREATEPEN(style,
+                               width=width, color=color,
+                               styleentries=dash))
+        else:
+            # use a standard create pen
+            newpen = self.emf.CreatePen(style, width, color)
+        self.emf.SelectObject(newpen)
 
-            self._createPath(path)
-            self.emf.StrokeAndFillPath()
+        # delete old pen if it is not a stock object
+        if not isStockObject(self.pen):
+            self.emf.DeleteObject(self.pen)
+        self.pen = newpen
 
-        def drawTextItem(self, pt, textitem):
-            """Convert text to a path and draw it.
-            """
-            # print "text", pt, textitem.text()
-            path = qt4.QPainterPath()
-            path.addText(pt, textitem.font(), textitem.text())
+    def _updateBrush(self, brush):
+        """Update to selected brush."""
 
-            fill = self.emf.CreateSolidBrush(self.pencolor)
-            self.emf.SelectObject(fill)
-            self._createPath(path)
-            self.emf.FillPath()
-            self.emf.SelectObject(self.brush)
-            self.emf.DeleteObject(fill)
-
-        def end(self):
-            return True
-
-        def saveFile(self, filename):
-            self.emf.save(filename)
-
-        def _updatePen(self, pen):
-            """Update the pen to the currently selected one."""
-
-            # line style
-            style = {qt4.Qt.NoPen: pyemf.PS_NULL,
-                     qt4.Qt.SolidLine: pyemf.PS_SOLID,
-                     qt4.Qt.DashLine: pyemf.PS_DASH,
-                     qt4.Qt.DotLine: pyemf.PS_DOT,
-                     qt4.Qt.DashDotLine: pyemf.PS_DASHDOT,
-                     qt4.Qt.DashDotDotLine: pyemf.PS_DASHDOTDOT,
-                     qt4.Qt.CustomDashLine: pyemf.PS_USERSTYLE}[pen.style()]
-
-            if style != pyemf.PS_NULL:
-                # set cap style
-                style |= {qt4.Qt.FlatCap: pyemf.PS_ENDCAP_FLAT,
-                          qt4.Qt.SquareCap: pyemf.PS_ENDCAP_SQUARE,
-                          qt4.Qt.RoundCap: pyemf.PS_ENDCAP_ROUND}[pen.capStyle()]
-
-                # set join style
-                style |= {qt4.Qt.MiterJoin: pyemf.PS_JOIN_MITER,
-                          qt4.Qt.BevelJoin: pyemf.PS_JOIN_BEVEL,
-                          qt4.Qt.RoundJoin: pyemf.PS_JOIN_ROUND,
-                          qt4.Qt.SvgMiterJoin: pyemf.PS_JOIN_MITER}[pen.joinStyle()]
-
-                # use proper widths of lines
-                style |= pyemf.PS_GEOMETRIC
-
-            width = pen.widthF()*scale
-            qc = pen.color()
-            color = (qc.red(), qc.green(), qc.blue())
-            self.pencolor = color
-
-            if pen.style() & qt4.Qt.CustomDashLine:
-                # make an extended pen if we need a custom dash pattern
-                dash = [width*f for f in pen.dashPattern()]
-                newpen = self.emf._appendHandle(
-                     _EXTCREATEPEN(style,
-                                   width=width, color=color,
-                                   styleentries=dash))
-            else:
-                # use a standard create pen
-                newpen = self.emf.CreatePen(style, width, color)
-            self.emf.SelectObject(newpen)
-
-            # delete old pen if it is not a stock object
-            if not isStockObject(self.pen):
-                self.emf.DeleteObject(self.pen)
-            self.pen = newpen
-
-        def _updateBrush(self, brush):
-            """Update to selected brush."""
-
-            style = brush.style()
-            qc = brush.color()
-            color = (qc.red(), qc.green(), qc.blue())
-            # print "brush", color
-            if style == qt4.Qt.SolidPattern:
+        style = brush.style()
+        qc = brush.color()
+        color = (qc.red(), qc.green(), qc.blue())
+        # print "brush", color
+        if style == qt4.Qt.SolidPattern:
+            newbrush = self.emf.CreateSolidBrush(color)
+        elif style == qt4.Qt.NoBrush:
+            newbrush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
+        else:
+            try:
+                hatch = {qt4.Qt.HorPattern: pyemf.HS_HORIZONTAL,
+                         qt4.Qt.VerPattern: pyemf.HS_VERTICAL,
+                         qt4.Qt.CrossPattern: pyemf.HS_CROSS,
+                         qt4.Qt.BDiagPattern: pyemf.HS_BDIAGONAL,
+                         qt4.Qt.FDiagPattern: pyemf.HS_FDIAGONAL,
+                         qt4.Qt.DiagCrossPattern:
+                              pyemf.HS_DIAGCROSS}[brush.style()]
+            except KeyError:
                 newbrush = self.emf.CreateSolidBrush(color)
-            elif style == qt4.Qt.NoBrush:
-                newbrush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
             else:
-                try:
-                    hatch = {qt4.Qt.HorPattern: pyemf.HS_HORIZONTAL,
-                             qt4.Qt.VerPattern: pyemf.HS_VERTICAL,
-                             qt4.Qt.CrossPattern: pyemf.HS_CROSS,
-                             qt4.Qt.BDiagPattern: pyemf.HS_BDIAGONAL,
-                             qt4.Qt.FDiagPattern: pyemf.HS_FDIAGONAL,
-                             qt4.Qt.DiagCrossPattern:
-                                  pyemf.HS_DIAGCROSS}[brush.style()]
-                except KeyError:
-                    newbrush = self.emf.CreateSolidBrush(color)
-                else:
-                    newbrush = self.emf.CreateHatchBrush(hatch, color)
-            self.emf.SelectObject(newbrush)
+                newbrush = self.emf.CreateHatchBrush(hatch, color)
+        self.emf.SelectObject(newbrush)
 
-            if not isStockObject(self.brush):
-                self.emf.DeleteObject(self.brush)
-            self.brush = newbrush
+        if not isStockObject(self.brush):
+            self.emf.DeleteObject(self.brush)
+        self.brush = newbrush
 
-        def _updateClipPath(self, path, operation):
-            """Update clipping path."""
-            # print "clip"
-            if operation != qt4.Qt.NoClip:
-                self._createPath(path)
-                clipmode = {
-                     qt4.Qt.ReplaceClip: pyemf.RGN_COPY,
-                     qt4.Qt.IntersectClip: pyemf.RGN_AND,
-                     qt4.Qt.UniteClip: pyemf.RGN_OR}[operation]
-            else:
-                # is this the only wave to get rid of clipping?
-                self.emf.BeginPath()
-                self.emf.MoveTo(0,0)
-                w = self.width*self.dpi*scale
-                h = self.height*self.dpi*scale
-                self.emf.LineTo(w, 0)
-                self.emf.LineTo(w, h)
-                self.emf.LineTo(0, h)
-                self.emf.CloseFigure()
-                self.emf.EndPath()
-                clipmode = pyemf.RGN_COPY
+    def _updateClipPath(self, path, operation):
+        """Update clipping path."""
+        # print "clip"
+        if operation != qt4.Qt.NoClip:
+            self._createPath(path)
+            clipmode = {
+                 qt4.Qt.ReplaceClip: pyemf.RGN_COPY,
+                 qt4.Qt.IntersectClip: pyemf.RGN_AND,
+                 qt4.Qt.UniteClip: pyemf.RGN_OR}[operation]
+        else:
+            # is this the only wave to get rid of clipping?
+            self.emf.BeginPath()
+            self.emf.MoveTo(0,0)
+            w = self.width*self.dpi*scale
+            h = self.height*self.dpi*scale
+            self.emf.LineTo(w, 0)
+            self.emf.LineTo(w, h)
+            self.emf.LineTo(0, h)
+            self.emf.CloseFigure()
+            self.emf.EndPath()
+            clipmode = pyemf.RGN_COPY
 
-            self.emf.SelectClipPath(mode=clipmode)
+        self.emf.SelectClipPath(mode=clipmode)
 
-        def _updateTransform(self, m):
-            """Update transformation."""
-            self.emf.SetWorldTransform(m.m11(), m.m12(),
-                                       m.m21(), m.m22(),
-                                       m.dx()*scale, m.dy()*scale)
+    def _updateTransform(self, m):
+        """Update transformation."""
+        self.emf.SetWorldTransform(m.m11(), m.m12(),
+                                   m.m21(), m.m22(),
+                                   m.dx()*scale, m.dy()*scale)
 
-        def updateState(self, state):
-            """Examine what has changed in state and call apropriate function."""
-            ss = state.state()
-            if ss & qt4.QPaintEngine.DirtyPen:
-                self._updatePen(state.pen())
-            if ss & qt4.QPaintEngine.DirtyBrush:
-                self._updateBrush(state.brush())
-            if ss & qt4.QPaintEngine.DirtyClipPath:
-                self._updateClipPath(state.clipPath(), state.clipOperation())
-            if ss & qt4.QPaintEngine.DirtyClipRegion:
-                path = qt4.QPainterPath()
-                path.addRegion(state.clipRegion())
-                self._updateClipPath(path, state.clipOperation())
-            if ss & qt4.QPaintEngine.DirtyTransform:
-                self._updateTransform(state.matrix())
+    def updateState(self, state):
+        """Examine what has changed in state and call apropriate function."""
+        ss = state.state()
+        if ss & qt4.QPaintEngine.DirtyPen:
+            self._updatePen(state.pen())
+        if ss & qt4.QPaintEngine.DirtyBrush:
+            self._updateBrush(state.brush())
+        if ss & qt4.QPaintEngine.DirtyClipPath:
+            self._updateClipPath(state.clipPath(), state.clipOperation())
+        if ss & qt4.QPaintEngine.DirtyClipRegion:
+            path = qt4.QPainterPath()
+            path.addRegion(state.clipRegion())
+            self._updateClipPath(path, state.clipOperation())
+        if ss & qt4.QPaintEngine.DirtyTransform:
+            self._updateTransform(state.matrix())
 
-        def type(self):
-            return qt4.QPaintEngine.PostScript
+    def type(self):
+        return qt4.QPaintEngine.PostScript
 
 class EMFPaintDevice(qt4.QPaintDevice):
     """Paint device for EMF paint engine."""
