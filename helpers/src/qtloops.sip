@@ -178,7 +178,10 @@ class IntermediatePaintDevice : QPaintDevice
 
 public:
   IntermediatePaintDevice(int width, int height, int dpi);
+  ~IntermediatePaintDevice();
   void playback(QPainter& painter);
 
   QPaintEngine* paintEngine() const;
+
+  int metric(QPaintDevice::PaintDeviceMetric metric) const;
  };

@@ -22,6 +22,7 @@
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
+from veusz.helpers.qtloops import IntermediatePaintDevice
 
 class DrawState(object):
     """Each widget plotted has a recorded state in this object."""
@@ -32,7 +33,7 @@ class DrawState(object):
         clip: if clipping should be done, another tuple."""
 
         self.widget = widget
-        self.picture = qt4.QPicture()
+        self.picture = IntermediatePaintDevice(1000,1000,100)
         self.bounds = bounds
         self.clip = clip
 
@@ -120,7 +121,8 @@ class PaintHelper(object):
             painter.save()
             #painter.setClipRect(state.clip)
 
-        painter.drawPicture(0, 0, state.picture)
+        #painter.drawPicture(0, 0, state.picture)
+        state.picture.playback(painter)
 
         for child in state.children:
             self._renderState(child, painter)
