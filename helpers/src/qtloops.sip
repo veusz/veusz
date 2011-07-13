@@ -169,3 +169,16 @@ QPolygonF bezier_fit_cubic_single(const QPolygonF& data, double error);
 
 QPolygonF bezier_fit_cubic_multi(const QPolygonF& data, double error,
 				 unsigned max_beziers);
+
+class IntermediatePaintDevice : QPaintDevice
+ {
+%TypeHeaderCode
+#include <intermediatepaintdevice.h>
+%End
+
+public:
+  IntermediatePaintDevice(int width, int height, int dpi);
+  void playback(QPainter& painter);
+
+  QPaintEngine* paintEngine() const;
+ };
