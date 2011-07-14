@@ -184,4 +184,5 @@ public:
   QPaintEngine* paintEngine() const;
 
   int metric(QPaintDevice::PaintDeviceMetric metric) const;
+  int drawItemCount() const;
  };

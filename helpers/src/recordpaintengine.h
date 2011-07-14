@@ -37,6 +37,7 @@ class RecordPaintEngine : public QPaintEngine
 public:
   RecordPaintEngine();
 
+  // standard methods to be overridden in engine
   bool begin(QPaintDevice* pdev);
 
   void drawEllipse(const QRectF& rect);
@@ -62,8 +63,12 @@ public:
   bool end ();
   QPaintEngine::Type type () const;
   void updateState(const QPaintEngineState& state);
+  
+  // return an estimate of number of items drawn
+  int drawItemCount() const { return _drawitemcount; }
 
 private:
+  int _drawitemcount;
   RecordPaintDevice* _pdev;
 };
 

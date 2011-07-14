@@ -36,6 +36,8 @@ public:
 
   int metric(QPaintDevice::PaintDeviceMetric metric) const;
 
+  int drawItemCount() const { return _engine->drawItemCount(); }
+
 public:
   friend class RecordPaintEngine;
 

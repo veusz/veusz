@@ -96,8 +96,8 @@ class PaintHelper(object):
             self.states[widget.parent].children.append(s)
 
         p = qt4.QPainter(s.record)
-        if clip:
-            p.setClipRect(clip)
+        #if clip:
+        #    p.setClipRect(clip)
 
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
@@ -122,6 +122,7 @@ class PaintHelper(object):
             painter.save()
 
         state.record.playback(painter)
+        #print state.record.drawItemCount()
 
         for child in state.children:
             self._renderState(child, painter)

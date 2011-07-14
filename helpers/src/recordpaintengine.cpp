@@ -34,10 +34,11 @@ namespace {
   // these are defined for each type of painting 
   // the QPaintEngine does
 
-  // draw an ellipse
-  class EllipseElement : public PaintElement {
+  // draw an ellipse (QRect and QRectF)
+  template <class T>
+  class ellipseElement : public PaintElement {
   public:
-    EllipseElement(const QRectF &rect) : _ellipse(rect) {}
+    ellipseElement(const T &rect) : _ellipse(rect) {}
 
     void paint(QPainter& painter)
     {
@@ -45,8 +46,10 @@ namespace {
     }
 
   private:
-    QRectF _ellipse;
+    T _ellipse;
   };
+  typedef ellipseElement<QRect> EllipseElement;
+  typedef ellipseElement<QRectF> EllipseFElement;
 
   // draw QImage
   class ImageElement : public PaintElement {
@@ -436,6 +439,7 @@ namespace {
 
 RecordPaintEngine::RecordPaintEngine()
   : QPaintEngine(QPaintEngine::AllFeatures),
+    _drawitemcount(0),
     _pdev(0)
 {
 }
@@ -454,12 +458,14 @@ bool RecordPaintEngine::begin(QPaintDevice* pdev)
 
 void RecordPaintEngine::drawEllipse(const QRectF& rect)
 {
-  _pdev->addElement( new EllipseElement(rect) );
+  _pdev->addElement( new EllipseFElement(rect) );
+  _drawitemcount++;
 }
 
 void RecordPaintEngine::drawEllipse(const QRect& rect)
 {
   _pdev->addElement( new EllipseElement(rect) );
+  _drawitemcount++;
 }
 
 void RecordPaintEngine::drawImage(const QRectF& rectangle,
@@ -468,65 +474,77 @@ void RecordPaintEngine::drawImage(const QRectF& rectangle,
 				  Qt::ImageConversionFlags flags)
 {
   _pdev->addElement( new ImageElement(rectangle, image, sr, flags) );
+  _drawitemcount++;
 }
 
 void RecordPaintEngine::drawLines(const QLineF* lines, int lineCount)
 {
   _pdev->addElement( new LineFElement(lines, lineCount) );
+  _drawitemcount += lineCount;
 }
 
 void RecordPaintEngine::drawLines(const QLine* lines, int lineCount)
 {
   _pdev->addElement( new LineElement(lines, lineCount) );
+  _drawitemcount += lineCount;
 }
 
 void RecordPaintEngine::drawPath(const QPainterPath& path)
 {
   _pdev->addElement( new PathElement(path) );
+  _drawitemcount++;
 }
 
 void RecordPaintEngine::drawPixmap(const QRectF& r,
-					 const QPixmap& pm, const QRectF& sr)
+				   const QPixmap& pm, const QRectF& sr)
 {
   _pdev->addElement( new PixmapElement(r, pm, sr) );
+  _drawitemcount++;
 }
 
 void RecordPaintEngine::drawPoints(const QPointF* points, int pointCount)
 {
   _pdev->addElement( new PointFElement(points, pointCount) );
+  _drawitemcount += pointCount;
 }
 
 void RecordPaintEngine::drawPoints(const QPoint* points, int pointCount)
 {
   _pdev->addElement( new PointElement(points, pointCount) );
+  _drawitemcount += pointCount;
 }
 
 void RecordPaintEngine::drawPolygon(const QPointF* points, int pointCount,
-					  QPaintEngine::PolygonDrawMode mode)
+				    QPaintEngine::PolygonDrawMode mode)
 {
   _pdev->addElement( new PolygonFElement(points, pointCount, mode) );
+  _drawitemcount += pointCount;
 }
 
 void RecordPaintEngine::drawPolygon(const QPoint* points, int pointCount,
-					  QPaintEngine::PolygonDrawMode mode)
+				    QPaintEngine::PolygonDrawMode mode)
 {
   _pdev->addElement( new PolygonElement(points, pointCount, mode) );
+  _drawitemcount += pointCount;
 }
 
 void RecordPaintEngine::drawRects(const QRectF* rects, int rectCount)
 {
   _pdev->addElement( new RectFElement( rects, rectCount ) );
+  _drawitemcount += rectCount;
 }
 
 void RecordPaintEngine::drawRects(const QRect* rects, int rectCount)
 {
   _pdev->addElement( new RectElement( rects, rectCount ) );
+  _drawitemcount += rectCount;
 }
 
 void RecordPaintEngine::drawTextItem(const QPointF& p,
-					   const QTextItem& textItem)
+				     const QTextItem& textItem)
 {
   _pdev->addElement( new TextElement(p, textItem) );
+  _drawitemcount += textItem.text().length();
 }
 
 void RecordPaintEngine::drawTiledPixmap(const QRectF& rect,
@@ -534,6 +552,7 @@ void RecordPaintEngine::drawTiledPixmap(const QRectF& rect,
 					      const QPointF& p)
 {
   _pdev->addElement( new TiledPixmapElement(rect, pixmap, p) );
+  _drawitemcount += 1;
 }
 
 bool RecordPaintEngine::end()
