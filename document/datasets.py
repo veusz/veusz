@@ -1539,7 +1539,7 @@ class Dataset2DExpression(Dataset2D):
     def __init__(self, expr):
         """Create 2d expression dataset."""
 
-        Dataset2D.__init__(self)
+        Dataset2D.__init__(self, None)
 
         self.expr = expr
         self.lastchangeset = -1
