@@ -203,21 +203,21 @@ namespace {
   typedef rectElement<QRect> RectElement;
   typedef rectElement<QRectF> RectFElement;
 
-  // Text - harder than most
+  // draw Text
   class TextElement : public PaintElement {
   public:
     TextElement(const QPointF& pt, const QTextItem& txt)
-      : _pt(pt), _txt(txt)
+      : _pt(pt), _text(txt.text())
     {}
 
     void paint(QPainter& painter)
     {
-      // FIXME
+      painter.drawText(_pt, _text);
     }
 
   private:
     QPointF _pt;
-    QTextItem _txt;
+    QString _text;
   };
 
   class TiledPixmapElement : public PaintElement {
