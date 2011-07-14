@@ -649,7 +649,7 @@ class PlotWindow( qt4.QGraphicsView ):
         size = self.document.basewidget.getSize(ph)
 
         # scale it according to the difference in dpi
-        ratiodpi = self.screendpi * 1. / ph.dpi
+        ratiodpi = self.screendpi * 1. / ph.dpi[1]
         size = (int(ratiodpi*size[0]), int(ratiodpi*size[1]))
 
         # make new buffer and resize widget
@@ -702,7 +702,9 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.painthelper = phelper = document.PaintHelper(
                         (self.bufferpixmap.width(),
                          self.bufferpixmap.height()),
-                        scaling = self.zoomfactor
+                        scaling = self.zoomfactor,
+                        dpi=(self.bufferpixmap.logicalDpiX(),
+                             self.bufferpixmap.logicalDpiY())
                         )
                     self.document.paintTo(phelper, self.pagenumber)
 

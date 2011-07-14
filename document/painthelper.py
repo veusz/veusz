@@ -27,13 +27,15 @@ from veusz.helpers.qtloops import RecordPaintDevice
 class DrawState(object):
     """Each widget plotted has a recorded state in this object."""
 
-    def __init__(self, widget, bounds, clip):
+    def __init__(self, widget, bounds, clip, helper):
         """Initialise state for widget.
         bounds: tuple of (x1, y1, x2, y2)
         clip: if clipping should be done, another tuple."""
 
         self.widget = widget
-        self.picture = RecordPaintDevice(1000,1000,100,100)
+        self.record = RecordPaintDevice(
+            helper.pagesize[0], helper.pagesize[1],
+            helper.dpi[0], helper.dpi[1])
         self.bounds = bounds
         self.clip = clip
 
@@ -51,12 +53,12 @@ class PaintHelper(object):
     Holds the scaling, dpi and size of the page.
     """
 
-    def __init__(self, pagesize, scaling=1.):
+    def __init__(self, pagesize, scaling=1., dpi=(100, 100)):
         """Initialise using page size (tuple of pixelw, pixelh)."""
 
-        self.dpi = qt4.QPicture().logicalDpiY()
+        self.dpi = dpi
         self.scaling = scaling
-        self.pixperpt = self.dpi / 72.
+        self.pixperpt = self.dpi[1] / 72.
         self.pagesize = pagesize
 
         # keep track of states of all widgets
@@ -75,8 +77,8 @@ class PaintHelper(object):
 
     def sizeAtDpi(self, dpi):
         """Return a tuple size for the page given an output device dpi."""
-        return ( int(self.pagesize[0]/self.dpi * dpi),
-                 int(self.pagesize[1]/self.dpi * dpi) )
+        return ( int(self.pagesize[0]/self.dpi[0] * dpi),
+                 int(self.pagesize[1]/self.dpi[1] * dpi) )
 
     def updatePageSize(self, pagew, pageh):
         """Update page size to value given (in user text units."""
@@ -89,19 +91,18 @@ class PaintHelper(object):
         bounds: tuple (x1, y1, x2, y2) of widget bounds
         clip: another tuple, if set clips drawing to this rectangle
         """
-        s = self.states[widget]  = DrawState(widget, bounds, clip)
+        s = self.states[widget]  = DrawState(widget, bounds, clip, self)
         if widget.parent is not None:
             self.states[widget.parent].children.append(s)
 
-        p = qt4.QPainter(s.picture)
+        p = qt4.QPainter(s.record)
         if clip:
             p.setClipRect(clip)
 
-        self.lpainter = p
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
         p.pagesize = self.pagesize
-        p.dpi = self.dpi
+        p.dpi = self.dpi[1]
 
         return p
 
@@ -110,7 +111,7 @@ class PaintHelper(object):
         self.states[widget].cgis = cgis
 
     def renderToPainter(self, root, painter):
-        """Render saved QPictures to painter.
+        """Render saved output to painter.
         root is the root widget
         """
         self._renderState(self.states[root], painter)
@@ -119,10 +120,8 @@ class PaintHelper(object):
         """Render state to painter."""
         if state.clip:
             painter.save()
-            #painter.setClipRect(state.clip)
 
-        #painter.drawPicture(0, 0, state.picture)
-        state.picture.playback(painter)
+        state.record.playback(painter)
 
         for child in state.children:
             self._renderState(child, painter)
