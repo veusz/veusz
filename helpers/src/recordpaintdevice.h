@@ -16,52 +16,40 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <math.h>
+#ifndef RECORD_PAINT_DEVICE__H
+#define RECORD_PAINT_DEVICE__H
 
-#include <QPainter>
-#include <QImage>
-#include <QRectF>
-#include <QLineF>
+#include <QPaintDevice>
 #include <QVector>
+#include "paintelement.h"
+#include "recordpaintengine.h"
 
-namespace {
+class RecordPaintDevice : public QPaintDevice
+{
+public:
+  RecordPaintDevice(int width, int height, int dpix, int dpiy);
+  ~RecordPaintDevice();
+  QPaintEngine* paintEngine() const;
 
-  class Element {
-  public:
-    virtual ~Element() {};
-    virtual void paint(QPainter& painter) = 0;
-  };
+  // play back all 
+  void playback(QPainter& painter);
 
-  class EllipseElement : public Element {
-  public:
-    EllipseElement(const QRectF &rect) : _ellipse(rect) {}
+  int metric(QPaintDevice::PaintDeviceMetric metric) const;
 
-  private:
-    QRectF _ellipse;
-  };
+public:
+  friend class RecordPaintEngine;
 
-  class ImageElement : public Element {
-  public:
-    ImageElement(const QRectF& rect, const QImage& image,
-		 const QRectF& sr, Qt::ImageConversionFlags flags)
-      : _image(image), _rect(rect), _sr(sr), _flags(flags)
-    {}
-
-  private:
-    QImage _image;
-    QRectF _rect, _sr;
-    Qt::ImageConversionFlags _flags;
-  };
-
-  class LineElement : public Element {
-  public:
-    LineElement(const QLineF *lines, int linecount)
-    {
-      for(int i = 0; i < linecount; i++)
-	_lines.push_back(lines[i]);
-    }
-
-  private:
-    QVector<QLineF> lines;
+private:
+  // add an element to the list of maintained elements
+  void addElement(PaintElement* el)
+  {
+    _elements.push_back(el);
   }
-}
+
+private:
+  int _width, _height, _dpix, _dpiy;
+  RecordPaintEngine* _engine;
+  QVector<PaintElement*> _elements;
+};
+
+#endif

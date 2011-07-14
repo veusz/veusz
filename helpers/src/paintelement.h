@@ -16,40 +16,15 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef INTERMEDIATE_PAINT_DEVICE__H
-#define INTERMEDIATE_PAINT_DEVICE__H
+#ifndef PAINTELEMENT_H
+#define PAINTELEMENT_H
 
-#include <QPaintDevice>
-#include <QVector>
-#include "paintelement.h"
-#include "intermediatepaintengine.h"
+class QPainter;
 
-class IntermediatePaintDevice : public QPaintDevice
-{
+class PaintElement {
 public:
-  IntermediatePaintDevice(int width, int height, int dpi);
-  ~IntermediatePaintDevice();
-  QPaintEngine* paintEngine() const;
-
-  // play back all 
-  void playback(QPainter& painter);
-
-  int metric(QPaintDevice::PaintDeviceMetric metric) const;
-
-public:
-  friend class IntermediatePaintEngine;
-
-private:
-  // add an element to the list of maintained elements
-  void addElement(PaintElement* el)
-  {
-    _elements.push_back(el);
-  }
-
-private:
-  int _width, _height, _dpi;
-  IntermediatePaintEngine* _engine;
-  QVector<PaintElement*> _elements;
+  virtual ~PaintElement() {};
+  virtual void paint(QPainter& painter) = 0;
 };
 
 #endif

@@ -24,8 +24,8 @@
 #include <QPaintEngine>
 
 #include "paintelement.h"
-#include "intermediatepaintengine.h"
-#include "intermediatepaintdevice.h"
+#include "recordpaintengine.h"
+#include "recordpaintdevice.h"
 
 namespace {
 
@@ -429,118 +429,118 @@ namespace {
 ///////////////////////////////////////////////////////////////////
 // Paint engine follows
 
-IntermediatePaintEngine::IntermediatePaintEngine()
+RecordPaintEngine::RecordPaintEngine()
   : QPaintEngine(QPaintEngine::AllFeatures),
     _pdev(0)
 {
 }
 
-bool IntermediatePaintEngine::begin(QPaintDevice* pdev)
+bool RecordPaintEngine::begin(QPaintDevice* pdev)
 {
   // old style C cast - probably should use dynamic_cast
-  _pdev = (IntermediatePaintDevice*)(pdev);
+  _pdev = (RecordPaintDevice*)(pdev);
 
   // signal started ok
   return 1;
 }
 
 
-void IntermediatePaintEngine::drawEllipse(const QRectF& rect)
+void RecordPaintEngine::drawEllipse(const QRectF& rect)
 {
   _pdev->addElement( new EllipseElement(rect) );
 }
 
-void IntermediatePaintEngine::drawEllipse(const QRect& rect)
+void RecordPaintEngine::drawEllipse(const QRect& rect)
 {
   _pdev->addElement( new EllipseElement(rect) );
 }
 
-void IntermediatePaintEngine::drawImage(const QRectF& rectangle,
-					const QImage& image,
-					const QRectF& sr,
-					Qt::ImageConversionFlags flags)
+void RecordPaintEngine::drawImage(const QRectF& rectangle,
+				  const QImage& image,
+				  const QRectF& sr,
+				  Qt::ImageConversionFlags flags)
 {
   _pdev->addElement( new ImageElement(rectangle, image, sr, flags) );
 }
 
-void IntermediatePaintEngine::drawLines(const QLineF* lines, int lineCount)
+void RecordPaintEngine::drawLines(const QLineF* lines, int lineCount)
 {
   _pdev->addElement( new LineElement(lines, lineCount) );
 }
 
-void IntermediatePaintEngine::drawLines(const QLine* lines, int lineCount)
+void RecordPaintEngine::drawLines(const QLine* lines, int lineCount)
 {
   _pdev->addElement( new LineElement(lines, lineCount) );
 }
 
-void IntermediatePaintEngine::drawPath(const QPainterPath& path)
+void RecordPaintEngine::drawPath(const QPainterPath& path)
 {
   _pdev->addElement( new PathElement(path) );
 }
 
-void IntermediatePaintEngine::drawPixmap(const QRectF& r,
+void RecordPaintEngine::drawPixmap(const QRectF& r,
 					 const QPixmap& pm, const QRectF& sr)
 {
   _pdev->addElement( new PixmapElement(r, pm, sr) );
 }
 
-void IntermediatePaintEngine::drawPoints(const QPointF* points, int pointCount)
+void RecordPaintEngine::drawPoints(const QPointF* points, int pointCount)
 {
   _pdev->addElement( new PointElement(points, pointCount) );
 }
 
-void IntermediatePaintEngine::drawPoints(const QPoint* points, int pointCount)
+void RecordPaintEngine::drawPoints(const QPoint* points, int pointCount)
 {
   _pdev->addElement( new PointElement(points, pointCount) );
 }
 
-void IntermediatePaintEngine::drawPolygon(const QPointF* points, int pointCount,
+void RecordPaintEngine::drawPolygon(const QPointF* points, int pointCount,
 					  QPaintEngine::PolygonDrawMode mode)
 {
   _pdev->addElement( new PolygonElement(points, pointCount, mode) );
 }
 
-void IntermediatePaintEngine::drawPolygon(const QPoint* points, int pointCount,
+void RecordPaintEngine::drawPolygon(const QPoint* points, int pointCount,
 					  QPaintEngine::PolygonDrawMode mode)
 {
   _pdev->addElement( new PolygonElement(points, pointCount, mode) );
 }
 
-void IntermediatePaintEngine::drawRects(const QRectF* rects, int rectCount)
+void RecordPaintEngine::drawRects(const QRectF* rects, int rectCount)
 {
   _pdev->addElement( new RectElement( rects, rectCount ) );
 }
 
-void IntermediatePaintEngine::drawRects(const QRect* rects, int rectCount)
+void RecordPaintEngine::drawRects(const QRect* rects, int rectCount)
 {
   _pdev->addElement( new RectElement( rects, rectCount ) );
 }
 
-void IntermediatePaintEngine::drawTextItem(const QPointF& p,
+void RecordPaintEngine::drawTextItem(const QPointF& p,
 					   const QTextItem& textItem)
 {
   _pdev->addElement( new TextElement(p, textItem) );
 }
 
-void IntermediatePaintEngine::drawTiledPixmap(const QRectF& rect,
+void RecordPaintEngine::drawTiledPixmap(const QRectF& rect,
 					      const QPixmap& pixmap,
 					      const QPointF& p)
 {
   _pdev->addElement( new TiledPixmapElement(rect, pixmap, p) );
 }
 
-bool IntermediatePaintEngine::end()
+bool RecordPaintEngine::end()
 {
   // signal finished ok
   return 1;
 }
 
-QPaintEngine::Type IntermediatePaintEngine::type () const
+QPaintEngine::Type RecordPaintEngine::type () const
 {
   return QPaintEngine::Type(int(QPaintEngine::User)+34);
 }
 
-void IntermediatePaintEngine::updateState(const QPaintEngineState& state)
+void RecordPaintEngine::updateState(const QPaintEngineState& state)
 {
   const int flags = state.state();
   if( flags & QPaintEngine::DirtyBackground )

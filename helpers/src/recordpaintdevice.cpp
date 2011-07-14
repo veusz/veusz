@@ -18,30 +18,30 @@
 
 #include <QtAlgorithms>
 #include <limits>
-#include "intermediatepaintdevice.h"
-#include "intermediatepaintengine.h"
+#include "recordpaintdevice.h"
+#include "recordpaintengine.h"
 
 #define INCH_MM 25.4
 
-IntermediatePaintDevice::IntermediatePaintDevice(int width, int height,
-						 int dpi)
-  :_width(width), _height(height), _dpi(dpi),
-   _engine(new IntermediatePaintEngine)
+RecordPaintDevice::RecordPaintDevice(int width, int height,
+				     int dpix, int dpiy)
+  :_width(width), _height(height), _dpix(dpix), _dpiy(dpiy),
+   _engine(new RecordPaintEngine)
 {
 }
 
-IntermediatePaintDevice::~IntermediatePaintDevice()
+RecordPaintDevice::~RecordPaintDevice()
 {
   delete _engine;
   qDeleteAll(_elements);
 }
 
-QPaintEngine* IntermediatePaintDevice::paintEngine() const
+QPaintEngine* RecordPaintDevice::paintEngine() const
 {
   return _engine;
 }
 
-int IntermediatePaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
+int RecordPaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
 {
   switch(metric) {
   case QPaintDevice::PdmWidth:
@@ -49,24 +49,25 @@ int IntermediatePaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) cons
   case QPaintDevice::PdmHeight:
     return _height;
   case QPaintDevice::PdmWidthMM:
-    return int(_width * INCH_MM / _dpi);
+    return int(_width * INCH_MM / _dpix);
   case QPaintDevice::PdmHeightMM:
-    return int(_height * INCH_MM / _dpi);
+    return int(_height * INCH_MM / _dpiy);
   case QPaintDevice::PdmNumColors:
     return std::numeric_limits<int>::max();
   case QPaintDevice::PdmDepth:
     return 24;
   case QPaintDevice::PdmDpiX:
-  case QPaintDevice::PdmDpiY:
   case QPaintDevice::PdmPhysicalDpiX:
+    return _dpix;
+  case QPaintDevice::PdmDpiY:
   case QPaintDevice::PdmPhysicalDpiY:
-    return _dpi;
+    return _dpiy;
   default:
     return -1;
   }
 }
 
-void IntermediatePaintDevice::playback(QPainter& painter)
+void RecordPaintDevice::playback(QPainter& painter)
 {
   foreach(PaintElement* el, _elements)
     {

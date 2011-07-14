@@ -22,7 +22,7 @@
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
-from veusz.helpers.qtloops import IntermediatePaintDevice
+from veusz.helpers.qtloops import RecordPaintDevice
 
 class DrawState(object):
     """Each widget plotted has a recorded state in this object."""
@@ -33,7 +33,7 @@ class DrawState(object):
         clip: if clipping should be done, another tuple."""
 
         self.widget = widget
-        self.picture = IntermediatePaintDevice(1000,1000,100)
+        self.picture = RecordPaintDevice(1000,1000,100,100)
         self.bounds = bounds
         self.clip = clip
 

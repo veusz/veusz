@@ -16,8 +16,8 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef INTERMEDIATE_PAINT_ENGINE__H
-#define INTERMEDIATE_PAINT_ENGINE__H
+#ifndef RECORD_PAINT_ENGINE__H
+#define RECORD_PAINT_ENGINE__H
 
 #include <QPaintEngine>
 #include <QRectF>
@@ -30,12 +30,12 @@
 #include <QRect>
 #include <QPixmap>
 
-class IntermediatePaintDevice;
+class RecordPaintDevice;
 
-class IntermediatePaintEngine : public QPaintEngine
+class RecordPaintEngine : public QPaintEngine
 {
 public:
-  IntermediatePaintEngine();
+  RecordPaintEngine();
 
   bool begin(QPaintDevice* pdev);
 
@@ -64,7 +64,7 @@ public:
   void updateState(const QPaintEngineState& state);
 
 private:
-  IntermediatePaintDevice* _pdev;
+  RecordPaintDevice* _pdev;
 };
 
 #endif
