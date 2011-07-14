@@ -29,9 +29,12 @@
 
 namespace {
 
+  //////////////////////////////////////////////////////////////
+  // Drawing Elements
   // these are defined for each type of painting 
   // the QPaintEngine does
 
+  // draw an ellipse
   class EllipseElement : public PaintElement {
   public:
     EllipseElement(const QRectF &rect) : _ellipse(rect) {}
@@ -45,6 +48,7 @@ namespace {
     QRectF _ellipse;
   };
 
+  // draw QImage
   class ImageElement : public PaintElement {
   public:
     ImageElement(const QRectF& rect, const QImage& image,
@@ -63,17 +67,15 @@ namespace {
     Qt::ImageConversionFlags _flags;
   };
 
-  class LineElement : public PaintElement {
+  // draw lines
+  // this is for painting QLine and QLineF
+  template <class T>
+  class lineElement : public PaintElement {
   public:
-    LineElement(const QLineF *lines, int linecount)
+    lineElement(const T *lines, int linecount)
     {
       for(int i = 0; i < linecount; i++)
-	_lines.push_back(lines[i]);
-    }
-    LineElement(const QLine *lines, int linecount)
-    {
-      for(int i = 0; i < linecount; i++)
-	_lines.push_back(lines[i]);
+	_lines << lines[i];
     }
 
     void paint(QPainter& painter)
@@ -82,9 +84,13 @@ namespace {
     }
 
   private:
-    QVector<QLineF> _lines;
+    QVector<T> _lines;
   };
+  // specific Line and LineF variants
+  typedef lineElement<QLine> LineElement;
+  typedef lineElement<QLineF> LineFElement;
 
+  // draw QPainterPath
   class PathElement : public PaintElement {
   public:
     PathElement(const QPainterPath& path)
@@ -99,6 +105,7 @@ namespace {
     QPainterPath _path;
   };
 
+  // draw Pixmap
   class PixmapElement : public PaintElement {
   public:
     PixmapElement(const QRectF& r, const QPixmap& pm,
@@ -116,14 +123,11 @@ namespace {
     QRectF _sr;
   };
 
-  class PointElement : public PaintElement {
+  // draw points (QPoint and QPointF)
+  template <class T, class V>
+  class pointElement : public PaintElement {
   public:
-    PointElement(const QPointF* points, int pointcount)
-    {
-      for(int i=0; i<pointcount; ++i)
-	_pts << points[i];
-    }
-    PointElement(const QPoint* points, int pointcount)
+    pointElement(const T* points, int pointcount)
     {
       for(int i=0; i<pointcount; ++i)
 	_pts << points[i];
@@ -135,20 +139,17 @@ namespace {
     }
 
   private:
-    QPolygonF _pts;
+    V _pts;
   };
+  typedef pointElement<QPoint, QPolygon> PointElement;
+  typedef pointElement<QPointF, QPolygonF> PointFElement;
 
-  class PolygonElement : public PaintElement {
+  // for QPolygon and QPolygonF
+  template <class T, class V>
+  class polyElement: public PaintElement {
   public:
-    PolygonElement(const QPointF* points, int pointcount,
-		   QPaintEngine::PolygonDrawMode mode)
-      : _mode(mode)
-    {
-      for(int i=0; i<pointcount; ++i)
-	_pts << points[i];
-    }
-    PolygonElement(const QPoint* points, int pointcount,
-		   QPaintEngine::PolygonDrawMode mode)
+    polyElement(const T* points, int pointcount,
+		QPaintEngine::PolygonDrawMode mode)
       : _mode(mode)
     {
       for(int i=0; i<pointcount; ++i)
@@ -176,17 +177,16 @@ namespace {
 
   private:
     QPaintEngine::PolygonDrawMode _mode;
-    QPolygonF _pts;
+    V _pts;
   };
+  typedef polyElement<QPoint,QPolygon> PolygonElement;
+  typedef polyElement<QPointF,QPolygonF> PolygonFElement;
 
-  class RectElement : public PaintElement {
+  // for QRect and QRectF
+  template <class T>
+  class rectElement : public PaintElement {
   public:
-    RectElement(const QRectF* rects, int rectcount)
-    {
-      for(int i=0; i<rectcount; i++)
-	_rects << rects[i];
-    }
-    RectElement(const QRect* rects, int rectcount)
+    rectElement(const T* rects, int rectcount)
     {
       for(int i=0; i<rectcount; i++)
 	_rects << rects[i];
@@ -198,9 +198,12 @@ namespace {
     }
 
   private:
-    QVector<QRectF> _rects;
+    QVector<T> _rects;
   };
+  typedef rectElement<QRect> RectElement;
+  typedef rectElement<QRectF> RectFElement;
 
+  // Text - harder than most
   class TextElement : public PaintElement {
   public:
     TextElement(const QPointF& pt, const QTextItem& txt)
@@ -237,6 +240,8 @@ namespace {
 
   ///////////////////////////////////////////////////////////////////
   // State paint elements
+
+  // these define and change the state of the painter
 
   class BackgroundBrushElement : public PaintElement {
   public:
@@ -444,6 +449,8 @@ bool RecordPaintEngine::begin(QPaintDevice* pdev)
   return 1;
 }
 
+// for each type of drawing command we add a new element
+// to the list maintained by the device
 
 void RecordPaintEngine::drawEllipse(const QRectF& rect)
 {
@@ -465,7 +472,7 @@ void RecordPaintEngine::drawImage(const QRectF& rectangle,
 
 void RecordPaintEngine::drawLines(const QLineF* lines, int lineCount)
 {
-  _pdev->addElement( new LineElement(lines, lineCount) );
+  _pdev->addElement( new LineFElement(lines, lineCount) );
 }
 
 void RecordPaintEngine::drawLines(const QLine* lines, int lineCount)
@@ -486,7 +493,7 @@ void RecordPaintEngine::drawPixmap(const QRectF& r,
 
 void RecordPaintEngine::drawPoints(const QPointF* points, int pointCount)
 {
-  _pdev->addElement( new PointElement(points, pointCount) );
+  _pdev->addElement( new PointFElement(points, pointCount) );
 }
 
 void RecordPaintEngine::drawPoints(const QPoint* points, int pointCount)
@@ -497,7 +504,7 @@ void RecordPaintEngine::drawPoints(const QPoint* points, int pointCount)
 void RecordPaintEngine::drawPolygon(const QPointF* points, int pointCount,
 					  QPaintEngine::PolygonDrawMode mode)
 {
-  _pdev->addElement( new PolygonElement(points, pointCount, mode) );
+  _pdev->addElement( new PolygonFElement(points, pointCount, mode) );
 }
 
 void RecordPaintEngine::drawPolygon(const QPoint* points, int pointCount,
@@ -508,7 +515,7 @@ void RecordPaintEngine::drawPolygon(const QPoint* points, int pointCount,
 
 void RecordPaintEngine::drawRects(const QRectF* rects, int rectCount)
 {
-  _pdev->addElement( new RectElement( rects, rectCount ) );
+  _pdev->addElement( new RectFElement( rects, rectCount ) );
 }
 
 void RecordPaintEngine::drawRects(const QRect* rects, int rectCount)
@@ -537,11 +544,14 @@ bool RecordPaintEngine::end()
 
 QPaintEngine::Type RecordPaintEngine::type () const
 {
+  // some sort of random number for the ID of the engine type
   return QPaintEngine::Type(int(QPaintEngine::User)+34);
 }
 
 void RecordPaintEngine::updateState(const QPaintEngineState& state)
 {
+  // we add a new element for each change of state
+  // these are replayed later
   const int flags = state.state();
   if( flags & QPaintEngine::DirtyBackground )
     _pdev->addElement( new BackgroundBrushElement( state.backgroundBrush() ) );
