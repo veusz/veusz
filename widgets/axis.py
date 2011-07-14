@@ -1005,8 +1005,6 @@ class Axis(widget.Widget):
                 box = r.render()
                 drawntext.addRect(rect)
                 
-        painter.end()
-
     def updateControlItem(self, cgi):
         """Update axis position from control item."""
 

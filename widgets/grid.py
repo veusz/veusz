@@ -360,7 +360,6 @@ class Grid(widget.Widget):
         maxbounds = self.computeBounds(parentposn, phelper)
 
         painter = phelper.painter(self, bounds)
-        painter.end()
         
         # controls for adjusting grid margins
         phelper.setControlGraph(self,[

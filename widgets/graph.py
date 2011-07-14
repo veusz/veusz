@@ -140,8 +140,6 @@ class Graph(widget.Widget):
         painter.drawRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
                                      qt4.QPointF(bounds[2], bounds[3])) )
 
-        painter.end()
-
         # do normal drawing of children
         # iterate over children in reverse order
         for c in reversed(self.children):
