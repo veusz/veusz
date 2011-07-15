@@ -32,7 +32,7 @@ public:
   QPaintEngine* paintEngine() const;
 
   // play back all 
-  void playback(QPainter& painter);
+  void play(QPainter& painter);
 
   int metric(QPaintDevice::PaintDeviceMetric metric) const;
 

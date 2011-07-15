@@ -67,7 +67,7 @@ int RecordPaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
   }
 }
 
-void RecordPaintDevice::playback(QPainter& painter)
+void RecordPaintDevice::play(QPainter& painter)
 {
   foreach(PaintElement* el, _elements)
     {

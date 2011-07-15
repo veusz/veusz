@@ -53,8 +53,13 @@ class PaintHelper(object):
     Holds the scaling, dpi and size of the page.
     """
 
-    def __init__(self, pagesize, scaling=1., dpi=(100, 100)):
-        """Initialise using page size (tuple of pixelw, pixelh)."""
+    def __init__(self, pagesize, scaling=1., dpi=(100, 100),
+                 directpaint=None):
+        """Initialise using page size (tuple of pixelw, pixelh).
+
+        If directpaint is set to a painter, use this directly
+        rather than creating separate layers for rendering later
+        """
 
         self.dpi = dpi
         self.scaling = scaling
@@ -67,8 +72,8 @@ class PaintHelper(object):
         # axis to plotter mappings
         self.axisplottermap = {}
 
-        # latest painter
-        self.lpainter = None
+        self.directpaint = directpaint
+        self.directpainting = False
 
     @property
     def maxsize(self):
@@ -91,18 +96,28 @@ class PaintHelper(object):
         bounds: tuple (x1, y1, x2, y2) of widget bounds
         clip: another tuple, if set clips drawing to this rectangle
         """
-        s = self.states[widget]  = DrawState(widget, bounds, clip, self)
+        s = self.states[widget] = DrawState(widget, bounds, clip, self)
         if widget.parent is not None:
             self.states[widget.parent].children.append(s)
 
-        p = qt4.QPainter(s.record)
-        #if clip:
-        #    p.setClipRect(clip)
+        if self.directpaint:
+            # only paint to one output painter
+            p = self.directpaint
+            if self.directpainting:
+                p.restore()
+            self.directpainting = True
+            p.save()
+        else:
+            # save to multiple recorded layers
+            p = qt4.QPainter(s.record)
 
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
         p.pagesize = self.pagesize
         p.dpi = self.dpi[1]
+
+        if clip:
+            p.setClipRect(clip)
 
         return p
 
@@ -118,14 +133,10 @@ class PaintHelper(object):
 
     def _renderState(self, state, painter):
         """Render state to painter."""
-        if state.clip:
-            painter.save()
 
-        state.record.playback(painter)
-        #print state.record.drawItemCount()
+        painter.save()
+        state.record.play(painter)
+        painter.restore()
 
         for child in state.children:
             self._renderState(child, painter)
-
-        if state.clip:
-            painter.restore()

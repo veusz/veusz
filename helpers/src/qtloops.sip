@@ -179,7 +179,7 @@ class RecordPaintDevice : QPaintDevice
 public:
   RecordPaintDevice(int width, int height, int dpix, int dpiy);
   ~RecordPaintDevice();
-  void playback(QPainter& painter);
+  void play(QPainter& painter);
 
   QPaintEngine* paintEngine() const;
 

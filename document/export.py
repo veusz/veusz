@@ -35,6 +35,28 @@ import svg_export
 import selftest_export
 import painthelper
 
+class PixmapWithDpi(qt4.QPixmap):
+    """A QPixmap device with a different DPI.
+    The user wants a bitmap output with a specific DPI.
+    This also ensures square pixels.
+    """
+
+    def __init__(self, size, dpi):
+        """Initialise the bitmap.
+        size: (width, height)
+        dpi: DPI value to use."""
+        qt4.QPixmap.__init__(self, *size)
+        self.dpi = dpi
+
+    def metric(self, m):
+        """Return dpi if requested."""
+        if m in (qt4.QPaintDevice.PdmDpiX, qt4.QPaintDevice.PdmDpiY,
+                 qt4.QPaintDevice.PdmPhysicalDpiX,
+                 qt4.QPaintDevice.PdmPhysicalDpiY):
+            return self.dpi
+        else:
+            return qt4.QPixmap.metric(self, m)             
+
 class Export(object):
     """Class to do the document exporting.
     
@@ -104,12 +126,13 @@ class Export(object):
         else:
             raise RuntimeError, "File type '%s' not supported" % ext
 
-    def renderPage(self, phelper, painter):
+    def renderPage(self, size, dpi, painter):
         """Render page using paint helper to painter.
         This first renders to the helper, then to the painter
         """
-        self.doc.paintTo(phelper, self.pagenumber)
-        phelper.renderToPainter(self.doc.basewidget, painter)
+        helper = painthelper.PaintHelper(size, dpi=(dpi, dpi),
+                                         directpaint = painter)
+        self.doc.paintTo(helper, self.pagenumber)
 
     def exportBitmap(self, format):
         """Export to a bitmap format."""
@@ -117,13 +140,11 @@ class Export(object):
         # work out what scaling is required to get from
         # Qt system dpi to required dpi
         # also work out scaled image size
-        helper = painthelper.PaintHelper( (1,1) )
-        scaling = self.bitmapdpi * 1. / helper.dpi
-        width, height = self.doc.basewidget.getSize(helper)
-        newsize = (int(width*scaling), int(height*scaling))
+        helper = painthelper.PaintHelper( (1,1), dpi=(self.bitmapdpi, self.bitmapdpi) )
+        size = self.doc.basewidget.getSize(helper)
 
         # create real output image
-        pixmap = qt4.QPixmap(*newsize)
+        pixmap = PixmapWithDpi(size, self.bitmapdpi)
         backqcolor = utils.extendedColorToQColor(self.backcolor)
         if format != '.png':
             # not transparent
@@ -134,8 +155,7 @@ class Export(object):
         painter = qt4.QPainter(pixmap)
         painter.setRenderHint(qt4.QPainter.Antialiasing, self.antialias)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, self.antialias)
-        helper = painthelper.PaintHelper(newsize, scaling=scaling)
-        self.renderPage(helper, painter)
+        self.renderPage(size, self.bitmapdpi, painter)
         painter.end()
 
         # write image to disk
@@ -229,18 +249,14 @@ class Export(object):
         dpi = float(svg_export.dpi)
         helper = painthelper.PaintHelper( (1,1) )
         size = self.doc.basewidget.getSize(helper)
-        scaling = dpi / helper.dpi
-        width, height = size[0]*scaling, size[1]*scaling
-
-        helper = painthelper.PaintHelper( size )
 
         if qt4.PYQT_VERSION >= 0x40600:
             # custom paint devices don't work in old PyQt versions
 
             f = open(self.filename, 'w')
-            paintdev = svg_export.SVGPaintDevice(f, width/dpi, height/dpi)
+            paintdev = svg_export.SVGPaintDevice(f, size[0]*1./dpi, size[1]*1./dpi)
             painter = qt4.QPainter(paintdev)
-            self.renderPage(helper, painter)
+            self.renderPage(size, dpi, painter)
             painter.end()
             f.close()
 
@@ -253,9 +269,9 @@ class Export(object):
             gen = PyQt4.QtSvg.QSvgGenerator()
             gen.setFileName(self.filename)
             gen.setResolution(dpi)
-            gen.setSize( qt4.QSize(int(width), int(height)) )
+            gen.setSize( qt4.QSize(int(size[0]), int(size[1])) )
             painter = qt4.QPainter(gen)
-            self.renderPage(helper, painter)
+            self.renderPage(size, dpi, painter)
             painter.end()
 
     def exportSelfTest(self, filename, page):

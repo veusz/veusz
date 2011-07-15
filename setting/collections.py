@@ -247,7 +247,7 @@ class Text(Settings):
         f = qt4.QFont(self.font, size,  weight, self.italic)
         if self.underline:
             f.setUnderline(True)
-        f.setStyleHint( qt4.QFont.Times, qt4.QFont.PreferDevice )
+        f.setStyleHint(qt4.QFont.Times)
 
         return f
 
