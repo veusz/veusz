@@ -131,6 +131,8 @@ class Export(object):
         This first renders to the helper, then to the painter
         """
         helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+        painter.setClipRect( qt4.QRectF(
+                qt4.QPointF(0,0), qt4.QPointF(*size)) )
         self.doc.paintTo(helper, self.pagenumber)
         painter.restore()
         painter.end()
@@ -281,10 +283,7 @@ class Export(object):
 
         dpi = (pic.logicalDpiX(), pic.logicalDpiY())
         size = self.doc.pageSize(self.pagenumber, dpi=dpi)
-        helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
-        self.doc.paintTo(helper, self.pagenumber)
-        painter.restore()
-        painter.end()
+        self.renderPage(size, dpi, painter)
         pic.save(self.filename)
 
     def exportEMF(self):

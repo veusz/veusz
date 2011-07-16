@@ -168,7 +168,8 @@ class NonOrthFunction(Widget):
 
         x1, y1, x2, y2 = posn
         cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
-        painter = phelper.painter(self, posn, clip=cliprect)
+        painter = phelper.painter(self, posn)
+        self.parent.setClip(painter, posn)
 
         apts, bpts = self.getFunctionPoints()
         px, py = self.parent.graphToPlotCoords(apts, bpts)

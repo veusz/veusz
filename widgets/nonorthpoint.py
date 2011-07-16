@@ -147,7 +147,8 @@ class NonOrthPoint(Widget):
 
         x1, y1, x2, y2 = posn
         cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
-        painter = phelper.painter(self, posn, clip=cliprect)
+        painter = phelper.painter(self, posn)
+        self.parent.setClip(painter, posn)
 
         # split parts separated by NaNs
         for v1, v2, vs in document.generateValidDatasetParts(d1, d2, dscale):
