@@ -440,10 +440,24 @@ class Document( qt4.QObject ):
 
         fileobj.write( stylesheet.saveText(True, rootname='') )
 
-    def getDocSize(self, dpi):
-        """Get size of document in pixels (as a tuple) given dpi."""
-        phelper = painthelper.PaintHelper( (1,1), scaling=1., dpi=dpi )
-        return self.basewidget.getSize(phelper)
+    def pageSize(self, pagenum, dpi=None, scaling=1., integer=True):
+        """Get the size of a particular page in pixels.
+
+        If dpi is None, use the default Qt screen dpi
+        Use dpi if given."""
+
+        if dpi is None:
+            p = qt4.QPixmap(1, 1)
+            dpi = (p.logicalDpiX(), p.logicalDpiY())
+
+        helper = painthelper.PaintHelper( (1,1), dpi=dpi, scaling=scaling )
+        page = self.basewidget.getPage(pagenum)
+        w = page.settings.get('width').convert(helper)
+        h = page.settings.get('height').convert(helper)
+        if integer:
+            return int(w), int(h)
+        else:
+            return w, h
 
     def resolveItem(self, fromwidget, where):
         """Resolve item relative to fromwidget.

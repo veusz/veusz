@@ -20,6 +20,7 @@
 
 import veusz.qtall as qt4
 import veusz.document as document
+import veusz.setting as setting
 
 import widget
 import root
@@ -186,6 +187,22 @@ class Page(widget.Widget):
         if type(self) == Page:
             self.readDefaults()
  
+    @classmethod
+    def addSettings(klass, s):
+        widget.Widget.addSettings(s)
+        
+        # page sizes are initially linked to the document page size
+        s.add( setting.Distance('width',
+                                setting.Reference('/width'),
+                                descr='Width of page',
+                                usertext='Page width',
+                                formatting=True) )
+        s.add( setting.Distance('height',
+                                setting.Reference('/height'),
+                                descr='Height of page',
+                                usertext='Page height',
+                                formatting=True) )
+        
     def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
 

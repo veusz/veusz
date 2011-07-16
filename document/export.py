@@ -130,21 +130,20 @@ class Export(object):
         """Render page using paint helper to painter.
         This first renders to the helper, then to the painter
         """
-        helper = painthelper.PaintHelper(size, dpi=(dpi, dpi),
-                                         directpaint = painter)
+        helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
         self.doc.paintTo(helper, self.pagenumber)
+        painter.restore()
+        painter.end()
 
     def exportBitmap(self, format):
         """Export to a bitmap format."""
 
-        # work out what scaling is required to get from
-        # Qt system dpi to required dpi
-        # also work out scaled image size
-        helper = painthelper.PaintHelper( (1,1), dpi=(self.bitmapdpi, self.bitmapdpi) )
-        size = self.doc.basewidget.getSize(helper)
+        # get size for bitmap's dpi
+        dpi = self.bitmapdpi
+        size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi))
 
         # create real output image
-        pixmap = PixmapWithDpi(size, self.bitmapdpi)
+        pixmap = PixmapWithDpi(size, dpi)
         backqcolor = utils.extendedColorToQColor(self.backcolor)
         if format != '.png':
             # not transparent
@@ -155,8 +154,7 @@ class Export(object):
         painter = qt4.QPainter(pixmap)
         painter.setRenderHint(qt4.QPainter.Antialiasing, self.antialias)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, self.antialias)
-        self.renderPage(size, self.bitmapdpi, painter)
-        painter.end()
+        self.renderPage(size, (dpi,dpi), painter)
 
         # write image to disk
         writer = qt4.QImageWriter()
@@ -176,10 +174,6 @@ class Export(object):
     def exportPS(self, ext):
         """Export to EPS or PDF format."""
 
-        helper = painthelper.PaintHelper( (1,1) )
-        size = self.doc.basewidget.getSize(helper)
-        helper = painthelper.PaintHelper( size )
-
         printer = qt4.QPrinter()
         printer.setFullPage(True)
 
@@ -195,71 +189,64 @@ class Export(object):
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())
 
-        # draw the page
+        # setup for printing
         printer.newPage()
         painter = qt4.QPainter(printer)
-        self.renderPage(helper, painter)
-        painter.end()
 
-        # we now need to adjust the output size
-        # the helper's width and height are scaled by helper dpi vs painter dpi
-        scaling = printer.logicalDpiY() / helper.dpi
-        width, height = helper.pagesize[0]*scaling, helper.pagesize[1]*scaling
+        # write to printer with correct dpi
+        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
+        width, height = size = self.doc.pageSize(self.pagenumber, dpi=dpi)
+        self.renderPage(size, dpi, painter)
 
         # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
         # this makes the bounding box correct
-        if ext == '.eps' or ext == '.pdf':
-            # copy eps to a temporary file
-            tmpfile = "%s.tmp.%i" % (self.filename, random.randint(0,1000000))
-            fout = open(tmpfile, 'wb')
-            fin = open(self.filename, 'rb')
+        # copy output to a temporary file
+        tmpfile = "%s.tmp.%i" % (self.filename, random.randint(0,1000000))
+        fout = open(tmpfile, 'wb')
+        fin = open(self.filename, 'rb')
 
-            if ext == '.eps':
-                # adjust bounding box
-                for line in fin:
-                    if line[:14] == '%%BoundingBox:':
-                        # replace bounding box line by calculated one
-                        parts = line.split()
-                        widthfactor = float(parts[3]) / printer.width()
-                        origheight = float(parts[4])
-                        line = "%s %i %i %i %i\n" % (
-                            parts[0], 0,
-                            int(math.floor(origheight-widthfactor*height)),
-                            int(math.ceil(widthfactor*width)),
-                            int(math.ceil(origheight)) )
-                    fout.write(line)
+        if ext == '.eps':
+            # adjust bounding box
+            for line in fin:
+                if line[:14] == '%%BoundingBox:':
+                    # replace bounding box line by calculated one
+                    parts = line.split()
+                    widthfactor = float(parts[3]) / printer.width()
+                    origheight = float(parts[4])
+                    line = "%s %i %i %i %i\n" % (
+                        parts[0], 0,
+                        int(math.floor(origheight-widthfactor*height)),
+                        int(math.ceil(widthfactor*width)),
+                        int(math.ceil(origheight)) )
+                fout.write(line)
 
-            elif ext == '.pdf':
-                # change pdf bounding box and correct pdf index
-                text = fin.read()
-                text = utils.scalePDFMediaBox(text,
-                                              printer.width(),
-                                              width, height)
-                text = utils.fixupPDFIndices(text)
-                fout.write(text)
+        elif ext == '.pdf':
+            # change pdf bounding box and correct pdf index
+            text = fin.read()
+            text = utils.scalePDFMediaBox(text, printer.width(),
+                                          width, height)
+            text = utils.fixupPDFIndices(text)
+            fout.write(text)
 
-            fout.close()
-            fin.close()
-            os.remove(self.filename)
-            os.rename(tmpfile, self.filename)
+        fout.close()
+        fin.close()
+        os.remove(self.filename)
+        os.rename(tmpfile, self.filename)
 
     def exportSVG(self):
         """Export document as SVG"""
 
-        dpi = float(svg_export.dpi)
-        helper = painthelper.PaintHelper( (1,1) )
-        size = self.doc.basewidget.getSize(helper)
+        dpi = svg_export.dpi * 1.
+        size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi), integer=False)
 
         if qt4.PYQT_VERSION >= 0x40600:
             # custom paint devices don't work in old PyQt versions
 
             f = open(self.filename, 'w')
-            paintdev = svg_export.SVGPaintDevice(f, size[0]*1./dpi, size[1]*1./dpi)
+            paintdev = svg_export.SVGPaintDevice(f, size[0]/dpi, size[1]/dpi)
             painter = qt4.QPainter(paintdev)
-            self.renderPage(size, dpi, painter)
-            painter.end()
+            self.renderPage(size, (dpi,dpi), painter)
             f.close()
-
         else:
             # use built-in svg generation, which doesn't work very well
             # (no clipping, font size problems)
@@ -271,41 +258,42 @@ class Export(object):
             gen.setResolution(dpi)
             gen.setSize( qt4.QSize(int(size[0]), int(size[1])) )
             painter = qt4.QPainter(gen)
-            self.renderPage(size, dpi, painter)
-            painter.end()
+            self.renderPage(size, (dpi,dpi), painter)
 
-    def exportSelfTest(self, filename, page):
+    def exportSelfTest(self):
         """Export document for testing"""
 
         dpi = 90.
-        width, height = self._getDocSize(dpi)
+        size = width, height = self.doc.pageSize(
+            self.pagenumber, dpi=(dpi,dpi), integer=False)
 
-        f = open(filename, 'w')
+        f = open(self.filename, 'w')
         paintdev = selftest_export.SelfTestPaintDevice(f, width/dpi, height/dpi)
-        painter = Painter(paintdev)
-        self.basewidget.draw(painter, page)
-        painter.end()
+        painter = qt4.QPainter(paintdev)
+        self.renderPage(size, (dpi,dpi), painter)
         f.close()
 
-    def exportPIC(self, filename, page):
+    def exportPIC(self):
         """Export document as Qt PIC"""
 
         pic = qt4.QPicture()
-        painter = Painter(pic)
-        self.basewidget.draw( painter, page )
-        painter.end()
-        pic.save(filename)
+        painter = qt4.QPainter(pic)
 
-    def exportEMF(self, filename, page):
+        dpi = (pic.logicalDpiX(), pic.logicalDpiY())
+        size = self.doc.pageSize(self.pagenumber, dpi=dpi)
+        helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+        self.doc.paintTo(helper, self.pagenumber)
+        painter.restore()
+        painter.end()
+        pic.save(self.filename)
+
+    def exportEMF(self):
         """Export document as EMF."""
 
         dpi = 90.
-        width, height = self._getDocSize(dpi)
+        size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi), integer=False)
 
-        paintdev = emf_export.EMFPaintDevice(width/dpi, height/dpi,
-                                             dpi=dpi)
-        painter = Painter(paintdev)
-        self.basewidget.draw( painter, page )
-        painter.end()
-        paintdev.paintEngine().saveFile(filename)
-
+        paintdev = emf_export.EMFPaintDevice(size[0]/dpi, size[1]/dpi, dpi=dpi)
+        painter = qt4.QPainter(paintdev)
+        self.renderPage(size, (dpi,dpi), painter)
+        paintdev.paintEngine().saveFile(self.filename)

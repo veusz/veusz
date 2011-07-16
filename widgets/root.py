@@ -82,10 +82,13 @@ class Root(widget.Widget):
             self.document.locale = qt4.QLocale()
         self.document.locale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
 
-    def getSize(self, painthelper):
-        """Get dimensions of widget in painter coordinates."""
-        return ( self.settings.get('width').convert(painthelper),
-                 self.settings.get('height').convert(painthelper) )
+    def getPage(self, pagenum):
+        """Get page widget."""
+        return self.children[pagenum]
+
+    def numPages(self):
+        """Return number of pages."""
+        return len(self.children)
 
     def draw(self, painthelper, pagenum):
         """Draw the page requested on the painter."""

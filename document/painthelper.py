@@ -57,8 +57,10 @@ class PaintHelper(object):
                  directpaint=None):
         """Initialise using page size (tuple of pixelw, pixelh).
 
-        If directpaint is set to a painter, use this directly
-        rather than creating separate layers for rendering later
+        If directpaint is set to a painter, use this directly rather
+        than creating separate layers for rendering later. The user
+        will need to call restore() on the painter before ending, if
+        using this mode, however.
         """
 
         self.dpi = dpi

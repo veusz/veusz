@@ -642,17 +642,13 @@ class PlotWindow( qt4.QGraphicsView ):
     def setOutputSize(self):
         """Set the ouput display size."""
 
-        # convert distances into pixels
-        pix = qt4.QPixmap(1, 1)
-        ph = document.PaintHelper( (1, 1), scaling = self.zoomfactor )
-        # this is size in PaintHelper's native pixels
-        size = self.document.basewidget.getSize(ph)
+        # when window opens there are no pages
+        if self.pagenumber >= self.document.basewidget.numPages():
+            return
 
-        # scale it according to the difference in dpi
-        ratiodpi = self.screendpi * 1. / ph.dpi[1]
-        size = (int(ratiodpi*size[0]), int(ratiodpi*size[1]))
+        size = self.document.pageSize(self.pagenumber, scaling=self.zoomfactor)
 
-        # make new buffer and resize widget
+        # if size has changed, make new buffer and resize widget
         if size != self.size:
             self.size = size
             self.bufferpixmap = qt4.QPixmap( *self.size )
