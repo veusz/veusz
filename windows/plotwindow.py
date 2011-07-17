@@ -78,7 +78,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # this graphics scene item is the actual graph
         self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
         self.controlgraphs = []
-        self.widgetcontrolgraphs = {}
         self.selwidget = None
         self.vzactions = None
 
@@ -124,10 +123,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # mode for clicking
         self.clickmode = 'select'
         self.currentclickmode = None
-
-        # list of widgets and positions last painted
-        self.widgetpositions = []
-        self.widgetpositionslookup = {}
 
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
@@ -366,7 +361,7 @@ class PlotWindow( qt4.QGraphicsView ):
             # convert points on plotter to axis coordinates
             # FIXME: Need To Trap Conversion Errors!
             r = axis.plotterToGraphCoords(
-                self.painthelper.states[axis].bounds, p)
+                self.painthelper.widgetBounds(axis), p)
 
             # invert if min and max are inverted
             if r[1] < r[0]:
@@ -390,10 +385,10 @@ class PlotWindow( qt4.QGraphicsView ):
         px, py = pos.x(), pos.y()
 
         axes = []
-        for widget, bounds in self.widgetpositions:
+        for widget, bounds in self.painthelper.widgetBoundsIterator(
+            self.document.basewidget, widgets.Axis):
             # if widget is axis, and point lies within bounds
-            if ( isinstance(widget, widgets.Axis) and
-                 px>=bounds[0] and px<=bounds[2] and
+            if ( px>=bounds[0] and px<=bounds[2] and
                  py>=bounds[1] and py<=bounds[3] ):
 
                 # convert correct pointer position
@@ -421,7 +416,8 @@ class PlotWindow( qt4.QGraphicsView ):
         pickinfo = widgets.PickInfo()
         pos = self.mapToScene(mousepos)
 
-        for w, bounds in self.widgetpositions:
+        for w, bounds in self.painthelper.widgetBoundsIterator(
+            self.document.basewidget):
             try:
                 # ask the widget for its (visually) closest point to the cursor
                 info = w.pickPoint(pos.x(), pos.y(), bounds)
@@ -563,8 +559,9 @@ class PlotWindow( qt4.QGraphicsView ):
                 # navigate to the previous or next point on the curve
                 dir = 'right' if k == qt4.Qt.Key_Right else 'left'
                 ix = self.pickerinfo.index
-                pickinfo = self.pickerinfo.widget.pickIndex(ix, dir,
-                                self.widgetpositionslookup[self.pickerinfo.widget])
+                pickinfo = self.pickerinfo.widget.pickIndex(
+                    ix, dir, self.painthelper.widgetBounds(
+                        self.pickerinfo.widget))
                 if not pickinfo:
                     # no more points visible in this direction
                     return
@@ -585,7 +582,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     # ask the widgets to pick their point which is closest horizontally
                     # to the last (screen) x value picked
                     pi = w.pickPoint(self.pickerinfo.screenpos[0], p.y(),
-                                     self.widgetpositionslookup[w],
+                                     self.painthelper.widgetBounds(w),
                                      distance='horizontal')
                     if not pi:
                         continue
@@ -957,7 +954,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 # convert point on plotter to axis coordinate
                 # FIXME: Need To Trap Conversion Errors!
                 r = axis.plotterToGraphCoords(
-                    self.painthelper.states[axis].bounds, p)
+                    self.painthelper.widgetBounds(axis), p)
 
                 axesretn.append( (axis.path, r[0]) )
 

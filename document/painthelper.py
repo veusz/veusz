@@ -209,3 +209,23 @@ class PaintHelper(object):
 
         recursestate(self.states[root])
         return widget[0]
+
+    def widgetBounds(self, widget):
+        """Return bounds of widget."""
+        return self.states[widget].bounds
+
+    def widgetBoundsIterator(self, root, widgettype=None):
+        """Returns bounds for each widget.
+        Set widgettype to be a widget type to filter returns
+        Yields (widget, bounds)
+        """
+
+        # this is a recursive algorithm turned into an iterative one
+        # which makes creation of a generator easier
+        stack = [self.states[root]]
+        while stack:
+            state = stack[0]
+            if widgettype is None or isinstance(state.widget, widgettype):
+                yield state.widget, state.bounds
+            # remove the widget itself from the stack and insert children
+            stack = state.children + stack[1:]
