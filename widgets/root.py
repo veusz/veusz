@@ -86,10 +86,6 @@ class Root(widget.Widget):
         """Get page widget."""
         return self.children[pagenum]
 
-    def numPages(self):
-        """Return number of pages."""
-        return len(self.children)
-
     def draw(self, painthelper, pagenum):
         """Draw the page requested on the painter."""
 

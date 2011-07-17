@@ -62,7 +62,7 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
-    intervals = [0, 100, 250, 500, 1000, 2000, 5000, 10000]
+    intervals = (0, 100, 250, 500, 1000, 2000, 5000, 10000)
 
     def __init__(self, document, parent, menu=None):
         """Initialise the window.
@@ -621,29 +621,21 @@ class PlotWindow( qt4.QGraphicsView ):
         if self.document.getNumberPages() == 0:
             return
 
-        # now crazily draw the whole thing again
-        # see which widgets change the region in the small box given below
-        bufferpixmap = qt4.QPixmap( *self.size )
-        painter = ClickPainter(bufferpixmap, x-3, y-3, 7, 7)
-
-        pagenumber = min( self.document.getNumberPages() - 1,
-                          self.pagenumber )
-        self.document.paintTo(painter, self.pagenumber,
-                              scaling=self.zoomfactor, dpi=self.widgetdpi)
-        painter.end()
-
-        widget = painter.getFoundWidget()
-        if not widget:
-            widget = self.document.getPage(self.pagenumber)
+        widget = self.painthelper.identifyWidgetAtPoint(
+            self.document.basewidget, x, y, antialias=self.antialias)
+        if widget is None:
+            # select page if nothing clicked
+            widget = self.document.basewidget.getPage(self.pagenumber)
 
         # tell connected objects that widget was clicked
-        self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
+        if widget is not None:
+            self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
 
     def setOutputSize(self):
         """Set the ouput display size."""
 
         # when window opens there are no pages
-        if self.pagenumber >= self.document.basewidget.numPages():
+        if self.pagenumber >= self.document.getNumberPages():
             return
 
         size = self.document.pageSize(self.pagenumber, scaling=self.zoomfactor)

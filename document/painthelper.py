@@ -142,3 +142,42 @@ class PaintHelper(object):
 
         for child in state.children:
             self._renderState(child, painter)
+
+    def identifyWidgetAtPoint(self, root, x, y, antialias=True):
+        """What is the widget plotted in the point?"""
+        
+        # make a small image filled with a specific color
+        box = 3
+        specialcolor = qt4.QColor(254, 255, 254)
+        origpix = qt4.QPixmap(2*box+1, 2*box+1)
+        origpix.fill(specialcolor)
+        origimg = origpix.toImage()
+        # store most recent widget here
+        lastwidget = [None]
+        
+        def _rendernextstate(state):
+            """Recursively draw painter.
+
+            Checks whether drawing a widgetchanges the small image
+            around the point given.
+            """
+
+            pixmap = qt4.QPixmap(origpix)
+            painter = qt4.QPainter(pixmap)
+            painter.setRenderHint(qt4.QPainter.Antialiasing, antialias)
+            painter.setRenderHint(qt4.QPainter.TextAntialiasing, antialias)
+            # this makes the small image draw from x-box->x+box, y-box->y+box
+            # translate would get overriden by coordinate system playback
+            painter.setWindow(x-box,y-box,box*2+1,box*2+1)
+            state.record.play(painter)
+            painter.end()
+            newimg = pixmap.toImage()
+
+            if newimg != origimg:
+                lastwidget[0] = state.widget
+
+            for child in state.children:
+                _rendernextstate(child)
+
+        _rendernextstate(self.states[root])
+        return lastwidget[0]
