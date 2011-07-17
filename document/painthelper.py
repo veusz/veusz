@@ -74,8 +74,12 @@ class PaintHelper(object):
         # axis to plotter mappings
         self.axisplottermap = {}
 
+        # whether to directly render to a painter or make new layers
         self.directpaint = directpaint
         self.directpainting = False
+
+        # state for root widget
+        self.rootstate = None
 
     @property
     def maxsize(self):
@@ -99,7 +103,9 @@ class PaintHelper(object):
         clip: another tuple, if set clips drawing to this rectangle
         """
         s = self.states[widget] = DrawState(widget, bounds, clip, self)
-        if widget.parent is not None:
+        if widget.parent is None:
+            self.rootstate = s
+        else:
             self.states[widget.parent].children.append(s)
 
         if self.directpaint:
@@ -127,11 +133,10 @@ class PaintHelper(object):
         """Records the control graph list for the widget given."""
         self.states[widget].cgis = cgis
 
-    def renderToPainter(self, root, painter):
+    def renderToPainter(self, painter):
         """Render saved output to painter.
-        root is the root widget
         """
-        self._renderState(self.states[root], painter)
+        self._renderState(self.rootstate, painter)
 
     def _renderState(self, state, painter):
         """Render state to painter."""
@@ -143,7 +148,7 @@ class PaintHelper(object):
         for child in state.children:
             self._renderState(child, painter)
 
-    def identifyWidgetAtPoint(self, root, x, y, antialias=True):
+    def identifyWidgetAtPoint(self, x, y, antialias=True):
         """What widget has drawn at the point x,y?
 
         Returns the widget drawn last on the point, or None if it is
@@ -185,10 +190,10 @@ class PaintHelper(object):
             for child in state.children:
                 rendernextstate(child)
 
-        rendernextstate(self.states[root])
+        rendernextstate(self.rootstate)
         return lastwidget[0]
 
-    def pointInWidgetBounds(self, root, x, y, widgettype):
+    def pointInWidgetBounds(self, x, y, widgettype):
         """Which graph widget plots at point x,y?
 
         Recurse from widget root
@@ -207,14 +212,14 @@ class PaintHelper(object):
             for child in state.children:
                 recursestate(child)
 
-        recursestate(self.states[root])
+        recursestate(self.rootstate)
         return widget[0]
 
     def widgetBounds(self, widget):
         """Return bounds of widget."""
         return self.states[widget].bounds
 
-    def widgetBoundsIterator(self, root, widgettype=None):
+    def widgetBoundsIterator(self, widgettype=None):
         """Returns bounds for each widget.
         Set widgettype to be a widget type to filter returns
         Yields (widget, bounds)
@@ -222,7 +227,7 @@ class PaintHelper(object):
 
         # this is a recursive algorithm turned into an iterative one
         # which makes creation of a generator easier
-        stack = [self.states[root]]
+        stack = [self.rootstate]
         while stack:
             state = stack[0]
             if widgettype is None or isinstance(state.widget, widgettype):

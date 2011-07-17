@@ -326,7 +326,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # try to work out in which widget the first point is in
         widget = self.painthelper.pointInWidgetBounds(
-            self.document.basewidget, pt1.x(), pt1.y(), widgets.Graph)
+            pt1.x(), pt1.y(), widgets.Graph)
         if widget is None:
             return
         
@@ -381,12 +381,16 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def axesForPoint(self, mousepos):
         """Find all the axes which contain the given mouse position"""
+
+        if self.painthelper is None:
+            return []
+
         pos = self.mapToScene(mousepos)
         px, py = pos.x(), pos.y()
 
         axes = []
         for widget, bounds in self.painthelper.widgetBoundsIterator(
-            self.document.basewidget, widgets.Axis):
+            widgettype=widgets.Axis):
             # if widget is axis, and point lies within bounds
             if ( px>=bounds[0] and px<=bounds[2] and
                  py>=bounds[1] and py<=bounds[3] ):
@@ -416,8 +420,7 @@ class PlotWindow( qt4.QGraphicsView ):
         pickinfo = widgets.PickInfo()
         pos = self.mapToScene(mousepos)
 
-        for w, bounds in self.painthelper.widgetBoundsIterator(
-            self.document.basewidget):
+        for w, bounds in self.painthelper.widgetBoundsIterator():
             try:
                 # ask the widget for its (visually) closest point to the cursor
                 info = w.pickPoint(pos.x(), pos.y(), bounds)
@@ -612,7 +615,7 @@ class PlotWindow( qt4.QGraphicsView ):
             return
 
         widget = self.painthelper.identifyWidgetAtPoint(
-            self.document.basewidget, x, y, antialias=self.antialias)
+            x, y, antialias=self.antialias)
         if widget is None:
             # select page if nothing clicked
             widget = self.document.basewidget.getPage(self.pagenumber)
@@ -691,8 +694,7 @@ class PlotWindow( qt4.QGraphicsView ):
                                           self.antialias)
                     painter.setRenderHint(qt4.QPainter.TextAntialiasing,
                                           self.antialias)
-                    phelper.renderToPainter(self.document.basewidget,
-                                            painter)
+                    phelper.renderToPainter(painter)
                     painter.end()
 
                     # update selected widget items
@@ -926,7 +928,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # try to work out in which widget the first point is in
         widget = self.painthelper.pointInWidgetBounds(
-            self.document.basewidget, pt.x(), pt.y(), widgets.Graph)
+            pt.x(), pt.y(), widgets.Graph)
         if widget is None:
             return []
         
