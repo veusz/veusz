@@ -144,7 +144,13 @@ class PaintHelper(object):
             self._renderState(child, painter)
 
     def identifyWidgetAtPoint(self, root, x, y, antialias=True):
-        """What is the widget plotted in the point?"""
+        """What widget has drawn at the point x,y?
+
+        Returns the widget drawn last on the point, or None if it is
+        an empty part of the page.
+        root is the root widget to recurse from
+        if antialias is true, do test for antialiased drawing
+        """
         
         # make a small image filled with a specific color
         box = 3
@@ -155,7 +161,7 @@ class PaintHelper(object):
         # store most recent widget here
         lastwidget = [None]
         
-        def _rendernextstate(state):
+        def rendernextstate(state):
             """Recursively draw painter.
 
             Checks whether drawing a widgetchanges the small image
@@ -177,7 +183,29 @@ class PaintHelper(object):
                 lastwidget[0] = state.widget
 
             for child in state.children:
-                _rendernextstate(child)
+                rendernextstate(child)
 
-        _rendernextstate(self.states[root])
+        rendernextstate(self.states[root])
         return lastwidget[0]
+
+    def pointInWidgetBounds(self, root, x, y, widgettype):
+        """Which graph widget plots at point x,y?
+
+        Recurse from widget root
+        widgettype is the class of widget to get
+        """
+
+        widget = [None]
+
+        def recursestate(state):
+            if isinstance(state.widget, widgettype):
+                b = state.bounds
+                if x >= b[0] and y >= b[1] and x <= b[2] and y <= b[3]:
+                    # most recent widget drawing on point
+                    widget[0] = state.widget
+
+            for child in state.children:
+                recursestate(child)
+
+        recursestate(self.states[root])
+        return widget[0]

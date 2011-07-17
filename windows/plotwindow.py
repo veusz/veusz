@@ -329,17 +329,8 @@ class PlotWindow( qt4.QGraphicsView ):
             return
 
         # try to work out in which widget the first point is in
-        bufferpixmap = qt4.QPixmap( *self.size )
-        painter = PointPainter(bufferpixmap, pt1.x(), pt1.y())
-        pagenumber = min( self.document.getNumberPages() - 1,
-                          self.pagenumber )
-        if pagenumber >= 0:
-            self.document.paintTo(painter, self.pagenumber,
-                                  scaling=self.zoomfactor, dpi=self.widgetdpi)
-        painter.end()
-
-        # get widget
-        widget = painter.widget
+        widget = self.painthelper.pointInWidgetBounds(
+            self.document.basewidget, pt1.x(), pt1.y(), widgets.Graph)
         if widget is None:
             return
         
@@ -373,7 +364,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
             # convert points on plotter to axis coordinates
             # FIXME: Need To Trap Conversion Errors!
-            r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+            r = axis.plotterToGraphCoords(
+                self.painthelper.states[axis].bounds, p)
 
             # invert if min and max are inverted
             if r[1] < r[0]:
