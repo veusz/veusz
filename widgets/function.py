@@ -352,9 +352,8 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = axispts
         try:
-            results = eval(self.checker.compiled, env)
-            resultpts = axis2.dataToPlotterCoords(
-                posn, results + N.zeros(axispts.shape))
+            results = eval(self.checker.compiled, env) + N.zeros(axispts.shape)
+            resultpts = axis2.dataToPlotterCoords(posn, results)
         except Exception, e:
             self.logEvalError(e)
             results = None
@@ -383,7 +382,7 @@ class FunctionPlotter(GenericPlotter):
             axisnames[0] = axisnames[0] + '(' + axisnames[1] + ')'
 
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
-
+        
         return pickable.GenericPickable(
                     self, axisnames, (xpts, ypts), (pxpts, pypts) )
 
