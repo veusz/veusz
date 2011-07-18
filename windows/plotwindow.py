@@ -160,7 +160,9 @@ class PlotWindow( qt4.QGraphicsView ):
         self.setScene(self.scene)
 
         # this graphics scene item is the actual graph
-        self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
+        pixmap = qt4.QPixmap(1, 1)
+        self.dpi = (pixmap.logicalDpiX(), pixmap.logicalDpiY())
+        self.pixmapitem = self.scene.addPixmap(pixmap)
         self.controlgraphs = []
         self.selwidget = None
         self.vzactions = None
@@ -191,7 +193,6 @@ class PlotWindow( qt4.QGraphicsView ):
         self.painthelper = None
 
         self.size = (1, 1)
-        self.bufferpixmap = qt4.QPixmap(*self.size)
         self.oldzoom = -1.
         self.zoomfactor = 1.
         self.pagenumber = 0
@@ -727,9 +728,8 @@ class PlotWindow( qt4.QGraphicsView ):
         # if size has changed, make new buffer and resize widget
         if size != self.size:
             self.size = size
-            self.bufferpixmap = qt4.QPixmap( *self.size )
             self.forceupdate = True
-            self.setSceneRect( 0, 0, size[0], size[1] )
+            self.setSceneRect(0, 0, size[0], size[1])
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -762,9 +762,6 @@ class PlotWindow( qt4.QGraphicsView ):
             self.pickeritem.hide()
             self.setOutputSize()
             
-            # fill pixmap with proper background colour
-            self.bufferpixmap.fill( setting.settingdb.color('page') )
-
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
             if self.pagenumber >= 0:
@@ -772,12 +769,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 # errors cause an exception window to pop up
                 try:
                     phelper = document.PaintHelper(
-                        (self.bufferpixmap.width(),
-                         self.bufferpixmap.height()),
-                        scaling = self.zoomfactor,
-                        dpi=(self.bufferpixmap.logicalDpiX(),
-                             self.bufferpixmap.logicalDpiY())
-                        )
+                        self.size, scaling = self.zoomfactor, dpi=self.dpi)
                     self.document.paintTo(phelper, self.pagenumber)
 
                     self.rendercontrol.addJob(phelper)
@@ -792,7 +784,9 @@ class PlotWindow( qt4.QGraphicsView ):
                     
             else:
                 self.pagenumber = 0
-                self.pixmapitem.setPixmap(self.bufferpixmap)
+                pixmap = qt4.QPixmap(*self.size)
+                pixmap.fill( setting.settingdb.color('page') )
+                self.pixmapitem.setPixmap(pixmap)
 
             self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
             self.updatePageToolbar()
@@ -801,13 +795,11 @@ class PlotWindow( qt4.QGraphicsView ):
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
-            #self.pixmapitem.setPixmap(self.bufferpixmap)
-
     def slotRenderFinished(self, jobid, img, helper):
         """Update image on display if render finished."""
         self.painthelper = helper
-        self.bufferpixmap = qt4.QPixmap.fromImage(img)
-        self.pixmapitem.setPixmap(self.bufferpixmap)
+        bufferpixmap = qt4.QPixmap.fromImage(img)
+        self.pixmapitem.setPixmap(bufferpixmap)
 
     def _constructContextMenu(self):
         """Construct the context menu."""
