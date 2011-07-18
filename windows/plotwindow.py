@@ -59,6 +59,90 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
         qt4.QGraphicsPathItem.focusOutEvent(self, event)
         self.hide()
 
+class RenderControl(qt4.QObject):
+    """Object for rendering plots in a separate thread."""
+
+    def __init__(self, numthreads):
+        """Start up numthreads rendering threads."""
+        qt4.QObject.__init__(self)
+        self.sem = qt4.QSemaphore()
+        self.mutex = qt4.QMutex()
+        self.threads = []
+        self.exit = False
+        self.latestjobs = []
+        self.latestaddedjob = -1
+        self.latestdrawnjob = -1
+
+        for i in xrange(numthreads):
+            t = RenderThread(self)
+            t.start()
+            self.threads.append(t)
+
+    def exitThreads(self):
+        """Exit threads started."""
+        self.exit = True
+        self.sem.release(len(self.threads))
+        for t in self.threads:
+            t.wait()
+        del self.threads[:]
+
+    def addJob(self, helper):
+        """Process drawing job in PaintHelper given."""
+        self.mutex.lock()
+        self.latestaddedjob += 1
+        self.latestjobs.append( (self.latestaddedjob, helper) )
+        self.mutex.unlock()
+        self.sem.release(1)
+
+class RenderThread( qt4.QThread ):
+    """A thread for processing rendering jobs.
+    This is controlled by a RenderControl object
+    """
+
+    def __init__(self, rendercontrol):
+        qt4.QThread.__init__(self)
+        self.rc = rendercontrol
+
+    def run(self):
+        """Repeat forever until told to exit.
+        If it aquires 1 resource from the semaphore it will process
+        the next job.
+        """
+        while True:
+            # wait until we can aquire the resources
+            self.rc.sem.acquire(1)
+            if self.rc.exit:
+                return
+
+            self.rc.mutex.lock()
+            jobid, helper = self.rc.latestjobs[-1]
+            del self.rc.latestjobs[-1]
+            lastadded = self.rc.latestaddedjob
+            self.rc.mutex.unlock()
+            if lastadded > jobid:
+                # don't process jobs which have been superseded
+                continue
+            
+            # this image format is faster for rendering to (apparently)
+            img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
+                             qt4.QImage.Format_ARGB32_Premultiplied)
+            img.fill( setting.settingdb.color('page').rgb() )
+
+            painter = qt4.QPainter(img)
+            aa = setting.settingdb["plot_antialias"]
+            painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
+            painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
+            helper.renderToPainter(painter)
+            painter.end()
+
+            self.rc.mutex.lock()
+            # just throw away result if it older than the latest one
+            if jobid > self.rc.latestdrawnjob:
+                self.rc.emit( qt4.SIGNAL("renderfinished"),
+                              jobid, img, helper )
+                self.rc.latestdrawnjob = jobid
+            self.rc.mutex.unlock()
+
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
@@ -114,8 +198,10 @@ class PlotWindow( qt4.QGraphicsView ):
         self.forceupdate = False
         self.ignoreclick = False
 
-        # work out dpi
-        self.screendpi = self.logicalDpiY()
+        # for rendering plots in separate threads
+        self.rendercontrol = RenderControl(2)
+        self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
+                     self.slotRenderFinished)
 
         # convert size to pixels
         self.setOutputSize()
@@ -158,6 +244,11 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # make the context menu object
         self._constructContextMenu()
+
+    def hideEvent(self, event):
+        """Window closing, so exit rendering threads."""
+        self.rendercontrol.exitThreads()
+        qt4.QGraphicsView.hideEvent(self, event)
 
     def showToolbar(self, show=True):
         """Show or hide toolbar"""
@@ -680,7 +771,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
                 try:
-                    self.painthelper = phelper = document.PaintHelper(
+                    phelper = document.PaintHelper(
                         (self.bufferpixmap.width(),
                          self.bufferpixmap.height()),
                         scaling = self.zoomfactor,
@@ -689,16 +780,7 @@ class PlotWindow( qt4.QGraphicsView ):
                         )
                     self.document.paintTo(phelper, self.pagenumber)
 
-                    painter = qt4.QPainter(self.bufferpixmap)
-                    painter.setRenderHint(qt4.QPainter.Antialiasing,
-                                          self.antialias)
-                    painter.setRenderHint(qt4.QPainter.TextAntialiasing,
-                                          self.antialias)
-                    phelper.renderToPainter(painter)
-                    painter.end()
-
-                    # update selected widget items
-                    self.selectedWidgets([self.selwidget])
+                    self.rendercontrol.addJob(phelper)
                     
                 except Exception:
                     # stop updates this time round and show exception dialog
@@ -710,6 +792,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     
             else:
                 self.pagenumber = 0
+                self.pixmapitem.setPixmap(self.bufferpixmap)
 
             self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
             self.updatePageToolbar()
@@ -718,7 +801,13 @@ class PlotWindow( qt4.QGraphicsView ):
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
-            self.pixmapitem.setPixmap(self.bufferpixmap)
+            #self.pixmapitem.setPixmap(self.bufferpixmap)
+
+    def slotRenderFinished(self, jobid, img, helper):
+        """Update image on display if render finished."""
+        self.painthelper = helper
+        self.bufferpixmap = qt4.QPixmap.fromImage(img)
+        self.pixmapitem.setPixmap(self.bufferpixmap)
 
     def _constructContextMenu(self):
         """Construct the context menu."""
