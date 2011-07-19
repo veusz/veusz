@@ -164,7 +164,6 @@ class PlotWindow( qt4.QGraphicsView ):
         self.dpi = (pixmap.logicalDpiX(), pixmap.logicalDpiY())
         self.pixmapitem = self.scene.addPixmap(pixmap)
         self.controlgraphs = []
-        self.selwidget = None
         self.vzactions = None
 
         # zoom rectangle for zooming into graph (not shown normally)
@@ -192,7 +191,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # state of last plot from painthelper
         self.painthelper = None
 
-        self.size = (1, 1)
         self.oldzoom = -1.
         self.zoomfactor = 1.
         self.pagenumber = 0
@@ -203,9 +201,6 @@ class PlotWindow( qt4.QGraphicsView ):
         self.rendercontrol = RenderControl(2)
         self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
                      self.slotRenderFinished)
-
-        # convert size to pixels
-        self.setOutputSize()
 
         # mode for clicking
         self.clickmode = 'select'
@@ -716,21 +711,6 @@ class PlotWindow( qt4.QGraphicsView ):
         if widget is not None:
             self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
 
-    def setOutputSize(self):
-        """Set the ouput display size."""
-
-        # when window opens there are no pages
-        if self.pagenumber >= self.document.getNumberPages():
-            return
-
-        size = self.document.pageSize(self.pagenumber, scaling=self.zoomfactor)
-
-        # if size has changed, make new buffer and resize widget
-        if size != self.size:
-            self.size = size
-            self.forceupdate = True
-            self.setSceneRect(0, 0, size[0], size[1])
-
     def setPageNumber(self, pageno):
         """Move the the selected page."""
 
@@ -760,20 +740,19 @@ class PlotWindow( qt4.QGraphicsView ):
              self.forceupdate ):
 
             self.pickeritem.hide()
-            self.setOutputSize()
             
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
             if self.pagenumber >= 0:
+                size = self.document.pageSize(self.pagenumber, scaling=self.zoomfactor)
+
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
                 try:
                     phelper = document.PaintHelper(
-                        self.size, scaling = self.zoomfactor, dpi=self.dpi)
+                        size, scaling=self.zoomfactor, dpi=self.dpi)
                     self.document.paintTo(phelper, self.pagenumber)
 
-                    self.rendercontrol.addJob(phelper)
-                    
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
@@ -781,24 +760,30 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.forceupdate = False
                     self.docchangeset = self.document.changeset
                     d.exec_()
-                    
+
+                self.painthelper = phelper
+                self.rendercontrol.addJob(phelper)
             else:
+                self.painthelper = None
                 self.pagenumber = 0
-                pixmap = qt4.QPixmap(*self.size)
+                size = self.document.docSize()
+                pixmap = qt4.QPixmap(*size)
                 pixmap.fill( setting.settingdb.color('page') )
+                self.setSceneRect(0, 0, *size)
                 self.pixmapitem.setPixmap(pixmap)
 
             self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
             self.updatePageToolbar()
 
+            self.updateControlGraphs(self.lastwidgetsselected)
             self.oldzoom = self.zoomfactor
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
     def slotRenderFinished(self, jobid, img, helper):
         """Update image on display if render finished."""
-        self.painthelper = helper
         bufferpixmap = qt4.QPixmap.fromImage(img)
+        self.setSceneRect(0, 0, bufferpixmap.width(), bufferpixmap.height())
         self.pixmapitem.setPixmap(bufferpixmap)
 
     def _constructContextMenu(self):
@@ -913,14 +898,15 @@ class PlotWindow( qt4.QGraphicsView ):
         # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
         aspectwin = viewportsize.width()*1./viewportsize.height()
-        aspectplot = self.size[0]*1./self.size[1]
+        r = self.pixmapitem.boundingRect()
+        aspectplot = r.width() / r.height()
 
         width = viewportsize.width()
         if aspectwin > aspectplot:
             # take account of scroll bar
             width -= self.verticalScrollBar().width()
             
-        mult = width*1./self.size[0]
+        mult = width / r.width()
         self.setZoomFactor(self.zoomfactor * mult)
         
     def slotViewZoomHeight(self):
@@ -929,22 +915,24 @@ class PlotWindow( qt4.QGraphicsView ):
         # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
         aspectwin = viewportsize.width()*1./viewportsize.height()
-        aspectplot = self.size[0]*1./self.size[1]
+        r = self.pixmapitem.boundingRect()
+        aspectplot = r.width() / r.height()
 
         height = viewportsize.height()
         if aspectwin < aspectplot:
             # take account of scroll bar
             height -= self.horizontalScrollBar().height()
             
-        mult = height*1./self.size[1]
+        mult = height / r.height()
         self.setZoomFactor(self.zoomfactor * mult)
 
     def slotViewZoomPage(self):
         """Make the zoom factor correct to show the whole page."""
 
         viewportsize = self.maximumViewportSize()
-        multw = viewportsize.width()*1./self.size[0]
-        multh = viewportsize.height()*1./self.size[1]
+        r = self.pixmapitem.boundingRect()
+        multw = viewportsize.width()*1./r.width()
+        multh = viewportsize.height()*1./r.height()
         self.setZoomFactor(self.zoomfactor * min(multw, multh))
 
     def slotViewZoom11(self):
@@ -1044,12 +1032,14 @@ class PlotWindow( qt4.QGraphicsView ):
         return axesretn
 
     def selectedWidgets(self, widgets):
-        """Update control items on screen associated with widget."""
+        """Update control items on screen associated with widget.
+        Called when widgets have been selected in the tree edit window
+        """
+        self.updateControlGraphs(widgets)
+        self.lastwidgetsselected = widgets
 
-        if not widgets:
-            self.selwidget = None
-        else:
-            self.selwidget = widgets[0]
+    def updateControlGraphs(self, widgets):
+        """Add control graphs for the widgets given."""
 
         # remove old items from scene
         for item in self.controlgraphs:
