@@ -191,6 +191,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # state of last plot from painthelper
         self.painthelper = None
 
+        self.lastwidgetsselected = []
         self.oldzoom = -1.
         self.zoomfactor = 1.
         self.pagenumber = 0
