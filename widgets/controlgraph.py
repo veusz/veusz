@@ -107,6 +107,7 @@ class ControlMarginBox(object):
         # we need these later to convert back to original units
         self.pagesize = painthelper.pagesize
         self.scaling = painthelper.scaling
+        self.dpi = painthelper.dpi
 
     def createGraphicsItem(self):
         return _GraphMarginBox(self)
@@ -127,7 +128,8 @@ class ControlMarginBox(object):
         bottom = self.maxposn[3] - self.posn[3]
 
         # set up fake painthelper containing veusz scalings
-        helper = document.PaintHelper(self.pagesize, scaling=self.scaling)
+        helper = document.PaintHelper(self.pagesize, scaling=self.scaling,
+                                      dpi=self.dpi)
 
         # convert to physical units
         left = s.get('leftMargin').convertInverse(left, helper)

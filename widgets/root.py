@@ -113,7 +113,8 @@ class Root(widget.Widget):
         height = cgi.posn[3] - cgi.posn[1]
 
         # set up fake painter containing veusz scalings
-        helper = document.PaintHelper(cgi.pagesize, scaling=cgi.scaling)
+        helper = document.PaintHelper(cgi.pagesize, scaling=cgi.scaling,
+                                      dpi=cgi.dpi)
 
         # convert to physical units
         width = s.get('width').convertInverse(width, helper)

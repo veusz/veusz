@@ -635,7 +635,6 @@ class IntOrAuto(Setting):
 
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
-
     return (painter.pixperpt * mult *
             float(match.group(1)) * painter.scaling)
 
