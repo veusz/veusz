@@ -181,7 +181,7 @@ class ColorsSequence(ToolsPlugin):
                 idx += 1
 
 class ColorsReplace(ToolsPlugin):
-    """Randomize the colors used in plotting."""
+    """Replace one color by another."""
 
     menu = ('Colors', 'Replace')
     name = 'Replace colors'
@@ -219,6 +219,55 @@ class ColorsReplace(ToolsPlugin):
                 # evaluate into qcolor to make sure is a true match
                 if qt4.QColor(node.val) == fromcol:
                     node.val = fields['color2']
+            else:
+                for c in node.children:
+                    walkNodes(c)
+
+        fromwidget = ifc.Root.fromPath(fields['widget'])
+        walkNodes(fromwidget)
+
+class ColorsSwap(ToolsPlugin):
+    """Swap colors used in plotting."""
+
+    menu = ('Colors', 'Swap')
+    name = 'Swap colors'
+    description_short = 'Swap two colors'
+    description_full = 'Swaps two colors in the plot'
+
+    def __init__(self):
+        """Construct plugin."""
+        self.fields = [
+            field.FieldWidget("widget", descr="Start from widget",
+                              default="/"),
+            field.FieldBool("follow", descr="Change references and defaults",
+                            default=True),
+            field.FieldColor('color1', descr="First color",
+                             default='black'),
+            field.FieldColor('color2', descr="Second color",
+                             default='red'),
+            ]
+
+    def apply(self, ifc, fields):
+        """Do the color search and replace."""
+
+        col1 = qt4.QColor(fields['color1'])
+        col2 = qt4.QColor(fields['color2'])
+
+        def walkNodes(node):
+            """Walk nodes, changing values."""
+            if node.type == 'setting' and node.settingtype == 'color':
+                # only follow references if requested
+                if node.isreference:
+                    if fields['follow']:
+                        node = node.resolveReference()
+                    else:
+                        return
+
+                # evaluate into qcolor to make sure is a true match
+                if qt4.QColor(node.val) == col1:
+                    node.val = fields['color2']
+                elif qt4.QColor(node.val) == col2:
+                    node.val = fields['color1']
             else:
                 for c in node.children:
                     walkNodes(c)
@@ -467,6 +516,7 @@ toolspluginregistry += [
     ColorsRandomize,
     ColorsSequence,
     ColorsReplace,
+    ColorsSwap,
     TextReplace,
     WidgetsClone,
     FontSizeIncrease,
