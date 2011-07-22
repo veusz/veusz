@@ -36,7 +36,6 @@ import veusz.qtall as qt4
 import widgetfactory
 import datasets
 import painthelper
-import export
 
 import veusz.utils as utils
 import veusz.setting as setting
@@ -346,18 +345,19 @@ class Document( qt4.QObject ):
                 antialias = False):
         """Print onto printing device."""
 
-        painter = Painter(scaling=scaling, dpi=dpi)
-       
-        painter.begin( printer )
-        painter.setRenderHint(qt4.QPainter.Antialiasing,
-                              antialias)
-        painter.setRenderHint(qt4.QPainter.TextAntialiasing,
-                              antialias)
-
+        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
+        painter = qt4.QPainter(printer)
+        if antialias:
+            painter.setRenderHint(qt4.QPainter.Antialiasing, True)
+            painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
+   
         # This all assumes that only pages can go into the root widget
         num = len(pages)
         for count, page in enumerate(pages):
-            self.basewidget.draw(painter, page)
+            size = self.pageSize(page, dpi=dpi)
+            helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+            self.paintTo(helper, page)
+            painter.restore()
 
             # start new pages between each page
             if count < num-1:
