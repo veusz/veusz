@@ -114,32 +114,37 @@ class RenderControl(qt4.QObject):
         lastadded = self.latestaddedjob
         self.mutex.unlock()
 
-        if lastadded > jobid:
-            # don't process jobs which have been superseded
-            return
+        # don't process jobs which have been superseded
+        if lastadded == jobid:
+            img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
+                             qt4.QImage.Format_ARGB32_Premultiplied)
+            img.fill( setting.settingdb.color('page').rgb() )
 
-        img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
-                         qt4.QImage.Format_ARGB32_Premultiplied)
-        img.fill( setting.settingdb.color('page').rgb() )
+            painter = qt4.QPainter(img)
+            aa = self.plotwindow.antialias
+            painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
+            painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
+            helper.renderToPainter(painter)
+            painter.end()
 
-        painter = qt4.QPainter(img)
-        aa = self.plotwindow.antialias
-        painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
-        painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
-        helper.renderToPainter(painter)
-        painter.end()
+            self.mutex.lock()
+            # just throw away result if it older than the latest one
+            if jobid > self.latestdrawnjob:
+                self.emit( qt4.SIGNAL("renderfinished"),
+                              jobid, img, helper )
+                self.latestdrawnjob = jobid
+            self.mutex.unlock()
 
-        self.mutex.lock()
-        # just throw away result if it older than the latest one
-        if jobid > self.latestdrawnjob:
-            self.emit( qt4.SIGNAL("renderfinished"),
-                          jobid, img, helper )
-            self.latestdrawnjob = jobid
-        self.mutex.unlock()
+        # tell any listeners that a job has been processed
+        self.plotwindow.emit( qt4.SIGNAL("queuechange"), -1 )
 
     def addJob(self, helper):
         """Process drawing job in PaintHelper given."""
 
+        # indicate that there is a new item to be processed to listeners
+        self.plotwindow.emit( qt4.SIGNAL("queuechange"), 1 )
+
+        # add the job to the queue
         self.mutex.lock()
         self.latestaddedjob += 1
         self.latestjobs.append( (self.latestaddedjob, helper) )

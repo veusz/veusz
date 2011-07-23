@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    Copyright (C) 2003 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -140,6 +141,15 @@ class MainWindow(qt4.QMainWindow):
         self._setPickerFont(self.pickerlabel)
         statusbar.addPermanentWidget(self.pickerlabel)
         self.pickerlabel.hide()
+
+        # plot queue - how many plots are currently being drawn
+        self.plotqueuecount = 0
+        self.connect( self.plot, qt4.SIGNAL("queuechange"),
+                      self.plotQueueChanged )
+        self.plotqueuelabel = qt4.QLabel(statusbar)
+        self.plotqueuelabel.setToolTip("Number of rendering jobs remaining")
+        statusbar.addPermanentWidget(self.plotqueuelabel)
+        self.plotqueuelabel.show()
 
         # a label for the cursor position readout
         self.axisvalueslabel = qt4.QLabel(statusbar)
@@ -791,6 +801,11 @@ class MainWindow(qt4.QMainWindow):
         else:
             self.setWindowTitle( "%s - Veusz" %
                                  os.path.basename(self.filename) )
+
+    def plotQueueChanged(self, incr):
+        self.plotqueuecount += incr
+        text = u'•' * self.plotqueuecount
+        self.plotqueuelabel.setText(text)
 
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
