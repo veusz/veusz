@@ -22,7 +22,13 @@
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
-from veusz.helpers.qtloops import RecordPaintDevice
+
+try:
+    from veusz.helpers.qtloops import RecordPaintDevice
+except ImportError:
+    # fallback to this if we don't get the native recorded
+    def RecordPaintDevice(width, height, dpix, dpiy):
+        return qt4.QPicture()
 
 class DrawState(object):
     """Each widget plotted has a recorded state in this object."""
