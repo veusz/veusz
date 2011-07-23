@@ -21,6 +21,7 @@
 
 import sys
 from itertools import izip
+import traceback
 
 import veusz.qtall as qt4
 import numpy as N
@@ -142,9 +143,11 @@ class RenderControl(qt4.QObject):
         self.latestaddedjob += 1
         self.latestjobs.append( (self.latestaddedjob, helper) )
         self.mutex.unlock()
-        self.sem.release(1)
 
-        if not self.threads:
+        if self.threads:
+            # tell a thread to process job
+            self.sem.release(1)
+        else:
             # process job in current thread if multithreading disabled
             self.processNextJob()
 
@@ -166,12 +169,12 @@ class RenderThread( qt4.QThread ):
             # wait until we can aquire the resources
             self.rc.sem.acquire(1)
             if self.rc.exit:
-                return
-
+                break
             try:
                 self.rc.processNextJob()
-            except Exception, e:
-                print >>sys.stderr, "Rendering thread error", repr(e)
+            except Exception:
+                sys.stderr.write("Error in rendering thread\n")
+                traceback.print_exc(file=sys.stderr)
 
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
