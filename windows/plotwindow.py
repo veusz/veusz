@@ -63,7 +63,7 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 class RenderControl(qt4.QObject):
     """Object for rendering plots in a separate thread."""
 
-    def __init__(self):
+    def __init__(self, plotwindow):
         """Start up numthreads rendering threads."""
         qt4.QObject.__init__(self)
         self.sem = qt4.QSemaphore()
@@ -73,6 +73,7 @@ class RenderControl(qt4.QObject):
         self.latestjobs = []
         self.latestaddedjob = -1
         self.latestdrawnjob = -1
+        self.plotwindow = plotwindow
 
         self.updateNumberThreads()
 
@@ -122,7 +123,7 @@ class RenderControl(qt4.QObject):
         img.fill( setting.settingdb.color('page').rgb() )
 
         painter = qt4.QPainter(img)
-        aa = setting.settingdb["plot_antialias"]
+        aa = self.plotwindow.antialias
         painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
         helper.renderToPainter(painter)
@@ -232,7 +233,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.ignoreclick = False
 
         # for rendering plots in separate threads
-        self.rendercontrol = RenderControl()
+        self.rendercontrol = RenderControl(self)
         self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
                      self.slotRenderFinished)
 
