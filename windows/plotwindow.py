@@ -62,7 +62,7 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 class RenderControl(qt4.QObject):
     """Object for rendering plots in a separate thread."""
 
-    def __init__(self, numthreads):
+    def __init__(self):
         """Start up numthreads rendering threads."""
         qt4.QObject.__init__(self)
         self.sem = qt4.QSemaphore()
@@ -73,26 +73,80 @@ class RenderControl(qt4.QObject):
         self.latestaddedjob = -1
         self.latestdrawnjob = -1
 
-        for i in xrange(numthreads):
+        self.updateNumberThreads()
+
+    def updateNumberThreads(self, num=None):
+        """Changes the number of rendering threads."""
+        if num is None:
+            num = setting.settingdb['plot_numthreads']
+
+        if self.threads:
+            # delete old ones
+            self.exit = True
+            self.sem.release(len(self.threads))
+            for t in self.threads:
+                t.wait()
+            del self.threads[:]
+            self.exit = False
+
+        # start new ones
+        for i in xrange(num):
             t = RenderThread(self)
             t.start()
             self.threads.append(t)
 
     def exitThreads(self):
         """Exit threads started."""
-        self.exit = True
-        self.sem.release(len(self.threads))
-        for t in self.threads:
-            t.wait()
-        del self.threads[:]
+        self.updateNumberThreads(0)
+
+    def processNextJob(self):
+        """Take a job from the queue and process it.
+
+        emits renderfinished(jobid, img, painthelper)
+        when done, if job has not been superseded
+        """
+
+        self.mutex.lock()
+        jobid, helper = self.latestjobs[-1]
+        del self.latestjobs[-1]
+        lastadded = self.latestaddedjob
+        self.mutex.unlock()
+
+        if lastadded > jobid:
+            # don't process jobs which have been superseded
+            return
+
+        img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
+                         qt4.QImage.Format_ARGB32_Premultiplied)
+        img.fill( setting.settingdb.color('page').rgb() )
+
+        painter = qt4.QPainter(img)
+        aa = setting.settingdb["plot_antialias"]
+        painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
+        painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
+        helper.renderToPainter(painter)
+        painter.end()
+
+        self.mutex.lock()
+        # just throw away result if it older than the latest one
+        if jobid > self.latestdrawnjob:
+            self.emit( qt4.SIGNAL("renderfinished"),
+                          jobid, img, helper )
+            self.latestdrawnjob = jobid
+        self.mutex.unlock()
 
     def addJob(self, helper):
         """Process drawing job in PaintHelper given."""
+
         self.mutex.lock()
         self.latestaddedjob += 1
         self.latestjobs.append( (self.latestaddedjob, helper) )
         self.mutex.unlock()
         self.sem.release(1)
+
+        if not self.threads:
+            # process job in current thread if multithreading disabled
+            self.processNextJob()
 
 class RenderThread( qt4.QThread ):
     """A thread for processing rendering jobs.
@@ -114,34 +168,10 @@ class RenderThread( qt4.QThread ):
             if self.rc.exit:
                 return
 
-            self.rc.mutex.lock()
-            jobid, helper = self.rc.latestjobs[-1]
-            del self.rc.latestjobs[-1]
-            lastadded = self.rc.latestaddedjob
-            self.rc.mutex.unlock()
-            if lastadded > jobid:
-                # don't process jobs which have been superseded
-                continue
-            
-            # this image format is faster for rendering to (apparently)
-            img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
-                             qt4.QImage.Format_ARGB32_Premultiplied)
-            img.fill( setting.settingdb.color('page').rgb() )
-
-            painter = qt4.QPainter(img)
-            aa = setting.settingdb["plot_antialias"]
-            painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
-            painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
-            helper.renderToPainter(painter)
-            painter.end()
-
-            self.rc.mutex.lock()
-            # just throw away result if it older than the latest one
-            if jobid > self.rc.latestdrawnjob:
-                self.rc.emit( qt4.SIGNAL("renderfinished"),
-                              jobid, img, helper )
-                self.rc.latestdrawnjob = jobid
-            self.rc.mutex.unlock()
+            try:
+                self.rc.processNextJob()
+            except Exception, e:
+                print >>sys.stderr, "Rendering thread error", repr(e)
 
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
@@ -199,7 +229,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.ignoreclick = False
 
         # for rendering plots in separate threads
-        self.rendercontrol = RenderControl(2)
+        self.rendercontrol = RenderControl()
         self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
                      self.slotRenderFinished)
 
@@ -834,6 +864,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Update plot window settings from settings."""
         self.setTimeout(setting.settingdb['plot_updateinterval'])
         self.antialias = setting.settingdb['plot_antialias']
+        self.rendercontrol.updateNumberThreads()
         self.actionForceUpdate()
 
     def contextMenuEvent(self, event):

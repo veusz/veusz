@@ -35,6 +35,7 @@ defaultValues = {
     # plot options
     'plot_updateinterval': 500,
     'plot_antialias': True,
+    'plot_numthreads': 2,
 
     # recent files list
     'main_recentfiles': [],

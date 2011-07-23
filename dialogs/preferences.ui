@@ -26,6 +26,26 @@
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0" colspan="2">
+          <widget class="QCheckBox" name="antialiasCheck">
+           <property name="toolTip">
+            <string>Use antialiasing to smooth jagged edges</string>
+           </property>
+           <property name="text">
+            <string>Antialiasing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="englishCheck">
+           <property name="toolTip">
+            <string>Please restart Veusz after changing this option</string>
+           </property>
+           <property name="text">
+            <string>Override system locale settings to show Veusz in US/English</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
@@ -34,7 +54,11 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QComboBox" name="intervalCombo"/>
+          <widget class="QComboBox" name="intervalCombo">
+           <property name="toolTip">
+            <string>How often Veusz will update the plot if it has changed</string>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_6">
@@ -77,20 +101,21 @@
            </item>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="englishCheck">
-           <property name="toolTip">
-            <string>Please restart Veusz after changing this option</string>
-           </property>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>Override system locale settings to show Veusz in US/English</string>
+            <string>Number of drawing threads</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="antialiasCheck">
-           <property name="text">
-            <string>Antialiasing</string>
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="threadSpinBox">
+           <property name="toolTip">
+            <string>Maximum number of parallel threads to use for drawing plots.
+Set to 0 to disable threads.</string>
+           </property>
+           <property name="maximum">
+            <number>16</number>
            </property>
           </widget>
          </item>
