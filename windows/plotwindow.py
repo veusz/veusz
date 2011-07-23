@@ -257,9 +257,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # get update period from setting database
         self.interval = setting.settingdb['plot_updateinterval']
 
-        # load antialias settings
-        self.antialias = setting.settingdb['plot_antialias']
-
         if self.interval > 0:
             self.timer.start(self.interval)
 
@@ -736,7 +733,7 @@ class PlotWindow( qt4.QGraphicsView ):
             return
 
         widget = self.painthelper.identifyWidgetAtPoint(
-            x, y, antialias=self.antialias)
+            x, y, antialias=setting.settingdb['plot_antialias'])
         if widget is None:
             # select page if nothing clicked
             widget = self.document.basewidget.getPage(self.pagenumber)
@@ -861,12 +858,11 @@ class PlotWindow( qt4.QGraphicsView ):
         menu.addSeparator()
         act = menu.addAction('Antialias', self.actionAntialias)
         act.setCheckable(True)
-        act.setChecked(self.antialias)
+        act.setChecked(setting.settingdb['plot_antialias'])
 
     def updatePlotSettings(self):
         """Update plot window settings from settings."""
         self.setTimeout(setting.settingdb['plot_updateinterval'])
-        self.antialias = setting.settingdb['plot_antialias']
         self.rendercontrol.updateNumberThreads()
         self.actionForceUpdate()
 
@@ -910,8 +906,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def actionAntialias(self):
         """Toggle antialias."""
-        self.antialias = not self.antialias
-        setting.settingdb['plot_antialias'] = self.antialias
+        setting.settingdb['plot_antialias'] = not setting.settingdb[
+            'plot_antialias']
         self.actionForceUpdate()
 
     def setZoomFactor(self, zoomfactor):
