@@ -80,7 +80,12 @@ class RenderControl(qt4.QObject):
     def updateNumberThreads(self, num=None):
         """Changes the number of rendering threads."""
         if num is None:
-            num = setting.settingdb['plot_numthreads']
+            if qt4.QFontDatabase.supportsThreadedFontRendering():
+                # use number of threads in preference
+                num = setting.settingdb['plot_numthreads']
+            else:
+                # disable threads
+                num = 0
 
         if self.threads:
             # delete old ones
@@ -99,7 +104,7 @@ class RenderControl(qt4.QObject):
 
     def exitThreads(self):
         """Exit threads started."""
-        self.updateNumberThreads(0)
+        self.updateNumberThreads(num=0)
 
     def processNextJob(self):
         """Take a job from the queue and process it.

@@ -146,9 +146,9 @@ class MainWindow(qt4.QMainWindow):
         self.plotqueuecount = 0
         self.connect( self.plot, qt4.SIGNAL("queuechange"),
                       self.plotQueueChanged )
-        self.plotqueuelabel = qt4.QLabel(statusbar)
+        self.plotqueuelabel = qt4.QLabel()
         self.plotqueuelabel.setToolTip("Number of rendering jobs remaining")
-        statusbar.addPermanentWidget(self.plotqueuelabel)
+        statusbar.addWidget(self.plotqueuelabel)
         self.plotqueuelabel.show()
 
         # a label for the cursor position readout

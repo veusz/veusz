@@ -44,6 +44,12 @@ class PreferencesDialog(VeuszDialog):
         self.intervalCombo.setCurrentIndex(index)
         self.threadSpinBox.setValue( setdb['plot_numthreads'] )
 
+        # disable thread option if not supported
+        if not qt4.QFontDatabase.supportsThreadedFontRendering():
+            self.threadSpinBox.setEnabled(False)
+            self.threadSpinBox.setToolTip("Disabled because of lack of "
+                                          "threaded drawing support")
+
         # use cwd for file dialogs
         self.cwdCheck.setChecked( setdb['dirname_usecwd'] )
 
