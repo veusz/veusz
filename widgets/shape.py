@@ -80,7 +80,7 @@ class BoxShape(Shape):
     def drawShape(self, painter, rect):
         pass
 
-    def draw(self, posn, painter, outerbounds = None):
+    def draw(self, posn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
 
         s = self.settings
@@ -107,10 +107,9 @@ class BoxShape(Shape):
                          not s.get('width').isDataset(d) and
                          not s.get('height').isDataset(d) and
                          not s.get('rotate').isDataset(d) )
-        self.controlgraphitems = []
+        controlgraphitems = []
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
+        painter = phelper.painter(self, posn)
 
         # drawing settings for shape
         if not s.Border.hide:
@@ -143,10 +142,9 @@ class BoxShape(Shape):
                 cgi.index = index
                 cgi.widgetposn = posn
                 index += 1
-                self.controlgraphitems.append(cgi)
+                controlgraphitems.append(cgi)
 
-        painter.restore()
-        painter.endPaintingWidget()
+        phelper.setControlGraph(self, controlgraphitems)
 
     def updateControlItem(self, cgi):
         """If control item is moved or resized, this is called."""

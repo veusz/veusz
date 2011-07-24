@@ -100,17 +100,15 @@ class GenericPlotter(widget.Widget):
         """Get key entry."""
         return self.settings.key
 
-    def drawKeySymbol(self, number, painter, x, y, width, height):
+    def drawKeySymbol(self, number, painter, phelper, x, y, width, height):
         """Draw the plot symbol and/or line at (x,y) in a box width*height.
 
         This is used to plot a key
         """
         pass
 
-    def clipAxesBounds(self, painter, axes, bounds):
-        """Clip painter to start and stop values of axis.
-        Returns clipping rectangle
-        """
+    def clipAxesBounds(self, axes, bounds):
+        """Returns clipping rectange for start and stop values of axis."""
 
         # update cached coordinates of axes
         axes[0].plotterToDataCoords(bounds, N.array([]))
@@ -126,7 +124,6 @@ class GenericPlotter(widget.Widget):
 
         # actually clip the data
         cliprect = qt4.QRectF(qt4.QPointF(x1, y1), qt4.QPointF(x2, y2))
-        painter.setClipRect(cliprect)
         return cliprect
 
     def getAxisLabels(self, direction):

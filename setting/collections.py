@@ -49,14 +49,14 @@ class Line(Settings):
                                descr = 'Hide the line',
                                usertext='Hide') )
         
-    def makeQPen(self, painter):
+    def makeQPen(self, painthelper):
         '''Make a QPen from the description.
         This currently ignores the hide attribute
         '''
 
         color = qt4.QColor(self.color)
         color.setAlphaF( (100-self.transparency) / 100.)
-        width = self.get('width').convert(painter)
+        width = self.get('width').convert(painthelper)
         style, dashpattern = setting.LineStyle._linecnvt[self.style]
         pen = qt4.QPen( color, width, style )
 
@@ -65,12 +65,12 @@ class Line(Settings):
 
         return pen
 
-    def makeQPenWHide(self, painter):
+    def makeQPenWHide(self, painthelper):
         """Make a pen, taking account of hide attribute."""
         if self.hide:
             return qt4.QPen(qt4.Qt.NoPen)
         else:
-            return self.makeQPen(painter)
+            return self.makeQPen(painthelper)
         
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
@@ -236,10 +236,10 @@ class Text(Settings):
         c.families = self.families
         return c
 
-    def makeQFont(self, painter):
+    def makeQFont(self, painthelper):
         '''Return a qt4.QFont object corresponding to the settings.'''
         
-        size = self.get('size').convertPts(painter)
+        size = self.get('size').convertPts(painthelper)
         weight = qt4.QFont.Normal
         if self.bold:
             weight = qt4.QFont.Bold
@@ -247,7 +247,7 @@ class Text(Settings):
         f = qt4.QFont(self.font, size,  weight, self.italic)
         if self.underline:
             f.setUnderline(True)
-        f.setStyleHint( qt4.QFont.Times, qt4.QFont.PreferDevice )
+        f.setStyleHint(qt4.QFont.Times)
 
         return f
 

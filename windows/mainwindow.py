@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    Copyright (C) 2003 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -140,6 +141,15 @@ class MainWindow(qt4.QMainWindow):
         self._setPickerFont(self.pickerlabel)
         statusbar.addPermanentWidget(self.pickerlabel)
         self.pickerlabel.hide()
+
+        # plot queue - how many plots are currently being drawn
+        self.plotqueuecount = 0
+        self.connect( self.plot, qt4.SIGNAL("queuechange"),
+                      self.plotQueueChanged )
+        self.plotqueuelabel = qt4.QLabel(statusbar)
+        self.plotqueuelabel.setToolTip("Number of rendering jobs remaining")
+        statusbar.addPermanentWidget(self.plotqueuelabel)
+        self.plotqueuelabel.show()
 
         # a label for the cursor position readout
         self.axisvalueslabel = qt4.QLabel(statusbar)
@@ -792,6 +802,11 @@ class MainWindow(qt4.QMainWindow):
             self.setWindowTitle( "%s - Veusz" %
                                  os.path.basename(self.filename) )
 
+    def plotQueueChanged(self, incr):
+        self.plotqueuecount += incr
+        text = u'•' * self.plotqueuecount
+        self.plotqueuelabel.setText(text)
+
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
         
@@ -1077,7 +1092,7 @@ class MainWindow(qt4.QMainWindow):
         filters = []
         # a list of extensions which are allowed
         validextns = []
-        formats = self.document.getExportFormats()
+        formats = document.Export.formats
         for extns, name in formats:
             extensions = " ".join(["*." + item for item in extns])
             # join eveything together to make a filter string
@@ -1130,13 +1145,16 @@ class MainWindow(qt4.QMainWindow):
             if (ext not in validextns) and (ext not in chosenextns):
                 filename = filename + "." + chosenextns[0]
 
+            e = document.Export( self.document,
+                                 filename,
+                                 self.plot.getPageNumber(),
+                                 bitmapdpi=setdb['export_DPI'],
+                                 antialias=setdb['export_antialias'],
+                                 color=setdb['export_color'],
+                                 quality=setdb['export_quality'],
+                                 backcolor=setdb['export_background'] )
             try:
-                self.document.export(filename, self.plot.getPageNumber(),
-                                     dpi=setdb['export_DPI'],
-                                     antialias=setdb['export_antialias'],
-                                     color=setdb['export_color'],
-                                     quality=setdb['export_quality'],
-                                     backcolor=setdb['export_background'])
+                e.export()
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox.critical(self, "Veusz",
                                          "Error exporting file:\n%s" % inst)

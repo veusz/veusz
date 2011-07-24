@@ -317,15 +317,14 @@ class Key(widget.Widget):
         
         return (layout, (numrows, numcols))
     
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
 
         s = self.settings
         if s.hide:
             return
 
-        painter.beginPaintingWidget(self, parentposn)
-        painter.save()
+        painter = phelper.painter(self, parentposn)
 
         font = s.get('Text').makeQFont(painter)
         painter.setFont(font)
@@ -357,7 +356,6 @@ class Key(widget.Widget):
                     
                     totallines += lines
                     entries.append( (c, i, lines) )
-
 
         # layout the box
         layout, (numrows, numcols) = self._layout(entries, totallines)
@@ -438,11 +436,7 @@ class Key(widget.Widget):
                                plotter.getKeyText(num),
                                -1, 1).render()
 
-        self.controlgraphitems = [
-            ControlKey(self, parentposn, boxposn, boxdims, height)
-            ]
-
-        painter.restore()
-        painter.endPaintingWidget()
+        phelper.setControlGraph(
+            self, [ControlKey(self, parentposn, boxposn, boxdims, height)] )
 
 document.thefactory.register( Key )

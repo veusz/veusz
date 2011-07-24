@@ -20,9 +20,11 @@
 
 import veusz.qtall as qt4
 import veusz.document as document
+import veusz.setting as setting
 
 import widget
 import root
+import controlgraph
 
 # x, y, fplot, xyplot
 # x-> xyplot(x)
@@ -186,12 +188,24 @@ class Page(widget.Widget):
         if type(self) == Page:
             self.readDefaults()
  
-    def draw(self, parentposn, painter, outerbounds=None):
+    @classmethod
+    def addSettings(klass, s):
+        widget.Widget.addSettings(s)
+        
+        # page sizes are initially linked to the document page size
+        s.add( setting.Distance('width',
+                                setting.Reference('/width'),
+                                descr='Width of page',
+                                usertext='Page width',
+                                formatting=True) )
+        s.add( setting.Distance('height',
+                                setting.Reference('/height'),
+                                descr='Height of page',
+                                usertext='Page height',
+                                formatting=True) )
+        
+    def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
-
-        # special scaling properties are stored in painter
-        if not hasattr(painter, 'veusz_scaling'):
-            painter.veusz_scaling = 1.
 
         # document should pass us the page bounds
         x1, y1, x2, y2 = parentposn
@@ -202,26 +216,36 @@ class Page(widget.Widget):
         axisdependhelper.findAxisRanges()
 
         # store axis->plotter mappings in painter too (is this nasty?)
-        painter.veusz_axis_plotter_map = axisdependhelper.axis_plotter_map
-
-        # page size is stored in painter
-        painter.veusz_page_size = (x2-x1, y2-y1)
+        painthelper.axisplottermap.update(axisdependhelper.axis_plotter_map)
 
         if self.settings.hide:
             bounds = self.computeBounds(parentposn, painter)
             return bounds
 
-        painter.beginPaintingWidget(self, parentposn)
-        painter.save()
+        clip = qt4.QRectF( qt4.QPointF(parentposn[0], parentposn[1]),
+                           qt4.QPointF(parentposn[2], parentposn[3]) )
+        painter = painthelper.painter(self, parentposn, clip=clip)
 
         # clip to page
-        painter.setClipRect( qt4.QRectF(x1, y1, x2-x1, y2-y1) )
-        bounds = widget.Widget.draw(self, parentposn, painter,
+        bounds = widget.Widget.draw(self, parentposn, painthelper,
                                     parentposn)
-        painter.restore()
-        painter.endPaintingWidget()
+
+        # w and h are non integer
+        w = self.settings.get('width').convert(painter)
+        h = self.settings.get('height').convert(painter)
+        painthelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, [0, 0, w, h],
+                                              [-10000, -10000,
+                                                10000,  10000],
+                                              painthelper,
+                                              ismovable = False)
+                ] )
 
         return bounds
+
+    def updateControlItem(self, cgi):
+        """Call helper to set page size."""
+        cgi.setPageSize()
 
 # allow the factory to instantiate this
 document.thefactory.register( Page )

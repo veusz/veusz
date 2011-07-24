@@ -196,7 +196,7 @@ class RenderState(object):
         painter = self.painter
         pixperpt = painter.device().logicalDpiY() / 72.
         try:
-            pixperpt *= painter.veusz_scaling
+            pixperpt *= painter.scaling
         except AttributeError:
             pass
         return pixperpt

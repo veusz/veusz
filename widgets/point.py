@@ -435,7 +435,8 @@ class PointPlotter(GenericPlotter):
         return path
         painter.strokePath(p, painter.pen())
 
-    def _drawBezierLine( self, painter, xvals, yvals, posn, xdata, ydata):
+    def _drawBezierLine( self, painter, xvals, yvals, posn,
+                         xdata, ydata):
         """Handle bezier lines and fills."""
 
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
@@ -532,8 +533,8 @@ class PointPlotter(GenericPlotter):
         # plot error bar
         painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
         for function in _errorBarFunctionMap[style]:
-            function(style, xneg, xpos, yneg, ypos, xpts, ypts, s, painter,
-                     cliprect)
+            function(style, xneg, xpos, yneg, ypos, xpts, ypts, s,
+                     painter, cliprect)
 
         # draw line
         if not s.PlotLine.hide:
@@ -554,7 +555,8 @@ class PointPlotter(GenericPlotter):
 
         painter.restore()
 
-    def drawLabels(self, painter, xplotter, yplotter, textvals, markersize):
+    def drawLabels(self, painter, xplotter, yplotter,
+                   textvals, markersize):
         """Draw labels for the points."""
 
         s = self.settings
@@ -624,10 +626,10 @@ class PointPlotter(GenericPlotter):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
 
-        posn = GenericPlotter.draw(self, parentposn, painter,
+        posn = GenericPlotter.draw(self, parentposn, phelper,
                                    outerbounds=outerbounds)
         x1, y1, x2, y2 = posn
 
@@ -659,9 +661,8 @@ class PointPlotter(GenericPlotter):
             return
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        cliprect = self.clipAxesBounds(painter, axes, posn)
+        cliprect = self.clipAxesBounds(axes, posn)
+        painter = phelper.painter(self, posn, clip=cliprect)
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals in document.generateValidDatasetParts(
@@ -725,10 +726,8 @@ class PointPlotter(GenericPlotter):
 
             # finally plot any labels
             if tvals and not s.Label.hide:
-                self.drawLabels(painter, xplotter, yplotter, tvals, markersize)
-
-        painter.restore()
-        painter.endPaintingWidget()
+                self.drawLabels(painter, xplotter, yplotter,
+                                tvals, markersize)
 
 # allow the factory to instantiate an x,y plotter
 document.thefactory.register( PointPlotter )

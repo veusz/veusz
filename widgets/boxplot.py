@@ -373,18 +373,18 @@ class BoxPlot(GenericPlotter):
                                markersize, clip=clip )
 
         # draw mean
-        meanplt = axes[not horz].dataToPlotterCoords(posn,
-                                                     N.array([stats.mean]))[0]
+        meanplt = axes[not horz].dataToPlotterCoords(
+            posn, N.array([stats.mean]))[0]
         if horz:
             x, y = meanplt, boxposn
         else:
             x, y = boxposn, meanplt
         utils.plotMarker( painter, x, y, s.meanmarker, markersize )
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
 
-        widgetposn = GenericPlotter.draw(self, parentposn, painter,
+        widgetposn = GenericPlotter.draw(self, parentposn, phelper,
                                          outerbounds=outerbounds)
         s = self.settings
 
@@ -417,10 +417,8 @@ class BoxPlot(GenericPlotter):
              axes[1].settings.direction != 'vertical' ):
             return
 
-        # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, widgetposn)
-        painter.save()
-        clip = self.clipAxesBounds(painter, axes, widgetposn)
+        clip = self.clipAxesBounds(axes, widgetposn)
+        painter = phelper.painter(self, widgetposn, clip=clip)
 
         # get boxes visible along direction of boxes to work out width
         horz = (s.direction == 'horizontal')
@@ -466,9 +464,6 @@ class BoxPlot(GenericPlotter):
                 stats.outliers = N.array([])
                 self.plotBox(painter, axes, vals[6][i], widgetposn,
                              width, clip, stats)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate a boxplot
 document.thefactory.register( BoxPlot )

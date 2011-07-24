@@ -28,7 +28,7 @@ inch_mm = 25.4
 def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
-
+    
     # this is to get consistent rounding to get the self test correct... yuck
     # decimal would work, but that drags in loads of code
     # convert float to string with prec decimal places
@@ -308,7 +308,8 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 self.fileobj.write('</g>\n')
             if self.lastclip is not None:
                 self.fileobj.write('</g>\n')
-            self.fileobj.write(clipgrp)
+            if clipgrp is not None:
+                self.fileobj.write(clipgrp)
             self.fileobj.write(state)
             self.laststate = state
             self.lastclip = clipgrp
@@ -404,65 +405,35 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.fileobj.write('" preserveAspectRatio="none"/>\n')
 
 class SVGPaintDevice(qt4.QPaintDevice):
-     """Paint device for SVG paint engine."""
+    """Paint device for SVG paint engine."""
 
-     def __init__(self, fileobj, width_in, height_in):
-          qt4.QPaintDevice.__init__(self)
-          self.engine = SVGPaintEngine(width_in, height_in)
-          self.fileobj = fileobj
+    def __init__(self, fileobj, width_in, height_in):
+        qt4.QPaintDevice.__init__(self)
+        self.engine = SVGPaintEngine(width_in, height_in)
+        self.fileobj = fileobj
 
-     def paintEngine(self):
-          return self.engine
+    def paintEngine(self):
+        return self.engine
 
-     def width(self):
-          return self.engine.width*dpi
-
-     def widthMM(self):
-          return int(self.width() * inch_mm)
-
-     def height(self):
-          return self.engine.height*dpi
-
-     def heightMM(self):
-          return int(self.height() * inch_mm)
-
-     def logicalDpiX(self):
-          return dpi
-
-     def logicalDpiY(self):
-          return dpi
-
-     def physicalDpiX(self):
-          return dpi
-
-     def physicalDpiY(self):
-          return dpi
-
-     def depth(self):
-          return 24
-
-     def numColors(self):
-          return 2147483647
-
-     def metric(self, m):
-          if m & qt4.QPaintDevice.PdmWidth:
-               return self.width()
-          elif m & qt4.QPaintDevice.PdmHeight:
-               return self.height()
-          elif m & qt4.QPaintDevice.PdmWidthMM:
-               return self.widthMM()
-          elif m & qt4.QPaintDevice.PdmHeightMM:
-               return self.heightMM()
-          elif m & qt4.QPaintDevice.PdmNumColors:
-               return self.numColors()
-          elif m & qt4.QPaintDevice.PdmDepth:
-               return self.depth()
-          elif m & qt4.QPaintDevice.PdmDpiX:
-               return self.logicalDpiX()
-          elif m & qt4.QPaintDevice.PdmDpiY:
-               return self.logicalDpiY()
-          elif m & qt4.QPaintDevice.PdmPhysicalDpiX:
-               return self.physicalDpiX()
-          elif m & qt4.QPaintDevice.PdmPhysicalDpiY:
-               return self.physcialDpiY()
-
+    def metric(self, m):
+        """Return the metrics of the painter."""
+        if m == qt4.QPaintDevice.PdmWidth:
+            return int(self.engine.width * dpi)
+        elif m == qt4.QPaintDevice.PdmHeight:
+            return int(self.engine.height * dpi)
+        elif m == qt4.QPaintDevice.PdmWidthMM:
+            return int(self.engine.width * inch_mm)
+        elif m == qt4.QPaintDevice.PdmHeightMM:
+            return int(self.engine.height * inch_mm)
+        elif m == qt4.QPaintDevice.PdmNumColors:
+            return 2147483647
+        elif m == qt4.QPaintDevice.PdmDepth:
+            return 24
+        elif m == qt4.QPaintDevice.PdmDpiX:
+            return int(dpi)
+        elif m == qt4.QPaintDevice.PdmDpiY:
+            return int(dpi)
+        elif m == qt4.QPaintDevice.PdmPhysicalDpiX:
+            return int(dpi)
+        elif m == qt4.QPaintDevice.PdmPhysicalDpiY:
+            return int(dpi)

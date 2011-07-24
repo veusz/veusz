@@ -85,14 +85,14 @@ class _EdgeLine(qt4.QGraphicsLineItem):
 ##############################################################################
 
 class ControlMarginBox(object):
-    def __init__(self, widget, posn, maxposn, painter,
+    def __init__(self, widget, posn, maxposn, painthelper,
                  ismovable = True, isresizable = True):
         """Create control box item.
 
         widget: widget this is controllng
         posn: coordinates of box [x1, y1, x2, y2]
         maxposn: coordinates of biggest possibe box
-        painter: painter to get scaling from
+        painthelper: painterhelper to get scaling from
         ismovable: box can be moved
         isresizable: box can be resized
         """
@@ -105,9 +105,9 @@ class ControlMarginBox(object):
         self.isresizable = isresizable
 
         # we need these later to convert back to original units
-        self.page_size = painter.veusz_page_size
-        self.scaling = painter.veusz_scaling
-        self.pixperpt = painter.veusz_pixperpt
+        self.pagesize = painthelper.pagesize
+        self.scaling = painthelper.scaling
+        self.dpi = painthelper.dpi
 
     def createGraphicsItem(self):
         return _GraphMarginBox(self)
@@ -116,8 +116,7 @@ class ControlMarginBox(object):
         """A helpful routine for setting widget margins after
         moving or resizing.
 
-        This is called by the widget after receiving
-        updateControlItem
+        This is called by the widget after receiving updateControlItem
         """
         s = self.widget.settings
 
@@ -127,17 +126,15 @@ class ControlMarginBox(object):
         top = self.posn[1] - self.maxposn[1]
         bottom = self.maxposn[3] - self.posn[3]
 
-        # set up fake painter containing veusz scalings
-        fakepainter = qt4.QPainter()
-        fakepainter.veusz_page_size = self.page_size
-        fakepainter.veusz_scaling = self.scaling
-        fakepainter.veusz_pixperpt = self.pixperpt
+        # set up fake painthelper containing veusz scalings
+        helper = document.PaintHelper(self.pagesize, scaling=self.scaling,
+                                      dpi=self.dpi)
 
         # convert to physical units
-        left = s.get('leftMargin').convertInverse(left, fakepainter)
-        right = s.get('rightMargin').convertInverse(right, fakepainter)
-        top = s.get('topMargin').convertInverse(top, fakepainter)
-        bottom = s.get('bottomMargin').convertInverse(bottom, fakepainter)
+        left = s.get('leftMargin').convertInverse(left, helper)
+        right = s.get('rightMargin').convertInverse(right, helper)
+        top = s.get('topMargin').convertInverse(top, helper)
+        bottom = s.get('bottomMargin').convertInverse(bottom, helper)
 
         # modify widget margins
         operations = (
@@ -148,6 +145,33 @@ class ControlMarginBox(object):
             )
         self.widget.document.applyOperation(
             document.OperationMultiple(operations, descr='resize margins'))
+
+    def setPageSize(self):
+        """Helper for setting document/page widget size.
+
+        This is called by the widget after receiving updateControlItem
+        """
+        s = self.widget.settings
+
+        # get margins in pixels
+        width = self.posn[2] - self.posn[0]
+        height = self.posn[3] - self.posn[1]
+
+        # set up fake painter containing veusz scalings
+        helper = document.PaintHelper(self.pagesize, scaling=self.scaling,
+                                      dpi=self.dpi)
+
+        # convert to physical units
+        width = s.get('width').convertInverse(width, helper)
+        height = s.get('height').convertInverse(height, helper)
+
+        # modify widget margins
+        operations = (
+            document.OperationSettingSet(s.get('width'), width),
+            document.OperationSettingSet(s.get('height'), height),
+            )
+        self.widget.document.applyOperation(
+            document.OperationMultiple(operations, descr='change page size'))
 
 class _GraphMarginBox(qt4.QGraphicsItem):
     """A box which can be moved or resized.
@@ -408,10 +432,10 @@ class ControlMovableBox(ControlMarginBox):
     the real position of the widget is
     """
 
-    def __init__(self, widget, posn, painter, crosspos=None):
+    def __init__(self, widget, posn, painthelper, crosspos=None):
         ControlMarginBox.__init__(self, widget, posn,
                                   [-10000, -10000, 10000, 10000],
-                                  painter, isresizable=False)
+                                  painthelper, isresizable=False)
         self.deltacrosspos = (crosspos[0] - self.posn[0],
                               crosspos[1] - self.posn[1])
 

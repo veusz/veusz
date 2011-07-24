@@ -425,10 +425,10 @@ class BarPlotter(GenericPlotter):
                                      qt4.QPointF(x+width, y+height*0.8)) )
 
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
 
-        widgetposn = GenericPlotter.draw(self, parentposn, painter,
+        widgetposn = GenericPlotter.draw(self, parentposn, phelper,
                                          outerbounds=outerbounds)
         s = self.settings
 
@@ -475,17 +475,13 @@ class BarPlotter(GenericPlotter):
             dsvals.append(vals)
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, widgetposn)
-        painter.save()
-        clip = self.clipAxesBounds(painter, axes, widgetposn)
+        clip = self.clipAxesBounds(axes, widgetposn)
+        painter = phelper.painter(self, widgetposn, clip=clip)
 
         # actually do the drawing
         fn = {'stacked': self.barDrawStacked,
               'grouped': self.barDrawGroup}[s.mode]
         fn(painter, barposns, maxwidth, dsvals, axes, widgetposn, clip)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate a bar plotter
 document.thefactory.register( BarPlotter )

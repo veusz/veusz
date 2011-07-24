@@ -82,56 +82,33 @@ class Root(widget.Widget):
             self.document.locale = qt4.QLocale()
         self.document.locale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
 
-    def getSize(self, painter):
-        """Get dimensions of widget in painter coordinates."""
-        return ( self.settings.get('width').convert(painter),
-                 self.settings.get('height').convert(painter) )
+    def getPage(self, pagenum):
+        """Get page widget."""
+        return self.children[pagenum]
 
-    def draw(self, painter, pagenum):
+    def draw(self, painthelper, pagenum):
         """Draw the page requested on the painter."""
 
-        xw, yw = self.getSize(painter)
+        xw, yw = painthelper.pagesize
         posn = [0, 0, xw, yw]
-        painter.beginPaintingWidget(self, posn)
+        painter = painthelper.painter(self, posn)
         page = self.children[pagenum]
-        page.draw( posn, painter )
+        page.draw( posn, painthelper )
 
-        self.controlgraphitems = [
-            controlgraph.ControlMarginBox(self, posn,
-                                          [-10000, -10000,
-                                            10000,  10000],
-                                          painter,
-                                          ismovable = False)
-            ]
-
-        painter.endPaintingWidget()
+        # w and h are non integer
+        w = self.settings.get('width').convert(painter)
+        h = self.settings.get('height').convert(painter)
+        painthelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, [0, 0, w, h],
+                                              [-10000, -10000,
+                                                10000,  10000],
+                                              painthelper,
+                                              ismovable = False)
+                ] )
 
     def updateControlItem(self, cgi):
-        """Graph resized or moved - call helper routine to move self."""
-
-        s = self.settings
-
-        # get margins in pixels
-        width = cgi.posn[2] - cgi.posn[0]
-        height = cgi.posn[3] - cgi.posn[1]
-
-        # set up fake painter containing veusz scalings
-        fakepainter = qt4.QPainter()
-        fakepainter.veusz_page_size = cgi.page_size
-        fakepainter.veusz_scaling = cgi.scaling
-        fakepainter.veusz_pixperpt = cgi.pixperpt
-
-        # convert to physical units
-        width = s.get('width').convertInverse(width, fakepainter)
-        height = s.get('height').convertInverse(height, fakepainter)
-
-        # modify widget margins
-        operations = (
-            document.OperationSettingSet(s.get('width'), width),
-            document.OperationSettingSet(s.get('height'), height),
-            )
-        self.document.applyOperation(
-            document.OperationMultiple(operations, descr='change page size'))
+        """Call helper to set page size."""
+        cgi.setPageSize()
 
     def fillStylesheet(self, stylesheet):
         """Register widgets with stylesheet."""

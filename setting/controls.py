@@ -736,6 +736,7 @@ class LineStyle(Choice):
 
         # import later for dependency issues
         import veusz.setting.collections
+        import veusz.document
 
         icons = []
         size = cls.size
@@ -746,12 +747,15 @@ class LineStyle(Choice):
         for lstyle in cls._lines:
             pix = qt4.QPixmap(*size)
             pix.fill()
+
+            ph = veusz.document.PaintHelper( (1, 1) )
+
             painter = qt4.QPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
 
             setn.get('style').set(lstyle)
             
-            painter.setPen( setn.makeQPen(painter) )
+            painter.setPen( setn.makeQPen(ph) )
             painter.drawLine( int(size[0]*0.1), size[1]/2,
                               int(size[0]*0.9), size[1]/2 )
             painter.end()

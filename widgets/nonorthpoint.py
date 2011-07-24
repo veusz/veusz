@@ -126,13 +126,11 @@ class NonOrthPoint(Widget):
             utils.plotMarkers(painter, plta, pltb, s.marker, size,
                               scaling=scaling, clip=clip)
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
 
-        posn = Widget.draw(self, parentposn, painter,
+        posn = Widget.draw(self, parentposn, phelper,
                            outerbounds=outerbounds)
-        x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
 
         s = self.settings
         d = self.document
@@ -147,8 +145,10 @@ class NonOrthPoint(Widget):
         if not d1 or not d2:
             return
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
+        x1, y1, x2, y2 = posn
+        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        painter = phelper.painter(self, posn)
+        self.parent.setClip(painter, posn)
 
         # split parts separated by NaNs
         for v1, v2, vs in document.generateValidDatasetParts(d1, d2, dscale):
@@ -184,9 +184,6 @@ class NonOrthPoint(Widget):
             if vs:
                 pscale = vs.data
             self.plotMarkers(painter, px, py, pscale, cliprect)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate plotter
 document.thefactory.register( NonOrthPoint )

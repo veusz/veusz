@@ -352,9 +352,8 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = axispts
         try:
-            results = eval(self.checker.compiled, env)
-            resultpts = axis2.dataToPlotterCoords(
-                posn, results + N.zeros(axispts.shape))
+            results = eval(self.checker.compiled, env) + N.zeros(axispts.shape)
+            resultpts = axis2.dataToPlotterCoords(posn, results)
         except Exception, e:
             self.logEvalError(e)
             results = None
@@ -383,7 +382,7 @@ class FunctionPlotter(GenericPlotter):
             axisnames[0] = axisnames[0] + '(' + axisnames[1] + ')'
 
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
-
+        
         return pickable.GenericPickable(
                     self, axisnames, (xpts, ypts), (pxpts, pypts) )
 
@@ -393,10 +392,10 @@ class FunctionPlotter(GenericPlotter):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, painthelper, outerbounds = None):
         """Draw the function."""
 
-        posn = GenericPlotter.draw(self, parentposn, painter,
+        posn = GenericPlotter.draw(self, parentposn, painthelper,
                                    outerbounds = outerbounds)
         x1, y1, x2, y2 = posn
         s = self.settings
@@ -415,9 +414,8 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # clip data within bounds of plotter
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        cliprect = self.clipAxesBounds(painter, axes, posn)
+        cliprect = self.clipAxesBounds(axes, posn)
+        painter = painthelper.painter(self, posn, clip=cliprect)
 
         # get the points to plot by evaluating the function
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
@@ -447,9 +445,6 @@ class FunctionPlotter(GenericPlotter):
                 painter.setBrush( qt4.QBrush() )
                 painter.setPen( s.Line.makeQPen(painter) )
                 self._plotLine(painter, pxpts, pypts, posn, cliprect)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 # allow the factory to instantiate an function plotter
 document.thefactory.register( FunctionPlotter )

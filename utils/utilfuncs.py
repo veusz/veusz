@@ -385,3 +385,14 @@ def positionFloatingPopup(popup, widget):
 
     popup.move(x, y)
     popup.setFocus()
+
+class BasicPaintHelper(object):
+    """Basic helper used when painting widgets.
+    Holds the scaling, dpi and size of the page.
+
+    We split this out here because settings needs access to some
+    of these attributes
+    """
+
+    def __init__(self, pagesize, scaling=1., dpi=75):
+        """Initialise using page size (tuple of pixelw, pixelh)."""

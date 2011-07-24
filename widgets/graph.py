@@ -18,8 +18,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from itertools import izip
-
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
@@ -111,28 +109,28 @@ class Graph(widget.Widget):
         # return list of found widgets
         return [widgets[n] for n in axesnames]
 
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, painthelper, outerbounds = None):
         '''Update the margins before drawing.'''
 
         s = self.settings
 
-        margins = ( s.get('leftMargin').convert(painter),
-                    s.get('topMargin').convert(painter),
-                    s.get('rightMargin').convert(painter),
-                    s.get('bottomMargin').convert(painter) )
-        bounds = self.computeBounds(parentposn, painter, margins=margins)
-        maxbounds = self.computeBounds(parentposn, painter)
+        margins = ( s.get('leftMargin').convert(painthelper),
+                    s.get('topMargin').convert(painthelper),
+                    s.get('rightMargin').convert(painthelper),
+                    s.get('bottomMargin').convert(painthelper) )
+
+        bounds = self.computeBounds(parentposn, painthelper, margins=margins)
+        maxbounds = self.computeBounds(parentposn, painthelper)
 
         # controls for adjusting graph margins
-        self.controlgraphitems = [
-            controlgraph.ControlMarginBox(self, bounds, maxbounds, painter)
-            ]
+        painter = painthelper.painter(self, bounds)
+        painthelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, bounds, maxbounds,
+                                              painthelper) ])
 
         # do no painting if hidden
         if s.hide:
             return bounds
-
-        painter.beginPaintingWidget(self, bounds)
 
         # set graph rectangle attributes
         painter.setBrush( s.get('Background').makeQBrushWHide() )
@@ -142,17 +140,10 @@ class Graph(widget.Widget):
         painter.drawRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
                                      qt4.QPointF(bounds[2], bounds[3])) )
 
-        painter.endPaintingWidget()
-
-        # set default pen/brush
-        # this is probably sticking plaster
-        painter.setPen( qt4.QPen() )
-        painter.setBrush( qt4.QBrush() )
-        
         # do normal drawing of children
         # iterate over children in reverse order
         for c in reversed(self.children):
-            c.draw(bounds, painter, outerbounds=outerbounds)
+            c.draw(bounds, painthelper, outerbounds=outerbounds)
 
         # now need to find axes which aren't children, and draw those again
         axestodraw = set()
@@ -171,7 +162,7 @@ class Graph(widget.Widget):
             axeswidgets = self.getAxes(axestodraw)
             for w in axeswidgets:
                 if w is not None:
-                    w.draw(bounds, painter, outerbounds=outerbounds)
+                    w.draw(bounds, painthelper, outerbounds=outerbounds)
 
         return bounds
 

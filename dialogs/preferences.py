@@ -42,6 +42,7 @@ class PreferencesDialog(VeuszDialog):
         index = self.plotwindow.intervals.index(
             setdb['plot_updateinterval'])
         self.intervalCombo.setCurrentIndex(index)
+        self.threadSpinBox.setValue( setdb['plot_numthreads'] )
 
         # use cwd for file dialogs
         self.cwdCheck.setChecked( setdb['dirname_usecwd'] )
@@ -182,6 +183,7 @@ class PreferencesDialog(VeuszDialog):
             self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
         setdb['plot_antialias'] = self.antialiasCheck.isChecked()
         setdb['ui_english'] = self.englishCheck.isChecked()
+        setdb['plot_numthreads'] = self.threadSpinBox.value()
 
         # use cwd
         setdb['dirname_usecwd'] = self.cwdCheck.isChecked()

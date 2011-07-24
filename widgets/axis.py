@@ -608,9 +608,9 @@ class Axis(widget.Widget):
             delta *= -1
         
         y = coordminorticks*0.+self.coordPerp
-        self.swaplines(painter,
-                       coordminorticks, y,
-                       coordminorticks, y-delta)
+        self.swaplines( painter,
+                        coordminorticks, y,
+                        coordminorticks, y-delta )
 
     def _drawMajorTicks(self, painter, tickcoords):
         """Draw major ticks on the plot."""
@@ -631,19 +631,19 @@ class Axis(widget.Widget):
             delta *= -1
 
         y = tickcoords*0.+self.coordPerp
-        self.swaplines(painter,
-                       tickcoords, y,
-                       tickcoords, y-delta)
+        self.swaplines( painter,
+                        tickcoords, y,
+                        tickcoords, y-delta )
 
         # account for ticks if they are in the direction of the label
         if s.outerticks and not self.coordReflected:
             self._delta_axis += abs(delta)
 
-    def generateLabelLabels(self, painter):
+    def generateLabelLabels(self, phelper):
         """Generate list of positions and labels from widgets using this
         axis."""
         try:
-            plotters = painter.veusz_axis_plotter_map[self]
+            plotters = phelper.axisplottermap[self]
         except (AttributeError, KeyError):
             return
 
@@ -661,7 +661,7 @@ class Axis(widget.Widget):
                     if N.isfinite(coord) and (minval <= coord <= maxval):
                         yield pcoord, lab
 
-    def _drawTickLabels(self, painter, coordticks, sign, outerbounds,
+    def _drawTickLabels(self, phelper, painter, coordticks, sign, outerbounds,
                         texttorender):
         """Draw tick labels on the plot.
 
@@ -724,7 +724,7 @@ class Axis(widget.Widget):
 
         # use generator function to get labels and positions
         if s.mode == 'labels':
-            ticklabels = self.generateLabelLabels(painter)
+            ticklabels = self.generateLabelLabels(phelper)
         else:
             ticklabels = generateTickLabels()
 
@@ -911,10 +911,13 @@ class Axis(widget.Widget):
                 return True
         return False
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None,
+             useexistingpainter=None):
         """Plot the axis on the painter.
 
-        if suppresstext is True, then we don't number or label the axis
+        useexistingpainter is a hack so that a colorbar can reuse the
+        drawing code here. If set to a painter, it will use this rather
+        than opening a new one.
         """
 
         s = self.settings
@@ -923,17 +926,19 @@ class Axis(widget.Widget):
         if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
-        posn = widget.Widget.draw(self, parentposn, painter, outerbounds)
+        posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
         self._updatePlotRange(posn)
 
+        # get ready to draw
+        if useexistingpainter is not None:
+            painter = useexistingpainter
+        else:
+            painter = phelper.painter(self, posn)
+
         # make control item for axis
-        self.controlgraphitems = [
-            controlgraph.ControlAxisLine(self, s.direction,
-                                         self.coordParr1,
-                                         self.coordParr2,
-                                         self.coordPerp,
-                                         posn)
-            ]
+        phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
+                    self, s.direction, self.coordParr1,
+                    self.coordParr2, self.coordPerp, posn) ])
 
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
@@ -942,10 +947,6 @@ class Axis(widget.Widget):
         # exit if axis is hidden
         if s.hide:
             return
-
-        # save the state of the painter for later
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
 
         texttorender = []
 
@@ -977,19 +978,11 @@ class Axis(widget.Widget):
         if not s.MajorTicks.hide:
             self._drawMajorTicks(painter, coordticks)
 
-        # debugging
-        #painter.save()
-        #painter.setPen(qt4.QPen(qt4.Qt.blue))
-        #painter.drawRect(
-        #    qt4.QRectF(qt4.QPointF(outerbounds[0], outerbounds[1]),
-        #               qt4.QPointF(outerbounds[2], outerbounds[3])) )
-        #painter.restore()
-
         # plot tick labels
         suppresstext = self._suppressText(painter, parentposn, outerbounds)
         if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(painter, coordticks, sign, outerbounds,
-                                 texttorender)
+            self._drawTickLabels(phelper, painter, coordticks, sign,
+                                 outerbounds, texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
@@ -1011,12 +1004,7 @@ class Axis(widget.Widget):
                 painter.setPen(pen)
                 box = r.render()
                 drawntext.addRect(rect)
-
-        # restore the state of the painter
-        painter.restore()
-
-        painter.endPaintingWidget()
-
+                
     def updateControlItem(self, cgi):
         """Update axis position from control item."""
 

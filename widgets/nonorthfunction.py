@@ -146,13 +146,11 @@ class NonOrthFunction(Widget):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable().pickIndex(oldindex, direction, bounds)
 
-    def draw(self, parentposn, painter, outerbounds=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the function on a plotter.'''
 
-        posn = Widget.draw(self, parentposn, painter,
+        posn = Widget.draw(self, parentposn, phelper,
                            outerbounds=outerbounds)
-        x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
 
         s = self.settings
         d = self.document
@@ -168,8 +166,10 @@ class NonOrthFunction(Widget):
             self.logEvalError(e)
             return
 
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
+        x1, y1, x2, y2 = posn
+        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        painter = phelper.painter(self, posn)
+        self.parent.setClip(painter, posn)
 
         apts, bpts = self.getFunctionPoints()
         px, py = self.parent.graphToPlotCoords(apts, bpts)
@@ -194,8 +194,5 @@ class NonOrthFunction(Widget):
                 painter.setBrush(qt4.QBrush())
                 painter.setPen( s.PlotLine.makeQPen(painter) )
                 utils.plotClippedPolyline(painter, cliprect, p)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
 document.thefactory.register( NonOrthFunction )

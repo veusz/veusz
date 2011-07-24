@@ -35,6 +35,7 @@ import datasets
 import operations
 import dataset_histo
 import mime
+import export
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
@@ -761,10 +762,11 @@ class CommandInterface(qt4.QObject):
          a #RRGGBBAA value (red, green, blue, alpha)
         """
         
-        self.document.export(filename, page, color=color,
-                             dpi=dpi, antialias=antialias,
-                             quality=quality, backcolor=backcolor)
-            
+        e = export.Export(self.document, filename, page, color=color,
+                          bitmapdpi=dpi, antialias=antialias,
+                          quality=quality, backcolor=backcolor)
+        e.export()
+
     def Rename(self, widget, newname):
         """Rename the widget with the path given to the new name.
 

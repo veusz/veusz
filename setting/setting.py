@@ -633,54 +633,40 @@ class IntOrAuto(Setting):
 # these are functions used by the distance setting below.
 # they don't work as class methods
 
-def _calcPixPerPt(painter):
-    """Calculate the numbers of pixels per point for the painter.
-
-    This is stored in the variable veusz_pixperpt."""
-
-    dpi = painter.device().logicalDpiY()
-    if dpi == 0: dpi = 72
-    painter.veusz_pixperpt = dpi / 72.
-
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
-
-    if not hasattr(painter, 'veusz_pixperpt'):
-        _calcPixPerPt(painter)
-
-    return (painter.veusz_pixperpt * mult *
-            float(match.group(1)) * painter.veusz_scaling)
+    return (painter.pixperpt * mult *
+            float(match.group(1)) * painter.scaling)
 
 def _distInvPhys(pixdist, painter, mult, unit):
     """Convert number of pixels into physical distance."""
-    dist = pixdist / (mult * painter.veusz_pixperpt *
-                      painter.veusz_scaling)
+    dist = pixdist / (mult * painter.pixperpt * painter.scaling)
     return "%.3g%s" % (dist, unit)
 
-def _distPerc(match, painter, maxsize):
+def _distPerc(match, painter):
     """Convert from a percentage of maxsize."""
-    return maxsize * 0.01 * float(match.group(1))
+    return painter.maxsize * 0.01 * float(match.group(1))
 
-def _distInvPerc(pixdist, painter, maxsize):
+def _distInvPerc(pixdist, painter):
     """Convert pixel distance into percentage."""
-    perc = pixdist * 100. / maxsize
+    perc = pixdist * 100. / painter.maxsize
     return "%.3g%%" % perc
 
-def _distFrac(match, painter, maxsize):
+def _distFrac(match, painter):
     """Convert from a fraction a/b of maxsize."""
     try:
-        return maxsize * float(match.group(1)) / float(match.group(2))
+        return painter.maxsize * float(match.group(1))/float(match.group(2))
     except ZeroDivisionError:
         return 0.
 
-def _distRatio(match, painter, maxsize):
+def _distRatio(match, painter):
     """Convert from a simple 0.xx ratio of maxsize."""
 
     # if it's greater than 1 then assume it's a point measurement
     if float(match.group(1)) > 1.:
         return _distPhys(match, painter, 1)
 
-    return maxsize * float(match.group(1))
+    return painter.maxsize * float(match.group(1))
 
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
@@ -695,30 +681,30 @@ class Distance(Setting):
     distregexp = [
         # cm distance
         ( re.compile('^([0-9\.]+) *cm$'),
-          lambda match, painter, t:
+          lambda match, painter:
               _distPhys(match, painter, 28.452756),
-          lambda pixdist, painter, t:
+          lambda pixdist, painter:
               _distInvPhys(pixdist, painter, 28.452756, 'cm') ),
 
         # point size
         ( re.compile('^([0-9\.]+) *pt$'),
-          lambda match, painter, t:
+          lambda match, painter:
               _distPhys(match, painter, 1.),
-          lambda pixdist, painter, t:
+          lambda pixdist, painter:
               _distInvPhys(pixdist, painter, 1., 'pt') ),
 
         # mm distance
         ( re.compile('^([0-9\.]+) *mm$'),
-          lambda match, painter, t:
+          lambda match, painter:
               _distPhys(match, painter, 2.8452756),
-          lambda pixdist, painter, t:
+          lambda pixdist, painter:
               _distInvPhys(pixdist, painter, 2.8452756, 'mm') ),
 
         # inch distance
         ( re.compile('^([0-9\.]+) *(inch|in|")$'),
-          lambda match, painter, t:
+          lambda match, painter:
               _distPhys(match, painter, 72.27),
-          lambda pixdist, painter, t:
+          lambda pixdist, painter:
               _distInvPhys(pixdist, painter, 72.27, 'in') ),
 
         # plain fraction
@@ -771,7 +757,7 @@ class Distance(Setting):
         return controls.Distance(self, *args)
 
     @classmethod
-    def convertDistance(kls, painter, distance):
+    def convertDistance(kls, painter, dist):
         '''Convert a distance to plotter units.
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
@@ -780,18 +766,8 @@ class Distance(Setting):
         painter: painter to get metrics to convert physical sizes
         '''
 
-        # we set a scaling variable in the painter if it's not set
-        if not hasattr(painter, 'veusz_scaling'):
-            painter.veusz_scaling = 1.
-
         # work out maximum size
-        try:
-            maxsize = max( *painter.veusz_page_size )
-        except AttributeError:
-            w = painter.window()
-            maxsize = max(w.width(), w.height())
-
-        dist = distance.strip()
+        dist = dist.strip()
 
         # compare string against each regexp
         for reg, fn, fninv in kls.distregexp:
@@ -799,7 +775,7 @@ class Distance(Setting):
 
             # if there's a match, then call the appropriate conversion fn
             if m:
-                return fn(m, painter, maxsize)
+                return fn(m, painter)
 
         # none of the regexps match
         raise ValueError( "Cannot convert distance in form '%s'" %
@@ -807,21 +783,14 @@ class Distance(Setting):
 
     def convert(self, painter):
         """Convert this setting's distance as above"""
-        
         return self.convertDistance(painter, self.val)
 
     def convertPts(self, painter):
         """Get the distance in points."""
-        if not hasattr(painter, 'veusz_pixperpt'):
-            _calcPixPerPt(painter)
-
-        return self.convert(painter) / painter.veusz_pixperpt
+        return self.convert(painter) / painter.pixperpt
         
     def convertInverse(self, distpix, painter):
         """Convert distance in pixels into units of this distance.
-
-        Not that great coding as takes "painter" containing veusz
-        scaling parameters. Should be cleaned up.
         """
 
         # identify units and get inverse mapping
@@ -834,10 +803,8 @@ class Distance(Setting):
         if not inversefn:
             inversefn = self.distregexp[0][2]
 
-        maxsize = max( *painter.veusz_page_size )
-
         # do inverse mapping
-        return inversefn(distpix, painter, maxsize)
+        return inversefn(distpix, painter)
 
 class DistancePt(Distance):
     """For a distance in points."""

@@ -21,6 +21,7 @@
 
 import sys
 from itertools import izip
+import traceback
 
 import veusz.qtall as qt4
 import numpy as N
@@ -30,119 +31,6 @@ import veusz.dialogs.exceptiondialog as exceptiondialog
 import veusz.document as document
 import veusz.utils as utils
 import veusz.widgets as widgets
-
-class RecordingPainter(document.Painter):
-    """A painter to remember where the positions of the
-    painted widgets."""
-
-    def __init__(self, device):
-        """Start painting on device."""
-        document.Painter.__init__(self)
-        self.widgetpositions = []
-        self.widgetpositionslookup = {}
-        self.begin(device)
-
-    def beginPaintingWidget(self, widget, bounds):
-        """Record the widget and position."""
-        self.widgetpositions.append( (widget, bounds) )
-        self.widgetpositionslookup[widget] = bounds
-
-class PointPainter(document.Painter):
-    """A simple painter variant which works out the last widget
-    to overlap with the point specified."""
-
-    def __init__(self, pixmap, x, y):
-        """Watch the point x, y."""
-        document.Painter.__init__(self)
-        self.x = x
-        self.y = y
-        self.widget = None
-        self.bounds = {}
-
-        self.pixmap = pixmap
-        self.begin(pixmap)
-
-    def beginPaintingWidget(self, widget, bounds):
-
-        if (isinstance(widget, widgets.Graph) and
-            bounds[0] <= self.x and bounds[1] <= self.y and
-            bounds[2] >= self.x and bounds[3] >= self.y):
-            self.widget = widget
-
-        # record bounds of each widget
-        self.bounds[widget] = bounds
-
-class ClickPainter(document.Painter):
-    """A variant of a painter which checks to see whether a certain
-    sized area is drawn over each time a widget is drawn. This allows
-    the program to identify clicks with a widget.
-
-    The painter monitors a certain sized region in the output pixmap
-    """
-
-    def __init__(self, pixmap, xmin, ymin, xw, yw):
-        """Monitor the region from (xmin, ymin) to (xmin+xw, ymin+yw).
-
-        pixmap is the region the painter monitors
-        """
-        
-        document.Painter.__init__(self)
-
-        self.pixmap = pixmap
-        self.xmin = xmin
-        self.ymin = ymin
-        self.xw = xw
-        self.yw = yw
-
-        # a stack keeping track of the widgets being painted currently
-        self.widgets = []
-        # a stack of starting state pixmaps of the widgets
-        self.pixmaps = []
-        # a list of widgets which change the region
-        self.foundwidgets = []
-
-        # we hope this color isn't actually used by the user
-        # if a pixel changes from this color, a widget has drawn something
-        self.specialcolor = qt4.QColor(254, 255, 254)
-        self.pixmap.fill(self.specialcolor)
-        self.begin(self.pixmap)
-
-    def beginPaintingWidget(self, widget, bounds):
-        self.widgets.append(widget)
-
-        # make a small pixmap of the starting state of the image
-        # we can compare this after the widget is painted
-        pixmap = self.pixmap.copy(self.xmin, self.ymin, self.xw, self.yw)
-        self.pixmaps.append(pixmap)
-
-    def endPaintingWidget(self):
-        """When a widget has finished."""
-
-        oldpixmap = self.pixmaps.pop()
-        widget = self.widgets.pop()
-
-        # compare current pixmap for region with initial contents
-        # hope this is not needed
-        #self.flush()
-        newpixmap = self.pixmap.copy(self.xmin, self.ymin, self.xw, self.yw)
-
-        if oldpixmap.toImage() != newpixmap.toImage():
-            # drawn here, so make a note
-            self.foundwidgets.append(widget)
-
-            # copy back original
-            self.drawPixmap(qt4.QRect(self.xmin, self.ymin, self.xw, self.yw),
-                            oldpixmap,
-                            qt4.QRect(0, 0, self.xw, self.yw))
-
-    def getFoundWidget(self):
-        """Return the widget lowest in the tree near the click of the mouse.
-        """
-
-        if self.foundwidgets:
-            return self.foundwidgets[-1]
-        else:
-            return None
 
 class PickerCrosshairItem( qt4.QGraphicsPathItem ):
     """The picker cross widget: it moves from point to point and curve to curve
@@ -172,10 +60,132 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
         qt4.QGraphicsPathItem.focusOutEvent(self, event)
         self.hide()
 
+class RenderControl(qt4.QObject):
+    """Object for rendering plots in a separate thread."""
+
+    def __init__(self, plotwindow):
+        """Start up numthreads rendering threads."""
+        qt4.QObject.__init__(self)
+        self.sem = qt4.QSemaphore()
+        self.mutex = qt4.QMutex()
+        self.threads = []
+        self.exit = False
+        self.latestjobs = []
+        self.latestaddedjob = -1
+        self.latestdrawnjob = -1
+        self.plotwindow = plotwindow
+
+        self.updateNumberThreads()
+
+    def updateNumberThreads(self, num=None):
+        """Changes the number of rendering threads."""
+        if num is None:
+            num = setting.settingdb['plot_numthreads']
+
+        if self.threads:
+            # delete old ones
+            self.exit = True
+            self.sem.release(len(self.threads))
+            for t in self.threads:
+                t.wait()
+            del self.threads[:]
+            self.exit = False
+
+        # start new ones
+        for i in xrange(num):
+            t = RenderThread(self)
+            t.start()
+            self.threads.append(t)
+
+    def exitThreads(self):
+        """Exit threads started."""
+        self.updateNumberThreads(0)
+
+    def processNextJob(self):
+        """Take a job from the queue and process it.
+
+        emits renderfinished(jobid, img, painthelper)
+        when done, if job has not been superseded
+        """
+
+        self.mutex.lock()
+        jobid, helper = self.latestjobs[-1]
+        del self.latestjobs[-1]
+        lastadded = self.latestaddedjob
+        self.mutex.unlock()
+
+        # don't process jobs which have been superseded
+        if lastadded == jobid:
+            img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
+                             qt4.QImage.Format_ARGB32_Premultiplied)
+            img.fill( setting.settingdb.color('page').rgb() )
+
+            painter = qt4.QPainter(img)
+            aa = self.plotwindow.antialias
+            painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
+            painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
+            helper.renderToPainter(painter)
+            painter.end()
+
+            self.mutex.lock()
+            # just throw away result if it older than the latest one
+            if jobid > self.latestdrawnjob:
+                self.emit( qt4.SIGNAL("renderfinished"),
+                              jobid, img, helper )
+                self.latestdrawnjob = jobid
+            self.mutex.unlock()
+
+        # tell any listeners that a job has been processed
+        self.plotwindow.emit( qt4.SIGNAL("queuechange"), -1 )
+
+    def addJob(self, helper):
+        """Process drawing job in PaintHelper given."""
+
+        # indicate that there is a new item to be processed to listeners
+        self.plotwindow.emit( qt4.SIGNAL("queuechange"), 1 )
+
+        # add the job to the queue
+        self.mutex.lock()
+        self.latestaddedjob += 1
+        self.latestjobs.append( (self.latestaddedjob, helper) )
+        self.mutex.unlock()
+
+        if self.threads:
+            # tell a thread to process job
+            self.sem.release(1)
+        else:
+            # process job in current thread if multithreading disabled
+            self.processNextJob()
+
+class RenderThread( qt4.QThread ):
+    """A thread for processing rendering jobs.
+    This is controlled by a RenderControl object
+    """
+
+    def __init__(self, rendercontrol):
+        qt4.QThread.__init__(self)
+        self.rc = rendercontrol
+
+    def run(self):
+        """Repeat forever until told to exit.
+        If it aquires 1 resource from the semaphore it will process
+        the next job.
+        """
+        while True:
+            # wait until we can aquire the resources
+            self.rc.sem.acquire(1)
+            if self.rc.exit:
+                break
+            try:
+                self.rc.processNextJob()
+            except Exception:
+                sys.stderr.write("Error in rendering thread\n")
+                traceback.print_exc(file=sys.stderr)
+
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
-    intervals = [0, 100, 250, 500, 1000, 2000, 5000, 10000]
+    intervals = (0, 100, 250, 500, 1000, 2000, 5000, 10000)
 
     def __init__(self, document, parent, menu=None):
         """Initialise the window.
@@ -189,10 +199,10 @@ class PlotWindow( qt4.QGraphicsView ):
         self.setScene(self.scene)
 
         # this graphics scene item is the actual graph
-        self.pixmapitem = self.scene.addPixmap( qt4.QPixmap(1, 1) )
+        pixmap = qt4.QPixmap(1, 1)
+        self.dpi = (pixmap.logicalDpiX(), pixmap.logicalDpiY())
+        self.pixmapitem = self.scene.addPixmap(pixmap)
         self.controlgraphs = []
-        self.widgetcontrolgraphs = {}
-        self.selwidget = None
         self.vzactions = None
 
         # zoom rectangle for zooming into graph (not shown normally)
@@ -217,26 +227,24 @@ class PlotWindow( qt4.QGraphicsView ):
         self.document = document
         self.docchangeset = -100
 
-        self.size = (1, 1)
+        # state of last plot from painthelper
+        self.painthelper = None
+
+        self.lastwidgetsselected = []
         self.oldzoom = -1.
         self.zoomfactor = 1.
         self.pagenumber = 0
         self.forceupdate = False
         self.ignoreclick = False
 
-        # work out dpi
-        self.widgetdpi = self.logicalDpiY()
-
-        # convert size to pixels
-        self.setOutputSize()
+        # for rendering plots in separate threads
+        self.rendercontrol = RenderControl(self)
+        self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
+                     self.slotRenderFinished)
 
         # mode for clicking
         self.clickmode = 'select'
         self.currentclickmode = None
-
-        # list of widgets and positions last painted
-        self.widgetpositions = []
-        self.widgetpositionslookup = {}
 
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
@@ -272,6 +280,11 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # make the context menu object
         self._constructContextMenu()
+
+    def hideEvent(self, event):
+        """Window closing, so exit rendering threads."""
+        self.rendercontrol.exitThreads()
+        qt4.QGraphicsView.hideEvent(self, event)
 
     def showToolbar(self, show=True):
         """Show or hide toolbar"""
@@ -439,17 +452,8 @@ class PlotWindow( qt4.QGraphicsView ):
             return
 
         # try to work out in which widget the first point is in
-        bufferpixmap = qt4.QPixmap( *self.size )
-        painter = PointPainter(bufferpixmap, pt1.x(), pt1.y())
-        pagenumber = min( self.document.getNumberPages() - 1,
-                          self.pagenumber )
-        if pagenumber >= 0:
-            self.document.paintTo(painter, self.pagenumber,
-                                  scaling=self.zoomfactor, dpi=self.widgetdpi)
-        painter.end()
-
-        # get widget
-        widget = painter.widget
+        widget = self.painthelper.pointInWidgetBounds(
+            pt1.x(), pt1.y(), widgets.Graph)
         if widget is None:
             return
         
@@ -483,7 +487,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
             # convert points on plotter to axis coordinates
             # FIXME: Need To Trap Conversion Errors!
-            r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+            r = axis.plotterToGraphCoords(
+                self.painthelper.widgetBounds(axis), p)
 
             # invert if min and max are inverted
             if r[1] < r[0]:
@@ -503,14 +508,18 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def axesForPoint(self, mousepos):
         """Find all the axes which contain the given mouse position"""
+
+        if self.painthelper is None:
+            return []
+
         pos = self.mapToScene(mousepos)
         px, py = pos.x(), pos.y()
 
         axes = []
-        for widget, bounds in self.widgetpositions:
+        for widget, bounds in self.painthelper.widgetBoundsIterator(
+            widgettype=widgets.Axis):
             # if widget is axis, and point lies within bounds
-            if ( isinstance(widget, widgets.Axis) and
-                 px>=bounds[0] and px<=bounds[2] and
+            if ( px>=bounds[0] and px<=bounds[2] and
                  py>=bounds[1] and py<=bounds[3] ):
 
                 # convert correct pointer position
@@ -538,7 +547,7 @@ class PlotWindow( qt4.QGraphicsView ):
         pickinfo = widgets.PickInfo()
         pos = self.mapToScene(mousepos)
 
-        for w, bounds in self.widgetpositions:
+        for w, bounds in self.painthelper.widgetBoundsIterator():
             try:
                 # ask the widget for its (visually) closest point to the cursor
                 info = w.pickPoint(pos.x(), pos.y(), bounds)
@@ -680,8 +689,9 @@ class PlotWindow( qt4.QGraphicsView ):
                 # navigate to the previous or next point on the curve
                 dir = 'right' if k == qt4.Qt.Key_Right else 'left'
                 ix = self.pickerinfo.index
-                pickinfo = self.pickerinfo.widget.pickIndex(ix, dir,
-                                self.widgetpositionslookup[self.pickerinfo.widget])
+                pickinfo = self.pickerinfo.widget.pickIndex(
+                    ix, dir, self.painthelper.widgetBounds(
+                        self.pickerinfo.widget))
                 if not pickinfo:
                     # no more points visible in this direction
                     return
@@ -702,7 +712,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     # ask the widgets to pick their point which is closest horizontally
                     # to the last (screen) x value picked
                     pi = w.pickPoint(self.pickerinfo.screenpos[0], p.y(),
-                                     self.widgetpositionslookup[w],
+                                     self.painthelper.widgetBounds(w),
                                      distance='horizontal')
                     if not pi:
                         continue
@@ -731,41 +741,15 @@ class PlotWindow( qt4.QGraphicsView ):
         if self.document.getNumberPages() == 0:
             return
 
-        # now crazily draw the whole thing again
-        # see which widgets change the region in the small box given below
-        bufferpixmap = qt4.QPixmap( *self.size )
-        painter = ClickPainter(bufferpixmap, x-3, y-3, 7, 7)
-
-        pagenumber = min( self.document.getNumberPages() - 1,
-                          self.pagenumber )
-        self.document.paintTo(painter, self.pagenumber,
-                              scaling=self.zoomfactor, dpi=self.widgetdpi)
-        painter.end()
-
-        widget = painter.getFoundWidget()
-        if not widget:
-            widget = self.document.getPage(self.pagenumber)
+        widget = self.painthelper.identifyWidgetAtPoint(
+            x, y, antialias=self.antialias)
+        if widget is None:
+            # select page if nothing clicked
+            widget = self.document.basewidget.getPage(self.pagenumber)
 
         # tell connected objects that widget was clicked
-        self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
-
-    def setOutputSize(self):
-        """Set the ouput display size."""
-
-        # convert distances into pixels
-        pix = qt4.QPixmap(1, 1)
-        painter = document.Painter(pix,
-                                   scaling = self.zoomfactor,
-                                   dpi = self.widgetdpi)
-        size = self.document.basewidget.getSize(painter)
-        painter.end()
-
-        # make new buffer and resize widget
-        if size != self.size:
-            self.size = size
-            self.bufferpixmap = qt4.QPixmap( *self.size )
-            self.forceupdate = True
-            self.setSceneRect( 0, 0, size[0], size[1] )
+        if widget is not None:
+            self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -796,38 +780,19 @@ class PlotWindow( qt4.QGraphicsView ):
              self.forceupdate ):
 
             self.pickeritem.hide()
-            self.setOutputSize()
             
-            # fill pixmap with proper background colour
-            self.bufferpixmap.fill( setting.settingdb.color('page') )
-
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
             if self.pagenumber >= 0:
+                size = self.document.pageSize(self.pagenumber, scaling=self.zoomfactor)
+
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
                 try:
-                    painter = RecordingPainter(self.bufferpixmap)
-                    painter.setRenderHint(qt4.QPainter.Antialiasing,
-                                          self.antialias)
-                    painter.setRenderHint(qt4.QPainter.TextAntialiasing,
-                                          self.antialias)
-                    self.document.paintTo( painter, self.pagenumber,
-                                           scaling = self.zoomfactor,
-                                           dpi = self.widgetdpi )
-                    painter.end()
-                    self.widgetpositions = painter.widgetpositions
-                    self.widgetpositionslookup = painter.widgetpositionslookup
+                    phelper = document.PaintHelper(
+                        size, scaling=self.zoomfactor, dpi=self.dpi)
+                    self.document.paintTo(phelper, self.pagenumber)
 
-                    # collect all controlgraphs (in case these change later
-                    # from e.g. printing)
-                    self.widgetcontrolgraphs = dict(
-                        [ (w[0], w[0].controlgraphitems)
-                          for w in self.widgetpositions ]) 
-
-                    # update selected widget items
-                    self.selectedWidgets([self.selwidget])
-                    
                 except Exception:
                     # stop updates this time round and show exception dialog
                     d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
@@ -835,18 +800,31 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.forceupdate = False
                     self.docchangeset = self.document.changeset
                     d.exec_()
-                    
+
+                self.painthelper = phelper
+                self.rendercontrol.addJob(phelper)
             else:
+                self.painthelper = None
                 self.pagenumber = 0
+                size = self.document.docSize()
+                pixmap = qt4.QPixmap(*size)
+                pixmap.fill( setting.settingdb.color('page') )
+                self.setSceneRect(0, 0, *size)
+                self.pixmapitem.setPixmap(pixmap)
 
             self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
             self.updatePageToolbar()
 
+            self.updateControlGraphs(self.lastwidgetsselected)
             self.oldzoom = self.zoomfactor
             self.forceupdate = False
             self.docchangeset = self.document.changeset
 
-            self.pixmapitem.setPixmap(self.bufferpixmap)
+    def slotRenderFinished(self, jobid, img, helper):
+        """Update image on display if render finished."""
+        bufferpixmap = qt4.QPixmap.fromImage(img)
+        self.setSceneRect(0, 0, bufferpixmap.width(), bufferpixmap.height())
+        self.pixmapitem.setPixmap(bufferpixmap)
 
     def _constructContextMenu(self):
         """Construct the context menu."""
@@ -895,6 +873,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Update plot window settings from settings."""
         self.setTimeout(setting.settingdb['plot_updateinterval'])
         self.antialias = setting.settingdb['plot_antialias']
+        self.rendercontrol.updateNumberThreads()
         self.actionForceUpdate()
 
     def contextMenuEvent(self, event):
@@ -960,14 +939,15 @@ class PlotWindow( qt4.QGraphicsView ):
         # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
         aspectwin = viewportsize.width()*1./viewportsize.height()
-        aspectplot = self.size[0]*1./self.size[1]
+        r = self.pixmapitem.boundingRect()
+        aspectplot = r.width() / r.height()
 
         width = viewportsize.width()
         if aspectwin > aspectplot:
             # take account of scroll bar
             width -= self.verticalScrollBar().width()
             
-        mult = width*1./self.size[0]
+        mult = width / r.width()
         self.setZoomFactor(self.zoomfactor * mult)
         
     def slotViewZoomHeight(self):
@@ -976,22 +956,24 @@ class PlotWindow( qt4.QGraphicsView ):
         # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
         aspectwin = viewportsize.width()*1./viewportsize.height()
-        aspectplot = self.size[0]*1./self.size[1]
+        r = self.pixmapitem.boundingRect()
+        aspectplot = r.width() / r.height()
 
         height = viewportsize.height()
         if aspectwin < aspectplot:
             # take account of scroll bar
             height -= self.horizontalScrollBar().height()
             
-        mult = height*1./self.size[1]
+        mult = height / r.height()
         self.setZoomFactor(self.zoomfactor * mult)
 
     def slotViewZoomPage(self):
         """Make the zoom factor correct to show the whole page."""
 
         viewportsize = self.maximumViewportSize()
-        multw = viewportsize.width()*1./self.size[0]
-        multh = viewportsize.height()*1./self.size[1]
+        r = self.pixmapitem.boundingRect()
+        multw = viewportsize.width()*1./r.width()
+        multh = viewportsize.height()*1./r.height()
         self.setZoomFactor(self.zoomfactor * min(multw, multh))
 
     def slotViewZoom11(self):
@@ -1055,17 +1037,8 @@ class PlotWindow( qt4.QGraphicsView ):
         pt = self.grabpos
 
         # try to work out in which widget the first point is in
-        bufferpixmap = qt4.QPixmap( *self.size )
-        painter = PointPainter(bufferpixmap, pt.x(), pt.y())
-        pagenumber = min( self.document.getNumberPages() - 1,
-                          self.pagenumber )
-        if pagenumber >= 0:
-            self.document.paintTo(painter, self.pagenumber,
-                                  scaling=self.zoomfactor, dpi=self.widgetdpi)
-        painter.end()
-
-        # get widget
-        widget = painter.widget
+        widget = self.painthelper.pointInWidgetBounds(
+            pt.x(), pt.y(), widgets.Graph)
         if widget is None:
             return []
         
@@ -1092,19 +1065,22 @@ class PlotWindow( qt4.QGraphicsView ):
 
                 # convert point on plotter to axis coordinate
                 # FIXME: Need To Trap Conversion Errors!
-                r = axis.plotterToGraphCoords(painter.bounds[axis], p)
+                r = axis.plotterToGraphCoords(
+                    self.painthelper.widgetBounds(axis), p)
 
                 axesretn.append( (axis.path, r[0]) )
 
         return axesretn
 
     def selectedWidgets(self, widgets):
-        """Update control items on screen associated with widget."""
+        """Update control items on screen associated with widget.
+        Called when widgets have been selected in the tree edit window
+        """
+        self.updateControlGraphs(widgets)
+        self.lastwidgetsselected = widgets
 
-        if not widgets:
-            self.selwidget = None
-        else:
-            self.selwidget = widgets[0]
+    def updateControlGraphs(self, widgets):
+        """Add control graphs for the widgets given."""
 
         # remove old items from scene
         for item in self.controlgraphs:
@@ -1113,8 +1089,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # put in new items
         for widget in widgets:
-            if widget in self.widgetcontrolgraphs:
-                for control in self.widgetcontrolgraphs[widget]:
+            if self.painthelper and widget in self.painthelper.states:
+                for control in self.painthelper.states[widget].cgis:
                     graphitem = control.createGraphicsItem()
                     self.controlgraphs.append(graphitem)
                     self.scene.addItem(graphitem)

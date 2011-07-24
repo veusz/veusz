@@ -401,10 +401,10 @@ class Contour(plotters.GenericPlotter):
 
         return True
 
-    def draw(self, parentposn, painter, outerbounds = None):
+    def draw(self, parentposn, phelper, outerbounds = None):
         """Draw the contours."""
 
-        posn = plotters.GenericPlotter.draw(self, parentposn, painter,
+        posn = plotters.GenericPlotter.draw(self, parentposn, phelper,
                                             outerbounds = outerbounds)
         s = self.settings
 
@@ -426,16 +426,12 @@ class Contour(plotters.GenericPlotter):
             return
 
         # plot the precalculated contours
-        painter.beginPaintingWidget(self, posn)
-        painter.save()
-        clip = self.clipAxesBounds(painter, axes, posn)
+        clip = self.clipAxesBounds(axes, posn)
+        painter = phelper.painter(self, posn, clip=clip)
 
         self.plotContourFills(painter, posn, axes, clip)
         self.plotContours(painter, posn, axes, clip)
         self.plotSubContours(painter, posn, axes, clip)
-
-        painter.restore()
-        painter.endPaintingWidget()
 
     def updateContours(self):
         """Update calculated contours."""
@@ -495,6 +491,9 @@ class Contour(plotters.GenericPlotter):
                     self._cachedsubcontours.append( finitePoly(linelist) )
 
     def plotContourLabel(self, painter, number, xplt, yplt, showline):
+        """Draw a label on a contour.
+        This clips when drawing the line, plotting the label on top.
+        """
         s = self.settings
         cl = s.get('ContourLabels')
 
@@ -541,8 +540,8 @@ class Contour(plotters.GenericPlotter):
 
         painter.restore()
 
-    def _plotContours(self, painter, posn, axes, linestyles, contours,
-                      showlabels, hidelines, clip):
+    def _plotContours(self, painter, posn, axes, linestyles,
+                      contours, showlabels, hidelines, clip):
         """Plot a set of contours.
         """
 
@@ -568,8 +567,8 @@ class Contour(plotters.GenericPlotter):
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
 
                 if showlabels:
-                    self.plotContourLabel(painter, s.levelsOut[num], xplt, yplt,
-                                          not hidelines)
+                    self.plotContourLabel(painter, s.levelsOut[num],
+                                          xplt, yplt, not hidelines)
                 else:
                     # actually draw the curve to the plotter
                     if not hidelines:
