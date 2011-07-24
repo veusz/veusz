@@ -35,27 +35,8 @@ import svg_export
 import selftest_export
 import painthelper
 
-class PixmapWithDpi(qt4.QPixmap):
-    """A QPixmap device with a different DPI.
-    The user wants a bitmap output with a specific DPI.
-    This also ensures square pixels.
-    """
-
-    def __init__(self, size, dpi):
-        """Initialise the bitmap.
-        size: (width, height)
-        dpi: DPI value to use."""
-        qt4.QPixmap.__init__(self, *size)
-        self.dpi = dpi
-
-    def metric(self, m):
-        """Return dpi if requested."""
-        if m in (qt4.QPaintDevice.PdmDpiX, qt4.QPaintDevice.PdmDpiY,
-                 qt4.QPaintDevice.PdmPhysicalDpiX,
-                 qt4.QPaintDevice.PdmPhysicalDpiY):
-            return self.dpi
-        else:
-            return qt4.QPixmap.metric(self, m)             
+# 1m in inch
+m_inch = 39.370079
 
 class Export(object):
     """Class to do the document exporting.
@@ -145,15 +126,26 @@ class Export(object):
         size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi))
 
         # create real output image
-        pixmap = PixmapWithDpi(size, dpi)
         backqcolor = utils.extendedColorToQColor(self.backcolor)
-        if format != '.png':
-            # not transparent
+        if format == '.png':
+            # transparent output
+            image = qt4.QImage(size[0], size[1],
+                               qt4.QImage.Format_ARGB32_Premultiplied)
+        else:
+            # non transparent output
+            image = qt4.QImage(size[0], size[1],
+                               qt4.QImage.Format_RGB32)
             backqcolor.setAlpha(255)
-        pixmap.fill(backqcolor)
+
+        image.setDotsPerMeterX(dpi*m_inch)
+        image.setDotsPerMeterY(dpi*m_inch)
+        if backqcolor.alpha() == 0:
+            image.fill(qt4.qRgba(0,0,0,0))
+        else:
+            image.fill(backqcolor.rgb())
 
         # paint to the image
-        painter = qt4.QPainter(pixmap)
+        painter = qt4.QPainter(image)
         painter.setRenderHint(qt4.QPainter.Antialiasing, self.antialias)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, self.antialias)
         self.renderPage(size, (dpi,dpi), painter)
@@ -171,7 +163,7 @@ class Export(object):
         else:
             writer.setQuality(self.quality)
 
-        writer.write( pixmap.toImage() )
+        writer.write(image)
 
     def exportPS(self, ext):
         """Export to EPS or PDF format."""
