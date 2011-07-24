@@ -26,4 +26,5 @@ if sys.platform != 'win32' and sys.platform != 'darwin':
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.QtSvg import *
 from PyQt4.uic import loadUi

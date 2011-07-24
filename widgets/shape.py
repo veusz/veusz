@@ -234,7 +234,7 @@ class ImageFile(BoxShape):
         if type(self) == ImageFile:
             self.readDefaults()
 
-        self.cachepixmap = None
+        self.cacheimage = None
         self.cachefilename = None
         self.cachestat = None
 
@@ -255,56 +255,57 @@ class ImageFile(BoxShape):
                posn=0 )
         s.Border.get('hide').newDefault(True)
 
-    def updateCachedPixmap(self):
+    def updateCachedImage(self):
         """Update cache."""
         s = self.settings
         self.cachestat = os.stat(s.filename)
-        self.cachepixmap = qt4.QPixmap(s.filename)
+        self.cacheimage = qt4.QImage(s.filename)
         self.cachefilename = s.filename
-        return self.cachepixmap
 
     def drawShape(self, painter, rect):
-        """Draw pixmap."""
+        """Draw image."""
         s = self.settings
 
         # draw border and fill
         painter.drawRect(rect)
 
-        # cache pixmap
-        pixmap = None
+        # cache image
+        image = None
         if s.filename != '' and os.path.isfile(s.filename):
             if (self.cachefilename != s.filename or 
                 os.stat(s.filename) != self.cachestat):
-                self.updateCachedPixmap()
-            pixmap = self.cachepixmap
+                self.updateCachedImage()
+            image = self.cacheimage
 
-        # if no pixmap, then use default image
-        if not pixmap or pixmap.width() == 0 or pixmap.height() == 0:
-            pixmap = utils.getIcon('button_imagefile').pixmap(64, 64)
+        # if no image, then use default image
+        if ( not image or image.isNull() or
+             image.width() == 0 or image.height() == 0 ):
+            # load replacement image
+            fname = os.path.join(utils.imagedir, 'button_imagefile.svg')
+            r = qt4.QSvgRenderer(fname)
+            r.render(painter, rect)
         
-        # pixmap rectangle
-        prect = qt4.QRectF(pixmap.rect())
+        else:
+            # image rectangle
+            irect = qt4.QRectF(image.rect())
 
-        # preserve aspect ratio
-        if s.aspect:
-            xr = rect.width() / prect.width()
-            yr = rect.height() / prect.height()
+            # preserve aspect ratio
+            if s.aspect:
+                xr = rect.width() / irect.width()
+                yr = rect.height() / irect.height()
 
-            if xr > yr:
-                rect = qt4.QRectF(rect.left()+(rect.width()-
-                                               prect.width()*yr)*0.5,
-                                  rect.top(),
-                                  prect.width()*yr,
-                                  rect.height())
-            else:
-                rect = qt4.QRectF(rect.left(),
-                                  rect.top()+(rect.height()-
-                                              prect.height()*xr)*0.5,
-                                  rect.width(),
-                                  prect.height()*xr)
+                if xr > yr:
+                    rect = qt4.QRectF(
+                        rect.left()+(rect.width()-irect.width()*yr)*0.5,
+                        rect.top(), irect.width()*yr, rect.height())
+                else:
+                    rect = qt4.QRectF(
+                        rect.left(),
+                        rect.top()+(rect.height()-irect.height()*xr)*0.5,
+                        rect.width(), irect.height()*xr)
 
-        # finally draw pixmap
-        painter.drawPixmap(rect, pixmap, prect)
+            # finally draw image
+            painter.drawImage(rect, image, irect)
 
 document.thefactory.register( Ellipse )
 document.thefactory.register( Rectangle )
