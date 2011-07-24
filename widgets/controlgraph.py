@@ -116,8 +116,7 @@ class ControlMarginBox(object):
         """A helpful routine for setting widget margins after
         moving or resizing.
 
-        This is called by the widget after receiving
-        updateControlItem
+        This is called by the widget after receiving updateControlItem
         """
         s = self.widget.settings
 
@@ -146,6 +145,33 @@ class ControlMarginBox(object):
             )
         self.widget.document.applyOperation(
             document.OperationMultiple(operations, descr='resize margins'))
+
+    def setPageSize(self):
+        """Helper for setting document/page widget size.
+
+        This is called by the widget after receiving updateControlItem
+        """
+        s = self.widget.settings
+
+        # get margins in pixels
+        width = self.posn[2] - self.posn[0]
+        height = self.posn[3] - self.posn[1]
+
+        # set up fake painter containing veusz scalings
+        helper = document.PaintHelper(self.pagesize, scaling=self.scaling,
+                                      dpi=self.dpi)
+
+        # convert to physical units
+        width = s.get('width').convertInverse(width, helper)
+        height = s.get('height').convertInverse(height, helper)
+
+        # modify widget margins
+        operations = (
+            document.OperationSettingSet(s.get('width'), width),
+            document.OperationSettingSet(s.get('height'), height),
+            )
+        self.widget.document.applyOperation(
+            document.OperationMultiple(operations, descr='change page size'))
 
 class _GraphMarginBox(qt4.QGraphicsItem):
     """A box which can be moved or resized.

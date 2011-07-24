@@ -95,8 +95,11 @@ class Root(widget.Widget):
         page = self.children[pagenum]
         page.draw( posn, painthelper )
 
+        # w and h are non integer
+        w = self.settings.get('width').convert(painter)
+        h = self.settings.get('height').convert(painter)
         painthelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, posn,
+                controlgraph.ControlMarginBox(self, [0, 0, w, h],
                                               [-10000, -10000,
                                                 10000,  10000],
                                               painthelper,
@@ -104,29 +107,8 @@ class Root(widget.Widget):
                 ] )
 
     def updateControlItem(self, cgi):
-        """Graph resized or moved - call helper routine to move self."""
-
-        s = self.settings
-
-        # get margins in pixels
-        width = cgi.posn[2] - cgi.posn[0]
-        height = cgi.posn[3] - cgi.posn[1]
-
-        # set up fake painter containing veusz scalings
-        helper = document.PaintHelper(cgi.pagesize, scaling=cgi.scaling,
-                                      dpi=cgi.dpi)
-
-        # convert to physical units
-        width = s.get('width').convertInverse(width, helper)
-        height = s.get('height').convertInverse(height, helper)
-
-        # modify widget margins
-        operations = (
-            document.OperationSettingSet(s.get('width'), width),
-            document.OperationSettingSet(s.get('height'), height),
-            )
-        self.document.applyOperation(
-            document.OperationMultiple(operations, descr='change page size'))
+        """Call helper to set page size."""
+        cgi.setPageSize()
 
     def fillStylesheet(self, stylesheet):
         """Register widgets with stylesheet."""

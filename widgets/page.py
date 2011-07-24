@@ -24,6 +24,7 @@ import veusz.setting as setting
 
 import widget
 import root
+import controlgraph
 
 # x, y, fplot, xyplot
 # x-> xyplot(x)
@@ -229,7 +230,22 @@ class Page(widget.Widget):
         bounds = widget.Widget.draw(self, parentposn, painthelper,
                                     parentposn)
 
+        # w and h are non integer
+        w = self.settings.get('width').convert(painter)
+        h = self.settings.get('height').convert(painter)
+        painthelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, [0, 0, w, h],
+                                              [-10000, -10000,
+                                                10000,  10000],
+                                              painthelper,
+                                              ismovable = False)
+                ] )
+
         return bounds
+
+    def updateControlItem(self, cgi):
+        """Call helper to set page size."""
+        cgi.setPageSize()
 
 # allow the factory to instantiate this
 document.thefactory.register( Page )
