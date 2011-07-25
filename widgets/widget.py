@@ -130,7 +130,6 @@ class Widget(object):
                 raise ValueError, 'New name "%s" already exists' % name
 
         self.name = name
-        self.document.setModified()
 
     def addDefaultSubWidgets(self):
         '''Add default sub widgets to widget, if any'''
@@ -410,7 +409,6 @@ class Widget(object):
             if existingname:
                 w.name = w.chooseName()
 
-            self.document.setModified(True)
             return True
 
     def updateControlItem(self, controlitem, pos):
