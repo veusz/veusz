@@ -330,16 +330,18 @@ class Document( qt4.QObject ):
         return self.modified
 
     @classmethod
-    def loadPlugins(kls):
+    def loadPlugins(kls, pluginlist=None):
         """Load plugins and catch exceptions."""
-        for plugin in setting.settingdb.get('plugins', []):
+        if pluginlist is None:
+            pluginlist = setting.settingdb.get('plugins', [])
+
+        for plugin in pluginlist:
             try:
                 execfile(plugin, dict())
             except Exception, ex:
                 err = ('Error loading plugin ' + plugin + '\n\n' +
                        traceback.format_exc())
-                qt4.QMessageBox.critical(None, "Error loading plugin",
-                                         err)
+                qt4.QMessageBox.critical(None, "Error loading plugin", err)
 
     def printTo(self, printer, pages, scaling = 1., dpi = None,
                 antialias = False):

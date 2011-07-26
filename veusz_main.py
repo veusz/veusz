@@ -170,7 +170,9 @@ def run():
                       ' output image file, exiting when finished')
     parser.add_option('--embed-remote', action='store_true',
                       help=optparse.SUPPRESS_HELP)
-
+    parser.add_option('--plugin', action='append', metavar='FILE',
+                      help='load the plugin from the file given for '
+                      'the session')
     options, args = parser.parse_args( app.argv() )
 
     # convert args to unicode from filesystem strings
@@ -193,6 +195,11 @@ def run():
     # for people who want to run any old script
     veusz.setting.transient_settings['unsafe_mode'] = bool(
         options.unsafe_mode)
+
+    # load any requested plugins
+    if options.plugin:
+        import veusz.document
+        veusz.document.Document.loadPlugins(pluginlist=options.plugin)
 
     # different modes
     if options.listen:
