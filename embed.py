@@ -47,9 +47,9 @@ import struct
 import new
 import cPickle
 import socket
-import random
 import subprocess
 import time
+import uuid
 
 # check remote process has this API version
 API_VERSION = 1
@@ -249,17 +249,15 @@ class Embedded(object):
         if waitaccept:
             cls.serv_socket, address = cls.serv_socket.accept()
 
-        # send a secret to the remote program by secure route and
-        # check it comes back
-        # this is to check that no program has secretly connected
-        # on our port, which isn't really useful for AF_UNIX sockets
-        secret = ''.join([random.choice('ABCDEFGHUJKLMNOPQRSTUVWXYZ'
-                                        'abcdefghijklmnopqrstuvwxyz'
-                                        '0123456789')
-                          for i in xrange(16)]) + '\n'
+        # Send a secret to the remote program by secure route and
+        # check it comes back.  This is to check that no program has
+        # secretly connected on our port, which isn't really useful
+        # for AF_UNIX sockets.
+        secret = str(uuid.uuid4()) + '\n'
         stdin.write(secret)
         secretback = cls.readLenFromSocket(cls.serv_socket, len(secret))
-        assert secret == secretback
+        if secret != secretback:
+            raise RuntimeError, "Security between client and server broken"
 
         # packet length for command bytes
         cls.cmdlen = struct.calcsize('<I')

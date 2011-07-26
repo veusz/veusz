@@ -36,11 +36,10 @@ class PreferencesDialog(VeuszDialog):
         # view settings
         self.antialiasCheck.setChecked( setdb['plot_antialias'] )
         self.englishCheck.setChecked( setdb['ui_english'] )
-        self.intervalCombo.addItem('Disabled')
-        for intv in self.plotwindow.intervals[1:]:
-            self.intervalCombo.addItem('%gs' % (intv * 0.001))
-        index = self.plotwindow.intervals.index(
-            setdb['plot_updateinterval'])
+        for intv in self.plotwindow.updateintervals:
+            self.intervalCombo.addItem(intv[1])
+        index = [i[0] for i in self.plotwindow.updateintervals].index(
+            setdb['plot_updatepolicy'])
         self.intervalCombo.setCurrentIndex(index)
         self.threadSpinBox.setValue( setdb['plot_numthreads'] )
 
@@ -185,8 +184,8 @@ class PreferencesDialog(VeuszDialog):
 
         # view settings
         setdb = setting.settingdb
-        setdb['plot_updateinterval'] = (
-            self.plotwindow.intervals[ self.intervalCombo.currentIndex() ] )
+        setdb['plot_updatepolicy'] = (
+            self.plotwindow.updateintervals[self.intervalCombo.currentIndex()][0] )
         setdb['plot_antialias'] = self.antialiasCheck.isChecked()
         setdb['ui_english'] = self.englishCheck.isChecked()
         setdb['plot_numthreads'] = self.threadSpinBox.value()

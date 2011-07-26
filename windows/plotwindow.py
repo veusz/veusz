@@ -190,7 +190,18 @@ class RenderThread( qt4.QThread ):
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
-    intervals = (0, 100, 250, 500, 1000, 2000, 5000, 10000)
+    # how often the document can update
+    updateintervals = (
+        (0, 'Disable'),
+        (-1, 'On document change'),
+        (100, 'Every 0.1s'),
+        (250, 'Every 0.25s'),
+        (500, 'Every 0.5s'),
+        (1000, 'Every 1s'),
+        (2000, 'Every 2s'),
+        (5000, 'Every 5s'),
+        (10000, 'Every 10s'),
+        )
 
     def __init__(self, document, parent, menu=None):
         """Initialise the window.
@@ -235,9 +246,6 @@ class PlotWindow( qt4.QGraphicsView ):
         self.connect(self.document, qt4.SIGNAL("sigModified"),
                      self.slotDocModified)
 
-        # ok to show updates
-        self.disableupdates = False
-
         # state of last plot from painthelper
         self.painthelper = None
 
@@ -257,9 +265,9 @@ class PlotWindow( qt4.QGraphicsView ):
         self.currentclickmode = None
 
         # set up redrawing timer
-        #self.timer = qt4.QTimer(self)
-        #self.connect( self.timer, qt4.SIGNAL('timeout()'),
-        #              self.slotTimeout )
+        self.timer = qt4.QTimer(self)
+        self.connect( self.timer, qt4.SIGNAL('timeout()'),
+                      self.checkPlotUpdate )
 
         # for drag scrolling
         self.grabpos = None
@@ -270,14 +278,18 @@ class PlotWindow( qt4.QGraphicsView ):
         self.connect( self.scrolltimer, qt4.SIGNAL('timeout()'),
                       self.slotBecomeScrollClick )
 
-        # get update period from setting database
-        self.interval = setting.settingdb['plot_updateinterval']
+        # get plot view updating policy
+        #  -1: update on document changes
+        #   0: never update automatically
+        #  >0: check for updates every x ms
+        self.interval = setting.settingdb['plot_updatepolicy']
+
+        # if using a time-based document update checking, start timer
+        if self.interval > 0:
+            self.timer.start(self.interval)
 
         # load antialias settings
         self.antialias = setting.settingdb['plot_antialias']
-
-        #if self.interval > 0:
-        #    self.timer.start(self.interval)
 
         # allow window to get focus, to allow context menu
         self.setFocusPolicy(qt4.Qt.StrongFocus)
@@ -774,7 +786,7 @@ class PlotWindow( qt4.QGraphicsView ):
         pageno = max(0, pageno)
 
         self.pagenumber = pageno
-        if not self.disableupdates:
+        if self.pagenumber != self.oldpagenumber and self.interval != 0:
             self.checkPlotUpdate()
 
     def getPageNumber(self):
@@ -783,19 +795,22 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def slotDocModified(self, ismodified):
         """Update plot on document being modified."""
-        if ismodified and not self.disableupdates:
+        # only update if doc is modified and the update policy is set
+        # to update on document updates
+        if ismodified and self.interval == -1:
             self.checkPlotUpdate()
 
     def checkPlotUpdate(self):
         """Check whether plot needs updating."""
 
+        # print >>sys.stderr, "checking update"
         # no threads, so can't get interrupted here
         # draw data into background pixmap if modified
         if ( self.zoomfactor != self.oldzoom or
              self.document.changeset != self.docchangeset or
              self.pagenumber != self.oldpagenumber ):
 
-            print "updating"
+            # print >>sys.stderr, "updating"
             self.pickeritem.hide()
             
             self.pagenumber = min( self.document.getNumberPages() - 1,
@@ -803,7 +818,8 @@ class PlotWindow( qt4.QGraphicsView ):
             self.oldpagenumber = self.pagenumber
 
             if self.pagenumber >= 0:
-                size = self.document.pageSize(self.pagenumber, scaling=self.zoomfactor)
+                size = self.document.pageSize(
+                    self.pagenumber, scaling=self.zoomfactor)
 
                 # draw the data into the buffer
                 # errors cause an exception window to pop up
@@ -838,7 +854,8 @@ class PlotWindow( qt4.QGraphicsView ):
             self.docchangeset = self.document.changeset
 
     def slotRenderFinished(self, jobid, img, helper):
-        """Update image on display if render finished."""
+        """Update image on display if rendering (usually in other
+        thread) finished."""
         bufferpixmap = qt4.QPixmap.fromImage(img)
         self.setSceneRect(0, 0, bufferpixmap.width(), bufferpixmap.height())
         self.pixmapitem.setPixmap(bufferpixmap)
@@ -855,32 +872,22 @@ class PlotWindow( qt4.QGraphicsView ):
         menu.addAction( self.vzactions['view.nextpage'] )
         menu.addSeparator()
 
-        # update NOW!
+        # force an update now menu item
         menu.addAction('Force update', self.actionForceUpdate)
-        act = menu.addAction('Disable updates', self.actionDisableUpdates)
-        act.setCheckable(True)
 
-        # Update submenu
-        # submenu = menu.addMenu('Updates')
-        # intgrp = qt4.QActionGroup(self)
+        # Update policy submenu
+        submenu = menu.addMenu('Updates')
+        intgrp = qt4.QActionGroup(self)
 
-        # inttext = ['Disable']
-        # for intv in self.intervals[1:]:
-        #     inttext.append('Every %gs' % (intv * 0.001))
-
-        # # need to keep copies of bound objects otherwise they are collected
-        # self._intfuncs = []
-
-        # # bind interval options to actions
-        # for intv, text in izip(self.intervals, inttext):
-        #     act = intgrp.addAction(text)
-        #     act.setCheckable(True)
-        #     fn = utils.BoundCaller(self.actionSetTimeout, intv)
-        #     self._intfuncs.append(fn)
-        #     self.connect(act, qt4.SIGNAL('triggered(bool)'), fn)
-        #     if intv == self.interval:
-        #         act.setChecked(True)
-        #     submenu.addAction(act)
+        # bind interval options to actions
+        for intv, text in self.updateintervals:
+            act = intgrp.addAction(text)
+            act.setCheckable(True)
+            fn = utils.BoundCaller(self.actionSetTimeout, intv)
+            self.connect(act, qt4.SIGNAL('triggered(bool)'), fn)
+            if intv == self.interval:
+                act.setChecked(True)
+            submenu.addAction(act)
 
         # antialias
         menu.addSeparator()
@@ -890,7 +897,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def updatePlotSettings(self):
         """Update plot window settings from settings."""
-        self.setTimeout(setting.settingdb['plot_updateinterval'])
+        self.setTimeout(setting.settingdb['plot_updatepolicy'])
         self.antialias = setting.settingdb['plot_antialias']
         self.rendercontrol.updateNumberThreads()
         self.actionForceUpdate()
@@ -904,40 +911,27 @@ class PlotWindow( qt4.QGraphicsView ):
         self.docchangeset = -100
         self.checkPlotUpdate()
 
-    def actionDisableUpdates(self):
-        """Disable updates until disabled."""
-        self.disableupdates = not self.disableupdates
-        if not self.disableupdates:
-            self.checkPlotUpdate()
-
     def setTimeout(self, interval):
         """Change timer setting without changing save value."""
-        if interval == 0:
+        self.interval = interval
+        if interval <= 0:
+            # stop updates
             if self.timer.isActive():
                 self.timer.stop()
         else:
+            # change interval to one selected
             self.timer.setInterval(interval)
+            # start timer if it was stopped
             if not self.timer.isActive():
                 self.timer.start()
 
-    # def actionSetTimeout(self, interval, checked):
-    #     """Called by setting the interval."""
+    def actionSetTimeout(self, interval, checked):
+        """Called by setting the interval."""
 
-    #     if interval == 0:
-    #         # stop updates
-    #         self.interval = 0
-    #         if self.timer.isActive():
-    #             self.timer.stop()
-    #     else:
-    #         # change interval to one selected
-    #         self.interval = interval
-    #         self.timer.setInterval(interval)
-    #         # start timer if it was stopped
-    #         if not self.timer.isActive():
-    #             self.timer.start()
+        self.setTimeout(interval)
 
-    #     # remember changes for next time
-    #     setting.settingdb['plot_updateinterval'] = self.interval
+        # remember changes for next time
+        setting.settingdb['plot_updatepolicy'] = self.interval
 
     def actionAntialias(self):
         """Toggle antialias."""
@@ -949,7 +943,6 @@ class PlotWindow( qt4.QGraphicsView ):
         """Set the zoom factor of the window."""
         self.zoomfactor = float(zoomfactor)
         self.checkPlotUpdate()
-        #self.update()
 
     def slotViewZoomIn(self):
         """Zoom into the plot."""

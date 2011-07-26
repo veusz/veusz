@@ -26,7 +26,6 @@
     </legalnotice>
   </bookinfo>
 
-  <!---------------------------------------------------------------->
   <chapter>
     <title>Introduction</title>
 
@@ -643,7 +642,6 @@
 
   </chapter>
 
-  <!---------------------------------------------------------------->
   <chapter>
     <title>Reading data</title>
 
@@ -1023,7 +1021,6 @@ SetData('y', y)
 
   </chapter>
 
-  <!---------------------------------------------------------------->
   <chapter>
     <title><anchor id="Commands" />Command line interface</title>
 
@@ -1219,6 +1216,17 @@ SetData('y', y)
       else greyscale. <command>page</command> is the page number of
       the document to export (starting from 0 for the first
       page!).</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.ForceUpdate" />ForceUpdate</title>
+
+	<para><command>ForceUpdate()</command></para>
+
+	<para>Force the window to be updated to reflect the current
+	state of the document. Often used when periodic updates have
+	been disabled (see SetUpdateInterval). This command is only
+	supported in embedded mode or from veusz_listen.</para>
       </section>
 
       <section>
@@ -1773,7 +1781,11 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 	
 	<para>Tells window to update every interval milliseconds at
 	most. The value 0 disables updates until this function is
-	called with a positive value.</para>
+	called with a non-zero. The value -1 tells Veusz to update the
+	window every time the document has changed. This will make
+	things slow if repeated changes are made to the
+	document. Disabling updates and using the ForceUpdate command
+	will allow the user to control updates directly.</para>
 	
 	<para>Note: this command is only supported in the embedding
 	interface or veusz_listen.</para>
@@ -1875,7 +1887,6 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 
   </chapter>
   
-  <!---------------------------------------------------------------->
   <chapter>
     <title>Using Veusz from other programs</title>
 
@@ -1962,7 +1973,7 @@ g.Close()
       command line by doing something like:</para>
 	<informalexample>
 	  <programlisting>
-veusz_listen < in.vsz
+veusz_listen &lt; in.vsz
 </programlisting>
       </informalexample>
       <para>where <command>in.vsz</command> contains:</para>

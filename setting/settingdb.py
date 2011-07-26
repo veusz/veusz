@@ -33,7 +33,7 @@ defaultValues = {
     'export_background': '#ffffff00',
 
     # plot options
-    'plot_updateinterval': 500,
+    'plot_updatepolicy': -1, # update on document changed
     'plot_antialias': True,
     'plot_numthreads': 2,
 

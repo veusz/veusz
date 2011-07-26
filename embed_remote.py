@@ -40,10 +40,13 @@ class EmbeddedClient(object):
         self.window.show()
         self.document = self.window.document
         self.plot = self.window.plot
+        # use time based checking by default
+        self.plot.setTimeout(250)
         self.ci = document.CommandInterpreter(self.document)
         self.ci.addCommand('Close', self.cmdClose)
         self.ci.addCommand('Zoom', self.cmdZoom)
         self.ci.addCommand('EnableToolbar', self.cmdEnableToolbar)
+        self.ci.addCommand('ForceUpdate', self.cmdForceUpdate)
         self.ci.addCommand('GetClick', self.cmdGetClick)
         self.ci.addCommand('ResizeWindow', self.cmdResizeWindow)
         self.ci.addCommand('SetUpdateInterval', self.cmdSetUpdateInterval)
@@ -99,6 +102,13 @@ class EmbeddedClient(object):
         """
         self.window.enableToolbar(enable)
 
+    def cmdForceUpdate(self):
+        """ForceUpdate()
+
+        Forces an update of the plot window.
+        """
+        self.plot.actionForceUpdate()
+
     def cmdGetClick(self):
         """GetClick()
 
@@ -126,6 +136,8 @@ class EmbeddedClient(object):
         Set graph update interval.
         interval is in milliseconds (ms)
         set to zero to disable updates
+        set to -1 to update when document changes
+        default interval is 250ms
         """
         self.plot.setTimeout(interval)
 
