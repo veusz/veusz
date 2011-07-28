@@ -1765,3 +1765,27 @@ class BoolSwitch(Bool):
     def copy(self):
         return self._copyHelper((), (), {'settingsfalse': self.sfalse,
                                          'settingstrue': self.strue})
+
+class RotateInterval(Choice):
+    '''Rotate a label with intervals given.'''
+
+    def __init__(self, name, val, **args):
+        Choice.__init__(self, name,
+                        ('0', '45', '90', '135', '180', '225', '270', '315'),
+                        val, **args)
+
+    def convertTo(self, val):
+        """Store rotate angle."""
+        # backward compatibility with rotate option
+        # False: angle 0
+        # True:  angle 90
+        if val == False:
+            val = '0'
+        elif val == True:
+            val = '90'
+        return Choice.convertTo(self, val)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+

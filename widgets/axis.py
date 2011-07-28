@@ -107,9 +107,10 @@ class AxisLabel(setting.Text):
                                 descr = 'Place axis label close to edge'
                                 ' of graph',
                                 usertext='At edge') )
-        self.add( setting.Bool( 'rotate', False,
-                                descr = 'Rotate the label by 90 degrees',
-                                usertext='Rotate') )
+        self.add( setting.RotateInterval(
+                'rotate', '0',
+                descr = 'Angle by which to rotate label by',
+                usertext='Rotate') )
         self.add( setting.DistancePt( 'offset',
                                       '0pt',
                                       descr = 'Additional offset of axis label'
@@ -131,9 +132,10 @@ class TickLabel(setting.Text):
 
     def __init__(self, name, **args):
         setting.Text.__init__(self, name, **args)
-        self.add( setting.Bool( 'rotate', False,
-                                descr = 'Rotate the label by 90 degrees',
-                                usertext='Rotate') )
+        self.add( setting.RotateInterval(
+                'rotate', '0',
+                descr = 'Angle by which to rotate label by',
+                usertext='Rotate') )
         self.add( setting.ChoiceOrMore( 'format',
                                         TickLabel.formatchoices,
                                         'Auto',
@@ -677,13 +679,9 @@ class Axis(widget.Widget):
         tl_spacing = fm.leading() + fm.descent()
 
         # work out font alignment
-        if s.TickLabels.rotate:
-            if self.coordReflected:
-                angle = 90
-            else:
-                angle = 270
-        else:
-            angle = 0
+        angle = int(s.TickLabels.rotate)
+        if not self.coordReflected and angle != 0:
+            angle = 360-angle
         
         if vertical:
             # limit tick labels to be directly below/besides axis
@@ -794,15 +792,16 @@ class Axis(widget.Widget):
         if reflected:
             ax, ay = -ax, -ay
 
-        # angle of text
-        if ( (horz and not sl.rotate) or
-             (not horz and sl.rotate) ):
-            angle = 0
+        # angle of text (logic is slightly complex)
+        angle = int(sl.rotate)
+        if horz:
+            if not reflected:
+                angle = 360-angle
         else:
+            angle = angle+270
             if reflected:
-                angle = 90
-            else:
-                angle = 270
+                angle = 360-angle
+        angle = angle % 360
 
         x = 0.5*(self.coordParr1 + self.coordParr2)
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
