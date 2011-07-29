@@ -1771,7 +1771,8 @@ class RotateInterval(Choice):
 
     def __init__(self, name, val, **args):
         Choice.__init__(self, name,
-                        ('0', '45', '90', '135', '180', '225', '270', '315'),
+                        ('-180', '-135', '-90', '-45',
+                         '0', '45', '90', '135', '180'),
                         val, **args)
 
     def convertTo(self, val):
