@@ -160,6 +160,24 @@ class Ternary(NonOrthGraph):
 
         return x, y
 
+    def drawFillPts(self, painter, cliprect, ptsx, ptsy, filltype):
+        '''Draw points for plotting a fill.'''
+        pts = qt4.QPolygonF()
+        utils.addNumpyToPolygonF(pts, ptsx, ptsy)
+
+        # this is broken: FIXME
+        if filltype == 'left':
+            pts.append( qt4.QPointF(self._box[0], self._box[3]) )
+            pts.append( qt4.QPointF(self._box[0]+self._width/2., self._box[1]) )
+        elif filltype == 'right':
+            pts.append( qt4.QPointF(self._box[2], self._box[3]) )
+            pts.append( qt4.QPointF(self._box[2]-self._width/2., self._box[1]) )
+        elif filltype == 'bottom':
+            pts.append( qt4.QPointF(self._box[0], self._box[3]) )
+            pts.append( qt4.QPointF(self._box[2], self._box[3]) )
+
+        utils.plotClippedPolygon(painter, cliprect, pts)
+
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''
 
@@ -185,9 +203,6 @@ class Ternary(NonOrthGraph):
                       (bounds[1]+bounds[3])/2 + height/2 )
         self._width = widthh*2
         self._height = height
-
-        painter.setPen( s.Border.makeQPenWHide(painter) )
-        painter.setBrush( s.Background.makeQBrushWHide() )
 
         # triangle shaped polygon for graph
         self._tripoly = p = qt4.QPolygonF()
