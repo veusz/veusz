@@ -41,5 +41,6 @@ from polygon import Polygon
 from vectorfield import VectorField
 from boxplot import BoxPlot
 from polar import Polar
+from ternary import Ternary
 from nonorthpoint import NonOrthPoint
 from nonorthfunction import NonOrthFunction
