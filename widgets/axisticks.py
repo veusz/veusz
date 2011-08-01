@@ -39,7 +39,8 @@ class AxisTicksBase(object):
 
     def __init__( self, minval, maxval, numticks, numminorticks,
                   logaxis = False, prefermore = True,
-                  extendbounds = True, extendzero = True ):
+                  extendbounds = True, extendzero = True,
+                  forceinterval = None ):
         """Initialise the class.
 
         minval and maxval are the range of the data to be plotted
@@ -47,7 +48,9 @@ class AxisTicksBase(object):
         logaxis: axis logarithmic?
         prefermore: prefer more ticks rather than fewer
         extendbounds: extend minval and maxval to nearest tick if okay
-        extendzero: extend one end to zero if it is okay"""
+        extendzero: extend one end to zero if it is okay
+        forceinterval: force interval to one given (if allowed)
+        """
 
         self.minval = minval
         self.maxval = maxval
@@ -57,6 +60,7 @@ class AxisTicksBase(object):
         self.prefermore = prefermore
         self.extendbounds = extendbounds
         self.extendzero = extendzero
+        self.forceinterval = forceinterval
 
     def getTicks( self ):
         """Calculate and return the position of the major ticks.
@@ -288,7 +292,8 @@ class AxisTicks(AxisTicksBase):
             # which linear intervals we'll allow
             intervals = AxisTicks.allowed_intervals_linear
             
-        minval, maxval, tickvals, interval, loginterval = self._axisScaler( intervals )
+        minval, maxval, tickvals, interval, loginterval = self._axisScaler(
+            intervals )
 
         # work out the most appropriate minor tick intervals
         if not self.logaxis:
@@ -305,8 +310,8 @@ class AxisTicks(AxisTicksBase):
                 # calculate minor ticks
                 # here we use 'conventional' minor log tick spacing
                 # e.g. 0.9, 1, 2, .., 8, 9, 10, 20, 30 ...
-                minorticks = self._calcLogMinorTickValues(10.**minval,
-                                                          10.**maxval)
+                minorticks = self._calcLogMinorTickValues(
+                    10.**minval, 10.**maxval)
 
                 # Here we test whether more log major tick values are needed...
                 # often we might only have one tick value, and so we add 2, then 5
@@ -333,13 +338,18 @@ class AxisTicks(AxisTicksBase):
                              (minval, maxval, interval, loginterval,
                               AxisTicks.allowed_minorintervals_log)
                 minorticks = 10.**minorticks
-                                                         
+
             # transform normal ticks back to real space
             minval = 10.**minval
             maxval = 10.**maxval
             tickvals = 10.**tickvals
-            
-        return (minval, maxval, tickvals, minorticks,  '%Vg')
+                                                         
+        self.interval = (interval, loginterval)
+        self.minorticks = minorticks
+        self.minval = minval
+        self.maxval = maxval
+        self.tickvals = tickvals
+        self.autoformat = '%Vg'
 
 class DateTicks(AxisTicksBase):
     """For formatting dates. We want something that chooses appropriate
@@ -479,7 +489,7 @@ class DateTicks(AxisTicksBase):
         Returns a tuple (minval, maxval, majorticks, minorticks, format)"""
 
         # find minor ticks
-        mindate, maxdate, est,  ticks, format = self.bestTickFinder(
+        mindate, maxdate, est, ticks, format = self.bestTickFinder(
             self.minval, self.maxval, self.numticks, self.extendbounds, 
             self.intervals, self.intervals_sec)
 
@@ -490,5 +500,9 @@ class DateTicks(AxisTicksBase):
             mindate, maxdate, self.numminorticks, False, 
             intervals, intervals_sec)
 
-        return (mindate,  maxdate, ticks, minorticks, format) 
-        
+        self.interval = (intervals, intervals_sec)
+        self.minval = mindate
+        self.maxval = maxdate
+        self.minorticks = minorticks
+        self.tickvals = ticks
+        self.autoformat = format

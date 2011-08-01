@@ -378,9 +378,12 @@ class Axis(widget.Widget):
                         extendzero = s.autoExtendZero,
                         logaxis = s.log )
 
-        (self.plottedrange[0],self.plottedrange[1],
-         self.majortickscalc, self.minortickscalc, 
-         self.autoformat) =  axs.getTicks()
+        axs.getTicks()
+        self.plottedrange[0] = axs.minval
+        self.plottedrange[1] = axs.maxval
+        self.majortickscalc = axs.tickvals
+        self.minortickscalc = axs.minorticks
+        self.autoformat = axs.autoformat
 
         # override values if requested
         if len(s.MajorTicks.manualTicks) > 0:

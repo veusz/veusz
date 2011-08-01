@@ -202,10 +202,10 @@ class Polar(NonOrthGraph):
         if self._maxradius <= 0.:
             self._maxradius = 1.
 
-        atick = AxisTicks(0, self._maxradius, t.number,
-                          t.number*4,
+        atick = AxisTicks(0, self._maxradius, t.number, t.number*4,
                           extendbounds=False,  extendzero=False)
-        minval, maxval, majtick, mintick, tickformat = atick.getTicks()
+        atick.getTicks()
+        majtick = atick.tickvals
 
         # draw ticks as circles
         if not t.hideannuli:
@@ -224,7 +224,7 @@ class Polar(NonOrthGraph):
         tl = s.TickLabels
         scale, format = tl.scale, tl.format
         if format == 'Auto':
-            format = tickformat
+            format = atick.autoformat
         painter.setPen( tl.makeQPen() )
         font = tl.makeQFont(painter)
 
