@@ -49,7 +49,8 @@ class AxisTicksBase(object):
         prefermore: prefer more ticks rather than fewer
         extendbounds: extend minval and maxval to nearest tick if okay
         extendzero: extend one end to zero if it is okay
-        forceinterval: force interval to one given (if allowed)
+        forceinterval: force interval to one given (if allowed). interval
+         is tuple as returned in self.interval after calling getTicks()
         """
 
         self.minval = minval
@@ -65,7 +66,9 @@ class AxisTicksBase(object):
     def getTicks( self ):
         """Calculate and return the position of the major ticks.
 
-        Returns a tuple (minval, maxval, majorticks, minorticks)"""
+        Results are returned as attributes of this object in
+        interval, minval, maxval, tickvals, minorticks, autoformat
+        """
 
 class AxisTicks(AxisTicksBase):
     """Class to work out at what values axis major ticks should appear."""
@@ -96,7 +99,7 @@ class AxisTicks(AxisTicksBase):
 
         startmult = int( math.ceil( minval / delta ) )
         stopmult = int( math.floor( maxval / delta ) )
-        
+
         return N.arange(startmult, stopmult+1) * delta
 
     def _tickNums(self, minval, maxval, delta):
@@ -203,40 +206,9 @@ class AxisTicks(AxisTicksBase):
                     ticks.append(v)
 
         return N.array( ticks )
-        
-    def _axisScaler(self, allowed_intervals):
-        """With minval and maxval find best tick positions."""
 
-        # work out range and log range
-        therange = self.maxval - self.minval
-        intlogrange = int( N.log10( therange ) )
-
-        # we step variable to move through log space to find best ticks
-        logstep = intlogrange + 1
-
-        # we iterate down in log spacing, until we have more than twice
-        # the number of ticks requested.
-        # Maybe a better algorithm is required
-        selection = []
-
-        largestno = 0
-        while True:
-            for interval in allowed_intervals:
-                no, minval, maxval = self._calcNoTicks( interval, logstep )
-                selection.append( (no, interval, logstep, minval, maxval ) )
-
-                largestno = max(largestno, no)
-
-            if largestno > self.numticks*2:
-                break
-
-            logstep -= 1
-
-            # necessary as we don't want 10**x on axis if |x|<1
-            # :-(
-            if logstep < 0 and self.logaxis:
-                break
-
+    def _selectBestTickFromSelection(self, selection):
+        """Choose best tick from selection given."""
         # we now try to find the best matching value
         minabsdelta = 1e99
         mindelta = 1e99
@@ -263,22 +235,70 @@ class AxisTicks(AxisTicksBase):
                     mindelta = delta
                     bestsel = s
 
-        # now we have the best, we work out the ticks and return
-        interval  = bestsel[1]
-        loginterval = bestsel[2]
+        return bestsel
 
+    def _getBestTickSelection(self, allowed_intervals):
+        """Go through allowed tick intervals and find one best matching
+        requested parameters."""
+
+        # work out range and log range
+        therange = self.maxval - self.minval
+        intlogrange = int( N.log10( therange ) )
+
+        # we step variable to move through log space to find best ticks
+        logstep = intlogrange + 1
+
+        # we iterate down in log spacing, until we have more than twice
+        # the number of ticks requested.
+        # Maybe a better algorithm is required
+        selection = []
+
+        # keep track of largest number of ticks calculated
+        largestno = 0
+
+        while True:
+            for interval in allowed_intervals:
+                no, minval, maxval = self._calcNoTicks( interval, logstep )
+                selection.append( (no, interval, logstep, minval, maxval ) )
+
+                largestno = max(largestno, no)
+
+            if largestno > self.numticks*2:
+                break
+
+            logstep -= 1
+
+            # necessary as we don't want 10**x on axis if |x|<1
+            # :-(
+            if logstep < 0 and self.logaxis:
+                break
+
+        return selection
+
+    def _tickSelector(self, allowed_intervals):
+        """With minval and maxval find best tick positions."""
+
+        if self.forceinterval is None:
+            # get selection of closely matching ticks
+            selection = self._getBestTickSelection(allowed_intervals)
+
+            # now we have the best, we work out the ticks and return
+            bestsel = self._selectBestTickFromSelection(selection)
+            dummy, interval, loginterval, minval, maxval = bestsel
+        else:
+            # forced specific interval requested
+            interval, loginterval = self.forceinterval
+            no, minval, maxval = self._calcNoTicks(interval, loginterval)
+
+        # calculate the positions of the ticks from parameters
         tickdelta = interval * 10.**loginterval
-        minval = bestsel[3]
-        maxval = bestsel[4]
-
-        # calculate the positions of the ticks
         ticks = self._calcTickValues( minval, maxval, tickdelta )
+
         return (minval, maxval, ticks, interval, loginterval)
 
-    def getTicks( self ):
+    def getTicks(self):
         """Calculate and return the position of the major ticks.
-
-        Returns a tuple (minval, maxval, majorticks, minorticks)"""
+        """
 
         if self.logaxis:
             # which intervals we'll accept for major ticks
@@ -287,25 +307,25 @@ class AxisTicks(AxisTicksBase):
             # transform range into log space
             self.minval = N.log10( self.minval )
             self.maxval = N.log10( self.maxval )
-
         else:
             # which linear intervals we'll allow
             intervals = AxisTicks.allowed_intervals_linear
-            
-        minval, maxval, tickvals, interval, loginterval = self._axisScaler(
+
+        minval, maxval, tickvals, interval, loginterval = self._tickSelector(
             intervals )
 
         # work out the most appropriate minor tick intervals
         if not self.logaxis:
             # just plain minor ticks
             # try to achieve no of minors close to value requested
-            
+
             minorticks = self._calcLinearMinorTickValues(
                 minval, maxval, interval, loginterval,
                 AxisTicks.allowed_minorintervals_linear[interval]
                 )
 
         else:
+            # log axis
             if interval == 1.:
                 # calculate minor ticks
                 # here we use 'conventional' minor log tick spacing
@@ -326,24 +346,24 @@ class AxisTicks(AxisTicksBase):
                         n = low10 + math.log10(i)
                         if n >= minval and n <= maxval:
                             tickvals = N.concatenate( (tickvals, N.array([n]) ))
-                
+
             else:
                 # if we increase by more than one power of 10 on the
                 # axis, we can't do the above, so we do linear ticks
                 # in log space
                 # aim is to choose powers of 3 for majors and minors
                 # to make it easy to read the axis. comments?
-                
-                minorticks = self._calcLinearMinorTickValues\
-                             (minval, maxval, interval, loginterval,
-                              AxisTicks.allowed_minorintervals_log)
+
+                minorticks = self._calcLinearMinorTickValues(
+                    minval, maxval, interval, loginterval,
+                    AxisTicks.allowed_minorintervals_log)
                 minorticks = 10.**minorticks
 
             # transform normal ticks back to real space
             minval = 10.**minval
             maxval = 10.**maxval
             tickvals = 10.**tickvals
-                                                         
+
         self.interval = (interval, loginterval)
         self.minorticks = minorticks
         self.minval = minval
@@ -357,58 +377,58 @@ class DateTicks(AxisTicksBase):
     So we want to choose most apropriate interval depending on number of
     ticks requested
     """
-    
+
     # possible intervals for a time/date axis
     # tuples of ((y, m, d, h, m, s, msec), autoformat)
     intervals = (
-                 ((200, 0, 0, 0, 0, 0, 0), '%VDY'),  
-                 ((100, 0, 0, 0, 0, 0, 0), '%VDY'),  
-                 ((50, 0, 0, 0, 0, 0, 0), '%VDY'),  
+                 ((200, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((100, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((50, 0, 0, 0, 0, 0, 0), '%VDY'),
                  ((20, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((10, 0, 0, 0, 0, 0, 0), '%VDY'),  
-                 ((5, 0, 0, 0, 0, 0, 0), '%VDY'),  
-                 ((2, 0, 0, 0, 0, 0, 0), '%VDY'),  
-                 ((1, 0, 0, 0, 0, 0, 0), '%VDY'),  
-                 ((0, 6, 0, 0, 0, 0, 0), '%VDY-%VDm'), 
+                 ((10, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((5, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((2, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((1, 0, 0, 0, 0, 0, 0), '%VDY'),
+                 ((0, 6, 0, 0, 0, 0, 0), '%VDY-%VDm'),
                  ((0, 4, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 3, 0, 0, 0, 0, 0), '%VDY-%VDm'),  
+                 ((0, 3, 0, 0, 0, 0, 0), '%VDY-%VDm'),
                  ((0, 2, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 1, 0, 0, 0, 0, 0), '%VDY-%VDm'), 
-                 ((0, 0, 28, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
-                 ((0, 0, 14, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
-                 ((0, 0, 7, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
-                 ((0, 0, 2, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
-                 ((0, 0, 1, 0, 0, 0, 0), '%VDY-%VDm-%VDd'), 
-                 ((0, 0, 0, 12, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
-                 ((0, 0, 0, 6, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
-                 ((0, 0, 0, 4, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
-                 ((0, 0, 0, 3, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'), 
-                 ((0, 0, 0, 2, 0, 0, 0), '%VDH:%VDM'), 
-                 ((0, 0, 0, 1, 0, 0, 0), '%VDH:%VDM'), 
-                 ((0, 0, 0, 0, 30, 0, 0), '%VDH:%VDM'), 
-                 ((0, 0, 0, 0, 15, 0, 0), '%VDH:%VDM'), 
-                 ((0, 0, 0, 0, 10, 0, 0), '%VDH:%VDM'), 
-                 ((0, 0, 0, 0, 5, 0, 0), '%VDH:%VDM'), 
-                 ((0, 0, 0, 0, 2, 0, 0), '%VDH:%VDM'), 
+                 ((0, 1, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+                 ((0, 0, 28, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+                 ((0, 0, 14, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+                 ((0, 0, 7, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+                 ((0, 0, 2, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+                 ((0, 0, 1, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+                 ((0, 0, 0, 12, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+                 ((0, 0, 0, 6, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+                 ((0, 0, 0, 4, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+                 ((0, 0, 0, 3, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+                 ((0, 0, 0, 2, 0, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 1, 0, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 0, 30, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 0, 15, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 0, 10, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 0, 5, 0, 0), '%VDH:%VDM'),
+                 ((0, 0, 0, 0, 2, 0, 0), '%VDH:%VDM'),
                  ((0, 0, 0, 0, 1, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 0, 30, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 15, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 10, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 5, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 2, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 1, 0), '%VDH:%VDM:%VDS'), 
-                 ((0, 0, 0, 0, 0, 0, 500000), '%VDH:%VDM:%VDVS'), 
-                 ((0, 0, 0, 0, 0, 0, 200000), '%VDVS'), 
-                 ((0, 0, 0, 0, 0, 0, 100000), '%VDVS'), 
-                 ((0, 0, 0, 0, 0, 0, 50000), '%VDVS'), 
-                 ((0, 0, 0, 0, 0, 0, 10000), '%VDVS'), 
+                 ((0, 0, 0, 0, 0, 30, 0), '%VDH:%VDM:%VDS'),
+                 ((0, 0, 0, 0, 0, 15, 0), '%VDH:%VDM:%VDS'),
+                 ((0, 0, 0, 0, 0, 10, 0), '%VDH:%VDM:%VDS'),
+                 ((0, 0, 0, 0, 0, 5, 0), '%VDH:%VDM:%VDS'),
+                 ((0, 0, 0, 0, 0, 2, 0), '%VDH:%VDM:%VDS'),
+                 ((0, 0, 0, 0, 0, 1, 0), '%VDH:%VDM:%VDS'),
+                 ((0, 0, 0, 0, 0, 0, 500000), '%VDH:%VDM:%VDVS'),
+                 ((0, 0, 0, 0, 0, 0, 200000), '%VDVS'),
+                 ((0, 0, 0, 0, 0, 0, 100000), '%VDVS'),
+                 ((0, 0, 0, 0, 0, 0, 50000), '%VDVS'),
+                 ((0, 0, 0, 0, 0, 0, 10000), '%VDVS'),
                  )
-    
+
     intervals_sec = N.array([(ms*1e-6+s+mi*60+hr*60*60+dy*24*60*60+
                               mn*(365/12.)*24*60*60+
                               yr*365*24*60*60)
                              for (yr, mn, dy, hr, mi, s, ms), fmt in intervals])
-    
+
     def bestTickFinder(self, minval, maxval, numticks, extendbounds,
                        intervals, intervals_sec):
         """Try to find best choice of numticks ticks between minval and maxval
@@ -424,10 +444,10 @@ class DateTicks(AxisTicksBase):
 
         tick1 = max(estimated.searchsorted(numticks)-1, 0)
         tick2 = min(tick1+1, len(estimated)-1)
-        
+
         del1 = abs(estimated[tick1] - numticks)
         del2 = abs(estimated[tick2] - numticks)
-        
+
         if del1 < del2:
             best = tick1
         else:
@@ -440,7 +460,7 @@ class DateTicks(AxisTicksBase):
         # round min and max to nearest
         minround = utils.tupleToDateTime(utils.roundDownToTimeTuple(mindate, besttt))
         maxround = utils.tupleToDateTime(utils.roundDownToTimeTuple(maxdate, besttt))
-        
+
         if minround == mindate:
             mintick = minround
         else:
@@ -458,7 +478,7 @@ class DateTicks(AxisTicksBase):
         if extendbounds and (deltamax != 0. and deltamax < delta*0.15):
             maxdate = utils.addTimeTupleToDateTime(maxtick, besttt)
             maxtick = maxdate
-        
+
         # make ticks
         ticks = []
         dt = mintick
@@ -466,11 +486,11 @@ class DateTicks(AxisTicksBase):
             ticks.append( utils.datetimeToFloat(dt))
             dt = utils.addTimeTupleToDateTime(dt, besttt)
 
-        return ( utils.datetimeToFloat(mindate), 
+        return ( utils.datetimeToFloat(mindate),
                  utils.datetimeToFloat(maxdate),
-                 intervals_sec[best], 
+                 intervals_sec[best],
                  N.array(ticks), format )
-    
+
     def filterIntervals(self, estint):
         """Filter intervals and intervals_sec to be
         multiples of estint seconds."""
@@ -485,19 +505,18 @@ class DateTicks(AxisTicksBase):
 
     def getTicks(self):
         """Calculate and return the position of the major ticks.
-
-        Returns a tuple (minval, maxval, majorticks, minorticks, format)"""
+        """
 
         # find minor ticks
         mindate, maxdate, est, ticks, format = self.bestTickFinder(
-            self.minval, self.maxval, self.numticks, self.extendbounds, 
+            self.minval, self.maxval, self.numticks, self.extendbounds,
             self.intervals, self.intervals_sec)
 
         # try to make minor ticks divide evenly into major ticks
         intervals, intervals_sec = self.filterIntervals(est)
         # get minor ticks
         ig, ig, ig, minorticks, ig = self.bestTickFinder(
-            mindate, maxdate, self.numminorticks, False, 
+            mindate, maxdate, self.numminorticks, False,
             intervals, intervals_sec)
 
         self.interval = (intervals, intervals_sec)
