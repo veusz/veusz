@@ -54,6 +54,7 @@ coord_lookup = {
 # useful trigonometric identities
 sin30 = 0.5
 sin60 = cos30 = 0.86602540378
+tan30 = 0.5773502691
 
 class Ternary(NonOrthGraph):
     '''Ternary plotter.'''
@@ -198,16 +199,25 @@ class Ternary(NonOrthGraph):
 
         # this is broken: FIXME
         if filltype == 'left':
-            pts.append( qt4.QPointF(self._box[0], self._box[3]) )
-            pts.append( qt4.QPointF(self._box[0]+self._width/2., self._box[1]) )
+            dyend = ptsy[-1]-self._box[1]
+            pts.append( qt4.QPointF(ptsx[-1]-dyend*tan30, self._box[1]) )
+            dystart = ptsy[0]-self._box[1]
+            pts.append( qt4.QPointF(ptsx[0]-dystart*tan30, self._box[1]) )
         elif filltype == 'right':
-            pts.append( qt4.QPointF(self._box[2], self._box[3]) )
-            pts.append( qt4.QPointF(self._box[2]-self._width/2., self._box[1]) )
+            pts.append( qt4.QPointF(self._box[2], ptsy[-1]) )
+            pts.append( qt4.QPointF(self._box[2], ptsy[0]) )
         elif filltype == 'bottom':
-            pts.append( qt4.QPointF(ptsx[-1], self._box[3]) )
-            pts.append( qt4.QPointF(ptsx[0], self._box[3]) )
+            dyend = self._box[3]-ptsy[-1]
+            pts.append( qt4.QPointF(ptsx[-1]-dyend*tan30, self._box[3]) )
+            dystart = self._box[3]-ptsy[0]
+            pts.append( qt4.QPointF(ptsx[0]-dystart*tan30, self._box[3]) )
+        elif filltype == 'polygon':
+            pass
+        else:
+            pts = None
 
-        utils.plotClippedPolygon(painter, cliprect, pts)
+        if pts is not None:
+            utils.plotClippedPolygon(painter, cliprect, pts)
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''

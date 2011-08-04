@@ -166,6 +166,8 @@ class Polar(NonOrthGraph):
             pp.arcTo(cliprect, 0, 360)
             pp.addPolygon(pts)
             painter.fillPath(pp, painter.brush())
+        elif filltype == 'polygon':
+            utils.plotClippedPolygon(painter, cliprect, pts)
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''

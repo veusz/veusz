@@ -25,7 +25,9 @@ from grid import Grid
 
 import veusz.setting as setting
 
-filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right')
+filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
+               'polygon')
+
 class FillBrush(setting.Brush):
     '''Brush for filling point region.'''
     def __init__(self, *args, **argsv):
