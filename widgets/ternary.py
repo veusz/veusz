@@ -40,6 +40,21 @@ def rotatePts(x, y, theta):
     c = math.cos(theta*math.pi/180.)
     return x*c-y*s, x*s+y*c
 
+# translate coordinates a,b,c from user to plot
+# user can select different coordinate systems
+coord_lookup = {
+    'bottom-left': (0, 1, 2),
+    'bottom-right': (0, 2, 1),
+    'left-bottom': (1, 0, 2),
+    'left-right': (2, 0, 1),
+    'right-bottom': (1, 2, 0),
+    'right-left': (2, 1, 0)
+}
+
+# useful trigonometric identities
+sin30 = 0.5
+sin60 = cos30 = 0.86602540378
+
 class Ternary(NonOrthGraph):
     '''Ternary plotter.'''
 
@@ -63,6 +78,15 @@ class Ternary(NonOrthGraph):
                               'percentage',
                               descr='Show percentages or fractions',
                               usertext='Mode') )
+
+        s.add( setting.Choice('coords',
+                              ('bottom-left', 'bottom-right',
+                               'left-bottom', 'left-right',
+                               'right-left', 'right-bottom'),
+                              'bottom-left',
+                              descr='Axes to use for plotting coordinates',
+                              usertext='Coord system') )
+
         s.add( setting.Str('labelleft', '',
                            descr='Left axis label text',
                            usertext='Label left') )
@@ -72,13 +96,16 @@ class Ternary(NonOrthGraph):
         s.add( setting.Str('labelbottom', '',
                            descr='Bottom axis label text',
                            usertext='Label bottom') )
-        s.add( setting.Choice('coords',
-                              ('bottom-left', 'bottom-right',
-                               'left-bottom', 'left-right',
-                               'right-left', 'right-bottom'),
-                              'bottom-left',
-                              descr='Axes to use for plotting coordinates',
-                              usertext='Coord system') )
+
+        s.add( setting.Float('originleft', 0.,
+                             descr='Fractional origin of left axis at its top',
+                             usertext='Left origin') )
+        s.add( setting.Float('originbottom', 0.,
+                             descr='Fractional origin of bottom axis at its '
+                             'left', usertext='Bottom origin') )
+        s.add( setting.Float('fracsize', 1.,
+                             descr='Fractional size of plot',
+                             usertext='Size') )
 
         s.add( AxisLabel('Label',
                          descr = 'Axis label settings',
@@ -124,8 +151,17 @@ class Ternary(NonOrthGraph):
 
     def coordRanges(self):
         '''Get ranges of coordinates.'''
-        r = [0., self._maxVal()]
-        return [r, r]
+
+        mv = self._maxVal()
+
+        # ranges for each coordinate
+        ra = [self._orgbottom*mv, (self._orgbottom+self._size)*mv]
+        rb = [self._orgleft*mv, (self._orgleft+self._size)*mv]
+        rc = [self._orgright*mv, (self._orgright+self._size)*mv]
+        ranges = [ra, rb, rc]
+
+        lookup = coord_lookup[s.coords]
+        return ranges[lookup.index(0)], ranges[lookup.index(1)]
 
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert coordinates in r, theta to x, y.'''
@@ -142,21 +178,16 @@ class Ternary(NonOrthGraph):
 
         # select the right coordinates for a, b and c given the system
         # requested by the user
-        lookup = {'bottom-left': (0, 1, 2),
-                  'bottom-right': (0, 2, 1),
-                  'left-bottom': (1, 0, 2),
-                  'left-right': (2, 0, 1),
-                  'right-bottom': (1, 2, 0),
-                  'right-left': (2, 1, 0)}[s.coords]
-        a = clist[ lookup[0] ]
-        b = clist[ lookup[1] ]
-        c = clist[ lookup[2] ]
+        # normalise by origins and plot size
+        lookup = coord_lookup[s.coords]
+        cbot = ( clist[ lookup[0] ] - self._orgbot ) / self._size
+        cleft = ( clist[ lookup[1] ] - self._orgleft ) / self._size
+        cright = ( clist[ lookup[2] ] - self._orgright ) / self._size
 
         # from Ingram, 1984, Area, 16, 175
         # remember that y goes in the opposite direction here
-        scale = self._box[2]-self._box[0]
-        x = (0.5*a + c)*scale + self._box[0]
-        y = self._box[3] - a*math.sin(60./180*math.pi)*scale
+        x = (0.5*cright + cbot)*self._width + self._box[0]
+        y = self._box[3] - cright * sin60 * self._width
 
         return x, y
 
@@ -173,8 +204,8 @@ class Ternary(NonOrthGraph):
             pts.append( qt4.QPointF(self._box[2], self._box[3]) )
             pts.append( qt4.QPointF(self._box[2]-self._width/2., self._box[1]) )
         elif filltype == 'bottom':
-            pts.append( qt4.QPointF(self._box[0], self._box[3]) )
-            pts.append( qt4.QPointF(self._box[2], self._box[3]) )
+            pts.append( qt4.QPointF(ptsx[-1], self._box[3]) )
+            pts.append( qt4.QPointF(ptsx[0], self._box[3]) )
 
         utils.plotClippedPolygon(painter, cliprect, pts)
 
@@ -214,74 +245,50 @@ class Ternary(NonOrthGraph):
         painter.setBrush( s.Background.makeQBrushWHide() )
         painter.drawPolygon(p)
 
+        # work out origins and size
+        self._size = max(min(s.fracsize, 1.), 0.)
+
+        # make sure we don't go past the ends of the allowed range
+        # value of origin of left axis at top
+        self._orgleft = min(s.originleft, 1.-self._size)
+        # value of origin of bottom axis at left
+        self._orgbot = min(s.originbottom, 1.-self._size)
+        # origin of right axis at bottom
+        self._orgright = 1. - self._orgleft - (self._orgbot + self._size)
+
+    def _computeTickVals(self):
+        """Compute tick values."""
+
+        s = self.settings
+
+        # this is a hack as we lose ends off the axis otherwise
+        d = 1e-6
+
+        # get ticks along left axis
+        atickleft = AxisTicks(self._orgleft-d, self._orgleft+self._size+d,
+                              s.MajorTicks.number, s.MinorTicks.number,
+                              extendbounds=False, extendzero=False)
+        atickleft.getTicks()
+        # use the interval from above to calculate ticks for right
+        atickright = AxisTicks(self._orgright-d, self._orgright+self._size+d,
+                               s.MajorTicks.number, s.MinorTicks.number,
+                               extendbounds=False, extendzero=False,
+                               forceinterval = atickleft.interval)
+        atickright.getTicks()
+        # then calculate for bottom
+        atickbot = AxisTicks(self._orgbot-d, self._orgbot+self._size+d,
+                             s.MajorTicks.number, s.MinorTicks.number,
+                             extendbounds=False, extendzero=False,
+                             forceinterval = atickleft.interval)
+        atickbot.getTicks()
+
+        return atickbot, atickleft, atickright
+
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
         p = qt4.QPainterPath()
         p.addPolygon( self._tripoly )
         painter.setClipPath(p)
-
-    def _drawTickSet(self, painter, tickSetn, gridSetn, tickvals,
-                     ticklabels=None, labelSetn=None):
-        '''Draw a set of ticks (major or minor).'''
-
-        tl = tickSetn.get('length').convert(painter)
-
-        # first set of ticks to draw and origin for coords
-        x1 = x2 = (tickvals/self._maxVal()) * self._width
-        y1 = 0*x1
-        y2 = y1-tl
-        ox, oy = self._box[0], self._box[3]
-
-        # 2nd set
-        x1p, y1p = rotatePts(x1, y1, -120)
-        x2p, y2p = rotatePts(x2, y2, -120)
-        oxp, oyp = self._box[0] + self._width*0.5, self._box[3] - self._height
-
-        # 3rd set
-        x1pp, y1pp = rotatePts(x1, y1, 120)
-        x2pp, y2pp = rotatePts(x2, y2, 120)
-        oxpp, oypp = self._box[0] + self._width, self._box[3]
-
-        # draw grid if not hidden
-        if not gridSetn.hide:
-            painter.setPen( gridSetn.makeQPen(painter) )
-            utils.plotLinesToPainter(painter, x1[1:-1]+ox, oy-y1[1:-1],
-                                     x1p[1:-1][::-1]+oxp, oyp-y1p[1:-1][::-1])
-            utils.plotLinesToPainter(painter, x1[1:-1]+ox, oy-y1[1:-1],
-                                     x1pp[1:-1][::-1]+oxpp,
-                                     oypp-y1pp[1:-1][::-1])
-            utils.plotLinesToPainter(painter, x1p[1:-1]+oxp, oyp-y1p[1:-1],
-                                     x1pp[1:-1][::-1]+oxpp,
-                                     oypp-y1pp[1:-1][::-1])
-
-        # draw ticks if not hidden
-        if not tickSetn.hide:
-            painter.setPen( tickSetn.makeQPen(painter) )
-            utils.plotLinesToPainter(painter, ox+x1, oy-y1, ox+x2, oy-y2)
-            utils.plotLinesToPainter(painter, oxp+x1p, oyp-y1p, oxp+x2p,
-                                     oyp-y2p)
-            utils.plotLinesToPainter(painter, oxpp+x1pp, oypp-y1pp,
-                                     oxpp+x2pp, oypp-y2pp)
-
-        # draw labels (if any)
-        if ticklabels and not labelSetn.hide:
-            painter.setPen( labelSetn.makeQPen() )
-            font = labelSetn.makeQFont(painter)
-            painter.setFont(font)
-
-            fm = utils.FontMetrics(font, painter.device())
-            sp = fm.leading() + fm.descent()
-            off = labelSetn.get('offset').convert(painter)
-
-            for l, x, y in izip(ticklabels, ox+x2, oy-y2+off):
-                r = utils.Renderer(painter, font, x, y, l, 0, 1, 0)
-                r.render()
-            for l, x, y in izip(ticklabels, oxp-sp-off+x2p, oyp-y2p):
-                r = utils.Renderer(painter, font, x, y, l, 1, 0, 0)
-                r.render()
-            for l, x, y in izip(ticklabels, oxpp+sp+off+x2pp, oypp-y2pp):
-                r = utils.Renderer(painter, font, x, y, l, -1, 0, 0)
-                r.render()
 
     def _getLabels(self, ticks, autoformat):
         """Return tick labels."""
@@ -296,20 +303,118 @@ class Ternary(NonOrthGraph):
             labels.append(l)
         return labels
 
+    def _drawTickSet(self, painter, tickSetn, gridSetn,
+                     tickbot, tickleft, tickright,
+                     labelSetn=None):
+        '''Draw a set of ticks (major or minor).
+
+        tickSetn: tick setting to get line details
+        gridSetn: setting for grid line (if any)
+        tickXXX: tick arrays for each axis
+        labelSetn: setting used to label ticks, or None if minor ticks
+        '''
+
+        # this is mostly a lot of annoying trigonometry
+        # compute line ends for ticks and grid lines
+
+        tl = tickSetn.get('length').convert(painter)
+        mv = self._maxVal()
+
+        # bottom ticks
+        x1 = (tickbot - self._orgbot)/self._size*self._width + self._box[0]
+        x2 = x1 - tl * sin30
+        y1 = self._box[3] + N.zeros(x1.shape)
+        y2 = y1 + tl * cos30
+        tickbotline = (x1, y1, x2, y2)
+
+        # bottom grid (removing lines at edge of plot)
+        scaletick = 1 - (tickbot-self._orgbot)/self._size
+        gx = x1 + scaletick*self._width*sin30
+        gy = y1 - scaletick*self._width*cos30
+        ne = (scaletick > 1e-6) & (scaletick < (1-1e-6))
+        gridbotline = (x1[ne], y1[ne], gx[ne], gy[ne])
+
+        # left ticks
+        x1 = -(tickleft - self._orgleft)/self._size*self._width*sin30 + (
+            self._box[0] + self._box[2])*0.5
+        x2 = x1 - tl * sin30
+        y1 = (tickleft - self._orgleft)/self._size*self._width*cos30 + self._box[1]
+        y2 = y1 - tl * cos30
+        tickleftline = (x1, y1, x2, y2)
+
+        # left grid
+        scaletick = 1 - (tickleft-self._orgleft)/self._size
+        gx = x1 + scaletick*self._width*sin30
+        gy = self._box[3] + N.zeros(y1.shape)
+        ne = (scaletick > 1e-6) & (scaletick < (1-1e-6))
+        gridleftline = (x1[ne], y1[ne], gx[ne], gy[ne])
+
+        # right ticks
+        x1 = -(tickright - self._orgright)/self._size*self._width*sin30+self._box[2]
+        x2 = x1 + tl
+        y1 = -(tickright - self._orgright)/self._size*self._width*cos30+self._box[3]
+        y2 = y1
+        tickrightline = (x1, y1, x2, y2)
+
+        # right grid
+        scaletick = 1 - (tickright-self._orgright)/self._size
+        gx = x1 - scaletick*self._width
+        gy = y1
+        gridrightline = (x1[ne], y1[ne], gx[ne], gy[ne])
+
+        if not gridSetn.hide:
+            painter.setPen( gridSetn.makeQPen(painter) )
+            utils.plotLinesToPainter(painter, *gridbotline)
+            utils.plotLinesToPainter(painter, *gridleftline)
+            utils.plotLinesToPainter(painter, *gridrightline)
+
+        if not tickSetn.hide:
+            # draw ticks themselves
+            painter.setPen( tickSetn.makeQPen(painter) )
+            utils.plotLinesToPainter(painter, *tickbotline)
+            utils.plotLinesToPainter(painter, *tickleftline)
+            utils.plotLinesToPainter(painter, *tickrightline)
+
+        if labelSetn is not None and not labelSetn.hide:
+            # compute the labels for the ticks
+            tleftlabels = self._getLabels(tickleft*mv, '%Vg')
+            trightlabels = self._getLabels(tickright*mv, '%Vg')
+            tbotlabels = self._getLabels(tickbot*mv, '%Vg')
+
+            painter.setPen( labelSetn.makeQPen() )
+            font = labelSetn.makeQFont(painter)
+            painter.setFont(font)
+
+            fm = utils.FontMetrics(font, painter.device())
+            sp = fm.leading() + fm.descent()
+            off = labelSetn.get('offset').convert(painter)
+
+            # draw tick labels in each direction
+            for l, x, y in izip(tbotlabels, tickbotline[2], tickbotline[3]+off):
+                r = utils.Renderer(painter, font, x, y, l, 0, 1, 0)
+                r.render()
+            for l, x, y in izip(tleftlabels, tickleftline[2]-off-sp, tickleftline[3]):
+                r = utils.Renderer(painter, font, x, y, l, 1, 0, 0)
+                r.render()
+            for l, x, y in izip(trightlabels,tickrightline[2]+off+sp, tickrightline[3]):
+                r = utils.Renderer(painter, font, x, y, l, -1, 0, 0)
+                r.render()
+
     def drawAxes(self, painter, bounds, datarange, outerbounds=None):
         '''Draw plot axes.'''
 
         s = self.settings
 
-        atick = AxisTicks(0, self._maxVal(), s.MajorTicks.number,
-                          s.MinorTicks.number,
-                          extendbounds=False,  extendzero=False)
-        minval, maxval, majtick, mintick, tickformat = atick.getTicks()
+        # compute tick values for later when plotting axes
+        tbot, tleft, tright = self._computeTickVals()
 
-        self._drawTickSet(painter, s.MinorTicks, s.MinorGridLines, mintick)
-        self._drawTickSet(painter, s.MajorTicks, s.GridLines, majtick,
-                          ticklabels=self._getLabels(majtick, tickformat),
+        # draw the major ticks
+        self._drawTickSet(painter, s.MajorTicks, s.GridLines,
+                          tbot.tickvals, tleft.tickvals, tright.tickvals,
                           labelSetn=s.TickLabels)
 
+        # now draw the minor ones
+        self._drawTickSet(painter, s.MinorTicks, s.MinorGridLines,
+                          tbot.minorticks, tleft.minorticks, tright.minorticks)
 
 document.thefactory.register(Ternary)
