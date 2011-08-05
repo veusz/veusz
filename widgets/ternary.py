@@ -88,15 +88,15 @@ class Ternary(NonOrthGraph):
                               descr='Axes to use for plotting coordinates',
                               usertext='Coord system') )
 
+        s.add( setting.Str('labelbottom', '',
+                           descr='Bottom axis label text',
+                           usertext='Label bottom') )
         s.add( setting.Str('labelleft', '',
                            descr='Left axis label text',
                            usertext='Label left') )
         s.add( setting.Str('labelright', '',
                            descr='Right axis label text',
                            usertext='Label right') )
-        s.add( setting.Str('labelbottom', '',
-                           descr='Bottom axis label text',
-                           usertext='Label bottom') )
 
         s.add( setting.Float('originleft', 0.,
                              descr='Fractional origin of left axis at its top',
@@ -315,13 +315,14 @@ class Ternary(NonOrthGraph):
 
     def _drawTickSet(self, painter, tickSetn, gridSetn,
                      tickbot, tickleft, tickright,
-                     labelSetn=None):
+                     tickLabelSetn=None, labelSetn=None):
         '''Draw a set of ticks (major or minor).
 
         tickSetn: tick setting to get line details
         gridSetn: setting for grid line (if any)
         tickXXX: tick arrays for each axis
-        labelSetn: setting used to label ticks, or None if minor ticks
+        tickLabelSetn: setting used to label ticks, or None if minor ticks
+        labelSetn: setting for labels, if any
         '''
 
         # this is mostly a lot of annoying trigonometry
@@ -380,6 +381,9 @@ class Ternary(NonOrthGraph):
             utils.plotLinesToPainter(painter, *gridleftline)
             utils.plotLinesToPainter(painter, *gridrightline)
 
+        # calculate deltas for ticks
+        bdelta = ldelta = rdelta = 0
+
         if not tickSetn.hide:
             # draw ticks themselves
             pen = tickSetn.makeQPen(painter)
@@ -389,12 +393,45 @@ class Ternary(NonOrthGraph):
             utils.plotLinesToPainter(painter, *tickleftline)
             utils.plotLinesToPainter(painter, *tickrightline)
 
-        if labelSetn is not None and not labelSetn.hide:
+            ldelta += tl*sin30
+            bdelta += tl*cos30
+            rdelta += tl
+
+        if tickLabelSetn is not None and not tickLabelSetn.hide:
             # compute the labels for the ticks
             tleftlabels = self._getLabels(tickleft*mv, '%Vg')
             trightlabels = self._getLabels(tickright*mv, '%Vg')
             tbotlabels = self._getLabels(tickbot*mv, '%Vg')
 
+            painter.setPen( tickLabelSetn.makeQPen() )
+            font = tickLabelSetn.makeQFont(painter)
+            painter.setFont(font)
+
+            fm = utils.FontMetrics(font, painter.device())
+            sp = fm.leading() + fm.descent()
+            off = tickLabelSetn.get('offset').convert(painter)
+
+            # draw tick labels in each direction
+            hlabbot = wlableft = wlabright = 0
+            for l, x, y in izip(tbotlabels, tickbotline[2], tickbotline[3]+off):
+                r = utils.Renderer(painter, font, x, y, l, 0, 1, 0)
+                bounds = r.render()
+                hlabbot = max(hlabbot, bounds[3]-bounds[1])
+            for l, x, y in izip(tleftlabels, tickleftline[2]-off-sp, tickleftline[3]):
+                r = utils.Renderer(painter, font, x, y, l, 1, 0, 0)
+                bounds = r.render()
+                wlableft = max(wlableft, bounds[2]-bounds[0])
+            for l, x, y in izip(trightlabels,tickrightline[2]+off+sp, tickrightline[3]):
+                r = utils.Renderer(painter, font, x, y, l, -1, 0, 0)
+                bounds = r.render()
+                wlabright = max(wlabright, bounds[2]-bounds[0])
+
+            bdelta += hlabbot+off+sp
+            ldelta += wlableft+off+sp
+            rdelta += wlabright+off+sp
+
+        if labelSetn is not None and not labelSetn.hide:
+            # draw label on edges (if requested)
             painter.setPen( labelSetn.makeQPen() )
             font = labelSetn.makeQFont(painter)
             painter.setFont(font)
@@ -403,16 +440,36 @@ class Ternary(NonOrthGraph):
             sp = fm.leading() + fm.descent()
             off = labelSetn.get('offset').convert(painter)
 
-            # draw tick labels in each direction
-            for l, x, y in izip(tbotlabels, tickbotline[2], tickbotline[3]+off):
-                r = utils.Renderer(painter, font, x, y, l, 0, 1, 0)
-                r.render()
-            for l, x, y in izip(tleftlabels, tickleftline[2]-off-sp, tickleftline[3]):
-                r = utils.Renderer(painter, font, x, y, l, 1, 0, 0)
-                r.render()
-            for l, x, y in izip(trightlabels,tickrightline[2]+off+sp, tickrightline[3]):
-                r = utils.Renderer(painter, font, x, y, l, -1, 0, 0)
-                r.render()
+            # bottom label
+            r = utils.Renderer(painter, font,
+                               self._box[0]+self._width/2,
+                               self._box[3] + bdelta + off,
+                               self.settings.labelbottom,
+                               0, 1)
+            r.render()
+
+            # left label - rotate frame before drawing so we can get
+            # the bounds correct
+            r = utils.Renderer(painter, font, 0, -sp,
+                               self.settings.labelleft,
+                               0, -1)
+            painter.save()
+            painter.translate(self._box[0]+self._width*0.25 - ldelta - off,
+                              0.5*(self._box[1]+self._box[3]))
+            painter.rotate(-60)
+            r.render()
+            painter.restore()
+
+            # right label
+            r = utils.Renderer(painter, font, 0, -sp,
+                               self.settings.labelright,
+                               0, -1)
+            painter.save()
+            painter.translate(self._box[0]+self._width*0.75 + ldelta + off,
+                              0.5*(self._box[1]+self._box[3]))
+            painter.rotate(60)
+            r.render()
+            painter.restore()
 
     def drawAxes(self, painter, bounds, datarange, outerbounds=None):
         '''Draw plot axes.'''
@@ -425,7 +482,8 @@ class Ternary(NonOrthGraph):
         # draw the major ticks
         self._drawTickSet(painter, s.MajorTicks, s.GridLines,
                           tbot.tickvals, tleft.tickvals, tright.tickvals,
-                          labelSetn=s.TickLabels)
+                          tickLabelSetn=s.TickLabels,
+                          labelSetn=s.Label)
 
         # now draw the minor ones
         self._drawTickSet(painter, s.MinorTicks, s.MinorGridLines,
