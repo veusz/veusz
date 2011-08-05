@@ -375,7 +375,6 @@ class Ternary(NonOrthGraph):
         if not gridSetn.hide:
             # draw the grid
             pen = gridSetn.makeQPen(painter)
-            pen.setCapStyle(qt4.Qt.FlatCap)
             painter.setPen(pen)
             utils.plotLinesToPainter(painter, *gridbotline)
             utils.plotLinesToPainter(painter, *gridleftline)
