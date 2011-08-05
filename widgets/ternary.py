@@ -373,14 +373,19 @@ class Ternary(NonOrthGraph):
         gridrightline = (x1[ne], y1[ne], gx[ne], gy[ne])
 
         if not gridSetn.hide:
-            painter.setPen( gridSetn.makeQPen(painter) )
+            # draw the grid
+            pen = gridSetn.makeQPen(painter)
+            pen.setCapStyle(qt4.Qt.FlatCap)
+            painter.setPen(pen)
             utils.plotLinesToPainter(painter, *gridbotline)
             utils.plotLinesToPainter(painter, *gridleftline)
             utils.plotLinesToPainter(painter, *gridrightline)
 
         if not tickSetn.hide:
             # draw ticks themselves
-            painter.setPen( tickSetn.makeQPen(painter) )
+            pen = tickSetn.makeQPen(painter)
+            pen.setCapStyle(qt4.Qt.FlatCap)
+            painter.setPen(pen)
             utils.plotLinesToPainter(painter, *tickbotline)
             utils.plotLinesToPainter(painter, *tickleftline)
             utils.plotLinesToPainter(painter, *tickrightline)
