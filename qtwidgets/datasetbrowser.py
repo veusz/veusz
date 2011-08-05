@@ -656,7 +656,7 @@ class DatasetBrowserPopup(DatasetBrowser):
         """Emit new dataset signal."""
         selected = self.navtree.selectionModel().currentIndex()
         if selected.isValid():
-            n = self.navtree.objFromIndex(selected)
+            n = self.navtree.model.objFromIndex(selected)
             if isinstance(n, DatasetNode):
                 self.emit(qt4.SIGNAL("newdataset"), n.data[0])
                 self.close()
