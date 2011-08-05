@@ -156,12 +156,12 @@ class Ternary(NonOrthGraph):
         mv = self._maxVal()
 
         # ranges for each coordinate
-        ra = [self._orgbottom*mv, (self._orgbottom+self._size)*mv]
+        ra = [self._orgbot*mv, (self._orgbot+self._size)*mv]
         rb = [self._orgleft*mv, (self._orgleft+self._size)*mv]
         rc = [self._orgright*mv, (self._orgright+self._size)*mv]
         ranges = [ra, rb, rc]
 
-        lookup = coord_lookup[s.coords]
+        lookup = coord_lookup[self.settings.coords]
         return ranges[lookup.index(0)], ranges[lookup.index(1)]
 
     def graphToPlotCoords(self, coorda, coordb):
