@@ -945,6 +945,7 @@ class ImportDialog(VeuszDialog):
         prefix, suffix = self.getPrefixSuffix(filename)
         try:
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+            self.document.suspendUpdates()
             importtab.doImport(self.document, filename, linked, encoding,
                                prefix, suffix)
             qt4.QApplication.restoreOverrideCursor()
@@ -954,6 +955,7 @@ class ImportDialog(VeuszDialog):
             # show exception dialog
             d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
             d.exec_()
+        self.document.enableUpdates()
 
     def retnDatasetInfo(self, dsnames):
         """Return a list of information for the dataset names given."""
