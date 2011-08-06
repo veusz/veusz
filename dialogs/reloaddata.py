@@ -105,6 +105,7 @@ class ReloadData(VeuszDialog):
         """Reload linked data. Show the user what was done."""
 
         text = ''
+        self.document.suspendUpdates()
         try:
             # try to reload the datasets
             datasets, errors = self.document.reloadLinkedDatasets(
@@ -135,5 +136,6 @@ class ReloadData(VeuszDialog):
         if text == '':
             text = 'Nothing to do. No linked datasets.'
 
+        self.document.enableUpdates()
         self.outputedit.setPlainText(text)
         
