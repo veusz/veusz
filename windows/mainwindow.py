@@ -122,7 +122,7 @@ class MainWindow(qt4.QMainWindow):
                                                     self.treeedit, self)
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.formatdock)
         self.datadock = DataNavigatorWindow(self.document, self, self)
-        self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.datadock)
+        self.addDockWidget(qt4.Qt.RightDockWidgetArea, self.datadock)
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
