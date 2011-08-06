@@ -924,7 +924,9 @@ class TreeEditDock(qt4.QDockWidget):
         minindex = min(indexes)
 
         # delete selected widget
+        self.document.suspendUpdates()
         self.document.applyOperation(document.OperationWidgetsDelete(widgets))
+        self.document.enableUpdates()
 
         # rebuild list
         widgetlist = []
