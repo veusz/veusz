@@ -1,0 +1,22 @@
+# Veusz saved document (version 1.12)
+# User: jss
+# Date: Sat, 06 Aug 2011 10:31:14 +0000
+
+ImportFileCSV(u'csv1.csv', linked=True)
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('xData', u'foo')
+Set('yData', u'test')
+Set('labels', u'aerg')
+To('..')
+To('..')
+To('..')
