@@ -899,9 +899,11 @@ class TreeEditDock(qt4.QDockWidget):
         data = document.getClipboardWidgetMime()
         if data:
             op = document.OperationWidgetPaste(self.selwidgets[0], data)
+            self.document.suspendUpdates()
             widgets = self.document.applyOperation(op)
             if widgets:
                 self.selectWidget(widgets[0])
+            self.document.enableUpdates()
 
     def slotWidgetDelete(self):
         """Delete the widget selected."""
@@ -952,7 +954,11 @@ class TreeEditDock(qt4.QDockWidget):
         index = self.treemodel.getWidgetIndex(widget)
         if index is not None:
             self.treeview.scrollTo(index)
-            self.treeview.setCurrentIndex(index)
+            self.treeview.selectionModel().select(
+                index, qt4.QItemSelectionModel.Clear |
+                qt4.QItemSelectionModel.Current |
+                qt4.QItemSelectionModel.Rows |
+                qt4.QItemSelectionModel.Select )
 
     def slotWidgetMove(self, direction):
         """Move the selected widget up/down in the hierarchy.
