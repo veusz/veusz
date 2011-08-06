@@ -210,7 +210,7 @@ class SettingsProxyMulti(SettingsProxy):
                 ops.append(document.OperationSettingSet(s, val))
         # apply all operations
         if ops:
-            self.document.applyOperation(
+            self.document.applyOperationAtomic(
                 document.OperationMultiple(ops, descr='change settings'))
 
     def onAction(self, action, console):
@@ -247,7 +247,7 @@ class SettingsProxyMulti(SettingsProxy):
         for s in self.settingsatlevel:
             setn = s.get(name)
             ops.append(document.OperationSettingSet(setn, setn.default))
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationMultiple(ops, descr="reset to default"))
 
 class PropertyList(qt4.QWidget):
@@ -850,7 +850,7 @@ class TreeEditDock(qt4.QDockWidget):
             name = None
         
         # make the new widget and update the document
-        w = self.document.applyOperation(
+        w = self.document.applyOperationAtomic(
             document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
                                         name=name) )
 
@@ -899,11 +899,9 @@ class TreeEditDock(qt4.QDockWidget):
         data = document.getClipboardWidgetMime()
         if data:
             op = document.OperationWidgetPaste(self.selwidgets[0], data)
-            self.document.suspendUpdates()
-            widgets = self.document.applyOperation(op)
+            widgets = self.document.applyOperationAtomic(op)
             if widgets:
                 self.selectWidget(widgets[0])
-            self.document.enableUpdates()
 
     def slotWidgetDelete(self):
         """Delete the widget selected."""
@@ -924,9 +922,8 @@ class TreeEditDock(qt4.QDockWidget):
         minindex = min(indexes)
 
         # delete selected widget
-        self.document.suspendUpdates()
-        self.document.applyOperation(document.OperationWidgetsDelete(widgets))
-        self.document.enableUpdates()
+        self.document.applyOperationAtomic(
+            document.OperationWidgetsDelete(widgets))
 
         # rebuild list
         widgetlist = []
@@ -975,7 +972,7 @@ class TreeEditDock(qt4.QDockWidget):
         w = self.selwidgets[0]
         
         # actually move the widget
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationWidgetMoveUpDown(w, direction) )
 
         # re-highlight moved widget
@@ -988,7 +985,8 @@ class TreeEditDock(qt4.QDockWidget):
         ops = [ document.OperationSettingSet(w.settings.get('hide'), hideshow)
                 for w in widgets ]
         descr = ('show', 'hide')[hideshow]
-        self.document.applyOperation(document.OperationMultiple(ops, descr=descr))
+        self.document.applyOperationAtomic(
+            document.OperationMultiple(ops, descr=descr))
 
     def checkWidgetSelected(self):
         """Check widget is selected."""
@@ -1186,7 +1184,7 @@ class SettingLabel(qt4.QWidget):
             def modify(widget=widget):
                 """Modify the setting for the widget given."""
                 wpath = widget + setpath
-                self.document.applyOperation(
+                self.document.applyOperationAtomic(
                     document.OperationSettingSet(wpath, self.setting.get()))
 
             menu.connect(action, qt4.SIGNAL('triggered()'), modify)
@@ -1242,26 +1240,26 @@ class SettingLabel(qt4.QWidget):
 
     def actionCopyTypedWidgets(self):
         """Copy setting to widgets of same type."""
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationSettingPropagate(self.setting) )
 
     def actionCopyTypedSiblings(self):
         """Copy setting to siblings of the same type."""
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationSettingPropagate(self.setting,
                                                root=self._clickwidget.parent,
                                                maxlevels=1) )
 
     def actionCopyTypedNamedWidgets(self):
         """Copy setting to widgets with the same name and type."""
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationSettingPropagate(self.setting,
                                                widgetname=
                                                self._clickwidget.name) )
 
     def actionUnlinkSetting(self):
         """Unlink the setting if it is a reference."""
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationSettingSet(self.setting, self.setting.get()) )
 
     def actionSetStyleSheet(self):
@@ -1270,7 +1268,7 @@ class SettingLabel(qt4.QWidget):
         # get name of stylesheet setting
         sslink = self.setting.getStylesheetLink()
         # apply operation to change it
-        self.document.applyOperation(
+        self.document.applyOperationAtomic(
             document.OperationMultiple(
                 [ document.OperationSettingSet(sslink, self.setting.get()),
                   document.OperationSettingSet(self.setting,

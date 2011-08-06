@@ -160,6 +160,18 @@ class Document( qt4.QObject ):
         self.setModified()
         return retn
 
+    def applyOperationAtomic(self, operation):
+        """Apply operation producing only one update signal."""
+        self.suspendUpdates()
+        retn = None
+        try:
+            retn = self.applyOperation(operation)
+        except:
+            self.enableUpdates()
+            raise
+        self.enableUpdates()
+        return retn
+
     def batchHistory(self, batch):
         """Enable/disable batch history mode.
         

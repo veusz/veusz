@@ -166,9 +166,8 @@ def runPlugin(window, doc, plugin, fields):
 
     resultstext = ''
     qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-    doc.suspendUpdates()
     try:
-        results = doc.applyOperation(op)
+        results = doc.applyOperationAtomic(op)
 
         # evaluate datasets using plugin to check it works
         if mode == 'dataset':
@@ -180,7 +179,6 @@ def runPlugin(window, doc, plugin, fields):
     except (plugins.ToolsPluginException, plugins.DatasetPluginException), ex:
         # unwind operations
         op.undo(doc)
-        doc.enableUpdates()
         qt4.QApplication.restoreOverrideCursor()
 
         qt4.QMessageBox.warning(
@@ -188,14 +186,12 @@ def runPlugin(window, doc, plugin, fields):
 
     except Exception:
         op.undo(doc)
-        doc.enableUpdates()
         qt4.QApplication.restoreOverrideCursor()
 
         # show exception dialog
         exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec_()
 
     else:
-        doc.enableUpdates()
         qt4.QApplication.restoreOverrideCursor()
 
     return resultstext
