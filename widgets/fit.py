@@ -307,7 +307,8 @@ class Fit(FunctionPlotter):
         operations.append( document.OperationSettingSet(s.get('outExpr'), expr) )
 
         # actually change all the settings
-        d.applyOperation( document.OperationMultiple(operations, descr='fit') )
+        d.applyOperation(
+            document.OperationMultiple(operations, descr='fit') )
     
     def evalfunc(self, params, xvals):
 

@@ -132,6 +132,9 @@ class ReloadData(VeuszDialog):
             text = 'Error reading file:\n' + unicode(e)
         except document.DescriptorError:
             text = 'Could not interpret descriptor. Reload failed.'
+        except:
+            self.document.enableUpdates()
+            raise
 
         if text == '':
             text = 'Nothing to do. No linked datasets.'

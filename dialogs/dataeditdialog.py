@@ -111,12 +111,12 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def removeRows(self, row, count):
         """Remove rows."""
-        self.document.applyOperationAtomic(
+        self.document.applyOperation(
             document.OperationDatasetDeleteRow(self.dsname, row, count))
 
     def insertRows(self, row, count):
         """Remove rows."""
-        self.document.applyOperationAtomic(
+        self.document.applyOperation(
             document.OperationDatasetInsertRow(self.dsname, row, count))
 
     def setData(self, index, value, role):
@@ -152,7 +152,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             document.OperationDatasetSetVal(self.dsname,
                                             ds.columns[column],
                                             row, val))
-        self.document.applyOperationAtomic(ops)
+        self.document.applyOperation(ops)
         return True
 
 class DatasetTableModel2D(qt4.QAbstractTableModel):
@@ -331,7 +331,7 @@ class DataEditDialog(VeuszDialog):
 
     def slotDatasetDelete(self):
         """Delete selected dataset."""
-        self.document.applyOperationAtomic(
+        self.document.applyOperation(
             document.OperationDatasetDelete(self.getSelectedDataset()) )
 
     def slotDatasetUnlink(self):
@@ -342,7 +342,7 @@ class DataEditDialog(VeuszDialog):
             op = document.OperationDatasetUnlinkFile(datasetname)
         else:
             op = document.OperationDatasetUnlinkRelation(datasetname)
-        self.document.applyOperationAtomic(op)
+        self.document.applyOperation(op)
 
     def slotDatasetDuplicate(self):
         """Duplicate selected dataset."""
@@ -356,7 +356,7 @@ class DataEditDialog(VeuszDialog):
                 newname = '%s_copy_%i' % (datasetname, index)
                 index += 1
 
-            self.document.applyOperationAtomic(
+            self.document.applyOperation(
                 document.OperationDatasetDuplicate(datasetname, newname))
 
     def slotDatasetImport(self):
@@ -439,5 +439,5 @@ class DataEditDialog(VeuszDialog):
                 count += 1
 
         # add new dataset
-        self.document.applyOperationAtomic(
+        self.document.applyOperation(
             document.OperationDatasetSet(name, ds))

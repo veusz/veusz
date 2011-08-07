@@ -167,7 +167,7 @@ def runPlugin(window, doc, plugin, fields):
     resultstext = ''
     qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
     try:
-        results = doc.applyOperationAtomic(op)
+        results = doc.applyOperation(op)
 
         # evaluate datasets using plugin to check it works
         if mode == 'dataset':

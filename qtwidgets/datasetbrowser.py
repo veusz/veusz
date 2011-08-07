@@ -466,11 +466,11 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.mainwindow.showDialog(d)
         def _unlink_all():
             """Unlink all datasets associated with file."""
-            self.doc.applyOperationAtomic(
+            self.doc.applyOperation(
                 document.OperationDatasetUnlinkByFile(filename))
         def _delete_all():
             """Delete all datasets associated with file."""
-            self.doc.applyOperationAtomic(
+            self.doc.applyOperation(
                 document.OperationDatasetDeleteByFile(filename))
 
         menu = qt4.QMenu()

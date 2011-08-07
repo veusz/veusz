@@ -85,7 +85,12 @@ class Document( qt4.QObject ):
             Document.pluginsloaded = True
 
         self.changeset = 0          # increased when the document changes
-        self.suspendupdates = False # if True then do not notify listeners of updates
+
+        # if set, do not notify listeners of updates
+        # wait under enableUpdates
+        self.suspendupdates = []
+
+        # default document locale
         self.locale = qt4.QLocale()
 
         self.clearHistory()
@@ -116,16 +121,17 @@ class Document( qt4.QObject ):
         self.historyredo = []
         
     def suspendUpdates(self):
-        """Holds sending update messages. This speeds up modification of the document."""
-        assert not self.suspendupdates
-        self.suspendchangeset = self.changeset
-        self.suspendupdates = True
+        """Holds sending update messages.
+        This speeds up modification of the document and prevents the document
+        from being updated on the screen."""
+        self.suspendupdates.append(self.changeset)
 
     def enableUpdates(self):
         """Reenables document updates."""
-        assert self.suspendupdates
-        self.suspendupdates = False
-        if self.suspendchangeset != self.changeset:
+        changeset = self.suspendupdates.pop()
+        if len(self.suspendupdates) == 0 and changeset != self.changeset:
+            # bump this up as some watchers might ignore this otherwise
+            self.changeset += 1
             self.setModified()
 
     def makeDefaultDoc(self):
@@ -145,9 +151,18 @@ class Document( qt4.QObject ):
         
         Operations represent atomic actions which can be done to the document
         and undone.
+
+        Updates are suspended during the operation.
         """
-        
-        retn = operation.do(self)
+
+        self.suspendUpdates()
+        try:
+            retn = operation.do(self)
+            self.changeset += 1
+        except:
+            self.enableUpdates()
+            raise
+        self.enableUpdates()
 
         if self.historybatch:
             # in batch mode, create an OperationMultiple for all changes
@@ -157,19 +172,6 @@ class Document( qt4.QObject ):
             self.historyundo = self.historyundo[-9:] + [operation]
         self.historyredo = []
 
-        self.setModified()
-        return retn
-
-    def applyOperationAtomic(self, operation):
-        """Apply operation producing only one update signal."""
-        self.suspendUpdates()
-        retn = None
-        try:
-            retn = self.applyOperation(operation)
-        except:
-            self.enableUpdates()
-            raise
-        self.enableUpdates()
         return retn
 
     def batchHistory(self, batch):
@@ -334,7 +336,7 @@ class Document( qt4.QObject ):
         self.modified = ismodified
         self.changeset += 1
 
-        if not self.suspendupdates:
+        if len(self.suspendupdates) == 0:
             self.emit( qt4.SIGNAL("sigModified"), ismodified )
 
     def isModified(self):

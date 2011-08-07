@@ -1501,11 +1501,9 @@ class OperationLoadStyleSheet(OperationMultiple):
         e = None
         try:
             interpreter.runFile( open(self.filename) )
-        except Exception, e:
-            pass
-        document.batchHistory(None)
-        if e:
-            raise e
+        except:
+            document.batchHistory(None)
+            raise
         
 class OperationLoadCustom(OperationLoadStyleSheet):
     descr = 'load custom definitions'
@@ -1532,7 +1530,7 @@ class OperationToolsPlugin(OperationMultiple):
         ifc = commandinterface.CommandInterface(document)
         try:
             self.plugin.apply(ifc, self.fields)
-        except Exception:
+        except:
             document.batchHistory(None)
             raise
         document.batchHistory(None)
