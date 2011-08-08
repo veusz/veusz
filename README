@@ -1,4 +1,4 @@
-Veusz 1.12
+Veusz 1.13
 ----------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -20,41 +20,31 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.12:
- * Multiple widgets can now be selected for editing properties
- * Add Edit->Select menu and context menu for above
- * Added context menu on dataset browser for filenames to reload,
-   delete or unlink all associated datasets
- * New tree-like dataset browsing widget is shown in data edit dialog
- * Importing 1D fits images is now supported
- * Date / time data has its own dataset type
- * The data edit dialog box can create or edit date/time data in
-   human-readable form
+Changes in 1.13:
+ * Graphs are rendered in separate threads for speed and a responsive
+   user interface
+ * A changed Graph is rendered immediately on document modification, 
+   improving latency
+ * A new ternary plot widget is included
+ * Size of pages can be modified individually in a document
+ * Binary data import added
+ * NPY/NPZ numpy data import added
 
 Minor improvements:
- * Add LaTeX commands \cdot, \nabla, \overline plus some arrows
- * Inform user in exception dialog if a new version is available
- * Add linevertbar and linehorzbar error bar styles
+ * Import dialog detects filename extension to show correct tab
+ * Polygon fill mode for non orthogonal plotting
+ * --plugin command line option added, for loading and testing plugins
+ * Plugin for swapping two colors in a plot
+ * Dataset navigator is moved to right of window by default
+ * Mac OS X binary now uses Python 2.7
+ * Import plugins can say which file extensions they support
+ * Import plugins can be "promoted" to their own tab on the import dialog
 
-Bug fixes:
- * Fix crash on filling filled error regions if no error bars
- * Remove grouping separator to numbers in locale as it creates
-   ambiguous lists of numbers
- * Undo works properly for boolean and integer settings
- * Prevent widgets getting the same names when dragging and dropping
- * Hidden plot widgets are ignored when calculating axis ranges
- * Combo boxes are now case sensitive when displaying matches with
-   previous text
- * Fix errors if plotting DatasetRange or Dataset1DPlugin datasets
-   against data with nan values
- * Fix division by zero in dataset preview
- * Do not leave settings pointing to deleted widgets after an undo
- * Fix errors when using super/subscripts of super/subscripts
- * Fix crash when giving positions of bar plot and labels
- * Do not allow dataset names to be invalid after remaining
- * Several EMF format bug fixes, including not showing hidden lines
-   and not connecting points making curves
- * Stop crash when contouring zero-sized datasets
+Bugs fixed:
+ * Images plotted when axes are inverted are inverted too
+ * Fixed crash when selecting datasets for plotting in the popup menu
+ * Picker crashes with a constant function
+ * 2D dataset creation using expressions fixed
 
 Features of package:
  * X-Y plots (with errorbars)
