@@ -561,6 +561,7 @@ class Image(plotters.GenericPlotter):
         yw = coordsy[0]-coordsy[1]
 
         # invert output drawing if axes go from positive->negative
+        # we only translate the coordinate system if this is the case
         xscale = yscale = 1
         if xw < 0:
             xscale = -1
@@ -572,7 +573,7 @@ class Image(plotters.GenericPlotter):
             xp = yp = 0
             painter.scale(xscale, yscale)
 
-        # draw image at origin of translated coordinate system
+        # draw image
         painter.drawImage(qt4.QRectF(xp, yp, abs(xw), abs(yw)), image)
 
         # restore painter if image was inverted
