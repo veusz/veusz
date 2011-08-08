@@ -555,11 +555,29 @@ class Image(plotters.GenericPlotter):
                                   qt4.Qt.IgnoreAspectRatio,
                                   qt4.Qt.SmoothTransformation )
 
-        # now draw pixmap
-        painter.drawImage( qt4.QRectF(coordsx[0], coordsy[1],
-                                      coordsx[1]-coordsx[0],
-                                      coordsy[0]-coordsy[1]),
-                           image )
+        # get position and size of output image
+        xp, yp = coordsx[0], coordsy[1]
+        xw = coordsx[1]-coordsx[0]
+        yw = coordsy[0]-coordsy[1]
+
+        # invert output drawing if axes go from positive->negative
+        xscale = yscale = 1
+        if xw < 0:
+            xscale = -1
+        if yw < 0:
+            yscale = -1
+        if xscale != 1 or yscale != 1:
+            painter.save()
+            painter.translate(xp, yp)
+            xp = yp = 0
+            painter.scale(xscale, yscale)
+
+        # draw image at origin of translated coordinate system
+        painter.drawImage(qt4.QRectF(xp, yp, abs(xw), abs(yw)), image)
+
+        # restore painter if image was inverted
+        if xscale != 1 or yscale != 1:
+            painter.restore()
 
 # allow the factory to instantiate an image
 document.thefactory.register( Image )
