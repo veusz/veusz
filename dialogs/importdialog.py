@@ -419,7 +419,7 @@ class ImportTabFITS(ImportTab):
         self.connect( self.fitshdulist, qt4.SIGNAL('itemSelectionChanged()'),
                       self.slotFitsUpdateCombos )
         self.connect( self.fitsdatasetname,
-                      qt4.SIGNAL('textChanged(const QString&)'),
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
                       self.dialog.enableDisableImport )
         self.connect( self.fitsdatacolumn,
                       qt4.SIGNAL('currentIndexChanged(int)'),
