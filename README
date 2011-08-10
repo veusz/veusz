@@ -29,6 +29,7 @@ Changes in 1.13:
  * Size of pages can be modified individually in a document
  * Binary data import added
  * NPY/NPZ numpy data import added
+ * Labels and tick labels on axes can be rotated at 45 deg intervals
 
 Minor improvements:
  * Import dialog detects filename extension to show correct tab
@@ -36,7 +37,7 @@ Minor improvements:
  * --plugin command line option added, for loading and testing plugins
  * Plugin for swapping two colors in a plot
  * Dataset navigator is moved to right of window by default
- * Mac OS X binary now uses Python 2.7
+ * Mac OS X binary release updated to Python 2.7.2
  * Import plugins can say which file extensions they support
  * Import plugins can be "promoted" to their own tab on the import dialog
 
