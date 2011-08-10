@@ -29,7 +29,8 @@ Changes in 1.13:
  * Size of pages can be modified individually in a document
  * Binary data import added
  * NPY/NPZ numpy data import added
- * Labels and tick labels on axes can be rotated at 45 deg intervals
+ * Axis and tick labels on axes can be rotated at 45 deg intervals
+ * Labels can be plotted next to points on non-orthogonal plots
 
 Minor improvements:
  * Import dialog detects filename extension to show correct tab
@@ -40,6 +41,8 @@ Minor improvements:
  * Mac OS X binary release updated to Python 2.7.2
  * Import plugins can say which file extensions they support
  * Import plugins can be "promoted" to their own tab on the import dialog
+ * ForceUpdate command added to embedding API, to force an update of
+   the displayed plot (useful if SetUpdateInterval is set to 0)
 
 Bugs fixed:
  * Images plotted when axes are inverted are inverted too

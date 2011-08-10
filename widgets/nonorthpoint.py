@@ -18,6 +18,7 @@
 
 """Non orthogonal point plotting."""
 
+import itertools
 import numpy as N
 
 import veusz.qtall as qt4
@@ -63,6 +64,9 @@ class NonOrthPoint(Widget):
                 'scalePoints', '',
                 descr = 'Scale size of plotted markers by this dataset or'
                 ' list of values', usertext='Scale markers') )
+        s.add( setting.DatasetOrStr('labels', '',
+                                    descr='Dataset or string to label points',
+                                    usertext='Labels', datatype='text') )
 
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
@@ -92,6 +96,10 @@ class NonOrthPoint(Widget):
                          descr = 'Fill settings (2)',
                          usertext = 'Area fill 2'),
                pixmap = 'settings_plotfillbelow' )
+        s.add( setting.PointLabel('Label',
+                                  descr = 'Label settings',
+                                  usertext='Label'),
+               pixmap = 'settings_axislabel' )
 
     def updateDataRanges(self, inrange):
         '''Extend inrange to range of data.'''
@@ -115,16 +123,46 @@ class NonOrthPoint(Widget):
                 lambda v1, v2: self.parent.graphToPlotCoords(v1, v2))
         return p.pickIndex(oldindex, direction, bounds)
 
-    def plotMarkers(self, painter, plta, pltb, scaling, clip):
+    def plotMarkers(self, painter, plta, pltb, scaling, markersize, clip):
         '''Draw markers in widget.'''
         s = self.settings
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
             painter.setBrush( s.MarkerFill.makeQBrushWHide() )
             painter.setPen( s.MarkerLine.makeQPenWHide(painter) )
-                
-            size = s.get('markerSize').convert(painter)
-            utils.plotMarkers(painter, plta, pltb, s.marker, size,
+
+            utils.plotMarkers(painter, plta, pltb, s.marker, markersize,
                               scaling=scaling, clip=clip)
+
+    def drawLabels(self, painter, xplotter, yplotter,
+                   textvals, markersize):
+        """Draw labels for the points.
+
+        This is copied from the xy (point) widget class, so it
+        probably should be somehow be shared.
+
+        FIXME: sane automatic placement of labels
+        """
+
+        s = self.settings
+        lab = s.get('Label')
+
+        # work out offset an alignment
+        deltax = markersize*1.5*{'left':-1, 'centre':0, 'right':1}[lab.posnHorz]
+        deltay = markersize*1.5*{'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
+        alignhorz = {'left':1, 'centre':0, 'right':-1}[lab.posnHorz]
+        alignvert = {'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
+
+        # make font and len
+        textpen = lab.makeQPen()
+        painter.setPen(textpen)
+        font = lab.makeQFont(painter)
+        angle = lab.angle
+
+        # iterate over each point and plot each label
+        for x, y, t in itertools.izip(xplotter+deltax, yplotter+deltay,
+                                      textvals):
+            utils.Renderer( painter, font, x, y, t,
+                            alignhorz, alignvert, angle ).render()
 
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
@@ -142,6 +180,7 @@ class NonOrthPoint(Widget):
         d1 = s.get('data1').getData(d)
         d2 = s.get('data2').getData(d)
         dscale = s.get('scalePoints').getData(d)
+        text = s.get('labels').getData(d, checknull=True)
         if not d1 or not d2:
             return
 
@@ -151,7 +190,8 @@ class NonOrthPoint(Widget):
         self.parent.setClip(painter, posn)
 
         # split parts separated by NaNs
-        for v1, v2, vs in document.generateValidDatasetParts(d1, d2, dscale):
+        for v1, v2, scalings, textitems in document.generateValidDatasetParts(
+            d1, d2, dscale, text):
             # convert data (chopping down length)
             v1d, v2d = v1.data, v2.data
             minlen = min(v1d.shape[0], v2d.shape[0])
@@ -180,10 +220,15 @@ class NonOrthPoint(Widget):
                 utils.plotClippedPolyline(painter, cliprect, pts)
 
             # markers
+            markersize = s.get('markerSize').convert(painter)
             pscale = None
-            if vs:
-                pscale = vs.data
-            self.plotMarkers(painter, px, py, pscale, cliprect)
+            if scalings:
+                pscale = scalings.data
+            self.plotMarkers(painter, px, py, pscale, markersize, cliprect)
+
+            # finally plot any labels
+            if textitems and not s.Label.hide:
+                self.drawLabels(painter, px, py, textitems, markersize)
 
 # allow the factory to instantiate plotter
 document.thefactory.register( NonOrthPoint )
