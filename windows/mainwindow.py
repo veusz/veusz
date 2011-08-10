@@ -1149,6 +1149,7 @@ class MainWindow(qt4.QMainWindow):
                                  filename,
                                  self.plot.getPageNumber(),
                                  bitmapdpi=setdb['export_DPI'],
+                                 pdfdpi=setdb['export_DPI_PDF'],
                                  antialias=setdb['export_antialias'],
                                  color=setdb['export_color'],
                                  quality=setdb['export_quality'],

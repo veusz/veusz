@@ -27,6 +27,7 @@ import veusz.qtall as qt4
 defaultValues = {
     # export options
     'export_DPI': 100,
+    'export_DPI_PDF': 150,
     'export_color': True,
     'export_antialias': True,
     'export_quality': 85,

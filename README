@@ -31,6 +31,7 @@ Changes in 1.13:
  * NPY/NPZ numpy data import added
  * Axis and tick labels on axes can be rotated at 45 deg intervals
  * Labels can be plotted next to points on non-orthogonal plots
+ * Add an option for DPI of output EPS and PDF files
 
 Minor improvements:
  * Import dialog detects filename extension to show correct tab

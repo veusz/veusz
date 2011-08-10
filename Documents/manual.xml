@@ -1205,17 +1205,27 @@ SetData('y', y)
 	<title><anchor id="Command.Export" />Export</title>
 
 	<para><command>Export(filename, color=True,
-      page=0)</command></para>
+      page=0 dpi=100,
+      antialias=True, quality=85, backcolor='#ffffff00',
+	pdfdpi=150)</command></para>
 
 	<para>Export the page given to the filename given. The
-      <command>filename</command> must end with the correct extension
-      to get the right sort of output file. Currrenly supported
-      extensions are '.eps', '.pdf', '.svg', '.jpg', '.jpeg', '.bmp'
-      and '.png'. If
-      <command>color</command> is True, then the output is in colour,
-      else greyscale. <command>page</command> is the page number of
-      the document to export (starting from 0 for the first
-      page!).</para>
+	<command>filename</command> must end with the correct
+	extension to get the right sort of output file. Currrenly
+	supported extensions are '.eps', '.pdf', '.svg', '.jpg',
+	'.jpeg', '.bmp' and '.png'. If <command>color</command> is
+	True, then the output is in colour, else
+	greyscale. <command>page</command> is the page number of the
+	document to export (starting from 0 for the first page!).
+	<command>dpi</command> is the number of dots per inch for
+	bitmap output files.  <command>antialias</command> -
+	antialiases output if True. <command>quality</command> is a
+	quality parameter for jpeg
+	output. <command>backcolor</command> is the background color
+	for bitmap files, which is a name or a #RRGGBBAA value (red,
+	green, blue, alpha). <command>pdfdpi</command> is the dpi to
+	use when exporting EPS or PDF files.
+</para>
       </section>
 
       <section>

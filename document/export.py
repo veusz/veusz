@@ -61,7 +61,8 @@ class Export(object):
         formats.sort()
 
     def __init__(self, doc, filename, pagenumber, color=True, bitmapdpi=100,
-                 antialias=True, quality=85, backcolor='#ffffff00'):
+                 antialias=True, quality=85, backcolor='#ffffff00',
+                 pdfdpi=150):
         """Initialise export class. Parameters are:
         doc: document to write
         filename: output filename
@@ -70,7 +71,9 @@ class Export(object):
         bitmapdpi: assume this dpi value when writing images
         antialias: antialias text and lines when writing bitmaps
         quality: compression factor for bitmaps
-        backcolor: background color default for bitmaps (default transparent)."""
+        backcolor: background color default for bitmaps (default transparent).
+        pdfdpi: dpi for pdf and eps files
+        """
 
         self.doc = doc
         self.filename = filename
@@ -80,7 +83,8 @@ class Export(object):
         self.antialias = antialias
         self.quality = quality
         self.backcolor = backcolor
-        
+        self.pdfdpi = pdfdpi
+
     def export(self):
         """Export the figure to the filename."""
 
@@ -182,6 +186,7 @@ class Export(object):
         printer.setOutputFormat(fmt)
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())
+        printer.setResolution(self.pdfdpi)
 
         # setup for printing
         printer.newPage()

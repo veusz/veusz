@@ -58,8 +58,14 @@ class PreferencesDialog(VeuszDialog):
                 str(setdb['toolbar_size'])))
 
         # set export dpi
+        dpis = ('75', '90', '100', '150', '200', '300')
+        self.exportDPI.addItems(dpis)
+        self.exportDPIPDF.addItems(dpis)
+
         self.exportDPI.setValidator( qt4.QIntValidator(10, 10000, self) )
         self.exportDPI.setEditText( str(setdb['export_DPI']) )
+        self.exportDPIPDF.setValidator( qt4.QIntValidator(10, 10000, self) )
+        self.exportDPIPDF.setEditText( str(setdb['export_DPI_PDF']) )
 
         # set export antialias
         self.exportAntialias.setChecked( setdb['export_antialias'])
@@ -203,13 +209,15 @@ class PreferencesDialog(VeuszDialog):
 
         # update dpi if possible
         # FIXME: requires some sort of visual notification of validator
-        try:
-            text = self.exportDPI.currentText()
-            valid = self.exportDPI.validator().validate(text, 0)[0]
-            if valid == qt4.QValidator.Acceptable:
-                setdb['export_DPI'] = int(text)
-        except ValueError:
-            pass
+        for cntrl, setn in ((self.exportDPI, 'export_DPI'),
+                            (self.exportDPIPDF, 'export_DPI_PDF')):
+            try:
+                text = cntrl.currentText()
+                valid = cntrl.validator().validate(text, 0)[0]
+                if valid == qt4.QValidator.Acceptable:
+                    setdb[setn] = int(text)
+            except ValueError:
+                pass
 
         # export settings
         setdb['export_antialias'] = self.exportAntialias.isChecked()

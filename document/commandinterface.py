@@ -750,7 +750,8 @@ class CommandInterface(qt4.QObject):
                                    range(self.document.getNumberPages()) )
             
     def Export(self, filename, color=True, page=0, dpi=100,
-               antialias=True, quality=85, backcolor='#ffffff00'):
+               antialias=True, quality=85, backcolor='#ffffff00',
+               pdfdpi=150):
         """Export plot to filename.
 
         color is True or False if color is requested in output file
@@ -760,11 +761,13 @@ class CommandInterface(qt4.QObject):
         quality is a quality parameter for jpeg output
         backcolor is the background color for bitmap files, which is a name or
          a #RRGGBBAA value (red, green, blue, alpha)
+        pdfdpi is the dpi to use when exporting eps or pdf files
         """
         
         e = export.Export(self.document, filename, page, color=color,
                           bitmapdpi=dpi, antialias=antialias,
-                          quality=quality, backcolor=backcolor)
+                          quality=quality, backcolor=backcolor,
+                          pdfdpi=pdfdpi)
         e.export()
 
     def Rename(self, widget, newname):
