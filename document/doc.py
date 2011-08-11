@@ -191,11 +191,17 @@ class Document( qt4.QObject ):
         
     def undoOperation(self):
         """Undo the previous operation."""
-        
+
         operation = self.historyundo.pop()
-        operation.undo(self)
+        self.suspendUpdates()
+        try:
+            operation.undo(self)
+            self.changeset += 1
+        except:
+            self.enableUpdates()
+            raise
+        self.enableUpdates()
         self.historyredo.append(operation)
-        self.setModified()
         
     def canUndo(self):
         """Returns True if previous operation can be removed."""
@@ -203,11 +209,8 @@ class Document( qt4.QObject ):
 
     def redoOperation(self):
         """Redo undone operations."""
-        
         operation = self.historyredo.pop()
-        operation.do(self)
-        self.historyundo.append(operation)
-        self.setModified()
+        return self.applyOperation(operation)
 
     def canRedo(self):
         """Returns True if previous operation can be redone."""
