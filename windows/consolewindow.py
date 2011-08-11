@@ -157,6 +157,7 @@ class ConsoleWindow(qt4.QDockWidget):
 
         # start an interpreter instance to the document
         self.interpreter = document.CommandInterpreter(thedocument)
+        self.document = thedocument
         # output from the interpreter goes to self.output_stdxxx
 
         self.con_stdout = _Writer(self.output_stdout)
@@ -238,14 +239,16 @@ class ConsoleWindow(qt4.QDockWidget):
         sys.stderr = _Writer(self.output_stderr)
 
         # catch any exceptions, printing problems to stderr
+        self.document.suspendUpdates()
         try:
             func()
-        except Exception, e:
+        except:
             # print out the backtrace to stderr
             i = sys.exc_info()
             backtrace = traceback.format_exception( *i )
             for l in backtrace:
                 sys.stderr.write(l)            
+        self.document.enableUpdates()
 
         # return output streams
         sys.stdout = temp_stdout

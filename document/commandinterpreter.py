@@ -152,15 +152,21 @@ class CommandInterpreter(object):
                 sys.stderr.write(l)
 
         else:
-            # execute the code
+            # block update signals from document while updating
+            self.document.suspendUpdates()
+
             try:
+                # execute the code
                 exec c in self.globals
-            except Exception:
+            except:
                 # print out the backtrace to stderr
                 i = sys.exc_info()
                 backtrace = traceback.format_exception( *i )
                 for l in backtrace:
-                    sys.stderr.write(l)            
+                    sys.stderr.write(l)
+
+            # reenable documents
+            self.document.enableUpdates()
 
         # return output streams
         sys.stdout = temp_stdout
