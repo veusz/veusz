@@ -405,7 +405,7 @@ class Document( qt4.QObject ):
         except KeyError:
             pass
         fileobj.write('# Date: %s\n\n' %
-                      time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                      time.strftime("%d/%m/%Y %H:%M:%S +0000",
                                     time.gmtime()) )
         
     def saveCustomDefinitions(self, fileobj):
