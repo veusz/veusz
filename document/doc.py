@@ -22,11 +22,9 @@
 """A class to represent Veusz documents, with dataset classes."""
 
 import os.path
-import time
-import random
-import math
 import re
 import traceback
+import datetime
 from collections import defaultdict
 
 import numpy as N
@@ -400,14 +398,9 @@ class Document( qt4.QObject ):
         """Write a header to a saved file of type."""
 
         fileobj.write('# Veusz %s (version %s)\n' % (type, utils.version()))
-        try:
-            fileobj.write('# User: %s\n' % os.environ['LOGNAME'] )
-        except KeyError:
-            pass
-        fileobj.write('# Date: %s\n\n' %
-                      time.strftime("%a, %d %b %Y %H:%M:%S +0000",
-                                    time.gmtime()) )
-        
+        fileobj.write('# Saved at %s\n\n' %
+                      datetime.datetime.utcnow().isoformat())
+
     def saveCustomDefinitions(self, fileobj):
         """Save custom constants and functions."""
 
