@@ -134,7 +134,9 @@ class ReadCSV(object):
             while prevcol >= 0:
                 n = self.colnames[prevcol]
                 if len(n) > 0 and n[-1] not in "+-":
-                    name = n + name
+                    # we add a \0 here so that there's no chance of the user
+                    # using this as a column name
+                    name = n + '\0' + name
                     return self.coltypes[prevcol], name
                 prevcol -= 1
             else:
@@ -253,14 +255,15 @@ class ReadCSV(object):
         for name in self.data.iterkeys():
 
             # skip error data here, they are used below
-            if name[-1] in '+-':
+            # error data name contains \0
+            if name.find('\0') >= 0:
                 continue
 
             dsnames.append(name)
 
             # get data and errors (if any)
             data = []
-            for k in (name, name+'+-', name+'+', name+'-'):
+            for k in (name, name+'\0+-', name+'\0+', name+'\0-'):
                 data.append( self.data.get(k, None) )
 
             # make them have a maximum length by adding NaNs
