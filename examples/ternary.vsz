@@ -1,8 +1,6 @@
-# Veusz saved document (version 1.12)
-# User: jss
-# Date: Wed, 10 Aug 2011 19:27:29 +0000
+# Veusz saved document (version 1.12.99)
+# Saved at 2011-08-14T11:00:24.842710
 
-AddImportPath(u'/home/jss/code/veusz-git/veusz/examples')
 ImportString('a1(numeric)','''
 3.785032e+01
 2.887586e+01
@@ -316,7 +314,7 @@ ImportString('b2(numeric)','''
 1.461585e+01
 ''')
 ImportString(u'label(text)',r'''
-u'Silly putty'
+u'Nougat'
 u'Chocolate'
 ''')
 ImportString(u'lx(numeric)','''
