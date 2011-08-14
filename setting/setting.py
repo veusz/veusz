@@ -1206,6 +1206,7 @@ class DatasetOrFloatList(Dataset):
         if isinstance(self.val, basestring):
             return self.val
         else:
+            # join based on , or ; depending on decimal point
             join = ', '
             if uilocale.decimalPoint() == qt4.QChar(','):
                 join = '; '
@@ -1213,6 +1214,9 @@ class DatasetOrFloatList(Dataset):
                                 for x in self.val ] )
 
     def fromText(self, text):
+        """Convert from text."""
+
+        # split based on , or ; depending on decimal point
         splitre = r'[\t\n, ]+'
         if uilocale.decimalPoint() == qt4.QChar(','):
             splitre = r'[\t\n; ]+'
@@ -1245,6 +1249,10 @@ class DatasetOrFloatList(Dataset):
         """Is this setting a dataset?"""
         return (isinstance(self.val, basestring) and
                 doc.data.get(self.val))
+
+    def isEmpty(self):
+        """Is this unset?"""
+        return self.val == []
 
     def getData(self, doc):
         """Return veusz dataset"""

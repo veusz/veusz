@@ -348,13 +348,26 @@ class PointPlotter(GenericPlotter):
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
     def updateAxisRange(self, axis, depname, axrange):
+        """Compute the effect of data on the axis range."""
         dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
-        data = self.settings.get(dataname).getData(self.document)
+        dsetn = self.settings.get(dataname)
+        data = dsetn.getData(self.document)
+
         if data:
             drange = data.getRange()
             if drange:
                 axrange[0] = min(axrange[0], drange[0])
                 axrange[1] = max(axrange[1], drange[1])
+        elif dsetn.isEmpty():
+            # no valid dataset.
+            # check if there a valid dataset for the other axis.
+            # if there is, treat this as a row number
+            dataname = {'sy': 'xData', 'sx': 'yData'}[depname]
+            data = self.settings.get(dataname).getData(self.document)
+            if data:
+                length = data.data.shape[0]
+                axrange[0] = min(axrange[0], 1)
+                axrange[1] = max(axrange[1], length)
 
     def _getLinePoints( self, xvals, yvals, posn, xdata, ydata ):
         """Get the points corresponding to the line connecting the points."""
@@ -646,7 +659,18 @@ class PointPlotter(GenericPlotter):
         text = s.get('labels').getData(doc, checknull=True)
         scalepoints = s.get('scalePoints').getData(doc)
 
+        # if a missing dataset, make a fake dataset for the second one
+        # based on a row number
+        if xv and not yv and s.get('yData').isEmpty():
+            # use index for y data
+            length = xv.data.shape[0]
+            yv = document.DatasetRange(length, (1,length))
+        elif yv and not xv and s.get('xData').isEmpty():
+            # use index for x data
+            length = yv.data.shape[0]
+            xv = document.DatasetRange(length, (1,length))
         if not xv or not yv:
+            # no valid dataset, so exit
             return
 
         # if text entered, then multiply up to get same number of values
@@ -658,6 +682,7 @@ class PointPlotter(GenericPlotter):
         # get axes widgets
         axes = self._fetchAxes()
         if not axes:
+            # no valid axes, so exit
             return
 
         # clip data within bounds of plotter
