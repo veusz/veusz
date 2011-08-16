@@ -1376,11 +1376,12 @@ def getSpacing(data):
     (i.e. steps are not all multiples of some mininimum)
     """
 
-    uniquesorted = N.unique1d(data)
+    uniquesorted = N.unique(data)
+
     sigfactor = (uniquesorted[-1]-uniquesorted[0])*1e-13
 
     # differences between elements
-    deltas = N.unique1d( N.ediff1d(uniquesorted) )
+    deltas = N.unique( N.ediff1d(uniquesorted) )
 
     mindelta = None
     for delta in deltas:
