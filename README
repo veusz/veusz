@@ -44,12 +44,15 @@ Minor improvements:
  * Import plugins can be "promoted" to their own tab on the import dialog
  * ForceUpdate command added to embedding API, to force an update of
    the displayed plot (useful if SetUpdateInterval is set to 0)
+ * X or Y dataset can be left blank in plotter to plot by row number
 
 Bugs fixed:
  * Images plotted when axes are inverted are inverted too
  * Fixed crash when selecting datasets for plotting in the popup menu
  * Picker crashes with a constant function
  * 2D dataset creation using expressions fixed
+ * CSV reader treated dataset names ending in + or - incorrectly
+ * unique1d function no longer available in numpy
 
 Features of package:
  * X-Y plots (with errorbars)
