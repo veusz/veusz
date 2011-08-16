@@ -1,49 +1,34 @@
-# This is a pyinstaller script file
-
-# to make the distribution you need to create a directory, e.g. temp
-# add a symlink called veusz inside temp, pointing to the veusz directory
-
-# you will need to edit the paths below to get the correct input directory
-
-# $Id: veusz_pyinst.spec 607 2007-05-20 10:23:15Z jeremysanders $
+# -*- mode: python -*-
 
 from glob import glob
 import os.path
-import sys
 
-# platform specific stuff
-if sys.platform == 'win32':
-    # windows
-    name = r'buildveusz_pyinst\veusz.exe'
-    thisdir = r'c:\src\veusz'
-    console = 0
-    aargs = {'icon': os.path.join(thisdir,'windows/icons/veusz.ico')}
-    upx = False
-    strip = False
-else:
-    # unix
-    name = 'buildveusz_pyinst/veusz'
-    thisdir = '/home/jss/veusz.qt4'
-    console = 1
-    aargs = {}
-    upx = False
-
-print name
-
-a = Analysis([os.path.join(HOMEPATH,'support/_mountzlib.py'),
-              os.path.join(HOMEPATH,'support/useUnicode.py'),
-              'veusz_main.py'],
-             pathex=[thisdir, os.path.join(thisdir, 'temp')],
+a = Analysis([os.path.join(HOMEPATH,'support\\_mountzlib.py'), os.path.join(CONFIGDIR,'support\\useUnicode.py'), 'veusz_main.py'],
+             pathex=['C:\\src\\veusz-msvc'],
              excludes=['Tkinter'])
+
+# get rid of debugging binaries
+a.binaries = [b for b in a.binaries if b[0][-6:] != 'd4.dll']
+
+# don't want kernel32, etc
+a.binaries = [b for b in a.binaries if not (os.path.basename(b[0]) in
+              ('kernel32.dll', 'Qt3Support4.dll',
+               'QtNetwork4.dll', 'QtOpenGL4.dll', 'QtSql4.dll'))]
+
+# remove unnedded plugins
+for pdir in ('accessible', 'codecs', 'graphicssystems'):
+    a.binaries = [b for b in a.binaries if b[1].find(os.path.join('plugins', pdir)) == -1]
+
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=1,
-          name=name,
+          name=os.path.join('buildveusz_pyinst', 'veusz.exe'),
           debug=False,
-          strip=strip,
-          upx=upx,
-          console=console, **aargs)
+          strip=None,
+          upx=False,
+          console=False,
+          icon='windows\\icons\\veusz.ico')
 
 # add necessary documentation, licence
 binaries = a.binaries
@@ -59,15 +44,10 @@ for f in ( glob('windows/icons/*.png') + glob('windows/icons/*.ico') +
            glob('dialogs/*.ui') + glob('widgets/data/*.dat')):
     binaries.append( (f, f, 'DATA') )
 
-
-# fix this to remove debugging dlls (and maybe mng)
-ti = Tree(os.path.join(sys.prefix, 'Lib', 'site-packages', 'PyQt4', 'plugins',
-                       'imageformats'), 'imageformats', excludes=['*.a'])
-tic = Tree(os.path.join(sys.prefix, 'Lib', 'site-packages', 'PyQt4', 'plugins',
-                       'iconengines'), 'iconengines', excludes=['*.a'])
-
 coll = COLLECT( exe,
-                a.binaries, ti, tic,
-                strip=strip,
-                upx=upx,
-                name='distveusz_main' )
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=None,
+               upx=False,
+               name='distveusz_main')
