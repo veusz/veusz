@@ -1,3 +1,37 @@
+Changes in 1.13:
+ * Graphs are rendered in separate threads for speed and a responsive
+   user interface
+ * A changed Graph is rendered immediately on document modification,
+   improving latency
+ * A new ternary plot widget is included
+ * Size of pages can be modified individually in a document
+ * Binary data import added
+ * NPY/NPZ numpy data import added
+ * Axis and tick labels on axes can be rotated at 45 deg intervals
+ * Labels can be plotted next to points on non-orthogonal plots
+ * Add an option for DPI of output EPS and PDF files
+
+Minor improvements:
+ * Import dialog detects filename extension to show correct tab
+ * Polygon fill mode for non orthogonal plotting
+ * --plugin command line option added, for loading and testing plugins
+ * Plugin for swapping two colors in a plot
+ * Dataset navigator is moved to right of window by default
+ * Mac OS X binary release updated to Python 2.7.2
+ * Import plugins can say which file extensions they support
+ * Import plugins can be "promoted" to their own tab on the import dialog
+ * ForceUpdate command added to embedding API, to force an update of
+   the displayed plot (useful if SetUpdateInterval is set to 0)
+ * X or Y dataset can be left blank in plotter to plot by row number
+
+Bugs fixed:
+ * Images plotted when axes are inverted are inverted too
+ * Fixed crash when selecting datasets for plotting in the popup menu
+ * Picker crashes with a constant function
+ * 2D dataset creation using expressions fixed
+ * CSV reader treated dataset names ending in + or - incorrectly
+ * unique1d function no longer available in numpy
+
 Changes in 1.12:
  * Multiple widgets can now be selected for editing properties
  * Add Edit->Select menu and context menu for above

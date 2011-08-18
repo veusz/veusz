@@ -23,7 +23,7 @@ external sources such as internet sockets or other programs.
 Changes in 1.13:
  * Graphs are rendered in separate threads for speed and a responsive
    user interface
- * A changed Graph is rendered immediately on document modification, 
+ * A changed Graph is rendered immediately on document modification,
    improving latency
  * A new ternary plot widget is included
  * Size of pages can be modified individually in a document
@@ -64,6 +64,7 @@ Features of package:
  * Vector field plots
  * Box plots
  * Polar plots
+ * Ternary plots
  * Plotting dates
  * Fitting functions to data
  * Stacked plots and arrays of plots
@@ -75,7 +76,7 @@ Features of package:
  * Scripting interface
  * Dataset creation/manipulation
  * Embed Veusz within other programs
- * Text, CSV, FITS and user-plugin importing
+ * Text, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
  * Data can be captured from external sources
  * User defined functions, constants and can import external Python functions
  * Plugin interface to allow user to write or load code to
@@ -83,6 +84,7 @@ Features of package:
     - make new datasets, optionally linked to existing datasets
     - arbitrarily manipulate the document
  * Data picker
+ * Multithreaded rendering
 
 Requirements for source install:
  Python (2.4 or greater required)
