@@ -19,10 +19,11 @@
     </copyright>
 
     <legalnotice>
-      <para>This document is released under the GNU Free Documention
-      Licence, Version 1.1 or any later version published by the Free
-      Software Foundation; with no Invariant Sections, no Front-Cover
-      Texts. and no Back-Cover Texts.</para>
+      <para>
+	This document is licensed under the GNU GNU General Public
+	License, version 2 or greater. Please see the file COPYING for
+	details, or see <ulink
+	url="http://www.gnu.org/licenses/gpl-2.0.html" />.</para>
     </legalnotice>
   </bookinfo>
 
@@ -333,6 +334,19 @@
 		of points in a dataset.</para>
 	      </listitem>
 
+	      <listitem>
+		<para><command>polar</command> - plot polar data or
+		functions. This is a non-orthogonal plot and is placed
+		directly on the page rather than in a graph.</para>
+	      </listitem>
+
+	      <listitem>
+		<para><command>ternary</command> - plot data of three
+		variables which add up to 100 per cent.This is a
+		non-orthogonal plot and is placed directly on the page
+		rather than in a graph.</para>
+	      </listitem>
+
 	    </orderedlist>
 
 	  </listitem>
@@ -447,7 +461,8 @@
 	appropriate date formatting is used so that the interval shown
 	is correct. A format can be given for an axis in the axis
 	number formatting panel can be given to explicitly choose a
-	format.</para>
+	format. Some examples are given in the drop down axis
+	menu. Hold the mouse over the example for detail.</para>
 
 	<para>C-style number formatting is used with a few Veusz
 	specific extensions. Text can be mixed with format specifiers,
@@ -552,6 +567,12 @@
       history like many Unix shells. Press the up and down cursor keys
       to browse through the history. Command line completion is not
       available yet!</para>
+
+      <para>In recent versions there also exists a dataset browsing
+      window, by default to the right of the screen. This window
+      allows you to view the datasets currently loaded, their
+      dimensions and type. Hovering a mouse over the size of the
+      dataset will give you a preview of the data.</para>
     </section>
 
     <section>
@@ -646,15 +667,15 @@
     <title>Reading data</title>
 
     <para>Currently Veusz supports reading data from a text file, FITS
-    format files or from CSV files. Reading data is supported using
-    the "Data, Import" dialog, or using
-    the <link linkend="Command.ImportFile">ImportFile</link>
+    format files, CSV files, QDP files, binary files and NPY/NPZ
+    files. Reading data is supported using the "Data, Import" dialog,
+    or using the <link linkend="Command.ImportFile">ImportFile</link>
     and <link linkend="Command.ImportString">ImportString</link>
     commands which read data from files or an existing Python string
     (allowing data to be embedded in a Python script).  In addition,
     the user can load or write plugins in Python which load data into
-    Veusz in an arbitrary format. At the moment QDP files are
-    supported with this method.
+    Veusz in an arbitrary format. At the moment QDP, binary and
+    NPY/NPZ files are supported with this method.
     </para>
     
       <mediaobject>
@@ -986,6 +1007,7 @@ SetData('y', y)
       dataset to an expression, so if the expression changes the
       dataset changes with it, like in a spreadsheet.</para>
       </section>
+
       
       <section>
 	<title>Splitting data</title>
@@ -1017,7 +1039,19 @@ SetData('y', y)
 	box.</para>
       </section>
 
+      <section>
+	<title>Dataset plugins</title>
+	<para>In addition to creating datasets based on expressions, a
+	variety of dataset plugins exist, which make certain
+	operations on datasets much more convenient. See the Data,
+	Operations menu for a list of the default plugins. The user
+	can easily create new plugins. See
+	<ulink
+	url="http://barmag.net/veusz-wiki/DatasetPlugins" /> for details.
+	</para>
       </section>
+
+    </section>
 
   </chapter>
 
