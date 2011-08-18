@@ -128,6 +128,7 @@ class PaintHelper(object):
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
         p.pagesize = self.pagesize
+        p.maxsize = max(*self.pagesize)
         p.dpi = self.dpi[1]
 
         if clip:
