@@ -355,7 +355,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         hdr = self.header()
         hdr.setStretchLastSection(False)
         hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
-        for col in xrange(1, 4):
+        for col in xrange(1, 3):
             hdr.setResizeMode(col, qt4.QHeaderView.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
