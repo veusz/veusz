@@ -308,6 +308,14 @@ class PlotWindow( qt4.QGraphicsView ):
         self.rendercontrol.exitThreads()
         qt4.QGraphicsView.hideEvent(self, event)
 
+    def sizeHint(self):
+        """Return size hint for window."""
+        p = self.pixmapitem.pixmap()
+        if p.width() <= 1 and p.height() <= 1:
+            # if the document has been uninitialized, get the doc size
+            return qt4.QSize(*self.document.docSize())
+        return p.size()
+
     def showToolbar(self, show=True):
         """Show or hide toolbar"""
         self.viewtoolbar.setVisible(show)
