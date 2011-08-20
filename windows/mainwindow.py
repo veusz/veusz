@@ -745,6 +745,9 @@ class MainWindow(qt4.QMainWindow):
         data = str(self.saveState())
         setdb['geometry_mainwindowstate'] = data
 
+        # save current setting db
+        setdb.writeSettings()
+
         event.accept()
 
     def setupWindowGeometry(self):
