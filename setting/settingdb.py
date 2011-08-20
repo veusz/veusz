@@ -19,7 +19,6 @@
 """A database for default values of settings."""
 
 import sys
-import atexit
 
 import veusz.qtall as qt4
 
@@ -147,7 +146,7 @@ class _SettingDB(object):
     def writeSettings(self):
         """Write the settings using QSettings.
 
-        This is called by the atexit handler below
+        This is called by the mainwindow on close
         """
 
         s = qt4.QSettings(self.domain, self.product)
@@ -196,9 +195,6 @@ settingdb = _SettingDB()
 # a normal dict for non-persistent settings
 # (e.g. disable safe mode)
 transient_settings = {}
-
-# write out settings at exit
-atexit.register(settingdb.writeSettings)
 
 def updateUILocale():
     """Update locale to one given in preferences."""
