@@ -219,7 +219,7 @@ class Page(widget.Widget):
         painthelper.axisplottermap.update(axisdependhelper.axis_plotter_map)
 
         if self.settings.hide:
-            bounds = self.computeBounds(parentposn, painter)
+            bounds = self.computeBounds(parentposn, painthelper)
             return bounds
 
         clip = qt4.QRectF( qt4.QPointF(parentposn[0], parentposn[1]),
