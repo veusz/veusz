@@ -585,6 +585,10 @@ class DatasetBase(object):
         """Is it possible to rename this dataset?"""
         return self.linked is None
 
+    def datasetAsText(self, fmt='%g', join='\t'):
+        """Return dataset as text (for use by user)."""
+        return ''
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -642,13 +646,22 @@ class Dataset2D(DatasetBase):
         fileobj.write("ImportString2D(%s, '''\n" % repr(name))
         fileobj.write("xrange %e %e\n" % self.xrange)
         fileobj.write("yrange %e %e\n" % self.yrange)
+        fileobj.write(self.datasetAsText(fmt='%e', join=' '))
+        fileobj.write("''')\n")
+
+    def datasetAsText(self, fmt='%g', join='\t'):
+        """Return dataset as text.
+        fmt is the format specifier to use
+        join is the string to separate the items
+        """
+        format = ((fmt+join) * (self.data.shape[1]-1)) + fmt + '\n'
 
         # write rows backwards, so lowest y comes first
+        lines = []
         for row in self.data[::-1]:
-            s = ('%e ' * len(row)) % tuple(row)
-            fileobj.write("%s\n" % (s[:-1],))
-
-        fileobj.write("''')\n")
+            line = format % tuple(row)
+            lines.append(line)
+        return ''.join(lines)
 
     def userSize(self):
         """Return dimensions of dataset for user."""
@@ -834,28 +847,35 @@ class Dataset(DatasetBase):
             return
 
         # build up descriptor
-        datasets = [self.data]
-
         descriptor = datasetNameToDescriptorName(name) + '(numeric)'
         if self.serr is not None:
             descriptor += ',+-'
-            datasets.append(self.serr)
         if self.perr is not None:
             descriptor += ',+'
-            datasets.append(self.perr)
         if self.nerr is not None:
             descriptor += ',-'
-            datasets.append(self.nerr)
 
         fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
-
-        # write line line-by-line
-        format = '%e ' * len(datasets)
-        format = format[:-1] + '\n'
-        for line in izip( *datasets ):
-            fileobj.write( format % line )
-
+        fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
         fileobj.write( "''')\n" )
+
+    def datasetAsText(self, fmt='%g', join='\t'):
+        """Return data as text."""
+
+        # work out which columns to write
+        cols = []
+        for c in (self.data, self.serr, self.perr, self.nerr):
+            if c is not None:
+                cols.append(c)
+
+        # format statement
+        format = (fmt + join) * (len(cols)-1) + fmt + '\n'
+
+        # do the conversion
+        lines = []
+        for line in izip(*cols):
+            lines.append( format % line )
+        return ''.join(lines)
 
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
@@ -931,9 +951,14 @@ class DatasetDateTime(Dataset):
 
         descriptor = datasetNameToDescriptorName(name) + '(date)'
         fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
-        for val in self.data:
-            fileobj.write( utils.dateFloatToString(val) + '\n' )
+        fileobj.write( self.datasetAsText() )
         fileobj.write( "''')\n" )
+
+    def datasetAsText(self, fmt=None, join=None):
+        """Return data as text."""
+        lines = [ utils.dateFloatToString(val) for val in self.data ]
+        lines.append('')
+        return '\n'.join(lines)
 
     def returnCopy(self):
         """Returns version of dataset with no linking."""
@@ -995,6 +1020,12 @@ class DatasetText(DatasetBase):
             r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
             fileobj.write(r)
         fileobj.write( "''')\n" )
+
+    def datasetAsText(self, fmt=None, join=None):
+        """Return data as text."""
+        lines = list(self.data)
+        lines.append('')
+        return '\n'.join(lines)
 
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.

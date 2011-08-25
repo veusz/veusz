@@ -432,6 +432,10 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         def _unlink_relation():
             """Unlink dataset from relation."""
             self.doc.applyOperation(document.OperationDatasetUnlinkRelation(dsname))
+        def _copy():
+            """Copy data to clipboard."""
+            text = self.doc.data[dsname].datasetAsText()
+            qt4.QApplication.clipboard().setText(text)
 
         menu = qt4.QMenu()
         if type(dataset) in dataeditdialog.recreate_register:
@@ -446,9 +450,12 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             else:
                 menu.addAction("Unlink relation", _unlink_relation)
 
+        menu.addAction("Copy", _copy)
+
         useasmenu = menu.addMenu("Use as")
         if dataset is not None:
             self.getMenuUseAs(useasmenu, dataset)
+
         return menu
 
     def filenameContextMenu(self, node):
