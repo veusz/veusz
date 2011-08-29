@@ -27,7 +27,12 @@ except ImportError:
     slowfuncs = True
     from slowfuncs import slowNumpyToQImage
 
-# default colormaps used by widgets
+# Default colormaps used by widgets.
+# Each item in this dict is a colormap entry, with the key the name.
+# The values in the dict are tuples of (B, G, R, alpha).
+# B, G, R and alpha go from 0 to 255
+# Colors are linearly interpolated in this space.
+
 defaultcolormaps = {
     'heat': (
         (0,   0,   0,   255),
@@ -82,11 +87,26 @@ defaultcolormaps = {
         (0,   0,   0,   255),
         (0,   0,   0,   0),
         ),
+    'royal': (
+        (0,   0,   0,   255),
+        (128, 0,   0,   255),
+        (255, 0,   128, 255),
+        (0,   255, 255, 255),
+        (255, 255, 255, 255),
+        ),
+    'complement': (
+        (0,   0,   0,   255),
+        (0,   255, 0,   255),
+        (255, 0,   255, 255),
+        (0,   0,   255, 255),
+        (0,   255, 255, 255),
+        (255, 255, 255, 255),
+        ),
     }
 
 def applyScaling(data, mode, minval, maxval):
     """Apply a scaling transformation on the data.
-
+    data is a numpy array
     mode is one of 'linear', 'sqrt', 'log', or 'squared'
     minval is the minimum value of the scale
     maxval is the maximum value of the scale
