@@ -249,6 +249,10 @@ class PointPlotter(GenericPlotter):
                 'scalePoints', '',
                 descr = 'Scale size of plotted markers by this dataset or'
                 ' list of values', usertext='Scale markers'), 6 )
+        s.add( setting.DatasetOrFloatList(
+                'colorPoints', '',
+                descr = 'Use color value (0-1) in dataset to paint points',
+                usertext='Color markers'), 7 )
 
         s.add( setting.DatasetOrFloatList(
                 'yData', 'y',

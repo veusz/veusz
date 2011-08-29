@@ -26,6 +26,7 @@
 
 from itertools import izip
 import re
+import numpy as N
 
 import veusz.qtall as qt4
 
@@ -1595,3 +1596,47 @@ class ErrorStyle(Choice):
         cls._icons = []
         for errstyle in cls._errorstyles:
             cls._icons.append( utils.getIcon('error_%s' % errstyle) )
+
+class Colormap(Choice):
+    """Give the user a preview of colormaps.
+
+    Based on Choice to make life easier
+    """
+
+    _icons = {}
+
+    size = (32, 12)
+
+    def __init__(self, setn, document, parent):
+        names = sorted(document.colormaps.keys())
+        icons = Colormap._generateIcons(document, names)
+        setting.controls.Choice.__init__(self, setn, True,
+                                         names, parent,
+                                         icons=icons)
+        self.setIconSize( qt4.QSize(*self.size) )
+
+    @classmethod
+    def _generateIcons(kls, document, names):
+        """Generate a list of icons for drop down menu."""
+
+        # create a fake dataset smoothly varying from 0 to size[0]-1
+        size = kls.size
+        fakedataset = N.fromfunction(lambda x, y: y, (size[1], size[0]))
+
+        # keep track of icons to return
+        retn = []
+
+        # iterate over colour maps
+        for name in names:
+            val = document.colormaps[name]
+            if val in kls._icons:
+                retn.append( kls._icons[val] )
+            else:
+                # generate icon
+                image = utils.applyColorMap(val, 'linear',
+                                            fakedataset,
+                                            0., size[0]-1., 0)
+                icon = qt4.QIcon( qt4.QPixmap.fromImage(image) )
+                kls._icons[val] = icon
+                retn.append(icon)
+        return retn

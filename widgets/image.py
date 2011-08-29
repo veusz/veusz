@@ -18,10 +18,6 @@
 
 """Image plotting from 2d datasets."""
 
-import string
-import os.path
-import struct
-
 import veusz.qtall as qt4
 import numpy as N
 
@@ -31,119 +27,9 @@ import veusz.utils as utils
 
 import plotters
 
-slowfuncs = False
-try:
-    from veusz.helpers.qtloops import numpyToQImage, applyImageTransparancy
-except ImportError:
-    slowfuncs = True
-
-def applyScaling(data, mode, minval, maxval):
-    """Apply a scaling transformation on the data.
-
-    mode is one of 'linear', 'sqrt', 'log', or 'squared'
-    minval is the minimum value of the scale
-    maxval is the maximum value of the scale
-
-    returns transformed data, valid between 0 and 1
-    """
-
-    # catch naughty people by hardcoding a range
-    if minval == maxval:
-        minval, maxval = 0., 1.
-        
-    if mode == 'linear':
-        # linear scaling
-        data = (data - minval) / (maxval - minval)
-
-    elif mode == 'sqrt':
-        # sqrt scaling
-        # translate into fractions of range
-        data = (data - minval) / (maxval - minval)
-        # clip off any bad sqrts
-        data[data < 0.] = 0.
-        # actually do the sqrt transform
-        data = N.sqrt(data)
-
-    elif mode == 'log':
-        # log scaling of image
-        # clip any values less than lowermin
-        lowermin = data < minval
-        data = N.log(data - (minval - 1)) / N.log(maxval - (minval - 1))
-        data[lowermin] = 0.
-
-    elif mode == 'squared':
-        # squared scaling
-        # clip any negative values
-        lowermin = data < minval
-        data = (data-minval)**2 / (maxval-minval)**2
-        data[lowermin] = 0.
-
-    else:
-        raise RuntimeError, 'Invalid scaling mode "%s"' % mode
-
-    return data
-
-def slowNumpyToQImage(img, cmap, transparencyimg):
-    """Slow version of routine to convert numpy array to QImage
-    This is hard work in Python, but it was like this originally.
-
-    img: numpy array to convert to QImage
-    cmap: 2D array of colors (BGRA rows)
-    forcetrans: force image to have alpha component."""
-
-    if struct.pack("h", 1) == "\000\001":
-        # have to swap colors for big endian architectures
-        cmap2 = cmap.copy()
-        cmap2[:,0] = cmap[:,3]
-        cmap2[:,1] = cmap[:,2]
-        cmap2[:,2] = cmap[:,1]
-        cmap2[:,3] = cmap[:,0]
-        cmap = cmap2
-
-    fracs = N.clip(N.ravel(img), 0., 1.)
-
-    # Work out which is the minimum colour map. Assumes we have <255 bands.
-    numbands = cmap.shape[0]-1
-    bands = (fracs*numbands).astype(N.uint8)
-    bands = N.clip(bands, 0, numbands-1)
-
-    # work out fractional difference of data from band to next band
-    deltafracs = (fracs - bands * (1./numbands)) * numbands
-
-    # need to make a 2-dimensional array to multiply against triplets
-    deltafracs.shape = (deltafracs.shape[0], 1)
-
-    # calculate BGRalpha quadruplets
-    # this is a linear interpolation between the band and the next band
-    quads = (deltafracs*cmap[bands+1] +
-             (1.-deltafracs)*cmap[bands]).astype(N.uint8)
-
-    # apply transparency if a transparency image is set
-    if transparencyimg is not None and transparencyimg.shape == img.shape:
-        quads[:,3] = ( N.clip(N.ravel(transparencyimg), 0., 1.) *
-                       quads[:,3] ).astype(N.uint8)
-
-    # convert 32bit quads to a Qt QImage
-    s = quads.tostring()
-
-    fmt = qt4.QImage.Format_RGB32
-    if N.any(cmap[:,3] != 255) or transparencyimg is not None:
-        # any transparency
-        fmt = qt4.QImage.Format_ARGB32
-
-    img = qt4.QImage(s, img.shape[1], img.shape[0], fmt)
-    img = img.mirrored()
-
-    # hack to ensure string isn't freed before QImage
-    img.veusz_string = s
-    return img
-
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
     coordinate system."""
-
-    # a dict of colormaps loaded in from external file
-    colormaps = None
 
     typename='image'
     allowusercreation=True
@@ -169,10 +55,6 @@ class Image(plotters.GenericPlotter):
     def addSettings(klass, s):
         """Construct list of settings."""
         plotters.GenericPlotter.addSettings(s)
-
-        # lazy read of colormap file (Let's help startup times)
-        if klass.colormaps is None:
-            klass.readColorMaps()
 
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
@@ -201,11 +83,11 @@ class Image(plotters.GenericPlotter):
                                usertext='Transparent data'),
                4 )
 
-        s.add( ColormapSetting('colorMap',
-                               'grey',
-                               descr = 'Set of colors to plot data with',
-                               usertext='Colormap',
-                               formatting=True),
+        s.add( setting.Colormap('colorMap',
+                                'grey',
+                                descr = 'Set of colors to plot data with',
+                                usertext='Colormap',
+                                formatting=True),
                5 )
         s.add( setting.Bool('colorInvert', False,
                             descr = 'Invert color map',
@@ -235,90 +117,6 @@ class Image(plotters.GenericPlotter):
         return ', '.join(out)
     userdescription = property(_getUserDescription)
 
-    def readColorMaps(cls):
-        """Read color maps data file (a class method)
-
-        File is made up of:
-          comments (prefaced by # on separate line)
-          colormapname
-          list of colors with B G R alpha order from 0->255 on separate lines
-          [colormapname ...]
-        """
-
-        name = ''
-        vals = []
-        cls.colormaps = {}
-
-        # locate file holding colormap data
-        filename = os.path.join(utils.veuszDirectory, 'widgets', 'data',
-                                'colormaps.dat')
-
-        # iterate over file
-        for l in open(filename):
-            p = l.split()
-            if len(p) == 0 or p[0][0] == '#':
-                # blank or commented line
-                pass
-            elif p[0][0] not in string.digits:
-                # new colormap follows
-                if name != '':
-                    cls.colormaps[name] = N.array(vals).astype(N.intc)
-                name = p[0]
-                vals = []
-            else:
-                # add value to current colormap
-                assert name != ''
-                assert len(p) == 4
-                vals.append( [int(i) for i in p] )
-
-        # add on final colormap
-        if name != '':
-            cls.colormaps[name] = N.array(vals).astype(N.intc)
-
-        # collect names and sort alphabetically
-        names = cls.colormaps.keys()
-        names.sort()
-        cls.colormapnames = names
-
-    readColorMaps = classmethod(readColorMaps)
-
-    def applyColorMap(self, cmap, scaling, datain, minval, maxval,
-                      trans, transimg=None):
-        """Apply a colour map to the 2d data given.
-
-        cmap is the color map (numpy of BGRalpha quads)
-        scaling is scaling mode => 'linear', 'sqrt', 'log' or 'squared'
-        data are the imaging data
-        minval and maxval are the extremes of the data for the colormap
-        trans is a number from 0 to 100
-        transimg is an optional image to apply transparency from
-        Returns a QImage
-        """
-
-        # invert colour map if min and max are swapped
-        if minval > maxval:
-            minval, maxval = maxval, minval
-            cmap = cmap[::-1]
-
-        # apply transparency
-        if trans != 0:
-            cmap = cmap.copy()
-            cmap[:,3] = (cmap[:,3].astype(N.float32) * (100-trans) /
-                         100.).astype(N.intc)
-        
-        # apply scaling of data
-        fracs = applyScaling(datain, scaling, minval, maxval)
-
-        if not slowfuncs:
-            img = numpyToQImage(fracs, cmap, transimg is not None)
-            if transimg is not None:
-                applyImageTransparancy(img, transimg)
-        else:
-            img = slowNumpyToQImage(fracs, cmap, transimg)
-        return img
-
-    applyColorMap = classmethod(applyColorMap)
-
     def updateImage(self):
         """Update the image with new contents."""
 
@@ -340,14 +138,14 @@ class Image(plotters.GenericPlotter):
         # this is used currently by colorbar objects
         self.cacheddatarange = (minval, maxval)
 
-        cmap = self.colormaps[s.colorMap]
+        # use grey by default
+        cmap = d.colormaps.get(s.colorMap, d.colormaps['grey'])
         if s.colorInvert:
             cmap = cmap[::-1]
 
-        self.image = self.applyColorMap(cmap, s.colorScaling,
-                                        data.data,
-                                        minval, maxval, s.transparency,
-                                        transimg=transimg)
+        self.image = utils.applyColorMap(
+            cmap, s.colorScaling, data.data, minval, maxval,
+            s.transparency, transimg=transimg)
 
     def providesAxesDependency(self):
         """Range information provided by widget."""
@@ -471,12 +269,12 @@ class Image(plotters.GenericPlotter):
             assert direction == 'vertical'
             vals = vals.reshape(barsize, 1)
 
-        cmap = self.colormaps[s.colorMap]
+        cmap = self.document.colormaps[s.colorMap]
         if s.colorInvert:
             cmap = cmap[::-1]
 
-        img = self.applyColorMap(cmap, colorscaling, vals,
-                                 minval, maxval, s.transparency)
+        img = utils.applyColorMap(cmap, colorscaling, vals,
+                                  minval, maxval, s.transparency)
 
         return (minval, maxval, coloraxisscale, img)
 
@@ -582,51 +380,3 @@ class Image(plotters.GenericPlotter):
 
 # allow the factory to instantiate an image
 document.thefactory.register( Image )
-
-class ColormapSetting(setting.Choice):
-    """A setting to set the colour map used in an image."""
-
-    def __init__(self, name, value, **args):
-        setting.Choice.__init__(self, name, Image.colormapnames, value, **args)
-
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-                              
-    def makeControl(self, *args):
-        return ColormapControl(self, *args)
-
-class ColormapControl(setting.controls.Choice):
-    """Give the user a preview of colourmaps."""
-
-    _icons = []
-
-    size = (32, 12)
-
-    def __init__(self, setn, parent):
-        if not self._icons:
-            self._generateIcons()
-
-        setting.controls.Choice.__init__(self, setn, False,
-                                         Image.colormapnames, parent,
-                                         icons=self._icons)
-        self.setIconSize( qt4.QSize(*self.size) )
-
-    def _generateIcons(cls):
-        """Generate a list of icons for drop down menu."""
-        size = cls.size
-
-        # create a fake dataset smoothly varying from 0 to size[0]-1
-        fakedataset = N.fromfunction(lambda x, y: y,
-                                     (size[1], size[0]))
-
-        # iterate over colour maps
-        for cmap in Image.colormapnames:
-            image = Image.applyColorMap(Image.colormaps[cmap], 'linear',
-                                        fakedataset,
-                                        0., size[0]-1., 0)
-            pixmap = qt4.QPixmap.fromImage(image)
-            cls._icons.append( qt4.QIcon(pixmap) )
-        
-    _generateIcons = classmethod(_generateIcons)
-    

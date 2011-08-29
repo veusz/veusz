@@ -103,6 +103,9 @@ class Document( qt4.QObject ):
         self.customs = []
         self.updateEvalContext()
 
+        # copy default colormaps
+        self.colormaps = dict(utils.defaultcolormaps)
+
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}

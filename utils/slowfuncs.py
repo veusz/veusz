@@ -134,3 +134,59 @@ def plotBoxesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
     # paint it
     if rects:
         painter.drawRects(rects)
+
+def slowNumpyToQImage(img, cmap, transparencyimg):
+    """Slow version of routine to convert numpy array to QImage
+    This is hard work in Python, but it was like this originally.
+
+    img: numpy array to convert to QImage
+    cmap: 2D array of colors (BGRA rows)
+    forcetrans: force image to have alpha component."""
+
+    if struct.pack("h", 1) == "\000\001":
+        # have to swap colors for big endian architectures
+        cmap2 = cmap.copy()
+        cmap2[:,0] = cmap[:,3]
+        cmap2[:,1] = cmap[:,2]
+        cmap2[:,2] = cmap[:,1]
+        cmap2[:,3] = cmap[:,0]
+        cmap = cmap2
+
+    fracs = N.clip(N.ravel(img), 0., 1.)
+
+    # Work out which is the minimum colour map. Assumes we have <255 bands.
+    numbands = cmap.shape[0]-1
+    bands = (fracs*numbands).astype(N.uint8)
+    bands = N.clip(bands, 0, numbands-1)
+
+    # work out fractional difference of data from band to next band
+    deltafracs = (fracs - bands * (1./numbands)) * numbands
+
+    # need to make a 2-dimensional array to multiply against triplets
+    deltafracs.shape = (deltafracs.shape[0], 1)
+
+    # calculate BGRalpha quadruplets
+    # this is a linear interpolation between the band and the next band
+    quads = (deltafracs*cmap[bands+1] +
+             (1.-deltafracs)*cmap[bands]).astype(N.uint8)
+
+    # apply transparency if a transparency image is set
+    if transparencyimg is not None and transparencyimg.shape == img.shape:
+        quads[:,3] = ( N.clip(N.ravel(transparencyimg), 0., 1.) *
+                       quads[:,3] ).astype(N.uint8)
+
+    # convert 32bit quads to a Qt QImage
+    s = quads.tostring()
+
+    fmt = qt4.QImage.Format_RGB32
+    if N.any(cmap[:,3] != 255) or transparencyimg is not None:
+        # any transparency
+        fmt = qt4.QImage.Format_ARGB32
+
+    img = qt4.QImage(s, img.shape[1], img.shape[0], fmt)
+    img = img.mirrored()
+
+    # hack to ensure string isn't freed before QImage
+    img.veusz_string = s
+    return img
+

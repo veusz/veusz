@@ -1798,3 +1798,11 @@ class RotateInterval(Choice):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
 
+class Colormap(Str):
+    """A setting to set the color map used in an image.
+    This is based on a Str rather than Choice as the list might
+    change later.
+    """
+
+    def makeControl(self, *args):
+        return controls.Colormap(self, self.getDocument(), *args)
