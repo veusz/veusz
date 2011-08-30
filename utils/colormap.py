@@ -143,7 +143,7 @@ def applyColorMap(cmap, scaling, datain, minval, maxval,
     Returns a QImage
     """
 
-    cmap = N.array(cmap)
+    cmap = N.array(cmap, dtype=N.intc)
 
     # invert colour map if min and max are swapped
     if minval > maxval:
