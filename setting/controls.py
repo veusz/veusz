@@ -1609,6 +1609,7 @@ class Colormap(Choice):
 
     def __init__(self, setn, document, parent):
         names = sorted(document.colormaps.keys())
+
         icons = Colormap._generateIcons(document, names)
         setting.controls.Choice.__init__(self, setn, True,
                                          names, parent,
@@ -1628,15 +1629,21 @@ class Colormap(Choice):
 
         # iterate over colour maps
         for name in names:
-            val = document.colormaps[name]
+            val = document.colormaps.get(name, None)
             if val in kls._icons:
-                retn.append( kls._icons[val] )
+                icon = kls._icons[val]
             else:
-                # generate icon
-                image = utils.applyColorMap(val, 'linear',
-                                            fakedataset,
-                                            0., size[0]-1., 0)
-                icon = qt4.QIcon( qt4.QPixmap.fromImage(image) )
+                if val is None:
+                    # empty icon
+                    pixmap = qt4.QPixmap(*size)
+                    pixmap.fill(qt4.Qt.transparent)
+                else:
+                    # generate icon
+                    image = utils.applyColorMap(val, 'linear',
+                                                fakedataset,
+                                                0., size[0]-1., 0)
+                    pixmap = qt4.QPixmap.fromImage(image)
+                icon = qt4.QIcon(pixmap)
                 kls._icons[val] = icon
-                retn.append(icon)
+            retn.append(icon)
         return retn

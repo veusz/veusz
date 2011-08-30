@@ -206,6 +206,13 @@ class MarkerFillBrush(setting.Brush):
 
         self.get('color').newDefault( setting.Reference(
             '../PlotLine/color') )
+
+        self.add( setting.Colormap(
+                'colorMap', 'blank',
+                descr = 'If color value dataset is given, use this colormap '
+                'instead of the fill color',
+                usertext='Colormap',
+                formatting=True) )
     
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
@@ -662,6 +669,7 @@ class PointPlotter(GenericPlotter):
         yv = s.get('yData').getData(doc)
         text = s.get('labels').getData(doc, checknull=True)
         scalepoints = s.get('scalePoints').getData(doc)
+        colorpoints = s.get('colorPoints').getData(doc)
 
         # if a missing dataset, make a fake dataset for the second one
         # based on a row number
@@ -694,8 +702,9 @@ class PointPlotter(GenericPlotter):
         painter = phelper.painter(self, posn, clip=cliprect)
 
         # loop over chopped up values
-        for xvals, yvals, tvals, ptvals in document.generateValidDatasetParts(
-            xv, yv, text, scalepoints):
+        for xvals, yvals, tvals, ptvals, cvals in (
+            document.generateValidDatasetParts(
+                xv, yv, text, scalepoints, colorpoints)):
 
             #print "Calculating coordinates"
             # calc plotter coords of x and y points
@@ -745,13 +754,18 @@ class PointPlotter(GenericPlotter):
                                   yplotter[::s.thinfactor])
 
                 # whether to scale markers
-                scaling = None
+                scaling = colorvals = cmap = None
                 if ptvals:
                     scaling = ptvals.data
+                # color point individually
+                if cvals:
+                    colorvals = cvals.data
+                    cmap = self.document.colormaps[s.MarkerFill.colorMap]
 
                 # actually plot datapoints
                 utils.plotMarkers(painter, xplt, yplt, s.marker, markersize,
-                                  scaling=scaling, clip=cliprect)
+                                  scaling=scaling, clip=cliprect,
+                                  cmap=cmap, colorvals=colorvals)
 
             # finally plot any labels
             if tvals and not s.Label.hide:

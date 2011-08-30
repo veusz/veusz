@@ -34,6 +34,10 @@ except ImportError:
 # Colors are linearly interpolated in this space.
 
 defaultcolormaps = {
+    'blank': (
+        (0,   0,   0,   0),
+        (0,   0,   0,   0),
+        ),
     'heat': (
         (0,   0,   0,   255),
         (0,   0,   186, 255),

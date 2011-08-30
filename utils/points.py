@@ -28,6 +28,8 @@ try:
 except ImportError:
     from slowfuncs import plotPathsToPainter
 
+import colormap
+
 """This is the symbol plotting part of Veusz
 
 There are actually several different ways symbols are plotted.
@@ -381,7 +383,7 @@ MarkerCodes = (
     )
 
 def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
-                clip=None):
+                clip=None, cmap=None, colorvals=None):
     """Funtion to plot an array of markers on a painter.
 
     painter: QPainter
@@ -390,6 +392,8 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
     markersize: size of marker to plot
     scaling: scale size of markers by array, or don't in None
     clip: rectangle if clipping wanted
+    cmap: colormap to use if colorvals is set
+    colorvals: color values 0-1 of each point if used
     """
 
     # minor optimization
@@ -409,10 +413,10 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
         # turn off brush
         painter.setBrush( qt4.QBrush() )
 
-    # split up into two loops as this is a critical path
-    if scaling is None:
+    # split up into different loops as this is a critical path
+    if scaling is None and colorvals is None:
         plotPathsToPainter(painter, path, xpos, ypos, clip)
-    else:
+    elif colorvals is None:
         # plot markers, scaling each one
         s = painter.scale
         t = painter.translate
@@ -423,7 +427,23 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
             s(sc, sc)
             d(path)
             r()
-    
+    else:
+        # if using color values
+        if scaling is None:
+            scaling = N.ones(shape=xpos.shape)
+        # convert colors to rgb values via a 2D image
+        trans = (1-painter.brush().color().alphaF())*100
+        color2d = colorvals.reshape( 1, len(colorvals) )
+        colorimg = colormap.applyColorMap(cmap, 'linear',
+                                          color2d, 0., 1., trans)
+        rgbs = [colorimg.pixel(i,0) for i in xrange(len(colorvals))]
+        for x, y, sc, rgb in izip(xpos, ypos, scaling, rgbs):
+            painter.setBrush( qt4.QBrush( qt4.QColor.fromRgba(rgb) ) )
+            painter.translate(x, y)
+            painter.scale(sc, sc)
+            painter.drawPath(path)
+            painter.resetTransform()
+
     painter.restore()
 
 def plotMarker(painter, xpos, ypos, markername, markersize):
