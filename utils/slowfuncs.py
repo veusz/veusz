@@ -51,7 +51,8 @@ def addNumpyToPolygonF(poly, *args):
     for p in points:
         pappend( qpointf(*p) )
 
-def plotPathsToPainter(painter, path, x, y, clip=None):
+def plotPathsToPainter(painter, path, x, y, scaling=None,
+                       clip=None, colorimg=None):
     """Plot array of x, y points."""
 
     if clip is None:
@@ -65,12 +66,27 @@ def plotPathsToPainter(painter, path, x, y, clip=None):
                 pathbox.bottom(), pathbox.right())
 
     # draw the paths
-    for xp, yp in izip(x, y):
-        pt = qt4.QPointF(xp, yp)
+    numpts = min(len(x), len(y))
+    if scaling is not None:
+        numpts = min(numpts, len(scaling))
+    if colorimg is not None:
+        numpts = min(numpts, colorimg.width())
+
+    origtrans = painter.worldTransform()
+    for i in xrange(numpts):
+        pt = qt4.QPointF(x[i], y[i])
         if clip.contains(pt):
             painter.translate(pt)
+            # scale if wanted
+            if scaling is not None:
+                painter.scale(scaling[i], scaling[i])
+            # set color if given
+            if colorimg is not None:
+                b = qt4.QBrush( qt4.QColor.fromRgba(colorimg.pixel(i, 0)) )
+                painter.setBrush(b)
+
             painter.drawPath(path)
-            painter.translate(-pt)
+            painter.setWorldTransform(origtrans)
 
 def plotLinesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
     """Plot lines given in numpy arrays to painter."""

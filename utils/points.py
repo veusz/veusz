@@ -413,36 +413,17 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
         # turn off brush
         painter.setBrush( qt4.QBrush() )
 
-    # split up into different loops as this is a critical path
-    if scaling is None and colorvals is None:
-        plotPathsToPainter(painter, path, xpos, ypos, clip)
-    elif colorvals is None:
-        # plot markers, scaling each one
-        s = painter.scale
-        t = painter.translate
-        d = painter.drawPath
-        r = painter.resetTransform
-        for x, y, sc in izip(xpos, ypos, scaling):
-            t(x, y)
-            s(sc, sc)
-            d(path)
-            r()
-    else:
-        # if using color values
-        if scaling is None:
-            scaling = N.ones(shape=xpos.shape)
-        # convert colors to rgb values via a 2D image
+    # if using colored points
+    colorimg = None
+    if colorvals is not None:
+        # convert colors to rgb values via a 2D image and pass to function
         trans = (1-painter.brush().color().alphaF())*100
         color2d = colorvals.reshape( 1, len(colorvals) )
-        colorimg = colormap.applyColorMap(cmap, 'linear',
-                                          color2d, 0., 1., trans)
-        rgbs = [colorimg.pixel(i,0) for i in xrange(len(colorvals))]
-        for x, y, sc, rgb in izip(xpos, ypos, scaling, rgbs):
-            painter.setBrush( qt4.QBrush( qt4.QColor.fromRgba(rgb) ) )
-            painter.translate(x, y)
-            painter.scale(sc, sc)
-            painter.drawPath(path)
-            painter.resetTransform()
+        colorimg = colormap.applyColorMap(
+            cmap, 'linear', color2d, 0., 1., trans)
+
+    # this is the fast (C++) or slow (python) helper
+    plotPathsToPainter(painter, path, xpos, ypos, scaling, clip, colorimg)
 
     painter.restore()
 

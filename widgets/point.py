@@ -208,8 +208,8 @@ class MarkerFillBrush(setting.Brush):
             '../PlotLine/color') )
 
         self.add( setting.Colormap(
-                'colorMap', 'blank',
-                descr = 'If color value dataset is given, use this colormap '
+                'colorMap', 'grey',
+                descr = 'If color markers dataset is given, use this colormap '
                 'instead of the fill color',
                 usertext='Colormap',
                 formatting=True) )
