@@ -20,6 +20,7 @@
 and exporting text as paths for WYSIWYG."""
 
 import sys
+import re
 import veusz.qtall as qt4
 
 dpi = 90.
@@ -348,7 +349,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
             m = self.matrix
             dx, dy = m.dx(), m.dy()
             if (m.m11(), m.m12(), m.m21(), m.m22()) == (1., 0., 0., 1):
-                out = ('transform="translate(%s, %s)"' % (fltStr(dx), fltStr(dy)) ,)
+                out = ('transform="translate(%s,%s)"' % (fltStr(dx), fltStr(dy)) ,)
             else:
                 out = ('transform="matrix(%s %s %s %s %s %s)"' % (
                         fltStr(m.m11(), 4), fltStr(m.m12(), 4),
@@ -376,7 +377,16 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 self.pathcache[attrb] = element, num
                 # add an id attribute
                 element.attrb += ' id="p%i"' % num
-            SVGElement(self.celement, 'use', 'xlink:href="#p%i"' % num)
+
+            # if the parent is a translation, swallow this into the use element
+            m = re.match('transform="translate\(([-0-9.]+),([-0-9.]+)\)"',
+                         self.celement.attrb)
+            if m:
+                SVGElement(self.celement.parent, 'use',
+                           'xlink:href="#p%i" x="%s" y="%s"' % (
+                        num, m.group(1), m.group(2)))
+            else:
+                SVGElement(self.celement, 'use', 'xlink:href="#p%i"' % num)
         else:
             pathel = SVGElement(self.celement, 'path', attrb)
             self.pathcache[attrb] = [pathel, None]
