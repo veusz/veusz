@@ -28,7 +28,7 @@ inch_mm = 25.4
 def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
-    
+
     # this is to get consistent rounding to get the self test correct... yuck
     # decimal would work, but that drags in loads of code
     # convert float to string with prec decimal places
@@ -84,6 +84,44 @@ def createPath(path, scale):
         i += 1
     return ''.join(p)
 
+class SVGElement(object):
+    """SVG element in output.
+    This represents the XML tree in memory
+    """
+
+    def __init__(self, parent, eltype, attrb, text=None):
+        """Intialise element.
+        parent: parent element or None
+        eltype: type (e.g. 'polyline')
+        attrb: attribute string appended to output
+        text: text to output between this and closing element.
+        """
+        self.eltype = eltype
+        self.attrb = attrb
+        self.children = []
+        self.parent = parent
+        self.text = text
+
+        if parent:
+            parent.children.append(self)
+
+    def write(self, fileobj):
+        """Write element and its children to the output file."""
+        fileobj.write('<%s' % self.eltype)
+        if self.attrb:
+            fileobj.write(' ' + self.attrb)
+        if self.children or self.text:
+            fileobj.write('>\n')
+            if self.text:
+                fileobj.write(self.text)
+                fileobj.write('\n')
+            for c in self.children:
+                c.write(fileobj)
+            fileobj.write('</%s>\n' % self.eltype)
+        else:
+            # simple close tag if not children or text
+            fileobj.write('/>\n')
+
 class SVGPaintEngine(qt4.QPaintEngine):
     """Paint engine class for writing to svg files."""
 
@@ -99,7 +137,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
                                   qt4.QPaintEngine.PixmapTransform |
                                   qt4.QPaintEngine.AlphaBlend
                                   )
-        
+
         self.width = width_in
         self.height = height_in
 
@@ -116,48 +154,58 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.clipnum = 0
         self.existingclips = {}
         self.matrix = qt4.QMatrix()
-        
-        self.lastclip = None
-        self.laststate = None
-        
-        self.defs = []
-        
-        self.fileobj.write('''<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="%spx" height="%spx" version="1.1"
-     xmlns="http://www.w3.org/2000/svg"
-     xmlns:xlink="http://www.w3.org/1999/xlink">
-<desc>Veusz output document</desc>
-''' % (fltStr(self.width*dpi), fltStr(self.height*dpi)))
 
-        # as defaults use qt defaults
-        self.fileobj.write('<g stroke-linejoin="bevel" '
-                           'stroke-linecap="square" '
-                           'stroke="#000000" '
-                           'fill-rule="evenodd">\n')
+        self.defs = []
+
+        self.fileobj.write('''<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+''')
+
+        # svg root element for qt defaults
+        self.rootelement = SVGElement(
+            None, 'svg',
+            ('width="%spx" height="%spx" version="1.1"\n'
+             '    xmlns="http://www.w3.org/2000/svg"\n'
+             '    xmlns:xlink="http://www.w3.org/1999/xlink"') %
+            (fltStr(self.width*dpi), fltStr(self.height*dpi)))
+        SVGElement(self.rootelement, 'desc', '', 'Veusz output document')
+
+        # definitions, for clips, etc.
+        self.defs = SVGElement(self.rootelement, 'defs', '')
+
+        # this is where all the drawing goes
+        self.celement = SVGElement(
+            self.rootelement, 'g',
+            'stroke-linejoin="bevel" stroke-linecap="square" '
+            'stroke="#000000" fill-rule="evenodd"')
+
+        # previous transform, stroke and clip states
+        self.oldstate = [None, None, None]
 
         return True
 
+    def pruneEmptyGroups(self):
+        """Take the element tree and remove any empty group entries."""
+
+        def recursive(root):
+            children = list(root.children)
+            # remove any empty children first
+            for c in children:
+                recursive(c)
+            if root.eltype == 'g' and len(root.children) == 0:
+                # safe to remove
+                index = root.parent.children.index(root)
+                del root.parent.children[index]
+
+        recursive(self.rootelement)
+
     def end(self):
-        # close any existing groups
-        if self.laststate is not None:
-            self.fileobj.write('</g>\n')
-        if self.lastclip is not None:
-            self.fileobj.write('</g>\n')
+        self.pruneEmptyGroups()
 
-        # close defaults
-        self.fileobj.write('</g>\n')
-            
         # write any defined objects
-        if self.defs:
-            self.fileobj.write('<defs>\n')
-            for d in self.defs:
-                self.fileobj.write(d)
-            self.fileobj.write('</defs>\n')
+        self.rootelement.write(self.fileobj)
 
-        # end svg file
-        self.fileobj.write('</svg>\n')
         return True
 
     def _updateClipPath(self, clippath, clipoperation):
@@ -171,31 +219,76 @@ class SVGPaintEngine(qt4.QPaintEngine):
         elif clipoperation == qt4.Qt.UniteClip:
             self.clippath = self.clippath.unite(clippath)
         else:
-            print clipoperation
+            assert False
 
     def updateState(self, state):
         """Examine what has changed in state and call apropriate function."""
-        self.updatedstate = True
         ss = state.state()
+
+        # state is a list of transform, stroke/fill and clip states
+        statevec = list(self.oldstate)
         if ss & qt4.QPaintEngine.DirtyPen:
             self.pen = state.pen()
+            statevec[1] = self.strokeFillState()
         if ss & qt4.QPaintEngine.DirtyBrush:
             self.brush = state.brush()
+            statevec[1] = self.strokeFillState()
         if ss & qt4.QPaintEngine.DirtyClipPath:
             self._updateClipPath(state.clipPath(), state.clipOperation())
+            statevec[2] = self.clipState()
         if ss & qt4.QPaintEngine.DirtyClipRegion:
             path = qt4.QPainterPath()
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
+            statevec[2] = self.clipState()
         if ss & qt4.QPaintEngine.DirtyTransform:
             self.matrix = state.matrix()
+            statevec[0] = self.transformState()
 
-    def getSVGState(self):
-        """Get state as svg group."""
-        # these are the values to write into the attribute
+        # work out which state differs first
+        pop = 0
+        for i in xrange(2, -1, -1):
+            if statevec[i] != self.oldstate[i]:
+                pop = i+1
+                break
+
+        # go back up the tree the required number of times
+        for i in xrange(pop):
+            if self.oldstate[i]:
+                self.celement = self.celement.parent
+
+        # create new elements for changed states
+        for i in xrange(pop-1, -1, -1):
+            if statevec[i]:
+                self.celement = SVGElement(
+                    self.celement, 'g', ' '.join(statevec[i]))
+
+        self.oldstate = statevec
+
+    def clipState(self):
+        """Get SVG clipping state. This is in the form of an svg group"""
+
+        if self.clippath is None:
+            return ()
+
+        path = createPath(self.clippath, 1.0)
+
+        if path in self.existingclips:
+            url = 'url(#c%i)' % self.existingclips[path]
+        else:
+            clippath = SVGElement(self.defs, 'clipPath',
+                                  'id="c%i"' % self.clipnum)
+            SVGElement(clippath, 'path', 'd="%s"' % path)
+            url = 'url(#c%i)' % self.clipnum
+            self.existingclips[path] = self.clipnum
+            self.clipnum += 1
+
+        return ('clip-path="%s"' % url,)
+
+    def strokeFillState(self):
+        """Return stroke-fill state."""
+
         vals = {}
-
-        # PEN UPDATE
         p = self.pen
         # - color
         color = p.color().name()
@@ -243,101 +336,46 @@ class SVGPaintEngine(qt4.QPaintEngine):
         if b.color().alphaF() != 1.0:
             vals['fill-opacity'] = '%.3g' % b.color().alphaF()
 
-        # MATRIX
+        items = ['%s="%s"' % x for x in sorted(vals.items())]
+        return tuple(items)
+
+    def transformState(self):
         if not self.matrix.isIdentity():
             m = self.matrix
             dx, dy = m.dx(), m.dy()
             if (m.m11(), m.m12(), m.m21(), m.m22()) == (1., 0., 0., 1):
-                vals['transform'] = 'translate(%s, %s)' % (fltStr(dx),
-                                                           fltStr(dy))
+                out = ('transform="translate(%s, %s)"' % (fltStr(dx), fltStr(dy)) ,)
             else:
-                vals['transform'] = 'matrix(%s %s %s %s %s %s)' % (
-                    fltStr(m.m11(), 4), fltStr(m.m12(), 4),
-                    fltStr(m.m21(), 4), fltStr(m.m22(), 4),
-                    fltStr(dx), fltStr(dy) )
-
-        # build up group for state
-        t = ['<g']
-        for name, val in vals.iteritems():
-            t.append('%s="%s"' % (name, val))
-        state = ' '.join(t)+'>\n'
-        return state
-
-    def getClipState(self):
-        """Get SVG clipping state. This is in the form of an svg group"""
-
-        if self.clippath is None:
-            return None
-
-        path = createPath(self.clippath, 1.0)
-
-        if path in self.existingclips:
-            url = 'url(#c%i)' % self.existingclips[path]
+                out = ('transform="matrix(%s %s %s %s %s %s)"' % (
+                        fltStr(m.m11(), 4), fltStr(m.m12(), 4),
+                        fltStr(m.m21(), 4), fltStr(m.m22(), 4),
+                        fltStr(dx), fltStr(dy) ),)
         else:
-            clippath = '<clipPath id="c%i"><path d="%s"/></clipPath>\n' % (
-                self.clipnum, path)
-
-            self.defs.append(clippath)
-            url = 'url(#c%i)' % self.clipnum
-            self.existingclips[path] = self.clipnum
-            self.clipnum += 1
-
-        return '<g clip-path="%s">\n' % url
-
-    def doStateUpdate(self):
-        """Handle changes of state, starting and stopping
-        groups to modify clipping and attributes."""
-        if not self.updatedstate:
-            return
-
-        clipgrp = self.getClipState()
-        state = self.getSVGState()
-
-        if clipgrp == self.lastclip and state == self.laststate:
-            # do nothing if everything is unchanged
-            pass
-        elif clipgrp == self.lastclip:
-            # if state has only changed
-            if self.laststate is not None:
-                self.fileobj.write('</g>\n')
-            self.fileobj.write(state)
-            self.laststate = state
-        else:
-            # clip and state have changed
-            if self.laststate is not None:
-                self.fileobj.write('</g>\n')
-            if self.lastclip is not None:
-                self.fileobj.write('</g>\n')
-            if clipgrp is not None:
-                self.fileobj.write(clipgrp)
-            self.fileobj.write(state)
-            self.laststate = state
-            self.lastclip = clipgrp
+            out = ()
+        return out
 
     def drawPath(self, path):
         """Draw a path on the output."""
-        self.doStateUpdate()
         p = createPath(path, 1.)
 
-        self.fileobj.write('<path d="%s"' % p)
+        attrb = 'd="%s"' % p
         if path.fillRule() == qt4.Qt.WindingFill:
-            self.fileobj.write(' fill-rule="nonzero"')
-        self.fileobj.write('/>\n')
+            attrb += ' fill-rule="nonzero"'
+        SVGElement(self.celement, 'path', attrb)
 
     def drawTextItem(self, pt, textitem):
         """Convert text to a path and draw it.
         """
-        self.doStateUpdate()
         path = qt4.QPainterPath()
         path.addText(pt, textitem.font(), textitem.text())
         p = createPath(path, 1.)
-        self.fileobj.write('<path d="%s" fill="%s" stroke="none" '
-                           'fill-opacity="%.3g"/>\n' % (
-                p, self.pen.color().name(), self.pen.color().alphaF() ))
+        SVGElement(
+            self.celement, 'path',
+            'd="%s" fill="%s" stroke="none" fill-opacity="%.3g"' % (
+                p, self.pen.color().name(), self.pen.color().alphaF()) )
 
     def drawLines(self, lines):
         """Draw multiple lines."""
-        self.doStateUpdate()
         paths = []
         for line in lines:
             path = 'M%s,%sl%s,%s' % (
@@ -345,52 +383,54 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 fltStr(line.x2()-line.x1()),
                 fltStr(line.y2()-line.y1()))
             paths.append(path)
-        self.fileobj.write('<path d="%s"/>\n' % (''.join(paths)))
+        SVGElement(self.celement, 'path', 'd="%s"' % ''.join(paths))
 
     def drawPolygon(self, points, mode):
         """Draw polygon on output."""
-        self.doStateUpdate()
         pts = []
         for p in points:
             pts.append( '%s,%s' % (fltStr(p.x()), fltStr(p.y())) )
 
         if mode == qt4.QPaintEngine.PolylineMode:
-            self.fileobj.write('<polyline fill="none" points="%s"/>\n' %
-                               ' '.join(pts))
+            SVGElement(self.celement, 'polyline',
+                       'fill="none" points="%s"' % ' '.join(pts))
 
         else:
-            self.fileobj.write('<polygon points="%s"' %
-                               ' '.join(pts))
+            attrb = 'points="%s"' % ' '.join(pts)
             if mode == qt4.Qt.WindingFill:
-                self.fileobj.write(' fill-rule="nonzero"')
-            self.fileobj.write('/>\n')
+                attrb += ' fill-rule="nonzero"'
+            SVGElement(self.celement, 'polygon', attrb)
 
     def drawEllipse(self, rect):
         """Draw an ellipse to the svg file."""
-        self.doStateUpdate()
-        self.fileobj.write('<ellipse cx="%s" cy="%s" rx="%s" ry="%s"/>\n' %
-                           (fltStr(rect.center().x()), fltStr(rect.center().y()),
-                            fltStr(rect.width()*0.5), fltStr(rect.height()*0.5)))
+        SVGElement(self.celement, 'ellipse',
+                   'cx="%s" cy="%s" rx="%s" ry="%s"' %
+                   (fltStr(rect.center().x()), fltStr(rect.center().y()),
+                    fltStr(rect.width()*0.5), fltStr(rect.height()*0.5)))
 
     def drawPoints(self, points):
         """Draw points."""
-        self.doStateUpdate()
         for pt in points:
-            self.fileobj.write( '<line x1="%s" y1="%s" x2="%s" y2="%s" '
-                                'stroke-linecap="round"/>\n' %
-                                fltStr(pt.x()), fltStr(pt.y()),
-                                fltStr(pt.x()), fltStr(pt.y()) )
+            SVGElement(self.celement, 'line',
+                       ('x1="%s" y1="%s" x2="%s" y2="%s" '
+                        'stroke-linecap="round"') %
+                       fltStr(pt.x()), fltStr(pt.y()),
+                       fltStr(pt.x()), fltStr(pt.y()) )
+
+    def drawImage(self, r, img, sr, flags):
+        """Draw image.
+        As the pixmap method uses the same code, just call this."""
+        self.drawPixmap(r, img, sr)
 
     def drawPixmap(self, r, pixmap, sr):
-        """Draw pixmap to file.
+        """Draw pixmap svg item.
 
-        This is converted to a PNG and embedded in the output
+        This is converted to a bitmap and embedded in the output
         """
 
-        self.doStateUpdate()
-        self.fileobj.write( '<image x="%s" y="%s" width="%s" height="%s" ' %
-                            (fltStr(r.x()), fltStr(r.y()),
-                             fltStr(r.width()), fltStr(r.height())) )
+        attrb = ['x="%s" y="%s" width="%s" height="%s" ' % (
+                fltStr(r.x()), fltStr(r.y()),
+                fltStr(r.width()), fltStr(r.height()))]
 
         # convert pixmap to textual data
         data = qt4.QByteArray()
@@ -399,10 +439,11 @@ class SVGPaintEngine(qt4.QPaintEngine):
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 
-        self.fileobj.write('xlink:href="data:image/%s;base64,' %
-                           self.imageformat)
-        self.fileobj.write( data.toBase64() )
-        self.fileobj.write('" preserveAspectRatio="none"/>\n')
+        attrb.append('xlink:href="data:image/%s;base64,' % self.imageformat)
+        attrb.append(str(data.toBase64()))
+        attrb.append('" preserveAspectRatio="none"')
+
+        SVGElement(self.celement, 'image', ''.join(attrb))
 
 class SVGPaintDevice(qt4.QPaintDevice):
     """Paint device for SVG paint engine."""
