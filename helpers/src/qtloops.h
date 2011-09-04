@@ -37,9 +37,16 @@ public:
 void addNumpyToPolygonF(QPolygonF& poly,
 			const Tuple2Ptrs& v);
 
+// plot paths to painter
+// x and y locations are given in x and y
+// if scaling is not 0, is an array to scale the data points by
+// if colorimg is not 0, is a Nx1 image containing color points for path fills
+// clip is a clipping rectangle if set
 void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
-			const QRectF* clip = 0);
+			const Numpy1DObj* scaling = 0,
+			const QRectF* clip = 0,
+			const QImage* colorimg = 0);
 
 void plotLinesToPainter(QPainter& painter,
 			const Numpy1DObj& x1, const Numpy1DObj& y1,

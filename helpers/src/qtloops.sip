@@ -59,20 +59,34 @@ void addNumpyToPolygonF(QPolygonF&, ...);
 %End
 
 void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
-     const QRectF* clip=0);
+			SIP_PYOBJECT,
+			const QRectF* clip=0,
+			const QImage* colorimg=0);
 %MethodCode
-   {
-   try
-     {
-       Numpy1DObj x(a2);
-       Numpy1DObj y(a3);
-       plotPathsToPainter(*a0, *a1, x, y, a4);
-     }
-   catch( const char *msg )
-     {
-       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
-     }
-   }
+{
+  Numpy1DObj* scaling = 0;
+  
+  try
+    {
+      // x and y coordinates
+      Numpy1DObj x(a2);
+      Numpy1DObj y(a3);
+      
+      // a4 is scaling or None
+      if (a4 != Py_None) {
+	scaling = new Numpy1DObj(a4);
+      }
+      
+      plotPathsToPainter(*a0, *a1, x, y, scaling, a5, a6);
+    }
+  catch( const char *msg )
+    {
+      sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+    }
+  
+  if( scaling )
+    delete scaling;
+}
 %End
 
 void plotLinesToPainter(QPainter& painter,
