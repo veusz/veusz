@@ -111,11 +111,11 @@ class SVGElement(object):
         fileobj.write('<%s' % self.eltype)
         if self.attrb:
             fileobj.write(' ' + self.attrb)
-        if self.children or self.text:
+
+        if self.text:
+            fileobj.write('>%s</%s>\n' % (self.text, self.eltype))
+        elif self.children:
             fileobj.write('>\n')
-            if self.text:
-                fileobj.write(self.text)
-                fileobj.write('\n')
             for c in self.children:
                 c.write(fileobj)
             fileobj.write('</%s>\n' % self.eltype)
@@ -456,10 +456,6 @@ class SVGPaintEngine(qt4.QPaintEngine):
         This is converted to a bitmap and embedded in the output
         """
 
-        attrb = ['x="%s" y="%s" width="%s" height="%s" ' % (
-                fltStr(r.x()), fltStr(r.y()),
-                fltStr(r.width()), fltStr(r.height()))]
-
         # convert pixmap to textual data
         data = qt4.QByteArray()
         buf = qt4.QBuffer(data)
@@ -467,10 +463,12 @@ class SVGPaintEngine(qt4.QPaintEngine):
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 
-        attrb.append('xlink:href="data:image/%s;base64,' % self.imageformat)
-        attrb.append(str(data.toBase64()))
-        attrb.append('" preserveAspectRatio="none"')
-
+        attrb = [ 'x="%s" y="%s" ' % (fltStr(r.x()), fltStr(r.y())),
+                  'width="%s" ' % fltStr(r.width()),
+                  'height="%s" ' % fltStr(r.height()),
+                  'xlink:href="data:image/%s;base64,' % self.imageformat,
+                  str(data.toBase64()),
+                  '" preserveAspectRatio="none"' ]
         SVGElement(self.celement, 'image', ''.join(attrb))
 
 class SVGPaintDevice(qt4.QPaintDevice):
