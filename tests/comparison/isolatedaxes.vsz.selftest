@@ -1,28 +1,36 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="341.43px" height="293.42px" version="1.1"
-     xmlns="http://www.w3.org/2000/svg"
-     xmlns:xlink="http://www.w3.org/1999/xlink">
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l341.43,0l0,293.42l-341.43,0l0,-293.42"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m110.02,25.48l212.78,0l0,250.75l-212.78,0l0,-250.75"/>
+</clipPath>
+</defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g stroke="none" stroke-width="1" fill="#ffffff">
+<g fill="#ffffff" stroke="none" stroke-width="1">
 <path d="m62.24,5.8l275.07,0l0,282.75l-275.07,0l0,-282.75"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g stroke="#ff0000" stroke-width="1.25" stroke-dasharray="2.5,5.0" fill="none">
+<g fill="none" stroke="#ff0000" stroke-dasharray="2.5,5.0" stroke-width="1.25">
 <polyline fill="none" points="108.77,273.79 112.76,273.57 118.38,273.23 123.99,272.84 129.6,272.4 135.22,271.9 140.83,271.35 146.44,270.71 152.06,270 157.67,269.2 163.29,268.29 168.9,267.26 174.51,266.1 180.13,264.8 185.74,263.32 191.35,261.65 196.97,259.77 202.58,257.64 208.19,255.24 213.81,252.53 219.42,249.47 225.04,246.01 230.65,242.1 236.26,237.7 241.88,232.72 247.49,227.1 253.1,220.75 258.72,213.58 264.33,205.49 269.94,196.35 275.56,186.03 281.17,174.38 286.78,161.23 292.4,146.37 298.01,129.59 303.63,110.65 309.24,89.26 314.85,65.11 320.47,37.84 322.95,24.23"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g fill="none" stroke-linecap="butt" stroke-width="0.62">
 <path d="M86.76,276.23l0,-250.75"/>
 <path d="M86.76,276.23l3.75,0M86.76,263.69l3.75,0M86.76,251.15l3.75,0M86.76,238.62l3.75,0M86.76,226.08l3.75,0M86.76,213.54l3.75,0M86.76,201l3.75,0M86.76,188.47l3.75,0M86.76,175.93l3.75,0M86.76,163.39l3.75,0M86.76,150.85l3.75,0M86.76,138.32l3.75,0M86.76,125.78l3.75,0M86.76,113.24l3.75,0M86.76,100.7l3.75,0M86.76,88.16l3.75,0M86.76,75.63l3.75,0M86.76,63.09l3.75,0M86.76,50.55l3.75,0M86.76,38.01l3.75,0M86.76,25.48l3.75,0"/>
 <path d="M86.76,276.23l7.5,0M86.76,226.08l7.5,0M86.76,175.93l7.5,0M86.76,125.78l7.5,0M86.76,75.63l7.5,0M86.76,25.48l7.5,0"/>
 </g>
-<g stroke-width="1" fill="none">
+<g fill="none" stroke-width="1">
 <text x="0" y="142.98" font-size="14pt" fill="#000000">y</text>
 <text x="8.75" y="142.98" font-size="14pt" fill="#000000">-axis</text>
 <text x="7" y="160.48" font-size="14pt" fill="#000000">(cm</text>
@@ -35,12 +43,12 @@
 <text x="57" y="84.38" font-size="14pt" fill="#000000">0.8</text>
 <text x="74.5" y="34.23" font-size="14pt" fill="#000000">1</text>
 </g>
-<g stroke-width="0.62" stroke-linecap="butt" fill="none">
+<g fill="none" stroke-linecap="butt" stroke-width="0.62">
 <path d="M110.02,153.84l212.78,0"/>
 <path d="M142.05,153.84l0,-3.75M160.78,153.84l0,-3.75M174.07,153.84l0,-3.75M184.38,153.84l0,-3.75M192.81,153.84l0,-3.75M199.93,153.84l0,-3.75M206.1,153.84l0,-3.75M211.54,153.84l0,-3.75M248.44,153.84l0,-3.75M267.17,153.84l0,-3.75M280.46,153.84l0,-3.75M290.78,153.84l0,-3.75M299.2,153.84l0,-3.75M306.32,153.84l0,-3.75M312.49,153.84l0,-3.75M317.93,153.84l0,-3.75"/>
 <path d="M110.02,153.84l0,-7.5M216.41,153.84l0,-7.5M322.8,153.84l0,-7.5"/>
 </g>
-<g stroke-width="1" fill="none">
+<g fill="none" stroke-width="1">
 <text x="190.16" y="167.84" font-size="14pt" fill="#000000">x</text>
 <text x="198.91" y="167.84" font-size="14pt" fill="#000000">-axis</text>
 <text x="194.53" y="185.34" font-size="14pt" fill="#000000">(erg)</text>
@@ -50,8 +58,4 @@
 </g>
 </g>
 </g>
-<defs>
-<clipPath id="c0"><path d="m0,0l341.43,0l0,293.42l-341.43,0l0,-293.42"/></clipPath>
-<clipPath id="c1"><path d="m110.02,25.48l212.78,0l0,250.75l-212.78,0l0,-250.75"/></clipPath>
-</defs>
 </svg>
