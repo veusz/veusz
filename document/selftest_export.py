@@ -37,20 +37,15 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
 
     def drawTextItem(self, pt, textitem):
         """Write text directly in self test mode."""
-        self.doStateUpdate()
-        self.fileobj.write(
-            '<text x="%s" y="%s" font-size="%gpt" fill="%s">' % (
-                svg_export.fltStr(pt.x()),
-                svg_export.fltStr(pt.y()),
-                textitem.font().pointSize(),
-                self.pen.color().name()
-                )
-            )
 
-        # fix up any unicode characters coming from renderer
         text = unicode(textitem.text()).encode('ascii', 'xmlcharrefreplace')
-        self.fileobj.write(text)
-        self.fileobj.write('</text>\n')
+        svg_export.SVGElement(self.celement, 'text',
+                              'x="%s" y="%s" font-size="%gpt" fill="%s"' %
+                              (svg_export.fltStr(pt.x()),
+                               svg_export.fltStr(pt.y()),
+                               textitem.font().pointSize(),
+                               self.pen.color().name()),
+                              text=text)
 
 class SelfTestPaintDevice(svg_export.SVGPaintDevice):
      """Paint device for SVG paint engine."""

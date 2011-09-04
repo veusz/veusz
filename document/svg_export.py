@@ -183,6 +183,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
         # previous transform, stroke and clip states
         self.oldstate = [None, None, None]
 
+        # cache paths to avoid duplication
+        self.pathcache = {}
+        self.pathcacheidx = 0
+
         return True
 
     def pruneEmptyGroups(self):
@@ -361,7 +365,21 @@ class SVGPaintEngine(qt4.QPaintEngine):
         attrb = 'd="%s"' % p
         if path.fillRule() == qt4.Qt.WindingFill:
             attrb += ' fill-rule="nonzero"'
-        SVGElement(self.celement, 'path', attrb)
+
+        if attrb in self.pathcache:
+            element, num = self.pathcache[attrb]
+            if num is None:
+                # this is the first time an element has been referenced again
+                # assign it an id for use below
+                num = self.pathcacheidx
+                self.pathcacheidx += 1
+                self.pathcache[attrb] = element, num
+                # add an id attribute
+                element.attrb += ' id="p%i"' % num
+            SVGElement(self.celement, 'use', 'xlink:href="#p%i"' % num)
+        else:
+            pathel = SVGElement(self.celement, 'path', attrb)
+            self.pathcache[attrb] = [pathel, None]
 
     def drawTextItem(self, pt, textitem):
         """Convert text to a path and draw it.
