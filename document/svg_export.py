@@ -147,7 +147,6 @@ class SVGPaintEngine(qt4.QPaintEngine):
     def begin(self, paintdevice):
         """Start painting."""
         self.device = paintdevice
-        self.fileobj = paintdevice.fileobj
 
         self.pen = qt4.QPen()
         self.brush = qt4.QBrush()
@@ -155,13 +154,6 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.clipnum = 0
         self.existingclips = {}
         self.matrix = qt4.QMatrix()
-
-        self.defs = []
-
-        self.fileobj.write('''<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-''')
 
         # svg root element for qt defaults
         self.rootelement = SVGElement(
@@ -208,8 +200,13 @@ class SVGPaintEngine(qt4.QPaintEngine):
     def end(self):
         self.pruneEmptyGroups()
 
-        # write any defined objects
-        self.rootelement.write(self.fileobj)
+        fileobj = self.device.fileobj
+        fileobj.write('<?xml version="1.0" standalone="no"?>\n'
+                      '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n'
+                      '  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
+
+        # write all the elements
+        self.rootelement.write(fileobj)
 
         return True
 
