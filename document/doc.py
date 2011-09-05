@@ -100,6 +100,7 @@ class Document( qt4.QObject ):
         # store custom functions and constants
         # consists of tuples of (name, type, value)
         # type is constant or function
+        # we use this format to preserve evaluation order
         self.customs = []
         self.updateEvalContext()
 
@@ -698,6 +699,13 @@ class Document( qt4.QObject ):
                 self._updateEvalContextImport(name, val)
             else:
                 raise ValueError, 'Invalid custom type'
+
+    def customDict(self):
+        """Return a dictionary mapping custom names to (idx, type, value)."""
+        retn = {}
+        for i, (ctype, name, val) in enumerate(self.customs):
+            retn[name] = (i, ctype, val)
+        return retn
 
     def evalDatasetExpression(self, expr, part='data'):
         """Return results of evaluating a 1D dataset expression.

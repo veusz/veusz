@@ -36,6 +36,14 @@ from datasetplugin import DatasetText as ImportDatasetText
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
 
+class ImportConstant(object):
+    """Dataset to return to set a veusz constant after import."""
+    def __init__(self, name, val):
+        """Map string value val to name.
+        Convert float vals to strings first!"""
+        self.name = name
+        self.val = val
+
 class ImportPluginParams(object):
     """Parameters to plugin are passed in this object."""
     def __init__(self, filename, encoding, field_results):

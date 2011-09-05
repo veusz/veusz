@@ -1228,6 +1228,22 @@ class OperationDataImportPlugin(object):
             except KeyError:
                 pass
 
+    def addConstants(self, document, consts):
+        """Add the constants return by plugins to document."""
+
+        self.oldconst = None
+        if len(consts) > 0:
+            self.oldconst = list(document.customs)
+            cd = document.customDict()
+            for name, val in consts:
+                x = ['constant', name, val]
+                if name in cd:
+                    idx, ctype, val = cd[name]
+                    document.customs[idx] = x
+                else:
+                    document.customs.append(x)
+            document.updateEvalContext()
+
     def do(self, document):
         """Do import."""
 
@@ -1249,6 +1265,8 @@ class OperationDataImportPlugin(object):
                 encoding=self.encoding, prefix=self.prefix,
                 suffix=self.suffix)
             
+        consts = []
+
         # convert results to real datasets
         for d in results:
             if isinstance(d, plugins.ImportDataset1D):
@@ -1259,6 +1277,8 @@ class OperationDataImportPlugin(object):
                                         yrange=d.rangey)
             elif isinstance(d, plugins.ImportDatasetText):
                 ds = datasets.DatasetText(data=d.data)
+            elif isinstance(d, plugins.ImportConstant):
+                consts.append( (d.name, d.val) )
             else:
                 raise RuntimeError("Invalid data set in plugin results")
 
@@ -1274,6 +1294,9 @@ class OperationDataImportPlugin(object):
             # actually make dataset
             document.setData(d.name, ds)
 
+        # add constants to doc, if any
+        self.addConstants(document, consts)
+
         self.datasetnames = [d.name for d in results]
         return self.datasetnames
 
@@ -1284,6 +1307,9 @@ class OperationDataImportPlugin(object):
             del document.data[name]
         for name, dataset in self.olddata.iteritems():
             document.setData(name, dataset)
+        if self.oldconst is not None:
+            document.customs = self.oldconst
+            document.updateEvalContext()
 
 class OperationDataCaptureSet(object):
     """An operation for setting the results from a SimpleRead into the
