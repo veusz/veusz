@@ -1235,13 +1235,12 @@ class OperationDataImportPlugin(object):
         if len(consts) > 0:
             self.oldconst = list(document.customs)
             cd = document.customDict()
-            for name, val in consts:
-                x = ['constant', name, val]
-                if name in cd:
+            for item in consts:
+                if item[1] in cd:
                     idx, ctype, val = cd[name]
-                    document.customs[idx] = x
+                    document.customs[idx] = item
                 else:
-                    document.customs.append(x)
+                    document.customs.append(item)
             document.updateEvalContext()
 
     def do(self, document):
@@ -1278,7 +1277,9 @@ class OperationDataImportPlugin(object):
             elif isinstance(d, plugins.ImportDatasetText):
                 ds = datasets.DatasetText(data=d.data)
             elif isinstance(d, plugins.ImportConstant):
-                consts.append( (d.name, d.val) )
+                consts.append( ['constant', d.name, d.val] )
+            elif isinstance(d, plugins.ImportFunction):
+                consts.append( ['function', d.name, d.val] )
             else:
                 raise RuntimeError("Invalid data set in plugin results")
 

@@ -37,10 +37,18 @@ from datasetplugin import DatasetText as ImportDatasetText
 importpluginregistry = []
 
 class ImportConstant(object):
-    """Dataset to return to set a veusz constant after import."""
+    """Dataset to return to set a Veusz constant after import."""
     def __init__(self, name, val):
         """Map string value val to name.
         Convert float vals to strings first!"""
+        self.name = name
+        self.val = val
+
+class ImportFunction(object):
+    """Dataset to return to set a Veusz function after import."""
+    def __init__(self, name, val):
+        """Map string value val to name.
+        name is "funcname(param,...)", val is a text expression of param."""
         self.name = name
         self.val = val
 
@@ -135,7 +143,9 @@ class ImportPluginExample(ImportPlugin):
         for line in f:
             data += [float(x)*mult-sub for x in line.split()]
 
-        return [ImportDataset1D(params.field_results["name"], data)]
+        return [ImportDataset1D(params.field_results["name"], data),
+                ImportConstant("testconst", "42"),
+                ImportFunction("testfunc(x)", "testconst*x**2")]
 
 class QdpFile(object):
     """Handle reading of a Qdp file."""
