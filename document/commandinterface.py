@@ -65,6 +65,7 @@ class CommandInterface(qt4.QObject):
         'NodeType',
         'ReloadData',
         'Remove',
+        'RemoveCustom',
         'Rename',
         'ResolveReference',
         'Set',
@@ -133,6 +134,10 @@ class CommandInterface(qt4.QObject):
           widget: widget path to place widget in
 
         The optional arguments are sent to construct the widget.
+
+        If autoadd is True (the default), then any sub widgets
+        associated with the widgets are added automatically (e.g. axes
+        for graph widgets).
         """
 
         at = self.currentwidget
@@ -148,15 +153,51 @@ class CommandInterface(qt4.QObject):
 
         return w.name
 
-    def AddCustom(self, name, ctype, val):
+    def AddCustom(self, ctype, name, val, mode='appendalways'):
         """Add a custom definition for evaluation of expressions.
 
-        name is name of constant, or function(params)
-        ctype is constant or function
-        val is definition."""
+        ctype is "constant", "function" or "import".
+
+        name is name of constant, or "function(x, y, ...)" or module
+        name.
+
+        val is definition for constant or function (both are
+        _strings_), or is a list of symbols for a module (comma
+        separated items in a string).
+
+        if mode is 'appendalways', the custom value is appended to the
+        end of the list even if there is one with the same name. If
+        mode is 'replace', it replaces any existing definition in the
+        same place in the list or is appended otherwise. If mode is
+        'append', then an existing definition is deleted, and the new
+        one appended to the end.
+        """
+
+        if not isinstance(val, basestring):
+            raise RuntimeError, 'Value should be string'
+        if mode not in ('appendalways', 'append', 'replace'):
+            raise RuntimeError, 'Invalid mode'
+        if ctype not in ('constant', 'import', 'function'):
+            raise RuntimeError, 'Invalid type'
 
         vals = list( self.document.customs )
-        vals.append( [name, ctype, val] )
+        item = [ctype, name, val]
+        if mode == 'appendalways':
+            vals.append(item)
+        else:
+            # find any existing item
+            for i, (t, n, v) in enumerate(vals):
+                if n == name:
+                    if mode == 'append':
+                        del vals[i]
+                        vals.append(item)
+                    else: # replace
+                        vals[i] = item
+                    break
+            else:
+                # no existing item, so append
+                vals.append(item)
+
         op = operations.OperationSetCustom(vals)
         self.document.applyOperation(op)
 
@@ -239,8 +280,23 @@ class CommandInterface(qt4.QObject):
         if self.verbose:
             print "Removed widget '%s'" % name
 
+    def RemoveCustom(self, name):
+        """Removes a custom-defined constant, function or import."""
+        vals = list( self.document.customs )
+        for i, (t, n, v) in enumerate(vals):
+            if n == name:
+                del vals[i]
+                break
+        else:
+            raise ValueError, 'Custom variable not defined'
+        op = operations.OperationSetCustom(vals)
+        self.document.applyOperation(op)
+
     def To(self, where):
-        """Change to a graph within the current graph."""
+        """Change to a graph within the current graph.
+
+        where is a path to the widget relative to the current widget
+        """
 
         self.currentwidget = self.document.resolve(self.currentwidget,
                                                    where)
@@ -249,7 +305,7 @@ class CommandInterface(qt4.QObject):
             print "Changed to graph '%s'" % self.currentwidget.path
 
     def List(self, where='.'):
-        """List the contents of a graph."""
+        """List the contents of a widget, by default the current widget."""
 
         widget = self.document.resolve(self.currentwidget, where)
         children = widget.childnames
