@@ -2,9 +2,14 @@
 # Saved at 2011-09-06T18:47:34.442485
 
 AddImportPath(u'/home/jss/code/veusz/veusz/tests/selftests')
-AddCustom('constant', u'myconst', u'42')
-AddCustom(u'function', u'myfunc(x)', u'myconst*x**2')
+AddCustom('constant', u'myconst', u'10')
+
+AddCustom('constant', 'myconst', '41', mode='replace')
+AddCustom('constant', 'myconst', '42', mode='append')
+
+AddCustom('function', 'myfunc(x)', 'myconst*x**2')
 AddCustom(u'import', u'numpy.linalg', u'inv')
+
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)
