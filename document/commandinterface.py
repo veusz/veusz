@@ -128,7 +128,7 @@ class CommandInterface(qt4.QObject):
         self.verbose = v
 
     def Add(self, widgettype, *args, **args_opt):
-        """Add a graph to the graph with the type given.
+        """Add a widget to the widget with the type given.
 
         optional argument:
           widget: widget path to place widget in
@@ -149,7 +149,7 @@ class CommandInterface(qt4.QObject):
         w = self.document.applyOperation(op)
 
         if self.verbose:
-            print "Added a graph of type '%s' (%s)" % (type, w.userdescription)
+            print "Added a widget of type '%s' (%s)" % (type, w.userdescription)
 
         return w.name
 
@@ -293,7 +293,7 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
     def To(self, where):
-        """Change to a graph within the current graph.
+        """Change to a widget within the current widget.
 
         where is a path to the widget relative to the current widget
         """
@@ -302,7 +302,7 @@ class CommandInterface(qt4.QObject):
                                                    where)
 
         if self.verbose:
-            print "Changed to graph '%s'" % self.currentwidget.path
+            print "Changed to widget '%s'" % self.currentwidget.path
 
     def List(self, where='.'):
         """List the contents of a widget, by default the current widget."""
