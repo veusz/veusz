@@ -742,14 +742,18 @@ class ImportTabPlugins(ImportTab):
             plugin, filename, linked=linked, encoding=encoding,
             prefix=prefix, suffix=suffix, **params)
         try:
-            results = doc.applyOperation(op)
+            datasets, customs = doc.applyOperation(op)
         except plugins.ImportPluginException, ex:
             self.pluginPreview.setPlainText( unicode(ex) )
             return
 
         out = ['Imported data for datasets:']
-        for ds in results:
+        for ds in datasets:
             out.append( doc.data[ds].description(showlinked=False) )
+        if customs:
+            out.append('')
+            out.append('Set custom definitions:')
+            out += customs
 
         self.pluginPreview.setPlainText('\n'.join(out))
 

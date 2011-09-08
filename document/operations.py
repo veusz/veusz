@@ -1228,8 +1228,8 @@ class OperationDataImportPlugin(object):
             except KeyError:
                 pass
 
-    def addConstants(self, document, consts):
-        """Add the constants return by plugins to document."""
+    def addCustoms(self, document, consts):
+        """Add the customs return by plugins to document."""
 
         self.oldconst = None
         if len(consts) > 0:
@@ -1237,7 +1237,7 @@ class OperationDataImportPlugin(object):
             cd = document.customDict()
             for item in consts:
                 if item[1] in cd:
-                    idx, ctype, val = cd[name]
+                    idx, ctype, val = cd[item[1]]
                     document.customs[idx] = item
                 else:
                     document.customs.append(item)
@@ -1263,10 +1263,11 @@ class OperationDataImportPlugin(object):
                 self.pluginname, self.filename, self.params,
                 encoding=self.encoding, prefix=self.prefix,
                 suffix=self.suffix)
-            
-        consts = []
+
+        customs = []
 
         # convert results to real datasets
+        names = []
         for d in results:
             if isinstance(d, plugins.ImportDataset1D):
                 ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
@@ -1277,9 +1278,11 @@ class OperationDataImportPlugin(object):
             elif isinstance(d, plugins.ImportDatasetText):
                 ds = datasets.DatasetText(data=d.data)
             elif isinstance(d, plugins.ImportConstant):
-                consts.append( ['constant', d.name, d.val] )
+                customs.append( ['constant', d.name, d.val] )
+                continue
             elif isinstance(d, plugins.ImportFunction):
-                consts.append( ['function', d.name, d.val] )
+                customs.append( ['function', d.name, d.val] )
+                continue
             else:
                 raise RuntimeError("Invalid data set in plugin results")
 
@@ -1295,11 +1298,16 @@ class OperationDataImportPlugin(object):
             # actually make dataset
             document.setData(d.name, ds)
 
-        # add constants to doc, if any
-        self.addConstants(document, consts)
+            names.append(d.name)
 
-        self.datasetnames = [d.name for d in results]
-        return self.datasetnames
+        # add constants, functions to doc, if any
+        self.addCustoms(document, customs)
+
+        # custom strings
+        custstr = ['%s %s=%s' % tuple(c) for c in customs]
+
+        self.datasetnames = names
+        return self.datasetnames, custstr
 
     def undo(self, document):
         """Undo import."""

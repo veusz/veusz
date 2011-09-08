@@ -1141,23 +1141,28 @@ SetData('y', y)
       <section>
 	<title><anchor id="Command.AddCustom" />AddCustom</title>
 	
-	<para><command>AddCustom(name, type, value)</command></para>
+	<para><command>AddCustom(type, name, value)</command></para>
 	
-	<para>Add a custom function or value for evaluating
-	expressions, or import external python functions.</para>
+	<para>Add a custom definition for evaluation of
+	expressions. This can define a constant (can be in terms of
+	other constants), a function of 1 or more variables, or a
+	function imported from an external python module.</para>
 
-	<para>For a constant value name should be the name of the
-	constant. type should be 'constant'. value is the value of the
-	constant.</para>
+        <para>ctype is "constant", "function" or "import".</para>
 
-	<para>For a function, name should be of the format
-	'functionname(x,y,z)' where x, y and z are its arguments. type
-	should be 'function'. value is the definition of the function,
-	e.g. 'x+y+z'.</para>
+        <para>name is name of constant, or "function(x, y, ...)" or
+        module name.</para>
 
-	<para>For a Python import, name should be the module to import
-	from. type is 'import'. value is the name of the symbol to
-	import.</para>
+        <para>val is definition for constant or function (both are
+        _strings_), or is a list of symbols for a module (comma
+        separated items in a string).</para>
+
+        <para>If mode is 'appendalways', the custom value is appended
+        to the end of the list even if there is one with the same
+        name. If mode is 'replace', it replaces any existing
+        definition in the same place in the list or is appended
+        otherwise. If mode is 'append', then an existing definition is
+        deleted, and the new one appended to the end.</para>
       </section>
 
       <section>
