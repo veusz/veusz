@@ -1269,14 +1269,16 @@ class OperationDataImportPlugin(object):
         # convert results to real datasets
         names = []
         for d in results:
-            if isinstance(d, plugins.ImportDataset1D):
+            if isinstance(d, plugins.Dataset1D):
                 ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
                                       nerr=d.nerr)
-            elif isinstance(d, plugins.ImportDataset2D):
+            elif isinstance(d, plugins.Dataset2D):
                 ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
                                         yrange=d.rangey)
-            elif isinstance(d, plugins.ImportDatasetText):
+            elif isinstance(d, plugins.DatasetText):
                 ds = datasets.DatasetText(data=d.data)
+            elif isinstance(d, plugins.DatasetDateTime):
+                ds = datasets.DatasetDateTime(data=d.data)
             elif isinstance(d, plugins.ImportConstant):
                 customs.append( ['constant', d.name, d.val] )
                 continue

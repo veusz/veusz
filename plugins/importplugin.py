@@ -21,17 +21,8 @@
 import numpy as N
 import veusz.utils as utils
 
-from field import Field as ImportField
-from field import FieldBool as ImportFieldCheck
-from field import FieldText as ImportFieldText
-from field import FieldFloat as ImportFieldFloat
-from field import FieldInt as ImportFieldInt
-from field import FieldCombo as ImportFieldCombo
 import field
-
-from datasetplugin import Dataset1D as ImportDataset1D
-from datasetplugin import Dataset2D as ImportDataset2D
-from datasetplugin import DatasetText as ImportDatasetText
+import datasetplugin
 
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
@@ -88,7 +79,7 @@ class ImportPlugin(object):
 
     def __init__(self):
         """Override this to declare a list of input fields if required."""
-        # a list of ImportField objects to display
+        # a list of Field objects to display
         self.fields = []
 
     def getPreview(self, params):
@@ -102,7 +93,7 @@ class ImportPlugin(object):
     def doImport(self, params):
         """Actually import data
         params is a ImportPluginParams object.
-        Return a list of ImportDataset1D, ImportDataset2D objects
+        Return a list of datasetplugin.Dataset1D, datasetplugin.Dataset2D objects
         """
         return []
 
@@ -118,19 +109,19 @@ class ImportPluginExample(ImportPlugin):
 
     def __init__(self):
         self.fields = [
-            ImportFieldText("name", descr="Dataset name", default="name"),
-            ImportFieldCheck("invert", descr="invert values"),
-            ImportFieldFloat("mult", descr="Multiplication factor", default=1),
-            ImportFieldInt("skip", descr="Skip N lines",
+            field.FieldText("name", descr="Dataset name", default="name"),
+            field.FieldBool("invert", descr="invert values"),
+            field.FieldFloat("mult", descr="Multiplication factor", default=1),
+            field.FieldInt("skip", descr="Skip N lines",
                            default=0, minval=0),
-            ImportFieldCombo("subtract", items=("0", "1", "2"),
+            field.FieldCombo("subtract", items=("0", "1", "2"),
                              editable=False, default="0")
             ]
 
     def doImport(self, params):
         """Actually import data
         params is a ImportPluginParams object.
-        Return a list of ImportDataset1D, ImportDataset2D objects
+        Return a list of datasetplugin.Dataset1D, datasetplugin.Dataset2D objects
         """
         f = params.openFileWithEncoding()
         data = []
@@ -143,9 +134,37 @@ class ImportPluginExample(ImportPlugin):
         for line in f:
             data += [float(x)*mult-sub for x in line.split()]
 
-        return [ImportDataset1D(params.field_results["name"], data),
+        return [datasetplugin.Dataset1D(params.field_results["name"], data),
                 ImportConstant("testconst", "42"),
                 ImportFunction("testfunc(x)", "testconst*x**2")]
+
+
+class ImportPluginDateTime(ImportPlugin):
+    """An example plugin for reading a set of iso date-times from a
+    file."""
+
+    name = "Example plugin for date/times"
+    author = "Jeremy Sanders"
+    description = "Reads a list of ISO date times in a text file"
+
+    def __init__(self):
+        self.fields = [
+            field.FieldText("name", descr="Dataset name", default="name"),
+            ]
+
+    def doImport(self, params):
+        """Actually import data
+        params is a ImportPluginParams object.
+        Return a list of datasetplugin.Dataset1D, datasetplugin.Dataset2D objects
+        """
+        f = params.openFileWithEncoding()
+        data = []
+        for line in f:
+            data.append( datasetplugin.DatasetDateTime.
+                         dateStringToFloat(line.strip()) )
+        return [ datasetplugin.DatasetDateTime(params.field_results["name"],
+                                               data) ]
+#importpluginregistry.append( ImportPluginDateTime() )
 
 class QdpFile(object):
     """Handle reading of a Qdp file."""
@@ -227,16 +246,16 @@ class QdpFile(object):
             a = N.array(self.data[i])
             if len(a.shape) == 1:
                 # no error bars
-                ds = ImportDataset1D(name, data=a)
+                ds = datasetplugin.Dataset1D(name, data=a)
             elif a.shape[1] == 2:
                 # serr
-                ds = ImportDataset1D(name, data=a[:,0], serr=a[:,1])
+                ds = datasetplugin.Dataset1D(name, data=a[:,0], serr=a[:,1])
             elif a.shape[1] == 3:
                 # perr/nerr
                 p = N.where(a[:,1] < a[:,2], a[:,2], a[:,1])
                 n = N.where(a[:,1] < a[:,2], a[:,1], a[:,2])
 
-                ds = ImportDataset1D(name, data=a[:,0], perr=p, nerr=n)
+                ds = datasetplugin.Dataset1D(name, data=a[:,0], perr=p, nerr=n)
             else:
                 raise RuntimeError
 
@@ -332,7 +351,7 @@ class ImportPluginQdp(ImportPlugin):
     def doImport(self, params):
         """Actually import data
         params is a ImportPluginParams object.
-        Return a list of ImportDataset1D, ImportDataset2D objects
+        Return a list of datasetplugin.Dataset1D, datasetplugin.Dataset2D objects
         """
         names = [x.strip() for x in params.field_results["names"]
                  if x.strip()]
@@ -358,20 +377,20 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
         raise ImportPluginException("Unsupported array type")
 
     if val.ndim == 1:
-        return ImportDataset1D(name, val)
+        return datasetplugin.Dataset1D(name, val)
     elif val.ndim == 2:
         if errorsin2d and val.shape[1] in (2, 3):
             # return 1d array
             if val.shape[1] == 2:
                 # use as symmetric errors
-                return ImportDataset1D(name, val[:,0], serr=val[:,1])
+                return datasetplugin.Dataset1D(name, val[:,0], serr=val[:,1])
             else:
                 # asymmetric errors
                 # unclear on ordering here...
-                return ImportDataset1D(name, val[:,0], perr=val[:,1],
-                                       nerr=val[:,2])
+                return datasetplugin.Dataset1D(name, val[:,0], perr=val[:,1],
+                                               nerr=val[:,2])
         else:
-            return ImportDataset2D(name, val)
+            return datasetplugin.Dataset2D(name, val)
     else:
         raise ImportPluginException("Unsupported dataset shape")
 
@@ -569,7 +588,7 @@ class ImportPluginBinary(ImportPlugin):
         data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
                             count=params.field_results["length"])
         data = data.astype(N.float64)
-        return [ ImportDataset1D(name, data) ]
+        return [ datasetplugin.Dataset1D(name, data) ]
 
 importpluginregistry += [
     ImportPluginNpy(),

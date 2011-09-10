@@ -20,3 +20,14 @@ from field import *
 from datasetplugin import *
 from importplugin import *
 from toolsplugin import *
+
+# backward compatibility
+ImportDataset1D = Dataset1D
+ImportDataset2D = Dataset2D
+ImportDatasetText = DatasetText
+ImportField = Field
+ImportFieldCheck = FieldBool
+ImportFieldText = FieldText
+ImportFieldFloat = FieldFloat
+ImportFieldInt = FieldInt
+ImportFieldCombo = FieldCombo

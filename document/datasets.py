@@ -915,6 +915,8 @@ class DatasetDateTime(Dataset):
     columns = ('data',)
     column_descriptions = ('Data',)
 
+    dstype = 'Date'
+
     def __init__(self, data=None, linked=None):
         Dataset.__init__(self, data=data, linked=linked)
 
@@ -1675,7 +1677,6 @@ class Dataset2DExpression(Dataset2D):
         """Return linking information."""
         return 'Linked 2D expression: %s' % self.expr
 
-
 class Dataset2DXYFunc(Dataset2D):
     """Given a range of x and y, this is a dataset which is a function of
     this.
@@ -1873,6 +1874,19 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
 
     def __getitem__(self, key):
         return DatasetText(self.data[key])
+
+    data = property( lambda self: self.getPluginData('data'),
+                     lambda self, val: None )
+
+class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTime):
+    """Return date dataset from plugin."""
+
+    def __init__(self, manager, ds):
+        _DatasetPlugin.__init__(self, manager, ds)
+        DatasetDateTime.__init__(self, [])
+
+    def __getitem__(self, key):
+        return DatasetDateTime(self.data[key])
 
     data = property( lambda self: self.getPluginData('data'),
                      lambda self, val: None )

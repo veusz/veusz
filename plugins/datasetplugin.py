@@ -24,6 +24,8 @@ import numpy as N
 from itertools import izip
 import field
 
+import veusz.utils as utils
+
 # add an instance of your class to this list to be registered
 datasetpluginregistry = []
 
@@ -102,6 +104,44 @@ class Dataset2D(object):
         import veusz.document as document
         return document.Dataset2DPlugin(manager, self)
 
+class DatasetDateTime(object):
+    """Date-time dataset for ImportPlugin or DatasetPlugin."""
+
+    def __init__(self, name, data=[]):
+        """A date dataset
+        name: name of dataset
+        data: list of datetime objects
+        """
+        self.name = name
+        self.update(data=data)
+
+    def update(self, data=[]):
+        self.data = N.array(data)
+
+    @staticmethod
+    def datetimeToFloat(datetimeval):
+        """Return a python datetime object to the required float type."""
+        return utils.datetimeToFloat(datetimeval)
+
+    @staticmethod
+    def dateStringToFloat(text):
+        """Try to convert an iso or local date time to the float type."""
+        return utils.dateStringToDate(text)
+
+    @staticmethod
+    def floatToDateTime(val):
+        """Convert float format datetime to Python datetime."""
+        return utils.floatToDateTime(val)
+
+    def _null(self):
+        """Empty data contents."""
+        self.data = N.array([])
+
+    def _makeVeuszDataset(self, manager):
+        """Make a Veusz dataset from the plugin dataset."""
+        import veusz.document as document
+        return document.DatasetDatePlugin(manager, self)
+
 class DatasetText(object):
     """Text dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[]):
@@ -150,6 +190,13 @@ class DatasetPluginHelper(object):
         return [name for name, ds in self._doc.data.iteritems() if
                 (ds.dimensions == 1 and ds.datatype == 'text')]
 
+    @property
+    def datasetsdatetime(self):
+        """Return list of existing date-time datesets"""
+        import veusz.document as document
+        return [name for name, ds in self._doc.data.iteritems() if
+                isinstance(ds, document.DatasetDateTime)]
+
     def evaluateExpression(self, expr, part='data'):
         """Return results of evaluating a 1D dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
@@ -167,6 +214,7 @@ class DatasetPluginHelper(object):
         name not found: raise a DatasetPluginException
         dimensions not right: raise a DatasetPluginException
         """
+        import veusz.document as document
         try:
             ds = self._doc.data[name]
         except KeyError:
@@ -179,7 +227,9 @@ class DatasetPluginHelper(object):
             raise DatasetPluginException(
                 "Dataset '%s' is not a numerical dataset" % name)
 
-        if ds.dimensions == 1:
+        if isinstance(ds, document.DatasetDateTime):
+            return DatasetDateTime(name, data=ds.data)
+        elif ds.dimensions == 1:
             return Dataset1D(name, data=ds.data, serr=ds.serr, 
                              perr=ds.perr, nerr=ds.nerr)
         elif ds.dimensions == 2:
