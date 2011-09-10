@@ -885,10 +885,9 @@ class OperationDataImport(object):
         olddatasets = dict(document.data)
         
         # actually set the data in the document
-        names = self.simpleread.setInDocument(document, linkedfile=LF,
-                                              prefix=self.prefix,
-                                              suffix=self.suffix)
-        
+        names = self.simpleread.setInDocument(
+            document, linkedfile=LF, prefix=self.prefix, suffix=self.suffix)
+
         # only remember the parts we need
         self.olddatasets = dict([ (n, olddatasets.get(n, None)) for n in names])
         
@@ -1069,7 +1068,8 @@ class OperationDataImport2D(object):
                                        suffix=self.suffix)
         
         # only remember the parts we need
-        self.olddatasets = dict([ (n, olddatasets.get(n, None)) for n in names])
+        self.olddatasets = dict([ (n, olddatasets.get(n, None))
+                                  for n in self.datasets ])
         
         return readds
 
@@ -1210,11 +1210,10 @@ class OperationDataImportFITS(object):
 
     def undo(self, document):
         """Undo the import."""
-        
-        document.deleteData(self.dsname)
-            
         if self.olddataset is not None:
             document.setData(self.dsname, self.olddataset)
+        else:
+            document.deleteData(self.dsname)
 
 class OperationDataImportPlugin(object):
     """Import data using a plugin."""
@@ -1334,7 +1333,7 @@ class OperationDataImportPlugin(object):
         """Undo import."""
 
         for name in self.datasetnames:
-            document.deletData(name)
+            document.deleteData(name)
         for name, dataset in self.olddata.iteritems():
             document.setData(name, dataset)
         if self.oldconst is not None:
