@@ -1625,7 +1625,7 @@ class OperationDatasetPlugin(object):
         # add new datasets to document
         for name, ds in izip(names, manager.veuszdatasets):
             if name is not None:
-                document.SetData(name, ds)
+                document.setData(name, ds)
 
         return names
 
