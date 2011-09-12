@@ -27,22 +27,6 @@ import datasetplugin
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
 
-class ImportConstant(object):
-    """Dataset to return to set a Veusz constant after import."""
-    def __init__(self, name, val):
-        """Map string value val to name.
-        Convert float vals to strings first!"""
-        self.name = name
-        self.val = val
-
-class ImportFunction(object):
-    """Dataset to return to set a Veusz function after import."""
-    def __init__(self, name, val):
-        """Map string value val to name.
-        name is "funcname(param,...)", val is a text expression of param."""
-        self.name = name
-        self.val = val
-
 class ImportPluginParams(object):
     """Parameters to plugin are passed in this object."""
     def __init__(self, filename, encoding, field_results):
@@ -135,8 +119,8 @@ class ImportPluginExample(ImportPlugin):
             data += [float(x)*mult-sub for x in line.split()]
 
         return [datasetplugin.Dataset1D(params.field_results["name"], data),
-                ImportConstant("testconst", "42"),
-                ImportFunction("testfunc(x)", "testconst*x**2")]
+                datasetplugin.Constant("testconst", "42"),
+                datasetplugin.Function("testfunc(x)", "testconst*x**2")]
 
 
 class ImportPluginDateTime(ImportPlugin):

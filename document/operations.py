@@ -1297,10 +1297,10 @@ class OperationDataImportPlugin(object):
                 ds = datasets.DatasetText(data=d.data)
             elif isinstance(d, plugins.DatasetDateTime):
                 ds = datasets.DatasetDateTime(data=d.data)
-            elif isinstance(d, plugins.ImportConstant):
+            elif isinstance(d, plugins.Constant):
                 customs.append( ['constant', d.name, d.val] )
                 continue
-            elif isinstance(d, plugins.ImportFunction):
+            elif isinstance(d, plugins.Function):
                 customs.append( ['function', d.name, d.val] )
                 continue
             else:

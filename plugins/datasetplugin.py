@@ -164,6 +164,26 @@ class DatasetText(object):
         import veusz.document as document
         return document.DatasetTextPlugin(manager, self)
 
+class Constant(object):
+    """Dataset to return to set a Veusz constant after import.
+    This is only useful in an ImportPlugin, not a DatasetPlugin
+    """
+    def __init__(self, name, val):
+        """Map string value val to name.
+        Convert float vals to strings first!"""
+        self.name = name
+        self.val = val
+
+class Function(object):
+    """Dataset to return to set a Veusz function after import."""
+    def __init__(self, name, val):
+        """Map string value val to name.
+        name is "funcname(param,...)", val is a text expression of param.
+        This is only useful in an ImportPlugin, not a DatasetPlugin
+        """
+        self.name = name
+        self.val = val
+
 # class to pass to plugin to give parameters
 class DatasetPluginHelper(object):
     """Helpers to get existing datasets for plugins."""
