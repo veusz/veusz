@@ -66,6 +66,7 @@ class Widget(object):
         # save parent widget for later
         self.parent = parent
         self.document = None
+        self.changeset = 0
 
         if not self.isAllowedParent(parent):
             raise RuntimeError, "Widget parent is of incorrect type"
@@ -114,6 +115,10 @@ class Widget(object):
         Unfortunately we need this as document is shadowed in StyleSheet,
         sigh."""
         return self.document
+
+    def modified(self):
+        """One of the settings has been modified."""
+        self.changeset += 1
 
     def rename(self, name):
         """Change name of self."""
@@ -337,7 +342,6 @@ class Widget(object):
         """Read the default settings.
         Also set settings to stylesheet
         """
-        self.settings.readDefaults('', self.name)
         self.settings.linkToStylesheet()
 
     def buildFlatWidgetList(self, thelist):

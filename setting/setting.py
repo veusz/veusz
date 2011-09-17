@@ -121,14 +121,21 @@ class Setting(object):
 
         if isinstance(v, Reference):
             self._val = v
+            v.parent = self
         else:
             # this also removes the linked value if there is one set
             self._val = self.convertTo(v)
 
-        self.onmodified.emit(qt4.SIGNAL("onModified"), True)
+        self.modified()
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
+
+    def modified(self):
+        """Called by Reference if it is modified."""
+        self.onmodified.emit(qt4.SIGNAL("onModified"), True)
+        if self.parent:
+            self.parent.modified()
 
     def isReference(self):
         """Is this a setting a reference to another object."""
@@ -155,8 +162,9 @@ class Setting(object):
     def linkToStylesheet(self):
         """Make this setting link to stylesheet setting, if possible."""
         self.set( Reference(self.getStylesheetLink()) )
-               
-    def _path(self):
+
+    @property
+    def path(self):
         """Return full path of setting."""
         path = []
         obj = self
@@ -172,10 +180,7 @@ class Setting(object):
                     path.insert(0, obj.name)
             obj = obj.parent
         return '/'.join(path)
-        
-    path = property(_path, None, None,
-                    'Return the full path of the setting')
-    
+
     def toText(self):
         """Convert the type to text for saving."""
         return ""
@@ -185,67 +190,6 @@ class Setting(object):
 
         Raises InvalidType if cannot convert."""
         return None
-
-    def readDefaults(self, root, widgetname):
-        """Check whether the user has a default for this setting."""
-
-        deftext = None
-        unnamedpath = '%s/%s' % (root, self.name)
-        try:
-            deftext = settingdb[unnamedpath]
-        except KeyError:
-            pass
-
-        # named defaults supersedes normal defaults
-        namedpath = '%s_NAME:%s' % (widgetname, unnamedpath)
-        try:
-            deftext = settingdb[namedpath]
-        except KeyError:
-            pass
-    
-        if deftext is not None:
-            self.val = self.fromText(deftext)
-            self.default = self.val
-
-    def removeDefault(self):
-        """Remove the default setting for this setting."""
-
-        # build up setting path
-        path = ''
-        item = self
-        while not item.isWidget():
-            path = '/%s%s' % (item.name, path)
-            item = item.parent
-
-        # remove the settings (ignore if they are not set)
-        if path in settingdb:
-            del settingdb[path]
-
-        # specific setting to this widgetname
-        namedpath = '%s_NAME:%s' % (item.name, path)
-
-        if namedpath in settingdb:
-            del settingdb[namedpath]
-
-    def setAsDefault(self, withwidgetname = False):
-        """Set the current value of this setting as the default value
-
-        If withwidthname is True, then it is only the default for widgets
-        of the particular name this setting is contained within."""
-
-        # build up setting path
-        path = ''
-        item = self
-        while not item.isWidget():
-            path = '/%s%s' % (item.name, path)
-            item = item.parent
-
-        # if the setting is only for widgets with a certain name
-        if withwidgetname:
-            path = '%s_NAME:%s' % (item.name, path)
-
-        # set the default
-        settingdb[path] = self.toText()
 
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""
@@ -264,11 +208,6 @@ class Setting(object):
         """Set the function to be called on modification (passing True)."""
         self.onmodified.connect(self.onmodified,
                                 qt4.SIGNAL("onModified"), fn)
-
-        if isinstance(self._val, Reference):
-            # make reference pointed to also call this onModified
-            r = self._val.resolve(self)
-            r.setOnModified(fn)
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""

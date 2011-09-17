@@ -204,8 +204,8 @@ class MarkerFillBrush(setting.Brush):
     def __init__(self, name, **args):
         setting.Brush.__init__(self, name, **args)
 
-        self.get('color').newDefault( setting.Reference(
-            '../PlotLine/color') )
+        #self.get('color').newDefault( setting.Reference(
+        #    '../PlotLine/color') )
 
         self.add( setting.Colormap(
                 'colorMap', 'grey',

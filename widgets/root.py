@@ -119,22 +119,21 @@ class Root(widget.Widget):
                 newsett = setting.Settings(name=klass.typename,
                                            usertext = klass.typename,
                                            pixmap="button_%s" % klass.typename)
-                classset = setting.Settings('temp')
-                klass.addSettings(classset)
-
-                # copy formatting settings to stylesheet
-                for name in classset.setnames:
-                    # might become recursive
-                    if name == 'StyleSheet':
-                        continue
-
-                    sett = classset.setdict[name]
-                    # skip non formatting settings
-                    #if hasattr(sett, 'formatting') and not sett.formatting:
-                    #    continue
-                    newsett.add( sett.copy() )
-            
                 stylesheet.add(newsett)
+
+                klass.addSettings(newsett)
+
+                # classset = setting.Settings('temp')
+                # klass.addSettings(classset)
+
+                # # copy settings to stylesheet
+                # for name in classset.setnames:
+                #     # might become recursive
+                #     if name == 'StyleSheet':
+                #         continue
+
+                #     sett = classset.setdict[name]
+                #     newsett.add( sett.copy() )
 
 # allow the factory to instantiate this
 document.thefactory.register( Root )

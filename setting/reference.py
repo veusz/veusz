@@ -33,18 +33,18 @@ class Reference(object):
     def __init__(self, value):
         """Initialise reference with value, which is a string as above."""
         self.value = value
-        self.split = value.split('/')
+
+        # assigned once reference has been resolved
         self.resolved = None
 
-    def resolve(self, thissetting):
+        # this is assigned by the setting using this reference
+        self.parent = None
+
+    def _doresolution(self, thissetting):
         """Return the setting object associated with the reference."""
 
-        # this is for stylesheet references which don't move
-        if self.resolved:
-            return self.resolved
-
         item = thissetting.parent
-        parts = list(self.split)
+        parts = list(self.value.split('/'))
         if parts[0] == '':
             # need root widget if begins with slash
             while item.parent is not None:
@@ -74,9 +74,18 @@ class Reference(object):
                     except KeyError:
                         raise self.ResolveException()
 
-        # shortcut to resolve stylesheets
-        # hopefully this won't ever change
-        if len(self.split) > 2 and self.split[1] == 'StyleSheet':
-            self.resolved = item
-
         return item
+
+    def resolve(self, thissetting):
+        """Just return the resolved setting."""
+
+        if self.resolved is None:
+            self.resolved = self._doresolution(thissetting)
+            self.resolved.setOnModified(self._onmodified)
+
+        return self.resolved
+
+    def _onmodified(self):
+        """Tell parent if a reference is modified."""
+        if self.parent:
+            self.parent.modified()

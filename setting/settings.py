@@ -81,6 +81,11 @@ class Settings(object):
         """Is the name a supported setting?"""
         return name in self.setdict
 
+    def modified(self):
+        """Called when a setting is modified."""
+        if self.parent:
+            self.parent.modified()
+
     def add(self, setting, posn = -1, readonly = False, pixmap=None):
         """Add a new setting with the name, or a set of subsettings."""
         name = setting.name
@@ -97,7 +102,7 @@ class Settings(object):
 
         if readonly:
             setting.readonly = True
-        
+
     def remove(self, name):
         """Remove name from the list of settings."""
 
@@ -201,19 +206,6 @@ class Settings(object):
         text = ''.join( [self.setdict[name].saveText(saveall, rootname)
                          for name in self.setnames] )
         return text
-
-    def readDefaults(self, root, widgetname):
-        """Return default values from saved text.
-
-        root is the path of the setting in the db, built up by settings
-        above this one
-
-        widgetname is the name of the widget this setting belongs to
-        """
-
-        root = '%s/%s' % (root, self.name)
-        for s in self.setdict.values():
-            s.readDefaults(root, widgetname)
 
     def linkToStylesheet(self, _root=None):
         """Link the settings within this Settings to a stylesheet.
