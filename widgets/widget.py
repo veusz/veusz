@@ -66,7 +66,6 @@ class Widget(object):
         # save parent widget for later
         self.parent = parent
         self.document = None
-        self.changeset = 0
 
         if not self.isAllowedParent(parent):
             raise RuntimeError, "Widget parent is of incorrect type"
@@ -85,6 +84,9 @@ class Widget(object):
         
         # position of this widget on its parent
         self.position = (0., 0., 1., 1.)
+
+        # this stores whether any settings have been changed
+        self.haschanged = False
 
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename )
@@ -113,9 +115,10 @@ class Widget(object):
     @property
     def changeset(self):
         """A number that increments everytime one of this widget's settings changes"""
-        changed = self.settings.hasChanged() or self.dataHasChanged()
+        changed = self.haschanged or self.dataHasChanged()
         if changed:
             self._changeset += 1
+            self.haschanged = False
 
         return self._changeset
 
@@ -150,7 +153,7 @@ class Widget(object):
 
     def modified(self):
         """One of the settings has been modified."""
-        self.changeset += 1
+        self.haschanged = True
 
     def rename(self, name):
         """Change name of self."""
