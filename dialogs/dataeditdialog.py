@@ -163,6 +163,8 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.slotDocumentModified)
 
     def rowCount(self, parent):
         ds = self.document.data[self.dsname].data
@@ -208,6 +210,38 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         return qt4.QVariant()
     
+    def flags(self, index):
+        """Update flags to say that items are editable."""
+        if not index.isValid():
+            return qt4.Qt.ItemIsEnabled
+        else:
+            return qt4.QAbstractTableModel.flags(self, index) | qt4.Qt.ItemIsEditable
+
+    def slotDocumentModified(self):
+        """Called when document modified."""
+        self.emit( qt4.SIGNAL('layoutChanged()') )
+
+    def setData(self, index, value, role):
+        """Called to set the data."""
+
+        if not index.isValid() or role != qt4.Qt.EditRole:
+            return False
+
+        ds = self.document.data[self.dsname]
+        row = ds.data.shape[0]-index.row()-1
+        col = index.column()
+
+        # update if conversion okay
+        try:
+            val = ds.uiConvertToDataItem( value.toString() )
+        except ValueError:
+            return False
+
+        op = document.OperationDatasetSetVal2D(
+            self.dsname, row, col, val)
+        self.document.applyOperation(op)
+        return True
+
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
     

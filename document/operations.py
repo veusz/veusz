@@ -1434,6 +1434,31 @@ class OperationDatasetSetVal(object):
         datacol[self.row] = self.oldval
         ds.changeValues(self.columnname, datacol)
     
+class OperationDatasetSetVal2D(object):
+    """Set a value in a 2D dataset."""
+
+    descr = 'change 2D dataset value'
+
+    def __init__(self, datasetname, row, col, val):
+        """Set row in column columnname to val."""
+        self.datasetname = datasetname
+        self.row = row
+        self.col = col
+        self.val = val
+
+    def do(self, document):
+        """Set the value."""
+        ds = document.data[self.datasetname]
+        self.oldval = ds.data[self.row, self.col]
+        ds.data[self.row, self.col] = self.val
+        document.modifiedData(ds)
+
+    def undo(self, document):
+        """Restore the value."""
+        ds = document.data[self.datasetname]
+        ds.data[self.row, self.col] = self.oldval
+        document.modifiedData(ds)
+
 class OperationDatasetDeleteRow(object):
     """Delete a row or several in the dataset."""
 
