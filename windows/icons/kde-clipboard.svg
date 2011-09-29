@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="kde-edit-paste.svg"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:version="0.32"
+   id="svg1"
+   x="0"
+   y="0"
+   version="1.0"
+   _SVGFile__filename="oldscale/actions/paste.svg"
+   width="60"
+   height="60">
+  <sodipodi:namedview
+     inkscape:current-layer="svg1"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="691"
+     inkscape:window-width="1020"
+     inkscape:cy="26.471539"
+     inkscape:cx="40.06557"
+     inkscape:zoom="3.4732669"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     inkscape:window-maximized="0" />
+  <defs
+     id="defs3" />
+  <metadata
+     id="metadata16">
+    <RDF
+       id="RDF17">
+      <Work
+         id="Work18"
+         about="">
+        <title
+           id="title19">Part of the Flat Icon Collection (Thu Aug 26 14:38:01 2004)</title>
+        <description
+           id="description21" />
+        <subject
+           id="subject22">
+          <Bag
+             id="Bag23">
+            <li
+               id="li24" />
+          </Bag>
+        </subject>
+        <publisher
+           id="publisher25">
+          <Agent
+             id="Agent26"
+             about="">
+            <title
+               id="title27" />
+          </Agent>
+        </publisher>
+        <creator
+           id="creator28">
+          <Agent
+             id="Agent29"
+             about="">
+            <title
+               id="title30">Danny Allen</title>
+          </Agent>
+        </creator>
+        <rights
+           id="rights32">
+          <Agent
+             id="Agent33"
+             about="">
+            <title
+               id="title34">Danny Allen</title>
+          </Agent>
+        </rights>
+        <date
+           id="date36" />
+        <format
+           id="format37">image/svg+xml</format>
+        <type
+           resource="http://purl.org/dc/dcmitype/StillImage"
+           id="type39" />
+        <license
+           resource="http://creativecommons.org/licenses/LGPL/2.1/"
+           id="license40">
+          <date
+             id="date41" />
+        </license>
+        <language
+           id="language42">en</language>
+      </Work>
+    </RDF>
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     id="path1078"
+     d="m 21.233061,5.1395461 c -2.123986,-10e-8 -3.849911,1.6948745 -3.849911,3.8188635 l 0,2.1733374 c 0,0.199675 0.09504,0.367577 0.124191,0.558858 l -3.72572,0 c -1.545421,0 -2.79429,1.338023 -2.79429,2.980577 l 0,37.81606 c 0,1.642555 1.248869,2.949529 2.79429,2.949529 l 33.593578,0 c 1.545424,-2e-6 2.794291,-1.306974 2.794291,-2.949529 l 0,-37.81606 c 10e-7,-1.642554 -1.24887,-2.980577 -2.794291,-2.980577 l -3.72572,0 c 0.02915,-0.191281 0.124192,-0.359183 0.124192,-0.558858 l 0,-2.1733374 c -5e-6,-2.1239887 -1.725925,-3.8188635 -3.849912,-3.8188635 l -18.690698,0 z"
+     style="font-size:12px;fill:none;stroke:#ffffff;stroke-width:9.20812225;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+     inkscape:connector-curvature="0" />
+  <path
+     id="rect1101"
+     d="m 13.791108,11.690812 c -1.54542,0 -2.789567,1.322343 -2.789567,2.964897 l 0,37.818926 c 0,1.642555 1.244147,2.964896 2.789567,2.964896 l 33.574614,0 c 1.545421,0 2.789564,-1.322341 2.789564,-2.964896 l 0,-37.818926 c 0,-1.642554 -1.244143,-2.964897 -2.789564,-2.964897 l -33.574614,0 z"
+     style="font-size:12px;fill:#ffe940;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3.54158282;stroke-linejoin:round;stroke-opacity:1"
+     inkscape:connector-curvature="0" />
+  <path
+     id="rect690"
+     d="m 14.276062,21.867586 8.666774,30.252853 23.937931,-6.857681 -8.666765,-30.252854 -23.93794,6.857682 z"
+     style="font-size:12px;fill:#fff591;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.83326936;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+     inkscape:connector-curvature="0" />
+  <path
+     id="rect689"
+     d="m 21.218043,5.1367869 c -2.123988,0 -3.833916,1.7099262 -3.833916,3.8339157 l 0,2.1632034 c 0,2.123988 1.709928,3.833917 3.833916,3.833917 l 18.720737,0 c 2.123988,0 3.833917,-1.709929 3.833917,-3.833917 l 0,-2.1632034 c 0,-2.1239895 -1.709929,-3.8339157 -3.833917,-3.8339157 l -18.720737,0 z"
+     style="font-size:12px;fill:#d8ae7e;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3.54158306;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+     inkscape:connector-curvature="0" />
+</svg>

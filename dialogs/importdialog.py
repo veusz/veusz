@@ -151,7 +151,7 @@ class ImportTabStandard(ImportTab):
         if len(lines) != 0:
             lines.append('')
             
-        lines += self.dialog.retnDatasetInfo(dsnames)
+        lines += self.dialog.retnDatasetInfo(dsnames, linked, filename)
 
         self.previewedit.setPlainText( '\n'.join(lines) )
 
@@ -224,7 +224,7 @@ class ImportTabCSV(ImportTab):
             return False
 
         try:
-            reader = utils.UnicodeCSVReader( open(filename),
+            reader = utils.UnicodeCSVReader( filename,
                                              delimiter=delimiter,
                                              quotechar=textdelimiter,
                                              encoding=encoding )
@@ -283,7 +283,7 @@ class ImportTabCSV(ImportTab):
         dsnames = doc.applyOperation(op)
         
         # what datasets were imported
-        lines = self.dialog.retnDatasetInfo(dsnames)
+        lines = self.dialog.retnDatasetInfo(dsnames, linked, filename)
 
         t = self.previewtablecsv
         t.verticalHeader().hide()
@@ -709,12 +709,13 @@ class ImportTabPlugins(ImportTab):
         """Preview using plugin."""
 
         # check file exists
-        try:
-            f = open(filename, 'r')
-            f.close()
-        except IOError:
-            self.pluginPreview.setPlainText('')
-            return False
+        if filename != '{clipboard}':
+            try:
+                f = open(filename, 'r')
+                f.close()
+            except IOError:
+                self.pluginPreview.setPlainText('')
+                return False
 
         # get the plugin selected
         plugin = self.getSelectedPlugin()
@@ -862,6 +863,14 @@ class ImportDialog(VeuszDialog):
         self.encodingcombo.defaultlist = utils.encodings
         self.encodingcombo.defaultval = 'utf_8'
 
+        # load icon for clipboard
+        self.clipbutton.setIcon( utils.getIcon('kde-clipboard') )
+        self.connect(qt4.QApplication.clipboard(), qt4.SIGNAL('dataChanged()'),
+                     self.updateClipPreview)
+        self.connect(
+            self.clipbutton, qt4.SIGNAL("clicked()"), self.slotClipButtonClicked)
+        self.updateClipPreview()
+
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
@@ -940,9 +949,13 @@ class ImportDialog(VeuszDialog):
         """Do the importing"""
 
         filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
         linked = self.linkcheckbox.isChecked()
         encoding = str(self.encodingcombo.currentText())
+        if filename == '{clipboard}':
+            linked = False
+        else:
+            # normalise filename
+            filename = os.path.abspath(filename)
 
         # import according to tab selected
         importtab = self.methodtab.currentWidget()
@@ -961,7 +974,7 @@ class ImportDialog(VeuszDialog):
             d.exec_()
         self.document.enableUpdates()
 
-    def retnDatasetInfo(self, dsnames):
+    def retnDatasetInfo(self, dsnames, linked, filename):
         """Return a list of information for the dataset names given."""
         
         lines = ['Imported data for datasets:']
@@ -970,10 +983,6 @@ class ImportDialog(VeuszDialog):
             ds = self.document.getData(name)
             # build up description
             lines.append( ' %s' % ds.description(showlinked=False) )
-
-        linked = self.linkcheckbox.isChecked()
-        filename = unicode( self.filenameedit.text() )
-        filename = os.path.abspath(filename)
 
         # whether the data were linked
         if linked:
@@ -1003,3 +1012,14 @@ class ImportDialog(VeuszDialog):
 
         importtab = self.methodtab.currentWidget()
         importtab.reset()
+
+    def slotClipButtonClicked(self):
+        """Clicked clipboard button."""
+        self.filenameedit.setText("{clipboard}")
+
+    def updateClipPreview(self):
+        """Clipboard contents changed, so update preview if showing clipboard."""
+
+        filename = unicode(self.filenameedit.text())
+        if filename == '{clipboard}':
+            self.slotUpdatePreview()

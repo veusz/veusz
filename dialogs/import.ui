@@ -46,6 +46,16 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="clipbutton">
+       <property name="toolTip">
+        <string>Read in data from clipboard rather than file</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

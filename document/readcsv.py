@@ -169,7 +169,7 @@ class ReadCSV(object):
         """Read the data into the document."""
 
         # open the csv file
-        csvf = utils.UnicodeCSVReader( open(self.filename),
+        csvf = utils.UnicodeCSVReader( self.filename,
                                        delimiter=self.delimiter,
                                        quotechar=self.textdelimiter,
                                        encoding=self.encoding )

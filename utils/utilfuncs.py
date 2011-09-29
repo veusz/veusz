@@ -26,6 +26,7 @@ import os.path
 import threading
 import codecs
 import csv
+import StringIO
 
 import veusz.qtall as qt4
 import numpy as N
@@ -288,9 +289,16 @@ encodings = [
     ]
 
 def openEncoding(filename, encoding, mode='r'):
-    """Convenience function for opening file with encoding given."""
-    return codecs.open(filename, mode, encoding, 'ignore')
+    """Convenience function for opening file with encoding given.
 
+    If filename == '{clipboard}', then load the data from the clipboard
+    instead.
+    """
+    if filename == '{clipboard}':
+        text = unicode(qt4.QApplication.clipboard().text())
+        return StringIO.StringIO(text)
+    else:
+        return codecs.open(filename, mode, encoding, 'ignore')
 
 # The following two classes are adapted from the Python documentation
 # they are modified to turn off encoding errors
@@ -315,8 +323,18 @@ class UnicodeCSVReader:
     which is encoded in the given encoding.
     """
 
-    def __init__(self, f, dialect=csv.excel, encoding='utf-8', **kwds):
-        f = UTF8Recoder(f, encoding)
+    def __init__(self, filename, dialect=csv.excel, encoding='utf-8', **kwds):
+
+        if filename != '{clipboard}':
+            # recode the opened file as utf-8
+            f = UTF8Recoder(open(filename), encoding)
+        else:
+            # take the unicode clipboard and just put into utf-8 format
+            s = unicode(qt4.QApplication.clipboard().text())
+            s = s.encode('utf-8')
+            f = StringIO.StringIO(s)
+
+        # the actual csv reader based on the file above
         self.reader = csv.reader(f, dialect=dialect, **kwds)
 
     def next(self):
