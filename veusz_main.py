@@ -179,10 +179,8 @@ def run():
     args = convertArgsUnicode(args)
 
     splash = None
-    if options.listen or options.export:
-        # do not show splash screen
-        spash = None
-    else:
+    if not (options.listen or options.export):
+        # show the splash screen on normal start
         splash = qt4.QSplashScreen(makeSplashLogo())
         splash.show()
         app.processEvents()
