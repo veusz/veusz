@@ -44,10 +44,10 @@ class ImportPluginException(RuntimeError):
 class ImportPlugin(object):
     """Define a plugin to read data in a particular format.
     
-    override doImport and optionally getPreview to define a new plugin
-    register the class by adding to the importpluginregistry list
-    if promote_tab is set to some text, put the plugin on its own tab
-     in the import dialog using that text as the tab name
+    Override doImport and optionally getPreview to define a new plugin.
+    Register the class by adding it to the importpluginregistry list.
+    Of promote_tab is set to some text, put the plugin on its own tab
+     in the import dialog using that text as the tab name.
     """
 
     name = 'Import plugin'
@@ -148,7 +148,7 @@ class ImportPluginDateTime(ImportPlugin):
                          dateStringToFloat(line.strip()) )
         return [ datasetplugin.DatasetDateTime(params.field_results["name"],
                                                data) ]
-#importpluginregistry.append( ImportPluginDateTime() )
+#importpluginregistry.append( ImportPluginDateTime )
 
 class QdpFile(object):
     """Handle reading of a Qdp file."""
@@ -575,9 +575,9 @@ class ImportPluginBinary(ImportPlugin):
         return [ datasetplugin.Dataset1D(name, data) ]
 
 importpluginregistry += [
-    ImportPluginNpy(),
-    ImportPluginNpz(),
-    ImportPluginQdp(),
-    ImportPluginBinary(),
-    ImportPluginExample(),
+    ImportPluginNpy,
+    ImportPluginNpz,
+    ImportPluginQdp,
+    ImportPluginBinary,
+    ImportPluginExample,
     ]

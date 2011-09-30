@@ -626,6 +626,7 @@ class ImportTabPlugins(ImportTab):
         """
         ImportTab.__init__(self, importdialog)
         self.promote = promote
+        self.plugininstance = None
 
     def loadUi(self):
         """Load the user interface."""
@@ -675,7 +676,17 @@ class ImportTabPlugins(ImportTab):
             idx = names.index(selname)
         except ValueError:
             return None
-        return plugins.importpluginregistry[idx]
+
+        p = plugins.importpluginregistry[idx]
+        if isinstance(p, type):
+            # this is a class, rather than an object
+            if not isinstance(self.plugininstance, p):
+                # create new instance, if required
+                self.plugininstance = p()
+            return self.plugininstance
+        else:
+            # backward compatibility with old API
+            return p
 
     def pluginChanged(self, index):
         """Update controls based on index."""

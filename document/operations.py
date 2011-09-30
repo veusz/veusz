@@ -1266,6 +1266,12 @@ class OperationDataImportPlugin(object):
 
         names = [p.name for p in plugins.importpluginregistry]
         plugin = plugins.importpluginregistry[names.index(self.pluginname)]
+
+        # if the plugin is a class, make an instance
+        # the old API is for the plugin to be instances
+        if isinstance(plugin, type):
+            plugin = plugin()
+
         plugparams = plugins.ImportPluginParams(self.filename, self.encoding,
                                                 self.params)
 
