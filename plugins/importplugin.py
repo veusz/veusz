@@ -107,21 +107,23 @@ class ImportPluginExample(ImportPlugin):
         params is a ImportPluginParams object.
         Return a list of datasetplugin.Dataset1D, datasetplugin.Dataset2D objects
         """
-        f = params.openFileWithEncoding()
-        data = []
-        mult = params.field_results["mult"]
-        sub = float(params.field_results["subtract"])
-        if params.field_results["invert"]:
-            mult *= -1
-        for i in xrange(params.field_results["skip"]):
-            f.readline()
-        for line in f:
-            data += [float(x)*mult-sub for x in line.split()]
+        try:
+            f = params.openFileWithEncoding()
+            data = []
+            mult = params.field_results["mult"]
+            sub = float(params.field_results["subtract"])
+            if params.field_results["invert"]:
+                mult *= -1
+            for i in xrange(params.field_results["skip"]):
+                f.readline()
+            for line in f:
+                data += [float(x)*mult-sub for x in line.split()]
 
-        return [datasetplugin.Dataset1D(params.field_results["name"], data),
-                datasetplugin.Constant("testconst", "42"),
-                datasetplugin.Function("testfunc(x)", "testconst*x**2")]
-
+            return [datasetplugin.Dataset1D(params.field_results["name"], data),
+                    datasetplugin.Constant("testconst", "42"),
+                    datasetplugin.Function("testfunc(x)", "testconst*x**2")]
+        except Exception, e:
+            raise ImportPluginException(unicode(e))
 
 class ImportPluginDateTime(ImportPlugin):
     """An example plugin for reading a set of iso date-times from a
