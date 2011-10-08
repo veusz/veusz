@@ -561,8 +561,11 @@ class PlotWindow( qt4.QGraphicsView ):
 
             # convert points on plotter to axis coordinates
             # FIXME: Need To Trap Conversion Errors!
-            r = axis.plotterToGraphCoords(
-                self.painthelper.widgetBounds(axis), p)
+            try:
+                r = axis.plotterToGraphCoords(
+                    self.painthelper.widgetBounds(axis), p)
+            except KeyError:
+                continue
 
             # invert if min and max are inverted
             if r[1] < r[0]:
