@@ -187,7 +187,7 @@ class RenderThread( qt4.QThread ):
                 sys.stderr.write("Error in rendering thread\n")
                 traceback.print_exc(file=sys.stderr)
 
-class GraphicsOpacityAnimator(qt4.QVariantAnimation):
+class GraphicsOpacityAnimator(qt4.QObject):
     """Do animation of opacity of a QGraphicsItem (here a control
     graph object group)."""
 
