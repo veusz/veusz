@@ -659,7 +659,12 @@ class PlotWindow( qt4.QGraphicsView ):
         qt4.QGraphicsView.mousePressEvent(self, event)
 
         # work out whether user is clicking on a control point
-        self.ignoreclick = self.itemAt(event.pos()) is not self.pixmapitem
+        # we have to ignore the item group which seems to be above
+        # its constituents
+        items = self.items(event.pos())
+        if len(items) > 0 and isinstance(items[0], qt4.QGraphicsItemGroup):
+            del items[0]
+        self.ignoreclick = len(items)==0 or items[0] is not self.pixmapitem
 
         if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
 
@@ -736,6 +741,7 @@ class PlotWindow( qt4.QGraphicsView ):
         clicked on a widget, and emit a sigWidgetClicked(widget)."""
 
         qt4.QGraphicsView.mouseReleaseEvent(self, event)
+
         if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
             event.accept()
             self.scrolltimer.stop()
