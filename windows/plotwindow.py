@@ -201,7 +201,7 @@ class GraphicsOpacityAnimator(qt4.QObject):
         if hasattr(qt4, 'QPropertyAnimation'):
             # only available in Qt 4.6
             self.anim = a = qt4.QPropertyAnimation(
-                self, "opacity", self, duration=500)
+                self, "opacity", self, duration=1000)
             a.setStartValue(0.)
             a.setEndValue(1.)
 
@@ -1173,6 +1173,13 @@ class PlotWindow( qt4.QGraphicsView ):
         """
         self.updateControlGraphs(widgets)
         self.lastwidgetsselected = widgets
+
+        # is the mouse cursor in the window?
+        curpos = qt4.QCursor.pos()
+        winpos = self.parent().mapFromGlobal(curpos)
+        if not self.frameGeometry().contains(winpos):
+            if self.controlgraphgroup is not None:
+                self.controlgraphanimation.runHide()
 
     def updateControlGraphs(self, widgets):
         """Add control graphs for the widgets given."""
