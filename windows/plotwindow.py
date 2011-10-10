@@ -187,43 +187,6 @@ class RenderThread( qt4.QThread ):
                 sys.stderr.write("Error in rendering thread\n")
                 traceback.print_exc(file=sys.stderr)
 
-class GraphicsOpacityAnimator(qt4.QObject):
-    """Do animation of opacity of a QGraphicsItem (here a control
-    graph object group)."""
-
-    def __init__(self, grp):
-        """grp is a QGraphicsItem to work on."""
-        qt4.QObject.__init__(self)
-        self._grp = grp
-        self._opacity = 1.
-
-        self.anim = None
-        if hasattr(qt4, 'QPropertyAnimation'):
-            # only available in Qt 4.6
-            self.anim = a = qt4.QPropertyAnimation(
-                self, "opacity", self, duration=1000)
-            a.setStartValue(0.)
-            a.setEndValue(1.)
-
-    def runShow(self):
-        """Make the group show itself."""
-        if self.anim is not None:
-            self.anim.setDirection(qt4.QAbstractAnimation.Forward)
-            self.anim.start()
-
-    def runHide(self):
-        """Make the group hide itself."""
-        if self.anim is not None:
-            self.anim.setDirection(qt4.QAbstractAnimation.Backward)
-            self.anim.start()
-
-    def setOpacity(self, o):
-        self._opacity = o
-        self._grp.setOpacity(o)
-    def getOpacity(self):
-        return self._opacity
-    opacity = qt4.pyqtProperty(float, getOpacity, setOpacity)
-
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
@@ -262,7 +225,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # for controlling plot elements
         g = self.controlgraphgroup = qt4.QGraphicsItemGroup()
         g.setHandlesChildEvents(False)
-        self.controlgraphanimation = GraphicsOpacityAnimator(g)
         self.scene.addItem(g)
 
         # zoom rectangle for zooming into graph (not shown normally)
@@ -817,21 +779,6 @@ class PlotWindow( qt4.QGraphicsView ):
                     # stays repeatable
                     pickinfo.screenpos = (oldx, pickinfo.screenpos[1])
 
-    def leaveEvent(self, evt):
-        """When mouse leaves the window."""
-        qt4.QGraphicsView.leaveEvent(self, evt)
-
-        if self.controlgraphgroup is not None:
-            self.controlgraphanimation.runHide()
-
-    def enterEvent(self, evt):
-        """When mouse enters the window."""
-
-        qt4.QGraphicsView.enterEvent(self, evt)
-
-        if self.controlgraphgroup is not None:
-            self.controlgraphanimation.runShow()
-
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
         a sigWidgetClicked(widget) signal."""
@@ -1173,13 +1120,6 @@ class PlotWindow( qt4.QGraphicsView ):
         """
         self.updateControlGraphs(widgets)
         self.lastwidgetsselected = widgets
-
-        # is the mouse cursor in the window?
-        curpos = qt4.QCursor.pos()
-        winpos = self.parent().mapFromGlobal(curpos)
-        if not self.frameGeometry().contains(winpos):
-            if self.controlgraphgroup is not None:
-                self.controlgraphanimation.runHide()
 
     def updateControlGraphs(self, widgets):
         """Add control graphs for the widgets given."""
