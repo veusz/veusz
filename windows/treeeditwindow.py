@@ -748,31 +748,31 @@ class TreeEditDock(qt4.QDockWidget):
         a = utils.makeAction
         actions.update({
                 'edit.cut':
-                    a(self, 'Cut the selected item', 'Cu&t',
+                    a(self, 'Cut the selected widget', 'Cu&t',
                       self.slotWidgetCut,
                       icon='veusz-edit-cut', key='Ctrl+X'),
                 'edit.copy':
-                    a(self, 'Copy the selected item', '&Copy',
+                    a(self, 'Copy the selected widget', '&Copy',
                       self.slotWidgetCopy,
                       icon='kde-edit-copy', key='Ctrl+C'),
                 'edit.paste':
-                    a(self, 'Paste item from the clipboard', '&Paste',
+                    a(self, 'Paste widget from the clipboard', '&Paste',
                       self.slotWidgetPaste,
                       icon='kde-edit-paste', key='Ctrl+V'),
                 'edit.moveup':
-                    a(self, 'Move the selected item up', 'Move &up',
+                    a(self, 'Move the selected widget up', 'Move &up',
                       utils.BoundCaller(self.slotWidgetMove, -1),
                       icon='kde-go-up'),
                 'edit.movedown':
-                    a(self, 'Move the selected item down', 'Move d&own',
+                    a(self, 'Move the selected widget down', 'Move d&own',
                       utils.BoundCaller(self.slotWidgetMove, 1),
                       icon='kde-go-down'),
                 'edit.delete':
-                    a(self, 'Remove the selected item', '&Delete',
+                    a(self, 'Remove the selected widget', '&Delete',
                       self.slotWidgetDelete,
                       icon='kde-edit-delete'),
                 'edit.rename':
-                    a(self, 'Renames the selected item', '&Rename',
+                    a(self, 'Renames the selected widget', '&Rename',
                       self.slotWidgetRename,
                       icon='kde-edit-rename'),
 
