@@ -24,8 +24,13 @@ import doc
 import operations
 import widgetfactory
 
+import StringIO
+
 # mime type for copy and paste
 widgetmime = 'text/x-vnd.veusz-widget-3'
+
+# dataset mime
+datamime = 'text/x-vnd.veusz-data-1'
 
 def generateWidgetsMime(widgets):
     """Create mime data describing widget and children.
@@ -55,6 +60,41 @@ def generateWidgetsMime(widgets):
 
     mimedata = qt4.QMimeData()
     mimedata.setData(widgetmime, qt4.QByteArray(text))
+    return mimedata
+
+def generateDatasetsMime(datasets, document):
+    """Generate mime for the list of dataset names given in the document.
+
+    Format is:
+    repr of names
+    text to recreate dataset 1
+    ...
+    """
+
+    mimedata = qt4.QMimeData()
+
+    # just plain text format
+    output = []
+    for name in datasets:
+        output.append( document.data[name].datasetAsText() )
+    text = '\n'.join(output)
+    mimedata.setData('text/plain', qt4.QByteArray(text))
+
+    # now the veusz-specfic copy mime format
+    output = [repr(tuple(datasets))]
+
+    for name in datasets:
+        # get unlinked copy of dataset
+        ds = document.data[name].returnCopy()
+
+        # write into a string file
+        textfile = StringIO.StringIO()
+        ds.saveToFile(textfile, name)
+        output.append( repr(textfile.getvalue()) )
+
+    text = '\n'.join(output)
+    mimedata.setData(datamime, qt4.QByteArray(text))
+
     return mimedata
 
 def getClipboardWidgetMime():

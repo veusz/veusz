@@ -434,8 +434,8 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.doc.applyOperation(document.OperationDatasetUnlinkRelation(dsname))
         def _copy():
             """Copy data to clipboard."""
-            text = self.doc.data[dsname].datasetAsText()
-            qt4.QApplication.clipboard().setText(text)
+            mime = document.generateDatasetsMime([dsname], self.doc)
+            qt4.QApplication.clipboard().setMimeData(mime)
 
         menu = qt4.QMenu()
         if type(dataset) in dataeditdialog.recreate_register:
