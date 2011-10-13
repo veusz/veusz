@@ -123,8 +123,8 @@ def getMimeWidgetPaths(data):
     paths = [eval(x) for x in lines[3:3+4*numwidgets:4]]
     return paths
 
-def isMimePastable(parentwidget, mimedata):
-    """Is mime data suitable to paste at parentwidget?"""
+def isWidgetMimePastable(parentwidget, mimedata):
+    """Is widget mime data suitable to paste at parentwidget?"""
 
     if mimedata is None:
         return False

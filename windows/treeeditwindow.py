@@ -878,7 +878,7 @@ class TreeEditDock(qt4.QDockWidget):
         if len(self.selwidgets) == 0:
             show = False
         else:
-            show = document.isMimePastable(self.selwidgets[0], data)
+            show = document.isWidgetMimePastable(self.selwidgets[0], data)
         self.vzactions['edit.paste'].setEnabled(show)
 
     def doInitialWidgetSelect(self):
