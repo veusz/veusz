@@ -897,7 +897,7 @@ class OperationDataImport(object):
         """Undo import."""
         
         for name, ds in self.olddatasets.iteritems():
-            if ds is not None:
+            if ds is None:
                 document.deleteData(name)
             else:
                 document.setData(name, ds)
@@ -1078,7 +1078,7 @@ class OperationDataImport2D(object):
         
         # restore old datasets
         for name, ds in self.olddatasets.iteritems():
-            if ds is not None:
+            if ds is None:
                 document.deleteData(name)
             else:
                 document.setData(name, ds)
