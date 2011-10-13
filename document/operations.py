@@ -970,7 +970,7 @@ class OperationDataImportCSV(object):
         """Undo import."""
         
         for name, ds in self.olddatasets.iteritems():
-            if ds is not None:
+            if ds is None:
                 document.deleteData(name)
             else:
                 document.setData(name, ds)
