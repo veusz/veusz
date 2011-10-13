@@ -223,7 +223,7 @@ class ReadCSV(object):
                 except ValueError:
                     if col.strip() == '':
                         # skip blanks unless blanksaredata is set
-                        if self.blanksaredata and colnum < len(self.colnames):
+                        if self.blanksaredata and colnum in self.colnames:
                             # assumes a numeric data type
                             self.data[self.colnames[colnum]].append(N.nan)
                     elif ( colnum in self.colnames and
