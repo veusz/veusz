@@ -33,10 +33,17 @@ class _FileReaderCols(object):
 
     def __init__(self, csvreader):
         self.csvreader = csvreader
+        self.maxlen = 0
 
     def next(self):
         """Return next row."""
-        return self.csvreader.next()
+        row = self.csvreader.next()
+
+        # add blank columns up to maximum previously read
+        self.maxlen = max(self.maxlen, len(row))
+        row = row + ['']*(self.maxlen - len(row))
+
+        return row
 
 class _FileReaderRows(object):
     """Read a CSV file in columns. This acts as an iterator.
