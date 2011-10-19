@@ -679,8 +679,8 @@ distre_expr = r'''^
  (cm|pt|mm|inch|in|"|%||             # ( unit, no unit,
   (?P<slash>/) )                     # or / )
 
- (?(slash)[ ]                        # if it was a slash, match number
-  *(\.?[0-9]+|[0-9]+\.[0-9]*))       # following it
+ (?(slash)[ ]*                       # if it was a slash, match any whitespace
+  (\.?[0-9]+|[0-9]+\.[0-9]*))        # and match following fp number
 
  [ ]*                                # optional whitespace
 $'''
