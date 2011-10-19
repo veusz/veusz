@@ -655,7 +655,7 @@ def _distInvPerc(pixdist, painter):
 def _distFrac(match, painter):
     """Convert from a fraction a/b of maxsize."""
     try:
-        return painter.maxsize * float(match.group(1))/float(match.group(2))
+        return painter.maxsize * float(match.group(1))/float(match.group(4))
     except ZeroDivisionError:
         return 0.
 
@@ -668,74 +668,77 @@ def _distRatio(match, painter):
 
     return painter.maxsize * float(match.group(1))
 
+# regular expression to match distances
+distre_expr = r'''^
+ [ ]*                                # optional whitespace
+
+ (\.?[0-9]+|[0-9]+\.[0-9]*)          # a floating point number
+
+ [ ]*                                # whitespace
+
+ (cm|pt|mm|inch|in|"|%||             # ( unit, no unit,
+  (?P<slash>/) )                     # or / )
+
+ (?(slash)[ ]                        # if it was a slash, match number
+  *(\.?[0-9]+|[0-9]+\.[0-9]*))       # following it
+
+ [ ]*                                # optional whitespace
+$'''
+
 class Distance(Setting):
     """A veusz distance measure, e.g. 1pt or 3%."""
 
     typename = 'distance'
 
-    # mappings from regular expressions to function to convert distance
-    # the recipient function takes regexp match,
-    # painter and maximum size of frac
+    # match a distance
+    distre = re.compile(distre_expr, re.VERBOSE)
 
-    # the second function is to do the inverse calculation
-    distregexp = [
-        # cm distance
-        ( re.compile('^([0-9\.]+) *cm$'),
-          lambda match, painter:
-              _distPhys(match, painter, 28.452756),
-          lambda pixdist, painter:
-              _distInvPhys(pixdist, painter, 28.452756, 'cm') ),
+    # functions to convert from unit values to pixels
+    unit_func = {
+        'cm': lambda match, painter:
+            _distPhys(match, painter, 28.452756),
+        'pt': lambda match, painter:
+            _distPhys(match, painter, 1.),
+        'mm': lambda match, painter:
+            _distPhys(match, painter, 2.8452756),
+        'in': lambda match, painter:
+            _distPhys(match, painter, 72.27),
+        'inch': lambda match, painter:
+            _distPhys(match, painter, 72.27),
+        '"': lambda match, painter:
+            _distPhys(match, painter, 72.27),
+        '%': _distPerc,
+        '/': _distFrac,
+        '': _distRatio
+        }
 
-        # point size
-        ( re.compile('^([0-9\.]+) *pt$'),
-          lambda match, painter:
-              _distPhys(match, painter, 1.),
-          lambda pixdist, painter:
-              _distInvPhys(pixdist, painter, 1., 'pt') ),
-
-        # mm distance
-        ( re.compile('^([0-9\.]+) *mm$'),
-          lambda match, painter:
-              _distPhys(match, painter, 2.8452756),
-          lambda pixdist, painter:
-              _distInvPhys(pixdist, painter, 2.8452756, 'mm') ),
-
-        # inch distance
-        ( re.compile('^([0-9\.]+) *(inch|in|")$'),
-          lambda match, painter:
-              _distPhys(match, painter, 72.27),
-          lambda pixdist, painter:
-              _distInvPhys(pixdist, painter, 72.27, 'in') ),
-
-        # plain fraction
-        ( re.compile('^([0-9\.]+)$'),
-          _distRatio,
-          _distInvPerc ),
-
-        # percentage
-        ( re.compile('^([0-9\.]+) *%$'),
-          _distPerc,
-          _distInvPerc ),
-
-        # fractional
-        ( re.compile('^([0-9\.]+) */ *([0-9\.]+)$'),
-          _distFrac,
-          _distInvPerc ),
-        ]
+    # inverse functions for converting pixels to units
+    inv_unit_func = {
+        'cm': lambda match, painter:
+            _distInvPhys(match, painter, 28.452756, 'cm'),
+        'pt': lambda match, painter:
+            _distInvPhys(match, painter, 1., 'pt'),
+        'mm': lambda match, painter:
+            _distInvPhys(match, painter, 2.8452756, 'mm'),
+        'in': lambda match, painter:
+            _distInvPhys(match, painter, 72.27, 'in'),
+        'inch': lambda match, painter:
+            _distInvPhys(match, painter, 72.27, 'in'),
+        '"': lambda match, painter:
+            _distInvPhys(match, painter, 72.27, 'in'),
+        '%': _distInvPerc,
+        '/': _distInvPerc,
+        '': _distInvPerc
+        }
 
     @classmethod
     def isDist(kls, dist):
         """Is the text a valid distance measure?"""
         
-        dist = dist.strip()
-        for reg, fn, fninv in kls.distregexp:
-            if reg.match(dist):
-                return True
-            
-        return False
+        return kls.distre.match(dist) is not None
 
     def convertTo(self, val):
-        if self.isDist(val):
+        if self.distre.match(val) is not None:
             return val
         else:
             raise InvalidType
@@ -766,16 +769,12 @@ class Distance(Setting):
         painter: painter to get metrics to convert physical sizes
         '''
 
-        # work out maximum size
-        dist = dist.strip()
-
-        # compare string against each regexp
-        for reg, fn, fninv in kls.distregexp:
-            m = reg.match(dist)
-
-            # if there's a match, then call the appropriate conversion fn
-            if m:
-                return fn(m, painter)
+        # match distance against expression
+        m = kls.distre.match(dist)
+        if m is not None:
+            # lookup function to call to do conversion
+            func = kls.unit_func[m.group(2)]
+            return func(m, painter)
 
         # none of the regexps match
         raise ValueError( "Cannot convert distance in form '%s'" %
@@ -793,15 +792,13 @@ class Distance(Setting):
         """Convert distance in pixels into units of this distance.
         """
 
-        # identify units and get inverse mapping
-        v = self.val
-        inversefn = None
-        for reg, fn, fninv in self.distregexp:
-            if reg.match(v):
-                inversefn = fninv
-                break
-        if not inversefn:
-            inversefn = self.distregexp[0][2]
+        m = self.distre.match(self.val)
+        if m is not None:
+            # if it matches convert back
+            inversefn = self.inv_unit_func[m.group(2)]
+        else:
+            # otherwise force unit
+            inversefn = self.inv_unit_func['cm']
 
         # do inverse mapping
         return inversefn(distpix, painter)
@@ -817,7 +814,7 @@ class DistanceOrAuto(Distance):
 
     typename = 'distance-or-auto'
 
-    distregexp = Distance.distregexp + [(re.compile('^Auto$'), None, None)]
+    distre = re.compile( distre_expr + r'|^Auto$', re.VERBOSE )
     
     def isAuto(self):
         return self.val == 'Auto'
