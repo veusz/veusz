@@ -693,6 +693,7 @@ class CommandInterface(qt4.QObject):
                       delimiter=',', textdelimiter='"',
                       encoding='utf_8',
                       headerignore=0, blanksaredata=False,
+                      numericlocale='en_US',
                       dsprefix='', dssuffix='',
                       linked=False):
         """Read data from a comma separated file (CSV).
@@ -710,6 +711,7 @@ class CommandInterface(qt4.QObject):
         encoding is the encoding used in the file
         headerignore is number of lines to ignore after header text
         blanksaredata treats blank lines in csv files as blank data values
+        numericlocale is format to use for reading numbers
 
         If linked is True the data are linked with the file."""
 
@@ -726,6 +728,7 @@ class CommandInterface(qt4.QObject):
             encoding=encoding,
             headerignore=headerignore,
             blanksaredata=blanksaredata,
+            numericlocale=numericlocale,
             prefix=dsprefix, suffix=dssuffix,
             linked=linked)
         dsnames = self.document.applyOperation(op)

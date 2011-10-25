@@ -6,11 +6,11 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>274</height>
+    <width>548</width>
+    <height>305</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label_8">
      <property name="text">
@@ -29,7 +29,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout_3">
+    <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
@@ -64,6 +64,37 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Numeric format</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="HistoryValueCombo" name="csvnumfmtcombo">
+       <property name="toolTip">
+        <string>Numerical format of numbers in file:
+ System - what this computer is set to use
+ English - format 123,456.78
+ European - format 123.456,78</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Date format</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="HistoryCombo" name="csvdatefmtcombo">
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
@@ -91,16 +122,6 @@
        </item>
       </widget>
      </item>
-     <item row="3" column="3">
-      <widget class="QPushButton" name="csvhelpbutton">
-       <property name="toolTip">
-        <string>Help on how CSV files should be formatted</string>
-       </property>
-       <property name="text">
-        <string>Help</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="2">
       <widget class="QLabel" name="label">
        <property name="text">
@@ -119,6 +140,16 @@
       <widget class="HistoryCheck" name="csvblanksdatacheck">
        <property name="text">
         <string>Treat blanks as data values</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QPushButton" name="csvhelpbutton">
+       <property name="toolTip">
+        <string>Help on how CSV files should be formatted</string>
+       </property>
+       <property name="text">
+        <string>Help</string>
        </property>
       </widget>
      </item>
@@ -141,6 +172,11 @@
    <class>HistoryCheck</class>
    <extends>QCheckBox</extends>
    <header>historycheck.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistoryValueCombo</class>
+   <extends>QComboBox</extends>
+   <header>historyvaluecombo.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

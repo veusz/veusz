@@ -359,12 +359,14 @@ class LinkedCSVFile(LinkedFileBase):
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
                  headerignore=0, blanksaredata=False,
+                 numericlocale='en_US',
                  prefix='', suffix=''):
         """Read CSV data from filename
 
         Read across rather than down if readrows
         headerignore is number of lines to ignore after each header
         blanksaredata treats blank cells as NaN values or empty strings
+        numericlocale is locale to use for number format
         Prepend prefix to dataset names if set.
         """
 
@@ -375,6 +377,7 @@ class LinkedCSVFile(LinkedFileBase):
         self.encoding = encoding
         self.headerignore = headerignore
         self.blanksaredata = blanksaredata
+        self.numericlocale = numericlocale
         self.prefix = prefix
         self.suffix = suffix
 
@@ -399,6 +402,8 @@ class LinkedCSVFile(LinkedFileBase):
             params.append('headerignore=' + repr(self.headerignore))
         if self.blanksaredata:
             params.append('blanksaredata=True')
+        if self.numericlocale != 'en_US':
+            params.append('numericlocale=' + repr(self.numericlocale))
 
         fileobj.write('ImportFileCSV(%s)\n' % (', '.join(params)))
         
@@ -415,6 +420,7 @@ class LinkedCSVFile(LinkedFileBase):
             encoding=self.encoding,
             headerignore=self.headerignore,
             blanksaredata=self.blanksaredata,
+            numericlocale=self.numericlocale,
             prefix=self.prefix, suffix=self.suffix )
         return self._reloadViaOperation(document, op)
 

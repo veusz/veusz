@@ -912,6 +912,7 @@ class OperationDataImportCSV(object):
                  encoding='utf_8',
                  prefix='', suffix='',
                  headerignore=0, blanksaredata=False,
+                 numericlocale='en_US',
                  linked=False):
         """Import CSV data from filename
 
@@ -919,6 +920,7 @@ class OperationDataImportCSV(object):
         Prefix is appended to each dataset name.
         headerignore is number of lines to ignore after each header
         blanksaredata treats blank cells as NaN values or empty strings
+        numericlocale: locale to convert numbers using
         Data are linked to file if linked is True.
         """
 
@@ -931,6 +933,7 @@ class OperationDataImportCSV(object):
         self.suffix = suffix
         self.headerignore = headerignore
         self.blanksaredata = blanksaredata
+        self.numericlocale = numericlocale
         self.linked = linked
 
     def do(self, document):
@@ -942,6 +945,7 @@ class OperationDataImportCSV(object):
                                encoding=self.encoding,
                                headerignore=self.headerignore,
                                blanksaredata=self.blanksaredata,
+                               numericlocale=self.numericlocale,
                                prefix=self.prefix, suffix=self.suffix)
         csvr.readData()
 
@@ -952,6 +956,7 @@ class OperationDataImportCSV(object):
                                         encoding=self.encoding,
                                         headerignore=self.headerignore,
                                         blanksaredata=self.blanksaredata,
+                                        numericlocale=self.numericlocale,
                                         prefix=self.prefix, suffix=self.suffix)
         else:
             LF = None

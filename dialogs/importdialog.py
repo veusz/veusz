@@ -178,6 +178,11 @@ class ImportTabCSV(ImportTab):
         self.csvdelimitercombo.default = [
             ',', '{tab}', '{space}', '|', ':', ';']
         self.csvtextdelimitercombo.default = ['"', "'"]
+        self.csvdatefmtcombo.default = [
+            '[YYYY-MM-DD][T][hh:mm:ss]',
+            '[M/d/yy][ ][hh:mm:ss]'
+            ]
+        self.csvnumfmtcombo.defaultlist = ['System', 'English', 'European']
 
     def reset(self):
         """Reset controls."""
@@ -186,6 +191,7 @@ class ImportTabCSV(ImportTab):
         self.csvdirectioncombo.setCurrentIndex(0)
         self.csvignorehdrspin.setValue(0)
         self.csvblanksdatacheck.setChecked(False)
+        self.csvnumfmtcombo.setCurrentIndex(0)
 
     def slotHelp(self):
         """Asked for help."""
@@ -268,8 +274,12 @@ class ImportTabCSV(ImportTab):
         except UnicodeEncodeError:
             return
 
+        numericlocale = {0: str(qt4.QLocale().name()),
+                         1: 'en_US',
+                         2: 'de_DE'}[self.csvnumfmtcombo.currentIndex()]
         headerignore = self.csvignorehdrspin.value()
         blanksaredata = self.csvblanksdatacheck.isChecked()
+
         op = document.OperationDataImportCSV(filename, readrows=inrows,
                                              prefix=prefix, suffix=suffix,
                                              linked=linked,
@@ -277,6 +287,7 @@ class ImportTabCSV(ImportTab):
                                              textdelimiter=textdelimiter,
                                              headerignore=headerignore,
                                              blanksaredata=blanksaredata,
+                                             numericlocale=numericlocale,
                                              encoding=encoding)
         
         # actually import the data

@@ -24,6 +24,7 @@ import numpy as N
 
 import datasets
 import veusz.utils as utils
+import veusz.qtall as qt4
 
 class _FileReaderCols(object):
     """Read a CSV file in rows. This acts as an iterator.
@@ -96,6 +97,7 @@ class ReadCSV(object):
                  delimiter=',', textdelimiter='"',
                  encoding='utf_8',
                  headerignore=0, blanksaredata=False,
+                 numericlocale='en_US',
                  prefix='', suffix=''):
         """Initialise the reader to import data from filename.
 
@@ -104,6 +106,8 @@ class ReadCSV(object):
 
         headerignore is number of lines to ignore after headers
         if blanksaredata is true, treat blank entries as nans
+
+        numericlocale: locale to use for converting numbers
 
         prefix is a prefix to prepend to the name of datasets from this file
         """
@@ -117,6 +121,7 @@ class ReadCSV(object):
         self.blanksaredata = blanksaredata
         self.prefix = prefix
         self.suffix = suffix
+        self.numericlocale = qt4.QLocale(numericlocale)
 
         # datasets. Each name is associated with a list
         self.data = {}
@@ -219,7 +224,9 @@ class ReadCSV(object):
                 try:
                     # do any necessary conversion
                     if ctype == 'float':
-                        v = float(col)
+                        v, ok = self.numericlocale.toDouble(col)
+                        if not ok:
+                            raise ValueError
                     elif ctype == 'date':
                         v = utils.dateStringToDate(col)
                     elif ctype == 'string':

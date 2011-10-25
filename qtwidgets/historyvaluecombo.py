@@ -73,11 +73,12 @@ class HistoryValueCombo(qt4.QComboBox):
         self.clear()
         self.addItems(self.defaultlist)
         text = setting.settingdb.get(self.getSettingName(), self.defaultval)
-        indx = self.findText(text)
-        if indx < 0:
-            self.insertItem(0, text)
-            indx = 0
-        self.setCurrentIndex(indx)
+        if text is not None:
+            indx = self.findText(text)
+            if indx < 0:
+                self.insertItem(0, text)
+                indx = 0
+            self.setCurrentIndex(indx)
         self.hasshown = True
 
     def hideEvent(self, event):
