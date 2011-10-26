@@ -179,8 +179,9 @@ class ImportTabCSV(ImportTab):
             ',', '{tab}', '{space}', '|', ':', ';']
         self.csvtextdelimitercombo.default = ['"', "'"]
         self.csvdatefmtcombo.default = [
-            '[YYYY-MM-DD][T][hh:mm:ss]',
-            '[M/d/yy][ ][hh:mm:ss]'
+            'YYYY-MM-DD|T|hh:mm:ss',
+            'DD/MM/YY| |hh:mm:ss',
+            'M/D/YY| |hh:mm:ss'
             ]
         self.csvnumfmtcombo.defaultlist = ['System', 'English', 'European']
 
