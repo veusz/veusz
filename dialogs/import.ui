@@ -111,7 +111,8 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Prefix to prepend to each dataset name imported, or enter $FILENAME to have filename prepended</string>
+           <string>Prefix to prepend to each dataset name imported,
+or enter $FILENAME to have filename prepended</string>
           </property>
           <property name="editable">
            <bool>true</bool>
@@ -151,7 +152,8 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Suffix to append to each dataset name imported, or enter $FILENAME to have filename appended</string>
+           <string>Suffix to append to each dataset name imported,
+or enter $FILENAME to have filename appended</string>
           </property>
           <property name="editable">
            <bool>true</bool>
@@ -161,7 +163,6 @@
        </layout>
       </item>
      </layout>
-     <zorder></zorder>
     </widget>
    </item>
    <item>

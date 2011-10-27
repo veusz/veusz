@@ -20,6 +20,7 @@
 in an easy-to-use manner."""
 
 from collections import defaultdict
+import re
 import numpy as N
 
 import datasets
@@ -98,6 +99,7 @@ class ReadCSV(object):
                  encoding='utf_8',
                  headerignore=0, blanksaredata=False,
                  numericlocale='en_US',
+                 dateformat='YYYY-MM-DD|T|hh:mm:ss',
                  prefix='', suffix=''):
         """Initialise the reader to import data from filename.
 
@@ -122,6 +124,7 @@ class ReadCSV(object):
         self.prefix = prefix
         self.suffix = suffix
         self.numericlocale = qt4.QLocale(numericlocale)
+        self.datere = re.compile(utils.dateStrToRegularExpression(dateformat))
 
         # datasets. Each name is associated with a list
         self.data = {}
@@ -228,7 +231,8 @@ class ReadCSV(object):
                         if not ok:
                             raise ValueError
                     elif ctype == 'date':
-                        v = utils.dateStringToDate(col)
+                        m = self.datere.match(col)
+                        v = utils.dateREMatchToDate(m)
                     elif ctype == 'string':
                         v = col
                     else:

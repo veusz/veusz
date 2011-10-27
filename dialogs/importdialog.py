@@ -184,6 +184,7 @@ class ImportTabCSV(ImportTab):
             'M/D/YY| |hh:mm:ss'
             ]
         self.csvnumfmtcombo.defaultlist = ['System', 'English', 'European']
+        self.csvheadermodecombo.defaultlist = ['Multiple', 'Single']
 
     def reset(self):
         """Reset controls."""

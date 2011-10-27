@@ -170,5 +170,101 @@ def roundDownToTimeTuple(dt,  tt):
         
     #print "rounded",  timein
     return tuple(timein)
-    
-    
+
+def dateStrToRegularExpression(instr):
+    """Convert date-time string to regular expression.
+
+    Converts format yyyy-mm-dd|T|hh:mm:ss to re for date
+    """
+
+    # first rename each special string to a unique string (this is a
+    # unicode character which is in the private use area) then rename
+    # back again to the regular expression. This avoids the regular
+    # expression being remapped.
+    maps = (
+            ('YYYY', u'\ue001', r'(?P<YYYY>[0-9]{4})'),
+            ('YY',   u'\ue002', r'(?P<YY>[0-9]{2})'),
+            ('MM',   u'\ue003', r'(?P<MM>[0-9]{2})'),
+            ('M',    u'\ue004', r'(?P<MM>[0-9]{1,2})'),
+            ('DD',   u'\ue005', r'(?P<DD>[0-9]{2})'),
+            ('D',    u'\ue006', r'(?P<DD>[0-9]{1,2})'),
+            ('hh',   u'\ue007', r'(?P<hh>[0-9]{2})'),
+            ('h',    u'\ue008', r'(?P<hh>[0-9]{1,2})'),
+            ('mm',   u'\ue009', r'(?P<mm>[0-9]{2})'),
+            ('m',    u'\ue00a', r'(?P<mm>[0-9]{1,2})'),
+            ('ss',   u'\ue00b', r'(?P<ss>[0-9]{2}(\.[0-9]*)?)'),
+            ('s',    u'\ue00c', r'(?P<ss>[0-9]{1,2}(\.[0-9]*)?)'),
+        )
+
+    out = []
+    for p in instr.split('|'):
+        # escape special characters (non alpha-num)
+        p = re.escape(p)
+
+        # replace strings with characters
+        for search, char, repl in maps:
+            p = p.replace(search, char)
+        # replace characters with re strings
+        for search, char, repl in maps:
+            p = p.replace(char, repl)
+
+        # save as an optional group
+        out.append( '(?:%s)?' % p )
+
+    # return final expression
+    return '^\s*%s\s*$' % (''.join(out))
+
+def dateREMatchToDate(match):
+    """Take match object for above regular expression,
+    and convert to float date value."""
+
+    if match is None:
+        raise ValueError, "match object is None"
+
+    # remove None matches
+    grps = {}
+    for k, v in match.groupdict().iteritems():
+        if v is not None:
+            grps[k] = v
+
+    # bomb out if nothing matches
+    if len(grps) == 0:
+        raise ValueError, "no groups matched"
+
+    # get values of offset
+    oyear = offsetdate.year
+    omon = offsetdate.month
+    oday = offsetdate.day
+    ohour = offsetdate.hour
+    omin = offsetdate.minute
+    osec = offsetdate.second
+    omicrosec = offsetdate.microsecond
+
+    # now convert each element from the re
+    if 'YYYY' in grps:
+        oyear = int(grps['YYYY'])
+    if 'YY' in grps:
+        y = int(grps['YY'])
+        if y >= 70:
+            oyear = int('19' + grps['YY'])
+        else:
+            oyear = int('20' + grps['YY'])
+    if 'MM' in grps:
+        omon = int(grps['MM'])
+    if 'DD' in grps:
+        oday = int(grps['DD'])
+    if 'hh' in grps:
+        ohour = int(grps['hh'])
+    if 'mm' in grps:
+        omin = int(grps['mm'])
+    if 'ss' in grps:
+        s = float(grps['ss'])
+        osec = int(s)
+        omicrosec = int(1e6*(s-osec))
+
+    # convert to python datetime object
+    d = datetime.datetime(
+        oyear, omon, oday, ohour, omin, osec, omicrosec)
+
+    # return to veusz float time
+    return datetimeToFloat(d)
