@@ -89,7 +89,7 @@ or allow multiple headers</string>
          <widget class="HistorySpinBox" name="csvignoretopspin">
           <property name="toolTip">
            <string>Ignore N row at the top of the file.
-If data are arranged in rows, ignores columns</string>
+If data are arranged in rows, ignores columns instead.</string>
           </property>
          </widget>
         </item>
@@ -103,8 +103,8 @@ If data are arranged in rows, ignores columns</string>
         <item row="3" column="1">
          <widget class="HistorySpinBox" name="csvignorehdrspin">
           <property name="toolTip">
-           <string>After reading a header item, N rows in that column.
-If Direction is set to Rows, ignore columns instead.</string>
+           <string>After reading a header, ignore N rows in that column.
+If Direction is set to Rows, ignore N columns instead.</string>
           </property>
          </widget>
         </item>
