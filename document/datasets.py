@@ -355,73 +355,34 @@ class LinkedFITSFile(LinkedFileBase):
 class LinkedCSVFile(LinkedFileBase):
     """A CSV file linked to datasets."""
 
-    def __init__(self, filename, readrows=False,
-                 delimiter=',', textdelimiter='"',
-                 encoding='utf_8',
-                 headerignore=0, blanksaredata=False,
-                 numericlocale='en_US',
-                 prefix='', suffix=''):
+    def __init__(self, params):
         """Read CSV data from filename
-
-        Read across rather than down if readrows
-        headerignore is number of lines to ignore after each header
-        blanksaredata treats blank cells as NaN values or empty strings
-        numericlocale is locale to use for number format
-        Prepend prefix to dataset names if set.
+        params is a ParamsCSV object
         """
-
-        self.filename = filename
-        self.readrows = readrows
-        self.delimiter = delimiter
-        self.textdelimiter = textdelimiter
-        self.encoding = encoding
-        self.headerignore = headerignore
-        self.blanksaredata = blanksaredata
-        self.numericlocale = numericlocale
-        self.prefix = prefix
-        self.suffix = suffix
+        self.filename = params.filename
+        self.params = params
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
-        params = [repr(self._getSaveFilename(relpath)),
-                  'linked=True']
-        if self.prefix:
-            params.append('dsprefix=' + repr(self.prefix))
-        if self.suffix:
-            params.append('dssuffix=' + repr(self.suffix))
-        if self.readrows:
-            params.append('readrows=True')
-        if self.encoding != 'utf_8':
-            params.append('encoding=' + repr(self.encoding))
-        if self.delimiter != ',':
-            params.append('delimiter=' + repr(self.delimiter))
-        if self.textdelimiter != '"':
-            params.append('textdelimiter=' + repr(self.textdelimiter))
-        if self.headerignore > 0:
-            params.append('headerignore=' + repr(self.headerignore))
-        if self.blanksaredata:
-            params.append('blanksaredata=True')
-        if self.numericlocale != 'en_US':
-            params.append('numericlocale=' + repr(self.numericlocale))
+        paramsout = [repr(self._getSaveFilename(relpath)),
+                     'linked=True']
 
-        fileobj.write('ImportFileCSV(%s)\n' % (', '.join(params)))
-        
+        # add parameters which aren't defaults
+        for param, default in sorted(self.params.defaults.items()):
+            v = getattr(self.params, param)
+            if v != default:
+                paramsout.append('%s=%s' % (param, repr(v)))
+
+        fileobj.write('ImportFileCSV(%s)\n' % (', '.join(paramsout)))
+
     def reloadLinks(self, document):
         """Reload any linked data from the CSV file."""
 
         # again, this is messy as we have to make sure we don't
         # overwrite any non-linked data
 
-        op = operations.OperationDataImportCSV(
-            self.filename, readrows=self.readrows,
-            delimiter=self.delimiter,
-            textdelimiter=self.textdelimiter,
-            encoding=self.encoding,
-            headerignore=self.headerignore,
-            blanksaredata=self.blanksaredata,
-            numericlocale=self.numericlocale,
-            prefix=self.prefix, suffix=self.suffix )
+        op = operations.OperationDataImportCSV(self.params)
         return self._reloadViaOperation(document, op)
 
 class LinkedFilePlugin(LinkedFileBase):

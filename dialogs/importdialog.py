@@ -184,7 +184,7 @@ class ImportTabCSV(ImportTab):
             'M/D/YY| |hh:mm:ss'
             ]
         self.csvnumfmtcombo.defaultlist = ['System', 'English', 'European']
-        self.csvheadermodecombo.defaultlist = ['Multiple', 'Single']
+        self.csvheadermodecombo.defaultlist = ['Multiple', '1st row']
 
     def reset(self):
         """Reset controls."""
@@ -282,15 +282,18 @@ class ImportTabCSV(ImportTab):
         headerignore = self.csvignorehdrspin.value()
         blanksaredata = self.csvblanksdatacheck.isChecked()
 
-        op = document.OperationDataImportCSV(filename, readrows=inrows,
-                                             prefix=prefix, suffix=suffix,
-                                             linked=linked,
-                                             delimiter=delimiter,
-                                             textdelimiter=textdelimiter,
-                                             headerignore=headerignore,
-                                             blanksaredata=blanksaredata,
-                                             numericlocale=numericlocale,
-                                             encoding=encoding)
+        params = document.ParamsCSV(
+            filename, readrows=inrows,
+            delimiter=delimiter,
+            textdelimiter=textdelimiter,
+            headerignore=headerignore,
+            blanksaredata=blanksaredata,
+            numericlocale=numericlocale,
+            encoding=encoding,
+            dsprefix=prefix, dssuffix=suffix
+            )
+
+        op = document.OperationDataImportCSV(params, linked=linked)
         
         # actually import the data
         dsnames = doc.applyOperation(op)

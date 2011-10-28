@@ -907,57 +907,22 @@ class OperationDataImportCSV(object):
 
     descr = 'import CSV data'
 
-    def __init__(self, filename, readrows=False,
-                 delimiter=',', textdelimiter='"',
-                 encoding='utf_8',
-                 prefix='', suffix='',
-                 headerignore=0, blanksaredata=False,
-                 numericlocale='en_US',
-                 linked=False):
-        """Import CSV data from filename
-
-        If readrows, then read in rows rather than columns.
-        Prefix is appended to each dataset name.
-        headerignore is number of lines to ignore after each header
-        blanksaredata treats blank cells as NaN values or empty strings
-        numericlocale: locale to convert numbers using
+    def __init__(self, params, linked=False):
+        """Import CSV data
+        params is a ParamsCSV object
         Data are linked to file if linked is True.
         """
-
-        self.filename = filename
-        self.readrows = readrows
-        self.delimiter = delimiter
-        self.textdelimiter = textdelimiter
-        self.encoding = encoding
-        self.prefix = prefix
-        self.suffix = suffix
-        self.headerignore = headerignore
-        self.blanksaredata = blanksaredata
-        self.numericlocale = numericlocale
         self.linked = linked
+        self.params = params
 
     def do(self, document):
         """Do the data import."""
         
-        csvr = readcsv.ReadCSV(self.filename, readrows=self.readrows,
-                               delimiter=self.delimiter,
-                               textdelimiter=self.textdelimiter,
-                               encoding=self.encoding,
-                               headerignore=self.headerignore,
-                               blanksaredata=self.blanksaredata,
-                               numericlocale=self.numericlocale,
-                               prefix=self.prefix, suffix=self.suffix)
+        csvr = readcsv.ReadCSV(self.params)
         csvr.readData()
 
         if self.linked:
-            LF = datasets.LinkedCSVFile(self.filename, readrows=self.readrows,
-                                        delimiter=self.delimiter,
-                                        textdelimiter=self.textdelimiter,
-                                        encoding=self.encoding,
-                                        headerignore=self.headerignore,
-                                        blanksaredata=self.blanksaredata,
-                                        numericlocale=self.numericlocale,
-                                        prefix=self.prefix, suffix=self.suffix)
+            LF = datasets.LinkedCSVFile(self.params)
         else:
             LF = None
 

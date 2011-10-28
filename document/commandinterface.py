@@ -37,6 +37,7 @@ import operations
 import dataset_histo
 import mime
 import export
+import readcsv
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
@@ -689,29 +690,37 @@ class CommandInterface(qt4.QObject):
 
         return (dsnames, errors)
 
-    def ImportFileCSV(self, filename, readrows=False, prefix=None,
+    def ImportFileCSV(self, filename,
+                      readrows=False,
                       delimiter=',', textdelimiter='"',
                       encoding='utf_8',
-                      headerignore=0, blanksaredata=False,
+                      headerignore=0, rowsignore=0,
+                      blanksaredata=False,
                       numericlocale='en_US',
-                      dsprefix='', dssuffix='',
+                      dateformat='YYYY-MM-DD|T|hh:mm:ss',
+                      headermode='multi',
+                      dsprefix='', dssuffix='', prefix=None,
                       linked=False):
         """Read data from a comma separated file (CSV).
 
         Data are read from filename
-        If readrows is True, then data are read across rather than down
         
+        readrows: if true, data are read across rather than down
+        delimiter: character for delimiting data (usually ',')
+        textdelimiter: character surrounding text (usually '"')
+        encoding: encoding used in file
+        headerignore: number of lines to ignore after header text
+        rowsignore: number of rows to ignore at top of file
+        blanksaredata: treats blank lines in csv files as blank data values
+        numericlocale: format to use for reading numbers
+        dateformat: format for interpreting dates
+        headermode: 'multi': multiple headers allowed in file
+                    '1st': first text found are headers
+
         Dataset names are prepended and appended, by dsprefix and dssuffix,
         respectively
          (prefix is backware compatibility only, it adds an underscore
           relative to dsprefix)
-
-        delimiter is the character for delimiting data (usually ',')
-        textdelimiter is the character surrounding text (usually '"')
-        encoding is the encoding used in the file
-        headerignore is number of lines to ignore after header text
-        blanksaredata treats blank lines in csv files as blank data values
-        numericlocale is format to use for reading numbers
 
         If linked is True the data are linked with the file."""
 
@@ -722,15 +731,17 @@ class CommandInterface(qt4.QObject):
         # lookup filename
         realfilename = self.findFileOnImportPath(filename)
 
-        op = operations.OperationDataImportCSV(
+        params = readcsv.ParamsCSV(
             realfilename, readrows=readrows,
             delimiter=delimiter, textdelimiter=textdelimiter,
             encoding=encoding,
-            headerignore=headerignore,
+            headerignore=headerignore, rowsignore=rowsignore,
             blanksaredata=blanksaredata,
-            numericlocale=numericlocale,
-            prefix=dsprefix, suffix=dssuffix,
-            linked=linked)
+            numericlocale=numericlocale, dateformat=dateformat,
+            headermode=headermode,
+            dsprefix=dsprefix, dssuffix=dssuffix,
+            )
+        op = operations.OperationDataImportCSV(params, linked=linked)
         dsnames = self.document.applyOperation(op)
             
         if self.verbose:

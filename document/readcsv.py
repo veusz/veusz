@@ -91,52 +91,79 @@ typecodes = (
     ('(number)', 'float'),
     )
 
-class ReadCSV(object):
-    """A class to import data from CSV files."""
+class ParamsCSV(object):
+    """CSV import parameters."""
 
-    def __init__(self, filename, readrows=False, 
-                 delimiter=',', textdelimiter='"',
-                 encoding='utf_8',
-                 headerignore=0, blanksaredata=False,
-                 numericlocale='en_US',
-                 dateformat='YYYY-MM-DD|T|hh:mm:ss',
-                 prefix='', suffix=''):
+    defaults = {
+        'readrows': False,
+        'encoding': 'utf_8',
+        'delimiter': ',',
+        'textdelimiter': '"',
+        'headerignore': 0,
+        'rowsignore': 0,
+        'blanksaredata': False,
+        'numericlocale': 'en_US',
+        'dateformat': 'YYYY-MM-DD|T|hh:mm:ss',
+        'headermode': 'multi',
+        'dsprefix': '',
+        'dssuffix': '',
+        }
+
+    def __init__(self, filename, **argsv):
         """Initialise the reader to import data from filename.
 
-        If readrows is True, then data are read from columns, rather than
-        rows
-
+        If readrows is True, then data are read from rows
         headerignore is number of lines to ignore after headers
+        rowsignore is number of lines to ignore at top of file
         if blanksaredata is true, treat blank entries as nans
 
         numericlocale: locale to use for converting numbers
+        dateformat: format for dates in file
 
-        prefix is a prefix to prepend to the name of datasets from this file
+        headermode: one of 'multi' or '1st': for multiple headers in file
+         or to use 1st row
+
+        dsprefix is a prefix to prepend to the name of datasets from this file
+        dssuffix is suffix to add to dataset names
         """
 
         self.filename = filename
-        self.readrows = readrows
-        self.delimiter = delimiter
-        self.textdelimiter = textdelimiter
-        self.encoding = encoding
-        self.headerignore = headerignore
-        self.blanksaredata = blanksaredata
-        self.prefix = prefix
-        self.suffix = suffix
-        self.numericlocale = qt4.QLocale(numericlocale)
-        self.datere = re.compile(utils.dateStrToRegularExpression(dateformat))
 
-        # datasets. Each name is associated with a list
+        #  set defaults
+        for k, v in self.defaults.iteritems():
+            setattr(self, k, v)
+
+        # set parameters
+        for k, v in argsv.iteritems():
+            if k not in self.defaults:
+                raise ValueError, "Invalid parameter %s" % k
+            setattr(self, k, v)
+
+class ReadCSV(object):
+    """A class to import data from CSV files."""
+
+    def __init__(self, params):
+        """Initialise the reader.
+        params is a ParamsCSV object
+        """
+
+        self.params = params
+        self.numericlocale = qt4.QLocale(params.numericlocale)
+        self.datere = re.compile(
+            utils.dateStrToRegularExpression(params.dateformat))
+
+        # created datasets. Each name is associated with a list
         self.data = {}
 
     def _generateName(self, column):
         """Generate a name for a column."""
-        if self.readrows:
+        if self.params.readrows:
             prefix = 'row'
         else:
             prefix = 'col'
 
-        name = '%s%s%i%s' % (self.prefix, prefix, column+1, self.suffix)
+        name = '%s%s%i%s' % (self.params.dsprefix, prefix,
+                             column+1, self.params.dssuffix)
         return name
 
     def _getNameAndColType(self, colnum, colval):
@@ -167,7 +194,7 @@ class ReadCSV(object):
                 name = name[:-len(codename)].strip()
                 break
 
-        return type, self.prefix + name + self.suffix
+        return type, self.params.dsprefix + name + self.params.dssuffix
 
     def _setNameAndType(self, colnum, colname, coltype):
         """Set a name for column number given column name and type."""
@@ -176,24 +203,30 @@ class ReadCSV(object):
         self.coltypes[colnum] = coltype
         self.nametypes[colname] = coltype
         self.colnames[colnum] = colname
-        self.colignore[colnum] = self.headerignore
+        self.colignore[colnum] = self.params.headerignore
         if colname not in self.data:
             self.data[colname] = []
 
     def readData(self):
         """Read the data into the document."""
 
+        par = self.params
+
         # open the csv file
-        csvf = utils.UnicodeCSVReader( self.filename,
-                                       delimiter=self.delimiter,
-                                       quotechar=self.textdelimiter,
-                                       encoding=self.encoding )
+        csvf = utils.UnicodeCSVReader( par.filename,
+                                       delimiter=par.delimiter,
+                                       quotechar=par.textdelimiter,
+                                       encoding=par.encoding )
 
         # make in iterator for the file
-        if self.readrows:
+        if par.readrows:
             it = _FileReaderRows(csvf)
         else:
             it = _FileReaderCols(csvf)
+
+        # ignore rows (at top), if requested
+        for i in xrange(par.rowsignore):
+            it.next()
 
         # dataset names for each column
         self.colnames = {}
@@ -202,7 +235,7 @@ class ReadCSV(object):
         # type of names of columns
         self.nametypes = {}
         # ignore lines after headers
-        self.colignore = defaultdict(lambda: int(self.headerignore))
+        self.colignore = defaultdict(lambda: int(par.headerignore))
 
         # iterate over each line (or column)
         while True:
@@ -224,6 +257,13 @@ class ReadCSV(object):
                     self.colignore[colnum] -= 1
                     continue
 
+                # if in 1st header mode, use to generate a column name
+                if ( colnum not in self.colnames and par.headermode == '1st' and
+                     col.strip() != '' ):
+                    coltype, name = self._getNameAndColType(colnum, col)
+                    self._setNameAndType(colnum, name.strip(), coltype)
+                    continue
+
                 try:
                     # do any necessary conversion
                     if ctype == 'float':
@@ -241,18 +281,23 @@ class ReadCSV(object):
                 except ValueError:
                     if col.strip() == '':
                         # skip blanks unless blanksaredata is set
-                        if self.blanksaredata and colnum in self.colnames:
+                        if par.blanksaredata and colnum in self.colnames:
                             # assumes a numeric data type
                             self.data[self.colnames[colnum]].append(N.nan)
                     elif ( colnum in self.colnames and
                          len(self.data[self.colnames[colnum]]) == 0 ):
                         # if dataset is empty, convert to a string dataset
-                        self._setNameAndType(colnum, self.colnames[colnum], 'string')
+                        self._setNameAndType(colnum, self.colnames[colnum],
+                                             'string')
                         self.data[self.colnames[colnum]].append(col)
                     else:
-                        # start a new dataset if conversion failed
-                        coltype, name = self._getNameAndColType(colnum, col)
-                        self._setNameAndType(colnum, name.strip(), coltype)
+                        if par.headermode == '1st':
+                            if colnum in self.colnames:
+                                self.data[self.colnames[colnum]].append(N.nan)
+                        else:
+                            # start a new dataset if conversion failed
+                            coltype, name = self._getNameAndColType(colnum, col)
+                            self._setNameAndType(colnum, name.strip(), coltype)
 
                 else:
                     # generate a name if required
