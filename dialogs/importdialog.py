@@ -192,8 +192,11 @@ class ImportTabCSV(ImportTab):
         self.csvtextdelimitercombo.setEditText('"')
         self.csvdirectioncombo.setCurrentIndex(0)
         self.csvignorehdrspin.setValue(0)
+        self.csvignoretopspin.setValue(0)
         self.csvblanksdatacheck.setChecked(False)
         self.csvnumfmtcombo.setCurrentIndex(0)
+        self.csvdatefmtcombo.setCurrentIndex(0)
+        self.csvheadermodecombo.setCurrentIndex(0)
 
     def slotHelp(self):
         """Asked for help."""
@@ -276,29 +279,36 @@ class ImportTabCSV(ImportTab):
         except UnicodeEncodeError:
             return
 
-        numericlocale = {0: str(qt4.QLocale().name()),
-                         1: 'en_US',
-                         2: 'de_DE'}[self.csvnumfmtcombo.currentIndex()]
+        numericlocale = ( str(qt4.QLocale().name()),
+                          'en_US',
+                          'de_DE' )[self.csvnumfmtcombo.currentIndex()]
         headerignore = self.csvignorehdrspin.value()
+        rowsignore = self.csvignoretopspin.value()
         blanksaredata = self.csvblanksdatacheck.isChecked()
+        dateformat = unicode(self.csvdatefmtcombo.currentText())
+        headermode = ('multi', '1st')[self.csvheadermodecombo.currentIndex()]
 
+        # create import parameters and operation objects
         params = document.ParamsCSV(
-            filename, readrows=inrows,
+            filename,
+            readrows=inrows,
+            encoding=encoding,
             delimiter=delimiter,
             textdelimiter=textdelimiter,
             headerignore=headerignore,
+            rowsignore=rowsignore,
             blanksaredata=blanksaredata,
             numericlocale=numericlocale,
-            encoding=encoding,
+            dateformat=dateformat,
+            headermode=headermode,
             dsprefix=prefix, dssuffix=suffix
             )
-
         op = document.OperationDataImportCSV(params, linked=linked)
-        
+
         # actually import the data
         dsnames = doc.applyOperation(op)
-        
-        # what datasets were imported
+
+        # update output, showing what datasets were imported
         lines = self.dialog.retnDatasetInfo(dsnames, linked, filename)
 
         t = self.previewtablecsv
