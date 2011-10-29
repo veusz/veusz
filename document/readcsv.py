@@ -248,8 +248,10 @@ class ReadCSV(object):
             for colnum, col in enumerate(line):
 
                 if colnum >= len(self.coltypes) or self.coltypes[colnum] == '':
+                    # default data type is float
                     ctype = 'float'
                 else:
+                    # use previous type
                     ctype = self.coltypes[colnum]
 
                 # ignore lines after headers
@@ -265,7 +267,7 @@ class ReadCSV(object):
                     continue
 
                 try:
-                    # do any necessary conversion
+                    # convert text to data type of column
                     if ctype == 'float':
                         v, ok = self.numericlocale.toDouble(col)
                         if not ok:
@@ -279,6 +281,7 @@ class ReadCSV(object):
                         raise RuntimeError, "Invalid type in CSV reader"
 
                 except ValueError:
+                    # conversion failed
                     if col.strip() == '':
                         # skip blanks unless blanksaredata is set
                         if par.blanksaredata and colnum in self.colnames:
@@ -300,12 +303,13 @@ class ReadCSV(object):
                             self._setNameAndType(colnum, name.strip(), coltype)
 
                 else:
-                    # generate a name if required
+                    # conversion succeeded
+
+                    # generate a dataset name if required
                     if colnum not in self.colnames:
                         self._setNameAndType(colnum, self._generateName(colnum),
                                              'float')
 
-                    # conversion okay
                     # append number to data
                     coldata = self.data[self.colnames[colnum]]
                     coldata.append(v)
