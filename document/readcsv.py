@@ -249,7 +249,7 @@ class ReadCSV(object):
 
         # blank value
         if col.strip() == '':
-            if self.params.blanksareadata:
+            if self.params.blanksaredata:
                 # keep track of blanks above autodetected data
                 self.colblanks[colnum] += 1
             # skip back to next value
