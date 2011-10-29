@@ -46,8 +46,9 @@
         <item row="0" column="1">
          <widget class="HistoryValueCombo" name="csvheadermodecombo">
           <property name="toolTip">
-           <string>Use a single header in file to define datasets
-or allow multiple headers</string>
+           <string>'Multiple': allow multiple headers in file
+'Single': 1st non-blank row is header
+'None': no headers, guess data types</string>
           </property>
          </widget>
         </item>

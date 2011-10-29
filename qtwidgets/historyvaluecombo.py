@@ -76,7 +76,8 @@ class HistoryValueCombo(qt4.QComboBox):
         if text is not None:
             indx = self.findText(text)
             if indx < 0:
-                self.insertItem(0, text)
+                if self.isEditable():
+                    self.insertItem(0, text)
                 indx = 0
             self.setCurrentIndex(indx)
         self.hasshown = True

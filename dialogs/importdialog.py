@@ -184,7 +184,7 @@ class ImportTabCSV(ImportTab):
             'M/D/YY| |hh:mm:ss'
             ]
         self.csvnumfmtcombo.defaultlist = ['System', 'English', 'European']
-        self.csvheadermodecombo.defaultlist = ['Multiple', '1st row']
+        self.csvheadermodecombo.defaultlist = ['Multiple', '1st row', 'None']
 
     def reset(self):
         """Reset controls."""
@@ -286,7 +286,8 @@ class ImportTabCSV(ImportTab):
         rowsignore = self.csvignoretopspin.value()
         blanksaredata = self.csvblanksdatacheck.isChecked()
         dateformat = unicode(self.csvdatefmtcombo.currentText())
-        headermode = ('multi', '1st')[self.csvheadermodecombo.currentIndex()]
+        headermode = ('multi', '1st', 'none')[
+            self.csvheadermodecombo.currentIndex()]
 
         # create import parameters and operation objects
         params = document.ParamsCSV(

@@ -119,8 +119,10 @@ class ParamsCSV(object):
         numericlocale: locale to use for converting numbers
         dateformat: format for dates in file
 
-        headermode: one of 'multi' or '1st': for multiple headers in file
-         or to use 1st row
+        headermode: one of ('multi', '1st', 'none')
+         multi: allow multiple headers in file
+         1st: first non-blank line is header
+         none: no headers, assign names
 
         dsprefix is a prefix to prepend to the name of datasets from this file
         dssuffix is suffix to add to dataset names
@@ -137,6 +139,9 @@ class ParamsCSV(object):
             if k not in self.defaults:
                 raise ValueError, "Invalid parameter %s" % k
             setattr(self, k, v)
+
+        if self.headermode not in ('multi', '1st', 'none'):
+            raise ValueError, "Invalid headermode"
 
 class _NextValue(Exception):
     """A class to be raised to move to next value."""
@@ -230,6 +235,11 @@ class ReadCSV(object):
             coltype, name = self._getNameAndColType(colnum, col)
             self._setNameAndType(colnum, name.strip(), coltype)
             raise _NextValue()
+        elif self.params.headermode == 'none':
+            # no header, so just start a new data set
+            dtype = self._guessType(col)
+            self._setNameAndType(colnum, self._generateName(colnum),
+                                 dtype)
         else:
             # see whether it looks like data, not a header
             dtype = self._guessType(col)

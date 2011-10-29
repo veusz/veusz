@@ -716,6 +716,7 @@ class CommandInterface(qt4.QObject):
         dateformat: format for interpreting dates
         headermode: 'multi': multiple headers allowed in file
                     '1st': first text found are headers
+                    'none': no headers, guess data and use default names
 
         Dataset names are prepended and appended, by dsprefix and dssuffix,
         respectively
