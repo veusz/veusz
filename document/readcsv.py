@@ -19,7 +19,6 @@
 """This module contains routines for importing CSV data files
 in an easy-to-use manner."""
 
-from collections import defaultdict
 import re
 import numpy as N
 
@@ -139,6 +138,9 @@ class ParamsCSV(object):
                 raise ValueError, "Invalid parameter %s" % k
             setattr(self, k, v)
 
+class _NextValue(Exception):
+    """A class to be raised to move to next value."""
+
 class ReadCSV(object):
     """A class to import data from CSV files."""
 
@@ -187,13 +189,12 @@ class ReadCSV(object):
 
         # examine whether object type is at end of name
         # convert, and remove, if is
-        type = 'float'
+        type = 'unknown'
         for codename, codetype in typecodes:
             if name[-len(codename):] == codename:
                 type = codetype
                 name = name[:-len(codename)].strip()
                 break
-
         return type, self.params.dsprefix + name + self.params.dssuffix
 
     def _setNameAndType(self, colnum, colname, coltype):
@@ -204,8 +205,126 @@ class ReadCSV(object):
         self.nametypes[colname] = coltype
         self.colnames[colnum] = colname
         self.colignore[colnum] = self.params.headerignore
+        self.colblanks[colnum] = 0
         if colname not in self.data:
             self.data[colname] = []
+
+    def _guessType(self, val):
+        """Guess type for new dataset."""
+        v, ok = self.numericlocale.toDouble(val)
+        if ok:
+            return 'float'
+        m = self.datere.match(val)
+        try:
+            v = utils.dateREMatchToDate(m)
+            return 'date'
+        except ValueError:
+            return 'string'
+
+    def _newValueInBlankColumn(self, colnum, col):
+        """Handle occurance of new data value in previously blank column.
+        """
+
+        if self.params.headermode == '1st':
+            # just use name of column as title in 1st header mode
+            coltype, name = self._getNameAndColType(colnum, col)
+            self._setNameAndType(colnum, name.strip(), coltype)
+            raise _NextValue()
+        else:
+            # see whether it looks like data, not a header
+            dtype = self._guessType(col)
+            if dtype == 'string':
+                # use text as dataset name
+                coltype, name = self._getNameAndColType(colnum, col)
+                self._setNameAndType(colnum, name.strip(), coltype)
+                raise _NextValue()
+            else:
+                # use guessed data type and generated name
+                self._setNameAndType(colnum, self._generateName(colnum),
+                                     dtype)
+
+    def _newUnknownDataValue(self, colnum, col):
+        """Process data value if data type is unknown.
+        """
+
+        # blank value
+        if col.strip() == '':
+            if self.params.blanksareadata:
+                # keep track of blanks above autodetected data
+                self.colblanks[colnum] += 1
+            # skip back to next value
+            raise _NextValue()
+
+        # guess type from data value
+        t = self._guessType(col)
+        self.nametypes[self.colnames[colnum]] = t
+        self.coltypes[colnum] = t
+
+        # add back on blanks if necessary with correct format
+        for i in xrange(self.colblanks[colnum]):
+            d = (N.nan, '')[t == 'string']
+            self.data[self.colnames[colnum]].append(d)
+        self.colblanks[colnum] = 0
+
+    def _handleFailedConversion(self, colnum, col):
+        """If conversion from text to data type fails."""
+        if col.strip() == '':
+            # skip blanks unless blanksaredata is set
+            if self.params.blanksaredata:
+                # assumes a numeric data type
+                self.data[self.colnames[colnum]].append(N.nan)
+        else:
+            if self.params.headermode == '1st':
+                # no more headers, so fill with invalid number
+                self.data[self.colnames[colnum]].append(N.nan)
+            else:
+                # start a new dataset if conversion failed
+                coltype, name = self._getNameAndColType(colnum, col)
+                self._setNameAndType(colnum, name.strip(), coltype)
+
+    def _handleVal(self, colnum, col):
+        """Handle a value from the file.
+        colnum: number of column
+        col: data value
+        """
+
+        if colnum not in self.colnames:
+            # ignore blanks
+            if col.strip() == '':
+                return
+            # process value
+            self._newValueInBlankColumn(colnum, col)
+
+        # ignore lines after headers
+        if self.colignore[colnum] > 0:
+            self.colignore[colnum] -= 1
+            return
+
+        # process value if data type unknown
+        if self.coltypes[colnum] == 'unknown':
+            self._newUnknownDataValue(colnum, col)
+
+        ctype = self.coltypes[colnum]
+        try:
+            # convert text to data type of column
+            if ctype == 'float':
+                v, ok = self.numericlocale.toDouble(col)
+                if not ok:
+                    raise ValueError
+            elif ctype == 'date':
+                m = self.datere.match(col)
+                v = utils.dateREMatchToDate(m)
+            elif ctype == 'string':
+                v = col
+            else:
+                raise RuntimeError, "Invalid type in CSV reader"
+
+        except ValueError:
+            self._handleFailedConversion(colnum, col)
+
+        else:
+            # conversion succeeded - append number to data
+            self.data[self.colnames[colnum]].append(v)
 
     def readData(self):
         """Read the data into the document."""
@@ -235,7 +354,10 @@ class ReadCSV(object):
         # type of names of columns
         self.nametypes = {}
         # ignore lines after headers
-        self.colignore = defaultdict(lambda: int(par.headerignore))
+        self.colignore = {}
+        # keep track of how many blank values before 1st data for auto
+        # type detection
+        self.colblanks = {}
 
         # iterate over each line (or column)
         while True:
@@ -246,73 +368,10 @@ class ReadCSV(object):
 
             # iterate over items on line
             for colnum, col in enumerate(line):
-
-                if colnum >= len(self.coltypes) or self.coltypes[colnum] == '':
-                    # default data type is float
-                    ctype = 'float'
-                else:
-                    # use previous type
-                    ctype = self.coltypes[colnum]
-
-                # ignore lines after headers
-                if colnum < len(self.coltypes) and self.colignore[colnum] > 0:
-                    self.colignore[colnum] -= 1
-                    continue
-
-                # if in 1st header mode, use to generate a column name
-                if ( colnum not in self.colnames and par.headermode == '1st' and
-                     col.strip() != '' ):
-                    coltype, name = self._getNameAndColType(colnum, col)
-                    self._setNameAndType(colnum, name.strip(), coltype)
-                    continue
-
                 try:
-                    # convert text to data type of column
-                    if ctype == 'float':
-                        v, ok = self.numericlocale.toDouble(col)
-                        if not ok:
-                            raise ValueError
-                    elif ctype == 'date':
-                        m = self.datere.match(col)
-                        v = utils.dateREMatchToDate(m)
-                    elif ctype == 'string':
-                        v = col
-                    else:
-                        raise RuntimeError, "Invalid type in CSV reader"
-
-                except ValueError:
-                    # conversion failed
-                    if col.strip() == '':
-                        # skip blanks unless blanksaredata is set
-                        if par.blanksaredata and colnum in self.colnames:
-                            # assumes a numeric data type
-                            self.data[self.colnames[colnum]].append(N.nan)
-                    elif ( colnum in self.colnames and
-                         len(self.data[self.colnames[colnum]]) == 0 ):
-                        # if dataset is empty, convert to a string dataset
-                        self._setNameAndType(colnum, self.colnames[colnum],
-                                             'string')
-                        self.data[self.colnames[colnum]].append(col)
-                    else:
-                        if par.headermode == '1st':
-                            if colnum in self.colnames:
-                                self.data[self.colnames[colnum]].append(N.nan)
-                        else:
-                            # start a new dataset if conversion failed
-                            coltype, name = self._getNameAndColType(colnum, col)
-                            self._setNameAndType(colnum, name.strip(), coltype)
-
-                else:
-                    # conversion succeeded
-
-                    # generate a dataset name if required
-                    if colnum not in self.colnames:
-                        self._setNameAndType(colnum, self._generateName(colnum),
-                                             'float')
-
-                    # append number to data
-                    coldata = self.data[self.colnames[colnum]]
-                    coldata.append(v)
+                    self._handleVal(colnum, col)
+                except _NextValue:
+                    pass
 
     def setData(self, document, linkedfile=None):
         """Set the read-in datasets in the document."""
