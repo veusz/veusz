@@ -26,21 +26,33 @@ class Settings(object):
     # differentiate widgets, settings and setting
     nodetype = 'settings'
 
-    def __init__(self, name, descr = '', usertext='', pixmap=''):
-        """A new Settings with a name."""
+    def __init__(self, name, descr = '', usertext='', pixmap='',
+                 setnsmode='formatting'):
+        """A new Settings with a name.
+
+        name: name in hierarchy
+        descr: description (for user)
+        usertext: name for user of class
+        pixmap: pixmap to show in tab (if appropriate)
+        setnsmode: type of Settings class, one of
+              ('formatting', 'groupedsetting', 'widgetsettings', 'stylesheet')
+        """
 
         self.__dict__['setdict'] = {}
         self.name = name
         self.descr = descr
-        self.pixmap = pixmap
         self.usertext = usertext
+        self.pixmap = pixmap
+        self.setnsmode = setnsmode
         self.setnames = []  # a list of names
         self.parent = None
 
     def copy(self):
         """Make a copy of the settings and its subsettings."""
-        s = Settings(self.name, descr=self.descr, usertext=self.usertext,
-                     pixmap=self.pixmap)
+
+        s = Settings(
+            self.name, descr=self.descr, usertext=self.usertext,
+            pixmap=self.pixmap, setnsmode=self.setnsmode )
         for name in self.setnames:
             s.add( self.setdict[name].copy() )
         return s
@@ -66,6 +78,10 @@ class Settings(object):
         """Get a list of settings types."""
         return [self.setdict[n] for n in self.setnames
                 if isinstance(self.setdict[n], Settings)]
+
+    def getNames(self):
+        """Return list of names."""
+        return self.setnames
 
     def getSettingNames(self):
         """Get list of setting names."""
@@ -245,5 +261,3 @@ class Settings(object):
                     setn.default = ref
                 except Reference.ResolveException:
                     pass
-
-

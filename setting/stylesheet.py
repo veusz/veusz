@@ -43,7 +43,7 @@ class StyleSheet(Settings):
 
     def __init__(self, **args):
         """Create the default settings."""
-        Settings.__init__(self, 'StyleSheet', **args)
+        Settings.__init__(self, 'StyleSheet', setnsmode='stylesheet', **args)
         self.pixmap = 'settings_stylesheet'
 
         for subset in self.registeredsettings:

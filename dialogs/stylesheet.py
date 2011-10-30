@@ -96,7 +96,7 @@ class StylesheetDialog(VeuszDialog):
         self.formattingGroup.layout().addWidget(self.tabformat)
 
         # update properties
-        self.properties = PropertyList(self.document, showsubsettings=False)
+        self.properties = PropertyList(self.document, showformatsettings=False)
         self.properties.updateProperties(setnsproxy, showformatting=False)
         self.propertiesScrollArea.setWidget(self.properties)
 

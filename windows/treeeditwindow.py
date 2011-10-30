@@ -33,6 +33,9 @@ class SettingsProxy(object):
     """Object to handle communication between widget/settings
     or sets of widgets/settings."""
 
+    def childProxyList(self):
+        """Return a list settings and setting variables proxified."""
+
     def settingsProxyList(self):
         """Return list of SettingsProxy objects for sub Settings."""
 
@@ -57,6 +60,9 @@ class SettingsProxy(object):
     def usertext(self):
         """Return text for user."""
 
+    def setnsmode(self):
+        """Return setnsmode of Settings."""
+
     def multivalued(self, name):
         """Is setting with name multivalued?"""
         return False
@@ -73,6 +79,18 @@ class SettingsProxySingle(SettingsProxy):
         self.document = document
         self.settings = settings
         self.actions = actions
+
+    def childProxyList(self):
+        """Return a list settings and setting variables proxified."""
+        retn = []
+        s = self.settings
+        for n in s.getNames():
+            o = s.get(n)
+            if isinstance(o, setting.Settings):
+                retn.append( SettingsProxySingle(self.document, o) )
+            else:
+                retn.append(o)
+        return retn
 
     def settingsProxyList(self):
         """Return list of SettingsProxy objects."""
@@ -109,6 +127,10 @@ class SettingsProxySingle(SettingsProxy):
         """Return text for user."""
         return self.settings.usertext
 
+    def setnsmode(self):
+        """Return setnsmode of Settings."""
+        return self.settings.setnsmode
+
     def resetToDefault(self, name):
         """Reset setting to default."""
         setn = self.settings.get(name)
@@ -125,10 +147,10 @@ class SettingsProxyMulti(SettingsProxy):
         self.widgets = widgets
         self._root = _root
 
-        self.settingsatlevel = self._settingsAtLevel()
-        self.settingsproxylist = self.settinglist = None
+        self._settingsatlevel = self._getSettingsAtLevel()
+        self._cachesettings = self._cachesetting = self._cachechild = None
 
-    def _settingsAtLevel(self):
+    def _getSettingsAtLevel(self):
         """Return settings of widgets at level given."""
         if self._root:
             levels = self._root.split('/')
@@ -142,48 +164,59 @@ class SettingsProxyMulti(SettingsProxy):
             setns.append(s)
         return setns
 
-    def settingsProxyList(self):
-        """Get list of settings proxy."""
-        if self.settingsproxylist:
-            return self.settingsproxylist
+    def _objList(self, filterclasses):
+        """Return a list of objects with the type in filterclasses."""
 
-        setns = self.settingsatlevel
+        setns = self._settingsatlevel
 
-        # find common Settings objects
-        names = setns[0].getSettingsNames()
+        # get list of names with appropriate class
+        names = []
+        for n in setns[0].getNames():
+            o = setns[0].get(n)
+            for c in filterclasses:
+                if isinstance(o, c):
+                    names.append(n)
+                    break
+
         sset = set(names)
         for s in setns[1:]:
-            sset &= set(s.getSettingsNames())
+            sset &= set(s.getNames())
         names = [n for n in names if n in sset]
-        pl = self.settingsproxylist = []
 
-        # construct new proxy settings (adding on name of root)
+        proxylist = []
         for n in names:
-            newroot = n
-            if self._root:
-                newroot = self._root + '/' + newroot
-            sp = SettingsProxyMulti(self.document, self.widgets,
-                                    _root=newroot)
-            pl.append(sp)
-        return pl
+            o = setns[0].get(n)
+            if isinstance(o, setting.Settings):
+                # construct new proxy settings (adding on name of root)
+                newroot = n
+                if self._root:
+                    newroot = self._root + '/' + newroot
+                v = SettingsProxyMulti(self.document, self.widgets,
+                                       _root=newroot)
+            else:
+                # use setting from first settings as template
+                v = o
+
+            proxylist.append(v)
+        return proxylist
+
+    def childProxyList(self):
+        """Make a list of proxy settings."""
+        if self._cachechild is not None:
+            self._cachechild = self._objList( () )
+        return self._cachechild
+
+    def settingsProxyList(self):
+        """Get list of settings proxy."""
+        if self._cachesettings is None:
+            self._cachesettings = self._objList( (setting.Settings,) )
+        return self._cachesettings
 
     def settingList(self):
         """Set list of common Setting objects for each widget."""
-        if self.settinglist is not None:
-            return self.settinglist
-
-        setns = self.settingsatlevel
-
-        # find common Setting objects
-        names = setns[0].getSettingNames()
-        sset = set(names)
-        for s in setns[1:]:
-            sset &= set(s.getSettingNames())
-        names = [n for n in names if n in sset]
-
-        # use setting from 1st Settings as template
-        self.settinglist = [setns[0].get(n) for n in names]
-        return self.settinglist
+        if self._cachesetting is None:
+            self._cachesetting = self._objList( (setting.Setting,) )
+        return self._cachesetting
 
     def actionsList(self):
         """Get list of common actions."""
@@ -222,19 +255,23 @@ class SettingsProxyMulti(SettingsProxy):
                     console.runFunction(a.function)
 
     def name(self):
-        return self.settingsatlevel[0].name
+        return self._settingsatlevel[0].name
 
     def pixmap(self):
         """Return pixmap."""
-        return self.settingsatlevel[0].pixmap
+        return self._settingsatlevel[0].pixmap
 
     def usertext(self):
         """Return text for user."""
-        return self.settingsatlevel[0].usertext
+        return self._settingsatlevel[0].usertext
+
+    def setnsmode(self):
+        """Return setnsmode."""
+        return self._settingsatlevel[0].setnsmode
 
     def multivalued(self, name):
         """Is setting multivalued?"""
-        slist = [s.get(name) for s in self.settingsatlevel]
+        slist = [s.get(name) for s in self._settingsatlevel]
         first = slist[0].get()
         for s in slist[1:]:
             if s.get() != first:
@@ -244,7 +281,7 @@ class SettingsProxyMulti(SettingsProxy):
     def resetToDefault(self, name):
         """Reset settings to default."""
         ops = []
-        for s in self.settingsatlevel:
+        for s in self._settingsatlevel:
             setn = s.get(name)
             ops.append(document.OperationSettingSet(setn, setn.default))
         self.document.applyOperation(
@@ -253,14 +290,13 @@ class SettingsProxyMulti(SettingsProxy):
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
 
-    def __init__(self, document, showsubsettings=True,
+    def __init__(self, document, showformatsettings=True,
                  *args):
         qt4.QWidget.__init__(self, *args)
         self.document = document
-        self.showsubsettings = showsubsettings
+        self.showformatsettings = showformatsettings
 
         self.layout = qt4.QGridLayout(self)
-
         self.layout.setSpacing( self.layout.spacing()/2 )
         self.layout.setMargin(4)
         
@@ -273,6 +309,108 @@ class PropertyList(qt4.QWidget):
         while not hasattr(win, 'console'):
             win = win.parent()
         return win.console
+
+    def _addActions(self, setnsproxy, row):
+        """Add a list of actions."""
+        for action in setnsproxy.actionsList():
+            text = action.name
+            if action.usertext:
+                text = action.usertext
+
+            lab = qt4.QLabel(text)
+            self.layout.addWidget(lab, row, 0)
+            self.childlist.append(lab)
+
+            button = qt4.QPushButton(text)
+            button.setToolTip(action.descr)
+            # need to save reference to caller object
+            button.caller = utils.BoundCaller(setnsproxy.onAction, action,
+                                              self.getConsole())
+            self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
+
+            self.layout.addWidget(button, row, 1)
+            self.childlist.append(button)
+
+            row += 1
+        return row
+
+    def _addControl(self, setnsproxy, setn, row):
+        """Add a control for a setting."""
+        cntrl = setn.makeControl(None)
+        if cntrl:
+            lab = SettingLabel(self.document, setn, setnsproxy)
+            self.layout.addWidget(lab, row, 0)
+            self.childlist.append(lab)
+
+            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                         setnsproxy.onSettingChanged)
+            self.layout.addWidget(cntrl, row, 1)
+            self.childlist.append(cntrl)
+            self.setncntrls[setn.name] = (lab, cntrl)
+
+            row += 1
+        return row
+
+    def _addGroupedSettingsControl(self, grpdsetting, row):
+        """Add a control for a set of grouped settings."""
+
+        slist = grpdsetting.settingList()
+
+        # make first widget with expandable button
+
+        # this is a label with a + button by this side
+        setnlab = SettingLabel(self.document, slist[0], grpdsetting)
+        expandbutton = qt4.QPushButton("+", checkable=True, flat=True,
+                                       maximumWidth=16)
+
+        l = qt4.QHBoxLayout(spacing=0)
+        l.setContentsMargins(0,0,0,0)
+        l.addWidget( expandbutton )
+        l.addWidget( setnlab )
+        lw = qt4.QWidget()
+        lw.setLayout(l)
+        self.layout.addWidget(lw, row, 0)
+        self.childlist.append(lw)
+
+        # make main control
+        cntrl = slist[0].makeControl(None)
+        self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                     grpdsetting.onSettingChanged)
+        self.layout.addWidget(cntrl, row, 1)
+        self.childlist.append(cntrl)
+
+        row += 1
+
+        # set of controls for remaining settings
+        l = qt4.QGridLayout()
+        grp_row = 0
+        for setn in slist[1:]:
+            cntrl = setn.makeControl(None)
+            if cntrl:
+                lab = SettingLabel(self.document, setn, grpdsetting)
+                l.addWidget(lab, grp_row, 0)
+                self.connect(cntrl, qt4.SIGNAL('settingChanged'),
+                             grpdsetting.onSettingChanged)
+                l.addWidget(cntrl, grp_row, 1)
+                grp_row += 1
+
+        grpwidget = qt4.QFrame( frameShape = qt4.QFrame.Panel,
+                                frameShadow = qt4.QFrame.Raised,
+                                visible=False )
+        grpwidget.setLayout(l)
+
+        def ontoggle(checked):
+            """Toggle button text and make grp visible/invisible."""
+            expandbutton.setText( ("+","-")[checked] )
+            grpwidget.setVisible( checked )
+
+        self.connect(expandbutton, qt4.SIGNAL("toggled(bool)"), ontoggle)
+
+        # add group to standard layout
+        self.layout.addWidget(grpwidget, row, 0, 1, -1)
+        self.childlist.append(grpwidget)
+        row += 1
+        return row
 
     def updateProperties(self, setnsproxy, title=None, showformatting=True,
                          onlyformatting=False):
@@ -300,37 +438,16 @@ class PropertyList(qt4.QWidget):
 
         # add a title if requested
         if title is not None:
-            lab = qt4.QLabel(title[0])
-            lab.setFrameShape(qt4.QFrame.Panel)
-            lab.setFrameShadow(qt4.QFrame.Sunken)
-            lab.setToolTip(title[1])
+            lab = qt4.QLabel(title[0], frameShape=qt4.QFrame.Panel,
+                             frameShadow=qt4.QFrame.Sunken, toolTip=title[1])
             self.layout.addWidget(lab, row, 0, 1, -1)
             row += 1
 
         # add actions if parent is widget
         if setnsproxy.actionsList() and not showformatting:
-            for action in setnsproxy.actionsList():
-                text = action.name
-                if action.usertext:
-                    text = action.usertext
+            row = self._addActions(setnsproxy, row)
 
-                lab = qt4.QLabel(text)
-                self.layout.addWidget(lab, row, 0)
-                self.childlist.append(lab)
-
-                button = qt4.QPushButton(text)
-                button.setToolTip(action.descr)
-                # need to save reference to caller object
-                button.caller = utils.BoundCaller(setnsproxy.onAction, action,
-                                                  self.getConsole())
-                self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
-                             
-                self.layout.addWidget(button, row, 1)
-                self.childlist.append(button)
-
-                row += 1
-
-        if setnsproxy.settingsProxyList() and self.showsubsettings:
+        if setnsproxy.settingsProxyList() and self.showformatsettings:
             # if we have subsettings, use tabs
             tabbed = TabbedFormatting(self.document, setnsproxy)
             self.layout.addWidget(tabbed, row, 1, 1, 2)
@@ -338,32 +455,22 @@ class PropertyList(qt4.QWidget):
             self.childlist.append(tabbed)
         else:
             # else add settings proper as a list
-            for setn in setnsproxy.settingList():
-                # skip if not to show formatting
-                if not showformatting and setn.formatting:
-                    continue
-                # skip if only to show formatting and not formatting
-                if onlyformatting and not setn.formatting:
-                    continue
+            for setn in setnsproxy.childProxyList():
 
-                cntrl = setn.makeControl(None)
-                if cntrl:
-                    lab = SettingLabel(self.document, setn, setnsproxy)
-                    self.layout.addWidget(lab, row, 0)
-                    self.childlist.append(lab)
-
-                    self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                                 setnsproxy.onSettingChanged)
-                    self.layout.addWidget(cntrl, row, 1)
-                    self.childlist.append(cntrl)
-                    self.setncntrls[setn.name] = (lab, cntrl)
-
-                    row += 1
+                # add setting
+                # only add if formatting setting and formatting allowed
+                # and not formatting and not formatting not allowed
+                if ( isinstance(setn, setting.Setting) and (
+                        (setn.formatting and (showformatting or onlyformatting))
+                        or (not setn.formatting and not onlyformatting)) ):
+                    row = self._addControl(setnsproxy, setn, row)
+                elif ( isinstance(setn, SettingsProxy) and
+                       setn.setnsmode() == 'groupedsetting' ):
+                    row = self._addGroupedSettingsControl(setn, row)
 
         # add empty widget to take rest of space
-        w = qt4.QWidget()
-        w.setSizePolicy(qt4.QSizePolicy.Maximum,
-                        qt4.QSizePolicy.MinimumExpanding)
+        w = qt4.QWidget( sizePolicy=qt4.QSizePolicy(
+                qt4.QSizePolicy.Maximum, qt4.QSizePolicy.MinimumExpanding) )
         self.layout.addWidget(w, row, 0)
         self.childlist.append(w)
 
@@ -414,13 +521,12 @@ class TabbedFormatting(qt4.QTabWidget):
 
         # add tab for each subsettings
         for subset in setnslist:
-            if subset.name() == 'StyleSheet':
+            if subset.setnsmode() not in ('formatting', 'widgetsettings'):
                 continue
             self.tabsubsetns.append(subset)
 
             # details of tab
-            mainsettings = (subset is setnsproxy)
-            if mainsettings:
+            if subset is setnsproxy:
                 # main tab formatting, so this is special
                 pixmap = 'settings_main'
                 tabname = title = 'Main'
@@ -458,7 +564,7 @@ class TabbedFormatting(qt4.QTabWidget):
         mainsettings = subsetn is self.setnsproxy
 
         # add this property list to the scroll widget for tab
-        plist = PropertyList(self.document, showsubsettings=not mainsettings)
+        plist = PropertyList(self.document, showformatsettings=not mainsettings)
         plist.updateProperties(subsetn, title=(self.tabtitles[tab],
                                                self.tabtooltips[tab]),
                                onlyformatting=mainsettings)
@@ -534,7 +640,7 @@ class PropertiesDock(qt4.QDockWidget):
         self.setWidget(self.scroll)
 
         # construct properties list in scrollable area
-        self.proplist = PropertyList(document, showsubsettings=False)
+        self.proplist = PropertyList(document, showformatsettings=False)
         self.scroll.setWidget(self.proplist)
 
     def slotWidgetsSelected(self, widgets, setnsproxy):
