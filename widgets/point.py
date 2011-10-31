@@ -213,7 +213,29 @@ class MarkerFillBrush(setting.Brush):
                 'instead of the fill color',
                 usertext='Colormap',
                 formatting=True) )
-    
+
+class ColorSettings(setting.Settings):
+    def __init__(self, name):
+        setting.Settings.__init__(self, name, setnsmode='groupedsetting')
+        self.add( setting.DatasetOrFloatList(
+                'points', '',
+                descr = 'Use color value (0-1) in dataset to paint points',
+                usertext='Color markers'), 7 )
+        self.add( setting.Float(
+                'min', 0.,
+                descr = 'Minimum value of color dataset',
+                usertext = 'Min val' ))
+        self.add( setting.Float(
+                'max', 1.,
+                descr = 'Maximum value of color dataset',
+                usertext = 'Max val' ))
+        self.add( setting.Choice(
+                'scaling',
+                ['linear', 'sqrt', 'log', 'squared'],
+                'linear',
+                descr = 'Scaling to transform numbers to color',
+                usertext='Scaling'))
+
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
@@ -256,10 +278,8 @@ class PointPlotter(GenericPlotter):
                 'scalePoints', '',
                 descr = 'Scale size of plotted markers by this dataset or'
                 ' list of values', usertext='Scale markers'), 6 )
-        s.add( setting.DatasetOrFloatList(
-                'colorPoints', '',
-                descr = 'Use color value (0-1) in dataset to paint points',
-                usertext='Color markers'), 7 )
+
+        s.add( ColorSettings('Color') )
 
         s.add( setting.DatasetOrFloatList(
                 'yData', 'y',
@@ -669,7 +689,7 @@ class PointPlotter(GenericPlotter):
         yv = s.get('yData').getData(doc)
         text = s.get('labels').getData(doc, checknull=True)
         scalepoints = s.get('scalePoints').getData(doc)
-        colorpoints = s.get('colorPoints').getData(doc)
+        colorpoints = s.Color.get('points').getData(doc)
 
         # if a missing dataset, make a fake dataset for the second one
         # based on a row number

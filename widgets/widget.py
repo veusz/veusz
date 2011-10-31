@@ -86,7 +86,8 @@ class Widget(object):
         self.position = (0., 0., 1., 1.)
 
         # settings for widget
-        self.settings = setting.Settings( 'Widget_' + self.typename )
+        self.settings = setting.Settings( 'Widget_' + self.typename,
+                                          setnsmode='widgetsettings' )
         self.settings.parent = self
 
         self.addSettings(self.settings)
