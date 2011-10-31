@@ -1,7 +1,7 @@
 # Veusz saved document (version 1.13)
 # Saved at 2011-10-29T19:22:19.911232
 
-ImportFileCSV(u'code/veusz-git/csv/veusz/tests/selftests/noheader.csv', linked=True, blanksaredata=True, headermode='none', numericlocale='en_GB')
+ImportFileCSV(u'noheader.csv', linked=True, blanksaredata=True, headermode='none', numericlocale='en_GB')
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)
