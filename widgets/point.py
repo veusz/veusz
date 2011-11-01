@@ -211,10 +211,17 @@ class MarkerFillBrush(setting.Brush):
                 'colorMap', 'grey',
                 descr = 'If color markers dataset is given, use this colormap '
                 'instead of the fill color',
-                usertext='Colormap',
+                usertext='Color map',
+                formatting=True) )
+        self.add( setting.Bool(
+                'colorMapInvert', False,
+                descr = 'Invert color map',
+                usertext = 'Invert map',
                 formatting=True) )
 
 class ColorSettings(setting.Settings):
+    """Settings for a coloring points using data values."""
+
     def __init__(self, name):
         setting.Settings.__init__(self, name, setnsmode='groupedsetting')
         self.add( setting.DatasetOrFloatList(
@@ -779,8 +786,12 @@ class PointPlotter(GenericPlotter):
                     scaling = ptvals.data
                 # color point individually
                 if cvals:
-                    colorvals = cvals.data
+                    colorvals = utils.applyScaling(cvals.data,
+                                                   s.Color.scaling,
+                                                   s.Color.min, s.Color.max)
                     cmap = self.document.colormaps[s.MarkerFill.colorMap]
+                    if s.MarkerFill.colorMapInvert:
+                        cmap = cmap[::-1]
 
                 # actually plot datapoints
                 utils.plotMarkers(painter, xplt, yplt, s.marker, markersize,
