@@ -190,3 +190,39 @@ def applyColorMap(cmap, scaling, datain, minval, maxval,
     else:
         img = slowNumpyToQImage(fracs, cmap, transimg)
     return img
+
+def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
+                      direction='horz'):
+    """Make a colorbar for the scaling given."""
+
+    barsize = 128
+
+    if scaling in ('linear', 'sqrt', 'squared'):
+        # do a linear color scaling
+        vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
+        colorscaling = scaling
+        coloraxisscale = 'linear'
+    else:
+        assert scaling == 'log'
+
+        # a logarithmic color scaling
+        # we cheat here by actually plotting a linear colorbar
+        # and telling veusz to put a log axis along it
+        # (as we only care about the endpoints)
+        # maybe should do this better...
+
+        vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
+        colorscaling = 'linear'
+        coloraxisscale = 'log'
+
+    # convert 1d array to 2d image
+    if direction == 'horizontal':
+        vals = vals.reshape(1, barsize)
+    else:
+        assert direction == 'vertical'
+        vals = vals.reshape(barsize, 1)
+
+    img = applyColorMap(cmap, colorscaling, vals,
+                        minval, maxval, transparency)
+
+    return (minval, maxval, coloraxisscale, img)

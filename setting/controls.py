@@ -893,8 +893,8 @@ class WidgetSelector(Choice):
         """Update list of axes."""
         self._populateEntries()
 
-class Image(WidgetSelector):
-    """Choose an image."""
+class WidgetChoice(WidgetSelector):
+    """Choose a widget."""
 
     def __init__(self, setting, document, parent):
         """Initialise and populate combobox."""
@@ -903,12 +903,12 @@ class Image(WidgetSelector):
         self._populateEntries()
 
     def _populateEntries(self):
-        """Build up a list of images for combobox."""
+        """Build up a list of widgets for combobox."""
 
-        images = self.setting.getImageList()
+        widgets = self.setting.getWidgetList()
 
         # we only need the list of names
-        names = images.keys()
+        names = widgets.keys()
         names.sort()
 
         utils.populateCombo(self, names)

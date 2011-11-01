@@ -138,10 +138,8 @@ class Image(plotters.GenericPlotter):
         # this is used currently by colorbar objects
         self.cacheddatarange = (minval, maxval)
 
-        # use grey by default
-        cmap = d.colormaps.get(s.colorMap, d.colormaps['grey'])
-        if s.colorInvert:
-            cmap = cmap[::-1]
+        # get color map
+        cmap = self.document.getColormap(s.colorMap, s.colorInvert)
 
         self.image = utils.applyColorMap(
             cmap, s.colorScaling, data.data, minval, maxval,
@@ -239,44 +237,15 @@ class Image(plotters.GenericPlotter):
         """
 
         self.recomputeInternals()
-
-        barsize = 128
-        s = self.settings
         minval, maxval = self.cacheddatarange
+        s = self.settings
 
-        if s.colorScaling in ('linear', 'sqrt', 'squared'):
-            # do a linear color scaling
-            vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
-            colorscaling = s.colorScaling
-            coloraxisscale = 'linear'
-        else:
-            assert s.colorScaling == 'log'
+        # get colormap
+        cmap = self.document.getColormap(s.colorMap, s.colorInvert)
 
-            # a logarithmic color scaling
-            # we cheat here by actually plotting a linear colorbar
-            # and telling veusz to put a log axis along it
-            # (as we only care about the endpoints)
-            # maybe should do this better...
-            
-            vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
-            colorscaling = 'linear'
-            coloraxisscale = 'log'
-
-        # convert 1d array to 2d image
-        if direction == 'horizontal':
-            vals = vals.reshape(1, barsize)
-        else:
-            assert direction == 'vertical'
-            vals = vals.reshape(barsize, 1)
-
-        cmap = self.document.colormaps[s.colorMap]
-        if s.colorInvert:
-            cmap = cmap[::-1]
-
-        img = utils.applyColorMap(cmap, colorscaling, vals,
-                                  minval, maxval, s.transparency)
-
-        return (minval, maxval, coloraxisscale, img)
+        return utils.makeColorbarImage(
+            minval, maxval, s.colorScaling, cmap, s.transparency,
+            direction=direction)
 
     def recomputeInternals(self):
         """Recompute the internals if required.

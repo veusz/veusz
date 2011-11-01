@@ -95,9 +95,6 @@ class Widget(object):
         # actions for widget
         self.actions = []
 
-        # pts user can move around
-        self.controlgraphitems = []
-
     @classmethod
     def addSettings(klass, s):
         """Add items to settings s."""

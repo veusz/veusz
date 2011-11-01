@@ -1438,16 +1438,25 @@ class Axis(Str):
         """Allows user to choose an axis or enter a name."""
         return controls.Axis(self, self.getDocument(), self.direction, *args)
 
-class Image(Str):
-    """Hold the name of a child image."""
+class WidgetChoice(Str):
+    """Hold the name of a child widget."""
 
-    typename = 'image-widget'
+    typename = 'widget-choice'
 
-    @staticmethod
-    def buildImageList(level, widget, outdict):
-        """A recursive helper to build up a list of possible image widgets.
+    def __init__(self, name, val, widgettypes={}, **args):
+        """Choose widgets from (named) type given."""
+        Setting.__init__(self, name, val, **args)
+        self.widgettypes = widgettypes
 
-        This iterates over widget's children, and adds Image widgets as tuples
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (),
+                                {'widgettypes': self.widgettypes})
+
+    def buildWidgetList(self, level, widget, outdict):
+        """A recursive helper to build up a list of possible widgets.
+
+        This iterates over widget's children, and adds widgets as tuples
         to outdict using outdict[name] = (widget, level)
 
         Lower level images of the same name outweigh other images further down
@@ -1455,14 +1464,14 @@ class Image(Str):
         """
 
         for child in widget.children:
-            if child.typename == 'image':
+            if child.typename in self.widgettypes:
                 if (child.name not in outdict) or (outdict[child.name][1]>level):
                     outdict[child.name] = (child, level)
             else:
-                Image.buildImageList(level+1, child, outdict)
+                self.buildWidgetList(level+1, child, outdict)
 
-    def getImageList(self):
-        """Return a dict of valid image names and the corresponding objects."""
+    def getWidgetList(self):
+        """Return a dict of valid widget names and the corresponding objects."""
 
         # find widget which contains setting
         widget = self.parent
@@ -1473,10 +1482,10 @@ class Image(Str):
         if widget is not None:
             widget = widget.parent
 
-        # get list of images from recursive find
+        # get list of widgets from recursive find
         images = {}
         if widget is not None:
-            Image.buildImageList(0, widget, images)
+            self.buildWidgetList(0, widget, images)
 
         # turn (object, level) pairs into object
         outdict = {}
@@ -1485,15 +1494,15 @@ class Image(Str):
 
         return outdict
 
-    def findImage(self):
+    def findWidget(self):
         """Find the image corresponding to this setting.
 
         Returns Image object if succeeds or None if fails
         """
 
-        images = self.getImageList()
+        widgets = self.getWidgetList()
         try:
-            return images[self.get()]
+            return widgets[self.get()]
         except KeyError:
             return None
 
@@ -1503,7 +1512,7 @@ class Image(Str):
 
     def makeControl(self, *args):
         """Allows user to choose an image widget or enter a name."""
-        return controls.Image(self, self.getDocument(), *args)
+        return controls.WidgetChoice(self, self.getDocument(), *args)
     
 class Marker(Choice):
     """Choose a marker type from one allowable."""

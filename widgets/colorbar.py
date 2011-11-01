@@ -54,9 +54,10 @@ class ColorBar(axis.Axis):
         """Construct list of settings."""
         axis.Axis.addSettings(s)
 
-        s.add( setting.Image('image', '',
-                             descr = 'Corresponding image',
-                             usertext = 'Image'), 0 )
+        s.add( setting.WidgetChoice('widgetName', '',
+                                    descr='Corresponding widget',
+                                    widgettypes=('image', 'xy'),
+                                    usertext = 'Widget'), 0 )
 
         s.get('log').readonly = True
         s.get('datascale').readonly = True
@@ -94,6 +95,8 @@ class ColorBar(axis.Axis):
         s.add( setting.Line('Border', descr = 'Colorbar border line',
                             usertext='Border'),
                pixmap='settings_border')
+
+        s.add( setting.SettingBackwardCompat('image', 'widgetName', None) )
 
     def chooseName(self):
         """Get name of widget."""
@@ -175,27 +178,37 @@ class ColorBar(axis.Axis):
         phelper.states[self].bounds = bounds
 
         # do no painting if hidden or no image
-        imgwidget = s.get('image').findImage()
-        if s.hide or not imgwidget:
+        imgwidget = s.get('widgetName').findWidget()
+        if s.hide:
             return bounds
 
         # update image if necessary with new settings
-        (minval, maxval,
-         axisscale, img) = imgwidget.makeColorbarImage(s.direction)
+        if imgwidget is not None:
+            # could find widget
+            (minval, maxval,
+             axisscale, img) = imgwidget.makeColorbarImage(s.direction)
+        else:
+            # couldn't find widget
+            minval, maxval, axisscale = 0., 1., 'linear'
+            img = None
+
         self.setAutoRange([minval, maxval])
 
         s.get('log').setSilent(axisscale == 'log')            
 
         # now draw image on axis...
-        minpix, maxpix = self.graphToPlotterCoords( bounds,
-                                                    N.array([minval, maxval]) )
+        minpix, maxpix = self.graphToPlotterCoords(
+            bounds, N.array([minval, maxval]) )
 
         if s.direction == 'horizontal':
             c = [ minpix, bounds[1], maxpix, bounds[3] ]
         else:
             c = [ bounds[0], maxpix, bounds[2], minpix ]
         r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
-        painter.drawImage(r, img)
+
+        # really draw the img
+        if img is not None:
+            painter.drawImage(r, img)
 
         # if there's a border
         if not s.Border.hide:

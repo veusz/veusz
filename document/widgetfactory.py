@@ -45,7 +45,7 @@ class WidgetFactory(object):
             # allow subsettings to be set using __ -> syntax
             name = name.replace('__', '/')
 
-            w.prefLookup(name).val = val
+            w.prefLookup(name).set(val)
 
         if autoadd:
             w.addDefaultSubWidgets()

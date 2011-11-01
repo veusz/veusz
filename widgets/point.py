@@ -677,6 +677,18 @@ class PointPlotter(GenericPlotter):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
+    def makeColorbarImage(self, direction='horz'):
+        """Make a QImage colorbar for the current plot."""
+
+        s = self.settings
+        c = s.Color
+        cmap = self.document.getColormap(
+            s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
+
+        return utils.makeColorbarImage(
+            c.min, c.max, c.scaling, cmap, 0,
+            direction=direction)
+
     def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
 
@@ -786,12 +798,11 @@ class PointPlotter(GenericPlotter):
                     scaling = ptvals.data
                 # color point individually
                 if cvals:
-                    colorvals = utils.applyScaling(cvals.data,
-                                                   s.Color.scaling,
-                                                   s.Color.min, s.Color.max)
-                    cmap = self.document.colormaps[s.MarkerFill.colorMap]
-                    if s.MarkerFill.colorMapInvert:
-                        cmap = cmap[::-1]
+                    colorvals = utils.applyScaling(
+                        cvals.data, s.Color.scaling,
+                        s.Color.min, s.Color.max)
+                    cmap = self.document.getColormap(
+                        s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
                 # actually plot datapoints
                 utils.plotMarkers(painter, xplt, yplt, s.marker, markersize,

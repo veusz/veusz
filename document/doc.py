@@ -774,3 +774,10 @@ class Document( qt4.QObject ):
                 self.walkNodes(tocall, root=s, nodetypes=nodetypes,
                                _path = _path + '/' + s.name)
         # elif root.nodetype == 'setting': pass
+
+    def getColormap(self, name, invert):
+        """Get colormap with name given (returning grey if does not exist)."""
+        cmap = self.colormaps.get(name, self.colormaps['grey'])
+        if invert:
+            return cmap[::-1]
+        return cmap
