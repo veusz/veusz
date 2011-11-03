@@ -25,7 +25,7 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
-
+import widget
 import controlgraph
 import plotters
 
@@ -102,7 +102,7 @@ class BoxShape(Shape):
             return
 
         # if a dataset is used, we can't use control items
-        isnotdataset = ( not s.get('xPos').isDataset(d) and 
+        isnotdataset = ( not s.get('xPos').isDataset(d) and
                          not s.get('yPos').isDataset(d) and
                          not s.get('width').isDataset(d) and
                          not s.get('height').isDataset(d) and
@@ -237,6 +237,12 @@ class ImageFile(BoxShape):
         self.cacheimage = None
         self.cachefilename = None
         self.cachestat = None
+        self.cacheembeddata = None
+
+        self.addAction( widget.Action('embed', self.actionEmbed,
+                                      descr = 'Embed image in Veusz document '
+                                      'to remove dependency on external file',
+                                      usertext = 'Embed image') )
 
     @classmethod
     def addSettings(klass, s):
@@ -248,12 +254,49 @@ class ImageFile(BoxShape):
                                      usertext='Filename',
                                      formatting=False),
                posn=0 )
+
+        s.add( setting.Str('embeddedImageData', '',
+                           descr='Embedded base 64-encoded image data, '
+                           'used if filename set to {embedded}',
+                           usertext='Embedded data',
+                           hidden=True) )
+
         s.add( setting.Bool('aspect', True,
                             descr='Preserve aspect ratio',
                             usertext='Preserve aspect',
                             formatting=True),
                posn=0 )
         s.Border.get('hide').newDefault(True)
+
+    def actionEmbed(self):
+        """Embed external image into veusz document."""
+
+        s = self.settings
+
+        if s.filename == '{embedded}':
+            print "Data already embedded"
+            return
+
+        # get data from external file
+        try:
+            f = open(s.filename, 'rb')
+            data = f.read()
+            f.close()
+        except IOError:
+            print "Could not find file. Not embedding."
+            return
+
+        # convert to base 64 to make it nicer in the saved file
+        encoded = str(qt4.QByteArray(data).toBase64())
+
+        # now put embedded data in hidden setting
+        ops = [
+            document.OperationSettingSet(s.get('filename'), '{embedded}'),
+            document.OperationSettingSet(s.get('embeddedImageData'),
+                                         encoded)
+            ]
+        self.document.applyOperation(
+            document.OperationMultiple(ops, descr='embed image') )
 
     def updateCachedImage(self):
         """Update cache."""
@@ -262,6 +305,18 @@ class ImageFile(BoxShape):
         self.cacheimage = qt4.QImage(s.filename)
         self.cachefilename = s.filename
 
+    def updateCachedEmbedded(self):
+        """Update cached image from embedded data."""
+        s = self.settings
+        self.cacheimage = qt4.QImage()
+
+        # convert the embedded data from base64 and load into the image
+        decoded = qt4.QByteArray.fromBase64(s.embeddedImageData)
+        self.cacheimage.loadFromData(decoded)
+
+        # we cache the data we have decoded
+        self.cacheembeddata = s.embeddedImageData
+
     def drawShape(self, painter, rect):
         """Draw image."""
         s = self.settings
@@ -269,12 +324,21 @@ class ImageFile(BoxShape):
         # draw border and fill
         painter.drawRect(rect)
 
-        # cache image
+        # check to see whether image needs reloading
         image = None
         if s.filename != '' and os.path.isfile(s.filename):
-            if (self.cachefilename != s.filename or 
+            if (self.cachefilename != s.filename or
                 os.stat(s.filename) != self.cachestat):
+                # update the image cache
                 self.updateCachedImage()
+                # clear any embedded image data
+                self.settings.get('embeddedImageData').set('')
+            image = self.cacheimage
+
+        # or needs recreating from embedded data
+        if s.filename == '{embedded}':
+            if s.embeddedImageData is not self.cacheembeddata:
+                self.updateCachedEmbedded()
             image = self.cacheimage
 
         # if no image, then use default image
@@ -284,7 +348,7 @@ class ImageFile(BoxShape):
             fname = os.path.join(utils.imagedir, 'button_imagefile.svg')
             r = qt4.QSvgRenderer(fname)
             r.render(painter, rect)
-        
+
         else:
             # image rectangle
             irect = qt4.QRectF(image.rect())

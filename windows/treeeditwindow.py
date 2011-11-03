@@ -462,7 +462,8 @@ class PropertyList(qt4.QWidget):
                 # and not formatting and not formatting not allowed
                 if ( isinstance(setn, setting.Setting) and (
                         (setn.formatting and (showformatting or onlyformatting))
-                        or (not setn.formatting and not onlyformatting)) ):
+                        or (not setn.formatting and not onlyformatting)) and
+                     not setn.hidden ):
                     row = self._addControl(setnsproxy, setn, row)
                 elif ( isinstance(setn, SettingsProxy) and
                        setn.setnsmode() == 'groupedsetting' ):

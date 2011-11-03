@@ -58,6 +58,7 @@ class Setting(object):
         descr:  description of the setting
         usertext: name of setting for user
         formatting: whether setting applies to formatting
+        hidden: hide widget from user
         """
         self.readonly = False
         self.parent = None
@@ -65,6 +66,7 @@ class Setting(object):
         self.descr = descr
         self.usertext = usertext
         self.formatting = formatting
+        self.hidden = hidden
         self.default = value
         self.onmodified = qt4.QObject()
         self._val = None
@@ -95,6 +97,7 @@ class Setting(object):
         opt['descr'] = self.descr
         opt['usertext'] = self.usertext
         opt['formatting'] = self.formatting
+        opt['hidden'] = self.hidden
 
         obj = self.__class__(*args, **opt)
         obj.readonly = self.readonly
