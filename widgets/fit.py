@@ -139,22 +139,29 @@ class Fit(FunctionPlotter):
                             'the function variable',
                             usertext='Fit only range'),
                4 )
+        s.add( setting.WidgetChoice(
+                'outLabel', '',
+                descr='Write best fit parameters to this text label '
+                'after fitting',
+                widgettypes=('label',),
+                usertext='Output label'),
+               5 )
         s.add( setting.Str('outExpr', '',
                            descr = 'Output best fitting expression',
                            usertext='Output expression'),
-               5, readonly=True )
+               6, readonly=True )
         s.add( setting.Float('chi2', -1,
                              descr = 'Output chi^2 from fitting',
                              usertext='Fit &chi;<sup>2</sup>'),
-               6, readonly=True )
+               7, readonly=True )
         s.add( setting.Int('dof', -1,
                            descr = 'Output degrees of freedom from fitting',
                            usertext='Fit d.o.f.'),
-               7, readonly=True )
+               8, readonly=True )
         s.add( setting.Float('redchi2', -1,
                              descr = 'Output reduced-chi-squared from fitting',
                              usertext='Fit reduced &chi;<sup>2</sup>'),
-               8, readonly=True )
+               9, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
@@ -184,6 +191,29 @@ class Fit(FunctionPlotter):
         env = self.document.eval_context.copy()
         env.update( self.settings.values )
         return env
+
+    def updateOutputLabel(self, ops, vals, chi2, dof):
+        """Use best fit parameters to update text label."""
+        s = self.settings
+        labelwidget = s.get('outLabel').findWidget()
+
+        if labelwidget is not None:
+            # build up a set of X=Y values
+            loc = self.document.locale
+            txt = []
+            for l, v in sorted(vals.iteritems()):
+                val = utils.formatNumber(v, '%.4Vg', locale=loc)
+                txt.append( '%s = %s' % (l, val) )
+            # add chi2 output
+            txt.append( r'\chi^{2}_{\nu} = %s/%i = %s' % (
+                    utils.formatNumber(chi2, '%.4Vg', locale=loc),
+                    dof,
+                    utils.formatNumber(chi2/dof, '%.4Vg', locale=loc) ))
+
+            # update label with text
+            text = r'\\'.join(txt)
+            ops.append( document.OperationSettingSet(
+                    labelwidget.settings.get('label') , text ) )
 
     def actionFit(self):
         """Fit the data."""
@@ -305,6 +335,8 @@ class Fit(FunctionPlotter):
         # expression for fit
         expr = self.generateOutputExpr(vals)
         operations.append( document.OperationSettingSet(s.get('outExpr'), expr) )
+
+        self.updateOutputLabel(operations, vals, chi2, dof)
 
         # actually change all the settings
         d.applyOperation(
