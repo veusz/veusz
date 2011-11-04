@@ -466,7 +466,8 @@ class PropertyList(qt4.QWidget):
                      not setn.hidden ):
                     row = self._addControl(setnsproxy, setn, row)
                 elif ( isinstance(setn, SettingsProxy) and
-                       setn.setnsmode() == 'groupedsetting' ):
+                       setn.setnsmode() == 'groupedsetting' and
+                       not onlyformatting ):
                     row = self._addGroupedSettingsControl(setn, row)
 
         # add empty widget to take rest of space
