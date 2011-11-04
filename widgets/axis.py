@@ -429,8 +429,8 @@ class Axis(widget.Widget):
 
             # other axis coordinates
             self.coordPerp  = y2 - dy*otherposition
-            self.coordPerp1 = y2 - dy*p1
-            self.coordPerp2 = y2 - dy*p2
+            self.coordPerp1 = y1
+            self.coordPerp2 = y2
 
         else: # vertical
             self.coordParr1 = y2 - dy*p1
@@ -438,8 +438,8 @@ class Axis(widget.Widget):
 
             # other axis coordinates
             self.coordPerp  = x1 + dx*otherposition
-            self.coordPerp1 = x1 + dx*p1
-            self.coordPerp2 = x1 + dx*p2
+            self.coordPerp1 = x1
+            self.coordPerp2 = x2
 
         # is this axis reflected
         if otherposition > 0.5:
