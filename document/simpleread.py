@@ -344,10 +344,12 @@ class DescriptorPart(object):
         return names
 
 class Stream(object):
+    """This object reads through an input data source (override
+    readLine) and interprets data from the source."""
                                     
-    # this regular expression is for splitting up the stream into words
+    # this is a regular expression for finding data items in data stream
     # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
-    split_re = re.compile( r'''
+    find_re = re.compile( r'''
     `.+?`[^ \t\n\r#!%;]* | # match dataset name quoted in back-ticks
                            # we also need to match following characters to catch
                            # corner cases in the descriptor
@@ -355,6 +357,7 @@ class Stream(object):
     u?".*?[^\\]" |  # match double-quoted string, ignoring escaped quotes
     u?'' |          # match empty single-quoted string
     u?'.*?[^\\]' |  # match single-quoted string, ignoring escaped quotes
+    [#!%;](?=descriptor) | # match separately comment char before descriptor
     [#!%;].* |      # match comment to end of line
     [^ \t\n\r#!%;]+ # match normal space/tab separated items
     ''', re.VERBOSE )
@@ -395,8 +398,8 @@ class Stream(object):
                 return False
 
             # break up and append to buffer (removing comments)
-            self.remainingline += [ x for x in self.split_re.findall(line) if
-                                    x[0] not in '#!%;' ]
+            cmpts = self.find_re.findall(line)
+            self.remainingline += [ x for x in cmpts if x[0] not in '#!%;']
 
             if self.remainingline and self.remainingline[-1] == '\\':
                 # this is a continuation: drop this item and read next line
