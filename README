@@ -1,4 +1,4 @@
-Veusz 1.13
+Veusz 1.14
 ----------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -20,39 +20,43 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as internet sockets or other programs.
 
-Changes in 1.13:
- * Graphs are rendered in separate threads for speed and a responsive
-   user interface
- * A changed Graph is rendered immediately on document modification,
-   improving latency
- * A new ternary plot widget is included
- * Size of pages can be modified individually in a document
- * Binary data import added
- * NPY/NPZ numpy data import added
- * Axis and tick labels on axes can be rotated at 45 deg intervals
- * Labels can be plotted next to points on non-orthogonal plots
- * Add an option for DPI of output EPS and PDF files
+Changes in 1.14:
+ * Points in graphs can be colored depending on another dataset and
+   the scale shown in a colorbar widget
+ * Improved CSV import
+    - better data type detection
+    - locale-specific numeric and date formats
+    - single/multiple/none header modes
+    - option to skip lines at top of file
+    - better handling of missing values
+ * Data can be imported from clipboard
+ * Substantially reduce size of output SVG files
+ * Descriptor can be left blank in standard import to generate dataset names
+ * If axis is in date-time format, show and allow min and max to be date-time
+ * ImageFile widget can have image data embedded in document file
+ * Fit widget can update fit parameters and fit quality to a label widget
+ * Allow editing of 2D datasets in data edit dialog
+ * Add copy dataset function in dataset browser
 
-Minor improvements:
- * Import dialog detects filename extension to show correct tab
- * Polygon fill mode for non orthogonal plotting
- * --plugin command line option added, for loading and testing plugins
- * Plugin for swapping two colors in a plot
- * Dataset navigator is moved to right of window by default
- * Mac OS X binary release updated to Python 2.7.2
- * Import plugins can say which file extensions they support
- * Import plugins can be "promoted" to their own tab on the import dialog
- * ForceUpdate command added to embedding API, to force an update of
-   the displayed plot (useful if SetUpdateInterval is set to 0)
- * X or Y dataset can be left blank in plotter to plot by row number
+Minor and API changes:
+ * Allow descriptor statement in standard data files after a comment character,
+   e.g. "#descriptor x y"
+ * Added some further color maps
+ * Import plugin changes
+    - Register classes rather than instances (backward compatibility is retained)
+    - Plugins can return constants and functions (Constant and Function types)
+    - Add DatasetDateTime for returning date-time datasets
+ * Custom definitions
+    - Add RemoveCustom API to remove custom definitions
+    - AddCustom API can specify where the custom definition is added in list
+ * C++ code to speed up plotting points of different sizes / colors
 
-Bugs fixed:
- * Images plotted when axes are inverted are inverted too
- * Fixed crash when selecting datasets for plotting in the popup menu
- * Picker crashes with a constant function
- * 2D dataset creation using expressions fixed
- * CSV reader treated dataset names ending in + or - incorrectly
- * unique1d function no longer available in numpy
+Bug fixes
+ * Fix initial extension in export dialog
+ * Fix crash on hiding pages
+ * Fixed validation for numeric values
+ * Position of grid lines in perpendicular direction for non default positions
+ * Catch errors in example import plugin
 
 Features of package:
  * X-Y plots (with errorbars)
