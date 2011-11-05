@@ -452,6 +452,15 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         menu.addAction("Copy", _copy)
 
+        def _paste():
+            """Paste dataset."""
+            if document.isDataMime():
+                mime = qt4.QApplication.clipboard().mimeData()
+                self.doc.applyOperation(document.OperationDataPaste(mime))
+
+        if document.isDataMime():
+            menu.addAction("Paste", _paste)
+
         useasmenu = menu.addMenu("Use as")
         if dataset is not None:
             self.getMenuUseAs(useasmenu, dataset)

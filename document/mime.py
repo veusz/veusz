@@ -16,7 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from itertools import izip
+from itertools import izip, count
 
 import veusz.qtall as qt4
 
@@ -80,22 +80,22 @@ def generateDatasetsMime(datasets, document):
     text = '\n'.join(output)
     mimedata.setData('text/plain', qt4.QByteArray(text))
 
-    # now the veusz-specfic copy mime format
-    output = [repr(tuple(datasets))]
-
+    textfile = StringIO.StringIO()
     for name in datasets:
         # get unlinked copy of dataset
         ds = document.data[name].returnCopy()
 
         # write into a string file
-        textfile = StringIO.StringIO()
         ds.saveToFile(textfile, name)
-        output.append( repr(textfile.getvalue()) )
 
-    text = '\n'.join(output)
-    mimedata.setData(datamime, qt4.QByteArray(text))
+    mimedata.setData(datamime, textfile.getvalue())
 
     return mimedata
+
+def isDataMime():
+    """Returns whether data available on clipboard."""
+    mimedata = qt4.QApplication.clipboard().mimeData()
+    return datamime in mimedata.formats()
 
 def getClipboardWidgetMime():
     """Returns widget mime data if clipboard contains mime data or None."""
@@ -246,3 +246,46 @@ class OperationWidgetClone(OperationWidgetPaste):
         """Do the import."""
         widgets = OperationWidgetPaste.do(self, document)
         return widgets[0]
+
+class OperationDataPaste(object):
+    """Paste dataset from mime data."""
+
+    descr = 'paste data'
+
+    def __init__(self, mimedata):
+        """Paste datasets into document."""
+        self.data = str(mimedata.data(datamime))
+
+    def do(self, thisdoc):
+        """Do the data paste."""
+
+        import commandinterpreter
+
+        # write data into a temporary document
+        tempdoc = doc.Document()
+        # interpreter to create datasets
+        interpreter = commandinterpreter.CommandInterpreter(tempdoc)
+        interpreter.runFile(self.data)
+
+        # list of pasted datasets
+        self.newds = []
+
+        # now transfer datasets to existing document
+        for name, ds in sorted(tempdoc.data.iteritems()):
+
+            # get new name
+            if name not in thisdoc.data:
+                newname = name
+            else:
+                for idx in count(2):
+                    newname = '%s_%s' % (name, idx)
+                    if newname not in thisdoc.data:
+                        break
+
+            thisdoc.setData(newname, ds)
+            self.newds.append(newname)
+
+    def undo(self, thisdoc):
+        """Undo pasting datasets."""
+        for n in self.newds:
+            thisdoc.deleteData(n)
