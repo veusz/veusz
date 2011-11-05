@@ -36,7 +36,7 @@ Changes in 1.14:
  * ImageFile widget can have image data embedded in document file
  * Fit widget can update fit parameters and fit quality to a label widget
  * Allow editing of 2D datasets in data edit dialog
- * Add copy dataset function in dataset browser
+ * Add copy and paste dataset command to dataset browser context menu
 
 Minor and API changes:
  * Allow descriptor statement in standard data files after a comment character,

@@ -397,20 +397,31 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def showContextMenu(self, pt):
         """Context menu for nodes."""
         idx = self.currentIndex()
-        if not idx.isValid():
-            return
+        if idx.isValid():
+            node = self.model.objFromIndex(idx)
+        else:
+            node = None
 
-        node = self.model.objFromIndex(idx)
-        menu = None
+        menu = qt4.QMenu()
         if isinstance(node, DatasetNode):
-            menu = self.datasetContextMenu(node)
+            self.datasetContextMenu(node, menu)
         elif isinstance(node, FilenameNode):
-            menu = self.filenameContextMenu(node)
+            self.filenameContextMenu(node, menu)
 
-        if menu is not None:
+        def _paste():
+            """Paste dataset."""
+            if document.isDataMime():
+                mime = qt4.QApplication.clipboard().mimeData()
+                self.doc.applyOperation(document.OperationDataPaste(mime))
+
+        # if there is data to paste, add menu item
+        if document.isDataMime():
+            menu.addAction("Paste", _paste)
+
+        if len( menu.actions() ) != 0:
             menu.exec_(self.mapToGlobal(pt))
 
-    def datasetContextMenu(self, dsnode):
+    def datasetContextMenu(self, dsnode, menu):
         """Return context menu for datasets."""
         import veusz.dialogs.dataeditdialog as dataeditdialog
         dataset = dsnode.dataset()
@@ -437,7 +448,6 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             mime = document.generateDatasetsMime([dsname], self.doc)
             qt4.QApplication.clipboard().setMimeData(mime)
 
-        menu = qt4.QMenu()
         if type(dataset) in dataeditdialog.recreate_register:
             menu.addAction("Edit", _edit)
         else:
@@ -452,22 +462,11 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         menu.addAction("Copy", _copy)
 
-        def _paste():
-            """Paste dataset."""
-            if document.isDataMime():
-                mime = qt4.QApplication.clipboard().mimeData()
-                self.doc.applyOperation(document.OperationDataPaste(mime))
-
-        if document.isDataMime():
-            menu.addAction("Paste", _paste)
-
         useasmenu = menu.addMenu("Use as")
         if dataset is not None:
             self.getMenuUseAs(useasmenu, dataset)
 
-        return menu
-
-    def filenameContextMenu(self, node):
+    def filenameContextMenu(self, node, menu):
         """Return context menu for filenames."""
 
         from veusz.dialogs.reloaddata import ReloadData
@@ -489,11 +488,9 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.doc.applyOperation(
                 document.OperationDatasetDeleteByFile(filename))
 
-        menu = qt4.QMenu()
         menu.addAction("Reload", _reload)
         menu.addAction("Unlink all", _unlink_all)
         menu.addAction("Delete all", _delete_all)
-        return menu
 
     def getMenuUseAs(self, menu, dataset):
         """Build up menu of widget settings to use dataset in."""
