@@ -1086,12 +1086,14 @@ class MainWindow(qt4.QMainWindow):
         # File types we can export to in the form ([extensions], Name)
         fd = qt4.QFileDialog(self, 'Export page')
         fd.setDirectory( self.dirname_export )
-            
+
         fd.setFileMode( qt4.QFileDialog.AnyFile )
         fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
 
         # Create a mapping between a format string and extensions
         filtertoext = {}
+        # convert extensions to filter
+        exttofilter = {}
         filters = []
         # a list of extensions which are allowed
         validextns = []
@@ -1101,26 +1103,20 @@ class MainWindow(qt4.QMainWindow):
             # join eveything together to make a filter string
             filterstr = '%s (%s)' % (name, extensions)
             filtertoext[filterstr] = extns
+            for e in extns:
+                exttofilter[e] = filterstr
             filters.append(filterstr)
             validextns += extns
-
-        try:
-            # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
-            fd.setNameFilters(filters)
-        except AttributeError:
-            fd.setFilters(filters)
+        fd.setNameFilters(filters)
 
         # restore last format if possible
         try:
             filt = setdb['export_lastformat']
-            try:
-                # Qt >= 4.4 (reqd for Fedora 12 Qt 4.6)
-                fd.selectNameFilter(filt)
-            except AttributeError:
-                fd.selectFilter(filt)
+            fd.selectNameFilter(filt)
             extn = formats[filters.index(filt)][0][0]
         except (KeyError, IndexError, ValueError):
-            extn = 'eps'
+            extn = 'pdf'
+            fd.selectNameFilter( exttofilter[extn] )
 
         if self.filename:
             # try to convert current filename to export name
@@ -1146,7 +1142,7 @@ class MainWindow(qt4.QMainWindow):
             # this is the extension without the dot
             ext = os.path.splitext(filename)[1][1:]
             if (ext not in validextns) and (ext not in chosenextns):
-                filename = filename + "." + chosenextns[0]
+                filename += "." + chosenextns[0]
 
             e = document.Export( self.document,
                                  filename,
@@ -1162,7 +1158,7 @@ class MainWindow(qt4.QMainWindow):
             except (IOError, RuntimeError), inst:
                 qt4.QMessageBox.critical(self, "Veusz",
                                          "Error exporting file:\n%s" % inst)
-                
+
             # restore the cursor
             qt4.QApplication.restoreOverrideCursor()
 

@@ -89,7 +89,7 @@ Features of package:
 Requirements for source install:
  Python (2.4 or greater required)
    http://www.python.org/
- Qt >= 4.3 (free edition)
+ Qt >= 4.4 (free edition)
    http://www.trolltech.com/products/qt/  
  PyQt >= 4.3 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/pyqt/

@@ -47,7 +47,7 @@ class Export(object):
     formats = [
         (["bmp"], "Windows bitmap"),
         (["eps"], "Encapsulated Postscript"),
-        (["jpg"], "Jpeg bitmap"),
+        (["jpg", "jpeg"], "Jpeg bitmap"),
         (["pdf"], "Portable Document Format"),
         #(["pic"], "QT Pic format"),
         (["png"], "Portable Network Graphics"),
