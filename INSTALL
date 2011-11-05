@@ -11,7 +11,7 @@ Requirements:
 
 PyQt requires
  Qt4             http://www.trolltech.com/products/qt/ (free version)
-                 version >= 4.3 recommended
+                 version >= 4.4 recommended
  SIP             http://www.riverbankcomputing.co.uk/sip/
 
 Optional requirements:
