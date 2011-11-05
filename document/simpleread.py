@@ -437,9 +437,14 @@ class SimpleRead(object):
     '''
 
     def __init__(self, descriptor):
+        # convert descriptor to part objects
+        descriptor = descriptor.strip()
         self._parseDescriptor(descriptor)
+
         # construct data names automatically
         self.autodescr = (descriptor == '')
+
+        # get read for reading data
         self.clearState()
 
     def clearState(self):
