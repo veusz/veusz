@@ -778,6 +778,12 @@
       errors. The signs on positive or negative errors are
       automatically set to be correct.</para>
 
+      <para>If a descriptor is left blank, Veusz will automatically
+      create dataset names. If the prefix and suffix settings are
+      blank, they are assigned names col1, col2, etc. If prefix and
+      suffix are not blank, the datasets are called
+      prefix+number+suffix.</para>
+
       <para>When reading in data, Veusz treats any whitespace as
 	separating columns. The columns do not actually need to be in
 	columns! Furthermore a "\" symbol can be placed at the end of
@@ -887,11 +893,15 @@ descriptor alpha beta gamma
     updated when the file changes. See the example CSV import for
     details.</para>
 
-    <para>Text datasets are not yet autodetected for CSV files. You
-    can specify a text dataset by using "(text)" after the name of the
-    dataset at the top of the column. A future release show allow a
-    more general method for autodetecting data or specifying, as the
-    standard Veusz file format currently does.</para>
+    <para>The data type in CSV files are automatically detected unless
+    specified. The data type can be given in brackets after the column
+    name, e.g. "name (text)", where the data type is "date", "numeric"
+    or "text". Explicit data types are needed if the data look like a
+    different data type (e.g. a text item of "1.23"). The date format
+    in CSV files can be specified in the import dialog box - see the
+    examples given. In addition CSV files support numbers in European
+    format (e.g. 2,34 rather than 2.34), depending on the setting in
+    the dialog box.</para>
 
     </section>
 
