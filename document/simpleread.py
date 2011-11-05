@@ -238,7 +238,6 @@ class DescriptorPart(object):
                 val = stream.nextColumn()
                 if val is None:
                     return
-
                 # append a suffix to specify whether error or value
                 # \0 is used as the user cannot enter it
                 fullname = '%s\0%s' % (name, col)
@@ -436,9 +435,11 @@ class SimpleRead(object):
 
     tail attribute if set says to only use last tail data points when setting
     '''
-    
+
     def __init__(self, descriptor):
         self._parseDescriptor(descriptor)
+        # construct data names automatically
+        self.autodescr = (descriptor == '')
         self.clearState()
 
     def clearState(self):
@@ -446,10 +447,9 @@ class SimpleRead(object):
         self.datasets = {}
         self.blocks = None
         self.tail = None
-        
+
     def _parseDescriptor(self, descriptor):
         """Take a descriptor, and parse it into its individual parts."""
-
         self.parts = interpretDescriptor(descriptor)
 
     def readData(self, stream, useblocks=False, ignoretext=False):
@@ -490,6 +490,15 @@ class SimpleRead(object):
                 # normal text
                 for p in self.parts:
                     p.readFromStream(stream, self.datasets)
+
+                # automatically create parts if data are remaining
+                if self.autodescr:
+                    while len(stream.remainingline) > 0:
+                        p = DescriptorPart(
+                            str(len(self.parts)+1), None, 'D', None )
+                        p.readFromStream(stream, self.datasets)
+                        self.parts.append(p)
+
             stream.flushLine()
 
         self.parts = allparts
@@ -513,6 +522,15 @@ class SimpleRead(object):
                 # read in data
                 for p in self.parts:
                     p.readFromStream(stream, self.datasets, block=block)
+
+                # automatically create parts if data are remaining
+                if self.autodescr:
+                    while len(stream.remainingline) > 0:
+                        p = DescriptorPart(
+                            str(len(self.parts)+1), None, 'D', None )
+                        p.readFromStream(stream, self.datasets, block=block)
+                        self.parts.append(p)
+
                 blocks[block] = True
 
             # lose remaining data
@@ -552,14 +570,19 @@ class SimpleRead(object):
         else:
             blocks = self.blocks
 
+        # if automatically making parts, use a prefix/suffix if not set
+        if self.autodescr and prefix == '' and suffix == '':
+            prefix = 'col'
+
         names = []
         for block in blocks:
             for part in self.parts:
-                names += part.setInDocument(self.datasets, document,
-                                            block=block,
-                                            linkedfile=linkedfile,
-                                            prefix=prefix, suffix=suffix,
-                                            tail=self.tail)
+                names += part.setInDocument(
+                    self.datasets, document,
+                    block=block,
+                    linkedfile=linkedfile,
+                    prefix=prefix, suffix=suffix,
+                    tail=self.tail)
 
         return names
 
