@@ -195,12 +195,12 @@ class Axis(widget.Widget):
         s.add( setting.Str('label', '',
                            descr='Axis label text',
                            usertext='Label') )
-        s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr='Minimum value of axis',
-                                   usertext='Min') )
-        s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr='Maximum value of axis',
-                                   usertext='Max') )
+        s.add( setting.AxisBound('min', 'Auto',
+                                 descr='Minimum value of axis',
+                                 usertext='Min') )
+        s.add( setting.AxisBound('max', 'Auto',
+                                 descr='Maximum value of axis',
+                                 usertext='Max') )
         s.add( setting.Bool('log', False,
                             descr = 'Whether axis is logarithmic',
                             usertext='Log') )

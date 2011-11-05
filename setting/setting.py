@@ -1815,3 +1815,37 @@ class Colormap(Str):
 
     def makeControl(self, *args):
         return controls.Colormap(self, self.getDocument(), *args)
+
+class AxisBound(FloatOrAuto):
+    """Axis bound - either numeric, Auto or date."""
+
+    typename = 'axis-bound'
+
+    def makeControl(self, *args):
+        return controls.AxisBound(self, *args)
+
+    def toText(self):
+        """Convert to text, taking into account mode of Axis.
+        Displays datetimes in date format if used
+        """
+
+        try:
+            mode = self.parent.mode
+        except AttributeError:
+            mode = None
+
+        v = self.val
+        if ( not isinstance(v, basestring) and v is not None and
+             mode == 'datetime' ):
+            return utils.dateFloatToString(v)
+
+        return FloatOrAuto.toText(self)
+
+    def fromText(self, txt):
+        """Convert from text, allowing datetimes."""
+
+        v = utils.dateStringToDate(txt)
+        if N.isfinite(v):
+            return v
+        else:
+            return FloatOrAuto.fromText(self, txt)

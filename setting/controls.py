@@ -1645,3 +1645,22 @@ class Colormap(Choice):
                 kls._icons[val] = icon
             retn.append(icon)
         return retn
+
+class AxisBound(Choice):
+    """Control for setting bounds of axis.
+
+    This is to allow dates etc
+    """
+
+    def __init__(self, setting, *args):
+        Choice.__init__(self, setting, True, ['Auto'], *args)
+
+        modesetn = setting.parent.get('mode')
+        modesetn.setOnModified(self.modeChange)
+
+    def modeChange(self, changed):
+        """Called if the mode of the axis changes.
+        Re-set text as float or date."""
+
+        if unicode(self.currentText()).lower() != 'auto':
+            self.setEditText( self.setting.toText() )
