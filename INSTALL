@@ -1,8 +1,10 @@
 Veusz Installation
 ==================
 
-Veusz uses distutils for its installation. See below for how to use
-it.
+1. INSTALLING FROM SOURCE
+*************************
+
+Veusz uses distutils for its installation. See below for how to use it.
 
 Requirements:
  python >= 2.4   http://www.python.org/
@@ -20,8 +22,44 @@ Optional requirements:
  Corefonts       http://corefonts.sourceforge.net/
  PyMinuit        http://code.google.com/p/pyminuit/
 
-Simple source use (if requirements installed)
-=============================================
+1.1 Full installation with distutils
+====================================
+There are a number of ways to install programs using distutils. I will
+list a few of the possible method here:
+
+To install on linux to the standard location on the hard disk
+
+# cd veusz-1.13
+# python setup.py build
+# su
+[enter root password]
+# python setup.py install 
+# exit
+
+If you do not have a root account (as is default on Ubuntu), do
+# sudo python setup.py install
+instead of the final three lines
+
+On Windows, it should just be a matter of running the python setup.py
+build and install steps with the requirements installed.
+
+1.2 Testing
+===========
+After veusz has been installed into the Python path (in the standard
+location or in PYTHONPATH), you can run the runselftest.py executable
+in the tests directory. This will compare the generated output of
+example documents with the expected output. The return code of the
+runselftest.py script is the number of tests that have failed (0 for
+success).
+
+On Unix/Linux, Qt requires the DISPLAY environment to be set to an X11
+server for the self test to run. In a non graphical environment Xvfb
+can be used to create a hidden X11 server:
+# xvfb-run -a --server-args "-screen 0 640x480x24" \
+    python tests/runselftest.py
+
+1.3 Simple source use (if requirements installed)
+=================================================
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
@@ -38,64 +76,28 @@ You can build support without installing by doing:
 # python setup.py build
 # cp build/*/veusz/helpers/*.so helpers/
 
-Full installation with distutils
-================================
-There are a number of ways to install programs using distutils. I will
-list a few of the possible method here:
+2. BINARY INSTALL
+*****************
 
-To install to the standard location on the hard disk (it's better to use
-rpms if you have an rpm-based linux distibution)
-------------------------------------------------------------------------
-# cd veusz-1.13
-# python setup.py build
-# su
-[enter root password]
-# python setup.py install 
-# exit
-
-Testing
-=======
-After veusz has been installed into the Python path (in the standard
-location or in PYTHONPATH), you can run the runselftest.py executable
-in the tests directory. This will compare the generated output of
-example doucments with the expected output.
-
-On Unix/Linux, Qt requires the DISPLAY environment to be set to an X11
-server for the self test to run. In a non graphical environment Xvfb
-can be used to create a hidden X11 server.
-
-Linux binary
-============
-If you do not have the requirements, you can use the Linux binary
-instead (if available). Note that this may not work on all
-distributions due to glibc/library incompatibilities. Simply unpack
-the tar file and run the main executable:
+2.1 Linux binary
+================
+If your distribution does not include an up to date package, you can
+use the Linux binary instead (for i386/x86_64). Note that this may not
+work on all distributions due to glibc/library
+incompatibilities. Simply unpack the tar file and run the main
+executable:
 
 # tar xzf veusz-linux-i386-1.13.tar.gz     [change version here]
 # cd veusz-linux-i386-1.13
 # ./veusz
 
-Installing in Windows
-=====================
-Simply run the setup.exe binary installer. Source installation works
-if you have the dependencies installed, though only gcc has been
-tested as a compiler.
+2.2 Installing in Windows
+=========================
+Simply run the setup.exe binary installer. Add the location of the
+embed.py file to your PYTHONPATH if you want to use the embedding
+module.
 
-Installing on Mac OS X
-======================
-A binary is available for Mac OS X. It does not provide the embedding
-interface. Simply drag the Veusz application into your Applications
-directory.
-
-Veusz can also be installed from source on Mac OS X. The requirements
-can be obtained using a system such as MacPorts. You can install them
-with MacPorts using:
-
-$ sudo port install qt4-mac
-$ sudo port install py-numpy
-
-Once these have successfully built and installed, you can unpack veusz
-and install as above.
-
-Qt is available from TrollTech as a binary, but SIP and PyQt are not
-available as a binary.
+2.3 Installing on Mac OS X
+==========================
+A binary is available for Mac OS X. Simply drag the Veusz application
+into your Applications directory.
