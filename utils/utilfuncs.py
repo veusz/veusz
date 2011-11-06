@@ -51,6 +51,7 @@ def _getVeuszDirectory():
         return os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 veuszDirectory = _getVeuszDirectory()
+exampleDirectory = os.path.join(veuszDirectory, 'examples')
 
 id_re = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 def validPythonIdentifier(name):

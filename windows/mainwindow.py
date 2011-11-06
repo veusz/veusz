@@ -22,6 +22,7 @@
 import os.path
 import sys
 import traceback
+import glob
 
 import veusz.qtall as qt4
 
@@ -555,6 +556,8 @@ class MainWindow(qt4.QMainWindow):
         helpmenu = [
             'help.home', 'help.project', 'help.bug',
             '',
+            ['help.examples', '&Example documents', []],
+            '',
             'help.about'
             ]
 
@@ -575,11 +578,27 @@ class MainWindow(qt4.QMainWindow):
         self.menus = {}
         utils.constructMenus(self.menuBar(), self.menus, menus, self.vzactions)
 
+        self.populateExamplesMenu()
+
     def _setPickerFont(self, label):
         f = label.font()
         f.setBold(True)
         f.setPointSizeF(f.pointSizeF() * 1.2)
         label.setFont(f)
+
+    def populateExamplesMenu(self):
+        """Add examples to help menu."""
+
+        examples = glob.glob(os.path.join(utils.exampleDirectory, '*.vsz'))
+        menu = self.menus["help.examples"]
+        for ex in sorted(examples):
+            name = os.path.splitext(os.path.basename(ex))[0]
+
+            def _openexample(ex=ex):
+                MainWindow.CreateWindow(ex)
+
+            a = menu.addAction(name, _openexample)
+            a.setStatusTip("Open %s example document" % name)
 
     def defineViewWindowMenu(self):
         """Setup View -> Window menu."""

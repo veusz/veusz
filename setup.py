@@ -90,6 +90,14 @@ else:
         'scripts': ['scripts/veusz', 'scripts/veusz_listen']
         }
 
+def findData(dirname, extns):
+    """Return tuple for directory name and list of file extensions for data."""
+    files = []
+    for extn in extns:
+        files += glob.glob(os.path.join(dirname, '*.'+extn))
+    files.sort()
+    return ( os.path.join('veusz', dirname), files )
+
 setup(name = 'veusz',
       version = version,
       description = 'A scientific plotting package',
@@ -118,11 +126,10 @@ setup(name = 'veusz',
                       'veusz.windows': 'windows',
                       },
       data_files = [ ('veusz', ['VERSION']),
-                     ('veusz/dialogs', glob.glob('dialogs/*.ui')),
-                     ('veusz/widgets/data', glob.glob('widgets/data/*.dat')),
-                     ('veusz/windows/icons',
-                      glob.glob('windows/icons/*.png')+
-                      glob.glob('windows/icons/*.svg')) ],
+                     findData('dialogs', ('ui',)),
+                     findData('windows/icons', ('png', 'svg')),
+                     findData('examples', ('vsz', 'py', 'csv', 'dat')),
+                     ],
       packages = [ 'veusz',
                    'veusz.dialogs',
                    'veusz.document',

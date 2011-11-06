@@ -39,6 +39,8 @@ Changes in 1.14:
  * Add copy and paste dataset command to dataset browser context menu
 
 Minor and API changes:
+ * Examples added to help menu
+ * Picker shows date values as dates
  * Allow descriptor statement in standard data files after a comment character,
    e.g. "#descriptor x y"
  * Added some further color maps
