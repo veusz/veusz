@@ -474,7 +474,7 @@ class SimpleRead(object):
     def _readDataUnblocked(self, stream, ignoretext):
         """Read in that data from the stream."""
 
-        allparts = self.parts
+        allparts = list(self.parts)
 
         # loop over lines
         while stream.newLine():
@@ -483,6 +483,7 @@ class SimpleRead(object):
                 descriptor =  ' '.join(stream.remainingline[1:])
                 self._parseDescriptor(descriptor)
                 allparts += self.parts
+                self.autodescr = False
             elif ( self.ignoretext and len(stream.remainingline) > 0 and 
                    text_start_re.match(stream.remainingline[0]) and
                    len(self.parts) > 0 and
@@ -503,6 +504,7 @@ class SimpleRead(object):
                             str(len(self.parts)+1), None, 'D', None )
                         p.readFromStream(stream, self.datasets)
                         self.parts.append(p)
+                        allparts.append(p)
 
             stream.flushLine()
 
@@ -515,11 +517,11 @@ class SimpleRead(object):
         blocks = {}
         block = 1
         while stream.newLine():
-            l = stream.remainingline
+            line = stream.remainingline
 
             # if this is a blank line, separating data then advance to a new
             # block
-            if len(l) == 0 or l[0].lower() == 'no':
+            if len(line) == 0 or line[0].lower() == 'no':
                 # blank lines separate blocks
                 if block in blocks:
                     block += 1
@@ -535,6 +537,7 @@ class SimpleRead(object):
                             str(len(self.parts)+1), None, 'D', None )
                         p.readFromStream(stream, self.datasets, block=block)
                         self.parts.append(p)
+                        allparts.append(p)
 
                 blocks[block] = True
 

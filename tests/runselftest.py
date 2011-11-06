@@ -145,7 +145,7 @@ def runTests():
     passes = 0
 
     d = Dirs()
-    for vsz in d.invszfiles:
+    for vsz in sorted(d.invszfiles):
         base = os.path.basename(vsz)
         print base
 
