@@ -433,16 +433,22 @@ class DatasetBase(object):
 
     # number of dimensions the dataset holds
     dimensions = 0
-    datatype = 'numeric'
+
+    # datatype is fundamental type of data
+    # displaytype is formatting suggestion for data
+    datatype = displaytype = 'numeric'
+
+    # dataset type to show to user
+    dstype = 'Dataset'
+
+    # list of columns in dataset (if any)
     columns = ()
+    # use descriptions for columns
     column_descriptions = ()
 
     # class for representing part of this dataset
     subsetclass = None
 
-    # dataset type
-    dstype = 'Dataset'
-    
     # whether this dataset's columns will change without updating the document's
     # changeset
     isstable = False
@@ -897,6 +903,7 @@ class DatasetDateTime(Dataset):
     isstable = True
 
     dstype = 'Date'
+    displaytype = 'date'
 
     def __init__(self, data=None, linked=None):
         Dataset.__init__(self, data=data, linked=linked)
@@ -951,7 +958,7 @@ class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
     dimensions = 1
-    datatype = 'text'
+    datatype = displaytype = 'text'
     columns = ('data',)
     column_descriptions = ('Data',)
     dstype = 'Text'

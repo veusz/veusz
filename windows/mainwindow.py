@@ -1249,11 +1249,27 @@ class MainWindow(qt4.QMainWindow):
         """Display the picked point"""
         xv, yv = info.coords
         xn, yn = info.labels
+        xt, yt = info.displaytype
         ix = str(info.index)
         if ix:
             ix = '[' + ix + ']'
-        t = '%s: %s%s = %0.5g, %s%s = %0.5g' % (
-                info.widget.name, xn, ix, xv, yn, ix, yv)
+
+        # format values for display
+        def fmt(val, dtype):
+            if dtype == 'date':
+                return utils.dateFloatToString(val)
+            elif dtype == 'numeric':
+                return '%0.5g' % val
+            elif dtype == 'text':
+                return val
+            else:
+                raise RuntimeError
+
+        xtext = fmt(xv, xt)
+        ytext = fmt(yv, yt)
+
+        t = '%s: %s%s = %s, %s%s = %s' % (
+                info.widget.name, xn, ix, xtext, yn, ix, ytext)
         self.pickerlabel.setText(t)
 
     def slotAllowedImportsDoc(self, module, names):

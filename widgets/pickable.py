@@ -36,6 +36,7 @@ class PickInfo:
         self.coords = coords
         self.index = index
         self.distance = float('inf')
+        self.displaytype = ('numeric', 'numeric')
 
     def __nonzero__(self):
         if self.widget and self.screenpos and self.labels and self.coords:
@@ -208,8 +209,8 @@ class DiscretePickable(GenericPickable):
     def __init__(self, widget, xdata_propname, ydata_propname, mapdata_fn):
         s = widget.settings
         doc = widget.document
-        xdata = s.get(xdata_propname).getData(doc)
-        ydata = s.get(ydata_propname).getData(doc)
+        self.xdata = xdata = s.get(xdata_propname).getData(doc)
+        self.ydata = ydata = s.get(ydata_propname).getData(doc)
         labels = s.__getattr__(xdata_propname), s.__getattr__(ydata_propname)
 
         if not xdata or not ydata or not mapdata_fn:
@@ -232,6 +233,7 @@ class DiscretePickable(GenericPickable):
 
     def pickPoint(self, x0, y0, bounds, distance_direction):
         info = GenericPickable.pickPoint(self, x0, y0, bounds, distance_direction)
+        info.displaytype = (self.xdata.displaytype, self.ydata.displaytype)
 
         if not info:
             return info
