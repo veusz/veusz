@@ -124,6 +124,20 @@ class VectorField(plotters.GenericPlotter):
                     axrange[0] = min( axrange[0], dyrange[0] )
                     axrange[1] = max( axrange[1], dyrange[1] )
 
+    def drawKeySymbol(self, number, painter, x, y, width, height):
+        """Draw the plot symbol and/or line."""
+        painter.save()
+
+        s = self.settings
+        painter.setPen( s.Line.makeQPenWHide(painter) )
+        painter.setBrush( s.get('Fill').makeQBrushWHide() )
+        utils.plotLineArrow(painter, x+width, y+height*0.5,
+                            width, 180, height*0.25,
+                            arrowleft=s.arrowfront,
+                            arrowright=s.arrowback)
+
+        painter.restore()
+
     def draw(self, parentposn, phelper, outerbounds = None):
         """Draw the widget."""
 

@@ -44,6 +44,7 @@ Minor and API changes:
  * Allow descriptor statement in standard data files after a comment character,
    e.g. "#descriptor x y"
  * Added some further color maps
+ * Draw key symbols for vector field widget
  * Import plugin changes
     - Register classes rather than instances (backward compatibility is retained)
     - Plugins can return constants and functions (Constant and Function types)
@@ -59,6 +60,7 @@ Bug fixes
  * Fixed validation for numeric values
  * Position of grid lines in perpendicular direction for non default positions
  * Catch errors in example import plugin
+ * Fix crash for non existent key symbols
 
 Features of package:
  * X-Y plots (with errorbars)
