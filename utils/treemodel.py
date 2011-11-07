@@ -123,10 +123,12 @@ class TreeModel(qt4.QAbstractItemModel):
 
     def objFromIndex(self, idx):
         """Given an index, return the node."""
-        if not idx.isValid():
-            obj = None
-        else:
-            return self.nodes[idx.internalId()]
+        if idx.isValid():
+            try:
+                return self.nodes[idx.internalId()]
+            except KeyError:
+                pass
+        return None
 
     def index(self, row, column, parent):
         """Return index of node."""
