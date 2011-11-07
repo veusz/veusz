@@ -100,7 +100,7 @@ class GenericPlotter(widget.Widget):
         """Get key entry."""
         return self.settings.key
 
-    def drawKeySymbol(self, number, painter, phelper, x, y, width, height):
+    def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line at (x,y) in a box width*height.
 
         This is used to plot a key
