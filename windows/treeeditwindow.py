@@ -202,8 +202,9 @@ class SettingsProxyMulti(SettingsProxy):
 
     def childProxyList(self):
         """Make a list of proxy settings."""
-        if self._cachechild is not None:
-            self._cachechild = self._objList( () )
+        if self._cachechild is None:
+            self._cachechild = self._objList( (setting.Settings,
+                                               setting.Setting) )
         return self._cachechild
 
     def settingsProxyList(self):
