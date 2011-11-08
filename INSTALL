@@ -29,7 +29,7 @@ list a few of the possible method here:
 
 To install on linux to the standard location on the hard disk
 
-# cd veusz-1.13
+# cd veusz-1.14
 # python setup.py build
 # su
 [enter root password]
@@ -63,8 +63,8 @@ can be used to create a hidden X11 server:
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-1.13.tar.gz                [change version here]
-# cd veusz-1.13
+# tar xzf veusz-1.14.tar.gz                [change version here]
+# cd veusz-1.14
 # ./veusz_main.py
 
 Certain features will be disabled if you do this. You will not be able
@@ -87,8 +87,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xzf veusz-linux-i386-1.13.tar.gz     [change version here]
-# cd veusz-linux-i386-1.13
+# tar xzf veusz-linux-i386-1.14.tar.gz     [change version here]
+# cd veusz-linux-i386-1.14
 # ./veusz
 
 2.2 Installing in Windows
