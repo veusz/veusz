@@ -15,7 +15,7 @@
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g fill="#ffffff" stroke-width="1.25">
+<g fill="#e5e9ff" stroke-width="1.25">
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </g>
 <g fill="none" stroke="#808080" stroke-dasharray="0.625,1.25" stroke-width="0.62">

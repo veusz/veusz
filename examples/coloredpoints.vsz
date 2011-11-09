@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.13.99)
-# Saved at 2011-11-09T10:33:47.341827
+# Saved at 2011-11-09T19:53:17.746203
 
-AddImportPath(u'/data/jss/veusz/code/veusz/examples')
 ImportString('c(numeric)','''
 1.459606e+02
 1.702896e+02
@@ -315,6 +314,7 @@ Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)
 To('graph1')
+Set('Background/color', u'#e5e9ff')
 Set('Border/width', u'1pt')
 Add('colorbar', name='colorbar1', autoadd=False)
 To('colorbar1')
