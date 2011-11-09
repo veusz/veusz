@@ -578,9 +578,21 @@ class Axis(widget.Widget):
             a = (b1, a1, b2, a2)
         utils.plotLinesToPainter(painter, a[0], a[1], a[2], a[3])
 
-    def _drawGridLines(self, subset, painter, coordticks):
+    def _drawGridLines(self, subset, painter, coordticks, parentposn):
         """Draw grid lines on the plot."""
         painter.setPen( self.settings.get(subset).makeQPen(painter) )
+
+        # drop points which overlap with graph box (if used)
+        if self.parent.typename == 'graph':
+            if not self.parent.settings.Border.hide:
+                if self.settings.direction == 'horizontal':
+                    ok = ( (N.abs(coordticks-parentposn[0]) > 1e-3) &
+                           (N.abs(coordticks-parentposn[2]) > 1e-3) )
+                else:
+                    ok = ( (N.abs(coordticks-parentposn[1]) > 1e-3) &
+                           (N.abs(coordticks-parentposn[3]) > 1e-3) )
+                coordticks = coordticks[ok]
+
         self.swaplines(painter,
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
@@ -961,9 +973,11 @@ class Axis(widget.Widget):
 
         # plot gridlines
         if not s.MinorGridLines.hide:
-            self._drawGridLines('MinorGridLines', painter, coordminorticks)
+            self._drawGridLines('MinorGridLines', painter, coordminorticks,
+                                parentposn)
         if not s.GridLines.hide:
-            self._drawGridLines('GridLines', painter, coordticks)
+            self._drawGridLines('GridLines', painter, coordticks,
+                                parentposn)
 
         # plot the line along the axis
         if not s.Line.hide:
