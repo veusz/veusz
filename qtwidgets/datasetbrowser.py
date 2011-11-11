@@ -21,6 +21,7 @@
 
 import os.path
 import numpy as N
+import textwrap
 
 import veusz.qtall as qt4
 import veusz.setting as setting
@@ -125,7 +126,7 @@ class DatasetNode(TMNode):
 
         c = self.cols[column]
         if c == "name":
-            return qt4.QVariant(ds.description())
+            return qt4.QVariant(textwrap.fill(ds.description(), 40))
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
             text = ds.userPreview()
             # add preview of dataset if possible
@@ -135,7 +136,7 @@ class DatasetNode(TMNode):
                 text = "<html>%s<br>%s</html>" % (text, pixmapAsHtml(pix))
             return qt4.QVariant(text)
         elif c == "linkfile" or c == "type":
-            return qt4.QVariant(ds.linkedInformation())
+            return qt4.QVariant(textwrap.fill(ds.linkedInformation(), 40))
         return qt4.QVariant()
 
     def dataset(self):
