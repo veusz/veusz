@@ -550,10 +550,21 @@ class ControlAxisLine(object):
                  maxposn):
         self.widget = widget
         self.direction = direction
-        self.minpos = minpos
-        self.maxpos = maxpos
-        self.axispos = axispos
+        if minpos > maxpos:
+            minpos, maxpos = maxpos, minpos
+        self.minpos = self.minzoom = self.minorig = minpos
+        self.maxpos = self.maxzoom = self.maxorig = maxpos
+        self.axisorigpos = self.axispos = axispos
         self.maxposn = maxposn
+
+    def zoomed(self):
+        """Is this a zoom?"""
+        return self.minzoom != self.minorig or self.maxzoom != self.maxorig
+
+    def moved(self):
+        """Has axis moved?"""
+        return ( self.minpos != self.minorig or self.maxpos != self.maxorig or
+                 self.axisorigpos != self.axispos )
 
     def createGraphicsItem(self):
         return _GraphAxisLine(self)
@@ -562,21 +573,27 @@ class _GraphAxisLine(qt4.QGraphicsItem):
 
     curs = {True: qt4.Qt.SizeVerCursor,
             False: qt4.Qt.SizeHorCursor}
+    curs_zoom = {True: qt4.Qt.SplitVCursor,
+                 False: qt4.Qt.SplitHCursor}
 
     def __init__(self, params):
         """Line is about to be shown."""
         qt4.QGraphicsItem.__init__(self)
         self.params = params
-        self.pts = [ _ShapeCorner(self),
-                     _ShapeCorner(self) ]
+        self.pts = [ _ShapeCorner(self), _ShapeCorner(self),
+                     _ShapeCorner(self), _ShapeCorner(self) ]
         self.line = _AxisGraphicsLineItem(self)
 
-        # set correct coordinates
+        # set cursors and tooltips for items
         self.horz = (params.direction == 'horizontal')
-        endcurs = self.curs[not self.horz]
-        self.pts[0].setCursor(endcurs)
-        self.pts[1].setCursor(endcurs)
+        for p in self.pts[0:2]:
+            p.setCursor(self.curs[not self.horz])
+            p.setToolTip("Move axis ends")
+        for p in self.pts[2:]:
+            p.setCursor(self.curs_zoom[not self.horz])
+            p.setToolTip("Change axis scale")
         self.line.setCursor( self.curs[self.horz] )
+        self.line.setToolTip("Move axis position")
         self.setZValue(2.)
 
         self.updatePos()
@@ -585,47 +602,58 @@ class _GraphAxisLine(qt4.QGraphicsItem):
         """Set ends of line and line positions from stored values."""
         par = self.params
         mxp = par.maxposn
+
+        def _clip(*args):
+            """Clip positions to bounds of box given coords."""
+            par.minpos = max(par.minpos, mxp[args[0]])
+            par.maxpos = min(par.maxpos, mxp[args[1]])
+            par.axispos = max(par.axispos, mxp[args[2]])
+            par.axispos = min(par.axispos, mxp[args[3]])
+
         if self.horz:
-            # clip to box bounds
-            par.minpos = max(par.minpos, mxp[0])
-            par.maxpos = min(par.maxpos, mxp[2])
-            par.axispos = max(par.axispos, mxp[1])
-            par.axispos = min(par.axispos, mxp[3])
+            _clip(0, 2, 1, 3)
 
             # set positions
-            self.line.setPos(par.minpos, par.axispos)
-            self.line.setLine(0, 0, par.maxpos-par.minpos, 0)
+            if par.zoomed():
+                self.line.setPos(par.minzoom, par.axispos)
+                self.line.setLine(0, 0, par.maxzoom-par.minzoom, 0)
+            else:
+                self.line.setPos(par.minpos, par.axispos)
+                self.line.setLine(0, 0, par.maxpos-par.minpos, 0)
             self.pts[0].setPos(par.minpos, par.axispos)
             self.pts[1].setPos(par.maxpos, par.axispos)
+            self.pts[2].setPos(par.minzoom, par.axispos-15)
+            self.pts[3].setPos(par.maxzoom, par.axispos-15)
         else:
-            # clip to box bounds
-            par.minpos = max(par.minpos, mxp[1])
-            par.maxpos = min(par.maxpos, mxp[3])
-            par.axispos = max(par.axispos, mxp[0])
-            par.axispos = min(par.axispos, mxp[2])
+            _clip(1, 3, 0, 2)
 
             # set positions
-            self.line.setPos(par.axispos, par.minpos)
-            self.line.setLine(0, 0, 0, par.maxpos-par.minpos)
+            if par.zoomed():
+                self.line.setPos(par.axispos, par.minzoom)
+                self.line.setLine(0, 0, 0, par.maxzoom-par.minzoom)
+            else:
+                self.line.setPos(par.axispos, par.minpos)
+                self.line.setLine(0, 0, 0, par.maxpos-par.minpos)
             self.pts[0].setPos(par.axispos, par.minpos)
             self.pts[1].setPos(par.axispos, par.maxpos)
+            self.pts[2].setPos(par.axispos+15, par.minzoom)
+            self.pts[3].setPos(par.axispos+15, par.maxzoom)
 
     def updateFromCorner(self, corner, event):
         """Ends of axis have moved, so update values."""
 
         par = self.params
+        pt = (corner.y(), corner.x())[self.horz]
         # which end has moved?
         if corner is self.pts[0]:
             # horizonal or vertical axis?
-            if self.horz:
-                par.minpos = corner.x()
-            else:
-                par.minpos = corner.y()
-        else:
-            if self.horz:
-                par.maxpos = corner.x()
-            else:
-                par.maxpos = corner.y()
+            par.minpos = pt
+        elif corner is self.pts[1]:
+            par.maxpos = pt
+        elif corner is self.pts[2]:
+            par.minzoom = pt
+        elif corner is self.pts[3]:
+            par.maxzoom = pt
 
         # swap round end points if min > max
         if par.minpos > par.maxpos:

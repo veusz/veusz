@@ -1026,25 +1026,42 @@ class Axis(widget.Widget):
 
         s = self.settings
         p = cgi.maxposn
-        if s.direction == 'horizontal':
-            minfrac = abs((cgi.minpos - p[0]) / (p[2] - p[0]))
-            maxfrac = abs((cgi.maxpos - p[0]) / (p[2] - p[0]))
-            axisfrac = abs((cgi.axispos - p[3]) / (p[1] - p[3]))
-        else:
-            minfrac = abs((cgi.minpos - p[3]) / (p[1] - p[3]))
-            maxfrac = abs((cgi.maxpos - p[3]) / (p[1] - p[3]))
-            axisfrac = abs((cgi.axispos - p[0]) / (p[2] - p[0]))
 
-        if minfrac > maxfrac:
-            minfrac, maxfrac = maxfrac, minfrac
+        if cgi.zoomed():
+            # zoom axis scale
+            c1, c2 = self.plotterToGraphCoords(
+                cgi.maxposn, N.array([cgi.minzoom, cgi.maxzoom]))
+            if c1 > c2:
+                c1, c2 = c2, c1
+            operations = (
+                document.OperationSettingSet(s.get('min'), float(c1)),
+                document.OperationSettingSet(s.get('max'), float(c2)),
+                document.OperationSettingSet(s.get('autoExtend'), False),
+                document.OperationSettingSet(s.get('autoExtendZero'), False),
+                )
+            self.document.applyOperation(
+                document.OperationMultiple(operations, descr='zoom axis'))
+        elif cgi.moved():
+            # move axis
+            # convert positions to fractions
+            pt1, pt2, ppt1, ppt2 = ( (3, 1, 0, 2), (0, 2, 3, 1)
+                                     ) [s.direction == 'horizontal']
+            minfrac = abs((cgi.minpos - p[pt1]) / (p[pt2] - p[pt1]))
+            maxfrac = abs((cgi.maxpos - p[pt1]) / (p[pt2] - p[pt1]))
+            axisfrac = abs((cgi.axispos - p[ppt1]) / (p[ppt2] - p[ppt1]))
 
-        operations = (
-            document.OperationSettingSet(s.get('lowerPosition'), minfrac),
-            document.OperationSettingSet(s.get('upperPosition'), maxfrac),
-            document.OperationSettingSet(s.get('otherPosition'), axisfrac),
-            )
-        self.document.applyOperation(
-            document.OperationMultiple(operations, descr='adjust axis'))
+            # swap if wrong way around
+            if minfrac > maxfrac:
+                minfrac, maxfrac = maxfrac, minfrac
+
+            # update doc
+            operations = (
+                document.OperationSettingSet(s.get('lowerPosition'), minfrac),
+                document.OperationSettingSet(s.get('upperPosition'), maxfrac),
+                document.OperationSettingSet(s.get('otherPosition'), axisfrac),
+                )
+            self.document.applyOperation(
+                document.OperationMultiple(operations, descr='adjust axis'))
 
 # allow the factory to instantiate an axis
 document.thefactory.register( Axis )
