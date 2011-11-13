@@ -393,6 +393,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             if isinstance(self.model.objFromIndex(idx), DatasetNode):
                 self.selectionModel().setCurrentIndex(
                     idx, qt4.QItemSelectionModel.SelectCurrent |
+                    qt4.QItemSelectionModel.Clear |
                     qt4.QItemSelectionModel.Rows )
 
     def showContextMenu(self, pt):
@@ -614,6 +615,10 @@ class DatasetBrowser(qt4.QWidget):
         """Filtering changed by user."""
         self.navtree.changeFilter(unicode(filtertext))
 
+    def selectDataset(self, dsname):
+        """Find, and if possible select dataset name."""
+        self.navtree.selectDataset(dsname)
+
 class DatasetBrowserPopup(DatasetBrowser):
     """Popup window for dataset browser for selecting datasets.
     This is used by setting.controls.Dataset
@@ -661,10 +666,6 @@ class DatasetBrowserPopup(DatasetBrowser):
         """Tell the calling widget that we are closing."""
         self.emit(qt4.SIGNAL("closing"))
         event.accept()
-
-    def selectDataset(self, dsname):
-        """Find, and if possible select dataset name."""
-        self.navtree.selectDataset(dsname)
 
     def slotUpdateItem(self):
         """Emit new dataset signal."""

@@ -475,3 +475,5 @@ class DataEditDialog(VeuszDialog):
         # add new dataset
         self.document.applyOperation(
             document.OperationDatasetSet(name, ds))
+
+        self.dsbrowser.selectDataset(name)
