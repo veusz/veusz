@@ -369,6 +369,11 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                                  "const QItemSelection&)"),
                       self.slotNewSelection )
 
+        # expand nodes by default
+        self.connect( self.model,
+                      qt4.SIGNAL("rowsInserted(const QModelIndex&, int, int)"),
+                      self.slotNewRow )
+
     def changeGrouping(self, grouping):
         """Change the tree grouping behaviour."""
         self.model.grouping = grouping
@@ -527,6 +532,10 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def slotNewSelection(self, selected, deselected):
         """Emit selecteditem signal on new selection."""
         self.emit(qt4.SIGNAL("selecteditem"), self.getSelectedDataset())
+
+    def slotNewRow(self, parent, start, end):
+        """Expand parent if added."""
+        self.expand(parent)
 
     def getSelectedDataset(self):
         """Return selected dataset."""
