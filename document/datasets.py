@@ -1486,7 +1486,7 @@ class Dataset2DXYZExpression(Dataset2D):
             except Exception, e:
                 raise DatasetExpressionException(
                     "Error evaluating expression: %s\n"
-                    "Error: %s" % (expr, str(e)) )
+                    "Error: %s" % (expr, unicode(e)) )
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
         miny, maxy, stepy, stepsy = getSpacing(evaluated['expry'])
@@ -1501,7 +1501,12 @@ class Dataset2DXYZExpression(Dataset2D):
         ypts = ((1./stepy)*(evaluated['expry']-miny)).astype('int32')
 
         # this is ugly - is this really the way to do it?
-        self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
+        try:
+            self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
+        except Exception, e:
+            raise DatasetExpressionException(
+                "Shape mismatch when constructing dataset\n"
+                "Error: %s" % unicode(e) )
 
         # update changeset
         self.lastchangeset = self.document.changeset
