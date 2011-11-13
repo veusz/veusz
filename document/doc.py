@@ -82,10 +82,12 @@ class Document( qt4.QObject ):
             Document.loadPlugins()
             Document.pluginsloaded = True
 
+        # change tracking of document as a whole
         self.changeset = 0            # increased when the document changes
 
+        # change tracking of datasets
         self.datachangeset = 0        # increased whan any dataset changes
-        self.datachangesets = dict()  # each dataset has an associated change se
+        self.datachangesets = dict()  # each ds has an associated change set
 
         # if set, do not notify listeners of updates
         # wait under enableUpdates
@@ -346,6 +348,8 @@ class Document( qt4.QObject ):
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
+        # transfer change set to new name
+        self.datachangesets[newname] = self.datachangesets[oldname]
 
         self.setModified()
 
