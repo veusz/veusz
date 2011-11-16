@@ -20,12 +20,14 @@
 import veusz.qtall as qt4
 
 class TutorialStep(qt4.QObject):
-    def __init__(self, text, nextstep=None, flash=None, disablenext=False):
+    def __init__(self, text, mainwin,
+                 nextstep=None, flash=None, disablenext=False):
         qt4.QObject.__init__(self)
         self.text = text
         self.nextstep = nextstep
         self.flash = flash
         self.disablenext = disablenext
+        self.mainwin = mainwin
 
 class StepIntro(TutorialStep):
     def __init__(self, mainwin):
@@ -39,7 +41,7 @@ possible.</p>
 <p>You can close at any time and restart the tutorial in the help
 menu. Press Next to go to the next step or complete a
 requested action.</p>
-''', nextstep=StepWidgets )
+''', mainwin, nextstep=StepWidgets )
 
 class StepWidgets(TutorialStep):
     def __init__(self, mainwin):
@@ -53,9 +55,9 @@ example, there are widgets for axes, for a graph, for plotting data
 and for functions.</p>
 
 <p>Widget can often be placed inside each other. For instance, a graph
-widget is placed in a page widget and function widget is in a graph
-widget.</p>
-''', nextstep=StepWidgetWin)
+widget is placed in a page widget or a grid widget. Plotting widgets
+are placed in graph widget.</p>
+''', mainwin, nextstep=StepWidgetWin)
 
 class StepWidgetWin(TutorialStep):
     def __init__(self, mainwin):
@@ -67,12 +69,20 @@ class StepWidgetWin(TutorialStep):
 <p>The flashing window is the editing window, which shows the widgets
 currently in the plot in a hierarchical tree. Each widget has a name
 (the left column) and a type (the right column).</p>
+''', mainwin,
+            nextstep=StepWidgetWinExpand,
+            flash=t)
 
-<p>The graph widget is the currently selected widget. Expand this
-widget - click the little arrow to its left in the editing window -
-and select the x axis widget.</p>
-''',
-            flash=t,
+class StepWidgetWinExpand(TutorialStep):
+    def __init__(self, mainwin):
+        t = mainwin.treeedit
+        TutorialStep.__init__(
+            self, '''
+<p>The graph widget is the currently selected widget.</p>
+
+<p>Expand the graph widget - click the little arrow to its left in
+the editing window - and select the x axis widget.</p>
+''', mainwin,
             disablenext=True,
             nextstep=StepPropertiesWin)
 
@@ -93,7 +103,7 @@ the x axis widget of the graph.</p>
 
 <p>Enter a new label for the widget, by clicking in the text edit box
 to the right of "Label", typing some text and press the Enter key.</p>
-''',
+''', mainwin,
             flash = mainwin.propdock,
             disablenext = True,
             nextstep = StepPropertiesWin2)
@@ -117,7 +127,7 @@ superscripts, subscripts and fractions.</p>
 of the axis and whether the axis is logarithmic.</p>
 
 <p>Click Next to continue.</p>
-''', nextstep=WidgetAdd)
+''', mainwin, nextstep=WidgetAdd)
 
 class WidgetAdd(TutorialStep):
     def __init__(self, mainwin):
@@ -125,19 +135,17 @@ class WidgetAdd(TutorialStep):
             self, '''
 <h1>Adding widgets</h1>
 
-<p>Use the flashing add widget toolbar to add widgets or go to the
-Insert menu.</p>
+<p>The flashing add widget toolbar, or the insert menu, is used to add
+widgets.</p>
 
-<p>Descriptions of the widgets pop up if you move your mouse over one
-of the toolbar buttons and hold it there.</p>
+<p>If you hold your mouse pointer over one of the toolbar buttons you
+will see a description of the widget type.</p>
 
 <p>Veusz will place the new widget inside the currently selected
-widget, or its parents if appropriate. Some widgets, however, need to
-be placed in particular widgets. For instance, a plotting widget needs
-to be placed on a graph.</p>
+widget, if possible, or its parents.</p>
 
 <p>Press Next to continue.</p>
-''',
+''', mainwin,
             flash=mainwin.treeedit.addtoolbar,
             nextstep=FunctionAdd )
 
@@ -150,21 +158,58 @@ class FunctionAdd(TutorialStep):
 <p>Add a function plotting widget to the current graph by clicking on
 the flashing icon, or by going to the Insert menu and choosing "Add
 function".</p>
-''',
+''', mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.function']),
-            disablenext=True)
+            disablenext=True,
+            nextstep=FunctionSet)
         self.connect( mainwin.document,
                       qt4.SIGNAL('sigModified'), self.slotDocModified )
 
     def slotDocModified(self, *args):
         try:
             # if widget has been added, move to next
-            mainwin.document.basewidget.getChild(
+            self.mainwin.document.basewidget.getChild(
                 'page1').getChild('graph1').getChild('function1')
             self.emit( qt4.SIGNAL('nextStep') )
         except AttributeError:
             pass
+
+class FunctionSet(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>You have now added a function widget to the graph widget. By
+default function widgets plot y=x.</p>
+
+<p>Go to the Function property and change the function to be
+<code>x**2</code>, plotting x squared.</p>
+
+<p>Veusz uses Python syntax for its functions, so the power operator
+is <code>**</code>, rather than <code>^</code>.</p>
+''', mainwin)
+
+        func = mainwin.document.basewidget.getChild(
+            'page1').getChild('graph1').getChild('function1')
+        self.setn = func.settings.get('function')
+        self.setn.setOnModified( self.slotNewLabel )
+
+    def slotNewLabel(self, *args):
+        if self.setn.val.strip() == 'x**2':
+            self.emit( qt4.SIGNAL('nextStep') )
+
+# template for text in text view
+_texttempl = '''
+<head>
+<style type="text/css">
+h1 { color: blue; font-size: x-large;}
+code { color: blue;}
+</style>
+</head>
+<body>
+%s
+</body>
+'''
 
 class TutorialDock(qt4.QDockWidget):
     '''A dock tutorial window.'''
@@ -213,7 +258,7 @@ class TutorialDock(qt4.QDockWidget):
         self.step = stepklass(self.mainwin)
         self.connect(self.step, qt4.SIGNAL('nextStep'), self.slotNext)
 
-        self.textedit.setHtml(self.step.text)
+        self.textedit.setHtml( _texttempl % self.step.text)
 
         self.flashct = 20
         self.flashon = True
