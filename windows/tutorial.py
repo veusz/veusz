@@ -17,17 +17,46 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+import os.path
+
 import veusz.qtall as qt4
+import veusz.utils as utils
 
 class TutorialStep(qt4.QObject):
     def __init__(self, text, mainwin,
-                 nextstep=None, flash=None, disablenext=False):
+                 nextstep=None, flash=None, disablenext=False,
+                 nextonsetting=None):
+
+        """
+        nextstep is class next TutorialStep class to use
+        If flash is set, flash widget
+        disablenext: wait until nextStep is emitted before going to next slide
+        nextonsetting: (setnpath, lambda val: ok) -
+          check setting to go to next slide
+        """
+
         qt4.QObject.__init__(self)
         self.text = text
         self.nextstep = nextstep
         self.flash = flash
         self.disablenext = disablenext
         self.mainwin = mainwin
+
+        self.nextonsetting = nextonsetting
+        if nextonsetting is not None:
+            self.connect( mainwin.document,
+                          qt4.SIGNAL('sigModified'), self.slotDocModified )
+
+    def slotDocModified(self, *args):
+        """Check setting to emit next."""
+
+        try:
+            setn = self.mainwin.document.basewidget.prefLookup(
+                self.nextonsetting[0]).get()
+            if self.nextonsetting[1](setn):
+                self.emit( qt4.SIGNAL('nextStep') )
+        except ValueError:
+            pass
 
 class StepIntro(TutorialStep):
     def __init__(self, mainwin):
@@ -106,14 +135,9 @@ to the right of "Label", typing some text and press the Enter key.</p>
 ''', mainwin,
             flash = mainwin.propdock,
             disablenext = True,
+            nextonsetting = ('/page1/graph1/x/label',
+                             lambda val: val != ''),
             nextstep = StepPropertiesWin2)
-
-        x = mainwin.document.basewidget.getChild(
-            'page1').getChild('graph1').getChild('x')
-        x.settings.get('label').setOnModified( self.slotNewLabel )
-
-    def slotNewLabel(self, *args):
-        self.emit( qt4.SIGNAL('nextStep') )
 
 class StepPropertiesWin2(TutorialStep):
     def __init__(self, mainwin):
@@ -162,18 +186,9 @@ function".</p>
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.function']),
             disablenext=True,
+            nextonsetting = ('/page1/graph1/function1/function',
+                             lambda val: val != ''),
             nextstep=FunctionSet)
-        self.connect( mainwin.document,
-                      qt4.SIGNAL('sigModified'), self.slotDocModified )
-
-    def slotDocModified(self, *args):
-        try:
-            # if widget has been added, move to next
-            self.mainwin.document.basewidget.getChild(
-                'page1').getChild('graph1').getChild('function1')
-            self.emit( qt4.SIGNAL('nextStep') )
-        except AttributeError:
-            pass
 
 class FunctionSet(TutorialStep):
     def __init__(self, mainwin):
@@ -185,31 +200,193 @@ default function widgets plot y=x.</p>
 <p>Go to the Function property and change the function to be
 <code>x**2</code>, plotting x squared.</p>
 
-<p>Veusz uses Python syntax for its functions, so the power operator
-is <code>**</code>, rather than <code>^</code>.</p>
-''', mainwin)
+<p>(Veusz uses Python syntax for its functions, so the power operator
+is <code>**</code>, rather than <code>^</code>)</p>
+''', mainwin,
+            nextonsetting = ('/page1/graph1/function1/function',
+                             lambda val: val.strip() == 'x**2'),
+            disablenext = True,
+            nextstep=FunctionFormatting)
 
-        func = mainwin.document.basewidget.getChild(
-            'page1').getChild('graph1').getChild('function1')
-        self.setn = func.settings.get('function')
-        self.setn.setOnModified( self.slotNewLabel )
+class FunctionFormatting(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Formatting</h1>
 
-    def slotNewLabel(self, *args):
-        if self.setn.val.strip() == 'x**2':
+<p>Widgets have a number of formatting options. The formatting window
+shows the options for the currently selected widget, here the function
+widget.</p>
+<p>Press Next to continue</p>
+''', mainwin,
+            flash=mainwin.formatdock,
+            nextstep=FunctionFormatLine)
+
+class FunctionFormatLine(TutorialStep):
+    def __init__(self, mainwin):
+
+        tb = mainwin.formatdock.tabwidget.tabBar()
+        label = qt4.QLabel("  ")
+        tb.setTabButton(1, qt4.QTabBar.LeftSide, label)
+
+        TutorialStep.__init__(
+            self, '''
+<p>Different types of formatting properties are grouped under separate
+tables. The options for drawing the function line are grouped under
+the flashing line tab.</p>
+
+<p>Click on the line tab to continue.</p>
+''', mainwin,
+            flash=label,
+            disablenext=True,
+            nextstep=FunctionLineFormatting)
+
+        self.connect(tb, qt4.SIGNAL('currentChanged(int)'),
+                     self.slotCurrentChanged)
+
+    def slotCurrentChanged(self, idx):
+        if idx == 1:
             self.emit( qt4.SIGNAL('nextStep') )
 
-# template for text in text view
-_texttempl = '''
-<head>
-<style type="text/css">
-h1 { color: blue; font-size: x-large;}
-code { color: blue;}
-</style>
-</head>
-<body>
-%s
-</body>
-'''
+class FunctionLineFormatting(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>Veusz lets you choose a line style, thickness and color for the
+function line.</p>
+
+<p>Choose a new line color for the line.</p>
+''',
+            mainwin,
+            disablenext=True,
+            nextonsetting = ('/page1/graph1/function1/Line/color',
+                             lambda val: val.strip() != 'black'),
+            nextstep=DataStart)
+
+class DataStart(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Datasets</h1>
+
+<p>Many widgets in Veusz plot datasets. To plot data, data can be
+imported from files or entered manually.</p>
+
+</p>Imported data can be linked to an external file or embedded in the
+document. Datasets can can also be created by applying operations on
+other datasets or by writing expressions.</p>
+''', mainwin,
+            nextstep=DataImport)
+
+class DataImport(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Importing data</h1>
+
+<p>Let us start by importing data.</p>
+
+<p>Click the flashing Data Import icon, or choose "Import..." From the
+Data menu.</p>
+''', mainwin,
+            flash=mainwin.datatoolbar.widgetForAction(
+                mainwin.vzactions['data.import']),
+            disablenext=True,
+            nextstep=DataImportDialog)
+
+        self.connect(mainwin, qt4.SIGNAL('dialogShown'), self.slotDialogShown )
+
+    def slotDialogShown(self, dialog):
+        """Called when a dialog is opened in the main window."""
+        from veusz.dialogs.importdialog import ImportDialog
+        if isinstance(dialog, ImportDialog):
+            # make life easy by sticking in filename
+            dialog.filenameedit.setText(
+                os.path.join(utils.exampleDirectory, 'tutorialdata.csv'))
+            # and choosing tab
+            dialog.guessImportTab()
+            # get rid of existing values
+            dialog.methodtab.currentWidget().reset()
+            self.emit( qt4.SIGNAL('nextStep') )
+
+class DataImportDialog(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>This is the data import dialog. In this tutorial, we have selected
+an example CSV (comma separated value) file for you, but you would
+normally browse to find your data file.</p>
+
+<p>This example file defines three datasets, <i>alpha</i>, <i>beta</i>
+and <i>gamma</i>, entered as columns in the CSV file.</p>
+
+<p>Press Next to continue</p>
+''', mainwin, nextstep=DataImportDialog2)
+
+class DataImportDialog2(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>Veusz will try to guess the datatype - numeric, text or date - from
+the data in the file or you can specify it manually.</p>
+
+<p>Several different data formats are supported in Veusz and plugins
+can be defined to import any data format. The Link option shows allows
+the data to be linked to the original data file.</p>
+
+<p>Click the Import button in the dialog.</p>
+''', mainwin,
+            nextstep=DataImportDialog3,
+            disablenext=True)
+        self.connect( mainwin.document,
+                      qt4.SIGNAL('sigModified'), self.slotDocModified )
+
+    def slotDocModified(self):
+        if 'alpha' in self.mainwin.document.data:
+            self.emit( qt4.SIGNAL('nextStep') )
+
+class DataImportDialog3(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>Notice how Veusz has loaded the three different datasets from the
+file. You can carry on importing new datasets from the Import dialog
+box or reopen it later.</p>
+
+<p>Close the Import dialog box.</p>
+''', mainwin,
+            disablenext=True,
+            nextstep=DataImportDialog4)
+
+        self.timer = qt4.QTimer()
+        self.connect( self.timer, qt4.SIGNAL('timeout()'),
+                      self.slotTimeout )
+        self.timer.start(200)
+
+    def slotTimeout(self):
+        from veusz.dialogs.importdialog import ImportDialog
+        closed = True
+        for dialog in self.mainwin.dialogs:
+            if isinstance(dialog, ImportDialog):
+                closed = False
+        if closed:
+            # move forward if no import dialog open
+            self.emit( qt4.SIGNAL('nextStep') )
+
+class DataImportDialog4(TutorialStep):
+    def __init__(self, mainwin):
+        mainwin.datadock.show()
+        TutorialStep.__init__(
+            self, '''
+<p>The dataset viewer shows the currently loaded datasets in the
+document.</p>
+
+<p>Hover your mouse over datasets to get information about them. You
+can see datasets in more detail in the Data Edit dialog box.</p>
+
+<p>Click next to continue</p>
+''', mainwin,
+            flash=mainwin.datadock)
 
 class TutorialDock(qt4.QDockWidget):
     '''A dock tutorial window.'''
@@ -226,7 +403,14 @@ class TutorialDock(qt4.QDockWidget):
 
         self.layout = l = qt4.QVBoxLayout()
 
+        txtdoc = qt4.QTextDocument(self)
+        txtdoc.setDefaultStyleSheet(
+            "h1 { font-size: x-large;} "
+            "code { color: blue;} "
+            )
         self.textedit = qt4.QTextEdit(readOnly=True)
+        self.textedit.setDocument(txtdoc)
+
         l.addWidget(self.textedit)
 
         bb = qt4.QDialogButtonBox()
@@ -251,14 +435,15 @@ class TutorialDock(qt4.QDockWidget):
         self.flashct = 0
         self.flashtimer.start(500)
 
-        self.changeStep(StepIntro)
+        #self.changeStep(StepIntro)
+        self.changeStep(DataStart)
 
     def changeStep(self, stepklass):
         '''Apply the next step.'''
         self.step = stepklass(self.mainwin)
         self.connect(self.step, qt4.SIGNAL('nextStep'), self.slotNext)
 
-        self.textedit.setHtml( _texttempl % self.step.text)
+        self.textedit.setHtml(self.step.text)
 
         self.flashct = 20
         self.flashon = True
