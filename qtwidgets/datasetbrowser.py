@@ -38,15 +38,6 @@ def datasetLinkFile(ds):
     else:
         return ds.linked.filename
 
-def pixmapAsHtml(pix):
-    """Get QPixmap as html image text."""
-    ba = qt4.QByteArray()
-    buf = qt4.QBuffer(ba)
-    buf.open(qt4.QIODevice.WriteOnly)
-    pix.toImage().save(buf, "PNG")
-    b64 = str(buf.data().toBase64())
-    return '<img src="data:image/png;base64,%s">' % b64
-
 class DatasetNode(TMNode):
     """Node for a dataset."""
 
@@ -133,7 +124,7 @@ class DatasetNode(TMNode):
             pix = self.getPreviewPixmap(ds)
             if pix:
                 text = text.replace("\n", "<br>")
-                text = "<html>%s<br>%s</html>" % (text, pixmapAsHtml(pix))
+                text = "<html>%s<br>%s</html>" % (text, utils.pixmapAsHtml(pix))
             return qt4.QVariant(text)
         elif c == "linkfile" or c == "type":
             return qt4.QVariant(textwrap.fill(ds.linkedInformation(), 40))

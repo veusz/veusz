@@ -125,6 +125,10 @@ class MainWindow(qt4.QMainWindow):
         self.datadock = DataNavigatorWindow(self.document, self, self)
         self.addDockWidget(qt4.Qt.RightDockWidgetArea, self.datadock)
 
+        import windows.tutorial
+        self.tutdock = windows.tutorial.TutorialDock(self.document, self, self)
+        self.addDockWidget(qt4.Qt.RightDockWidgetArea, self.tutdock)
+
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
                                                    self)
@@ -644,6 +648,7 @@ class MainWindow(qt4.QMainWindow):
         self.connect(dialog, qt4.SIGNAL('dialogFinished'), self.deleteDialog)
         self.dialogs.append(dialog)
         dialog.show()
+        self.emit( qt4.SIGNAL('dialogShown'), dialog )
 
     def deleteDialog(self, dialog):
         """Remove dialog from list of dialogs."""

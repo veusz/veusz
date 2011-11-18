@@ -120,6 +120,15 @@ def extendedColorFromQColor(col):
         return '#%02x%02x%02x%02x' % (col.red(), col.green(), col.blue(),
                                       col.alpha())
 
+def pixmapAsHtml(pix):
+    """Get QPixmap as html image text."""
+    ba = qt4.QByteArray()
+    buf = qt4.QBuffer(ba)
+    buf.open(qt4.QIODevice.WriteOnly)
+    pix.toImage().save(buf, "PNG")
+    b64 = str(buf.data().toBase64())
+    return '<img src="data:image/png;base64,%s">' % b64
+
 def BoundCaller(function, *params):
     """Wrap a function with its initial arguments."""
     def wrapped(*args):
