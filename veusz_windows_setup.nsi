@@ -9,7 +9,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Veusz"
-!define PRODUCT_VERSION "1.12.999"
+!define PRODUCT_VERSION "1.13.999"
 !define PRODUCT_PUBLISHER "Jeremy Sanders"
 !define PRODUCT_WEB_SITE "http://home.gna.org/veusz/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\veusz.exe"
@@ -54,6 +54,29 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
+; taken from http://stackoverflow.com/questions/719631/how-do-i-require-user-to-uninstall-previous-version-with-nsis
+; The "" makes the section hidden.
+Section "" SecUninstallPrevious
+    Call UninstallPrevious
+SectionEnd
+
+Function UninstallPrevious
+
+    ; Check for uninstaller.
+    ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
+    ${If} $R0 == ""
+        Goto Done
+    ${EndIf}
+
+    DetailPrint "Removing previous installation."
+
+    ; Run the uninstaller silently.
+    ExecWait '"$R0 /S"'
+
+    Done:
+
+FunctionEnd
+
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite try
@@ -77,13 +100,10 @@ Section "MainSection" SEC01
   File "${PYINST_DIR}\windows\icons\*.png"
   File "${PYINST_DIR}\windows\icons\*.ico"
   File "${PYINST_DIR}\windows\icons\*.svg"
-  
-  SetOutPath "$INSTDIR\widgets\data"
-  File "${PYINST_DIR}\widgets\data\*.dat"
-  
+
   SetOutPath "$INSTDIR\dialogs"
   File "${PYINST_DIR}\dialogs\*.ui"
-  
+
   SetOutPath "$INSTDIR\examples"
   File "${PYINST_DIR}\examples\*.vsz"
   File "${PYINST_DIR}\examples\*.py"
@@ -155,7 +175,6 @@ Section Uninstall
   Delete "$INSTDIR\windows\icons\*.png"
   Delete "$INSTDIR\windows\icons\*.ico"
   Delete "$INSTDIR\windows\icons\*.svg"
-  Delete "$INSTDIR\widgets\data\*.dat"
   Delete "$INSTDIR\dialogs\*.ui"
   Delete "$INSTDIR\examples\*.*"
 
@@ -170,7 +189,6 @@ Section Uninstall
   RMDir "$INSTDIR\qt4_plugins"
   RMDir "$INSTDIR\windows\icons"
   RMDIR "$INSTDIR\windows"
-  RMDir "$INSTDIR\widgets\data"
   RMDIR "$INSTDIR\widgets"
   RMDir "$INSTDIR\dialogs"
   RMDIR "$INSTDIR\examples"
