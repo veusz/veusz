@@ -1,3 +1,59 @@
+Changes in 1.14:
+ * Added interactive tutorial
+ * Points in graphs can be colored depending on another dataset and
+   the scale shown in a colorbar widget
+ * Improved CSV import
+    - better data type detection
+    - locale-specific numeric and date formats
+    - single/multiple/none header modes
+    - option to skip lines at top of file
+    - better handling of missing values
+ * Data can be imported from clipboard
+ * Substantially reduced size of output SVG files
+ * In standard data import, descriptor can be left blank to generate
+   dataset names colX
+ * Axis plotting range can be interactively manipulated
+ * If axis is in date-time format, show and allow the min and max
+   values to be in date-time format
+ * ImageFile widget can have image data embedded in document file
+ * Fit widget can update the fit parameters and fit quality to a
+   label widget
+ * Allow editing of 2D datasets in data edit dialog
+ * Add copy and paste dataset command to dataset browser context menu
+
+Minor and API changes:
+ * Examples added to help menu
+ * Picker shows date values as dates
+ * Allow descriptor statement in standard data files after a comment
+   character, e.g. "#descriptor x y"
+ * Added some further color maps
+ * Draw key symbols for vector field widget
+ * Import plugin changes
+    - Register classes rather than instances (backward compatibility
+      is retained)
+    - Plugins can return constants and functions (see Constant and
+      Function types)
+    - Add DatasetDateTime for returning date-time datasets
+ * Custom definitions
+    - Add RemoveCustom API to remove custom definitions
+    - AddCustom API can specify order where custom definition is added
+ * C++ code to speed up plotting points of different sizes / colors
+ * Expand files by default in data navigator window
+ * Select created datasets in data edit dialog
+ * Tooltip wrapping used in data navigator window
+ * Grid lines are dropped if they overlap with edge of graph
+
+Bug fixes
+ * Fix initial extension in export dialog
+ * Fix crash on hiding pages
+ * Fixed validation for numeric values
+ * Position of grid lines in perpendicular direction for non default
+   positions
+ * Catch errors in example import plugin
+ * Fix crash for non existent key symbols
+ * Fix crash when mismatch of dataset sizes when combining 1D datasets
+   to make 2D dataset
+
 Changes in 1.13:
  * Graphs are rendered in separate threads for speed and a responsive
    user interface
