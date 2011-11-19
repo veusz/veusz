@@ -653,10 +653,10 @@ class PropertiesDock(qt4.QDockWidget):
 class TreeEditDock(qt4.QDockWidget):
     """A dock window presenting widgets as a tree."""
 
-    def __init__(self, document, parent):
+    def __init__(self, document, parentwin):
         """Initialise dock given document and parent widget."""
-        qt4.QDockWidget.__init__(self, parent)
-        self.parent = parent
+        qt4.QDockWidget.__init__(self, parentwin)
+        self.parentwin = parentwin
         self.setWindowTitle("Editing - Veusz")
         self.setObjectName("veuszeditingwindow")
         self.selwidgets = []
@@ -680,19 +680,19 @@ class TreeEditDock(qt4.QDockWidget):
 
         # toolbar to create widgets
         self.addtoolbar = qt4.QToolBar("Insert toolbar - Veusz",
-                                       parent)
+                                       parentwin)
         # note wrong description!: backwards compatibility
         self.addtoolbar.setObjectName("veuszeditingtoolbar")
 
         # toolbar for editting widgets
         self.edittoolbar = qt4.QToolBar("Edit toolbar - Veusz",
-                                        parent)
+                                        parentwin)
         self.edittoolbar.setObjectName("veuszedittoolbar")
 
         self._constructToolbarMenu()
-        parent.addToolBarBreak(qt4.Qt.TopToolBarArea)
-        parent.addToolBar(qt4.Qt.TopToolBarArea, self.addtoolbar)
-        parent.addToolBar(qt4.Qt.TopToolBarArea, self.edittoolbar)
+        parentwin.addToolBarBreak(qt4.Qt.TopToolBarArea)
+        parentwin.addToolBar(qt4.Qt.TopToolBarArea, self.addtoolbar)
+        parentwin.addToolBar(qt4.Qt.TopToolBarArea, self.edittoolbar)
 
         # this sets various things up
         self.selectWidget(document.basewidget)
@@ -741,7 +741,7 @@ class TreeEditDock(qt4.QDockWidget):
         m = qt4.QMenu(self)
 
         # selection
-        m.addMenu(self.parent.menus['edit.select'])
+        m.addMenu(self.parentwin.menus['edit.select'])
         m.addSeparator()
 
         # actions on widget(s)
@@ -834,7 +834,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.edittoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
 
         self.addslots = {}
-        self.vzactions = actions = self.parent.vzactions
+        self.vzactions = actions = self.parentwin.vzactions
         for widgettype in ('page', 'grid', 'graph', 'axis',
                            'xy', 'bar', 'fit', 'function', 'boxplot',
                            'image', 'contour', 'vectorfield',
@@ -911,14 +911,14 @@ class TreeEditDock(qt4.QDockWidget):
                     'edit.delete', 'edit.rename'
                     ]),
             ]            
-        utils.constructMenus( self.parent.menuBar(),
-                              self.parent.menus,
+        utils.constructMenus( self.parentwin.menuBar(),
+                              self.parentwin.menus,
                               menuitems,
                               actions )
 
         # create shape toolbar button
         # attach menu to insert shape button
-        actions['add.shapemenu'].setMenu(self.parent.menus['insert.shape'])
+        actions['add.shapemenu'].setMenu(self.parentwin.menus['insert.shape'])
 
         # add actions to toolbar to create widgets
         utils.addToolbarActions(self.addtoolbar, actions,
@@ -930,7 +930,7 @@ class TreeEditDock(qt4.QDockWidget):
                                  'edit.moveup', 'edit.movedown',
                                  'edit.delete', 'edit.rename'))
 
-        self.connect( self.parent.menus['edit.select'],
+        self.connect( self.parentwin.menus['edit.select'],
                       qt4.SIGNAL('aboutToShow()'), self.updateSelectMenu )
 
     def slotMakeWidgetButton(self, wc):
@@ -1127,7 +1127,7 @@ class TreeEditDock(qt4.QDockWidget):
                 
     def updateSelectMenu(self):
         """Update edit.select menu."""
-        menu = self.parent.menus['edit.select']
+        menu = self.parentwin.menus['edit.select']
         menu.clear()
 
         if len(self.selwidgets) == 0:
