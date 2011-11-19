@@ -24,15 +24,20 @@ import veusz.utils as utils
 
 class TutorialStep(qt4.QObject):
     def __init__(self, text, mainwin,
-                 nextstep=None, flash=None, disablenext=False,
-                 nextonsetting=None):
+                 nextstep=None, flash=None,
+                 disablenext=False,
+                 closestep=False,
+                 nextonsetting=None,
+                 nextonselected=None):
 
         """
         nextstep is class next TutorialStep class to use
         If flash is set, flash widget
         disablenext: wait until nextStep is emitted before going to next slide
+        closestep: add a close button
         nextonsetting: (setnpath, lambda val: ok) -
           check setting to go to next slide
+        nextonselected: go to next if widget with name is selected
         """
 
         qt4.QObject.__init__(self)
@@ -40,16 +45,21 @@ class TutorialStep(qt4.QObject):
         self.nextstep = nextstep
         self.flash = flash
         self.disablenext = disablenext
+        self.closestep = closestep
         self.mainwin = mainwin
 
         self.nextonsetting = nextonsetting
         if nextonsetting is not None:
             self.connect( mainwin.document,
-                          qt4.SIGNAL('sigModified'), self.slotDocModified )
+                          qt4.SIGNAL('sigModified'), self.slotNextSetting )
 
-    def slotDocModified(self, *args):
+        self.nextonselected = nextonselected
+        if nextonselected is not None:
+            self.connect(mainwin.treeedit, qt4.SIGNAL('widgetsSelected'),
+                         self.slotWidgetsSelected)
+
+    def slotNextSetting(self, *args):
         """Check setting to emit next."""
-
         try:
             setn = self.mainwin.document.basewidget.prefLookup(
                 self.nextonsetting[0]).get()
@@ -57,6 +67,14 @@ class TutorialStep(qt4.QObject):
                 self.emit( qt4.SIGNAL('nextStep') )
         except ValueError:
             pass
+
+    def slotWidgetsSelected(self, widgets, *args):
+        """Go to next page if widget selected."""
+        if len(widgets) == 1 and widgets[0].name == self.nextonselected:
+            self.emit( qt4.SIGNAL('nextStep') )
+
+##########################
+## Introduction to widgets
 
 class StepIntro(TutorialStep):
     def __init__(self, mainwin):
@@ -67,12 +85,14 @@ class StepIntro(TutorialStep):
 <p>This tutorial aims to get you working with Veusz as quickly as
 possible.</p>
 
-<p>You can close at any time and restart the tutorial in the help
-menu. Press Next to go to the next step or complete a
-requested action.</p>
-''', mainwin, nextstep=StepWidgets )
+<p>You can close this window at any time using the close button to the
+top-right of this panel. The tutorial can be replayed in the help
+menu.</p>
 
-class StepWidgets(TutorialStep):
+<p class="usercmd">Press Next to go to the next step</p>
+''', mainwin, nextstep=StepWidgets1)
+
+class StepWidgets1(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
             self, '''
@@ -81,11 +101,24 @@ class StepWidgets(TutorialStep):
 <p>Plots in Veusz are constructed from <i>widgets</i>.  Different
 types of widgets are used to make different parts of a plot. For
 example, there are widgets for axes, for a graph, for plotting data
-and for functions.</p>
+and for plotting functions.</p>
 
+<p>There are also special widgets. The grid widget arranges graphs
+inside it in a grid arrangement.</p>
+''', mainwin, nextstep=StepWidgets2)
+
+class StepWidgets2(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
 <p>Widget can often be placed inside each other. For instance, a graph
 widget is placed in a page widget or a grid widget. Plotting widgets
 are placed in graph widget.</p>
+
+<p>You can have multiple widgets of different types. For example, you
+can have several graphs on the page, optionally arranged in a
+grid. Several plotting widgets and axis widgets can be put in a
+graph.</p>
 ''', mainwin, nextstep=StepWidgetWin)
 
 class StepWidgetWin(TutorialStep):
@@ -95,7 +128,7 @@ class StepWidgetWin(TutorialStep):
             self, '''
 <h1>Widget editing</h1>
 
-<p>The flashing window is the editing window, which shows the widgets
+<p>The flashing window is the Editing window, which shows the widgets
 currently in the plot in a hierarchical tree. Each widget has a name
 (the left column) and a type (the right column).</p>
 ''', mainwin,
@@ -104,7 +137,6 @@ currently in the plot in a hierarchical tree. Each widget has a name
 
 class StepWidgetWinExpand(TutorialStep):
     def __init__(self, mainwin):
-        t = mainwin.treeedit
         TutorialStep.__init__(
             self, '''
 <p>The graph widget is the currently selected widget.</p>
@@ -113,13 +145,8 @@ class StepWidgetWinExpand(TutorialStep):
 its left in the editing window - and select the x axis widget.</p>
 ''', mainwin,
             disablenext=True,
+            nextonselected='x',
             nextstep=StepPropertiesWin)
-
-        self.connect(t, qt4.SIGNAL('widgetsSelected'), self.slotWidgetsSelected)
-
-    def slotWidgetsSelected(self, widgets, *args):
-        if len(widgets) == 1 and widgets[0].name == 'x':
-            self.emit( qt4.SIGNAL('nextStep') )
 
 class StepPropertiesWin(TutorialStep):
     def __init__(self, mainwin):
@@ -160,14 +187,12 @@ class WidgetAdd(TutorialStep):
             self, '''
 <h1>Adding widgets</h1>
 
-<p>The flashing add widget toolbar, or the insert menu, is used to add
-widgets.</p>
-
-<p>If you hold your mouse pointer over one of the toolbar buttons you
-will see a description of the widget type.</p>
-
-<p>Veusz will place the new widget inside the currently selected
+<p>The flashing Add Widget toolbar and the Insert menu add widgets to
+the document. New widgets are inserted in the currently selected
 widget, if possible, or its parents.</p>
+
+<p>Hold your mouse pointer over one of the toolbar buttons to
+see a description of a widget type.</p>
 
 <p class="usercmd">Press Next to continue.</p>
 ''', mainwin,
@@ -217,7 +242,7 @@ class FunctionFormatting(TutorialStep):
             self, '''
 <h1>Formatting</h1>
 
-<p>Widgets have a number of formatting options. The formatting window
+<p>Widgets have a number of formatting options. The Formatting window
 shows the options for the currently selected widget, here the function
 widget.</p>
 
@@ -237,9 +262,9 @@ class FunctionFormatLine(TutorialStep):
             self, '''
 <p>Different types of formatting properties are grouped under separate
 tables. The options for drawing the function line are grouped under
-the flashing line tab.</p>
+the flashing Line tab.</p>
 
-<p class="usercmd">Click on the line tab to continue.</p>
+<p class="usercmd">Click on the Line tab to continue.</p>
 ''', mainwin,
             flash=label,
             disablenext=True,
@@ -267,6 +292,9 @@ function line.</p>
                              lambda val: val.strip() != 'black'),
             nextstep=DataStart)
 
+###########
+## Datasets
+
 class DataStart(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
@@ -279,6 +307,8 @@ operations or expressions.</p>
 
 <p>Imported data can be linked to an external file or embedded in the
 document.</p>
+
+<p class="usercmd">Press Next to continue</p>
 ''', mainwin,
             nextstep=DataImport)
 
@@ -379,11 +409,10 @@ box or reopen it later.</p>
 
 class DataImportDialog4(TutorialStep):
     def __init__(self, mainwin):
-        mainwin.datadock.show()
         TutorialStep.__init__(
             self, '''
-<p>The dataset viewer shows the currently loaded datasets in the
-document.</p>
+<p>The Data viewing window (flashing) shows the currently loaded
+datasets in the document.</p>
 
 <p>Hover your mouse over datasets to get information about them. You
 can see datasets in more detail in the Data Edit dialog box.</p>
@@ -392,6 +421,9 @@ can see datasets in more detail in the Data Edit dialog box.</p>
 ''', mainwin,
             flash=mainwin.datadock,
             nextstep=AddXYPlotter)
+
+##############
+## XY plotting
 
 class AddXYPlotter(TutorialStep):
     def __init__(self, mainwin):
@@ -417,7 +449,7 @@ class SetXY_X(TutorialStep):
             self, '''
 <p>The datasets to be plotted are in the widget's properties.</p>
 
-<p class="usercmd">Change the X Dataset setting to be the
+<p class="usercmd">Change the "X data" setting to be the
 <code>alpha</code> dataset. You can choose this from the drop down
 menu or type it.</p>
 ''', mainwin,
@@ -430,7 +462,7 @@ class SetXY_Y(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
             self, '''
-<p class="usercmd">Change the Y Dataset setting to be the
+<p class="usercmd">Change the "Y data" setting to be the
 <code>beta</code> dataset.</p>
 ''', mainwin,
             disablenext=True,
@@ -445,12 +477,13 @@ class SetXYLine(TutorialStep):
 <p>Veusz has now plotted the data on the graph. You can manipulate how
 the data are shown using the formatting settings.</p>
 
-<p class="usercmd">Click on the Line formatting settings tab for the
-xy widget.</p>
+<p class="usercmd">Make sure that the line Formatting tab (%s) for the
+widget is selected.</p>
 
-<p class="usercmd">Click on the check box next to the Hide option to
-hide the line plotted between the data points.</p>
-''', mainwin,
+<p class="usercmd">Click on the check box next to the Hide option at
+the bottom, to hide the line plotted between the data points.</p>
+''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
+            mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/PlotLine/hide',
                              lambda val: val),
@@ -462,29 +495,248 @@ class SetXYFill(TutorialStep):
             self, '''
 <p>Now we will change the point color.</p>
 
-<p class="usercmd">Click on the point fill formatting tab (%s), and
-change the fill color of the plotted data.</p>
+<p class="usercmd">Click on the "Marker fill (%s)" formatting tab.
+Change the fill color of the plotted data.</p>
 ''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotmarkerfill.png')),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/MarkerFill/color',
                              lambda val: val != 'black'),
-            nextstep=AddXY2)
+            nextstep=AddXY2nd)
 
-class AddXY2(TutorialStep):
+class AddXY2nd(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
             self, '''
 <h1>Adding a second dataset</h1>
 
-<p></p>
-'''
+<p>We will now plot dataset <code>alpha</code> against
+<code>gamma</code> on the same graph.</p>
+
+<p class="usercmd">Add a second point plotting (xy) widget using the
+flashing icon, or go to the Add menu and choose "Add xy".</p>
+''', mainwin,
+            flash=mainwin.treeedit.addtoolbar.widgetForAction(
+                mainwin.vzactions['add.xy']),
+            disablenext=True,
+            nextonsetting = ('/page1/graph1/xy2/xData',
+                             lambda val: val != ''),
+            nextstep=AddXY2nd_2)
+
+class AddXY2nd_2(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p class="usercmd">Change the "X data" setting to be the
+<code>alpha</code> dataset.</p>
+''', mainwin,
+            disablenext=True,
+            nextonsetting = ('/page1/graph1/xy2/xData',
+                             lambda val: val == 'alpha'),
+            nextstep=AddXY2nd_3)
+
+class AddXY2nd_3(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p class="usercmd">Next, change the "Y data" setting to be the
+<code>gamma</code> dataset.</p>
+''', mainwin,
+            disablenext=True,
+            nextonsetting = ('/page1/graph1/xy2/yData',
+                             lambda val: val == 'gamma'),
+            nextstep=AddXY2nd_4)
+
+class AddXY2nd_4(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>We can fill regions under plots using the Fill Below Formatting tab
+(%s).</p>
+
+<p class="usercmd">Go to this tab, and unselect the "Hide edge fill"
+option.</p>
+''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotfillbelow.png')),
+            mainwin,
+            disablenext=True,
+            nextonsetting = ('/page1/graph1/xy2/FillBelow/hide',
+                             lambda val: not val),
+            nextstep=File1)
+
+class File1(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Saving</h1>
+
+<p>The document can be saved under the File menu, choosing "Save
+as...", or by clicking on the Save icon (flashing).</p>
+
+<p>Veusz documents are simple text files which can be easily modified
+outside the program.</p>
+
+<p class="usercmd">Click Next to continue</p>
+''', mainwin,
+            flash=mainwin.maintoolbar.widgetForAction(
+                mainwin.vzactions['file.save']),
+            nextstep=File2)
+
+class File2(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Exporting</h1>
+
+<p>The document can be exported in scalable (EPS, PDF, SVG and EMF) or
+bitmap formats.</p>
+
+<p>The "Export..." command under the File menu exports the selected
+page. Alternatively, click on the Export icon (flashing).</p>
+
+<p class="usercmd">Click Next to continue</p>
+''', mainwin,
+            flash=mainwin.maintoolbar.widgetForAction(
+                mainwin.vzactions['file.export']),
+            nextstep=Cut1,
+            )
+
+class Cut1(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Cut and paste</h1>
+
+<p>Widgets can be cut and pasted to manipulate the document.</p>
+
+<p class="usercmd">Select the "graph1" widget in the Editing window.</p>
+''', mainwin,
+            disablenext=True,
+            nextonselected='graph1',
+            nextstep=Cut2)
+
+class Cut2(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p class="usercmd">Now click the Cut icon (flashing) or choose "Cut"
+from the Edit menu.</p>
+
+<p>This copies the currently selected widget to the clipboard and
+deletes it from the document.</p>
+''', mainwin,
+            disablenext=True,
+            flash=mainwin.treeedit.edittoolbar.widgetForAction(
+                mainwin.vzactions['edit.cut']),
+            nextstep=AddGrid)
+        self.connect( mainwin.document,
+                      qt4.SIGNAL('sigModified'), self.slotCheckDelete )
+
+    def slotCheckDelete(self, *args):
+        d = self.mainwin.document
+        try:
+            d.resolve(d.basewidget, '/page1/graph1')
+        except ValueError:
+            # success!
+            self.emit( qt4.SIGNAL('nextStep') )
+
+class AddGrid(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>Adding a grid</h1>
+
+<p>Now we will add a grid widget to paste the graph back into.</p>
+
+<p class="usercmd">Click on the flashing Grid widget icon, or choose
+"Add grid" from the Insert menu.</p>
+''', mainwin,
+            flash=mainwin.treeedit.addtoolbar.widgetForAction(
+                mainwin.vzactions['add.grid']),
+            disablenext=True,
+            nextonsetting = ('/page1/grid1/rows',
+                             lambda val: val != ''),
+            nextstep=Paste1)
+
+class Paste1(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p class="usercmd">Now click the Paste icon (flashing) or choose "Paste"
+from the Edit menu.</p>
+
+<p>This pastes back the widget from the clipboard.</p>
+''', mainwin,
+            disablenext=True,
+            flash=mainwin.treeedit.edittoolbar.widgetForAction(
+                mainwin.vzactions['edit.paste']),
+            nextonsetting = ('/page1/grid1/graph1/leftMargin',
+                             lambda val: val != ''),
+            nextstep=Paste2)
+
+class Paste2(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p class="usercmd">For a second time, click the Paste icon (flashing)
+or choose "Paste" from the Edit menu.</p>
+
+<p>This adds a second copy of the original graph to the grid.</p>
+''', mainwin,
+            disablenext=True,
+            flash=mainwin.treeedit.edittoolbar.widgetForAction(
+                mainwin.vzactions['edit.paste']),
+            nextonsetting = ('/page1/grid1/graph2/leftMargin',
+                             lambda val: val != ''),
+            nextstep=Paste3)
+
+class Paste3(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>Having the graphs side-by-side looks a bit messy. We would like to
+change the graphs to be arranged in rows.</p>
+
+<p class="usercmd">Navigate to the grid1 widget properties. Change the
+number of columns to 1.</p>
+''', mainwin,
+            disablenext=True,
+            nextonsetting = ('/page1/grid1/columns',
+                             lambda val: val == 1),
+            nextstep=Paste4)
+
+class Paste4(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<p>We could now adjust the margins of the graphs and the grid.</p>
+
+<p>Axes can also be shared by the graphs of the grid by moving them
+into the grid widget. This shares the same axis scale for graphs.</p>
+
+<p class="usercmd">Click Next to continue</p>
+''', mainwin, nextstep=EndStep)
+
+class EndStep(TutorialStep):
+    def __init__(self, mainwin):
+        TutorialStep.__init__(
+            self, '''
+<h1>The End</h1>
+
+<p>Thank you for working through this Veusz tutorial. We hope you
+enjoy using Veusz!</p>
+
+<p>Please send comments, bug reports and suggestions to the
+developers.</p>
+
+<p>You can try this tutorial again from the Help menu.</p>
+''', mainwin, closestep=True, disablenext=True)
 
 class TutorialDock(qt4.QDockWidget):
     '''A dock tutorial window.'''
 
     def __init__(self, document, mainwin, *args):
         qt4.QDockWidget.__init__(self, *args)
+        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
         self.setWindowTitle('Tutorial - Veusz')
         self.setObjectName('veusztutorialwindow')
 
@@ -506,13 +758,12 @@ class TutorialDock(qt4.QDockWidget):
 
         l.addWidget(self.textedit)
 
-        bb = qt4.QDialogButtonBox()
-        closeb = bb.addButton('Close', qt4.QDialogButtonBox.ActionRole)
-        self.connect(closeb, qt4.SIGNAL('clicked()'), self.slotClose)
-        self.nextb = bb.addButton('Next', qt4.QDialogButtonBox.ActionRole)
+        self.buttonbox = qt4.QDialogButtonBox()
+        self.nextb = self.buttonbox.addButton(
+            'Next', qt4.QDialogButtonBox.ActionRole)
         self.connect(self.nextb, qt4.SIGNAL('clicked()'), self.slotNext)
 
-        l.addWidget(bb)
+        l.addWidget(self.buttonbox)
 
         # have to use a separate widget as dialog already has layout
         self.widget = qt4.QWidget()
@@ -528,22 +779,42 @@ class TutorialDock(qt4.QDockWidget):
         self.flashct = 0
         self.flashtimer.start(500)
 
-        #self.changeStep(StepIntro)
-        #self.changeStep(DataStart)
-        self.changeStep(SetXYFill)
+        self.changeStep(StepIntro)
+
+    def ensureShowFlashWidgets(self):
+        '''Ensure we can see the widgets flashing.'''
+        w = self.flash
+        while w is not None:
+            w.show()
+            w = w.parent()
 
     def changeStep(self, stepklass):
         '''Apply the next step.'''
+
+        # this is the current text
         self.step = stepklass(self.mainwin)
+
+        # listen to step for next step
         self.connect(self.step, qt4.SIGNAL('nextStep'), self.slotNext)
 
+        # update text
         self.textedit.setHtml(self.step.text)
 
+        # handle requests for flashing
         self.flashct = 20
         self.flashon = True
         self.flash = self.step.flash
+        if self.flash is not None:
+            self.ensureShowFlashWidgets()
 
+        # enable/disable next button
         self.nextb.setEnabled(not self.step.disablenext)
+
+        # add a close button if requested
+        if self.step.closestep:
+            closeb = self.buttonbox.addButton(
+                'Close', qt4.QDialogButtonBox.ActionRole)
+            self.connect(closeb, qt4.SIGNAL('clicked()'), self.close)
 
     def slotFlashTimeout(self):
         '''Handle flashing of UI components.'''
@@ -554,8 +825,9 @@ class TutorialDock(qt4.QDockWidget):
             self.oldflash = None
 
         if self.flash:
+            # set flash state and toggle variable
             if self.flashon:
-                self.flash.setStyleSheet('background: lightyellow;')
+                self.flash.setStyleSheet('background: yellow;')
             else:
                 self.flash.setStyleSheet('')
             self.flashon = not self.flashon
@@ -568,10 +840,6 @@ class TutorialDock(qt4.QDockWidget):
 
     def slotNext(self):
         """Move to the next page of the tutorial."""
-        print "next"
         nextstepklass = self.step.nextstep
         if nextstepklass is not None:
             self.changeStep( nextstepklass )
-
-    def slotClose(self):
-        print 'close'
