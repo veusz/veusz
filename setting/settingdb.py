@@ -60,6 +60,9 @@ defaultValues = {
 
     # use cwd as starting directory
     'dirname_usecwd': False,
+
+    # ask tutorial before?
+    'ask_tutorial': False,
     }
 
 class _SettingDB(object):

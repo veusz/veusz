@@ -84,6 +84,13 @@ class MainWindow(qt4.QMainWindow):
         win.treeedit.doInitialWidgetSelect()
             
         cls.windows.append(win)
+
+        # check if tutorial wanted
+        if not setting.settingdb['ask_tutorial']:
+            win.askTutorial()
+        # don't ask again
+        setting.settingdb['ask_tutorial'] = True
+
         return win
 
     def __init__(self, *args):
@@ -124,10 +131,6 @@ class MainWindow(qt4.QMainWindow):
         self.addDockWidget(qt4.Qt.LeftDockWidgetArea, self.formatdock)
         self.datadock = DataNavigatorWindow(self.document, self, self)
         self.addDockWidget(qt4.Qt.RightDockWidgetArea, self.datadock)
-
-        import windows.tutorial
-        self.tutdock = windows.tutorial.TutorialDock(self.document, self, self)
-        self.addDockWidget(qt4.Qt.RightDockWidgetArea, self.tutdock)
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(self.document,
@@ -489,6 +492,9 @@ class MainWindow(qt4.QMainWindow):
             'help.bug':
                 a(self, 'Report a bug on the internet',
                   'Suggestions and bugs', self.slotHelpBug),
+            'help.tutorial':
+                a(self, 'An interactive Veusz tutorial',
+                  'Tutorial', self.slotHelpTutorial),
             'help.about':
                 a(self, 'Displays information about the program', 'About...',
                   self.slotHelpAbout, icon='veusz')
@@ -559,6 +565,8 @@ class MainWindow(qt4.QMainWindow):
             ]
         helpmenu = [
             'help.home', 'help.project', 'help.bug',
+            '',
+            'help.tutorial',
             '',
             ['help.examples', '&Example documents', []],
             '',
@@ -717,6 +725,32 @@ class MainWindow(qt4.QMainWindow):
         """Go to the veusz bug page."""
         qt4.QDesktopServices.openUrl(
             qt4.QUrl('https://gna.org/bugs/?group=veusz') )
+
+    def askTutorial(self):
+        """Ask if tutorial wanted."""
+        retn = qt4.QMessageBox.question(
+            self, "Veusz Tutorial",
+            "Veusz includes a tutorial to help get you started.\n"
+            "Would you like to start the tutorial now?\n"
+            "If not, you can access it later through the Help menu.",
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No
+            )
+
+        if retn == qt4.QMessageBox.Yes:
+            self.slotHelpTutorial()
+
+    def slotHelpTutorial(self):
+        """Show a Veusz tutorial."""
+        if self.document.isBlank():
+            # run the tutorial
+            from veusz.windows.tutorial import TutorialDock
+            tutdock = TutorialDock(self.document, self, self)
+            self.addDockWidget(qt4.Qt.RightDockWidgetArea, tutdock)
+            tutdock.show()
+        else:
+            # open up a blank window for tutorial
+            win = self.CreateWindow()
+            win.slotHelpTutorial()
 
     def slotHelpAbout(self):
         """Show about dialog."""
