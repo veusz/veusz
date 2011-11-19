@@ -85,8 +85,8 @@ class StepIntro(TutorialStep):
 <p>This tutorial aims to get you working with Veusz as quickly as
 possible.</p>
 
-<p>You can close this window at any time using the close button to the
-top-right of this panel. The tutorial can be replayed in the help
+<p>You can close this tutorial at any time using the close button to
+the top-right of this panel. The tutorial can be replayed in the help
 menu.</p>
 
 <p class="usercmd">Press Next to go to the next step</p>
@@ -243,8 +243,8 @@ class FunctionFormatting(TutorialStep):
 <h1>Formatting</h1>
 
 <p>Widgets have a number of formatting options. The Formatting window
-shows the options for the currently selected widget, here the function
-widget.</p>
+(flashing) shows the options for the currently selected widget, here
+the function widget.</p>
 
 <p class="usercmd">Press Next to continue</p>
 ''', mainwin,
@@ -262,10 +262,11 @@ class FunctionFormatLine(TutorialStep):
             self, '''
 <p>Different types of formatting properties are grouped under separate
 tables. The options for drawing the function line are grouped under
-the flashing Line tab.</p>
+the flashing Line tab (%s).</p>
 
 <p class="usercmd">Click on the Line tab to continue.</p>
-''', mainwin,
+''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
+            mainwin,
             flash=label,
             disablenext=True,
             nextstep=FunctionLineFormatting)
@@ -737,6 +738,7 @@ class TutorialDock(qt4.QDockWidget):
     def __init__(self, document, mainwin, *args):
         qt4.QDockWidget.__init__(self, *args)
         self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        self.setMinimumHeight(300)
         self.setWindowTitle('Tutorial - Veusz')
         self.setObjectName('veusztutorialwindow')
 
