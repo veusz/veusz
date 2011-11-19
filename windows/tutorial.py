@@ -131,6 +131,8 @@ class StepWidgetWin(TutorialStep):
 <p>The flashing window is the Editing window, which shows the widgets
 currently in the plot in a hierarchical tree. Each widget has a name
 (the left column) and a type (the right column).</p>
+
+<p class="usercmd">Press Next to continue.</p>
 ''', mainwin,
             nextstep=StepWidgetWinExpand,
             flash=t)
@@ -141,8 +143,8 @@ class StepWidgetWinExpand(TutorialStep):
             self, '''
 <p>The graph widget is the currently selected widget.</p>
 
-<p class="usercmd">Expand the graph widget - click the little arrow to
-its left in the editing window - and select the x axis widget.</p>
+<p class="usercmd">Expand the graph widget - click the arrow or plus
+to its left in the editing window - and select the x axis widget.</p>
 ''', mainwin,
             disablenext=True,
             nextonselected='x',
@@ -727,7 +729,7 @@ class EndStep(TutorialStep):
 enjoy using Veusz!</p>
 
 <p>Please send comments, bug reports and suggestions to the
-developers.</p>
+developers via the mailing list.</p>
 
 <p>You can try this tutorial again from the Help menu.</p>
 ''', mainwin, closestep=True, disablenext=True)
