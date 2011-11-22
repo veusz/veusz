@@ -21,6 +21,7 @@ import os.path
 
 import veusz.qtall as qt4
 import veusz.utils as utils
+import veusz.setting as setting
 
 class TutorialStep(qt4.QObject):
     def __init__(self, text, mainwin,
@@ -331,6 +332,12 @@ class DataImport(TutorialStep):
             disablenext=True,
             nextstep=DataImportDialog)
 
+        # make sure we have the default delimiters
+        for k in ( 'importdialog_csvdelimitercombo_HistoryCombo',
+                   'importdialog_csvtextdelimitercombo_HistoryCombo' ):
+            if k in setting.settingdb:
+                del setting.settingdb[k]
+
         self.connect(mainwin, qt4.SIGNAL('dialogShown'), self.slotDialogShown )
 
     def slotDialogShown(self, dialog):
@@ -343,7 +350,6 @@ class DataImport(TutorialStep):
             # and choosing tab
             dialog.guessImportTab()
             # get rid of existing values
-            dialog.methodtab.currentWidget().reset()
             self.emit( qt4.SIGNAL('nextStep') )
 
 class DataImportDialog(TutorialStep):
