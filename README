@@ -115,8 +115,8 @@ Requirements for source install:
  Qt >= 4.4 (free edition)
    http://www.trolltech.com/products/qt/  
  PyQt >= 4.3 (SIP is required to be installed first)
-   http://www.riverbankcomputing.co.uk/pyqt/
-   http://www.riverbankcomputing.co.uk/sip/
+   http://www.riverbankcomputing.co.uk/software/pyqt/
+   http://www.riverbankcomputing.co.uk/software/sip/
  numpy >= 1.0
    http://numpy.scipy.org/
 
