@@ -8,13 +8,13 @@ Veusz uses distutils for its installation. See below for how to use it.
 
 Requirements:
  python >= 2.4   http://www.python.org/
- PyQt >= 4.3     http://www.riverbankcomputing.co.uk/pyqt/
+ PyQt >= 4.3     http://www.riverbankcomputing.co.uk/software/pyqt/
  numpy >= 1.0    http://numpy.scipy.org/
 
 PyQt requires
  Qt4             http://www.trolltech.com/products/qt/ (free version)
                  version >= 4.4 recommended
- SIP             http://www.riverbankcomputing.co.uk/sip/
+ SIP             http://www.riverbankcomputing.co.uk/software/sip/
 
 Optional requirements:
  PyFITS>=1.1     http://www.stsci.edu/resources/software_hardware/pyfits
