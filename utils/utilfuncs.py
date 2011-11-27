@@ -35,23 +35,32 @@ class IgnoreException(Exception):
     """A special exception class to be ignored by the exception handler."""
 
 def _getVeuszDirectory():
-    """Get installed directory to find files relative to this one."""
+    """Get resource and examples directories for Veusz."""
 
     if hasattr(sys, 'frozen'):
         # for pyinstaller/py2app compatability
-        dirname = os.path.dirname(os.path.abspath(sys.executable))
+        resdir = os.path.dirname(os.path.abspath(sys.executable))
         if sys.platform == 'darwin':
-            # py2app
-            return os.path.join(dirname, '..', 'Resources', 'veusz')
-        else:
-            # pyinstaller
-            return dirname
+            # special case for py2app
+            resdir = os.path.join(resdir, '..', 'Resources', 'veusz')
     else:
         # standard installation
-        return os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-veuszDirectory = _getVeuszDirectory()
-exampleDirectory = os.path.join(veuszDirectory, 'examples')
+    # override data directory with symlink
+    if os.path.exists( os.path.join(resdir, 'resources') ):
+        resdir = os.path.realpath( os.path.join(resdir, 'resources') )
+
+    # override with VEUSZ_RESOURCE_DIR environment variable if necessary
+    resdir = os.environ.get('VEUSZ_RESOURCE_DIR', resdir)
+
+    # now get example directory (which may be a symlink)
+    examplesdir = os.path.realpath( os.path.join(resdir, 'examples') )
+
+    return resdir, examplesdir
+
+# get resource and example directories
+veuszDirectory, exampleDirectory = _getVeuszDirectory()
 
 id_re = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 def validPythonIdentifier(name):

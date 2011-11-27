@@ -28,6 +28,7 @@ import os.path
 import sys
 import numpy
 from distutils.command.install_data import install_data
+from distutils.command.install import install as orig_install
 import pyqtdistutils
 
 # try to get py2app if it exists
@@ -42,15 +43,41 @@ except ImportError:
 # get version
 version = open('VERSION').read().strip()
 
+class install(orig_install):
+    user_options = orig_install.user_options + [
+        # tell veusz where to install its data files
+        ('veusz-resource-dir=', None,
+         'override veusz resource directory location'),
+        ('disable-install-examples', None,
+         'do not install examples files'),
+        ]
+    boolean_options = orig_install.boolean_options + [
+        'disable-install-examples']
+
+    def initialize_options(self):
+        orig_install.initialize_options(self)
+        self.veusz_resource_dir = None
+        self.disable_install_examples = False
+
 # Pete Shinner's distutils data file fix... from distutils-sig
 #  data installer with improved intelligence over distutils
 #  data files are copied into the project directory instead
 #  of willy-nilly
 class smart_install_data(install_data):   
     def run(self):
-        # need to change self.install_dir to the library dir
         install_cmd = self.get_finalized_command('install')
-        self.install_dir = getattr(install_cmd, 'install_lib')
+        if install_cmd.veusz_resource_dir:
+            # override location with veusz-resource-dir option
+            self.install_dir = install_cmd.veusz_resource_dir
+        else:
+            # change self.install_dir to the library dir + veusz by default
+            self.install_dir = os.path.join(install_cmd.install_lib, 'veusz')
+
+        # disable examples install if requested
+        if install_cmd.disable_install_examples:
+            self.data_files = [f for f in self.data_files
+                               if f[0][-8:] != 'examples']
+
         return install_data.run(self)
 
 descr = '''Veusz is a scientific plotting package, designed to create
@@ -96,7 +123,7 @@ def findData(dirname, extns):
     for extn in extns:
         files += glob.glob(os.path.join(dirname, '*.'+extn))
     files.sort()
-    return ( os.path.join('veusz', dirname), files )
+    return (dirname, files)
 
 setup(name = 'veusz',
       version = version,
@@ -125,7 +152,7 @@ setup(name = 'veusz',
                       'veusz.widgets': 'widgets',
                       'veusz.windows': 'windows',
                       },
-      data_files = [ ('veusz', ['VERSION']),
+      data_files = [ ('', ['VERSION']),
                      findData('dialogs', ('ui',)),
                      findData('windows/icons', ('png', 'svg')),
                      findData('examples', ('vsz', 'py', 'csv', 'dat')),
@@ -166,7 +193,8 @@ setup(name = 'veusz',
         ],
                                 
       cmdclass = {'build_ext': pyqtdistutils.build_ext,
-                  'install_data': smart_install_data },
+                  'install_data': smart_install_data,
+                  'install': install},
 
       **extraoptions
       )
