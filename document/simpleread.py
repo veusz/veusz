@@ -514,6 +514,8 @@ class SimpleRead(object):
     def _readDataBlocked(self, stream, ignoretext):
         """Read in the data, using blocks."""
 
+        allparts = list(self.parts)
+
         blocks = {}
         block = 1
         while stream.newLine():
@@ -544,6 +546,7 @@ class SimpleRead(object):
             # lose remaining data
             stream.flushLine()
 
+        self.parts = allparts
         self.blocks = blocks.keys()
 
     def getInvalidConversions(self):
