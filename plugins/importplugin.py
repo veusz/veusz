@@ -18,6 +18,7 @@
 
 """Import plugin base class and helpers."""
 
+import os.path
 import numpy as N
 import veusz.utils as utils
 
@@ -43,7 +44,7 @@ class ImportPluginException(RuntimeError):
 
 class ImportPlugin(object):
     """Define a plugin to read data in a particular format.
-    
+
     Override doImport and optionally getPreview to define a new plugin.
     Register the class by adding it to the importpluginregistry list.
     Of promote_tab is set to some text, put the plugin on its own tab
@@ -159,9 +160,17 @@ class QdpFile(object):
         self.colmodes = {}
         self.skipmode = 'none'
         self.retndata = []
+
+        # store read in data here
         self.data = []
+        # index of max vector
         self.dataindex = 1
         self.colnames = colnames
+
+        # list of data groups for 2d objects
+        self.datagroup2d = []
+        # axis ranges for 2d objects
+        self.axis2d = [None, None]
 
     def handleRead(self, p):
         """Handle read command."""
@@ -189,10 +198,12 @@ class QdpFile(object):
             self.addNans( len(p) )
         elif self.skipmode == 'single':
             self.pushData()
+            del self.data[:]
             self.dataindex += 1
         elif self.skipmode == 'double':
             if lastp[0] == 'no':
                 self.pushData()
+                del self.data[:]
                 self.dataindex += 1
             else:
                 self.addNans( len(p) )
@@ -216,10 +227,43 @@ class QdpFile(object):
                 col += 1
             ds += 1
 
+    def pushData2D(self):
+        """Handle 2D data groups."""
+
+        for num, r1, c1, r2, c2 in self.datagroup2d:
+            arr = []
+            for c in xrange(c1-1,c2-1+1):
+                arr.append( self.data[c][r1-1:r2-1+1] )
+                # make data as "used"
+                self.data[c] = None
+            arr = N.array(arr)
+            if num-1 < len(self.colnames):
+                name = self.colnames[num-1]
+            else:
+                name = 'vec2d%i' % num
+
+            rangex = rangey = None
+            if self.axis2d[0] is not None:
+                minval, pixsize = self.axis2d[0]
+                rangex = (minval - pixsize*0.5,
+                          minval+(arr.shape[1]-0.5)*pixsize )
+            if self.axis2d[1] is not None:
+                minval, pixsize = self.axis2d[1]
+                rangey = (minval - pixsize*0.5,
+                          minval+(arr.shape[0]-0.5)*pixsize )
+
+            ds = datasetplugin.Dataset2D(name, data=arr,
+                                         rangex=rangex, rangey=rangey)
+            self.retndata.append(ds)
+
     def pushData(self):
-        """Add data to output array."""
+        """Add data to output array.
+        """
 
         for i in xrange(len(self.data)):
+            if self.data[i] is None:
+                continue
+
             # get dataset name
             if i < len(self.colnames):
                 name = self.colnames[i]
@@ -246,11 +290,34 @@ class QdpFile(object):
                 raise RuntimeError
 
             self.retndata.append(ds)
-        self.data = []
+
+    def handleDataGroup(self, p):
+        """Handle data groups."""
+
+        if len(p) == 3:
+            # we don't support the renaming thing
+            pass
+        elif len(p) == 6:
+            # 2d data
+            try:
+                pint = [int(x) for x in p[1:]]
+            except ValueError:
+                raise ImportPluginException("invalid 2d datagroup command")
+
+            self.datagroup2d.append(pint)
+
+    def handleAxis(self, p):
+        """Axis command gives range of axes (used for 2d)."""
+
+        try:
+            minval, maxval = float(p[2]), float(p[3])
+        except ValueError:
+            raise ImportPluginException("invalid axis range")
+        self.axis2d[ p[0][0] == 'y' ] = (minval, maxval)
 
     def handleNum(self, p):
         """Handle set of numbers."""
-        
+
         try:
             nums = [float(x) for x in p]
         except ValueError:
@@ -274,8 +341,10 @@ class QdpFile(object):
 
             ds += 1
 
-    def importFile(self, fileobj):
-        """Read data from file object."""
+    def importFile(self, fileobj, dirname):
+        """Read data from file object.
+        dirname is the directory in which the file is located
+        """
 
         contline = None
         lastp = []
@@ -284,9 +353,15 @@ class QdpFile(object):
             if line.find("!") >= 0:
                 line = line[:line.find("!")]
             if line[:1] == '@':
-                # read another file - we don't do this
+                # read another file
+                fname = os.path.join(dirname, line[1:].strip())
+                try:
+                    newf = open(fname)
+                    self.importFile(newf, dirname)
+                except IOError:
+                    pass
                 continue
-            
+
             p = [x.lower() for x in line.split()]
 
             if contline:
@@ -304,21 +379,24 @@ class QdpFile(object):
                 # nothing
                 continue
 
-            if p[0] == 'read':
-                self.handleRead(p)
-            elif p[0][:2] == 'sk':
-                self.handleSkip(p)
-            elif p[0] == 'no':
-                self.handleNO(p, lastp)
-            elif p[0][0] in '0123456789-.':
+            v0 = p[0]
+            if v0[0] in '0123456789-.':
                 self.handleNum(p)
+            elif v0 == 'no':
+                self.handleNO(p, lastp)
+            elif v0 == 'read':
+                self.handleRead(p)
+            elif v0[:2] == 'sk':
+                self.handleSkip(p)
+            elif v0[:2] == 'dg':
+                self.handleDataGroup(p)
+            elif v0[:1] == 'x' or v0[:2] == 'ya':
+                self.handleAxis(p)
             else:
                 # skip everything else (for now)
                 pass
 
             lastp = p
-
-        self.pushData()
 
 class ImportPluginQdp(ImportPlugin):
     """An example plugin for reading data from QDP files."""
@@ -344,7 +422,9 @@ class ImportPluginQdp(ImportPlugin):
 
         f = params.openFileWithEncoding()
         rqdp = QdpFile(names)
-        rqdp.importFile(f)
+        rqdp.importFile(f, os.path.dirname(params.filename))
+        rqdp.pushData2D()
+        rqdp.pushData()
         f.close()
 
         return rqdp.retndata

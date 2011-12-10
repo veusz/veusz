@@ -1,0 +1,23 @@
+LWIDTH   2.
+COL  OFF 1..41
+DG     1       1      1     31     41
+LIne ON    1
+LW   1.0 ON   1
+LIne ON    2
+LW   1.0 ON   2
+CONT  1 LEVEL 197.9456 200.2556 204.85561
+CONT  1 COLOR       1       2       3
+CONT  1 LSTYL       1       1       1
+CONT  1  LWID       1       1       1
+XAX  LIN  1.5 3.33333015E-2
+YAX  LIN 0.69999999 2.49999762E-2
+LOC  0 0 1 1
+LAB  1 POS 2.0544801 1.11201 "+"
+LAB  10 CS 0.75 CEN Top JUS Lef
+LAB  10 POS 1.52 1.6799999 "min = 1.956456e+02; Levels =  1.979456e+02 2.002556e+02 2.048556e+02"
+LAB  F
+LAB  T  Confidence contours: Chi-Squared
+LAB  X  Parameter: kT (keV)
+LAB  Y  Parameter: Abundanc
+R    X1 1.5 2.5
+R    Y1 0.69999999 1.7

@@ -1,0 +1,9 @@
+! example qdp file (no skipping)
+skip single
+read serr 2
+1 5 0.1
+2 3 0.2
+3 4 0.1
+no no no
+5 3 0.2
+6 4 0.1

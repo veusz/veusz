@@ -1,7 +1,7 @@
 include VERSION AUTHORS ChangeLog COPYING INSTALL README
 include MANIFEST.in setup.py setup.cfg
 include scripts/veusz scripts/veusz_listen
-recursive-include tests *.py *.sh *.vsz *.selftest *.csv *.dat *.npy *.npz
+recursive-include tests *.py *.sh *.vsz *.selftest *.csv *.dat *.npy *.npz *.qdp *.pco
 recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html *.xsl *.py *.pod *.1
 recursive-include windows *.png *.ico *.svg README
 recursive-include dialogs *.ui
