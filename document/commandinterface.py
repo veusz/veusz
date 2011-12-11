@@ -31,6 +31,7 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.embed as embed
 import veusz.plugins as plugins
+import veusz.utils as utils
 
 import datasets
 import operations
@@ -54,6 +55,7 @@ class CommandInterface(qt4.QObject):
         'Get',
         'GetChildren',
         'GetData',
+        'GetDataType',
         'GetDatasets',
         'ImportFITSFile',
         'ImportFile',
@@ -77,6 +79,7 @@ class CommandInterface(qt4.QObject):
         'SetData2DExpression',
         'SetData2DExpressionXYZ',
         'SetData2DXYFunc',
+        'SetDataDateTime',
         'SetDataExpression',
         'SetDataRange',
         'SetDataText',
@@ -388,11 +391,24 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
  
         if self.verbose:
-            print "Set variable '%s':" % name
+            print "Set dataset '%s':" % name
             print " Values = %s" % str( data.data )
             print " Symmetric errors = %s" % str( data.serr )
             print " Negative errors = %s" % str( data.nerr )
             print " Positive errors = %s" % str( data.perr )
+
+    def SetDataDateTime(self, name, vals):
+        """Set datetime dataset to be values given.
+        vals is a list of python datetime objects
+        """
+        v = [utils.datetimeToFloat(x) for x in vals]
+        ds = datasets.DatasetDateTime(v)
+        op = operations.OperationDatasetSet(name, ds)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Set dataset '%s':" % name
+            print " Values = %s" % str(ds.data)
 
     def SetDataExpression(self, name, val, symerr=None, negerr=None, poserr=None,
                           linked=False, parametric=None):
@@ -419,7 +435,7 @@ class CommandInterface(qt4.QObject):
         data = self.document.applyOperation(op)
         
         if self.verbose:
-            print "Set variable '%s' based on expression:" % name
+            print "Set dataset '%s' based on expression:" % name
             print " Values = %s" % str( data.data )
             print " Symmetric errors = %s" % str( data.serr )
             print " Negative errors = %s" % str( data.nerr )
@@ -444,7 +460,7 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
         
         if self.verbose:
-            print "Set variable '%s' based on range:" % name
+            print "Set dataset '%s' based on range:" % name
             print " Number of steps = %i" % numsteps
             print " Range of data = %s" % repr(val)
             print " Range of symmetric error = %s" % repr(symerr)
@@ -532,28 +548,30 @@ class CommandInterface(qt4.QObject):
 
         if self.verbose:
             print "Set text dataset '%s'" % name
-            print " Values = %s" % str(data.data)
+            print " Values = %s" % unicode(data.data)
 
     def GetData(self, name):
         """Return the data with the name.
 
-        Returns a tuple containing:
+        For a 1D dataset, returns a tuple (None if not defined)
             (data, serr, nerr, perr)
-        if 'name' is a Dataset, and 
-            data
-        if 'name' is a DatasetText, where data is a list.
-
-        Values not defined are set to None
+        For a 2D dataset, returns
+            (data, xrange, yrange)
+        For a text dataset, return a list of text
+        For a date dataset, return a list of python datetime objects
 
         Return copies, so that the original data can't be indirectly modified
         """
 
         d = self.document.getData(name)
-        data = serr = nerr = perr = None
-        if isinstance(d, datasets.DatasetText):
+        if d.displaytype == 'text':
             return d.data[:]
+        elif d.displaytype == 'date':
+            return [utils.floatToDateTime(x) for x in d.data]
+        elif d.dimensions == 2:
+            return (d.data.copy(), d.xrange, d.yrange)
         else:
-
+            data = serr = nerr = perr = None
             if d.data is not None:
                 data = d.data.copy()
             if d.serr is not None:
@@ -564,6 +582,28 @@ class CommandInterface(qt4.QObject):
                 perr = d.perr.copy()
 
             return (data, serr, nerr, perr)
+
+    def GetDataType(self, name):
+        """Return the type of dataset. Returns None if no dataset.
+
+        For a 1D dataset, returns '1d'
+        For a 2D dataset, returns '2d'
+        For a text dataset, returns 'text'
+        For a datetime dataset, returns 'datetime'
+        """
+
+        try:
+            d = self.document.getData(name)
+        except KeyError:
+            return None
+        if d.displaytype == 'text':
+            return 'text'
+        elif d.displaytype == 'date':
+            return 'datetime'
+        elif d.dimensions == 2:
+            return '2d'
+        else:
+            return '1d'
 
     def ImportString(self, descriptor, string, useblocks=False):
         """Read data from the string using a descriptor.

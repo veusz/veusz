@@ -1330,13 +1330,18 @@ SetData('y', y)
 	<title><anchor id="Command.GetData" />GetData</title>
 	<para><command>GetData(name)</command></para>
 
-	<para>Returns: A tuple containing the dataset with the name
-	  given. If <command>name</command> refers to numpy array data, the tuple is 
-	  (data, symerr, negerr, poserr), with each a numpy array of the same size or 
-	  None. data are the values of the dataset, symerr are the symmetric errors 
-	  (if set), negerr and poserr and negative and positive asymmetric errors 
-	  (if set). If <command>name</command> refers to a text dataset, a list
-	  of text elements is returned.</para>
+	<para>Returns: For a 1D dataset, a tuple containing the
+	dataset with the name given. The value is (data, symerr,
+	negerr, poserr), with each a numpy array of the same size or
+	None. data are the values of the dataset, symerr are the
+	symmetric errors (if set), negerr and poserr and negative and
+	positive asymmetric errors (if set). If a text dataset, return
+	a list of text elements. If the dataset is a date-time
+	dataset, return a list of Python datetime objects. If the
+	dataset is a 2D dataset return the tuple (data, rangex,
+	rangey), where data is a 2D numpy array and rangex/y are
+	tuples giving the range of the x and y coordinates of the
+	data.</para>
 
 	<informalexample>
 	  <programlisting>
@@ -1344,6 +1349,15 @@ data = GetData('x')
 SetData('x', data[0]*0.1, *data[1:])
 </programlisting>
 	</informalexample>
+      </section>
+
+      <section>
+	<title><anchor id="Command.GetDataType" />GetDataType</title>
+	<para><command>GetDataType(name)</command></para>
+
+	<para>Get type of dataset with name given. Returns '1d' for a
+	1d dataset, '2d' for a 2d dataset, 'text' for a text dataset
+	and 'datetime' for a datetime dataset.</para>
       </section>
 
       <section>
@@ -1805,6 +1819,17 @@ Set('page1/graph1/x/min', -10.)
 	in xstep as a tuple, the y values similarly. If linked remains
 	as False, then a real 2D dataset is created, where values can
 	be modified and the data are stored in the saved file.</para>
+      </section>
+
+      <section>
+	<title><anchor id="Command.SetDataDateTime"
+	/>SetDataDateTime</title>
+
+	<para><command>SetDataDateTime('name', vals)</command></para>
+
+	<para>Creates a datetime dataset of name given. vals is a list
+	of Python datetime objects.</para>
+
       </section>
 
       <section>
