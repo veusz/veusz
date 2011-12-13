@@ -947,6 +947,65 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to subtract mean from dataset."""
+
+    menu = ('Compute', 'Subtract mean',)
+    name = 'Subtract Mean'
+    description_short = 'Subtract mean from dataset'
+    description_full = ('Subtract mean from dataset,'
+                        ' optionally dividing by standard deviation.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset 1'),
+            field.FieldBool('divstddev', 'Divide by standard deviation'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do scaling of dataset."""
+
+        dsin = helper.getDataset(fields['ds_in'])
+
+        vals = dsin.data
+        mean = vals[N.isfinite(vals)].mean()
+        vals = vals - mean
+
+        if fields['divstddev']:
+            vals /= vals[N.isfinite(vals)].std()
+
+        self.dsout.update(
+            data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
+
+class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to subtract minimum from dataset."""
+
+    menu = ('Compute', 'Subtract minimum',)
+    name = 'Subtract Minimum'
+    description_short = 'Subtract minimum from dataset'
+    description_full = 'Subtract the minimum value from a dataset'
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset 1'),
+            field.FieldDataset('ds_out', 'Output dataset name'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do scaling of dataset."""
+
+        dsin = helper.getDataset(fields['ds_in'])
+
+        vals = dsin.data
+        minval = vals[N.isfinite(vals)].min()
+        vals = vals - minval
+
+        self.dsout.update(
+            data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
+
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
 
@@ -1245,6 +1304,8 @@ datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
     SubtractDatasetPlugin,
+    SubtractMeanDatasetPlugin,
+    SubtractMinimumDatasetPlugin,
     MeanDatasetPlugin,
     MultiplyDatasetPlugin,
     MultiplyDatasetsPlugin,
