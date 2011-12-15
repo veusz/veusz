@@ -109,5 +109,6 @@ class Numpy2DIntObj
   PyObject* _array;
 };
 
+PyObject* doubleArrayToNumpy(const double* d, int len);
 
 #endif

@@ -130,3 +130,15 @@ Numpy2DIntObj::~Numpy2DIntObj()
   data = 0;
 }
 
+PyObject* doubleArrayToNumpy(const double* d, int len)
+{
+  npy_int dims[1];
+  dims[0] = len;
+  PyObject* n = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+
+  double* pydata = (double*) ((PyArrayObject*)(n))->data;
+  for(int i = 0; i < len; ++i)
+    pydata[i] = d[i];
+
+  return n;
+}

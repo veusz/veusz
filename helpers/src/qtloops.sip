@@ -37,6 +37,7 @@ class QtLoops
 #include <polygonclip.h>
 #include <polylineclip.h>
 #include <beziers_qtwrap.h>
+#include <numpyfuncs.h>
 %End
 
 public:
@@ -200,3 +201,20 @@ public:
   int metric(QPaintDevice::PaintDeviceMetric metric) const;
   int drawItemCount() const;
  };
+
+SIP_PYOBJECT binData(SIP_PYOBJECT data, int binning, bool average);
+%MethodCode
+   try
+     {
+       Numpy1DObj d(a0);
+       double* data;
+       int numelem;
+       binData(d, a1, a2, &numelem, &data);
+       sipRes = doubleArrayToNumpy(data, numelem);
+       delete[] data;
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
+%End
