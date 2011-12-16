@@ -132,7 +132,7 @@ Numpy2DIntObj::~Numpy2DIntObj()
 
 PyObject* doubleArrayToNumpy(const double* d, int len)
 {
-  npy_int dims[1];
+  npy_intp dims[1];
   dims[0] = len;
   PyObject* n = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
 
