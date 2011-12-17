@@ -85,8 +85,7 @@ void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
     }
   
-  if( scaling )
-    delete scaling;
+  delete scaling;
 }
 %End
 
@@ -217,4 +216,29 @@ SIP_PYOBJECT binData(SIP_PYOBJECT data, int binning, bool average);
      {
        sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
      }
+%End
+
+SIP_PYOBJECT rollingAverage(SIP_PYOBJECT data, SIP_PYOBJECT weights,
+			    int width);
+%MethodCode
+{
+  Numpy1DObj* weightarray = 0;
+  try
+    {
+      Numpy1DObj d(a0);
+      if( a1 != Py_None ) {
+	weightarray = new Numpy1DObj(a1);
+      }
+      double* data;
+      int numelem;
+      rollingAverage(d, weightarray, a2, &numelem, &data);
+      sipRes = doubleArrayToNumpy(data, numelem);
+      delete[] data;
+    }
+  catch( const char *msg )
+    {
+      sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+    }
+  delete weightarray;
+}
 %End

@@ -25,6 +25,10 @@ from itertools import izip
 import field
 
 import veusz.utils as utils
+try:
+    import veusz.helpers.qtloops as qtloops
+except ImportError:
+    pass
 
 # add an instance of your class to this list to be registered
 datasetpluginregistry = []
@@ -1259,7 +1263,7 @@ class PolarToCartesianPlugin(DatasetPlugin):
         self.y_out.update(data=y)
 
 class FilterDatasetPlugin(_OneOutputDatasetPlugin):
-    """Dataset plugin to add a constant to a dataset."""
+    """Dataset plugin to filter a dataset using an expression."""
 
     menu = ('Filter', 'Expression',)
     name = 'FilterExpression'
@@ -1300,6 +1304,40 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class MovingAveragePlugin(_OneOutputDatasetPlugin):
+    """Compute moving average for dataset."""
+
+    menu = ('Filtering', 'Moving Average',)
+    name = 'MovingAverage'
+    description_short = 'Compute moving average for regularly spaced data'
+    description_full = ('Compute moving average for regularly spaced data.'
+                        'Average is computed either\nside of each data point '
+                        'by number of points given.')
+    
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldInt('width', 'Points either side of point to average',
+                           default=1, minval=0),
+            field.FieldBool('weighterrors', 'Weight by error bars',
+                            default=True),
+            field.FieldDataset('ds_out', 'Output dataset'),
+            ]
+    
+    def updateDatasets(self, fields, helper):
+        """Do shifting of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        weights = None
+        if fields['weighterrors']:
+            if ds_in.serr is not None:
+                weights = 1. / ds_in.serr**2
+            elif ds_in.perr is not None and ds_in.nerr is not None:
+                weights = 1. / ( (ds_in.perr**2+ds_in.nerr**2)/2. )
+        width = fields['width']
+        data = qtloops.rollingAverage(ds_in.data, weights, width)
+        self.dsout.update(data=data)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1323,4 +1361,6 @@ datasetpluginregistry += [
     PolarToCartesianPlugin,
 
     FilterDatasetPlugin,
+
+    MovingAveragePlugin,
     ]
