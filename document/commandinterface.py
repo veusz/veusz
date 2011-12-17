@@ -132,17 +132,14 @@ class CommandInterface(qt4.QObject):
         """Specify whether we want verbose output after operations."""
         self.verbose = v
 
-    def Add(self, widgettype, *args, **args_opt):
+    def Add(self, widgettype, **args_opt):
         """Add a widget to the widget with the type given.
 
-        optional argument:
+        optional arguments:
           widget: widget path to place widget in
-
-        The optional arguments are sent to construct the widget.
-
-        If autoadd is True (the default), then any sub widgets
-        associated with the widgets are added automatically (e.g. axes
-        for graph widgets).
+          autoadd: if True (default), any subwidgets associated with
+            widget are created automatically
+          setting names, e.g. leftMargin='1cm', Border_color='red'
         """
 
         at = self.currentwidget
@@ -150,7 +147,7 @@ class CommandInterface(qt4.QObject):
             at = self.document.resolve(self.currentwidget, args_opt['widget'])
             del args_opt['widget']
 
-        op = operations.OperationWidgetAdd(at, widgettype, *args, **args_opt)
+        op = operations.OperationWidgetAdd(at, widgettype, **args_opt)
         w = self.document.applyOperation(op)
 
         if self.verbose:

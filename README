@@ -121,8 +121,6 @@ Requirements for source install:
    http://numpy.scipy.org/
 
 Optional:
- Microsoft Core Fonts (recommended for nice output)
-   http://corefonts.sourceforge.net/
  PyFITS >= 1.1 (optional for FITS import)
    http://www.stsci.edu/resources/software_hardware/pyfits
  pyemf >= 2.0.0 (optional for EMF export)
@@ -131,7 +129,8 @@ Optional:
    http://code.google.com/p/pyminuit/
  For EMF and better SVG export, PyQt >= 4.6 or better is
    required, to fix a bug in the C++ wrapping
-   
+ dbus-python, for dbus interface
+   http://dbus.freedesktop.org/doc/dbus-python/
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
