@@ -46,7 +46,7 @@ private:
   QVector<PyObject*> _arrays;
 };
 
-// class for converting numpy array to a valarray
+// class for converting numpy array to an array
 class Numpy1DObj
 {
  public:
@@ -67,7 +67,7 @@ class Numpy1DObj
   PyObject* _array;
 };
 
-// class for converting a 2D numpy array to a valarray
+// class for converting a 2D numpy array to an array
 class Numpy2DObj
 {
  public:
@@ -88,7 +88,7 @@ class Numpy2DObj
   PyObject* _array;
 };
 
-// class for converting a 2D numpy array to an integer valarray
+// class for converting a 2D numpy array to an integer array
 class Numpy2DIntObj
 {
  public:

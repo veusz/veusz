@@ -27,4 +27,12 @@ void binData(const Numpy1DObj& indata, int binning,
 	     bool average,
 	     int* numoutbins, double** outdata);
 
+
+// rolling average calculation
+// weights is an optional weighting array
+void rollingAverage(const Numpy1DObj& indata,
+		    const Numpy1DObj* weights,
+		    int width,
+		    int* numoutbins, double** outdata);
+
 #endif

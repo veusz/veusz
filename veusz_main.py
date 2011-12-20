@@ -189,6 +189,8 @@ def run():
     # have too long a wait before it shows
     import veusz.setting
     import veusz.widgets
+    import veusz.utils.vzdbus as vzdbus
+    vzdbus.setup()
 
     # for people who want to run any old script
     veusz.setting.transient_settings['unsafe_mode'] = bool(

@@ -28,6 +28,7 @@ import veusz.qtall as qt4
 
 import veusz.document as document
 import veusz.utils as utils
+import veusz.utils.vzdbus as vzdbus
 import veusz.setting as setting
 import veusz.plugins as plugins
 
@@ -53,6 +54,26 @@ import veusz.dialogs.dataeditdialog as dataeditdialog
 
 # shortcut to this
 setdb = setting.settingdb
+
+class DBusWinInterface(vzdbus.Object):
+    """Simple DBus interface to window for triggering actions."""
+
+    interface = 'org.veusz.actions'
+
+    def __init__(self, actions, index):
+        prefix = '/Windows/%i/Actions' % index
+        vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
+        self.actions = actions
+
+    @vzdbus.method(dbus_interface=interface, out_signature='as')
+    def GetActions(self):
+        """Get list of actions which can be activated."""
+        return list(sorted(self.actions.keys()))
+
+    @vzdbus.method(dbus_interface=interface, in_signature='s')
+    def TriggerAction(self, action):
+        """Activate action given."""
+        self.actions[unicode(action)].trigger()
 
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
@@ -212,6 +233,11 @@ class MainWindow(qt4.QMainWindow):
         self.connect(self.document, qt4.SIGNAL('check_allowed_imports'),
                      self.slotAllowedImportsDoc)
 
+        # add on dbus interface
+        self.dbusdocinterface = document.DBusInterface(self.document)
+        self.dbuswininterface = DBusWinInterface(
+            self.vzactions, self.dbusdocinterface.index)
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().showMessage(text, 2000)
@@ -337,7 +363,7 @@ class MainWindow(qt4.QMainWindow):
                 """Load plugin dialog"""
                 handlePlugin(self, self.document, pluginkls)
 
-            actname = menuname + '.' + '.'.join(pluginkls.name)
+            actname = menuname + '.' + '.'.join(pluginkls.menu)
             text = pluginkls.menu[-1]
             if pluginkls.has_parameters:
                 text += '...'

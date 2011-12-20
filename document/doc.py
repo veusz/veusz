@@ -64,7 +64,7 @@ def getSuitableParent(widgettype, initialwidget):
     while parent is not None and not wc.willAllowParent(parent):
         parent = parent.parent
     return parent
-            
+
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
