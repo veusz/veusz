@@ -111,7 +111,7 @@ class _SettingDB(object):
             if default == 'LightBase':
                 base = qt4.qApp.palette().color(qt4.QPalette.Base)
                 if base.value() < 127:
-                    base = qt4.Qt.white
+                    base = qt4.QColor(qt4.Qt.white)
                 return base
 
             return qt4.QColor(default)
