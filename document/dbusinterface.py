@@ -19,7 +19,7 @@
 """DBus interface to Veusz document."""
 
 import veusz.utils.vzdbus as vzdbus
-import commandinterface
+import commandinterpreter
 
 class DBusInterface(vzdbus.Object):
     """DBus interface to Veusz document command interface."""
@@ -32,18 +32,29 @@ class DBusInterface(vzdbus.Object):
         vzdbus.Object.__init__(self, vzdbus.sessionbus, root)
         self.index = DBusInterface._ctr
         DBusInterface._ctr += 1
-        self.ci = commandinterface.CommandInterface(doc)
+        self.cmdinter = commandinterpreter.CommandInterpreter(doc)
+        self.ci = self.cmdinter.interface
 
     @vzdbus.method(dbus_interface=interface,
-                   in_signature='ssa{sv}',
+                   in_signature='s')
+    def RunPython(self, cmdstr):
+        return self.cmdinter.run(cmdstr)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='sa{sv}')
+    def Action(self, action, optargs):
+        return self.ci.Action(action, **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='sa{sv}',
                    out_signature='s')
-    def Add(self, path, wtype, optargs):
-        return self.ci.Add(wtype, widget=path, **optargs)
+    def Add(self, wtype, optargs):
+        return self.ci.Add(wtype, **optargs)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sssa{sv}')
-    def AddCustom(self, type, name, val, argsv):
-        self.ci.AddCustom(type, name, val, **argsv)
+    def AddCustom(self, thetype, name, val, argsv):
+        self.ci.AddCustom(thetype, name, val, **argsv)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s')
@@ -85,6 +96,8 @@ class DBusInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s', out_signature='adadadad')
     def GetData1D(self, datasetname):
+        """Get a numeric dataset. Returns lists of numeric values
+        for data, symmetric error, negative error and positive error."""
         def lornull(l):
             """Get blank list if None or convert to list otherwise."""
             if l is None: return []
@@ -95,6 +108,11 @@ class DBusInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s', out_signature='iiddddad')
     def GetData2D(self, datasetname):
+        """Get a 2D dataset. Returns
+        (X dim, Y dim, rangex min, rangex max,
+         rangey min, rangey max,
+         data (as 1d numeric array))
+        """
         data = self.ci.GetData(unicode(datasetname))
         return ( data[0].shape[1], data[0].shape[0],
                  data[1][0], data[1][1], data[2][0], data[2][1],
@@ -103,6 +121,7 @@ class DBusInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s', out_signature='as')
     def GetDataText(self, datasetname):
+        """Get a text dataset as an array of strings."""
         return self.ci.GetData(unicode(datasetname))
 
     @vzdbus.method(dbus_interface=interface,
@@ -111,11 +130,41 @@ class DBusInterface(vzdbus.Object):
         return self.ci.GetDatasets()
 
     @vzdbus.method(dbus_interface=interface,
-                   in_signature='ssb')
-    def ImportString(self, descriptor, string, useblocks):
+                   in_signature='ssa{sv}')
+    def ImportFile(self, filename, descriptor, optargs):
+        self.ci.ImportFile(filename, descriptor, **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='sasa{sv}')
+    def ImportFile2D(self, filename, datasetnames, optargs):
+        self.ci.ImportFile2D(filename, datasetnames, **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='sa{sv}')
+    def ImportFileCSV(self, filename, optargs):
+        self.ci.ImportFileCSV(filename, **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='sssa{sv}')
+    def ImportFITSFile(self, dsname, filename, hdu, optargs):
+        self.ci.ImportFITSFile(filename, **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='ssa{sv}')
+    def ImportFileCSV(self, plugin, filename, optargs):
+        self.ci.ImportFilePlugin(plugin, filename, **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='ssa{sv}')
+    def ImportString(self, descriptor, string, optargs):
         self.ci.ImportString(unicode(descriptor), unicode(string),
-                             useblocks=useblocks)
- 
+                             **optargs)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='s')
+    def Load(self, filename):
+        self.cmdinter.Load(filename)
+
     @vzdbus.method(dbus_interface=interface)
     def Print(self):
         self.ci.Print()
@@ -199,6 +248,11 @@ class DBusInterface(vzdbus.Object):
                    in_signature='ss')
     def SetToReference(self, var, val):
         self.ci.SetToReference(var, val)
+
+    @vzdbus.method(dbus_interface=interface,
+                   in_signature='s')
+    def To(self, path):
+        self.ci.To(path)
 
     # node interface
 
