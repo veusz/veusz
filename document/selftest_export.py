@@ -18,10 +18,6 @@
 
 """A paint engine for doing self-tests."""
 
-import sys
-import struct
-import veusz.qtall as qt4
-
 import svg_export
 
 class SelfTestPaintEngine(svg_export.SVGPaintEngine):
@@ -41,8 +37,8 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
         text = unicode(textitem.text()).encode('ascii', 'xmlcharrefreplace')
         svg_export.SVGElement(self.celement, 'text',
                               'x="%s" y="%s" font-size="%gpt" fill="%s"' %
-                              (svg_export.fltStr(pt.x()),
-                               svg_export.fltStr(pt.y()),
+                              (svg_export.fltStr(pt.x()*svg_export.scale),
+                               svg_export.fltStr(pt.y()*svg_export.scale),
                                textitem.font().pointSize(),
                                self.pen.color().name()),
                               text=text)
@@ -51,6 +47,5 @@ class SelfTestPaintDevice(svg_export.SVGPaintDevice):
      """Paint device for SVG paint engine."""
 
      def __init__(self, fileobj, width_in, height_in):
-          qt4.QPaintDevice.__init__(self)
+          svg_export.SVGPaintDevice.__init__(self, fileobj, width_in, height_in)
           self.engine = SelfTestPaintEngine(width_in, height_in)
-          self.fileobj = fileobj

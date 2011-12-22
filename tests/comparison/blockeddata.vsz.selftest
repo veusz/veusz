@@ -30,8 +30,6 @@
 <use xlink:href="#p0" x="107.05" y="414.79"/>
 <use xlink:href="#p0" x="200.24" y="240.07"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke-width="0.62">
 <polyline fill="none" points="107.05,473.03 246.83,298.31 340.01,181.83 433.19,65.35"/>
 </g>

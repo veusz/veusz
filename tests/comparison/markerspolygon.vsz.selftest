@@ -29,8 +29,6 @@
 </g>
 <use xlink:href="#p0" x="275.94" y="34.74"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="265.77,78.83 260.24,46.58"/>
 </g>
@@ -40,8 +38,6 @@
 </g>
 <use xlink:href="#p1" x="260.24" y="46.58"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="251.7,79.85 243.36,47.8"/>
 </g>
@@ -51,8 +47,6 @@
 </g>
 <use xlink:href="#p2" x="243.36" y="47.8"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="234.53,73.4 222.75,40.06"/>
 </g>
@@ -62,8 +56,6 @@
 </g>
 <use xlink:href="#p3" x="222.75" y="40.06"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="214.24,64.9 198.4,29.87"/>
 </g>
@@ -73,8 +65,6 @@
 </g>
 <use xlink:href="#p4" x="198.4" y="29.87"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="193.4,61.02 173.39,25.21"/>
 </g>
@@ -84,8 +74,6 @@
 </g>
 <use xlink:href="#p5" x="173.39" y="25.21"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="176.03,66.38 152.55,31.64"/>
 </g>
@@ -95,8 +83,6 @@
 </g>
 <use xlink:href="#p6" x="152.55" y="31.64"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="165.35,81.47 139.74,49.74"/>
 </g>
@@ -106,8 +92,6 @@
 </g>
 <use xlink:href="#p7" x="139.74" y="49.74"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="161.74,102.68 135.41,75.2"/>
 </g>
@@ -117,8 +101,6 @@
 </g>
 <use xlink:href="#p8" x="135.41" y="75.2"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="162.05,124.45 135.77,101.32"/>
 </g>
@@ -128,8 +110,6 @@
 </g>
 <use xlink:href="#p9" x="135.77" y="101.32"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="160.96,142.1 134.47,122.51"/>
 </g>
@@ -139,8 +119,6 @@
 </g>
 <use xlink:href="#p10" x="134.47" y="122.51"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="153.69,154.04 125.75,136.83"/>
 </g>
@@ -150,8 +128,6 @@
 </g>
 <use xlink:href="#p11" x="125.75" y="136.83"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="138.66,162.04 107.7,146.43"/>
 </g>
@@ -161,8 +137,6 @@
 </g>
 <use xlink:href="#p12" x="107.7" y="146.43"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="118.66,169.85 83.71,155.8"/>
 </g>
@@ -172,8 +146,6 @@
 </g>
 <use xlink:href="#p13" x="83.71" y="155.8"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="99.81,180.78 61.09,168.92"/>
 </g>
@@ -183,8 +155,6 @@
 </g>
 <use xlink:href="#p14" x="61.09" y="168.92"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="88.65,195.94 59.84,189.73"/>
 </g>
@@ -193,8 +163,6 @@
 <path d="m-6.25,-6.25l-6.25,6.25l6.25,6.25m-6.25,-6.25l12.5,0"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="88.89,213.88 59.84,210.16"/>
 </g>
@@ -203,8 +171,6 @@
 <path d="m-6.25,-6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="99.47,231.83 60.68,230.18"/>
 </g>
@@ -214,8 +180,6 @@
 </g>
 <use xlink:href="#p15" x="60.68" y="230.18"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="114.98,247.65 79.29,249.17"/>
 </g>
@@ -225,8 +189,6 @@
 </g>
 <use xlink:href="#p16" x="79.29" y="249.17"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="128.24,261.22 95.2,265.45"/>
 </g>
@@ -236,8 +198,6 @@
 </g>
 <use xlink:href="#p17" x="95.2" y="265.45"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="133.82,274.47 101.91,281.34"/>
 </g>
@@ -247,8 +207,6 @@
 </g>
 <use xlink:href="#p18" x="101.91" y="281.34"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="130.64,289.92 98.08,299.89"/>
 </g>
@@ -258,8 +216,6 @@
 </g>
 <use xlink:href="#p19" x="98.08" y="299.89"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="122.33,308.82 88.11,322.57"/>
 </g>
@@ -269,8 +225,6 @@
 </g>
 <use xlink:href="#p20" x="88.11" y="322.57"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="115.36,329.85 79.75,347.8"/>
 </g>
@@ -280,8 +234,6 @@
 </g>
 <use xlink:href="#p21" x="79.75" y="347.8"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="115.76,349.46 80.22,371.34"/>
 </g>
@@ -291,8 +243,6 @@
 </g>
 <use xlink:href="#p22" x="80.22" y="371.34"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="126.2,363.74 92.76,388.48"/>
 </g>
@@ -302,8 +252,6 @@
 </g>
 <use xlink:href="#p23" x="92.76" y="388.48"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="144.99,370.7 115.31,396.83"/>
 </g>
@@ -313,8 +261,6 @@
 </g>
 <use xlink:href="#p24" x="115.31" y="396.83"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="167.19,371.78 141.94,398.12"/>
 </g>
@@ -324,8 +270,6 @@
 </g>
 <use xlink:href="#p25" x="141.94" y="398.12"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="187.33,371.46 166.11,397.74"/>
 </g>
@@ -335,8 +279,6 @@
 </g>
 <use xlink:href="#p26" x="166.11" y="397.74"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="202.09,375.19 183.83,402.22"/>
 </g>
@@ -346,8 +288,6 @@
 </g>
 <use xlink:href="#p27" x="183.83" y="402.22"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="211.66,386.42 195.31,415.69"/>
 </g>
@@ -357,8 +297,6 @@
 </g>
 <use xlink:href="#p28" x="195.31" y="415.69"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="219.07,404.54 204.2,437.44"/>
 </g>
@@ -368,8 +306,6 @@
 </g>
 <use xlink:href="#p29" x="204.2" y="437.44"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="228.14,424.84 215.08,461.79"/>
 </g>
@@ -379,8 +315,6 @@
 </g>
 <use xlink:href="#p30" x="215.08" y="461.79"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="241.22,440.55 232.6,473.65"/>
 </g>
@@ -389,8 +323,6 @@
 <path d="m0,6.25l-1.19,-3.36l-3.22,1.53l1.53,-3.22l-3.36,-1.19l3.36,-1.19l-1.53,-3.22l3.22,1.53l1.19,-3.36l1.19,3.36l3.22,-1.53l-1.53,3.22l3.36,1.19l-3.36,1.19l1.53,3.22l-3.22,-1.53l-1.19,3.36"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="258.07,446.2 253.37,473.65"/>
 </g>
@@ -399,8 +331,6 @@
 <path d="m0,6.25l-1.56,-3.54l-3.85,0.42l2.29,-3.12l-2.29,-3.12l3.85,0.42l1.56,-3.54l1.56,3.54l3.85,-0.42l-2.29,3.12l2.29,3.12l-3.85,-0.42l-1.56,3.54"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="276.37,440.35 273.54,473.65"/>
 </g>
@@ -409,8 +339,6 @@
 <path d="m0,6.25l-2.21,-4.04l-4.04,-2.21l4.04,-2.21l2.21,-4.04l2.21,4.04l4.04,2.21l-4.04,2.21l-2.21,4.04"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="293.42,426.44 293.42,463.71"/>
 </g>
@@ -420,8 +348,6 @@
 </g>
 <use xlink:href="#p31" x="293.42" y="463.71"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="307.98,411.18 310.9,445.4"/>
 </g>
@@ -431,8 +357,6 @@
 </g>
 <use xlink:href="#p32" x="310.9" y="445.4"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="321.07,401.31 326.6,433.56"/>
 </g>
@@ -442,8 +366,6 @@
 </g>
 <use xlink:href="#p33" x="326.6" y="433.56"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="335.14,400.29 343.48,432.34"/>
 </g>
@@ -453,8 +375,6 @@
 </g>
 <use xlink:href="#p34" x="343.48" y="432.34"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="352.31,406.74 364.09,440.08"/>
 </g>
@@ -464,8 +384,6 @@
 </g>
 <use xlink:href="#p35" x="364.09" y="440.08"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="372.6,415.24 388.44,450.27"/>
 </g>
@@ -475,8 +393,6 @@
 </g>
 <use xlink:href="#p36" x="388.44" y="450.27"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="393.44,419.12 413.45,454.93"/>
 </g>
@@ -486,8 +402,6 @@
 </g>
 <use xlink:href="#p37" x="413.45" y="454.93"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="410.81,413.76 434.29,448.5"/>
 </g>
@@ -497,8 +411,6 @@
 </g>
 <use xlink:href="#p38" x="434.29" y="448.5"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="421.48,398.68 447.1,430.4"/>
 </g>
@@ -508,8 +420,6 @@
 </g>
 <use xlink:href="#p39" x="447.1" y="430.4"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="425.1,377.46 451.43,404.94"/>
 </g>
@@ -519,8 +429,6 @@
 </g>
 <use xlink:href="#p40" x="451.43" y="404.94"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="424.79,355.69 451.06,378.82"/>
 </g>
@@ -530,8 +438,6 @@
 </g>
 <use xlink:href="#p41" x="451.06" y="378.82"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="425.88,338.04 452.37,357.63"/>
 </g>
@@ -541,8 +447,6 @@
 </g>
 <use xlink:href="#p42" x="452.37" y="357.63"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="433.15,326.1 461.09,343.31"/>
 </g>
@@ -552,8 +456,6 @@
 </g>
 <use xlink:href="#p43" x="461.09" y="343.31"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="448.18,318.1 479.13,333.71"/>
 </g>
@@ -563,8 +465,6 @@
 </g>
 <use xlink:href="#p44" x="479.13" y="333.71"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="468.18,310.29 503.13,324.34"/>
 </g>
@@ -574,8 +474,6 @@
 </g>
 <use xlink:href="#p45" x="503.13" y="324.34"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="487.03,299.36 525.75,311.22"/>
 </g>
@@ -585,8 +483,6 @@
 </g>
 <use xlink:href="#p46" x="525.75" y="311.22"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="498.19,284.2 527,290.41"/>
 </g>
@@ -595,8 +491,6 @@
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.12,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="497.95,266.26 527,269.98"/>
 </g>
@@ -605,8 +499,6 @@
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.12,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12" fill-rule="nonzero"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="487.37,248.31 526.16,249.96"/>
 </g>
@@ -616,8 +508,6 @@
 </g>
 <use xlink:href="#p47" x="526.16" y="249.96"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="471.86,232.49 507.55,230.97"/>
 </g>
@@ -627,8 +517,6 @@
 </g>
 <use xlink:href="#p48" x="507.55" y="230.97"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="458.6,218.92 491.63,214.69"/>
 </g>
@@ -638,8 +526,6 @@
 </g>
 <use xlink:href="#p49" x="491.63" y="214.69"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="453.01,205.67 484.93,198.8"/>
 </g>
@@ -649,8 +535,6 @@
 </g>
 <use xlink:href="#p50" x="484.93" y="198.8"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="456.2,190.22 488.76,180.25"/>
 </g>
@@ -660,8 +544,6 @@
 </g>
 <use xlink:href="#p51" x="488.76" y="180.25"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="464.51,171.32 498.73,157.57"/>
 </g>
@@ -671,8 +553,6 @@
 </g>
 <use xlink:href="#p52" x="498.73" y="157.57"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="471.48,150.29 507.09,132.34"/>
 </g>
@@ -682,8 +562,6 @@
 </g>
 <use xlink:href="#p53" x="507.09" y="132.34"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="471.08,130.68 506.61,108.8"/>
 </g>
@@ -693,8 +571,6 @@
 </g>
 <use xlink:href="#p54" x="506.61" y="108.8"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="460.64,116.4 494.08,91.66"/>
 </g>
@@ -704,8 +580,6 @@
 </g>
 <use xlink:href="#p55" x="494.08" y="91.66"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="441.85,109.44 471.53,83.31"/>
 </g>
@@ -715,8 +589,6 @@
 </g>
 <use xlink:href="#p56" x="471.53" y="83.31"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="419.65,108.36 444.89,82.02"/>
 </g>
@@ -726,8 +598,6 @@
 </g>
 <use xlink:href="#p57" x="444.89" y="82.02"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="399.51,108.68 420.73,82.4"/>
 </g>
@@ -737,8 +607,6 @@
 </g>
 <use xlink:href="#p58" x="420.73" y="82.4"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="384.75,104.95 403.01,77.92"/>
 </g>
@@ -748,8 +616,6 @@
 </g>
 <use xlink:href="#p59" x="403.01" y="77.92"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="375.17,93.72 391.53,64.45"/>
 </g>
@@ -759,8 +625,6 @@
 </g>
 <use xlink:href="#p60" x="391.53" y="64.45"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="367.77,75.6 382.63,42.7"/>
 </g>
@@ -770,8 +634,6 @@
 </g>
 <use xlink:href="#p61" x="382.63" y="42.7"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="358.7,55.3 371.76,18.35"/>
 </g>
@@ -781,8 +643,6 @@
 </g>
 <use xlink:href="#p62" x="371.76" y="18.35"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="345.62,39.59 354.24,6.49"/>
 </g>
@@ -791,8 +651,6 @@
 <path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="328.76,33.94 333.47,6.49"/>
 </g>
@@ -801,8 +659,6 @@
 <path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="310.47,39.79 313.3,6.49"/>
 </g>
@@ -811,18 +667,12 @@
 <path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="0.62">
 <polyline fill="none" points="293.42,53.7 293.42,16.43"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="#0000ff" stroke="none" stroke-width="1">
 <polygon points="305.07,368.2 273.62,271.61 172.14,271.61 254.33,211.93 222.88,115.34 305.07,175.03 387.25,115.34 355.8,211.93 437.99,271.61 336.52,271.61"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="#00ffff" fill-opacity="0.9" stroke="none" stroke-width="1">
 <polygon points="293.42,379.84 261.97,283.26 160.49,283.26 242.68,223.58 211.23,126.99 293.42,186.68 375.61,126.99 344.16,223.58 426.34,283.26 324.87,283.26"/>
 </g>

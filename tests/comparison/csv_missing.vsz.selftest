@@ -30,15 +30,11 @@
 <use xlink:href="#p0" x="235.18" y="40.97"/>
 <use xlink:href="#p0" x="293.42" y="188.74"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke-linejoin="miter" stroke-width="0.62">
 <g transform="translate(235.18,240.07)">
 <path d="m37.5,0c0,20.71,-16.79,37.5,-37.5,37.5c-20.71,0,-37.5,-16.79,-37.5,-37.5c0,-20.71,16.79,-37.5,37.5,-37.5c20.71,0,37.5,16.79,37.5,37.5"/>
 </g>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.62">
 <g transform="translate(409.9,395.37)">
 <path d="m0,5.3l5.3,-5.3l-5.3,-5.3l-5.3,5.3l5.3,5.3" id="p1"/>
@@ -51,8 +47,6 @@
 <use xlink:href="#p1" x="293.42" y="240.07"/>
 <use xlink:href="#p1" x="526.38" y="162.42"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke-width="0.62">
 <polyline fill="none" points="176.94,317.72 235.18,240.07 293.42,162.42"/>
 </g>

@@ -125,8 +125,6 @@
 <use xlink:href="#p0" x="147.04" y="507.07"/>
 <use xlink:href="#p0" x="291.34" y="463.88"/>
 </g>
-</g>
-<g clip-path="url(#c2)">
 <g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
 <path d="M74.89,403.42l0,-51.82M147.04,515.71l0,-17.27M291.34,481.16l0,-34.55"/>
 <path d="M60.46,377.51l28.86,0M139.82,507.07l14.43,0M276.91,463.88l36.07,0"/>

@@ -46,6 +46,7 @@ import veusz.utils.textrender
 import veusz.document as document
 import veusz.setting as setting
 import veusz.windows.mainwindow
+import veusz.document.svg_export as svg_export
 
 # these tests fail for some reason which haven't been debugged
 # it appears the failures aren't important however
@@ -181,11 +182,14 @@ if __name__ == '__main__':
     # and replace text renderer with one that encodes unicode symbols
     veusz.utils.textrender.FontMetrics = StupidFontMetrics
     veusz.utils.FontMetrics = StupidFontMetrics
-    #veusz.utils.Renderer = AsciiRenderer
     veusz.utils.textrender.PartText = PartTextAscii
 
     # nasty hack to remove underlining
     del veusz.utils.textrender.part_commands[r'\underline']
+
+    # dpi (use old values)
+    svg_export.dpi = 90.
+    svg_export.scale = 1.
 
     if len(sys.argv) == 1:
         runTests()

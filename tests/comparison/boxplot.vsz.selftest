@@ -34,8 +34,6 @@
 <use xlink:href="#p0" x="69.35" y="122.16"/>
 <use xlink:href="#p0" x="69.35" y="124.61"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="#0000ff" stroke="none" stroke-linejoin="miter" stroke-width="1">
 <g transform="translate(485.48,138.04)">
 <path d="m-2.23,4.14l2.23,-2.23l2.23,2.23l1.91,-1.91l-2.23,-2.23l2.23,-2.23l-1.91,-1.91l-2.23,2.23l-2.23,-2.23l-1.91,1.91l2.23,2.23l-2.23,2.23l1.91,1.91" id="p1"/>
@@ -50,8 +48,6 @@
 <use xlink:href="#p1" x="485.48" y="251.28"/>
 <use xlink:href="#p1" x="485.48" y="33.42"/>
 </g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="none" stroke-linecap="butt" stroke-width="1.25">
 <path d="M161.83,61l0,66.46"/>
 <path d="M132.93,61l57.79,0"/>

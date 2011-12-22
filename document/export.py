@@ -235,12 +235,13 @@ class Export(object):
     def exportSVG(self):
         """Export document as SVG"""
 
-        dpi = svg_export.dpi * 1.
-        size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi), integer=False)
 
         if qt4.PYQT_VERSION >= 0x40600:
             # custom paint devices don't work in old PyQt versions
 
+            dpi = svg_export.dpi * 1.
+            size = self.doc.pageSize(
+                self.pagenumber, dpi=(dpi,dpi), integer=False)
             f = open(self.filename, 'w')
             paintdev = svg_export.SVGPaintDevice(f, size[0]/dpi, size[1]/dpi)
             painter = qt4.QPainter(paintdev)
@@ -250,6 +251,10 @@ class Export(object):
             # use built-in svg generation, which doesn't work very well
             # (no clipping, font size problems)
             import PyQt4.QtSvg
+
+            dpi = 90.
+            size = self.doc.pageSize(
+                self.pagenumber, dpi=(dpi,dpi), integer=False)
 
             # actually paint the image
             gen = PyQt4.QtSvg.QSvgGenerator()
@@ -262,7 +267,7 @@ class Export(object):
     def exportSelfTest(self):
         """Export document for testing"""
 
-        dpi = 90.
+        dpi = svg_export.dpi * 1.
         size = width, height = self.doc.pageSize(
             self.pagenumber, dpi=(dpi,dpi), integer=False)
 
