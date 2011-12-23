@@ -66,6 +66,7 @@ class PreferencesDialog(VeuszDialog):
         self.exportDPI.setEditText( str(setdb['export_DPI']) )
         self.exportDPIPDF.setValidator( qt4.QIntValidator(10, 10000, self) )
         self.exportDPIPDF.setEditText( str(setdb['export_DPI_PDF']) )
+        self.exportSVGTextAsText.setChecked( setdb['export_SVG_text_as_text'] )
 
         # set export antialias
         self.exportAntialias.setChecked( setdb['export_antialias'])
@@ -226,6 +227,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['export_color'] = {0: True, 1: False}[
             self.exportColor.currentIndex()]
         setdb['export_background'] = self.exportBackgroundButton.iconcolor
+        setdb['export_SVG_text_as_text'] = self.exportSVGTextAsText.isChecked()
 
         # new document settings
         setdb['stylesheet_default'] = unicode(self.styleLineEdit.text())

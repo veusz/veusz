@@ -31,6 +31,7 @@ defaultValues = {
     'export_antialias': True,
     'export_quality': 85,
     'export_background': '#ffffff00',
+    'export_SVG_text_as_text': False,
 
     # plot options
     'plot_updatepolicy': -1, # update on document changed

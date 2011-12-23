@@ -1228,15 +1228,18 @@ class MainWindow(qt4.QMainWindow):
             if (ext not in validextns) and (ext not in chosenextns):
                 filename += "." + chosenextns[0]
 
-            e = document.Export( self.document,
-                                 filename,
-                                 self.plot.getPageNumber(),
-                                 bitmapdpi=setdb['export_DPI'],
-                                 pdfdpi=setdb['export_DPI_PDF'],
-                                 antialias=setdb['export_antialias'],
-                                 color=setdb['export_color'],
-                                 quality=setdb['export_quality'],
-                                 backcolor=setdb['export_background'] )
+            e = document.Export(
+                self.document,
+                filename,
+                self.plot.getPageNumber(),
+                bitmapdpi=setdb['export_DPI'],
+                pdfdpi=setdb['export_DPI_PDF'],
+                antialias=setdb['export_antialias'],
+                color=setdb['export_color'],
+                quality=setdb['export_quality'],
+                backcolor=setdb['export_background'],
+                svgtextastext=setdb['export_SVG_text_as_text'],
+                )
             try:
                 e.export()
             except (IOError, RuntimeError), inst:

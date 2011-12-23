@@ -1256,7 +1256,7 @@ SetData('y', y)
 	<para><command>Export(filename, color=True,
       page=0 dpi=100,
       antialias=True, quality=85, backcolor='#ffffff00',
-	pdfdpi=150)</command></para>
+	pdfdpi=150, svgtextastext=False)</command></para>
 
 	<para>Export the page given to the filename given. The
 	<command>filename</command> must end with the correct
@@ -1273,7 +1273,9 @@ SetData('y', y)
 	output. <command>backcolor</command> is the background color
 	for bitmap files, which is a name or a #RRGGBBAA value (red,
 	green, blue, alpha). <command>pdfdpi</command> is the dpi to
-	use when exporting EPS or PDF files.
+	use when exporting EPS or PDF
+	files. <command>svgtextastext</command> says whether to export
+	SVG text as text, rather than curves.
 </para>
       </section>
 

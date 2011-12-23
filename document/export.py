@@ -62,7 +62,7 @@ class Export(object):
 
     def __init__(self, doc, filename, pagenumber, color=True, bitmapdpi=100,
                  antialias=True, quality=85, backcolor='#ffffff00',
-                 pdfdpi=150):
+                 pdfdpi=150, svgtextastext=False):
         """Initialise export class. Parameters are:
         doc: document to write
         filename: output filename
@@ -73,6 +73,7 @@ class Export(object):
         quality: compression factor for bitmaps
         backcolor: background color default for bitmaps (default transparent).
         pdfdpi: dpi for pdf and eps files
+        svgtextastext: write text in SVG as text, rather than curves
         """
 
         self.doc = doc
@@ -84,6 +85,7 @@ class Export(object):
         self.quality = quality
         self.backcolor = backcolor
         self.pdfdpi = pdfdpi
+        self.svgtextastext = svgtextastext
 
     def export(self):
         """Export the figure to the filename."""
@@ -243,7 +245,8 @@ class Export(object):
             size = self.doc.pageSize(
                 self.pagenumber, dpi=(dpi,dpi), integer=False)
             f = open(self.filename, 'w')
-            paintdev = svg_export.SVGPaintDevice(f, size[0]/dpi, size[1]/dpi)
+            paintdev = svg_export.SVGPaintDevice(
+                f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
             painter = qt4.QPainter(paintdev)
             self.renderPage(size, (dpi,dpi), painter)
             f.close()
