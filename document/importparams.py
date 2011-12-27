@@ -180,11 +180,11 @@ class ImportParamsPlugin(ImportParamsBase):
         pluginpars = {}
         upvars = {}
         for n, v in argsv.iteritems():
-            if n in ImportParamsBase.defaults:
+            if n in self.defaults:
                 upvars[n] = v
             else:
                 pluginpars[n] = v
 
         ImportParamsBase.__init__(self, **upvars)
         self.pluginpars = pluginpars
-        self._extras = self.pluginpars.keys()
+        self._extras.append('pluginpars')

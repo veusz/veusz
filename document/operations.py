@@ -1101,7 +1101,7 @@ class OperationDataImportPlugin(OperationDataImportBase):
 
         pluginnames = [p.name for p in plugins.importpluginregistry]
         plugin = plugins.importpluginregistry[
-            pluginnames.index(self.pluginname)]
+            pluginnames.index(self.params.plugin)]
 
         # if the plugin is a class, make an instance
         # the old API is for the plugin to be instances
@@ -1110,18 +1110,16 @@ class OperationDataImportPlugin(OperationDataImportBase):
 
         # strip out parameters for plugin itself
         p = self.params
-        pluginsownparams = dict( (n, v) for n, v in p.iteritems()
-                                 if n not in ImportParamsPlugin.defaults )
 
         # stick back together the plugin parameter object
-        plugparams = plugins.ImportPluginParams(p.filename, p.encoding,
-                                                pluginsownparams)
+        plugparams = plugins.ImportPluginParams(
+            p.filename, p.encoding,  p.pluginpars)
         results = plugin.doImport(plugparams)
 
         # make link for file
-        linked = None
+        LF = None
         if p.linked:
-            linked = linked.LinkedFilePlugin(p)
+            LF = linked.LinkedFilePlugin(p)
 
         customs = []
 
@@ -1149,7 +1147,7 @@ class OperationDataImportPlugin(OperationDataImportBase):
 
             # set any linking
             if linked:
-                ds.linked = linked
+                ds.linked = LF
 
             # save old dataset for undo
             d.name = p.prefix + d.name + p.suffix
