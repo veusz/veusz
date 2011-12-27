@@ -144,7 +144,7 @@ class ImportTabStandard(ImportTab):
             return
 
         # actually import the data
-        dsnames = doc.applyOperation(op)
+        doc.applyOperation(op)
 
         # tell the user what happened
         # failures in conversion
@@ -156,7 +156,7 @@ class ImportTabStandard(ImportTab):
         if len(lines) != 0:
             lines.append('')
 
-        lines += self.dialog.retnDatasetInfo(dsnames, linked, filename)
+        lines += self.dialog.retnDatasetInfo(op.outdatasets, linked, filename)
 
         self.previewedit.setPlainText( '\n'.join(lines) )
 
@@ -314,10 +314,10 @@ class ImportTabCSV(ImportTab):
         op = document.OperationDataImportCSV(params)
 
         # actually import the data
-        dsnames = doc.applyOperation(op)
+        doc.applyOperation(op)
 
         # update output, showing what datasets were imported
-        lines = self.dialog.retnDatasetInfo(dsnames, linked, filename)
+        lines = self.dialog.retnDatasetInfo(op.outdatasets, linked, filename)
 
         t = self.previewtablecsv
         t.verticalHeader().hide()
@@ -432,10 +432,10 @@ class ImportTab2D(ImportTab):
 
         try:
             op = document.OperationDataImport2D(params)
-            readds = doc.applyOperation(op)
+            doc.applyOperation(op)
 
             output = ['Successfully read datasets:']
-            for ds in readds:
+            for ds in op.outdatasets:
                 output.append(' %s' % doc.data[ds].description(
                         showlinked=False))
             
