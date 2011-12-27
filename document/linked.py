@@ -118,7 +118,7 @@ class LinkedFile(LinkedFileBase):
         params = [ repr(self._getSaveFilename(relpath)),
                    repr(p.descriptor),
                    "linked=True",
-                   "ignoretext=" + repr(self.ignoretext) ]
+                   "ignoretext=" + repr(p.ignoretext) ]
 
         if p.encoding != "utf_8":
             params.append("encoding=" + repr(p.encoding))
@@ -171,12 +171,12 @@ class LinkedFile2D(LinkedFileBase):
         """Save the link to the document file."""
 
         args = [ repr(self._getSaveFilename(relpath)),
-                 repr(self.params.datasets) ]
-        for p in ("xrange", "yrange", "invertrows", "invertcols", "transpose",
-                  "prefix", "suffix", "encoding"):
-            v = getattr(self.params, p)
-            if (v is not None) and (v != ""):
-                args.append( "%s=%s" % (p, repr(v)) )
+                 repr(self.params.datasetnames) ]
+        for par in ("xrange", "yrange", "invertrows", "invertcols", "transpose",
+                    "prefix", "suffix", "encoding"):
+            v = getattr(self.params, par)
+            if v is not None and v != "" and v != self.params.defaults[par]:
+                args.append( "%s=%s" % (par, repr(v)) )
         args.append("linked=True")
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
@@ -193,13 +193,15 @@ class LinkedFileFITS(LinkedFileBase):
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
-        args = [self.dsname, self._getSaveFilename(relpath), self.hdu]
+        p = self.params
+        args = [p.dsname, self._getSaveFilename(relpath), p.hdu]
         args = [repr(i) for i in args]
-        for c, a in izip(self.columns,
-                         ("datacol", "symerrcol",
-                          "poserrcol", "negerrcol")):
-            if c is not None:
-                args.append("%s=%s" % (a, repr(c)))
+        for param, column in ( ("datacol", p.datacol),
+                               ("symerrcol", p.symerrcol),
+                               ("poserrcol", p.poserrcol),
+                               ("negerrcol", p.negerrcol) ):
+            if column is not None:
+                args.append("%s=%s" % (param, repr(column)))
         args.append("linked=True")
 
         fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))
@@ -216,13 +218,14 @@ class LinkedFileCSV(LinkedFileBase):
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
-        paramsout = [repr(self._getSaveFilename(relpath)),
-                     "linked=True"]
+        paramsout = [ repr(self._getSaveFilename(relpath)) ]
 
         # add parameters which aren"t defaults
         for param, default in sorted(self.params.defaults.items()):
             v = getattr(self.params, param)
-            if v != default:
+            if param == 'prefix' or param == 'suffix':
+                param = 'ds' + param
+            if param != 'filename' and v != default:
                 paramsout.append("%s=%s" % (param, repr(v)))
 
         fileobj.write("ImportFileCSV(%s)\n" % (", ".join(paramsout)))
@@ -249,7 +252,7 @@ class LinkedFilePlugin(LinkedFileBase):
             params.append("prefix=" + repr(p.prefix))
         if p.suffix:
             params.append("suffix=" + repr(p.suffix))
-        for name, val in p.pluginparams.iteritems():
+        for name, val in p.pluginpars.iteritems():
             params.append("%s=%s" % (name, repr(val)))
 
         fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))

@@ -1007,14 +1007,15 @@ class OperationDataImportFITS(OperationDataImportBase):
         negv = None
 
         # read the columns required
-        if self.datacol is not None:
-            datav = data.field(self.datacol)
-        if self.symerrcol is not None:
-            symv = data.field(self.symerrcol)
-        if self.poserrcol is not None:
-            posv = data.field(self.poserrcol)
-        if self.negerrcol is not None:
-            negv = data.field(self.negerrcol)
+        p = self.params
+        if p.datacol is not None:
+            datav = data.field(p.datacol)
+        if p.symerrcol is not None:
+            symv = data.field(p.symerrcol)
+        if p.poserrcol is not None:
+            posv = data.field(p.poserrcol)
+        if p.negerrcol is not None:
+            negv = data.field(p.negerrcol)
 
         # actually create the dataset
         return datasets.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
@@ -1025,10 +1026,11 @@ class OperationDataImportFITS(OperationDataImportBase):
 
     def _import2dimage(self, hdu):
         """Import 2d image data from hdu."""
-    
-        if ( self.datacol is not None or self.symerrcol is not None
-             or self.poserrcol is not None
-             or self.negerrcol is not None ):
+
+        p = self.params
+        if ( p.datacol is not None or p.symerrcol is not None
+             or p.poserrcol is not None
+             or p.negerrcol is not None ):
             print "Warning: ignoring columns as import 2D dataset"
 
         header = hdu.header
@@ -1082,7 +1084,7 @@ class OperationDataImportFITS(OperationDataImportBase):
                 raise RuntimeError, "Cannot import images with %i dimensions" % naxis
         f.close()
 
-        if self.linked:
+        if p.linked:
             ds.linked = linked.LinkedFileFITS(self.params)
         if p.dsname in document.data:
             self.olddataset = document.data[p.dsname]
@@ -1149,15 +1151,13 @@ class OperationDataImportPlugin(OperationDataImportBase):
             if linked:
                 ds.linked = LF
 
-            # save old dataset for undo
-            d.name = p.prefix + d.name + p.suffix
-            if d.name in document.data:
-                self.olddata[d.name] = document.data[d.name]
+            # construct name
+            name = p.prefix + d.name + p.suffix
 
             # actually make dataset
-            document.setData(d.name, ds)
+            document.setData(name, ds)
 
-            names.append(d.name)
+            names.append(name)
 
         # add constants, functions to doc, if any
         self.addCustoms(document, customs)

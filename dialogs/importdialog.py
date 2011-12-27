@@ -201,7 +201,7 @@ class ImportTabCSV(ImportTab):
         self.csvblanksdatacheck.setChecked(False)
         self.csvnumfmtcombo.setCurrentIndex(0)
         self.csvdatefmtcombo.setEditText(
-            document.ParamsCSV.defaults['dateformat'])
+            document.ImportParamsCSV.defaults['dateformat'])
         self.csvheadermodecombo.setCurrentIndex(0)
 
     def slotHelp(self):
