@@ -90,59 +90,6 @@ typecodes = (
     ('(number)', 'float'),
     )
 
-class ParamsCSV(object):
-    """CSV import parameters."""
-
-    defaults = {
-        'readrows': False,
-        'encoding': 'utf_8',
-        'delimiter': ',',
-        'textdelimiter': '"',
-        'headerignore': 0,
-        'rowsignore': 0,
-        'blanksaredata': False,
-        'numericlocale': 'en_US',
-        'dateformat': 'YYYY-MM-DD|T|hh:mm:ss',
-        'headermode': 'multi',
-        'dsprefix': '',
-        'dssuffix': '',
-        }
-
-    def __init__(self, filename, **argsv):
-        """Initialise the reader to import data from filename.
-
-        If readrows is True, then data are read from rows
-        headerignore is number of lines to ignore after headers
-        rowsignore is number of lines to ignore at top of file
-        if blanksaredata is true, treat blank entries as nans
-
-        numericlocale: locale to use for converting numbers
-        dateformat: format for dates in file
-
-        headermode: one of ('multi', '1st', 'none')
-         multi: allow multiple headers in file
-         1st: first non-blank line is header
-         none: no headers, assign names
-
-        dsprefix is a prefix to prepend to the name of datasets from this file
-        dssuffix is suffix to add to dataset names
-        """
-
-        self.filename = filename
-
-        #  set defaults
-        for k, v in self.defaults.iteritems():
-            setattr(self, k, v)
-
-        # set parameters
-        for k, v in argsv.iteritems():
-            if k not in self.defaults:
-                raise ValueError, "Invalid parameter %s" % k
-            setattr(self, k, v)
-
-        if self.headermode not in ('multi', '1st', 'none'):
-            raise ValueError, "Invalid headermode"
-
 class _NextValue(Exception):
     """A class to be raised to move to next value."""
 

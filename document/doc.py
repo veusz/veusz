@@ -89,6 +89,9 @@ class Document( qt4.QObject ):
         self.datachangeset = 0        # increased whan any dataset changes
         self.datachangesets = dict()  # each ds has an associated change set
 
+        # map tags to dataset names
+        self.datasettags = defaultdict(list)
+
         # if set, do not notify listeners of updates
         # wait under enableUpdates
         self.suspendupdates = []

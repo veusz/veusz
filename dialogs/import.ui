@@ -160,6 +160,23 @@ or enter $FILENAME to have filename appended</string>
           </property>
          </widget>
         </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Tag</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QComboBox" name="tagcombo">
+          <property name="toolTip">
+           <string>Enter a list of tags to apply to the imported datasets</string>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>

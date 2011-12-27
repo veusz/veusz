@@ -33,6 +33,8 @@ import veusz.embed as embed
 import veusz.plugins as plugins
 import veusz.utils as utils
 
+import linked
+import importparams
 import datasets
 import operations
 import dataset_histo
@@ -602,7 +604,7 @@ class CommandInterface(qt4.QObject):
         else:
             return '1d'
 
-    def ImportString(self, descriptor, string, useblocks=False):
+    def ImportString(self, descriptor, dstring, useblocks=False):
         """Read data from the string using a descriptor.
 
         If useblocks is set, then blank lines or the word 'no' are used
@@ -615,18 +617,21 @@ class CommandInterface(qt4.QObject):
          converting the data
         """
 
-        op = operations.OperationDataImport(descriptor, datastr=string, useblocks=useblocks)
-        dsnames = self.document.applyOperation(op)
-        errors = op.simpleread.getInvalidConversions()
-            
+        params = importparams.ImportParamsSimple(
+            descriptor=descriptor,
+            datastr=dstring,
+            useblocks=useblocks)
+        op = operations.OperationDataImport(params)
+        self.document.applyOperation(op)
+
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(dsnames),)
-            for name, num in errors.iteritems():
+            print "Imported datasets %s" % (' '.join(op.outdatasets),)
+            for name, num in op.outinvalids.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
-        return (dsnames, errors)
+        return (op.outdatasets, op.outinvalids)
 
-    def ImportString2D(self, datasetnames, string, xrange=None, yrange=None,
+    def ImportString2D(self, datasetnames, dstring, xrange=None, yrange=None,
                        invertrows=None, invertcols=None, transpose=None):
         """Read two dimensional data from the string specified.
         datasetnames is a list of datasets to read from the string or a single
@@ -644,10 +649,12 @@ class CommandInterface(qt4.QObject):
         if type(datasetnames) in (str, unicode):
             datasetnames = [datasetnames]
 
-        op = operations.OperationDataImport2D(
-            datasetnames, datastr=string, xrange=xrange,
+        params = importparams.ImportParams2D(
+            datasetnames=datasetnames,
+            datastr=dstring, xrange=xrange,
             yrange=yrange, invertrows=invertrows,
             invertcols=invertcols, transpose=transpose)
+        op = operations.OperationDataImport2D(op)
         self.document.applyOperation(op)
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasetnames))
@@ -680,12 +687,14 @@ class CommandInterface(qt4.QObject):
         if type(datasetnames) in (str, unicode):
             datasetnames = [datasetnames]
 
-        op = operations.OperationDataImport2D(
-            datasetnames, filename=realfilename, xrange=xrange,
+        params = importparams.ImportParams2D(
+            datasetnames=datasetnames, 
+            filename=realfilename, xrange=xrange,
             yrange=yrange, invertrows=invertrows,
             invertcols=invertcols, transpose=transpose,
             prefix=prefix, suffix=suffix,
             linked=linked)
+        op = operations.OperationDataImport2D(params)
         self.document.applyOperation(op)
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasetnames))
@@ -712,20 +721,20 @@ class CommandInterface(qt4.QObject):
 
         realfilename = self.findFileOnImportPath(filename)
 
-        op = operations.OperationDataImport(
-            descriptor, filename=realfilename,
+        params = importparams.ImportParamsSimple(
+            descriptor=descriptor, filename=realfilename,
             useblocks=useblocks, linked=linked,
             prefix=prefix, suffix=suffix,
             ignoretext=ignoretext)
-        dsnames = self.document.applyOperation(op)
-        errors = op.simpleread.getInvalidConversions()
-            
+        op = operations.OperationDataImport(params)
+        self.document.applyOperation(op)
+
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(dsnames),)
-            for name, num in errors.iteritems():
+            print "Imported datasets %s" % (' '.join(op.outdatasets),)
+            for name, num in op.outinvalids.iteritems():
                 print "%i errors encountered reading dataset %s" % (num, name)
 
-        return (dsnames, errors)
+        return (op.outdatasets, op.outinvalids)
 
     def ImportFileCSV(self, filename,
                       readrows=False,
@@ -769,23 +778,24 @@ class CommandInterface(qt4.QObject):
         # lookup filename
         realfilename = self.findFileOnImportPath(filename)
 
-        params = readcsv.ParamsCSV(
-            realfilename, readrows=readrows,
+        params = importparams.ImportParamsCSV(
+            filename=realfilename, readrows=readrows,
             delimiter=delimiter, textdelimiter=textdelimiter,
             encoding=encoding,
             headerignore=headerignore, rowsignore=rowsignore,
             blanksaredata=blanksaredata,
             numericlocale=numericlocale, dateformat=dateformat,
             headermode=headermode,
-            dsprefix=dsprefix, dssuffix=dssuffix,
+            prefix=dsprefix, suffix=dssuffix,
+            linked=linked,
             )
-        op = operations.OperationDataImportCSV(params, linked=linked)
-        dsnames = self.document.applyOperation(op)
-            
-        if self.verbose:
-            print "Imported datasets %s" % (' '.join(dsnames),)
+        op = operations.OperationDataImportCSV(params)
+        self.document.applyOperation(op)
 
-        return dsnames
+        if self.verbose:
+            print "Imported datasets %s" % (' '.join(op.outdatasets),)
+
+        return op.outdatasets
 
     def ImportFITSFile(self, dsname, filename, hdu,
                        datacol = None, symerrcol = None,
@@ -806,12 +816,12 @@ class CommandInterface(qt4.QObject):
 
         # lookup filename
         realfilename = self.findFileOnImportPath(filename)
-
-        op = operations.OperationDataImportFITS(
-            dsname, realfilename, hdu,
+        params = importparams.ImportParamsFITS(
+            dsname=dsname, filename=realfilename, hdu=hdu,
             datacol=datacol, symerrcol=symerrcol,
             poserrcol=poserrcol, negerrcol=negerrcol,
             linked=linked)
+        op = operations.OperationDataImportFITS(params)
         self.document.applyOperation(op)
 
     def ImportFilePlugin(self, plugin, filename, **args):
@@ -823,17 +833,22 @@ class CommandInterface(qt4.QObject):
         linked: link import to file (default False)
         encoding: file encoding (may not be used, default 'utf_8')
         plus arguments to plugin
+
+        returns: list of imported datasets, list of imported customs
         """
 
         realfilename = self.findFileOnImportPath(filename)
-        op = operations.OperationDataImportPlugin(plugin, realfilename,
-                                                  **args)
+        params = importparams.ImportParamsPlugin(
+            plugin=plugin, filename=realfilename, **args)
+
+        op = operations.OperationDataImportPlugin(params)
         try:
             self.document.applyOperation(op)
         except:
             self.document.log("Error in plugin %s" % plugin)
             exc =  ''.join(traceback.format_exc())
             self.document.log(exc)
+        return op.outdatasets, op.outcustoms
 
     def ReloadData(self):
         """Reload any linked datasets.
