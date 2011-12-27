@@ -124,14 +124,19 @@ class ImportTabStandard(ImportTab):
         useblocks = self.blockcheckbox.isChecked()
         ignoretext = self.ignoretextcheckbox.isChecked()
 
+        params = document.ImportParamsSimple(
+            descriptor=descriptor,
+            filename=filename,
+            useblocks=useblocks,
+            linked=linked,
+            prefix=prefix, suffix=suffix,
+            ignoretext=ignoretext,
+            encoding=encoding,
+            )
+
         try:
             # construct operation. this checks the descriptor.
-            op = document.OperationDataImport(descriptor, filename=filename,
-                                              useblocks=useblocks, 
-                                              linked=linked,
-                                              prefix=prefix, suffix=suffix,
-                                              ignoretext=ignoretext,
-                                              encoding=encoding)
+            op = document.OperationDataImport(params)
 
         except document.DescriptorError:
             qt4.QMessageBox.warning(self, "Veusz",
@@ -140,17 +145,17 @@ class ImportTabStandard(ImportTab):
 
         # actually import the data
         dsnames = doc.applyOperation(op)
-        
+
         # tell the user what happened
         # failures in conversion
         lines = []
-        for var, count in op.simpleread.getInvalidConversions().iteritems():
+        for var, count in op.outinvalids.iteritems():
             if count != 0:
                 lines.append('%i conversions failed for dataset "%s"' %
                              (count, var))
         if len(lines) != 0:
             lines.append('')
-            
+
         lines += self.dialog.retnDatasetInfo(dsnames, linked, filename)
 
         self.previewedit.setPlainText( '\n'.join(lines) )
@@ -291,8 +296,8 @@ class ImportTabCSV(ImportTab):
             self.csvheadermodecombo.currentIndex()]
 
         # create import parameters and operation objects
-        params = document.ParamsCSV(
-            filename,
+        params = document.ImportParamsCSV(
+            filename=filename,
             readrows=inrows,
             encoding=encoding,
             delimiter=delimiter,
@@ -303,9 +308,10 @@ class ImportTabCSV(ImportTab):
             numericlocale=numericlocale,
             dateformat=dateformat,
             headermode=headermode,
-            dsprefix=prefix, dssuffix=suffix
+            prefix=prefix, suffix=suffix,
+            linked=linked,
             )
-        op = document.OperationDataImportCSV(params, linked=linked)
+        op = document.OperationDataImportCSV(params)
 
         # actually import the data
         dsnames = doc.applyOperation(op)
@@ -412,15 +418,20 @@ class ImportTab2D(ImportTab):
         transpose = self.twod_transposecheck.isChecked()
 
         # loop over datasets and read...
+        params = document.ImportParams2D(
+            datasetnames=datasets,
+            filename=filename,
+            xrange=rangex, yrange=rangey,
+            invertrows=invertrows,
+            invertcols=invertcols,
+            transpose=transpose,
+            prefix=prefix, suffix=suffix,
+            linked=linked,
+            encoding=encoding
+            )
+
         try:
-            op = document.OperationDataImport2D(datasets, filename=filename,
-                                                xrange=rangex, yrange=rangey,
-                                                invertrows=invertrows,
-                                                invertcols=invertcols,
-                                                transpose=transpose,
-                                                prefix=prefix, suffix=suffix,
-                                                linked=linked,
-                                                encoding=encoding)
+            op = document.OperationDataImport2D(params)
             readds = doc.applyOperation(op)
 
             output = ['Successfully read datasets:']
@@ -431,7 +442,7 @@ class ImportTab2D(ImportTab):
             output = '\n'.join(output)
         except document.Read2DError, e:
             output = 'Error importing datasets:\n %s' % str(e)
-                
+
         # show status in preview box
         self.twod_previewedit.setPlainText(output)
 
@@ -624,12 +635,18 @@ class ImportTabFITS(ImportTab):
             cols = [None]*4
 
         # construct operation to import fits
-        op = document.OperationDataImportFITS(name, filename, hdunum,
-                                              datacol=cols[0],
-                                              symerrcol=cols[1],
-                                              poserrcol=cols[2],
-                                              negerrcol=cols[3],
-                                              linked=linked)
+        params = document.ImportParamsFITS(
+            dsname=name,
+            filename=filename,
+            hdu=hdunum,
+            datacol=cols[0],
+            symerrcol=cols[1],
+            poserrcol=cols[2],
+            negerrcol=cols[3],
+            linked=linked,
+            )
+
+        op = document.OperationDataImportFITS(params)
 
         # actually do the import
         doc.applyOperation(op)
@@ -776,24 +793,30 @@ class ImportTabPlugins(ImportTab):
     def doImport(self, doc, filename, linked, encoding, prefix, suffix):
         """Import using plugin."""
         
-        params = self.getPluginFields()
+        fields = self.getPluginFields()
         plugin = unicode(self.pluginType.currentText())
-        op = document.OperationDataImportPlugin(
-            plugin, filename, linked=linked, encoding=encoding,
-            prefix=prefix, suffix=suffix, **params)
+
+        params = document.ImportParamsPlugin(
+            plugin=plugin,
+            filename=filename,
+            linked=linked, encoding=encoding,
+            prefix=prefix, suffix=suffix,
+            **fields)
+
+        op = document.OperationDataImportPlugin(params)
         try:
-            datasets, customs = doc.applyOperation(op)
+            doc.applyOperation(op)
         except plugins.ImportPluginException, ex:
             self.pluginPreview.setPlainText( unicode(ex) )
             return
 
         out = ['Imported data for datasets:']
-        for ds in datasets:
+        for ds in op.outdatasets:
             out.append( doc.data[ds].description(showlinked=False) )
-        if customs:
+        if op.outcustoms:
             out.append('')
             out.append('Set custom definitions:')
-            out += customs
+            out += outcustoms
 
         self.pluginPreview.setPlainText('\n'.join(out))
 
