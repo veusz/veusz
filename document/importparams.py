@@ -53,6 +53,17 @@ class ImportParamsBase(object):
                 raise ValueError, "Invalid parameter %s" % k
             setattr(self, k, v)
 
+        # extra parameters to copy besides defaults
+        self._extras = []
+
+    def copy(self):
+        """Make a copy of the parameters object."""
+
+        newp = {}
+        for k in self.defaults.keys() + self._extras:
+            newp[k] = getattr(self, k)
+        return self.__class__(**newp)
+
 class ImportParamsSimple(ImportParamsBase):
     """simpleread import parameters.
 
@@ -100,7 +111,7 @@ class ImportParamsCSV(ImportParamsBase):
     defaults.update(ImportParamsBase.defaults)
 
     def __init__(self, **argsv):
-        ImportParams.__init__(self, **argsv)
+        ImportParamsBase.__init__(self, **argsv)
         if self.headermode not in ('multi', '1st', 'none'):
             raise ValueError, "Invalid headermode"
 
@@ -176,3 +187,4 @@ class ImportParamsPlugin(ImportParamsBase):
 
         ImportParamsBase.__init__(self, **upvars)
         self.pluginpars = pluginpars
+        self._extras = self.pluginpars.keys()

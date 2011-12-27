@@ -116,8 +116,8 @@ class ReadCSV(object):
         else:
             prefix = 'col'
 
-        name = '%s%s%i%s' % (self.params.dsprefix, prefix,
-                             column+1, self.params.dssuffix)
+        name = '%s%s%i%s' % (self.params.prefix, prefix,
+                             column+1, self.params.suffix)
         return name
 
     def _getNameAndColType(self, colnum, colval):
@@ -147,7 +147,7 @@ class ReadCSV(object):
                 type = codetype
                 name = name[:-len(codename)].strip()
                 break
-        return type, self.params.dsprefix + name + self.params.dssuffix
+        return type, self.params.prefix + name + self.params.suffix
 
     def _setNameAndType(self, colnum, colname, coltype):
         """Set a name for column number given column name and type."""

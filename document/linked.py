@@ -33,6 +33,11 @@ class LinkedFileBase(object):
         """Save parameters."""
         self.params = params
 
+    @property
+    def filename(self):
+        """Get filename."""
+        return self.params.filename
+
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
         pass

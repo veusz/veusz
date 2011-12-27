@@ -654,7 +654,7 @@ class CommandInterface(qt4.QObject):
             datastr=dstring, xrange=xrange,
             yrange=yrange, invertrows=invertrows,
             invertcols=invertcols, transpose=transpose)
-        op = operations.OperationDataImport2D(op)
+        op = operations.OperationDataImport2D(params)
         self.document.applyOperation(op)
         if self.verbose:
             print "Imported datasets %s" % (', '.join(datasetnames))

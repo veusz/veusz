@@ -604,38 +604,36 @@ class Read2DError(ValueError):
     pass
 
 class SimpleRead2D(object):
-    def __init__(self, name):
-        """Read dataset with name given."""
+    def __init__(self, name, params):
+        """Read dataset with name given.
+        params is a ImportParams2D object
+        """
         self.name = name
-        self.xrange = None
-        self.yrange = None
-        self.invertrows = False
-        self.invertcols = False
-        self.transpose = False
+        self.params = params.copy()
 
     ####################################################################
     # Follow functions are for setting parameters during reading of data
 
     def _paramXRange(self, cols):
         try:
-            self.xrange = ( float(cols[1]), float(cols[2]) )
+            self.params.xrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
             raise Read2DError, "Could not interpret xrange"
         
     def _paramYRange(self, cols):
         try:
-            self.yrange = ( float(cols[1]), float(cols[2]) )
+            self.params.yrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
             raise Read2DError, "Could not interpret yrange"
 
     def _paramInvertRows(self, cols):
-        self.invertrows = True
+        self.params.invertrows = True
         
     def _paramInvertCols(self, cols):
-        self.invertcols = True
+        self.params.invertcols = True
 
     def _paramTranspose(self, cols):
-        self.transpose = True
+        self.params.transpose = True
 
     ####################################################################
 
@@ -693,12 +691,12 @@ class SimpleRead2D(object):
 
             # add row to dataset
             if len(line) != 0:
-                if self.invertcols:
+                if self.params.invertcols:
                     line.reverse()
                 rows.insert(0, line)
 
         # swap rows if requested
-        if self.invertrows:
+        if self.params.invertrows:
             rows.reverse()
 
         # dodgy formatting probably...
@@ -716,22 +714,20 @@ class SimpleRead2D(object):
             raise Read2DError, "Dataset was not 2D"
 
         # transpose matrix if requested
-        if self.transpose:
+        if self.params.transpose:
             self.data = N.transpose(self.data).copy()
 
-    def setInDocument(self, document, linkedfile=None,
-                      prefix="", suffix=""):
+    def setInDocument(self, document, linkedfile=None):
         """Set the data in the document.
 
         Returns list containing name of dataset read
         """
 
-        ds = datasets.Dataset2D(self.data, xrange=self.xrange,
-                                yrange=self.yrange)
+        ds = datasets.Dataset2D(self.data, xrange=self.params.xrange,
+                                yrange=self.params.yrange)
         ds.linked = linkedfile
 
-        fullname = prefix + self.name + suffix
+        fullname = self.params.prefix + self.name + self.params.suffix
         document.setData(fullname, ds)
-        
-        return [fullname]
 
+        return [fullname]

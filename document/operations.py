@@ -38,6 +38,7 @@ import simpleread
 import readcsv
 import importparams
 import datasets
+import linked
 
 import veusz.utils as utils
 import veusz.plugins as plugins
@@ -967,11 +968,11 @@ class OperationDataImport2D(OperationDataImportBase):
     descr = 'import 2d data'
 
     def doImport(self, document):
-        """Import data
-        
-        Returns list of datasets read."""
+        """Import data."""
 
         p = self.params
+
+        # get stream
         if p.filename is not None:
             stream = simpleread.FileStream(
                 utils.openEncoding(p.filename, p.encoding) )
@@ -980,13 +981,14 @@ class OperationDataImport2D(OperationDataImportBase):
         else:
             assert False
 
+        # linked file
         LF = None
         if p.linked:
             assert p.filename
             LF = linked.LinkedFile2D(p)
 
         for name in p.datasetnames:
-            sr = simpleread.SimpleRead2D(p)
+            sr = simpleread.SimpleRead2D(name, p)
             sr.readData(stream)
             self.outdatasets += sr.setInDocument(document, linkedfile=LF)
 
