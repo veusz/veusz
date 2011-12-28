@@ -29,6 +29,9 @@ import simpleread
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
 
+    # operation to recreate dataset
+    create_operation = None
+
     def __init__(self, params):
         """Save parameters."""
         self.params = params
@@ -75,8 +78,13 @@ class LinkedFileBase(object):
                 ds.linked = self
         return read
 
-    def _reloadViaOperation(self, document, op):
-        """Reload links using a supplied operation, op."""
+    def reloadLinks(self, document):
+        """Reload links using an operation"""
+
+        # get the operation for reloading
+        op = self.create_operation(self.params)
+
+        # load data into a temporary document
         tempdoc = document.__class__()
 
         try:
@@ -96,8 +104,8 @@ class LinkedFileBase(object):
         # move datasets into document
         read = self._moveReadDatasets(tempdoc, document)
 
-        # return zero errors
-        errors = dict( [(ds, 0) for ds in read] )
+        # return errors (if any)
+        errors = op.outinvalids
 
         return (read, errors)
 
@@ -108,6 +116,8 @@ class LinkedFile(LinkedFileBase):
 
     This class is used to store a link filename with the descriptor
     """
+
+    create_operation = operations.OperationDataImport
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file.
@@ -131,41 +141,10 @@ class LinkedFile(LinkedFileBase):
 
         fileobj.write("ImportFile(%s)\n" % (", ".join(params)))
 
-    def reloadLinks(self, document):
-        """Reload datasets linked to this file.
-
-        Returns a tuple of
-        - List of datasets read
-        - Dict of tuples containing dataset names and number of errors
-        """
-
-        # a bit clumsy, but we need to load this into a separate document
-        # to make sure we do not overwrited non-linked data (which may
-        # be specified in the descriptor)
-
-        tempdoc = document.__class__()
-        sr = simpleread.SimpleRead(self.descriptor)
-
-        stream = simpleread.FileStream(
-            utils.openEncoding(self.filename, self.encoding))
-
-        sr.readData(stream,
-                    useblocks=self.useblocks,
-                    ignoretext=self.ignoretext)
-        sr.setInDocument(tempdoc, linkedfile=self,
-                         prefix=self.prefix, suffix=self.suffix)
-
-        errors = sr.getInvalidConversions()
-
-        self._deleteLinkedDatasets(document)
-        read = self._moveReadDatasets(tempdoc, document)
-
-        # returns list of datasets read, and a dict of variables with number
-        # of errors
-        return (read, errors)
-
 class LinkedFile2D(LinkedFileBase):
     """Class representing a file linked to a 2d dataset."""
+
+    create_operation = operations.OperationDataImport2D
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
@@ -181,14 +160,10 @@ class LinkedFile2D(LinkedFileBase):
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
 
-    def reloadLinks(self, document):
-        """Reload datasets linked to this file."""
-
-        op = operations.OperationDataImport2D(self.params)
-        return self._reloadViaOperation(document, op)
-
 class LinkedFileFITS(LinkedFileBase):
     """Links a FITS file to the data."""
+
+    create_operation = operations.OperationDataImportFITS
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
@@ -206,14 +181,10 @@ class LinkedFileFITS(LinkedFileBase):
 
         fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))
 
-    def reloadLinks(self, document):
-        """Reload any linked data from the CSV file."""
-
-        op = operations.OperationDataImportFITS(self.params)
-        return self._reloadViaOperation(document, op)
-
 class LinkedFileCSV(LinkedFileBase):
     """A CSV file linked to datasets."""
+
+    create_operation = operations.OperationDataImportCSV
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
@@ -230,14 +201,10 @@ class LinkedFileCSV(LinkedFileBase):
 
         fileobj.write("ImportFileCSV(%s)\n" % (", ".join(paramsout)))
 
-    def reloadLinks(self, document):
-        """Reload any linked data from the CSV file."""
-
-        op = operations.OperationDataImportCSV(self.params)
-        return self._reloadViaOperation(document, op)
-
 class LinkedFilePlugin(LinkedFileBase):
     """Represent a file linked using an import plugin."""
+
+    create_operation = operations.OperationDataImportPlugin
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the vsz document file."""
@@ -256,9 +223,3 @@ class LinkedFilePlugin(LinkedFileBase):
             params.append("%s=%s" % (name, repr(val)))
 
         fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))
-
-    def reloadLinks(self, document):
-        """Reload data from file."""
-
-        op = operations.OperationDataImportPlugin(self.params)
-        return self._reloadViaOperation(document, op)

@@ -825,6 +825,13 @@ class OperationDataImportBase(object):
     def __init__(self, params):
         self.params = params
 
+        # list of returned datasets
+        self.outdatasets = []
+        # list of returned custom variables
+        self.outcustoms = []
+        # invalid conversions
+        self.outinvalids = {}
+
     def doTag(self, doc):
         """Do tagging of datasets."""
         self.removetags = defaultdict(list)
@@ -863,13 +870,6 @@ class OperationDataImportBase(object):
 
     def do(self, document):
         """Do import."""
-
-        # list of returned datasets
-        self.outdatasets = []
-        # list of returned custom variables
-        self.outcustoms = []
-        # invalid conversions
-        self.outinvalids = {}
 
         # remember datasets in document for undo
         olddatasets = dict(document.data)
