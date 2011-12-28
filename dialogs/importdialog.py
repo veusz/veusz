@@ -59,7 +59,7 @@ class ImportTab(qt4.QWidget):
         should be attempted."""
         pass
 
-    def doImport(self, filename, linked, encoding, prefix, suffix):
+    def doImport(self, filename, linked, encoding, prefix, suffix, tags):
         """Do the import iteself."""
         pass
 
@@ -116,7 +116,7 @@ class ImportTabStandard(ImportTab):
             self.previewedit.setPlainText('')
             return False
 
-    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Standard Veusz importing."""
 
         # convert controls to values
@@ -130,6 +130,7 @@ class ImportTabStandard(ImportTab):
             useblocks=useblocks,
             linked=linked,
             prefix=prefix, suffix=suffix,
+            tags=tags,
             ignoretext=ignoretext,
             encoding=encoding,
             )
@@ -273,7 +274,7 @@ class ImportTabCSV(ImportTab):
 
         return True
 
-    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import from CSV file."""
 
         # get various values
@@ -309,6 +310,7 @@ class ImportTabCSV(ImportTab):
             dateformat=dateformat,
             headermode=headermode,
             prefix=prefix, suffix=suffix,
+            tags=tags,
             linked=linked,
             )
         op = document.OperationDataImportCSV(params)
@@ -375,7 +377,7 @@ class ImportTab2D(ImportTab):
             self.twod_previewedit.setPlainText('')
             return False
 
-    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import from 2D file."""
 
         # this really needs improvement...
@@ -426,6 +428,7 @@ class ImportTab2D(ImportTab):
             invertcols=invertcols,
             transpose=transpose,
             prefix=prefix, suffix=suffix,
+            tags=tags,
             linked=linked,
             encoding=encoding
             )
@@ -607,7 +610,7 @@ class ImportTabFITS(ImportTab):
             return True
         return False
 
-    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import fits file."""
         
         item = self.fitshdulist.selectedItems()[0]
@@ -643,6 +646,7 @@ class ImportTabFITS(ImportTab):
             symerrcol=cols[1],
             poserrcol=cols[2],
             negerrcol=cols[3],
+            tags=tags,
             linked=linked,
             )
 
@@ -790,7 +794,7 @@ class ImportTabPlugins(ImportTab):
         self.pluginPreview.setPlainText(text)
         return bool(ok)
 
-    def doImport(self, doc, filename, linked, encoding, prefix, suffix):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import using plugin."""
         
         fields = self.getPluginFields()
@@ -801,6 +805,7 @@ class ImportTabPlugins(ImportTab):
             filename=filename,
             linked=linked, encoding=encoding,
             prefix=prefix, suffix=suffix,
+            tags=tags,
             **fields)
 
         op = document.OperationDataImportPlugin(params)
@@ -1023,11 +1028,13 @@ class ImportDialog(VeuszDialog):
         # import according to tab selected
         importtab = self.methodtab.currentWidget()
         prefix, suffix = self.getPrefixSuffix(filename)
+        tags = unicode(self.tagcombo.currentText()).split()
+
         try:
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
             self.document.suspendUpdates()
             importtab.doImport(self.document, filename, linked, encoding,
-                               prefix, suffix)
+                               prefix, suffix, tags)
             qt4.QApplication.restoreOverrideCursor()
         except Exception:
             qt4.QApplication.restoreOverrideCursor()
