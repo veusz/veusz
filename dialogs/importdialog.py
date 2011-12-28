@@ -816,7 +816,8 @@ class ImportTabPlugins(ImportTab):
         if op.outcustoms:
             out.append('')
             out.append('Set custom definitions:')
-            out += outcustoms
+            # format custom definitions
+            out += ['%s %s=%s' % tuple(c) for c in op.outcustoms]
 
         self.pluginPreview.setPlainText('\n'.join(out))
 

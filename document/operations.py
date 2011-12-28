@@ -1162,11 +1162,8 @@ class OperationDataImportPlugin(OperationDataImportBase):
         # add constants, functions to doc, if any
         self.addCustoms(document, customs)
 
-        # custom strings
-        custstr = ['%s %s=%s' % tuple(c) for c in customs]
-
         self.outdatasets = names
-        self.outcustoms = custstr
+        self.outcustoms = list(customs)
 
 class OperationDataCaptureSet(object):
     """An operation for setting the results from a SimpleRead into the
