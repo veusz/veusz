@@ -431,6 +431,13 @@ class Document( qt4.QObject ):
         """Return widget for page."""
         return self.basewidget.children[pagenumber]
 
+    def datasetTags(self):
+        """Get list of all tags in datasets."""
+        tags = set()
+        for dataset in self.data.itervalues():
+            tags.update(dataset.tags)
+        return list(sorted(tags))
+
     def _writeFileHeader(self, fileobj, type):
         """Write a header to a saved file of type."""
 
@@ -444,6 +451,20 @@ class Document( qt4.QObject ):
         for vals in self.customs:
             fileobj.write('AddCustom(%s, %s, %s)\n' %
                           tuple([repr(x) for x in vals]))
+
+    def saveDatasetTags(self, fileobj):
+        """Write dataset tags to output file"""
+
+        # get a list of all tags and which datasets have them
+        bytag = defaultdict(list)
+        for name, dataset in sorted(self.data.iteritems()):
+            for t in dataset.tags:
+                bytag[t].append(name)
+
+        # write out tags
+        for tag, val in sorted(bytag.iteritems()):
+            fileobj.write('TagDatasets(%s, %s)\n' %
+                          (repr(tag), repr(val)))
 
     def saveCustomFile(self, fileobj):
         """Export the custom settings to a file."""
@@ -475,6 +496,9 @@ class Document( qt4.QObject ):
         # save the remaining datasets
         for name, dataset in sorted(self.data.items()):
             dataset.saveToFile(fileobj, name)
+
+        # save tags of datasets
+        self.saveDatasetTags(fileobj)
 
         # save the actual tree structure
         fileobj.write(self.basewidget.getSaveText())

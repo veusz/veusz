@@ -832,23 +832,6 @@ class OperationDataImportBase(object):
         # invalid conversions
         self.outinvalids = {}
 
-    def doTag(self, doc):
-        """Do tagging of datasets."""
-        self.removetags = defaultdict(list)
-        if self.params.tags:
-            for t in self.params.tags:
-                for n in self.outdatasets:
-                    if n not in doc.datasettags:
-                        doc.datasettags[t].append(n)
-                        self.removetags[t].append(n)
-
-    def undoTag(self, doc):
-        """Undo tagging of datasets."""
-        for tag, names in self.removetags.iteritems():
-            n = set(names)
-            doc.datasettags[t] = [x for x in doc.datasettags[t]
-                                  if x not in n]
-
     def doImport(self, document):
         """Do import, override this.
         Return list of names of datasets read
@@ -880,7 +863,11 @@ class OperationDataImportBase(object):
 
         # only remember the parts we need
         self.olddatasets = [ (n, olddatasets.get(n)) for n in self.outdatasets ]
-        self.doTag(document)
+
+        # apply tags
+        if self.params.tags:
+            for n in self.outdatasets:
+                document.data[n].tags.update(self.params.tags)
 
     def undo(self, document):
         """Undo import."""
@@ -891,9 +878,6 @@ class OperationDataImportBase(object):
                 document.deleteData(name)
             else:
                 document.setData(name, ds)
-
-        # undo tagging
-        self.undoTag(document)
 
         # for custom definitions
         if self.oldconst is not None:
@@ -1202,6 +1186,50 @@ class OperationDataCaptureSet(object):
             else:
                 # or delete datasets that weren't there before
                 document.deleteData(name)
+
+class OperationDataTag(object):
+    """Add a tag to a list of datasets."""
+
+    descr = "add dataset tags"
+
+    def __init__(self, tag, datasetnames):
+        """Add tag to datasets listed."""
+        self.tag = tag
+        self.datasetnames = datasetnames
+
+    def do(self, document):
+        """Add new tags, if required."""
+        self.removetags = []
+        for name in self.datasetnames:
+            existing = document.data[name].tags
+            if self.tag not in existing:
+                existing.add(self.tag)
+                self.removetags.append(name)
+
+    def undo(self, document):
+        """Remove tags, if not previously present."""
+        for name in self.removetags:
+            document.data[name].tags.remove(self.tag)
+
+class OperationDataUntag(object):
+    """Add a tag to a list of datasets."""
+
+    descr = "remove dataset tags"
+
+    def __init__(self, tag, datasetnames):
+        """Remove tag to datasets listed."""
+        self.tag = tag
+        self.datasetnames = datasetnames
+
+    def do(self, document):
+        """Add new tags, if required."""
+        for name in self.datasetnames:
+            document.data[name].tags.remove(self.tag)
+
+    def undo(self, document):
+        """Remove tags, if not previously present."""
+        for name in self.datasetnames:
+            document.data[name].tags.add(self.tag)
 
 ###############################################################################
 # Alter dataset

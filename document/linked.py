@@ -196,7 +196,7 @@ class LinkedFileCSV(LinkedFileBase):
             v = getattr(self.params, param)
             if param == 'prefix' or param == 'suffix':
                 param = 'ds' + param
-            if param != 'filename' and v != default:
+            if param != 'filename' and param != 'tags' and v != default:
                 paramsout.append("%s=%s" % (param, repr(v)))
 
         fileobj.write("ImportFileCSV(%s)\n" % (", ".join(paramsout)))

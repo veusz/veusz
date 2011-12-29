@@ -250,6 +250,11 @@ class DBusInterface(vzdbus.Object):
         self.ci.SetToReference(var, val)
 
     @vzdbus.method(dbus_interface=interface,
+                   in_signature='sas')
+    def TagDatasets(self, tag, datasets):
+        self.ci.TagDatasets(unicode(tag), datasets)
+
+    @vzdbus.method(dbus_interface=interface,
                    in_signature='s')
     def To(self, path):
         self.ci.To(path)

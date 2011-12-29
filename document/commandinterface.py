@@ -87,6 +87,7 @@ class CommandInterface(qt4.QObject):
         'SetDataText',
         'SettingType',
         'SetVerbose',
+        'TagDatasets',
         'To',
         'WidgetType',
         )
@@ -968,3 +969,12 @@ class CommandInterface(qt4.QObject):
 
         setn = self.currentwidget.prefLookup(path)
         return setn.typename
+
+    def TagDatasets(self, tag, datasets):
+        """Apply tag to list of datasets."""
+        op = operations.OperationDataTag(tag, datasets)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print "Applied tag %s to datasets %s" % (
+                tag, ' '.join(datasets))

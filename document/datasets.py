@@ -158,6 +158,9 @@ class DatasetBase(object):
         # file this dataset is linked to
         self.linked = linked
 
+        # tags applied to dataset
+        self.tags = set()
+
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 

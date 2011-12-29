@@ -117,7 +117,10 @@ class DatasetNode(TMNode):
 
         c = self.cols[column]
         if c == "name":
-            return qt4.QVariant(textwrap.fill(ds.description(), 40))
+            text = ds.description()
+            if ds.tags:
+                text += '\n\nTags: %s' % (' '.join(list(sorted(ds.tags))))
+            return qt4.QVariant(textwrap.fill(text, 40))
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
             text = ds.userPreview()
             # add preview of dataset if possible
@@ -241,11 +244,12 @@ class DatasetRelationModel(TreeModel):
             # check whether filtered out
             if not self.datasetFilterOut(ds, child):
                 # get group
-                grp = grouper(ds)
-                if grp not in grpnodes:
-                    grpnodes[grp] = GrpNodeClass( (grp,), None )
-                # add to group
-                grpnodes[grp].insertChildSorted(child)
+                grps = grouper(ds)
+                for grp in grps:
+                    if grp not in grpnodes:
+                        grpnodes[grp] = GrpNodeClass( (grp,), None )
+                    # add to group
+                    grpnodes[grp].insertChildSorted(child)
 
         return treeFromList(grpnodes.values(), coltitles)
 
@@ -254,7 +258,7 @@ class DatasetRelationModel(TreeModel):
         return self.makeGrpTree(
             ("Dataset", "Size", "Type"),
             ("name", "size", "type"),
-            lambda ds: datasetLinkFile(ds),
+            lambda ds: (datasetLinkFile(ds),),
             FilenameNode
             )
 
@@ -263,7 +267,7 @@ class DatasetRelationModel(TreeModel):
         return self.makeGrpTree(
             ("Dataset", "Type", "Filename"),
             ("name", "type", "linkfile"),
-            lambda ds: ds.userSize(),
+            lambda ds: (ds.userSize(),),
             TMNode
             )
 
@@ -272,7 +276,23 @@ class DatasetRelationModel(TreeModel):
         return self.makeGrpTree(
             ("Dataset", "Size", "Filename"),
             ("name", "size", "linkfile"),
-            lambda ds: ds.dstype,
+            lambda ds: (ds.dstype,),
+            TMNode
+            )
+
+    def makeGrpTreeTags(self):
+        """Make a tree of datasets grouped by tags."""
+
+        def getgrp(ds):
+            if ds.tags:
+                return list(sorted(ds.tags))
+            else:
+                return [u"None"]
+
+        return self.makeGrpTree(
+            ("Dataset", "Size", "Type", "Filename"),
+            ("name", "size", "type", "linkfile"),
+            getgrp,
             TMNode
             )
 
@@ -308,6 +328,7 @@ class DatasetRelationModel(TreeModel):
             "filename": self.makeGrpTreeFilename,
             "size": self.makeGrpTreeSize,
             "type": self.makeGrpTreeType,
+            "tags": self.makeGrpTreeTags,
             }[self.grouping]()
 
         self.syncTree(tree)
@@ -458,6 +479,30 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             else:
                 menu.addAction("Unlink relation", _unlink_relation)
 
+        # tagging submenu
+        tagmenu = menu.addMenu("Tags")
+        for tag in self.doc.datasetTags():
+            def toggle(tag=tag):
+                if tag in dataset.tags:
+                    op = document.OperationDataUntag
+                else:
+                    op = document.OperationDataTag
+                self.doc.applyOperation(op(tag, (dsname,)))
+
+            a = tagmenu.addAction(tag, toggle)
+            a.setCheckable(True)
+            a.setChecked(tag in dataset.tags)
+
+        def addtag():
+            tag, ok = qt4.QInputDialog.getText(
+                self, "New tag", "Enter new tag")
+            if ok:
+                tag = unicode(tag).strip().replace(' ', '')
+                if tag:
+                    self.doc.applyOperation( document.OperationDataTag(
+                            tag, (dsname,)) )
+        tagmenu.addAction("Add...", addtag)
+
         menu.addAction("Copy", _copy)
 
         useasmenu = menu.addMenu("Use as")
@@ -545,12 +590,13 @@ class DatasetBrowser(qt4.QWidget):
     """Widget which shows the document's datasets."""
 
     # how datasets can be grouped
-    grpnames = ("none", "filename", "type", "size")
+    grpnames = ("none", "filename", "type", "size", "tags")
     grpentries = {
         "none": "None",
         "filename": "Filename",
         "type": "Type", 
-        "size": "Size"
+        "size": "Size",
+        "tags": "Tags",
         }
 
     def __init__(self, thedocument, mainwin, parent, readonly=False,

@@ -168,7 +168,7 @@ or enter $FILENAME to have filename appended</string>
          </widget>
         </item>
         <item row="0" column="5">
-         <widget class="QComboBox" name="tagcombo">
+         <widget class="HistoryCombo" name="tagcombo">
           <property name="toolTip">
            <string>Enter a list of tags to apply to the imported datasets</string>
           </property>
