@@ -1904,6 +1904,14 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
       </section>
 
       <section>
+	<title><anchor id="Command.TagDatasets" />TagDatasets</title>
+	
+	<para><command>TagDatasets('tag', ['ds1', 'ds2'...])</command></para>
+	
+	<para>Adds the tag to the list of datasets given..</para>
+      </section>
+
+      <section>
 	<title><anchor id="Command.To" />To</title>
 	
 	<para><command>To('widgetpath')</command></para>
