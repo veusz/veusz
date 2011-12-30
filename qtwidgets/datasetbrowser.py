@@ -430,19 +430,21 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         nodes = [ self.model.objFromIndex(i)
                   for i in idxs if i.column() == 0 ]
 
-        classes = utils.unique([ n.__class__ for n in nodes ])
+        # unique list of types of nodes
+        types = utils.unique([ type(n) for n in nodes ])
 
         menu = qt4.QMenu()
-        if DatasetNode in classes:
+        # put contexts onto submenus if multiple types selected
+        if DatasetNode in types:
             thismenu = menu
-            if len(classes) > 1:
+            if len(types) > 1:
                 thismenu = menu.addMenu("Datasets")
             self.datasetContextMenu(
                 [n for n in nodes if isinstance(n, DatasetNode)],
                 thismenu)
-        elif FilenameNode in classes:
+        elif FilenameNode in types:
             thismenu = menu
-            if len(classes) > 1:
+            if len(types) > 1:
                 thismenu = menu.addMenu("Files")
             self.filenameContextMenu(
                 [n for n in nodes if isinstance(n, FilenameNode)],
@@ -559,27 +561,31 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             useasmenu = menu.addMenu("Use as")
             self.getMenuUseAs(useasmenu, datasets[0])
 
-    def filenameContextMenu(self, node, menu):
+    def filenameContextMenu(self, nodes, menu):
         """Return context menu for filenames."""
 
         from veusz.dialogs.reloaddata import ReloadData
-        filename = node.filename()
-        if filename == '/':
-            # non linked filename node
-            return None
+
+        filenames = [n.filename() for n in nodes if n.filename() != '/']
+        if not filenames:
+            return
 
         def _reload():
             """Reload data in this file."""
-            d = ReloadData(self.doc, self.mainwindow, filenames=set([filename]))
+            d = ReloadData(self.doc, self.mainwindow, filenames=set(filenames))
             self.mainwindow.showDialog(d)
         def _unlink_all():
             """Unlink all datasets associated with file."""
             self.doc.applyOperation(
-                document.OperationDatasetUnlinkByFile(filename))
+                document.OperationMultiple(
+                    [document.OperationDatasetUnlinkByFile(f) for f in filenames],
+                    descr='unlink by file'))
         def _delete_all():
             """Delete all datasets associated with file."""
             self.doc.applyOperation(
-                document.OperationDatasetDeleteByFile(filename))
+                document.OperationMultiple(
+                    [document.OperationDatasetDeleteByFile(f) for f in filenames],
+                    descr='delete by file'))
 
         menu.addAction("Reload", _reload)
         menu.addAction("Unlink all", _unlink_all)
