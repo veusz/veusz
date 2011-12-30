@@ -204,18 +204,26 @@ class DatasetRelationModel(TreeModel):
         """Should dataset be filtered out by filter options."""
         filterout = False
 
-        # is filter text not in node text
-        if ( self.filter != "" and
-             all([d.find(self.filter)<0 for d in node.data]) ):
-            filterout = True
+        # is filter text not in node text or text
+        keep = True
+        if self.filter != "":
+            keep = False
+            if any([t.find(self.filter) >= 0 for t in ds.tags]):
+                keep = True
+            if any([t.find(self.filter) >= 0 for t in node.data]):
+                keep = True
+        # check dimensions haven't been filtered
         if ( self.filterdims is not None and
              ds.dimensions not in self.filterdims ):
             filterout = True
+        # check type hasn't been filtered
         if ( self.filterdtype is not None and
              ds.datatype not in self.filterdtype ):
             filterout = True
 
-        return filterout
+        if filterout:
+            return True
+        return not keep
 
     def makeGrpTreeNone(self):
         """Make tree with no grouping."""
