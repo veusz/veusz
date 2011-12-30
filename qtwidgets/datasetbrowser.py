@@ -363,6 +363,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                                           filterdtype=filterdtype)
 
         self.setModel(self.model)
+        self.setSelectionMode(qt4.QTreeView.ExtendedSelection)
         self.setSelectionBehavior(qt4.QTreeView.SelectRows)
         self.setUniformRowHeights(True)
         self.setContextMenuPolicy(qt4.Qt.CustomContextMenu)
@@ -423,20 +424,32 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
     def showContextMenu(self, pt):
         """Context menu for nodes."""
-        idx = self.currentIndex()
-        if idx.isValid():
-            node = self.model.objFromIndex(idx)
-        else:
-            node = None
+
+        # get selected nodes
+        idxs = self.selectionModel().selection().indexes()
+        nodes = [ self.model.objFromIndex(i)
+                  for i in idxs if i.column() == 0 ]
+
+        classes = utils.unique([ n.__class__ for n in nodes ])
 
         menu = qt4.QMenu()
-        if isinstance(node, DatasetNode):
-            self.datasetContextMenu(node, menu)
-        elif isinstance(node, FilenameNode):
-            self.filenameContextMenu(node, menu)
+        if DatasetNode in classes:
+            thismenu = menu
+            if len(classes) > 1:
+                thismenu = menu.addMenu("Datasets")
+            self.datasetContextMenu(
+                [n for n in nodes if isinstance(n, DatasetNode)],
+                thismenu)
+        elif FilenameNode in classes:
+            thismenu = menu
+            if len(classes) > 1:
+                thismenu = menu.addMenu("Files")
+            self.filenameContextMenu(
+                [n for n in nodes if isinstance(n, FilenameNode)],
+                thismenu)
 
         def _paste():
-            """Paste dataset."""
+            """Paste dataset(s)."""
             if document.isDataMime():
                 mime = qt4.QApplication.clipboard().mimeData()
                 self.doc.applyOperation(document.OperationDataPaste(mime))
@@ -448,58 +461,86 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         if len( menu.actions() ) != 0:
             menu.exec_(self.mapToGlobal(pt))
 
-    def datasetContextMenu(self, dsnode, menu):
+    def datasetContextMenu(self, dsnodes, menu):
         """Return context menu for datasets."""
         import veusz.dialogs.dataeditdialog as dataeditdialog
-        dataset = dsnode.dataset()
-        dsname = dsnode.datasetName()
+
+        datasets = [d.dataset() for d in dsnodes]
+        dsnames = [d.datasetName() for d in dsnodes]
 
         def _edit():
             """Open up dialog box to recreate dataset."""
-            dataeditdialog.recreate_register[type(dataset)](
-                self.mainwindow, self.doc, dataset, dsname)
+            for dataset, dsname in zip(datasets, dsnames):
+                if type(dataset) in dataeditdialog.recreate_register:
+                    dataeditdialog.recreate_register[type(dataset)](
+                        self.mainwindow, self.doc, dataset, dsname)
         def _edit_data():
             """Open up data edit dialog."""
-            dialog = self.mainwindow.slotDataEdit(editdataset=dsname)
+            for dataset, dsname in zip(datasets, dsnames):
+                if type(dataset) not in dataeditdialog.recreate_register:
+                    dialog = self.mainwindow.slotDataEdit(editdataset=dsname)
         def _delete():
             """Simply delete dataset."""
-            self.doc.applyOperation(document.OperationDatasetDelete(dsname))
+            self.doc.applyOperation(
+                document.OperationMultiple(
+                    [document.OperationDatasetDelete(n) for n in dsnames],
+                    descr='delete dataset(s)'))
         def _unlink_file():
             """Unlink dataset from file."""
-            self.doc.applyOperation(document.OperationDatasetUnlinkFile(dsname))
+            self.doc.applyOperation(
+                document.OperationMultiple(
+                    [document.OperationDatasetUnlinkFile(n)
+                     for d,n in zip(datasets,dsnames)
+                     if d.canUnlink() and d.linked],
+                    descr='unlink dataset(s)'))
         def _unlink_relation():
             """Unlink dataset from relation."""
-            self.doc.applyOperation(document.OperationDatasetUnlinkRelation(dsname))
+            self.doc.applyOperation(
+                document.OperationMultiple(
+                    [document.OperationDatasetUnlinkRelation(n)
+                     for d,n in zip(datasets,dsnames)
+                     if d.canUnlink() and not d.linked],
+                    descr='unlink dataset(s)'))
         def _copy():
             """Copy data to clipboard."""
-            mime = document.generateDatasetsMime([dsname], self.doc)
+            mime = document.generateDatasetsMime(dsnames, self.doc)
             qt4.QApplication.clipboard().setMimeData(mime)
 
-        if type(dataset) in dataeditdialog.recreate_register:
+        # editing
+        recreate = [type(d) in dataeditdialog.recreate_register
+                    for d in datasets]
+        if any(recreate):
             menu.addAction("Edit", _edit)
-        else:
+        if not all(recreate):
             menu.addAction("Edit data", _edit_data)
 
+        # deletion
         menu.addAction("Delete", _delete)
-        if dataset.canUnlink():
-            if dataset.linked:
-                menu.addAction("Unlink file", _unlink_file)
-            else:
-                menu.addAction("Unlink relation", _unlink_relation)
+
+        # linking
+        unlink_file = [d.canUnlink() and d.linked for d in datasets]
+        if any(unlink_file):
+            menu.addAction("Unlink file", _unlink_file)
+        unlink_relation = [d.canUnlink() and not d.linked for d in datasets]
+        if any(unlink_relation):
+            menu.addAction("Unlink relation", _unlink_relation)
 
         # tagging submenu
         tagmenu = menu.addMenu("Tags")
         for tag in self.doc.datasetTags():
             def toggle(tag=tag):
-                if tag in dataset.tags:
+                state = [tag in d.tags for d in datasets]
+                if all(state):
                     op = document.OperationDataUntag
                 else:
                     op = document.OperationDataTag
-                self.doc.applyOperation(op(tag, (dsname,)))
+                self.doc.applyOperation(op(tag, dsnames))
 
             a = tagmenu.addAction(tag, toggle)
             a.setCheckable(True)
-            a.setChecked(tag in dataset.tags)
+            state = [tag in d.tags for d in datasets]
+
+            a.setChecked(all([tag in d.tags for d in datasets]))
 
         def addtag():
             tag, ok = qt4.QInputDialog.getText(
@@ -508,14 +549,15 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                 tag = unicode(tag).strip().replace(' ', '')
                 if tag:
                     self.doc.applyOperation( document.OperationDataTag(
-                            tag, (dsname,)) )
+                            tag, dsnames) )
         tagmenu.addAction("Add...", addtag)
 
+        # copy
         menu.addAction("Copy", _copy)
 
-        useasmenu = menu.addMenu("Use as")
-        if dataset is not None:
-            self.getMenuUseAs(useasmenu, dataset)
+        if len(datasets) == 1:
+            useasmenu = menu.addMenu("Use as")
+            self.getMenuUseAs(useasmenu, datasets[0])
 
     def filenameContextMenu(self, node, menu):
         """Return context menu for filenames."""

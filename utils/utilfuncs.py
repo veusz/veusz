@@ -422,3 +422,18 @@ def positionFloatingPopup(popup, widget):
 
     popup.move(x, y)
     popup.setFocus()
+
+def unique(inlist):
+    """Get unique entries in list."""
+
+    inlist = list(inlist)
+    inlist.sort()
+
+    class X: pass
+    last = X()
+    out = []
+    for x in inlist:
+        if x != last:
+            out.append(x)
+            last = x
+    return out
