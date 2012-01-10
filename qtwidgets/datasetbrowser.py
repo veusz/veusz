@@ -118,8 +118,12 @@ class DatasetNode(TMNode):
         c = self.cols[column]
         if c == "name":
             text = ds.description()
+            if text is None:
+                text = ''
+
             if ds.tags:
                 text += '\n\nTags: %s' % (' '.join(list(sorted(ds.tags))))
+
             return qt4.QVariant(textwrap.fill(text, 40))
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
             text = ds.userPreview()
