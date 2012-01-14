@@ -246,15 +246,8 @@ class CommandInterpreter(object):
 
     def GPL(self):
         """Write the GPL to the console window."""
+        sys.stdout.write( utils.getLicense() )
 
-        try:
-            f = open(os.path.join(utils.veuszDirectory, 'COPYING'), 'rU')
-        except IOError:
-            sys.stdout.write('Could not open the license file.\n')
-        else:
-            for line in f:
-                sys.stdout.write(line)
-            
     def runPickle(self, command):
         """Run a pickled command given as arguments.
 

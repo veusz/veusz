@@ -282,7 +282,7 @@ class ImageFile(BoxShape):
             f = open(s.filename, 'rb')
             data = f.read()
             f.close()
-        except IOError:
+        except EnvironmentError:
             print "Could not find file. Not embedding."
             return
 

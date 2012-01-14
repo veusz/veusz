@@ -112,7 +112,7 @@ class ImportTabStandard(ImportTab):
 
             self.previewedit.setPlainText(text)
             return True
-        except (UnicodeError, IOError):
+        except (UnicodeError, EnvironmentError):
             self.previewedit.setPlainText('')
             return False
 
@@ -260,7 +260,7 @@ class ImportTabCSV(ImportTab):
                 pass
             numrows = len(rows)
 
-        except (IOError, UnicodeError, csv.Error):
+        except (EnvironmentError, UnicodeError, csv.Error):
             return False
 
         # fill up table
@@ -373,7 +373,7 @@ class ImportTab2D(ImportTab):
             self.twod_previewedit.setPlainText(text)
             return True
 
-        except (UnicodeError, IOError):
+        except (UnicodeError, EnvironmentError):
             self.twod_previewedit.setPlainText('')
             return False
 
@@ -500,9 +500,9 @@ class ImportTabFITS(ImportTab):
             line = ifile.readline()
             # is this a hack?
             if line.find('SIMPLE  =                    T') == -1:
-                raise IOError
+                raise EnvironmentError
             ifile.close()
-        except IOError:
+        except EnvironmentError:
             self.clearFITSView()
             return False
 
@@ -773,7 +773,7 @@ class ImportTabPlugins(ImportTab):
             try:
                 f = open(filename, 'r')
                 f.close()
-            except IOError:
+            except EnvironmentError:
                 self.pluginPreview.setPlainText('')
                 return False
 

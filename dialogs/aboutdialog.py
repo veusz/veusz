@@ -55,11 +55,4 @@ class LicenseDialog(VeuszDialog):
 
     def __init__(self, parent):
         VeuszDialog.__init__(self, parent, 'license.ui')
-
-        try:
-            f = open(os.path.join(utils.veuszDirectory, 'COPYING'), 'rU')
-            text = f.read()
-        except IOError:
-            text = 'Could not open the license file.'
-
-        self.licenseEdit.setPlainText(text)
+        self.licenseEdit.setPlainText(utils.getLicense())

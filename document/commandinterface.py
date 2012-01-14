@@ -127,7 +127,7 @@ class CommandInterface(qt4.QObject):
                 opened = open(fname)
                 opened.close()
                 return fname
-            except IOError:
+            except EnvironmentError:
                 pass
         return filename
 

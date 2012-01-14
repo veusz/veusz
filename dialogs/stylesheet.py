@@ -112,10 +112,10 @@ class StylesheetDialog(VeuszDialog):
                 f.close()
                 self.recentButton.addFile(filename)
 
-            except IOError:
-                qt4.QMessageBox.critical(self, "Veusz",
-                                         "Cannot export stylesheet as '%s'" %
-                                         filename)
+            except EnvironmentError, e:
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Unable to save '%s'\n\n%s" % (filename, e.strerror))
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
@@ -124,10 +124,10 @@ class StylesheetDialog(VeuszDialog):
         if filename:
             try:
                 self.loadStyleSheet(filename)
-            except IOError:
-                qt4.QMessageBox.critical(self, "Veusz",
-                                         "Cannot load stylesheet '%s'" %
-                                         filename)
+            except EnvironmentError, e:
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Unable to load '%s'\n\n%s" % (filename, e.strerror))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

@@ -94,12 +94,7 @@ class MainWindow(qt4.QMainWindow):
             # load document
             win.openFileInWindow(filename)
         else:
-            # add page and default graph
-            win.document.makeDefaultDoc()
-
-            # load defaults if set
-            win.loadDefaultStylesheet()
-            win.loadDefaultCustomDefinitions()
+            win.setupDefaultDoc()
 
         # try to select first graph of first page
         win.treeedit.doInitialWidgetSelect()
@@ -273,6 +268,16 @@ class MainWindow(qt4.QMainWindow):
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
 
+    def setupDefaultDoc(self):
+        """Setup default document."""
+
+        # add page and default graph
+        self.document.makeDefaultDoc()
+
+        # load defaults if set
+        self.loadDefaultStylesheet()
+        self.loadDefaultCustomDefinitions()
+
     def loadDefaultStylesheet(self):
         """Loads the default stylesheet for the new document."""
         filename = setdb['stylesheet_default']
@@ -280,10 +285,11 @@ class MainWindow(qt4.QMainWindow):
             try:
                 self.document.applyOperation(
                     document.OperationLoadStyleSheet(filename) )
-            except IOError:
-                qt4.QMessageBox.warning(self, "Veusz",
-                                        "Unable to load default "
-                                        "stylesheet '%s'" % filename)
+            except EnvironmentError, e:
+                qt4.QMessageBox.warning(
+                    self, "Error - Veusz",
+                    "Unable to load default stylesheet '%s'\n\n%s" %
+                    (filename, e.strerror))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -296,10 +302,11 @@ class MainWindow(qt4.QMainWindow):
             try:
                 self.document.applyOperation(
                     document.OperationLoadCustom(filename) )
-            except IOError:
-                qt4.QMessageBox.warning(self, "Veusz",
-                                        "Unable to load default custom "
-                                        "definitons '%s'" % filename)
+            except EnvironmentError, e:
+                qt4.QMessageBox.warning(
+                    self, "Error - Veusz",
+                    "Unable to load custom definitions '%s'\n\n%s" %
+                    (filename, e.strerror))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -871,12 +878,12 @@ class MainWindow(qt4.QMainWindow):
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
                 self.updateStatusbar("Saved to %s" % self.filename)
-            except IOError, e:
+            except EnvironmentError, e:
                 qt4.QApplication.restoreOverrideCursor()
-                qt4.QMessageBox.critical(self, "Cannot save document",
-                                         "Cannot save document as '%s'\n"
-                                         "\n%s (error %i)" %
-                                         (self.filename,  e.strerror, e.errno))
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Unable to save document as '%s'\n\n%s" %
+                    (self.filename, e.strerror))
             else:
                 # restore the cursor
                 qt4.QApplication.restoreOverrideCursor()
@@ -932,10 +939,11 @@ class MainWindow(qt4.QMainWindow):
             filename = unicode( fd.selectedFiles()[0] )
             try:
                 open(filename)
-            except IOError, e:
-                qt4.QMessageBox.critical(self, "Unable to open file",
-                                         "Unable to open file '%s'\n'%s'" %
-                                         (filename, unicode(e)))
+            except EnvironmentError, e:
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Unable to open '%s'\n\n%s" %
+                    (filename, e.strerror))
                 return None
             return filename
         return None
@@ -1009,12 +1017,13 @@ class MainWindow(qt4.QMainWindow):
         # read script
         try:
             script = open(filename, 'rU').read()
-        except IOError, e:
+        except EnvironmentError, e:
             qt4.QApplication.restoreOverrideCursor()
-            qt4.QMessageBox.warning(self, "Cannot open document",
-                                    "Cannot open the document '%s'\n"
-                                    "\n%s (error %i)" % (filename,
-                                                         e.strerror, e.errno))
+            qt4.QMessageBox.critical(
+                self, "Error - Veusz",
+                "Cannot open document '%s'\n\n%s" %
+                (filename, e.strerror))
+            self.setupDefaultDoc()
             return
 
         # check code for any security issues
@@ -1163,7 +1172,7 @@ class MainWindow(qt4.QMainWindow):
 
         # check there is a page
         if self.document.getNumberPages() == 0:
-            qt4.QMessageBox.warning(self, "Veusz",
+            qt4.QMessageBox.warning(self, "Error - Veusz",
                                     "No pages to export")
             return
 
@@ -1228,7 +1237,7 @@ class MainWindow(qt4.QMainWindow):
             if (ext not in validextns) and (ext not in chosenextns):
                 filename += "." + chosenextns[0]
 
-            e = document.Export(
+            export = document.Export(
                 self.document,
                 filename,
                 self.plot.getPageNumber(),
@@ -1240,20 +1249,28 @@ class MainWindow(qt4.QMainWindow):
                 backcolor=setdb['export_background'],
                 svgtextastext=setdb['export_SVG_text_as_text'],
                 )
-            try:
-                e.export()
-            except (IOError, RuntimeError), inst:
-                qt4.QMessageBox.critical(self, "Veusz",
-                                         "Error exporting file:\n%s" % inst)
 
-            # restore the cursor
-            qt4.QApplication.restoreOverrideCursor()
+            try:
+                export.export()
+            except (RuntimeError, EnvironmentError), e:
+                if isinstance(e, EnvironmentError):
+                    msg = e.strerror
+                else:
+                    msg = unicode(e)
+
+                qt4.QApplication.restoreOverrideCursor()
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Error exporting to file '%s'\n\n%s" %
+                    (filename, msg))
+            else:
+                qt4.QApplication.restoreOverrideCursor()
 
     def slotFilePrint(self):
         """Print the document."""
 
         if self.document.getNumberPages() == 0:
-            qt4.QMessageBox.warning(self, "Veusz",
+            qt4.QMessageBox.warning(self, "Error - Veusz",
                                     "No pages to print")
             return
 

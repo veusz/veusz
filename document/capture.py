@@ -174,7 +174,7 @@ class CommandCaptureStream(CaptureStream):
 
         try:
             self.popen.stdout.close()
-        except IOError:
+        except EnvironmentError:
             # problems closing stdout for some reason
             pass
 

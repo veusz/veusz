@@ -224,10 +224,10 @@ class CustomDialog(VeuszDialog):
                 self.document.saveCustomFile(f)
                 f.close()
                 self.recentButton.addFile(filename)
-
-            except IOError:
-                qt4.QMessageBox.critical(self, "Veusz",
-                                         "Cannot save as '%s'" % filename)
+            except EnvironmentError, e:
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Unable to save '%s'\n\n%s" % (filename, e.strerror))
 
     def slotLoad(self):
         """Load entries."""
@@ -237,10 +237,10 @@ class CustomDialog(VeuszDialog):
         if filename:
             try:
                 self.loadFile(filename)
-            except IOError:
-                qt4.QMessageBox.critical(self, "Veusz",
-                                         "Cannot load custom definitions '%s'"
-                                         % filename)
+            except EnvironmentError, e:
+                qt4.QMessageBox.critical(
+                    self, "Error - Veusz",
+                    "Unable to load '%s'\n\n%s" % (filename, e.strerror))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

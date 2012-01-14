@@ -358,7 +358,7 @@ class QdpFile(object):
                 try:
                     newf = open(fname)
                     self.importFile(newf, dirname)
-                except IOError:
+                except EnvironmentError:
                     pass
                 continue
 
@@ -612,8 +612,8 @@ class ImportPluginBinary(ImportPlugin):
             f = open(params.filename, "rb")
             data = f.read()
             f.close()
-        except IOError:
-            return "Cannot read file", False
+        except EnvironmentError, e:
+            return "Cannot read file (%s)" % e.strerror, False
 
         text = ['File length: %i bytes' % len(data)]
 
@@ -647,9 +647,9 @@ class ImportPluginBinary(ImportPlugin):
             f.seek( params.field_results["offset"] )
             retn = f.read()
             f.close()
-        except IOError, e:
-            raise ImportPluginException("Error while reading file: %s" %
-                                        unicode(e))
+        except EnvironmentError, e:
+            raise ImportPluginException("Error while reading file '%s'\n\n%s" %
+                                        (params.filename, e.strerror))
 
         data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
                             count=params.field_results["length"])

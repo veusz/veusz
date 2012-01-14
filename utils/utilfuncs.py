@@ -62,6 +62,17 @@ def _getVeuszDirectory():
 # get resource and example directories
 veuszDirectory, exampleDirectory = _getVeuszDirectory()
 
+def getLicense():
+    """Return license text."""
+    try:
+        f = open(os.path.join(veuszDirectory, 'COPYING'), 'rU')
+        text = f.read()
+        f.close()
+    except EnvironmentError:
+        text = ('Could not open the license file.\n'
+                'See license at http://www.gnu.org/licenses/gpl-2.0.html')
+    return text
+
 id_re = re.compile('^[A-Za-z_][A-Za-z0-9_]*$')
 def validPythonIdentifier(name):
     """Is this a valid python identifier?"""
