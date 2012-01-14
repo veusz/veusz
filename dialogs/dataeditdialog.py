@@ -279,13 +279,8 @@ class DataEditDialog(VeuszDialog):
         # select first item, if any or initialise if none
         if len(self.document.data) > 0:
             self.selectDataset( sorted(self.document.data.keys())[0] )
-
-        #if self.dslistmodel.rowCount() > 0:
-        #    self.datasetlistview.selectionModel().select(
-        #        self.dslistmodel.createIndex(0, 0),
-        #        qt4.QItemSelectionModel.Select)
-        #else:
-        #    self.slotDatasetSelected(None, None)
+        else:
+            self.slotDatasetSelected("")
 
         self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteditem"),
                      self.slotDatasetSelected)
