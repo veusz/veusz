@@ -150,6 +150,9 @@ class TreeModel(qt4.QAbstractItemModel):
             return qt4.QModelIndex()
 
         childitem = self.objFromIndex(index)
+        if childitem is None:
+            return qt4.QModelIndex()
+
         parentitem = childitem.parent
 
         if parentitem is self.root:
