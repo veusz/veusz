@@ -203,10 +203,10 @@ def dateStrToRegularExpression(instr):
 
         # replace strings with characters
         for search, char, repl in maps:
-            p = p.replace(search, char)
+            p = p.replace(search, char, 1)
         # replace characters with re strings
         for search, char, repl in maps:
-            p = p.replace(char, repl)
+            p = p.replace(char, repl, 1)
 
         # save as an optional group
         out.append( '(?:%s)?' % p )
