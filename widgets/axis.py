@@ -1071,8 +1071,6 @@ class Axis(widget.Widget):
             operations = (
                 document.OperationSettingSet(s.get('min'), float(c1)),
                 document.OperationSettingSet(s.get('max'), float(c2)),
-                document.OperationSettingSet(s.get('autoExtend'), False),
-                document.OperationSettingSet(s.get('autoExtendZero'), False),
                 )
             self.document.applyOperation(
                 document.OperationMultiple(operations, descr='zoom axis'))

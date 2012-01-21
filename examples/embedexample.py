@@ -39,8 +39,7 @@ g.To( g.Add('graph') )
 g.Add('xy', marker='tiehorz', MarkerFill__color='green')
 
 # this stops intelligent axis extending
-g.Set('x/autoExtend', False)
-g.Set('x/autoExtendZero', False)
+g.Set('x/autoRange', 'exact')
 
 # zoom out
 g.Zoom(0.8)
