@@ -639,6 +639,15 @@ class PointPlotter(GenericPlotter):
         text = s.get('labels').getData(doc, checknull=True)
         xv = s.get('xData').getData(doc)
         yv = s.get('yData').getData(doc)
+
+        # handle missing dataset
+        if yv and not xv and s.get('xData').isEmpty():
+            length = yv.data.shape[0]
+            xv = document.DatasetRange(length, (1,length))
+        elif xv and not yv and s.get('yData').isEmpty():
+            length = xv.data.shape[0]
+            yv = document.DatasetRange(length, (1,length))
+
         if None in (text, xv, yv):
             return (None, None)
         if direction == 'horizontal':
