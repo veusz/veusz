@@ -2,7 +2,6 @@
 # User: jss
 # Date: Sun, 13 Sep 2009 21:41:45 +0000
 
-AddImportPath(u'/home/jss/code/veusz/examples')
 ImportFile(u'bar_labels.dat', u'', linked=True, ignoretext=True)
 Set('width', '10.5cm')
 Set('height', '16.2cm')

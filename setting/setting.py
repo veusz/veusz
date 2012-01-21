@@ -358,10 +358,13 @@ class SettingBackwardCompat(Setting):
 
     typename = 'backward-compat'
 
-    def __init__(self, name, newrelpath, val, **args):
+    def __init__(self, name, newrelpath, val, translatefn = None,
+                 **args):
         """Point this setting to another.
         newrelpath is a path relative to this setting's parent
         """
+
+        self.translatefn = translatefn
         Setting.__init__(self, name, val, **args)
         self.relpath = newrelpath.split('/')
 
@@ -381,6 +384,8 @@ class SettingBackwardCompat(Setting):
 
     def set(self, val):
         if self.parent is not None and not isinstance(val, Reference):
+            if self.translatefn:
+                val = self.translatefn(val)
             self.getForward().set(val)
 
     def isDefault(self):
@@ -390,7 +395,8 @@ class SettingBackwardCompat(Setting):
         return self.getForward().get()
 
     def copy(self):
-        return self._copyHelper(('/'.join(self.relpath),), (), {})
+        return self._copyHelper(('/'.join(self.relpath),), (),
+                                {'translatefn': self.translatefn})
 
     def makeControl(self, *args):
         return None
@@ -833,10 +839,18 @@ class Choice(Setting):
     typename = 'choice'
 
     def __init__(self, name, vallist, val, **args):
-        """Setting val must be in vallist."""
-        
+        """Setting val must be in vallist.
+        descriptions is an optional addon to put a tooltip on each item
+        in the control.
+        """
+
         assert type(vallist) in (list, tuple)
+
         self.vallist = vallist
+        self.descriptions = args.get('descriptions', None)
+        if self.descriptions:
+            del args['descriptions']
+
         Setting.__init__(self, name, val, **args)
 
     def copy(self):
@@ -857,9 +871,10 @@ class Choice(Setting):
             return text
         else:
             raise InvalidType
-        
+
     def makeControl(self, *args):
-        return controls.Choice(self, False, self.vallist, *args)
+        argsv = {'descriptions': self.descriptions}
+        return controls.Choice(self, False, self.vallist, *args, **argsv)
 
 class ChoiceOrMore(Setting):
     """One out of a list of strings, or anything else."""

@@ -39,7 +39,7 @@ class AxisTicksBase(object):
 
     def __init__( self, minval, maxval, numticks, numminorticks,
                   logaxis = False, prefermore = True,
-                  extendbounds = True, extendzero = True,
+                  extendmin = False, extendmax = False,
                   forceinterval = None ):
         """Initialise the class.
 
@@ -48,7 +48,6 @@ class AxisTicksBase(object):
         logaxis: axis logarithmic?
         prefermore: prefer more ticks rather than fewer
         extendbounds: extend minval and maxval to nearest tick if okay
-        extendzero: extend one end to zero if it is okay
         forceinterval: force interval to one given (if allowed). interval
          is tuple as returned in self.interval after calling getTicks()
         """
@@ -59,8 +58,8 @@ class AxisTicksBase(object):
         self.numminorticks = numminorticks
         self.logaxis = logaxis
         self.prefermore = prefermore
-        self.extendbounds = extendbounds
-        self.extendzero = extendzero
+        self.extendmin = extendmin
+        self.extendmax = extendmax
         self.forceinterval = forceinterval
 
     def getTicks( self ):
@@ -91,7 +90,7 @@ class AxisTicks(AxisTicksBase):
     # positions we're allowed to put minor intervals
     allowed_minorintervals_log = (1., 3., 6., 9., 12., 15., 19.)
 
-    # how much we should allow axes to extend to zero or intervals
+    # how much we should allow axes to extend to a tick
     max_extend_factor = 0.15
 
     def _calcTickValues( self, minval, maxval, delta ):
@@ -124,22 +123,15 @@ class AxisTicks(AxisTicksBase):
         delta = interval * (10**logdelta)
         maxextend = (maxval - minval) * AxisTicks.max_extend_factor
 
-        # should we try to extend one of the bounds to zero?
-        if self.extendzero:
-            # extend to zero using heuristic
-            if minval > 0. and minval <= maxextend:
-                minval = 0.
-            if maxval < 0. and math.fabs(maxval) <= maxextend:
-                maxval = 0.
-
         # should we try to extend to nearest interval*10^logdelta?
-        if self.extendbounds:
+        if self.extendmin:
             # extend minval if possible
             if math.fabs( math.modf( minval / delta )[0] ) > 1e-8:
                 d = minval - ( math.floor( minval / delta ) * delta )
                 if d <= maxextend:
                     minval -= d
 
+        if self.extendmax:
             # extend maxval if possible
             if math.fabs( math.modf( maxval / delta)[0] ) > 1e-8:
                 d = ( (math.floor(maxval / delta)+1.) * delta) - maxval
@@ -429,7 +421,7 @@ class DateTicks(AxisTicksBase):
                               yr*365*24*60*60)
                              for (yr, mn, dy, hr, mi, s, ms), fmt in intervals])
 
-    def bestTickFinder(self, minval, maxval, numticks, extendbounds,
+    def bestTickFinder(self, minval, maxval, numticks, extendmin, extendmax,
                        intervals, intervals_sec):
         """Try to find best choice of numticks ticks between minval and maxval
         intervals is an array similar to self.intervals
@@ -470,12 +462,12 @@ class DateTicks(AxisTicksBase):
 
         # extend bounds if requested
         deltamin = utils.datetimeToFloat(mindate)-utils.datetimeToFloat(mintick)
-        if extendbounds and (deltamin != 0. and deltamin < delta*0.15):
+        if extendmin and (deltamin != 0. and deltamin < delta*0.15):
             mindate = utils.addTimeTupleToDateTime(minround,
                                                    [-x for x in besttt])
             mintick = mindate
         deltamax = utils.datetimeToFloat(maxdate)-utils.datetimeToFloat(maxtick)
-        if extendbounds and (deltamax != 0. and deltamax < delta*0.15):
+        if extendmax and (deltamax != 0. and deltamax < delta*0.15):
             maxdate = utils.addTimeTupleToDateTime(maxtick, besttt)
             maxtick = maxdate
 
@@ -509,14 +501,15 @@ class DateTicks(AxisTicksBase):
 
         # find minor ticks
         mindate, maxdate, est, ticks, format = self.bestTickFinder(
-            self.minval, self.maxval, self.numticks, self.extendbounds,
+            self.minval, self.maxval, self.numticks,
+            self.extendmin, self.extendmax,
             self.intervals, self.intervals_sec)
 
         # try to make minor ticks divide evenly into major ticks
         intervals, intervals_sec = self.filterIntervals(est)
         # get minor ticks
         ig, ig, ig, minorticks, ig = self.bestTickFinder(
-            mindate, maxdate, self.numminorticks, False,
+            mindate, maxdate, self.numminorticks, False, False,
             intervals, intervals_sec)
 
         self.interval = (intervals, intervals_sec)

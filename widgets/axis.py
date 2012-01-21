@@ -204,20 +204,39 @@ class Axis(widget.Widget):
         s.add( setting.Bool('log', False,
                             descr = 'Whether axis is logarithmic',
                             usertext='Log') )
+        s.add( setting.Choice(
+                'autoRange',
+                ('exact', 'next-tick', '+2%', '+5%', '+10%', '+15%'),
+                'next-tick',
+                descr = 'If axis range not specified, use range of '
+                'data and this setting',
+                descriptions = ('Use exact data range',
+                                'Use data range, rounding up to tick marks',
+                                'Use data range, adding 2% of range',
+                                'Use data range, adding 5% of range',
+                                'Use data range, adding 10% of range',
+                                'Use data range, adding 15% of range',
+                                ),
+                formatting = True,
+                usertext = 'Auto range' ) )
         s.add( setting.Choice('mode',
                               ('numeric', 'datetime', 'labels'), 
                               'numeric', 
                               descr = 'Type of ticks to show on on axis', 
                               usertext='Mode') )
-                            
-        s.add( setting.Bool('autoExtend', True,
-                            descr = 'Extend axis to nearest major tick',
-                            usertext='Auto extend',
-                            formatting=True ) )
+
+        s.add( setting.SettingBackwardCompat(
+                'autoExtend', 'autoRange', True,
+                translatefn = lambda x: ('exact', 'next-tick')[x],
+                formatting=True ) )
+
+        # this setting no longer used
         s.add( setting.Bool('autoExtendZero', True,
-                            descr = 'Extend axis to zero if close',
+                            descr = 'Extend axis to zero if close (UNUSED)',
                             usertext='Zero extend',
+                            hidden=True,
                             formatting=True) )
+
         s.add( setting.Bool('autoMirror', True,
                             descr = 'Place axis on opposite side of graph '
                             'if none',
@@ -371,11 +390,27 @@ class Axis(widget.Widget):
             tickclass = axisticks.AxisTicks
         else:
             tickclass = axisticks.DateTicks
-        
+
+        extendmin = extendmax = False
+        r = s.autoRange
+        if r == 'exact':
+            pass
+        elif r == 'next-tick':
+            if s.min == 'Auto':
+                extendmin = True
+            if s.max == 'Auto':
+                extendmax = True
+        else:
+            val = {'+2%': 0.02, '+5%': 0.05, '+10%': 0.1, '+15%': 0.15}[r]
+            rng = self.plottedrange[1] - self.plottedrange[0]
+            if s.min == 'Auto':
+                self.plottedrange[0] -= rng*val
+            if s.max == 'Auto':
+                self.plottedrange[1] += rng*val
+
         axs = tickclass(self.plottedrange[0], self.plottedrange[1],
                         s.MajorTicks.number, s.MinorTicks.number,
-                        extendbounds = s.autoExtend,
-                        extendzero = s.autoExtendZero,
+                        extendmin = extendmin, extendmax = extendmax,
                         logaxis = s.log )
 
         axs.getTicks()

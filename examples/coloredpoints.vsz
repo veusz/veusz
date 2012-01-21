@@ -1,6 +1,7 @@
-# Veusz saved document (version 1.13.99)
-# Saved at 2011-11-09T19:53:17.746203
+# Veusz saved document (version 1.14)
+# Saved at 2012-01-21T17:19:49.964627
 
+AddImportPath(u'/home/jss/code/veusz-git/veusz/examples')
 ImportString('c(numeric)','''
 1.459606e+02
 1.702896e+02
@@ -320,8 +321,7 @@ Add('colorbar', name='colorbar1', autoadd=False)
 To('colorbar1')
 Set('widgetName', u'xy1')
 Set('label', u'Power (W)')
-Set('autoExtend', False)
-Set('autoExtendZero', False)
+Set('autoRange', u'exact')
 Set('lowerPosition', 0.0)
 Set('upperPosition', 1.0)
 Set('otherPosition', 0.0)
@@ -352,7 +352,6 @@ To('y')
 Set('label', u'Offset (m)')
 Set('min', -3.0)
 Set('max', 3.0)
-Set('autoExtend', False)
 Set('direction', 'vertical')
 Set('GridLines/hide', False)
 To('..')

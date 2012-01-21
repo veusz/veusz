@@ -2,7 +2,6 @@
 # User: jss
 # Date: Thu, 26 Aug 2010 20:55:46 +0000
 
-AddImportPath('/home/jss/code/veusz/examples')
 ImportString('x(numeric)','''
 0.000000e+00
 1.000000e+00

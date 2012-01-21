@@ -277,18 +277,18 @@ class Ternary(NonOrthGraph):
         # get ticks along left axis
         atickleft = AxisTicks(self._orgleft-d, self._orgleft+self._size+d,
                               s.MajorTicks.number, s.MinorTicks.number,
-                              extendbounds=False, extendzero=False)
+                              extendmin=False, extendmax=False)
         atickleft.getTicks()
         # use the interval from above to calculate ticks for right
         atickright = AxisTicks(self._orgright-d, self._orgright+self._size+d,
                                s.MajorTicks.number, s.MinorTicks.number,
-                               extendbounds=False, extendzero=False,
+                               extendmin=False, extendmax=False,
                                forceinterval = atickleft.interval)
         atickright.getTicks()
         # then calculate for bottom
         atickbot = AxisTicks(self._orgbot-d, self._orgbot+self._size+d,
                              s.MajorTicks.number, s.MinorTicks.number,
-                             extendbounds=False, extendzero=False,
+                             extendmin=False, extendmax=False,
                              forceinterval = atickleft.interval)
         atickbot.getTicks()
 

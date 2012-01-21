@@ -205,7 +205,7 @@ class Polar(NonOrthGraph):
             self._maxradius = 1.
 
         atick = AxisTicks(0, self._maxradius, t.number, t.number*4,
-                          extendbounds=False,  extendzero=False)
+                          extendmin=False, extendmax=False)
         atick.getTicks()
         majtick = atick.tickvals
 

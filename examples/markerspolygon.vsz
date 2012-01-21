@@ -2,7 +2,6 @@
 # User: jss
 # Date: Tue, 19 Jan 2010 21:30:02 +0000
 
-AddImportPath(u'/home/jss/code/veusz')
 SetDataExpression(u'stary_offset', u'stary+0.1', linked=True)
 SetDataExpression(u'starx_offset', u'starx+0.1', linked=True)
 
