@@ -50,9 +50,14 @@ class LinkedFileBase(object):
         If relpath is a string, write relative to path given
         """
         if relpath:
-            return utils.relpath(self.params.filename, relpath)
+            f = utils.relpath(self.params.filename, relpath)
         else:
-            return self.filename
+            f = self.filename
+        # Here we convert backslashes in Windows to forward slashes
+        # This is compatible, but also works on Unix/Mac
+        if sys.platform == 'win32':
+            f = f.replace('\\', '/')
+        return f
 
     def reloadLinks(self, document):
         """Reload datasets linked to this file."""
