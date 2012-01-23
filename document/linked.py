@@ -19,6 +19,7 @@
 
 """Classes for linked files"""
 
+import sys
 from itertools import izip
 
 import veusz.utils as utils
