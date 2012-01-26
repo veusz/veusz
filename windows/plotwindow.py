@@ -219,6 +219,9 @@ class PlotWindow( qt4.QGraphicsView ):
         self.dpi = (pixmap.logicalDpiX(), pixmap.logicalDpiY())
         self.pixmapitem = self.scene.addPixmap(pixmap)
 
+        # whether full screen mode
+        self.isfullscreen = False
+
         # set to be parent's actions
         self.vzactions = None
 
@@ -306,9 +309,6 @@ class PlotWindow( qt4.QGraphicsView ):
         # create toolbar in main window (urgh)
         self.createToolbar(parent, menu)
 
-        # make the context menu object
-        self._constructContextMenu()
-
     def hideEvent(self, event):
         """Window closing, so exit rendering threads."""
         self.rendercontrol.exitThreads()
@@ -334,9 +334,10 @@ class PlotWindow( qt4.QGraphicsView ):
         iconsize = setting.settingdb['toolbar_size']
         self.viewtoolbar.setIconSize(qt4.QSize(iconsize, iconsize))
         self.viewtoolbar.hide()
-        parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
+        if parent:
+            parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
 
-        if hasattr(parent, 'vzactions'):
+        if parent and hasattr(parent, 'vzactions'):
             # share actions with parent if possible
             # as plot windows can be isolated from mainwindows, we need this
             self.vzactions = actions = parent.vzactions
@@ -728,22 +729,24 @@ class PlotWindow( qt4.QGraphicsView ):
     def keyPressEvent(self, event):
         """Keypad motion moves the picker if it has focus"""
         if self.pickeritem.hasFocus():
-            event.accept()
+
             k = event.key()
             if k == qt4.Qt.Key_Left or k == qt4.Qt.Key_Right:
                 # navigate to the previous or next point on the curve
+                event.accept()
                 dir = 'right' if k == qt4.Qt.Key_Right else 'left'
                 ix = self.pickerinfo.index
                 pickinfo = self.pickerinfo.widget.pickIndex(
                     ix, dir, self.painthelper.widgetBounds(
                         self.pickerinfo.widget))
-                if not pickinfo:
-                    # no more points visible in this direction
-                    return
+                if pickinfo:
+                    # more points visible in this direction
+                    self.emitPicked(pickinfo)
+                return
 
-                self.emitPicked(pickinfo)
             elif k == qt4.Qt.Key_Up or k == qt4.Qt.Key_Down:
                 # navigate to the next plot up or down on the screen
+                event.accept()
                 p = self.pickeritem.pos()
 
                 oldw = self.pickerinfo.widget
@@ -778,6 +781,11 @@ class PlotWindow( qt4.QGraphicsView ):
                     # restore the previous x-position, so that vertical navigation
                     # stays repeatable
                     pickinfo.screenpos = (oldx, pickinfo.screenpos[1])
+
+                return
+
+        # handle up-stream
+        qt4.QGraphicsView.keyPressEvent(self, event)
 
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
@@ -883,10 +891,17 @@ class PlotWindow( qt4.QGraphicsView ):
         self.setSceneRect(0, 0, bufferpixmap.width(), bufferpixmap.height())
         self.pixmapitem.setPixmap(bufferpixmap)
 
-    def _constructContextMenu(self):
-        """Construct the context menu."""
+    def updatePlotSettings(self):
+        """Update plot window settings from settings."""
+        self.setTimeout(setting.settingdb['plot_updatepolicy'])
+        self.antialias = setting.settingdb['plot_antialias']
+        self.rendercontrol.updateNumberThreads()
+        self.actionForceUpdate()
 
-        menu = self.contextmenu = qt4.QMenu(self)
+    def contextMenuEvent(self, event):
+        """Show context menu."""
+
+        menu = qt4.QMenu(self)
 
         # add some useful entries
         menu.addAction( self.vzactions['view.zoommenu'] )
@@ -897,6 +912,9 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # force an update now menu item
         menu.addAction('Force update', self.actionForceUpdate)
+        act = menu.addAction('Full screen', self.actionFullScreen)
+        act.setCheckable(True)
+        act.setChecked(self.isfullscreen)
 
         # Update policy submenu
         submenu = menu.addMenu('Updates')
@@ -918,21 +936,23 @@ class PlotWindow( qt4.QGraphicsView ):
         act.setCheckable(True)
         act.setChecked(self.antialias)
 
-    def updatePlotSettings(self):
-        """Update plot window settings from settings."""
-        self.setTimeout(setting.settingdb['plot_updatepolicy'])
-        self.antialias = setting.settingdb['plot_antialias']
-        self.rendercontrol.updateNumberThreads()
-        self.actionForceUpdate()
-
-    def contextMenuEvent(self, event):
-        """Show context menu."""
-        self.contextmenu.exec_(qt4.QCursor.pos())
+        menu.exec_(qt4.QCursor.pos())
 
     def actionForceUpdate(self):
         """Force an update for the graph."""
         self.docchangeset = -100
         self.checkPlotUpdate()
+
+    def actionFullScreen(self):
+        """Show window full screen or not."""
+        if not self.isfullscreen:
+            self._fullscreenwindow = FullScreenPlotWindow(self.document)
+        else:
+            # cheesy way of closing full screen window
+            p = self
+            while p.parent() is not None:
+                p = p.parent()
+            p.close()
 
     def setTimeout(self, interval):
         """Change timer setting without changing save value."""
@@ -1137,3 +1157,30 @@ class PlotWindow( qt4.QGraphicsView ):
                 for control in self.painthelper.states[widget].cgis:
                     graphitem = control.createGraphicsItem()
                     cgg.addToGroup(graphitem)
+
+class FullScreenPlotWindow(qt4.QScrollArea):
+    """Window for showing plot in full-screen mode."""
+
+    def __init__(self, document):
+        qt4.QScrollArea.__init__(self)
+        self.setFrameShape(qt4.QFrame.NoFrame)
+        self.setWidgetResizable(True)
+
+        # window which shows plot
+        pw = self.plotwin = PlotWindow(document, None)
+        pw.isfullscreen = True
+        self.setWidget(pw)
+        pw.setFocus()
+        pw.zoomfactor = 2.
+
+        self.showFullScreen()
+
+        pw.checkPlotUpdate()
+
+    def keyPressEvent(self, event):
+        k = event.key()
+        if k == qt4.Qt.Key_Escape:
+            event.accept()
+            self.close()
+            return
+        qt4.QScrollArea.keyPressEvent(self, event)
