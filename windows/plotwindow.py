@@ -912,9 +912,11 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # force an update now menu item
         menu.addAction('Force update', self.actionForceUpdate)
-        act = menu.addAction('Full screen', self.actionFullScreen)
-        act.setCheckable(True)
-        act.setChecked(self.isfullscreen)
+
+        if self.isfullscreen:
+            menu.addAction('Close full screen', self.actionFullScreen)
+        else:
+            menu.addAction('Full screen', self.actionFullScreen)
 
         # Update policy submenu
         submenu = menu.addMenu('Updates')
@@ -946,7 +948,8 @@ class PlotWindow( qt4.QGraphicsView ):
     def actionFullScreen(self):
         """Show window full screen or not."""
         if not self.isfullscreen:
-            self._fullscreenwindow = FullScreenPlotWindow(self.document)
+            self._fullscreenwindow = FullScreenPlotWindow(
+                self.document, self.pagenumber)
         else:
             # cheesy way of closing full screen window
             p = self
@@ -1161,23 +1164,48 @@ class PlotWindow( qt4.QGraphicsView ):
 class FullScreenPlotWindow(qt4.QScrollArea):
     """Window for showing plot in full-screen mode."""
 
-    def __init__(self, document):
+    def __init__(self, document, pagenumber):
         qt4.QScrollArea.__init__(self)
         self.setFrameShape(qt4.QFrame.NoFrame)
         self.setWidgetResizable(True)
 
         # window which shows plot
+        self.document = document
         pw = self.plotwin = PlotWindow(document, None)
         pw.isfullscreen = True
+        pw.pagenumber = pagenumber
         self.setWidget(pw)
         pw.setFocus()
-        pw.zoomfactor = 2.
 
         self.showFullScreen()
 
-        pw.checkPlotUpdate()
+        self.toolbar = qt4.QToolBar("Full screen toolbar", self)
+        self.toolbar.addAction(utils.getIcon("kde-window-close"), "Close",
+                               self.close)
+        for a in ('view.zoom11', 'view.zoomin', 'view.zoomout',
+                  'view.zoomwidth', 'view.zoomheight',
+                  'view.zoompage', 'view.prevpage', 'view.nextpage'):
+            self.toolbar.addAction( pw.vzactions[a] )
+        self.toolbar.show()
+
+    def resizeEvent(self, event):
+        """Make zoom fit screen."""
+
+        qt4.QScrollArea.resizeEvent(self, event)
+
+        # size graph to fill screen
+        pagesize = self.document.pageSize(self.plotwin.pagenumber,
+                                          dpi=self.plotwin.dpi)
+        screensize = self.plotwin.size()
+
+        aspectw = screensize.width() * 1. / pagesize[0]
+        aspecth = screensize.height() * 1. / pagesize[1]
+
+        self.plotwin.zoomfactor = min(aspectw, aspecth)
+        self.plotwin.checkPlotUpdate()
 
     def keyPressEvent(self, event):
+
         k = event.key()
         if k == qt4.Qt.Key_Escape:
             event.accept()
