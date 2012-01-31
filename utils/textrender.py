@@ -25,6 +25,8 @@ import re
 import numpy as N
 import veusz.qtall as qt4
 
+import points
+
 # this definition is monkey-patched when veusz is running in self-test
 # mode as we need to hack the metrics - urgh
 FontMetrics = qt4.QFontMetricsF
@@ -557,6 +559,51 @@ class PartDot(Part):
                 qt4.QPointF(x+circsize,y+circsize)) )
         painter.restore()
 
+class PartMarker(Part):
+    """Draw a marker symbol."""
+
+    def render(self, state):
+        painter = state.painter
+        size = state.fontMetrics().ascent()
+
+        painter.save()
+        pen = painter.pen()
+        pen.setWidthF( state.getPixelsPerPt() * 0.5 )
+        painter.setPen(pen)
+
+        try:
+            points.plotMarker(
+                painter, state.x + size/2.,
+                state.y - size/2.,
+                self.children[0].text, size*0.3)
+        except ValueError:
+            pass
+
+        painter.restore()
+
+        state.x += size
+
+class PartColor(Part):
+    def __init__(self, children):
+        try:
+            self.colorname = children[0].text
+        except AttributeError:
+            self.colorname = ''
+        self.children = children[1:]
+
+    def render(self, state):
+        painter = state.painter
+        pen = painter.pen()
+        oldcolor = pen.color()
+
+        pen.setColor( qt4.QColor(self.colorname) )
+        painter.setPen(pen)
+
+        Part.render(self, state)
+
+        pen.setColor(oldcolor)
+        painter.setPen(pen)
+
 # a dict of latex commands, the part object they correspond to,
 # and the number of arguments
 part_commands = {
@@ -574,6 +621,8 @@ part_commands = {
     r'\bar': (PartBar, 1),
     r'\overline': (PartBar, 1),
     r'\dot': (PartDot, 1),
+    r'\marker': (PartMarker, 1),
+    r'\color': (PartColor, 2),
     }
 
 # split up latex expression into bits
