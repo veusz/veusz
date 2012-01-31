@@ -1173,6 +1173,47 @@ class ExtremesDatasetPlugin(DatasetPlugin):
             mean = tot / num
             self.dserror.update(data=mean, nerr=minvals-mean, perr=maxvals-mean)
 
+class CumulativePlugin(_OneOutputDatasetPlugin):
+    """Compute cumulative values."""
+
+    menu = ('Compute', 'Cumulative value',)
+    name = 'Cumulative'
+    description_short = 'Compute the cumulative value of a dataset'
+    description_full = ('Compute the cumulative value of a dataset. '
+                        ' Error bars are combined.\n'
+                        'Default behaviour is to accumulate from start.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', 'Input dataset'),
+            field.FieldBool('fromend', 'Compute cumulative value from end'),
+            field.FieldDataset('ds_out', 'Output dataset'),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do accumulation."""
+
+        ds_in = helper.getDataset(fields['ds_in'])
+        fromend = fields['fromend']
+
+        def cumsum(v):
+            """Compute cumulative, handing nans and reverse."""
+            v = N.array(v)
+            if fromend: v = v[::-1]
+            v[ N.logical_not(N.isfinite(v)) ] = 0.
+            c = N.cumsum(v)
+            if fromend: c = c[::-1]
+            return c
+
+        # compute cumulative values
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+        data = cumsum(data)
+        if serr is not None: serr = N.sqrt( cumsum(serr**2) )
+        if perr is not None: perr = N.sqrt( cumsum(perr**2) )
+        if nerr is not None: nerr = -N.sqrt( cumsum(nerr**2) )
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 class DemultiplexPlugin(DatasetPlugin):
     """Dataset plugin to split a dataset into multiple datasets, element-by-element."""
 
@@ -1349,6 +1390,7 @@ datasetpluginregistry += [
     MultiplyDatasetsPlugin,
     DivideDatasetsPlugin,
     ExtremesDatasetPlugin,
+    CumulativePlugin,
 
     ConcatenateDatasetPlugin,
     InterleaveDatasetPlugin,
