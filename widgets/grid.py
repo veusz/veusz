@@ -376,5 +376,8 @@ class Grid(widget.Widget):
         """Grid resized or moved - call helper routine to move self."""
         cgi.setWidgetMargins()
 
+# can't refer to Grid in Grid definition
+Grid.allowedparenttypes.append( Grid )
+
 # allow the factory to instantiate a grid
 document.thefactory.register( Grid )
