@@ -122,6 +122,8 @@ class GenericPickable:
 
         if None in (self.xvals, self.yvals):
             return info
+        if len(self.xscreen) == 0 or len(self.yscreen) == 0:
+            return info
 
         # calculate distances
         if distance_direction == 'vertical':
