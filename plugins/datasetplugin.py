@@ -501,7 +501,7 @@ def combineMultipliedErrors(inds, length, data):
 class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to scale a dataset."""
 
-    menu = ('Compute', 'Multiply by constant',)
+    menu = ('Multiply', 'By constant',)
     name = 'Multiply'
     description_short = 'Multiply dataset by a constant'
     description_full = ('Multiply a dataset by a factor. '
@@ -532,7 +532,7 @@ class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
 class AddDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to add a constant to a dataset."""
 
-    menu = ('Compute', 'Add constant',)
+    menu = ('Add', 'Constant',)
     name = 'Add'
     description_short = 'Add a constant to a dataset'
     description_full = ('Add a dataset by adding a value. '
@@ -862,7 +862,7 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
 class AddDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to mean datasets together."""
 
-    menu = ('Compute', 'Add datasets',)
+    menu = ('Add', 'Datasets',)
     name = 'Add Datasets'
     description_short = 'Add two or more datasets together'
     description_full = ('Add datasets together to make a single dataset. '
@@ -901,7 +901,7 @@ class AddDatasetsPlugin(_OneOutputDatasetPlugin):
 class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to subtract two datasets."""
 
-    menu = ('Compute', 'Subtract datasets',)
+    menu = ('Subtract', 'Datasets',)
     name = 'Subtract Datasets'
     description_short = 'Subtract two datasets'
     description_full = ('Subtract two datasets. '
@@ -954,7 +954,7 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
 class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to subtract mean from dataset."""
 
-    menu = ('Compute', 'Subtract mean',)
+    menu = ('Subtract', 'Mean',)
     name = 'Subtract Mean'
     description_short = 'Subtract mean from dataset'
     description_full = ('Subtract mean from dataset,'
@@ -986,7 +986,7 @@ class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
 class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to subtract minimum from dataset."""
 
-    menu = ('Compute', 'Subtract minimum',)
+    menu = ('Subtract', 'Minimum',)
     name = 'Subtract Minimum'
     description_short = 'Subtract minimum from dataset'
     description_full = 'Subtract the minimum value from a dataset'
@@ -1013,7 +1013,7 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
 
-    menu = ('Compute', 'Multiply datasets',)
+    menu = ('Multiply', 'Datasets',)
     name = 'Multiply Datasets'
     description_short = 'Multiply two or more datasets'
     description_full = ('Multiply two or more datasets. '
@@ -1052,7 +1052,7 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
 class DivideDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to divide two datasets."""
 
-    menu = ('Compute', 'Divide datasets',)
+    menu = ('Divide', 'Datasets',)
     name = 'Divide Datasets'
     description_short = ('Compute ratio or fractional difference'
                          ' between two datasets')
@@ -1379,16 +1379,54 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
         data = qtloops.rollingAverage(ds_in.data, weights, width)
         self.dsout.update(data=data)
 
+class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
+    """Do linear interpolation of data."""
+
+    menu = ('Filtering', 'Linear interpolation',)
+    name = 'LinearInterpolation'
+    description_short = 'Linear interpolation of x,y data'
+    description_full = ("Compute linear interpolation of 2D x,y data.\n"
+                        "Given datasets for y = f(x), compute y' = f(x'), "
+                        "using linear interpolation.\n"
+                        "Assumes x dataset increases in value.")
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_x', 'Input dataset x'),
+            field.FieldDataset('ds_y', 'Input dataset y'),
+            field.FieldDataset('ds_xprime', "Input dataset x'"),
+            field.FieldBool('edgenan', 'Use nan for values outside x range'),
+            field.FieldDataset('ds_out', "Output dataset y'"),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do shifting of dataset."""
+        ds_x = helper.getDataset(fields['ds_x']).data
+        ds_y = helper.getDataset(fields['ds_y']).data
+        ds_xprime = helper.getDataset(fields['ds_xprime']).data
+
+        minlenin = min( len(ds_x), len(ds_y) )
+        pad = None
+        if fields['edgenan']:
+            pad = N.nan
+
+        interpol = N.interp(ds_xprime,
+                            ds_x[:minlenin], ds_y[:minlenin],
+                            left=pad, right=pad)
+
+        self.dsout.update(data=interpol)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
     SubtractDatasetPlugin,
     SubtractMeanDatasetPlugin,
     SubtractMinimumDatasetPlugin,
-    MeanDatasetPlugin,
     MultiplyDatasetPlugin,
     MultiplyDatasetsPlugin,
     DivideDatasetsPlugin,
+    MeanDatasetPlugin,
     ExtremesDatasetPlugin,
     CumulativePlugin,
 
@@ -1405,4 +1443,5 @@ datasetpluginregistry += [
     FilterDatasetPlugin,
 
     MovingAveragePlugin,
+    LinearInterpolatePlugin,
     ]
