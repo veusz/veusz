@@ -396,6 +396,10 @@ class PlotWindow( qt4.QGraphicsView ):
                     a(self, 'Zoom into graph', 'Zoom graph',
                       None,
                       icon='veusz-zoom-graph'),
+                'view.fullscreen':
+                    a(self, 'View plot full screen', 'Full screen',
+                      self.slotFullScreen,
+                      icon='veusz-view-fullscreen'),
                 })
 
         if menu:
@@ -407,6 +411,8 @@ class PlotWindow( qt4.QGraphicsView ):
                         'view.zoomheight', 'view.zoompage',
                         '',
                         'view.prevpage', 'view.nextpage',
+                        'view.fullscreen',
+                        '',
                         'view.select', 'view.pick', 'view.zoomgraph',
                         ]),
                 ]
@@ -914,9 +920,9 @@ class PlotWindow( qt4.QGraphicsView ):
         menu.addAction('Force update', self.actionForceUpdate)
 
         if self.isfullscreen:
-            menu.addAction('Close full screen', self.actionFullScreen)
+            menu.addAction('Close full screen', self.slotFullScreen)
         else:
-            menu.addAction('Full screen', self.actionFullScreen)
+            menu.addAction( self.vzactions['view.fullscreen'] )
 
         # Update policy submenu
         submenu = menu.addMenu('Updates')
@@ -945,7 +951,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.docchangeset = -100
         self.checkPlotUpdate()
 
-    def actionFullScreen(self):
+    def slotFullScreen(self):
         """Show window full screen or not."""
         if not self.isfullscreen:
             self._fullscreenwindow = FullScreenPlotWindow(
