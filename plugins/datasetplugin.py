@@ -1385,7 +1385,7 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
     menu = ('Filtering', 'Linear interpolation',)
     name = 'LinearInterpolation'
     description_short = 'Linear interpolation of x,y data'
-    description_full = ("Compute linear interpolation of 2D x,y data.\n"
+    description_full = ("Compute linear interpolation of x,y data.\n"
                         "Given datasets for y = f(x), compute y' = f(x'), "
                         "using linear interpolation.\n"
                         "Assumes x dataset increases in value.")
