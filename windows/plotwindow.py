@@ -273,6 +273,9 @@ class PlotWindow( qt4.QGraphicsView ):
         self.clickmode = 'select'
         self.currentclickmode = None
 
+        # wheel zooming accumulator
+        self.sumwheeldelta = 0
+
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
         self.connect( self.timer, qt4.SIGNAL('timeout()'),
@@ -797,10 +800,13 @@ class PlotWindow( qt4.QGraphicsView ):
         """For zooming in or moving."""
 
         if event.modifiers() & qt4.Qt.ControlModifier:
-            if event.delta() < 0:
+            self.sumwheeldelta += event.delta()
+            while self.sumwheeldelta <= -120:
                 self.slotViewZoomOut()
-            elif event.delta() > 0:
+                self.sumwheeldelta += 120
+            while self.sumwheeldelta >= 120:
                 self.slotViewZoomIn()
+                self.sumwheeldelta -= 120
         else:
             qt4.QGraphicsView.wheelEvent(self, event)
 
