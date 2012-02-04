@@ -793,6 +793,17 @@ class PlotWindow( qt4.QGraphicsView ):
         # handle up-stream
         qt4.QGraphicsView.keyPressEvent(self, event)
 
+    def wheelEvent(self, event):
+        """For zooming in or moving."""
+
+        if event.modifiers() & qt4.Qt.ControlModifier:
+            if event.delta() < 0:
+                self.slotViewZoomOut()
+            elif event.delta() > 0:
+                self.slotViewZoomIn()
+        else:
+            qt4.QGraphicsView.wheelEvent(self, event)
+
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
         a sigWidgetClicked(widget) signal."""
