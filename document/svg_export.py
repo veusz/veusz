@@ -31,6 +31,13 @@ scale = 0.1
 inch_mm = 25.4
 inch_pt = 72.0
 
+def printpath(path):
+    """Debugging print path."""
+    print "Contents of", path
+    for i in xrange(path.elementCount()):
+        el = path.elementAt(i)
+        print " ", el.type, el.x, el.y
+
 def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
@@ -243,6 +250,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
 
     def _updateClipPath(self, clippath, clipoperation):
         """Update clip path given state change."""
+
+        clippath = self.matrix.map(clippath)
+
         if clipoperation == qt4.Qt.NoClip:
             self.clippath = None
         elif clipoperation == qt4.Qt.ReplaceClip:
@@ -250,7 +260,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         elif clipoperation == qt4.Qt.IntersectClip:
             self.clippath = self.clippath.intersected(clippath)
         elif clipoperation == qt4.Qt.UniteClip:
-            self.clippath = self.clippath.unite(clippath)
+            self.clippath = self.clippath.united(clippath)
         else:
             assert False
 
@@ -260,6 +270,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
 
         # state is a list of transform, stroke/fill and clip states
         statevec = list(self.oldstate)
+        if ss & qt4.QPaintEngine.DirtyTransform:
+            self.matrix = state.matrix()
+            statevec[0] = self.transformState()
         if ss & qt4.QPaintEngine.DirtyPen:
             self.pen = state.pen()
             statevec[1] = self.strokeFillState()
@@ -274,9 +287,6 @@ class SVGPaintEngine(qt4.QPaintEngine):
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
             statevec[2] = self.clipState()
-        if ss & qt4.QPaintEngine.DirtyTransform:
-            self.matrix = state.matrix()
-            statevec[0] = self.transformState()
 
         # work out which state differs first
         pop = 0
