@@ -116,10 +116,10 @@ class BoxShape(Shape):
             painter.setPen( s.get('Border').makeQPen(painter) )
         else:
             painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-        if not s.Fill.hide:
-            painter.setBrush( s.get('Fill').makeQBrush() )
-        else:
-            painter.setBrush( qt4.QBrush() )
+        #if not s.Fill.hide:
+        #    painter.setBrush( s.get('Fill').makeQBrush() )
+        #else:
+        #    painter.setBrush( qt4.QBrush() )
 
         # iterate over positions
         index = 0
@@ -202,10 +202,14 @@ class Rectangle(BoxShape):
 
     def drawShape(self, painter, rect):
         s = self.settings
+        path = qt4.QPainterPath()
         if s.rounding == 0:
-            painter.drawRect(rect)
+            path.addRect(rect)
         else:
-            painter.drawRoundRect(rect, s.rounding, s.rounding )
+            path.addRoundedRect(rect, s.rounding, s.rounding)
+
+        utils.brushExtFillPath(painter, s.Fill, path)
+        painter.drawPath(path)
 
 class Ellipse(BoxShape):
     """Draw an ellipse."""
@@ -220,7 +224,11 @@ class Ellipse(BoxShape):
             self.readDefaults()
 
     def drawShape(self, painter, rect):
-        painter.drawEllipse(rect)
+        s = self.settings
+        path = qt4.QPainterPath()
+        path.addEllipse(rect)
+        utils.brushExtFillPath(painter, s.Fill, path)
+        painter.drawPath(path)
 
 class ImageFile(BoxShape):
     """Draw an image."""

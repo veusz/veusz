@@ -521,27 +521,19 @@ class PointPlotter(GenericPlotter):
         s = self.settings
 
         if not s.FillBelow.hide:
-            # empty pen (line gets drawn below)
-            painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-            painter.setBrush( s.FillBelow.makeQBrush() )
-
             # construct polygon to draw filled region
             polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[3])])
             polypts += pts
             polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[3]))
 
-            # clip polygon and paint
-            utils.plotClippedPolygon(painter, cliprect, polypts)
+            utils.brushExtFillPolygon(painter, s.FillBelow, cliprect, polypts)
 
         if not s.FillAbove.hide:
-            painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-            painter.setBrush( s.FillAbove.makeQBrush() )
-
             polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[1])])
             polypts += pts
             polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[1]))
 
-            utils.plotClippedPolygon(painter, cliprect, polypts)
+            utils.brushExtFillPolygon(painter, s.FillAbove, cliprect, polypts)
 
         # draw line between points
         if not s.PlotLine.hide:

@@ -30,6 +30,7 @@ from pdf import *
 from dates import *
 from formatting import *
 from colormap import *
+from extbrushfilling import *
 
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \

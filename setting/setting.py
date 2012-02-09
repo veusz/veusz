@@ -1381,6 +1381,49 @@ class FillStyle(Choice):
     def makeControl(self, *args):
         return controls.FillStyle(self, *args)
 
+class FillStyleExtended(Choice):
+    """A setting for the different fill styles provided by Qt."""
+
+    typename = 'fill-style-ext'
+
+    _fillstyles = ( 'solid', 'horizontal', 'vertical', 'cross',
+                    'forward diagonals', 'backward diagonals',
+                    'diagonal cross',
+                    '94% dense', '88% dense', '63% dense', '50% dense',
+                    '37% dense', '12% dense', '6% dense' )
+
+    _fillcnvt = { 'solid': qt4.Qt.SolidPattern,
+                  'horizontal': qt4.Qt.HorPattern,
+                  'vertical': qt4.Qt.VerPattern,
+                  'cross': qt4.Qt.CrossPattern,
+                  'forward diagonals': qt4.Qt.FDiagPattern,
+                  'backward diagonals': qt4.Qt.BDiagPattern,
+                  'diagonal cross': qt4.Qt.DiagCrossPattern,
+                  '94% dense': qt4.Qt.Dense1Pattern,
+                  '88% dense': qt4.Qt.Dense2Pattern,
+                  '63% dense': qt4.Qt.Dense3Pattern,
+                  '50% dense': qt4.Qt.Dense4Pattern,
+                  '37% dense': qt4.Qt.Dense5Pattern,
+                  '12% dense': qt4.Qt.Dense6Pattern,
+                  '6% dense': qt4.Qt.Dense7Pattern }
+
+    controls.FillStyle._fills = _fillstyles
+    controls.FillStyle._fillcnvt = _fillcnvt
+
+    def __init__(self, name, value, **args):
+        Choice.__init__(self, name, self._fillstyles, value, **args)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+    def qtStyle(self):
+        """Return Qt ID of fill."""
+        return self._fillcnvt[self.val]
+
+    def makeControl(self, *args):
+        return controls.FillStyle(self, *args)
+
 class LineStyle(Choice):
     """A setting choosing a particular line style."""
 
