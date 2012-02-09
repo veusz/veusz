@@ -367,7 +367,8 @@ class Axis(widget.Widget):
         # yuck, but sometimes it's true
         # tweak range to make sure things don't blow up further down the
         # line
-        if self.plottedrange[0] == self.plottedrange[1]:
+        if ( abs(self.plottedrange[0] - self.plottedrange[1]) <
+             ( abs(self.plottedrange[0]) + abs(self.plottedrange[1]) )*1e-8 ):
                self.plottedrange[1] = ( self.plottedrange[0] +
                                         max(1., self.plottedrange[0]*0.1) )
 
