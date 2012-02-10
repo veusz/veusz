@@ -141,7 +141,7 @@ class Brush(Settings):
             return self.makeQBrush()
 
 class BrushExtended(Settings):
-    '''Settings of a fill.'''
+    '''Extended brush style.'''
 
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
@@ -154,6 +154,12 @@ class BrushExtended(Settings):
                 'style', 'solid',
                 descr = 'Fill style',
                 usertext='Style') )
+
+        self.add( setting.Bool(
+                'hide', False,
+                descr = 'Hide the fill',
+                usertext='Hide') )
+
         self.add( setting.Int(
                 'transparency', 0,
                 descr = 'Transparency percentage',
@@ -173,10 +179,20 @@ class BrushExtended(Settings):
                 'patternspacing', '5pt',
                 descr = 'Hatch or pattern spacing',
                 usertext = 'Spacing') )
+        self.add( setting.Color(
+                'backcolor', 'white',
+                descr = 'Hatch or pattern background color',
+                usertext = 'Back color' ) )
+        self.add( setting.Int(
+                'backtransparency', 0,
+                descr = 'Hatch or pattern background transparency percentage',
+                usertext = 'Back trans.',
+                minval = 0,
+                maxval = 100 ) )
         self.add( setting.Bool(
-                'hide', False,
-                descr = 'Hide the fill',
-                usertext='Hide') )
+                'backhide', True,
+                descr = 'Hide hatch or pattern background',
+                usertext='Back hide') )
 
 class KeyBrush(Brush):
     '''Fill used for back of key.'''

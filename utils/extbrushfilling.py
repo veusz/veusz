@@ -77,6 +77,13 @@ def brushExtFillPath(painter, extbrush, path):
     if extbrush.style in _hatchmap:
         # fill with hatching
 
+        if not extbrush.backhide:
+            # background brush
+            color = qt4.QColor(extbrush.backcolor)
+            color.setAlphaF( (100-extbrush.backtransparency) / 100.)
+            brush = qt4.QBrush( color )
+            painter.fillPath(path, brush)
+
         color = qt4.QColor(extbrush.color)
         color.setAlphaF( (100-extbrush.transparency) / 100.)
         width = extbrush.get('linewidth').convert(painter)
