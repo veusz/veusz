@@ -138,10 +138,14 @@ class ExceptionDialog(VeuszDialog):
     def checkVeuszVersion(self):
         """See whether there is a later version of veusz and inform the
         user."""
+
         try:
             p = urllib2.urlopen('http://download.gna.org/veusz/').read()
             versions = re.findall('veusz-([0-9.]+).tar.gz', p)
         except urllib2.URLError:
+            versions = []
+
+        if not versions:
             msg = 'Could not check the latest Veusz version'
         else:
             vsort = sorted([[int(i) for i in v.split('.')] for v in versions])
