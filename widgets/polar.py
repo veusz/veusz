@@ -183,10 +183,11 @@ class Polar(NonOrthGraph):
         self._xc = 0.5*(bounds[0]+bounds[2])
         self._yc = 0.5*(bounds[3]+bounds[1])
 
-        painter.setPen( s.Border.makeQPenWHide(painter) )
-        painter.setBrush( s.Background.makeQBrushWHide() )
-        painter.drawEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
-                                         qt4.QPointF(bounds[2], bounds[3]) ) )
+        path = qt4.QPainterPath()
+        path.addEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
+                                     qt4.QPointF(bounds[2], bounds[3]) ) )
+        utils.brushExtFillPath(painter, s.Background, path)
+        painter.strokePath(path, s.Border.makeQPenWHide(painter))
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
