@@ -194,11 +194,11 @@ class BrushExtended(Settings):
                 descr = 'Hide hatch or pattern background',
                 usertext='Back hide') )
 
-class KeyBrush(Brush):
+class KeyBrush(BrushExtended):
     '''Fill used for back of key.'''
 
     def __init__(self, name, **args):
-        Brush.__init__(self, name, **args)
+        BrushExtended.__init__(self, name, **args)
 
         self.get('color').newDefault('white')
 
