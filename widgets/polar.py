@@ -152,22 +152,23 @@ class Polar(NonOrthGraph):
         y = self._yc + ca * N.sin(cb) * self._yscale
         return x, y
 
-    def drawFillPts(self, painter, cliprect, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, extfill, cliprect,
+                    ptsx, ptsy, filltype):
         '''Draw points for plotting a fill.'''
         pts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
         if filltype == 'center':
             pts.append( qt4.QPointF(self._xc, self._yc) )
-            utils.plotClippedPolygon(painter, cliprect, pts)
+            utils.brushExtFillPolygon(painter, extfill, cliprect, pts)
         elif filltype == 'outside':
             pp = qt4.QPainterPath()
             pp.moveTo(self._xc, self._yc)
             pp.arcTo(cliprect, 0, 360)
             pp.addPolygon(pts)
-            painter.fillPath(pp, painter.brush())
+            utils.brushExtFillPath(painter, extfill, pp)
         elif filltype == 'polygon':
-            utils.plotClippedPolygon(painter, cliprect, pts)
+            utils.brushExtFillPolygon(painter, extfill, cliprect, pts)
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''

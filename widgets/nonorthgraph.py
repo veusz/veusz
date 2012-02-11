@@ -28,10 +28,10 @@ import veusz.setting as setting
 filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
                'polygon')
 
-class FillBrush(setting.Brush):
+class FillBrush(setting.BrushExtended):
     '''Brush for filling point region.'''
     def __init__(self, *args, **argsv):
-        setting.Brush.__init__(self, *args, **argsv)
+        setting.BrushExtended.__init__(self, *args, **argsv)
         self.add( setting.Choice('filltype', filloptions, 'center',
                                  descr='Fill to this edge/position',
                                  usertext='Fill type') )
