@@ -51,13 +51,11 @@ def swapline(painter, x1, y1, x2, y2, swap):
         painter.drawLine( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
 
 def swapbox(painter, x1, y1, x2, y2, swap):
-    """Draw box, swapping x and y coordinates if swap is True."""
+    """Return box, swapping x and y coordinates if swap is True."""
     if swap:
-        painter.drawRect( qt4.QRectF(qt4.QPointF(y1, x1),
-                                     qt4.QPointF(y2, x2)) )
+        return qt4.QRectF(qt4.QPointF(y1, x1), qt4.QPointF(y2, x2))
     else:
-        painter.drawRect( qt4.QRectF(qt4.QPointF(x1, y1),
-                                     qt4.QPointF(x2, y2)) )
+        return qt4.QRectF(qt4.QPointF(x1, y1), qt4.QPointF(x2, y2))
 
 class _Stats(object):
     """Store statistics about box."""
@@ -211,9 +209,9 @@ class BoxPlot(GenericPlotter):
                             descr = 'Line around markers',
                             usertext = 'Markers border'),
                pixmap = 'settings_plotmarkerline' )
-        s.add( setting.GraphBrush('MarkersFill',
-                                  descr = 'Markers fill',
-                                  usertext = 'Markers fill'),
+        s.add( setting.BoxPlotMarkerFillBrush('MarkersFill',
+                                              descr = 'Markers fill',
+                                              usertext = 'Markers fill'),
                pixmap = 'settings_plotmarkerfill' )
 
     @property
@@ -339,10 +337,10 @@ class BoxPlot(GenericPlotter):
                  boxposn+endsize/2, botwhisplt, horz)
 
         # draw box fill
-        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-        painter.setBrush( s.Fill.makeQBrushWHide() )
-        swapbox(painter, boxposn-width/2, botplt,
-                boxposn+width/2, topplt, horz)
+        boxpath = qt4.QPainterPath()
+        boxpath.addRect( swapbox(painter, boxposn-width/2, botplt,
+                                 boxposn+width/2, topplt, horz) )
+        utils.brushExtFillPath(painter, s.Fill, boxpath)
 
         # draw line across box
         p = s.Whisker.makeQPenWHide(painter)
@@ -352,10 +350,7 @@ class BoxPlot(GenericPlotter):
                  boxposn+width/2, medplt, horz)
 
         # draw box
-        painter.setPen( s.Border.makeQPenWHide(painter) )
-        painter.setBrush( qt4.QBrush() )
-        swapbox(painter, boxposn-width/2, botplt,
-                boxposn+width/2, topplt, horz)
+        painter.strokePath(boxpath, s.Border.makeQPenWHide(painter) )
 
         # draw outliers
         painter.setPen( s.MarkersLine.makeQPenWHide(painter) )

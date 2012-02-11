@@ -202,6 +202,14 @@ class KeyBrush(Brush):
 
         self.get('color').newDefault('white')
 
+class BoxPlotMarkerFillBrush(Brush):
+    '''Fill used for points on box plots.'''
+
+    def __init__(self, name, **args):
+        Brush.__init__(self, name, **args)
+
+        self.get('color').newDefault('white')
+
 class GraphBrush(BrushExtended):
     '''Fill used for back of graph.'''
 
