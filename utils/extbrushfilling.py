@@ -160,10 +160,10 @@ _fillcnvt = {
     '6% dense': qt4.Qt.Dense7Pattern
     }
 
-def brushExtFillPath(painter, extbrush, path):
+def brushExtFillPath(painter, extbrush, path, ignorehide=False):
     """Use an BrushExtended settings object to fill a path on painter."""
 
-    if extbrush.hide:
+    if extbrush.hide and not ignorehide:
         return
     
     style = extbrush.style
@@ -199,10 +199,10 @@ def brushExtFillPath(painter, extbrush, path):
         if spacing > 0:
             _hatcher(painter, pen, path, spacing, _hatchmap[style])
 
-def brushExtFillPolygon(painter, extbrush, cliprect, polygon):
+def brushExtFillPolygon(painter, extbrush, cliprect, polygon, ignorehide=False):
     """Fill a polygon with an extended brush."""
     clipped = qt4.QPolygonF()
     polygonClip(polygon, cliprect, clipped)
     path = qt4.QPainterPath()
     path.addPolygon(clipped)
-    brushExtFillPath(painter, extbrush, path)
+    brushExtFillPath(painter, extbrush, path, ignorehide=ignorehide)

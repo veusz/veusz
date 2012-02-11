@@ -166,15 +166,12 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
         # polygons consist of lines joining the points and continuing
         # back along the plot line (retnpts)
-        painter.save()
-        painter.setPen( qt4.Qt.NoPen )
         if not s.FillBelow.hideerror:
-            painter.setBrush( s.FillBelow.makeQBrush() )
-            painter.drawPolygon( ptsbelow + retnpts )
+            utils.brushExtFillPolygon(painter, s.FillBelow, clip,
+                                      ptsbelow+retnpts, ignorehide=True)
         if not s.FillAbove.hideerror:
-            painter.setBrush( s.FillAbove.makeQBrush() )
-            painter.drawPolygon( ptsabove + retnpts )
-        painter.restore()
+            utils.brushExtFillPolygon(painter, s.FillAbove, clip,
+                                      ptsabove+retnpts, ignorehide=True)
 
     # draw optional line (on top of fill)
     utils.plotClippedPolyline(painter, clip, ptsabove)
