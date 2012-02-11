@@ -133,12 +133,11 @@ class Graph(widget.Widget):
             return bounds
 
         # set graph rectangle attributes
-        painter.setBrush( s.get('Background').makeQBrushWHide() )
-        painter.setPen( s.get('Border').makeQPenWHide(painter) )
-
-        # draw graph rectangle
-        painter.drawRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
-                                     qt4.QPointF(bounds[2], bounds[3])) )
+        path = qt4.QPainterPath()
+        path.addRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
+                                 qt4.QPointF(bounds[2], bounds[3])) )
+        utils.brushExtFillPath(painter, s.Background, path)
+        painter.strokePath(path, s.Border.makeQPenWHide(painter))
 
         # do normal drawing of children
         # iterate over children in reverse order

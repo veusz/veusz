@@ -202,11 +202,11 @@ class KeyBrush(Brush):
 
         self.get('color').newDefault('white')
 
-class GraphBrush(Brush):
+class GraphBrush(BrushExtended):
     '''Fill used for back of graph.'''
 
     def __init__(self, name, **args):
-        Brush.__init__(self, name, **args)
+        BrushExtended.__init__(self, name, **args)
 
         self.get('color').newDefault('white')
 
