@@ -384,6 +384,69 @@ class Choice(qt4.QComboBox):
         if self.isEditable():
             self.setEditText(text)
 
+class ChoiceSwitch(Choice):
+    """Show or hide other settings based on value."""
+
+    def showEvent(self, event):
+        Choice.showEvent(self, event)
+        self.updateState()
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        Choice.onModified(self, mod)
+        self.updateState()
+
+    def updateState(self):
+        """Set hidden state of settings."""
+        s1, s2 = self.setting.strue, self.setting.sfalse
+        if self.setting.showfn(self.setting.val):
+            show, hide = s1, s2
+        else:
+            show, hide = s2, s1
+
+        if hasattr(self.parent(), 'showHideSettings'):
+            self.parent().showHideSettings(show, hide)
+
+class FillStyleExtended(ChoiceSwitch):
+
+    _icons = None
+
+    def __init__(self, setting, parent):
+        if self._icons is None:
+            self._generateIcons()
+
+        ChoiceSwitch.__init__(self, setting, False,
+                              utils.extfillstyles, parent,
+                              icons=self._icons)
+
+    @classmethod
+    def _generateIcons(cls):
+        """Generate a list of pixmaps for drop down menu."""
+
+        import collections
+        brush = collections.BrushExtended("")
+        brush.color = 'black'
+        brush.patternspacing = '5pt'
+        brush.linewidth = '0.5pt'
+
+        size = 12
+        cls._icons = icons = []
+
+        path = qt4.QPainterPath()
+        path.addRect(0, 0, size, size)
+
+        for f in utils.extfillstyles:
+            pix = qt4.QPixmap(size, size)
+            pix.fill()
+            painter = qt4.QPainter(pix)
+            painter.pixperpt = 1.
+            painter.scaling = 1.
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            brush.style = f
+            utils.brushExtFillPath(painter, brush, path)
+            painter.end()
+            icons.append( qt4.QIcon(pix) )
+
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
 

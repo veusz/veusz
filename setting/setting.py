@@ -1381,49 +1381,6 @@ class FillStyle(Choice):
     def makeControl(self, *args):
         return controls.FillStyle(self, *args)
 
-class FillStyleExtended(Choice):
-    """A setting for the different fill styles provided by Qt."""
-
-    typename = 'fill-style-ext'
-
-    _fillstyles = ( 'solid', 'horizontal', 'vertical', 'cross',
-                    'forward diagonals', 'backward diagonals',
-                    'diagonal cross',
-                    '94% dense', '88% dense', '63% dense', '50% dense',
-                    '37% dense', '12% dense', '6% dense' )
-
-    _fillcnvt = { 'solid': qt4.Qt.SolidPattern,
-                  'horizontal': qt4.Qt.HorPattern,
-                  'vertical': qt4.Qt.VerPattern,
-                  'cross': qt4.Qt.CrossPattern,
-                  'forward diagonals': qt4.Qt.FDiagPattern,
-                  'backward diagonals': qt4.Qt.BDiagPattern,
-                  'diagonal cross': qt4.Qt.DiagCrossPattern,
-                  '94% dense': qt4.Qt.Dense1Pattern,
-                  '88% dense': qt4.Qt.Dense2Pattern,
-                  '63% dense': qt4.Qt.Dense3Pattern,
-                  '50% dense': qt4.Qt.Dense4Pattern,
-                  '37% dense': qt4.Qt.Dense5Pattern,
-                  '12% dense': qt4.Qt.Dense6Pattern,
-                  '6% dense': qt4.Qt.Dense7Pattern }
-
-    controls.FillStyle._fills = _fillstyles
-    controls.FillStyle._fillcnvt = _fillcnvt
-
-    def __init__(self, name, value, **args):
-        Choice.__init__(self, name, self._fillstyles, value, **args)
-
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-
-    def qtStyle(self):
-        """Return Qt ID of fill."""
-        return self._fillcnvt[self.val]
-
-    def makeControl(self, *args):
-        return controls.FillStyle(self, *args)
-
 class LineStyle(Choice):
     """A setting choosing a particular line style."""
 
@@ -1840,6 +1797,55 @@ class BoolSwitch(Bool):
     def copy(self):
         return self._copyHelper((), (), {'settingsfalse': self.sfalse,
                                          'settingstrue': self.strue})
+
+class ChoiceSwitch(Choice):
+    """Show or hide other settings based on the choice given here."""
+
+    def __init__(self, name, vallist, value, settingstrue=[], settingsfalse=[],
+                 showfn=lambda val: True, **args):
+        """Enables/disables a set of settings if True or False
+        settingsfalse and settingstrue are lists of names of settings
+        which are hidden/shown to user depending on showfn(val)."""
+
+        self.sfalse = settingsfalse
+        self.strue = settingstrue
+        self.showfn = showfn
+        Choice.__init__(self, name, vallist, value, **args)
+
+    def makeControl(self, *args):
+        return controls.ChoiceSwitch(self, *args)
+
+    def copy(self):
+        return self._copyHelper((self.vallist), (),
+                                {'settingsfalse': self.sfalse,
+                                 'settingstrue': self.strue,
+                                 'showfn': self.showfn})
+
+class FillStyleExtended(ChoiceSwitch):
+    """A setting for the different fill styles provided by Qt."""
+
+    typename = 'fill-style-ext'
+
+    _strue = ( 'linewidth', 'linestyle', 'patternspacing',
+               'backcolor', 'backtransparency', 'backhide' )
+
+    @staticmethod
+    def _ishatch(val):
+        """Is this a hatching fill?"""
+        return not ( val == 'solid' or val.find('dense') >= 0 )
+
+    def __init__(self, name, value, **args):
+        ChoiceSwitch.__init__(self, name, utils.extfillstyles, value,
+                              settingstrue=self._strue, settingsfalse=(),
+                              showfn=self._ishatch,
+                              **args)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+    def makeControl(self, *args):
+        return controls.FillStyleExtended(self, *args)
 
 class RotateInterval(Choice):
     '''Rotate a label with intervals given.'''
