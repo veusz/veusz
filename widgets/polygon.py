@@ -21,6 +21,7 @@ from itertools import izip
 import veusz.document as document
 import veusz.setting as setting
 import veusz.qtall as qt4
+import veusz.utils as utils
 
 import plotters
 
@@ -44,9 +45,9 @@ class Polygon(plotters.FreePlotter):
                             descr = 'Line around polygon',
                             usertext = 'Line'),
                pixmap = 'settings_plotline' )
-        s.add( setting.Brush('Fill',
-                             descr = 'Fill within polygon',
-                             usertext = 'Fill'),
+        s.add( setting.BrushExtended('Fill',
+                                     descr = 'Fill within polygon',
+                                     usertext = 'Fill'),
                pixmap = 'settings_plotfillbelow' )
 
     def draw(self, posn, phelper, outerbounds=None):
@@ -69,20 +70,24 @@ class Polygon(plotters.FreePlotter):
         cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
         painter = phelper.painter(self, posn, clip=cliprect)
 
-        painter.setPen( s.Line.makeQPenWHide(painter) )
-        painter.setBrush( s.Fill.makeQBrushWHide() )
+        pen = s.Line.makeQPenWHide(painter)
+        pw = pen.widthF()*2
+        lineclip = qt4.QRectF( qt4.QPointF(x1-pw, y1-pw),
+                               qt4.QPointF(x2+pw, y2+pw) )
 
         # this is a hack as we generate temporary fake datasets
+        path = qt4.QPainterPath()
         for xvals, yvals in document.generateValidDatasetParts(
             document.Dataset(xp), document.Dataset(yp)):
 
-            # construct polygon
             poly = qt4.QPolygonF()
-            xd, yd = xvals.data, yvals.data
-            for x, y in izip(xd, yd):
-                poly.append(qt4.QPointF(x, y))
-            # draw it
-            painter.drawPolygon(poly)
+            utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)
+            clippedpoly = qt4.QPolygonF()
+            utils.polygonClip(poly, lineclip, clippedpoly)
+            path.addPolygon(clippedpoly)
+            path.closeSubpath()
+
+        utils.brushExtFillPath(painter, s.Fill, path, stroke=pen)
 
 # allow the factory to instantiate this
 document.thefactory.register( Polygon )
