@@ -34,8 +34,13 @@ public:
   QtLoops() {};
 };
 
+// add sets of points to a QPolygonF
 void addNumpyToPolygonF(QPolygonF& poly,
 			const Tuple2Ptrs& v);
+
+// add sets of polygon points to a path
+void addNumpyPolygonToPath(QPainterPath &path, const Tuple2Ptrs& d,
+			   const QRectF* clip = 0);
 
 // plot paths to painter
 // x and y locations are given in x and y

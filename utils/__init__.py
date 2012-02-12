@@ -35,8 +35,8 @@ from extbrushfilling import *
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon, plotBoxesToPainter
+        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath
 except ImportError:
     from slowfuncs import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon, plotBoxesToPainter
+        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath

@@ -20,7 +20,7 @@
 These are slow versions of routines also implemented in C++
 """
 
-from itertools import izip
+from itertools import izip, count
 import sys
 import struct
 
@@ -50,6 +50,31 @@ def addNumpyToPolygonF(poly, *args):
     qpointf = qt4.QPointF
     for p in points:
         pappend( qpointf(*p) )
+
+def addNumpyPolygonToPath(path, clip, *args):
+    """Add a set of polygons to a path, clipping (optionally)."""
+    if clip is None:
+        clip = qt4.QRectF(qt4.QPointF(-32767,-32767),qt4.QPointF(32767,32767))
+    else:
+        clip = qt4.QRectF(clip)
+
+    for i in count():
+        p = qt4.QPolygonF()
+        dobreak = True
+        for c in xrange(len(args)/2):
+            if i < len(args[c*2]) and i < len(args[c*2+1]):
+                p.append(qt4.QPointF(args[c*2][i], args[c*2+1][i]))
+                dobreak = False
+        if dobreak:
+            break
+        else:
+            if clip is None:
+                path.addPolygon(p)
+            else:
+                cp = qt4.QPolygonF()
+                polygonClip(p, clip, cp)
+                path.addPolygon(cp)
+            path.closeSubpath()
 
 def plotPathsToPainter(painter, path, x, y, scaling=None,
                        clip=None, colorimg=None):

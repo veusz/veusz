@@ -83,13 +83,19 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
         # filled region below
         if not s.FillBelow.hideerror:
-            painter.setBrush( s.FillBelow.makeQBrush() )
-            utils.plotBoxesToPainter(painter, xmin, ymin, xmax, yplotter, clip)
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, ymin, xmin, yplotter,
+                                        xmax, yplotter, xmax, ymin)
+            utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
         # filled region above
         if not s.FillAbove.hideerror:
-            painter.setBrush( s.FillAbove.makeQBrush() )
-            utils.plotBoxesToPainter(painter, xmin, yplotter, xmax, ymax, clip)
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, yplotter, xmax, yplotter,
+                                        xmax, ymax, xmin, ymax)
+            utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
         painter.restore()
 
@@ -497,13 +503,13 @@ class PointPlotter(GenericPlotter):
             temppath = qt4.QPainterPath(path)
             temppath.lineTo(pts[-1].x(), posn[3])
             temppath.lineTo(pts[0].x(), posn[3])
-            painter.fillPath(temppath, s.FillBelow.makeQBrush() )
+            utils.brushExtFillPath(painter, s.FillBelow, temppath)
 
         if not s.FillAbove.hide:
             temppath = qt4.QPainterPath(path)
             temppath.lineTo(pts[-1].x(), posn[1])
             temppath.lineTo(pts[0].x(), posn[1])
-            painter.fillPath(temppath, s.FillAbove.makeQBrush() )
+            utils.brushExtFillPath(painter, s.FillAbove, temppath)
 
         if not s.PlotLine.hide:
             painter.strokePath(path, s.PlotLine.makeQPen(painter))

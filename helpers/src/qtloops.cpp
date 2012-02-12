@@ -19,6 +19,7 @@
 #include "qtloops.h"
 #include "isnan.h"
 #include "polylineclip.h"
+#include "polygonclip.h"
 
 #include <math.h>
 
@@ -82,6 +83,50 @@ void addNumpyToPolygonF(QPolygonF& poly, const Tuple2Ptrs& d)
       // exit loop if no more columns
       if(! ifany )
 	break;
+    }
+}
+
+void addNumpyPolygonToPath(QPainterPath &path, const Tuple2Ptrs& d,
+			   const QRectF* clip)
+{
+  const int numcols = d.data.size();
+  for(int row=0 ; ; ++row)
+    {
+      bool ifany = false;
+      // output polygon
+      QPolygonF poly;
+
+      // the numcols-1 makes sure we don't get odd numbers of columns
+      for(int col=0; col < (numcols-1); col += 2)
+	{
+	  // add point if point in two columns
+	  if( row < d.dims[col] && row < d.dims[col+1] )
+	    {
+	      const QPointF pt(d.data[col][row], d.data[col+1][row]);
+	      poly << pt;
+	      ifany = true;
+	    }
+	}
+
+      if( ifany )
+	{
+	  if( clip != 0 )
+	    {
+	      QPolygonF clippedpoly;
+	      polygonClip(poly, *clip, clippedpoly);
+	      path.addPolygon(clippedpoly);
+	    }
+	  else
+	    {
+	      path.addPolygon(poly);
+	    }
+	  path.closeSubpath();
+	}
+      else
+	{
+	  // exit loop if no more columns
+	  break;
+	}
     }
 }
 
