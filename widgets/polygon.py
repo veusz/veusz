@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from itertools import izip
-
 import veusz.document as document
 import veusz.setting as setting
 import veusz.qtall as qt4
