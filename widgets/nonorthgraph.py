@@ -84,11 +84,11 @@ class NonOrthGraph(Widget):
         '''Return coordinate ranges of plot.
         This is in the form [[mina, maxa], [minb, maxb]].'''
 
-    def drawFillPts(self, painter, bounds, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, extfill, bounds, ptsx, ptsy):
         '''Draw set of points for filling.
+        extfill: extended fill brush
         bounds: usual tuple (minx, miny, maxx, maxy)
         ptsx, ptsy: translated plotter coordinates
-        filltype: one of filloptions
         '''
     
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):

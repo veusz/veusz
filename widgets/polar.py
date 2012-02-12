@@ -153,11 +153,12 @@ class Polar(NonOrthGraph):
         return x, y
 
     def drawFillPts(self, painter, extfill, cliprect,
-                    ptsx, ptsy, filltype):
+                    ptsx, ptsy):
         '''Draw points for plotting a fill.'''
         pts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
+        filltype = extfill.filltype
         if filltype == 'center':
             pts.append( qt4.QPointF(self._xc, self._yc) )
             utils.brushExtFillPolygon(painter, extfill, cliprect, pts)

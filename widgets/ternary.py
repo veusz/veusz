@@ -192,11 +192,12 @@ class Ternary(NonOrthGraph):
 
         return x, y
 
-    def drawFillPts(self, painter, brushext, cliprect, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, brushext, cliprect, ptsx, ptsy):
         '''Draw points for plotting a fill.'''
         pts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
+        filltype = brushext.filltype
         # this is broken: FIXME
         if filltype == 'left':
             dyend = ptsy[-1]-self._box[1]

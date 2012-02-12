@@ -179,11 +179,9 @@ class NonOrthFunction(Widget):
         painter.setPen( s.PlotLine.makeQPenWHide(painter) )
         for x, y in utils.validLinePoints(px, py):
             if not s.Fill1.hide:
-                self.parent.drawFillPts(painter, s.Fill1, cliprect, x, y,
-                                        s.Fill1.filltype)
+                self.parent.drawFillPts(painter, s.Fill1, cliprect, x, y)
             if not s.Fill2.hide:
-                self.parent.drawFillPts(painter, s.Fill2, cliprect, x, y,
-                                        s.Fill2.filltype)
+                self.parent.drawFillPts(painter, s.Fill2, cliprect, x, y)
             if not s.PlotLine.hide:
                 p = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(p, x, y)
