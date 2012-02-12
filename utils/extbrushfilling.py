@@ -35,7 +35,7 @@ def _hatcher(painter, pen, painterpath, spacing, hatchlist):
 
     painter.save()
     painter.setPen(pen)
-    painter.setClipPath(painterpath)
+    painter.setClipPath(painterpath, qt4.Qt.IntersectClip)
 
     # this is the bounding box of the path
     bb = painter.clipPath().boundingRect()
@@ -161,7 +161,9 @@ _fillcnvt = {
     }
 
 def brushExtFillPath(painter, extbrush, path, ignorehide=False):
-    """Use an BrushExtended settings object to fill a path on painter."""
+    """Use an BrushExtended settings object to fill a path on painter.
+    If ignorehide is True, ignore the hide setting on the brush object.
+    """
 
     if extbrush.hide and not ignorehide:
         return
