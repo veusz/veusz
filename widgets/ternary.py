@@ -254,8 +254,8 @@ class Ternary(NonOrthGraph):
         path = qt4.QPainterPath()
         path.addPolygon(p)
         path.closeSubpath()
-        utils.brushExtFillPath(painter, s.Background, path)
-        painter.strokePath(path, s.Border.makeQPenWHide(painter))
+        utils.brushExtFillPath(painter, s.Background, path,
+                               stroke=s.Border.makeQPenWHide(painter))
 
         # work out origins and size
         self._size = max(min(s.fracsize, 1.), 0.)

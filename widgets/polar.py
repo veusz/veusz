@@ -187,8 +187,8 @@ class Polar(NonOrthGraph):
         path = qt4.QPainterPath()
         path.addEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
                                      qt4.QPointF(bounds[2], bounds[3]) ) )
-        utils.brushExtFillPath(painter, s.Background, path)
-        painter.strokePath(path, s.Border.makeQPenWHide(painter))
+        utils.brushExtFillPath(painter, s.Background, path,
+                               stroke=s.Border.makeQPenWHide(painter))
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
