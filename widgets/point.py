@@ -78,9 +78,6 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                         s, painter, clip):
     """Draw box filled region inside error bars."""
     if None not in (xmin, xmax, ymin, ymax):
-        painter.save()
-        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-
         # filled region below
         if not s.FillBelow.hideerror:
             path = qt4.QPainterPath()
@@ -97,21 +94,40 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                                         xmax, ymax, xmin, ymax)
             utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
-        painter.restore()
-
 def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                       s, painter, clip):
     """Draw diamond around error region."""
     if None not in (xmin, xmax, ymin, ymax):
+
+        # expand clip by pen width (urgh)
+        pw = painter.pen().widthF()*2
+        clip = qt4.QRectF(qt4.QPointF(clip.left()-pw,clip.top()-pw),
+                          qt4.QPointF(clip.right()+pw,clip.bottom()+pw))
+
+        path = qt4.QPainterPath()
+        utils.addNumpyPolygonToPath(path, clip,
+                                    xmin, yplotter, xplotter, ymax,
+                                    xmax, yplotter, xplotter, ymin)
         painter.setBrush( qt4.QBrush() )
+        painter.drawPath(path)
 
-        for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
-            xplotter, yplotter, xmin, ymin, xmax, ymax):
+def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                            s, painter, clip):
+    """Draw diamond filled region inside error bars."""
+    if None not in (xmin, xmax, ymin, ymax):
+        if not s.FillBelow.hideerror:
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, yplotter, xplotter, ymin,
+                                        xmax, yplotter)
+            utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
-            utils.plotClippedPolygon(
-                painter, clip,
-                qt4.QPolygonF([qt4.QPointF(xmn, yp), qt4.QPointF(xp, ymx),
-                               qt4.QPointF(xmx, yp), qt4.QPointF(xp, ymn)]) )
+        if not s.FillAbove.hideerror:
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, yplotter, xplotter, ymax,
+                                        xmax, yplotter)
+            utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
 def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                     s, painter, clip):
@@ -194,6 +210,7 @@ _errorBarFunctionMap = {
     'box':  (_errorBarsBox,),
     'boxfill': (_errorBarsBoxFilled, _errorBarsBox,),
     'diamond':  (_errorBarsDiamond,),
+    'diamondfill':  (_errorBarsDiamond, _errorBarsDiamondFilled),
     'curve': (_errorBarsCurve,),
     'fillhorz': (_errorBarsFilled,),
     'fillvert': (_errorBarsFilled,),
