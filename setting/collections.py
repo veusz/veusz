@@ -167,8 +167,7 @@ class BrushExtended(Settings):
                 minval = 0,
                 maxval = 100 ) )
         self.add( setting.DistancePt(
-                'linewidth',
-                setting.Reference('/StyleSheet/Line/width'),
+                'linewidth', '0.5pt',
                 descr = 'Width of hatch or pattern line',
                 usertext='Line width') )
         self.add( setting.LineStyle(

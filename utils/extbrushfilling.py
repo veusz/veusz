@@ -24,6 +24,7 @@ Paints solid, hatching and various qt brushes
 import numpy as N
 import veusz.qtall as qt4
 import math
+import utilfuncs
 
 try:
     from veusz.helpers.qtloops import plotLinesToPainter, polygonClip

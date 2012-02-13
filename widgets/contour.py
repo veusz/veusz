@@ -597,16 +597,11 @@ class Contour(plotters.GenericPlotter):
         if self._cachedpolygons is None or s.Fills.hide:
             return
 
-        # ensure plotting of contours does not go outside the area
-        painter.setPen(qt4.QPen(qt4.Qt.NoPen))
-
         # iterate over each level, and list of lines
         for num, polylist in enumerate(self._cachedpolygons):
 
-            # move to the next line style
-            painter.setBrush(s.Fills.get('fills').makeBrush(num))
-                
             # iterate over each complete line of the contour
+            path = qt4.QPainterPath()
             for poly in polylist:
                 # convert coordinates from graph to plotter
                 xplt = axes[0].dataToPlotterCoords(posn, poly[:,0])
@@ -614,7 +609,14 @@ class Contour(plotters.GenericPlotter):
 
                 pts = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
-                utils.plotClippedPolygon(painter, clip, pts)
+
+                clippedpoly = qt4.QPolygonF()
+                utils.polygonClip(pts, clip, clippedpoly)
+                path.addPolygon(clippedpoly)
+
+            # fill polygons
+            brush = s.Fills.get('fills').returnBrushExtended(num)
+            utils.brushExtFillPath(painter, brush, path)
 
 # allow the factory to instantiate a contour
 document.thefactory.register( Contour )

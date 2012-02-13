@@ -1139,13 +1139,16 @@ class ListSet(qt4.QFrame):
 
         color = self.setting.val[row][col]
         wcolor = qt4.QPushButton()
+        wcolor.setFlat(True)
+        wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        wcolor.setMaximumHeight(24)
+        wcolor.setMaximumWidth(24)
+
         self.layout.addWidget(wcolor, row, col)
-        wcolor.setMaximumWidth(wcolor.height())
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
         pix.fill( utils.extendedColorToQColor(color) )
         wcolor.setIcon( qt4.QIcon(pix) )
         wcolor.setToolTip(tooltip)
-        wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
 
         self.connect(wcolor, qt4.SIGNAL('clicked()'), self.onColorClicked)
         return wcolor

@@ -1635,7 +1635,12 @@ class FillSet(Setting):
         [('solid', 'color', False), ...]
 
         These are color, fill style, and hide or
-        color, fill style, transparency and hide
+        color, fill style, and hide
+
+        (style, color, hide,
+        [optional linewidth,
+         linestyle, spacing, backcolor, backtrans, backhide]])
+
         """
 
         if type(val) not in (list, tuple):
@@ -1644,13 +1649,14 @@ class FillSet(Setting):
         # check each entry in the list is appropriate
         for fill in val:
             try:
-                style, color, hide = fill
+                style, color, hide = fill[:3]
             except ValueError:
                 raise InvalidType
 
             if ( not isinstance(color, basestring) or
-                 style not in FillStyle._fillstyles or
-                 type(hide) not in (int, bool) ):
+                 style not in utils.extfillstyles or
+                 type(hide) not in (int, bool) or
+                 len(fill) not in (3, 10) ):
                 raise InvalidType
 
         return val
@@ -1658,24 +1664,31 @@ class FillSet(Setting):
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.FillSet(self, *args)
-    
-    def makeBrush(self, row):
-        """Make a Qt brush corresponding to the row given.
 
-        If row is outside of range, then cycle
-        """
+    def returnBrushExtended(self, row):
+        """Return BrushExtended for the row."""
+        import collections
+        s = collections.BrushExtended('tempbrush')
 
         if len(self.val) == 0:
-            return qt4.QBrush()
+            s.hide = True
         else:
-            row = row % len(self.val)
-            style, color, hide = self.val[row]
-            col = utils.extendedColorToQColor(color)
-            b = qt4.QBrush(col, FillStyle._fillcnvt[style])
-            if hide:
-                b.setStyle(qt4.Qt.NoBrush)
-            return b
-    
+            v = self.val[row % len(self.val)]
+            s.style = v[0]
+            col = utils.extendedColorToQColor(v[1])
+            if col.alpha() != 255:
+                s.transparency = 100 - col.alphaF()*100.
+                col.setAlpha(255)
+                s.color = col.name()
+            else:
+                s.color = v[1]
+            s.hide = v[2]
+            if len(v) == 10:
+                (s.transparency, s.linewidth, s.linestyle,
+                 s.patternspacing, s.backcolor,
+                 s.backtransparency, s.backhide) = v[3:]
+        return s
+
 class ImageFilename(Str):
     """Represents an image filename setting."""
 
