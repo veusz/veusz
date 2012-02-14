@@ -1677,7 +1677,7 @@ class FillSet(Setting):
             s.style = v[0]
             col = utils.extendedColorToQColor(v[1])
             if col.alpha() != 255:
-                s.transparency = 100 - col.alphaF()*100.
+                s.transparency = int(100 - col.alphaF()*100)
                 col.setAlpha(255)
                 s.color = col.name()
             else:
