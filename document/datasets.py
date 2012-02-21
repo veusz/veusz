@@ -83,13 +83,10 @@ def generateValidDatasetParts(*datasets):
     invalid = datasets[0].invalidDataPoints()
     minlen = invalid.shape[0]
     for ds in datasets[1:]:
-        try:
+        if isinstance(ds, DatasetBase) and not ds.empty():
             nextinvalid = ds.invalidDataPoints()
             minlen = min(nextinvalid.shape[0], minlen)
             invalid = N.logical_or(invalid[:minlen], nextinvalid[:minlen])
-        except AttributeError:
-            # if not a dataset
-            pass
 
     # get indexes of invalid points
     indexes = invalid.nonzero()[0].tolist()
@@ -107,7 +104,8 @@ def generateValidDatasetParts(*datasets):
         if index != lastindex:
             retn = []
             for ds in datasets:
-                if ds is not None:
+                if ds is not None and (not isinstance(ds, DatasetBase) or
+                                       not ds.empty()):
                     retn.append( ds[lastindex:index] )
                 else:
                     retn.append( None )
