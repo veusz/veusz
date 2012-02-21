@@ -1308,8 +1308,10 @@ class SettingLabel(qt4.QWidget):
 
         # get widget, with its type and name
         widget = self.setting.parent
-        while not isinstance(widget, widgets.Widget):
+        while widget is not None and not isinstance(widget, widgets.Widget):
             widget = widget.parent
+        if widget is None:
+            return
         self._clickwidget = widget
 
         wtype = widget.typename

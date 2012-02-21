@@ -1638,7 +1638,7 @@ class FillSet(Setting):
         color, fill style, and hide
 
         (style, color, hide,
-        [optional linewidth,
+        [optional transparency, linewidth,
          linestyle, spacing, backcolor, backtrans, backhide]])
 
         """
