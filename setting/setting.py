@@ -27,6 +27,7 @@ s.fromText('42')
 """
 
 import re
+import sys
 
 import numpy as N
 import veusz.qtall as qt4
@@ -1675,15 +1676,7 @@ class FillSet(Setting):
             if hide:
                 b.setStyle(qt4.Qt.NoBrush)
             return b
-    
-class ImageFilename(Str):
-    """Represents an image filename setting."""
 
-    typename = 'filename-image'
-
-    def makeControl(self, *args):
-        return controls.Filename(self, 'image', *args)
-    
 class Filename(Str):
     """Represents a filename setting."""
 
@@ -1691,7 +1684,20 @@ class Filename(Str):
 
     def makeControl(self, *args):
         return controls.Filename(self, 'file', *args)
+
+    def convertTo(self, val):
+        if sys.platform == 'win32':
+            val = val.replace('\\', '/')
+        return val
     
+class ImageFilename(Filename):
+    """Represents an image filename setting."""
+
+    typename = 'filename-image'
+
+    def makeControl(self, *args):
+        return controls.Filename(self, 'image', *args)
+
 class FontFamily(Str):
     """Represents a font family."""
 
