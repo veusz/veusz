@@ -101,3 +101,17 @@ module.
 ==========================
 A binary is available for Mac OS X. Simply drag the Veusz application
 into your Applications directory.
+
+3. NOTES FOR PACKAGERS
+**********************
+- It is recommended to run the self test above (if possible)
+- The --veusz-resource-dir allows the packager to move veusz's
+  resource data files outside of the python path, e.g. into
+  LFS /usr/share/veusz. This option installs the resource
+  files into this direction
+- The --disable-install-examples option prevents installing the
+  examples, so that they can be installed by the packager into e.g.
+  /usr/share/doc/veusz/examples. Veusz looks for the examples
+  directory in the resource directory for the examples, to make
+  its examples menu. It is recommended to use a symlink to
+  point this to the real examples location.
