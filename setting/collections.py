@@ -140,37 +140,98 @@ class Brush(Settings):
         else:
             return self.makeQBrush()
 
-class KeyBrush(Brush):
+class BrushExtended(Settings):
+    '''Extended brush style.'''
+
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
+
+        self.add( setting.Color(
+                'color', 'black',
+                descr = 'Fill colour',
+                usertext='Color') )
+        self.add( setting.FillStyleExtended(
+                'style', 'solid',
+                descr = 'Fill style',
+                usertext='Style') )
+
+        self.add( setting.Bool(
+                'hide', False,
+                descr = 'Hide the fill',
+                usertext='Hide') )
+
+        self.add( setting.Int(
+                'transparency', 0,
+                descr = 'Transparency percentage',
+                usertext = 'Transparency',
+                minval = 0,
+                maxval = 100 ) )
+        self.add( setting.DistancePt(
+                'linewidth', '0.5pt',
+                descr = 'Width of hatch or pattern line',
+                usertext='Line width') )
+        self.add( setting.LineStyle(
+                'linestyle', 'solid',
+                descr = 'Hatch or pattern line style',
+                usertext='Line style') )
+        self.add( setting.DistancePt(
+                'patternspacing', '5pt',
+                descr = 'Hatch or pattern spacing',
+                usertext = 'Spacing') )
+        self.add( setting.Color(
+                'backcolor', 'white',
+                descr = 'Hatch or pattern background color',
+                usertext = 'Back color' ) )
+        self.add( setting.Int(
+                'backtransparency', 0,
+                descr = 'Hatch or pattern background transparency percentage',
+                usertext = 'Back trans.',
+                minval = 0,
+                maxval = 100 ) )
+        self.add( setting.Bool(
+                'backhide', True,
+                descr = 'Hide hatch or pattern background',
+                usertext='Back hide') )
+
+class KeyBrush(BrushExtended):
     '''Fill used for back of key.'''
 
     def __init__(self, name, **args):
+        BrushExtended.__init__(self, name, **args)
+
+        self.get('color').newDefault('white')
+
+class BoxPlotMarkerFillBrush(Brush):
+    '''Fill used for points on box plots.'''
+
+    def __init__(self, name, **args):
         Brush.__init__(self, name, **args)
 
         self.get('color').newDefault('white')
 
-class GraphBrush(Brush):
+class GraphBrush(BrushExtended):
     '''Fill used for back of graph.'''
 
     def __init__(self, name, **args):
-        Brush.__init__(self, name, **args)
+        BrushExtended.__init__(self, name, **args)
 
         self.get('color').newDefault('white')
 
-class PlotterFill(Brush):
+class PlotterFill(BrushExtended):
     '''Filling used for filling on plotters.'''
 
     def __init__(self, name, **args):
-        Brush.__init__(self, name, **args)
+        BrushExtended.__init__(self, name, **args)
 
         self.get('hide').newDefault(True)
 
-class PointFill(Brush):
-    '''Filling used for filling above/below line or inside error region for xy-point
-    plotters.
+class PointFill(BrushExtended):
+    '''Filling used for filling above/below line or inside error
+    region for xy-point plotters.
     '''
 
     def __init__(self, name, **args):
-        Brush.__init__(self, name, **args)
+        BrushExtended.__init__(self, name, **args)
 
         hide = self.get('hide')
         hide.newDefault(True)
@@ -182,11 +243,11 @@ class PointFill(Brush):
                                 descr = 'Hide the filled region inside the error bars',
                                 usertext='Hide error fill') )
 
-class ShapeFill(Brush):
+class ShapeFill(BrushExtended):
     '''Filling used for filling shapes.'''
 
     def __init__(self, name, **args):
-        Brush.__init__(self, name, **args)
+        BrushExtended.__init__(self, name, **args)
 
         self.get('hide').newDefault(True)
         self.get('color').newDefault('white')

@@ -59,6 +59,22 @@ void addNumpyToPolygonF(QPolygonF&, ...);
    }
 %End
 
+void addNumpyPolygonToPath(QPainterPath&, const QRectF*, ...);
+%MethodCode
+   {
+   try
+     {
+       Tuple2Ptrs t(a2);
+       addNumpyPolygonToPath(*a0, t, a1);
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
+   }
+%End
+
+
 void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
 			SIP_PYOBJECT,
 			const QRectF* clip=0,

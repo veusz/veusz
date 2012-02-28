@@ -192,11 +192,12 @@ class Ternary(NonOrthGraph):
 
         return x, y
 
-    def drawFillPts(self, painter, cliprect, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, brushext, cliprect, ptsx, ptsy):
         '''Draw points for plotting a fill.'''
         pts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
+        filltype = brushext.filltype
         # this is broken: FIXME
         if filltype == 'left':
             dyend = ptsy[-1]-self._box[1]
@@ -217,7 +218,7 @@ class Ternary(NonOrthGraph):
             pts = None
 
         if pts is not None:
-            utils.plotClippedPolygon(painter, cliprect, pts)
+            utils.brushExtFillPolygon(painter, brushext, cliprect, pts)
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''
@@ -251,9 +252,11 @@ class Ternary(NonOrthGraph):
         p.append( qt4.QPointF(self._box[0]+widthh, self._box[1]) )
         p.append( qt4.QPointF(self._box[2], self._box[3]) )
 
-        painter.setPen( s.Border.makeQPenWHide(painter) )
-        painter.setBrush( s.Background.makeQBrushWHide() )
-        painter.drawPolygon(p)
+        path = qt4.QPainterPath()
+        path.addPolygon(p)
+        path.closeSubpath()
+        utils.brushExtFillPath(painter, s.Background, path,
+                               stroke=s.Border.makeQPenWHide(painter))
 
         # work out origins and size
         self._size = max(min(s.fracsize, 1.), 0.)

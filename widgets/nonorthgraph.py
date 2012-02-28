@@ -28,10 +28,10 @@ import veusz.setting as setting
 filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
                'polygon')
 
-class FillBrush(setting.Brush):
+class FillBrush(setting.BrushExtended):
     '''Brush for filling point region.'''
     def __init__(self, *args, **argsv):
-        setting.Brush.__init__(self, *args, **argsv)
+        setting.BrushExtended.__init__(self, *args, **argsv)
         self.add( setting.Choice('filltype', filloptions, 'center',
                                  descr='Fill to this edge/position',
                                  usertext='Fill type') )
@@ -84,11 +84,11 @@ class NonOrthGraph(Widget):
         '''Return coordinate ranges of plot.
         This is in the form [[mina, maxa], [minb, maxb]].'''
 
-    def drawFillPts(self, painter, bounds, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, extfill, bounds, ptsx, ptsy):
         '''Draw set of points for filling.
+        extfill: extended fill brush
         bounds: usual tuple (minx, miny, maxx, maxy)
         ptsx, ptsy: translated plotter coordinates
-        filltype: one of filloptions
         '''
     
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):

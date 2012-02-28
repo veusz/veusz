@@ -1636,7 +1636,12 @@ class FillSet(Setting):
         [('solid', 'color', False), ...]
 
         These are color, fill style, and hide or
-        color, fill style, transparency and hide
+        color, fill style, and hide
+
+        (style, color, hide,
+        [optional transparency, linewidth,
+         linestyle, spacing, backcolor, backtrans, backhide]])
+
         """
 
         if type(val) not in (list, tuple):
@@ -1645,13 +1650,14 @@ class FillSet(Setting):
         # check each entry in the list is appropriate
         for fill in val:
             try:
-                style, color, hide = fill
+                style, color, hide = fill[:3]
             except ValueError:
                 raise InvalidType
 
             if ( not isinstance(color, basestring) or
-                 style not in FillStyle._fillstyles or
-                 type(hide) not in (int, bool) ):
+                 style not in utils.extfillstyles or
+                 type(hide) not in (int, bool) or
+                 len(fill) not in (3, 10) ):
                 raise InvalidType
 
         return val
@@ -1659,23 +1665,30 @@ class FillSet(Setting):
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.FillSet(self, *args)
-    
-    def makeBrush(self, row):
-        """Make a Qt brush corresponding to the row given.
 
-        If row is outside of range, then cycle
-        """
+    def returnBrushExtended(self, row):
+        """Return BrushExtended for the row."""
+        import collections
+        s = collections.BrushExtended('tempbrush')
 
         if len(self.val) == 0:
-            return qt4.QBrush()
+            s.hide = True
         else:
-            row = row % len(self.val)
-            style, color, hide = self.val[row]
-            col = utils.extendedColorToQColor(color)
-            b = qt4.QBrush(col, FillStyle._fillcnvt[style])
-            if hide:
-                b.setStyle(qt4.Qt.NoBrush)
-            return b
+            v = self.val[row % len(self.val)]
+            s.style = v[0]
+            col = utils.extendedColorToQColor(v[1])
+            if col.alpha() != 255:
+                s.transparency = int(100 - col.alphaF()*100)
+                col.setAlpha(255)
+                s.color = col.name()
+            else:
+                s.color = v[1]
+            s.hide = v[2]
+            if len(v) == 10:
+                (s.transparency, s.linewidth, s.linestyle,
+                 s.patternspacing, s.backcolor,
+                 s.backtransparency, s.backhide) = v[3:]
+        return s
 
 class Filename(Str):
     """Represents a filename setting."""
@@ -1689,7 +1702,7 @@ class Filename(Str):
         if sys.platform == 'win32':
             val = val.replace('\\', '/')
         return val
-    
+
 class ImageFilename(Filename):
     """Represents an image filename setting."""
 
@@ -1718,7 +1731,7 @@ class ErrorStyle(Choice):
         'none',
         'bar', 'barends', 'box', 'diamond', 'curve',
         'barbox', 'bardiamond', 'barcurve',
-        'boxfill',
+        'boxfill', 'diamondfill',
         'fillvert', 'fillhorz',
         'linevert', 'linehorz',
         'linevertbar', 'linehorzbar'
@@ -1803,6 +1816,55 @@ class BoolSwitch(Bool):
     def copy(self):
         return self._copyHelper((), (), {'settingsfalse': self.sfalse,
                                          'settingstrue': self.strue})
+
+class ChoiceSwitch(Choice):
+    """Show or hide other settings based on the choice given here."""
+
+    def __init__(self, name, vallist, value, settingstrue=[], settingsfalse=[],
+                 showfn=lambda val: True, **args):
+        """Enables/disables a set of settings if True or False
+        settingsfalse and settingstrue are lists of names of settings
+        which are hidden/shown to user depending on showfn(val)."""
+
+        self.sfalse = settingsfalse
+        self.strue = settingstrue
+        self.showfn = showfn
+        Choice.__init__(self, name, vallist, value, **args)
+
+    def makeControl(self, *args):
+        return controls.ChoiceSwitch(self, *args)
+
+    def copy(self):
+        return self._copyHelper((self.vallist), (),
+                                {'settingsfalse': self.sfalse,
+                                 'settingstrue': self.strue,
+                                 'showfn': self.showfn})
+
+class FillStyleExtended(ChoiceSwitch):
+    """A setting for the different fill styles provided by Qt."""
+
+    typename = 'fill-style-ext'
+
+    _strue = ( 'linewidth', 'linestyle', 'patternspacing',
+               'backcolor', 'backtransparency', 'backhide' )
+
+    @staticmethod
+    def _ishatch(val):
+        """Is this a hatching fill?"""
+        return not ( val == 'solid' or val.find('dense') >= 0 )
+
+    def __init__(self, name, value, **args):
+        ChoiceSwitch.__init__(self, name, utils.extfillstyles, value,
+                              settingstrue=self._strue, settingsfalse=(),
+                              showfn=self._ishatch,
+                              **args)
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper((), (), {})
+
+    def makeControl(self, *args):
+        return controls.FillStyleExtended(self, *args)
 
 class RotateInterval(Choice):
     '''Rotate a label with intervals given.'''

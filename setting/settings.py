@@ -100,7 +100,8 @@ class Settings(object):
     def add(self, setting, posn = -1, readonly = False, pixmap=None):
         """Add a new setting with the name, or a set of subsettings."""
         name = setting.name
-        assert name not in self.setdict
+        if name in self.setdict:
+            raise RuntimeError, "Name already in settings dictionary"
         self.setdict[name] = setting
         if posn < 0:
             self.setnames.append(name)

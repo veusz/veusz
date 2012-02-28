@@ -384,6 +384,70 @@ class Choice(qt4.QComboBox):
         if self.isEditable():
             self.setEditText(text)
 
+class ChoiceSwitch(Choice):
+    """Show or hide other settings based on value."""
+
+    def showEvent(self, event):
+        Choice.showEvent(self, event)
+        self.updateState()
+
+    def onModified(self, mod):
+        """called when the setting is changed remotely"""
+        Choice.onModified(self, mod)
+        self.updateState()
+
+    def updateState(self):
+        """Set hidden state of settings."""
+        s1, s2 = self.setting.strue, self.setting.sfalse
+        if self.setting.showfn(self.setting.val):
+            show, hide = s1, s2
+        else:
+            show, hide = s2, s1
+
+        if hasattr(self.parent(), 'showHideSettings'):
+            self.parent().showHideSettings(show, hide)
+
+class FillStyleExtended(ChoiceSwitch):
+    """Extended fill style list."""
+
+    _icons = None
+
+    def __init__(self, setting, parent):
+        if self._icons is None:
+            self._generateIcons()
+
+        ChoiceSwitch.__init__(self, setting, False,
+                              utils.extfillstyles, parent,
+                              icons=self._icons)
+
+    @classmethod
+    def _generateIcons(cls):
+        """Generate a list of pixmaps for drop down menu."""
+
+        import collections
+        brush = collections.BrushExtended("")
+        brush.color = 'black'
+        brush.patternspacing = '5pt'
+        brush.linewidth = '0.5pt'
+
+        size = 12
+        cls._icons = icons = []
+
+        path = qt4.QPainterPath()
+        path.addRect(0, 0, size, size)
+
+        for f in utils.extfillstyles:
+            pix = qt4.QPixmap(size, size)
+            pix.fill()
+            painter = qt4.QPainter(pix)
+            painter.pixperpt = 1.
+            painter.scaling = 1.
+            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            brush.style = f
+            utils.brushExtFillPath(painter, brush, path)
+            painter.end()
+            icons.append( qt4.QIcon(pix) )
+
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
 
@@ -582,7 +646,6 @@ class DatasetOrString(Dataset):
         Dataset.__init__(self, setting, document, dimensions, datatype, parent)
 
         b = self.textbutton = DotDotButton()
-        b.setCheckable(True)
         self.layout().addWidget(b)
         self.connect(b, qt4.SIGNAL('toggled(bool)'), self.textButtonToggled)
 
@@ -1006,8 +1069,10 @@ class ListSet(qt4.QFrame):
         row = -1
         for row, val in enumerate(self.setting.val):
             cntrls = self.populateRow(row, val)
-            for i in cntrls:
-                i.show()
+            for col in xrange(len(cntrls)):
+                self.layout.addWidget(cntrls[col], row, col)
+            for c in cntrls:
+                c.show()
             self.controls.append(cntrls)
 
         # buttons at end
@@ -1076,13 +1141,15 @@ class ListSet(qt4.QFrame):
 
         color = self.setting.val[row][col]
         wcolor = qt4.QPushButton()
-        self.layout.addWidget(wcolor, row, col)
-        wcolor.setMaximumWidth(wcolor.height())
+        wcolor.setFlat(True)
+        wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        wcolor.setMaximumHeight(24)
+        wcolor.setMaximumWidth(24)
+
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
         pix.fill( utils.extendedColorToQColor(color) )
         wcolor.setIcon( qt4.QIcon(pix) )
         wcolor.setToolTip(tooltip)
-        wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
 
         self.connect(wcolor, qt4.SIGNAL('clicked()'), self.onColorClicked)
         return wcolor
@@ -1092,7 +1159,6 @@ class ListSet(qt4.QFrame):
 
         toggle = self.setting.val[row][col]
         wtoggle = qt4.QCheckBox()
-        self.layout.addWidget(wtoggle, row, col)
         wtoggle.setChecked(toggle)
         wtoggle.setToolTip(tooltip)
         self.connect(wtoggle, qt4.SIGNAL('toggled(bool)'), self.onToggled)
@@ -1104,7 +1170,6 @@ class ListSet(qt4.QFrame):
         val = self.setting.val[row][col]
 
         wcombo = qt4.QComboBox()
-        self.layout.addWidget(wcombo, row, col)
 
         if texts is None:
             for icon in icons:
@@ -1185,7 +1250,6 @@ class LineSet(ListSet):
         
         # make line width edit box
         wwidth = qt4.QLineEdit()
-        self.layout.addWidget(wwidth, row, 1)
         wwidth.setText(self.setting.val[row][1])
         wwidth.setToolTip('Line width')
         self.connect(wwidth, qt4.SIGNAL('editingFinished()'),
@@ -1215,6 +1279,89 @@ class LineSet(ListSet):
             # invalid distance
             styleError(sender)
 
+class _FillBox(qt4.QScrollArea):
+    """Pop up box for extended fill settings."""
+
+    def __init__(self, doc, thesetting, row, button, parent):
+        """Initialse widget. This is based on a PropertyList widget.
+
+        FIXME: we have to import at runtime, so we should improve
+        the inheritance here. Is using PropertyList window a hack?
+        """
+
+        qt4.QScrollArea.__init__(self, parent)
+        self.setWindowFlags(qt4.Qt.Popup)
+        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        self.parent = parent
+        self.row = row
+        self.setting = thesetting
+
+        self.extbrush = thesetting.returnBrushExtended(row)
+
+        from veusz.windows.treeeditwindow import SettingsProxySingle, \
+            PropertyList
+
+        fbox = self
+        class DirectSetProxy(SettingsProxySingle):
+            """Class to intercept changes of settings from UI."""
+            def onSettingChanged(self, control, setting, val):
+                # set value in setting
+                setting.val = val
+                # tell box to update setting
+                fbox.onSettingChanged()
+
+        # actual widget for changing the fill
+        plist = PropertyList(doc)
+        plist.updateProperties( DirectSetProxy(doc, self.extbrush) )
+        self.setWidget(plist)
+
+        utils.positionFloatingPopup(self, button)
+        self.installEventFilter(self)
+
+    def onSettingChanged(self):
+        """Called when user changes a fill property."""
+
+        # get value of brush and get data for row
+        e = self.extbrush
+        rowdata = [e.style, e.color, e.hide]
+        if e.style != 'solid':
+            rowdata += [
+                e.transparency, e.linewidth, e.linestyle,
+                e.patternspacing, e.backcolor,
+                e.backtransparency, e.backhide ]
+        rowdata = tuple(rowdata)
+
+        if self.setting.val[self.row] != rowdata:
+            # if row different, send update signal
+            val = list(self.setting.val)
+            val[self.row] = rowdata
+            self.emit( qt4.SIGNAL("settingChanged"), self, self.setting, val )
+
+    def eventFilter(self, obj, event):
+        """Grab clicks outside this window to close it."""
+        if ( isinstance(event, qt4.QMouseEvent) and
+             event.buttons() != qt4.Qt.NoButton ):
+            frame = qt4.QRect(0, 0, self.width(), self.height())
+            if not frame.contains(event.pos()):
+                self.close()
+                return True
+        return qt4.QScrollArea.eventFilter(self, obj, event)
+
+    def keyPressEvent(self, event):
+        """Close if escape or return is pressed."""
+        qt4.QScrollArea.keyPressEvent(self, event)
+
+        key = event.key()
+        if key == qt4.Qt.Key_Escape:
+            self.close()
+
+    def closeEvent(self, event):
+        """Tell the calling widget that we are closing, and provide
+        the new text."""
+
+        self.emit(qt4.SIGNAL("closing"), self.row)
+        qt4.QScrollArea.closeEvent(self, event)
+
 class FillSet(ListSet):
     """A list of fill settings."""
 
@@ -1230,30 +1377,53 @@ class FillSet(ListSet):
             FillStyle._generateIcons()
     
         # make fill style selector
-        wfillstyle = self.addCombo(row, 0, 'Fill style',
+        wfillstyle = self.addCombo(row, 0, "Fill style",
                                    FillStyle._fills,
                                    FillStyle._icons,
                                    FillStyle._fills)
         wfillstyle.setMinimumWidth(self.pixsize)
 
         # make color selector button
-        wcolor = self.addColorButton(row, 1, 'Fill color')
+        wcolor = self.addColorButton(row, 1, "Fill color")
 
         # make hide checkbox
-        whide = self.addToggleButton(row, 2, 'Hide fill')
+        whide = self.addToggleButton(row, 2, "Hide fill")
+
+        # extended options
+        wmore = DotDotButton(tooltip="More options")
+        self.connect(wmore, qt4.SIGNAL("toggled(bool)"),
+                     lambda on, row=row: self.editMore(on, row))
 
         # return widgets
-        return [wfillstyle, wcolor, whide]
+        return [wfillstyle, wcolor, whide, wmore]
+
+    def buttonAtRow(self, row):
+        """Get .. button on row."""
+        return self.layout.itemAtPosition(row, 3).widget()
+
+    def editMore(self, on, row):
+        if on:
+            fb = _FillBox(self.setting.getDocument(), self.setting,
+                          row, self.buttonAtRow(row), self.parent())
+            self.connect(fb, qt4.SIGNAL("closing"), self.boxClosing)
+            self.connect(fb, qt4.SIGNAL("settingChanged"), self,
+                         qt4.SIGNAL("settingChanged"))
+            fb.show()
+
+    def boxClosing(self, row):
+        """Called when the popup edit box closes."""
+        # uncheck the .. button
+        self.buttonAtRow(row).setChecked(False)
 
 class MultiSettingWidget(qt4.QWidget):
     """A widget for storing multiple values in a tuple,
     with + and - signs by each entry."""
 
-    def __init__(self, setting, doc, parent):
+    def __init__(self, setting, doc, *args):
         """Construct widget as combination of LineEdit and PushButton
         for browsing."""
 
-        qt4.QWidget.__init__(self, parent)
+        qt4.QWidget.__init__(self, *args)
         self.setting = setting
         self.document = doc
 
@@ -1373,10 +1543,10 @@ class MultiSettingWidget(qt4.QWidget):
 class Datasets(MultiSettingWidget):
     """A control for editing a list of datasets."""
 
-    def __init__(self, setting, doc, dimensions, datatype, parent):
+    def __init__(self, setting, doc, dimensions, datatype, *args):
         """Contruct set of comboboxes"""
 
-        MultiSettingWidget.__init__(self, setting, doc, parent)
+        MultiSettingWidget.__init__(self, setting, doc, *args)
         self.dimensions = dimensions
         self.datatype = datatype
 
@@ -1435,11 +1605,11 @@ class Datasets(MultiSettingWidget):
 class Strings(MultiSettingWidget):
     """A list of strings."""
 
-    def __init__(self, setting, doc, parent):
+    def __init__(self, setting, doc, *args):
         """Construct widget as combination of LineEdit and PushButton
         for browsing."""
 
-        MultiSettingWidget.__init__(self, setting, doc, parent)
+        MultiSettingWidget.__init__(self, setting, doc, *args)
         self.onModified(True)
 
     def makeControl(self, row):

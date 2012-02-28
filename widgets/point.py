@@ -78,34 +78,56 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                         s, painter, clip):
     """Draw box filled region inside error bars."""
     if None not in (xmin, xmax, ymin, ymax):
-        painter.save()
-        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-
         # filled region below
         if not s.FillBelow.hideerror:
-            painter.setBrush( s.FillBelow.makeQBrush() )
-            utils.plotBoxesToPainter(painter, xmin, ymin, xmax, yplotter, clip)
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, ymin, xmin, yplotter,
+                                        xmax, yplotter, xmax, ymin)
+            utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
         # filled region above
         if not s.FillAbove.hideerror:
-            painter.setBrush( s.FillAbove.makeQBrush() )
-            utils.plotBoxesToPainter(painter, xmin, yplotter, xmax, ymax, clip)
-
-        painter.restore()
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, yplotter, xmax, yplotter,
+                                        xmax, ymax, xmin, ymax)
+            utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
 def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                       s, painter, clip):
     """Draw diamond around error region."""
     if None not in (xmin, xmax, ymin, ymax):
+
+        # expand clip by pen width (urgh)
+        pw = painter.pen().widthF()*2
+        clip = qt4.QRectF(qt4.QPointF(clip.left()-pw,clip.top()-pw),
+                          qt4.QPointF(clip.right()+pw,clip.bottom()+pw))
+
+        path = qt4.QPainterPath()
+        utils.addNumpyPolygonToPath(path, clip,
+                                    xmin, yplotter, xplotter, ymax,
+                                    xmax, yplotter, xplotter, ymin)
         painter.setBrush( qt4.QBrush() )
+        painter.drawPath(path)
 
-        for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
-            xplotter, yplotter, xmin, ymin, xmax, ymax):
+def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                            s, painter, clip):
+    """Draw diamond filled region inside error bars."""
+    if None not in (xmin, xmax, ymin, ymax):
+        if not s.FillBelow.hideerror:
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, yplotter, xplotter, ymin,
+                                        xmax, yplotter)
+            utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
-            utils.plotClippedPolygon(
-                painter, clip,
-                qt4.QPolygonF([qt4.QPointF(xmn, yp), qt4.QPointF(xp, ymx),
-                               qt4.QPointF(xmx, yp), qt4.QPointF(xp, ymn)]) )
+        if not s.FillAbove.hideerror:
+            path = qt4.QPainterPath()
+            utils.addNumpyPolygonToPath(path, clip,
+                                        xmin, yplotter, xplotter, ymax,
+                                        xmax, yplotter)
+            utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
 def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                     s, painter, clip):
@@ -166,15 +188,12 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
         # polygons consist of lines joining the points and continuing
         # back along the plot line (retnpts)
-        painter.save()
-        painter.setPen( qt4.Qt.NoPen )
         if not s.FillBelow.hideerror:
-            painter.setBrush( s.FillBelow.makeQBrush() )
-            painter.drawPolygon( ptsbelow + retnpts )
+            utils.brushExtFillPolygon(painter, s.FillBelow, clip,
+                                      ptsbelow+retnpts, ignorehide=True)
         if not s.FillAbove.hideerror:
-            painter.setBrush( s.FillAbove.makeQBrush() )
-            painter.drawPolygon( ptsabove + retnpts )
-        painter.restore()
+            utils.brushExtFillPolygon(painter, s.FillAbove, clip,
+                                      ptsabove+retnpts, ignorehide=True)
 
     # draw optional line (on top of fill)
     utils.plotClippedPolyline(painter, clip, ptsabove)
@@ -191,6 +210,7 @@ _errorBarFunctionMap = {
     'box':  (_errorBarsBox,),
     'boxfill': (_errorBarsBoxFilled, _errorBarsBox,),
     'diamond':  (_errorBarsDiamond,),
+    'diamondfill':  (_errorBarsDiamond, _errorBarsDiamondFilled),
     'curve': (_errorBarsCurve,),
     'fillhorz': (_errorBarsFilled,),
     'fillvert': (_errorBarsFilled,),
@@ -500,13 +520,13 @@ class PointPlotter(GenericPlotter):
             temppath = qt4.QPainterPath(path)
             temppath.lineTo(pts[-1].x(), posn[3])
             temppath.lineTo(pts[0].x(), posn[3])
-            painter.fillPath(temppath, s.FillBelow.makeQBrush() )
+            utils.brushExtFillPath(painter, s.FillBelow, temppath)
 
         if not s.FillAbove.hide:
             temppath = qt4.QPainterPath(path)
             temppath.lineTo(pts[-1].x(), posn[1])
             temppath.lineTo(pts[0].x(), posn[1])
-            painter.fillPath(temppath, s.FillAbove.makeQBrush() )
+            utils.brushExtFillPath(painter, s.FillAbove, temppath)
 
         if not s.PlotLine.hide:
             painter.strokePath(path, s.PlotLine.makeQPen(painter))
@@ -521,27 +541,19 @@ class PointPlotter(GenericPlotter):
         s = self.settings
 
         if not s.FillBelow.hide:
-            # empty pen (line gets drawn below)
-            painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-            painter.setBrush( s.FillBelow.makeQBrush() )
-
             # construct polygon to draw filled region
             polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[3])])
             polypts += pts
             polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[3]))
 
-            # clip polygon and paint
-            utils.plotClippedPolygon(painter, cliprect, polypts)
+            utils.brushExtFillPolygon(painter, s.FillBelow, cliprect, polypts)
 
         if not s.FillAbove.hide:
-            painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-            painter.setBrush( s.FillAbove.makeQBrush() )
-
             polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[1])])
             polypts += pts
             polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[1]))
 
-            utils.plotClippedPolygon(painter, cliprect, polypts)
+            utils.brushExtFillPolygon(painter, s.FillAbove, cliprect, polypts)
 
         # draw line between points
         if not s.PlotLine.hide:

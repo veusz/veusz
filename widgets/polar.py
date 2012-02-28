@@ -152,22 +152,24 @@ class Polar(NonOrthGraph):
         y = self._yc + ca * N.sin(cb) * self._yscale
         return x, y
 
-    def drawFillPts(self, painter, cliprect, ptsx, ptsy, filltype):
+    def drawFillPts(self, painter, extfill, cliprect,
+                    ptsx, ptsy):
         '''Draw points for plotting a fill.'''
         pts = qt4.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
+        filltype = extfill.filltype
         if filltype == 'center':
             pts.append( qt4.QPointF(self._xc, self._yc) )
-            utils.plotClippedPolygon(painter, cliprect, pts)
+            utils.brushExtFillPolygon(painter, extfill, cliprect, pts)
         elif filltype == 'outside':
             pp = qt4.QPainterPath()
             pp.moveTo(self._xc, self._yc)
             pp.arcTo(cliprect, 0, 360)
             pp.addPolygon(pts)
-            painter.fillPath(pp, painter.brush())
+            utils.brushExtFillPath(painter, extfill, pp)
         elif filltype == 'polygon':
-            utils.plotClippedPolygon(painter, cliprect, pts)
+            utils.brushExtFillPolygon(painter, extfill, cliprect, pts)
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''
@@ -183,10 +185,11 @@ class Polar(NonOrthGraph):
         self._xc = 0.5*(bounds[0]+bounds[2])
         self._yc = 0.5*(bounds[3]+bounds[1])
 
-        painter.setPen( s.Border.makeQPenWHide(painter) )
-        painter.setBrush( s.Background.makeQBrushWHide() )
-        painter.drawEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
-                                         qt4.QPointF(bounds[2], bounds[3]) ) )
+        path = qt4.QPainterPath()
+        path.addEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
+                                     qt4.QPointF(bounds[2], bounds[3]) ) )
+        utils.brushExtFillPath(painter, s.Background, path,
+                               stroke=s.Border.makeQPenWHide(painter))
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''

@@ -297,6 +297,24 @@ class BarPlotter(GenericPlotter):
                 utils.plotLinesToPainter(painter, posns-w, maxcoord,
                                          posns+w, maxcoord)
 
+    def plotBars(self, painter, s, dsnum, clip, corners):
+        """Plot a set of boxes."""
+        # get style
+        brush = s.BarFill.get('fills').returnBrushExtended(dsnum)
+        pen = s.BarLine.get('lines').makePen(painter, dsnum)
+        lw = pen.widthF() * 2
+
+        # make clip box bigger to avoid lines showing
+        extclip = qt4.QRectF(qt4.QPointF(clip.left()-lw, clip.top()-lw),
+                             qt4.QPointF(clip.right()+lw, clip.bottom()+lw))
+
+        # plot bars
+        path = qt4.QPainterPath()
+        utils.addNumpyPolygonToPath(
+            path, extclip, corners[0], corners[1], corners[2], corners[1],
+            corners[2], corners[3], corners[0], corners[3])
+        utils.brushExtFillPath(painter, brush, path, stroke=pen)
+
     def barDrawGroup(self, painter, posns, maxwidth, dsvals,
                      axes, widgetposn, clip):
         """Draw groups of bars."""
@@ -317,10 +335,7 @@ class BarPlotter(GenericPlotter):
                                                       N.array([0.]))
 
         for dsnum, dataset in enumerate(dsvals):
-            # set correct attributes for datasets
-            painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
-            painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
-            
+
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, dataset['data'])
@@ -337,8 +352,7 @@ class BarPlotter(GenericPlotter):
                 p = (posns1, zeropt + N.zeros(posns2.shape),
                      posns2, lengthcoord)
 
-            # iterate over coordinates to plot bars
-            utils.plotBoxesToPainter(painter, p[0], p[1], p[2], p[3], clip)
+            self.plotBars(painter, s, dsnum, clip, p)
 
             # draw error bars
             self.drawErrorBars(painter, posns2-barwidth*0.5, barwidth,
@@ -364,10 +378,6 @@ class BarPlotter(GenericPlotter):
         # keep track of bars for error bars
         barvals = []
         for dsnum, data in enumerate(dsvals):
-            # set correct attributes for datasets
-            painter.setBrush( s.BarFill.get('fills').makeBrush(dsnum) )
-            painter.setPen( s.BarLine.get('lines').makePen(painter, dsnum) )
-            
             # add on value to last value in correct direction
             data = data['data']
             last = N.where(data < 0., lastneg, lastpos)
@@ -393,8 +403,7 @@ class BarPlotter(GenericPlotter):
             else:
                 p = (posns1, lastplt, posns2, newplt)
 
-            # draw bars
-            utils.plotBoxesToPainter(painter, p[0], p[1], p[2], p[3], clip)
+            self.plotBars(painter, s, dsnum, clip, p)
 
             barvals.append(new)
 
@@ -418,12 +427,10 @@ class BarPlotter(GenericPlotter):
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw a fill rectangle for key entry."""
 
-        s = self.settings
-        painter.setBrush( s.BarFill.get('fills').makeBrush(number) )
-        painter.setPen( s.BarLine.get('lines').makePen(painter, number) )
-        painter.drawRect( qt4.QRectF(qt4.QPointF(x, y+height*0.1),
-                                     qt4.QPointF(x+width, y+height*0.8)) )
-
+        self.plotBars(painter, self.settings, number,
+                      qt4.QRectF(0,0,32767,32767),
+                      ([x], [y+height*0.1],
+                       [x+width], [y+height*0.8]))
 
     def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the data on a plotter."""

@@ -242,7 +242,8 @@ class FunctionPlotter(GenericPlotter):
         if len(pts) >= 2:
             utils.plotClippedPolyline(painter, clip, pts)
 
-    def _fillRegion(self, painter, pxpts, pypts, bounds, belowleft, clip):
+    def _fillRegion(self, painter, pxpts, pypts, bounds, belowleft, clip,
+                    brush):
         """Fill the region above/below or left/right of the points.
 
         belowleft fills below if the variable is 'x', or left if 'y'
@@ -274,8 +275,12 @@ class FunctionPlotter(GenericPlotter):
         # stick on the ending point
         pts.append(endpt)
 
-        # actually do the filling
-        utils.plotClippedPolygon(painter, clip, pts)
+        # draw the clipped polygon
+        clipped = qt4.QPolygonF()
+        utils.polygonClip(pts, clip, clipped)
+        path = qt4.QPainterPath()
+        path.addPolygon(clipped)
+        utils.brushExtFillPath(painter, brush, path)
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
@@ -432,14 +437,12 @@ class FunctionPlotter(GenericPlotter):
                               "Cannot evaluate '%s'" % s.function )
         else:
             if not s.FillBelow.hide:
-                painter.setBrush( s.FillBelow.makeQBrush() )
-                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                self._fillRegion(painter, pxpts, pypts, posn, True, cliprect)
+                self._fillRegion(painter, pxpts, pypts, posn, True, cliprect,
+                                 s.FillBelow)
 
             if not s.FillAbove.hide:
-                painter.setBrush( s.FillAbove.makeQBrush() )
-                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-                self._fillRegion(painter, pxpts, pypts, posn, False, cliprect)
+                self._fillRegion(painter, pxpts, pypts, posn, False, cliprect,
+                                 s.FillAbove)
 
             if not s.Line.hide:
                 painter.setBrush( qt4.QBrush() )

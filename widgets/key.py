@@ -400,12 +400,12 @@ class Key(widget.Widget):
         boxdims = (totalwidth, totalheight)
 
         # draw surrounding box
+        boxpath = qt4.QPainterPath()
+        boxpath.addRect(qt4.QRectF(x, y, totalwidth, totalheight))
         if not s.Background.hide:
-            brush = s.get('Background').makeQBrush()
-            painter.fillRect( qt4.QRectF(x, y, totalwidth, totalheight), brush)
+            utils.brushExtFillPath(painter, s.Background, boxpath)
         if not s.Border.hide:
-            painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.drawRect( qt4.QRectF(x, y, totalwidth, totalheight) )
+            painter.strokePath(boxpath, s.get('Border').makeQPen(painter) )
             x += margin
             y += margin*0.5
 
