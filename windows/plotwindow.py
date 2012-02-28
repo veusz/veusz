@@ -441,6 +441,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # add items to toolbar
         utils.addToolbarActions(self.viewtoolbar, actions,
                                 ('view.prevpage', 'view.nextpage',
+                                 'view.fullscreen',
                                  'view.select', 'view.pick',
                                  'view.zoomgraph', 'view.zoommenu'))
 

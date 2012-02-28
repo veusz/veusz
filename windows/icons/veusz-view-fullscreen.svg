@@ -13,7 +13,7 @@
    height="16px"
    id="svg3086"
    version="1.1"
-   inkscape:version="0.48.2 r9819"
+   inkscape:version="0.48.1 r9760"
    sodipodi:docname="veusz-view-fullscreen.svg">
   <sodipodi:namedview
      id="base"
@@ -22,16 +22,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="15.696216"
-     inkscape:cx="0.77341903"
-     inkscape:cy="8"
+     inkscape:zoom="58.233998"
+     inkscape:cx="8.0274123"
+     inkscape:cy="8.0592673"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:window-width="1280"
-     inkscape:window-height="745"
-     inkscape:window-x="-3"
+     inkscape:window-height="965"
+     inkscape:window-x="-2"
      inkscape:window-y="-3"
      inkscape:window-maximized="1" />
   <defs
@@ -221,7 +221,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Jeremy Sanders</dc:title>
@@ -236,6 +236,13 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="rect3012"
+       width="15.553524"
+       height="12.413415"
+       x="0.22323729"
+       y="1.682507" />
     <rect
        style="fill:#ffffff;stroke:#000000;stroke-width:0.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3096"
