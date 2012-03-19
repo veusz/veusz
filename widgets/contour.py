@@ -272,6 +272,10 @@ class Contour(plotters.GenericPlotter):
                 delta = N.sqrt(maxval - minval) / (numlevels-1)
                 levels = minval + (N.arange(numlevels)*delta)**2
             elif scaling == 'log':
+                if minval == 0.:
+                    minval = 1.
+                if minval == maxval:
+                    maxval = minval + 1
                 delta = N.log(maxval/minval) / (numlevels-1)
                 levels = N.exp(N.arange(numlevels)*delta)*minval
             elif scaling == 'squared':
