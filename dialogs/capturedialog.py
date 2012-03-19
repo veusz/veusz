@@ -42,8 +42,11 @@ class CaptureDialog(VeuszDialog):
         validator = qt4.QIntValidator(1, 1000000000, self)
         self.numLinesStopEdit.setValidator(validator)
         self.timeStopEdit.setValidator(validator)
-        self.updateIntervalsEdit.setValidator(validator)
         self.tailEdit.setValidator(validator)
+
+        # floating point values for interval
+        self.updateIntervalsEdit.setValidator(
+            qt4.QDoubleValidator(1e-2, 10000000, 2, self))
 
         # add completion for filename if there is support in version of qt
         # (requires qt >= 4.3)
@@ -155,7 +158,7 @@ class CaptureDialog(VeuszDialog):
 
             # whether to do an update periodically
             if self.updateIntervalsCheck.isChecked():
-                updateinterval = int( self.updateIntervalsEdit.text() )
+                updateinterval = float( self.updateIntervalsEdit.text() )
 
             # whether to only retain N values
             if self.tailCheck.isChecked():
@@ -251,7 +254,7 @@ class CapturingDialog(VeuszDialog):
         if updateinterval:
             self.connect( self.updatetimer, qt4.SIGNAL('timeout()'),
                           self.slotUpdateTimer )
-            self.updatetimer.start(updateinterval*1000)
+            self.updatetimer.start( int(updateinterval*1000) )
 
         # start display and read timers
         self.displaytimer.start(1000)
