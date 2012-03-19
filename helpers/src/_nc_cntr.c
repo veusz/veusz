@@ -1361,12 +1361,14 @@ build_cntr_list_p(long *np, double *xp, double *yp, int nparts, long ntotal)
     int i, j, k;
 
     all_contours = PyList_New(nparts);
+    if (all_contours == NULL) return NULL;
 
     for (i = 0; i < nparts; i++)
     {
         start = end;
         end += np[i];
         contourList = PyList_New(np[i]);
+	if (contourList == NULL) goto error;
         for (k = 0, j = start; j < end; j++, k++)
         {
             point = Py_BuildValue("(dd)", xp[j], yp[j]);
@@ -1430,6 +1432,7 @@ build_cntr_list_v2(long *np, double *xp, double *yp, int nparts, long ntotal)
     long j, k;
 
     all_contours = PyList_New(nparts);
+    if (all_contours == NULL) return NULL;
 
     k = 0;
     for (i = 0; i < nparts; i++)
