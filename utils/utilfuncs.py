@@ -42,7 +42,7 @@ def _getVeuszDirectory():
         resdir = os.path.dirname(os.path.abspath(sys.executable))
         if sys.platform == 'darwin':
             # special case for py2app
-            resdir = os.path.join(resdir, '..', 'Resources', 'veusz')
+            resdir = os.path.join(resdir, '..', 'Resources')
     else:
         # standard installation
         resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
