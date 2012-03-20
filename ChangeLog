@@ -33,6 +33,7 @@ Minor changes:
  * Support labels on xy datasets if one of x or y datasets missing
  * Reorganise dataset plugin menu
  * Fix links in INSTALL/README
+ * Floating point intervals in capture dialog
 
 Bug fixes:
  * Trap case where nan values could be plotted
@@ -44,6 +45,8 @@ Bug fixes:
  * Fix crash in tool tip in dataset browser
  * Fix GlobalColor error (on certain dark color sets)
  * Fix blocked data import if no descriptor
+ * Fix crash if log contours and minimum is zero
+ * Bug fix https://bugzilla.redhat.com/show_bug.cgi?id=800196
 
 Changes in 1.14:
  * Added interactive tutorial
