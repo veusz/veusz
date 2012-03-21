@@ -1,5 +1,5 @@
 # Veusz saved document (version 1.15)
-# Saved at 2012-03-20T19:45:49.257894
+# Saved at 2012-03-21T19:30:52.420824
 
 ImportString(u'y1(numeric)','''
 0.000000e+00
@@ -19,7 +19,7 @@ ImportString(u'y2(numeric)','''
 1.000000e+01
 8.000000e+00
 ''')
-DatasetPlugin('Add', {'ds_out': u'y3', 'value': 1.0, 'ds_in': u'y2'})
+DatasetPlugin('Add', {'ds_out': u'y3', 'ds_in': u'y2', 'value': 1.0})
 Set('StyleSheet/Font/font', u'Lucida Sans')
 Set('StyleSheet/xy/marker', u'none')
 Add('page', name='page1', autoadd=False)
@@ -47,6 +47,7 @@ Add('xy', name='xy1', autoadd=False)
 To('xy1')
 Set('xData', [])
 Set('yData', u'y1')
+Set('PlotLine/steps', u'centre')
 Set('PlotLine/color', u'blue')
 Set('PlotLine/width', u'1pt')
 Set('FillBelow/color', u'blue')
