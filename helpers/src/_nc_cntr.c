@@ -1510,7 +1510,11 @@ cntr_trace(Csite *site, double levels[], int nlevels, int points, long nchunk)
     xp0 = (double *) PyMem_Malloc(ntotal * sizeof(double));
     yp0 = (double *) PyMem_Malloc(ntotal * sizeof(double));
     nseg0 = (long *) PyMem_Malloc(nparts * sizeof(long));
-    if (xp0 == NULL || yp0 == NULL || nseg0 == NULL) goto error;
+    if (xp0 == NULL || yp0 == NULL || nseg0 == NULL)
+    {
+	PyErr_NoMemory();
+	goto error;
+    }
 
     /* second pass */
     site->xcp = xp0;
