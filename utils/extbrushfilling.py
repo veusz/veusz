@@ -31,11 +31,30 @@ try:
 except ImportError:
     from slowfuncs import plotLinesToPainter, polygonClip
 
+def dumppath(p):
+    i =0
+    while i < p.elementCount():
+        e = p.elementAt(i)
+        if e.isLineTo():
+            print " l(%i,%i)" %( e.x, e.y),
+            i += 1
+        elif e.isMoveTo():
+            print " m(%i,%i)" %(e.x, e.y),
+            i += 1
+        else:
+            print " c(%i,%i,%i,%i)" %(e.x, e.y, p.elementAt(i+1).x, p.elementAt(i+1).y, p.elementAt(i+2).x, p.elementAt(i+2).y),
+            i += 3
+    print
+
 def _hatcher(painter, pen, painterpath, spacing, hatchlist):
     """Draw hatching on painter path given."""
 
     painter.save()
     painter.setPen(pen)
+
+    # debugging
+    # dumppath(painterpath)
+
     painter.setClipPath(painterpath, qt4.Qt.IntersectClip)
 
     # this is the bounding box of the path

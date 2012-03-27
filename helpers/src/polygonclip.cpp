@@ -20,7 +20,10 @@
 // It is inspired by another version by Sjaak Priester
 // see http://www.codeguru.com/Cpp/misc/misc/graphics/article.php/c8965/
 
+#include <cmath>
 #include "polygonclip.h"
+
+using std::abs;
 
 // macro to clip point against edge
 //   - edge: name of edge for clipping
@@ -59,6 +62,9 @@
     lastpt = pt;						\
   }
 
+// tolerance for points being the same
+#define TOL 1e-5
+
 namespace
 {
   inline QPointF interceptVert(qreal horzval,
@@ -74,6 +80,17 @@ namespace
     return QPointF((vertval - pt1.y())*gradient + pt1.x(), vertval);
   }
 
+  // greater than or close
+  inline int gtclose(qreal v1, qreal v2)
+  {
+    return v1 > v2 || abs(v1-v2) < TOL;
+  }
+  // less than or close
+  inline int ltclose(qreal v1, qreal v2)
+  {
+    return v1 < v2 || abs(v1-v2) < TOL;
+  }
+
   struct State
   {
     State(const QRectF& rect, QPolygonF& out)
@@ -85,19 +102,19 @@ namespace
     // tests for whether point is inside of outside of each side
     inline bool insideBottom(const QPointF& pt) const
     {
-      return pt.y() <= clip.bottom();
+      return ltclose(pt.y(), clip.bottom());
     }
     inline bool insideTop(const QPointF& pt) const
     {
-      return pt.y() >= clip.top();
+      return gtclose(pt.y(), clip.top());
     }
     inline bool insideRight(const QPointF& pt) const
     {
-      return pt.x() <= clip.right();
+      return ltclose(pt.x(), clip.right());
     }
     inline bool insideLeft(const QPointF& pt) const
     {
-      return pt.x() >= clip.left();
+      return gtclose(pt.x(), clip.left());
     }
 
     // add functions for clipping to each edge
@@ -109,7 +126,11 @@ namespace
     // finally writes to output
     void writeClipPoint(const QPointF& pt)
     {
-      output << pt;
+      // don't add the same point
+      if( output.empty() ||
+	  abs(pt.x() - output.last().x()) > TOL ||
+	  abs(pt.y() - output.last().y()) > TOL )
+	output << pt;
     }
 
     /* location of corners of clip rectangle */
