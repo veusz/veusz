@@ -181,6 +181,10 @@ class Key(widget.Widget):
                             usertext='Border'),
                pixmap = 'settings_border' )
 
+        s.add( setting.Str('title', '',
+                           descr='Key title text',
+                           usertext='Title') )
+
         s.add( setting.AlignHorzWManual( 'horzPosn',
                                          'right',
                                          descr = 'Horizontal key position',
@@ -329,6 +333,7 @@ class Key(widget.Widget):
         font = s.get('Text').makeQFont(painter)
         painter.setFont(font)
         height = utils.FontMetrics(font, painter.device()).height()
+        margin = s.marginSize * height
 
         showtext = not s.Text.hide
 
@@ -336,6 +341,16 @@ class Key(widget.Widget):
         maxwidth = 1
         # total number of layout lines required
         totallines = 0
+
+        # reserve space for the title
+        titlewidth, titleheight = 0, 0
+        if s.title != '':
+            titlefont = qt4.QFont(font)
+            titlefont.setPointSize(max(font.pointSize() * 1.2, font.pointSize() + 2))
+            titlewidth, titleheight = utils.Renderer(painter, titlefont,
+                                            0, 0, s.title).getDimensions()
+            titleheight += 0.5*margin
+            maxwidth = titlewidth
 
         entries = []
         # iterate over children and find widgets which are suitable
@@ -364,8 +379,7 @@ class Key(widget.Widget):
         symbolwidth = s.get('keyLength').convert(painter)
         totalwidth = ( (maxwidth + height + symbolwidth)*numcols +
                        height*(numcols-1) )
-        totalheight = numrows * height
-        margin = s.marginSize * height
+        totalheight = numrows * height + titleheight
         if not s.Border.hide:
             totalwidth += 2*margin
             totalheight += margin
@@ -408,6 +422,12 @@ class Key(widget.Widget):
             painter.strokePath(boxpath, s.get('Border').makeQPen(painter) )
             x += margin
             y += margin*0.5
+
+        # center and draw the title
+        if s.title:
+            xpos = x + 0.5*(totalwidth - (0 if s.Border.hide else 2*margin) - titlewidth)
+            utils.Renderer(painter, titlefont, xpos, y, s.title, alignvert=1).render()
+            y += titleheight
 
         textpen = s.get('Text').makeQPen()
 
