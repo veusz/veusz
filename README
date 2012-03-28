@@ -46,6 +46,7 @@ Changes in 1.15:
  * Add setup.py options for packagers
     --veusz-resource-dir : location of data files
     --disable-install-docs
+ * Add title option for keys
 
 Minor changes:
  * Use / rather than \ for path separator in saved file names for
