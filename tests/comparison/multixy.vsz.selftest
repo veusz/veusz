@@ -13,13 +13,13 @@
 <path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
 </clipPath>
 <clipPath id="c2">
-<path d="m358.56,376.78l35.57,0l0,17.5l-35.57,0l0,-17.5"/>
+<path d="m357.31,376.78l35.57,0l0,17.5l-35.57,0l0,-17.5"/>
 </clipPath>
 <clipPath id="c3">
-<path d="m358.56,394.28l35.57,0l0,17.5l-35.57,0l0,-17.5"/>
+<path d="m357.31,394.28l35.57,0l0,17.5l-35.57,0l0,-17.5"/>
 </clipPath>
 <clipPath id="c4">
-<path d="m358.56,411.78l35.57,0l0,17.5l-35.57,0l0,-17.5"/>
+<path d="m357.31,411.78l35.57,0l0,17.5l-35.57,0l0,-17.5"/>
 </clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
@@ -126,63 +126,66 @@
 </g>
 <g clip-path="url(#c0)">
 <g fill="#f0f0f0" stroke="none" stroke-width="1">
-<path d="m341.06,368.03l167.82,0l0,87.5l-167.82,0l0,-87.5" id="p3"/>
+<path d="m339.81,356.28l169.07,0l0,99.25l-169.07,0l0,-99.25" id="p3"/>
 </g>
 <g fill="none" stroke-width="0.62">
 <use xlink:href="#p3"/>
 </g>
+<g fill="none" stroke-width="1">
+<text x="383.83" y="367.03" font-size="16pt" fill="#000000">Datasets</text>
+</g>
 </g>
 <g clip-path="url(#c2)">
 <g fill="none" stroke-width="0.62">
-<path d="M376.34,385.53l0,0"/>
-<path d="M358.56,385.53l35.57,0"/>
+<path d="M375.09,385.53l0,0"/>
+<path d="M357.31,385.53l35.57,0"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.62">
-<use xlink:href="#p2" x="376.34" y="385.53"/>
+<use xlink:href="#p2" x="375.09" y="385.53"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
-<text x="411.62" y="378.53" font-size="14pt" fill="#000000">Valkyries</text>
+<text x="410.37" y="378.53" font-size="14pt" fill="#000000">Valkyries</text>
 </g>
 </g>
 <g clip-path="url(#c3)">
 <g fill="none" stroke-width="0.62">
-<path d="M376.34,403.03l0,0"/>
+<path d="M375.09,403.03l0,0"/>
 </g>
 <g fill="none" stroke-dasharray="0.625,1.25" stroke-width="0.62">
-<path d="M358.56,403.03l35.57,0"/>
+<path d="M357.31,403.03l35.57,0"/>
 </g>
 <g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.62">
-<use xlink:href="#p1" x="376.34" y="403.03"/>
+<use xlink:href="#p1" x="375.09" y="403.03"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
-<text x="411.62" y="396.03" font-size="14pt" fill="#000000">Swindon</text>
+<text x="410.37" y="396.03" font-size="14pt" fill="#000000">Swindon</text>
 </g>
 </g>
 <g clip-path="url(#c4)">
 <g fill="none" stroke-width="0.62">
-<path d="M376.34,413.53l0,14"/>
-<path d="M376.34,420.53l0,0"/>
+<path d="M375.09,413.53l0,14"/>
+<path d="M375.09,420.53l0,0"/>
 </g>
 <g fill="none" stroke-dasharray="2.5,1.25" stroke-width="0.62">
-<path d="M358.56,420.53l35.57,0"/>
+<path d="M357.31,420.53l35.57,0"/>
 </g>
 <g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<use xlink:href="#p0" x="376.34" y="420.53"/>
+<use xlink:href="#p0" x="375.09" y="420.53"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
-<text x="411.62" y="413.53" font-size="14pt" fill="#000000">Discworld</text>
+<text x="410.37" y="413.53" font-size="14pt" fill="#000000">Discworld</text>
 </g>
 <g fill="none" stroke="#20f020" stroke-width="2.5">
-<path d="M358.56,438.03l35.57,0"/>
+<path d="M357.31,438.03l35.57,0"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="411.62" y="431.03" font-size="14pt" fill="#000000">Model</text>
+<text x="410.37" y="431.03" font-size="14pt" fill="#000000">Model</text>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.62">
 <path d="M60.46,473.03l0,-465.91"/>
