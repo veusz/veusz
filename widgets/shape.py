@@ -48,6 +48,10 @@ class Shape(plotters.FreePlotter):
                             descr = 'Shape border',
                             usertext='Border'),
                pixmap = 'settings_border' )
+        s.add( setting.Bool('clip', False,
+                            descr='Clip shape to its container',
+                            usertext='Clip',
+                            formatting=True) )
 
 class BoxShape(Shape):
     """For drawing box-like shapes."""
@@ -109,7 +113,11 @@ class BoxShape(Shape):
                          not s.get('rotate').isDataset(d) )
         controlgraphitems = []
 
-        painter = phelper.painter(self, posn)
+        clip = None
+        if s.clip:
+            clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
+                               qt4.QPointF(posn[2], posn[3]) )
+        painter = phelper.painter(self, posn, clip=clip)
 
         # drawing settings for shape
         if not s.Border.hide:
