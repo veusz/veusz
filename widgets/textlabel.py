@@ -23,6 +23,7 @@ import itertools
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
+import veusz.qtall as qt4
 
 import plotters
 import controlgraph
@@ -66,6 +67,11 @@ class TextLabel(plotters.FreePlotter):
                              usertext='Angle',
                              formatting=True), 9 )
 
+        s.add( setting.Bool('clip', False,
+                            descr='Clip line to its container',
+                            usertext='Clip',
+                            formatting=True), 10 )
+
         s.add( setting.Text('Text',
                             descr = 'Text settings',
                             usertext='Text'),
@@ -92,7 +98,11 @@ class TextLabel(plotters.FreePlotter):
             # we can't calculate coordinates
             return
 
-        painter = phelper.painter(self, posn)
+        clip = None
+        if s.clip:
+            clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
+                               qt4.QPointF(posn[2], posn[3]) )
+        painter = phelper.painter(self, posn, clip=clip)
         textpen = s.get('Text').makeQPen()
         painter.setPen(textpen)
         font = s.get('Text').makeQFont(painter)
