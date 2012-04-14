@@ -57,6 +57,10 @@ class Line(plotters.FreePlotter):
                                           'dataset',
                                           usertext='Angles',
                                           formatting=False), 4 )
+        s.add( setting.Bool('clip', False,
+                            descr='Clip line to its container',
+                            usertext='Clip',
+                            formatting=True), 0 )
 
         s.add( setting.Line('Line',
                             descr = 'Line style',
@@ -76,7 +80,6 @@ class Line(plotters.FreePlotter):
         s.add( setting.Arrow('arrowleft', 'none',
                              descr = 'Arrow to plot on left side',
                              usertext='Arrow left', formatting=True), 0)
-
 
     def draw(self, posn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
@@ -105,7 +108,11 @@ class Line(plotters.FreePlotter):
                          not s.get('angle').isDataset(d) )
 
         # now do the drawing
-        painter = phelper.painter(self, posn)
+        clip = None
+        if s.clip:
+            clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
+                               qt4.QPointF(posn[2], posn[3]) )
+        painter = phelper.painter(self, posn, clip=clip)
 
         # adjustable positions for the lines
         controlgraphitems = []
