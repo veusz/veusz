@@ -67,6 +67,10 @@ static const int      g_min_font_point_size		= 8;
 static const QChar    g_radical_char  	    	    	= QChar(0x1A, 0x22);
 static const unsigned g_oper_spec_rows     	        = 9;
 
+// use unnamed namespace
+namespace
+{
+
 struct Mml
 {
     enum NodeType {
@@ -135,6 +139,7 @@ struct EntitySpec
 
 typedef QMap<QString, QString> MmlAttributeMap;
 class MmlNode;
+} // namespace
 
 class MmlDocument : public Mml
 {
@@ -191,9 +196,10 @@ class MmlDocument : public Mml
 	QColor m_background_color;
 };
 
+namespace {
 class MmlNode : public Mml
 {
-    friend class MmlDocument;
+    friend class ::MmlDocument;
 
     public:
 	MmlNode(NodeType type, MmlDocument *document, const MmlAttributeMap &attribute_map);
@@ -640,6 +646,7 @@ class MmlMspaceNode : public MmlNode
 	MmlMspaceNode(MmlDocument *document, const MmlAttributeMap &attribute_map)
 		: MmlNode(MspaceNode, document, attribute_map) {}
 };
+}
 
 static const NodeSpec *mmlFindNodeSpec(Mml::NodeType type);
 static const NodeSpec *mmlFindNodeSpec(const QString &tag);
