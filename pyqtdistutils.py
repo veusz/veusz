@@ -44,7 +44,7 @@ class build_ext (distutils.command.build_ext.build_ext):
 
     def get_includes(self, cfg):
         incdirs = []
-        for mod in ('QtCore', 'QtGui'):
+        for mod in ('QtCore', 'QtGui', 'QtXml'):
             if cfg.qt_framework:
                 incdirs.append( os.path.join(cfg.qt_lib_dir,
                                              mod + '.framework', 'Headers') )
@@ -70,11 +70,12 @@ class build_ext (distutils.command.build_ext.build_ext):
         # link against libraries
         if cfg.qt_framework:
             extension.extra_link_args = ['-framework', 'QtGui',
-                                         '-framework', 'QtCore']
+                                         '-framework', 'QtCore',
+                                         '-framework', 'QtXml']
         elif sys.platform == 'win32':
-            extension.libraries = ['QtGui4', 'QtCore4']
+            extension.libraries = ['QtGui4', 'QtCore4', 'QtXml4']
         else:
-            extension.libraries = ['QtGui', 'QtCore']
+            extension.libraries = ['QtGui', 'QtCore', 'QtXml']
         extension.library_dirs = [cfg.qt_lib_dir]
 
         depends = extension.depends

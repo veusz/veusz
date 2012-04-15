@@ -170,6 +170,14 @@ setup(name = 'veusz',
                    ],
 
       ext_modules = [
+        # mathml widget
+        Extension('veusz.helpers.qtmml',
+                  ['helpers/src/qtmml/qtmmlwidget.cpp',
+                   'helpers/src/qtmml/qtmml.sip'],
+                  language="c++",
+                  include_dirs=['/helpers/src/qtmml'],
+                  ),
+
         # contour plotting library
         Extension('veusz.helpers._nc_cntr',
                   ['helpers/src/nc_cntr/_nc_cntr.c'],
@@ -188,7 +196,7 @@ setup(name = 'veusz',
                    'helpers/src/qtloops/recordpaintengine.cpp',
                    'helpers/src/qtloops/qtloops.sip'],
                   language="c++",
-                  include_dirs=['/helpers/src',
+                  include_dirs=['/helpers/src/qtloops',
                                 numpy.get_include()],
                   ),
         ],
