@@ -6,4 +6,4 @@ recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html *.xsl *.py *.pod
 recursive-include windows *.png *.ico *.svg README
 recursive-include dialogs *.ui
 recursive-include examples *.vsz *.py *.csv *.dat
-recursive-include helpers *.c *.cpp *.h README LICENSE_*
+recursive-include helpers *.c *.cpp *.h README LICENSE_* QtMml*
