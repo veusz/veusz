@@ -24,7 +24,7 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 try:
-    from veusz.helpers.qtloops import RecordPaintDevice
+    from veusz.helpers.recordpaint import RecordPaintDevice
 except ImportError:
     # fallback to this if we don't get the native recorded
     def RecordPaintDevice(width, height, dpix, dpiy):

@@ -200,23 +200,6 @@ QPolygonF bezier_fit_cubic_single(const QPolygonF& data, double error);
 QPolygonF bezier_fit_cubic_multi(const QPolygonF& data, double error,
 				 unsigned max_beziers);
 
-class RecordPaintDevice : QPaintDevice
- {
-%TypeHeaderCode
-#include <recordpaintdevice.h>
-%End
-
-public:
-  RecordPaintDevice(int width, int height, int dpix, int dpiy);
-  ~RecordPaintDevice();
-  void play(QPainter& painter);
-
-  QPaintEngine* paintEngine() const;
-
-  int metric(QPaintDevice::PaintDeviceMetric metric) const;
-  int drawItemCount() const;
- };
-
 SIP_PYOBJECT binData(SIP_PYOBJECT data, int binning, bool average);
 %MethodCode
    try
