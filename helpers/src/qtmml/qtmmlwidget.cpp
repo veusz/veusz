@@ -6345,6 +6345,7 @@ QString QtMmlDocument::fontName(QtMmlWidget::MmlFont type) const
 void QtMmlDocument::setFontName(QtMmlWidget::MmlFont type, const QString &name)
 {
     m_doc->setFontName(type, name);
+    m_doc->layout();
 }
 
 /*!
@@ -6367,4 +6368,5 @@ int QtMmlDocument::baseFontPointSize() const
 void QtMmlDocument::setBaseFontPointSize(int size)
 {
     m_doc->setBaseFontPointSize(size);
+    m_doc->layout();
 }
