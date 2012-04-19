@@ -193,7 +193,10 @@ class DatasetHistoGenerator(object):
 class DatasetHistoBins(Dataset):
     """A dataset for getting the bin positions for the histogram."""
 
+    dstype = 'Histogram'
+
     def __init__(self, generator, document):
+        Dataset.__init__(self, data=[])
         self.generator = generator
         self.document = document
         self.linked = None
@@ -223,7 +226,10 @@ class DatasetHistoBins(Dataset):
 class DatasetHistoValues(Dataset):
     """A dataset for getting the height of the bins in a histogram."""
 
+    dstype = 'Histogram'
+
     def __init__(self, generator, document):
+        Dataset.__init__(self, data=[])
         self.generator = generator
         self.document = document
         self.linked = None
