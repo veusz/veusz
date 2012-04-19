@@ -90,7 +90,7 @@
 <use xlink:href="#p0" x="353.88" y="14.23"/>
 </g>
 <g fill="#000000" stroke-width="1">
-<text x="524.87" y="421.31" font-size="14pt" fill="#000000">xxx</text>
+<text x="524.88" y="421.31" font-size="14pt" fill="#000000">xxx</text>
 <text x="359.5" y="22.98" font-size="14pt" fill="#000000">aaa</text>
 </g>
 </g>
@@ -120,9 +120,9 @@
 <path d="M353.88,14.23l0,7.5M519.26,14.23l0,7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="336.37" y="417.81" font-size="14pt" fill="#000000">1000</text>
-<text x="507.87" y="417.81" font-size="14pt" fill="#000000">10</text>
-<text x="525.37" y="410.81" font-size="8pt" fill="#000000">4</text>
+<text x="336.38" y="417.81" font-size="14pt" fill="#000000">1000</text>
+<text x="507.88" y="417.81" font-size="14pt" fill="#000000">10</text>
+<text x="525.38" y="410.81" font-size="8pt" fill="#000000">4</text>
 </g>
 </g>
 </g>

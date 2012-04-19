@@ -47,17 +47,18 @@ def fltStr(v, prec=2):
     # convert float to string with prec decimal places
 
     fmt = '% 10.' + str(prec) + 'f'
-    v1 = fmt % (v-1e-6)
-    v2 = fmt % (v+1e-6)
-
-    # always round down
-    if v1 < v2:
-        val = v1
-    else:
-        val = v2
+    formatted = [
+        fmt % v,
+        fmt % (v+1e-7), fmt % (v-1e-7),
+        fmt % (v+1e-5), fmt % (v-1e-5),
+        fmt % (v+1e-6), fmt % (v-1e-6),
+        fmt % (v+5e-5), fmt % (v+5e-6),
+        ]
+    formatted.sort()
+    middleval = formatted[3]
 
     # drop any trailing zeros
-    val = val.rstrip('0').lstrip(' ').rstrip('.')
+    val = middleval.rstrip('0').lstrip(' ').rstrip('.')
     # get rid of -0s (platform differences here)
     if val == '-0':
         val = '0'

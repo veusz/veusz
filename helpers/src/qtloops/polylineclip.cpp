@@ -38,18 +38,26 @@ namespace
   inline QPointF horzIntersection(qreal yval, const QPointF& pt1,
 				  const QPointF& pt2)
   {
-    return QPointF( pt1.x() + (yval-pt1.y()) *
-		    (pt2.x()-pt1.x()) / (pt2.y()-pt1.y()),
-		    yval );
+    if( pt1.y() == pt2.y() )
+      // line is vertical
+      return QPointF( pt1.x(), yval );
+    else
+      return QPointF( pt1.x() + (yval-pt1.y()) *
+		      (pt2.x()-pt1.x()) / (pt2.y()-pt1.y()),
+		      yval );
   }
 
   // compute intersection with vertical line
   inline QPointF vertIntersection(qreal xval, const QPointF& pt1,
 				  const QPointF& pt2)
   {
-    return QPointF( xval,
-		    pt1.y() + (xval-pt1.x()) *
-		    (pt2.y()-pt1.y()) / (pt2.x()-pt1.x()) );
+    if( pt1.x() == pt2.x() )
+      // line is horizontal
+      return QPointF( xval, pt1.y() );
+    else
+      return QPointF( xval,
+		      pt1.y() + (xval-pt1.x()) *
+		      (pt2.y()-pt1.y()) / (pt2.x()-pt1.x()) );
   }
 
   class Clipper
@@ -75,9 +83,27 @@ namespace
       return code;
     }
 
+    // get consistent clipping on different platforms by making line
+    // edges meet clipping box if close
+    void fixPt(QPointF& pt) const
+    {
+      if( fabs(pt.x() - clip.left()) < 1e-4 )
+	pt.setX(clip.left());
+      if( fabs(pt.x() - clip.right()) < 1e-4 )
+	pt.setX(clip.right());
+      if( fabs(pt.y() - clip.top()) < 1e-4 )
+	pt.setY(clip.top());
+      if( fabs(pt.y() - clip.bottom()) < 1e-4 )
+	pt.setY(clip.bottom());
+    }
+
     // modifies points, returning true if okay to accept
     bool clipLine(QPointF& pt1, QPointF& pt2) const
     {
+      // fixup ends to meet clip box if close
+      fixPt(pt1);
+      fixPt(pt2);
+
       unsigned code1 = computeCode(pt1);
       unsigned code2 = computeCode(pt2);
 

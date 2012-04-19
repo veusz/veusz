@@ -40,6 +40,8 @@ Unicode code to work around different font handling on platforms.
 import glob
 import os.path
 import sys
+import re
+from itertools import izip
 
 import veusz.qtall as qt4
 import veusz.utils.textrender
@@ -53,13 +55,13 @@ import veusz.document.svg_export as svg_export
 excluded_tests = set([
 
         # fails on Windows
-        'histo.vsz',      # duplicate in long list of values
-        'spectrum.vsz',   # angstrom is split into two on linux
+        #'histo.vsz',      # duplicate in long list of values
+        #'spectrum.vsz',   # angstrom is split into two on linux
 
         # fails on Mac OS X
-        'histo.vsz',      # somewhere in long list of values
-        'spectrum.vsz',   # symbol issue
-        'labels.vsz'      # symbol issue
+        #'histo.vsz',      # somewhere in long list of values
+        #'spectrum.vsz',   # symbol issue
+        #'labels.vsz'      # symbol issue
     ])
 
 class StupidFontMetrics(object):
@@ -139,6 +141,43 @@ def renderAllTests():
         outfile = os.path.join(d.comparisondir, base + '.selftest')
         renderTest(vsz, outfile)
 
+def compareLoosely(f1, f2):
+    """Compare two files ignore issues in floating point numbers."""
+
+    number_re = re.compile('(-?[0-9]+(?:\.[0-9]+)?)')
+    numberfull_re = re.compile('^-?[0-9]+(?:\.[0-9]+)?$')
+
+    fail = False
+
+    # read all of files
+    lines1, lines2 = f1.readlines(), f2.readlines()
+    if len(lines1) != len(lines2):
+        # number of lines are different
+        print " Number of lines different"
+        fail = True
+
+    for i, (l1, l2) in enumerate(izip(lines1, lines2)):
+        # split lines into numeric, non-numeric parts
+        parts1 = number_re.split(l1)
+        parts2 = number_re.split(l2)
+
+        if len(parts1) != len(parts2):
+            # different number of parts
+            print " Number of parts different"
+            fail = True
+        for p1, p2 in izip(parts1, parts2):
+            if numberfull_re.match(p1) and numberfull_re.match(p2):
+                # both numeric, so compare numerically
+                if abs(float(p1) - float(p2)) > 0.1:
+                    print " Numerical values are different"
+                    fail = True
+            else:
+                # non-numeric, so compare text
+                if p1 != p2:
+                    print " Non-numerical values are different"
+                    fail = True
+    return not fail
+
 def runTests():
     print "Testing output"
 
@@ -155,9 +194,13 @@ def runTests():
 
         comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
 
-        t1 = open(outfile, 'rU').read()
-        t2 = open(comparfile, 'rU').read()
-        if t1 != t2:
+        f1 = open(outfile, 'rU')
+        f2 = open(comparfile, 'rU')
+        comp = compareLoosely(f1, f2)
+        f1.close()
+        f2.close()
+
+        if not comp:
             print " FAIL: results differed"
             fails += 1
         else:
