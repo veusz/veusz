@@ -219,17 +219,16 @@
 <path d="M871.3,343.8l-7.5,0M871.3,281.4l-7.5,0M871.3,219.1l-7.5,0M871.3,156.7l-7.5,0M871.3,94.4l-7.5,0M871.3,32l-7.5,0"/>
 </g>
 <g fill="none" stroke-width="1">
-<g transform="matrix(0 -1 1 0 21.9 297)">
+<g transform="matrix(0 -1 1 0 21.9 323.3)">
 <text x="0" y="0" font-size="14pt" fill="#000000">Flux (10</text>
 <text x="70" y="-7" font-size="8pt" fill="#000000">-3</text>
 <text x="80.5" y="0" font-size="14pt" fill="#000000"> photon cm</text>
 <text x="168" y="-7" font-size="8pt" fill="#000000">-2</text>
 <text x="178.5" y="0" font-size="14pt" fill="#000000"> s</text>
 <text x="196" y="-7" font-size="8pt" fill="#000000">-1</text>
-<text x="206.5" y="0" font-size="14pt" fill="#000000"> </text>
-<text x="211.5" y="0" font-size="14pt" fill="#000000">&#8491;</text>
-<text x="224" y="-7" font-size="8pt" fill="#000000">-1</text>
-<text x="234.5" y="0" font-size="14pt" fill="#000000">)</text>
+<text x="206.5" y="0" font-size="14pt" fill="#000000"> &#8491;</text>
+<text x="276.5" y="-7" font-size="8pt" fill="#000000">-1</text>
+<text x="287" y="0" font-size="14pt" fill="#000000">)</text>
 </g>
 <text x="48.2" y="343.8" font-size="14pt" fill="#000000">0</text>
 <text x="30.7" y="290.2" font-size="14pt" fill="#000000">0.5</text>
@@ -345,9 +344,7 @@
 <path d="M60.4,350.9l0,7.5M101,350.9l0,7.5M141.5,350.9l0,7.5M182,350.9l0,7.5M222.6,350.9l0,7.5M263.1,350.9l0,7.5M303.7,350.9l0,7.5M344.2,350.9l0,7.5M384.8,350.9l0,7.5M425.3,350.9l0,7.5M465.9,350.9l0,7.5M506.4,350.9l0,7.5M547,350.9l0,7.5M587.5,350.9l0,7.5M628,350.9l0,7.5M668.6,350.9l0,7.5M709.1,350.9l0,7.5M749.7,350.9l0,7.5M790.2,350.9l0,7.5M830.8,350.9l0,7.5M871.3,350.9l0,7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="404.6" y="526.1" font-size="14pt" fill="#000000">Wavelength (</text>
-<text x="509.6" y="526.1" font-size="14pt" fill="#000000">&#8491;</text>
-<text x="522.6" y="526.1" font-size="14pt" fill="#000000">)</text>
+<text x="378.4" y="526.1" font-size="14pt" fill="#000000">Wavelength (&#8491;)</text>
 <text x="56" y="517.4" font-size="14pt" fill="#000000">6</text>
 <text x="96.6" y="517.4" font-size="14pt" fill="#000000">7</text>
 <text x="137.1" y="517.4" font-size="14pt" fill="#000000">8</text>

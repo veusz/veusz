@@ -96,6 +96,10 @@ class PartTextAscii(_pt):
     def __init__(self, text):
         text = unicode(text).encode('ascii', 'xmlcharrefreplace')
         _pt.__init__(self, text)
+    def render(self, state):
+        _pt.render(self, state)
+    def addText(self, text):
+        self.text += unicode(text).encode('ascii', 'xmlcharrefreplace')
 
 def renderTest(invsz, outfile):
     """Render vsz document to create outfile."""
