@@ -1,6 +1,7 @@
 # Veusz saved document (version 1.15)
-# Saved at 2012-03-21T19:30:52.420824
+# Saved at 2012-04-21T09:57:53.271330
 
+AddImportPath(u'/home/jss/code/veusz-git/veusz/examples')
 ImportString(u'y1(numeric)','''
 0.000000e+00
 2.000000e+00
@@ -17,9 +18,9 @@ ImportString(u'y2(numeric)','''
 8.000000e+00
 8.000000e+00
 1.000000e+01
-8.000000e+00
+9.000000e+00
 ''')
-DatasetPlugin('Add', {'ds_out': u'y3', 'ds_in': u'y2', 'value': 1.0})
+DatasetPlugin('Add', {'ds_out': u'y3', 'value': 1.0, 'ds_in': u'y2'})
 Set('StyleSheet/Font/font', u'Lucida Sans')
 Set('StyleSheet/xy/marker', u'none')
 Add('page', name='page1', autoadd=False)
@@ -58,7 +59,7 @@ Set('FillBelow/backhide', False)
 To('..')
 Add('function', name='function3', autoadd=False)
 To('function3')
-Set('function', u'4-y/2')
+Set('function', u'4-y/2.01')
 Set('variable', u'y')
 Set('Line/color', u'magenta')
 Set('Line/width', u'1pt')

@@ -42,23 +42,10 @@ def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
-    # this is to get consistent rounding to get the self test correct... yuck
-    # decimal would work, but that drags in loads of code
-    # convert float to string with prec decimal places
-
-    fmt = '% 10.' + str(prec) + 'f'
-    formatted = [
-        fmt % v,
-        fmt % (v+1e-7), fmt % (v-1e-7),
-        fmt % (v+1e-5), fmt % (v-1e-5),
-        fmt % (v+1e-6), fmt % (v-1e-6),
-        fmt % (v+5e-5), fmt % (v+5e-6),
-        ]
-    formatted.sort()
-    middleval = formatted[3]
+    val = ('% 20.10f' % v)[:10+prec]
 
     # drop any trailing zeros
-    val = middleval.rstrip('0').lstrip(' ').rstrip('.')
+    val = val.rstrip('0').lstrip(' ').rstrip('.')
     # get rid of -0s (platform differences here)
     if val == '-0':
         val = '0'
@@ -368,7 +355,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
             vals['stroke'] = 'none'
         elif p.style() not in (qt4.Qt.SolidLine, qt4.Qt.NoPen):
             # convert from pen width fractions to pts
-            nums = [str(scale*w*x) for x in p.dashPattern()]
+            nums = [fltStr(scale*w*x) for x in p.dashPattern()]
             vals['stroke-dasharray'] = ','.join(nums)
 
         # BRUSH STYLES

@@ -1,589 +1,589 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="533.49px" height="533.49px" version="1.1"
+<svg width="533.4px" height="533.4px" version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
 <defs>
 <clipPath id="c0">
-<path d="m0,0l533.49,0l0,533.49l-533.49,0l0,-533.49"/>
+<path d="m0,0l533.4,0l0,533.4l-533.4,0l0,-533.4"/>
 </clipPath>
 <clipPath id="c1">
-<path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
+<path d="m60.4,7.1l465.9,0l0,465.9l-465.9,0l0,-465.9"/>
 </clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g fill="#e5e9ff" stroke-width="1.25">
-<path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
+<g fill="#e5e9ff" stroke-width="1.2">
+<path d="m60.4,7.1l465.9,0l0,465.9l-465.9,0l0,-465.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-dasharray="0.625,1.25" stroke-width="0.62">
-<path d="M60.46,395.37l465.91,0M60.46,317.72l465.91,0M60.46,240.07l465.91,0M60.46,162.42l465.91,0M60.46,84.77l465.91,0"/>
+<g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
+<path d="M60.4,395.3l465.9,0M60.4,317.7l465.9,0M60.4,240l465.9,0M60.4,162.4l465.9,0M60.4,84.7l465.9,0"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.25">
-<path d="M60.46,473.03l0,-465.91"/>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M60.4,473l0,-465.9"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M60.46,473.03l3.75,0M60.46,434.2l3.75,0M60.46,395.37l3.75,0M60.46,356.55l3.75,0M60.46,317.72l3.75,0M60.46,278.9l3.75,0M60.46,240.07l3.75,0M60.46,201.24l3.75,0M60.46,162.42l3.75,0M60.46,123.59l3.75,0M60.46,84.77l3.75,0M60.46,45.94l3.75,0M60.46,7.11l3.75,0"/>
-<path d="M60.46,473.03l7.5,0M60.46,395.37l7.5,0M60.46,317.72l7.5,0M60.46,240.07l7.5,0M60.46,162.42l7.5,0M60.46,84.77l7.5,0M60.46,7.11l7.5,0"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.4,473l3.7,0M60.4,434.2l3.7,0M60.4,395.3l3.7,0M60.4,356.5l3.7,0M60.4,317.7l3.7,0M60.4,278.8l3.7,0M60.4,240l3.7,0M60.4,201.2l3.7,0M60.4,162.4l3.7,0M60.4,123.5l3.7,0M60.4,84.7l3.7,0M60.4,45.9l3.7,0M60.4,7.1l3.7,0"/>
+<path d="M60.4,473l7.5,0M60.4,395.3l7.5,0M60.4,317.7l7.5,0M60.4,240l7.5,0M60.4,162.4l7.5,0M60.4,84.7l7.5,0M60.4,7.1l7.5,0"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.25">
-<path d="M526.38,473.03l0,-465.91"/>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M526.3,473l0,-465.9"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M526.38,473.03l-3.75,0M526.38,434.2l-3.75,0M526.38,395.37l-3.75,0M526.38,356.55l-3.75,0M526.38,317.72l-3.75,0M526.38,278.9l-3.75,0M526.38,240.07l-3.75,0M526.38,201.24l-3.75,0M526.38,162.42l-3.75,0M526.38,123.59l-3.75,0M526.38,84.77l-3.75,0M526.38,45.94l-3.75,0M526.38,7.11l-3.75,0"/>
-<path d="M526.38,473.03l-7.5,0M526.38,395.37l-7.5,0M526.38,317.72l-7.5,0M526.38,240.07l-7.5,0M526.38,162.42l-7.5,0M526.38,84.77l-7.5,0M526.38,7.11l-7.5,0"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M526.3,473l-3.7,0M526.3,434.2l-3.7,0M526.3,395.3l-3.7,0M526.3,356.5l-3.7,0M526.3,317.7l-3.7,0M526.3,278.8l-3.7,0M526.3,240l-3.7,0M526.3,201.2l-3.7,0M526.3,162.4l-3.7,0M526.3,123.5l-3.7,0M526.3,84.7l-3.7,0M526.3,45.9l-3.7,0M526.3,7.1l-3.7,0"/>
+<path d="M526.3,473l-7.5,0M526.3,395.3l-7.5,0M526.3,317.7l-7.5,0M526.3,240l-7.5,0M526.3,162.4l-7.5,0M526.3,84.7l-7.5,0M526.3,7.1l-7.5,0"/>
 </g>
 <g fill="none" stroke-width="1">
-<g transform="matrix(0 -1 1 0 1.75 283.82)">
+<g transform="matrix(0 -1 1 0 1.7 283.8)">
 <text x="0" y="0" font-size="14pt" fill="#000000">Offset (m)</text>
 </g>
-<text x="-13.03" y="481.78" font-size="14pt" fill="#000000">&#8722;3</text>
-<text x="-13.03" y="404.12" font-size="14pt" fill="#000000">&#8722;2</text>
-<text x="-13.03" y="326.47" font-size="14pt" fill="#000000">&#8722;1</text>
-<text x="48.2" y="248.82" font-size="14pt" fill="#000000">0</text>
-<text x="48.2" y="171.17" font-size="14pt" fill="#000000">1</text>
-<text x="48.2" y="93.52" font-size="14pt" fill="#000000">2</text>
+<text x="-13" y="481.7" font-size="14pt" fill="#000000">&#8722;3</text>
+<text x="-13" y="404.1" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="-13" y="326.4" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="48.2" y="248.8" font-size="14pt" fill="#000000">0</text>
+<text x="48.2" y="171.1" font-size="14pt" fill="#000000">1</text>
+<text x="48.2" y="93.5" font-size="14pt" fill="#000000">2</text>
 <text x="48.2" y="21" font-size="14pt" fill="#000000">3</text>
 </g>
-<g fill="none" stroke="#808080" stroke-dasharray="0.625,1.25" stroke-width="0.62">
-<path d="M153.64,7.11l0,465.91M246.83,7.11l0,465.91M340.01,7.11l0,465.91M433.19,7.11l0,465.91"/>
+<g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
+<path d="M153.6,7.1l0,465.9M246.8,7.1l0,465.9M340,7.1l0,465.9M433.1,7.1l0,465.9"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.25">
-<path d="M60.46,473.03l465.91,0"/>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M60.4,473l465.9,0"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M60.46,473.03l0,-3.75M83.76,473.03l0,-3.75M107.05,473.03l0,-3.75M130.35,473.03l0,-3.75M153.64,473.03l0,-3.75M176.94,473.03l0,-3.75M200.24,473.03l0,-3.75M223.53,473.03l0,-3.75M246.83,473.03l0,-3.75M270.12,473.03l0,-3.75M293.42,473.03l0,-3.75M316.71,473.03l0,-3.75M340.01,473.03l0,-3.75M363.31,473.03l0,-3.75M386.6,473.03l0,-3.75M409.9,473.03l0,-3.75M433.19,473.03l0,-3.75M456.49,473.03l0,-3.75M479.78,473.03l0,-3.75M503.08,473.03l0,-3.75M526.38,473.03l0,-3.75"/>
-<path d="M60.46,473.03l0,-7.5M153.64,473.03l0,-7.5M246.83,473.03l0,-7.5M340.01,473.03l0,-7.5M433.19,473.03l0,-7.5M526.38,473.03l0,-7.5"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.4,473l0,-3.7M83.7,473l0,-3.7M107,473l0,-3.7M130.3,473l0,-3.7M153.6,473l0,-3.7M176.9,473l0,-3.7M200.2,473l0,-3.7M223.5,473l0,-3.7M246.8,473l0,-3.7M270.1,473l0,-3.7M293.4,473l0,-3.7M316.7,473l0,-3.7M340,473l0,-3.7M363.3,473l0,-3.7M386.6,473l0,-3.7M409.8,473l0,-3.7M433.1,473l0,-3.7M456.4,473l0,-3.7M479.7,473l0,-3.7M503,473l0,-3.7M526.3,473l0,-3.7"/>
+<path d="M60.4,473l0,-7.5M153.6,473l0,-7.5M246.8,473l0,-7.5M340,473l0,-7.5M433.1,473l0,-7.5M526.3,473l0,-7.5"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.25">
-<path d="M60.46,7.11l465.91,0"/>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M60.4,7.1l465.9,0"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M60.46,7.11l0,3.75M83.76,7.11l0,3.75M107.05,7.11l0,3.75M130.35,7.11l0,3.75M153.64,7.11l0,3.75M176.94,7.11l0,3.75M200.24,7.11l0,3.75M223.53,7.11l0,3.75M246.83,7.11l0,3.75M270.12,7.11l0,3.75M293.42,7.11l0,3.75M316.71,7.11l0,3.75M340.01,7.11l0,3.75M363.31,7.11l0,3.75M386.6,7.11l0,3.75M409.9,7.11l0,3.75M433.19,7.11l0,3.75M456.49,7.11l0,3.75M479.78,7.11l0,3.75M503.08,7.11l0,3.75M526.38,7.11l0,3.75"/>
-<path d="M60.46,7.11l0,7.5M153.64,7.11l0,7.5M246.83,7.11l0,7.5M340.01,7.11l0,7.5M433.19,7.11l0,7.5M526.38,7.11l0,7.5"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.4,7.1l0,3.7M83.7,7.1l0,3.7M107,7.1l0,3.7M130.3,7.1l0,3.7M153.6,7.1l0,3.7M176.9,7.1l0,3.7M200.2,7.1l0,3.7M223.5,7.1l0,3.7M246.8,7.1l0,3.7M270.1,7.1l0,3.7M293.4,7.1l0,3.7M316.7,7.1l0,3.7M340,7.1l0,3.7M363.3,7.1l0,3.7M386.6,7.1l0,3.7M409.8,7.1l0,3.7M433.1,7.1l0,3.7M456.4,7.1l0,3.7M479.7,7.1l0,3.7M503,7.1l0,3.7M526.3,7.1l0,3.7"/>
+<path d="M60.4,7.1l0,7.5M153.6,7.1l0,7.5M246.8,7.1l0,7.5M340,7.1l0,7.5M433.1,7.1l0,7.5M526.3,7.1l0,7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="254.03" y="487.03" font-size="14pt" fill="#000000">Time (yr)</text>
-<text x="56.08" y="478.28" font-size="14pt" fill="#000000">0</text>
-<text x="140.52" y="478.28" font-size="14pt" fill="#000000">0.2</text>
-<text x="233.69" y="478.28" font-size="14pt" fill="#000000">0.4</text>
-<text x="326.88" y="478.28" font-size="14pt" fill="#000000">0.6</text>
-<text x="420.06" y="478.28" font-size="14pt" fill="#000000">0.8</text>
-<text x="522" y="478.28" font-size="14pt" fill="#000000">1</text>
+<text x="254" y="487" font-size="14pt" fill="#000000">Time (yr)</text>
+<text x="56" y="478.2" font-size="14pt" fill="#000000">0</text>
+<text x="140.5" y="478.2" font-size="14pt" fill="#000000">0.2</text>
+<text x="233.6" y="478.2" font-size="14pt" fill="#000000">0.4</text>
+<text x="326.8" y="478.2" font-size="14pt" fill="#000000">0.6</text>
+<text x="420" y="478.2" font-size="14pt" fill="#000000">0.8</text>
+<text x="522" y="478.2" font-size="14pt" fill="#000000">1</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="#ff000a" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.674 0 0 0.674 212.33 106.45)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25" id="p0"/>
+<g fill="#ff000a" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.674 0 0 0.674 212.3 106.4)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2" id="p0"/>
 </g>
 </g>
-<g fill="#ff0c00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7063 0 0 0.7063 197.28 404.16)">
+<g fill="#ff0c00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7063 0 0 0.7063 197.2 404.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0067" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6838 0 0 0.6838 207.79 338.64)">
+<g fill="#ff0067" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6837 0 0 0.6837 207.7 338.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#708e70" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7362 0 0 0.7362 183.38 234.82)">
+<g fill="#708e70" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7361 0 0 0.7361 183.3 234.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8803 0 0 0.8803 470.61 275.32)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8803 0 0 0.8803 470.6 275.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#956995" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7422 0 0 0.7422 180.57 264.33)">
+<g fill="#956995" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7422 0 0 0.7422 180.5 264.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9479 0 0 0.9479 502.12 313.11)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9479 0 0 0.9479 502.1 313.1)">
 <use xlink:href="#p0"/>
 </g>
-<g transform="matrix(0.5931 0 0 0.5931 336.8 446.83)">
+<g transform="matrix(0.5931 0 0 0.5931 336.7 446.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff6c00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5223 0 0 0.5223 303.8 304.5)">
+<g fill="#ff6c00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5222 0 0 0.5222 303.7 304.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#26d826" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8982 0 0 0.8982 107.92 316.63)">
+<g fill="#26d826" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8981 0 0 0.8981 107.9 316.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff93" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7321 0 0 0.7321 401.56 304.87)">
+<g fill="#ffff93" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7321 0 0 0.7321 401.5 304.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7753 0 0 0.7753 421.7 145.35)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7753 0 0 0.7753 421.7 145.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff00f7" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7028 0 0 0.7028 198.91 192.01)">
+<g fill="#ff00f7" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7028 0 0 0.7028 198.9 192)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff00b0" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6125 0 0 0.6125 241.01 217.41)">
+<g fill="#ff00b0" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6124 0 0 0.6124 241 217.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#fff300" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5285 0 0 0.5285 280.13 396.14)">
+<g fill="#fff300" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5285 0 0 0.5285 280.1 396.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff6c00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5461 0 0 0.5461 314.92 289.54)">
+<g fill="#ff6c00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5461 0 0 0.5461 314.9 289.5)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8913 0 0 0.8913 475.71 141.31)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8912 0 0 0.8912 475.7 141.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff5900" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6862 0 0 0.6862 206.67 425.5)">
+<g fill="#ff5900" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6861 0 0 0.6861 206.6 425.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0017" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6161 0 0 0.6161 239.31 331.92)">
+<g fill="#ff0017" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6161 0 0 0.6161 239.3 331.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#fffff5" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7173 0 0 0.7173 394.66 122.71)">
+<g fill="#fffff5" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7173 0 0 0.7173 394.6 122.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9487 0 0 0.9487 502.49 233.81)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9487 0 0 0.9487 502.4 233.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff005e" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.697 0 0 0.697 201.63 350.83)">
+<g fill="#ff005e" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.697 0 0 0.697 201.6 350.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0015" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5137 0 0 0.5137 287.05 269.44)">
+<g fill="#ff0015" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5136 0 0 0.5136 287 269.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8589 0 0 0.8589 460.64 295.94)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8589 0 0 0.8589 460.6 295.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffd000" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5711 0 0 0.5711 326.52 318.77)">
+<g fill="#ffd000" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.571 0 0 0.571 326.5 318.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff7c" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7576 0 0 0.7576 413.45 278.54)">
+<g fill="#ffff7c" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7576 0 0 0.7576 413.4 278.5)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff5800" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.505 0 0 0.505 295.74 306.33)">
+<g fill="#ff5800" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5049 0 0 0.5049 295.7 306.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#52ac52" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7692 0 0 0.7692 168.01 253.76)">
+<g fill="#52ac52" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7691 0 0 0.7691 168 253.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8571 0 0 0.8571 459.79 201.27)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.857 0 0 0.857 459.7 201.2)">
 <use xlink:href="#p0"/>
 </g>
-<g transform="matrix(0.8613 0 0 0.8613 461.74 356.69)">
+<g transform="matrix(0.8612 0 0 0.8612 461.7 356.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0009" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.524 0 0 0.524 282.22 280.86)">
+<g fill="#ff0009" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.524 0 0 0.524 282.2 280.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff32" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5248 0 0 0.5248 305 390.21)">
+<g fill="#ffff32" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5248 0 0 0.5248 304.9 390.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff1d00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.528 0 0 0.528 280.37 179.3)">
+<g fill="#ff1d00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.528 0 0 0.528 280.3 179.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7991 0 0 0.7991 432.77 87.02)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.799 0 0 0.799 432.7 87)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#006700" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9036 0 0 0.9036 105.36 226.44)">
+<g fill="#006700" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9036 0 0 0.9036 105.3 226.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#002c00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9362 0 0 0.9362 90.17 222.41)">
+<g fill="#002c00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9362 0 0 0.9362 90.1 222.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff9300" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6057 0 0 0.6057 342.67 210)">
+<g fill="#ff9300" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6057 0 0 0.6057 342.6 210)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9103 0 0 0.9103 484.56 273.35)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9102 0 0 0.9102 484.5 273.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#fffff5" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7865 0 0 0.7865 426.89 165.65)">
+<g fill="#fffff5" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7864 0 0 0.7864 426.8 165.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff1a" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6261 0 0 0.6261 352.15 316.75)">
+<g fill="#ffff1a" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.626 0 0 0.626 352.1 316.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0061" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5912 0 0 0.5912 250.9 196.22)">
+<g fill="#ff0061" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5912 0 0 0.5912 250.9 196.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#00d300" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8259 0 0 0.8259 141.58 239.2)">
+<g fill="#00d300" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8258 0 0 0.8258 141.5 239.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#46b846" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8835 0 0 0.8835 114.74 160.2)">
+<g fill="#46b846" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8834 0 0 0.8834 114.7 160.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff005c" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6554 0 0 0.6554 221.03 326)">
+<g fill="#ff005c" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6553 0 0 0.6553 221 325.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#916d91" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.783 0 0 0.783 161.58 192.21)">
+<g fill="#916d91" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7829 0 0 0.7829 161.5 192.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#807e80" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9043 0 0 0.9043 105.06 356.22)">
+<g fill="#807e80" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9042 0 0 0.9042 105 356.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8219 0 0 0.8219 443.41 302.82)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8219 0 0 0.8219 443.4 302.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#003d00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9082 0 0 0.9082 103.25 235.41)">
+<g fill="#003d00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9081 0 0 0.9081 103.2 235.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#c737c7" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7981 0 0 0.7981 154.51 320.12)">
+<g fill="#c737c7" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7981 0 0 0.7981 154.5 320.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff26" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6841 0 0 0.6841 379.19 286.02)">
+<g fill="#ffff26" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.684 0 0 0.684 379.1 286)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6112 0 0 0.6112 241.61 339.28)">
+<g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6111 0 0 0.6111 241.6 339.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffc9" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8064 0 0 0.8064 436.19 282.68)">
+<g fill="#ffffc9" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8064 0 0 0.8064 436.1 282.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9381 0 0 0.9381 497.56 311.3)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9381 0 0 0.9381 497.5 311.2)">
 <use xlink:href="#p0"/>
 </g>
-<g transform="matrix(0.8748 0 0 0.8748 468.07 214.29)">
+<g transform="matrix(0.8748 0 0 0.8748 468 214.2)">
 <use xlink:href="#p0"/>
 </g>
-<g transform="matrix(0.8717 0 0 0.8717 466.59 308.69)">
+<g transform="matrix(0.8716 0 0 0.8716 466.5 308.6)">
 <use xlink:href="#p0"/>
 </g>
-<g transform="matrix(0.8352 0 0 0.8352 449.57 174.34)">
+<g transform="matrix(0.8351 0 0 0.8351 449.5 174.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#9b639b" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8953 0 0 0.8953 109.26 118.11)">
+<g fill="#9b639b" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8952 0 0 0.8952 109.2 118.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff3d00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5292 0 0 0.5292 279.8 315.56)">
+<g fill="#ff3d00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5292 0 0 0.5292 279.7 315.5)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0003" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.508 0 0 0.508 289.67 273.61)">
+<g fill="#ff0003" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.508 0 0 0.508 289.6 273.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff9900" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5672 0 0 0.5672 324.75 183.73)">
+<g fill="#ff9900" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5672 0 0 0.5672 324.7 183.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff5800" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5949 0 0 0.5949 249.18 111.64)">
+<g fill="#ff5800" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5949 0 0 0.5949 249.1 111.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff8400" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5217 0 0 0.5217 283.32 342.47)">
+<g fill="#ff8400" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5216 0 0 0.5216 283.3 342.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#f608f6" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6717 0 0 0.6717 213.4 218.23)">
+<g fill="#f608f6" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6717 0 0 0.6717 213.4 218.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff3f" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6756 0 0 0.6756 375.23 302.73)">
+<g fill="#ffff3f" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6755 0 0 0.6755 375.2 302.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9435 0 0 0.9435 500.06 377)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9435 0 0 0.9435 500 377)">
 <use xlink:href="#p0"/>
 </g>
-<g transform="matrix(0.9405 0 0 0.9405 498.64 336.2)">
+<g transform="matrix(0.9404 0 0 0.9404 498.6 336.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff00b6" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7344 0 0 0.7344 184.22 335.54)">
+<g fill="#ff00b6" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7343 0 0 0.7343 184.2 335.5)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9456 0 0 0.9456 501.05 347.43)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9456 0 0 0.9456 501 347.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff009f" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6014 0 0 0.6014 246.17 217.15)">
+<g fill="#ff009f" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6014 0 0 0.6014 246.1 217.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff3e00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5263 0 0 0.5263 305.7 281.78)">
+<g fill="#ff3e00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5263 0 0 0.5263 305.6 281.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#fffffd" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6926 0 0 0.6926 383.14 376.6)">
+<g fill="#fffffd" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6925 0 0 0.6925 383.1 376.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff8d" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6756 0 0 0.6756 375.25 337.32)">
+<g fill="#ffff8d" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6756 0 0 0.6756 375.2 337.3)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9412 0 0 0.9412 499 248.51)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9412 0 0 0.9412 499 248.5)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff07" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6769 0 0 0.6769 375.84 276.77)">
+<g fill="#ffff07" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6768 0 0 0.6768 375.8 276.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8147 0 0 0.8147 440.05 444.41)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8147 0 0 0.8147 440 444.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffc500" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5732 0 0 0.5732 327.5 312.62)">
+<g fill="#ffc500" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5731 0 0 0.5731 327.5 312.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffe400" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5591 0 0 0.5591 320.98 145.15)">
+<g fill="#ffe400" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5591 0 0 0.5591 320.9 145.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8807 0 0 0.8807 470.79 305.91)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8806 0 0 0.8806 470.7 305.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff003e" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.597 0 0 0.597 248.25 177)">
+<g fill="#ff003e" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5969 0 0 0.5969 248.2 176.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#00eb00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8362 0 0 0.8362 136.78 223.95)">
+<g fill="#00eb00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8361 0 0 0.8361 136.7 223.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff4d00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.584 0 0 0.584 254.3 356.76)">
+<g fill="#ff4d00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5839 0 0 0.5839 254.2 356.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#699569" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7657 0 0 0.7657 169.64 219.28)">
+<g fill="#699569" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7656 0 0 0.7656 169.6 219.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#4bb34b" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8058 0 0 0.8058 150.96 206.44)">
+<g fill="#4bb34b" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8057 0 0 0.8057 150.9 206.4)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff0c" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6533 0 0 0.6533 364.84 293.92)">
+<g fill="#ffff0c" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6532 0 0 0.6532 364.8 293.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0035" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.626 0 0 0.626 234.72 155.25)">
+<g fill="#ff0035" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6259 0 0 0.6259 234.7 155.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0047" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6662 0 0 0.6662 215.99 137.97)">
+<g fill="#ff0047" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6661 0 0 0.6661 215.9 137.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff3f00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6663 0 0 0.6663 215.94 401.7)">
+<g fill="#ff3f00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6663 0 0 0.6663 215.9 401.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8618 0 0 0.8618 461.97 334.16)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8617 0 0 0.8617 461.9 334.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffc0" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7427 0 0 0.7427 406.49 162.03)">
+<g fill="#ffffc0" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7426 0 0 0.7426 406.4 162)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff4c00" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5496 0 0 0.5496 270.31 335.19)">
+<g fill="#ff4c00" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5495 0 0 0.5495 270.3 335.1)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff00e7" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.7309 0 0 0.7309 185.83 312.29)">
+<g fill="#ff00e7" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.7309 0 0 0.7309 185.8 312.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#001200" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9486 0 0 0.9486 84.42 220.95)">
+<g fill="#001200" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9485 0 0 0.9485 84.4 220.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.9142 0 0 0.9142 486.41 271.83)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.9142 0 0 0.9142 486.4 271.8)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#b549b5" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8004 0 0 0.8004 153.47 166.23)">
+<g fill="#b549b5" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8003 0 0 0.8003 153.4 166.2)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0019" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.5223 0 0 0.5223 303.81 244.99)">
+<g fill="#ff0019" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.5223 0 0 0.5223 303.8 244.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffff23" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.706 0 0 0.706 389.4 208.95)">
+<g fill="#ffff23" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.706 0 0 0.706 389.4 208.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0079" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6054 0 0 0.6054 244.3 197.95)">
+<g fill="#ff0079" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6054 0 0 0.6054 244.2 197.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#00a800" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8809 0 0 0.8809 115.97 219.91)">
+<g fill="#00a800" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8808 0 0 0.8808 115.9 219.9)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff006a" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.6962 0 0 0.6962 201.99 134.69)">
+<g fill="#ff006a" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.6962 0 0 0.6962 201.9 134.6)">
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="matrix(0.8537 0 0 0.8537 458.21 338.8)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="matrix(0.8536 0 0 0.8536 458.2 338.7)">
 <use xlink:href="#p0"/>
 </g>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
-<image x="151.16" y="24.61" width="284.53" height="17.5" xlink:href="data:image/ppm;base64,UDYKMTI4IDEKMjU1CgAAAAAKAAAUAAAeAAAoAAAyAAA8AABGAABQAABaAABkAABuAAB4AACCAACMAACWAACgAACqAAC0AAC+AADIAADSAADcAADmAADwAAD6AAb4BhDuEBrkGiTaJC7QLjjGOEK8QkyyTFaoVmCeYGqUanSKdH6Afoh2iJJskpxinKZYprBOsLpEusQ6xM4wztgm2OIc4uwS7PYI9v8A/P8A8v8A6P8A3v8A1P8Ayv8AwP8Atv8ArP8Aov8AmP8Ajv8AhP8Aev8AcP8AZv8AXP8AUv8ASP8APv8ANP8AKv8AIP8AFv8ADP8AAv8IAP8SAP8cAP8mAP8wAP86AP9EAP9OAP9YAP9iAP9sAP92AP+AAP+KAP+UAP+eAP+oAP+yAP+8AP/GAP/QAP/aAP/kAP/uAP/4AP//BP//Dv//GP//Iv//LP//Nv//QP//Sv//VP//Xv//aP//cv//fP//hv//kP//mv//pP//rv//uP//wv//zP//1v//4P//6v//9P///w==" preserveAspectRatio="none"/>
+<image x="151.1" y="24.6" width="284.5" height="17.5" xlink:href="data:image/ppm;base64,UDYKMTI4IDEKMjU1CgAAAAAKAAAUAAAeAAAoAAAyAAA8AABGAABQAABaAABkAABuAAB4AACCAACMAACWAACgAACqAAC0AAC+AADIAADSAADcAADmAADwAAD6AAb4BhDuEBrkGiTaJC7QLjjGOEK8QkyyTFaoVmCeYGqUanSKdH6Afoh2iJJskpxinKZYprBOsLpEusQ6xM4wztgm2OIc4uwS7PYI9v8A/P8A8v8A6P8A3v8A1P8Ayv8AwP8Atv8ArP8Aov8AmP8Ajv8AhP8Aev8AcP8AZv8AXP8AUv8ASP8APv8ANP8AKv8AIP8AFv8ADP8AAv8IAP8SAP8cAP8mAP8wAP86AP9EAP9OAP9YAP9iAP9sAP92AP+AAP+KAP+UAP+eAP+oAP+yAP+8AP/GAP/QAP/aAP/kAP/uAP/4AP//BP//Dv//GP//Iv//LP//Nv//QP//Sv//VP//Xv//aP//cv//fP//hv//kP//mv//pP//rv//uP//wv//zP//1v//4P//6v//9P///w==" preserveAspectRatio="none"/>
 </g>
-<g fill="none" stroke-width="0.62">
-<path d="m151.16,24.61l284.53,0l0,17.5l-284.53,0l0,-17.5"/>
+<g fill="none" stroke-width="0.6">
+<path d="m151.1,24.6l284.5,0l0,17.5l-284.5,0l0,-17.5"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M151.16,42.11l284.53,0"/>
-<path d="M151.16,42.11l0,-3.75M166.1,42.11l0,-3.75M176.71,42.11l0,-3.75M184.93,42.11l0,-3.75M191.65,42.11l0,-3.75M197.33,42.11l0,-3.75M202.26,42.11l0,-3.75M206.6,42.11l0,-3.75M236.03,42.11l0,-3.75M250.98,42.11l0,-3.75M261.58,42.11l0,-3.75M269.81,42.11l0,-3.75M276.53,42.11l0,-3.75M282.21,42.11l0,-3.75M287.14,42.11l0,-3.75M291.48,42.11l0,-3.75M320.91,42.11l0,-3.75M335.86,42.11l0,-3.75M346.46,42.11l0,-3.75M354.69,42.11l0,-3.75M361.41,42.11l0,-3.75M367.09,42.11l0,-3.75M372.01,42.11l0,-3.75M376.36,42.11l0,-3.75M405.79,42.11l0,-3.75M420.74,42.11l0,-3.75M431.34,42.11l0,-3.75"/>
-<path d="M210.48,42.11l0,-7.5M295.36,42.11l0,-7.5M380.24,42.11l0,-7.5"/>
-<path d="M151.16,24.61l284.53,0"/>
-<path d="M151.16,24.61l0,3.75M166.1,24.61l0,3.75M176.71,24.61l0,3.75M184.93,24.61l0,3.75M191.65,24.61l0,3.75M197.33,24.61l0,3.75M202.26,24.61l0,3.75M206.6,24.61l0,3.75M236.03,24.61l0,3.75M250.98,24.61l0,3.75M261.58,24.61l0,3.75M269.81,24.61l0,3.75M276.53,24.61l0,3.75M282.21,24.61l0,3.75M287.14,24.61l0,3.75M291.48,24.61l0,3.75M320.91,24.61l0,3.75M335.86,24.61l0,3.75M346.46,24.61l0,3.75M354.69,24.61l0,3.75M361.41,24.61l0,3.75M367.09,24.61l0,3.75M372.01,24.61l0,3.75M376.36,24.61l0,3.75M405.79,24.61l0,3.75M420.74,24.61l0,3.75M431.34,24.61l0,3.75"/>
-<path d="M210.48,24.61l0,7.5M295.36,24.61l0,7.5M380.24,24.61l0,7.5"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M151.1,42.1l284.5,0"/>
+<path d="M151.1,42.1l0,-3.7M166.1,42.1l0,-3.7M176.7,42.1l0,-3.7M184.9,42.1l0,-3.7M191.6,42.1l0,-3.7M197.3,42.1l0,-3.7M202.2,42.1l0,-3.7M206.5,42.1l0,-3.7M236,42.1l0,-3.7M250.9,42.1l0,-3.7M261.5,42.1l0,-3.7M269.8,42.1l0,-3.7M276.5,42.1l0,-3.7M282.2,42.1l0,-3.7M287.1,42.1l0,-3.7M291.4,42.1l0,-3.7M320.9,42.1l0,-3.7M335.8,42.1l0,-3.7M346.4,42.1l0,-3.7M354.6,42.1l0,-3.7M361.4,42.1l0,-3.7M367,42.1l0,-3.7M372,42.1l0,-3.7M376.3,42.1l0,-3.7M405.7,42.1l0,-3.7M420.7,42.1l0,-3.7M431.3,42.1l0,-3.7"/>
+<path d="M210.4,42.1l0,-7.5M295.3,42.1l0,-7.5M380.2,42.1l0,-7.5"/>
+<path d="M151.1,24.6l284.5,0"/>
+<path d="M151.1,24.6l0,3.7M166.1,24.6l0,3.7M176.7,24.6l0,3.7M184.9,24.6l0,3.7M191.6,24.6l0,3.7M197.3,24.6l0,3.7M202.2,24.6l0,3.7M206.5,24.6l0,3.7M236,24.6l0,3.7M250.9,24.6l0,3.7M261.5,24.6l0,3.7M269.8,24.6l0,3.7M276.5,24.6l0,3.7M282.2,24.6l0,3.7M287.1,24.6l0,3.7M291.4,24.6l0,3.7M320.9,24.6l0,3.7M335.8,24.6l0,3.7M346.4,24.6l0,3.7M354.6,24.6l0,3.7M361.4,24.6l0,3.7M367,24.6l0,3.7M372,24.6l0,3.7M376.3,24.6l0,3.7M405.7,24.6l0,3.7M420.7,24.6l0,3.7M431.3,24.6l0,3.7"/>
+<path d="M210.4,24.6l0,7.5M295.3,24.6l0,7.5M380.2,24.6l0,7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="254.03" y="56.11" font-size="14pt" fill="#000000">Power (W)</text>
-<text x="201.72" y="47.36" font-size="14pt" fill="#000000">10</text>
-<text x="282.23" y="47.36" font-size="14pt" fill="#000000">100</text>
-<text x="371.48" y="47.36" font-size="14pt" fill="#000000">1k</text>
+<text x="254" y="56.1" font-size="14pt" fill="#000000">Power (W)</text>
+<text x="201.7" y="47.3" font-size="14pt" fill="#000000">10</text>
+<text x="282.2" y="47.3" font-size="14pt" fill="#000000">100</text>
+<text x="371.4" y="47.3" font-size="14pt" fill="#000000">1k</text>
 </g>
 </g>
 </g>

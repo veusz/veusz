@@ -1,715 +1,715 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="533.49px" height="533.49px" version="1.1"
+<svg width="533.4px" height="533.4px" version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
 <defs>
 <clipPath id="c0">
-<path d="m0,0l533.49,0l0,533.49l-533.49,0l0,-533.49"/>
+<path d="m0,0l533.4,0l0,533.4l-533.4,0l0,-533.4"/>
 </clipPath>
 <clipPath id="c1">
-<path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
+<path d="m60.4,7.1l465.9,0l0,465.9l-465.9,0l0,-465.9"/>
 </clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
-<g fill="#ffffff" stroke-width="0.62">
-<path d="m60.46,7.11l465.91,0l0,465.91l-465.91,0l0,-465.91"/>
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.4,7.1l465.9,0l0,465.9l-465.9,0l0,-465.9"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="278.86,68.96 275.94,34.74"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="278.8,68.9 275.9,34.7"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(278.86,68.96)">
-<path d="m0,-6.25l0,6.25l6.25,0l0,-6.25l6.25,6.25l-6.25,6.25l0,-6.25l-6.25,0l0,6.25l0,-12.5" id="p0"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(278.8,68.9)">
+<path d="m0,-6.2l0,6.2l6.2,0l0,-6.2l6.2,6.2l-6.2,6.2l0,-6.2l-6.2,0l0,6.2l0,-12.5" id="p0"/>
 </g>
-<use xlink:href="#p0" x="275.94" y="34.74"/>
+<use xlink:href="#p0" x="275.9" y="34.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="265.77,78.83 260.24,46.58"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="265.7,78.8 260.2,46.5"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(265.77,78.83)">
-<path d="m0,-6.25l0,6.25l-6.25,0l0,-6.25l-6.25,6.25l6.25,6.25l0,-6.25l6.25,0l0,6.25l0,-12.5" id="p1"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(265.7,78.8)">
+<path d="m0,-6.2l0,6.2l-6.2,0l0,-6.2l-6.2,6.2l6.2,6.2l0,-6.2l6.2,0l0,6.2l0,-12.5" id="p1"/>
 </g>
-<use xlink:href="#p1" x="260.24" y="46.58"/>
+<use xlink:href="#p1" x="260.2" y="46.5"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="251.7,79.85 243.36,47.8"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="251.7,79.8 243.3,47.8"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(251.7,79.85)">
-<path d="m-6.25,0l6.25,0l0,6.25l-6.25,0l6.25,6.25l6.25,-6.25l-6.25,0l0,-6.25l6.25,0l-12.5,0" id="p2"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(251.7,79.8)">
+<path d="m-6.2,0l6.2,0l0,6.2l-6.2,0l6.2,6.2l6.2,-6.2l-6.2,0l0,-6.2l6.2,0l-12.5,0" id="p2"/>
 </g>
-<use xlink:href="#p2" x="243.36" y="47.8"/>
+<use xlink:href="#p2" x="243.3" y="47.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="234.53,73.4 222.75,40.06"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="234.5,73.3 222.7,40"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(234.53,73.4)">
-<path d="m-6.25,0l6.25,0l0,-6.25l-6.25,0l6.25,-6.25l6.25,6.25l-6.25,0l0,6.25l6.25,0l-12.5,0" id="p3"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(234.5,73.3)">
+<path d="m-6.2,0l6.2,0l0,-6.2l-6.2,0l6.2,-6.2l6.2,6.2l-6.2,0l0,6.2l6.2,0l-12.5,0" id="p3"/>
 </g>
-<use xlink:href="#p3" x="222.75" y="40.06"/>
+<use xlink:href="#p3" x="222.7" y="40"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="214.24,64.9 198.4,29.87"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="214.2,64.9 198.4,29.8"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(214.24,64.9)">
-<path d="m6.25,-6.25l6.25,6.25l-6.25,6.25m6.25,-6.25l-12.5,0m0,-6.25l0,12.5" id="p4"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(214.2,64.9)">
+<path d="m6.2,-6.2l6.2,6.2l-6.2,6.2m6.2,-6.2l-12.5,0m0,-6.2l0,12.5" id="p4"/>
 </g>
-<use xlink:href="#p4" x="198.4" y="29.87"/>
+<use xlink:href="#p4" x="198.4" y="29.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="193.4,61.02 173.39,25.21"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="193.3,61 173.3,25.2"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(193.4,61.02)">
-<path d="m-6.25,-6.25l-6.25,6.25l6.25,6.25m-6.25,-6.25l12.5,0m0,-6.25l0,12.5" id="p5"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(193.3,61)">
+<path d="m-6.2,-6.2l-6.2,6.2l6.2,6.2m-6.2,-6.2l12.5,0m0,-6.2l0,12.5" id="p5"/>
 </g>
-<use xlink:href="#p5" x="173.39" y="25.21"/>
+<use xlink:href="#p5" x="173.3" y="25.2"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="176.03,66.38 152.55,31.64"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="176,66.3 152.5,31.6"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(176.03,66.38)">
-<path d="m-6.25,6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5m-6.25,-12.5l12.5,0" id="p6"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(176,66.3)">
+<path d="m-6.2,6.2l6.2,6.2l6.2,-6.2m-6.2,-6.2l0,12.5m-6.2,-12.5l12.5,0" id="p6"/>
 </g>
-<use xlink:href="#p6" x="152.55" y="31.64"/>
+<use xlink:href="#p6" x="152.5" y="31.6"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="165.35,81.47 139.74,49.74"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="165.3,81.4 139.7,49.7"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(165.35,81.47)">
-<path d="m-6.25,-6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5m-6.25,12.5l12.5,0" id="p7"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(165.3,81.4)">
+<path d="m-6.2,-6.2l6.2,-6.2l6.2,6.2m-6.2,6.2l0,-12.5m-6.2,12.5l12.5,0" id="p7"/>
 </g>
-<use xlink:href="#p7" x="139.74" y="49.74"/>
+<use xlink:href="#p7" x="139.7" y="49.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="161.74,102.68 135.41,75.2"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="161.7,102.6 135.4,75.2"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(161.74,102.68)">
-<path d="m-6.25,-6.25l6.25,6.25l-6.25,6.25m-6.25,-6.25l12.5,0m0,-6.25l0,12.5" id="p8"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(161.7,102.6)">
+<path d="m-6.2,-6.2l6.2,6.2l-6.2,6.2m-6.2,-6.2l12.5,0m0,-6.2l0,12.5" id="p8"/>
 </g>
-<use xlink:href="#p8" x="135.41" y="75.2"/>
+<use xlink:href="#p8" x="135.4" y="75.2"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="162.05,124.45 135.77,101.32"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="162,124.4 135.7,101.3"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(162.05,124.45)">
-<path d="m6.25,-6.25l-6.25,6.25l6.25,6.25m6.25,-6.25l-12.5,0m0,-6.25l0,12.5" id="p9"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(162,124.4)">
+<path d="m6.2,-6.2l-6.2,6.2l6.2,6.2m6.2,-6.2l-12.5,0m0,-6.2l0,12.5" id="p9"/>
 </g>
-<use xlink:href="#p9" x="135.77" y="101.32"/>
+<use xlink:href="#p9" x="135.7" y="101.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="160.96,142.1 134.47,122.51"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="160.9,142.1 134.4,122.5"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(160.96,142.1)">
-<path d="m-6.25,-6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5m-6.25,0l12.5,0" id="p10"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(160.9,142.1)">
+<path d="m-6.2,-6.2l6.2,6.2l6.2,-6.2m-6.2,-6.2l0,12.5m-6.2,0l12.5,0" id="p10"/>
 </g>
-<use xlink:href="#p10" x="134.47" y="122.51"/>
+<use xlink:href="#p10" x="134.4" y="122.5"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="153.69,154.04 125.75,136.83"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="153.6,154 125.7,136.8"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(153.69,154.04)">
-<path d="m-6.25,6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5m-6.25,0l12.5,0" id="p11"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(153.6,154)">
+<path d="m-6.2,6.2l6.2,-6.2l6.2,6.2m-6.2,6.2l0,-12.5m-6.2,0l12.5,0" id="p11"/>
 </g>
-<use xlink:href="#p11" x="125.75" y="136.83"/>
+<use xlink:href="#p11" x="125.7" y="136.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="138.66,162.04 107.7,146.43"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="138.6,162 107.7,146.4"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(138.66,162.04)">
-<path d="m-6.25,6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5" id="p12"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(138.6,162)">
+<path d="m-6.2,6.2l6.2,6.2l6.2,-6.2m-6.2,-6.2l0,12.5" id="p12"/>
 </g>
-<use xlink:href="#p12" x="107.7" y="146.43"/>
+<use xlink:href="#p12" x="107.7" y="146.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="118.66,169.85 83.71,155.8"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="118.6,169.8 83.7,155.8"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(118.66,169.85)">
-<path d="m-6.25,-6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5" id="p13"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(118.6,169.8)">
+<path d="m-6.2,-6.2l6.2,-6.2l6.2,6.2m-6.2,6.2l0,-12.5" id="p13"/>
 </g>
-<use xlink:href="#p13" x="83.71" y="155.8"/>
+<use xlink:href="#p13" x="83.7" y="155.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="99.81,180.78 61.09,168.92"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="99.8,180.7 61,168.9"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(99.81,180.78)">
-<path d="m6.25,-6.25l6.25,6.25l-6.25,6.25m6.25,-6.25l-12.5,0" id="p14"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(99.8,180.7)">
+<path d="m6.2,-6.2l6.2,6.2l-6.2,6.2m6.2,-6.2l-12.5,0" id="p14"/>
 </g>
-<use xlink:href="#p14" x="61.09" y="168.92"/>
+<use xlink:href="#p14" x="61" y="168.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="88.65,195.94 59.84,189.73"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="88.6,195.9 59.8,189.7"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(88.65,195.94)">
-<path d="m-6.25,-6.25l-6.25,6.25l6.25,6.25m-6.25,-6.25l12.5,0"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(88.6,195.9)">
+<path d="m-6.2,-6.2l-6.2,6.2l6.2,6.2m-6.2,-6.2l12.5,0"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="88.89,213.88 59.84,210.16"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="88.8,213.8 59.8,210.1"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(88.89,213.88)">
-<path d="m-6.25,-6.25l6.25,6.25l6.25,-6.25m-6.25,-6.25l0,12.5"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(88.8,213.8)">
+<path d="m-6.2,-6.2l6.2,6.2l6.2,-6.2m-6.2,-6.2l0,12.5"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="99.47,231.83 60.68,230.18"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="99.4,231.8 60.6,230.1"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(99.47,231.83)">
-<path d="m-6.25,6.25l6.25,-6.25l6.25,6.25m-6.25,6.25l0,-12.5" id="p15"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(99.4,231.8)">
+<path d="m-6.2,6.2l6.2,-6.2l6.2,6.2m-6.2,6.2l0,-12.5" id="p15"/>
 </g>
-<use xlink:href="#p15" x="60.68" y="230.18"/>
+<use xlink:href="#p15" x="60.6" y="230.1"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="114.98,247.65 79.29,249.17"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="114.9,247.6 79.2,249.1"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(114.98,247.65)">
-<path d="m-6.25,-6.25l6.25,6.25l-6.25,6.25m-6.25,-6.25l12.5,0" id="p16"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(114.9,247.6)">
+<path d="m-6.2,-6.2l6.2,6.2l-6.2,6.2m-6.2,-6.2l12.5,0" id="p16"/>
 </g>
-<use xlink:href="#p16" x="79.29" y="249.17"/>
+<use xlink:href="#p16" x="79.2" y="249.1"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="128.24,261.22 95.2,265.45"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="128.2,261.2 95.2,265.4"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(128.24,261.22)">
-<path d="m6.25,-6.25l-6.25,6.25l6.25,6.25m6.25,-6.25l-12.5,0" id="p17"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(128.2,261.2)">
+<path d="m6.2,-6.2l-6.2,6.2l6.2,6.2m6.2,-6.2l-12.5,0" id="p17"/>
 </g>
-<use xlink:href="#p17" x="95.2" y="265.45"/>
+<use xlink:href="#p17" x="95.2" y="265.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="133.82,274.47 101.91,281.34"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="133.8,274.4 101.9,281.3"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(133.82,274.47)">
-<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0" id="p18"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(133.8,274.4)">
+<path d="m-6.2,0l3.1,0m9.3,0l-3.1,0" id="p18"/>
 </g>
-<use xlink:href="#p18" x="101.91" y="281.34"/>
+<use xlink:href="#p18" x="101.9" y="281.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="130.64,289.92 98.08,299.89"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="130.6,289.9 98,299.8"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(130.64,289.92)">
-<path d="m0,-6.25l0,3.12m0,9.38l0,-3.12" id="p19"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(130.6,289.9)">
+<path d="m0,-6.2l0,3.1m0,9.3l0,-3.1" id="p19"/>
 </g>
-<use xlink:href="#p19" x="98.08" y="299.89"/>
+<use xlink:href="#p19" x="98" y="299.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="122.33,308.82 88.11,322.57"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="122.3,308.8 88.1,322.5"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(122.33,308.82)">
-<path d="m-6.25,0l12.5,0" id="p20"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(122.3,308.8)">
+<path d="m-6.2,0l12.5,0" id="p20"/>
 </g>
-<use xlink:href="#p20" x="88.11" y="322.57"/>
+<use xlink:href="#p20" x="88.1" y="322.5"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="115.36,329.85 79.75,347.8"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="115.3,329.8 79.7,347.8"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(115.36,329.85)">
-<path d="m0,-6.25l0,12.5" id="p21"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(115.3,329.8)">
+<path d="m0,-6.2l0,12.5" id="p21"/>
 </g>
-<use xlink:href="#p21" x="79.75" y="347.8"/>
+<use xlink:href="#p21" x="79.7" y="347.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="115.76,349.46 80.22,371.34"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="115.7,349.4 80.2,371.3"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(115.76,349.46)">
-<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0m-3.12,-6.25l0,3.12m0,9.38l0,-3.12m-4.42,-7.54l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21" id="p22"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(115.7,349.4)">
+<path d="m-6.2,0l3.1,0m9.3,0l-3.1,0m-3.1,-6.2l0,3.1m0,9.3l0,-3.1m-4.4,-7.5l2.2,2.2m6.6,6.6l-2.2,-2.2m2.2,-6.6l-2.2,2.2m-6.6,6.6l2.2,-2.2" id="p22"/>
 </g>
-<use xlink:href="#p22" x="80.22" y="371.34"/>
+<use xlink:href="#p22" x="80.2" y="371.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="126.2,363.74 92.76,388.48"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="126.2,363.7 92.7,388.4"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(126.2,363.74)">
-<path d="m-4.42,-4.42l2.21,2.21m6.63,6.63l-2.21,-2.21m2.21,-6.63l-2.21,2.21m-6.63,6.63l2.21,-2.21" id="p23"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(126.2,363.7)">
+<path d="m-4.4,-4.4l2.2,2.2m6.6,6.6l-2.2,-2.2m2.2,-6.6l-2.2,2.2m-6.6,6.6l2.2,-2.2" id="p23"/>
 </g>
-<use xlink:href="#p23" x="92.76" y="388.48"/>
+<use xlink:href="#p23" x="92.7" y="388.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="144.99,370.7 115.31,396.83"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="144.9,370.7 115.3,396.8"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(144.99,370.7)">
-<path d="m-6.25,0l3.12,0m9.38,0l-3.12,0m-3.12,-6.25l0,3.12m0,9.38l0,-3.12" id="p24"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(144.9,370.7)">
+<path d="m-6.2,0l3.1,0m9.3,0l-3.1,0m-3.1,-6.2l0,3.1m0,9.3l0,-3.1" id="p24"/>
 </g>
-<use xlink:href="#p24" x="115.31" y="396.83"/>
+<use xlink:href="#p24" x="115.3" y="396.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="167.19,371.78 141.94,398.12"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="167.1,371.7 141.9,398.1"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(167.19,371.78)">
-<path d="m-4.42,-4.42l8.84,8.84m-8.84,0l8.84,-8.84" id="p25"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(167.1,371.7)">
+<path d="m-4.4,-4.4l8.8,8.8m-8.8,0l8.8,-8.8" id="p25"/>
 </g>
-<use xlink:href="#p25" x="141.94" y="398.12"/>
+<use xlink:href="#p25" x="141.9" y="398.1"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="187.33,371.46 166.11,397.74"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="187.3,371.4 166.1,397.7"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(187.33,371.46)">
-<path d="m-6.25,0l12.5,0m-6.25,-6.25l0,12.5" id="p26"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(187.3,371.4)">
+<path d="m-6.2,0l12.5,0m-6.2,-6.2l0,12.5" id="p26"/>
 </g>
-<use xlink:href="#p26" x="166.11" y="397.74"/>
+<use xlink:href="#p26" x="166.1" y="397.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="202.09,375.19 183.83,402.22"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="202,375.1 183.8,402.2"/>
 </g>
-<g fill="none" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(202.09,375.19)">
-<path d="m-4.42,-4.42l8.84,8.84m-8.84,0l8.84,-8.84m-10.67,4.42l12.5,0m-6.25,-6.25l0,12.5" id="p27"/>
+<g fill="none" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(202,375.1)">
+<path d="m-4.4,-4.4l8.8,8.8m-8.8,0l8.8,-8.8m-10.6,4.4l12.5,0m-6.2,-6.2l0,12.5" id="p27"/>
 </g>
-<use xlink:href="#p27" x="183.83" y="402.22"/>
+<use xlink:href="#p27" x="183.8" y="402.2"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="211.66,386.42 195.31,415.69"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="211.6,386.4 195.3,415.6"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(211.66,386.42)">
-<path d="m3.12,-3.12c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12m0,6.25c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12" id="p28"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(211.6,386.4)">
+<path d="m3.1,-3.1c0,1.7,-1.3,3.1,-3.1,3.1c-1.7,0,-3.1,-1.3,-3.1,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1c1.7,0,3.1,1.3,3.1,3.1m0,6.2c0,1.7,-1.3,3.1,-3.1,3.1c-1.7,0,-3.1,-1.3,-3.1,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1c1.7,0,3.1,1.3,3.1,3.1" id="p28"/>
 </g>
-<use xlink:href="#p28" x="195.31" y="415.69"/>
+<use xlink:href="#p28" x="195.3" y="415.6"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="219.07,404.54 204.2,437.44"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="219,404.5 204.2,437.4"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(219.07,404.54)">
-<path d="m0,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12m6.25,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12" id="p29"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(219,404.5)">
+<path d="m0,0c0,1.7,-1.3,3.1,-3.1,3.1c-1.7,0,-3.1,-1.3,-3.1,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1c1.7,0,3.1,1.3,3.1,3.1m6.2,0c0,1.7,-1.3,3.1,-3.1,3.1c-1.7,0,-3.1,-1.3,-3.1,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1c1.7,0,3.1,1.3,3.1,3.1" id="p29"/>
 </g>
-<use xlink:href="#p29" x="204.2" y="437.44"/>
+<use xlink:href="#p29" x="204.2" y="437.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="228.14,424.84 215.08,461.79"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="228.1,424.8 215,461.7"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(228.14,424.84)">
-<path d="m0,7.5l-1.69,-5.18l-5.44,0l4.41,-3.2l-1.69,-5.18l4.41,3.2l4.41,-3.2l-1.69,5.18l4.41,3.2l-5.44,0l-1.69,5.18" id="p30"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(228.1,424.8)">
+<path d="m0,7.5l-1.6,-5.1l-5.4,0l4.4,-3.2l-1.6,-5.1l4.4,3.2l4.4,-3.2l-1.6,5.1l4.4,3.2l-5.4,0l-1.6,5.1" id="p30"/>
 </g>
-<use xlink:href="#p30" x="215.08" y="461.79"/>
+<use xlink:href="#p30" x="215" y="461.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="241.22,440.55 232.6,473.65"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="241.2,440.5 232.5,473.6"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(241.22,440.55)">
-<path d="m0,6.25l-1.19,-3.36l-3.22,1.53l1.53,-3.22l-3.36,-1.19l3.36,-1.19l-1.53,-3.22l3.23,1.53l1.19,-3.36l1.19,3.36l3.23,-1.53l-1.53,3.23l3.36,1.19l-3.36,1.19l1.53,3.23l-3.22,-1.53l-1.19,3.36"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(241.2,440.5)">
+<path d="m0,6.2l-1.1,-3.3l-3.2,1.5l1.5,-3.2l-3.3,-1.1l3.3,-1.1l-1.5,-3.2l3.2,1.5l1.1,-3.3l1.1,3.3l3.2,-1.5l-1.5,3.2l3.3,1.1l-3.3,1.1l1.5,3.2l-3.2,-1.5l-1.1,3.3"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="258.07,446.2 253.37,473.65"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="258,446.2 253.3,473.6"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(258.07,446.2)">
-<path d="m0,6.25l-1.56,-3.54l-3.85,0.42l2.29,-3.12l-2.29,-3.12l3.85,0.42l1.56,-3.54l1.56,3.54l3.85,-0.42l-2.29,3.12l2.29,3.12l-3.85,-0.42l-1.56,3.54"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(258,446.2)">
+<path d="m0,6.2l-1.5,-3.5l-3.8,0.4l2.2,-3.1l-2.2,-3.1l3.8,0.4l1.5,-3.5l1.5,3.5l3.8,-0.4l-2.2,3.1l2.2,3.1l-3.8,-0.4l-1.5,3.5"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="276.37,440.35 273.54,473.65"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="276.3,440.3 273.5,473.6"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(276.37,440.35)">
-<path d="m0,6.25l-2.21,-4.04l-4.04,-2.21l4.04,-2.21l2.21,-4.04l2.21,4.04l4.04,2.21l-4.04,2.21l-2.21,4.04"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(276.3,440.3)">
+<path d="m0,6.2l-2.2,-4l-4,-2.2l4,-2.2l2.2,-4l2.2,4l4,2.2l-4,2.2l-2.2,4"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="293.42,426.44 293.42,463.71"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="293.4,426.4 293.4,463.7"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(293.42,426.44)">
-<path d="m0,-6.25l1.08,5.62l4.33,3.75l-5.41,-1.87l-5.41,1.88l4.33,-3.75l1.08,-5.62" id="p31"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(293.4,426.4)">
+<path d="m0,-6.2l1,5.6l4.3,3.7l-5.4,-1.8l-5.4,1.8l4.3,-3.7l1,-5.6" id="p31"/>
 </g>
-<use xlink:href="#p31" x="293.42" y="463.71"/>
+<use xlink:href="#p31" x="293.4" y="463.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="307.98,411.18 310.9,445.4"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="307.9,411.1 310.8,445.4"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(307.98,411.18)">
-<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m0,0l12.5,12.5m-12.5,0l12.5,-12.5" id="p32"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(307.9,411.1)">
+<path d="m-6.2,-6.2l12.5,0l0,12.5l-12.5,0l0,-12.5m0,0l12.5,12.5m-12.5,0l12.5,-12.5" id="p32"/>
 </g>
-<use xlink:href="#p32" x="310.9" y="445.4"/>
+<use xlink:href="#p32" x="310.8" y="445.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="321.07,401.31 326.6,433.56"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="321,401.3 326.5,433.5"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(321.07,401.31)">
-<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m6.25,0l0,12.5m-6.25,-6.25l12.5,0" id="p33"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(321,401.3)">
+<path d="m-6.2,-6.2l12.5,0l0,12.5l-12.5,0l0,-12.5m6.2,0l0,12.5m-6.2,-6.2l12.5,0" id="p33"/>
 </g>
-<use xlink:href="#p33" x="326.6" y="433.56"/>
+<use xlink:href="#p33" x="326.5" y="433.5"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="335.14,400.29 343.48,432.34"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="335.1,400.2 343.4,432.3"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(335.14,400.29)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-10.67,-4.42l8.84,8.84m-8.84,0l8.84,-8.84" id="p34"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(335.1,400.2)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2m-10.6,-4.4l8.8,8.8m-8.8,0l8.8,-8.8" id="p34"/>
 </g>
-<use xlink:href="#p34" x="343.48" y="432.34"/>
+<use xlink:href="#p34" x="343.4" y="432.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="352.31,406.74 364.09,440.08"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="352.3,406.7 364,440"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(352.31,406.74)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-6.25,-6.25l0,12.5m-6.25,-6.25l12.5,0" id="p35"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(352.3,406.7)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2m-6.2,-6.2l0,12.5m-6.2,-6.2l12.5,0" id="p35"/>
 </g>
-<use xlink:href="#p35" x="364.09" y="440.08"/>
+<use xlink:href="#p35" x="364" y="440"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="372.6,415.24 388.44,450.27"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="372.6,415.2 388.4,450.2"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(372.6,415.24)">
-<path d="m-3.54,5.31l3.54,-3.54l3.54,3.54l1.77,-1.77l-3.54,-3.54l3.54,-3.54l-1.77,-1.77l-3.54,3.54l-3.54,-3.54l-1.77,1.77l3.54,3.54l-3.54,3.54l1.77,1.77" id="p36"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(372.6,415.2)">
+<path d="m-3.5,5.3l3.5,-3.5l3.5,3.5l1.7,-1.7l-3.5,-3.5l3.5,-3.5l-1.7,-1.7l-3.5,3.5l-3.5,-3.5l-1.7,1.7l3.5,3.5l-3.5,3.5l1.7,1.7" id="p36"/>
 </g>
-<use xlink:href="#p36" x="388.44" y="450.27"/>
+<use xlink:href="#p36" x="388.4" y="450.2"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="393.44,419.12 413.45,454.93"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="393.4,419.1 413.4,454.9"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(393.44,419.12)">
-<path d="m1.25,6.25l0,-5l5,0l0,-2.5l-5,0l0,-5l-2.5,0l0,5l-5,0l0,2.5l5,0l0,5l2.5,0" id="p37"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(393.4,419.1)">
+<path d="m1.2,6.2l0,-5l5,0l0,-2.5l-5,0l0,-5l-2.5,0l0,5l-5,0l0,2.5l5,0l0,5l2.5,0" id="p37"/>
 </g>
-<use xlink:href="#p37" x="413.45" y="454.93"/>
+<use xlink:href="#p37" x="413.4" y="454.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="410.81,413.76 434.29,448.5"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="410.8,413.7 434.2,448.4"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(410.81,413.76)">
-<path d="m0,8.84l4.42,-8.84l-4.42,-8.84l-4.42,8.84l4.42,8.84" id="p38"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(410.8,413.7)">
+<path d="m0,8.8l4.4,-8.8l-4.4,-8.8l-4.4,8.8l4.4,8.8" id="p38"/>
 </g>
-<use xlink:href="#p38" x="434.29" y="448.5"/>
+<use xlink:href="#p38" x="434.2" y="448.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="421.48,398.68 447.1,430.4"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="421.4,398.6 447,430.3"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(421.48,398.68)">
-<path d="m0,4.42l8.84,-4.42l-8.84,-4.42l-8.84,4.42l8.84,4.42" id="p39"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(421.4,398.6)">
+<path d="m0,4.4l8.8,-4.4l-8.8,-4.4l-8.8,4.4l8.8,4.4" id="p39"/>
 </g>
-<use xlink:href="#p39" x="447.1" y="430.4"/>
+<use xlink:href="#p39" x="447" y="430.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="425.1,377.46 451.43,404.94"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="425,377.4 451.4,404.9"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(425.1,377.46)">
-<path d="m3.12,0c0,3.45,-1.4,6.25,-3.12,6.25c-1.73,0,-3.12,-2.8,-3.12,-6.25c0,-3.45,1.4,-6.25,3.12,-6.25c1.73,0,3.12,2.8,3.12,6.25" id="p40"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(425,377.4)">
+<path d="m3.1,0c0,3.4,-1.3,6.2,-3.1,6.2c-1.7,0,-3.1,-2.7,-3.1,-6.2c0,-3.4,1.3,-6.2,3.1,-6.2c1.7,0,3.1,2.7,3.1,6.2" id="p40"/>
 </g>
-<use xlink:href="#p40" x="451.43" y="404.94"/>
+<use xlink:href="#p40" x="451.4" y="404.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="424.79,355.69 451.06,378.82"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="424.7,355.6 451,378.8"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(424.79,355.69)">
-<path d="m6.25,0c0,1.73,-2.8,3.12,-6.25,3.12c-3.45,0,-6.25,-1.4,-6.25,-3.12c0,-1.73,2.8,-3.12,6.25,-3.12c3.45,0,6.25,1.4,6.25,3.12" id="p41"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(424.7,355.6)">
+<path d="m6.2,0c0,1.7,-2.7,3.1,-6.2,3.1c-3.4,0,-6.2,-1.3,-6.2,-3.1c0,-1.7,2.7,-3.1,6.2,-3.1c3.4,0,6.2,1.3,6.2,3.1" id="p41"/>
 </g>
-<use xlink:href="#p41" x="451.06" y="378.82"/>
+<use xlink:href="#p41" x="451" y="378.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="425.88,338.04 452.37,357.63"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="425.8,338 452.3,357.6"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(425.88,338.04)">
-<path d="m-6.25,6.25l6.25,-3.12l6.25,3.12l-3.12,-6.25l3.12,-6.25l-6.25,3.12l-6.25,-3.12l3.12,6.25l-3.12,6.25" id="p42"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(425.8,338)">
+<path d="m-6.2,6.2l6.2,-3.1l6.2,3.1l-3.1,-6.2l3.1,-6.2l-6.2,3.1l-6.2,-3.1l3.1,6.2l-3.1,6.2" id="p42"/>
 </g>
-<use xlink:href="#p42" x="452.37" y="357.63"/>
+<use xlink:href="#p42" x="452.3" y="357.6"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="433.15,326.1 461.09,343.31"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="433.1,326.1 461,343.3"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(433.15,326.1)">
-<path d="m-6.25,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12l6.25,0c1.73,0,3.12,1.4,3.12,3.12l0,6.25c0,1.73,-1.4,3.12,-3.12,3.12l-6.25,0c-1.73,0,-3.12,-1.4,-3.12,-3.12l0,-6.25" id="p43"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(433.1,326.1)">
+<path d="m-6.2,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1l6.2,0c1.7,0,3.1,1.3,3.1,3.1l0,6.2c0,1.7,-1.3,3.1,-3.1,3.1l-6.2,0c-1.7,0,-3.1,-1.3,-3.1,-3.1l0,-6.2" id="p43"/>
 </g>
-<use xlink:href="#p43" x="461.09" y="343.31"/>
+<use xlink:href="#p43" x="461" y="343.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="448.18,318.1 479.13,333.71"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="448.1,318.1 479.1,333.7"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(448.18,318.1)">
-<path d="m0,-7.5l7.13,5.18l-2.8,8.38l-8.67,0l-2.8,-8.38l7.13,-5.18m0,3.75l3.57,2.59l-1.4,4.19l-4.33,0l-1.4,-4.19l3.57,-2.59" id="p44"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(448.1,318.1)">
+<path d="m0,-7.5l7.1,5.1l-2.7,8.3l-8.6,0l-2.7,-8.3l7.1,-5.1m0,3.7l3.5,2.5l-1.3,4.1l-4.3,0l-1.3,-4.1l3.5,-2.5" id="p44"/>
 </g>
-<use xlink:href="#p44" x="479.13" y="333.71"/>
+<use xlink:href="#p44" x="479.1" y="333.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="468.18,310.29 503.13,324.34"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="468.1,310.2 503.1,324.3"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(468.18,310.29)">
-<path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84m0,-4.42l4.42,-4.42l-4.42,-4.42l-4.42,4.42l4.42,4.42" id="p45"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(468.1,310.2)">
+<path d="m0,8.8l8.8,-8.8l-8.8,-8.8l-8.8,8.8l8.8,8.8m0,-4.4l4.4,-4.4l-4.4,-4.4l-4.4,4.4l4.4,4.4" id="p45"/>
 </g>
-<use xlink:href="#p45" x="503.13" y="324.34"/>
+<use xlink:href="#p45" x="503.1" y="324.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="487.03,299.36 525.75,311.22"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="487,299.3 525.7,311.2"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(487.03,299.36)">
-<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5m3.12,3.12l6.25,0l0,6.25l-6.25,0l0,-6.25" id="p46"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(487,299.3)">
+<path d="m-6.2,-6.2l12.5,0l0,12.5l-12.5,0l0,-12.5m3.1,3.1l6.2,0l0,6.2l-6.2,0l0,-6.2" id="p46"/>
 </g>
-<use xlink:href="#p46" x="525.75" y="311.22"/>
+<use xlink:href="#p46" x="525.7" y="311.2"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="498.19,284.2 527,290.41"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="498.1,284.2 527,290.4"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(498.19,284.2)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.12,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(498.1,284.2)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2m-3.1,0c0,1.7,-1.3,3.1,-3.1,3.1c-1.7,0,-3.1,-1.3,-3.1,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1c1.7,0,3.1,1.3,3.1,3.1"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="497.95,266.26 527,269.98"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="497.9,266.2 527,269.9"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(497.95,266.26)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-3.12,0c0,1.73,-1.4,3.12,-3.12,3.12c-1.73,0,-3.12,-1.4,-3.12,-3.12c0,-1.73,1.4,-3.12,3.12,-3.12c1.73,0,3.12,1.4,3.12,3.12" fill-rule="nonzero"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(497.9,266.2)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2m-3.1,0c0,1.7,-1.3,3.1,-3.1,3.1c-1.7,0,-3.1,-1.3,-3.1,-3.1c0,-1.7,1.3,-3.1,3.1,-3.1c1.7,0,3.1,1.3,3.1,3.1" fill-rule="nonzero"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="487.37,248.31 526.16,249.96"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="487.3,248.3 526.1,249.9"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(487.37,248.31)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25m-5.94,0c0,0.17,-0.14,0.31,-0.31,0.31c-0.17,0,-0.31,-0.14,-0.31,-0.31c0,-0.17,0.14,-0.31,0.31,-0.31c0.17,0,0.31,0.14,0.31,0.31" fill-rule="nonzero" id="p47"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(487.3,248.3)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2m-5.9,0c0,0.1,-0.1,0.3,-0.3,0.3c-0.1,0,-0.3,-0.1,-0.3,-0.3c0,-0.1,0.1,-0.3,0.3,-0.3c0.1,0,0.3,0.1,0.3,0.3" fill-rule="nonzero" id="p47"/>
 </g>
-<use xlink:href="#p47" x="526.16" y="249.96"/>
+<use xlink:href="#p47" x="526.1" y="249.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="471.86,232.49 507.55,230.97"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="471.8,232.4 507.5,230.9"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(471.86,232.49)">
-<path d="m0.31,0c0,0.17,-0.14,0.31,-0.31,0.31c-0.17,0,-0.31,-0.14,-0.31,-0.31c0,-0.17,0.14,-0.31,0.31,-0.31c0.17,0,0.31,0.14,0.31,0.31" id="p48"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(471.8,232.4)">
+<path d="m0.3,0c0,0.1,-0.1,0.3,-0.3,0.3c-0.1,0,-0.3,-0.1,-0.3,-0.3c0,-0.1,0.1,-0.3,0.3,-0.3c0.1,0,0.3,0.1,0.3,0.3" id="p48"/>
 </g>
-<use xlink:href="#p48" x="507.55" y="230.97"/>
+<use xlink:href="#p48" x="507.5" y="230.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="458.6,218.92 491.63,214.69"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="458.5,218.9 491.6,214.6"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(458.6,218.92)">
-<path d="m7.5,0l-11.25,6.49l0,-12.99l11.25,6.49" id="p49"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(458.5,218.9)">
+<path d="m7.5,0l-11.2,6.4l0,-12.9l11.2,6.4" id="p49"/>
 </g>
-<use xlink:href="#p49" x="491.63" y="214.69"/>
+<use xlink:href="#p49" x="491.6" y="214.6"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="453.01,205.67 484.93,198.8"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="453,205.6 484.9,198.7"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(453.01,205.67)">
-<path d="m-7.5,0l11.25,6.49l0,-12.99l-11.25,6.49" id="p50"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(453,205.6)">
+<path d="m-7.5,0l11.2,6.4l0,-12.9l-11.2,6.4" id="p50"/>
 </g>
-<use xlink:href="#p50" x="484.93" y="198.8"/>
+<use xlink:href="#p50" x="484.9" y="198.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="456.2,190.22 488.76,180.25"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="456.2,190.2 488.7,180.2"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(456.2,190.22)">
-<path d="m0,7.5l6.49,-11.25l-12.99,0l6.49,11.25" id="p51"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(456.2,190.2)">
+<path d="m0,7.5l6.4,-11.2l-12.9,0l6.4,11.2" id="p51"/>
 </g>
-<use xlink:href="#p51" x="488.76" y="180.25"/>
+<use xlink:href="#p51" x="488.7" y="180.2"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="464.51,171.32 498.73,157.57"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="464.5,171.3 498.7,157.5"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(464.51,171.32)">
-<path d="m0,-7.5l6.49,11.25l-12.99,0l6.49,-11.25" id="p52"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(464.5,171.3)">
+<path d="m0,-7.5l6.4,11.2l-12.9,0l6.4,-11.2" id="p52"/>
 </g>
-<use xlink:href="#p52" x="498.73" y="157.57"/>
+<use xlink:href="#p52" x="498.7" y="157.5"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="471.48,150.29 507.09,132.34"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="471.4,150.2 507,132.3"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(471.48,150.29)">
-<path d="m-6.25,-6.25l0,12.5l12.5,-12.5l0,12.5l-12.5,-12.5" id="p53"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(471.4,150.2)">
+<path d="m-6.2,-6.2l0,12.5l12.5,-12.5l0,12.5l-12.5,-12.5" id="p53"/>
 </g>
-<use xlink:href="#p53" x="507.09" y="132.34"/>
+<use xlink:href="#p53" x="507" y="132.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="471.08,130.68 506.61,108.8"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="471,130.6 506.6,108.8"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(471.08,130.68)">
-<path d="m-6.25,-6.25l12.5,0l-12.5,12.5l12.5,0l-12.5,-12.5" id="p54"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(471,130.6)">
+<path d="m-6.2,-6.2l12.5,0l-12.5,12.5l12.5,0l-12.5,-12.5" id="p54"/>
 </g>
-<use xlink:href="#p54" x="506.61" y="108.8"/>
+<use xlink:href="#p54" x="506.6" y="108.8"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="460.64,116.4 494.08,91.66"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="460.6,116.3 494,91.6"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(460.64,116.4)">
-<path d="m2.59,6.25l3.66,-3.66l0,-5.17l-3.66,-3.66l-5.17,0l-3.66,3.66l0,5.17l3.66,3.66l5.17,0" id="p55"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(460.6,116.3)">
+<path d="m2.5,6.2l3.6,-3.6l0,-5.1l-3.6,-3.6l-5.1,0l-3.6,3.6l0,5.1l3.6,3.6l5.1,0" id="p55"/>
 </g>
-<use xlink:href="#p55" x="494.08" y="91.66"/>
+<use xlink:href="#p55" x="494" y="91.6"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="441.85,109.44 471.53,83.31"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="441.8,109.4 471.5,83.3"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(441.85,109.44)">
-<path d="m0,6.25l5.41,-3.12l0,-6.25l-5.41,-3.12l-5.41,3.12l0,6.25l5.41,3.12" id="p56"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(441.8,109.4)">
+<path d="m0,6.2l5.4,-3.1l0,-6.2l-5.4,-3.1l-5.4,3.1l0,6.2l5.4,3.1" id="p56"/>
 </g>
-<use xlink:href="#p56" x="471.53" y="83.31"/>
+<use xlink:href="#p56" x="471.5" y="83.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="419.65,108.36 444.89,82.02"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="419.6,108.3 444.8,82"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(419.65,108.36)">
-<path d="m0,-7.5l7.13,5.18l-2.8,8.38l-8.67,0l-2.8,-8.38l7.13,-5.18" id="p57"/>
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(419.6,108.3)">
+<path d="m0,-7.5l7.1,5.1l-2.7,8.3l-8.6,0l-2.7,-8.3l7.1,-5.1" id="p57"/>
 </g>
-<use xlink:href="#p57" x="444.89" y="82.02"/>
+<use xlink:href="#p57" x="444.8" y="82"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="399.51,108.68 420.73,82.4"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="399.5,108.6 420.7,82.3"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(399.51,108.68)">
-<path d="m-3.12,-6.25l6.25,0l0,12.5l-6.25,0l0,-12.5" id="p58"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(399.5,108.6)">
+<path d="m-3.1,-6.2l6.2,0l0,12.5l-6.2,0l0,-12.5" id="p58"/>
 </g>
-<use xlink:href="#p58" x="420.73" y="82.4"/>
+<use xlink:href="#p58" x="420.7" y="82.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="384.75,104.95 403.01,77.92"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="384.7,104.9 403,77.9"/>
 </g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(384.75,104.95)">
-<path d="m-6.25,-3.12l12.5,0l0,6.25l-12.5,0l0,-6.25" id="p59"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(384.7,104.9)">
+<path d="m-6.2,-3.1l12.5,0l0,6.2l-12.5,0l0,-6.2" id="p59"/>
 </g>
-<use xlink:href="#p59" x="403.01" y="77.92"/>
+<use xlink:href="#p59" x="403" y="77.9"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="375.17,93.72 391.53,64.45"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="375.1,93.7 391.5,64.4"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(375.17,93.72)">
-<path d="m0,-7.5l-1.69,5.18l-5.44,0l4.41,3.2l-1.69,5.18l4.41,-3.2l4.41,3.2l-1.69,-5.18l4.41,-3.2l-5.44,0l-1.69,-5.18" id="p60"/>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(375.1,93.7)">
+<path d="m0,-7.5l-1.6,5.1l-5.4,0l4.4,3.2l-1.6,5.1l4.4,-3.2l4.4,3.2l-1.6,-5.1l4.4,-3.2l-5.4,0l-1.6,-5.1" id="p60"/>
 </g>
-<use xlink:href="#p60" x="391.53" y="64.45"/>
+<use xlink:href="#p60" x="391.5" y="64.4"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="367.77,75.6 382.63,42.7"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="367.7,75.5 382.6,42.7"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(367.77,75.6)">
-<path d="m2.5,6.25l0,-3.75l3.75,0l0,-5l-3.75,0l0,-3.75l-5,0l0,3.75l-3.75,0l0,5l3.75,0l0,3.75l5,0" id="p61"/>
+<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(367.7,75.5)">
+<path d="m2.5,6.2l0,-3.7l3.7,0l0,-5l-3.7,0l0,-3.7l-5,0l0,3.7l-3.7,0l0,5l3.7,0l0,3.7l5,0" id="p61"/>
 </g>
-<use xlink:href="#p61" x="382.63" y="42.7"/>
+<use xlink:href="#p61" x="382.6" y="42.7"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="358.7,55.3 371.76,18.35"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="358.7,55.3 371.7,18.3"/>
 </g>
-<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.62">
+<g fill="#ffc0cb" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(358.7,55.3)">
-<path d="m-3.71,6.89l3.71,-3.71l3.71,3.71l3.18,-3.18l-3.71,-3.71l3.71,-3.71l-3.18,-3.18l-3.71,3.71l-3.71,-3.71l-3.18,3.18l3.71,3.71l-3.71,3.71l3.18,3.18" id="p62"/>
+<path d="m-3.7,6.8l3.7,-3.7l3.7,3.7l3.1,-3.1l-3.7,-3.7l3.7,-3.7l-3.1,-3.1l-3.7,3.7l-3.7,-3.7l-3.1,3.1l3.7,3.7l-3.7,3.7l3.1,3.1" id="p62"/>
 </g>
-<use xlink:href="#p62" x="371.76" y="18.35"/>
+<use xlink:href="#p62" x="371.7" y="18.3"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="345.62,39.59 354.24,6.49"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="345.6,39.5 354.2,6.4"/>
 </g>
-<g fill="#800080" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(345.62,39.59)">
-<path d="m-6.25,-6.25l12.5,0l0,12.5l-12.5,0l0,-12.5"/>
-</g>
-</g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="328.76,33.94 333.47,6.49"/>
-</g>
-<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(328.76,33.94)">
-<path d="m0,8.84l8.84,-8.84l-8.84,-8.84l-8.84,8.84l8.84,8.84"/>
+<g fill="#800080" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(345.6,39.5)">
+<path d="m-6.2,-6.2l12.5,0l0,12.5l-12.5,0l0,-12.5"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="310.47,39.79 313.3,6.49"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="328.7,33.9 333.4,6.4"/>
 </g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.62">
-<g transform="translate(310.47,39.79)">
-<path d="m6.25,0c0,3.45,-2.8,6.25,-6.25,6.25c-3.45,0,-6.25,-2.8,-6.25,-6.25c0,-3.45,2.8,-6.25,6.25,-6.25c3.45,0,6.25,2.8,6.25,6.25"/>
+<g fill="#90ee90" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(328.7,33.9)">
+<path d="m0,8.8l8.8,-8.8l-8.8,-8.8l-8.8,8.8l8.8,8.8"/>
 </g>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.62">
-<polyline fill="none" points="293.42,53.7 293.42,16.43"/>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="310.4,39.7 313.3,6.4"/>
+</g>
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(310.4,39.7)">
+<path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2"/>
+</g>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<polyline fill="none" points="293.4,53.7 293.4,16.4"/>
 </g>
 <g fill="#0000ff" stroke="none" stroke-width="1">
-<path d="m222.88,115.34l82.19,59.68l82.19,-59.68l-31.45,96.58l82.19,59.68l-101.48,0l-31.45,96.58l-31.45,-96.58l-101.48,0l82.19,-59.68l-31.45,-96.58"/>
+<path d="m222.8,115.3l82.1,59.6l82.1,-59.6l-31.4,96.5l82.1,59.6l-101.4,0l-31.4,96.5l-31.4,-96.5l-101.4,0l82.1,-59.6l-31.4,-96.5"/>
 </g>
 <g fill="#00ffff" fill-opacity="0.9" stroke="none" stroke-width="1">
-<path d="m211.23,126.99l82.19,59.68l82.19,-59.68l-31.45,96.58l82.19,59.68l-101.48,0l-31.45,96.58l-31.45,-96.58l-101.48,0l82.19,-59.68l-31.45,-96.58"/>
+<path d="m211.2,126.9l82.1,59.6l82.1,-59.6l-31.4,96.5l82.1,59.6l-101.4,0l-31.4,96.5l-31.4,-96.5l-101.4,0l82.1,-59.6l-31.4,-96.5"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M60.46,473.03l0,-465.91"/>
-<path d="M60.46,473.03l-3.75,0M60.46,449.73l-3.75,0M60.46,426.44l-3.75,0M60.46,403.14l-3.75,0M60.46,379.84l-3.75,0M60.46,356.55l-3.75,0M60.46,333.25l-3.75,0M60.46,309.96l-3.75,0M60.46,286.66l-3.75,0M60.46,263.37l-3.75,0M60.46,240.07l-3.75,0M60.46,216.77l-3.75,0M60.46,193.48l-3.75,0M60.46,170.18l-3.75,0M60.46,146.89l-3.75,0M60.46,123.59l-3.75,0M60.46,100.3l-3.75,0M60.46,77l-3.75,0M60.46,53.7l-3.75,0M60.46,30.41l-3.75,0M60.46,7.11l-3.75,0"/>
-<path d="M60.46,473.03l-7.5,0M60.46,356.55l-7.5,0M60.46,240.07l-7.5,0M60.46,123.59l-7.5,0M60.46,7.11l-7.5,0"/>
-<path d="M526.38,473.03l0,-465.91"/>
-<path d="M526.38,473.03l3.75,0M526.38,449.73l3.75,0M526.38,426.44l3.75,0M526.38,403.14l3.75,0M526.38,379.84l3.75,0M526.38,356.55l3.75,0M526.38,333.25l3.75,0M526.38,309.96l3.75,0M526.38,286.66l3.75,0M526.38,263.37l3.75,0M526.38,240.07l3.75,0M526.38,216.77l3.75,0M526.38,193.48l3.75,0M526.38,170.18l3.75,0M526.38,146.89l3.75,0M526.38,123.59l3.75,0M526.38,100.3l3.75,0M526.38,77l3.75,0M526.38,53.7l3.75,0M526.38,30.41l3.75,0M526.38,7.11l3.75,0"/>
-<path d="M526.38,473.03l7.5,0M526.38,356.55l7.5,0M526.38,240.07l7.5,0M526.38,123.59l7.5,0M526.38,7.11l7.5,0"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.4,473l0,-465.9"/>
+<path d="M60.4,473l-3.7,0M60.4,449.7l-3.7,0M60.4,426.4l-3.7,0M60.4,403.1l-3.7,0M60.4,379.8l-3.7,0M60.4,356.5l-3.7,0M60.4,333.2l-3.7,0M60.4,309.9l-3.7,0M60.4,286.6l-3.7,0M60.4,263.3l-3.7,0M60.4,240l-3.7,0M60.4,216.7l-3.7,0M60.4,193.4l-3.7,0M60.4,170.1l-3.7,0M60.4,146.8l-3.7,0M60.4,123.5l-3.7,0M60.4,100.2l-3.7,0M60.4,77l-3.7,0M60.4,53.7l-3.7,0M60.4,30.4l-3.7,0M60.4,7.1l-3.7,0"/>
+<path d="M60.4,473l-7.5,0M60.4,356.5l-7.5,0M60.4,240l-7.5,0M60.4,123.5l-7.5,0M60.4,7.1l-7.5,0"/>
+<path d="M526.3,473l0,-465.9"/>
+<path d="M526.3,473l3.7,0M526.3,449.7l3.7,0M526.3,426.4l3.7,0M526.3,403.1l3.7,0M526.3,379.8l3.7,0M526.3,356.5l3.7,0M526.3,333.2l3.7,0M526.3,309.9l3.7,0M526.3,286.6l3.7,0M526.3,263.3l3.7,0M526.3,240l3.7,0M526.3,216.7l3.7,0M526.3,193.4l3.7,0M526.3,170.1l3.7,0M526.3,146.8l3.7,0M526.3,123.5l3.7,0M526.3,100.2l3.7,0M526.3,77l3.7,0M526.3,53.7l3.7,0M526.3,30.4l3.7,0M526.3,7.1l3.7,0"/>
+<path d="M526.3,473l7.5,0M526.3,356.5l7.5,0M526.3,240l7.5,0M526.3,123.5l7.5,0M526.3,7.1l7.5,0"/>
 </g>
 <g fill="none" stroke-width="1">
-<g transform="matrix(0 -1 1 0 1.75 362.57)">
+<g transform="matrix(0 -1 1 0 1.7 362.5)">
 <text x="0" y="0" font-size="14pt" fill="#000000">Outward ticks on this y axis</text>
 </g>
-<text x="-20.53" y="481.78" font-size="14pt" fill="#000000">&#8722;2</text>
-<text x="40.7" y="248.82" font-size="14pt" fill="#000000">0</text>
-<text x="40.7" y="132.34" font-size="14pt" fill="#000000">1</text>
+<text x="-20.5" y="481.7" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="40.7" y="248.8" font-size="14pt" fill="#000000">0</text>
+<text x="40.7" y="132.3" font-size="14pt" fill="#000000">1</text>
 <text x="40.7" y="21" font-size="14pt" fill="#000000">2</text>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.62">
-<path d="M60.46,473.03l465.91,0"/>
-<path d="M60.46,473.03l0,3.75M83.76,473.03l0,3.75M107.05,473.03l0,3.75M130.35,473.03l0,3.75M153.64,473.03l0,3.75M176.94,473.03l0,3.75M200.24,473.03l0,3.75M223.53,473.03l0,3.75M246.83,473.03l0,3.75M270.12,473.03l0,3.75M293.42,473.03l0,3.75M316.71,473.03l0,3.75M340.01,473.03l0,3.75M363.31,473.03l0,3.75M386.6,473.03l0,3.75M409.9,473.03l0,3.75M433.19,473.03l0,3.75M456.49,473.03l0,3.75M479.78,473.03l0,3.75M503.08,473.03l0,3.75M526.38,473.03l0,3.75"/>
-<path d="M60.46,473.03l0,7.5M176.94,473.03l0,7.5M293.42,473.03l0,7.5M409.9,473.03l0,7.5M526.38,473.03l0,7.5"/>
-<path d="M60.46,7.11l465.91,0"/>
-<path d="M60.46,7.11l0,-3.75M83.76,7.11l0,-3.75M107.05,7.11l0,-3.75M130.35,7.11l0,-3.75M153.64,7.11l0,-3.75M176.94,7.11l0,-3.75M200.24,7.11l0,-3.75M223.53,7.11l0,-3.75M246.83,7.11l0,-3.75M270.12,7.11l0,-3.75M293.42,7.11l0,-3.75M316.71,7.11l0,-3.75M340.01,7.11l0,-3.75M363.31,7.11l0,-3.75M386.6,7.11l0,-3.75M409.9,7.11l0,-3.75M433.19,7.11l0,-3.75M456.49,7.11l0,-3.75M479.78,7.11l0,-3.75M503.08,7.11l0,-3.75M526.38,7.11l0,-3.75"/>
-<path d="M60.46,7.11l0,-7.5M176.94,7.11l0,-7.5M293.42,7.11l0,-7.5M409.9,7.11l0,-7.5M526.38,7.11l0,-7.5"/>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.4,473l465.9,0"/>
+<path d="M60.4,473l0,3.7M83.7,473l0,3.7M107,473l0,3.7M130.3,473l0,3.7M153.6,473l0,3.7M176.9,473l0,3.7M200.2,473l0,3.7M223.5,473l0,3.7M246.8,473l0,3.7M270.1,473l0,3.7M293.4,473l0,3.7M316.7,473l0,3.7M340,473l0,3.7M363.3,473l0,3.7M386.6,473l0,3.7M409.8,473l0,3.7M433.1,473l0,3.7M456.4,473l0,3.7M479.7,473l0,3.7M503,473l0,3.7M526.3,473l0,3.7"/>
+<path d="M60.4,473l0,7.5M176.9,473l0,7.5M293.4,473l0,7.5M409.8,473l0,7.5M526.3,473l0,7.5"/>
+<path d="M60.4,7.1l465.9,0"/>
+<path d="M60.4,7.1l0,-3.7M83.7,7.1l0,-3.7M107,7.1l0,-3.7M130.3,7.1l0,-3.7M153.6,7.1l0,-3.7M176.9,7.1l0,-3.7M200.2,7.1l0,-3.7M223.5,7.1l0,-3.7M246.8,7.1l0,-3.7M270.1,7.1l0,-3.7M293.4,7.1l0,-3.7M316.7,7.1l0,-3.7M340,7.1l0,-3.7M363.3,7.1l0,-3.7M386.6,7.1l0,-3.7M409.8,7.1l0,-3.7M433.1,7.1l0,-3.7M456.4,7.1l0,-3.7M479.7,7.1l0,-3.7M503,7.1l0,-3.7M526.3,7.1l0,-3.7"/>
+<path d="M60.4,7.1l0,-7.5M176.9,7.1l0,-7.5M293.4,7.1l0,-7.5M409.8,7.1l0,-7.5M526.3,7.1l0,-7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="170.91" y="494.53" font-size="14pt" fill="#000000">Outward ticks on this x axis</text>
-<text x="25.45" y="485.78" font-size="14pt" fill="#000000">&#8722;2</text>
-<text x="141.94" y="485.78" font-size="14pt" fill="#000000">&#8722;1</text>
-<text x="289.03" y="485.78" font-size="14pt" fill="#000000">0</text>
-<text x="405.52" y="485.78" font-size="14pt" fill="#000000">1</text>
-<text x="522" y="485.78" font-size="14pt" fill="#000000">2</text>
+<text x="170.9" y="494.5" font-size="14pt" fill="#000000">Outward ticks on this x axis</text>
+<text x="25.4" y="485.7" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="141.9" y="485.7" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="289" y="485.7" font-size="14pt" fill="#000000">0</text>
+<text x="405.5" y="485.7" font-size="14pt" fill="#000000">1</text>
+<text x="522" y="485.7" font-size="14pt" fill="#000000">2</text>
 </g>
 </g>
 </g>

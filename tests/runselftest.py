@@ -38,6 +38,7 @@ Unicode code to work around different font handling on platforms.
 """
 
 import glob
+import os
 import os.path
 import sys
 import re
@@ -141,43 +142,6 @@ def renderAllTests():
         outfile = os.path.join(d.comparisondir, base + '.selftest')
         renderTest(vsz, outfile)
 
-def compareLoosely(f1, f2):
-    """Compare two files ignore issues in floating point numbers."""
-
-    number_re = re.compile('(-?[0-9]+(?:\.[0-9]+)?)')
-    numberfull_re = re.compile('^-?[0-9]+(?:\.[0-9]+)?$')
-
-    fail = False
-
-    # read all of files
-    lines1, lines2 = f1.readlines(), f2.readlines()
-    if len(lines1) != len(lines2):
-        # number of lines are different
-        print " Number of lines different"
-        fail = True
-
-    for i, (l1, l2) in enumerate(izip(lines1, lines2)):
-        # split lines into numeric, non-numeric parts
-        parts1 = number_re.split(l1)
-        parts2 = number_re.split(l2)
-
-        if len(parts1) != len(parts2):
-            # different number of parts
-            print " Number of parts different"
-            fail = True
-        for p1, p2 in izip(parts1, parts2):
-            if numberfull_re.match(p1) and numberfull_re.match(p2):
-                # both numeric, so compare numerically
-                if abs(float(p1) - float(p2)) > 0.1:
-                    print " Numerical values are different"
-                    fail = True
-            else:
-                # non-numeric, so compare text
-                if p1 != p2:
-                    print " Non-numerical values are different"
-                    fail = True
-    return not fail
-
 def runTests():
     print "Testing output"
 
@@ -196,7 +160,7 @@ def runTests():
 
         f1 = open(outfile, 'rU')
         f2 = open(comparfile, 'rU')
-        comp = compareLoosely(f1, f2)
+        comp = f1.read() == f2.read()
         f1.close()
         f2.close()
 
@@ -216,7 +180,19 @@ def runTests():
         print "%i/%i tests FAILED" % (fails, passes+fails)
         sys.exit(fails)
 
+oldflt = svg_export.fltStr
+def fltStr(v, prec=1):
+    # this is to get consistent rounding to get the self test correct... yuck
+    # decimal would work, but that drags in loads of code
+    # convert float to string with prec decimal places
+
+    v = round(v, prec+2)
+
+    return oldflt(v, prec=prec)
+
 if __name__ == '__main__':
+    os.environ['LANG'] = 'C'
+
     app = qt4.QApplication([])
 
     veusz.setting.transient_settings['unsafe_mode'] = True
@@ -233,6 +209,7 @@ if __name__ == '__main__':
     # dpi (use old values)
     svg_export.dpi = 90.
     svg_export.scale = 1.
+    svg_export.fltStr = fltStr
 
     if len(sys.argv) == 1:
         runTests()
