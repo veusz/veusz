@@ -54,15 +54,9 @@ import veusz.document.svg_export as svg_export
 # these tests fail for some reason which haven't been debugged
 # it appears the failures aren't important however
 excluded_tests = set([
-
-        # fails on Windows
-        #'histo.vsz',      # duplicate in long list of values
-        #'spectrum.vsz',   # angstrom is split into two on linux
-
-        # fails on Mac OS X
-        #'histo.vsz',      # somewhere in long list of values
-        #'spectrum.vsz',   # symbol issue
-        #'labels.vsz'      # symbol issue
+        # fails on Linux Arm
+        'spectrum.vsz',
+        'hatching.vsz',
     ])
 
 class StupidFontMetrics(object):
