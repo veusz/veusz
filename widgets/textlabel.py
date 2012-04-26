@@ -68,7 +68,7 @@ class TextLabel(plotters.FreePlotter):
                              formatting=True), 9 )
 
         s.add( setting.Bool('clip', False,
-                            descr='Clip line to its container',
+                            descr='Clip text to its container',
                             usertext='Clip',
                             formatting=True), 10 )
 
