@@ -28,6 +28,13 @@ import veusz.qtall as qt4
 import plotters
 import controlgraph
 
+mmlsupport = True
+try:
+    import veusz.helpers.qtmml as qtmml
+    import veusz.helpers.recordpaint as recordpaint
+except ImportError:
+    mmlsupport = False
+
 class TextLabel(plotters.FreePlotter):
 
     """Add a text label to a graph."""
@@ -38,6 +45,7 @@ class TextLabel(plotters.FreePlotter):
 
     def __init__(self, parent, name=None):
         plotters.FreePlotter.__init__(self, parent, name=name)
+        self.mmltextcache = self.mmldoccache = None
 
         if type(self) == TextLabel:
             self.readDefaults()
@@ -50,6 +58,12 @@ class TextLabel(plotters.FreePlotter):
         s.add( setting.DatasetOrStr('label', '',
                                     descr='Text to show or text dataset',
                                     usertext='Label', datatype='text'), 0 )
+
+        s.add( setting.Choice('type',
+                              ('standard', 'mathml'),
+                              'standard',
+                              descr='Type of text to plot',
+                              usertext='Type'), 4 )
 
         s.add( setting.AlignHorz('alignHorz',
                                  'left',
@@ -81,6 +95,52 @@ class TextLabel(plotters.FreePlotter):
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
     cnvtalignvert = { 'top': 1, 'centre': 0, 'bottom': -1 }
 
+    def drawMML(self, painter, phelper, font, x, y, t):
+        """Draw text in MathML mode."""
+
+        s = self.settings
+        if not mmlsupport:
+            self.document.log("Error: MathML support not compiled")
+            return [x, y, x, y]
+
+        if t != self.mmltextcache:
+            self.mmltextcache = t
+            self.mmldoccache = qtmml.QtMmlDocument()
+            try:
+                self.mmldoccache.setContent(t)
+            except ValueError, e:
+                self.document.log("Error interpreting MathML: %s" %
+                                  unicode(e))
+
+        self.mmldoccache.setFontName( qtmml.QtMmlWidget.NormalFont,
+                                      font.family() )
+        self.mmldoccache.setBaseFontPointSize(
+            s.Text.get('size').convertPts(painter) * phelper.dpi[0]/72. )
+        size = self.mmldoccache.size()
+
+        print s.Text.get('size').convertPts(painter), phelper.scaling, phelper.dpi[0]/72.
+
+        # do alignment
+        if s.alignHorz == 'centre':
+            x -= size.width()/2
+        elif s.alignHorz == 'right':
+            x -= size.width()
+        if s.alignVert == 'centre':
+            y -= size.height()/2
+        elif s.alignVert == 'bottom':
+            y -= size.height()
+
+        # do painting
+        rc = recordpaint.RecordPaintDevice(1024, 1024, 72, 72)
+        rcpaint = qt4.QPainter(rc)
+        self.mmldoccache.paint(rcpaint, qt4.QPoint(x, y))
+        rcpaint.end()
+        rc.play(painter)
+
+        # bounds for control
+        tbounds = [x, y, x+size.width(), y+size.height()]
+        return tbounds
+
     def draw(self, posn, phelper, outerbounds = None):
         """Draw the text label."""
 
@@ -106,6 +166,7 @@ class TextLabel(plotters.FreePlotter):
         textpen = s.get('Text').makeQPen()
         painter.setPen(textpen)
         font = s.get('Text').makeQFont(painter)
+        ttype = s.type
 
         # we should only be able to move non-dataset labels
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
@@ -115,10 +176,13 @@ class TextLabel(plotters.FreePlotter):
         for index, (x, y, t) in enumerate(itertools.izip(
                 xp, yp, itertools.cycle(text))):
             # render the text
-            tbounds = utils.Renderer( painter, font, x, y, t,
-                                      TextLabel.cnvtalignhorz[s.alignHorz],
-                                      TextLabel.cnvtalignvert[s.alignVert],
-                                      s.angle ).render()
+            if ttype == 'standard':
+                tbounds = utils.Renderer( painter, font, x, y, t,
+                                          TextLabel.cnvtalignhorz[s.alignHorz],
+                                          TextLabel.cnvtalignvert[s.alignVert],
+                                          s.angle ).render()
+            elif ttype == 'mathml':
+                tbounds = self.drawMML(painter, phelper, font, x, y, t)
 
             # add cgi for adjustable positions
             if isnotdataset:
