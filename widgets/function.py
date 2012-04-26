@@ -203,8 +203,9 @@ class FunctionPlotter(GenericPlotter):
         finitevals = vals[N.isfinite(vals)]
 
         # update the automatic range
-        axrange[0] = min(N.min(finitevals), axrange[0])
-        axrange[1] = max(N.max(finitevals), axrange[1])
+        if len(finitevals) > 0:
+            axrange[0] = min(N.min(finitevals), axrange[0])
+            axrange[1] = max(N.max(finitevals), axrange[1])
 
     def _plotLine(self, painter, xpts, ypts, bounds, clip):
         """ Plot the points in xpts, ypts."""
