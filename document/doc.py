@@ -51,7 +51,9 @@ module_re = re.compile(r'^[A-Za-z_\.]+$')
 function_re = re.compile(r'''
 ^([A-Za-z_][A-Za-z0-9_]*)[ ]*  # identifier
 \((                            # begin args
-(?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )* # args
+(?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )*     # named args
+(?: [ ]* ,? [ ]* \*[A-Za-z_][A-Za-z0-9_]* )?   # *args
+(?: [ ]* ,? [ ]* \*\*[A-Za-z_][A-Za-z0-9_]* )? # **kwargs
 )\)$                           # endargs''', re.VERBOSE)
 
 def getSuitableParent(widgettype, initialwidget):
