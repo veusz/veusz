@@ -118,8 +118,6 @@ class TextLabel(plotters.FreePlotter):
             s.Text.get('size').convertPts(painter) * phelper.dpi[0]/72. )
         size = self.mmldoccache.size()
 
-        print s.Text.get('size').convertPts(painter), phelper.scaling, phelper.dpi[0]/72.
-
         # do alignment
         if s.alignHorz == 'centre':
             x -= size.width()/2
@@ -130,11 +128,16 @@ class TextLabel(plotters.FreePlotter):
         elif s.alignVert == 'bottom':
             y -= size.height()
 
-        # do painting
-        rc = recordpaint.RecordPaintDevice(1024, 1024, 72, 72)
+        # do painting to a device with screen resolution
+        # this is assumed by the mml rendering code
+        screendev = qt4.QApplication.desktop()
+        rc = recordpaint.RecordPaintDevice(
+            1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
         rcpaint = qt4.QPainter(rc)
         self.mmldoccache.paint(rcpaint, qt4.QPoint(x, y))
         rcpaint.end()
+
+        # replay back to painter
         rc.play(painter)
 
         # bounds for control

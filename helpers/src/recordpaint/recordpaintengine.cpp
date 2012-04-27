@@ -357,16 +357,26 @@ namespace {
 
   class FontElement : public PaintElement {
   public:
-    FontElement(const QFont& font)
-      : _font(font)
+    FontElement(const QFont& font, int dpi)
+      : _dpi(dpi), _font(font)
     {}
 
     void paint(QPainter& painter)
     {
-      painter.setFont(_font);
+      QFont tempfont(_font);
+      if( tempfont.pointSizeF() > 0. )
+	{
+	  // scale font sizes in points using dpi ratio
+	  int thisdpi = painter.device()->logicalDpiY();
+	  double scale = tempfont.pointSizeF() / thisdpi * _dpi;
+	  tempfont.setPointSizeF(scale);
+	}
+
+      painter.setFont(tempfont);
     }
 
   private:
+    int _dpi;
     QFont _font;
   };
 
@@ -589,7 +599,7 @@ void RecordPaintEngine::updateState(const QPaintEngineState& state)
   if( flags & QPaintEngine::DirtyCompositionMode )
     _pdev->addElement( new CompositionElement( state.compositionMode() ) );
   if( flags & QPaintEngine::DirtyFont )
-    _pdev->addElement( new FontElement( state.font() ) );
+    _pdev->addElement( new FontElement( state.font(), _pdev->_dpiy ) );
   if( flags & QPaintEngine::DirtyTransform )
     _pdev->addElement( new TransformElement( state.transform() ) );
   if( flags & QPaintEngine::DirtyClipEnabled )
