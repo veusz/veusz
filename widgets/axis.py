@@ -747,12 +747,8 @@ class Axis(widget.Widget):
         
         if vertical:
             # limit tick labels to be directly below/besides axis
-            bounds = { 'miny': min(self.coordParr1, self.coordParr2),
-                       'maxy': max(self.coordParr1, self.coordParr2) }
             ax, ay = 1, 0
         else:
-            bounds = { 'minx': min(self.coordParr1, self.coordParr2),
-                       'maxx': max(self.coordParr1, self.coordParr2) }
             ax, ay = 0, 1
 
         if self.coordReflected:
@@ -1065,7 +1061,7 @@ class Axis(widget.Widget):
 
             if not drawntext.intersects(rect):
                 painter.setPen(pen)
-                box = r.render()
+                r.render()
                 drawntext.addRect(rect)
                 
     def updateControlItem(self, cgi):

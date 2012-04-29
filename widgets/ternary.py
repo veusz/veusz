@@ -182,7 +182,7 @@ class Ternary(NonOrthGraph):
         # normalise by origins and plot size
         lookup = coord_lookup[s.coords]
         cbot = ( clist[ lookup[0] ] - self._orgbot ) / self._size
-        cleft = ( clist[ lookup[1] ] - self._orgleft ) / self._size
+        # cleft = ( clist[ lookup[1] ] - self._orgleft ) / self._size
         cright = ( clist[ lookup[2] ] - self._orgright ) / self._size
 
         # from Ingram, 1984, Area, 16, 175

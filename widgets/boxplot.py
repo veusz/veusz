@@ -305,11 +305,6 @@ class BoxPlot(GenericPlotter):
         positions = self.getPosns()
         return (text, positions)
 
-    def calcStats(self, data):
-        """Calculate statistics for data."""
-
-        stats = _Stats()
-
     def plotBox(self, painter, axes, boxposn, posn, width, clip, stats):
         """Draw box for dataset."""
 

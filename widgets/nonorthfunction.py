@@ -153,7 +153,6 @@ class NonOrthFunction(Widget):
                            outerbounds=outerbounds)
 
         s = self.settings
-        d = self.document
 
         # exit if hidden
         if s.hide:

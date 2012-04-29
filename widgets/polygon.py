@@ -52,7 +52,6 @@ class Polygon(plotters.FreePlotter):
         """Plot the data on a plotter."""
 
         s = self.settings
-        d = self.document
 
         # exit if hidden
         if s.hide:

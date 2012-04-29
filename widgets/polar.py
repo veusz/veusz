@@ -144,7 +144,6 @@ class Polar(NonOrthGraph):
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert coordinates in r, theta to x, y.'''
 
-        s = self.settings
         ca = coorda / self._maxradius
         cb = self.toPlotAngle(coordb)
 

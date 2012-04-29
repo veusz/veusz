@@ -279,7 +279,6 @@ class Image(plotters.GenericPlotter):
                                             outerbounds = outerbounds)
         x1, y1, x2, y2 = posn
         s = self.settings
-        d = self.document
 
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )

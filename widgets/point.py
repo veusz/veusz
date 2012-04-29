@@ -504,7 +504,6 @@ class PointPlotter(GenericPlotter):
             lastpt = npts[i+3]
             i += 4
         return path
-        painter.strokePath(p, painter.pen())
 
     def _drawBezierLine( self, painter, xvals, yvals, posn,
                          xdata, ydata):

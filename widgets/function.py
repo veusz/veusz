@@ -252,7 +252,6 @@ class FunctionPlotter(GenericPlotter):
 
         # find starting and ending points for the filled region
         x1, y1, x2, y2 = bounds
-        s = self.settings
         
         pts = qt4.QPolygonF()
         if self.settings.variable == 'x':

@@ -392,7 +392,6 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
 
     def updateCorners(self):
         """Update corners on size."""
-        size = 5
         par = self.params
 
         # update position and size

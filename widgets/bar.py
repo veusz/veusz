@@ -18,7 +18,7 @@
 
 """For plotting bar graphs."""
 
-from itertools import izip, repeat
+from itertools import izip
 import numpy as N
 
 import veusz.qtall as qt4
@@ -241,7 +241,6 @@ class BarPlotter(GenericPlotter):
         """Get values for error bars."""
         minval = None
         maxval = None
-        length = len(vals)
         if 'serr' in dataset:
             s = N.nan_to_num(dataset['serr'])
             minval = vals - s

@@ -22,7 +22,6 @@ The graphs may share axes if they are stored in the grid widget.
 
 import veusz.document as document
 import veusz.setting as setting
-import veusz.qtall as qt4
 
 import widget
 import page
@@ -326,11 +325,6 @@ class Grid(widget.Widget):
         # draw widget
         child.draw(bounds, phelper, outerbounds=coutbound)
 
-        # debugging
-        #painter.setPen(qt4.QPen(qt4.Qt.red))
-        #painter.drawRect( qt4.QRectF(qt4.QPointF(coutbound[0], coutbound[1]),
-        #                             qt4.QPointF(coutbound[2], coutbound[3])))
-
         # restore position
         child.position = oldposn
 
@@ -359,7 +353,7 @@ class Grid(widget.Widget):
         bounds = self.computeBounds(parentposn, phelper, margins=margins)
         maxbounds = self.computeBounds(parentposn, phelper)
 
-        painter = phelper.painter(self, bounds)
+        phelper.painter(self, bounds)
         
         # controls for adjusting grid margins
         phelper.setControlGraph(self,[

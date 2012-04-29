@@ -22,7 +22,6 @@
 import itertools
 
 import veusz.document as document
-import veusz.utils as utils
 import veusz.setting as setting
 
 class Action(object):
