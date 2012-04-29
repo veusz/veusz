@@ -20,7 +20,6 @@
 ##############################################################################
 
 import sys
-from itertools import izip
 import traceback
 
 import veusz.qtall as qt4

@@ -714,22 +714,22 @@ class TreeEditDock(qt4.QDockWidget):
         """
 
         # get selected widgets
-        self.selwidgets = widgets = [
+        self.selwidgets = swidget = [
             self.treemodel.getWidget(idx)
             for idx in self.treeview.selectionModel().selectedRows() ]
 
-        if len(widgets) == 0:
+        if len(swidget) == 0:
             setnsproxy = None
-        elif len(widgets) == 1:
-            setnsproxy = SettingsProxySingle(self.document, widgets[0].settings,
-                                             actions=widgets[0].actions)
+        elif len(swidget) == 1:
+            setnsproxy = SettingsProxySingle(self.document, swidget[0].settings,
+                                             actions=swidget[0].actions)
         else:
-            setnsproxy = SettingsProxyMulti(self.document, widgets)
+            setnsproxy = SettingsProxyMulti(self.document, swidget)
 
         self._enableCorrectButtons()
         self._checkPageChange()
 
-        self.emit( qt4.SIGNAL('widgetsSelected'), self.selwidgets, setnsproxy )
+        self.emit( qt4.SIGNAL('widgetsSelected'), swidget, setnsproxy )
 
     def contextMenuEvent(self, event):
         """Bring up context menu."""

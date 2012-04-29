@@ -114,7 +114,6 @@ class MainWindow(qt4.QMainWindow):
         self.setAcceptDrops(True)
 
         # icon and different size variations
-        d = utils.imagedir
         self.setWindowIcon( utils.getIcon('veusz') )
 
         # master documenent
