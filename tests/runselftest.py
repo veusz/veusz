@@ -41,15 +41,15 @@ import glob
 import os
 import os.path
 import sys
-import re
-from itertools import izip
 
 import veusz.qtall as qt4
-import veusz.utils.textrender
+import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
-import veusz.windows.mainwindow
 import veusz.document.svg_export as svg_export
+
+# required to get structures initialised
+import veusz.windows.mainwindow
 
 # these tests fail for some reason which haven't been debugged
 # it appears the failures aren't important however
@@ -84,7 +84,7 @@ class StupidFontMetrics(object):
     def boundingRect(self, c):
         return qt4.QRectF(0, 0, self.height()*0.5, self.height())
 
-_pt = veusz.utils.textrender.PartText
+_pt = utils.textrender.PartText
 class PartTextAscii(_pt):
     """Text renderer which converts text to ascii."""
     def __init__(self, text):
@@ -193,16 +193,16 @@ if __name__ == '__main__':
 
     app = qt4.QApplication([])
 
-    veusz.setting.transient_settings['unsafe_mode'] = True
+    setting.transient_settings['unsafe_mode'] = True
 
     # hack metrics object to always return same metrics
     # and replace text renderer with one that encodes unicode symbols
-    veusz.utils.textrender.FontMetrics = StupidFontMetrics
-    veusz.utils.FontMetrics = StupidFontMetrics
-    veusz.utils.textrender.PartText = PartTextAscii
+    utils.textrender.FontMetrics = StupidFontMetrics
+    utils.FontMetrics = StupidFontMetrics
+    utils.textrender.PartText = PartTextAscii
 
     # nasty hack to remove underlining
-    del veusz.utils.textrender.part_commands[r'\underline']
+    del utils.textrender.part_commands[r'\underline']
 
     # dpi (use old values)
     svg_export.dpi = 90.
