@@ -410,7 +410,7 @@ class PartMultiScript(Part):
             newx = max([state.x, newx])
         state.x = newx
     
-    def append(p):
+    def append(self, p):
         self.children.append(p)
 
 class PartItalic(Part):
@@ -487,7 +487,7 @@ class PartSize(Part):
             else:
                 # is an absolute font size
                 self.size = float(size)
-        except AttributeError, ValueError:
+        except (AttributeError, ValueError):
             self.deltasize = 0.
 
         self.children = children[1:]
@@ -525,7 +525,6 @@ class PartBar(Part):
         height = state.fontMetrics().ascent()
 
         painter.save()
-        pen = painter.pen()
         penw = state.getPixelsPerPt()*0.5
         painter.setPen( qt4.QPen(painter.pen().brush(), penw) )
         painter.drawLine(qt4.QPointF(initx,

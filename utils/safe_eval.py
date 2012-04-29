@@ -33,9 +33,6 @@ problem for veusz documents
 import inspect, compiler.ast
 import thread, time
 import __builtin__
-import os.path
-
-import numpy as N
 
 #----------------------------------------------------------------------
 # Module globals.

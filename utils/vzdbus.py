@@ -23,7 +23,6 @@ sessionbus = busname = None
 
 try:
     import dbus
-    import dbus.service as service
     from dbus.service import method, Object
     from dbus.mainloop.qt import DBusQtMainLoop
     import os
