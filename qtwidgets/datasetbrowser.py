@@ -334,7 +334,6 @@ class DatasetRelationModel(TreeModel):
     def refresh(self):
         """Update tree of datasets when document changes."""
 
-        header = self.root.data
         tree = {
             "none": self.makeGrpTreeNone,
             "filename": self.makeGrpTreeFilename,
@@ -484,7 +483,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             """Open up data edit dialog."""
             for dataset, dsname in zip(datasets, dsnames):
                 if type(dataset) not in dataeditdialog.recreate_register:
-                    dialog = self.mainwindow.slotDataEdit(editdataset=dsname)
+                    self.mainwindow.slotDataEdit(editdataset=dsname)
         def _delete():
             """Simply delete dataset."""
             self.doc.applyOperation(
@@ -545,8 +544,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             a = tagmenu.addAction(tag, toggle)
             a.setCheckable(True)
             state = [tag in d.tags for d in datasets]
-
-            a.setChecked(all([tag in d.tags for d in datasets]))
+            a.setChecked( all(state) )
 
         def addtag():
             tag, ok = qt4.QInputDialog.getText(
