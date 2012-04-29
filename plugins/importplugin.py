@@ -485,7 +485,7 @@ class ImportPluginNpy(ImportPlugin):
         """
         try:
             retn = N.load(params.filename)
-        except Exception, e:
+        except Exception:
             return "Cannot read file", False
 
         try:
@@ -537,7 +537,7 @@ class ImportPluginNpz(ImportPlugin):
         """
         try:
             retn = N.load(params.filename)
-        except Exception, e:
+        except Exception:
             return "Cannot read file", False
 
         # npz files should define this attribute

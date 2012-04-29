@@ -166,8 +166,8 @@ class FieldWidget(Field):
         c = _WidgetCombo(doc, self.widgettypes, default)
         return (l, c)
 
-    def setControlVal(self, cntrls, val):
-        controls[1].setCurrentIndex(c.findText(val))
+    def setControlVal(self, controls, val):
+        controls[1].setCurrentIndex(controls[1].findText(val))
 
     def getControlResults(self, cntrls):
         return cntrls[1].getWidgetPath()
