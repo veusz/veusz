@@ -40,7 +40,7 @@ namespace {
   public:
     ellipseElement(const T &rect) : _ellipse(rect) {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawEllipse(_ellipse);
     }
@@ -59,7 +59,7 @@ namespace {
       : _image(image), _rect(rect), _sr(sr), _flags(flags)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawImage(_rect, _image, _sr, _flags);
     }
@@ -81,7 +81,7 @@ namespace {
 	_lines << lines[i];
     }
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawLines(_lines);
     }
@@ -99,7 +99,7 @@ namespace {
     PathElement(const QPainterPath& path)
       : _path(path) {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawPath(_path);
     }
@@ -115,7 +115,7 @@ namespace {
 		  const QRectF& sr) :
       _r(r), _pm(pm), _sr(sr) {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawPixmap(_r, _pm, _sr);
     }
@@ -136,7 +136,7 @@ namespace {
 	_pts << points[i];
     }
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawPoints(_pts);
     }
@@ -159,7 +159,7 @@ namespace {
 	_pts << points[i];
     }
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       switch(_mode)
 	{
@@ -195,7 +195,7 @@ namespace {
 	_rects << rects[i];
     }
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawRects(_rects);
     }
@@ -213,7 +213,7 @@ namespace {
       : _pt(pt), _text(txt.text())
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawText(_pt, _text);
     }
@@ -230,7 +230,7 @@ namespace {
       : _rect(rect), _pixmap(pixmap), _pt(pt)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.drawTiledPixmap(_rect, _pixmap, _pt);
     }
@@ -252,7 +252,7 @@ namespace {
       : _brush(brush)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setBackground(_brush);
     }
@@ -267,7 +267,7 @@ namespace {
       : _mode(mode)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setBackgroundMode(_mode);
     }
@@ -282,7 +282,7 @@ namespace {
       : _brush(brush)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setBrush(_brush);
     }
@@ -297,7 +297,7 @@ namespace {
       : _origin(origin)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setBrushOrigin(_origin);
     }
@@ -313,7 +313,7 @@ namespace {
       : _op(op), _region(region)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setClipRegion(_region, _op);
     }
@@ -330,7 +330,7 @@ namespace {
       : _op(op), _region(region)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setClipPath(_region, _op);
     }
@@ -346,7 +346,7 @@ namespace {
       : _mode(mode)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setCompositionMode(_mode);
     }
@@ -361,7 +361,7 @@ namespace {
       : _dpi(dpi), _font(font)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       QFont tempfont(_font);
       if( tempfont.pointSizeF() > 0. )
@@ -386,9 +386,10 @@ namespace {
       : _t(t)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform& origtransform)
     {
-      painter.setWorldTransform(_t);
+      painter.setWorldTransform(origtransform);
+      painter.setWorldTransform(_t, true);
     }
 
   private:
@@ -401,7 +402,7 @@ namespace {
       : _enabled(enabled)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setClipping(_enabled);
     }
@@ -416,7 +417,7 @@ namespace {
       : _pen(pen)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setPen(_pen);
     }
@@ -431,7 +432,7 @@ namespace {
       : _hints(hints)
     {}
 
-    void paint(QPainter& painter)
+    void paint(QPainter& painter, const QTransform&)
     {
       painter.setRenderHints(_hints);
     }

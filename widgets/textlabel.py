@@ -112,11 +112,20 @@ class TextLabel(plotters.FreePlotter):
                 self.document.log("Error interpreting MathML: %s" %
                                   unicode(e))
 
+        screendev = qt4.QApplication.desktop()
+        rc = recordpaint.RecordPaintDevice(
+            1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
+        rcpaint = qt4.QPainter(rc)
+        rcpaint.pixperpt = screendev.logicalDpiY() / 72.
+        rcpaint.scaling = 1.0
+
         self.mmldoccache.setFontName( qtmml.QtMmlWidget.NormalFont,
                                       font.family() )
         self.mmldoccache.setBaseFontPointSize(
-            s.Text.get('size').convertPts(painter) * phelper.dpi[0]/72. )
-        size = self.mmldoccache.size()
+            s.Text.get('size').convertPts(rcpaint))
+
+        drawscale = painter.scaling * painter.dpi / screendev.logicalDpiY()
+        size = self.mmldoccache.size() * drawscale
 
         # do alignment
         if s.alignHorz == 'centre':
@@ -130,15 +139,15 @@ class TextLabel(plotters.FreePlotter):
 
         # do painting to a device with screen resolution
         # this is assumed by the mml rendering code
-        screendev = qt4.QApplication.desktop()
-        rc = recordpaint.RecordPaintDevice(
-            1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
-        rcpaint = qt4.QPainter(rc)
-        self.mmldoccache.paint(rcpaint, qt4.QPoint(x, y))
+        self.mmldoccache.paint(rcpaint, qt4.QPoint(0, 0))
         rcpaint.end()
 
+        painter.save()
+        painter.translate(x, y)
+        painter.scale(drawscale, drawscale)
         # replay back to painter
         rc.play(painter)
+        painter.restore()
 
         # bounds for control
         tbounds = [x, y, x+size.width(), y+size.height()]

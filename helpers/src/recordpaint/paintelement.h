@@ -20,11 +20,12 @@
 #define PAINTELEMENT_H
 
 class QPainter;
+class QTransform;
 
 class PaintElement {
 public:
   virtual ~PaintElement() {};
-  virtual void paint(QPainter& painter) = 0;
+  virtual void paint(QPainter& painter, const QTransform& origtransform) = 0;
 };
 
 #endif

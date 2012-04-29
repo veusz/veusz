@@ -69,8 +69,9 @@ int RecordPaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
 
 void RecordPaintDevice::play(QPainter& painter)
 {
+  QTransform origtransform(painter.worldTransform());
   foreach(PaintElement* el, _elements)
     {
-      el->paint(painter);
+      el->paint(painter, origtransform);
     }
 }
