@@ -17,7 +17,6 @@
 ###############################################################################
 
 import numpy as N
-import veusz.qtall as qt4
 
 # use fast or slow helpers
 slowfuncs = False
