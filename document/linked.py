@@ -23,17 +23,16 @@ import sys
 
 import veusz.utils as utils
 
-import operations
-
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
-
-    # operation to recreate dataset
-    create_operation = None
 
     def __init__(self, params):
         """Save parameters."""
         self.params = params
+
+    def createOperation(self):
+        """Return operation to recreate self."""
+        return None
 
     @property
     def filename(self):
@@ -82,7 +81,7 @@ class LinkedFileBase(object):
         """Reload links using an operation"""
 
         # get the operation for reloading
-        op = self.create_operation(self.params)
+        op = self.createOperation()(self.params)
 
         # load data into a temporary document
         tempdoc = document.__class__()
@@ -117,7 +116,10 @@ class LinkedFile(LinkedFileBase):
     This class is used to store a link filename with the descriptor
     """
 
-    create_operation = operations.OperationDataImport
+    def createOperation(self):
+        """Return operation to recreate self."""
+        import operations
+        return operations.OperationDataImport
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file.
@@ -144,7 +146,10 @@ class LinkedFile(LinkedFileBase):
 class LinkedFile2D(LinkedFileBase):
     """Class representing a file linked to a 2d dataset."""
 
-    create_operation = operations.OperationDataImport2D
+    def createOperation(self):
+        """Return operation to recreate self."""
+        import operations
+        return operations.OperationDataImport2D
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
@@ -163,7 +168,10 @@ class LinkedFile2D(LinkedFileBase):
 class LinkedFileFITS(LinkedFileBase):
     """Links a FITS file to the data."""
 
-    create_operation = operations.OperationDataImportFITS
+    def createOperation(self):
+        """Return operation to recreate self."""
+        import operations
+        return operations.OperationDataImportFITS
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
@@ -184,7 +192,10 @@ class LinkedFileFITS(LinkedFileBase):
 class LinkedFileCSV(LinkedFileBase):
     """A CSV file linked to datasets."""
 
-    create_operation = operations.OperationDataImportCSV
+    def createOperation(self):
+        """Return operation to recreate self."""
+        import operations
+        return operations.OperationDataImportCSV
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
@@ -204,7 +215,10 @@ class LinkedFileCSV(LinkedFileBase):
 class LinkedFilePlugin(LinkedFileBase):
     """Represent a file linked using an import plugin."""
 
-    create_operation = operations.OperationDataImportPlugin
+    def createOperation(self):
+        """Return operation to recreate self."""
+        import operations
+        return operations.OperationDataImportPlugin
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the vsz document file."""
