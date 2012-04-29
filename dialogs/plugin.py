@@ -22,7 +22,6 @@ import sys
 from itertools import izip
 
 import veusz.qtall as qt4
-import veusz.utils as utils
 import veusz.document as document
 import veusz.plugins as plugins
 import exceptiondialog

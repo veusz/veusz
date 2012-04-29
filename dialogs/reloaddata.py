@@ -24,7 +24,6 @@ import os
 
 import veusz.qtall as qt4
 import veusz.document as document
-import veusz.utils as utils
 from veuszdialog import VeuszDialog
 
 class ReloadData(VeuszDialog):

@@ -17,7 +17,6 @@
 ##############################################################################
 
 import veusz.qtall as qt4
-import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
 
@@ -112,7 +111,7 @@ class HistoDataDialog(VeuszDialog):
     def datasetExprChanged(self):
         """Validate expression."""
         text = self.indataset.text()
-        res = document.simpleEvalExpression(self.document, unicode(text))
+        document.simpleEvalExpression(self.document, unicode(text))
 
     class Params(object):
         """Parameters to creation of histogram."""

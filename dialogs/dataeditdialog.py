@@ -20,12 +20,9 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
-import bisect
-
 import veusz.qtall as qt4
 
 import veusz.document as document
-import veusz.utils as utils
 from veusz.qtwidgets.datasetbrowser import DatasetBrowser
 from veuszdialog import VeuszDialog
 

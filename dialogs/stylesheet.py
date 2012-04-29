@@ -19,7 +19,6 @@
 import veusz.utils as utils
 import veusz.qtall as qt4
 import veusz.document as document
-import veusz.setting as setting
 from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList, \
     SettingsProxySingle
 from veuszdialog import VeuszDialog
@@ -87,7 +86,6 @@ class StylesheetDialog(VeuszDialog):
         if self.properties:
             self.properties.deleteLater()
 
-        style = str(current.text())
         settings = current.VZsettings
 
         # update formatting properties

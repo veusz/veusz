@@ -19,7 +19,6 @@
 """Dialog to show if there is an error loading."""
 
 import veusz.qtall as qt4
-import veusz.utils as utils
 from veuszdialog import VeuszDialog
 
 class ErrorLoadingDialog(VeuszDialog):

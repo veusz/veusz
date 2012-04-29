@@ -19,7 +19,6 @@
 """Veusz data capture dialog."""
 
 import veusz.qtall as qt4
-import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
 from veuszdialog import VeuszDialog

@@ -21,8 +21,6 @@
 
 """About dialog module."""
 
-import os.path
-
 import veusz.qtall as qt4
 import veusz.utils as utils
 from veuszdialog import VeuszDialog

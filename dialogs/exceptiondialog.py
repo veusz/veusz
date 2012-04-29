@@ -20,7 +20,6 @@
 This allows the user to send a bug report in via email.'''
 
 import sys
-import os.path
 import time
 import traceback
 import urllib2

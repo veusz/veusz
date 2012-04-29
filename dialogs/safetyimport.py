@@ -57,7 +57,7 @@ class SafetyImportDialog(qt4.QMessageBox):
         # when loading the document the busy cursor is on, this gets
         # rid of it for a while
         qt4.qApp.setOverrideCursor(qt4.QCursor(qt4.Qt.ArrowCursor))
-        retn = qt4.QMessageBox.exec_(self)
+        qt4.QMessageBox.exec_(self)
         qt4.qApp.restoreOverrideCursor()
 
         b = self.clickedButton()
