@@ -1591,7 +1591,6 @@ class Datasets(MultiSettingWidget):
 
         MultiSettingWidget.onModified(self, mod)
 
-        s = self.setting
         datasets = self.getDatasets()
 
         if self.lastdatasets == datasets:
