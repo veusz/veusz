@@ -61,10 +61,6 @@ class Settings(object):
         """Is this object a widget?"""
         return False
 
-    def getSettingsNames(self):
-        """Get a list of names of settings."""
-        return self.setnames
-
     def getList(self):
         """Get a list of setting or settings types."""
         return [self.setdict[n] for n in self.setnames]

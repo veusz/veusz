@@ -1525,10 +1525,6 @@ class WidgetChoice(Str):
         except KeyError:
             return None
 
-    def copy(self):
-        """Make a copy of the setting."""
-        return self._copyHelper((), (), {})
-
     def makeControl(self, *args):
         """Allows user to choose an image widget or enter a name."""
         return controls.WidgetChoice(self, self.getDocument(), *args)

@@ -168,7 +168,6 @@ class _SettingDB(object):
             s.setValue(cleankey, qt4.QVariant(repr(value)))
 
         # now remove all the values which have been removed
-        remove = []
         for key in list(s.childKeys()):
             if unicode(key) not in cleankeys:
                 s.remove(key)
