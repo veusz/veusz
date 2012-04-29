@@ -33,14 +33,12 @@ import veusz.embed as embed
 import veusz.plugins as plugins
 import veusz.utils as utils
 
-import linked
 import importparams
 import datasets
 import operations
 import dataset_histo
 import mime
 import export
-import readcsv
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
@@ -274,11 +272,11 @@ class CommandInterface(qt4.QObject):
         # do the work
         op = operations.OperationDatasetPlugin(plugin, fields,
                                                datasetnames=datasetnames)
-        datasets = self.document.applyOperation(op)
+        outdatasets = self.document.applyOperation(op)
 
         if self.verbose:
             print "Used dataset plugin %s to make datasets %s" % (
-                pluginname, ', '.join(datasets))
+                pluginname, ', '.join(outdatasets))
 
     def Remove(self, name):
         """Remove a widget from the dataset."""

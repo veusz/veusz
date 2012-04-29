@@ -149,7 +149,7 @@ class Document( qt4.QObject ):
     def makeDefaultDoc(self):
         """Add default widgets to create document."""
         page = widgetfactory.thefactory.makeWidget('page', self.basewidget)
-        graph = widgetfactory.thefactory.makeWidget('graph', page)
+        widgetfactory.thefactory.makeWidget('graph', page)
         self.setModified()
         self.setModified(False)
         self.changeset = 0
@@ -392,7 +392,7 @@ class Document( qt4.QObject ):
         for plugin in pluginlist:
             try:
                 execfile(plugin, dict())
-            except Exception, ex:
+            except Exception:
                 err = ('Error loading plugin ' + plugin + '\n\n' +
                        traceback.format_exc())
                 qt4.QMessageBox.critical(None, "Error loading plugin", err)
@@ -712,7 +712,7 @@ class Document( qt4.QObject ):
             if not m:
                 self.log( "Invalid function specification '%s'" % name )
                 return
-            name = funcname = m.group(1)
+            name = m.group(1)
             args = m.group(2)
             defn = 'lambda %s: %s' % (args, val)
 

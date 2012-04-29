@@ -23,7 +23,6 @@ Requires: PyQt-x11-gpl-4.6-snapshot-20090906.tar.gz
           pyemf
 """
 
-import sys
 import struct
 
 import pyemf

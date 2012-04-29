@@ -28,7 +28,6 @@ because some operations cannot restore references (e.g. add object)
 
 import os.path
 from itertools import izip
-from collections import defaultdict
 
 import numpy as N
 
@@ -36,8 +35,6 @@ import datasets
 import widgetfactory
 import simpleread
 import readcsv
-import importparams
-import datasets
 import linked
 
 import veusz.utils as utils
@@ -1051,7 +1048,6 @@ class OperationDataImportFITS(OperationDataImportBase):
         p = self.params
         f = pyfits.open( str(p.filename), 'readonly')
         hdu = f[p.hdu]
-        data = hdu.data
 
         try:
             # raise an exception if this isn't a table therefore is an image
@@ -1431,7 +1427,6 @@ class OperationLoadStyleSheet(OperationMultiple):
 
         # fire up interpreter to read file
         interpreter = commandinterpreter.CommandInterpreter(document)
-        e = None
         try:
             interpreter.runFile( open(self.filename) )
         except:

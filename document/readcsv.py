@@ -168,7 +168,7 @@ class ReadCSV(object):
             return 'float'
         m = self.datere.match(val)
         try:
-            v = utils.dateREMatchToDate(m)
+            utils.dateREMatchToDate(m)
             return 'date'
         except ValueError:
             return 'string'

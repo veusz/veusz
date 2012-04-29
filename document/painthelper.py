@@ -21,7 +21,6 @@
 
 import veusz.qtall as qt4
 import veusz.setting as setting
-import veusz.utils as utils
 
 try:
     from veusz.helpers.recordpaint import RecordPaintDevice

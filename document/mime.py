@@ -188,7 +188,7 @@ class OperationWidgetPaste(operations.OperationMultiple):
         names = [eval(name) for name in names]
         if self.newnames is not None:
             names = self.newnames
-        paths = lines[3:3+4*numwidgets:4] # (not required here)
+        # paths = lines[3:3+4*numwidgets:4] (not required here)
         widgetslines = lines[4:4+4*numwidgets:4]
         widgetslines = [int(x) for x in widgetslines]
 

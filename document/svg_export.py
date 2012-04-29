@@ -19,7 +19,6 @@
 """A home-brewed SVG paint engine for doing svg with clipping
 and exporting text as paths for WYSIWYG."""
 
-import sys
 import re
 import veusz.qtall as qt4
 

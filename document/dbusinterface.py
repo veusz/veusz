@@ -18,6 +18,7 @@
 
 """DBus interface to Veusz document."""
 
+import numpy as N
 import veusz.utils.vzdbus as vzdbus
 import commandinterpreter
 
@@ -151,7 +152,7 @@ class DBusInterface(vzdbus.Object):
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ssa{sv}')
-    def ImportFileCSV(self, plugin, filename, optargs):
+    def ImportFilePlugin(self, plugin, filename, optargs):
         self.ci.ImportFilePlugin(plugin, filename, **optargs)
 
     @vzdbus.method(dbus_interface=interface,
@@ -243,11 +244,6 @@ class DBusInterface(vzdbus.Object):
     def SetDataText(self, name, val):
         val = [unicode(x) for x in val]
         self.ci.SetDataText(unicode(name), val)
-
-    @vzdbus.method(dbus_interface=interface,
-                   in_signature='ss')
-    def SetToReference(self, var, val):
-        self.ci.SetToReference(var, val)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sas')

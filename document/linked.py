@@ -20,12 +20,10 @@
 """Classes for linked files"""
 
 import sys
-from itertools import izip
 
 import veusz.utils as utils
 
 import operations
-import simpleread
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
@@ -59,10 +57,6 @@ class LinkedFileBase(object):
         if sys.platform == 'win32':
             f = f.replace('\\', '/')
         return f
-
-    def reloadLinks(self, document):
-        """Reload datasets linked to this file."""
-        pass
 
     def _deleteLinkedDatasets(self, document):
         """Delete linked datasets from document linking to self."""

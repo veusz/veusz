@@ -27,7 +27,6 @@ import numpy as N
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
-import veusz.plugins as plugins
 
 def _convertNumpy(a):
     """Convert to a numpy double if possible."""
@@ -1519,9 +1518,6 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset.__init__(self, data=[])
-
-    def __getitem__(self, key):
-        return Dataset(**self._getItemHelper(key))
 
     def userSize(self):
         """Size of dataset."""
