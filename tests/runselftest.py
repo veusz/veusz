@@ -189,7 +189,7 @@ def fltStr(v, prec=1):
     return oldflt(v, prec=prec)
 
 if __name__ == '__main__':
-    os.environ['LANG'] = 'C'
+    os.environ['LC_ALL'] = 'C'
 
     app = qt4.QApplication([])
 
