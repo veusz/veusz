@@ -183,6 +183,7 @@ def run():
         # show the splash screen on normal start
         splash = qt4.QSplashScreen(makeSplashLogo())
         splash.show()
+        splash.showMessage(" ")
         app.processEvents()
 
     # import these after showing splash screen so we don't
