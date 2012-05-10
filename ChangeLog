@@ -1,3 +1,16 @@
+Changes in 1.16:
+ * Experimental MathML support
+ * Support for *args and **kwargs for custom functions
+ * Add upper/lower-left/right arrows
+ * Add options to clip text/lines/shapes to graphs
+
+Bug fixes:
+ * Workaround for splash screen problem
+ * Fix numerous problems reported by pyflakes
+ * Histograms fail when saved
+ * Fix plot with nan functions
+ * Fix failure of self tests on ARM platforms
+
 Changes in 1.15:
  * Improved hatching:
     - More hatch styles

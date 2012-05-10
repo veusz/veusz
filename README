@@ -1,4 +1,4 @@
-Veusz 1.15
+Veusz 1.16
 ----------
 Velvet Ember Under Sky Zenith
 -----------------------------
@@ -20,56 +20,18 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.15:
- * Improved hatching:
-    - More hatch styles
-    - Adjust spacing of hatching
-    - Change hatching line style
-    - Allow hatching background color
- * Axes will not extend beyond specified min and max values
- * Add options to extend axes by 2, 5, 10 and 15% of data range
- * Ctrl+MouseWheel zooms in and out of plot
- * Full screen graph view mode
- * New dataset plugins
-    - Linear interpolation
-    - Cumulative value
-    - Rolling average
-    - Subtract mean / minimum
- * Allow grid widgets to be placed in grid widgets
- * Catch EnvironmentError exceptions on Windows
- * Allow multiple datasets to be selected in dataset browser
- * Allow tagging of datasets and allow datasets be grouped by tags
-   in dataset browser
- * Allow text to be written as text in SVG, rather than curves
- * Add DBus interface to program, if DBus is installed
- * 2D QDP support
- * Add setup.py options for packagers
-    --veusz-resource-dir : location of data files
-    --disable-install-docs
- * Add title option for keys
-
-Minor changes:
- * Use / rather than \ for path separator in saved file names for
-   Windows/Unix compatibility
- * Add diamond fill error bar type
- * Add \color and \marker commands to text renderer
- * Support labels on xy datasets if one of x or y datasets missing
- * Reorganise dataset plugin menu
- * Fix links in INSTALL/README
- * Floating point intervals in capture dialog
+Changes in 1.16:
+ * Experimental MathML support
+ * Support for *args and **kwargs for custom functions
+ * Add upper/lower-left/right arrows
+ * Add options to clip text/lines/shapes to graphs
 
 Bug fixes:
- * Trap case where nan values could be plotted
- * Fix error if website not accessible in exception dialog
- * Crash when min and max of axes are too similar
- * Fix clipping of paths after transform in SVG files
- * Fix crash in picker
- * Fix crash if duplication of characters in CSV date format
- * Fix crash in tool tip in dataset browser
- * Fix GlobalColor error (on certain dark color sets)
- * Fix blocked data import if no descriptor
- * Fix crash if log contours and minimum is zero
- * Bug fix https://bugzilla.redhat.com/show_bug.cgi?id=800196
+ * Workaround for splash screen problem
+ * Fix numerous problems reported by pyflakes
+ * Histograms fail when saved
+ * Fix plot with nan functions
+ * Fix failure of self tests on ARM platforms
 
 Features of package:
  * X-Y plots (with errorbars)
