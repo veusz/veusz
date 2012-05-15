@@ -29,7 +29,7 @@ class AboutDialog(VeuszDialog):
     """About dialog."""
 
     def __init__(self, mainwindow):
-        VeuszDialog.__init__(self, mainwindow, 'about.ui')
+        VeuszDialog.__init__(self, mainwindow, 'about.ui', modal=True)
 
         # draw logo in dialog
         self.frame.setBackgroundRole(qt4.QPalette.Base)
