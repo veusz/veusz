@@ -26,7 +26,7 @@ class PreferencesDialog(VeuszDialog):
 
     def __init__(self, mainwindow):
         """Setup dialog."""
-        VeuszDialog.__init__(self, mainwindow, 'preferences.ui')
+        VeuszDialog.__init__(self, mainwindow, 'preferences.ui', modal=True)
 
         self.plotwindow = mainwindow.plot
 
