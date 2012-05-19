@@ -84,7 +84,7 @@ class BarPlotter(GenericPlotter):
                                     descr='Dataset or string to label bars',
                                     usertext='Labels', datatype='text'), 5 )
 
-        s.add( setting.Choice('mode', ('grouped', 'stacked'), 
+        s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'), 
                               'grouped', 
                               descr='Show datasets grouped '
                               'together or as a single bar', 
@@ -358,6 +358,35 @@ class BarPlotter(GenericPlotter):
                                dataset['data'], dataset,
                                axes, widgetposn)
 
+    def calcStackedPoints(self, dsvals, axis, widgetposn):
+        """Calculate stacked dataset coordinates for plotting."""
+
+        # keep track of last most negative or most positive values in bars
+        poslen = len(dsvals[0]['data'])
+        lastneg = N.zeros(poslen)
+        lastpos = N.zeros(poslen)
+
+        # returned stacked values and coordinates
+        stackedvals = []
+        stackedcoords = []
+
+        for dsnum, data in enumerate(dsvals):
+            # add on value to last value in correct direction
+            data = data['data']
+            new = N.where(data < 0., lastneg+data, lastpos+data)
+
+            # work out maximum extents for next time
+            lastneg = N.min( N.vstack((lastneg, new)), axis=0 )
+            lastpos = N.max( N.vstack((lastpos, new)), axis=0 )
+
+            # convert values to plotter coordinates
+            newplt = axis.dataToPlotterCoords(widgetposn, new)
+
+            stackedvals.append(new)
+            stackedcoords.append(newplt)
+
+        return stackedvals, stackedcoords
+
     def barDrawStacked(self, painter, posns, maxwidth, dsvals,
                        axes, widgetposn, clip):
         """Draw each dataset in a single bar."""
@@ -367,47 +396,90 @@ class BarPlotter(GenericPlotter):
         # get positions of groups of bars
         barwidth = maxwidth * s.barfill
 
+        # get axis which values are plotted along
         ishorz = s.direction == 'horizontal'
+        vaxis = axes[not ishorz]
 
-        # keep track of last most negative or most positive values in bars
-        poslen = len(posns)
-        lastneg = N.zeros(poslen)
-        lastpos = N.zeros(poslen)
+        # compute stacked coordinates
+        stackedvals, stackedcoords = self.calcStackedPoints(
+            dsvals, vaxis, widgetposn)
+        # coordinates of origin
+        zerocoords = vaxis.dataToPlotterCoords(widgetposn, N.zeros(posns.shape))
 
-        # keep track of bars for error bars
-        barvals = []
-        for dsnum, data in enumerate(dsvals):
-            # add on value to last value in correct direction
-            data = data['data']
-            last = N.where(data < 0., lastneg, lastpos)
-            new = N.where(data < 0., lastneg+data, lastpos+data)
+        # positions of bar perpendicular to bar direction
+        posns1 = posns - barwidth*0.5
+        posns2 = posns1 + barwidth
 
-            # work out maximum extents for next time
-            lastneg = N.min( N.vstack((lastneg, new)), axis=0 )
-            lastpos = N.max( N.vstack((lastpos, new)), axis=0 )
-
-            # convert values to plotter coordinates
-            lastplt = axes[not ishorz].dataToPlotterCoords(
-                widgetposn, last)
-            newplt = axes[not ishorz].dataToPlotterCoords(
-                widgetposn, new)
-
-            # positions of bar perpendicular to bar direction
-            posns1 = posns - barwidth*0.5
-            posns2 = posns1 + barwidth 
-
+        # draw bars (reverse order, so edges are plotted correctly)
+        for dsnum, coords in izip( xrange(len(stackedcoords)-1, -1, -1),
+                                   stackedcoords[::-1]):
             # we iterate over each of these coordinates
             if ishorz:
-                p = (lastplt, posns1, newplt, posns2)
+                p = (zerocoords, posns1, coords, posns2)
             else:
-                p = (posns1, lastplt, posns2, newplt)
-
+                p = (posns1, zerocoords, posns2, coords)
             self.plotBars(painter, s, dsnum, clip, p)
 
-            barvals.append(new)
+        # draw error bars
+        for barval, dsval in izip(stackedvals, dsvals):
+            self.drawErrorBars(painter, posns, barwidth,
+                               barval, dsval,
+                               axes, widgetposn)
 
-        for barval, dsval in izip(barvals, dsvals):
-            # draw error bars
+    def areaDrawStacked(self, painter, posns, maxwidth, dsvals,
+                        axes, widgetposn, clip):
+        """Draw a stacked area plot"""
+
+        s = self.settings
+
+        # get axis which values are plotted along
+        ishorz = s.direction == 'horizontal'
+        vaxis = axes[not ishorz]
+
+        # compute stacked coordinates
+        stackedvals, stackedcoords = self.calcStackedPoints(
+            dsvals, vaxis, widgetposn)
+        # coordinates of origin
+        zerocoords = vaxis.dataToPlotterCoords(widgetposn, N.zeros(posns.shape))
+
+        # draw areas (reverse order, so edges are plotted correctly)
+        for dsnum, coords in izip( xrange(len(stackedcoords)-1, -1, -1),
+                                   stackedcoords[::-1]):
+
+            # add points at end to make polygon
+            p1 = N.hstack( [ [zerocoords[0]], coords, [zerocoords[-1]] ] )
+            p2 = N.hstack( [ [posns[0]], posns, [posns[-1]] ] )
+
+            # construct polygon on path, clipped
+            poly = qt4.QPolygonF()
+            if ishorz:
+                utils.addNumpyToPolygonF(poly, p1, p2)
+            else:
+                utils.addNumpyToPolygonF(poly, p2, p1)
+            clippoly = qt4.QPolygonF()
+            utils.polygonClip(poly, clip, clippoly)
+            path = qt4.QPainterPath()
+            path.addPolygon(clippoly)
+            path.closeSubpath()
+
+            # actually draw polygon
+            brush = s.BarFill.get('fills').returnBrushExtended(dsnum)
+            utils.brushExtFillPath(painter, brush, path)
+
+            # now draw lines
+            poly = qt4.QPolygonF()
+            if ishorz:
+                utils.addNumpyToPolygonF(poly, coords, posns)
+            else:
+                utils.addNumpyToPolygonF(poly, posns, coords)
+
+            pen = s.BarLine.get('lines').makePen(painter, dsnum)
+            painter.setPen(pen)
+            utils.plotClippedPolyline(painter, clip, poly)
+
+        # draw error bars
+        barwidth = maxwidth * s.barfill
+        for barval, dsval in izip(stackedvals, dsvals):
             self.drawErrorBars(painter, posns, barwidth,
                                barval, dsval,
                                axes, widgetposn)
@@ -486,6 +558,7 @@ class BarPlotter(GenericPlotter):
 
         # actually do the drawing
         fn = {'stacked': self.barDrawStacked,
+              'stacked-area': self.areaDrawStacked,
               'grouped': self.barDrawGroup}[s.mode]
         fn(painter, barposns, maxwidth, dsvals, axes, widgetposn, clip)
 
