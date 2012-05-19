@@ -111,6 +111,31 @@ def _raiseIgnoreException():
     """Ignore this exception to clear out stack frame of previous exception."""
     raise utils.IgnoreException()
 
+def formatLocals(exception):
+    """Return local variables."""
+
+    tb = exception[2]
+    outlines = []
+    while tb:
+        frame = tb.tb_frame
+        tb = tb.tb_next
+
+        outlines.append('')
+        outlines.append('Frame %s (File %s, line %s)' %
+                        (frame.f_code.co_name,
+                         frame.f_code.co_filename,
+                         frame.f_lineno))
+
+        # get local variables for frame
+        for key, value in frame.f_locals.iteritems():
+            try:
+                v = repr(value)
+            except:
+                v = "<???>"
+            outlines.append(' %s = %s' % (key, v))
+
+    return '\n'.join(outlines)
+
 class ExceptionDialog(VeuszDialog):
     """Choose an exception to send to developers."""
     
@@ -120,8 +145,10 @@ class ExceptionDialog(VeuszDialog):
 
         VeuszDialog.__init__(self, parent, 'exceptionlist.ui')
 
-        # create backtrace text from exception, and add to list
-        self.backtrace = ''.join(traceback.format_exception(*exception)).strip()
+        # get text for traceback and locals
+        self.backtrace = ( ''.join(traceback.format_exception(*exception)) +
+                           formatLocals(exception) )
+
         self.errortextedit.setPlainText(self.backtrace)
 
         # set critical pixmap to left of dialog
