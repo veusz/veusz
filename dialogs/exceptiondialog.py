@@ -114,6 +114,8 @@ def _raiseIgnoreException():
 def formatLocals(exception):
     """Return local variables."""
 
+    alreadyself = set()
+
     tb = exception[2]
     outlines = []
     while tb:
@@ -128,11 +130,27 @@ def formatLocals(exception):
 
         # get local variables for frame
         for key, value in frame.f_locals.iteritems():
+            # print out variables in frame
             try:
                 v = repr(value)
             except:
-                v = "<???>"
+                v = '<???>'
+            if len(v) > 128:
+                v = v[:120] + '...'
             outlines.append(' %s = %s' % (key, v))
+
+            # print out attributes if item is self
+            if key == 'self' and value not in alreadyself:
+                alreadyself.add(value)
+                for sattr, svalue in value.__dict__.iteritems():
+                    try:
+                        sv = repr(svalue)
+                    except:
+                        sv = '<???>'
+                    if len(sv) > 128:
+                        sv = sv[:120] + '...'
+
+                    outlines.append('  self.%s = %s' % (sattr, sv))
 
     return '\n'.join(outlines)
 
