@@ -27,6 +27,7 @@ Changes in 1.16:
  * Add options to clip text/lines/shapes to graphs
  * Add stacked-area option to bar plot widget
  * Draw stacked bar plots top-down for better overlapping line behaviour
+ * Axis labels can be placed at left or right of axes, in addition to centre
 
 Bug fixes:
  * Workaround for splash screen problem

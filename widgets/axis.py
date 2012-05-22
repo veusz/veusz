@@ -116,6 +116,12 @@ class AxisLabel(setting.Text):
                                       descr = 'Additional offset of axis label'
                                       ' from axis tick labels',
                                       usertext='Label offset') )
+        self.add( setting.Choice(
+                'position',
+                ('at-minimum', 'centre', 'at-maximum'),
+                'centre',
+                descr = 'Position of axis label',
+                usertext = 'Position') )
 
 class TickLabel(setting.Text):
     """For tick labels on axes."""
@@ -841,14 +847,23 @@ class Axis(widget.Widget):
             return
 
         horz = s.direction == 'horizontal'
-        if not horz:
-            ax, ay = 1, 0
+
+        align1 = 1
+        align2 = {'centre': 0,
+                  'at-minimum': -1,
+                  'at-maximum': 1}[sl.position]
+
+        if horz:
+            ax, ay = align2, align1
         else:
-            ax, ay = 0, 1
+            ax, ay = align1, align2
 
         reflected = self.coordReflected
         if reflected:
-            ax, ay = -ax, -ay
+            if horz:
+                ay = -ay
+            else:
+                ax = -ax
 
         # angle of text (logic is slightly complex)
         angle = int(sl.rotate)
@@ -861,7 +876,13 @@ class Axis(widget.Widget):
                 angle = 360-angle
         angle = angle % 360
 
-        x = 0.5*(self.coordParr1 + self.coordParr2)
+        if sl.position == 'centre':
+            x = 0.5*(self.coordParr1 + self.coordParr2)
+        elif sl.position == 'at-minimum':
+            x = self.coordParr1
+        else:
+            x = self.coordParr2
+
         y = self.coordPerp + sign*(self._delta_axis+al_spacing)
         if not horz:
             x, y = y, x
