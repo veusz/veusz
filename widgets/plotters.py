@@ -170,12 +170,15 @@ class FreePlotter(widget.Widget):
                             descr = 'Name of Y-axis to use',
                             usertext='Y axis') )
 
-    def _getPlotterCoords(self, posn):
-        """Calculate coordinates from relative or axis positioning."""
+    def _getPlotterCoords(self, posn, xsetting='xPos', ysetting='yPos'):
+        """Calculate coordinates from relative or axis positioning.
+
+        xsetting and ysetting are the settings to get data from
+        """
 
         s = self.settings
-        xpos = s.get('xPos').getFloatArray(self.document)
-        ypos = s.get('yPos').getFloatArray(self.document)
+        xpos = s.get(xsetting).getFloatArray(self.document)
+        ypos = s.get(ysetting).getFloatArray(self.document)
         if xpos is None or ypos is None:
             return None, None
         if s.positioning == 'axes':

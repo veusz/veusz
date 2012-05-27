@@ -1828,10 +1828,10 @@ class ChoiceSwitch(Choice):
         Choice.__init__(self, name, vallist, value, **args)
 
     def makeControl(self, *args):
-        return controls.ChoiceSwitch(self, *args)
+        return controls.ChoiceSwitch(self, False, self.vallist, *args)
 
     def copy(self):
-        return self._copyHelper((self.vallist), (),
+        return self._copyHelper((self.vallist,), (),
                                 {'settingsfalse': self.sfalse,
                                  'settingstrue': self.strue,
                                  'showfn': self.showfn})
