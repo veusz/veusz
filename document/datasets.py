@@ -28,40 +28,39 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
 
-def _convertNumpy(a):
-    """Convert to a numpy double if possible."""
+def convertNumpy(a, dims=1):
+    """Convert to a numpy double if possible.
+
+    dims is number of dimensions to check for
+    """
     if a is None:
         # leave as None
         return None
-    elif not isinstance(a, N.ndarray):
-        # convert to numpy array
-        return N.array(a, dtype=N.float64)
-    else:
+    elif isinstance(a, N.ndarray):
         # make conversion if numpy type is not correct
         if a.dtype != N.float64:
-            return a.astype(N.float64)
-        else:
-            return a
+            a = a.astype(N.float64)
+    else:
+        # convert to numpy array
+        a = N.array(a, dtype=N.float64)
 
-def _convertNumpyAbs(a):
+    if len(a.shape) != dims:
+        raise ValueError, "Only %i-dimensional arrays or lists allowed" % dims
+    return a
+
+def convertNumpyAbs(a):
     """Convert to numpy 64 bit positive values, if possible."""
     if a is None:
         return None
-    if not isinstance(a, N.ndarray):
-        a = N.array(a, dtype=N.float64)
-    elif a.dtype != N.float64:
-        a = a.astype(N.float64)
-    return N.abs(a)
+    else:
+        return N.abs( convertNumpy(a) )
 
-def _convertNumpyNegAbs(a):
+def convertNumpyNegAbs(a):
     """Convert to numpy 64 bit negative values, if possible."""
     if a is None:
         return None
-    if not isinstance(a, N.ndarray):
-        a = N.array(a, dtype=N.float64)
-    elif a.dtype != N.float64:
-        a = a.astype(N.float64)
-    return -N.abs(a)
+    else:
+        return -N.abs( convertNumpy(a) )
 
 def _copyOrNone(a):
     """Return a copy if not None, or None."""
@@ -287,7 +286,7 @@ class Dataset2D(DatasetBase):
         # we don't want these set if a inheriting class uses properties instead
         if not hasattr(self, 'data'):
             try:
-                self.data = _convertNumpy(data)
+                self.data = convertNumpy(data, dims=2)
                 self.xrange = (0, self.data.shape[1])
                 self.yrange = (0, self.data.shape[0])
 
@@ -402,10 +401,10 @@ class Dataset(DatasetBase):
         DatasetBase.__init__(self, linked=linked)
 
         # convert data to numpy arrays
-        data = _convertNumpy(data)
-        serr = _convertNumpyAbs(serr)
-        perr = _convertNumpyAbs(perr)
-        nerr = _convertNumpyNegAbs(nerr)
+        data = convertNumpy(data)
+        serr = convertNumpyAbs(serr)
+        perr = convertNumpyAbs(perr)
+        nerr = convertNumpyNegAbs(nerr)
 
         # check the sizes of things match up
         s = data.shape
@@ -1132,7 +1131,7 @@ class Dataset2DXYZExpression(Dataset2D):
         """Initialise dataset.
 
         Parameters are mathematical expressions based on datasets."""
-        Dataset2D.__init__(self, [])
+        Dataset2D.__init__(self, None)
 
         self.lastchangeset = -1
         self.cacheddata = None
@@ -1388,7 +1387,7 @@ class Dataset2DXYFunc(Dataset2D):
         expr: expression of x and y
         """
 
-        Dataset2D.__init__(self, [])
+        Dataset2D.__init__(self, None)
 
         self.xstep = xstep
         self.ystep = ystep
