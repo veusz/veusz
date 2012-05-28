@@ -31,6 +31,8 @@ Changes in 1.16:
  * Line widget now has length-angle or point-to-point modes. Better support
    for only specifying some coordinates.
  * Exception dialog records more detailed traceback
+ * Use top level windows for non-modal dialogs, giving minimize in window
+   and no always-on-top behaviour
 
 Bug fixes:
  * Workaround for splash screen problem

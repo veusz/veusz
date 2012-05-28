@@ -32,16 +32,13 @@ class VeuszDialog(qt4.QDialog):
 
     def __init__(self, mainwindow, uifile, modal=False):
         """Initialise dialog given Veusz mainwindow and uifile for dialog.
-        If modal is False, add minimize, maximize and close buttons
+        If modal is False, base on a top level window instead
         """
 
-        flag = qt4.Qt.Dialog
-        if not modal:
-            flag |= ( qt4.Qt.CustomizeWindowHint |
-                      qt4.Qt.WindowTitleHint |
-                      qt4.Qt.WindowSystemMenuHint |
-                      qt4.Qt.WindowMinMaxButtonsHint |
-                      qt4.Qt.WindowCloseButtonHint )
+        if modal:
+            flag = qt4.Qt.Dialog
+        else:
+            flag = qt4.Qt.Window
 
         qt4.QDialog.__init__(self, mainwindow, flag)
         self.setAttribute(qt4.Qt.WA_DeleteOnClose)
