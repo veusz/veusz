@@ -57,22 +57,25 @@ class Root(widget.Widget):
         widget.Widget.addSettings(s)
         s.remove('hide')
 
-        s.add( setting.Distance('width',
-                                '15cm',
-                                descr='Width of the pages',
-                                usertext='Page width',
-                                formatting=True) )
-        s.add( setting.Distance('height',
-                                '15cm',
-                                descr='Height of the pages',
-                                usertext='Page height',
-                                formatting=True) )    
-        s.add( setting.Bool('englishlocale', False,
-                            descr='Use US/English number formatting for '
-                            'document',
-                            usertext='English locale',
-                            formatting=True) )
-            
+        s.add( setting.DistancePhysical(
+                'width',
+                '15cm',
+                descr='Width of the pages',
+                usertext='Page width',
+                formatting=True) )
+        s.add( setting.DistancePhysical(
+                'height',
+                '15cm',
+                descr='Height of the pages',
+                usertext='Page height',
+                formatting=True) )
+        s.add( setting.Bool(
+                'englishlocale', False,
+                descr='Use US/English number formatting for '
+                'document',
+                usertext='English locale',
+                formatting=True) )
+
     def changeLocale(self):
         """Update locale of document if changed by user."""
 

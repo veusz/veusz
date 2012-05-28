@@ -765,7 +765,7 @@ class Distance(Setting):
             return text
         else:
             raise InvalidType
-        
+
     def makeControl(self, *args):
         return controls.Distance(self, *args)
 
@@ -818,6 +818,20 @@ class DistancePt(Distance):
 
     def makeControl(self, *args):
         return controls.DistancePt(self, *args)
+
+class DistancePhysical(Distance):
+    """For physical distances (no fractional)."""
+
+    def isDist(self, val):
+        m = self.distre.match(val)
+        if m:
+            # disallow non-physical distances
+            if m.group(2) not in ('/', '', '%'):
+                return True
+        return False
+
+    def makeControl(self, *args):
+        return controls.Distance(self, *args, physical=True)
 
 class DistanceOrAuto(Distance):
     """A distance or the value Auto"""

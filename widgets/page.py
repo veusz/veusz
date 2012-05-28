@@ -193,16 +193,18 @@ class Page(widget.Widget):
         widget.Widget.addSettings(s)
         
         # page sizes are initially linked to the document page size
-        s.add( setting.Distance('width',
-                                setting.Reference('/width'),
-                                descr='Width of page',
-                                usertext='Page width',
-                                formatting=True) )
-        s.add( setting.Distance('height',
-                                setting.Reference('/height'),
-                                descr='Height of page',
-                                usertext='Page height',
-                                formatting=True) )
+        s.add( setting.DistancePhysical(
+                'width',
+                setting.Reference('/width'),
+                descr='Width of page',
+                usertext='Page width',
+                formatting=True) )
+        s.add( setting.DistancePhysical(
+                'height',
+                setting.Reference('/height'),
+                descr='Height of page',
+                usertext='Page height',
+                formatting=True) )
         
     def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""

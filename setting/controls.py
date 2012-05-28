@@ -495,10 +495,11 @@ class Distance(Choice):
     # remove spaces
     stripspcre = re.compile(r"\s")
 
-    def __init__(self, setting, parent, allowauto=False):
+    def __init__(self, setting, parent, allowauto=False, physical=False):
         '''Initialise with blank list, then populate with sensible units.'''
         Choice.__init__(self, setting, True, [], parent)
         self.allowauto = allowauto
+        self.physical = physical
         self.updateComboList()
         
     def updateComboList(self):
@@ -516,7 +517,9 @@ class Distance(Choice):
         # here are a list of possible different units the user can choose
         # between. should this be in utils?
         newitems = [ num+'pt', num+'cm', num+'mm',
-                     num+'in', num+'%', '1/'+num ]
+                     num+'in' ]
+        if not self.physical:
+            newitems += [ num+'%', '1/'+num ]
 
         if self.allowauto:
             newitems.insert(0, 'Auto')

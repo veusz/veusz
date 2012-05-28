@@ -30,6 +30,7 @@ Changes in 1.16:
  * Axis labels can be placed at left or right of axes, in addition to centre
  * Line widget now has length-angle or point-to-point modes. Better support
    for only specifying some coordinates.
+ * Exception dialog records more detailed traceback
 
 Bug fixes:
  * Workaround for splash screen problem
@@ -37,6 +38,9 @@ Bug fixes:
  * Histograms fail when saved
  * Fix plot with nan functions
  * Fix failure of self tests on ARM platforms
+ * Force pages/documents to have physical sizes
+ * Fix crash if deleting multiple datasets in data edit dialog
+ * Check dimensions of datasets in SetData
 
 Features of package:
  * X-Y plots (with errorbars)
