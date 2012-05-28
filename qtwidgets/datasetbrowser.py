@@ -642,6 +642,8 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                 name = node.datasetName()
         except IndexError:
             pass
+        if name not in self.doc.data:
+            name = None
         return name
 
 class DatasetBrowser(qt4.QWidget):
