@@ -265,7 +265,10 @@ class DescriptorPart(object):
                     if string_re.match(val):
                         # possible security issue:
                         # regular expression checks this is safe
-                        dat = eval(val)
+                        try:
+                            dat = eval(val)
+                        except:
+                            dat = val
                     else:
                         dat = val
                         
