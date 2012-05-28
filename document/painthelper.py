@@ -71,7 +71,7 @@ class PaintHelper(object):
         self.dpi = dpi
         self.scaling = scaling
         self.pixperpt = self.dpi[1] / 72.
-        self.pagesize = pagesize
+        self.pagesize = ( max(pagesize[0], 1), max(pagesize[1], 1) )
 
         # keep track of states of all widgets
         self.states = {}
