@@ -174,7 +174,8 @@ class VectorField(plotters.GenericPlotter):
         cliprect = self.clipAxesBounds(axes, posn)
         painter = phelper.painter(self, posn, clip=cliprect)
 
-        baselength = s.get('baselength').convert(painter)
+        # get base length (ensure > 0)
+        baselength = max(s.get('baselength').convert(painter), 1e-6)
 
         # try to be nice if the datasets don't match
         data1st, data2nd = data1.data, data2.data
