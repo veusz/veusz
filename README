@@ -33,6 +33,7 @@ Changes in 1.16:
  * Exception dialog records more detailed traceback
  * Use top level windows for non-modal dialogs, giving minimize in window
    and no always-on-top behaviour
+ * Zero length vectors and arrows in vector fields are not plotted
 
 Bug fixes:
  * Workaround for splash screen problem
@@ -45,6 +46,7 @@ Bug fixes:
  * Check dimensions of datasets in SetData
  * Handle better zero bytes in data files
  * Fix error if page size zero
+ * Fix error if vector baselength is zero
 
 Features of package:
  * X-Y plots (with errorbars)

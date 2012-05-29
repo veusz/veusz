@@ -226,9 +226,10 @@ class VectorField(plotters.GenericPlotter):
 
             for x, y, l, a, asize in itertools.izip(x2, y2, lengths, angles,
                                                     arrowsizes):
-                utils.plotLineArrow(painter, x, y, l, a, asize,
-                                    arrowleft=s.arrowfront,
-                                    arrowright=s.arrowback)
+                if l != 0.:
+                    utils.plotLineArrow(painter, x, y, l, a, asize,
+                                        arrowleft=s.arrowfront,
+                                        arrowright=s.arrowback)
                 
 # allow the factory to instantiate a vector field
 document.thefactory.register( VectorField )
