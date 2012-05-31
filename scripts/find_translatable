@@ -1,0 +1,136 @@
+#!/usr/bin/env python
+
+import argparse
+import ast
+import re
+import StringIO
+from collections import defaultdict
+
+from lxml import etree
+
+class TransError(RuntimeError):
+    """Raised if translation error."""
+    pass
+
+class String(object):
+    """A translatable string found."""
+    def __init__(self, string, filename=None, lineno=None, comment=None):
+        self.string = string
+        self.filename = filename
+        self.lineno = lineno
+        self.comment = comment
+
+class visitor(ast.NodeVisitor):
+    """A visitor which visits function calls and definitions in source."""
+
+    def __init__(self, filename, outstrings = None):
+        """filename is file being read
+        If set, mapping of context to Strings will be returned in outstrings."""
+
+        self.filename = filename
+        self.trfns = dict()
+
+        if outstrings is not None:
+            self.strings = outstrings
+        else:
+            self.strings = {}
+
+    def visit_Call(self, obj):
+        """Function call made."""
+
+        try:
+            fn = obj.func.id
+        except AttributeError:
+            # no name known
+            return
+
+        if fn in self.trfns:
+            if len(obj.args) not in (1, 2):
+                raise TransError, "Translatable function '%s' on line number %i requires 1 or 2 parameters" % (fn, obj.lineno)
+
+            for a in obj.args:
+                if not isinstance(a, ast.Str):
+                    raise TransError, "Parameters to translatable function '%s' on line number %i are not strings" % (fn, obj.lineno)
+
+            # context from here
+            context = self.trfns[fn]
+
+            # disambiguation
+            if len(obj.args) == 2:
+                comment = obj.args[1].s
+            else:
+                comment = None
+            text = obj.args[0].s
+
+            if context not in self.strings:
+                self.strings[context] = []
+            self.strings[context].append(
+                String(text, filename=self.filename, lineno=obj.lineno,
+                       comment=comment) )
+
+    def visit_FunctionDef(self, obj):
+        """Function definition made."""
+
+        docstring = ast.get_docstring(obj)
+        if docstring:
+            m = re.search(r'^@tr_context:\s*(.*)\s*$', docstring, re.MULTILINE)
+            if m:
+                name = obj.name
+                if name in self.trfns:
+                    raise TransError, "Duplicate translation function '%s' on line %i" % (name, obj.lineno)
+
+                context = m.group(1)
+                self.trfns[name] = context
+
+def find_strings(filename, retn):
+    with open(filename) as f:
+        source = f.read()
+
+    tree = ast.parse(source, filename)
+
+    v = visitor(filename, retn)
+    v.visit(tree)
+
+def write_new_ts(filename, contexts):
+    """Write a new output .ts file."""
+
+    nroot = etree.Element("TS")
+    nroot.set("version", "2.0")
+
+    for context, strings in sorted(contexts.iteritems()):
+        ncontext = etree.SubElement(nroot, "context")
+        nname = etree.SubElement(ncontext, "name")
+        nname.text = context
+
+        for s in sorted(strings, key=lambda s: s.lineno):
+            nmessage = etree.SubElement(ncontext, "message")
+            nlocation = etree.SubElement(nmessage, "location")
+            nlocation.set("filename", s.filename)
+            nlocation.set("line", str(s.lineno))
+            nsource = etree.SubElement(nmessage, "source")
+            nsource.text = s.string
+            ntranslation = etree.SubElement(nmessage, "translation")
+            ntranslation.set("type", "unfinished")
+
+    tree = etree.ElementTree(nroot)
+
+    with open(filename, "w") as f:
+        f.write('<?xml version="1.0" encoding="utf-8"?>\n')
+        f.write('<!DOCTYPE TS>\n')
+        tree.write(f, pretty_print=True)
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Find translatable strings in PyQt programs')
+    parser.add_argument('files', metavar='FILE', nargs='+',
+                        help='input source file')
+    args = parser.parse_args()
+
+    retn = {}
+    for infile in args.files:
+        find_strings(infile, retn)
+
+    write_new_ts('test.ts', retn)
+
+if __name__ == '__main__':
+    main()
