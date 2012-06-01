@@ -222,9 +222,11 @@ def update_ts(filename, contexts):
                 nlocation.set("filename", message.filename)
                 nlocation.set("line", str(message.lineno))
 
+                # this is the translation itself
                 ntranslation = nmessage.find("translation")
                 if ntranslation is None:
                     ntranslation = etree.SubElement("translation")
+                    ntranslation.set("type", "unfinished")
 
                 # unmark as obsolete, if appropriate
                 if ntranslation.get("type") == "obsolete":
