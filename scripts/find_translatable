@@ -12,7 +12,7 @@ class TransError(RuntimeError):
     """Raised if translation error."""
     pass
 
-class String(object):
+class Message(object):
     """A translatable string found."""
     def __init__(self, string, filename=None, lineno=None, comment=None):
         self.string = string
@@ -23,17 +23,17 @@ class String(object):
 class visitor(ast.NodeVisitor):
     """A visitor which visits function calls and definitions in source."""
 
-    def __init__(self, filename, outstrings = None):
+    def __init__(self, filename, outmessages = None):
         """filename is file being read
-        If set, mapping of context to Strings will be returned in outstrings."""
+        If set, mapping of context to Messages will be returned in outmessages."""
 
         self.filename = filename
         self.trfns = dict()
 
-        if outstrings is not None:
-            self.strings = outstrings
+        if outmessages is not None:
+            self.messages = outmessages
         else:
-            self.strings = {}
+            self.messages = {}
 
     def visit_Call(self, obj):
         """Function call made."""
@@ -46,11 +46,19 @@ class visitor(ast.NodeVisitor):
 
         if fn in self.trfns:
             if len(obj.args) not in (1, 2):
-                raise TransError, "Translatable function '%s' on line number %i requires 1 or 2 parameters" % (fn, obj.lineno)
+                sys.stderr.write(
+                    "Warning: translatable function '%s' on line number "
+                    "%i requires 1 or 2 parameters\n" %
+                    (fn, obj.lineno))
+                return
 
             for a in obj.args:
                 if not isinstance(a, ast.Str):
-                    raise TransError, "Parameters to translatable function '%s' on line number %i are not strings" % (fn, obj.lineno)
+                    sys.stderr.write(
+                        "Warnign: parameters to translatable function "
+                        "'%s' on line number %i are not "
+                        "strings\n" % (fn, obj.lineno))
+                    return
 
             # context from here
             context = self.trfns[fn]
@@ -62,11 +70,11 @@ class visitor(ast.NodeVisitor):
                 comment = None
             text = obj.args[0].s
 
-            if context not in self.strings:
-                self.strings[context] = []
-            self.strings[context].append(
-                String(text, filename=self.filename, lineno=obj.lineno,
-                       comment=comment) )
+            if context not in self.messages:
+                self.messages[context] = []
+            self.messages[context].append(
+                Message(text, filename=self.filename, lineno=obj.lineno,
+                        comment=comment) )
 
     def visit_FunctionDef(self, obj):
         """Function definition made."""
@@ -77,12 +85,17 @@ class visitor(ast.NodeVisitor):
             if m:
                 name = obj.name
                 if name in self.trfns:
-                    raise TransError, "Duplicate translation function '%s' on line %i" % (name, obj.lineno)
+                    sys.stderr.write(
+                        "Warnign: duplicate translation function '%s' "
+                        "on line %i\n" % (name, obj.lineno))
+                    return
 
                 context = m.group(1)
                 self.trfns[name] = context
 
 def find_strings(filename, retn):
+    """Update output in retn with strings in filename."""
+
     with open(filename) as f:
         source = f.read()
 
@@ -91,26 +104,57 @@ def find_strings(filename, retn):
     v = visitor(filename, retn)
     v.visit(tree)
 
+def add_message_to_context(ncontext, message):
+    """Given the context xml node, add a new message."""
+    nmessage = etree.SubElement(ncontext, "message")
+
+    # where the message is in the source
+    nlocation = etree.SubElement(nmessage, "location")
+    nlocation.set("filename", message.filename)
+    nlocation.set("line", str(message.lineno))
+
+    # original message
+    nsource = etree.SubElement(nmessage, "source")
+    nsource.text = message.string
+
+    if message.comment:
+        # the disambiguation
+        ncomment = etree.SubElement(nmessage, "comment")
+        ncomment.text = message.comment
+
+    # blank translated text
+    ntranslation = etree.SubElement(nmessage, "translation")
+    ntranslation.set("type", "unfinished")
+
+def add_context_to_root(nroot, contextname, messages):
+    """Add a new context tag to the root node given."""
+    ncontext = etree.SubElement(nroot, "context")
+    nname = etree.SubElement(ncontext, "name")
+    nname.text = contextname
+
+    # avoid writing message twice
+    done = set()
+
+    # iterate over messages in context
+    for msg in sorted(messages, key=lambda s: s.lineno):
+
+        # only write unique messages
+        k = (msg.string, msg.comment)
+        if k in done:
+            continue
+        done.add(k)
+
+        add_message_to_context(ncontext, msg)
+
 def write_new_ts(filename, contexts):
     """Write a new output .ts file."""
 
     nroot = etree.Element("TS")
     nroot.set("version", "2.0")
 
-    for context, strings in sorted(contexts.iteritems()):
-        ncontext = etree.SubElement(nroot, "context")
-        nname = etree.SubElement(ncontext, "name")
-        nname.text = context
-
-        for s in sorted(strings, key=lambda s: s.lineno):
-            nmessage = etree.SubElement(ncontext, "message")
-            nlocation = etree.SubElement(nmessage, "location")
-            nlocation.set("filename", s.filename)
-            nlocation.set("line", str(s.lineno))
-            nsource = etree.SubElement(nmessage, "source")
-            nsource.text = s.string
-            ntranslation = etree.SubElement(nmessage, "translation")
-            ntranslation.set("type", "unfinished")
+    # iterate over contexts and write them
+    for context, messages in sorted(contexts.iteritems()):
+        add_context_to_root(nroot, context, messages)
 
     tree = etree.ElementTree(nroot)
 
@@ -118,6 +162,88 @@ def write_new_ts(filename, contexts):
         f.write('<?xml version="1.0" encoding="utf-8"?>\n')
         f.write('<!DOCTYPE TS>\n')
         tree.write(f, pretty_print=True)
+
+def mark_obsolete(nmessage):
+    """Mark message as obsolete."""
+    # message no longer exists, so obsolete
+    ntranslation = nmessage.find("translation")
+    if ntranslation is None:
+        ntranslation = etree.SubElement(nmessage, "translation")
+    ntranslation.set("type", "obsolete")
+    # remove obsolete location
+    nlocation = nmessage.find("location")
+    if nlocation is not None:
+        nmessage.remove(nlocation)
+
+def update_ts(filename, contexts):
+    """Update an existing ts file with the contexts given."""
+
+    contexts = dict(contexts)
+
+    tree = etree.parse(filename)
+    nroot = tree.getroot()
+    if nroot.tag != 'TS':
+        sys.stderr.write('Root node in ts file is not TS\n')
+        return
+
+    # iterate over context nodes
+    processedcontexts = set()
+    for ncontext in nroot.getiterator(tag='context'):
+        try:
+            contextname = ncontext.find('name').text
+        except AttributeError:
+            continue
+        processedcontexts.add(contextname)
+
+        if contextname not in contexts:
+            # FIXME: make obselete in messages if context no longer exists?
+            continue
+
+        # make copy of messages to add/update in context
+        toprocess = {}
+        for message in contexts[contextname]:
+            toprocess[ (message.string, message.comment) ] = message
+
+        # iterate over message nodes
+        for nmessage in ncontext.getiterator(tag='message'):
+            source = nmessage.find('source').text
+            try:
+                comment = nmessage.find("comment").text
+            except AttributeError:
+                comment = None
+
+            key = (source, comment)
+            if key in toprocess:
+                # existing key, so update location
+                message = toprocess[key]
+                nlocation = nmessage.find("location")
+                if nlocation is None:
+                    nlocation = etree.SubElement(nmessage, "location")
+                nlocation.set("filename", message.filename)
+                nlocation.set("line", str(message.lineno))
+
+                ntranslation = nmessage.find("translation")
+                if ntranslation is None:
+                    ntranslation = etree.SubElement("translation")
+
+                # unmark as obsolete, if appropriate
+                if ntranslation.get("type") == "obsolete":
+                    ntranslation.set("type", "unfinished")
+
+                # don't need to add at end
+                del toprocess[key]
+            else:
+                mark_obsolete(nmessage)
+
+        # add remaining items in this context
+        for key, message in sorted(toprocess.iteritems()):
+            add_message_to_context(ncontext, message)
+
+    for context, messages in sorted(contexts.iteritems()):
+        if context not in processedcontexts:
+            add_context_to_root(nroot, context, messages)
+
+    tree.write(filename)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -130,7 +256,8 @@ def main():
     for infile in args.files:
         find_strings(infile, retn)
 
-    write_new_ts('test.ts', retn)
+    update_ts('test.ts', retn)
+    #write_new_ts('test.ts', retn)
 
 if __name__ == '__main__':
     main()
