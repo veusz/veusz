@@ -157,13 +157,12 @@ def write_new_ts(filename, contexts):
         add_context_to_root(nroot, context, messages)
 
     tree = etree.ElementTree(nroot)
-
     with open(filename, "w") as f:
         f.write('<?xml version="1.0" encoding="utf-8"?>\n')
         f.write('<!DOCTYPE TS>\n')
         tree.write(f, pretty_print=True)
 
-def mark_obsolete(nmessage):
+def mark_message_obsolete(nmessage):
     """Mark message as obsolete."""
     # message no longer exists, so obsolete
     ntranslation = nmessage.find("translation")
@@ -175,10 +174,26 @@ def mark_obsolete(nmessage):
     if nlocation is not None:
         nmessage.remove(nlocation)
 
+def update_message(nmessage, message):
+    """Update message node."""
+    nlocation = nmessage.find("location")
+    if nlocation is None:
+        nlocation = etree.SubElement(nmessage, "location")
+    nlocation.set("filename", message.filename)
+    nlocation.set("line", str(message.lineno))
+
+    # this is the translation itself
+    ntranslation = nmessage.find("translation")
+    if ntranslation is None:
+        ntranslation = etree.SubElement("translation")
+        ntranslation.set("type", "unfinished")
+
+    # unmark as obsolete, if appropriate
+    if ntranslation.get("type") == "obsolete":
+        ntranslation.set("type", "unfinished")
+
 def update_ts(filename, contexts):
     """Update an existing ts file with the contexts given."""
-
-    contexts = dict(contexts)
 
     tree = etree.parse(filename)
     nroot = tree.getroot()
@@ -214,37 +229,24 @@ def update_ts(filename, contexts):
 
             key = (source, comment)
             if key in toprocess:
-                # existing key, so update location
-                message = toprocess[key]
-                nlocation = nmessage.find("location")
-                if nlocation is None:
-                    nlocation = etree.SubElement(nmessage, "location")
-                nlocation.set("filename", message.filename)
-                nlocation.set("line", str(message.lineno))
-
-                # this is the translation itself
-                ntranslation = nmessage.find("translation")
-                if ntranslation is None:
-                    ntranslation = etree.SubElement("translation")
-                    ntranslation.set("type", "unfinished")
-
-                # unmark as obsolete, if appropriate
-                if ntranslation.get("type") == "obsolete":
-                    ntranslation.set("type", "unfinished")
+                # existing key, so update details
+                update_message(nmessage, toprocess[key])
 
                 # don't need to add at end
                 del toprocess[key]
             else:
-                mark_obsolete(nmessage)
+                mark_message_obsolete(nmessage)
 
         # add remaining items in this context
         for key, message in sorted(toprocess.iteritems()):
             add_message_to_context(ncontext, message)
 
+    # add any new contexts
     for context, messages in sorted(contexts.iteritems()):
         if context not in processedcontexts:
             add_context_to_root(nroot, context, messages)
 
+    # write tree back to file
     tree.write(filename)
 
 def main():
