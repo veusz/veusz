@@ -248,6 +248,9 @@ class TSWriter(object):
     def write_new(self):
         '''Write a new output .ts file.'''
 
+        if self.verbose:
+            sys.stdout.write('Writing %s\n' % repr(self.filename))
+
         nroot = etree.Element('TS')
         nroot.set('version', '2.0')
 
@@ -262,6 +265,9 @@ class TSWriter(object):
 
     def update(self):
         '''Update an existing ts file with the contexts given.'''
+
+        if self.verbose:
+            sys.stdout.write('Updating %s\n' % repr(self.filename))
 
         tree = etree.parse(self.filename)
         nroot = tree.getroot()
@@ -330,6 +336,34 @@ def python_find_strings(filename, retn, verbose=True):
     v = PythonMessageVisitor(filename, retn, verbose=verbose)
     v.visit(tree)
 
+def ui_find_strings(filename, retn, verbose=True):
+    '''Find strings in UI files.'''
+
+    if verbose:
+        sys.stdout.write('Examining UI file %s\n' % repr(filename))
+
+    tree = etree.parse(filename)
+    nroot = tree.getroot()
+
+    try:
+        context = nroot.find('class').text
+    except AttributeError:
+        sys.stderr.write('Could not find class element in %s\n' % filename)
+        return
+
+    for string in nroot.getiterator('string'):
+        message = Message(string.text, filename=filename,
+                          lineno=string.sourceline)
+
+        if verbose:
+            sys.stdout.write('Found string %s in %s:%i\n' %
+                             (repr(message.string), filename,
+                              string.sourceline))
+
+        if context not in retn:
+            retn[context] = []
+        retn[context].append(message)
+
 def main():
     parser = argparse.ArgumentParser(
         description='Find translatable strings in PyQt programs',
@@ -347,18 +381,25 @@ def main():
 
     retn = {}
     for infile in args.files:
-        python_find_strings(infile, retn, verbose=args.verbose)
+        if not os.path.isfile(infile):
+            sys.stderr.write('Cannot access file %s\n' % infile)
+            continue
+
+        ext = os.path.splitext(infile)[1]
+        if ext == '.py':
+            python_find_strings(infile, retn, verbose=args.verbose)
+        elif ext == '.ui':
+            ui_find_strings(infile, retn, verbose=args.verbose)
+        else:
+            sys.stderr.write('Unknown file extension %s in %s\n' %
+                             (ext, infile))
 
     writer = TSWriter(args.output, retn, filenames=args.files,
                       verbose=args.verbose)
 
     if os.path.isfile(args.output) and not args.reset:
-        if args.verbose:
-            sys.stdout.write('Updating %s\n' % repr(args.output))
         writer.update()
     else:
-        if args.verbose:
-            sys.stdout.write('Writing %s\n' % repr(args.output))
         writer.write_new()
 
 if __name__ == '__main__':
