@@ -136,6 +136,157 @@ class PythonMessageVisitor(ast.NodeVisitor):
         self.fn2context[name] = context
         self.fnargs[name] = argids
 
+class TSWriter(object):
+    """Class for writing ts files."""
+
+    def __init__(self, filename, contexts):
+        self.filename = filename
+        self.contexts = contexts
+
+    def add_message_to_context(self, ncontext, message):
+        '''Given the context xml node, add a new message.'''
+        nmessage = etree.SubElement(ncontext, 'message')
+
+        # where the message is in the source
+        nlocation = etree.SubElement(nmessage, 'location')
+        nlocation.set('filename', message.filename)
+        nlocation.set('line', str(message.lineno))
+
+        # original message
+        nsource = etree.SubElement(nmessage, 'source')
+        nsource.text = message.string
+
+        if message.comment:
+            # the disambiguation
+            ncomment = etree.SubElement(nmessage, 'comment')
+            ncomment.text = message.comment
+
+        # blank translated text
+        ntranslation = etree.SubElement(nmessage, 'translation')
+        ntranslation.set('type', 'unfinished')
+
+    def add_context_to_root(self, nroot, contextname, messages):
+        '''Add a new context tag to the root node given.'''
+        ncontext = etree.SubElement(nroot, 'context')
+        nname = etree.SubElement(ncontext, 'name')
+        nname.text = contextname
+
+        # avoid writing message twice
+        done = set()
+
+        # iterate over messages in context
+        for msg in sorted(messages, key=lambda s: s.lineno):
+
+            # only write unique messages
+            k = (msg.string, msg.comment)
+            if k in done:
+                continue
+            done.add(k)
+
+            self.add_message_to_context(ncontext, msg)
+
+    def mark_message_obsolete(self, nmessage):
+        '''Mark message as obsolete.'''
+        # message no longer exists, so obsolete
+        ntranslation = nmessage.find('translation')
+        if ntranslation is None:
+            ntranslation = etree.SubElement(nmessage, 'translation')
+        ntranslation.set('type', 'obsolete')
+        # remove obsolete location
+        nlocation = nmessage.find('location')
+        if nlocation is not None:
+            nmessage.remove(nlocation)
+
+    def update_message(self, nmessage, message):
+        '''Update message node.'''
+        nlocation = nmessage.find('location')
+        if nlocation is None:
+            nlocation = etree.SubElement(nmessage, 'location')
+        nlocation.set('filename', message.filename)
+        nlocation.set('line', str(message.lineno))
+
+        # this is the translation itself
+        ntranslation = nmessage.find('translation')
+        if ntranslation is None:
+            ntranslation = etree.SubElement('translation')
+            ntranslation.set('type', 'unfinished')
+
+        # unmark as obsolete, if appropriate
+        if ntranslation.get('type') == 'obsolete':
+            ntranslation.set('type', 'unfinished')
+
+    def write_new(self):
+        '''Write a new output .ts file.'''
+
+        nroot = etree.Element('TS')
+        nroot.set('version', '2.0')
+
+        # iterate over contexts and write them
+        for context, messages in sorted(self.contexts.items()):
+            self.add_context_to_root(nroot, context, messages)
+
+        tree = etree.ElementTree(nroot)
+        with open(self.filename, 'w') as f:
+            f.write('<!DOCTYPE TS>\n')
+            tree.write(f, pretty_print=True, encoding='utf-8')
+
+    def update(self):
+        '''Update an existing ts file with the contexts given.'''
+
+        tree = etree.parse(self.filename)
+        nroot = tree.getroot()
+        if nroot.tag != 'TS':
+            sys.stderr.write('Root node in ts file is not TS\n')
+            return
+
+        # iterate over context nodes
+        processedcontexts = set()
+        for ncontext in nroot.getiterator(tag='context'):
+            try:
+                contextname = ncontext.find('name').text
+            except AttributeError:
+                continue
+            processedcontexts.add(contextname)
+
+            if contextname not in self.contexts:
+                # FIXME: make obselete in messages if context no longer exists?
+                continue
+
+            # make copy of messages to add/update in context
+            toprocess = {}
+            for message in self.contexts[contextname]:
+                toprocess[ (message.string, message.comment) ] = message
+
+            # iterate over message nodes
+            for nmessage in ncontext.getiterator(tag='message'):
+                source = nmessage.find('source').text
+                try:
+                    comment = nmessage.find('comment').text
+                except AttributeError:
+                    comment = None
+
+                key = (source, comment)
+                if key in toprocess:
+                    # existing key, so update details
+                    self.update_message(nmessage, toprocess[key])
+
+                    # don't need to add at end
+                    del toprocess[key]
+                else:
+                    self.mark_message_obsolete(nmessage)
+
+            # add remaining items in this context
+            for key, message in sorted(toprocess.items()):
+                self.add_message_to_context(ncontext, message)
+
+        # add any new contexts
+        for context, messages in sorted(self.contexts.items()):
+            if context not in processedcontexts:
+                self.add_context_to_root(nroot, context, messages)
+
+        # write tree back to file
+        tree.write(self.filename, encoding='utf-8')
+
 def python_find_strings(filename, retn, verbose=True):
     '''Update output in retn with strings in filename.'''
 
@@ -148,151 +299,6 @@ def python_find_strings(filename, retn, verbose=True):
 
     v = PythonMessageVisitor(filename, retn, verbose=verbose)
     v.visit(tree)
-
-def add_message_to_context(ncontext, message):
-    '''Given the context xml node, add a new message.'''
-    nmessage = etree.SubElement(ncontext, 'message')
-
-    # where the message is in the source
-    nlocation = etree.SubElement(nmessage, 'location')
-    nlocation.set('filename', message.filename)
-    nlocation.set('line', str(message.lineno))
-
-    # original message
-    nsource = etree.SubElement(nmessage, 'source')
-    nsource.text = message.string
-
-    if message.comment:
-        # the disambiguation
-        ncomment = etree.SubElement(nmessage, 'comment')
-        ncomment.text = message.comment
-
-    # blank translated text
-    ntranslation = etree.SubElement(nmessage, 'translation')
-    ntranslation.set('type', 'unfinished')
-
-def add_context_to_root(nroot, contextname, messages):
-    '''Add a new context tag to the root node given.'''
-    ncontext = etree.SubElement(nroot, 'context')
-    nname = etree.SubElement(ncontext, 'name')
-    nname.text = contextname
-
-    # avoid writing message twice
-    done = set()
-
-    # iterate over messages in context
-    for msg in sorted(messages, key=lambda s: s.lineno):
-
-        # only write unique messages
-        k = (msg.string, msg.comment)
-        if k in done:
-            continue
-        done.add(k)
-
-        add_message_to_context(ncontext, msg)
-
-def write_new_ts(filename, contexts):
-    '''Write a new output .ts file.'''
-
-    nroot = etree.Element('TS')
-    nroot.set('version', '2.0')
-
-    # iterate over contexts and write them
-    for context, messages in sorted(contexts.items()):
-        add_context_to_root(nroot, context, messages)
-
-    tree = etree.ElementTree(nroot)
-    with open(filename, 'w') as f:
-        f.write("<?xml version='1.0' encoding='utf-8'?>\n")
-        f.write('<!DOCTYPE TS>\n')
-        tree.write(f, pretty_print=True)
-
-def mark_message_obsolete(nmessage):
-    '''Mark message as obsolete.'''
-    # message no longer exists, so obsolete
-    ntranslation = nmessage.find('translation')
-    if ntranslation is None:
-        ntranslation = etree.SubElement(nmessage, 'translation')
-    ntranslation.set('type', 'obsolete')
-    # remove obsolete location
-    nlocation = nmessage.find('location')
-    if nlocation is not None:
-        nmessage.remove(nlocation)
-
-def update_message(nmessage, message):
-    '''Update message node.'''
-    nlocation = nmessage.find('location')
-    if nlocation is None:
-        nlocation = etree.SubElement(nmessage, 'location')
-    nlocation.set('filename', message.filename)
-    nlocation.set('line', str(message.lineno))
-
-    # this is the translation itself
-    ntranslation = nmessage.find('translation')
-    if ntranslation is None:
-        ntranslation = etree.SubElement('translation')
-        ntranslation.set('type', 'unfinished')
-
-    # unmark as obsolete, if appropriate
-    if ntranslation.get('type') == 'obsolete':
-        ntranslation.set('type', 'unfinished')
-
-def update_ts(filename, contexts):
-    '''Update an existing ts file with the contexts given.'''
-
-    tree = etree.parse(filename)
-    nroot = tree.getroot()
-    if nroot.tag != 'TS':
-        sys.stderr.write('Root node in ts file is not TS\n')
-        return
-
-    # iterate over context nodes
-    processedcontexts = set()
-    for ncontext in nroot.getiterator(tag='context'):
-        try:
-            contextname = ncontext.find('name').text
-        except AttributeError:
-            continue
-        processedcontexts.add(contextname)
-
-        if contextname not in contexts:
-            # FIXME: make obselete in messages if context no longer exists?
-            continue
-
-        # make copy of messages to add/update in context
-        toprocess = {}
-        for message in contexts[contextname]:
-            toprocess[ (message.string, message.comment) ] = message
-
-        # iterate over message nodes
-        for nmessage in ncontext.getiterator(tag='message'):
-            source = nmessage.find('source').text
-            try:
-                comment = nmessage.find('comment').text
-            except AttributeError:
-                comment = None
-
-            key = (source, comment)
-            if key in toprocess:
-                # existing key, so update details
-                update_message(nmessage, toprocess[key])
-
-                # don't need to add at end
-                del toprocess[key]
-            else:
-                mark_message_obsolete(nmessage)
-
-        # add remaining items in this context
-        for key, message in sorted(toprocess.items()):
-            add_message_to_context(ncontext, message)
-
-    # add any new contexts
-    for context, messages in sorted(contexts.items()):
-        if context not in processedcontexts:
-            add_context_to_root(nroot, context, messages)
-
-    # write tree back to file
-    tree.write(filename)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -313,14 +319,16 @@ def main():
     for infile in args.files:
         python_find_strings(infile, retn, verbose=args.verbose)
 
+    writer = TSWriter(args.output, retn)
+
     if os.path.isfile(args.output) and not args.reset:
         if args.verbose:
             sys.stdout.write('Updating %s\n' % repr(args.output))
-        update_ts(args.output, retn)
+        writer.update()
     else:
         if args.verbose:
             sys.stdout.write('Writing %s\n' % repr(args.output))
-        write_new_ts(args.output, retn)
+        writer.write_new()
 
 if __name__ == '__main__':
     main()
