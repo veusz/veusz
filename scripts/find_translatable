@@ -3,6 +3,7 @@
 import argparse
 import ast
 import sys
+import os.path
 
 from lxml import etree
 
@@ -43,7 +44,7 @@ class PythonMessageVisitor(ast.NodeVisitor):
         if fn not in self.fn2context:
             return
 
-        if len(obj.args)+len(obj.keywords) not in (1,2,3):
+        if len(obj.args)+len(obj.keywords) not in (1,2,3) or len(obj.args) < 1:
             sys.stderr.write(
                 'WARNING: Translatable call to %s in %s:%i '
                 'requires 1 to 3 parameters\n' %
@@ -135,15 +136,17 @@ class PythonMessageVisitor(ast.NodeVisitor):
         self.fn2context[name] = context
         self.fnargs[name] = argids
 
-def find_strings(filename, retn):
+def python_find_strings(filename, retn, verbose=True):
     '''Update output in retn with strings in filename.'''
 
+    if verbose:
+        sys.stdout.write('Examining file %s\n' % repr(filename))
     with open(filename) as f:
         source = f.read()
 
     tree = ast.parse(source, filename)
 
-    v = PythonMessageVisitor(filename, retn)
+    v = PythonMessageVisitor(filename, retn, verbose=verbose)
     v.visit(tree)
 
 def add_message_to_context(ncontext, message):
@@ -195,7 +198,7 @@ def write_new_ts(filename, contexts):
     nroot.set('version', '2.0')
 
     # iterate over contexts and write them
-    for context, messages in sorted(contexts.iteritems()):
+    for context, messages in sorted(contexts.items()):
         add_context_to_root(nroot, context, messages)
 
     tree = etree.ElementTree(nroot)
@@ -280,11 +283,11 @@ def update_ts(filename, contexts):
                 mark_message_obsolete(nmessage)
 
         # add remaining items in this context
-        for key, message in sorted(toprocess.iteritems()):
+        for key, message in sorted(toprocess.items()):
             add_message_to_context(ncontext, message)
 
     # add any new contexts
-    for context, messages in sorted(contexts.iteritems()):
+    for context, messages in sorted(contexts.items()):
         if context not in processedcontexts:
             add_context_to_root(nroot, context, messages)
 
@@ -293,17 +296,31 @@ def update_ts(filename, contexts):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Find translatable strings in PyQt programs')
+        description='Find translatable strings in PyQt programs',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('files', metavar='FILE', nargs='+',
                         help='input source file')
+    parser.add_argument('--verbose', action='store_true',
+                        help='display verbose output')
+    parser.add_argument('--reset', action='store_true',
+                        help='write output file as new')
+    parser.add_argument('--output', metavar='FILE',
+                        default='output.ts',
+                        help='output ts file')
     args = parser.parse_args()
 
     retn = {}
     for infile in args.files:
-        find_strings(infile, retn)
+        python_find_strings(infile, retn, verbose=args.verbose)
 
-    update_ts('test.ts', retn)
-    #write_new_ts('test.ts', retn)
+    if os.path.isfile(args.output) and not args.reset:
+        if args.verbose:
+            sys.stdout.write('Updating %s\n' % repr(args.output))
+        update_ts(args.output, retn)
+    else:
+        if args.verbose:
+            sys.stdout.write('Writing %s\n' % repr(args.output))
+        write_new_ts(args.output, retn)
 
 if __name__ == '__main__':
     main()
