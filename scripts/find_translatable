@@ -36,11 +36,15 @@ class PythonMessageVisitor(ast.NodeVisitor):
     def visit_Call(self, obj):
         '''Function call made.'''
 
+        # this needs to be called to walk the tree
+        self.generic_visit(obj)
+
         try:
             fn = obj.func.id
         except AttributeError:
             # no name known
             return
+
         if fn not in self.fn2context:
             return
 
@@ -94,6 +98,9 @@ class PythonMessageVisitor(ast.NodeVisitor):
 
     def visit_FunctionDef(self, obj):
         '''Function definition made.'''
+
+        # this needs to be called to walk the tree
+        self.generic_visit(obj)
 
         try:
             name = obj.name
