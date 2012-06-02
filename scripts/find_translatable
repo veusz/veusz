@@ -2,134 +2,176 @@
 
 import argparse
 import ast
-import re
-import StringIO
-from collections import defaultdict
+import sys
 
 from lxml import etree
 
-class TransError(RuntimeError):
-    """Raised if translation error."""
-    pass
-
 class Message(object):
-    """A translatable string found."""
+    '''A translatable string.'''
     def __init__(self, string, filename=None, lineno=None, comment=None):
         self.string = string
         self.filename = filename
         self.lineno = lineno
         self.comment = comment
 
-class visitor(ast.NodeVisitor):
-    """A visitor which visits function calls and definitions in source."""
+class PythonMessageVisitor(ast.NodeVisitor):
+    '''A visitor which visits function calls and definitions in source.'''
 
-    def __init__(self, filename, outmessages = None):
-        """filename is file being read
-        If set, mapping of context to Messages will be returned in outmessages."""
+    def __init__(self, filename, outmessages, verbose=True):
+        '''filename is file being read
+        If set, mapping of context to Messages will be returned in
+        outmessages.'''
 
         self.filename = filename
-        self.trfns = dict()
 
-        if outmessages is not None:
-            self.messages = outmessages
-        else:
-            self.messages = {}
+        # map translation functions to contexts
+        self.fn2context = {}
+        # arguments for functions
+        self.fnargs = {}
+
+        self.messages = outmessages
+        self.verbose = verbose
 
     def visit_Call(self, obj):
-        """Function call made."""
+        '''Function call made.'''
 
         try:
             fn = obj.func.id
         except AttributeError:
             # no name known
             return
+        if fn not in self.fn2context:
+            return
 
-        if fn in self.trfns:
-            if len(obj.args) not in (1, 2):
-                sys.stderr.write(
-                    "Warning: translatable function '%s' on line number "
-                    "%i requires 1 or 2 parameters\n" %
-                    (fn, obj.lineno))
-                return
+        if len(obj.args)+len(obj.keywords) not in (1,2,3):
+            sys.stderr.write(
+                'WARNING: Translatable call to %s in %s:%i '
+                'requires 1 to 3 parameters\n' %
+                (repr(fn), self.filename, obj.lineno))
+            return
 
-            for a in obj.args:
-                if not isinstance(a, ast.Str):
-                    sys.stderr.write(
-                        "Warnign: parameters to translatable function "
-                        "'%s' on line number %i are not "
-                        "strings\n" % (fn, obj.lineno))
-                    return
+        # convert arguments to text
+        try:
+            args = [a.s for a in obj.args]
+            keywords = dict([(a.arg, a.value.s) for a in obj.keywords])
+        except AttributeError:
+            sys.stderr.write(
+                'WARNING: Parameter to translatable function '
+                '%s in %s:%i is not string\n' %
+                (repr(fn), self.filename, obj.lineno))
+            return
 
-            # context from here
-            context = self.trfns[fn]
+        # defaults
+        text = args[0]
+        context = self.fn2context[fn]
+        comment = None
 
-            # disambiguation
-            if len(obj.args) == 2:
-                comment = obj.args[1].s
-            else:
-                comment = None
-            text = obj.args[0].s
+        # examine any unnamed arguments
+        ctxidx = self.fnargs[fn].index('context')
+        if len(args) > ctxidx:
+            context = args[ctxidx]
+        disidx = self.fnargs[fn].index('disambiguation')
+        if len(args) > disidx:
+            comment = args[disidx]
 
-            if context not in self.messages:
-                self.messages[context] = []
-            self.messages[context].append(
-                Message(text, filename=self.filename, lineno=obj.lineno,
-                        comment=comment) )
+        # now look at named arguments which override defaults
+        context = keywords.get('context', context)
+        comment = keywords.get('disambiguation', comment)
+
+        # create new message
+        if context not in self.messages:
+            self.messages[context] = []
+        self.messages[context].append(
+            Message(text, filename=self.filename, lineno=obj.lineno,
+                    comment=comment) )
+
+        if self.verbose:
+            sys.stdout.write(
+                'Found text %s (context=%s, disambiguation=%s) in %s:%i\n' %
+                (repr(text), repr(context), repr(comment),
+                 self.filename, obj.lineno))
 
     def visit_FunctionDef(self, obj):
-        """Function definition made."""
+        '''Function definition made.'''
 
-        docstring = ast.get_docstring(obj)
-        if docstring:
-            m = re.search(r'^@tr_context:\s*(.*)\s*$', docstring, re.MULTILINE)
-            if m:
-                name = obj.name
-                if name in self.trfns:
-                    sys.stderr.write(
-                        "Warnign: duplicate translation function '%s' "
-                        "on line %i\n" % (name, obj.lineno))
-                    return
+        try:
+            name = obj.name
+        except AttributeError:
+            return
 
-                context = m.group(1)
-                self.trfns[name] = context
+        args = obj.args
+        # want a three-parameter function with two default values
+        if len(args.args) != 3 or len(args.defaults) != 2:
+            return
+
+        argids = [a.id.lower() for a in args.args]
+        # only functions with disambiguation and context as optional arguments
+        if 'disambiguation' not in argids or 'context' not in argids:
+            return
+
+        contextidx = argids.index('context')
+        try:
+            context = args.defaults[contextidx-1].s
+        except AttributeError:
+            sys.stderr.write(
+                "WARNING: Translation function definition %s in "
+                "%s:%i does not have default string for 'context'\n" %
+                (repr(name), self.filename, obj.lineno))
+            return
+
+        if name in self.fn2context:
+            sys.stderr.write(
+                'WARNING: Duplicate translation function %s '
+                'in %s:%i\n' % (repr(name), self.filename, obj.lineno))
+            return
+
+        if self.verbose:
+            sys.stdout.write(
+                'Found translation function %s with default '
+                'context %s in %s:%i\n' %
+                (repr(name), repr(context), self.filename, obj.lineno))
+
+        # map function name to default context
+        self.fn2context[name] = context
+        self.fnargs[name] = argids
 
 def find_strings(filename, retn):
-    """Update output in retn with strings in filename."""
+    '''Update output in retn with strings in filename.'''
 
     with open(filename) as f:
         source = f.read()
 
     tree = ast.parse(source, filename)
 
-    v = visitor(filename, retn)
+    v = PythonMessageVisitor(filename, retn)
     v.visit(tree)
 
 def add_message_to_context(ncontext, message):
-    """Given the context xml node, add a new message."""
-    nmessage = etree.SubElement(ncontext, "message")
+    '''Given the context xml node, add a new message.'''
+    nmessage = etree.SubElement(ncontext, 'message')
 
     # where the message is in the source
-    nlocation = etree.SubElement(nmessage, "location")
-    nlocation.set("filename", message.filename)
-    nlocation.set("line", str(message.lineno))
+    nlocation = etree.SubElement(nmessage, 'location')
+    nlocation.set('filename', message.filename)
+    nlocation.set('line', str(message.lineno))
 
     # original message
-    nsource = etree.SubElement(nmessage, "source")
+    nsource = etree.SubElement(nmessage, 'source')
     nsource.text = message.string
 
     if message.comment:
         # the disambiguation
-        ncomment = etree.SubElement(nmessage, "comment")
+        ncomment = etree.SubElement(nmessage, 'comment')
         ncomment.text = message.comment
 
     # blank translated text
-    ntranslation = etree.SubElement(nmessage, "translation")
-    ntranslation.set("type", "unfinished")
+    ntranslation = etree.SubElement(nmessage, 'translation')
+    ntranslation.set('type', 'unfinished')
 
 def add_context_to_root(nroot, contextname, messages):
-    """Add a new context tag to the root node given."""
-    ncontext = etree.SubElement(nroot, "context")
-    nname = etree.SubElement(ncontext, "name")
+    '''Add a new context tag to the root node given.'''
+    ncontext = etree.SubElement(nroot, 'context')
+    nname = etree.SubElement(ncontext, 'name')
     nname.text = contextname
 
     # avoid writing message twice
@@ -147,53 +189,53 @@ def add_context_to_root(nroot, contextname, messages):
         add_message_to_context(ncontext, msg)
 
 def write_new_ts(filename, contexts):
-    """Write a new output .ts file."""
+    '''Write a new output .ts file.'''
 
-    nroot = etree.Element("TS")
-    nroot.set("version", "2.0")
+    nroot = etree.Element('TS')
+    nroot.set('version', '2.0')
 
     # iterate over contexts and write them
     for context, messages in sorted(contexts.iteritems()):
         add_context_to_root(nroot, context, messages)
 
     tree = etree.ElementTree(nroot)
-    with open(filename, "w") as f:
-        f.write('<?xml version="1.0" encoding="utf-8"?>\n')
+    with open(filename, 'w') as f:
+        f.write("<?xml version='1.0' encoding='utf-8'?>\n")
         f.write('<!DOCTYPE TS>\n')
         tree.write(f, pretty_print=True)
 
 def mark_message_obsolete(nmessage):
-    """Mark message as obsolete."""
+    '''Mark message as obsolete.'''
     # message no longer exists, so obsolete
-    ntranslation = nmessage.find("translation")
+    ntranslation = nmessage.find('translation')
     if ntranslation is None:
-        ntranslation = etree.SubElement(nmessage, "translation")
-    ntranslation.set("type", "obsolete")
+        ntranslation = etree.SubElement(nmessage, 'translation')
+    ntranslation.set('type', 'obsolete')
     # remove obsolete location
-    nlocation = nmessage.find("location")
+    nlocation = nmessage.find('location')
     if nlocation is not None:
         nmessage.remove(nlocation)
 
 def update_message(nmessage, message):
-    """Update message node."""
-    nlocation = nmessage.find("location")
+    '''Update message node.'''
+    nlocation = nmessage.find('location')
     if nlocation is None:
-        nlocation = etree.SubElement(nmessage, "location")
-    nlocation.set("filename", message.filename)
-    nlocation.set("line", str(message.lineno))
+        nlocation = etree.SubElement(nmessage, 'location')
+    nlocation.set('filename', message.filename)
+    nlocation.set('line', str(message.lineno))
 
     # this is the translation itself
-    ntranslation = nmessage.find("translation")
+    ntranslation = nmessage.find('translation')
     if ntranslation is None:
-        ntranslation = etree.SubElement("translation")
-        ntranslation.set("type", "unfinished")
+        ntranslation = etree.SubElement('translation')
+        ntranslation.set('type', 'unfinished')
 
     # unmark as obsolete, if appropriate
-    if ntranslation.get("type") == "obsolete":
-        ntranslation.set("type", "unfinished")
+    if ntranslation.get('type') == 'obsolete':
+        ntranslation.set('type', 'unfinished')
 
 def update_ts(filename, contexts):
-    """Update an existing ts file with the contexts given."""
+    '''Update an existing ts file with the contexts given.'''
 
     tree = etree.parse(filename)
     nroot = tree.getroot()
@@ -223,7 +265,7 @@ def update_ts(filename, contexts):
         for nmessage in ncontext.getiterator(tag='message'):
             source = nmessage.find('source').text
             try:
-                comment = nmessage.find("comment").text
+                comment = nmessage.find('comment').text
             except AttributeError:
                 comment = None
 
