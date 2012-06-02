@@ -139,12 +139,20 @@ class PythonMessageVisitor(ast.NodeVisitor):
 class TSWriter(object):
     """Class for writing ts files."""
 
-    def __init__(self, filename, contexts):
+    def __init__(self, filename, contexts, filenames=[], verbose=True):
         self.filename = filename
         self.contexts = contexts
+        self.filenames = filenames
+        self.verbose = verbose
 
     def add_message_to_context(self, ncontext, message):
         '''Given the context xml node, add a new message.'''
+
+        if self.verbose:
+            sys.stdout.write('Adding new message %s to context %s\n' %
+                             (repr(message.string),
+                              repr(ncontext.find('name').text)))
+
         nmessage = etree.SubElement(ncontext, 'message')
 
         # where the message is in the source
@@ -167,6 +175,10 @@ class TSWriter(object):
 
     def add_context_to_root(self, nroot, contextname, messages):
         '''Add a new context tag to the root node given.'''
+
+        if self.verbose:
+            sys.stdout.write('Adding new context %s\n' % repr(contextname))
+
         ncontext = etree.SubElement(nroot, 'context')
         nname = etree.SubElement(ncontext, 'name')
         nname.text = contextname
@@ -187,7 +199,22 @@ class TSWriter(object):
 
     def mark_message_obsolete(self, nmessage):
         '''Mark message as obsolete.'''
+
+        # if we didn't examine this file, then do not mark
+        # as obsolete
+        nlocation = nmessage.find('location')
+        source = nmessage.find('source').text
+
+        if nlocation is not None:
+            filename = nlocation.get('filename')
+            if filename not in self.filenames:
+                if self.verbose:
+                    sys.stdout.write('Not marking %s as obsolete as file not processed\n' % repr(source))
+                return
+
         # message no longer exists, so obsolete
+            sys.stdout.write('Marking %s as obsolete\n' % repr(source))
+
         ntranslation = nmessage.find('translation')
         if ntranslation is None:
             ntranslation = etree.SubElement(nmessage, 'translation')
@@ -214,6 +241,9 @@ class TSWriter(object):
         # unmark as obsolete, if appropriate
         if ntranslation.get('type') == 'obsolete':
             ntranslation.set('type', 'unfinished')
+            if self.verbose:
+                sys.stdout.write('Unmarking %s as obsolete\n' %
+                                 nmessage.find('source').text)
 
     def write_new(self):
         '''Write a new output .ts file.'''
@@ -249,7 +279,7 @@ class TSWriter(object):
             processedcontexts.add(contextname)
 
             if contextname not in self.contexts:
-                # FIXME: make obselete in messages if context no longer exists?
+                # FIXME: make obsolete in messages if context no longer exists?
                 continue
 
             # make copy of messages to add/update in context
@@ -319,7 +349,8 @@ def main():
     for infile in args.files:
         python_find_strings(infile, retn, verbose=args.verbose)
 
-    writer = TSWriter(args.output, retn)
+    writer = TSWriter(args.output, retn, filenames=args.files,
+                      verbose=args.verbose)
 
     if os.path.isfile(args.output) and not args.reset:
         if args.verbose:
