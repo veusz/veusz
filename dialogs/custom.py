@@ -20,6 +20,11 @@ import veusz.qtall as qt4
 import veusz.document as document
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="CustomDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class CustomItemModel(qt4.QAbstractTableModel):
     """A model for editing custom items."""
 
@@ -43,10 +48,10 @@ class CustomItemModel(qt4.QAbstractTableModel):
             d = self.document.customs[index.row()][index.column()]
             return qt4.QVariant(d)
         elif role == qt4.Qt.ToolTipRole:
-            return ('Constant, function or import',
-                    'Name for constant, function(arg1, arg2...) or module name',
-                    'Expression defining constant or function, '
-                    'or list of symbols to import from module')[index.column()]
+            return (_('Constant, function or import'),
+                    _('Name for constant, function(arg1, arg2...) or module name'),
+                    _('Expression defining constant or function, '
+                      'or list of symbols to import from module'))[index.column()]
 
         return qt4.QVariant()
 
@@ -59,7 +64,8 @@ class CustomItemModel(qt4.QAbstractTableModel):
         """Return the headers at the top of the view."""
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
-                return qt4.QVariant( ('Type', 'Name', 'Definition')[section] )
+                return qt4.QVariant( (_('Type'), _('Name'),
+                                      _('Definition'))[section] )
             else:
                 return qt4.QVariant(str(section+1))
         return qt4.QVariant()
@@ -216,7 +222,7 @@ class CustomDialog(VeuszDialog):
     def slotSave(self):
         """Save entries."""
         filename = self.parent()._fileSaveDialog(
-            'vsz', 'Veusz document', 'Save custom definitions')
+            'vsz', _('Veusz document'), _('Save custom definitions'))
         if filename:
             try:
                 f = open(filename, 'w')
@@ -225,21 +231,21 @@ class CustomDialog(VeuszDialog):
                 self.recentButton.addFile(filename)
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Unable to save '%s'\n\n%s" % (filename, e.strerror))
+                    self, _("Error - Veusz"),
+                    _("Unable to save '%s'\n\n%s") % (filename, e.strerror))
 
     def slotLoad(self):
         """Load entries."""
 
         filename = self.parent()._fileOpenDialog(
-            'vsz', 'Veusz document', 'Load custom definitions')
+            'vsz', _('Veusz document'), _('Load custom definitions'))
         if filename:
             try:
                 self.loadFile(filename)
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Unable to load '%s'\n\n%s" % (filename, e.strerror))
+                    self, _("Error - Veusz"),
+                    _("Unable to load '%s'\n\n%s") % (filename, e.strerror))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

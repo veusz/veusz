@@ -23,6 +23,11 @@ import veusz.document as document
 import veusz.setting as setting
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="CaptureDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class CaptureDialog(VeuszDialog):
     """Capture dialog.
 
@@ -164,7 +169,7 @@ class CaptureDialog(VeuszDialog):
                 tail = int( self.tailEdit.text() )
 
         except ValueError:
-            qt4.QMessageBox.critical(self, "Invalid number", "Invalid number")
+            qt4.QMessageBox.critical(self, _("Invalid number"), _("Invalid number"))
             return
             
         # get method of getting data
@@ -186,9 +191,9 @@ class CaptureDialog(VeuszDialog):
                     unicode(self.commandLineEdit.text()) )
         except EnvironmentError, e:
             # problem opening stream
-            qt4.QMessageBox.critical(self, "Cannot open input",
-                                     "Cannot open input:\n"
-                                     " %s (error %i)" % (e.strerror, e.errno))
+            qt4.QMessageBox.critical(self, _("Cannot open input"),
+                                     _("Cannot open input:\n"
+                                       " %s (error %i)") % (e.strerror, e.errno))
             return
 
         stream.maxlines = maxlines

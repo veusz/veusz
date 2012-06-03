@@ -29,6 +29,11 @@ from veuszdialog import VeuszDialog
 # register function to dataset class to edit dataset
 recreate_register = {}
 
+def _(text, disambiguation=None, context="DataEditDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
 
@@ -128,7 +133,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         data = getattr(ds, ds.columns[index.column()])
 
         # add new column if necessary
-        ops = document.OperationMultiple([], descr='add value')
+        ops = document.OperationMultiple([], descr=_('add value'))
         if data is None:
             ops.addOperation(
                 document.OperationDatasetAddColumn(self.dsname,
@@ -252,9 +257,9 @@ class DataEditDialog(VeuszDialog):
 
         # actions for data table
         for text, slot in (
-            ('Copy', self.slotCopy),
-            ('Delete row', self.slotDeleteRow),
-            ('Insert row', self.slotInsertRow),
+            (_('Copy'), self.slotCopy),
+            (_('Delete row'), self.slotDeleteRow),
+            (_('Insert row'), self.slotInsertRow),
             ):
             act = qt4.QAction(text, self)
             self.connect(act, qt4.SIGNAL('triggered()'), slot)
@@ -294,9 +299,9 @@ class DataEditDialog(VeuszDialog):
 
         # menu for new button
         self.newmenu = qt4.QMenu()
-        for text, slot in ( ('Numerical dataset', self.slotNewNumericalDataset),
-                            ('Text dataset', self.slotNewTextDataset),
-                            ('Date/time dataset', self.slotNewDateDataset) ):
+        for text, slot in ( (_('Numerical dataset'), self.slotNewNumericalDataset),
+                            (_('Text dataset'), self.slotNewTextDataset),
+                            (_('Date/time dataset'), self.slotNewDateDataset) ):
             a = self.newmenu.addAction(text)
             self.connect(a, qt4.SIGNAL('triggered()'), slot)
         self.newbutton.setMenu(self.newmenu)
@@ -457,11 +462,11 @@ class DataEditDialog(VeuszDialog):
     def newDataset(self, ds):
         """Add new dataset to document."""
         # get a name for dataset
-        name = 'new dataset'
+        name = _('new dataset')
         if name in self.document.data:
             count = 1
             while name in self.document.data:
-                name = 'new dataset %i' % count
+                name = _('new dataset %i') % count
                 count += 1
 
         # add new dataset

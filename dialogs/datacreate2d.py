@@ -23,6 +23,11 @@ import veusz.utils as utils
 import veusz.document as document
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="DataCreate2D"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def checkGetStep(text):
     """Check step syntax is okay.
     Syntax is min:max:stepsize
@@ -195,11 +200,11 @@ class DataCreate2DDialog(VeuszDialog):
         except (document.CreateDatasetException,
                 document.DatasetException), e:
             # error in evaluation or something
-            qt4.QMessageBox.warning(self, "Veusz",
-                                    'Dataset creation failed: %s' % unicode(e))
-            msg = "Failed to create dataset '%s'" % text['name']
+            qt4.QMessageBox.warning(self, _("Veusz"),
+                                    _('Dataset creation failed: %s') % unicode(e))
+            msg = _("Failed to create dataset '%s'") % text['name']
         else:
-            msg = "Created dataset '%s'" % text['name']
+            msg = _("Created dataset '%s'") % text['name']
 
         self.notifylabel.setText(msg)
         qt4.QTimer.singleShot(4000, self.notifylabel.clear)

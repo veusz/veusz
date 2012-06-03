@@ -25,6 +25,11 @@ import dataeditdialog
 
 import numpy as N
 
+def _(text, disambiguation=None, context="HistogramDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def checkValidator(combo):
     """Is this validator ok?"""
     valid = combo.validator()
@@ -121,13 +126,13 @@ class HistoDataDialog(VeuszDialog):
             numbins = dialog.numbins.value()
 
             if not checkValidator(dialog.minval):
-                raise RuntimeError("Invalid minimum value")
+                raise RuntimeError(_("Invalid minimum value"))
             minval = unicode( dialog.minval.text() )
             if minval != 'Auto':
                 minval = float(minval)
 
             if not checkValidator(dialog.maxval):
-                raise RuntimeError("Invalid maximum value")
+                raise RuntimeError(_("Invalid maximum value"))
             maxval = unicode( dialog.maxval.text() )
             if maxval != 'Auto':
                 maxval = float(maxval)
@@ -176,7 +181,7 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError, ex:
-            qt4.QMessageBox.warning(self, "Invalid parameters", unicode(ex))
+            qt4.QMessageBox.warning(self, _("Invalid parameters"), unicode(ex))
             return
 
         if p.expr != '':
@@ -265,21 +270,21 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError, ex:
-            self.statuslabel.setText("Invalid parameters: %s" % unicode(ex))
+            self.statuslabel.setText(_("Invalid parameters: %s") % unicode(ex))
             return
 
         exprresult = N.array(
             document.simpleEvalExpression(self.document, p.expr),
             dtype=N.float64)
         if len(exprresult) == 0:
-            self.statuslabel.setText("Invalid expression")
+            self.statuslabel.setText(_("Invalid expression"))
             return
 
         op = p.getOperation()
         self.document.applyOperation(op)
 
         self.statuslabel.setText(
-            'Created datasets "%s" and "%s"' % (p.outbins, p.outdataset))
+            _('Created datasets "%s" and "%s"') % (p.outbins, p.outdataset))
 
 def recreateDataset(mainwindow, document, dataset, datasetname):
     """Open dialog to recreate histogram."""

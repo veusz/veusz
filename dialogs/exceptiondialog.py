@@ -32,6 +32,11 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="ExceptionDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 _reportformat = \
 '''Veusz version: %s
 Python version: %s
@@ -97,14 +102,14 @@ class ExceptionSendDialog(VeuszDialog):
 
         except urllib2.URLError:
             # something went wrong...
-            qt4.QMessageBox.critical(None, "Veusz",
-                                     "Failed to connect to error server "
-                                     "to send report. Is your internet "
-                                     "connected?")
+            qt4.QMessageBox.critical(None, _("Veusz"),
+                                     _("Failed to connect to error server "
+                                       "to send report. Is your internet "
+                                       "connected?"))
             return
 
-        qt4.QMessageBox.information(self, "Submitted",
-                                    "Thank you for submitting an error report")
+        qt4.QMessageBox.information(self, _("Submitted"),
+                                    _("Thank you for submitting an error report"))
         VeuszDialog.accept(self)
 
 def _raiseIgnoreException():
@@ -190,19 +195,19 @@ class ExceptionDialog(VeuszDialog):
             versions = []
 
         if not versions:
-            msg = 'Could not check the latest Veusz version'
+            msg = _('Could not check the latest Veusz version')
         else:
             vsort = sorted([[int(i) for i in v.split('.')] for v in versions])
             latest = '.'.join([str(x) for x in vsort[-1]])
 
             current = [int(i) for i in utils.version().split('.')]
             if current == vsort[-1]:
-                msg = 'You are running the latest released Veusz version'
+                msg = _('You are running the latest released Veusz version')
             elif current > vsort[-1]:
-                msg = 'You are running an unreleased Veusz version'
+                msg = _('You are running an unreleased Veusz version')
             else:
-                msg = ('<b>Your current version of Veusz is old. '
-                       'Veusz %s is available.</b>' % latest)
+                msg = (_('<b>Your current version of Veusz is old. '
+                         'Veusz %s is available.</b>') % latest)
 
         self.veuszversionlabel.setText(msg)
 

@@ -25,6 +25,11 @@ from veuszdialog import VeuszDialog
 
 import dataeditdialog
 
+def _(text, disambiguation=None, context="DataCreateDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class _DSException(RuntimeError):
     """A class to handle errors while trying to create datasets."""
     pass
@@ -47,9 +52,9 @@ class DataCreateDialog(VeuszDialog):
 
         # connect create button
         self.createbutton = self.buttonBox.addButton(
-            "C&reate", qt4.QDialogButtonBox.ApplyRole )
+            _("C&reate"), qt4.QDialogButtonBox.ApplyRole )
         self.replacebutton = self.buttonBox.addButton(
-            "&Replace", qt4.QDialogButtonBox.ApplyRole )
+            _("&Replace"), qt4.QDialogButtonBox.ApplyRole )
 
         self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
                       qt4.SIGNAL('clicked()'), self.resetButtonClicked )
@@ -225,9 +230,9 @@ class DataCreateDialog(VeuszDialog):
             self.document.applyOperation(op)
 
             if dsexists:
-                status = "Replaced dataset '%s'" % dsname
+                status = _("Replaced dataset '%s'") % dsname
             else:
-                status = "Created dataset '%s'" % dsname
+                status = _("Created dataset '%s'") % dsname
             self.statuslabel.setText(status)
 
         except (document.CreateDatasetException,
@@ -235,11 +240,11 @@ class DataCreateDialog(VeuszDialog):
 
             # all bad roads lead here - take exception string and tell user
             if dsexists:
-                status = "Replacement failed"
+                status = _("Replacement failed")
             else:
-                status = "Creation failed"
+                status = _("Creation failed")
             self.statuslabel.setText(status)
-            qt4.QMessageBox.warning(self, "Veusz", unicode(e))
+            qt4.QMessageBox.warning(self, _("Veusz"), unicode(e))
             
     def createFromRange(self, name):
         """Make dataset from a range or constant.
@@ -263,17 +268,17 @@ class DataCreateDialog(VeuszDialog):
                 parts = text.split(':')
                 
                 if len(parts) != 2:
-                    raise _DSException("Incorrect range format, use form 1:10")
+                    raise _DSException(_("Incorrect range format, use form 1:10"))
                 try:
                     minval, maxval = float(parts[0]), float(parts[1])
                 except ValueError:
-                    raise _DSException("Invalid number in range")
+                    raise _DSException(_("Invalid number in range"))
 
             else:
                 try:
                     minval = float(text)
                 except ValueError:
-                    raise _DSException("Invalid number")
+                    raise _DSException(_("Invalid number"))
                 maxval = minval
                 
             vals[key] = (minval, maxval)

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Jeremy Sanders</author>
- <class>dataeditdialog</class>
- <widget class="QDialog" name="dataeditdialog">
+ <class>DataEditDialog</class>
+ <widget class="QDialog" name="DataEditDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -187,7 +187,7 @@
   <connection>
    <sender>closebutton</sender>
    <signal>clicked()</signal>
-   <receiver>dataeditdialog</receiver>
+   <receiver>DataEditDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
