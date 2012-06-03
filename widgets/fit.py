@@ -27,6 +27,7 @@ import numpy as N
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
+import veusz.qtall as qt4
 
 from function import FunctionPlotter
 import widget
@@ -35,6 +36,11 @@ try:
     import minuit
 except ImportError:
     minuit = None
+
+def _(text, disambiguation=None, context='Fit'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     """Do fitting with minuit (if installed)."""
@@ -57,7 +63,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     # this is safe because the only user-controlled variable is len(names)
     fn = eval(fnstr, {'chi2' : chi2, 'N' : N})
 
-    print 'Fitting via Minuit:'
+    print _('Fitting via Minuit:')
     m = minuit.Minuit(fn, fix_x=True, **values)
 
     # run the fit
@@ -85,16 +91,16 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     redchi2 = retchi2 / dof
 
     if have_err:
-        print 'Fit results:\n', "\n".join([
+        print _('Fit results:\n'), "\n".join([
             u"    %s = %g \u00b1 %g (+%g / %g)"
                 % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)], m.merrors[(n, -1.0)]) for n in names])
     elif have_symerr:
-        print 'Fit results:\n', "\n".join([
+        print _('Fit results:\n'), "\n".join([
             u"    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n]) for n in names])
-        print 'MINOS error estimate not available.'
+        print _('MINOS error estimate not available.')
     else:
-        print 'Fit results:\n', "\n".join(['    %s = %g' % (n, m.values[n]) for n in names])
-        print 'No error analysis available: fit quality uncertain'
+        print _('Fit results:\n'), "\n".join(['    %s = %g' % (n, m.values[n]) for n in names])
+        print _('No error analysis available: fit quality uncertain')
 
     print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2)
 
@@ -106,7 +112,7 @@ class Fit(FunctionPlotter):
 
     typename='fit'
     allowusercreation=True
-    description='Fit a function to data'
+    description=_('Fit a function to data')
 
     def __init__(self, parent, name=None):
         FunctionPlotter.__init__(self, parent, name=name)
@@ -115,8 +121,8 @@ class Fit(FunctionPlotter):
             self.readDefaults()
 
         self.addAction( widget.Action('fit', self.actionFit,
-                                      descr = 'Fit function',
-                                      usertext = 'Fit function') )
+                                      descr = _('Fit function'),
+                                      usertext = _('Fit function')) )
 
     @classmethod
     def addSettings(klass, s):
@@ -125,51 +131,51 @@ class Fit(FunctionPlotter):
 
         s.add( setting.FloatDict('values',
                                  {'a': 0.0, 'b': 1.0},
-                                 descr = 'Variables and fit values',
-                                 usertext='Parameters'), 1 )
+                                 descr = _('Variables and fit values'),
+                                 usertext=_('Parameters')), 1 )
         s.add( setting.Dataset('xData', 'x',
-                               descr = 'Variable containing x data to fit',
-                               usertext='X dataset'), 2 )
+                               descr = _('Variable containing x data to fit'),
+                               usertext=_('X dataset')), 2 )
         s.add( setting.Dataset('yData', 'y',
-                               descr = 'Variable containing y data to fit',
-                               usertext='Y dataset'), 3 )
+                               descr = _('Variable containing y data to fit'),
+                               usertext=_('Y dataset')), 3 )
         s.add( setting.Bool('fitRange', False,
-                            descr = 'Fit only the data between the '
-                            'minimum and maximum of the axis for '
-                            'the function variable',
-                            usertext='Fit only range'),
+                            descr = _('Fit only the data between the '
+                                      'minimum and maximum of the axis for '
+                                      'the function variable'),
+                            usertext=_('Fit only range')),
                4 )
         s.add( setting.WidgetChoice(
                 'outLabel', '',
-                descr='Write best fit parameters to this text label '
-                'after fitting',
+                descr=_('Write best fit parameters to this text label '
+                        'after fitting'),
                 widgettypes=('label',),
-                usertext='Output label'),
+                usertext=_('Output label')),
                5 )
         s.add( setting.Str('outExpr', '',
-                           descr = 'Output best fitting expression',
-                           usertext='Output expression'),
+                           descr = _('Output best fitting expression'),
+                           usertext=_('Output expression')),
                6, readonly=True )
         s.add( setting.Float('chi2', -1,
                              descr = 'Output chi^2 from fitting',
-                             usertext='Fit &chi;<sup>2</sup>'),
+                             usertext=_('Fit &chi;<sup>2</sup>')),
                7, readonly=True )
         s.add( setting.Int('dof', -1,
-                           descr = 'Output degrees of freedom from fitting',
-                           usertext='Fit d.o.f.'),
+                           descr = _('Output degrees of freedom from fitting'),
+                           usertext=_('Fit d.o.f.')),
                8, readonly=True )
         s.add( setting.Float('redchi2', -1,
-                             descr = 'Output reduced-chi-squared from fitting',
-                             usertext='Fit reduced &chi;<sup>2</sup>'),
+                             descr = _('Output reduced-chi-squared from fitting'),
+                             usertext=_('Fit reduced &chi;<sup>2</sup>')),
                9, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
-        f.descr = 'Function to fit'
+        f.descr = _('Function to fit')
 
         # modify description
-        s.get('min').usertext='Min. fit range'
-        s.get('max').usertext='Max. fit range'
+        s.get('min').usertext=_('Min. fit range')
+        s.get('max').usertext=_('Max. fit range')
 
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""
@@ -292,13 +298,13 @@ class Fit(FunctionPlotter):
 
         # various error checks
         if len(xvals) == 0:
-            sys.stderr.write('No data values. Not fitting.\n')
+            sys.stderr.write(_('No data values. Not fitting.\n'))
             return
         if len(xvals) != len(yvals) or len(xvals) != len(yserr):
-            sys.stderr.write('Fit data not equal in length. Not fitting.\n')
+            sys.stderr.write(_('Fit data not equal in length. Not fitting.\n'))
             return
         if len(params) > len(xvals):
-            sys.stderr.write('No degrees of freedom for fit. Not fitting\n')
+            sys.stderr.write(_('No degrees of freedom for fit. Not fitting\n'))
             return
 
         # actually do the fit, either via Minuit or our own LM fitter
@@ -308,7 +314,7 @@ class Fit(FunctionPlotter):
         if minuit is not None:
             vals, chi2, dof = minuitFit(self.evalfunc, params, names, s.values, xvals, yvals, yserr)
         else:
-            print 'Minuit not available, falling back to simple L-M fitting:'
+            print _('Minuit not available, falling back to simple L-M fitting:')
             retn, chi2, dof = utils.fitLM(self.evalfunc, params,
                                           xvals,
                                           yvals, yserr)
@@ -326,7 +332,7 @@ class Fit(FunctionPlotter):
         operations.append( document.OperationSettingSet(s.get('chi2'), float(chi2)) )
         operations.append( document.OperationSettingSet(s.get('dof'), int(dof)) )
         if dof <= 0:
-            print 'No degrees of freedom in fit.\n'
+            print _('No degrees of freedom in fit.\n')
             redchi2 = -1.
         else:
             redchi2 = float(chi2/dof)
@@ -340,7 +346,7 @@ class Fit(FunctionPlotter):
 
         # actually change all the settings
         d.applyOperation(
-            document.OperationMultiple(operations, descr='fit') )
+            document.OperationMultiple(operations, descr=_('fit')) )
     
     def evalfunc(self, params, xvals):
 

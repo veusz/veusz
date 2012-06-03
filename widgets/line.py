@@ -30,10 +30,15 @@ import veusz.utils as utils
 import controlgraph
 import plotters
 
+def _(text, disambiguation=None, context='Line'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Line(plotters.FreePlotter):
     """A line on the plot/graph."""
     typename='line'
-    description='Line or arrow'
+    description=_('Line or arrow')
     allowusercreation = True
     
     def __init__(self, parent, name=None):
@@ -51,9 +56,9 @@ class Line(plotters.FreePlotter):
                 'mode',
                 ('length-angle', 'point-to-point'),
                 'length-angle',
-                descr='Provide line position and length,angle or '
-                'first and second points',
-                usertext='Mode',
+                descr=_('Provide line position and length,angle or '
+                        'first and second points'),
+                usertext=_('Mode'),
                 formatting=False,
                 showfn = lambda val: val == 'length-angle',
                 settingstrue = ('length', 'angle'),
@@ -61,49 +66,49 @@ class Line(plotters.FreePlotter):
                 ), 0)
 
         s.add( setting.DatasetOrFloatList('length', [0.2],
-                                          descr='List of fractional '
-                                          'lengths or dataset',
-                                          usertext='Lengths',
+                                          descr=_('List of fractional '
+                                                  'lengths or dataset'),
+                                          usertext=_('Lengths'),
                                           formatting=False), 4 )
         s.add( setting.DatasetOrFloatList('angle', [0.],
-                                          descr='Angle of lines or '
-                                          'dataset (degrees)',
-                                          usertext='Angles',
+                                          descr=_('Angle of lines or '
+                                                  'dataset (degrees)'),
+                                          usertext=_('Angles'),
                                           formatting=False), 5 )
         s.add( setting.DatasetOrFloatList('xPos2', [1.],
-                                          descr='List of fractional X '
-                                          'coordinates or dataset for point 2',
-                                          usertext='X positions 2',
+                                          descr=_('List of fractional X '
+                                                  'coordinates or dataset for point 2'),
+                                          usertext=_('X positions 2'),
                                           formatting=False), 6 )
         s.add( setting.DatasetOrFloatList('yPos2', [1.],
-                                          descr='List of fractional Y '
-                                          'coordinates or dataset for point 2',
-                                          usertext='Y positions 2',
+                                          descr=_('List of fractional Y '
+                                                  'coordinates or dataset for point 2'),
+                                          usertext=_('Y positions 2'),
                                           formatting=False), 7 )
 
         s.add( setting.Bool('clip', False,
-                            descr='Clip line to its container',
-                            usertext='Clip',
+                            descr=_('Clip line to its container'),
+                            usertext=_('Clip'),
                             formatting=True), 0 )
 
         s.add( setting.Line('Line',
-                            descr = 'Line style',
-                            usertext = 'Line'),
+                            descr = _('Line style'),
+                            usertext = _('Line')),
                pixmap = 'settings_plotline' )
         s.add( setting.ArrowFill('Fill',
-                                 descr = 'Arrow fill settings',
-                                 usertext = 'Arrow fill'),
+                                 descr = _('Arrow fill settings'),
+                                 usertext = _('Arrow fill')),
                pixmap = 'settings_plotmarkerfill' )
 
         s.add( setting.DistancePt('arrowSize', '5pt',
-                                  descr = 'Size of arrow to plot',
-                                  usertext='Arrow size', formatting=True), 0)
+                                  descr = _('Size of arrow to plot'),
+                                  usertext=_('Arrow size'), formatting=True), 0)
         s.add( setting.Arrow('arrowright', 'none',
-                             descr = 'Arrow to plot on right side',
-                             usertext='Arrow right', formatting=True), 0)
+                             descr = _('Arrow to plot on right side'),
+                             usertext=_('Arrow right'), formatting=True), 0)
         s.add( setting.Arrow('arrowleft', 'none',
-                             descr = 'Arrow to plot on left side',
-                             usertext='Arrow left', formatting=True), 0)
+                             descr = _('Arrow to plot on left side'),
+                             usertext=_('Arrow left'), formatting=True), 0)
 
     def _computeLinesLengthAngle(self, posn, lengthscaling):
         """Return set of lines to plot for length-angle."""
@@ -273,6 +278,6 @@ class Line(plotters.FreePlotter):
                     ]
 
         self.document.applyOperation(
-            document.OperationMultiple(operations, descr='adjust lines') )
+            document.OperationMultiple(operations, descr=_('adjust lines')) )
 
 document.thefactory.register( Line )

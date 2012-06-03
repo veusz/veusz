@@ -27,13 +27,18 @@ import veusz.utils as utils
 
 import plotters
 
+def _(text, disambiguation=None, context='Image'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
     coordinate system."""
 
     typename='image'
     allowusercreation=True
-    description='Plot a 2d dataset as an image'
+    description=_('Plot a 2d dataset as an image')
 
     def __init__(self, parent, name=None):
         """Initialise plotter with axes."""
@@ -58,53 +63,53 @@ class Image(plotters.GenericPlotter):
 
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
-                               descr = 'Dataset to plot',
-                               usertext='Dataset'),
+                               descr = _('Dataset to plot'),
+                               usertext=_('Dataset')),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr = 'Minimum value of image scale',
-                                   usertext='Min. value'),
+                                   descr = _('Minimum value of image scale'),
+                                   usertext=_('Min. value')),
                1 )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr = 'Maximum value of image scale',
-                                   usertext='Max. value'),
+                                   descr = _('Maximum value of image scale'),
+                                   usertext=_('Max. value')),
                2 )
         s.add( setting.Choice('colorScaling',
                               ['linear', 'sqrt', 'log', 'squared'],
                               'linear',
-                              descr = 'Scaling to transform numbers to color',
-                              usertext='Scaling'),
+                              descr = _('Scaling to transform numbers to color'),
+                              usertext=_('Scaling')),
                3 )
 
         s.add( setting.Dataset('transparencyData', '',
                                dimensions = 2,
-                               descr = 'Dataset to use for transparency '
-                               '(0 to 1)',
-                               usertext='Transparent data'),
+                               descr = _('Dataset to use for transparency '
+                                         '(0 to 1)'),
+                               usertext=_('Transparent data')),
                4 )
 
         s.add( setting.Colormap('colorMap',
                                 'grey',
-                                descr = 'Set of colors to plot data with',
-                                usertext='Colormap',
+                                descr = _('Set of colors to plot data with'),
+                                usertext=_('Colormap'),
                                 formatting=True),
                5 )
         s.add( setting.Bool('colorInvert', False,
-                            descr = 'Invert color map',
-                            usertext='Invert colormap',
+                            descr = _('Invert color map'),
+                            usertext=_('Invert colormap'),
                             formatting=True),
                6 )
         s.add( setting.Int( 'transparency', 0,
-                            descr = 'Transparency percentage',
-                            usertext = 'Transparency',
+                            descr = _('Transparency percentage'),
+                            usertext = _('Transparency'),
                             minval = 0,
                             maxval = 100,
                             formatting=True),
                7 )
 
         s.add( setting.Bool( 'smooth', False,
-                             descr = 'Smooth image to display resolution',
-                             usertext = 'Smooth',
+                             descr = _('Smooth image to display resolution'),
+                             usertext = _('Smooth'),
                              formatting = True ) )
 
     def _getUserDescription(self):

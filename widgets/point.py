@@ -35,6 +35,11 @@ try:
 except ImportError:
     hasqtloops = False
 
+def _(text, disambiguation=None, context='XY'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 # functions for plotting error bars
 # different styles are made up of combinations of these functions
 # each function takes the same arguments
@@ -229,14 +234,14 @@ class MarkerFillBrush(setting.Brush):
 
         self.add( setting.Colormap(
                 'colorMap', 'grey',
-                descr = 'If color markers dataset is given, use this colormap '
-                'instead of the fill color',
-                usertext='Color map',
+                descr = _('If color markers dataset is given, use this colormap '
+                          'instead of the fill color'),
+                usertext=_('Color map'),
                 formatting=True) )
         self.add( setting.Bool(
                 'colorMapInvert', False,
-                descr = 'Invert color map',
-                usertext = 'Invert map',
+                descr = _('Invert color map'),
+                usertext = _('Invert map'),
                 formatting=True) )
 
 class ColorSettings(setting.Settings):
@@ -246,29 +251,29 @@ class ColorSettings(setting.Settings):
         setting.Settings.__init__(self, name, setnsmode='groupedsetting')
         self.add( setting.DatasetOrFloatList(
                 'points', '',
-                descr = 'Use color value (0-1) in dataset to paint points',
-                usertext='Color markers'), 7 )
+                descr = _('Use color value (0-1) in dataset to paint points'),
+                usertext=_('Color markers')), 7 )
         self.add( setting.Float(
                 'min', 0.,
-                descr = 'Minimum value of color dataset',
-                usertext = 'Min val' ))
+                descr = _('Minimum value of color dataset'),
+                usertext = _('Min val') ))
         self.add( setting.Float(
                 'max', 1.,
-                descr = 'Maximum value of color dataset',
-                usertext = 'Max val' ))
+                descr = _('Maximum value of color dataset'),
+                usertext = _('Max val') ))
         self.add( setting.Choice(
                 'scaling',
                 ['linear', 'sqrt', 'log', 'squared'],
                 'linear',
-                descr = 'Scaling to transform numbers to color',
-                usertext='Scaling'))
+                descr = _('Scaling to transform numbers to color'),
+                usertext=_('Scaling')))
 
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
     typename='xy'
     allowusercreation=True
-    description='Plot points with lines and errorbars'
+    description=_('Plot points with lines and errorbars')
 
     def __init__(self, parent, name=None):
         """Initialise XY plotter plotting (xdata, ydata).
@@ -286,68 +291,69 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.Int('thinfactor', 1,
                            minval=1,
-                           descr='Thin number of markers plotted'
-                           ' for each datapoint by this factor',
-                           usertext='Thin markers',
+                           descr=_('Thin number of markers plotted'
+                                   ' for each datapoint by this factor'),
+                           usertext=_('Thin markers'),
                            formatting=True), 0 )
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
-                                  descr = 'Size of marker to plot',
-                                  usertext='Marker size', formatting=True), 0 )
+                                  descr = _('Size of marker to plot'),
+                                  usertext=_('Marker size'), formatting=True), 0 )
         s.add( setting.Marker('marker',
                               'circle',
-                              descr = 'Type of marker to plot',
-                              usertext='Marker', formatting=True), 0 )
+                              descr = _('Type of marker to plot'),
+                              usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.DatasetOrStr('labels', '',
-                                    descr='Dataset or string to label points',
-                                    usertext='Labels', datatype='text'), 5 )
+                                    descr=_('Dataset or string to label points'),
+                                    usertext=_('Labels'), datatype='text'), 5 )
         s.add( setting.DatasetOrFloatList(
                 'scalePoints', '',
-                descr = 'Scale size of plotted markers by this dataset or'
-                ' list of values', usertext='Scale markers'), 6 )
+                descr = _('Scale size of plotted markers by this dataset or'
+                          ' list of values'),
+                usertext=_('Scale markers')), 6 )
 
         s.add( ColorSettings('Color') )
 
         s.add( setting.DatasetOrFloatList(
                 'yData', 'y',
-                descr='Dataset containing y data or list of values',
-                usertext='Y data'), 0 )
+                descr=_('Dataset containing y data or list of values'),
+                usertext=_('Y data')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'xData', 'x',
-                descr='Dataset containing x data or list of values',
-                usertext='X data'), 0 )
+                descr=_('Dataset containing x data or list of values'),
+                usertext=_('X data')), 0 )
         s.add( setting.ErrorStyle('errorStyle',
                                   'bar',
-                                  descr='Style of error bars to plot',
-                                  usertext='Error style', formatting=True) )
+                                  descr=_('Style of error bars to plot'),
+                                  usertext=_('Error style'), formatting=True) )
 
         s.add( setting.XYPlotLine('PlotLine',
-                                  descr = 'Plot line settings',
-                                  usertext = 'Plot line'),
+                                  descr = _('Plot line settings'),
+                                  usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
         s.add( setting.Line('MarkerLine',
-                            descr = 'Line around the marker settings',
-                            usertext = 'Marker border'),
+                            descr = _('Line around the marker settings'),
+                            usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( MarkerFillBrush('MarkerFill',
-                               descr = 'Marker fill settings',
-                               usertext = 'Marker fill'),
+                               descr = _('Marker fill settings'),
+                               usertext = _('Marker fill')),
                pixmap = 'settings_plotmarkerfill' )
         s.add( setting.ErrorBarLine('ErrorBarLine',
-                                    descr = 'Error bar line settings',
-                                    usertext = 'Error bar line'),
+                                    descr = _('Error bar line settings'),
+                                    usertext = _('Error bar line')),
                pixmap = 'settings_ploterrorline' )
         s.add( setting.PointFill('FillBelow',
-                                 descr = 'Fill below plot line',
-                                 usertext = 'Fill below'),
+                                 descr = _('Fill below plot line'),
+                                 usertext = _('Fill below')),
                pixmap = 'settings_plotfillbelow' )
         s.add( setting.PointFill('FillAbove',
-                                 descr = 'Fill above plot line',
-                                 usertext = 'Fill above'),
+                                 descr = _('Fill above plot line'),
+                                 usertext = _('Fill above')),
                pixmap = 'settings_plotfillabove' )
         s.add( setting.PointLabel('Label',
-                                  descr = 'Label settings',
-                                  usertext='Label'),
+                                  descr = _('Label settings'),
+                                  usertext=_('Label')),
                pixmap = 'settings_axislabel' )
 
     def _getUserDescription(self):

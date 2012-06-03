@@ -29,13 +29,18 @@ import page
 import grid
 import controlgraph
 
+def _(text, disambiguation=None, context='Graph'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
     allowedparenttypes = [page.Page, grid.Grid]
     allowusercreation = True
-    description = 'Base graph'
+    description = _('Base graph')
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
@@ -50,30 +55,30 @@ class Graph(widget.Widget):
 
         s.add( setting.Distance( 'leftMargin',
                                  '1.7cm',
-                                 descr='Distance from left of graph to edge',
-                                 usertext='Left margin',
+                                 descr=_('Distance from left of graph to edge'),
+                                 usertext=_('Left margin'),
                                  formatting=True) )
         s.add( setting.Distance( 'rightMargin',
                                  '0.2cm',
-                                 descr='Distance from right of graph to edge',
-                                 usertext='Right margin',
+                                 descr=_('Distance from right of graph to edge'),
+                                 usertext=_('Right margin'),
                                  formatting=True) )
         s.add( setting.Distance( 'topMargin',
                                  '0.2cm',
-                                 descr='Distance from top of graph to edge',
-                                 usertext='Top margin',
+                                 descr=_('Distance from top of graph to edge'),
+                                 usertext=_('Top margin'),
                                  formatting=True) )
         s.add( setting.Distance( 'bottomMargin',
                                  '1.7cm',
-                                 descr='Distance from bottom of graph to edge',
-                                 usertext='Bottom margin',
+                                 descr=_('Distance from bottom of graph to edge'),
+                                 usertext=_('Bottom margin'),
                                  formatting=True) )
         s.add( setting.GraphBrush( 'Background',
-                                   descr = 'Background plot fill',
-                                   usertext='Background'),
+                                   descr = _('Background plot fill'),
+                                   usertext=_('Background')),
                pixmap='settings_bgfill' )
-        s.add( setting.Line('Border', descr = 'Graph border line',
-                            usertext='Border'),
+        s.add( setting.Line('Border', descr = _('Graph border line'),
+                            usertext=_('Border')),
                pixmap='settings_border')
         
     def addDefaultSubWidgets(self):

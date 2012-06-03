@@ -29,6 +29,11 @@ import veusz.setting as setting
 
 from widgettree import WidgetTreeModel, WidgetTreeView
 
+def _(text, disambiguation=None, context='TreeEditWindow'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class SettingsProxy(object):
     """Object to handle communication between widget/settings
     or sets of widgets/settings."""
@@ -245,7 +250,7 @@ class SettingsProxyMulti(SettingsProxy):
         # apply all operations
         if ops:
             self.document.applyOperation(
-                document.OperationMultiple(ops, descr='change settings'))
+                document.OperationMultiple(ops, descr=_('change settings')))
 
     def onAction(self, action, console):
         """Run actions with same name."""
@@ -286,7 +291,7 @@ class SettingsProxyMulti(SettingsProxy):
             setn = s.get(name)
             ops.append(document.OperationSettingSet(setn, setn.default))
         self.document.applyOperation(
-            document.OperationMultiple(ops, descr="reset to default"))
+            document.OperationMultiple(ops, descr=_("reset to default")))
 
 class PropertyList(qt4.QWidget):
     """Edit the widget properties using a set of controls."""
@@ -592,7 +597,7 @@ class FormatDock(qt4.QDockWidget):
 
     def __init__(self, document, treeedit, *args):
         qt4.QDockWidget.__init__(self, *args)
-        self.setWindowTitle("Formatting - Veusz")
+        self.setWindowTitle(_("Formatting - Veusz"))
         self.setObjectName("veuszformattingdock")
 
         self.document = document
@@ -628,7 +633,7 @@ class PropertiesDock(qt4.QDockWidget):
 
     def __init__(self, document, treeedit, *args):
         qt4.QDockWidget.__init__(self, *args)
-        self.setWindowTitle("Properties - Veusz")
+        self.setWindowTitle(_("Properties - Veusz"))
         self.setObjectName("veuszpropertiesdock")
 
         self.document = document
@@ -657,7 +662,7 @@ class TreeEditDock(qt4.QDockWidget):
         """Initialise dock given document and parent widget."""
         qt4.QDockWidget.__init__(self, parentwin)
         self.parentwin = parentwin
-        self.setWindowTitle("Editing - Veusz")
+        self.setWindowTitle(_("Editing - Veusz"))
         self.setObjectName("veuszeditingwindow")
         self.selwidgets = []
 
@@ -679,13 +684,13 @@ class TreeEditDock(qt4.QDockWidget):
         self.setWidget(self.treeview)
 
         # toolbar to create widgets
-        self.addtoolbar = qt4.QToolBar("Insert toolbar - Veusz",
+        self.addtoolbar = qt4.QToolBar(_("Insert toolbar - Veusz"),
                                        parentwin)
         # note wrong description!: backwards compatibility
         self.addtoolbar.setObjectName("veuszeditingtoolbar")
 
         # toolbar for editting widgets
-        self.edittoolbar = qt4.QToolBar("Edit toolbar - Veusz",
+        self.edittoolbar = qt4.QToolBar(_("Edit toolbar - Veusz"),
                                         parentwin)
         self.edittoolbar.setObjectName("veuszedittoolbar")
 
@@ -857,36 +862,36 @@ class TreeEditDock(qt4.QDockWidget):
         a = utils.makeAction
         actions.update({
                 'edit.cut':
-                    a(self, 'Cut the selected widget', 'Cu&t',
+                    a(self, _('Cut the selected widget'), _('Cu&t'),
                       self.slotWidgetCut,
                       icon='veusz-edit-cut', key='Ctrl+X'),
                 'edit.copy':
-                    a(self, 'Copy the selected widget', '&Copy',
+                    a(self, _('Copy the selected widget'), _('&Copy'),
                       self.slotWidgetCopy,
                       icon='kde-edit-copy', key='Ctrl+C'),
                 'edit.paste':
-                    a(self, 'Paste widget from the clipboard', '&Paste',
+                    a(self, _('Paste widget from the clipboard'), _('&Paste'),
                       self.slotWidgetPaste,
                       icon='kde-edit-paste', key='Ctrl+V'),
                 'edit.moveup':
-                    a(self, 'Move the selected widget up', 'Move &up',
+                    a(self, _('Move the selected widget up'), _('Move &up'),
                       utils.BoundCaller(self.slotWidgetMove, -1),
                       icon='kde-go-up'),
                 'edit.movedown':
-                    a(self, 'Move the selected widget down', 'Move d&own',
+                    a(self, _('Move the selected widget down'), _('Move d&own'),
                       utils.BoundCaller(self.slotWidgetMove, 1),
                       icon='kde-go-down'),
                 'edit.delete':
-                    a(self, 'Remove the selected widget', '&Delete',
+                    a(self, _('Remove the selected widget'), _('&Delete'),
                       self.slotWidgetDelete,
                       icon='kde-edit-delete'),
                 'edit.rename':
-                    a(self, 'Renames the selected widget', '&Rename',
+                    a(self, _('Renames the selected widget'), _('&Rename'),
                       self.slotWidgetRename,
                       icon='kde-edit-rename'),
 
                 'add.shapemenu':
-                    a(self, 'Add a shape to the plot', 'Shape',
+                    a(self, _('Add a shape to the plot'), _('Shape'),
                       self.slotShowShapeMenu,
                       icon='veusz-shape-menu'),
                 })
@@ -1137,16 +1142,16 @@ class TreeEditDock(qt4.QDockWidget):
         name = self.selwidgets[0].name
 
         menu.addAction(
-            "All '%s' widgets" % wtype,
+            _("All '%s' widgets") % wtype,
             lambda: self._selectWidgetsTypeAndOrName(wtype, None))
         menu.addAction(
-            "Siblings of '%s' with type '%s'" % (name, wtype),
+            _("Siblings of '%s' with type '%s'") % (name, wtype),
             lambda: self._selectWidgetSiblings(self.selwidgets[0], wtype))
         menu.addAction(
-            "All '%s' widgets called '%s'" % (wtype, name),
+            _("All '%s' widgets called '%s'") % (wtype, name),
             lambda: self._selectWidgetsTypeAndOrName(wtype, name))
         menu.addAction(
-            "All widgets called '%s'" % name,
+            _("All widgets called '%s'") % name,
             lambda: self._selectWidgetsTypeAndOrName(None, name))
 
 class SettingLabel(qt4.QWidget):
@@ -1214,7 +1219,7 @@ class SettingLabel(qt4.QWidget):
         # update tooltip
         tooltip = self.setting.descr
         if self.setting.isReference():
-            tooltip += ('\nLinked to %s' %
+            tooltip += (_('\nLinked to %s') %
                         self.setting.getReference().resolve(self.setting).path)
         self.setToolTip(tooltip)
 
@@ -1318,26 +1323,26 @@ class SettingLabel(qt4.QWidget):
         name = widget.name
 
         popup = qt4.QMenu(self)
-        popup.addAction('Reset to default',
+        popup.addAction(_('Reset to default'),
                         self.actionResetDefault)
 
-        copyto = popup.addMenu('Copy to')
-        copyto.addAction("all '%s' widgets" % wtype,
+        copyto = popup.addMenu(_('Copy to'))
+        copyto.addAction(_("all '%s' widgets") % wtype,
                          self.actionCopyTypedWidgets)
-        copyto.addAction("'%s' siblings" % wtype,
+        copyto.addAction(_("'%s' siblings") % wtype,
                          self.actionCopyTypedSiblings)
-        copyto.addAction("'%s' widgets called '%s'" % (wtype, name),
+        copyto.addAction(_("'%s' widgets called '%s'") % (wtype, name),
                          self.actionCopyTypedNamedWidgets)
         copyto.addSeparator()
         self.addCopyToWidgets(copyto)
 
-        popup.addAction('Use as default style',
+        popup.addAction(_('Use as default style'),
                         self.actionSetStyleSheet)
 
         # special actions for references
         if self.setting.isReference():
             popup.addSeparator()
-            popup.addAction('Unlink setting', self.actionUnlinkSetting)
+            popup.addAction(_('Unlink setting'), self.actionUnlinkSetting)
 
         self.inmenu = True
         self.updateHighlight()
@@ -1384,5 +1389,5 @@ class SettingLabel(qt4.QWidget):
                 [ document.OperationSettingSet(sslink, self.setting.get()),
                   document.OperationSettingSet(self.setting,
                                                self.setting.default) ],
-                descr="make default style")
+                descr=_("make default style"))
             )

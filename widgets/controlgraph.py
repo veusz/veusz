@@ -30,6 +30,11 @@ import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 
+def _(text, disambiguation=None, context='controlgraph'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 ##############################################################################
 
 class _ShapeCorner(qt4.QGraphicsRectItem):
@@ -144,7 +149,7 @@ class ControlMarginBox(object):
             document.OperationSettingSet(s.get('bottomMargin'), bottom)
             )
         self.widget.document.applyOperation(
-            document.OperationMultiple(operations, descr='resize margins'))
+            document.OperationMultiple(operations, descr=_('resize margins')))
 
     def setPageSize(self):
         """Helper for setting document/page widget size.
@@ -171,7 +176,7 @@ class ControlMarginBox(object):
             document.OperationSettingSet(s.get('height'), height),
             )
         self.widget.document.applyOperation(
-            document.OperationMultiple(operations, descr='change page size'))
+            document.OperationMultiple(operations, descr=_('change page size')))
 
 class _GraphMarginBox(qt4.QGraphicsItem):
     """A box which can be moved or resized.

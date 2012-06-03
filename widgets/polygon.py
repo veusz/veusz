@@ -23,12 +23,17 @@ import veusz.utils as utils
 
 import plotters
 
+def _(text, disambiguation=None, context='Polygon'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Polygon(plotters.FreePlotter):
     """For plotting polygons."""
 
     typename = 'polygon'
     allowusercreeation = True
-    description = 'Plot a polygon'
+    description = _('Plot a polygon')
 
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
@@ -40,12 +45,12 @@ class Polygon(plotters.FreePlotter):
         plotters.FreePlotter.addSettings(s)
 
         s.add( setting.Line('Line',
-                            descr = 'Line around polygon',
-                            usertext = 'Line'),
+                            descr = _('Line around polygon'),
+                            usertext = _('Line')),
                pixmap = 'settings_plotline' )
         s.add( setting.BrushExtended('Fill',
-                                     descr = 'Fill within polygon',
-                                     usertext = 'Fill'),
+                                     descr = _('Fill within polygon'),
+                                     usertext = _('Fill')),
                pixmap = 'settings_plotfillbelow' )
 
     def draw(self, posn, phelper, outerbounds=None):

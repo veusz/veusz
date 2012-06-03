@@ -31,6 +31,11 @@ import veusz.document as document
 import veusz.utils as utils
 import veusz.widgets as widgets
 
+def _(text, disambiguation=None, context='PlotWindow'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class PickerCrosshairItem( qt4.QGraphicsPathItem ):
     """The picker cross widget: it moves from point to point and curve to curve
        with the arrow keys, and hides itself when it looses focus"""
@@ -183,7 +188,7 @@ class RenderThread( qt4.QThread ):
             try:
                 self.rc.processNextJob()
             except Exception:
-                sys.stderr.write("Error in rendering thread\n")
+                sys.stderr.write(_("Error in rendering thread\n"))
                 traceback.print_exc(file=sys.stderr)
 
 class PlotWindow( qt4.QGraphicsView ):
@@ -191,15 +196,15 @@ class PlotWindow( qt4.QGraphicsView ):
 
     # how often the document can update
     updateintervals = (
-        (0, 'Disable'),
-        (-1, 'On document change'),
-        (100, 'Every 0.1s'),
-        (250, 'Every 0.25s'),
-        (500, 'Every 0.5s'),
-        (1000, 'Every 1s'),
-        (2000, 'Every 2s'),
-        (5000, 'Every 5s'),
-        (10000, 'Every 10s'),
+        (0, _('Disable')),
+        (-1, _('On document change')),
+        (100, _('Every 0.1s')),
+        (250, _('Every 0.25s')),
+        (500, _('Every 0.5s')),
+        (1000, _('Every 1s')),
+        (2000, _('Every 2s')),
+        (5000, _('Every 5s')),
+        (10000, _('Every 10s')),
         )
 
     def __init__(self, document, parent, menu=None):
@@ -331,7 +336,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def createToolbar(self, parent, menu=None):
         """Make a view toolbar, and optionally update menu."""
 
-        self.viewtoolbar = qt4.QToolBar("View toolbar - Veusz", parent)
+        self.viewtoolbar = qt4.QToolBar(_("View toolbar - Veusz"), parent)
         self.viewtoolbar.setObjectName('veuszviewtoolbar')
         iconsize = setting.settingdb['toolbar_size']
         self.viewtoolbar.setIconSize(qt4.QSize(iconsize, iconsize))
@@ -349,57 +354,57 @@ class PlotWindow( qt4.QGraphicsView ):
         a = utils.makeAction
         actions.update({
                 'view.zoomin':
-                    a(self, 'Zoom into the plot', 'Zoom &In',
+                    a(self, _('Zoom into the plot'), _('Zoom &In'),
                       self.slotViewZoomIn,
                       icon='kde-zoom-in', key='Ctrl++'),
                 'view.zoomout':
-                    a(self, 'Zoom out of the plot', 'Zoom &Out',
+                    a(self, _('Zoom out of the plot'), _('Zoom &Out'),
                       self.slotViewZoomOut,
                       icon='kde-zoom-out', key='Ctrl+-'),
                 'view.zoom11':
-                    a(self, 'Restore plot to natural size', 'Zoom 1:1',
+                    a(self, _('Restore plot to natural size'), _('Zoom 1:1'),
                       self.slotViewZoom11,
                       icon='kde-zoom-1-veuszedit', key='Ctrl+1'),
                 'view.zoomwidth':
-                    a(self, 'Zoom plot to show whole width', 'Zoom to width',
+                    a(self, _('Zoom plot to show whole width'), _('Zoom to width'),
                       self.slotViewZoomWidth,
                       icon='kde-zoom-width-veuszedit'),
                 'view.zoomheight':
-                    a(self, 'Zoom plot to show whole height', 'Zoom to height',
+                    a(self, _('Zoom plot to show whole height'), _('Zoom to height'),
                       self.slotViewZoomHeight,
                       icon='kde-zoom-height-veuszedit'),
                 'view.zoompage':
-                    a(self, 'Zoom plot to show whole page', 'Zoom to page',
+                    a(self, _('Zoom plot to show whole page'), _('Zoom to page'),
                       self.slotViewZoomPage,
                       icon='kde-zoom-page-veuszedit'),
                 'view.zoommenu':
-                    a(self, 'Zoom functions menu', 'Zoom',
+                    a(self, _('Zoom functions menu'), _('Zoom'),
                       self.doZoomMenuButton,
                       icon='kde-zoom-veuszedit'),
                 'view.prevpage':
-                    a(self, 'Move to the previous page', '&Previous page',
+                    a(self, _('Move to the previous page'), _('&Previous page'),
                       self.slotViewPreviousPage,
                       icon='kde-go-previous', key='Ctrl+PgUp'),
                 'view.nextpage':
-                    a(self, 'Move to the next page', '&Next page',
+                    a(self, _('Move to the next page'), _('&Next page'),
                       self.slotViewNextPage,
                       icon='kde-go-next', key='Ctrl+PgDown'),
                 'view.select':
-                    a(self, 'Select items from the graph or scroll',
-                      'Select items or scroll',
+                    a(self, _('Select items from the graph or scroll'),
+                      _('Select items or scroll'),
                       None,
                       icon='kde-mouse-pointer'),
                 'view.pick':
-                    a(self, 'Read data points on the graph',
-                      'Read data points',
+                    a(self, _('Read data points on the graph'),
+                      _('Read data points'),
                       None,
                       icon='veusz-pick-data'),
                 'view.zoomgraph':
-                    a(self, 'Zoom into graph', 'Zoom graph',
+                    a(self, _('Zoom into graph'), _('Zoom graph'),
                       None,
                       icon='veusz-zoom-graph'),
                 'view.fullscreen':
-                    a(self, 'View plot full screen', 'Full screen',
+                    a(self, _('View plot full screen'), _('Full screen'),
                       self.slotFullScreen,
                       icon='veusz-view-fullscreen', key='Ctrl+F11'),
                 })
@@ -553,7 +558,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # finally change the axes
         self.document.applyOperation(
-            document.OperationMultiple(operations,descr='zoom axes') )
+            document.OperationMultiple(operations,descr=_('zoom axes')) )
 
     def axesForPoint(self, mousepos):
         """Find all the axes which contain the given mouse position"""
@@ -1202,8 +1207,8 @@ class FullScreenPlotWindow(qt4.QScrollArea):
 
         self.showFullScreen()
 
-        self.toolbar = qt4.QToolBar("Full screen toolbar", self)
-        self.toolbar.addAction(utils.getIcon("kde-window-close"), "Close",
+        self.toolbar = qt4.QToolBar(_("Full screen toolbar"), self)
+        self.toolbar.addAction(utils.getIcon("kde-window-close"), _("Close"),
                                self.close)
         for a in ('view.zoom11', 'view.zoomin', 'view.zoomout',
                   'view.zoomwidth', 'view.zoomheight',

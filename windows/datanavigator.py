@@ -20,12 +20,17 @@
 import veusz.qtall as qt4
 from veusz.qtwidgets.datasetbrowser import DatasetBrowser
 
+def _(text, disambiguation=None, context="DataNavigator"):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class DataNavigatorWindow(qt4.QDockWidget):
     """A dock window containing a dataset browsing widget."""
 
     def __init__(self, thedocument, mainwin, *args):
         qt4.QDockWidget.__init__(self, *args)
-        self.setWindowTitle("Data - Veusz")
+        self.setWindowTitle(_("Data - Veusz"))
         self.setObjectName("veuszdatawindow")
 
         self.nav = DatasetBrowser(thedocument, mainwin, self)

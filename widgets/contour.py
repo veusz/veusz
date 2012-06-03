@@ -34,6 +34,11 @@ import veusz.utils as utils
 
 import plotters
 
+def _(text, disambiguation=None, context='Contour'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def finitePoly(poly):
     """Remove non-finite coordinates from numpy arrays of coordinates."""
     out = []
@@ -49,12 +54,12 @@ class ContourFills(setting.Settings):
         setting.Settings.__init__(self, name, **args)
         self.add( setting.FillSet(
                 'fills', [],
-                descr = 'Fill styles to plot between contours',
-                usertext='Fill styles',
+                descr = _('Fill styles to plot between contours'),
+                usertext=_('Fill styles'),
                 formatting=True) )
         self.add( setting.Bool('hide', False,
-                               descr = 'Hide fills',
-                               usertext = 'Hide',
+                               descr = _('Hide fills'),
+                               usertext = _('Hide'),
                                formatting = True) )
         
 class ContourLines(setting.Settings):
@@ -64,12 +69,12 @@ class ContourLines(setting.Settings):
         self.add( setting.LineSet(
                 'lines',
                 [('solid', '1pt', 'black', False)],
-                descr = 'Line styles to plot the contours '
-                'using', usertext='Line styles',
+                descr = _('Line styles to plot the contours '
+                          'using'), usertext=_('Line styles'),
                 formatting=True) )
         self.add( setting.Bool('hide', False,
-                               descr = 'Hide lines',
-                               usertext = 'Hide',
+                               descr = _('Hide lines'),
+                               usertext = _('Hide'),
                                formatting = True) )
 
 class SubContourLines(setting.Settings):
@@ -79,17 +84,17 @@ class SubContourLines(setting.Settings):
         self.add( setting.LineSet(
                 'lines',
                 [('dot1', '1pt', 'black', False)],
-                descr = 'Line styles used for sub-contours',
-                usertext='Line styles',
+                descr = _('Line styles used for sub-contours'),
+                usertext=_('Line styles'),
                 formatting=True) )
         self.add( setting.Int('numLevels', 5,
                               minval=2,
-                              descr='Number of sub-levels to plot between '
-                              'each contour',
+                              descr=_('Number of sub-levels to plot between '
+                                      'each contour'),
                               usertext='Levels') )
         self.add( setting.Bool('hide', True,
-                               descr='Hide lines',
-                               usertext='Hide',
+                               descr=_('Hide lines'),
+                               usertext=_('Hide'),
                                formatting=True) )
 
 class ContourLabel(setting.Text):
@@ -98,12 +103,12 @@ class ContourLabel(setting.Text):
     def __init__(self, name, **args):
         setting.Text.__init__(self, name, **args)
         self.add( setting.Str( 'format', '%.3Vg',
-                               descr = 'Format of the tick labels',
-                               usertext='Format') )
+                               descr = _('Format of the tick labels'),
+                               usertext=_('Format')) )
         self.add( setting.Float('scale', 1.,
-                                descr='A scale factor to apply to the values '
-                                'of the tick labels',
-                                usertext='Scale') )
+                                descr=_('A scale factor to apply to the values '
+                                        'of the tick labels'),
+                                usertext=_('Scale')) )
 
         self.get('hide').newDefault(True)
 
@@ -113,7 +118,7 @@ class Contour(plotters.GenericPlotter):
 
     typename='contour'
     allowusercreation=True
-    description='Plot a 2d dataset as contours'
+    description=_('Plot a 2d dataset as contours')
 
     def __init__(self, parent, name=None):
         """Initialise plotter with axes."""
@@ -149,62 +154,62 @@ class Contour(plotters.GenericPlotter):
 
         s.add( setting.Dataset('data', '',
                                dimensions = 2,
-                               descr = 'Dataset to plot',
-                               usertext='Dataset'),
+                               descr = _('Dataset to plot'),
+                               usertext=_('Dataset')),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr = 'Minimum value of contour scale',
-                                   usertext='Min. value'),
+                                   descr = _('Minimum value of contour scale'),
+                                   usertext=_('Min. value')),
                1 )
         s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr = 'Maximum value of contour scale',
-                                   usertext='Max. value'),
+                                   descr = _('Maximum value of contour scale'),
+                                   usertext=_('Max. value')),
                2 )
         s.add( setting.Int('numLevels', 5,
                            minval = 1,
-                           descr = 'Number of contour levels to plot',
-                           usertext='Number levels'),
+                           descr = _('Number of contour levels to plot'),
+                           usertext=_('Number levels')),
                3 )
         s.add( setting.Choice('scaling',
                               ['linear', 'sqrt', 'log', 'squared', 'manual'],
                               'linear',
-                              descr = 'Scaling between contour levels',
-                              usertext='Scaling'),
+                              descr = _('Scaling between contour levels'),
+                              usertext=_('Scaling')),
                4 )
         s.add( setting.FloatList('manualLevels',
                                  [],
-                                 descr = 'Levels to use for manual scaling',
-                                 usertext='Manual levels'),
+                                 descr = _('Levels to use for manual scaling'),
+                                 usertext=_('Manual levels')),
                5 )
 
-        s.add( setting.Bool('keyLevels', False, descr='Show levels in key',
-                            usertext='Levels in key'),
+        s.add( setting.Bool('keyLevels', False, descr=_('Show levels in key'),
+                            usertext=_('Levels in key')),
                6 )
 
         s.add( setting.FloatList('levelsOut',
                                  [],
-                                 descr = 'Levels used in the plot',
-                                 usertext='Output levels'),
+                                 descr = _('Levels used in the plot'),
+                                 usertext=_('Output levels')),
                7, readonly=True )
 
         s.add( ContourLabel('ContourLabels',
-                            descr = 'Contour label settings',
-                            usertext = 'Contour labels'),
+                            descr = _('Contour label settings'),
+                            usertext = _('Contour labels')),
                pixmap = 'settings_axisticklabels' )
 
         s.add( ContourLines('Lines',
-                            descr='Contour lines',
-                            usertext='Contour lines'),
+                            descr=_('Contour lines'),
+                            usertext=_('Contour lines')),
                pixmap = 'settings_contourline' )
 
         s.add( ContourFills('Fills',
-                            descr='Fill within contours',
-                            usertext='Contour fills'),
+                            descr=_('Fill within contours'),
+                            usertext=_('Contour fills')),
                pixmap = 'settings_contourfill' )
 
         s.add( SubContourLines('SubLines',
-                               descr='Sub-contour lines',
-                               usertext='Sub-contour lines'),
+                               descr=_('Sub-contour lines'),
+                               usertext=_('Sub-contour lines')),
                pixmap = 'settings_subcontourline' )
 
         s.add( setting.SettingBackwardCompat('lines', 'Lines/lines', None) )

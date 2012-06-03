@@ -23,18 +23,24 @@ from widget import Widget
 from page import Page
 from grid import Grid
 
+import veusz.qtall as qt4
 import veusz.setting as setting
 
 filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
                'polygon')
+
+def _(text, disambiguation=None, context='NonOrthGraph'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class FillBrush(setting.BrushExtended):
     '''Brush for filling point region.'''
     def __init__(self, *args, **argsv):
         setting.BrushExtended.__init__(self, *args, **argsv)
         self.add( setting.Choice('filltype', filloptions, 'center',
-                                 descr='Fill to this edge/position',
-                                 usertext='Fill type') )
+                                 descr=_('Fill to this edge/position'),
+                                 usertext=_('Fill type')) )
         self.get('hide').newDefault(True)
 
 class NonOrthGraph(Widget):
@@ -49,30 +55,30 @@ class NonOrthGraph(Widget):
 
         s.add( setting.Distance( 'leftMargin',
                                  '1.7cm',
-                                 descr='Distance from left of graph to edge',
-                                 usertext='Left margin',
+                                 descr=_('Distance from left of graph to edge'),
+                                 usertext=_('Left margin'),
                                  formatting=True) )
         s.add( setting.Distance( 'rightMargin',
                                  '0.2cm',
-                                 descr='Distance from right of graph to edge',
-                                 usertext='Right margin',
+                                 descr=_('Distance from right of graph to edge'),
+                                 usertext=_('Right margin'),
                                  formatting=True) )
         s.add( setting.Distance( 'topMargin',
                                  '0.2cm',
-                                 descr='Distance from top of graph to edge',
-                                 usertext='Top margin',
+                                 descr=_('Distance from top of graph to edge'),
+                                 usertext=_('Top margin'),
                                  formatting=True) )
         s.add( setting.Distance( 'bottomMargin',
                                  '1.7cm',
-                                 descr='Distance from bottom of graph to edge',
-                                 usertext='Bottom margin',
+                                 descr=_('Distance from bottom of graph to edge'),
+                                 usertext=_('Bottom margin'),
                                  formatting=True) )
         s.add( setting.GraphBrush( 'Background',
-                                   descr = 'Background plot fill',
-                                   usertext='Background'),
+                                   descr = _('Background plot fill'),
+                                   usertext=_('Background')),
                pixmap='settings_bgfill' )
-        s.add( setting.Line('Border', descr = 'Graph border line',
-                            usertext='Border'),
+        s.add( setting.Line('Border', descr = _('Graph border line'),
+                            usertext=_('Border')),
                pixmap='settings_border')
 
     def graphToPlotCoords(self, coorda, coordb):

@@ -32,12 +32,17 @@ from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
 from point import MarkerFillBrush
 
+def _(text, disambiguation=None, context='NonOrthPoint'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class NonOrthPoint(Widget):
     '''Widget for plotting points in a non-orthogonal plot.'''
 
     typename = 'nonorthpoint'
     allowusercreation = True
-    description = 'Plot points on a graph with non-orthogonal axes'
+    description = _('Plot points on a graph with non-orthogonal axes')
 
     allowedparenttypes = [NonOrthGraph]
 
@@ -54,51 +59,52 @@ class NonOrthPoint(Widget):
 
         s.add( setting.DatasetOrFloatList(
                 'data1', 'x',
-                descr='Dataset containing 1st dataset or list of values',
-                usertext='Dataset 1') )
+                descr=_('Dataset containing 1st dataset or list of values'),
+                usertext=_('Dataset 1')) )
         s.add( setting.DatasetOrFloatList(
                 'data2', 'y',
-                descr='Dataset containing 2nd dataset or list of values',
-                usertext='Dataset 2') )
+                descr=_('Dataset containing 2nd dataset or list of values'),
+                usertext=_('Dataset 2')) )
         s.add( setting.DatasetOrFloatList(
                 'scalePoints', '',
-                descr = 'Scale size of plotted markers by this dataset or'
-                ' list of values', usertext='Scale markers') )
+                descr = _('Scale size of plotted markers by this dataset or'
+                          ' list of values'),
+                usertext=_('Scale markers')) )
         s.add( setting.DatasetOrStr('labels', '',
-                                    descr='Dataset or string to label points',
-                                    usertext='Labels', datatype='text') )
+                                    descr=_('Dataset or string to label points'),
+                                    usertext=_('Labels'), datatype='text') )
 
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
-                                  descr = 'Size of marker to plot',
-                                  usertext='Marker size', formatting=True), 0 )
+                                  descr = _('Size of marker to plot'),
+                                  usertext=_('Marker size'), formatting=True), 0 )
         s.add( setting.Marker('marker',
                               'circle',
-                              descr = 'Type of marker to plot',
-                              usertext='Marker', formatting=True), 0 )
+                              descr = _('Type of marker to plot'),
+                              usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.Line('PlotLine',
-                            descr = 'Plot line settings',
-                            usertext = 'Plot line'),
+                            descr = _('Plot line settings'),
+                            usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
         s.add( setting.Line('MarkerLine',
-                            descr = 'Line around the marker settings',
-                            usertext = 'Marker border'),
+                            descr = _('Line around the marker settings'),
+                            usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( MarkerFillBrush('MarkerFill',
-                               descr = 'Marker fill settings',
-                               usertext = 'Marker fill'),
+                               descr = _('Marker fill settings'),
+                               usertext = _('Marker fill')),
                pixmap = 'settings_plotmarkerfill' )
         s.add( FillBrush('Fill1',
-                         descr = 'Fill settings (1)',
-                         usertext = 'Area fill 1'),
+                         descr = _('Fill settings (1)'),
+                         usertext = _('Area fill 1')),
                pixmap = 'settings_plotfillbelow' )
         s.add( FillBrush('Fill2',
-                         descr = 'Fill settings (2)',
-                         usertext = 'Area fill 2'),
+                         descr = _('Fill settings (2)'),
+                         usertext = _('Area fill 2')),
                pixmap = 'settings_plotfillbelow' )
         s.add( setting.PointLabel('Label',
-                                  descr = 'Label settings',
-                                  usertext='Label'),
+                                  descr = _('Label settings'),
+                                  usertext=_('Label')),
                pixmap = 'settings_axislabel' )
 
     def updateDataRanges(self, inrange):

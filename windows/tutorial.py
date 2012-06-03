@@ -23,6 +23,11 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
 
+def _(text, disambiguation=None, context="Tutorial"):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class TutorialStep(qt4.QObject):
     def __init__(self, text, mainwin,
                  nextstep=None, flash=None,
@@ -80,7 +85,7 @@ class TutorialStep(qt4.QObject):
 class StepIntro(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Welcome to Veusz!</h1>
 
 <p>This tutorial aims to get you working with Veusz as quickly as
@@ -91,12 +96,12 @@ the top-right of this panel. The tutorial can be replayed in the help
 menu.</p>
 
 <p class="usercmd">Press Next to go to the next step</p>
-''', mainwin, nextstep=StepWidgets1)
+'''), mainwin, nextstep=StepWidgets1)
 
 class StepWidgets1(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Widgets</h1>
 
 <p>Plots in Veusz are constructed from <i>widgets</i>.  Different
@@ -106,12 +111,12 @@ and for plotting functions.</p>
 
 <p>There are also special widgets. The grid widget arranges graphs
 inside it in a grid arrangement.</p>
-''', mainwin, nextstep=StepWidgets2)
+'''), mainwin, nextstep=StepWidgets2)
 
 class StepWidgets2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Widget can often be placed inside each other. For instance, a graph
 widget is placed in a page widget or a grid widget. Plotting widgets
 are placed in graph widget.</p>
@@ -120,13 +125,13 @@ are placed in graph widget.</p>
 can have several graphs on the page, optionally arranged in a
 grid. Several plotting widgets and axis widgets can be put in a
 graph.</p>
-''', mainwin, nextstep=StepWidgetWin)
+'''), mainwin, nextstep=StepWidgetWin)
 
 class StepWidgetWin(TutorialStep):
     def __init__(self, mainwin):
         t = mainwin.treeedit
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Widget editing</h1>
 
 <p>The flashing window is the Editing window, which shows the widgets
@@ -134,19 +139,19 @@ currently in the plot in a hierarchical tree. Each widget has a name
 (the left column) and a type (the right column).</p>
 
 <p class="usercmd">Press Next to continue.</p>
-''', mainwin,
+'''), mainwin,
             nextstep=StepWidgetWinExpand,
             flash=t)
 
 class StepWidgetWinExpand(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>The graph widget is the currently selected widget.</p>
 
 <p class="usercmd">Expand the graph widget - click the arrow or plus
 to its left in the editing window - and select the x axis widget.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonselected='x',
             nextstep=StepPropertiesWin)
@@ -154,7 +159,7 @@ to its left in the editing window - and select the x axis widget.</p>
 class StepPropertiesWin(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Widget properties</h1>
 
 <p>This window shows the properties of the currently selected widget,
@@ -163,7 +168,7 @@ the x axis widget of the graph.</p>
 <p class="usercmd">Enter a new label for the widget, by clicking in the
 text edit box to the right of "Label", typing some text and press the
 Enter key.</p>
-''', mainwin,
+'''), mainwin,
             flash = mainwin.propdock,
             disablenext = True,
             nextonsetting = ('/page1/graph1/x/label',
@@ -173,7 +178,7 @@ Enter key.</p>
 class StepPropertiesWin2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Notice that the x axis label of your plot has now been updated.
 Veusz supports LaTeX style formatting for labels, so you could include
 superscripts, subscripts and fractions.</p>
@@ -182,12 +187,12 @@ superscripts, subscripts and fractions.</p>
 of the axis and whether the axis is logarithmic.</p>
 
 <p class="usercmd">Click Next to continue.</p>
-''', mainwin, nextstep=WidgetAdd)
+'''), mainwin, nextstep=WidgetAdd)
 
 class WidgetAdd(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Adding widgets</h1>
 
 <p>The flashing Add Widget toolbar and the Insert menu add widgets to
@@ -198,14 +203,14 @@ widget, if possible, or its parents.</p>
 see a description of a widget type.</p>
 
 <p class="usercmd">Press Next to continue.</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.treeedit.addtoolbar,
             nextstep=FunctionAdd )
 
 class FunctionAdd(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Add a function</h1>
 
 <p>We will now add a function plotting widget to the current
@@ -213,7 +218,7 @@ graph.</p>
 
 <p class="usercmd">Click on the flashing icon, or go to the Insert menu
 and choosing "Add function".</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.function']),
             disablenext=True,
@@ -224,7 +229,7 @@ and choosing "Add function".</p>
 class FunctionSet(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>You have now added a function widget to the graph widget. By
 default function widgets plot y=x.</p>
 
@@ -233,7 +238,7 @@ be <code>x**2</code>, plotting x squared.</p>
 
 <p>(Veusz uses Python syntax for its functions, so the power operator
 is <code>**</code>, rather than <code>^</code>)</p>
-''', mainwin,
+'''), mainwin,
             nextonsetting = ('/page1/graph1/function1/function',
                              lambda val: val.strip() == 'x**2'),
             disablenext = True,
@@ -242,7 +247,7 @@ is <code>**</code>, rather than <code>^</code>)</p>
 class FunctionFormatting(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Formatting</h1>
 
 <p>Widgets have a number of formatting options. The Formatting window
@@ -250,7 +255,7 @@ class FunctionFormatting(TutorialStep):
 the function widget.</p>
 
 <p class="usercmd">Press Next to continue</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.formatdock,
             nextstep=FunctionFormatLine)
 
@@ -262,13 +267,13 @@ class FunctionFormatLine(TutorialStep):
         tb.setTabButton(1, qt4.QTabBar.LeftSide, label)
 
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Different types of formatting properties are grouped under separate
 tables. The options for drawing the function line are grouped under
 the flashing Line tab (%s).</p>
 
 <p class="usercmd">Click on the Line tab to continue.</p>
-''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
             mainwin,
             flash=label,
             disablenext=True,
@@ -284,12 +289,12 @@ the flashing Line tab (%s).</p>
 class FunctionLineFormatting(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Veusz lets you choose a line style, thickness and color for the
 function line.</p>
 
 <p class="usercmd">Choose a new line color for the line.</p>
-''',
+'''),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/function1/Line/color',
@@ -302,7 +307,7 @@ function line.</p>
 class DataStart(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Datasets</h1>
 
 <p>Many widgets in Veusz plot datasets. Datasets can be imported from
@@ -313,20 +318,20 @@ operations or expressions.</p>
 document.</p>
 
 <p class="usercmd">Press Next to continue</p>
-''', mainwin,
+'''), mainwin,
             nextstep=DataImport)
 
 class DataImport(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Importing data</h1>
 
 <p>Let us start by importing data.</p>
 
 <p class="usercmd">Click the flashing Data Import icon, or choose
 "Import..."  From the Data menu.</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.datatoolbar.widgetForAction(
                 mainwin.vzactions['data.import']),
             disablenext=True,
@@ -355,7 +360,7 @@ class DataImport(TutorialStep):
 class DataImportDialog(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>This is the data import dialog. In this tutorial, we have selected
 an example CSV (comma separated value) file for you, but you would
 normally browse to find your data file.</p>
@@ -364,12 +369,12 @@ normally browse to find your data file.</p>
 and <i>gamma</i>, entered as columns in the CSV file.</p>
 
 <p class="usercmd">Press Next to continue</p>
-''', mainwin, nextstep=DataImportDialog2)
+'''), mainwin, nextstep=DataImportDialog2)
 
 class DataImportDialog2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Veusz will try to guess the datatype - numeric, text or date - from
 the data in the file or you can specify it manually.</p>
 
@@ -378,7 +383,7 @@ can be defined to import any data format. The Link option links data
 to the original file.</p>
 
 <p class="usercmd">Click the Import button in the dialog.</p>
-''', mainwin,
+'''), mainwin,
             nextstep=DataImportDialog3,
             disablenext=True)
         self.connect( mainwin.document,
@@ -391,13 +396,13 @@ to the original file.</p>
 class DataImportDialog3(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Notice how Veusz has loaded the three different datasets from the
 file. You could carry on importing new datasets from the Import dialog
 box or reopen it later.</p>
 
 <p class="usercmd">Close the Import dialog box.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextstep=DataImportDialog4)
 
@@ -419,7 +424,7 @@ box or reopen it later.</p>
 class DataImportDialog4(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>The Data viewing window (flashing) shows the currently loaded
 datasets in the document.</p>
 
@@ -427,7 +432,7 @@ datasets in the document.</p>
 can see datasets in more detail in the Data Edit dialog box.</p>
 
 <p class="usercmd">Click Next to continue</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.datadock,
             nextstep=AddXYPlotter)
 
@@ -437,14 +442,14 @@ can see datasets in more detail in the Data Edit dialog box.</p>
 class AddXYPlotter(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Plotting data</h1>
 
 <p>The point plotting widget plots datasets loaded in Veusz.</p>
 
 <p class="usercmd">The flashing icon adds a point plotting (xy)
 widget. Click on this, or go to the Add menu and choose "Add xy".</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.xy']),
             disablenext=True,
@@ -455,13 +460,13 @@ widget. Click on this, or go to the Add menu and choose "Add xy".</p>
 class SetXY_X(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>The datasets to be plotted are in the widget's properties.</p>
 
 <p class="usercmd">Change the "X data" setting to be the
 <code>alpha</code> dataset. You can choose this from the drop down
 menu or type it.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/xData',
                              lambda val: val == 'alpha'),
@@ -470,10 +475,10 @@ menu or type it.</p>
 class SetXY_Y(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p class="usercmd">Change the "Y data" setting to be the
 <code>beta</code> dataset.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/yData',
                              lambda val: val == 'beta'),
@@ -482,7 +487,7 @@ class SetXY_Y(TutorialStep):
 class SetXYLine(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Veusz has now plotted the data on the graph. You can manipulate how
 the data are shown using the formatting settings.</p>
 
@@ -491,7 +496,7 @@ widget is selected.</p>
 
 <p class="usercmd">Click on the check box next to the Hide option at
 the bottom, to hide the line plotted between the data points.</p>
-''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/PlotLine/hide',
@@ -501,12 +506,12 @@ the bottom, to hide the line plotted between the data points.</p>
 class SetXYFill(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Now we will change the point color.</p>
 
 <p class="usercmd">Click on the "Marker fill (%s)" formatting tab.
 Change the fill color of the plotted data.</p>
-''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotmarkerfill.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotmarkerfill.png')),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/MarkerFill/color',
@@ -516,7 +521,7 @@ Change the fill color of the plotted data.</p>
 class AddXY2nd(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Adding a second dataset</h1>
 
 <p>We will now plot dataset <code>alpha</code> against
@@ -524,7 +529,7 @@ class AddXY2nd(TutorialStep):
 
 <p class="usercmd">Add a second point plotting (xy) widget using the
 flashing icon, or go to the Add menu and choose "Add xy".</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.xy']),
             disablenext=True,
@@ -535,10 +540,10 @@ flashing icon, or go to the Add menu and choose "Add xy".</p>
 class AddXY2nd_2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p class="usercmd">Change the "X data" setting to be the
 <code>alpha</code> dataset.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy2/xData',
                              lambda val: val == 'alpha'),
@@ -547,10 +552,10 @@ class AddXY2nd_2(TutorialStep):
 class AddXY2nd_3(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p class="usercmd">Next, change the "Y data" setting to be the
 <code>gamma</code> dataset.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy2/yData',
                              lambda val: val == 'gamma'),
@@ -559,13 +564,13 @@ class AddXY2nd_3(TutorialStep):
 class AddXY2nd_4(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>We can fill regions under plots using the Fill Below Formatting tab
 (%s).</p>
 
 <p class="usercmd">Go to this tab, and unselect the "Hide edge fill"
 option.</p>
-''' % utils.pixmapAsHtml(utils.getPixmap('settings_plotfillbelow.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotfillbelow.png')),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy2/FillBelow/hide',
@@ -575,7 +580,7 @@ option.</p>
 class File1(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Saving</h1>
 
 <p>The document can be saved under the File menu, choosing "Save
@@ -585,7 +590,7 @@ as...", or by clicking on the Save icon (flashing).</p>
 outside the program.</p>
 
 <p class="usercmd">Click Next to continue</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.maintoolbar.widgetForAction(
                 mainwin.vzactions['file.save']),
             nextstep=File2)
@@ -593,7 +598,7 @@ outside the program.</p>
 class File2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Exporting</h1>
 
 <p>The document can be exported in scalable (EPS, PDF, SVG and EMF) or
@@ -603,7 +608,7 @@ bitmap formats.</p>
 page. Alternatively, click on the Export icon (flashing).</p>
 
 <p class="usercmd">Click Next to continue</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.maintoolbar.widgetForAction(
                 mainwin.vzactions['file.export']),
             nextstep=Cut1,
@@ -612,13 +617,13 @@ page. Alternatively, click on the Export icon (flashing).</p>
 class Cut1(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Cut and paste</h1>
 
 <p>Widgets can be cut and pasted to manipulate the document.</p>
 
 <p class="usercmd">Select the "graph1" widget in the Editing window.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonselected='graph1',
             nextstep=Cut2)
@@ -626,13 +631,13 @@ class Cut1(TutorialStep):
 class Cut2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p class="usercmd">Now click the Cut icon (flashing) or choose "Cut"
 from the Edit menu.</p>
 
 <p>This copies the currently selected widget to the clipboard and
 deletes it from the document.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.cut']),
@@ -651,14 +656,14 @@ deletes it from the document.</p>
 class AddGrid(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>Adding a grid</h1>
 
 <p>Now we will add a grid widget to paste the graph back into.</p>
 
 <p class="usercmd">Click on the flashing Grid widget icon, or choose
 "Add grid" from the Insert menu.</p>
-''', mainwin,
+'''), mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.grid']),
             disablenext=True,
@@ -669,12 +674,12 @@ class AddGrid(TutorialStep):
 class Paste1(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p class="usercmd">Now click the Paste icon (flashing) or choose "Paste"
 from the Edit menu.</p>
 
 <p>This pastes back the widget from the clipboard.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.paste']),
@@ -685,12 +690,12 @@ from the Edit menu.</p>
 class Paste2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p class="usercmd">For a second time, click the Paste icon (flashing)
 or choose "Paste" from the Edit menu.</p>
 
 <p>This adds a second copy of the original graph to the grid.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.paste']),
@@ -701,13 +706,13 @@ or choose "Paste" from the Edit menu.</p>
 class Paste3(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>Having the graphs side-by-side looks a bit messy. We would like to
 change the graphs to be arranged in rows.</p>
 
 <p class="usercmd">Navigate to the grid1 widget properties. Change the
 number of columns to 1.</p>
-''', mainwin,
+'''), mainwin,
             disablenext=True,
             nextonsetting = ('/page1/grid1/columns',
                              lambda val: val == 1),
@@ -716,19 +721,19 @@ number of columns to 1.</p>
 class Paste4(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <p>We could now adjust the margins of the graphs and the grid.</p>
 
 <p>Axes can also be shared by the graphs of the grid by moving them
 into the grid widget. This shares the same axis scale for graphs.</p>
 
 <p class="usercmd">Click Next to continue</p>
-''', mainwin, nextstep=EndStep)
+'''), mainwin, nextstep=EndStep)
 
 class EndStep(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
-            self, '''
+            self, _('''
 <h1>The End</h1>
 
 <p>Thank you for working through this Veusz tutorial. We hope you
@@ -738,7 +743,7 @@ enjoy using Veusz!</p>
 developers via the mailing list.</p>
 
 <p>You can try this tutorial again from the Help menu.</p>
-''', mainwin, closestep=True, disablenext=True)
+'''), mainwin, closestep=True, disablenext=True)
 
 class TutorialDock(qt4.QDockWidget):
     '''A dock tutorial window.'''

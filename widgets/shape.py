@@ -29,6 +29,11 @@ import widget
 import controlgraph
 import plotters
 
+def _(text, disambiguation=None, context='Shape'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Shape(plotters.FreePlotter):
     """A shape on a page/graph."""
 
@@ -41,16 +46,16 @@ class Shape(plotters.FreePlotter):
         plotters.FreePlotter.addSettings(s)
 
         s.add( setting.ShapeFill('Fill',
-                                 descr = 'Shape fill',
-                                 usertext='Fill'),
+                                 descr = _('Shape fill'),
+                                 usertext=_('Fill')),
                pixmap = 'settings_bgfill' )
         s.add( setting.Line('Border',
-                            descr = 'Shape border',
-                            usertext='Border'),
+                            descr = _('Shape border'),
+                            usertext=_('Border')),
                pixmap = 'settings_border' )
         s.add( setting.Bool('clip', False,
-                            descr='Clip shape to its container',
-                            usertext='Clip',
+                            descr=_('Clip shape to its container'),
+                            usertext=_('Clip'),
                             formatting=True) )
 
 class BoxShape(Shape):
@@ -65,19 +70,19 @@ class BoxShape(Shape):
         Shape.addSettings(s)
 
         s.add( setting.DatasetOrFloatList('width', [0.1],
-                                          descr='List of fractional '
-                                          'widths or dataset',
-                                          usertext='Widths',
+                                          descr=_('List of fractional '
+                                                  'widths or dataset'),
+                                          usertext=_('Widths'),
                                           formatting=False), 3 )
         s.add( setting.DatasetOrFloatList('height', [0.1],
-                                          descr='List of fractional '
-                                          'heights or dataset',
-                                          usertext='Heights',
+                                          descr=_('List of fractional '
+                                                  'heights or dataset'),
+                                          usertext=_('Heights'),
                                           formatting=False), 4 )
         s.add( setting.DatasetOrFloatList('rotate', [0.],
-                                          descr='Rotation angles of '
-                                          'shape or dataset',
-                                          usertext='Rotate',
+                                          descr=_('Rotation angles of '
+                                                  'shape or dataset'),
+                                          usertext=_('Rotate'),
                                           formatting=False), 5 )
 
 
@@ -180,12 +185,12 @@ class BoxShape(Shape):
             document.OperationSettingSet(s.get('rotate'), r)
             )
         self.document.applyOperation(
-            document.OperationMultiple(operations, descr='adjust shape') )
+            document.OperationMultiple(operations, descr=_('adjust shape')) )
 
 class Rectangle(BoxShape):
     """Draw a rectangle, or rounded rectangle."""
     typename = 'rect'
-    description = 'Rectangle'
+    description = _('Rectangle')
     allowusercreation = True
 
     def __init__(self, parent, name=None):
@@ -200,8 +205,8 @@ class Rectangle(BoxShape):
 
         s.add( setting.Int('rounding', 0,
                            minval=0, maxval=100,
-                           descr='Round corners with this percentage',
-                           usertext='Rounding corners',
+                           descr=_('Round corners with this percentage'),
+                           usertext=_('Rounding corners'),
                            formatting=True) )
 
     def drawShape(self, painter, rect):
@@ -218,7 +223,7 @@ class Ellipse(BoxShape):
     """Draw an ellipse."""
 
     typename = 'ellipse'
-    description = 'Ellipse'
+    description = _('Ellipse')
     allowusercreation = True
 
     def __init__(self, parent, name=None):
@@ -236,7 +241,7 @@ class ImageFile(BoxShape):
     """Draw an image."""
 
     typename = 'imagefile'
-    description = 'Image file'
+    description = _('Image file')
     allowusercreation = True
 
     def __init__(self, parent, name=None):
@@ -250,9 +255,9 @@ class ImageFile(BoxShape):
         self.cacheembeddata = None
 
         self.addAction( widget.Action('embed', self.actionEmbed,
-                                      descr = 'Embed image in Veusz document '
-                                      'to remove dependency on external file',
-                                      usertext = 'Embed image') )
+                                      descr = _('Embed image in Veusz document '
+                                                'to remove dependency on external file'),
+                                      usertext = _('Embed image')) )
 
     @classmethod
     def addSettings(klass, s):
@@ -260,20 +265,20 @@ class ImageFile(BoxShape):
         BoxShape.addSettings(s)
 
         s.add( setting.ImageFilename('filename', '',
-                                     descr='Image filename',
-                                     usertext='Filename',
+                                     descr=_('Image filename'),
+                                     usertext=_('Filename'),
                                      formatting=False),
                posn=0 )
 
         s.add( setting.Str('embeddedImageData', '',
-                           descr='Embedded base 64-encoded image data, '
-                           'used if filename set to {embedded}',
-                           usertext='Embedded data',
+                           descr=_('Embedded base 64-encoded image data, '
+                                   'used if filename set to {embedded}'),
+                           usertext=_('Embedded data'),
                            hidden=True) )
 
         s.add( setting.Bool('aspect', True,
-                            descr='Preserve aspect ratio',
-                            usertext='Preserve aspect',
+                            descr=_('Preserve aspect ratio'),
+                            usertext=_('Preserve aspect'),
                             formatting=True),
                posn=0 )
         s.Border.get('hide').newDefault(True)
@@ -306,7 +311,7 @@ class ImageFile(BoxShape):
                                          encoded)
             ]
         self.document.applyOperation(
-            document.OperationMultiple(ops, descr='embed image') )
+            document.OperationMultiple(ops, descr=_('embed image')) )
 
     def updateCachedImage(self):
         """Update cache."""

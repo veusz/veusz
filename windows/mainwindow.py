@@ -52,6 +52,11 @@ from veusz.dialogs.plugin import handlePlugin
 import veusz.dialogs.importdialog as importdialog
 import veusz.dialogs.dataeditdialog as dataeditdialog
 
+def _(text, disambiguation=None, context='MainWindow'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 # shortcut to this
 setdb = setting.settingdb
 
@@ -157,7 +162,7 @@ class MainWindow(qt4.QMainWindow):
         # assemble the statusbar
         statusbar = self.statusbar = qt4.QStatusBar(self)
         self.setStatusBar(statusbar)
-        self.updateStatusbar('Ready')
+        self.updateStatusbar(_('Ready'))
 
         # a label for the picker readout
         self.pickerlabel = qt4.QLabel(statusbar)
@@ -170,7 +175,7 @@ class MainWindow(qt4.QMainWindow):
         self.connect( self.plot, qt4.SIGNAL("queuechange"),
                       self.plotQueueChanged )
         self.plotqueuelabel = qt4.QLabel()
-        self.plotqueuelabel.setToolTip("Number of rendering jobs remaining")
+        self.plotqueuelabel.setToolTip(_("Number of rendering jobs remaining"))
         statusbar.addWidget(self.plotqueuelabel)
         self.plotqueuelabel.show()
 
@@ -286,8 +291,8 @@ class MainWindow(qt4.QMainWindow):
                     document.OperationLoadStyleSheet(filename) )
             except EnvironmentError, e:
                 qt4.QMessageBox.warning(
-                    self, "Error - Veusz",
-                    "Unable to load default stylesheet '%s'\n\n%s" %
+                    self, _("Error - Veusz"),
+                    _("Unable to load default stylesheet '%s'\n\n%s") %
                     (filename, e.strerror))
             else:
                 # reset any modified flag
@@ -303,8 +308,8 @@ class MainWindow(qt4.QMainWindow):
                     document.OperationLoadCustom(filename) )
             except EnvironmentError, e:
                 qt4.QMessageBox.warning(
-                    self, "Error - Veusz",
-                    "Unable to load custom definitions '%s'\n\n%s" %
+                    self, _("Error - Veusz"),
+                    _("Unable to load custom definitions '%s'\n\n%s") %
                     (filename, e.strerror))
             else:
                 # reset any modified flag
@@ -317,14 +322,14 @@ class MainWindow(qt4.QMainWindow):
         # enable distable, and add appropriate text to describe
         # the operation being undone/redone
         canundo = self.document.canUndo()
-        undotext = 'Undo'
+        undotext = _('Undo')
         if canundo:
             undotext = "%s %s" % (undotext, self.document.historyundo[-1].descr)
         self.vzactions['edit.undo'].setText(undotext)
         self.vzactions['edit.undo'].setEnabled(canundo)
         
         canredo = self.document.canRedo()
-        redotext = 'Redo'
+        redotext = _('Redo')
         if canredo:
             redotext = "%s %s" % (redotext, self.document.historyredo[-1].descr)
         self.vzactions['edit.redo'].setText(redotext)
@@ -405,135 +410,135 @@ class MainWindow(qt4.QMainWindow):
         a = utils.makeAction
         self.vzactions = {
             'file.new':
-                a(self, 'New document', '&New',
+                a(self, _('New document'), _('&New'),
                   self.slotFileNew,
                   icon='kde-document-new', key='Ctrl+N'),
             'file.open':
-                a(self, 'Open a document', '&Open...',
+                a(self, _('Open a document'), _('&Open...'),
                   self.slotFileOpen,
                   icon='kde-document-open', key='Ctrl+O'),
             'file.save':
-                a(self, 'Save the document', '&Save',
+                a(self, _('Save the document'), _('&Save'),
                   self.slotFileSave,
                   icon='kde-document-save', key='Ctrl+S'),
             'file.saveas':
-                a(self, 'Save the current graph under a new name',
-                  'Save &As...', self.slotFileSaveAs,
+                a(self, _('Save the current graph under a new name'),
+                  _('Save &As...'), self.slotFileSaveAs,
                   icon='kde-document-save-as'),
             'file.print':
-                a(self, 'Print the document', '&Print...',
+                a(self, _('Print the document'), _('&Print...'),
                   self.slotFilePrint,
                   icon='kde-document-print', key='Ctrl+P'),
             'file.export':
-                a(self, 'Export the current page', '&Export...',
+                a(self, _('Export the current page'), _('&Export...'),
                   self.slotFileExport,
                   icon='kde-document-export'),
             'file.close':
-                a(self, 'Close current window', 'Close Window',
+                a(self, _('Close current window'), _('Close Window'),
                   self.slotFileClose,
                   icon='kde-window-close', key='Ctrl+W'),
             'file.quit':
-                a(self, 'Exit the program', '&Quit',
+                a(self, _('Exit the program'), _('&Quit'),
                   self.slotFileQuit,
                   icon='kde-application-exit', key='Ctrl+Q'),
             
             'edit.undo':
-                a(self, 'Undo the previous operation', 'Undo',
+                a(self, _('Undo the previous operation'), _('Undo'),
                   self.slotEditUndo,
                   icon='kde-edit-undo',  key='Ctrl+Z'),
             'edit.redo':
-                a(self, 'Redo the previous operation', 'Redo',
+                a(self, _('Redo the previous operation'), _('Redo'),
                   self.slotEditRedo,
                   icon='kde-edit-redo', key='Ctrl+Shift+Z'),
             'edit.prefs':
-                a(self, 'Edit preferences', 'Preferences...',
+                a(self, _('Edit preferences'), _('Preferences...'),
                   self.slotEditPreferences,
                   icon='veusz-edit-prefs'),
             'edit.custom':
-                a(self, 'Edit custom functions and constants',
-                  'Custom definitions...',
+                a(self, _('Edit custom functions and constants'),
+                  _('Custom definitions...'),
                   self.slotEditCustom,
                   icon='veusz-edit-custom'),
 
             'edit.stylesheet':
                 a(self,
-                  'Edit stylesheet to change default widget settings',
-                  'Default styles...',
+                  _('Edit stylesheet to change default widget settings'),
+                  _('Default styles...'),
                   self.slotEditStylesheet, icon='settings_stylesheet'),
 
             'view.edit':
-                a(self, 'Show or hide edit window', 'Edit window',
+                a(self, _('Show or hide edit window'), _('Edit window'),
                   None, checkable=True),
             'view.props':
-                a(self, 'Show or hide property window', 'Properties window',
+                a(self, _('Show or hide property window'), _('Properties window'),
                   None, checkable=True),
             'view.format':
-                a(self, 'Show or hide formatting window', 'Formatting window',
+                a(self, _('Show or hide formatting window'), _('Formatting window'),
                   None, checkable=True),
             'view.console':
-                a(self, 'Show or hide console window', 'Console window',
+                a(self, _('Show or hide console window'), _('Console window'),
                   None, checkable=True),
             'view.datanav':
-                a(self, 'Show or hide data navigator window', 'Data navigator window',
+                a(self, _('Show or hide data navigator window'), _('Data navigator window'),
                   None, checkable=True),
 
             'view.maintool':
-                a(self, 'Show or hide main toolbar', 'Main toolbar',
+                a(self, _('Show or hide main toolbar'), _('Main toolbar'),
                   None, checkable=True),
             'view.datatool':
-                a(self, 'Show or hide data toolbar', 'Data toolbar',
+                a(self, _('Show or hide data toolbar'), _('Data toolbar'),
                   None, checkable=True),
             'view.viewtool':
-                a(self, 'Show or hide view toolbar', 'View toolbar',
+                a(self, _('Show or hide view toolbar'), _('View toolbar'),
                   None, checkable=True),
             'view.edittool':
-                a(self, 'Show or hide editing toolbar', 'Editing toolbar',
+                a(self, _('Show or hide editing toolbar'), _('Editing toolbar'),
                   None, checkable=True),
             'view.addtool':
-                a(self, 'Show or hide insert toolbar', 'Insert toolbar',
+                a(self, _('Show or hide insert toolbar'), _('Insert toolbar'),
                   None, checkable=True),
             
             'data.import':
-                a(self, 'Import data into Veusz', '&Import...',
+                a(self, _('Import data into Veusz'), _('&Import...'),
                   self.slotDataImport, icon='kde-vzdata-import'),
             'data.edit':
-                a(self, 'Edit existing datasets', '&Edit...',
+                a(self, _('Edit existing datasets'), _('&Edit...'),
                   self.slotDataEdit, icon='kde-edit-veuszedit'),
             'data.create':
-                a(self, 'Create new datasets', '&Create...',
+                a(self, _('Create new datasets'), _('&Create...'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
             'data.create2d':
-                a(self, 'Create new 2D datasets', 'Create &2D...',
+                a(self, _('Create new 2D datasets'), _('Create &2D...'),
                   self.slotDataCreate2D, icon='kde-dataset2d-new-veuszedit'),
             'data.capture':
-                a(self, 'Capture remote data', 'Ca&pture...',
+                a(self, _('Capture remote data'), _('Ca&pture...'),
                   self.slotDataCapture, icon='veusz-capture-data'),
             'data.histogram':
-                a(self, 'Histogram data', '&Histogram...',
+                a(self, _('Histogram data'), _('&Histogram...'),
                   self.slotDataHistogram, icon='button_bar'),
             'data.reload':
-                a(self, 'Reload linked datasets', '&Reload',
+                a(self, _('Reload linked datasets'), _('&Reload'),
                   self.slotDataReload, icon='kde-view-refresh'),
 
             'help.home':
-                a(self, 'Go to the Veusz home page on the internet',
-                  'Home page', self.slotHelpHomepage),
+                a(self, _('Go to the Veusz home page on the internet'),
+                  _('Home page'), self.slotHelpHomepage),
             'help.project':
-                a(self, 'Go to the Veusz project page on the internet',
-                  'GNA Project page', self.slotHelpProjectPage),
+                a(self, _('Go to the Veusz project page on the internet'),
+                  _('GNA Project page'), self.slotHelpProjectPage),
             'help.bug':
-                a(self, 'Report a bug on the internet',
-                  'Suggestions and bugs', self.slotHelpBug),
+                a(self, _('Report a bug on the internet'),
+                  _('Suggestions and bugs'), self.slotHelpBug),
             'help.tutorial':
-                a(self, 'An interactive Veusz tutorial',
-                  'Tutorial', self.slotHelpTutorial),
+                a(self, _('An interactive Veusz tutorial'),
+                  _('Tutorial'), self.slotHelpTutorial),
             'help.about':
-                a(self, 'Displays information about the program', 'About...',
+                a(self, _('Displays information about the program'), _('About...'),
                   self.slotHelpAbout, icon='veusz')
             }
 
         # create main toolbar
-        tb = self.maintoolbar = qt4.QToolBar("Main toolbar - Veusz", self)
+        tb = self.maintoolbar = qt4.QToolBar(_("Main toolbar - Veusz"), self)
         iconsize = setdb['toolbar_size']
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszmaintoolbar')
@@ -543,7 +548,7 @@ class MainWindow(qt4.QMainWindow):
                                  'file.print', 'file.export'))
 
         # data toolbar
-        tb = self.datatoolbar = qt4.QToolBar("Data toolbar - Veusz", self)
+        tb = self.datatoolbar = qt4.QToolBar(_("Data toolbar - Veusz"), self)
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszdatatoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
@@ -600,7 +605,7 @@ class MainWindow(qt4.QMainWindow):
             '',
             'help.tutorial',
             '',
-            ['help.examples', '&Example documents', []],
+            ['help.examples', _('&Example documents'), []],
             '',
             'help.about'
             ]
@@ -610,13 +615,13 @@ class MainWindow(qt4.QMainWindow):
                                         self.vzactions, 'tools' )
 
         menus = [
-            ['file', '&File', filemenu],
-            ['edit', '&Edit', editmenu],
-            ['view', '&View', viewmenu],
-            ['insert', '&Insert', insertmenu],
-            ['data', '&Data', datamenu],
-            ['tools', '&Tools', toolsmenu],
-            ['help', '&Help', helpmenu],
+            ['file', _('&File'), filemenu],
+            ['edit', _('&Edit'), editmenu],
+            ['view', _('&View'), viewmenu],
+            ['insert', _('&Insert'), insertmenu],
+            ['data', _('&Data'), datamenu],
+            ['tools', _('&Tools'), toolsmenu],
+            ['help', _('&Help'), helpmenu],
             ]
 
         self.menus = {}
@@ -642,7 +647,7 @@ class MainWindow(qt4.QMainWindow):
                 MainWindow.CreateWindow(ex)
 
             a = menu.addAction(name, _openexample)
-            a.setStatusTip("Open %s example document" % name)
+            a.setStatusTip(_("Open %s example document") % name)
 
     def defineViewWindowMenu(self):
         """Setup View -> Window menu."""
@@ -761,10 +766,10 @@ class MainWindow(qt4.QMainWindow):
     def askTutorial(self):
         """Ask if tutorial wanted."""
         retn = qt4.QMessageBox.question(
-            self, "Veusz Tutorial",
-            "Veusz includes a tutorial to help get you started.\n"
-            "Would you like to start the tutorial now?\n"
-            "If not, you can access it later through the Help menu.",
+            self, _("Veusz Tutorial"),
+            _("Veusz includes a tutorial to help get you started.\n"
+              "Would you like to start the tutorial now?\n"
+              "If not, you can access it later through the Help menu."),
             qt4.QMessageBox.Yes | qt4.QMessageBox.No
             )
 
@@ -799,16 +804,16 @@ class MainWindow(qt4.QMainWindow):
             filetext = " '%s'" % os.path.basename(self.filename)
 
         # show message box
-        mb = qt4.QMessageBox("Save file?",
-                             "Document%s was modified. Save first?" % filetext,
+        mb = qt4.QMessageBox(_("Save file?"),
+                             _("Document%s was modified. Save first?") % filetext,
                              qt4.QMessageBox.Warning,
                              qt4.QMessageBox.Yes | qt4.QMessageBox.Default,
                              qt4.QMessageBox.No,
                              qt4.QMessageBox.Cancel | qt4.QMessageBox.Escape,
                              self)
-        mb.setButtonText(qt4.QMessageBox.Yes, "&Save")
-        mb.setButtonText(qt4.QMessageBox.No, "&Discard")
-        mb.setButtonText(qt4.QMessageBox.Cancel, "&Cancel")
+        mb.setButtonText(qt4.QMessageBox.Yes, _("&Save"))
+        mb.setButtonText(qt4.QMessageBox.No, _("&Discard"))
+        mb.setButtonText(qt4.QMessageBox.Cancel, _("&Cancel"))
         return mb.exec_()
 
     def closeEvent(self, event):
@@ -876,12 +881,12 @@ class MainWindow(qt4.QMainWindow):
             try:
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
-                self.updateStatusbar("Saved to %s" % self.filename)
+                self.updateStatusbar(_("Saved to %s") % self.filename)
             except EnvironmentError, e:
                 qt4.QApplication.restoreOverrideCursor()
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Unable to save document as '%s'\n\n%s" %
+                    self, _("Error - Veusz"),
+                    _("Unable to save document as '%s'\n\n%s") %
                     (self.filename, e.strerror))
             else:
                 # restore the cursor
@@ -890,9 +895,9 @@ class MainWindow(qt4.QMainWindow):
     def updateTitlebar(self):
         """Put the filename into the title bar."""
         if self.filename == '':
-            self.setWindowTitle('Untitled - Veusz')
+            self.setWindowTitle(_('Untitled - Veusz'))
         else:
-            self.setWindowTitle( "%s - Veusz" %
+            self.setWindowTitle( _("%s - Veusz") %
                                  os.path.basename(self.filename) )
 
     def plotQueueChanged(self, incr):
@@ -940,8 +945,8 @@ class MainWindow(qt4.QMainWindow):
                 open(filename)
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Unable to open '%s'\n\n%s" %
+                    self, _("Error - Veusz"),
+                    _("Unable to open '%s'\n\n%s") %
                     (filename, e.strerror))
                 return None
             return filename
@@ -950,7 +955,7 @@ class MainWindow(qt4.QMainWindow):
     def slotFileSaveAs(self):
         """Save As file."""
 
-        filename = self._fileSaveDialog('vsz', 'Veusz script files', 'Save as')
+        filename = self._fileSaveDialog('vsz', _('Veusz script files'), _('Save as'))
         if filename:
             self.filename = filename
             self.updateTitlebar()
@@ -972,35 +977,35 @@ class MainWindow(qt4.QMainWindow):
     class _unsafeCmdMsgBox(qt4.QMessageBox):
         """Show document is unsafe."""
         def __init__(self, window, filename):
-            qt4.QMessageBox.__init__(self, "Unsafe code in document",
-                                     "The document '%s' contains potentially "
-                                     "unsafe code which may damage your "
-                                     "computer or data. Please check that the "
-                                     "file comes from a "
-                                     "trusted source." % filename,
+            qt4.QMessageBox.__init__(self, _("Unsafe code in document"),
+                                     _("The document '%s' contains potentially "
+                                       "unsafe code which may damage your "
+                                       "computer or data. Please check that the "
+                                       "file comes from a "
+                                       "trusted source.") % filename,
                                      qt4.QMessageBox.Warning,
                                      qt4.QMessageBox.Yes,
                                      qt4.QMessageBox.No | qt4.QMessageBox.Default,
                                      qt4.QMessageBox.NoButton,
                                      window)
-            self.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
-            self.setButtonText(qt4.QMessageBox.No, "&Stop loading")
+            self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
+            self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
  
     class _unsafeVeuszCmdMsgBox(qt4.QMessageBox):
         """Show document has unsafe Veusz commands."""
         def __init__(self, window):
-            qt4.QMessageBox.__init__(self, 'Unsafe Veusz commands',
-                                     'This Veusz document contains potentially'
-                                     ' unsafe Veusz commands for Saving, '
-                                     'Exporting or Printing. Please check that the'
-                                     ' file comes from a trusted source.',
+            qt4.QMessageBox.__init__(self, _('Unsafe Veusz commands'),
+                                     _('This Veusz document contains potentially'
+                                       ' unsafe Veusz commands for Saving, '
+                                       'Exporting or Printing. Please check that the'
+                                       ' file comes from a trusted source.'),
                                      qt4.QMessageBox.Warning,
                                      qt4.QMessageBox.Yes,
                                      qt4.QMessageBox.No | qt4.QMessageBox.Default,
                                      qt4.QMessageBox.NoButton,
                                      window)
-            self.setButtonText(qt4.QMessageBox.Yes, "C&ontinue anyway")
-            self.setButtonText(qt4.QMessageBox.No, "&Ignore command")
+            self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
+            self.setButtonText(qt4.QMessageBox.No, _("&Ignore command"))
 
     def openFileInWindow(self, filename):
         """Actually do the work of loading a new document.
@@ -1019,8 +1024,8 @@ class MainWindow(qt4.QMainWindow):
         except EnvironmentError, e:
             qt4.QApplication.restoreOverrideCursor()
             qt4.QMessageBox.critical(
-                self, "Error - Veusz",
-                "Cannot open document '%s'\n\n%s" %
+                self, _("Error - Veusz"),
+                _("Cannot open document '%s'\n\n%s") %
                 (filename, e.strerror))
             self.setupDefaultDoc()
             return
@@ -1105,7 +1110,7 @@ class MainWindow(qt4.QMainWindow):
         # let the main window know
         self.filename = filename
         self.updateTitlebar()
-        self.updateStatusbar("Opened %s" % filename)
+        self.updateStatusbar(_("Opened %s") % filename)
 
         # use current directory of file if not using cwd mode
         if not setdb['dirname_usecwd']:
@@ -1131,7 +1136,7 @@ class MainWindow(qt4.QMainWindow):
     def slotFileOpen(self):
         """Open an existing file in a new window."""
 
-        filename = self._fileOpenDialog('vsz', 'Veusz script files', 'Open')
+        filename = self._fileOpenDialog('vsz', _('Veusz script files'), _('Open'))
         if filename:
             self.openFile(filename)
         
@@ -1155,7 +1160,7 @@ class MainWindow(qt4.QMainWindow):
                     self.openFile(filename)
 
                 self._openRecentFunctions.append(fileOpener)
-                newMenuItems.append(('filerecent%i' % i, 'Open File %s' % path,
+                newMenuItems.append(('filerecent%i' % i, _('Open File %s') % path,
                                      os.path.basename(path),
                                      'file.filerecent', fileOpener,
                                      '', False, ''))
@@ -1171,12 +1176,12 @@ class MainWindow(qt4.QMainWindow):
 
         # check there is a page
         if self.document.getNumberPages() == 0:
-            qt4.QMessageBox.warning(self, "Error - Veusz",
-                                    "No pages to export")
+            qt4.QMessageBox.warning(self, _("Error - Veusz"),
+                                    _("No pages to export"))
             return
 
         # File types we can export to in the form ([extensions], Name)
-        fd = qt4.QFileDialog(self, 'Export page')
+        fd = qt4.QFileDialog(self, _('Export page'))
         fd.setDirectory( self.dirname_export )
 
         fd.setFileMode( qt4.QFileDialog.AnyFile )
@@ -1259,8 +1264,8 @@ class MainWindow(qt4.QMainWindow):
 
                 qt4.QApplication.restoreOverrideCursor()
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Error exporting to file '%s'\n\n%s" %
+                    self, _("Error - Veusz"),
+                    _("Error exporting to file '%s'\n\n%s") %
                     (filename, msg))
             else:
                 qt4.QApplication.restoreOverrideCursor()
@@ -1269,13 +1274,13 @@ class MainWindow(qt4.QMainWindow):
         """Print the document."""
 
         if self.document.getNumberPages() == 0:
-            qt4.QMessageBox.warning(self, "Error - Veusz",
-                                    "No pages to print")
+            qt4.QMessageBox.warning(self, _("Error - Veusz"),
+                                    _("No pages to print"))
             return
 
         prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
         prnt.setColorMode(qt4.QPrinter.Color)
-        prnt.setCreator('Veusz %s' % utils.version())
+        prnt.setCreator(_('Veusz %s') % utils.version())
         prnt.setDocName(self.filename)
 
         dialog = qt4.QPrintDialog(prnt, self)
@@ -1324,9 +1329,9 @@ class MainWindow(qt4.QMainWindow):
 
         np = self.document.getNumberPages()
         if np == 0:
-            self.pagelabel.setText("No pages")
+            self.pagelabel.setText(_("No pages"))
         else:
-            self.pagelabel.setText("Page %i/%i" % (number+1, np))
+            self.pagelabel.setText(_("Page %i/%i") % (number+1, np))
 
     def slotUpdateAxisValues(self, values):
         """Update the position where the mouse is relative to the axes."""
@@ -1339,11 +1344,11 @@ class MainWindow(qt4.QMainWindow):
             valitems.sort()
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
-            self.axisvalueslabel.setText('No position')
+            self.axisvalueslabel.setText(_('No position'))
 
     def slotPickerEnabled(self, enabled):
         if enabled:
-            self.pickerlabel.setText('No point selected')
+            self.pickerlabel.setText(_('No point selected'))
             self.pickerlabel.show()
         else:
             self.pickerlabel.hide()

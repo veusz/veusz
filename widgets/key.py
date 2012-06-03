@@ -29,6 +29,11 @@ import controlgraph
 
 import math
 
+def _(text, disambiguation=None, context='Key'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 #############################################################################
 # classes for controlling key position interactively
 
@@ -145,7 +150,7 @@ class _GraphControlKey(qt4.QGraphicsRectItem):
             document.OperationSettingSet(s.get('vertManual'), vm),
             )
         self.params.widget.document.applyOperation(
-            document.OperationMultiple(operations, descr='move key'))
+            document.OperationMultiple(operations, descr=_('move key')))
 
 ############################################################################
 
@@ -153,7 +158,7 @@ class Key(widget.Widget):
     """Key on graph."""
 
     typename = 'key'
-    description = "Plot key"
+    description = _('Plot key')
     allowedparenttypes = [graph.Graph]
     allowusercreation = True
 
@@ -169,67 +174,67 @@ class Key(widget.Widget):
         widget.Widget.addSettings(s)
 
         s.add( setting.Text('Text',
-                            descr = 'Text settings',
-                            usertext='Text'),
+                            descr = _('Text settings'),
+                            usertext=_('Text')),
                pixmap = 'settings_axislabel' )
         s.add( setting.KeyBrush('Background',
-                                descr = 'Key background fill',
-                                usertext='Background'),
+                                descr = _('Key background fill'),
+                                usertext=_('Background')),
                pixmap = 'settings_bgfill' )
         s.add( setting.Line('Border',
-                            descr = 'Key border line',
-                            usertext='Border'),
+                            descr = _('Key border line'),
+                            usertext=_('Border')),
                pixmap = 'settings_border' )
 
         s.add( setting.Str('title', '',
-                           descr='Key title text',
-                           usertext='Title') )
+                           descr=_('Key title text'),
+                           usertext=_('Title')) )
 
         s.add( setting.AlignHorzWManual( 'horzPosn',
                                          'right',
-                                         descr = 'Horizontal key position',
-                                         usertext='Horz posn',
+                                         descr = _('Horizontal key position'),
+                                         usertext=_('Horz posn'),
                                          formatting=True) )
         s.add( setting.AlignVertWManual( 'vertPosn',
                                          'bottom',
-                                         descr = 'Vertical key position',
-                                         usertext='Vert posn',
+                                         descr = _('Vertical key position'),
+                                         usertext=_('Vert posn'),
                                          formatting=True) )
                                
         s.add( setting.Distance('keyLength',
                                 '1cm',
-                                descr = 'Length of line to show in sample',
-                                usertext='Key length',
+                                descr = _('Length of line to show in sample'),
+                                usertext=_('Key length'),
                                 formatting=True) )
         
         s.add( setting.AlignVert( 'keyAlign',
                                   'top',
-                                  descr = 'Alignment of key symbols relative to text',
-                                  usertext = 'Key alignment',
+                                  descr = _('Alignment of key symbols relative to text'),
+                                  usertext = _('Key alignment'),
                                   formatting = True) )
 
         s.add( setting.Float( 'horzManual',
                               0.,
-                              descr = 'Manual horizontal fractional position',
-                              usertext='Horz manual',
+                              descr = _('Manual horizontal fractional position'),
+                              usertext=_('Horz manual'),
                               formatting=True) )
         s.add( setting.Float( 'vertManual',
                               0.,
-                              descr = 'Manual vertical fractional position',
-                              usertext='Vert manual',
+                              descr = _('Manual vertical fractional position'),
+                              usertext=_('Vert manual'),
                               formatting=True) )
 
         s.add( setting.Float( 'marginSize',
                               1.,
                               minval = 0.,
-                              descr = 'Width of margin in characters',
-                              usertext='Margin size',
+                              descr = _('Width of margin in characters'),
+                              usertext=_('Margin size'),
                               formatting=True) )
 
         s.add( setting.Int( 'columns',
                             1,
-                            descr = 'Number of columns in key',
-                            usertext = 'Columns',
+                            descr = _('Number of columns in key'),
+                            usertext = _('Columns'),
                             minval = 1,
                             maxval = 100,
                             formatting = True) )

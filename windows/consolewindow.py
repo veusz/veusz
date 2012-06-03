@@ -31,6 +31,11 @@ import veusz.setting as setting
 
 # TODO - command line completion
 
+def _(text, disambiguation=None, context='ConsoleWindow'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class _Writer(object):
     """ Class to behave like an output stream. Pipes input back to
     the specified function."""
@@ -63,7 +68,7 @@ class _CommandEdit(qt4.QLineEdit):
         qt4.QObject.connect( self, qt4.SIGNAL("returnPressed()"),
                              self.slotReturnPressed )
 
-        self.setToolTip("Input a python expression here and press enter" )
+        self.setToolTip(_("Input a python expression here and press enter"))
 
     def slotReturnPressed(self):
         """ Called if the return key is pressed in the edit control."""
@@ -133,19 +138,19 @@ class _CommandEdit(qt4.QLineEdit):
             text = self.history[ self.history_posn ]
             self.setText(text)
 
-introtext=u'''Welcome to <b><font color="purple">Veusz %s</font></b> --- a scientific plotting application.<br>
+introtext=_(u'''Welcome to <b><font color="purple">Veusz %s</font></b> --- a scientific plotting application.<br>
 Copyright \u00a9 2003-2012 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt; and contributors.<br>
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are<br>
 welcome to redistribute it under certain conditions. Enter "GPL()" for details.<br>
 This window is a Python command line console and acts as a calculator.<br>
-''' % utils.version()
+''') % utils.version()
 
 class ConsoleWindow(qt4.QDockWidget):
     """ A python-like qt console."""
 
     def __init__(self, thedocument, *args):
         qt4.QDockWidget.__init__(self, *args)
-        self.setWindowTitle("Console - Veusz")
+        self.setWindowTitle(_("Console - Veusz"))
         self.setObjectName("veuszconsolewindow")
 
         # arrange sub-widgets in a vbox
@@ -258,10 +263,10 @@ class ConsoleWindow(qt4.QDockWidget):
         """If this window is hidden, show it, then hide it again in a few
         seconds."""
         if self.isHidden():
-            self._hiddennotify.setText("This window will shortly disappear. "
-                                       "You can bring it back by selecting "
-                                       "View, Windows, Console Window on the "
-                                       "menu.")
+            self._hiddennotify.setText(_("This window will shortly disappear. "
+                                         "You can bring it back by selecting "
+                                         "View, Windows, Console Window on the "
+                                         "menu."))
             qt4.QTimer.singleShot(5000, self.hideConsole)
             self.show()
             self._hiddennotify.show()

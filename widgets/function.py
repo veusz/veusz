@@ -29,6 +29,11 @@ import veusz.utils as utils
 import pickable
 from plotters import GenericPlotter
 
+def _(text, disambiguation=None, context='Function'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class FunctionChecker(object):
     """Help check function is valid."""
     def __init__(self):
@@ -67,7 +72,7 @@ class FunctionPlotter(GenericPlotter):
 
     typename='function'
     allowusercreation=True
-    description='Plot a function'
+    description=_('Plot a function')
     
     def __init__(self, parent, name=None):
         """Initialise plotter."""
@@ -87,37 +92,38 @@ class FunctionPlotter(GenericPlotter):
         s.add( setting.Int('steps',
                            50,
                            minval = 3,
-                           descr = 'Number of steps to evaluate the function'
-                           ' over', usertext='Steps', formatting=True), 0 )
+                           descr = _('Number of steps to evaluate the function'
+                                     ' over'),
+                           usertext=_('Steps'), formatting=True), 0 )
         s.add( setting.Choice('variable', ['x', 'y'], 'x',
-                              descr='Variable the function is a function of',
-                              usertext='Variable'),
+                              descr=_('Variable the function is a function of'),
+                              usertext=_('Variable')),
                0 )
         s.add( setting.Str('function', 'x',
-                           descr='Function expression',
-                           usertext='Function'), 0 )
+                           descr=_('Function expression'),
+                           usertext=_('Function')), 0 )
 
         s.add(setting.FloatOrAuto('min', 'Auto',
-                                  descr='Minimum value at which to plot function',
-                                  usertext='Min'))
+                                  descr=_('Minimum value at which to plot function'),
+                                  usertext=_('Min')))
         
         s.add(setting.FloatOrAuto('max', 'Auto',
-                                  descr='Maximum value at which to plot function',
-                                  usertext='Max'))
+                                  descr=_('Maximum value at which to plot function'),
+                                  usertext=_('Max')))
 
         s.add( setting.Line('Line',
-                            descr = 'Function line settings',
-                            usertext = 'Plot line'),
+                            descr = _('Function line settings'),
+                            usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
 
         s.add( setting.PlotterFill('FillBelow',
-                                   descr = 'Fill below function',
-                                   usertext = 'Fill below'),
+                                   descr = _('Fill below function'),
+                                   usertext = _('Fill below')),
                pixmap = 'settings_plotfillbelow' )
         
         s.add( setting.PlotterFill('FillAbove',
-                                   descr = 'Fill above function',
-                                   usertext = 'Fill above'),
+                                   descr = _('Fill above function'),
+                                   usertext = _('Fill above')),
                pixmap = 'settings_plotfillabove' )
 
     @property

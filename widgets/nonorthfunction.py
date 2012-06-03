@@ -30,12 +30,17 @@ from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
 from function import FunctionChecker
 
+def _(text, disambiguation=None, context='NonOrthFunction'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class NonOrthFunction(Widget):
     '''Widget for plotting a function on a non-orthogonal plot.'''
 
     typename = 'nonorthfunc'
     allowusercreation = True
-    description = 'Plot a function on graphs with non-orthogonal axes'
+    description = _('Plot a function on graphs with non-orthogonal axes')
 
     allowedparenttypes = [NonOrthGraph]
 
@@ -53,36 +58,37 @@ class NonOrthFunction(Widget):
         Widget.addSettings(s)
 
         s.add( setting.Str('function', 'a',
-                           descr='Function expression',
-                           usertext='Function') )
+                           descr=_('Function expression'),
+                           usertext=_('Function')) )
         s.add( setting.Choice('variable', ['a', 'b'], 'a',
-                              descr='Variable the function is a function of',
-                              usertext='Variable') )
+                              descr=_('Variable the function is a function of'),
+                              usertext=_('Variable')) )
         s.add(setting.FloatOrAuto('min', 'Auto',
-                                  descr='Minimum value at which to plot function',
-                                  usertext='Min'))
+                                  descr=_('Minimum value at which to plot function'),
+                                  usertext=_('Min')))
         
         s.add(setting.FloatOrAuto('max', 'Auto',
-                                  descr='Maximum value at which to plot function',
-                                  usertext='Max'))
+                                  descr=_('Maximum value at which to plot function'),
+                                  usertext=_('Max')))
 
 
         s.add( setting.Line('PlotLine',
-                            descr = 'Plot line settings',
-                            usertext = 'Plot line'),
+                            descr = _('Plot line settings'),
+                            usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
         s.add( FillBrush('Fill1',
-                         descr = 'Fill settings (1)',
-                         usertext = 'Area fill 1'),
+                         descr = _('Fill settings (1)'),
+                         usertext = _('Area fill 1')),
                pixmap = 'settings_plotfillbelow' )
         s.add( FillBrush('Fill2',
-                         descr = 'Fill settings (2)',
-                         usertext = 'Area fill 2'),
+                         descr = _('Fill settings (2)'),
+                         usertext = _('Area fill 2')),
                pixmap = 'settings_plotfillbelow' )
 
         s.add( setting.Int('steps', 50,
-                           descr = 'Number of steps to evaluate the function'
-                           ' over', usertext='Steps', formatting=True), 0 )
+                           descr = _('Number of steps to evaluate the function'
+                                     ' over'),
+                           usertext=_('Steps'), formatting=True), 0 )
 
     def initEnviron(self):
         '''Set up function environment.'''

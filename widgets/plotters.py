@@ -30,6 +30,11 @@ import widget
 import graph
 import page
 
+def _(text, disambiguation=None, context='Plotters'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class GenericPlotter(widget.Widget):
     """Generic plotter."""
 
@@ -47,14 +52,14 @@ class GenericPlotter(widget.Widget):
         widget.Widget.addSettings(s)
 
         s.add( setting.Str('key', '',
-                           descr = 'Description of the plotted data to appear in key',
-                           usertext='Key text') )
+                           descr = _('Description of the plotted data to appear in key'),
+                           usertext=_('Key text')) )
         s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = 'Name of X-axis to use',
-                            usertext='X axis') )
+                            descr = _('Name of X-axis to use'),
+                            usertext=_('X axis')) )
         s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = 'Name of Y-axis to use',
-                            usertext='Y axis') )
+                            descr = _('Name of Y-axis to use'),
+                            usertext=_('Y axis')) )
 
     def getAxesNames(self):
         """Returns names of axes used."""
@@ -148,27 +153,27 @@ class FreePlotter(widget.Widget):
         widget.Widget.addSettings(s)
 
         s.add( setting.DatasetOrFloatList('xPos', [0.5],
-                                          descr='List of fractional X '
-                                          'coordinates or dataset',
-                                          usertext='X positions',
+                                          descr=_('List of fractional X '
+                                                  'coordinates or dataset'),
+                                          usertext=_('X positions'),
                                           formatting=False) )
         s.add( setting.DatasetOrFloatList('yPos', [0.5],
-                                          descr='List of fractional Y '
-                                          'coordinates or dataset',
-                                          usertext='Y positions',
+                                          descr=_('List of fractional Y '
+                                                  'coordinates or dataset'),
+                                          usertext=_('Y positions'),
                                           formatting=False) )
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
-                              descr='Use axes or fractional '
-                              'position to place label',
-                              usertext='Position mode',
+                              descr=_('Use axes or fractional '
+                                      'position to place label'),
+                              usertext=_('Position mode'),
                               formatting=False) )
         s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = 'Name of X-axis to use',
-                            usertext='X axis') )
+                            descr = _('Name of X-axis to use'),
+                            usertext=_('X axis')) )
         s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = 'Name of Y-axis to use',
-                            usertext='Y axis') )
+                            descr = _('Name of Y-axis to use'),
+                            usertext=_('Y axis')) )
 
     def _getPlotterCoords(self, posn, xsetting='xPos', ysetting='yPos'):
         """Calculate coordinates from relative or axis positioning.

@@ -23,6 +23,11 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 
+def _(text, disambiguation=None, context="WidgetTree"):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class WidgetTreeModel(qt4.QAbstractItemModel):
     """A model representing the widget tree structure.
     """
@@ -208,7 +213,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         deleteops = []
         for w in parent.children[row:row+count]:
             deleteops.append( document.OperationWidgetDelete(w) )
-        op = document.OperationMultiple(deleteops, descr="remove widget(s)")
+        op = document.OperationMultiple(deleteops, descr=_("remove widget(s)"))
         self.document.applyOperation(op)
 
         self.endRemoveRows()

@@ -27,6 +27,11 @@ import veusz.setting as setting
 import widget
 import controlgraph
 
+def _(text, disambiguation=None, context='Root'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Root(widget.Widget):
     """Root widget class for plotting the document."""
 
@@ -42,8 +47,8 @@ class Root(widget.Widget):
         self.document = document
 
         # don't want user to be able to hide entire document
-        stylesheet = setting.StyleSheet(descr='Master settings for document',
-                                        usertext='Style sheet')
+        stylesheet = setting.StyleSheet(descr=_('Master settings for document'),
+                                        usertext=_('Style sheet'))
         s.add(stylesheet)
         self.fillStylesheet(stylesheet)
 
@@ -60,20 +65,20 @@ class Root(widget.Widget):
         s.add( setting.DistancePhysical(
                 'width',
                 '15cm',
-                descr='Width of the pages',
-                usertext='Page width',
+                descr=_('Width of the pages'),
+                usertext=_('Page width'),
                 formatting=True) )
         s.add( setting.DistancePhysical(
                 'height',
                 '15cm',
-                descr='Height of the pages',
-                usertext='Page height',
+                descr=_('Height of the pages'),
+                usertext=_('Page height'),
                 formatting=True) )
         s.add( setting.Bool(
                 'englishlocale', False,
-                descr='Use US/English number formatting for '
-                'document',
-                usertext='English locale',
+                descr=_('Use US/English number formatting for '
+                        'document'),
+                usertext=_('English locale'),
                 formatting=True) )
 
     def changeLocale(self):

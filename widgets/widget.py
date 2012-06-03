@@ -23,6 +23,12 @@ import itertools
 
 import veusz.document as document
 import veusz.setting as setting
+import veusz.qtall as qt4
+
+def _(text, disambiguation=None, context='Widget'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class Action(object):
     """A class to wrap functions operating on widgets.
@@ -98,8 +104,8 @@ class Widget(object):
     def addSettings(klass, s):
         """Add items to settings s."""
         s.add( setting.Bool('hide', False,
-                            descr = 'Hide object',
-                            usertext = 'Hide',
+                            descr = _('Hide object'),
+                            usertext = _('Hide'),
                             formatting = True) )
 
     def isWidget(self):

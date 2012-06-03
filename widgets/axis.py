@@ -35,6 +35,11 @@ import controlgraph
 
 ###############################################################################
 
+def _(text, disambiguation=None, context='Axis'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class MajorTick(setting.Line):
     '''Major tick settings.'''
 
@@ -42,17 +47,17 @@ class MajorTick(setting.Line):
         setting.Line.__init__(self, name, **args)
         self.add( setting.DistancePt( 'length',
                                       '6pt',
-                                      descr = 'Length of major ticks',
-                                      usertext='Length') )
+                                      descr = _('Length of major ticks'),
+                                      usertext= _('Length') ) )
         self.add( setting.Int( 'number',
                                6,
-                               descr = 'Number of major ticks to aim for',
-                               usertext='Number') )
+                               descr = _('Number of major ticks to aim for'),
+                               usertext= _('Number') ) )
         self.add( setting.FloatList('manualTicks',
                                     [],
-                                    descr = 'List of tick values'
-                                    ' overriding defaults',
-                                    usertext='Manual ticks') )
+                                    descr = _('List of tick values'
+                                              ' overriding defaults'),
+                                    usertext= _('Manual ticks') ) )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -66,12 +71,12 @@ class MinorTick(setting.Line):
         setting.Line.__init__(self, name, **args)
         self.add( setting.DistancePt( 'length',
                                       '3pt',
-                                      descr = 'Length of minor ticks',
-                                      usertext='Length') )
+                                      descr = _('Length of minor ticks'),
+                                      usertext= _('Length')) )
         self.add( setting.Int( 'number',
                                20,
-                               descr = 'Number of minor ticks to aim for',
-                               usertext='Number') )
+                               descr = _('Number of minor ticks to aim for'),
+                               usertext= _('Number') ) )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -104,61 +109,61 @@ class AxisLabel(setting.Text):
     def __init__(self, name, **args):
         setting.Text.__init__(self, name, **args)
         self.add( setting.Bool( 'atEdge', False,
-                                descr = 'Place axis label close to edge'
-                                ' of graph',
-                                usertext='At edge') )
+                                descr = _('Place axis label close to edge'
+                                          ' of graph'),
+                                usertext= _('At edge') ) )
         self.add( setting.RotateInterval(
                 'rotate', '0',
                 descr = 'Angle by which to rotate label by',
                 usertext='Rotate') )
         self.add( setting.DistancePt( 'offset',
                                       '0pt',
-                                      descr = 'Additional offset of axis label'
-                                      ' from axis tick labels',
-                                      usertext='Label offset') )
+                                      descr = _('Additional offset of axis label'
+                                                ' from axis tick labels'),
+                                      usertext= _('Label offset') ) )
         self.add( setting.Choice(
                 'position',
                 ('at-minimum', 'centre', 'at-maximum'),
                 'centre',
-                descr = 'Position of axis label',
-                usertext = 'Position') )
+                descr = _('Position of axis label'),
+                usertext = _('Position') ) )
 
 class TickLabel(setting.Text):
     """For tick labels on axes."""
 
     formatchoices = ('Auto', '%Vg', '%Ve', '%VE',
                      '%g', '%e', '%.2f')
-    descriptions = ('Automatic',
-                    'General numerical format',
-                    'Scientific notation',
-                    'Engineering suffix notation',
-                    'C-style general format',
-                    'C-style scientific notation',
-                    '2 decimal places always shown')
+    descriptions = ( _('Automatic'),
+                     _('General numerical format'),
+                     _('Scientific notation'),
+                     _('Engineering suffix notation'),
+                     _('C-style general format'),
+                     _('C-style scientific notation'),
+                     _('2 decimal places always shown') )
 
     def __init__(self, name, **args):
         setting.Text.__init__(self, name, **args)
         self.add( setting.RotateInterval(
                 'rotate', '0',
-                descr = 'Angle by which to rotate label by',
-                usertext='Rotate') )
+                descr = _('Angle by which to rotate label by'),
+                usertext= _('Rotate') ) )
         self.add( setting.ChoiceOrMore( 'format',
                                         TickLabel.formatchoices,
                                         'Auto',
-                                        descr = 'Format of the tick labels',
+                                        descr = _('Format of the tick labels'),
                                         descriptions=TickLabel.descriptions,
-                                        usertext='Format') )
+                                        usertext= _('Format') ) )
 
         self.add( setting.Float('scale', 1.,
-                                descr='A scale factor to apply to the values '
-                                'of the tick labels',
-                                usertext='Scale') )
+                                descr=_('A scale factor to apply to the values '
+                                        'of the tick labels'),
+                                usertext=_('Scale') ) )
 
         self.add( setting.DistancePt( 'offset',
                                       '0pt',
-                                      descr = 'Additional offset of axis tick '
-                                      'labels from axis',
-                                      usertext='Tick offset') )
+                                      descr = _('Additional offset of axis tick '
+                                                'labels from axis'),
+                                      usertext= _('Tick offset') ) )
 
 ###############################################################################
 
@@ -199,37 +204,37 @@ class Axis(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
         s.add( setting.Str('label', '',
-                           descr='Axis label text',
-                           usertext='Label') )
+                           descr=_('Axis label text'),
+                           usertext=_('Label')) )
         s.add( setting.AxisBound('min', 'Auto',
-                                 descr='Minimum value of axis',
-                                 usertext='Min') )
+                                 descr=_('Minimum value of axis'),
+                                 usertext=_('Min')) )
         s.add( setting.AxisBound('max', 'Auto',
-                                 descr='Maximum value of axis',
-                                 usertext='Max') )
+                                 descr=_('Maximum value of axis'),
+                                 usertext=_('Max')) )
         s.add( setting.Bool('log', False,
-                            descr = 'Whether axis is logarithmic',
-                            usertext='Log') )
+                            descr = _('Whether axis is logarithmic'),
+                            usertext=_('Log')) )
         s.add( setting.Choice(
                 'autoRange',
                 ('exact', 'next-tick', '+2%', '+5%', '+10%', '+15%'),
                 'next-tick',
-                descr = 'If axis range not specified, use range of '
-                'data and this setting',
-                descriptions = ('Use exact data range',
-                                'Use data range, rounding up to tick marks',
-                                'Use data range, adding 2% of range',
-                                'Use data range, adding 5% of range',
-                                'Use data range, adding 10% of range',
-                                'Use data range, adding 15% of range',
+                descr = _('If axis range not specified, use range of '
+                          'data and this setting'),
+                descriptions = (_('Use exact data range'),
+                                _('Use data range, rounding up to tick marks'),
+                                _('Use data range, adding 2% of range'),
+                                _('Use data range, adding 5% of range'),
+                                _('Use data range, adding 10% of range'),
+                                _('Use data range, adding 15% of range'),
                                 ),
                 formatting = True,
-                usertext = 'Auto range' ) )
+                usertext = _('Auto range') ) )
         s.add( setting.Choice('mode',
                               ('numeric', 'datetime', 'labels'), 
                               'numeric', 
-                              descr = 'Type of ticks to show on on axis', 
-                              usertext='Mode') )
+                              descr = _('Type of ticks to show on on axis'), 
+                              usertext=_('Mode')) )
 
         s.add( setting.SettingBackwardCompat(
                 'autoExtend', 'autoRange', True,
@@ -238,82 +243,82 @@ class Axis(widget.Widget):
 
         # this setting no longer used
         s.add( setting.Bool('autoExtendZero', True,
-                            descr = 'Extend axis to zero if close (UNUSED)',
-                            usertext='Zero extend',
+                            descr = _('Extend axis to zero if close (UNUSED)'),
+                            usertext=_('Zero extend'),
                             hidden=True,
                             formatting=True) )
 
         s.add( setting.Bool('autoMirror', True,
-                            descr = 'Place axis on opposite side of graph '
-                            'if none',
-                            usertext='Auto mirror',
+                            descr = _('Place axis on opposite side of graph '
+                                      'if none'),
+                            usertext=_('Auto mirror'),
                             formatting=True) )
         s.add( setting.Bool('reflect', False,
-                            descr = 'Place axis text and ticks on other side'
-                            ' of axis',
-                            usertext='Reflect',
+                            descr = _('Place axis text and ticks on other side'
+                                      ' of axis'),
+                            usertext=_('Reflect'),
                             formatting=True) )
         s.add( setting.Bool('outerticks', False,
-                            descr = 'Place ticks on outside of graph',
-                            usertext='Outer ticks',
+                            descr = _('Place ticks on outside of graph'),
+                            usertext=_('Outer ticks'),
                             formatting=True) )
 
         s.add( setting.Float('datascale', 1.,
-                             descr='Scale data plotted by this factor',
-                             usertext='Scale') )
+                             descr=_('Scale data plotted by this factor'),
+                             usertext=_('Scale')) )
 
         s.add( setting.Choice('direction',
                               ['horizontal', 'vertical'],
                               'horizontal',
-                              descr = 'Direction of axis',
-                              usertext='Direction') )
+                              descr = _('Direction of axis'),
+                              usertext=_('Direction')) )
         s.add( setting.Float('lowerPosition', 0.,
-                             descr='Fractional position of lower end of '
-                             'axis on graph',
-                             usertext='Min position') )
+                             descr=_('Fractional position of lower end of '
+                                     'axis on graph'),
+                             usertext=_('Min position')) )
         s.add( setting.Float('upperPosition', 1.,
-                             descr='Fractional position of upper end of '
-                             'axis on graph',
-                             usertext='Max position') )
+                             descr=_('Fractional position of upper end of '
+                                     'axis on graph'),
+                             usertext=_('Max position')) )
         s.add( setting.Float('otherPosition', 0.,
-                             descr='Fractional position of axis '
-                             'in its perpendicular direction',
-                             usertext='Axis position') )
+                             descr=_('Fractional position of axis '
+                                     'in its perpendicular direction'),
+                             usertext=_('Axis position')) )
 
         s.add( setting.WidgetPath('match', '',
                                   descr =
-                                  'Match the scale of this axis to the '
-                                  'axis specified',
-                                  usertext='Match',
+                                  _('Match the scale of this axis to the '
+                                    'axis specified'),
+                                  usertext=_('Match'),
                                   allowedwidgets = [Axis] ))
 
         s.add( setting.Line('Line',
-                            descr = 'Axis line settings',
-                            usertext = 'Axis line'),
+                            descr = _('Axis line settings'),
+                            usertext = _('Axis line')),
                pixmap='settings_axisline' )
         s.add( AxisLabel('Label',
-                         descr = 'Axis label settings',
-                         usertext = 'Axis label'),
+                         descr = _('Axis label settings'),
+                         usertext = _('Axis label')),
                pixmap='settings_axislabel' )
         s.add( TickLabel('TickLabels',
-                         descr = 'Tick label settings',
-                         usertext = 'Tick labels'),
+                         descr = _('Tick label settings'),
+                         usertext = _('Tick labels')),
                pixmap='settings_axisticklabels' )
         s.add( MajorTick('MajorTicks',
-                         descr = 'Major tick line settings',
-                         usertext = 'Major ticks'),
+                         descr = _('Major tick line settings'),
+                         usertext = _('Major ticks')),
                pixmap='settings_axismajorticks' )
         s.add( MinorTick('MinorTicks',
-                         descr = 'Minor tick line settings',
-                         usertext = 'Minor ticks'),
+                         descr = _('Minor tick line settings'),
+                         usertext = _('Minor ticks')),
                pixmap='settings_axisminorticks' )
         s.add( GridLine('GridLines',
-                        descr = 'Grid line settings',
-                        usertext = 'Grid lines'),
+                        descr = _('Grid line settings'),
+                        usertext = _('Grid lines')),
                pixmap='settings_axisgridlines' )
         s.add( MinorGridLine('MinorGridLines',
-                             descr = 'Minor grid line settings',
-                             usertext = 'Grid lines for minor ticks'),
+                             descr = _('Minor grid line settings'),
+                             usertext = _('Grid lines for minor ticks')),
                pixmap='settings_axisminorgridlines' )
 
     def _getUserDescription(self):
@@ -1102,7 +1107,7 @@ class Axis(widget.Widget):
                 document.OperationSettingSet(s.get('max'), float(c2)),
                 )
             self.document.applyOperation(
-                document.OperationMultiple(operations, descr='zoom axis'))
+                document.OperationMultiple(operations, descr=_('zoom axis')))
         elif cgi.moved():
             # move axis
             # convert positions to fractions
@@ -1123,7 +1128,7 @@ class Axis(widget.Widget):
                 document.OperationSettingSet(s.get('otherPosition'), axisfrac),
                 )
             self.document.applyOperation(
-                document.OperationMultiple(operations, descr='adjust axis'))
+                document.OperationMultiple(operations, descr=_('adjust axis')))
 
 # allow the factory to instantiate an axis
 document.thefactory.register( Axis )

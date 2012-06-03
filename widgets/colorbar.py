@@ -31,6 +31,11 @@ import grid
 import widget
 import axis
 
+def _(text, disambiguation=None, context='ColorBar'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class ColorBar(axis.Axis):
     """Color bar for showing scale of image.
 
@@ -40,7 +45,7 @@ class ColorBar(axis.Axis):
     typename='colorbar'
     allowedparenttypes = [graph.Graph, grid.Grid]
     allowusercreation = True
-    description = 'Image color bar'
+    description = _('Image color bar')
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
@@ -55,45 +60,45 @@ class ColorBar(axis.Axis):
         axis.Axis.addSettings(s)
 
         s.add( setting.WidgetChoice('widgetName', '',
-                                    descr='Corresponding widget',
+                                    descr=_('Corresponding widget'),
                                     widgettypes=('image', 'xy'),
-                                    usertext = 'Widget'), 0 )
+                                    usertext = _('Widget')), 0 )
 
         s.get('log').readonly = True
         s.get('datascale').readonly = True
 
         s.add( setting.AlignHorzWManual( 'horzPosn',
                                          'right',
-                                         descr = 'Horizontal position',
-                                         usertext='Horz posn',
+                                         descr = _('Horizontal position'),
+                                         usertext=_('Horz posn'),
                                          formatting=True) )
         s.add( setting.AlignVertWManual( 'vertPosn',
                                          'bottom',
-                                         descr = 'Vertical position',
-                                         usertext='Vert posn',
+                                         descr = _('Vertical position'),
+                                         usertext=_('Vert posn'),
                                          formatting=True) )
         s.add( setting.DistanceOrAuto('width', 'Auto',
-                                      descr = 'Width of colorbar',
-                                      usertext='Width',
+                                      descr = _('Width of colorbar'),
+                                      usertext=_('Width'),
                                       formatting=True) )
         s.add( setting.DistanceOrAuto('height', 'Auto',
-                                      descr = 'Height of colorbar',
-                                      usertext='Height',
+                                      descr = _('Height of colorbar'),
+                                      usertext=_('Height'),
                                       formatting=True) )
         
         s.add( setting.Float( 'horzManual',
                               0.,
-                              descr = 'Manual horizontal fractional position',
-                              usertext='Horz manual',
+                              descr = _('Manual horizontal fractional position'),
+                              usertext=_('Horz manual'),
                               formatting=True) )
         s.add( setting.Float( 'vertManual',
                               0.,
-                              descr = 'Manual vertical fractional position',
-                              usertext='Vert manual',
+                              descr = _('Manual vertical fractional position'),
+                              usertext=_('Vert manual'),
                               formatting=True) )
 
-        s.add( setting.Line('Border', descr = 'Colorbar border line',
-                            usertext='Border'),
+        s.add( setting.Line('Border', descr = _('Colorbar border line'),
+                            usertext=_('Border')),
                pixmap='settings_border')
 
         s.add( setting.SettingBackwardCompat('image', 'widgetName', None) )

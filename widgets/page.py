@@ -35,6 +35,11 @@ import controlgraph
 # x -> xyplot(x)
 # y -> (xyplot(y), fplot(y) -> x)
 
+def _(text, disambiguation=None, context='Page'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 defaultrange = [1e99, -1e99]
 
 class _AxisDependHelper(object):
@@ -180,7 +185,7 @@ class Page(widget.Widget):
     typename='page'
     allowusercreation = True
     allowedparenttypes = [root.Root]
-    description='Blank page'
+    description=_('Blank page')
 
     def __init__(self, parent, name=None):
         """Initialise object."""
@@ -196,14 +201,14 @@ class Page(widget.Widget):
         s.add( setting.DistancePhysical(
                 'width',
                 setting.Reference('/width'),
-                descr='Width of page',
-                usertext='Page width',
+                descr=_('Width of page'),
+                usertext=_('Page width'),
                 formatting=True) )
         s.add( setting.DistancePhysical(
                 'height',
                 setting.Reference('/height'),
-                descr='Height of page',
-                usertext='Page height',
+                descr=_('Height of page'),
+                usertext=_('Page height'),
                 formatting=True) )
         
     def draw(self, parentposn, painthelper, outerbounds=None):

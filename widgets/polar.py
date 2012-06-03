@@ -31,6 +31,11 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
+def _(text, disambiguation=None, context='Polar'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Tick(setting.Line):
     '''Polar tick settings.'''
 
@@ -38,18 +43,18 @@ class Tick(setting.Line):
         setting.Line.__init__(self, name, **args)
         self.add( setting.DistancePt( 'length',
                                       '6pt',
-                                      descr = 'Length of major ticks',
-                                      usertext='Length') )
+                                      descr = _('Length of major ticks'),
+                                      usertext=_('Length') ) )
         self.add( setting.Int( 'number',
                                6,
-                               descr = 'Number of major ticks to aim for',
-                               usertext='Number') )
+                               descr = _('Number of major ticks to aim for'),
+                               usertext=_('Number')) )
         self.add( setting.Bool('hidespokes', False,
-                               descr = 'Hide radial spokes',
-                               usertext = 'Hide spokes') )
+                               descr = _('Hide radial spokes'),
+                               usertext = _('Hide spokes')) )
         self.add( setting.Bool('hideannuli', False,
-                               descr = 'Hide annuli',
-                               usertext = 'Hide annuli') )
+                               descr = _('Hide annuli'),
+                               usertext = _('Hide annuli') ) )
         self.get('color').newDefault('grey')
 
     def getLength(self, painter):
@@ -65,18 +70,18 @@ class TickLabel(axis.TickLabel):
         self.remove('rotate')
         self.remove('hide')
         self.add( setting.Bool('hideradial', False,
-                               descr = 'Hide radial labels',
-                               usertext='Hide radial') )
+                               descr = _('Hide radial labels'),
+                               usertext=_('Hide radial') ) )
         self.add( setting.Bool('hidetangential', False,
-                               descr = 'Hide tangential labels',
-                               usertext='Hide tangent') )
+                               descr = _('Hide tangential labels'),
+                               usertext=_('Hide tangent') ) )
 
 class Polar(NonOrthGraph):
     '''Polar plotter.'''
 
     typename='polar'
     allowusercreation = True
-    description = 'Polar graph'
+    description = _('Polar graph')
 
     def __init__(self, parent, name=None):
         '''Initialise polar plot.'''
@@ -90,29 +95,29 @@ class Polar(NonOrthGraph):
         NonOrthGraph.addSettings(s)
 
         s.add( setting.FloatOrAuto('maxradius', 'Auto',
-                                   descr='Maximum value of radius',
-                                   usertext='Max radius') )
+                                   descr=_('Maximum value of radius'),
+                                   usertext=_('Max radius')) )
         s.add( setting.Choice('units',
                               ('degrees', 'radians'), 
                               'degrees', 
-                              descr = 'Angular units',
-                              usertext='Units') )
+                              descr = _('Angular units'),
+                              usertext=_('Units')) )
         s.add( setting.Choice('direction',
                               ('clockwise', 'anticlockwise'),
                               'anticlockwise',
-                              descr = 'Angle direction',
-                              usertext = 'Direction') )
+                              descr = _('Angle direction'),
+                              usertext = _('Direction')) )
         s.add( setting.Choice('position0',
                               ('right', 'top', 'left', 'bottom'),
                               'right',
-                              descr = 'Direction of 0 angle',
-                              usertext = u'Position of 0°') )
+                              descr = _('Direction of 0 angle'),
+                              usertext = _(u'Position of 0°')) )
 
-        s.add( TickLabel('TickLabels', descr = 'Tick labels',
-                    usertext='Tick labels'),
+        s.add( TickLabel('TickLabels', descr = _('Tick labels'),
+                    usertext=_('Tick labels')),
                pixmap='settings_axisticklabels' )
-        s.add( Tick('Tick', descr = 'Tick line',
-                    usertext='Tick'),
+        s.add( Tick('Tick', descr = _('Tick line'),
+                    usertext=_('Tick')),
                pixmap='settings_axismajorticks' )
 
         s.get('leftMargin').newDefault('1cm')

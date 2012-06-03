@@ -29,6 +29,11 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
+def _(text, disambiguation=None, context='BoxPlot'):
+    """Translate text."""
+    return unicode( 
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def percentile(sortedds, perc):
     """Given a sorted dataset, get the percentile perc.
 
@@ -100,7 +105,7 @@ class BoxPlot(GenericPlotter):
 
     typename='boxplot'
     allowusercreation=True
-    description='Plot box plots'
+    description=_('Plot box plots')
 
     def __init__(self, parent, name=None):
         """Initialise box plot."""
@@ -121,58 +126,59 @@ class BoxPlot(GenericPlotter):
                                '9/91 percentile',
                                '2/98 percentile'),
                               '1.5IQR', 
-                              descr = 'Whisker mode', 
-                              usertext='Whisker mode'), 0 )
+                              descr = _('Whisker mode'), 
+                              usertext=_('Whisker mode')), 0 )
 
         s.add( setting.Choice('direction', 
                               ('horizontal', 'vertical'), 'vertical', 
-                              descr = 'Horizontal or vertical boxes', 
-                              usertext='Direction'), 0 )
+                              descr = _('Horizontal or vertical boxes'), 
+                              usertext=_('Direction')), 0 )
         s.add( setting.DatasetOrStr('labels', '',
-                                    descr='Dataset or string to label bars',
-                                    usertext='Labels', datatype='text'), 0 )
+                                    descr=_('Dataset or string to label bars'),
+                                    usertext=_('Labels'), datatype='text'), 0 )
         s.add( setting.DatasetOrFloatList(
                 'posn', '',
-                descr = 'Dataset or list of values giving '
-                'positions of boxes (optional)', usertext='Positions'), 0 )
+                descr = _('Dataset or list of values giving '
+                          'positions of boxes (optional)'),
+                usertext=_('Positions')), 0 )
 
         # calculate statistics from these datasets
         s.add( setting.Datasets('values', ('data',),
-                                descr = 'Datasets containing values to '
-                                'calculate statistics for',
-                                usertext='Datasets'), 0 )
+                                descr = _('Datasets containing values to '
+                                          'calculate statistics for'),
+                                usertext=_('Datasets')), 0 )
 
         # alternate mode where data are provided for boxes
         s.add( setting.DatasetOrFloatList(
                 'whiskermax', '',
-                descr='Dataset with whisker maxima or list of values',
-                usertext='Whisker max'), 0 )
+                descr=_('Dataset with whisker maxima or list of values'),
+                usertext=_('Whisker max')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'whiskermin', '',
-                descr='Dataset with whisker minima or list of values',
-                usertext='Whisker min'), 0 )
+                descr=_('Dataset with whisker minima or list of values'),
+                usertext=_('Whisker min')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'boxmax', '',
-                descr='Dataset with box maxima or list of values',
-                usertext='Box max'), 0 )
+                descr=_('Dataset with box maxima or list of values'),
+                usertext=_('Box max')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'boxmin', '',
-                descr='Dataset with box minima or list of values',
-                usertext='Box min'), 0 )
+                descr=_('Dataset with box minima or list of values'),
+                usertext=_('Box min')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'median', '',
-                descr='Dataset with medians or list of values',
-                usertext='Median'), 0 )
+                descr=_('Dataset with medians or list of values'),
+                usertext=_('Median')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'mean', '',
-                descr='Dataset with means or list of values',
-                usertext='Mean'), 0 )
+                descr=_('Dataset with means or list of values'),
+                usertext=_('Mean')), 0 )
 
         # switch between different modes
         s.add( setting.BoolSwitch('calculate', True,
-                                  descr = 'Calculate statistics from datasets'
-                                  ' rather than given manually',
-                                  usertext = 'Calculate',
+                                  descr = _('Calculate statistics from datasets'
+                                            ' rather than given manually'),
+                                  usertext = _('Calculate'),
                                   settingstrue=('whiskermode', 'values'),
                                   settingsfalse=('boxmin', 'whiskermin',
                                                  'boxmax', 'whiskermax',
@@ -180,38 +186,38 @@ class BoxPlot(GenericPlotter):
 
         # formatting options
         s.add( setting.Float('fillfraction', 0.75,
-                             descr = 'Fill fraction of boxes',
-                             usertext='Fill fraction', formatting=True) )
+                             descr = _('Fill fraction of boxes'),
+                             usertext=_('Fill fraction'), formatting=True) )
         s.add( setting.Marker('outliersmarker',
                               'circle',
-                              descr = 'Marker for outliers',
-                              usertext='Outliers', formatting=True) )
+                              descr = _('Marker for outliers'),
+                              usertext=_('Outliers'), formatting=True) )
         s.add( setting.Marker('meanmarker',
                               'linecross',
-                              descr = 'Marker for mean',
-                              usertext='Mean', formatting=True) )
+                              descr = _('Marker for mean'),
+                              usertext=_('Mean'), formatting=True) )
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
-                                  descr = 'Size of markers to plot',
-                                  usertext='Markers size', formatting=True) )
+                                  descr = _('Size of markers to plot'),
+                                  usertext=_('Markers size'), formatting=True) )
 
         s.add( setting.GraphBrush( 'Fill',
-                                   descr = 'Box fill',
-                                   usertext='Box fill'),
+                                   descr = _('Box fill'),
+                                   usertext=_('Box fill')),
                pixmap='settings_bgfill' )
-        s.add( setting.Line('Border', descr = 'Box border line',
-                            usertext='Box border'),
+        s.add( setting.Line('Border', descr = _('Box border line'),
+                            usertext=_('Box border')),
                pixmap='settings_border')
-        s.add( setting.Line('Whisker', descr = 'Whisker line',
-                            usertext='Whisker line'),
+        s.add( setting.Line('Whisker', descr = _('Whisker line'),
+                            usertext=_('Whisker line')),
                pixmap='settings_whisker')
         s.add( setting.Line('MarkersLine',
-                            descr = 'Line around markers',
-                            usertext = 'Markers border'),
+                            descr = _('Line around markers'),
+                            usertext = _('Markers border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( setting.BoxPlotMarkerFillBrush('MarkersFill',
-                                              descr = 'Markers fill',
-                                              usertext = 'Markers fill'),
+                                              descr = _('Markers fill'),
+                                              usertext = _('Markers fill')),
                pixmap = 'settings_plotmarkerfill' )
 
     @property
