@@ -24,6 +24,11 @@ import collections
 
 import veusz.qtall as qt4
 
+def _(text, disambiguation=None, context="Setting"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class StyleSheet(Settings):
     """A class for handling default values of settings.
     
@@ -53,15 +58,15 @@ class StylesheetLine(Settings):
     """Hold the properties of the default line."""
     def __init__(self):
         Settings.__init__(self, 'Line', pixmap='settings_plotline',
-                          descr='Default line style for document',
-                          usertext='Line')
+                          descr=_('Default line style for document'),
+                          usertext=_('Line'))
         self.add( setting.DistancePt('width', '0.5pt',
-                                     descr='Default line width',
-                                     usertext='Width',
+                                     descr=_('Default line width'),
+                                     usertext=_('Width'),
                                      formatting=True) )
         self.add( setting.Color('color', 'black',
-                                descr='Default line color',
-                                usertext='Color',
+                                descr=_('Default line color'),
+                                usertext=_('Color'),
                                 formatting=True) )
 # register these properties with the stylesheet
 StyleSheet.register(StylesheetLine)
@@ -95,21 +100,21 @@ class StylesheetText(Settings):
     def __init__(self):
         """Initialise with default font family and list of families."""
         Settings.__init__(self, 'Font', pixmap='settings_axislabel',
-                          descr='Default font for document',
-                          usertext='Font')
+                          descr=_('Default font for document'),
+                          usertext=_('Font'))
 
         if StylesheetText.defaultfamily is None:
             _registerFontStyleSheet()
 
         self.add( setting.FontFamily('font', StylesheetText.defaultfamily,
-                                     descr='Font name', usertext='Font',
+                                     descr=_('Font name'), usertext=_('Font'),
                                      formatting=True))
         self.add( setting.DistancePt('size', '14pt',
-                                     descr='Default font size',
-                                     usertext='Size',
+                                     descr=_('Default font size'),
+                                     usertext=_('Size'),
                                      formatting=True))
         self.add( setting.Color('color', 'black',
-                                descr='Default font color',
-                                usertext='Color',
+                                descr=_('Default font color'),
+                                usertext=_('Color'),
                                 formatting=True))
 StyleSheet.register(StylesheetText)

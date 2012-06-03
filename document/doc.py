@@ -38,6 +38,11 @@ import painthelper
 import veusz.utils as utils
 import veusz.setting as setting
 
+def _(text, disambiguation=None, context="Document"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 # python identifier
 identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 # for splitting
@@ -393,9 +398,9 @@ class Document( qt4.QObject ):
             try:
                 execfile(plugin, dict())
             except Exception:
-                err = ('Error loading plugin ' + plugin + '\n\n' +
-                       traceback.format_exc())
-                qt4.QMessageBox.critical(None, "Error loading plugin", err)
+                err = _('Error loading plugin %s\n\n%s') % (
+                    plugin, traceback.format_exc())
+                qt4.QMessageBox.critical(None, _("Error loading plugin"), err)
 
     def printTo(self, printer, pages, scaling = 1., dpi = None,
                 antialias = False):
@@ -686,31 +691,31 @@ class Document( qt4.QObject ):
                 try:
                     exec defn in self.eval_context
                 except Exception:
-                    self.log("Failed to import '%s' from "
-                             "module '%s'" % (', '.join(toimport),
-                                              module))
+                    self.log(_("Failed to import '%s' from "
+                               "module '%s'") % (', '.join(toimport),
+                                                 module))
                     return
 
             delta = set(symbols)-set(toimport)
             if delta:
-                self.log("Did not import '%s' from module '%s'" %
+                self.log(_("Did not import '%s' from module '%s'") %
                          (', '.join(list(delta)), module))
 
         else:
-            self.log( "Invalid module name '%s'" % module )
+            self.log( _("Invalid module name '%s'") % module )
 
     def _updateEvalContextFuncOrConst(self, ctype, name, val):
         """Update a function or constant in eval function context."""
 
         if ctype == 'constant':
             if not identifier_re.match(name):
-                self.log( "Invalid constant name '%s'" % name )
+                self.log( _("Invalid constant name '%s'") % name )
                 return
             defn = val
         elif ctype == 'function':
             m = function_re.match(name)
             if not m:
-                self.log( "Invalid function specification '%s'" % name )
+                self.log( _("Invalid function specification '%s'") % name )
                 return
             name = m.group(1)
             args = m.group(2)
@@ -719,13 +724,13 @@ class Document( qt4.QObject ):
         # evaluate, but we ignore any unsafe commands or exceptions
         checked = utils.checkCode(defn)
         if checked is not None:
-            self.log( "Expression '%s' failed safe code test" %
+            self.log( _("Expression '%s' failed safe code test") %
                       defn )
             return
         try:
             self.eval_context[name] = eval(defn, self.eval_context)
         except Exception, e:
-            self.log( "Error evaluating '%s': '%s'" %
+            self.log( _("Error evaluating '%s': '%s'") %
                       (name, unicode(e)) )
 
     def updateEvalContext(self):

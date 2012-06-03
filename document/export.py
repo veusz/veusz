@@ -38,6 +38,11 @@ import painthelper
 # 1m in inch
 m_inch = 39.370079
 
+def _(text, disambiguation=None, context="Export"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Export(object):
     """Class to do the document exporting.
     
@@ -45,19 +50,19 @@ class Export(object):
     """
 
     formats = [
-        (["bmp"], "Windows bitmap"),
-        (["eps"], "Encapsulated Postscript"),
-        (["jpg", "jpeg"], "Jpeg bitmap"),
-        (["pdf"], "Portable Document Format"),
-        #(["pic"], "QT Pic format"),
-        (["png"], "Portable Network Graphics"),
-        (["svg"], "Scalable Vector Graphics"),
-        (["tiff"], "Tagged Image File Format bitmap"),
-        (["xpm"], "X Pixmap"),
+        (["bmp"], _("Windows bitmap")),
+        (["eps"], _("Encapsulated Postscript")),
+        (["jpg", "jpeg"], _("Jpeg bitmap")),
+        (["pdf"], _("Portable Document Format")),
+        #(["pic"], _("QT Pic format")),
+        (["png"], _("Portable Network Graphics")),
+        (["svg"], _("Scalable Vector Graphics")),
+        (["tiff"], _("Tagged Image File Format bitmap")),
+        (["xpm"], _("X Pixmap")),
         ]
 
     if hasemf:
-        formats.append( (["emf"], "Windows Enhanced Metafile") )
+        formats.append( (["emf"], _("Windows Enhanced Metafile")) )
         formats.sort()
 
     def __init__(self, doc, filename, pagenumber, color=True, bitmapdpi=100,

@@ -39,14 +39,20 @@ import linked
 
 import veusz.utils as utils
 import veusz.plugins as plugins
-    
+import veusz.qtall as qt4
+
+def _(text, disambiguation=None, context="Operations"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 ###############################################################################
 # Setting operations
 
 class OperationSettingSet(object):
     """Set a variable to a value."""
 
-    descr = 'change setting'
+    descr = _('change setting')
     
     def __init__(self, setting, value):
         """Set the setting to value.
@@ -76,7 +82,7 @@ class OperationSettingSet(object):
 class OperationSettingPropagate(object):
     """Propagate setting to other widgets."""
     
-    descr = 'propagate setting'
+    descr = _('propagate setting')
     
     def __init__(self, setting, widgetname = None, root = None,
                  maxlevels = -1):
@@ -167,7 +173,7 @@ class OperationSettingPropagate(object):
 class OperationWidgetRename(object):
     """Rename widget."""
     
-    descr = 'rename'
+    descr = _('rename')
     
     def __init__(self, widget, newname):
         """Rename the widget to newname."""
@@ -192,7 +198,7 @@ class OperationWidgetRename(object):
 class OperationWidgetDelete(object):
     """Delete widget."""
     
-    descr = 'delete'
+    descr = _('delete')
     
     def __init__(self, widget):
         """Delete the widget."""
@@ -219,7 +225,7 @@ class OperationWidgetDelete(object):
 class OperationWidgetsDelete(object):
     """Delete mutliple widget."""
     
-    descr = 'delete'
+    descr = _('delete')
     
     def __init__(self, widgets):
         """Delete the widget."""
@@ -265,7 +271,7 @@ class OperationWidgetsDelete(object):
 class OperationWidgetMoveUpDown(object):
     """Move a widget up or down in the hierarchy."""
 
-    descr = 'move'
+    descr = _('move')
     
     def __init__(self, widget, direction):
         """Move the widget specified up or down in the hierarchy.
@@ -294,7 +300,7 @@ class OperationWidgetMoveUpDown(object):
 class OperationWidgetMove(object):
     """Move a widget arbitrarily in the hierarchy."""
 
-    descr = 'move'
+    descr = _('move')
 
     def __init__(self, oldchildpath, newparentpath, newindex):
         """Move widget with path oldchildpath to be a child of
@@ -365,7 +371,7 @@ class OperationWidgetMove(object):
 class OperationWidgetAdd(object):
     """Add a widget of specified type to parent."""
 
-    descr = 'add'
+    descr = _('add')
     
     def __init__(self, parent, type, autoadd=True, name=None,
                  index=-1, **defaultvals):
@@ -413,7 +419,7 @@ class OperationWidgetAdd(object):
 class OperationDatasetSet(object):
     """Set a dataset to that specified."""
     
-    descr = 'set dataset'
+    descr = _('set dataset')
     
     def __init__(self, datasetname, dataset):
         self.datasetname = datasetname
@@ -439,7 +445,7 @@ class OperationDatasetSet(object):
 class OperationDatasetDelete(object):
     """Delete a dateset."""
     
-    descr = 'delete dataset'
+    descr = _('delete dataset')
     
     def __init__(self, datasetname):
         self.datasetname = datasetname
@@ -459,7 +465,7 @@ class OperationDatasetRename(object):
     Assumes newname doesn't already exist
     """
     
-    descr = 'rename dataset'
+    descr = _('rename dataset')
     
     def __init__(self, oldname, newname):
         self.oldname = oldname
@@ -481,7 +487,7 @@ class OperationDatasetDuplicate(object):
     Assumes duplicate name doesn't already exist
     """
     
-    descr = 'duplicate dataset'
+    descr = _('duplicate dataset')
     
     def __init__(self, origname, duplname):
         self.origname = origname
@@ -505,7 +511,7 @@ class OperationDatasetDuplicate(object):
         
 class OperationDatasetUnlinkFile(object):
     """Remove association between dataset and file."""
-    descr = 'unlink dataset'
+    descr = _('unlink dataset')
     
     def __init__(self, datasetname):
         self.datasetname = datasetname
@@ -523,7 +529,7 @@ class OperationDatasetUnlinkRelation(object):
     """Remove association between dataset and another dataset.
     """
     
-    descr = 'unlink dataset'
+    descr = _('unlink dataset')
     
     def __init__(self, datasetname):
         self.datasetname = datasetname
@@ -560,7 +566,7 @@ class OperationDatasetCreate(object):
 class OperationDatasetCreateRange(OperationDatasetCreate):
     """Create a dataset in a specfied range."""
     
-    descr = 'create dataset from range'
+    descr = _('create dataset from range')
     
     def __init__(self, datasetname, numsteps, parts, linked=False):
         """Create a dataset with numsteps values.
@@ -599,7 +605,7 @@ class CreateDatasetException(Exception):
 class OperationDatasetCreateParameteric(OperationDatasetCreate):
     """Create a dataset using expressions dependent on t."""
     
-    descr = 'create parametric dataset'
+    descr = _('create parametric dataset')
     
     def __init__(self, datasetname, t0, t1, numsteps, parts, linked=False):
         """Create a parametric dataset.
@@ -633,7 +639,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
         return ds
         
 class OperationDatasetCreateExpression(OperationDatasetCreate):
-    descr = 'create dataset from expression'
+    descr = _('create dataset from expression')
 
     def __init__(self, datasetname, parts, link, parametric=None):
         """Create a dataset from existing dataset using expressions.
@@ -725,7 +731,7 @@ class OperationDataset2DBase(object):
             document.setData(self.datasetname, self.olddataset)
 
 class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
-    descr = 'create 2D dataset from x, y and z expressions'
+    descr = _('create 2D dataset from x, y and z expressions')
     
     def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
@@ -738,7 +744,7 @@ class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
             self.xexpr, self.yexpr, self.zexpr)
 
 class OperationDataset2DCreateExpression(OperationDataset2DBase):
-    descr = 'create 2D dataset from expression'
+    descr = _('create 2D dataset from expression')
     
     def __init__(self, datasetname, expr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
@@ -748,7 +754,7 @@ class OperationDataset2DCreateExpression(OperationDataset2DBase):
         return datasets.Dataset2DExpression(self.expr)
 
 class OperationDataset2DXYFunc(OperationDataset2DBase):
-    descr = 'create 2D dataset from function of x and y'
+    descr = _('create 2D dataset from function of x and y')
 
     def __init__(self, datasetname, xstep, ystep, expr, link):
         """Create 2d dataset:
@@ -769,7 +775,7 @@ class OperationDataset2DXYFunc(OperationDataset2DBase):
 class OperationDatasetUnlinkByFile(object):
     """Unlink all datasets associated with file."""
 
-    descr = "unlink datasets"
+    descr = _('unlink datasets')
 
     def __init__(self, filename):
         """Unlink all datasets associated with filename."""
@@ -794,7 +800,7 @@ class OperationDatasetUnlinkByFile(object):
 class OperationDatasetDeleteByFile(object):
     """Delete all datasets associated with file."""
 
-    descr = "delete datasets"
+    descr = _('delete datasets')
 
     def __init__(self, filename):
         """Delete all datasets associated with filename."""
@@ -884,7 +890,7 @@ class OperationDataImportBase(object):
 class OperationDataImport(OperationDataImportBase):
     """Import 1D data from text files."""
 
-    descr = 'import data'
+    descr = _('import data')
 
     def __init__(self, params):
         """Setup operation.
@@ -928,7 +934,7 @@ class OperationDataImport(OperationDataImportBase):
 class OperationDataImportCSV(OperationDataImportBase):
     """Import data from a CSV file."""
 
-    descr = 'import CSV data'
+    descr = _('import CSV data')
 
     def doImport(self, document):
         """Do the data import."""
@@ -946,7 +952,7 @@ class OperationDataImportCSV(OperationDataImportBase):
 class OperationDataImport2D(OperationDataImportBase):
     """Import a 2D matrix from a file."""
     
-    descr = 'import 2d data'
+    descr = _('import 2d data')
 
     def doImport(self, document):
         """Import data."""
@@ -976,7 +982,7 @@ class OperationDataImport2D(OperationDataImportBase):
 class OperationDataImportFITS(OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""
 
-    descr = 'import FITS file'
+    descr = _('import FITS file')
     
     def _import1d(self, hdu):
         """Import 1d data from hdu."""
@@ -1076,7 +1082,7 @@ class OperationDataImportFITS(OperationDataImportBase):
 class OperationDataImportPlugin(OperationDataImportBase):
     """Import data using a plugin."""
 
-    descr = 'import using plugin'
+    descr = _('import using plugin')
 
     def doImport(self, document):
         """Do import."""
@@ -1152,7 +1158,7 @@ class OperationDataCaptureSet(object):
     This is a bit primative, but it is not obvious how to isolate the capturing
     functionality elsewhere."""
 
-    descr = 'data capture'
+    descr = _('data capture')
 
     def __init__(self, simplereadobject):
         """Takes a simpleread object containing the data to be set."""
@@ -1186,7 +1192,7 @@ class OperationDataCaptureSet(object):
 class OperationDataTag(object):
     """Add a tag to a list of datasets."""
 
-    descr = "add dataset tags"
+    descr = _('add dataset tags')
 
     def __init__(self, tag, datasetnames):
         """Add tag to datasets listed."""
@@ -1210,7 +1216,7 @@ class OperationDataTag(object):
 class OperationDataUntag(object):
     """Add a tag to a list of datasets."""
 
-    descr = "remove dataset tags"
+    descr = _('remove dataset tags')
 
     def __init__(self, tag, datasetnames):
         """Remove tag to datasets listed."""
@@ -1233,7 +1239,7 @@ class OperationDataUntag(object):
 class OperationDatasetAddColumn(object):
     """Add a column to a dataset, blanked to zero."""
     
-    descr = 'add dataset column'
+    descr = _('add dataset column')
     
     def __init__(self, datasetname, columnname):
         """Initialise column columnname in datasetname.
@@ -1259,7 +1265,7 @@ class OperationDatasetAddColumn(object):
 class OperationDatasetSetVal(object):
     """Set a value in the dataset."""
 
-    descr = 'change dataset value'
+    descr = _('change dataset value')
     
     def __init__(self, datasetname, columnname, row, val):
         """Set row in column columnname to val."""
@@ -1286,7 +1292,7 @@ class OperationDatasetSetVal(object):
 class OperationDatasetSetVal2D(object):
     """Set a value in a 2D dataset."""
 
-    descr = 'change 2D dataset value'
+    descr = _('change 2D dataset value')
 
     def __init__(self, datasetname, row, col, val):
         """Set row in column columnname to val."""
@@ -1311,7 +1317,7 @@ class OperationDatasetSetVal2D(object):
 class OperationDatasetDeleteRow(object):
     """Delete a row or several in the dataset."""
 
-    descr = 'delete dataset row'
+    descr = _('delete dataset row')
     
     def __init__(self, datasetname, row, numrows=1):
         """Delete a row in a dataset."""
@@ -1332,7 +1338,7 @@ class OperationDatasetDeleteRow(object):
 class OperationDatasetInsertRow(object):
     """Insert a row or several in the dataset."""
 
-    descr = 'insert dataset row'
+    descr = _('insert dataset row')
     
     def __init__(self, datasetname, row, numrows=1):
         """Delete a row in a dataset."""
@@ -1356,7 +1362,7 @@ class OperationDatasetInsertRow(object):
 class OperationSetCustom(object):
     """Set custom objects, such as constants."""
 
-    descr = 'set a custom definition'
+    descr = _('set a custom definition')
 
     def __init__(self, vals):
         """customtype is the type of custom object to set:
@@ -1410,7 +1416,7 @@ class OperationMultiple(object):
 class OperationLoadStyleSheet(OperationMultiple):
     """An operation to load a stylesheet."""
     
-    descr = 'load stylesheet'
+    descr = _('load stylesheet')
 
     def __init__(self, filename):
         """Load stylesheet with filename."""
@@ -1434,7 +1440,7 @@ class OperationLoadStyleSheet(OperationMultiple):
             raise
         
 class OperationLoadCustom(OperationLoadStyleSheet):
-    descr = 'load custom definitions'
+    descr = _('load custom definitions')
 
 class OperationToolsPlugin(OperationMultiple):
     """An operation to represent what a tools plugin does."""

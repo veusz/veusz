@@ -23,6 +23,11 @@ import veusz.qtall as qt4
 import setting
 from settings import Settings
 
+def _(text, disambiguation=None, context="Setting"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class Line(Settings):
     '''For holding properities of a line.'''
 
@@ -31,23 +36,23 @@ class Line(Settings):
 
         self.add( setting.Color('color',
                                 setting.Reference('/StyleSheet/Line/color'),
-                                descr = 'Color of line',
-                                usertext='Color') )
+                                descr = _('Color of line'),
+                                usertext=_('Color')) )
         self.add( setting.DistancePt('width',
                                      setting.Reference('/StyleSheet/Line/width'),
-                                     descr = 'Width of line',
-                                     usertext='Width') )
+                                     descr = _('Width of line'),
+                                     usertext=_('Width')) )
         self.add( setting.LineStyle('style', 'solid',
-                                    descr = 'Line style',
-                                    usertext='Style') )
+                                    descr = _('Line style'),
+                                    usertext=_('Style')) )
         self.add( setting.Int( 'transparency', 0,
-                               descr = 'Transparency percentage',
-                               usertext = 'Transparency',
+                               descr = _('Transparency percentage'),
+                               usertext = _('Transparency'),
                                minval = 0,
                                maxval = 100 ) )
         self.add( setting.Bool('hide', False,
-                               descr = 'Hide the line',
-                               usertext='Hide') )
+                               descr = _('Hide the line'),
+                               usertext=_('Hide')) )
         
     def makeQPen(self, painthelper):
         '''Make a QPen from the description.
@@ -81,12 +86,12 @@ class XYPlotLine(Line):
 
         self.add( setting.Choice('steps',
                                  ['off', 'left', 'centre', 'right'], 'off',
-                                 descr='Plot horizontal steps '
+                                 descr=_('Plot horizontal steps ')
                                  'instead of a line',
-                                 usertext='Steps'), 0 )
+                                 usertext=_('Steps')), 0 )
         self.add( setting.Bool('bezierJoin', False,
-                               descr='Connect points with a cubic Bezier curve',
-                               usertext='Bezier join'), 1 )
+                               descr=_('Connect points with a cubic Bezier curve'),
+                               usertext=_('Bezier join')), 1 )
 
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''
@@ -96,14 +101,14 @@ class ErrorBarLine(Line):
 
         self.add( setting.Float('endsize', 1.0,
                                 minval = 0.,
-                                descr='Scale ends of error bars by this factor',
-                                usertext = 'End size') )
+                                descr=_('Scale ends of error bars by this factor'),
+                                usertext = _('End size')) )
         self.add( setting.Bool('hideHorz', False,
-                               descr = 'Hide horizontal errors',
-                               usertext='Hide horz.') )
+                               descr = _('Hide horizontal errors'),
+                               usertext=_('Hide horz.')) )
         self.add( setting.Bool('hideVert', False,
-                               descr = 'Hide vertical errors',
-                               usertext='Hide vert.') )
+                               descr = _('Hide vertical errors'),
+                               usertext=_('Hide vert.')) )
 
 class Brush(Settings):
     '''Settings of a fill.'''
@@ -112,19 +117,19 @@ class Brush(Settings):
         Settings.__init__(self, name, **args)
 
         self.add( setting.Color( 'color', 'black',
-                                 descr = 'Fill colour',
-                                 usertext='Color') )
+                                 descr = _('Fill colour'),
+                                 usertext=_('Color')) )
         self.add( setting.FillStyle( 'style', 'solid',
-                                     descr = 'Fill style',
-                                     usertext='Style') )
+                                     descr = _('Fill style'),
+                                     usertext=_('Style')) )
         self.add( setting.Int( 'transparency', 0,
-                               descr = 'Transparency percentage',
-                               usertext = 'Transparency',
+                               descr = _('Transparency percentage'),
+                               usertext = _('Transparency'),
                                minval = 0,
                                maxval = 100 ) )
         self.add( setting.Bool( 'hide', False,
-                                descr = 'Hide the fill',
-                                usertext='Hide') )
+                                descr = _('Hide the fill'),
+                                usertext=_('Hide')) )
         
     def makeQBrush(self):
         '''Make a qbrush from the settings.'''
@@ -148,50 +153,50 @@ class BrushExtended(Settings):
 
         self.add( setting.Color(
                 'color', 'black',
-                descr = 'Fill colour',
-                usertext='Color') )
+                descr = _('Fill colour'),
+                usertext=_('Color')) )
         self.add( setting.FillStyleExtended(
                 'style', 'solid',
-                descr = 'Fill style',
-                usertext='Style') )
+                descr = _('Fill style'),
+                usertext=_('Style')) )
 
         self.add( setting.Bool(
                 'hide', False,
-                descr = 'Hide the fill',
-                usertext='Hide') )
+                descr = _('Hide the fill'),
+                usertext=_('Hide')) )
 
         self.add( setting.Int(
                 'transparency', 0,
-                descr = 'Transparency percentage',
-                usertext = 'Transparency',
+                descr = _('Transparency percentage'),
+                usertext = _('Transparency'),
                 minval = 0,
                 maxval = 100 ) )
         self.add( setting.DistancePt(
                 'linewidth', '0.5pt',
-                descr = 'Width of hatch or pattern line',
-                usertext='Line width') )
+                descr = _('Width of hatch or pattern line'),
+                usertext=_('Line width')) )
         self.add( setting.LineStyle(
                 'linestyle', 'solid',
-                descr = 'Hatch or pattern line style',
-                usertext='Line style') )
+                descr = _('Hatch or pattern line style'),
+                usertext=_('Line style')) )
         self.add( setting.DistancePt(
                 'patternspacing', '5pt',
-                descr = 'Hatch or pattern spacing',
-                usertext = 'Spacing') )
+                descr = _('Hatch or pattern spacing'),
+                usertext = _('Spacing')) )
         self.add( setting.Color(
                 'backcolor', 'white',
-                descr = 'Hatch or pattern background color',
-                usertext = 'Back color' ) )
+                descr = _('Hatch or pattern background color'),
+                usertext = _('Back color') ) )
         self.add( setting.Int(
                 'backtransparency', 0,
-                descr = 'Hatch or pattern background transparency percentage',
-                usertext = 'Back trans.',
+                descr = _('Hatch or pattern background transparency percentage'),
+                usertext = _('Back trans.'),
                 minval = 0,
                 maxval = 100 ) )
         self.add( setting.Bool(
                 'backhide', True,
-                descr = 'Hide hatch or pattern background',
-                usertext='Back hide') )
+                descr = _('Hide hatch or pattern background'),
+                usertext=_('Back hide')) )
 
 class KeyBrush(BrushExtended):
     '''Fill used for back of key.'''
@@ -235,13 +240,13 @@ class PointFill(BrushExtended):
 
         hide = self.get('hide')
         hide.newDefault(True)
-        hide.usertext = 'Hide edge fill'
-        hide.descr = 'Hide the filled region to the edge of the plot'
+        hide.usertext = _('Hide edge fill')
+        hide.descr = _('Hide the filled region to the edge of the plot')
         self.get('color').newDefault('grey')
 
         self.add( setting.Bool( 'hideerror', False,
-                                descr = 'Hide the filled region inside the error bars',
-                                usertext='Hide error fill') )
+                                descr = _('Hide the filled region inside the error bars'),
+                                usertext=_('Hide error fill')) )
 
 class ShapeFill(BrushExtended):
     '''Filling used for filling shapes.'''
@@ -273,22 +278,22 @@ class Text(Settings):
 
         self.add( setting.FontFamily('font',
                                      setting.Reference('/StyleSheet/Font/font'),
-                                     descr = 'Font name',
-                                     usertext='Font') )
+                                     descr = _('Font name'),
+                                     usertext=_('Font')) )
         self.add( setting.DistancePt('size',
                                      setting.Reference('/StyleSheet/Font/size'),
-                                     descr = 'Font size', usertext='Size' ) )
+                                     descr = _('Font size'), usertext=_('Size') ) )
         self.add( setting.Color( 'color',
                                  setting.Reference('/StyleSheet/Font/color'),
-                                 descr = 'Font color', usertext='Color' ) )
+                                 descr = _('Font color'), usertext=_('Color') ) )
         self.add( setting.Bool( 'italic', False,
-                                descr = 'Italic font', usertext='Italic' ) )
+                                descr = _('Italic font'), usertext=_('Italic') ) )
         self.add( setting.Bool( 'bold', False,
-                                descr = 'Bold font', usertext='Bold' ) )
+                                descr = _('Bold font'), usertext=_('Bold') ) )
         self.add( setting.Bool( 'underline', False,
-                                descr = 'Underline font', usertext='Underline' ) )
+                                descr = _('Underline font'), usertext=_('Underline') ) )
         self.add( setting.Bool( 'hide', False,
-                                descr = 'Hide the text', usertext='Hide') )
+                                descr = _('Hide the text'), usertext=_('Hide')) )
 
     def copy(self):
         """Make copy of settings."""
@@ -323,16 +328,16 @@ class PointLabel(Text):
         Text.__init__(self, name, **args)
         
         self.add( setting.Float('angle', 0.,
-                                descr='Angle of the labels in degrees',
-                                usertext='Angle',
+                                descr=_('Angle of the labels in degrees'),
+                                usertext=_('Angle'),
                                 formatting=True), 0 )
         self.add( setting.AlignVert('posnVert',
                                     'centre',
-                                    descr='Vertical position of label',
-                                    usertext='Vert position',
+                                    descr=_('Vertical position of label'),
+                                    usertext=_('Vert position'),
                                     formatting=True), 0 )
         self.add( setting.AlignHorz('posnHorz',
                                     'right',
-                                    descr="Horizontal position of label",
-                                    usertext='Horz position',
+                                    descr=_('Horizontal position of label'),
+                                    usertext=_('Horz position'),
                                     formatting=True), 0 )

@@ -34,6 +34,11 @@ import setting
 
 import veusz.utils as utils
 
+def _(text, disambiguation=None, context="Setting"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def styleClear(widget):
     """Return widget to default"""
     widget.setStyleSheet("")
@@ -580,7 +585,7 @@ class Dataset(qt4.QWidget):
         self.connect( self.choice, qt4.SIGNAL("settingChanged"),
                       self.slotSettingChanged )
 
-        b = self.button = DotDotButton(tooltip="Select using dataset browser")
+        b = self.button = DotDotButton(tooltip=_("Select using dataset browser"))
         self.connect(b, qt4.SIGNAL("toggled(bool)"),
                      self.slotButtonToggled)
 
@@ -1247,7 +1252,7 @@ class LineSet(ListSet):
             LineStyle._generateIcons()
 
         # make line style selector
-        wlinestyle = self.addCombo(row, 0, 'Line style',
+        wlinestyle = self.addCombo(row, 0, _('Line style'),
                                    LineStyle._lines,
                                    LineStyle._icons, None)
         
@@ -1259,10 +1264,10 @@ class LineSet(ListSet):
                      self.onWidthChanged)
 
         # make color selector button
-        wcolor = self.addColorButton(row, 2, 'Line color')
+        wcolor = self.addColorButton(row, 2, _('Line color'))
 
         # make hide checkbox
-        whide = self.addToggleButton(row, 3, 'Hide line')
+        whide = self.addToggleButton(row, 3, _('Hide line'))
 
         # return created controls
         return [wlinestyle, wwidth, wcolor, whide]
@@ -1380,20 +1385,20 @@ class FillSet(ListSet):
             FillStyle._generateIcons()
     
         # make fill style selector
-        wfillstyle = self.addCombo(row, 0, "Fill style",
+        wfillstyle = self.addCombo(row, 0, _("Fill style"),
                                    FillStyle._fills,
                                    FillStyle._icons,
                                    FillStyle._fills)
         wfillstyle.setMinimumWidth(self.pixsize)
 
         # make color selector button
-        wcolor = self.addColorButton(row, 1, "Fill color")
+        wcolor = self.addColorButton(row, 1, _("Fill color"))
 
         # make hide checkbox
-        whide = self.addToggleButton(row, 2, "Hide fill")
+        whide = self.addToggleButton(row, 2, _("Hide fill"))
 
         # extended options
-        wmore = DotDotButton(tooltip="More options")
+        wmore = DotDotButton(tooltip=_("More options"))
         self.connect(wmore, qt4.SIGNAL("toggled(bool)"),
                      lambda on, row=row: self.editMore(on, row))
 
@@ -1655,7 +1660,7 @@ class Filename(qt4.QWidget):
         layout.addWidget(self.edit)
         
         b = self.button = DotDotButton(checkable=False,
-                                       tooltip="Browse for file")
+                                       tooltip=_("Browse for file"))
         layout.addWidget(b)
 
         # connect up signals
@@ -1680,10 +1685,10 @@ class Filename(qt4.QWidget):
     def buttonClicked(self):
         """Button clicked - show file open dialog."""
 
-        title = 'Choose file'
-        filefilter = "All files (*)"
+        title = _('Choose file')
+        filefilter = _("All files (*)")
         if self.mode == 'image':
-            title = 'Choose image'
+            title = _('Choose image')
             filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
                           "*.gif *.xbm *.xpm);;" + filefilter)
 

@@ -31,6 +31,11 @@ import veusz.utils as utils
 from lineeditwithclear import LineEditWithClear
 from veusz.utils.treemodel import TMNode, TreeModel
 
+def _(text, disambiguation=None, context="DatasetBrowser"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def datasetLinkFile(ds):
     """Get a linked filename from a dataset."""
     if ds.linked is None:
@@ -122,7 +127,7 @@ class DatasetNode(TMNode):
                 text = ''
 
             if ds.tags:
-                text += '\n\nTags: %s' % (' '.join(list(sorted(ds.tags))))
+                text += '\n\n' + _('Tags: %s') % (' '.join(list(sorted(ds.tags))))
 
             return qt4.QVariant(textwrap.fill(text, 40))
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
@@ -192,7 +197,7 @@ class DatasetRelationModel(TreeModel):
         filterdims/filterdtype: filter dimensions and datatypes.
         """
 
-        TreeModel.__init__(self, ("Dataset", "Size", "Type"))
+        TreeModel.__init__(self, (_("Dataset"), _("Size"), _("Type")))
         self.doc = doc
         self.linkednodes = {}
         self.grouping = grouping
@@ -231,7 +236,7 @@ class DatasetRelationModel(TreeModel):
 
     def makeGrpTreeNone(self):
         """Make tree with no grouping."""
-        tree = TMNode( ("Dataset", "Size", "Type", "File"), None )
+        tree = TMNode( (_("Dataset"), _("Size"), _("Type"), _("File")), None )
         for name, ds in self.doc.data.iteritems():
             child = DatasetNode( self.doc, name,
                                  ("name", "size", "type", "linkfile"),
@@ -268,7 +273,7 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeFilename(self):
         """Make a tree of datasets grouped by linked file."""
         return self.makeGrpTree(
-            ("Dataset", "Size", "Type"),
+            (_("Dataset"), _("Size"), _("Type")),
             ("name", "size", "type"),
             lambda ds: (datasetLinkFile(ds),),
             FilenameNode
@@ -277,7 +282,7 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeSize(self):
         """Make a tree of datasets grouped by dataset size."""
         return self.makeGrpTree(
-            ("Dataset", "Type", "Filename"),
+            (_("Dataset"), _("Type"), _("Filename")),
             ("name", "type", "linkfile"),
             lambda ds: (ds.userSize(),),
             TMNode
@@ -286,7 +291,7 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeType(self):
         """Make a tree of datasets grouped by dataset type."""
         return self.makeGrpTree(
-            ("Dataset", "Size", "Filename"),
+            (_("Dataset"), _("Size"), _("Filename")),
             ("name", "size", "linkfile"),
             lambda ds: (ds.dstype,),
             TMNode
@@ -299,10 +304,10 @@ class DatasetRelationModel(TreeModel):
             if ds.tags:
                 return list(sorted(ds.tags))
             else:
-                return [u"None"]
+                return [u_("None")]
 
         return self.makeGrpTree(
-            ("Dataset", "Size", "Type", "Filename"),
+            (_("Dataset"), _("Size"), _("Type"), _("Filename")),
             ("name", "size", "type", "linkfile"),
             getgrp,
             TMNode
@@ -441,14 +446,14 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         if DatasetNode in types:
             thismenu = menu
             if len(types) > 1:
-                thismenu = menu.addMenu("Datasets")
+                thismenu = menu.addMenu(_("Datasets"))
             self.datasetContextMenu(
                 [n for n in nodes if isinstance(n, DatasetNode)],
                 thismenu)
         elif FilenameNode in types:
             thismenu = menu
             if len(types) > 1:
-                thismenu = menu.addMenu("Files")
+                thismenu = menu.addMenu(_("Files"))
             self.filenameContextMenu(
                 [n for n in nodes if isinstance(n, FilenameNode)],
                 thismenu)
@@ -461,7 +466,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         # if there is data to paste, add menu item
         if document.isDataMime():
-            menu.addAction("Paste", _paste)
+            menu.addAction(_("Paste"), _paste)
 
         if len( menu.actions() ) != 0:
             menu.exec_(self.mapToGlobal(pt))
@@ -489,7 +494,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetDelete(n) for n in dsnames],
-                    descr='delete dataset(s)'))
+                    descr=_('delete dataset(s)')))
         def _unlink_file():
             """Unlink dataset from file."""
             self.doc.applyOperation(
@@ -497,7 +502,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                     [document.OperationDatasetUnlinkFile(n)
                      for d,n in zip(datasets,dsnames)
                      if d.canUnlink() and d.linked],
-                    descr='unlink dataset(s)'))
+                    descr=_('unlink dataset(s)')))
         def _unlink_relation():
             """Unlink dataset from relation."""
             self.doc.applyOperation(
@@ -505,7 +510,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                     [document.OperationDatasetUnlinkRelation(n)
                      for d,n in zip(datasets,dsnames)
                      if d.canUnlink() and not d.linked],
-                    descr='unlink dataset(s)'))
+                    descr=_('unlink dataset(s)')))
         def _copy():
             """Copy data to clipboard."""
             mime = document.generateDatasetsMime(dsnames, self.doc)
@@ -515,23 +520,23 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         recreate = [type(d) in dataeditdialog.recreate_register
                     for d in datasets]
         if any(recreate):
-            menu.addAction("Edit", _edit)
+            menu.addAction(_("Edit"), _edit)
         if not all(recreate):
-            menu.addAction("Edit data", _edit_data)
+            menu.addAction(_("Edit data"), _edit_data)
 
         # deletion
-        menu.addAction("Delete", _delete)
+        menu.addAction(_("Delete"), _delete)
 
         # linking
         unlink_file = [d.canUnlink() and d.linked for d in datasets]
         if any(unlink_file):
-            menu.addAction("Unlink file", _unlink_file)
+            menu.addAction(_("Unlink file"), _unlink_file)
         unlink_relation = [d.canUnlink() and not d.linked for d in datasets]
         if any(unlink_relation):
-            menu.addAction("Unlink relation", _unlink_relation)
+            menu.addAction(_("Unlink relation"), _unlink_relation)
 
         # tagging submenu
-        tagmenu = menu.addMenu("Tags")
+        tagmenu = menu.addMenu(_("Tags"))
         for tag in self.doc.datasetTags():
             def toggle(tag=tag):
                 state = [tag in d.tags for d in datasets]
@@ -548,19 +553,19 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         def addtag():
             tag, ok = qt4.QInputDialog.getText(
-                self, "New tag", "Enter new tag")
+                self, _("New tag"), _("Enter new tag"))
             if ok:
                 tag = unicode(tag).strip().replace(' ', '')
                 if tag:
                     self.doc.applyOperation( document.OperationDataTag(
                             tag, dsnames) )
-        tagmenu.addAction("Add...", addtag)
+        tagmenu.addAction(_("Add..."), addtag)
 
         # copy
-        menu.addAction("Copy", _copy)
+        menu.addAction(_("Copy"), _copy)
 
         if len(datasets) == 1:
-            useasmenu = menu.addMenu("Use as")
+            useasmenu = menu.addMenu(_("Use as"))
             self.getMenuUseAs(useasmenu, datasets[0])
 
     def filenameContextMenu(self, nodes, menu):
@@ -581,17 +586,17 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetUnlinkByFile(f) for f in filenames],
-                    descr='unlink by file'))
+                    descr=_('unlink by file')))
         def _delete_all():
             """Delete all datasets associated with file."""
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetDeleteByFile(f) for f in filenames],
-                    descr='delete by file'))
+                    descr=_('delete by file')))
 
-        menu.addAction("Reload", _reload)
-        menu.addAction("Unlink all", _unlink_all)
-        menu.addAction("Delete all", _delete_all)
+        menu.addAction(_("Reload"), _reload)
+        menu.addAction(_("Unlink all"), _unlink_all)
+        menu.addAction(_("Delete all"), _delete_all)
 
     def getMenuUseAs(self, menu, dataset):
         """Build up menu of widget settings to use dataset in."""
@@ -652,11 +657,11 @@ class DatasetBrowser(qt4.QWidget):
     # how datasets can be grouped
     grpnames = ("none", "filename", "type", "size", "tags")
     grpentries = {
-        "none": "None",
-        "filename": "Filename",
-        "type": "Type", 
-        "size": "Size",
-        "tags": "Tags",
+        "none": _("None"),
+        "filename": _("Filename"),
+        "type": _("Type"), 
+        "size": _("Size"),
+        "tags": _("Tags"),
         }
 
     def __init__(self, thedocument, mainwin, parent, readonly=False,
@@ -678,7 +683,7 @@ class DatasetBrowser(qt4.QWidget):
         self.optslayout = qt4.QHBoxLayout()
 
         # grouping options - use a menu to choose the grouping
-        self.grpbutton = qt4.QPushButton("Group")
+        self.grpbutton = qt4.QPushButton(_("Group"))
         self.grpmenu = qt4.QMenu()
         self.grouping = setting.settingdb.get("navtree_grouping", "filename")
         self.grpact = qt4.QActionGroup(self)
@@ -693,13 +698,13 @@ class DatasetBrowser(qt4.QWidget):
         self.connect(self.grpact, qt4.SIGNAL("triggered(QAction*)"),
                      self.slotGrpChanged)
         self.grpbutton.setMenu(self.grpmenu)
-        self.grpbutton.setToolTip("Group datasets with property given")
+        self.grpbutton.setToolTip(_("Group datasets with property given"))
         self.optslayout.addWidget(self.grpbutton)
 
         # filtering by entering text
-        self.optslayout.addWidget(qt4.QLabel("Filter"))
+        self.optslayout.addWidget(qt4.QLabel(_("Filter")))
         self.filteredit = LineEditWithClear()
-        self.filteredit.setToolTip("Enter text here to filter datasets")
+        self.filteredit.setToolTip(_("Enter text here to filter datasets"))
         self.connect(self.filteredit, qt4.SIGNAL("textChanged(const QString&)"),
                      self.slotFilterChanged)
         self.optslayout.addWidget(self.filteredit)
