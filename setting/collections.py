@@ -86,8 +86,8 @@ class XYPlotLine(Line):
 
         self.add( setting.Choice('steps',
                                  ['off', 'left', 'centre', 'right'], 'off',
-                                 descr=_('Plot horizontal steps ')
-                                 'instead of a line',
+                                 descr=_('Plot horizontal steps '
+                                         'instead of a line'),
                                  usertext=_('Steps')), 0 )
         self.add( setting.Bool('bezierJoin', False,
                                descr=_('Connect points with a cubic Bezier curve'),
