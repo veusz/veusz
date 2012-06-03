@@ -23,6 +23,11 @@ from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList, \
     SettingsProxySingle
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="StylesheetDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class StylesheetDialog(VeuszDialog):
     """This is a dialog box to edit stylesheets.
     Most of the work is done elsewhere, so this doesn't do a great deal
@@ -102,7 +107,7 @@ class StylesheetDialog(VeuszDialog):
         """Save stylesheet as a file."""
     
         filename = self.parent()._fileSaveDialog(
-            'vst', 'Veusz stylesheet', 'Save stylesheet')
+            'vst', _('Veusz stylesheet'), _('Save stylesheet'))
         if filename:
             try:
                 f = open(filename, 'w')
@@ -112,20 +117,20 @@ class StylesheetDialog(VeuszDialog):
 
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Unable to save '%s'\n\n%s" % (filename, e.strerror))
+                    self, _("Error - Veusz"),
+                    _("Unable to save '%s'\n\n%s") % (filename, e.strerror))
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
         filename = self.parent()._fileOpenDialog(
-            'vst', 'Veusz stylesheet', 'Load stylesheet')
+            'vst', _('Veusz stylesheet'), _('Load stylesheet'))
         if filename:
             try:
                 self.loadStyleSheet(filename)
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
-                    self, "Error - Veusz",
-                    "Unable to load '%s'\n\n%s" % (filename, e.strerror))
+                    self, _("Error - Veusz"),
+                    _("Unable to load '%s'\n\n%s") % (filename, e.strerror))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

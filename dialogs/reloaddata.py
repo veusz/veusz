@@ -26,6 +26,11 @@ import veusz.qtall as qt4
 import veusz.document as document
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="ReloadDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class ReloadData(VeuszDialog):
     """Dialog for reloading linked datasets."""
 
@@ -113,12 +118,12 @@ class ReloadData(VeuszDialog):
             # show errors in read data
             for var, count in errors.items():
                 if count != 0:
-                    text += ( '%i conversions failed for dataset "%s"\n' %
+                    text += ( _('%i conversions failed for dataset "%s"\n') %
                               (count, var) )
 
             # show successes
             if len(datasets) != 0:
-                text += 'Reloaded (%i)\n' % self.reloadct
+                text += _('Reloaded (%i)\n') % self.reloadct
                 self.reloadct += 1
                 for var in datasets:
                     descr = self.document.data[var].description()
@@ -128,15 +133,15 @@ class ReloadData(VeuszDialog):
                         text += ' %s\n' % var
 
         except EnvironmentError, e:
-            text = 'Error reading file:\n' + unicode(e)
+            text = _('Error reading file:\n') + unicode(e)
         except document.DescriptorError:
-            text = 'Could not interpret descriptor. Reload failed.'
+            text = _('Could not interpret descriptor. Reload failed.')
         except:
             self.document.enableUpdates()
             raise
 
         if text == '':
-            text = 'Nothing to do. No linked datasets.'
+            text = _('Nothing to do. No linked datasets.')
 
         self.document.enableUpdates()
         self.outputedit.setPlainText(text)

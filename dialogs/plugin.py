@@ -28,6 +28,11 @@ import exceptiondialog
 import dataeditdialog
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="PluginDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def handlePlugin(mainwindow, doc, pluginkls):
     """Show plugin dialog or directly execute (if it takes no parameters)."""
 
@@ -76,7 +81,7 @@ class PluginDialog(VeuszDialog):
         self.setWindowTitle(title)
         descr = plugininst.description_full
         if plugininst.author:
-            descr += '\n Author: ' + plugininst.author
+            descr += '\n ' + _('Author: %s') % plugininst.author
         self.descriptionLabel.setText( wordwrap(descr) )
 
         self.fieldcntrls = []
@@ -171,9 +176,9 @@ def runPlugin(window, doc, plugin, fields):
         # evaluate datasets using plugin to check it works
         if mode == 'dataset':
             op.validate()
-            resultstext = 'Created datasets: ' + ', '.join(results)
+            resultstext = _('Created datasets: ') + ', '.join(results)
         else:
-            resultstext = 'Done'
+            resultstext = _('Done')
 
     except (plugins.ToolsPluginException, plugins.DatasetPluginException), ex:
         # unwind operations
@@ -181,7 +186,7 @@ def runPlugin(window, doc, plugin, fields):
         qt4.QApplication.restoreOverrideCursor()
 
         qt4.QMessageBox.warning(
-            window, "Error in %s" % plugin.name, unicode(ex))
+            window, _("Error in %s") % plugin.name, unicode(ex))
 
     except Exception:
         op.undo(doc)

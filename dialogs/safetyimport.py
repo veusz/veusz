@@ -21,6 +21,11 @@
 import veusz.qtall as qt4
 import veusz.setting as setting
 
+def _(text, disambiguation=None, context="SafetyImportDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class SafetyImportDialog(qt4.QMessageBox):
 
     def __init__(self, parent, module, names):
@@ -36,20 +41,20 @@ class SafetyImportDialog(qt4.QMessageBox):
         self.module = module
 
         self.setIcon(qt4.QMessageBox.Warning)
-        self.setWindowTitle("Allow Python import?")
-        self.setText("The document has requested that the symbol(s):\n"
-                     " %s\nbe loaded from Python module '%s'.\n\n"
-                     "This could be unsafe if the document comes from "
-                     "an untrusted source." % (
+        self.setWindowTitle(_("Allow Python import?"))
+        self.setText(_("The document has requested that the symbol(s):\n"
+                       " %s\nbe loaded from Python module '%s'.\n\n"
+                       "This could be unsafe if the document comes from "
+                       "an untrusted source.") % (
                 ', '.join(names), module))
-        self.allow = self.addButton("Allow", qt4.QMessageBox.YesRole)
-        self.allow.setToolTip("Allow use of symbol in module during session")
-        self.allowalways = self.addButton("Allow always",
+        self.allow = self.addButton(_("Allow"), qt4.QMessageBox.YesRole)
+        self.allow.setToolTip(_("Allow use of symbol in module during session"))
+        self.allowalways = self.addButton(_("Allow always"),
                                           qt4.QMessageBox.YesRole)
-        self.allowalways.setToolTip("Always allow use of symbol in module")
-        self.notallow = self.addButton("Do not allow",
+        self.allowalways.setToolTip(_("Always allow use of symbol in module"))
+        self.notallow = self.addButton(_("Do not allow"),
                                        qt4.QMessageBox.NoRole)
-        self.notallow.setToolTip("Do allow use of symbol in module in session")
+        self.notallow.setToolTip(_("Do allow use of symbol in module in session"))
 
     def exec_(self):
         """Execute dialog."""

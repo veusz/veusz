@@ -33,6 +33,11 @@ import veusz.plugins as plugins
 import exceptiondialog
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="ImportDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class ImportTab(qt4.QWidget):
     """Tab for a particular import type."""
 
@@ -140,8 +145,8 @@ class ImportTabStandard(ImportTab):
             op = document.OperationDataImport(params)
 
         except document.DescriptorError:
-            qt4.QMessageBox.warning(self, "Veusz",
-                                    "Cannot interpret descriptor")
+            qt4.QMessageBox.warning(self, _("Veusz"),
+                                    _("Cannot interpret descriptor"))
             return
 
         # actually import the data
@@ -152,7 +157,7 @@ class ImportTabStandard(ImportTab):
         lines = []
         for var, count in op.outinvalids.iteritems():
             if count != 0:
-                lines.append('%i conversions failed for dataset "%s"' %
+                lines.append(_('%i conversions failed for dataset "%s"') %
                              (count, var))
         if len(lines) != 0:
             lines.append('')
@@ -189,8 +194,8 @@ class ImportTabCSV(ImportTab):
             'DD/MM/YY| |hh:mm:ss',
             'M/D/YY| |hh:mm:ss'
             ]
-        self.csvnumfmtcombo.defaultlist = ['System', 'English', 'European']
-        self.csvheadermodecombo.defaultlist = ['Multiple', '1st row', 'None']
+        self.csvnumfmtcombo.defaultlist = [_('System'), _('English'), _('European')]
+        self.csvheadermodecombo.defaultlist = [_('Multiple'), _('1st row'), _('None')]
 
     def reset(self):
         """Reset controls."""
@@ -391,8 +396,8 @@ class ImportTab2D(ImportTab):
 
         # an obvious error...
         if len(datasets) == 0:
-            self.twod_previewedit.setPlainText('At least one dataset needs to '
-                                               'be specified')
+            self.twod_previewedit.setPlainText(_('At least one dataset needs to '
+                                                 'be specified'))
             return
         
         # convert range parameters
@@ -437,14 +442,14 @@ class ImportTab2D(ImportTab):
             op = document.OperationDataImport2D(params)
             doc.applyOperation(op)
 
-            output = ['Successfully read datasets:']
+            output = [_('Successfully read datasets:')]
             for ds in op.outdatasets:
                 output.append(' %s' % doc.data[ds].description(
                         showlinked=False))
             
             output = '\n'.join(output)
         except document.Read2DError, e:
-            output = 'Error importing datasets:\n %s' % str(e)
+            output = _('Error importing datasets:\n %s') % str(e)
 
         # show status in preview box
         self.twod_previewedit.setPlainText(output)
@@ -489,9 +494,9 @@ class ImportTabFITS(ImportTab):
         # if it isn't
         if pyfits is None:
             self.fitslabel.setText(
-                'FITS file support requires that PyFITS is installed.'
-                ' You can download it from'
-                ' http://www.stsci.edu/resources/software_hardware/pyfits')
+                _('FITS file support requires that PyFITS is installed.'
+                  ' You can download it from'
+                  ' http://www.stsci.edu/resources/software_hardware/pyfits'))
             return False
         
         # try to identify fits file
@@ -537,7 +542,7 @@ class ImportTabFITS(ImportTab):
                 # it's a table
                 data = ['table', cols]
                 rows = header['NAXIS2']
-                descr = 'Table (%i rows)' % rows
+                descr = _('Table (%i rows)') % rows
 
             except AttributeError:
                 # this is an image
@@ -551,7 +556,7 @@ class ImportTabFITS(ImportTab):
                 dims = '*'.join(dims)
                 if dims:
                     dims = '(%s)' % dims
-                descr = '%iD image %s' % (naxis, dims)
+                descr = _('%iD image %s') % (naxis, dims)
 
             hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
             items.append(hduitem)
@@ -656,7 +661,7 @@ class ImportTabFITS(ImportTab):
         doc.applyOperation(op)
 
         # inform user
-        self.fitsimportstatus.setText("Imported dataset '%s'" % name)
+        self.fitsimportstatus.setText(_("Imported dataset '%s'") % name)
         qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
 
     def isFiletypeSupported(self, ftype):
@@ -815,12 +820,12 @@ class ImportTabPlugins(ImportTab):
             self.pluginPreview.setPlainText( unicode(ex) )
             return
 
-        out = ['Imported data for datasets:']
+        out = [_('Imported data for datasets:')]
         for ds in op.outdatasets:
             out.append( doc.data[ds].description(showlinked=False) )
         if op.outcustoms:
             out.append('')
-            out.append('Set custom definitions:')
+            out.append(_('Set custom definitions:'))
             # format custom definitions
             out += ['%s %s=%s' % tuple(c) for c in op.outcustoms]
 
@@ -872,11 +877,11 @@ class ImportDialog(VeuszDialog):
         # tabs loaded currently in dialog
         self.tabs = {}
         for tabname, tabclass in (
-            ('&Standard', ImportTabStandard),
-            ('CS&V', ImportTabCSV),
-            ('FI&TS', ImportTabFITS),
-            ('&2D', ImportTab2D),
-            ('Plugins', ImportTabPlugins),
+            (_('&Standard'), ImportTabStandard),
+            (_('CS&V'), ImportTabCSV),
+            (_('FI&TS'), ImportTabFITS),
+            (_('&2D'), ImportTab2D),
+            (_('Plugins'), ImportTabPlugins),
             ):
             w = tabclass(self)
             self.methodtab.addTab(w, tabname)
@@ -897,7 +902,7 @@ class ImportDialog(VeuszDialog):
                       qt4.SIGNAL('editTextChanged(const QString&)'),
                       self.slotUpdatePreview )
 
-        self.importbutton = self.buttonBox.addButton("&Import",
+        self.importbutton = self.buttonBox.addButton(_("&Import"),
                                                      qt4.QDialogButtonBox.ApplyRole)
         self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
                       self.slotImport)
@@ -942,7 +947,7 @@ class ImportDialog(VeuszDialog):
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
-        fd = qt4.QFileDialog(self, 'Browse data file')
+        fd = qt4.QFileDialog(self, _('Browse data file'))
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
 
         # use filename to guess a path if possible
@@ -1047,7 +1052,7 @@ class ImportDialog(VeuszDialog):
     def retnDatasetInfo(self, dsnames, linked, filename):
         """Return a list of information for the dataset names given."""
         
-        lines = ['Imported data for datasets:']
+        lines = [_('Imported data for datasets:')]
         dsnames.sort()
         for name in dsnames:
             ds = self.document.getData(name)
@@ -1057,7 +1062,7 @@ class ImportDialog(VeuszDialog):
         # whether the data were linked
         if linked:
             lines.append('')
-            lines.append('Datasets were linked to file "%s"' % filename)
+            lines.append(_('Datasets were linked to file "%s"') % filename)
 
         return lines
 

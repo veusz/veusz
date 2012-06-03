@@ -21,6 +21,11 @@ import veusz.setting as setting
 import veusz.utils as utils
 from veuszdialog import VeuszDialog
 
+def _(text, disambiguation=None, context="PrefsDialog"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class PreferencesDialog(VeuszDialog):
     """Preferences dialog."""
 
@@ -46,8 +51,8 @@ class PreferencesDialog(VeuszDialog):
         # disable thread option if not supported
         if not qt4.QFontDatabase.supportsThreadedFontRendering():
             self.threadSpinBox.setEnabled(False)
-            self.threadSpinBox.setToolTip("Disabled because of lack of "
-                                          "threaded drawing support")
+            self.threadSpinBox.setToolTip(_("Disabled because of lack of "
+                                            "threaded drawing support"))
 
         # use cwd for file dialogs
         self.cwdCheck.setChecked( setdb['dirname_usecwd'] )
@@ -129,7 +134,7 @@ class PreferencesDialog(VeuszDialog):
             # is default check
             defcheck = qt4.QCheckBox("Default")
             defcheck.setToolTip(
-                "Use the default color instead of the one chosen here")
+                _("Use the default color instead of the one chosen here"))
             layout.addWidget(defcheck, row, 1)
             self.colordefaultcheck[colname] = defcheck
             defcheck.setChecked(isdefault)
@@ -251,21 +256,21 @@ class PreferencesDialog(VeuszDialog):
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""
         filename = self.parent()._fileOpenDialog(
-            'vst', 'Veusz stylesheet', 'Choose stylesheet')
+            'vst', _('Veusz stylesheet'), _('Choose stylesheet'))
         if filename:
             self.styleLineEdit.setText(filename)
 
     def customBrowseClicked(self):
         """Browse for a custom definitons."""
         filename = self.parent()._fileOpenDialog(
-            'vsz', 'Veusz documents', 'Choose custom definitons')
+            'vsz', _('Veusz documents'), _('Choose custom definitons'))
         if filename:
             self.customLineEdit.setText(filename)
 
     def pluginAddClicked(self):
         """Add a new plugin."""
         filename = self.parent()._fileOpenDialog(
-            'py', 'Python scripts', 'Choose plugin')
+            'py', _('Python scripts'), _('Choose plugin'))
         if filename:
             self.pluginmodel.insertRows(0, 1)
             self.pluginmodel.setData( self.pluginmodel.index(0),
