@@ -26,6 +26,11 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import field
 
+def _(text, disambiguation=None, context='ToolsPlugin'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 # add an instance of your class to this list to be registered
 toolspluginregistry = []
 
@@ -37,7 +42,7 @@ class ToolsPluginException(RuntimeError):
 class ToolsPlugin(object):
     # the plugin will get inserted into the menu in a hierarchy based on
     # the elements of this tuple
-    menu = ('Base plugin',)
+    menu = (_('Base plugin'),)
     name = 'Base plugin'
 
     author = ''
@@ -67,23 +72,23 @@ class ToolsPlugin(object):
 class ColorsRandomize(ToolsPlugin):
     """Randomize the colors used in plotting."""
 
-    menu = ('Colors', 'Randomize')
+    menu = (_('Colors'), _('Randomize'))
     name = 'Randomize colors'
-    description_short = 'Randomize the colors used in plotting'
-    description_full = 'Randomize the colors used in plotting markers, lines or error bars. Random colors in hue, saturation and luminosity (HSV) are chosen between the two colors given.'
+    description_short = _('Randomize the colors used in plotting')
+    description_full = _('Randomize the colors used in plotting markers, lines or error bars. Random colors in hue, saturation and luminosity (HSV) are chosen between the two colors given.')
 
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr="Start from widget",
+            field.FieldWidget("widget", descr=_("Start from widget"),
                               default="/"),
-            field.FieldBool("randxy", descr="Randomize xy plotters",
+            field.FieldBool("randxy", descr=_("Randomize xy plotters"),
                             default=True),
-            field.FieldBool("randfunc", descr="Randomize function plotters",
+            field.FieldBool("randfunc", descr=_("Randomize function plotters"),
                             default=True),
-            field.FieldColor('color1', descr="Start of color range",
+            field.FieldColor('color1', descr=_("Start of color range"),
                              default='#404040'),
-            field.FieldColor('color2', descr="End of color range",
+            field.FieldColor('color2', descr=_("End of color range"),
                              default='#ff0004'),
             ]
 
@@ -124,23 +129,23 @@ class ColorsRandomize(ToolsPlugin):
 class ColorsSequence(ToolsPlugin):
     """Color plotters in sequence."""
 
-    menu = ('Colors', 'Sequence')
+    menu = (_('Colors'), _('Sequence'))
     name = 'Create color sequence'
-    description_short = 'Make widgets use sequence of colors'
-    description_full = 'Give new colors to each widget in a sequence between the two colors given.'
+    description_short = _('Make widgets use sequence of colors')
+    description_full = _('Give new colors to each widget in a sequence between the two colors given.')
 
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr="Start from widget",
+            field.FieldWidget("widget", descr=_("Start from widget"),
                               default="/"),
-            field.FieldBool("randxy", descr="Color xy plotters",
+            field.FieldBool("randxy", descr=_("Color xy plotters"),
                             default=True),
-            field.FieldBool("randfunc", descr="Color function plotters",
+            field.FieldBool("randfunc", descr=_("Color function plotters"),
                             default=True),
-            field.FieldColor('color1', descr="Start of color range",
+            field.FieldColor('color1', descr=_("Start of color range"),
                              default='#ff0000'),
-            field.FieldColor('color2', descr="End of color range",
+            field.FieldColor('color2', descr=_("End of color range"),
                              default='#4000ff'),
             ]
 
@@ -183,21 +188,21 @@ class ColorsSequence(ToolsPlugin):
 class ColorsReplace(ToolsPlugin):
     """Replace one color by another."""
 
-    menu = ('Colors', 'Replace')
+    menu = (_('Colors'), _('Replace'))
     name = 'Replace colors'
-    description_short = 'Search and replace colors'
-    description_full = 'Searches for a color and replaces it with a different color'
+    description_short = _('Search and replace colors')
+    description_full = _('Searches for a color and replaces it with a different color')
 
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr="Start from widget",
+            field.FieldWidget("widget", descr=_("Start from widget"),
                               default="/"),
-            field.FieldBool("follow", descr="Change references and defaults",
+            field.FieldBool("follow", descr=_("Change references and defaults"),
                             default=True),
-            field.FieldColor('color1', descr="Color to change",
+            field.FieldColor('color1', descr=_("Color to change"),
                              default='black'),
-            field.FieldColor('color2', descr="Replacement color",
+            field.FieldColor('color2', descr=_("Replacement color"),
                              default='red'),
             ]
 
@@ -229,21 +234,21 @@ class ColorsReplace(ToolsPlugin):
 class ColorsSwap(ToolsPlugin):
     """Swap colors used in plotting."""
 
-    menu = ('Colors', 'Swap')
+    menu = (_('Colors'), _('Swap'))
     name = 'Swap colors'
-    description_short = 'Swap two colors'
-    description_full = 'Swaps two colors in the plot'
+    description_short = _('Swap two colors')
+    description_full = _('Swaps two colors in the plot')
 
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr="Start from widget",
+            field.FieldWidget("widget", descr=_("Start from widget"),
                               default="/"),
-            field.FieldBool("follow", descr="Change references and defaults",
+            field.FieldBool("follow", descr=_("Change references and defaults"),
                             default=True),
-            field.FieldColor('color1', descr="First color",
+            field.FieldColor('color1', descr=_("First color"),
                              default='black'),
-            field.FieldColor('color2', descr="Second color",
+            field.FieldColor('color2', descr=_("Second color"),
                              default='red'),
             ]
 
@@ -278,23 +283,23 @@ class ColorsSwap(ToolsPlugin):
 class TextReplace(ToolsPlugin):
     """Randomize the colors used in plotting."""
 
-    menu = ('General', 'Replace text')
+    menu = (_('General'), _('Replace text'))
     name = 'Replace text'
-    description_short = 'Search and replace text in settings'
-    description_full = 'Searches for text in a setting and replaces it'
+    description_short = _('Search and replace text in settings')
+    description_full = _('Searches for text in a setting and replaces it')
 
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr="Start from widget",
+            field.FieldWidget("widget", descr=_("Start from widget"),
                               default="/"),
-            field.FieldBool("follow", descr="Change references and defaults",
+            field.FieldBool("follow", descr=_("Change references and defaults"),
                             default=True),
-            field.FieldBool("onlystr", descr="Change only textual data",
+            field.FieldBool("onlystr", descr=_("Change only textual data"),
                             default=False),
-            field.FieldText('text1', descr="Text to change",
+            field.FieldText('text1', descr=_("Text to change"),
                             default=''),
-            field.FieldText('text2', descr="Replacement text",
+            field.FieldText('text2', descr=_("Replacement text"),
                             default=''),
             ]
 
@@ -332,25 +337,25 @@ class TextReplace(ToolsPlugin):
 class WidgetsClone(ToolsPlugin):
     """Take a widget and children and clone them."""
 
-    menu = ('Widgets', 'Clone for datasets')
+    menu = (_('Widgets'), _('Clone for datasets'))
     name = 'Clone widgets for datasets'
-    description_short = 'Clones a widget and its children for datasets'
-    description_full = 'Take a widget and its children and clone it, plotting different sets of data in each clone.\nHint: Use a "*" in the name of a replacement dataset to match multiple datasets, e.g. x_*'
+    description_short = _('Clones a widget and its children for datasets')
+    description_full = _('Take a widget and its children and clone it, plotting different sets of data in each clone.\nHint: Use a "*" in the name of a replacement dataset to match multiple datasets, e.g. x_*')
 
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr="Clone widget",
+            field.FieldWidget("widget", descr=_("Clone widget"),
                               default=""),
-            field.FieldDataset('ds1', descr="Dataset 1 to change",
+            field.FieldDataset('ds1', descr=_("Dataset 1 to change"),
                                default=''),
             field.FieldDatasetMulti('ds1repl',
-                                    descr="Replacement(s) for dataset 1"),
-            field.FieldDataset('ds2', descr="Dataset 2 to change (optional)",
+                                    descr=_("Replacement(s) for dataset 1")),
+            field.FieldDataset('ds2', descr=_("Dataset 2 to change (optional)"),
                                default=''),
             field.FieldDatasetMulti('ds2repl',
-                                    descr="Replacement(s) for dataset 2"),
-            field.FieldBool("names", descr="Build new names from datasets",
+                                    descr=_("Replacement(s) for dataset 2")),
+            field.FieldBool("names", descr=_("Build new names from datasets"),
                             default=True),
             ]
 
@@ -445,11 +450,11 @@ class FontSize(ToolsPlugin):
         """
         self.dirn = dirn
         self.fields = [
-            field.FieldWidget("widget", descr="Start from widget",
+            field.FieldWidget("widget", descr=_("Start from widget"),
                               default="/"),
-            field.FieldBool("follow", descr="Change references and defaults",
+            field.FieldBool("follow", descr=_("Change references and defaults"),
                             default=True),
-            field.FieldFloat("delta", descr="Change by value",
+            field.FieldFloat("delta", descr=_("Change by value"),
                              default=2),
             ]
 
@@ -495,19 +500,19 @@ class FontSize(ToolsPlugin):
         walkNodes(fromwidget)
 
 class FontSizeIncrease(FontSize):
-    menu = ('General', 'Increase font sizes')
+    menu = (_('General'), _('Increase font sizes'))
     name = 'Increase font sizes'
-    description_short = 'Increase font sizes'
-    description_full = 'Increase font sizes by number of points given'
+    description_short = _('Increase font sizes')
+    description_full = _('Increase font sizes by number of points given')
 
     def __init__(self):
         FontSize.__init__(self, 1)
 
 class FontSizeDecrease(FontSize):
-    menu = ('General', 'Decrease font sizes')
+    menu = (_('General'), _('Decrease font sizes'))
     name = 'Decrease font sizes'
-    description_short = 'Decrease font sizes'
-    description_full = 'Decrease font sizes by number of points given'
+    description_short = _('Decrease font sizes')
+    description_full = _('Decrease font sizes by number of points given')
 
     def __init__(self):
         FontSize.__init__(self, -1)

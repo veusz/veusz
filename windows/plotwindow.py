@@ -947,7 +947,7 @@ class PlotWindow( qt4.QGraphicsView ):
             menu.addAction( self.vzactions['view.fullscreen'] )
 
         # Update policy submenu
-        submenu = menu.addMenu('Updates')
+        submenu = menu.addMenu(_('Updates'))
         intgrp = qt4.QActionGroup(self)
 
         # bind interval options to actions

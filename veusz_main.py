@@ -186,9 +186,9 @@ def run():
         splash.showMessage(" ")
         app.processEvents()
 
-    trans = qt4.QTranslator()
-    trans.load("rev.qm")
-    app.installTranslator(trans)
+    #trans = qt4.QTranslator()
+    #trans.load("rev.qm")
+    #app.installTranslator(trans)
 
     # import these after showing splash screen so we don't
     # have too long a wait before it shows
