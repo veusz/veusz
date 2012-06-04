@@ -186,6 +186,10 @@ def run():
         splash.showMessage(" ")
         app.processEvents()
 
+    trans = qt4.QTranslator()
+    trans.load("rev.qm")
+    app.installTranslator(trans)
+
     # import these after showing splash screen so we don't
     # have too long a wait before it shows
     import veusz.setting
@@ -201,10 +205,6 @@ def run():
     if options.plugin:
         import veusz.document
         veusz.document.Document.loadPlugins(pluginlist=options.plugin)
-
-    trans = qt4.QTranslator()
-    trans.load("rev.qm")
-    app.installTranslator(trans)
 
     # different modes
     if options.listen:

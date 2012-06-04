@@ -407,6 +407,9 @@ def ui_find_strings(filename, retn, verbose=True):
         return
 
     for string in nroot.getiterator('string'):
+        if not string.text:
+            continue
+
         message = Message(string.text, filename=filename,
                           lineno=string.sourceline)
 

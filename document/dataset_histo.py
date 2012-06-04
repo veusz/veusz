@@ -18,6 +18,7 @@
 
 import numpy as N
 from datasets import Dataset, simpleEvalExpression
+import veusz.qtall as qt4
 
 def _(text, disambiguation=None, context="Datasets"):
     """Translate text."""
@@ -198,7 +199,7 @@ class DatasetHistoGenerator(object):
 class DatasetHistoBins(Dataset):
     """A dataset for getting the bin positions for the histogram."""
 
-    dstype = 'Histogram'
+    dstype = _('Histogram')
 
     def __init__(self, generator, document):
         Dataset.__init__(self, data=[])
@@ -231,7 +232,7 @@ class DatasetHistoBins(Dataset):
 class DatasetHistoValues(Dataset):
     """A dataset for getting the height of the bins in a histogram."""
 
-    dstype = 'Histogram'
+    dstype = _('Histogram')
 
     def __init__(self, generator, document):
         Dataset.__init__(self, data=[])

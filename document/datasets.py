@@ -272,7 +272,7 @@ class Dataset2D(DatasetBase):
     dimensions = 2
 
     # dataset type
-    dstype = '2D'
+    dstype = _('2D')
     
     # the dataset is recreated if its data changes
     isstable = True
@@ -390,7 +390,7 @@ class Dataset(DatasetBase):
     columns = ('data', 'serr', 'nerr', 'perr')
     column_descriptions = (_('Data'), _('Sym. errors'), _('Neg. errors'),
                            _('Pos. errors') )
-    dstype = '1D'
+    dstype = _('1D')
 
     # the dataset is recreated if its data changes
     isstable = True
@@ -603,7 +603,7 @@ class DatasetDateTime(Dataset):
     column_descriptions = (_('Data'),)
     isstable = True
 
-    dstype = 'Date'
+    dstype = _('Date')
     displaytype = 'date'
 
     def __init__(self, data=None, linked=None):
@@ -662,7 +662,7 @@ class DatasetText(DatasetBase):
     datatype = displaytype = 'text'
     columns = ('data',)
     column_descriptions = (_('Data'),)
-    dstype = 'Text'
+    dstype = _('Text')
     isstable = True
 
     def __init__(self, data=None, linked=None):
@@ -840,7 +840,7 @@ def simpleEvalExpression(doc, expr, part='data'):
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
-    dstype = 'Expression'
+    dstype = _('Expression')
 
     def __init__(self, data=None, serr=None, nerr=None, perr=None,
                  parametric=None):
@@ -1024,7 +1024,7 @@ class DatasetExpression(Dataset):
 class DatasetRange(Dataset):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
 
-    dstype = 'Range'
+    dstype = _('Range')
     isstable = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
@@ -1130,7 +1130,7 @@ def getSpacing(data):
 class Dataset2DXYZExpression(Dataset2D):
     '''A 2d dataset with expressions for x, y and z.'''
 
-    dstype = '2D XYZ'
+    dstype = _('2D XYZ')
 
     def __init__(self, exprx, expry, exprz):
         """Initialise dataset.
@@ -1268,7 +1268,7 @@ class Dataset2DXYZExpression(Dataset2D):
 class Dataset2DExpression(Dataset2D):
     """Evaluate an expression of 2d datasets."""
 
-    dstype = '2D Expr'
+    dstype = _('2D Expr')
 
     def __init__(self, expr):
         """Create 2d expression dataset."""
@@ -1382,7 +1382,7 @@ class Dataset2DXYFunc(Dataset2D):
     this.
     """
 
-    dstype = '2D f(x,y)'
+    dstype = _('2D f(x,y)')
 
     def __init__(self, xstep, ystep, expr):
         """Create 2d dataset:
