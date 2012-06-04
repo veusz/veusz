@@ -202,6 +202,10 @@ def run():
         import veusz.document
         veusz.document.Document.loadPlugins(pluginlist=options.plugin)
 
+    trans = qt4.QTranslator()
+    trans.load("rev.qm")
+    app.installTranslator(trans)
+
     # different modes
     if options.listen:
         # listen to incoming commands

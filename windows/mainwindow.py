@@ -560,7 +560,7 @@ class MainWindow(qt4.QMainWindow):
         # menu structure
         filemenu = [
             'file.new', 'file.open',
-            ['file.filerecent', 'Open &Recent', []],
+            ['file.filerecent', _('Open &Recent'), []],
             '',
             'file.save', 'file.saveas',
             '',
@@ -571,7 +571,7 @@ class MainWindow(qt4.QMainWindow):
         editmenu = [
             'edit.undo', 'edit.redo',
             '',
-            ['edit.select', '&Select', []],
+            ['edit.select', _('&Select'), []],
             '',
             'edit.prefs', 'edit.stylesheet', 'edit.custom',
             ''
@@ -584,7 +584,7 @@ class MainWindow(qt4.QMainWindow):
             'view.addtool', 'view.edittool'
             ]
         viewmenu = [
-            ['view.viewwindows', '&Windows', viewwindowsmenu],
+            ['view.viewwindows', _('&Windows'), viewwindowsmenu],
             ''
             ]
         insertmenu = [
@@ -595,7 +595,7 @@ class MainWindow(qt4.QMainWindow):
                                               self.vzactions, 'data.ops' )
 
         datamenu = [
-            ['data.ops', '&Operations', datapluginsmenu],
+            ['data.ops', _('&Operations'), datapluginsmenu],
             'data.import', 'data.edit', 'data.create',
             'data.create2d', 'data.capture', 'data.histogram',
             'data.reload',

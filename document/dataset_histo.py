@@ -19,6 +19,11 @@
 import numpy as N
 from datasets import Dataset, simpleEvalExpression
 
+def _(text, disambiguation=None, context="Datasets"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
                  binmanual = None, binparams = None,
@@ -182,13 +187,13 @@ class DatasetHistoGenerator(object):
         """Informating about linking."""
 
         if self.binmanual:
-            bins = 'manual bins'
+            bins = _('manual bins')
         else:
-            bins = '%i bins from %s to %s' % (self.binparams[0],
-                                              self.binparams[1],
-                                              self.binparams[2])
+            bins = _('%i bins from %s to %s') % (self.binparams[0],
+                                                 self.binparams[1],
+                                                 self.binparams[2])
 
-        return "Histogram of '%s' with %s" % (self.inexpr, bins)
+        return _("Histogram of '%s' with %s") % (self.inexpr, bins)
 
 class DatasetHistoBins(Dataset):
     """A dataset for getting the bin positions for the histogram."""
@@ -216,7 +221,7 @@ class DatasetHistoBins(Dataset):
 
     def linkedInformation(self):
         """Informating about linking."""
-        return self.generator.linkedInformation() + " (bin positions)"
+        return self.generator.linkedInformation() + _(" (bin positions)")
 
     data = property(lambda self: self.getData()[0])
     nerr = property(lambda self: self.getData()[1])
@@ -249,7 +254,7 @@ class DatasetHistoValues(Dataset):
 
     def linkedInformation(self):
         """Informating about linking."""
-        return self.generator.linkedInformation() + " (bin values)"
+        return self.generator.linkedInformation() + _(" (bin values)")
 
     data = property(lambda self: self.getData()[0])
     nerr = property(lambda self: self.getData()[1])

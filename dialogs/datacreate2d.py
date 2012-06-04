@@ -51,7 +51,7 @@ class DataCreate2DDialog(VeuszDialog):
         self.document = document
 
         self.createbutton = self.buttonBox.addButton(
-            "C&reate", qt4.QDialogButtonBox.ApplyRole )
+            _("C&reate"), qt4.QDialogButtonBox.ApplyRole )
         self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
                       self.createButtonClickedSlot )
 

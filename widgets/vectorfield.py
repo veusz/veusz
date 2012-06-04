@@ -24,15 +24,21 @@ import numpy as N
 import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
+import veusz.qtall as qt4
 
 import plotters
+
+def _(text, disambiguation=None, context='VectorField'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class VectorField(plotters.GenericPlotter):
     '''A plotter for plotting a vector field.'''
 
     typename = 'vectorfield'
     allowusercreation = True
-    description = 'Plot a vector field'
+    description = _('Plot a vector field')
 
     def __init__(self, parent, name=None):
         """Initialse vector field plotter."""
@@ -50,53 +56,53 @@ class VectorField(plotters.GenericPlotter):
         # datasets
         s.add( setting.Dataset('data1', '',
                                dimensions = 2,
-                               descr = 'X coordinate length or vector magnitude',
-                               usertext = u'δx or r'),
+                               descr = _('X coordinate length or vector magnitude'),
+                               usertext = _('dx or r')),
                0 )
         s.add( setting.Dataset('data2', '',
                                dimensions = 2,
-                               descr = 'Y coordinate length or vector angle',
-                               usertext = u'δy or θ'),
+                               descr = _('Y coordinate length or vector angle'),
+                               usertext = _('dy or theta')),
                1 )
         s.add( setting.Choice('mode',
                               ['cartesian', 'polar'],
                               'cartesian',
-                              descr = u'Cartesian (δx,δy) or polar (r,θ)',
-                              usertext = 'Mode'),
+                              descr = _('Cartesian (dx,dy) or polar (r,theta)'),
+                              usertext = _('Mode')),
                2 )
 
         # formatting
         s.add( setting.DistancePt('baselength', '10pt',
-                                  descr = "Base length of unit vector",
-                                  usertext = "Base length",
+                                  descr = _('Base length of unit vector'),
+                                  usertext = _('Base length'),
                                   formatting=True),
                0 )
         s.add( setting.DistancePt('arrowsize', '2pt',
-                                  descr = "Size of any arrows",
-                                  usertext = "Arrow size",
+                                  descr = _('Size of any arrows'),
+                                  usertext = _('Arrow size'),
                                   formatting=True),
                1 )
         s.add( setting.Bool('scalearrow', True,
-                            descr = 'Scale arrow head by length',
-                            usertext = 'Scale arrow',
+                            descr = _('Scale arrow head by length'),
+                            usertext = _('Scale arrow'),
                             formatting=True),
                2 )
         s.add( setting.Arrow('arrowfront', 'none',
-                             descr = 'Arrow in front direction',
-                             usertext='Arrow front', formatting=True),
+                             descr = _('Arrow in front direction'),
+                             usertext=_('Arrow front'), formatting=True),
                3)
         s.add( setting.Arrow('arrowback', 'none',
-                             descr = 'Arrow in back direction',
-                             usertext='Arrow back', formatting=True),
+                             descr = _('Arrow in back direction'),
+                             usertext=_('Arrow back'), formatting=True),
                4)
 
         s.add( setting.Line('Line',
-                            descr = 'Line style',
-                            usertext = 'Line'),
+                            descr = _('Line style'),
+                            usertext = _('Line')),
                pixmap = 'settings_plotline' )
         s.add( setting.ArrowFill('Fill',
-                                 descr = 'Arrow fill settings',
-                                 usertext = 'Arrow fill'),
+                                 descr = _('Arrow fill settings'),
+                                 usertext = _('Arrow fill')),
                pixmap = 'settings_plotmarkerfill' )
 
     def providesAxesDependency(self):

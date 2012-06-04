@@ -537,8 +537,8 @@ class TabbedFormatting(qt4.QTabWidget):
             if subset is setnsproxy:
                 # main tab formatting, so this is special
                 pixmap = 'settings_main'
-                tabname = title = 'Main'
-                tooltip = 'Main formatting'
+                tabname = title = _('Main')
+                tooltip = _('Main formatting')
             else:
                 # others
                 if hasattr(subset, 'pixmap'):
@@ -855,7 +855,7 @@ class TreeEditDock(qt4.QDockWidget):
             actionname = 'add.' + widgettype
             actions[actionname] = utils.makeAction(
                 self,
-                wc.description, 'Add %s' % widgettype,
+                wc.description, _('Add %s') % widgettype,
                 slot,
                 icon='button_%s' % widgettype)
 
