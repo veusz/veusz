@@ -22,6 +22,11 @@ import sys
 
 import veusz.qtall as qt4
 
+def _(text, disambiguation=None, context="Preferences"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 # default values to some settings in case the user does not have these
 defaultValues = {
     # export options
@@ -76,11 +81,11 @@ class _SettingDB(object):
     colors = ('page', 'error', 'command', 'cntrlline', 'cntrlcorner')
     # names for display of colors and a longer description
     color_names = {
-        'page': ('Page', 'Page background color'),
-        'error': ('Error', 'Color for errors'),
-        'command': ('Console command', 'Commands in the console window color'),
-        'cntrlline': ('Control line', 'Color of lines controlling widgets'),
-        'cntrlcorner': ('Control corner', 'Color of corners controlling widgets'),
+        'page': (_('Page'), _('Page background color')),
+        'error': (_('Error'), _('Color for errors')),
+        'command': (_('Console command'), _('Commands in the console window color')),
+        'cntrlline': (_('Control line'), _('Color of lines controlling widgets')),
+        'cntrlcorner': (_('Control corner'), _('Color of corners controlling widgets')),
         }
     # default colors if isdefault is set in the setting
     color_defaults = {

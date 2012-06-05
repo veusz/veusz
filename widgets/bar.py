@@ -28,13 +28,18 @@ import veusz.utils as utils
 
 from plotters import GenericPlotter
 
+def _(text, disambiguation=None, context='BarPlotter'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 class BarFill(setting.Settings):
     '''Filling of bars.'''
     def __init__(self, name, **args):
         setting.Settings.__init__(self, name, **args)
         self.add( setting.FillSet('fills', [('solid', 'grey', False)],
-                                  descr = 'Fill styles for dataset bars',
-                                  usertext='Fill styles') )
+                                  descr = _('Fill styles for dataset bars'),
+                                  usertext=_('Fill styles')) )
 
 class BarLine(setting.Settings):
     '''Edges of bars.'''
@@ -42,8 +47,8 @@ class BarLine(setting.Settings):
         setting.Settings.__init__(self, name, **args)
         self.add( setting.LineSet('lines',
                                   [('solid', '0.5pt', 'black', False)],
-                                  descr = 'Line styles for dataset bars', 
-                                  usertext='Line styles') )
+                                  descr = _('Line styles for dataset bars'), 
+                                  usertext=_('Line styles')) )
 
 def extend1DArray(array, length, missing=0.):
     """Return array with length given (original if appropriate.
@@ -60,7 +65,7 @@ class BarPlotter(GenericPlotter):
 
     typename='bar'
     allowusercreation=True
-    description='Plot bar charts'
+    description=_('Plot bar charts')
 
     def __init__(self, parent, name=None):
         """Initialise bar chart."""
@@ -77,57 +82,57 @@ class BarPlotter(GenericPlotter):
         s.remove('key')
 
         s.add( setting.Strings('keys', ('',),
-                               descr='Key text for each dataset',
-                               usertext='Key text'), 0)
+                               descr=_('Key text for each dataset'),
+                               usertext=_('Key text')), 0)
 
         s.add( setting.DatasetOrStr('labels', '',
-                                    descr='Dataset or string to label bars',
-                                    usertext='Labels', datatype='text'), 5 )
+                                    descr=_('Dataset or string to label bars'),
+                                    usertext=_('Labels'), datatype='text'), 5 )
 
-        s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'), 
-                              'grouped', 
-                              descr='Show datasets grouped '
-                              'together or as a single bar', 
-                              usertext='Mode'), 0)
-        s.add( setting.Choice('direction', 
+        s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'),
+                              'grouped',
+                              descr=_('Show datasets grouped '
+                                      'together or as a single bar'),
+                              usertext=_('Mode')), 0)
+        s.add( setting.Choice('direction',
                               ('horizontal', 'vertical'), 'vertical', 
-                              descr = 'Horizontal or vertical bar chart', 
-                              usertext='Direction'), 0 )
+                              descr = _('Horizontal or vertical bar chart'),
+                              usertext=_('Direction')), 0 )
         s.add( setting.Dataset('posn', '', 
-                               descr = 'Dataset containing position of bars'
-                               ' (optional)',
-                               usertext='Positions'), 0 )
+                               descr = _('Dataset containing position of bars'
+                                         ' (optional)'),
+                               usertext=_('Positions')), 0 )
         s.add( setting.Datasets('lengths', ('y',),
-                                descr = 'Datasets containing lengths of bars',
-                                usertext='Lengths'), 0 )
+                                descr = _('Datasets containing lengths of bars'),
+                                usertext=_('Lengths')), 0 )
 
         s.add( setting.Float('barfill', 0.75,
                              minval = 0., maxval = 1.,
-                             descr = 'Filling fraction of bars'
-                             ' (between 0 and 1)',
-                             usertext='Bar fill',
+                             descr = _('Filling fraction of bars'
+                                       ' (between 0 and 1)'),
+                             usertext=_('Bar fill'),
                              formatting=True) )
         s.add( setting.Float('groupfill', 0.9,
                              minval = 0., maxval = 1.,
-                             descr = 'Filling fraction of groups of bars'
-                             ' (between 0 and 1)',
-                             usertext='Group fill',
+                             descr = _('Filling fraction of groups of bars'
+                                       ' (between 0 and 1)'),
+                             usertext=_('Group fill'),
                              formatting=True) )
 
-        s.add( setting.Choice('errorstyle', ('none', 'bar', 'barends'), 
-                              'bar', 
-                              descr='Error bar style to show', 
-                              usertext='Error style',
+        s.add( setting.Choice('errorstyle', ('none', 'bar', 'barends'),
+                              'bar',
+                              descr=_('Error bar style to show'),
+                              usertext=_('Error style'),
                               formatting=True) )
 
-        s.add(BarFill('BarFill', descr='Bar fill', usertext='Fill'),
+        s.add(BarFill('BarFill', descr=_('Bar fill'), usertext=_('Fill')),
               pixmap = 'settings_bgfill')
-        s.add(BarLine('BarLine', descr='Bar line', usertext='Line'),
+        s.add(BarLine('BarLine', descr=_('Bar line'), usertext=_('Line')),
               pixmap = 'settings_border')
 
         s.add( setting.ErrorBarLine('ErrorBarLine',
-                                    descr = 'Error bar line settings',
-                                    usertext = 'Error bar line'),
+                                    descr = _('Error bar line settings'),
+                                    usertext = _('Error bar line')),
                pixmap = 'settings_ploterrorline' )
 
     @property
@@ -135,8 +140,8 @@ class BarPlotter(GenericPlotter):
         """User-friendly description."""
 
         s = self.settings
-        return "lengths='%s', position='%s'" % (', '.join(s.lengths), 
-                                                s.posn)
+        return _("lengths='%s', position='%s'") % (', '.join(s.lengths), 
+                                                   s.posn)
 
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""

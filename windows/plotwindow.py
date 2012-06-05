@@ -939,15 +939,15 @@ class PlotWindow( qt4.QGraphicsView ):
         menu.addSeparator()
 
         # force an update now menu item
-        menu.addAction('Force update', self.actionForceUpdate)
+        menu.addAction(_('Force update'), self.actionForceUpdate)
 
         if self.isfullscreen:
-            menu.addAction('Close full screen', self.slotFullScreen)
+            menu.addAction(_('Close full screen'), self.slotFullScreen)
         else:
             menu.addAction( self.vzactions['view.fullscreen'] )
 
         # Update policy submenu
-        submenu = menu.addMenu('Updates')
+        submenu = menu.addMenu(_('Updates'))
         intgrp = qt4.QActionGroup(self)
 
         # bind interval options to actions
@@ -962,7 +962,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # antialias
         menu.addSeparator()
-        act = menu.addAction('Antialias', self.actionAntialias)
+        act = menu.addAction(_('Antialias'), self.actionAntialias)
         act.setCheckable(True)
         act.setChecked(self.antialias)
 

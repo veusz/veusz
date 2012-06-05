@@ -28,6 +28,11 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
 
+def _(text, disambiguation=None, context="Datasets"):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def convertNumpy(a, dims=1):
     """Convert to a numpy double if possible.
 
@@ -243,11 +248,10 @@ class DatasetBase(object):
 
     def linkedInformation(self):
         """Return information about any linking for the user."""
-        if self.linked is not None:
-            name = self.linked.filename
+        if self.linked is None:
+            return _('Linked file: None')
         else:
-            name = 'None'
-        return 'Linked file: %s' % name
+            return _('Linked file: %s') % self.linked.filename
 
     def returnCopy(self):
         """Return an unlinked copy of self."""
@@ -268,7 +272,7 @@ class Dataset2D(DatasetBase):
     dimensions = 2
 
     # dataset type
-    dstype = '2D'
+    dstype = _('2D')
     
     # the dataset is recreated if its data changes
     isstable = True
@@ -369,7 +373,7 @@ def dsPreviewHelper(d):
                            ['%.3g' % x for x in d[-3:]] )
 
     try:
-        line2 = 'mean: %.3g, min: %.3g, max: %.3g' % (
+        line2 = _('mean: %.3g, min: %.3g, max: %.3g') % (
             N.nansum(d) / N.isfinite(d).sum(),
             N.nanmin(d),
             N.nanmax(d))
@@ -384,8 +388,9 @@ class Dataset(DatasetBase):
     # number of dimensions the dataset holds
     dimensions = 1
     columns = ('data', 'serr', 'nerr', 'perr')
-    column_descriptions = ('Data', 'Sym. errors', 'Neg. errors', 'Pos. errors')
-    dstype = '1D'
+    column_descriptions = (_('Data'), _('Sym. errors'), _('Neg. errors'),
+                           _('Pos. errors') )
+    dstype = _('1D')
 
     # the dataset is recreated if its data changes
     isstable = True
@@ -443,10 +448,10 @@ class Dataset(DatasetBase):
             text += ',+'
         if self.nerr is not None:
             text += ',-'
-        text += ' (length %i)' % len(self.data)
+        text += _(' (length %i)') % len(self.data)
 
         if self.linked and showlinked:
-            text += ' linked to %s' % self.linked.filename
+            text += _(' linked to %s') % self.linked.filename
         return text
 
     def invalidDataPoints(self):
@@ -595,17 +600,17 @@ class DatasetDateTime(Dataset):
     """Dataset holding dates and times."""
 
     columns = ('data',)
-    column_descriptions = ('Data',)
+    column_descriptions = (_('Data'),)
     isstable = True
 
-    dstype = 'Date'
+    dstype = _('Date')
     displaytype = 'date'
 
     def __init__(self, data=None, linked=None):
         Dataset.__init__(self, data=data, linked=linked)
 
     def description(self, showlinked=True):
-        text = '%s (%i date/times)' % (self.name(), len(self.data))
+        text = _('%s (%i date/times)') % (self.name(), len(self.data))
         if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
@@ -656,8 +661,8 @@ class DatasetText(DatasetBase):
     dimensions = 1
     datatype = displaytype = 'text'
     columns = ('data',)
-    column_descriptions = ('Data',)
-    dstype = 'Text'
+    column_descriptions = (_('Data'),)
+    dstype = _('Text')
     isstable = True
 
     def __init__(self, data=None, linked=None):
@@ -667,9 +672,9 @@ class DatasetText(DatasetBase):
         self.data = list(data)
 
     def description(self, showlinked=True):
-        text = '%s (%i items)' % (self.name(), len(self.data))
+        text = _('%s (%i items)') % (self.name(), len(self.data))
         if self.linked and showlinked:
-            text += ', linked to %s' % self.linked.filename
+            text += _(', linked to %s') % self.linked.filename
         return text
 
     def userSize(self):
@@ -795,7 +800,7 @@ def _evaluateDataset(datasets, dsname, dspart):
         val = getattr(datasets[dsname], dspart)
         if val is None:
             raise DatasetExpressionException(
-                "Dataset '%s' does not have part '%s'" % (dsname, dspart))
+                _("Dataset '%s' does not have part '%s'") % (dsname, dspart))
         return val
     else:
         raise DatasetExpressionException(
@@ -835,7 +840,7 @@ def simpleEvalExpression(doc, expr, part='data'):
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
 
-    dstype = 'Expression'
+    dstype = _('Expression')
 
     def __init__(self, data=None, serr=None, nerr=None, perr=None,
                  parametric=None):
@@ -877,7 +882,7 @@ class DatasetExpression(Dataset):
             if ( not setting.transient_settings['unsafe_mode'] and
                  utils.checkCode(expr, securityonly=True) ):
                 raise DatasetExpressionException(
-                    "Unsafe expression '%s' in %s part of dataset" % (
+                    _("Unsafe expression '%s' in %s part of dataset") % (
                         self.expr[part], part))
             self.cachedexpr[part] = expr
 
@@ -1003,23 +1008,23 @@ class DatasetExpression(Dataset):
         """Return information about linking."""
         text = []
         if self.parametric:
-            text.append('Linked parametric dataset')
+            text.append(_('Linked parametric dataset'))
         else:
-            text.append('Linked expression dataset')
+            text.append(_('Linked expression dataset'))
         for label, part in izip(self.column_descriptions,
                                 self.columns):
             if self.expr[part]:
                 text.append('%s: %s' % (label, self.expr[part]))
 
         if self.parametric:
-            text.append("where t goes from %g:%g in %i steps" % self.parametric)
+            text.append(_("where t goes from %g:%g in %i steps") % self.parametric)
 
         return '\n'.join(text)
 
 class DatasetRange(Dataset):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
 
-    dstype = 'Range'
+    dstype = _('Range')
     isstable = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
@@ -1081,7 +1086,7 @@ class DatasetRange(Dataset):
 
     def linkedInformation(self):
         """Return information about linking."""
-        text = ['Linked range dataset']
+        text = [_('Linked range dataset')]
         for label, part in izip(self.column_descriptions,
                                 self.columns):
             val = getattr(self, 'range_%s' % part)
@@ -1125,7 +1130,7 @@ def getSpacing(data):
 class Dataset2DXYZExpression(Dataset2D):
     '''A 2d dataset with expressions for x, y and z.'''
 
-    dstype = '2D XYZ'
+    dstype = _('2D XYZ')
 
     def __init__(self, exprx, expry, exprz):
         """Initialise dataset.
@@ -1257,13 +1262,13 @@ class Dataset2DXYZExpression(Dataset2D):
 
     def linkedInformation(self):
         """Return linking information."""
-        return 'Linked 2D function: x=%s, y=%s, z=%s' % (
+        return _('Linked 2D function: x=%s, y=%s, z=%s') % (
             self.exprx, self.expry, self.exprz)
 
 class Dataset2DExpression(Dataset2D):
     """Evaluate an expression of 2d datasets."""
 
-    dstype = '2D Expr'
+    dstype = _('2D Expr')
 
     def __init__(self, expr):
         """Create 2d expression dataset."""
@@ -1326,7 +1331,7 @@ class Dataset2DExpression(Dataset2D):
             if ( not setting.transient_settings['unsafe_mode'] and
                  utils.checkCode(expr, securityonly=True) ):
                 raise DatasetExpressionException(
-                    "Unsafe expression '%s'" % (
+                    _("Unsafe expression '%s'") % (
                         expr))
             self.cachedexpr = expr
 
@@ -1335,8 +1340,8 @@ class Dataset2DExpression(Dataset2D):
             evaluated = eval(expr, environment)
         except Exception, e:
             raise DatasetExpressionException(
-                "Error evaluating expression: %s\n"
-                "Error: %s" % (expr, str(e)) )
+                _("Error evaluating expression: %s\n"
+                  "Error: %s") % (expr, str(e)) )
 
         # find 2d dataset dimensions
         dsdim = None
@@ -1370,14 +1375,14 @@ class Dataset2DExpression(Dataset2D):
 
     def linkedInformation(self):
         """Return linking information."""
-        return 'Linked 2D expression: %s' % self.expr
+        return _('Linked 2D expression: %s') % self.expr
 
 class Dataset2DXYFunc(Dataset2D):
     """Given a range of x and y, this is a dataset which is a function of
     this.
     """
 
-    dstype = '2D f(x,y)'
+    dstype = _('2D f(x,y)')
 
     def __init__(self, xstep, ystep, expr):
         """Create 2d dataset:
@@ -1394,7 +1399,7 @@ class Dataset2DXYFunc(Dataset2D):
         self.expr = expr
 
         if utils.checkCode(expr, securityonly=True) is not None:
-            raise DatasetExpressionException("Unsafe expression '%s'" % expr)
+            raise DatasetExpressionException(_("Unsafe expression '%s'") % expr)
         
         self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
                        self.xstep[1] + self.xstep[2]*0.5)
@@ -1433,8 +1438,9 @@ class Dataset2DXYFunc(Dataset2D):
         try:
             data = eval(self.expr, env)
         except Exception, e:
-            raise DatasetExpressionException("Error evaluating expression: %s\n"
-                                             "Error: %s" % (self.expr, str(e)) )
+            raise DatasetExpressionException(
+                _("Error evaluating expression: %s\n"
+                  "Error: %s") % (self.expr, str(e)) )
 
         # ensure we get an array out of this (in case expr is scalar)
         data = data + xstep*0
@@ -1456,7 +1462,7 @@ class Dataset2DXYFunc(Dataset2D):
 
     def linkedInformation(self):
         """Return linking information."""
-        return 'Linked 2D function: x=%g:%g:%g, y=%g:%g:%g, z=%s' % tuple(
+        return _('Linked 2D function: x=%g:%g:%g, y=%g:%g:%g, z=%s') % tuple(
             list(self.xstep) + list(self.ystep) + [self.expr])
 
 class _DatasetPlugin(object):

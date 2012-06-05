@@ -132,7 +132,7 @@ class PreferencesDialog(VeuszDialog):
             layout.addWidget(label, row, 0)
 
             # is default check
-            defcheck = qt4.QCheckBox("Default")
+            defcheck = qt4.QCheckBox(_("Default"))
             defcheck.setToolTip(
                 _("Use the default color instead of the one chosen here"))
             layout.addWidget(defcheck, row, 1)

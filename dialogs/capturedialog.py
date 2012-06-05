@@ -90,7 +90,7 @@ class CaptureDialog(VeuszDialog):
 
         # user starts capture
         self.captureButton = self.buttonBox.addButton(
-            "Ca&pture", qt4.QDialogButtonBox.ApplyRole )
+            _("Ca&pture"), qt4.QDialogButtonBox.ApplyRole )
         self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
                      self.slotCaptureClicked)
 

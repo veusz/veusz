@@ -21,9 +21,15 @@
 import os.path
 import numpy as N
 import veusz.utils as utils
+import veusz.qtall as qt4
 
 import field
 import datasetplugin
+
+def _(text, disambiguation=None, context='ImportPlugin'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
@@ -90,14 +96,14 @@ class ImportPluginExample(ImportPlugin):
 
     name = "Example plugin"
     author = "Jeremy Sanders"
-    description = "Reads a list of numbers in a text file"
+    description = _("Reads a list of numbers in a text file")
 
     def __init__(self):
         self.fields = [
-            field.FieldText("name", descr="Dataset name", default="name"),
-            field.FieldBool("invert", descr="invert values"),
-            field.FieldFloat("mult", descr="Multiplication factor", default=1),
-            field.FieldInt("skip", descr="Skip N lines",
+            field.FieldText("name", descr=_("Dataset name"), default="name"),
+            field.FieldBool("invert", descr=_("invert values")),
+            field.FieldFloat("mult", descr=_("Multiplication factor"), default=1),
+            field.FieldInt("skip", descr=_("Skip N lines"),
                            default=0, minval=0),
             field.FieldCombo("subtract", items=("0", "1", "2"),
                              editable=False, default="0")
@@ -132,11 +138,11 @@ class ImportPluginDateTime(ImportPlugin):
 
     name = "Example plugin for date/times"
     author = "Jeremy Sanders"
-    description = "Reads a list of ISO date times in a text file"
+    description = _("Reads a list of ISO date times in a text file")
 
     def __init__(self):
         self.fields = [
-            field.FieldText("name", descr="Dataset name", default="name"),
+            field.FieldText("name", descr=_("Dataset name"), default="name"),
             ]
 
     def doImport(self, params):
@@ -177,11 +183,11 @@ class QdpFile(object):
         try:
             mode = {'t': 'terr', 's': 'serr'}[p[1][:1]]
         except (IndexError, KeyError):
-            raise ImportPluginException("read command takes terr/serr")
+            raise ImportPluginException(_("read command takes terr/serr"))
         try:
             cols = [int(x) for x in p[2:]]
         except ValueError:
-            raise ImportPluginException("read command takes list of columns separated by spaces")
+            raise ImportPluginException(_("read command takes list of columns separated by spaces"))
         for c in cols:
             self.colmodes[c] = mode
 
@@ -190,7 +196,7 @@ class QdpFile(object):
         try:
             self.skipmode = {'o': 'off', 's': 'single', 'd': 'double'}[p[1][:1]]
         except (IndexError, KeyError):
-            raise ImportPluginException("skip command takes single/double/off")
+            raise ImportPluginException(_("skip command takes single/double/off"))
 
     def handleNO(self, p, lastp):
         """Handle no command, meaning no data."""
@@ -302,7 +308,7 @@ class QdpFile(object):
             try:
                 pint = [int(x) for x in p[1:]]
             except ValueError:
-                raise ImportPluginException("invalid 2d datagroup command")
+                raise ImportPluginException(_("invalid 2d datagroup command"))
 
             self.datagroup2d.append(pint)
 
@@ -312,7 +318,7 @@ class QdpFile(object):
         try:
             minval, maxval = float(p[2]), float(p[3])
         except ValueError:
-            raise ImportPluginException("invalid axis range")
+            raise ImportPluginException(_("invalid axis range"))
         self.axis2d[ p[0][0] == 'y' ] = (minval, maxval)
 
     def handleNum(self, p):
@@ -321,7 +327,7 @@ class QdpFile(object):
         try:
             nums = [float(x) for x in p]
         except ValueError:
-            raise ImportPluginException("Cannot convert '%s' to numbers" %
+            raise ImportPluginException(_("Cannot convert '%s' to numbers") %
                                         (' '.join(p)))
         col = 0
         ds = 0
@@ -403,12 +409,12 @@ class ImportPluginQdp(ImportPlugin):
 
     name = "QDP import"
     author = "Jeremy Sanders"
-    description = "Reads datasets from QDP files"
+    description = _("Reads datasets from QDP files")
     file_extensions = set(['.qdp'])
 
     def __init__(self):
         self.fields = [
-            field.FieldTextMulti("names", descr="Vector name list ",
+            field.FieldTextMulti("names", descr=_("Vector name list "),
                                  default=['']),
             ]
 
@@ -435,12 +441,12 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
     try:
         val.shape
     except AttributeError:
-        raise ImportPluginException("Not the correct format file")
+        raise ImportPluginException(_("Not the correct format file"))
     try:
         val + 0.
         val = val.astype(N.float64)
     except TypeError:
-        raise ImportPluginException("Unsupported array type")
+        raise ImportPluginException(_("Unsupported array type"))
 
     if val.ndim == 1:
         return datasetplugin.Dataset1D(name, val)
@@ -458,23 +464,23 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
         else:
             return datasetplugin.Dataset2D(name, val)
     else:
-        raise ImportPluginException("Unsupported dataset shape")
+        raise ImportPluginException(_("Unsupported dataset shape"))
 
 class ImportPluginNpy(ImportPlugin):
     """For reading single datasets from NPY numpy saved files."""
 
     name = "Numpy NPY import"
     author = "Jeremy Sanders"
-    description = "Reads a 1D/2D numeric dataset from a Numpy NPY file"
+    description = _("Reads a 1D/2D numeric dataset from a Numpy NPY file")
     file_extensions = set(['.npy'])
 
     def __init__(self):
         self.fields = [
-            field.FieldText("name", descr="Dataset name",
+            field.FieldText("name", descr=_("Dataset name"),
                             default=''),
             field.FieldBool("errorsin2d",
-                            descr="Treat 2 and 3 column 2D arrays as\n"
-                            "data with error bars",
+                            descr=_("Treat 2 and 3 column 2D arrays as\n"
+                                    "data with error bars"),
                             default=True),
             ]
 
@@ -486,16 +492,16 @@ class ImportPluginNpy(ImportPlugin):
         try:
             retn = N.load(params.filename)
         except Exception:
-            return "Cannot read file", False
+            return _("Cannot read file"), False
 
         try:
-            text = 'Array shape: %s\n' % str(retn.shape)
-            text += 'Array datatype: %s (%s)\n' % (retn.dtype.str,
-                                                   str(retn.dtype))
+            text = _('Array shape: %s\n') % str(retn.shape)
+            text += _('Array datatype: %s (%s)\n') % (retn.dtype.str,
+                                                      str(retn.dtype))
             text += str(retn)
             return text, True
         except AttributeError:
-            return "Not an NPY file", False
+            return _("Not an NPY file"), False
 
     def doImport(self, params):
         """Actually import data.
@@ -503,12 +509,12 @@ class ImportPluginNpy(ImportPlugin):
 
         name = params.field_results["name"].strip()
         if not name:
-            raise ImportPluginException("Please provide a name for the dataset")
+            raise ImportPluginException(_("Please provide a name for the dataset"))
 
         try:
             retn = N.load(params.filename)
         except Exception, e:
-            raise ImportPluginException("Error while reading file: %s" %
+            raise ImportPluginException(_("Error while reading file: %s") %
                                         unicode(e))
 
         return [ cnvtImportNumpyArray(
@@ -519,14 +525,14 @@ class ImportPluginNpz(ImportPlugin):
 
     name = "Numpy NPZ import"
     author = "Jeremy Sanders"
-    description = "Reads datasets from a Numpy NPZ file."
+    description = _("Reads datasets from a Numpy NPZ file.")
     file_extensions = set(['.npz'])
 
     def __init__(self):
         self.fields = [
             field.FieldBool("errorsin2d",
-                            descr="Treat 2 and 3 column 2D arrays as\n"
-                            "data with error bars",
+                            descr=_("Treat 2 and 3 column 2D arrays as\n"
+                                    "data with error bars"),
                             default=True),
             ]
 
@@ -538,20 +544,20 @@ class ImportPluginNpz(ImportPlugin):
         try:
             retn = N.load(params.filename)
         except Exception:
-            return "Cannot read file", False
+            return _("Cannot read file"), False
 
         # npz files should define this attribute
         try:
             retn.files
         except AttributeError:
-            return "Not an NPZ file", False
+            return _("Not an NPZ file"), False
 
         text = []
         for f in sorted(retn.files):
             a = retn[f]
-            text.append('Name: %s' % f)
-            text.append(' Shape: %s' % str(a.shape))
-            text.append(' Datatype: %s (%s)' % (a.dtype.str, str(a.dtype)))
+            text.append(_('Name: %s') % f)
+            text.append(_(' Shape: %s') % str(a.shape))
+            text.append(_(' Datatype: %s (%s)') % (a.dtype.str, str(a.dtype)))
             text.append('')
         return '\n'.join(text), True
 
@@ -562,13 +568,13 @@ class ImportPluginNpz(ImportPlugin):
         try:
             retn = N.load(params.filename)
         except Exception, e:
-            raise ImportPluginException("Error while reading file: %s" %
+            raise ImportPluginException(_("Error while reading file: %s") %
                                         unicode(e))
 
         try:
             retn.files
         except AttributeError:
-            raise ImportPluginException("File is not in NPZ format")
+            raise ImportPluginException(_("File is not in NPZ format"))
 
         # convert each of the imported arrays
         out = []
@@ -582,22 +588,22 @@ class ImportPluginBinary(ImportPlugin):
 
     name = "Binary import"
     author = "Jeremy Sanders"
-    description = "Reads numerical binary files."
+    description = _("Reads numerical binary files.")
     file_extensions = set(['.bin'])
 
     def __init__(self):
         self.fields = [
-            field.FieldText("name", descr="Dataset name",
+            field.FieldText("name", descr=_("Dataset name"),
                             default=""),
-            field.FieldCombo("datatype", descr="Data type",
+            field.FieldCombo("datatype", descr=_("Data type"),
                              items = ("float32", "float64",
                                       "int8", "int16", "int32", "int64",
                                       "uint8", "uint16", "uint32", "uint64"),
                              default="float64", editable=False),
-            field.FieldCombo("endian", descr="Endian (byte order)",
+            field.FieldCombo("endian", descr=_("Endian (byte order)"),
                              items = ("little", "big"), editable=False),
-            field.FieldInt("offset", descr="Offset (bytes)", default=0, minval=0),
-            field.FieldInt("length", descr="Length (values)", default=-1)
+            field.FieldInt("offset", descr=_("Offset (bytes)"), default=0, minval=0),
+            field.FieldInt("length", descr=_("Length (values)"), default=-1)
             ]
 
     def getNumpyDataType(self, params):
@@ -613,9 +619,9 @@ class ImportPluginBinary(ImportPlugin):
             data = f.read()
             f.close()
         except EnvironmentError, e:
-            return "Cannot read file (%s)" % e.strerror, False
+            return _("Cannot read file (%s)") % e.strerror, False
 
-        text = ['File length: %i bytes' % len(data)]
+        text = [_('File length: %i bytes') % len(data)]
 
         def filtchr(c):
             """Filtered character to ascii range."""
@@ -640,7 +646,7 @@ class ImportPluginBinary(ImportPlugin):
 
         name = params.field_results["name"].strip()
         if not name:
-            raise ImportPluginException("Please provide a name for the dataset")
+            raise ImportPluginException(_("Please provide a name for the dataset"))
 
         try:
             f = open(params.filename, "rb")
@@ -648,7 +654,7 @@ class ImportPluginBinary(ImportPlugin):
             retn = f.read()
             f.close()
         except EnvironmentError, e:
-            raise ImportPluginException("Error while reading file '%s'\n\n%s" %
+            raise ImportPluginException(_("Error while reading file '%s'\n\n%s") %
                                         (params.filename, e.strerror))
 
         data = N.fromstring(retn, dtype=self.getNumpyDataType(params),

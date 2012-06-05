@@ -34,6 +34,11 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
+def _(text, disambiguation=None, context='Ternary'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
+
 def rotatePts(x, y, theta):
     '''Rotate points by theta degrees.'''
     s = math.sin(theta*math.pi/180.)
@@ -61,7 +66,7 @@ class Ternary(NonOrthGraph):
 
     typename='ternary'
     allowusercreation = True
-    description = 'Ternary graph'
+    description = _('Ternary graph')
 
     def __init__(self, parent, name=None):
         '''Initialise ternary plot.'''
@@ -77,60 +82,60 @@ class Ternary(NonOrthGraph):
         s.add( setting.Choice('mode',
                               ('percentage', 'fraction'),
                               'percentage',
-                              descr='Show percentages or fractions',
-                              usertext='Mode') )
+                              descr=_('Show percentages or fractions'),
+                              usertext=_('Mode')) )
 
         s.add( setting.Choice('coords',
                               ('bottom-left', 'bottom-right',
                                'left-bottom', 'left-right',
                                'right-left', 'right-bottom'),
                               'bottom-left',
-                              descr='Axes to use for plotting coordinates',
-                              usertext='Coord system') )
+                              descr=_('Axes to use for plotting coordinates'),
+                              usertext=_('Coord system')) )
 
         s.add( setting.Str('labelbottom', '',
-                           descr='Bottom axis label text',
-                           usertext='Label bottom') )
+                           descr=_('Bottom axis label text'),
+                           usertext=_('Label bottom')) )
         s.add( setting.Str('labelleft', '',
-                           descr='Left axis label text',
-                           usertext='Label left') )
+                           descr=_('Left axis label text'),
+                           usertext=_('Label left')) )
         s.add( setting.Str('labelright', '',
-                           descr='Right axis label text',
-                           usertext='Label right') )
+                           descr=_('Right axis label text'),
+                           usertext=_('Label right')) )
 
         s.add( setting.Float('originleft', 0.,
-                             descr='Fractional origin of left axis at its top',
-                             usertext='Left origin') )
+                             descr=_('Fractional origin of left axis at its top'),
+                             usertext=_('Left origin')) )
         s.add( setting.Float('originbottom', 0.,
-                             descr='Fractional origin of bottom axis at its '
-                             'left', usertext='Bottom origin') )
+                             descr=_('Fractional origin of bottom axis at its left'),
+                             usertext=_('Bottom origin')) )
         s.add( setting.Float('fracsize', 1.,
-                             descr='Fractional size of plot',
-                             usertext='Size') )
+                             descr=_('Fractional size of plot'),
+                             usertext=_('Size')) )
 
         s.add( AxisLabel('Label',
-                         descr = 'Axis label settings',
-                         usertext = 'Axis label'),
+                         descr = _('Axis label settings'),
+                         usertext = _('Axis label')),
                pixmap='settings_axislabel' )
         s.add( TickLabel('TickLabels',
-                         descr = 'Tick label settings',
-                         usertext = 'Tick labels'),
+                         descr = _('Tick label settings'),
+                         usertext = _('Tick labels')),
                pixmap='settings_axisticklabels' )
         s.add( MajorTick('MajorTicks',
-                         descr = 'Major tick line settings',
-                         usertext = 'Major ticks'),
+                         descr = _('Major tick line settings'),
+                         usertext = _('Major ticks')),
                pixmap='settings_axismajorticks' )
         s.add( MinorTick('MinorTicks',
-                         descr = 'Minor tick line settings',
-                         usertext = 'Minor ticks'),
+                         descr = _('Minor tick line settings'),
+                         usertext = _('Minor ticks')),
                pixmap='settings_axisminorticks' )
         s.add( GridLine('GridLines',
-                        descr = 'Grid line settings',
-                        usertext = 'Grid lines'),
+                        descr = _('Grid line settings'),
+                        usertext = _('Grid lines')),
                pixmap='settings_axisgridlines' )
         s.add( MinorGridLine('MinorGridLines',
-                             descr = 'Minor grid line settings',
-                             usertext = 'Grid lines for minor ticks'),
+                             descr = _('Minor grid line settings'),
+                             usertext = _('Grid lines for minor ticks')),
                pixmap='settings_axisminorgridlines' )
 
         s.get('leftMargin').newDefault('1cm')
