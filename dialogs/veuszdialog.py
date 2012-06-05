@@ -35,10 +35,12 @@ class VeuszDialog(qt4.QDialog):
         If modal is False, base on a top level window instead
         """
 
-        if modal:
-            flag = qt4.Qt.Dialog
-        else:
-            flag = qt4.Qt.Window
+        flag = qt4.Qt.Dialog
+        if not modal:
+            flag |= (
+                qt4.Qt.CustomizeWindowHint | qt4.Qt.WindowMinimizeButtonHint |
+                qt4.Qt.WindowMaximizeButtonHint | qt4.Qt.WindowCloseButtonHint |
+                qt4.Qt.WindowTitleHint | qt4.Qt.WindowSystemMenuHint )
 
         qt4.QDialog.__init__(self, mainwindow, flag)
         self.setAttribute(qt4.Qt.WA_DeleteOnClose)
