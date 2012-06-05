@@ -1434,6 +1434,7 @@ class SortPlugin(_OneOutputDatasetPlugin):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldBool('reverse', _('Reverse')),
             field.FieldDataset('ds_out', _('Output dataset')),
             ]
 
@@ -1442,6 +1443,9 @@ class SortPlugin(_OneOutputDatasetPlugin):
         ds = helper.getDataset(fields['ds_in'])
 
         idxs = N.argsort(ds.data)
+        if fields['reverse']:
+            idxs = idxs[::-1]
+
         out = { 'data': ds.data[idxs] }
         if ds.serr is not None: out['serr'] = ds.serr[idxs]
         if ds.perr is not None: out['perr'] = ds.perr[idxs]
