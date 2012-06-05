@@ -1401,9 +1401,9 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_x', _('Input dataset x')),
             field.FieldDataset('ds_y', _('Input dataset y')),
-            field.FieldDataset('ds_xprime', "Input dataset x'"),
+            field.FieldDataset('ds_xprime', _("Input dataset x'")),
             field.FieldBool('edgenan', _('Use nan for values outside x range')),
-            field.FieldDataset('ds_out', "Output dataset y'"),
+            field.FieldDataset('ds_out', _("Output dataset y'")),
             ]
 
     def updateDatasets(self, fields, helper):
@@ -1422,6 +1422,32 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
                             left=pad, right=pad)
 
         self.dsout.update(data=interpol)
+
+class SortPlugin(_OneOutputDatasetPlugin):
+    """Sort a dataset."""
+
+    menu = (_('Compute'), _('Sorted'),)
+    name = 'Sort'
+    description_short = description_full = _('Sort a dataset')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do sorting of dataset."""
+        ds = helper.getDataset(fields['ds_in'])
+
+        idxs = N.argsort(ds.data)
+        out = { 'data': ds.data[idxs] }
+        if ds.serr is not None: out['serr'] = ds.serr[idxs]
+        if ds.perr is not None: out['perr'] = ds.perr[idxs]
+        if ds.nerr is not None: out['nerr'] = ds.nerr[idxs]
+
+        self.dsout.update(**out)
 
 datasetpluginregistry += [
     AddDatasetPlugin,
@@ -1450,4 +1476,5 @@ datasetpluginregistry += [
 
     MovingAveragePlugin,
     LinearInterpolatePlugin,
+    SortPlugin,
     ]

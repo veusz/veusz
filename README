@@ -34,6 +34,8 @@ Changes in 1.16:
  * Use top level windows for non-modal dialogs, giving minimize in window
    and no always-on-top behaviour
  * Zero length vectors and arrows in vector fields are not plotted
+ * Add support for strings to be translated
+ * Add "Sort" dataset plugin
 
 Bug fixes:
  * Workaround for splash screen problem
