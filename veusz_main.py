@@ -173,6 +173,8 @@ def run():
     parser.add_option('--plugin', action='append', metavar='FILE',
                       help='load the plugin from the file given for '
                       'the session')
+    parser.add_option('--translation', metavar='FILE',
+                      help='load the translation .qm file given')
     options, args = parser.parse_args( app.argv() )
 
     # convert args to unicode from filesystem strings
@@ -186,9 +188,11 @@ def run():
         splash.showMessage(" ")
         app.processEvents()
 
-    #trans = qt4.QTranslator()
-    #trans.load("rev.qm")
-    #app.installTranslator(trans)
+    # optionally load a translation
+    if options.translation:
+        trans = qt4.QTranslator()
+        trans.load(options.translation)
+        app.installTranslator(trans)
 
     # import these after showing splash screen so we don't
     # have too long a wait before it shows
