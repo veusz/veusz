@@ -156,11 +156,8 @@ class TextLabel(plotters.FreePlotter):
         by = N.array( [-h/2.,  h/2., -h/2.,  h/2.] )
         cos, sin = N.cos(-angle*N.pi/180), N.sin(-angle*N.pi/180)
         newx = bx*cos + by*sin
-        newy = by*cos - by*sin
+        newy = by*cos - bx*sin
         newbound = (newx.min(), newy.min(), newx.max(), newy.max())
-
-        print bx, by
-        print newx, newy
 
         # do alignment
         if s.alignHorz == 'left':
