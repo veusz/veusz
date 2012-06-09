@@ -27,6 +27,13 @@ import veusz.qtall as qt4
 
 import points
 
+mmlsupport = True
+try:
+    import veusz.helpers.qtmml as qtmml
+    import veusz.helpers.recordpaint as recordpaint
+except ImportError:
+    mmlsupport = False
+
 # this definition is monkey-patched when veusz is running in self-test
 # mode as we need to hack the metrics - urgh
 FontMetrics = qt4.QFontMetricsF
@@ -739,30 +746,13 @@ def makePartTree(partlist):
     else:
         return PartLines(lines)
 
-class Renderer(object):
-    """A class for rendering text.
-
-    The class emulates latex-like formatting, allows rotated text, and alignment
-    """
+class _Renderer:
+    """Different renderer types based on this."""
 
     def __init__(self, painter, font, x, y, text,
                  alignhorz = -1, alignvert = -1, angle = 0,
                  usefullheight = False):
-        """Initialise the renderer.
 
-        painter is the painter to draw on
-        font is the starting font to use
-        x and y are the x and y positions to draw the text at
-        alignhorz = (-1, 0, 1) for (left, centre, right) alignment
-        alignvert = (-1, 0, 1) for (above, centre, below) alignment
-        angle is the angle to draw the text at
-        usefullheight means include descenders in calculation of height
-          of text
-
-        alignment is in the painter frame, not the text frame
-        """
-
-        # save things we'll need later
         self.painter = painter
         self.font = font
         self.alignhorz = alignhorz
@@ -770,95 +760,16 @@ class Renderer(object):
         self.angle = angle
         self.usefullheight = usefullheight
 
-        #self.text = text
-        partlist = makePartList(text)
-        self.parttree = makePartTree(partlist)
-
-        self.x = x
-        self.y = y
+        # x and y are the original coordinates
+        # xi and yi are adjusted for alignment
+        self.x = self.xi = x
+        self.y = self.yi = y
         self.calcbounds = None
 
-        # debug position
-        #self.painter.drawPoint( qt4.QPointF(self.x, self.y) )
+        self._initText(text)
 
-    def getBounds(self):
-        """Get bounds of text on screen."""
-
-        if self.calcbounds is not None:
-            return self.calcbounds
-
-        # work out total width and height
-        self.painter.setFont(self.font)
-
-        # work out height of box, and
-        # make the bounding box a bit bigger if we want to include descents
-
-        state = RenderState(self.font, self.painter, 0, 0,
-                            self.alignhorz,
-                            actually_render = False)
-        fm = state.fontMetrics()
-        
-        if self.usefullheight:
-            totalheight = fm.ascent()
-            dy = fm.descent()
-        else:
-            if self.alignvert == 0:
-                # if want vertical centering, better to centre around middle
-                # of typical letter (i.e. where strike position is)
-                #totalheight = fm.strikeOutPos()*2
-                totalheight = fm.boundingRect(qt4.QChar('0')).height()
-            else:
-                # if top/bottom alignment, better to use maximum letter height
-                totalheight = fm.ascent()
-            dy = 0
-
-        # work out width
-        self.parttree.render(state)
-        totalwidth = state.x
-        totalheight += fm.height()*(state.maxlines-1)
-
-        # in order to work out text position, we rotate a bounding box
-        # in fact we add two extra points to account for descent if reqd
-        tw = totalwidth / 2
-        th = totalheight / 2
-        coordx = N.array( [-tw,  tw,  tw, -tw, -tw,    tw   ] )
-        coordy = N.array( [ th,  th, -th, -th,  th+dy, th+dy] )
-        
-        # rotate angles by theta
-        theta = -self.angle * (math.pi / 180.)
-        c = math.cos(theta)
-        s = math.sin(theta)
-        newx = coordx*c + coordy*s
-        newy = coordy*c - coordx*s
-
-        # calculate bounding box
-        newbound = (newx.min(), newy.min(), newx.max(), newy.max())
-
-        # use rotated bounding box to find position of start text posn
-        if self.alignhorz < 0:
-            xr = ( self.x, self.x+(newbound[2]-newbound[0]) )
-            self.xi = self.x + (newx[0] - newbound[0])
-        elif self.alignhorz > 0:
-            xr = ( self.x-(newbound[2]-newbound[0]), self.x )
-            self.xi = self.x + (newx[0] - newbound[2])
-        else:
-            xr = ( self.x+newbound[0], self.x+newbound[2] )
-            self.xi = self.x + newx[0]
-
-        # y alignment
-        # adjust y by these values to ensure proper alignment
-        if self.alignvert < 0:
-            yr = ( self.y + (newbound[1]-newbound[3]), self.y )
-            self.yi = self.y + (newy[0] - newbound[3])
-        elif self.alignvert > 0:
-            yr = ( self.y, self.y + (newbound[3]-newbound[1]) )
-            self.yi = self.y + (newy[0] - newbound[1])
-        else:
-            yr = ( self.y+newbound[1], self.y+newbound[3] )
-            self.yi = self.y + newy[0]
-
-        self.calcbounds = [xr[0], yr[0], xr[1], yr[1]]
-        return self.calcbounds
+    def _initText(self, text):
+        """Override this to set up renderer with text."""
 
     def ensureInBox(self, minx = -32767, maxx = 32767,
                     miny = -32767, maxy = 32767, extraspace = False):
@@ -872,8 +783,9 @@ class Renderer(object):
         # add a small amount of extra room if requested
         if extraspace:
             self.painter.setFont(self.font)
-            l = FontMetrics(self.font,
-                            self.painter.device()).height()*0.2
+            l = FontMetrics(
+                self.font,
+                self.painter.device()).height()*0.2
             miny += l
 
         # twiddle positions and bounds
@@ -909,6 +821,108 @@ class Renderer(object):
         cb = self.calcbounds
         return (cb[2]-cb[0]+1, cb[3]-cb[1]+1)
 
+    def _getWidthHeight(self):
+        """Calculate the width and height of rendered text.
+
+        Return totalwidth, totalheight, dy
+        dy is a descent to add, to include in the alignment, if wanted
+        """
+
+    def getBounds(self):
+        """Get bounds in standard version."""
+
+        if self.calcbounds is not None:
+            return self.calcbounds
+
+        totalwidth, totalheight, dy = self._getWidthHeight()
+
+        # in order to work out text position, we rotate a bounding box
+        # in fact we add two extra points to account for descent if reqd
+        tw = totalwidth / 2
+        th = totalheight / 2
+        coordx = N.array( [-tw,  tw,  tw, -tw, -tw,    tw   ] )
+        coordy = N.array( [ th,  th, -th, -th,  th+dy, th+dy] )
+
+        # rotate angles by theta
+        theta = -self.angle * (math.pi / 180.)
+        c = math.cos(theta)
+        s = math.sin(theta)
+        newx = coordx*c + coordy*s
+        newy = coordy*c - coordx*s
+
+        # calculate bounding box
+        newbound = (newx.min(), newy.min(), newx.max(), newy.max())
+
+        # use rotated bounding box to find position of start text posn
+        if self.alignhorz < 0:
+            xr = ( self.x, self.x+(newbound[2]-newbound[0]) )
+            self.xi += (newx[0] - newbound[0])
+        elif self.alignhorz > 0:
+            xr = ( self.x-(newbound[2]-newbound[0]), self.x )
+            self.xi += (newx[0] - newbound[2])
+        else:
+            xr = ( self.x+newbound[0], self.x+newbound[2] )
+            self.xi += newx[0]
+
+        # y alignment
+        # adjust y by these values to ensure proper alignment
+        if self.alignvert < 0:
+            yr = ( self.y + (newbound[1]-newbound[3]), self.y )
+            self.yi += (newy[0] - newbound[3])
+        elif self.alignvert > 0:
+            yr = ( self.y, self.y + (newbound[3]-newbound[1]) )
+            self.yi += (newy[0] - newbound[1])
+        else:
+            yr = ( self.y+newbound[1], self.y+newbound[3] )
+            self.yi += newy[0]
+
+        self.calcbounds = [xr[0], yr[0], xr[1], yr[1]]
+        return self.calcbounds
+
+class _StdRenderer(_Renderer):
+    """Standard rendering class."""
+
+    def _initText(self, text):
+        # make internal tree
+        partlist = makePartList(text)
+        self.parttree = makePartTree(partlist)
+
+    def _getWidthHeight(self):
+        """Get size of box around text."""
+
+        # work out total width and height
+        self.painter.setFont(self.font)
+
+        # work out height of box, and
+        # make the bounding box a bit bigger if we want to include descents
+
+        state = RenderState(self.font, self.painter, 0, 0,
+                            self.alignhorz,
+                            actually_render = False)
+        fm = state.fontMetrics()
+
+        if self.usefullheight:
+            totalheight = fm.ascent()
+            dy = fm.descent()
+        else:
+            if self.alignvert == 0:
+                # if want vertical centering, better to centre around middle
+                # of typical letter (i.e. where strike position is)
+                #totalheight = fm.strikeOutPos()*2
+                totalheight = fm.boundingRect(qt4.QChar('0')).height()
+            else:
+                # if top/bottom alignment, better to use maximum letter height
+                totalheight = fm.ascent()
+            dy = 0
+
+        # work out width
+        self.parttree.render(state)
+        totalwidth = state.x
+        # add number of lines for height
+        totalheight += fm.height()*(state.maxlines-1)
+
+        return totalwidth, totalheight, dy
+
     def render(self):
         """Render the text."""
 
@@ -937,3 +951,117 @@ class Renderer(object):
 
         # caller might want this information
         return self.calcbounds
+
+class _MmlRenderer(_Renderer):
+    """MathML renderer."""
+
+    def _initText(self, text):
+        """Setup MML document and draw it in recording paint device."""
+
+        self.size = qt4.QSize(1, 1)
+        if not mmlsupport:
+            self.mmldoc = None
+            self.document.log(_('Error: MathML support not built'))
+            return
+
+        self.mmldoc = doc = qtmml.QtMmlDocument()
+        try:
+            self.mmldoc.setContent(text)
+        except ValueError, e:
+            self.mmldoc = None
+            self.document.log(_('Error interpreting MathML: %s') %
+                              unicode(e))
+            return
+
+        # this is pretty horrible :-(
+
+        # We write the mathmml document to a RecordPaintDevice device
+        # at the same DPI as the screen, because the MML code breaks
+        # for other DPIs. We then repaint the output to the real
+        # device, scaling to make the size correct.
+
+        screendev = qt4.QApplication.desktop()
+        self.record = recordpaint.RecordPaintDevice(
+            1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
+
+        rpaint = qt4.QPainter(self.record)
+        # painting code relies on these attributes of the painter
+        rpaint.pixperpt = screendev.logicalDpiY() / 72.
+        rpaint.scaling = 1.0
+
+        # Upscale any drawing by this factor, then scale back when
+        # drawing. We have to do this to get consistent output at
+        # different zoom factors (I hate this code).
+        upscale = 5.
+
+        doc.setFontName( qtmml.QtMmlWidget.NormalFont, self.font.family() )
+
+        ptsize = self.font.pointSizeF()
+        if ptsize < 0:
+            ptsize = self.font.pixelSize() / self.painter.pixperpt
+        ptsize /= self.painter.scaling
+
+        doc.setBaseFontPointSize(ptsize * upscale)
+
+        # the output will be painted finally scaled
+        self.drawscale = (
+            self.painter.scaling * self.painter.dpi / screendev.logicalDpiY()
+            / upscale )
+        self.size = doc.size() * self.drawscale
+
+        doc.paint(rpaint, qt4.QPoint(0, 0))
+        rpaint.end()
+
+    def _getWidthHeight(self):
+        return self.size.width(), self.size.height(), 0
+
+    def render(self):
+        """Render the text."""
+
+        if self.calcbounds is None:
+            self.getBounds()
+
+        if self.mmldoc is not None:
+            p = self.painter
+            p.save()
+            p.translate(self.xi, self.yi)
+            p.rotate(self.angle)
+            # is drawn from bottom of box, not top
+            p.translate(0, -self.size.height())
+            p.scale(self.drawscale, self.drawscale)
+            self.record.play(p)
+            p.restore()
+
+        return self.calcbounds
+
+# identify mathml text
+mml_re = re.compile(r'^\s*<math.*</math\s*>\s*$', re.DOTALL)
+
+def Renderer(painter, font, x, y, text,
+             alignhorz = -1, alignvert = -1, angle = 0,
+             usefullheight = False):
+    """Return an appropriate Renderer object depending on the text.
+    This looks like a class name, because it was a class originally.
+
+    painter is the painter to draw on
+    font is the starting font to use
+    x and y are the x and y positions to draw the text at
+    alignhorz = (-1, 0, 1) for (left, centre, right) alignment
+    alignvert = (-1, 0, 1) for (above, centre, below) alignment
+    angle is the angle to draw the text at
+    usefullheight means include descenders in calculation of height
+    of text
+
+    alignment is in the painter frame, not the text frame
+    """
+
+    if mml_re.match(text):
+        r = _MmlRenderer
+    else:
+        r = _StdRenderer
+
+    return r(
+        painter, font, x, y, text,
+        alignhorz=alignhorz, alignvert=alignvert,
+        angle=angle, usefullheight=usefullheight
+        )

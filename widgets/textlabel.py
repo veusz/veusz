@@ -30,13 +30,6 @@ import veusz.qtall as qt4
 import plotters
 import controlgraph
 
-mmlsupport = True
-try:
-    import veusz.helpers.qtmml as qtmml
-    import veusz.helpers.recordpaint as recordpaint
-except ImportError:
-    mmlsupport = False
-
 def _(text, disambiguation=None, context='TextLabel'):
     """Translate text."""
     return unicode( 
@@ -52,7 +45,6 @@ class TextLabel(plotters.FreePlotter):
 
     def __init__(self, parent, name=None):
         plotters.FreePlotter.__init__(self, parent, name=name)
-        self.mmltextcache = self.mmldoccache = None
 
         if type(self) == TextLabel:
             self.readDefaults()
@@ -65,12 +57,6 @@ class TextLabel(plotters.FreePlotter):
         s.add( setting.DatasetOrStr('label', '',
                                     descr=_('Text to show or text dataset'),
                                     usertext=_('Label'), datatype='text'), 0 )
-
-        s.add( setting.Choice('type',
-                              ('standard', 'mathml'),
-                              'standard',
-                              descr=_('Type of text to plot'),
-                              usertext=_('Type')), 4 )
 
         s.add( setting.AlignHorz('alignHorz',
                                  'left',
@@ -102,107 +88,6 @@ class TextLabel(plotters.FreePlotter):
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
     cnvtalignvert = { 'top': 1, 'centre': 0, 'bottom': -1 }
 
-    def drawMML(self, painter, phelper, font, x, y, t, angle):
-        """Draw text in MathML mode."""
-
-        s = self.settings
-        if not mmlsupport:
-            self.document.log(_('Error: MathML support not compiled'))
-            return [x, y, x, y]
-
-        if t != self.mmltextcache:
-            self.mmltextcache = t
-            self.mmldoccache = qtmml.QtMmlDocument()
-            try:
-                self.mmldoccache.setContent(t)
-            except ValueError, e:
-                self.document.log(_('Error interpreting MathML: %s') %
-                                  unicode(e))
-
-        # this is pretty horrible :-(
-
-        # We write the mathmml document to a RecordPaintDevice device
-        # at the same DPI as the screen, because the MML code breaks
-        # for other DPIs. We then repaint the output to the real
-        # device, scaling to make the size correct.
-
-        screendev = qt4.QApplication.desktop()
-        rc = recordpaint.RecordPaintDevice(
-            1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
-
-        rcpaint = qt4.QPainter(rc)
-        # painting code relies on these attributes of the painter
-        rcpaint.pixperpt = screendev.logicalDpiY() / 72.
-        rcpaint.scaling = 1.0
-
-        # Upscale any drawing by this factor, then scale back when
-        # drawing. We have to do this to get consistent output at
-        # different zoom factors (I hate this code).
-        upscale = 5.
-
-        self.mmldoccache.setFontName( qtmml.QtMmlWidget.NormalFont,
-                                      font.family() )
-        self.mmldoccache.setBaseFontPointSize(
-            s.Text.get('size').convertPts(rcpaint) * upscale )
-
-        # the output will be painted finally scaled
-        drawscale = ( painter.scaling * painter.dpi / screendev.logicalDpiY()
-                      / upscale )
-        size = self.mmldoccache.size() * drawscale
-
-        # rotate bounding box by angle
-        w, h = size.width(), size.height()
-        bx = N.array( [-w/2.,  w/2.,  w/2., -w/2.] )
-        by = N.array( [-h/2.,  h/2., -h/2.,  h/2.] )
-        cos, sin = N.cos(-angle*N.pi/180), N.sin(-angle*N.pi/180)
-        newx = bx*cos + by*sin
-        newy = by*cos - bx*sin
-        newbound = (newx.min(), newy.min(), newx.max(), newy.max())
-
-        # do alignment
-        if s.alignHorz == 'left':
-            xr = ( x, x+(newbound[2]-newbound[0]) )
-            xi = x + (newx[0] - newbound[0])
-        elif s.alignHorz == 'right':
-            xr = ( x-(newbound[2]-newbound[0]), x )
-            xi = x + (newx[0] - newbound[2])
-        else:
-            xr = ( x+newbound[0], x+newbound[2] )
-            xi = x + newx[0]
-
-        # y alignment
-        # adjust y by these values to ensure proper alignment
-        if s.alignVert == 'top':
-            yr = ( y + (newbound[1]-newbound[3]), y )
-            yi = y + (newy[0] - newbound[3])
-        elif s.alignVert == 'bottom':
-            yr = ( y, y + (newbound[3]-newbound[1]) )
-            yi = y + (newy[0] - newbound[1])
-        else:
-            yr = ( y+newbound[1], y+newbound[3] )
-            yi = y + newy[0]
-
-        self.mmldoccache.paint(rcpaint, qt4.QPoint(0, 0))
-        rcpaint.end()
-
-        painter.save()
-        painter.translate(xi, yi)
-        painter.scale(drawscale, drawscale)
-        painter.rotate(angle)
-        # replay back to painter
-        rc.play(painter)
-
-        painter.drawPoint(0,0)
-        painter.drawPoint(0,size.height()/drawscale)
-        painter.drawPoint(size.width()/drawscale,0)
-        painter.drawPoint(size.width()/drawscale,size.height()/drawscale)
-
-        painter.restore()
-
-        # bounds for control
-        tbounds = [xr[0], yr[0], xr[1], yr[1]]
-        return tbounds
-
     def draw(self, posn, phelper, outerbounds = None):
         """Draw the text label."""
 
@@ -228,7 +113,6 @@ class TextLabel(plotters.FreePlotter):
         textpen = s.get('Text').makeQPen()
         painter.setPen(textpen)
         font = s.get('Text').makeQFont(painter)
-        ttype = s.type
 
         # we should only be able to move non-dataset labels
         isnotdataset = ( not s.get('xPos').isDataset(d) and 
@@ -238,14 +122,10 @@ class TextLabel(plotters.FreePlotter):
         for index, (x, y, t) in enumerate(itertools.izip(
                 xp, yp, itertools.cycle(text))):
             # render the text
-            if ttype == 'standard':
-                tbounds = utils.Renderer( painter, font, x, y, t,
-                                          TextLabel.cnvtalignhorz[s.alignHorz],
-                                          TextLabel.cnvtalignvert[s.alignVert],
-                                          s.angle ).render()
-            elif ttype == 'mathml':
-                tbounds = self.drawMML(painter, phelper, font, x, y, t,
-                                       s.angle)
+            tbounds = utils.Renderer( painter, font, x, y, t,
+                                      TextLabel.cnvtalignhorz[s.alignHorz],
+                                      TextLabel.cnvtalignvert[s.alignVert],
+                                      s.angle ).render()
 
             # add cgi for adjustable positions
             if isnotdataset:
