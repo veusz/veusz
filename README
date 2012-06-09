@@ -22,7 +22,6 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.16:
  * Experimental MathML support
- * Support for *args and **kwargs for custom functions
  * Add upper/lower-left/right arrows
  * Add options to clip text/lines/shapes to graphs
  * Add stacked-area option to bar plot widget
@@ -36,8 +35,10 @@ Changes in 1.16:
  * Zero length vectors and arrows in vector fields are not plotted
  * Add support for strings to be translated
  * Add "Sort" dataset plugin
+ * Support for *args and **kwargs for custom functions
 
 Bug fixes:
+ * Use correct definition of 1pt = 1/72in
  * Workaround for splash screen problem
  * Fix numerous problems reported by pyflakes
  * Histograms fail when saved

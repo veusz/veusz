@@ -722,7 +722,7 @@ class Distance(Setting):
         '': _distRatio
         }
 
-    # inverse functions for converting pixels to points
+    # inverse functions for converting points to units
     inv_unit_func = {
         'cm': lambda match, painter:
             _distInvPhys(match, painter, 720/25.4, 'cm'),
