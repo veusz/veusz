@@ -18,8 +18,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-"""Main Veusz executable.
-"""
+'''Main Veusz executable.'''
 
 import sys
 import os.path
@@ -31,7 +30,7 @@ try:
     import veusz
 except ImportError:
     # load in the veusz module, but change its path to
-    # the veusz directory, and insert it into sys.modules    
+    # the veusz directory, and insert it into sys.modules
     import __init__ as veusz
     thisdir = os.path.dirname( os.path.abspath(__file__) )
     veusz.__path__ = [thisdir]
@@ -57,7 +56,7 @@ def handleIntSignal(signum, frame):
     qt4.qApp.closeAllWindows()
 
 def makeSplashLogo():
-    """Make a splash screen logo."""
+    '''Make a splash screen logo.'''
     border = 16
     xw, yw = 520, 240
     pix = qt4.QPixmap(xw, yw)
@@ -82,7 +81,7 @@ def makeSplashLogo():
     return pix
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
-    """Show exception dialog if an exception occurs."""
+    '''Show exception dialog if an exception occurs.'''
     from veusz.dialogs.exceptiondialog import ExceptionDialog
     if not isinstance(exceptvalue, utils.IgnoreException):
         # next exception is ignored to clear out the stack frame of the
@@ -131,6 +130,83 @@ def convertArgsUnicode(args):
             out.append(a)
     return out
 
+class ImportThread(qt4.QThread):
+    '''Do import of main code within another thread.
+    Main application runs when this is done
+    '''
+    def run(self):
+        import veusz.setting
+        import veusz.widgets
+        import veusz.utils.vzdbus as vzdbus
+
+        vzdbus.setup()
+
+class AppRunner(qt4.QObject):
+    '''Object to run application. We have to do this to get an
+    event loop while importing, etc.'''
+
+    def __init__(self, app, options, args):
+
+        qt4.QObject.__init__(self)
+
+        self.splash = None
+        if not (options.listen or options.export):
+            # show the splash screen on normal start
+            self.splash = qt4.QSplashScreen(makeSplashLogo())
+            self.splash.show()
+
+        self.app = app
+        self.options = options
+        self.args = args
+
+        self.thread = ImportThread()
+        self.connect( self.thread, qt4.SIGNAL('finished()'),
+                      self.slotStartApplication )
+        self.thread.start()
+
+        # optionally load a translation
+        if options.translation:
+            trans = qt4.QTranslator()
+            trans.load(options.translation)
+            app.installTranslator(trans)
+
+    def slotStartApplication(self):
+        '''Main start of application.'''
+
+        options = self.options
+        args = self.args
+
+        import veusz.document
+        import veusz.setting
+
+        # for people who want to run any old script
+        veusz.setting.transient_settings['unsafe_mode'] = bool(
+            options.unsafe_mode)
+
+        # load any requested plugins
+        if options.plugin:
+            veusz.document.Document.loadPlugins(pluginlist=options.plugin)
+
+        # different modes
+        if options.listen:
+            # listen to incoming commands
+            listen(args, quiet=options.quiet)
+        elif options.export:
+            # export files to make images
+            if len(options.export) != len(args)-1:
+                parser.error(
+                    'export option needs same number of documents and '
+                    'output files')
+            export(options.export, args)
+            self.app.quit()
+        else:
+            # standard start main window
+            mainwindow(args)
+
+        # clear splash when startup done
+        if self.splash is not None:
+            self.splash.finish(self.app.topLevelWidgets()[0])
+
 def run():
     '''Run the main application.'''
 
@@ -145,8 +221,8 @@ def run():
     # is shown
 
     app = qt4.QApplication(sys.argv)
-    app.connect(app, qt4.SIGNAL("lastWindowClosed()"),
-                app, qt4.SLOT("quit()"))
+    app.connect(app, qt4.SIGNAL('lastWindowClosed()'),
+                app, qt4.SLOT('quit()'))
     sys.excepthook = excepthook
 
     # register a signal handler to catch ctrl+C
@@ -154,7 +230,7 @@ def run():
 
     # parse command line options
     parser = optparse.OptionParser(
-        usage="%prog [options] filename.vsz ...",
+        usage='%prog [options] filename.vsz ...',
         version=copyr % utils.version())
     parser.add_option('--unsafe-mode', action='store_true',
                       help='disable safety checks when running documents'
@@ -180,56 +256,7 @@ def run():
     # convert args to unicode from filesystem strings
     args = convertArgsUnicode(args)
 
-    splash = None
-    if not (options.listen or options.export):
-        # show the splash screen on normal start
-        splash = qt4.QSplashScreen(makeSplashLogo())
-        splash.show()
-        splash.showMessage(" ")
-        app.processEvents()
-
-    # optionally load a translation
-    if options.translation:
-        trans = qt4.QTranslator()
-        trans.load(options.translation)
-        app.installTranslator(trans)
-
-    # import these after showing splash screen so we don't
-    # have too long a wait before it shows
-    import veusz.setting
-    import veusz.widgets
-    import veusz.utils.vzdbus as vzdbus
-    vzdbus.setup()
-
-    # for people who want to run any old script
-    veusz.setting.transient_settings['unsafe_mode'] = bool(
-        options.unsafe_mode)
-
-    # load any requested plugins
-    if options.plugin:
-        import veusz.document
-        veusz.document.Document.loadPlugins(pluginlist=options.plugin)
-
-    # different modes
-    if options.listen:
-        # listen to incoming commands
-        listen(args, quiet=options.quiet)
-    elif options.export:
-        # export files to make images
-        if len(options.export) != len(args)-1:
-            parser.error(
-                'export option needs same number of documents and output files')
-        export(options.export, args)
-        return
-    else:
-        # standard start main window
-        mainwindow(args)
-
-    # clear splash when startup done
-    if splash is not None:
-        splash.finish(app.topLevelWidgets()[0])
-
-    # wait for application to exit
+    s = AppRunner(app, options, args)
     app.exec_()
 
 # if ran as a program
