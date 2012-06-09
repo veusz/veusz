@@ -147,15 +147,15 @@ def formatLocals(exception):
             # print out attributes if item is self
             if key == 'self' and value not in alreadyself:
                 alreadyself.add(value)
-                for sattr, svalue in value.__dict__.iteritems():
+                for attr in sorted( dir(value) ):
                     try:
-                        sv = repr(svalue)
+                        sv = repr( getattr(value, attr) )
                     except:
                         sv = '<???>'
                     if len(sv) > 128:
                         sv = sv[:120] + '...'
 
-                    outlines.append('  self.%s = %s' % (sattr, sv))
+                    outlines.append('  self.%s = %s' % (attr, sv))
 
     return '\n'.join(outlines)
 
