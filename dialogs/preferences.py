@@ -26,6 +26,20 @@ def _(text, disambiguation=None, context="PrefsDialog"):
     return unicode(
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
+# names for display of colors and a longer description
+color_names = {
+    'page': (_('Page'),
+             _('Page background color')),
+    'error': (_('Error'),
+              _('Color for errors')),
+    'command': (_('Console command'),
+                _('Commands in the console window color')),
+    'cntrlline': (_('Control line'),
+                  _('Color of lines controlling widgets')),
+    'cntrlcorner': (_('Control corner'),
+                    _('Color of corners controlling widgets')),
+    }
+
 class PreferencesDialog(VeuszDialog):
     """Preferences dialog."""
 
@@ -126,7 +140,7 @@ class PreferencesDialog(VeuszDialog):
             self.chosencolors[colname] = qt4.QColor(colval)
 
             # label
-            name, tooltip = setdb.color_names[colname]
+            name, tooltip = color_names[colname]
             label = qt4.QLabel(name)
             label.setToolTip(tooltip)
             layout.addWidget(label, row, 0)

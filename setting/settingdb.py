@@ -79,14 +79,6 @@ class _SettingDB(object):
 
     # list of colors
     colors = ('page', 'error', 'command', 'cntrlline', 'cntrlcorner')
-    # names for display of colors and a longer description
-    color_names = {
-        'page': (_('Page'), _('Page background color')),
-        'error': (_('Error'), _('Color for errors')),
-        'command': (_('Console command'), _('Commands in the console window color')),
-        'cntrlline': (_('Control line'), _('Color of lines controlling widgets')),
-        'cntrlcorner': (_('Control corner'), _('Color of corners controlling widgets')),
-        }
     # default colors if isdefault is set in the setting
     color_defaults = {
         'page': 'LightBase',
