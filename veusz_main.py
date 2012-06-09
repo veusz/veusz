@@ -145,7 +145,7 @@ class AppRunner(qt4.QObject):
     '''Object to run application. We have to do this to get an
     event loop while importing, etc.'''
 
-    def __init__(self, app, options, args):
+    def __init__(self, options, args):
 
         qt4.QObject.__init__(self)
 
@@ -155,20 +155,19 @@ class AppRunner(qt4.QObject):
             self.splash = qt4.QSplashScreen(makeSplashLogo())
             self.splash.show()
 
-        self.app = app
         self.options = options
         self.args = args
-
-        self.thread = ImportThread()
-        self.connect( self.thread, qt4.SIGNAL('finished()'),
-                      self.slotStartApplication )
-        self.thread.start()
 
         # optionally load a translation
         if options.translation:
             trans = qt4.QTranslator()
             trans.load(options.translation)
-            app.installTranslator(trans)
+            qt4.qApp.installTranslator(trans)
+
+        self.thread = ImportThread()
+        self.connect( self.thread, qt4.SIGNAL('finished()'),
+                      self.slotStartApplication )
+        self.thread.start()
 
     def slotStartApplication(self):
         '''Main start of application.'''
@@ -198,14 +197,14 @@ class AppRunner(qt4.QObject):
                     'export option needs same number of documents and '
                     'output files')
             export(options.export, args)
-            self.app.quit()
+            qt4.qApp.quit()
         else:
             # standard start main window
             mainwindow(args)
 
         # clear splash when startup done
         if self.splash is not None:
-            self.splash.finish(self.app.topLevelWidgets()[0])
+            self.splash.finish(qt4.qApp.topLevelWidgets()[0])
 
 def run():
     '''Run the main application.'''
@@ -256,7 +255,7 @@ def run():
     # convert args to unicode from filesystem strings
     args = convertArgsUnicode(args)
 
-    s = AppRunner(app, options, args)
+    s = AppRunner(options, args)
     app.exec_()
 
 # if ran as a program
