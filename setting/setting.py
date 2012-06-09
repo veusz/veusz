@@ -703,39 +703,39 @@ class Distance(Setting):
     # match a distance
     distre = re.compile(distre_expr, re.VERBOSE)
 
-    # functions to convert from unit values to pixels
+    # functions to convert from unit values to points
     unit_func = {
         'cm': lambda match, painter:
-            _distPhys(match, painter, 28.452756),
+            _distPhys(match, painter, 720/25.4),
         'pt': lambda match, painter:
             _distPhys(match, painter, 1.),
         'mm': lambda match, painter:
-            _distPhys(match, painter, 2.8452756),
+            _distPhys(match, painter, 72/25.4),
         'in': lambda match, painter:
-            _distPhys(match, painter, 72.27),
+            _distPhys(match, painter, 72.),
         'inch': lambda match, painter:
-            _distPhys(match, painter, 72.27),
+            _distPhys(match, painter, 72.),
         '"': lambda match, painter:
-            _distPhys(match, painter, 72.27),
+            _distPhys(match, painter, 72.),
         '%': _distPerc,
         '/': _distFrac,
         '': _distRatio
         }
 
-    # inverse functions for converting pixels to units
+    # inverse functions for converting pixels to points
     inv_unit_func = {
         'cm': lambda match, painter:
-            _distInvPhys(match, painter, 28.452756, 'cm'),
+            _distInvPhys(match, painter, 720/25.4, 'cm'),
         'pt': lambda match, painter:
             _distInvPhys(match, painter, 1., 'pt'),
         'mm': lambda match, painter:
-            _distInvPhys(match, painter, 2.8452756, 'mm'),
+            _distInvPhys(match, painter, 72/25.4, 'mm'),
         'in': lambda match, painter:
-            _distInvPhys(match, painter, 72.27, 'in'),
+            _distInvPhys(match, painter, 72., 'in'),
         'inch': lambda match, painter:
-            _distInvPhys(match, painter, 72.27, 'in'),
+            _distInvPhys(match, painter, 72., 'in'),
         '"': lambda match, painter:
-            _distInvPhys(match, painter, 72.27, 'in'),
+            _distInvPhys(match, painter, 72., 'in'),
         '%': _distInvPerc,
         '/': _distInvPerc,
         '': _distInvPerc

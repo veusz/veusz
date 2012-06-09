@@ -1,128 +1,128 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="515.7px" height="426.7px" version="1.1"
+<svg width="513.7px" height="425.1px" version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
 <defs>
 <clipPath id="c0">
-<path d="m0,0l515.7,0l0,426.7l-515.7,0l0,-426.7"/>
+<path d="m0,0l513.7,0l0,425.1l-513.7,0l0,-425.1"/>
 </clipPath>
 <clipPath id="c1">
-<path d="m46.2,7.1l462.3,0l0,373.4l-462.3,0l0,-373.4"/>
+<path d="m46,7l460.6,0l0,372l-460.6,0l0,-372"/>
 </clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
 <g fill="#fffeea" stroke-width="0.6">
-<path d="m46.2,7.1l462.3,0l0,373.4l-462.3,0l0,-373.4"/>
+<path d="m46,7l460.6,0l0,372l-460.6,0l0,-372"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
 <g fill="#ff00ff" stroke="none" stroke-linejoin="miter" stroke-width="1">
-<g transform="translate(69.3,99.8)">
+<g transform="translate(69,99.4)">
 <path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
 </g>
-<use xlink:href="#p0" x="69.3" y="49.6"/>
-<use xlink:href="#p0" x="69.3" y="81.1"/>
-<use xlink:href="#p0" x="69.3" y="63.6"/>
-<use xlink:href="#p0" x="69.3" y="117.5"/>
-<use xlink:href="#p0" x="69.3" y="123.7"/>
-<use xlink:href="#p0" x="69.3" y="139.5"/>
-<use xlink:href="#p0" x="69.3" y="105.3"/>
-<use xlink:href="#p0" x="69.3" y="122.1"/>
-<use xlink:href="#p0" x="69.3" y="124.6"/>
+<use xlink:href="#p0" x="69" y="49.5"/>
+<use xlink:href="#p0" x="69" y="80.8"/>
+<use xlink:href="#p0" x="69" y="63.4"/>
+<use xlink:href="#p0" x="69" y="117.1"/>
+<use xlink:href="#p0" x="69" y="123.3"/>
+<use xlink:href="#p0" x="69" y="139"/>
+<use xlink:href="#p0" x="69" y="104.9"/>
+<use xlink:href="#p0" x="69" y="121.7"/>
+<use xlink:href="#p0" x="69" y="124.1"/>
 </g>
 <g fill="#0000ff" stroke="none" stroke-linejoin="miter" stroke-width="1">
-<g transform="translate(485.4,138)">
+<g transform="translate(483.6,137.5)">
 <path d="m-2.2,4.1l2.2,-2.2l2.2,2.2l1.9,-1.9l-2.2,-2.2l2.2,-2.2l-1.9,-1.9l-2.2,2.2l-2.2,-2.2l-1.9,1.9l2.2,2.2l-2.2,2.2l1.9,1.9" id="p1"/>
 </g>
-<use xlink:href="#p1" x="485.4" y="303.5"/>
-<use xlink:href="#p1" x="485.4" y="293.4"/>
-<use xlink:href="#p1" x="485.4" y="244.3"/>
-<use xlink:href="#p1" x="485.4" y="349.1"/>
-<use xlink:href="#p1" x="485.4" y="79.7"/>
-<use xlink:href="#p1" x="485.4" y="38"/>
-<use xlink:href="#p1" x="485.4" y="121.9"/>
-<use xlink:href="#p1" x="485.4" y="251.2"/>
-<use xlink:href="#p1" x="485.4" y="33.4"/>
+<use xlink:href="#p1" x="483.6" y="302.4"/>
+<use xlink:href="#p1" x="483.6" y="292.3"/>
+<use xlink:href="#p1" x="483.6" y="243.4"/>
+<use xlink:href="#p1" x="483.6" y="347.8"/>
+<use xlink:href="#p1" x="483.6" y="79.4"/>
+<use xlink:href="#p1" x="483.6" y="37.9"/>
+<use xlink:href="#p1" x="483.6" y="121.4"/>
+<use xlink:href="#p1" x="483.6" y="250.3"/>
+<use xlink:href="#p1" x="483.6" y="33.2"/>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M161.8,61l0,66.4"/>
-<path d="M132.9,61l57.7,0"/>
-<path d="M132.9,127.4l57.7,0"/>
+<path d="M161.2,60.7l0,66.2"/>
+<path d="M132.4,60.7l57.5,0"/>
+<path d="M132.4,126.9l57.5,0"/>
 </g>
 <g fill="#ffffff" stroke="none" stroke-width="1">
-<path d="m104,123.3l115.5,0l0,-37.5l-115.5,0l0,37.5" id="p2"/>
+<path d="m103.6,122.9l115.1,0l0,-37.4l-115.1,0l0,37.4" id="p2"/>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M104,111.4l115.5,0"/>
+<path d="M103.6,111l115.1,0"/>
 </g>
 <g fill="none" stroke-width="1.2">
 <use xlink:href="#p2"/>
 </g>
 <g fill="#ffffff" stroke-linejoin="miter" stroke-width="1.2">
-<use xlink:href="#p0" x="161.8" y="139.5"/>
-<use xlink:href="#p0" x="161.8" y="49.6"/>
+<use xlink:href="#p0" x="161.2" y="139"/>
+<use xlink:href="#p0" x="161.2" y="49.5"/>
 </g>
 <g fill="none" stroke-linejoin="miter" stroke-width="1.2">
-<g transform="translate(161.8,102.7)">
+<g transform="translate(161.2,102.3)">
 <path d="m-2.6,-2.6l5.3,5.3m-5.3,0l5.3,-5.3" id="p4"/>
 </g>
 </g>
 <g fill="#ffffff" stroke-linecap="butt" stroke-width="1.2">
-<path d="M393,37.2l0,275"/>
-<path d="M364.1,37.2l57.7,0"/>
-<path d="M364.1,312.2l57.7,0"/>
+<path d="M391.5,37l0,274"/>
+<path d="M362.7,37l57.5,0"/>
+<path d="M362.7,311l57.5,0"/>
 </g>
 <g fill="#ffffff" stroke="none" stroke-width="1">
-<path d="m335.2,282.8l115.5,0l0,-192.5l-115.5,0l0,192.5" id="p3"/>
+<path d="m333.9,281.8l115.1,0l0,-191.8l-115.1,0l0,191.8" id="p3"/>
 </g>
 <g fill="#ffffff" stroke-linecap="butt" stroke-width="1.2">
-<path d="M335.2,191.2l115.5,0"/>
+<path d="M333.9,190.4l115.1,0"/>
 </g>
 <g fill="none" stroke-width="1.2">
 <use xlink:href="#p3"/>
 </g>
 <g fill="#ffffff" stroke-linejoin="miter" stroke-width="1.2">
-<use xlink:href="#p0" x="393" y="349.1"/>
-<use xlink:href="#p0" x="393" y="33.4"/>
+<use xlink:href="#p0" x="391.5" y="347.8"/>
+<use xlink:href="#p0" x="391.5" y="33.2"/>
 </g>
 <g fill="none" stroke-linejoin="miter" stroke-width="1.2">
-<use xlink:href="#p4" x="393" y="185.3"/>
+<use xlink:href="#p4" x="391.5" y="184.6"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M46.2,380.5l0,-373.4"/>
-<path d="M46.2,380.5l3.7,0M46.2,361.8l3.7,0M46.2,343.2l3.7,0M46.2,324.5l3.7,0M46.2,305.8l3.7,0M46.2,287.1l3.7,0M46.2,268.5l3.7,0M46.2,249.8l3.7,0M46.2,231.1l3.7,0M46.2,212.5l3.7,0M46.2,193.8l3.7,0M46.2,175.1l3.7,0M46.2,156.4l3.7,0M46.2,137.8l3.7,0M46.2,119.1l3.7,0M46.2,100.4l3.7,0M46.2,81.8l3.7,0M46.2,63.1l3.7,0M46.2,44.4l3.7,0M46.2,25.7l3.7,0M46.2,7.1l3.7,0"/>
-<path d="M46.2,380.5l7.5,0M46.2,287.1l7.5,0M46.2,193.8l7.5,0M46.2,100.4l7.5,0M46.2,7.1l7.5,0"/>
-<path d="M508.5,380.5l0,-373.4"/>
-<path d="M508.5,380.5l-3.7,0M508.5,361.8l-3.7,0M508.5,343.2l-3.7,0M508.5,324.5l-3.7,0M508.5,305.8l-3.7,0M508.5,287.1l-3.7,0M508.5,268.5l-3.7,0M508.5,249.8l-3.7,0M508.5,231.1l-3.7,0M508.5,212.5l-3.7,0M508.5,193.8l-3.7,0M508.5,175.1l-3.7,0M508.5,156.4l-3.7,0M508.5,137.8l-3.7,0M508.5,119.1l-3.7,0M508.5,100.4l-3.7,0M508.5,81.8l-3.7,0M508.5,63.1l-3.7,0M508.5,44.4l-3.7,0M508.5,25.7l-3.7,0M508.5,7.1l-3.7,0"/>
-<path d="M508.5,380.5l-7.5,0M508.5,287.1l-7.5,0M508.5,193.8l-7.5,0M508.5,100.4l-7.5,0M508.5,7.1l-7.5,0"/>
+<path d="M46,379.1l0,-372"/>
+<path d="M46,379.1l3.7,0M46,360.5l3.7,0M46,341.9l3.7,0M46,323.3l3.7,0M46,304.7l3.7,0M46,286.1l3.7,0M46,267.5l3.7,0M46,248.9l3.7,0M46,230.3l3.7,0M46,211.7l3.7,0M46,193.1l3.7,0M46,174.5l3.7,0M46,155.9l3.7,0M46,137.3l3.7,0M46,118.7l3.7,0M46,100l3.7,0M46,81.4l3.7,0M46,62.8l3.7,0M46,44.2l3.7,0M46,25.6l3.7,0M46,7l3.7,0"/>
+<path d="M46,379.1l7.5,0M46,286.1l7.5,0M46,193.1l7.5,0M46,100l7.5,0M46,7l7.5,0"/>
+<path d="M506.6,379.1l0,-372"/>
+<path d="M506.6,379.1l-3.7,0M506.6,360.5l-3.7,0M506.6,341.9l-3.7,0M506.6,323.3l-3.7,0M506.6,304.7l-3.7,0M506.6,286.1l-3.7,0M506.6,267.5l-3.7,0M506.6,248.9l-3.7,0M506.6,230.3l-3.7,0M506.6,211.7l-3.7,0M506.6,193.1l-3.7,0M506.6,174.5l-3.7,0M506.6,155.9l-3.7,0M506.6,137.3l-3.7,0M506.6,118.7l-3.7,0M506.6,100l-3.7,0M506.6,81.4l-3.7,0M506.6,62.8l-3.7,0M506.6,44.2l-3.7,0M506.6,25.6l-3.7,0M506.6,7l-3.7,0"/>
+<path d="M506.6,379.1l-7.5,0M506.6,286.1l-7.5,0M506.6,193.1l-7.5,0M506.6,100l-7.5,0M506.6,7l-7.5,0"/>
 </g>
 <g fill="none" stroke-width="1">
-<g transform="matrix(0 -1 1 0 16.4 268.2)">
+<g transform="matrix(0 -1 1 0 16.3 267.4)">
 <text x="0" y="0" font-size="14pt" fill="#000000">Number of insects</text>
 </g>
-<text x="33.9" y="389.3" font-size="14pt" fill="#000000">0</text>
-<text x="33.9" y="295.9" font-size="14pt" fill="#000000">5</text>
-<text x="25.2" y="202.5" font-size="14pt" fill="#000000">10</text>
-<text x="25.2" y="109.2" font-size="14pt" fill="#000000">15</text>
-<text x="25.2" y="21" font-size="14pt" fill="#000000">20</text>
+<text x="33.8" y="387.8" font-size="14pt" fill="#000000">0</text>
+<text x="33.8" y="294.8" font-size="14pt" fill="#000000">5</text>
+<text x="25" y="201.8" font-size="14pt" fill="#000000">10</text>
+<text x="25" y="108.8" font-size="14pt" fill="#000000">15</text>
+<text x="25" y="21" font-size="14pt" fill="#000000">20</text>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M46.2,380.5l462.3,0"/>
-<path d="M46.2,380.5l0,-3.7M69.3,380.5l0,-3.7M92.4,380.5l0,-3.7M115.5,380.5l0,-3.7M138.7,380.5l0,-3.7M161.8,380.5l0,-3.7M184.9,380.5l0,-3.7M208,380.5l0,-3.7M231.1,380.5l0,-3.7M254.2,380.5l0,-3.7M277.4,380.5l0,-3.7M300.5,380.5l0,-3.7M323.6,380.5l0,-3.7M346.7,380.5l0,-3.7M369.8,380.5l0,-3.7M393,380.5l0,-3.7M416.1,380.5l0,-3.7M439.2,380.5l0,-3.7M462.3,380.5l0,-3.7M485.4,380.5l0,-3.7M508.5,380.5l0,-3.7"/>
-<path d="M46.2,380.5l0,-7.5M161.8,380.5l0,-7.5M277.4,380.5l0,-7.5M393,380.5l0,-7.5M508.5,380.5l0,-7.5"/>
-<path d="M46.2,7.1l462.3,0"/>
-<path d="M46.2,7.1l0,3.7M69.3,7.1l0,3.7M92.4,7.1l0,3.7M115.5,7.1l0,3.7M138.7,7.1l0,3.7M161.8,7.1l0,3.7M184.9,7.1l0,3.7M208,7.1l0,3.7M231.1,7.1l0,3.7M254.2,7.1l0,3.7M277.4,7.1l0,3.7M300.5,7.1l0,3.7M323.6,7.1l0,3.7M346.7,7.1l0,3.7M369.8,7.1l0,3.7M393,7.1l0,3.7M416.1,7.1l0,3.7M439.2,7.1l0,3.7M462.3,7.1l0,3.7M485.4,7.1l0,3.7M508.5,7.1l0,3.7"/>
-<path d="M46.2,7.1l0,7.5M161.8,7.1l0,7.5M277.4,7.1l0,7.5M393,7.1l0,7.5M508.5,7.1l0,7.5"/>
+<path d="M46,379.1l460.6,0"/>
+<path d="M46,379.1l0,-3.7M69,379.1l0,-3.7M92.1,379.1l0,-3.7M115.1,379.1l0,-3.7M138.1,379.1l0,-3.7M161.2,379.1l0,-3.7M184.2,379.1l0,-3.7M207.2,379.1l0,-3.7M230.3,379.1l0,-3.7M253.3,379.1l0,-3.7M276.3,379.1l0,-3.7M299.4,379.1l0,-3.7M322.4,379.1l0,-3.7M345.4,379.1l0,-3.7M368.5,379.1l0,-3.7M391.5,379.1l0,-3.7M414.5,379.1l0,-3.7M437.5,379.1l0,-3.7M460.6,379.1l0,-3.7M483.6,379.1l0,-3.7M506.6,379.1l0,-3.7"/>
+<path d="M46,379.1l0,-7.5M161.2,379.1l0,-7.5M276.3,379.1l0,-7.5M391.5,379.1l0,-7.5M506.6,379.1l0,-7.5"/>
+<path d="M46,7l460.6,0"/>
+<path d="M46,7l0,3.7M69,7l0,3.7M92.1,7l0,3.7M115.1,7l0,3.7M138.1,7l0,3.7M161.2,7l0,3.7M184.2,7l0,3.7M207.2,7l0,3.7M230.3,7l0,3.7M253.3,7l0,3.7M276.3,7l0,3.7M299.4,7l0,3.7M322.4,7l0,3.7M345.4,7l0,3.7M368.5,7l0,3.7M391.5,7l0,3.7M414.5,7l0,3.7M437.5,7l0,3.7M460.6,7l0,3.7M483.6,7l0,3.7M506.6,7l0,3.7"/>
+<path d="M46,7l0,7.5M161.2,7l0,7.5M276.3,7l0,7.5M391.5,7l0,7.5M506.6,7l0,7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="139.3" y="387.3" font-size="18pt" fill="#000000">Bees</text>
-<text x="336.7" y="387.3" font-size="18pt" fill="#000000">Butterflys</text>
+<text x="138.7" y="385.8" font-size="18pt" fill="#000000">Bees</text>
+<text x="335.2" y="385.8" font-size="18pt" fill="#000000">Butterflys</text>
 </g>
 </g>
 </g>

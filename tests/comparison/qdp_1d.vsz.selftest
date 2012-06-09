@@ -1,109 +1,109 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="533.4px" height="533.4px" version="1.1"
+<svg width="531.4px" height="531.4px" version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
 <defs>
 <clipPath id="c0">
-<path d="m0,0l533.4,0l0,533.4l-533.4,0l0,-533.4"/>
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
 </clipPath>
 <clipPath id="c1">
-<path d="m60.4,7.1l465.9,0l0,465.9l-465.9,0l0,-465.9"/>
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
 </clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
 <g fill="#ffffff" stroke-width="0.6">
-<path d="m60.4,7.1l465.9,0l0,465.9l-465.9,0l0,-465.9"/>
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
 </g>
 </g>
 <g clip-path="url(#c1)">
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M371,309.9l0,-23.2M448.7,245.8l0,-11.6"/>
+<path d="M369.6,308.7l0,-23.2M447,244.9l0,-11.6"/>
 </g>
 <g fill="none" stroke-width="0.6">
-<polyline fill="none" points="371,298.3 448.7,240"/>
+<polyline fill="none" points="369.6,297.1 447,239.1"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
-<g transform="translate(371,298.3)">
+<g transform="translate(369.6,297.1)">
 <path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
 </g>
-<use xlink:href="#p0" x="448.7" y="240"/>
+<use xlink:href="#p0" x="447" y="239.1"/>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M60.4,187.6l0,-11.6M138.1,309.9l0,-23.2M215.7,245.8l0,-11.6"/>
+<path d="M60.2,186.9l0,-11.6M137.5,308.7l0,-23.2M214.9,244.9l0,-11.6"/>
 </g>
 <g fill="none" stroke-width="0.6">
-<polyline fill="none" points="60.4,181.8 138.1,298.3 215.7,240"/>
+<polyline fill="none" points="60.2,181.1 137.5,297.1 214.9,239.1"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="60.4" y="181.8"/>
-<use xlink:href="#p0" x="138.1" y="298.3"/>
-<use xlink:href="#p0" x="215.7" y="240"/>
+<use xlink:href="#p0" x="60.2" y="181.1"/>
+<use xlink:href="#p0" x="137.5" y="297.1"/>
+<use xlink:href="#p0" x="214.9" y="239.1"/>
 </g>
 <g fill="none" stroke-width="0.6">
-<polyline fill="none" points="60.4,298.3 138.1,240"/>
+<polyline fill="none" points="60.2,297.1 137.5,239.1"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="60.4" y="298.3"/>
-<use xlink:href="#p0" x="138.1" y="240"/>
+<use xlink:href="#p0" x="60.2" y="297.1"/>
+<use xlink:href="#p0" x="137.5" y="239.1"/>
 </g>
 <g fill="#000000" stroke-width="0.6">
-<polyline fill="none" points="371,7.1 526.3,414.7"/>
+<polyline fill="none" points="369.6,7 524.4,413.2"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="371" y="7.1"/>
-<use xlink:href="#p0" x="526.3" y="414.7"/>
+<use xlink:href="#p0" x="369.6" y="7"/>
+<use xlink:href="#p0" x="524.4" y="413.2"/>
 </g>
 <g fill="none" stroke-width="0.6">
-<polyline fill="none" points="60.4,356.5 138.1,123.5"/>
+<polyline fill="none" points="60.2,355.2 137.5,123.1"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="60.4" y="356.5"/>
-<use xlink:href="#p0" x="138.1" y="123.5"/>
+<use xlink:href="#p0" x="60.2" y="355.2"/>
+<use xlink:href="#p0" x="137.5" y="123.1"/>
 </g>
 <g fill="#000000" stroke-width="0.6">
-<polyline fill="none" points="371,123.5 526.3,356.5"/>
+<polyline fill="none" points="369.6,123.1 524.4,355.2"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="371" y="123.5"/>
-<use xlink:href="#p0" x="526.3" y="356.5"/>
+<use xlink:href="#p0" x="369.6" y="123.1"/>
+<use xlink:href="#p0" x="524.4" y="355.2"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M60.4,473l0,-465.9"/>
-<path d="M60.4,473l3.7,0M60.4,443.9l3.7,0M60.4,414.7l3.7,0M60.4,385.6l3.7,0M60.4,356.5l3.7,0M60.4,327.4l3.7,0M60.4,298.3l3.7,0M60.4,269.1l3.7,0M60.4,240l3.7,0M60.4,210.9l3.7,0M60.4,181.8l3.7,0M60.4,152.7l3.7,0M60.4,123.5l3.7,0M60.4,94.4l3.7,0M60.4,65.3l3.7,0M60.4,36.2l3.7,0M60.4,7.1l3.7,0"/>
-<path d="M60.4,473l7.5,0M60.4,356.5l7.5,0M60.4,240l7.5,0M60.4,123.5l7.5,0M60.4,7.1l7.5,0"/>
-<path d="M526.3,473l0,-465.9"/>
-<path d="M526.3,473l-3.7,0M526.3,443.9l-3.7,0M526.3,414.7l-3.7,0M526.3,385.6l-3.7,0M526.3,356.5l-3.7,0M526.3,327.4l-3.7,0M526.3,298.3l-3.7,0M526.3,269.1l-3.7,0M526.3,240l-3.7,0M526.3,210.9l-3.7,0M526.3,181.8l-3.7,0M526.3,152.7l-3.7,0M526.3,123.5l-3.7,0M526.3,94.4l-3.7,0M526.3,65.3l-3.7,0M526.3,36.2l-3.7,0M526.3,7.1l-3.7,0"/>
-<path d="M526.3,473l-7.5,0M526.3,356.5l-7.5,0M526.3,240l-7.5,0M526.3,123.5l-7.5,0M526.3,7.1l-7.5,0"/>
+<path d="M60.2,471.2l0,-464.1"/>
+<path d="M60.2,471.2l3.7,0M60.2,442.2l3.7,0M60.2,413.2l3.7,0M60.2,384.2l3.7,0M60.2,355.2l3.7,0M60.2,326.2l3.7,0M60.2,297.1l3.7,0M60.2,268.1l3.7,0M60.2,239.1l3.7,0M60.2,210.1l3.7,0M60.2,181.1l3.7,0M60.2,152.1l3.7,0M60.2,123.1l3.7,0M60.2,94.1l3.7,0M60.2,65.1l3.7,0M60.2,36l3.7,0M60.2,7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,355.2l7.5,0M60.2,239.1l7.5,0M60.2,123.1l7.5,0M60.2,7l7.5,0"/>
+<path d="M524.4,471.2l0,-464.1"/>
+<path d="M524.4,471.2l-3.7,0M524.4,442.2l-3.7,0M524.4,413.2l-3.7,0M524.4,384.2l-3.7,0M524.4,355.2l-3.7,0M524.4,326.2l-3.7,0M524.4,297.1l-3.7,0M524.4,268.1l-3.7,0M524.4,239.1l-3.7,0M524.4,210.1l-3.7,0M524.4,181.1l-3.7,0M524.4,152.1l-3.7,0M524.4,123.1l-3.7,0M524.4,94.1l-3.7,0M524.4,65.1l-3.7,0M524.4,36l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,355.2l-7.5,0M524.4,239.1l-7.5,0M524.4,123.1l-7.5,0M524.4,7l-7.5,0"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="48.2" y="481.7" font-size="14pt" fill="#000000">0</text>
-<text x="48.2" y="365.2" font-size="14pt" fill="#000000">2</text>
-<text x="48.2" y="248.8" font-size="14pt" fill="#000000">4</text>
-<text x="48.2" y="132.3" font-size="14pt" fill="#000000">6</text>
-<text x="48.2" y="21" font-size="14pt" fill="#000000">8</text>
+<text x="47.9" y="480" font-size="14pt" fill="#000000">0</text>
+<text x="47.9" y="363.9" font-size="14pt" fill="#000000">2</text>
+<text x="47.9" y="247.9" font-size="14pt" fill="#000000">4</text>
+<text x="47.9" y="131.8" font-size="14pt" fill="#000000">6</text>
+<text x="47.9" y="21" font-size="14pt" fill="#000000">8</text>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M60.4,473l465.9,0"/>
-<path d="M60.4,473l0,-3.7M99.2,473l0,-3.7M138.1,473l0,-3.7M176.9,473l0,-3.7M215.7,473l0,-3.7M254.5,473l0,-3.7M293.4,473l0,-3.7M332.2,473l0,-3.7M371,473l0,-3.7M409.8,473l0,-3.7M448.7,473l0,-3.7M487.5,473l0,-3.7M526.3,473l0,-3.7"/>
-<path d="M60.4,473l0,-7.5M138.1,473l0,-7.5M215.7,473l0,-7.5M293.4,473l0,-7.5M371,473l0,-7.5M448.7,473l0,-7.5M526.3,473l0,-7.5"/>
-<path d="M60.4,7.1l465.9,0"/>
-<path d="M60.4,7.1l0,3.7M99.2,7.1l0,3.7M138.1,7.1l0,3.7M176.9,7.1l0,3.7M215.7,7.1l0,3.7M254.5,7.1l0,3.7M293.4,7.1l0,3.7M332.2,7.1l0,3.7M371,7.1l0,3.7M409.8,7.1l0,3.7M448.7,7.1l0,3.7M487.5,7.1l0,3.7M526.3,7.1l0,3.7"/>
-<path d="M60.4,7.1l0,7.5M138.1,7.1l0,7.5M215.7,7.1l0,7.5M293.4,7.1l0,7.5M371,7.1l0,7.5M448.7,7.1l0,7.5M526.3,7.1l0,7.5"/>
+<path d="M60.2,471.2l464.1,0"/>
+<path d="M60.2,471.2l0,-3.7M98.9,471.2l0,-3.7M137.5,471.2l0,-3.7M176.2,471.2l0,-3.7M214.9,471.2l0,-3.7M253.6,471.2l0,-3.7M292.3,471.2l0,-3.7M331,471.2l0,-3.7M369.6,471.2l0,-3.7M408.3,471.2l0,-3.7M447,471.2l0,-3.7M485.7,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
+<path d="M60.2,471.2l0,-7.5M137.5,471.2l0,-7.5M214.9,471.2l0,-7.5M292.3,471.2l0,-7.5M369.6,471.2l0,-7.5M447,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
+<path d="M60.2,7l464.1,0"/>
+<path d="M60.2,7l0,3.7M98.9,7l0,3.7M137.5,7l0,3.7M176.2,7l0,3.7M214.9,7l0,3.7M253.6,7l0,3.7M292.3,7l0,3.7M331,7l0,3.7M369.6,7l0,3.7M408.3,7l0,3.7M447,7l0,3.7M485.7,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M60.2,7l0,7.5M137.5,7l0,7.5M214.9,7l0,7.5M292.3,7l0,7.5M369.6,7l0,7.5M447,7l0,7.5M524.4,7l0,7.5"/>
 </g>
 <g fill="none" stroke-width="1">
-<text x="56" y="478.2" font-size="14pt" fill="#000000">1</text>
-<text x="133.7" y="478.2" font-size="14pt" fill="#000000">2</text>
-<text x="211.3" y="478.2" font-size="14pt" fill="#000000">3</text>
-<text x="289" y="478.2" font-size="14pt" fill="#000000">4</text>
-<text x="366.6" y="478.2" font-size="14pt" fill="#000000">5</text>
-<text x="444.3" y="478.2" font-size="14pt" fill="#000000">6</text>
-<text x="522" y="478.2" font-size="14pt" fill="#000000">7</text>
+<text x="55.8" y="476.5" font-size="14pt" fill="#000000">1</text>
+<text x="133.2" y="476.5" font-size="14pt" fill="#000000">2</text>
+<text x="210.5" y="476.5" font-size="14pt" fill="#000000">3</text>
+<text x="287.9" y="476.5" font-size="14pt" fill="#000000">4</text>
+<text x="365.2" y="476.5" font-size="14pt" fill="#000000">5</text>
+<text x="442.6" y="476.5" font-size="14pt" fill="#000000">6</text>
+<text x="520" y="476.5" font-size="14pt" fill="#000000">7</text>
 </g>
 </g>
 </g>
