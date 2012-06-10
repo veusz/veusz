@@ -21,6 +21,7 @@
 
 import math
 import re
+import sys
 
 import numpy as N
 import veusz.qtall as qt4
@@ -961,7 +962,7 @@ class _MmlRenderer(_Renderer):
         self.size = qt4.QSize(1, 1)
         if not mmlsupport:
             self.mmldoc = None
-            self.document.log(_('Error: MathML support not built'))
+            sys.stderr.write('Error: MathML support not built\n')
             return
 
         self.mmldoc = doc = qtmml.QtMmlDocument()
@@ -969,8 +970,8 @@ class _MmlRenderer(_Renderer):
             self.mmldoc.setContent(text)
         except ValueError, e:
             self.mmldoc = None
-            self.document.log(_('Error interpreting MathML: %s') %
-                              unicode(e))
+            sys.stderr.write('Error interpreting MathML: %s\n' %
+                             unicode(e))
             return
 
         # this is pretty horrible :-(
@@ -1038,8 +1039,8 @@ class _MmlRenderer(_Renderer):
 mml_re = re.compile(r'^\s*<math.*</math\s*>\s*$', re.DOTALL)
 
 def Renderer(painter, font, x, y, text,
-             alignhorz = -1, alignvert = -1, angle = 0,
-             usefullheight = False):
+                alignhorz = -1, alignvert = -1, angle = 0,
+                usefullheight = False):
     """Return an appropriate Renderer object depending on the text.
     This looks like a class name, because it was a class originally.
 
