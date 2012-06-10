@@ -162,14 +162,15 @@ class CommandInterface(qt4.QObject):
 	constants), a function of 1 or more variables, or a function
 	imported from an external python module.
 
-        ctype is "constant", "function" or "import".
+        ctype is "constant", "function", "import" or "colormap".
 
-        name is name of constant, or "function(x, y, ...)" or module
-        name.
+        name is name of constant or colormap, "function(x, y, ...)"
+        or module name.
 
         val is definition for constant or function (both are
         _strings_), or is a list of symbols for a module (comma
-        separated items in a string).
+        separated items in a string). For a colormap, val is a list of
+        4-item tuples containing R,G,B,alpha values from 0 to 255.
 
         if mode is 'appendalways', the custom value is appended to the
         end of the list even if there is one with the same name. If
@@ -179,11 +180,15 @@ class CommandInterface(qt4.QObject):
         one appended to the end.
         """
 
-        if not isinstance(val, basestring):
-            raise RuntimeError, 'Value should be string'
+        if ctype == 'colormap':
+            self.document.validateProcessColormap(val)
+        else:
+            if not isinstance(val, basestring):
+                raise RuntimeError, 'Value should be string'
+
         if mode not in ('appendalways', 'append', 'replace'):
             raise RuntimeError, 'Invalid mode'
-        if ctype not in ('constant', 'import', 'function'):
+        if ctype not in ('constant', 'import', 'function', 'colormap'):
             raise RuntimeError, 'Invalid type'
 
         vals = list( self.document.customs )

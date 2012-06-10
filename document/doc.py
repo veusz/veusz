@@ -704,6 +704,48 @@ class Document( qt4.QObject ):
         else:
             self.log( _("Invalid module name '%s'") % module )
 
+    def validateProcessColormap(self, colormap):
+        """Validate and process a colormap value.
+
+        Returns a list of B,G,R,alpha tuples or raises ValueError if a problem."""
+
+        if len(colormap) < 2:
+            raise ValueError( _("Need at least two entries in colormap") )
+
+        out = []
+        for entry in colormap:
+            for v in entry:
+                try:
+                    v - 0
+                except TypeError:
+                    raise ValueError(
+                        _("Colormap entries should be numerical") )
+                if v < 0 or v > 255:
+                    raise ValueError(
+                        _("Colormap entries should be between 0 and 255") )
+
+            if len(entry) == 3:
+                out.append( (int(entry[2]), int(entry[1]), int(entry[0]),
+                             255) )
+            elif len(entry) == 4:
+                out.append( (int(entry[2]), int(entry[1]), int(entry[0]),
+                             int(entry[3])) )
+            else:
+                raise ValueError( _("Each colormap entry consists of R,G,B "
+                                    "and optionally alpha values") )
+
+        return tuple(out)
+
+    def _updateEvalContextColormap(self, name, val):
+        """Add a colormap entry."""
+
+        try:
+            cmap = self.validateProcessColormap(val)
+        except ValueError, e:
+            self.log( unicode(e) )
+        else:
+            self.colormaps[ unicode(name) ] = cmap
+
     def _updateEvalContextFuncOrConst(self, ctype, name, val):
         """Update a function or constant in eval function context."""
 
@@ -756,11 +798,12 @@ class Document( qt4.QObject ):
         # custom definitions
         for ctype, name, val in self.customs:
             name = name.strip()
-            val = val.strip()
             if ctype == 'constant' or ctype == 'function':
-                self._updateEvalContextFuncOrConst(ctype, name, val)
+                self._updateEvalContextFuncOrConst(ctype, name, val.strip())
             elif ctype == 'import':
-                self._updateEvalContextImport(name, val)
+                self._updateEvalContextImport(name, val.strip())
+            elif ctype == 'colormap':
+                self._updateEvalContextColormap(name, val)
             else:
                 raise ValueError, 'Invalid custom type'
 
