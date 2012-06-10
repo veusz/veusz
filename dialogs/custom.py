@@ -16,6 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+import ast
+
 import veusz.qtall as qt4
 import veusz.document as document
 from veuszdialog import VeuszDialog
@@ -45,13 +47,21 @@ class CustomItemModel(qt4.QAbstractTableModel):
     def data(self, index, role):
         """Lookup data in document customs list."""
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
-            d = self.document.customs[index.row()][index.column()]
-            return qt4.QVariant(d)
+            cust = self.document.customs[index.row()]
+            if cust[0] == 'colormap' and index.column() == 2:
+                # values are not a string
+                return qt4.QVariant( repr(cust[2]) )
+            else:
+                return qt4.QVariant( cust[index.column()] )
         elif role == qt4.Qt.ToolTipRole:
-            return (_('Constant, function or import'),
-                    _('Name for constant, function(arg1, arg2...) or module name'),
-                    _('Expression defining constant or function, '
-                      'or list of symbols to import from module'))[index.column()]
+            return (_('Constant, function, import or colormap'),
+                    _('Constant or colormap: enter name\n'
+                      'Function: enter functionname(arg1, arg2...)\n'
+                      'Import: enter module name'),
+                    _('Constant or function: expression giving value\n'
+                      'Import: comma or space separated list of symbols to import\n'
+                      'Colormap: (R,G,B[,alpha]) list surrounded by brackets, e.g. ((10,10,10), (20,20,20,128))'),
+                    )[index.column()]
 
         return qt4.QVariant()
 
@@ -114,7 +124,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
             value = unicode(value.toString())
 
             if col == 0:
-                ok = value in ('constant', 'function', 'import')
+                ok = value in ('constant', 'function', 'import', 'colormap')
             elif col == 1:
                 dtype = self.document.customs[row][0]
                 if dtype == 'constant':
@@ -123,8 +133,19 @@ class CustomItemModel(qt4.QAbstractTableModel):
                     ok = document.function_re.match(value) is not None
                 elif dtype == 'import':
                     ok = True
-            else:
-                ok = True
+                elif dtype == 'colormap':
+                    ok = value.strip() != ''
+            elif col == 2:
+                dtype = self.document.customs[row][0]
+                if dtype == 'colormap':
+                    try:
+                        value = ast.literal_eval(value)
+                    except ValueError:
+                        ok = False
+                    else:
+                        ok = True
+                else:
+                    ok = True
             if not ok:
                 return False
 
@@ -145,7 +166,7 @@ class ComboTypeDeligate(qt4.QItemDelegate):
     def createEditor(self, parent, option, index):
         """Create combobox for editing type."""
         w = qt4.QComboBox(parent)
-        w.addItems(['constant', 'function', 'import'])
+        w.addItems(['constant', 'function', 'import', 'colormap'])
         w.setFocusPolicy( qt4.Qt.StrongFocus )
         return w
 

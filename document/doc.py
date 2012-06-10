@@ -709,8 +709,11 @@ class Document( qt4.QObject ):
 
         Returns a list of B,G,R,alpha tuples or raises ValueError if a problem."""
 
-        if len(colormap) < 2:
-            raise ValueError( _("Need at least two entries in colormap") )
+        try:
+            if len(colormap) < 2:
+                raise ValueError( _("Need at least two entries in colormap") )
+        except TypeError:
+            raise ValueError( _("Invalid type for colormap") )
 
         out = []
         for entry in colormap:
@@ -801,7 +804,7 @@ class Document( qt4.QObject ):
             if ctype == 'constant' or ctype == 'function':
                 self._updateEvalContextFuncOrConst(ctype, name, val.strip())
             elif ctype == 'import':
-                self._updateEvalContextImport(name, val.strip())
+                self._updateEvalContextImport(name, val)
             elif ctype == 'colormap':
                 self._updateEvalContextColormap(name, val)
             else:

@@ -36,6 +36,7 @@ Changes in 1.16:
  * Add support for strings to be translated
  * Add "Sort" dataset plugin
  * Support for *args and **kwargs for custom functions
+ * Custom colormaps can be defined in the custom editing dialog
 
 Bug fixes:
  * Use correct definition of 1pt = 1/72in
