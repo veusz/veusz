@@ -1,0 +1,152 @@
+# Veusz saved document (version 1.15.99)
+# Saved at 2012-06-10T10:13:43.570573
+
+ImportString(u'x(numeric)','''
+1.000000e+00
+2.000000e+00
+3.000000e+00
+4.000000e+00
+5.000000e+00
+6.000000e+00
+7.000000e+00
+8.000000e+00
+''')
+ImportString(u'y1(numeric)','''
+4.000000e+00
+2.000000e+00
+6.000000e+00
+7.000000e+00
+3.000000e+00
+5.000000e+00
+7.000000e+00
+2.000000e+00
+''')
+ImportString(u'y2(numeric)','''
+1.000000e+00
+3.000000e+00
+2.000000e+00
+2.000000e+00
+3.000000e+00
+3.000000e+00
+1.000000e+00
+2.000000e+00
+''')
+ImportString(u'y3(numeric)','''
+5.000000e-01
+1.000000e+00
+3.000000e-01
+5.000000e-01
+7.000000e-01
+1.000000e+00
+1.500000e+00
+1.000000e+00
+''')
+Set('width', '12cm')
+Set('height', '15cm')
+Set('StyleSheet/Font/font', u'Georgia')
+Set('StyleSheet/bar/BarFill/fills', [('solid', '#5555ff', False), ('solid', '#00ffff', False), ('solid', '#00aaff', False)])
+Set('StyleSheet/graph/bottomMargin', u'0.3cm')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('grid', name='grid1', autoadd=False)
+To('grid1')
+Set('columns', 1)
+Set('leftMargin', u'0cm')
+Set('rightMargin', u'0cm')
+Set('topMargin', u'0.cm')
+Set('bottomMargin', u'1.cm')
+Add('graph', name=u'stackedarea', autoadd=False)
+To(u'stackedarea')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('autoRange', u'exact')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('min', 0.0)
+Set('direction', 'vertical')
+To('..')
+Add('key', name='key1', autoadd=False)
+To('key1')
+Set('Text/size', u'10pt')
+Set('horzPosn', 'centre')
+Set('vertPosn', 'bottom')
+Set('horzManual', 0.0)
+Set('vertManual', 0.0)
+To('..')
+Add('bar', name='bar1', autoadd=False)
+To('bar1')
+Set('lengths', (u'y1', u'y2', u'y3'))
+Set('posn', u'x')
+Set('mode', u'stacked-area')
+Set('keys', (u'Balloons', u'Slinkys', u'Jigsaws'))
+Set('BarLine/lines', [('solid', u'1.5pt', 'black', False), ('solid', u'1pt', 'black', False), ('solid', u'0.5pt', 'black', False)])
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', u'Stacked area')
+Set('xPos', [0.025])
+Set('yPos', [0.95])
+Set('alignVert', u'top')
+To('..')
+To('..')
+Add('graph', name=u'stacked', autoadd=False)
+To(u'stacked')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('autoRange', u'exact')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('min', 0.0)
+Set('direction', 'vertical')
+To('..')
+Add('bar', name=u'bar1', autoadd=False)
+To(u'bar1')
+Set('lengths', (u'y1', u'y2', u'y3'))
+Set('posn', u'x')
+Set('mode', u'stacked')
+Set('barfill', 1.0)
+Set('BarLine/lines', [])
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', u'Stacked')
+Set('xPos', [0.025])
+Set('yPos', [0.95])
+Set('alignVert', u'top')
+To('..')
+To('..')
+Add('graph', name=u'grouped', autoadd=False)
+To(u'grouped')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', u'Area')
+Set('autoRange', u'exact')
+Set('Label/position', u'at-minimum')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Sales')
+Set('min', 0.0)
+Set('direction', 'vertical')
+Set('Label/position', u'at-minimum')
+To('..')
+Add('bar', name=u'bar1', autoadd=False)
+To(u'bar1')
+Set('lengths', (u'y1', u'y2', u'y3'))
+Set('posn', u'x')
+Set('mode', u'grouped')
+Set('barfill', 1.0)
+Set('BarLine/lines', [])
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', u'Grouped')
+Set('xPos', [0.025])
+Set('yPos', [0.95])
+Set('alignVert', u'top')
+To('..')
+To('..')
+To('..')
+To('..')
