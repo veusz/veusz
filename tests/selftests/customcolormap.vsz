@@ -1,7 +1,7 @@
 # Veusz saved document (version 1.15.99)
 # Saved at 2012-06-10T09:45:52.827597
 
-AddCustom('colormap', 'xyzzy', ((255, 0, 255, 255), (255, 255, 0), (0, 255, 255, 128)))
+AddCustom('colormap', 'xyzzy', ((0,0,0,255), (255,255,0), (0,0,0)))
 SetData2DXYFunc(u'img', (0.0, 1.0, 0.1), (0.0, 1.0, 0.1), u'x*y', linked=True)
 Add('page', name='page1', autoadd=False)
 To('page1')
