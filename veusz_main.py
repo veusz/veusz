@@ -178,6 +178,9 @@ class AppRunner(qt4.QObject):
         import veusz.document
         import veusz.setting
 
+        # install exception hook after thread has finished
+        sys.excepthook = excepthook
+
         # for people who want to run any old script
         veusz.setting.transient_settings['unsafe_mode'] = bool(
             options.unsafe_mode)
@@ -222,7 +225,6 @@ def run():
     app = qt4.QApplication(sys.argv)
     app.connect(app, qt4.SIGNAL('lastWindowClosed()'),
                 app, qt4.SLOT('quit()'))
-    sys.excepthook = excepthook
 
     # register a signal handler to catch ctrl+C
     signal.signal(signal.SIGINT, handleIntSignal)
