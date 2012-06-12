@@ -245,6 +245,18 @@ class FieldFloat(_FieldSetting):
                                name, descr=descr, default=default,
                                setnparams={'minval': minval, 'maxval': maxval})
 
+class FieldFloatOrAuto(_FieldSetting):
+    """A floating point value or the text 'Auto'."""
+
+    def __init__(self, name, descr=None, default='Auto'):
+        """name: name of field
+        descr: description to show to user
+        default: default value.
+        """
+
+        _FieldSetting.__init__(self, setting.FloatOrAuto,
+                               name, descr=descr, default=default)
+
 class FieldColor(_FieldSetting):
     """Field for selecting a color - returns #rrggbb string."""
     def __init__(self, name, descr=None, default='black'):
