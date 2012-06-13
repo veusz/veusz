@@ -35,6 +35,7 @@ Changes in 1.16:
  * Zero length vectors and arrows in vector fields are not plotted
  * Add support for strings to be translated
  * Add "Sort" dataset plugin
+ * Add "Histogram 2D" dataset plugin
  * Support for *args and **kwargs for custom functions
  * Custom colormaps can be defined in the custom editing dialog
 
@@ -51,6 +52,7 @@ Bug fixes:
  * Handle better zero bytes in data files
  * Fix error if page size zero
  * Fix error if vector baselength is zero
+ * If dataset plugin parameter not given in saved file, use default
 
 Features of package:
  * X-Y plots (with errorbars)
