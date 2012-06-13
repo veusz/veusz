@@ -302,10 +302,17 @@ class DatasetPluginManager(object):
         self.plugin = plugin
         self.document = doc
         self.helper = DatasetPluginHelper(doc)
-        self.fields = fields
+        self.fields = dict(fields)
         self.changeset = -1
 
+        self.fixMissingFields()
         self.setupDatasets()
+
+    def fixMissingFields(self):
+        """If fields are missing, use defaults."""
+        for pluginfield in self.plugin.fields:
+            if pluginfield.name not in self.fields:
+                self.fields[pluginfield.name] = pluginfield.default
 
     def setupDatasets(self):
         """Do initial construction of datasets."""
@@ -1453,6 +1460,110 @@ class SortPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(**out)
 
+class Histogram2D(DatasetPlugin):
+    """Compute 2D histogram for two 1D dataset.
+
+    Algorithm: Count up values in boxes. Sort. Compute probability
+    working downwards.
+    """
+
+    menu = (_('Compute'), _('2D histogram'),)
+    name = 'Histogram 2D'
+    description_short = _('Compute 2D histogram.')
+    description_long = _('Given two 1D datasets, compute a 2D histogram. '
+                         'Can optionally compute a probability distribution.')
+
+    def __init__(self):
+        """Input fields."""
+        self.fields = [
+            field.FieldDataset('ds_inx', _('Input dataset x')),
+            field.FieldFloatOrAuto('minx', _('Minimum value for dataset x')),
+            field.FieldFloatOrAuto('maxx', _('Maximum value for dataset x')),
+            field.FieldInt('binsx', _('Number of bins for dataset x'),
+                           default=10, minval=2),
+
+            field.FieldDataset('ds_iny', _('Input dataset y')),
+            field.FieldFloatOrAuto('miny', _('Minimum value for dataset y')),
+            field.FieldFloatOrAuto('maxy', _('Maximum value for dataset y')),
+            field.FieldInt('binsy', _('Number of bins for dataset y'),
+                           default=10, minval=2),
+
+            field.FieldCombo('mode', _('Mode'),
+                             items=('Count',
+                                    'Fraction',
+                                    'CumulativeProbability',
+                                    'CumulativeProbabilityInverse'),
+                             default='Count', editable=False),
+
+            field.FieldDataset('ds_out', _('Output 2D dataset'), dims=2),
+            ]
+
+    def probabilityCalculator(self, histo):
+        """Convert an image of counts to a cumulative probability
+        distribution.
+        """
+
+        # get sorted pixel values
+        pixvals = N.ravel(histo)
+        sortpix = N.sort(pixvals)
+
+        # cumulative sum of values
+        probs = N.cumsum(sortpix)
+        probs = probs * (1./probs[-1])
+
+        # values in pixvals which are unique
+        unique = N.concatenate( (sortpix[:-1] != sortpix[1:], [True]) )
+
+        # now we have the pixel values and probabilities
+        pixaxis = sortpix[unique]
+        probaxis = probs[unique]
+
+        # use linear interpolation to map the pixvals -> cumulative probability
+        probvals = N.interp(pixvals, pixaxis, probaxis)
+        probvals = probvals.reshape(histo.shape)
+        return probvals
+
+    def updateDatasets(self, fields, helper):
+        """Calculate values of output dataset."""
+
+        dsy = helper.getDataset(fields['ds_iny']).data
+        dsx = helper.getDataset(fields['ds_inx']).data
+
+        # use range of data or specified parameters
+        miny = fields['miny']
+        if miny == 'Auto': miny = N.nanmin(dsy)
+        maxy = fields['maxy']
+        if maxy == 'Auto': maxy = N.nanmax(dsy)
+        minx = fields['minx']
+        if minx == 'Auto': minx = N.nanmin(dsx)
+        maxx = fields['maxx']
+        if maxx == 'Auto': maxx = N.nanmax(dsx)
+
+        # compute counts in each bin
+        histo, xedge, yedge = N.histogram2d(
+            dsy, dsx, bins=[fields['binsy'], fields['binsx']],
+            range=[[miny,maxy], [minx,maxx]], normed=False)
+
+        m = fields['mode']
+        if m == 'Count':
+            out = histo
+        elif m == 'Fraction':
+            out = histo * (1./N.sum(histo))
+        elif m == 'CumulativeProbability':
+            out = self.probabilityCalculator(histo)
+        elif m == 'CumulativeProbabilityInverse':
+            out = 1. - self.probabilityCalculator(histo)
+
+        # update output dataset
+        self.dsout.update(out, rangey=(miny, maxy), rangex=(minx, maxx))
+
+    def getDatasets(self, fields):
+        """Returns single output dataset (self.dsout)."""
+        if fields['ds_out'] == '':
+            raise DatasetPluginException('Invalid output dataset name')
+        self.dsout = Dataset2D(fields['ds_out'])
+        return [self.dsout]
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1481,4 +1592,6 @@ datasetpluginregistry += [
     MovingAveragePlugin,
     LinearInterpolatePlugin,
     SortPlugin,
+
+    Histogram2D,
     ]
