@@ -1101,6 +1101,65 @@ class DivideDatasetsPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class DivideMaxPlugin(_OneOutputDatasetPlugin):
+    """Plugin to divide by maximum of dataset."""
+
+    menu = (_('Divide'), _('By maximum'),)
+    name = 'Divide Maximum'
+    description_short = description_full = _('Divide dataset by its maximum')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldDataset('ds_out', _('Output dataset name')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+
+        inds = helper.getDataset( fields['ds_in'] )
+        maxval = N.nanmax( inds.data )
+
+        # divide data
+        data = inds.data / maxval
+        # divide error bars
+        serr = perr = nerr = None
+        if inds.serr: serr = inds.serr / maxval
+        if inds.perr: perr = inds.perr / maxval
+        if inds.nerr: nerr = inds.nerr / maxval
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
+class DivideNormalizePlugin(_OneOutputDatasetPlugin):
+    """Plugin to normalize dataset."""
+
+    menu = (_('Divide'), _('Normalize'),)
+    name = 'Normalize'
+    description_short = description_full = _(
+        'Divide dataset by its sum of values')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldDataset('ds_out', _('Output dataset name')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+
+        inds = helper.getDataset( fields['ds_in'] )
+        tot = N.nansum( inds.data )
+
+        # divide data
+        data = inds.data / tot
+        # divide error bars
+        serr = perr = nerr = None
+        if inds.serr: serr = inds.serr / tot
+        if inds.perr: perr = inds.perr / tot
+        if inds.nerr: nerr = inds.nerr / tot
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 class ExtremesDatasetPlugin(DatasetPlugin):
     """Dataset plugin to get extremes of dataset."""
 
@@ -1573,6 +1632,8 @@ datasetpluginregistry += [
     MultiplyDatasetPlugin,
     MultiplyDatasetsPlugin,
     DivideDatasetsPlugin,
+    DivideMaxPlugin,
+    DivideNormalizePlugin,
     MeanDatasetPlugin,
     ExtremesDatasetPlugin,
     CumulativePlugin,
