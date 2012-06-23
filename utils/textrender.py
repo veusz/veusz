@@ -22,6 +22,7 @@
 import math
 import re
 import sys
+import textwrap
 
 import numpy as N
 import veusz.qtall as qt4
@@ -959,10 +960,11 @@ class _MmlRenderer(_Renderer):
     def _initText(self, text):
         """Setup MML document and draw it in recording paint device."""
 
+        self.error = ''
         self.size = qt4.QSize(1, 1)
         if not mmlsupport:
             self.mmldoc = None
-            sys.stderr.write('Error: MathML support not built\n')
+            self.error = 'Error: MathML support not built\n'
             return
 
         self.mmldoc = doc = qtmml.QtMmlDocument()
@@ -970,8 +972,8 @@ class _MmlRenderer(_Renderer):
             self.mmldoc.setContent(text)
         except ValueError, e:
             self.mmldoc = None
-            sys.stderr.write('Error interpreting MathML: %s\n' %
-                             unicode(e))
+            self.error = ('Error interpreting MathML: %s\n' %
+                          unicode(e))
             return
 
         # this is pretty horrible :-(
@@ -1022,8 +1024,8 @@ class _MmlRenderer(_Renderer):
         if self.calcbounds is None:
             self.getBounds()
 
+        p = self.painter
         if self.mmldoc is not None:
-            p = self.painter
             p.save()
             p.translate(self.xi, self.yi)
             p.rotate(self.angle)
@@ -1031,6 +1033,16 @@ class _MmlRenderer(_Renderer):
             p.translate(0, -self.size.height())
             p.scale(self.drawscale, self.drawscale)
             self.record.play(p)
+            p.restore()
+        else:
+            # display an error - must be a better way to do this
+            p.save()
+            p.setFont(qt4.QFont())
+            p.setPen(qt4.QPen(qt4.QColor("red")))
+            p.drawText( qt4.QRectF(self.xi, self.yi, 200, 200),
+                        qt4.Qt.AlignLeft | qt4.Qt.AlignTop |
+                        qt4.Qt.TextWordWrap,
+                        self.error )
             p.restore()
 
         return self.calcbounds
