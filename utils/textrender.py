@@ -1025,25 +1025,23 @@ class _MmlRenderer(_Renderer):
             self.getBounds()
 
         p = self.painter
+        p.save()
         if self.mmldoc is not None:
-            p.save()
             p.translate(self.xi, self.yi)
             p.rotate(self.angle)
             # is drawn from bottom of box, not top
             p.translate(0, -self.size.height())
             p.scale(self.drawscale, self.drawscale)
             self.record.play(p)
-            p.restore()
         else:
             # display an error - must be a better way to do this
-            p.save()
             p.setFont(qt4.QFont())
             p.setPen(qt4.QPen(qt4.QColor("red")))
             p.drawText( qt4.QRectF(self.xi, self.yi, 200, 200),
                         qt4.Qt.AlignLeft | qt4.Qt.AlignTop |
                         qt4.Qt.TextWordWrap,
                         self.error )
-            p.restore()
+        p.restore()
 
         return self.calcbounds
 
