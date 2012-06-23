@@ -50,8 +50,6 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
-#include <QtXml/QXmlInputSource>
-#include <QtXml/QXmlSimpleReader>
 
 #include "qtmmlwidget.h"
 
@@ -3188,15 +3186,8 @@ bool MmlDocument::setContent(QString text, QString *errorMsg,
 	    ++prefix_lines;
     }
 
-
-    // use QXmlInputSource to avoid this bug
-    // https://bugreports.qt-project.org/browse/QTBUG-26106
-    QXmlSimpleReader reader;
-    QXmlInputSource source;
-    source.setData(prefix + text);
-
     QDomDocument dom;
-    if (!dom.setContent(&source, &reader, errorMsg, errorLine, errorColumn)) {
+    if (!dom.setContent(prefix + text, false, errorMsg, errorLine, errorColumn)) {
 	if (errorLine != 0)
 	    *errorLine -= prefix_lines;
 	return false;
