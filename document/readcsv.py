@@ -153,8 +153,15 @@ class ReadCSV(object):
         """Set a name for column number given column name and type."""
         while colnum >= len(self.coltypes):
             self.coltypes.append('')
+
+        if colname in self.nametypes:
+            # if there is an existing dataset with the same name,
+            # ensure there is consistency of type
+            coltype = self.nametypes[colname]
+        else:
+            self.nametypes[colname] = coltype
+
         self.coltypes[colnum] = coltype
-        self.nametypes[colname] = coltype
         self.colnames[colnum] = colname
         self.colignore[colnum] = self.params.headerignore
         self.colblanks[colnum] = 0
@@ -335,8 +342,8 @@ class ReadCSV(object):
 
         # iterate over each read-in dataset
         dsnames = []
-        for name in self.data.iterkeys():
 
+        for name in self.data.iterkeys():
             # skip error data here, they are used below
             # error data name contains \0
             if name.find('\0') >= 0:
