@@ -1,15 +1,36 @@
 Changes in 1.16:
  * Experimental MathML support
- * Support for *args and **kwargs for custom functions
  * Add upper/lower-left/right arrows
  * Add options to clip text/lines/shapes to graphs
+ * Add stacked-area option to bar plot widget
+ * Draw stacked bar plots top-down for better overlapping line behaviour
+ * Axis labels can be placed at left or right of axes, in addition to centre
+ * Line widget now has length-angle or point-to-point modes. Better support
+   for only specifying some coordinates.
+ * Exception dialog records more detailed traceback
+ * Use top level windows for non-modal dialogs, giving minimize in window
+   and no always-on-top behaviour
+ * Zero length vectors and arrows in vector fields are not plotted
+ * Add support for strings to be translated
+ * Add "Sort" dataset plugin
+ * Add "Histogram 2D" dataset plugin
+ * Support for *args and **kwargs for custom functions
+ * Custom colormaps can be defined in the custom editing dialog
 
 Bug fixes:
+ * Use correct definition of 1pt = 1/72in
  * Workaround for splash screen problem
  * Fix numerous problems reported by pyflakes
  * Histograms fail when saved
  * Fix plot with nan functions
  * Fix failure of self tests on ARM platforms
+ * Force pages/documents to have physical sizes
+ * Fix crash if deleting multiple datasets in data edit dialog
+ * Check dimensions of datasets in SetData
+ * Handle better zero bytes in data files
+ * Fix error if page size zero
+ * Fix error if vector baselength is zero
+ * If dataset plugin parameter not given in saved file, use default
 
 Changes in 1.15:
  * Improved hatching:

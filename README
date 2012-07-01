@@ -117,9 +117,8 @@ to the Veusz wiki: http://barmag.net/veusz-wiki/
 
 Issues with the current version:
 
- * Some recent versions of PyQt/SIP will causes crashes when exporting
-   SVG files. Update to 4.7.4 (if released) or a recent snapshot to
-   solve this problem.
+  * Due to a bug in the Qt XML processing, some MathML elements
+    containing purely white space (e.g. thin space) will give an error.
 
 If you enjoy using Veusz, we would love to hear from you. Please join
 the mailing lists at
