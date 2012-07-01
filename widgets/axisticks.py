@@ -303,6 +303,10 @@ class AxisTicks(AxisTicksBase):
             # which linear intervals we'll allow
             intervals = AxisTicks.allowed_intervals_linear
 
+        # avoid breakage if range is zero
+        if abs(self.minval - self.maxval) < 1e-99:
+            self.maxval = self.minval + 1.
+
         minval, maxval, tickvals, interval, loginterval = self._tickSelector(
             intervals )
 
