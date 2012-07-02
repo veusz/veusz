@@ -822,11 +822,16 @@ class PointPlotter(GenericPlotter):
                 scaling = colorvals = cmap = None
                 if ptvals:
                     scaling = ptvals.data
+                    if s.thinfactor > 1:
+                        scaling = scaling[::s.thinfactor]
+
                 # color point individually
                 if cvals:
                     colorvals = utils.applyScaling(
                         cvals.data, s.Color.scaling,
                         s.Color.min, s.Color.max)
+                    if s.thinfactor > 1:
+                        colorvals = colorvals[::s.thinfactor]
                     cmap = self.document.getColormap(
                         s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
