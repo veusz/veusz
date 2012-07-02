@@ -34,6 +34,7 @@ Bug fixes:
  * If dataset plugin parameter not given in saved file, use default
  * Fix crash for axes with same minimum and maximum
  * Fix CSV import problem when same dataset has multiple types
+ * Thinning markers works when using marker sizes / colors
 
 Changes in 1.15:
  * Improved hatching:
