@@ -329,11 +329,11 @@
 </g>
 </g>
 <g clip-path="url(#c3)">
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M81.4,159.4l0,-35.4M94.6,132.8l0,-17.7M107.7,137.9l0,-42.5M120.8,125.2l0,-28.3M133.9,124l0,-35.4M147,102.1l0,0M160.1,98.3l0,0M173.2,94.8l0,0M186.3,91.6l0,0M199.4,88.5l0,0"/>
-</g>
 <g fill="none" stroke-width="0.6">
 <polyline fill="none" points="81.4,141.7 94.6,124 107.7,116.6 120.8,111 133.9,106.2 147,102.1 160.1,98.3 173.2,94.8 186.3,91.6 199.4,88.5"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M81.4,159.4l0,-35.4M94.6,132.8l0,-17.7M107.7,137.9l0,-42.5M120.8,125.2l0,-28.3M133.9,124l0,-35.4M147,102.1l0,0M160.1,98.3l0,0M173.2,94.8l0,0M186.3,91.6l0,0M199.4,88.5l0,0"/>
 </g>
 <g fill="#008000" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(81.4,141.7)">

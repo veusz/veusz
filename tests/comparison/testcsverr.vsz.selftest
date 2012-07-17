@@ -31,13 +31,13 @@
 <use xlink:href="#p0" x="245.9" y="7"/>
 <use xlink:href="#p0" x="106.6" y="99.9"/>
 </g>
+<g fill="none" stroke-width="0.6">
+<polyline fill="none" points="292.3,192.7 338.7,192.7 338.7,285.5 292.3,285.5"/>
+</g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M292.3,192.7l0,-9.2M338.7,192.7l0,-27.8M338.7,285.5l0,-18.5M292.3,285.5l0,-9.2"/>
 <path d="M288.5,192.7l7.5,0M334.9,192.7l7.5,0M334.9,285.5l7.5,0M288.5,285.5l7.5,0"/>
 <path d="M288.5,183.4l7.5,0M334.9,164.9l7.5,0M334.9,267l7.5,0M288.5,276.3l7.5,0"/>
-</g>
-<g fill="none" stroke-width="0.6">
-<polyline fill="none" points="292.3,192.7 338.7,192.7 338.7,285.5 292.3,285.5"/>
 </g>
 <g fill="#8b0000" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(292.3,192.7)">
@@ -69,12 +69,12 @@
 <use xlink:href="#p3" x="74.1" y="192.7"/>
 <use xlink:href="#p3" x="69.5" y="99.9"/>
 </g>
+<g fill="none" stroke-width="0.6">
+<polyline fill="none" points="338.7,285.5 385.1,285.5 245.9,192.7 153,99.9"/>
+</g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M338.7,313.4l0,-55.7M385.1,304.1l0,-37.1M245.9,220.6l0,-55.7M153,118.4l0,-37.1"/>
 <path d="M334,285.5l32.4,0M371.2,285.5l51,0M227.3,192.7l27.8,0M148.4,99.9l9.2,0"/>
-</g>
-<g fill="none" stroke-width="0.6">
-<polyline fill="none" points="338.7,285.5 385.1,285.5 245.9,192.7 153,99.9"/>
 </g>
 <g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(338.7,285.5)">
@@ -84,11 +84,11 @@
 <use xlink:href="#p4" x="245.9" y="192.7"/>
 <use xlink:href="#p4" x="153" y="99.9"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M185.5,471.2l27.8,0M190.2,378.4l18.5,0M231.9,285.5l27.8,0M283,192.7l18.5,0"/>
-</g>
 <g fill="none" stroke-width="0.6">
 <polyline fill="none" points="199.4,471.2 199.4,378.4 245.9,285.5 292.3,192.7"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M185.5,471.2l27.8,0M190.2,378.4l18.5,0M231.9,285.5l27.8,0M283,192.7l18.5,0"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="199.4" y="471.2"/>

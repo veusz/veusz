@@ -20,11 +20,11 @@
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M506.5,471.2l17.8,0M238.7,378.4l17.8,0M149.5,285.5l17.8,0M60.2,192.7l17.8,0M140.5,99.9l35.7,0M229.8,7l35.7,0"/>
-</g>
 <g fill="none" stroke-width="0.6">
 <polyline fill="none" points="515.4,471.2 247.6,378.4 158.4,285.5 69.1,192.7 158.4,99.9 247.6,7"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M506.5,471.2l17.8,0M238.7,378.4l17.8,0M149.5,285.5l17.8,0M60.2,192.7l17.8,0M140.5,99.9l35.7,0M229.8,7l35.7,0"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(515.4,471.2)">
