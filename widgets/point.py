@@ -37,7 +37,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='XY'):
     """Translate text."""
-    return unicode( 
+    return unicode(
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
 # functions for plotting error bars
@@ -57,7 +57,7 @@ def _errorBarsBar(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                    s, painter, clip):
     """Draw perpendiclar ends on error bars."""
-    size = ( s.get('markerSize').convert(painter) * 
+    size = ( s.get('markerSize').convert(painter) *
              s.ErrorBarLine.endsize )
 
     if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
@@ -277,9 +277,9 @@ class PointPlotter(GenericPlotter):
 
     def __init__(self, parent, name=None):
         """Initialise XY plotter plotting (xdata, ydata).
-        
+
         xdata and ydata are strings specifying the data in the document"""
-        
+
         GenericPlotter.__init__(self, parent, name=name)
         if type(self) == PointPlotter:
             self.readDefaults()
@@ -396,7 +396,7 @@ class PointPlotter(GenericPlotter):
         # no error bars - break out of processing below
         if ymin is None and ymax is None and xmin is None and xmax is None:
             return
-        
+
         # iterate to call the error bars functions required to draw style
         pen = s.ErrorBarLine.makeQPenWHide(painter)
         pen.setCapStyle(qt4.Qt.FlatCap)
@@ -405,7 +405,7 @@ class PointPlotter(GenericPlotter):
         for function in _errorBarFunctionMap[style]:
             function(style, xmin, xmax, ymin, ymax,
                      xplotter, yplotter, s, painter, cliprect)
-            
+
     def providesAxesDependency(self):
         """This widget provides range information about these axes."""
         s = self.settings
@@ -460,7 +460,7 @@ class PointPlotter(GenericPlotter):
             y1 = yvals[:-1]
             y2 = yvals[1:]
             utils.addNumpyToPolygonF(pts, x1, y1, x1, y2, x2, y2)
-            
+
         # stepped line, with points in centre
         # this is complex as we can't use the mean of the plotter coords,
         #  as the axis could be log
@@ -618,7 +618,7 @@ class PointPlotter(GenericPlotter):
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
                 painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
-                
+
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
         painter.restore()
@@ -629,7 +629,7 @@ class PointPlotter(GenericPlotter):
 
         s = self.settings
         lab = s.get('Label')
-        
+
         # work out offset an alignment
         deltax = markersize*1.5*{'left':-1, 'centre':0, 'right':1}[lab.posnHorz]
         deltay = markersize*1.5*{'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
