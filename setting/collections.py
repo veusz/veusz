@@ -85,7 +85,9 @@ class XYPlotLine(Line):
         Line.__init__(self, name, **args)
 
         self.add( setting.Choice('steps',
-                                 ['off', 'left', 'centre', 'right'], 'off',
+                                 ['off', 'left', 'centre', 'right',
+                                  'left-shift-points', 'right-shift-points'],
+                                 'off',
                                  descr=_('Plot horizontal steps '
                                          'instead of a line'),
                                  usertext=_('Steps')), 0 )

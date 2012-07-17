@@ -446,7 +446,7 @@ class PointPlotter(GenericPlotter):
             utils.addNumpyToPolygonF(pts, xvals, yvals)
 
         # stepped line, with points on left
-        elif steps == 'left':
+        elif steps[:4] == 'left':
             x1 = xvals[:-1]
             x2 = xvals[1:]
             y1 = yvals[:-1]
@@ -454,7 +454,7 @@ class PointPlotter(GenericPlotter):
             utils.addNumpyToPolygonF(pts, x1, y1, x2, y1, x2, y2)
 
         # stepped line, with points on right
-        elif steps == 'right':
+        elif steps[:5] == 'right':
             x1 = xvals[:-1]
             x2 = xvals[1:]
             y1 = yvals[:-1]
@@ -464,7 +464,7 @@ class PointPlotter(GenericPlotter):
         # stepped line, with points in centre
         # this is complex as we can't use the mean of the plotter coords,
         #  as the axis could be log
-        elif steps == 'centre':
+        elif steps[:6] == 'centre':
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
             if xdata.hasErrors():
@@ -776,11 +776,6 @@ class PointPlotter(GenericPlotter):
             xplotter = axes[0].dataToPlotterCoords(posn, xvals.data)
             yplotter = axes[1].dataToPlotterCoords(posn, yvals.data)
 
-            #print "Painting error bars"
-            # plot errors bars
-            self._plotErrors(posn, painter, xplotter, yplotter,
-                             axes, xvals, yvals, cliprect)
-
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
@@ -790,6 +785,19 @@ class PointPlotter(GenericPlotter):
                 else:
                     self._drawPlotLine( painter, xplotter, yplotter, posn,
                                         xvals, yvals, cliprect )
+
+            # shift points if in certain step modes
+            if s.PlotLine.steps != 'off':
+                steps = s.PlotLine.steps
+                if s.PlotLine.steps == 'right-shift-points':
+                    xplotter[1:] = 0.5*(xplotter[:-1] + xplotter[1:])
+                elif s.PlotLine.steps == 'left-shift-points':
+                    xplotter[:-1] = 0.5*(xplotter[:-1] + xplotter[1:])
+
+            #print "Painting error bars"
+            # plot errors bars
+            self._plotErrors(posn, painter, xplotter, yplotter,
+                             axes, xvals, yvals, cliprect)
 
             # plot the points (we do this last so they are on top)
             markersize = s.get('markerSize').convert(painter)
