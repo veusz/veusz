@@ -1483,10 +1483,16 @@ class _DatasetPlugin(object):
         for name, val in self.pluginmanager.fields.iteritems():
             fields.append('%s: %s' % (unicode(name), unicode(val)))
 
-        return '%s plugin dataset (fields %s), size %i' % (
+        try:
+            shape = [str(x) for x in self.data.shape]
+        except AttributeError:
+            shape = [str(len(self.data))]
+        shape = u'\u00d7'.join(shape)
+
+        return '%s plugin dataset (fields %s), size %s' % (
             self.pluginmanager.plugin.name,
             ', '.join(fields),
-            self.data.shape[0])
+            shape)
 
     def canUnlink(self):
         """Can relationship be unlinked?"""

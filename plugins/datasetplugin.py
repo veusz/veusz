@@ -1500,15 +1500,19 @@ class SortPlugin(_OneOutputDatasetPlugin):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldDataset('ds_sort', _('Sort by (optional)')),
             field.FieldBool('reverse', _('Reverse')),
             field.FieldDataset('ds_out', _('Output dataset')),
             ]
 
     def updateDatasets(self, fields, helper):
         """Do sorting of dataset."""
-        ds = helper.getDataset(fields['ds_in'])
 
-        idxs = N.argsort(ds.data)
+        ds_sort = ds = helper.getDataset(fields['ds_in'])
+        if fields['ds_sort'].strip():
+            ds_sort = helper.getDataset(fields['ds_sort'])
+
+        idxs = N.argsort(ds_sort.data)
         if fields['reverse']:
             idxs = idxs[::-1]
 
@@ -1518,6 +1522,47 @@ class SortPlugin(_OneOutputDatasetPlugin):
         if ds.nerr is not None: out['nerr'] = ds.nerr[idxs]
 
         self.dsout.update(**out)
+
+class SortTextPlugin(_OneOutputDatasetPlugin):
+    """Sort a text dataset."""
+
+    menu = (_('Compute'), _('Sorted Text'),)
+    name = 'Sort Text'
+    description_short = description_full = _('Sort a text dataset')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset'), datatype='text'),
+            field.FieldDataset('ds_sort', _('Sort by (optional)')),
+            field.FieldBool('reverse', _('Reverse')),
+            field.FieldDataset('ds_out', _('Output dataset'), datatype='text'),
+            ]
+
+    def getDatasets(self, fields):
+        """Returns single output dataset (self.dsout)."""
+        if fields['ds_out'] == '':
+            raise DatasetPluginException('Invalid output dataset name')
+        self.dsout = DatasetText(fields['ds_out'])
+        return [self.dsout]
+
+    def updateDatasets(self, fields, helper):
+        """Do sorting of dataset."""
+
+        ds = helper.getTextDataset(fields['ds_in']).data
+        if fields['ds_sort'].strip():
+            ds_sort = helper.getDataset(fields['ds_sort'])
+            idxs = N.argsort(ds_sort.data)
+            dout = []
+            for i in idxs:
+                dout.append(ds[i])
+        else:
+            dout = list(ds)
+            dout.sort()
+
+        if fields['reverse']:
+            dout = dout[::1]
+        self.dsout.update(dout)
 
 class Histogram2D(DatasetPlugin):
     """Compute 2D histogram for two 1D dataset.
@@ -1653,6 +1698,7 @@ datasetpluginregistry += [
     MovingAveragePlugin,
     LinearInterpolatePlugin,
     SortPlugin,
+    SortTextPlugin,
 
     Histogram2D,
     ]
