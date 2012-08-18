@@ -466,7 +466,7 @@ class PartFont(Part):
     def __init__(self, children):
         try:
             self.fontname = children[0].text
-        except AttributeError:
+        except (AttributeError, IndexError):
             self.fontname = ''
         self.children = children[1:]
 
