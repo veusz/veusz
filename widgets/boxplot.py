@@ -70,6 +70,11 @@ class _Stats(object):
         cleaned = data[ N.isfinite(data) ]
         cleaned.sort()
 
+        if len(cleaned) == 0:
+            self.median = self.botquart = self.topquart = self.mean = \
+                self.botwhisker = self.topwhisker = N.nan
+            return
+
         self.median = percentile(cleaned, 50)
         self.botquart = percentile(cleaned, 25)
         self.topquart = percentile(cleaned, 75)
@@ -313,6 +318,10 @@ class BoxPlot(GenericPlotter):
 
     def plotBox(self, painter, axes, boxposn, posn, width, clip, stats):
         """Draw box for dataset."""
+
+        if not N.isfinite(stats.median):
+            # skip bad datapoints
+            return
 
         s = self.settings
         horz = (s.direction == 'horizontal')
