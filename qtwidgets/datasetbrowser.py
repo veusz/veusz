@@ -304,7 +304,7 @@ class DatasetRelationModel(TreeModel):
             if ds.tags:
                 return list(sorted(ds.tags))
             else:
-                return [u_("None")]
+                return [_("None")]
 
         return self.makeGrpTree(
             (_("Dataset"), _("Size"), _("Type"), _("Filename")),
