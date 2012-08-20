@@ -253,7 +253,8 @@ class CustomDialog(VeuszDialog):
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
-                    _("Unable to save '%s'\n\n%s") % (filename, e.strerror))
+                    _("Unable to save '%s'\n\n%s") % (
+                        filename, utils.decodeDefault(e.strerror)))
 
     def slotLoad(self):
         """Load entries."""
@@ -266,7 +267,8 @@ class CustomDialog(VeuszDialog):
             except EnvironmentError, e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
-                    _("Unable to load '%s'\n\n%s") % (filename, e.strerror))
+                    _("Unable to load '%s'\n\n%s") % (
+                            filename, utils.decodeDefault(e.strerror)))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

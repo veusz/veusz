@@ -619,7 +619,7 @@ class ImportPluginBinary(ImportPlugin):
             data = f.read()
             f.close()
         except EnvironmentError, e:
-            return _("Cannot read file (%s)") % e.strerror, False
+            return _("Cannot read file (%s)") % utils.decodeDefault(e.strerror), False
 
         text = [_('File length: %i bytes') % len(data)]
 
@@ -655,7 +655,7 @@ class ImportPluginBinary(ImportPlugin):
             f.close()
         except EnvironmentError, e:
             raise ImportPluginException(_("Error while reading file '%s'\n\n%s") %
-                                        (params.filename, e.strerror))
+                                        (params.filename, utils.decodeDefault(e.strerror)))
 
         data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
                             count=params.field_results["length"])

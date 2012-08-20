@@ -22,6 +22,7 @@ import os
 import socket
 import platform
 import signal
+import locale
 
 import veusz.qtall as qt4
 import veusz.utils as utils
@@ -207,7 +208,7 @@ class SocketCaptureStream(CaptureStream):
 
         ee = EnvironmentError()
         if isinstance(e, basestring):         # windows?
-            ee.strerror = unicode(e)
+            ee.strerror = unicode(e).encode(locale.getdefaultlocale()[1])
             ee.errno = -1
         else:                                 # unix
             ee.strerror = e[1]

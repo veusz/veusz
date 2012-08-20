@@ -27,6 +27,7 @@ import threading
 import codecs
 import csv
 import StringIO
+import locale
 
 import veusz.qtall as qt4
 import numpy as N
@@ -448,3 +449,8 @@ def unique(inlist):
             out.append(x)
             last = x
     return out
+
+def decodeDefault(s):
+    """Decode the string using current locale.
+    Used for decoding exceptions."""
+    return s.decode(locale.getdefaultlocale()[1])

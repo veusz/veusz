@@ -293,7 +293,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load default stylesheet '%s'\n\n%s") %
-                    (filename, e.strerror))
+                    (filename, utils.decodeDefault(e.strerror)))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -310,7 +310,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load custom definitions '%s'\n\n%s") %
-                    (filename, e.strerror))
+                    (filename, utils.decodeDefault(e.strerror)))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -887,7 +887,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save document as '%s'\n\n%s") %
-                    (self.filename, e.strerror))
+                    (self.filename, utils.decodeDefault(e.strerror)))
             else:
                 # restore the cursor
                 qt4.QApplication.restoreOverrideCursor()
@@ -947,7 +947,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to open '%s'\n\n%s") %
-                    (filename, e.strerror))
+                    (filename, utils.decodeDefault(e.strerror)))
                 return None
             return filename
         return None
@@ -1026,7 +1026,7 @@ class MainWindow(qt4.QMainWindow):
             qt4.QMessageBox.critical(
                 self, _("Error - Veusz"),
                 _("Cannot open document '%s'\n\n%s") %
-                (filename, e.strerror))
+                (filename, utils.decodeDefault(e.strerror)))
             self.setupDefaultDoc()
             return
 
@@ -1258,7 +1258,7 @@ class MainWindow(qt4.QMainWindow):
                 export.export()
             except (RuntimeError, EnvironmentError), e:
                 if isinstance(e, EnvironmentError):
-                    msg = e.strerror
+                    msg = utils.decodeDefault(e.strerror)
                 else:
                     msg = unicode(e)
 
