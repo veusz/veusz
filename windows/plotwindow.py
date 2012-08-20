@@ -1065,9 +1065,10 @@ class PlotWindow( qt4.QGraphicsView ):
 
         viewportsize = self.maximumViewportSize()
         r = self.pixmapitem.boundingRect()
-        multw = viewportsize.width()*1./r.width()
-        multh = viewportsize.height()*1./r.height()
-        self.setZoomFactor(self.zoomfactor * min(multw, multh))
+        if r.width() != 0 and r.height() != 0:
+            multw = viewportsize.width()*1./r.width()
+            multh = viewportsize.height()*1./r.height()
+            self.setZoomFactor(self.zoomfactor * min(multw, multh))
 
     def slotViewZoom11(self):
         """Restore the zoom to 1:1"""
