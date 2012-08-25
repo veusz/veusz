@@ -215,6 +215,9 @@ class Line(plotters.FreePlotter):
         else:
             lines = self._computeLinesPointToPoint(posn)
 
+        if lines is None:
+            return
+
         controlgraphitems = []
         for index, (x, y, l, a) in enumerate(lines):
 
