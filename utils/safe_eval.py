@@ -326,10 +326,10 @@ def checkCode(code, securityonly=False):
     """
 
     # compiler can't parse strings with unicode
-    code = code.encode('utf8')
     try:
+        code = code.encode('utf8')
         ast = compiler.parse(code)
-    except SyntaxError, e:
+    except Exception, e:
         return _filterExceptions([e], securityonly)
 
     checker = SafeEvalVisitor()
