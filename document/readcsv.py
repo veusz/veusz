@@ -309,7 +309,10 @@ class ReadCSV(object):
 
         # ignore rows (at top), if requested
         for i in xrange(par.rowsignore):
-            it.next()
+            try:
+                it.next()
+            except StopIteration:
+                return
 
         # dataset names for each column
         self.colnames = {}
