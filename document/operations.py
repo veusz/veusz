@@ -1238,9 +1238,9 @@ class OperationDataUntag(object):
 
 class OperationDatasetAddColumn(object):
     """Add a column to a dataset, blanked to zero."""
-    
+
     descr = _('add dataset column')
-    
+
     def __init__(self, datasetname, columnname):
         """Initialise column columnname in datasetname.
         
@@ -1248,20 +1248,24 @@ class OperationDatasetAddColumn(object):
         """
         self.datasetname = datasetname
         self.columnname = columnname
-        
+
     def do(self, document):
         """Zero the column."""
         ds = document.data[self.datasetname]
         datacol = ds.data
-        setattr(ds, self.columnname, N.zeros(datacol.shape, dtype='float64'))
+        try:
+            setattr(ds, self.columnname,
+                    N.zeros(datacol.shape, dtype='float64'))
+        except AttributeError:
+            raise RuntimeError, "Invalid column name for dataset"
         document.setData(self.datasetname, ds)
-        
+
     def undo(self, document):
         """Remove the column."""
         ds = document.data[self.datasetname]
         setattr(ds, self.columnname, None)
         document.setData(self.datasetname, ds)
-        
+
 class OperationDatasetSetVal(object):
     """Set a value in the dataset."""
 

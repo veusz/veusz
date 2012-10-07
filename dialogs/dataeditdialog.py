@@ -154,7 +154,10 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             document.OperationDatasetSetVal(self.dsname,
                                             ds.columns[column],
                                             row, val))
-        self.document.applyOperation(ops)
+        try:
+            self.document.applyOperation(ops)
+        except RuntimeError:
+            return False
         return True
 
 class DatasetTableModel2D(qt4.QAbstractTableModel):
