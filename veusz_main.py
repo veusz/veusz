@@ -138,8 +138,10 @@ class ImportThread(qt4.QThread):
         import veusz.setting
         import veusz.widgets
         import veusz.utils.vzdbus as vzdbus
+        import veusz.utils.vzsamp as vzsamp
 
         vzdbus.setup()
+        vzsamp.setup()
 
 class AppRunner(qt4.QObject):
     '''Object to run application. We have to do this to get an
