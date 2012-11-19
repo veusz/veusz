@@ -113,6 +113,8 @@ Optional:
    required, to fix a bug in the C++ wrapping
  dbus-python, for dbus interface
    http://dbus.freedesktop.org/doc/dbus-python/
+ astropy (optional for VO table import)
+   http://www.astropy.org/
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
