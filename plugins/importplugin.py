@@ -657,8 +657,13 @@ class ImportPluginBinary(ImportPlugin):
             raise ImportPluginException(_("Error while reading file '%s'\n\n%s") %
                                         (params.filename, utils.decodeDefault(e.strerror)))
 
-        data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
-                            count=params.field_results["length"])
+        try:
+            data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
+                                count=params.field_results["length"])
+        except ValueError, e:
+            raise ImportPluginException(_("Error converting data for file '%s'\n\n%s") %
+                                        (params.filename, unicode(e)))
+
         data = data.astype(N.float64)
         return [ datasetplugin.Dataset1D(name, data) ]
 
