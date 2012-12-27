@@ -907,7 +907,7 @@ class DatasetExpression(Dataset):
             result = eval(expr, environment)
             evalout = N.array(result, N.float64)
 
-            if len(evalout.shape) != 1:
+            if len(evalout.shape) > 1:
                 raise RuntimeError, "Number of dimensions is not 1"
         except Exception, ex:
             raise DatasetExpressionException(
