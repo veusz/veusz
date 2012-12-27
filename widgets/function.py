@@ -258,7 +258,11 @@ class FunctionPlotter(GenericPlotter):
 
         # find starting and ending points for the filled region
         x1, y1, x2, y2 = bounds
-        
+
+        # trimming can lead to too few points
+        if len(pxpts) < 2 or len(pypts) < 2:
+            return
+
         pts = qt4.QPolygonF()
         if self.settings.variable == 'x':
             if belowleft:
