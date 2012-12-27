@@ -92,7 +92,10 @@ class Root(widget.Widget):
 
     def getPage(self, pagenum):
         """Get page widget."""
-        return self.children[pagenum]
+        try:
+            return self.children[pagenum]
+        except IndexError:
+            return None
 
     def draw(self, painthelper, pagenum):
         """Draw the page requested on the painter."""
