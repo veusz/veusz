@@ -648,10 +648,14 @@ def _distPhys(match, painter, mult):
     return (painter.pixperpt * mult *
             float(match.group(1)) * painter.scaling)
 
+def _idistval(val, unit):
+    """Convert value to text, dropping zeros and . points on right."""
+    return ("%.3f" % val).rstrip('0').rstrip('.') + unit
+
 def _distInvPhys(pixdist, painter, mult, unit):
     """Convert number of pixels into physical distance."""
-    dist = pixdist / (mult * painter.pixperpt * painter.scaling)
-    return "%.3g%s" % (dist, unit)
+    return _idistval( pixdist / (mult * painter.pixperpt * painter.scaling),
+                      unit )
 
 def _distPerc(match, painter):
     """Convert from a percentage of maxsize."""
@@ -659,8 +663,7 @@ def _distPerc(match, painter):
 
 def _distInvPerc(pixdist, painter):
     """Convert pixel distance into percentage."""
-    perc = pixdist * 100. / painter.maxsize
-    return "%.3g%%" % perc
+    return _idistval(pixdist * 100. / painter.maxsize, '%')
 
 def _distFrac(match, painter):
     """Convert from a fraction a/b of maxsize."""
