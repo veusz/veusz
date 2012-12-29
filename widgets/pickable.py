@@ -246,6 +246,7 @@ class DiscretePickable(GenericPickable):
 
     def pickIndex(self, oldindex, direction, bounds):
         info = GenericPickable.pickIndex(self, oldindex, direction, bounds)
+        info.displaytype = (self.xdata.displaytype, self.ydata.displaytype)
 
         if not info:
             return info
