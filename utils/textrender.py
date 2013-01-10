@@ -74,7 +74,7 @@ symbols = {
     r'\unrhd': u'\u22b5',
 
     r'\oslash': u'\u2298',
-    r'\odot': u'\u0e4f',
+    r'\odot': u'\u2299',
     r'\oplus': u'\u2295',
     r'\ominus': u'\u2296',
     r'\otimes': u'\u2297',
@@ -95,7 +95,8 @@ symbols = {
     r'\downarrow': u'\u2193',
     r'\leftrightarrow': u'\u2194',
     r'\Leftrightarrow': u'\u21d4',
-    r'\circ': u'\u0e50',
+    r'\circ': u'\u25cb',
+    r'\ell': u'\u2113',
 
     # relations
     r'\le': u'\u2264',
