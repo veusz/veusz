@@ -158,7 +158,7 @@ symbols = {
     r'\chi': u'\u03c7',
     r'\psi': u'\u03c8',
     r'\omega': u'\u03c9',
-    
+
     # upper case greek letters
     r'\Alpha': u'\u0391',
     r'\Beta': u'\u0392',
@@ -183,7 +183,410 @@ symbols = {
     r'\Phi': u'\u03a6',
     r'\Chi': u'\u03a7',
     r'\Psi': u'\u03a8',
-    r'\Omega': u'\u03a9'
+    r'\Omega': u'\u03a9',
+
+    # hebrew
+    r'\aleph': u'\u05d0',
+    r'\beth': u'\u05d1',
+    r'\daleth': u'\u05d3',
+    r'\gimel': u'\u2137',
+
+    # more symbols
+    '\\AE'              : u'\xc6',
+    '\\Angle'           : u'\u299c',
+    '\\Bumpeq'          : u'\u224e',
+    '\\Cap'             : u'\u22d2',
+    '\\Colon'           : u'\u2237',
+    '\\Cup'             : u'\u22d3',
+    '\\DH'              : u'\xd0',
+    '\\DJ'              : u'\u0110',
+    '\\Digamma'         : u'\u03dc',
+    '\\Koppa'           : u'\u03de',
+    '\\L'               : u'\u0141',
+    '\\LeftDownTeeVector': u'\u2961',
+    '\\LeftDownVectorBar': u'\u2959',
+    '\\LeftRightVector' : u'\u294e',
+    '\\LeftTeeVector'   : u'\u295a',
+    '\\LeftTriangleBar' : u'\u29cf',
+    '\\LeftUpDownVector': u'\u2951',
+    '\\LeftUpTeeVector' : u'\u2960',
+    '\\LeftUpVectorBar' : u'\u2958',
+    '\\LeftVectorBar'   : u'\u2952',
+    '\\Lleftarrow'      : u'\u21da',
+    '\\Longleftarrow'   : u'\u27f8',
+    '\\Longleftrightarrow': u'\u27fa',
+    '\\Longrightarrow'  : u'\u27f9',
+    '\\Lsh'             : u'\u21b0',
+    '\\NG'              : u'\u014a',
+    '\\NestedGreaterGreater': u'\u2aa2',
+    '\\NestedLessLess'  : u'\u2aa1',
+    '\\O'               : u'\xd8',
+    '\\OE'              : u'\u0152',
+    '\\ReverseUpEquilibrium': u'\u296f',
+    '\\RightDownTeeVector': u'\u295d',
+    '\\RightDownVectorBar': u'\u2955',
+    '\\RightTeeVector'  : u'\u295b',
+    '\\RightTriangleBar': u'\u29d0',
+    '\\RightUpDownVector': u'\u294f',
+    '\\RightUpTeeVector': u'\u295c',
+    '\\RightUpVectorBar': u'\u2954',
+    '\\RightVectorBar'  : u'\u2953',
+    '\\RoundImplies'    : u'\u2970',
+    '\\Rrightarrow'     : u'\u21db',
+    '\\Rsh'             : u'\u21b1',
+    '\\RuleDelayed'     : u'\u29f4',
+    '\\Sampi'           : u'\u03e0',
+    '\\Stigma'          : u'\u03da',
+    '\\Subset'          : u'\u22d0',
+    '\\Supset'          : u'\u22d1',
+    '\\TH'              : u'\xde',
+    '\\UpArrowBar'      : u'\u2912',
+    '\\UpEquilibrium'   : u'\u296e',
+    '\\Uparrow'         : u'\u21d1',
+    '\\Updownarrow'     : u'\u21d5',
+    '\\VDash'           : u'\u22ab',
+    '\\Vdash'           : u'\u22a9',
+    '\\Vert'            : u'\u2016',
+    '\\Vvdash'          : u'\u22aa',
+    '\\aa'              : u'\xe5',
+    '\\ae'              : u'\xe6',
+    '\\allequal'        : u'\u224c',
+    '\\amalg'           : u'\u2a3f',
+    '\\angle'           : u'\u2220',
+    '\\approxeq'        : u'\u224a',
+    '\\approxnotequal'  : u'\u2246',
+    '\\aquarius'        : u'\u2652',
+    '\\aries'           : u'\u2648',
+    '\\arrowwaveright'  : u'\u219d',
+    '\\backepsilon'     : u'\u03f6',
+    '\\backprime'       : u'\u2035',
+    '\\backsim'         : u'\u223d',
+    '\\backsimeq'       : u'\u22cd',
+    '\\barwedge'        : u'\u2305',
+    '\\because'         : u'\u2235',
+    '\\between'         : u'\u226c',
+    '\\bigcap'          : u'\u22c2',
+    '\\bigcirc'         : u'\u25ef',
+    '\\bigcup'          : u'\u22c3',
+    '\\bigtriangledown' : u'\u25bd',
+    '\\bigtriangleup'   : u'\u25b3',
+    '\\blacklozenge'    : u'\u29eb',
+    '\\blacksquare'     : u'\u25aa',
+    '\\blacktriangle'   : u'\u25b4',
+    '\\blacktriangledown': u'\u25be',
+    '\\blacktriangleleft': u'\u25c2',
+    '\\blacktriangleright': u'\u25b8',
+    '\\boxdot'          : u'\u22a1',
+    '\\boxminus'        : u'\u229f',
+    '\\boxplus'         : u'\u229e',
+    '\\boxtimes'        : u'\u22a0',
+    '\\bumpeq'          : u'\u224f',
+    '\\cancer'          : u'\u264b',
+    '\\capricornus'     : u'\u2651',
+    '\\cdots'           : u'\u22ef',
+    '\\circeq'          : u'\u2257',
+    '\\circlearrowleft' : u'\u21ba',
+    '\\circlearrowright': u'\u21bb',
+    '\\circledS'        : u'\u24c8',
+    '\\circledast'      : u'\u229b',
+    '\\circledcirc'     : u'\u229a',
+    '\\circleddash'     : u'\u229d',
+    '\\clockoint'       : u'\u2a0f',
+    '\\clwintegral'     : u'\u2231',
+    '\\complement'      : u'\u2201',
+    '\\cong'            : u'\u2245',
+    '\\coprod'          : u'\u2210',
+    '\\curlyeqprec'     : u'\u22de',
+    '\\curlyeqsucc'     : u'\u22df',
+    '\\curlyvee'        : u'\u22ce',
+    '\\curlywedge'      : u'\u22cf',
+    '\\curvearrowleft'  : u'\u21b6',
+    '\\curvearrowright' : u'\u21b7',
+    '\\dblarrowupdown'  : u'\u21c5',
+    '\\ddddot'          : u'\u20dc',
+    '\\dddot'           : u'\u20db',
+    '\\dh'              : u'\xf0',
+    '\\diagup'          : u'\u2571',
+    '\\digamma'         : u'\u03dd',
+    '\\div'             : u'\xf7',
+    '\\divideontimes'   : u'\u22c7',
+    '\\dj'              : u'\u0111',
+    '\\doteqdot'        : u'\u2251',
+    '\\dotplus'         : u'\u2214',
+    '\\downdownarrows'  : u'\u21ca',
+    '\\downharpoonleft' : u'\u21c3',
+    '\\downharpoonright': u'\u21c2',
+    '\\downslopeellipsis': u'\u22f1',
+    '\\eighthnote'      : u'\u266a',
+    '\\eqcirc'          : u'\u2256',
+    '\\eqslantgtr'      : u'\u2a96',
+    '\\eqslantless'     : u'\u2a95',
+    '\\estimates'       : u'\u2259',
+    '\\eth'             : u'\u01aa',
+    '\\exists'          : u'\u2203',
+    '\\fallingdotseq'   : u'\u2252',
+    '\\flat'            : u'\u266d',
+    '\\forall'          : u'\u2200',
+    '\\forcesextra'     : u'\u22a8',
+    '\\frown'           : u'\u2322',
+    '\\gemini'          : u'\u264a',
+    '\\geq'             : u'\u2265',
+    '\\geqq'            : u'\u2267',
+    '\\geqslant'        : u'\u2a7e',
+    '\\gnapprox'        : u'\u2a8a',
+    '\\gneq'            : u'\u2a88',
+    '\\gneqq'           : u'\u2269',
+    '\\gnsim'           : u'\u22e7',
+    '\\greaterequivlnt': u'\u2273',
+    '\\gtrapprox'       : u'\u2a86',
+    '\\gtrdot'          : u'\u22d7',
+    '\\gtreqless'       : u'\u22db',
+    '\\gtreqqless'      : u'\u2a8c',
+    '\\gtrless'         : u'\u2277',
+    '\\guillemotleft'   : u'\xab',
+    '\\guillemotright'  : u'\xbb',
+    '\\guilsinglleft'   : u'\u2039',
+    '\\guilsinglright'  : u'\u203a',
+    '\\hermitconjmatrix': u'\u22b9',
+    '\\homothetic'      : u'\u223b',
+    '\\hookleftarrow'   : u'\u21a9',
+    '\\hookrightarrow'  : u'\u21aa',
+    '\\hslash'          : u'\u210f',
+    '\\i'               : u'\u0131',
+    '\\intercal'        : u'\u22ba',
+    '\\jupiter'         : u'\u2643',
+    '\\k'               : u'\u0328',
+    '\\l'               : u'\u0142',
+    '\\langle'          : u'\u2329',
+    '\\lazysinv'        : u'\u223e',
+    '\\lceil'           : u'\u2308',
+    '\\ldots'           : u'\u2026',
+    '\\leftarrowtail'   : u'\u21a2',
+    '\\leftharpoondown' : u'\u21bd',
+    '\\leftharpoonup'   : u'\u21bc',
+    '\\leftleftarrows'  : u'\u21c7',
+    '\\leftrightarrows' : u'\u21c6',
+    '\\leftrightharpoons': u'\u21cb',
+    '\\leftrightsquigarrow': u'\u21ad',
+    '\\leftthreetimes'  : u'\u22cb',
+    '\\leo'             : u'\u264c',
+    '\\leq'             : u'\u2264',
+    '\\leqq'            : u'\u2266',
+    '\\leqslant'        : u'\u2a7d',
+    '\\lessapprox'      : u'\u2a85',
+    '\\lessdot'         : u'\u22d6',
+    '\\lesseqgtr'       : u'\u22da',
+    '\\lesseqqgtr'      : u'\u2a8b',
+    '\\lessequivlnt'    : u'\u2272',
+    '\\lessgtr'         : u'\u2276',
+    '\\lfloor'          : u'\u230a',
+    '\\libra'           : u'\u264e',
+    '\\llcorner'        : u'\u231e',
+    '\\lmoustache'      : u'\u23b0',
+    '\\lnapprox'        : u'\u2a89',
+    '\\lneq'            : u'\u2a87',
+    '\\lneqq'           : u'\u2268',
+    '\\lnot'            : u'\xac',
+    '\\lnsim'           : u'\u22e6',
+    '\\longleftarrow'   : u'\u27f5',
+    '\\longleftrightarrow': u'\u27f7',
+    '\\longmapsto'      : u'\u27fc',
+    '\\longrightarrow'  : u'\u27f6',
+    '\\looparrowleft'   : u'\u21ab',
+    '\\looparrowright'  : u'\u21ac',
+    '\\lozenge'         : u'\u25ca',
+    '\\lrcorner'        : u'\u231f',
+    '\\ltimes'          : u'\u22c9',
+    '\\male'            : u'\u2642',
+    '\\mapsto'          : u'\u21a6',
+    '\\measuredangle'   : u'\u2221',
+    '\\mercury'         : u'\u263f',
+    '\\mho'             : u'\u2127',
+    '\\mid'             : u'\u2223',
+    '\\mkern1mu'        : u'\u200a',
+    '\\mkern4mu'        : u'\u205f',
+    '\\multimap'        : u'\u22b8',
+    '\\nLeftarrow'      : u'\u21cd',
+    '\\nLeftrightarrow' : u'\u21ce',
+    '\\nRightarrow'     : u'\u21cf',
+    '\\nVDash'          : u'\u22af',
+    '\\nVdash'          : u'\u22ae',
+    '\\natural'         : u'\u266e',
+    '\\nearrow'         : u'\u2197',
+    '\\neptune'         : u'\u2646',
+    '\\nexists'         : u'\u2204',
+    '\\ng'              : u'\u014b',
+    '\\nleftarrow'      : u'\u219a',
+    '\\nleftrightarrow' : u'\u21ae',
+    '\\nmid'            : u'\u2224',
+    '\\nolinebreak'     : u'\u2060',
+    '\\notgreaterless'  : u'\u2279',
+    '\\notlessgreater'  : u'\u2278',
+    '\\nparallel'       : u'\u2226',
+    '\\nrightarrow'     : u'\u219b',
+    '\\ntriangleleft'   : u'\u22ea',
+    '\\ntrianglelefteq' : u'\u22ec',
+    '\\ntriangleright'  : u'\u22eb',
+    '\\ntrianglerighteq': u'\u22ed',
+    '\\nvDash'          : u'\u22ad',
+    '\\nvdash'          : u'\u22ac',
+    '\\nwarrow'         : u'\u2196',
+    '\\o'               : u'\xf8',
+    '\\oe'              : u'\u0153',
+    '\\oint'            : u'\u222e',
+    '\\openbracketleft' : u'\u301a',
+    '\\openbracketright': u'\u301b',
+    '\\original'        : u'\u22b6',
+    '\\partial'         : u'\u2202',
+    '\\perspcorrespond' : u'\u2a5e',
+    '\\pisces'          : u'\u2653',
+    '\\pitchfork'       : u'\u22d4',
+    '\\pluto'           : u'\u2647',
+    '\\precapprox'      : u'\u2ab7',
+    '\\preccurlyeq'     : u'\u227c',
+    '\\precedesnotsimilar': u'\u22e8',
+    '\\precnapprox'     : u'\u2ab9',
+    '\\precneqq'        : u'\u2ab5',
+    '\\prod'            : u'\u220f',
+    '\\quarternote'     : u'\u2669',
+    '\\rangle'          : u'\u232a',
+    '\\rbrace'          : u'}',
+    '\\rceil'           : u'\u2309',
+    '\\recorder'        : u'\u2315',
+    '\\rfloor'          : u'\u230b',
+    '\\rightangle'      : u'\u221f',
+    '\\rightanglearc'   : u'\u22be',
+    '\\rightarrowtail'  : u'\u21a3',
+    '\\rightharpoondown': u'\u21c1',
+    '\\rightharpoonup'  : u'\u21c0',
+    '\\rightleftarrows' : u'\u21c4',
+    '\\rightleftharpoons': u'\u21cc',
+    '\\rightmoon'       : u'\u263e',
+    '\\rightrightarrows': u'\u21c9',
+    '\\rightsquigarrow' : u'\u21dd',
+    '\\rightthreetimes' : u'\u22cc',
+    '\\risingdotseq'    : u'\u2253',
+    '\\rmoustache'      : u'\u23b1',
+    '\\rtimes'          : u'\u22ca',
+    '\\sagittarius'     : u'\u2650',
+    '\\saturn'          : u'\u2644',
+    '\\scorpio'         : u'\u264f',
+    '\\searrow'         : u'\u2198',
+    '\\setminus'        : u'\u2216',
+    '\\sharp'           : u'\u266f',
+    '\\smile'           : u'\u2323',
+    '\\sphericalangle'  : u'\u2222',
+    '\\sqcap'           : u'\u2293',
+    '\\sqcup'           : u'\u2294',
+    '\\sqrint'          : u'\u2a16',
+    '\\square'          : u'\u25a1',
+    '\\ss'              : u'\xdf',
+    '\\starequal'       : u'\u225b',
+    '\\subseteqq'       : u'\u2ac5',
+    '\\subsetneq'       : u'\u228a',
+    '\\subsetneqq'      : u'\u2acb',
+    '\\succapprox'      : u'\u2ab8',
+    '\\succcurlyeq'     : u'\u227d',
+    '\\succnapprox'     : u'\u2aba',
+    '\\succneqq'        : u'\u2ab6',
+    '\\succnsim'        : u'\u22e9',
+    '\\sum'             : u'\u2211',
+    '\\supseteqq'       : u'\u2ac6',
+    '\\supsetneq'       : u'\u228b',
+    '\\supsetneqq'      : u'\u2acc',
+    '\\surd'            : u'\u221a',
+    '\\surfintegral'    : u'\u222f',
+    '\\swarrow'         : u'\u2199',
+    '\\taurus'          : u'\u2649',
+    '\\textTheta'       : u'\u03f4',
+    '\\textasciiacute'  : u'\xb4',
+    '\\textasciibreve'  : u'\u02d8',
+    '\\textasciicaron'  : u'\u02c7',
+    '\\textasciidieresis': u'\xa8',
+    '\\textasciigrave'  : u'`',
+    '\\textasciimacron' : u'\xaf',
+    '\\textasciitilde'  : u'~',
+    '\\textbrokenbar'   : u'\xa6',
+    '\\textbullet'      : u'\u2022',
+    '\\textcent'        : u'\xa2',
+    '\\textcopyright'   : u'\xa9',
+    '\\textcurrency'    : u'\xa4',
+    '\\textdagger'      : u'\u2020',
+    '\\textdaggerdbl'   : u'\u2021',
+    '\\textdegree'      : u'\xb0',
+    '\\textdollar'      : u'$',
+    '\\textdoublepipe'  : u'\u01c2',
+    '\\textemdash'      : u'\u2014',
+    '\\textendash'      : u'\u2013',
+    '\\textexclamdown'  : u'\xa1',
+    '\\texthvlig'       : u'\u0195',
+    '\\textnrleg'       : u'\u019e',
+    '\\textonehalf'     : u'\xbd',
+    '\\textonequarter'  : u'\xbc',
+    '\\textordfeminine' : u'\xaa',
+    '\\textordmasculine': u'\xba',
+    '\\textparagraph'   : u'\xb6',
+    '\\textperiodcentered': u'\u02d9',
+    '\\textpertenthousand': u'\u2031',
+    '\\textperthousand' : u'\u2030',
+    '\\textphi'         : u'\u0278',
+    '\\textquestiondown': u'\xbf',
+    '\\textquotedblleft': u'\u201c',
+    '\\textquotedblright': u'\u201d',
+    '\\textquotesingle' : u"'",
+    '\\textregistered'  : u'\xae',
+    '\\textsection'     : u'\xa7',
+    '\\textsterling'    : u'\xa3',
+    '\\texttheta'       : u'\u03b8',
+    '\\textthreequarters': u'\xbe',
+    '\\texttildelow'    : u'\u02dc',
+    '\\texttimes'       : u'\xd7',
+    '\\texttrademark'   : u'\u2122',
+    '\\textturnk'       : u'\u029e',
+    '\\textvartheta'    : u'\u03d1',
+    '\\textvisiblespace': u'\u2423',
+    '\\textyen'         : u'\xa5',
+    '\\th'              : u'\xfe',
+    '\\therefore'       : u'\u2234',
+    '\\tildetrpl'       : u'\u224b',
+    '\\top'             : u'\u22a4',
+    '\\triangledown'    : u'\u25bf',
+    '\\triangleleft'    : u'\u25c3',
+    '\\trianglelefteq'  : u'\u22b4',
+    '\\triangleq'       : u'\u225c',
+    '\\triangleright'   : u'\u25b9',
+    '\\trianglerighteq' : u'\u22b5',
+    '\\truestate'       : u'\u22a7',
+    '\\twoheadleftarrow': u'\u219e',
+    '\\twoheadrightarrow': u'\u21a0',
+    '\\ulcorner'        : u'\u231c',
+    '\\updownarrow'     : u'\u2195',
+    '\\upharpoonleft'   : u'\u21bf',
+    '\\upharpoonright'  : u'\u21be',
+    '\\upslopeellipsis' : u'\u22f0',
+    '\\upuparrows'      : u'\u21c8',
+    '\\uranus'          : u'\u2645',
+    '\\urcorner'        : u'\u231d',
+    '\\varepsilon'      : u'\u025b',
+    '\\varkappa'        : u'\u03f0',
+    '\\varnothing'      : u'\u2205',
+    '\\varphi'          : u'\u03c6',
+    '\\varpi'           : u'\u03d6',
+    '\\varrho'          : u'\u03f1',
+    '\\varsigma'        : u'\u03c2',
+    '\\vartriangle'     : u'\u25b5',
+    '\\vartriangleleft' : u'\u22b2',
+    '\\vartriangleright': u'\u22b3',
+    '\\vdots'           : u'\u22ee',
+    '\\veebar'          : u'\u22bb',
+    '\\venus'           : u'\u2640',
+    '\\vert'            : u'|',
+    '\\verymuchgreater' : u'\u22d9',
+    '\\verymuchless'    : u'\u22d8',
+    '\\virgo'           : u'\u264d',
+    '\\volintegral'     : u'\u2230',
+    '\\wp'              : u'\u2118',
+    '\\wr'              : u'\u2240',
     }
 
 class RenderState(object):
@@ -226,10 +629,10 @@ class PartText(Part):
     """Fundamental bit of text to be rendered: some text."""
     def __init__(self, text):
         self.text = text
-    
+
     def addText(self, text):
         self.text += text
-    
+
     def render(self, state):
         """Render some text."""
 
@@ -238,7 +641,7 @@ class PartText(Part):
         # actually write the text if requested
         if state.actually_render:
             state.painter.drawText( qt4.QPointF(state.x, state.y), self.text )
-            
+
         # move along, nothing to see
         state.x += width
 
@@ -419,7 +822,7 @@ class PartMultiScript(Part):
             p.render(state)
             newx = max([state.x, newx])
         state.x = newx
-    
+
     def append(self, p):
         self.children.append(p)
 
@@ -430,9 +833,9 @@ class PartItalic(Part):
 
         font.setItalic( not font.italic() )
         state.painter.setFont(font)
-                
+
         Part.render(self, state)
-                
+
         font.setItalic( not font.italic() )
         state.painter.setFont(font)
 
@@ -443,9 +846,9 @@ class PartBold(Part):
 
         font.setBold( not font.bold() )
         state.painter.setFont(font)
-                
+
         Part.render(self, state)
-                
+
         font.setBold( not font.bold() )
         state.painter.setFont(font)
 
@@ -458,7 +861,7 @@ class PartUnderline(Part):
         state.painter.setFont(font)
 
         Part.render(self, state)
-                
+
         font.setUnderline( not font.underline() )
         state.painter.setFont(font)
 
@@ -512,7 +915,7 @@ class PartSize(Part):
         elif self.deltasize:
             # change of size
             size = max(size+self.deltasize, 0.1)
-        
+
         font.setPointSizeF(size)
         state.painter.setFont(font)
 
@@ -651,7 +1054,7 @@ def makePartList(text):
     """Make list of parts from text"""
     parts = []
     parents = [parts]
-    
+
     def doAdd(p):
         """Add the part at the correct level."""
         parents[-1].append(p)
@@ -686,14 +1089,14 @@ def makePartTree(partlist):
     lines = []
     itemlist = []
     length = len(partlist)
-    
+
     def addText(text):
         """Try to merge consecutive text items for better rendering."""
         if itemlist and isinstance(itemlist[-1], PartText):
             itemlist[-1].addText(text)
         else:
             itemlist.append( PartText(text) )
-    
+
     i = 0
     while i < length:
         p = partlist[i]
@@ -712,14 +1115,14 @@ def makePartTree(partlist):
                     partargs = [makePartTree([partlist[i+1]])]
                 else:
                     partargs = [makePartTree(k) for k in partlist[i+1:i+numargs+1]]
-                
+
                 if (p == '^' or p == '_'):
                     if len(itemlist) > 0 and (
                         isinstance(itemlist[-1], PartSubScript) or
                         isinstance(itemlist[-1], PartSuperScript) or
                         isinstance(itemlist[-1], PartMultiScript)):
                         # combine sequences of multiple sub-/superscript parts into
-                        # a MultiScript item so that a single text item can have 
+                        # a MultiScript item so that a single text item can have
                         # both super and subscript indicies
                         # e.g. X^{(q)}_{i}
                         if isinstance(itemlist[-1], PartMultiScript):
