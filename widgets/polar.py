@@ -94,6 +94,9 @@ class Polar(NonOrthGraph):
         '''Construct list of settings.'''
         NonOrthGraph.addSettings(s)
 
+        s.add( setting.FloatOrAuto('minradius', 'Auto',
+                                   descr=_('Minimum value of radius'),
+                                   usertext=_('Min radius')) )
         s.add( setting.FloatOrAuto('maxradius', 'Auto',
                                    descr=_('Maximum value of radius'),
                                    usertext=_('Max radius')) )
@@ -112,6 +115,9 @@ class Polar(NonOrthGraph):
                               'right',
                               descr = _('Direction of 0 angle'),
                               usertext = _(u'Position of 0°')) )
+        s.add( setting.Bool('log', False,
+                            descr = _('Logarithmic radial axis'),
+                            usertext = _('Log')) )
 
         s.add( TickLabel('TickLabels', descr = _('Tick labels'),
                     usertext=_('Tick labels')),
@@ -127,9 +133,12 @@ class Polar(NonOrthGraph):
 
     def coordRanges(self):
         '''Get ranges of coordinates.'''
-        if self.settings.units == 'degrees':
-            return [[0., self._maxradius], [0., 360.]]
-        return [[0., self._maxradius], [0., 2.*N.pi]]
+        angularrange = [[0., 2.*N.pi], [0., 360]][
+            self.settings.units == 'degrees' ]
+        return [
+            [self._minradius, self._maxradius],
+            angularrange
+            ]
 
     def toPlotAngle(self, angles):
         """Convert one or more angles to angle on plot."""
@@ -145,11 +154,23 @@ class Polar(NonOrthGraph):
         angles -= {'right': 0, 'top': 0.5*N.pi, 'left': N.pi,
                    'bottom': 1.5*N.pi}[self.settings.position0]
         return angles
-        
+
+    def toPlotRadius(self, radii):
+        """Convert radii to a plot radii."""
+        if self.settings.log:
+            logmin = N.log(self._minradius)
+            logmax = N.log(self._maxradius)
+            r = ( N.log(N.clip(radii, 1e-99, 1e99)) - logmin ) / (
+                logmax - logmin)
+        else:
+            r = (radii - self._minradius) / (
+                self._maxradius - self._minradius)
+        return N.where(r > 0., r, 0.)
+
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert coordinates in r, theta to x, y.'''
 
-        ca = coorda / self._maxradius
+        ca = self.toPlotRadius(coorda)
         cb = self.toPlotAngle(coordb)
 
         x = self._xc + ca * N.cos(cb) * self._xscale
@@ -183,7 +204,24 @@ class Polar(NonOrthGraph):
             self._maxradius = datarange[1]
         else:
             self._maxradius = s.maxradius
-    
+        if s.minradius == 'Auto':
+            if s.log:
+                if datarange[0] > 0.:
+                    self._minradius = datarange[0]
+                else:
+                    self._minradius = self._maxradius / 100.
+            else:
+                self._minradius = 0.
+        else:
+            self._minradius = s.minradius
+
+        # stop negative values
+        if s.log:
+            self._minradius = N.clip(self._minradius, 1e-99, 1e99)
+            self._maxradius = N.clip(self._maxradius, 1e-99, 1e99)
+        if self._minradius == self._maxradius:
+            self._maxradius = self._minradius + 1
+
         self._xscale = (bounds[2]-bounds[0])*0.5
         self._yscale = (bounds[3]-bounds[1])*0.5
         self._xc = 0.5*(bounds[0]+bounds[2])
@@ -208,26 +246,31 @@ class Polar(NonOrthGraph):
         s = self.settings
         t = s.Tick
 
-        if self._maxradius <= 0.:
-            self._maxradius = 1.
-
-        atick = AxisTicks(0, self._maxradius, t.number, t.number*4,
-                          extendmin=False, extendmax=False)
+        atick = AxisTicks(self._minradius, self._maxradius,
+                          t.number, t.number*4,
+                          extendmin=False, extendmax=False,
+                          logaxis=s.log)
         atick.getTicks()
         majtick = atick.tickvals
+
+        # drop 0 at origin
+        if self._minradius == 0. and not s.log:
+            majtick = majtick[1:]
 
         # draw ticks as circles
         if not t.hideannuli:
             painter.setPen( s.Tick.makeQPenWHide(painter) )
             painter.setBrush( qt4.QBrush() )      
-            for tick in majtick[1:]:
-                radius = tick / self._maxradius
 
-                painter.drawEllipse(qt4.QRectF(
+            for tick in majtick:
+                radius = self.toPlotRadius(tick)
+                if radius > 0:
+                    rect = qt4.QRectF(
                         qt4.QPointF( self._xc - radius*self._xscale,
                                      self._yc - radius*self._yscale ),
                         qt4.QPointF( self._xc + radius*self._xscale,
-                                     self._yc + radius*self._yscale ) ))
+                                     self._yc + radius*self._yscale ) )
+                    painter.drawEllipse(rect)
 
         # setup axes plot
         tl = s.TickLabels
@@ -239,10 +282,10 @@ class Polar(NonOrthGraph):
 
         # draw radial axis
         if not s.TickLabels.hideradial:
-            for tick in majtick[1:]:
+            for tick in majtick:
                 num = utils.formatNumber(tick*scale, format,
                                          locale=self.document.locale)
-                x = tick / self._maxradius * self._xscale + self._xc
+                x = self.toPlotRadius(tick) * self._xscale + self._xc
                 r = utils.Renderer(painter, font, x, self._yc, num,
                                    alignhorz=-1,
                                    alignvert=-1, usefullheight=True)
