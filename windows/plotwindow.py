@@ -277,7 +277,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.clickmode = 'select'
         self.currentclickmode = None
 
-        # wheel zooming accumulator
+        # wheel zooming/scrolling accumulator
         self.sumwheeldelta = 0
 
         # set up redrawing timer
@@ -811,6 +811,18 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.sumwheeldelta += 120
             while self.sumwheeldelta >= 120:
                 self.slotViewZoomIn()
+                self.sumwheeldelta -= 120
+        elif event.modifiers() & qt4.Qt.ShiftModifier:
+            self.sumwheeldelta += event.delta()
+            while self.sumwheeldelta <= -120:
+                # scroll left
+                self.sumwheeldelta += 120
+                scrollx = self.horizontalScrollBar()
+                scrollx.setValue(scrollx.value() + 120)
+            while self.sumwheeldelta >= 120:
+                # scroll right
+                scrollx = self.horizontalScrollBar()
+                scrollx.setValue(scrollx.value() - 120)
                 self.sumwheeldelta -= 120
         else:
             qt4.QGraphicsView.wheelEvent(self, event)
