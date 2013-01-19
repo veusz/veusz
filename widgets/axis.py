@@ -468,7 +468,7 @@ class Axis(widget.Widget):
             self._computePlottedRange()
         return (self.plottedrange[0], self.plottedrange[1])
 
-    def _updatePlotRange(self, bounds, otherposition=None):
+    def _updateAxisLocation(self, bounds, otherposition=None):
         """Calculate coordinates on plotter of axis."""
 
         s = self.settings
@@ -515,7 +515,7 @@ class Axis(widget.Widget):
         if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
-        self._updatePlotRange(bounds)
+        self._updateAxisLocation(bounds)
 
         return self._graphToPlotter(vals)
 
@@ -536,7 +536,7 @@ class Axis(widget.Widget):
         if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
-        self._updatePlotRange(posn)
+        self._updateAxisLocation(posn)
         return self._graphToPlotter(data*self.settings.datascale)
 
     def plotterToGraphCoords(self, bounds, vals):
@@ -551,7 +551,7 @@ class Axis(widget.Widget):
         if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
-        self._updatePlotRange( bounds )
+        self._updateAxisLocation( bounds )
 
         # work out fractional positions of the plotter coords
         frac = ( (vals.astype(N.float64) - self.coordParr1) /
@@ -947,7 +947,7 @@ class Axis(widget.Widget):
             otheredge = 0.
 
         # temporarily change position of axis to other side for drawing
-        self._updatePlotRange(posn, otherposition=otheredge)
+        self._updateAxisLocation(posn, otherposition=otheredge)
         if not s.Line.hide:
             self._drawAxisLine(painter)
         if not s.MinorTicks.hide:
@@ -1008,7 +1008,7 @@ class Axis(widget.Widget):
             self._computePlottedRange()
 
         posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
-        self._updatePlotRange(posn)
+        self._updateAxisLocation(posn)
 
         # get ready to draw
         if useexistingpainter is not None:
