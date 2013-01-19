@@ -37,7 +37,7 @@ import controlgraph
 
 def _(text, disambiguation=None, context='Axis'):
     """Translate text."""
-    return unicode( 
+    return unicode(
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class MajorTick(setting.Line):
@@ -61,9 +61,9 @@ class MajorTick(setting.Line):
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
-        
+
         return self.get('length').convert(painter)
-    
+
 class MinorTick(setting.Line):
     '''Minor tick settings.'''
 
@@ -80,9 +80,9 @@ class MinorTick(setting.Line):
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
-        
+
         return self.get('length').convert(painter)
-    
+
 class GridLine(setting.Line):
     '''Grid line settings.'''
 
@@ -190,10 +190,7 @@ class Axis(widget.Widget):
         elif self.name == 'x' and s.direction != 'horizontal':
             s.direction = 'horizontal'
 
-        self.minorticks = None
-        self.majorticks = None
-
-        # automatic range 
+        # automatic range
         self.setAutoRange(None)
 
         # document updates change set variable when things need recalculating
@@ -231,9 +228,9 @@ class Axis(widget.Widget):
                 formatting = True,
                 usertext = _('Auto range') ) )
         s.add( setting.Choice('mode',
-                              ('numeric', 'datetime', 'labels'), 
-                              'numeric', 
-                              descr = _('Type of ticks to show on on axis'), 
+                              ('numeric', 'datetime', 'labels'),
+                              'numeric',
+                              descr = _('Type of ticks to show on on axis'),
                               usertext=_('Mode')) )
 
         s.add( setting.SettingBackwardCompat(
@@ -341,7 +338,7 @@ class Axis(widget.Widget):
                 self.autorange = [1e-2, 1.]
             else:
                 self.autorange = [0., 1.]
-                
+
     def _computePlottedRange(self):
         """Convert the range requested into a plotted range."""
 
@@ -397,21 +394,11 @@ class Axis(widget.Widget):
             if self.plottedrange[0] == self.plottedrange[1]:
                 self.plottedrange[1] = self.plottedrange[0]*2
 
-        # work out tick values and expand axes if necessary
-        if s.mode in ('numeric', 'labels'):
-            tickclass = axisticks.AxisTicks
-        else:
-            tickclass = axisticks.DateTicks
-
-        extendmin = extendmax = False
         r = s.autoRange
         if r == 'exact':
             pass
         elif r == 'next-tick':
-            if s.min == 'Auto':
-                extendmin = True
-            if s.max == 'Auto':
-                extendmax = True
+            pass
         else:
             val = {'+2%': 0.02, '+5%': 0.05, '+10%': 0.1, '+15%': 0.15}[r]
 
@@ -431,6 +418,29 @@ class Axis(widget.Widget):
                 if s.max == 'Auto':
                     self.plottedrange[1] += rng*val
 
+        self.computeTicks()
+
+        # invert bounds if axis was inverted
+        if invertaxis:
+            self.plottedrange.reverse()
+
+        self.docchangeset = self.document.changeset
+
+    def computeTicks(self):
+        """Update ticks given plotted range."""
+
+        s = self.settings
+
+        if s.mode in ('numeric', 'labels'):
+            tickclass = axisticks.AxisTicks
+        else:
+            tickclass = axisticks.DateTicks
+
+        nexttick = s.autoRange == 'next-tick'
+        extendmin = nexttick and s.min == 'Auto'
+        extendmax = nexttick and s.max == 'Auto'
+
+        # create object to compute ticks
         axs = tickclass(self.plottedrange[0], self.plottedrange[1],
                         s.MajorTicks.number, s.MinorTicks.number,
                         extendmin = extendmin, extendmax = extendmax,
@@ -451,18 +461,6 @@ class Axis(widget.Widget):
                     ticks.append(i)
             self.majortickscalc = N.array(ticks)
 
-        # invert bounds if axis was inverted
-        if invertaxis:
-            self.plottedrange.reverse()
-
-        if self.majorticks is not None:
-            self.majortickscalc = N.array(self.majorticks)
-
-        if self.minorticks is not None:
-            self.minortickscalc = N.array(self.minorticks)
-
-        self.docchangeset = self.document.changeset
-        
     def getPlottedRange(self):
         """Return the range plotted by the axes."""
 
@@ -504,7 +502,7 @@ class Axis(widget.Widget):
             self.coordReflected = not s.reflect
         else:
             self.coordReflected = s.reflect
-     
+
     def graphToPlotterCoords(self, bounds, vals):
         """Convert graph coordinates to plotter coordinates on this axis.
 
@@ -523,7 +521,7 @@ class Axis(widget.Widget):
 
     def _graphToPlotter(self, vals):
         """Convert the coordinates assuming the machinery is in place."""
-        
+
         # work out fractional posistions, then convert to pixels
         if self.settings.log:
             fracposns = self.logConvertToPlotter(vals)
@@ -540,10 +538,10 @@ class Axis(widget.Widget):
 
         self._updatePlotRange(posn)
         return self._graphToPlotter(data*self.settings.datascale)
-    
+
     def plotterToGraphCoords(self, bounds, vals):
         """Convert plotter coordinates on this axis to graph coordinates.
-        
+
         bounds specifies the plot bounds
         vals is a numpy of coordinates
         returns a numpy of floats
@@ -564,7 +562,7 @@ class Axis(widget.Widget):
             return self.logConvertFromPlotter(frac)
         else:
             return self.linearConvertFromPlotter(frac)
-        
+
     def plotterToDataCoords(self, bounds, vals):
         """Convert plotter coordinates to data, removing scaling."""
         try:
@@ -578,13 +576,13 @@ class Axis(widget.Widget):
         """
         return ( (v - self.plottedrange[0]) /
                  (self.plottedrange[1] - self.plottedrange[0]) )
-    
+
     def linearConvertFromPlotter(self, v):
         """Convert from (fractional) plotter coords to graph coords.
         """
         return ( self.plottedrange[0] + v *
                  (self.plottedrange[1]-self.plottedrange[0]) )
-    
+
     def logConvertToPlotter(self, v):
         """Convert graph coordinates to fractional plotter units for log10 scale.
         """
@@ -592,13 +590,13 @@ class Axis(widget.Widget):
         log1 = N.log(self.plottedrange[0])
         log2 = N.log(self.plottedrange[1])
         return ( N.log( N.clip(v, 1e-99, 1e99) ) - log1 )/(log2 - log1)
-    
+
     def logConvertFromPlotter(self, v):
         """Convert from fraction plotter coords to graph coords with log scale.
         """
         return ( self.plottedrange[0] *
                  ( self.plottedrange[1]/self.plottedrange[0] )**v )
-    
+
     def againstWhichEdge(self):
         """Returns edge this axis is against, if any.
 
@@ -620,7 +618,7 @@ class Axis(widget.Widget):
                     return 3
                 else:
                     return 1
-    
+
     def swapline(self, painter, a1, b1, a2, b2):
         """Draw line, but swap x & y coordinates if vertical axis."""
         if self.settings.direction == 'horizontal':
@@ -663,7 +661,7 @@ class Axis(widget.Widget):
         painter.setPen(pen)
         self.swapline( painter,
                        self.coordParr1, self.coordPerp,
-                       self.coordParr2, self.coordPerp )        
+                       self.coordParr2, self.coordPerp )
 
     def _drawMinorTicks(self, painter, coordminorticks):
         """Draw minor ticks on plot."""
@@ -681,7 +679,7 @@ class Axis(widget.Widget):
             delta *= -1
         if s.outerticks:
             delta *= -1
-        
+
         y = coordminorticks*0.+self.coordPerp
         self.swaplines( painter,
                         coordminorticks, y,
@@ -755,7 +753,7 @@ class Axis(widget.Widget):
         angle = int(s.TickLabels.rotate)
         if not self.coordReflected and angle != 0:
             angle = 360-angle
-        
+
         if vertical:
             # limit tick labels to be directly below/besides axis
             ax, ay = 1, 0
@@ -1089,7 +1087,7 @@ class Axis(widget.Widget):
                 painter.setPen(pen)
                 r.render()
                 drawntext.addRect(rect)
-                
+
     def updateControlItem(self, cgi):
         """Update axis position from control item."""
 
