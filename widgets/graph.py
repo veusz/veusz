@@ -89,29 +89,36 @@ class Graph(widget.Widget):
         if self.parent.getChild('y') is None:
             axis.Axis(self, name='y')
 
-    def getAxes(self, axesnames):
+    def getAxesDict(self, axesnames, ignoremissing=False):
         """Get the axes for widgets to plot against.
-        names is a list of names to find."""
+        axesnames is a list/set of names to find.
+        Returns a dict of objects
+        """
 
-        widgets = {}
+        axes = {}
         # recursively go back up the tree to find axes 
         w = self
-        while w is not None and len(widgets) < len(axesnames):
+        while w is not None and len(axes) < len(axesnames):
             for c in w.children:
                 name = c.name
-                if ( name in axesnames and name not in widgets and
+                if ( name in axesnames and name not in axes and
                      isinstance(c, axis.Axis) ):
-                    widgets[name] = c
+                    axes[name] = c
             w = w.parent
 
         # didn't find everything...
-        if w is None:
+        if w is None and not ignoremissing:
             for name in axesnames:
-                if name not in widgets:
-                    widgets[name] = None
+                if name not in axes:
+                    axes[name] = None
 
-        # return list of found widgets
-        return [widgets[n] for n in axesnames]
+        # return list of found axes
+        return axes
+
+    def getAxes(self, axesnames):
+        """Return a list of axes widgets given a list of names."""
+        ad = self.getAxesDict(axesnames)
+        return [ad[n] for n in axesnames]
 
     def draw(self, parentposn, painthelper, outerbounds = None):
         '''Update the margins before drawing.'''
@@ -143,29 +150,33 @@ class Graph(widget.Widget):
         utils.brushExtFillPath(painter, s.Background, path,
                                stroke=s.Border.makeQPenWHide(painter))
 
-        # do normal drawing of children
-        # iterate over children in reverse order
-        for c in reversed(self.children):
-            c.draw(bounds, painthelper, outerbounds=outerbounds)
+        # child drawing algorithm is a bit complex due to axes
+        # being shared between graphs and broken axes
 
-        # now need to find axes which aren't children, and draw those again
+        # get list of axes to draw
         axestodraw = set()
-        childrennames = set()
         for c in self.children:
-            childrennames.add(c.name)
             try:
                 for axis in c.getAxesNames():
                     axestodraw.add(axis)
             except AttributeError:
-                pass
+                if hasattr(c, 'isaxis'):
+                    axestodraw.add(c.name)
 
-        axestodraw = axestodraw - childrennames
-        if axestodraw:
-            # now redraw all these axes if they aren't children of us
-            axeswidgets = self.getAxes(axestodraw)
-            for w in axeswidgets:
-                if w is not None:
-                    w.draw(bounds, painthelper, outerbounds=outerbounds)
+        axes = self.getAxesDict(axestodraw, ignoremissing=True)
+        axeswidgets = set(axes.values())
+
+        for axis in axeswidgets:
+            axis.drawGrid(bounds, painthelper, outerbounds=outerbounds)
+
+        # do normal drawing of children
+        # iterate over children in reverse order
+        for c in reversed(self.children):
+            if c not in axeswidgets:
+                c.draw(bounds, painthelper, outerbounds=outerbounds)
+
+        for aname, awidget in sorted(axes.items())[::-1]:
+            awidget.draw(bounds, painthelper, outerbounds=outerbounds)
 
         return bounds
 

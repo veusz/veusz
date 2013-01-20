@@ -992,6 +992,36 @@ class Axis(widget.Widget):
                 return True
         return False
 
+    def drawGrid(self, parentposn, phelper, outerbounds=None):
+        """Code to draw gridlines.
+
+        This is separate from the main draw routine because the grid
+        should be behind/infront the data points.
+        """
+
+        # recompute if document modified
+        if self.docchangeset != self.document.changeset:
+            self._computePlottedRange()
+
+        s = self.settings
+        if s.hide or (s.MinorGridLines.hide and s.GridLines.hide):
+            return
+
+        posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
+        self._updateAxisLocation(posn)
+
+        painter = phelper.painter(self, posn)
+
+        # plot gridlines
+        if not s.MinorGridLines.hide:
+            coordminorticks = self._graphToPlotter(self.minortickscalc)
+            self._drawGridLines('MinorGridLines', painter, coordminorticks,
+                                parentposn)
+        if not s.GridLines.hide:
+            coordticks = self._graphToPlotter(self.majortickscalc)
+            self._drawGridLines('GridLines', painter, coordticks,
+                                parentposn)
+
     def draw(self, parentposn, phelper, outerbounds=None,
              useexistingpainter=None):
         """Plot the axis on the painter.
@@ -1037,14 +1067,6 @@ class Axis(widget.Widget):
             sign *= -1
         if self.coordReflected:
             sign *= -1
-
-        # plot gridlines
-        if not s.MinorGridLines.hide:
-            self._drawGridLines('MinorGridLines', painter, coordminorticks,
-                                parentposn)
-        if not s.GridLines.hide:
-            self._drawGridLines('GridLines', painter, coordticks,
-                                parentposn)
 
         # plot the line along the axis
         if not s.Line.hide:
