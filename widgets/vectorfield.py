@@ -143,27 +143,11 @@ class VectorField(plotters.GenericPlotter):
 
         painter.restore()
 
-    def draw(self, parentposn, phelper, outerbounds = None):
+    def dataDraw(self, painter, axes, posn, cliprect):
         """Draw the widget."""
 
-        posn = plotters.GenericPlotter.draw(self, parentposn, phelper,
-                                            outerbounds = outerbounds)
-        x1, y1, x2, y2 = posn
         s = self.settings
         d = self.document
-
-        # hide if hidden!
-        if s.hide:
-            return
-
-        # get axes widgets
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # return if there's no proper axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
-            return
 
         # ignore non existing datasets
         try:
@@ -175,10 +159,6 @@ class VectorField(plotters.GenericPlotter):
         # require 2d datasets
         if data1.dimensions != 2 or data2.dimensions != 2:
             return
-
-        # clip data within bounds of plotter
-        cliprect = self.clipAxesBounds(axes, posn)
-        painter = phelper.painter(self, posn, clip=cliprect)
 
         # get base length (ensure > 0)
         baselength = max(s.get('baselength').convert(painter), 1e-6)
@@ -239,4 +219,3 @@ class VectorField(plotters.GenericPlotter):
                 
 # allow the factory to instantiate a vector field
 document.thefactory.register( VectorField )
-

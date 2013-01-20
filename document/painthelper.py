@@ -50,6 +50,19 @@ class DrawState(object):
         # list of child widgets states
         self.children = []
 
+class Painter(qt4.QPainter):
+    def __init__(self, helper, widget, outdev):
+        qt4.QPainter.__init__(self, outdev)
+        self.helper = helper
+        self.widget = widget
+
+    def __enter__(self):
+        print ' '*len(self.helper.widgetstack), self.widget
+        self.helper.widgetstack.append(self.widget)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.helper.widgetstack.pop()
+
 class PaintHelper(object):
     """Helper used when painting widgets.
 
@@ -86,6 +99,8 @@ class PaintHelper(object):
         # state for root widget
         self.rootstate = None
 
+        self.widgetstack = []
+
     @property
     def maxsize(self):
         """Return maximum page dimension (using PaintHelper's DPI)."""
@@ -101,17 +116,23 @@ class PaintHelper(object):
         self.pagesize = ( setting.Distance.convertDistance(self, pagew),
                           setting.Distance.convertDistance(self, pageh) )
 
-    def painter(self, widget, bounds, clip=None):
+    def painter(self, widget, bounds, clip=None, layer=0):
         """Return a painter for use when drawing the widget.
         widget: widget object
         bounds: tuple (x1, y1, x2, y2) of widget bounds
-        clip: another tuple, if set clips drawing to this rectangle
+        clip: a QRectF, if set
+        layer for drawing in widget, allows multiple paints per widget
+        widgetparent: sometimes widgets are drawn by other widgets other than
+          direct parents, so this options means it will be painted "as if"
+          it is a child of the widget given
         """
-        s = self.states[widget] = DrawState(widget, bounds, clip, self)
-        if widget.parent is None:
-            self.rootstate = s
+
+        s = self.states[(widget,layer)] = DrawState(widget, bounds, clip, self)
+
+        if self.widgetstack:
+            self.states[(self.widgetstack[-1],0)].children.append(s)
         else:
-            self.states[widget.parent].children.append(s)
+            self.rootstate = s
 
         if self.directpaint:
             # only paint to one output painter
@@ -122,7 +143,7 @@ class PaintHelper(object):
             p.save()
         else:
             # save to multiple recorded layers
-            p = qt4.QPainter(s.record)
+            p = Painter(self, widget, s.record)
 
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
@@ -137,14 +158,21 @@ class PaintHelper(object):
 
     def setControlGraph(self, widget, cgis):
         """Records the control graph list for the widget given."""
-        self.states[widget].cgis = cgis
+        self.states[(widget,0)].cgis = cgis
+
+    def getControlGraph(self, widget):
+        """Return control graph for widget (or None)."""
+        try:
+            return self.states[(widget,0)].cgis
+        except IndexError:
+            return None
 
     def renderToPainter(self, painter):
         """Render saved output to painter.
         """
         self._renderState(self.rootstate, painter)
 
-    def _renderState(self, state, painter):
+    def _renderState(self, state, painter, indent=0):
         """Render state to painter."""
 
         painter.save()
@@ -152,7 +180,8 @@ class PaintHelper(object):
         painter.restore()
 
         for child in state.children:
-            self._renderState(child, painter)
+            #print '  '*indent, child.widget
+            self._renderState(child, painter, indent=indent+1)
 
     def identifyWidgetAtPoint(self, x, y, antialias=True):
         """What widget has drawn at the point x,y?
@@ -223,7 +252,7 @@ class PaintHelper(object):
 
     def widgetBounds(self, widget):
         """Return bounds of widget."""
-        return self.states[widget].bounds
+        return self.states[(widget,0)].bounds
 
     def widgetBoundsIterator(self, widgettype=None):
         """Returns bounds for each widget.

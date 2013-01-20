@@ -234,12 +234,14 @@ class Page(widget.Widget):
         painter = painthelper.painter(self, parentposn, clip=clip)
 
         # clip to page
-        bounds = widget.Widget.draw(self, parentposn, painthelper,
-                                    parentposn)
+        with painter:
+            bounds = widget.Widget.draw(self, parentposn, painthelper,
+                                        parentposn)
 
-        # w and h are non integer
-        w = self.settings.get('width').convert(painter)
-        h = self.settings.get('height').convert(painter)
+            # w and h are non integer
+            w = self.settings.get('width').convert(painter)
+            h = self.settings.get('height').convert(painter)
+
         painthelper.setControlGraph(self, [
                 controlgraph.ControlMarginBox(self, [0, 0, w, h],
                                               [-10000, -10000,

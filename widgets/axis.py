@@ -92,6 +92,9 @@ class GridLine(setting.Line):
         self.get('color').newDefault( 'grey' )
         self.get('hide').newDefault( True )
         self.get('style').newDefault( 'dotted' )
+        self.add( setting.Bool( 'onTop', False,
+                                descr = _('Put grid lines on top of graph'),
+                                usertext = _('On top') ) )
 
 class MinorGridLine(setting.Line):
     '''Minor tick grid line settings.'''
@@ -992,7 +995,8 @@ class Axis(widget.Widget):
                 return True
         return False
 
-    def drawGrid(self, parentposn, phelper, outerbounds=None):
+    def drawGrid(self, parentposn, phelper, outerbounds=None,
+                 ontop=False):
         """Code to draw gridlines.
 
         This is separate from the main draw routine because the grid
@@ -1004,13 +1008,13 @@ class Axis(widget.Widget):
             self._computePlottedRange()
 
         s = self.settings
-        if s.hide or (s.MinorGridLines.hide and s.GridLines.hide):
+        if ( s.hide or (s.MinorGridLines.hide and s.GridLines.hide) or
+             s.GridLines.onTop != bool(ontop) ):
             return
 
-        posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
-        self._updateAxisLocation(posn)
-
-        painter = phelper.painter(self, posn)
+        layer = (-2, -1)[bool(ontop)]
+        painter = phelper.painter(self, parentposn, layer=layer)
+        self._updateAxisLocation(parentposn)
 
         # plot gridlines
         if not s.MinorGridLines.hide:
@@ -1046,69 +1050,70 @@ class Axis(widget.Widget):
         else:
             painter = phelper.painter(self, posn)
 
-        # make control item for axis
-        phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-                    self, s.direction, self.coordParr1,
-                    self.coordParr2, self.coordPerp, posn) ])
+        with painter:
+            # make control item for axis
+            phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
+                        self, s.direction, self.coordParr1,
+                        self.coordParr2, self.coordPerp, posn) ])
 
-        # get tick vals
-        coordticks = self._graphToPlotter(self.majortickscalc)
-        coordminorticks = self._graphToPlotter(self.minortickscalc)
+            # get tick vals
+            coordticks = self._graphToPlotter(self.majortickscalc)
+            coordminorticks = self._graphToPlotter(self.minortickscalc)
 
-        # exit if axis is hidden
-        if s.hide:
-            return
+            # exit if axis is hidden
+            if s.hide:
+                return
 
-        texttorender = []
+            texttorender = []
 
-        # multiplication factor if reflection on the axis is requested
-        sign = 1
-        if s.direction == 'vertical':
-            sign *= -1
-        if self.coordReflected:
-            sign *= -1
+            # multiplication factor if reflection on the axis is requested
+            sign = 1
+            if s.direction == 'vertical':
+                sign *= -1
+            if self.coordReflected:
+                sign *= -1
 
-        # plot the line along the axis
-        if not s.Line.hide:
-            self._drawAxisLine(painter)
+            # plot the line along the axis
+            if not s.Line.hide:
+                self._drawAxisLine(painter)
 
-        # plot minor ticks
-        if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter, coordminorticks)
+            # plot minor ticks
+            if not s.MinorTicks.hide:
+                self._drawMinorTicks(painter, coordminorticks)
 
-        # keep track of distance from axis
-        self._delta_axis = 0
+            # keep track of distance from axis
+            self._delta_axis = 0
 
-        # plot major ticks
-        if not s.MajorTicks.hide:
-            self._drawMajorTicks(painter, coordticks)
+            # plot major ticks
+            if not s.MajorTicks.hide:
+                self._drawMajorTicks(painter, coordticks)
 
-        # plot tick labels
-        suppresstext = self._suppressText(painter, parentposn, outerbounds)
-        if not s.TickLabels.hide and not suppresstext:
-            self._drawTickLabels(phelper, painter, coordticks, sign,
-                                 outerbounds, texttorender)
+            # plot tick labels
+            suppresstext = self._suppressText(painter, parentposn, outerbounds)
+            if not s.TickLabels.hide and not suppresstext:
+                self._drawTickLabels(phelper, painter, coordticks, sign,
+                                     outerbounds, texttorender)
 
-        # draw an axis label
-        if not s.Label.hide and not suppresstext:
-            self._drawAxisLabel(painter, sign, outerbounds, texttorender)
+            # draw an axis label
+            if not s.Label.hide and not suppresstext:
+                self._drawAxisLabel(painter, sign, outerbounds, texttorender)
 
-        # mirror axis at other side of plot
-        if s.autoMirror:
-            self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
+            # mirror axis at other side of plot
+            if s.autoMirror:
+                self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
-        # all the text is drawn at the end so that
-        # we can check it doesn't overlap
-        drawntext = qt4.QPainterPath()
-        for r, pen in texttorender:
-            bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1])
+            # all the text is drawn at the end so that
+            # we can check it doesn't overlap
+            drawntext = qt4.QPainterPath()
+            for r, pen in texttorender:
+                bounds = r.getBounds()
+                rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
+                                  bounds[3]-bounds[1])
 
-            if not drawntext.intersects(rect):
-                painter.setPen(pen)
-                r.render()
-                drawntext.addRect(rect)
+                if not drawntext.intersects(rect):
+                    painter.setPen(pen)
+                    r.render()
+                    drawntext.addRect(rect)
 
     def updateControlItem(self, cgi):
         """Update axis position from control item."""

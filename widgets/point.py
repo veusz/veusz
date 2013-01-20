@@ -672,22 +672,8 @@ class PointPlotter(GenericPlotter):
         else:
             return (text, yv.data)
 
-    def _fetchAxes(self):
-        """Returns the axes for this widget"""
-
-        s = self.settings
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # fail if we don't have good axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
-            return None
-
-        return axes
-
     def _pickable(self, bounds):
-        axes = self._fetchAxes()
+        axes = self.fetchAxes()
 
         if axes is None:
             map_fn = None
@@ -715,20 +701,11 @@ class PointPlotter(GenericPlotter):
             c.min, c.max, c.scaling, cmap, 0,
             direction=direction)
 
-    def draw(self, parentposn, phelper, outerbounds=None):
+    def dataDraw(self, painter, axes, posn, cliprect):
         """Plot the data on a plotter."""
 
-        posn = GenericPlotter.draw(self, parentposn, phelper,
-                                   outerbounds=outerbounds)
-        x1, y1, x2, y2 = posn
-
-        s = self.settings
-
-        # exit if hidden
-        if s.hide:
-            return
-
         # get data
+        s = self.settings
         doc = self.document
         xv = s.get('xData').getData(doc)
         yv = s.get('yData').getData(doc)
@@ -755,16 +732,6 @@ class PointPlotter(GenericPlotter):
         if text:
             length = min( len(xv.data), len(yv.data) )
             text = text*(length / len(text)) + text[:length % len(text)]
-
-        # get axes widgets
-        axes = self._fetchAxes()
-        if not axes:
-            # no valid axes, so exit
-            return
-
-        # clip data within bounds of plotter
-        cliprect = self.clipAxesBounds(axes, posn)
-        painter = phelper.painter(self, posn, clip=cliprect)
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals, cvals in (

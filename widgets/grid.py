@@ -353,15 +353,16 @@ class Grid(widget.Widget):
         bounds = self.computeBounds(parentposn, phelper, margins=margins)
         maxbounds = self.computeBounds(parentposn, phelper)
 
-        phelper.painter(self, bounds)
-        
+        painter = phelper.painter(self, bounds)
+
         # controls for adjusting grid margins
         phelper.setControlGraph(self,[
                 controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
-        for child in self.children:
-            if child.typename != 'axis':
-                self._drawChild(phelper, child, bounds, parentposn)
+        with painter:
+            for child in self.children:
+                if child.typename != 'axis':
+                    self._drawChild(phelper, child, bounds, parentposn)
 
         # do not call widget.Widget.draw, do not collect 200 pounds
         pass

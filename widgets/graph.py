@@ -135,48 +135,57 @@ class Graph(widget.Widget):
 
         # controls for adjusting graph margins
         painter = painthelper.painter(self, bounds)
-        painthelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, bounds, maxbounds,
-                                              painthelper) ])
+        with painter:
+            painthelper.setControlGraph(self, [
+                    controlgraph.ControlMarginBox(self, bounds, maxbounds,
+                                                  painthelper) ])
 
-        # do no painting if hidden
-        if s.hide:
-            return bounds
+            # do no painting if hidden
+            if s.hide:
+                return bounds
 
-        # set graph rectangle attributes
-        path = qt4.QPainterPath()
-        path.addRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
-                                 qt4.QPointF(bounds[2], bounds[3])) )
-        utils.brushExtFillPath(painter, s.Background, path,
-                               stroke=s.Border.makeQPenWHide(painter))
+            # set graph rectangle attributes
+            path = qt4.QPainterPath()
+            path.addRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
+                                     qt4.QPointF(bounds[2], bounds[3])) )
+            utils.brushExtFillPath(painter, s.Background, path,
+                                   stroke=s.Border.makeQPenWHide(painter))
 
-        # child drawing algorithm is a bit complex due to axes
-        # being shared between graphs and broken axes
+            # child drawing algorithm is a bit complex due to axes
+            # being shared between graphs and broken axes
 
-        # get list of axes to draw
-        axestodraw = set()
-        for c in self.children:
-            try:
-                for axis in c.getAxesNames():
-                    axestodraw.add(axis)
-            except AttributeError:
-                if hasattr(c, 'isaxis'):
-                    axestodraw.add(c.name)
+            # get list of axes to draw
+            axestodraw = set()
+            for c in self.children:
+                try:
+                    for axis in c.getAxesNames():
+                        axestodraw.add(axis)
+                except AttributeError:
+                    if hasattr(c, 'isaxis'):
+                        axestodraw.add(c.name)
 
-        axes = self.getAxesDict(axestodraw, ignoremissing=True)
-        axeswidgets = set(axes.values())
+            axes = self.getAxesDict(axestodraw, ignoremissing=True)
+            axeswidgets = set(axes.values())
 
-        for axis in axeswidgets:
-            axis.drawGrid(bounds, painthelper, outerbounds=outerbounds)
+            # grid lines are normally plotted before other child widgets
+            for axis in axeswidgets:
+                axis.drawGrid(bounds, painthelper, outerbounds=outerbounds,
+                              ontop=False)
 
-        # do normal drawing of children
-        # iterate over children in reverse order
-        for c in reversed(self.children):
-            if c not in axeswidgets:
-                c.draw(bounds, painthelper, outerbounds=outerbounds)
+            # do normal drawing of children
+            # iterate over children in reverse order
+            for c in reversed(self.children):
+                if c not in axeswidgets:
+                    c.draw(bounds, painthelper, outerbounds=outerbounds)
 
-        for aname, awidget in sorted(axes.items())[::-1]:
-            awidget.draw(bounds, painthelper, outerbounds=outerbounds)
+            # then for grid lines on top
+            for axis in axeswidgets:
+                axis.drawGrid(bounds, painthelper, outerbounds=outerbounds,
+                              ontop=True)
+
+            # draw axes on top of grid lines
+            for aname, awidget in sorted(axes.items()):
+                awidget.draw(bounds, painthelper, outerbounds=outerbounds)
 
         return bounds
 

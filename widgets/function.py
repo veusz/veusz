@@ -407,31 +407,14 @@ class FunctionPlotter(GenericPlotter):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
-    def draw(self, parentposn, painthelper, outerbounds = None):
+    def dataDraw(self, painter, axes, posn, cliprect):
         """Draw the function."""
 
-        posn = GenericPlotter.draw(self, parentposn, painthelper,
-                                   outerbounds = outerbounds)
-        x1, y1, x2, y2 = posn
         s = self.settings
 
         # exit if hidden or function blank
-        if s.hide or s.function.strip() == '':
+        if s.function.strip() == '':
             return
-
-        # get axes widgets
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # return if there's no proper axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
-            return
-
-        # clip data within bounds of plotter
-        cliprect = self.clipAxesBounds(axes, posn)
-        painter = painthelper.painter(self, posn, clip=cliprect)
-
         # get the points to plot by evaluating the function
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
 

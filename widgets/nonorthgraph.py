@@ -125,24 +125,24 @@ class NonOrthGraph(Widget):
         bounds = self.computeBounds(parentposn, phelper, margins=margins)
         maxbounds = self.computeBounds(parentposn, phelper)
 
-        painter = phelper.painter(self, bounds)
-
-        # controls for adjusting margins
-        phelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
-
         # do no painting if hidden
         if s.hide:
             return bounds
 
-        # plot graph
-        datarange = self.getDataRange()
-        self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
-        self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
+        painter = phelper.painter(self, bounds)
+        with painter:
+            # plot graph
+            datarange = self.getDataRange()
+            self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
+            self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
 
-        # paint children
-        for c in reversed(self.children):
-            c.draw(bounds, phelper, outerbounds=outerbounds)
+            # paint children
+            for c in reversed(self.children):
+                c.draw(bounds, phelper, outerbounds=outerbounds)
+
+        # controls for adjusting margins
+        phelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
         return bounds
 
