@@ -57,7 +57,7 @@ class Painter(qt4.QPainter):
         self.widget = widget
 
     def __enter__(self):
-        print ' '*len(self.helper.widgetstack), self.widget
+        #print ' '*len(self.helper.widgetstack), self.widget
         self.helper.widgetstack.append(self.widget)
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -99,6 +99,7 @@ class PaintHelper(object):
         # state for root widget
         self.rootstate = None
 
+        # keep track of last widget being plotted
         self.widgetstack = []
 
     @property

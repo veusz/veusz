@@ -193,48 +193,48 @@ class Line(plotters.FreePlotter):
             clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
                                qt4.QPointF(posn[2], posn[3]) )
         painter = phelper.painter(self, posn, clip=clip)
+        with painter:
+            # adjustable positions for the lines
+            arrowsize = s.get('arrowSize').convert(painter)
 
-        # adjustable positions for the lines
-        arrowsize = s.get('arrowSize').convert(painter)
+            # drawing settings for line
+            if not s.Line.hide:
+                painter.setPen( s.get('Line').makeQPen(painter) )
+            else:
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
-        # drawing settings for line
-        if not s.Line.hide:
-            painter.setPen( s.get('Line').makeQPen(painter) )
-        else:
-            painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+            # settings for fill
+            if not s.Fill.hide:
+                painter.setBrush( s.get('Fill').makeQBrush() )
+            else:
+                painter.setBrush( qt4.QBrush() )
 
-        # settings for fill
-        if not s.Fill.hide:
-            painter.setBrush( s.get('Fill').makeQBrush() )
-        else:
-            painter.setBrush( qt4.QBrush() )
+            # iterate over positions
+            scaling = posn[2]-posn[0]
+            if s.mode == 'length-angle':
+                lines = self._computeLinesLengthAngle(posn, scaling)
+            else:
+                lines = self._computeLinesPointToPoint(posn)
 
-        # iterate over positions
-        scaling = posn[2]-posn[0]
-        if s.mode == 'length-angle':
-            lines = self._computeLinesLengthAngle(posn, scaling)
-        else:
-            lines = self._computeLinesPointToPoint(posn)
+            if lines is None:
+                return
 
-        if lines is None:
-            return
+            controlgraphitems = []
+            for index, (x, y, l, a) in enumerate(lines):
 
-        controlgraphitems = []
-        for index, (x, y, l, a) in enumerate(lines):
+                utils.plotLineArrow(painter, x, y, l, a,
+                                    arrowsize=arrowsize,
+                                    arrowleft=s.arrowleft,
+                                    arrowright=s.arrowright)
 
-            utils.plotLineArrow(painter, x, y, l, a,
-                                arrowsize=arrowsize,
-                                arrowleft=s.arrowleft,
-                                arrowright=s.arrowright)
-
-            if isnotdataset:
-                cgi = controlgraph.ControlLine(
-                    self, x, y,
-                    x + l*math.cos(a/180.*math.pi),
-                    y + l*math.sin(a/180.*math.pi))
-                cgi.index = index
-                cgi.widgetposn = posn
-                controlgraphitems.append(cgi)
+                if isnotdataset:
+                    cgi = controlgraph.ControlLine(
+                        self, x, y,
+                        x + l*math.cos(a/180.*math.pi),
+                        y + l*math.sin(a/180.*math.pi))
+                    cgi.index = index
+                    cgi.widgetposn = posn
+                    controlgraphitems.append(cgi)
 
         phelper.setControlGraph(self, controlgraphitems)
 

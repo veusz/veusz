@@ -71,25 +71,25 @@ class Polygon(plotters.FreePlotter):
         x1, y1, x2, y2 = posn
         cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
         painter = phelper.painter(self, posn, clip=cliprect)
+        with painter:
+            pen = s.Line.makeQPenWHide(painter)
+            pw = pen.widthF()*2
+            lineclip = qt4.QRectF( qt4.QPointF(x1-pw, y1-pw),
+                                   qt4.QPointF(x2+pw, y2+pw) )
 
-        pen = s.Line.makeQPenWHide(painter)
-        pw = pen.widthF()*2
-        lineclip = qt4.QRectF( qt4.QPointF(x1-pw, y1-pw),
-                               qt4.QPointF(x2+pw, y2+pw) )
+            # this is a hack as we generate temporary fake datasets
+            path = qt4.QPainterPath()
+            for xvals, yvals in document.generateValidDatasetParts(
+                document.Dataset(xp), document.Dataset(yp)):
 
-        # this is a hack as we generate temporary fake datasets
-        path = qt4.QPainterPath()
-        for xvals, yvals in document.generateValidDatasetParts(
-            document.Dataset(xp), document.Dataset(yp)):
+                poly = qt4.QPolygonF()
+                utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)
+                clippedpoly = qt4.QPolygonF()
+                utils.polygonClip(poly, lineclip, clippedpoly)
+                path.addPolygon(clippedpoly)
+                path.closeSubpath()
 
-            poly = qt4.QPolygonF()
-            utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)
-            clippedpoly = qt4.QPolygonF()
-            utils.polygonClip(poly, lineclip, clippedpoly)
-            path.addPolygon(clippedpoly)
-            path.closeSubpath()
-
-        utils.brushExtFillPath(painter, s.Fill, path, stroke=pen)
+            utils.brushExtFillPath(painter, s.Fill, path, stroke=pen)
 
 # allow the factory to instantiate this
 document.thefactory.register( Polygon )
