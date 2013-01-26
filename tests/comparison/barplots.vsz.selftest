@@ -27,6 +27,9 @@
 <g fill="#ffffff" stroke-width="0.6">
 <path d="m38.9,14.1l217.9,0l0,217.9l-217.9,0l0,-217.9"/>
 </g>
+<g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
+<path d="M38.9,195.7l217.9,0M38.9,159.4l217.9,0M38.9,123.1l217.9,0M38.9,86.8l217.9,0M38.9,50.4l217.9,0"/>
+</g>
 <g fill="#0055ff" stroke-width="0.6">
 <path d="m193.3,191.3l17.7,0l0,12.2l-17.7,0l0,-12.2"/>
 </g>
@@ -51,9 +54,6 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
-<path d="M38.9,195.7l217.9,0M38.9,159.4l217.9,0M38.9,123.1l217.9,0M38.9,86.8l217.9,0M38.9,50.4l217.9,0"/>
-</g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M38.9,232l0,-217.9"/>
 <path d="M38.9,232l3.7,0M38.9,213.9l3.7,0M38.9,195.7l3.7,0M38.9,177.6l3.7,0M38.9,159.4l3.7,0M38.9,141.2l3.7,0M38.9,123.1l3.7,0M38.9,104.9l3.7,0M38.9,86.8l3.7,0M38.9,68.6l3.7,0M38.9,50.4l3.7,0M38.9,32.3l3.7,0M38.9,14.1l3.7,0"/>
@@ -184,6 +184,10 @@
 <g fill="#ffffff" stroke-width="0.6">
 <path d="m299.4,274.6l217.9,0l0,217.9l-217.9,0l0,-217.9"/>
 </g>
+<g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
+<path d="M299.4,419.8l217.9,0M299.4,347.2l217.9,0"/>
+<path d="M353.8,274.6l0,217.9M408.3,274.6l0,217.9M462.8,274.6l0,217.9"/>
+</g>
 <g fill="none" stroke-width="1">
 <text x="310.2" y="300.6" font-size="14pt" fill="#000000">horizontal</text>
 <text x="310.2" y="318.1" font-size="14pt" fill="#000000">with values</text>
@@ -200,9 +204,6 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
-<path d="M299.4,419.8l217.9,0M299.4,347.2l217.9,0"/>
-</g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M299.4,492.5l0,-217.9"/>
 <path d="M299.4,492.5l3.7,0M299.4,468.3l3.7,0M299.4,444l3.7,0M299.4,419.8l3.7,0M299.4,395.6l3.7,0M299.4,371.4l3.7,0M299.4,347.2l3.7,0M299.4,323l3.7,0M299.4,298.8l3.7,0M299.4,274.6l3.7,0"/>
@@ -218,9 +219,6 @@
 <text x="290.6" y="348.9" font-size="8pt" fill="#000000">6</text>
 <text x="273.1" y="288.5" font-size="14pt" fill="#000000">10</text>
 <text x="290.6" y="281.5" font-size="8pt" fill="#000000">9</text>
-</g>
-<g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
-<path d="M353.8,274.6l0,217.9M408.3,274.6l0,217.9M462.8,274.6l0,217.9"/>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M299.4,492.5l217.9,0"/>

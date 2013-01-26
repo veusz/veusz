@@ -1012,19 +1012,27 @@ class Axis(widget.Widget):
              s.GridLines.onTop != bool(ontop) ):
             return
 
+        # draw grid on a different layer, depending on whether on top or not
         layer = (-2, -1)[bool(ontop)]
         painter = phelper.painter(self, parentposn, layer=layer)
         self._updateAxisLocation(parentposn)
 
-        # plot gridlines
-        if not s.MinorGridLines.hide:
-            coordminorticks = self._graphToPlotter(self.minortickscalc)
-            self._drawGridLines('MinorGridLines', painter, coordminorticks,
-                                parentposn)
-        if not s.GridLines.hide:
-            coordticks = self._graphToPlotter(self.majortickscalc)
-            self._drawGridLines('GridLines', painter, coordticks,
-                                parentposn)
+        with painter:
+            painter.save()
+            painter.setClipRect( qt4.QRectF(
+                    qt4.QPointF(parentposn[0], parentposn[1]),
+                    qt4.QPointF(parentposn[2], parentposn[3]) ) )
+
+            if not s.MinorGridLines.hide:
+                coordminorticks = self._graphToPlotter(self.minortickscalc)
+                self._drawGridLines('MinorGridLines', painter, coordminorticks,
+                                    parentposn)
+            if not s.GridLines.hide:
+                coordticks = self._graphToPlotter(self.majortickscalc)
+                self._drawGridLines('GridLines', painter, coordticks,
+                                    parentposn)
+
+            painter.restore()
 
     def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the axis on the painter.

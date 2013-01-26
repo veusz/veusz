@@ -171,9 +171,9 @@ class Graph(widget.Widget):
         axeswidgets = set(axes.values())
 
         # grid lines are normally plotted before other child widgets
-        for axis in axeswidgets:
-            axis.drawGrid(bounds, painthelper, outerbounds=outerbounds,
-                          ontop=False)
+        for aname, awidget in sorted(axes.items(), reverse=True):
+            awidget.drawGrid(bounds, painthelper, outerbounds=outerbounds,
+                             ontop=False)
 
         # do normal drawing of children
         # iterate over children in reverse order
@@ -187,7 +187,7 @@ class Graph(widget.Widget):
                           ontop=True)
 
         # draw axes on top of grid lines
-        for aname, awidget in sorted(axes.items()):
+        for aname, awidget in sorted(axes.items(), reverse=True):
             awidget.draw(bounds, painthelper, outerbounds=outerbounds)
 
         return bounds

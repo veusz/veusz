@@ -64,10 +64,12 @@ class Painter(qt4.QPainter):
         self.helper.widgetstack.pop()
 
 class DirectPainter(qt4.QPainter):
+    """Painter class for direct painting with PaintHelper below.
+    Use save() and restore() around this.
+    """
 
     def __enter__(self):
-        self.restore()
-        self.save()
+        pass
     def __exit__(self, exc_type, exc_value, traceback):
         pass
 
@@ -145,6 +147,9 @@ class PaintHelper(object):
         else:
             # only paint to one output painter
             p = self.directpaint
+            # make sure we get the same state each time
+            p.restore()
+            p.save()
 
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
@@ -152,7 +157,7 @@ class PaintHelper(object):
         p.maxsize = max(*self.pagesize)
         p.dpi = self.dpi[1]
 
-        if clip:
+        if clip is not None:
             p.setClipRect(clip)
 
         return p
