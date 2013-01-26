@@ -125,17 +125,17 @@ class PaintHelper(object):
         self.pagesize = ( setting.Distance.convertDistance(self, pagew),
                           setting.Distance.convertDistance(self, pageh) )
 
-    def painter(self, widget, bounds, clip=None):
+    def painter(self, widget, bounds, clip=None, layer=0):
         """Return a painter for use when drawing the widget.
         widget: widget object
         bounds: tuple (x1, y1, x2, y2) of widget bounds
         clip: a QRectF, if set
         """
 
-        s = self.states[widget] = DrawState(widget, bounds, clip, self)
+        s = self.states[(widget, layer)] = DrawState(widget, bounds, clip, self)
 
         if self.widgetstack:
-            self.states[self.widgetstack[-1]].children.append(s)
+            self.states[(self.widgetstack[-1], 0)].children.append(s)
         else:
             self.rootstate = s
 
@@ -159,12 +159,12 @@ class PaintHelper(object):
 
     def setControlGraph(self, widget, cgis):
         """Records the control graph list for the widget given."""
-        self.states[widget].cgis = cgis
+        self.states[(widget,0)].cgis = cgis
 
     def getControlGraph(self, widget):
         """Return control graph for widget (or None)."""
         try:
-            return self.states[widget].cgis
+            return self.states[(widget,0)].cgis
         except KeyError:
             return None
 
@@ -253,7 +253,7 @@ class PaintHelper(object):
 
     def widgetBounds(self, widget):
         """Return bounds of widget."""
-        return self.states[widget].bounds
+        return self.states[(widget,0)].bounds
 
     def widgetBoundsIterator(self, widgettype=None):
         """Returns bounds for each widget.

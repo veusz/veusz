@@ -175,7 +175,7 @@ class ColorBar(axis.Axis):
             bounds[3] = bounds[1] + totalheight
 
         # FIXME: this is ugly - update bounds in helper state
-        phelper.states[self].bounds = bounds
+        phelper.states[(self,0)].bounds = bounds
 
         # do no painting if hidden or no image
         imgwidget = s.get('widgetName').findWidget()
@@ -219,13 +219,7 @@ class ColorBar(axis.Axis):
                                          bounds[3]-bounds[1]) )
 
         # actually draw axis
-        # we have to force position to full, as otherwise computeBounds
-        # will mess up range if called twice
-        savedposition = self.position
-        self.position = (0., 0., 1., 1.)
-
         axis.Axis._axisDraw(self, posn, parentposn, outerbounds, painter, phelper)
-        self.position = savedposition
 
 # allow the factory to instantiate a colorbar
 document.thefactory.register( ColorBar )
