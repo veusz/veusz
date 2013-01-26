@@ -200,26 +200,36 @@ class ColorBar(axis.Axis):
         minpix, maxpix = self.graphToPlotterCoords(
             bounds, N.array([minval, maxval]) )
 
-        if s.direction == 'horizontal':
-            c = [ minpix, bounds[1], maxpix, bounds[3] ]
-        else:
-            c = [ bounds[0], maxpix, bounds[2], minpix ]
-        r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
+        routside = qt4.QRectF(
+            bounds[0], bounds[1],
+            bounds[2]-bounds[0], bounds[3]-bounds[1] )
 
         # really draw the img
         if img is not None:
+            # coordinates to draw image and to clip rectangle
+            if s.direction == 'horizontal':
+                c = [ minpix, bounds[1], maxpix, bounds[3] ]
+                cl = [ self.coordParr1, bounds[1], self.coordParr2, bounds[3] ]
+            else:
+                c = [ bounds[0], maxpix, bounds[2], minpix ]
+                cl = [ bounds[0], self.coordParr1, bounds[2], self.coordParr2 ]
+            r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
+            rclip = qt4.QRectF(cl[0], cl[1], cl[2]-cl[0], cl[3]-cl[1])
+
+            painter.save()
+            painter.setClipRect(rclip & routside)
             painter.drawImage(r, img)
+            painter.restore()
 
         # if there's a border
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
             painter.setBrush( qt4.QBrush() )
-            painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
-                                         bounds[2]-bounds[0],
-                                         bounds[3]-bounds[1]) )
+            painter.drawRect( routside )
 
         # actually draw axis
-        axis.Axis._axisDraw(self, posn, parentposn, outerbounds, painter, phelper)
+        axis.Axis._axisDraw(self, bounds, parentposn, outerbounds, painter,
+                            phelper)
 
 # allow the factory to instantiate a colorbar
 document.thefactory.register( ColorBar )
