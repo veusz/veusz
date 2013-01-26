@@ -165,7 +165,7 @@ class PaintHelper(object):
         """Return control graph for widget (or None)."""
         try:
             return self.states[widget].cgis
-        except IndexError:
+        except KeyError:
             return None
 
     def renderToPainter(self, painter):
