@@ -120,17 +120,20 @@ class Graph(widget.Widget):
         ad = self.getAxesDict(axesnames)
         return [ad[n] for n in axesnames]
 
+    def getMargins(self, painthelper):
+        """Use settings to compute margins."""
+        s = self.settings
+        return ( s.get('leftMargin').convert(painthelper),
+                 s.get('topMargin').convert(painthelper),
+                 s.get('rightMargin').convert(painthelper),
+                 s.get('bottomMargin').convert(painthelper) )
+
     def draw(self, parentposn, painthelper, outerbounds = None):
         '''Update the margins before drawing.'''
 
         s = self.settings
 
-        margins = ( s.get('leftMargin').convert(painthelper),
-                    s.get('topMargin').convert(painthelper),
-                    s.get('rightMargin').convert(painthelper),
-                    s.get('bottomMargin').convert(painthelper) )
-
-        bounds = self.computeBounds(parentposn, painthelper, margins=margins)
+        bounds = self.computeBounds(parentposn, painthelper)
         maxbounds = self.computeBounds(parentposn, painthelper)
 
         # do no painting if hidden

@@ -112,17 +112,21 @@ class NonOrthGraph(Widget):
         for c in self.children:
             c.updateDataRanges(drange)
         return drange
-            
+
+    def getMargins(self, painthelper):
+        """Use settings to compute margins."""
+        s = self.settings
+        return ( s.get('leftMargin').convert(painthelper),
+                 s.get('topMargin').convert(painthelper),
+                 s.get('rightMargin').convert(painthelper),
+                 s.get('bottomMargin').convert(painthelper) )
+
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Update the margins before drawing.'''
 
         s = self.settings
 
-        margins = ( s.get('leftMargin').convert(phelper),
-                    s.get('topMargin').convert(phelper),
-                    s.get('rightMargin').convert(phelper),
-                    s.get('bottomMargin').convert(phelper) )
-        bounds = self.computeBounds(parentposn, phelper, margins=margins)
+        bounds = self.computeBounds(parentposn, phelper)
         maxbounds = self.computeBounds(parentposn, phelper)
 
         # do no painting if hidden

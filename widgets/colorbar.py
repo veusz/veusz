@@ -110,6 +110,7 @@ class ColorBar(axis.Axis):
         return widget.Widget.chooseName(self)
 
     def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
+        """Do actual drawing."""
 
         s = self.settings
 

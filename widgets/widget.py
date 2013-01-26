@@ -282,8 +282,11 @@ class Widget(object):
         return build
     path = property(_getPath)
 
-    def computeBounds(self, parentposn, painthelper,
-                      margins = (0., 0., 0., 0.)):
+    def getMargins(self, painthelper):
+        """Return margins of widget."""
+        return (0., 0., 0., 0.)
+
+    def computeBounds(self, parentposn, painthelper):
         """Compute a bounds array, giving the bounding box for the widget."""
 
         # get parent's position
@@ -293,7 +296,7 @@ class Widget(object):
         # get our position
         px1, py1, px2, py2 = self.position
         x1, y1, x2, y2 = ( x1+dx*px1, y1+dy*py1, x1+dx*px2, y1+dy*py2 )
-        dx1, dy1, dx2, dy2 = margins
+        dx1, dy1, dx2, dy2 = self.getMargins(painthelper)
         return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
 
     def draw(self, parentposn, painthelper, outerbounds = None):
