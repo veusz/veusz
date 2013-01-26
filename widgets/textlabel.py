@@ -109,6 +109,7 @@ class TextLabel(plotters.FreePlotter):
         if s.clip:
             clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
                                qt4.QPointF(posn[2], posn[3]) )
+
         painter = phelper.painter(self, posn, clip=clip)
         with painter:
             textpen = s.get('Text').makeQPen()

@@ -125,6 +125,7 @@ class Export(object):
         helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
         painter.setClipRect( qt4.QRectF(
                 qt4.QPointF(0,0), qt4.QPointF(*size)) )
+        painter.save()
         self.doc.paintTo(helper, self.pagenumber)
         painter.restore()
         painter.end()
@@ -156,7 +157,7 @@ class Export(object):
             image.fill(backqcolor.rgb())
 
         # paint to the image
-        painter = qt4.QPainter(image)
+        painter = painthelper.DirectPainter(image)
         painter.setRenderHint(qt4.QPainter.Antialiasing, self.antialias)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, self.antialias)
         self.renderPage(size, (dpi,dpi), painter)
@@ -197,7 +198,7 @@ class Export(object):
 
         # setup for printing
         printer.newPage()
-        painter = qt4.QPainter(printer)
+        painter = painthelper.DirectPainter(printer)
 
         # write to printer with correct dpi
         dpi = (printer.logicalDpiX(), printer.logicalDpiY())
@@ -252,7 +253,7 @@ class Export(object):
             f = open(self.filename, 'w')
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
-            painter = qt4.QPainter(paintdev)
+            painter = painthelper.DirectPainter(paintdev)
             self.renderPage(size, (dpi,dpi), painter)
             f.close()
         else:
@@ -269,7 +270,7 @@ class Export(object):
             gen.setFileName(self.filename)
             gen.setResolution(dpi)
             gen.setSize( qt4.QSize(int(size[0]), int(size[1])) )
-            painter = qt4.QPainter(gen)
+            painter = painthelper.DirectPainter(gen)
             self.renderPage(size, (dpi,dpi), painter)
 
     def exportSelfTest(self):
@@ -281,7 +282,7 @@ class Export(object):
 
         f = open(self.filename, 'w')
         paintdev = selftest_export.SelfTestPaintDevice(f, width/dpi, height/dpi)
-        painter = qt4.QPainter(paintdev)
+        painter = painthelper.DirectPainter(paintdev)
         self.renderPage(size, (dpi,dpi), painter)
         f.close()
 
@@ -289,7 +290,7 @@ class Export(object):
         """Export document as Qt PIC"""
 
         pic = qt4.QPicture()
-        painter = qt4.QPainter(pic)
+        painter = painthelper.DirectPainter(pic)
 
         dpi = (pic.logicalDpiX(), pic.logicalDpiY())
         size = self.doc.pageSize(self.pagenumber, dpi=dpi)
@@ -303,6 +304,6 @@ class Export(object):
         size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi), integer=False)
 
         paintdev = emf_export.EMFPaintDevice(size[0]/dpi, size[1]/dpi, dpi=dpi)
-        painter = qt4.QPainter(paintdev)
+        painter = painthelper.DirectPainter(paintdev)
         self.renderPage(size, (dpi,dpi), painter)
         paintdev.paintEngine().saveFile(self.filename)

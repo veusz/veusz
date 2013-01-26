@@ -132,7 +132,6 @@ class Graph(widget.Widget):
 
         bounds = self.computeBounds(parentposn, painthelper, margins=margins)
         maxbounds = self.computeBounds(parentposn, painthelper)
-
         # controls for adjusting graph margins
         painter = painthelper.painter(self, bounds)
         with painter:

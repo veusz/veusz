@@ -1026,16 +1026,9 @@ class Axis(widget.Widget):
             self._drawGridLines('GridLines', painter, coordticks,
                                 parentposn)
 
-    def draw(self, parentposn, phelper, outerbounds=None,
-             useexistingpainter=None):
+    def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the axis on the painter.
-
-        useexistingpainter is a hack so that a colorbar can reuse the
-        drawing code here. If set to a painter, it will use this rather
-        than opening a new one.
         """
-
-        s = self.settings
 
         # recompute if document modified
         if self.docchangeset != self.document.changeset:
@@ -1044,76 +1037,82 @@ class Axis(widget.Widget):
         posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
         self._updateAxisLocation(posn)
 
-        # get ready to draw
-        if useexistingpainter is not None:
-            painter = useexistingpainter
-        else:
-            painter = phelper.painter(self, posn)
+        # exit if axis is hidden
+        if self.settings.hide:
+            return
 
+        painter = phelper.painter(self, posn)
         with painter:
-            # make control item for axis
-            phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-                        self, s.direction, self.coordParr1,
-                        self.coordParr2, self.coordPerp, posn) ])
+            self._axisDraw(posn, parentposn, outerbounds, painter, phelper)
 
-            # get tick vals
-            coordticks = self._graphToPlotter(self.majortickscalc)
-            coordminorticks = self._graphToPlotter(self.minortickscalc)
+    def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
+        """Internal drawing routine."""
 
-            # exit if axis is hidden
-            if s.hide:
-                return
+        s = self.settings
 
-            texttorender = []
+        # make control item for axis
+        phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
+                    self, s.direction, self.coordParr1,
+                    self.coordParr2, self.coordPerp, posn) ])
 
-            # multiplication factor if reflection on the axis is requested
-            sign = 1
-            if s.direction == 'vertical':
-                sign *= -1
-            if self.coordReflected:
-                sign *= -1
+        # get tick vals
+        coordticks = self._graphToPlotter(self.majortickscalc)
+        coordminorticks = self._graphToPlotter(self.minortickscalc)
 
-            # plot the line along the axis
-            if not s.Line.hide:
-                self._drawAxisLine(painter)
+        # exit if axis is hidden
+        if s.hide:
+            return
 
-            # plot minor ticks
-            if not s.MinorTicks.hide:
-                self._drawMinorTicks(painter, coordminorticks)
+        texttorender = []
 
-            # keep track of distance from axis
-            self._delta_axis = 0
+        # multiplication factor if reflection on the axis is requested
+        sign = 1
+        if s.direction == 'vertical':
+            sign *= -1
+        if self.coordReflected:
+            sign *= -1
 
-            # plot major ticks
-            if not s.MajorTicks.hide:
-                self._drawMajorTicks(painter, coordticks)
+        # plot the line along the axis
+        if not s.Line.hide:
+            self._drawAxisLine(painter)
 
-            # plot tick labels
-            suppresstext = self._suppressText(painter, parentposn, outerbounds)
-            if not s.TickLabels.hide and not suppresstext:
-                self._drawTickLabels(phelper, painter, coordticks, sign,
-                                     outerbounds, texttorender)
+        # plot minor ticks
+        if not s.MinorTicks.hide:
+            self._drawMinorTicks(painter, coordminorticks)
 
-            # draw an axis label
-            if not s.Label.hide and not suppresstext:
-                self._drawAxisLabel(painter, sign, outerbounds, texttorender)
+        # keep track of distance from axis
+        self._delta_axis = 0
 
-            # mirror axis at other side of plot
-            if s.autoMirror:
-                self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
+        # plot major ticks
+        if not s.MajorTicks.hide:
+            self._drawMajorTicks(painter, coordticks)
 
-            # all the text is drawn at the end so that
-            # we can check it doesn't overlap
-            drawntext = qt4.QPainterPath()
-            for r, pen in texttorender:
-                bounds = r.getBounds()
-                rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
-                                  bounds[3]-bounds[1])
+        # plot tick labels
+        suppresstext = self._suppressText(painter, parentposn, outerbounds)
+        if not s.TickLabels.hide and not suppresstext:
+            self._drawTickLabels(phelper, painter, coordticks, sign,
+                                 outerbounds, texttorender)
 
-                if not drawntext.intersects(rect):
-                    painter.setPen(pen)
-                    r.render()
-                    drawntext.addRect(rect)
+        # draw an axis label
+        if not s.Label.hide and not suppresstext:
+            self._drawAxisLabel(painter, sign, outerbounds, texttorender)
+
+        # mirror axis at other side of plot
+        if s.autoMirror:
+            self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
+
+        # all the text is drawn at the end so that
+        # we can check it doesn't overlap
+        drawntext = qt4.QPainterPath()
+        for r, pen in texttorender:
+            bounds = r.getBounds()
+            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
+                              bounds[3]-bounds[1])
+
+            if not drawntext.intersects(rect):
+                painter.setPen(pen)
+                r.render()
+                drawntext.addRect(rect)
 
     def updateControlItem(self, cgi):
         """Update axis position from control item."""

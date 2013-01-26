@@ -63,6 +63,14 @@ class Painter(qt4.QPainter):
     def __exit__(self, exc_type, exc_value, traceback):
         self.helper.widgetstack.pop()
 
+class DirectPainter(qt4.QPainter):
+
+    def __enter__(self):
+        self.restore()
+        self.save()
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
 class PaintHelper(object):
     """Helper used when painting widgets.
 
@@ -76,9 +84,10 @@ class PaintHelper(object):
         """Initialise using page size (tuple of pixelw, pixelh).
 
         If directpaint is set to a painter, use this directly rather
-        than creating separate layers for rendering later. The user
-        will need to call restore() on the painter before ending, if
-        using this mode, however.
+        than creating separate layers for rendering later. In this
+        case the painter must be a DirectPainter object, and
+        save()/restore() must be placed around doing the rendering to
+        the painter.
         """
 
         self.dpi = dpi
@@ -94,7 +103,6 @@ class PaintHelper(object):
 
         # whether to directly render to a painter or make new layers
         self.directpaint = directpaint
-        self.directpainting = False
 
         # state for root widget
         self.rootstate = None
@@ -117,34 +125,26 @@ class PaintHelper(object):
         self.pagesize = ( setting.Distance.convertDistance(self, pagew),
                           setting.Distance.convertDistance(self, pageh) )
 
-    def painter(self, widget, bounds, clip=None, layer=0):
+    def painter(self, widget, bounds, clip=None):
         """Return a painter for use when drawing the widget.
         widget: widget object
         bounds: tuple (x1, y1, x2, y2) of widget bounds
         clip: a QRectF, if set
-        layer for drawing in widget, allows multiple paints per widget
-        widgetparent: sometimes widgets are drawn by other widgets other than
-          direct parents, so this options means it will be painted "as if"
-          it is a child of the widget given
         """
 
-        s = self.states[(widget,layer)] = DrawState(widget, bounds, clip, self)
+        s = self.states[widget] = DrawState(widget, bounds, clip, self)
 
         if self.widgetstack:
-            self.states[(self.widgetstack[-1],0)].children.append(s)
+            self.states[self.widgetstack[-1]].children.append(s)
         else:
             self.rootstate = s
 
-        if self.directpaint:
-            # only paint to one output painter
-            p = self.directpaint
-            if self.directpainting:
-                p.restore()
-            self.directpainting = True
-            p.save()
-        else:
+        if self.directpaint is None:
             # save to multiple recorded layers
             p = Painter(self, widget, s.record)
+        else:
+            # only paint to one output painter
+            p = self.directpaint
 
         p.scaling = self.scaling
         p.pixperpt = self.pixperpt
@@ -159,12 +159,12 @@ class PaintHelper(object):
 
     def setControlGraph(self, widget, cgis):
         """Records the control graph list for the widget given."""
-        self.states[(widget,0)].cgis = cgis
+        self.states[widget].cgis = cgis
 
     def getControlGraph(self, widget):
         """Return control graph for widget (or None)."""
         try:
-            return self.states[(widget,0)].cgis
+            return self.states[widget].cgis
         except IndexError:
             return None
 
@@ -253,7 +253,7 @@ class PaintHelper(object):
 
     def widgetBounds(self, widget):
         """Return bounds of widget."""
-        return self.states[(widget,0)].bounds
+        return self.states[widget].bounds
 
     def widgetBoundsIterator(self, widgettype=None):
         """Returns bounds for each widget.
