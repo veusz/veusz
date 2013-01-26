@@ -27,9 +27,13 @@
 <g fill="#ffffff" stroke-width="0.6">
 <path d="m38.9,14.1l217.9,0l0,217.9l-217.9,0l0,-217.9"/>
 </g>
+</g>
+<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
 <path d="M38.9,195.7l217.9,0M38.9,159.4l217.9,0M38.9,123.1l217.9,0M38.9,86.8l217.9,0M38.9,50.4l217.9,0"/>
 </g>
+</g>
+<g clip-path="url(#c0)">
 <g fill="#0055ff" stroke-width="0.6">
 <path d="m193.3,191.3l17.7,0l0,12.2l-17.7,0l0,-12.2"/>
 </g>
@@ -184,10 +188,16 @@
 <g fill="#ffffff" stroke-width="0.6">
 <path d="m299.4,274.6l217.9,0l0,217.9l-217.9,0l0,-217.9"/>
 </g>
+</g>
+<g clip-path="url(#c4)">
 <g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
 <path d="M299.4,419.8l217.9,0M299.4,347.2l217.9,0"/>
+</g>
+<g fill="none" stroke="#808080" stroke-dasharray="1.2,2.5" stroke-width="0.6">
 <path d="M353.8,274.6l0,217.9M408.3,274.6l0,217.9M462.8,274.6l0,217.9"/>
 </g>
+</g>
+<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="310.2" y="300.6" font-size="14pt" fill="#000000">horizontal</text>
 <text x="310.2" y="318.1" font-size="14pt" fill="#000000">with values</text>

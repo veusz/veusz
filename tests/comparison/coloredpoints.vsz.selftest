@@ -18,12 +18,14 @@
 <g fill="#e5e9ff" stroke-width="1.2">
 <path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
 </g>
-<g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
-<path d="M60.2,393.8l464.1,0M60.2,316.5l464.1,0M60.2,239.1l464.1,0M60.2,161.8l464.1,0M60.2,84.4l464.1,0"/>
-<path d="M153,7l0,464.1M245.9,7l0,464.1M338.7,7l0,464.1M431.5,7l0,464.1"/>
-</g>
 </g>
 <g clip-path="url(#c1)">
+<g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
+<path d="M60.2,393.8l464.1,0M60.2,316.5l464.1,0M60.2,239.1l464.1,0M60.2,161.8l464.1,0M60.2,84.4l464.1,0"/>
+</g>
+<g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
+<path d="M153,7l0,464.1M245.9,7l0,464.1M338.7,7l0,464.1M431.5,7l0,464.1"/>
+</g>
 <g fill="#ff000a" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="matrix(0.674 0 0 0.674 211.5 106)">
 <path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2" id="p0"/>
