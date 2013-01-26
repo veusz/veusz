@@ -156,8 +156,7 @@ class GenericPlotter(widget.Widget):
     def draw(self, parentposn, painthelper, outerbounds = None):
         """Draw for generic plotters."""
 
-        posn = widget.Widget.draw(self, parentposn, painthelper,
-                                  outerbounds = outerbounds)
+        posn = self.computeBounds(parentposn, painthelper, outerbounds)
 
         # exit if hidden or function blank
         if self.settings.hide:

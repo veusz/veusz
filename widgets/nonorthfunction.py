@@ -155,9 +155,7 @@ class NonOrthFunction(Widget):
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the function on a plotter.'''
 
-        posn = Widget.draw(self, parentposn, phelper,
-                           outerbounds=outerbounds)
-
+        posn = self.computeBounds(parentposn, phelper, outerbounds)
         s = self.settings
 
         # exit if hidden

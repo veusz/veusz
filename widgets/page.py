@@ -229,15 +229,9 @@ class Page(widget.Widget):
             bounds = self.computeBounds(parentposn, painthelper)
             return bounds
 
-        clip = qt4.QRectF( qt4.QPointF(parentposn[0], parentposn[1]),
-                           qt4.QPointF(parentposn[2], parentposn[3]) )
-        painter = painthelper.painter(self, parentposn, clip=clip)
-
         # clip to page
+        painter = painthelper.painter(self, parentposn)
         with painter:
-            bounds = widget.Widget.draw(self, parentposn, painthelper,
-                                        parentposn)
-
             # w and h are non integer
             w = self.settings.get('width').convert(painter)
             h = self.settings.get('height').convert(painter)
@@ -250,6 +244,8 @@ class Page(widget.Widget):
                                               ismovable = False)
                 ] )
 
+        bounds = widget.Widget.draw(self, parentposn, painthelper,
+                                    parentposn)
         return bounds
 
     def updateControlItem(self, cgi):
