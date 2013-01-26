@@ -1042,7 +1042,7 @@ class Axis(widget.Widget):
         if self.docchangeset != self.document.changeset:
             self._computePlottedRange()
 
-        posn = self.computeBounds(parentposn, phelper, outerbounds)
+        posn = self.computeBounds(parentposn, phelper)
         self._updateAxisLocation(posn)
 
         # exit if axis is hidden

@@ -173,7 +173,7 @@ class NonOrthPoint(Widget):
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
 
-        posn = self.computeBounds(parentposn, phelper, outerbounds)
+        posn = self.computeBounds(parentposn, phelper)
         s = self.settings
         d = self.document
 
