@@ -354,7 +354,7 @@ class Grid(widget.Widget):
             self.lastscalings = scalings
 
         bounds = self.computeBounds(parentposn, phelper)
-        maxbounds = self.computeBounds(parentposn, phelper)
+        maxbounds = self.computeBounds(parentposn, phelper, withmargin=False)
 
         painter = phelper.painter(self, bounds)
 

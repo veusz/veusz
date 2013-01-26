@@ -127,7 +127,7 @@ class NonOrthGraph(Widget):
         s = self.settings
 
         bounds = self.computeBounds(parentposn, phelper)
-        maxbounds = self.computeBounds(parentposn, phelper)
+        maxbounds = self.computeBounds(parentposn, phelper, withmargin=False)
 
         # do no painting if hidden
         if s.hide:

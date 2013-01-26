@@ -134,7 +134,7 @@ class Graph(widget.Widget):
         s = self.settings
 
         bounds = self.computeBounds(parentposn, painthelper)
-        maxbounds = self.computeBounds(parentposn, painthelper)
+        maxbounds = self.computeBounds(parentposn, painthelper, withmargin=False)
 
         # do no painting if hidden
         if s.hide:
