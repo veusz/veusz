@@ -425,7 +425,7 @@ class FunctionPlotter(GenericPlotter):
             f = qt4.QFont()
             f.setPointSize(20)
             painter.setFont(f)
-            painter.drawText( qt4.QRectF(x1, y1, x2-x1, y2-y1),
+            painter.drawText( cliprect,
                               qt4.Qt.AlignCenter,
                               "Cannot evaluate '%s'" % s.function )
         else:
