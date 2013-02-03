@@ -102,6 +102,7 @@ class PaintHelper(object):
 
         # axis to plotter mappings
         self.axisplottermap = {}
+        self.plotteraxismap = {}
 
         # whether to directly render to a painter or make new layers
         self.directpaint = directpaint
@@ -127,12 +128,19 @@ class PaintHelper(object):
         self.pagesize = ( setting.Distance.convertDistance(self, pagew),
                           setting.Distance.convertDistance(self, pageh) )
 
-    def painter(self, widget, bounds, clip=None, layer=0):
+    def painter(self, widget, bounds, clip=None, layer=None):
         """Return a painter for use when drawing the widget.
         widget: widget object
         bounds: tuple (x1, y1, x2, y2) of widget bounds
         clip: a QRectF, if set
+        layer: layer to plot widget, or None to get next automatically
         """
+
+        # automatically add a layer if not given
+        if layer is None:
+            layer = 0
+            while (widget, layer) in self.states:
+                layer += 1
 
         s = self.states[(widget, layer)] = DrawState(widget, bounds, clip, self)
 

@@ -28,9 +28,9 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import widget
-import axisticks
 import graph
 import grid
+import axisticks
 import controlgraph
 
 ###############################################################################
@@ -174,7 +174,7 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = [graph.Graph, grid.Grid]
+    allowedparenttypes = (graph.Graph, grid.Grid)
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
     isaxis = True
@@ -342,8 +342,11 @@ class Axis(widget.Widget):
             else:
                 self.autorange = [0., 1.]
 
-    def _computePlottedRange(self):
+    def computePlottedRange(self, force=False):
         """Convert the range requested into a plotted range."""
+
+        if self.docchangeset == self.document.changeset and not force:
+            return
 
         s = self.settings
         self.plottedrange = [s.min, s.max]
@@ -363,7 +366,7 @@ class Axis(widget.Widget):
                 widget.settings.match == ''):
                 # update if out of date
                 if widget.docchangeset != self.document.changeset:
-                    widget._computePlottedRange()
+                    widget.computePlottedRange()
                 # copy the range
                 self.plottedrange = list(widget.plottedrange)
                 matched = True
@@ -466,12 +469,10 @@ class Axis(widget.Widget):
 
     def getPlottedRange(self):
         """Return the range plotted by the axes."""
-
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
+        self.computePlottedRange()
         return (self.plottedrange[0], self.plottedrange[1])
 
-    def _updateAxisLocation(self, bounds, otherposition=None):
+    def updateAxisLocation(self, bounds, otherposition=None):
         """Calculate coordinates on plotter of axis."""
 
         s = self.settings
@@ -515,10 +516,7 @@ class Axis(widget.Widget):
         """
 
         # if the doc was modified, recompute the range
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
-        self._updateAxisLocation(bounds)
+        self.updateAxisLocation(bounds)
 
         return self._graphToPlotter(vals)
 
@@ -535,11 +533,7 @@ class Axis(widget.Widget):
 
     def dataToPlotterCoords(self, posn, data):
         """Convert data values to plotter coordinates, scaling if necessary."""
-        # if the doc was modified, recompute the range
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
-        self._updateAxisLocation(posn)
+        self.updateAxisLocation(posn)
         return self._graphToPlotter(data*self.settings.datascale)
 
     def plotterToGraphCoords(self, bounds, vals):
@@ -550,11 +544,7 @@ class Axis(widget.Widget):
         returns a numpy of floats
         """
 
-        # if the doc was modified, recompute the range
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
-        self._updateAxisLocation( bounds )
+        self.updateAxisLocation( bounds )
 
         # work out fractional positions of the plotter coords
         frac = ( (vals.astype(N.float64) - self.coordParr1) /
@@ -950,7 +940,7 @@ class Axis(widget.Widget):
             otheredge = 0.
 
         # temporarily change position of axis to other side for drawing
-        self._updateAxisLocation(posn, otherposition=otheredge)
+        self.updateAxisLocation(posn, otherposition=otheredge)
         if not s.Line.hide:
             self._drawAxisLine(painter)
         if not s.MinorTicks.hide:
@@ -1003,10 +993,6 @@ class Axis(widget.Widget):
         should be behind/infront the data points.
         """
 
-        # recompute if document modified
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
         s = self.settings
         if ( s.hide or (s.MinorGridLines.hide and s.GridLines.hide) or
              s.GridLines.onTop != bool(ontop) ):
@@ -1015,7 +1001,7 @@ class Axis(widget.Widget):
         # draw grid on a different layer, depending on whether on top or not
         layer = (-2, -1)[bool(ontop)]
         painter = phelper.painter(self, parentposn, layer=layer)
-        self._updateAxisLocation(parentposn)
+        self.updateAxisLocation(parentposn)
 
         with painter:
             painter.save()
@@ -1038,17 +1024,14 @@ class Axis(widget.Widget):
         """Plot the axis on the painter.
         """
 
-        # recompute if document modified
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
         posn = self.computeBounds(parentposn, phelper)
-        self._updateAxisLocation(posn)
+        self.updateAxisLocation(posn)
 
         # exit if axis is hidden
         if self.settings.hide:
             return
 
+        self.computePlottedRange()
         painter = phelper.painter(self, posn)
         with painter:
             self._axisDraw(posn, parentposn, outerbounds, painter, phelper)

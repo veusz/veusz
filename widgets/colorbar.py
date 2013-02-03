@@ -182,6 +182,8 @@ class ColorBar(axis.Axis):
         if s.hide:
             return bounds
 
+        self.updateAxisLocation(bounds)
+
         # update image if necessary with new settings
         if imgwidget is not None:
             # could find widget
@@ -194,7 +196,7 @@ class ColorBar(axis.Axis):
 
         s.get('log').setSilent(axisscale == 'log')
         self.setAutoRange([minval, maxval])
-        self._computePlottedRange()
+        self.computePlottedRange(force=True)
 
         # now draw image on axis...
         minpix, maxpix = self.graphToPlotterCoords(

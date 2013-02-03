@@ -150,14 +150,9 @@ class Widget(object):
 
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
-        ap = self.allowedparenttypes 
-        if parent is None:# and len(ap)>0 and ap[0] is None:
-            return True
-        
-        for p in ap:
-            if isinstance(parent, p):
-                return True
-        return False      
+
+        return parent is None or any(
+            ( isinstance(parent, t) for t in self.allowedparenttypes ) )
 
     def willAllowParent(cls, parent):
         """Is the parent of an allowed type to have this type as a child?"""

@@ -12,6 +12,9 @@
 <clipPath id="c1">
 <path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
 </clipPath>
+<clipPath id="c2">
+<path d="m489.4,24.5l17.5,0l0,429.1l-17.5,0l0,-429.1"/>
+</clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
@@ -58,8 +61,14 @@
 <text x="356.2" y="476.5" font-size="14pt" fill="#000000">0</text>
 <text x="415.7" y="476.5" font-size="14pt" fill="#000000">0.5</text>
 <text x="492.7" y="476.5" font-size="14pt" fill="#000000">1</text>
+</g>
+</g>
+<g clip-path="url(#c2)">
+<g fill="none" stroke-width="1">
 <image x="489.4" y="24.5" width="17.5" height="429.1" xlink:href="data:image/ppm;base64,UDYKMSAxMjgKMjU1CgAAAAUAAAsAABEAABcAAB0AACMAACkAAC4AADQAADoAAEAAAEYAAEwAAFIAAFcAAF0AAGMAAGkAAG8AAHUAAHsAAIAAAIYAAIwAAJIAAJgAAJ4AAKQAAKkAAK8AALUAALoBALwFAb4JA8EOBcMSBsUWCMcbCckfC8skDM4oDtAsENIxEdQ1E9Y6FNg+FttCGN1HGd9LG+FPHONUHuZYH+hdIephI+xlJO5qJvBuJ/NyKfV3Kvd7LPmALvuEL/2IMf6MMf6PMP6SL/6WLv6ZLf2cLP2fK/2iKv2lKfyoKPysJ/yvJvyyJfy1JPu4I/u7Ivu+IfvCIPrFH/rIHvrLHfrOHfrRHPnVG/nYGvnbGfneGPjhF/jkFvjnFfjrFPjuE/jvGPjvIPjwJ/jwLvnxNvnxPfnyRfnyTPnzVPrzW/r0Yvr0avr1cfv1efv2gPv2iPv3j/v3lvz4nvz4pfz5rfz5tP36vP36w/37yv370v382f784f796P798P7+9////w==" preserveAspectRatio="none"/>
 </g>
+</g>
+<g clip-path="url(#c0)">
 <g fill="none" stroke-width="0.6">
 <path d="m489.4,24.5l17.5,0l0,429.1l-17.5,0l0,-429.1"/>
 </g>
@@ -67,9 +76,9 @@
 <path d="M489.4,453.7l0,-429.1"/>
 <path d="M489.4,354.4l3.7,0M489.4,296.3l3.7,0M489.4,255.1l3.7,0M489.4,223.1l3.7,0M489.4,197l3.7,0M489.4,174.9l3.7,0M489.4,155.8l3.7,0M489.4,138.9l3.7,0M489.4,24.5l3.7,0"/>
 <path d="M489.4,453.7l7.5,0M489.4,123.8l7.5,0"/>
-<path d="M524.4,471.2l0,-464.1"/>
-<path d="M524.4,354.4l-3.7,0M524.4,296.3l-3.7,0M524.4,255.1l-3.7,0M524.4,223.1l-3.7,0M524.4,197l-3.7,0M524.4,174.9l-3.7,0M524.4,155.8l-3.7,0M524.4,138.9l-3.7,0M524.4,24.5l-3.7,0"/>
-<path d="M524.4,453.7l-7.5,0M524.4,123.8l-7.5,0"/>
+<path d="M506.9,453.7l0,-429.1"/>
+<path d="M506.9,354.4l-3.7,0M506.9,296.3l-3.7,0M506.9,255.1l-3.7,0M506.9,223.1l-3.7,0M506.9,197l-3.7,0M506.9,174.9l-3.7,0M506.9,155.8l-3.7,0M506.9,138.9l-3.7,0M506.9,24.5l-3.7,0"/>
+<path d="M506.9,453.7l-7.5,0M506.9,123.8l-7.5,0"/>
 </g>
 <g fill="none" stroke-width="1">
 <text x="477.1" y="462.5" font-size="14pt" fill="#000000">1</text>

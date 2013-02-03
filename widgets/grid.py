@@ -229,7 +229,8 @@ class Grid(widget.Widget):
         ge = _gridengine(self.settings.columns, self.settings.rows)
 
         # copy children, and remove any which are axes
-        children = [c for c in self.children if c.typename != 'axis']
+        children = [ c for c in self.children if
+                     not hasattr(c, 'isaxis') ]
         child_dimensions = {}
         child_posns = {}
         for c in children:
@@ -365,7 +366,7 @@ class Grid(widget.Widget):
 
         with painter:
             for child in self.children:
-                if child.typename != 'axis':
+                if not hasattr(child.typename, 'isaxis'):
                     self._drawChild(phelper, child, bounds, parentposn)
 
         # do not call widget.Widget.draw, do not collect 200 pounds

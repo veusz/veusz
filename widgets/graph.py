@@ -18,13 +18,14 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+from collections import defaultdict
+
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
 
 import widget
-import axis
 import page
 import grid
 import controlgraph
@@ -38,7 +39,7 @@ class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = [page.Page, grid.Grid]
+    allowedparenttypes = (page.Page, grid.Grid)
     allowusercreation = True
     description = _('Base graph')
 
@@ -84,6 +85,7 @@ class Graph(widget.Widget):
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 
+        import axis
         if self.parent.getChild('x') is None:
             axis.Axis(self, name='x')
         if self.parent.getChild('y') is None:
@@ -102,7 +104,7 @@ class Graph(widget.Widget):
             for c in w.children:
                 name = c.name
                 if ( name in axesnames and name not in axes and
-                     isinstance(c, axis.Axis) ):
+                     hasattr(c, 'isaxis') ):
                     axes[name] = c
             w = w.parent
 
@@ -131,6 +133,9 @@ class Graph(widget.Widget):
     def draw(self, parentposn, painthelper, outerbounds = None):
         '''Update the margins before drawing.'''
 
+        # yuck, avoid circular imports
+        import axisbroken
+
         s = self.settings
 
         bounds = self.computeBounds(parentposn, painthelper)
@@ -157,37 +162,70 @@ class Graph(widget.Widget):
         # child drawing algorithm is a bit complex due to axes
         # being shared between graphs and broken axes
 
-        # get list of axes to draw
-        axestodraw = set()
+        # this is a map of axis names to plot to axis widgets
+        axestodraw = {}
+        # axes widgets for each plotter (precalculated by Page)
+        axesofwidget = painthelper.plotteraxismap
         for c in self.children:
             try:
-                for axis in c.getAxesNames():
-                    axestodraw.add(axis)
-            except AttributeError:
+                for a in axesofwidget[c]:
+                    axestodraw[a.name] = a
+            except KeyError:
                 if hasattr(c, 'isaxis'):
-                    axestodraw.add(c.name)
-
-        axes = self.getAxesDict(axestodraw, ignoremissing=True)
-        axeswidgets = set(axes.values())
+                    axestodraw[c.name] = c
 
         # grid lines are normally plotted before other child widgets
-        for aname, awidget in sorted(axes.items(), reverse=True):
+        axisdrawlist = sorted(axestodraw.items(), reverse=True)
+        for aname, awidget in axisdrawlist:
+            awidget.updateAxisLocation(bounds)
+            awidget.computePlottedRange()
             awidget.drawGrid(bounds, painthelper, outerbounds=outerbounds,
                              ontop=False)
+
+        # broken axis handling
+        brokenaxismap = {}
+        for name, axis in axestodraw.iteritems():
+            if isinstance(axis, axisbroken.AxisBroken):
+                brokenaxismap[name] = axis
 
         # do normal drawing of children
         # iterate over children in reverse order
         for c in reversed(self.children):
-            if c not in axeswidgets:
+
+            if hasattr(c, 'isaxis'):
+                continue
+
+            axes = axesofwidget.get(c, None)
+            if axes is not None and any((n in brokenaxismap for n in axes)):
+                # handle broken axes
+                brokenaxes = [axisnamemap[n] for n in axes
+                              if n in brokenaxismap]
+                def iteratebrokenaxes(b):
+                    """Recursively iterate over each broken axis and redraw
+                    child for each.
+                    We might have more than one broken axis per child, so
+                    hence this rather strange iteration.
+                    """
+                    for i in xrange(b[0].breakvnum):
+                        b[0].switchBreak(i)
+                        if len(b) == 1:
+                            c.draw(bounds, painthelper, outerbounds=outerbounds)
+                        else:
+                            iteratebrokenaxes(b[1:])
+                    b[0].switchBreak(None)
+                    iteratebrokenaxes(brokenaxes)
+
+            else:
+                # standard non broken axis drawing
                 c.draw(bounds, painthelper, outerbounds=outerbounds)
 
         # then for grid lines on top
-        for axis in axeswidgets:
+        for aname, awidget in axisdrawlist:
             axis.drawGrid(bounds, painthelper, outerbounds=outerbounds,
                           ontop=True)
 
         # draw axes on top of grid lines
-        for aname, awidget in sorted(axes.items(), reverse=True):
+        for aname, awidget in axisdrawlist:
             awidget.draw(bounds, painthelper, outerbounds=outerbounds)
 
         return bounds

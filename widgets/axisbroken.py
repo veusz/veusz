@@ -24,14 +24,14 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.document as document
 
-from axis import Axis
+import axis
 
 def _(text, disambiguation=None, context='BrokenAxis'):
     '''Translate text.'''
     return unicode( 
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
-class AxisBroken(Axis):
+class AxisBroken(axis.Axis):
 
     typename = 'axis-broken'
     description = 'Axis with breaks in it'
@@ -39,7 +39,7 @@ class AxisBroken(Axis):
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''
-        Axis.addSettings(s)
+        axis.Axis.addSettings(s)
 
         s.add( setting.FloatList(
                 'breakPoints',
@@ -54,10 +54,10 @@ class AxisBroken(Axis):
                 usertext = _('Break positions'),
                 ) )
 
-    def _updateAxisLocation(self, bounds, otherposition=None):
+    def updateAxisLocation(self, bounds, otherposition=None):
         """Recalculate broken axis positions."""
 
-        Axis._updateAxisLocation(self, bounds, otherposition=otherposition)
+        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition)
 
         s = self.settings
 
@@ -88,16 +88,51 @@ class AxisBroken(Axis):
 
         stops.append(1.)
 
-        # axis values for starting and stopping
-        self.valstarts = [ points[i*2] for i in xrange(num) ]
-        self.valstops = [ points[i*2+1] for i in xrange(num) ]
+        # save these
+        self.orig_coordPerp = self.coordPerp
+        self.orig_coordParr1 = self.coordParr1
+        self.orig_coordParr2 = self.coordParr2
 
-        print
-        print stops
-        print starts
-        print self.valstarts
-        print self.valstops
-        print
+    def computePlottedRange(self):
+
+        axis.Axis.computePlottedRange(self)
+
+        self.orig_plottedrange = self.plottedrange
+        points = self.settings.breakPoints
+        self.breakvnum = num = len(points)/2 + 1
+        self.breakvlist = [self.plottedrange[0]] + points[:len(points)/2*2] + [
+            self.plottedrange[1]]
+        print self.breakvlist, num
+
+        # axis values for starting and stopping
+        self.breakvstarts = [ self.breakvlist[i*2] for i in xrange(num) ]
+        self.breakvstops = [ self.breakvlist[i*2+1] for i in xrange(num) ]
+
+    def switchBreak(self, num):
+        """Switch to break given (or None to disable."""
+
+        print "switch", num
+
+        if num is None:
+            self.plottedrange = self.orig_plottedrange
+            self.coordPerp = self.orig_coordPerp
+            self.coordParr1 = self.orig_coordParr1
+            self.coordParr2 = self.orig_coordParr2
+        else:
+            self.plottedrange = [self.breakvstarts[num], self.breakvstops[num]]
+            d = self.orig_coordParr2 - self.orig_coordParr1
+            self.coordPerp = self.orig_coordPerp
+            self.coordParr1 = self.orig_coordParr1 + d*self.posstarts[num]
+            self.coordParr2 = self.orig_coordParr1 + d*self.posstops[num]
+
+    def draw(self, parentposn, phelper, outerbounds=None):
+        """Plot the axis on the painter.
+        """
+
+        posn = self.computeBounds(parentposn, phelper)
+        self.updateAxisLocation(posn)
+
+
 
 # allow the factory to instantiate an image
 document.thefactory.register( AxisBroken )
