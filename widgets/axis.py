@@ -432,8 +432,11 @@ class Axis(widget.Widget):
 
         self.docchangeset = self.document.changeset
 
-    def computeTicks(self):
-        """Update ticks given plotted range."""
+    def computeTicks(self, allowauto=True):
+        """Update ticks given plotted range.
+        if allowauto is False, then do not allow ticks to be
+        updated
+        """
 
         s = self.settings
 
@@ -443,8 +446,8 @@ class Axis(widget.Widget):
             tickclass = axisticks.DateTicks
 
         nexttick = s.autoRange == 'next-tick'
-        extendmin = nexttick and s.min == 'Auto'
-        extendmax = nexttick and s.max == 'Auto'
+        extendmin = nexttick and s.min == 'Auto' and allowauto
+        extendmax = nexttick and s.max == 'Auto' and allowauto
 
         # create object to compute ticks
         axs = tickclass(self.plottedrange[0], self.plottedrange[1],

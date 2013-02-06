@@ -115,10 +115,6 @@ class GenericPlotter(widget.Widget):
     def clipAxesBounds(self, axes, bounds):
         """Returns clipping rectange for start and stop values of axis."""
 
-        # update cached coordinates of axes
-        axes[0].plotterToDataCoords(bounds, N.array([]))
-        axes[1].plotterToDataCoords(bounds, N.array([]))
-
         # get range
         x1, x2 = axes[0].coordParr1, axes[0].coordParr2
         if x1 > x2:

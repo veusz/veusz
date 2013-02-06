@@ -183,10 +183,10 @@ class Graph(widget.Widget):
                              ontop=False)
 
         # broken axis handling
-        brokenaxismap = {}
+        brokenaxes = set()
         for name, axis in axestodraw.iteritems():
             if isinstance(axis, axisbroken.AxisBroken):
-                brokenaxismap[name] = axis
+                brokenaxes.add(axis)
 
         # do normal drawing of children
         # iterate over children in reverse order
@@ -196,24 +196,26 @@ class Graph(widget.Widget):
                 continue
 
             axes = axesofwidget.get(c, None)
-            if axes is not None and any((n in brokenaxismap for n in axes)):
+            if axes is not None and any((a in brokenaxes for a in axes)):
                 # handle broken axes
-                brokenaxes = [axisnamemap[n] for n in axes
-                              if n in brokenaxismap]
+                childbrokenaxes = sorted([ (a.name, a) for a in axes
+                                           if a in brokenaxes ])
+                childbrokenaxes.sort()
                 def iteratebrokenaxes(b):
                     """Recursively iterate over each broken axis and redraw
                     child for each.
                     We might have more than one broken axis per child, so
                     hence this rather strange iteration.
                     """
-                    for i in xrange(b[0].breakvnum):
-                        b[0].switchBreak(i)
+                    ax = b[0][1]
+                    for i in xrange(ax.breakvnum):
+                        ax.switchBreak(i, bounds)
                         if len(b) == 1:
                             c.draw(bounds, painthelper, outerbounds=outerbounds)
                         else:
                             iteratebrokenaxes(b[1:])
-                    b[0].switchBreak(None)
-                    iteratebrokenaxes(brokenaxes)
+                    ax.switchBreak(None, bounds)
+                iteratebrokenaxes(childbrokenaxes)
 
             else:
                 # standard non broken axis drawing
