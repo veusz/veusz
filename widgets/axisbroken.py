@@ -180,6 +180,45 @@ class AxisBroken(axis.Axis):
 
         self.switchBreak(None, posn)
 
+
+    def drawGrid(self, parentposn, phelper, outerbounds=None,
+                 ontop=False):
+        """Code to draw gridlines.
+
+        This is separate from the main draw routine because the grid
+        should be behind/infront the data points.
+        """
+
+        s = self.settings
+        if ( s.hide or (s.MinorGridLines.hide and s.GridLines.hide) or
+             s.GridLines.onTop != bool(ontop) ):
+            return
+
+        # draw grid on a different layer, depending on whether on top or not
+        layer = (-2, -1)[bool(ontop)]
+        painter = phelper.painter(self, parentposn, layer=layer)
+        self.updateAxisLocation(parentposn)
+
+        with painter:
+            painter.save()
+            painter.setClipRect( qt4.QRectF(
+                    qt4.QPointF(parentposn[0], parentposn[1]),
+                    qt4.QPointF(parentposn[2], parentposn[3]) ) )
+
+            for i in xrange(self.breakvnum):
+                self.switchBreak(i, parentposn)
+                if not s.MinorGridLines.hide:
+                    coordminorticks = self._graphToPlotter(self.minorticklist[i])
+                    self._drawGridLines('MinorGridLines', painter, coordminorticks,
+                                        parentposn)
+                if not s.GridLines.hide:
+                    coordticks = self._graphToPlotter(self.majorticklist[i])
+                    self._drawGridLines('GridLines', painter, coordticks,
+                                        parentposn)
+
+            self.switchBreak(None, parentposn)
+            painter.restore()
+
     def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
         """Main drawing routine of axis."""
 
@@ -203,7 +242,6 @@ class AxisBroken(axis.Axis):
         max_delta = 0
         for i in xrange(self.breakvnum):
             self.switchBreak(i, posn)
-            self.computeTicks(allowauto=False)
 
             # plot coordinates of ticks
             coordticks = self._graphToPlotter(self.majorticklist[i])
@@ -223,7 +261,8 @@ class AxisBroken(axis.Axis):
             suppresstext = self._suppressText(painter, parentposn, outerbounds)
             if not s.TickLabels.hide and not suppresstext:
                 self._drawTickLabels(phelper, painter, coordticks, sign,
-                                     outerbounds, texttorender)
+                                     outerbounds, self.majorticklist[i],
+                                     texttorender)
 
             # this is the maximum delta of any of the breaks
             max_delta = max(max_delta, self._delta_axis)
@@ -234,7 +273,6 @@ class AxisBroken(axis.Axis):
         # draw an axis label
         if not s.Label.hide and not suppresstext:
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
-
 
         # mirror axis at other side of plot
         if s.autoMirror:

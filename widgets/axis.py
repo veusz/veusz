@@ -731,7 +731,7 @@ class Axis(widget.Widget):
                         yield pcoord, lab
 
     def _drawTickLabels(self, phelper, painter, coordticks, sign, outerbounds,
-                        texttorender):
+                        tickvals, texttorender):
         """Draw tick labels on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -775,7 +775,7 @@ class Axis(widget.Widget):
                 format = self.autoformat
 
             # generate positions and labels
-            for posn, tickval in izip(coordticks, self.majortickscalc):
+            for posn, tickval in izip(coordticks, tickvals):
                 text = utils.formatNumber(tickval*scale, format,
                                           locale=self.document.locale)
                 yield posn, text
@@ -1104,7 +1104,7 @@ class Axis(widget.Widget):
         suppresstext = self._suppressText(painter, parentposn, outerbounds)
         if not s.TickLabels.hide and not suppresstext:
             self._drawTickLabels(phelper, painter, coordticks, sign,
-                                 outerbounds, texttorender)
+                                 outerbounds, self.majortickscalc, texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
