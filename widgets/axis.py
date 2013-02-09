@@ -1039,6 +1039,24 @@ class Axis(widget.Widget):
         with painter:
             self._axisDraw(posn, parentposn, outerbounds, painter, phelper)
 
+
+    def _drawTextWithoutOverlap(self, painter, texttorender):
+        """Aall the text is drawn at the end so that we can check it
+        doesn't overlap.
+
+        texttorender is a list of (Renderer, QPen) tuples.
+        """
+        drawntext = qt4.QPainterPath()
+        for r, pen in texttorender:
+            bounds = r.getBounds()
+            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
+                              bounds[3]-bounds[1])
+
+            if not drawntext.intersects(rect):
+                painter.setPen(pen)
+                r.render()
+                drawntext.addRect(rect)
+
     def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
         """Internal drawing routine."""
 
@@ -1052,10 +1070,6 @@ class Axis(widget.Widget):
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
         coordminorticks = self._graphToPlotter(self.minortickscalc)
-
-        # exit if axis is hidden
-        if s.hide:
-            return
 
         texttorender = []
 
@@ -1095,18 +1109,7 @@ class Axis(widget.Widget):
         if s.autoMirror:
             self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
-        # all the text is drawn at the end so that
-        # we can check it doesn't overlap
-        drawntext = qt4.QPainterPath()
-        for r, pen in texttorender:
-            bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1])
-
-            if not drawntext.intersects(rect):
-                painter.setPen(pen)
-                r.render()
-                drawntext.addRect(rect)
+        self._drawTextWithoutOverlap(painter, texttorender)
 
     def updateControlItem(self, cgi):
         """Update axis position from control item."""
