@@ -61,14 +61,14 @@ class AxisBroken(axis.Axis):
                 usertext = _('Break positions'),
                 ) )
 
-    def switchBreak(self, num, posn):
+    def switchBreak(self, num, posn, otherposition=None):
         """Switch to break given (or None to disable)."""
         self.rangeswitch = num
         if num is None:
             self.plottedrange = self.orig_plottedrange
         else:
             self.plottedrange = [self.breakvstarts[num], self.breakvstops[num]]
-        self.updateAxisLocation(posn)
+        self.updateAxisLocation(posn, otherposition=otherposition)
 
     def updateAxisLocation(self, bounds, otherposition=None):
         """Recalculate broken axis positions."""
@@ -94,6 +94,7 @@ class AxisBroken(axis.Axis):
 
         axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition)
 
+        # actually start and stop values on axis
         points = s.breakPoints
         num = len(points) / 2
         posns = list(s.breakPosns)
@@ -111,7 +112,7 @@ class AxisBroken(axis.Axis):
         # fractional difference between starts and stops
         breakgap = 0.05
 
-        # get fractional positions for starting and stopping
+        # collate fractional positions for starting and stopping
         self.posstarts = starts = [0.]
         self.posstops = stops = []
 
@@ -135,26 +136,111 @@ class AxisBroken(axis.Axis):
         self.breakvstarts = [ self.breakvlist[i*2] for i in xrange(num) ]
         self.breakvstops = [ self.breakvlist[i*2+1] for i in xrange(num) ]
 
-    def draw(self, parentposn, phelper, outerbounds=None):
-        """Plot the axis on the painter.
-        """
+        # compute ticks for each range
+        self.minorticklist = []
+        self.majorticklist = []
+        for i in xrange(self.breakvnum):
+            self.plottedrange = [self.breakvstarts[i], self.breakvstops[i]]
+            self.computeTicks(allowauto=False)
+            self.minorticklist.append(self.minortickscalc)
+            self.majorticklist.append(self.majortickscalc)
 
-        posn = self.computeBounds(parentposn, phelper)
-        self.updateAxisLocation(posn)
+        self.plottedrange = self.orig_plottedrange
 
-        # exit if axis is hidden
-        if self.settings.hide:
+    def _autoMirrorDraw(self, posn, painter):
+        """Mirror axis to opposite side of graph if there isn't an
+        axis there already."""
+
+        if not self._shouldAutoMirror():
             return
 
-        self.computePlottedRange()
-        painter = phelper.painter(self, posn)
-        with painter:
-            for i in xrange(self.breakvnum):
-                self.switchBreak(i, posn)
-                self.computeTicks(allowauto=False)
-                self._axisDraw(posn, parentposn, outerbounds, painter, phelper)
+        # swap axis to other side
+        s = self.settings
+        if s.otherPosition < 0.5:
+            otheredge = 1.
+        else:
+            otheredge = 0.
 
-            self.switchBreak(None, posn)
+        # temporarily change position of axis to other side for drawing
+        self.updateAxisLocation(posn, otherposition=otheredge)
+        if not s.Line.hide:
+            self._drawAxisLine(painter)
+
+        for i in xrange(self.breakvnum):
+            self.switchBreak(i, posn, otherposition=otheredge)
+
+            # plot coordinates of ticks
+            coordticks = self._graphToPlotter(self.majorticklist[i])
+            coordminorticks = self._graphToPlotter(self.minorticklist[i])
+
+            if not s.MinorTicks.hide:
+                self._drawMinorTicks(painter, coordminorticks)
+            if not s.MajorTicks.hide:
+                self._drawMajorTicks(painter, coordticks)
+
+        self.switchBreak(None, posn)
+
+    def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
+        """Main drawing routine of axis."""
+
+        s = self.settings
+
+        # multiplication factor if reflection on the axis is requested
+        sign = 1
+        if s.direction == 'vertical':
+            sign *= -1
+        if self.coordReflected:
+            sign *= -1
+
+        # keep track of distance from axis
+        # text to output
+        texttorender = []
+
+        # plot the line along the axis
+        if not s.Line.hide:
+            self._drawAxisLine(painter)
+
+        max_delta = 0
+        for i in xrange(self.breakvnum):
+            self.switchBreak(i, posn)
+            self.computeTicks(allowauto=False)
+
+            # plot coordinates of ticks
+            coordticks = self._graphToPlotter(self.majorticklist[i])
+            coordminorticks = self._graphToPlotter(self.minorticklist[i])
+
+            self._delta_axis = 0
+
+            # plot minor ticks
+            if not s.MinorTicks.hide:
+                self._drawMinorTicks(painter, coordminorticks)
+
+            # plot major ticks
+            if not s.MajorTicks.hide:
+                self._drawMajorTicks(painter, coordticks)
+
+            # plot tick labels
+            suppresstext = self._suppressText(painter, parentposn, outerbounds)
+            if not s.TickLabels.hide and not suppresstext:
+                self._drawTickLabels(phelper, painter, coordticks, sign,
+                                     outerbounds, texttorender)
+
+            # this is the maximum delta of any of the breaks
+            max_delta = max(max_delta, self._delta_axis)
+
+        self.switchBreak(None, posn)
+        self._delta_axis = max_delta
+
+        # draw an axis label
+        if not s.Label.hide and not suppresstext:
+            self._drawAxisLabel(painter, sign, outerbounds, texttorender)
+
+
+        # mirror axis at other side of plot
+        if s.autoMirror:
+            self._autoMirrorDraw(posn, painter)
+
+        self._drawTextWithoutOverlap(painter, texttorender)
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(

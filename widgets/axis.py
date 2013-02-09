@@ -915,11 +915,11 @@ class Axis(widget.Widget):
 
         texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
-    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
-        """Mirror axis to opposite side of graph if there isn't
-        an axis there already."""
+    def _shouldAutoMirror(self):
+        """Work out whether to do mirroring."""
 
-        # This is a nasty hack: must think of a better way to do this
+        # FIXME: This is a nasty hack: must think of a better way to do this
+
         s = self.settings
         countaxis = 0
         for c in self.parent.children:
@@ -931,12 +931,17 @@ class Axis(widget.Widget):
             except AttributeError:
                 # if it's not an axis we get here
                 pass
+        return countaxis <= 1
 
-        # another axis in the same direction, so we don't mirror it
-        if countaxis > 1:
+    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
+        """Mirror axis to opposite side of graph if there isn't
+        an axis there already."""
+
+        if not self._shouldAutoMirror():
             return
 
         # swap axis to other side
+        s = self.settings
         if s.otherPosition < 0.5:
             otheredge = 1.
         else:
