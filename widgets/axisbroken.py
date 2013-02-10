@@ -57,12 +57,13 @@ class AxisBroken(axis.Axis):
                 [],
                 descr = _('Pairs of values to start and stop breaks'),
                 usertext = _('Break pairs'),
-                ) )
+                ), 4 )
         s.add( setting.FloatList(
                 'breakPosns',
                 [],
                 descr = _('Positions (fractions) along axis where to break'),
                 usertext = _('Break positions'),
+                formatting=True,
                 ) )
 
     def switchBreak(self, num, posn, otherposition=None):
