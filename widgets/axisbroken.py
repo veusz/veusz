@@ -76,22 +76,34 @@ class AxisBroken(axis.Axis):
     def plotterToGraphCoords(self, bounds, vals):
         """Convert values in plotter coordinates to data values.  This
         needs to know about whether we've not switched between the
-        breaks."""
+        breaks.
+
+        Note that this implementation is very slow! Hopefully it won't
+        be called often.
+        """
 
         if self.rangeswitch is not None:
             return axis.Axis.plotterToGraphCoords(self, bounds, vals)
 
+        # scaled to be fractional coordinates in bounds
+        if self.settings.direction == 'horizontal':
+            svals = (vals - bounds[0]) / (bounds[2] - bounds[0])
+        else:
+            svals = (vals - bounds[3]) / (bounds[1] - bounds[3])
+
         # first work out which break region the values are in
         out = []
-        for val in vals:
-            coord = N.nan
-            breaki = bisect.bisect_left(self.breakvstarts, val) - 1
-            print self.breakvstarts, val
-            print breaki
+        for sval, val in zip(svals, vals):
+            # find index for appropriated scaled starting value
+            breaki = bisect.bisect_left(self.posstarts, sval) - 1
+
             if ( breaki >= 0 and breaki < self.breakvnum and
-                 val <= self.breakvstops[breaki] ):
+                 sval <= self.posstops[breaki] ):
                 self.switchBreak(breaki, bounds)
-                coord = axis.Axis.plotterToGraphCoords(self, bounds, val)[0]
+                coord = axis.Axis.plotterToGraphCoords(
+                    self, bounds, N.array([val]))[0]
+            else:
+                coord = N.nan
             out.append(coord)
         self.switchBreak(None, bounds)
 
