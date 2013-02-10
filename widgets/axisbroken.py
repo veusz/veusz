@@ -25,6 +25,7 @@ import numpy as N
 import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.document as document
+import veusz.utils as utils
 
 import axis
 import controlgraph
@@ -118,8 +119,7 @@ class AxisBroken(axis.Axis):
             self.breakchangeset = self.document.changeset
 
             # actually start and stop values on axis
-            points = s.breakPoints
-            num = len(points) / 2
+            num = len(s.breakPoints) / 2
             posns = list(s.breakPosns)
             posns.sort()
 
@@ -165,10 +165,18 @@ class AxisBroken(axis.Axis):
 
         axis.Axis.computePlottedRange(self)
 
-        self.orig_plottedrange = self.plottedrange
-        points = self.settings.breakPoints
-        self.breakvnum = num = len(points)/2 + 1
-        self.breakvlist = [self.plottedrange[0]] + points[:len(points)/2*2] + [
+        r = self.orig_plottedrange = self.plottedrange
+        points = list(self.settings.breakPoints)
+        points.sort()
+
+        # filter to range
+        newpoints = []
+        for i in xrange(0,len(points)/2*2,2):
+            if points[i] >= r[0] and points[i+1] <= r[1]:
+                newpoints += [points[i], points[i+1]]
+
+        self.breakvnum = num = len(newpoints)/2 + 1
+        self.breakvlist = [self.plottedrange[0]] + newpoints + [
             self.plottedrange[1]]
 
         # axis values for starting and stopping
@@ -180,7 +188,12 @@ class AxisBroken(axis.Axis):
         self.majorticklist = []
         for i in xrange(self.breakvnum):
             self.plottedrange = [self.breakvstarts[i], self.breakvstops[i]]
+            reverse = self.plottedrange[0] > self.plottedrange[1]
+            if reverse:
+                self.plottedrange.reverse()
             self.computeTicks(allowauto=False)
+            if reverse:
+                self.plottedrange.reverse()
             self.minorticklist.append(self.minortickscalc)
             self.majorticklist.append(self.majortickscalc)
 
@@ -215,6 +228,46 @@ class AxisBroken(axis.Axis):
                 self._drawMajorTicks(painter, coordticks)
 
         self.switchBreak(None, posn)
+
+    def _drawAxisLine(self, painter):
+        """Draw the line of the axis, indicating broken positions.
+        We currently use a triangle to mark the broken position
+        """
+
+        # these are x and y, or y and x coordinates
+        p1 = [self.posstarts[0]]
+        p2 = [0.]
+
+        # mirror shape using this setting
+        markdirn = -1
+        if self.coordReflected:
+            markdirn = -markdirn
+
+        # add shape for each break
+        for start, stop in zip( self.posstarts[1:], self.posstops[:-1] ):
+            p1 += [stop, (start+stop)*0.5, start]
+            p2 += [0, markdirn*(start-stop)*0.5, 0]
+
+        # end point
+        p1.append(self.posstops[-1])
+        p2.append(0.)
+
+        # scale points by length of axis and add correct origin
+        scale = self.coordParr2 - self.coordParr1
+        p1 = N.array(p1) * scale + self.coordParr1
+        p2 = N.array(p2) * scale + self.coordPerp
+
+        if self.settings.direction == 'vertical':
+            p1, p2 = p2, p1
+
+        # convert to polygon and draw
+        poly = qt4.QPolygonF()
+        utils.addNumpyToPolygonF(poly, p1, p2)
+
+        pen = self.settings.get('Line').makeQPen(painter)
+        pen.setCapStyle(qt4.Qt.FlatCap)
+        painter.setPen(pen)
+        painter.drawPolyline(poly)
 
     def drawGrid(self, parentposn, phelper, outerbounds=None,
                  ontop=False):
