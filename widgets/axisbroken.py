@@ -124,37 +124,32 @@ class AxisBroken(axis.Axis):
             breakgap = 0.05
 
             # collate fractional positions for starting and stopping
-            self.posstarts = starts = [0.]
-            self.posstops = stops = []
+            starts = [0.]
+            stops = []
             for pos in posns:
                 stops.append( pos - breakgap/2. )
                 starts.append( pos + breakgap/2. )
             stops.append(1.)
 
-        # adjust bounds for chosen range
-        bounds = list(bounds)
+            # scale according to allowable range
+            d = s.upperPosition - s.lowerPosition
+            self.posstarts = N.array(starts)*d + s.lowerPosition
+            self.posstops = N.array(stops)*d + s.lowerPosition
+
+        # pass lower and upper ranges if a particular range is chosen
         if self.rangeswitch is None:
-            axis.Axis.updateAxisLocation(self, bounds,
-                                         otherposition=otherposition)
+            lowerupper = None
         else:
-            if s.direction == 'horizontal':
-                i1, i2 = 0, 2
-            else:
-                i1, i2 = 3, 1
+            lowerupper = ( self.posstarts[self.rangeswitch],
+                           self.posstops[self.rangeswitch] )
 
-            p1, p2 = s.lowerPosition, s.upperPosition
-            dfull = bounds[i2] - bounds[i1]
-            dsel = dfull * (p2 - p1)
-            v1 = bounds[i1] + p1*dfull + dsel*self.posstarts[self.rangeswitch]
-            v2 = bounds[i1] + p1*dfull + dsel*self.posstops[self.rangeswitch]
-            bounds[i1] = v1
-            bounds[i2] = v2
-
-            axis.Axis.updateAxisLocation(self, bounds,
-                                         otherposition=otherposition,
-                                         lowerupperposition=(0.,1.))
+        axis.Axis.updateAxisLocation(self, bounds,
+                                     otherposition=otherposition,
+                                     lowerupperposition=lowerupper)
 
     def computePlottedRange(self):
+        """Given range of data, recompute stops and start values of
+        breaks."""
 
         axis.Axis.computePlottedRange(self)
 
@@ -208,7 +203,6 @@ class AxisBroken(axis.Axis):
                 self._drawMajorTicks(painter, coordticks)
 
         self.switchBreak(None, posn)
-
 
     def drawGrid(self, parentposn, phelper, outerbounds=None,
                  ontop=False):
