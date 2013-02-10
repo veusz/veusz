@@ -475,16 +475,27 @@ class Axis(widget.Widget):
         self.computePlottedRange()
         return (self.plottedrange[0], self.plottedrange[1])
 
-    def updateAxisLocation(self, bounds, otherposition=None):
-        """Calculate coordinates on plotter of axis."""
+    def updateAxisLocation(self, bounds, otherposition=None,
+                           lowerupperposition=None):
+        """Recalculate coordinates on plotter of axis.
+
+        otherposition: overrid otherPosition setting
+        lowerupperposition: set to tuple (lower, upper) to override
+         lowerPosition and upperPosition settings
+        """
 
         s = self.settings
+
+        if lowerupperposition is None:
+            p1, p2 = s.lowerPosition, s.upperPosition
+        else:
+            p1, p2 = lowerupperposition
+        if otherposition is None:
+            otherposition = s.otherPosition
+
         x1, y1, x2, y2 = bounds
         dx = x2 - x1
         dy = y2 - y1
-        p1, p2 = s.lowerPosition, s.upperPosition
-        if otherposition is None:
-            otherposition = s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
             self.coordParr1 = x1 + dx*p1
@@ -937,9 +948,6 @@ class Axis(widget.Widget):
         """Mirror axis to opposite side of graph if there isn't
         an axis there already."""
 
-        if not self._shouldAutoMirror():
-            return
-
         # swap axis to other side
         s = self.settings
         if s.otherPosition < 0.5:
@@ -1111,7 +1119,7 @@ class Axis(widget.Widget):
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
 
         # mirror axis at other side of plot
-        if s.autoMirror:
+        if s.autoMirror and self._shouldAutoMirror():
             self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
         self._drawTextWithoutOverlap(painter, texttorender)

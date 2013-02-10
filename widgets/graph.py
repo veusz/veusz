@@ -170,7 +170,7 @@ class Graph(widget.Widget):
             try:
                 for a in axesofwidget[c]:
                     axestodraw[a.name] = a
-            except KeyError:
+            except (KeyError, AttributeError):
                 if hasattr(c, 'isaxis'):
                     axestodraw[c.name] = c
 

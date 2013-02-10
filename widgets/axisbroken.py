@@ -18,6 +18,8 @@
 
 '''An axis which can be broken in places.'''
 
+import bisect
+
 import numpy as N
 
 import veusz.qtall as qt4
@@ -42,6 +44,7 @@ class AxisBroken(axis.Axis):
         """Initialise axis."""
         axis.Axis.__init__(self, parent, name=name)
         self.rangeswitch = None
+        self.breakchangeset = -1
 
     @classmethod
     def addSettings(klass, s):
@@ -70,57 +73,86 @@ class AxisBroken(axis.Axis):
             self.plottedrange = [self.breakvstarts[num], self.breakvstops[num]]
         self.updateAxisLocation(posn, otherposition=otherposition)
 
+    def plotterToGraphCoords(self, bounds, vals):
+        """Convert values in plotter coordinates to data values.  This
+        needs to know about whether we've not switched between the
+        breaks."""
+
+        if self.rangeswitch is not None:
+            return axis.Axis.plotterToGraphCoords(self, bounds, vals)
+
+        # first work out which break region the values are in
+        out = []
+        for val in vals:
+            coord = N.nan
+            breaki = bisect.bisect_left(self.breakvstarts, val) - 1
+            print self.breakvstarts, val
+            print breaki
+            if ( breaki >= 0 and breaki < self.breakvnum and
+                 val <= self.breakvstops[breaki] ):
+                self.switchBreak(breaki, bounds)
+                coord = axis.Axis.plotterToGraphCoords(self, bounds, val)[0]
+            out.append(coord)
+        self.switchBreak(None, bounds)
+
+        return N.array(out)
+
     def updateAxisLocation(self, bounds, otherposition=None):
         """Recalculate broken axis positions."""
 
         s = self.settings
 
+        if self.document.changeset != self.breakchangeset:
+            self.breakchangeset = self.document.changeset
+
+            # actually start and stop values on axis
+            points = s.breakPoints
+            num = len(points) / 2
+            posns = list(s.breakPosns)
+            posns.sort()
+
+            # add on more break positions if not specified
+            if len(posns) < num:
+                start = 0.
+                if len(posns) != 0:
+                    start = posns[-1]
+                posns = posns + list(
+                    N.arange(1,num-len(posns)+1) *
+                    ( (1.-start) / (num-len(posns)+1) + start ))
+
+            # fractional difference between starts and stops
+            breakgap = 0.05
+
+            # collate fractional positions for starting and stopping
+            self.posstarts = starts = [0.]
+            self.posstops = stops = []
+            for pos in posns:
+                stops.append( pos - breakgap/2. )
+                starts.append( pos + breakgap/2. )
+            stops.append(1.)
+
+        # adjust bounds for chosen range
         bounds = list(bounds)
         if self.rangeswitch is None:
-            pass
+            axis.Axis.updateAxisLocation(self, bounds,
+                                         otherposition=otherposition)
         else:
             if s.direction == 'horizontal':
-                d = bounds[2]-bounds[0]
-                n0 = bounds[0] + d*self.posstarts[self.rangeswitch]
-                n2 = bounds[0] + d*self.posstops[self.rangeswitch]
-                bounds[0] = n0
-                bounds[2] = n2
+                i1, i2 = 0, 2
             else:
-                d = bounds[1]-bounds[3]
-                n1 = bounds[3] + d*self.posstops[self.rangeswitch]
-                n3 = bounds[3] + d*self.posstarts[self.rangeswitch]
-                bounds[1] = n1
-                bounds[3] = n3
+                i1, i2 = 3, 1
 
-        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition)
+            p1, p2 = s.lowerPosition, s.upperPosition
+            dfull = bounds[i2] - bounds[i1]
+            dsel = dfull * (p2 - p1)
+            v1 = bounds[i1] + p1*dfull + dsel*self.posstarts[self.rangeswitch]
+            v2 = bounds[i1] + p1*dfull + dsel*self.posstops[self.rangeswitch]
+            bounds[i1] = v1
+            bounds[i2] = v2
 
-        # actually start and stop values on axis
-        points = s.breakPoints
-        num = len(points) / 2
-        posns = list(s.breakPosns)
-        posns.sort()
-
-        # add on more break positions if not specified
-        if len(posns) < num:
-            start = 0.
-            if len(posns) != 0:
-                start = posns[-1]
-            posns = posns + list(
-                N.arange(1,num-len(posns)+1) *
-                ( (1.-start) / (num-len(posns)+1) + start ))
-
-        # fractional difference between starts and stops
-        breakgap = 0.05
-
-        # collate fractional positions for starting and stopping
-        self.posstarts = starts = [0.]
-        self.posstops = stops = []
-
-        for pos in posns:
-            stops.append( pos - breakgap/2. )
-            starts.append( pos + breakgap/2. )
-
-        stops.append(1.)
+            axis.Axis.updateAxisLocation(self, bounds,
+                                         otherposition=otherposition,
+                                         lowerupperposition=(0.,1.))
 
     def computePlottedRange(self):
 
@@ -150,9 +182,6 @@ class AxisBroken(axis.Axis):
     def _autoMirrorDraw(self, posn, painter):
         """Mirror axis to opposite side of graph if there isn't an
         axis there already."""
-
-        if not self._shouldAutoMirror():
-            return
 
         # swap axis to other side
         s = self.settings
@@ -275,7 +304,7 @@ class AxisBroken(axis.Axis):
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
 
         # mirror axis at other side of plot
-        if s.autoMirror:
+        if s.autoMirror and self._shouldAutoMirror():
             self._autoMirrorDraw(posn, painter)
 
         self._drawTextWithoutOverlap(painter, texttorender)
