@@ -1196,11 +1196,13 @@ class PlotWindow( qt4.QGraphicsView ):
             self.scene.removeItem(c)
 
         # add each item to the group
-        for widget in widgets:
-            if self.painthelper and widget in self.painthelper.states:
-                for control in self.painthelper.states[widget].cgis:
-                    graphitem = control.createGraphicsItem()
-                    cgg.addToGroup(graphitem)
+        if self.painthelper:
+            for widget in widgets:
+                cgis = self.painthelper.getControlGraph(widget)
+                if cgis:
+                    for control in cgis:
+                        graphitem = control.createGraphicsItem()
+                        cgg.addToGroup(graphitem)
 
 class FullScreenPlotWindow(qt4.QScrollArea):
     """Window for showing plot in full-screen mode."""

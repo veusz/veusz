@@ -173,9 +173,7 @@ class NonOrthPoint(Widget):
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
 
-        posn = Widget.draw(self, parentposn, phelper,
-                           outerbounds=outerbounds)
-
+        posn = self.computeBounds(parentposn, phelper)
         s = self.settings
         d = self.document
 
@@ -193,42 +191,43 @@ class NonOrthPoint(Widget):
         x1, y1, x2, y2 = posn
         cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
         painter = phelper.painter(self, posn)
-        self.parent.setClip(painter, posn)
+        with painter:
+            self.parent.setClip(painter, posn)
 
-        # split parts separated by NaNs
-        for v1, v2, scalings, textitems in document.generateValidDatasetParts(
-            d1, d2, dscale, text):
-            # convert data (chopping down length)
-            v1d, v2d = v1.data, v2.data
-            minlen = min(v1d.shape[0], v2d.shape[0])
-            v1d, v2d = v1d[:minlen], v2d[:minlen]
-            px, py = self.parent.graphToPlotCoords(v1d, v2d)
+            # split parts separated by NaNs
+            for v1, v2, scalings, textitems in document.generateValidDatasetParts(
+                d1, d2, dscale, text):
+                # convert data (chopping down length)
+                v1d, v2d = v1.data, v2.data
+                minlen = min(v1d.shape[0], v2d.shape[0])
+                v1d, v2d = v1d[:minlen], v2d[:minlen]
+                px, py = self.parent.graphToPlotCoords(v1d, v2d)
 
-            # do fill1 (if any)
-            if not s.Fill1.hide:
-                self.parent.drawFillPts(painter, s.Fill1, cliprect, px, py)
-            # do fill2
-            if not s.Fill2.hide:
-                self.parent.drawFillPts(painter, s.Fill2, cliprect, px, py)
+                # do fill1 (if any)
+                if not s.Fill1.hide:
+                    self.parent.drawFillPts(painter, s.Fill1, cliprect, px, py)
+                # do fill2
+                if not s.Fill2.hide:
+                    self.parent.drawFillPts(painter, s.Fill2, cliprect, px, py)
 
-            # plot line
-            if not s.PlotLine.hide:
-                painter.setBrush( qt4.QBrush() )
-                painter.setPen(s.PlotLine.makeQPen(painter))
-                pts = qt4.QPolygonF()
-                utils.addNumpyToPolygonF(pts, px, py)
-                utils.plotClippedPolyline(painter, cliprect, pts)
+                # plot line
+                if not s.PlotLine.hide:
+                    painter.setBrush( qt4.QBrush() )
+                    painter.setPen(s.PlotLine.makeQPen(painter))
+                    pts = qt4.QPolygonF()
+                    utils.addNumpyToPolygonF(pts, px, py)
+                    utils.plotClippedPolyline(painter, cliprect, pts)
 
-            # markers
-            markersize = s.get('markerSize').convert(painter)
-            pscale = None
-            if scalings:
-                pscale = scalings.data
-            self.plotMarkers(painter, px, py, pscale, markersize, cliprect)
+                # markers
+                markersize = s.get('markerSize').convert(painter)
+                pscale = None
+                if scalings:
+                    pscale = scalings.data
+                self.plotMarkers(painter, px, py, pscale, markersize, cliprect)
 
-            # finally plot any labels
-            if textitems and not s.Label.hide:
-                self.drawLabels(painter, px, py, textitems, markersize)
+                # finally plot any labels
+                if textitems and not s.Label.hide:
+                    self.drawLabels(painter, px, py, textitems, markersize)
 
 # allow the factory to instantiate plotter
 document.thefactory.register( NonOrthPoint )

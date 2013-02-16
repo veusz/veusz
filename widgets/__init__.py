@@ -20,6 +20,7 @@
 
 from widget import Widget, Action
 from axis import Axis
+from axisbroken import AxisBroken
 from graph import Graph
 from grid import Grid
 from plotters import GenericPlotter, FreePlotter

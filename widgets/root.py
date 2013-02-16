@@ -103,8 +103,9 @@ class Root(widget.Widget):
         xw, yw = painthelper.pagesize
         posn = [0, 0, xw, yw]
         painter = painthelper.painter(self, posn)
-        page = self.children[pagenum]
-        page.draw( posn, painthelper )
+        with painter:
+            page = self.children[pagenum]
+            page.draw( posn, painthelper )
 
         # w and h are non integer
         w = self.settings.get('width').convert(painter)

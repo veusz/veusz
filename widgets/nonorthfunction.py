@@ -155,9 +155,7 @@ class NonOrthFunction(Widget):
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the function on a plotter.'''
 
-        posn = Widget.draw(self, parentposn, phelper,
-                           outerbounds=outerbounds)
-
+        posn = self.computeBounds(parentposn, phelper)
         s = self.settings
 
         # exit if hidden
@@ -171,27 +169,28 @@ class NonOrthFunction(Widget):
             self.logEvalError(e)
             return
 
-        x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
-        painter = phelper.painter(self, posn)
-        self.parent.setClip(painter, posn)
-
         apts, bpts = self.getFunctionPoints()
         px, py = self.parent.graphToPlotCoords(apts, bpts)
 
-        # plot line
-        painter.setBrush(qt4.QBrush())
-        painter.setPen( s.PlotLine.makeQPenWHide(painter) )
-        for x, y in utils.validLinePoints(px, py):
-            if not s.Fill1.hide:
-                self.parent.drawFillPts(painter, s.Fill1, cliprect, x, y)
-            if not s.Fill2.hide:
-                self.parent.drawFillPts(painter, s.Fill2, cliprect, x, y)
-            if not s.PlotLine.hide:
-                p = qt4.QPolygonF()
-                utils.addNumpyToPolygonF(p, x, y)
-                painter.setBrush(qt4.QBrush())
-                painter.setPen( s.PlotLine.makeQPen(painter) )
-                utils.plotClippedPolyline(painter, cliprect, p)
+        x1, y1, x2, y2 = posn
+        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        painter = phelper.painter(self, posn)
+        with painter:
+            self.parent.setClip(painter, posn)
+
+            # plot line
+            painter.setBrush(qt4.QBrush())
+            painter.setPen( s.PlotLine.makeQPenWHide(painter) )
+            for x, y in utils.validLinePoints(px, py):
+                if not s.Fill1.hide:
+                    self.parent.drawFillPts(painter, s.Fill1, cliprect, x, y)
+                if not s.Fill2.hide:
+                    self.parent.drawFillPts(painter, s.Fill2, cliprect, x, y)
+                if not s.PlotLine.hide:
+                    p = qt4.QPolygonF()
+                    utils.addNumpyToPolygonF(p, x, y)
+                    painter.setBrush(qt4.QBrush())
+                    painter.setPen( s.PlotLine.makeQPen(painter) )
+                    utils.plotClippedPolyline(painter, cliprect, p)
 
 document.thefactory.register( NonOrthFunction )

@@ -12,69 +12,23 @@
 <clipPath id="c1">
 <path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
 </clipPath>
+<clipPath id="c2">
+<path d="m150.5,24.5l283.4,0l0,17.5l-283.4,0l0,-17.5"/>
+</clipPath>
 </defs>
 <g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
 <g clip-path="url(#c0)">
 <g fill="#e5e9ff" stroke-width="1.2">
 <path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
 </g>
+</g>
+<g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
 <path d="M60.2,393.8l464.1,0M60.2,316.5l464.1,0M60.2,239.1l464.1,0M60.2,161.8l464.1,0M60.2,84.4l464.1,0"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M60.2,471.2l0,-464.1"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M60.2,471.2l3.7,0M60.2,432.5l3.7,0M60.2,393.8l3.7,0M60.2,355.2l3.7,0M60.2,316.5l3.7,0M60.2,277.8l3.7,0M60.2,239.1l3.7,0M60.2,200.4l3.7,0M60.2,161.8l3.7,0M60.2,123.1l3.7,0M60.2,84.4l3.7,0M60.2,45.7l3.7,0M60.2,7l3.7,0"/>
-<path d="M60.2,471.2l7.5,0M60.2,393.8l7.5,0M60.2,316.5l7.5,0M60.2,239.1l7.5,0M60.2,161.8l7.5,0M60.2,84.4l7.5,0M60.2,7l7.5,0"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M524.4,471.2l0,-464.1"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M524.4,471.2l-3.7,0M524.4,432.5l-3.7,0M524.4,393.8l-3.7,0M524.4,355.2l-3.7,0M524.4,316.5l-3.7,0M524.4,277.8l-3.7,0M524.4,239.1l-3.7,0M524.4,200.4l-3.7,0M524.4,161.8l-3.7,0M524.4,123.1l-3.7,0M524.4,84.4l-3.7,0M524.4,45.7l-3.7,0M524.4,7l-3.7,0"/>
-<path d="M524.4,471.2l-7.5,0M524.4,393.8l-7.5,0M524.4,316.5l-7.5,0M524.4,239.1l-7.5,0M524.4,161.8l-7.5,0M524.4,84.4l-7.5,0M524.4,7l-7.5,0"/>
-</g>
-<g fill="none" stroke-width="1">
-<g transform="matrix(0 -1 1 0 1.7 282.9)">
-<text x="0" y="0" font-size="14pt" fill="#000000">Offset (m)</text>
-</g>
-<text x="-13.2" y="480" font-size="14pt" fill="#000000">&#8722;3</text>
-<text x="-13.2" y="402.6" font-size="14pt" fill="#000000">&#8722;2</text>
-<text x="-13.2" y="325.2" font-size="14pt" fill="#000000">&#8722;1</text>
-<text x="47.9" y="247.9" font-size="14pt" fill="#000000">0</text>
-<text x="47.9" y="170.5" font-size="14pt" fill="#000000">1</text>
-<text x="47.9" y="93.1" font-size="14pt" fill="#000000">2</text>
-<text x="47.9" y="21" font-size="14pt" fill="#000000">3</text>
 </g>
 <g fill="none" stroke="#808080" stroke-dasharray="0.6,1.2" stroke-width="0.6">
 <path d="M153,7l0,464.1M245.9,7l0,464.1M338.7,7l0,464.1M431.5,7l0,464.1"/>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M60.2,471.2l464.1,0"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M60.2,471.2l0,-3.7M83.4,471.2l0,-3.7M106.6,471.2l0,-3.7M129.8,471.2l0,-3.7M153,471.2l0,-3.7M176.2,471.2l0,-3.7M199.4,471.2l0,-3.7M222.6,471.2l0,-3.7M245.9,471.2l0,-3.7M269.1,471.2l0,-3.7M292.3,471.2l0,-3.7M315.5,471.2l0,-3.7M338.7,471.2l0,-3.7M361.9,471.2l0,-3.7M385.1,471.2l0,-3.7M408.3,471.2l0,-3.7M431.5,471.2l0,-3.7M454.7,471.2l0,-3.7M477.9,471.2l0,-3.7M501.2,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
-<path d="M60.2,471.2l0,-7.5M153,471.2l0,-7.5M245.9,471.2l0,-7.5M338.7,471.2l0,-7.5M431.5,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M60.2,7l464.1,0"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M60.2,7l0,3.7M83.4,7l0,3.7M106.6,7l0,3.7M129.8,7l0,3.7M153,7l0,3.7M176.2,7l0,3.7M199.4,7l0,3.7M222.6,7l0,3.7M245.9,7l0,3.7M269.1,7l0,3.7M292.3,7l0,3.7M315.5,7l0,3.7M338.7,7l0,3.7M361.9,7l0,3.7M385.1,7l0,3.7M408.3,7l0,3.7M431.5,7l0,3.7M454.7,7l0,3.7M477.9,7l0,3.7M501.2,7l0,3.7M524.4,7l0,3.7"/>
-<path d="M60.2,7l0,7.5M153,7l0,7.5M245.9,7l0,7.5M338.7,7l0,7.5M431.5,7l0,7.5M524.4,7l0,7.5"/>
-</g>
-<g fill="none" stroke-width="1">
-<text x="252.9" y="485.2" font-size="14pt" fill="#000000">Time (yr)</text>
-<text x="55.8" y="476.5" font-size="14pt" fill="#000000">0</text>
-<text x="139.9" y="476.5" font-size="14pt" fill="#000000">0.2</text>
-<text x="232.7" y="476.5" font-size="14pt" fill="#000000">0.4</text>
-<text x="325.6" y="476.5" font-size="14pt" fill="#000000">0.6</text>
-<text x="418.4" y="476.5" font-size="14pt" fill="#000000">0.8</text>
-<text x="520" y="476.5" font-size="14pt" fill="#000000">1</text>
-</g>
-</g>
-<g clip-path="url(#c1)">
 <g fill="#ff000a" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="matrix(0.674 0 0 0.674 211.5 106)">
 <path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2" id="p0"/>
@@ -565,9 +519,62 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M60.2,471.2l0,-464.1"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l3.7,0M60.2,432.5l3.7,0M60.2,393.8l3.7,0M60.2,355.2l3.7,0M60.2,316.5l3.7,0M60.2,277.8l3.7,0M60.2,239.1l3.7,0M60.2,200.4l3.7,0M60.2,161.8l3.7,0M60.2,123.1l3.7,0M60.2,84.4l3.7,0M60.2,45.7l3.7,0M60.2,7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,393.8l7.5,0M60.2,316.5l7.5,0M60.2,239.1l7.5,0M60.2,161.8l7.5,0M60.2,84.4l7.5,0M60.2,7l7.5,0"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M524.4,471.2l0,-464.1"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M524.4,471.2l-3.7,0M524.4,432.5l-3.7,0M524.4,393.8l-3.7,0M524.4,355.2l-3.7,0M524.4,316.5l-3.7,0M524.4,277.8l-3.7,0M524.4,239.1l-3.7,0M524.4,200.4l-3.7,0M524.4,161.8l-3.7,0M524.4,123.1l-3.7,0M524.4,84.4l-3.7,0M524.4,45.7l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,393.8l-7.5,0M524.4,316.5l-7.5,0M524.4,239.1l-7.5,0M524.4,161.8l-7.5,0M524.4,84.4l-7.5,0M524.4,7l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<g transform="matrix(0 -1 1 0 1.7 282.9)">
+<text x="0" y="0" font-size="14pt" fill="#000000">Offset (m)</text>
+</g>
+<text x="-13.2" y="480" font-size="14pt" fill="#000000">&#8722;3</text>
+<text x="-13.2" y="402.6" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="-13.2" y="325.2" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="47.9" y="247.9" font-size="14pt" fill="#000000">0</text>
+<text x="47.9" y="170.5" font-size="14pt" fill="#000000">1</text>
+<text x="47.9" y="93.1" font-size="14pt" fill="#000000">2</text>
+<text x="47.9" y="21" font-size="14pt" fill="#000000">3</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M60.2,471.2l464.1,0"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-3.7M83.4,471.2l0,-3.7M106.6,471.2l0,-3.7M129.8,471.2l0,-3.7M153,471.2l0,-3.7M176.2,471.2l0,-3.7M199.4,471.2l0,-3.7M222.6,471.2l0,-3.7M245.9,471.2l0,-3.7M269.1,471.2l0,-3.7M292.3,471.2l0,-3.7M315.5,471.2l0,-3.7M338.7,471.2l0,-3.7M361.9,471.2l0,-3.7M385.1,471.2l0,-3.7M408.3,471.2l0,-3.7M431.5,471.2l0,-3.7M454.7,471.2l0,-3.7M477.9,471.2l0,-3.7M501.2,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
+<path d="M60.2,471.2l0,-7.5M153,471.2l0,-7.5M245.9,471.2l0,-7.5M338.7,471.2l0,-7.5M431.5,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M60.2,7l464.1,0"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,7l0,3.7M83.4,7l0,3.7M106.6,7l0,3.7M129.8,7l0,3.7M153,7l0,3.7M176.2,7l0,3.7M199.4,7l0,3.7M222.6,7l0,3.7M245.9,7l0,3.7M269.1,7l0,3.7M292.3,7l0,3.7M315.5,7l0,3.7M338.7,7l0,3.7M361.9,7l0,3.7M385.1,7l0,3.7M408.3,7l0,3.7M431.5,7l0,3.7M454.7,7l0,3.7M477.9,7l0,3.7M501.2,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M60.2,7l0,7.5M153,7l0,7.5M245.9,7l0,7.5M338.7,7l0,7.5M431.5,7l0,7.5M524.4,7l0,7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="252.9" y="485.2" font-size="14pt" fill="#000000">Time (yr)</text>
+<text x="55.8" y="476.5" font-size="14pt" fill="#000000">0</text>
+<text x="139.9" y="476.5" font-size="14pt" fill="#000000">0.2</text>
+<text x="232.7" y="476.5" font-size="14pt" fill="#000000">0.4</text>
+<text x="325.6" y="476.5" font-size="14pt" fill="#000000">0.6</text>
+<text x="418.4" y="476.5" font-size="14pt" fill="#000000">0.8</text>
+<text x="520" y="476.5" font-size="14pt" fill="#000000">1</text>
+</g>
+</g>
+<g clip-path="url(#c2)">
 <g fill="none" stroke-width="1">
 <image x="150.5" y="24.5" width="283.4" height="17.5" xlink:href="data:image/ppm;base64,UDYKMTI4IDEKMjU1CgAAAAAKAAAUAAAeAAAoAAAyAAA8AABGAABQAABaAABkAABuAAB4AACCAACMAACWAACgAACqAAC0AAC+AADIAADSAADcAADmAADwAAD6AAb4BhDuEBrkGiTaJC7QLjjGOEK8QkyyTFaoVmCeYGqUanSKdH6Afoh2iJJskpxinKZYprBOsLpEusQ6xM4wztgm2OIc4uwS7PYI9v8A/P8A8v8A6P8A3v8A1P8Ayv8AwP8Atv8ArP8Aov8AmP8Ajv8AhP8Aev8AcP8AZv8AXP8AUv8ASP8APv8ANP8AKv8AIP8AFv8ADP8AAv8IAP8SAP8cAP8mAP8wAP86AP9EAP9OAP9YAP9iAP9sAP92AP+AAP+KAP+UAP+eAP+oAP+yAP+8AP/GAP/QAP/aAP/kAP/uAP/4AP//BP//Dv//GP//Iv//LP//Nv//QP//Sv//VP//Xv//aP//cv//fP//hv//kP//mv//pP//rv//uP//wv//zP//1v//4P//6v//9P///w==" preserveAspectRatio="none"/>
 </g>
+</g>
+<g clip-path="url(#c0)">
 <g fill="none" stroke-width="0.6">
 <path d="m150.5,24.5l283.4,0l0,17.5l-283.4,0l0,-17.5"/>
 </g>

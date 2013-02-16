@@ -115,10 +115,6 @@ class GenericPlotter(widget.Widget):
     def clipAxesBounds(self, axes, bounds):
         """Returns clipping rectange for start and stop values of axis."""
 
-        # update cached coordinates of axes
-        axes[0].plotterToDataCoords(bounds, N.array([]))
-        axes[1].plotterToDataCoords(bounds, N.array([]))
-
         # get range
         x1, x2 = axes[0].coordParr1, axes[0].coordParr2
         if x1 > x2:
@@ -138,6 +134,45 @@ class GenericPlotter(widget.Widget):
         return (labels, coordinates)
         """
         return (None, None)
+
+    def fetchAxes(self):
+        """Returns the axes for this widget"""
+
+        axes = self.parent.getAxes( (self.settings.xAxis,
+                                     self.settings.yAxis) )
+
+        # fail if we don't have good axes
+        if ( None in axes or
+             axes[0].settings.direction != 'horizontal' or
+             axes[1].settings.direction != 'vertical' ):
+            return None
+
+        return axes
+
+    def draw(self, parentposn, painthelper, outerbounds = None):
+        """Draw for generic plotters."""
+
+        posn = self.computeBounds(parentposn, painthelper)
+
+        # exit if hidden or function blank
+        if self.settings.hide:
+            return
+
+        # get axes widgets
+        axes = self.fetchAxes()
+        if not axes:
+            return
+
+        # clip data within bounds of plotter
+        cliprect = self.clipAxesBounds(axes, posn)
+        painter = painthelper.painter(self, posn, clip=cliprect)
+        with painter:
+            self.dataDraw(painter, axes, posn, cliprect)
+        return posn
+
+    def dataDraw(self, painter, axes, posn, cliprect):
+        """Actually plot the data."""
+        pass
 
 class FreePlotter(widget.Widget):
     """A plotter which can be plotted on the page or in a graph."""

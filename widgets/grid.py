@@ -229,7 +229,8 @@ class Grid(widget.Widget):
         ge = _gridengine(self.settings.columns, self.settings.rows)
 
         # copy children, and remove any which are axes
-        children = [c for c in self.children if c.typename != 'axis']
+        children = [ c for c in self.children if
+                     not hasattr(c, 'isaxis') ]
         child_dimensions = {}
         child_posns = {}
         for c in children:
@@ -298,13 +299,12 @@ class Grid(widget.Widget):
     def _drawChild(self, phelper, child, bounds, parentposn):
         """Draw child at correct position, with correct bounds."""
 
-        # save old position, then update with calculated
-        oldposn = child.position
+        # outer bounds of child and child fractional position
         coutbound = parentposn
+        cpos = (0., 0., 1., 1.)
 
         if child in self.childpositions:
             cpos = self.childpositions[child]
-            child.position = cpos
 
             # outer bounds for child
             dx, dy = bounds[2]-bounds[0], bounds[3]-bounds[1]
@@ -322,11 +322,21 @@ class Grid(widget.Widget):
             if abs(cpos[3]-1) < 1e-3:
                 coutbound[3] = parentposn[3]
 
-        # draw widget
-        child.draw(bounds, phelper, outerbounds=coutbound)
+        # convert fractional positions into bounds
+        dx, dy = bounds[2]-bounds[0], bounds[3]-bounds[1]
+        newbounds = [ bounds[0] + dx*cpos[0], bounds[1] + dy*cpos[1],
+                      bounds[0] + dx*cpos[2], bounds[1] + dy*cpos[3] ]
 
-        # restore position
-        child.position = oldposn
+        # draw widget
+        child.draw(newbounds, phelper, outerbounds=coutbound)
+
+    def getMargins(self, painthelper):
+        """Use settings to compute margins."""
+        s = self.settings
+        return ( s.get('leftMargin').convert(painthelper),
+                 s.get('topMargin').convert(painthelper),
+                 s.get('rightMargin').convert(painthelper),
+                 s.get('bottomMargin').convert(painthelper) )
 
     def draw(self, parentposn, phelper, outerbounds=None):
         """Draws the widget's children."""
@@ -345,23 +355,19 @@ class Grid(widget.Widget):
             self.lastdimensions = dimensions
             self.lastscalings = scalings
 
-        margins = ( s.get('leftMargin').convert(phelper),
-                    s.get('topMargin').convert(phelper),
-                    s.get('rightMargin').convert(phelper),
-                    s.get('bottomMargin').convert(phelper) )
+        bounds = self.computeBounds(parentposn, phelper)
+        maxbounds = self.computeBounds(parentposn, phelper, withmargin=False)
 
-        bounds = self.computeBounds(parentposn, phelper, margins=margins)
-        maxbounds = self.computeBounds(parentposn, phelper)
+        painter = phelper.painter(self, bounds)
 
-        phelper.painter(self, bounds)
-        
         # controls for adjusting grid margins
         phelper.setControlGraph(self,[
                 controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
-        for child in self.children:
-            if child.typename != 'axis':
-                self._drawChild(phelper, child, bounds, parentposn)
+        with painter:
+            for child in self.children:
+                if not hasattr(child.typename, 'isaxis'):
+                    self._drawChild(phelper, child, bounds, parentposn)
 
         # do not call widget.Widget.draw, do not collect 200 pounds
         pass
