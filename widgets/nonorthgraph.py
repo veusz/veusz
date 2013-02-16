@@ -112,37 +112,41 @@ class NonOrthGraph(Widget):
         for c in self.children:
             c.updateDataRanges(drange)
         return drange
-            
+
+    def getMargins(self, painthelper):
+        """Use settings to compute margins."""
+        s = self.settings
+        return ( s.get('leftMargin').convert(painthelper),
+                 s.get('topMargin').convert(painthelper),
+                 s.get('rightMargin').convert(painthelper),
+                 s.get('bottomMargin').convert(painthelper) )
+
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Update the margins before drawing.'''
 
         s = self.settings
 
-        margins = ( s.get('leftMargin').convert(phelper),
-                    s.get('topMargin').convert(phelper),
-                    s.get('rightMargin').convert(phelper),
-                    s.get('bottomMargin').convert(phelper) )
-        bounds = self.computeBounds(parentposn, phelper, margins=margins)
-        maxbounds = self.computeBounds(parentposn, phelper)
-
-        painter = phelper.painter(self, bounds)
-
-        # controls for adjusting margins
-        phelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
+        bounds = self.computeBounds(parentposn, phelper)
+        maxbounds = self.computeBounds(parentposn, phelper, withmargin=False)
 
         # do no painting if hidden
         if s.hide:
             return bounds
 
-        # plot graph
-        datarange = self.getDataRange()
-        self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
-        self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
+        painter = phelper.painter(self, bounds)
+        with painter:
+            # plot graph
+            datarange = self.getDataRange()
+            self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)
+            self.drawAxes(painter, bounds, datarange, outerbounds=outerbounds)
 
-        # paint children
-        for c in reversed(self.children):
-            c.draw(bounds, phelper, outerbounds=outerbounds)
+            # paint children
+            for c in reversed(self.children):
+                c.draw(bounds, phelper, outerbounds=outerbounds)
+
+        # controls for adjusting margins
+        phelper.setControlGraph(self, [
+                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
         return bounds
 

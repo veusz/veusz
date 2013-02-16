@@ -277,22 +277,10 @@ class Image(plotters.GenericPlotter):
         else:
             return None
     
-    def draw(self, parentposn, phelper, outerbounds = None):
+    def dataDraw(self, painter, axes, posn, clip):
         """Draw the image."""
 
-        posn = plotters.GenericPlotter.draw(self, parentposn, phelper,
-                                            outerbounds = outerbounds)
-        x1, y1, x2, y2 = posn
         s = self.settings
-
-        # get axes widgets
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # return if there's no proper axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
-            return
 
         # get data and update internal computations
         data = self.recomputeInternals()
@@ -308,6 +296,7 @@ class Image(plotters.GenericPlotter):
 
         # truncate image down if necessary
         # This assumes linear pixels!
+        x1, y1, x2, y2 = posn
         if ( coordsx[0] < x1 or coordsx[1] > x2 or
              coordsy[0] < y1 or coordsy[1] > y2 ):
 
@@ -315,10 +304,6 @@ class Image(plotters.GenericPlotter):
                                                          posn)
         else:
             image = self.image
-
-        # clip data within bounds of plotter
-        clip = self.clipAxesBounds(axes, posn)
-        painter = phelper.painter(self, posn, clip=clip)
 
         # optionally smooth images before displaying
         if s.smooth:

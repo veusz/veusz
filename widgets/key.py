@@ -334,7 +334,13 @@ class Key(widget.Widget):
             return
 
         painter = phelper.painter(self, parentposn)
+        with painter:
+            self._doDrawing(painter, phelper, parentposn)
 
+    def _doDrawing(self, painter, phelper, parentposn):
+        """Do the actual drawing."""
+
+        s = self.settings
         font = s.get('Text').makeQFont(painter)
         painter.setFont(font)
         height = utils.FontMetrics(font, painter.device()).height()

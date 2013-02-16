@@ -28,9 +28,9 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import widget
-import axisticks
 import graph
 import grid
+import axisticks
 import controlgraph
 
 ###############################################################################
@@ -92,6 +92,9 @@ class GridLine(setting.Line):
         self.get('color').newDefault( 'grey' )
         self.get('hide').newDefault( True )
         self.get('style').newDefault( 'dotted' )
+        self.add( setting.Bool( 'onTop', False,
+                                descr = _('Put grid lines on top of graph'),
+                                usertext = _('On top') ) )
 
 class MinorGridLine(setting.Line):
     '''Minor tick grid line settings.'''
@@ -171,7 +174,7 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = [graph.Graph, grid.Grid]
+    allowedparenttypes = (graph.Graph, grid.Grid)
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
     isaxis = True
@@ -339,8 +342,11 @@ class Axis(widget.Widget):
             else:
                 self.autorange = [0., 1.]
 
-    def _computePlottedRange(self):
+    def computePlottedRange(self, force=False):
         """Convert the range requested into a plotted range."""
+
+        if self.docchangeset == self.document.changeset and not force:
+            return
 
         s = self.settings
         self.plottedrange = [s.min, s.max]
@@ -360,7 +366,7 @@ class Axis(widget.Widget):
                 widget.settings.match == ''):
                 # update if out of date
                 if widget.docchangeset != self.document.changeset:
-                    widget._computePlottedRange()
+                    widget.computePlottedRange()
                 # copy the range
                 self.plottedrange = list(widget.plottedrange)
                 matched = True
@@ -426,8 +432,11 @@ class Axis(widget.Widget):
 
         self.docchangeset = self.document.changeset
 
-    def computeTicks(self):
-        """Update ticks given plotted range."""
+    def computeTicks(self, allowauto=True):
+        """Update ticks given plotted range.
+        if allowauto is False, then do not allow ticks to be
+        updated
+        """
 
         s = self.settings
 
@@ -437,8 +446,8 @@ class Axis(widget.Widget):
             tickclass = axisticks.DateTicks
 
         nexttick = s.autoRange == 'next-tick'
-        extendmin = nexttick and s.min == 'Auto'
-        extendmax = nexttick and s.max == 'Auto'
+        extendmin = nexttick and s.min == 'Auto' and allowauto
+        extendmax = nexttick and s.max == 'Auto' and allowauto
 
         # create object to compute ticks
         axs = tickclass(self.plottedrange[0], self.plottedrange[1],
@@ -463,21 +472,30 @@ class Axis(widget.Widget):
 
     def getPlottedRange(self):
         """Return the range plotted by the axes."""
-
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
+        self.computePlottedRange()
         return (self.plottedrange[0], self.plottedrange[1])
 
-    def _updateAxisLocation(self, bounds, otherposition=None):
-        """Calculate coordinates on plotter of axis."""
+    def updateAxisLocation(self, bounds, otherposition=None,
+                           lowerupperposition=None):
+        """Recalculate coordinates on plotter of axis.
+
+        otherposition: overrid otherPosition setting
+        lowerupperposition: set to tuple (lower, upper) to override
+         lowerPosition and upperPosition settings
+        """
 
         s = self.settings
+
+        if lowerupperposition is None:
+            p1, p2 = s.lowerPosition, s.upperPosition
+        else:
+            p1, p2 = lowerupperposition
+        if otherposition is None:
+            otherposition = s.otherPosition
+
         x1, y1, x2, y2 = bounds
         dx = x2 - x1
         dy = y2 - y1
-        p1, p2 = s.lowerPosition, s.upperPosition
-        if otherposition is None:
-            otherposition = s.otherPosition
 
         if s.direction == 'horizontal': # horizontal
             self.coordParr1 = x1 + dx*p1
@@ -512,10 +530,7 @@ class Axis(widget.Widget):
         """
 
         # if the doc was modified, recompute the range
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
-        self._updateAxisLocation(bounds)
+        self.updateAxisLocation(bounds)
 
         return self._graphToPlotter(vals)
 
@@ -532,11 +547,7 @@ class Axis(widget.Widget):
 
     def dataToPlotterCoords(self, posn, data):
         """Convert data values to plotter coordinates, scaling if necessary."""
-        # if the doc was modified, recompute the range
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
-        self._updateAxisLocation(posn)
+        self.updateAxisLocation(posn)
         return self._graphToPlotter(data*self.settings.datascale)
 
     def plotterToGraphCoords(self, bounds, vals):
@@ -547,11 +558,7 @@ class Axis(widget.Widget):
         returns a numpy of floats
         """
 
-        # if the doc was modified, recompute the range
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
-
-        self._updateAxisLocation( bounds )
+        self.updateAxisLocation( bounds )
 
         # work out fractional positions of the plotter coords
         frac = ( (vals.astype(N.float64) - self.coordParr1) /
@@ -735,7 +742,7 @@ class Axis(widget.Widget):
                         yield pcoord, lab
 
     def _drawTickLabels(self, phelper, painter, coordticks, sign, outerbounds,
-                        texttorender):
+                        tickvals, texttorender):
         """Draw tick labels on the plot.
 
         texttorender is a list which contains text for the axis to render
@@ -779,7 +786,7 @@ class Axis(widget.Widget):
                 format = self.autoformat
 
             # generate positions and labels
-            for posn, tickval in izip(coordticks, self.majortickscalc):
+            for posn, tickval in izip(coordticks, tickvals):
                 text = utils.formatNumber(tickval*scale, format,
                                           locale=self.document.locale)
                 yield posn, text
@@ -919,11 +926,11 @@ class Axis(widget.Widget):
 
         texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
-    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
-        """Mirror axis to opposite side of graph if there isn't
-        an axis there already."""
+    def _shouldAutoMirror(self):
+        """Work out whether to do mirroring."""
 
-        # This is a nasty hack: must think of a better way to do this
+        # FIXME: This is a nasty hack: must think of a better way to do this
+
         s = self.settings
         countaxis = 0
         for c in self.parent.children:
@@ -935,19 +942,21 @@ class Axis(widget.Widget):
             except AttributeError:
                 # if it's not an axis we get here
                 pass
+        return countaxis <= 1
 
-        # another axis in the same direction, so we don't mirror it
-        if countaxis > 1:
-            return
+    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
+        """Mirror axis to opposite side of graph if there isn't
+        an axis there already."""
 
         # swap axis to other side
+        s = self.settings
         if s.otherPosition < 0.5:
             otheredge = 1.
         else:
             otheredge = 0.
 
         # temporarily change position of axis to other side for drawing
-        self._updateAxisLocation(posn, otherposition=otheredge)
+        self.updateAxisLocation(posn, otherposition=otheredge)
         if not s.Line.hide:
             self._drawAxisLine(painter)
         if not s.MinorTicks.hide:
@@ -992,29 +1001,79 @@ class Axis(widget.Widget):
                 return True
         return False
 
-    def draw(self, parentposn, phelper, outerbounds=None,
-             useexistingpainter=None):
-        """Plot the axis on the painter.
+    def drawGrid(self, parentposn, phelper, outerbounds=None,
+                 ontop=False):
+        """Code to draw gridlines.
 
-        useexistingpainter is a hack so that a colorbar can reuse the
-        drawing code here. If set to a painter, it will use this rather
-        than opening a new one.
+        This is separate from the main draw routine because the grid
+        should be behind/infront the data points.
         """
 
         s = self.settings
+        if ( s.hide or (s.MinorGridLines.hide and s.GridLines.hide) or
+             s.GridLines.onTop != bool(ontop) ):
+            return
 
-        # recompute if document modified
-        if self.docchangeset != self.document.changeset:
-            self._computePlottedRange()
+        # draw grid on a different layer, depending on whether on top or not
+        layer = (-2, -1)[bool(ontop)]
+        painter = phelper.painter(self, parentposn, layer=layer)
+        self.updateAxisLocation(parentposn)
 
-        posn = widget.Widget.draw(self, parentposn, phelper, outerbounds)
-        self._updateAxisLocation(posn)
+        with painter:
+            painter.save()
+            painter.setClipRect( qt4.QRectF(
+                    qt4.QPointF(parentposn[0], parentposn[1]),
+                    qt4.QPointF(parentposn[2], parentposn[3]) ) )
 
-        # get ready to draw
-        if useexistingpainter is not None:
-            painter = useexistingpainter
-        else:
-            painter = phelper.painter(self, posn)
+            if not s.MinorGridLines.hide:
+                coordminorticks = self._graphToPlotter(self.minortickscalc)
+                self._drawGridLines('MinorGridLines', painter, coordminorticks,
+                                    parentposn)
+            if not s.GridLines.hide:
+                coordticks = self._graphToPlotter(self.majortickscalc)
+                self._drawGridLines('GridLines', painter, coordticks,
+                                    parentposn)
+
+            painter.restore()
+
+    def draw(self, parentposn, phelper, outerbounds=None):
+        """Plot the axis on the painter.
+        """
+
+        posn = self.computeBounds(parentposn, phelper)
+        self.updateAxisLocation(posn)
+
+        # exit if axis is hidden
+        if self.settings.hide:
+            return
+
+        self.computePlottedRange()
+        painter = phelper.painter(self, posn)
+        with painter:
+            self._axisDraw(posn, parentposn, outerbounds, painter, phelper)
+
+
+    def _drawTextWithoutOverlap(self, painter, texttorender):
+        """Aall the text is drawn at the end so that we can check it
+        doesn't overlap.
+
+        texttorender is a list of (Renderer, QPen) tuples.
+        """
+        drawntext = qt4.QPainterPath()
+        for r, pen in texttorender:
+            bounds = r.getBounds()
+            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
+                              bounds[3]-bounds[1])
+
+            if not drawntext.intersects(rect):
+                painter.setPen(pen)
+                r.render()
+                drawntext.addRect(rect)
+
+    def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
+        """Internal drawing routine."""
+
+        s = self.settings
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
@@ -1025,10 +1084,6 @@ class Axis(widget.Widget):
         coordticks = self._graphToPlotter(self.majortickscalc)
         coordminorticks = self._graphToPlotter(self.minortickscalc)
 
-        # exit if axis is hidden
-        if s.hide:
-            return
-
         texttorender = []
 
         # multiplication factor if reflection on the axis is requested
@@ -1037,14 +1092,6 @@ class Axis(widget.Widget):
             sign *= -1
         if self.coordReflected:
             sign *= -1
-
-        # plot gridlines
-        if not s.MinorGridLines.hide:
-            self._drawGridLines('MinorGridLines', painter, coordminorticks,
-                                parentposn)
-        if not s.GridLines.hide:
-            self._drawGridLines('GridLines', painter, coordticks,
-                                parentposn)
 
         # plot the line along the axis
         if not s.Line.hide:
@@ -1065,28 +1112,17 @@ class Axis(widget.Widget):
         suppresstext = self._suppressText(painter, parentposn, outerbounds)
         if not s.TickLabels.hide and not suppresstext:
             self._drawTickLabels(phelper, painter, coordticks, sign,
-                                 outerbounds, texttorender)
+                                 outerbounds, self.majortickscalc, texttorender)
 
         # draw an axis label
         if not s.Label.hide and not suppresstext:
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
 
         # mirror axis at other side of plot
-        if s.autoMirror:
+        if s.autoMirror and self._shouldAutoMirror():
             self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
-        # all the text is drawn at the end so that
-        # we can check it doesn't overlap
-        drawntext = qt4.QPainterPath()
-        for r, pen in texttorender:
-            bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1])
-
-            if not drawntext.intersects(rect):
-                painter.setPen(pen)
-                r.render()
-                drawntext.addRect(rect)
+        self._drawTextWithoutOverlap(painter, texttorender)
 
     def updateControlItem(self, cgi):
         """Update axis position from control item."""

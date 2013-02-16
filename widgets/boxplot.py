@@ -386,16 +386,10 @@ class BoxPlot(GenericPlotter):
             x, y = boxposn, meanplt
         utils.plotMarker( painter, x, y, s.meanmarker, markersize )
 
-    def draw(self, parentposn, phelper, outerbounds=None):
+    def dataDraw(self, painter, axes, widgetposn, clip):
         """Plot the data on a plotter."""
 
-        widgetposn = GenericPlotter.draw(self, parentposn, phelper,
-                                         outerbounds=outerbounds)
         s = self.settings
-
-        # exit if hidden
-        if s.hide:
-            return
 
         # get data
         doc = self.document
@@ -421,9 +415,6 @@ class BoxPlot(GenericPlotter):
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return
-
-        clip = self.clipAxesBounds(axes, widgetposn)
-        painter = phelper.painter(self, widgetposn, clip=clip)
 
         # get boxes visible along direction of boxes to work out width
         horz = (s.direction == 'horizontal')

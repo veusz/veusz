@@ -508,31 +508,15 @@ class BarPlotter(GenericPlotter):
                       ([x], [y+height*0.1],
                        [x+width], [y+height*0.8]))
 
-    def draw(self, parentposn, phelper, outerbounds=None):
+    def dataDraw(self, painter, axes, widgetposn, clip):
         """Plot the data on a plotter."""
-
-        widgetposn = GenericPlotter.draw(self, parentposn, phelper,
-                                         outerbounds=outerbounds)
         s = self.settings
-
-        # exit if hidden
-        if s.hide:
-            return
 
         # get data
         doc = self.document
         positions = s.get('posn').getData(doc)
         lengths = s.get('lengths').getData(doc)
         if not lengths:
-            return
-
-        # get axes widgets
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # return if there are no proper axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
             return
 
         # where the bars are to be placed horizontally
@@ -556,10 +540,6 @@ class BarPlotter(GenericPlotter):
                     vals[key] = extend1DArray(N.nan_to_num(v),
                                               origposnlen)[validposn]
             dsvals.append(vals)
-
-        # clip data within bounds of plotter
-        clip = self.clipAxesBounds(axes, widgetposn)
-        painter = phelper.painter(self, widgetposn, clip=clip)
 
         # actually do the drawing
         fn = {'stacked': self.barDrawStacked,

@@ -87,9 +87,6 @@ class Widget(object):
         # store child widgets
         self.children = []
         
-        # position of this widget on its parent
-        self.position = (0., 0., 1., 1.)
-
         # settings for widget
         self.settings = setting.Settings( 'Widget_' + self.typename,
                                           setnsmode='widgetsettings' )
@@ -153,14 +150,9 @@ class Widget(object):
 
     def isAllowedParent(self, parent):
         """Is the parent a suitable type?"""
-        ap = self.allowedparenttypes 
-        if parent is None:# and len(ap)>0 and ap[0] is None:
-            return True
-        
-        for p in ap:
-            if isinstance(parent, p):
-                return True
-        return False      
+
+        return parent is None or any(
+            ( isinstance(parent, t) for t in self.allowedparenttypes ) )
 
     def willAllowParent(cls, parent):
         """Is the parent of an allowed type to have this type as a child?"""
@@ -282,19 +274,19 @@ class Widget(object):
         return build
     path = property(_getPath)
 
-    def computeBounds(self, parentposn, painthelper,
-                      margins = (0., 0., 0., 0.)):
+    def getMargins(self, painthelper):
+        """Return margins of widget."""
+        return (0., 0., 0., 0.)
+
+    def computeBounds(self, parentposn, painthelper, withmargin=True):
         """Compute a bounds array, giving the bounding box for the widget."""
 
-        # get parent's position
-        x1, y1, x2, y2 = parentposn
-        dx, dy = x2-x1, y2-y1
-
-        # get our position
-        px1, py1, px2, py2 = self.position
-        x1, y1, x2, y2 = ( x1+dx*px1, y1+dy*py1, x1+dx*px2, y1+dy*py2 )
-        dx1, dy1, dx2, dy2 = margins
-        return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
+        if withmargin:
+            x1, y1, x2, y2 = parentposn
+            dx1, dy1, dx2, dy2 = self.getMargins(painthelper)
+            return [ x1+dx1, y1+dy1, x2-dx2, y2-dy2 ]
+        else:
+            return parentposn
 
     def draw(self, parentposn, painthelper, outerbounds = None):
         """Draw the widget and its children in posn (a tuple with x1,y1,x2,y2).

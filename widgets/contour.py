@@ -410,37 +410,18 @@ class Contour(plotters.GenericPlotter):
 
         return True
 
-    def draw(self, parentposn, phelper, outerbounds = None):
+    def dataDraw(self, painter, axes, posn, cliprect):
         """Draw the contours."""
 
-        posn = plotters.GenericPlotter.draw(self, parentposn, phelper,
-                                            outerbounds = outerbounds)
         s = self.settings
-
-        # do not paint if hidden
-        if s.hide:
-            return
-        
-        # get axes widgets
-        axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
-        # return if there's no proper axes
-        if ( None in axes or
-             axes[0].settings.direction != 'horizontal' or
-             axes[1].settings.direction != 'vertical' ):
-            return
 
         # update contours if necessary
         if not self.checkContoursUpToDate():
             return
 
-        # plot the precalculated contours
-        clip = self.clipAxesBounds(axes, posn)
-        painter = phelper.painter(self, posn, clip=clip)
-
-        self.plotContourFills(painter, posn, axes, clip)
-        self.plotContours(painter, posn, axes, clip)
-        self.plotSubContours(painter, posn, axes, clip)
+        self.plotContourFills(painter, posn, axes, cliprect)
+        self.plotContours(painter, posn, axes, cliprect)
+        self.plotSubContours(painter, posn, axes, cliprect)
 
     def updateContours(self):
         """Update calculated contours."""

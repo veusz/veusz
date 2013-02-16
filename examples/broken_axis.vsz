@@ -1,0 +1,59 @@
+# Veusz saved document (version 1.16)
+# Saved at 2013-02-16T17:16:25.362109
+
+ImportString(u'vals(numeric)','''
+3.000000e+00
+1.000000e+00
+5.000000e+00
+8.000000e+00
+1.000000e+00
+3.000000e+00
+1.010000e+02
+1.030000e+02
+1.100000e+02
+9.500000e+01
+8.000000e+01
+5.000000e+00
+2.000000e+00
+4.000000e+00
+1.000000e+00
+''')
+SetDataRange(u'x', 15, (0.0, 14.0), linked=True)
+Set('width', u'14cm')
+Set('height', u'10cm')
+Set('StyleSheet/Font/font', u'Arial')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Set('Border/hide', True)
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', u'Axis without breaks')
+Set('autoRange', u'exact')
+Set('Label/size', u'16pt')
+Set('Label/position', u'at-minimum')
+Set('MajorTicks/number', 7)
+To('..')
+Add('axis-broken', name=u'y', autoadd=False)
+To(u'y')
+Set('label', u'An axis with a break in it')
+Set('breakPoints', [25.0, 75.0])
+Set('direction', u'vertical')
+Set('Label/size', u'16pt')
+Set('Label/position', u'at-minimum')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('xData', u'x')
+Set('yData', u'vals')
+Set('marker', u'squashbox')
+Set('markerSize', u'5pt')
+Set('PlotLine/width', u'1pt')
+Set('MarkerFill/color', u'red')
+Set('FillBelow/color', u'red')
+Set('FillBelow/style', u'diagonal cross')
+Set('FillBelow/hide', False)
+To('..')
+To('..')
+To('..')

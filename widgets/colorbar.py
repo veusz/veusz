@@ -109,18 +109,13 @@ class ColorBar(axis.Axis):
         # override axis naming of x and y
         return widget.Widget.chooseName(self)
 
-    def draw(self, parentposn, phelper, outerbounds = None):
-        '''Update the margins before drawing.'''
+    def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
+        """Do actual drawing."""
 
         s = self.settings
 
-        # exit if hidden
-        if s.hide:
-            return
-
         # get height of label font
         bounds = self.computeBounds(parentposn, phelper)
-        painter = phelper.painter(self, parentposn)
 
         font = s.get('Label').makeQFont(phelper)
         painter.setFont(font)
@@ -167,10 +162,10 @@ class ColorBar(axis.Axis):
         v = s.vertPosn
         if v == 'top':
             bounds[1] += fontheight
-            bounds[3] = bounds[1] + totalheight 
+            bounds[3] = bounds[1] + totalheight
         elif v == 'bottom':
             bounds[3] -= fontheight
-            bounds[1] = bounds[3] - totalheight 
+            bounds[1] = bounds[3] - totalheight
         elif v == 'centre':
             delta = (bounds[3]-bounds[1]-totalheight)/2.
             bounds[1] += delta
@@ -179,13 +174,15 @@ class ColorBar(axis.Axis):
             bounds[1] += (bounds[3]-bounds[1])*s.vertManual
             bounds[3] = bounds[1] + totalheight
 
-        # this is ugly - update bounds in helper state
-        phelper.states[self].bounds = bounds
+        # FIXME: this is ugly - update bounds in helper state
+        phelper.states[(self,0)].bounds = bounds
 
         # do no painting if hidden or no image
         imgwidget = s.get('widgetName').findWidget()
         if s.hide:
             return bounds
+
+        self.updateAxisLocation(bounds)
 
         # update image if necessary with new settings
         if imgwidget is not None:
@@ -197,41 +194,44 @@ class ColorBar(axis.Axis):
             minval, maxval, axisscale = 0., 1., 'linear'
             img = None
 
+        s.get('log').setSilent(axisscale == 'log')
         self.setAutoRange([minval, maxval])
-
-        s.get('log').setSilent(axisscale == 'log')            
+        self.computePlottedRange(force=True)
 
         # now draw image on axis...
         minpix, maxpix = self.graphToPlotterCoords(
             bounds, N.array([minval, maxval]) )
 
-        if s.direction == 'horizontal':
-            c = [ minpix, bounds[1], maxpix, bounds[3] ]
-        else:
-            c = [ bounds[0], maxpix, bounds[2], minpix ]
-        r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
+        routside = qt4.QRectF(
+            bounds[0], bounds[1],
+            bounds[2]-bounds[0], bounds[3]-bounds[1] )
 
         # really draw the img
         if img is not None:
+            # coordinates to draw image and to clip rectangle
+            if s.direction == 'horizontal':
+                c = [ minpix, bounds[1], maxpix, bounds[3] ]
+                cl = [ self.coordParr1, bounds[1], self.coordParr2, bounds[3] ]
+            else:
+                c = [ bounds[0], maxpix, bounds[2], minpix ]
+                cl = [ bounds[0], self.coordParr1, bounds[2], self.coordParr2 ]
+            r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
+            rclip = qt4.QRectF(cl[0], cl[1], cl[2]-cl[0], cl[3]-cl[1])
+
+            painter.save()
+            painter.setClipRect(rclip & routside)
             painter.drawImage(r, img)
+            painter.restore()
 
         # if there's a border
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
             painter.setBrush( qt4.QBrush() )
-            painter.drawRect( qt4.QRectF(bounds[0], bounds[1],
-                                         bounds[2]-bounds[0],
-                                         bounds[3]-bounds[1]) )
+            painter.drawRect( routside )
 
         # actually draw axis
-        # we have to force position to full, as otherwise computeBounds
-        # will mess up range if called twice
-        savedposition = self.position
-        self.position = (0., 0., 1., 1.)
+        axis.Axis._axisDraw(self, bounds, parentposn, outerbounds, painter,
+                            phelper)
 
-        axis.Axis.draw(self, bounds, phelper, outerbounds=outerbounds,
-                       useexistingpainter=painter)
-        self.position = savedposition
-        
 # allow the factory to instantiate a colorbar
 document.thefactory.register( ColorBar )

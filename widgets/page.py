@@ -18,6 +18,8 @@
 
 """Widget that represents a page in the document."""
 
+import collections
+
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
@@ -51,9 +53,9 @@ class _AxisDependHelper(object):
 
     def __init__(self, root):
         self.root = root
-        self.nodes = {}
+        self.nodes = collections.defaultdict(list)
         self.axes = []
-        self.axis_plotter_map = {}
+        self.axis_plotter_map = collections.defaultdict(list)
 
     def recursivePlotterSearch(self, widget):
         """Find a list of plotters below widget.
@@ -71,8 +73,6 @@ class _AxisDependHelper(object):
             for axname in widget.getAxesNames():
                 axis = widget.lookupAxis(axname)
                 widgetaxes[axname] = axis
-                if axis not in self.axis_plotter_map:
-                    self.axis_plotter_map[axis] = []
                 self.axis_plotter_map[axis].append(widget)
 
             # if the widget is a plotter, find which axes the plotter can
@@ -80,8 +80,6 @@ class _AxisDependHelper(object):
             for axname, depname in widget.providesAxesDependency():
                 axis = widgetaxes[axname]
                 axdep = (axis, None)
-                if axdep not in nodes:
-                    nodes[axdep] = []
                 nodes[axdep].append( (widget, depname) )
 
             # find which axes the plotter needs information from
@@ -222,24 +220,26 @@ class Page(widget.Widget):
         axisdependhelper.findPlotters()
         axisdependhelper.findAxisRanges()
 
-        # store axis->plotter mappings in painter too (is this nasty?)
+        # store axis->plotter mappings in painthelper
         painthelper.axisplottermap.update(axisdependhelper.axis_plotter_map)
+        # reverse mapping
+        pamap = collections.defaultdict(list)
+        for axis, plotters in painthelper.axisplottermap.iteritems():
+            for plot in plotters:
+                pamap[plot].append(axis)
+        painthelper.plotteraxismap.update(pamap)
 
         if self.settings.hide:
             bounds = self.computeBounds(parentposn, painthelper)
             return bounds
 
-        clip = qt4.QRectF( qt4.QPointF(parentposn[0], parentposn[1]),
-                           qt4.QPointF(parentposn[2], parentposn[3]) )
-        painter = painthelper.painter(self, parentposn, clip=clip)
-
         # clip to page
-        bounds = widget.Widget.draw(self, parentposn, painthelper,
-                                    parentposn)
+        painter = painthelper.painter(self, parentposn)
+        with painter:
+            # w and h are non integer
+            w = self.settings.get('width').convert(painter)
+            h = self.settings.get('height').convert(painter)
 
-        # w and h are non integer
-        w = self.settings.get('width').convert(painter)
-        h = self.settings.get('height').convert(painter)
         painthelper.setControlGraph(self, [
                 controlgraph.ControlMarginBox(self, [0, 0, w, h],
                                               [-10000, -10000,
@@ -248,6 +248,8 @@ class Page(widget.Widget):
                                               ismovable = False)
                 ] )
 
+        bounds = widget.Widget.draw(self, parentposn, painthelper,
+                                    parentposn)
         return bounds
 
     def updateControlItem(self, cgi):

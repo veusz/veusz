@@ -109,32 +109,34 @@ class TextLabel(plotters.FreePlotter):
         if s.clip:
             clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
                                qt4.QPointF(posn[2], posn[3]) )
+
         painter = phelper.painter(self, posn, clip=clip)
-        textpen = s.get('Text').makeQPen()
-        painter.setPen(textpen)
-        font = s.get('Text').makeQFont(painter)
+        with painter:
+            textpen = s.get('Text').makeQPen()
+            painter.setPen(textpen)
+            font = s.get('Text').makeQFont(painter)
 
-        # we should only be able to move non-dataset labels
-        isnotdataset = ( not s.get('xPos').isDataset(d) and 
-                         not s.get('yPos').isDataset(d) )
+            # we should only be able to move non-dataset labels
+            isnotdataset = ( not s.get('xPos').isDataset(d) and
+                             not s.get('yPos').isDataset(d) )
 
-        controlgraphitems = []
-        for index, (x, y, t) in enumerate(itertools.izip(
-                xp, yp, itertools.cycle(text))):
-            # render the text
-            tbounds = utils.Renderer( painter, font, x, y, t,
-                                      TextLabel.cnvtalignhorz[s.alignHorz],
-                                      TextLabel.cnvtalignvert[s.alignVert],
-                                      s.angle ).render()
+            controlgraphitems = []
+            for index, (x, y, t) in enumerate(itertools.izip(
+                    xp, yp, itertools.cycle(text))):
+                # render the text
+                tbounds = utils.Renderer( painter, font, x, y, t,
+                                          TextLabel.cnvtalignhorz[s.alignHorz],
+                                          TextLabel.cnvtalignvert[s.alignVert],
+                                          s.angle ).render()
 
-            # add cgi for adjustable positions
-            if isnotdataset:
-                cgi = controlgraph.ControlMovableBox(self, tbounds, phelper,
-                                                     crosspos = (x, y))
-                cgi.labelpt = (x, y)
-                cgi.widgetposn = posn
-                cgi.index = index
-                controlgraphitems.append(cgi)
+                # add cgi for adjustable positions
+                if isnotdataset:
+                    cgi = controlgraph.ControlMovableBox(self, tbounds, phelper,
+                                                         crosspos = (x, y))
+                    cgi.labelpt = (x, y)
+                    cgi.widgetposn = posn
+                    cgi.index = index
+                    controlgraphitems.append(cgi)
 
         phelper.setControlGraph(self, controlgraphitems)
 

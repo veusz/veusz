@@ -29,19 +29,7 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M471.2,471.2l0,-464.1"/>
-<path d="M471.2,401.3l-3.7,0M471.2,360.5l-3.7,0M471.2,331.5l-3.7,0M471.2,309l-3.7,0M471.2,290.6l-3.7,0M471.2,275.1l-3.7,0M471.2,261.6l-3.7,0M471.2,249.7l-3.7,0M471.2,169.3l-3.7,0M471.2,128.4l-3.7,0M471.2,99.4l-3.7,0M471.2,76.9l-3.7,0M471.2,58.5l-3.7,0M471.2,43l-3.7,0M471.2,29.5l-3.7,0M471.2,17.7l-3.7,0"/>
-<path d="M471.2,471.2l-7.5,0M471.2,239.1l-7.5,0M471.2,7l-7.5,0"/>
-</g>
 <g fill="none" stroke-width="1">
-<g transform="matrix(0 1 -1 0 529.7 186.6)">
-<text x="0" y="0" font-size="14pt" fill="#000000">Another axis</text>
-</g>
-<text x="474.7" y="480" font-size="14pt" fill="#000000">10</text>
-<text x="492.2" y="473" font-size="8pt" fill="#000000">&#8722;2</text>
-<text x="474.7" y="21" font-size="14pt" fill="#000000">10</text>
-<text x="492.2" y="14" font-size="8pt" fill="#000000">0</text>
 <text x="88" y="42.7" font-size="100pt" fill="#000000">&#948;</text>
 </g>
 </g>
@@ -97,6 +85,20 @@
 <text x="321.1" y="476.5" font-size="14pt" fill="#000000">0.5</text>
 <text x="398.3" y="476.5" font-size="14pt" fill="#000000">1</text>
 <text x="458.1" y="476.5" font-size="14pt" fill="#000000">1.5</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M471.2,471.2l0,-464.1"/>
+<path d="M471.2,401.3l-3.7,0M471.2,360.5l-3.7,0M471.2,331.5l-3.7,0M471.2,309l-3.7,0M471.2,290.6l-3.7,0M471.2,275.1l-3.7,0M471.2,261.6l-3.7,0M471.2,249.7l-3.7,0M471.2,169.3l-3.7,0M471.2,128.4l-3.7,0M471.2,99.4l-3.7,0M471.2,76.9l-3.7,0M471.2,58.5l-3.7,0M471.2,43l-3.7,0M471.2,29.5l-3.7,0M471.2,17.7l-3.7,0"/>
+<path d="M471.2,471.2l-7.5,0M471.2,239.1l-7.5,0M471.2,7l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<g transform="matrix(0 1 -1 0 529.7 186.6)">
+<text x="0" y="0" font-size="14pt" fill="#000000">Another axis</text>
+</g>
+<text x="474.7" y="480" font-size="14pt" fill="#000000">10</text>
+<text x="492.2" y="473" font-size="8pt" fill="#000000">&#8722;2</text>
+<text x="474.7" y="21" font-size="14pt" fill="#000000">10</text>
+<text x="492.2" y="14" font-size="8pt" fill="#000000">0</text>
 </g>
 </g>
 </g>

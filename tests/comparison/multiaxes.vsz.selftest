@@ -98,21 +98,6 @@
 <text x="130.6" y="438" font-size="14pt" fill="#000000">Iron </text>
 <text x="174.4" y="438" font-size="14pt" fill="#000000">XMM</text>
 </g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M648.4,471.2l0,-464.1"/>
-<path d="M648.4,376.6l-3.7,0M648.4,321.3l-3.7,0M648.4,282l-3.7,0M648.4,251.6l-3.7,0M648.4,226.7l-3.7,0M648.4,205.6l-3.7,0M648.4,187.4l-3.7,0M648.4,171.3l-3.7,0M648.4,62.4l-3.7,0M648.4,7l-3.7,0"/>
-<path d="M648.4,471.2l-7.5,0M648.4,157l-7.5,0"/>
-</g>
-<g fill="none" stroke-width="1">
-<g transform="matrix(0 1 -1 0 706.9 142)">
-<text x="0" y="0" font-size="14pt" fill="#000000">Electron density (cm</text>
-<text x="175" y="-7" font-size="8pt" fill="#000000">-3</text>
-<text x="185.5" y="0" font-size="14pt" fill="#000000">)</text>
-</g>
-<text x="651.9" y="480" font-size="14pt" fill="#000000">10</text>
-<text x="669.4" y="473" font-size="8pt" fill="#000000">&#8722;3</text>
-<text x="651.9" y="165.7" font-size="14pt" fill="#000000">0.01</text>
-</g>
 </g>
 <g clip-path="url(#c4)">
 <g fill="none" stroke-width="0.6">
@@ -130,28 +115,6 @@
 <use xlink:href="#p0" x="591.1" y="426.7"/>
 <use xlink:href="#p0" x="630.4" y="465.5"/>
 </g>
-</g>
-<g clip-path="url(#c0)">
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M530.7,471.2l0,-464.1"/>
-<path d="M530.7,471.2l-3.7,0M530.7,442.2l-3.7,0M530.7,413.2l-3.7,0M530.7,384.2l-3.7,0M530.7,355.2l-3.7,0M530.7,326.2l-3.7,0M530.7,297.1l-3.7,0M530.7,268.1l-3.7,0M530.7,239.1l-3.7,0M530.7,210.1l-3.7,0M530.7,181.1l-3.7,0M530.7,152.1l-3.7,0M530.7,123.1l-3.7,0M530.7,94.1l-3.7,0M530.7,65.1l-3.7,0M530.7,36l-3.7,0"/>
-<path d="M530.7,442.2l-7.5,0M530.7,384.2l-7.5,0M530.7,326.2l-7.5,0M530.7,268.1l-7.5,0M530.7,210.1l-7.5,0M530.7,152.1l-7.5,0M530.7,94.1l-7.5,0M530.7,36l-7.5,0"/>
-</g>
-<g fill="none" stroke-width="1">
-<g transform="matrix(0 1 -1 0 569.2 107.9)">
-<text x="0" y="0" font-size="14pt" fill="#000000">Iron metallicity (solar units)</text>
-</g>
-<text x="534.2" y="450.9" font-size="14pt" fill="#000000">0.4</text>
-<text x="534.2" y="392.9" font-size="14pt" fill="#000000">0.6</text>
-<text x="534.2" y="334.9" font-size="14pt" fill="#000000">0.8</text>
-<text x="534.2" y="276.9" font-size="14pt" fill="#000000">1</text>
-<text x="534.2" y="218.9" font-size="14pt" fill="#000000">1.2</text>
-<text x="534.2" y="160.8" font-size="14pt" fill="#000000">1.4</text>
-<text x="534.2" y="102.8" font-size="14pt" fill="#000000">1.6</text>
-<text x="534.2" y="44.8" font-size="14pt" fill="#000000">1.8</text>
-</g>
-</g>
-<g clip-path="url(#c4)">
 <g fill="none" stroke-width="0.6">
 <polyline fill="none" points="59.6,119.5 76.8,107.4 131.1,92.2 185.2,114.6 236.7,177.1 282.4,202.8 323.6,258.6 357.8,281.8 387.1,285.6 412.8,325.9 435.6,320.1 458,345.2"/>
 </g>
@@ -201,6 +164,39 @@
 </g>
 </g>
 <g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M648.4,471.2l0,-464.1"/>
+<path d="M648.4,376.6l-3.7,0M648.4,321.3l-3.7,0M648.4,282l-3.7,0M648.4,251.6l-3.7,0M648.4,226.7l-3.7,0M648.4,205.6l-3.7,0M648.4,187.4l-3.7,0M648.4,171.3l-3.7,0M648.4,62.4l-3.7,0M648.4,7l-3.7,0"/>
+<path d="M648.4,471.2l-7.5,0M648.4,157l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<g transform="matrix(0 1 -1 0 706.9 142)">
+<text x="0" y="0" font-size="14pt" fill="#000000">Electron density (cm</text>
+<text x="175" y="-7" font-size="8pt" fill="#000000">-3</text>
+<text x="185.5" y="0" font-size="14pt" fill="#000000">)</text>
+</g>
+<text x="651.9" y="480" font-size="14pt" fill="#000000">10</text>
+<text x="669.4" y="473" font-size="8pt" fill="#000000">&#8722;3</text>
+<text x="651.9" y="165.7" font-size="14pt" fill="#000000">0.01</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M530.7,471.2l0,-464.1"/>
+<path d="M530.7,471.2l-3.7,0M530.7,442.2l-3.7,0M530.7,413.2l-3.7,0M530.7,384.2l-3.7,0M530.7,355.2l-3.7,0M530.7,326.2l-3.7,0M530.7,297.1l-3.7,0M530.7,268.1l-3.7,0M530.7,239.1l-3.7,0M530.7,210.1l-3.7,0M530.7,181.1l-3.7,0M530.7,152.1l-3.7,0M530.7,123.1l-3.7,0M530.7,94.1l-3.7,0M530.7,65.1l-3.7,0M530.7,36l-3.7,0"/>
+<path d="M530.7,442.2l-7.5,0M530.7,384.2l-7.5,0M530.7,326.2l-7.5,0M530.7,268.1l-7.5,0M530.7,210.1l-7.5,0M530.7,152.1l-7.5,0M530.7,94.1l-7.5,0M530.7,36l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<g transform="matrix(0 1 -1 0 569.2 107.9)">
+<text x="0" y="0" font-size="14pt" fill="#000000">Iron metallicity (solar units)</text>
+</g>
+<text x="534.2" y="450.9" font-size="14pt" fill="#000000">0.4</text>
+<text x="534.2" y="392.9" font-size="14pt" fill="#000000">0.6</text>
+<text x="534.2" y="334.9" font-size="14pt" fill="#000000">0.8</text>
+<text x="534.2" y="276.9" font-size="14pt" fill="#000000">1</text>
+<text x="534.2" y="218.9" font-size="14pt" fill="#000000">1.2</text>
+<text x="534.2" y="160.8" font-size="14pt" fill="#000000">1.4</text>
+<text x="534.2" y="102.8" font-size="14pt" fill="#000000">1.6</text>
+<text x="534.2" y="44.8" font-size="14pt" fill="#000000">1.8</text>
+</g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M60.2,471.2l0,-464.1"/>
 <path d="M60.2,7l3.7,0M60.2,32.8l3.7,0M60.2,58.6l3.7,0M60.2,84.4l3.7,0M60.2,110.2l3.7,0M60.2,136l3.7,0M60.2,161.8l3.7,0M60.2,187.5l3.7,0M60.2,213.3l3.7,0M60.2,239.1l3.7,0M60.2,264.9l3.7,0M60.2,290.7l3.7,0M60.2,316.5l3.7,0M60.2,342.3l3.7,0M60.2,368.1l3.7,0M60.2,393.8l3.7,0M60.2,419.6l3.7,0M60.2,445.4l3.7,0M60.2,471.2l3.7,0"/>

@@ -123,35 +123,35 @@ class BoxShape(Shape):
             clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
                                qt4.QPointF(posn[2], posn[3]) )
         painter = phelper.painter(self, posn, clip=clip)
+        with painter:
+            # drawing settings for shape
+            if not s.Border.hide:
+                painter.setPen( s.get('Border').makeQPen(painter) )
+            else:
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
 
-        # drawing settings for shape
-        if not s.Border.hide:
-            painter.setPen( s.get('Border').makeQPen(painter) )
-        else:
-            painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+            # iterate over positions
+            index = 0
+            dx, dy = posn[2]-posn[0], posn[3]-posn[1]
+            for x, y, w, h, r in itertools.izip(xpos, ypos,
+                                                itertools.cycle(width),
+                                                itertools.cycle(height),
+                                                itertools.cycle(rotate)):
+                wp, hp = dx*w, dy*h
+                painter.save()
+                painter.translate(x, y)
+                if r != 0:
+                    painter.rotate(r)
+                self.drawShape(painter, qt4.QRectF(-wp*0.5, -hp*0.5, wp, hp))
+                painter.restore()
 
-        # iterate over positions
-        index = 0
-        dx, dy = posn[2]-posn[0], posn[3]-posn[1]
-        for x, y, w, h, r in itertools.izip(xpos, ypos,
-                                            itertools.cycle(width),
-                                            itertools.cycle(height),
-                                            itertools.cycle(rotate)):
-            wp, hp = dx*w, dy*h
-            painter.save()
-            painter.translate(x, y)
-            if r != 0:
-                painter.rotate(r)
-            self.drawShape(painter, qt4.QRectF(-wp*0.5, -hp*0.5, wp, hp))
-            painter.restore()
-
-            if isnotdataset:
-                cgi = controlgraph.ControlResizableBox(
-                    self, [x, y], [wp, hp], r, allowrotate=True)
-                cgi.index = index
-                cgi.widgetposn = posn
-                index += 1
-                controlgraphitems.append(cgi)
+        if isnotdataset:
+            cgi = controlgraph.ControlResizableBox(
+                self, [x, y], [wp, hp], r, allowrotate=True)
+            cgi.index = index
+            cgi.widgetposn = posn
+            index += 1
+            controlgraphitems.append(cgi)
 
         phelper.setControlGraph(self, controlgraphitems)
 
