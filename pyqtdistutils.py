@@ -69,9 +69,12 @@ class build_ext (distutils.command.build_ext.build_ext):
 
         # link against libraries
         if cfg.qt_framework:
-            extension.extra_link_args = ['-framework', 'QtGui',
-                                         '-framework', 'QtCore',
-                                         '-framework', 'QtXml']
+            extension.extra_link_args = [
+                '-F', os.path.join(cfg.qt_lib_dir),
+                '-framework', 'QtGui',
+                '-framework', 'QtCore',
+                '-framework', 'QtXml'
+                ]
         elif sys.platform == 'win32':
             extension.libraries = ['QtGui4', 'QtCore4', 'QtXml4']
         else:
