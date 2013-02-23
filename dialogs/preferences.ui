@@ -370,21 +370,32 @@ to be loaded.</string>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="Picker">
+      <attribute name="title">
+       <string>Picker</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QCheckBox" name="pickerToConsoleCheck">
+         <property name="text">
+          <string>Print picked points to internal console</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="pickerToClipboardCheck">
+         <property name="text">
+          <string>Copy picked points to clipboard</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="pluginTab">
       <attribute name="title">
        <string>Plugins</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0" colspan="4">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Add entries here to load Veusz import plugins. Entries should consist of a Python file to load.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0" colspan="4">
         <widget class="QListView" name="pluginList"/>
        </item>
@@ -401,6 +412,23 @@ to be loaded.</string>
          </property>
         </spacer>
        </item>
+       <item row="3" column="1">
+        <widget class="QPushButton" name="pluginAddButton">
+         <property name="text">
+          <string>Add...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="4">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Add entries here to load Veusz import plugins. Entries should consist of a Python file to load.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="2">
         <widget class="QPushButton" name="pluginRemoveButton">
          <property name="sizePolicy">
@@ -411,13 +439,6 @@ to be loaded.</string>
          </property>
          <property name="text">
           <string>Remove</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="pluginAddButton">
-         <property name="text">
-          <string>Add...</string>
          </property>
         </widget>
        </item>

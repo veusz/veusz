@@ -124,6 +124,10 @@ class PreferencesDialog(VeuszDialog):
         # specifics for color tab
         self.setupColorTab()
 
+        # for point picker
+        self.pickerToConsoleCheck.setChecked( setdb['picker_to_console'] )
+        self.pickerToClipboardCheck.setChecked( setdb['picker_to_clipboard'] )
+
     def setupColorTab(self):
         """Initialise color tab
         this makes a grid of controls for each color
@@ -205,7 +209,7 @@ class PreferencesDialog(VeuszDialog):
 
     def accept(self):
         """Keep settings if okay pressed."""
-        
+
         qt4.QDialog.accept(self)
 
         # view settings
@@ -257,6 +261,10 @@ class PreferencesDialog(VeuszDialog):
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = unicode(color.name())
             setdb['color_' + name] = (isdefault, colorname)
+
+        # picker
+        setdb['picker_to_clipboard'] = self.pickerToClipboardCheck.isChecked()
+        setdb['picker_to_console'] = self.pickerToConsoleCheck.isChecked()
 
         # plugins
         plugins = [unicode(x) for x in self.pluginmodel.stringList()]

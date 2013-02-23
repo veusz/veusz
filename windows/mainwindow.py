@@ -54,7 +54,7 @@ import veusz.dialogs.dataeditdialog as dataeditdialog
 
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
-    return unicode( 
+    return unicode(
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
 # shortcut to this
@@ -103,7 +103,7 @@ class MainWindow(qt4.QMainWindow):
 
         # try to select first graph of first page
         win.treeedit.doInitialWidgetSelect()
-            
+
         cls.windows.append(win)
 
         # check if tutorial wanted
@@ -258,7 +258,7 @@ class MainWindow(qt4.QMainWindow):
                     self.CreateWindow(files[0])
                 for filename in files[1:]:
                     self.CreateWindow(filename)
-            
+
     def _getVeuszDropFiles(self, event):
         """Return a list of veusz files from a drag/drop event containing a
         text/uri-list"""
@@ -318,7 +318,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotAboutToShowEdit(self):
         """Enable/disable undo/redo menu items."""
-        
+
         # enable distable, and add appropriate text to describe
         # the operation being undone/redone
         canundo = self.document.canUndo()
@@ -327,20 +327,20 @@ class MainWindow(qt4.QMainWindow):
             undotext = "%s %s" % (undotext, self.document.historyundo[-1].descr)
         self.vzactions['edit.undo'].setText(undotext)
         self.vzactions['edit.undo'].setEnabled(canundo)
-        
+
         canredo = self.document.canRedo()
         redotext = _('Redo')
         if canredo:
             redotext = "%s %s" % (redotext, self.document.historyredo[-1].descr)
         self.vzactions['edit.redo'].setText(redotext)
         self.vzactions['edit.redo'].setEnabled(canredo)
-        
+
     def slotEditUndo(self):
         """Undo the previous operation"""
         if self.document.canUndo():
             self.document.undoOperation()
         self.treeedit.checkWidgetSelected()
-        
+
     def slotEditRedo(self):
         """Redo the previous operation"""
         if self.document.canRedo():
@@ -354,7 +354,7 @@ class MainWindow(qt4.QMainWindow):
         dialog = StylesheetDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
-        
+
     def slotEditCustom(self):
         dialog = CustomDialog(self, self.document)
         self.showDialog(dialog)
@@ -441,7 +441,7 @@ class MainWindow(qt4.QMainWindow):
                 a(self, _('Exit the program'), _('&Quit'),
                   self.slotFileQuit,
                   icon='kde-application-exit', key='Ctrl+Q'),
-            
+
             'edit.undo':
                 a(self, _('Undo the previous operation'), _('Undo'),
                   self.slotEditUndo,
@@ -497,7 +497,7 @@ class MainWindow(qt4.QMainWindow):
             'view.addtool':
                 a(self, _('Show or hide insert toolbar'), _('Insert toolbar'),
                   None, checkable=True),
-            
+
             'data.import':
                 a(self, _('Import data into Veusz'), _('&Import...'),
                   self.slotDataImport, icon='kde-vzdata-import'),
@@ -543,7 +543,7 @@ class MainWindow(qt4.QMainWindow):
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
-        utils.addToolbarActions(tb, self.vzactions, 
+        utils.addToolbarActions(tb, self.vzactions,
                                 ('file.new', 'file.open', 'file.save',
                                  'file.print', 'file.export'))
 
@@ -891,7 +891,7 @@ class MainWindow(qt4.QMainWindow):
             else:
                 # restore the cursor
                 qt4.QApplication.restoreOverrideCursor()
-                
+
     def updateTitlebar(self):
         """Put the filename into the title bar."""
         if self.filename == '':
@@ -907,7 +907,7 @@ class MainWindow(qt4.QMainWindow):
 
     def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
         """A generic file save dialog for exporting / saving."""
-        
+
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.AnyFile )
@@ -928,13 +928,13 @@ class MainWindow(qt4.QMainWindow):
 
     def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
         """Display an open dialog and return a filename."""
-        
+
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
         fd.setAcceptMode( qt4.QFileDialog.AcceptOpen )
         fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
-        
+
         # if the user chooses a file
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
@@ -990,7 +990,7 @@ class MainWindow(qt4.QMainWindow):
                                      window)
             self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
             self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
- 
+
     class _unsafeVeuszCmdMsgBox(qt4.QMessageBox):
         """Show document has unsafe Veusz commands."""
         def __init__(self, window):
@@ -1066,7 +1066,7 @@ class MainWindow(qt4.QMainWindow):
             return wrapped
         for name in interface.unsafe_commands:
             env[name] = _unsafeCaller(getattr(interface, name))
-                               
+
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = self.console.con_stdout
@@ -1086,7 +1086,7 @@ class MainWindow(qt4.QMainWindow):
         except Exception, e:
             # need to remember to restore stdout, stderr
             sys.stdout, sys.stderr = stdout, stderr
-            
+
             # display error dialog if there is an error loading
             qt4.QApplication.restoreOverrideCursor()
             self.document.enableUpdates()
@@ -1139,7 +1139,7 @@ class MainWindow(qt4.QMainWindow):
         filename = self._fileOpenDialog('vsz', _('Veusz script files'), _('Open'))
         if filename:
             self.openFile(filename)
-        
+
     def populateRecentFiles(self):
         """Populate the recently opened files menu with a list of
         recently opened files"""
@@ -1170,7 +1170,7 @@ class MainWindow(qt4.QMainWindow):
                 newMenuItems, self.maintoolbar, self.menus)
         else:
             menu.setEnabled(False)
-    
+
     def slotFileExport(self):
         """Export the graph."""
 
@@ -1220,7 +1220,7 @@ class MainWindow(qt4.QMainWindow):
             filename = os.path.basename(self.filename)
             filename = os.path.splitext(filename)[0] + '.' + extn
             fd.selectFile(filename)
-        
+
         if fd.exec_() == qt4.QDialog.Accepted:
             # save directory for next time
             self.dirname_export = fd.directory().absolutePath()
@@ -1229,12 +1229,12 @@ class MainWindow(qt4.QMainWindow):
             setdb['export_lastformat'] = filterused
 
             chosenextns = filtertoext[filterused]
-            
+
             # show busy cursor
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
             filename = unicode( fd.selectedFiles()[0] )
-            
+
             # Add a default extension if one isn't supplied
             # this is the extension without the dot
             ext = os.path.splitext(filename)[1][1:]
@@ -1323,7 +1323,7 @@ class MainWindow(qt4.QMainWindow):
     def slotFileQuit(self):
         """File quit chosen."""
         qt4.qApp.closeAllWindows()
-        
+
     def slotUpdatePage(self, number):
         """Update page number when the plot window says so."""
 
@@ -1379,6 +1379,14 @@ class MainWindow(qt4.QMainWindow):
         t = '%s: %s%s = %s, %s%s = %s' % (
                 info.widget.name, xn, ix, xtext, yn, ix, ytext)
         self.pickerlabel.setText(t)
+        if setdb['picker_to_console']:
+            self.console.appendOutput(t + "\n", 'error')
+        if setdb['picker_to_clipboard']:
+            clipboard = qt4.QApplication.clipboard()
+            if clipboard.mimeData().hasText():
+                clipboard.setText(clipboard.text()+"\n"+t)
+            else:
+                qt4.QApplication.clipboard().setText(t)
 
     def slotAllowedImportsDoc(self, module, names):
         """Are allowed imports?"""

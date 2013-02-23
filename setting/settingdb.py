@@ -69,11 +69,15 @@ defaultValues = {
 
     # ask tutorial before?
     'ask_tutorial': False,
+
+    # log picked points to clipboard or to console
+    'picker_to_clipboard': False,
+    'picker_to_console': True
     }
 
 class _SettingDB(object):
     """A class which provides access to a persistant settings database.
-    
+
     Items are accesses as a dict, with items as key=value
     """
 
@@ -143,7 +147,7 @@ class _SettingDB(object):
         for key, value in defaultValues.iteritems():
             if key not in self.database:
                 self.database[key] = value
-        
+
     def writeSettings(self):
         """Write the settings using QSettings.
 

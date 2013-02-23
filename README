@@ -29,6 +29,8 @@ Changes in 1.17:
  * Add SAMP/VoTable support (thanks to Graham Bell)
  * New shifted-points xy line mode, which plots a stepped line with
    the points shifted to lie between the coordinates given
+ * Points can be picked to console and/or clipboard
+   (thanks to Valerio Mussi)
 
 Bug fixes:
  * Fix unicode characters for \circ and \odot
