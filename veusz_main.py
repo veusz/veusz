@@ -47,7 +47,7 @@ Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2012 and contributors<br>
+Copyright (C) Jeremy Sanders 2003-2013 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 

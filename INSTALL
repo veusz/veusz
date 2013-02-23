@@ -7,7 +7,7 @@ Veusz Installation
 Veusz uses distutils for its installation. See below for how to use it.
 
 Requirements:
- python >= 2.4   http://www.python.org/
+ python >= 2.6   http://www.python.org/
  PyQt >= 4.3     http://www.riverbankcomputing.co.uk/software/pyqt/
  numpy >= 1.0    http://numpy.scipy.org/
 
@@ -29,7 +29,7 @@ list a few of the possible method here:
 
 To install on linux to the standard location on the hard disk
 
-# cd veusz-1.15
+# cd veusz-1.17
 # python setup.py build
 # su
 [enter root password]
@@ -63,8 +63,8 @@ can be used to create a hidden X11 server:
 If you don't want to bother installing veusz fully, it can be run from
 its own directory (at the moment). Simply do:
 
-# tar xzf veusz-1.15.tar.gz                [change version here]
-# cd veusz-1.15
+# tar xzf veusz-1.17.tar.gz                [change version here]
+# cd veusz-1.17
 # ./veusz_main.py
 
 Certain features will be disabled if you do this. You will not be able
@@ -87,8 +87,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xzf veusz-linux-i386-1.15.tar.gz     [change version here]
-# cd veusz-linux-i386-1.15
+# tar xzf veusz-linux-i386-1.17.tar.gz     [change version here]
+# cd veusz-linux-i386-1.17
 # ./veusz
 
 2.2 Installing in Windows
