@@ -348,8 +348,6 @@ class Key(widget.Widget):
 
         showtext = not s.Text.hide
 
-        # maximum width of text required
-        maxwidth = 1
         # total number of layout lines required
         totallines = 0
 
@@ -361,7 +359,9 @@ class Key(widget.Widget):
             titlewidth, titleheight = utils.Renderer(painter, titlefont,
                                             0, 0, s.title).getDimensions()
             titleheight += 0.5*margin
-            maxwidth = titlewidth
+
+        # maximum width of text required
+        maxwidth = 1
 
         entries = []
         # iterate over children and find widgets which are suitable
@@ -390,6 +390,8 @@ class Key(widget.Widget):
         symbolwidth = s.get('keyLength').convert(painter)
         totalwidth = ( (maxwidth + height + symbolwidth)*numcols +
                        height*(numcols-1) )
+        totalwidth = max(totalwidth, titlewidth)
+
         totalheight = numrows * height + titleheight
         if not s.Border.hide:
             totalwidth += 2*margin
