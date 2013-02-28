@@ -386,11 +386,12 @@ class Key(widget.Widget):
         # layout the box
         layout, (numrows, numcols) = self._layout(entries, totallines)
 
-        # total size of box
+        # width of key part of key
         symbolwidth = s.get('keyLength').convert(painter)
-        totalwidth = ( (maxwidth + height + symbolwidth)*numcols +
-                       height*(numcols-1) )
-        totalwidth = max(totalwidth, titlewidth)
+        keyswidth = ( (maxwidth + height + symbolwidth)*numcols +
+                      height*(numcols-1) )
+        # total width of box
+        totalwidth = max(keyswidth, titlewidth)
 
         totalheight = numrows * height + titleheight
         if not s.Border.hide:
@@ -433,14 +434,16 @@ class Key(widget.Widget):
             utils.brushExtFillPath(painter, s.Background, boxpath)
         if not s.Border.hide:
             painter.strokePath(boxpath, s.get('Border').makeQPen(painter) )
-            x += margin
             y += margin*0.5
 
         # center and draw the title
         if s.title:
-            xpos = x + 0.5*(totalwidth - (0 if s.Border.hide else 2*margin) - titlewidth)
+            xpos = x + (totalwidth-titlewidth)/2
             utils.Renderer(painter, titlefont, xpos, y, s.title, alignvert=1).render()
             y += titleheight
+
+        # centres key below title
+        x += (totalwidth-keyswidth)/2
 
         textpen = s.get('Text').makeQPen()
 

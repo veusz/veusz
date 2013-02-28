@@ -37,6 +37,7 @@ Bug fixes:
  * Fix for data type of pickable points
  * Fix sort by group crash bug
  * Many crashes fixed
+ * Fix width of key when using long titles/and or multiple columns
 
 Features of package:
  * X-Y plots (with errorbars)
