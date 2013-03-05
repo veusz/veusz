@@ -540,6 +540,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
                   '" preserveAspectRatio="none"' ]
         SVGElement(self.celement, 'image', ''.join(attrb))
 
+    def type(self):
+        """A random number for the engine."""
+        return qt4.QPaintEngine.User + 11
+
 class SVGPaintDevice(qt4.QPaintDevice):
     """Paint device for SVG paint engine."""
 
