@@ -38,6 +38,7 @@ Bug fixes:
  * Fix sort by group crash bug
  * Many crashes fixed
  * Fix width of key when using long titles/and or multiple columns
+ * Fix bold and italic output in SVG output
 
 Features of package:
  * X-Y plots (with errorbars)

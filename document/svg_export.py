@@ -429,25 +429,35 @@ class SVGPaintEngine(qt4.QPaintEngine):
             else:
                 size = f.pointSizeF()*scale*dpi/inch_pt
 
-            attrb = [
+            font = textitem.font()
+            grpattrb = [
+                'stroke="none"',
+                'fill="%s"' % self.pen.color().name(),
+                'fill-opacity="%.3g"' % self.pen.color().alphaF(),
+                'font-family="%s"' % escapeXML(font.family()),
+                'font-size="%s"' % size,
+                ]
+            if font.italic():
+                grpattrb.append('font-style="italic"')
+            if font.bold():
+                grpattrb.append('font-weight="bold"')
+
+            grp = SVGElement(
+                self.celement, 'g',
+                ' '.join(grpattrb) )
+
+            text = escapeXML( unicode(textitem.text()) )
+
+            textattrb = [
                 'x="%s"' % fltStr(pt.x()*scale),
                 'y="%s"' % fltStr(pt.y()*scale),
                 'textLength="%s"' % fltStr(textitem.width()*scale),
                 ]
 
-            grp = SVGElement(
-                self.celement, 'g',
-                'stroke="none" fill="%s" fill-opacity="%.3g" '
-                'font-family="%s" font-size="%s"' %
-                (self.pen.color().name(), self.pen.color().alphaF(),
-                 escapeXML(textitem.font().family()), size))
-
-            text = escapeXML( unicode(textitem.text()) )
-
             # write as an SVG text element
             SVGElement(
                 grp, 'text',
-                ' '.join(attrb),
+                ' '.join(textattrb),
                 text=text.encode('utf-8') )
 
         else:
