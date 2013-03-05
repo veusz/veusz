@@ -113,6 +113,10 @@ class Ternary(NonOrthGraph):
                              descr=_('Fractional size of plot'),
                              usertext=_('Size')) )
 
+        s.add( setting.Bool('reverse', False,
+                            descr=_('Reverse axes'),
+                            usertext=_('Reverse')) )
+
         s.add( AxisLabel('Label',
                          descr = _('Axis label settings'),
                          usertext = _('Axis label')),
@@ -180,19 +184,25 @@ class Ternary(NonOrthGraph):
         coordbn = coordb / maxval
 
         # the three coordinates on the plot
-        clist = (coordan, coordbn, 1.-coordan-coordbn)
+        clist = [coordan, coordbn, 1.-coordan-coordbn]
 
         # select the right coordinates for a, b and c given the system
         # requested by the user
         # normalise by origins and plot size
         lookup = coord_lookup[s.coords]
+
         cbot = ( clist[ lookup[0] ] - self._orgbot ) / self._size
-        # cleft = ( clist[ lookup[1] ] - self._orgleft ) / self._size
+        cleft = ( clist[ lookup[1] ] - self._orgleft ) / self._size
         cright = ( clist[ lookup[2] ] - self._orgright ) / self._size
 
         # from Ingram, 1984, Area, 16, 175
         # remember that y goes in the opposite direction here
-        x = (0.5*cright + cbot)*self._width + self._box[0]
+        if s.reverse:
+            cleft, cright = cright, cleft
+            x = (1-(0.5*cright + cbot))*self._width + self._box[0]
+        else:
+            x = (0.5*cright + cbot)*self._width + self._box[0]
+
         y = self._box[3] - cright * sin60 * self._width
 
         return x, y
@@ -319,6 +329,8 @@ class Ternary(NonOrthGraph):
         for v in ticks:
             l = utils.formatNumber(v*scale, format, locale=self.document.locale)
             labels.append(l)
+        if self.settings.reverse:
+            labels = labels[::-1]
         return labels
 
     def _drawTickSet(self, painter, tickSetn, gridSetn,
@@ -339,10 +351,13 @@ class Ternary(NonOrthGraph):
         tl = tickSetn.get('length').convert(painter)
         mv = self._maxVal()
 
+        reverse = bool(self.settings.reverse)
+        revsign = [1, -1][reverse]
+
         # bottom ticks
         x1 = (tickbot - self._orgbot)/self._size*self._width + self._box[0]
-        x2 = x1 - tl * sin30
         y1 = self._box[3] + N.zeros(x1.shape)
+        x2 = x1 - revsign * tl * sin30
         y2 = y1 + tl * cos30
         tickbotline = (x1, y1, x2, y2)
 
@@ -356,9 +371,13 @@ class Ternary(NonOrthGraph):
         # left ticks
         x1 = -(tickleft - self._orgleft)/self._size*self._width*sin30 + (
             self._box[0] + self._box[2])*0.5
-        x2 = x1 - tl * sin30
         y1 = (tickleft - self._orgleft)/self._size*self._width*cos30 + self._box[1]
-        y2 = y1 - tl * cos30
+        if reverse:
+            x2 = x1 - tl
+            y2 = y1
+        else:
+            x2 = x1 - tl * sin30
+            y2 = y1 - tl * cos30
         tickleftline = (x1, y1, x2, y2)
 
         # left grid
@@ -370,9 +389,13 @@ class Ternary(NonOrthGraph):
 
         # right ticks
         x1 = -(tickright - self._orgright)/self._size*self._width*sin30+self._box[2]
-        x2 = x1 + tl
         y1 = -(tickright - self._orgright)/self._size*self._width*cos30+self._box[3]
-        y2 = y1
+        if reverse:
+            x2 = x1 + tl * sin30
+            y2 = y1 - tl * cos30
+        else:
+            x2 = x1 + tl
+            y2 = y1
         tickrightline = (x1, y1, x2, y2)
 
         # right grid
