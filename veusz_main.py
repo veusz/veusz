@@ -106,6 +106,7 @@ def export(exports, args):
 def mainwindow(args):
     '''Open the main window with any loaded files.'''
     from veusz.windows.mainwindow import MainWindow
+
     if len(args) > 1:
         # load in filenames given
         for filename in args[1:]:
@@ -130,18 +131,22 @@ def convertArgsUnicode(args):
             out.append(a)
     return out
 
+def initImports():
+    '''Do imports and start up DBUS/SAMP.'''
+    import veusz.setting
+    import veusz.widgets
+    import veusz.utils.vzdbus as vzdbus
+    import veusz.utils.vzsamp as vzsamp
+
+    vzdbus.setup()
+    vzsamp.setup()
+
 class ImportThread(qt4.QThread):
     '''Do import of main code within another thread.
     Main application runs when this is done
     '''
     def run(self):
-        import veusz.setting
-        import veusz.widgets
-        import veusz.utils.vzdbus as vzdbus
-        import veusz.utils.vzsamp as vzsamp
-
-        vzdbus.setup()
-        vzsamp.setup()
+        initImports()
 
 class AppRunner(qt4.QObject):
     '''Object to run application. We have to do this to get an
@@ -151,8 +156,13 @@ class AppRunner(qt4.QObject):
 
         qt4.QObject.__init__(self)
 
+        # workaround because there's a weird bug on Mac OS where
+        # using a separate thread means the user has to click on
+        # on the dock again
+        darwinworkaround = sys.platform == 'darwin'
+
         self.splash = None
-        if not (options.listen or options.export):
+        if not (options.listen or options.export) and not darwinworkaround:
             # show the splash screen on normal start
             self.splash = qt4.QSplashScreen(makeSplashLogo())
             self.splash.show()
@@ -166,10 +176,14 @@ class AppRunner(qt4.QObject):
             trans.load(options.translation)
             qt4.qApp.installTranslator(trans)
 
-        self.thread = ImportThread()
-        self.connect( self.thread, qt4.SIGNAL('finished()'),
-                      self.slotStartApplication )
-        self.thread.start()
+        if darwinworkaround:
+            initImports()
+            self.slotStartApplication()
+        else:
+            self.thread = ImportThread()
+            self.connect( self.thread, qt4.SIGNAL('finished()'),
+                          self.slotStartApplication )
+            self.thread.start()
 
     def slotStartApplication(self):
         '''Main start of application.'''
