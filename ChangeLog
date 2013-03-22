@@ -1,3 +1,24 @@
+Changes in 1.17:
+ * Add new broken axis widget with gaps in the numerical sequence
+ * Grid lines are plotted always under (or over) the data
+ * Shift+Scroll wheel scrolls left/right (thanks to Dave Hughes)
+ * Polar plots can have a "minimum" radius and log axes
+ * Many more LaTeX symbols added
+ * Add SAMP/VoTable support (thanks to Graham Bell)
+ * New shifted-points xy line mode, which plots a stepped line with
+   the points shifted to lie between the coordinates given
+ * Points can be picked to console and/or clipboard
+   (thanks to Valerio Mussi)
+ * Allow reversed ternary plot
+
+Bug fixes:
+ * Fix unicode characters for \circ and \odot
+ * Fix for data type of pickable points
+ * Fix sort by group crash bug
+ * Many crashes fixed
+ * Fix width of key when using long titles/and or multiple columns
+ * Fix bold and italic output in SVG output
+
 Changes in 1.16:
  * Experimental MathML support
  * Add upper/lower-left/right arrows
