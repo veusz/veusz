@@ -1272,43 +1272,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotFilePrint(self):
         """Print the document."""
-
-        if self.document.getNumberPages() == 0:
-            qt4.QMessageBox.warning(self, _("Error - Veusz"),
-                                    _("No pages to print"))
-            return
-
-        prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
-        prnt.setColorMode(qt4.QPrinter.Color)
-        prnt.setCreator(_('Veusz %s') % utils.version())
-        prnt.setDocName(self.filename)
-
-        dialog = qt4.QPrintDialog(prnt, self)
-        dialog.setMinMax(1, self.document.getNumberPages())
-        if dialog.exec_():
-            # get page range
-            if dialog.printRange() == qt4.QAbstractPrintDialog.PageRange:
-                # page range
-                minval, maxval = dialog.fromPage(), dialog.toPage()
-            else:
-                # all pages
-                minval, maxval = 1, self.document.getNumberPages()
-
-            # pages are relative to zero
-            minval -= 1
-            maxval -= 1
-
-            # reverse or forward order
-            if prnt.pageOrder() == qt4.QPrinter.FirstPageFirst:
-                pages = range(minval, maxval+1)
-            else:
-                pages = range(maxval, minval-1, -1)
-
-            # if more copies are requested
-            pages *= prnt.numCopies()
-
-            # do the printing
-            self.document.printTo( prnt, pages )
+        document.printDialog(self, self.document, filename=self.filename)
 
     def slotModifiedDoc(self, ismodified):
         """Disable certain actions if document is not modified."""

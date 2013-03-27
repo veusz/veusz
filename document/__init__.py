@@ -29,6 +29,6 @@ from capture import *
 from mime import *
 from dataset_histo import *
 from painthelper import *
-from export import Export
+from export import Export, printDialog
 from dbusinterface import *
 from importparams import *

@@ -875,12 +875,7 @@ class CommandInterface(qt4.QObject):
 
     def Print(self):
         """Print document."""
-        p = qt4.QPrinter()
-
-        if p.setup():
-            p.newPage()
-            self.document.printTo( p,
-                                   range(self.document.getNumberPages()) )
+        export.printDialog(None, self.document)
             
     def Export(self, filename, color=True, page=0, dpi=100,
                antialias=True, quality=85, backcolor='#ffffff00',

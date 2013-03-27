@@ -20,6 +20,10 @@ Veusz provides a GUI, command line, embedding and scripting interface
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
+Bug fixes in 1.17.1:
+ * Fix Print dialog
+ * Fix command-line "Print" command
+
 Changes in 1.17:
  * Add new broken axis widget with gaps in the numerical sequence
  * Grid lines are plotted always under (or over) the data

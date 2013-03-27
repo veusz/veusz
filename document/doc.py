@@ -407,24 +407,23 @@ class Document( qt4.QObject ):
         """Print onto printing device."""
 
         dpi = (printer.logicalDpiX(), printer.logicalDpiY())
-        painter = qt4.QPainter(printer)
+        painter = painthelper.DirectPainter(printer)
         if antialias:
             painter.setRenderHint(qt4.QPainter.Antialiasing, True)
             painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
    
-        # This all assumes that only pages can go into the root widget
-        num = len(pages)
-        for count, page in enumerate(pages):
-            size = self.pageSize(page, dpi=dpi)
-            helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
-            self.paintTo(helper, page)
-            painter.restore()
+        with painter:
+            # This all assumes that only pages can go into the root widget
+            for count, page in enumerate(pages):
+                painter.save()
+                size = self.pageSize(page, dpi=dpi)
+                helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+                self.paintTo(helper, page)
+                painter.restore()
 
-            # start new pages between each page
-            if count < num-1:
-                printer.newPage()
-
-        painter.end()
+                # start new pages between each page
+                if count < len(pages)-1:
+                    printer.newPage()
 
     def paintTo(self, painthelper, page):
         """Paint page specified to the paint helper."""

@@ -307,3 +307,44 @@ class Export(object):
         painter = painthelper.DirectPainter(paintdev)
         self.renderPage(size, (dpi,dpi), painter)
         paintdev.paintEngine().saveFile(self.filename)
+
+def printDialog(parentwindow, document, filename=None):
+    """Open a print dialog and print document."""
+
+    if document.getNumberPages() == 0:
+        qt4.QMessageBox.warning(parentwindow, _("Error - Veusz"),
+                                _("No pages to print"))
+        return
+
+    prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
+    prnt.setColorMode(qt4.QPrinter.Color)
+    prnt.setCreator(_('Veusz %s') % utils.version())
+    if filename:
+        prnt.setDocName(filename)
+
+    dialog = qt4.QPrintDialog(prnt, parentwindow)
+    dialog.setMinMax(1, document.getNumberPages())
+    if dialog.exec_():
+        # get page range
+        if dialog.printRange() == qt4.QAbstractPrintDialog.PageRange:
+            # page range
+            minval, maxval = dialog.fromPage(), dialog.toPage()
+        else:
+            # all pages
+            minval, maxval = 1, document.getNumberPages()
+
+        # pages are relative to zero
+        minval -= 1
+        maxval -= 1
+
+        # reverse or forward order
+        if prnt.pageOrder() == qt4.QPrinter.FirstPageFirst:
+            pages = range(minval, maxval+1)
+        else:
+            pages = range(maxval, minval-1, -1)
+
+        # if more copies are requested
+        pages *= prnt.numCopies()
+
+        # do the printing
+        document.printTo( prnt, pages )
