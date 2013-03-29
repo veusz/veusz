@@ -366,7 +366,7 @@ class Grid(widget.Widget):
 
         with painter:
             for child in self.children:
-                if not hasattr(child.typename, 'isaxis'):
+                if not hasattr(child, 'isaxis'):
                     self._drawChild(phelper, child, bounds, parentposn)
 
         # do not call widget.Widget.draw, do not collect 200 pounds
