@@ -98,19 +98,29 @@ class NonOrthGraph(Widget):
         '''
     
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
-        '''Plot graph area.'''
+        '''Plot graph area.
+        datarange is  [mina, maxa, minb, maxb] or None
+        '''
 
     def drawAxes(self, painter, bounds, datarange, outerbounds=None):
-        '''Plot axes.'''
+        '''Plot axes.
+        datarange is  [mina, maxa, minb, maxb] or None
+        '''
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
 
     def getDataRange(self):
-        """Get automatic data range."""
+        """Get automatic data range. Return None if no data."""
+
         drange = [1e199, -1e199, 1e199, -1e199]
         for c in self.children:
             c.updateDataRanges(drange)
+
+        # no data
+        if drange[0] > drange[1] or drange[2] > drange[3]:
+            drange = None
+
         return drange
 
     def getMargins(self, painthelper):

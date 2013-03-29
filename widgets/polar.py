@@ -200,10 +200,15 @@ class Polar(NonOrthGraph):
         '''Plot graph area and axes.'''
 
         s = self.settings
+
+        if datarange is None:
+            datarange = [0., 1., 0., 1.]
+
         if s.maxradius == 'Auto':
             self._maxradius = datarange[1]
         else:
             self._maxradius = s.maxradius
+
         if s.minradius == 'Auto':
             if s.log:
                 if datarange[0] > 0.:
