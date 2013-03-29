@@ -244,30 +244,6 @@ class MarkerFillBrush(setting.Brush):
                 usertext = _('Invert map'),
                 formatting=True) )
 
-class ColorSettings(setting.Settings):
-    """Settings for a coloring points using data values."""
-
-    def __init__(self, name):
-        setting.Settings.__init__(self, name, setnsmode='groupedsetting')
-        self.add( setting.DatasetOrFloatList(
-                'points', '',
-                descr = _('Use color value (0-1) in dataset to paint points'),
-                usertext=_('Color markers')), 7 )
-        self.add( setting.Float(
-                'min', 0.,
-                descr = _('Minimum value of color dataset'),
-                usertext = _('Min val') ))
-        self.add( setting.Float(
-                'max', 1.,
-                descr = _('Maximum value of color dataset'),
-                usertext = _('Max val') ))
-        self.add( setting.Choice(
-                'scaling',
-                ['linear', 'sqrt', 'log', 'squared'],
-                'linear',
-                descr = _('Scaling to transform numbers to color'),
-                usertext=_('Scaling')))
-
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
@@ -312,7 +288,7 @@ class PointPlotter(GenericPlotter):
                           ' list of values'),
                 usertext=_('Scale markers')), 6 )
 
-        s.add( ColorSettings('Color') )
+        s.add( setting.MarkerColor('Color') )
 
         s.add( setting.DatasetOrFloatList(
                 'yData', 'y',
