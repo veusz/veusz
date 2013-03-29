@@ -115,7 +115,8 @@ class NonOrthGraph(Widget):
 
         drange = [1e199, -1e199, 1e199, -1e199]
         for c in self.children:
-            c.updateDataRanges(drange)
+            if hasattr(c, 'updateDataRanges'):
+                c.updateDataRanges(drange)
 
         # no data
         if drange[0] > drange[1] or drange[2] > drange[3]:

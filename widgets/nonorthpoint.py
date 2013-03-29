@@ -65,14 +65,15 @@ class NonOrthPoint(Widget):
                 'data2', 'y',
                 descr=_('Dataset containing 2nd dataset or list of values'),
                 usertext=_('Dataset 2')) )
+        s.add( setting.DatasetOrStr('labels', '',
+                                    descr=_('Dataset or string to label points'),
+                                    usertext=_('Labels'), datatype='text') )
         s.add( setting.DatasetOrFloatList(
                 'scalePoints', '',
                 descr = _('Scale size of plotted markers by this dataset or'
                           ' list of values'),
                 usertext=_('Scale markers')) )
-        s.add( setting.DatasetOrStr('labels', '',
-                                    descr=_('Dataset or string to label points'),
-                                    usertext=_('Labels'), datatype='text') )
+        s.add( setting.MarkerColor('Color') )
 
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
@@ -129,16 +130,6 @@ class NonOrthPoint(Widget):
                 lambda v1, v2: self.parent.graphToPlotCoords(v1, v2))
         return p.pickIndex(oldindex, direction, bounds)
 
-    def plotMarkers(self, painter, plta, pltb, scaling, markersize, clip):
-        '''Draw markers in widget.'''
-        s = self.settings
-        if not s.MarkerLine.hide or not s.MarkerFill.hide:
-            painter.setBrush( s.MarkerFill.makeQBrushWHide() )
-            painter.setPen( s.MarkerLine.makeQPenWHide(painter) )
-
-            utils.plotMarkers(painter, plta, pltb, s.marker, markersize,
-                              scaling=scaling, clip=clip)
-
     def drawLabels(self, painter, xplotter, yplotter,
                    textvals, markersize):
         """Draw labels for the points.
@@ -170,6 +161,13 @@ class NonOrthPoint(Widget):
             utils.Renderer( painter, font, x, y, t,
                             alignhorz, alignvert, angle ).render()
 
+    def getColorbarParameters(self):
+        """Return parameters for colorbar."""
+        s = self.settings
+        c = s.Color
+        return (c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
+                s.MarkerFill.colorMapInvert)
+
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
 
@@ -184,6 +182,7 @@ class NonOrthPoint(Widget):
         d1 = s.get('data1').getData(d)
         d2 = s.get('data2').getData(d)
         dscale = s.get('scalePoints').getData(d)
+        colorpoints = s.Color.get('points').getData(d)
         text = s.get('labels').getData(d, checknull=True)
         if not d1 or not d2:
             return
@@ -195,8 +194,8 @@ class NonOrthPoint(Widget):
             self.parent.setClip(painter, posn)
 
             # split parts separated by NaNs
-            for v1, v2, scalings, textitems in document.generateValidDatasetParts(
-                d1, d2, dscale, text):
+            for v1, v2, scalings, cvals, textitems in document.generateValidDatasetParts(
+                d1, d2, dscale, colorpoints, text):
                 # convert data (chopping down length)
                 v1d, v2d = v1.data, v2.data
                 minlen = min(v1d.shape[0], v2d.shape[0])
@@ -218,12 +217,28 @@ class NonOrthPoint(Widget):
                     utils.addNumpyToPolygonF(pts, px, py)
                     utils.plotClippedPolyline(painter, cliprect, pts)
 
-                # markers
+                # plot markers
                 markersize = s.get('markerSize').convert(painter)
-                pscale = None
-                if scalings:
-                    pscale = scalings.data
-                self.plotMarkers(painter, px, py, pscale, markersize, cliprect)
+                if not s.MarkerLine.hide or not s.MarkerFill.hide:
+                    pscale = colorvals = cmap = None
+
+                    if scalings:
+                        pscale = scalings.data
+
+                    # color point individually
+                    if cvals and not s.MarkerFill.hide:
+                        colorvals = utils.applyScaling(
+                            cvals.data, s.Color.scaling,
+                            s.Color.min, s.Color.max)
+                        cmap = self.document.getColormap(
+                            s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
+
+                    painter.setBrush(s.MarkerFill.makeQBrushWHide())
+                    painter.setPen(s.MarkerLine.makeQPenWHide(painter))
+
+                    utils.plotMarkers(painter, px, py, s.marker, markersize,
+                                      scaling=pscale, clip=cliprect,
+                                      cmap=cmap, colorvals=colorvals)
 
                 # finally plot any labels
                 if textitems and not s.Label.hide:

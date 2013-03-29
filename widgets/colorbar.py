@@ -30,6 +30,7 @@ import graph
 import grid
 import widget
 import axis
+import nonorthgraph
 
 def _(text, disambiguation=None, context='ColorBar'):
     """Translate text."""
@@ -43,7 +44,7 @@ class ColorBar(axis.Axis):
     """
 
     typename='colorbar'
-    allowedparenttypes = [graph.Graph, grid.Grid]
+    allowedparenttypes = [graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph]
     allowusercreation = True
     description = _('Image color bar')
 
@@ -61,7 +62,7 @@ class ColorBar(axis.Axis):
 
         s.add( setting.WidgetChoice('widgetName', '',
                                     descr=_('Corresponding widget'),
-                                    widgettypes=('image', 'xy'),
+                                    widgettypes=('image', 'xy', 'nonorthpoint'),
                                     usertext = _('Widget')), 0 )
 
         s.get('log').readonly = True

@@ -772,7 +772,7 @@ class PointPlotter(GenericPlotter):
                         scaling = scaling[::s.thinfactor]
 
                 # color point individually
-                if cvals:
+                if cvals and not s.MarkerFill.hide:
                     colorvals = utils.applyScaling(
                         cvals.data, s.Color.scaling,
                         s.Color.min, s.Color.max)

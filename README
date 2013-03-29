@@ -17,6 +17,7 @@ Bug fixes in 1.17.1:
  * Fix command-line "Print" command
  * Fix duplicate axes drawn in grid
  * Fix crash adding empty polar plot
+ * Allow coloured points for non-orthogonal plots (polar, ternary)
 
 Changes in 1.17:
  * Add new broken axis widget with gaps in the numerical sequence
