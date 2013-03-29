@@ -186,9 +186,14 @@ class ColorBar(axis.Axis):
 
         # update image if necessary with new settings
         if imgwidget is not None:
-            # could find widget
-            (minval, maxval,
-             axisscale, img) = imgwidget.makeColorbarImage(s.direction)
+            minval, maxval, axisscale, cmapname, trans, invert = \
+                imgwidget.getColorbarParameters()
+
+            cmap = self.document.getColormap(cmapname, invert)
+
+            img = utils.makeColorbarImage(
+                minval, maxval, axisscale, cmap, trans,
+                direction=s.direction)
         else:
             # couldn't find widget
             minval, maxval, axisscale = 0., 1., 'linear'

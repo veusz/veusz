@@ -224,4 +224,4 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
     img = applyColorMap(cmap, colorscaling, vals,
                         minval, maxval, transparency)
 
-    return (minval, maxval, coloraxisscale, img)
+    return img

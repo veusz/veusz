@@ -227,30 +227,15 @@ class Image(plotters.GenericPlotter):
         # return new image coordinates and image
         return pltx, plty, newimage
 
-    def makeColorbarImage(self, direction='horz'):
-        """Make a QImage colorbar for the current plot.
-
-        direction is 'horizontal' or 'vertical' to draw horizontal or
-          vertical bars
-
-        Returns a tuple (minval, maxval, scale, qimage)
-
-        minval is the minimum value which should be plotted on the axis
-        maxval is the maximum "                                       "
-        scale is 'linear' or 'log', depending on how numbers should be scaled
-        qimage is a QImage of 1 x barsize
-        """
+    def getColorbarParameters(self):
+        """Return parameters for colorbar."""
 
         self.recomputeInternals()
         minval, maxval = self.cacheddatarange
         s = self.settings
 
-        # get colormap
-        cmap = self.document.getColormap(s.colorMap, s.colorInvert)
-
-        return utils.makeColorbarImage(
-            minval, maxval, s.colorScaling, cmap, s.transparency,
-            direction=direction)
+        return (minval, maxval, s.colorScaling, s.colorMap,
+                s.transparency, s.colorInvert)
 
     def recomputeInternals(self):
         """Recompute the internals if required.

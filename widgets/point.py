@@ -689,17 +689,12 @@ class PointPlotter(GenericPlotter):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable(bounds).pickIndex(oldindex, direction, bounds)
 
-    def makeColorbarImage(self, direction='horz'):
-        """Make a QImage colorbar for the current plot."""
-
+    def getColorbarParameters(self):
+        """Return parameters for colorbar."""
         s = self.settings
         c = s.Color
-        cmap = self.document.getColormap(
-            s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
-
-        return utils.makeColorbarImage(
-            c.min, c.max, c.scaling, cmap, 0,
-            direction=direction)
+        return (c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
+                s.MarkerFill.colorMapInvert)
 
     def dataDraw(self, painter, axes, posn, cliprect):
         """Plot the data on a plotter."""
