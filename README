@@ -1,28 +1,22 @@
-Veusz 1.17
-----------
-Velvet Ember Under Sky Zenith
------------------------------
+Veusz 1.17.1
+------------
 http://home.gna.org/veusz/
 
-Copyright (C) 2003-2013 Jeremy Sanders <jeremy@jeremysanders.net>
-and contributors.
+Veusz is a scientific plotting package.  It is designed to produce
+publication-ready Postscript/PDF/SVG output. Graphs are built-up by
+combining plotting widgets. The user interface aims to be simple,
+consistent and powerful.
 
-Licenced under the GPL (version 2 or greater).
-
-Veusz is a Qt4 based scientific plotting package. It is written in
-Python, using PyQt4 for display and user-interfaces, and numpy for
-handling the numeric data. Veusz is designed to produce
-publication-ready Postscript/PDF/SVG output. The user interface aims
-to be simple, consistent and powerful.
-
-Veusz provides a GUI, command line, embedding and scripting interface
-(based on Python) to its plotting facilities. It also allows for
+Veusz provides GUI, Python module, command line, scripting, DBUS and
+SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Bug fixes in 1.17.1:
  * Fix Print dialog
  * Fix command-line "Print" command
+ * Fix duplicate axes drawn in grid
+ * Fix crash adding empty polar plot
 
 Changes in 1.17:
  * Add new broken axis widget with gaps in the numerical sequence
@@ -46,43 +40,49 @@ Bug fixes:
  * Fix bold and italic output in SVG output
 
 Features of package:
- * X-Y plots (with errorbars)
- * Line and function plots
- * Contour plots
- * Images (with colour mappings and colorbars)
- * Stepped plots (for histograms)
- * Bar graphs
- * Vector field plots
- * Box plots
- * Polar plots
- * Ternary plots
- * Plotting dates
- * Fitting functions to data
- * Stacked plots and arrays of plots
- * Plot keys
- * Plot labels
- * Shapes and arrows on plots
- * LaTeX-like formatting for text
- * EPS/PDF/PNG/SVG/EMF export
- * Scripting interface
- * Dataset creation/manipulation
- * Embed Veusz within other programs
- * Text, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
- * Data can be captured from external sources
- * User defined functions, constants and can import external Python functions
- * Plugin interface to allow user to write or load code to
-    - import data using new formats
-    - make new datasets, optionally linked to existing datasets
-    - arbitrarily manipulate the document
- * Data picker
- * Interactive tutorial
- * Multithreaded rendering
+ Plotting features:
+  * X-Y plots (with errorbars)
+  * Line and function plots
+  * Contour plots
+  * Images (with colour mappings and colorbars)
+  * Stepped plots (for histograms)
+  * Bar graphs
+  * Vector field plots
+  * Box plots
+  * Polar plots
+  * Ternary plots
+  * Plotting dates
+  * Fitting functions to data
+  * Stacked plots and arrays of plots
+  * Plot keys
+  * Plot labels
+  * Shapes and arrows on plots
+  * LaTeX-like formatting for text
+ Input and output:
+  * EPS/PDF/PNG/SVG/EMF export
+  * Dataset creation/manipulation
+  * Embed Veusz within other programs
+  * Text, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
+  * Data can be captured from external sources
+ Extending:
+  * Use as a Python module
+  * User defined functions, constants and can import external Python functions
+  * Plugin interface to allow user to write or load code to
+     - import data using new formats
+     - make new datasets, optionally linked to existing datasets
+     - arbitrarily manipulate the document
+  * Scripting interface
+  * Control with DBUS and SAMP
+ Other features:
+  * Data picker
+  * Interactive tutorial
+  * Multithreaded rendering
 
 Requirements for source install:
  Python (2.6 or greater required)
    http://www.python.org/
  Qt >= 4.4 (free edition)
-   http://www.trolltech.com/products/qt/  
+   http://www.trolltech.com/products/qt/
  PyQt >= 4.3 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
    http://www.riverbankcomputing.co.uk/software/sip/
@@ -104,6 +104,10 @@ Optional:
    http://www.astropy.org/
  SAMPy (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
+
+Veusz is Copyright (C) 2003-2013 Jeremy Sanders
+<jeremy@jeremysanders.net> and contributors. It is licenced under the
+GPL (version 2 or greater).
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
