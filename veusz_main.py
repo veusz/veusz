@@ -217,6 +217,7 @@ class AppRunner(qt4.QObject):
                     'output files')
             export(options.export, args)
             qt4.qApp.quit()
+            sys.exit(0)
         else:
             # standard start main window
             mainwindow(args)
