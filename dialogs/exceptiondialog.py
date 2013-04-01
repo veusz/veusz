@@ -148,8 +148,12 @@ def formatLocals(exception):
             if key == 'self' and value not in alreadyself:
                 alreadyself.add(value)
                 for attr in sorted( dir(value) ):
+                    v = getattr(value, attr)
+                    if hasattr(v, '__call__'):
+                        # skip callables, to cut down output
+                        continue
                     try:
-                        sv = repr( getattr(value, attr) )
+                        sv = repr(v)
                     except:
                         sv = '<???>'
                     if len(sv) > 128:

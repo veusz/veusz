@@ -14,6 +14,7 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.17.1:
  * Allow coloured points for non-orthogonal plots (polar, ternary)
+ * Remove unnecessary exception data
 
 Bug fixes:
  * Fix Print dialog
