@@ -8,6 +8,7 @@ Bug fixes:
  * Fix duplicate axes drawn in grid
  * Fix crash adding empty polar plot
  * Exit properly on Mac OS X with --export option
+ * Fix highlighted button icons missing (Mac OS X binary)
 
 Changes in 1.17:
  * Add new broken axis widget with gaps in the numerical sequence
