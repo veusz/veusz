@@ -841,7 +841,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.addslots = {}
         self.vzactions = actions = self.parentwin.vzactions
         for widgettype in ('page', 'grid', 'graph', 'axis',
-                           'axis-broken',
+                           'axis-broken', 'axis-function',
                            'xy', 'bar', 'fit', 'function', 'boxplot',
                            'image', 'contour', 'vectorfield',
                            'key', 'label', 'colorbar',
@@ -906,7 +906,8 @@ class TreeEditDock(qt4.QDockWidget):
                    'key', 'label', 'colorbar', 'polar', 'ternary')]
 
         menuitems = [
-            ('insert', '', addact + ['add.axis-broken'] + [
+            ('insert', '', addact + ['add.axis-broken', 'add.axis-function'] +
+             [
                     ['insert.shape', 'Add shape',
                      ['add.rect', 'add.ellipse', 'add.line', 'add.imagefile',
                       'add.polygon']
@@ -916,7 +917,7 @@ class TreeEditDock(qt4.QDockWidget):
                     'edit.moveup', 'edit.movedown',
                     'edit.delete', 'edit.rename'
                     ]),
-            ]            
+            ]
         utils.constructMenus( self.parentwin.menuBar(),
                               self.parentwin.menus,
                               menuitems,

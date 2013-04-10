@@ -1003,20 +1003,16 @@ class Axis(WidgetSelector):
             widget = widget.parent
 
         # get list of axis widgets up the tree
-        axes = {}
+        axes = set()
         while widget is not None:
             for w in widget.children:
-                try:
-                    # succeeds if axis
-                    if w.settings.direction == self.direction:
-                        axes[w.name] = True
-                except AttributeError:
-                    pass
+                if ( hasattr(w, 'isaxis') and (
+                        self.direction == 'both' or
+                        w.settings.direction == self.direction) ):
+                    axes.add(w.name)
             widget = widget.parent
 
-        names = axes.keys()
-        names.sort()
-
+        names = sorted(axes)
         utils.populateCombo(self, names)
 
 class ListSet(qt4.QFrame):

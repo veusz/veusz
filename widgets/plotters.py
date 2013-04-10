@@ -29,13 +29,14 @@ import veusz.setting as setting
 import widget
 import graph
 import page
+import axisuser
 
 def _(text, disambiguation=None, context='Plotters'):
     """Translate text."""
     return unicode( 
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
-class GenericPlotter(widget.Widget):
+class GenericPlotter(widget.Widget, axisuser.AxisUser):
     """Generic plotter."""
 
     typename='genericplotter'
@@ -65,34 +66,6 @@ class GenericPlotter(widget.Widget):
         """Returns names of axes used."""
         s = self.settings
         return (s.xAxis, s.yAxis)
-
-    def lookupAxis(self, axisname):
-        """Find widget associated with axisname."""
-        w = self.parent
-        while w:
-            for c in w.children:
-                if c.name == axisname and hasattr(c, 'isaxis'):
-                    return c
-            w = w.parent
-        return None
-
-    def providesAxesDependency(self):
-        """Returns information on the following axes.
-        format is ( ('x', 'sx'), ('y', 'sy') )
-        where key is the axis and value is a provided bound
-        """
-        return ()
-
-    def requiresAxesDependency(self):
-        """Requires information about the axis given before providing
-        information.
-        Format (('sx': 'x'), ('sy': 'y'))
-        """
-        return ()
-    
-    def updateAxisRange(self, axis, depname, range):
-        """Update range variable for axis with dependency name given."""
-        pass
 
     def getNumberKeys(self):
         """Return number of key entries."""

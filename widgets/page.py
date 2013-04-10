@@ -27,6 +27,7 @@ import veusz.setting as setting
 import widget
 import root
 import controlgraph
+import axisuser
 
 # x, y, fplot, xyplot
 # x-> xyplot(x)
@@ -65,7 +66,9 @@ class _AxisDependHelper(object):
         The tuples are (widget, depname), where depname is a name for the 
         part of the plotter, e.g. "sx" or "sy" for x or y.
         """
-        if hasattr(widget, 'isplotter'):
+
+        if isinstance(widget, axisuser.AxisUser):
+
             nodes = self.nodes
 
             # keep track of which widgets depend on which axes
@@ -90,15 +93,11 @@ class _AxisDependHelper(object):
                     nodes[widdep] = []
                 nodes[widdep].append( (axis, None) )
 
-        elif hasattr(widget, 'isaxis'):
-            # it is an axis, so keep track of it
-            if hasattr(widget, 'isaxis'):
-                self.axes.append(widget)
+        if hasattr(widget, 'isaxis'):
+            self.axes.append(widget)
 
-        else:
-            # otherwise search children
-            for c in widget.children:
-                self.recursivePlotterSearch(c)
+        for c in widget.children:
+            self.recursivePlotterSearch(c)
 
     def findPlotters(self):
         """Construct a list of plotters associated with each axis.
@@ -109,6 +108,7 @@ class _AxisDependHelper(object):
         """
 
         self.recursivePlotterSearch(self.root)
+
         self.ranges = dict( [(a, list(defaultrange)) for a in self.axes] )
 
     def processDepends(self, widget, depends):
@@ -116,20 +116,24 @@ class _AxisDependHelper(object):
         If the dependency has no dependency itself, then update the
         axis with the widget or vice versa
         """
+
         modified = False
         i = 0
         while i < len(depends):
             dep = depends[i]
+
             if dep not in self.nodes:
                 dwidget, dwidget_dep = dep
-                if hasattr(dwidget, 'isplotter'):
+
+                if isinstance(dwidget, axisuser.AxisUser):
                     # update range of axis with (dwidget, dwidget_dep)
                     # do not do this if the widget is hidden
                     if ( not dwidget.settings.isSetting('hide') or
                          not dwidget.settings.hide ):
                         dwidget.updateAxisRange(widget, dwidget_dep,
                                                 self.ranges[widget])
-                elif hasattr(dwidget, 'isaxis'):
+
+                if hasattr(dwidget, 'isaxis'):
                     # set actual range on axis, as axis no longer has a
                     # dependency
                     if dwidget in self.ranges:
@@ -138,6 +142,7 @@ class _AxisDependHelper(object):
                             axrange = None
                         dwidget.setAutoRange(axrange)
                         del self.ranges[dwidget]
+
                 del depends[i]
                 modified = True
                 continue

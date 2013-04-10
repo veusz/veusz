@@ -1452,7 +1452,10 @@ class LineStyle(Choice):
         return controls.LineStyle(self, *args)
 
 class Axis(Str):
-    """A setting to hold the name of an axis."""
+    """A setting to hold the name of an axis.
+
+    direction is 'horizontal', 'vertical' or 'both'
+    """
 
     typename = 'axis'
 
