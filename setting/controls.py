@@ -265,6 +265,9 @@ class Bool(qt4.QCheckBox):
     def __init__(self, setting, parent):
         qt4.QCheckBox.__init__(self, parent)
 
+        self.setSizePolicy( qt4.QSizePolicy(
+                qt4.QSizePolicy.MinimumExpanding, qt4.QSizePolicy.Fixed) )
+
         self.ignorechange = False
         self.setting = setting
         self.setChecked(setting.val)
