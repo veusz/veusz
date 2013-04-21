@@ -151,7 +151,7 @@ class FunctionPlotter(GenericPlotter):
         else:
             return (('both', s.yAxis),)
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Adjust the range of the axis depending on the values plotted."""
         s = self.settings
 

@@ -387,7 +387,7 @@ class PointPlotter(GenericPlotter):
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Compute the effect of data on the axis range."""
         dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
         dsetn = self.settings.get(dataname)

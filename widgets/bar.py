@@ -182,7 +182,7 @@ class BarPlotter(GenericPlotter):
             maxv = max(maxv, totpos)
         return minv,  maxv
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Update axis range from data."""
         s = self.settings
         if ((s.direction == 'horizontal' and depname == 'sx') or

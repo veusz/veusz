@@ -182,7 +182,7 @@ class Fit(FunctionPlotter):
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Update range with range of data."""
         dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
         data = self.settings.get(dataname).getData(self.document)

@@ -130,8 +130,8 @@ class _AxisDependHelper(object):
                     # do not do this if the widget is hidden
                     if ( not dwidget.settings.isSetting('hide') or
                          not dwidget.settings.hide ):
-                        dwidget.updateAxisRange(widget, dwidget_dep,
-                                                self.ranges[widget])
+                        dwidget.getRange(widget, dwidget_dep,
+                                         self.ranges[widget])
 
                 if hasattr(dwidget, 'isaxis'):
                     # set actual range on axis, as axis no longer has a

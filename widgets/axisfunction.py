@@ -45,7 +45,7 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
         axis.Axis.addSettings(s)
 
         s.add( setting.Str('function', 't',
-                           descr=_('Monatonic function (use t as variable)'),
+                           descr=_('Monotonic function (use t as variable)'),
                            usertext=_('Function')), 1 )
         s.add( setting.Axis('otheraxis', '', 'both',
                             descr =
@@ -69,9 +69,9 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
         print "AR",autorange
         axis.Axis.setAutoRange(self, autorange)
 
-    def updateAxisRange(self, axis, depname, range):
+    def getRange(self, axis, depname, axrange):
         """Update range variable for axis with dependency name given."""
-        print "uAR", axis, depname, range
+        print "uAR", axis, depname, axrange
 
 # allow the factory to instantiate the widget
 document.thefactory.register( AxisFunction )

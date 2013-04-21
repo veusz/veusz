@@ -276,7 +276,7 @@ class BoxPlot(GenericPlotter):
             else:
                 return N.arange(1, len(vals)+1, dtype=N.float64)
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Update axis range from data."""
 
         s = self.settings

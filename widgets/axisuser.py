@@ -49,6 +49,6 @@ class AxisUser(object):
         """
         return ()
 
-    def updateAxisRange(self, axis, depname, range):
+    def getRange(self, axis, depname, therange):
         """Update range variable for axis with dependency name given."""
         pass
