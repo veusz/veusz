@@ -69,8 +69,6 @@ class _AxisDependHelper(object):
 
         if isinstance(widget, axisuser.AxisUser):
 
-            nodes = self.nodes
-
             # keep track of which widgets depend on which axes
             widgetaxes = {}
             for axname in widget.getAxesNames():
@@ -78,22 +76,21 @@ class _AxisDependHelper(object):
                 widgetaxes[axname] = axis
                 self.axis_plotter_map[axis].append(widget)
 
-            # if the widget is a plotter, find which axes the plotter can
-            # provide range information about
+            # if the widget is a user of an axis, find which axes the
+            # widget can provide range information about
             for axname, depname in widget.providesAxesDependency():
                 axis = widgetaxes[axname]
                 axdep = (axis, None)
-                nodes[axdep].append( (widget, depname) )
+                self.nodes[axdep].append( (widget, depname) )
 
-            # find which axes the plotter needs information from
+            # find which axes the axis-user needs information from
             for depname, axname in widget.requiresAxesDependency():
                 axis = widgetaxes[axname]
                 widdep = (widget, depname)
-                if widdep not in nodes:
-                    nodes[widdep] = []
-                nodes[widdep].append( (axis, None) )
+                self.nodes[widdep].append( (axis, None) )
 
         if hasattr(widget, 'isaxis'):
+            # keep track of all axis widgets
             self.axes.append(widget)
 
         for c in widget.children:
@@ -115,6 +112,13 @@ class _AxisDependHelper(object):
         """Go through dependencies of widget.
         If the dependency has no dependency itself, then update the
         axis with the widget or vice versa
+
+        Algorithm:
+          Iterate over dependencies for widget.
+
+          If the widget has a dependency on a widget which doesn't
+          have a dependency itself, update range from that
+          widget. Then delete that depency from the dependency list.
         """
 
         modified = False
@@ -130,6 +134,7 @@ class _AxisDependHelper(object):
                     # do not do this if the widget is hidden
                     if ( not dwidget.settings.isSetting('hide') or
                          not dwidget.settings.hide ):
+
                         dwidget.getRange(widget, dwidget_dep,
                                          self.ranges[widget])
 

@@ -60,10 +60,10 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
         return (self.settings.otheraxis,)
 
     def providesAxesDependency(self):
-        return ((self.settings.otheraxis, 'both'),)
+        return ((self.settings.otheraxis, None),)
 
     def requiresAxesDependency(self):
-        return (('both', self.settings.otheraxis),)
+        return ((None, self.settings.otheraxis),)
 
     def setAutoRange(self, autorange):
         print "AR",autorange
