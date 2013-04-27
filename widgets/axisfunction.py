@@ -36,13 +36,13 @@ def _(text, disambiguation=None, context='FunctionAxis'):
 class AxisError(RuntimeError):
     pass
 
-def solveEqn(function, vals):
-    """Solve an equation for a list of values (vals), if we don't know
+def solveFunction(function, vals):
+    '''Solve a function for a list of values (vals), if we don't know
     where the solution lies. function is a function to call.
 
     This tries a range of possible input values, and uses binary
     search to refine the solution.
-    """
+    '''
 
     xvals = N.array(
         ( -1e90, -1e70, -1e50, -1e40, -1e30, -1e20,
@@ -70,15 +70,15 @@ def solveEqn(function, vals):
     yfilt = yvals[f]
 
     if len(yfilt) < 2:
-        raise AxisError, 'Solutions to equation cannot be found'
+        raise AxisError, _('Solutions to equation cannot be found')
 
     # check for monotonicity
     delta = N.sign(yfilt[1:] - yfilt[:-1])
     pos, neg = N.all(delta >= 0), N.all(delta <= 0)
     if not (pos or neg):
-        raise AxisError, 'Not a monotonic function'
+        raise AxisError, _('Not a monotonic function')
     if pos and neg:
-        raise AxisError, 'Constant function'
+        raise AxisError, _('Constant function')
 
     # easier if the values are increasing only
     if neg:
@@ -93,14 +93,23 @@ def solveEqn(function, vals):
 
         # solution is between this and the next
         idx = N.searchsorted(ydelta, 0.)
-        if idx == 0 or idx == len(ydelta):
-            raise AxisError, 'No solution found'
+        if idx == 0:
+            if ydelta[0] == 0.:
+                # work around value being at start of array
+                idx = 1
+            else:
+                raise AxisError, _('No solution found')
+        elif idx == len(ydelta):
+            raise AxisError, _('No solution found')
+
         x1, x2 = xfilt[idx-1], xfilt[idx]
         y1, y2 = ydelta[idx-1], ydelta[idx]
 
         # binary search
         tol = abs(1e-6 * thisval)
         for i in xrange(30):
+            # print x1, y1, "->", x2, y2
+
             if abs(y1) <= tol and abs(y1) < abs(y2):
                 x2, y2 = x1, y1
                 break   # found solution
@@ -109,12 +118,27 @@ def solveEqn(function, vals):
                 break   # found solution
 
             if y1 == y2 or ((y1<0) and (y2<0)) or ((y1>0) and (y2>0)):
-                raise AxisError, 'No solution found'
+                raise AxisError, _('No solution found')
+
+            ### This is a bit faster, but bisection is simpler
+            # xv = N.linspace(x1, x2, num=100)
+            # yv = function(xv) + xv*0. - thisval
+
+            # idx = N.searchsorted(yv, 0.)
+            # if idx == 0:
+            #     idx = 1
+
+            # x1 = xv[idx-1]
+            # y1 = yv[idx-1]
+            # x2 = xv[idx]
+            # y2 = yv[idx]
 
             x3 = 0.5*(x1+x2)
             y3 = function(x3) - thisval
+            if not N.isfinite(y3):
+                raise AxisError, _('Non-finite value encountered')
 
-            if y3 < 0 and y1 < 0:
+            if y3 < 0:
                 x1 = x3
                 y1 = y3
             else:
@@ -131,6 +155,11 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
     typename = 'axis-function'
     description = 'An axis based on a function of the values of another axis'
 
+    def __init__(self, *args, **argsv):
+        axis.Axis.__init__(self, *args, **argsv)
+        self.cachedfunc = None
+        self.cachedcompfunc = None
+
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''
@@ -146,6 +175,8 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
 
         s.get('min').hidden = True
         s.get('max').hidden = True
+        s.get('autoRange').hidden = True
+        s.get('autoRange').val = 'exact'
 
     def getAxesNames(self):
         '''Axes used by widget.'''
@@ -157,15 +188,77 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
     def requiresAxesDependency(self):
         return ((None, self.settings.otheraxis),)
 
+    def logError(self, ex):
+        '''Write error message to document log for exception ex.'''
+        self.document.log(
+            _("Error in axis function: '%s'") % unicode(ex))
+
+    def getFunction(self):
+        '''Check whether function needs to be compiled.'''
+
+        # default something's-gone-wrong return
+        nanfunc = lambda t: N.nan
+
+        fn = self.settings.function.strip()
+        if fn != self.cachedfunc:
+            # check function obeys safety rules
+            checked = utils.checkCode(fn)
+            if checked is not None:
+                try:
+                    msg = checked[0][0]
+                except Exception, e:
+                    msg = e
+                logError(msg)
+                return nanfunc
+
+            # compile result
+            self.cachedfunc = fn
+            try:
+                self.cachedcompfunc = compile(fn, '<string>', 'eval')
+            except Exception, e:
+                self.cachedcompfunc = None
+                self.logError(e)
+                return nanfunc
+
+        if self.cachedcompfunc is None:
+            return nanfunc
+
+        # a python function for doing the evaluation and handling
+        # errors
+        env = self.document.eval_context.copy()
+        def function(t):
+            env['t'] = t
+            try:
+                return eval(self.cachedfunc, env)
+            except Exception, e:
+                self.logError(e)
+                return N.nan
+
+        return function
+
+    def getOtherAxis(self):
+        '''Get the widget for the other axis.'''
+        other = self.lookupAxis(self.settings.otheraxis)
+        if other is self:
+            return None
+        return other
+
     def setAutoRange(self, autorange):
-        print "AR",autorange
         axis.Axis.setAutoRange(self, autorange)
 
-        # update dependent axis with transformed values
-
+        # convert values on this axis to the other axis by solving
+        # the equation
+        other = self.getOtherAxis()
+        if other is not None:
+            try:
+                inverse = solveFunction(self.getFunction(), autorange)
+            except Exception, e:
+                self.logError(e)
+                return
+            other.setAutoRange(inverse)
 
     def getRange(self, axis, depname, axrange):
-        """Update range variable for axis with dependency name given."""
+        '''Update range variable for axis with dependency name given.'''
         print "uAR", axis, depname, axrange
 
 # allow the factory to instantiate the widget
