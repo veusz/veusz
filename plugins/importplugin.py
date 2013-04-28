@@ -324,8 +324,13 @@ class QdpFile(object):
     def handleNum(self, p):
         """Handle set of numbers."""
 
+        nums = []
         try:
-            nums = [float(x) for x in p]
+            for n in p:
+                if n.lower() == 'no':
+                    nums.append(N.nan)
+                else:
+                    nums.append(float(n))
         except ValueError:
             raise ImportPluginException(_("Cannot convert '%s' to numbers") %
                                         (' '.join(p)))
