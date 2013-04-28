@@ -342,14 +342,17 @@ class Axis(widget.Widget):
             else:
                 self.autorange = [0., 1.]
 
-    def computePlottedRange(self, force=False):
+    def computePlottedRange(self, force=False, overriderange=None):
         """Convert the range requested into a plotted range."""
 
         if self.docchangeset == self.document.changeset and not force:
             return
 
         s = self.settings
-        self.plottedrange = [s.min, s.max]
+        if overriderange is None:
+            self.plottedrange = [s.min, s.max]
+        else:
+            self.plottedrange = overriderange
 
         # match the scale of this axis to another
         matched = False
@@ -372,11 +375,11 @@ class Axis(widget.Widget):
                 matched = True
 
         # automatic lookup of minimum
-        if s.min == 'Auto' and not matched:
-            self.plottedrange[0] = self.autorange[0]
-
-        if s.max == 'Auto' and not matched:
-            self.plottedrange[1] = self.autorange[1]
+        if not matched and overriderange is None:
+            if s.min == 'Auto':
+                self.plottedrange[0] = self.autorange[0]
+            if s.max == 'Auto':
+                self.plottedrange[1] = self.autorange[1]
 
         # yuck, but sometimes it's true
         # tweak range to make sure things don't blow up further down the

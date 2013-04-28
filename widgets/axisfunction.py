@@ -157,8 +157,11 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
 
     def __init__(self, *args, **argsv):
         axis.Axis.__init__(self, *args, **argsv)
-        self.cachedfunc = None
-        self.cachedcompfunc = None
+
+        self.cachedfunctxt = None
+        self.cachedcompiled = None
+        self.cachedfuncobj = None
+        self.funcchangeset = -1
 
     @classmethod
     def addSettings(klass, s):
@@ -175,6 +178,7 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
 
         s.get('min').hidden = True
         s.get('max').hidden = True
+        s.get('match').hidden = True
         s.get('autoRange').hidden = True
         s.get('autoRange').val = 'exact'
 
@@ -196,45 +200,46 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
     def getFunction(self):
         '''Check whether function needs to be compiled.'''
 
-        # default something's-gone-wrong return
-        nanfunc = lambda t: N.nan
+        if self.funcchangeset == self.document.changeset:
+            return self.cachedfuncobj
+        self.funcchangeset = self.document.changeset
 
-        fn = self.settings.function.strip()
-        if fn != self.cachedfunc:
+        functxt = self.settings.function.strip()
+        if functxt != self.cachedfunctxt:
+            self.cachedfunctxt = functxt
+            self.cachedcompiled = None
+
             # check function obeys safety rules
-            checked = utils.checkCode(fn)
+            checked = utils.checkCode(functxt)
             if checked is not None:
                 try:
                     msg = checked[0][0]
                 except Exception, e:
                     msg = e
                 logError(msg)
-                return nanfunc
+            else:
+                # compile result
+                try:
+                    self.cachedcompiled = compile(functxt, '<string>', 'eval')
+                except Exception, e:
+                    self.logError(e)
 
-            # compile result
-            self.cachedfunc = fn
-            try:
-                self.cachedcompfunc = compile(fn, '<string>', 'eval')
-            except Exception, e:
-                self.cachedcompfunc = None
-                self.logError(e)
-                return nanfunc
+        if self.cachedcompiled is None:
+            self.cachedfuncobj = lambda t: N.nan
+        else:
+            # a python function for doing the evaluation and handling
+            # errors
+            env = self.document.eval_context.copy()
+            def function(t):
+                env['t'] = t
+                try:
+                    return eval(self.cachedcompiled, env)
+                except Exception, e:
+                    self.logError(e)
+                    return N.nan
+            self.cachedfuncobj = function
 
-        if self.cachedcompfunc is None:
-            return nanfunc
-
-        # a python function for doing the evaluation and handling
-        # errors
-        env = self.document.eval_context.copy()
-        def function(t):
-            env['t'] = t
-            try:
-                return eval(self.cachedfunc, env)
-            except Exception, e:
-                self.logError(e)
-                return N.nan
-
-        return function
+        return self.cachedfuncobj
 
     def getOtherAxis(self):
         '''Get the widget for the other axis.'''
@@ -260,6 +265,30 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
     def getRange(self, axis, depname, axrange):
         '''Update range variable for axis with dependency name given.'''
         print "uAR", axis, depname, axrange
+
+    def computePlottedRange(self, force=False):
+        '''Use other axis to compute range.'''
+
+        if self.docchangeset == self.document.changeset and not force:
+            return
+
+        therange = None
+
+        other = self.lookupAxis(self.settings.otheraxis)
+        if other is not None:
+            # compute our range from the other axis
+
+            #other.computePlottedRange()
+            print other.autorange, other.plottedrange
+
+            try:
+                fn = self.getFunction()
+                therange = fn(N.array(other.plottedrange)) * N.ones(2)
+            except Exception, e:
+                self.logError(e)
+
+        axis.Axis.computePlottedRange(self, force=force,
+                                      overriderange=therange)
 
 # allow the factory to instantiate the widget
 document.thefactory.register( AxisFunction )
