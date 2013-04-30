@@ -323,8 +323,8 @@ class Dataset2D(DatasetBase):
             return
 
         fileobj.write("ImportString2D(%s, '''\n" % repr(name))
-        fileobj.write("xrange %e %e\n" % self.xrange)
-        fileobj.write("yrange %e %e\n" % self.yrange)
+        fileobj.write("xrange %e %e\n" % tuple(self.xrange))
+        fileobj.write("yrange %e %e\n" % tuple(self.yrange))
         fileobj.write(self.datasetAsText(fmt='%e', join=' '))
         fileobj.write("''')\n")
 
