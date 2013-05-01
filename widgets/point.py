@@ -382,7 +382,7 @@ class PointPlotter(GenericPlotter):
             function(style, xmin, xmax, ymin, ymax,
                      xplotter, yplotter, s, painter, cliprect)
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """This widget provides range information about these axes."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )

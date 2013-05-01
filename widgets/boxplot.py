@@ -232,7 +232,7 @@ class BoxPlot(GenericPlotter):
         return "values='%s', position='%s'" % (
             ', '.join(s.values),  s.posn)
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """This widget provides range information about these axes."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )

@@ -177,7 +177,7 @@ class Fit(FunctionPlotter):
         s.get('min').usertext=_('Min. fit range')
         s.get('max').usertext=_('Max. fit range')
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """This widget provides range information about these axes."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )

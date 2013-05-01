@@ -331,7 +331,7 @@ class Contour(plotters.GenericPlotter):
 
         return slev
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """Range information provided by widget."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )

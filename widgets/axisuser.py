@@ -35,14 +35,14 @@ class AxisUser(object):
             w = w.parent
         return None
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """Returns information on the following axes.
         format is ( ('x', 'sx'), ('y', 'sy') )
         where key is the axis and value is a provided bound
         """
         return ()
 
-    def requiresAxesDependency(self):
+    def requiresAxisRange(self):
         """Requires information about the axis given before providing
         information.
         Format (('sx', 'x'), ('sy', 'y'))

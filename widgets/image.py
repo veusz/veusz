@@ -150,7 +150,7 @@ class Image(plotters.GenericPlotter):
             cmap, s.colorScaling, data.data, minval, maxval,
             s.transparency, transimg=transimg)
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """Range information provided by widget."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )

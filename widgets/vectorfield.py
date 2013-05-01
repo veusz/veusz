@@ -105,7 +105,7 @@ class VectorField(plotters.GenericPlotter):
                                  usertext = _('Arrow fill')),
                pixmap = 'settings_plotmarkerfill' )
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """Range information provided by widget."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )

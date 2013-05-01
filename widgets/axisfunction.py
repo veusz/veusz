@@ -186,10 +186,10 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
         '''Axes used by widget.'''
         return (self.settings.otheraxis,)
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         return ((self.settings.otheraxis, None),)
 
-    def requiresAxesDependency(self):
+    def requiresAxisRange(self):
         return ((None, self.settings.otheraxis),)
 
     def logError(self, ex):
