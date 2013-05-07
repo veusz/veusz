@@ -46,7 +46,7 @@ def _(text, disambiguation=None, context='Page'):
 
 defaultrange = [1e99, -1e99]
 
-class _AxisDependHelper(object):
+class AxisDependHelper(object):
     """A class to work out the dependency of widgets on axes and vice
     versa, in terms of ranges of the axes.
 
@@ -55,6 +55,28 @@ class _AxisDependHelper(object):
     plotters).
 
     It then works out the ranges for each of the axes from the plotters.
+
+    connection types:
+      plotter->axis : axis needs to know data range
+      axis->plotter : plotter needs to know axis range
+      axis<->axis   : axes are mutually dependent
+
+    aim: calculate ranges of axes given plotters
+
+    problem: cycles in the graph
+
+    f1<-x: function f1 depends on axis x
+    f2<-y: function f2 depends on axis y
+    y<-f1: axis y depends on function f1
+    x<-f2: axis x depends on function f2
+
+    solution: break dependency cycle: choose somewhere - probably better
+    to choose where widget depends on axis
+
+    however, axis<->axis cycle can't be broken
+
+    additional solution: convert all dependencies on axis1 or axis2 to
+    axiscomb
     """
 
     def __init__(self, root):
@@ -109,6 +131,32 @@ class _AxisDependHelper(object):
         for c in widget.children:
             self.recursivePlotterSearch(c)
 
+    def breakCycles(self, origcyclic):
+        """Remove cycles if possible."""
+
+        numcyclic = len(origcyclic)
+        best = -1
+
+        for i in xrange(len(self.pairs)):
+            if hasattr(self.pairs[i][0][0], 'isaxis'):
+                print self.pairs[i]
+                continue
+
+            p = self.pairs[:i] + self.pairs[i+1:]
+            ordered, cyclic = utils.topological_sort(p)
+            if len(cyclic) <= numcyclic:
+                numcyclic = len(cyclic)
+                best = i
+
+        print best
+
+        # delete best, or last one if none better found
+        p = self.pairs[best]
+        del self.pairs[best]
+
+        idx = self.deps[p[1]].index(p[0])
+        del self.deps[p[1]][idx]
+
     def findPlotters(self):
         """Construct a list of plotters associated with each axis.
         Returns nodes:
@@ -118,19 +166,6 @@ class _AxisDependHelper(object):
         """
 
         self.recursivePlotterSearch(self.root)
-
-        for p1, p2 in self.pairs:
-            print '%s,%s -> %s,%s' % (p1[0].name, p1[1], p2[0].name, p2[1])
-
-        ordered, cyclic = utils.topological_sort(self.pairs)
-        print ordered
-        print cyclic
-
-        print
-        for p in utils.topsort(self.pairs):
-            print ' %s,%s ->' % (p[0].name, p[1])
-        print
-
         self.ranges = dict( [(a, list(defaultrange)) for a in self.axes] )
 
     def processDepends(self):
@@ -153,8 +188,15 @@ class _AxisDependHelper(object):
         def _isokaxis(widget):
             return hasattr(widget, 'isaxis') and widget in self.ranges
 
+        # get ordered list, breaking cycles
+        while True:
+            ordered, cyclic = utils.topological_sort(self.pairs)
+            if not cyclic:
+                break
+            self.breakCycles(cyclic)
+
         # iterate over widgets in order
-        for dep in utils.topsort(self.pairs):
+        for dep in ordered:
             widget, widget_dep = dep
 
             # iterate over dependent widgets
@@ -227,7 +269,7 @@ class Page(widget.Widget):
         x1, y1, x2, y2 = parentposn
 
         # find ranges of axes
-        axisdependhelper = _AxisDependHelper(self)
+        axisdependhelper = AxisDependHelper(self)
         axisdependhelper.findPlotters()
         axisdependhelper.findAxisRanges()
 
