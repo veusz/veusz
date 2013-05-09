@@ -27,8 +27,6 @@ import numpy as N
 import veusz.setting as setting
 
 import widget
-import graph
-import page
 
 def _(text, disambiguation=None, context='Plotters'):
     """Translate text."""
@@ -39,12 +37,16 @@ class GenericPlotter(widget.Widget):
     """Generic plotter."""
 
     typename='genericplotter'
-    allowedparenttypes=[graph.Graph]
     isplotter = True
 
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
+
+    @classmethod
+    def allowedParentTypes(self):
+        import graph
+        return (graph.Graph,)
 
     @classmethod
     def addSettings(klass, s):
@@ -121,31 +123,6 @@ class GenericPlotter(widget.Widget):
 
         return axes
 
-    def draw(self, parentposn, painthelper, outerbounds = None):
-        """Draw for generic plotters."""
-
-        posn = self.computeBounds(parentposn, painthelper)
-
-        # exit if hidden or function blank
-        if self.settings.hide:
-            return
-
-        # get axes widgets
-        axes = self.fetchAxes()
-        if not axes:
-            return
-
-        # clip data within bounds of plotter
-        cliprect = self.clipAxesBounds(axes, posn)
-        painter = painthelper.painter(self, posn, clip=cliprect)
-        with painter:
-            self.dataDraw(painter, axes, posn, cliprect)
-        return posn
-
-    def getAxesNames(self):
-        """Returns names of axes used."""
-        return ()
-
     def lookupAxis(self, axisname):
         """Find widget associated with axisname."""
         w = self.parent
@@ -174,6 +151,27 @@ class GenericPlotter(widget.Widget):
         """Update range variable for axis with dependency name given."""
         pass
 
+    def draw(self, parentposn, painthelper, outerbounds = None):
+        """Draw for generic plotters."""
+
+        posn = self.computeBounds(parentposn, painthelper)
+
+        # exit if hidden or function blank
+        if self.settings.hide:
+            return
+
+        # get axes widgets
+        axes = self.fetchAxes()
+        if not axes:
+            return
+
+        # clip data within bounds of plotter
+        cliprect = self.clipAxesBounds(axes, posn)
+        painter = painthelper.painter(self, posn, clip=cliprect)
+        with painter:
+            self.dataDraw(painter, axes, posn, cliprect)
+        return posn
+
     def dataDraw(self, painter, axes, posn, cliprect):
         """Actually plot the data."""
         pass
@@ -181,10 +179,14 @@ class GenericPlotter(widget.Widget):
 class FreePlotter(widget.Widget):
     """A plotter which can be plotted on the page or in a graph."""
 
-    allowedparenttypes = [graph.Graph, page.Page]
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
+
+    @classmethod
+    def allowedParentTypes(self):
+        import page, graph
+        return (graph.Graph, page.Page)
 
     @classmethod
     def addSettings(klass, s):

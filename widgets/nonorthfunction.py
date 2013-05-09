@@ -42,8 +42,6 @@ class NonOrthFunction(Widget):
     allowusercreation = True
     description = _('Plot a function on graphs with non-orthogonal axes')
 
-    allowedparenttypes = [NonOrthGraph]
-
     def __init__(self, parent, name=None):
         '''Initialise plotter.'''
         Widget.__init__(self, parent, name=name)
@@ -89,6 +87,10 @@ class NonOrthFunction(Widget):
                            descr = _('Number of steps to evaluate the function'
                                      ' over'),
                            usertext=_('Steps'), formatting=True), 0 )
+
+    @classmethod
+    def allowedParentTypes(self):
+        return (NonOrthGraph,)
 
     def initEnviron(self):
         '''Set up function environment.'''

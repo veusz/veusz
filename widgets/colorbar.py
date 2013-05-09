@@ -26,11 +26,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import graph
-import grid
 import widget
 import axis
-import nonorthgraph
 
 def _(text, disambiguation=None, context='ColorBar'):
     """Translate text."""
@@ -44,7 +41,6 @@ class ColorBar(axis.Axis):
     """
 
     typename='colorbar'
-    allowedparenttypes = [graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph]
     allowusercreation = True
     description = _('Image color bar')
 
@@ -103,6 +99,11 @@ class ColorBar(axis.Axis):
                pixmap='settings_border')
 
         s.add( setting.SettingBackwardCompat('image', 'widgetName', None) )
+
+    @classmethod
+    def allowedParentTypes(self):
+        import graph, grid, nonorthgraph
+        return (graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph)
 
     def chooseName(self):
         """Get name of widget."""

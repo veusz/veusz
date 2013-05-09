@@ -26,7 +26,6 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import widget
-import root
 import controlgraph
 import axis
 import plotters
@@ -222,7 +221,6 @@ class Page(widget.Widget):
 
     typename='page'
     allowusercreation = True
-    allowedparenttypes = [root.Root]
     description=_('Blank page')
 
     def __init__(self, parent, name=None):
@@ -248,6 +246,11 @@ class Page(widget.Widget):
                 descr=_('Height of page'),
                 usertext=_('Page height'),
                 formatting=True) )
+
+    @classmethod
+    def allowedParentTypes(self):
+        import root
+        return (root.Root,)
         
     def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""

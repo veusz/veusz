@@ -24,7 +24,6 @@ import veusz.document as document
 import veusz.setting as setting
 
 import widget
-import page
 import graph
 import controlgraph
 
@@ -145,7 +144,6 @@ class Grid(widget.Widget):
     typename='grid'
     allowusercreation=True
     description='Arrange graphs in a grid'
-    allowedparenttypes=[page.Page]
 
     def __init__(self, parent, name=None):
         """Initialise the grid.
@@ -215,6 +213,11 @@ class Grid(widget.Widget):
                                  'to edge of page',
                                  usertext='Bottom margin',
                                  formatting=True) )
+
+    @classmethod
+    def allowedParentTypes(self):
+        import page
+        return (page.Page, Grid)
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -375,9 +378,6 @@ class Grid(widget.Widget):
     def updateControlItem(self, cgi):
         """Grid resized or moved - call helper routine to move self."""
         cgi.setWidgetMargins()
-
-# can't refer to Grid in Grid definition
-Grid.allowedparenttypes.append( Grid )
 
 # allow the factory to instantiate a grid
 document.thefactory.register( Grid )

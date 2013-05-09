@@ -26,8 +26,6 @@ import veusz.utils as utils
 import veusz.document as document
 
 import widget
-import page
-import grid
 import controlgraph
 
 def _(text, disambiguation=None, context='Graph'):
@@ -39,7 +37,6 @@ class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = (page.Page, grid.Grid)
     allowusercreation = True
     description = _('Base graph')
 
@@ -81,7 +78,12 @@ class Graph(widget.Widget):
         s.add( setting.Line('Border', descr = _('Graph border line'),
                             usertext=_('Border')),
                pixmap='settings_border')
-        
+
+    @classmethod
+    def allowedParentTypes(self):
+        import page, grid
+        return (page.Page, grid.Grid)
+
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 

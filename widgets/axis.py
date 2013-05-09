@@ -28,8 +28,6 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import widget
-import graph
-import grid
 import axisticks
 import controlgraph
 
@@ -174,7 +172,6 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = (graph.Graph, grid.Grid)
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
     isaxis = True
@@ -320,6 +317,11 @@ class Axis(widget.Widget):
                              descr = _('Minor grid line settings'),
                              usertext = _('Grid lines for minor ticks')),
                pixmap='settings_axisminorgridlines' )
+
+    @classmethod
+    def allowedParentTypes(self):
+        import graph, grid
+        return (graph.Graph, grid.Grid)
 
     def _getUserDescription(self):
         """User friendly description."""

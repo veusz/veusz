@@ -81,7 +81,7 @@ def processWidgetType(root, name):
     except AttributeError:
         pass
 
-    for parent in [k for k in klass.allowedparenttypes if k is not None]:
+    for parent in [k for k in klass.allowedParentTypes() if k is not None]:
         ET.SubElement(widgetxml, "allowedparent").text = parent.typename
 
     ET.SubElement(widgetxml, "usercreation").text = str(klass.allowusercreation)

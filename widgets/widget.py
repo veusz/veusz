@@ -62,9 +62,6 @@ class Widget(object):
     typename = 'generic'
     allowusercreation = False
 
-    # list of allowed types this can have as a parent
-    allowedparenttypes = []
-
     def __init__(self, parent, name=None):
         """Initialise a blank widget."""
 
@@ -96,6 +93,11 @@ class Widget(object):
 
         # actions for widget
         self.actions = []
+
+    @classmethod
+    def allowedParentTypes(self):
+        """Get types of widgets this can be a child of."""
+        return ()
 
     @classmethod
     def addSettings(klass, s):
@@ -152,16 +154,16 @@ class Widget(object):
         """Is the parent a suitable type?"""
 
         return parent is None or any(
-            ( isinstance(parent, t) for t in self.allowedparenttypes ) )
+            ( isinstance(parent, t) for t in self.allowedParentTypes() ) )
 
     def willAllowParent(cls, parent):
         """Is the parent of an allowed type to have this type as a child?"""
 
         # allow base widget to have no parent
-        ap = cls.allowedparenttypes 
+        ap = cls.allowedParentTypes()
         if parent is None and len(ap) > 0 and ap[0] is None:
             return True
-        
+
         for p in ap:
             if isinstance(parent, p):
                 return True

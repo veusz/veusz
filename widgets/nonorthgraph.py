@@ -20,8 +20,6 @@
 
 import controlgraph
 from widget import Widget
-from page import Page
-from grid import Grid
 
 import veusz.qtall as qt4
 import veusz.setting as setting
@@ -45,8 +43,6 @@ class FillBrush(setting.BrushExtended):
 
 class NonOrthGraph(Widget):
     '''Non-orthogonal graph base widget.'''
-
-    allowedparenttypes = [Page, Grid]
 
     @classmethod
     def addSettings(klass, s):
@@ -80,6 +76,11 @@ class NonOrthGraph(Widget):
         s.add( setting.Line('Border', descr = _('Graph border line'),
                             usertext=_('Border')),
                pixmap='settings_border')
+
+    @classmethod
+    def allowedParentTypes(self):
+        import page, grid
+        return (page.Page, grid.Grid)
 
     def graphToPlotCoords(self, coorda, coordb):
         '''Convert graph to plotting coordinates.
