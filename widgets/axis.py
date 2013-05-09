@@ -342,6 +342,10 @@ class Axis(widget.Widget):
             else:
                 self.autorange = [0., 1.]
 
+    def usesAutoRange(self):
+        """Return whether any of the bounds are automatically determined."""
+        return self.settings.min == 'Auto' or self.settings.max == 'Auto'
+
     def computePlottedRange(self, force=False, overriderange=None):
         """Convert the range requested into a plotted range."""
 

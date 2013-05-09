@@ -30,15 +30,6 @@ import root
 import controlgraph
 import axisuser
 
-# x, y, fplot, xyplot
-# x-> xyplot(x)
-# y-> xyplot(y)
-# fplot(y) -> x
-# y -> fplot(y)
-
-# x -> xyplot(x)
-# y -> (xyplot(y), fplot(y) -> x)
-
 def _(text, disambiguation=None, context='Page'):
     """Translate text."""
     return unicode( 
@@ -88,6 +79,8 @@ class AxisDependHelper(object):
         self.axes = []
         # list of plotters associated with each axis
         self.axis_plotter_map = collections.defaultdict(list)
+        # ranges for each axis
+        self.ranges = {}
         # pairs of dependent widgets
         self.pairs = []
 
@@ -113,20 +106,24 @@ class AxisDependHelper(object):
             # widget can provide range information about
             for axname, depname in widget.affectsAxisRange():
                 axis = widgetaxes[axname]
-                p1, p2 = (axis, None), (widget, depname)
-                self.deps[p1].append(p2)
-                self.pairs.append( (p2, p1) )
+                if axis.usesAutoRange():
+                    # only add dependency if axis has an automatic range
+                    p1, p2 = (axis, None), (widget, depname)
+                    self.deps[p1].append(p2)
+                    self.pairs.append( (p2, p1) )
 
             # find which axes the axis-user needs information from
             for depname, axname in widget.requiresAxisRange():
                 axis = widgetaxes[axname]
-                p2, p1 = (axis, None), (widget, depname)
-                self.deps[p1].append(p2)
-                self.pairs.append( (p2, p1) )
+                if axis.usesAutoRange():
+                    p2, p1 = (axis, None), (widget, depname)
+                    self.deps[p1].append(p2)
+                    self.pairs.append( (p2, p1) )
 
         if hasattr(widget, 'isaxis'):
             # keep track of all axis widgets
             self.axes.append(widget)
+            self.ranges[widget] = list(defaultrange)
 
         for c in widget.children:
             self.recursivePlotterSearch(c)
@@ -138,17 +135,12 @@ class AxisDependHelper(object):
         best = -1
 
         for i in xrange(len(self.pairs)):
-            if hasattr(self.pairs[i][0][0], 'isaxis'):
-                print self.pairs[i]
-                continue
-
-            p = self.pairs[:i] + self.pairs[i+1:]
-            ordered, cyclic = utils.topological_sort(p)
-            if len(cyclic) <= numcyclic:
-                numcyclic = len(cyclic)
-                best = i
-
-        print best
+            if not hasattr(self.pairs[i][0][0], 'isaxis'):
+                p = self.pairs[:i] + self.pairs[i+1:]
+                ordered, cyclic = utils.topological_sort(p)
+                if len(cyclic) <= numcyclic:
+                    numcyclic = len(cyclic)
+                    best = i
 
         # delete best, or last one if none better found
         p = self.pairs[best]
@@ -166,7 +158,6 @@ class AxisDependHelper(object):
         """
 
         self.recursivePlotterSearch(self.root)
-        self.ranges = dict( [(a, list(defaultrange)) for a in self.axes] )
 
     def processDepends(self):
         """Go through dependencies of widget.
@@ -180,13 +171,6 @@ class AxisDependHelper(object):
           have a dependency itself, update range from that
           widget. Then delete that depency from the dependency list.
         """
-
-        def _isokuser(widget):
-            return ( isinstance(widget, axisuser.AxisUser) and
-                     (not widget.settings.isSetting('hide') or
-                      not widget.settings.hide) )
-        def _isokaxis(widget):
-            return hasattr(widget, 'isaxis') and widget in self.ranges
 
         # get ordered list, breaking cycles
         while True:
@@ -202,12 +186,14 @@ class AxisDependHelper(object):
             # iterate over dependent widgets
             for widgetd, widgetd_dep in self.deps[dep]:
 
-                if _isokuser(widgetd):
+                if ( isinstance(widgetd, axisuser.AxisUser) and
+                     (not widgetd.settings.isSetting('hide') or
+                      not widgetd.settings.hide) ):
                     # update range of axis with (widgetd, widgetd_dep)
                     # do not do this if the widget is hidden
                     widgetd.getRange(widget, widgetd_dep, self.ranges[widget])
 
-                if _isokaxis(widgetd):
+                if hasattr(widgetd, 'isaxis') and widgetd in self.ranges:
                     # set actual range on axis, as axis no longer has a
                     # dependency
                     axrange = self.ranges[widgetd]
