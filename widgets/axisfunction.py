@@ -26,7 +26,6 @@ import veusz.document as document
 import veusz.utils as utils
 
 import axis
-import axisuser
 
 def _(text, disambiguation=None, context='FunctionAxis'):
     '''Translate text.'''
@@ -149,7 +148,7 @@ def solveFunction(function, vals):
 
     return out
 
-class AxisFunction(axis.Axis, axisuser.AxisUser):
+class AxisFunction(axis.Axis):
     '''An axis using an function of another axis.'''
 
     typename = 'axis-function'
@@ -181,16 +180,6 @@ class AxisFunction(axis.Axis, axisuser.AxisUser):
         s.get('match').hidden = True
         s.get('autoRange').hidden = True
         s.get('autoRange').val = 'exact'
-
-    def getAxesNames(self):
-        '''Axes used by widget.'''
-        return (self.settings.otheraxis,)
-
-    def affectsAxisRange(self):
-        return ((self.settings.otheraxis, None),)
-
-    def requiresAxisRange(self):
-        return ((None, self.settings.otheraxis),)
 
     def logError(self, ex):
         '''Write error message to document log for exception ex.'''

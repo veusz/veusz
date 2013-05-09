@@ -29,14 +29,13 @@ import veusz.setting as setting
 import widget
 import graph
 import page
-import axisuser
 
 def _(text, disambiguation=None, context='Plotters'):
     """Translate text."""
     return unicode( 
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
-class GenericPlotter(widget.Widget, axisuser.AxisUser):
+class GenericPlotter(widget.Widget):
     """Generic plotter."""
 
     typename='genericplotter'
@@ -142,6 +141,38 @@ class GenericPlotter(widget.Widget, axisuser.AxisUser):
         with painter:
             self.dataDraw(painter, axes, posn, cliprect)
         return posn
+
+    def getAxesNames(self):
+        """Returns names of axes used."""
+        return ()
+
+    def lookupAxis(self, axisname):
+        """Find widget associated with axisname."""
+        w = self.parent
+        while w:
+            for c in w.children:
+                if c.name == axisname and hasattr(c, 'isaxis'):
+                    return c
+            w = w.parent
+        return None
+
+    def affectsAxisRange(self):
+        """Returns information on the following axes.
+        format is ( ('x', 'sx'), ('y', 'sy') )
+        where key is the axis and value is a provided bound
+        """
+        return ()
+
+    def requiresAxisRange(self):
+        """Requires information about the axis given before providing
+        information.
+        Format (('sx', 'x'), ('sy', 'y'))
+        """
+        return ()
+
+    def getRange(self, axis, depname, therange):
+        """Update range variable for axis with dependency name given."""
+        pass
 
     def dataDraw(self, painter, axes, posn, cliprect):
         """Actually plot the data."""

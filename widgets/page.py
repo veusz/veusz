@@ -28,7 +28,8 @@ import veusz.utils as utils
 import widget
 import root
 import controlgraph
-import axisuser
+import axis
+import plotters
 
 def _(text, disambiguation=None, context='Page'):
     """Translate text."""
@@ -93,7 +94,7 @@ class AxisDependHelper(object):
         part of the plotter, e.g. "sx" or "sy" for x or y.
         """
 
-        if isinstance(widget, axisuser.AxisUser):
+        if isinstance(widget, plotters.GenericPlotter):
 
             # keep track of which widgets depend on which axes
             widgetaxes = {}
@@ -102,8 +103,8 @@ class AxisDependHelper(object):
                 widgetaxes[axname] = axis
                 self.axis_plotter_map[axis].append(widget)
 
-            # if the widget is a user of an axis, find which axes the
-            # widget can provide range information about
+            # if the widget is a plotter, find which axes the widget
+            # can provide range information about
             for axname, depname in widget.affectsAxisRange():
                 axis = widgetaxes[axname]
                 if axis.usesAutoRange():
@@ -112,7 +113,7 @@ class AxisDependHelper(object):
                     self.deps[p1].append(p2)
                     self.pairs.append( (p2, p1) )
 
-            # find which axes the axis-user needs information from
+            # find which axes the plotter needs information from
             for depname, axname in widget.requiresAxisRange():
                 axis = widgetaxes[axname]
                 if axis.usesAutoRange():
@@ -186,7 +187,7 @@ class AxisDependHelper(object):
             # iterate over dependent widgets
             for widgetd, widgetd_dep in self.deps[dep]:
 
-                if ( isinstance(widgetd, axisuser.AxisUser) and
+                if ( isinstance(widgetd, plotters.GenericPlotter) and
                      (not widgetd.settings.isSetting('hide') or
                       not widgetd.settings.hide) ):
                     # update range of axis with (widgetd, widgetd_dep)
