@@ -154,6 +154,8 @@ class AxisFunction(axis.Axis):
     typename = 'axis-function'
     description = 'An axis based on a function of the values of another axis'
 
+    isaxisfunction = True
+
     def __init__(self, *args, **argsv):
         axis.Axis.__init__(self, *args, **argsv)
 
@@ -230,30 +232,28 @@ class AxisFunction(axis.Axis):
 
         return self.cachedfuncobj
 
+    def invertFunctionVals(self, vals):
+        '''Convert values which are a function of fn and compute t.'''
+        fn = self.getFunction()
+        return solveFunction(fn, vals)
+
+    def lookupAxis(self, axisname):
+        '''Find widget associated with axisname.'''
+        w = self.parent
+        while w:
+            for c in w.children:
+                if ( c.name == axisname and hasattr(c, 'isaxis') and
+                     c is not self ):
+                    return c
+            w = w.parent
+        return None
+
     def getOtherAxis(self):
         '''Get the widget for the other axis.'''
         other = self.lookupAxis(self.settings.otheraxis)
         if other is self:
             return None
         return other
-
-    def setAutoRange(self, autorange):
-        axis.Axis.setAutoRange(self, autorange)
-
-        # convert values on this axis to the other axis by solving
-        # the equation
-        other = self.getOtherAxis()
-        if other is not None:
-            try:
-                inverse = solveFunction(self.getFunction(), autorange)
-            except Exception, e:
-                self.logError(e)
-                return
-            other.setAutoRange(inverse)
-
-    def getRange(self, axis, depname, axrange):
-        '''Update range variable for axis with dependency name given.'''
-        print "uAR", axis, depname, axrange
 
     def computePlottedRange(self, force=False):
         '''Use other axis to compute range.'''
@@ -267,8 +267,7 @@ class AxisFunction(axis.Axis):
         if other is not None:
             # compute our range from the other axis
 
-            #other.computePlottedRange()
-            print other.autorange, other.plottedrange
+            other.computePlottedRange()
 
             try:
                 fn = self.getFunction()
