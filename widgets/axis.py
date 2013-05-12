@@ -398,7 +398,7 @@ class Axis(widget.Widget):
         # handle axis values round the wrong way
         invertaxis = self.plottedrange[0] > self.plottedrange[1]
         if invertaxis:
-            self.plottedrange.reverse()
+            self.plottedrange = self.plottedrange[::-1]
 
         # make sure log axes don't blow up
         if s.log:
@@ -437,7 +437,7 @@ class Axis(widget.Widget):
 
         # invert bounds if axis was inverted
         if invertaxis:
-            self.plottedrange.reverse()
+            self.plottedrange = self.plottedrange[::-1]
 
         self.docchangeset = self.document.changeset
 
