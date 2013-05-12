@@ -188,7 +188,7 @@ class AxisFunction(axis.Axis):
     def logError(self, ex):
         '''Write error message to document log for exception ex.'''
         self.document.log(
-            _("Error in axis function: '%s'") % unicode(ex))
+            _("Error in axis-function: '%s'") % unicode(ex))
 
     def getFunction(self):
         '''Check whether function needs to be compiled.'''
@@ -209,7 +209,7 @@ class AxisFunction(axis.Axis):
                     msg = checked[0][0]
                 except Exception, e:
                     msg = e
-                logError(msg)
+                self.logError(msg)
             else:
                 # compile result
                 try:
@@ -218,7 +218,7 @@ class AxisFunction(axis.Axis):
                     self.logError(e)
 
         if self.cachedcompiled is None:
-            self.cachedfuncobj = lambda t: N.nan
+            self.cachedfuncobj = None
         else:
             # a python function for doing the evaluation and handling
             # errors
@@ -237,7 +237,13 @@ class AxisFunction(axis.Axis):
     def invertFunctionVals(self, vals):
         '''Convert values which are a function of fn and compute t.'''
         fn = self.getFunction()
-        return solveFunction(fn, vals)
+        if fn is None:
+            return None
+        try:
+            return solveFunction(fn, vals)
+        except Exception, e:
+            self.logError(e)
+            return None
 
     def lookupAxis(self, axisname):
         '''Find widget associated with axisname.'''
@@ -266,11 +272,11 @@ class AxisFunction(axis.Axis):
         therange = None
 
         other = self.getOtherAxis()
-        if other is not None:
+        fn = self.getFunction()
+        if other is not None and fn is not None:
             # compute our range from the other axis
             other.computePlottedRange()
             try:
-                fn = self.getFunction()
                 therange = fn(N.array(other.plottedrange)) * N.ones(2)
             except Exception, e:
                 self.logError(e)
@@ -310,13 +316,15 @@ class AxisFunction(axis.Axis):
                 ))
 
         other = self.getOtherAxis()
-        if other is None:
-            self.graphcoords = self.pixcoords = None
-            self.graphcoords_inv = self.pixcoords_inv = None
-        else:
+        self.graphcoords = None
+        if other is not None:
             # lookup what pixels are on other axis
             othercoordvals = other.plotterToGraphCoords(bounds, pixcoords)
-            ourgraphcoords = self.getFunction()(othercoordvals)
+
+            try:
+                ourgraphcoords = self.getFunction()(othercoordvals)
+            except Exception, e:
+                return
 
             # Select only finite vals. We store _inv coords separately
             # as linear interpolation requires increasing values.

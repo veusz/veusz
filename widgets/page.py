@@ -205,7 +205,7 @@ class AxisDependHelper(object):
                     axis = axis.getOtherAxis()
                     if axis in loopcheck:
                         axis = None
-                if axis is not None:
+                if axis is not None and therange is not None:
                     self.ranges[axis] = [
                         N.nanmin((self.ranges[axis][0], therange[0])),
                         N.nanmax((self.ranges[axis][1], therange[1]))
