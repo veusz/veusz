@@ -162,7 +162,9 @@ class AxisFunction(axis.Axis):
         self.cachedfunctxt = None
         self.cachedcompiled = None
         self.cachedfuncobj = None
+        self.cachedbounds = None
         self.funcchangeset = -1
+        self.boundschangeset = -1
 
     @classmethod
     def addSettings(klass, s):
@@ -263,12 +265,10 @@ class AxisFunction(axis.Axis):
 
         therange = None
 
-        other = self.lookupAxis(self.settings.otheraxis)
+        other = self.getOtherAxis()
         if other is not None:
             # compute our range from the other axis
-
             other.computePlottedRange()
-
             try:
                 fn = self.getFunction()
                 therange = fn(N.array(other.plottedrange)) * N.ones(2)
@@ -277,6 +277,74 @@ class AxisFunction(axis.Axis):
 
         axis.Axis.computePlottedRange(self, force=force,
                                       overriderange=therange)
+
+    def updateAxisLocation(self, bounds, otherposition=None,
+                           lowerupperposition=None):
+        """Calculate conversion from pixels to axis values."""
+
+        if ( self.boundschangeset == self.document.changeset and
+             bounds == self.cachedbounds ):
+            # don't recalculate unless document updated or bounds changes
+            return
+        self.cachedbounds = list(bounds)
+        self.boundschangeset = self.document.changeset
+
+        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
+                                     lowerupperposition=lowerupperposition)
+
+        if self.settings.direction == 'horizontal':
+            p1, p2 = bounds[0], bounds[2]
+        else:
+            p1, p2 = bounds[1], bounds[3]
+        w = p2-p1
+
+        # To do the inverse calculation, we define a grid of pixel
+        # values.  We need some sensitivity outside the axis range to
+        # get angles of lines correct.
+        pixcoords = N.hstack((
+                N.linspace(p1-10.*w, p1-2.0*w, 5),
+                N.linspace(p1-2.0*w, p1-0.2*w, 25),
+                N.linspace(p1-0.2*w, p2+0.2*w, 250),
+                N.linspace(p2+0.2*w, p2+2.0*w, 25),
+                N.linspace(p2+2.0*w, p2+10.*w, 5)
+                ))
+
+        other = self.getOtherAxis()
+        if other is None:
+            self.graphcoords = self.pixcoords = None
+            self.graphcoords_inv = self.pixcoords_inv = None
+        else:
+            # lookup what pixels are on other axis
+            othercoordvals = other.plotterToGraphCoords(bounds, pixcoords)
+            ourgraphcoords = self.getFunction()(othercoordvals)
+
+            # Select only finite vals. We store _inv coords separately
+            # as linear interpolation requires increasing values.
+            f = N.isfinite(othercoordvals + ourgraphcoords)
+            self.graphcoords = self.graphcoords_inv = ourgraphcoords[f]
+            self.pixcoords = self.pixcoords_inv = pixcoords[f]
+
+            if self.graphcoords[0] > self.graphcoords[-1]:
+                # order must be increasing (for forward conversion)
+                self.graphcoords = self.graphcoords[::-1]
+                self.pixcoords = self.pixcoords[::-1]
+
+    def _graphToPlotter(self, vals):
+        """Override normal axis graph->plotter coords to do lookup."""
+        if self.graphcoords is None:
+            return axis.Axis._graphToPlotter(self, vals)
+        else:
+            # do linear interpolation on previously calculated values
+            return N.interp(vals, self.graphcoords, self.pixcoords)
+
+    def plotterToGraphCoords(self, bounds, vals):
+        """Override normal axis plotter->graph coords to do lookup."""
+        if self.graphcoords is None:
+            return axis.Axis.plotterToGraphCoords(self, bounds, vals)
+        else:
+            self.updateAxisLocation(bounds)
+            # do linear interpolation on previously calculated (inverse) values
+            return N.interp(vals, self.pixcoords_inv, self.graphcoords_inv)
 
 # allow the factory to instantiate the widget
 document.thefactory.register( AxisFunction )
