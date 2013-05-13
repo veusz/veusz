@@ -112,7 +112,7 @@ class AxisDependHelper(object):
         part of the plotter, e.g. "sx" or "sy" for x or y.
         """
 
-        if hasattr(widget, 'isplotter'):
+        if widget.isplotter:
             # keep track of which widgets depend on which axes
             widgetaxes = {}
             for axname in widget.getAxesNames():
@@ -140,7 +140,7 @@ class AxisDependHelper(object):
                     self.pairs.append( ((resolvedaxis, None),
                                         (widget, depname)) )
 
-        elif hasattr(widget, 'isaxis'):
+        elif widget.isaxis:
             if hasattr(widget, 'isaxisfunction'):
                 pass
                 # function of another axis
@@ -163,7 +163,7 @@ class AxisDependHelper(object):
         best = -1
 
         for i in xrange(len(self.pairs)):
-            if not hasattr(self.pairs[i][0][0], 'isaxis'):
+            if not self.pairs[i][0][0].isaxis:
                 p = self.pairs[:i] + self.pairs[i+1:]
                 ordered, cyclic = utils.topological_sort(p)
                 if len(cyclic) <= numcyclic:
@@ -221,12 +221,12 @@ class AxisDependHelper(object):
         for widgetd, widgetd_dep in self.deps[dep]:
 
             # print "Dep: ", widget.name, widgetd.name
-            if ( hasattr(widgetd, 'isplotter') and
+            if ( widgetd.isplotter and
                  (not widgetd.settings.isSetting('hide') or
                   not widgetd.settings.hide) ):
                 self._updateRangeFromPlotter(widget, widgetd, widgetd_dep)
 
-            elif hasattr(widgetd, 'isaxis'):
+            elif widgetd.isaxis:
                 axis = _resolveAxisFunction(widgetd)
                 if axis in self.ranges:
                     self._updateAxisAutoRange(axis)

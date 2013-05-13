@@ -35,18 +35,23 @@ def _(text, disambiguation=None, context='FunctionAxis'):
 class AxisError(RuntimeError):
     pass
 
-def solveFunction(function, vals):
+class FunctionError(AxisError):
+    pass
+
+def solveFunction(function, vals, mint=None, maxt=None):
     '''Solve a function for a list of values (vals), if we don't know
     where the solution lies. function is a function to call.
 
     This tries a range of possible input values, and uses binary
     search to refine the solution.
+
+    mint and maxt are the bounds to use when solving
     '''
 
     xvals = N.array(
         ( -1e90, -1e70, -1e50, -1e40, -1e30, -1e20,
            -1e10, -1e8, -1e6, -1e5, -1e4,
-           -1e3, -1e2, -1e1, -1e0,
+           -1e3, -1e2, -1e1, -4e0, -2e0, -1e0,
            -1e-1, -1e-2, -1e-3, -1e-4,
            -1e-6, -1e-8, -1e-10, -1e-12, -1e-14,
            -1e-18, -1e-22, -1e-26, -1e-30, -1e-34,
@@ -56,28 +61,39 @@ def solveFunction(function, vals):
            1e-34, 1e-30, 1e-26, 1e-22, 1e-18,
            1e-14, 1e-12, 1e-10, 1e-8, 1e-6,
            1e-4, 1e-3, 1e-2, 1e-1,
-           1e0, 1e1, 1e2, 1e3,
+           1e0, 2e0, 4e0, 1e1, 1e2, 1e3,
            1e4, 1e5, 1e6, 1e8, 1e10,
            1e20, 1e30, 1e40, 1e50, 1e70, 1e90 ))
+
+    if mint is not None:
+        xvals = N.hstack(( mint, xvals[xvals > mint] ))
+    if maxt is not None:
+        xvals = N.hstack(( xvals[xvals < maxt], maxt ))
 
     # yvalue in correct shape
     yvals = function(xvals) + N.zeros(len(xvals))
 
-    # remove any regions where the function goes wrong
+    anynan = N.any( N.isnan(yvals) )
+    if anynan:
+        raise FunctionError, _('Invalid regions in function '
+                               '(try setting minimum or maximum t)')
+
+    # remove any infinite regions
     f = N.isfinite(yvals)
     xfilt = xvals[f]
     yfilt = yvals[f]
 
     if len(yfilt) < 2:
-        raise AxisError, _('Solutions to equation cannot be found')
+        raise FunctionError, _('Solutions to equation cannot be found')
 
     # check for monotonicity
-    delta = N.sign(yfilt[1:] - yfilt[:-1])
+    delta = yfilt[1:] - yfilt[:-1]
     pos, neg = N.all(delta >= 0), N.all(delta <= 0)
     if not (pos or neg):
-        raise AxisError, _('Not a monotonic function')
+        raise FunctionError, _('Not a monotonic function '
+                               '(try setting minimum or maximum t)')
     if pos and neg:
-        raise AxisError, _('Constant function')
+        raise FunctionError, _('Constant function')
 
     # easier if the values are increasing only
     if neg:
@@ -178,6 +194,13 @@ class AxisFunction(axis.Axis):
                             descr =
                             _('Axis for which this axis is based on'),
                             usertext=_('Other axis')), 2 )
+        s.add( setting.FloatOrAuto('mint', 'Auto',
+                                   descr=_('Minimum value of t or Auto'),
+                                   usertext=('Min t')), 3 )
+        s.add( setting.FloatOrAuto('maxt', 'Auto',
+                                   descr=_('Maximum value of t or Auto'),
+                                   usertext=('Max t')), 4 )
+
 
         s.get('min').hidden = True
         s.get('max').hidden = True
@@ -188,7 +211,18 @@ class AxisFunction(axis.Axis):
     def logError(self, ex):
         '''Write error message to document log for exception ex.'''
         self.document.log(
-            _("Error in axis-function: '%s'") % unicode(ex))
+            _("Error in axis-function (%s): '%s'") % (
+                self.settings.function, unicode(ex)))
+
+    def getMinMaxT(self):
+        '''Get minimum and maximum t.'''
+        mint = self.settings.mint
+        if mint == 'Auto':
+            mint = None
+        maxt = self.settings.maxt
+        if maxt == 'Auto':
+            maxt = None
+        return mint, maxt
 
     def getFunction(self):
         '''Check whether function needs to be compiled.'''
@@ -223,14 +257,22 @@ class AxisFunction(axis.Axis):
             # a python function for doing the evaluation and handling
             # errors
             env = self.document.eval_context.copy()
+
             def function(t):
                 env['t'] = t
                 try:
                     return eval(self.cachedcompiled, env)
                 except Exception, e:
                     self.logError(e)
-                    return N.nan
+                    return N.nan + t
             self.cachedfuncobj = function
+
+            mint, maxt = self.getMinMaxT()
+            try:
+                solveFunction(function, [0.], mint=mint, maxt=maxt)
+            except FunctionError, e:
+                self.logError(e)
+                self.cachedfuncobj = None
 
         return self.cachedfuncobj
 
@@ -239,8 +281,9 @@ class AxisFunction(axis.Axis):
         fn = self.getFunction()
         if fn is None:
             return None
+        mint, maxt = self.getMinMaxT()
         try:
-            return solveFunction(fn, vals)
+            return solveFunction(fn, vals, mint=mint, maxt=maxt)
         except Exception, e:
             self.logError(e)
             return None
@@ -250,7 +293,7 @@ class AxisFunction(axis.Axis):
         w = self.parent
         while w:
             for c in w.children:
-                if ( c.name == axisname and hasattr(c, 'isaxis') and
+                if ( c.name == axisname and c.isaxis and
                      c is not self ):
                     return c
             w = w.parent
@@ -280,6 +323,8 @@ class AxisFunction(axis.Axis):
                 therange = fn(N.array(other.plottedrange)) * N.ones(2)
             except Exception, e:
                 self.logError(e)
+            if not N.all( N.isfinite(therange) ):
+                therange = None
 
         axis.Axis.computePlottedRange(self, force=force,
                                       overriderange=therange)
@@ -298,6 +343,11 @@ class AxisFunction(axis.Axis):
         axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
                                      lowerupperposition=lowerupperposition)
 
+        other = self.getOtherAxis()
+        self.graphcoords = None
+        if other is None:
+            return
+
         if self.settings.direction == 'horizontal':
             p1, p2 = bounds[0], bounds[2]
         else:
@@ -307,6 +357,7 @@ class AxisFunction(axis.Axis):
         # To do the inverse calculation, we define a grid of pixel
         # values.  We need some sensitivity outside the axis range to
         # get angles of lines correct.
+
         pixcoords = N.hstack((
                 N.linspace(p1-10.*w, p1-2.0*w, 5),
                 N.linspace(p1-2.0*w, p1-0.2*w, 25),
@@ -315,27 +366,44 @@ class AxisFunction(axis.Axis):
                 N.linspace(p2+2.0*w, p2+10.*w, 5)
                 ))
 
-        other = self.getOtherAxis()
-        self.graphcoords = None
-        if other is not None:
-            # lookup what pixels are on other axis
-            othercoordvals = other.plotterToGraphCoords(bounds, pixcoords)
+        # lookup what pixels are on other axis
+        othercoordvals = other.plotterToGraphCoords(bounds, pixcoords)
 
-            try:
-                ourgraphcoords = self.getFunction()(othercoordvals)
-            except Exception, e:
-                return
+        # chop to range
+        mint, maxt = self.getMinMaxT()
+        if mint is not None and mint > othercoordvals[0]:
+            othercoordvals = N.hstack((
+                    mint, othercoordvals[othercoordvals>mint]))
+        if maxt is not None and maxt < othercoordvals[-1]:
+            othercoordvals = N.hstack((
+                    maxt, othercoordvals[othercoordvals<maxt]))
 
-            # Select only finite vals. We store _inv coords separately
-            # as linear interpolation requires increasing values.
-            f = N.isfinite(othercoordvals + ourgraphcoords)
-            self.graphcoords = self.graphcoords_inv = ourgraphcoords[f]
-            self.pixcoords = self.pixcoords_inv = pixcoords[f]
+        try:
+            ourgraphcoords = self.getFunction()(othercoordvals)
+        except Exception, e:
+            return
 
-            if self.graphcoords[0] > self.graphcoords[-1]:
-                # order must be increasing (for forward conversion)
-                self.graphcoords = self.graphcoords[::-1]
-                self.pixcoords = self.pixcoords[::-1]
+        deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]
+        pos = N.all(deltas >= 0.)
+        neg = N.all(deltas <= 0.)
+        if (not pos and not neg) or (pos and neg):
+            self.logError(_('Not a monotonic function'))
+            return
+
+        # Select only finite vals. We store _inv coords separately
+        # as linear interpolation requires increasing values.
+        f = N.isfinite(othercoordvals + ourgraphcoords)
+        self.graphcoords = self.graphcoords_inv = ourgraphcoords[f]
+        self.pixcoords = self.pixcoords_inv = pixcoords[f]
+
+        if len(self.graphcoords) == 0:
+            self.graphcoords = None
+            return
+
+        if self.graphcoords[0] > self.graphcoords[-1]:
+            # order must be increasing (for forward conversion)
+            self.graphcoords = self.graphcoords[::-1]
+            self.pixcoords = self.pixcoords[::-1]
 
     def _graphToPlotter(self, vals):
         """Override normal axis graph->plotter coords to do lookup."""

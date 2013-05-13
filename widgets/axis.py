@@ -946,7 +946,7 @@ class Axis(widget.Widget):
             try:
                 # don't allow descendents of axis to look like an axis
                 # to this function (e.g. colorbar)
-                if c.typename == 'axis' and s.direction == c.settings.direction:
+                if c.isaxis and s.direction == c.settings.direction:
                     countaxis += 1
             except AttributeError:
                 # if it's not an axis we get here

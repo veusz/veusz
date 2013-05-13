@@ -62,6 +62,9 @@ class Widget(object):
     typename = 'generic'
     allowusercreation = False
 
+    isaxis = False
+    isplotter = False
+
     def __init__(self, parent, name=None):
         """Initialise a blank widget."""
 

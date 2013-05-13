@@ -233,7 +233,7 @@ class Grid(widget.Widget):
 
         # copy children, and remove any which are axes
         children = [ c for c in self.children if
-                     not hasattr(c, 'isaxis') ]
+                     not c.isaxis ]
         child_dimensions = {}
         child_posns = {}
         for c in children:
@@ -369,7 +369,7 @@ class Grid(widget.Widget):
 
         with painter:
             for child in self.children:
-                if not hasattr(child, 'isaxis'):
+                if not child.isaxis:
                     self._drawChild(phelper, child, bounds, parentposn)
 
         # do not call widget.Widget.draw, do not collect 200 pounds

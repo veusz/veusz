@@ -43,6 +43,7 @@ class ColorBar(axis.Axis):
     typename='colorbar'
     allowusercreation = True
     description = _('Image color bar')
+    isaxis = False
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""

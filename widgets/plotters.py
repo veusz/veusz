@@ -128,7 +128,7 @@ class GenericPlotter(widget.Widget):
         w = self.parent
         while w:
             for c in w.children:
-                if c.name == axisname and hasattr(c, 'isaxis'):
+                if c.name == axisname and c.isaxis:
                     return c
             w = w.parent
         return None
