@@ -1009,7 +1009,7 @@ class Axis(WidgetSelector):
         axes = set()
         while widget is not None:
             for w in widget.children:
-                if ( hasattr(w, 'isaxis') and (
+                if ( w.isaxis and (
                         self.direction == 'both' or
                         w.settings.direction == self.direction) ):
                     axes.add(w.name)
