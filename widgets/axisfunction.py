@@ -372,11 +372,17 @@ class AxisFunction(axis.Axis):
         # chop to range
         mint, maxt = self.getMinMaxT()
         if mint is not None and mint > othercoordvals[0]:
-            othercoordvals = N.hstack((
-                    mint, othercoordvals[othercoordvals>mint]))
+            # only use coordinates bigger than mint, and add on mint
+            # at beginning
+            mintpix = other.graphToPlotterCoords(bounds, N.array([mint]))
+            sel = othercoordvals > mint
+            othercoordvals = N.hstack((mint, othercoordvals[sel]))
+            pixcoords = N.hstack((mintpix, pixcoords[sel]))
         if maxt is not None and maxt < othercoordvals[-1]:
-            othercoordvals = N.hstack((
-                    maxt, othercoordvals[othercoordvals<maxt]))
+            maxtpix = other.graphToPlotterCoords(bounds, N.array([maxt]))
+            sel = othercoordvals < maxt
+            othercoordvals = N.hstack((othercoordvals[sel], maxt))
+            pixcoords = N.hstack((pixcoords[sel], maxtpix))
 
         try:
             ourgraphcoords = self.getFunction()(othercoordvals)
