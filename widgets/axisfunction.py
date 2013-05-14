@@ -273,6 +273,8 @@ class AxisFunction(axis.Axis):
             except FunctionError, e:
                 self.logError(e)
                 self.cachedfuncobj = None
+            except AxisError, e:
+                pass
 
         return self.cachedfuncobj
 
@@ -359,11 +361,11 @@ class AxisFunction(axis.Axis):
         # get angles of lines correct.
 
         pixcoords = N.hstack((
-                N.linspace(p1-10.*w, p1-2.0*w, 5),
-                N.linspace(p1-2.0*w, p1-0.2*w, 25),
-                N.linspace(p1-0.2*w, p2+0.2*w, 250),
-                N.linspace(p2+0.2*w, p2+2.0*w, 25),
-                N.linspace(p2+2.0*w, p2+10.*w, 5)
+                N.linspace(p1-10.*w, p1-2.0*w, 5, endpoint=False),
+                N.linspace(p1-2.0*w, p1-0.2*w, 25, endpoint=False),
+                N.linspace(p1-0.2*w, p2+0.2*w, 250, endpoint=False),
+                N.linspace(p2+0.2*w, p2+2.0*w, 25, endpoint=False),
+                N.linspace(p2+2.0*w, p2+10.*w, 5, endpoint=False)
                 ))
 
         # lookup what pixels are on other axis
