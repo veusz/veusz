@@ -329,8 +329,9 @@ class Node(object):
         
     def __repr__(self):
         """Text description"""
-        return "<%s at %s (type %s)>" % (self.__class__.__name__,
-                                         self._path, self._type)
+        r = u"<%s at %s (type %s)>" % (self.__class__.__name__,
+                                       self._path, self._type)
+        return r.encode('unicode_escape')
 
     def fromPath(self, path):
         """Return a new Node for the path given."""
