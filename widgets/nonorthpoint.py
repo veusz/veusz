@@ -110,6 +110,11 @@ class NonOrthPoint(Widget):
     def allowedParentTypes(self):
         return (NonOrthGraph,)
 
+    @property
+    def userdescription(self):
+        return _("data1='%s', data2='%s'") % (
+            self.settings.data1, self.settings.data2)
+
     def updateDataRanges(self, inrange):
         '''Extend inrange to range of data.'''
 

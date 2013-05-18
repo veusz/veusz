@@ -131,6 +131,12 @@ class Polar(NonOrthGraph):
         s.get('topMargin').newDefault('1cm')
         s.get('bottomMargin').newDefault('1cm')
 
+    @property
+    def userdescription(self):
+        s = self.settings
+        return _("'units=%s, direction=%s, log=%s") % (
+            s.units, s.direction, str(s.log))
+
     def coordRanges(self):
         '''Get ranges of coordinates.'''
         angularrange = [[0., 2.*N.pi], [0., 360]][

@@ -106,6 +106,11 @@ class ColorBar(axis.Axis):
         import graph, grid, nonorthgraph
         return (graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph)
 
+    @property
+    def userdescription(self):
+        return _("widget='%s', label='%s'") % (
+            self.settings.widgetName, self.settings.label)
+
     def chooseName(self):
         """Get name of widget."""
 

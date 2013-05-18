@@ -323,12 +323,12 @@ class Axis(widget.Widget):
         import graph, grid
         return (graph.Graph, grid.Grid)
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User friendly description."""
         s = self.settings
         return "range %s to %s%s" % ( str(s.min), str(s.max),
                                       ['',' (log)'][s.log])
-    userdescription = property(_getUserDescription)
 
     def setAutoRange(self, autorange):
         """Set the automatic range of this axis (called from page helper)."""

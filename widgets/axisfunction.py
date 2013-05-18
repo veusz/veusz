@@ -211,6 +211,12 @@ class AxisFunction(axis.Axis):
         s.get('autoRange').hidden = True
         s.get('autoRange').val = 'exact'
 
+    @property
+    def userdescription(self):
+        """User friendly description."""
+        s = self.settings
+        return _("axis='%s', function='%s'") % (s.otheraxis, s.function)
+
     def logError(self, ex):
         '''Write error message to document log for exception ex.'''
         self.document.log(

@@ -92,6 +92,10 @@ class NonOrthFunction(Widget):
     def allowedParentTypes(self):
         return (NonOrthGraph,)
 
+    @property
+    def userdescription(self):
+        return _("function='%s'") % self.settings.function
+
     def initEnviron(self):
         '''Set up function environment.'''
         return self.document.eval_context.copy()

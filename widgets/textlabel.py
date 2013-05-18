@@ -88,6 +88,12 @@ class TextLabel(plotters.FreePlotter):
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
     cnvtalignvert = { 'top': 1, 'centre': 0, 'bottom': -1 }
 
+    @property
+    def userdescription(self):
+        """User friendly description."""
+        s = self.settings
+        return _("text='%s'") % s.label
+
     def draw(self, posn, phelper, outerbounds = None):
         """Draw the text label."""
 
