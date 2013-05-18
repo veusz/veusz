@@ -336,7 +336,7 @@ class AxisFunction(axis.Axis):
 
     def updateAxisLocation(self, bounds, otherposition=None,
                            lowerupperposition=None):
-        """Calculate conversion from pixels to axis values."""
+        '''Calculate conversion from pixels to axis values.'''
 
         if ( self.boundschangeset == self.document.changeset and
              bounds == self.cachedbounds ):
@@ -416,22 +416,32 @@ class AxisFunction(axis.Axis):
             self.graphcoords = self.graphcoords[::-1]
             self.pixcoords = self.pixcoords[::-1]
 
+    def _linearInterpolWarning(self, vals, xcoords, ycoords):
+        '''Linear interpolation, giving out of bounds warning.'''
+        if ( any(vals < xcoords[0]) or
+             any(vals > xcoords[-1]) ):
+            self.document.log(
+                _('Warning: values exceed bounds in axis-function'))
+
+        return N.interp(vals, xcoords, ycoords)
+
     def _graphToPlotter(self, vals):
-        """Override normal axis graph->plotter coords to do lookup."""
+        '''Override normal axis graph->plotter coords to do lookup.'''
         if self.graphcoords is None:
             return axis.Axis._graphToPlotter(self, vals)
         else:
-            # do linear interpolation on previously calculated values
-            return N.interp(vals, self.graphcoords, self.pixcoords)
+            return self._linearInterpolWarning(
+                vals, self.graphcoords, self.pixcoords)
 
     def plotterToGraphCoords(self, bounds, vals):
-        """Override normal axis plotter->graph coords to do lookup."""
+        '''Override normal axis plotter->graph coords to do lookup.'''
         if self.graphcoords is None:
             return axis.Axis.plotterToGraphCoords(self, bounds, vals)
         else:
             self.updateAxisLocation(bounds)
-            # do linear interpolation on previously calculated (inverse) values
-            return N.interp(vals, self.pixcoords_inv, self.graphcoords_inv)
+
+            return self._linearInterpolWarning(
+                vals, self.pixcoords_inv, self.graphcoords_inv)
 
 # allow the factory to instantiate the widget
 document.thefactory.register( AxisFunction )
