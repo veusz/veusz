@@ -195,6 +195,7 @@ class Axis(widget.Widget):
 
         # document updates change set variable when things need recalculating
         self.docchangeset = -1
+        self.currentbounds = [0,0,1,1]
 
     @classmethod
     def addSettings(klass, s):
@@ -488,7 +489,7 @@ class Axis(widget.Widget):
                            lowerupperposition=None):
         """Recalculate coordinates on plotter of axis.
 
-        otherposition: overrid otherPosition setting
+        otherposition: override otherPosition setting
         lowerupperposition: set to tuple (lower, upper) to override
          lowerPosition and upperPosition settings
         """
@@ -502,7 +503,7 @@ class Axis(widget.Widget):
         if otherposition is None:
             otherposition = s.otherPosition
 
-        x1, y1, x2, y2 = bounds
+        x1, y1, x2, y2 = self.currentbounds = bounds
         dx = x2 - x1
         dy = y2 - y1
 

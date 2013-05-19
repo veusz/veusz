@@ -171,11 +171,16 @@ class AxisDependHelper(object):
                     best = i
 
         # delete best, or last one if none better found
+        print "Breaking cycle. Deleting", self.pairs[best]
+
         p = self.pairs[best]
         del self.pairs[best]
 
-        idx = self.deps[p[1]].index(p[0])
-        del self.deps[p[1]][idx]
+        try:
+            idx = self.deps[p[1]].index(p[0])
+            del self.deps[p[1]][idx]
+        except ValueError:
+            pass
 
     def _updateAxisAutoRange(self, axis):
         """Update auto range for axis."""

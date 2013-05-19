@@ -359,44 +359,48 @@ class AxisFunction(axis.Axis):
         if other is None:
             return
 
-        if self.settings.direction == 'horizontal':
-            p1, p2 = bounds[0], bounds[2]
-        else:
-            p1, p2 = bounds[1], bounds[3]
-        w = p2-p1
-
         # To do the inverse calculation, we define a grid of pixel
         # values.  We need some sensitivity outside the axis range to
-        # get angles of lines correct.
-
-        pixcoords = N.hstack((
-                N.linspace(p1-10.*w, p1-2.0*w, 5, endpoint=False),
-                N.linspace(p1-2.0*w, p1-0.2*w, 25, endpoint=False),
-                N.linspace(p1-0.2*w, p2+0.2*w, 250, endpoint=False),
-                N.linspace(p2+0.2*w, p2+2.0*w, 25, endpoint=False),
-                N.linspace(p2+2.0*w, p2+10.*w, 5, endpoint=False)
+        # get angles of lines correct. We start with fractional graph
+        # coordinates to translate to the other axis coordinates.
+        fraccoords = N.hstack((
+                N.linspace(-10., -2.0, 5, endpoint=False),
+                N.linspace(-2.0, -0.2, 25, endpoint=False),
+                N.linspace(-0.2, +1.2, 250, endpoint=False),
+                N.linspace(+1.2, +3.0, 25, endpoint=False),
+                N.linspace(+3.0, +11., 5, endpoint=False)
                 ))
 
-        # lookup what pixels are on other axis
-        othercoordvals = other.plotterToGraphCoords(bounds, pixcoords)
+        # coordinate values on the other axis
+        owidth = other.coordParr2-other.coordParr1
+        oorg = other.coordParr1
+        otherpixcoords = fraccoords*owidth + oorg
+        obounds = other.currentbounds
 
-        # chop to range
+        # lookup what pixels are on other axis in values
+        othergraphcoords = other.plotterToGraphCoords(obounds, otherpixcoords)
+
+        # Chop to range. This is rather messy as there are several
+        # sets of coordinates to extend and chop: graph coordinates,
+        # pixel coordinates and fractional coordinates.
         mint, maxt = self.getMinMaxT()
-        if mint is not None and mint > othercoordvals[0]:
-            # only use coordinates bigger than mint, and add on mint
-            # at beginning
-            mintpix = other.graphToPlotterCoords(bounds, N.array([mint]))
-            sel = othercoordvals > mint
-            othercoordvals = N.hstack((mint, othercoordvals[sel]))
-            pixcoords = N.hstack((mintpix, pixcoords[sel]))
-        if maxt is not None and maxt < othercoordvals[-1]:
-            maxtpix = other.graphToPlotterCoords(bounds, N.array([maxt]))
-            sel = othercoordvals < maxt
-            othercoordvals = N.hstack((othercoordvals[sel], maxt))
-            pixcoords = N.hstack((pixcoords[sel], maxtpix))
+        if mint is not None and mint > othergraphcoords[0]:
+            mintpix = other.graphToPlotterCoords(obounds, N.array([mint]))
+            sel = othergraphcoords > mint
+            othergraphcoords = N.hstack((mint, othergraphcoords[sel]))
+            otherpixcoords = N.hstack((mintpix, otherpixcoords[sel]))
+            frac = (mintpix - oorg) / owidth
+            fraccoords = N.hstack((frac, fraccoords[sel]))
+        if maxt is not None and maxt < othergraphcoords[-1]:
+            maxtpix = other.graphToPlotterCoords(obounds, N.array([maxt]))
+            sel = othergraphcoords < maxt
+            othergraphcoords = N.hstack((othergraphcoords[sel], maxt))
+            otherpixcoords = N.hstack((otherpixcoords[sel], maxtpix))
+            frac = (maxtpix - oorg) / owidth
+            fraccoords = N.hstack((fraccoords[sel], frac))
 
         try:
-            ourgraphcoords = self.getFunction()(othercoordvals)
+            ourgraphcoords = self.getFunction()(othergraphcoords)
         except Exception, e:
             return
 
@@ -409,9 +413,20 @@ class AxisFunction(axis.Axis):
 
         # Select only finite vals. We store _inv coords separately
         # as linear interpolation requires increasing values.
-        f = N.isfinite(othercoordvals + ourgraphcoords)
+        f = N.isfinite(othergraphcoords + ourgraphcoords)
         self.graphcoords = self.graphcoords_inv = ourgraphcoords[f]
-        self.pixcoords = self.pixcoords_inv = pixcoords[f]
+
+        # This is true if the axis is plotting on the same graph in
+        # the same direction. If this is the case, use our coordinates
+        # directly.
+        if ( other.settings.direction == self.settings.direction
+             and other.currentbounds == bounds ):
+            self.pixcoords = self.pixcoords_inv = otherpixcoords[f]
+        else:
+            # convert fractions to our coordinates
+            self.pixcoords = ( fraccoords*(self.coordParr2-self.coordParr1) +
+                               self.coordParr1 )
+            self.pixcoords_inv = self.pixcoords
 
         if len(self.graphcoords) == 0:
             self.graphcoords = None
@@ -421,6 +436,10 @@ class AxisFunction(axis.Axis):
             # order must be increasing (for forward conversion)
             self.graphcoords = self.graphcoords[::-1]
             self.pixcoords = self.pixcoords[::-1]
+        if self.pixcoords_inv[0] > self.pixcoords_inv[-1]:
+            # likewise increasing order for inverse
+            self.pixcoords_inv = self.pixcoords_inv[::-1]
+            self.graphcoords_inv = self.graphcoords_inv[::-1]
 
     def _linearInterpolWarning(self, vals, xcoords, ycoords):
         '''Linear interpolation, giving out of bounds warning.'''
