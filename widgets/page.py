@@ -170,8 +170,6 @@ class AxisDependHelper(object):
                     best = i
 
         # delete best, or last one if none better found
-        print "Breaking cycle. Deleting", self.pairs[best]
-
         p = self.pairs[best]
         del self.pairs[best]
 

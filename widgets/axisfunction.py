@@ -192,7 +192,7 @@ class AxisFunction(axis.Axis):
                 'linked', False,
                 settingsfalse=('min', 'max'),
                 settingstrue=('linkedaxis',),
-                descr=_('Axis is linked to another axis'),
+                descr=_('Link axis to another axis'),
                 usertext=_('Linked') ), 0 )
 
         s.add( setting.Str('function', 't',
