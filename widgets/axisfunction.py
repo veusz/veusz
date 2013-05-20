@@ -188,26 +188,29 @@ class AxisFunction(axis.Axis):
         '''Construct list of settings.'''
         axis.Axis.addSettings(s)
 
+        s.add( setting.BoolSwitch(
+                'linked', False,
+                settingsfalse=('min', 'max'),
+                settingstrue=('linkedaxis',),
+                descr=_('Axis is linked to another axis'),
+                usertext=_('Linked') ), 0 )
+
         s.add( setting.Str('function', 't',
                            descr=_('Monotonic function (use t as variable)'),
                            usertext=_('Function')), 1 )
         s.add( setting.Axis('linkedaxis', '', 'both',
                             descr =
                             _('Axis which this axis is based on'),
-                            usertext=_('Linked axis')), 2 )
+                            usertext=_('Linked axis')), 6 )
         s.add( setting.FloatOrAuto('mint', 'Auto',
                                    descr=_('Minimum value of t or Auto'),
-                                   usertext=('Min t')), 3 )
+                                   usertext=('Min t')), 7 )
         s.add( setting.FloatOrAuto('maxt', 'Auto',
                                    descr=_('Maximum value of t or Auto'),
-                                   usertext=('Max t')), 4 )
+                                   usertext=('Max t')), 8 )
 
-
-        s.get('min').hidden = True
-        s.get('max').hidden = True
-        s.get('match').hidden = True
         s.get('autoRange').hidden = True
-        s.get('autoRange').val = 'exact'
+        s.get('autoRange').newDefault('exact')
 
     @property
     def userdescription(self):
@@ -309,10 +312,13 @@ class AxisFunction(axis.Axis):
         return None
 
     def isLinked(self):
-        return True
+        '''Is this axis linked to another?'''
+        return self.settings.linked
 
     def getLinkedAxis(self):
         '''Get the widget for the linked axis.'''
+        if not self.settings.linked:
+            return None
         linked = self.lookupAxis(self.settings.linkedaxis)
         if linked is self:
             return None
@@ -341,22 +347,26 @@ class AxisFunction(axis.Axis):
         axis.Axis.computePlottedRange(self, force=force,
                                       overriderange=therange)
 
-    def updateAxisLocation(self, bounds, otherposition=None,
-                           lowerupperposition=None):
-        '''Calculate conversion from pixels to axis values.'''
+    def _orderCoordinates(self):
+        '''Put coordinates in correct order for linear interpolation.'''
 
-        if ( self.boundschangeset == self.document.changeset and
-             bounds == self.cachedbounds ):
-            # don't recalculate unless document updated or bounds changes
+        if len(self.graphcoords) == 0:
+            self.graphcoords = None
             return
-        self.cachedbounds = list(bounds)
-        self.boundschangeset = self.document.changeset
 
-        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
-                                     lowerupperposition=lowerupperposition)
+        if self.graphcoords[0] > self.graphcoords[-1]:
+            # order must be increasing (for forward conversion)
+            self.graphcoords = self.graphcoords[::-1]
+            self.pixcoords = self.pixcoords[::-1]
+        if self.pixcoords_inv[0] > self.pixcoords_inv[-1]:
+            # likewise increasing order for inverse
+            self.pixcoords_inv = self.pixcoords_inv[::-1]
+            self.graphcoords_inv = self.graphcoords_inv[::-1]
+
+    def _updateLinkedAxis(self, bounds, fraccoords):
+        '''Calculate coordinate conversion for linked axes.'''
 
         link = self.getLinkedAxis()
-        self.graphcoords = None
         if link is None:
             return
 
@@ -364,13 +374,6 @@ class AxisFunction(axis.Axis):
         # values.  We need some sensitivity outside the axis range to
         # get angles of lines correct. We start with fractional graph
         # coordinates to translate to the other axis coordinates.
-        fraccoords = N.hstack((
-                N.linspace(-10., -2.0, 5, endpoint=False),
-                N.linspace(-2.0, -0.2, 25, endpoint=False),
-                N.linspace(-0.2, +1.2, 250, endpoint=False),
-                N.linspace(+1.2, +3.0, 25, endpoint=False),
-                N.linspace(+3.0, +11., 5, endpoint=False)
-                ))
 
         # coordinate values on the other axis
         linkwidth = link.coordParr2-link.coordParr1
@@ -380,6 +383,12 @@ class AxisFunction(axis.Axis):
 
         # lookup what pixels are on linked axis in values
         linkgraphcoords = link.plotterToGraphCoords(linkbounds, linkpixcoords)
+
+        # flip round if coordinates reversed
+        if linkgraphcoords[0] > linkgraphcoords[-1]:
+            linkgraphcoords = linkgraphcoords[::-1]
+            linkpixcoords = linkpixcoords[::-1]
+            fraccoords = fraccoords[::-1]
 
         # Chop to range. This is rather messy as there are several
         # sets of coordinates to extend and chop: graph coordinates,
@@ -425,22 +434,91 @@ class AxisFunction(axis.Axis):
             self.pixcoords = self.pixcoords_inv = linkpixcoords[f]
         else:
             # convert fractions to our coordinates
-            self.pixcoords = ( fraccoords*(self.coordParr2-self.coordParr1) +
-                               self.coordParr1 )
-            self.pixcoords_inv = self.pixcoords
+            self.pixcoords = self.pixcoords_inv = (
+                fraccoords[f]*(self.coordParr2-self.coordParr1)+self.coordParr1)
 
-        if len(self.graphcoords) == 0:
-            self.graphcoords = None
+        # put output coordinates in correct order
+        self._orderCoordinates()
+
+    def _updateFreeAxis(self, bounds, fraccoords):
+        '''Calculate coordinates for a free axis.'''
+
+        self.computePlottedRange()
+        trange = self.invertFunctionVals(N.array(self.plottedrange))
+        if trange is None:
             return
 
-        if self.graphcoords[0] > self.graphcoords[-1]:
-            # order must be increasing (for forward conversion)
-            self.graphcoords = self.graphcoords[::-1]
-            self.pixcoords = self.pixcoords[::-1]
-        if self.pixcoords_inv[0] > self.pixcoords_inv[-1]:
-            # likewise increasing order for inverse
-            self.pixcoords_inv = self.pixcoords_inv[::-1]
-            self.graphcoords_inv = self.graphcoords_inv[::-1]
+        tvals = fraccoords*(trange[1]-trange[0]) + trange[0]
+
+        if tvals[0] > tvals[-1]:
+            # simplifies below if t is in order
+            tvals = tvals[::-1]
+            fraccoords = fraccoords[::-1]
+
+        # limit t to the range if given
+        mint, maxt = self.getMinMaxT()
+        if mint is not None and mint > tvals[0]:
+            sel = tvals > mint
+            minfrac = (mint - trange[0]) / (trange[1]-trange[0])
+            fraccoords = N.hstack( (minfrac, fraccoords[sel]) )
+            tvals = N.hstack( (mint, tvals[sel]) )
+        if maxt is not None and maxt < tvals[-1]:
+            sel = tvals < maxt
+            maxfrac = (maxt - trange[0]) / (trange[1]-trange[0])
+            fraccoords = N.hstack( (fraccoords[sel], maxfrac) )
+            tvals = N.hstack( (tvals[sel], maxt) )
+
+        try:
+            ourgraphcoords = self.getFunction()(tvals)
+        except Exception, e:
+            return
+
+        deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]
+        pos = N.all(deltas >= 0.)
+        neg = N.all(deltas <= 0.)
+        if (not pos and not neg) or (pos and neg):
+            self.logError(_('Not a monotonic function'))
+            return
+
+        # Select only finite vals. We store _inv coords separately
+        # as linear interpolation requires increasing values.
+        f = N.isfinite(ourgraphcoords)
+        self.graphcoords = self.graphcoords_inv = ourgraphcoords[f]
+        self.pixcoords = self.pixcoords_inv = (
+            fraccoords[f]*(self.coordParr2-self.coordParr1) + self.coordParr1 )
+
+        # put output coordinates in correct order
+        self._orderCoordinates()
+
+    def updateAxisLocation(self, bounds, otherposition=None,
+                           lowerupperposition=None):
+        '''Calculate conversion from pixels to axis values.'''
+
+        if ( self.boundschangeset == self.document.changeset and
+             bounds == self.cachedbounds ):
+            # don't recalculate unless document updated or bounds changes
+            return
+
+        self.cachedbounds = list(bounds)
+        self.boundschangeset = self.document.changeset
+
+        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
+                                     lowerupperposition=lowerupperposition)
+        self.graphcoords = None
+
+        # fractional coordinate grid to evaluate functions
+        fraccoords = N.hstack((
+                N.linspace(-10., -2.0, 5, endpoint=False),
+                N.linspace(-2.0, -0.2, 25, endpoint=False),
+                N.linspace(-0.2, +1.2, 250, endpoint=False),
+                N.linspace(+1.2, +3.0, 25, endpoint=False),
+                N.linspace(+3.0, +11., 5, endpoint=False)
+                ))
+
+        if self.isLinked():
+            self._updateLinkedAxis(bounds, fraccoords)
+        else:
+            self._updateFreeAxis(bounds, fraccoords)
 
     def _linearInterpolWarning(self, vals, xcoords, ycoords):
         '''Linear interpolation, giving out of bounds warning.'''
