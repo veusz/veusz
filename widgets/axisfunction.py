@@ -170,8 +170,6 @@ class AxisFunction(axis.Axis):
     typename = 'axis-function'
     description = 'An axis based on a function of the values of another axis'
 
-    isaxisfunction = True
-
     def __init__(self, *args, **argsv):
         axis.Axis.__init__(self, *args, **argsv)
 
@@ -193,10 +191,10 @@ class AxisFunction(axis.Axis):
         s.add( setting.Str('function', 't',
                            descr=_('Monotonic function (use t as variable)'),
                            usertext=_('Function')), 1 )
-        s.add( setting.Axis('otheraxis', '', 'both',
+        s.add( setting.Axis('linkedaxis', '', 'both',
                             descr =
-                            _('Axis for which this axis is based on'),
-                            usertext=_('Other axis')), 2 )
+                            _('Axis which this axis is based on'),
+                            usertext=_('Linked axis')), 2 )
         s.add( setting.FloatOrAuto('mint', 'Auto',
                                    descr=_('Minimum value of t or Auto'),
                                    usertext=('Min t')), 3 )
@@ -215,7 +213,7 @@ class AxisFunction(axis.Axis):
     def userdescription(self):
         """User friendly description."""
         s = self.settings
-        return _("axis='%s', function='%s'") % (s.otheraxis, s.function)
+        return _("axis='%s', function='%s'") % (s.linkedaxis, s.function)
 
     def logError(self, ex):
         '''Write error message to document log for exception ex.'''
@@ -310,12 +308,15 @@ class AxisFunction(axis.Axis):
             w = w.parent
         return None
 
-    def getOtherAxis(self):
-        '''Get the widget for the other axis.'''
-        other = self.lookupAxis(self.settings.otheraxis)
-        if other is self:
+    def isLinked(self):
+        return True
+
+    def getLinkedAxis(self):
+        '''Get the widget for the linked axis.'''
+        linked = self.lookupAxis(self.settings.linkedaxis)
+        if linked is self:
             return None
-        return other
+        return linked
 
     def computePlottedRange(self, force=False):
         '''Use other axis to compute range.'''
@@ -325,13 +326,13 @@ class AxisFunction(axis.Axis):
 
         therange = None
 
-        other = self.getOtherAxis()
+        linked = self.getLinkedAxis()
         fn = self.getFunction()
-        if other is not None and fn is not None:
-            # compute our range from the other axis
-            other.computePlottedRange()
+        if linked is not None and fn is not None:
+            # compute our range from the linked axis
+            linked.computePlottedRange()
             try:
-                therange = fn(N.array(other.plottedrange)) * N.ones(2)
+                therange = fn(N.array(linked.plottedrange)) * N.ones(2)
             except Exception, e:
                 self.logError(e)
             if not N.all( N.isfinite(therange) ):
@@ -354,9 +355,9 @@ class AxisFunction(axis.Axis):
         axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
                                      lowerupperposition=lowerupperposition)
 
-        other = self.getOtherAxis()
+        link = self.getLinkedAxis()
         self.graphcoords = None
-        if other is None:
+        if link is None:
             return
 
         # To do the inverse calculation, we define a grid of pixel
@@ -372,35 +373,35 @@ class AxisFunction(axis.Axis):
                 ))
 
         # coordinate values on the other axis
-        owidth = other.coordParr2-other.coordParr1
-        oorg = other.coordParr1
-        otherpixcoords = fraccoords*owidth + oorg
-        obounds = other.currentbounds
+        linkwidth = link.coordParr2-link.coordParr1
+        linkorigin = link.coordParr1
+        linkpixcoords = fraccoords*linkwidth + linkorigin
+        linkbounds = link.currentbounds
 
-        # lookup what pixels are on other axis in values
-        othergraphcoords = other.plotterToGraphCoords(obounds, otherpixcoords)
+        # lookup what pixels are on linked axis in values
+        linkgraphcoords = link.plotterToGraphCoords(linkbounds, linkpixcoords)
 
         # Chop to range. This is rather messy as there are several
         # sets of coordinates to extend and chop: graph coordinates,
         # pixel coordinates and fractional coordinates.
         mint, maxt = self.getMinMaxT()
-        if mint is not None and mint > othergraphcoords[0]:
-            mintpix = other.graphToPlotterCoords(obounds, N.array([mint]))
-            sel = othergraphcoords > mint
-            othergraphcoords = N.hstack((mint, othergraphcoords[sel]))
-            otherpixcoords = N.hstack((mintpix, otherpixcoords[sel]))
-            frac = (mintpix - oorg) / owidth
+        if mint is not None and mint > linkgraphcoords[0]:
+            mintpix = link.graphToPlotterCoords(linkbounds, N.array([mint]))
+            sel = linkgraphcoords > mint
+            linkgraphcoords = N.hstack((mint, linkgraphcoords[sel]))
+            linkpixcoords = N.hstack((mintpix, linkpixcoords[sel]))
+            frac = (mintpix - linkorigin) / linkwidth
             fraccoords = N.hstack((frac, fraccoords[sel]))
-        if maxt is not None and maxt < othergraphcoords[-1]:
-            maxtpix = other.graphToPlotterCoords(obounds, N.array([maxt]))
-            sel = othergraphcoords < maxt
-            othergraphcoords = N.hstack((othergraphcoords[sel], maxt))
-            otherpixcoords = N.hstack((otherpixcoords[sel], maxtpix))
-            frac = (maxtpix - oorg) / owidth
+        if maxt is not None and maxt < linkgraphcoords[-1]:
+            maxtpix = link.graphToPlotterCoords(linkbounds, N.array([maxt]))
+            sel = linkgraphcoords < maxt
+            linkgraphcoords = N.hstack((linkgraphcoords[sel], maxt))
+            linkpixcoords = N.hstack((linkpixcoords[sel], maxtpix))
+            frac = (maxtpix - linkorigin) / linkwidth
             fraccoords = N.hstack((fraccoords[sel], frac))
 
         try:
-            ourgraphcoords = self.getFunction()(othergraphcoords)
+            ourgraphcoords = self.getFunction()(linkgraphcoords)
         except Exception, e:
             return
 
@@ -413,15 +414,15 @@ class AxisFunction(axis.Axis):
 
         # Select only finite vals. We store _inv coords separately
         # as linear interpolation requires increasing values.
-        f = N.isfinite(othergraphcoords + ourgraphcoords)
+        f = N.isfinite(linkgraphcoords + ourgraphcoords)
         self.graphcoords = self.graphcoords_inv = ourgraphcoords[f]
 
         # This is true if the axis is plotting on the same graph in
         # the same direction. If this is the case, use our coordinates
         # directly.
-        if ( other.settings.direction == self.settings.direction
-             and other.currentbounds == bounds ):
-            self.pixcoords = self.pixcoords_inv = otherpixcoords[f]
+        if ( link.settings.direction == self.settings.direction
+             and link.currentbounds == bounds ):
+            self.pixcoords = self.pixcoords_inv = linkpixcoords[f]
         else:
             # convert fractions to our coordinates
             self.pixcoords = ( fraccoords*(self.coordParr2-self.coordParr1) +

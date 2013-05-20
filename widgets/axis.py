@@ -331,6 +331,14 @@ class Axis(widget.Widget):
         return "range %s to %s%s" % ( str(s.min), str(s.max),
                                       ['',' (log)'][s.log])
 
+    def isLinked(self):
+        """Whether is an axis linked to another."""
+        return False
+
+    def getLinkedAxis(self):
+        """Return axis linked to this one (or None)."""
+        return None
+
     def setAutoRange(self, autorange):
         """Set the automatic range of this axis (called from page helper)."""
 

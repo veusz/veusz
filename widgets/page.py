@@ -36,12 +36,12 @@ def _(text, disambiguation=None, context='Page'):
 
 defaultrange = [1e99, -1e99]
 
-def _resolveAxisFunction(axis):
+def _resolveLinkedAxis(axis):
     """Follow a chain of axis function dependencies."""
     loopcheck = set()
-    while hasattr(axis, 'isaxisfunction'):
+    while axis.isLinked():
         loopcheck.add(axis)
-        axis = axis.getOtherAxis()
+        axis = axis.getLinkedAxis()
         if axis in loopcheck:
             # fail if loop
             return None
@@ -81,7 +81,7 @@ class AxisDependHelper(object):
 
     x <-> axis1 <-> axis2
 
-    For axisfunctions:
+    For linked axes (e.g. AxisFunction):
       * Don't keep track of range separately -> propagate to real axis
       * For dependency order resolution, use real axis
       * In self.deps, use axisfunction axis so we know which axis to use
@@ -99,9 +99,9 @@ class AxisDependHelper(object):
         # pairs of dependent widgets
         self.pairs = []
 
-        # axes which map from one axis to another (AxisFunction)
-        self.axis_to_axisfn = {}
-        self.axisfn_to_axis = {}
+        # track axes which map from one axis to another
+        self.axis_to_axislinked = {}
+        self.axislinked_to_axis = {}
 
     def recursivePlotterSearch(self, widget):
         """Find a list of plotters below widget.
@@ -124,7 +124,7 @@ class AxisDependHelper(object):
             # can provide range information about
             for axname, depname in widget.affectsAxisRange():
                 origaxis = widgetaxes[axname]
-                resolvedaxis = _resolveAxisFunction(origaxis)
+                resolvedaxis = _resolveLinkedAxis(origaxis)
                 if resolvedaxis is not None and resolvedaxis.usesAutoRange():
                     # only add dependency if axis has an automatic range
                     self.deps[(origaxis, None)].append((widget, depname))
@@ -134,20 +134,19 @@ class AxisDependHelper(object):
             # find which axes the plotter needs information from
             for depname, axname in widget.requiresAxisRange():
                 origaxis = widgetaxes[axname]
-                resolvedaxis = _resolveAxisFunction(origaxis)
+                resolvedaxis = _resolveLinkedAxis(origaxis)
                 if resolvedaxis is not None and resolvedaxis.usesAutoRange():
                     self.deps[(widget, depname)].append((origaxis, None))
                     self.pairs.append( ((resolvedaxis, None),
                                         (widget, depname)) )
 
         elif widget.isaxis:
-            if hasattr(widget, 'isaxisfunction'):
-                pass
+            if widget.isaxis and widget.isLinked():
                 # function of another axis
-                other = widget.getOtherAxis()
-                if other is not None:
-                    self.axis_to_axisfn[other] = widget
-                    self.axisfn_to_axis[widget] = other
+                linked = widget.getLinkedAxis()
+                if linked is not None:
+                    self.axis_to_axislinked[linked] = widget
+                    self.axislinked_to_axis[widget] = linked
             else:
                 # make a range for a normal axis
                 self.axes.append(widget)
@@ -196,7 +195,7 @@ class AxisDependHelper(object):
     def _updateRangeFromPlotter(self, axis, plotter, plotterdep):
         """Update the range for axis from the plotter."""
 
-        if hasattr(axis, 'isaxisfunction'):
+        if axis.isLinked():
             # take range and map back to real axis
             therange = list(defaultrange)
             plotter.getRange(axis, plotterdep, therange)
@@ -204,10 +203,10 @@ class AxisDependHelper(object):
             if therange != defaultrange:
                 # follow up chain
                 loopcheck = set()
-                while hasattr(axis, 'isaxisfunction'):
+                while axis.isLinked():
                     loopcheck.add(axis)
                     therange = axis.invertFunctionVals(therange)
-                    axis = axis.getOtherAxis()
+                    axis = axis.getLinkedAxis()
                     if axis in loopcheck:
                         axis = None
                 if axis is not None and therange is not None:
@@ -232,7 +231,7 @@ class AxisDependHelper(object):
                 self._updateRangeFromPlotter(widget, widgetd, widgetd_dep)
 
             elif widgetd.isaxis:
-                axis = _resolveAxisFunction(widgetd)
+                axis = _resolveLinkedAxis(widgetd)
                 if axis in self.ranges:
                     self._updateAxisAutoRange(axis)
 
@@ -261,8 +260,8 @@ class AxisDependHelper(object):
             self.processWidgetDeps(dep)
 
             # process deps for any axis functions
-            while dep[0] in self.axis_to_axisfn:
-                dep = (self.axis_to_axisfn[dep[0]], None)
+            while dep[0] in self.axis_to_axislinked:
+                dep = (self.axis_to_axislinked[dep[0]], None)
                 self.processWidgetDeps(dep)
 
     def findAxisRanges(self):
