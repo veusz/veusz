@@ -494,6 +494,9 @@ class AxisFunction(axis.Axis):
                            lowerupperposition=None):
         '''Calculate conversion from pixels to axis values.'''
 
+        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
+                                     lowerupperposition=lowerupperposition)
+
         if ( self.boundschangeset == self.document.changeset and
              bounds == self.cachedbounds ):
             # don't recalculate unless document updated or bounds changes
@@ -502,8 +505,6 @@ class AxisFunction(axis.Axis):
         self.cachedbounds = list(bounds)
         self.boundschangeset = self.document.changeset
 
-        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
-                                     lowerupperposition=lowerupperposition)
         self.graphcoords = None
 
         # fractional coordinate grid to evaluate functions
