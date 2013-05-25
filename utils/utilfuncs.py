@@ -28,6 +28,7 @@ import codecs
 import csv
 import StringIO
 import locale
+from collections import defaultdict
 
 import veusz.qtall as qt4
 import numpy as N
@@ -454,3 +455,30 @@ def decodeDefault(s):
     """Decode the string using current locale.
     Used for decoding exceptions."""
     return s.decode(locale.getdefaultlocale()[1])
+
+# based on http://stackoverflow.com/questions/10607841/algorithm-for-topological-sorting-if-cycles-exist
+def topological_sort(dependency_pairs):
+    """Given a list of pairs, perform a topological sort.
+    That means, each item has something which needs to be done first.
+    topsort( [(1,2), (3,4), (5,6), (1,3), (1,5), (1,6), (2,5)] )
+    returns  [1, 2, 3, 5, 4, 6], []
+    for ordered and cyclic items
+    """
+
+    num_heads = defaultdict(int)   # num arrows pointing in
+    tails = defaultdict(list)      # list of arrows going out
+    for h, t in dependency_pairs:
+        num_heads[t] += 1
+        tails[h].append(t)
+
+    ordered = [h for h in tails if h not in num_heads]
+    i = 0
+    while i < len(ordered):
+        h = ordered[i]
+        for t in tails[h]:
+            num_heads[t] -= 1
+            if not num_heads[t]:
+                ordered.append(t)
+        i += 1
+    cyclic = [n for n, heads in num_heads.iteritems() if heads]
+    return ordered, cyclic

@@ -105,12 +105,12 @@ class VectorField(plotters.GenericPlotter):
                                  usertext = _('Arrow fill')),
                pixmap = 'settings_plotmarkerfill' )
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """Range information provided by widget."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
         
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
         for name in (self.settings.data1, self.settings.data2):

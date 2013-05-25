@@ -26,8 +26,6 @@ import veusz.utils as utils
 import veusz.document as document
 
 import widget
-import page
-import grid
 import controlgraph
 
 def _(text, disambiguation=None, context='Graph'):
@@ -39,7 +37,6 @@ class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
     
     typename='graph'
-    allowedparenttypes = (page.Page, grid.Grid)
     allowusercreation = True
     description = _('Base graph')
 
@@ -81,7 +78,12 @@ class Graph(widget.Widget):
         s.add( setting.Line('Border', descr = _('Graph border line'),
                             usertext=_('Border')),
                pixmap='settings_border')
-        
+
+    @classmethod
+    def allowedParentTypes(self):
+        import page, grid
+        return (page.Page, grid.Grid)
+
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 
@@ -104,7 +106,7 @@ class Graph(widget.Widget):
             for c in w.children:
                 name = c.name
                 if ( name in axesnames and name not in axes and
-                     hasattr(c, 'isaxis') ):
+                     c.isaxis ):
                     axes[name] = c
             w = w.parent
 
@@ -171,7 +173,7 @@ class Graph(widget.Widget):
                 for a in axesofwidget[c]:
                     axestodraw[a.name] = a
             except (KeyError, AttributeError):
-                if hasattr(c, 'isaxis'):
+                if c.isaxis:
                     axestodraw[c.name] = c
 
         # grid lines are normally plotted before other child widgets
@@ -192,7 +194,7 @@ class Graph(widget.Widget):
         # iterate over children in reverse order
         for c in reversed(self.children):
 
-            if hasattr(c, 'isaxis'):
+            if c.isaxis:
                 continue
 
             axes = axesofwidget.get(c, None)

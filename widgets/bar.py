@@ -143,7 +143,7 @@ class BarPlotter(GenericPlotter):
         return _("lengths='%s', position='%s'") % (', '.join(s.lengths), 
                                                    s.posn)
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         """This widget provides range information about these axes."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
@@ -182,7 +182,7 @@ class BarPlotter(GenericPlotter):
             maxv = max(maxv, totpos)
         return minv,  maxv
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Update axis range from data."""
         s = self.settings
         if ((s.direction == 'horizontal' and depname == 'sx') or

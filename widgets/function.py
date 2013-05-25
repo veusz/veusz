@@ -137,21 +137,21 @@ class FunctionPlotter(GenericPlotter):
             "Error evaluating expression in function widget '%s': '%s'" % (
                 self.name, unicode(ex)))
 
-    def providesAxesDependency(self):
+    def affectsAxisRange(self):
         s = self.settings
         if s.variable == 'x':
             return ((s.yAxis, 'both'),)
         else:
             return ((s.xAxis, 'both'),)
 
-    def requiresAxesDependency(self):
+    def requiresAxisRange(self):
         s = self.settings
         if s.variable == 'x':
             return (('both', s.xAxis),)
         else:
             return (('both', s.yAxis),)
 
-    def updateAxisRange(self, axis, depname, axrange):
+    def getRange(self, axis, depname, axrange):
         """Adjust the range of the axis depending on the values plotted."""
         s = self.settings
 

@@ -26,11 +26,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import graph
-import grid
 import widget
 import axis
-import nonorthgraph
 
 def _(text, disambiguation=None, context='ColorBar'):
     """Translate text."""
@@ -44,9 +41,9 @@ class ColorBar(axis.Axis):
     """
 
     typename='colorbar'
-    allowedparenttypes = [graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph]
     allowusercreation = True
     description = _('Image color bar')
+    isaxis = False
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
@@ -103,6 +100,16 @@ class ColorBar(axis.Axis):
                pixmap='settings_border')
 
         s.add( setting.SettingBackwardCompat('image', 'widgetName', None) )
+
+    @classmethod
+    def allowedParentTypes(self):
+        import graph, grid, nonorthgraph
+        return (graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph)
+
+    @property
+    def userdescription(self):
+        return _("widget='%s', label='%s'") % (
+            self.settings.widgetName, self.settings.label)
 
     def chooseName(self):
         """Get name of widget."""

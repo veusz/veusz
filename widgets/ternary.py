@@ -152,6 +152,10 @@ class Ternary(NonOrthGraph):
         s.GridLines.get('hide').newDefault(False)
         s.TickLabels.remove('rotate')
 
+    @property
+    def userdescription(self):
+        return _("mode='%s'") % self.settings.mode
+
     def _maxVal(self):
         '''Get maximum value on axis.'''
         if self.settings.mode == 'percentage':

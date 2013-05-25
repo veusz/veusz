@@ -518,7 +518,29 @@
 </g>
 </g>
 </g>
+<g clip-path="url(#c2)">
+<g fill="none" stroke-width="1">
+<image x="150.5" y="24.5" width="283.4" height="17.5" xlink:href="data:image/ppm;base64,UDYKMTI4IDEKMjU1CgAAAAAKAAAUAAAeAAAoAAAyAAA8AABGAABQAABaAABkAABuAAB4AACCAACMAACWAACgAACqAAC0AAC+AADIAADSAADcAADmAADwAAD6AAb4BhDuEBrkGiTaJC7QLjjGOEK8QkyyTFaoVmCeYGqUanSKdH6Afoh2iJJskpxinKZYprBOsLpEusQ6xM4wztgm2OIc4uwS7PYI9v8A/P8A8v8A6P8A3v8A1P8Ayv8AwP8Atv8ArP8Aov8AmP8Ajv8AhP8Aev8AcP8AZv8AXP8AUv8ASP8APv8ANP8AKv8AIP8AFv8ADP8AAv8IAP8SAP8cAP8mAP8wAP86AP9EAP9OAP9YAP9iAP9sAP92AP+AAP+KAP+UAP+eAP+oAP+yAP+8AP/GAP/QAP/aAP/kAP/uAP/4AP//BP//Dv//GP//Iv//LP//Nv//QP//Sv//VP//Xv//aP//cv//fP//hv//kP//mv//pP//rv//uP//wv//zP//1v//4P//6v//9P///w==" preserveAspectRatio="none"/>
+</g>
+</g>
 <g clip-path="url(#c0)">
+<g fill="none" stroke-width="0.6">
+<path d="m150.5,24.5l283.4,0l0,17.5l-283.4,0l0,-17.5"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M150.5,42l283.4,0"/>
+<path d="M150.5,42l0,-3.7M165.4,42l0,-3.7M176,42l0,-3.7M184.2,42l0,-3.7M190.9,42l0,-3.7M196.5,42l0,-3.7M201.5,42l0,-3.7M205.8,42l0,-3.7M235.1,42l0,-3.7M250,42l0,-3.7M260.6,42l0,-3.7M268.8,42l0,-3.7M275.4,42l0,-3.7M281.1,42l0,-3.7M286,42l0,-3.7M290.3,42l0,-3.7M319.7,42l0,-3.7M334.6,42l0,-3.7M345.1,42l0,-3.7M353.3,42l0,-3.7M360,42l0,-3.7M365.7,42l0,-3.7M370.6,42l0,-3.7M374.9,42l0,-3.7M404.2,42l0,-3.7M419.1,42l0,-3.7M429.7,42l0,-3.7"/>
+<path d="M209.6,42l0,-7.5M294.2,42l0,-7.5M378.8,42l0,-7.5"/>
+<path d="M150.5,24.5l283.4,0"/>
+<path d="M150.5,24.5l0,3.7M165.4,24.5l0,3.7M176,24.5l0,3.7M184.2,24.5l0,3.7M190.9,24.5l0,3.7M196.5,24.5l0,3.7M201.5,24.5l0,3.7M205.8,24.5l0,3.7M235.1,24.5l0,3.7M250,24.5l0,3.7M260.6,24.5l0,3.7M268.8,24.5l0,3.7M275.4,24.5l0,3.7M281.1,24.5l0,3.7M286,24.5l0,3.7M290.3,24.5l0,3.7M319.7,24.5l0,3.7M334.6,24.5l0,3.7M345.1,24.5l0,3.7M353.3,24.5l0,3.7M360,24.5l0,3.7M365.7,24.5l0,3.7M370.6,24.5l0,3.7M374.9,24.5l0,3.7M404.2,24.5l0,3.7M419.1,24.5l0,3.7M429.7,24.5l0,3.7"/>
+<path d="M209.6,24.5l0,7.5M294.2,24.5l0,7.5M378.8,24.5l0,7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="252.9" y="56" font-size="14pt" fill="#000000">Power (W)</text>
+<text x="200.9" y="47.3" font-size="14pt" fill="#000000">10</text>
+<text x="281.1" y="47.3" font-size="14pt" fill="#000000">100</text>
+<text x="370" y="47.3" font-size="14pt" fill="#000000">1k</text>
+</g>
 <g fill="none" stroke-linecap="butt" stroke-width="1.2">
 <path d="M60.2,471.2l0,-464.1"/>
 </g>
@@ -567,30 +589,6 @@
 <text x="325.6" y="476.5" font-size="14pt" fill="#000000">0.6</text>
 <text x="418.4" y="476.5" font-size="14pt" fill="#000000">0.8</text>
 <text x="520" y="476.5" font-size="14pt" fill="#000000">1</text>
-</g>
-</g>
-<g clip-path="url(#c2)">
-<g fill="none" stroke-width="1">
-<image x="150.5" y="24.5" width="283.4" height="17.5" xlink:href="data:image/ppm;base64,UDYKMTI4IDEKMjU1CgAAAAAKAAAUAAAeAAAoAAAyAAA8AABGAABQAABaAABkAABuAAB4AACCAACMAACWAACgAACqAAC0AAC+AADIAADSAADcAADmAADwAAD6AAb4BhDuEBrkGiTaJC7QLjjGOEK8QkyyTFaoVmCeYGqUanSKdH6Afoh2iJJskpxinKZYprBOsLpEusQ6xM4wztgm2OIc4uwS7PYI9v8A/P8A8v8A6P8A3v8A1P8Ayv8AwP8Atv8ArP8Aov8AmP8Ajv8AhP8Aev8AcP8AZv8AXP8AUv8ASP8APv8ANP8AKv8AIP8AFv8ADP8AAv8IAP8SAP8cAP8mAP8wAP86AP9EAP9OAP9YAP9iAP9sAP92AP+AAP+KAP+UAP+eAP+oAP+yAP+8AP/GAP/QAP/aAP/kAP/uAP/4AP//BP//Dv//GP//Iv//LP//Nv//QP//Sv//VP//Xv//aP//cv//fP//hv//kP//mv//pP//rv//uP//wv//zP//1v//4P//6v//9P///w==" preserveAspectRatio="none"/>
-</g>
-</g>
-<g clip-path="url(#c0)">
-<g fill="none" stroke-width="0.6">
-<path d="m150.5,24.5l283.4,0l0,17.5l-283.4,0l0,-17.5"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M150.5,42l283.4,0"/>
-<path d="M150.5,42l0,-3.7M165.4,42l0,-3.7M176,42l0,-3.7M184.2,42l0,-3.7M190.9,42l0,-3.7M196.5,42l0,-3.7M201.5,42l0,-3.7M205.8,42l0,-3.7M235.1,42l0,-3.7M250,42l0,-3.7M260.6,42l0,-3.7M268.8,42l0,-3.7M275.4,42l0,-3.7M281.1,42l0,-3.7M286,42l0,-3.7M290.3,42l0,-3.7M319.7,42l0,-3.7M334.6,42l0,-3.7M345.1,42l0,-3.7M353.3,42l0,-3.7M360,42l0,-3.7M365.7,42l0,-3.7M370.6,42l0,-3.7M374.9,42l0,-3.7M404.2,42l0,-3.7M419.1,42l0,-3.7M429.7,42l0,-3.7"/>
-<path d="M209.6,42l0,-7.5M294.2,42l0,-7.5M378.8,42l0,-7.5"/>
-<path d="M150.5,24.5l283.4,0"/>
-<path d="M150.5,24.5l0,3.7M165.4,24.5l0,3.7M176,24.5l0,3.7M184.2,24.5l0,3.7M190.9,24.5l0,3.7M196.5,24.5l0,3.7M201.5,24.5l0,3.7M205.8,24.5l0,3.7M235.1,24.5l0,3.7M250,24.5l0,3.7M260.6,24.5l0,3.7M268.8,24.5l0,3.7M275.4,24.5l0,3.7M281.1,24.5l0,3.7M286,24.5l0,3.7M290.3,24.5l0,3.7M319.7,24.5l0,3.7M334.6,24.5l0,3.7M345.1,24.5l0,3.7M353.3,24.5l0,3.7M360,24.5l0,3.7M365.7,24.5l0,3.7M370.6,24.5l0,3.7M374.9,24.5l0,3.7M404.2,24.5l0,3.7M419.1,24.5l0,3.7M429.7,24.5l0,3.7"/>
-<path d="M209.6,24.5l0,7.5M294.2,24.5l0,7.5M378.8,24.5l0,7.5"/>
-</g>
-<g fill="none" stroke-width="1">
-<text x="252.9" y="56" font-size="14pt" fill="#000000">Power (W)</text>
-<text x="200.9" y="47.3" font-size="14pt" fill="#000000">10</text>
-<text x="281.1" y="47.3" font-size="14pt" fill="#000000">100</text>
-<text x="370" y="47.3" font-size="14pt" fill="#000000">1k</text>
 </g>
 </g>
 </g>

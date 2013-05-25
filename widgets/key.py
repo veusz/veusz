@@ -24,7 +24,6 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import widget
-import graph
 import controlgraph
 
 import math
@@ -159,7 +158,6 @@ class Key(widget.Widget):
 
     typename = 'key'
     description = _('Plot key')
-    allowedparenttypes = [graph.Graph]
     allowusercreation = True
 
     def __init__(self, parent, name=None):
@@ -238,7 +236,12 @@ class Key(widget.Widget):
                             minval = 1,
                             maxval = 100,
                             formatting = True) )
-    
+
+    @classmethod
+    def allowedParentTypes(self):
+        import graph
+        return (graph.Graph,)
+
     @staticmethod
     def _layoutChunk(entries, start, dims):
         """Layout the entries into the given box, starting at start"""

@@ -28,8 +28,6 @@ import veusz.setting as setting
 import veusz.utils as utils
 
 import widget
-import graph
-import grid
 import axisticks
 import controlgraph
 
@@ -174,7 +172,6 @@ class Axis(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis'
-    allowedparenttypes = (graph.Graph, grid.Grid)
     allowusercreation = True
     description = 'Axis to a plot or shared in a grid'
     isaxis = True
@@ -198,6 +195,7 @@ class Axis(widget.Widget):
 
         # document updates change set variable when things need recalculating
         self.docchangeset = -1
+        self.currentbounds = [0,0,1,1]
 
     @classmethod
     def addSettings(klass, s):
@@ -321,12 +319,25 @@ class Axis(widget.Widget):
                              usertext = _('Grid lines for minor ticks')),
                pixmap='settings_axisminorgridlines' )
 
-    def _getUserDescription(self):
+    @classmethod
+    def allowedParentTypes(self):
+        import graph, grid
+        return (graph.Graph, grid.Grid)
+
+    @property
+    def userdescription(self):
         """User friendly description."""
         s = self.settings
         return "range %s to %s%s" % ( str(s.min), str(s.max),
                                       ['',' (log)'][s.log])
-    userdescription = property(_getUserDescription)
+
+    def isLinked(self):
+        """Whether is an axis linked to another."""
+        return False
+
+    def getLinkedAxis(self):
+        """Return axis linked to this one (or None)."""
+        return None
 
     def setAutoRange(self, autorange):
         """Set the automatic range of this axis (called from page helper)."""
@@ -342,14 +353,21 @@ class Axis(widget.Widget):
             else:
                 self.autorange = [0., 1.]
 
-    def computePlottedRange(self, force=False):
+    def usesAutoRange(self):
+        """Return whether any of the bounds are automatically determined."""
+        return self.settings.min == 'Auto' or self.settings.max == 'Auto'
+
+    def computePlottedRange(self, force=False, overriderange=None):
         """Convert the range requested into a plotted range."""
 
         if self.docchangeset == self.document.changeset and not force:
             return
 
         s = self.settings
-        self.plottedrange = [s.min, s.max]
+        if overriderange is None:
+            self.plottedrange = [s.min, s.max]
+        else:
+            self.plottedrange = overriderange
 
         # match the scale of this axis to another
         matched = False
@@ -372,11 +390,11 @@ class Axis(widget.Widget):
                 matched = True
 
         # automatic lookup of minimum
-        if s.min == 'Auto' and not matched:
-            self.plottedrange[0] = self.autorange[0]
-
-        if s.max == 'Auto' and not matched:
-            self.plottedrange[1] = self.autorange[1]
+        if not matched and overriderange is None:
+            if s.min == 'Auto':
+                self.plottedrange[0] = self.autorange[0]
+            if s.max == 'Auto':
+                self.plottedrange[1] = self.autorange[1]
 
         # yuck, but sometimes it's true
         # tweak range to make sure things don't blow up further down the
@@ -389,7 +407,7 @@ class Axis(widget.Widget):
         # handle axis values round the wrong way
         invertaxis = self.plottedrange[0] > self.plottedrange[1]
         if invertaxis:
-            self.plottedrange.reverse()
+            self.plottedrange = self.plottedrange[::-1]
 
         # make sure log axes don't blow up
         if s.log:
@@ -428,7 +446,7 @@ class Axis(widget.Widget):
 
         # invert bounds if axis was inverted
         if invertaxis:
-            self.plottedrange.reverse()
+            self.plottedrange = self.plottedrange[::-1]
 
         self.docchangeset = self.document.changeset
 
@@ -479,7 +497,7 @@ class Axis(widget.Widget):
                            lowerupperposition=None):
         """Recalculate coordinates on plotter of axis.
 
-        otherposition: overrid otherPosition setting
+        otherposition: override otherPosition setting
         lowerupperposition: set to tuple (lower, upper) to override
          lowerPosition and upperPosition settings
         """
@@ -493,7 +511,7 @@ class Axis(widget.Widget):
         if otherposition is None:
             otherposition = s.otherPosition
 
-        x1, y1, x2, y2 = bounds
+        x1, y1, x2, y2 = self.currentbounds = bounds
         dx = x2 - x1
         dy = y2 - y1
 
@@ -937,7 +955,7 @@ class Axis(widget.Widget):
             try:
                 # don't allow descendents of axis to look like an axis
                 # to this function (e.g. colorbar)
-                if c.typename == 'axis' and s.direction == c.settings.direction:
+                if c.isaxis and s.direction == c.settings.direction:
                     countaxis += 1
             except AttributeError:
                 # if it's not an axis we get here

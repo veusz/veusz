@@ -44,8 +44,6 @@ class NonOrthPoint(Widget):
     allowusercreation = True
     description = _('Plot points on a graph with non-orthogonal axes')
 
-    allowedparenttypes = [NonOrthGraph]
-
     def __init__(self, parent, name=None):
         """Initialise plotter."""
         Widget.__init__(self, parent, name=name)
@@ -107,6 +105,15 @@ class NonOrthPoint(Widget):
                                   descr = _('Label settings'),
                                   usertext=_('Label')),
                pixmap = 'settings_axislabel' )
+
+    @classmethod
+    def allowedParentTypes(self):
+        return (NonOrthGraph,)
+
+    @property
+    def userdescription(self):
+        return _("data1='%s', data2='%s'") % (
+            self.settings.data1, self.settings.data2)
 
     def updateDataRanges(self, inrange):
         '''Extend inrange to range of data.'''

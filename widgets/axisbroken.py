@@ -374,5 +374,5 @@ class AxisBroken(axis.Axis):
                     self, self.settings.direction, self.coordParr1,
                     self.coordParr2, self.coordPerp, posn) ])
 
-# allow the factory to instantiate an image
+# allow the factory to instantiate the widget
 document.thefactory.register( AxisBroken )

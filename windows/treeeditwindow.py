@@ -841,7 +841,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.addslots = {}
         self.vzactions = actions = self.parentwin.vzactions
         for widgettype in ('page', 'grid', 'graph', 'axis',
-                           'axis-broken',
+                           'axis-broken', 'axis-function',
                            'xy', 'bar', 'fit', 'function', 'boxplot',
                            'image', 'contour', 'vectorfield',
                            'key', 'label', 'colorbar',
@@ -852,7 +852,7 @@ class TreeEditDock(qt4.QDockWidget):
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
             self.addslots[wc] = slot
-            
+
             actionname = 'add.' + widgettype
             actions[actionname] = utils.makeAction(
                 self,
@@ -895,40 +895,77 @@ class TreeEditDock(qt4.QDockWidget):
                     a(self, _('Add a shape to the plot'), _('Shape'),
                       self.slotShowShapeMenu,
                       icon='veusz-shape-menu'),
+
+                'add.axismenu':
+                    a(self, _('Add an axis to the plot'), _('Axis'),
+                      None,
+                      icon='button_axis'),
+
                 })
 
-        # add actions to menus for adding widgets and editing
-        addact = [('add.'+w) for w in 
-                  ('page', 'grid', 'graph', 'axis',
-                   'xy', 'nonorthpoint', 'bar', 'fit',
-                   'function', 'nonorthfunc', 'boxplot',
-                   'image', 'contour', 'vectorfield',
-                   'key', 'label', 'colorbar', 'polar', 'ternary')]
+        # list of widget-generating actions for menu and toolbar
+        widgetactions = (
+            'add.page',
+            'add.grid',
+            'add.graph',
+            'add.axismenu',
+            'add.xy',
+            'add.nonorthpoint',
+            'add.bar',
+            'add.fit',
+            'add.function',
+            'add.nonorthfunc',
+            'add.boxplot',
+            'add.image',
+            'add.contour',
+            'add.vectorfield',
+            'add.key',
+            'add.label',
+            'add.colorbar',
+            'add.polar',
+            'add.ternary',
+            'add.shapemenu',
+            )
 
-        menuitems = [
-            ('insert', '', addact + ['add.axis-broken'] + [
-                    ['insert.shape', 'Add shape',
-                     ['add.rect', 'add.ellipse', 'add.line', 'add.imagefile',
-                      'add.polygon']
-                     ]]),
-            ('edit', '', [
-                    'edit.cut', 'edit.copy', 'edit.paste',
-                    'edit.moveup', 'edit.movedown',
-                    'edit.delete', 'edit.rename'
-                    ]),
-            ]            
+        # separate menus for adding shapes and axis types
+        shapemenu = qt4.QMenu()
+        shapemenu.addActions( [actions[a] for a in (
+                    'add.rect',
+                    'add.ellipse',
+                    'add.line',
+                    'add.imagefile',
+                    'add.polygon',
+                    )])
+        actions['add.shapemenu'].setMenu(shapemenu)
+
+        axismenu = qt4.QMenu()
+        axismenu.addActions( [actions[a] for a in (
+                    'add.axis',
+                    'add.axis-broken',
+                    'add.axis-function',
+             )])
+        actions['add.axismenu'].setMenu(axismenu)
+        actions['add.axismenu'].triggered.connect(actions['add.axis'].trigger)
+
+        menuitems = (
+            ('insert', '', widgetactions),
+            ('edit', '', (
+                    'edit.cut',
+                    'edit.copy',
+                    'edit.paste',
+                    'edit.moveup',
+                    'edit.movedown',
+                    'edit.delete',
+                    'edit.rename'
+                    )),
+            )
         utils.constructMenus( self.parentwin.menuBar(),
                               self.parentwin.menus,
                               menuitems,
                               actions )
 
-        # create shape toolbar button
-        # attach menu to insert shape button
-        actions['add.shapemenu'].setMenu(self.parentwin.menus['insert.shape'])
-
         # add actions to toolbar to create widgets
-        utils.addToolbarActions(self.addtoolbar, actions,
-                                addact + ['add.shapemenu'])
+        utils.addToolbarActions(self.addtoolbar, actions, widgetactions)
 
         # add action to toolbar for editing
         utils.addToolbarActions(self.edittoolbar,  actions,

@@ -19,23 +19,15 @@
 """Widget that represents a page in the document."""
 
 import collections
+import numpy as N
 
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
+import veusz.utils as utils
 
 import widget
-import root
 import controlgraph
-
-# x, y, fplot, xyplot
-# x-> xyplot(x)
-# y-> xyplot(y)
-# fplot(y) -> x
-# y -> fplot(y)
-
-# x -> xyplot(x)
-# y -> (xyplot(y), fplot(y) -> x)
 
 def _(text, disambiguation=None, context='Page'):
     """Translate text."""
@@ -44,18 +36,72 @@ def _(text, disambiguation=None, context='Page'):
 
 defaultrange = [1e99, -1e99]
 
-class _AxisDependHelper(object):
+def _resolveLinkedAxis(axis):
+    """Follow a chain of axis function dependencies."""
+    loopcheck = set()
+    while axis.isLinked():
+        loopcheck.add(axis)
+        axis = axis.getLinkedAxis()
+        if axis in loopcheck:
+            # fail if loop
+            return None
+    return axis
+
+class AxisDependHelper(object):
     """A class to work out the dependency of widgets on axes and vice
     versa, in terms of ranges of the axes.
 
+    Note: Here a widget is really (widget, depname), as each widget
+    can have a different dependency (e.g. sx and sy dependencies for
+    plotters).
+
     It then works out the ranges for each of the axes from the plotters.
+
+    connection types:
+      plotter->axis : axis needs to know data range
+      axis->plotter : plotter needs to know axis range
+      axis<->axis   : axes are mutually dependent
+
+    aim: calculate ranges of axes given plotters
+
+    problem: cycles in the graph
+
+    f1<-x: function f1 depends on axis x
+    f2<-y: function f2 depends on axis y
+    y<-f1: axis y depends on function f1
+    x<-f2: axis x depends on function f2
+
+    solution: break dependency cycle: choose somewhere - probably better
+    to choose where widget depends on axis
+
+    however, axis<->axis cycle can't be broken
+
+    additional solution: convert all dependencies on axis1 or axis2 to
+    axiscomb
+
+    x <-> axis1 <-> axis2
+
+    For linked axes (e.g. AxisFunction):
+      * Don't keep track of range separately -> propagate to real axis
+      * For dependency order resolution, use real axis
+      * In self.deps, use axisfunction axis so we know which axis to use
     """
 
-    def __init__(self, root):
-        self.root = root
-        self.nodes = collections.defaultdict(list)
+    def __init__(self):
+        # map widgets to widgets it depends on
+        self.deps = collections.defaultdict(list)
+        # list of axes
         self.axes = []
+        # list of plotters associated with each axis
         self.axis_plotter_map = collections.defaultdict(list)
+        # ranges for each axis
+        self.ranges = {}
+        # pairs of dependent widgets
+        self.pairs = []
+
+        # track axes which map from one axis to another
+        self.axis_to_axislinked = {}
+        self.axislinked_to_axis = {}
 
     def recursivePlotterSearch(self, widget):
         """Find a list of plotters below widget.
@@ -65,9 +111,8 @@ class _AxisDependHelper(object):
         The tuples are (widget, depname), where depname is a name for the 
         part of the plotter, e.g. "sx" or "sy" for x or y.
         """
-        if hasattr(widget, 'isplotter'):
-            nodes = self.nodes
 
+        if widget.isplotter:
             # keep track of which widgets depend on which axes
             widgetaxes = {}
             for axname in widget.getAxesNames():
@@ -75,74 +120,147 @@ class _AxisDependHelper(object):
                 widgetaxes[axname] = axis
                 self.axis_plotter_map[axis].append(widget)
 
-            # if the widget is a plotter, find which axes the plotter can
-            # provide range information about
-            for axname, depname in widget.providesAxesDependency():
-                axis = widgetaxes[axname]
-                axdep = (axis, None)
-                nodes[axdep].append( (widget, depname) )
+            # if the widget is a plotter, find which axes the widget
+            # can provide range information about
+            for axname, depname in widget.affectsAxisRange():
+                origaxis = widgetaxes[axname]
+                resolvedaxis = _resolveLinkedAxis(origaxis)
+                if resolvedaxis is not None and resolvedaxis.usesAutoRange():
+                    # only add dependency if axis has an automatic range
+                    self.deps[(origaxis, None)].append((widget, depname))
+                    self.pairs.append( ((widget, depname),
+                                        (resolvedaxis, None)) )
 
             # find which axes the plotter needs information from
-            for depname, axname in widget.requiresAxesDependency():
-                axis = widgetaxes[axname]
-                widdep = (widget, depname)
-                if widdep not in nodes:
-                    nodes[widdep] = []
-                nodes[widdep].append( (axis, None) )
+            for depname, axname in widget.requiresAxisRange():
+                origaxis = widgetaxes[axname]
+                resolvedaxis = _resolveLinkedAxis(origaxis)
+                if resolvedaxis is not None and resolvedaxis.usesAutoRange():
+                    self.deps[(widget, depname)].append((origaxis, None))
+                    self.pairs.append( ((resolvedaxis, None),
+                                        (widget, depname)) )
 
-        elif hasattr(widget, 'isaxis'):
-            # it is an axis, so keep track of it
-            if hasattr(widget, 'isaxis'):
+        elif widget.isaxis:
+            if widget.isaxis and widget.isLinked():
+                # function of another axis
+                linked = widget.getLinkedAxis()
+                if linked is not None:
+                    self.axis_to_axislinked[linked] = widget
+                    self.axislinked_to_axis[widget] = linked
+            else:
+                # make a range for a normal axis
                 self.axes.append(widget)
+                self.ranges[widget] = list(defaultrange)
 
+        for c in widget.children:
+            self.recursivePlotterSearch(c)
+
+    def breakCycles(self, origcyclic):
+        """Remove cycles if possible."""
+
+        numcyclic = len(origcyclic)
+        best = -1
+
+        for i in xrange(len(self.pairs)):
+            if not self.pairs[i][0][0].isaxis:
+                p = self.pairs[:i] + self.pairs[i+1:]
+                ordered, cyclic = utils.topological_sort(p)
+                if len(cyclic) <= numcyclic:
+                    numcyclic = len(cyclic)
+                    best = i
+
+        # delete best, or last one if none better found
+        p = self.pairs[best]
+        del self.pairs[best]
+
+        try:
+            idx = self.deps[p[1]].index(p[0])
+            del self.deps[p[1]][idx]
+        except ValueError:
+            pass
+
+    def _updateAxisAutoRange(self, axis):
+        """Update auto range for axis."""
+        # set actual range on axis, as axis no longer has a
+        # dependency
+        axrange = self.ranges[axis]
+        if axrange == defaultrange:
+            axrange = None
+        # print "Updating", axis.name, axrange
+        axis.setAutoRange(axrange)
+        del self.ranges[axis]
+
+    def _updateRangeFromPlotter(self, axis, plotter, plotterdep):
+        """Update the range for axis from the plotter."""
+
+        if axis.isLinked():
+            # take range and map back to real axis
+            therange = list(defaultrange)
+            plotter.getRange(axis, plotterdep, therange)
+
+            if therange != defaultrange:
+                # follow up chain
+                loopcheck = set()
+                while axis.isLinked():
+                    loopcheck.add(axis)
+                    therange = axis.invertFunctionVals(therange)
+                    axis = axis.getLinkedAxis()
+                    if axis in loopcheck:
+                        axis = None
+                if axis is not None and therange is not None:
+                    self.ranges[axis] = [
+                        N.nanmin((self.ranges[axis][0], therange[0])),
+                        N.nanmax((self.ranges[axis][1], therange[1]))
+                        ]
         else:
-            # otherwise search children
-            for c in widget.children:
-                self.recursivePlotterSearch(c)
+            plotter.getRange(axis, plotterdep, self.ranges[axis])
 
-    def findPlotters(self):
-        """Construct a list of plotters associated with each axis.
-        Returns nodes:
+    def processWidgetDeps(self, dep):
+        """Process dependencies for a single widget."""
+        widget, widget_dep = dep
 
-        {axisobject: [plotterobject, plotter2...]),
-         ...}
-        """
+        # iterate over dependent widgets
+        for widgetd, widgetd_dep in self.deps[dep]:
 
-        self.recursivePlotterSearch(self.root)
-        self.ranges = dict( [(a, list(defaultrange)) for a in self.axes] )
+            # print "Dep: ", widget.name, widgetd.name
+            if ( widgetd.isplotter and
+                 (not widgetd.settings.isSetting('hide') or
+                  not widgetd.settings.hide) ):
+                self._updateRangeFromPlotter(widget, widgetd, widgetd_dep)
 
-    def processDepends(self, widget, depends):
+            elif widgetd.isaxis:
+                axis = _resolveLinkedAxis(widgetd)
+                if axis in self.ranges:
+                    self._updateAxisAutoRange(axis)
+
+    def processDepends(self):
         """Go through dependencies of widget.
         If the dependency has no dependency itself, then update the
         axis with the widget or vice versa
+
+        Algorithm:
+          Iterate over dependencies for widget.
+
+          If the widget has a dependency on a widget which doesn't
+          have a dependency itself, update range from that
+          widget. Then delete that depency from the dependency list.
         """
-        modified = False
-        i = 0
-        while i < len(depends):
-            dep = depends[i]
-            if dep not in self.nodes:
-                dwidget, dwidget_dep = dep
-                if hasattr(dwidget, 'isplotter'):
-                    # update range of axis with (dwidget, dwidget_dep)
-                    # do not do this if the widget is hidden
-                    if ( not dwidget.settings.isSetting('hide') or
-                         not dwidget.settings.hide ):
-                        dwidget.updateAxisRange(widget, dwidget_dep,
-                                                self.ranges[widget])
-                elif hasattr(dwidget, 'isaxis'):
-                    # set actual range on axis, as axis no longer has a
-                    # dependency
-                    if dwidget in self.ranges:
-                        axrange = self.ranges[dwidget]
-                        if axrange == defaultrange:
-                            axrange = None
-                        dwidget.setAutoRange(axrange)
-                        del self.ranges[dwidget]
-                del depends[i]
-                modified = True
-                continue
-            i += 1
-        return modified
+
+        # get ordered list, breaking cycles
+        while True:
+            ordered, cyclic = utils.topological_sort(self.pairs)
+            if not cyclic:
+                break
+            self.breakCycles(cyclic)
+
+        # iterate over widgets in order
+        for dep in ordered:
+            self.processWidgetDeps(dep)
+
+            # process deps for any axis functions
+            while dep[0] in self.axis_to_axislinked:
+                dep = (self.axis_to_axislinked[dep[0]], None)
+                self.processWidgetDeps(dep)
 
     def findAxisRanges(self):
         """Find the ranges from the plotters and set the axis ranges.
@@ -150,39 +268,17 @@ class _AxisDependHelper(object):
         Follows the dependencies calculated above.
         """
 
-        # probaby horribly inefficient
-        nodes = self.nodes
-        while nodes:
-            # iterate over dependencies for each widget
-            inloop = True
+        self.processDepends()
 
-            for (widget, widget_depname), depends in nodes.iteritems():
-                # go through dependencies of widget
-                if widget and self.processDepends(widget, depends):
-                    # if modified, we keep looping
-                    inloop = False
-
-                # delete dependencies for widget if none remaining
-                if not depends:
-                    del nodes[(widget, widget_depname)]
-                    break
-
-            # prevent infinite loops, break out if we do nothing in an
-            # iteration
-            if inloop:
-                break
-
-        for axis, axrange in self.ranges.iteritems():
-            if axrange == defaultrange:
-                axrange = None
-            axis.setAutoRange(axrange)
+        # set any remaining ranges
+        for axis in list(self.ranges.keys()):
+            self._updateAxisAutoRange(axis)
 
 class Page(widget.Widget):
     """A class for representing a page of plotting."""
 
     typename='page'
     allowusercreation = True
-    allowedparenttypes = [root.Root]
     description=_('Blank page')
 
     def __init__(self, parent, name=None):
@@ -208,6 +304,11 @@ class Page(widget.Widget):
                 descr=_('Height of page'),
                 usertext=_('Page height'),
                 formatting=True) )
+
+    @classmethod
+    def allowedParentTypes(self):
+        import root
+        return (root.Root,)
         
     def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
@@ -216,8 +317,8 @@ class Page(widget.Widget):
         x1, y1, x2, y2 = parentposn
 
         # find ranges of axes
-        axisdependhelper = _AxisDependHelper(self)
-        axisdependhelper.findPlotters()
+        axisdependhelper = AxisDependHelper()
+        axisdependhelper.recursivePlotterSearch(self)
         axisdependhelper.findAxisRanges()
 
         # store axis->plotter mappings in painthelper

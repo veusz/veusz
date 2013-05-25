@@ -37,7 +37,6 @@ class Root(widget.Widget):
 
     typename='document'
     allowusercreation = False
-    allowedparenttypes = [None]
 
     def __init__(self, parent, name=None, document=None):
         """Initialise object."""
@@ -80,6 +79,10 @@ class Root(widget.Widget):
                         'document'),
                 usertext=_('English locale'),
                 formatting=True) )
+
+    @classmethod
+    def allowedParentTypes(self):
+        return (None,)
 
     def changeLocale(self):
         """Update locale of document if changed by user."""
