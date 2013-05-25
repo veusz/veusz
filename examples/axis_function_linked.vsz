@@ -1,6 +1,6 @@
 # Veusz saved document (version 1.17.1)
 
-ImportFileCSV('axis-function.csv', blanksaredata=True, delimiter='\t', linked=True, numericlocale='en_GB')
+ImportFileCSV('axis_function_linked.csv', blanksaredata=True, delimiter='\t', linked=True, numericlocale='en_GB')
 Set('height', u'12cm')
 Set('StyleSheet/Font/font', u'DejaVu Serif')
 Set('StyleSheet/axis/TickLabels/size', u'12pt')
