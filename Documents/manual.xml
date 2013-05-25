@@ -146,6 +146,16 @@
 	    <para>If an axis appears within a grid, then it can be
 	  shared by all the graphs which are contained within the
 	  grid.</para>
+
+	    <para> The <command>axis-broken</command> widget is an
+	    axis sub-type. It is an axis type where there are
+	    jumps in the scale of the axis.</para>
+
+	    <para>The <command>axis-function</command> widget allows
+	    the user to create an axis where the values are scaled by
+	    a monotonic function, allowing non-linear and
+	    non-logarithmic axis scales. The widget can also be linked
+	    to a different axis via the function.</para>
 	  </listitem>
 
 	  <listitem>
