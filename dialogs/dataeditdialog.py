@@ -439,7 +439,7 @@ class DataEditDialog(VeuszDialog):
         if len(self.document.data) > 0:
             self.selectDataset( sorted(self.document.data.keys())[0] )
         else:
-            self.slotDatasetSelected([])
+            self.slotDatasetsSelected([])
 
         self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteddatasets"),
                      self.slotDatasetsSelected)
