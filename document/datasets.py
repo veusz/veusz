@@ -585,7 +585,8 @@ class Dataset(DatasetBase):
             if col in rowdata:
                 data[:len(rowdata[col])] = N.array(rowdata[col])
             if coldata is not None:
-                setattr(self, col, N.insert(coldata, [row]*numrows, data))
+                newdata = N.insert(coldata, [row]*numrows, data)
+                setattr(self, col, newdata)
 
         self.document.modifiedData(self)
 

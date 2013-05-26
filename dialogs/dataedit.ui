@@ -12,7 +12,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit data - Veusz</string>
+   <string>Dataset editor - Veusz</string>
   </property>
   <layout class="QVBoxLayout">
    <property name="spacing">

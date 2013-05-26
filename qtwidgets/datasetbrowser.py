@@ -630,26 +630,25 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
     def slotNewSelection(self, selected, deselected):
         """Emit selecteditem signal on new selection."""
-        self.emit(qt4.SIGNAL("selecteditem"), self.getSelectedDataset())
+        self.emit(qt4.SIGNAL("selecteddatasets"), self.getSelectedDatasets())
 
     def slotNewRow(self, parent, start, end):
         """Expand parent if added."""
         self.expand(parent)
 
-    def getSelectedDataset(self):
-        """Return selected dataset."""
-        name = None
-        sel = self.selectionModel().selection()
-        try:
-            modelidx = sel.indexes()[0]
-            node = self.model.objFromIndex(modelidx)
-            if isinstance(node, DatasetNode):
+    def getSelectedDatasets(self):
+        """Returns list of selected datasets."""
+
+        datasets = []
+        for idx in self.selectionModel().selectedRows():
+            node = self.model.objFromIndex(idx)
+            try:
                 name = node.datasetName()
-        except IndexError:
-            pass
-        if name not in self.doc.data:
-            name = None
-        return name
+                if name in self.doc.data:
+                    datasets.append(name)
+            except AttributeError:
+                pass
+        return datasets
 
 class DatasetBrowser(qt4.QWidget):
     """Widget which shows the document's datasets."""

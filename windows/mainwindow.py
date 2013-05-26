@@ -502,13 +502,13 @@ class MainWindow(qt4.QMainWindow):
                 a(self, _('Import data into Veusz'), _('&Import...'),
                   self.slotDataImport, icon='kde-vzdata-import'),
             'data.edit':
-                a(self, _('Edit existing datasets'), _('&Edit...'),
+                a(self, _('Edit and enter new datasets'), _('&Editor...'),
                   self.slotDataEdit, icon='kde-edit-veuszedit'),
             'data.create':
-                a(self, _('Create new datasets'), _('&Create...'),
+                a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create...'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
             'data.create2d':
-                a(self, _('Create new 2D datasets'), _('Create &2D...'),
+                a(self, _('Create new 2D datasets from existing datasets, or as a function of x and y'), _('Create &2D...'),
                   self.slotDataCreate2D, icon='kde-dataset2d-new-veuszedit'),
             'data.capture':
                 a(self, _('Capture remote data'), _('Ca&pture...'),

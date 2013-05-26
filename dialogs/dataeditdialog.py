@@ -65,7 +65,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         return len( ds.column_descriptions )
 
     def data(self, index, role):
-        """Return data associated with column given."""
+        """Return data for index."""
         # get dataset
         ds = self.document.data[self.dsname]
         if ds is not None:
@@ -84,7 +84,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         return qt4.QVariant()
 
     def headerData(self, section, orientation, role):
-        """Return headers at top."""
+        """Return row numbers or column names."""
 
         try:
             ds = self.document.data[self.dsname]
@@ -105,11 +105,10 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         
     def flags(self, index):
         """Update flags to say that items are editable."""
-        
-        if not index.isValid():
-            return qt4.Qt.ItemIsEnabled
-        else:
-            return qt4.QAbstractTableModel.flags(self, index) | qt4.Qt.ItemIsEditable
+        if index.isValid():
+            return ( qt4.QAbstractTableModel.flags(self, index) |
+                     qt4.Qt.ItemIsEditable )
+        return qt4.Qt.ItemIsEnabled
 
     def removeRows(self, row, count):
         """Remove rows."""
@@ -133,7 +132,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         data = getattr(ds, ds.columns[index.column()])
 
         # add new column if necessary
-        ops = document.OperationMultiple([], descr=_('add value'))
+        ops = document.OperationMultiple([], descr=_('set value'))
         if data is None:
             ops.addOperation(
                 document.OperationDatasetAddColumn(self.dsname,
@@ -159,6 +158,161 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         except RuntimeError:
             return False
         return True
+
+class DatasetTableModelMulti(qt4.QAbstractTableModel):
+    """Edit multiple datasets simultaneously with a spreadsheet-like style."""
+
+    def __init__(self, parent, document, datasetnames):
+        qt4.QAbstractTableModel.__init__(self, parent)
+
+        self.document = document
+        self.dsnames = datasetnames
+        self.connect(document, qt4.SIGNAL('sigModified'),
+                     self.slotDocumentModified)
+
+        self.changeset = -1
+        self.rows = 0
+
+    def updateCounts(self):
+        """Count rows and columns."""
+
+        self.changeset = self.document.changeset
+
+        rows = 0
+        rowcounts = self.rowcounts = []
+        colcounts = self.colcounts = []
+        colattrs = self.colattrs = []
+
+        for dsidx, name in enumerate(self.dsnames):
+            if name not in self.document.data:
+                continue
+            dataset = self.document.data[name]
+            if (not hasattr(dataset, 'data') or
+                not hasattr(dataset, 'columns') or
+                dataset.dimensions != 1):
+                continue
+
+            r = len(dataset.data)+1
+            rowcounts.append(r)
+            rows = max(rows, r)
+
+            attr = []
+            for colidx, col in enumerate(dataset.columns):
+                data = getattr(dataset, col)
+                if data is not None:
+                    attr.append( (name, col, dsidx, colidx) )
+            colcounts.append( len(attr) )
+            colattrs += attr
+
+        self.rows = rows
+
+    def rowCount(self, parent):
+        if self.changeset != self.document.changeset:
+            self.updateCounts()
+        return self.rows
+
+    def columnCount(self, parent):
+        if self.changeset != self.document.changeset:
+            self.updateCounts()
+        return len(self.colattrs)
+
+    def slotDocumentModified(self):
+        self.updateCounts()
+        self.emit( qt4.SIGNAL('layoutChanged()') )
+
+    def data(self, index, role):
+        """Return data for index."""
+
+        dsname, colname, dsidx, colidx = self.colattrs[index.column()]
+        ds = self.document.data[dsname]
+        data = getattr(ds, colname)
+
+        if role == qt4.Qt.DisplayRole:
+            if index.row() < self.rowcounts[dsidx]-1:
+                # convert data to QVariant
+                d = data[index.row()]
+                return ds.uiDataItemToQVariant(d)
+
+        # empty entry
+        return qt4.QVariant()
+
+    def headerData(self, section, orientation, role):
+        """Return row numbers or column names."""
+
+        if role == qt4.Qt.DisplayRole:
+            if orientation == qt4.Qt.Horizontal:
+                # column names
+                dsname, colname, dsidx, colidx = self.colattrs[section]
+                ds = self.document.data[dsname]
+                descr = ds.column_descriptions[colidx]
+                header = dsname + '\n' + descr
+                return qt4.QVariant(header)
+            else:
+                # return row numbers
+                if section == self.rows-1:
+                    return qt4.QVariant("+")
+                return qt4.QVariant(section+1)
+
+        return qt4.QVariant()
+
+    def flags(self, index):
+        """Update flags to say that items are editable."""
+        if index.isValid():
+            return ( qt4.QAbstractTableModel.flags(self, index) |
+                     qt4.Qt.ItemIsEditable )
+        return qt4.Qt.ItemIsEnabled
+
+    def setData(self, index, value, role):
+        """Validate and set data in dataset."""
+
+        if not index.isValid() or role != qt4.Qt.EditRole:
+            return False
+
+        row = index.row()
+        column = index.column()
+        dsname, colname, dsidx, colidx = self.colattrs[column]
+        ds = self.document.data[dsname]
+
+        ops = document.OperationMultiple([], descr=_('set value'))
+        if row >= self.rowcounts[dsidx]-1:
+            # add number of rows required to add new value below
+            ops.addOperation(
+                document.OperationDatasetInsertRow(
+                    dsname, self.rowcounts[dsidx]-1,
+                    row+1-self.rowcounts[dsidx]+1))
+
+        # convert text to value
+        try:
+            val = ds.uiConvertToDataItem( value.toString() )
+        except ValueError:
+            return False
+
+        ops.addOperation(
+            document.OperationDatasetSetVal(dsname, colname, row, val))
+
+        try:
+            self.document.applyOperation(ops)
+            return True
+        except RuntimeError:
+            return False
+
+    def insertRows(self, row, count):
+        ops = []
+        for i, name in enumerate(self.dsnames):
+            if self.rowcounts[i]-1 >= row:
+                ops.append(
+                    document.OperationDatasetInsertRow(name, row, count))
+        self.document.applyOperation(
+            document.OperationMultiple(ops, _('insert row(s)')))
+
+    def removeRows(self, row, count):
+        ops = []
+        for i, name in enumerate(self.dsnames):
+            if self.rowcounts[i]-1 >= row:
+                ops.append(
+                    document.OperationDatasetDeleteRow(name, row, count))
+        self.document.applyOperation(
+            document.OperationMultiple(ops, _('delete row(s)')))
 
 class DatasetTableModel2D(qt4.QAbstractTableModel):
     """A 2D dataset model."""
@@ -285,10 +439,10 @@ class DataEditDialog(VeuszDialog):
         if len(self.document.data) > 0:
             self.selectDataset( sorted(self.document.data.keys())[0] )
         else:
-            self.slotDatasetSelected("")
+            self.slotDatasetSelected([])
 
-        self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteditem"),
-                     self.slotDatasetSelected)
+        self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteddatasets"),
+                     self.slotDatasetsSelected)
 
         # connect buttons
         for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
@@ -309,20 +463,22 @@ class DataEditDialog(VeuszDialog):
             self.connect(a, qt4.SIGNAL('triggered()'), slot)
         self.newbutton.setMenu(self.newmenu)
 
-    def slotDatasetSelected(self, name):
+    def slotDatasetsSelected(self, names):
         """Called when a new dataset is selected."""
 
         # FIXME: Make readonly models readonly!!
         model = None
-        if name:
+        if len(names) == 1:
             # get selected dataset
-            ds = self.document.data[name]
+            ds = self.document.data[names[0]]
 
             # make model for dataset
             if ds.dimensions == 1:
-                model = DatasetTableModel1D(self, self.document, name)
+                model = DatasetTableModel1D(self, self.document, names[0])
             elif ds.dimensions == 2:
-                model = DatasetTableModel2D(self, self.document, name)
+                model = DatasetTableModel2D(self, self.document, names[0])
+        else:
+            model = DatasetTableModelMulti(self, self.document, names)
 
         # disable context menu if no menu
         for a in self.datatableview.actions():
@@ -333,65 +489,70 @@ class DataEditDialog(VeuszDialog):
 
     def setUnlinkState(self):
         """Enable the unlink button correctly."""
-        # get dataset
-        dsname = self.getSelectedDataset()
-        try:
-            ds = self.document.data[dsname]
-            unlink = ds.canUnlink()
-            linkinfo = ds.linkedInformation()
-        except KeyError:
-            ds = None
-            unlink = False
-            linkinfo = ""
 
-        self.editbutton.setVisible(type(ds) in recreate_register)
-        self.unlinkbutton.setEnabled(unlink)
-        self.linkedlabel.setText(linkinfo)
-        self.deletebutton.setEnabled(ds is not None)
-        self.duplicatebutton.setEnabled(ds is not None)
+        linkinfo = []
+        canunlink = []
+        canedit = []
+        names = self.dsbrowser.navtree.getSelectedDatasets()
+        for name in names:
+            ds = self.document.data[name]
+            canunlink.append(ds.canUnlink())
+            if len(names) > 1:
+                linkinfo.append(name)
+            linkinfo.append(ds.linkedInformation())
+            canedit.append(type(ds) in recreate_register)
+
+        self.editbutton.setVisible(any(canedit))
+        self.unlinkbutton.setEnabled(any(canunlink))
+        self.linkedlabel.setText('\n'.join(linkinfo))
+        self.deletebutton.setEnabled(bool(names))
+        self.duplicatebutton.setEnabled(bool(names))
 
     def slotDocumentModified(self):
         """Set unlink status when document modified."""
         self.setUnlinkState()
 
-    def getSelectedDataset(self):
-        """Return the selected dataset."""
-        return self.dsbrowser.navtree.getSelectedDataset()
-
     def selectDataset(self, dsname):
         """Select dataset with name given."""
         self.dsbrowser.navtree.selectDataset(dsname)
-        self.slotDatasetSelected(dsname)
+        self.slotDatasetsSelected([dsname])
 
     def slotDatasetDelete(self):
         """Delete selected dataset."""
+        dsnames = self.dsbrowser.navtree.getSelectedDatasets()
         self.document.applyOperation(
-            document.OperationDatasetDelete(self.getSelectedDataset()) )
+            document.OperationMultiple(
+                [document.OperationDatasetDelete(n) for n in dsnames],
+                descr=_('delete dataset(s)')))
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
-        datasetname = self.getSelectedDataset()
-        d = self.document.data[datasetname]
-        if d.linked is not None:
-            op = document.OperationDatasetUnlinkFile(datasetname)
-        else:
-            op = document.OperationDatasetUnlinkRelation(datasetname)
-        self.document.applyOperation(op)
+        ops = []
+        for name in self.dsbrowser.navtree.getSelectedDatasets():
+            d = self.document.data[name]
+            if d.linked is not None:
+                ops.append(document.OperationDatasetUnlinkFile(name))
+            elif d.canUnlink():
+                ops.append(document.OperationDatasetUnlinkRelation(name))
+        if ops:
+            self.document.applyOperation(
+                document.OperationMultiple(ops, _('unlink dataset(s)')))
 
     def slotDatasetDuplicate(self):
-        """Duplicate selected dataset."""
-        
-        datasetname = self.getSelectedDataset()
-        if datasetname is not None:
+        """Duplicate selected datasets."""
+        ops = []
+        for name in self.dsbrowser.navtree.getSelectedDatasets():
             # generate new name for dataset
-            newname = datasetname + '_copy'
+            newname = name + '_copy'
             index = 2
             while newname in self.document.data:
-                newname = '%s_copy_%i' % (datasetname, index)
+                newname = '%s_copy_%i' % (name, index)
                 index += 1
-
+            ops.append(
+                document.OperationDatasetDuplicate(name, newname))
+        if ops:
             self.document.applyOperation(
-                document.OperationDatasetDuplicate(datasetname, newname))
+                document.OperationMultiple(ops, _('duplicate dataset(s)')))
 
     def slotDatasetImport(self):
         """Show import dialog."""
@@ -403,11 +564,13 @@ class DataEditDialog(VeuszDialog):
 
     def slotDatasetEdit(self):
         """Reload dataset into dataset creation dialog."""
-        dsname = self.getSelectedDataset()
-        if dsname:
-            dataset = self.document.data[dsname]
-            recreate_register[type(dataset)](self.mainwindow, self.document,
-                                             dataset, dsname)
+        for name in self.dsbrowser.navtree.getSelectedDatasets():
+            dataset = self.document.data[name]
+            try:
+                recreate_register[type(dataset)](self.mainwindow, self.document,
+                                                 dataset, name)
+            except KeyError:
+                pass
 
     def slotCopy(self):
         """Copy text from selection."""
