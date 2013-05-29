@@ -331,8 +331,8 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 {
-  const int xw = min(data.dims[0], img.width());
-  const int yw = min(data.dims[1], img.height());
+  const int xw = min(data.dims[1], img.width());
+  const int yw = min(data.dims[0], img.height());
   
   for(int y=0; y<yw; ++y)
     {
