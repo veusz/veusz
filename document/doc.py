@@ -862,5 +862,9 @@ class Document( qt4.QObject ):
         """Get colormap with name given (returning grey if does not exist)."""
         cmap = self.colormaps.get(name, self.colormaps['grey'])
         if invert:
-            return cmap[::-1]
+            if cmap[0][0] >= 0:
+                return cmap[::-1]
+            else:
+                # ignore marker at beginning
+                return tuple([cmap[0]] + list(cmap[-1:0:-1]))
         return cmap

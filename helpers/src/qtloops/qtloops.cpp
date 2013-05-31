@@ -269,9 +269,14 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
   const int numcolors = colors.dims[0];
   if ( colors.dims[1] != 4 )
     throw "4 columns required in colors array";
+  if ( numcolors < 1 )
+    throw "at least 1 color required";
   const int numbands = numcolors-1;
   const int xw = imgdata.dims[1];
   const int yw = imgdata.dims[0];
+
+  // if the first value in the color is -1 then switch to jumping mode
+  const bool jumps = colors(0,0) == -1;
 
   QImage::Format format = QImage::Format_RGB32;
   if( forcetrans )
@@ -296,34 +301,56 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
       for(int x=0; x<xw; ++x)
 	{
 	  double val = imgdata(x, y);
+
+	  // output color
+	  int b, g, r, a;
+
 	  if( ! isFinite(val) )
 	    {
 	      // transparent
-	      *(scanline+x) = qRgba(0, 0, 0, 0);
+	      b = g = r = a = 0;
 	    }
 	  else
 	    {
-	      // do linear interpolation between bands
-	      // make sure between 0 and 1
 	      val = clipval(val, 0., 1.);
-	      const int band = clipval(int(val*numbands), 0, numbands-1);
-	      const double delta = val*numbands - band;
 
-	      // ensure we don't read beyond where we should
-	      const int band2 = min(band + 1, numbands);
-	      const double delta1 = 1.-delta;
+	      if( jumps )
+		{
+		  // jumps between colours in discrete mode
+		  // (ignores 1st color, which signals this mode)
+		  const int band = clipval(int(val*(numcolors-1))+1, 1,
+					   numcolors-1);
 
-	      const int b = int(delta1*colors(0, band) +
-				delta *colors(0, band2));
-	      const int g = int(delta1*colors(1, band) +
-				delta *colors(1, band2));
-	      const int r = int(delta1*colors(2, band) +
-				delta *colors(2, band2));
-	      const int a = int(delta1*colors(3, band) +
-				delta *colors(3, band2));
+		  b = colors(0, band);
+		  g = colors(1, band);
+		  r = colors(2, band);
+		  a = colors(3, band);
+		}
+	      else
+		{
+		  // do linear interpolation between bands
+		  // make sure between 0 and 1
+
+		  const int band = clipval(int(val*numbands), 0, numbands-1);
+		  const double delta = val*numbands - band;
+
+		  // ensure we don't read beyond where we should
+		  const int band2 = min(band + 1, numbands);
+		  const double delta1 = 1.-delta;
+
+		  b = int(delta1*colors(0, band) +
+			  delta *colors(0, band2));
+		  g = int(delta1*colors(1, band) +
+			  delta *colors(1, band2));
+		  r = int(delta1*colors(2, band) +
+			  delta *colors(2, band2));
+		  a = int(delta1*colors(3, band) +
+			  delta *colors(3, band2));
 	      
-	      *(scanline+x) = qRgba(r, g, b, a);
+		}
 	    }
+
+	  *(scanline+x) = qRgba(r, g, b, a);
 	}
     }
   return img;
