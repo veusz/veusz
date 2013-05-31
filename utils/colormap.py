@@ -28,9 +28,13 @@ except ImportError:
 
 # Default colormaps used by widgets.
 # Each item in this dict is a colormap entry, with the key the name.
-# The values in the dict are tuples of (B, G, R, alpha).
-# B, G, R and alpha go from 0 to 255
-# Colors are linearly interpolated in this space.
+
+# The values in the dict are tuples of (B, G, R, alpha).  B, G, R and
+# alpha go from 0 to 255
+
+# Colors are linearly interpolated in this space, unless they start
+# with (-1,0,0,0) which enables a step mode (this first value is
+# ignored)
 
 defaultcolormaps = {
     'blank': (
@@ -131,6 +135,14 @@ defaultcolormaps = {
         ),
     'transblack': (
         (0,   0,   0,   255),
+        (0,   0,   0,   0),
+        ),
+    'transblack-step5': (
+        (-1,  0,   0,   0),
+        (0,   0,   0,   255),
+        (0,   0,   0,   191),
+        (0,   0,   0,   128),
+        (0,   0,   0,   64),
         (0,   0,   0,   0),
         ),
     'royal': (
