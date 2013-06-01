@@ -865,6 +865,6 @@ class Document( qt4.QObject ):
             if cmap[0][0] >= 0:
                 return cmap[::-1]
             else:
-                # ignore marker at beginning
+                # ignore marker at beginning for stepped maps
                 return tuple([cmap[0]] + list(cmap[-1:0:-1]))
         return cmap

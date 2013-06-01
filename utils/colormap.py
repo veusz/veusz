@@ -244,11 +244,12 @@ def applyColorMap(cmap, scaling, datain, minval, maxval,
     if minval > maxval:
         minval, maxval = maxval, minval
         if cmap[0,0] >= 0:
-            # smooth colormap
+            # reverse standard colormap
             cmap = cmap[::-1]
         else:
-            # uses flag signal at start of array
-            cmap = N.hstack( (cmap[0], cmap[1::-1]) )
+            # uses flag signal at start of array for stepped maps
+            # ignore this in reverse
+            cmap[1:] = cmap[-1:0:-1]
 
     # apply transparency
     if trans != 0:
