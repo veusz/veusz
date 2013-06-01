@@ -190,12 +190,15 @@ class Graph(widget.Widget):
             if isinstance(axis, axisbroken.AxisBroken):
                 brokenaxes.add(axis)
 
+        # don't duplicate drawing axes
+        axesdrawn = set()
+
         # do normal drawing of children
         # iterate over children in reverse order
         for c in reversed(self.children):
 
             if c.isaxis:
-                continue
+                axesdrawn.add(c)
 
             axes = axesofwidget.get(c, None)
             if axes is not None and any((a in brokenaxes for a in axes)):
@@ -228,9 +231,10 @@ class Graph(widget.Widget):
             axis.drawGrid(bounds, painthelper, outerbounds=outerbounds,
                           ontop=True)
 
-        # draw axes on top of grid lines
+        # draw remaining axes
         for aname, awidget in axisdrawlist:
-            awidget.draw(bounds, painthelper, outerbounds=outerbounds)
+            if awidget not in axesdrawn:
+                awidget.draw(bounds, painthelper, outerbounds=outerbounds)
 
         return bounds
 
