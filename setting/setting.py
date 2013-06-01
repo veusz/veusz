@@ -562,14 +562,14 @@ class Float(Setting):
     def makeControl(self, *args):
         return controls.Edit(self, *args)
 
-class FloatOrAuto(Setting):
+class FloatOrAuto(Float):
     """Save a float or text auto."""
 
     typename = 'float-or-auto'
 
     def convertTo(self, val):
         if type(val) in (int, float):
-            return _finiteRangeFloat(val)
+            return _finiteRangeFloat(val, minval=self.minval, maxval=self.maxval)
         elif isinstance(val, basestring) and val.strip().lower() == 'auto':
             return None
         else:
@@ -579,7 +579,7 @@ class FloatOrAuto(Setting):
         if val is None:
             return 'Auto'
         else:
-            return val
+            return Float.convertFrom(self, val)
 
     def toText(self):
         if self.val is None or (isinstance(self.val, basestring) and
@@ -592,12 +592,7 @@ class FloatOrAuto(Setting):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
-            f, ok = uilocale.toDouble(text)
-            if ok:
-                return self.convertTo(f)
-            else:
-                # try to evaluate
-                return self.safeEvalHelper(text)
+            return Float.fromText(self, text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)

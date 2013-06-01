@@ -71,6 +71,14 @@ class Graph(widget.Widget):
                                  descr=_('Distance from bottom of graph to edge'),
                                  usertext=_('Bottom margin'),
                                  formatting=True) )
+        s.add( setting.FloatOrAuto('aspect',
+                                   'Auto',
+                                   descr=_('Fix aspect ratio of graph to this value'),
+                                   usertext=_('Aspect ratio'),
+                                   minval = 0.01,
+                                   maxval = 100.,
+                                   formatting=True) )
+
         s.add( setting.GraphBrush( 'Background',
                                    descr = _('Background plot fill'),
                                    usertext=_('Background')),
@@ -124,6 +132,32 @@ class Graph(widget.Widget):
         ad = self.getAxesDict(axesnames)
         return [ad[n] for n in axesnames]
 
+    def adjustBoundsForAspect(self, bounds):
+        s = self.settings
+        if s.aspect != 'Auto':
+            saspect = s.aspect
+            width = bounds[2]-bounds[0]
+            height = bounds[3]-bounds[1]
+            gaspect = float(width)/height
+
+            bounds = list(bounds)
+            if saspect > gaspect:
+                # want a graph which is wider than the current size
+                # => add space to top/bottom
+                newheight = width / saspect
+                delta = (height-newheight) / 2
+                bounds[1] += delta
+                bounds[3] -= delta
+            else:
+                # want a graph which is narrower than the current size
+                # => add space to left/right
+                newwidth = height * saspect
+                delta = (width-newwidth) / 2
+                bounds[0] += delta
+                bounds[2] -= delta
+
+        return bounds
+
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
         s = self.settings
@@ -152,6 +186,8 @@ class Graph(widget.Widget):
         painthelper.setControlGraph(self, [
                 controlgraph.ControlMarginBox(self, bounds, maxbounds,
                                               painthelper) ])
+
+        bounds = self.adjustBoundsForAspect(bounds)
 
         with painter:
             # set graph rectangle attributes
