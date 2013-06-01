@@ -47,16 +47,18 @@
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M115.1,62.5l354.3,0"/>
-<path d="M126.9,62.5l0,-3.7M138.7,62.5l0,-3.7M150.5,62.5l0,-3.7M162.4,62.5l0,-3.7M174.2,62.5l0,-3.7M186,62.5l0,-3.7M197.8,62.5l0,-3.7M209.6,62.5l0,-3.7M221.4,62.5l0,-3.7M233.2,62.5l0,-3.7M245,62.5l0,-3.7M256.8,62.5l0,-3.7M268.7,62.5l0,-3.7M280.5,62.5l0,-3.7M292.3,62.5l0,-3.7M304.1,62.5l0,-3.7M315.9,62.5l0,-3.7M327.7,62.5l0,-3.7M339.5,62.5l0,-3.7M351.3,62.5l0,-3.7M363.1,62.5l0,-3.7M375,62.5l0,-3.7M386.8,62.5l0,-3.7M398.6,62.5l0,-3.7M410.4,62.5l0,-3.7M422.2,62.5l0,-3.7M434,62.5l0,-3.7M445.8,62.5l0,-3.7M457.6,62.5l0,-3.7"/>
-<path d="M174.2,62.5l0,-7.5M233.2,62.5l0,-7.5M292.3,62.5l0,-7.5M351.3,62.5l0,-7.5M410.4,62.5l0,-7.5"/>
+<path d="M115.7,62.5l0,-3.7M145.1,62.5l0,-3.7M174.5,62.5l0,-3.7M203.8,62.5l0,-3.7M233.2,62.5l0,-3.7M262.6,62.5l0,-3.7M292,62.5l0,-3.7M321.4,62.5l0,-3.7M350.7,62.5l0,-3.7M380.1,62.5l0,-3.7M409.5,62.5l0,-3.7M438.9,62.5l0,-3.7M468.3,62.5l0,-3.7"/>
+<path d="M115.7,62.5l0,-7.5M174.5,62.5l0,-7.5M233.2,62.5l0,-7.5M292,62.5l0,-7.5M350.7,62.5l0,-7.5M409.5,62.5l0,-7.5M468.3,62.5l0,-7.5"/>
 </g>
 <g fill="none" stroke-width="1">
 <text x="252.3" y="70.5" font-size="8pt" fill="#000000">Supernova colour</text>
-<text x="149.2" y="65.5" font-size="8pt" fill="#000000">&#8722;0.2</text>
+<text x="90.7" y="65.5" font-size="8pt" fill="#000000">&#8722;0.3</text>
+<text x="149.5" y="65.5" font-size="8pt" fill="#000000">&#8722;0.2</text>
 <text x="208.2" y="65.5" font-size="8pt" fill="#000000">&#8722;0.1</text>
-<text x="289.8" y="65.5" font-size="8pt" fill="#000000">0</text>
-<text x="343.8" y="65.5" font-size="8pt" fill="#000000">0.1</text>
-<text x="402.9" y="65.5" font-size="8pt" fill="#000000">0.2</text>
+<text x="289.5" y="65.5" font-size="8pt" fill="#000000">0</text>
+<text x="343.2" y="65.5" font-size="8pt" fill="#000000">0.1</text>
+<text x="402" y="65.5" font-size="8pt" fill="#000000">0.2</text>
+<text x="460.8" y="65.5" font-size="8pt" fill="#000000">0.3</text>
 </g>
 </g>
 <g clip-path="url(#c1)">
@@ -85,8 +87,10 @@
 <g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="73.7" y="283.7"/>
 </g>
-<g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="66.1" y="332.7"/>
+</g>
+<g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="90.4" y="250.5"/>
 <use xlink:href="#p0" x="64.2" y="344.9"/>
 </g>
@@ -104,6 +108,8 @@
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="77.8" y="274.9"/>
+</g>
+<g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="71.1" y="304.3"/>
 </g>
 <g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.6">
@@ -131,6 +137,8 @@
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="69.3" y="311.1"/>
+</g>
+<g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="67.5" y="324.1"/>
 </g>
 <g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
@@ -282,9 +290,9 @@
 </g>
 <g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="64.2" y="332.3"/>
+<use xlink:href="#p0" x="66.2" y="317.9"/>
 </g>
 <g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="66.2" y="317.9"/>
 <use xlink:href="#p0" x="62.8" y="349.6"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -330,8 +338,6 @@
 </g>
 <g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="245.7" y="168.8"/>
-</g>
-<g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="230.8" y="170.8"/>
 </g>
 <g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
@@ -343,7 +349,7 @@
 <g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="188.9" y="186.1"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="132" y="205.7"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -551,6 +557,8 @@
 <use xlink:href="#p0" x="284.6" y="160.8"/>
 <use xlink:href="#p0" x="251.7" y="163"/>
 <use xlink:href="#p0" x="188.9" y="181.1"/>
+</g>
+<g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="251.7" y="164.5"/>
 </g>
 <g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
@@ -630,11 +638,7 @@
 </g>
 <g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="438.8" y="126.4"/>
-</g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="461.2" y="124.7"/>
-</g>
-<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="329.5" y="157.5"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -701,9 +705,9 @@
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="296.9" y="155"/>
-<use xlink:href="#p0" x="268.2" y="158.5"/>
 </g>
 <g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="268.2" y="158.5"/>
 <use xlink:href="#p0" x="249.6" y="164.1"/>
 <use xlink:href="#p0" x="134.6" y="214.9"/>
 </g>
@@ -732,9 +736,11 @@
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="278.7" y="156.6"/>
 <use xlink:href="#p0" x="200.8" y="169.4"/>
+</g>
+<g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="245.7" y="163.4"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="216.1" y="172.3"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -852,7 +858,7 @@
 <g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="219.1" y="174.1"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="234.7" y="167.1"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -938,7 +944,7 @@
 <g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="265.8" y="170.8"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#00ffff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="210.4" y="169.8"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -991,10 +997,8 @@
 <g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="261" y="166.1"/>
 </g>
-<g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
-<use xlink:href="#p0" x="249" y="170.6"/>
-</g>
 <g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="249" y="170.6"/>
 <use xlink:href="#p0" x="216.4" y="172.9"/>
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
@@ -1022,7 +1026,11 @@
 </g>
 <g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="121.5" y="218.6"/>
+</g>
+<g fill="#ffff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="123.3" y="219.7"/>
+</g>
+<g fill="#00ff00" stroke-linejoin="miter" stroke-width="0.6">
 <use xlink:href="#p0" x="107.8" y="224.2"/>
 <use xlink:href="#p0" x="114.4" y="230.2"/>
 </g>
