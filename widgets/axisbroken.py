@@ -169,11 +169,13 @@ class AxisBroken(axis.Axis):
         r = self.orig_plottedrange = self.plottedrange
         points = list(self.settings.breakPoints)
         points.sort()
+        if r[1] < r[0]:
+            points.reverse()
 
         # filter to range
         newpoints = []
         for i in xrange(0,len(points)/2*2,2):
-            if points[i] >= r[0] and points[i+1] <= r[1]:
+            if points[i] >= min(r) and points[i+1] <= max(r):
                 newpoints += [points[i], points[i+1]]
 
         self.breakvnum = num = len(newpoints)/2 + 1

@@ -39,7 +39,7 @@ defaultrange = [1e99, -1e99]
 def _resolveLinkedAxis(axis):
     """Follow a chain of axis function dependencies."""
     loopcheck = set()
-    while axis.isLinked():
+    while axis is not None and axis.isLinked():
         loopcheck.add(axis)
         axis = axis.getLinkedAxis()
         if axis in loopcheck:
