@@ -1,5 +1,5 @@
-Veusz 1.17.1
-------------
+Veusz 1.18
+----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,38 +12,21 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.17.1:
- * Allow coloured points for non-orthogonal plots (polar, ternary)
- * Remove unnecessary exception data
+Changes in 1.18:
+ * Add axis-function widget for plotting axes which have a scale given
+   by a function, or are linked to a different axis via a function
+ * Add colour maps with steps
+ * Allow editing multiple datasets simultaneously in editor
+ * Fixed aspect-ratio for graphs setting added
 
 Bug fixes:
- * Fix Print dialog
- * Fix command-line "Print" command
- * Fix duplicate axes drawn in grid
- * Fix crash adding empty polar plot
- * Exit properly on Mac OS X with --export option
- * Fix highlighted button icons missing (Mac OS X binary)
-
-Changes in 1.17:
- * Add new broken axis widget with gaps in the numerical sequence
- * Grid lines are plotted always under (or over) the data
- * Shift+Scroll wheel scrolls left/right (thanks to Dave Hughes)
- * Polar plots can have a "minimum" radius and log axes
- * Many more LaTeX symbols added
- * Add SAMP/VoTable support (thanks to Graham Bell)
- * New shifted-points xy line mode, which plots a stepped line with
-   the points shifted to lie between the coordinates given
- * Points can be picked to console and/or clipboard
-   (thanks to Valerio Mussi)
- * Allow reversed ternary plot
-
-Bug fixes:
- * Fix unicode characters for \circ and \odot
- * Fix for data type of pickable points
- * Fix sort by group crash bug
- * Many crashes fixed
- * Fix width of key when using long titles/and or multiple columns
- * Fix bold and italic output in SVG output
+ * Fix reversed 'broken'-axes
+ * Do not always draw axes above other widgets (fixes problem with key
+   below axis)
+ * Fix use of transparency image when plotting non-square images
+ * Allow lists passed as xrange and yrange to create 2D dataset
+ * Fix FieldBool positioning for plugins
+ * Fix "no" values when used mixed with numbers
 
 Features of package:
  Plotting features:
