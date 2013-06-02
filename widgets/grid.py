@@ -22,10 +22,16 @@ The graphs may share axes if they are stored in the grid widget.
 
 import veusz.document as document
 import veusz.setting as setting
+import veusz.qtall as qt4
 
 import widget
 import graph
 import controlgraph
+
+def _(text, disambiguation=None, context='Grid'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class _gridengine:
     """Internal class to build up grid of widgets."""
@@ -143,7 +149,7 @@ class Grid(widget.Widget):
 
     typename='grid'
     allowusercreation=True
-    description='Arrange graphs in a grid'
+    description=_('Arrange graphs in a grid')
 
     def __init__(self, parent, name=None):
         """Initialise the grid.
@@ -155,9 +161,10 @@ class Grid(widget.Widget):
         if type(self) == Grid:
             self.readDefaults()
 
-        self.addAction( widget.Action('zeroMargins', self.actionZeroMargins,
-                                      descr = 'Zero margins of graphs in grid',
-                                      usertext = 'Zero margins') )
+        self.addAction( widget.Action(
+                'zeroMargins', self.actionZeroMargins,
+                descr = _('Zero margins of graphs in grid'),
+                usertext = _('Zero margins')) )
 
         # calculated positions for children
         self.childpositions = {}
@@ -174,45 +181,52 @@ class Grid(widget.Widget):
         widget.Widget.addSettings(s)
 
         s.add(setting.Int('rows', 2,
-                          descr = 'Number of rows in grid',
-                          usertext='Number of rows') )
+                          descr = _('Number of rows in grid'),
+                          usertext=_('Number of rows')) )
         s.add(setting.Int('columns', 2,
-                          descr = 'Number of columns in grid',
-                          usertext='Number of columns') )
+                          descr = _('Number of columns in grid'),
+                          usertext=_('Number of columns')) )
 
-        s.add( setting.FloatList('scaleRows',
-                                 [],
-                                 descr = 'Row scaling factors. A sequence'
-                                 ' of values\nby which to scale rows '
-                                 'relative to each other.',
-                                 usertext='Row scalings') )
-        s.add( setting.FloatList('scaleCols',
-                                 [],
-                                 descr = 'Column scaling factors. A sequence'
-                                 ' of values\nby which to scale columns'
-                                 ' relative to each other.',
-                                 usertext='Column scalings') )
+        s.add( setting.FloatList(
+                'scaleRows',
+                [],
+                descr = _('Row scaling factors. A sequence'
+                          ' of values\nby which to scale rows '
+                          'relative to each other.'),
+                usertext=_('Row scalings')) )
+        s.add( setting.FloatList(
+                'scaleCols',
+                [],
+                descr = _('Column scaling factors. A sequence'
+                          ' of values\nby which to scale columns'
+                          ' relative to each other.'),
+                usertext=_('Column scalings')) )
 
-        s.add( setting.Distance( 'leftMargin', '1.7cm', descr=
-                                 'Distance from left of grid to '
-                                 'edge of page',
-                                 usertext='Left margin',
-                                 formatting=True) )
-        s.add( setting.Distance( 'rightMargin', '0.2cm', descr=
-                                 'Distance from right of grid to '
-                                 'edge of page',
-                                 usertext='Right margin',
-                                 formatting=True) )
-        s.add( setting.Distance( 'topMargin', '0.2cm', descr=
-                                 'Distance from top of grid to '
-                                 'edge of page',
-                                 usertext='Top margin',
-                                 formatting=True) )
-        s.add( setting.Distance( 'bottomMargin', '1.7cm', descr=
-                                 'Distance from bottom of grid'
-                                 'to edge of page',
-                                 usertext='Bottom margin',
-                                 formatting=True) )
+        s.add( setting.Distance(
+                'leftMargin', '1.7cm',
+                descr=_('Distance from left of grid to edge of page'),
+                usertext=_('Left margin'),
+                formatting=True) )
+        s.add( setting.Distance(
+                'rightMargin', '0.2cm',
+                descr=_('Distance from right of grid to edge of page'),
+                usertext=_('Right margin'),
+                formatting=True) )
+        s.add( setting.Distance(
+                'topMargin', '0.2cm',
+                descr=_('Distance from top of grid to edge of page'),
+                usertext=_('Top margin'),
+                formatting=True) )
+        s.add( setting.Distance(
+                'bottomMargin', '1.7cm',
+                descr=_('Distance from bottom of grid to edge of page'),
+                usertext=_('Bottom margin'),
+                formatting=True) )
+        s.add( setting.Distance(
+                'internalMargin', '0cm',
+                descr=_('Gap between grid members'),
+                usertext=_('Internal margin'),
+                formatting=True) )
 
     @classmethod
     def allowedParentTypes(self):
@@ -242,6 +256,8 @@ class Grid(widget.Widget):
             child_posns[c] = ge.add(*dims)
 
         nocols, norows = ge.getAllocedDimensions()
+        self.dims = (nocols, norows)
+
         # exit if there aren't any children
         if nocols == 0 or norows == 0:
             return
@@ -279,10 +295,14 @@ class Grid(widget.Widget):
         for child in children:
             dims = child_dimensions[child]
             pos = child_posns[child]
-            self.childpositions[child] = ( startcols[pos[0]],
-                                           startrows[pos[1]],
-                                           startcols[pos[0]+dims[0]],
-                                           startrows[pos[1]+dims[1]] )
+            self.childpositions[child] = (
+                ( pos[0],
+                  pos[1] ),
+                ( startcols[pos[0]],
+                  startrows[pos[1]],
+                  startcols[pos[0]+dims[0]],
+                  startrows[pos[1]+dims[1]] ),
+                )
 
     def actionZeroMargins(self):
         """Zero margins of plots inside this grid."""
@@ -302,33 +322,54 @@ class Grid(widget.Widget):
     def _drawChild(self, phelper, child, bounds, parentposn):
         """Draw child at correct position, with correct bounds."""
 
-        # outer bounds of child and child fractional position
-        coutbound = parentposn
-        cpos = (0., 0., 1., 1.)
+        # default positioning
+        coutbound = newbounds = parentposn
 
         if child in self.childpositions:
-            cpos = self.childpositions[child]
+            intmargin = self.settings.get('internalMargin').convert(phelper)
+            cidx, cpos = self.childpositions[child]
 
-            # outer bounds for child
-            dx, dy = bounds[2]-bounds[0], bounds[3]-bounds[1]
-            coutbound = [ bounds[0]+dx*cpos[0],  bounds[1]+dy*cpos[1],
-                          bounds[0]+dx*cpos[2],  bounds[1]+dy*cpos[3] ]
+            # calculate size after margins
+            dx = bounds[2]-bounds[0]
+            dy = bounds[3]-bounds[1]
+            marx = intmargin*max(0, self.dims[0]-1)
+            mary = intmargin*max(0, self.dims[1]-1)
+            if dx > marx and dy > mary:
+                dx -= marx
+                dy -= mary
+            else:
+                # margins too big
+                intmargin = 0
+
+            # bounds for child
+            newbounds = [ bounds[0]+dx*cpos[0]+intmargin*cidx[0],
+                          bounds[1]+dy*cpos[1]+intmargin*cidx[1],
+                          bounds[0]+dx*cpos[2]+intmargin*cidx[0],
+                          bounds[1]+dy*cpos[3]+intmargin*cidx[1] ]
+            # bounds the axes can spread into
+            coutbound = list(newbounds)
+
+            # adjust outer bounds to half the internal margin space
+            if cidx[0] > 0:
+                coutbound[0] -= intmargin/2.
+            if cidx[1] > 0:
+                coutbound[1] -= intmargin/2.
+            if cidx[0] < self.dims[0]-1:
+                coutbound[2] += intmargin/2.
+            if cidx[1] < self.dims[1]-1:
+                coutbound[3] += intmargin/2.
 
             # work out bounds for graph in box
+            # this is the space available for axes, etc
             # FIXME: should consider case if no graphs to side
-            if abs(cpos[0]) < 1e-3:
+            if cidx[0] == 0:
                 coutbound[0] = parentposn[0]
-            if abs(cpos[1]) < 1e-3:
+            if cidx[1] == 0:
                 coutbound[1] = parentposn[1]
-            if abs(cpos[2]-1) < 1e-3:
+            if cidx[0] == self.dims[0]-1:
                 coutbound[2] = parentposn[2]
-            if abs(cpos[3]-1) < 1e-3:
+            if cidx[1] == self.dims[1]-1:
                 coutbound[3] = parentposn[3]
-
-        # convert fractional positions into bounds
-        dx, dy = bounds[2]-bounds[0], bounds[3]-bounds[1]
-        newbounds = [ bounds[0] + dx*cpos[0], bounds[1] + dy*cpos[1],
-                      bounds[0] + dx*cpos[2], bounds[1] + dy*cpos[3] ]
 
         # draw widget
         child.draw(newbounds, phelper, outerbounds=coutbound)

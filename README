@@ -47,6 +47,8 @@ Features of package:
   * Plot labels
   * Shapes and arrows on plots
   * LaTeX-like formatting for text
+  * Axes with steps in axis scale (broken axes)
+  * Axis scales using functional forms
  Input and output:
   * EPS/PDF/PNG/SVG/EMF export
   * Dataset creation/manipulation

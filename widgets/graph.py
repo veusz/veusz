@@ -30,7 +30,7 @@ import controlgraph
 
 def _(text, disambiguation=None, context='Graph'):
     """Translate text."""
-    return unicode( 
+    return unicode(
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class Graph(widget.Widget):
@@ -196,6 +196,16 @@ class Graph(widget.Widget):
                                      qt4.QPointF(bounds[2], bounds[3])) )
             utils.brushExtFillPath(painter, s.Background, path,
                                    stroke=s.Border.makeQPenWHide(painter))
+
+            # debugging positions (uncomment)
+            # painter.drawRect( qt4.QRectF(
+            #         qt4.QPointF(parentposn[0], parentposn[1]),
+            #         qt4.QPointF(parentposn[2], parentposn[3]) ))
+
+            # if outerbounds:
+            #     painter.drawRect( qt4.QRectF(
+            #             qt4.QPointF(outerbounds[0], outerbounds[1]),
+            #             qt4.QPointF(outerbounds[2], outerbounds[3]) ))
 
         # child drawing algorithm is a bit complex due to axes
         # being shared between graphs and broken axes
