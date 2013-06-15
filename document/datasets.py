@@ -808,19 +808,19 @@ def _evaluateDataset(datasets, dsname, dspart):
             'Internal error - invalid dataset part')
 
 _safeexpr = set()
-def simpleEvalExpression(doc, expr, part='data'):
+def simpleEvalExpression(doc, origexpr, part='data'):
     """Evaluate expression and return data.
 
     part is 'data', 'serr', 'perr' or 'nerr' - these are the
     dataset parts which are evaluated by the expression
     """
 
-    expr = _substituteDatasets(doc.data, expr, part)[0]
+    expr = _substituteDatasets(doc.data, origexpr, part)[0]
 
     if expr not in _safeexpr:
         if ( not setting.transient_settings['unsafe_mode'] and
              utils.checkCode(expr, securityonly=True) ):
-            doc.log("Unsafe expression: %s\n" % expr)
+            doc.log("Unsafe expression: '%s'\n" % expr)
             return N.array([])
 
     # for speed, track safe expressions
@@ -834,7 +834,7 @@ def simpleEvalExpression(doc, expr, part='data'):
     try:
         evalout = eval(expr, env)
     except Exception, ex:
-        doc.log(unicode(ex))
+        doc.log("Error evaluating '%s': '%s'" % (expr, unicode(ex)))
         return N.array([])
     return evalout
 

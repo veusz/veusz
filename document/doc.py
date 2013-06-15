@@ -72,6 +72,24 @@ def getSuitableParent(widgettype, initialwidget):
         parent = parent.parent
     return parent
 
+def cache_on_changeset(function):
+    """Decorator to cache result of function call if changeset has changed."""
+    cache = {}
+    changeset = [-1]
+
+    def wrapper(self, *args):
+        # invalidate cache on changeset change
+        if self.changeset != changeset[0]:
+            changeset[0] = self.changeset
+            cache.clear()
+        try:
+            res = cache[args]
+        except KeyError:
+            res = cache[args] = function(self, *args)
+        return res
+
+    return wrapper
+
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
@@ -816,6 +834,7 @@ class Document( qt4.QObject ):
             retn[name] = (i, ctype, val)
         return retn
 
+    @cache_on_changeset
     def evalDatasetExpression(self, expr, part='data'):
         """Return results of evaluating a 1D dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
