@@ -210,7 +210,8 @@ def applyScaling(data, mode, minval, maxval):
         # log scaling of image
         # clip any values less than lowermin
         lowermin = data < minval
-        data = N.log(data - (minval - 1)) / N.log(maxval - (minval - 1))
+        chopvals = N.where(data > (minval-1), data - (minval-1), 1e-200)
+        data = N.log(chopvals) / N.log(maxval - (minval - 1))
         data[lowermin] = 0.
 
     elif mode == 'squared':
