@@ -284,19 +284,19 @@ class PointPlotter(GenericPlotter):
                                     usertext=_('Labels'), datatype='text'), 5 )
         s.add( setting.DatasetOrFloatList(
                 'scalePoints', '',
-                descr = _('Scale size of plotted markers by this dataset or'
-                          ' list of values'),
+                descr = _('Scale size of markers given by dataset, expression'
+                          ' or list of values'),
                 usertext=_('Scale markers')), 6 )
 
         s.add( setting.MarkerColor('Color') )
 
         s.add( setting.DatasetOrFloatList(
                 'yData', 'y',
-                descr=_('Dataset containing y data or list of values'),
+                descr=_('Y values, given by dataset, expression or list of values'),
                 usertext=_('Y data')), 0 )
         s.add( setting.DatasetOrFloatList(
                 'xData', 'x',
-                descr=_('Dataset containing x data or list of values'),
+                descr=_('X values, given by dataset, expression or list of values'),
                 usertext=_('X data')), 0 )
         s.add( setting.ErrorStyle('errorStyle',
                                   'bar',

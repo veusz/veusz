@@ -1210,8 +1210,19 @@ class Datasets(Setting):
                 out.append(d)
         return out
 
+class DatasetOrExpression(Dataset):
+    """Give the name of a dataset or give an expression."""
+
+    typename = 'dataset-or-expression'
+
+    def getData(self, doc):
+        """Return veusz dataset"""
+        return doc.datasetExpressionToDataset(
+            self.val, self.datatype, self.dimensions)
+
 class DatasetOrFloatList(Dataset):
-    """Choose a dataset or specify a list of float values."""
+    """Choose a dataset, give an expression or specify a list of float
+    values."""
 
     typename = 'dataset-or-floatlist'
 

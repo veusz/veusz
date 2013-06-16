@@ -61,10 +61,10 @@ class Image(plotters.GenericPlotter):
         """Construct list of settings."""
         plotters.GenericPlotter.addSettings(s)
 
-        s.add( setting.Dataset('data', '',
-                               dimensions = 2,
-                               descr = _('Dataset to plot'),
-                               usertext=_('Dataset')),
+        s.add( setting.DatasetOrExpression('data', '',
+                                           dimensions = 2,
+                                           descr = _('Dataset to plot'),
+                                           usertext=_('Dataset')),
                0 )
         s.add( setting.FloatOrAuto('min', 'Auto',
                                    descr = _('Minimum value of image scale'),
@@ -127,11 +127,9 @@ class Image(plotters.GenericPlotter):
 
         s = self.settings
         d = self.document
-        data = d.data[s.data]
+        data = s.get('data').getData(d)
 
-        transimg = None
-        if s.transparencyData in d.data:
-            transimg = d.data[s.transparencyData].data
+        transimg = s.get('transparencyData').getData(d)
 
         minval = s.min
         if minval == 'Auto':
@@ -163,12 +161,8 @@ class Image(plotters.GenericPlotter):
         d = self.document
 
         # return if no data
-        if s.data not in d.data:
-            return
-
-        # return if the dataset isn't two dimensional
-        data = d.data[s.data]
-        if data.dimensions != 2:
+        data = s.get('data').getData(d)
+        if data is None or data.dimensions != 2:
             return
 
         if depname == 'sx':
@@ -247,20 +241,15 @@ class Image(plotters.GenericPlotter):
         d = self.document
 
         # return if the dataset isn't two dimensional
-        try:
-            data = d.data[s.data]
-        except KeyError:
-            return None
-
-        # recompute data
-        if data.dimensions == 2:
+        data = s.get('data').getData(d)
+        if data is not None and data.dimensions == 2:
             if data != self.lastdataset or self.schangeset != d.changeset:
                 self.updateImage()
                 self.lastdataset = data
                 self.schangeset = d.changeset
             return data
-        else:
-            return None
+
+        return None
     
     def dataDraw(self, painter, axes, posn, clip):
         """Draw the image."""
