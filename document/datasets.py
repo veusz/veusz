@@ -834,7 +834,7 @@ def simpleEvalExpression(doc, origexpr, part='data'):
     try:
         evalout = eval(expr, env)
     except Exception, ex:
-        doc.log("Error evaluating '%s': '%s'" % (expr, unicode(ex)))
+        doc.log("Error evaluating '%s': '%s'" % (origexpr, unicode(ex)))
         return N.array([])
     return evalout
 

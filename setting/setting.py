@@ -1285,45 +1285,12 @@ class DatasetOrFloatList(Dataset):
     def getData(self, doc):
         """Return veusz dataset"""
         if isinstance(self.val, basestring):
-            d = doc.data.get(self.val)
-            if ( d is not None and
-                 d.datatype == self.datatype and
-                 d.dimensions == self.dimensions ):
-                return d
-            elif self.val:
-                import veusz.document as document
-                vals = doc.evalDatasetExpression(self.val)
-                try:
-                    vals = N.array(vals, dtype=N.float64)
-                except Exception, e:
-                    doc.log("Error in '%s': %s\n" % (self.val, unicode(e)))
-                    vals = None
-
-                if vals is not None and len(vals) > 0:
-                    if self.dimensions == 1:
-                        if vals.ndim == 1:
-                            return document.Dataset(data=vals)
-                        elif vals.ndim == 2:
-                            # providing multiple expression for error bars
-                            if vals.shape[0] == 2:
-                                return document.Dataset(
-                                    data=vals[0,:], serr=vals[1,:])
-                            if vals.shape[0] == 3:
-                                return document.Dataset(
-                                    data=vals[0,:], perr=vals[1,:],
-                                    nerr=vals[2,:])
-                    elif self.dimensions == 2 and vals.ndim == 2:
-                        return document.Dataset2D(vals)
-
-                    doc.log("Error in '%s': Expression has wrong dimensions\n"
-                            % self.val)
-
-            return None
+            return doc.datasetExpressionToDataset(
+                self.val, self.datatype, self.dimensions)
         else:
-            # blah - need to import here due to dependencies
-            import veusz.document as document
-            return document.Dataset(data=self.val)
-    
+            return doc.valsToDataset(
+                self.val, self.datatype, self.dimensions)
+
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string."""
 
