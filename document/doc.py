@@ -852,6 +852,11 @@ class Document( qt4.QObject ):
              d.dimensions == dimensions ):
             return d
 
+        if utils.id_re.match(expr):
+            # if name is a python identifier, don't give an error message
+            # below - just print nothing
+            return None
+
         if not expr:
             return None
 
