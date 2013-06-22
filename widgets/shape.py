@@ -69,22 +69,21 @@ class BoxShape(Shape):
         """Construct list of settings."""
         Shape.addSettings(s)
 
-        s.add( setting.DatasetOrFloatList('width', [0.1],
-                                          descr=_('List of fractional '
-                                                  'widths or dataset'),
-                                          usertext=_('Widths'),
-                                          formatting=False), 3 )
-        s.add( setting.DatasetOrFloatList('height', [0.1],
-                                          descr=_('List of fractional '
-                                                  'heights or dataset'),
-                                          usertext=_('Heights'),
-                                          formatting=False), 4 )
-        s.add( setting.DatasetOrFloatList('rotate', [0.],
-                                          descr=_('Rotation angles of '
-                                                  'shape or dataset'),
-                                          usertext=_('Rotate'),
-                                          formatting=False), 5 )
-
+        s.add( setting.DatasetExtended(
+                'width', [0.1],
+                descr=_('List of fractional widths, dataset or expression'),
+                usertext=_('Widths'),
+                formatting=False), 3 )
+        s.add( setting.DatasetExtended(
+                'height', [0.1],
+                descr=_('List of fractional heights, dataset or expression'),
+                usertext=_('Heights'),
+                formatting=False), 4 )
+        s.add( setting.DatasetExtended(
+                'rotate', [0.],
+                descr=_('Rotation angles of shape, dataset or expression'),
+                usertext=_('Rotate'),
+                formatting=False), 5 )
 
     def drawShape(self, painter, rect):
         pass

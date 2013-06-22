@@ -349,7 +349,7 @@ class MarkerColor(Settings):
 
     def __init__(self, name):
         Settings.__init__(self, name, setnsmode='groupedsetting')
-        self.add( setting.DatasetOrFloatList(
+        self.add( setting.DatasetExtended(
                 'points', '',
                 descr = _('Use color value (0-1) in dataset to paint points'),
                 usertext=_('Color markers')), 7 )

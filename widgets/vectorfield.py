@@ -54,15 +54,17 @@ class VectorField(plotters.GenericPlotter):
         plotters.GenericPlotter.addSettings(s)
 
         # datasets
-        s.add( setting.Dataset('data1', '',
-                               dimensions = 2,
-                               descr = _('X coordinate length or vector magnitude'),
-                               usertext = _('dx or r')),
+        s.add( setting.DatasetExtended(
+                'data1', '',
+                dimensions = 2,
+                descr = _('X coordinate length or vector magnitude'),
+                usertext = _('dx or r')),
                0 )
-        s.add( setting.Dataset('data2', '',
-                               dimensions = 2,
-                               descr = _('Y coordinate length or vector angle'),
-                               usertext = _('dy or theta')),
+        s.add( setting.DatasetExtended(
+                'data2', '',
+                dimensions = 2,
+                descr = _('Y coordinate length or vector angle'),
+                usertext = _('dy or theta')),
                1 )
         s.add( setting.Choice('mode',
                               ['cartesian', 'polar'],
@@ -113,10 +115,9 @@ class VectorField(plotters.GenericPlotter):
     def getRange(self, axis, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
-        for name in (self.settings.data1, self.settings.data2):
-            try:
-                data = self.document.data[name]
-            except KeyError:
+        for name in ('data1', 'data2'):
+            data = self.settings.get(name).getData(self.document)
+            if data is None:
                 continue
 
             if data.dimensions == 2:
@@ -150,10 +151,9 @@ class VectorField(plotters.GenericPlotter):
         d = self.document
 
         # ignore non existing datasets
-        try:
-            data1 = d.data[s.data1]
-            data2 = d.data[s.data2]
-        except KeyError:
+        data1 = s.get('data1').getData(d)
+        data2 = s.get('data2').getData(d)
+        if data1 is None or data2 is None:
             return
 
         # require 2d datasets

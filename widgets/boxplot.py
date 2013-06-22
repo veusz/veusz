@@ -141,7 +141,7 @@ class BoxPlot(GenericPlotter):
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
                                     usertext=_('Labels'), datatype='text'), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'posn', '',
                 descr = _('Dataset or list of values giving '
                           'positions of boxes (optional)'),
@@ -154,27 +154,27 @@ class BoxPlot(GenericPlotter):
                                 usertext=_('Datasets')), 0 )
 
         # alternate mode where data are provided for boxes
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'whiskermax', '',
                 descr=_('Dataset with whisker maxima or list of values'),
                 usertext=_('Whisker max')), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'whiskermin', '',
                 descr=_('Dataset with whisker minima or list of values'),
                 usertext=_('Whisker min')), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'boxmax', '',
                 descr=_('Dataset with box maxima or list of values'),
                 usertext=_('Box max')), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'boxmin', '',
                 descr=_('Dataset with box minima or list of values'),
                 usertext=_('Box min')), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'median', '',
                 descr=_('Dataset with medians or list of values'),
                 usertext=_('Median')), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'mean', '',
                 descr=_('Dataset with means or list of values'),
                 usertext=_('Mean')), 0 )

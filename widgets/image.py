@@ -29,7 +29,7 @@ import plotters
 
 def _(text, disambiguation=None, context='Image'):
     """Translate text."""
-    return unicode( 
+    return unicode(
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
 class Image(plotters.GenericPlotter):
@@ -61,56 +61,64 @@ class Image(plotters.GenericPlotter):
         """Construct list of settings."""
         plotters.GenericPlotter.addSettings(s)
 
-        s.add( setting.DatasetOrExpression('data', '',
-                                           dimensions = 2,
-                                           descr = _('Dataset to plot'),
-                                           usertext=_('Dataset')),
+        s.add( setting.DatasetExtended(
+                'data', '',
+                dimensions = 2,
+                descr = _('Dataset to plot'),
+                usertext=_('Dataset')),
                0 )
-        s.add( setting.FloatOrAuto('min', 'Auto',
-                                   descr = _('Minimum value of image scale'),
-                                   usertext=_('Min. value')),
+        s.add( setting.FloatOrAuto(
+                'min', 'Auto',
+                descr = _('Minimum value of image scale'),
+                usertext=_('Min. value')),
                1 )
-        s.add( setting.FloatOrAuto('max', 'Auto',
-                                   descr = _('Maximum value of image scale'),
-                                   usertext=_('Max. value')),
+        s.add( setting.FloatOrAuto(
+                'max', 'Auto',
+                descr = _('Maximum value of image scale'),
+                usertext=_('Max. value')),
                2 )
-        s.add( setting.Choice('colorScaling',
-                              ['linear', 'sqrt', 'log', 'squared'],
-                              'linear',
-                              descr = _('Scaling to transform numbers to color'),
-                              usertext=_('Scaling')),
+        s.add( setting.Choice(
+                'colorScaling',
+                ['linear', 'sqrt', 'log', 'squared'],
+                'linear',
+                descr = _('Scaling to transform numbers to color'),
+                usertext=_('Scaling')),
                3 )
 
-        s.add( setting.Dataset('transparencyData', '',
-                               dimensions = 2,
-                               descr = _('Dataset to use for transparency '
-                                         '(0 to 1)'),
-                               usertext=_('Transparent data')),
+        s.add( setting.DatasetExtended(
+                'transparencyData', '',
+                dimensions = 2,
+                descr = _('Dataset to use for transparency (0 to 1)'),
+                usertext=_('Trans. data')),
                4 )
 
-        s.add( setting.Colormap('colorMap',
-                                'grey',
-                                descr = _('Set of colors to plot data with'),
-                                usertext=_('Colormap'),
-                                formatting=True),
+        s.add( setting.Colormap(
+                'colorMap',
+                'grey',
+                descr = _('Set of colors to plot data with'),
+                usertext=_('Colormap'),
+                formatting=True),
                5 )
-        s.add( setting.Bool('colorInvert', False,
-                            descr = _('Invert color map'),
-                            usertext=_('Invert colormap'),
-                            formatting=True),
+        s.add( setting.Bool(
+                'colorInvert', False,
+                descr = _('Invert color map'),
+                usertext=_('Invert colormap'),
+                formatting=True),
                6 )
-        s.add( setting.Int( 'transparency', 0,
-                            descr = _('Transparency percentage'),
-                            usertext = _('Transparency'),
-                            minval = 0,
-                            maxval = 100,
-                            formatting=True),
+        s.add( setting.Int(
+                'transparency', 0,
+                descr = _('Transparency percentage'),
+                usertext = _('Transparency'),
+                minval = 0,
+                maxval = 100,
+                formatting=True),
                7 )
 
-        s.add( setting.Bool( 'smooth', False,
-                             descr = _('Smooth image to display resolution'),
-                             usertext = _('Smooth'),
-                             formatting = True ) )
+        s.add( setting.Bool(
+                'smooth', False,
+                descr = _('Smooth image to display resolution'),
+                usertext = _('Smooth'),
+                formatting = True ) )
 
     def _getUserDescription(self):
         """User friendly description."""
@@ -130,6 +138,8 @@ class Image(plotters.GenericPlotter):
         data = s.get('data').getData(d)
 
         transimg = s.get('transparencyData').getData(d)
+        if transimg is not None:
+            transimg = transimg.data
 
         minval = s.min
         if minval == 'Auto':
@@ -207,7 +217,7 @@ class Image(plotters.GenericPlotter):
             d = int((y1-plty1) / pixh)
             cutr[1] += d
             plty[1] += d*pixh
-            
+
         # chop bottom
         if plty2 > y2:
             d = max(0, int((plty2-y2) / pixh) - 1)
@@ -250,7 +260,7 @@ class Image(plotters.GenericPlotter):
             return data
 
         return None
-    
+
     def dataDraw(self, painter, axes, posn, clip):
         """Draw the image."""
 

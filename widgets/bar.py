@@ -98,10 +98,10 @@ class BarPlotter(GenericPlotter):
                               ('horizontal', 'vertical'), 'vertical', 
                               descr = _('Horizontal or vertical bar chart'),
                               usertext=_('Direction')), 0 )
-        s.add( setting.Dataset('posn', '', 
-                               descr = _('Dataset containing position of bars'
-                                         ' (optional)'),
-                               usertext=_('Positions')), 0 )
+        s.add( setting.DatasetExtended('posn', '',
+                                       descr = _('Position of bars, dataset '
+                                                 ' or expression (optional)'),
+                                       usertext=_('Positions')), 0 )
         s.add( setting.Datasets('lengths', ('y',),
                                 descr = _('Datasets containing lengths of bars'),
                                 usertext=_('Lengths')), 0 )

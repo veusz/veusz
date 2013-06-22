@@ -1105,9 +1105,9 @@ class Dataset(Str):
         dimensions is the number of dimensions the dataset needs
         """
 
-        Setting.__init__(self, name, val, **args)
         self.dimensions = dimensions
         self.datatype = datatype
+        Setting.__init__(self, name, val, **args)
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
@@ -1210,36 +1210,29 @@ class Datasets(Setting):
                 out.append(d)
         return out
 
-class DatasetOrExpression(Dataset):
-    """Give the name of a dataset or give an expression."""
-
-    typename = 'dataset-or-expression'
-
-    def getData(self, doc):
-        """Return veusz dataset"""
-        return doc.datasetExpressionToDataset(
-            self.val, self.datatype, self.dimensions)
-
-class DatasetOrFloatList(Dataset):
+class DatasetExtended(Dataset):
     """Choose a dataset, give an expression or specify a list of float
     values."""
 
-    typename = 'dataset-or-floatlist'
+    typename = 'dataset-extended'
 
     def convertTo(self, val):
-        """Check is a string (dataset name) or a list of floats (numbers).
-
+        """Check is a string (dataset name or expression) or a list of
+        floats (numbers).
         """
-        
+
         if isinstance(val, basestring):
             return val
-        elif isinstance(val, float) or isinstance(val, int):
-            return [val]
-        else:
-            try:
-                return [float(x) for x in val]
-            except (TypeError, ValueError):
-                raise InvalidType
+        elif self.dimensions == 1:
+            # list of numbers only allowed for 1d datasets
+            if isinstance(val, float) or isinstance(val, int):
+                return [val]
+            else:
+                try:
+                    return [float(x) for x in val]
+                except (TypeError, ValueError):
+                    pass
+        raise InvalidType
 
     def toText(self):
         if isinstance(self.val, basestring):
@@ -1255,13 +1248,18 @@ class DatasetOrFloatList(Dataset):
     def fromText(self, text):
         """Convert from text."""
 
+        text = text.strip()
+
+        if self.dimensions > 1:
+            return text
+
         # split based on , or ; depending on decimal point
         splitre = r'[\t\n, ]+'
         if uilocale.decimalPoint() == qt4.QChar(','):
             splitre = r'[\t\n; ]+'
 
         out = []
-        for x in re.split(splitre, text.strip()):
+        for x in re.split(splitre, text):
             if x:
                 f, ok = uilocale.toDouble(x)
                 if ok:
@@ -1274,16 +1272,16 @@ class DatasetOrFloatList(Dataset):
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
         if isinstance(self.val, basestring):
-            ds = doc.data.get(self.val)
+            ds = doc.datasetExpressionToDataset(
+                self.val, self.datatype, self.dimensions)
             if ds:
-                # get numpy of values
+                # get numpy array of values
                 return ds.data
-            else:
-                return None
         else:
             # list of values
             return N.array(self.val)
-            
+        return None
+
     def isDataset(self, doc):
         """Is this setting a dataset?"""
         return (isinstance(self.val, basestring) and
@@ -1291,7 +1289,7 @@ class DatasetOrFloatList(Dataset):
 
     def isEmpty(self):
         """Is this unset?"""
-        return self.val == []
+        return self.val == [] or self.val == ''
 
     def getData(self, doc):
         """Return veusz dataset"""

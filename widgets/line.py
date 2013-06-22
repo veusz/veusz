@@ -65,26 +65,29 @@ class Line(plotters.FreePlotter):
                 settingsfalse = ('xPos2', 'yPos2'),
                 ), 0)
 
-        s.add( setting.DatasetOrFloatList('length', [0.2],
-                                          descr=_('List of fractional '
-                                                  'lengths or dataset'),
-                                          usertext=_('Lengths'),
-                                          formatting=False), 4 )
-        s.add( setting.DatasetOrFloatList('angle', [0.],
-                                          descr=_('Angle of lines or '
-                                                  'dataset (degrees)'),
-                                          usertext=_('Angles'),
-                                          formatting=False), 5 )
-        s.add( setting.DatasetOrFloatList('xPos2', [1.],
-                                          descr=_('List of fractional X '
-                                                  'coordinates or dataset for point 2'),
-                                          usertext=_('X positions 2'),
-                                          formatting=False), 6 )
-        s.add( setting.DatasetOrFloatList('yPos2', [1.],
-                                          descr=_('List of fractional Y '
-                                                  'coordinates or dataset for point 2'),
-                                          usertext=_('Y positions 2'),
-                                          formatting=False), 7 )
+        s.add( setting.DatasetExtended(
+                'length', [0.2],
+                descr=_('List of fractional lengths, dataset or expression'),
+                usertext=_('Lengths'),
+                formatting=False), 4 )
+        s.add( setting.DatasetExtended(
+                'angle', [0.],
+                descr=_('List of angle of lines, dataset or expression '
+                        '(degrees)'),
+                usertext=_('Angles'),
+                formatting=False), 5 )
+        s.add( setting.DatasetExtended(
+                'xPos2', [1.],
+                descr=_('List of fractional X coordinates, dataset or '
+                        'expression for point 2'),
+                usertext=_('X positions 2'),
+                formatting=False), 6 )
+        s.add( setting.DatasetExtended(
+                'yPos2', [1.],
+                descr=_('List of fractional Y coordinates, dataset or '
+                        'expression for point 2'),
+                usertext=_('Y positions 2'),
+                formatting=False), 7 )
 
         s.add( setting.Bool('clip', False,
                             descr=_('Clip line to its container'),

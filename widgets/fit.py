@@ -129,21 +129,27 @@ class Fit(FunctionPlotter):
         """Construct list of settings."""
         FunctionPlotter.addSettings(s)
 
-        s.add( setting.FloatDict('values',
-                                 {'a': 0.0, 'b': 1.0},
-                                 descr = _('Variables and fit values'),
-                                 usertext=_('Parameters')), 1 )
-        s.add( setting.Dataset('xData', 'x',
-                               descr = _('Variable containing x data to fit'),
-                               usertext=_('X dataset')), 2 )
-        s.add( setting.Dataset('yData', 'y',
-                               descr = _('Variable containing y data to fit'),
-                               usertext=_('Y dataset')), 3 )
-        s.add( setting.Bool('fitRange', False,
-                            descr = _('Fit only the data between the '
-                                      'minimum and maximum of the axis for '
-                                      'the function variable'),
-                            usertext=_('Fit only range')),
+        s.add( setting.FloatDict(
+                'values',
+                {'a': 0.0, 'b': 1.0},
+                descr = _('Variables and fit values'),
+                usertext=_('Parameters')), 1 )
+        s.add( setting.DatasetExtended(
+                'xData', 'x',
+                descr = _('X data to fit (dataset name, list of values '
+                          'or expression)'),
+                usertext=_('X data')), 2 )
+        s.add( setting.DatasetExtended(
+                'yData', 'y',
+                descr = _('Y data to fit (dataset name, list of values '
+                          'or expression)'),
+                usertext=_('Y data')), 3 )
+        s.add( setting.Bool(
+                'fitRange', False,
+                descr = _('Fit only the data between the '
+                          'minimum and maximum of the axis for '
+                          'the function variable'),
+                usertext=_('Fit only range')),
                4 )
         s.add( setting.WidgetChoice(
                 'outLabel', '',
@@ -243,15 +249,13 @@ class Fit(FunctionPlotter):
 
         # choose dataset depending on fit variable
         if s.variable == 'x':
-            xvals = d.getData(s.xData).data
-            ydata = d.getData(s.yData)
-            yvals = ydata.data
-            yserr = ydata.serr
+            xvals = s.get('xData').getData(d).data
+            ydata = s.get('yData').getData(d)
         else:
-            xvals = d.getData(s.yData).data
-            ydata = d.getData(s.xData)
-            yvals = ydata.data
-            yserr = ydata.serr
+            xvals = s.get('yData').getData(d).data
+            ydata = s.get('xData').getData(d)
+        yvals = ydata.data
+        yserr = ydata.serr
 
         # if there are no errors on data
         if yserr is None:
@@ -262,7 +266,7 @@ class Fit(FunctionPlotter):
                 print "Warning: No errors on y values. Assuming 5% errors."
                 yserr = yvals*0.05
                 yserr[yserr < 1e-8] = 1e-8
-        
+
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
         if s.fitRange:

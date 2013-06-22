@@ -282,7 +282,7 @@ class PointPlotter(GenericPlotter):
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label points'),
                                     usertext=_('Labels'), datatype='text'), 5 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'scalePoints', '',
                 descr = _('Scale size of markers given by dataset, expression'
                           ' or list of values'),
@@ -290,11 +290,11 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.MarkerColor('Color') )
 
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'yData', 'y',
                 descr=_('Y values, given by dataset, expression or list of values'),
                 usertext=_('Y data')), 0 )
-        s.add( setting.DatasetOrFloatList(
+        s.add( setting.DatasetExtended(
                 'xData', 'x',
                 descr=_('X values, given by dataset, expression or list of values'),
                 usertext=_('X data')), 0 )

@@ -193,16 +193,16 @@ class FreePlotter(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add( setting.DatasetOrFloatList('xPos', [0.5],
-                                          descr=_('List of fractional X '
-                                                  'coordinates or dataset'),
-                                          usertext=_('X positions'),
-                                          formatting=False) )
-        s.add( setting.DatasetOrFloatList('yPos', [0.5],
-                                          descr=_('List of fractional Y '
-                                                  'coordinates or dataset'),
-                                          usertext=_('Y positions'),
-                                          formatting=False) )
+        s.add( setting.DatasetExtended(
+                'xPos', [0.5],
+                descr=_('List of fractional X coordinates or dataset'),
+                usertext=_('X positions'),
+                formatting=False) )
+        s.add( setting.DatasetExtended(
+                'yPos', [0.5],
+                descr=_('List of fractional Y coordinates or dataset'),
+                usertext=_('Y positions'),
+                formatting=False) )
         s.add( setting.Choice('positioning',
                               ['axes', 'relative'], 'relative',
                               descr=_('Use axes or fractional '
