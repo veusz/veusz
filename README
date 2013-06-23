@@ -19,7 +19,7 @@ Changes in 1.18:
  * Allow editing multiple datasets simultaneously in editor
  * Fixed aspect-ratio for graphs setting added
  * Add 'vcentre' line step mode for vertical step plots
- * Expressions of datasets can be used for plotting
+ * Expressions of datasets can be used when plotting
 
 Bug fixes:
  * Fix reversed 'broken'-axes
@@ -29,6 +29,7 @@ Bug fixes:
  * Allow lists passed as xrange and yrange to create 2D dataset
  * Fix FieldBool positioning for plugins
  * Fix "no" values when used mixed with numbers
+ * Remove warning of log images with zeros
 
 Features of package:
  Plotting features:
