@@ -33,59 +33,56 @@
     <section>
       <title>Veusz</title>
 
-      <para>Veusz is a scientific plotting package. It was written as
-      I was dissatisfied with existing plotting packages as they were
-      either old and unmaintained (like pgplot and qdp, which does not
-      support postscript fonts), not free (like IDL or Matlab), or had
-      user interfaces I do not appreciate (like gnuplot).</para>
+      <para>Veusz is a scientific plotting package. It was designed to
+      be easy to use, easily extensible, but powerful. The program
+      features a graphical user interface, which works under
+      Unix/Linux, Windows or Mac OS X. It can also be easily scripted
+      (the saved file formats are similar to Python scripts) or used
+      as module inside Python. Veusz reads data from a number of
+      different types of data file, it can be manually entered, or
+      constructed from other datasets.</para>
 
-      <para>Veusz is designed to be easily extensible, and is written
-      in Python, a high level language (in the future it may be
-      necessary to write some parts in another language for speed, but
-      this will be kept to an absolute minimum). It is also designed
-      in an object oriented fashion, where a document is built up by a
-      number of parts in a hierarchy. The advantage of using Python
-      is that is is easy to allow the user to script Veusz using
-      Python as a very powerful scripting language. Indeed, the
-      saved file format is a Python script.</para>
+      <para>In Veusz the document is built in an object-oriented
+      fashion, where a document is built up by a number of widgets in
+      a hierarchy. For example, multiple function or xy widgets can be
+      placed inside a graph widget, and many graphs can be placed in a
+      grid widget.</para>
 
       <para>The technologies behind Veusz include PyQt (a very easy to
       use Python interface to Qt, which is used for rendering and the
       graphical user interface, GUI) and numpy (a package for Python
-      which makes the handling of large datasets easy).</para>
-
-      <para>Veusz has two user interfaces: a graphical one which gives
-      the user a relatively shallow learning curve, and a command line
-      interface. The command line interface is also used by scripting
-      and in the saved file format.</para>
-
-      <para>Furthermore, Veusz can be embedded within other Python
-      programs, with plots in their own windows, or it can be
-      controlled from any other application.</para>
+      which makes the handling of large datasets easy). Veusz can be
+      extended by the user easily by adding plugins. Support for
+      different data file types can be added with import
+      plugins. Dataset plugins automate the manipulation of
+      datasets. Tools plugins automate the manipulation of the
+      document.</para>
    </section>
 
     <section>
       <title>Terminology</title>
-      <para>Here I define some terminology for future use.</para>
+      <para>Here we define some terminology for future use.</para>
 
       <section>
 	<title>Widget</title>
 	<para>A document and its graphs are built up from widgets.
-	   These widgets can often by placed within each other,
-	   depending on the type of the widget. A widget has children,
-	   those widgets placed within it, and its parent. The widgets
-	   have a number of different settings which modify their
-	   behaviour. These include the font to be used, the line
-	   thickness, and whether an axis is logarithmic. In addition
-	   they have actions, which perform some sort of activity on
-	   the widget or its children, like "fit" for a fit
-	   widget.</para>
+	These widgets can often by placed within each other, depending
+	on the type of the widget. A widget has children (those
+	widgets placed within it) and its parent. The widgets have a
+	number of different settings which modify their
+	behaviour. These settings are divided into properties, which
+	affect what is plotted and how it is plotted. These would
+	include the dataset being plotted or whether an axis is
+	logarithmic.  There are also formatting settings, including
+	the font to be used and the line thickness. In addition they
+	have actions, which perform some sort of activity on the
+	widget or its children, like "fit" for a fit widget.</para>
 	
-	<para>Widgets are specified with a "path", like a file in Unix
-	or Windows. These can be relative to the current widget (do
-	not start with a slash), or absolute (do not start with a
-	slash). Examples of paths include, "/page1/graph1/x", "x" and
-	".".</para>
+	<para>As an aside, using the scripting interface, widgets are
+	specified with a "path", like a file in Unix or Windows. These
+	can be relative to the current widget (do not start with a
+	slash), or absolute (do not start with a slash). Examples of
+	paths include, "/page1/graph1/x", "x" and ".".</para>
 
 	<para>The widget types include</para>
 	
@@ -123,29 +120,28 @@
 
 	  <listitem>
 	    <para><command>grid</command> - containing one or more
-	      graphs. A grid plots graphs in a gridlike fashion. You
-	      can specify the number of rows and columns, and the
-	      plots are automatically replotted in the chosen
-	      arrangement. A grid can contain graphs or axes. If an
-	      axis is placed in a grid, it can be shared by the graphs
-	      in the grid.</para>
+	    graphs. A grid plots graphs in a gridlike fashion. You can
+	    specify the number of rows and columns, and the plots are
+	    automatically replotted in the chosen arrangement. A grid
+	    can contain graphs or axes. If an axis is placed in a
+	    grid, it can be shared by the graphs in the grid.</para>
 	  </listitem>
 
 	  <listitem>
 	    <para><command>axis</command> - giving the scale for
-	      plotting data. An axis translates the coordinates of the
-	      data to the screen. An axis can be linear or
-	      logarithmic, it can have fixed endpoints, or can
-	      automatically get them from the plotted data. It also
-	      has settings for the axis labels and lines, tick labels,
-	      and major and minor tick marks.</para>
+	    plotting data. An axis translates the coordinates of the
+	    data to the screen. An axis can be linear or logarithmic,
+	    it can have fixed endpoints, or can automatically get them
+	    from the plotted data. It also has settings for the axis
+	    labels and lines, tick labels, and major and minor tick
+	    marks.</para>
 
 	    <para>An axis may be "horizontal" or "vertical" and can
 	    appear anywhere on its parent graph or grid.</para>
 
 	    <para>If an axis appears within a grid, then it can be
-	  shared by all the graphs which are contained within the
-	  grid.</para>
+	    shared by all the graphs which are contained within the
+	    grid.</para>
 
 	    <para> The <command>axis-broken</command> widget is an
 	    axis sub-type. It is an axis type where there are
@@ -366,21 +362,12 @@
       </section>
       
       <section>
-	<title>Measurements</title>
-
-	<para>Distances, widths and lengths in Veusz can be specified
-	in a number of different ways. These include absolute
-	distances specified in physical units, e.g. 1cm, 0.05m, 10mm,
-	5in and 10pt, and relative units, which are relative to
-	the largest dimension of the page, including 5%, 1/20,
-	0.05.</para> </section>
-
-      <section>
-	<title>Settings</title>
+	<title>Settings: properties and formatting</title>
 
 	<para>The various settings of the widgets come in a number of
-	types, including integers (e.g. 10), floats (e.g. 3.14), text
-	("hi there!"), distances (see above), options ("horizontal" or
+	types, including integers (e.g. 10), floats (e.g. 3.14),
+	dataset names ("mydata"), expressions ("x+y"), text ("hi
+	there!"), distances (see above), options ("horizontal" or
 	"vertical" for axes).</para>
 
 	<para>Veusz performs type checks on these parameters. If they
@@ -455,19 +442,30 @@
 	<para>Example text could include "Area / \pi (10^{-23}
 	cm^{-2})", or "\pi\bold{g}".</para>
 
-	<para>Veusz plots these symbols with Qt's unicode support. If
-	your current font does not contain these symbols then you may
-	get messy results. If you find this is the case, I highly
-	recommend you to down load Microsoft's Corefonts (see <ulink
-	url="http://corefonts.sourceforge.net/" />).</para>
+	<para>Veusz plots these symbols with Qt's unicode support. You
+	can also include special characters directly, by copying and
+	pasting from a character map application. If your current font
+	does not contain these symbols then you may get a box
+	character.</para>
       </section>
 
       <section>
-	<title>Axis numbers</title>
+	<title>Measurements</title>
+
+	<para>Distances, widths and lengths in Veusz can be specified
+	in a number of different ways. These include absolute
+	distances specified in physical units, e.g. 1cm, 0.05m, 10mm,
+	5in and 10pt, and relative units, which are relative to
+	the largest dimension of the page, including 5%, 1/20,
+	0.05.</para>
+      </section>
+
+      <section>
+	<title>Axis numeric scales</title>
 	
-	<para>The way numbers are shown on axes is chosen
-	automatically. For standard numerical axes, values are shown
-	with the "%Vg" formatting (see below). For date axes, an
+	<para>The way in which numbers are formatted in axis scales is
+	chosen automatically. For standard numerical axes, values are
+	shown with the "%Vg" formatting (see below). For date axes, an
 	appropriate date formatting is used so that the interval shown
 	is correct. A format can be given for an axis in the axis
 	number formatting panel can be given to explicitly choose a
@@ -480,8 +478,8 @@
 	include: "%.2f" (decimal number with two decimal places,
 	e.g. 2.01), "%.3e" (scientific formatting with three decimal
 	places, e.g. 2.123e-02), "%g" (general formatting, switching
-	between "%f" and "%e" as appropriate). See
-	<ulink url="http://opengroup.org/onlinepubs/007908799/xsh/fprintf.html"
+	between "%f" and "%e" as appropriate). See <ulink
+	url="http://opengroup.org/onlinepubs/007908799/xsh/fprintf.html"
 	/> for details.</para>
 
 	<para>Veusz extensions include "%Ve", which is like "%e"
@@ -578,11 +576,11 @@
       to browse through the history. Command line completion is not
       available yet!</para>
 
-      <para>In recent versions there also exists a dataset browsing
-      window, by default to the right of the screen. This window
-      allows you to view the datasets currently loaded, their
-      dimensions and type. Hovering a mouse over the size of the
-      dataset will give you a preview of the data.</para>
+      <para>There also exists a dataset browsing window, by default to
+      the right of the screen. This window allows you to view the
+      datasets currently loaded, their dimensions and type. Hovering a
+      mouse over the size of the dataset will give you a preview of
+      the data.</para>
     </section>
 
     <section>
