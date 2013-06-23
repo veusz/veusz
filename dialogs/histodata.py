@@ -116,7 +116,7 @@ class HistoDataDialog(VeuszDialog):
     def datasetExprChanged(self):
         """Validate expression."""
         text = self.indataset.text()
-        document.simpleEvalExpression(self.document, unicode(text))
+        document.evalDatasetExpression(self.document, unicode(text))
 
     class Params(object):
         """Parameters to creation of histogram."""
@@ -273,10 +273,8 @@ class HistoDataDialog(VeuszDialog):
             self.statuslabel.setText(_("Invalid parameters: %s") % unicode(ex))
             return
 
-        exprresult = N.array(
-            document.simpleEvalExpression(self.document, p.expr),
-            dtype=N.float64)
-        if len(exprresult) == 0:
+        exprresult = document.evalDatasetExpression(self.document, p.expr)
+        if exprresult is None:
             self.statuslabel.setText(_("Invalid expression"))
             return
 

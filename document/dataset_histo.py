@@ -17,7 +17,7 @@
 ###############################################################################
 
 import numpy as N
-from datasets import Dataset, simpleEvalExpression
+from datasets import Dataset, evalDatasetExpression
 import veusz.qtall as qt4
 
 def _(text, disambiguation=None, context="Datasets"):
@@ -53,7 +53,10 @@ class DatasetHistoGenerator(object):
     def getData(self):
         """Get data from input expression, caching result."""
         if self.document.changeset != self.changeset:
-            self._cacheddata = simpleEvalExpression(self.document, self.inexpr)
+            d = evalDatasetExpression(self.document, self.inexpr)
+            if d is not None:
+                d = d.data
+            self._cacheddata = d
             self.changeset = self.document.changeset
         return self._cacheddata
 
@@ -66,7 +69,7 @@ class DatasetHistoGenerator(object):
 
             if minval == 'Auto' or maxval == 'Auto':
                 data = self.getData()
-                if len(data) == 0:
+                if data is None:
                     return N.array([])
                 if minval == 'Auto':
                     minval = N.nanmin(data)
@@ -88,7 +91,7 @@ class DatasetHistoGenerator(object):
     def getBinLocations(self):
         """Return bin centre, -ve bin width, +ve bin width."""
 
-        if len(self.getData()) == 0:
+        if self.getData() is None:
             return (N.array([]), None, None)
 
         binlocs = self.binLocations()
@@ -135,7 +138,7 @@ class DatasetHistoGenerator(object):
         """Return results for each bin."""
 
         data = self.getData()
-        if len(data) == 0:
+        if data is None:
             return (N.array([]), None, None)
 
         normed = self.method == 'density'

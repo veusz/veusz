@@ -1272,8 +1272,8 @@ class DatasetExtended(Dataset):
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
         if isinstance(self.val, basestring):
-            ds = doc.datasetExpressionToDataset(
-                self.val, self.datatype, self.dimensions)
+            ds = doc.evalDatasetExpression(
+                self.val, datatype=self.datatype, dimensions=self.dimensions)
             if ds:
                 # get numpy array of values
                 return ds.data
@@ -1294,8 +1294,8 @@ class DatasetExtended(Dataset):
     def getData(self, doc):
         """Return veusz dataset"""
         if isinstance(self.val, basestring):
-            return doc.datasetExpressionToDataset(
-                self.val, self.datatype, self.dimensions)
+            return doc.evalDatasetExpression(
+                self.val, datatype=self.datatype, dimensions=self.dimensions)
         else:
             return doc.valsToDataset(
                 self.val, self.datatype, self.dimensions)

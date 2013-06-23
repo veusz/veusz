@@ -761,12 +761,9 @@ def _substituteDatasets(datasets, expression, thispart):
     evaluate them.
 
     Returns (new expression, list of substituted datasets)
-
-    This is horribly hacky, but python-2.3 can't use eval with dict subclass
     """
 
     # split apart the expression to look for dataset names
-    # re could be compiled if this gets slow
     bits = dataexpr_split_re.split(expression)
 
     dslist = []
@@ -807,36 +804,143 @@ def _evaluateDataset(datasets, dsname, dspart):
         raise DatasetExpressionException(
             'Internal error - invalid dataset part')
 
+def _returnNumericDataset(doc, vals, dimensions, subdatasets):
+    """Used internally to convert a set of values (which needs to be
+    numeric) into a Dataset.
+
+    subdatasets is list of datasets substituted into expression
+    """
+
+    err = None
+
+    # try to convert array to a numpy array
+    try:
+        vals = N.array(vals, dtype=N.float64)
+    except ValueError:
+        err = _('Could not convert to array')
+
+    # if error on first time, try to sanitize input arrays
+    if err and dimensions == 1:
+        try:
+            vals = list(vals)
+            vals[0] = N.array(vals[0])
+            minlen = len(vals[0])
+            if len(vals) in (2,3):
+                # expand/convert error bars
+                for i in xrange(1, len(vals)):
+                    if N.isscalar(vals[i]):
+                        # convert to scalar
+                        vals[i] = N.zeros(minlen) + vals[i]
+                    else:
+                        # convert to array
+                        vals[i] = N.array(vals[i])
+                        if vals[i].ndim != 1:
+                            raise ValueError
+                    minlen = min(minlen, len(vals[i]))
+
+                # chop to minimum length
+                for i in xrange(len(vals)):
+                    vals[i] = vals[i][:minlen]
+            vals = N.array(vals, dtype=N.float64)
+            err = None
+        except (ValueError, IndexError):
+            pass
+
+    if not err:
+        if dimensions == 1:
+            # see whether data values suitable for a 1d dataset
+            if vals.ndim == 1:
+                # 1d, so ok
+                return Dataset(data=vals)
+            elif vals.ndim == 2:
+                # 2d, see whether data are error bars
+                if vals.shape[0] == 2:
+                    return Dataset(
+                        data=vals[0,:], serr=vals[1,:])
+                elif vals.shape[0] == 3:
+                    return Dataset(
+                        data=vals[0,:], perr=vals[1,:],
+                        nerr=vals[2,:])
+                else:
+                    err = _('Expression has wrong dimensions')
+        elif dimensions == 2 and vals.ndim == 2:
+            # try to use dimensions of first-substituted dataset
+            dsdim = ((0.,1.), (0.,1.))
+            for ds in subdatasets:
+                d = doc.data[ds]
+                if d.dimensions == 2:
+                    dsdim = (d.xrange, d.yrange)
+                    break
+
+            return Dataset2D(vals, xrange=dsdim[0], yrange=dsdim[1])
+        else:
+            err = _('Expression has wrong dimensions')
+
+    raise DatasetExpressionException(err)
+
 _safeexpr = set()
-def simpleEvalExpression(doc, origexpr, part='data'):
-    """Evaluate expression and return data.
+def evalDatasetExpression(doc, origexpr, datatype='numeric',
+                          dimensions=1, part='data'):
+    """Evaluate expression and return an appropriate Dataset.
 
     part is 'data', 'serr', 'perr' or 'nerr' - these are the
     dataset parts which are evaluated by the expression
+
+    Returns None if error
     """
 
-    expr = _substituteDatasets(doc.data, origexpr, part)[0]
+    d = doc.data.get(origexpr)
+    if ( d is not None and
+         d.datatype == datatype and
+         d.dimensions == dimensions ):
+        return d
 
+    if utils.id_re.match(origexpr):
+        # if name is a python identifier, then it has to be a dataset
+        # name. As it wasn't there, just return with nothing rather
+        # than print error message
+        return None
+
+    if not origexpr:
+        # ignore blank names
+        return None
+
+    # replace dataset names by calls to _DS_(name,part)
+    expr, subdatasets = _substituteDatasets(doc.data, origexpr, part)
+
+    # for speed, track safe expressions
     if expr not in _safeexpr:
         if ( not setting.transient_settings['unsafe_mode'] and
              utils.checkCode(expr, securityonly=True) ):
             doc.log("Unsafe expression: '%s'\n" % expr)
-            return N.array([])
+            return None
+        _safeexpr.add(expr)
 
-    # for speed, track safe expressions
-    _safeexpr.add(expr)
-
+    # set up environment for evaluation
     env = doc.eval_context.copy()
-    def evaluateDataset(dsname, dspart):
+    def doeval(dsname, dspart):
         return _evaluateDataset(doc.data, dsname, dspart)
+    env['_DS_'] = doeval
 
-    env['_DS_'] = evaluateDataset
+    # do evaluation
     try:
         evalout = eval(expr, env)
     except Exception, ex:
         doc.log("Error evaluating '%s': '%s'" % (origexpr, unicode(ex)))
-        return N.array([])
-    return evalout
+        return None
+
+    # return correct dataset for data type
+    try:
+        if datatype == 'numeric':
+            return _returnNumericDataset(doc, evalout, dimensions, subdatasets)
+        elif datatype == 'text':
+            return DatasetText([unicode(x) for x in evalout])
+        else:
+            raise RuntimeError('Invalid data type')
+    except DatasetExpressionException, ex:
+        doc.log(_("Error evaluating '%s': %s\n") % (origexpr, unicode(ex)))
+
+    return None
 
 class DatasetExpression(Dataset):
     """A dataset which is linked to another dataset by an expression."""
@@ -1281,7 +1385,6 @@ class Dataset2DExpression(Dataset2D):
 
         self.expr = expr
         self.lastchangeset = -1
-        self.cachedexpr = None
 
         if utils.checkCode(expr, securityonly=True) is not None:
             raise DatasetExpressionException("Unsafe expression '%s'" % expr)
@@ -1289,83 +1392,30 @@ class Dataset2DExpression(Dataset2D):
     @property
     def data(self):
         """Return data, or empty array if error."""
-        try:
-            return self.evalDataset()[0]
-        except DatasetExpressionException, ex:
-            self.document.log(unicode(ex))
+        ds = self.evalDataset()
+        if ds is None:
             return N.array([[]])
+        return ds.data
 
     @property
     def xrange(self):
         """Return x range."""
-        try:
-            return self.evalDataset()[1]
-        except DatasetExpressionException, ex:
-            self.document.log(unicode(ex))
+        ds = self.evalDataset()
+        if ds is None:
             return [0., 1.]
+        return ds.xrange
 
     @property
     def yrange(self):
         """Return y range."""
-        try:
-            return self.evalDataset()[2]
-        except DatasetExpressionException, ex:
-            self.document.log(unicode(ex))
+        ds = self.evalDataset()
+        if ds is None:
             return [0., 1.]
+        return ds.yrange
 
     def evalDataset(self):
         """Do actual evaluation."""
-
-        if self.document.changeset == self.lastchangeset:
-            return self._cacheddata
-
-        environment = self.document.eval_context.copy()
-
-        def getdataset(dsname, dspart):
-            """Return the dataset given in document."""
-            return _evaluateDataset(self.document.data, dsname, dspart)
-        environment['_DS_'] = getdataset
-
-        # substituted expression
-        expr, datasets = _substituteDatasets(self.document.data, self.expr,
-                                             'data')
-
-        # check expression if not checked before
-        if self.cachedexpr != expr:
-            if ( not setting.transient_settings['unsafe_mode'] and
-                 utils.checkCode(expr, securityonly=True) ):
-                raise DatasetExpressionException(
-                    _("Unsafe expression '%s'") % (
-                        expr))
-            self.cachedexpr = expr
-
-        # do evaluation
-        try:
-            evaluated = eval(expr, environment)
-        except Exception, e:
-            raise DatasetExpressionException(
-                _("Error evaluating expression: %s\n"
-                  "Error: %s") % (expr, str(e)) )
-
-        # find 2d dataset dimensions
-        dsdim = None
-        for ds in datasets:
-            d = self.document.data[ds]
-            if d.dimensions == 2:
-                dsdim = d
-                break
-
-        if dsdim is None:
-            # use default if none found
-            rangex = rangey = [0., 1.]
-        else:
-            # use 1st dataset otherwise
-            rangex = dsdim.xrange
-            rangey = dsdim.yrange
-
-        self.lastchangeset = self.document.changeset
-        self._cacheddata = evaluated, rangex, rangey
-        return self._cacheddata
+        return self.document.evalDatasetExpression(self.expr, dimensions=2)
 
     def saveToFile(self, fileobj, name):
         '''Save expression to file.'''

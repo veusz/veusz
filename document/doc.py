@@ -72,24 +72,6 @@ def getSuitableParent(widgettype, initialwidget):
         parent = parent.parent
     return parent
 
-def cache_on_changeset(function):
-    """Decorator to cache result of function call if changeset has changed."""
-    cache = {}
-    changeset = [-1]
-
-    def wrapper(self, *args):
-        # invalidate cache on changeset change
-        if self.changeset != changeset[0]:
-            changeset[0] = self.changeset
-            cache.clear()
-        try:
-            res = cache[args]
-        except KeyError:
-            res = cache[args] = function(self, *args)
-        return res
-
-    return wrapper
-
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
 
@@ -834,99 +816,26 @@ class Document( qt4.QObject ):
             retn[name] = (i, ctype, val)
         return retn
 
-    @cache_on_changeset
-    def evalDatasetExpression(self, expr, part='data'):
-        """Return results of evaluating a 1D dataset expression.
+    def evalDatasetExpression(self, expr, part='data', datatype='numeric',
+                              dimensions=1,
+                              _cache={}, _cache_changeset=[None]):
+        """Return dataset after evaluating a dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
         dataset parts which are evaluated by the expression
+
+        None is returned on error
         """
-        return datasets.simpleEvalExpression(self, expr, part=part)
 
-    def datasetExpressionToDataset(self, expr, datatype, dimensions):
-        """Use an expression or dataset name to get dataset of type
-        and dimensions given."""
+        key = (expr, part, datatype, dimensions)
+        if _cache_changeset[0] != self.changeset:
+            _cache_changeset[0] = self.changeset
+            _cache.clear()
+        elif key in _cache:
+            return _cache[key]
 
-        d = self.data.get(expr)
-        if ( d is not None and
-             d.datatype == datatype and
-             d.dimensions == dimensions ):
-            return d
-
-        if utils.id_re.match(expr):
-            # if name is a python identifier, don't give an error message
-            # below - just print nothing
-            return None
-
-        if not expr:
-            return None
-
-        vals = self.evalDatasetExpression(expr)
-
-        err = None
-        if datatype == 'numeric':
-            # try to convert array to a numpy array
-            try:
-                vals = N.array(vals, dtype=N.float64)
-            except ValueError:
-                err = _('Could not convert to array')
-
-            # if error on first time, try to sanitize input arrays
-            if err and dimensions == 1:
-                try:
-                    vals = list(vals)
-                    vals[0] = N.array(vals[0])
-                    minlen = len(vals[0])
-                    if len(vals) in (2,3):
-                        # expand/convert error bars
-                        for i in xrange(1, len(vals)):
-                            if N.isscalar(vals[i]):
-                                # convert to scalar
-                                vals[i] = N.zeros(minlen) + vals[i]
-                            else:
-                                # convert to array
-                                vals[i] = N.array(vals[i])
-                                if vals[i].ndim != 1:
-                                    raise ValueError
-                            minlen = min(minlen, len(vals[i]))
-
-                        # chop to minimum length
-                        for i in xrange(len(vals)):
-                            vals[i] = vals[i][:minlen]
-                    vals = N.array(vals, dtype=N.float64)
-                    err = None
-                except (ValueError, IndexError):
-                    pass
-
-            if not err:
-                if dimensions == 1:
-                    if vals.ndim == 1:
-                        return datasets.Dataset(data=vals)
-                    elif vals.ndim == 2:
-                        # providing multiple expression for error bars
-                        if vals.shape[0] == 2:
-                            return datasets.Dataset(
-                                data=vals[0,:], serr=vals[1,:])
-                        elif vals.shape[0] == 3:
-                            return datasets.Dataset(
-                                data=vals[0,:], perr=vals[1,:],
-                                nerr=vals[2,:])
-                        else:
-                            err = _('Expression has wrong dimensions')
-                elif dimensions == 2 and vals.ndim == 2:
-                    return datasets.Dataset2D(vals)
-                else:
-                    err = _('Expression has wrong dimensions')
-
-        elif datatype == 'text':
-            try:
-                return datasets.DatasetText([unicode(x) for x in vals])
-            except ValueError:
-                err = _('Unable to convert to text')
-
-        if err:
-            self.log(_("Error in '%s': %s\n") % (expr, err))
-
-        return None
+        _cache[key] = ds = datasets.evalDatasetExpression(
+            self, expr, part=part, datatype=datatype, dimensions=dimensions)
+        return ds
 
     def valsToDataset(self, vals, datatype, dimensions):
         """Return a dataset given a numpy array of values."""
