@@ -20,6 +20,7 @@ Changes in 1.18:
  * Fixed aspect-ratio for graphs setting added
  * Add 'vcentre' line step mode for vertical step plots
  * Expressions of datasets can be used when plotting
+ * Add internal margin setting for grids to separate sub-plots
 
 Bug fixes:
  * Fix reversed 'broken'-axes
@@ -30,6 +31,7 @@ Bug fixes:
  * Fix FieldBool positioning for plugins
  * Fix "no" values when used mixed with numbers
  * Remove warning of log images with zeros
+ * For embedded mode, always return string for __repr__
 
 Features of package:
  Plotting features:
