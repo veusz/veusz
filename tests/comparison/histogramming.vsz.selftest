@@ -1,0 +1,180 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m60.2,60.2l411,0l0,411l-411,0l0,-411"/>
+</clipPath>
+<clipPath id="c2">
+<path d="m60.2,265.7l411,0l0,205.5l-411,0l0,-205.5"/>
+</clipPath>
+<clipPath id="c3">
+<path d="m60.2,60.2l205.5,0l0,411l-205.5,0l0,-411"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.2,60.2l411,0l0,411l-411,0l0,-411"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(299.1,307.8)">
+<path d="m0,10.6l10.6,-10.6l-10.6,-10.6l-10.6,10.6l10.6,10.6" id="p0"/>
+</g>
+<use xlink:href="#p0" x="105" y="244.6"/>
+<use xlink:href="#p0" x="309.8" y="196.1"/>
+<use xlink:href="#p0" x="166.9" y="325.5"/>
+<use xlink:href="#p0" x="193.2" y="234.8"/>
+<use xlink:href="#p0" x="293.4" y="377.8"/>
+<use xlink:href="#p0" x="264.2" y="297.6"/>
+<use xlink:href="#p0" x="355.2" y="219.8"/>
+<use xlink:href="#p0" x="125.3" y="227.2"/>
+<use xlink:href="#p0" x="244" y="281.4"/>
+<use xlink:href="#p0" x="231.7" y="355.3"/>
+<use xlink:href="#p0" x="175.5" y="397.8"/>
+<use xlink:href="#p0" x="217.8" y="297.5"/>
+<use xlink:href="#p0" x="274.7" y="295.2"/>
+<use xlink:href="#p0" x="354" y="304.1"/>
+<use xlink:href="#p0" x="282.3" y="369.6"/>
+<use xlink:href="#p0" x="187.9" y="336.6"/>
+<use xlink:href="#p0" x="83.9" y="244.9"/>
+<use xlink:href="#p0" x="207.6" y="199.3"/>
+<use xlink:href="#p0" x="260.6" y="165.3"/>
+<use xlink:href="#p0" x="304.7" y="172.3"/>
+<use xlink:href="#p0" x="359.6" y="317.4"/>
+<use xlink:href="#p0" x="174" y="345.2"/>
+<use xlink:href="#p0" x="256.5" y="264.7"/>
+<use xlink:href="#p0" x="415.4" y="224.4"/>
+<use xlink:href="#p0" x="388.5" y="306.3"/>
+<use xlink:href="#p0" x="237.6" y="286.4"/>
+<use xlink:href="#p0" x="374.7" y="316.3"/>
+<use xlink:href="#p0" x="251.2" y="257.7"/>
+<use xlink:href="#p0" x="157.6" y="362.9"/>
+<use xlink:href="#p0" x="262.6" y="199.1"/>
+<use xlink:href="#p0" x="267.2" y="424.5"/>
+<use xlink:href="#p0" x="345.6" y="255.7"/>
+<use xlink:href="#p0" x="426.5" y="338.7"/>
+<use xlink:href="#p0" x="401.3" y="298.3"/>
+<use xlink:href="#p0" x="205.4" y="314.5"/>
+<use xlink:href="#p0" x="298.6" y="293.9"/>
+<use xlink:href="#p0" x="270.9" y="152.1"/>
+<use xlink:href="#p0" x="268.9" y="373.9"/>
+<use xlink:href="#p0" x="341.7" y="115.3"/>
+<use xlink:href="#p0" x="261.8" y="212.4"/>
+<use xlink:href="#p0" x="312.9" y="235.4"/>
+<use xlink:href="#p0" x="279.7" y="160.2"/>
+<use xlink:href="#p0" x="221.5" y="216.9"/>
+<use xlink:href="#p0" x="227.5" y="311.2"/>
+<use xlink:href="#p0" x="238.4" y="213.2"/>
+<use xlink:href="#p0" x="137" y="145.1"/>
+<use xlink:href="#p0" x="232.9" y="196.8"/>
+<use xlink:href="#p0" x="318.7" y="252.3"/>
+</g>
+</g>
+<g clip-path="url(#c2)">
+<g fill="none" stroke="#ff00ff" stroke-width="2.5">
+<polyline fill="none" points="60.2,467.2 97.6,467.2 97.6,459.1 134.9,459.1 134.9,447 172.3,447 172.3,422.9 209.6,422.9 209.6,390.6 247,390.6 247,342.3 284.4,342.3 284.4,314.1 321.7,314.1 321.7,297.9 359.1,297.9 359.1,285.8 396.5,285.8 396.5,273.8 433.8,273.8 471.2,273.8"/>
+</g>
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
+<path d="M60.2,467.2l37.3,0M97.6,459.1l37.3,0M134.9,447l37.3,0M172.3,422.9l37.3,0M209.6,390.6l37.3,0M247,342.3l37.3,0M284.4,314.1l37.3,0M321.7,297.9l37.3,0M359.1,285.8l37.3,0M396.5,273.8l37.3,0M433.8,273.8l37.3,0"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M471.2,471.2l0,-205.5"/>
+<path d="M471.2,471.2l-3.7,0M471.2,461.1l-3.7,0M471.2,451.1l-3.7,0M471.2,441l-3.7,0M471.2,430.9l-3.7,0M471.2,420.8l-3.7,0M471.2,410.8l-3.7,0M471.2,400.7l-3.7,0M471.2,390.6l-3.7,0M471.2,380.5l-3.7,0M471.2,370.5l-3.7,0M471.2,360.4l-3.7,0M471.2,350.3l-3.7,0M471.2,340.2l-3.7,0M471.2,330.2l-3.7,0M471.2,320.1l-3.7,0M471.2,310l-3.7,0M471.2,300l-3.7,0M471.2,289.9l-3.7,0M471.2,279.8l-3.7,0M471.2,269.7l-3.7,0"/>
+<path d="M471.2,471.2l-7.5,0M471.2,430.9l-7.5,0M471.2,390.6l-7.5,0M471.2,350.3l-7.5,0M471.2,310l-7.5,0M471.2,269.7l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<g transform="matrix(0 1 -1 0 509.7 320.3)">
+<text x="0" y="0" font-size="14pt" fill="#000000">X histogram</text>
+</g>
+<text x="474.7" y="480" font-size="14pt" fill="#000000">0</text>
+<text x="474.7" y="439.7" font-size="14pt" fill="#000000">0.2</text>
+<text x="474.7" y="399.4" font-size="14pt" fill="#000000">0.4</text>
+<text x="474.7" y="359.1" font-size="14pt" fill="#000000">0.6</text>
+<text x="474.7" y="318.8" font-size="14pt" fill="#000000">0.8</text>
+<text x="474.7" y="278.5" font-size="14pt" fill="#000000">1</text>
+</g>
+</g>
+<g clip-path="url(#c2)">
+<g fill="none" stroke="#0000ff" stroke-width="2.5">
+<polyline fill="none" points="60.2,462.2 97.6,462.2 97.6,453.1 134.9,453.1 134.9,444.1 172.3,444.1 172.3,416.9 209.6,416.9 209.6,398.8 247,398.8 247,362.7 284.4,362.7 284.4,407.9 321.7,407.9 321.7,435 359.1,435 359.1,444.1 396.5,444.1 433.8,444.1 433.8,471.2 471.2,471.2"/>
+</g>
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
+<path d="M60.2,462.2l37.3,0M97.6,453.1l37.3,0M134.9,444.1l37.3,0M172.3,416.9l37.3,0M209.6,398.8l37.3,0M247,362.7l37.3,0M284.4,407.9l37.3,0M321.7,435l37.3,0M359.1,444.1l37.3,0M396.5,444.1l37.3,0M433.8,471.2l37.3,0"/>
+</g>
+</g>
+<g clip-path="url(#c3)">
+<g fill="none" stroke="#00ff00" stroke-width="2.5">
+<polyline fill="none" points="60.2,471.2 60.2,433.8 68.2,433.8 68.2,396.5 84.4,396.5 84.4,359.1 104.5,359.1 104.5,321.7 156.9,321.7 156.9,284.4 181.1,284.4 181.1,247 221.4,247 221.4,209.6 241.5,209.6 241.5,172.3 257.6,172.3 257.6,134.9 261.7,134.9 261.7,97.6 261.7,60.2"/>
+</g>
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
+<path d="M60.2,471.2l0,-37.3M68.2,433.8l0,-37.3M84.4,396.5l0,-37.3M104.5,359.1l0,-37.3M156.9,321.7l0,-37.3M181.1,284.4l0,-37.3M221.4,247l0,-37.3M241.5,209.6l0,-37.3M257.6,172.3l0,-37.3M261.7,134.9l0,-37.3M261.7,97.6l0,-37.3"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,60.2l205.5,0"/>
+<path d="M60.2,60.2l0,3.7M70.3,60.2l0,3.7M80.3,60.2l0,3.7M90.4,60.2l0,3.7M100.5,60.2l0,3.7M110.6,60.2l0,3.7M120.6,60.2l0,3.7M130.7,60.2l0,3.7M140.8,60.2l0,3.7M150.9,60.2l0,3.7M160.9,60.2l0,3.7M171,60.2l0,3.7M181.1,60.2l0,3.7M191.2,60.2l0,3.7M201.2,60.2l0,3.7M211.3,60.2l0,3.7M221.4,60.2l0,3.7M231.4,60.2l0,3.7M241.5,60.2l0,3.7M251.6,60.2l0,3.7M261.7,60.2l0,3.7"/>
+<path d="M60.2,60.2l0,7.5M100.5,60.2l0,7.5M140.8,60.2l0,7.5M181.1,60.2l0,7.5M221.4,60.2l0,7.5M261.7,60.2l0,7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="114.8" y="46.2" font-size="14pt" fill="#000000">Y histogram</text>
+<text x="55.8" y="56.7" font-size="14pt" fill="#000000">0</text>
+<text x="87.4" y="56.7" font-size="14pt" fill="#000000">0.2</text>
+<text x="127.7" y="56.7" font-size="14pt" fill="#000000">0.4</text>
+<text x="168" y="56.7" font-size="14pt" fill="#000000">0.6</text>
+<text x="208.2" y="56.7" font-size="14pt" fill="#000000">0.8</text>
+<text x="257.3" y="56.7" font-size="14pt" fill="#000000">1</text>
+</g>
+</g>
+<g clip-path="url(#c3)">
+<g fill="none" stroke="#ff0000" stroke-width="2.5">
+<polyline fill="none" points="60.2,471.2 60.2,433.8 77.9,433.8 77.9,396.5 95.6,396.5 95.6,359.1 104.5,359.1 104.5,321.7 175.4,321.7 175.4,284.4 113.4,284.4 113.4,247 148.8,247 148.8,209.6 104.5,209.6 104.5,172.3 95.6,172.3 95.6,134.9 69.1,134.9 69.1,97.6 60.2,97.6 60.2,60.2"/>
+</g>
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
+<path d="M60.2,471.2l0,-37.3M77.9,433.8l0,-37.3M95.6,396.5l0,-37.3M104.5,359.1l0,-37.3M175.4,321.7l0,-37.3M113.4,284.4l0,-37.3M148.8,247l0,-37.3M104.5,209.6l0,-37.3M95.6,172.3l0,-37.3M69.1,134.9l0,-37.3M60.2,97.6l0,-37.3"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-411"/>
+<path d="M60.2,463l3.7,0M60.2,446.5l3.7,0M60.2,430.1l3.7,0M60.2,413.7l3.7,0M60.2,397.2l3.7,0M60.2,380.8l3.7,0M60.2,364.3l3.7,0M60.2,347.9l3.7,0M60.2,331.5l3.7,0M60.2,315l3.7,0M60.2,298.6l3.7,0M60.2,282.1l3.7,0M60.2,265.7l3.7,0M60.2,249.3l3.7,0M60.2,232.8l3.7,0M60.2,216.4l3.7,0M60.2,199.9l3.7,0M60.2,183.5l3.7,0M60.2,167.1l3.7,0M60.2,150.6l3.7,0M60.2,134.2l3.7,0M60.2,117.7l3.7,0M60.2,101.3l3.7,0M60.2,84.8l3.7,0M60.2,68.4l3.7,0"/>
+<path d="M60.2,430.1l7.5,0M60.2,347.9l7.5,0M60.2,265.7l7.5,0M60.2,183.5l7.5,0M60.2,101.3l7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<g transform="matrix(0 -1 1 0 1.7 296.3)">
+<text x="0" y="0" font-size="14pt" fill="#000000">Y value</text>
+</g>
+<text x="-13.2" y="438.9" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="-13.2" y="356.7" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="47.9" y="274.4" font-size="14pt" fill="#000000">0</text>
+<text x="47.9" y="192.2" font-size="14pt" fill="#000000">1</text>
+<text x="47.9" y="110" font-size="14pt" fill="#000000">2</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l411,0"/>
+<path d="M68.4,471.2l0,-3.7M84.8,471.2l0,-3.7M101.3,471.2l0,-3.7M117.7,471.2l0,-3.7M134.2,471.2l0,-3.7M150.6,471.2l0,-3.7M167.1,471.2l0,-3.7M183.5,471.2l0,-3.7M199.9,471.2l0,-3.7M216.4,471.2l0,-3.7M232.8,471.2l0,-3.7M249.3,471.2l0,-3.7M265.7,471.2l0,-3.7M282.1,471.2l0,-3.7M298.6,471.2l0,-3.7M315,471.2l0,-3.7M331.5,471.2l0,-3.7M347.9,471.2l0,-3.7M364.3,471.2l0,-3.7M380.8,471.2l0,-3.7M397.2,471.2l0,-3.7M413.7,471.2l0,-3.7M430.1,471.2l0,-3.7M446.5,471.2l0,-3.7M463,471.2l0,-3.7"/>
+<path d="M101.3,471.2l0,-7.5M183.5,471.2l0,-7.5M265.7,471.2l0,-7.5M347.9,471.2l0,-7.5M430.1,471.2l0,-7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="235.1" y="485.2" font-size="14pt" fill="#000000">X value</text>
+<text x="66.3" y="476.5" font-size="14pt" fill="#000000">&#8722;2</text>
+<text x="148.5" y="476.5" font-size="14pt" fill="#000000">&#8722;1</text>
+<text x="261.3" y="476.5" font-size="14pt" fill="#000000">0</text>
+<text x="343.5" y="476.5" font-size="14pt" fill="#000000">1</text>
+<text x="425.7" y="476.5" font-size="14pt" fill="#000000">2</text>
+</g>
+</g>
+</g>
+</svg>

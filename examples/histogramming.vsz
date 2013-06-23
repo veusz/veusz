@@ -1,0 +1,201 @@
+# Veusz saved document (version 1.17.1)
+
+ImportString('a(numeric)','''
+4.064151e-01
+-1.955427e+00
+5.367960e-01
+-1.201281e+00
+-8.823834e-01
+3.370551e-01
+-1.877312e-02
+1.088443e+00
+-1.707573e+00
+-2.634517e-01
+-4.137204e-01
+-1.097392e+00
+-5.821462e-01
+1.091239e-01
+1.074642e+00
+2.023820e-01
+-2.822896e+00
+-9.460682e-01
+-2.210939e+00
+-7.071375e-01
+-6.229418e-02
+4.740030e-01
+1.142621e+00
+-1.115908e+00
+-1.119911e-01
+1.821279e+00
+1.493768e+00
+-3.421813e-01
+1.325412e+00
+-1.768811e-01
+-1.314423e+00
+-3.753827e-02
+1.842780e-02
+9.716551e-01
+1.956101e+00
+1.649411e+00
+-7.339221e-01
+3.996795e-01
+6.276289e-02
+3.893068e-02
+9.249883e-01
+-4.728369e-02
+5.743185e-01
+1.701567e-01
+-5.380860e-01
+-4.650062e-01
+-3.322537e-01
+-1.565993e+00
+-3.993179e-01
+6.449638e-01
+''')
+CreateHistogram(u'a+0', u'a_p', u'a_h', binparams=(11, -2.5, 2.5, False), binmanual=None, method=u'density', cumulative='none', errors=False)
+CreateHistogram(u'a', u'a_p_cuml', u'a_h_cuml', binparams=(11, -2.5, 2.5, False), binmanual=None, method=u'fractions', cumulative='smalltolarge', errors=False)
+ImportString('b(numeric)','''
+-5.119920e-01
+2.569989e-01
+8.461096e-01
+-7.280449e-01
+3.753062e-01
+-1.363823e+00
+-3.881765e-01
+5.583240e-01
+4.682697e-01
+-1.904293e-01
+-1.090520e+00
+-1.606417e+00
+-3.863972e-01
+-3.592417e-01
+-4.671219e-01
+-1.263556e+00
+-9.915580e-02
+-8.630928e-01
+2.531121e-01
+8.082021e-01
+1.220910e+00
+1.136309e+00
+-6.283861e-01
+-9.666840e-01
+1.243800e-02
+5.026563e-01
+-4.936574e-01
+-2.520510e-01
+-6.160691e-01
+9.710006e-02
+-1.182792e+00
+8.105359e-01
+-1.931395e+00
+1.213877e-01
+-8.875079e-01
+-3.964456e-01
+-5.933237e-01
+-3.436124e-01
+1.381866e+00
+-1.315651e+00
+1.829677e+00
+6.486507e-01
+3.684826e-01
+1.283694e+00
+5.930318e-01
+-5.533747e-01
+6.386597e-01
+1.467606e+00
+8.377984e-01
+1.625319e-01
+''')
+CreateHistogram(u'b', u'b_p', u'b_h', binparams=(11, -2.5, 2.5, False), binmanual=None, method=u'density', cumulative='none', errors=False)
+CreateHistogram(u'b', u'b_p_cuml', u'b_h_cuml', binparams=(11, -2.5, 2.5, False), binmanual=None, method=u'fractions', cumulative='smalltolarge', errors=False)
+Set('StyleSheet/Font/font', u'Bitstream Vera Sans')
+Set('StyleSheet/xy/ErrorBarLine/hide', True)
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Set('rightMargin', u'1.7cm')
+Set('topMargin', u'1.7cm')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', u'X value')
+Set('min', -2.5)
+Set('max', 2.5)
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Y value')
+Set('min', -2.5)
+Set('max', 2.5)
+Set('direction', 'vertical')
+To('..')
+Add('xy', name=u'b_hist', autoadd=False)
+To(u'b_hist')
+Set('xData', u'b_h')
+Set('yData', u'b_p')
+Set('marker', u'none')
+Set('xAxis', u'x2')
+Set('PlotLine/steps', u'vcentre')
+Set('PlotLine/color', u'red')
+Set('PlotLine/width', u'2pt')
+Set('MarkerFill/color', u'red')
+To('..')
+Add('axis', name=u'x2', autoadd=False)
+To(u'x2')
+Set('label', u'Y histogram')
+Set('max', 1.02)
+Set('upperPosition', 0.5)
+Set('otherPosition', 1.0)
+To('..')
+Add('xy', name=u'b_hist_cuml', autoadd=False)
+To(u'b_hist_cuml')
+Set('xData', u'b_h_cuml')
+Set('yData', u'b_p_cuml')
+Set('marker', u'none')
+Set('hide', False)
+Set('xAxis', u'x2')
+Set('PlotLine/steps', u'vcentre')
+Set('PlotLine/color', u'#00ff00')
+Set('PlotLine/width', u'2pt')
+To('..')
+Add('xy', name=u'a_hist', autoadd=False)
+To(u'a_hist')
+Set('xData', u'a_p')
+Set('yData', u'a_h')
+Set('marker', u'none')
+Set('yAxis', u'y2')
+Set('PlotLine/steps', u'centre')
+Set('PlotLine/color', u'blue')
+Set('PlotLine/width', u'2pt')
+Set('MarkerFill/color', u'red')
+To('..')
+Add('axis', name=u'y2', autoadd=False)
+To(u'y2')
+Set('label', u'X histogram')
+Set('max', 1.02)
+Set('direction', 'vertical')
+Set('upperPosition', 0.5)
+Set('otherPosition', 1.0)
+To('..')
+Add('xy', name=u'a_hist_cuml', autoadd=False)
+To(u'a_hist_cuml')
+Set('xData', u'a_p_cuml')
+Set('yData', u'a_h_cuml')
+Set('marker', u'none')
+Set('hide', False)
+Set('yAxis', u'y2')
+Set('PlotLine/steps', u'centre')
+Set('PlotLine/color', u'magenta')
+Set('PlotLine/width', u'2pt')
+To('..')
+Add('xy', name=u'datapoints', autoadd=False)
+To(u'datapoints')
+Set('xData', u'a')
+Set('yData', u'b')
+Set('marker', u'diamond')
+Set('markerSize', u'6pt')
+Set('PlotLine/hide', True)
+Set('MarkerFill/color', u'white')
+To('..')
+To('..')
+To('..')
