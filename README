@@ -18,6 +18,8 @@ Changes in 1.18:
  * Add colour maps with steps
  * Allow editing multiple datasets simultaneously in editor
  * Fixed aspect-ratio for graphs setting added
+ * Add 'vcentre' line step mode for vertical step plots
+ * Expressions of datasets can be used for plotting
 
 Bug fixes:
  * Fix reversed 'broken'-axes

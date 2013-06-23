@@ -467,6 +467,33 @@ class PointPlotter(GenericPlotter):
                 if len(xvals) > 0:
                     pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
 
+        elif steps[:7] == 'vcentre':
+            axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
+
+            if ydata.hasErrors():
+                # Special case if error bars on y points:
+                # here we use the error bars to define the steps
+                ymin, ymax = ydata.getPointRanges()
+
+                # this is duplicated from drawing error bars: bad
+                # convert ymin and ymax to graph coordinates
+                ymin = axes[1].dataToPlotterCoords(posn, ymin)
+                ymax = axes[1].dataToPlotterCoords(posn, ymax)
+                utils.addNumpyToPolygonF(pts, xvals, ymin, xvals, ymax)
+
+            else:
+                # we put the bin edges half way between the points
+                # we assume this is the correct thing to do even in log space
+                y1 = yvals[:-1]
+                y2 = yvals[1:]
+                x1 = xvals[:-1]
+                x2 = xvals[1:]
+                yc = 0.5*(y1+y2)
+                utils.addNumpyToPolygonF(pts, x1, y1, x1, yc, x2, yc)
+
+                if len(yvals) > 0:
+                    pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
+
         else:
             assert False
 
