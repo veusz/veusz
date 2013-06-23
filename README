@@ -21,6 +21,8 @@ Changes in 1.18:
  * Add 'vcentre' line step mode for vertical step plots
  * Expressions of datasets can be used when plotting
  * Add internal margin setting for grids to separate sub-plots
+ * Add pixel, pixel_wcs, fraction and linear_wcs modes for fits
+   import coordinate systems
 
 Bug fixes:
  * Fix reversed 'broken'-axes

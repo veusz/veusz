@@ -472,12 +472,18 @@ class ImportTabFITS(ImportTab):
                       qt4.SIGNAL('currentIndexChanged(int)'),
                       self.dialog.enableDisableImport )
 
+        self.fitswcsmode.defaultlist = [
+            _('Pixel (simple)'), _('Pixel (WCS)'), _('Fractional'),
+            _('Linear (WCS)')
+            ]
+
     def reset(self):
         """Reset controls."""
         self.fitsdatasetname.setEditText("")
         for c in ('data', 'sym', 'pos', 'neg'):
             cntrl = getattr(self, 'fits%scolumn' % c)
             cntrl.setCurrentIndex(0)
+        self.fitswcsmode.setCurrentIndex(0)
             
     def doPreview(self, filename, encoding):
         """Set up controls for FITS file."""
@@ -624,6 +630,7 @@ class ImportTabFITS(ImportTab):
 
         name = prefix + unicode(self.fitsdatasetname.text()) + suffix
 
+        wcsmode = None
         if data[0] == 'table':
             # get list of appropriate columns
             cols = []
@@ -631,16 +638,18 @@ class ImportTabFITS(ImportTab):
             # get data from controls
             for c in ('data', 'sym', 'pos', 'neg'):
                 cntrl = getattr(self, 'fits%scolumn' % c)
-                
+
                 i = cntrl.currentIndex()
                 if i == 0:
                     cols.append(None)
                 else:
                     cols.append(data[1][i-1].name)
-                    
+
         else:
             # item is an image, so no columns
             cols = [None]*4
+            wcsmode = ('pixel', 'pixel_wcs', 'fraction', 'linear_wcs')[
+                self.fitswcsmode.currentIndex()]
 
         # construct operation to import fits
         params = document.ImportParamsFITS(
@@ -651,6 +660,7 @@ class ImportTabFITS(ImportTab):
             symerrcol=cols[1],
             poserrcol=cols[2],
             negerrcol=cols[3],
+            wcsmode=wcsmode,
             tags=tags,
             linked=linked,
             )

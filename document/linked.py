@@ -179,12 +179,14 @@ class LinkedFileFITS(LinkedFileBase):
         p = self.params
         args = [p.dsname, self._getSaveFilename(relpath), p.hdu]
         args = [repr(i) for i in args]
-        for param, column in ( ("datacol", p.datacol),
-                               ("symerrcol", p.symerrcol),
-                               ("poserrcol", p.poserrcol),
-                               ("negerrcol", p.negerrcol) ):
-            if column is not None:
-                args.append("%s=%s" % (param, repr(column)))
+        for param, val in ( ("datacol", p.datacol),
+                            ("symerrcol", p.symerrcol),
+                            ("poserrcol", p.poserrcol),
+                            ("negerrcol", p.negerrcol),
+                            ("wcsmode", p.wcsmode),
+                            ):
+            if val is not None:
+                args.append("%s=%s" % (param, repr(val)))
         args.append("linked=True")
 
         fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))

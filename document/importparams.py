@@ -157,6 +157,7 @@ class ImportParamsFITS(ImportParamsBase):
         'symerrcol': None,
         'poserrcol': None,
         'negerrcol': None,
+        'wcsmode': None,
         }
     defaults.update(ImportParamsBase.defaults)
 

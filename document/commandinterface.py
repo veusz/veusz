@@ -804,6 +804,7 @@ class CommandInterface(qt4.QObject):
     def ImportFITSFile(self, dsname, filename, hdu,
                        datacol = None, symerrcol = None,
                        poserrcol = None, negerrcol = None,
+                       wcsmode = None,
                        linked = False):
         """Import data from a FITS file
 
@@ -815,6 +816,13 @@ class CommandInterface(qt4.QObject):
         specify the columns containing the data, symmetric error,
         positive and negative errors.
 
+        wcsmode is one of ('pixel', 'pixel_wcs' or 'linear_wcs'). None
+        gives 'linear_wcs'. 'pixel' mode just gives pixel values from
+        0 to maximum. 'pixel_wcs' is the pixel number relative to the
+        wcs reference pixel. 'linear_wcs' takes the wcs coordinate,
+        assuming a linear coordinate system. 'fraction' assumes
+        fractional values from 0 to 1.
+
         linked specfies that the dataset is linked to the file
         """
 
@@ -824,6 +832,7 @@ class CommandInterface(qt4.QObject):
             dsname=dsname, filename=realfilename, hdu=hdu,
             datacol=datacol, symerrcol=symerrcol,
             poserrcol=poserrcol, negerrcol=negerrcol,
+            wcsmode=wcsmode,
             linked=linked)
         op = operations.OperationDataImportFITS(params)
         self.document.applyOperation(op)

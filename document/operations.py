@@ -1028,17 +1028,26 @@ class OperationDataImportFITS(OperationDataImportBase):
             wcs = [header[i] for i in ('CRVAL1', 'CRPIX1', 'CDELT1',
                                        'CRVAL2', 'CRPIX2', 'CDELT2')]
 
-            rangex = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
-                       (0-wcs[1])*wcs[2] + wcs[0])
-            rangey = ( (0-wcs[4])*wcs[5] + wcs[3],
-                       (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
+            if p.wcsmode == 'pixel':
+                # no coordinate system - just pixel values
+                rangex = rangey = None
+            elif p.wcsmode == 'pixel_wcs':
+                rangex = (data.shape[1]-wcs[1], 0-wcs[1])
+                rangey = (0-wcs[4], data.shape[0]-wcs[4])
+            elif p.wcsmode == 'fraction':
+                rangex = rangey = (0., 1.)
+            else:
+                # linear wcs mode (linear_wcs)
+                rangex = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
+                           (0-wcs[1])*wcs[2] + wcs[0])
+                rangey = ( (0-wcs[4])*wcs[5] + wcs[3],
+                           (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
 
-            rangex = (rangex[1], rangex[0])
+                rangex = (rangex[1], rangex[0])
 
         except KeyError:
             # no / broken wcs
-            rangex = None
-            rangey = None
+            rangex = rangey = None
 
         return datasets.Dataset2D(data, xrange=rangex, yrange=rangey)
 
