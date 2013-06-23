@@ -1,0 +1,98 @@
+# Veusz saved document (version 1.17.1)
+
+ImportString('x(numeric)','''
+0.000000e+00
+4.188790e-01
+8.377580e-01
+1.256637e+00
+1.675516e+00
+2.094395e+00
+2.513274e+00
+2.932153e+00
+3.351032e+00
+3.769911e+00
+4.188790e+00
+4.607669e+00
+5.026548e+00
+5.445427e+00
+5.864306e+00
+6.283185e+00
+''')
+ImportString('y(numeric)','''
+0.000000e+00
+4.067366e-01
+7.431448e-01
+9.510565e-01
+9.945219e-01
+8.660254e-01
+5.877853e-01
+2.079117e-01
+-2.079117e-01
+-5.877853e-01
+-8.660254e-01
+-9.945219e-01
+-9.510565e-01
+-7.431448e-01
+-4.067366e-01
+-2.449213e-16
+''')
+Set('StyleSheet/Font/font', u'Bitstream Vera Serif')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', '\\italic{x}')
+Set('autoRange', u'exact')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'\\italic{y}')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('PlotLine/color', '#3b57d0')
+Set('MarkerFill/color', '#3b57d0')
+Set('ErrorBarLine/color', '#3b57d0')
+To('..')
+Add('xy', name='xy2', autoadd=False)
+To('xy2')
+Set('yData', u'y*1.5')
+Set('PlotLine/color', '#d7dede')
+Set('MarkerFill/color', '#d7dede')
+Set('ErrorBarLine/color', '#d7dede')
+To('..')
+Add('xy', name='xy3', autoadd=False)
+To('xy3')
+Set('yData', u'(-y*1.5,0.1)')
+Set('PlotLine/color', '#526c38')
+Set('MarkerFill/color', '#526c38')
+Set('ErrorBarLine/color', '#526c38')
+To('..')
+Add('xy', name='xy4', autoadd=False)
+To('xy4')
+Set('yData', u'(-y, 0.1, -0.2)')
+Set('PlotLine/color', '#5e136d')
+Set('MarkerFill/color', '#5e136d')
+Set('ErrorBarLine/color', '#5e136d')
+To('..')
+Add('xy', name='xy5', autoadd=False)
+To('xy5')
+Set('xData', u'(x+y,0.1)')
+Set('yData', u'(-y*1.5,y*0.2)')
+Set('PlotLine/color', '#a60523')
+Set('MarkerFill/color', '#a60523')
+Set('ErrorBarLine/color', '#a60523')
+To('..')
+Add('label', name='label1', autoadd=False)
+To('label1')
+Set('label', u'Using expressions of datasets')
+Set('xPos', [0.5])
+Set('yPos', [0.98])
+Set('alignHorz', u'centre')
+Set('alignVert', u'top')
+To('..')
+To('..')
+To('..')
