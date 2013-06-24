@@ -231,8 +231,14 @@ class DatasetPluginHelper(object):
         """Return results of evaluating a 1D dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
         dataset parts which are evaluated by the expression
+
+        Returns None if expression could not be evaluated.
         """
-        return self._doc.evalDatasetExpression(expr, part=part)
+        ds = self._doc.evalDatasetExpression(expr, part=part)
+        if ds is not None:
+            return ds.data
+        else:
+            return None
 
     def getDataset(self, name, dimensions=1):
         """Return numerical dataset object for name given.
@@ -1399,7 +1405,15 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
         """Do shifting of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         filt = helper.evaluateExpression(fields['filter'])
+
         data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+
+        if filt is None:
+            # select nothing
+            filt = N.zeros(data.shape, dtype=N.bool)
+        else:
+            # filter must have int/bool type
+            filt = N.array(filt, dtype=N.bool)
 
         try:
             if fields['replacenan']:
@@ -1412,8 +1426,9 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
                 if serr is not None: serr = serr[filt]
                 if perr is not None: perr = perr[filt]
                 if nerr is not None: nerr = nerr[filt]
-        except:
-            raise DatasetPluginException(_('Error filtering dataset'))
+        except (ValueError, IndexError), e:
+            raise DatasetPluginException(_("Error filtering dataset: '%s')") %
+                                         unicode(e))
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 

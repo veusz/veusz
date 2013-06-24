@@ -843,7 +843,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
                     vals[i] = vals[i][:minlen]
             vals = N.array(vals, dtype=N.float64)
             err = None
-        except (ValueError, IndexError):
+        except (ValueError, IndexError, TypeError):
             pass
 
     if not err:
