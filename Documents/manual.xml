@@ -969,17 +969,14 @@ SetData('y', y)
     <section>
       <title>Manipulating datasets</title>
 
-      <para>Imported datasets can easily be modified in the Edit data
-      dialog box, by clicking on a value and entering a new one. What
-      is probably more interesting is using the Create dialog box to
-      make new datasets from scratch or based on other
-      datasets.</para>
-
-      <para>New datasets can be made by entering a name, and choosing
-      whether to make a dataset consisting of a single value or over a
-      range, from expressions based on a parametric expression, or
-      from expressions based on existing datasets.</para>
-
+      <para>Imported datasets can easily be modified in the Data
+      Editor dialog box. This dialog box can also be used to create
+      new datasets from scratch by typing them in. The Data Create
+      dialog box is used to new datasets as a numerical sequence,
+      parametrically or based on other datasets given expressions. If
+      you want to plot a function of a dataset, you often do not have
+      to create a new dataset. Veusz allows to enter expressions
+      directly in many places.</para>
 
       <section>
 	<title>Using dataset plugins</title>
@@ -1017,6 +1014,23 @@ SetData('y', y)
       <para>If a dataset name contains non alphanumeric characters,
       its name should be quoted in the expression in back-tick
       characters, e.g. <command>`length (cm)`*2</command>.</para>
+
+      <para>The numpy functionality is particularly useful for doing
+      more complicated expressions. For instance, a conditional
+      expression can be written as
+      <command>where(x&lt;y,x,y)</command> or
+      <command>where(isfinite(x),a,b))</command>.</para>
+
+      <para>You often do not need to create a new dataset when. For
+      example, with the xy point plotter widget, you can directly
+      enter an expression as the X and Y dataset settings. When you
+      give a direct dataset expression, you can define error bar
+      expressions by separating them by commas, and optionally
+      surrounding them by brackets. For example
+      <command>(a,0.1)</command> plots dataset a as the data, with
+      symmetric errors bars of 0.1. Asymmetric bars are given as
+      <command>(a,a*0.1,-a*0.1)</command>.</para>
+
       </section>
 
       <section>

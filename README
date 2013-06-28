@@ -13,16 +13,18 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 1.18:
+ * Add support for dataset expressions when plotting
  * Add axis-function widget for plotting axes which have a scale given
    by a function, or are linked to a different axis via a function
- * Add colour maps with steps
- * Allow editing multiple datasets simultaneously in editor
- * Fixed aspect-ratio for graphs setting added
+ * Add stepped colour maps
+ * Support editing multiple datasets simultaneously in editor
+ * Add setting to fix aspect-ratio of graphs
  * Add 'vcentre' line step mode for vertical step plots
- * Expressions of datasets can be used when plotting
  * Add internal margin setting for grids to separate sub-plots
- * Add pixel, pixel_wcs, fraction and linear_wcs modes for fits
-   import coordinate systems
+ * Add pixel, pixel_wcs, fraction and linear_wcs FITS import
+   coordinate system modes
+ * Add drop down toolbar button menu to create axis widgets
+ * More efficient widget dependency resolution
 
 Bug fixes:
  * Fix reversed 'broken'-axes
@@ -31,7 +33,7 @@ Bug fixes:
  * Fix use of transparency image when plotting non-square images
  * Allow lists passed as xrange and yrange to create 2D dataset
  * Fix FieldBool positioning for plugins
- * Fix "no" values when used mixed with numbers
+ * QDP import: fix "no" values when used mixed with numbers
  * Remove warning of log images with zeros
  * For embedded mode, always return string for __repr__
 
