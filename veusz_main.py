@@ -156,13 +156,8 @@ class AppRunner(qt4.QObject):
 
         qt4.QObject.__init__(self)
 
-        # workaround because there's a weird bug on Mac OS where
-        # using a separate thread means the user has to click on
-        # on the dock again
-        darwinworkaround = sys.platform == 'darwin'
-
         self.splash = None
-        if not (options.listen or options.export) and not darwinworkaround:
+        if not (options.listen or options.export):
             # show the splash screen on normal start
             self.splash = qt4.QSplashScreen(makeSplashLogo())
             self.splash.show()
@@ -176,14 +171,10 @@ class AppRunner(qt4.QObject):
             trans.load(options.translation)
             qt4.qApp.installTranslator(trans)
 
-        if darwinworkaround:
-            initImports()
-            self.slotStartApplication()
-        else:
-            self.thread = ImportThread()
-            self.connect( self.thread, qt4.SIGNAL('finished()'),
-                          self.slotStartApplication )
-            self.thread.start()
+        self.thread = ImportThread()
+        self.connect( self.thread, qt4.SIGNAL('finished()'),
+                      self.slotStartApplication )
+        self.thread.start()
 
     def slotStartApplication(self):
         '''Main start of application.'''
@@ -228,6 +219,14 @@ class AppRunner(qt4.QObject):
 
 def run():
     '''Run the main application.'''
+
+    # nasty workaround for bug that causes non-modal windows not to
+    # appear on mac see
+    # https://github.com/jeremysanders/veusz/issues/39
+    if sys.platform == 'darwin':
+        import glob
+        for f in glob.glob(os.environ['HOME'] + '/Library/Saved Application State/org.python.veusz.*/*'):
+            os.unlink(f)
 
     # jump to the embedding client entry point if required
     if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
