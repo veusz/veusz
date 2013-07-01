@@ -47,6 +47,10 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def rowCount(self, parent):
         """Return number of rows."""
+        if parent.isValid():
+            # docs say we should return zero
+            return 0
+
         try:
             return len(self.document.data[self.dsname].data)+1
         except (KeyError, AttributeError):
@@ -58,6 +62,9 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def columnCount(self, parent):
         """Return number of columns."""
+
+        if parent.isValid():
+            return 0
         try:
             ds = self.document.data[self.dsname]
         except KeyError:
@@ -207,11 +214,15 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
         self.rows = rows
 
     def rowCount(self, parent):
+        if parent.isValid():
+            return 0
         if self.changeset != self.document.changeset:
             self.updateCounts()
         return self.rows
 
     def columnCount(self, parent):
+        if parent.isValid():
+            return 0
         if self.changeset != self.document.changeset:
             self.updateCounts()
         return len(self.colattrs)
@@ -326,6 +337,8 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
                      self.slotDocumentModified)
 
     def rowCount(self, parent):
+        if parent.isValid():
+            return 0
         ds = self.document.data[self.dsname].data
         if ds is not None:
             return ds.shape[0]
@@ -333,6 +346,8 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             return 0
 
     def columnCount(self, parent):
+        if parent.isValid():
+            return 0
         ds = self.document.data[self.dsname].data
         if ds is not None:
             return ds.shape[1]
