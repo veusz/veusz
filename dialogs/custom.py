@@ -39,9 +39,15 @@ class CustomItemModel(qt4.QAbstractTableModel):
                       self.doUpdate )
 
     def rowCount(self, parent):
+        if parent.isValid():
+            # qt docs say we have to return zero here, and we get a
+            # crash if we don't (pressing right arrow)
+            return 0
         return len(self.document.customs)
 
     def columnCount(self, parent):
+        if parent.isValid():
+            return 0
         return 3
 
     def data(self, index, role):
