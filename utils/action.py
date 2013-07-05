@@ -19,6 +19,7 @@
 import veusz.qtall as qt4
 import utilfuncs
 import os.path
+import textwrap
 
 # where images are stored
 imagedir = os.path.join(utilfuncs.veuszDirectory, 'windows', 'icons')
@@ -54,7 +55,7 @@ def makeAction(parent, descr, menutext, slot, icon=None, key=None,
     a = qt4.QAction(parent)
     a.setText(menutext)
     a.setStatusTip(descr)
-    a.setToolTip(descr)
+    a.setToolTip(textwrap.fill(descr, 25))
     if slot:
         parent.connect(a, qt4.SIGNAL('triggered()'), slot)
     if icon:
