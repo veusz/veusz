@@ -21,8 +21,6 @@
 
 import math
 import re
-import sys
-import textwrap
 
 import numpy as N
 import veusz.qtall as qt4
