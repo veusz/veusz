@@ -425,6 +425,8 @@ class DataEditDialog(VeuszDialog):
 
         # set up dataset list
         self.dsbrowser = DatasetBrowser(document, parent, parent)
+        self.dsbrowser.setToolTip(
+            _('Select multiple datasets to edit simultaneously'))
         self.splitter.insertWidget(0, self.dsbrowser)
 
         # actions for data table
