@@ -53,6 +53,7 @@ Features of package:
   * Plotting dates
   * Fitting functions to data
   * Stacked plots and arrays of plots
+  * Nested plots
   * Plot keys
   * Plot labels
   * Shapes and arrows on plots
