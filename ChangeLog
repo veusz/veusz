@@ -23,6 +23,7 @@ Bug fixes:
  * Remove warning of log images with zeros
  * For embedded mode, always return string for __repr__
  * Workaround for windows appearing behind for Mac OS X
+ * Improve property spacing on Mac OS X
 
 Changes in 1.17.1:
  * Allow coloured points for non-orthogonal plots (polar, ternary)

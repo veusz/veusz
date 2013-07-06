@@ -52,7 +52,7 @@ class DotDotButton(qt4.QPushButton):
     """A button for opening up more complex editor."""
     def __init__(self, tooltip=None, checkable=True):
         qt4.QPushButton.__init__(self, "..", flat=True, checkable=checkable,
-                                 maximumWidth=16)
+                                 maximumWidth=16, maximumHeight=16)
         if tooltip:
             self.setToolTip(tooltip)
         self.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
