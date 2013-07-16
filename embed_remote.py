@@ -28,16 +28,17 @@ import veusz.document as document
 """Program to be run by embedding interface to run Veusz commands."""
 
 # embed.py module checks this is the same as its version number
-API_VERSION = 1
+API_VERSION = 2
 
 class EmbeddedClient(object):
     """An object for each instance of embedded window with document."""
 
-    def __init__(self, title, doc=None):
+    def __init__(self, title, doc=None, hidden=False):
         """Construct window with title given."""
 
         self.window = SimpleWindow(title, doc=doc)
-        self.window.show()
+        if not hidden:
+            self.window.show()
         self.document = self.window.document
         self.plot = self.window.plot
         # use time based checking by default
@@ -195,9 +196,9 @@ class EmbedApplication(qt4.QApplication):
             EmbedApplication.readLenFromSocket(socket, length))
     readCommand = staticmethod(readCommand)
 
-    def makeNewClient(self, title, doc=None):
+    def makeNewClient(self, title, doc=None, hidden=False):
         """Make a new client window."""
-        client = EmbeddedClient(title, doc=doc)
+        client = EmbeddedClient(title, doc=doc, hidden=hidden)
         self.clients[self.clientcounter] = client
         # return new number and list of commands and docstrings
         retfuncs = []
@@ -225,7 +226,7 @@ class EmbedApplication(qt4.QApplication):
         window, cmd, args, argsv = self.readCommand(self.socket)
 
         if cmd == '_NewWindow':
-            retval = self.makeNewClient(args[0])
+            retval = self.makeNewClient(args[0], hidden=argsv['hidden'])
         elif cmd == '_Quit':
             # exit client
             retval = None
@@ -233,7 +234,8 @@ class EmbedApplication(qt4.QApplication):
             # sets the document of this window to be the same as the
             # one specified
             retval = self.makeNewClient( args[0],
-                                         doc=self.clients[args[1]].document )
+                                         doc=self.clients[args[1]].document,
+                                         hidden=argsv['hidden'] )
         else:
             interpreter = self.clients[window].ci
 

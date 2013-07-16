@@ -44,15 +44,21 @@ import sys
 import os
 import os.path
 import struct
-import new
-import cPickle
 import socket
 import subprocess
 import time
 import uuid
+import functools
+import types
+
+# python3 compatibility
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 # check remote process has this API version
-API_VERSION = 1
+API_VERSION = 2
 
 def Bind1st(function, arg):
     """Bind the first argument of a given function to the given
@@ -81,11 +87,12 @@ class Embedded(object):
 
     remote = None
 
-    def __init__(self, name = 'Veusz', copyof = None):
+    def __init__(self, name='Veusz', copyof=None, hidden=False):
         """Initialse the embedded veusz window.
 
         name is the name of the window to show.
-        This method creates a new thread to run Qt if necessary
+        copyof duplicates a view of the document in the Embedded instance given
+        hidden makes a hidden window (useful for batch scripting)
         """
 
         if not Embedded.remote:
@@ -93,19 +100,21 @@ class Embedded(object):
 
         if not copyof:
             retval = self.sendCommand( (-1, '_NewWindow',
-                                         (name,), {}) )
+                                         (name,),
+                                         {'hidden': hidden}) )
         else:
             retval = self.sendCommand( (-1, '_NewWindowCopy',
-                                         (name, copyof.winno), {}) )
+                                         (name, copyof.winno),
+                                         {'hidden': hidden}) )
 
         self.winno, cmds = retval
 
         # add methods corresponding to Veusz commands
         for name, doc in cmds:
-            func = Bind1st(self.runCommand, name)
+            func = functools.partial(self.runCommand, name)
             func.__doc__ = doc    # set docstring
             func.__name__ = name  # make name match what it calls
-            method = new.instancemethod(func, Embedded)
+            method =  types.MethodType(func, self)
             setattr(self, name, method) # assign to self
 
         # check API version is same
@@ -162,7 +171,7 @@ class Embedded(object):
             sendtext = 'internet %s %i\n' % (interface, port)
             waitaccept = True
 
-        return (sock, sendtext, waitaccept)
+        return (sock, sendtext.encode('ascii'), waitaccept)
 
     @classmethod
     def makeRemoteProcess(cls):
@@ -198,9 +207,17 @@ class Embedded(object):
                 [findexe] ]
 
         else:
+            if sys.version_info[0] != 2:
+                # remote needs to run on python 2
+                executable = findOnPath('python2')
+                if not executable:
+                    executable = findOnPath('python')
+            else:
+                executable = sys.executable
+
             # try embed_remote.py in this directory, veusz in this directory
             # or veusz on the path in order
-            possiblecommands = [ [sys.executable,
+            possiblecommands = [ [executable,
                                   os.path.join(thisdir, 'veusz_main.py')],
                                  [os.path.join(thisdir, 'veusz')],
                                  [findOnPath('veusz')] ]
@@ -253,11 +270,11 @@ class Embedded(object):
         # check it comes back.  This is to check that no program has
         # secretly connected on our port, which isn't really useful
         # for AF_UNIX sockets.
-        secret = str(uuid.uuid4()) + '\n'
+        secret = (str(uuid.uuid4()) + '\n').encode('ascii')
         stdin.write(secret)
         secretback = cls.readLenFromSocket(cls.serv_socket, len(secret))
         if secret != secretback:
-            raise RuntimeError, "Security between client and server broken"
+            raise RuntimeError("Security between client and server broken")
 
         # packet length for command bytes
         cls.cmdlen = struct.calcsize('<I')
@@ -266,7 +283,7 @@ class Embedded(object):
     @staticmethod
     def readLenFromSocket(socket, length):
         """Read length bytes from socket."""
-        s = ''
+        s = b''
         while len(s) < length:
             s += socket.recv(length-len(s))
         return s
@@ -281,7 +298,7 @@ class Embedded(object):
     def sendCommand(cls, cmd):
         """Send the command to the remote process."""
 
-        outs = cPickle.dumps(cmd)
+        outs = pickle.dumps(cmd)
 
         cls.writeToSocket( cls.serv_socket, struct.pack('<I', len(outs)) )
         cls.writeToSocket( cls.serv_socket, outs )
@@ -289,7 +306,7 @@ class Embedded(object):
         backlen = struct.unpack('<I', cls.readLenFromSocket(cls.serv_socket,
                                                             cls.cmdlen))[0]
         rets = cls.readLenFromSocket( cls.serv_socket, backlen )
-        retobj = cPickle.loads(rets)
+        retobj = pickle.loads(rets)
         if isinstance(retobj, Exception):
             raise retobj
         else:
@@ -368,8 +385,8 @@ class Node(object):
             except ValueError:
                 pass
 
-        raise KeyError, "%s does not have key or child '%s'" % (
-            self.__class__.__name__, key)
+        raise KeyError("%s does not have key or child '%s'" % (
+            self.__class__.__name__, key))
 
     def __getattr__(self, attr):
         """Return a child widget, settinggroup or setting."""
@@ -382,8 +399,8 @@ class Node(object):
             except ValueError:
                 pass
 
-        raise AttributeError, "%s does not have attribute or child '%s'" % (
-            self.__class__.__name__, attr)
+        raise AttributeError("%s does not have attribute or child '%s'" % (
+            self.__class__.__name__, attr))
 
     # boring ways to get children of nodes
     @property
@@ -428,7 +445,7 @@ class Node(object):
     def parent(self):
         """Return parent of node."""
         if self._path == '/':
-            raise TypeError, "Cannot get parent node of root node"""
+            raise TypeError("Cannot get parent node of root node""")
         p = self._path.split('/')[:-1]
         if p == ['']:
             newpath = '/'
@@ -451,13 +468,13 @@ class SettingNode(Node):
         """The value of a setting."""
         if self._type == 'setting':
             return self._ci.Get(self._path)
-        raise TypeError, "Cannot get value unless is a setting"""
+        raise TypeError("Cannot get value unless is a setting""")
 
     def _setVal(self, val):
         if self._type == 'setting':
             self._ci.Set(self._path, val)
         else:
-            raise TypeError, "Cannot set value unless is a setting."""
+            raise TypeError("Cannot set value unless is a setting.""")
 
     val = property(_getVal, _setVal)
 
@@ -489,7 +506,7 @@ class SettingNode(Node):
         destroy the link."""
 
         if not isinstance(othernode, SettingNode):
-            raise ValueError, "othernode is not a SettingNode"
+            raise ValueError("othernode is not a SettingNode")
 
         self._ci.SetToReference(self._path, othernode._path)
 
@@ -536,7 +553,7 @@ class WidgetNode(Node):
         """Renames widget to name given."""
 
         if self._path == '/':
-            raise RuntimeError, "Cannot rename root widget"
+            raise RuntimeError("Cannot rename root widget")
 
         self._ci.Rename(self._path, newname)
         self._path = '/'.join( self._path.split('/')[:-1] + [newname] )
