@@ -192,8 +192,8 @@ class EmbedApplication(qt4.QApplication):
         length = struct.unpack('<I', EmbedApplication.readLenFromSocket(
                 socket, EmbedApplication.cmdlenlen))[0]
         # unpickle command and arguments
-        return cPickle.loads(
-            EmbedApplication.readLenFromSocket(socket, length))
+        temp = EmbedApplication.readLenFromSocket(socket, length)
+        return cPickle.loads(temp)
     readCommand = staticmethod(readCommand)
 
     def makeNewClient(self, title, doc=None, hidden=False):

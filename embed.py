@@ -60,15 +60,6 @@ except ImportError:
 # check remote process has this API version
 API_VERSION = 2
 
-def Bind1st(function, arg):
-    """Bind the first argument of a given function to the given
-    parameter."""
-
-    def runner(*args, **args2):
-        return function( arg, *args, **args2 )
-
-    return runner
-
 def findOnPath(cmd):
     """Find a command on the system path, or None if does not exist."""
     path = os.getenv('PATH', os.path.defpath)
@@ -298,7 +289,8 @@ class Embedded(object):
     def sendCommand(cls, cmd):
         """Send the command to the remote process."""
 
-        outs = pickle.dumps(cmd)
+        # note: protocol 2 for python2 compat
+        outs = pickle.dumps(cmd, 2)
 
         cls.writeToSocket( cls.serv_socket, struct.pack('<I', len(outs)) )
         cls.writeToSocket( cls.serv_socket, outs )
@@ -307,6 +299,7 @@ class Embedded(object):
                                                             cls.cmdlen))[0]
         rets = cls.readLenFromSocket( cls.serv_socket, backlen )
         retobj = pickle.loads(rets)
+
         if isinstance(retobj, Exception):
             raise retobj
         else:
