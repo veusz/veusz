@@ -20,7 +20,7 @@
 
 from version import version
 from textrender import Renderer, FontMetrics
-from safe_eval import checkCode
+from safe_eval import compileChecked, SafeEvalException
 from fitlm import fitLM
 
 from utilfuncs import *

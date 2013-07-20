@@ -1030,16 +1030,31 @@ class MainWindow(qt4.QMainWindow):
             self.setupDefaultDoc()
             return
 
-        # check code for any security issues
-        ignore_unsafe = setting.transient_settings['unsafe_mode']
-        if not ignore_unsafe:
-            errors = utils.checkCode(script, securityonly=True)
-            if errors:
+        def errordialog(e):
+            # display error dialog if there is an error loading
+            qt4.QApplication.restoreOverrideCursor()
+            i = sys.exc_info()
+            backtrace = traceback.format_exception( *i )
+            d = ErrorLoadingDialog(self, filename, str(e), ''.join(backtrace))
+            d.exec_()
+
+        # compile script and check for security (if reqd)
+        unsafe = setting.transient_settings['unsafe_mode']
+        while True:
+            try:
+                compiled = utils.compileChecked(script, mode='exec', filename=filename,
+                                                ignoresecurity=unsafe)
+                break
+            except utils.SafeEvalException:
+                # ask the user whether to execute in unsafe mode
                 qt4.QApplication.restoreOverrideCursor()
                 if ( self._unsafeCmdMsgBox(self, filename).exec_() ==
                      qt4.QMessageBox.No ):
                     return
-                ignore_unsafe = True # allow unsafe veusz commands below
+                unsafe = True
+            except Exception, e:
+                errordialog(e)
+                return
 
         # set up environment to run script
         env = self.document.eval_context.copy()
@@ -1053,7 +1068,7 @@ class MainWindow(qt4.QMainWindow):
         env['Root'] = interface.Root
 
         # wrap "unsafe" commands with a message box to check the user
-        safenow = [ignore_unsafe]
+        safenow = [unsafe]
         def _unsafeCaller(func):
             def wrapped(*args, **argsk):
                 if not safenow[0]:
@@ -1082,18 +1097,12 @@ class MainWindow(qt4.QMainWindow):
 
         try:
             # actually run script text
-            exec script in env
+            exec compiled in env
         except Exception, e:
             # need to remember to restore stdout, stderr
             sys.stdout, sys.stderr = stdout, stderr
-
-            # display error dialog if there is an error loading
-            qt4.QApplication.restoreOverrideCursor()
             self.document.enableUpdates()
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            d = ErrorLoadingDialog(self, filename, str(e), ''.join(backtrace))
-            d.exec_()
+            errordialog(e)
             return
 
         # need to remember to restore stdout, stderr

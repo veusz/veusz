@@ -878,7 +878,6 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
 
     raise DatasetExpressionException(err)
 
-_safeexpr = set()
 def evalDatasetExpression(doc, origexpr, datatype='numeric',
                           dimensions=1, part='data'):
     """Evaluate expression and return an appropriate Dataset.
@@ -908,13 +907,9 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     # replace dataset names by calls to _DS_(name,part)
     expr, subdatasets = _substituteDatasets(doc.data, origexpr, part)
 
-    # for speed, track safe expressions
-    if expr not in _safeexpr:
-        if ( not setting.transient_settings['unsafe_mode'] and
-             utils.checkCode(expr, securityonly=True) ):
-            doc.log("Unsafe expression: '%s'\n" % expr)
-            return None
-        _safeexpr.add(expr)
+    comp = doc.compileCheckedExpression(expr, origexpr=origexpr)
+    if comp is None:
+        return
 
     # set up environment for evaluation
     env = doc.eval_context.copy()
@@ -924,7 +919,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
 
     # do evaluation
     try:
-        evalout = eval(expr, env)
+        evalout = eval(comp, env)
     except Exception, ex:
         doc.log("Error evaluating '%s': '%s'" % (origexpr, unicode(ex)))
         return None
@@ -964,8 +959,6 @@ class DatasetExpression(Dataset):
         self.expr['perr'] = perr
         self.parametric = parametric
 
-        self.cachedexpr = {}
-
         self.docchangeset = -1
         self.evaluated = {}
 
@@ -976,20 +969,18 @@ class DatasetExpression(Dataset):
         dspart is the part to get (e.g. data, serr)
         """
         return _evaluateDataset(self.document.data, dsname, dspart)
-                    
-    def _evaluatePart(self, expr, part):
-        """Evaluate expression expr for part part."""
-        # replace dataset names with calls
-        expr = _substituteDatasets(self.document.data, expr, part)[0]
 
-        # check expression for nasties if it has changed
-        if self.cachedexpr.get(part) != expr:
-            if ( not setting.transient_settings['unsafe_mode'] and
-                 utils.checkCode(expr, securityonly=True) ):
-                raise DatasetExpressionException(
-                    _("Unsafe expression '%s' in %s part of dataset") % (
-                        self.expr[part], part))
-            self.cachedexpr[part] = expr
+    def _evaluatePart(self, expr, part):
+        """Evaluate expression expr for part part.
+
+        Returns None if error, or new values
+        """
+        # replace dataset names with calls
+        newexpr = _substituteDatasets(self.document.data, expr, part)[0]
+
+        comp = self.document.compileCheckedExpression(newexpr, origexpr=expr)
+        if comp is None:
+            return
 
         # set up environment to evaluate expressions in
         environment = self.document.eval_context.copy()
@@ -1009,15 +1000,16 @@ class DatasetExpression(Dataset):
 
         # actually evaluate the expression
         try:
-            result = eval(expr, environment)
+            result = eval(comp, environment)
             evalout = N.array(result, N.float64)
 
             if len(evalout.shape) > 1:
                 raise RuntimeError, "Number of dimensions is not 1"
         except Exception, ex:
-            raise DatasetExpressionException(
-                "Error evaluating expression: %s\n"
-                "Error: %s" % (self.expr[part], unicode(ex)) )
+            self.document.log(
+                _("Error evaluating expression: %s\n"
+                  "Error: %s") % (self.expr[part], unicode(ex)) )
+            return
 
         # make evaluated error expression have same shape as data
         if part != 'data':
@@ -1039,7 +1031,6 @@ class DatasetExpression(Dataset):
 
     def updateEvaluation(self):
         """Update evaluation of parts of dataset.
-        Throws DatasetExpressionException if error
         """
         if self.docchangeset != self.document.changeset:
             # avoid infinite recursion!
@@ -1058,10 +1049,8 @@ class DatasetExpression(Dataset):
     def _propValues(self, part):
         """Check whether expressions need reevaluating,
         and recalculate if necessary."""
-        try:
-            self.updateEvaluation()
-        except DatasetExpressionException, ex:
-            self.document.log(unicode(ex))
+
+        self.updateEvaluation()
 
         # catch case where error in setting data, need to return "real" data
         if self.evaluated['data'] is None:
@@ -1093,7 +1082,7 @@ class DatasetExpression(Dataset):
 
         s = 'SetDataExpression(%s)\n' % ', '.join(parts)
         fileobj.write(s)
-        
+
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
@@ -1254,9 +1243,6 @@ class Dataset2DXYZExpression(Dataset2D):
         self.expry = expry
         self.exprz = exprz
 
-        # cache x y and z expressions
-        self.cachedexpr = {}
-
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
         
@@ -1278,24 +1264,21 @@ class Dataset2DXYZExpression(Dataset2D):
 
         # evaluate the x, y and z expressions
         for name in ('exprx', 'expry', 'exprz'):
-            expr = _substituteDatasets(self.document.data, getattr(self, name),
+            origexpr = getattr(self, name)
+            expr = _substituteDatasets(self.document.data, origexpr,
                                        'data')[0]
 
-            # check expression if not checked before
-            if self.cachedexpr.get(name) != expr:
-                if ( not setting.transient_settings['unsafe_mode'] and
-                     utils.checkCode(expr, securityonly=True) ):
-                    raise DatasetExpressionException(
-                        "Unsafe expression '%s'" % (
-                            expr))
-                self.cachedexpr[name] = expr
+            comp = self.document.compileCheckedExpression(
+                expr, origexpr=origexpr)
+            if comp is None:
+                return None
 
             try:
-                evaluated[name] = eval(expr, environment)
+                evaluated[name] = eval(comp, environment)
             except Exception, e:
-                raise DatasetExpressionException(
-                    "Error evaluating expression: %s\n"
-                    "Error: %s" % (expr, unicode(e)) )
+                self.document.log(_("Error evaluating expression: %s\n"
+                                    "Error: %s") % (expr, unicode(e)) )
+                return None
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
         miny, maxy, stepy, stepsy = getSpacing(evaluated['expry'])
@@ -1313,9 +1296,9 @@ class Dataset2DXYZExpression(Dataset2D):
         try:
             self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
         except Exception, e:
-            raise DatasetExpressionException(
-                "Shape mismatch when constructing dataset\n"
-                "Error: %s" % unicode(e) )
+            self.document.log(_("Shape mismatch when constructing dataset\n"
+                                "Error: %s") % unicode(e) )
+            return None
 
         # update changeset
         self.lastchangeset = self.document.changeset
@@ -1326,28 +1309,26 @@ class Dataset2DXYZExpression(Dataset2D):
     def xrange(self):
         """Get x range of data as a tuple (min, max)."""
         return self.getDataRanges()[0]
-    
+
     @property
     def yrange(self):
         """Get y range of data as a tuple (min, max)."""
         return self.getDataRanges()[1]
-        
+
     def getDataRanges(self):
         """Get both ranges of axis."""
-        try:
-            self.evalDataset()
-            return (self._xrange, self._yrange)
-        except DatasetExpressionException:
+        ds = self.evalDataset()
+        if ds is None:
             return ( (0., 1.), (0., 1.) )
-        
+        return (self._xrange, self._yrange)
+
     @property
     def data(self):
         """Get data, or none if error."""
-        try:
-            return self.evalDataset()
-        except DatasetExpressionException, ex:
-            self.document.log(unicode(ex))
+        ds = self.evalDataset()
+        if ds is None:
             return N.array( [[]] )
+        return ds
 
     def description(self, showlinked=True):
         # FIXME: dataeditdialog descriptions should be taken from here somewhere
@@ -1385,9 +1366,6 @@ class Dataset2DExpression(Dataset2D):
 
         self.expr = expr
         self.lastchangeset = -1
-
-        if utils.checkCode(expr, securityonly=True) is not None:
-            raise DatasetExpressionException("Unsafe expression '%s'" % expr)
         
     @property
     def data(self):
@@ -1452,9 +1430,6 @@ class Dataset2DXYFunc(Dataset2D):
         self.ystep = ystep
         self.expr = expr
 
-        if utils.checkCode(expr, securityonly=True) is not None:
-            raise DatasetExpressionException(_("Unsafe expression '%s'") % expr)
-        
         self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
                        self.xstep[1] + self.xstep[2]*0.5)
         self.yrange = (self.ystep[0] - self.ystep[2]*0.5,

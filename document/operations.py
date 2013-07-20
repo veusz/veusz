@@ -666,6 +666,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         p['parametric'] = self.parametric
         ds = datasets.DatasetExpression(**p)
         ds.document = document
+
         try:
             # we force an evaluation of the dataset for the first time, to
             # check for errors in the expressions

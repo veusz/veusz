@@ -173,8 +173,6 @@ class AxisFunction(axis.Axis):
     def __init__(self, *args, **argsv):
         axis.Axis.__init__(self, *args, **argsv)
 
-        self.cachedfunctxt = None
-        self.cachedcompiled = None
         self.cachedfuncobj = None
         self.cachedbounds = None
         self.funcchangeset = -1
@@ -241,27 +239,10 @@ class AxisFunction(axis.Axis):
             return self.cachedfuncobj
         self.funcchangeset = self.document.changeset
 
-        functxt = self.settings.function.strip()
-        if functxt != self.cachedfunctxt:
-            self.cachedfunctxt = functxt
-            self.cachedcompiled = None
+        compiled = self.document.compileCheckedExpression(
+            self.settings.function.strip())
 
-            # check function obeys safety rules
-            checked = utils.checkCode(functxt)
-            if checked is not None:
-                try:
-                    msg = checked[0][0]
-                except Exception, e:
-                    msg = e
-                self.logError(msg)
-            else:
-                # compile result
-                try:
-                    self.cachedcompiled = compile(functxt, '<string>', 'eval')
-                except Exception, e:
-                    self.logError(e)
-
-        if self.cachedcompiled is None:
+        if compiled is None:
             self.cachedfuncobj = None
         else:
             # a python function for doing the evaluation and handling
@@ -271,7 +252,7 @@ class AxisFunction(axis.Axis):
             def function(t):
                 env['t'] = t
                 try:
-                    return eval(self.cachedcompiled, env)
+                    return eval(compiled, env)
                 except Exception, e:
                     self.logError(e)
                     return N.nan + t

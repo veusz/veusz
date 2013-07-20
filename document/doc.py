@@ -122,6 +122,9 @@ class Document( qt4.QObject ):
         # copy default colormaps
         self.colormaps = dict(utils.defaultcolormaps)
 
+        # copies of validated ast trees for expressions
+        self.exprcompiled = {}
+
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}
@@ -766,16 +769,44 @@ class Document( qt4.QObject ):
             defn = 'lambda %s: %s' % (args, val)
 
         # evaluate, but we ignore any unsafe commands or exceptions
-        checked = utils.checkCode(defn)
-        if checked is not None:
-            self.log( _("Expression '%s' failed safe code test") %
-                      defn )
+        comp = self.compileCheckedExpression(defn)
+        if comp is None:
             return
         try:
-            self.eval_context[name] = eval(defn, self.eval_context)
+            self.eval_context[name] = eval(comp, self.eval_context)
         except Exception, e:
             self.log( _("Error evaluating '%s': '%s'") %
                       (name, unicode(e)) )
+
+    def compileCheckedExpression(self, expr, origexpr=None):
+        """Compile expression and check for errors.
+
+        origexpr is an expression to show in error messages. This is
+        used if replacements have been done, etc.
+        """
+
+        try:
+            return self.exprcompiled[expr]
+        except KeyError:
+            pass
+
+        if origexpr is None:
+            origexpr = expr
+        try:
+            checked = utils.compileChecked(
+                expr,
+                ignoresecurity=setting.transient_settings['unsafe_mode'])
+        except utils.SafeEvalException, e:
+            self.log(
+                _("Unsafe expression '%s': %s\n") % (origexpr, unicode(e)))
+            return None
+        except Exception, e:
+            self.log(
+                _("Error in expression '%s': %s\n") % (origexpr, unicode(e)))
+            return None
+
+        self.exprcompiled[expr] = checked
+        return checked
 
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.

@@ -344,9 +344,11 @@ class Setting(object):
     def safeEvalHelper(self, text):
         """Evaluate an expression, catching naughtiness."""
         try:
-            if utils.checkCode(text) is not None:
+            comp = self.getDocument().compileCheckedExpression(
+                text)
+            if comp is None:
                 raise InvalidType
-            return float( eval(text, self.getDocument().eval_context) )
+            return float( eval(comp, self.getDocument().eval_context) )
         except:
             raise InvalidType
 

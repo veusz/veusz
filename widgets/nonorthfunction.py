@@ -28,7 +28,6 @@ import veusz.utils as utils
 import pickable
 from nonorthgraph import NonOrthGraph, FillBrush
 from widget import Widget
-from function import FunctionChecker
 
 def _(text, disambiguation=None, context='NonOrthFunction'):
     """Translate text."""
@@ -47,8 +46,6 @@ class NonOrthFunction(Widget):
         Widget.__init__(self, parent, name=name)
         if type(self) == NonOrthFunction:
             self.readDefaults()
-
-        self.checker = FunctionChecker()
 
     @classmethod
     def addSettings(klass, s):
@@ -126,8 +123,11 @@ class NonOrthFunction(Widget):
         # do evaluation
         env = self.initEnviron()
         env[s.variable] = invals
+        comp = self.document.compileCheckedExpression(s.function)
+        if comp is None:
+            return N.array([]), N.array([])
         try:
-            vals = eval(self.checker.compiled, env) + invals*0.
+            vals = eval(comp, env) + invals*0.
         except Exception, e:
             self.logEvalError(e)
             vals = invals = N.array([])
@@ -166,13 +166,6 @@ class NonOrthFunction(Widget):
 
         # exit if hidden
         if s.hide:
-            return
-
-        # ignore if function isn't sensible
-        try:
-            self.checker.check(s.function, s.variable)
-        except RuntimeError, e:
-            self.logEvalError(e)
             return
 
         apts, bpts = self.getFunctionPoints()

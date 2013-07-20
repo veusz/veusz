@@ -34,39 +34,6 @@ def _(text, disambiguation=None, context='Function'):
     return unicode( 
         qt4.QCoreApplication.translate(context, text, disambiguation))
 
-class FunctionChecker(object):
-    """Help check function is valid."""
-    def __init__(self):
-        self.cachedfunc = None
-        self.cachedvar = None
-        self.compiled = None
-
-    def check(self, fn, var):
-        """check function doesn't contain dangerous code.
-        fn:  function
-        var: function is a variable of this
-        
-        raises a RuntimeError(msg) if a problem
-        """
-        fn = fn.strip()
-        if self.cachedfunc != fn or self.cachedvar != var:
-            checked = utils.checkCode(fn)
-            if checked is not None:
-                try:
-                    msg = checked[0][0]
-                except Exception:
-                    msg = ''
-                raise RuntimeError(msg)
-
-            self.cachedfunc = fn
-            self.cachedvar = var
-
-            try:
-                # compile code
-                self.compiled = compile(fn, '<string>', 'eval')
-            except Exception, e:
-                raise RuntimeError(e)
-
 class FunctionPlotter(GenericPlotter):
     """Function plotting class."""
 
@@ -81,8 +48,6 @@ class FunctionPlotter(GenericPlotter):
 
         if type(self) == FunctionPlotter:
             self.readDefaults()
-
-        self.checker = FunctionChecker()
 
     @classmethod
     def addSettings(klass, s):
@@ -160,10 +125,8 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # ignore if function isn't sensible
-        try:
-            self.checker.check(s.function, s.variable)
-        except RuntimeError, e:
-            self.logEvalError(e)
+        compiled = self.document.compileCheckedExpression(s.function)
+        if compiled is None:
             return
 
         # find axis to find variable range over
@@ -200,7 +163,7 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = points
         try:
-            vals = eval(self.checker.compiled, env) + points*0.
+            vals = eval(compiled, env) + points*0.
         except:
             # something wrong in the evaluation
             return
@@ -355,10 +318,8 @@ class FunctionPlotter(GenericPlotter):
         if axispts is None:
             return None, None
 
-        try:
-            self.checker.check(s.function, s.variable)
-        except RuntimeError, e:
-            self.logEvalError(e)
+        compiled = self.document.compileCheckedExpression(s.function)
+        if not compiled:
             return None, None
 
         axis2 = axes[1] if s.variable == 'x' else axes[0]
@@ -367,7 +328,7 @@ class FunctionPlotter(GenericPlotter):
         env = self.initEnviron()
         env[s.variable] = axispts
         try:
-            results = eval(self.checker.compiled, env) + N.zeros(axispts.shape)
+            results = eval(compiled, env) + N.zeros(axispts.shape)
             resultpts = axis2.dataToPlotterCoords(posn, results)
         except Exception, e:
             self.logEvalError(e)
