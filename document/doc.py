@@ -122,8 +122,10 @@ class Document( qt4.QObject ):
         # copy default colormaps
         self.colormaps = dict(utils.defaultcolormaps)
 
-        # copies of validated ast trees for expressions
+        # copies of validated compiled expressions
         self.exprcompiled = {}
+        self.exprfailed = set()
+        self.exprfailedchangeset = -1
 
     def wipe(self):
         """Wipe out any stored data."""
@@ -790,6 +792,13 @@ class Document( qt4.QObject ):
         except KeyError:
             pass
 
+        # track failed compilations, so we only print them once
+        if self.exprfailedchangeset != self.changeset:
+            self.exprfailedchangeset = self.changeset
+            self.exprfailed.clear()
+        elif expr in self.exprfailed:
+            return None
+
         if origexpr is None:
             origexpr = expr
         try:
@@ -798,11 +807,13 @@ class Document( qt4.QObject ):
                 ignoresecurity=setting.transient_settings['unsafe_mode'])
         except utils.SafeEvalException, e:
             self.log(
-                _("Unsafe expression '%s': %s\n") % (origexpr, unicode(e)))
+                _("Unsafe expression '%s': %s") % (origexpr, unicode(e)))
+            self.exprfailed.add(expr)
             return None
         except Exception, e:
             self.log(
-                _("Error in expression '%s': %s\n") % (origexpr, unicode(e)))
+                _("Error in expression '%s': %s") % (origexpr, unicode(e)))
+            self.exprfailed.add(expr)
             return None
 
         self.exprcompiled[expr] = checked
