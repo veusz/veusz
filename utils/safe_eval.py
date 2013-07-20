@@ -25,6 +25,12 @@ entries
 
 import __builtin__
 import ast
+import veusz.qtall as qt4
+
+def _(text, disambiguation=None, context='SafeEval'):
+    """Translate text."""
+    return unicode(
+        qt4.QCoreApplication.translate(context, text, disambiguation))
 
 # blacklist of nodes
 forbidden_nodes = frozenset((
@@ -122,40 +128,45 @@ class CheckNodeVisitor(ast.NodeVisitor):
 
     def generic_visit(self, node):
         if type(node) in forbidden_nodes:
-            raise SafeEvalException("%s not safe" % type(node))
+            raise SafeEvalException(_("%s not safe") % type(node))
         ast.NodeVisitor.generic_visit(self, node)
 
     def visit_Name(self, name):
         if name.id[:2] == '__' or name.id in forbidden_builtins:
             raise SafeEvalException(
-                'Access to special names not allowed: "%s"' % name.id)
+                _('Access to special names not allowed: "%s"') % name.id)
 
     def visit_Call(self, call):
         if not hasattr(call.func, 'id'):
-            raise SafeEvalException("Function has no identifier")
+            raise SafeEvalException(_("Function has no identifier"))
 
         if call.func.id[:2] == '__' or call.func.id in forbidden_builtins:
             raise SafeEvalException(
-                'Access to special functions not allowed: "%s"' %
+                _('Access to special functions not allowed: "%s"') %
                 call.func.id)
 
     def visit_Attribute(self, attr):
         if not hasattr(attr, 'attr'):
-            raise SafeEvalException('Access denied to attribute')
+            raise SafeEvalException(_('Access denied to attribute'))
         if ( attr.attr[:2] == '__' or attr.attr[:5] == 'func_' or
              attr.attr[:3] == 'im_' or attr.attr[:3] == 'tb_' ):
             raise SafeEvalException(
-                'Access to special attributes not allowed: "%s"' %
+                _('Access to special attributes not allowed: "%s"') %
                 attr.attr)
 
-def compileChecked(code, mode='eval', filename='<string>', ignoresecurity=False):
+def compileChecked(code, mode='eval', filename='<string>',
+                   ignoresecurity=False):
     """Compile code, checking for security errors.
 
     Returns a compiled code object.
     mode = 'exec' or 'eval'
     """
 
-    tree = ast.parse(code, filename, mode)
+    try:
+        tree = ast.parse(code, filename, mode)
+    except Exception, e:
+        raise ValueError, _('Unable to parse file: %s') % unicode(e)
+
     if not ignoresecurity:
         visitor = CheckNodeVisitor()
         visitor.visit(tree)
