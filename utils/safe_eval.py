@@ -135,6 +135,7 @@ class CheckNodeVisitor(ast.NodeVisitor):
         if name.id[:2] == '__' or name.id in forbidden_builtins:
             raise SafeEvalException(
                 _('Access to special names not allowed: "%s"') % name.id)
+        self.generic_visit(name)
 
     def visit_Call(self, call):
         if not hasattr(call.func, 'id'):
@@ -144,6 +145,7 @@ class CheckNodeVisitor(ast.NodeVisitor):
             raise SafeEvalException(
                 _('Access to special functions not allowed: "%s"') %
                 call.func.id)
+        self.generic_visit(call)
 
     def visit_Attribute(self, attr):
         if not hasattr(attr, 'attr'):
@@ -153,6 +155,7 @@ class CheckNodeVisitor(ast.NodeVisitor):
             raise SafeEvalException(
                 _('Access to special attributes not allowed: "%s"') %
                 attr.attr)
+        self.generic_visit(attr)
 
 def compileChecked(code, mode='eval', filename='<string>',
                    ignoresecurity=False):
