@@ -801,6 +801,7 @@ class Document( qt4.QObject ):
 
         if origexpr is None:
             origexpr = expr
+
         try:
             checked = utils.compileChecked(
                 expr,
@@ -813,11 +814,10 @@ class Document( qt4.QObject ):
         except Exception, e:
             self.log(
                 _("Error in expression '%s': %s") % (origexpr, unicode(e)))
-            self.exprfailed.add(expr)
             return None
-
-        self.exprcompiled[expr] = checked
-        return checked
+        else:
+            self.exprcompiled[expr] = checked
+            return checked
 
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.

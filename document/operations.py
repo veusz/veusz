@@ -659,7 +659,8 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
 
     def validateExpression(self, document):
         """Validate the expression is okay.
-        A CreateDatasetException is raised if not
+
+        Returns True if ok
         """
 
         p = self.parts.copy()
@@ -667,13 +668,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         ds = datasets.DatasetExpression(**p)
         ds.document = document
 
-        try:
-            # we force an evaluation of the dataset for the first time, to
-            # check for errors in the expressions
-            ds.updateEvaluation()
-            
-        except datasets.DatasetExpressionException, e:
-            raise CreateDatasetException(unicode(e))
+        return ds.updateEvaluation()
         
     def do(self, document):
         """Create the dataset."""

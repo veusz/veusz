@@ -243,8 +243,11 @@ class DataCreateDialog(VeuszDialog):
                 status = _("Replacement failed")
             else:
                 status = _("Creation failed")
+
+            if unicode(e) != '':
+                status += ': %s' % unicode(e)
+
             self.statuslabel.setText(status)
-            qt4.QMessageBox.warning(self, _("Veusz"), unicode(e))
             
     def createFromRange(self, name):
         """Make dataset from a range or constant.
@@ -302,12 +305,12 @@ class DataCreateDialog(VeuszDialog):
             text = unicode( cntrl.text() ).strip()
             if text:
                 vals[key] = text
-           
+
         linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
         return document.OperationDatasetCreateParameteric(name,
                                                           t0, t1, numsteps,
                                                           vals, linked=linked)
-      
+
     def createFromExpression(self, name):
         """Create a dataset based on the expressions given."""
 
@@ -320,7 +323,8 @@ class DataCreateDialog(VeuszDialog):
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
         op = document.OperationDatasetCreateExpression(name, vals, link)
-        op.validateExpression(self.document)
+        if not op.validateExpression(self.document):
+            raise _DSException()
         return op
 
 def recreateDataset(mainwindow, document, dataset, datasetname):

@@ -973,14 +973,14 @@ class DatasetExpression(Dataset):
     def _evaluatePart(self, expr, part):
         """Evaluate expression expr for part part.
 
-        Returns None if error, or new values
+        Returns True if succeeded
         """
         # replace dataset names with calls
         newexpr = _substituteDatasets(self.document.data, expr, part)[0]
 
         comp = self.document.compileCheckedExpression(newexpr, origexpr=expr)
         if comp is None:
-            return
+            return False
 
         # set up environment to evaluate expressions in
         environment = self.document.eval_context.copy()
@@ -1009,7 +1009,7 @@ class DatasetExpression(Dataset):
             self.document.log(
                 _("Error evaluating expression: %s\n"
                   "Error: %s") % (self.expr[part], unicode(ex)) )
-            return
+            return False
 
         # make evaluated error expression have same shape as data
         if part != 'data':
@@ -1028,10 +1028,14 @@ class DatasetExpression(Dataset):
                 evalout = N.resize(evalout, 1)
 
         self.evaluated[part] = evalout
+        return True
 
     def updateEvaluation(self):
         """Update evaluation of parts of dataset.
+
+        Returns False if problem with any evaluation
         """
+        ok = True
         if self.docchangeset != self.document.changeset:
             # avoid infinite recursion!
             self.docchangeset = self.document.changeset
@@ -1044,7 +1048,9 @@ class DatasetExpression(Dataset):
             for part in self.columns:
                 expr = self.expr[part]
                 if expr is not None and expr.strip() != '':
-                    self._evaluatePart(expr, part)
+                    ok = ok and self._evaluatePart(expr, part)
+
+        return ok
 
     def _propValues(self, part):
         """Check whether expressions need reevaluating,
