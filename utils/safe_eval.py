@@ -168,6 +168,9 @@ def compileChecked(code, mode='eval', filename='<string>',
     """
 
     try:
+        # non ascii filenames break without encoding
+        filename = filename.encode('utf-8')
+
         tree = ast.parse(code, filename, mode)
     except Exception, e:
         raise ValueError, _('Unable to parse file: %s') % unicode(e)
