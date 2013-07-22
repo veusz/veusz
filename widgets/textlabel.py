@@ -18,6 +18,7 @@
 
 """For plotting one or more text labels on a graph."""
 
+from __future__ import division
 import itertools
 import math
 import numpy as N

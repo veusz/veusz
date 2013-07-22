@@ -18,6 +18,7 @@
 
 '''Non orthogonal function plotting.'''
 
+from __future__ import division
 import numpy as N
 
 import veusz.qtall as qt4

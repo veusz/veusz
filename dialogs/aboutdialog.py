@@ -21,6 +21,7 @@
 
 """About dialog module."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.utils as utils
 from veuszdialog import VeuszDialog

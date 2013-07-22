@@ -20,6 +20,8 @@
 """Window to edit the document using a tree, widget properties
 and formatting properties."""
 
+from __future__ import division
+
 import veusz.qtall as qt4
 
 import veusz.widgets as widgets
@@ -303,7 +305,7 @@ class PropertyList(qt4.QWidget):
         self.showformatsettings = showformatsettings
 
         self.layout = qt4.QGridLayout(self)
-        self.layout.setSpacing( self.layout.spacing()/2 )
+        self.layout.setSpacing( self.layout.spacing()//2 )
         self.layout.setMargin(4)
         
         self.childlist = []

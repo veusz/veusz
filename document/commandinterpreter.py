@@ -38,6 +38,8 @@ This class is modelled on the one described in
 'GUI Programming in Python: QT Edition' (Boudewijn Rempt)
 """
 
+from __future__ import division
+
 # get globals before things are imported
 _globals = globals()
 

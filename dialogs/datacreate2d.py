@@ -18,6 +18,7 @@
 
 """Dataset creation dialog for 2d data."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document

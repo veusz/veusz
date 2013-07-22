@@ -20,6 +20,7 @@
 These are slow versions of routines also implemented in C++
 """
 
+from __future__ import division
 from itertools import izip, count
 import sys
 import struct
@@ -43,7 +44,7 @@ def addNumpyToPolygonF(poly, *args):
     # reshape it into an array of x, y pairs
     minlen = min([x.shape[0] for x in args])
     cols = N.hstack([N.reshape(x[:minlen], (minlen, 1)) for x in args])
-    points = N.reshape(cols, (minlen*len(args)/2, 2))
+    points = N.reshape(cols, (minlen*len(args)//2, 2))
 
     # finally draw the points
     pappend = poly.append
@@ -61,7 +62,7 @@ def addNumpyPolygonToPath(path, clip, *args):
     for i in count():
         p = qt4.QPolygonF()
         dobreak = True
-        for c in xrange(len(args)/2):
+        for c in xrange(len(args)//2):
             if i < len(args[c*2]) and i < len(args[c*2+1]):
                 p.append(qt4.QPointF(args[c*2][i], args[c*2+1][i]))
                 dobreak = False

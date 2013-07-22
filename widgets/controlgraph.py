@@ -23,6 +23,7 @@ Control items have a createGraphicsItem method which returns a graphics
 item to control the object
 """
 
+from __future__ import division
 import math
 import itertools
 

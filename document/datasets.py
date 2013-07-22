@@ -19,6 +19,7 @@
 
 """Classes to represent datasets."""
 
+from __future__ import division
 import re
 from itertools import izip
 

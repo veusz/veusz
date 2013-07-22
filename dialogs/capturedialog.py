@@ -18,6 +18,7 @@
 
 """Veusz data capture dialog."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting

@@ -20,6 +20,7 @@
 
 """Dialog for reloading linked data."""
 
+from __future__ import division
 import os
 
 import veusz.qtall as qt4

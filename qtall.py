@@ -18,6 +18,7 @@
 
 """A convenience module to import both the used Qt symbols from."""
 
+from __future__ import division
 import sys
 import os
 # disable KDE specific dialog boxes as they are currently broken

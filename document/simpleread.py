@@ -40,6 +40,7 @@ Commas are now optional in 1.6, so descriptors can look like
 x +- y + -
 """
 
+from __future__ import division
 import re
 import cStringIO
 

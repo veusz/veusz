@@ -37,6 +37,8 @@ on each platform. In addition Unicode characters are expanded to their
 Unicode code to work around different font handling on platforms.
 """
 
+# messes up loaded files if set
+# from __future__ import division
 import glob
 import os
 import os.path
@@ -114,7 +116,6 @@ def renderTest(invsz, outfile):
     ifc.AddImportPath( os.path.dirname(invsz) )
     exec open(invsz) in cmds
     ifc.Export(outfile)
-
 
 class Dirs(object):
     """Directories and files object."""

@@ -20,6 +20,7 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
+from __future__ import division
 import veusz.qtall as qt4
 
 import veusz.document as document

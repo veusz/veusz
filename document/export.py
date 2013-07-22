@@ -18,6 +18,7 @@
 
 """Routines to export the document."""
 
+from __future__ import division
 import os.path
 import random
 import math
@@ -218,8 +219,8 @@ class Export(object):
                 if line[:14] == '%%BoundingBox:':
                     # replace bounding box line by calculated one
                     parts = line.split()
-                    widthfactor = float(parts[3]) / printer.width()
-                    origheight = float(parts[4])
+                    widthfactor = parts[3] / printer.width()
+                    origheight = parts[4]
                     line = "%s %i %i %i %i\n" % (
                         parts[0], 0,
                         int(math.floor(origheight-widthfactor*height)),

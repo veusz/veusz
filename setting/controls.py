@@ -24,6 +24,7 @@
     changed. The creator should use this to change the setting.
 """
 
+from __future__ import division
 from itertools import izip
 import re
 import numpy as N
@@ -1045,8 +1046,8 @@ class ListSet(qt4.QFrame):
         self.setting = setting
         self.controls = []
         self.layout = qt4.QGridLayout(self)
-        self.layout.setMargin( self.layout.margin()/2 )
-        self.layout.setSpacing( self.layout.spacing()/4 )
+        self.layout.setMargin( self.layout.margin()//2 )
+        self.layout.setSpacing( self.layout.spacing()//4 )
 
         # ignore changes if this set
         self.ignorechange = False

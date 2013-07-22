@@ -18,6 +18,7 @@
 
 '''An axis based on a function of another axis.'''
 
+from __future__ import division
 import numpy as N
 
 import veusz.qtall as qt4

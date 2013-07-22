@@ -23,6 +23,7 @@ Veusz distutils setup script
 see the file INSTALL for details on how to install Veusz
 """
 
+from __future__ import division
 import glob
 import os.path
 import sys

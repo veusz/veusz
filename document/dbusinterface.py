@@ -18,6 +18,7 @@
 
 """DBus interface to Veusz document."""
 
+from __future__ import division
 import numpy as N
 import veusz.utils.vzdbus as vzdbus
 import commandinterpreter

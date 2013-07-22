@@ -19,6 +19,7 @@
 '''Dialog to pop up if an exception occurs in Veusz.
 This allows the user to send a bug report in via email.'''
 
+from __future__ import division
 import sys
 import time
 import traceback

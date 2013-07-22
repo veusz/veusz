@@ -19,6 +19,7 @@
 
 """Classes for linked files"""
 
+from __future__ import division
 import sys
 
 import veusz.utils as utils

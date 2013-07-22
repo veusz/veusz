@@ -18,6 +18,8 @@
 
 """Image plotting from 2d datasets."""
 
+from __future__ import division
+
 import veusz.qtall as qt4
 import numpy as N
 
@@ -193,8 +195,8 @@ class Image(plotters.GenericPlotter):
 
         imw = self.image.width()
         imh = self.image.height()
-        pixw = pltw / float(imw)
-        pixh = plth / float(imh)
+        pixw = pltw / imw
+        pixh = plth / imh
         cutr = [0, 0, imw-1, imh-1]
 
         # work out where image intercepts posn, and make sure image

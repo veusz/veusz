@@ -19,6 +19,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+from __future__ import division
+
 class WidgetFactory(object):
     """Class to help produce any type of widget you want by name."""
 

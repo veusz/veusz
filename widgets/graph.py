@@ -18,6 +18,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+from __future__ import division
 from collections import defaultdict
 
 import veusz.qtall as qt4
@@ -138,7 +139,7 @@ class Graph(widget.Widget):
             saspect = s.aspect
             width = bounds[2]-bounds[0]
             height = bounds[3]-bounds[1]
-            gaspect = float(width)/height
+            gaspect = width/height
 
             bounds = list(bounds)
             if saspect > gaspect:

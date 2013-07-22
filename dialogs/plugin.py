@@ -18,6 +18,7 @@
 
 """Dialog boxes for tools and dataset plugins."""
 
+from __future__ import division
 import sys
 from itertools import izip
 

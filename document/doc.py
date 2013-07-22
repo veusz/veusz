@@ -21,6 +21,7 @@
 
 """A class to represent Veusz documents, with dataset classes."""
 
+from __future__ import division
 import os.path
 import re
 import traceback

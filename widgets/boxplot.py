@@ -18,6 +18,7 @@
 
 """For making box plots."""
 
+from __future__ import division
 import math
 from itertools import izip
 import numpy as N

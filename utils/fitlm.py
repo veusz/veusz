@@ -20,6 +20,7 @@
 Numerical fitting of functions to data.
 """
 
+from __future__ import division
 import sys
 
 import numpy as N

@@ -21,6 +21,7 @@
 Paints solid, hatching and various qt brushes
 """
 
+from __future__ import division
 import numpy as N
 import veusz.qtall as qt4
 import math

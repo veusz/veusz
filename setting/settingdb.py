@@ -18,6 +18,7 @@
 
 """A database for default values of settings."""
 
+from __future__ import division
 import sys
 
 import veusz.qtall as qt4

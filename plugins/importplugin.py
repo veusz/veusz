@@ -18,6 +18,7 @@
 
 """Import plugin base class and helpers."""
 
+from __future__ import division
 import os.path
 import numpy as N
 import veusz.utils as utils

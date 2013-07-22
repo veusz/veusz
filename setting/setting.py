@@ -26,6 +26,7 @@ s.set(42)
 s.fromText('42')
 """
 
+from __future__ import division
 import re
 import sys
 

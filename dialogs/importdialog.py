@@ -20,6 +20,7 @@
 
 """Module for implementing dialog boxes for importing data in Veusz."""
 
+from __future__ import division
 import os.path
 import re
 import csv

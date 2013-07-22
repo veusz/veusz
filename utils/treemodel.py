@@ -18,6 +18,7 @@
 
 """A Qt data model show a tree of Python nodes."""
 
+from __future__ import division
 import bisect
 import veusz.qtall as qt4
 

@@ -18,6 +18,7 @@
 
 """Plotting a line with arrowheads or labels."""
 
+from __future__ import division
 import itertools
 import math
 import numpy as N

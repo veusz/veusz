@@ -4,6 +4,7 @@
 # Written by Giovanni Bajo <rasky at develer dot com>
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
+from __future__ import division
 import distutils.command.build_ext
 from distutils.dep_util import newer, newer_group
 import os

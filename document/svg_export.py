@@ -19,6 +19,7 @@
 """A home-brewed SVG paint engine for doing svg with clipping
 and exporting text as paths for WYSIWYG."""
 
+from __future__ import division
 import re
 import veusz.qtall as qt4
 

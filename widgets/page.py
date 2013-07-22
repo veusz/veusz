@@ -18,6 +18,7 @@
 
 """Widget that represents a page in the document."""
 
+from __future__ import division
 import collections
 import numpy as N
 

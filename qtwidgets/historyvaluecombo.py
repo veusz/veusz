@@ -19,6 +19,7 @@
 """A combobox which remembers previous setting
 """
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.setting as setting
 

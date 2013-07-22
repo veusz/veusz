@@ -19,6 +19,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+from __future__ import division
 import sys
 import traceback
 
@@ -1043,7 +1044,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
-        aspectwin = viewportsize.width()*1./viewportsize.height()
+        aspectwin = viewportsize.width() / viewportsize.height()
         r = self.pixmapitem.boundingRect()
         aspectplot = r.width() / r.height()
 
@@ -1060,7 +1061,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
-        aspectwin = viewportsize.width()*1./viewportsize.height()
+        aspectwin = viewportsize.width() / viewportsize.height()
         r = self.pixmapitem.boundingRect()
         aspectplot = r.width() / r.height()
 
@@ -1078,8 +1079,8 @@ class PlotWindow( qt4.QGraphicsView ):
         viewportsize = self.maximumViewportSize()
         r = self.pixmapitem.boundingRect()
         if r.width() != 0 and r.height() != 0:
-            multw = viewportsize.width()*1./r.width()
-            multh = viewportsize.height()*1./r.height()
+            multw = viewportsize.width() / r.width()
+            multh = viewportsize.height() / r.height()
             self.setZoomFactor(self.zoomfactor * min(multw, multh))
 
     def slotViewZoom11(self):
@@ -1241,8 +1242,8 @@ class FullScreenPlotWindow(qt4.QScrollArea):
                                           dpi=self.plotwin.dpi)
         screensize = self.plotwin.size()
 
-        aspectw = screensize.width() * 1. / pagesize[0]
-        aspecth = screensize.height() * 1. / pagesize[1]
+        aspectw = screensize.width() / pagesize[0]
+        aspecth = screensize.height() / pagesize[1]
 
         self.plotwin.zoomfactor = min(aspectw, aspecth)
         self.plotwin.checkPlotUpdate()

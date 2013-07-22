@@ -20,6 +20,7 @@
 
 """Plugins for creating datasets."""
 
+from __future__ import division
 import numpy as N
 from itertools import izip
 import field
@@ -771,7 +772,7 @@ class PartsDatasetPlugin(DatasetPlugin):
         ds_in = helper.getDataset(fields['ds_in'])
         data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
 
-        plen = float(len(data)) / len(self.dsout)
+        plen = len(data) / len(self.dsout)
         for i, ds in enumerate(self.dsout):
             minv, maxv = int(plen*i), int(plen*(i+1))
             pserr = pperr = pnerr = None

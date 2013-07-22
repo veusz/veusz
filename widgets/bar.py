@@ -18,6 +18,7 @@
 
 """For plotting bar graphs."""
 
+from __future__ import division
 from itertools import izip
 import numpy as N
 
@@ -329,7 +330,7 @@ class BarPlotter(GenericPlotter):
         numgroups = len(dsvals)
         groupwidth = maxwidth
         usablewidth = groupwidth * s.groupfill
-        bardelta = usablewidth / float(numgroups)
+        bardelta = usablewidth / numgroups
         barwidth = bardelta * s.barfill
 
         ishorz = s.direction == 'horizontal'

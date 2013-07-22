@@ -19,6 +19,7 @@
 
 """A widget for navigating datasets."""
 
+from __future__ import division
 import os.path
 import numpy as N
 import textwrap
@@ -80,7 +81,7 @@ class DatasetNode(TMNode):
             if len(ds.data) < size[1]:
                 y = ds.data
             else:
-                intvl = len(ds.data)/size[1]+1
+                intvl = len(ds.data)//size[1]+1
                 y = ds.data[::intvl]
             x = N.arange(len(y))
 

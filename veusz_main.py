@@ -20,6 +20,7 @@
 
 '''Main Veusz executable.'''
 
+from __future__ import division
 import sys
 import os.path
 import signal
@@ -65,7 +66,7 @@ def makeSplashLogo():
 
     # draw logo on pixmap
     logo = utils.getPixmap('logo.png')
-    p.drawPixmap( xw/2 - logo.width()/2, border, logo )
+    p.drawPixmap( xw//2 - logo.width()//2, border, logo )
 
     # add copyright text
     doc = qt4.QTextDocument()

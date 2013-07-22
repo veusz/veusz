@@ -18,6 +18,7 @@
 
 """For plotting numerical functions."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import itertools
 import numpy as N

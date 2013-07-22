@@ -18,6 +18,7 @@
 
 """Contains a model and view for handling a tree of widgets."""
 
+from __future__ import division
 import veusz.qtall as qt4
 
 import veusz.utils as utils

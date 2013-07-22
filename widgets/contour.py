@@ -22,6 +22,7 @@ Contour plotting requires that the veusz_helpers package is installed,
 as a C routine (taken from matplotlib) is used to trace the contours.
 """
 
+from __future__ import division
 from itertools import izip
 import sys
 
@@ -496,7 +497,7 @@ class Contour(plotters.GenericPlotter):
         descent = utils.FontMetrics(font, painter.device()).descent()
 
         # work out where text lies
-        half = len(xplt)/2
+        half = len(xplt) // 2
         hx, hy = xplt[half], yplt[half]
         r = utils.Renderer(painter, font, hx, hy, text, alignhorz=0,
                            alignvert=0, angle=0)

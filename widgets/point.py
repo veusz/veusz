@@ -18,10 +18,11 @@
 
 """For plotting xy points."""
 
-import veusz.qtall as qt4
+from __future__ import division
 import itertools
 import numpy as N
 
+import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
@@ -729,7 +730,7 @@ class PointPlotter(GenericPlotter):
         # as datapoints
         if text:
             length = min( len(xv.data), len(yv.data) )
-            text = text*(length / len(text)) + text[:length % len(text)]
+            text = text*(length // len(text)) + text[:length % len(text)]
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals, cvals in (

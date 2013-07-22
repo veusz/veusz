@@ -20,6 +20,7 @@
 
 """Polar plot widget."""
 
+from __future__ import division
 import numpy as N
 
 from nonorthgraph import NonOrthGraph

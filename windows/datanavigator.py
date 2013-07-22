@@ -17,6 +17,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+from __future__ import division
 import veusz.qtall as qt4
 from veusz.qtwidgets.datasetbrowser import DatasetBrowser
 

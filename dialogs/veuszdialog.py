@@ -18,6 +18,7 @@
 
 """Define a base dialog class cleans up self after being hidden."""
 
+from __future__ import division
 import os.path
 
 import veusz.qtall as qt4

@@ -18,6 +18,8 @@
 
 """Wrapper for D-Bus module it."""
 
+from __future__ import division
+
 # interface name veusz interfaces appear on
 sessionbus = busname = None
 

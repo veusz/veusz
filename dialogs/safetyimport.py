@@ -18,6 +18,7 @@
 
 """Ask user whether to import symbols."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.setting as setting
 

@@ -19,6 +19,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+from __future__ import division
 import math
 import re
 
@@ -783,7 +784,7 @@ class PartFrac(Part):
         painter.drawLine(qt4.QPointF(initx,
                                      inity-height/2.),
                          qt4.QPointF(initx+max(self.widths),
-                                     inity-height/2))
+                                     inity-height/2.))
 
         painter.restore()
 

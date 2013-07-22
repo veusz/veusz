@@ -39,6 +39,7 @@ g.Close()
 More than one embedded window can be opened at once
 """
 
+from __future__ import division
 import atexit
 import sys
 import os

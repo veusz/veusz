@@ -23,6 +23,8 @@ The idea is to examine the compiled ast tree and chack for invalid
 entries
 """
 
+# don't do this as it messes up imported files
+# from __future__ import division
 import __builtin__
 import ast
 import veusz.qtall as qt4

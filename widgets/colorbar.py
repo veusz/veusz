@@ -19,6 +19,7 @@
 """A colorbar widget for the image widget. Should show the scale of
 the image."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import numpy as N
 

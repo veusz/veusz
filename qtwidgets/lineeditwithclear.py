@@ -17,6 +17,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.utils as utils
 
@@ -61,7 +62,7 @@ class LineEditWithClear(qt4.QLineEdit):
         fw = self.style().pixelMetric(qt4.QStyle.PM_DefaultFrameWidth)
         r = self.rect()
         self.clearbutton.move( r.right() - fw - sz.width(),
-                               (r.bottom() + 1 - sz.height())/2 )
+                               (r.bottom() + 1 - sz.height())//2 )
 
     def updateCloseButton(self, text):
         """Button should only appear if there is text."""

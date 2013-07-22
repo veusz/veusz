@@ -19,6 +19,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+from __future__ import division
 import codeop
 import traceback
 import sys
@@ -157,8 +158,8 @@ class ConsoleWindow(qt4.QDockWidget):
         self.vbox = qt4.QWidget()
         self.setWidget(self.vbox)
         vlayout = qt4.QVBoxLayout(self.vbox)
-        vlayout.setMargin( vlayout.margin()/4 )
-        vlayout.setSpacing( vlayout.spacing()/4 )
+        vlayout.setMargin( vlayout.margin()//4 )
+        vlayout.setSpacing( vlayout.spacing()//4 )
 
         # start an interpreter instance to the document
         self.interpreter = document.CommandInterpreter(thedocument)

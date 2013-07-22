@@ -20,6 +20,7 @@
 The graphs may share axes if they are stored in the grid widget.
 """
 
+from __future__ import division
 import veusz.document as document
 import veusz.setting as setting
 import veusz.qtall as qt4

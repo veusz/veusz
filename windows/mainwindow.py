@@ -19,6 +19,7 @@
 
 """Implements the main window of the application."""
 
+from __future__ import division
 import os.path
 import sys
 import traceback

@@ -18,6 +18,7 @@
 
 '''An axis which can be broken in places.'''
 
+from __future__ import division
 import bisect
 
 import numpy as N
@@ -123,7 +124,7 @@ class AxisBroken(axis.Axis):
             self.breakchangeset = self.document.changeset
 
             # actually start and stop values on axis
-            num = len(s.breakPoints) / 2
+            num = len(s.breakPoints) // 2
             posns = list(s.breakPosns)
             posns.sort()
 
@@ -177,11 +178,11 @@ class AxisBroken(axis.Axis):
 
         # filter to range
         newpoints = []
-        for i in xrange(0,len(points)/2*2,2):
+        for i in xrange(0, len(points)//2 * 2, 2):
             if points[i] >= min(r) and points[i+1] <= max(r):
                 newpoints += [points[i], points[i+1]]
 
-        self.breakvnum = num = len(newpoints)/2 + 1
+        self.breakvnum = num = len(newpoints)//2 + 1
         self.breakvlist = [self.plottedrange[0]] + newpoints + [
             self.plottedrange[1]]
 

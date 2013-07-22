@@ -18,6 +18,7 @@
 
 """Plugins for general operations."""
 
+from __future__ import division
 import random
 import re
 import fnmatch
@@ -166,7 +167,7 @@ class ColorsSequence(ToolsPlugin):
 
         def colatidx(i):
             """Get color in range 0...numwidgets-1."""
-            div = float(max(numwidgets-1, 1))
+            div = max(numwidgets-1, 1)
 
             H = i * (H2-H1) / div + H1
             S = i * (S2-S1) / div + S1

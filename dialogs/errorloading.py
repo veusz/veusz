@@ -18,6 +18,7 @@
 
 """Dialog to show if there is an error loading."""
 
+from __future__ import division
 import veusz.qtall as qt4
 from veuszdialog import VeuszDialog
 

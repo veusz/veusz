@@ -18,6 +18,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+from __future__ import division
+import math
+
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
@@ -25,8 +28,6 @@ import veusz.utils as utils
 
 import widget
 import controlgraph
-
-import math
 
 def _(text, disambiguation=None, context='Key'):
     """Translate text."""
@@ -279,7 +280,7 @@ class Key(widget.Widget):
             return (list(), (0, 0))
         
         # start with evenly-sized rows and expand to fit
-        numrows = totallines / numcols
+        numrows = totallines // numcols
         layout = []
         
         while not layout:
@@ -294,7 +295,7 @@ class Key(widget.Widget):
         while colstats[-1] == 0:
             # shift 1 item to the right, up to the first column that has
             # excess items
-            meanoccupation = max(1, sum(colstats)/float(numcols))
+            meanoccupation = max(1, sum(colstats)/numcols)
             
             # loop until we find a victim item which can be safely moved
             victimcol = numcols
@@ -381,7 +382,7 @@ class Key(widget.Widget):
                         w, h = utils.Renderer(painter, font, 0, 0,
                                               c.getKeyText(i)).getDimensions()
                         maxwidth = max(maxwidth, w)
-                        lines = max(1, math.ceil(float(h)/float(height)))
+                        lines = max(1, math.ceil(h/height))
                     
                     totallines += lines
                     entries.append( (c, i, lines) )

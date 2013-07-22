@@ -19,6 +19,7 @@
 """Widget to plot axes, and to handle conversion of coordinates to plot
 positions."""
 
+from __future__ import division
 from itertools import izip
 import numpy as N
 

@@ -24,6 +24,7 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
+from __future__ import division
 import os.path
 import traceback
 

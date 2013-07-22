@@ -18,6 +18,8 @@
 
 """Parameters for import routines."""
 
+from __future__ import division
+
 class ImportParamsBase(object):
     """Import parameters for the various imports.
 

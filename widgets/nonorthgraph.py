@@ -18,6 +18,7 @@
 
 """Non orthogonal graph root."""
 
+from __future__ import division
 import controlgraph
 from widget import Widget
 

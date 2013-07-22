@@ -27,6 +27,7 @@ Quit: exit the listening program
 Zoom x: Change the zoom factor of the plot to x
 """
 
+from __future__ import division
 import sys
 import os.path
 

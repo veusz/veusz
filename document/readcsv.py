@@ -19,6 +19,7 @@
 """This module contains routines for importing CSV data files
 in an easy-to-use manner."""
 
+from __future__ import division
 import re
 import numpy as N
 

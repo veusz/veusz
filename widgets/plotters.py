@@ -21,6 +21,7 @@
 
 """A generic plotter widget which is inherited by function and point."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import numpy as N
 

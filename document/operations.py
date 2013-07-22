@@ -26,6 +26,7 @@ Operations store paths to objects to be modified rather than object references
 because some operations cannot restore references (e.g. add object)
 """
 
+from __future__ import division
 import os.path
 from itertools import izip
 

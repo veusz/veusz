@@ -18,6 +18,7 @@
 
 """Data entry fields for plugins."""
 
+from __future__ import division
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.setting as setting
