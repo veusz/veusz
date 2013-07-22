@@ -118,8 +118,32 @@ allowed_builtins = frozenset((
         'zip'
         ))
 
+numpy_forbidden = set((
+        'frombuffer',
+        'fromfile',
+        'getbuffer',
+        'getbufsize',
+        'load',
+        'loads',
+        'loadtxt',
+        'ndfromtxt',
+        'newbuffer',
+        'pkgload',
+        'recfromcsv',
+        'recfromtxt',
+        'save',
+        'savetxt',
+        'savez',
+        'savez_compressed',
+        'setbufsize',
+        'seterr',
+        'seterrcall',
+        'seterrobj',
+        ))
+
 # blacklist using whitelist above
-forbidden_builtins = set(__builtin__.__dict__.keys()) - allowed_builtins
+forbidden_builtins = ( set(__builtin__.__dict__.keys()) - allowed_builtins |
+                       numpy_forbidden )
 
 class SafeEvalException(Exception):
     """Raised by safety errors in code."""
