@@ -358,12 +358,16 @@ class AxisFunction(axis.Axis):
         # coordinates to translate to the other axis coordinates.
 
         # coordinate values on the other axis
-        linkwidth = link.coordParr2-link.coordParr1
-        linkorigin = link.coordParr1
-        linkpixcoords = fraccoords*linkwidth + linkorigin
-        linkbounds = link.currentbounds
+        try:
+            linkwidth = link.coordParr2-link.coordParr1
+            linkorigin = link.coordParr1
+            linkbounds = link.currentbounds
+        except AttributeError:
+            # if hasn't been initialised
+            return
 
         # lookup what pixels are on linked axis in values
+        linkpixcoords = fraccoords*linkwidth + linkorigin
         linkgraphcoords = link.plotterToGraphCoords(linkbounds, linkpixcoords)
 
         # flip round if coordinates reversed
