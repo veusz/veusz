@@ -1263,6 +1263,8 @@ class Dataset2DXYZExpression(Dataset2D):
         # return cached data if document unchanged
         if self.document.changeset == self.lastchangeset:
             return self.cacheddata
+        self.lastchangeset = self.document.changeset
+        self.cacheddata = None
 
         evaluated = {}
 
@@ -1306,9 +1308,6 @@ class Dataset2DXYZExpression(Dataset2D):
             self.document.log(_("Shape mismatch when constructing dataset\n"
                                 "Error: %s") % unicode(e) )
             return None
-
-        # update changeset
-        self.lastchangeset = self.document.changeset
 
         return self.cacheddata
 

@@ -698,13 +698,11 @@ class OperationDataset2DBase(object):
     
     def validateExpression(self, document):
         """Validate expression is okay."""
-        try:
-            ds = self.makeDSClass()
-            ds.document = document
-            ds.evalDataset()
-            
-        except datasets.DatasetExpressionException, e:
-            raise CreateDatasetException(unicode(e))
+        ds = self.makeDSClass()
+        ds.document = document
+        ds.evalDataset()
+        if 0 in ds.data.shape:
+            raise CreateDatasetException()
 
     def do(self, document):
         """Make new dataset."""

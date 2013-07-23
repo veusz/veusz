@@ -200,9 +200,6 @@ class DataCreate2DDialog(VeuszDialog):
             self.document.data[text['name']].data
         except (document.CreateDatasetException,
                 document.DatasetException), e:
-            # error in evaluation or something
-            qt4.QMessageBox.warning(self, _("Veusz"),
-                                    _('Dataset creation failed: %s') % unicode(e))
             msg = _("Failed to create dataset '%s'") % text['name']
         else:
             msg = _("Created dataset '%s'") % text['name']
