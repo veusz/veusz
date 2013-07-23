@@ -233,17 +233,14 @@ class Fit(FunctionPlotter):
 
         s = self.settings
 
-        # update function for fitting
-        try:
-            self.checker.check(s.function, s.variable)
-        except RuntimeError, e:
-            self.logEvalError(e)
+        # check and get compiled for of function
+        compiled = self.document.compileCheckedExpression(s.function)
+        if compiled is None:
             return
 
         # populate the input parameters
-        names = s.values.keys()
-        names.sort()
-        params = N.array( [s.values[i] for i in names] )
+        paramnames = list(sorted(s.values.keys()))
+        params = N.array( [s.values[p] for p in paramnames] )
 
         # FIXME: loads of error handling!!
         d = self.document
@@ -282,6 +279,18 @@ class Fit(FunctionPlotter):
             print "Fitting %s from %g to %g" % (s.variable,
                                                 drange[0], drange[1])
 
+        evalenv = self.initEnviron()
+        def evalfunc(params, xvals):
+            # update environment with variable and parameters
+            evalenv[self.settings.variable] = xvals
+            evalenv.update( zip(paramnames, params) )
+
+            try:
+                return eval(compiled, evalenv) + xvals*0.
+            except Exception, e:
+                self.document.log(unicode(e))
+                return N.nan
+
         # minimum set for fitting
         if s.min != 'Auto':
             if s.variable == 'x':
@@ -317,14 +326,15 @@ class Fit(FunctionPlotter):
         dof = 1
 
         if minuit is not None:
-            vals, chi2, dof = minuitFit(self.evalfunc, params, names, s.values, xvals, yvals, yserr)
+            vals, chi2, dof = minuitFit(evalfunc, params, paramnames, s.values,
+                                        xvals, yvals, yserr)
         else:
             print _('Minuit not available, falling back to simple L-M fitting:')
-            retn, chi2, dof = utils.fitLM(self.evalfunc, params,
+            retn, chi2, dof = utils.fitLM(evalfunc, params,
                                           xvals,
                                           yvals, yserr)
             vals = {}
-            for i, v in zip(names, retn):
+            for i, v in zip(paramnames, retn):
                 vals[i] = float(v)
 
         # list of operations do we can undo the changes
@@ -353,24 +363,6 @@ class Fit(FunctionPlotter):
         d.applyOperation(
             document.OperationMultiple(operations, descr=_('fit')) )
     
-    def evalfunc(self, params, xvals):
-
-        # make an environment
-        env = self.initEnviron()
-        s = self.settings
-        env[s.variable] = xvals
-
-        # set values for real function
-        names = s.values.keys()
-        names.sort()
-        for name, val in zip(names, params):
-            env[name] = val
-
-        try:
-            return eval(self.checker.compiled, env) + xvals*0.
-        except:
-            return N.nan
-
     def generateOutputExpr(self, vals):
         """Try to generate text form of output expression.
         
