@@ -1080,7 +1080,7 @@ class OperationDataImportFITS(OperationDataImportBase):
             self.olddataset = document.data[p.dsname]
         else:
             self.olddataset = None
-        document.setData(p.dsname, ds)
+        document.setData(p.dsname.strip(), ds)
         self.outdatasets.append(p.dsname)
 
 class OperationDataImportPlugin(OperationDataImportBase):

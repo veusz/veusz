@@ -472,6 +472,12 @@ class ImportTabFITS(ImportTab):
         self.connect( self.fitsdatacolumn,
                       qt4.SIGNAL('currentIndexChanged(int)'),
                       self.dialog.enableDisableImport )
+        self.connect( self.dialog.prefixcombo,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
+                      self.dialog.enableDisableImport )
+        self.connect( self.dialog.suffixcombo,
+                      qt4.SIGNAL('editTextChanged(const QString&)'),
+                      self.dialog.enableDisableImport )
 
         self.fitswcsmode.defaultlist = [
             _('Pixel (simple)'), _('Pixel (WCS)'), _('Fractional'),
@@ -611,7 +617,11 @@ class ImportTabFITS(ImportTab):
             hdunum = int( str(item.text(0)) )
 
             # any name for the dataset?
-            if not unicode(self.fitsdatasetname.text()):
+            filename = unicode(self.dialog.filenameedit.text())
+            prefix, suffix = self.dialog.getPrefixSuffix(filename)
+
+            if not ( prefix + unicode(self.fitsdatasetname.text()) +
+                     suffix ).strip():
                 return False
 
             # if a table, need selected item
@@ -629,7 +639,7 @@ class ImportTabFITS(ImportTab):
         hdunum = int( str(item.text(0)) )
         data = self.fitsitemdata[hdunum]
 
-        name = prefix + unicode(self.fitsdatasetname.text()) + suffix
+        name = (prefix + unicode(self.fitsdatasetname.text()) + suffix).strip()
 
         wcsmode = None
         if data[0] == 'table':
