@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "Python.h"
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include "numpy/arrayobject.h"
 
 #include "qtloops_helpers.h"
@@ -37,13 +38,13 @@ Tuple2Ptrs::Tuple2Ptrs(PyObject* tuple)
 
       // convert to C array (stored in objdata)
       PyArrayObject *array = (PyArrayObject*)
-	PyArray_ContiguousFromObject(obj, PyArray_DOUBLE, 1, 1);
+	PyArray_ContiguousFromObject(obj, NPY_DOUBLE, 1, 1);
       if( array == NULL )
 	{
 	  throw "Cannot covert parameter to 1D numpy array";
 	}
-      data.push_back( (double*)(array->data) );
-      dims.push_back( array->dimensions[0] );
+      data.push_back( (double*)PyArray_DATA(array) );
+      dims.push_back( PyArray_DIMS(array)[0] );
       _arrays.push_back( (PyObject*)array );
     }
 }
@@ -63,14 +64,14 @@ Numpy1DObj::Numpy1DObj(PyObject* array)
   : data(0), _array(0)
 {
   PyArrayObject *arrayobj = (PyArrayObject*)
-    PyArray_ContiguousFromObject(array, PyArray_DOUBLE, 1, 1);
+    PyArray_ContiguousFromObject(array, NPY_DOUBLE, 1, 1);
   if( arrayobj == NULL )
     {
       throw "Cannot covert item to 1D numpy array";
     }
 
-  data = (double*)(arrayobj->data);
-  dim = arrayobj->dimensions[0];
+  data = (double*)PyArray_DATA(arrayobj);
+  dim = PyArray_DIMS(arrayobj)[0];
   _array = (PyObject*)arrayobj;
 }
 
@@ -85,16 +86,16 @@ Numpy2DObj::Numpy2DObj(PyObject* array)
   : data(0), _array(0)
 {
   PyArrayObject *arrayobj = (PyArrayObject*)
-    PyArray_ContiguousFromObject(array, PyArray_DOUBLE, 2, 2);
+    PyArray_ContiguousFromObject(array, NPY_DOUBLE, 2, 2);
 
   if( arrayobj == NULL )
     {
       throw "Cannot convert to 2D numpy array";
     }
 
-  data = (double*)(arrayobj->data);
-  dims[0] = arrayobj->dimensions[0];
-  dims[1] = arrayobj->dimensions[1];
+  data = (double*)PyArray_DATA(arrayobj);
+  dims[0] = PyArray_DIMS(arrayobj)[0];
+  dims[1] = PyArray_DIMS(arrayobj)[1];
   _array = (PyObject*)arrayobj;
 }
 
@@ -109,7 +110,7 @@ Numpy2DIntObj::Numpy2DIntObj(PyObject* array)
   : data(0), _array(0)
 {
   PyArrayObject *arrayobj = (PyArrayObject*)
-    PyArray_ContiguousFromObject(array, PyArray_INT, 2, 2);
+    PyArray_ContiguousFromObject(array, NPY_INT, 2, 2);
 
   if( arrayobj == NULL )
     {
@@ -117,9 +118,9 @@ Numpy2DIntObj::Numpy2DIntObj(PyObject* array)
 	"Requires numpy.intc argument.";
     }
 
-  data = (int*)(arrayobj->data);
-  dims[0] = arrayobj->dimensions[0];
-  dims[1] = arrayobj->dimensions[1];
+  data = (int*)PyArray_DATA(arrayobj);
+  dims[0] = PyArray_DIMS(arrayobj)[0];
+  dims[1] = PyArray_DIMS(arrayobj)[1];
   _array = (PyObject*)arrayobj;
 }
 
@@ -136,7 +137,7 @@ PyObject* doubleArrayToNumpy(const double* d, int len)
   dims[0] = len;
   PyObject* n = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
 
-  double* pydata = (double*) ((PyArrayObject*)(n))->data;
+  double* pydata = (double*)PyArray_DATA((PyArrayObject*)(n));
   for(int i = 0; i < len; ++i)
     pydata[i] = d[i];
 

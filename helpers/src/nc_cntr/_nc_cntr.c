@@ -69,13 +69,10 @@ Agreement.
 #include <stdlib.h>
 #include <stdio.h>
 
-/* modified by jss */
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 #define NUMERIC
 #include "numpy/arrayobject.h"
-
-#ifndef PyArray_SBYTE
-#include "numpy/oldnumeric.h"
-#endif
 
 /* Note that all arrays in these routines are Fortran-style,
    in the sense that the "i" index varies fastest; the dimensions
@@ -1400,8 +1397,8 @@ build_cntr_list_v(long *np, double *xp, double *yp, int nparts, long ntotal)
     for (i = 0; i < nparts; i++)
     {
         dims[0] = np[i];
-        xv = (PyArrayObject *) PyArray_SimpleNew(1, dims, PyArray_DOUBLE);
-        yv = (PyArrayObject *) PyArray_SimpleNew(1, dims, PyArray_DOUBLE);
+        xv = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_DOUBLE);
+        yv = (PyArrayObject *) PyArray_SimpleNew(1, dims, NPY_DOUBLE);
         if (xv == NULL || yv == NULL)  goto error;
         for (j = 0; j < dims[0]; j++)
         {
@@ -1437,14 +1434,16 @@ build_cntr_list_v2(long *np, double *xp, double *yp, int nparts, long ntotal)
     k = 0;
     for (i = 0; i < nparts; i++)
     {
+        double *data;
         dims[0] = np[i];
         dims[1] = 2;
-        xyv = (PyArrayObject *) PyArray_SimpleNew(2, dims, PyArray_DOUBLE);
+        xyv = (PyArrayObject *) PyArray_SimpleNew(2, dims, NPY_DOUBLE);
         if (xyv == NULL)  goto error;
+	data = (double*)PyArray_DATA(xyv);
         for (j = 0; j < dims[0]; j++)
         {
-            ((double *)xyv->data)[2*j] = xp[k];
-            ((double *)xyv->data)[2*j+1] = yp[k];
+            data[2*j] = xp[k];
+            data[2*j+1] = yp[k];
             k++;
         }
         if (PyList_SetItem(all_contours, i, (PyObject *)xyv)) goto error;
@@ -1664,15 +1663,15 @@ Cntr_init(Cntr *self, PyObject *args, PyObject *kwds)
     }
 
     xpa = (PyArrayObject *) PyArray_ContiguousFromObject(xarg,
-							 PyArray_DOUBLE, 2, 2);
+							 NPY_DOUBLE, 2, 2);
     ypa = (PyArrayObject *) PyArray_ContiguousFromObject(yarg,
-							 PyArray_DOUBLE,
+							 NPY_DOUBLE,
 							 2, 2);
-    zpa = (PyArrayObject *) PyArray_ContiguousFromObject(zarg, PyArray_DOUBLE,
+    zpa = (PyArrayObject *) PyArray_ContiguousFromObject(zarg, NPY_DOUBLE,
 							 2, 2);
     if (marg)
         mpa = (PyArrayObject *) PyArray_ContiguousFromObject(marg,
-							     PyArray_SBYTE,
+							     NPY_BYTE,
 							     2, 2);
     else
         mpa = NULL;
@@ -1683,22 +1682,22 @@ Cntr_init(Cntr *self, PyObject *args, PyObject *kwds)
             "Arguments x, y, z, mask (if present) must be 2D arrays.");
         goto error;
     }
-    iMax = zpa->dimensions[1];
-    jMax = zpa->dimensions[0];
-    if (xpa->dimensions[0] != jMax || xpa->dimensions[1] != iMax ||
-        ypa->dimensions[0] != jMax || ypa->dimensions[1] != iMax ||
-        (mpa && (mpa->dimensions[0] != jMax || mpa->dimensions[1] != iMax)))
+    iMax = PyArray_DIMS(zpa)[1];
+    jMax = PyArray_DIMS(zpa)[0];
+    if (PyArray_DIMS(xpa)[0] != jMax || PyArray_DIMS(xpa)[1] != iMax ||
+        PyArray_DIMS(ypa)[0] != jMax || PyArray_DIMS(ypa)[1] != iMax ||
+        (mpa && (PyArray_DIMS(mpa)[0] != jMax || PyArray_DIMS(mpa)[1] != iMax)))
     {
         PyErr_SetString(PyExc_ValueError,
             "Arguments x, y, z, mask (if present)"
              " must have the same dimensions.");
         goto error;
     }
-    if (mpa) mask = mpa->data;
+    if (mpa) mask = PyArray_DATA(mpa);
     else     mask = NULL;
-    if ( cntr_init(self->site, iMax, jMax, (double *)xpa->data,
-                            (double *)ypa->data,
-                            (double *)zpa->data, mask))
+    if ( cntr_init(self->site, iMax, jMax, (double *)PyArray_DATA(xpa),
+		   (double *)PyArray_DATA(ypa),
+		   (double *)PyArray_DATA(zpa), mask))
     {
         PyErr_SetString(PyExc_MemoryError,
             "Memory allocation failure in cntr_init");
