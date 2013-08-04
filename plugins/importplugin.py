@@ -130,7 +130,7 @@ class ImportPluginExample(ImportPlugin):
             return [datasetplugin.Dataset1D(params.field_results["name"], data),
                     datasetplugin.Constant("testconst", "42"),
                     datasetplugin.Function("testfunc(x)", "testconst*x**2")]
-        except Exception, e:
+        except Exception as e:
             raise ImportPluginException(unicode(e))
 
 class ImportPluginDateTime(ImportPlugin):
@@ -519,7 +519,7 @@ class ImportPluginNpy(ImportPlugin):
 
         try:
             retn = N.load(params.filename)
-        except Exception, e:
+        except Exception as e:
             raise ImportPluginException(_("Error while reading file: %s") %
                                         unicode(e))
 
@@ -573,7 +573,7 @@ class ImportPluginNpz(ImportPlugin):
 
         try:
             retn = N.load(params.filename)
-        except Exception, e:
+        except Exception as e:
             raise ImportPluginException(_("Error while reading file: %s") %
                                         unicode(e))
 
@@ -624,7 +624,7 @@ class ImportPluginBinary(ImportPlugin):
             f = open(params.filename, "rb")
             data = f.read()
             f.close()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             return _("Cannot read file (%s)") % utils.decodeDefault(e.strerror), False
 
         text = [_('File length: %i bytes') % len(data)]
@@ -659,14 +659,14 @@ class ImportPluginBinary(ImportPlugin):
             f.seek( params.field_results["offset"] )
             retn = f.read()
             f.close()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             raise ImportPluginException(_("Error while reading file '%s'\n\n%s") %
                                         (params.filename, utils.decodeDefault(e.strerror)))
 
         try:
             data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
                                 count=params.field_results["length"])
-        except ValueError, e:
+        except ValueError as e:
             raise ImportPluginException(_("Error converting data for file '%s'\n\n%s") %
                                         (params.filename, unicode(e)))
 

@@ -1373,7 +1373,7 @@ class _MmlRenderer(_Renderer):
         self.mmldoc = doc = qtmml.QtMmlDocument()
         try:
             self.mmldoc.setContent(text)
-        except ValueError, e:
+        except ValueError as e:
             self.mmldoc = None
             self.error = ('Error interpreting MathML: %s\n' %
                           unicode(e))

@@ -290,7 +290,7 @@ class MainWindow(qt4.QMainWindow):
             try:
                 self.document.applyOperation(
                     document.OperationLoadStyleSheet(filename) )
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load default stylesheet '%s'\n\n%s") %
@@ -307,7 +307,7 @@ class MainWindow(qt4.QMainWindow):
             try:
                 self.document.applyOperation(
                     document.OperationLoadCustom(filename) )
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load custom definitions '%s'\n\n%s") %
@@ -883,7 +883,7 @@ class MainWindow(qt4.QMainWindow):
                 ofile = open(self.filename, 'w')
                 self.document.saveToFile(ofile)
                 self.updateStatusbar(_("Saved to %s") % self.filename)
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QApplication.restoreOverrideCursor()
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
@@ -944,7 +944,7 @@ class MainWindow(qt4.QMainWindow):
             filename = unicode( fd.selectedFiles()[0] )
             try:
                 open(filename)
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to open '%s'\n\n%s") %
@@ -1022,7 +1022,7 @@ class MainWindow(qt4.QMainWindow):
         # read script
         try:
             script = open(filename, 'rU').read()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             qt4.QApplication.restoreOverrideCursor()
             qt4.QMessageBox.critical(
                 self, _("Error - Veusz"),
@@ -1053,7 +1053,7 @@ class MainWindow(qt4.QMainWindow):
                      qt4.QMessageBox.No ):
                     return
                 unsafe = True
-            except Exception, e:
+            except Exception as e:
                 errordialog(e)
                 return
 
@@ -1099,7 +1099,7 @@ class MainWindow(qt4.QMainWindow):
         try:
             # actually run script text
             exec compiled in env
-        except Exception, e:
+        except Exception as e:
             # need to remember to restore stdout, stderr
             sys.stdout, sys.stderr = stdout, stderr
             self.document.enableUpdates()
@@ -1266,7 +1266,7 @@ class MainWindow(qt4.QMainWindow):
 
             try:
                 export.export()
-            except (RuntimeError, EnvironmentError), e:
+            except (RuntimeError, EnvironmentError) as e:
                 if isinstance(e, EnvironmentError):
                     msg = utils.decodeDefault(e.strerror)
                 else:

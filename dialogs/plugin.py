@@ -181,7 +181,7 @@ def runPlugin(window, doc, plugin, fields):
         else:
             resultstext = _('Done')
 
-    except (plugins.ToolsPluginException, plugins.DatasetPluginException), ex:
+    except (plugins.ToolsPluginException, plugins.DatasetPluginException) as ex:
         # unwind operations
         op.undo(doc)
         qt4.QApplication.restoreOverrideCursor()

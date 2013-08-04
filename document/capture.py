@@ -125,7 +125,7 @@ class FileCaptureStream(CaptureStream):
             if len(data) == 0 and done:
                 raise CaptureFinishException("End of file")
             return data
-        except OSError, e:
+        except OSError as e:
             raise CaptureFinishException("OSError: %s" % unicode(e))
 
     def close(self):
@@ -192,7 +192,7 @@ class SocketCaptureStream(CaptureStream):
             self.socket = socket.socket( socket.AF_INET,
                                           socket.SOCK_STREAM )
             self.socket.connect( (host, port) )
-        except socket.error, e:
+        except socket.error as e:
             self._handleSocketError(e)
 
     def _handleSocketError(self, e):
@@ -224,7 +224,7 @@ class SocketCaptureStream(CaptureStream):
         if i:
             try:
                 retn = self.socket.recv(1024)
-            except socket.error, e:
+            except socket.error as e:
                 self._handleSocketError(e)
             if len(retn) == 0:
                 raise CaptureFinishException("Remote socket closed")

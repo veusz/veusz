@@ -246,7 +246,7 @@ class EmbedApplication(qt4.QApplication):
                     raise AttributeError, "No Veusz command %s" % cmd
 
                 retval = interpreter.cmds[cmd](*args, **argsv)
-            except Exception, e:
+            except Exception as e:
                 retval = e
 
         self.writeOutput(retval)

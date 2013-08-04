@@ -749,7 +749,7 @@ class Document( qt4.QObject ):
 
         try:
             cmap = self.validateProcessColormap(val)
-        except ValueError, e:
+        except ValueError as e:
             self.log( unicode(e) )
         else:
             self.colormaps[ unicode(name) ] = cmap
@@ -777,7 +777,7 @@ class Document( qt4.QObject ):
             return
         try:
             self.eval_context[name] = eval(comp, self.eval_context)
-        except Exception, e:
+        except Exception as e:
             self.log( _("Error evaluating '%s': '%s'") %
                       (name, unicode(e)) )
 
@@ -807,12 +807,12 @@ class Document( qt4.QObject ):
             checked = utils.compileChecked(
                 expr,
                 ignoresecurity=setting.transient_settings['unsafe_mode'])
-        except utils.SafeEvalException, e:
+        except utils.SafeEvalException as e:
             self.log(
                 _("Unsafe expression '%s': %s") % (origexpr, unicode(e)))
             self.exprfailed.add(expr)
             return None
-        except Exception, e:
+        except Exception as e:
             self.log(
                 _("Error in expression '%s': %s") % (origexpr, unicode(e)))
             return None

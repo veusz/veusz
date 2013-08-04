@@ -449,7 +449,7 @@ class ImportTab2D(ImportTab):
                         showlinked=False))
             
             output = '\n'.join(output)
-        except document.Read2DError, e:
+        except document.Read2DError as e:
             output = _('Error importing datasets:\n %s') % str(e)
 
         # show status in preview box
@@ -814,7 +814,7 @@ class ImportTabPlugins(ImportTab):
                                             self.getPluginFields())
         try:
             text, ok = plugin.getPreview(params)
-        except plugins.ImportPluginException, ex:
+        except plugins.ImportPluginException as ex:
             text = unicode(ex)
             ok = False
         self.pluginPreview.setPlainText(text)
@@ -837,7 +837,7 @@ class ImportTabPlugins(ImportTab):
         op = document.OperationDataImportPlugin(params)
         try:
             doc.applyOperation(op)
-        except plugins.ImportPluginException, ex:
+        except plugins.ImportPluginException as ex:
             self.pluginPreview.setPlainText( unicode(ex) )
             return
 

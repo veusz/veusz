@@ -116,7 +116,7 @@ class StylesheetDialog(VeuszDialog):
                 f.close()
                 self.recentButton.addFile(filename)
 
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
@@ -129,7 +129,7 @@ class StylesheetDialog(VeuszDialog):
         if filename:
             try:
                 self.loadStyleSheet(filename)
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (

@@ -236,7 +236,7 @@ class DataCreateDialog(VeuszDialog):
             self.statuslabel.setText(status)
 
         except (document.CreateDatasetException,
-                document.DatasetException, _DSException), e:
+                document.DatasetException, _DSException) as e:
 
             # all bad roads lead here - take exception string and tell user
             if dsexists:

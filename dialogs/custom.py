@@ -257,7 +257,7 @@ class CustomDialog(VeuszDialog):
                 self.document.saveCustomFile(f)
                 f.close()
                 self.recentButton.addFile(filename)
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
@@ -271,7 +271,7 @@ class CustomDialog(VeuszDialog):
         if filename:
             try:
                 self.loadFile(filename)
-            except EnvironmentError, e:
+            except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (

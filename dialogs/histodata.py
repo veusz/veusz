@@ -181,7 +181,7 @@ class HistoDataDialog(VeuszDialog):
 
         try:
             p = HistoDataDialog.Params(self)
-        except RuntimeError, ex:
+        except RuntimeError as ex:
             qt4.QMessageBox.warning(self, _("Invalid parameters"), unicode(ex))
             return
 
@@ -270,7 +270,7 @@ class HistoDataDialog(VeuszDialog):
         qt4.QTimer.singleShot(4000, self.statuslabel.clear)
         try:
             p = HistoDataDialog.Params(self)
-        except RuntimeError, ex:
+        except RuntimeError as ex:
             self.statuslabel.setText(_("Invalid parameters: %s") % unicode(ex))
             return
 

@@ -199,7 +199,7 @@ class DataCreate2DDialog(VeuszDialog):
             # forces an evaluation
             self.document.data[text['name']].data
         except (document.CreateDatasetException,
-                document.DatasetException), e:
+                document.DatasetException) as e:
             msg = _("Failed to create dataset '%s'") % text['name']
         else:
             msg = _("Created dataset '%s'") % text['name']

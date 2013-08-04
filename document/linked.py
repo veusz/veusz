@@ -89,7 +89,7 @@ class LinkedFileBase(object):
 
         try:
             tempdoc.applyOperation(op)
-        except Exception, ex:
+        except Exception as ex:
             # if something breaks, record an error and return nothing
             document.log(unicode(ex))
 

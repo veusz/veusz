@@ -375,7 +375,7 @@ class DatasetPluginManager(object):
         # run the plugin with its parameters
         try:
             self.plugin.updateDatasets(self.fields, self.helper)
-        except DatasetPluginException, ex:
+        except DatasetPluginException as ex:
             # this is for immediate notification
             if raiseerrors:
                 raise
@@ -1427,7 +1427,7 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
                 if serr is not None: serr = serr[filt]
                 if perr is not None: perr = perr[filt]
                 if nerr is not None: nerr = nerr[filt]
-        except (ValueError, IndexError), e:
+        except (ValueError, IndexError) as e:
             raise DatasetPluginException(_("Error filtering dataset: '%s')") %
                                          unicode(e))
 

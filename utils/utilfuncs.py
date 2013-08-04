@@ -281,7 +281,7 @@ class NonBlockingReaderThread(threading.Thread):
         while True:
             try:
                 data = self.fileobject.readline()
-            except Exception, e:
+            except Exception as e:
                 # error in reading
                 self.lock.acquire()
                 self.data = e

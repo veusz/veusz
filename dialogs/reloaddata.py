@@ -133,7 +133,7 @@ class ReloadData(VeuszDialog):
                     else:
                         text += ' %s\n' % var
 
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             text = _('Error reading file:\n') + unicode(e)
         except document.DescriptorError:
             text = _('Could not interpret descriptor. Reload failed.')

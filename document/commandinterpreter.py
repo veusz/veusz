@@ -267,7 +267,7 @@ class CommandInterpreter(object):
         print name, args, namedargs
         try:
             retn = eval('%s(*_tmp_args0, **_tmp_args1)' % name)
-        except Exception, e:
+        except Exception as e:
             # return exception picked if exception
             retn = e
             
