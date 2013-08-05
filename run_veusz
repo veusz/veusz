@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
-#    Veusz listening script
-#
-#    Copyright (C) 2008 Jeremy S. Sanders
+# Run veusz here without installation, to make development easier
+
+#    Copyright (C) 2013 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -20,5 +20,14 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-import veusz.veusz_listen
-veusz.veusz_listen.run()
+import sys
+import os.path
+try:
+    import veusz
+except ImportError:
+    # python3 will require this
+    sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
+    import veusz
+
+import veusz.veusz_main
+veusz.veusz_main.run()
