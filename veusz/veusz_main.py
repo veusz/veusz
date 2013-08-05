@@ -26,20 +26,8 @@ import os.path
 import signal
 import optparse
 
-# Allow veusz to be run even if not installed into PYTHONPATH
-try:
-    import veusz
-except ImportError:
-    # load in the veusz module, but change its path to
-    # the veusz directory, and insert it into sys.modules
-    import __init__ as veusz
-    thisdir = os.path.dirname( os.path.abspath(__file__) )
-    veusz.__path__ = [thisdir]
-    veusz.__name__ = 'veusz'
-    sys.modules['veusz'] = veusz
-
-import veusz.qtall as qt4
-import veusz.utils as utils
+from . import qtall as qt4
+from . import utils
 
 copyr='''Veusz %s
 
@@ -83,7 +71,7 @@ def makeSplashLogo():
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
-    from veusz.dialogs.exceptiondialog import ExceptionDialog
+    from .dialogs.exceptiondialog import ExceptionDialog
     if not isinstance(exceptvalue, utils.IgnoreException):
         # next exception is ignored to clear out the stack frame of the
         # previous exception - yuck
@@ -92,12 +80,12 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
 
 def listen(args, quiet):
     '''For running with --listen option.'''
-    from veusz.veusz_listen import openWindow
+    from .veusz_listen import openWindow
     openWindow(args, quiet=quiet)
 
 def export(exports, args):
     '''A shortcut to load a set of files and export them.'''
-    import veusz.document as document
+    from . import document
     for expfn, vsz in zip(exports, args[1:]):
         doc = document.Document()
         ci = document.CommandInterpreter(doc)
@@ -106,7 +94,7 @@ def export(exports, args):
 
 def mainwindow(args):
     '''Open the main window with any loaded files.'''
-    from veusz.windows.mainwindow import MainWindow
+    from .windows.mainwindow import MainWindow
 
     if len(args) > 1:
         # load in filenames given
@@ -134,10 +122,10 @@ def convertArgsUnicode(args):
 
 def initImports():
     '''Do imports and start up DBUS/SAMP.'''
-    import veusz.setting
-    import veusz.widgets
-    import veusz.utils.vzdbus as vzdbus
-    import veusz.utils.vzsamp as vzsamp
+    from . import setting
+    from . import widgets
+    from .utils import vzdbus
+    from .utils import vzsamp
 
     vzdbus.setup()
     vzsamp.setup()
@@ -183,19 +171,19 @@ class AppRunner(qt4.QObject):
         options = self.options
         args = self.args
 
-        import veusz.document
-        import veusz.setting
+        from . import document
+        from . import setting
 
         # install exception hook after thread has finished
         sys.excepthook = excepthook
 
         # for people who want to run any old script
-        veusz.setting.transient_settings['unsafe_mode'] = bool(
+        setting.transient_settings['unsafe_mode'] = bool(
             options.unsafe_mode)
 
         # load any requested plugins
         if options.plugin:
-            veusz.document.Document.loadPlugins(pluginlist=options.plugin)
+            document.Document.loadPlugins(pluginlist=options.plugin)
 
         # different modes
         if options.listen:
@@ -231,7 +219,7 @@ def run():
 
     # jump to the embedding client entry point if required
     if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
-        from veusz.embed_remote import runremote
+        from .embed_remote import runremote
         runremote()
         return
 

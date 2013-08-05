@@ -22,11 +22,15 @@
 
 import sys
 import os.path
+
+thisdir = os.path.abspath(os.path.dirname(__file__))
+os.environ['VEUSZ_EXAMPLES_DIR'] = os.path.join(thisdir, 'examples')
+
 try:
     import veusz
 except ImportError:
     # python3 will require this
-    sys.path = [os.path.abspath(os.path.dirname(__file__))] + sys.path
+    sys.path = [thisdir] + sys.path
     import veusz
 
 import veusz.veusz_main

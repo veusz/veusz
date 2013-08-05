@@ -59,6 +59,7 @@ def _getVeuszDirectory():
 
     # now get example directory (which may be a symlink)
     examplesdir = os.path.realpath( os.path.join(resdir, 'examples') )
+    examplesdir = os.environ.get('VEUSZ_EXAMPLES_DIR', examplesdir)
 
     return resdir, examplesdir
 
