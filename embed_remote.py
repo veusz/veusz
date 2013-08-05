@@ -243,7 +243,7 @@ class EmbedApplication(qt4.QApplication):
             # window commands
             try:
                 if cmd not in interpreter.cmds:
-                    raise AttributeError, "No Veusz command %s" % cmd
+                    raise AttributeError("No Veusz command %s" % cmd)
 
                 retval = interpreter.cmds[cmd](*args, **argsv)
             except Exception as e:

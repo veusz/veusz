@@ -101,7 +101,7 @@ class _Stats(object):
             self.topwhisker = percentile(cleaned, 98)
             self.botwhisker = percentile(cleaned, 2)
         else:
-            raise RuntimeError, "Invalid whisker mode"
+            raise RuntimeError("Invalid whisker mode")
 
         self.outliers = cleaned[ (cleaned < self.botwhisker) |
                                  (cleaned > self.topwhisker) ]

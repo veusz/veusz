@@ -352,7 +352,7 @@ class Document( qt4.QObject ):
         for name, ds in self.data.iteritems():
             if ds is dataset:
                 return name
-        raise ValueError, "Cannot find dataset"
+        raise ValueError("Cannot find dataset")
 
     def deleteDataset(self, name):
         """Remove the selected dataset."""
@@ -569,7 +569,7 @@ class Document( qt4.QObject ):
             if p == '..':
                 p = obj.parent
                 if p is None:
-                    raise ValueError, "Base graph has no parent"
+                    raise ValueError("Base graph has no parent")
                 obj = p
             elif p == '.' or len(p) == 0:
                 pass
@@ -582,15 +582,15 @@ class Document( qt4.QObject ):
                         if p in obj.settings:
                             obj = obj.settings[p]
                         else:
-                            raise ValueError, "Widget has no child %s" % p
+                            raise ValueError("Widget has no child %s" % p)
                 else:
                     if isinstance(obj, setting.Settings):
                         try:
                             obj = obj.get(p)
                         except KeyError:
-                            raise ValueError, "Settings has no child %s" % p
+                            raise ValueError("Settings has no child %s" % p)
                     else:
-                        raise ValueError, "Item has no children"
+                        raise ValueError("Item has no children")
 
         # return widget
         return obj
@@ -617,7 +617,7 @@ class Document( qt4.QObject ):
                 # relative to parent object
                 p = obj.parent
                 if p is None:
-                    raise ValueError, "Base graph has no parent"
+                    raise ValueError("Base graph has no parent")
                 obj = p
             elif p == '.' or len(p) == 0:
                 # relative to here
@@ -626,7 +626,7 @@ class Document( qt4.QObject ):
                 # child specified
                 obj = obj.getChild( p )
                 if obj is None:
-                    raise ValueError, "Child '%s' does not exist" % p
+                    raise ValueError("Child '%s' does not exist" % p)
 
         # return widget
         return obj
@@ -850,7 +850,7 @@ class Document( qt4.QObject ):
             elif ctype == 'colormap':
                 self._updateEvalContextColormap(name, val)
             else:
-                raise ValueError, 'Invalid custom type'
+                raise ValueError('Invalid custom type')
 
     def customDict(self):
         """Return a dictionary mapping custom names to (idx, type, value)."""
@@ -901,7 +901,7 @@ class Document( qt4.QObject ):
             except ValueError:
                 pass
 
-        raise RuntimError, 'Invalid array'
+        raise RuntimError('Invalid array')
 
     def walkNodes(self, tocall, root=None,
                   nodetypes=('widget', 'setting', 'settings'),

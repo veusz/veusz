@@ -196,8 +196,8 @@ def compileChecked(code, mode='eval', filename='<string>',
         filename = filename.encode('utf-8')
 
         tree = ast.parse(code, filename, mode)
-    except Exception, e:
-        raise ValueError, _('Unable to parse file: %s') % unicode(e)
+    except Exception as e:
+        raise ValueError(_('Unable to parse file: %s') % unicode(e))
 
     if not ignoresecurity:
         visitor = CheckNodeVisitor()

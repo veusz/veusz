@@ -185,12 +185,12 @@ class CommandInterface(qt4.QObject):
             self.document.validateProcessColormap(val)
         else:
             if not isinstance(val, basestring):
-                raise RuntimeError, 'Value should be string'
+                raise RuntimeError('Value should be string')
 
         if mode not in ('appendalways', 'append', 'replace'):
-            raise RuntimeError, 'Invalid mode'
+            raise RuntimeError('Invalid mode')
         if ctype not in ('constant', 'import', 'function', 'colormap'):
-            raise RuntimeError, 'Invalid type'
+            raise RuntimeError('Invalid type')
 
         vals = list( self.document.customs )
         item = [ctype, name, val]
@@ -273,7 +273,7 @@ class CommandInterface(qt4.QObject):
                 plugin = pkls()
                 break
         if plugin is None:
-            raise RuntimeError, "Cannot find dataset plugin '%s'" % pluginname
+            raise RuntimeError("Cannot find dataset plugin '%s'" % pluginname)
 
         # do the work
         op = operations.OperationDatasetPlugin(plugin, fields,
@@ -300,7 +300,7 @@ class CommandInterface(qt4.QObject):
                 del vals[i]
                 break
         else:
-            raise ValueError, 'Custom variable not defined'
+            raise ValueError('Custom variable not defined')
         op = operations.OperationSetCustom(vals)
         self.document.applyOperation(op)
 
@@ -967,7 +967,7 @@ class CommandInterface(qt4.QObject):
         if hasattr(item, 'isWidget') and item.isWidget():
             return item.typename
         else:
-            raise ValueError, "Path '%s' is not a widget" % path
+            raise ValueError("Path '%s' is not a widget" % path)
 
     def SettingType(self, path):
         """Get the type of setting (a string) for the path given.

@@ -76,8 +76,8 @@ def solveFunction(function, vals, mint=None, maxt=None):
 
     anynan = N.any( N.isnan(yvals) )
     if anynan:
-        raise FunctionError, _('Invalid regions in function '
-                               '(try setting minimum or maximum t)')
+        raise FunctionError(_('Invalid regions in function '
+                               '(try setting minimum or maximum t)'))
 
     # remove any infinite regions
     f = N.isfinite(yvals)
@@ -85,16 +85,16 @@ def solveFunction(function, vals, mint=None, maxt=None):
     yfilt = yvals[f]
 
     if len(yfilt) < 2:
-        raise FunctionError, _('Solutions to equation cannot be found')
+        raise FunctionError(_('Solutions to equation cannot be found'))
 
     # check for monotonicity
     delta = yfilt[1:] - yfilt[:-1]
     pos, neg = N.all(delta >= 0), N.all(delta <= 0)
     if not (pos or neg):
-        raise FunctionError, _('Not a monotonic function '
-                               '(try setting minimum or maximum t)')
+        raise FunctionError(_('Not a monotonic function '
+                               '(try setting minimum or maximum t)'))
     if pos and neg:
-        raise FunctionError, _('Constant function')
+        raise FunctionError(_('Constant function'))
 
     # easier if the values are increasing only
     if neg:
@@ -114,9 +114,9 @@ def solveFunction(function, vals, mint=None, maxt=None):
                 # work around value being at start of array
                 idx = 1
             else:
-                raise AxisError, _('No solution found')
+                raise AxisError(_('No solution found'))
         elif idx == len(ydelta):
-            raise AxisError, _('No solution found')
+            raise AxisError(_('No solution found'))
 
         x1, x2 = xfilt[idx-1], xfilt[idx]
         y1, y2 = ydelta[idx-1], ydelta[idx]
@@ -134,7 +134,7 @@ def solveFunction(function, vals, mint=None, maxt=None):
                 break   # found solution
 
             if y1 == y2 or ((y1<0) and (y2<0)) or ((y1>0) and (y2>0)):
-                raise AxisError, _('No solution found')
+                raise AxisError(_('No solution found'))
 
             ### This is a bit faster, but bisection is simpler
             # xv = N.linspace(x1, x2, num=100)
@@ -152,7 +152,7 @@ def solveFunction(function, vals, mint=None, maxt=None):
             x3 = 0.5*(x1+x2)
             y3 = function(x3) - thisval
             if not N.isfinite(y3):
-                raise AxisError, _('Non-finite value encountered')
+                raise AxisError(_('Non-finite value encountered'))
 
             if y3 < 0:
                 x1 = x3
@@ -254,7 +254,7 @@ class AxisFunction(axis.Axis):
                 env['t'] = t
                 try:
                     return eval(compiled, env)
-                except Exception, e:
+                except Exception as e:
                     self.logError(e)
                     return N.nan + t
             self.cachedfuncobj = function
@@ -262,10 +262,10 @@ class AxisFunction(axis.Axis):
             mint, maxt = self.getMinMaxT()
             try:
                 solveFunction(function, [0.], mint=mint, maxt=maxt)
-            except FunctionError, e:
+            except FunctionError as e:
                 self.logError(e)
                 self.cachedfuncobj = None
-            except AxisError, e:
+            except AxisError as e:
                 pass
 
         return self.cachedfuncobj
@@ -278,7 +278,7 @@ class AxisFunction(axis.Axis):
         mint, maxt = self.getMinMaxT()
         try:
             return solveFunction(fn, vals, mint=mint, maxt=maxt)
-        except Exception, e:
+        except Exception as e:
             self.logError(e)
             return None
 
@@ -321,7 +321,7 @@ class AxisFunction(axis.Axis):
             linked.computePlottedRange()
             try:
                 therange = fn(N.array(linked.plottedrange)) * N.ones(2)
-            except Exception, e:
+            except Exception as e:
                 self.logError(e)
             if not N.all( N.isfinite(therange) ):
                 therange = None
@@ -397,7 +397,7 @@ class AxisFunction(axis.Axis):
 
         try:
             ourgraphcoords = self.getFunction()(linkgraphcoords)
-        except Exception, e:
+        except Exception as e:
             return
 
         deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]
@@ -456,7 +456,7 @@ class AxisFunction(axis.Axis):
 
         try:
             ourgraphcoords = self.getFunction()(tvals)
-        except Exception, e:
+        except Exception as e:
             return
 
         deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]

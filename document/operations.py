@@ -908,7 +908,7 @@ class OperationDataImport(OperationDataImportBase):
         elif p.datastr is not None:
             stream = simpleread.StringStream(p.datastr)
         else:
-            raise RuntimeError, "No filename or string"
+            raise RuntimeError("No filename or string")
 
         # do the import
         self.simpleread.clearState()
@@ -1052,8 +1052,8 @@ class OperationDataImportFITS(OperationDataImportBase):
         try:
             import pyfits
         except ImportError:
-            raise RuntimeError, ( 'PyFITS is required to import '
-                                  'data from FITS files' )
+            raise RuntimeError( 'PyFITS is required to import '
+                                  'data from FITS files')
 
         p = self.params
         f = pyfits.open( str(p.filename), 'readonly')
@@ -1071,7 +1071,7 @@ class OperationDataImportFITS(OperationDataImportBase):
             elif naxis == 2:
                 ds = self._import2dimage(hdu)
             else:
-                raise RuntimeError, "Cannot import images with %i dimensions" % naxis
+                raise RuntimeError("Cannot import images with %i dimensions" % naxis)
         f.close()
 
         if p.linked:
@@ -1261,7 +1261,7 @@ class OperationDatasetAddColumn(object):
             setattr(ds, self.columnname,
                     N.zeros(datacol.shape, dtype='float64'))
         except AttributeError:
-            raise RuntimeError, "Invalid column name for dataset"
+            raise RuntimeError("Invalid column name for dataset")
         document.setData(self.datasetname, ds)
 
     def undo(self, document):

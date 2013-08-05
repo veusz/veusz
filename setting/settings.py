@@ -98,7 +98,7 @@ class Settings(object):
         """Add a new setting with the name, or a set of subsettings."""
         name = setting.name
         if name in self.setdict:
-            raise RuntimeError, "Name already in settings dictionary"
+            raise RuntimeError("Name already in settings dictionary")
         self.setdict[name] = setting
         if posn < 0:
             self.setnames.append(name)
@@ -147,7 +147,7 @@ class Settings(object):
         try:
             return self.__dict__[name]
         except KeyError:
-            raise AttributeError, "'%s' is not a setting" % name
+            raise AttributeError("'%s' is not a setting" % name)
 
     def __getitem__(self, name):
         """Also allows us to do
@@ -163,7 +163,7 @@ class Settings(object):
             else:
                 return s.val
         except KeyError:
-            raise KeyError, "'%s' is not a setting" % name
+            raise KeyError("'%s' is not a setting" % name)
 
     def __contains__(self, name):
         """Whether settings contains name."""
@@ -186,7 +186,7 @@ class Settings(object):
                 
             if len(path) == 1:
                 if isinstance(val, Settings):
-                    raise ValueError, (
+                    raise ValueError(
                         '"%s" is a list of settings, not a setting' % name)
                 else:
                     return val
@@ -194,9 +194,9 @@ class Settings(object):
                 if isinstance(val, Settings):
                     return val.getFromPath(path[1:])
                 else:
-                    raise ValueError, '"%s" not a valid subsetting' % name
+                    raise ValueError('"%s" not a valid subsetting' % name)
         else:
-            raise ValueError, '"%s" is not a setting' % name
+            raise ValueError('"%s" is not a setting' % name)
 
     def saveText(self, saveall, rootname = None):
         """Return the text which would reload the settings.

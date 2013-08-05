@@ -33,7 +33,7 @@ class build_ext (distutils.command.build_ext.build_ext):
                     out.append(os.path.join(self.build_temp, o))
                 return out
 
-        raise RuntimeError, 'cannot parse SIP-generated "%s"' % sbf
+        raise RuntimeError('cannot parse SIP-generated "%s"' % sbf)
 
     def _find_sip(self):
         cfg = PyQt4.pyqtconfig.Configuration()

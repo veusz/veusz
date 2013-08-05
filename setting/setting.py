@@ -144,7 +144,7 @@ class Setting(object):
         if isinstance(self._val, Reference):
             return self._val
         else:
-            raise ValueError, "Setting is not a reference"
+            raise ValueError("Setting is not a reference")
 
     def getStylesheetLink(self):
         """Get text that this setting should default to linked to the
@@ -492,7 +492,7 @@ class Int(Setting):
             if val >= self.minval and val <= self.maxval:
                 return val
             else:
-                raise InvalidType, 'Out of range allowed'
+                raise InvalidType('Out of range allowed')
         raise InvalidType
 
     def toText(self):
@@ -506,7 +506,7 @@ class Int(Setting):
         if i >= self.minval and i <= self.maxval:
             return i
         else:
-            raise InvalidType, 'Out of range allowed'
+            raise InvalidType('Out of range allowed')
 
     def makeControl(self, *args):
         return controls.Int(self, *args)
@@ -515,9 +515,9 @@ def _finiteRangeFloat(f, minval=-1e300, maxval=1e300):
     """Return a finite float in range or raise exception otherwise."""
     f = float(f)
     if not N.isfinite(f):
-        raise InvalidType, 'Finite values only allowed'
+        raise InvalidType('Finite values only allowed')
     if f < minval or f > maxval:
-        raise InvalidType, 'Out of range allowed'
+        raise InvalidType('Out of range allowed')
     return f
 
 # for storing floats

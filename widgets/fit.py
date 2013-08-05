@@ -80,7 +80,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
         have_symerr = True
         m.minos()
         have_err = True
-    except minuit.MinuitError, e:
+    except minuit.MinuitError as e:
         print e
         if str(e).startswith('Discovered a new minimum'):
             # the initial fit really failed
@@ -287,7 +287,7 @@ class Fit(FunctionPlotter):
 
             try:
                 return eval(compiled, evalenv) + xvals*0.
-            except Exception, e:
+            except Exception as e:
                 self.document.log(unicode(e))
                 return N.nan
 

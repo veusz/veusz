@@ -282,7 +282,7 @@ class ReadCSV(object):
             elif ctype == 'string':
                 v = col
             else:
-                raise RuntimeError, "Invalid type in CSV reader"
+                raise RuntimeError("Invalid type in CSV reader")
 
         except ValueError:
             self._handleFailedConversion(colnum, col)

@@ -336,7 +336,7 @@ class DescriptorPart(object):
                     ds = datasets.DatasetText( data=vals,
                                                linked = linkedfile )
                 else:
-                    raise RuntimeError, "Invalid data type"
+                    raise RuntimeError("Invalid data type")
 
                 finalname = prefix + name + suffix
                 document.setData( finalname, ds )
@@ -622,13 +622,13 @@ class SimpleRead2D(object):
         try:
             self.params.xrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
-            raise Read2DError, "Could not interpret xrange"
+            raise Read2DError("Could not interpret xrange")
         
     def _paramYRange(self, cols):
         try:
             self.params.yrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
-            raise Read2DError, "Could not interpret yrange"
+            raise Read2DError("Could not interpret yrange")
 
     def _paramInvertRows(self, cols):
         self.params.invertrows = True
@@ -691,7 +691,7 @@ class SimpleRead2D(object):
                 try:
                     line.append( float(v) )
                 except ValueError:
-                    raise Read2DError, "Could not interpret number '%s'" % v
+                    raise Read2DError("Could not interpret number '%s'" % v)
 
             # add row to dataset
             if len(line) != 0:
@@ -705,17 +705,17 @@ class SimpleRead2D(object):
 
         # dodgy formatting probably...
         if len(rows) == 0:
-            raise Read2DError, "No data could be imported for dataset"
+            raise Read2DError("No data could be imported for dataset")
 
         # convert the data to a numpy
         try:
             self.data = N.array(rows)
         except ValueError:
-            raise Read2DError, "Could not convert data to 2D matrix"
+            raise Read2DError("Could not convert data to 2D matrix")
 
         # obvious check
         if len(self.data.shape) != 2:
-            raise Read2DError, "Dataset was not 2D"
+            raise Read2DError("Dataset was not 2D")
 
         # transpose matrix if requested
         if self.params.transpose:

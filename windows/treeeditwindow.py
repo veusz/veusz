@@ -1072,7 +1072,7 @@ class TreeEditDock(qt4.QDockWidget):
         # find indices of widgets to be deleted - find one to select after
         indexes = [widgetlist.index(w) for w in widgets]
         if -1 in indexes:
-            raise RuntimeError, "Invalid widget in list of selected widgets"
+            raise RuntimeError("Invalid widget in list of selected widgets")
         minindex = min(indexes)
 
         # delete selected widget

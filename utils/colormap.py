@@ -223,7 +223,7 @@ def applyScaling(data, mode, minval, maxval):
         data[lowermin] = 0.
 
     else:
-        raise RuntimeError, 'Invalid scaling mode "%s"' % mode
+        raise RuntimeError('Invalid scaling mode "%s"' % mode)
 
     return data
 

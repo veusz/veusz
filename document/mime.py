@@ -200,7 +200,7 @@ class OperationWidgetPaste(operations.OperationMultiple):
                 thisparent = doc.getSuitableParent(wtype, parentwidget)
 
                 if thisparent is None:
-                    raise RuntimeError, "Cannot find suitable parent for pasting"
+                    raise RuntimeError("Cannot find suitable parent for pasting")
 
                 # override name if it exists already
                 if name in thisparent.childnames:

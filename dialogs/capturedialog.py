@@ -190,7 +190,7 @@ class CaptureDialog(VeuszDialog):
                 # external program
                 stream = document.CommandCaptureStream(
                     unicode(self.commandLineEdit.text()) )
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             # problem opening stream
             qt4.QMessageBox.critical(self, _("Cannot open input"),
                                      _("Cannot open input:\n"
@@ -269,7 +269,7 @@ class CapturingDialog(VeuszDialog):
         """Time to read more data."""
         try:
             self.simpleread.readData(self.stream)
-        except document.CaptureFinishException, e:
+        except document.CaptureFinishException as e:
             # stream tells us it's time to finish
             self.streamCaptureFinished( unicode(e) )
 

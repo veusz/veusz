@@ -55,7 +55,7 @@ def _isoDataStringToDate(datestr):
                 # if there is a date part of the string
                 dateval = [int(x) for x in dategrp.split('-')]
                 if len(dateval) != 3:
-                    raise ValueError, "Invalid date '%s'" % dategrp
+                    raise ValueError("Invalid date '%s'" % dategrp)
             else:
                 dateval = [2009, 01, 01]
 
@@ -63,7 +63,7 @@ def _isoDataStringToDate(datestr):
                 # if there is a time part of the string
                 p = timegrp.split(':')
                 if len(p) != 3:
-                    raise ValueError, "Invalid time '%s'" % timegrp
+                    raise ValueError("Invalid time '%s'" % timegrp)
                 secfrac, sec = math.modf(float(p[2]))
                 timeval = [ int(p[0]), int(p[1]), int(sec), int(secfrac*1e6) ]
             else:
@@ -238,7 +238,7 @@ def dateREMatchToDate(match):
     and convert to float date value."""
 
     if match is None:
-        raise ValueError, "match object is None"
+        raise ValueError("match object is None")
 
     # remove None matches
     grps = {}
@@ -248,7 +248,7 @@ def dateREMatchToDate(match):
 
     # bomb out if nothing matches
     if len(grps) == 0:
-        raise ValueError, "no groups matched"
+        raise ValueError("no groups matched")
 
     # get values of offset
     oyear = offsetdate.year

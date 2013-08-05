@@ -51,7 +51,7 @@ def convertNumpy(a, dims=1):
         a = N.array(a, dtype=N.float64)
 
     if len(a.shape) != dims:
-        raise ValueError, "Only %i-dimensional arrays or lists allowed" % dims
+        raise ValueError("Only %i-dimensional arrays or lists allowed" % dims)
     return a
 
 def convertNumpyAbs(a):
@@ -204,7 +204,7 @@ class DatasetBase(object):
         if isinstance(val, basestring) or isinstance(val, qt4.QString):
             val, ok = setting.uilocale.toDouble(val)
             if ok: return val
-            raise ValueError, "Invalid floating point number"
+            raise ValueError("Invalid floating point number")
         return float(val)
 
     def uiDataItemToQVariant(self, val):
@@ -513,7 +513,7 @@ class Dataset(DatasetBase):
         if thetype in self.columns:
             setattr(self, thetype, vals)
         else:
-            raise ValueError, 'thetype does not contain an allowed value'
+            raise ValueError('thetype does not contain an allowed value')
 
         # just a check...
         s = self.data.shape
@@ -687,7 +687,7 @@ class DatasetText(DatasetBase):
         if type == 'data':
             self.data = list(vals)
         else:
-            raise ValueError, 'type does not contain an allowed value'
+            raise ValueError('type does not contain an allowed value')
 
         self.document.modifiedData(self)
     
@@ -921,7 +921,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     # do evaluation
     try:
         evalout = eval(comp, env)
-    except Exception, ex:
+    except Exception as ex:
         doc.log("Error evaluating '%s': '%s'" % (origexpr, unicode(ex)))
         return None
 
@@ -933,7 +933,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
             return DatasetText([unicode(x) for x in evalout])
         else:
             raise RuntimeError('Invalid data type')
-    except DatasetExpressionException, ex:
+    except DatasetExpressionException as ex:
         doc.log(_("Error evaluating '%s': %s\n") % (origexpr, unicode(ex)))
 
     return None
@@ -1005,8 +1005,8 @@ class DatasetExpression(Dataset):
             evalout = N.array(result, N.float64)
 
             if len(evalout.shape) > 1:
-                raise RuntimeError, "Number of dimensions is not 1"
-        except Exception, ex:
+                raise RuntimeError("Number of dimensions is not 1")
+        except Exception as ex:
             self.document.log(
                 _("Error evaluating expression: %s\n"
                   "Error: %s") % (self.expr[part], unicode(ex)) )
@@ -1284,7 +1284,7 @@ class Dataset2DXYZExpression(Dataset2D):
 
             try:
                 evaluated[name] = eval(comp, environment)
-            except Exception, e:
+            except Exception as e:
                 self.document.log(_("Error evaluating expression: %s\n"
                                     "Error: %s") % (expr, unicode(e)) )
                 return None
@@ -1304,7 +1304,7 @@ class Dataset2DXYZExpression(Dataset2D):
         # this is ugly - is this really the way to do it?
         try:
             self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
-        except Exception, e:
+        except Exception as e:
             self.document.log(_("Shape mismatch when constructing dataset\n"
                                 "Error: %s") % unicode(e) )
             return None
@@ -1448,7 +1448,7 @@ class Dataset2DXYFunc(Dataset2D):
         """Return data, or empty array if error."""
         try:
             return self.evalDataset()
-        except DatasetExpressionException, ex:
+        except DatasetExpressionException as ex:
             self.document.log(unicode(ex))
             return N.array([[]])
 
@@ -1472,7 +1472,7 @@ class Dataset2DXYFunc(Dataset2D):
         env['y'] = ystep
         try:
             data = eval(self.expr, env)
-        except Exception, e:
+        except Exception as e:
             raise DatasetExpressionException(
                 _("Error evaluating expression: %s\n"
                   "Error: %s") % (self.expr, str(e)) )

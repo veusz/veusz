@@ -331,7 +331,7 @@ class FunctionPlotter(GenericPlotter):
         try:
             results = eval(compiled, env) + N.zeros(axispts.shape)
             resultpts = axis2.dataToPlotterCoords(posn, results)
-        except Exception, e:
+        except Exception as e:
             self.logEvalError(e)
             results = None
             resultpts = None

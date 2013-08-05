@@ -74,7 +74,7 @@ class Widget(object):
         self.document = None
 
         if not self.isAllowedParent(parent):
-            raise RuntimeError, "Widget parent is of incorrect type"
+            raise RuntimeError("Widget parent is of incorrect type")
 
         if name is None:
             name = self.chooseName()
@@ -125,15 +125,15 @@ class Widget(object):
         """Change name of self."""
 
         if self.parent is None:
-            raise ValueError, 'Cannot rename root widget'
+            raise ValueError('Cannot rename root widget')
 
         if name.find('/') != -1:
-            raise ValueError, 'Names cannot contain "/"'
+            raise ValueError('Names cannot contain "/"')
 
         # check whether name already exists in siblings
         for i in self.parent.children:
             if i != self and i.name == name:
-                raise ValueError, 'New name "%s" already exists' % name
+                raise ValueError('New name "%s" already exists' % name)
 
         self.name = name
 
@@ -224,7 +224,7 @@ class Widget(object):
             i += 1
 
         if i == noparts:
-            raise ValueError, "Specified a widget, not a setting"
+            raise ValueError("Specified a widget, not a setting")
         else:
             return obj.settings.getFromPath( parts[i:] )
 
@@ -255,8 +255,7 @@ class Widget(object):
         if i < nc:
             self.children.pop(i)
         else:
-            raise ValueError, \
-                  "Cannot remove graph '%s' - does not exist" % name
+            raise ValueError("Cannot remove graph '%s' - does not exist" % name)
 
     def widgetSiblingIndex(self):
         """Get index of widget in its siblings."""

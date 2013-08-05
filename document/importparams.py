@@ -52,7 +52,7 @@ class ImportParamsBase(object):
         # set parameters
         for k, v in argsv.iteritems():
             if k not in self.defaults:
-                raise ValueError, "Invalid parameter %s" % k
+                raise ValueError("Invalid parameter %s" % k)
             setattr(self, k, v)
 
         # extra parameters to copy besides defaults
@@ -115,7 +115,7 @@ class ImportParamsCSV(ImportParamsBase):
     def __init__(self, **argsv):
         ImportParamsBase.__init__(self, **argsv)
         if self.headermode not in ('multi', '1st', 'none'):
-            raise ValueError, "Invalid headermode"
+            raise ValueError("Invalid headermode")
 
 class ImportParams2D(ImportParamsBase):
     """2D import parameters.

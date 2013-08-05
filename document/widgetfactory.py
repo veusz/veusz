@@ -38,7 +38,7 @@ class WidgetFactory(object):
 
         # check for / in name of widget
         if name is not None and name.find('/') != -1:
-            raise ValueError, 'name cannot contain "/"'
+            raise ValueError('name cannot contain "/"')
 
         w = self.regwidgets[widgetname](parent, name=name)
 

@@ -51,14 +51,14 @@ def localeFormat(totfmt, args, locale=None):
                 s = f.group() % args[i]
                 i += 1
             except IndexError:
-                raise TypeError, "Not enough arguments for format string"
+                raise TypeError("Not enough arguments for format string")
             if locale is not None and code in 'eEfFgG':
                 s = s.replace('.', qt4.QString(locale.decimalPoint()))
 
         strings.append(s)
 
     if i != len(args):
-        raise TypeError, "Not all arguments converted during string formatting"
+        raise TypeError("Not all arguments converted during string formatting")
 
     return newfmt % tuple(strings)
 

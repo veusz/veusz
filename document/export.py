@@ -117,7 +117,7 @@ class Export(object):
             self.exportEMF()
 
         else:
-            raise RuntimeError, "File type '%s' not supported" % ext
+            raise RuntimeError("File type '%s' not supported" % ext)
 
     def renderPage(self, size, dpi, painter):
         """Render page using paint helper to painter.

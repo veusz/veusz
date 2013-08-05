@@ -129,7 +129,7 @@ class NonOrthFunction(Widget):
             return N.array([]), N.array([])
         try:
             vals = eval(comp, env) + invals*0.
-        except Exception, e:
+        except Exception as e:
             self.logEvalError(e)
             vals = invals = N.array([])
 
