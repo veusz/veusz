@@ -18,8 +18,8 @@
 ###############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
-from veusz.qtwidgets.datasetbrowser import DatasetBrowser
+from .. import qtall as qt4
+from ..qtwidgets.datasetbrowser import DatasetBrowser
 
 def _(text, disambiguation=None, context="DataNavigator"):
     """Translate text."""

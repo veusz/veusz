@@ -19,8 +19,8 @@
 from __future__ import division
 import os.path
 
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 def removeBadRecents(itemlist):
     """Remove duplicates from list and bad entries."""

@@ -23,8 +23,8 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from veusz.plugins import ImportPlugin, importpluginregistry, \
-                          Dataset1D, DatasetText
+from .importplugin import ImportPlugin, importpluginregistry
+from .datasetplugin import Dataset1D, DatasetText
 
 try:
     from astropy.io.vo.table import parse

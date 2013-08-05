@@ -17,9 +17,9 @@
 ##############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import setting
+from .. import utils
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PrefsDialog"):

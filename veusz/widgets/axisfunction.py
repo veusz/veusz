@@ -21,10 +21,10 @@
 from __future__ import division
 import numpy as N
 
-import veusz.qtall as qt4
-import veusz.setting as setting
-import veusz.document as document
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import setting
+from .. import document
+from .. import utils
 
 from . import axis
 

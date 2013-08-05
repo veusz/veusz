@@ -19,7 +19,7 @@
 from __future__ import division
 import numpy as N
 from .datasets import Dataset, evalDatasetExpression
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Datasets"):
     """Translate text."""

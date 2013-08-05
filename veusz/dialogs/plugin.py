@@ -22,9 +22,9 @@ from __future__ import division
 import sys
 from itertools import izip
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.plugins as plugins
+from .. import qtall as qt4
+from .. import document
+from .. import plugins
 from . import exceptiondialog
 from . import dataeditdialog
 from .veuszdialog import VeuszDialog

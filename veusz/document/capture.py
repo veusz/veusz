@@ -25,8 +25,8 @@ import platform
 import signal
 import locale
 
-import veusz.qtall as qt4
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import utils
 from . import simpleread
 
 class CaptureFinishException(Exception):

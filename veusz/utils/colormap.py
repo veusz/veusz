@@ -22,7 +22,7 @@ import numpy as N
 # use fast or slow helpers
 slowfuncs = False
 try:
-    from veusz.helpers.qtloops import numpyToQImage, applyImageTransparancy
+    from ..helpers.qtloops import numpyToQImage, applyImageTransparancy
 except ImportError:
     slowfuncs = True
     from .slowfuncs import slowNumpyToQImage

@@ -20,9 +20,9 @@
 from __future__ import division
 import os.path
 
-import veusz.qtall as qt4
-import veusz.utils as utils
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import utils
+from .. import setting
 
 def _(text, disambiguation=None, context="Tutorial"):
     """Translate text."""
@@ -348,7 +348,7 @@ class DataImport(TutorialStep):
 
     def slotDialogShown(self, dialog):
         """Called when a dialog is opened in the main window."""
-        from veusz.dialogs.importdialog import ImportDialog
+        from ..dialogs.importdialog import ImportDialog
         if isinstance(dialog, ImportDialog):
             # make life easy by sticking in filename
             dialog.filenameedit.setText(
@@ -413,7 +413,7 @@ box or reopen it later.</p>
         self.timer.start(200)
 
     def slotTimeout(self):
-        from veusz.dialogs.importdialog import ImportDialog
+        from ..dialogs.importdialog import ImportDialog
         closed = True
         for dialog in self.mainwin.dialogs:
             if isinstance(dialog, ImportDialog):

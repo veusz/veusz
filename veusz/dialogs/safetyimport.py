@@ -19,8 +19,8 @@
 """Ask user whether to import symbols."""
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 def _(text, disambiguation=None, context="SafetyImportDialog"):
     """Translate text."""

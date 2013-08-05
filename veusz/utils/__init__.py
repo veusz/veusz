@@ -33,7 +33,7 @@ from .colormap import *
 from .extbrushfilling import *
 
 try:
-    from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
+    from ..helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
         plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath
 except ImportError:

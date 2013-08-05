@@ -27,7 +27,7 @@ entries
 # from __future__ import division
 import __builtin__
 import ast
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='SafeEval'):
     """Translate text."""

@@ -29,7 +29,7 @@ from itertools import izip
 import re
 import numpy as N
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 from . import settingdb
 from .. import utils
@@ -631,7 +631,7 @@ class Dataset(qt4.QWidget):
     def slotButtonToggled(self, on):
         """Bring up list of datasets."""
         if on:
-            from veusz.qtwidgets.datasetbrowser import DatasetBrowserPopup
+            from ..qtwidgets.datasetbrowser import DatasetBrowserPopup
             d = DatasetBrowserPopup(self.document,
                                     unicode(self.choice.currentText()),
                                     self.button,
@@ -1305,7 +1305,7 @@ class _FillBox(qt4.QScrollArea):
 
         self.extbrush = thesetting.returnBrushExtended(row)
 
-        from veusz.windows.treeeditwindow import SettingsProxySingle, \
+        from ..windows.treeeditwindow import SettingsProxySingle, \
             PropertyList
 
         fbox = self

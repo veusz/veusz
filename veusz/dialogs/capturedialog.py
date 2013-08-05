@@ -19,9 +19,9 @@
 """Veusz data capture dialog."""
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import document
+from .. import setting
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CaptureDialog"):

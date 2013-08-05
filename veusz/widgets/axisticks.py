@@ -23,7 +23,7 @@ from __future__ import division
 import math
 import numpy as N
 
-import veusz.utils as utils
+from .. import utils
 
 """Algorithms for working with axis ticks.
 

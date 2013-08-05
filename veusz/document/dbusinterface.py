@@ -20,7 +20,7 @@
 
 from __future__ import division
 import numpy as N
-import veusz.utils.vzdbus as vzdbus
+from ..utils import vzdbus
 from . import commandinterpreter
 
 class DBusInterface(vzdbus.Object):

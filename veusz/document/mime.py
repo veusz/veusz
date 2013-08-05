@@ -19,7 +19,7 @@
 from __future__ import division
 from itertools import izip, count
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 from . import doc
 from . import operations

@@ -30,14 +30,14 @@ from collections import defaultdict
 
 import numpy as N
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 from . import widgetfactory
 from . import datasets
 from . import painthelper
 
-import veusz.utils as utils
-import veusz.setting as setting
+from .. import utils
+from .. import setting
 
 def _(text, disambiguation=None, context="Document"):
     """Translate text."""

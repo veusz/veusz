@@ -24,14 +24,14 @@ import math
 import re
 
 import numpy as N
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 from . import points
 
 mmlsupport = True
 try:
-    import veusz.helpers.qtmml as qtmml
-    import veusz.helpers.recordpaint as recordpaint
+    from ..helpers import qtmml
+    from ..helpers import recordpaint
 except ImportError:
     mmlsupport = False
 

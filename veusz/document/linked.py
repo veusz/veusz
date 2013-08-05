@@ -22,7 +22,7 @@
 from __future__ import division
 import sys
 
-import veusz.utils as utils
+from .. import utils
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""

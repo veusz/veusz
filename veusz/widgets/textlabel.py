@@ -23,10 +23,10 @@ import itertools
 import math
 import numpy as N
 
-import veusz.document as document
-import veusz.setting as setting
-import veusz.utils as utils
-import veusz.qtall as qt4
+from .. import document
+from .. import setting
+from .. import utils
+from .. import qtall as qt4
 
 from . import plotters
 from . import controlgraph

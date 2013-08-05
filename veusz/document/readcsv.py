@@ -24,8 +24,8 @@ import re
 import numpy as N
 
 from . import datasets
-import veusz.utils as utils
-import veusz.qtall as qt4
+from .. import utils
+from .. import qtall as qt4
 
 class _FileReaderCols(object):
     """Read a CSV file in rows. This acts as an iterator.

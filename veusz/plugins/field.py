@@ -19,9 +19,9 @@
 """Data entry fields for plugins."""
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.utils as utils
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import utils
+from .. import setting
 
 class Field(object):
     """A class to represent an input field on the dialog or command line."""

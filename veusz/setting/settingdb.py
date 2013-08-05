@@ -21,7 +21,7 @@
 from __future__ import division
 import sys
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Preferences"):
     """Translate text."""

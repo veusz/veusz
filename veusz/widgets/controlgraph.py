@@ -27,9 +27,9 @@ from __future__ import division
 import math
 import itertools
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import document
+from .. import setting
 
 def _(text, disambiguation=None, context='controlgraph'):
     """Translate text."""

@@ -21,7 +21,7 @@ import re
 import math
 
 from . import dates
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 _formaterror = 'FormatError'
 

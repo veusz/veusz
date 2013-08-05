@@ -19,4 +19,4 @@
 """Veusz dialogs module."""
 
 # load custom widgets
-import veusz.qtwidgets
+from .. import qtwidgets

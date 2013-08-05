@@ -18,9 +18,9 @@
 
 """Dataset creation dialog."""
 
-import veusz.qtall as qt4
-import veusz.utils as utils
-import veusz.document as document
+from .. import qtall as qt4
+from .. import utils
+from .. import document
 from .veuszdialog import VeuszDialog
 
 from . import dataeditdialog

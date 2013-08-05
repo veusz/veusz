@@ -25,7 +25,7 @@ from itertools import izip, count
 import sys
 import struct
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 import numpy as N
 
 sys.stderr.write("Warning: Using slow substitutes for some functions. "

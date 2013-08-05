@@ -17,9 +17,9 @@
 ##############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.document as document
+from .. import document
 from . import plotwindow
 
 """

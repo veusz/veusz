@@ -23,11 +23,11 @@ Paints solid, hatching and various qt brushes
 
 from __future__ import division
 import numpy as N
-import veusz.qtall as qt4
+from .. import qtall as qt4
 import math
 
 try:
-    from veusz.helpers.qtloops import plotLinesToPainter, polygonClip
+    from ..helpers.qtloops import plotLinesToPainter, polygonClip
 except ImportError:
     from .slowfuncs import plotLinesToPainter, polygonClip
 

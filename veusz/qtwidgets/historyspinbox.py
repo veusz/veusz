@@ -17,8 +17,8 @@
 ##############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 class HistorySpinBox(qt4.QSpinBox):
     """A SpinBox which remembers its setting between calls."""

@@ -21,8 +21,8 @@
 from __future__ import division
 import os.path
 import numpy as N
-import veusz.utils as utils
-import veusz.qtall as qt4
+from .. import utils
+from .. import qtall as qt4
 
 from . import field
 from . import datasetplugin

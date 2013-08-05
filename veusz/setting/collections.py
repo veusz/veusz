@@ -19,7 +19,7 @@
 """Collections of predefined settings for common settings."""
 
 from __future__ import division
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 from . import setting
 from .settings import Settings

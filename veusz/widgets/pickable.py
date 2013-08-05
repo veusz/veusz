@@ -22,7 +22,7 @@
 from __future__ import division
 import numpy as N
 
-import veusz.document as document
+from .. import document
 
 class PickInfo:
     """Encapsulates the results of a Pick operation. screenpos and coords are

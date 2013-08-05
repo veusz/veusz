@@ -18,9 +18,9 @@
 from __future__ import division
 import atexit
 
-from veusz.windows.mainwindow import MainWindow
-from veusz.document.commandinterpreter import CommandInterpreter
-from veusz.utils import veuszDirectory
+from ..windows.mainwindow import MainWindow
+from ..document.commandinterpreter import CommandInterpreter
+from ..utils import veuszDirectory
 
 samp = None
 

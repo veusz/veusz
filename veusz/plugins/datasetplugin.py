@@ -25,12 +25,12 @@ import numpy as N
 from itertools import izip
 from . import field
 
-import veusz.utils as utils
+from .. import utils
 try:
-    import veusz.helpers.qtloops as qtloops
+    from ..helpers import qtloops
 except ImportError:
     pass
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='DatasetPlugin'):
     """Translate text."""
@@ -85,7 +85,7 @@ class Dataset1D(object):
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
         # need to do the import here as otherwise we get a loop
-        import veusz.document as document
+        from .. import document
         return document.Dataset1DPlugin(manager, self)
 
 class Dataset2D(object):
@@ -112,7 +112,7 @@ class Dataset2D(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        import veusz.document as document
+        from .. import document
         return document.Dataset2DPlugin(manager, self)
 
 class DatasetDateTime(object):
@@ -150,7 +150,7 @@ class DatasetDateTime(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        import veusz.document as document
+        from .. import document
         return document.DatasetDatePlugin(manager, self)
 
 class DatasetText(object):
@@ -172,7 +172,7 @@ class DatasetText(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        import veusz.document as document
+        from .. import document
         return document.DatasetTextPlugin(manager, self)
 
 class Constant(object):
@@ -224,7 +224,7 @@ class DatasetPluginHelper(object):
     @property
     def datasetsdatetime(self):
         """Return list of existing date-time datesets"""
-        import veusz.document as document
+        from .. import document
         return [name for name, ds in self._doc.data.iteritems() if
                 isinstance(ds, document.DatasetDateTime)]
 
@@ -251,7 +251,7 @@ class DatasetPluginHelper(object):
         name not found: raise a DatasetPluginException
         dimensions not right: raise a DatasetPluginException
         """
-        import veusz.document as document
+        from .. import document
         try:
             ds = self._doc.data[name]
         except KeyError:

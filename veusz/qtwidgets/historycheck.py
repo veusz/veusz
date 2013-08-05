@@ -17,8 +17,8 @@
 ##############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 class HistoryCheck(qt4.QCheckBox):
     """Checkbox remembers its setting between calls

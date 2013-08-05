@@ -31,7 +31,7 @@ import StringIO
 import locale
 from collections import defaultdict
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 import numpy as N
 
 class IgnoreException(Exception):

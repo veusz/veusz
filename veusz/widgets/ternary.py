@@ -30,10 +30,10 @@ from .axisticks import AxisTicks
 from .axis import MajorTick, MinorTick, GridLine, MinorGridLine, AxisLabel, \
     TickLabel
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import document
+from .. import setting
+from .. import utils
 
 def _(text, disambiguation=None, context='Ternary'):
     """Translate text."""

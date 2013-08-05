@@ -23,14 +23,14 @@ from __future__ import division
 import sys
 import traceback
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 import numpy as N
 
-import veusz.setting as setting
-import veusz.dialogs.exceptiondialog as exceptiondialog
-import veusz.document as document
-import veusz.utils as utils
-import veusz.widgets as widgets
+from .. import setting
+from ..dialogs import exceptiondialog
+from .. import document
+from .. import utils
+from .. import widgets
 
 def _(text, disambiguation=None, context='PlotWindow'):
     """Translate text."""

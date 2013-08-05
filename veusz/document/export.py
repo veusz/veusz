@@ -23,8 +23,8 @@ import os.path
 import random
 import math
 
-import veusz.qtall as qt4
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import utils
 
 try:
     from . import emf_export

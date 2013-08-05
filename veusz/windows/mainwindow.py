@@ -25,33 +25,33 @@ import sys
 import traceback
 import glob
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.document as document
-import veusz.utils as utils
-import veusz.utils.vzdbus as vzdbus
-import veusz.setting as setting
-import veusz.plugins as plugins
+from .. import document
+from .. import utils
+from ..utils import vzdbus
+from .. import setting
+from .. import plugins
 
 from . import consolewindow
 from . import plotwindow
 from . import treeeditwindow
 from .datanavigator import DataNavigatorWindow
 
-from veusz.dialogs.aboutdialog import AboutDialog
-from veusz.dialogs.reloaddata import ReloadData
-from veusz.dialogs.datacreate import DataCreateDialog
-from veusz.dialogs.datacreate2d import DataCreate2DDialog
-from veusz.dialogs.preferences import PreferencesDialog
-from veusz.dialogs.errorloading import ErrorLoadingDialog
-from veusz.dialogs.capturedialog import CaptureDialog
-from veusz.dialogs.stylesheet import StylesheetDialog
-from veusz.dialogs.custom import CustomDialog
-from veusz.dialogs.safetyimport import SafetyImportDialog
-from veusz.dialogs.histodata import HistoDataDialog
-from veusz.dialogs.plugin import handlePlugin
-import veusz.dialogs.importdialog as importdialog
-import veusz.dialogs.dataeditdialog as dataeditdialog
+from ..dialogs.aboutdialog import AboutDialog
+from ..dialogs.reloaddata import ReloadData
+from ..dialogs.datacreate import DataCreateDialog
+from ..dialogs.datacreate2d import DataCreate2DDialog
+from ..dialogs.preferences import PreferencesDialog
+from ..dialogs.errorloading import ErrorLoadingDialog
+from ..dialogs.capturedialog import CaptureDialog
+from ..dialogs.stylesheet import StylesheetDialog
+from ..dialogs.custom import CustomDialog
+from ..dialogs.safetyimport import SafetyImportDialog
+from ..dialogs.histodata import HistoDataDialog
+from ..dialogs.plugin import handlePlugin
+from ..dialogs import importdialog
+from ..dialogs import dataeditdialog
 
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
@@ -781,7 +781,7 @@ class MainWindow(qt4.QMainWindow):
         """Show a Veusz tutorial."""
         if self.document.isBlank():
             # run the tutorial
-            from veusz.windows.tutorial import TutorialDock
+            from .tutorial import TutorialDock
             tutdock = TutorialDock(self.document, self, self)
             self.addDockWidget(qt4.Qt.RightDockWidgetArea, tutdock)
             tutdock.show()

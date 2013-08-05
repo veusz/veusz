@@ -18,8 +18,8 @@
 ###############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import utils
 
 class LineEditWithClear(qt4.QLineEdit):
     """This is a line edit widget which supplies a clear button

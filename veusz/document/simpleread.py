@@ -46,7 +46,7 @@ import cStringIO
 
 import numpy as N
 
-import veusz.utils as utils
+from .. import utils
 from . import datasets
 
 # a regular expression for splitting descriptor into tokens

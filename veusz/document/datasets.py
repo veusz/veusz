@@ -25,9 +25,9 @@ from itertools import izip
 
 import numpy as N
 
-import veusz.qtall as qt4
-import veusz.utils as utils
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import utils
+from .. import setting
 
 def _(text, disambiguation=None, context="Datasets"):
     """Translate text."""

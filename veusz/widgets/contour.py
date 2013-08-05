@@ -26,12 +26,12 @@ from __future__ import division
 from itertools import izip
 import sys
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 import numpy as N
 
-import veusz.setting as setting
-import veusz.document as document
-import veusz.utils as utils
+from .. import setting
+from .. import document
+from .. import utils
 
 from . import plotters
 
@@ -129,7 +129,7 @@ class Contour(plotters.GenericPlotter):
         # try to import contour helpers here
         Cntr = None
         try:
-            from veusz.helpers._nc_cntr import Cntr
+            from ..helpers._nc_cntr import Cntr
         except ImportError:
             print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'
                                 'Please run python setup.py build\n'

@@ -22,16 +22,16 @@ from __future__ import division
 import itertools
 import numpy as N
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import document
+from .. import setting
+from .. import utils
 
 from . import pickable
 from .plotters import GenericPlotter
 
 try:
-    import veusz.helpers.qtloops as qtloops
+    from ..helpers import qtloops
     hasqtloops = True
 except ImportError:
     hasqtloops = False

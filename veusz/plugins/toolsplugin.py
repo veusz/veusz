@@ -23,8 +23,8 @@ import random
 import re
 import fnmatch
 
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 from . import field
 
 def _(text, disambiguation=None, context='ToolsPlugin'):

@@ -20,11 +20,11 @@
 """
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 try:
-    from veusz.helpers.recordpaint import RecordPaintDevice
+    from ..helpers.recordpaint import RecordPaintDevice
 except ImportError:
     # fallback to this if we don't get the native recorded
     def RecordPaintDevice(width, height, dpix, dpiy):

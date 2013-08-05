@@ -17,10 +17,10 @@
 ###############################################################################
 
 from __future__ import division
-import veusz.utils as utils
-import veusz.qtall as qt4
-import veusz.document as document
-from veusz.windows.treeeditwindow import TabbedFormatting, PropertyList, \
+from .. import utils
+from .. import qtall as qt4
+from .. import document
+from ..windows.treeeditwindow import TabbedFormatting, PropertyList, \
     SettingsProxySingle
 from .veuszdialog import VeuszDialog
 

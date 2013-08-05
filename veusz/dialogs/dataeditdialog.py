@@ -21,10 +21,10 @@
 """Module for implementing dialog box for viewing/editing data."""
 
 from __future__ import division
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.document as document
-from veusz.qtwidgets.datasetbrowser import DatasetBrowser
+from .. import document
+from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog
 
 # register function to dataset class to edit dataset

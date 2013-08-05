@@ -22,8 +22,8 @@ from __future__ import division
 from . import controlgraph
 from .widget import Widget
 
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
                'polygon')

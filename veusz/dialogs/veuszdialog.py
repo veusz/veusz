@@ -21,8 +21,8 @@
 from __future__ import division
 import os.path
 
-import veusz.qtall as qt4
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import utils
 
 class VeuszDialog(qt4.QDialog):
     """Base dialog class.

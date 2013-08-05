@@ -20,8 +20,8 @@
 """
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 class HistoryValueCombo(qt4.QComboBox):
     """This combobox records what value was previously saved

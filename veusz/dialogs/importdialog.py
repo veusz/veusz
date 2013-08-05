@@ -26,11 +26,11 @@ import re
 import csv
 import sys
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
-import veusz.utils as utils
-import veusz.plugins as plugins
+from .. import qtall as qt4
+from .. import document
+from .. import setting
+from .. import utils
+from .. import plugins
 from . import exceptiondialog
 from .veuszdialog import VeuszDialog
 

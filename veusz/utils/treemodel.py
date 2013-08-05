@@ -20,7 +20,7 @@
 
 from __future__ import division
 import bisect
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 class TMNode(object):
     """Object to represent nodes in TreeModel.

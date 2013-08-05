@@ -22,10 +22,10 @@ from __future__ import division
 from itertools import izip
 import numpy as N
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import document
+from .. import setting
+from .. import utils
 
 from .plotters import GenericPlotter
 

@@ -21,10 +21,10 @@
 from __future__ import division
 from collections import defaultdict
 
-import veusz.qtall as qt4
-import veusz.setting as setting
-import veusz.utils as utils
-import veusz.document as document
+from .. import qtall as qt4
+from .. import setting
+from .. import utils
+from .. import document
 
 from . import widget
 from . import controlgraph

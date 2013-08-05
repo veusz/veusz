@@ -21,7 +21,7 @@ and exporting text as paths for WYSIWYG."""
 
 from __future__ import division
 import re
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 # dpi runs at many times usual, and results are scaled down
 # helps fix point issues in font sizes

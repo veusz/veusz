@@ -20,10 +20,10 @@
 ##############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.document as document
-import veusz.setting as setting
+from .. import document
+from .. import setting
 
 from . import widget
 from . import controlgraph

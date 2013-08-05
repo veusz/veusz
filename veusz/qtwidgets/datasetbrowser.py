@@ -24,13 +24,13 @@ import os.path
 import numpy as N
 import textwrap
 
-import veusz.qtall as qt4
-import veusz.setting as setting
-import veusz.document as document
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import setting
+from .. import document
+from .. import utils
 
 from .lineeditwithclear import LineEditWithClear
-from veusz.utils.treemodel import TMNode, TreeModel
+from ..utils.treemodel import TMNode, TreeModel
 
 def _(text, disambiguation=None, context="DatasetBrowser"):
     """Translate text."""
@@ -474,7 +474,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
     def datasetContextMenu(self, dsnodes, menu):
         """Return context menu for datasets."""
-        import veusz.dialogs.dataeditdialog as dataeditdialog
+        from ..dialogs import dataeditdialog
 
         datasets = [d.dataset() for d in dsnodes]
         dsnames = [d.datasetName() for d in dsnodes]
@@ -572,7 +572,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def filenameContextMenu(self, nodes, menu):
         """Return context menu for filenames."""
 
-        from veusz.dialogs.reloaddata import ReloadData
+        from ..dialogs.reloaddata import ReloadData
 
         filenames = [n.filename() for n in nodes if n.filename() != '/']
         if not filenames:

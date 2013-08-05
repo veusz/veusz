@@ -22,12 +22,12 @@ and formatting properties."""
 
 from __future__ import division
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.widgets as widgets
-import veusz.utils as utils
-import veusz.document as document
-import veusz.setting as setting
+from .. import widgets
+from .. import utils
+from .. import document
+from .. import setting
 
 from .widgettree import WidgetTreeModel, WidgetTreeView
 

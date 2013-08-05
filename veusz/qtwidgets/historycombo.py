@@ -22,8 +22,8 @@ The history is stored in the Veusz settings database.
 """
 
 from __future__ import division
-import veusz.qtall as qt4
-import veusz.setting as setting
+from .. import qtall as qt4
+from .. import setting
 
 class HistoryCombo(qt4.QComboBox):
     """This combobox records what items have been entered into it so the

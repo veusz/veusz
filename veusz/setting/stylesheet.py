@@ -23,7 +23,7 @@ from .settings import Settings
 from . import setting
 from . import collections
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""

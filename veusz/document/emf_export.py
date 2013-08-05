@@ -27,7 +27,7 @@ from __future__ import division
 import struct
 
 import pyemf
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
 inch_mm = 25.4
 scale = 100

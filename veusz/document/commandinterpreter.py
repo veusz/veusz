@@ -49,7 +49,7 @@ import pickle
 import os.path
 
 from .commandinterface import CommandInterface
-import veusz.utils as utils
+from .. import utils
 
 class CommandInterpreter(object):
     """Class for executing commands in the Veusz command line language."""

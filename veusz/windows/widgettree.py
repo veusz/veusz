@@ -19,10 +19,10 @@
 """Contains a model and view for handling a tree of widgets."""
 
 from __future__ import division
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.utils as utils
-import veusz.document as document
+from .. import utils
+from .. import document
 
 def _(text, disambiguation=None, context="WidgetTree"):
     """Translate text."""

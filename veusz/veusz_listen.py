@@ -31,22 +31,10 @@ from __future__ import division
 import sys
 import os.path
 
-# Allow veusz to be run even if not installed into PYTHONPATH
-try:
-    import veusz
-except ImportError:
-    # load in the veusz module, but change its path to
-    # the veusz directory, and insert it into sys.modules    
-    from . import __init__ as veusz
-    thisdir = os.path.dirname( os.path.abspath(__file__) )
-    veusz.__path__ = [thisdir]
-    veusz.__name__ = 'veusz'
-    sys.modules['veusz'] = veusz
+from . import qtall as qt4
 
-import veusz.qtall as qt4
-
-from veusz.windows.simplewindow import SimpleWindow
-import veusz.document as document
+from .windows.simplewindow import SimpleWindow
+from . import document
 
 class ReadingThread(qt4.QThread):
     """Stdin reading thread. Emits newline signals with new data.

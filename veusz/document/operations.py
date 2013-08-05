@@ -38,9 +38,9 @@ from . import simpleread
 from . import readcsv
 from . import linked
 
-import veusz.utils as utils
-import veusz.plugins as plugins
-import veusz.qtall as qt4
+from .. import utils
+from .. import plugins
+from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Operations"):
     """Translate text."""

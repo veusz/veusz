@@ -22,9 +22,9 @@ import struct
 import cPickle
 import socket
 
-import veusz.qtall as qt4
-from veusz.windows.simplewindow import SimpleWindow
-import veusz.document as document
+from .windows.simplewindow import SimpleWindow
+from . import document
+from . import qtall as qt4
 
 """Program to be run by embedding interface to run Veusz commands."""
 

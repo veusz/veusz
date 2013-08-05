@@ -27,10 +27,10 @@ from .nonorthgraph import NonOrthGraph
 from .axisticks import AxisTicks
 from . import axis
 
-import veusz.qtall as qt4
-import veusz.document as document
-import veusz.setting as setting
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import document
+from .. import setting
+from .. import utils
 
 def _(text, disambiguation=None, context='Polar'):
     """Translate text."""

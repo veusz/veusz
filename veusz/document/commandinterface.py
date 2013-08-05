@@ -28,11 +28,11 @@ from __future__ import division
 import os.path
 import traceback
 
-import veusz.qtall as qt4
-import veusz.setting as setting
-import veusz.embed as embed
-import veusz.plugins as plugins
-import veusz.utils as utils
+from .. import qtall as qt4
+from .. import setting
+from .. import embed
+from .. import plugins
+from .. import utils
 
 from . import importparams
 from . import datasets

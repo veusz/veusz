@@ -24,11 +24,11 @@ import codeop
 import traceback
 import sys
 
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import veusz.document as document
-import veusz.utils as utils
-import veusz.setting as setting
+from .. import document
+from .. import utils
+from .. import setting
 
 # TODO - command line completion
 

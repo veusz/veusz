@@ -19,11 +19,11 @@
 ###############################################################################
 
 from __future__ import division
-import veusz.qtall as qt4
+from .. import qtall as qt4
 import numpy as N
 
 try:
-    from veusz.helpers.qtloops import plotPathsToPainter
+    from ..helpers.qtloops import plotPathsToPainter
 except ImportError:
     from .slowfuncs import plotPathsToPainter
 
