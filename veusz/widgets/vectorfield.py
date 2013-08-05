@@ -27,7 +27,7 @@ import veusz.document as document
 import veusz.utils as utils
 import veusz.qtall as qt4
 
-import plotters
+from . import plotters
 
 def _(text, disambiguation=None, context='VectorField'):
     """Translate text."""

@@ -23,7 +23,7 @@
 from __future__ import division
 import numpy as N
 from itertools import izip
-import field
+from . import field
 
 import veusz.utils as utils
 try:

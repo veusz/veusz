@@ -16,9 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from settingdb import *
-from reference import Reference
-from setting import *
-from settings import *
-from collections import *
-from stylesheet import *
+from .settingdb import *
+from .reference import Reference
+from .setting import *
+from .settings import *
+from .collections import *
+from .stylesheet import *

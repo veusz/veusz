@@ -25,9 +25,9 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.qtall as qt4
 
-import widget
-import graph
-import controlgraph
+from . import widget
+from . import graph
+from . import controlgraph
 
 def _(text, disambiguation=None, context='Grid'):
     """Translate text."""
@@ -231,7 +231,7 @@ class Grid(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import page
+        from . import page
         return (page.Page, Grid)
 
     def _getUserDescription(self):

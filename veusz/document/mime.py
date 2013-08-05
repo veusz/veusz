@@ -21,9 +21,9 @@ from itertools import izip, count
 
 import veusz.qtall as qt4
 
-import doc
-import operations
-import widgetfactory
+from . import doc
+from . import operations
+from . import widgetfactory
 
 import StringIO
 
@@ -169,7 +169,7 @@ class OperationWidgetPaste(operations.OperationMultiple):
     def do(self, document):
         """Do the import."""
 
-        import commandinterpreter
+        from . import commandinterpreter
 
         index = self.index
 
@@ -260,7 +260,7 @@ class OperationDataPaste(object):
     def do(self, thisdoc):
         """Do the data paste."""
 
-        import commandinterpreter
+        from . import commandinterpreter
 
         # write data into a temporary document
         tempdoc = doc.Document()

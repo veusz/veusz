@@ -33,7 +33,7 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-import plotters
+from . import plotters
 
 def _(text, disambiguation=None, context='Contour'):
     """Translate text."""

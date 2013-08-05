@@ -21,8 +21,8 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 
-from veuszdialog import VeuszDialog
-import dataeditdialog
+from .veuszdialog import VeuszDialog
+from . import dataeditdialog
 
 import numpy as N
 

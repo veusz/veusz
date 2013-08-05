@@ -18,17 +18,17 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from widgetfactory import *
-from doc import *
-from datasets import *
-from commandinterface import *
-from commandinterpreter import *
-from simpleread import *
-from operations import *
-from capture import *
-from mime import *
-from dataset_histo import *
-from painthelper import *
-from export import Export, printDialog
-from dbusinterface import *
-from importparams import *
+from .widgetfactory import *
+from .doc import *
+from .datasets import *
+from .commandinterface import *
+from .commandinterpreter import *
+from .simpleread import *
+from .operations import *
+from .capture import *
+from .mime import *
+from .dataset_histo import *
+from .painthelper import *
+from .export import Export, printDialog
+from .dbusinterface import *
+from .importparams import *

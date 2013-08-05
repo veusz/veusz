@@ -26,9 +26,9 @@ import veusz.qtall as qt4
 import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
-import widget
-import controlgraph
-import plotters
+from . import widget
+from . import controlgraph
+from . import plotters
 
 def _(text, disambiguation=None, context='Shape'):
     """Translate text."""

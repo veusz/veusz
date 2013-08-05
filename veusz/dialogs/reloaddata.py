@@ -25,7 +25,7 @@ import os
 
 import veusz.qtall as qt4
 import veusz.document as document
-from veuszdialog import VeuszDialog
+from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ReloadDialog"):
     """Translate text."""

@@ -19,7 +19,7 @@
 """Module for holding collections of settings."""
 
 from __future__ import division
-from reference import Reference
+from .reference import Reference
 
 class Settings(object):
     """A class for holding collections of settings."""

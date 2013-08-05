@@ -26,7 +26,7 @@ import re
 import numpy as N
 import veusz.qtall as qt4
 
-import points
+from . import points
 
 mmlsupport = True
 try:

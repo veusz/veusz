@@ -31,7 +31,7 @@ import numpy
 
 import veusz.qtall as qt4
 import veusz.utils as utils
-from veuszdialog import VeuszDialog
+from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ExceptionDialog"):
     """Translate text."""

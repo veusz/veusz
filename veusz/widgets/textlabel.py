@@ -28,8 +28,8 @@ import veusz.setting as setting
 import veusz.utils as utils
 import veusz.qtall as qt4
 
-import plotters
-import controlgraph
+from . import plotters
+from . import controlgraph
 
 def _(text, disambiguation=None, context='TextLabel'):
     """Translate text."""

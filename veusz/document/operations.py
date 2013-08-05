@@ -32,11 +32,11 @@ from itertools import izip
 
 import numpy as N
 
-import datasets
-import widgetfactory
-import simpleread
-import readcsv
-import linked
+from . import datasets
+from . import widgetfactory
+from . import simpleread
+from . import readcsv
+from . import linked
 
 import veusz.utils as utils
 import veusz.plugins as plugins
@@ -1434,7 +1434,7 @@ class OperationLoadStyleSheet(OperationMultiple):
     def do(self, document):
         """Do the import."""
 
-        import commandinterpreter
+        from . import commandinterpreter
 
         # get document to keep track of changes for undo/redo
         document.batchHistory(self)
@@ -1463,7 +1463,7 @@ class OperationToolsPlugin(OperationMultiple):
     def do(self, document):
         """Use the plugin."""
 
-        import commandinterface
+        from . import commandinterface
 
         # get document to keep track of changes for undo/redo
         document.batchHistory(self)

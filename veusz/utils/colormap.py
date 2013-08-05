@@ -25,7 +25,7 @@ try:
     from veusz.helpers.qtloops import numpyToQImage, applyImageTransparancy
 except ImportError:
     slowfuncs = True
-    from slowfuncs import slowNumpyToQImage
+    from .slowfuncs import slowNumpyToQImage
 
 # Default colormaps used by widgets.
 # Each item in this dict is a colormap entry, with the key the name.

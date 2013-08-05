@@ -27,7 +27,7 @@ import locale
 
 import veusz.qtall as qt4
 import veusz.utils as utils
-import simpleread
+from . import simpleread
 
 class CaptureFinishException(Exception):
     """An exception to say when a stream has been finished."""

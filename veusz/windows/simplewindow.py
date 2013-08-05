@@ -20,7 +20,7 @@ from __future__ import division
 import veusz.qtall as qt4
 
 import veusz.document as document
-import plotwindow
+from . import plotwindow
 
 """
 A simple window class for wrapping a plotwindow

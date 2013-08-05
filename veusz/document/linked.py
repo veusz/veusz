@@ -119,7 +119,7 @@ class LinkedFile(LinkedFileBase):
 
     def createOperation(self):
         """Return operation to recreate self."""
-        import operations
+        from . import operations
         return operations.OperationDataImport
 
     def saveToFile(self, fileobj, relpath=None):
@@ -149,7 +149,7 @@ class LinkedFile2D(LinkedFileBase):
 
     def createOperation(self):
         """Return operation to recreate self."""
-        import operations
+        from . import operations
         return operations.OperationDataImport2D
 
     def saveToFile(self, fileobj, relpath=None):
@@ -171,7 +171,7 @@ class LinkedFileFITS(LinkedFileBase):
 
     def createOperation(self):
         """Return operation to recreate self."""
-        import operations
+        from . import operations
         return operations.OperationDataImportFITS
 
     def saveToFile(self, fileobj, relpath=None):
@@ -197,7 +197,7 @@ class LinkedFileCSV(LinkedFileBase):
 
     def createOperation(self):
         """Return operation to recreate self."""
-        import operations
+        from . import operations
         return operations.OperationDataImportCSV
 
     def saveToFile(self, fileobj, relpath=None):
@@ -220,7 +220,7 @@ class LinkedFilePlugin(LinkedFileBase):
 
     def createOperation(self):
         """Return operation to recreate self."""
-        import operations
+        from . import operations
         return operations.OperationDataImportPlugin
 
     def saveToFile(self, fileobj, relpath=None):

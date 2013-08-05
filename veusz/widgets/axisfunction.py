@@ -26,7 +26,7 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-import axis
+from . import axis
 
 def _(text, disambiguation=None, context='FunctionAxis'):
     '''Translate text.'''

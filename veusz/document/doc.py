@@ -32,9 +32,9 @@ import numpy as N
 
 import veusz.qtall as qt4
 
-import widgetfactory
-import datasets
-import painthelper
+from . import widgetfactory
+from . import datasets
+from . import painthelper
 
 import veusz.utils as utils
 import veusz.setting as setting

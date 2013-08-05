@@ -21,8 +21,8 @@
 from __future__ import division
 import veusz.qtall as qt4
 
-import setting
-from settings import Settings
+from . import setting
+from .settings import Settings
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""

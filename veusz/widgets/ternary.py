@@ -25,9 +25,9 @@ import numpy as N
 import math
 from itertools import izip
 
-from nonorthgraph import NonOrthGraph
-from axisticks import AxisTicks
-from axis import MajorTick, MinorTick, GridLine, MinorGridLine, AxisLabel, \
+from .nonorthgraph import NonOrthGraph
+from .axisticks import AxisTicks
+from .axis import MajorTick, MinorTick, GridLine, MinorGridLine, AxisLabel, \
     TickLabel
 
 import veusz.qtall as qt4

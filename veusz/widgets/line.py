@@ -28,8 +28,8 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-import controlgraph
-import plotters
+from . import controlgraph
+from . import plotters
 
 def _(text, disambiguation=None, context='Line'):
     """Translate text."""

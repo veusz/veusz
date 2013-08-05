@@ -34,12 +34,12 @@ import veusz.embed as embed
 import veusz.plugins as plugins
 import veusz.utils as utils
 
-import importparams
-import datasets
-import operations
-import dataset_histo
-import mime
-import export
+from . import importparams
+from . import datasets
+from . import operations
+from . import dataset_histo
+from . import mime
+from . import export
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""

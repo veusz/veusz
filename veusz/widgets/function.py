@@ -27,8 +27,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import pickable
-from plotters import GenericPlotter
+from . import pickable
+from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='Function'):
     """Translate text."""

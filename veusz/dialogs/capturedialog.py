@@ -22,7 +22,7 @@ from __future__ import division
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.setting as setting
-from veuszdialog import VeuszDialog
+from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CaptureDialog"):
     """Translate text."""

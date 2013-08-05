@@ -18,7 +18,7 @@
 
 from __future__ import division
 import veusz.qtall as qt4
-import utilfuncs
+from . import utilfuncs
 import os.path
 import textwrap
 

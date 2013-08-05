@@ -31,8 +31,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 import veusz.plugins as plugins
-import exceptiondialog
-from veuszdialog import VeuszDialog
+from . import exceptiondialog
+from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ImportDialog"):
     """Translate text."""

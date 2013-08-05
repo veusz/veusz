@@ -29,7 +29,7 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-from lineeditwithclear import LineEditWithClear
+from .lineeditwithclear import LineEditWithClear
 from veusz.utils.treemodel import TMNode, TreeModel
 
 def _(text, disambiguation=None, context="DatasetBrowser"):

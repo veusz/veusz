@@ -27,8 +27,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import widget
-import axis
+from . import widget
+from . import axis
 
 def _(text, disambiguation=None, context='ColorBar'):
     """Translate text."""
@@ -104,7 +104,7 @@ class ColorBar(axis.Axis):
 
     @classmethod
     def allowedParentTypes(self):
-        import graph, grid, nonorthgraph
+        from . import graph, grid, nonorthgraph
         return (graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph)
 
     @property

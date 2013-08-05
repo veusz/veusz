@@ -18,31 +18,31 @@
 
 """Widgets are defined in this module."""
 
-from widget import Widget, Action
-from axis import Axis
-from axisbroken import AxisBroken
-from axisfunction import AxisFunction
-from graph import Graph
-from grid import Grid
-from plotters import GenericPlotter, FreePlotter
-from pickable import PickInfo
-from point import PointPlotter
-from function import FunctionPlotter
-from textlabel import TextLabel
-from page import Page
-from root import Root
-from key import Key
-from fit import Fit
-from image import Image
-from contour import Contour
-from colorbar import ColorBar
-from shape import Shape, BoxShape, Rectangle, Ellipse, ImageFile
-from line import Line
-from bar import BarPlotter
-from polygon import Polygon
-from vectorfield import VectorField
-from boxplot import BoxPlot
-from polar import Polar
-from ternary import Ternary
-from nonorthpoint import NonOrthPoint
-from nonorthfunction import NonOrthFunction
+from .widget import Widget, Action
+from .axis import Axis
+from .axisbroken import AxisBroken
+from .axisfunction import AxisFunction
+from .graph import Graph
+from .grid import Grid
+from .plotters import GenericPlotter, FreePlotter
+from .pickable import PickInfo
+from .point import PointPlotter
+from .function import FunctionPlotter
+from .textlabel import TextLabel
+from .page import Page
+from .root import Root
+from .key import Key
+from .fit import Fit
+from .image import Image
+from .contour import Contour
+from .colorbar import ColorBar
+from .shape import Shape, BoxShape, Rectangle, Ellipse, ImageFile
+from .line import Line
+from .bar import BarPlotter
+from .polygon import Polygon
+from .vectorfield import VectorField
+from .boxplot import BoxPlot
+from .polar import Polar
+from .ternary import Ternary
+from .nonorthpoint import NonOrthPoint
+from .nonorthfunction import NonOrthFunction

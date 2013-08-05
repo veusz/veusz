@@ -25,7 +25,7 @@ import fnmatch
 
 import veusz.qtall as qt4
 import veusz.setting as setting
-import field
+from . import field
 
 def _(text, disambiguation=None, context='ToolsPlugin'):
     """Translate text."""

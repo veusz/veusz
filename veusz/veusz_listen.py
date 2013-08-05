@@ -37,7 +37,7 @@ try:
 except ImportError:
     # load in the veusz module, but change its path to
     # the veusz directory, and insert it into sys.modules    
-    import __init__ as veusz
+    from . import __init__ as veusz
     thisdir = os.path.dirname( os.path.abspath(__file__) )
     veusz.__path__ = [thisdir]
     veusz.__name__ = 'veusz'

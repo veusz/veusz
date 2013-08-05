@@ -19,8 +19,8 @@
 """Non orthogonal graph root."""
 
 from __future__ import division
-import controlgraph
-from widget import Widget
+from . import controlgraph
+from .widget import Widget
 
 import veusz.qtall as qt4
 import veusz.setting as setting
@@ -80,7 +80,7 @@ class NonOrthGraph(Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import page, grid
+        from . import page, grid
         return (page.Page, grid.Grid)
 
     def graphToPlotCoords(self, coorda, coordb):

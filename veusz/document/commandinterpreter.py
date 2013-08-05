@@ -48,7 +48,7 @@ import traceback
 import pickle
 import os.path
 
-from commandinterface import CommandInterface
+from .commandinterface import CommandInterface
 import veusz.utils as utils
 
 class CommandInterpreter(object):

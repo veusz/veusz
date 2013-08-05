@@ -18,25 +18,25 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from version import version
-from textrender import Renderer, FontMetrics
-from safe_eval import compileChecked, SafeEvalException
-from fitlm import fitLM
+from .version import version
+from .textrender import Renderer, FontMetrics
+from .safe_eval import compileChecked, SafeEvalException
+from .fitlm import fitLM
 
-from utilfuncs import *
-from points import *
-from action import *
-from pdf import *
-from dates import *
-from formatting import *
-from colormap import *
-from extbrushfilling import *
+from .utilfuncs import *
+from .points import *
+from .action import *
+from .pdf import *
+from .dates import *
+from .formatting import *
+from .colormap import *
+from .extbrushfilling import *
 
 try:
     from veusz.helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
         plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath
 except ImportError:
-    from slowfuncs import addNumpyToPolygonF, plotPathsToPainter, \
+    from .slowfuncs import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
         plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath

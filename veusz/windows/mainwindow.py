@@ -33,10 +33,10 @@ import veusz.utils.vzdbus as vzdbus
 import veusz.setting as setting
 import veusz.plugins as plugins
 
-import consolewindow
-import plotwindow
-import treeeditwindow
-from datanavigator import DataNavigatorWindow
+from . import consolewindow
+from . import plotwindow
+from . import treeeditwindow
+from .datanavigator import DataNavigatorWindow
 
 from veusz.dialogs.aboutdialog import AboutDialog
 from veusz.dialogs.reloaddata import ReloadData

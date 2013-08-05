@@ -27,7 +27,7 @@ import numpy as N
 
 import veusz.setting as setting
 
-import widget
+from . import widget
 
 def _(text, disambiguation=None, context='Plotters'):
     """Translate text."""
@@ -46,7 +46,7 @@ class GenericPlotter(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import graph
+        from . import graph
         return (graph.Graph,)
 
     @classmethod
@@ -186,7 +186,7 @@ class FreePlotter(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import page, graph
+        from . import page, graph
         return (graph.Graph, page.Page)
 
     @classmethod

@@ -22,7 +22,7 @@ import veusz.setting as setting
 import veusz.qtall as qt4
 import veusz.utils as utils
 
-import plotters
+from . import plotters
 
 def _(text, disambiguation=None, context='Polygon'):
     """Translate text."""

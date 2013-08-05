@@ -23,7 +23,7 @@ from __future__ import division
 import re
 import numpy as N
 
-import datasets
+from . import datasets
 import veusz.utils as utils
 import veusz.qtall as qt4
 

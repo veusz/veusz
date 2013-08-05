@@ -24,7 +24,7 @@
 from __future__ import division
 import veusz.qtall as qt4
 import veusz.utils as utils
-from veuszdialog import VeuszDialog
+from .veuszdialog import VeuszDialog
 
 class AboutDialog(VeuszDialog):
     """About dialog."""

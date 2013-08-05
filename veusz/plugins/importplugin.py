@@ -24,8 +24,8 @@ import numpy as N
 import veusz.utils as utils
 import veusz.qtall as qt4
 
-import field
-import datasetplugin
+from . import field
+from . import datasetplugin
 
 def _(text, disambiguation=None, context='ImportPlugin'):
     """Translate text."""

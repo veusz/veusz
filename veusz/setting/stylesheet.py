@@ -19,9 +19,9 @@
 from __future__ import division
 import sys
 
-from settings import Settings
-import setting
-import collections
+from .settings import Settings
+from . import setting
+from . import collections
 
 import veusz.qtall as qt4
 

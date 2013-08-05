@@ -20,7 +20,7 @@
 
 from __future__ import division
 import veusz.qtall as qt4
-from veuszdialog import VeuszDialog
+from .veuszdialog import VeuszDialog
 
 class ErrorLoadingDialog(VeuszDialog):
     """Dialog when error loading."""

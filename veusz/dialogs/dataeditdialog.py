@@ -25,7 +25,7 @@ import veusz.qtall as qt4
 
 import veusz.document as document
 from veusz.qtwidgets.datasetbrowser import DatasetBrowser
-from veuszdialog import VeuszDialog
+from .veuszdialog import VeuszDialog
 
 # register function to dataset class to edit dataset
 recreate_register = {}

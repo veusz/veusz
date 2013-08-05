@@ -31,17 +31,15 @@ import re
 import sys
 
 import numpy as N
-import veusz.qtall as qt4
+from .. import qtall as qt4
 
-import controls
-from settingdb import settingdb, uilocale
-from reference import Reference
+from . import controls
+from .settingdb import settingdb, uilocale
+from .reference import Reference
 
-import veusz.utils as utils
+from .. import utils
 
 # if invalid type passed to set
-class InvalidType(Exception):
-    pass
 
 class Setting(object):
     """A class to store a value with a particular type."""
@@ -188,7 +186,7 @@ class Setting(object):
     def fromText(self, text):
         """Convert text to type suitable for setting.
 
-        Raises InvalidType if cannot convert."""
+        Raises utils.InvalidType if cannot convert."""
         return None
 
     def readDefaults(self, root, widgetname):
@@ -348,10 +346,10 @@ class Setting(object):
             comp = self.getDocument().compileCheckedExpression(
                 text)
             if comp is None:
-                raise InvalidType
+                raise utils.InvalidType
             return float( eval(comp, self.getDocument().eval_context) )
         except:
-            raise InvalidType
+            raise utils.InvalidType
 
 # forward setting to another setting
 class SettingBackwardCompat(Setting):
@@ -421,7 +419,7 @@ class Str(Setting):
     def convertTo(self, val):
         if isinstance(val, basestring):
             return val
-        raise InvalidType
+        raise utils.InvalidType
 
     def toText(self):
         return self.val
@@ -441,7 +439,7 @@ class Bool(Setting):
     def convertTo(self, val):
         if type(val) in (bool, int):
             return bool(val)
-        raise InvalidType
+        raise utils.InvalidType
 
     def toText(self):
         if self.val:
@@ -456,7 +454,7 @@ class Bool(Setting):
         elif t in ('false', '0', 'f', 'n', 'no'):
             return False
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def makeControl(self, *args):
         return controls.Bool(self, *args)
@@ -492,8 +490,8 @@ class Int(Setting):
             if val >= self.minval and val <= self.maxval:
                 return val
             else:
-                raise InvalidType('Out of range allowed')
-        raise InvalidType
+                raise utils.InvalidType('Out of range allowed')
+        raise utils.InvalidType
 
     def toText(self):
         return unicode( uilocale.toString(self.val) )
@@ -506,7 +504,7 @@ class Int(Setting):
         if i >= self.minval and i <= self.maxval:
             return i
         else:
-            raise InvalidType('Out of range allowed')
+            raise utils.InvalidType('Out of range allowed')
 
     def makeControl(self, *args):
         return controls.Int(self, *args)
@@ -515,9 +513,9 @@ def _finiteRangeFloat(f, minval=-1e300, maxval=1e300):
     """Return a finite float in range or raise exception otherwise."""
     f = float(f)
     if not N.isfinite(f):
-        raise InvalidType('Finite values only allowed')
+        raise utils.InvalidType('Finite values only allowed')
     if f < minval or f > maxval:
-        raise InvalidType('Out of range allowed')
+        raise utils.InvalidType('Out of range allowed')
     return f
 
 # for storing floats
@@ -550,7 +548,7 @@ class Float(Setting):
         if isinstance(val, int) or isinstance(val, float):
             return _finiteRangeFloat(val,
                                      minval=self.minval, maxval=self.maxval)
-        raise InvalidType
+        raise utils.InvalidType
 
     def toText(self):
         return unicode(uilocale.toString(self.val))
@@ -576,7 +574,7 @@ class FloatOrAuto(Float):
         elif isinstance(val, basestring) and val.strip().lower() == 'auto':
             return None
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def convertFrom(self, val):
         if val is None:
@@ -611,7 +609,7 @@ class IntOrAuto(Setting):
         elif isinstance(val, basestring) and val.strip().lower() == 'auto':
             return None
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def convertFrom(self, val):
         if val is None:
@@ -632,7 +630,7 @@ class IntOrAuto(Setting):
         else:
             i, ok = uilocale.toLongLong(text)
             if not ok:
-                raise InvalidType
+                raise utils.InvalidType
             return i
             
     def makeControl(self, *args):
@@ -752,7 +750,7 @@ class Distance(Setting):
         if self.distre.match(val) is not None:
             return val
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def toText(self):
         # convert decimal point to display locale
@@ -765,7 +763,7 @@ class Distance(Setting):
         if self.isDist(text):
             return text
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def makeControl(self, *args):
         return controls.Distance(self, *args)
@@ -877,7 +875,7 @@ class Choice(Setting):
         if val in self.vallist:
             return val
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def toText(self):
         return self.val
@@ -886,7 +884,7 @@ class Choice(Setting):
         if text in self.vallist:
             return text
         else:
-            raise InvalidType
+            raise utils.InvalidType
 
     def makeControl(self, *args):
         argsv = {'descriptions': self.descriptions}
@@ -936,12 +934,12 @@ class FloatDict(Setting):
 
     def convertTo(self, val):
         if type(val) != dict:
-            raise InvalidType
+            raise utils.InvalidType
 
         out = {}
         for key, val in val.iteritems():
             if type(val) not in (float, int):
-                raise InvalidType
+                raise utils.InvalidType
             else:
                 out[key] = val
 
@@ -968,11 +966,11 @@ class FloatDict(Setting):
             p = l.strip().split('=')
 
             if len(p) != 2:
-                raise InvalidType
+                raise utils.InvalidType
 
             v, ok = uilocale.toDouble(p[1])
             if not ok:
-                raise InvalidType
+                raise utils.InvalidType
 
             out[ p[0].strip() ] = v
         return out
@@ -987,13 +985,13 @@ class FloatList(Setting):
 
     def convertTo(self, val):
         if type(val) not in (list, tuple):
-            raise InvalidType
+            raise utils.InvalidType
 
         # horribly slow test for invalid entries
         out = []
         for i in val:
             if type(i) not in (float, int):
-                raise InvalidType
+                raise utils.InvalidType
             else:
                 out.append( float(i) )
         return out
@@ -1060,7 +1058,7 @@ class WidgetPath(Str):
         it's the one.
 
         Returns None if setting is blank
-        InvalidType is raised if there's a problem
+        utils.InvalidType is raised if there's a problem
         """
 
         # this is a bit of a hack, so we don't have to pass a value
@@ -1084,7 +1082,7 @@ class WidgetPath(Str):
         try:
             widget = widget.document.resolve(widget, val)
         except ValueError:
-            raise InvalidType
+            raise utils.InvalidType
 
         # check the widget against the list of allowed types if given
         if self.allowedwidgets is not None:
@@ -1093,7 +1091,7 @@ class WidgetPath(Str):
                 if isinstance(widget, c):
                     allowed = True
             if not allowed:
-                raise InvalidType
+                raise utils.InvalidType
         
         return widget
 
@@ -1145,12 +1143,12 @@ class Strings(Setting):
             return (val, )
 
         if type(val) not in (list, tuple):
-            raise InvalidType
+            raise utils.InvalidType
 
         # check each entry in the list is appropriate
         for ds in val:
             if not isinstance(ds, basestring):
-                raise InvalidType
+                raise utils.InvalidType
 
         return tuple(val)
         
@@ -1182,12 +1180,12 @@ class Datasets(Setting):
             return (val, )
 
         if type(val) not in (list, tuple):
-            raise InvalidType
+            raise utils.InvalidType
 
         # check each entry in the list is appropriate
         for ds in val:
             if not isinstance(ds, basestring):
-                raise InvalidType
+                raise utils.InvalidType
 
         return tuple(val)
 
@@ -1235,7 +1233,7 @@ class DatasetExtended(Dataset):
                     return [float(x) for x in val]
                 except (TypeError, ValueError):
                     pass
-        raise InvalidType
+        raise utils.InvalidType
 
     def toText(self):
         if isinstance(self.val, basestring):
@@ -1596,20 +1594,20 @@ class LineSet(Setting):
         """
 
         if type(val) not in (list, tuple):
-            raise InvalidType
+            raise utils.InvalidType
 
         # check each entry in the list is appropriate
         for line in val:
             try:
                 style, width, color, hide = line
             except ValueError:
-                raise InvalidType
+                raise utils.InvalidType
 
             if ( not isinstance(color, basestring) or
                  not Distance.isDist(width) or
                  style not in LineStyle._linestyles or
                  type(hide) not in (int, bool) ):
-                raise InvalidType
+                raise utils.InvalidType
 
         return val
     
@@ -1663,20 +1661,20 @@ class FillSet(Setting):
         """
 
         if type(val) not in (list, tuple):
-            raise InvalidType
+            raise utils.InvalidType
 
         # check each entry in the list is appropriate
         for fill in val:
             try:
                 style, color, hide = fill[:3]
             except ValueError:
-                raise InvalidType
+                raise utils.InvalidType
 
             if ( not isinstance(color, basestring) or
                  style not in utils.extfillstyles or
                  type(hide) not in (int, bool) or
                  len(fill) not in (3, 10) ):
-                raise InvalidType
+                raise utils.InvalidType
 
         return val
     
@@ -1686,7 +1684,7 @@ class FillSet(Setting):
 
     def returnBrushExtended(self, row):
         """Return BrushExtended for the row."""
-        import collections
+        from . import collections
         s = collections.BrushExtended('tempbrush')
 
         if len(self.val) == 0:

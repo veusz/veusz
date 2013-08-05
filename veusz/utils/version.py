@@ -24,7 +24,7 @@ Return Veusz' version number
 """
 
 from __future__ import division
-import utilfuncs
+from . import utilfuncs
 import os.path
 
 def version():

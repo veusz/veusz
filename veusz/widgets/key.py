@@ -26,8 +26,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import widget
-import controlgraph
+from . import widget
+from . import controlgraph
 
 def _(text, disambiguation=None, context='Key'):
     """Translate text."""
@@ -240,7 +240,7 @@ class Key(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import graph
+        from . import graph
         return (graph.Graph,)
 
     @staticmethod

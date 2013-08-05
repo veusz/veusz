@@ -31,9 +31,8 @@ import numpy as N
 
 import veusz.qtall as qt4
 
-import setting
-
-import veusz.utils as utils
+from . import settingdb
+from .. import utils
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
@@ -47,7 +46,7 @@ def styleClear(widget):
 def styleError(widget):
     """Show error state on widget."""
     widget.setStyleSheet("background-color: " +
-                         setting.settingdb.color('error').name() )
+                         settingdb.settingdb.color('error').name() )
 
 class DotDotButton(qt4.QPushButton):
     """A button for opening up more complex editor."""
@@ -87,7 +86,7 @@ class Edit(qt4.QLineEdit):
             styleClear(self)
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
-        except setting.InvalidType:
+        except utils.InvalidType:
             styleError(self)
 
     def onModified(self, mod):
@@ -223,7 +222,7 @@ class String(qt4.QWidget):
             styleClear(self.edit)
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
-        except setting.InvalidType:
+        except utils.InvalidType:
             styleError(self.edit)
 
     def onModified(self, mod):
@@ -381,7 +380,7 @@ class Choice(qt4.QComboBox):
             styleClear(self)
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
-        except setting.InvalidType:
+        except utils.InvalidType:
             styleError(self)
 
     def onModified(self, mod):
@@ -433,7 +432,7 @@ class FillStyleExtended(ChoiceSwitch):
     def _generateIcons(cls):
         """Generate a list of pixmaps for drop down menu."""
 
-        import collections
+        from . import collections
         brush = collections.BrushExtended("")
         brush.color = 'black'
         brush.patternspacing = '5pt'
@@ -487,7 +486,7 @@ class MultiLine(qt4.QTextEdit):
             styleClear(self)
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
-        except setting.InvalidType:
+        except utils.InvalidType:
             styleError(self)
 
     def onModified(self, mod):
@@ -809,12 +808,12 @@ class LineStyle(Choice):
         """Generate a list of icons for drop down menu."""
 
         # import later for dependency issues
-        import veusz.setting.collections
-        import veusz.document
+        from . import collections
+        from .. import document
 
         icons = []
         size = cls.size
-        setn = veusz.setting.collections.Line('temp')
+        setn = collections.Line('temp')
         setn.get('color').set('black')
         setn.get('width').set('1pt')
         
@@ -822,7 +821,7 @@ class LineStyle(Choice):
             pix = qt4.QPixmap(*size)
             pix.fill()
 
-            ph = veusz.document.PaintHelper( (1, 1) )
+            ph = document.PaintHelper( (1, 1) )
 
             painter = qt4.QPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
@@ -1708,7 +1707,7 @@ class Filename(qt4.QWidget):
             styleClear(self.edit)
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
-        except setting.InvalidType:
+        except utils.InvalidType:
             styleError(self.edit)
 
     def onModified(self, mod):

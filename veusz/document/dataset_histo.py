@@ -18,7 +18,7 @@
 
 from __future__ import division
 import numpy as N
-from datasets import Dataset, evalDatasetExpression
+from .datasets import Dataset, evalDatasetExpression
 import veusz.qtall as qt4
 
 def _(text, disambiguation=None, context="Datasets"):

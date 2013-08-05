@@ -21,7 +21,7 @@
 from __future__ import division
 import numpy as N
 import veusz.utils.vzdbus as vzdbus
-import commandinterpreter
+from . import commandinterpreter
 
 class DBusInterface(vzdbus.Object):
     """DBus interface to Veusz document command interface."""

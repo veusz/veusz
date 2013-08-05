@@ -27,14 +27,14 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 
 try:
-    import emf_export
+    from . import emf_export
     hasemf = True
 except ImportError:
     hasemf = False
 
-import svg_export
-import selftest_export
-import painthelper
+from . import svg_export
+from . import selftest_export
+from . import painthelper
 
 # 1m in inch
 m_inch = 39.370079

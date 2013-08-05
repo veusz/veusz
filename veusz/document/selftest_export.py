@@ -19,7 +19,7 @@
 """A paint engine for doing self-tests."""
 
 from __future__ import division
-import svg_export
+from . import svg_export
 
 class SelfTestPaintEngine(svg_export.SVGPaintEngine):
     """Paint engine class for self testing output."""

@@ -29,7 +29,7 @@ import math
 try:
     from veusz.helpers.qtloops import plotLinesToPainter, polygonClip
 except ImportError:
-    from slowfuncs import plotLinesToPainter, polygonClip
+    from .slowfuncs import plotLinesToPainter, polygonClip
 
 def dumppath(p):
     i =0

@@ -16,11 +16,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from field import *
-from datasetplugin import *
-from importplugin import *
-from toolsplugin import *
-from votable import *
+from .field import *
+from .datasetplugin import *
+from .importplugin import *
+from .toolsplugin import *
+from .votable import *
 
 # backward compatibility
 ImportDataset1D = Dataset1D

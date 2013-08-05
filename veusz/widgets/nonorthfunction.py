@@ -26,9 +26,9 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import pickable
-from nonorthgraph import NonOrthGraph, FillBrush
-from widget import Widget
+from . import pickable
+from .nonorthgraph import NonOrthGraph, FillBrush
+from .widget import Widget
 
 def _(text, disambiguation=None, context='NonOrthFunction'):
     """Translate text."""

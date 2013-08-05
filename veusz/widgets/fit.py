@@ -30,8 +30,8 @@ import veusz.setting as setting
 import veusz.utils as utils
 import veusz.qtall as qt4
 
-from function import FunctionPlotter
-import widget
+from .function import FunctionPlotter
+from . import widget
 
 try:
     import minuit

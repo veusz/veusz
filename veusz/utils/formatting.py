@@ -20,7 +20,7 @@ from __future__ import division
 import re
 import math
 
-import dates
+from . import dates
 import veusz.qtall as qt4
 
 _formaterror = 'FormatError'

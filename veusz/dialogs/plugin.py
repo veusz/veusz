@@ -25,9 +25,9 @@ from itertools import izip
 import veusz.qtall as qt4
 import veusz.document as document
 import veusz.plugins as plugins
-import exceptiondialog
-import dataeditdialog
-from veuszdialog import VeuszDialog
+from . import exceptiondialog
+from . import dataeditdialog
+from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PluginDialog"):
     """Translate text."""

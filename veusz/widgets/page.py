@@ -27,8 +27,8 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import widget
-import controlgraph
+from . import widget
+from . import controlgraph
 
 def _(text, disambiguation=None, context='Page'):
     """Translate text."""
@@ -308,7 +308,7 @@ class Page(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import root
+        from . import root
         return (root.Root,)
         
     def draw(self, parentposn, painthelper, outerbounds=None):

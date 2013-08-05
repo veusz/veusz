@@ -25,9 +25,9 @@ import numpy as N
 try:
     from veusz.helpers.qtloops import plotPathsToPainter
 except ImportError:
-    from slowfuncs import plotPathsToPainter
+    from .slowfuncs import plotPathsToPainter
 
-import colormap
+from . import colormap
 
 """This is the symbol plotting part of Veusz
 

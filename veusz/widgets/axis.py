@@ -28,9 +28,9 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import widget
-import axisticks
-import controlgraph
+from . import widget
+from . import axisticks
+from . import controlgraph
 
 ###############################################################################
 
@@ -322,7 +322,7 @@ class Axis(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import graph, grid
+        from . import graph, grid
         return (graph.Graph, grid.Grid)
 
     @property

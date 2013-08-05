@@ -29,7 +29,7 @@ import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
 
-from widgettree import WidgetTreeModel, WidgetTreeView
+from .widgettree import WidgetTreeModel, WidgetTreeView
 
 def _(text, disambiguation=None, context='TreeEditWindow'):
     """Translate text."""

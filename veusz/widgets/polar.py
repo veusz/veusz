@@ -23,9 +23,9 @@
 from __future__ import division
 import numpy as N
 
-from nonorthgraph import NonOrthGraph
-from axisticks import AxisTicks
-import axis
+from .nonorthgraph import NonOrthGraph
+from .axisticks import AxisTicks
+from . import axis
 
 import veusz.qtall as qt4
 import veusz.document as document

@@ -28,8 +28,8 @@ import veusz.setting as setting
 import veusz.document as document
 import veusz.utils as utils
 
-import axis
-import controlgraph
+from . import axis
+from . import controlgraph
 
 def _(text, disambiguation=None, context='BrokenAxis'):
     '''Translate text.'''

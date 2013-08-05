@@ -27,11 +27,11 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-import pickable
+from . import pickable
 
-from nonorthgraph import NonOrthGraph, FillBrush
-from widget import Widget
-from point import MarkerFillBrush
+from .nonorthgraph import NonOrthGraph, FillBrush
+from .widget import Widget
+from .point import MarkerFillBrush
 
 def _(text, disambiguation=None, context='NonOrthPoint'):
     """Translate text."""

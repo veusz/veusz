@@ -21,13 +21,13 @@
 # insert history combo into the list of modules so that it can be found
 # by loadUi - yuck
 import sys
-import historycombo
-import historycheck
-import historyvaluecombo
-import historygroupbox
-import historyspinbox
-import recentfilesbutton
-import lineeditwithclear
+from . import historycombo
+from . import historycheck
+from . import historyvaluecombo
+from . import historygroupbox
+from . import historyspinbox
+from . import recentfilesbutton
+from . import lineeditwithclear
 
 sys.modules['historycombo'] = historycombo
 sys.modules['historycheck'] = historycheck

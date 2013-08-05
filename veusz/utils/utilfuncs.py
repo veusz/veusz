@@ -37,6 +37,9 @@ import numpy as N
 class IgnoreException(Exception):
     """A special exception class to be ignored by the exception handler."""
 
+class InvalidType(Exception):
+    """Exception used when invalid values are used in settings."""
+
 def _getVeuszDirectory():
     """Get resource and examples directories for Veusz."""
 

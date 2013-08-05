@@ -27,7 +27,7 @@ import veusz.document as document
 import veusz.setting as setting
 import veusz.utils as utils
 
-from plotters import GenericPlotter
+from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='BarPlotter'):
     """Translate text."""

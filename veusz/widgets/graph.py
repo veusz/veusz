@@ -26,8 +26,8 @@ import veusz.setting as setting
 import veusz.utils as utils
 import veusz.document as document
 
-import widget
-import controlgraph
+from . import widget
+from . import controlgraph
 
 def _(text, disambiguation=None, context='Graph'):
     """Translate text."""
@@ -90,13 +90,13 @@ class Graph(widget.Widget):
 
     @classmethod
     def allowedParentTypes(self):
-        import page, grid
+        from . import page, grid
         return (page.Page, grid.Grid)
 
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
 
-        import axis
+        from . import axis
         if self.parent.getChild('x') is None:
             axis.Axis(self, name='x')
         if self.parent.getChild('y') is None:
@@ -171,7 +171,7 @@ class Graph(widget.Widget):
         '''Update the margins before drawing.'''
 
         # yuck, avoid circular imports
-        import axisbroken
+        from . import axisbroken
 
         s = self.settings
 
