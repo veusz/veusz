@@ -26,8 +26,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="DataCreate2D"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def checkGetStep(text):
     """Check step syntax is okay.
@@ -138,7 +137,7 @@ class DataCreate2DDialog(VeuszDialog):
         # get contents of combo boxes
         text = {}
         for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
-            text[name] = unicode(getattr(self, name+'combo').currentText()).strip()
+            text[name] = getattr(self, name+'combo').currentText().strip()
 
         disable = False
         # need name and zexpr
@@ -165,7 +164,7 @@ class DataCreate2DDialog(VeuszDialog):
 
         text = {}
         for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
-            text[name] = unicode(getattr(self, name+'combo').currentText()).strip()
+            text[name] = getattr(self, name+'combo').currentText().strip()
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
         if self.mode == 'xyzexpr':

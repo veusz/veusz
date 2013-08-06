@@ -62,7 +62,7 @@ class FieldText(Field):
         controls[1].setText(val)
 
     def getControlResults(self, cntrls):
-        return unicode( cntrls[1].text() )
+        return cntrls[1].text()
 
 class FieldCombo(Field):
     """Drop-down combobox on dialog."""
@@ -96,7 +96,7 @@ class FieldCombo(Field):
             controls[1].setCurrentIndex(controls[1].findText(val))
 
     def getControlResults(self, cntrls):
-        return unicode( cntrls[1].currentText() )
+        return cntrls[1].currentText()
 
 class _WidgetCombo(qt4.QComboBox):
     """Combo box for selecting widgets."""

@@ -28,8 +28,7 @@ import numpy as N
 
 def _(text, disambiguation=None, context="HistogramDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def checkValidator(combo):
     """Is this validator ok?"""
@@ -117,7 +116,7 @@ class HistoDataDialog(VeuszDialog):
     def datasetExprChanged(self):
         """Validate expression."""
         text = self.indataset.text()
-        document.evalDatasetExpression(self.document, unicode(text))
+        document.evalDatasetExpression(self.document, text)
 
     class Params(object):
         """Parameters to creation of histogram."""
@@ -128,24 +127,23 @@ class HistoDataDialog(VeuszDialog):
 
             if not checkValidator(dialog.minval):
                 raise RuntimeError(_("Invalid minimum value"))
-            minval = unicode( dialog.minval.text() )
+            minval = dialog.minval.text()
             if minval != 'Auto':
                 minval = float(minval)
 
             if not checkValidator(dialog.maxval):
                 raise RuntimeError(_("Invalid maximum value"))
-            maxval = unicode( dialog.maxval.text() )
+            maxval = dialog.maxval.text()
             if maxval != 'Auto':
                 maxval = float(maxval)
 
             islog = dialog.logarithmic.isChecked()
             self.binparams = (numbins, minval, maxval, islog)
 
-            self.expr = unicode( dialog.indataset.currentText() )
-            self.outdataset = unicode( dialog.outdataset.currentText() )
-            self.outbins = unicode( dialog.outbins.currentText() )
-            self.method = unicode( dialog.methodGroup.getRadioChecked().
-                                   objectName() )
+            self.expr = dialog.indataset.currentText()
+            self.outdataset = dialog.outdataset.currentText()
+            self.outbins = dialog.outbins.currentText()
+            self.method = dialog.methodGroup.getRadioChecked().objectName()
             self.manualbins = list( dialog.bindata )
             self.manualbins.sort()
             if len(self.manualbins) == 0:

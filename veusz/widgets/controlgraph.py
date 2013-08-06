@@ -33,8 +33,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context='controlgraph'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 ##############################################################################
 

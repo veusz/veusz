@@ -29,7 +29,7 @@ class ErrorLoadingDialog(VeuszDialog):
         VeuszDialog.__init__(self, parent, 'errorloading.ui')
 
         # insert filename into label
-        text = unicode(self.errorlabel.text())
+        text = self.errorlabel.text()
         text = text % filename
         self.errorlabel.setText(text)
         self.errormessagelabel.setText(error)

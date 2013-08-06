@@ -36,8 +36,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ImportDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTab(qt4.QWidget):
     """Tab for a particular import type."""
@@ -126,7 +125,7 @@ class ImportTabStandard(ImportTab):
         """Standard Veusz importing."""
 
         # convert controls to values
-        descriptor = unicode( self.descriptoredit.text() )
+        descriptor = self.descriptoredit.text()
         useblocks = self.blockcheckbox.isChecked()
         ignoretext = self.ignoretextcheckbox.isChecked()
 
@@ -275,7 +274,7 @@ class ImportTabCSV(ImportTab):
         for r in xrange(numrows):
             for c in xrange(numcols):
                 if c < len(rows[r]):
-                    item = qt4.QTableWidgetItem(unicode(rows[r][c]))
+                    item = qt4.QTableWidgetItem(rows[r][c])
                     t.setItem(r, c, item)
 
         return True
@@ -298,7 +297,7 @@ class ImportTabCSV(ImportTab):
         headerignore = self.csvignorehdrspin.value()
         rowsignore = self.csvignoretopspin.value()
         blanksaredata = self.csvblanksdatacheck.isChecked()
-        dateformat = unicode(self.csvdatefmtcombo.currentText())
+        dateformat = self.csvdatefmtcombo.currentText()
         headermode = ('multi', '1st', 'none')[
             self.csvheadermodecombo.currentIndex()]
 
@@ -369,7 +368,7 @@ class ImportTab2D(ImportTab):
 
     def doPreview(self, filename, encoding):
         """Preview 2d dataset files."""
-        
+
         try:
             ifile = utils.openEncoding(filename, encoding)
             text = ifile.read(4096)+'\n'
@@ -389,7 +388,7 @@ class ImportTab2D(ImportTab):
         # this really needs improvement...
 
         # get datasets and split into a list
-        datasets = unicode( self.twod_datasetsedit.text() )
+        datasets = self.twod_datasetsedit.text()
         datasets = re.split('[, ]+', datasets)
 
         # strip out blank items
@@ -400,12 +399,12 @@ class ImportTab2D(ImportTab):
             self.twod_previewedit.setPlainText(_('At least one dataset needs to '
                                                  'be specified'))
             return
-        
+
         # convert range parameters
         ranges = []
         for e in (self.twod_xminedit, self.twod_xmaxedit,
                   self.twod_yminedit, self.twod_ymaxedit):
-            f = unicode(e.text())
+            f = e.text()
             r = None
             try:
                 r = float(f)
@@ -447,7 +446,7 @@ class ImportTab2D(ImportTab):
             for ds in op.outdatasets:
                 output.append(' %s' % doc.data[ds].description(
                         showlinked=False))
-            
+
             output = '\n'.join(output)
         except document.Read2DError as e:
             output = _('Error importing datasets:\n %s') % str(e)
@@ -491,7 +490,7 @@ class ImportTabFITS(ImportTab):
             cntrl = getattr(self, 'fits%scolumn' % c)
             cntrl.setCurrentIndex(0)
         self.fitswcsmode.setCurrentIndex(0)
-            
+
     def doPreview(self, filename, encoding):
         """Set up controls for FITS file."""
 
@@ -511,7 +510,7 @@ class ImportTabFITS(ImportTab):
                   ' You can download it from'
                   ' http://www.stsci.edu/resources/software_hardware/pyfits'))
             return False
-        
+
         # try to identify fits file
         try:
             ifile = open(filename,  'rU')
@@ -581,7 +580,7 @@ class ImportTabFITS(ImportTab):
 
     def slotFitsUpdateCombos(self):
         """Update list of fits columns when new item is selected."""
-        
+
         items = self.fitshdulist.selectedItems()
         if len(items) != 0:
             item = items[0]
@@ -599,7 +598,7 @@ class ImportTabFITS(ImportTab):
                 cols = ['None']
                 cols += ['%s (%s)' %
                          (i.name, i.format) for i in data[1]]
-        
+
         for c in ('data', 'sym', 'pos', 'neg'):
             cntrl = getattr(self, 'fits%scolumn' % c)
             cntrl.setEnabled(enablecolumns)
@@ -617,10 +616,10 @@ class ImportTabFITS(ImportTab):
             hdunum = int( str(item.text(0)) )
 
             # any name for the dataset?
-            filename = unicode(self.dialog.filenameedit.text())
+            filename = self.dialog.filenameedit.text()
             prefix, suffix = self.dialog.getPrefixSuffix(filename)
 
-            if not ( prefix + unicode(self.fitsdatasetname.text()) +
+            if not ( prefix + self.fitsdatasetname.text() +
                      suffix ).strip():
                 return False
 
@@ -628,18 +627,18 @@ class ImportTabFITS(ImportTab):
             data = self.fitsitemdata[hdunum]
             if data[0] != 'image' and self.fitsdatacolumn.currentIndex() == 0:
                 return False
-            
+
             return True
         return False
 
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import fits file."""
-        
+
         item = self.fitshdulist.selectedItems()[0]
         hdunum = int( str(item.text(0)) )
         data = self.fitsitemdata[hdunum]
 
-        name = (prefix + unicode(self.fitsdatasetname.text()) + suffix).strip()
+        name = (prefix + self.fitsdatasetname.text() + suffix).strip()
 
         wcsmode = None
         if data[0] == 'table':
@@ -732,7 +731,7 @@ class ImportTabPlugins(ImportTab):
 
         if idx >= 0:
             self.pluginType.setCurrentIndex(idx)
-        
+
         self.pluginChanged(-1)
 
     def getPluginFields(self):
@@ -745,7 +744,7 @@ class ImportTabPlugins(ImportTab):
 
     def getSelectedPlugin(self):
         """Get instance selected plugin or none."""
-        selname = unicode(self.pluginType.currentText())
+        selname = self.pluginType.currentText()
         names = [p.name for p in plugins.importpluginregistry]
         try:
             idx = names.index(selname)
@@ -822,9 +821,9 @@ class ImportTabPlugins(ImportTab):
 
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import using plugin."""
-        
+
         fields = self.getPluginFields()
-        plugin = unicode(self.pluginType.currentText())
+        plugin = self.pluginType.currentText()
 
         params = document.ImportParamsPlugin(
             plugin=plugin,
@@ -972,7 +971,7 @@ class ImportDialog(VeuszDialog):
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
 
         # use filename to guess a path if possible
-        filename = unicode(self.filenameedit.text())
+        filename = self.filenameedit.text()
         if os.path.isdir(filename):
             ImportDialog.dirname = filename
         elif os.path.isdir( os.path.dirname(filename) ):
@@ -988,7 +987,7 @@ class ImportDialog(VeuszDialog):
 
     def guessImportTab(self):
         """Guess import tab based on filename."""
-        filename = unicode( self.filenameedit.text() )
+        filename = self.filenameedit.text()
 
         fname, ftype = os.path.splitext(filename)
         # strip off any gz, bz2 extensions to get real extension
@@ -1014,7 +1013,7 @@ class ImportDialog(VeuszDialog):
         # save so we can restore later
         tab = self.methodtab.currentIndex()
         setting.settingdb['import_lasttab'] = tab
-        filename = unicode(self.filenameedit.text())
+        filename = self.filenameedit.text()
         encoding = str(self.encodingcombo.currentText())
         importtab = self.methodtab.currentWidget()
 
@@ -1042,7 +1041,7 @@ class ImportDialog(VeuszDialog):
     def slotImport(self):
         """Do the importing"""
 
-        filename = unicode( self.filenameedit.text() )
+        filename = self.filenameedit.text()
         linked = self.linkcheckbox.isChecked()
         encoding = str(self.encodingcombo.currentText())
         if filename == '{clipboard}':
@@ -1054,7 +1053,7 @@ class ImportDialog(VeuszDialog):
         # import according to tab selected
         importtab = self.methodtab.currentWidget()
         prefix, suffix = self.getPrefixSuffix(filename)
-        tags = unicode(self.tagcombo.currentText()).split()
+        tags = self.tagcombo.currentText().split()
 
         try:
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
@@ -1072,7 +1071,7 @@ class ImportDialog(VeuszDialog):
 
     def retnDatasetInfo(self, dsnames, linked, filename):
         """Return a list of information for the dataset names given."""
-        
+
         lines = [_('Imported data for datasets:')]
         dsnames.sort()
         for name in dsnames:
@@ -1090,9 +1089,9 @@ class ImportDialog(VeuszDialog):
     def getPrefixSuffix(self, filename):
         """Get prefix and suffix values."""
         f = utils.cleanDatasetName( os.path.basename(filename) )
-        prefix = unicode( self.prefixcombo.lineEdit().text() )
+        prefix = self.prefixcombo.lineEdit().text()
         prefix = prefix.replace('$FILENAME', f)
-        suffix = unicode( self.suffixcombo.lineEdit().text() )
+        suffix = self.suffixcombo.lineEdit().text()
         suffix = suffix.replace('$FILENAME', f)
         return prefix, suffix
 
@@ -1116,6 +1115,6 @@ class ImportDialog(VeuszDialog):
     def updateClipPreview(self):
         """Clipboard contents changed, so update preview if showing clipboard."""
 
-        filename = unicode(self.filenameedit.text())
+        filename = self.filenameedit.text()
         if filename == '{clipboard}':
             self.slotUpdatePreview()

@@ -1314,7 +1314,7 @@ class _StdRenderer(_Renderer):
                 # if want vertical centering, better to centre around middle
                 # of typical letter (i.e. where strike position is)
                 #totalheight = fm.strikeOutPos()*2
-                totalheight = fm.boundingRect(qt4.QChar('0')).height()
+                totalheight = fm.boundingRectChar('0').height()
             else:
                 # if top/bottom alignment, better to use maximum letter height
                 totalheight = fm.ascent()

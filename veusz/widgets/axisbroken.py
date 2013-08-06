@@ -33,8 +33,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='BrokenAxis'):
     '''Translate text.'''
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class AxisBroken(axis.Axis):
     '''An axis widget which can have gaps in it.'''

@@ -29,8 +29,7 @@ from . import field
 
 def _(text, disambiguation=None, context='ToolsPlugin'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # add an instance of your class to this list to be registered
 toolspluginregistry = []

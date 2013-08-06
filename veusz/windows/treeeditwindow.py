@@ -33,8 +33,7 @@ from .widgettree import WidgetTreeModel, WidgetTreeView
 
 def _(text, disambiguation=None, context='TreeEditWindow'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class SettingsProxy(object):
     """Object to handle communication between widget/settings

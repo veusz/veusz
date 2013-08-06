@@ -37,8 +37,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Contour'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def finitePoly(poly):
     """Remove non-finite coordinates from numpy arrays of coordinates."""

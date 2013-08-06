@@ -447,7 +447,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 self.celement, 'g',
                 ' '.join(grpattrb) )
 
-            text = escapeXML( unicode(textitem.text()) )
+            text = escapeXML( textitem.text() )
 
             textattrb = [
                 'x="%s"' % fltStr(pt.x()*scale),

@@ -27,8 +27,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class StyleSheet(Settings):
     """A class for handling default values of settings.
@@ -74,18 +73,18 @@ StyleSheet.register(StylesheetLine)
 
 def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet and Text class."""
-    families = [ unicode(name) for name in qt4.QFontDatabase().families() ]
+    families = qt4.QFontDatabase().families()
     
     deffont = None
     for f in ('Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
               'Serif'):
         if f in families:
-            deffont = unicode(f)
+            deffont = f
             break
             
     if deffont is None:
         print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
-        deffont = unicode(families[0])
+        deffont = families[0]
 
     collections.Text.defaultfamily = deffont
     collections.Text.families = families

@@ -31,8 +31,7 @@ from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='BarPlotter'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class BarFill(setting.Settings):
     '''Filling of bars.'''

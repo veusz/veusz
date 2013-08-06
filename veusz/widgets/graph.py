@@ -31,8 +31,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Graph'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""

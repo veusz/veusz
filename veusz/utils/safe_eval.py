@@ -31,8 +31,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='SafeEval'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # blacklist of nodes
 forbidden_nodes = frozenset((

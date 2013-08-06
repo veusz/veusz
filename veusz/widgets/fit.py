@@ -40,8 +40,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Fit'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     """Do fitting with minuit (if installed)."""

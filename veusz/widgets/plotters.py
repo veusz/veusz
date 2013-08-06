@@ -31,8 +31,7 @@ from . import widget
 
 def _(text, disambiguation=None, context='Plotters'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class GenericPlotter(widget.Widget):
     """Generic plotter."""

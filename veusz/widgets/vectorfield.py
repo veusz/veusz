@@ -31,8 +31,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='VectorField'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class VectorField(plotters.GenericPlotter):
     '''A plotter for plotting a vector field.'''

@@ -38,7 +38,7 @@ class AboutDialog(VeuszDialog):
         self.logolabel.setPixmap( utils.getPixmap('logo.png') )
 
         # add version to copyright text
-        copyrighttext = unicode(self.copyrightlabel.text())
+        copyrighttext = self.copyrightlabel.text()
         copyrighttext = copyrighttext % {'version': utils.version()}
         self.copyrightlabel.setText(copyrighttext)
 

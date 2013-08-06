@@ -38,8 +38,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='XY'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # functions for plotting error bars
 # different styles are made up of combinations of these functions

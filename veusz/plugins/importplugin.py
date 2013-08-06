@@ -29,8 +29,7 @@ from . import datasetplugin
 
 def _(text, disambiguation=None, context='ImportPlugin'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # add an instance of your class to this list to get it registered
 importpluginregistry = []

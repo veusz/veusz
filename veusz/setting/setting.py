@@ -494,7 +494,7 @@ class Int(Setting):
         raise utils.InvalidType
 
     def toText(self):
-        return unicode( uilocale.toString(self.val) )
+        return uilocale.toString(self.val)
 
     def fromText(self, text):
         i, ok = uilocale.toLongLong(text)
@@ -551,7 +551,7 @@ class Float(Setting):
         raise utils.InvalidType
 
     def toText(self):
-        return unicode(uilocale.toString(self.val))
+        return uilocale.toString(self.val)
 
     def fromText(self, text):
         f, ok = uilocale.toDouble(text)
@@ -587,7 +587,7 @@ class FloatOrAuto(Float):
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return unicode(uilocale.toString(self.val))
+            return uilocale.toString(self.val)
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
@@ -622,7 +622,7 @@ class IntOrAuto(Setting):
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return unicode( uilocale.toString(self.val) )
+            return uilocale.toString(self.val)
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
@@ -754,11 +754,11 @@ class Distance(Setting):
 
     def toText(self):
         # convert decimal point to display locale
-        return self.val.replace('.', qt4.QString(uilocale.decimalPoint()))
+        return self.val.replace('.', uilocale.decimalPoint())
 
     def fromText(self, text):
         # convert decimal point from display locale
-        text = text.replace(qt4.QString(uilocale.decimalPoint()), '.')
+        text = text.replace(uilocale.decimalPoint(), '.')
 
         if self.isDist(text):
             return text
@@ -1003,7 +1003,7 @@ class FloatList(Setting):
         join = ', '
         if uilocale.decimalPoint() == qt4.QChar(','):
             join = '; '
-        return join.join( [unicode(uilocale.toString(x)) for x in self.val] )
+        return join.join( [uilocale.toString(x) for x in self.val] )
 
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
@@ -1243,7 +1243,7 @@ class DatasetExtended(Dataset):
             join = ', '
             if uilocale.decimalPoint() == qt4.QChar(','):
                 join = '; '
-            return join.join( [ unicode(uilocale.toString(x))
+            return join.join( [ uilocale.toString(x)
                                 for x in self.val ] )
 
     def fromText(self, text):

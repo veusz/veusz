@@ -26,8 +26,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CaptureDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class CaptureDialog(VeuszDialog):
     """Capture dialog.
@@ -145,7 +144,7 @@ class CaptureDialog(VeuszDialog):
         """User requested capture."""
 
         # object to interpret data from stream
-        descriptor = unicode( self.descriptorEdit.text() )
+        descriptor = self.descriptorEdit.text()
         simpleread = document.SimpleRead(descriptor)
 
         maxlines = None
@@ -179,17 +178,16 @@ class CaptureDialog(VeuszDialog):
             # create stream
             if method == 0:
                 # file/socket
-                stream = document.FileCaptureStream(
-                    unicode(self.filenameEdit.text()) )
+                stream = document.FileCaptureStream(self.filenameEdit.text())
             elif method == 1:
                 # internet socket
                 stream = document.SocketCaptureStream(
-                    unicode(self.hostEdit.text()),
+                    self.hostEdit.text(),
                     int(self.portEdit.text()) )
             elif method == 2:
                 # external program
                 stream = document.CommandCaptureStream(
-                    unicode(self.commandLineEdit.text()) )
+                    self.commandLineEdit.text())
         except EnvironmentError as e:
             # problem opening stream
             qt4.QMessageBox.critical(self, _("Cannot open input"),
@@ -248,9 +246,9 @@ class CapturingDialog(VeuszDialog):
         self.displaytimer = qt4.QTimer(self)
         self.connect( self.displaytimer, qt4.SIGNAL('timeout()'),
                       self.slotDisplayTimer )
-        self.sourceLabel.setText( unicode(self.sourceLabel.text()) %
+        self.sourceLabel.setText( self.sourceLabel.text() %
                                   stream.name )
-        self.txt_statusLabel = unicode(self.statusLabel.text())
+        self.txt_statusLabel = self.statusLabel.text()
         self.slotDisplayTimer() # initialise label
 
         # timer to update document

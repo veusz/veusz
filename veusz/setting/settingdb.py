@@ -25,8 +25,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Preferences"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # default values to some settings in case the user does not have these
 defaultValues = {
@@ -136,10 +135,10 @@ class _SettingDB(object):
 
         for key in s.childKeys():
             val = s.value(key).toString()
-            realkey = unicode(key).replace(self.sepchars, '/')
+            realkey = key.replace(self.sepchars, '/')
 
             try:
-                self.database[realkey] = eval( unicode(val) )
+                self.database[realkey] = eval(val)
             except:
                 print >>sys.stderr, ('Error interpreting item "%s" in '
                                      'settings file' % realkey)
@@ -163,15 +162,11 @@ class _SettingDB(object):
             cleankey = key.replace('/', self.sepchars)
             cleankeys.append(cleankey)
 
-            # repr doesn't work on QStrings
-            if isinstance(value, qt4.QString):
-                value = unicode(value)
-
             s.setValue(cleankey, qt4.QVariant(repr(value)))
 
         # now remove all the values which have been removed
         for key in list(s.childKeys()):
-            if unicode(key) not in cleankeys:
+            if key not in cleankeys:
                 s.remove(key)
 
     def get(self, key, defaultval=None):

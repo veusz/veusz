@@ -28,8 +28,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='Widget'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Action(object):
     """A class to wrap functions operating on widgets.

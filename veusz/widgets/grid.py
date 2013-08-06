@@ -31,8 +31,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Grid'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class _gridengine:
     """Internal class to build up grid of widgets."""

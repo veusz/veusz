@@ -34,8 +34,7 @@ from ..utils.treemodel import TMNode, TreeModel
 
 def _(text, disambiguation=None, context="DatasetBrowser"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def datasetLinkFile(ds):
     """Get a linked filename from a dataset."""
@@ -326,7 +325,7 @@ class DatasetRelationModel(TreeModel):
     def setData(self, idx, data, role):
         """Rename dataset."""
         dsnode = self.objFromIndex(idx)
-        newname = unicode(data.toString())
+        newname = data.toString()
         if not utils.validateDatasetName(newname) or newname in self.doc.data:
             return False
 
@@ -556,7 +555,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             tag, ok = qt4.QInputDialog.getText(
                 self, _("New tag"), _("Enter new tag"))
             if ok:
-                tag = unicode(tag).strip().replace(' ', '')
+                tag = tag.strip().replace(' ', '')
                 if tag:
                     self.doc.applyOperation( document.OperationDataTag(
                             tag, dsnames) )
@@ -724,7 +723,7 @@ class DatasetBrowser(qt4.QWidget):
 
     def slotFilterChanged(self, filtertext):
         """Filtering changed by user."""
-        self.navtree.changeFilter(unicode(filtertext))
+        self.navtree.changeFilter(filtertext)
 
     def selectDataset(self, dsname):
         """Find, and if possible select dataset name."""

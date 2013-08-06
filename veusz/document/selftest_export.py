@@ -35,7 +35,7 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
     def drawTextItem(self, pt, textitem):
         """Write text directly in self test mode."""
 
-        text = unicode(textitem.text()).encode('ascii', 'xmlcharrefreplace')
+        text = textitem.text().encode('ascii', 'xmlcharrefreplace')
         svg_export.SVGElement(self.celement, 'text',
                               'x="%s" y="%s" font-size="%gpt" fill="%s"' %
                               (svg_export.fltStr(pt.x()*svg_export.scale),

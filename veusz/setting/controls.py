@@ -36,8 +36,7 @@ from .. import utils
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def styleClear(widget):
     """Return widget to default"""
@@ -80,7 +79,7 @@ class Edit(qt4.QLineEdit):
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
-        text = unicode(self.text())
+        text = self.text()
         try:
             val = self.setting.fromText(text)
             styleClear(self)
@@ -153,7 +152,7 @@ class _EditBox(qt4.QTextEdit):
         """Tell the calling widget that we are closing, and provide
         the new text."""
 
-        text = unicode(self.toPlainText())
+        text = self.toPlainText()
         text = text.replace('\n', '')
         self.emit(qt4.SIGNAL('closing'), text)
         event.accept()
@@ -194,7 +193,7 @@ class String(qt4.QWidget):
 
         # if button is down and there's no existing popup, bring up a new one
         if on:
-            e = _EditBox( unicode(self.edit.text()),
+            e = _EditBox( self.edit.text(),
                           self.setting.readonly, self.button)
 
             # we get notified with text when the popup closes
@@ -216,7 +215,7 @@ class String(qt4.QWidget):
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
-        text = unicode(self.edit.text())
+        text = self.edit.text()
         try:
             val = self.setting.fromText(text)
             styleClear(self.edit)
@@ -374,7 +373,7 @@ class Choice(qt4.QComboBox):
     def slotActivated(self, val):
         """If a different item is chosen."""
 
-        text = unicode(self.currentText())
+        text = self.currentText()
         try:
             val = self.setting.fromText(text)
             styleClear(self)
@@ -480,7 +479,7 @@ class MultiLine(qt4.QTextEdit):
         """Allows us to check the contents of the widget."""
         qt4.QTextEdit.focusOutEvent(self, *args)
 
-        text = unicode(self.toPlainText())
+        text = self.toPlainText()
         try:
             val = self.setting.fromText(text)
             styleClear(self)
@@ -517,7 +516,7 @@ class Distance(Choice):
         self.blockSignals(True)
 
         # get current text
-        text = unicode(self.currentText())
+        text = self.currentText()
 
         # get rid of non-numeric things from the string
         num = self.stripnumre.sub('', text)
@@ -633,7 +632,7 @@ class Dataset(qt4.QWidget):
         if on:
             from ..qtwidgets.datasetbrowser import DatasetBrowserPopup
             d = DatasetBrowserPopup(self.document,
-                                    unicode(self.choice.currentText()),
+                                    self.choice.currentText(),
                                     self.button,
                                     filterdims=set((self.dimensions,)),
                                     filterdtype=set((self.datatype,)) )
@@ -665,7 +664,7 @@ class DatasetOrString(Dataset):
 
         # if button is down and there's no existing popup, bring up a new one
         if on:
-            e = _EditBox( unicode(self.choice.currentText()),
+            e = _EditBox( self.choice.currentText(),
                           self.choice.setting.readonly, self.textbutton)
 
             # we get notified with text when the popup closes
@@ -920,13 +919,13 @@ class Color(qt4.QWidget):
         col = qt4.QColorDialog.getColor(self.setting.color(), self)
         if col.isValid():
             # change setting
-            val = unicode( col.name() )
+            val = col.name()
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
     def slotActivated(self, val):
         """A different value is selected."""
         
-        text = unicode(self.combo.currentText())
+        text = self.combo.currentText()
         val = self.setting.fromText(text)
         self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
@@ -1277,7 +1276,7 @@ class LineSet(ListSet):
         sender = self.sender()
         row, col = self.identifyPosn(sender)
 
-        text = unicode(sender.text())
+        text = sender.text()
         if setting.Distance.isDist(text):
             # valid distance
             styleClear(sender)
@@ -1575,7 +1574,7 @@ class Datasets(MultiSettingWidget):
 
     def readControl(self, control):
         """Get text for control."""
-        return unicode( control.lineEdit().text() )
+        return control.lineEdit().text()
 
     def getDatasets(self):
         """Get applicable datasets (sorted)."""
@@ -1627,7 +1626,7 @@ class Strings(MultiSettingWidget):
 
     def readControl(self, control):
         """Get text for control."""
-        return unicode( control.text() )
+        return control.text()
 
     def updateControls(self):
         """Set values of controls."""
@@ -1695,13 +1694,13 @@ class Filename(qt4.QWidget):
             self, title, self.edit.text(), filefilter)
 
         if filename:
-            val = unicode(filename)
+            val = filename
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
 
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
 
-        text = unicode(self.edit.text())
+        text = self.edit.text()
         try:
             val = self.setting.fromText(text)
             styleClear(self.edit)
@@ -1744,7 +1743,7 @@ class FontFamily(qt4.QFontComboBox):
 
     def slotActivated(self, val):
         """Update setting if a different item is chosen."""
-        newval = unicode(self.currentText())
+        newval = self.currentText()
         self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, newval )
 
     def onModified(self, mod):
@@ -1838,5 +1837,5 @@ class AxisBound(Choice):
         """Called if the mode of the axis changes.
         Re-set text as float or date."""
 
-        if unicode(self.currentText()).lower() != 'auto':
+        if self.currentText().lower() != 'auto':
             self.setEditText( self.setting.toText() )

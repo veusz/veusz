@@ -24,8 +24,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context="SafetyImportDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class SafetyImportDialog(qt4.QMessageBox):
 

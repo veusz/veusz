@@ -55,8 +55,7 @@ from ..dialogs import dataeditdialog
 
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # shortcut to this
 setdb = setting.settingdb
@@ -79,7 +78,7 @@ class DBusWinInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface, in_signature='s')
     def TriggerAction(self, action):
         """Activate action given."""
-        self.actions[unicode(action)].trigger()
+        self.actions[action].trigger()
 
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
@@ -269,7 +268,7 @@ class MainWindow(qt4.QMainWindow):
             return []
         else:
             # get list of vsz files dropped
-            urls = [unicode(u.path()) for u in mime.urls()]
+            urls = [u.path() for u in mime.urls()]
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
 
@@ -920,7 +919,7 @@ class MainWindow(qt4.QMainWindow):
             # save directory for next time
             self.dirname = fd.directory().absolutePath()
             # update the edit box
-            filename = unicode( fd.selectedFiles()[0] )
+            filename = fd.selectedFiles()[0]
             if os.path.splitext(filename)[1] == '':
                 filename += '.' + filetype
 
@@ -941,7 +940,7 @@ class MainWindow(qt4.QMainWindow):
             # save directory for next time
             self.dirname = fd.directory().absolutePath()
 
-            filename = unicode( fd.selectedFiles()[0] )
+            filename = fd.selectedFiles()[0]
             try:
                 open(filename)
             except EnvironmentError as e:
@@ -1243,7 +1242,7 @@ class MainWindow(qt4.QMainWindow):
             # show busy cursor
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
-            filename = unicode( fd.selectedFiles()[0] )
+            filename = fd.selectedFiles()[0]
 
             # Add a default extension if one isn't supplied
             # this is the extension without the dot

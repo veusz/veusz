@@ -30,8 +30,7 @@ filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
 
 def _(text, disambiguation=None, context='NonOrthGraph'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class FillBrush(setting.BrushExtended):
     '''Brush for filling point region.'''

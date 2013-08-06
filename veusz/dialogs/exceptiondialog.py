@@ -24,10 +24,11 @@ import sys
 import time
 import traceback
 import urllib2
-import sip
 import re
+import base64
 
 import numpy
+import sip
 
 from .. import qtall as qt4
 from .. import utils
@@ -35,8 +36,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ExceptionDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 _reportformat = \
 '''Veusz version: %s
@@ -88,13 +88,13 @@ class ExceptionSendDialog(VeuszDialog):
         """Send text."""
         # build up the text of the message
         text = ( _sendformat % (
-                unicode(self.emailedit.text()),
+                self.emailedit.text(),
                 self.text,
-                unicode(self.detailsedit.toPlainText())
+                self.detailsedit.toPlainText()
                 ))
 
         # send the message as base-64 encoded utf-8
-        text = str( qt4.QString(text).toUtf8().toBase64() )
+        text = base64.b64encode(text.encode('utf8'))
 
         try:
             # send the message

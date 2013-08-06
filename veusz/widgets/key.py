@@ -31,8 +31,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Key'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 #############################################################################
 # classes for controlling key position interactively

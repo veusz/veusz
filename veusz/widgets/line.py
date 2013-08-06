@@ -33,8 +33,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Line'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Line(plotters.FreePlotter):
     """A line on the plot/graph."""

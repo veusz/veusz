@@ -32,8 +32,7 @@ from . import axis
 
 def _(text, disambiguation=None, context='ColorBar'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ColorBar(axis.Axis):
     """Color bar for showing scale of image.

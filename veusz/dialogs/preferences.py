@@ -24,8 +24,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PrefsDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # names for display of colors and a longer description
 color_names = {
@@ -254,13 +253,13 @@ class PreferencesDialog(VeuszDialog):
         setdb['export_SVG_text_as_text'] = self.exportSVGTextAsText.isChecked()
 
         # new document settings
-        setdb['stylesheet_default'] = unicode(self.styleLineEdit.text())
-        setdb['custom_default'] = unicode(self.customLineEdit.text())
+        setdb['stylesheet_default'] = self.styleLineEdit.text()
+        setdb['custom_default'] = self.customLineEdit.text()
 
         # colors
         for name, color in self.chosencolors.iteritems():
             isdefault = self.colordefaultcheck[name].isChecked()
-            colorname = unicode(color.name())
+            colorname = color.name()
             setdb['color_' + name] = (isdefault, colorname)
 
         # picker
@@ -268,7 +267,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['picker_to_console'] = self.pickerToConsoleCheck.isChecked()
 
         # plugins
-        plugins = [unicode(x) for x in self.pluginmodel.stringList()]
+        plugins = self.pluginmodel.stringList()
         setdb['plugins'] = plugins
 
         self.plotwindow.updatePlotSettings()

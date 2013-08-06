@@ -32,8 +32,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Page'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 defaultrange = [1e99, -1e99]
 

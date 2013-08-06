@@ -26,8 +26,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="StylesheetDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class StylesheetDialog(VeuszDialog):
     """This is a dialog box to edit stylesheets.

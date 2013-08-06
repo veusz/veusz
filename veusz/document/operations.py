@@ -44,8 +44,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Operations"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 ###############################################################################
 # Setting operations

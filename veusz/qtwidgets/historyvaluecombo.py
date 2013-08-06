@@ -53,8 +53,8 @@ class HistoryValueCombo(qt4.QComboBox):
             return
 
         # collect current items
-        history = [ unicode(self.itemText(i)) for i in xrange(self.count()) ]
-        history.insert(0, unicode(self.currentText()))
+        history = [ self.itemText(i) for i in xrange(self.count()) ]
+        history.insert(0, self.currentText())
 
         # remove dups
         histout = []
@@ -88,6 +88,6 @@ class HistoryValueCombo(qt4.QComboBox):
         qt4.QComboBox.hideEvent(self, event)
 
         if self.hasshown:
-            text = unicode(self.currentText())
+            text = self.currentText()
             setting.settingdb[self.getSettingName()] = text
 

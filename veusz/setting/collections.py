@@ -26,8 +26,7 @@ from .settings import Settings
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Line(Settings):
     '''For holding properities of a line.'''

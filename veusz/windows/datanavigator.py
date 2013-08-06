@@ -23,8 +23,7 @@ from ..qtwidgets.datasetbrowser import DatasetBrowser
 
 def _(text, disambiguation=None, context="DataNavigator"):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class DataNavigatorWindow(qt4.QDockWidget):
     """A dock window containing a dataset browsing widget."""

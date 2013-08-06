@@ -32,8 +32,7 @@ from .widget import Widget
 
 def _(text, disambiguation=None, context='NonOrthFunction'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class NonOrthFunction(Widget):
     '''Widget for plotting a function on a non-orthogonal plot.'''

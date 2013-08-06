@@ -34,8 +34,7 @@ from .. import utils
 
 def _(text, disambiguation=None, context='Polar'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Tick(setting.Line):
     '''Polar tick settings.'''

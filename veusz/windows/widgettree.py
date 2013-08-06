@@ -26,8 +26,7 @@ from .. import document
 
 def _(text, disambiguation=None, context="WidgetTree"):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class WidgetTreeModel(qt4.QAbstractItemModel):
     """A model representing the widget tree structure.
@@ -108,7 +107,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """User renames object. This renames the widget."""
         
         widget = index.internalPointer()
-        name = unicode(value.toString())
+        name = value.toString()
 
         # check symbols in name
         if not utils.validateWidgetName(name):

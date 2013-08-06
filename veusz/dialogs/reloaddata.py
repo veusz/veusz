@@ -29,8 +29,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ReloadDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ReloadData(VeuszDialog):
     """Dialog for reloading linked datasets."""

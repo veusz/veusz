@@ -32,8 +32,7 @@ recreate_register = {}
 
 def _(text, disambiguation=None, context="DataEditDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
@@ -611,8 +610,8 @@ class DataEditDialog(VeuszDialog):
                     lines.append( '\t'.join(rowitems) )
                     rowitems = []
                 lastrow = row
-            rowitems.append( unicode(
-                model.createIndex(row, column).data().toString()) )
+            rowitems.append(
+                model.createIndex(row, column).data().toString() )
         if rowitems:
             lines.append( '\t'.join(rowitems) )
         lines.append('')  # blank line at end

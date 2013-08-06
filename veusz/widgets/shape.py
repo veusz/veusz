@@ -32,8 +32,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Shape'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Shape(plotters.FreePlotter):
     """A shape on a page/graph."""

@@ -41,8 +41,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context="Document"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # python identifier
 identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')

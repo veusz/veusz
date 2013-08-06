@@ -36,8 +36,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Axis'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class MajorTick(setting.Line):
     '''Major tick settings.'''

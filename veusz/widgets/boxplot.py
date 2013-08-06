@@ -32,8 +32,7 @@ from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='BoxPlot'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def percentile(sortedds, perc):
     """Given a sorted dataset, get the percentile perc.

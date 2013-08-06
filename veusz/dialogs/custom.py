@@ -25,8 +25,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CustomDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class CustomItemModel(qt4.QAbstractTableModel):
     """A model for editing custom items."""
@@ -128,7 +127,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
         if index.isValid() and role == qt4.Qt.EditRole:
             col = index.column()
             row = index.row()
-            value = unicode(value.toString())
+            value = value.toString()
 
             if col == 0:
                 ok = value in ('constant', 'function', 'import', 'colormap')

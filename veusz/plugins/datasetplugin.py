@@ -34,8 +34,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='DatasetPlugin'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # add an instance of your class to this list to be registered
 datasetpluginregistry = []

@@ -26,8 +26,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context="Tutorial"):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class TutorialStep(qt4.QObject):
     def __init__(self, text, mainwin,

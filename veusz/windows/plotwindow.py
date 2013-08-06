@@ -34,8 +34,7 @@ from .. import widgets
 
 def _(text, disambiguation=None, context='PlotWindow'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class PickerCrosshairItem( qt4.QGraphicsPathItem ):
     """The picker cross widget: it moves from point to point and curve to curve

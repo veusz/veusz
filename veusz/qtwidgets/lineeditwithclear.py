@@ -66,4 +66,4 @@ class LineEditWithClear(qt4.QLineEdit):
 
     def updateCloseButton(self, text):
         """Button should only appear if there is text."""
-        self.clearbutton.setVisible( not text.isEmpty() )
+        self.clearbutton.setVisible(text != '')

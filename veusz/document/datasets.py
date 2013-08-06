@@ -31,8 +31,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context="Datasets"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def convertNumpy(a, dims=1):
     """Convert to a numpy double if possible.
@@ -201,7 +200,7 @@ class DatasetBase(object):
         """Return a value cast to this dataset data type.
         We assume here it is a float, so override if not
         """
-        if isinstance(val, basestring) or isinstance(val, qt4.QString):
+        if isinstance(val, basestring):
             val, ok = setting.uilocale.toDouble(val)
             if ok: return val
             raise ValueError("Invalid floating point number")
@@ -619,7 +618,7 @@ class DatasetDateTime(Dataset):
 
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
-        if isinstance(val, basestring) or isinstance(val, qt4.QString):
+        if isinstance(val, basestring):
             v = utils.dateStringToDate( unicode(val) )
             if not N.isfinite(v):
                 try:

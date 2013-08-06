@@ -30,8 +30,7 @@ from . import axis
 
 def _(text, disambiguation=None, context='FunctionAxis'):
     '''Translate text.'''
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class AxisError(RuntimeError):
     pass

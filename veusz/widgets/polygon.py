@@ -26,8 +26,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Polygon'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Polygon(plotters.FreePlotter):
     """For plotting polygons."""

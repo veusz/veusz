@@ -41,8 +41,7 @@ m_inch = 39.370079
 
 def _(text, disambiguation=None, context="Export"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Export(object):
     """Class to do the document exporting.

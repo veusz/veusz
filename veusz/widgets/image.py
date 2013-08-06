@@ -31,8 +31,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Image'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified

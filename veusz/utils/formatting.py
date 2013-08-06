@@ -53,7 +53,7 @@ def localeFormat(totfmt, args, locale=None):
             except IndexError:
                 raise TypeError("Not enough arguments for format string")
             if locale is not None and code in 'eEfFgG':
-                s = s.replace('.', qt4.QString(locale.decimalPoint()))
+                s = s.replace('.', locale.decimalPoint())
 
         strings.append(s)
 
@@ -104,7 +104,7 @@ def formatSciNotation(num, formatargs, locale=None):
 
     # do substitution of decimals
     if locale is not None:
-        leader = leader.replace('.', qt4.QString(locale.decimalPoint()))
+        leader = leader.replace('.', locale.decimalPoint())
 
     return '%s10^{%i}' % (leader, int(exponent))
 
@@ -129,7 +129,7 @@ def formatGeneral(num, fmtarg, locale=None):
             retn = _formaterror
 
         if locale is not None:
-            retn = retn.replace('.', qt4.QString(locale.decimalPoint()))
+            retn = retn.replace('.', locale.decimalPoint())
     return retn
 
 engsuffixes = ( 'y', 'z', 'a', 'f', 'p', 'n',
@@ -158,7 +158,7 @@ def formatEngineering(num, fmtarg, locale=None):
 
     text = ('%' + fmtarg + 'g%s') % (val, suffix)
     if locale is not None:
-        text = text.replace('.', qt4.QString(locale.decimalPoint()))
+        text = text.replace('.', locale.decimalPoint())
     return text
 
 # catch general veusz formatting expression

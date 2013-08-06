@@ -23,8 +23,7 @@ from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Datasets"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,

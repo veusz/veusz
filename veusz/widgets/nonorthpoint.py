@@ -35,8 +35,7 @@ from .point import MarkerFillBrush
 
 def _(text, disambiguation=None, context='NonOrthPoint'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class NonOrthPoint(Widget):
     '''Widget for plotting points in a non-orthogonal plot.'''

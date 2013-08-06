@@ -37,8 +37,7 @@ from .. import utils
 
 def _(text, disambiguation=None, context='Ternary'):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def rotatePts(x, y, theta):
     '''Rotate points by theta degrees.'''

@@ -33,8 +33,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='TextLabel'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class TextLabel(plotters.FreePlotter):
 

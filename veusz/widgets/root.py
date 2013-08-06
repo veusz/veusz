@@ -30,8 +30,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Root'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Root(widget.Widget):
     """Root widget class for plotting the document."""

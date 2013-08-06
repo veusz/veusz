@@ -27,8 +27,7 @@ from . import dataeditdialog
 
 def _(text, disambiguation=None, context="DataCreateDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class _DSException(RuntimeError):
     """A class to handle errors while trying to create datasets."""
@@ -120,7 +119,7 @@ class DataCreateDialog(VeuszDialog):
         for editing."""
 
         if index >= 0:
-            dsname = unicode( self.nameedit.text() )
+            dsname = self.nameedit.text()
             if dsname in self.document.data:
                 self.reEditDataset(self.document.data[dsname], dsname)
 
@@ -168,7 +167,7 @@ class DataCreateDialog(VeuszDialog):
         """Enable/disable createbutton."""
 
         # dataset name checks
-        dstext = unicode(self.nameedit.text())
+        dstext = self.nameedit.text()
         dsvalid = utils.validateDatasetName(dstext)
         dsexists = dstext in self.document.data
 
@@ -187,7 +186,7 @@ class DataCreateDialog(VeuszDialog):
             editsokay = True
 
         # we needs some input on the value
-        if len(unicode(self.valueedit.text())) == 0:
+        if not self.valueedit.text():
             editsokay = False
 
         # hide / show create button depending whether dataset exists
@@ -214,7 +213,7 @@ class DataCreateDialog(VeuszDialog):
     def createButtonClicked(self):
         """Create button pressed."""
         
-        dsname = unicode( self.nameedit.text() )
+        dsname = self.nameedit.text()
         dsexists = dsname in self.document.data
 
         try:
@@ -256,12 +255,12 @@ class DataCreateDialog(VeuszDialog):
         Raises _DSException if error
         """
 
-        numsteps = int( unicode(self.numstepsedit.text()) )
+        numsteps = int(self.numstepsedit.text())
 
         # go over each of the ranges / values
         vals = {}
         for key, cntrl in self.dsedits.iteritems():
-            text = unicode( cntrl.text() ).strip()
+            text = cntrl.text().strip()
 
             if not text:
                 continue
@@ -295,14 +294,14 @@ class DataCreateDialog(VeuszDialog):
 
         Raises _DSException if error
         """
-        t0 = float( unicode(self.tstartedit.text()) )
-        t1 = float( unicode(self.tendedit.text()) )
-        numsteps = int( unicode(self.tstepsedit.text()) )
+        t0 = float(self.tstartedit.text())
+        t1 = float(self.tendedit.text())
+        numsteps = int(self.tstepsedit.text())
 
         # get expressions
         vals = {}
         for key, cntrl in self.dsedits.iteritems():
-            text = unicode( cntrl.text() ).strip()
+            text = cntrl.text().strip()
             if text:
                 vals[key] = text
 
@@ -317,7 +316,7 @@ class DataCreateDialog(VeuszDialog):
         # get expression for each part of the dataset
         vals = {}
         for key, cntrl in self.dsedits.iteritems():
-            text = unicode( cntrl.text() ).strip()
+            text = cntrl.text().strip()
             if text:
                 vals[key] = text
 

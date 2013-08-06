@@ -34,8 +34,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context='ConsoleWindow'):
     """Translate text."""
-    return unicode( 
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class _Writer(object):
     """ Class to behave like an output stream. Pipes input back to
@@ -75,7 +74,7 @@ class _CommandEdit(qt4.QLineEdit):
         """ Called if the return key is pressed in the edit control."""
 
         # retrieve the text
-        command = unicode( self.text() )
+        command = self.text()
         self.setText("")
 
         # keep the command for history
@@ -100,7 +99,7 @@ class _CommandEdit(qt4.QLineEdit):
             # look for the next or previous history item which our current text
             # is a prefix of
             if self.isModified():
-                text = unicode(self.text())
+                text = self.text()
                 self.history_posn = len(self.history)
             else:
                 text = self.entered_text
@@ -322,7 +321,7 @@ class ConsoleWindow(qt4.QDockWidget):
             self._prompt.setText( '...' )
         else:
             # actually execute the command
-            self.interpreter.run( unicode(newc) )
+            self.interpreter.run(newc)
             self.command_build = ''
             # modify the prompt
             self._prompt.setText( '>>>' )

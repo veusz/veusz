@@ -332,7 +332,7 @@ def openEncoding(filename, encoding, mode='r'):
     instead.
     """
     if filename == '{clipboard}':
-        text = unicode(qt4.QApplication.clipboard().text())
+        text = qt4.QApplication.clipboard().text()
         return StringIO.StringIO(text)
     else:
         return codecs.open(filename, mode, encoding, 'ignore')
@@ -367,7 +367,7 @@ class UnicodeCSVReader:
             f = UTF8Recoder(open(filename), encoding)
         else:
             # take the unicode clipboard and just put into utf-8 format
-            s = unicode(qt4.QApplication.clipboard().text())
+            s = qt4.QApplication.clipboard().text()
             s = s.encode('utf-8')
             f = StringIO.StringIO(s)
 
@@ -391,7 +391,7 @@ def populateCombo(combo, items):
     """
 
     # existing setting
-    currenttext = unicode(combo.currentText())
+    currenttext = combo.currentText()
 
     # add to list if not included
     if currenttext not in items:

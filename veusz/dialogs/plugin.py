@@ -31,8 +31,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PluginDialog"):
     """Translate text."""
-    return unicode(
-        qt4.QCoreApplication.translate(context, text, disambiguation))
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 def handlePlugin(mainwindow, doc, pluginkls):
     """Show plugin dialog or directly execute (if it takes no parameters)."""
