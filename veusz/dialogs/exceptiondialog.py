@@ -149,7 +149,11 @@ def formatLocals(exception):
             if key == 'self' and value not in alreadyself:
                 alreadyself.add(value)
                 for attr in sorted( dir(value) ):
-                    v = getattr(value, attr)
+                    try:
+                        v = getattr(value, attr)
+                    except:
+                        # can sometimes get type error
+                        continue
                     if hasattr(v, '__call__'):
                         # skip callables, to cut down output
                         continue

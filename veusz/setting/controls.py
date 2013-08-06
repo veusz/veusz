@@ -1785,9 +1785,9 @@ class Colormap(Choice):
         names = sorted(document.colormaps.keys())
 
         icons = Colormap._generateIcons(document, names)
-        setting.controls.Choice.__init__(self, setn, True,
-                                         names, parent,
-                                         icons=icons)
+        Choice.__init__(self, setn, True,
+                        names, parent,
+                        icons=icons)
         self.setIconSize( qt4.QSize(*self.size) )
 
     @classmethod
