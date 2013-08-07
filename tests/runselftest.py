@@ -88,6 +88,9 @@ class StupidFontMetrics(object):
     def boundingRect(self, c):
         return qt4.QRectF(0, 0, self.height()*0.5, self.height())
 
+    def boundingRectChar(self, c):
+        return qt4.QRectF(0, 0, self.height()*0.5, self.height())
+
 _pt = utils.textrender.PartText
 class PartTextAscii(_pt):
     """Text renderer which converts text to ascii."""
