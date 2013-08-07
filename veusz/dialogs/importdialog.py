@@ -51,7 +51,7 @@ class ImportTab(qt4.QWidget):
 
     def loadUi(self):
         """Load up UI file."""
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs',
+        qt4.loadUi(os.path.join(utils.resourceDirectory, 'ui',
                                 self.resource), self)
         self.uiloaded = True
 

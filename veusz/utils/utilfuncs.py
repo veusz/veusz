@@ -62,17 +62,16 @@ def _getVeuszDirectory():
 
     # now get example directory (which may be a symlink)
     examplesdir = os.path.realpath( os.path.join(resdir, 'examples') )
-    examplesdir = os.environ.get('VEUSZ_EXAMPLES_DIR', examplesdir)
 
     return resdir, examplesdir
 
 # get resource and example directories
-veuszDirectory, exampleDirectory = _getVeuszDirectory()
+resourceDirectory, exampleDirectory = _getVeuszDirectory()
 
 def getLicense():
     """Return license text."""
     try:
-        f = open(os.path.join(veuszDirectory, 'COPYING'), 'rU')
+        f = open(os.path.join(resourceDirectory, 'COPYING'), 'rU')
         text = f.read()
         f.close()
     except EnvironmentError:

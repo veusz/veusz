@@ -46,8 +46,7 @@ class VeuszDialog(qt4.QDialog):
         qt4.QDialog.__init__(self, mainwindow, flag)
         self.setAttribute(qt4.Qt.WA_DeleteOnClose)
 
-        qt4.loadUi(os.path.join(utils.veuszDirectory, 'dialogs', uifile),
-                   self)
+        qt4.loadUi(os.path.join(utils.resourceDirectory, 'ui', uifile), self)
 
         self.mainwindow = mainwindow
 

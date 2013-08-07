@@ -42,7 +42,7 @@ except ImportError:
     py2app = False
 
 # get version
-version = open('veusz/VERSION').read().strip()
+version = open('VERSION').read().strip()
 
 class install(orig_install):
     user_options = orig_install.user_options + [
@@ -122,7 +122,7 @@ def findData(dirname, extns):
     """Return tuple for directory name and list of file extensions for data."""
     files = []
     for extn in extns:
-        files += glob.glob(os.path.join('veusz', dirname, '*.'+extn))
+        files += glob.glob(os.path.join(dirname, '*.'+extn))
     files.sort()
     return (dirname, files)
 
@@ -141,9 +141,9 @@ setup(name = 'veusz',
                       'License :: OSI Approved :: '
                       'GNU General Public License (GPL)',
                       'Topic :: Scientific/Engineering :: Visualization' ],
-      data_files = [ ('', ['veusz/VERSION']),
-                     findData('dialogs', ('ui',)),
-                     findData('windows/icons', ('png', 'svg')),
+      data_files = [ ('', ['VERSION']),
+                     findData('ui', ('ui',)),
+                     findData('icons', ('png', 'svg')),
                      findData('examples', ('vsz', 'py', 'csv', 'dat')),
                      ],
       packages = [ 'veusz',

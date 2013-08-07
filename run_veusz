@@ -23,8 +23,8 @@
 import sys
 import os.path
 
-thisdir = os.path.abspath(os.path.dirname(__file__))
-os.environ['VEUSZ_EXAMPLES_DIR'] = os.path.join(thisdir, 'examples')
+thisdir = os.path.abspath( os.path.dirname(__file__) )
+os.environ['VEUSZ_RESOURCE_DIR'] = os.path.join(thisdir)
 
 try:
     import veusz

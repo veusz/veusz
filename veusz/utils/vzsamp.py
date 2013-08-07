@@ -20,7 +20,7 @@ import atexit
 
 from ..windows.mainwindow import MainWindow
 from ..document.commandinterpreter import CommandInterpreter
-from ..utils import veuszDirectory
+from ..utils import resourceDirectory
 
 samp = None
 
@@ -67,8 +67,8 @@ else:
         global samp
 
         try:
-            icon = 'file:///' + '/'.join([veuszDirectory,
-                                          'windows', 'icons', 'veusz.png'])
+            icon = 'file:///' + '/'.join([resourceDirectory,
+                                          'icons', 'veusz_16.png'])
 
             samp = SAMPIntegratedClient(metadata={'samp.name': 'Veusz',
                                                   'samp.icon.url': icon})

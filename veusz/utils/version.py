@@ -30,5 +30,5 @@ import os.path
 def version():
     """Return the version number as a string."""
 
-    f = open( os.path.join(utilfuncs.veuszDirectory, 'VERSION') )
+    f = open( os.path.join(utilfuncs.resourceDirectory, 'VERSION') )
     return f.readline().strip()

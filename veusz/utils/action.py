@@ -23,7 +23,7 @@ import os.path
 import textwrap
 
 # where images are stored
-imagedir = os.path.join(utilfuncs.veuszDirectory, 'windows', 'icons')
+imagedir = os.path.join(utilfuncs.resourceDirectory, 'icons')
 
 _pixmapcache = {}
 def getPixmap(pixmap):
