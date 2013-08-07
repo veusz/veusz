@@ -1001,7 +1001,7 @@ class FloatList(Setting):
         # can't use the comma for splitting if used as a decimal point
 
         join = ', '
-        if uilocale.decimalPoint() == qt4.QChar(','):
+        if uilocale.decimalPoint() == ',':
             join = '; '
         return join.join( [uilocale.toString(x) for x in self.val] )
 
@@ -1010,7 +1010,7 @@ class FloatList(Setting):
 
         # don't use commas if it is the decimal separator
         splitre = r'[\t\n, ]+'
-        if uilocale.decimalPoint() == qt4.QChar(','):
+        if uilocale.decimalPoint() == ',':
             splitre = r'[\t\n; ]+'
 
         out = []
@@ -1241,7 +1241,7 @@ class DatasetExtended(Dataset):
         else:
             # join based on , or ; depending on decimal point
             join = ', '
-            if uilocale.decimalPoint() == qt4.QChar(','):
+            if uilocale.decimalPoint() == ',':
                 join = '; '
             return join.join( [ uilocale.toString(x)
                                 for x in self.val ] )
@@ -1256,7 +1256,7 @@ class DatasetExtended(Dataset):
 
         # split based on , or ; depending on decimal point
         splitre = r'[\t\n, ]+'
-        if uilocale.decimalPoint() == qt4.QChar(','):
+        if uilocale.decimalPoint() == ',':
             splitre = r'[\t\n; ]+'
 
         out = []
