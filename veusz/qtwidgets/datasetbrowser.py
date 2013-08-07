@@ -118,7 +118,7 @@ class DatasetNode(TMNode):
         try:
             ds = self.doc.data[self.data[0]]
         except KeyError:
-            return qt4.QVariant()
+            return None
 
         c = self.cols[column]
         if c == "name":
@@ -129,7 +129,7 @@ class DatasetNode(TMNode):
             if ds.tags:
                 text += '\n\n' + _('Tags: %s') % (' '.join(list(sorted(ds.tags))))
 
-            return qt4.QVariant(textwrap.fill(text, 40))
+            return textwrap.fill(text, 40)
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
             text = ds.userPreview()
             # add preview of dataset if possible
@@ -137,10 +137,10 @@ class DatasetNode(TMNode):
             if pix:
                 text = text.replace("\n", "<br>")
                 text = "<html>%s<br>%s</html>" % (text, utils.pixmapAsHtml(pix))
-            return qt4.QVariant(text)
+            return text
         elif c == "linkfile" or c == "type":
-            return qt4.QVariant(textwrap.fill(ds.linkedInformation(), 40))
-        return qt4.QVariant()
+            return textwrap.fill(ds.linkedInformation(), 40)
+        return None
 
     def dataset(self):
         """Get associated dataset."""
@@ -164,10 +164,10 @@ class FilenameNode(TMNode):
         """basename of filename for data."""
         if column == 0:
             if self.data[0] == "/":
-                return qt4.QVariant("/")
+                return "/"
             else:
-                return qt4.QVariant(os.path.basename(self.data[0]))
-        return qt4.QVariant()
+                return os.path.basename(self.data[0])
+        return None
 
     def filename(self):
         """Return filename."""
@@ -176,8 +176,8 @@ class FilenameNode(TMNode):
     def toolTip(self, column):
         """Full filename for tooltip."""
         if column == 0:
-            return qt4.QVariant(self.data[0])
-        return qt4.QVariant()
+            return self.data[0]
+        return None
 
 def treeFromList(nodelist, rootdata):
     """Construct a tree from a list of nodes."""
@@ -322,10 +322,9 @@ class DatasetRelationModel(TreeModel):
             f |= qt4.Qt.ItemIsEditable
         return f
 
-    def setData(self, idx, data, role):
+    def setData(self, idx, newname, role):
         """Rename dataset."""
         dsnode = self.objFromIndex(idx)
-        newname = data.toString()
         if not utils.validateDatasetName(newname) or newname in self.doc.data:
             return False
 
@@ -420,7 +419,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         matches = self.model.match(
             self.model.index(0, 0, qt4.QModelIndex()),
-            qt4.Qt.DisplayRole, qt4.QVariant(dsname), -1,
+            qt4.Qt.DisplayRole, dsname, -1,
             qt4.Qt.MatchFixedString | qt4.Qt.MatchCaseSensitive |
             qt4.Qt.MatchRecursive )
         for idx in matches:

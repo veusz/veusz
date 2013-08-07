@@ -62,7 +62,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         # why do we get passed invalid indicies? :-)
         if not index.isValid():
-            return qt4.QVariant()
+            return None
 
         column = index.column()
         obj = index.internalPointer()
@@ -70,20 +70,20 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if role == qt4.Qt.DisplayRole:
             # return text for columns
             if column == 0:
-                return qt4.QVariant(obj.name)
+                return obj.name
             elif column == 1:
-                return qt4.QVariant(obj.typename)
+                return obj.typename
 
         elif role == qt4.Qt.DecorationRole:
             # return icon for first column
             if column == 0:
                 filename = 'button_%s' % obj.typename
-                return qt4.QVariant(utils.getIcon(filename))
+                return utils.getIcon(filename)
 
         elif role == qt4.Qt.ToolTipRole:
             # provide tool tip showing description
             if obj.userdescription:
-                return qt4.QVariant(obj.userdescription)
+                return obj.userdescription
 
         elif role == qt4.Qt.TextColorRole:
             # show disabled looking text if object or any parent is hidden
@@ -97,11 +97,11 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
             # return brush for hidden widget text, based on disabled text
             if hidden:
-                return qt4.QVariant(qt4.QPalette().brush(qt4.QPalette.Disabled,
-                                                         qt4.QPalette.Text))
+                return qt4.QPalette().brush(qt4.QPalette.Disabled,
+                                            qt4.QPalette.Text)
 
         # return nothing
-        return qt4.QVariant()
+        return None
 
     def setData(self, index, value, role):
         """User renames object. This renames the widget."""
@@ -146,9 +146,9 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
             val = ('Name', 'Type')[section]
-            return qt4.QVariant(val)
+            return val
 
-        return qt4.QVariant()
+        return None
 
     def index(self, row, column, parent):
         """Construct an index for a child of parent."""

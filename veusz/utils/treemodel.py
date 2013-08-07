@@ -39,7 +39,7 @@ class TMNode(object):
 
     def toolTip(self, column):
         """Return tooltip for column, if any."""
-        return qt4.QVariant()
+        return None
 
     def doPrint(self, indent=0):
         """Print out tree for debugging."""
@@ -54,9 +54,9 @@ class TMNode(object):
     def nodeData(self, idx):
         """Get data with index given."""
         try:
-            return qt4.QVariant(self.data[idx])
+            return self.data[idx]
         except:
-            return qt4.QVariant()
+            return None
 
     def childWithData1(self, d):
         """Get child node with 1st column data d."""
@@ -108,7 +108,7 @@ class TreeModel(qt4.QAbstractItemModel):
             elif role == qt4.Qt.ToolTipRole:
                 return item.toolTip(index.column())
 
-        return qt4.QVariant()
+        return None
 
     def flags(self, index):
         """Return whether node is editable."""
@@ -120,7 +120,7 @@ class TreeModel(qt4.QAbstractItemModel):
         """Use root node to get headers."""
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
             return self.root.nodeData(section)
-        return qt4.QVariant()
+        return None
 
     def objFromIndex(self, idx):
         """Given an index, return the node."""

@@ -27,6 +27,7 @@ if sys.platform != 'win32' and sys.platform != 'darwin':
 
 import sip
 sip.setapi('QString', 2)
+sip.setapi('QVariant', 2)
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

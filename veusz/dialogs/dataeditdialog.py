@@ -81,14 +81,14 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         if ds is not None and data is not None and role == qt4.Qt.DisplayRole:
             # blank row at end of data
             if index.row() == len(data):
-                return qt4.QVariant()
+                return None
 
-            # convert data to QVariant
+            # convert data to data
             d = data[index.row()]
-            return ds.uiDataItemToQVariant(d)
+            return ds.uiDataItemToData(d)
 
         # empty entry
-        return qt4.QVariant()
+        return None
 
     def headerData(self, section, orientation, role):
         """Return row numbers or column names."""
@@ -96,19 +96,19 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         try:
             ds = self.document.data[self.dsname]
         except KeyError:
-            return qt4.QVariant()
+            return None
 
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
                 # column names
-                return qt4.QVariant( ds.column_descriptions[section] )
+                return ds.column_descriptions[section]
             else:
                 if section == len(ds.data):
                     return "+"
                 # return row numbers
-                return qt4.QVariant(section+1)
+                return section+1
 
-        return qt4.QVariant()
+        return None
         
     def flags(self, index):
         """Update flags to say that items are editable."""
@@ -152,7 +152,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         # update if conversion okay
         try:
-            val = ds.uiConvertToDataItem( value.toString() )
+            val = ds.uiConvertToDataItem(value)
         except ValueError:
             return False
 
@@ -240,12 +240,12 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
 
         if role == qt4.Qt.DisplayRole:
             if index.row() < self.rowcounts[dsidx]-1:
-                # convert data to QVariant
+                # convert data to Data
                 d = data[index.row()]
-                return ds.uiDataItemToQVariant(d)
+                return ds.uiDataItemToData(d)
 
         # empty entry
-        return qt4.QVariant()
+        return None
 
     def headerData(self, section, orientation, role):
         """Return row numbers or column names."""
@@ -257,14 +257,14 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
                 ds = self.document.data[dsname]
                 descr = ds.column_descriptions[colidx]
                 header = dsname + '\n' + descr
-                return qt4.QVariant(header)
+                return header
             else:
                 # return row numbers
                 if section == self.rows-1:
-                    return qt4.QVariant("+")
-                return qt4.QVariant(section+1)
+                    return "+"
+                return section+1
 
-        return qt4.QVariant()
+        return None
 
     def flags(self, index):
         """Update flags to say that items are editable."""
@@ -294,7 +294,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
 
         # convert text to value
         try:
-            val = ds.uiConvertToDataItem( value.toString() )
+            val = ds.uiConvertToDataItem(value)
         except ValueError:
             return False
 
@@ -360,9 +360,9 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             ds = self.document.data[self.dsname].data
             if ds is not None:
                 num = ds[ds.shape[0]-index.row()-1, index.column()]
-                return qt4.QVariant( float(num) )
+                return float(num)
 
-        return qt4.QVariant()
+        return None
 
     def headerData(self, section, orientation, role):
         """Return headers at top."""
@@ -380,9 +380,9 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
                     r = (r[1], r[0]) # swap (as y reversed)
                     num = ds.data.shape[0]
                 val = (r[1]-r[0])/num*(section+0.5)+r[0]
-                return qt4.QVariant( '%g' % val )
+                return '%g' % val
 
-        return qt4.QVariant()
+        return None
     
     def flags(self, index):
         """Update flags to say that items are editable."""
@@ -407,7 +407,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         # update if conversion okay
         try:
-            val = ds.uiConvertToDataItem( value.toString() )
+            val = ds.uiConvertToDataItem(value)
         except ValueError:
             return False
 
@@ -611,7 +611,7 @@ class DataEditDialog(VeuszDialog):
                     rowitems = []
                 lastrow = row
             rowitems.append(
-                model.createIndex(row, column).data().toString() )
+                unicode(model.createIndex(row, column).data()) )
         if rowitems:
             lines.append( '\t'.join(rowitems) )
         lines.append('')  # blank line at end

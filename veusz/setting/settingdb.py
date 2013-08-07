@@ -134,7 +134,7 @@ class _SettingDB(object):
         s = qt4.QSettings(self.domain, self.product)
 
         for key in s.childKeys():
-            val = s.value(key).toString()
+            val = s.value(key)
             realkey = key.replace(self.sepchars, '/')
 
             try:
@@ -162,7 +162,7 @@ class _SettingDB(object):
             cleankey = key.replace('/', self.sepchars)
             cleankeys.append(cleankey)
 
-            s.setValue(cleankey, qt4.QVariant(repr(value)))
+            s.setValue(cleankey, repr(value))
 
         # now remove all the values which have been removed
         for key in list(s.childKeys()):

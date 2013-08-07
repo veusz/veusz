@@ -43,8 +43,8 @@ class ManualBinModel(qt4.QAbstractListModel):
         self.data = data
     def data(self, index, role):
         if role == qt4.Qt.DisplayRole and index.isValid():
-            return qt4.QVariant(float(self.data[index.row()]))
-        return qt4.QVariant()
+            return float(self.data[index.row()])
+        return None
     def rowCount(self, parent):
         return len(self.data)
     def flags(self, index):

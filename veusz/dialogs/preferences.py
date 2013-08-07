@@ -296,7 +296,7 @@ class PreferencesDialog(VeuszDialog):
         if filename:
             self.pluginmodel.insertRows(0, 1)
             self.pluginmodel.setData( self.pluginmodel.index(0),
-                                      qt4.QVariant(filename) )
+                                      filename )
 
     def pluginRemoveClicked(self):
         """Remove selected plugin."""

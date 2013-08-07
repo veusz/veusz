@@ -340,7 +340,7 @@ class Choice(qt4.QComboBox):
         # use tooltip descriptions if requested
         if descriptions is not None:
             for i, descr in enumerate(descriptions):
-                self.setItemData(i, qt4.QVariant(descr), qt4.Qt.ToolTipRole)
+                self.setItemData(i, descr, qt4.Qt.ToolTipRole)
 
         # choose the correct setting
         try:

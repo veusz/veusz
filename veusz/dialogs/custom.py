@@ -56,9 +56,9 @@ class CustomItemModel(qt4.QAbstractTableModel):
             cust = self.document.customs[index.row()]
             if cust[0] == 'colormap' and index.column() == 2:
                 # values are not a string
-                return qt4.QVariant( repr(cust[2]) )
+                return repr(cust[2])
             else:
-                return qt4.QVariant( cust[index.column()] )
+                return cust[index.column()]
         elif role == qt4.Qt.ToolTipRole:
             return (_('Constant, function, import or colormap'),
                     _('Constant or colormap: enter name\n'
@@ -69,7 +69,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
                       'Colormap: (R,G,B[,alpha]) list surrounded by brackets, e.g. ((10,10,10), (20,20,20,128))'),
                     )[index.column()]
 
-        return qt4.QVariant()
+        return None
 
     def flags(self, index):
         """Items are editable"""
@@ -80,11 +80,11 @@ class CustomItemModel(qt4.QAbstractTableModel):
         """Return the headers at the top of the view."""
         if role == qt4.Qt.DisplayRole:
             if orientation == qt4.Qt.Horizontal:
-                return qt4.QVariant( (_('Type'), _('Name'),
-                                      _('Definition'))[section] )
+                return (_('Type'), _('Name'),
+                        _('Definition'))[section]
             else:
-                return qt4.QVariant(str(section+1))
-        return qt4.QVariant()
+                return str(section+1)
+        return None
 
     def doUpdate(self):
         """Document changed."""
@@ -127,7 +127,6 @@ class CustomItemModel(qt4.QAbstractTableModel):
         if index.isValid() and role == qt4.Qt.EditRole:
             col = index.column()
             row = index.row()
-            value = value.toString()
 
             if col == 0:
                 ok = value in ('constant', 'function', 'import', 'colormap')
@@ -166,7 +165,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
         return False
 
 class ComboTypeDeligate(qt4.QItemDelegate):
-    """This class is for choosing between the constant and function
+    """This class is for choosing between the custom
     types in a combo box in a model view."""
 
     def createEditor(self, parent, option, index):
@@ -178,12 +177,12 @@ class ComboTypeDeligate(qt4.QItemDelegate):
 
     def setEditorData(self, editor, index):
         """Update data in editor."""
-        i = editor.findText( index.data().toString() )
+        i = editor.findText( index.data() )
         editor.setCurrentIndex(i)
 
     def setModelData(self, editor, model, index):
         """Update data in model."""
-        model.setData(index, qt4.QVariant(editor.currentText()),
+        model.setData(index, editor.currentText(),
                       qt4.Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):

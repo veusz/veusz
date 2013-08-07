@@ -206,9 +206,9 @@ class DatasetBase(object):
             raise ValueError("Invalid floating point number")
         return float(val)
 
-    def uiDataItemToQVariant(self, val):
-        """Return val converted to QVariant."""
-        return qt4.QVariant(float(val))
+    def uiDataItemToData(self, val):
+        """Return val converted to data."""
+        return float(val)
     
     def _getItemHelper(self, key):
         """Help get arguments to constructor."""
@@ -629,9 +629,9 @@ class DatasetDateTime(Dataset):
         else:
             return N.nan
 
-    def uiDataItemToQVariant(self, val):
-        """Return val converted to QVariant."""
-        return qt4.QVariant(utils.dateFloatToString(val))
+    def uiDataItemToData(self, val):
+        """Return val converted to data."""
+        return utils.dateFloatToString(val)
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
@@ -694,9 +694,9 @@ class DatasetText(DatasetBase):
         """Return a value cast to this dataset data type."""
         return unicode(val)
 
-    def uiDataItemToQVariant(self, val):
-        """Return val converted to QVariant."""
-        return qt4.QVariant(unicode(val))
+    def uiDataItemToData(self, val):
+        """Return val converted to data."""
+        return unicode(val)
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
