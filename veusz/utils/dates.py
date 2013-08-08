@@ -23,6 +23,8 @@ import re
 
 import numpy as N
 
+from ..compat import crange, citems
+
 # date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
 # date and time part are optional (check we have at least one!)
 date_re = re.compile( r'''
@@ -150,7 +152,7 @@ def addTimeTupleToDateTime(dt,  tt):
     
     # add on months - this could be much simpler
     if tt[1] > 0:
-        for i in xrange(tt[1]):
+        for i in crange(tt[1]):
             # find interval between this month and next...
             m, y = dt.month + 1, dt.year
             if m == 13:
@@ -158,7 +160,7 @@ def addTimeTupleToDateTime(dt,  tt):
                 y += 1          
             dt = dt.replace(year=y, month=m)
     elif tt[1] < 0:
-        for i in xrange(abs(tt[1])):
+        for i in crange(abs(tt[1])):
             # find interval between this month and next...
             m, y = dt.month - 1, dt.year
             if m == 0:
@@ -242,7 +244,7 @@ def dateREMatchToDate(match):
 
     # remove None matches
     grps = {}
-    for k, v in match.groupdict().iteritems():
+    for k, v in citems(match.groupdict()):
         if v is not None:
             grps[k] = v
 

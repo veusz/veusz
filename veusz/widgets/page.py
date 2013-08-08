@@ -22,6 +22,7 @@ from __future__ import division
 import collections
 import numpy as N
 
+from ..compat import crange
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -161,7 +162,7 @@ class AxisDependHelper(object):
         numcyclic = len(origcyclic)
         best = -1
 
-        for i in xrange(len(self.pairs)):
+        for i in crange(len(self.pairs)):
             if not self.pairs[i][0][0].isaxis:
                 p = self.pairs[:i] + self.pairs[i+1:]
                 ordered, cyclic = utils.topological_sort(p)

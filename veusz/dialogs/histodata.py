@@ -17,6 +17,8 @@
 ##############################################################################
 
 from __future__ import division
+
+from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -94,7 +96,7 @@ class HistoDataDialog(VeuszDialog):
     def escapeDatasets(self, dsnames):
         """Escape dataset names if they are not typical python ones."""
 
-        for i in xrange(len(dsnames)):
+        for i in crange(len(dsnames)):
             if not utils.validPythonIdentifier(dsnames[i]):
                 dsnames[i] = '`%s`' % dsnames[i]
 
@@ -102,7 +104,7 @@ class HistoDataDialog(VeuszDialog):
         """Update list of datasets."""
 
         datasets = []
-        for name, ds in self.document.data.iteritems():
+        for name, ds in citems(self.document.data):
             if ds.datatype == 'numeric' and ds.dimensions == 1:
                 datasets.append(name)
         datasets.sort()
@@ -229,7 +231,7 @@ class HistoDataDialog(VeuszDialog):
         self.indataset.setEditText(gen.inexpr)
 
         # need to map backwards to get dataset names
-        revds = dict( (a,b) for b,a in self.document.data.iteritems() )
+        revds = dict( (a,b) for b,a in citems(self.document.data) )
         self.outdataset.setEditText( revds[gen.valuedataset] )
         self.outbins.setEditText( revds[gen.bindataset] )
 

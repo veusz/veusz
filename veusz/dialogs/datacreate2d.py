@@ -19,6 +19,7 @@
 """Dataset creation dialog for 2d data."""
 
 from __future__ import division
+from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -88,7 +89,7 @@ class DataCreate2DDialog(VeuszDialog):
     def escapeDatasets(self, dsnames):
         """Escape dataset names if they are not typical python ones."""
 
-        for i in xrange(len(dsnames)):
+        for i in crange(len(dsnames)):
             if not utils.validPythonIdentifier(dsnames[i]):
                 dsnames[i] = '`%s`' % dsnames[i]
 
@@ -97,7 +98,7 @@ class DataCreate2DDialog(VeuszDialog):
 
         # get list of 1d and 2d numeric datasets
         datasets = [[],[]]
-        for name, ds in self.document.data.iteritems():
+        for name, ds in citems(self.document.data):
             if ds.datatype == 'numeric':
                 datasets[ds.dimensions-1].append(name)
         datasets[0].sort()

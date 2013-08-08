@@ -27,6 +27,7 @@ from .nonorthgraph import NonOrthGraph
 from .axisticks import AxisTicks
 from . import axis
 
+from ..compat import crange
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -325,7 +326,7 @@ class Polar(NonOrthGraph):
 
         # draw labels around plot
         if not s.TickLabels.hidetangential:
-            for i in xrange(12):
+            for i in crange(12):
                 angle = 2 * N.pi / 12
                 x = self._xc +  N.cos(angle*i) * self._xscale
                 y = self._yc +  N.sin(angle*i) * self._yscale
@@ -341,7 +342,7 @@ class Polar(NonOrthGraph):
             painter.setBrush( qt4.QBrush() )      
             angle = 2 * N.pi / 12
             lines = []
-            for i in xrange(12):
+            for i in crange(12):
                 x = self._xc +  N.cos(angle*i) * self._xscale
                 y = self._yc +  N.sin(angle*i) * self._yscale
                 lines.append( qt4.QLineF(qt4.QPointF(self._xc, self._yc),

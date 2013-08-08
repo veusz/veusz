@@ -19,9 +19,9 @@
 """For plotting xy points."""
 
 from __future__ import division
-import itertools
 import numpy as N
 
+from ..compat import czip
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -141,7 +141,7 @@ def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
         # non-filling brush
         painter.setBrush( qt4.QBrush() )
 
-        for xp, yp, xmn, ymn, xmx, ymx in itertools.izip(
+        for xp, yp, xmn, ymn, xmx, ymx in czip(
             xplotter, yplotter, xmin, ymin, xmax, ymax):
 
             # break up curve into four arcs (for asym error bars)
@@ -646,8 +646,8 @@ class PointPlotter(GenericPlotter):
         angle = lab.angle
 
         # iterate over each point and plot each label
-        for x, y, t in itertools.izip(xplotter+deltax, yplotter+deltay,
-                                      textvals):
+        for x, y, t in czip(xplotter+deltax, yplotter+deltay,
+                            textvals):
             utils.Renderer( painter, font, x, y, t,
                             alignhorz, alignvert, angle ).render()
 

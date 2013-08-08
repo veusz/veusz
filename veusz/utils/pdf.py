@@ -19,6 +19,8 @@
 from __future__ import division
 import re
 
+from ..compat import crange
+
 def scalePDFMediaBox(text, pagewidth,
                      requiredwidth, requiredheight):
     """Take the PDF file text and adjust the page size.
@@ -57,7 +59,7 @@ def fixupPDFIndices(text):
 
     # build up xref block (note trailing spaces)
     xref = ['xref', '0 %i' % (len(indices)+1), '0000000000 65535 f ']
-    for i in xrange(len(indices)):
+    for i in crange(len(indices)):
         xref.append( '%010i %05i n ' % (indices[i+1], 0) )
     xref.append('trailer\n')
     xref = '\n'.join(xref)

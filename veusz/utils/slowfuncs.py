@@ -21,10 +21,11 @@ These are slow versions of routines also implemented in C++
 """
 
 from __future__ import division
-from itertools import izip, count
+from itertools import count
 import sys
 import struct
 
+from ..compat import crange, czip
 from .. import qtall as qt4
 import numpy as N
 
@@ -62,7 +63,7 @@ def addNumpyPolygonToPath(path, clip, *args):
     for i in count():
         p = qt4.QPolygonF()
         dobreak = True
-        for c in xrange(len(args)//2):
+        for c in crange(len(args)//2):
             if i < len(args[c*2]) and i < len(args[c*2+1]):
                 p.append(qt4.QPointF(args[c*2][i], args[c*2+1][i]))
                 dobreak = False
@@ -99,7 +100,7 @@ def plotPathsToPainter(painter, path, x, y, scaling=None,
         numpts = min(numpts, colorimg.width())
 
     origtrans = painter.worldTransform()
-    for i in xrange(numpts):
+    for i in crange(numpts):
         pt = qt4.QPointF(x[i], y[i])
         if clip.contains(pt):
             painter.translate(pt)
@@ -119,7 +120,7 @@ def plotLinesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
     lines = []
     lappend = lines.append
     qlinef = qt4.QLineF
-    for p in izip(x1, y1, x2, y2):
+    for p in czip(x1, y1, x2, y2):
         lappend( qlinef(*p) )
     painter.drawLines(lines)
 
@@ -168,7 +169,7 @@ def plotBoxesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
 
     # construct rectangle list
     rects = []
-    for ix1, iy1, ix2, iy2 in izip(x1, y1, x2, y2):
+    for ix1, iy1, ix2, iy2 in czip(x1, y1, x2, y2):
         rect = qt4.QRectF( qt4.QPointF(ix1, iy1), qt4.QPointF(ix2, iy2) )
         if clip.intersects(rect):
             rects.append(clip.intersected(rect))

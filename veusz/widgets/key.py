@@ -21,6 +21,7 @@
 from __future__ import division
 import math
 
+from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -89,8 +90,8 @@ class _GraphControlKey(qt4.QGraphicsRectItem):
 
         # these are special places where the key is aligned
         self.highlightpoints = {}
-        for xname, xval in xposn.iteritems():
-            for yname, yval in yposn.iteritems():
+        for xname, xval in citems(xposn):
+            for yname, yval in citems(yposn):
                 self.highlightpoints[(xname, yname)] = qt4.QPointF(xval, yval)
 
         self.updatePen()
@@ -104,7 +105,7 @@ class _GraphControlKey(qt4.QGraphicsRectItem):
 
         highlight = None
         highlightrect = qt4.QRectF(rect.left()-10, rect.top()-10, 20, 20)
-        for name, point in self.highlightpoints.iteritems():
+        for name, point in citems(self.highlightpoints):
             if highlightrect.contains(point):
                 highlight = name
                 break
@@ -300,14 +301,14 @@ class Key(widget.Widget):
             victimcol = numcols
             while True:
                 # find the right-most column with excess occupation number
-                for i in reversed(xrange(victimcol)):
+                for i in reversed(crange(victimcol)):
                     if colstats[i] > meanoccupation:
                         victimcol = i
                         break
                 
                 # find the last item in the victim column
                 victim = 0
-                for i in reversed(xrange(len(layout))):
+                for i in reversed(crange(len(layout))):
                     if layout[i][2] == victimcol:
                         victim = i
                         break
@@ -375,7 +376,7 @@ class Key(widget.Widget):
                 continue
             if not c.settings.hide:
                 # add an entry for each key entry for each widget
-                for i in xrange(num):
+                for i in crange(num):
                     lines = 1
                     if showtext:
                         w, h = utils.Renderer(painter, font, 0, 0,

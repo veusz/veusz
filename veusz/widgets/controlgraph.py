@@ -25,8 +25,8 @@ item to control the object
 
 from __future__ import division
 import math
-import itertools
 
+from ..compat import crange, czip
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -197,11 +197,11 @@ class _GraphMarginBox(qt4.QGraphicsItem):
 
         # create corners of box
         self.corners = [_ShapeCorner(self)
-                        for i in xrange(4)]
+                        for i in crange(4)]
 
         # lines connecting corners
         self.lines = [_EdgeLine(self, ismovable=params.ismovable)
-                      for i in xrange(4)]
+                      for i in crange(4)]
 
         # hide corners if box is not resizable
         if not params.isresizable:
@@ -228,8 +228,8 @@ class _GraphMarginBox(qt4.QGraphicsItem):
         pos[3] = min(pos[3], par.maxposn[3])
 
         # move corners
-        for corner, (xindex, yindex) in itertools.izip(self.corners,
-                                                       self.mapcornertoposn):
+        for corner, (xindex, yindex) in czip(self.corners,
+                                             self.mapcornertoposn):
             corner.setPos( qt4.QPointF( pos[xindex], pos[yindex] ) )
 
         # move lines
@@ -357,7 +357,7 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
         self.setBrush( qt4.QBrush() )
 
         # create child graphicsitem for each corner
-        self.corners = [_ShapeCorner(self) for i in xrange(4)]
+        self.corners = [_ShapeCorner(self) for i in crange(4)]
         self.corners[0].setCursor(qt4.Qt.SizeFDiagCursor)
         self.corners[1].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)

@@ -21,6 +21,8 @@
 from __future__ import division
 import os.path
 import numpy as N
+
+from ..compat import crange
 from .. import utils
 from .. import qtall as qt4
 
@@ -121,7 +123,7 @@ class ImportPluginExample(ImportPlugin):
             sub = float(params.field_results["subtract"])
             if params.field_results["invert"]:
                 mult *= -1
-            for i in xrange(params.field_results["skip"]):
+            for i in crange(params.field_results["skip"]):
                 f.readline()
             for line in f:
                 data += [float(x)*mult-sub for x in line.split()]
@@ -238,7 +240,7 @@ class QdpFile(object):
 
         for num, r1, c1, r2, c2 in self.datagroup2d:
             arr = []
-            for c in xrange(c1-1,c2-1+1):
+            for c in crange(c1-1,c2-1+1):
                 arr.append( self.data[c][r1-1:r2-1+1] )
                 # make data as "used"
                 self.data[c] = None
@@ -266,7 +268,7 @@ class QdpFile(object):
         """Add data to output array.
         """
 
-        for i in xrange(len(self.data)):
+        for i in crange(len(self.data)):
             if self.data[i] is None:
                 continue
 
@@ -636,7 +638,7 @@ class ImportPluginBinary(ImportPlugin):
                 return c
 
         # do a hex dump (like in CP/M)
-        for i in xrange(0, min(65536, len(data)), 16):
+        for i in crange(0, min(65536, len(data)), 16):
             hdr = '%04X  ' % i
             subset = data[i:i+16]
             hexdata = ('%02X '*len(subset)) % tuple([ord(x) for x in subset])

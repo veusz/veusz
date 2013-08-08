@@ -24,6 +24,7 @@ import os.path
 import numpy as N
 import textwrap
 
+from ..compat import crange, citems, czip
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -237,7 +238,7 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeNone(self):
         """Make tree with no grouping."""
         tree = TMNode( (_("Dataset"), _("Size"), _("Type"), _("File")), None )
-        for name, ds in self.doc.data.iteritems():
+        for name, ds in citems(self.doc.data):
             child = DatasetNode( self.doc, name,
                                  ("name", "size", "type", "linkfile"),
                                  None )
@@ -255,7 +256,7 @@ class DatasetRelationModel(TreeModel):
         GrpNodeClass: class for creating grouping nodes
         """
         grpnodes = {}
-        for name, ds in self.doc.data.iteritems():
+        for name, ds in citems(self.doc.data):
             child = DatasetNode(self.doc, name, colitems, None)
 
             # check whether filtered out
@@ -384,7 +385,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         hdr = self.header()
         hdr.setStretchLastSection(False)
         hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
-        for col in xrange(1, 3):
+        for col in crange(1, 3):
             hdr.setResizeMode(col, qt4.QHeaderView.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
@@ -479,13 +480,13 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         def _edit():
             """Open up dialog box to recreate dataset."""
-            for dataset, dsname in zip(datasets, dsnames):
+            for dataset, dsname in czip(datasets, dsnames):
                 if type(dataset) in dataeditdialog.recreate_register:
                     dataeditdialog.recreate_register[type(dataset)](
                         self.mainwindow, self.doc, dataset, dsname)
         def _edit_data():
             """Open up data edit dialog."""
-            for dataset, dsname in zip(datasets, dsnames):
+            for dataset, dsname in czip(datasets, dsnames):
                 if type(dataset) not in dataeditdialog.recreate_register:
                     self.mainwindow.slotDataEdit(editdataset=dsname)
         def _delete():
@@ -499,7 +500,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetUnlinkFile(n)
-                     for d,n in zip(datasets,dsnames)
+                     for d,n in czip(datasets,dsnames)
                      if d.canUnlink() and d.linked],
                     descr=_('unlink dataset(s)')))
         def _unlink_relation():
@@ -507,7 +508,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetUnlinkRelation(n)
-                     for d,n in zip(datasets,dsnames)
+                     for d,n in czip(datasets,dsnames)
                      if d.canUnlink() and not d.linked],
                     descr=_('unlink dataset(s)')))
         def _copy():

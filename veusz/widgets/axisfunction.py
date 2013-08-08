@@ -21,6 +21,7 @@
 from __future__ import division
 import numpy as N
 
+from ..compat import crange
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -122,7 +123,7 @@ def solveFunction(function, vals, mint=None, maxt=None):
 
         # binary search
         tol = abs(1e-6 * thisval)
-        for i in xrange(30):
+        for i in crange(30):
             # print x1, y1, "->", x2, y2
 
             if abs(y1) <= tol and abs(y1) < abs(y2):

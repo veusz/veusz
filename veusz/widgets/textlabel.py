@@ -19,10 +19,11 @@
 """For plotting one or more text labels on a graph."""
 
 from __future__ import division
-import itertools
 import math
+import itertools
 import numpy as N
 
+from ..compat import czip
 from .. import document
 from .. import setting
 from .. import utils
@@ -127,7 +128,7 @@ class TextLabel(plotters.FreePlotter):
                              not s.get('yPos').isDataset(d) )
 
             controlgraphitems = []
-            for index, (x, y, t) in enumerate(itertools.izip(
+            for index, (x, y, t) in enumerate(czip(
                     xp, yp, itertools.cycle(text))):
                 # render the text
                 tbounds = utils.Renderer( painter, font, x, y, t,

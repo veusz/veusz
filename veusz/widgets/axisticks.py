@@ -23,6 +23,7 @@ from __future__ import division
 import math
 import numpy as N
 
+from ..compat import crange
 from .. import utils
 
 """Algorithms for working with axis ticks.
@@ -188,10 +189,10 @@ class AxisTicks(AxisTicksBase):
 
         ticks = []
         # iterate over range in log space
-        for i in xrange(alpha, beta+1):
+        for i in crange(alpha, beta+1):
             power = 10.**i
             # add ticks for values in correct range
-            for j in xrange(2, 10):
+            for j in crange(2, 10):
                 v = power*j
                 # blah log conversions mean we have to use 'fuzzy logic'
                 if ( math.fabs(v - minval)/v < 1e-6 or v > minval ) and \

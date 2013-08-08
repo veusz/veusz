@@ -23,6 +23,7 @@ import bisect
 
 import numpy as N
 
+from ..compat import crange, czip
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -98,7 +99,7 @@ class AxisBroken(axis.Axis):
 
         # first work out which break region the values are in
         out = []
-        for sval, val in zip(svals, vals):
+        for sval, val in czip(svals, vals):
             # find index for appropriated scaled starting value
             breaki = bisect.bisect_left(self.posstarts, sval) - 1
 
@@ -177,7 +178,7 @@ class AxisBroken(axis.Axis):
 
         # filter to range
         newpoints = []
-        for i in xrange(0, len(points)//2 * 2, 2):
+        for i in crange(0, len(points)//2 * 2, 2):
             if points[i] >= min(r) and points[i+1] <= max(r):
                 newpoints += [points[i], points[i+1]]
 
@@ -186,13 +187,13 @@ class AxisBroken(axis.Axis):
             self.plottedrange[1]]
 
         # axis values for starting and stopping
-        self.breakvstarts = [ self.breakvlist[i*2] for i in xrange(num) ]
-        self.breakvstops = [ self.breakvlist[i*2+1] for i in xrange(num) ]
+        self.breakvstarts = [ self.breakvlist[i*2] for i in crange(num) ]
+        self.breakvstops = [ self.breakvlist[i*2+1] for i in crange(num) ]
 
         # compute ticks for each range
         self.minorticklist = []
         self.majorticklist = []
-        for i in xrange(self.breakvnum):
+        for i in crange(self.breakvnum):
             self.plottedrange = [self.breakvstarts[i], self.breakvstops[i]]
             reverse = self.plottedrange[0] > self.plottedrange[1]
             if reverse:
@@ -221,7 +222,7 @@ class AxisBroken(axis.Axis):
         if not s.Line.hide:
             self._drawAxisLine(painter)
 
-        for i in xrange(self.breakvnum):
+        for i in crange(self.breakvnum):
             self.switchBreak(i, posn, otherposition=otheredge)
 
             # plot coordinates of ticks
@@ -250,7 +251,7 @@ class AxisBroken(axis.Axis):
             markdirn = -markdirn
 
         # add shape for each break
-        for start, stop in zip( self.posstarts[1:], self.posstops[:-1] ):
+        for start, stop in czip( self.posstarts[1:], self.posstops[:-1] ):
             p1 += [stop, (start+stop)*0.5, start]
             p2 += [0, markdirn*(start-stop)*0.5, 0]
 
@@ -299,7 +300,7 @@ class AxisBroken(axis.Axis):
                     qt4.QPointF(parentposn[0], parentposn[1]),
                     qt4.QPointF(parentposn[2], parentposn[3]) ) )
 
-            for i in xrange(self.breakvnum):
+            for i in crange(self.breakvnum):
                 self.switchBreak(i, parentposn)
                 if not s.MinorGridLines.hide:
                     coordminorticks = self._graphToPlotter(self.minorticklist[i])
@@ -334,7 +335,7 @@ class AxisBroken(axis.Axis):
             self._drawAxisLine(painter)
 
         max_delta = 0
-        for i in xrange(self.breakvnum):
+        for i in crange(self.breakvnum):
             self.switchBreak(i, posn)
 
             # plot coordinates of ticks

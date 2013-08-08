@@ -21,6 +21,7 @@
 from __future__ import division
 from collections import defaultdict
 
+from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import setting
 from .. import utils
@@ -232,7 +233,7 @@ class Graph(widget.Widget):
 
         # broken axis handling
         brokenaxes = set()
-        for name, axis in axestodraw.iteritems():
+        for name, axis in citems(axestodraw):
             if isinstance(axis, axisbroken.AxisBroken):
                 brokenaxes.add(axis)
 
@@ -259,7 +260,7 @@ class Graph(widget.Widget):
                     hence this rather strange iteration.
                     """
                     ax = b[0][1]
-                    for i in xrange(ax.breakvnum):
+                    for i in crange(ax.breakvnum):
                         ax.switchBreak(i, bounds)
                         if len(b) == 1:
                             c.draw(bounds, painthelper, outerbounds=outerbounds)

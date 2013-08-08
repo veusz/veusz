@@ -19,9 +19,9 @@
 """For plotting bar graphs."""
 
 from __future__ import division
-from itertools import izip
 import numpy as N
 
+from ..compat import crange, czip
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -174,7 +174,7 @@ class BarPlotter(GenericPlotter):
         """For single bars where multiple datasets are added,
         compute maximum range."""
         minv, maxv = 0., 0.
-        for data in izip(*[ds.data for ds in datasets]):
+        for data in czip(*[ds.data for ds in datasets]):
             totpos = sum( [d for d in data if d > 0] )
             totneg = sum( [d for d in data if d < 0] )
             
@@ -416,7 +416,7 @@ class BarPlotter(GenericPlotter):
         posns2 = posns1 + barwidth
 
         # draw bars (reverse order, so edges are plotted correctly)
-        for dsnum, coords in izip( xrange(len(stackedcoords)-1, -1, -1),
+        for dsnum, coords in czip( crange(len(stackedcoords)-1, -1, -1),
                                    stackedcoords[::-1]):
             # we iterate over each of these coordinates
             if ishorz:
@@ -426,7 +426,7 @@ class BarPlotter(GenericPlotter):
             self.plotBars(painter, s, dsnum, clip, p)
 
         # draw error bars
-        for barval, dsval in izip(stackedvals, dsvals):
+        for barval, dsval in czip(stackedvals, dsvals):
             self.drawErrorBars(painter, posns, barwidth,
                                barval, dsval,
                                axes, widgetposn)
@@ -448,7 +448,7 @@ class BarPlotter(GenericPlotter):
         zerocoords = vaxis.dataToPlotterCoords(widgetposn, N.zeros(posns.shape))
 
         # draw areas (reverse order, so edges are plotted correctly)
-        for dsnum, coords in izip( xrange(len(stackedcoords)-1, -1, -1),
+        for dsnum, coords in czip( crange(len(stackedcoords)-1, -1, -1),
                                    stackedcoords[::-1]):
 
             # add points at end to make polygon
@@ -484,7 +484,7 @@ class BarPlotter(GenericPlotter):
 
         # draw error bars
         barwidth = maxwidth * s.barfill
-        for barval, dsval in izip(stackedvals, dsvals):
+        for barval, dsval in czip(stackedvals, dsvals):
             self.drawErrorBars(painter, posns, barwidth,
                                barval, dsval,
                                axes, widgetposn)

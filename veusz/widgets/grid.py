@@ -21,6 +21,7 @@ The graphs may share axes if they are stored in the grid widget.
 """
 
 from __future__ import division
+from ..compat import crange
 from .. import document
 from .. import setting
 from .. import qtall as qt4
@@ -60,8 +61,8 @@ class _gridengine:
 
     def isAllocedBlock(self, c, r, w, h):
         """Is the block (c,r) -> (c+w,r+h) allocated?"""
-        for y in xrange(h):
-            for x in xrange(w):
+        for y in crange(h):
+            for x in crange(w):
                 if self.isAlloced(c+x, y+r):
                     return True
         return False
@@ -78,8 +79,8 @@ class _gridengine:
 
     def setAllocedBlock(self, c, r, w, h):
         """Set block (c,r)->(c+w,r+h) as allocated."""
-        for y in xrange(h):
-            for x in xrange(w):
+        for y in crange(h):
+            for x in crange(w):
                 self.setAlloced(x+c, y+r)
 
     def add(self, width, height):

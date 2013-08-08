@@ -26,6 +26,7 @@ import re
 import csv
 import sys
 
+from ..compat import crange, czip, citems
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -155,7 +156,7 @@ class ImportTabStandard(ImportTab):
         # tell the user what happened
         # failures in conversion
         lines = []
-        for var, count in op.outinvalids.iteritems():
+        for var, count in citems(op.outinvalids):
             if count != 0:
                 lines.append(_('%i conversions failed for dataset "%s"') %
                              (count, var))
@@ -255,7 +256,7 @@ class ImportTabCSV(ImportTab):
             rows = []
             numcols = 0
             try:
-                for i in xrange(10):
+                for i in crange(10):
                     row = reader.next()
                     rows.append(row)
                     numcols = max(numcols, len(row))
@@ -271,8 +272,8 @@ class ImportTabCSV(ImportTab):
         # fill up table
         t.setColumnCount(numcols)
         t.setRowCount(numrows)
-        for r in xrange(numrows):
-            for c in xrange(numcols):
+        for r in crange(numrows):
+            for c in crange(numcols):
                 if c < len(rows[r]):
                     item = qt4.QTableWidgetItem(rows[r][c])
                     t.setItem(r, c, item)
@@ -564,7 +565,7 @@ class ImportTabFITS(ImportTab):
                 else:
                     data = ['invalidimage']
                 dims = [ str(header['NAXIS%i' % (i+1)])
-                         for i in xrange(naxis) ]
+                         for i in crange(naxis) ]
                 dims = '*'.join(dims)
                 if dims:
                     dims = '(%s)' % dims
@@ -738,7 +739,7 @@ class ImportTabPlugins(ImportTab):
         """Return a dict of the fields given."""
         results = {}
         plugin = self.getSelectedPlugin()
-        for field, cntrls in zip(plugin.fields, self.fields):
+        for field, cntrls in czip(plugin.fields, self.fields):
             results[field.name] = field.getControlResults(cntrls)
         return results
 
@@ -998,7 +999,7 @@ class ImportDialog(VeuszDialog):
         # examine from left to right
         # promoted plugins come after plugins
         idx = -1
-        for i in xrange(self.methodtab.count()):
+        for i in crange(self.methodtab.count()):
             w = self.methodtab.widget(i)
             if w.isFiletypeSupported(ftype):
                 idx = i

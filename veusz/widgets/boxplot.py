@@ -20,9 +20,9 @@
 
 from __future__ import division
 import math
-from itertools import izip
 import numpy as N
 
+from ..compat import crange, czip
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -440,7 +440,7 @@ class BoxPlot(GenericPlotter):
 
         if s.calculate:
             # calculated boxes
-            for vals, plotpos in izip(values, plotposns):
+            for vals, plotpos in czip(values, plotposns):
                 stats = _Stats()
                 stats.calculate(vals.data, s.whiskermode)
                 self.plotBox(painter, axes, plotpos, widgetposn, width,
@@ -449,7 +449,7 @@ class BoxPlot(GenericPlotter):
             # manually given boxes
             vals = [d.data for d in datasets] + [plotposns]
             lens = [len(d) for d in vals]
-            for i in xrange(min(lens)):
+            for i in crange(min(lens)):
                 stats = _Stats()
                 stats.topwhisker = vals[0][i]
                 stats.botwhisker = vals[1][i]

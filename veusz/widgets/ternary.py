@@ -23,8 +23,8 @@
 from __future__ import division
 import numpy as N
 import math
-from itertools import izip
 
+from ..compat import czip
 from .nonorthgraph import NonOrthGraph
 from .axisticks import AxisTicks
 from .axis import MajorTick, MinorTick, GridLine, MinorGridLine, AxisLabel, \
@@ -448,15 +448,15 @@ class Ternary(NonOrthGraph):
 
             # draw tick labels in each direction
             hlabbot = wlableft = wlabright = 0
-            for l, x, y in izip(tbotlabels, tickbotline[2], tickbotline[3]+off):
+            for l, x, y in czip(tbotlabels, tickbotline[2], tickbotline[3]+off):
                 r = utils.Renderer(painter, font, x, y, l, 0, 1, 0)
                 bounds = r.render()
                 hlabbot = max(hlabbot, bounds[3]-bounds[1])
-            for l, x, y in izip(tleftlabels, tickleftline[2]-off-sp, tickleftline[3]):
+            for l, x, y in czip(tleftlabels, tickleftline[2]-off-sp, tickleftline[3]):
                 r = utils.Renderer(painter, font, x, y, l, 1, 0, 0)
                 bounds = r.render()
                 wlableft = max(wlableft, bounds[2]-bounds[0])
-            for l, x, y in izip(trightlabels,tickrightline[2]+off+sp, tickrightline[3]):
+            for l, x, y in czip(trightlabels,tickrightline[2]+off+sp, tickrightline[3]):
                 r = utils.Renderer(painter, font, x, y, l, -1, 0, 0)
                 bounds = r.render()
                 wlabright = max(wlabright, bounds[2]-bounds[0])

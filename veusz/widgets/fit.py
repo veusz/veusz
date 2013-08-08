@@ -19,12 +19,13 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
+from __future__ import division, absolute_import, print_function
 import re
 import sys
 
 import numpy as N
 
+from ..compat import citems
 from .. import document
 from .. import setting
 from .. import utils
@@ -53,7 +54,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
             chi2.iters += 1
             p = [chi2.iters, c] + params.tolist()
             str = ("%5i " + "%8g " * (len(params)+1)) % tuple(p)
-            print str
+            print(str)
 
         return c
 
@@ -63,7 +64,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     # this is safe because the only user-controlled variable is len(names)
     fn = eval(fnstr, {'chi2' : chi2, 'N' : N})
 
-    print _('Fitting via Minuit:')
+    print(_('Fitting via Minuit:'))
     m = minuit.Minuit(fn, fix_x=True, **values)
 
     # run the fit
@@ -80,7 +81,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
         m.minos()
         have_err = True
     except minuit.MinuitError as e:
-        print e
+        print(e)
         if str(e).startswith('Discovered a new minimum'):
             # the initial fit really failed
             raise
@@ -91,18 +92,21 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     redchi2 = retchi2 / dof
 
     if have_err:
-        print _('Fit results:\n'), "\n".join([
-            u"    %s = %g \u00b1 %g (+%g / %g)"
-                % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)], m.merrors[(n, -1.0)]) for n in names])
+        print(_('Fit results:\n'), "\n".join([
+                    u"    %s = %g \u00b1 %g (+%g / %g)"
+                    % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)],
+                       m.merrors[(n, -1.0)]) for n in names]))
     elif have_symerr:
-        print _('Fit results:\n'), "\n".join([
-            u"    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n]) for n in names])
-        print _('MINOS error estimate not available.')
+        print(_('Fit results:\n'), "\n".join([
+                    u"    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n])
+                    for n in names]))
+        print(_('MINOS error estimate not available.'))
     else:
-        print _('Fit results:\n'), "\n".join(['    %s = %g' % (n, m.values[n]) for n in names])
-        print _('No error analysis available: fit quality uncertain')
+        print(_('Fit results:\n'), "\n".join([
+                    '    %s = %g' % (n, m.values[n]) for n in names]))
+        print(_('No error analysis available: fit quality uncertain'))
 
-    print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2)
+    print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2))
 
     vals = m.values
     return vals, retchi2, dof
@@ -213,7 +217,7 @@ class Fit(FunctionPlotter):
             # build up a set of X=Y values
             loc = self.document.locale
             txt = []
-            for l, v in sorted(vals.iteritems()):
+            for l, v in sorted(citems(vals)):
                 val = utils.formatNumber(v, '%.4Vg', locale=loc)
                 txt.append( '%s = %s' % (l, val) )
             # add chi2 output
@@ -257,10 +261,10 @@ class Fit(FunctionPlotter):
         # if there are no errors on data
         if yserr is None:
             if ydata.perr is not None and ydata.nerr is not None:
-                print "Warning: Symmeterising positive and negative errors"
+                print("Warning: Symmeterising positive and negative errors")
                 yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
-                print "Warning: No errors on y values. Assuming 5% errors."
+                print("Warning: No errors on y values. Assuming 5% errors.")
                 yserr = yvals*0.05
                 yserr[yserr < 1e-8] = 1e-8
 
@@ -275,8 +279,8 @@ class Fit(FunctionPlotter):
                 drange = self.parent.getAxes((s.yAxis,))[0].getPlottedRange()
                 mask = N.logical_and(yvals >= drange[0], yvals <= drange[1])
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
-            print "Fitting %s from %g to %g" % (s.variable,
-                                                drange[0], drange[1])
+            print("Fitting %s from %g to %g" % (s.variable,
+                                                drange[0], drange[1]))
 
         evalenv = self.initEnviron()
         def evalfunc(params, xvals):
@@ -307,7 +311,7 @@ class Fit(FunctionPlotter):
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
         if s.min != 'Auto' or s.max != 'Auto':
-            print "Fitting %s between %s and %s" % (s.variable, s.min, s.max)
+            print("Fitting %s between %s and %s" % (s.variable, s.min, s.max))
 
         # various error checks
         if len(xvals) == 0:
@@ -328,7 +332,7 @@ class Fit(FunctionPlotter):
             vals, chi2, dof = minuitFit(evalfunc, params, paramnames, s.values,
                                         xvals, yvals, yserr)
         else:
-            print _('Minuit not available, falling back to simple L-M fitting:')
+            print(_('Minuit not available, falling back to simple L-M fitting:'))
             retn, chi2, dof = utils.fitLM(evalfunc, params,
                                           xvals,
                                           yvals, yserr)
@@ -346,7 +350,7 @@ class Fit(FunctionPlotter):
         operations.append( document.OperationSettingSet(s.get('chi2'), float(chi2)) )
         operations.append( document.OperationSettingSet(s.get('dof'), int(dof)) )
         if dof <= 0:
-            print _('No degrees of freedom in fit.\n')
+            print(_('No degrees of freedom in fit.\n'))
             redchi2 = -1.
         else:
             redchi2 = float(chi2/dof)

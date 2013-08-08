@@ -25,10 +25,10 @@
 """
 
 from __future__ import division
-from itertools import izip
 import re
 import numpy as N
 
+from ..compat import crange, czip, citems
 from .. import qtall as qt4
 
 from . import settingdb
@@ -334,7 +334,7 @@ class Choice(qt4.QComboBox):
             self.addItems( list(vallist) )
         else:
             # add pixmaps and text to list
-            for icon, text in izip(icons, vallist):
+            for icon, text in czip(icons, vallist):
                 self.addItem(icon, text)
 
         # use tooltip descriptions if requested
@@ -1075,7 +1075,7 @@ class ListSet(qt4.QFrame):
         row = -1
         for row, val in enumerate(self.setting.val):
             cntrls = self.populateRow(row, val)
-            for col in xrange(len(cntrls)):
+            for col in crange(len(cntrls)):
                 self.layout.addWidget(cntrls[col], row, col)
             for c in cntrls:
                 c.show()
@@ -1181,7 +1181,7 @@ class ListSet(qt4.QFrame):
             for icon in icons:
                 wcombo.addItem(icon, "")
         else:
-            for text, icon in izip(texts, icons):
+            for text, icon in czip(texts, icons):
                 wcombo.addItem(icon, text)
 
         wcombo.setCurrentIndex(values.index(val))
@@ -1579,7 +1579,7 @@ class Datasets(MultiSettingWidget):
     def getDatasets(self):
         """Get applicable datasets (sorted)."""
         datasets = []
-        for name, ds in self.document.data.iteritems():
+        for name, ds in citems(self.document.data):
             if (ds.dimensions == self.dimensions and
                 ds.datatype == self.datatype):
                 datasets.append(name)
@@ -1588,7 +1588,7 @@ class Datasets(MultiSettingWidget):
 
     def updateControls(self):
         """Set values of controls."""
-        for cntrls, val in izip(self.controls, self.setting.val):
+        for cntrls, val in czip(self.controls, self.setting.val):
             cntrls[0].lineEdit().setText(val)
 
     def onModified(self, mod):
@@ -1630,7 +1630,7 @@ class Strings(MultiSettingWidget):
 
     def updateControls(self):
         """Set values of controls."""
-        for cntrls, val in izip(self.controls, self.setting.val):
+        for cntrls, val in czip(self.controls, self.setting.val):
             cntrls[0].setText(val)        
 
 class Filename(qt4.QWidget):

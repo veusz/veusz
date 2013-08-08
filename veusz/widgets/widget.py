@@ -22,6 +22,7 @@
 from __future__ import division
 import itertools
 
+from ..compat import czip
 from .. import document
 from .. import setting
 from .. import qtall as qt4
@@ -355,7 +356,7 @@ class Widget(object):
 
         slots.append( (self, 0) )
 
-        for child, index in itertools.izip(self.children, itertools.count(1)):
+        for child, index in czip(self.children, itertools.count(1)):
             child._recursiveBuildSlots(slots)
             slots.append( (self, index) )
 
