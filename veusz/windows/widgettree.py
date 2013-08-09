@@ -103,11 +103,10 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         # return nothing
         return None
 
-    def setData(self, index, value, role):
+    def setData(self, index, name, role):
         """User renames object. This renames the widget."""
         
         widget = index.internalPointer()
-        name = value.toString()
 
         # check symbols in name
         if not utils.validateWidgetName(name):
