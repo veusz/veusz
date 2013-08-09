@@ -552,7 +552,7 @@ class SimpleRead(object):
             stream.flushLine()
 
         self.parts = allparts
-        self.blocks = blocks.keys()
+        self.blocks = list(blocks.keys())
 
     def getInvalidConversions(self):
         """Return the number of invalid conversions after reading data.

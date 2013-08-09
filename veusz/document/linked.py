@@ -62,7 +62,7 @@ class LinkedFileBase(object):
     def _deleteLinkedDatasets(self, document):
         """Delete linked datasets from document linking to self."""
 
-        for name, ds in document.data.items():
+        for name, ds in list(document.data.items()):
             if ds.linked == self:
                 document.deleteData(name)
 
@@ -71,7 +71,7 @@ class LinkedFileBase(object):
         in the destination."""
 
         read = []
-        for name, ds in tempdoc.data.items():
+        for name, ds in list(tempdoc.data.items()):
             if name not in document.data:
                 read.append(name)
                 document.setData(name, ds)
@@ -207,7 +207,7 @@ class LinkedFileCSV(LinkedFileBase):
         paramsout = [ repr(self._getSaveFilename(relpath)) ]
 
         # add parameters which aren"t defaults
-        for param, default in sorted(self.params.defaults.items()):
+        for param, default in sorted(citems(self.params.defaults)):
             v = getattr(self.params, param)
             if param == 'prefix' or param == 'suffix':
                 param = 'ds' + param

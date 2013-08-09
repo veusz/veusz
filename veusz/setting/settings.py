@@ -227,7 +227,7 @@ class Settings(object):
         """
 
         root = '%s/%s' % (root, self.name)
-        for s in self.setdict.values():
+        for s in list(self.setdict.values()):
             s.readDefaults(root, widgetname)
 
     def linkToStylesheet(self, _root=None):

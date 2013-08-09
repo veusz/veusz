@@ -448,7 +448,7 @@ class Document( qt4.QObject ):
         tags = set()
         for dataset in cvalues(self.data):
             tags.update(dataset.tags)
-        return list(sorted(tags))
+        return sorted(tags)
 
     def _writeFileHeader(self, fileobj, type):
         """Write a header to a saved file of type."""
@@ -501,12 +501,12 @@ class Document( qt4.QObject ):
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
-        for name, dataset in sorted(self.data.items()):
+        for name, dataset in sorted(citems(self.data)):
             dataset.saveLinksToSavedDoc(fileobj, savedlinks,
                                         relpath=reldirname)
 
         # save the remaining datasets
-        for name, dataset in sorted(self.data.items()):
+        for name, dataset in sorted(citems(self.data)):
             dataset.saveToFile(fileobj, name)
 
         # save tags of datasets

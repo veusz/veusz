@@ -803,7 +803,7 @@ class OperationDatasetDeleteByFile(object):
     def do(self, document):
         """Remove datasets."""
         self.olddatasets = {}
-        for name, ds in document.data.items():
+        for name, ds in list(document.data.items()):
             if ds.linked is not None and ds.linked.filename == self.filename:
                 self.olddatasets[name] = ds
                 document.deleteData(name)

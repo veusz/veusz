@@ -82,7 +82,7 @@ class AxisTicks(AxisTicksBase):
                                       5.:  (0.5, 1., 2.5),
                                       2.5: (0.5,) }
     # just get the allowable majors
-    allowed_intervals_linear = allowed_minorintervals_linear.keys()
+    allowed_intervals_linear = list(allowed_minorintervals_linear.keys())
 
     # the allowed values we can increase by in log space
     # by default we increase by 10^3

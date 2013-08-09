@@ -224,7 +224,7 @@ class Graph(widget.Widget):
                     axestodraw[c.name] = c
 
         # grid lines are normally plotted before other child widgets
-        axisdrawlist = sorted(axestodraw.items(), reverse=True)
+        axisdrawlist = sorted(citems(axestodraw), reverse=True)
         for aname, awidget in axisdrawlist:
             awidget.updateAxisLocation(bounds)
             awidget.computePlottedRange()

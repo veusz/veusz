@@ -63,7 +63,7 @@ class ImportParamsBase(object):
         """Make a copy of the parameters object."""
 
         newp = {}
-        for k in self.defaults.keys() + self._extras:
+        for k in list(self.defaults.keys()) + self._extras:
             newp[k] = getattr(self, k)
         return self.__class__(**newp)
 

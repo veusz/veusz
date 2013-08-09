@@ -25,7 +25,7 @@ import sys
 import traceback
 import glob
 
-from ..compat import citems
+from ..compat import citems, ckeys
 from .. import qtall as qt4
 
 from .. import document
@@ -74,7 +74,7 @@ class DBusWinInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface, out_signature='as')
     def GetActions(self):
         """Get list of actions which can be activated."""
-        return list(sorted(self.actions.keys()))
+        return sorted(ckeys(self.actions))
 
     @vzdbus.method(dbus_interface=interface, in_signature='s')
     def TriggerAction(self, action):

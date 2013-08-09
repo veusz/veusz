@@ -708,7 +708,7 @@ class ImportTabPlugins(ImportTab):
         ImportTab.loadUi(self)
 
         # fill plugin combo
-        names = list(sorted([p.name for p in plugins.importpluginregistry]))
+        names = sorted([p.name for p in plugins.importpluginregistry])
         self.pluginType.addItems(names)
 
         self.connect(self.pluginType, qt4.SIGNAL('currentIndexChanged(int)'),

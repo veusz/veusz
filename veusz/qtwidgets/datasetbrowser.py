@@ -128,7 +128,7 @@ class DatasetNode(TMNode):
                 text = ''
 
             if ds.tags:
-                text += '\n\n' + _('Tags: %s') % (' '.join(list(sorted(ds.tags))))
+                text += '\n\n' + _('Tags: %s') % (' '.join(sorted(ds.tags)))
 
             return textwrap.fill(text, 40)
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
@@ -269,7 +269,7 @@ class DatasetRelationModel(TreeModel):
                     # add to group
                     grpnodes[grp].insertChildSorted(child)
 
-        return treeFromList(grpnodes.values(), coltitles)
+        return treeFromList(list(grpnodes.values()), coltitles)
 
     def makeGrpTreeFilename(self):
         """Make a tree of datasets grouped by linked file."""
@@ -303,7 +303,7 @@ class DatasetRelationModel(TreeModel):
 
         def getgrp(ds):
             if ds.tags:
-                return list(sorted(ds.tags))
+                return sorted(ds.tags)
             else:
                 return [_("None")]
 

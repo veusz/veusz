@@ -22,7 +22,7 @@ and exporting text as paths for WYSIWYG."""
 from __future__ import division, print_function
 import re
 
-from ..compat import crange
+from ..compat import crange, citems
 from .. import qtall as qt4
 
 # dpi runs at many times usual, and results are scaled down
@@ -369,7 +369,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         if b.color().alphaF() != 1.0:
             vals['fill-opacity'] = '%.3g' % b.color().alphaF()
 
-        items = ['%s="%s"' % x for x in sorted(vals.items())]
+        items = ['%s="%s"' % x for x in sorted(citems(vals))]
         return tuple(items)
 
     def transformState(self):

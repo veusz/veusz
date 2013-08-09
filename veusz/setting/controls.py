@@ -28,7 +28,7 @@ from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, czip, citems
+from ..compat import crange, czip, citems, ckeys
 from .. import qtall as qt4
 
 from .settingdb import settingdb
@@ -981,7 +981,7 @@ class WidgetChoice(WidgetSelector):
         widgets = self.setting.getWidgetList()
 
         # we only need the list of names
-        names = widgets.keys()
+        names = list(widgets.keys())
         names.sort()
 
         utils.populateCombo(self, names)
@@ -1781,7 +1781,7 @@ class Colormap(Choice):
     size = (32, 12)
 
     def __init__(self, setn, document, parent):
-        names = sorted(document.colormaps.keys())
+        names = sorted(ckeys(document.colormaps))
 
         icons = Colormap._generateIcons(document, names)
         Choice.__init__(self, setn, True,

@@ -20,7 +20,7 @@
 ##############################################################################
 
 from __future__ import division
-from ..compat import citems
+from ..compat import citems, ckeys
 
 class WidgetFactory(object):
     """Class to help produce any type of widget you want by name."""
@@ -66,13 +66,11 @@ class WidgetFactory(object):
 
     def listWidgets(self):
         """Return an array of the widgets the factory can make."""
-        names = self.regwidgets.keys()
-        names.sort()
-        return names
+        return sorted(ckeys(self.regwidgets))
 
     def listWidgetClasses(self):
         """Return list of allowed classes."""
-        return self.regwidgets.values()
+        return list(self.regwidgets.values())
 
 # singleton
 thefactory = WidgetFactory()
