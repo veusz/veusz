@@ -49,6 +49,12 @@ if cpy3:
     def cvalues(d):
         return d.values()
 
+    # next iterator
+    cnext = next
+
+    # python3 compatible iterator
+    CIterator = object
+
 else:
     # py2
     crange = xrange
@@ -66,3 +72,12 @@ else:
         return d.iterkeys()
     def cvalues(d):
         return d.itervalues()
+
+    # next iterator
+    def cnext(i):
+        return i.next()
+
+    # python3 compatible iterator
+    class CIterator(object):
+        def next(self):
+            return type(self).__next__(self)

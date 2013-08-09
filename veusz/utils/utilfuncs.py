@@ -31,7 +31,7 @@ import StringIO
 import locale
 from collections import defaultdict
 
-from ..compat import citems
+from ..compat import citems, CIterator, cnext
 from .. import qtall as qt4
 import numpy as N
 
@@ -340,7 +340,7 @@ def openEncoding(filename, encoding, mode='r'):
 # The following two classes are adapted from the Python documentation
 # they are modified to turn off encoding errors
 
-class UTF8Recoder:
+class UTF8Recoder(CIterator):
     """
     Iterator that reads an encoded stream and reencodes the input to UTF-8
     """
@@ -350,11 +350,11 @@ class UTF8Recoder:
     def __iter__(self):
         return self
 
-    def next(self):
-        line = self.reader.next()
+    def __next__(self):
+        line = cnext(self.reader)
         return line.encode("utf-8")
 
-class UnicodeCSVReader:
+class UnicodeCSVReader(CIterator):
     """
     A CSV reader which will iterate over lines in the CSV file "f",
     which is encoded in the given encoding.
@@ -374,8 +374,8 @@ class UnicodeCSVReader:
         # the actual csv reader based on the file above
         self.reader = csv.reader(f, dialect=dialect, **kwds)
 
-    def next(self):
-        row = self.reader.next()
+    def __next__(self):
+        row = cnext(self.reader)
         return [unicode(s, 'utf-8') for s in row]
 
     def __iter__(self):

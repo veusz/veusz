@@ -26,7 +26,7 @@ import re
 import csv
 import sys
 
-from ..compat import crange, czip, citems
+from ..compat import crange, czip, citems, cnext
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -257,7 +257,7 @@ class ImportTabCSV(ImportTab):
             numcols = 0
             try:
                 for i in crange(10):
-                    row = reader.next()
+                    row = cnext(reader)
                     rows.append(row)
                     numcols = max(numcols, len(row))
                 rows.append(['...'])

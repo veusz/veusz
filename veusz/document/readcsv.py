@@ -23,12 +23,12 @@ from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, ckeys
+from ..compat import crange, ckeys, cnext, CIterator
 from . import datasets
 from .. import utils
 from .. import qtall as qt4
 
-class _FileReaderCols(object):
+class _FileReaderCols(CIterator):
     """Read a CSV file in rows. This acts as an iterator.
 
     This is a very simple wrapper around the csv module
@@ -38,9 +38,12 @@ class _FileReaderCols(object):
         self.csvreader = csvreader
         self.maxlen = 0
 
-    def next(self):
+    def __iter__(self):
+        return self
+
+    def __next__(self):
         """Return next row."""
-        row = self.csvreader.next()
+        row = cnext(self.csvreader)
 
         # add blank columns up to maximum previously read
         self.maxlen = max(self.maxlen, len(row))
@@ -48,7 +51,7 @@ class _FileReaderCols(object):
 
         return row
 
-class _FileReaderRows(object):
+class _FileReaderRows(CIterator):
     """Read a CSV file in columns. This acts as an iterator.
 
     This means we have to read the whole file in, then return cols :-(
@@ -64,7 +67,10 @@ class _FileReaderRows(object):
 
         self.counter = 0
 
-    def next(self):
+    def __iter__(self):
+        return self
+
+    def __next__(self):
         """Return the next column."""
 
         if self.counter == self.maxlength:
@@ -312,7 +318,7 @@ class ReadCSV(object):
         # ignore rows (at top), if requested
         for i in crange(par.rowsignore):
             try:
-                it.next()
+                cnext(it)
             except StopIteration:
                 return
 
@@ -331,7 +337,7 @@ class ReadCSV(object):
         # iterate over each line (or column)
         while True:
             try:
-                line = it.next()
+                line = cnext(it)
             except StopIteration:
                 break
 

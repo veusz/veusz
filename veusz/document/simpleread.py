@@ -46,7 +46,7 @@ import cStringIO
 
 import numpy as N
 
-from ..compat import crange
+from ..compat import crange, cnext
 from .. import utils
 from . import datasets
 
@@ -422,7 +422,7 @@ class FileStream(Stream):
     def readLine(self):
         """Read the next line of the data source.
         StopIteration is raised if there is no more data."""
-        return self.file.next()
+        return cnext(self.file)
 
 class StringStream(FileStream):
     '''For reading data from a string.'''
