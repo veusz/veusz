@@ -22,7 +22,7 @@ Contour plotting requires that the veusz_helpers package is installed,
 as a C routine (taken from matplotlib) is used to trace the contours.
 """
 
-from __future__ import division
+from __future__ import division, print_function
 from itertools import izip
 import sys
 
@@ -130,9 +130,9 @@ class Contour(plotters.GenericPlotter):
         try:
             from ..helpers._nc_cntr import Cntr
         except ImportError:
-            print >>sys.stderr,('WARNING: Veusz cannot import contour module\n'
+            print(('WARNING: Veusz cannot import contour module\n'
                                 'Please run python setup.py build\n'
-                                'Contour support is disabled')
+                                'Contour support is disabled'), file=sys.stderr)
             
         self.Cntr = Cntr
         # keep track of settings so we recalculate when necessary

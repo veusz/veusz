@@ -19,7 +19,7 @@
 """A home-brewed SVG paint engine for doing svg with clipping
 and exporting text as paths for WYSIWYG."""
 
-from __future__ import division
+from __future__ import division, print_function
 import re
 from .. import qtall as qt4
 
@@ -33,10 +33,10 @@ inch_pt = 72.0
 
 def printpath(path):
     """Debugging print path."""
-    print "Contents of", path
+    print("Contents of", path)
     for i in xrange(path.elementCount()):
         el = path.elementAt(i)
-        print " ", el.type, el.x, el.y
+        print(" ", el.type, el.x, el.y)
 
 def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places

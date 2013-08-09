@@ -15,7 +15,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
+from __future__ import division, print_function
 from urllib2 import urlopen
 
 try:
@@ -63,16 +63,16 @@ else:
                                                  table.array[fieldname]))
 
                     elif field.datatype in ['floatComplex', 'doubleComplex']:
-                        print('VO table import: skipping complex field ' +
-                              fieldname)
+                        print(('VO table import: skipping complex field ' +
+                              fieldname))
 
                     elif field.datatype in ['boolean', 'bit']:
-                        print('VO table import: skipping boolean field ' +
-                              fieldname)
+                        print(('VO table import: skipping boolean field ' +
+                              fieldname))
 
                     else:
-                        print('VO table import: unknown data type ' +
-                              field.datatype + ' for field ' + fieldname)
+                        print(('VO table import: unknown data type ' +
+                              field.datatype + ' for field ' + fieldname))
 
             return result
 

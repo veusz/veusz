@@ -24,7 +24,7 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import os.path
 import traceback
 
@@ -153,7 +153,7 @@ class CommandInterface(qt4.QObject):
         w = self.document.applyOperation(op)
 
         if self.verbose:
-            print "Added a widget of type '%s' (%s)" % (type, w.userdescription)
+            print("Added a widget of type '%s' (%s)" % (type, w.userdescription))
 
         return w.name
 
@@ -255,8 +255,8 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print ('Constructed histogram of "%s", creating datasets'
-                   ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds)
+            print(('Constructed histogram of "%s", creating datasets'
+                   ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds))
 
     def DatasetPlugin(self, pluginname, fields, datasetnames={}):
         """Use a dataset plugin.
@@ -281,8 +281,8 @@ class CommandInterface(qt4.QObject):
         outdatasets = self.document.applyOperation(op)
 
         if self.verbose:
-            print "Used dataset plugin %s to make datasets %s" % (
-                pluginname, ', '.join(outdatasets))
+            print("Used dataset plugin %s to make datasets %s" % (
+                pluginname, ', '.join(outdatasets)))
 
     def Remove(self, name):
         """Remove a widget from the dataset."""
@@ -290,7 +290,7 @@ class CommandInterface(qt4.QObject):
         op = operations.OperationWidgetDelete(w)
         self.document.applyOperation(op)
         if self.verbose:
-            print "Removed widget '%s'" % name
+            print("Removed widget '%s'" % name)
 
     def RemoveCustom(self, name):
         """Removes a custom-defined constant, function or import."""
@@ -314,7 +314,7 @@ class CommandInterface(qt4.QObject):
                                                    where)
 
         if self.verbose:
-            print "Changed to widget '%s'" % self.currentwidget.path
+            print("Changed to widget '%s'" % self.currentwidget.path)
 
     def List(self, where='.'):
         """List the contents of a widget, by default the current widget."""
@@ -323,12 +323,12 @@ class CommandInterface(qt4.QObject):
         children = widget.childnames
 
         if len(children) == 0:
-            print '%30s' % 'No children found'
+            print('%30s' % 'No children found')
         else:
             # output format name, type
             for name in children:
                 w = widget.getChild(name)
-                print '%10s %10s %30s' % (name, w.typename, w.userdescription)
+                print('%10s %10s %30s' % (name, w.typename, w.userdescription))
 
     def Get(self, var):
         """Get the value of a setting."""
@@ -373,8 +373,8 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
         
         if self.verbose:
-            print ( "Set setting '%s' to %s" %
-                    (var, repr(pref.get())) )
+            print(( "Set setting '%s' to %s" %
+                    (var, repr(pref.get())) ))
 
     def SetToReference(self, var, val):
         """Set setting to a reference value."""
@@ -384,8 +384,8 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
         
         if self.verbose:
-            print ( "Set setting '%s' to %s" %
-                    (var, repr(pref.get())) )
+            print(( "Set setting '%s' to %s" %
+                    (var, repr(pref.get())) ))
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Set dataset with name with values (and optionally errors)."""
@@ -395,11 +395,11 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
  
         if self.verbose:
-            print "Set dataset '%s':" % name
-            print " Values = %s" % str( data.data )
-            print " Symmetric errors = %s" % str( data.serr )
-            print " Negative errors = %s" % str( data.nerr )
-            print " Positive errors = %s" % str( data.perr )
+            print("Set dataset '%s':" % name)
+            print(" Values = %s" % str( data.data ))
+            print(" Symmetric errors = %s" % str( data.serr ))
+            print(" Negative errors = %s" % str( data.nerr ))
+            print(" Positive errors = %s" % str( data.perr ))
 
     def SetDataDateTime(self, name, vals):
         """Set datetime dataset to be values given.
@@ -411,8 +411,8 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Set dataset '%s':" % name
-            print " Values = %s" % str(ds.data)
+            print("Set dataset '%s':" % name)
+            print(" Values = %s" % str(ds.data))
 
     def SetDataExpression(self, name, val, symerr=None, negerr=None, poserr=None,
                           linked=False, parametric=None):
@@ -439,14 +439,14 @@ class CommandInterface(qt4.QObject):
         data = self.document.applyOperation(op)
         
         if self.verbose:
-            print "Set dataset '%s' based on expression:" % name
-            print " Values = %s" % str( data.data )
-            print " Symmetric errors = %s" % str( data.serr )
-            print " Negative errors = %s" % str( data.nerr )
-            print " Positive errors = %s" % str( data.perr )
+            print("Set dataset '%s' based on expression:" % name)
+            print(" Values = %s" % str( data.data ))
+            print(" Symmetric errors = %s" % str( data.serr ))
+            print(" Negative errors = %s" % str( data.nerr ))
+            print(" Positive errors = %s" % str( data.perr ))
             if parametric:
-                print " Where t goes form %g:%g in %i steps" % parametric
-            print " linked to expression = %s" % repr(linked)
+                print(" Where t goes form %g:%g in %i steps" % parametric)
+            print(" linked to expression = %s" % repr(linked))
 
     def SetDataRange(self, name, numsteps, val, symerr=None, negerr=None,
                      poserr=None, linked=False):
@@ -464,12 +464,12 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
         
         if self.verbose:
-            print "Set dataset '%s' based on range:" % name
-            print " Number of steps = %i" % numsteps
-            print " Range of data = %s" % repr(val)
-            print " Range of symmetric error = %s" % repr(symerr)
-            print " Range of positive error = %s" % repr(poserr)
-            print " Range of negative error = %s" % repr(negerr)
+            print("Set dataset '%s' based on range:" % name)
+            print(" Number of steps = %i" % numsteps)
+            print(" Range of data = %s" % repr(val))
+            print(" Range of symmetric error = %s" % repr(symerr))
+            print(" Range of positive error = %s" % repr(poserr))
+            print(" Range of negative error = %s" % repr(negerr))
 
     def SetData2DExpression(self, name, expr, linked=False):
         """Create a 2D dataset based on expressions
@@ -483,11 +483,11 @@ class CommandInterface(qt4.QObject):
         data = self.document.applyOperation(op)
 
         if self.verbose:
-            print "Set 2D dataset '%s' based on expressions" % name
-            print " expression = %s" % repr(expr)
-            print " linked to expression = %s" % repr(linked)
-            print " Made a dataset (%i x %i)" % (data.data.shape[0],
-                                                 data.data.shape[1])
+            print("Set 2D dataset '%s' based on expressions" % name)
+            print(" expression = %s" % repr(expr))
+            print(" linked to expression = %s" % repr(linked))
+            print(" Made a dataset (%i x %i)" % (data.data.shape[0],
+                                                 data.data.shape[1]))
 
     def SetData2DExpressionXYZ(self, name, xexpr, yexpr, zexpr, linked=False):
         """Create a 2D dataset based on expressions in x, y and z
@@ -503,13 +503,13 @@ class CommandInterface(qt4.QObject):
         data = self.document.applyOperation(op)
 
         if self.verbose:
-            print "Set 2D dataset '%s' based on expressions" % name
-            print " X expression = %s" % repr(xexpr)
-            print " Y expression = %s" % repr(yexpr)
-            print " Z expression = %s" % repr(zexpr)
-            print " linked to expression = %s" % repr(linked)
-            print " Made a dataset (%i x %i)" % (data.data.shape[0],
-                                                 data.data.shape[1])
+            print("Set 2D dataset '%s' based on expressions" % name)
+            print(" X expression = %s" % repr(xexpr))
+            print(" Y expression = %s" % repr(yexpr))
+            print(" Z expression = %s" % repr(zexpr))
+            print(" linked to expression = %s" % repr(linked))
+            print(" Made a dataset (%i x %i)" % (data.data.shape[0],
+                                                 data.data.shape[1]))
 
     def SetData2DXYFunc(self, name, xstep, ystep, expr, linked=False):
         """Create a 2D dataset based on expressions of a range of x and y
@@ -525,13 +525,13 @@ class CommandInterface(qt4.QObject):
         data = self.document.applyOperation(op)
 
         if self.verbose:
-            print "Set 2D dataset '%s' based on function of x and y" % name
-            print " X steps = %s" % repr(xstep)
-            print " Y steps = %s" % repr(ystep)
-            print " Expression = %s" % repr(expr)
-            print " linked to expression = %s" % repr(linked)
-            print " Made a dataset (%i x %i)" % (data.data.shape[0],
-                                                 data.data.shape[1])
+            print("Set 2D dataset '%s' based on function of x and y" % name)
+            print(" X steps = %s" % repr(xstep))
+            print(" Y steps = %s" % repr(ystep))
+            print(" Expression = %s" % repr(expr))
+            print(" linked to expression = %s" % repr(linked))
+            print(" Made a dataset (%i x %i)" % (data.data.shape[0],
+                                                 data.data.shape[1]))
 
     def SetData2D(self, name, data, xrange=None, yrange=None):
         """Create a 2D dataset."""
@@ -541,7 +541,7 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Set 2d dataset '%s'" % name
+            print("Set 2d dataset '%s'" % name)
 
     def SetDataText(self, name, val):
         """Create a text dataset."""
@@ -551,8 +551,8 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Set text dataset '%s'" % name
-            print " Values = %s" % unicode(data.data)
+            print("Set text dataset '%s'" % name)
+            print(" Values = %s" % unicode(data.data))
 
     def GetData(self, name):
         """Return the data with the name.
@@ -630,9 +630,9 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(op.outdatasets),)
+            print("Imported datasets %s" % (' '.join(op.outdatasets),))
             for name, num in op.outinvalids.iteritems():
-                print "%i errors encountered reading dataset %s" % (num, name)
+                print("%i errors encountered reading dataset %s" % (num, name))
 
         return (op.outdatasets, op.outinvalids)
 
@@ -662,7 +662,7 @@ class CommandInterface(qt4.QObject):
         op = operations.OperationDataImport2D(params)
         self.document.applyOperation(op)
         if self.verbose:
-            print "Imported datasets %s" % (', '.join(datasetnames))
+            print("Imported datasets %s" % (', '.join(datasetnames)))
 
     def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
                      invertrows=None, invertcols=None, transpose=None,
@@ -702,7 +702,7 @@ class CommandInterface(qt4.QObject):
         op = operations.OperationDataImport2D(params)
         self.document.applyOperation(op)
         if self.verbose:
-            print "Imported datasets %s" % (', '.join(datasetnames))
+            print("Imported datasets %s" % (', '.join(datasetnames)))
 
     def ImportFile(self, filename, descriptor, useblocks=False, linked=False,
                    prefix='', suffix='', ignoretext=False, encoding='utf_8'):
@@ -735,9 +735,9 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(op.outdatasets),)
+            print("Imported datasets %s" % (' '.join(op.outdatasets),))
             for name, num in op.outinvalids.iteritems():
-                print "%i errors encountered reading dataset %s" % (num, name)
+                print("%i errors encountered reading dataset %s" % (num, name))
 
         return (op.outdatasets, op.outinvalids)
 
@@ -798,7 +798,7 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Imported datasets %s" % (' '.join(op.outdatasets),)
+            print("Imported datasets %s" % (' '.join(op.outdatasets),))
 
         return op.outdatasets
 
@@ -984,5 +984,5 @@ class CommandInterface(qt4.QObject):
         self.document.applyOperation(op)
 
         if self.verbose:
-            print "Applied tag %s to datasets %s" % (
-                tag, ' '.join(datasets))
+            print("Applied tag %s to datasets %s" % (
+                tag, ' '.join(datasets)))

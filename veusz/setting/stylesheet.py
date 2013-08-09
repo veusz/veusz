@@ -16,7 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
+from __future__ import division, print_function
 import sys
 
 from .settings import Settings
@@ -83,7 +83,7 @@ def _registerFontStyleSheet():
             break
             
     if deffont is None:
-        print >>sys.stderr, "Warning: did not find a sensible default font. Choosing first font."    
+        print("Warning: did not find a sensible default font. Choosing first font.", file=sys.stderr)    
         deffont = families[0]
 
     collections.Text.defaultfamily = deffont

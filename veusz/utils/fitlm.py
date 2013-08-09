@@ -20,7 +20,7 @@
 Numerical fitting of functions to data.
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import sys
 
 import numpy as N
@@ -137,7 +137,7 @@ def fitLM(func, params, xvals, yvals, errors,
             iters += 1
             p = [iters, chi2] + params.tolist()
             str = ("%5i " + "%8g " * (len(params)+1)) % tuple(p)
-            print str
+            print(str)
 
     if not done:
         sys.stderr.write("Warning: maximum number of iterations reached\n")
@@ -145,7 +145,7 @@ def fitLM(func, params, xvals, yvals, errors,
     # print out fit statistics at end
     dof = len(yvals) - len(params)
     redchi2 = chi2 / dof
-    print "chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (chi2, dof, redchi2)
+    print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (chi2, dof, redchi2))
 
     return (params, chi2, dof)
 

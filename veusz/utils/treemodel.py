@@ -18,7 +18,7 @@
 
 """A Qt data model show a tree of Python nodes."""
 
-from __future__ import division
+from __future__ import division, print_function
 import bisect
 from .. import qtall as qt4
 
@@ -43,7 +43,7 @@ class TMNode(object):
 
     def doPrint(self, indent=0):
         """Print out tree for debugging."""
-        print " "*indent, self.data, self
+        print(" "*indent, self.data, self)
         for c in self.childnodes:
             c.doPrint(indent=indent+1)
 

@@ -38,7 +38,7 @@ This class is modelled on the one described in
 'GUI Programming in Python: QT Edition' (Boudewijn Rempt)
 """
 
-from __future__ import division
+from __future__ import division, print_function
 
 # get globals before things are imported
 _globals = globals()
@@ -264,7 +264,7 @@ class CommandInterpreter(object):
         self.globals['_tmp_args0'] = args
         self.globals['_tmp_args1'] = namedargs
 
-        print name, args, namedargs
+        print(name, args, namedargs)
         try:
             retn = eval('%s(*_tmp_args0, **_tmp_args1)' % name)
         except Exception as e:

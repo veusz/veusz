@@ -21,7 +21,7 @@
 Paints solid, hatching and various qt brushes
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import numpy as N
 from .. import qtall as qt4
 import math
@@ -36,15 +36,15 @@ def dumppath(p):
     while i < p.elementCount():
         e = p.elementAt(i)
         if e.isLineTo():
-            print " l(%i,%i)" %( e.x, e.y),
+            print(" l(%i,%i)" %( e.x, e.y), end=' ')
             i += 1
         elif e.isMoveTo():
-            print " m(%i,%i)" %(e.x, e.y),
+            print(" m(%i,%i)" %(e.x, e.y), end=' ')
             i += 1
         else:
-            print " c(%i,%i,%i,%i)" %(e.x, e.y, p.elementAt(i+1).x, p.elementAt(i+1).y, p.elementAt(i+2).x, p.elementAt(i+2).y),
+            print(" c(%i,%i,%i,%i)" %(e.x, e.y, p.elementAt(i+1).x, p.elementAt(i+1).y, p.elementAt(i+2).x, p.elementAt(i+2).y), end=' ')
             i += 3
-    print
+    print()
 
 def _hatcher(painter, pen, painterpath, spacing, hatchlist):
     """Draw hatching on painter path given."""

@@ -18,7 +18,7 @@
 
 """For plotting shapes."""
 
-from __future__ import division
+from __future__ import division, print_function
 import itertools
 import os
 
@@ -288,7 +288,7 @@ class ImageFile(BoxShape):
         s = self.settings
 
         if s.filename == '{embedded}':
-            print "Data already embedded"
+            print("Data already embedded")
             return
 
         # get data from external file
@@ -297,7 +297,7 @@ class ImageFile(BoxShape):
             data = f.read()
             f.close()
         except EnvironmentError:
-            print "Could not find file. Not embedding."
+            print("Could not find file. Not embedding.")
             return
 
         # convert to base 64 to make it nicer in the saved file

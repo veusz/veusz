@@ -18,7 +18,7 @@
 
 """A database for default values of settings."""
 
-from __future__ import division
+from __future__ import division, print_function
 import sys
 
 from .. import qtall as qt4
@@ -140,8 +140,8 @@ class _SettingDB(object):
             try:
                 self.database[realkey] = eval(val)
             except:
-                print >>sys.stderr, ('Error interpreting item "%s" in '
-                                     'settings file' % realkey)
+                print(('Error interpreting item "%s" in '
+                                     'settings file' % realkey), file=sys.stderr)
 
         # set any defaults which haven't been set
         for key, value in defaultValues.iteritems():

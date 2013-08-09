@@ -26,7 +26,7 @@ Operations store paths to objects to be modified rather than object references
 because some operations cannot restore references (e.g. add object)
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import os.path
 from itertools import izip
 
@@ -1012,7 +1012,7 @@ class OperationDataImportFITS(OperationDataImportBase):
         if ( p.datacol is not None or p.symerrcol is not None
              or p.poserrcol is not None
              or p.negerrcol is not None ):
-            print "Warning: ignoring columns as import 2D dataset"
+            print("Warning: ignoring columns as import 2D dataset")
 
         header = hdu.header
         data = hdu.data
