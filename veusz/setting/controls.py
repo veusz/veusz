@@ -45,7 +45,7 @@ def styleClear(widget):
 def styleError(widget):
     """Show error state on widget."""
     widget.setStyleSheet("background-color: " +
-                         settingdb.settingdb.color('error').name() )
+                         settingdb.color('error').name() )
 
 class DotDotButton(qt4.QPushButton):
     """A button for opening up more complex editor."""
