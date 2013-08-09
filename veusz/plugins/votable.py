@@ -39,7 +39,7 @@ else:
         description = 'Reads datasets from VO tables'
 
         def _load_votable(self, params):
-            if params.field_results.has_key('url'):
+            if 'url' in params.field_results:
                 buff = StringIO(urlopen(params.field_results['url']).read())
                 return parse(buff, filename=params.filename)
             else:
