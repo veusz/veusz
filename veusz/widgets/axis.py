@@ -20,9 +20,9 @@
 positions."""
 
 from __future__ import division
-from itertools import izip
 import numpy as N
 
+from ..compat import czip
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -753,7 +753,7 @@ class Axis(widget.Widget):
             if None not in (labels, coords):
                 # convert coordinates to plotter coordinates
                 pcoords = self._graphToPlotter(coords)
-                for coord, pcoord, lab in izip(coords, pcoords, labels):
+                for coord, pcoord, lab in czip(coords, pcoords, labels):
                     # return labels that are within the plotted range
                     # of coordinates
                     if N.isfinite(coord) and (minval <= coord <= maxval):
@@ -804,7 +804,7 @@ class Axis(widget.Widget):
                 format = self.autoformat
 
             # generate positions and labels
-            for posn, tickval in izip(coordticks, tickvals):
+            for posn, tickval in czip(coordticks, tickvals):
                 text = utils.formatNumber(tickval*scale, format,
                                           locale=self.document.locale)
                 yield posn, text

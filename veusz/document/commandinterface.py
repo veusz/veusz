@@ -28,6 +28,7 @@ from __future__ import division, print_function
 import os.path
 import traceback
 
+from ..compat import citems
 from .. import qtall as qt4
 from .. import setting
 from .. import embed
@@ -631,7 +632,7 @@ class CommandInterface(qt4.QObject):
 
         if self.verbose:
             print("Imported datasets %s" % (' '.join(op.outdatasets),))
-            for name, num in op.outinvalids.iteritems():
+            for name, num in citems(op.outinvalids):
                 print("%i errors encountered reading dataset %s" % (num, name))
 
         return (op.outdatasets, op.outinvalids)
@@ -736,7 +737,7 @@ class CommandInterface(qt4.QObject):
 
         if self.verbose:
             print("Imported datasets %s" % (' '.join(op.outdatasets),))
-            for name, num in op.outinvalids.iteritems():
+            for name, num in citems(op.outinvalids):
                 print("%i errors encountered reading dataset %s" % (num, name))
 
         return (op.outdatasets, op.outinvalids)

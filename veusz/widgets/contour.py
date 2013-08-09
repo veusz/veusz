@@ -23,9 +23,9 @@ as a C routine (taken from matplotlib) is used to trace the contours.
 """
 
 from __future__ import division, print_function
-from itertools import izip
 import sys
 
+from ..compat import czip
 from .. import qtall as qt4
 import numpy as N
 
@@ -324,7 +324,7 @@ class Contour(plotters.GenericPlotter):
         elif scaling == 'manual':
             drange = N.arange(1, num)
             out = [[]]
-            for conmin, conmax in izip(levels[:-1], levels[1:]):
+            for conmin, conmax in czip(levels[:-1], levels[1:]):
                 delta = (conmax-conmin) / num
                 out.append( conmin+drange*delta )
             slev = N.hstack(out)
@@ -469,7 +469,7 @@ class Contour(plotters.GenericPlotter):
             # trace the polygons between the contours
             if len(s.Fills.fills) != 0 and len(levels) > 1 and not s.Fills.hide:
                 self._cachedpolygons = []
-                for level1, level2 in izip(levels[:-1], levels[1:]):
+                for level1, level2 in czip(levels[:-1], levels[1:]):
                     linelist = c.trace(level1, level2)
                     self._cachedpolygons.append( finitePoly(linelist) )
 

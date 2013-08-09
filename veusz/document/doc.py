@@ -30,6 +30,7 @@ from collections import defaultdict
 
 import numpy as N
 
+from ..compat import crange, citems, cvalues
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -304,7 +305,7 @@ class Document( qt4.QObject ):
 
     def modifiedData(self, dataset):
         """The named dataset was modified"""
-        for name, ds in self.data.iteritems():
+        for name, ds in citems(self.data):
             if ds is dataset:
                 self.datachangesets[name] += 1
                 self.datachangeset += 1
@@ -315,7 +316,7 @@ class Document( qt4.QObject ):
         if filenames is a set, only get the objects with filenames given
         """
         links = set()
-        for ds in self.data.itervalues():
+        for ds in cvalues(self.data):
             if ds.linked and (filenames is None or
                               ds.linked.filename in filenames):
                 links.add(ds.linked)
@@ -348,7 +349,7 @@ class Document( qt4.QObject ):
 
     def datasetName(self, dataset):
         """Find name for given dataset, raising ValueError if missing."""
-        for name, ds in self.data.iteritems():
+        for name, ds in citems(self.data):
             if ds is dataset:
                 return name
         raise ValueError("Cannot find dataset")
@@ -445,7 +446,7 @@ class Document( qt4.QObject ):
     def datasetTags(self):
         """Get list of all tags in datasets."""
         tags = set()
-        for dataset in self.data.itervalues():
+        for dataset in cvalues(self.data):
             tags.update(dataset.tags)
         return list(sorted(tags))
 
@@ -468,12 +469,12 @@ class Document( qt4.QObject ):
 
         # get a list of all tags and which datasets have them
         bytag = defaultdict(list)
-        for name, dataset in sorted(self.data.iteritems()):
+        for name, dataset in sorted(citems(self.data)):
             for t in dataset.tags:
                 bytag[t].append(name)
 
         # write out tags
-        for tag, val in sorted(bytag.iteritems()):
+        for tag, val in sorted(citems(bytag)):
             fileobj.write('TagDatasets(%s, %s)\n' %
                           (repr(tag), repr(val)))
 
@@ -642,7 +643,7 @@ class Document( qt4.QObject ):
             return symbols
 
         # two-pass to ask user whether they want to import symbol
-        for thepass in xrange(2):
+        for thepass in crange(2):
             # remembered during session
             a = 'import_allowed'
             if a not in setting.transient_settings:
@@ -828,7 +829,7 @@ class Document( qt4.QObject ):
 
         # add numpy things
         # we try to avoid various bits and pieces for safety
-        for name, val in N.__dict__.iteritems():
+        for name, val in citems(N.__dict__):
             if ( (callable(val) or type(val)==float) and
                  name not in __builtins__ and
                  name[:1] != '_' and name[-1:] != '_' ):
@@ -932,7 +933,7 @@ class Document( qt4.QObject ):
                            nodetypes=nodetypes, _path=_path)
         elif root.nodetype == 'settings':
             # do the settings of the settings
-            for name, s in sorted(root.setdict.iteritems()):
+            for name, s in sorted(citems(root.setdict)):
                 self.walkNodes(tocall, root=s, nodetypes=nodetypes,
                                _path = _path + '/' + s.name)
         # elif root.nodetype == 'setting': pass

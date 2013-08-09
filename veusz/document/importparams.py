@@ -19,6 +19,7 @@
 """Parameters for import routines."""
 
 from __future__ import division
+from ..compat import citems
 
 class ImportParamsBase(object):
     """Import parameters for the various imports.
@@ -46,11 +47,11 @@ class ImportParamsBase(object):
         """
 
         #  set defaults
-        for k, v in self.defaults.iteritems():
+        for k, v in citems(self.defaults):
             setattr(self, k, v)
 
         # set parameters
-        for k, v in argsv.iteritems():
+        for k, v in citems(argsv):
             if k not in self.defaults:
                 raise ValueError("Invalid parameter %s" % k)
             setattr(self, k, v)
@@ -182,7 +183,7 @@ class ImportParamsPlugin(ImportParamsBase):
 
         pluginpars = {}
         upvars = {}
-        for n, v in argsv.iteritems():
+        for n, v in citems(argsv):
             if n in self.defaults:
                 upvars[n] = v
             else:

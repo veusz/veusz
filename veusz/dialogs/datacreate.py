@@ -18,6 +18,7 @@
 
 """Dataset creation dialog."""
 
+from ..compat import citems, ckeys
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -143,7 +144,7 @@ class DataCreateDialog(VeuszDialog):
             # make sure name is set
             self.nameedit.setText(dsname)
             # set expressions
-            for part in self.dsedits.iterkeys():
+            for part in ckeys(self.dsedits):
                 text = ds.expr[part]
                 if text is None:
                     text = ''
@@ -155,7 +156,7 @@ class DataCreateDialog(VeuszDialog):
             # make sure name is set
             self.nameedit.setText(dsname)
             # set expressions
-            for part in self.dsedits.iterkeys():
+            for part in ckeys(self.dsedits):
                 data = getattr(ds, 'range_%s' % part)
                 if data is None:
                     text = ''
@@ -259,7 +260,7 @@ class DataCreateDialog(VeuszDialog):
 
         # go over each of the ranges / values
         vals = {}
-        for key, cntrl in self.dsedits.iteritems():
+        for key, cntrl in citems(self.dsedits):
             text = cntrl.text().strip()
 
             if not text:
@@ -300,7 +301,7 @@ class DataCreateDialog(VeuszDialog):
 
         # get expressions
         vals = {}
-        for key, cntrl in self.dsedits.iteritems():
+        for key, cntrl in citems(self.dsedits):
             text = cntrl.text().strip()
             if text:
                 vals[key] = text
@@ -315,7 +316,7 @@ class DataCreateDialog(VeuszDialog):
 
         # get expression for each part of the dataset
         vals = {}
-        for key, cntrl in self.dsedits.iteritems():
+        for key, cntrl in citems(self.dsedits):
             text = cntrl.text().strip()
             if text:
                 vals[key] = text

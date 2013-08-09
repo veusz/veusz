@@ -17,6 +17,7 @@
 ##############################################################################
 
 from __future__ import division
+from ..compat import citems
 from .. import qtall as qt4
 from .. import setting
 from .. import utils
@@ -181,7 +182,7 @@ class PreferencesDialog(VeuszDialog):
 
     def updateButtonColors(self):
         """Update color icons on color buttons."""
-        for name, val in self.chosencolors.iteritems():
+        for name, val in citems(self.chosencolors):
             pixmap = qt4.QPixmap(16, 16)
             pixmap.fill(val)
             self.colorbutton[name].setIcon( qt4.QIcon(pixmap) )
@@ -257,7 +258,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['custom_default'] = self.customLineEdit.text()
 
         # colors
-        for name, color in self.chosencolors.iteritems():
+        for name, color in citems(self.chosencolors):
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = color.name()
             setdb['color_' + name] = (isdefault, colorname)

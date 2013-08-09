@@ -25,7 +25,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems
+from ..compat import citems, czip
 from .. import document
 from .. import setting
 from .. import utils
@@ -286,7 +286,7 @@ class Fit(FunctionPlotter):
         def evalfunc(params, xvals):
             # update environment with variable and parameters
             evalenv[self.settings.variable] = xvals
-            evalenv.update( zip(paramnames, params) )
+            evalenv.update( czip(paramnames, params) )
 
             try:
                 return eval(compiled, evalenv) + xvals*0.
@@ -337,7 +337,7 @@ class Fit(FunctionPlotter):
                                           xvals,
                                           yvals, yserr)
             vals = {}
-            for i, v in zip(paramnames, retn):
+            for i, v in czip(paramnames, retn):
                 vals[i] = float(v)
 
         # list of operations do we can undo the changes

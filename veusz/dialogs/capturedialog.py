@@ -19,6 +19,7 @@
 """Veusz data capture dialog."""
 
 from __future__ import division
+from ..compat import citems
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -281,7 +282,7 @@ class CapturingDialog(VeuszDialog):
         cts = self.simpleread.getDatasetCounts()
 
         # iterate over each dataset
-        for name, length in cts.iteritems():
+        for name, length in citems(cts):
             find = tree.findItems(name, qt4.Qt.MatchExactly, 0)
             if find:
                 # if already in tree, update number of counts

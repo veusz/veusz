@@ -542,7 +542,7 @@ class Distance(Choice):
             newitems.insert(0, text)
 
         # get rid of existing items in list (clear doesn't work here)
-        for i in range(self.count()):
+        for i in crange(self.count()):
             self.removeItem(0)
 
         # put new items in and select the correct option
@@ -614,7 +614,7 @@ class Dataset(qt4.QWidget):
 
         # get datasets of the correct dimension
         datasets = []
-        for name, ds in self.document.data.iteritems():
+        for name, ds in citems(self.document.data):
             if ds.dimensions == self.dimensions and ds.datatype == self.datatype:
                 datasets.append(name)
         datasets.sort()

@@ -22,6 +22,7 @@ and formatting properties."""
 
 from __future__ import division
 
+from ..compat import crange, citems
 from .. import qtall as qt4
 
 from .. import widgets
@@ -808,7 +809,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         # check whether each button can have this widget
         # (or a parent) as parent
-        for wc, action in self.addslots.iteritems():
+        for wc, action in citems(self.addslots):
             w = selw
             while w is not None and not wc.willAllowParent(w):
                 w = w.parent
@@ -1037,7 +1038,7 @@ class TreeEditDock(qt4.QDockWidget):
     def doInitialWidgetSelect(self):
         """Select a sensible initial widget."""
         w = self.document.basewidget
-        for i in xrange(2):
+        for i in crange(2):
             try:
                 c = w.children[0]
             except IndexError:

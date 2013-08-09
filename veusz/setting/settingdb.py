@@ -21,6 +21,7 @@
 from __future__ import division, print_function
 import sys
 
+from ..compat import citems
 from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Preferences"):
@@ -144,7 +145,7 @@ class _SettingDB(object):
                                      'settings file' % realkey), file=sys.stderr)
 
         # set any defaults which haven't been set
-        for key, value in defaultValues.iteritems():
+        for key, value in citems(defaultValues):
             if key not in self.database:
                 self.database[key] = value
 
@@ -158,7 +159,7 @@ class _SettingDB(object):
 
         # write each entry, keeping track of which ones haven't been written
         cleankeys = []
-        for key, value in self.database.iteritems():
+        for key, value in citems(self.database):
             cleankey = key.replace('/', self.sepchars)
             cleankeys.append(cleankey)
 

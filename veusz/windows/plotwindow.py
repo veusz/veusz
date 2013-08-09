@@ -23,6 +23,7 @@ from __future__ import division
 import sys
 import traceback
 
+from ..compat import crange, ckeys
 from .. import qtall as qt4
 import numpy as N
 
@@ -101,7 +102,7 @@ class RenderControl(qt4.QObject):
             self.exit = False
 
         # start new ones
-        for i in xrange(num):
+        for i in crange(num):
             t = RenderThread(self)
             t.start()
             self.threads.append(t)
@@ -529,7 +530,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     axes[a] = True
 
         # iterate over each axis, and update the ranges
-        for axis in axes.iterkeys():
+        for axis in ckeys(axes):
             s = axis.settings
             if s.direction == 'horizontal':
                 p = xpts

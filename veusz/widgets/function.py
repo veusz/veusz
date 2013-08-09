@@ -19,10 +19,10 @@
 """For plotting numerical functions."""
 
 from __future__ import division
-from .. import qtall as qt4
-import itertools
 import numpy as N
 
+from ..compat import czip
+from .. import qtall as qt4
 from .. import document
 from .. import setting
 from .. import utils
@@ -187,7 +187,7 @@ class FunctionPlotter(GenericPlotter):
         # or reach the end, then plot them
         pts = qt4.QPolygonF()
         lastx = lasty = -65536
-        for x, y in itertools.izip(xpts, ypts):
+        for x, y in czip(xpts, ypts):
 
             # ignore point if it outside sensible bounds
             if x < -32767 or y < -32767 or x > 32767 or y > 32767:

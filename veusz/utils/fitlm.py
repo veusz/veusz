@@ -29,6 +29,8 @@ try:
 except:
     import scipy.linalg as NLA
 
+from ..compat import crange
+
 def fitLM(func, params, xvals, yvals, errors,
           stopdeltalambda = 1e-5,
           deltaderiv = 1e-5, maxiters = 20, Lambda = 1e-4):
@@ -82,7 +84,7 @@ def fitLM(func, params, xvals, yvals, errors,
         # also calculate the derivative of the function at each of the points
         # wrt the parameters
 
-        for i in range( len(params) ):
+        for i in crange( len(params) ):
             params[i] += deltaderiv
             new_func = func(params, xvals)
             chi2_new = ((new_func - yvals)**2 * inve2).sum()
@@ -97,8 +99,8 @@ def fitLM(func, params, xvals, yvals, errors,
 
         # calculate alpha matrix
         # FIXME: stupid - must be a better way to avoid this iteration
-        for j in range( len(params) ):
-            for k in range(j+1):
+        for j in crange( len(params) ):
+            for k in crange(j+1):
                 v = (derivs[j]*derivs[k] * inve2).sum()
                 alpha[j][k] = v
                 alpha[k][j] = v

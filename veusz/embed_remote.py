@@ -22,6 +22,7 @@ import struct
 import cPickle
 import socket
 
+from .compat import citems
 from .windows.simplewindow import SimpleWindow
 from . import document
 from . import qtall as qt4
@@ -203,7 +204,7 @@ class EmbedApplication(qt4.QApplication):
         self.clients[self.clientcounter] = client
         # return new number and list of commands and docstrings
         retfuncs = []
-        for name, cmd in client.ci.cmds.iteritems():
+        for name, cmd in citems(client.ci.cmds):
             retfuncs.append( (name, cmd.__doc__) )
 
         retval = self.clientcounter, retfuncs

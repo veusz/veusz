@@ -26,6 +26,7 @@ import os.path
 import signal
 import optparse
 
+from .compat import czip
 from . import qtall as qt4
 from . import utils
 
@@ -86,7 +87,7 @@ def listen(args, quiet):
 def export(exports, args):
     '''A shortcut to load a set of files and export them.'''
     from . import document
-    for expfn, vsz in zip(exports, args[1:]):
+    for expfn, vsz in czip(exports, args[1:]):
         doc = document.Document()
         ci = document.CommandInterpreter(doc)
         ci.Load(vsz)

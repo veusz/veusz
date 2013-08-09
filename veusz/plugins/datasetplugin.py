@@ -22,9 +22,9 @@
 
 from __future__ import division
 import numpy as N
-from itertools import izip
 from . import field
 
+from ..compat import czip, citems
 from .. import utils
 try:
     from ..helpers import qtloops
@@ -205,26 +205,26 @@ class DatasetPluginHelper(object):
     @property
     def datasets1d(self):
         """Return list of existing 1D numeric datasets"""
-        return [name for name, ds in self._doc.data.iteritems() if
+        return [name for name, ds in citems(self._doc.data) if
                 (ds.dimensions == 1 and ds.datatype == 'numeric')]
 
     @property
     def datasets2d(self):
         """Return list of existing 2D numeric datasets"""
-        return [name for name, ds in self._doc.data.iteritems() if
+        return [name for name, ds in citems(self._doc.data) if
                 (ds.dimensions == 2 and ds.datatype == 'numeric')]
 
     @property
     def datasetstext(self):
         """Return list of existing 1D text datasets"""
-        return [name for name, ds in self._doc.data.iteritems() if
+        return [name for name, ds in citems(self._doc.data) if
                 (ds.dimensions == 1 and ds.datatype == 'text')]
 
     @property
     def datasetsdatetime(self):
         """Return list of existing date-time datesets"""
         from .. import document
-        return [name for name, ds in self._doc.data.iteritems() if
+        return [name for name, ds in citems(self._doc.data) if
                 isinstance(ds, document.DatasetDateTime)]
 
     def evaluateExpression(self, expr, part='data'):
@@ -345,7 +345,7 @@ class DatasetPluginManager(object):
 
         # look for renamed or deleted datasets
         names = {}
-        for ds, dsname in izip( self.veuszdatasets, self.datasetnames ):
+        for ds, dsname in czip( self.veuszdatasets, self.datasetnames ):
             try:
                 currentname = self.document.datasetName(ds)
             except ValueError:

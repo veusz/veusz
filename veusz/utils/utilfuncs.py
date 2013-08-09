@@ -31,6 +31,7 @@ import StringIO
 import locale
 from collections import defaultdict
 
+from ..compat import citems
 from .. import qtall as qt4
 import numpy as N
 
@@ -484,5 +485,5 @@ def topological_sort(dependency_pairs):
             if not num_heads[t]:
                 ordered.append(t)
         i += 1
-    cyclic = [n for n, heads in num_heads.iteritems() if heads]
+    cyclic = [n for n, heads in citems(num_heads) if heads]
     return ordered, cyclic

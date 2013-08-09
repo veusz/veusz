@@ -31,8 +31,9 @@ import re
 import sys
 
 import numpy as N
-from .. import qtall as qt4
 
+from ..compat import citems
+from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
 from .reference import Reference
@@ -937,7 +938,7 @@ class FloatDict(Setting):
             raise utils.InvalidType
 
         out = {}
-        for key, val in val.iteritems():
+        for key, val in citems(val):
             if type(val) not in (float, int):
                 raise utils.InvalidType
             else:
@@ -1528,7 +1529,7 @@ class WidgetChoice(Str):
 
         # turn (object, level) pairs into object
         outdict = {}
-        for name, val in images.iteritems():
+        for name, val in citems(images):
             outdict[name] = val[0]
 
         return outdict

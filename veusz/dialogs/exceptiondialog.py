@@ -30,6 +30,7 @@ import base64
 import numpy
 import sip
 
+from ..compat import citems
 from .. import qtall as qt4
 from .. import utils
 from .veuszdialog import VeuszDialog
@@ -135,7 +136,7 @@ def formatLocals(exception):
                          frame.f_lineno))
 
         # get local variables for frame
-        for key, value in frame.f_locals.iteritems():
+        for key, value in citems(frame.f_locals):
             # print out variables in frame
             try:
                 v = repr(value)

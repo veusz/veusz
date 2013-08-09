@@ -19,9 +19,9 @@
 ###############################################################################
 
 from __future__ import division
-import itertools
 import numpy as N
 
+from ..compat import czip
 from .. import setting
 from .. import document
 from .. import utils
@@ -210,8 +210,7 @@ class VectorField(plotters.GenericPlotter):
             else:
                 arrowsizes = N.zeros(lengths.shape) + arrowsize
 
-            for x, y, l, a, asize in itertools.izip(x2, y2, lengths, angles,
-                                                    arrowsizes):
+            for x, y, l, a, asize in czip(x2, y2, lengths, angles, arrowsizes):
                 if l != 0.:
                     utils.plotLineArrow(painter, x, y, l, a, asize,
                                         arrowleft=s.arrowfront,

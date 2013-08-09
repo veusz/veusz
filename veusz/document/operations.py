@@ -28,10 +28,10 @@ because some operations cannot restore references (e.g. add object)
 
 from __future__ import division, print_function
 import os.path
-from itertools import izip
 
 import numpy as N
 
+from ..compat import czip, crange, citems
 from . import datasets
 from . import widgetfactory
 from . import simpleread
@@ -142,7 +142,7 @@ class OperationSettingPropagate(object):
     def undo(self, document):
         """Undo all those changes."""
         
-        for setpath, setval in self.restorevals.iteritems():
+        for setpath, setval in citems(self.restorevals):
             setting = document.resolveFullSettingPath(setpath)
             setting.set(setval)
 
@@ -241,7 +241,7 @@ class OperationWidgetsDelete(object):
         i = 0
         while i < len(widgetpaths):
             wp = widgetpaths[i]
-            for j in xrange(i):
+            for j in crange(i):
                 if wp[:len(widgetpaths[j])+1] == widgetpaths[j]+'/':
                     del widgetpaths[i]
                     break
@@ -264,7 +264,7 @@ class OperationWidgetsDelete(object):
         """Restore deleted widget."""
         
         # put back widgets in reverse order so that indexes are corrent
-        for i in xrange(len(self.oldwidgets)-1,-1,-1):
+        for i in crange(len(self.oldwidgets)-1,-1,-1):
             oldparent = document.resolveFullWidgetPath(self.oldparentpaths[i])
             oldparent.addChild(self.oldwidgets[i], index=self.oldindexes[i])
         
@@ -778,14 +778,14 @@ class OperationDatasetUnlinkByFile(object):
     def do(self, document):
         """Remove links."""
         self.oldlinks = {}
-        for name, ds in document.data.iteritems():
+        for name, ds in citems(document.data):
             if ds.linked is not None and ds.linked.filename == self.filename:
                 self.oldlinks[name] = ds.linked
                 ds.linked = None
 
     def undo(self, document):
         """Restore links."""
-        for name, link in self.oldlinks.iteritems():
+        for name, link in citems(self.oldlinks):
             try:
                 document.data[name].linked = link
             except KeyError:
@@ -810,7 +810,7 @@ class OperationDatasetDeleteByFile(object):
 
     def undo(self, document):
         """Restore datasets."""
-        for name, ds in self.olddatasets.iteritems():
+        for name, ds in citems(self.olddatasets):
             document.setData(name, ds)
 
 ###############################################################################
@@ -1499,7 +1499,7 @@ class OperationDatasetPlugin(object):
         names = self.datasetnames = list(manager.datasetnames)
 
         # rename if requested
-        for i in xrange(len(names)):
+        for i in crange(len(names)):
             if names[i] in self.names:
                 names[i] = self.names[names[i]]
 
@@ -1509,7 +1509,7 @@ class OperationDatasetPlugin(object):
                 self.olddata[name] = document.data[name]
 
         # add new datasets to document
-        for name, ds in izip(names, manager.veuszdatasets):
+        for name, ds in czip(names, manager.veuszdatasets):
             if name is not None:
                 document.setData(name, ds)
 
@@ -1528,5 +1528,5 @@ class OperationDatasetPlugin(object):
                 document.deleteData(name)
 
         # put back old datasets
-        for name, ds in self.olddata.iteritems():
+        for name, ds in citems(self.olddata):
             document.setData(name, ds)

@@ -22,6 +22,7 @@
 from __future__ import division
 import sys
 
+from ..compat import citems
 from .. import utils
 
 class LinkedFileBase(object):
@@ -95,7 +96,7 @@ class LinkedFileBase(object):
 
             # find datasets which are linked using this link object
             # return errors for them
-            errors = dict([(name, 1) for name, ds in document.data.iteritems()
+            errors = dict([(name, 1) for name, ds in citems(document.data)
                            if ds.linked is self])
             return ([], errors)
 
@@ -236,7 +237,7 @@ class LinkedFilePlugin(LinkedFileBase):
             params.append("prefix=" + repr(p.prefix))
         if p.suffix:
             params.append("suffix=" + repr(p.suffix))
-        for name, val in p.pluginpars.iteritems():
+        for name, val in citems(p.pluginpars):
             params.append("%s=%s" % (name, repr(val)))
 
         fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))

@@ -17,8 +17,9 @@
 ###############################################################################
 
 from __future__ import division
-from itertools import izip, count
+from itertools import count
 
+from ..compat import czip, citems
 from .. import qtall as qt4
 
 from . import doc
@@ -196,7 +197,7 @@ class OperationWidgetPaste(operations.OperationMultiple):
         newwidgets = []
         widgetline = 1+4*numwidgets
         try:
-            for wtype, name, numline in izip(types, names, widgetslines):
+            for wtype, name, numline in czip(types, names, widgetslines):
                 thisparent = doc.getSuitableParent(wtype, parentwidget)
 
                 if thisparent is None:
@@ -272,7 +273,7 @@ class OperationDataPaste(object):
         self.newds = []
 
         # now transfer datasets to existing document
-        for name, ds in sorted(tempdoc.data.iteritems()):
+        for name, ds in sorted(citems(tempdoc.data)):
 
             # get new name
             if name not in thisdoc.data:

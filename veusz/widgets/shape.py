@@ -22,6 +22,7 @@ from __future__ import division, print_function
 import itertools
 import os
 
+from ..compat import czip
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -132,10 +133,10 @@ class BoxShape(Shape):
             # iterate over positions
             index = 0
             dx, dy = posn[2]-posn[0], posn[3]-posn[1]
-            for x, y, w, h, r in itertools.izip(xpos, ypos,
-                                                itertools.cycle(width),
-                                                itertools.cycle(height),
-                                                itertools.cycle(rotate)):
+            for x, y, w, h, r in czip(xpos, ypos,
+                                      itertools.cycle(width),
+                                      itertools.cycle(height),
+                                      itertools.cycle(rotate)):
                 wp, hp = dx*w, dy*h
                 painter.save()
                 painter.translate(x, y)

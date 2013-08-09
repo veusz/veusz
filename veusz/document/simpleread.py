@@ -46,6 +46,7 @@ import cStringIO
 
 import numpy as N
 
+from ..compat import crange
 from .. import utils
 from . import datasets
 
@@ -222,7 +223,7 @@ class DescriptorPart(object):
         """Read data from stream, and write to thedatasets."""
 
         # loop over column range
-        for index in xrange(self.startindex, self.stopindex+1):
+        for index in crange(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
                 name = self.name
@@ -289,7 +290,7 @@ class DescriptorPart(object):
             return []
 
         names = []
-        for index in xrange(self.startindex, self.stopindex+1):
+        for index in crange(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
                 name = '%s' % (self.name,)
@@ -567,7 +568,7 @@ class SimpleRead(object):
         """Get a dict of the datasets read (main data part) and number
         of entries read."""
         out = {}
-        for name, data in self.datasets.iteritems():
+        for name, data in citems(self.datasets):
             if name[-2:] == '\0D':
                 out[name[:-2]] = len(data)
         return out

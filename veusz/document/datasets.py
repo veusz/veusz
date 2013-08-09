@@ -21,10 +21,10 @@
 
 from __future__ import division
 import re
-from itertools import izip
 
 import numpy as N
 
+from ..compat import czip, crange, citems
 from .. import qtall as qt4
 from .. import utils
 from .. import setting
@@ -178,7 +178,7 @@ class DatasetBase(object):
 
     def name(self):
         """Get dataset name."""
-        for name, ds in self.document.data.iteritems():
+        for name, ds in citems(self.document.data):
             if ds == self:
                 return name
         raise ValueError('Could not find self in document.data')
@@ -557,7 +557,7 @@ class Dataset(DatasetBase):
 
         # do the conversion
         lines = []
-        for line in izip(*cols):
+        for line in czip(*cols):
             lines.append( format % line )
         return ''.join(lines)
 
@@ -827,7 +827,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
             minlen = len(vals[0])
             if len(vals) in (2,3):
                 # expand/convert error bars
-                for i in xrange(1, len(vals)):
+                for i in crange(1, len(vals)):
                     if N.isscalar(vals[i]):
                         # convert to scalar
                         vals[i] = N.zeros(minlen) + vals[i]
@@ -839,7 +839,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
                     minlen = min(minlen, len(vals[i]))
 
                 # chop to minimum length
-                for i in xrange(len(vals)):
+                for i in crange(len(vals)):
                     vals[i] = vals[i][:minlen]
             vals = N.array(vals, dtype=N.float64)
             err = None
@@ -1114,7 +1114,7 @@ class DatasetExpression(Dataset):
             text.append(_('Linked parametric dataset'))
         else:
             text.append(_('Linked expression dataset'))
-        for label, part in izip(self.column_descriptions,
+        for label, part in czip(self.column_descriptions,
                                 self.columns):
             if self.expr[part]:
                 text.append('%s: %s' % (label, self.expr[part]))
@@ -1190,7 +1190,7 @@ class DatasetRange(Dataset):
     def linkedInformation(self):
         """Return information about linking."""
         text = [_('Linked range dataset')]
-        for label, part in izip(self.column_descriptions,
+        for label, part in czip(self.column_descriptions,
                                 self.columns):
             val = getattr(self, 'range_%s' % part)
             if val:
@@ -1514,7 +1514,7 @@ class _DatasetPlugin(object):
         """Return information about how this dataset was created."""
 
         fields = []
-        for name, val in self.pluginmanager.fields.iteritems():
+        for name, val in citems(self.pluginmanager.fields):
             fields.append('%s: %s' % (unicode(name), unicode(val)))
 
         try:

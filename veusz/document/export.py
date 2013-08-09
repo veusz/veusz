@@ -23,6 +23,7 @@ import os.path
 import random
 import math
 
+from ..compat import crange
 from .. import qtall as qt4
 from .. import utils
 
@@ -339,9 +340,9 @@ def printDialog(parentwindow, document, filename=None):
 
         # reverse or forward order
         if prnt.pageOrder() == qt4.QPrinter.FirstPageFirst:
-            pages = range(minval, maxval+1)
+            pages = list(crange(minval, maxval+1))
         else:
-            pages = range(maxval, minval-1, -1)
+            pages = list(crange(maxval, minval-1, -1))
 
         # if more copies are requested
         pages *= prnt.numCopies()

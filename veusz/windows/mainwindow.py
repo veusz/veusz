@@ -25,6 +25,7 @@ import sys
 import traceback
 import glob
 
+from ..compat import citems
 from .. import qtall as qt4
 
 from .. import document
@@ -1312,7 +1313,7 @@ class MainWindow(qt4.QMainWindow):
         if values:
             # construct comma separated text representing axis values
             valitems = []
-            for name, val in values.iteritems():
+            for name, val in citems(values):
                 valitems.append('%s=%#.4g' % (name, val))
             valitems.sort()
             self.axisvalueslabel.setText(', '.join(valitems))

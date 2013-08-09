@@ -23,6 +23,7 @@ from __future__ import division
 import re
 import numpy as N
 
+from ..compat import crange, ckeys
 from . import datasets
 from .. import utils
 from .. import qtall as qt4
@@ -226,7 +227,7 @@ class ReadCSV(object):
         self.coltypes[colnum] = t
 
         # add back on blanks if necessary with correct format
-        for i in xrange(self.colblanks[colnum]):
+        for i in crange(self.colblanks[colnum]):
             d = (N.nan, '')[t == 'string']
             self.data[self.colnames[colnum]].append(d)
         self.colblanks[colnum] = 0
@@ -309,7 +310,7 @@ class ReadCSV(object):
             it = _FileReaderCols(csvf)
 
         # ignore rows (at top), if requested
-        for i in xrange(par.rowsignore):
+        for i in crange(par.rowsignore):
             try:
                 it.next()
             except StopIteration:
@@ -347,7 +348,7 @@ class ReadCSV(object):
         # iterate over each read-in dataset
         dsnames = []
 
-        for name in self.data.iterkeys():
+        for name in ckeys(self.data):
             # skip error data here, they are used below
             # error data name contains \0
             if name.find('\0') >= 0:
@@ -362,7 +363,7 @@ class ReadCSV(object):
 
             # make them have a maximum length by adding NaNs
             maxlen = max([len(x) for x in data if x is not None])
-            for i in range(len(data)):
+            for i in crange(len(data)):
                 if data[i] is not None and len(data[i]) < maxlen:
                     data[i] = N.concatenate(
                         ( data[i], N.zeros(maxlen-len(data[i]))*N.nan ) )

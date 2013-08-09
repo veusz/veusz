@@ -19,6 +19,7 @@
 """Module for holding collections of settings."""
 
 from __future__ import division
+from ..compat import citems
 from .reference import Reference
 
 class Settings(object):
@@ -245,7 +246,7 @@ class Settings(object):
             _root = '/'.join(path)
 
         # iterate over subsettings
-        for name, setn in self.setdict.iteritems():
+        for name, setn in citems(self.setdict):
             thispath = _root + name
             if isinstance(setn, Settings):
                 # call recursively if this is a Settings

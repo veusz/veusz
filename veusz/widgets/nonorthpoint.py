@@ -19,9 +19,9 @@
 """Non orthogonal point plotting."""
 
 from __future__ import division
-import itertools
 import numpy as N
 
+from ..compat import czip
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -166,8 +166,8 @@ class NonOrthPoint(Widget):
         angle = lab.angle
 
         # iterate over each point and plot each label
-        for x, y, t in itertools.izip(xplotter+deltax, yplotter+deltay,
-                                      textvals):
+        for x, y, t in czip(xplotter+deltax, yplotter+deltay,
+                            textvals):
             utils.Renderer( painter, font, x, y, t,
                             alignhorz, alignvert, angle ).render()
 

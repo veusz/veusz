@@ -21,6 +21,8 @@ and exporting text as paths for WYSIWYG."""
 
 from __future__ import division, print_function
 import re
+
+from ..compat import crange
 from .. import qtall as qt4
 
 # dpi runs at many times usual, and results are scaled down
@@ -34,7 +36,7 @@ inch_pt = 72.0
 def printpath(path):
     """Debugging print path."""
     print("Contents of", path)
-    for i in xrange(path.elementCount()):
+    for i in crange(path.elementCount()):
         el = path.elementAt(i)
         print(" ", el.type, el.x, el.y)
 
@@ -278,18 +280,18 @@ class SVGPaintEngine(qt4.QPaintEngine):
 
         # work out which state differs first
         pop = 0
-        for i in xrange(2, -1, -1):
+        for i in crange(2, -1, -1):
             if statevec[i] != self.oldstate[i]:
                 pop = i+1
                 break
 
         # go back up the tree the required number of times
-        for i in xrange(pop):
+        for i in crange(pop):
             if self.oldstate[i]:
                 self.celement = self.celement.parent
 
         # create new elements for changed states
-        for i in xrange(pop-1, -1, -1):
+        for i in crange(pop-1, -1, -1):
             if statevec[i]:
                 self.celement = SVGElement(
                     self.celement, 'g', ' '.join(statevec[i]))

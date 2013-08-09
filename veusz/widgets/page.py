@@ -22,7 +22,7 @@ from __future__ import division
 import collections
 import numpy as N
 
-from ..compat import crange
+from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -326,7 +326,7 @@ class Page(widget.Widget):
         painthelper.axisplottermap.update(axisdependhelper.axis_plotter_map)
         # reverse mapping
         pamap = collections.defaultdict(list)
-        for axis, plotters in painthelper.axisplottermap.iteritems():
+        for axis, plotters in citems(painthelper.axisplottermap):
             for plot in plotters:
                 pamap[plot].append(axis)
         painthelper.plotteraxismap.update(pamap)
