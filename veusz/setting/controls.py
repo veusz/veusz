@@ -31,7 +31,7 @@ import numpy as N
 from ..compat import crange, czip, citems
 from .. import qtall as qt4
 
-from . import settingdb
+from .settingdb import settingdb
 from .. import utils
 
 def _(text, disambiguation=None, context="Setting"):
