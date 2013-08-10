@@ -28,7 +28,7 @@ from __future__ import division, print_function
 import os.path
 import traceback
 
-from ..compat import citems, ckeys
+from ..compat import citems, ckeys, cbasestr
 from .. import qtall as qt4
 from .. import setting
 from .. import embed
@@ -185,7 +185,7 @@ class CommandInterface(qt4.QObject):
         if ctype == 'colormap':
             self.document.validateProcessColormap(val)
         else:
-            if not isinstance(val, basestring):
+            if not isinstance(val, cbasestr):
                 raise RuntimeError('Value should be string')
 
         if mode not in ('appendalways', 'append', 'replace'):
@@ -216,7 +216,7 @@ class CommandInterface(qt4.QObject):
 
     def AddImportPath(self, directory):
         """Add directory to import file path."""
-        assert isinstance(directory, basestring)
+        assert isinstance(directory, cbasestr)
         self.importpath.append(directory)
 
     def CloneWidget(self, widget, newparent, newname=None):

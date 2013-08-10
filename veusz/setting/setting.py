@@ -32,7 +32,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, ckeys
+from ..compat import citems, ckeys, cbasestr
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
@@ -418,7 +418,7 @@ class Str(Setting):
     typename = 'str'
 
     def convertTo(self, val):
-        if isinstance(val, basestring):
+        if isinstance(val, cbasestr):
             return val
         raise utils.InvalidType
 
@@ -572,7 +572,7 @@ class FloatOrAuto(Float):
     def convertTo(self, val):
         if type(val) in (int, float):
             return _finiteRangeFloat(val, minval=self.minval, maxval=self.maxval)
-        elif isinstance(val, basestring) and val.strip().lower() == 'auto':
+        elif isinstance(val, cbasestr) and val.strip().lower() == 'auto':
             return None
         else:
             raise utils.InvalidType
@@ -584,7 +584,7 @@ class FloatOrAuto(Float):
             return Float.convertFrom(self, val)
 
     def toText(self):
-        if self.val is None or (isinstance(self.val, basestring) and
+        if self.val is None or (isinstance(self.val, cbasestr) and
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
@@ -607,7 +607,7 @@ class IntOrAuto(Setting):
     def convertTo(self, val):
         if isinstance(val, int):
             return val
-        elif isinstance(val, basestring) and val.strip().lower() == 'auto':
+        elif isinstance(val, cbasestr) and val.strip().lower() == 'auto':
             return None
         else:
             raise utils.InvalidType
@@ -619,7 +619,7 @@ class IntOrAuto(Setting):
             return val
 
     def toText(self):
-        if self.val is None or (isinstance(self.val, basestring) and
+        if self.val is None or (isinstance(self.val, cbasestr) and
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
@@ -1138,7 +1138,7 @@ class Strings(Setting):
         ('ds1','ds2'...)
         """
 
-        if isinstance(val, basestring):
+        if isinstance(val, cbasestr):
             return (val, )
 
         if type(val) not in (list, tuple):
@@ -1146,7 +1146,7 @@ class Strings(Setting):
 
         # check each entry in the list is appropriate
         for ds in val:
-            if not isinstance(ds, basestring):
+            if not isinstance(ds, cbasestr):
                 raise utils.InvalidType
 
         return tuple(val)
@@ -1175,7 +1175,7 @@ class Datasets(Setting):
         ('ds1','ds2'...)
         """
 
-        if isinstance(val, basestring):
+        if isinstance(val, cbasestr):
             return (val, )
 
         if type(val) not in (list, tuple):
@@ -1183,7 +1183,7 @@ class Datasets(Setting):
 
         # check each entry in the list is appropriate
         for ds in val:
-            if not isinstance(ds, basestring):
+            if not isinstance(ds, cbasestr):
                 raise utils.InvalidType
 
         return tuple(val)
@@ -1221,7 +1221,7 @@ class DatasetExtended(Dataset):
         floats (numbers).
         """
 
-        if isinstance(val, basestring):
+        if isinstance(val, cbasestr):
             return val
         elif self.dimensions == 1:
             # list of numbers only allowed for 1d datasets
@@ -1235,7 +1235,7 @@ class DatasetExtended(Dataset):
         raise utils.InvalidType
 
     def toText(self):
-        if isinstance(self.val, basestring):
+        if isinstance(self.val, cbasestr):
             return self.val
         else:
             # join based on , or ; depending on decimal point
@@ -1271,7 +1271,7 @@ class DatasetExtended(Dataset):
 
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
-        if isinstance(self.val, basestring):
+        if isinstance(self.val, cbasestr):
             ds = doc.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
             if ds:
@@ -1284,7 +1284,7 @@ class DatasetExtended(Dataset):
 
     def isDataset(self, doc):
         """Is this setting a dataset?"""
-        return (isinstance(self.val, basestring) and
+        return (isinstance(self.val, cbasestr) and
                 doc.data.get(self.val))
 
     def isEmpty(self):
@@ -1293,7 +1293,7 @@ class DatasetExtended(Dataset):
 
     def getData(self, doc):
         """Return veusz dataset"""
-        if isinstance(self.val, basestring):
+        if isinstance(self.val, cbasestr):
             return doc.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
         else:
@@ -1602,7 +1602,7 @@ class LineSet(Setting):
             except ValueError:
                 raise utils.InvalidType
 
-            if ( not isinstance(color, basestring) or
+            if ( not isinstance(color, cbasestr) or
                  not Distance.isDist(width) or
                  style not in LineStyle._linestyles or
                  type(hide) not in (int, bool) ):
@@ -1669,7 +1669,7 @@ class FillSet(Setting):
             except ValueError:
                 raise utils.InvalidType
 
-            if ( not isinstance(color, basestring) or
+            if ( not isinstance(color, cbasestr) or
                  style not in utils.extfillstyles or
                  type(hide) not in (int, bool) or
                  len(fill) not in (3, 10) ):
@@ -1933,7 +1933,7 @@ class AxisBound(FloatOrAuto):
             mode = None
 
         v = self.val
-        if ( not isinstance(v, basestring) and v is not None and
+        if ( not isinstance(v, cbasestr) and v is not None and
              mode == 'datetime' ):
             return utils.dateFloatToString(v)
 

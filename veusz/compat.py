@@ -65,6 +65,9 @@ else:
     # function to create user strings
     cstr = unicode
 
+    # base string
+    cbasestr = basestring
+
     # iterate over dict
     def citems(d):
         return d.iteritems()

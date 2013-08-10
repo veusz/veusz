@@ -23,6 +23,7 @@ import random
 import re
 import fnmatch
 
+from ..compat import cbasestr
 from .. import qtall as qt4
 from .. import setting
 from . import field
@@ -320,8 +321,8 @@ class TextReplace(ToolsPlugin):
 
                 val = node.val
                 # try to change if a string, and not only strings or type is string
-                if isinstance(val, basestring) and (not fields['onlystr'] or
-                                                    node.settingtype == 'str'):
+                if isinstance(val, cbasestr) and (not fields['onlystr'] or
+                                                  node.settingtype == 'str'):
                     # update text if it changes
                     val2 = val.replace(fields['text1'], fields['text2'])
                     if val != val2:

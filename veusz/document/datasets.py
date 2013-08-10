@@ -24,7 +24,7 @@ import re
 
 import numpy as N
 
-from ..compat import czip, crange, citems
+from ..compat import czip, crange, citems, cbasestr
 from .. import qtall as qt4
 from .. import utils
 from .. import setting
@@ -200,7 +200,7 @@ class DatasetBase(object):
         """Return a value cast to this dataset data type.
         We assume here it is a float, so override if not
         """
-        if isinstance(val, basestring):
+        if isinstance(val, cbasestr):
             val, ok = setting.uilocale.toDouble(val)
             if ok: return val
             raise ValueError("Invalid floating point number")
@@ -618,7 +618,7 @@ class DatasetDateTime(Dataset):
 
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
-        if isinstance(val, basestring):
+        if isinstance(val, cbasestr):
             v = utils.dateStringToDate( unicode(val) )
             if not N.isfinite(v):
                 try:

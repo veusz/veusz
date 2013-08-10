@@ -25,6 +25,7 @@ import platform
 import signal
 import locale
 
+from ..compat import cbasestr
 from .. import qtall as qt4
 from .. import utils
 from . import simpleread
@@ -208,7 +209,7 @@ class SocketCaptureStream(CaptureStream):
             raise e
 
         ee = EnvironmentError()
-        if isinstance(e, basestring):         # windows?
+        if isinstance(e, cbasestr):           # windows?
             ee.strerror = unicode(e).encode(locale.getdefaultlocale()[1])
             ee.errno = -1
         else:                                 # unix

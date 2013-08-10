@@ -24,8 +24,9 @@ import math
 import re
 
 import numpy as N
-from .. import qtall as qt4
 
+from ..compat import cbasestr
+from .. import qtall as qt4
 from . import points
 
 mmlsupport = True
@@ -1102,12 +1103,12 @@ def makePartTree(partlist):
         if p == r'\\':
             lines.append( Part(itemlist) )
             itemlist = []
-        elif isinstance(p, basestring):
+        elif isinstance(p, cbasestr):
             if p in symbols:
                 addText(symbols[p])
             elif p in part_commands:
                 klass, numargs = part_commands[p]
-                if numargs == 1 and len(partlist) > i+1 and isinstance(partlist[i+1], basestring):
+                if numargs == 1 and len(partlist) > i+1 and isinstance(partlist[i+1], cbasestr):
                     # coerce a single argument to a partlist so that things
                     # like "A^\dagger" render correctly without needing
                     # curly brackets

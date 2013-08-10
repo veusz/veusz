@@ -31,7 +31,7 @@ import os.path
 
 import numpy as N
 
-from ..compat import czip, crange, citems
+from ..compat import czip, crange, citems, cbasestr
 from . import datasets
 from . import widgetfactory
 from . import simpleread
@@ -59,7 +59,7 @@ class OperationSettingSet(object):
         Setting may be a widget path
         """
         
-        if isinstance(setting, basestring):
+        if isinstance(setting, cbasestr):
             self.settingpath = setting
         else:
             self.settingpath = setting.path
