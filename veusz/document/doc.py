@@ -30,7 +30,7 @@ from collections import defaultdict
 
 import numpy as N
 
-from ..compat import crange, citems, cvalues, cstr
+from ..compat import crange, citems, cvalues, cstr, cexec
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -402,7 +402,7 @@ class Document( qt4.QObject ):
 
         for plugin in pluginlist:
             try:
-                execfile(plugin, dict())
+                cexec(compile(open(plugin).read(), plugin, 'exec'), dict())
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
@@ -694,7 +694,7 @@ class Document( qt4.QObject ):
                 defn = 'from %s import %s' % (module,
                                               ', '.join(toimport))
                 try:
-                    exec defn in self.eval_context
+                    cexec(defn, self.eval_context)
                 except Exception:
                     self.log(_("Failed to import '%s' from "
                                "module '%s'") % (', '.join(toimport),

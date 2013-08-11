@@ -25,10 +25,9 @@ entries
 
 # don't do this as it messes up imported files
 # from __future__ import division
-import __builtin__
 import ast
 
-from ..compat import cstr
+from ..compat import cstr, cbuiltins
 from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='SafeEval'):
@@ -143,7 +142,7 @@ numpy_forbidden = set((
         ))
 
 # blacklist using whitelist above
-forbidden_builtins = ( set(__builtin__.__dict__.keys()) - allowed_builtins |
+forbidden_builtins = ( set(cbuiltins.__dict__.keys()) - allowed_builtins |
                        numpy_forbidden )
 
 class SafeEvalException(Exception):

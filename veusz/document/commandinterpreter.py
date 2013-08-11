@@ -47,7 +47,7 @@ import sys
 import traceback
 import os.path
 
-from ..compat import pickle
+from ..compat import pickle, cexec
 from .commandinterface import CommandInterface
 from .. import utils
 
@@ -69,7 +69,7 @@ class CommandInterpreter(object):
         self.write_stderr = sys.stderr
 
         # import numpy into the environment
-        exec "from numpy import *" in self.globals
+        cexec("from numpy import *", self.globals)
 
         # define root object
         self.globals['Root'] = self.interface.Root
@@ -159,7 +159,7 @@ class CommandInterpreter(object):
 
             try:
                 # execute the code
-                exec c in self.globals
+                cexec(c, self.globals)
             except:
                 # print out the backtrace to stderr
                 i = sys.exc_info()
@@ -205,7 +205,7 @@ class CommandInterpreter(object):
 
         # actually run the code
         try:
-            exec fileobject in self.globals
+            cexec(fileobject, self.globals)
         except Exception:
             # print out the backtrace to stderr
             i = sys.exc_info()

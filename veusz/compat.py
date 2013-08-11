@@ -31,6 +31,9 @@ cpy3 = sys.version_info[0] == 3
 if cpy3:
     # py3
 
+    # builtins
+    import builtins as cbuiltins
+
     # imports
     import pickle
 
@@ -60,8 +63,14 @@ if cpy3:
     # python3 compatible iterator
     CIterator = object
 
+    # exec function
+    cexec = getattr(cbuiltins, 'exec')
+
 else:
     # py2
+
+    # builtins
+    import __builtin__ as cbuiltins
 
     # imports
     import cPickle as pickle
@@ -94,3 +103,13 @@ else:
     class CIterator(object):
         def next(self):
             return type(self).__next__(self)
+
+    # exec function
+    def cexec(text, globdict):
+        """An exec-like function.
+
+        As veusz always supplies a globals and no locals, we simplify this."""
+
+        # this is done like this to avoid a compile-time error in py3
+        code = 'exec text in globdict'
+        exec(code)
