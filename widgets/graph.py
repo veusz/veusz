@@ -275,8 +275,8 @@ class Graph(widget.Widget):
 
         # then for grid lines on top
         for aname, awidget in axisdrawlist:
-            axis.drawGrid(bounds, painthelper, outerbounds=outerbounds,
-                          ontop=True)
+            awidget.drawGrid(bounds, painthelper, outerbounds=outerbounds,
+                             ontop=True)
 
         # draw remaining axes
         for aname, awidget in axisdrawlist:
