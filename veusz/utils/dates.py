@@ -38,7 +38,7 @@ $
 ''', re.VERBOSE )
 
 # we store dates as intervals in sec from this date as a float
-offsetdate = datetime.datetime(2009, 01, 01, 0, 0, 0, 0)
+offsetdate = datetime.datetime(2009, 1, 1, 0, 0, 0, 0)
 
 def isDateTime(datestr):
     """Check date/time string looks valid."""
@@ -59,7 +59,7 @@ def _isoDataStringToDate(datestr):
                 if len(dateval) != 3:
                     raise ValueError("Invalid date '%s'" % dategrp)
             else:
-                dateval = [2009, 01, 01]
+                dateval = [2009, 1, 1]
 
             if timegrp:
                 # if there is a time part of the string
