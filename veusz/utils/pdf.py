@@ -29,16 +29,16 @@ def scalePDFMediaBox(text, pagewidth,
     requiredheight: height we want
     """
                      
-    m = re.search(r'^/MediaBox \[([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)\]$',
+    m = re.search(br'^/MediaBox \[([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)\]$',
                   text, re.MULTILINE)
 
     box = [float(x) for x in m.groups()]
     widthfactor = box[2] / pagewidth
-    newbox = '/MediaBox [%i %i %i %i]' % (
-        0, 
-        int(box[3]-widthfactor*requiredheight),
-        int(widthfactor*requiredwidth),
-        int(box[3]))
+    newbox = ('/MediaBox [%i %i %i %i]' % (
+            0, 
+            int(box[3]-widthfactor*requiredheight),
+            int(widthfactor*requiredwidth),
+            int(box[3]))).encode('ascii')
 
     text = text[:m.start()] + newbox + text[m.end():]
     return text
@@ -53,24 +53,26 @@ def fixupPDFIndices(text):
 
     # find occurences of obj in string
     indices = {}
-    for m in re.finditer('([0-9]+) 0 obj', text):
+    for m in re.finditer(b'([0-9]+) 0 obj', text):
         index = int(m.group(1))
         indices[index] = m.start(0)
 
     # build up xref block (note trailing spaces)
-    xref = ['xref', '0 %i' % (len(indices)+1), '0000000000 65535 f ']
+    xref = [b'xref', ('0 %i' % (len(indices)+1)).encode('ascii'),
+            b'0000000000 65535 f ']
     for i in crange(len(indices)):
-        xref.append( '%010i %05i n ' % (indices[i+1], 0) )
-    xref.append('trailer\n')
-    xref = '\n'.join(xref)
+        xref.append( ('%010i %05i n ' % (indices[i+1], 0)).encode('ascii') )
+    xref.append(b'trailer\n')
+    xref = b'\n'.join(xref)
 
     # replace current xref with this one
-    xref_match = re.search('^xref\n.*trailer\n', text, re.DOTALL | re.MULTILINE)
+    xref_match = re.search(b'^xref\n.*trailer\n', text, re.DOTALL | re.MULTILINE)
     xref_index = xref_match.start(0)
     text = text[:xref_index] + xref + text[xref_match.end(0):]
 
     # put the correct index to the xref after startxref
-    startxref_re = re.compile('^startxref\n[0-9]+\n', re.DOTALL | re.MULTILINE)
-    text = startxref_re.sub('startxref\n%i\n' % xref_index, text)
-    
+    startxref_re = re.compile(b'^startxref\n[0-9]+\n', re.DOTALL | re.MULTILINE)
+    text = startxref_re.sub( ('startxref\n%i\n' % xref_index).encode('ascii'),
+                             text)
+
     return text
