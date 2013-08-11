@@ -16,13 +16,8 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from urllib2 import urlopen
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
-
+from ..compat import CStringIO, curlrequest
 from .importplugin import ImportPlugin, importpluginregistry
 from .datasetplugin import Dataset1D, DatasetText
 
@@ -40,7 +35,8 @@ else:
 
         def _load_votable(self, params):
             if 'url' in params.field_results:
-                buff = StringIO(urlopen(params.field_results['url']).read())
+                buff = CStringIO(curlrequest.urlopen(
+                        params.field_results['url']).read())
                 return parse(buff, filename=params.filename)
             else:
                 return parse(params.filename)

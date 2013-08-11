@@ -107,7 +107,7 @@ class CommandInterpreter(object):
             parts = l.split()
 
             # turn Cmd a b c into Cmd(a,b,c)
-            if len(parts) != 0 and parts[0] in self.cmds.keys():
+            if len(parts) != 0 and parts[0] in self.cmds:
                 l = utils.pythonise(l)
 
             out += l + '\n'

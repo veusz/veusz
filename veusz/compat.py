@@ -33,6 +33,8 @@ if cpy3:
 
     # builtins
     import builtins as cbuiltins
+    from io import StringIO as CStringIO
+    import urllib.request as curlrequest
 
     # imports
     import pickle
@@ -63,6 +65,11 @@ if cpy3:
     # python3 compatible iterator
     CIterator = object
 
+    # python3 object with __bool__/__nonzero__
+    class CBool(object):
+        def __bool__(self):
+            return self.cbool()
+
     # exec function
     cexec = getattr(cbuiltins, 'exec')
 
@@ -74,6 +81,8 @@ else:
 
     # imports
     import cPickle as pickle
+    from cStringIO import StringIO as CStringIO
+    import urllib2 as curlrequest
 
     # range function
     crange = xrange
@@ -103,6 +112,11 @@ else:
     class CIterator(object):
         def next(self):
             return type(self).__next__(self)
+
+    # python3 object with __bool__/__nonzero__
+    class CBool(object):
+        def __nonzero__(self):
+            return self.cbool()
 
     # exec function
     def cexec(text, globdict):

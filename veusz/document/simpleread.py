@@ -42,11 +42,10 @@ x +- y + -
 
 from __future__ import division
 import re
-import cStringIO
 
 import numpy as N
 
-from ..compat import crange, cnext
+from ..compat import crange, cnext, CStringIO
 from .. import utils
 from . import datasets
 
@@ -430,7 +429,7 @@ class StringStream(FileStream):
     def __init__(self, text):
         """A stream which reads in from a text string."""
         
-        FileStream.__init__( self, cStringIO.StringIO(text) )
+        FileStream.__init__( self, CStringIO(text) )
 
 class SimpleRead(object):
     '''Class to read in datasets from a stream.

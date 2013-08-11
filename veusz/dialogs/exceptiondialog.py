@@ -23,14 +23,13 @@ from __future__ import division
 import sys
 import time
 import traceback
-import urllib2
 import re
 import base64
 
 import numpy
 import sip
 
-from ..compat import citems
+from ..compat import citems, curlrequest
 from .. import qtall as qt4
 from .. import utils
 from .veuszdialog import VeuszDialog
@@ -99,10 +98,10 @@ class ExceptionSendDialog(VeuszDialog):
 
         try:
             # send the message
-            urllib2.urlopen('http://barmag.net/veusz-mail.php',
-                            'message=%s' % text)
+            curlrequest.urlopen('http://barmag.net/veusz-mail.php',
+                                'message=%s' % text)
 
-        except urllib2.URLError:
+        except:
             # something went wrong...
             qt4.QMessageBox.critical(None, _("Veusz"),
                                      _("Failed to connect to error server "
@@ -199,9 +198,9 @@ class ExceptionDialog(VeuszDialog):
         user."""
 
         try:
-            p = urllib2.urlopen('http://download.gna.org/veusz/').read()
+            p = curlrequest.urlopen('http://download.gna.org/veusz/').read()
             versions = re.findall('veusz-([0-9.]+).tar.gz', p)
-        except urllib2.URLError:
+        except:
             versions = []
 
         if not versions:

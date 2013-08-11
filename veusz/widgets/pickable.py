@@ -22,9 +22,10 @@
 from __future__ import division
 import numpy as N
 
+from ..compat import CBool
 from .. import document
 
-class PickInfo:
+class PickInfo(CBool):
     """Encapsulates the results of a Pick operation. screenpos and coords are
        numeric (x,y) tuples, labels are the textual labels for the x and y
        datasets, and index is some object that the picker can use to figure out
@@ -39,10 +40,9 @@ class PickInfo:
         self.distance = float('inf')
         self.displaytype = ('numeric', 'numeric')
 
-    def __nonzero__(self):
-        if self.widget and self.screenpos and self.labels and self.coords:
-            return True
-        return False
+    def cbool(self):
+        return bool(self.widget and self.screenpos and self.labels and
+                    self.coords)
 
 class Index:
     """A class containing all the state a GenericPickable needs to find the

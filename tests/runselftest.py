@@ -45,6 +45,7 @@ import os
 import os.path
 import sys
 
+from veusz.compat import cexec
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
@@ -96,12 +97,12 @@ _pt = utils.textrender.PartText
 class PartTextAscii(_pt):
     """Text renderer which converts text to ascii."""
     def __init__(self, text):
-        text = unicode(text).encode('ascii', 'xmlcharrefreplace')
+        text = text.encode('ascii', 'xmlcharrefreplace')
         _pt.__init__(self, text)
     def render(self, state):
         _pt.render(self, state)
     def addText(self, text):
-        self.text += unicode(text).encode('ascii', 'xmlcharrefreplace')
+        self.text += text.encode('ascii', 'xmlcharrefreplace')
 
 def renderTest(invsz, outfile):
     """Render vsz document to create outfile."""
@@ -116,9 +117,9 @@ def renderTest(invsz, outfile):
     for cmd in document.CommandInterface.unsafe_commands:
         cmds[cmd] = getattr(ifc, cmd)
 
-    exec "from numpy import *" in cmds
+    cexec("from numpy import *", cmds)
     ifc.AddImportPath( os.path.dirname(invsz) )
-    exec open(invsz) in cmds
+    cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
     ifc.Export(outfile)
 
 class Dirs(object):

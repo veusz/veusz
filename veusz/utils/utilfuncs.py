@@ -27,11 +27,10 @@ import os.path
 import threading
 import codecs
 import csv
-import StringIO
 import locale
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext, cstr
+from ..compat import citems, CIterator, cnext, cstr, CStringIO
 from .. import qtall as qt4
 import numpy as N
 
@@ -333,7 +332,7 @@ def openEncoding(filename, encoding, mode='r'):
     """
     if filename == '{clipboard}':
         text = qt4.QApplication.clipboard().text()
-        return StringIO.StringIO(text)
+        return CStringIO(text)
     else:
         return codecs.open(filename, mode, encoding, 'ignore')
 
@@ -369,7 +368,7 @@ class UnicodeCSVReader(CIterator):
             # take the unicode clipboard and just put into utf-8 format
             s = qt4.QApplication.clipboard().text()
             s = s.encode('utf-8')
-            f = StringIO.StringIO(s)
+            f = CStringIO(s)
 
         # the actual csv reader based on the file above
         self.reader = csv.reader(f, dialect=dialect, **kwds)

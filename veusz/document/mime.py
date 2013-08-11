@@ -19,14 +19,12 @@
 from __future__ import division
 from itertools import count
 
-from ..compat import czip, citems
+from ..compat import czip, citems, CStringIO
 from .. import qtall as qt4
 
 from . import doc
 from . import operations
 from . import widgetfactory
-
-import StringIO
 
 # mime type for copy and paste
 widgetmime = 'text/x-vnd.veusz-widget-3'
@@ -82,7 +80,7 @@ def generateDatasetsMime(datasets, document):
     text = '\n'.join(output)
     mimedata.setData('text/plain', qt4.QByteArray(text))
 
-    textfile = StringIO.StringIO()
+    textfile = CStringIO()
     for name in datasets:
         # get unlinked copy of dataset
         ds = document.data[name].returnCopy()
