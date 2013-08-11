@@ -19,7 +19,7 @@
 """Veusz data capture dialog."""
 
 from __future__ import division
-from ..compat import citems
+from ..compat import citems, cstr
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -270,7 +270,7 @@ class CapturingDialog(VeuszDialog):
             self.simpleread.readData(self.stream)
         except document.CaptureFinishException as e:
             # stream tells us it's time to finish
-            self.streamCaptureFinished( unicode(e) )
+            self.streamCaptureFinished( cstr(e) )
 
     def slotDisplayTimer(self):
         """Time to update information about data source."""

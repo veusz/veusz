@@ -27,6 +27,8 @@ entries
 # from __future__ import division
 import __builtin__
 import ast
+
+from ..compat import cstr
 from .. import qtall as qt4
 
 def _(text, disambiguation=None, context='SafeEval'):
@@ -196,7 +198,7 @@ def compileChecked(code, mode='eval', filename='<string>',
 
         tree = ast.parse(code, filename, mode)
     except Exception as e:
-        raise ValueError(_('Unable to parse file: %s') % unicode(e))
+        raise ValueError(_('Unable to parse file: %s') % cstr(e))
 
     if not ignoresecurity:
         visitor = CheckNodeVisitor()

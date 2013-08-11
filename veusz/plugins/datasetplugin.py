@@ -24,7 +24,7 @@ from __future__ import division
 import numpy as N
 from . import field
 
-from ..compat import czip, citems
+from ..compat import czip, citems, cstr
 from .. import utils
 try:
     from ..helpers import qtloops
@@ -380,7 +380,7 @@ class DatasetPluginManager(object):
                 raise
 
             # otherwise if there's an error, then log and null outputs
-            self.document.log( unicode(ex) )
+            self.document.log( cstr(ex) )
             self.nullDatasets()
 
 class DatasetPlugin(object):
@@ -1428,7 +1428,7 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
                 if nerr is not None: nerr = nerr[filt]
         except (ValueError, IndexError) as e:
             raise DatasetPluginException(_("Error filtering dataset: '%s')") %
-                                         unicode(e))
+                                         cstr(e))
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 

@@ -25,7 +25,7 @@ import re
 
 import numpy as N
 
-from ..compat import cbasestr
+from ..compat import cbasestr, cstr
 from .. import qtall as qt4
 from . import points
 
@@ -1377,7 +1377,7 @@ class _MmlRenderer(_Renderer):
         except ValueError as e:
             self.mmldoc = None
             self.error = ('Error interpreting MathML: %s\n' %
-                          unicode(e))
+                          cstr(e))
             return
 
         # this is pretty horrible :-(

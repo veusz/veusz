@@ -28,7 +28,7 @@ from __future__ import division, print_function
 import os.path
 import traceback
 
-from ..compat import citems, ckeys, cbasestr
+from ..compat import citems, ckeys, cbasestr, cstr
 from .. import qtall as qt4
 from .. import setting
 from .. import embed
@@ -551,7 +551,7 @@ class CommandInterface(qt4.QObject):
 
         if self.verbose:
             print("Set text dataset '%s'" % name)
-            print(" Values = %s" % unicode(data.data))
+            print(" Values = %s" % cstr(data.data))
 
     def GetData(self, name):
         """Return the data with the name.
@@ -650,7 +650,7 @@ class CommandInterface(qt4.QObject):
 
         """
         
-        if type(datasetnames) in (str, unicode):
+        if isinstance(datasetnames, cbasestr):
             datasetnames = [datasetnames]
 
         params = importparams.ImportParams2D(
@@ -688,7 +688,7 @@ class CommandInterface(qt4.QObject):
         # look up filename on path
         realfilename = self.findFileOnImportPath(filename)
 
-        if type(datasetnames) in (str, unicode):
+        if isinstance(datasetnames, cbasestr):
             datasetnames = [datasetnames]
 
         params = importparams.ImportParams2D(

@@ -21,7 +21,7 @@
 from __future__ import division
 import sys
 
-from ..compat import czip
+from ..compat import czip, cstr
 from .. import qtall as qt4
 from .. import document
 from .. import plugins
@@ -186,7 +186,7 @@ def runPlugin(window, doc, plugin, fields):
         qt4.QApplication.restoreOverrideCursor()
 
         qt4.QMessageBox.warning(
-            window, _("Error in %s") % plugin.name, unicode(ex))
+            window, _("Error in %s") % plugin.name, cstr(ex))
 
     except Exception:
         op.undo(doc)

@@ -17,6 +17,8 @@
 ##############################################################################
 
 from __future__ import division
+
+from ..compat import cstr
 from .. import qtall as qt4
 from .. import setting
 
@@ -63,7 +65,7 @@ class HistoryGroupBox(qt4.QGroupBox):
 
     def saveHistory(self):
         """Save to settings."""
-        name = unicode(self.getRadioChecked().objectName())
+        name = cstr(self.getRadioChecked().objectName())
         setting.settingdb[self.getSettingName()] = name
 
     def showEvent(self, event):

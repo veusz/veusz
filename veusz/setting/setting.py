@@ -32,7 +32,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, ckeys, cbasestr
+from ..compat import citems, ckeys, cbasestr, cstr
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
@@ -1316,7 +1316,7 @@ class DatasetOrStr(Dataset):
         if checknull and not self.val:
             return None
         else:
-            return [unicode(self.val)]
+            return [cstr(self.val)]
 
     def makeControl(self, *args):
         # use string editor rather than drop down list

@@ -25,7 +25,7 @@ import sys
 import traceback
 import glob
 
-from ..compat import citems, ckeys
+from ..compat import citems, ckeys, cstr
 from .. import qtall as qt4
 
 from .. import document
@@ -1270,7 +1270,7 @@ class MainWindow(qt4.QMainWindow):
                 if isinstance(e, EnvironmentError):
                     msg = utils.decodeDefault(e.strerror)
                 else:
-                    msg = unicode(e)
+                    msg = cstr(e)
 
                 qt4.QApplication.restoreOverrideCursor()
                 qt4.QMessageBox.critical(

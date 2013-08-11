@@ -22,7 +22,7 @@ from __future__ import division
 import os.path
 import numpy as N
 
-from ..compat import crange
+from ..compat import crange, cstr
 from .. import utils
 from .. import qtall as qt4
 
@@ -132,7 +132,7 @@ class ImportPluginExample(ImportPlugin):
                     datasetplugin.Constant("testconst", "42"),
                     datasetplugin.Function("testfunc(x)", "testconst*x**2")]
         except Exception as e:
-            raise ImportPluginException(unicode(e))
+            raise ImportPluginException(cstr(e))
 
 class ImportPluginDateTime(ImportPlugin):
     """An example plugin for reading a set of iso date-times from a
@@ -522,7 +522,7 @@ class ImportPluginNpy(ImportPlugin):
             retn = N.load(params.filename)
         except Exception as e:
             raise ImportPluginException(_("Error while reading file: %s") %
-                                        unicode(e))
+                                        cstr(e))
 
         return [ cnvtImportNumpyArray(
                 name, retn, errorsin2d=params.field_results["errorsin2d"]) ]
@@ -576,7 +576,7 @@ class ImportPluginNpz(ImportPlugin):
             retn = N.load(params.filename)
         except Exception as e:
             raise ImportPluginException(_("Error while reading file: %s") %
-                                        unicode(e))
+                                        cstr(e))
 
         try:
             retn.files
@@ -669,7 +669,7 @@ class ImportPluginBinary(ImportPlugin):
                                 count=params.field_results["length"])
         except ValueError as e:
             raise ImportPluginException(_("Error converting data for file '%s'\n\n%s") %
-                                        (params.filename, unicode(e)))
+                                        (params.filename, cstr(e)))
 
         data = data.astype(N.float64)
         return [ datasetplugin.Dataset1D(name, data) ]

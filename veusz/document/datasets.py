@@ -24,7 +24,7 @@ import re
 
 import numpy as N
 
-from ..compat import czip, crange, citems, cbasestr
+from ..compat import czip, crange, citems, cbasestr, cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import setting
@@ -619,7 +619,7 @@ class DatasetDateTime(Dataset):
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         if isinstance(val, cbasestr):
-            v = utils.dateStringToDate( unicode(val) )
+            v = utils.dateStringToDate( cstr(val) )
             if not N.isfinite(v):
                 try:
                     v = float(val)
@@ -692,11 +692,11 @@ class DatasetText(DatasetBase):
     
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
-        return unicode(val)
+        return cstr(val)
 
     def uiDataItemToData(self, val):
         """Return val converted to data."""
-        return unicode(val)
+        return cstr(val)
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
@@ -921,7 +921,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     try:
         evalout = eval(comp, env)
     except Exception as ex:
-        doc.log("Error evaluating '%s': '%s'" % (origexpr, unicode(ex)))
+        doc.log("Error evaluating '%s': '%s'" % (origexpr, cstr(ex)))
         return None
 
     # return correct dataset for data type
@@ -929,11 +929,11 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
         if datatype == 'numeric':
             return _returnNumericDataset(doc, evalout, dimensions, subdatasets)
         elif datatype == 'text':
-            return DatasetText([unicode(x) for x in evalout])
+            return DatasetText([cstr(x) for x in evalout])
         else:
             raise RuntimeError('Invalid data type')
     except DatasetExpressionException as ex:
-        doc.log(_("Error evaluating '%s': %s\n") % (origexpr, unicode(ex)))
+        doc.log(_("Error evaluating '%s': %s\n") % (origexpr, cstr(ex)))
 
     return None
 
@@ -1008,7 +1008,7 @@ class DatasetExpression(Dataset):
         except Exception as ex:
             self.document.log(
                 _("Error evaluating expression: %s\n"
-                  "Error: %s") % (self.expr[part], unicode(ex)) )
+                  "Error: %s") % (self.expr[part], cstr(ex)) )
             return False
 
         # make evaluated error expression have same shape as data
@@ -1285,7 +1285,7 @@ class Dataset2DXYZExpression(Dataset2D):
                 evaluated[name] = eval(comp, environment)
             except Exception as e:
                 self.document.log(_("Error evaluating expression: %s\n"
-                                    "Error: %s") % (expr, unicode(e)) )
+                                    "Error: %s") % (expr, cstr(e)) )
                 return None
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
@@ -1305,7 +1305,7 @@ class Dataset2DXYZExpression(Dataset2D):
             self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
         except Exception as e:
             self.document.log(_("Shape mismatch when constructing dataset\n"
-                                "Error: %s") % unicode(e) )
+                                "Error: %s") % cstr(e) )
             return None
 
         return self.cacheddata
@@ -1448,7 +1448,7 @@ class Dataset2DXYFunc(Dataset2D):
         try:
             return self.evalDataset()
         except DatasetExpressionException as ex:
-            self.document.log(unicode(ex))
+            self.document.log(cstr(ex))
             return N.array([[]])
 
     def evalDataset(self):
@@ -1515,7 +1515,7 @@ class _DatasetPlugin(object):
 
         fields = []
         for name, val in citems(self.pluginmanager.fields):
-            fields.append('%s: %s' % (unicode(name), unicode(val)))
+            fields.append('%s: %s' % (cstr(name), cstr(val)))
 
         try:
             shape = [str(x) for x in self.data.shape]

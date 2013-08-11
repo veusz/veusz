@@ -18,7 +18,7 @@
 
 from __future__ import division
 
-from ..compat import crange, citems
+from ..compat import crange, citems, cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -182,7 +182,7 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError as ex:
-            qt4.QMessageBox.warning(self, _("Invalid parameters"), unicode(ex))
+            qt4.QMessageBox.warning(self, _("Invalid parameters"), cstr(ex))
             return
 
         if p.expr != '':
@@ -239,8 +239,8 @@ class HistoDataDialog(VeuszDialog):
         if gen.binparams:
             p = gen.binparams
             self.numbins.setValue( p[0] )
-            self.minval.setEditText( unicode(p[1]) )
-            self.maxval.setEditText( unicode(p[2]) )
+            self.minval.setEditText( cstr(p[1]) )
+            self.maxval.setEditText( cstr(p[2]) )
             self.logarithmic.setChecked( bool(p[3]) )
         else:
             self.numbins.setValue(10)
@@ -271,7 +271,7 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError as ex:
-            self.statuslabel.setText(_("Invalid parameters: %s") % unicode(ex))
+            self.statuslabel.setText(_("Invalid parameters: %s") % cstr(ex))
             return
 
         exprresult = document.evalDatasetExpression(self.document, p.expr)

@@ -23,7 +23,7 @@
 from __future__ import division
 import os
 
-from ..compat import citems
+from ..compat import citems, cstr
 from .. import qtall as qt4
 from .. import document
 from .veuszdialog import VeuszDialog
@@ -134,7 +134,7 @@ class ReloadData(VeuszDialog):
                         text += ' %s\n' % var
 
         except EnvironmentError as e:
-            text = _('Error reading file:\n') + unicode(e)
+            text = _('Error reading file:\n') + cstr(e)
         except document.DescriptorError:
             text = _('Could not interpret descriptor. Reload failed.')
         except:

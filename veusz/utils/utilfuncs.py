@@ -31,7 +31,7 @@ import StringIO
 import locale
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext
+from ..compat import citems, CIterator, cnext, cstr
 from .. import qtall as qt4
 import numpy as N
 
@@ -376,7 +376,7 @@ class UnicodeCSVReader(CIterator):
 
     def __next__(self):
         row = cnext(self.reader)
-        return [unicode(s, 'utf-8') for s in row]
+        return [cstr(s, 'utf-8') for s in row]
 
     def __iter__(self):
         return self

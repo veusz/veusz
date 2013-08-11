@@ -20,6 +20,8 @@
 
 from __future__ import division
 import numpy as N
+
+from ..compat import cstr
 from ..utils import vzdbus
 from . import commandinterpreter
 
@@ -61,24 +63,24 @@ class DBusInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s')
     def AddImportPath(self, dirname):
-        self.ci.AddImportPath(unicode(dirname))
+        self.ci.AddImportPath(cstr(dirname))
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ssa{sv}', out_signature='s')
     def CloneWidget(self, widget, newparent, optargs):
-        return self.ci.CloneWidget(unicode(widget), unicode(newparent),
+        return self.ci.CloneWidget(cstr(widget), cstr(newparent),
                                    **optargs)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sssa{sv}')
     def CreateHistogram(self, inexpr, outbinsds, outvalsds, optargs):
-        self.ci.CreateHistogram(unicode(inexpr), unicode(outbinsds),
-                                unicode(outvalsds), **optargs)
+        self.ci.CreateHistogram(cstr(inexpr), cstr(outbinsds),
+                                cstr(outvalsds), **optargs)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sa{sv}a{sv}')
     def DatasetPlugin(self, pluginname, fields, datasetnames):
-        self.ci.DatasetPlugin(unicode(pluginname), fields, datasetnames)
+        self.ci.DatasetPlugin(cstr(pluginname), fields, datasetnames)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sa{sv}')
@@ -104,7 +106,7 @@ class DBusInterface(vzdbus.Object):
             """Get blank list if None or convert to list otherwise."""
             if l is None: return []
             return list(l)
-        data, serr, nerr, perr = self.ci.GetData(unicode(datasetname))
+        data, serr, nerr, perr = self.ci.GetData(cstr(datasetname))
         return lornull(data), lornull(serr), lornull(nerr), lornull(perr)
 
     @vzdbus.method(dbus_interface=interface,
@@ -115,7 +117,7 @@ class DBusInterface(vzdbus.Object):
          rangey min, rangey max,
          data (as 1d numeric array))
         """
-        data = self.ci.GetData(unicode(datasetname))
+        data = self.ci.GetData(cstr(datasetname))
         return ( data[0].shape[1], data[0].shape[0],
                  data[1][0], data[1][1], data[2][0], data[2][1],
                  list(data[0].flat) )
@@ -124,7 +126,7 @@ class DBusInterface(vzdbus.Object):
                    in_signature='s', out_signature='as')
     def GetDataText(self, datasetname):
         """Get a text dataset as an array of strings."""
-        return self.ci.GetData(unicode(datasetname))
+        return self.ci.GetData(cstr(datasetname))
 
     @vzdbus.method(dbus_interface=interface,
                    out_signature='as')
@@ -159,7 +161,7 @@ class DBusInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ssa{sv}')
     def ImportString(self, descriptor, string, optargs):
-        self.ci.ImportString(unicode(descriptor), unicode(string),
+        self.ci.ImportString(cstr(descriptor), cstr(string),
                              **optargs)
 
     @vzdbus.method(dbus_interface=interface,
@@ -178,37 +180,37 @@ class DBusInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ss')
     def Rename(self, widget, newname):
-        self.ci.Rename( unicode(widget), unicode(newname) )
+        self.ci.Rename( cstr(widget), cstr(newname) )
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s')
     def Remove(self, name):
-        self.ci.Remove(unicode(name))
+        self.ci.Remove(cstr(name))
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s')
     def RemoveCustom(self, name):
-        self.ci.RemoveCustom(unicode(name))
+        self.ci.RemoveCustom(cstr(name))
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s', out_signature='s')
     def ResolveReference(self, name):
-        return self.ci.ResolveReference(unicode(name))
+        return self.ci.ResolveReference(cstr(name))
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s')
     def Save(self, filename):
-        self.ci.Save(unicode(filename))
+        self.ci.Save(cstr(filename))
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sv')
     def Set(self, name, val):
-        return self.ci.Set(unicode(name), val)
+        return self.ci.Set(cstr(name), val)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ss')
     def SetToReference(self, name, val):
-        return self.ci.SetToReference(unicode(name), unicode(val))
+        return self.ci.SetToReference(cstr(name), cstr(val))
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sadadadad')
@@ -216,40 +218,40 @@ class DBusInterface(vzdbus.Object):
         if not symerr: symerr = None
         if not negerr: negerr = None
         if not poserr: poserr = None
-        self.ci.SetData(unicode(name), data, symerr, negerr, poserr)
+        self.ci.SetData(cstr(name), data, symerr, negerr, poserr)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ssssa{sv}')
     def SetData2DExpressionXYZ(self, name, xexpr, yexpr, zexpr, optargs):
-        self.ci.SetData2DExpressionXYZ(unicode(name), xexpr, yexpr, zexpr,
+        self.ci.SetData2DExpressionXYZ(cstr(name), xexpr, yexpr, zexpr,
                                        **optargs)
 
     @vzdbus.method(dbus_interface=interface,
                            in_signature='s(ddd)(ddd)sa{sv}')
     def SetData2DXYFunc(self, name, xstep, ystep, expr, optargs):
-        self.ci.SetData2DXYFunc(unicode(name), xstep, ystep, expr, **optargs)
+        self.ci.SetData2DXYFunc(cstr(name), xstep, ystep, expr, **optargs)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sadii(dd)(dd)')
     def SetData2D(self, name, data, nx, ny, xrange, yrange):
         data = N.array(data).reshape(nx, ny)
-        self.ci.SetData2D(unicode(name), data, xrange=xrange, yrange=yrange)
+        self.ci.SetData2D(cstr(name), data, xrange=xrange, yrange=yrange)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='ssa{sv}')
     def SetDataExpression(self, name, val, optargs):
-        self.ci.SetDataExpression(unicode(name), val, **optargs)
+        self.ci.SetDataExpression(cstr(name), val, **optargs)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sas')
     def SetDataText(self, name, val):
-        val = [unicode(x) for x in val]
-        self.ci.SetDataText(unicode(name), val)
+        val = [cstr(x) for x in val]
+        self.ci.SetDataText(cstr(name), val)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='sas')
     def TagDatasets(self, tag, datasets):
-        self.ci.TagDatasets(unicode(tag), datasets)
+        self.ci.TagDatasets(cstr(tag), datasets)
 
     @vzdbus.method(dbus_interface=interface,
                    in_signature='s')

@@ -25,7 +25,7 @@ import platform
 import signal
 import locale
 
-from ..compat import cbasestr
+from ..compat import cbasestr, cstr
 from .. import qtall as qt4
 from .. import utils
 from . import simpleread
@@ -127,7 +127,7 @@ class FileCaptureStream(CaptureStream):
                 raise CaptureFinishException("End of file")
             return data
         except OSError as e:
-            raise CaptureFinishException("OSError: %s" % unicode(e))
+            raise CaptureFinishException("OSError: %s" % cstr(e))
 
     def close(self):
         """Close file."""
@@ -210,7 +210,7 @@ class SocketCaptureStream(CaptureStream):
 
         ee = EnvironmentError()
         if isinstance(e, cbasestr):           # windows?
-            ee.strerror = unicode(e).encode(locale.getdefaultlocale()[1])
+            ee.strerror = cstr(e).encode(locale.getdefaultlocale()[1])
             ee.errno = -1
         else:                                 # unix
             ee.strerror = e[1]

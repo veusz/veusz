@@ -21,8 +21,9 @@
 """Module for implementing dialog box for viewing/editing data."""
 
 from __future__ import division
-from .. import qtall as qt4
 
+from ..compat import cstr
+from .. import qtall as qt4
 from .. import document
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog
@@ -611,7 +612,7 @@ class DataEditDialog(VeuszDialog):
                     rowitems = []
                 lastrow = row
             rowitems.append(
-                unicode(model.createIndex(row, column).data()) )
+                cstr(model.createIndex(row, column).data()) )
         if rowitems:
             lines.append( '\t'.join(rowitems) )
         lines.append('')  # blank line at end

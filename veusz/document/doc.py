@@ -30,7 +30,7 @@ from collections import defaultdict
 
 import numpy as N
 
-from ..compat import crange, citems, cvalues
+from ..compat import crange, citems, cvalues, cstr
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -750,9 +750,9 @@ class Document( qt4.QObject ):
         try:
             cmap = self.validateProcessColormap(val)
         except ValueError as e:
-            self.log( unicode(e) )
+            self.log( cstr(e) )
         else:
-            self.colormaps[ unicode(name) ] = cmap
+            self.colormaps[ cstr(name) ] = cmap
 
     def _updateEvalContextFuncOrConst(self, ctype, name, val):
         """Update a function or constant in eval function context."""
@@ -779,7 +779,7 @@ class Document( qt4.QObject ):
             self.eval_context[name] = eval(comp, self.eval_context)
         except Exception as e:
             self.log( _("Error evaluating '%s': '%s'") %
-                      (name, unicode(e)) )
+                      (name, cstr(e)) )
 
     def compileCheckedExpression(self, expr, origexpr=None):
         """Compile expression and check for errors.
@@ -809,12 +809,12 @@ class Document( qt4.QObject ):
                 ignoresecurity=setting.transient_settings['unsafe_mode'])
         except utils.SafeEvalException as e:
             self.log(
-                _("Unsafe expression '%s': %s") % (origexpr, unicode(e)))
+                _("Unsafe expression '%s': %s") % (origexpr, cstr(e)))
             self.exprfailed.add(expr)
             return None
         except Exception as e:
             self.log(
-                _("Error in expression '%s': %s") % (origexpr, unicode(e)))
+                _("Error in expression '%s': %s") % (origexpr, cstr(e)))
             return None
         else:
             self.exprcompiled[expr] = checked
@@ -897,7 +897,7 @@ class Document( qt4.QObject ):
 
         elif datatype == 'text':
             try:
-                return datasets.DatasetText([unicode(x) for x in vals])
+                return datasets.DatasetText([cstr(x) for x in vals])
             except ValueError:
                 pass
 

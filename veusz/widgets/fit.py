@@ -25,7 +25,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, czip, ckeys
+from ..compat import citems, czip, ckeys, cstr
 from .. import document
 from .. import setting
 from .. import utils
@@ -291,7 +291,7 @@ class Fit(FunctionPlotter):
             try:
                 return eval(compiled, evalenv) + xvals*0.
             except Exception as e:
-                self.document.log(unicode(e))
+                self.document.log(cstr(e))
                 return N.nan
 
         # minimum set for fitting

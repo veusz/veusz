@@ -26,7 +26,7 @@ import re
 import csv
 import sys
 
-from ..compat import crange, czip, citems, cnext
+from ..compat import crange, czip, citems, cnext, cstr
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -815,7 +815,7 @@ class ImportTabPlugins(ImportTab):
         try:
             text, ok = plugin.getPreview(params)
         except plugins.ImportPluginException as ex:
-            text = unicode(ex)
+            text = cstr(ex)
             ok = False
         self.pluginPreview.setPlainText(text)
         return bool(ok)
@@ -838,7 +838,7 @@ class ImportTabPlugins(ImportTab):
         try:
             doc.applyOperation(op)
         except plugins.ImportPluginException as ex:
-            self.pluginPreview.setPlainText( unicode(ex) )
+            self.pluginPreview.setPlainText( cstr(ex) )
             return
 
         out = [_('Imported data for datasets:')]

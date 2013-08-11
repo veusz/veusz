@@ -21,7 +21,7 @@
 from __future__ import division
 import numpy as N
 
-from ..compat import czip
+from ..compat import czip, cstr
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -100,7 +100,7 @@ class FunctionPlotter(GenericPlotter):
         """Write error message to document log for exception ex."""
         self.document.log(
             "Error evaluating expression in function widget '%s': '%s'" % (
-                self.name, unicode(ex)))
+                self.name, cstr(ex)))
 
     def affectsAxisRange(self):
         s = self.settings

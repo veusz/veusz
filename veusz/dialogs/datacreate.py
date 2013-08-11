@@ -18,7 +18,7 @@
 
 """Dataset creation dialog."""
 
-from ..compat import citems, ckeys
+from ..compat import citems, ckeys, cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -244,8 +244,8 @@ class DataCreateDialog(VeuszDialog):
             else:
                 status = _("Creation failed")
 
-            if unicode(e) != '':
-                status += ': %s' % unicode(e)
+            if cstr(e) != '':
+                status += ': %s' % cstr(e)
 
             self.statuslabel.setText(status)
             

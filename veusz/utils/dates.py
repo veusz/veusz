@@ -23,7 +23,7 @@ import re
 
 import numpy as N
 
-from ..compat import crange, citems
+from ..compat import crange, citems, cstr
 
 # date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
 # date and time part are optional (check we have at least one!)
@@ -112,7 +112,7 @@ def dateFloatToString(f):
     if N.isfinite(f):
         return floatToDateTime(f).isoformat()
     else:
-        return unicode(f)
+        return cstr(f)
 
 def datetimeToTuple(dt):
     """Return tuple (year,month,day,hour,minute,second,microsecond) from

@@ -22,7 +22,7 @@
 from __future__ import division
 import sys
 
-from ..compat import citems
+from ..compat import citems, cstr
 from .. import utils
 
 class LinkedFileBase(object):
@@ -92,7 +92,7 @@ class LinkedFileBase(object):
             tempdoc.applyOperation(op)
         except Exception as ex:
             # if something breaks, record an error and return nothing
-            document.log(unicode(ex))
+            document.log(cstr(ex))
 
             # find datasets which are linked using this link object
             # return errors for them

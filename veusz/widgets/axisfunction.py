@@ -21,7 +21,7 @@
 from __future__ import division
 import numpy as N
 
-from ..compat import crange
+from ..compat import crange, cstr
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -221,7 +221,7 @@ class AxisFunction(axis.Axis):
         '''Write error message to document log for exception ex.'''
         self.document.log(
             _("Error in axis-function (%s): '%s'") % (
-                self.settings.function, unicode(ex)))
+                self.settings.function, cstr(ex)))
 
     def getMinMaxT(self):
         '''Get minimum and maximum t.'''
