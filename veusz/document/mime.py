@@ -56,7 +56,7 @@ def generateWidgetsMime(widgets):
         savetext.append(save)
 
     header.append('')
-    text = '\n'.join(header) + ''.join(savetext)
+    text = ('\n'.join(header) + ''.join(savetext)).encode('utf-8')
 
     mimedata = qt4.QMimeData()
     mimedata.setData(widgetmime, qt4.QByteArray(text))
@@ -77,7 +77,7 @@ def generateDatasetsMime(datasets, document):
     output = []
     for name in datasets:
         output.append( document.data[name].datasetAsText() )
-    text = '\n'.join(output)
+    text = ('\n'.join(output)).encode('utf-8')
     mimedata.setData('text/plain', qt4.QByteArray(text))
 
     textfile = CStringIO()
@@ -88,22 +88,29 @@ def generateDatasetsMime(datasets, document):
         # write into a string file
         ds.saveToFile(textfile, name)
 
-    mimedata.setData(datamime, textfile.getvalue())
+    rawdata = textfile.getvalue().encode('utf-8')
+    mimedata.setData(datamime, rawdata)
 
     return mimedata
 
-def isDataMime():
+def isClipboardDataMime():
     """Returns whether data available on clipboard."""
     mimedata = qt4.QApplication.clipboard().mimeData()
     return datamime in mimedata.formats()
 
-def getClipboardWidgetMime():
-    """Returns widget mime data if clipboard contains mime data or None."""
-    mimedata = qt4.QApplication.clipboard().mimeData()
+def getWidgetMime(mimedata):
+    """Given mime data, return decoded python string."""
     if widgetmime in mimedata.formats():
-        return str(mimedata.data(widgetmime))
+        return mimedata.data(widgetmime).data().decode('utf-8')
     else:
         return None
+
+def getClipboardWidgetMime():
+    """Returns widget mime data if mimedata contains correct mimetype or None
+
+    If mimedata is set, use this rather than clipboard directly
+    """
+    return getWidgetMime(qt4.QApplication.clipboard().mimeData())
 
 def getMimeWidgetTypes(data):
     """Get list of widget types in the mime data."""
@@ -254,7 +261,7 @@ class OperationDataPaste(object):
 
     def __init__(self, mimedata):
         """Paste datasets into document."""
-        self.data = str(mimedata.data(datamime))
+        self.data = mimedata.data(datamime).data().decode('utf-8')
 
     def do(self, thisdoc):
         """Do the data paste."""

@@ -237,10 +237,11 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         if action == qt4.Qt.IgnoreAction:
             return True
-        if not mimedata.hasFormat(document.widgetmime):
+
+        data = document.getWidgetMime(mimedata)
+        if data is None:
             return False
 
-        data = str(mimedata.data(document.widgetmime))
         if parentindex.isValid():
             parent = self.getWidget(parentindex)
         else:
@@ -323,7 +324,7 @@ class WidgetTreeView(qt4.QTreeView):
 
         if index.isValid():
             parent = self.model().getWidget(index)
-            data = str(event.mimeData().data(document.widgetmime))
+            data = document.getWidgetMime(event.mimeData)
             if document.isMimeDropable(parent, data):
                 # move the widget!
                 parentpath = parent.path

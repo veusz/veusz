@@ -460,12 +460,12 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         def _paste():
             """Paste dataset(s)."""
-            if document.isDataMime():
+            if document.isClipboardDataMime():
                 mime = qt4.QApplication.clipboard().mimeData()
                 self.doc.applyOperation(document.OperationDataPaste(mime))
 
         # if there is data to paste, add menu item
-        if document.isDataMime():
+        if document.isClipboardDataMime():
             menu.addAction(_("Paste"), _paste)
 
         if len( menu.actions() ) != 0:
