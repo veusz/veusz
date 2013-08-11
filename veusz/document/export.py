@@ -210,17 +210,18 @@ class Export(object):
         # this makes the bounding box correct
         # copy output to a temporary file
         tmpfile = "%s.tmp.%i" % (self.filename, random.randint(0,1000000))
-        fout = open(tmpfile, 'wb')
-        fin = open(self.filename, 'rb')
 
         if ext == '.eps':
             # adjust bounding box
+            fin = open(self.filename, 'rU')
+            fout = open(tmpfile, 'w')
+
             for line in fin:
                 if line[:14] == '%%BoundingBox:':
                     # replace bounding box line by calculated one
                     parts = line.split()
-                    widthfactor = parts[3] / printer.width()
-                    origheight = parts[4]
+                    widthfactor = float(parts[3]) / printer.width()
+                    origheight = float(parts[4])
                     line = "%s %i %i %i %i\n" % (
                         parts[0], 0,
                         int(math.floor(origheight-widthfactor*height)),
@@ -230,6 +231,9 @@ class Export(object):
 
         elif ext == '.pdf':
             # change pdf bounding box and correct pdf index
+            fin = open(self.filename, 'rb')
+            fout = open(tmpfile, 'wb')
+
             text = fin.read()
             text = utils.scalePDFMediaBox(text, printer.width(),
                                           width, height)
