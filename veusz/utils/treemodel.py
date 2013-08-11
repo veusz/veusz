@@ -224,7 +224,7 @@ class TreeModel(qt4.QAbstractItemModel):
                 continue
 
             # one to insert
-            if toadd and (k > toadd[0] or k is None):
+            if toadd and (k is None or k > toadd[0]):
                 self.beginInsertRows(parentidx, i, i)
                 a = nlookup[toadd[0]].cloneTo(root)
                 a._idx = self.nodeindex

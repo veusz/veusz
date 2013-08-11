@@ -30,7 +30,7 @@ import csv
 import locale
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext, cstr, CStringIO
+from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr
 from .. import qtall as qt4
 import numpy as N
 
@@ -486,3 +486,7 @@ def topological_sort(dependency_pairs):
         i += 1
     cyclic = [n for n, heads in citems(num_heads) if heads]
     return ordered, cyclic
+
+def isiternostr(i):
+    """Is this iterator, but not a string?"""
+    return hasattr(i, '__iter__') and not isinstance(i, cbasestr)

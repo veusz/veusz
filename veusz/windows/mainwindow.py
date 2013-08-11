@@ -25,7 +25,7 @@ import sys
 import traceback
 import glob
 
-from ..compat import citems, ckeys, cstr
+from ..compat import citems, ckeys, cstr, cexec
 from .. import qtall as qt4
 
 from .. import document
@@ -1098,7 +1098,7 @@ class MainWindow(qt4.QMainWindow):
 
         try:
             # actually run script text
-            exec compiled in env
+            cexec(compiled, env)
         except Exception as e:
             # need to remember to restore stdout, stderr
             sys.stdout, sys.stderr = stdout, stderr

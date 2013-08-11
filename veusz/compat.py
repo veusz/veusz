@@ -49,7 +49,10 @@ if cpy3:
     cstr = str
 
     # base string type
-    cstrbase = str
+    cbasestr = str
+
+    # bytes-like object
+    cbytes = bytes
 
     # iterate over dict
     def citems(d):
@@ -95,6 +98,9 @@ else:
 
     # base string
     cbasestr = basestring
+
+    # bytes-like object
+    cbytes = str
 
     # iterate over dict
     def citems(d):

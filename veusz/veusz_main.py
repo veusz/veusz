@@ -34,7 +34,7 @@ except ImportError:
         os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) )
     import veusz
 
-from veusz.compat import czip
+from veusz.compat import czip, cbytes
 from veusz import qtall as qt4
 from veusz import utils
 
@@ -123,7 +123,7 @@ def convertArgsUnicode(args):
         return args
     out = []
     for a in args:
-        if isinstance(a, str):
+        if isinstance(a, cbytes):
             out.append( a.decode(enc) )
         else:
             out.append(a)

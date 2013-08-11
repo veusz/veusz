@@ -35,12 +35,14 @@ def _(text, disambiguation=None, context='SafeEval'):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # blacklist of nodes
-forbidden_nodes = frozenset((
-        ast.Exec,
+forbidden_nodes = set((
         ast.Global,
         ast.Import,
         ast.ImportFrom,
         ))
+
+if hasattr(ast, 'Exec'):
+    forbidden_nodes.add(ast.Exec)
 
 # whitelist of allowed builtins
 allowed_builtins = frozenset((

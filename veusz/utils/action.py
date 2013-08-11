@@ -93,7 +93,7 @@ def constructMenus(rootobject, menuout, menutree, actions):
 
         # add actions to the menu
         for action in actlist:
-            if hasattr(action, '__iter__'):
+            if utilfuncs.isiternostr(action):
                 # recurse for submenus
                 constructMenus(menu, menuout, [action], actions)
             elif action == '':
