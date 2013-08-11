@@ -237,7 +237,7 @@ class OperationWidgetsDelete(object):
         # ignore widgets which share ancestry
         # as deleting the parent deletes the child
         widgetpaths = list(self.widgetpaths)
-        widgetpaths.sort( cmp=lambda a, b: len(a)-len(b) )
+        widgetpaths.sort(key=len)
         i = 0
         while i < len(widgetpaths):
             wp = widgetpaths[i]
