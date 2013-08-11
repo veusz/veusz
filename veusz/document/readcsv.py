@@ -304,10 +304,11 @@ class ReadCSV(object):
         par = self.params
 
         # open the csv file
-        csvf = utils.UnicodeCSVReader( par.filename,
-                                       delimiter=par.delimiter,
-                                       quotechar=par.textdelimiter,
-                                       encoding=par.encoding )
+        csvf = utils.get_unicode_csv_reader(
+            par.filename,
+            delimiter=par.delimiter,
+            quotechar=par.textdelimiter,
+            encoding=par.encoding )
 
         # make in iterator for the file
         if par.readrows:

@@ -30,7 +30,7 @@ import csv
 import locale
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr
+from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr, cpy3
 from .. import qtall as qt4
 import numpy as N
 
@@ -339,46 +339,55 @@ def openEncoding(filename, encoding, mode='r'):
 # The following two classes are adapted from the Python documentation
 # they are modified to turn off encoding errors
 
-class UTF8Recoder(CIterator):
+class _UTF8Recoder:
     """
     Iterator that reads an encoded stream and reencodes the input to UTF-8
+
+    Needed for python2
     """
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f, errors='ignore')
-
     def __iter__(self):
         return self
-
-    def __next__(self):
-        line = cnext(self.reader)
+    def next(self):
+        line = self.reader.next()
         return line.encode("utf-8")
 
-class UnicodeCSVReader(CIterator):
+class _UTF8Decoder:
     """
-    A CSV reader which will iterate over lines in the CSV file "f",
-    which is encoded in the given encoding.
+    Python2 iterator than decodes lists of utf-8 encoded strings
     """
-
-    def __init__(self, filename, dialect=csv.excel, encoding='utf-8', **kwds):
-
-        if filename != '{clipboard}':
-            # recode the opened file as utf-8
-            f = UTF8Recoder(open(filename), encoding)
-        else:
-            # take the unicode clipboard and just put into utf-8 format
-            s = qt4.QApplication.clipboard().text()
-            s = s.encode('utf-8')
-            f = CStringIO(s)
-
-        # the actual csv reader based on the file above
-        self.reader = csv.reader(f, dialect=dialect, **kwds)
-
-    def __next__(self):
-        row = cnext(self.reader)
-        return [cstr(s, 'utf-8') for s in row]
-
+    def __init__(self, iterator):
+        self.iterator = iterator
     def __iter__(self):
         return self
+    def next(self):
+        line = self.iterator.next()
+        return [cstr(x, "utf-8") for x in line]
+
+def get_unicode_csv_reader(filename, dialect=csv.excel,
+                           encoding='utf-8', **kwds):
+    """Return an iterator to iterate over CSV file with encoding given."""
+
+    if filename != '{clipboard}':
+        if cpy3:
+            # python3 native encoding support
+            f = open(filename, encoding=encoding, errors='ignore')
+        else:
+            # recode the opened file as utf-8
+            f = _UTF8Recoder(open(filename), encoding)
+    else:
+        # take the unicode clipboard and just put into utf-8 format
+        s = qt4.QApplication.clipboard().text()
+        if not cpy3:
+            s = s.encode("utf-8")
+        f = CStringIO(s)
+
+    reader = csv.reader(f, dialect=dialect, **kwds)
+    if cpy3:
+        return reader
+    else:
+        return _UTF8Decoder(reader)
 
 # End python doc classes
 

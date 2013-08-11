@@ -248,10 +248,12 @@ class ImportTabCSV(ImportTab):
             return False
 
         try:
-            reader = utils.UnicodeCSVReader( filename,
-                                             delimiter=delimiter,
-                                             quotechar=textdelimiter,
-                                             encoding=encoding )
+            reader = utils.get_unicode_csv_reader(
+                filename,
+                delimiter=delimiter,
+                quotechar=textdelimiter,
+                encoding=encoding )
+
             # construct list of rows
             rows = []
             numcols = 0
