@@ -39,6 +39,7 @@ Unicode code to work around different font handling on platforms.
 
 # messes up loaded files if set
 # from __future__ import division
+from __future__ import print_function
 import glob
 import os
 import os.path
@@ -137,17 +138,17 @@ class Dirs(object):
 def renderAllTests():
     """Check documents produce same output as in comparison directory."""
 
-    print "Regenerating all test output"
+    print("Regenerating all test output")
 
     d = Dirs()
     for vsz in d.invszfiles:
         base = os.path.basename(vsz)
-        print base
+        print(base)
         outfile = os.path.join(d.comparisondir, base + '.selftest')
         renderTest(vsz, outfile)
 
 def runTests():
-    print "Testing output"
+    print("Testing output")
 
     fails = 0
     passes = 0
@@ -155,7 +156,7 @@ def runTests():
     d = Dirs()
     for vsz in sorted(d.invszfiles):
         base = os.path.basename(vsz)
-        print base
+        print(base)
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
         renderTest(vsz, outfile)
@@ -169,19 +170,19 @@ def runTests():
         f2.close()
 
         if not comp:
-            print " FAIL: results differed"
+            print(" FAIL: results differed")
             fails += 1
         else:
-            print " PASS"
+            print(" PASS")
             passes += 1
             os.unlink(outfile)
 
-    print
+    print()
     if fails == 0:
-        print "All tests %i/%i PASSED" % (passes, passes)
+        print("All tests %i/%i PASSED" % (passes, passes))
         sys.exit(0)
     else:
-        print "%i/%i tests FAILED" % (fails, passes+fails)
+        print("%i/%i tests FAILED" % (fails, passes+fails))
         sys.exit(fails)
 
 oldflt = svg_export.fltStr

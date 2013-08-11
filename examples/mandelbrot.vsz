@@ -7,7 +7,7 @@ size = 300
 maxiters = 20
 image = zeros( (size, size) )
 
-print "This takes some time, please wait"
+print("This takes some time, please wait")
 
 minx = 100000
 maxx = -100000
