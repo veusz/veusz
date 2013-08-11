@@ -45,9 +45,9 @@ _globals = globals()
 
 import sys
 import traceback
-import pickle
 import os.path
 
+from ..compat import pickle
 from .commandinterface import CommandInterface
 from .. import utils
 

@@ -19,10 +19,9 @@
 from __future__ import division
 import sys
 import struct
-import cPickle
 import socket
 
-from .compat import citems
+from .compat import citems, pickle
 from .windows.simplewindow import SimpleWindow
 from . import document
 from . import qtall as qt4
@@ -195,7 +194,7 @@ class EmbedApplication(qt4.QApplication):
                 socket, EmbedApplication.cmdlenlen))[0]
         # unpickle command and arguments
         temp = EmbedApplication.readLenFromSocket(socket, length)
-        return cPickle.loads(temp)
+        return pickle.loads(temp)
     readCommand = staticmethod(readCommand)
 
     def makeNewClient(self, title, doc=None, hidden=False):
@@ -214,7 +213,7 @@ class EmbedApplication(qt4.QApplication):
     def writeOutput(self, output):
         """Send output back to embed process."""
         # format return data
-        outstr = cPickle.dumps(output)
+        outstr = pickle.dumps(output)
 
         # send return data to stdout
         self.writeToSocket( self.socket, struct.pack('<I', len(outstr)) )

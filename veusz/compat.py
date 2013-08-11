@@ -30,6 +30,11 @@ cpy3 = sys.version_info[0] == 3
 
 if cpy3:
     # py3
+
+    # imports
+    import pickle
+
+    # range function
     crange = range
 
     # zip function
@@ -57,6 +62,11 @@ if cpy3:
 
 else:
     # py2
+
+    # imports
+    import cPickle as pickle
+
+    # range function
     crange = xrange
 
     # zip function
