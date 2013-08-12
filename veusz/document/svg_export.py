@@ -22,7 +22,7 @@ and exporting text as paths for WYSIWYG."""
 from __future__ import division, print_function
 import re
 
-from ..compat import crange, citems
+from ..compat import crange, citems, cbytes
 from .. import qtall as qt4
 
 # dpi runs at many times usual, and results are scaled down
@@ -539,7 +539,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
                   'width="%s" ' % fltStr(r.width()*scale),
                   'height="%s" ' % fltStr(r.height()*scale),
                   'xlink:href="data:image/%s;base64,' % self.imageformat,
-                  str(data.toBase64()),
+                  cbytes(data.toBase64()).decode('ascii'),
                   '" preserveAspectRatio="none"' ]
         SVGElement(self.celement, 'image', ''.join(attrb))
 

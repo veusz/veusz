@@ -97,12 +97,12 @@ _pt = utils.textrender.PartText
 class PartTextAscii(_pt):
     """Text renderer which converts text to ascii."""
     def __init__(self, text):
-        text = cstr(text.encode('ascii', 'xmlcharrefreplace'))
+        text = text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
         _pt.__init__(self, text)
     def render(self, state):
         _pt.render(self, state)
     def addText(self, text):
-        self.text += cstr(text.encode('ascii', 'xmlcharrefreplace'))
+        self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
 def renderTest(invsz, outfile):
     """Render vsz document to create outfile."""
