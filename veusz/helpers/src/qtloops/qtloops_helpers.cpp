@@ -22,9 +22,24 @@
 
 #include "qtloops_helpers.h"
 
+namespace
+{
+  // python3 numpy import_array is a macro with a return (how stupid),
+  // so we have to wrap it up to get it to portably compile
+#if PY_MAJOR_VERSION >= 3
+  int
+#else
+  void
+#endif
+  do_import()
+  {
+    import_array();
+  }
+}
+
 void do_numpy_init_package()
 {
-  import_array();
+  do_import();
 }
 
 Tuple2Ptrs::Tuple2Ptrs(PyObject* tuple)
