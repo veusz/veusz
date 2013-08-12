@@ -1609,7 +1609,7 @@ static void
 Cntr_dealloc(Cntr* self)
 {
     Cntr_clear(self);
-    self->ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject *
@@ -1752,9 +1752,8 @@ static PyMethodDef Cntr_methods[] = {
 };
 
 static PyTypeObject CntrType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "cntr.Cntr",               /*tp_name*/
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "_nc_cntr.Cntr",           /*tp_name*/
     sizeof(Cntr),              /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)Cntr_dealloc,  /*tp_dealloc*/
@@ -1794,82 +1793,49 @@ static PyTypeObject CntrType = {
 };
 
 static PyMethodDef module_methods[] = {
-    {NULL}  /* Sentinel */
+  {NULL}  /* Sentinel */
 };
 
-
-#ifdef NUMARRAY
-#if PY_MINOR_VERSION > 2
-PyMODINIT_FUNC
+/* see http://python3porting.com/cextensions.html */
+#if PY_MAJOR_VERSION >= 3
+# define MOD_ERROR_VAL NULL
+# define MOD_SUCCESS_VAL(val) val
+# define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
+# define MOD_DEF(ob, name, doc, methods) \
+  static struct PyModuleDef moduledef = {		      \
+    PyModuleDef_HEAD_INIT, name, doc, -1, methods, };	      \
+  ob = PyModule_Create(&moduledef)
 #else
-DL_EXPORT(void)
+# define MOD_ERROR_VAL
+# define MOD_SUCCESS_VAL(val)
+# define MOD_INIT(name) void init##name(void)
+# define MOD_DEF(ob, name, doc, methods) \
+  ob = Py_InitModule3(name, methods, doc)
 #endif
-init_na_cntr(void)
-{
-    PyObject* m;
 
-    if (PyType_Ready(&CntrType) < 0)
-        return;
-
-    m = Py_InitModule3("_na_cntr", module_methods,
-                       "Contouring engine as an extension type (numarray).");
-
-    if (m == NULL)
-      return;
-
-    import_array();
-    Py_INCREF(&CntrType);
-    PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
-}
-#endif
-#ifdef NUMERIC
-#if PY_MINOR_VERSION > 2
-PyMODINIT_FUNC
+/* returns different type depending on python version */
+#if PY_MAJOR_VERSION >= 3
+static void* donumpyinit(void) { import_array(); return NULL; }
 #else
-DL_EXPORT(void)
+static void donumpyinit(void) { import_array(); }
 #endif
-init_nc_cntr(void)
+
+MOD_INIT(_nc_cntr)
 {
-    PyObject* m;
+  PyObject *m;
 
-    if (PyType_Ready(&CntrType) < 0)
-        return;
+  if( PyType_Ready(&CntrType) < 0 )
+    return MOD_ERROR_VAL;
 
-    m = Py_InitModule3("_nc_cntr", module_methods,
-                       "Contouring engine as an extension type (Numeric).");
+  MOD_DEF(m, "_nc_cntr", "Contour 2D data", module_methods);
 
-    if (m == NULL)
-      return;
+  if( m == NULL )
+    return MOD_ERROR_VAL;
 
-    import_array();
-    Py_INCREF(&CntrType);
-    PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
+  donumpyinit();
+
+  Py_INCREF(&CntrType);
+  PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
+
+  return MOD_SUCCESS_VAL(m);
 }
-#endif
-
-#ifdef SCIPY
-#if PY_MINOR_VERSION > 2
-PyMODINIT_FUNC
-#else
-DL_EXPORT(void)
-#endif
-init_ns_cntr(void)
-{
-    PyObject* m;
-
-    if (PyType_Ready(&CntrType) < 0)
-        return;
-
-    m = Py_InitModule3("_ns_cntr", module_methods,
-                       "Contouring engine as an extension type (Scipy).");
-
-    if (m == NULL)
-      return;
-
-    import_array();
-    Py_INCREF(&CntrType);
-    PyModule_AddObject(m, "Cntr", (PyObject *)&CntrType);
-}
-#endif
-
-
