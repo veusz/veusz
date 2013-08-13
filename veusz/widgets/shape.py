@@ -22,7 +22,7 @@ from __future__ import division, print_function
 import itertools
 import os
 
-from ..compat import czip
+from ..compat import czip, cbytes
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -302,7 +302,7 @@ class ImageFile(BoxShape):
             return
 
         # convert to base 64 to make it nicer in the saved file
-        encoded = str(qt4.QByteArray(data).toBase64())
+        encoded = cbytes(qt4.QByteArray(data).toBase64()).decode('ascii')
 
         # now put embedded data in hidden setting
         ops = [
