@@ -30,7 +30,7 @@ import csv
 import locale
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr, cpy3
+from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr, cpy3, cbytes
 from .. import qtall as qt4
 import numpy as N
 
@@ -152,7 +152,7 @@ def pixmapAsHtml(pix):
     buf = qt4.QBuffer(ba)
     buf.open(qt4.QIODevice.WriteOnly)
     pix.toImage().save(buf, "PNG")
-    b64 = str(buf.data().toBase64())
+    b64 = cbytes(buf.data().toBase64()).decode('ascii')
     return '<img src="data:image/png;base64,%s">' % b64
 
 def BoundCaller(function, *params):
