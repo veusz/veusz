@@ -82,7 +82,7 @@ class AxisTicks(AxisTicksBase):
                                       5.:  (0.5, 1., 2.5),
                                       2.5: (0.5,) }
     # just get the allowable majors
-    allowed_intervals_linear = list(allowed_minorintervals_linear.keys())
+    allowed_intervals_linear = sorted(allowed_minorintervals_linear.keys())
 
     # the allowed values we can increase by in log space
     # by default we increase by 10^3
@@ -140,8 +140,8 @@ class AxisTicks(AxisTicksBase):
                 if d <= maxextend:
                     maxval += d
 
-        # return (noticks, minbound, maxbound)
-        return ( self._tickNums(minval, maxval, delta), minval, maxval )
+        numticks = self._tickNums(minval, maxval, delta)
+        return (numticks, minval, maxval)
 
     def _calcLinearMinorTickValues(self, minval, maxval, interval, logstep,
                                    allowedintervals):
