@@ -22,6 +22,7 @@ from __future__ import division
 import os.path
 import random
 import math
+import codecs
 
 from ..compat import crange
 from .. import qtall as qt4
@@ -248,34 +249,13 @@ class Export(object):
     def exportSVG(self):
         """Export document as SVG"""
 
-
-        if qt4.PYQT_VERSION >= 0x40600:
-            # custom paint devices don't work in old PyQt versions
-
-            dpi = svg_export.dpi * 1.
-            size = self.doc.pageSize(
-                self.pagenumber, dpi=(dpi,dpi), integer=False)
-            f = open(self.filename, 'w')
+        dpi = svg_export.dpi * 1.
+        size = self.doc.pageSize(
+            self.pagenumber, dpi=(dpi,dpi), integer=False)
+        with codecs.open(self.filename, 'w', encoding='utf-8') as f:
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
             painter = painthelper.DirectPainter(paintdev)
-            self.renderPage(size, (dpi,dpi), painter)
-            f.close()
-        else:
-            # use built-in svg generation, which doesn't work very well
-            # (no clipping, font size problems)
-            import PyQt4.QtSvg
-
-            dpi = 90.
-            size = self.doc.pageSize(
-                self.pagenumber, dpi=(dpi,dpi), integer=False)
-
-            # actually paint the image
-            gen = PyQt4.QtSvg.QSvgGenerator()
-            gen.setFileName(self.filename)
-            gen.setResolution(dpi)
-            gen.setSize( qt4.QSize(int(size[0]), int(size[1])) )
-            painter = painthelper.DirectPainter(gen)
             self.renderPage(size, (dpi,dpi), painter)
 
     def exportSelfTest(self):

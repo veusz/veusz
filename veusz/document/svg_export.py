@@ -461,7 +461,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
             SVGElement(
                 grp, 'text',
                 ' '.join(textattrb),
-                text=text.encode('utf-8') )
+                text=text )
 
         else:
             # convert to a path
