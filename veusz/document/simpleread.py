@@ -45,7 +45,7 @@ import re
 
 import numpy as N
 
-from ..compat import crange, cnext, CStringIO
+from ..compat import crange, cnext, CStringIO, citems
 from .. import utils
 from . import datasets
 

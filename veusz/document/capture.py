@@ -229,7 +229,7 @@ class SocketCaptureStream(CaptureStream):
                 self._handleSocketError(e)
             if len(retn) == 0:
                 raise CaptureFinishException("Remote socket closed")
-            return retn
+            return retn.decode('utf-8', errors='ignore')
         else:
             return ''
 
