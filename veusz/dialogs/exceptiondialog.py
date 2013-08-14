@@ -198,7 +198,8 @@ class ExceptionDialog(VeuszDialog):
         user."""
 
         try:
-            p = curlrequest.urlopen('http://download.gna.org/veusz/').read()
+            p = curlrequest.urlopen(
+                'http://download.gna.org/veusz/').read().decode('ascii')
             versions = re.findall('veusz-([0-9.]+).tar.gz', p)
         except:
             versions = []
