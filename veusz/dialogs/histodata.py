@@ -35,7 +35,7 @@ def _(text, disambiguation=None, context="HistogramDialog"):
 def checkValidator(combo):
     """Is this validator ok?"""
     valid = combo.validator()
-    state, x = valid.validate( combo.currentText(), 0 )
+    state, s, x = valid.validate(combo.currentText(), 0)
     return state == qt4.QValidator.Acceptable
 
 class ManualBinModel(qt4.QAbstractListModel):
@@ -54,12 +54,15 @@ class ManualBinModel(qt4.QAbstractListModel):
                  qt4.Qt.ItemIsEditable )
     def setData(self, index, value, role):
         if role == qt4.Qt.EditRole:
-            val, ok = value.toDouble()
-            if ok:
-                self.data[ index.row() ] = val
-                self.emit( qt4.SIGNAL("dataChanged(const QModelIndex &,"
-                                      " const QModelIndex &)"), index, index)
-                return True
+            try:
+                val = float(value)
+            except ValueError:
+                return False
+
+            self.data[ index.row() ] = val
+            self.emit( qt4.SIGNAL("dataChanged(const QModelIndex &,"
+                                  " const QModelIndex &)"), index, index)
+            return True
         return False
 
 class HistoDataDialog(VeuszDialog):
