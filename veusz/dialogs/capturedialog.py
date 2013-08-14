@@ -19,7 +19,7 @@
 """Veusz data capture dialog."""
 
 from __future__ import division
-from ..compat import citems, cstr
+from ..compat import citems, cstr, cstrerror
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -193,7 +193,8 @@ class CaptureDialog(VeuszDialog):
             # problem opening stream
             qt4.QMessageBox.critical(self, _("Cannot open input"),
                                      _("Cannot open input:\n"
-                                       " %s (error %i)") % (e.strerror, e.errno))
+                                       " %s (error %i)") % (
+                    cstrerror(e), e.errno))
             return
 
         stream.maxlines = maxlines

@@ -22,7 +22,7 @@ from __future__ import division
 import os.path
 import numpy as N
 
-from ..compat import crange, cstr
+from ..compat import crange, cstr, cstrerror
 from .. import utils
 from .. import qtall as qt4
 
@@ -626,7 +626,7 @@ class ImportPluginBinary(ImportPlugin):
             data = f.read()
             f.close()
         except EnvironmentError as e:
-            return _("Cannot read file (%s)") % utils.decodeDefault(e.strerror), False
+            return _("Cannot read file (%s)") % cstrerror(e), False
 
         text = [_('File length: %i bytes') % len(data)]
 
@@ -662,7 +662,7 @@ class ImportPluginBinary(ImportPlugin):
             f.close()
         except EnvironmentError as e:
             raise ImportPluginException(_("Error while reading file '%s'\n\n%s") %
-                                        (params.filename, utils.decodeDefault(e.strerror)))
+                                        (params.filename, cstrerror(e)))
 
         try:
             data = N.fromstring(retn, dtype=self.getNumpyDataType(params),

@@ -17,6 +17,8 @@
 ###############################################################################
 
 from __future__ import division
+
+from ..compat import cstrerror
 from .. import utils
 from .. import qtall as qt4
 from .. import document
@@ -119,7 +121,7 @@ class StylesheetDialog(VeuszDialog):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
-                        filename, utils.decodeDefault(e.strerror)))
+                        filename, cstrerror(e)))
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
@@ -132,7 +134,7 @@ class StylesheetDialog(VeuszDialog):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (
-                        filename, utils.decodeDefault(e.strerror)))
+                        filename, cstrerror(e)))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

@@ -25,7 +25,7 @@ import sys
 import traceback
 import glob
 
-from ..compat import citems, ckeys, cstr, cexec
+from ..compat import citems, ckeys, cstr, cexec, cstrerror
 from .. import qtall as qt4
 
 from .. import document
@@ -294,7 +294,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load default stylesheet '%s'\n\n%s") %
-                    (filename, utils.decodeDefault(e.strerror)))
+                    (filename, cstrerror(e)))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -311,7 +311,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load custom definitions '%s'\n\n%s") %
-                    (filename, utils.decodeDefault(e.strerror)))
+                    (filename, cstrerror(e)))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -888,7 +888,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save document as '%s'\n\n%s") %
-                    (self.filename, utils.decodeDefault(e.strerror)))
+                    (self.filename, cstrerror(e)))
             else:
                 # restore the cursor
                 qt4.QApplication.restoreOverrideCursor()
@@ -948,7 +948,7 @@ class MainWindow(qt4.QMainWindow):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to open '%s'\n\n%s") %
-                    (filename, utils.decodeDefault(e.strerror)))
+                    (filename, cstrerror(e)))
                 return None
             return filename
         return None
@@ -1027,7 +1027,7 @@ class MainWindow(qt4.QMainWindow):
             qt4.QMessageBox.critical(
                 self, _("Error - Veusz"),
                 _("Cannot open document '%s'\n\n%s") %
-                (filename, utils.decodeDefault(e.strerror)))
+                (filename, cstrerror(e)))
             self.setupDefaultDoc()
             return
 
@@ -1268,7 +1268,7 @@ class MainWindow(qt4.QMainWindow):
                 export.export()
             except (RuntimeError, EnvironmentError) as e:
                 if isinstance(e, EnvironmentError):
-                    msg = utils.decodeDefault(e.strerror)
+                    msg = cstrerror(e)
                 else:
                     msg = cstr(e)
 

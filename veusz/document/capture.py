@@ -205,17 +205,8 @@ class SocketCaptureStream(CaptureStream):
         # clean up
         self.socket.close()
 
-        if isinstance(e, EnvironmentError):   # python 2.6
-            raise e
-
-        ee = EnvironmentError()
-        if isinstance(e, cbasestr):           # windows?
-            ee.strerror = cstr(e).encode(locale.getdefaultlocale()[1])
-            ee.errno = -1
-        else:                                 # unix
-            ee.strerror = e[1]
-            ee.errno = e[0]
-        raise ee
+        # re-raise
+        raise e
 
     def getMoreData(self):
         """Read data from the socket."""

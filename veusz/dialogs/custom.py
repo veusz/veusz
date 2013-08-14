@@ -19,6 +19,7 @@
 from __future__ import division
 import ast
 
+from ..compat import cstrerror
 from .. import qtall as qt4
 from .. import document
 from .veuszdialog import VeuszDialog
@@ -259,7 +260,7 @@ class CustomDialog(VeuszDialog):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
-                        filename, utils.decodeDefault(e.strerror)))
+                        filename, cstrerror(e)))
 
     def slotLoad(self):
         """Load entries."""
@@ -273,7 +274,7 @@ class CustomDialog(VeuszDialog):
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (
-                            filename, utils.decodeDefault(e.strerror)))
+                            filename, cstrerror(e)))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

@@ -464,11 +464,6 @@ def unique(inlist):
             last = x
     return out
 
-def decodeDefault(s):
-    """Decode the string using current locale.
-    Used for decoding exceptions."""
-    return s.decode(locale.getdefaultlocale()[1])
-
 # based on http://stackoverflow.com/questions/10607841/algorithm-for-topological-sorting-if-cycles-exist
 def topological_sort(dependency_pairs):
     """Given a list of pairs, perform a topological sort.

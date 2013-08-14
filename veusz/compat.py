@@ -76,6 +76,10 @@ if cpy3:
     # exec function
     cexec = getattr(cbuiltins, 'exec')
 
+    # convert strerror exception to string
+    def cstrerror(ex):
+        return ex.strerror
+
 else:
     # py2
 
@@ -133,3 +137,11 @@ else:
         # this is done like this to avoid a compile-time error in py3
         code = 'exec text in globdict'
         exec(code)
+
+    # convert strerror exception to string
+    def cstrerror(ex):
+        if isinstance(ex, str):
+            return ex.strerror.decode(locale.getdefaultlocale()[1])
+        else:
+            return ex.strerror
+
