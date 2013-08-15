@@ -133,10 +133,6 @@ def initImports():
     '''Do imports and start up DBUS/SAMP.'''
     from veusz import setting
     from veusz import widgets
-    from veusz.utils import vzdbus, vzsamp
-
-    vzdbus.setup()
-    vzsamp.setup()
 
 class ImportThread(qt4.QThread):
     '''Do import of main code within another thread.
@@ -178,6 +174,10 @@ class AppRunner(qt4.QObject):
 
         options = self.options
         args = self.args
+
+        from veusz.utils import vzdbus, vzsamp
+        vzdbus.setup()
+        vzsamp.setup()
 
         from veusz import document
         from veusz import setting
