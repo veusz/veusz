@@ -23,9 +23,8 @@ import os
 import socket
 import platform
 import signal
-import locale
 
-from ..compat import cbasestr, cstr
+from ..compat import cstr
 from .. import qtall as qt4
 from .. import utils
 from . import simpleread

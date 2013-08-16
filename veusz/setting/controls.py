@@ -1101,11 +1101,6 @@ class ListSet(qt4.QFrame):
         b.setEnabled( len(self.setting.val) > 0 )
         b.show()
 
-    def polish(self):
-        """Remove tooltip from widget - avoid Qt bugs."""
-        qt4.QVBox.polish(self)
-        qt4.QToolTip.remove(self)
-
     def onAddClicked(self):
         """Add a line style to the list given."""
 
@@ -1277,6 +1272,7 @@ class LineSet(ListSet):
         row, col = self.identifyPosn(sender)
 
         text = sender.text()
+        from . import setting
         if setting.Distance.isDist(text):
             # valid distance
             styleClear(sender)
@@ -1531,7 +1527,7 @@ class MultiSettingWidget(qt4.QWidget):
         """Override this to make an editing widget."""
         return None
 
-    def updateControls():
+    def updateControls(self):
         """Override this to update values in controls."""
         pass
 
@@ -1764,6 +1760,7 @@ class ErrorStyle(Choice):
                         self._errorstyles, parent,
                         icons=self._icons)
 
+    @classmethod
     def _generateIcons(cls):
         """Generate a list of pixmaps for drop down menu."""
         cls._icons = []

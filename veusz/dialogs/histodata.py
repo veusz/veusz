@@ -26,8 +26,6 @@ from .. import document
 from .veuszdialog import VeuszDialog
 from . import dataeditdialog
 
-import numpy as N
-
 def _(text, disambiguation=None, context="HistogramDialog"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -40,15 +38,15 @@ def checkValidator(combo):
 
 class ManualBinModel(qt4.QAbstractListModel):
     """Model to store a list of floating point values in a list."""
-    def __init__(self, data):
+    def __init__(self, thedata):
         qt4.QAbstractListModel.__init__(self)
-        self.data = data
+        self.thedata = thedata
     def data(self, index, role):
         if role == qt4.Qt.DisplayRole and index.isValid():
-            return float(self.data[index.row()])
+            return float(self.thedata[index.row()])
         return None
     def rowCount(self, parent):
-        return len(self.data)
+        return len(self.thedata)
     def flags(self, index):
         return ( qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsEnabled |
                  qt4.Qt.ItemIsEditable )
@@ -59,7 +57,7 @@ class ManualBinModel(qt4.QAbstractListModel):
             except ValueError:
                 return False
 
-            self.data[ index.row() ] = val
+            self.thedata[ index.row() ] = val
             self.emit( qt4.SIGNAL("dataChanged(const QModelIndex &,"
                                   " const QModelIndex &)"), index, index)
             return True

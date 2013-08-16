@@ -901,7 +901,7 @@ class Document( qt4.QObject ):
             except ValueError:
                 pass
 
-        raise RuntimError('Invalid array')
+        raise RuntimeError('Invalid array')
 
     def walkNodes(self, tocall, root=None,
                   nodetypes=('widget', 'setting', 'settings'),

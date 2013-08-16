@@ -1440,6 +1440,7 @@ class Dataset2DXYFunc(Dataset2D):
         self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
                        self.ystep[1] + self.ystep[2]*0.5)
 
+        self.cacheddata = None
         self.lastchangeset = -1
 
     @property

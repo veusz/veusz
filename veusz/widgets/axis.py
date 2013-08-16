@@ -376,7 +376,7 @@ class Axis(widget.Widget):
             # this is ensured to be an Axis
             try:
                 widget = s.get('match').getReferredWidget()
-            except setting.InvalidType:
+            except utils.InvalidType:
                 widget = None
 
             # this looks valid + sanity checks

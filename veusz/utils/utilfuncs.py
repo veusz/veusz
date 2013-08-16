@@ -27,10 +27,9 @@ import os.path
 import threading
 import codecs
 import csv
-import locale
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr, cpy3, cbytes
+from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes
 from .. import qtall as qt4
 import numpy as N
 

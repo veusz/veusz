@@ -25,7 +25,7 @@ import fnmatch
 
 from ..compat import cbasestr
 from .. import qtall as qt4
-from .. import setting
+from .. import utils
 from . import field
 
 def _(text, disambiguation=None, context='ToolsPlugin'):
@@ -328,7 +328,7 @@ class TextReplace(ToolsPlugin):
                     if val != val2:
                         try:
                             node.val = val2
-                        except setting.InvalidType:
+                        except utils.InvalidType:
                             pass
             else:
                 for c in node.children:

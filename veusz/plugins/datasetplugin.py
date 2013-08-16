@@ -150,7 +150,7 @@ class DatasetDateTime(object):
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
         from .. import document
-        return document.DatasetDatePlugin(manager, self)
+        return document.DatasetDateTimePlugin(manager, self)
 
 class DatasetText(object):
     """Text dataset for ImportPlugin or DatasetPlugin."""

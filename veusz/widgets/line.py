@@ -20,6 +20,7 @@
 
 from __future__ import division
 import math
+import itertools
 import numpy as N
 
 from ..compat import czip
@@ -144,8 +145,6 @@ class Line(plotters.FreePlotter):
 
     def _computeLinesPointToPoint(self, posn):
         """Return set of lines for point to point."""
-
-        s = self.settings
 
         # translate coordinates from axes or relative values
         xpos, ypos = self._getPlotterCoords(posn)

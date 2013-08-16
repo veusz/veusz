@@ -413,8 +413,6 @@ class Contour(plotters.GenericPlotter):
     def dataDraw(self, painter, axes, posn, cliprect):
         """Draw the contours."""
 
-        s = self.settings
-
         # update contours if necessary
         if not self.checkContoursUpToDate():
             return

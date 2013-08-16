@@ -19,9 +19,7 @@
 """For plotting one or more text labels on a graph."""
 
 from __future__ import division
-import math
 import itertools
-import numpy as N
 
 from ..compat import czip
 from .. import document

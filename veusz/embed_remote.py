@@ -159,9 +159,9 @@ class EmbedApplication(qt4.QApplication):
     # lengths of lengths sent to application
     cmdlenlen = struct.calcsize('<I')
 
-    def __init__(self, socket, args):
+    def __init__(self, thesocket, args):
         qt4.QApplication.__init__(self, args)
-        self.socket = socket
+        self.socket = thesocket
 
         # listen to commands on the socket
         self.notifier = qt4.QSocketNotifier(self.socket.fileno(),
@@ -188,12 +188,12 @@ class EmbedApplication(qt4.QApplication):
             count += thesocket.send(data[count:])
     writeToSocket = staticmethod(writeToSocket)
 
-    def readCommand(socket):
+    def readCommand(thesocket):
         # get length of packet
         length = struct.unpack('<I', EmbedApplication.readLenFromSocket(
-                socket, EmbedApplication.cmdlenlen))[0]
+                thesocket, EmbedApplication.cmdlenlen))[0]
         # unpickle command and arguments
-        temp = EmbedApplication.readLenFromSocket(socket, length)
+        temp = EmbedApplication.readLenFromSocket(thesocket, length)
         return pickle.loads(temp)
     readCommand = staticmethod(readCommand)
 
