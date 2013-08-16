@@ -198,11 +198,6 @@ class AppRunner(qt4.QObject):
             # listen to incoming commands
             listen(args, quiet=options.quiet)
         elif options.export:
-            # export files to make images
-            if len(options.export) != len(args)-1:
-                parser.error(
-                    'export option needs same number of documents and '
-                    'output files')
             export(options.export, args)
             qt4.qApp.quit()
             sys.exit(0)
@@ -266,6 +261,12 @@ def run():
     parser.add_option('--translation', metavar='FILE',
                       help='load the translation .qm file given')
     options, args = parser.parse_args( app.argv() )
+    
+    # export files to make images
+    if options.export and len(options.export) != len(args)-1:
+        parser.error(
+            'export option needs same number of documents and '
+            'output files')
 
     # convert args to unicode from filesystem strings
     args = convertArgsUnicode(args)
