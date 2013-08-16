@@ -264,7 +264,7 @@ class AxisFunction(axis.Axis):
             except FunctionError as e:
                 self.logError(e)
                 self.cachedfuncobj = None
-            except AxisError as e:
+            except AxisError:
                 pass
 
         return self.cachedfuncobj

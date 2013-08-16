@@ -99,7 +99,7 @@ class Widget(object):
         self.actions = []
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         """Get types of widgets this can be a child of."""
         return ()
 

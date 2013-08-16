@@ -239,7 +239,7 @@ class Key(widget.Widget):
                             formatting = True) )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import graph
         return (graph.Graph,)
 

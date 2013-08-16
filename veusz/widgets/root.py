@@ -81,7 +81,7 @@ class Root(widget.Widget):
                 formatting=True) )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         return (None,)
 
     def changeLocale(self):

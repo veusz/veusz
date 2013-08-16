@@ -230,7 +230,7 @@ class Grid(widget.Widget):
                 formatting=True) )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import page
         return (page.Page, Grid)
 

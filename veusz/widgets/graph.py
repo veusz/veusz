@@ -89,7 +89,7 @@ class Graph(widget.Widget):
                pixmap='settings_border')
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import page, grid
         return (page.Page, grid.Grid)
 

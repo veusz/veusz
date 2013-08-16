@@ -320,7 +320,7 @@ class Axis(widget.Widget):
                pixmap='settings_axisminorgridlines' )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import graph, grid
         return (graph.Graph, grid.Grid)
 

@@ -307,7 +307,7 @@ class Page(widget.Widget):
                 formatting=True) )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import root
         return (root.Root,)
         

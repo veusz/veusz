@@ -44,7 +44,7 @@ class GenericPlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import graph
         return (graph.Graph,)
 
@@ -184,7 +184,7 @@ class FreePlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import page, graph
         return (graph.Graph, page.Page)
 

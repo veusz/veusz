@@ -110,7 +110,7 @@ class NonOrthPoint(Widget):
                pixmap = 'settings_axislabel' )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         return (NonOrthGraph,)
 
     @property
