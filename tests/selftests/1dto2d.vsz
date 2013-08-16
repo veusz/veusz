@@ -6,8 +6,8 @@ AddImportPath(u'/data/jss/veusz/code/veusz/tests/selftests')
 xv = []
 yv = []
 zv = []
-for x in xrange(10):
-    for y in xrange(10):
+for x in range(10):
+    for y in range(10):
         z = sqrt((x-5.)**2 + (y-5.)**2)
         xv.append(x)
         yv.append(y)

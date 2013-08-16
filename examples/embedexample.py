@@ -55,9 +55,9 @@ for i in range(10):
     time.sleep(2)
 
 # let the user see the final result
-print "Waiting for 10 seconds"
+print("Waiting for 10 seconds")
 time.sleep(10)
-print "Done!"
+print("Done!")
 
 # close the window (this is not strictly necessary)
 g.Close()

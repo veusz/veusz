@@ -39,11 +39,13 @@ Unicode code to work around different font handling on platforms.
 
 # messes up loaded files if set
 # from __future__ import division
+from __future__ import print_function
 import glob
 import os
 import os.path
 import sys
 
+from veusz.compat import cexec, cstr
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
@@ -88,16 +90,19 @@ class StupidFontMetrics(object):
     def boundingRect(self, c):
         return qt4.QRectF(0, 0, self.height()*0.5, self.height())
 
+    def boundingRectChar(self, c):
+        return qt4.QRectF(0, 0, self.height()*0.5, self.height())
+
 _pt = utils.textrender.PartText
 class PartTextAscii(_pt):
     """Text renderer which converts text to ascii."""
     def __init__(self, text):
-        text = unicode(text).encode('ascii', 'xmlcharrefreplace')
+        text = text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
         _pt.__init__(self, text)
     def render(self, state):
         _pt.render(self, state)
     def addText(self, text):
-        self.text += unicode(text).encode('ascii', 'xmlcharrefreplace')
+        self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
 def renderTest(invsz, outfile):
     """Render vsz document to create outfile."""
@@ -112,9 +117,9 @@ def renderTest(invsz, outfile):
     for cmd in document.CommandInterface.unsafe_commands:
         cmds[cmd] = getattr(ifc, cmd)
 
-    exec "from numpy import *" in cmds
+    cexec("from numpy import *", cmds)
     ifc.AddImportPath( os.path.dirname(invsz) )
-    exec open(invsz) in cmds
+    cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
     ifc.Export(outfile)
 
 class Dirs(object):
@@ -134,17 +139,17 @@ class Dirs(object):
 def renderAllTests():
     """Check documents produce same output as in comparison directory."""
 
-    print "Regenerating all test output"
+    print("Regenerating all test output")
 
     d = Dirs()
     for vsz in d.invszfiles:
         base = os.path.basename(vsz)
-        print base
+        print(base)
         outfile = os.path.join(d.comparisondir, base + '.selftest')
         renderTest(vsz, outfile)
 
 def runTests():
-    print "Testing output"
+    print("Testing output")
 
     fails = 0
     passes = 0
@@ -152,7 +157,7 @@ def runTests():
     d = Dirs()
     for vsz in sorted(d.invszfiles):
         base = os.path.basename(vsz)
-        print base
+        print(base)
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
         renderTest(vsz, outfile)
@@ -166,19 +171,19 @@ def runTests():
         f2.close()
 
         if not comp:
-            print " FAIL: results differed"
+            print(" FAIL: results differed")
             fails += 1
         else:
-            print " PASS"
+            print(" PASS")
             passes += 1
             os.unlink(outfile)
 
-    print
+    print()
     if fails == 0:
-        print "All tests %i/%i PASSED" % (passes, passes)
+        print("All tests %i/%i PASSED" % (passes, passes))
         sys.exit(0)
     else:
-        print "%i/%i tests FAILED" % (fails, passes+fails)
+        print("%i/%i tests FAILED" % (fails, passes+fails))
         sys.exit(fails)
 
 oldflt = svg_export.fltStr

@@ -25,7 +25,7 @@ class build_ext (distutils.command.build_ext.build_ext):
         Parse the sbf file specified to extract the name of the generated source
         files. Make them absolute assuming they reside in the temp directory.
         '''
-        for L in file(sbf):
+        for L in open(sbf):
             key, value = L.split('=', 1)
             if key.strip() == 'sources':
                 out = []
@@ -33,7 +33,7 @@ class build_ext (distutils.command.build_ext.build_ext):
                     out.append(os.path.join(self.build_temp, o))
                 return out
 
-        raise RuntimeError, 'cannot parse SIP-generated "%s"' % sbf
+        raise RuntimeError('cannot parse SIP-generated "%s"' % sbf)
 
     def _find_sip(self):
         cfg = PyQt4.pyqtconfig.Configuration()

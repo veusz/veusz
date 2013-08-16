@@ -7,15 +7,15 @@ size = 300
 maxiters = 20
 image = zeros( (size, size) )
 
-print "This takes some time, please wait"
+print("This takes some time, please wait")
 
 minx = 100000
 maxx = -100000
 miny = 100000
 maxy = -100000
 
-for i in xrange(size):
-    for j in xrange(size/2):
+for i in range(size):
+    for j in range(int(size/2)):
         c1 = -2+4.*i/size
         c2 = 2-4.*j/size
         x = c1

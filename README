@@ -1,4 +1,4 @@
-Veusz 1.18
+Veusz 1.19
 ----------
 http://home.gna.org/veusz/
 
@@ -12,32 +12,18 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.18:
- * Add support for dataset expressions when plotting
- * Add axis-function widget for plotting axes which have a scale given
-   by a function, or are linked to a different axis via a function
- * Add stepped colour maps
- * Support editing multiple datasets simultaneously in editor
- * Add setting to fix aspect-ratio of graphs
- * Add 'vcentre' line step mode for vertical step plots
- * Add internal margin setting for grids to separate sub-plots
- * Add pixel, pixel_wcs, fraction and linear_wcs FITS import
-   coordinate system modes
- * Add drop down toolbar button menu to create axis widgets
- * More efficient widget dependency resolution
+Changes in 1.19:
+ * Make code compatible with python3
+ * Separation of python module and resources in source package
+   (packagers may need to consult INSTALL)
+ * Move to v2 of PyQt API
+ * Remove deprecated numpy API from helpers module
+ * Allow fits dataset names to be blank if prefix/suffix are not
+ * New ast-based code checker
 
 Bug fixes:
- * Fix reversed 'broken'-axes
- * Do not always draw axes above other widgets (fixes problem with key
-   below axis)
- * Fix use of transparency image when plotting non-square images
- * Allow lists passed as xrange and yrange to create 2D dataset
- * Fix FieldBool positioning for plugins
- * QDP import: fix "no" values when used mixed with numbers
- * Remove warning of log images with zeros
- * For embedded mode, always return string for __repr__
- * Workaround for windows appearing behind for Mac OS X
- * Improve property spacing on Mac OS X
+ * Fix crash if other linked axis not initialized
+ 
 
 Features of package:
  Plotting features:

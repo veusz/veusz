@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #    Copyright (C) 2008 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
@@ -108,7 +108,7 @@ if py2app and sys.platform == 'darwin':
                                 'includes': ('veusz.helpers._nc_cntr',
                                              'veusz.helpers.qtloops'),
                                 'plist': plist,
-                                'iconfile': 'windows/icons/veusz.icns',
+                                'iconfile': 'veusz/windows/icons/veusz.icns',
                                 }
                      }
 	}
@@ -141,21 +141,9 @@ setup(name = 'veusz',
                       'License :: OSI Approved :: '
                       'GNU General Public License (GPL)',
                       'Topic :: Scientific/Engineering :: Visualization' ],
-      package_dir = { 'veusz': '',
-                      'veusz.dialogs': 'dialogs',
-                      'veusz.document': 'document',
-                      'veusz.helpers': 'helpers',
-                      'veusz.plugins': 'plugins',
-                      'veusz.qtwidgets': 'qtwidgets',
-                      'veusz.setting': 'setting',
-                      'veusz.tests': 'tests',
-                      'veusz.utils': 'utils',
-                      'veusz.widgets': 'widgets',
-                      'veusz.windows': 'windows',
-                      },
       data_files = [ ('', ['VERSION']),
-                     findData('dialogs', ('ui',)),
-                     findData('windows/icons', ('png', 'svg')),
+                     findData('ui', ('ui',)),
+                     findData('icons', ('png', 'svg')),
                      findData('examples', ('vsz', 'py', 'csv', 'dat')),
                      ],
       packages = [ 'veusz',
@@ -173,38 +161,38 @@ setup(name = 'veusz',
       ext_modules = [
         # mathml widget
         Extension('veusz.helpers.qtmml',
-                  ['helpers/src/qtmml/qtmmlwidget.cpp',
-                   'helpers/src/qtmml/qtmml.sip'],
+                  ['veusz/helpers/src/qtmml/qtmmlwidget.cpp',
+                   'veusz/helpers/src/qtmml/qtmml.sip'],
                   language="c++",
-                  include_dirs=['helpers/src/qtmml'],
+                  include_dirs=['veusz/helpers/src/qtmml'],
                   ),
 
         # device to record paint commands
         Extension('veusz.helpers.recordpaint',
-                  ['helpers/src/recordpaint/recordpaintdevice.cpp',
-                   'helpers/src/recordpaint/recordpaintengine.cpp',
-                   'helpers/src/recordpaint/recordpaint.sip'],
+                  ['veusz/helpers/src/recordpaint/recordpaintdevice.cpp',
+                   'veusz/helpers/src/recordpaint/recordpaintengine.cpp',
+                   'veusz/helpers/src/recordpaint/recordpaint.sip'],
                   language="c++",
-                  include_dirs=['helpers/src/recordpaint'],
+                  include_dirs=['veusz/helpers/src/recordpaint'],
                   ),
 
         # contour plotting library
         Extension('veusz.helpers._nc_cntr',
-                  ['helpers/src/nc_cntr/_nc_cntr.c'],
+                  ['veusz/helpers/src/nc_cntr/_nc_cntr.c'],
                   include_dirs=[numpy.get_include()]),
 
         # qt helper module
         Extension('veusz.helpers.qtloops',
-                  ['helpers/src/qtloops/qtloops.cpp',
-                   'helpers/src/qtloops/qtloops_helpers.cpp',
-                   'helpers/src/qtloops/polygonclip.cpp',
-                   'helpers/src/qtloops/polylineclip.cpp',
-                   'helpers/src/qtloops/beziers.cpp',
-                   'helpers/src/qtloops/beziers_qtwrap.cpp',
-                   'helpers/src/qtloops/numpyfuncs.cpp',
-                   'helpers/src/qtloops/qtloops.sip'],
+                  ['veusz/helpers/src/qtloops/qtloops.cpp',
+                   'veusz/helpers/src/qtloops/qtloops_helpers.cpp',
+                   'veusz/helpers/src/qtloops/polygonclip.cpp',
+                   'veusz/helpers/src/qtloops/polylineclip.cpp',
+                   'veusz/helpers/src/qtloops/beziers.cpp',
+                   'veusz/helpers/src/qtloops/beziers_qtwrap.cpp',
+                   'veusz/helpers/src/qtloops/numpyfuncs.cpp',
+                   'veusz/helpers/src/qtloops/qtloops.sip'],
                   language="c++",
-                  include_dirs=['helpers/src/qtloops',
+                  include_dirs=['veusz/helpers/src/qtloops',
                                 numpy.get_include()],
                   ),
         ],
