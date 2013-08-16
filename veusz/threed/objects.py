@@ -1,7 +1,7 @@
 import numpy as N
 
-import veusz.utils as utils
-import veusz.qtall as qt4
+from .. import utils
+from .. import qtall as at4
 
 class SurfaceProp(object):
     """Describe surface properties."""

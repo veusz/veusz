@@ -1,4 +1,4 @@
-from funcs import normalise
+from .funcs import normalise
 import numpy as N
 
 class Camera(object):

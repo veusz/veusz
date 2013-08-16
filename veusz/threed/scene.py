@@ -1,4 +1,4 @@
-import funcs
+from . import funcs
 import numpy as N
 
 class LightSource(object):
