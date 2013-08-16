@@ -71,7 +71,6 @@ Agreement.
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
-#define NUMERIC
 #include "numpy/arrayobject.h"
 
 /* Note that all arrays in these routines are Fortran-style,
