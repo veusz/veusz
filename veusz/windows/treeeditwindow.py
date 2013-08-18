@@ -816,6 +816,9 @@ class TreeEditDock(qt4.QDockWidget):
 
             self.vzactions['add.%s' % wc.typename].setEnabled(w is not None)
 
+        self.vzactions['add.axismenu'].setEnabled(
+            self.vzactions['add.axis'].isEnabled())
+
         # exclusive widgets
         nonorth = self.vzactions['add.nonorthpoint'].isEnabled()
         self.vzactions['add.nonorthpoint'].setVisible(nonorth)
