@@ -166,6 +166,31 @@ class TickLabel(setting.Text):
                                                 'labels from axis'),
                                       usertext= _('Tick offset') ) )
 
+class AutoRange(setting.Choice):
+    """Choose how to choose range of axis."""
+
+    def __init__(self, name, value, **args):
+        setting.Choice.__init__(self,
+                name,
+                ('exact', 'next-tick', '+2%', '+5%', '+10%', '+15%'),
+                value,
+                descr = _('If axis range not specified, use range of '
+                          'data and this setting'),
+                descriptions = (_('Use exact data range'),
+                                _('Use data range, rounding up to tick marks'),
+                                _('Use data range, adding 2% of range'),
+                                _('Use data range, adding 5% of range'),
+                                _('Use data range, adding 10% of range'),
+                                _('Use data range, adding 15% of range'),
+                                ),
+                formatting = True,
+                usertext = _('Auto range'))
+
+    def copy(self):
+        """Return copy of this setting."""
+        return self._copyHelper((), (), {})
+
+
 ###############################################################################
 
 class Axis(widget.Widget):
@@ -213,21 +238,7 @@ class Axis(widget.Widget):
         s.add( setting.Bool('log', False,
                             descr = _('Whether axis is logarithmic'),
                             usertext=_('Log')) )
-        s.add( setting.Choice(
-                'autoRange',
-                ('exact', 'next-tick', '+2%', '+5%', '+10%', '+15%'),
-                'next-tick',
-                descr = _('If axis range not specified, use range of '
-                          'data and this setting'),
-                descriptions = (_('Use exact data range'),
-                                _('Use data range, rounding up to tick marks'),
-                                _('Use data range, adding 2% of range'),
-                                _('Use data range, adding 5% of range'),
-                                _('Use data range, adding 10% of range'),
-                                _('Use data range, adding 15% of range'),
-                                ),
-                formatting = True,
-                usertext = _('Auto range') ) )
+        s.add( AutoRange('autoRange', 'next-tick') )
         s.add( setting.Choice('mode',
                               ('numeric', 'datetime', 'labels'),
                               'numeric',
