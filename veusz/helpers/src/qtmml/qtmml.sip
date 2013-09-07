@@ -16,10 +16,10 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-%Module qtmml 0
+%Module(name=qtmml, version=0)
 
-%Import QtCore/QtCoremod.sip
-%Import QtGui/QtGuimod.sip
+%Import(name=QtCore/QtCoremod.sip)
+%Import(name=QtGui/QtGuimod.sip)
 
 %ModuleHeaderCode
  // we have to do this twice, so define as a template

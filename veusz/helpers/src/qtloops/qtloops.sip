@@ -16,10 +16,10 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-%Module qtloops 0
+%Module(name=qtloops, version=0)
 
-%Import QtCore/QtCoremod.sip
-%Import QtGui/QtGuimod.sip
+%Import(name=QtCore/QtCoremod.sip)
+%Import(name=QtGui/QtGuimod.sip)
 
 %ModuleHeaderCode
 #include <qtloops_helpers.h>

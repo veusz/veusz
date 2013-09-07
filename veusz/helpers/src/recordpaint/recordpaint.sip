@@ -16,10 +16,10 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-%Module recordpaint 0
+%Module(name=recordpaint, version=0)
 
-%Import QtCore/QtCoremod.sip
-%Import QtGui/QtGuimod.sip
+%Import(name=QtCore/QtCoremod.sip)
+%Import(name=QtGui/QtGuimod.sip)
 
 class RecordPaintDevice : QPaintDevice
  {
