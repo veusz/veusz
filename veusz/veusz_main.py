@@ -40,7 +40,7 @@ from veusz import utils
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2012 <jeremy@jeremysanders.net> and contributors
+Copyright (C) Jeremy Sanders 2003-2013 <jeremy@jeremysanders.net> and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
