@@ -20,10 +20,11 @@ Changes in 1.19:
  * Remove deprecated numpy API from helpers module
  * Allow fits dataset names to be blank if prefix/suffix are not
  * New ast-based code checker
+ * Picker uses 1-based index for consistency
 
 Bug fixes:
  * Fix crash if other linked axis not initialized
- 
+ * Fix crash if trying to edit non-editable datasets
 
 Features of package:
  Plotting features:
