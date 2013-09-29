@@ -265,6 +265,10 @@ class DatasetBase(object):
         """Return dataset as text (for use by user)."""
         return ''
 
+    def editable(self):
+        """Is the dataset editable?"""
+        return True
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -962,6 +966,10 @@ class DatasetExpression(Dataset):
         self.docchangeset = -1
         self.evaluated = {}
 
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
+
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
         
@@ -1157,6 +1165,10 @@ class DatasetRange(Dataset):
                 vals = None
             setattr(self, name, vals)
 
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
+
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
@@ -1248,6 +1260,10 @@ class Dataset2DXYZExpression(Dataset2D):
         self.exprx = exprx
         self.expry = expry
         self.exprz = exprz
+
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
 
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
@@ -1371,6 +1387,10 @@ class Dataset2DExpression(Dataset2D):
 
         self.expr = expr
         self.lastchangeset = -1
+
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
         
     @property
     def data(self):
@@ -1442,6 +1462,10 @@ class Dataset2DXYFunc(Dataset2D):
 
         self.cacheddata = None
         self.lastchangeset = -1
+
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
 
     @property
     def data(self):
@@ -1565,6 +1589,10 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset.__init__(self, data=[])
 
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
+
     def userSize(self):
         """Size of dataset."""
         return str( self.data.shape[0] )
@@ -1594,6 +1622,10 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset2D.__init__(self, [[]])
 
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
+
     def __getitem__(self, key):
         return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange)
         
@@ -1611,6 +1643,10 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetText.__init__(self, [])
 
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
+
     def __getitem__(self, key):
         return DatasetText(self.data[key])
 
@@ -1623,6 +1659,10 @@ class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTime):
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetDateTime.__init__(self, [])
+
+    def editable(self):
+        """Is the dataset editable?"""
+        return False
 
     def __getitem__(self, key):
         return DatasetDateTime(self.data[key])
