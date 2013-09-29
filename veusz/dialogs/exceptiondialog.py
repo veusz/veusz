@@ -178,8 +178,8 @@ class ExceptionDialog(VeuszDialog):
         VeuszDialog.__init__(self, parent, 'exceptionlist.ui')
 
         # get text for traceback and locals
-        self.backtrace = ( ''.join(traceback.format_exception(*exception)) +
-                           formatLocals(exception) )
+        self.fmtexcept = ''.join(traceback.format_exception(*exception))
+        self.backtrace = self.fmtexcept + formatLocals(exception)
 
         self.errortextedit.setPlainText(self.backtrace)
 
@@ -229,12 +229,12 @@ class ExceptionDialog(VeuszDialog):
         
     def ignoreSessionSlot(self):
         """Ignore exception for session."""
-        ExceptionDialog.ignore_exceptions.add(self.backtrace)
+        ExceptionDialog.ignore_exceptions.add(self.fmtexcept)
         self.reject()
 
     def exec_(self):
         """Exec dialog if exception is not ignored."""
-        if self.backtrace not in ExceptionDialog.ignore_exceptions:
+        if self.fmtexcept not in ExceptionDialog.ignore_exceptions:
             VeuszDialog.exec_(self)
 
         # send another exception shortly - this clears out the current one

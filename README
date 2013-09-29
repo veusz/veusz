@@ -25,6 +25,7 @@ Changes in 1.19:
 Bug fixes:
  * Fix crash if other linked axis not initialized
  * Fix crash if trying to edit non-editable datasets
+ * Make ignore exception work in error reporting dialog
 
 Features of package:
  Plotting features:
