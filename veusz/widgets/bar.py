@@ -87,7 +87,7 @@ class BarPlotter(GenericPlotter):
 
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels'), datatype='text'), 5 )
+                                    usertext=_('Labels')), 5 )
 
         s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'),
                               'grouped',

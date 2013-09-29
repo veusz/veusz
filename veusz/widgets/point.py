@@ -281,7 +281,7 @@ class PointPlotter(GenericPlotter):
                               usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label points'),
-                                    usertext=_('Labels'), datatype='text'), 5 )
+                                    usertext=_('Labels')), 5 )
         s.add( setting.DatasetExtended(
                 'scalePoints', '',
                 descr = _('Scale size of markers given by dataset, expression'

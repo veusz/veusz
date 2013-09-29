@@ -68,7 +68,7 @@ class NonOrthPoint(Widget):
         s.add( setting.DatasetOrStr(
                 'labels', '',
                 descr=_('Dataset or string to label points'),
-                usertext=_('Labels'), datatype='text') )
+                usertext=_('Labels')) )
         s.add( setting.DatasetExtended(
                 'scalePoints', '',
                 descr = _('Scale size of plotted markers by this dataset, '

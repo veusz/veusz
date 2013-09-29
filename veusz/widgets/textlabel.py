@@ -55,7 +55,7 @@ class TextLabel(plotters.FreePlotter):
 
         s.add( setting.DatasetOrStr('label', '',
                                     descr=_('Text to show or text dataset'),
-                                    usertext=_('Label'), datatype='text'), 0 )
+                                    usertext=_('Label')), 0 )
 
         s.add( setting.AlignHorz('alignHorz',
                                  'left',

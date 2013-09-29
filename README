@@ -21,6 +21,7 @@ Changes in 1.19:
  * Allow fits dataset names to be blank if prefix/suffix are not
  * New ast-based code checker
  * Picker uses 1-based index for consistency
+ * Allow non-text datasets to be used for labels
 
 Bug fixes:
  * Fix crash if other linked axis not initialized

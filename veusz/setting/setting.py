@@ -1301,9 +1301,15 @@ class DatasetExtended(Dataset):
                 self.val, self.datatype, self.dimensions)
 
 class DatasetOrStr(Dataset):
-    """Choose a dataset or enter a string."""
+    """Choose a dataset or enter a string.
+
+    Non string datasets are converted to string arrays using this.
+    """
 
     typename = 'dataset-or-str'
+
+    def __init__(self, name, val, **args):
+        Dataset.__init__(self, name, val, datatype='text', **args)
 
     def getData(self, doc, checknull=False):
         """Return either a list of strings, a single item list.
@@ -1311,19 +1317,20 @@ class DatasetOrStr(Dataset):
         """
         if doc:
             ds = doc.data.get(self.val)
-            if ds and ds.datatype == self.datatype:
-                return ds.data
+            if ds:
+                return doc.formatValsWithDatatypeToText(
+                    ds.data, ds.displaytype)
         if checknull and not self.val:
             return None
         else:
             return [cstr(self.val)]
 
     def makeControl(self, *args):
-        # use string editor rather than drop down list
-        # need to write a custom control
-        return controls.DatasetOrString(self, self.getDocument(), self.dimensions,
-                                        self.datatype, *args)
-        #return controls.String(self, *args)
+        return controls.DatasetOrString(self, self.getDocument(), *args)
+
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        return self._copyHelper((), (), {})
 
 class Color(ChoiceOrMore):
     """A color setting."""

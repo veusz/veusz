@@ -140,7 +140,7 @@ class BoxPlot(GenericPlotter):
                               usertext=_('Direction')), 0 )
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels'), datatype='text'), 0 )
+                                    usertext=_('Labels')), 0 )
         s.add( setting.DatasetExtended(
                 'posn', '',
                 descr = _('Dataset or list of values giving '

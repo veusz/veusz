@@ -615,7 +615,10 @@ class Dataset(qt4.QWidget):
         # get datasets of the correct dimension
         datasets = []
         for name, ds in citems(self.document.data):
-            if ds.dimensions == self.dimensions and ds.datatype == self.datatype:
+            if ds.dimensions == self.dimensions and (
+                ds.datatype == self.datatype or
+                self.datatype == 'all' or
+                ds.datatype in self.datatype ):
                 datasets.append(name)
         datasets.sort()
 
@@ -652,8 +655,8 @@ class Dataset(qt4.QWidget):
 class DatasetOrString(Dataset):
     """Allow use to choose a dataset or enter some text."""
 
-    def __init__(self, setting, document, dimensions, datatype, parent):
-        Dataset.__init__(self, setting, document, dimensions, datatype, parent)
+    def __init__(self, setting, document, parent):
+        Dataset.__init__(self, setting, document, 1, 'all', parent)
 
         b = self.textbutton = DotDotButton()
         self.layout().addWidget(b)

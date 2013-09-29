@@ -948,3 +948,17 @@ class Document( qt4.QObject ):
                 # ignore marker at beginning for stepped maps
                 return tuple([cmap[0]] + list(cmap[-1:0:-1]))
         return cmap
+
+    def formatValsWithDatatypeToText(self, vals, displaydatatype):
+        """Given a set of values, datatype, return a list of strings
+        corresponding to these data."""
+
+        if displaydatatype == 'text':
+            return vals
+        elif displaydatatype == 'numeric':
+            return [ utils.formatNumber(val, '%Vg', locale=self.locale)
+                     for val in vals ]
+        elif displaydatatype == 'date':
+            return [ utils.dateFloatToString(val) for val in vals ]
+        else:
+            raise RuntimeError, 'Invalid data type'
