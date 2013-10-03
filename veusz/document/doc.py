@@ -961,4 +961,4 @@ class Document( qt4.QObject ):
         elif displaydatatype == 'date':
             return [ utils.dateFloatToString(val) for val in vals ]
         else:
-            raise RuntimeError, 'Invalid data type'
+            raise RuntimeError('Invalid data type')
