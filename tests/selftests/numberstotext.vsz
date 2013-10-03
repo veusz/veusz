@@ -1,0 +1,44 @@
+# Veusz saved document (version 1.18)
+# Saved at 2013-10-03T14:25:30.785711
+
+AddImportPath(u'/home/jss/code/veusz-git/veusz/tests/selftests')
+DatasetPlugin('NumbersToText', {'ds_out': u'text', 'ds_in': u'x', 'format': u'%Vg'})
+ImportString(u'x(numeric)','''
+1.000000e+00
+2.000000e+05
+2.000000e-05
+''')
+ImportString(u'y(numeric)','''
+1.000000e+00
+2.000000e+00
+3.000000e+00
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('log', True)
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('log', True)
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('labels', u'text')
+Set('PlotLine/hide', True)
+Set('Label/angle', 90.0)
+To('..')
+Add('xy', name='xy2', autoadd=False)
+To('xy2')
+Set('xData', u'y')
+Set('yData', u'x')
+Set('labels', u'y')
+Set('PlotLine/hide', True)
+Set('Label/angle', 90.0)
+To('..')
+To('..')
+To('..')

@@ -227,6 +227,11 @@ class DatasetPluginHelper(object):
         return [name for name, ds in citems(self._doc.data) if
                 isinstance(ds, document.DatasetDateTime)]
 
+    @property
+    def locale(self):
+        """Return Qt locale."""
+        return self._doc.locale
+
     def evaluateExpression(self, expr, part='data'):
         """Return results of evaluating a 1D dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
@@ -1589,7 +1594,7 @@ class Histogram2D(DatasetPlugin):
     menu = (_('Compute'), _('2D histogram'),)
     name = 'Histogram 2D'
     description_short = _('Compute 2D histogram.')
-    description_long = _('Given two 1D datasets, compute a 2D histogram. '
+    description_full = _('Given two 1D datasets, compute a 2D histogram. '
                          'Can optionally compute a probability distribution.')
 
     def __init__(self):
@@ -1683,6 +1688,45 @@ class Histogram2D(DatasetPlugin):
         self.dsout = Dataset2D(fields['ds_out'])
         return [self.dsout]
 
+class ConvertNumbersToText(DatasetPlugin):
+    """Convert a set of numbers to text."""
+
+    menu = (_('Convert'), _('Numbers to Text'),)
+    name = 'NumbersToText'
+    description_short = _('Convert numeric dataset to text')
+    description_full = _('Given a 1D numeric dataset, create a text dataset '
+                         'by applying formatting. Format string is in standard '
+                         'Veusz-extended C formatting, e.g.\n'
+                         ' "%Vg" - general,'
+                         ' "%Ve" - scientific,'
+                         ' "%VE" - engineering suffix,'
+                         ' "%.2f" - two decimal places and'
+                         ' "%e" - C-style scientific')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldText('format', _('Format'), default='%Vg'),
+            field.FieldDataset('ds_out', _('Output dataset name')),
+            ]
+
+    def getDatasets(self, fields):
+        if fields['ds_out'] == '':
+            raise DatasetPluginException('Invalid output dataset name')
+        self.dsout = DatasetText(fields['ds_out'])
+        return [self.dsout]
+
+    def updateDatasets(self, fields, helper):
+        """Convert dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        f = fields['format']
+
+        data = [ utils.formatNumber(n, f, locale=helper.locale)
+                 for n in ds_in.data ]
+
+        self.dsout.update(data=data)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1707,6 +1751,7 @@ datasetpluginregistry += [
     ThinDatasetPlugin,
 
     PolarToCartesianPlugin,
+    ConvertNumbersToText,
 
     FilterDatasetPlugin,
 

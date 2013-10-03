@@ -22,6 +22,7 @@ Changes in 1.19:
  * New ast-based code checker
  * Picker uses 1-based index for consistency
  * Allow non-text datasets to be used for labels
+ * Add number->text conversion dataset plugin
 
 Bug fixes:
  * Fix crash if other linked axis not initialized

@@ -110,12 +110,12 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
                 return section+1
 
         return None
-        
+
     def flags(self, index):
         """Update flags to say that items are editable."""
         if index.isValid():
             f = qt4.QAbstractTableModel.flags(self, index)
-            ds = self.document.data[self.dsname]
+            ds = self.document.data.get(self.dsname)
             if ds is not None and ds.editable():
                 f |= qt4.Qt.ItemIsEditable
             return f
@@ -275,7 +275,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
         if index.isValid():
             f = qt4.QAbstractTableModel.flags(self, index)
             dsname, colname, dsidx, colidx = self.colattrs[index.column()]
-            ds = self.document.data[dsname]
+            ds = self.document.data.get(dsname)
             if ds is not None and ds.editable():
                 f |= qt4.Qt.ItemIsEditable
             return f
@@ -398,7 +398,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             return qt4.Qt.ItemIsEnabled
         else:
             f = qt4.QAbstractTableModel.flags(self, index)
-            ds = self.document.data[self.dsname]
+            ds = self.document.data.get(self.dsname)
             if ds is not None and ds.editable():
                 f |= qt4.Qt.ItemIsEditable
             return f
