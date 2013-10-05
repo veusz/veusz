@@ -622,17 +622,33 @@ class SimpleRead2D(object):
         try:
             self.params.xrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
-            raise Read2DError("Could not interpret xrange")
-        
+            raise Read2DError("xrange is not two numerical values")
+
     def _paramYRange(self, cols):
         try:
             self.params.yrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
-            raise Read2DError("Could not interpret yrange")
+            raise Read2DError("yrange is not two numerical values")
+
+    def _paramXGrid(self, cols):
+        try:
+            g = self.params.xgrid = [float(v) for v in cols[1:]]
+        except ValueError:
+            raise Read2DError("xgrid is not a list of numerical values")
+        if not utils.checkAscending(g):
+            raise Read2DError("xgrid values are not ascending")
+
+    def _paramYGrid(self, cols):
+        try:
+            g = self.params.ygrid = [float(v) for v in cols[1:]]
+        except ValueError:
+            raise Read2DError("ygrid is not a list of numerical values")
+        if not utils.checkAscending(g):
+            raise Read2DError("ygrid values are not ascending")
 
     def _paramInvertRows(self, cols):
         self.params.invertrows = True
-        
+
     def _paramInvertCols(self, cols):
         self.params.invertcols = True
 
@@ -648,6 +664,8 @@ class SimpleRead2D(object):
         optional:
          xrange A B   - set the range of x from A to B
          yrange A B   - set the range of y from A to B
+         xgrid A B... - set list of x values (instead of xrange)
+         ygrid A B... - set list oy y values (instead of yrange)
          invertrows   - invert order of the rows
          invertcols   - invert order of the columns
          transpose    - swap rows and columns
@@ -660,6 +678,8 @@ class SimpleRead2D(object):
         settings = {
             'xrange': self._paramXRange,
             'yrange': self._paramYRange,
+            'xgrid': self._paramXGrid,
+            'ygrid': self._paramYGrid,
             'invertrows': self._paramInvertRows,
             'invertcols': self._paramInvertCols,
             'transpose': self._paramTranspose

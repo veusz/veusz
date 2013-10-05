@@ -125,6 +125,8 @@ class ImportParams2D(ImportParamsBase):
      datastr: text to read from instead of file
      xrange: tuple with range of x data coordinates
      yrange: tuple with range of y data coordinates
+     xgrid: list of x values (instead of xrange)
+     ygrid: list of y values (instead of yrange)
      invertrows: invert rows when reading
      invertcols: invert columns when reading
      transpose: swap rows and columns
@@ -135,6 +137,8 @@ class ImportParams2D(ImportParamsBase):
         'datastr': None,
         'xrange': None,
         'yrange': None,
+        'xgrid': None,
+        'ygrid': None,
         'invertrows': False,
         'invertcols': False,
         'transpose': False,

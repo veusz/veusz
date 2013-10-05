@@ -89,25 +89,34 @@ class Dataset1D(object):
 
 class Dataset2D(object):
     """2D dataset for ImportPlugin or DatasetPlugin."""
-    def __init__(self, name, data=[[]], rangex=None, rangey=None):
+    def __init__(self, name, data=[[]], rangex=None, rangey=None,
+                 xgrid=None, ygrid=None):
         """2D dataset.
         name: name of dataset
         data: 2D numpy array of values or list of lists of floats
         rangex: optional tuple with X range of data (min, max)
         rangey: optional tuple with Y range of data (min, max)
+        xgrid: x values for grid (instead of rangex)
+        ygrid: y values for grid (instead of rangey)
+
         """
         self.name = name
-        self.update(data=data, rangex=rangex, rangey=rangey)
+        self.update(data=data, rangex=rangex, rangey=rangey,
+                    xgrid=xgrid, ygrid=ygrid)
 
-    def update(self, data=[[]], rangex=None, rangey=None):
+    def update(self, data=[[]], rangex=None, rangey=None,
+               xgrid=None, ygrid=None):
         self.data = N.array(data, dtype=N.float64)
         self.rangex = rangex
         self.rangey = rangey
+        self.xgrid = xgrid
+        self.ygrid = ygrid
 
     def _null(self):
         """Empty data contents."""
         self.data = N.array([[]])
         self.rangex = self.rangey = (0, 1)
+        self.xgrid = self.ygrid = None
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
