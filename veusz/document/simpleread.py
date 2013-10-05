@@ -737,6 +737,18 @@ class SimpleRead2D(object):
         if len(self.data.shape) != 2:
             raise Read2DError("Dataset was not 2D")
 
+        if ( (self.params.xgrid is not None and
+              not utils.checkAscending(self.params.xgrid)) or
+             (self.params.ygrid is not None and
+              not utils.checkAscending(self.params.ygrid)) ):
+            raise ValueError("xgrid and ygrid must be ascending, if given")
+
+        if ( (self.params.xgrid is not None and
+              len(self.params.xgrid) != self.data.shape[1]+1) or
+             (self.params.ygrid is not None and
+              len(self.params.ygrid) != self.data.shape[0]+1) ):
+            raise ValueError("xgrid and ygrid lengths must be data shape+1")
+
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
@@ -747,8 +759,11 @@ class SimpleRead2D(object):
         Returns list containing name of dataset read
         """
 
-        ds = datasets.Dataset2D(self.data, xrange=self.params.xrange,
-                                yrange=self.params.yrange)
+        ds = datasets.Dataset2D(self.data,
+                                xrange=self.params.xrange,
+                                yrange=self.params.yrange,
+                                xgrid=self.params.xgrid,
+                                ygrid=self.params.ygrid)
         ds.linked = linkedfile
 
         fullname = self.params.prefix + self.name + self.params.suffix

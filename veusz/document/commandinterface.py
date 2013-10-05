@@ -27,6 +27,7 @@ external programs.
 from __future__ import division, print_function
 import os.path
 import traceback
+import numpy as N
 
 from ..compat import citems, ckeys, cbasestr, cstr
 from .. import qtall as qt4
@@ -544,12 +545,18 @@ class CommandInterface(qt4.QObject):
         ygrid: y values for grid (instead of rangey)
         """
 
+        data = N.array(data)
+
         if ( (xgrid is not None and not utils.checkAscending(xgrid)) or
              (ygrid is not None and not utils.checkAscending(ygrid)) ):
             raise ValueError("xgrid and ygrid must be ascending, if given")
 
+        if ( (xgrid is not None and len(xgrid) != data.shape[1]+1) or
+             (ygrid is not None and len(ygrid) != data.shape[0]+1) ):
+            raise ValueError("xgrid and ygrid lengths must be data shape+1")
+
         data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange,
-                                  xgrid=None, ygrid=None)
+                                  xgrid=xgrid, ygrid=ygrid)
         op = operations.OperationDatasetSet(name, data)
         self.document.applyOperation(op)
 

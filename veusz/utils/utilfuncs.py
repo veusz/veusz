@@ -497,6 +497,6 @@ def isiternostr(i):
 def checkAscending(v):
     """Check list of values is finite and ascending."""
     v = N.array(v)
-    if not N.isfinite(v):
+    if not N.all( N.isfinite(v) ):
         return False
     return N.all( (v[1:] - v[:-1]) > 0 )
