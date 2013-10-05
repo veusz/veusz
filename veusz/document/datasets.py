@@ -304,16 +304,16 @@ class Dataset2D(DatasetBase):
                 self.xgrid = self.ygrid = self.xrange = self.yrange = None
 
                 if xrange is not None:
-                    self.xrange = N.array(xrange)
+                    self.xrange = tuple(xrange)
                 elif xgrid is not None:
-                    self.xgrid = None
+                    self.xgrid = N.array(xgrid)
                 else:
                     self.xrange = (0, self.data.shape[1])
 
                 if yrange is not None:
-                    self.yrange = N.array(yrange)
-                elif xgrid is not None:
-                    self.xgrid = None
+                    self.yrange = tuple(yrange)
+                elif ygrid is not None:
+                    self.ygrid = N.array(ygrid)
                 else:
                     self.yrange = (0, self.data.shape[0])
 
@@ -332,10 +332,13 @@ class Dataset2D(DatasetBase):
         return xfloat, yfloat
 
     def getDataRanges(self):
+        """Return ranges of x and y data (as tuples)."""
+
         if self.xgrid is not None:
             xr = self.xgrid[0], self.xgrid[-1]
         else:
             xr = self.xrange
+
         if self.ygrid is not None:
             yr = self.ygrid[0], self.ygrid[-1]
         else:
