@@ -493,3 +493,10 @@ def topological_sort(dependency_pairs):
 def isiternostr(i):
     """Is this iterator, but not a string?"""
     return hasattr(i, '__iter__') and not isinstance(i, cbasestr)
+
+def checkAscending(v):
+    """Check list of values is finite and ascending."""
+    v = N.array(v)
+    if not N.isfinite(v):
+        return False
+    return N.all( (v[1:] - v[:-1]) > 0 )

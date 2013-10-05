@@ -532,10 +532,24 @@ class CommandInterface(qt4.QObject):
             print(" Made a dataset (%i x %i)" % (data.data.shape[0],
                                                  data.data.shape[1]))
 
-    def SetData2D(self, name, data, xrange=None, yrange=None):
-        """Create a 2D dataset."""
+    def SetData2D(self, name, data, xrange=None, yrange=None,
+                  xgrid=None, ygrid=None):
+        """Create a 2D dataset.
 
-        data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange)
+        name: name of dataset
+        data: 2d array
+        xrange: optional tuple with X range of data (min, max)
+        yrange: optional tuple with Y range of data (min, max)
+        xgrid: x values for grid (instead of rangex)
+        ygrid: y values for grid (instead of rangey)
+        """
+
+        if ( (xgrid is not None and not utils.checkAscending(xgrid)) or
+             (ygrid is not None and not utils.checkAscending(ygrid)) ):
+            raise ValueError("xgrid and ygrid must be ascending, if given")
+
+        data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange,
+                                  xgrid=None, ygrid=None)
         op = operations.OperationDatasetSet(name, data)
         self.document.applyOperation(op)
 
@@ -636,34 +650,37 @@ class CommandInterface(qt4.QObject):
         return (op.outdatasets, op.outinvalids)
 
     def ImportString2D(self, datasetnames, dstring, xrange=None, yrange=None,
+                       xgrid=None, ygrid=None,
                        invertrows=None, invertcols=None, transpose=None):
         """Read two dimensional data from the string specified.
         datasetnames is a list of datasets to read from the string or a single
         dataset name
 
-
         xrange is a tuple containing the range of data in x coordinates
         yrange is a tuple containing the range of data in y coordinates
+        xgrid is a list of x values (used instead of xrange)
+        ygrid is a list of y values (used instead of yrange)
         if invertrows=True, then rows are inverted when read
         if invertcols=True, then cols are inverted when read
         if transpose=True, then rows and columns are swapped
-
         """
-        
+
         if isinstance(datasetnames, cbasestr):
             datasetnames = [datasetnames]
 
         params = importparams.ImportParams2D(
             datasetnames=datasetnames,
-            datastr=dstring, xrange=xrange,
-            yrange=yrange, invertrows=invertrows,
-            invertcols=invertcols, transpose=transpose)
+            datastr=dstring,
+            xrange=xrange, yrange=yrange,
+            xgrid=xgrid, ygrid=ygrid,
+            invertrows=invertrows, invertcols=invertcols, transpose=transpose)
         op = operations.OperationDataImport2D(params)
         self.document.applyOperation(op)
         if self.verbose:
             print("Imported datasets %s" % (', '.join(datasetnames)))
 
     def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
+                     xgrid=None, ygrid=None,
                      invertrows=None, invertcols=None, transpose=None,
                      prefix="", suffix="", encoding='utf_8',
                      linked=False):
@@ -674,6 +691,8 @@ class CommandInterface(qt4.QObject):
 
         xrange is a tuple containing the range of data in x coordinates
         yrange is a tuple containing the range of data in y coordinates
+        xgrid is a list of x values (used instead of xrange)
+        ygrid is a list of y values (used instead of yrange)
         if invertrows=True, then rows are inverted when read
         if invertcols=True, then cols are inverted when read
         if transpose=True, then rows and columns are swapped
@@ -693,9 +712,10 @@ class CommandInterface(qt4.QObject):
 
         params = importparams.ImportParams2D(
             datasetnames=datasetnames, 
-            filename=realfilename, xrange=xrange,
-            yrange=yrange, invertrows=invertrows,
-            invertcols=invertcols, transpose=transpose,
+            filename=realfilename,
+            xrange=xrange, yrange=yrange,
+            xgrid=xgrid, ygrid=ygrid,
+            invertrows=invertrows, invertcols=invertcols, transpose=transpose,
             prefix=prefix, suffix=suffix,
             linked=linked)
         op = operations.OperationDataImport2D(params)

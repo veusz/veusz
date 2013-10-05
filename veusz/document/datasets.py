@@ -281,12 +281,18 @@ class Dataset2D(DatasetBase):
     # the dataset is recreated if its data changes
     isstable = True
 
-    def __init__(self, data, xrange=None, yrange=None):
+    def __init__(self, data, xrange=None, yrange=None,
+                 xgrid=None, ygrid=None):
         '''Create a two dimensional dataset based on data.
 
         data: 2d numpy of imaging data
-        xrange: a tuple of (start, end) coordinates for x
-        yrange: a tuple of (start, end) coordinates for y
+
+        Range specfied by:
+         xrange: a tuple of (start, end) coordinates for x
+         yrange: a tuple of (start, end) coordinates for y
+        _or_
+         xgrid: list of values start..end (npix+1 values)
+         ygrid: list of values start..end (npix+1 values)
         '''
 
         DatasetBase.__init__(self)
@@ -295,13 +301,22 @@ class Dataset2D(DatasetBase):
         if not hasattr(self, 'data'):
             try:
                 self.data = convertNumpy(data, dims=2)
-                self.xrange = (0, self.data.shape[1])
-                self.yrange = (0, self.data.shape[0])
+                self.xgrid = self.ygrid = self.xrange = self.yrange = None
 
-                if xrange:
-                    self.xrange = xrange
-                if yrange:
-                    self.yrange = yrange
+                if xrange is not None:
+                    self.xrange = N.array(xrange)
+                elif xgrid is not None:
+                    self.xgrid = None
+                else:
+                    self.xrange = (0, self.data.shape[1])
+
+                if yrange is not None:
+                    self.yrange = N.array(yrange)
+                elif xgrid is not None:
+                    self.xgrid = None
+                else:
+                    self.yrange = (0, self.data.shape[0])
+
             except AttributeError:
                 # for some reason hasattr doesn't always work
                 pass
@@ -317,7 +332,16 @@ class Dataset2D(DatasetBase):
         return xfloat, yfloat
 
     def getDataRanges(self):
-        return self.xrange, self.yrange
+        if self.xgrid is not None:
+            xr = self.xgrid[0], self.xgrid[-1]
+        else:
+            xr = self.xrange
+        if self.ygrid is not None:
+            yr = self.ygrid[0], self.ygrid[-1]
+        else:
+            yr = self.yrange
+
+        return xr, yr
 
     def saveToFile(self, fileobj, name):
         """Write the 2d dataset to the file given."""
@@ -327,8 +351,17 @@ class Dataset2D(DatasetBase):
             return
 
         fileobj.write("ImportString2D(%s, '''\n" % repr(name))
-        fileobj.write("xrange %e %e\n" % tuple(self.xrange))
-        fileobj.write("yrange %e %e\n" % tuple(self.yrange))
+        if self.xgrid is not None:
+            fileobj.write("xgrid %s\n" %
+                          " ".join(("%e" % v for v in self.xgrid)) )
+        else:
+            fileobj.write("xrange %e %e\n" % tuple(self.xrange))
+        if self.ygrid is not None:
+            fileobj.write("ygrid %s\n" %
+                          " ".join(("%e" % v for v in self.ygrid)) )
+        else:
+            fileobj.write("yrange %e %e\n" % tuple(self.yrange))
+
         fileobj.write(self.datasetAsText(fmt='%e', join=' '))
         fileobj.write("''')\n")
 
@@ -358,14 +391,17 @@ class Dataset2D(DatasetBase):
         """Get description of dataset."""
         text = self.name()
         text += u' (%i×%i)' % self.data.shape
-        text += ', x=%g->%g' % tuple(self.xrange)
-        text += ', y=%g->%g' % tuple(self.yrange)
+        xr, yr = self.getDataRanges()
+        text += ', x=%g->%g' % tuple(xr)
+        text += ', y=%g->%g' % tuple(yr)
         if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
 
     def returnCopy(self):
-        return Dataset2D( N.array(self.data), self.xrange, self.yrange)
+        return Dataset2D( N.array(self.data),
+                          xrange=self.xrange, yrange=self.yrange,
+                          xgrid=self.xgrid, ygrid=self.ygrid )
 
 def dsPreviewHelper(d):
     """Get preview of numpy data d."""
@@ -1255,6 +1291,8 @@ class Dataset2DXYZExpression(Dataset2D):
 
         self.lastchangeset = -1
         self.cacheddata = None
+
+        self.xgrid = self.ygrid = None
         
         # copy parameters
         self.exprx = exprx
@@ -1387,6 +1425,7 @@ class Dataset2DExpression(Dataset2D):
 
         self.expr = expr
         self.lastchangeset = -1
+        self.xgrid = self.ygrid = None
 
     def editable(self):
         """Is the dataset editable?"""
@@ -1459,6 +1498,7 @@ class Dataset2DXYFunc(Dataset2D):
                        self.xstep[1] + self.xstep[2]*0.5)
         self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
                        self.ystep[1] + self.ystep[2]*0.5)
+        self.xgrid = self.ygrid = None
 
         self.cacheddata = None
         self.lastchangeset = -1

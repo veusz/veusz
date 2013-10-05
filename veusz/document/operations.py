@@ -713,8 +713,9 @@ class OperationDataset2DBase(object):
         ds.document = document
         if not self.link:
             # unlink if necessary
-            ds = datasets.Dataset2D(ds.data, xrange=ds.xrange,
-                                    yrange=ds.yrange)
+            ds = datasets.Dataset2D(ds.data,
+                                    xrange=ds.xrange, yrange=ds.yrange,
+                                    xgrid=ds.xgrid, ygrid=ds.ygrid)
         document.setData(self.datasetname, ds)
         return ds
 
@@ -726,7 +727,7 @@ class OperationDataset2DBase(object):
 
 class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
     descr = _('create 2D dataset from x, y and z expressions')
-    
+
     def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
         self.xexpr = xexpr
@@ -739,7 +740,7 @@ class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
 
 class OperationDataset2DCreateExpression(OperationDataset2DBase):
     descr = _('create 2D dataset from expression')
-    
+
     def __init__(self, datasetname, expr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
         self.expr = expr
@@ -945,7 +946,7 @@ class OperationDataImportCSV(OperationDataImportBase):
 
 class OperationDataImport2D(OperationDataImportBase):
     """Import a 2D matrix from a file."""
-    
+
     descr = _('import 2d data')
 
     def doImport(self, document):
@@ -1121,8 +1122,9 @@ class OperationDataImportPlugin(OperationDataImportBase):
                 ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
                                       nerr=d.nerr)
             elif isinstance(d, plugins.Dataset2D):
-                ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
-                                        yrange=d.rangey)
+                ds = datasets.Dataset2D(data=d.data,
+                                        xrange=d.rangex, yrange=d.rangey,
+                                        xgrid=d.xgrid, ygrid=d.ygrid)
             elif isinstance(d, plugins.DatasetText):
                 ds = datasets.DatasetText(data=d.data)
             elif isinstance(d, plugins.DatasetDateTime):
