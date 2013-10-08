@@ -21,6 +21,7 @@
 from __future__ import division
 
 from .. import qtall as qt4
+from ..compat import crange
 import numpy as N
 
 from .. import setting
@@ -32,6 +33,31 @@ from . import plotters
 def _(text, disambiguation=None, context='Image'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+
+def resampleLinear(painter, img, xpts, ypts):
+    """Resample image to linear image.
+
+    img: QImage
+    xpts: edge grid points for image
+    ypts: edge grid points for image.
+    """
+
+    # find minimum pixel delta
+    mindelta = min( (xpts[1:]-xpts[:-1]).min(),
+                    (ypts[1:]-ypts[:-1]).min() )
+
+
+
+    w = img.size().width()
+    h = img.size().height()
+    for y in crange(h):
+        for x in crange(w):
+            col = img.pixel(qt4.QPoint(x, y))
+            painter.fillRect(
+                qt4.QRectF( qt4.QPointF(xpts[x], ypts[y]),
+                            qt4.QPointF(xpts[x+1], ypts[y+1]) ),
+                qt4.QColor(col) )
 
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
@@ -176,14 +202,15 @@ class Image(plotters.GenericPlotter):
         if data is None or data.dimensions != 2:
             return
 
+        xr, yr = data.getDataRanges()
         if depname == 'sx':
-            dxrange = data.xrange
-            axrange[0] = min( axrange[0], dxrange[0] )
-            axrange[1] = max( axrange[1], dxrange[1] )
+            dxrange = xr
+            axrange[0] = min( axrange[0], xr[0] )
+            axrange[1] = max( axrange[1], xr[1] )
         elif depname == 'sy':
-            dyrange = data.yrange
-            axrange[0] = min( axrange[0], dyrange[0] )
-            axrange[1] = max( axrange[1], dyrange[1] )
+            dyrange = yr
+            axrange[0] = min( axrange[0], yr[0] )
+            axrange[1] = max( axrange[1], yr[1] )
 
     def cutImageToFit(self, pltx, plty, posn):
         x1, y1, x2, y2 = posn
