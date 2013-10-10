@@ -25,6 +25,7 @@ from __future__ import division
 from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
+from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog
 
@@ -79,7 +80,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         if ds is not None:
             # select correct part of dataset
             data = getattr(ds, ds.columns[index.column()])
-        if ds is not None and data is not None and role == qt4.Qt.DisplayRole:
+        if ds is not None and data is not None and role in (
+            qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             # blank row at end of data
             if index.row() == len(data):
                 return None
@@ -428,6 +430,26 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         self.document.applyOperation(op)
         return True
 
+class ViewDelegate(qt4.QStyledItemDelegate):
+    """Delegate for fixing double editing.
+    Normal editing uses double spin box, which is inappropriate
+    """
+
+    def createEditor(self, parent, option, index):
+        if type(index.data()) is float:
+            return qt4.QLineEdit(parent)
+        else:
+            return qt4.QStyledItemDelegate.createEditor(
+                self, parent, option, index)
+
+    def setEditorData(self, editor, index):
+        """Override setData to use correct formatting."""
+        if type(index.data()) is float:
+            txt = setting.uilocale.toString(index.data(), 'g', 8)
+            editor.setText(txt)
+        else:
+            qt4.QStyledItemDelegate.setEditorData(self, editor, index)
+
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
     
@@ -440,6 +462,9 @@ class DataEditDialog(VeuszDialog):
         self.dsbrowser.setToolTip(
             _('Select multiple datasets to edit simultaneously'))
         self.splitter.insertWidget(0, self.dsbrowser)
+
+        self.deligate = ViewDelegate()
+        self.datatableview.setItemDelegate(self.deligate)
 
         # actions for data table
         for text, slot in (

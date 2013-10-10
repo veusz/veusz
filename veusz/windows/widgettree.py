@@ -67,7 +67,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         column = index.column()
         obj = index.internalPointer()
 
-        if role == qt4.Qt.DisplayRole:
+        if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             # return text for columns
             if column == 0:
                 return obj.name

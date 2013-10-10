@@ -103,7 +103,7 @@ class TreeModel(qt4.QAbstractItemModel):
         """Get text or tooltip."""
         if index.isValid():
             item = self.objFromIndex(index)
-            if role == qt4.Qt.DisplayRole:
+            if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
                 return item.nodeData(index.column())
             elif role == qt4.Qt.ToolTipRole:
                 return item.toolTip(index.column())
