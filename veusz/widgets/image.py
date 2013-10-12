@@ -121,7 +121,8 @@ class Image(plotters.GenericPlotter):
                 usertext = _('Smooth'),
                 formatting = True ) )
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User friendly description."""
         s = self.settings
         out = []
@@ -129,7 +130,6 @@ class Image(plotters.GenericPlotter):
             out.append(s.data)
         out += [s.colorScaling, s.colorMap]
         return ', '.join(out)
-    userdescription = property(_getUserDescription)
 
     def updateImage(self):
         """Update the image with new contents."""

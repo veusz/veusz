@@ -332,13 +332,13 @@ class PointPlotter(GenericPlotter):
                                   usertext=_('Label')),
                pixmap = 'settings_axislabel' )
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User-friendly description."""
 
         s = self.settings
         return "x='%s', y='%s', marker='%s'" % (s.xData, s.yData,
                                                 s.marker)
-    userdescription = property(_getUserDescription)
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
                     axes, xdata, ydata, cliprect):

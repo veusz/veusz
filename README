@@ -23,11 +23,14 @@ Changes in 1.19:
  * Picker uses 1-based index for consistency
  * Allow non-text datasets to be used for labels
  * Add number->text conversion dataset plugin
+ * Add notes properties to document, pages and graphs
 
 Bug fixes:
  * Fix crash if other linked axis not initialized
  * Fix crash if trying to edit non-editable datasets
  * Make ignore exception work in error reporting dialog
+ * Renaming datasets, widgets and editing data now allow original
+   text to be edited, rather than being cleared
 
 Features of package:
  Plotting features:

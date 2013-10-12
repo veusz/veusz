@@ -20,6 +20,7 @@
 
 from __future__ import division
 import collections
+import textwrap
 import numpy as N
 
 from ..compat import crange, citems
@@ -306,11 +307,22 @@ class Page(widget.Widget):
                 usertext=_('Page height'),
                 formatting=True) )
 
+        s.add( setting.Notes(
+                'notes', '',
+                descr=_('User-defined notes'),
+                usertext=_('Notes')
+                ) )
+
     @classmethod
     def allowedParentTypes(klass):
         from . import root
         return (root.Root,)
-        
+
+    @property
+    def userdescription(self):
+        """Return user-friendly description."""
+        return textwrap.fill(self.settings.notes, 60)
+
     def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
 

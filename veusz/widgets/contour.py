@@ -217,7 +217,8 @@ class Contour(plotters.GenericPlotter):
 
         s.remove('key')
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User friendly description."""
         s = self.settings
         out = []
@@ -229,7 +230,6 @@ class Contour(plotters.GenericPlotter):
         else:
             out.append('%(numLevels)i %(scaling)s levels (%(min)s to %(max)s)' % s)
         return ', '.join(out)
-    userdescription = property(_getUserDescription)
 
     def calculateLevels(self):
         """Calculate contour levels from data and settings.

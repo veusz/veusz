@@ -234,11 +234,11 @@ class Grid(widget.Widget):
         from . import page
         return (page.Page, Grid)
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User friendly description."""
         s = self.settings
         return "%(rows)i rows, %(columns)i columns"  % s
-    userdescription = property(_getUserDescription)
 
     def _recalcPositions(self):
         """(internal) recalculate the positions of the children."""

@@ -475,6 +475,22 @@ class MultiLine(qt4.QTextEdit):
         if setting.readonly:
             self.setReadOnly(True)
 
+        self.document().contentsChanged.connect(self.onSizeChange)
+
+        self.heightmin = 0
+        self.heightmax = 2048
+
+        # recalculate size of document to fix size
+        self.document().adjustSize()
+        self.onSizeChange()
+
+    def onSizeChange(self):
+        """Make size match content size."""
+        m = self.contentsMargins()
+        docheight = self.document().size().height() + m.top() + m.bottom()
+        docheight = min(self.heightmax, max(self.heightmin, docheight))
+        self.setFixedHeight(docheight)
+
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
         qt4.QTextEdit.focusOutEvent(self, *args)
@@ -491,6 +507,13 @@ class MultiLine(qt4.QTextEdit):
     def onModified(self, mod):
         """called when the setting is changed remotely"""
         self.setPlainText( self.setting.toText() )
+
+class Notes(MultiLine):
+    """For editing notes."""
+
+    def __init__(self, setting, parent):
+        MultiLine.__init__(self, setting, parent)
+        self.setWordWrapMode(qt4.QTextOption.WordWrap)
 
 class Distance(Choice):
     """For editing distance settings."""

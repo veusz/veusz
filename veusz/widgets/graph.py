@@ -20,6 +20,7 @@
 
 from __future__ import division
 from collections import defaultdict
+import textwrap
 
 from ..compat import crange, citems
 from .. import qtall as qt4
@@ -80,6 +81,12 @@ class Graph(widget.Widget):
                                    maxval = 100.,
                                    formatting=True) )
 
+        s.add( setting.Notes(
+                'notes', '',
+                descr=_('User-defined notes'),
+                usertext=_('Notes')
+                ) )
+
         s.add( setting.GraphBrush( 'Background',
                                    descr = _('Background plot fill'),
                                    usertext=_('Background')),
@@ -92,6 +99,11 @@ class Graph(widget.Widget):
     def allowedParentTypes(klass):
         from . import page, grid
         return (page.Page, grid.Grid)
+
+    @property
+    def userdescription(self):
+        """Return user-friendly description."""
+        return textwrap.fill(self.settings.notes, 60)
 
     def addDefaultSubWidgets(self):
         """Add axes automatically."""

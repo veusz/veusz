@@ -431,6 +431,14 @@ class Str(Setting):
     def makeControl(self, *args):
         return controls.String(self, *args)
 
+class Notes(Str):
+    """String for making notes."""
+
+    typename = 'str-notes'
+
+    def makeControl(self, *args):
+        return controls.Notes(self, *args)
+
 # Store bools
 class Bool(Setting):
     """Bool setting."""
