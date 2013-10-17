@@ -68,4 +68,7 @@ QImage numpyToQImage(const Numpy2DObj& data, const Numpy2DIntObj &colors,
 
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data);
 
+QImage resampleLinearImage(QImage& img,
+			   const Numpy1DObj& xpts, const Numpy1DObj& ypts);
+
 #endif

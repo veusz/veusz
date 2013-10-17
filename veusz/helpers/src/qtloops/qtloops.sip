@@ -181,6 +181,24 @@ void applyImageTransparancy(QImage& img, SIP_PYOBJECT);
   }
 %End
 
+QImage resampleLinearImage(QImage& img, SIP_PYOBJECT, SIP_PYOBJECT);
+%MethodCode
+   {
+   try
+     {
+       Numpy1DObj xpts(a1);
+       Numpy1DObj ypts(a2);
+
+       QImage *oimg = new QImage( resampleLinearImage(*a0, xpts, ypts) );
+       sipRes = oimg;
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
+   }
+%End
+
 void polygonClip(const QPolygonF& inpoly,
 		 const QRectF& cliprect,
 		 QPolygonF& outpoly);
