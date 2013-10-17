@@ -476,6 +476,8 @@ class MultiLine(qt4.QTextEdit):
             self.setReadOnly(True)
 
         self.document().contentsChanged.connect(self.onSizeChange)
+        self.document().documentLayout().documentSizeChanged.connect(
+            self.onSizeChange)
 
         self.heightmin = 0
         self.heightmax = 2048
