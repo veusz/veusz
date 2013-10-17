@@ -258,3 +258,47 @@ def slowNumpyToQImage(img, cmap, transparencyimg):
     img.veusz_string = s
     return img
 
+def resampleLinearImage(img, xpts, ypts):
+    """Resample image to linear image.
+
+    img: QImage
+    xpts: edge grid points for image
+    ypts: edge grid points for image.
+    """
+
+    if xpts[0] > xpts[-1]:
+        xpts = xpts[::-1]
+    if ypts[0] > ypts[-1]:
+        ypts = ypts[::-1]
+
+    # find minimum pixel delta
+    mindeltax = (xpts[1:]-xpts[:-1]).min()
+    mindeltay = (ypts[1:]-ypts[:-1]).min()
+
+    minx, maxx = xpts[0], xpts[-1]
+    miny, maxy = ypts[0], ypts[-1]
+
+    sizex = int((maxx - minx) / (mindeltax*0.5) + 0.01)
+    sizey = int((maxy - miny) / (mindeltay*0.5) + 0.01)
+    sizex = min(sizex, 1024)
+    sizey = min(sizey, 1024)
+
+    deltax = (maxx - minx) / sizex
+    deltay = (maxy - miny) / sizey
+
+    outimg = qt4.QImage(sizex, sizey, img.format())
+
+    iy = 0
+    for oy in crange(sizey):
+        while miny+(oy+0.5)*deltay > ypts[iy+1] and iy < len(ypts)-2:
+            iy += 1
+
+        ix = 0
+        for ox in crange(sizex):
+            while minx+(ox+0.5)*deltax > xpts[ix+1] and ix < len(xpts)-2:
+                ix += 1
+
+            col = img.pixel(qt4.QPoint(ix, iy))
+            outimg.setPixel(ox, oy, col)
+
+    return outimg
