@@ -34,8 +34,7 @@ def _(text, disambiguation=None, context='Image'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-
-def resampleLinear(painter, img, xpts, ypts):
+def resampleLinear(img, xpts, ypts):
     """Resample image to linear image.
 
     img: QImage
@@ -43,21 +42,42 @@ def resampleLinear(painter, img, xpts, ypts):
     ypts: edge grid points for image.
     """
 
+    if xpts[0] > xpts[-1]:
+        xpts = xpts[::-1]
+    if ypts[0] > ypts[-1]:
+        ypts = ypts[::-1]
+
     # find minimum pixel delta
-    mindelta = min( (xpts[1:]-xpts[:-1]).min(),
-                    (ypts[1:]-ypts[:-1]).min() )
+    mindeltax = (xpts[1:]-xpts[:-1]).min()
+    mindeltay = (ypts[1:]-ypts[:-1]).min()
 
+    minx, maxx = xpts.min(), xpts.max()
+    miny, maxy = ypts.min(), ypts.max()
 
+    sizex = int((maxx - minx) / (mindeltax*0.5) + 0.01)
+    sizey = int((maxy - miny) / (mindeltay*0.5) + 0.01)
+    sizex = min(sizex, 1024)
+    sizey = min(sizey, 1024)
 
-    w = img.size().width()
-    h = img.size().height()
-    for y in crange(h):
-        for x in crange(w):
-            col = img.pixel(qt4.QPoint(x, y))
-            painter.fillRect(
-                qt4.QRectF( qt4.QPointF(xpts[x], ypts[y]),
-                            qt4.QPointF(xpts[x+1], ypts[y+1]) ),
-                qt4.QColor(col) )
+    deltax = (maxx - minx) / sizex
+    deltay = (maxy - miny) / sizey
+
+    outimg = qt4.QImage(sizex, sizey, img.format())
+
+    iy = 0
+    for oy in crange(sizey):
+        while miny+(oy+0.5)*deltay > ypts[iy+1] and iy < len(ypts)-2:
+            iy += 1
+
+        ix = 0
+        for ox in crange(sizex):
+            while minx+(ox+0.5)*deltax > xpts[ix+1] and ix < len(xpts)-2:
+                ix += 1
+
+            col = img.pixel(qt4.QPoint(ix, iy))
+            outimg.setPixel(ox, oy, col)
+
+    return outimg
 
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
@@ -157,7 +177,21 @@ class Image(plotters.GenericPlotter):
         return ', '.join(out)
     userdescription = property(_getUserDescription)
 
-    def updateImage(self):
+    def updateDataRange(self, data):
+        """Update data range from data."""
+
+        s = self.settings
+        minval = s.min
+        if minval == 'Auto' and data is not None:
+            minval = N.nanmin(data.data)
+        maxval = s.max
+        if maxval == 'Auto' and data is not None:
+            maxval = N.nanmax(data.data)
+
+        # this is used currently by colorbar objects
+        self.cacheddatarange = (minval, maxval)
+
+    def updateImage(self, posn):
         """Update the image with new contents."""
 
         s = self.settings
@@ -168,22 +202,22 @@ class Image(plotters.GenericPlotter):
         if transimg is not None:
             transimg = transimg.data
 
-        minval = s.min
-        if minval == 'Auto':
-            minval = N.nanmin(data.data)
-        maxval = s.max
-        if maxval == 'Auto':
-            maxval = N.nanmax(data.data)
-
-        # this is used currently by colorbar objects
-        self.cacheddatarange = (minval, maxval)
+        self.updateDataRange(data)
 
         # get color map
         cmap = self.document.getColormap(s.colorMap, s.colorInvert)
 
         self.image = utils.applyColorMap(
-            cmap, s.colorScaling, data.data, minval, maxval,
+            cmap, s.colorScaling, data.data,
+            self.cacheddatarange[0], self.cacheddatarange[1],
             s.transparency, transimg=transimg)
+
+        if data.xgrid is not None or data.ygrid is not None:
+            axes = self.fetchAxes()
+            xgrid = axes[0].dataToPlotterCoords(posn, data.xgrid)
+            ygrid = axes[1].dataToPlotterCoords(posn, data.ygrid)
+
+            self.image = resampleLinear(self.image, xgrid, ygrid)
 
     def affectsAxisRange(self):
         """Range information provided by widget."""
@@ -262,14 +296,17 @@ class Image(plotters.GenericPlotter):
     def getColorbarParameters(self):
         """Return parameters for colorbar."""
 
-        self.recomputeInternals()
-        minval, maxval = self.cacheddatarange
         s = self.settings
+        d = self.document
+        data = s.get('data').getData(d)
+        self.updateDataRange(data)
+
+        minval, maxval = self.cacheddatarange
 
         return (minval, maxval, s.colorScaling, s.colorMap,
                 s.transparency, s.colorInvert)
 
-    def recomputeInternals(self):
+    def recomputeInternals(self, posn):
         """Recompute the internals if required.
 
         This is used by colorbar as it needs to know data range when plotting
@@ -281,8 +318,11 @@ class Image(plotters.GenericPlotter):
         # return if the dataset isn't two dimensional
         data = s.get('data').getData(d)
         if data is not None and data.dimensions == 2:
-            if data != self.lastdataset or self.schangeset != d.changeset:
-                self.updateImage()
+            nonlinear = data.xgrid is not None or data.ygrid is not None
+
+            if ( data != self.lastdataset or self.schangeset != d.changeset or
+                 nonlinear ):
+                self.updateImage(posn)
                 self.lastdataset = data
                 self.schangeset = d.changeset
             return data
@@ -295,7 +335,7 @@ class Image(plotters.GenericPlotter):
         s = self.settings
 
         # get data and update internal computations
-        data = self.recomputeInternals()
+        data = self.recomputeInternals(posn)
         if not data or s.hide:
             return
 
