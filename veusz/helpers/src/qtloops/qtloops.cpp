@@ -427,39 +427,40 @@ void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 QImage resampleLinearImage(QImage& img,
 			   const Numpy1DObj& xpts, const Numpy1DObj& ypts)
 {
-  const int ptlen = std::min(xpts.dim, ypts.dim);
-
   // reversed mode
-  const int revx = xpts(0) > xpts(ptlen-1);
-  const int revy = ypts(0) > ypts(ptlen-1);
+  const int revx = xpts(0) > xpts(xpts.dim-1);
+  const int revy = ypts(0) > ypts(ypts.dim-1);
 
   // get smallest spacing
   double mindeltax = 1e99;
-  double mindeltay = 1e99;
-  for(int i=0; i<(ptlen-1); ++i)
+  for(int i=0; i<(xpts.dim-1); ++i)
     {
       mindeltax = std::min(mindeltax, fabs(xpts(i+1)-xpts(i)));
+    }
+  double mindeltay = 1e99;
+  for(int i=0; i<(ypts.dim-1); ++i)
+    {
       mindeltay = std::min(mindeltay, fabs(ypts(i+1)-ypts(i)));
     }
 
   // get bounds
-  const double minx = revx ? xpts(ptlen-1) : xpts(0);
-  const double maxx = revx ? xpts(0) : xpts(ptlen-1);
-  const double miny = revy ? ypts(ptlen-1) : ypts(0);
-  const double maxy = revy ? ypts(0) : ypts(ptlen-1);
+  const double minx = revx ? xpts(xpts.dim-1) : xpts(0);
+  const double maxx = revx ? xpts(0) : xpts(xpts.dim-1);
+  const double miny = revy ? ypts(ypts.dim-1) : ypts(0);
+  const double maxy = revy ? ypts(0) : ypts(ypts.dim-1);
 
   // output size (trimmed to 1024)
-  const int sizex = std::min(1024, int((maxx-minx) / (mindeltax*0.5) + 0.01) );
-  const int sizey = std::min(1024, int((maxy-miny) / (mindeltay*0.5) + 0.01) );
+  const int sizex = std::min(1024, int((maxx-minx) / (mindeltax*0.25) + 0.01) );
+  const int sizey = std::min(1024, int((maxy-miny) / (mindeltay*0.25) + 0.01) );
   const double deltax = (maxx-minx) / sizex;
   const double deltay = (maxy-miny) / sizey;
 
   QImage outimg(sizex, sizey, img.format());
 
   // need to account for reverse direction, so count backwards
-  const int xptsbase = revx ? ptlen-1 : 0;
+  const int xptsbase = revx ? xpts.dim-1 : 0;
   const int xptsdir = revx ? -1 : 1;
-  const int yptsbase = revy ? ptlen-1 : 0;
+  const int yptsbase = revy ? ypts.dim-1 : 0;
   const int yptsdir = revy ? -1 : 1;
 
   int iy = 0;
@@ -467,7 +468,7 @@ QImage resampleLinearImage(QImage& img,
     {
       // do we move to the next pixel in y?
       while( miny+(oy+0.5)*deltay > ypts(yptsbase+yptsdir*(iy+1)) &&
-	     iy < ptlen-2 )
+	     iy < ypts.dim-2 )
 	++iy;
 
       const QRgb* iscanline = reinterpret_cast<const QRgb*>
@@ -479,7 +480,7 @@ QImage resampleLinearImage(QImage& img,
 	{
 	  // do we move to the next pixel in x?
 	  while( minx+(ox+0.5)*deltax > xpts(xptsbase+xptsdir*(ix+1)) &&
-		 ix < ptlen-2 )
+		 ix < xpts.dim-2 )
 	    ++ix;
 
 	  // copy pixel

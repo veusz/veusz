@@ -90,6 +90,39 @@ def cropLinearImageToBox(image, pltx, plty, posn):
     # return new image coordinates and image
     return pltx, plty, newimage
 
+def cropGridImageToBox(image, gridx, gridy, posn):
+    """Given an image, pixel coordinates and box, crop image to box."""
+
+    def trimGrid(grid, p1, p2):
+        """Trim grid to bounds given, returning index range."""
+
+        if grid[0] < grid[-1]:
+            # fwd order
+            i1 = max(N.searchsorted(grid, p1, side='left')-1, 0)
+            i2 = min(N.searchsorted(grid, p2, side='right')+1, len(grid)+1)
+        else:
+            # reverse order of grid
+            gridr = grid[::-1]
+
+            t1 = max(N.searchsorted(gridr, p1, side='left')-1, 0)
+            t2 = min(N.searchsorted(gridr, p2, side='right')+1, len(grid)+1)
+
+            i1 = len(grid)+1 - t2
+            i2 = len(grid)+1 - t1
+        return i1, i2
+
+    # see whether cropping necessary
+    x1, x2 = trimGrid(gridx, posn[0], posn[2])
+    y1, y2 = trimGrid(gridy, posn[1], posn[3])
+
+    if x1 > 0 or y1 > 0 or x2 < len(gridx)-1 or y2 < len(gridy)-1:
+        # do cropping
+        image = image.copy(x1, y1, x2-x1-1, y2-y1-1)
+        gridx = gridx[x1:x2]
+        gridy = gridy[y1:y2]
+
+    return gridx, gridy, image
+
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
     coordinate system."""
@@ -282,7 +315,15 @@ class Image(plotters.GenericPlotter):
             else:
                 ygridp = axes[1].dataToPlotterCoords(posn, ygrid)
 
+            # crop any pixels completely outside posn
+            xgridp, ygridp, image = cropGridImageToBox(
+                image, xgridp, ygridp, posn)
+
+            # make image on linear grid
             image = utils.resampleLinearImage(image, xgridp, ygridp)
+
+            pltrangex = xgridp[0], xgridp[-1]
+            pltrangey = ygridp[0], ygridp[-1]
 
         # optionally smooth images before displaying
         if s.smooth:
@@ -297,11 +338,9 @@ class Image(plotters.GenericPlotter):
 
         # invert output drawing if axes go from positive->negative
         # we only translate the coordinate system if this is the case
-        xscale = yscale = 1
-        if xw < 0:
-            xscale = -1
-        if yw < 0:
-            yscale = -1
+        xscale = 1 if xw > 0 else -1
+        yscale = 1 if yw > 0 else -1
+
         if xscale != 1 or yscale != 1:
             painter.save()
             painter.translate(xp, yp)
@@ -309,6 +348,7 @@ class Image(plotters.GenericPlotter):
             painter.scale(xscale, yscale)
 
         # draw image
+        #image = image.copy(qt4.QRect(qt4.QPoint(0, 0), qt4.QPoint(20, 20)))
         painter.drawImage(qt4.QRectF(xp, yp, abs(xw), abs(yw)), image)
 
         # restore painter if image was inverted
