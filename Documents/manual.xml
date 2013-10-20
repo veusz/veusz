@@ -914,6 +914,73 @@ descriptor alpha beta gamma
     </section>
 
     <section>
+      <title>Reading 2D data</title>
+      <para>
+	Veusz can import 2D data from standard text files. In this
+	case the data should consist of a matrix of data values, with
+	the columns separated by one or more spaces or tabs and the
+	rows on different lines.
+      </para>
+
+    <para>
+      In addition to the data the file can contain lines at the top
+      which affect the import. Such specifiers are used, for example,
+      to change the coordinates of the pixels in the file. By default
+      the first pixels coordinates is between 0 and 1, with the centre
+      at 0.5. Subsequent pixels are 1 greater. Below are listed the
+      specifiers:
+    </para>
+
+    <orderedlist>
+      <listitem>
+	<para><command>xrange A B</command> - make the 2D dataset span
+	the coordinate range A to B in the x-axis (where A and B are
+	numbers). Note that the range is inclusive, so a 1 pixel wide
+	image with A=0 and B=1 would have the pixel centre at
+	0.5. The pixels are assumed to have the same spacing. Do not
+	use this as the same time as <command>xgrid</command>.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>yrange A B</command> - make the 2D dataset span
+	the coordinate range A to B in the y-axis (where A and B are
+	numbers).</para>
+      </listitem>
+
+      <listitem>
+	<para><command>xgrid A B C...</command> - rather than assume
+	the pixels have the same spacing, give the coordinates of the
+	edges of the pixels in the x-axis. The numbers should be
+	space-separated and there should be one more number than
+	pixels. Do not give <command>xrange</command> if this is
+	given.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>ygrid A B C...</command> - rather than assume
+	the pixels have the same spacing, give the coordinates of the
+	edges of the pixels in the y-axis.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>invertrows</command> - invert the rows after
+	reading the data.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>invertcols</command> - invert the columns after
+	reading the data.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>transpose</command> - swap rows and columns
+	after importing data.</para>
+      </listitem>
+    </orderedlist>
+
+    </section>
+
+    <section>
       <title>Reading FITS files</title>
       <para>
 	1D or 2D data can be read from FITS files. 1D data, with
