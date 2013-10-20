@@ -374,42 +374,17 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """Return headers at top."""
 
-        def getMidVal(rng, grid, data, i):
-            if rng is None:
-                v = 0.5*(grid[i]+grid[i+1])
-            else:
-                v = (rng[1]-rng[0])/num*(i+0.5)+rng[0]
-            return setting.uilocale.toString(v)
+        ds = self.document.data[self.dsname]
 
-        def getRange(rng, grid, data, i):
-            if rng is None:
-                v1, v2 = grid[i], grid[i+1]
-            else:
-                delta = (rng[1]-rng[0])/num
-                v1, v2 = delta*i+rng[0], delta*(i+1)+rng[0]
+        axis = 'x' if orientation == qt4.Qt.Horizontal else 'y'
+        if ds is not None and role == qt4.Qt.DisplayRole:
+            v = ds.pixMidPointFromIndex(section, axis)
+            return '%i (%s)' % (section+1, setting.uilocale.toString(v))
 
-            return u'%s\u2014%s' % (setting.uilocale.toString(v1),
+        elif ds is not None and role == qt4.Qt.ToolTipRole:
+            v1, v2 = ds.pixRangeFromIndex(section, axis)
+            return u'%s\u2013%s' % (setting.uilocale.toString(v1),
                                     setting.uilocale.toString(v2))
-
-        if role == qt4.Qt.DisplayRole:
-            ds = self.document.data[self.dsname]
-
-            if ds is not None:
-                # mid value of range
-                if orientation == qt4.Qt.Horizontal:
-                    return getMidVal(ds.xrange, ds.xgrid, ds.data, section)
-                else:
-                    return getMidVal(ds.yrange, ds.ygrid, ds.data, section)
-
-        elif role == qt4.Qt.ToolTipRole:
-            ds = self.document.data[self.dsname]
-
-            if ds is not None:
-                # range itself
-                if orientation == qt4.Qt.Horizontal:
-                    return getRange(ds.xrange, ds.xgrid, ds.data, section)
-                else:
-                    return getRange(ds.yrange, ds.ygrid, ds.data, section)
 
         return None
     

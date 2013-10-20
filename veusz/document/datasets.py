@@ -321,15 +321,37 @@ class Dataset2D(DatasetBase):
                 # for some reason hasattr doesn't always work
                 pass
 
-    def indexToPoint(self, xidx, yidx):
-        """Convert a set of indices to pixels in integers to
-        floating point vals using xrange and yrange."""
+    def pixMidPointFromIndex(self, idx, axis='x'):
+        """Get mid point of pixel from index."""
 
-        xfracpix = (xidx+0.5) * (1./self.data.shape[1])
-        xfloat = xfracpix * (self.xrange[1] - self.xrange[0]) + self.xrange[0]
-        yfracpix = (yidx+0.5) * (1./self.data.shape[0])
-        yfloat = yfracpix * (self.yrange[1] - self.yrange[0]) + self.yrange[0]
-        return xfloat, yfloat
+        if axis == 'x':
+            if self.xrange is None:
+                return 0.5*(self.xgrid[idx]+self.xgrid[idx+1])
+            else:
+                return ( (self.xrange[1]-self.xrange[0]) /
+                         self.data.shape[0] * (idx+0.5) ) + self.xrange[0]
+        else:
+            if self.yrange is None:
+                return 0.5*(self.ygrid[idx]+self.ygrid[idx+1])
+            else:
+                return ( (self.yrange[1]-self.yrange[0]) /
+                         self.data.shape[1] * (idx+0.5) ) + self.yrange[0]
+
+    def pixRangeFromIndex(self, idx, axis='x'):
+        """Get range from pixel index."""
+
+        if axis == 'x':
+            if self.xrange is None:
+                return self.xgrid[idx], self.xgrid[idx+1]
+            else:
+                delta = (self.xrange[1]-self.xrange[0]) / self.data.shape[0]
+                return delta*idx+self.xrange[0], delta*(idx+1)+self.xrange[0]
+        else:
+            if self.yrange is None:
+                return self.ygrid[idx], self.ygrid[idx+1]
+            else:
+                delta = (self.yrange[1]-self.yrange[0]) / self.data.shape[1]
+                return delta*idx+self.yrange[0], delta*(idx+1)+self.yrange[0]
 
     def getDataRanges(self):
         """Return ranges of x and y data (as tuples)."""
