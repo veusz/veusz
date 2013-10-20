@@ -121,12 +121,13 @@ class VectorField(plotters.GenericPlotter):
                 continue
 
             if data.dimensions == 2:
+                xr, yr = data.getDataRanges()
                 if depname == 'sx':
-                    dxrange = data.xrange
+                    dxrange = xr
                     axrange[0] = min( axrange[0], dxrange[0] )
                     axrange[1] = max( axrange[1], dxrange[1] )
                 elif depname == 'sy':
-                    dyrange = data.yrange
+                    dyrange = yr
                     axrange[0] = min( axrange[0], dyrange[0] )
                     axrange[1] = max( axrange[1], dyrange[1] )
 
@@ -171,7 +172,8 @@ class VectorField(plotters.GenericPlotter):
         # construct indices into datasets
         yvals, xvals = N.mgrid[0:yw, 0:xw]
         # convert using 1st dataset to axes values
-        xdsvals, ydsvals = data1.indexToPoint(xvals.ravel(), yvals.ravel())
+        xdsvals = data1.pixMidPointFromIndex(xvals.ravel(), axis='x')
+        ydsvals = data1.pixMidPointFromIndex(yvals.ravel(), axis='y')
 
         # convert using axes to plotter values
         xplotter = axes[0].dataToPlotterCoords(posn, xdsvals)
