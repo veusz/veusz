@@ -306,12 +306,14 @@ class Image(plotters.GenericPlotter):
         else:
             # non-linear grid
             if xgrid is None:
-                xgridp = N.linspace(pltrangex[0], pltrangex[1], data.shape[1]+1)
+                xgridp = N.linspace(pltrangex[0], pltrangex[1],
+                                    data.data.shape[1]+1)
             else:
                 xgridp = axes[0].dataToPlotterCoords(posn, xgrid)
 
             if ygrid is None:
-                ygridp = N.linspace(pltrangey[1], pltrangey[0], data.shape[0]+1)
+                ygridp = N.linspace(pltrangey[1], pltrangey[0],
+                                    data.data.shape[0]+1)
             else:
                 ygridp = axes[1].dataToPlotterCoords(posn, ygrid)
 

@@ -298,28 +298,38 @@ class Dataset2D(DatasetBase):
         DatasetBase.__init__(self)
 
         # we don't want these set if a inheriting class uses properties instead
-        if not hasattr(self, 'data'):
-            try:
-                self.data = convertNumpy(data, dims=2)
-                self.xgrid = self.ygrid = self.xrange = self.yrange = None
+        self._data = d = convertNumpy(data, dims=2)
 
-                if xrange is not None:
-                    self.xrange = tuple(xrange)
-                elif xgrid is not None:
-                    self.xgrid = N.array(xgrid)
-                else:
-                    self.xrange = (0, self.data.shape[1])
+        self._xgrid = self._ygrid = self._xrange = self._yrange = None
 
-                if yrange is not None:
-                    self.yrange = tuple(yrange)
-                elif ygrid is not None:
-                    self.ygrid = N.array(ygrid)
-                else:
-                    self.yrange = (0, self.data.shape[0])
+        if xrange is not None:
+            self._xrange = tuple(xrange)
+        elif xgrid is not None:
+            self._xgrid = N.array(xgrid)
+        elif d is not None:
+            self._xrange = (0, d.shape[1])
+        else:
+            self._xrange = (0., 1.)
 
-            except AttributeError:
-                # for some reason hasattr doesn't always work
-                pass
+        if yrange is not None:
+            self._yrange = tuple(yrange)
+        elif ygrid is not None:
+            self._ygrid = N.array(ygrid)
+        elif d is not None:
+            self._yrange = (0, d.shape[0])
+        else:
+            self._yrange = (0., 1.)
+
+    @property
+    def data(self): return self._data
+    @property
+    def xrange(self): return self._xrange
+    @property
+    def yrange(self): return self._yrange
+    @property
+    def xgrid(self): return self._xgrid
+    @property
+    def ygrid(self): return self._ygrid
 
     def pixMidPointFromIndex(self, idx, axis='x'):
         """Get mid point of pixel from index."""
@@ -327,15 +337,19 @@ class Dataset2D(DatasetBase):
         if axis == 'x':
             if self.xrange is None:
                 return 0.5*(self.xgrid[idx]+self.xgrid[idx+1])
-            else:
+            elif self.data.shape[0] != 0:
                 return ( (self.xrange[1]-self.xrange[0]) /
                          self.data.shape[0] * (idx+0.5) ) + self.xrange[0]
+            else:
+                return 0.
         else:
             if self.yrange is None:
                 return 0.5*(self.ygrid[idx]+self.ygrid[idx+1])
-            else:
+            elif self.data.shape[1] != 0:
                 return ( (self.yrange[1]-self.yrange[0]) /
                          self.data.shape[1] * (idx+0.5) ) + self.yrange[0]
+            else:
+                return 0.
 
     def pixRangeFromIndex(self, idx, axis='x'):
         """Get range from pixel index."""
@@ -343,15 +357,19 @@ class Dataset2D(DatasetBase):
         if axis == 'x':
             if self.xrange is None:
                 return self.xgrid[idx], self.xgrid[idx+1]
-            else:
+            elif self.data.shape[0] != 0:
                 delta = (self.xrange[1]-self.xrange[0]) / self.data.shape[0]
                 return delta*idx+self.xrange[0], delta*(idx+1)+self.xrange[0]
+            else:
+                return 0., 1.
         else:
             if self.yrange is None:
                 return self.ygrid[idx], self.ygrid[idx+1]
-            else:
+            elif self.data.shape[1] != 0:
                 delta = (self.yrange[1]-self.yrange[0]) / self.data.shape[1]
                 return delta*idx+self.yrange[0], delta*(idx+1)+self.yrange[0]
+            else:
+                return 0., 1.
 
     def getDataRanges(self):
         """Return ranges of x and y data (as tuples)."""
@@ -414,6 +432,7 @@ class Dataset2D(DatasetBase):
 
     def description(self, showlinked=True):
         """Get description of dataset."""
+
         text = self.name()
         text += u' (%i×%i)' % self.data.shape
         xr, yr = self.getDataRanges()
@@ -930,14 +949,15 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
                     err = _('Expression has wrong dimensions')
         elif dimensions == 2 and vals.ndim == 2:
             # try to use dimensions of first-substituted dataset
-            dsdim = ((0.,1.), (0.,1.))
+            dsrange = {}
             for ds in subdatasets:
                 d = doc.data[ds]
                 if d.dimensions == 2:
-                    dsdim = (d.xrange, d.yrange)
+                    for p in ('xrange', 'yrange', 'xgrid', 'ygrid'):
+                        dsrange[p] = getattr(d, p)
                     break
 
-            return Dataset2D(vals, xrange=dsdim[0], yrange=dsdim[1])
+            return Dataset2D(vals, **dsrange)
         else:
             err = _('Expression has wrong dimensions')
 
@@ -1317,8 +1337,6 @@ class Dataset2DXYZExpression(Dataset2D):
         self.lastchangeset = -1
         self.cacheddata = None
 
-        self.xgrid = self.ygrid = None
-        
         # copy parameters
         self.exprx = exprx
         self.expry = expry
@@ -1450,7 +1468,6 @@ class Dataset2DExpression(Dataset2D):
 
         self.expr = expr
         self.lastchangeset = -1
-        self.xgrid = self.ygrid = None
 
     def editable(self):
         """Is the dataset editable?"""
@@ -1460,25 +1477,31 @@ class Dataset2DExpression(Dataset2D):
     def data(self):
         """Return data, or empty array if error."""
         ds = self.evalDataset()
-        if ds is None:
-            return N.array([[]])
-        return ds.data
+        return ds.data if ds is not None else N.array([[]])
 
     @property
     def xrange(self):
         """Return x range."""
         ds = self.evalDataset()
-        if ds is None:
-            return [0., 1.]
-        return ds.xrange
+        return ds.xrange if ds is not None else [0., 1.]
 
     @property
     def yrange(self):
         """Return y range."""
         ds = self.evalDataset()
-        if ds is None:
-            return [0., 1.]
-        return ds.yrange
+        return ds.yrange if ds is not None else [0., 1.]
+
+    @property
+    def xgrid(self):
+        """Return x grid points."""
+        ds = self.evalDataset()
+        return ds.xgrid if ds is not None else None
+
+    @property
+    def ygrid(self):
+        """Return y grid points."""
+        ds = self.evalDataset()
+        return ds.ygrid if ds is not None else None
 
     def evalDataset(self):
         """Do actual evaluation."""
@@ -1519,11 +1542,10 @@ class Dataset2DXYFunc(Dataset2D):
         self.ystep = ystep
         self.expr = expr
 
-        self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
-                       self.xstep[1] + self.xstep[2]*0.5)
-        self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
-                       self.ystep[1] + self.ystep[2]*0.5)
-        self.xgrid = self.ygrid = None
+        self._xrange = (self.xstep[0] - self.xstep[2]*0.5,
+                        self.xstep[1] + self.xstep[2]*0.5)
+        self._yrange = (self.ystep[0] - self.ystep[2]*0.5,
+                        self.ystep[1] + self.ystep[2]*0.5)
 
         self.cacheddata = None
         self.lastchangeset = -1
@@ -1685,20 +1707,25 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
-        Dataset2D.__init__(self, [[]])
+        Dataset2D.__init__(self, None)
 
     def editable(self):
         """Is the dataset editable?"""
         return False
 
     def __getitem__(self, key):
-        return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange)
-        
+        return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange,
+                         xgrid=self.xgrid, ygrid=self.ygrid)
+
     data   = property( lambda self: self.getPluginData('data'),
                        lambda self, val: None )
     xrange = property( lambda self: self.getPluginData('rangex'),
                        lambda self, val: None )
     yrange = property( lambda self: self.getPluginData('rangey'),
+                       lambda self, val: None )
+    xgrid  = property( lambda self: self.getPluginData('xgrid'),
+                       lambda self, val: None )
+    ygrid  = property( lambda self: self.getPluginData('ygrid'),
                        lambda self, val: None )
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
