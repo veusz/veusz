@@ -25,6 +25,7 @@ from __future__ import division
 from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
+from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog
 
@@ -375,20 +376,42 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """Return headers at top."""
 
+        def getMidVal(rng, grid, data, i):
+            if rng is None:
+                v = 0.5*(grid[i]+grid[i+1])
+            else:
+                v = (rng[1]-rng[0])/num*(i+0.5)+rng[0]
+            return setting.uilocale.toString(v)
+
+        def getRange(rng, grid, data, i):
+            if rng is None:
+                v1, v2 = grid[i], grid[i+1]
+            else:
+                delta = (rng[1]-rng[0])/num
+                v1, v2 = delta*i+rng[0], delta*(i+1)+rng[0]
+
+            return u'%s\u2014%s' % (setting.uilocale.toString(v1),
+                                    setting.uilocale.toString(v2))
+
         if role == qt4.Qt.DisplayRole:
             ds = self.document.data[self.dsname]
 
             if ds is not None:
-                # return a number for the top left of the cell
+                # mid value of range
                 if orientation == qt4.Qt.Horizontal:
-                    r = ds.xrange
-                    num = ds.data.shape[1]
+                    return getMidVal(ds.xrange, ds.xgrid, ds.data, section)
                 else:
-                    r = ds.yrange
-                    r = (r[1], r[0]) # swap (as y reversed)
-                    num = ds.data.shape[0]
-                val = (r[1]-r[0])/num*(section+0.5)+r[0]
-                return '%g' % val
+                    return getMidVal(ds.yrange, ds.ygrid, ds.data, section)
+
+        elif role == qt4.Qt.ToolTipRole:
+            ds = self.document.data[self.dsname]
+
+            if ds is not None:
+                # range itself
+                if orientation == qt4.Qt.Horizontal:
+                    return getRange(ds.xrange, ds.xgrid, ds.data, section)
+                else:
+                    return getRange(ds.yrange, ds.ygrid, ds.data, section)
 
         return None
     
