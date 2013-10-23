@@ -98,18 +98,29 @@ def cropGridImageToBox(image, gridx, gridy, posn):
 
         if grid[0] < grid[-1]:
             # fwd order
-            i1 = max(N.searchsorted(grid, p1, side='left')-1, 0)
-            i2 = min(N.searchsorted(grid, p2, side='right')+1, len(grid)+1)
+            i1 = max(N.searchsorted(grid, p1, side='right')-1, 0)
+            i2 = min(N.searchsorted(grid, p2, side='left'), len(grid)) + 1
+
         else:
             # reverse order of grid
             gridr = grid[::-1]
 
-            t1 = max(N.searchsorted(gridr, p1, side='left')-1, 0)
-            t2 = min(N.searchsorted(gridr, p2, side='right')+1, len(grid)+1)
+            t1 = max(N.searchsorted(gridr, p1, side='right')-1, 0)
+            t2 = min(N.searchsorted(gridr, p2, side='left'), len(gridr)) + 1
 
-            i1 = len(grid)+1 - t2
+            i1 = len(grid) - t2
             i2 = len(grid)+1 - t1
+
         return i1, i2
+
+    def trimEdge(grid, minval, maxval):
+        """Trim outer gridpoints to minval and maxval."""
+        if grid[0] < grid[-1]:
+            grid[0] = max(grid[0], minval)
+            grid[-1] = min(grid[-1], maxval)
+        else:
+            grid[0] = min(grid[0], maxval)
+            grid[-1] = max(grid[-1], minval)
 
     # see whether cropping necessary
     x1, x2 = trimGrid(gridx, posn[0], posn[2])
@@ -118,8 +129,12 @@ def cropGridImageToBox(image, gridx, gridy, posn):
     if x1 > 0 or y1 > 0 or x2 < len(gridx)-1 or y2 < len(gridy)-1:
         # do cropping
         image = image.copy(x1, y1, x2-x1-1, y2-y1-1)
-        gridx = gridx[x1:x2]
-        gridy = gridy[y1:y2]
+        gridx = N.array(gridx[x1:x2])
+        gridy = N.array(gridy[y1:y2])
+
+        # trim outer grid point to viewable range
+        trimEdge(gridx, posn[0], posn[2])
+        trimEdge(gridy, posn[1], posn[3])
 
     return gridx, gridy, image
 
