@@ -1860,21 +1860,26 @@ Set('page1/graph1/x/min', -10.)
 	<title><anchor id="Command.SetData2D" />SetData2D</title>
 	
 	<para><command>SetData2D('name', val, xrange=(A,B),
-	yrange=(C,D))</command></para>
+	yrange=(C,D), xgrid=[1,2,3...],
+	ygrid=[4,5,6...])</command></para>
 
 	<para>Creates a two-dimensional dataset with the name
 	given. val is either a two-dimensional numpy array, or is a
 	list of lists, with each list in the list representing a
-	row.</para>
+	row. Do not give xrange if xgrid is set and do not give yrange
+	if ygrid is set, and vice versa.</para>
 
 	<para>xrange and yrange are optional tuples giving the
-	inclusive range of the X and Y coordinates of the data.</para>
+	inclusive range of the X and Y coordinates of the data. xgrid
+	and ygrid are optional lists, tuples or arrays which give the
+	coordinates of the edges of the pixels. There should be one
+	more item in each array than pixels.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.SetData2DExpression" />SetData2DExpression</title>
 	
-	<para><command>SetData2D('name', expr, linked=False)</command></para>
+	<para><command>SetData2DExpression('name', expr, linked=False)</command></para>
 
 	<para>Create a 2D dataset based on expressions.  name is the
         new dataset name expr is an expression which should return a
