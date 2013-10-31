@@ -655,6 +655,9 @@ class SimpleRead2D(object):
     def _paramTranspose(self, cols):
         self.params.transpose = True
 
+    def _paramGridAtEdge(self, cols):
+        self.params.gridatedge = True
+
     ####################################################################
 
     def readData(self, stream):
@@ -669,6 +672,7 @@ class SimpleRead2D(object):
          invertrows   - invert order of the rows
          invertcols   - invert order of the columns
          transpose    - swap rows and columns
+         gridatedge   - positions of pixels are given at top and left
         then:
          matrix of columns and rows, separated by line endings
          the rows are in reverse-y order (highest y first)
@@ -682,7 +686,8 @@ class SimpleRead2D(object):
             'ygrid': self._paramYGrid,
             'invertrows': self._paramInvertRows,
             'invertcols': self._paramInvertCols,
-            'transpose': self._paramTranspose
+            'transpose': self._paramTranspose,
+            'gridatedge': self._paramGridAtEdge,
             }
 
         rows = []
@@ -690,17 +695,18 @@ class SimpleRead2D(object):
         while stream.newLine():
             cols = stream.allColumns()
 
-            if len(cols) > 0:
-                # check to see whether parameter is set
-                c = cols[0].lower()
-                if c in settings:
-                    settings[c](cols)
-                    stream.flushLine()
-                    continue
-            else:
-                # if there's data and we get to a blank line, finish
+            if len(cols) == 0:
                 if len(rows) != 0:
+                    # end of data
                     break
+                continue
+
+            # check to see whether parameter is set
+            c = cols[0].lower()
+            if c in settings:
+                settings[c](cols)
+                stream.flushLine()
+                continue
 
             # read columns
             line = []
@@ -713,23 +719,40 @@ class SimpleRead2D(object):
                 except ValueError:
                     raise Read2DError("Could not interpret number '%s'" % v)
 
-            # add row to dataset
-            if len(line) != 0:
-                if self.params.invertcols:
-                    line.reverse()
-                rows.insert(0, line)
+            rows.insert(0, line)
 
-        # swap rows if requested
-        if self.params.invertrows:
-            rows.reverse()
+        if self.params.gridatedge:
+            if self.params.xgrid is not None or self.params.ygrid is not None:
+                raise ValueError("xgrid/ygrid are incompatible with gridatedge")
+
+            # calculate grid from values at edge of rows
+            oldxgrid = N.array(rows[-1])
+            xgrid = 0.5*(oldxgrid[1:]+oldxgrid[:-1])
+            if len(oldxgrid) >= 2:
+                xgrid = N.hstack( (xgrid[0]  - (oldxgrid[1]-oldxgrid[0]),
+                                   xgrid,
+                                   xgrid[-1] + (oldxgrid[-1]-oldxgrid[-2])) )
+            self.xgrid = xgrid
+
+            oldygrid = N.array([r[0] for r in rows[:-1]])
+            ygrid = 0.5*(oldygrid[1:]+oldygrid[:-1])
+            if len(oldygrid) >= 2:
+                ygrid = N.hstack( (ygrid[0]  - (oldygrid[1]-oldygrid[0]),
+                                   ygrid,
+                                   ygrid[-1] + (oldygrid[-1]-oldygrid[-2])) )
+            self.ygrid = ygrid
+
+            # chop out grid
+            rows = [ r[1:] for r in rows[:-1] ]
+        else:
+            self.xgrid = self.ygrid = None
 
         # dodgy formatting probably...
         if len(rows) == 0:
             raise Read2DError("No data could be imported for dataset")
 
-        # convert the data to a numpy
         try:
-            self.data = N.array(rows)
+            self.data = N.array(rows, dtype=N.float64)
         except ValueError:
             raise Read2DError("Could not convert data to 2D matrix")
 
@@ -737,21 +760,38 @@ class SimpleRead2D(object):
         if len(self.data.shape) != 2:
             raise Read2DError("Dataset was not 2D")
 
-        if ( (self.params.xgrid is not None and
-              not utils.checkAscending(self.params.xgrid)) or
-             (self.params.ygrid is not None and
-              not utils.checkAscending(self.params.ygrid)) ):
-            raise ValueError("xgrid and ygrid must be ascending, if given")
-
-        if ( (self.params.xgrid is not None and
-              len(self.params.xgrid) != self.data.shape[1]+1) or
-             (self.params.ygrid is not None and
-              len(self.params.ygrid) != self.data.shape[0]+1) ):
-            raise ValueError("xgrid and ygrid lengths must be data shape+1")
+        if self.params.invertcols:
+            self.data = self.data[:,::-1]
+            if self.xgrid is not None:
+                self.xgrid = self.xgrid[::-1]
+        if self.params.invertrows:
+            self.data = self.data[::-1,:]
+            if self.ygrid is not None:
+                self.ygrid = self.ygrid[::-1]
 
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
+            self.xgrid, self.ygrid = self.xgrid, self.ygrid
+
+        # copy grid, if not given at edge
+        if self.params.xgrid is not None:
+            self.xgrid = self.params.xgrid
+        if self.params.ygrid is not None:
+            self.ygrid = self.params.ygrid
+
+        # sanity check
+        if ( (self.xgrid is not None and
+              not utils.checkAscending(self.xgrid)) or
+             (self.ygrid is not None and
+              not utils.checkAscending(self.ygrid)) ):
+            raise Read2DError("xgrid and ygrid must be ascending")
+
+        if ( (self.xgrid is not None and
+              len(self.xgrid) != self.data.shape[1]+1) or
+             (self.params.ygrid is not None and
+              len(self.ygrid) != self.data.shape[0]+1) ):
+            raise ValueError("xgrid and ygrid lengths must be data shape+1")
 
     def setInDocument(self, document, linkedfile=None):
         """Set the data in the document.
@@ -762,8 +802,8 @@ class SimpleRead2D(object):
         ds = datasets.Dataset2D(self.data,
                                 xrange=self.params.xrange,
                                 yrange=self.params.yrange,
-                                xgrid=self.params.xgrid,
-                                ygrid=self.params.ygrid)
+                                xgrid=self.xgrid, ygrid=self.ygrid)
+
         ds.linked = linkedfile
 
         fullname = self.params.prefix + self.name + self.params.suffix

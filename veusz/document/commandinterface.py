@@ -658,7 +658,8 @@ class CommandInterface(qt4.QObject):
 
     def ImportString2D(self, datasetnames, dstring, xrange=None, yrange=None,
                        xgrid=None, ygrid=None,
-                       invertrows=None, invertcols=None, transpose=None):
+                       gridatedge=False,
+                       invertrows=False, invertcols=False, transpose=False):
         """Read two dimensional data from the string specified.
         datasetnames is a list of datasets to read from the string or a single
         dataset name
@@ -667,6 +668,7 @@ class CommandInterface(qt4.QObject):
         yrange is a tuple containing the range of data in y coordinates
         xgrid is a list of x values (used instead of xrange)
         ygrid is a list of y values (used instead of yrange)
+        if gridatedge=True, read positions of pixels from left col and top row
         if invertrows=True, then rows are inverted when read
         if invertcols=True, then cols are inverted when read
         if transpose=True, then rows and columns are swapped
@@ -680,6 +682,7 @@ class CommandInterface(qt4.QObject):
             datastr=dstring,
             xrange=xrange, yrange=yrange,
             xgrid=xgrid, ygrid=ygrid,
+            gridatedge=gridatedge,
             invertrows=invertrows, invertcols=invertcols, transpose=transpose)
         op = operations.OperationDataImport2D(params)
         self.document.applyOperation(op)
@@ -688,7 +691,8 @@ class CommandInterface(qt4.QObject):
 
     def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
                      xgrid=None, ygrid=None,
-                     invertrows=None, invertcols=None, transpose=None,
+                     gridatedge=False,
+                     invertrows=False, invertcols=False, transpose=False,
                      prefix="", suffix="", encoding='utf_8',
                      linked=False):
         """Import two-dimensional data from a file.
@@ -700,6 +704,7 @@ class CommandInterface(qt4.QObject):
         yrange is a tuple containing the range of data in y coordinates
         xgrid is a list of x values (used instead of xrange)
         ygrid is a list of y values (used instead of yrange)
+        if gridatedge=True, read positions of pixels from left col and top row
         if invertrows=True, then rows are inverted when read
         if invertcols=True, then cols are inverted when read
         if transpose=True, then rows and columns are swapped
@@ -722,6 +727,7 @@ class CommandInterface(qt4.QObject):
             filename=realfilename,
             xrange=xrange, yrange=yrange,
             xgrid=xgrid, ygrid=ygrid,
+            gridatedge=gridatedge,
             invertrows=invertrows, invertcols=invertcols, transpose=transpose,
             prefix=prefix, suffix=suffix,
             linked=linked)
