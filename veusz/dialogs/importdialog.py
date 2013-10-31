@@ -366,7 +366,7 @@ class ImportTab2D(ImportTab):
                       self.twod_datasetsedit):
             combo.setEditText("")
         for check in (self.twod_invertrowscheck, self.twod_invertcolscheck,
-                      self.twod_transposecheck):
+                      self.twod_transposecheck, self.twod_gridatedge):
             check.setChecked(False)
 
     def doPreview(self, filename, encoding):
@@ -426,6 +426,7 @@ class ImportTab2D(ImportTab):
         invertrows = self.twod_invertrowscheck.isChecked()
         invertcols = self.twod_invertcolscheck.isChecked()
         transpose = self.twod_transposecheck.isChecked()
+        gridatedge = self.twod_gridatedge.isChecked()
 
         # loop over datasets and read...
         params = document.ImportParams2D(
@@ -435,6 +436,7 @@ class ImportTab2D(ImportTab):
             invertrows=invertrows,
             invertcols=invertcols,
             transpose=transpose,
+            gridatedge=gridatedge,
             prefix=prefix, suffix=suffix,
             tags=tags,
             linked=linked,

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
+    <width>509</width>
     <height>475</height>
    </rect>
   </property>
@@ -29,13 +29,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label_20">
        <property name="text">
@@ -50,11 +44,18 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="twod_helpbutton">
+       <property name="text">
+        <string>Help</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
       <widget class="QLabel" name="label_15">
        <property name="text">
         <string>Range of &amp;X:</string>
@@ -64,28 +65,28 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item>
       <widget class="HistoryCombo" name="twod_xminedit">
        <property name="toolTip">
         <string>Enter a number for the minimum coordinate of the X axis (default 0)</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item>
       <widget class="QLabel" name="label_16">
        <property name="text">
         <string>to</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item>
       <widget class="HistoryCombo" name="twod_xmaxedit">
        <property name="toolTip">
         <string>Enter a value for a maximum coordinate of the X axis (default is number of columns in file)</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item>
       <widget class="QLabel" name="label_18">
        <property name="text">
         <string>Range of &amp;Y:</string>
@@ -95,21 +96,21 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item>
       <widget class="HistoryCombo" name="twod_yminedit">
        <property name="toolTip">
         <string>Enter a number for the minimum coordinate of the Y axis (default 0)</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item>
       <widget class="QLabel" name="label_17">
        <property name="text">
         <string>to</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="3">
+     <item>
       <widget class="HistoryCombo" name="twod_ymaxedit">
        <property name="toolTip">
         <string>Enter a number for the maximum coordinate of the Y axis (default number of rows in file)</string>
@@ -119,36 +120,42 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="twod_invertrowscheck">
-     <property name="text">
-      <string>Invert &amp;rows when reading</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="twod_invertcolscheck">
-     <property name="text">
-      <string>Invert colu&amp;mns when reading</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="twod_transposecheck">
-     <property name="text">
-      <string>Trans&amp;pose rows and columns</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_19">
-     <property name="text">
-      <string>Data are read as a 2D matrix from the file.  X is read from left to right, Y from bottom to top, by default. These parameters listed here can be altered by including xrange A B, yrange A B, invertrows, invertcols and transpose as lines in the data file. Multiple datasets can be included by separating with blank lines.
-</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="HistoryCheck" name="twod_invertrowscheck">
+       <property name="text">
+        <string>Invert &amp;rows</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="HistoryCheck" name="twod_transposecheck">
+       <property name="toolTip">
+        <string>Transpose rows and columns</string>
+       </property>
+       <property name="text">
+        <string>Trans&amp;pose</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="HistoryCheck" name="twod_invertcolscheck">
+       <property name="text">
+        <string>Invert &amp;columns</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="HistoryCheck" name="twod_gridatedge">
+       <property name="toolTip">
+        <string>The centres of the pixels are given in the top row and the left column</string>
+       </property>
+       <property name="text">
+        <string>Grid at edge</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -157,6 +164,11 @@
    <class>HistoryCombo</class>
    <extends>QComboBox</extends>
    <header>historycombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistoryCheck</class>
+   <extends>QCheckBox</extends>
+   <header>historycheck.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

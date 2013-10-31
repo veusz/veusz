@@ -142,6 +142,7 @@ class ImportParams2D(ImportParamsBase):
         'invertrows': False,
         'invertcols': False,
         'transpose': False,
+        'gridatedge': False,
         }
     defaults.update(ImportParamsBase.defaults)
 
