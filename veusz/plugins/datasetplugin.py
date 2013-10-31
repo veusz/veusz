@@ -1509,6 +1509,112 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=interpol)
 
+class ReBinXYPlugin(DatasetPlugin):
+    """Bin-up data by factor given."""
+
+    menu = (_('Filtering'), _('Bin X,Y'))
+    name = 'RebinXY'
+    description_short = 'Bin every N datapoints'
+    description_full = ('Given dataset Y (and optionally X), for every N '
+                        'datapoints calculate the binned value. For '
+                        'dataset Y this is the sum or mean of every N '
+                        'datapoints. For X this is the midpoint of the '
+                        'datapoints (using error bars to give the range.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_y', _('Input dataset Y')),
+            field.FieldDataset('ds_x', _('Input dataset X (optional)')),
+            field.FieldInt('binsize', _('Bin size (N)'),
+                           minval=1, default=2),
+            field.FieldCombo('mode', _('Mode of binning'),
+                             items=('sum', 'average'),
+                             editable=False),
+            field.FieldDataset('ds_yout', _("Output Y'")),
+            field.FieldDataset('ds_xout', _("Output X' (optional)")),
+            ]
+
+    def getDatasets(self, fields):
+        """Return output datasets"""
+        if fields['ds_yout'] == '':
+            raise DatasetPluginException('Invalid output Y dataset name')
+        if fields['ds_x'] != '' and fields['ds_xout'] == '':
+            raise DatasetPluginException('Invalid output X dataset name')
+
+        self.dssout = out = [ Dataset1D(fields['ds_yout']) ]
+        if fields['ds_xout'] != '':
+            out.append(Dataset1D(fields['ds_xout']))
+        return out
+
+    def updateDatasets(self, fields, helper):
+        """Do binning."""
+
+        binsize = fields['binsize']
+        average = fields['mode'] == 'average'
+
+        def binerr(err):
+            """Compute binned error."""
+            if err is None:
+                return None
+            err2 = qtloops.binData(err**2, binsize, False)
+            cts = qtloops.binData(N.ones(err.shape), binsize, False)
+            return N.sqrt(err2) / cts
+
+        # bin up data and calculate errors (if any)
+        dsy = helper.getDataset(fields['ds_y'])
+        binydata = qtloops.binData(dsy.data, binsize, average)
+        binyserr = binerr(dsy.serr)
+        binyperr = binerr(dsy.perr)
+        binynerr = binerr(dsy.nerr)
+
+        self.dssout[0].update(data=binydata, serr=binyserr, perr=binyperr, nerr=binynerr)
+
+        if len(self.dssout) == 2:
+            # x datasets
+            dsx = helper.getDataset(fields['ds_x'])
+
+            # Calculate ranges between adjacent binned points.  This
+            # is horribly messy - we have to account for the fact
+            # there might not be error bars and calculate the midpoint
+            # to the previous/next point.
+            minvals = N.array(dsx.data)
+            if dsx.serr is not None:
+                minvals -= dsx.serr
+            elif dsx.nerr is not None:
+                minvals += dsx.nerr
+            else:
+                minvals = 0.5*(dsx.data[1:] + dsx.data[:-1])
+                if len(dsx.data) > 2:
+                    # assume +ve error bar on last point is as big as its -ve error
+                    minvals = N.insert(minvals, 0, dsx.data[0] - 0.5*(
+                            dsx.data[1] - dsx.data[0]))
+                elif len(dsx.data) != 0:
+                    # no previous point so we assume 0 error
+                    minvals = N.insert(minvals, 0, dsx.data[0])
+
+            maxvals = N.array(dsx.data)
+            if dsx.serr is not None:
+                maxvals += dsx.serr
+            elif dsx.perr is not None:
+                maxvals += dsx.perr
+            else:
+                maxvals = 0.5*(dsx.data[1:] + dsx.data[:-1])
+                if len(dsx.data) > 2:
+                    maxvals = N.append(maxvals, dsx.data[-1] + 0.5*(
+                            dsx.data[-1] - dsx.data[-2]))
+                elif len(dsx.data) != 0:
+                    maxvals = N.append(maxvals, dsx.data[-1])
+
+            minbin = minvals[::binsize]
+            maxbin = maxvals[binsize-1::binsize]
+            if len(minbin) > len(maxbin):
+                # not an even number of bin size
+                maxbin = N.append(maxbin, maxvals[-1])
+
+            self.dssout[1].update(data=0.5*(minbin+maxbin),
+                                  serr=0.5*(maxbin-minbin))
+
 class SortPlugin(_OneOutputDatasetPlugin):
     """Sort a dataset."""
 
@@ -1757,6 +1863,8 @@ datasetpluginregistry += [
 
     MovingAveragePlugin,
     LinearInterpolatePlugin,
+    ReBinXYPlugin,
+
     SortPlugin,
     SortTextPlugin,
 
