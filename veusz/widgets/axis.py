@@ -20,6 +20,7 @@
 positions."""
 
 from __future__ import division
+import re
 import numpy as N
 
 from ..compat import czip
@@ -1150,16 +1151,26 @@ class Axis(widget.Widget):
 
         if cgi.zoomed():
             # zoom axis scale
-            c1, c2 = self.plotterToGraphCoords(
-                cgi.maxposn, N.array([cgi.minzoom, cgi.maxzoom]))
+            # we convert a neighbouring pixel to see how we should
+            # round the text
+            c1, c2, c1delt, c2delt = self.plotterToGraphCoords(
+                cgi.maxposn, N.array([cgi.minzoom, cgi.maxzoom,
+                                      cgi.minzoom+1, cgi.maxzoom-1]))
             if c1 > c2:
                 c1, c2 = c2, c1
-            operations = (
-                document.OperationSettingSet(s.get('min'), float(c1)),
-                document.OperationSettingSet(s.get('max'), float(c2)),
-                )
+                c1delt, c2delt = c2delt, c1delt
+
+            ops = []
+            if s.min == 'Auto' or not N.allclose(c1, s.min):
+                ops.append( document.OperationSettingSet(
+                        s.get('min'), utils.round2delt(c1, c1delt)) )
+            if s.max == 'Auto' or not N.allclose(c2, s.max):
+                ops.append( document.OperationSettingSet(
+                        s.get('max'), utils.round2delt(c2, c2delt)) )
+
             self.document.applyOperation(
-                document.OperationMultiple(operations, descr=_('zoom axis')))
+                document.OperationMultiple(ops, descr=_('zoom axis')))
+
         elif cgi.moved():
             # move axis
             # convert positions to fractions
@@ -1174,13 +1185,18 @@ class Axis(widget.Widget):
                 minfrac, maxfrac = maxfrac, minfrac
 
             # update doc
-            operations = (
-                document.OperationSettingSet(s.get('lowerPosition'), minfrac),
-                document.OperationSettingSet(s.get('upperPosition'), maxfrac),
-                document.OperationSettingSet(s.get('otherPosition'), axisfrac),
-                )
+            ops = []
+            if s.lowerPosition != minfrac:
+                ops.append( document.OperationSettingSet(
+                        s.get('lowerPosition'), round(minfrac, 3)) )
+            if s.upperPosition != maxfrac:
+                ops.append( document.OperationSettingSet(
+                        s.get('upperPosition'), round(maxfrac, 3)) )
+            if s.otherPosition != axisfrac:
+                ops.append( document.OperationSettingSet(
+                        s.get('otherPosition'), round(axisfrac, 3)) )
             self.document.applyOperation(
-                document.OperationMultiple(operations, descr=_('adjust axis')))
+                document.OperationMultiple(ops, descr=_('adjust axis')))
 
 # allow the factory to instantiate an axis
 document.thefactory.register( Axis )

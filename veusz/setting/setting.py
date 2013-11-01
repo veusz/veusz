@@ -40,7 +40,9 @@ from .reference import Reference
 
 from .. import utils
 
-# if invalid type passed to set
+def floattostring(f):
+    """Convert float to string with more precision."""
+    return uilocale.toString(f, 'g', 15)
 
 class Setting(object):
     """A class to store a value with a particular type."""
@@ -560,7 +562,7 @@ class Float(Setting):
         raise utils.InvalidType
 
     def toText(self):
-        return uilocale.toString(self.val)
+        return floattostring(self.val)
 
     def fromText(self, text):
         f, ok = uilocale.toDouble(text)
@@ -596,7 +598,7 @@ class FloatOrAuto(Float):
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return uilocale.toString(self.val)
+            return floattostring(self.val)
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
@@ -955,7 +957,7 @@ class FloatDict(Setting):
         return out
 
     def toText(self):
-        text = ['%s = %s' % (k, uilocale.toString(self.val[k]))
+        text = ['%s = %s' % (k, floattostring(self.val[k]))
                 for k in sorted(ckeys(self.val))]
         return '\n'.join(text)
 
@@ -1010,7 +1012,7 @@ class FloatList(Setting):
         join = ', '
         if uilocale.decimalPoint() == ',':
             join = '; '
-        return join.join( [uilocale.toString(x) for x in self.val] )
+        return join.join( [floattostring(x) for x in self.val] )
 
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
@@ -1250,7 +1252,7 @@ class DatasetExtended(Dataset):
             join = ', '
             if uilocale.decimalPoint() == ',':
                 join = '; '
-            return join.join( [ uilocale.toString(x)
+            return join.join( [ floattostring(x)
                                 for x in self.val ] )
 
     def fromText(self, text):

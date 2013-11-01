@@ -510,8 +510,9 @@ class PlotWindow( qt4.QGraphicsView ):
             return
         
         # convert points on plotter to points on axis for each axis
-        xpts = N.array( [pt1.x(), pt2.x()] )
-        ypts = N.array( [pt1.y(), pt2.y()] )
+        # we also add a neighbouring pixel for the rounding calculation
+        xpts = N.array( [pt1.x(), pt2.x(), pt1.x()+1, pt2.x()-1] )
+        ypts = N.array( [pt1.y(), pt2.y(), pt2.y()+1, pt2.y()-1] )
 
         # build up operation list to do zoom
         operations = []
@@ -548,14 +549,18 @@ class PlotWindow( qt4.QGraphicsView ):
             # invert if min and max are inverted
             if r[1] < r[0]:
                 r[1], r[0] = r[0], r[1]
+                r[3], r[2] = r[2], r[3]
 
             # build up operations to change axis
             if s.min != r[0]:
-                operations.append( document.OperationSettingSet(s.get('min'),
-                                                                float(r[0])) )
+                operations.append( document.OperationSettingSet(
+                        s.get('min'),
+                        utils.round2delt(r[0], r[2])) )
+
             if s.max != r[1]:
-                operations.append( document.OperationSettingSet(s.get('max'),
-                                                                float(r[1])) )
+                operations.append( document.OperationSettingSet(
+                        s.get('max'),
+                        utils.round2delt(r[1], r[3])) )
 
         # finally change the axes
         self.document.applyOperation(

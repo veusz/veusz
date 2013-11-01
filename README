@@ -24,6 +24,9 @@ Changes in 1.19:
  * Allow non-text datasets to be used for labels
  * Add number->text conversion dataset plugin
  * Add notes properties to document, pages and graphs
+ * Allow more significant figures in float values
+ * Intelligent choice of significant figures when interactively
+   changing axis range
 
 Bug fixes:
  * Fix crash if other linked axis not initialized

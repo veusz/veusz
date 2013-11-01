@@ -493,3 +493,21 @@ def topological_sort(dependency_pairs):
 def isiternostr(i):
     """Is this iterator, but not a string?"""
     return hasattr(i, '__iter__') and not isinstance(i, cbasestr)
+
+def round2delt(v, delt):
+    """Choose an appropriate number of decimal places to round
+    value to.  This takes a value and neighbouring value. We
+    look where they start to differ when converted to text.
+    """
+    if not N.isfinite(delt):
+        return v
+
+    s1 = '%400.200f' % abs(v)
+    s2 = '%400.200f' % abs(delt)
+    i = 0
+    while i < len(s1) and s1[i] == s2[i]:
+        i += 1
+
+    # replace all numbers right of text with zeros
+    rounded = s1[:i+1] + re.sub('[1-9]', '0', s1[i+1:])
+    return float(rounded) * float(N.sign(v))
