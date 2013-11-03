@@ -245,14 +245,14 @@ class Line(plotters.FreePlotter):
         s = self.settings
 
         # calculate new position coordinate for item
-        xpos, ypos = self._getGraphCoords(cgi.widgetposn,
-                                          pt1[0], pt1[1])
-        if xpos is None or ypos is None:
+        xret, yret = self._getGraphCoords(
+            cgi.widgetposn, [pt1[0], pt1[0]+1], [pt1[1], pt1[1]+1])
+        if xret is None or yret is None:
             return
 
         x, y = list(s.xPos), list(s.yPos)
-        x[min(cgi.index, len(x)-1)] = xpos
-        y[min(cgi.index, len(y)-1)] = ypos
+        x[min(cgi.index, len(x)-1)] = utils.round2delt(xret[0], xret[1])
+        y[min(cgi.index, len(y)-1)] = utils.round2delt(yret[0], yret[1])
         operations = [
             document.OperationSettingSet(s.get('xPos'), x),
             document.OperationSettingSet(s.get('yPos'), y),
@@ -263,21 +263,29 @@ class Line(plotters.FreePlotter):
                        (cgi.widgetposn[2]-cgi.widgetposn[0]) )
             angle = ( (math.atan2( pt2[1]-pt1[1], pt2[0]-pt1[0] )
                        * 180. / math.pi) % 360. )
+            ldelt = ( math.sqrt( (pt2[0]+1-pt1[0])**2 + (pt2[1]+1-pt1[1])**2 ) /
+                      (cgi.widgetposn[2]-cgi.widgetposn[0]) )
+            adelt = ( (math.atan2( pt2[1]+1-pt1[1], pt2[0]+1-pt1[0] )
+                       * 180. / math.pi) % 360. )
+
+
             # update values
             l, a = list(s.length), list(s.angle)
-            l[min(cgi.index, len(l)-1)] = length
-            a[min(cgi.index, len(a)-1)] = angle
+            l[min(cgi.index, len(l)-1)] = utils.round2delt(length, ldelt)
+            a[min(cgi.index, len(a)-1)] = utils.round2delt(angle, adelt)
             operations += [
                 document.OperationSettingSet(s.get('length'), l),
                 document.OperationSettingSet(s.get('angle'), a),
                 ]
         else:
-            xpos2, ypos2 = self._getGraphCoords(cgi.widgetposn,
-                                                pt2[0], pt2[1])
-            if xpos is not None and ypos is not None:
+            xpos2, ypos2 = self._getGraphCoords(
+                cgi.widgetposn, [pt2[0], pt2[0]+1], [pt2[1], pt2[1]+1])
+            if xpos2 is not None and ypos2 is not None:
                 x2, y2 = list(s.xPos2), list(s.yPos2)
-                x2[min(cgi.index, len(x2)-1)] = xpos2
-                y2[min(cgi.index, len(y2)-1)] = ypos2
+                x2[min(cgi.index, len(x2)-1)] = utils.round2delt(
+                    xpos2[0], xpos2[1])
+                y2[min(cgi.index, len(y2)-1)] = utils.round2delt(
+                    ypos2[0], ypos2[1])
                 operations += [
                     document.OperationSettingSet(s.get('xPos2'), x2),
                     document.OperationSettingSet(s.get('yPos2'), y2)
