@@ -245,18 +245,23 @@ class Line(plotters.FreePlotter):
         s = self.settings
 
         # calculate new position coordinate for item
-        xret, yret = self._getGraphCoords(
+        xpos, ypos = self._getGraphCoords(
             cgi.widgetposn, [pt1[0], pt1[0]+1], [pt1[1], pt1[1]+1])
-        if xret is None or yret is None:
+        if xpos is None or ypos is None:
             return
 
         x, y = list(s.xPos), list(s.yPos)
-        x[min(cgi.index, len(x)-1)] = utils.round2delt(xret[0], xret[1])
-        y[min(cgi.index, len(y)-1)] = utils.round2delt(yret[0], yret[1])
+        idx = min(cgi.index, len(x)-1)
+        if not N.allclose(x[idx], xpos[0]):
+            x[idx] = utils.round2delt(xpos[0], xpos[1])
+        idx = min(cgi.index, len(y)-1)
+        if not N.allclose(y[idx], ypos[0]):
+            y[idx] = utils.round2delt(ypos[0], ypos[1])
         operations = [
             document.OperationSettingSet(s.get('xPos'), x),
             document.OperationSettingSet(s.get('yPos'), y),
             ]
+
         if s.mode == 'length-angle':
             # convert 2nd point to length, angle
             def la(ptx, pty):
@@ -271,8 +276,13 @@ class Line(plotters.FreePlotter):
 
             # update values
             l, a = list(s.length), list(s.angle)
-            l[min(cgi.index, len(l)-1)] = utils.round2delt(length, ldelt)
-            a[min(cgi.index, len(a)-1)] = utils.round2delt(angle, adelt)
+            idx = min(cgi.index, len(l)-1)
+            if abs(l[idx]-length) > 1e-8:
+                l[idx] = utils.round2delt(length, ldelt)
+            idx = min(cgi.index, len(a)-1)
+            if abs(a[idx]-angle) > 1e-8:
+                a[idx] = utils.round2delt(angle, adelt)
+
             operations += [
                 document.OperationSettingSet(s.get('length'), l),
                 document.OperationSettingSet(s.get('angle'), a),
@@ -282,10 +292,14 @@ class Line(plotters.FreePlotter):
                 cgi.widgetposn, [pt2[0], pt2[0]+1], [pt2[1], pt2[1]+1])
             if xpos2 is not None and ypos2 is not None:
                 x2, y2 = list(s.xPos2), list(s.yPos2)
-                x2[min(cgi.index, len(x2)-1)] = utils.round2delt(
-                    xpos2[0], xpos2[1])
-                y2[min(cgi.index, len(y2)-1)] = utils.round2delt(
-                    ypos2[0], ypos2[1])
+
+                idx = min(cgi.index, len(x2)-1)
+                if not N.allclose(x2[idx], xpos2[0]):
+                    x2[idx] = utils.round2delt(xpos2[0], xpos2[1])
+                idx = min(cgi.index, len(y2)-1)
+                if not N.allclose(y2[idx], ypos2[0]):
+                    y2[idx] = utils.round2delt(ypos2[0], ypos2[1])
+
                 operations += [
                     document.OperationSettingSet(s.get('xPos2'), x2),
                     document.OperationSettingSet(s.get('yPos2'), y2)
