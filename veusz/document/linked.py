@@ -22,7 +22,7 @@
 from __future__ import division
 import sys
 
-from ..compat import citems, cstr
+from ..compat import citems, cstr, crepr
 from .. import utils
 
 class LinkedFileBase(object):
@@ -129,19 +129,19 @@ class LinkedFile(LinkedFileBase):
         """
 
         p = self.params
-        params = [ repr(self._getSaveFilename(relpath)),
-                   repr(p.descriptor),
+        params = [ crepr(self._getSaveFilename(relpath)),
+                   crepr(p.descriptor),
                    "linked=True",
-                   "ignoretext=" + repr(p.ignoretext) ]
+                   "ignoretext=" + crepr(p.ignoretext) ]
 
         if p.encoding != "utf_8":
-            params.append("encoding=" + repr(p.encoding))
+            params.append("encoding=" + crepr(p.encoding))
         if p.useblocks:
             params.append("useblocks=True")
         if p.prefix:
-            params.append("prefix=" + repr(p.prefix))
+            params.append("prefix=" + crepr(p.prefix))
         if p.suffix:
-            params.append("suffix=" + repr(p.suffix))
+            params.append("suffix=" + crepr(p.suffix))
 
         fileobj.write("ImportFile(%s)\n" % (", ".join(params)))
 
@@ -156,13 +156,13 @@ class LinkedFile2D(LinkedFileBase):
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
-        args = [ repr(self._getSaveFilename(relpath)),
-                 repr(self.params.datasetnames) ]
+        args = [ crepr(self._getSaveFilename(relpath)),
+                 crepr(self.params.datasetnames) ]
         for par in ("xrange", "yrange", "invertrows", "invertcols", "transpose",
                     "prefix", "suffix", "encoding"):
             v = getattr(self.params, par)
             if v is not None and v != "" and v != self.params.defaults[par]:
-                args.append( "%s=%s" % (par, repr(v)) )
+                args.append( "%s=%s" % (par, crepr(v)) )
         args.append("linked=True")
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
@@ -180,7 +180,7 @@ class LinkedFileFITS(LinkedFileBase):
 
         p = self.params
         args = [p.dsname, self._getSaveFilename(relpath), p.hdu]
-        args = [repr(i) for i in args]
+        args = [crepr(i) for i in args]
         for param, val in ( ("datacol", p.datacol),
                             ("symerrcol", p.symerrcol),
                             ("poserrcol", p.poserrcol),
@@ -188,7 +188,7 @@ class LinkedFileFITS(LinkedFileBase):
                             ("wcsmode", p.wcsmode),
                             ):
             if val is not None:
-                args.append("%s=%s" % (param, repr(val)))
+                args.append("%s=%s" % (param, crepr(val)))
         args.append("linked=True")
 
         fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))
@@ -204,7 +204,7 @@ class LinkedFileCSV(LinkedFileBase):
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
-        paramsout = [ repr(self._getSaveFilename(relpath)) ]
+        paramsout = [ crepr(self._getSaveFilename(relpath)) ]
 
         # add parameters which aren"t defaults
         for param, default in sorted(citems(self.params.defaults)):
@@ -212,7 +212,7 @@ class LinkedFileCSV(LinkedFileBase):
             if param == 'prefix' or param == 'suffix':
                 param = 'ds' + param
             if param != 'filename' and param != 'tags' and v != default:
-                paramsout.append("%s=%s" % (param, repr(v)))
+                paramsout.append("%s=%s" % (param, crepr(v)))
 
         fileobj.write("ImportFileCSV(%s)\n" % (", ".join(paramsout)))
 
@@ -228,16 +228,16 @@ class LinkedFilePlugin(LinkedFileBase):
         """Save the link to the vsz document file."""
 
         p = self.params
-        params = [repr(p.plugin),
-                  repr(self._getSaveFilename(relpath)),
+        params = [crepr(p.plugin),
+                  crepr(self._getSaveFilename(relpath)),
                   "linked=True"]
         if p.encoding != "utf_8":
-            params.append("encoding=" + repr(p.encoding))
+            params.append("encoding=" + crepr(p.encoding))
         if p.prefix:
-            params.append("prefix=" + repr(p.prefix))
+            params.append("prefix=" + crepr(p.prefix))
         if p.suffix:
-            params.append("suffix=" + repr(p.suffix))
+            params.append("suffix=" + crepr(p.suffix))
         for name, val in citems(p.pluginpars):
-            params.append("%s=%s" % (name, repr(val)))
+            params.append("%s=%s" % (name, crepr(val)))
 
         fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))

@@ -24,7 +24,7 @@ import re
 
 import numpy as N
 
-from ..compat import czip, crange, citems, cbasestr, cstr
+from ..compat import czip, crange, citems, cbasestr, cstr, crepr
 from .. import qtall as qt4
 from .. import utils
 from .. import setting
@@ -326,7 +326,7 @@ class Dataset2D(DatasetBase):
         if self.linked is not None:
             return
 
-        fileobj.write("ImportString2D(%s, '''\n" % repr(name))
+        fileobj.write("ImportString2D(%s, '''\n" % crepr(name))
         fileobj.write("xrange %e %e\n" % tuple(self.xrange))
         fileobj.write("yrange %e %e\n" % tuple(self.yrange))
         fileobj.write(self.datasetAsText(fmt='%e', join=' '))
@@ -543,7 +543,7 @@ class Dataset(DatasetBase):
         if self.nerr is not None:
             descriptor += ',-'
 
-        fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
+        fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
         fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
         fileobj.write( "''')\n" )
 
@@ -646,7 +646,7 @@ class DatasetDateTime(Dataset):
             return
 
         descriptor = datasetNameToDescriptorName(name) + '(date)'
-        fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
+        fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
         fileobj.write( self.datasetAsText() )
         fileobj.write( "''')\n" )
 
@@ -711,7 +711,7 @@ class DatasetText(DatasetBase):
             return
 
         descriptor = datasetNameToDescriptorName(name) + '(text)'
-        fileobj.write( "ImportString(%s,r'''\n" % repr(descriptor) )
+        fileobj.write( "ImportString(%s, ur'''\n" % crepr(descriptor) )
         for line in self.data:
             # need to "escape" ''' marks in text
             r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
@@ -787,7 +787,7 @@ def _substituteDatasets(datasets, expression, thispart):
 
         if bit in datasets:
             # replace name with a function to call
-            bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
+            bits[i] = "_DS_(%s, %s)" % (crepr(bit), crepr(part))
             dslist.append(bit)
 
     return ''.join(bits), dslist
@@ -1082,15 +1082,15 @@ class DatasetExpression(Dataset):
         '''Save data to file.
         '''
 
-        parts = [repr(name), repr(self.expr['data'])]
+        parts = [crepr(name), crepr(self.expr['data'])]
         if self.expr['serr']:
-            parts.append('symerr=%s' % repr(self.expr['serr']))
+            parts.append('symerr=%s' % crepr(self.expr['serr']))
         if self.expr['nerr']:
-            parts.append('negerr=%s' % repr(self.expr['nerr']))
+            parts.append('negerr=%s' % crepr(self.expr['nerr']))
         if self.expr['perr']:
-            parts.append('poserr=%s' % repr(self.expr['perr']))
+            parts.append('poserr=%s' % crepr(self.expr['perr']))
         if self.parametric is not None:
-            parts.append('parametric=%s' % repr(self.parametric))
+            parts.append('parametric=%s' % crepr(self.parametric))
 
         parts.append('linked=True')
 
@@ -1184,13 +1184,13 @@ class DatasetRange(Dataset):
     def saveToFile(self, fileobj, name):
         """Save dataset to file."""
 
-        parts = [repr(name), repr(self.numsteps), repr(self.range_data)]
+        parts = [crepr(name), crepr(self.numsteps), crepr(self.range_data)]
         if self.range_serr is not None:
-            parts.append('symerr=%s' % repr(self.range_serr))
+            parts.append('symerr=%s' % crepr(self.range_serr))
         if self.range_perr is not None:
-            parts.append('poserr=%s' % repr(self.range_perr))
+            parts.append('poserr=%s' % crepr(self.range_perr))
         if self.range_nerr is not None:
-            parts.append('negerr=%s' % repr(self.range_nerr))
+            parts.append('negerr=%s' % crepr(self.range_nerr))
         parts.append('linked=True')
 
         s = 'SetDataRange(%s)\n' % ', '.join(parts)
@@ -1363,7 +1363,7 @@ class Dataset2DXYZExpression(Dataset2D):
         '''
 
         s = 'SetData2DExpressionXYZ(%s, %s, %s, %s, linked=True)\n' % (
-            repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
+            crepr(name), crepr(self.exprx), crepr(self.expry), crepr(self.exprz) )
         fileobj.write(s)
 
     def canUnlink(self):
@@ -1423,7 +1423,7 @@ class Dataset2DExpression(Dataset2D):
     def saveToFile(self, fileobj, name):
         '''Save expression to file.'''
         s = 'SetData2DExpression(%s, %s, linked=True)\n' % (
-            repr(name), repr(self.expr) )
+            crepr(name), crepr(self.expr) )
         fileobj.write(s)
 
     def canUnlink(self):
@@ -1512,7 +1512,7 @@ class Dataset2DXYFunc(Dataset2D):
         '''Save expressions to file.
         '''
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
-            repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
+            crepr(name), crepr(self.xstep), crepr(self.ystep), crepr(self.expr) )
         fileobj.write(s)
 
     def canUnlink(self):

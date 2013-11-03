@@ -80,6 +80,12 @@ if cpy3:
     def cstrerror(ex):
         return ex.strerror
 
+    # text repr (compatible with python2)
+    def crepr(v):
+        if isinstance(v, str):
+            return 'u' + repr(v)
+        return repr(v)
+
 else:
     # py2
 
@@ -145,3 +151,5 @@ else:
         else:
             return ex.strerror
 
+    # py2/3 repr
+    crepr = repr

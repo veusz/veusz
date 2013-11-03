@@ -22,7 +22,7 @@
 from __future__ import division
 import itertools
 
-from ..compat import czip
+from ..compat import czip, crepr
 from .. import document
 from .. import setting
 from .. import qtall as qt4
@@ -322,14 +322,14 @@ class Widget(object):
         # now go throught the subwidgets
         for c in self.children:
             text += ( "Add('%s', name=%s, autoadd=False)\n" %
-                      (c.typename, repr(c.name)) )
+                      (c.typename, crepr(c.name)) )
 
             # if we need to go to the child, go there
             ctext = c.getSaveText(saveall)
             if ctext != '':
                 text += ("To(%s)\n"
                          "%s"
-                         "To('..')\n") % (repr(c.name), ctext)
+                         "To('..')\n") % (crepr(c.name), ctext)
 
         return text
 

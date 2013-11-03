@@ -45,6 +45,7 @@ _globals = globals()
 
 import sys
 import traceback
+import codecs
 import os.path
 
 from ..compat import pickle, cexec
@@ -177,7 +178,7 @@ class CommandInterpreter(object):
     def Load(self, filename):
         """Replace the document with a new one from the filename."""
 
-        f = open(filename, 'rU')
+        f = codecs.open(filename, 'rU', encoding='utf8')
         self.document.wipe()
         self.interface.To('/')
         oldfile = self.globals['__file__']

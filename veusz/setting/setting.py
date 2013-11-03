@@ -32,7 +32,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, ckeys, cbasestr, cstr
+from ..compat import citems, ckeys, cbasestr, cstr, crepr
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
@@ -259,10 +259,10 @@ class Setting(object):
         if (saveall or not self.isDefault()) and not self.readonly:
             if isinstance(self._val, Reference):
                 return "SetToReference('%s%s', %s)\n" % (rootname, self.name,
-                                                         repr(self._val.value))
+                                                         crepr(self._val.value))
             else:
                 return "Set('%s%s', %s)\n" % ( rootname, self.name,
-                                               repr(self.val) )
+                                               crepr(self.val) )
         else:
             return ''
 

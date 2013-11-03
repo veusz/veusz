@@ -24,6 +24,7 @@ import os.path
 import sys
 import traceback
 import glob
+import codecs
 
 from ..compat import citems, ckeys, cstr, cexec, cstrerror
 from .. import qtall as qt4
@@ -1021,7 +1022,7 @@ class MainWindow(qt4.QMainWindow):
 
         # read script
         try:
-            script = open(filename, 'rU').read()
+            script = codecs.open(filename, 'rU', encoding='utf8').read()
         except EnvironmentError as e:
             qt4.QApplication.restoreOverrideCursor()
             qt4.QMessageBox.critical(
