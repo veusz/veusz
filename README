@@ -14,6 +14,7 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.19:
  * Make code compatible with python3
+ * Changes to filesystem layout of module
  * Separation of python module and resources in source package
    (packagers may need to consult INSTALL)
  * Move to v2 of PyQt API
@@ -23,10 +24,13 @@ Changes in 1.19:
  * Picker uses 1-based index for consistency
  * Allow non-text datasets to be used for labels
  * Add number->text conversion dataset plugin
+ * Add binning dataset plugin
  * Add notes properties to document, pages and graphs
  * Allow more significant figures in float values
  * Intelligent choice of significant figures when interactively
    changing axis range
+ * Decrease minimum range of axis
+ * Add notes setting to document, pages and graphs
 
 Bug fixes:
  * Fix crash if other linked axis not initialized
@@ -34,6 +38,7 @@ Bug fixes:
  * Make ignore exception work in error reporting dialog
  * Renaming datasets, widgets and editing data now allow original
    text to be edited, rather than being cleared
+ * Fix line positions on broken axes
 
 Features of package:
  Plotting features:
