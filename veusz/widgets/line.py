@@ -259,15 +259,15 @@ class Line(plotters.FreePlotter):
             ]
         if s.mode == 'length-angle':
             # convert 2nd point to length, angle
-            length = ( math.sqrt( (pt2[0]-pt1[0])**2 + (pt2[1]-pt1[1])**2 ) /
-                       (cgi.widgetposn[2]-cgi.widgetposn[0]) )
-            angle = ( (math.atan2( pt2[1]-pt1[1], pt2[0]-pt1[0] )
-                       * 180. / math.pi) % 360. )
-            ldelt = ( math.sqrt( (pt2[0]+1-pt1[0])**2 + (pt2[1]+1-pt1[1])**2 ) /
-                      (cgi.widgetposn[2]-cgi.widgetposn[0]) )
-            adelt = ( (math.atan2( pt2[1]+1-pt1[1], pt2[0]+1-pt1[0] )
-                       * 180. / math.pi) % 360. )
-
+            def la(ptx, pty):
+                length = ( math.sqrt( (ptx-pt1[0])**2 + (pty-pt1[1])**2 ) /
+                           (cgi.widgetposn[2]-cgi.widgetposn[0]) )
+                angle = ( (math.atan2( pty-pt1[1], ptx-pt1[0] )
+                           * 180. / math.pi) % 360. )
+                return length, angle
+            length, angle = la(pt2[0], pt2[1])
+            # calculate length angle for neighbouring point, to get delta
+            ldelt, adelt = la(pt2[0]+1, pt2[1]+1)
 
             # update values
             l, a = list(s.length), list(s.angle)
