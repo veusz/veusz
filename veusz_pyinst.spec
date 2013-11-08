@@ -1,75 +1,56 @@
-# This is a pyinstaller script file
+# -*- mode: python -*-
 
-# to make the distribution you need to create a directory, e.g. temp
-# add a symlink called veusz inside temp, pointing to the veusz directory
+# linux pyinstaller file
 
-# you will need to edit the paths below to get the correct input directory
-
-from glob import glob
-import os.path
-import sys
-
-# platform specific stuff
-if sys.platform == 'win32':
-    # windows
-    name = r'buildveusz_pyinst\veusz.exe'
-    thisdir = r'c:\source\veusz'
-    console = 0
-    aargs = {'icon': os.path.join(thisdir,'windows/icons/veusz.ico')}
-    upx = True
-else:
-    # unix
-    name = 'buildveusz_pyinst/veusz'
-    thisdir = '/home/jss/veusz.qt4'
-    console = 1
-    aargs = {}
-    upx = False
-
-a = Analysis([os.path.join(HOMEPATH,'support/_mountzlib.py'),
-              os.path.join(HOMEPATH,'support/useUnicode.py'), 'veusz_main.py'],
-             pathex=[thisdir, os.path.join(thisdir, 'temp')],
-             excludes=['Tkinter', 'readline', 'termios'])
+a = Analysis(['veusz/veusz_main.py'],
+             pathex=['/home/jss/veusz'],
+             hiddenimports=[],
+             hookspath=None,
+             runtime_hooks=None)
 pyz = PYZ(a.pure)
+
 exe = EXE(pyz,
           a.scripts,
-          exclude_binaries=1,
-          name=name,
+          exclude_binaries=True,
+          name='veusz',
           debug=False,
-          strip=True,
-          upx=upx,
-          console=console,
-          **aargs)
+          strip=None,
+          upx=False,
+          console=True )
 
 # add necessary documentation, licence
 binaries = a.binaries
-for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README', 'INSTALL', 'COPYING',
-	'embed.py', '__init__.py'):
+for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README', 'INSTALL', 'COPYING'):
     binaries += [ (bin, bin, 'DATA') ]
 
+binaries += [
+    ('embed.py', 'veusz/embed.py', 'DATA'),
+    ('__init__.py', 'veusz/__init__.py', 'DATA'),
+    ]
+
 # add various required files to distribution
-for f in ( glob('windows/icons/*.png')  + glob('windows/icons/*.ico') +
-	   glob('windows/icons/*.svg') +
-           glob('examples/*.vsz') +
-           glob('examples/*.dat') + glob('examples/*.csv') +
-           glob('examples/*.py') +
-           glob('dialogs/*.ui') + glob('widgets/data/*.dat')):
+for f in ( glob.glob('icons/*.png')  + glob.glob('icons/*.ico') +
+	   glob.glob('icons/*.svg') +
+           glob.glob('examples/*.vsz') +
+           glob.glob('examples/*.dat') + glob.glob('examples/*.csv') +
+           glob.glob('examples/*.py') +
+           glob.glob('ui/*.ui') ):
     binaries.append( (f, f, 'DATA') )
 
-excludes = set(['ld-linux.so.2', 'libcom_err.so.3', 'libcrypto.so.4',
-                'libdl.so.2', 'libfontconfig.so.1', 'libfreetype.so.6',
-                'libgpm.so.1', 'libgssapi_krb5.so.2', 'libICE.so.6',
-                'libk5crypto.so.3', 'libkrb5.so.3', 'libncurses.so.5',
-                'libncursesw.so.5', 'libreadline.so.4', 'libresolv.so.2',
-                'libSM.so.6', 'libssl.so.4', 'libutil.so.1', 'libX11.so.6',
-                'libXext.so.6', 'libXrender.so.1', 'libz.so.1', 'readline.so',
-                'termios.so'])
-
+excludes = set([
+    'libfontconfig.so.1', 'libfreetype.so.6', 'libICE.so.6',
+    'libSM.so.6', 'libX11.so.6', 'libXau.so.6', 'libXdmcp.so.6',
+    'libXext.so.6', 'libXrender.so.1', 'libz.so.1', 'libutil.so.1',
+    'libQtNetwork.so.4', 'libreadline.so.5'
+    ])
 # remove libraries in the set above
 # works a lot better if we do this...
 binaries[:] = [b for b in binaries if b[0] not in excludes]
 
-coll = COLLECT( exe,
-                a.binaries, a.zipfiles, a.datas,
-                strip=False,
-                upx=upx,
-                name='distveusz_main' )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=None,
+               upx=False,
+               name='veusz')
