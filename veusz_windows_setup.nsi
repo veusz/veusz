@@ -5,11 +5,11 @@
 
 ; Change this to specify location to build installer from
 !define VEUSZ_SRC_DIR "c:\src\veusz-msvc\veusz"
-!define PYINST_DIR "${VEUSZ_SRC_DIR}\distveusz_main"
+!define PYINST_DIR "${VEUSZ_SRC_DIR}\dist\veusz_main"
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Veusz"
-!define PRODUCT_VERSION "1.13.999"
+;!define PRODUCT_VERSION "1.xx"
 !define PRODUCT_PUBLISHER "Jeremy Sanders"
 !define PRODUCT_WEB_SITE "http://home.gna.org/veusz/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\veusz.exe"
@@ -70,8 +70,8 @@ Function UninstallPrevious
 
     DetailPrint "Removing previous installation."
 
-    ; Run the uninstaller silently.
-    ExecWait '"$R0 /S"'
+    ; Run the uninstaller
+    ExecWait '"$R0" _?=$INSTDIR'
 
     Done:
 
@@ -84,8 +84,8 @@ Section "MainSection" SEC01
   File "${PYINST_DIR}\*.dll"
   File "${PYINST_DIR}\*.pyd"
   File "${PYINST_DIR}\*.manifest"
-  File "${VEUSZ_SRC_DIR}\embed.py"
-  File "${VEUSZ_SRC_DIR}\__init__.py"
+  File "${VEUSZ_SRC_DIR}\veusz\embed.py"
+  File "${VEUSZ_SRC_DIR}\veusz\__init__.py"
 
   CreateDirectory "$SMPROGRAMS\Veusz"
   CreateShortCut "$SMPROGRAMS\Veusz\Veusz.lnk" "$INSTDIR\veusz.exe"
@@ -96,13 +96,13 @@ Section "MainSection" SEC01
   File "${PYINST_DIR}\COPYING"
   File "${PYINST_DIR}\VERSION"
 
-  SetOutPath "$INSTDIR\windows\icons"
-  File "${PYINST_DIR}\windows\icons\*.png"
-  File "${PYINST_DIR}\windows\icons\*.ico"
-  File "${PYINST_DIR}\windows\icons\*.svg"
+  SetOutPath "$INSTDIR\icons"
+  File "${PYINST_DIR}\icons\*.png"
+  File "${PYINST_DIR}\icons\*.ico"
+  File "${PYINST_DIR}\icons\*.svg"
 
-  SetOutPath "$INSTDIR\dialogs"
-  File "${PYINST_DIR}\dialogs\*.ui"
+  SetOutPath "$INSTDIR\ui"
+  File "${PYINST_DIR}\ui\*.ui"
 
   SetOutPath "$INSTDIR\examples"
   File "${PYINST_DIR}\examples\*.vsz"
@@ -172,10 +172,10 @@ Section Uninstall
   Delete "$INSTDIR\qt4_plugins\iconengines\*.dll"
   Delete "$INSTDIR\qt4_plugins\imageformats\*.dll"
 
-  Delete "$INSTDIR\windows\icons\*.png"
-  Delete "$INSTDIR\windows\icons\*.ico"
-  Delete "$INSTDIR\windows\icons\*.svg"
-  Delete "$INSTDIR\dialogs\*.ui"
+  Delete "$INSTDIR\icons\*.png"
+  Delete "$INSTDIR\icons\*.ico"
+  Delete "$INSTDIR\icons\*.svg"
+  Delete "$INSTDIR\ui\*.ui"
   Delete "$INSTDIR\examples\*.*"
 
   Delete "$SMPROGRAMS\Veusz\Uninstall.lnk"
@@ -187,10 +187,8 @@ Section Uninstall
   RMDir "$INSTDIR\qt4_plugins\iconengines"
   RMDIR "$INSTDIR\qt4_plugins\imageformats"
   RMDir "$INSTDIR\qt4_plugins"
-  RMDir "$INSTDIR\windows\icons"
-  RMDIR "$INSTDIR\windows"
-  RMDIR "$INSTDIR\widgets"
-  RMDir "$INSTDIR\dialogs"
+  RMDIR "$INSTDIR\icons"
+  RMDir "$INSTDIR\ui"
   RMDIR "$INSTDIR\examples"
   RMDir "$INSTDIR"
 
