@@ -103,12 +103,12 @@ if py2app and sys.platform == 'darwin':
     
     extraoptions = {
         'setup_requires': ['py2app'],
-        'app': ['veusz_main.py'],
+        'app': ['veusz/veusz_main.py'],
         'options': { 'py2app': {'argv_emulation': True,
                                 'includes': ('veusz.helpers._nc_cntr',
                                              'veusz.helpers.qtloops'),
                                 'plist': plist,
-                                'iconfile': 'veusz/windows/icons/veusz.icns',
+                                'iconfile': 'icons/veusz.icns',
                                 }
                      }
 	}
