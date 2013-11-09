@@ -6,7 +6,9 @@ a = Analysis(['veusz\\veusz_main.py'],
              runtime_hooks=None)
 
 # get rid of debugging binaries
-a.binaries = [b for b in a.binaries if b[0][-6:] != 'd4.dll']
+#a.binaries = [b for b in a.binaries if b[0][-6:] != 'd4.dll']
+# this doesn't work - have to go and delete the debugging libraries from Qt
+# otherwise, we get sxs errors
 
 # don't want kernel32, etc
 a.binaries = [b for b in a.binaries if not (os.path.basename(b[0]) in
