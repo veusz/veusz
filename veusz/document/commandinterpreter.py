@@ -206,7 +206,7 @@ class CommandInterpreter(object):
 
         # actually run the code
         try:
-            cexec(fileobject, self.globals)
+            cexec(fileobject.read(), self.globals)
         except Exception:
             # print out the backtrace to stderr
             i = sys.exc_info()

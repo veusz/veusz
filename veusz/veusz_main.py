@@ -95,23 +95,12 @@ def listen(args, quiet):
 def export(exports, args):
     '''A shortcut to load a set of files and export them.'''
     from veusz import document
+    from veusz import utils
     for expfn, vsz in czip(exports, args[1:]):
         doc = document.Document()
         ci = document.CommandInterpreter(doc)
         ci.Load(vsz)
         ci.run('Export(%s)' % repr(expfn))
-
-def mainwindow(args):
-    '''Open the main window with any loaded files.'''
-    from veusz.windows.mainwindow import MainWindow
-
-    if len(args) > 1:
-        # load in filenames given
-        for filename in args[1:]:
-            MainWindow.CreateWindow(filename)
-    else:
-        # create blank window
-        MainWindow.CreateWindow()
 
 def convertArgsUnicode(args):
     '''Convert set of arguments to unicode.
@@ -129,40 +118,115 @@ def convertArgsUnicode(args):
             out.append(a)
     return out
 
-def initImports():
-    '''Do imports and start up DBUS/SAMP.'''
-    from veusz import setting
-    from veusz import widgets
-
 class ImportThread(qt4.QThread):
     '''Do import of main code within another thread.
     Main application runs when this is done
     '''
     def run(self):
-        initImports()
+        from veusz import setting
+        from veusz import widgets
 
-class AppRunner(qt4.QObject):
-    '''Object to run application. We have to do this to get an
-    event loop while importing, etc.'''
+class VeuszApp(qt4.QApplication):
+    """Event which can open mac files."""
 
-    def __init__(self, options, args):
+    def __init__(self, args):
+        qt4.QApplication.__init__(self, args)
 
-        qt4.QObject.__init__(self)
+        self.connect(self, qt4.SIGNAL('lastWindowClosed()'),
+                     self, qt4.SLOT('quit()'))
 
+        # register a signal handler to catch ctrl+C
+        signal.signal(signal.SIGINT, handleIntSignal)
+
+        # parse command line options
+        parser = optparse.OptionParser(
+            usage='%prog [options] filename.vsz ...',
+            version=copyr % utils.version())
+        parser.add_option('--unsafe-mode', action='store_true',
+                          help='disable safety checks when running documents'
+                          ' or scripts')
+        parser.add_option('--listen', action='store_true',
+                          help='read and execute Veusz commands from stdin,'
+                          ' replacing veusz_listen')
+        parser.add_option('--quiet', action='store_true',
+                          help='if in listening mode, do not open a window but'
+                          ' execute commands quietly')
+        parser.add_option('--export', action='append', metavar='FILE',
+                          help='export the next document to this'
+                          ' output image file, exiting when finished')
+        parser.add_option('--embed-remote', action='store_true',
+                          help=optparse.SUPPRESS_HELP)
+        parser.add_option('--plugin', action='append', metavar='FILE',
+                          help='load the plugin from the file given for '
+                          'the session')
+        parser.add_option('--translation', metavar='FILE',
+                          help='load the translation .qm file given')
+        options, args = parser.parse_args(self.argv())
+
+        # export files to make images
+        if options.export and len(options.export) != len(args)-1:
+            parser.error(
+                'export option needs same number of documents and '
+                'output files')
+
+        # convert args to unicode from filesystem strings
+        self.args = convertArgsUnicode(args)
+        self.options = options
+
+        self.openeventfiles = []
+        self.startupdone = False
         self.splash = None
-        if not (options.listen or options.export):
+
+    def openMainWindow(self, args):
+        """Open the main window with any loaded files."""
+        from veusz.windows.mainwindow import MainWindow
+
+        emptywins = []
+        for w in self.topLevelWidgets():
+            if isinstance(w, MainWindow) and w.document.isBlank():
+                emptywins.append(w)
+
+        if len(args) > 1:
+            # load in filenames given
+            for filename in args[1:]:
+                if not emptywins:
+                    MainWindow.CreateWindow(filename)
+                else:
+                    emptywins[0].openFile(filename)
+        else:
+            # create blank window
+            MainWindow.CreateWindow()
+
+    def checkOpen(self):
+        """If startup complete, open any files."""
+        if self.startupdone:
+            self.openMainWindow([None] + self.openeventfiles)
+            del self.openeventfiles[:]
+        else:
+            qt4.QTimer.singleShot(100, self.checkOpen)
+
+    def event(self, event):
+        """Handle events. This is the only way to get the FileOpen event."""
+        if event.type() == qt4.QEvent.FileOpen:
+            self.openeventfiles.append(event.file())
+            # need to wait until startup has finished
+            qt4.QTimer.singleShot(100, self.checkOpen)
+            return True
+        return qt4.QApplication.event(self, event)
+
+    def startup(self):
+        """Do startup."""
+
+        if not (self.options.listen or self.options.export):
             # show the splash screen on normal start
             self.splash = qt4.QSplashScreen(makeSplashLogo())
             self.splash.show()
 
-        self.options = options
-        self.args = args
-
         # optionally load a translation
-        if options.translation:
+        if self.options.translation:
             trans = qt4.QTranslator()
             trans.load(options.translation)
-            qt4.qApp.installTranslator(trans)
+            self.installTranslator(trans)
 
         self.thread = ImportThread()
         self.connect( self.thread, qt4.SIGNAL('finished()'),
@@ -170,7 +234,7 @@ class AppRunner(qt4.QObject):
         self.thread.start()
 
     def slotStartApplication(self):
-        '''Main start of application.'''
+        """Start app, after modules imported."""
 
         options = self.options
         args = self.args
@@ -199,15 +263,16 @@ class AppRunner(qt4.QObject):
             listen(args, quiet=options.quiet)
         elif options.export:
             export(options.export, args)
-            qt4.qApp.quit()
+            self.quit()
             sys.exit(0)
         else:
             # standard start main window
-            mainwindow(args)
+            self.openMainWindow(args)
+            self.startupdone = True
 
         # clear splash when startup done
         if self.splash is not None:
-            self.splash.finish(qt4.qApp.topLevelWidgets()[0])
+            self.splash.finish(self.topLevelWidgets()[0])
 
 def run():
     '''Run the main application.'''
@@ -230,48 +295,8 @@ def run():
     # the idea is to postpone the imports until the splash screen
     # is shown
 
-    app = qt4.QApplication(sys.argv)
-    app.connect(app, qt4.SIGNAL('lastWindowClosed()'),
-                app, qt4.SLOT('quit()'))
-
-    # register a signal handler to catch ctrl+C
-    signal.signal(signal.SIGINT, handleIntSignal)
-
-    # parse command line options
-    parser = optparse.OptionParser(
-        usage='%prog [options] filename.vsz ...',
-        version=copyr % utils.version())
-    parser.add_option('--unsafe-mode', action='store_true',
-                      help='disable safety checks when running documents'
-                      ' or scripts')
-    parser.add_option('--listen', action='store_true',
-                      help='read and execute Veusz commands from stdin,'
-                      ' replacing veusz_listen')
-    parser.add_option('--quiet', action='store_true',
-                      help='if in listening mode, do not open a window but'
-                      ' execute commands quietly')
-    parser.add_option('--export', action='append', metavar='FILE',
-                      help='export the next document to this'
-                      ' output image file, exiting when finished')
-    parser.add_option('--embed-remote', action='store_true',
-                      help=optparse.SUPPRESS_HELP)
-    parser.add_option('--plugin', action='append', metavar='FILE',
-                      help='load the plugin from the file given for '
-                      'the session')
-    parser.add_option('--translation', metavar='FILE',
-                      help='load the translation .qm file given')
-    options, args = parser.parse_args( app.argv() )
-    
-    # export files to make images
-    if options.export and len(options.export) != len(args)-1:
-        parser.error(
-            'export option needs same number of documents and '
-            'output files')
-
-    # convert args to unicode from filesystem strings
-    args = convertArgsUnicode(args)
-
-    s = AppRunner(options, args)
+    app = VeuszApp(sys.argv)
+    app.startup()
     app.exec_()
 
 # if ran as a program
