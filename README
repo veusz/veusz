@@ -14,13 +14,12 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.19:
  * Make code compatible with python3
- * Changes to filesystem layout of module
  * Separation of python module and resources in source package
    (packagers may need to consult INSTALL)
  * Move to v2 of PyQt API
  * Remove deprecated numpy API from helpers module
- * Allow fits dataset names to be blank if prefix/suffix are not
- * New ast-based code checker
+ * Allow FITS dataset names to be blank if prefix/suffix are not
+ * New ast-based code security checker
  * Picker uses 1-based index for consistency
  * Allow non-text datasets to be used for labels
  * Add number->text conversion dataset plugin
@@ -39,6 +38,7 @@ Bug fixes:
  * Renaming datasets, widgets and editing data now allow original
    text to be edited, rather than being cleared
  * Fix line positions on broken axes
+ * OS X Mavericks - fixes for opening files from finder and fonts
 
 Features of package:
  Plotting features:
@@ -85,7 +85,7 @@ Features of package:
   * Multithreaded rendering
 
 Requirements for source install:
- Python 2.x (2.6 or greater required)
+ Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
    http://www.python.org/
  Qt >= 4.4 (free edition)
    http://www.trolltech.com/products/qt/
