@@ -494,20 +494,56 @@ def isiternostr(i):
     """Is this iterator, but not a string?"""
     return hasattr(i, '__iter__') and not isinstance(i, cbasestr)
 
-def round2delt(v, delt):
-    """Choose an appropriate number of decimal places to round
-    value to.  This takes a value and neighbouring value. We
-    look where they start to differ when converted to text.
-    """
-    if not N.isfinite(delt):
-        return v
+def nextfloat(fin):
+    """Return (approximately) next float value (for f>0)."""
+    d = 2**-52
+    split = N.frexp(fin)
+    while True:
+        fout = N.ldexp(split[0] + d, split[1])
+        if fin != fout:
+            return fout
+        d *= 2
 
-    s1 = '%400.200f' % abs(v)
-    s2 = '%400.200f' % abs(delt)
-    i = 0
-    while i < len(s1) and s1[i] == s2[i]:
-        i += 1
+def round2delt(fin1, fin2):
+    """Take two float values. Return value rounded to number
+    of decimal places where they differ."""
 
-    # replace all numbers right of text with zeros
-    rounded = s1[:i+1] + re.sub('[1-9]', '0', s1[i+1:])
-    return float(rounded) * float(N.sign(v))
+    if not N.isfinite(fin1) or not N.isfinite(fin2):
+        return fin1
+
+    # round up to next value to avoid 0.999999...
+    f1 = nextfloat(abs(fin1))
+    f2 = nextfloat(abs(fin2))
+
+    maxlog = int( max(N.log10(f1), N.log10(f2)) + 1 )
+    # note: out2 unused, but useful for debugging
+    if maxlog < 0:
+        out1 = out2 = '0.' + '0'*(-1-maxlog)
+    else:
+        out1 = out2 = ''
+
+    for i in xrange(maxlog,-200,-1):
+        p = 10**i
+        d1, d2 = int(f1/p), int(f2/p)
+        f1 -= int(d1)*p
+        f2 -= int(d2)*p
+
+        c1 = chr(d1 + 48) # 48 == '0'
+        c2 = chr(d2 + 48)
+        out1 += c1
+        out2 += c2
+
+        if c1 != c2 and p < abs(fin1): # at least 1 sig fig
+            if i > 0:
+                # add missing zeros
+                out1 += '0'*i
+                out2 += '0'*i
+            break
+
+        if i == 0:
+            out1 += '.'
+            out2 += '.'
+
+    # convert back to float for output
+    fout = float(out1)
+    return fout if fin1 > 0 else -fout
