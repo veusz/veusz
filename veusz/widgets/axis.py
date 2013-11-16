@@ -1161,10 +1161,10 @@ class Axis(widget.Widget):
                 c1delt, c2delt = c2delt, c1delt
 
             ops = []
-            if s.min == 'Auto' or not N.allclose(c1, s.min):
+            if s.min == 'Auto' or not N.allclose(c1, s.min, rtol=1e-8):
                 ops.append( document.OperationSettingSet(
                         s.get('min'), utils.round2delt(c1, c1delt)) )
-            if s.max == 'Auto' or not N.allclose(c2, s.max):
+            if s.max == 'Auto' or not N.allclose(c2, s.max, rtol=1e-8):
                 ops.append( document.OperationSettingSet(
                         s.get('max'), utils.round2delt(c2, c2delt)) )
 
