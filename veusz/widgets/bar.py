@@ -447,6 +447,10 @@ class BarPlotter(GenericPlotter):
         # coordinates of origin
         zerocoords = vaxis.dataToPlotterCoords(widgetposn, N.zeros(posns.shape))
 
+        # bail out if problem
+        if len(zerocoords) == 0 or len(posns) == 0:
+            return
+
         # draw areas (reverse order, so edges are plotted correctly)
         for dsnum, coords in czip( crange(len(stackedcoords)-1, -1, -1),
                                    stackedcoords[::-1]):
