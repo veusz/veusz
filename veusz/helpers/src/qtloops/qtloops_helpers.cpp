@@ -27,14 +27,17 @@ namespace
   // python3 numpy import_array is a macro with a return (how stupid),
   // so we have to wrap it up to get it to portably compile
 #if PY_MAJOR_VERSION >= 3
-  int
+  void* do_import()
+  {
+    import_array();
+    return 0;
+  }
 #else
-  void
-#endif
-  do_import()
+  void do_import()
   {
     import_array();
   }
+#endif
 }
 
 void do_numpy_init_package()
