@@ -122,7 +122,7 @@ Section "MainSection" SEC01
   WriteRegStr HKCR ".vsz" "" "Veusz.Document"
   WriteRegStr HKCR "Veusz.Document" "" "Veusz document"
   WriteRegStr HKCR "Veusz.Document\shell\open\command" "" '"$INSTDIR\veusz.exe" "%1"'
-  WriteRegStr HKCR "Veusz.Document\DefaultIcon" "" '"$INSTDIR\windows\icons\veusz.ico"'
+  WriteRegStr HKCR "Veusz.Document\DefaultIcon" "" '"$INSTDIR\icons\veusz.ico"'
 SectionEnd
 
 Section -AdditionalIcons
