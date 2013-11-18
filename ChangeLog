@@ -1,3 +1,30 @@
+Changes in 1.19:
+ * Make code compatible with python3
+ * Separation of python module and resources in source package
+   (packagers may need to consult INSTALL)
+ * Move to v2 of PyQt API
+ * Remove deprecated numpy API from helpers module
+ * Allow FITS dataset names to be blank if prefix/suffix are not
+ * New ast-based code security checker
+ * Picker uses 1-based index for consistency
+ * Allow non-text datasets to be used for labels
+ * Add number->text conversion dataset plugin
+ * Add binning dataset plugin
+ * Allow more significant figures in float values
+ * Intelligent choice of significant figures when interactively
+   changing axis range
+ * Decrease minimum range of axis
+ * Add notes setting to document, pages and graphs
+
+Bug fixes:
+ * Fix crash if other linked axis not initialized
+ * Fix crash if trying to edit non-editable datasets
+ * Make ignore exception work in error reporting dialog
+ * Renaming datasets, widgets and editing data now allow original
+   text to be edited, rather than being cleared
+ * Fix line positions on broken axes
+ * OS X Mavericks - fixes for opening files from finder and fonts
+
 Changes in 1.18:
  * Add support for dataset expressions when plotting
  * Add axis-function widget for plotting axes which have a scale given
