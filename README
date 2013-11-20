@@ -1,5 +1,5 @@
-Veusz 1.19
-----------
+Veusz 1.19.1
+------------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -11,6 +11,13 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Bug fixes in 1.19.1:
+ * Fix broken drag and drop in documents
+ * Fix deleted C/C++ object crash when using undo
+ * Fix compilation in MSVC for Python 3
+ * Remove warning/error in compilation in gcc in SUSE
+ * Add Python version classifiers
 
 Changes in 1.19:
  * Make code compatible with python3
