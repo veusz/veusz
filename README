@@ -14,7 +14,7 @@ external sources such as Internet sockets or other programs.
 
 Bug fixes in 1.19.1:
  * Fix broken drag and drop in documents
- * Fix deleted C/C++ object crash when using undo
+ * Fix deleted C/C++ object crash when using undo and in tutorial
  * Fix compilation in MSVC for Python 3
  * Remove warning/error in compilation in gcc in SUSE
  * Add Python version classifiers

@@ -784,8 +784,7 @@ class TutorialDock(qt4.QDockWidget):
 
         # timer for controlling flashing
         self.flashtimer = qt4.QTimer(self)
-        self.connect(self.flashtimer, qt4.SIGNAL('timeout()'),
-                     self.slotFlashTimeout)
+        self.flashtimer.timeout.connect(self.slotFlashTimeout)
         self.flash = self.oldflash = None
         self.flashon = False
         self.flashct = 0
@@ -828,6 +827,8 @@ class TutorialDock(qt4.QDockWidget):
                 'Close', qt4.QDialogButtonBox.ActionRole)
             self.connect(closeb, qt4.SIGNAL('clicked()'), self.close)
 
+    # work around C/C++ object deleted
+    @qt4.pyqtSlot()
     def slotFlashTimeout(self):
         '''Handle flashing of UI components.'''
 
