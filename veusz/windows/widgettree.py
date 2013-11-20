@@ -324,7 +324,7 @@ class WidgetTreeView(qt4.QTreeView):
 
         if index.isValid():
             parent = self.model().getWidget(index)
-            data = document.getWidgetMime(event.mimeData)
+            data = document.getWidgetMime(event.mimeData())
             if document.isMimeDropable(parent, data):
                 # move the widget!
                 parentpath = parent.path
