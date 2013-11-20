@@ -433,6 +433,13 @@ class PropertyList(qt4.QWidget):
         while len(self.childlist) > 0:
             c = self.childlist.pop()
             self.layout.removeWidget(c)
+            if isinstance(c, SettingLabel):
+                # if we don't disconnect, this can give an C/C++
+                # object deleted message. This can be reproduced by
+                # dragging a widget between two documents and
+                # undoing. This is a bit cargo-cult, as I'm not quite
+                # sure why this happens.
+                c.disconnectModified()
             c.deleteLater()
             del c
 
@@ -1237,6 +1244,12 @@ class SettingLabel(qt4.QWidget):
 
         # initialise settings
         self.slotDocModified()
+
+    def disconnectModified(self):
+        """Needed because document can be modified before the widget
+        goes away."""
+        self.disconnect(self.document, qt4.SIGNAL('sigModified'),
+                        self.slotDocModified)
 
     def mouseReleaseEvent(self, event):
         """Emit clicked(pos) on mouse release."""
