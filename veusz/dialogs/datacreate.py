@@ -65,8 +65,7 @@ class DataCreateDialog(VeuszDialog):
                       self.createButtonClicked )
 
         # connect notification of document change
-        self.connect( self.document, qt4.SIGNAL("sigModified"),
-                      self.modifiedDocSlot )
+        self.document.signalModified.connect(self.modifiedDocSlot)
 
         # set validators for edit controls
         self.numstepsedit.setValidator( qt4.QIntValidator(1, 99999999, self) )

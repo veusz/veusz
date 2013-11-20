@@ -209,8 +209,7 @@ class MainWindow(qt4.QMainWindow):
                       self.slotUpdatePickerLabel )
 
         # disable save if already saved
-        self.connect( self.document, qt4.SIGNAL("sigModified"),
-                      self.slotModifiedDoc )
+        self.document.signalModified.connect(self.slotModifiedDoc)
         # if the treeeditwindow changes the page, change the plot window
         self.connect( self.treeedit, qt4.SIGNAL("sigPageChanged"),
                       self.plot.setPageNumber )

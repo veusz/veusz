@@ -39,8 +39,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         self.document = document
 
-        self.connect( self.document, qt4.SIGNAL("sigModified"),
-                      self.slotDocumentModified )
+        document.signalModified.connect(self.slotDocumentModified)
         self.connect( self.document, qt4.SIGNAL("sigWiped"),
                       self.slotDocumentModified )
 

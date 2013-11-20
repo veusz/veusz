@@ -257,8 +257,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.document = document
         self.docchangeset = -100
         self.oldpagenumber = -1
-        self.connect(self.document, qt4.SIGNAL("sigModified"),
-                     self.slotDocModified)
+        self.document.signalModified.connect(self.slotDocModified)
 
         # state of last plot from painthelper
         self.painthelper = None
@@ -272,7 +271,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # for rendering plots in separate threads
         self.rendercontrol = RenderControl(self)
         self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
-        self.slotRenderFinished)
+                     self.slotRenderFinished)
 
         # mode for clicking
         self.clickmode = 'select'

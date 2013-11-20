@@ -433,13 +433,6 @@ class PropertyList(qt4.QWidget):
         while len(self.childlist) > 0:
             c = self.childlist.pop()
             self.layout.removeWidget(c)
-            if isinstance(c, SettingLabel):
-                # if we don't disconnect, this can give an C/C++
-                # object deleted message. This can be reproduced by
-                # dragging a widget between two documents and
-                # undoing. This is a bit cargo-cult, as I'm not quite
-                # sure why this happens.
-                c.disconnectModified()
             c.deleteLater()
             del c
 
@@ -1218,7 +1211,7 @@ class SettingLabel(qt4.QWidget):
         self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         self.document = document
-        self.connect(document, qt4.SIGNAL('sigModified'), self.slotDocModified)
+        document.signalModified.connect(self.slotDocModified)
 
         self.setting = setting
         self.setnsproxy = setnsproxy
@@ -1245,12 +1238,6 @@ class SettingLabel(qt4.QWidget):
         # initialise settings
         self.slotDocModified()
 
-    def disconnectModified(self):
-        """Needed because document can be modified before the widget
-        goes away."""
-        self.disconnect(self.document, qt4.SIGNAL('sigModified'),
-                        self.slotDocModified)
-
     def mouseReleaseEvent(self, event):
         """Emit clicked(pos) on mouse release."""
         self.emit( qt4.SIGNAL('clicked'),
@@ -1266,6 +1253,11 @@ class SettingLabel(qt4.QWidget):
         else:
             return qt4.QWidget.keyReleaseEvent(self, event)
 
+    # Mark as a qt slot. This fixes a bug where you get C/C++ object
+    # deleted messages when the document emits signalModified but this
+    # widget has been deleted. This can be reproduced by dragging a
+    # widget between two windows, then undoing.
+    @qt4.pyqtSlot()
     def slotDocModified(self):
         """If the document has been modified."""
 

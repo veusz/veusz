@@ -90,8 +90,7 @@ class HistoDataDialog(VeuszDialog):
         self.binmodel = ManualBinModel(self.bindata)
         self.binmanuals.setModel(self.binmodel)
 
-        self.connect(document, qt4.SIGNAL("sigModified"),
-                     self.updateDatasetLists)
+        document.signalModified.connect(self.updateDatasetLists)
         self.updateDatasetLists()
 
     def escapeDatasets(self, dsnames):

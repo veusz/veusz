@@ -36,8 +36,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
         self.document = document
 
         # connect notification of document change
-        self.connect( self.document, qt4.SIGNAL('sigModified'),
-                      self.doUpdate )
+        document.signalModified.connect(self.doUpdate)
 
     def rowCount(self, parent):
         if parent.isValid():

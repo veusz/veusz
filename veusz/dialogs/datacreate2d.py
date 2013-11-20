@@ -63,8 +63,7 @@ class DataCreate2DDialog(VeuszDialog):
         self.connect( self.from2dexpr, qt4.SIGNAL('toggled(bool)'),
                       self.from2dexprSlot )
 
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.updateDatasetLists)
+        document.signalModified.connect(self.updateDatasetLists)
 
         for combo in (self.namecombo, self.xexprcombo, self.yexprcombo,
                       self.zexprcombo):

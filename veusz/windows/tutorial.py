@@ -56,8 +56,7 @@ class TutorialStep(qt4.QObject):
 
         self.nextonsetting = nextonsetting
         if nextonsetting is not None:
-            self.connect( mainwin.document,
-                          qt4.SIGNAL('sigModified'), self.slotNextSetting )
+            mainwin.document.signalModified.connect(self.slotNextSetting)
 
         self.nextonselected = nextonselected
         if nextonselected is not None:
@@ -386,8 +385,7 @@ to the original file.</p>
 '''), mainwin,
             nextstep=DataImportDialog3,
             disablenext=True)
-        self.connect( mainwin.document,
-                      qt4.SIGNAL('sigModified'), self.slotDocModified )
+        mainwin.document.signalModified.connect(self.slotDocModified)
 
     def slotDocModified(self):
         if 'alpha' in self.mainwin.document.data:
@@ -642,8 +640,7 @@ deletes it from the document.</p>
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.cut']),
             nextstep=AddGrid)
-        self.connect( mainwin.document,
-                      qt4.SIGNAL('sigModified'), self.slotCheckDelete )
+        mainwin.document.signalModified.connect(self.slotCheckDelete)
 
     def slotCheckDelete(self, *args):
         d = self.mainwin.document

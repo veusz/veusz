@@ -621,7 +621,7 @@ class Dataset(qt4.QWidget):
         self.datatype = datatype
         self.lastdatasets = None
         self._populateEntries()
-        self.connect(document, qt4.SIGNAL("sigModified"), self.slotModified)
+        document.signalModified.connect(self.slotModified)
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
@@ -984,8 +984,7 @@ class WidgetSelector(Choice):
 
         Choice.__init__(self, setting, True, [], parent)
         self.document = document
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotModified)
+        document.signalModified.connect(self.slotModified)
 
     def _populateEntries(self):
         pass

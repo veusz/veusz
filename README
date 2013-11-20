@@ -18,6 +18,7 @@ Bug fixes in 1.19.1:
  * Fix compilation in MSVC for Python 3
  * Remove warning/error in compilation in gcc in SUSE
  * Add Python version classifiers
+ * Fix document icons in Windows binary
 
 Changes in 1.19:
  * Make code compatible with python3

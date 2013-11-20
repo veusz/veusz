@@ -111,7 +111,7 @@ class _WidgetCombo(qt4.QComboBox):
         self.widgettypes = widgettypes
         self.default = default
         self.updateWidgets()
-        self.connect(doc, qt4.SIGNAL("sigModified"), self.updateWidgets)
+        doc.signalModified.connect(self.updateWidgets)
 
     def _iterateWidgets(self, comboitems, paths, widget, level):
         """Walk widget tree recursively.

@@ -208,7 +208,7 @@ class DatasetRelationModel(TreeModel):
         self.filterdtype = filterdtype
         self.refresh()
 
-        self.connect(doc, qt4.SIGNAL("sigModified"), self.refresh)
+        doc.signalModified.connect(self.refresh)
 
     def datasetFilterOut(self, ds, node):
         """Should dataset be filtered out by filter options."""

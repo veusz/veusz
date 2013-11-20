@@ -44,8 +44,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        document.signalModified.connect(self.slotDocumentModified)
 
     def rowCount(self, parent):
         """Return number of rows."""
@@ -180,8 +179,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsnames = datasetnames
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        document.signalModified.connect(self.slotDocumentModified)
 
         self.changeset = -1
         self.rows = 0
@@ -343,8 +341,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        document.signalModified.connect(self.slotDocumentModified)
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -486,8 +483,7 @@ class DataEditDialog(VeuszDialog):
         self.linkedlabel.viewport().setBackgroundRole(qt4.QPalette.Window)
 
         # document changes
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        document.signalModified.connect(self.slotDocumentModified)
 
         # select first item, if any or initialise if none
         if len(self.document.data) > 0:

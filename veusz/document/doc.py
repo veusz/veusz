@@ -82,6 +82,9 @@ class Document( qt4.QObject ):
 
     pluginsloaded = False
 
+    # this is emitted when the document is modified
+    signalModified = qt4.pyqtSignal(int)
+
     def __init__(self):
         """Initialise the document."""
         qt4.QObject.__init__( self )
@@ -388,7 +391,7 @@ class Document( qt4.QObject ):
         self.changeset += 1
 
         if len(self.suspendupdates) == 0:
-            self.emit( qt4.SIGNAL("sigModified"), ismodified )
+            self.signalModified.emit(ismodified)
 
     def isModified(self):
         """Return whether modified flag set."""
