@@ -1236,7 +1236,7 @@ class SettingLabel(qt4.QWidget):
         self.inmenu = False
 
         # initialise settings
-        self.slotDocModified()
+        self.slotDocModified(True)
 
     def mouseReleaseEvent(self, event):
         """Emit clicked(pos) on mouse release."""
@@ -1257,8 +1257,8 @@ class SettingLabel(qt4.QWidget):
     # deleted messages when the document emits signalModified but this
     # widget has been deleted. This can be reproduced by dragging a
     # widget between two windows, then undoing.
-    @qt4.pyqtSlot()
-    def slotDocModified(self):
+    @qt4.pyqtSlot(int)
+    def slotDocModified(self, ismodified):
         """If the document has been modified."""
 
         # update pixmap (e.g. link added/removed)

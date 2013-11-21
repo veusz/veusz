@@ -68,6 +68,9 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 class RenderControl(qt4.QObject):
     """Object for rendering plots in a separate thread."""
 
+    signalRenderFinished = qt4.pyqtSignal(
+        int, qt4.QImage, document.PaintHelper)
+
     def __init__(self, plotwindow):
         """Start up numthreads rendering threads."""
         qt4.QObject.__init__(self)
@@ -140,8 +143,7 @@ class RenderControl(qt4.QObject):
             self.mutex.lock()
             # just throw away result if it older than the latest one
             if jobid > self.latestdrawnjob:
-                self.emit( qt4.SIGNAL("renderfinished"),
-                              jobid, img, helper )
+                self.signalRenderFinished.emit(jobid, img, helper)
                 self.latestdrawnjob = jobid
             self.mutex.unlock()
 
@@ -270,8 +272,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # for rendering plots in separate threads
         self.rendercontrol = RenderControl(self)
-        self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
-                     self.slotRenderFinished)
+        self.rendercontrol.signalRenderFinished.connect(
+            self.slotRenderFinished)
 
         # mode for clicking
         self.clickmode = 'select'
@@ -282,8 +284,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
-        self.connect( self.timer, qt4.SIGNAL('timeout()'),
-                      self.checkPlotUpdate )
+        self.timer.timeout.connect(self.checkPlotUpdate)
 
         # for drag scrolling
         self.grabpos = None
@@ -291,8 +292,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.scrolltimer.setSingleShot(True)
 
         # for turning clicking into scrolling after a period
-        self.connect( self.scrolltimer, qt4.SIGNAL('timeout()'),
-                      self.slotBecomeScrollClick )
+        self.scrolltimer.timeout.connect(self.slotBecomeScrollClick)
 
         # get plot view updating policy
         #  -1: update on document changes
@@ -436,8 +436,7 @@ class PlotWindow( qt4.QGraphicsView ):
             zoomag.addAction(a)
             a.vzname = act
         actions['view.zoommenu'].setMenu(zoommenu)
-        self.connect(zoomag, qt4.SIGNAL('triggered(QAction*)'),
-                     self.zoomActionTriggered)
+        zoomag.triggered.connect(self.zoomActionTriggered)
 
         lastzoom = setting.settingdb.get('view_defaultzoom', 'view.zoompage')
         self.updateZoomMenuButton(actions[lastzoom])
@@ -456,8 +455,7 @@ class PlotWindow( qt4.QGraphicsView ):
             actions[a].setActionGroup(grp)
             actions[a].setCheckable(True)
         actions['view.select'].setChecked(True)
-        self.connect( grp, qt4.SIGNAL('triggered(QAction*)'),
-                      self.slotSelectMode )
+        grp.triggered.connect(self.slotSelectMode)
 
         return self.viewtoolbar
 
@@ -869,6 +867,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Get the the selected page."""
         return self.pagenumber
 
+    @qt4.pyqtSlot(int)
     def slotDocModified(self, ismodified):
         """Update plot on document being modified."""
         # only update if doc is modified and the update policy is set
@@ -972,7 +971,7 @@ class PlotWindow( qt4.QGraphicsView ):
             act = intgrp.addAction(text)
             act.setCheckable(True)
             fn = utils.BoundCaller(self.actionSetTimeout, intv)
-            self.connect(act, qt4.SIGNAL('triggered(bool)'), fn)
+            act.triggered.connect(fn)
             if intv == self.interval:
                 act.setChecked(True)
             submenu.addAction(act)
