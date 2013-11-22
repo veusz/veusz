@@ -130,6 +130,36 @@ void addNumpyPolygonToPath(QPainterPath &path, const Tuple2Ptrs& d,
     }
 }
 
+namespace
+{
+
+  // Scale path by scale given. Puts output in out.
+  void scalePath(const QPainterPath& path, qreal scale, QPainterPath& out)
+  {
+    const int count = path.elementCount();
+    for(int i=0; i<count; ++i)
+      {
+	const QPainterPath::Element& el = path.elementAt(i);
+	if(el.isMoveTo())
+	  {
+	    out.moveTo(el*scale);
+	  }
+	else if(el.isLineTo())
+	  {
+	    out.lineTo(el*scale);
+	  }
+	else if(el.isCurveTo())
+	  {
+	    out.cubicTo(el*scale,
+			path.elementAt(i+1)*scale,
+			path.elementAt(i+2)*scale);
+	    i += 2;
+	  }
+      }
+  }
+
+} // namespace
+
 void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
 			const Numpy1DObj* scaling,
@@ -169,12 +199,7 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
       if( cliprect.contains(pt) && ! smallDelta(lastpt, pt) )
 	{
 	  painter.translate(pt);
-	  if( scaling != 0 )
-	    {
-	      // scale point if requested
-	      const qreal s = (*scaling)(i);
-	      painter.scale(s, s);
-	    }
+
 	  if( colorimg != 0 )
 	    {
 	      // get color from pixel and create a new brush
@@ -182,7 +207,19 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 	      painter.setBrush(b);
 	    }
 
-	  painter.drawPath(path);
+	  if( scaling == 0 )
+	    {
+	      painter.drawPath(path);
+	    }
+	  else
+	    {
+	      // scale point if requested
+	      const qreal s = (*scaling)(i);
+	      QPainterPath scaled;
+	      scalePath(path, s, scaled);
+	      painter.drawPath(scaled);
+	    }
+
 	  painter.setWorldTransform(origtrans);
 	  lastpt = pt;
 	}

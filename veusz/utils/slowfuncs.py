@@ -78,6 +78,23 @@ def addNumpyPolygonToPath(path, clip, *args):
                 path.addPolygon(cp)
             path.closeSubpath()
 
+def scalePath(path, scale, out):
+    """Put scaled path in out."""
+
+    i = 0
+    while i < path.elementCount():
+        el = path.elementAt(i)
+        if el.isMoveTo():
+            out.moveTo(qt4.QPointF(el)*scale)
+        elif el.isLineTo():
+            out.lineTo(qt4.QPointF(el)*scale)
+        elif el.isCurveTo():
+            out.cubicTo(qt4.QPointF(el)*scale,
+                        qt4.QPointF(path.elementAt(i+1))*scale,
+                        qt4.QPointF(path.elementAt(i+2))*scale);
+            i += 2
+        i += 1
+
 def plotPathsToPainter(painter, path, x, y, scaling=None,
                        clip=None, colorimg=None):
     """Plot array of x, y points."""
@@ -104,15 +121,19 @@ def plotPathsToPainter(painter, path, x, y, scaling=None,
         pt = qt4.QPointF(x[i], y[i])
         if clip.contains(pt):
             painter.translate(pt)
-            # scale if wanted
-            if scaling is not None:
-                painter.scale(scaling[i], scaling[i])
             # set color if given
             if colorimg is not None:
                 b = qt4.QBrush( qt4.QColor.fromRgba(colorimg.pixel(i, 0)) )
                 painter.setBrush(b)
 
-            painter.drawPath(path)
+            # scale if wanted
+            if scaling is None:
+                painter.drawPath(path)
+            else:
+                spath = qt4.QPainterPath()
+                scalePath(path, scaling[i], spath)
+                painter.drawPath(spath)
+
             painter.setWorldTransform(origtrans)
 
 def plotLinesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):

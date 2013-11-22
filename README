@@ -13,6 +13,7 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Bug fixes in 1.19.1:
+ * Use same line thickness when plotting scaled data points
  * Fix broken drag and drop in documents
  * Fix deleted C/C++ object crash when using undo and in tutorial
  * Fix compilation in MSVC for Python 3
