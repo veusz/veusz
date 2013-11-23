@@ -1,3 +1,15 @@
+Changes in 1.19.1:
+ * Add option to disable scaling of marker border with point scaling
+ * Implement label at-minimum/at-maximum for ternary plot
+
+Bug fixes:
+ * Fix broken drag and drop in documents
+ * Fix deleted C/C++ object crash when using undo and in tutorial
+ * Fix compilation in MSVC for Python 3
+ * Remove warning/error in compilation in gcc in SUSE
+ * Add Python version classifiers
+ * Fix document icons in Windows binary
+
 Changes in 1.19:
  * Make code compatible with python3
  * Separation of python module and resources in source package
