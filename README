@@ -12,8 +12,10 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Bug fixes in 1.19.1:
- * Use same line thickness when plotting scaled data points
+Changes in 1.19.1:
+ * Add option to disable scaling of marker border with point scaling
+
+Bug fixes:
  * Fix broken drag and drop in documents
  * Fix deleted C/C++ object crash when using undo and in tutorial
  * Fix compilation in MSVC for Python 3

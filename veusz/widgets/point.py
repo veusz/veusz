@@ -307,9 +307,9 @@ class PointPlotter(GenericPlotter):
                                   descr = _('Plot line settings'),
                                   usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add( setting.Line('MarkerLine',
-                            descr = _('Line around the marker settings'),
-                            usertext = _('Marker border')),
+        s.add( setting.MarkerLine('MarkerLine',
+                                  descr = _('Line around the marker settings'),
+                                  usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( MarkerFillBrush('MarkerFill',
                                descr = _('Marker fill settings'),
@@ -811,7 +811,8 @@ class PointPlotter(GenericPlotter):
                 # actually plot datapoints
                 utils.plotMarkers(painter, xplt, yplt, s.marker, markersize,
                                   scaling=scaling, clip=cliprect,
-                                  cmap=cmap, colorvals=colorvals)
+                                  cmap=cmap, colorvals=colorvals,
+                                  scaleline=s.MarkerLine.scaleLine)
 
             # finally plot any labels
             if tvals and not s.Label.hide:

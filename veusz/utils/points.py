@@ -401,7 +401,7 @@ MarkerCodes = (
     )
 
 def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
-                clip=None, cmap=None, colorvals=None):
+                clip=None, cmap=None, colorvals=None, scaleline=False):
     """Funtion to plot an array of markers on a painter.
 
     painter: QPainter
@@ -412,6 +412,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
     clip: rectangle if clipping wanted
     cmap: colormap to use if colorvals is set
     colorvals: color values 0-1 of each point if used
+    scaleline: if scaling, scale border line width with scaling
     """
 
     # minor optimization
@@ -441,7 +442,8 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
             cmap, 'linear', color2d, 0., 1., trans)
 
     # this is the fast (C++) or slow (python) helper
-    plotPathsToPainter(painter, path, xpos, ypos, scaling, clip, colorimg)
+    plotPathsToPainter(painter, path, xpos, ypos, scaling, clip, colorimg,
+                       scaleline)
 
     painter.restore()
 

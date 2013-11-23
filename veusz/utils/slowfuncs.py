@@ -96,7 +96,7 @@ def scalePath(path, scale, out):
         i += 1
 
 def plotPathsToPainter(painter, path, x, y, scaling=None,
-                       clip=None, colorimg=None):
+                       clip=None, colorimg=None, scaleline=False):
     """Plot array of x, y points."""
 
     if clip is None:
@@ -130,9 +130,13 @@ def plotPathsToPainter(painter, path, x, y, scaling=None,
             if scaling is None:
                 painter.drawPath(path)
             else:
-                spath = qt4.QPainterPath()
-                scalePath(path, scaling[i], spath)
-                painter.drawPath(spath)
+                if scaleline:
+                    painter.scale(scaling[i], scaling[i])
+                    painter.drawPath(path)
+                else:
+                    spath = qt4.QPainterPath()
+                    scalePath(path, scaling[i], spath)
+                    painter.drawPath(spath)
 
             painter.setWorldTransform(origtrans)
 

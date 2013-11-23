@@ -96,6 +96,17 @@ class XYPlotLine(Line):
                                descr=_('Connect points with a cubic Bezier curve'),
                                usertext=_('Bezier join')), 1 )
 
+class MarkerLine(Line):
+    '''A line for marker border.'''
+
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
+
+        self.add( setting.Bool('scaleLine', True,
+                               descr=_('Scale line width with marker if scaling'
+                                       ' enabled'),
+                               usertext=_('Scale')), 4 )
+
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''
 

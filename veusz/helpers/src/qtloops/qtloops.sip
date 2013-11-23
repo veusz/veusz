@@ -78,7 +78,8 @@ void addNumpyPolygonToPath(QPainterPath&, const QRectF*, ...);
 void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
 			SIP_PYOBJECT,
 			const QRectF* clip=0,
-			const QImage* colorimg=0);
+			const QImage* colorimg=0,
+			bool scaleline=false);
 %MethodCode
 {
   Numpy1DObj* scaling = 0;
@@ -94,7 +95,7 @@ void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
 	scaling = new Numpy1DObj(a4);
       }
       
-      plotPathsToPainter(*a0, *a1, x, y, scaling, a5, a6);
+      plotPathsToPainter(*a0, *a1, x, y, scaling, a5, a6, a7);
     }
   catch( const char *msg )
     {

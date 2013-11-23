@@ -88,9 +88,9 @@ class NonOrthPoint(Widget):
                             descr = _('Plot line settings'),
                             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add( setting.Line('MarkerLine',
-                            descr = _('Line around the marker settings'),
-                            usertext = _('Marker border')),
+        s.add( setting.MarkerLine('MarkerLine',
+                                  descr = _('Line around the marker settings'),
+                                  usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( MarkerFillBrush('MarkerFill',
                                descr = _('Marker fill settings'),
@@ -248,7 +248,8 @@ class NonOrthPoint(Widget):
 
                     utils.plotMarkers(painter, px, py, s.marker, markersize,
                                       scaling=pscale, clip=cliprect,
-                                      cmap=cmap, colorvals=colorvals)
+                                      cmap=cmap, colorvals=colorvals,
+                                      scaleline=s.MarkerLine.scaleLine)
 
                 # finally plot any labels
                 if textitems and not s.Label.hide:

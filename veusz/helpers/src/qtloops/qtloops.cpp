@@ -164,7 +164,8 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
 			const Numpy1DObj* scaling,
 			const QRectF* clip,
-			const QImage* colorimg)
+			const QImage* colorimg,
+			bool scaleline)
 {
   QRectF cliprect( QPointF(-32767,-32767), QPointF(32767,32767) );
   if( clip != 0 )
@@ -215,9 +216,17 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 	    {
 	      // scale point if requested
 	      const qreal s = (*scaling)(i);
-	      QPainterPath scaled;
-	      scalePath(path, s, scaled);
-	      painter.drawPath(scaled);
+	      if( scaleline )
+		{
+		  painter.scale(s, s);
+		  painter.drawPath(path);
+		}
+	      else
+		{
+		  QPainterPath scaled;
+		  scalePath(path, s, scaled);
+		  painter.drawPath(scaled);
+		}
 	    }
 
 	  painter.setWorldTransform(origtrans);

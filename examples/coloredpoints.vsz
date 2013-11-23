@@ -1,4 +1,5 @@
-# Veusz saved document (version 1.17.1)
+# Veusz saved document (version 1.19)
+# Saved at 2013-11-23T13:54:44.879031
 
 ImportString('c(numeric)','''
 1.459606e+02
@@ -351,6 +352,7 @@ Set('Color/min', 2.0)
 Set('Color/max', 4500.0)
 Set('Color/scaling', u'log')
 Set('PlotLine/hide', True)
+Set('MarkerLine/scaleLine', False)
 Set('MarkerFill/colorMap', u'complement')
 To('..')
 To('..')

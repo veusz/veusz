@@ -51,7 +51,8 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
 			const Numpy1DObj* scaling = 0,
 			const QRectF* clip = 0,
-			const QImage* colorimg = 0);
+			const QImage* colorimg = 0,
+			bool scaleline = false);
 
 void plotLinesToPainter(QPainter& painter,
 			const Numpy1DObj& x1, const Numpy1DObj& y1,
