@@ -14,6 +14,7 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.19.1:
  * Add option to disable scaling of marker border with point scaling
+ * Implement label at-minimum/at-maximum for ternary plot
 
 Bug fixes:
  * Fix broken drag and drop in documents
