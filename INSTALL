@@ -18,7 +18,7 @@ PyQt requires
  SIP >= 4.12     http://www.riverbankcomputing.co.uk/software/sip/
 
 Optional requirements:
- PyFITS >=1.1    http://www.stsci.edu/resources/software_hardware/pyfits
+ Astropy >= 0.2  http://www.astropy.org
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
  PyMinuit        http://code.google.com/p/pyminuit/
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/

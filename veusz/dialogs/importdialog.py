@@ -501,10 +501,14 @@ class ImportTabFITS(ImportTab):
         global pyfits
         if pyfits is None:
             try:
-                import pyfits as PF
+                from astropy.io import fits as PF
                 pyfits = PF
             except ImportError:
-                pyfits = None
+                try:
+                    import pyfits as PF
+                    pyfits = PF
+                except ImportError:
+                    pyfits = None
 
         # if it isn't
         if pyfits is None:
