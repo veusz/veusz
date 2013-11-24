@@ -1050,10 +1050,13 @@ class OperationDataImportFITS(OperationDataImportBase):
         """Do the import."""
 
         try:
-            import pyfits
+            from astropy.io import fits as pyfits
         except ImportError:
-            raise RuntimeError( 'PyFITS is required to import '
-                                  'data from FITS files')
+            try:
+                import pyfits
+            except ImportError:
+                raise RuntimeError('Either Astropy or PyFITS is required '
+                                   'to import data from FITS files')
 
         p = self.params
         f = pyfits.open( str(p.filename), 'readonly')
