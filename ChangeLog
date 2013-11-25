@@ -1,6 +1,8 @@
 Changes in 1.19.1:
  * Add option to disable scaling of marker border with point scaling
  * Implement label at-minimum/at-maximum for ternary plot
+ * Add border and background fill settings for text label widget
+ * Enable FITS support with astropy
 
 Bug fixes:
  * Fix broken drag and drop in documents
