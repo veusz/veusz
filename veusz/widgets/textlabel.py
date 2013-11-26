@@ -206,10 +206,17 @@ class TextLabel(plotters.FreePlotter):
         xpos, ypos = self._getGraphCoords(cgi.widgetposn,
                                           cgi.deltacrosspos[0]+cgi.posn[0],
                                           cgi.deltacrosspos[1]+cgi.posn[1])
+        # this is a small distance away to get delta
+        xposd, yposd = self._getGraphCoords(cgi.widgetposn,
+                                            cgi.deltacrosspos[0]+cgi.posn[0]+1,
+                                            cgi.deltacrosspos[1]+cgi.posn[1]+1)
         if xpos is None or ypos is None:
             return
 
-        pointsX[ind], pointsY[ind] = xpos, ypos
+        roundx = utils.round2delt(xpos, xposd)
+        roundy = utils.round2delt(ypos, yposd)
+
+        pointsX[ind], pointsY[ind] = roundx, roundy
         operations = (
             document.OperationSettingSet(s.get('xPos'), pointsX),
             document.OperationSettingSet(s.get('yPos'), pointsY)
