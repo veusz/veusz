@@ -513,20 +513,16 @@ class ImportTabFITS(ImportTab):
         # if it isn't
         if pyfits is None:
             self.fitslabel.setText(
-                _('FITS file support requires that PyFITS is installed.'
-                  ' You can download it from'
-                  ' http://www.stsci.edu/resources/software_hardware/pyfits'))
+                _('FITS file support requires that astropy or PyFITS '
+                  'are installed'))
             return False
 
         # try to identify fits file
         try:
-            ifile = open(filename,  'rU')
-            line = ifile.readline()
-            # is this a hack?
-            if line.find('SIMPLE  =                    T') == -1:
-                raise EnvironmentError
-            ifile.close()
-        except EnvironmentError:
+            f = pyfits.open(filename)
+            f[0].header
+            f.close()
+        except Exception:
             self.clearFITSView()
             return False
 
