@@ -113,6 +113,7 @@ class DatasetHistoGenerator(object):
         """Compute error bars if requried."""
 
         hist, edges = N.histogram(data, bins=binlocs)
+        hist = hist.astype(N.float64)  # integers can break plots (github#49)
 
         # calculate scaling values for error bars
         if self.method == 'density':
@@ -144,6 +145,7 @@ class DatasetHistoGenerator(object):
         normed = self.method == 'density'
         binlocs = self.binLocations()
         hist, edges = N.histogram(data, bins=binlocs, normed=normed)
+        hist = hist.astype(N.float64)  # integers can break plots (github#49)
         
         if self.method == 'fractions':
             hist = hist * (1./data.size)
