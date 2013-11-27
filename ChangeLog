@@ -11,6 +11,7 @@ Bug fixes:
  * Remove warning/error in compilation in gcc in SUSE
  * Add Python version classifiers
  * Fix document icons in Windows binary
+ * Error bars can be plotted incorrectly for histogrammed data
 
 Changes in 1.19:
  * Make code compatible with python3
