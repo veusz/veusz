@@ -1,5 +1,5 @@
-Veusz 1.19.1
-------------
+Veusz 1.20
+----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -11,6 +11,9 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 1.20:
+ * Allow expressions to be edited for linked 2D datasets
 
 Changes in 1.19.1:
  * Add option to disable scaling of marker border with point scaling
