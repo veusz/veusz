@@ -126,6 +126,7 @@ class _WidgetCombo(qt4.QComboBox):
         for w in widget.children:
             self._iterateWidgets(comboitems, paths, w, level+1)
 
+    @qt4.pyqtSlot()
     def updateWidgets(self):
         """Update combo with new widgets."""
 

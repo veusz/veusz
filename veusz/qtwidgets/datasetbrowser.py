@@ -336,6 +336,7 @@ class DatasetRelationModel(TreeModel):
             idx, idx)
         return True
 
+    @qt4.pyqtSlot()
     def refresh(self):
         """Update tree of datasets when document changes."""
 
