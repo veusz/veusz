@@ -42,11 +42,16 @@ from . import dataset_histo
 from . import mime
 from . import export
 
+def registerImportCommand(name, method):
+    """Add command to command interface."""
+    setattr(CommandInterface, name, method)
+    CommandInterface.safe_commands.append(name)
+
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
 
     # commands which are safe in any script
-    safe_commands = (
+    safe_commands = [
         'Action',
         'Add',
         'AddCustom',
@@ -60,12 +65,6 @@ class CommandInterface(qt4.QObject):
         'GetDataType',
         'GetDatasets',
         'ImportFITSFile',
-        'ImportFile',
-        'ImportFile2D',
-        'ImportFileCSV',
-        'ImportFilePlugin',
-        'ImportString',
-        'ImportString2D',
         'List',
         'NodeChildren',
         'NodeType',
@@ -90,7 +89,7 @@ class CommandInterface(qt4.QObject):
         'TagDatasets',
         'To',
         'WidgetType',
-        )
+        ]
 
     # commands which can modify disk, etc
     unsafe_commands = (
@@ -607,261 +606,6 @@ class CommandInterface(qt4.QObject):
             return '2d'
         else:
             return '1d'
-
-    def ImportString(self, descriptor, dstring, useblocks=False):
-        """Read data from the string using a descriptor.
-
-        If useblocks is set, then blank lines or the word 'no' are used
-        to split the data into blocks. Dataset names are appended with an
-        underscore and the block number (starting from 1).
-
-        Returned is a tuple (datasets, errors)
-         where datasets is a list of datasets read
-         errors is a dict of the datasets with the number of errors while
-         converting the data
-        """
-
-        params = importparams.ImportParamsSimple(
-            descriptor=descriptor,
-            datastr=dstring,
-            useblocks=useblocks)
-        op = operations.OperationDataImport(params)
-        self.document.applyOperation(op)
-
-        if self.verbose:
-            print("Imported datasets %s" % (' '.join(op.outdatasets),))
-            for name, num in citems(op.outinvalids):
-                print("%i errors encountered reading dataset %s" % (num, name))
-
-        return (op.outdatasets, op.outinvalids)
-
-    def ImportString2D(self, datasetnames, dstring, xrange=None, yrange=None,
-                       invertrows=None, invertcols=None, transpose=None):
-        """Read two dimensional data from the string specified.
-        datasetnames is a list of datasets to read from the string or a single
-        dataset name
-
-
-        xrange is a tuple containing the range of data in x coordinates
-        yrange is a tuple containing the range of data in y coordinates
-        if invertrows=True, then rows are inverted when read
-        if invertcols=True, then cols are inverted when read
-        if transpose=True, then rows and columns are swapped
-
-        """
-        
-        if isinstance(datasetnames, cbasestr):
-            datasetnames = [datasetnames]
-
-        params = importparams.ImportParams2D(
-            datasetnames=datasetnames,
-            datastr=dstring, xrange=xrange,
-            yrange=yrange, invertrows=invertrows,
-            invertcols=invertcols, transpose=transpose)
-        op = operations.OperationDataImport2D(params)
-        self.document.applyOperation(op)
-        if self.verbose:
-            print("Imported datasets %s" % (', '.join(datasetnames)))
-
-    def ImportFile2D(self, filename, datasetnames, xrange=None, yrange=None,
-                     invertrows=None, invertcols=None, transpose=None,
-                     prefix="", suffix="", encoding='utf_8',
-                     linked=False):
-        """Import two-dimensional data from a file.
-        filename is the name of the file to read
-        datasetnames is a list of datasets to read from the file, or a single
-        dataset name
-
-        xrange is a tuple containing the range of data in x coordinates
-        yrange is a tuple containing the range of data in y coordinates
-        if invertrows=True, then rows are inverted when read
-        if invertcols=True, then cols are inverted when read
-        if transpose=True, then rows and columns are swapped
-
-        prefix and suffix are prepended and appended to dataset names
-
-        encoding is encoding character set
-
-        if linked=True then the dataset is linked to the file
-        """
-
-        # look up filename on path
-        realfilename = self.findFileOnImportPath(filename)
-
-        if isinstance(datasetnames, cbasestr):
-            datasetnames = [datasetnames]
-
-        params = importparams.ImportParams2D(
-            datasetnames=datasetnames, 
-            filename=realfilename, xrange=xrange,
-            yrange=yrange, invertrows=invertrows,
-            invertcols=invertcols, transpose=transpose,
-            prefix=prefix, suffix=suffix,
-            linked=linked)
-        op = operations.OperationDataImport2D(params)
-        self.document.applyOperation(op)
-        if self.verbose:
-            print("Imported datasets %s" % (', '.join(datasetnames)))
-
-    def ImportFile(self, filename, descriptor, useblocks=False, linked=False,
-                   prefix='', suffix='', ignoretext=False, encoding='utf_8'):
-        """Read data from file with filename using descriptor.
-        If linked is True, the data won't be saved in a saved document,
-        the data will be reread from the file.
-
-        If useblocks is set, then blank lines or the word 'no' are used
-        to split the data into blocks. Dataset names are appended with an
-        underscore and the block number (starting from 1).
-
-        If prefix is set, prefix is prepended to each dataset name
-        Suffix is added to each dataset name
-        ignoretext ignores lines of text in the file
-
-        Returned is a tuple (datasets, errors)
-         where datasets is a list of datasets read
-         errors is a dict of the datasets with the number of errors while
-         converting the data
-        """
-
-        realfilename = self.findFileOnImportPath(filename)
-
-        params = importparams.ImportParamsSimple(
-            descriptor=descriptor, filename=realfilename,
-            useblocks=useblocks, linked=linked,
-            prefix=prefix, suffix=suffix,
-            ignoretext=ignoretext)
-        op = operations.OperationDataImport(params)
-        self.document.applyOperation(op)
-
-        if self.verbose:
-            print("Imported datasets %s" % (' '.join(op.outdatasets),))
-            for name, num in citems(op.outinvalids):
-                print("%i errors encountered reading dataset %s" % (num, name))
-
-        return (op.outdatasets, op.outinvalids)
-
-    def ImportFileCSV(self, filename,
-                      readrows=False,
-                      delimiter=',', textdelimiter='"',
-                      encoding='utf_8',
-                      headerignore=0, rowsignore=0,
-                      blanksaredata=False,
-                      numericlocale='en_US',
-                      dateformat='YYYY-MM-DD|T|hh:mm:ss',
-                      headermode='multi',
-                      dsprefix='', dssuffix='', prefix=None,
-                      linked=False):
-        """Read data from a comma separated file (CSV).
-
-        Data are read from filename
-        
-        readrows: if true, data are read across rather than down
-        delimiter: character for delimiting data (usually ',')
-        textdelimiter: character surrounding text (usually '"')
-        encoding: encoding used in file
-        headerignore: number of lines to ignore after header text
-        rowsignore: number of rows to ignore at top of file
-        blanksaredata: treats blank lines in csv files as blank data values
-        numericlocale: format to use for reading numbers
-        dateformat: format for interpreting dates
-        headermode: 'multi': multiple headers allowed in file
-                    '1st': first text found are headers
-                    'none': no headers, guess data and use default names
-
-        Dataset names are prepended and appended, by dsprefix and dssuffix,
-        respectively
-         (prefix is backware compatibility only, it adds an underscore
-          relative to dsprefix)
-
-        If linked is True the data are linked with the file."""
-
-        # backward compatibility
-        if prefix:
-            dsprefix = prefix + '_'
-
-        # lookup filename
-        realfilename = self.findFileOnImportPath(filename)
-
-        params = importparams.ImportParamsCSV(
-            filename=realfilename, readrows=readrows,
-            delimiter=delimiter, textdelimiter=textdelimiter,
-            encoding=encoding,
-            headerignore=headerignore, rowsignore=rowsignore,
-            blanksaredata=blanksaredata,
-            numericlocale=numericlocale, dateformat=dateformat,
-            headermode=headermode,
-            prefix=dsprefix, suffix=dssuffix,
-            linked=linked,
-            )
-        op = operations.OperationDataImportCSV(params)
-        self.document.applyOperation(op)
-
-        if self.verbose:
-            print("Imported datasets %s" % (' '.join(op.outdatasets),))
-
-        return op.outdatasets
-
-    def ImportFITSFile(self, dsname, filename, hdu,
-                       datacol = None, symerrcol = None,
-                       poserrcol = None, negerrcol = None,
-                       wcsmode = None,
-                       linked = False):
-        """Import data from a FITS file
-
-        dsname is the name of the dataset
-        filename is name of the fits file to open
-        hdu is the number/name of the hdu to access
-
-        if the hdu is a table, datacol, symerrcol, poserrcol and negerrcol
-        specify the columns containing the data, symmetric error,
-        positive and negative errors.
-
-        wcsmode is one of ('pixel', 'pixel_wcs' or 'linear_wcs'). None
-        gives 'linear_wcs'. 'pixel' mode just gives pixel values from
-        0 to maximum. 'pixel_wcs' is the pixel number relative to the
-        wcs reference pixel. 'linear_wcs' takes the wcs coordinate,
-        assuming a linear coordinate system. 'fraction' assumes
-        fractional values from 0 to 1.
-
-        linked specfies that the dataset is linked to the file
-        """
-
-        # lookup filename
-        realfilename = self.findFileOnImportPath(filename)
-        params = importparams.ImportParamsFITS(
-            dsname=dsname, filename=realfilename, hdu=hdu,
-            datacol=datacol, symerrcol=symerrcol,
-            poserrcol=poserrcol, negerrcol=negerrcol,
-            wcsmode=wcsmode,
-            linked=linked)
-        op = operations.OperationDataImportFITS(params)
-        self.document.applyOperation(op)
-
-    def ImportFilePlugin(self, plugin, filename, **args):
-        """Import file using a plugin.
-
-        optional arguments:
-        prefix: add to start of dataset name (default '')
-        suffix: add to end of dataset name (default '')
-        linked: link import to file (default False)
-        encoding: file encoding (may not be used, default 'utf_8')
-        plus arguments to plugin
-
-        returns: list of imported datasets, list of imported customs
-        """
-
-        realfilename = self.findFileOnImportPath(filename)
-        params = importparams.ImportParamsPlugin(
-            plugin=plugin, filename=realfilename, **args)
-
-        op = operations.OperationDataImportPlugin(params)
-        try:
-            self.document.applyOperation(op)
-        except:
-            self.document.log("Error in plugin %s" % plugin)
-            exc =  ''.join(traceback.format_exc())
-            self.document.log(exc)
-        return op.outdatasets, op.outcustoms
 
     def ReloadData(self):
         """Reload any linked datasets.
