@@ -22,8 +22,13 @@ import traceback
 from ..compat import citems, cstr, crepr
 from .. import document
 from .. import plugins
+from .. import qtall as qt4
+from . import base
 
-class ImportParamsPlugin(document.ImportParamsBase):
+def _(text, disambiguation=None, context="Import_Plugin"):
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class ImportParamsPlugin(base.ImportParamsBase):
     """Parameters for import plugins.
 
     Additional parameter:
@@ -34,7 +39,7 @@ class ImportParamsPlugin(document.ImportParamsBase):
     defaults = {
         'plugin': None,
         }
-    defaults.update(document.ImportParamsBase.defaults)
+    defaults.update(base.ImportParamsBase.defaults)
 
     def __init__(self, **argsv):
         """Initialise plugin parameters, splitting up default parameters
@@ -48,11 +53,11 @@ class ImportParamsPlugin(document.ImportParamsBase):
             else:
                 pluginpars[n] = v
 
-        document.ImportParamsBase.__init__(self, **upvars)
+        base.ImportParamsBase.__init__(self, **upvars)
         self.pluginpars = pluginpars
         self._extras.append('pluginpars')
 
-class LinkedFilePlugin(document.LinkedFileBase):
+class LinkedFilePlugin(base.LinkedFileBase):
     """Represent a file linked using an import plugin."""
 
     def createOperation(self):
@@ -77,12 +82,12 @@ class LinkedFilePlugin(document.LinkedFileBase):
 
         fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))
 
-class OperationDataImportPlugin(document.OperationDataImportBase):
+class OperationDataImportPlugin(base.OperationDataImportBase):
     """Import data using a plugin."""
 
     descr = _('import using plugin')
 
-    def doImport(self, document):
+    def doImport(self, doc):
         """Do import."""
 
         pluginnames = [p.name for p in plugins.importpluginregistry]
@@ -132,19 +137,19 @@ class OperationDataImportPlugin(document.OperationDataImportBase):
                 raise RuntimeError("Invalid data set in plugin results")
 
             # set any linking
-            if linked:
+            if p.linked:
                 ds.linked = LF
 
             # construct name
             name = p.prefix + d.name + p.suffix
 
             # actually make dataset
-            document.setData(name, ds)
+            doc.setData(name, ds)
 
             names.append(name)
 
         # add constants, functions to doc, if any
-        self.addCustoms(document, customs)
+        self.addCustoms(doc, customs)
 
         self.outdatasets = names
         self.outcustoms = list(customs)

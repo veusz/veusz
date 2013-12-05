@@ -26,7 +26,6 @@ from .. import utils
 from . import defn_csv
 
 def _(text, disambiguation=None, context="Import_CSV"):
-    """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTabCSV(importdialog.ImportTab):

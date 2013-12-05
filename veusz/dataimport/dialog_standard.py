@@ -25,7 +25,6 @@ from . import defn_standard
 from . import simpleread
 
 def _(text, disambiguation=None, context="Import_Standard"):
-    """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTabStandard(importdialog.ImportTab):

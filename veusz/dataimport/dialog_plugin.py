@@ -22,11 +22,10 @@ from .. import qtall as qt4
 from .. import setting
 from .. import plugins
 from ..dialogs import importdialog
-from ..compat import czip
+from ..compat import czip, cstr
 from . import defn_plugin
 
 def _(text, disambiguation=None, context="Import_Plugin"):
-    """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTabPlugins(importdialog.ImportTab):

@@ -17,12 +17,17 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from ..compat import citems, cstr, crepr
+from ..compat import citems, cstr, crepr, cbasestr
+from .. import qtall as qt4
 from .. import utils
 from .. import document
 from . import simpleread
+from . import base
 
-class ImportParams2D(document.ImportParamsBase):
+def _(text, disambiguation=None, context="Import_2D"):
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class ImportParams2D(base.ImportParamsBase):
     """2D import parameters.
 
     additional parameters:
@@ -43,9 +48,9 @@ class ImportParams2D(document.ImportParamsBase):
         'invertcols': False,
         'transpose': False,
         }
-    defaults.update(document.ImportParamsBase.defaults)
+    defaults.update(base.ImportParamsBase.defaults)
 
-class LinkedFile2D(document.LinkedFileBase):
+class LinkedFile2D(base.LinkedFileBase):
     """Class representing a file linked to a 2d dataset."""
 
     def createOperation(self):
@@ -66,7 +71,7 @@ class LinkedFile2D(document.LinkedFileBase):
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
 
-class OperationDataImport2D(document.OperationDataImportBase):
+class OperationDataImport2D(base.OperationDataImportBase):
     """Import a 2D matrix from a file."""
     
     descr = _('import 2d data')
@@ -162,5 +167,5 @@ def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
     if comm.verbose:
         print("Imported datasets %s" % (', '.join(datasetnames)))
 
-registerImportCommand('ImportFile2D', ImportFile2D)
-registerImportCommand('ImportString2D', ImportString2D)
+document.registerImportCommand('ImportFile2D', ImportFile2D)
+document.registerImportCommand('ImportString2D', ImportString2D)

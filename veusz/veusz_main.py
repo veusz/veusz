@@ -125,6 +125,7 @@ class ImportThread(qt4.QThread):
     def run(self):
         from veusz import setting
         from veusz import widgets
+        from veusz import dataimport
 
 class VeuszApp(qt4.QApplication):
     """Event which can open mac files."""

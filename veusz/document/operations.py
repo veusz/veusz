@@ -35,9 +35,6 @@ import numpy as N
 from ..compat import czip, crange, citems, cbasestr
 from . import datasets
 from . import widgetfactory
-from . import simpleread
-from . import readcsv
-from . import linked
 
 from .. import utils
 from .. import plugins
@@ -816,71 +813,6 @@ class OperationDatasetDeleteByFile(object):
 
 ###############################################################################
 # Import datasets
-
-class OperationDataImportBase(object):
-    """Default useful import class."""
-
-    def __init__(self, params):
-        self.params = params
-
-        # list of returned datasets
-        self.outdatasets = []
-        # list of returned custom variables
-        self.outcustoms = []
-        # invalid conversions
-        self.outinvalids = {}
-
-    def doImport(self, document):
-        """Do import, override this.
-        Return list of names of datasets read
-        """
-
-    def addCustoms(self, document, consts):
-        """Optionally, add the customs return by plugins to document."""
-
-        if len(consts) > 0:
-            self.oldconst = list(document.customs)
-            cd = document.customDict()
-            for item in consts:
-                if item[1] in cd:
-                    idx, ctype, val = cd[item[1]]
-                    document.customs[idx] = item
-                else:
-                    document.customs.append(item)
-            document.updateEvalContext()
-
-    def do(self, document):
-        """Do import."""
-
-        # remember datasets in document for undo
-        olddatasets = dict(document.data)
-        self.oldconst = None
-
-        # do actual import
-        self.doImport(document)
-
-        # only remember the parts we need
-        self.olddatasets = [ (n, olddatasets.get(n)) for n in self.outdatasets ]
-
-        # apply tags
-        if self.params.tags:
-            for n in self.outdatasets:
-                document.data[n].tags.update(self.params.tags)
-
-    def undo(self, document):
-        """Undo import."""
-
-        # put back old datasets
-        for name, ds in self.olddatasets:
-            if ds is None:
-                document.deleteData(name)
-            else:
-                document.setData(name, ds)
-
-        # for custom definitions
-        if self.oldconst is not None:
-            document.customs = self.oldconst
-            document.updateEvalContext()
 
 class OperationDataCaptureSet(object):
     """An operation for setting the results from a SimpleRead into the

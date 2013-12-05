@@ -22,11 +22,9 @@
 
 from __future__ import division, print_function
 import os.path
-import re
-import csv
 import sys
 
-from ..compat import crange, czip, citems, cnext, cstr
+from ..compat import crange
 from .. import qtall as qt4
 from .. import document
 from .. import setting

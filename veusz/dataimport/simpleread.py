@@ -47,7 +47,7 @@ import numpy as N
 
 from ..compat import crange, cnext, CStringIO, citems
 from .. import utils
-from . import datasets
+from .. import document
 
 # a regular expression for splitting descriptor into tokens
 descrtokens_split_re = re.compile(r'''
@@ -279,7 +279,7 @@ class DescriptorPart(object):
                 # add data into dataset
                 dataset.append(dat)
 
-    def setInDocument(self, thedatasets, document, block=None,
+    def setInDocument(self, thedatasets, doc, block=None,
                       linkedfile=None,
                       prefix="", suffix="", tail=None):
         """Set the read-in data in the document."""
@@ -326,20 +326,20 @@ class DescriptorPart(object):
 
                 # create the dataset
                 if self.datatype == 'float':
-                    ds = datasets.Dataset( data = vals, serr = sym,
+                    ds = document.Dataset( data = vals, serr = sym,
                                            nerr = neg, perr = pos,
                                            linked = linkedfile )
                 elif self.datatype == 'date':
-                    ds = datasets.DatasetDateTime( data=vals,
+                    ds = document.DatasetDateTime( data=vals,
                                                    linked=linkedfile )
                 elif self.datatype == 'string':
-                    ds = datasets.DatasetText( data=vals,
+                    ds = document.DatasetText( data=vals,
                                                linked = linkedfile )
                 else:
                     raise RuntimeError("Invalid data type")
 
                 finalname = prefix + name + suffix
-                document.setData( finalname, ds )
+                doc.setData( finalname, ds )
                 names.append(finalname)
             else:
                 break
@@ -721,17 +721,17 @@ class SimpleRead2D(object):
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
 
-    def setInDocument(self, document, linkedfile=None):
+    def setInDocument(self, doc, linkedfile=None):
         """Set the data in the document.
 
         Returns list containing name of dataset read
         """
 
-        ds = datasets.Dataset2D(self.data, xrange=self.params.xrange,
+        ds = document.Dataset2D(self.data, xrange=self.params.xrange,
                                 yrange=self.params.yrange)
         ds.linked = linkedfile
 
         fullname = self.params.prefix + self.name + self.params.suffix
-        document.setData(fullname, ds)
+        doc.setData(fullname, ds)
 
         return [fullname]

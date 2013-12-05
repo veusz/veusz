@@ -18,11 +18,16 @@
 
 from __future__ import division, print_function
 from ..compat import citems, cstr, crepr
+from .. import qtall as qt4
 from .. import utils
 from .. import document
 from . import simpleread
+from . import base
 
-class ImportParamsSimple(document.ImportParamsBase):
+def _(text, disambiguation=None, context="Import_Standard"):
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class ImportParamsSimple(base.ImportParamsBase):
     """simpleread import parameters.
 
     additional parameters:
@@ -38,9 +43,9 @@ class ImportParamsSimple(document.ImportParamsBase):
         'datastr': None,
         'ignoretext': False,
         }
-    defaults.update(document.ImportParamsBase.defaults)
+    defaults.update(base.ImportParamsBase.defaults)
 
-class LinkedFile(document.LinkedFileBase):
+class LinkedFile(base.LinkedFileBase):
     """Instead of reading data from a string, data can be read from
     a "linked file". This means the same document can be reloaded, and
     the data would be reread from the file.
@@ -74,7 +79,7 @@ class LinkedFile(document.LinkedFileBase):
 
         fileobj.write("ImportFile(%s)\n" % (", ".join(params)))
 
-class OperationDataImport(document.OperationDataImportBase):
+class OperationDataImport(base.OperationDataImportBase):
     """Import 1D data from text files."""
 
     descr = _('import data')
@@ -83,10 +88,10 @@ class OperationDataImport(document.OperationDataImportBase):
         """Setup operation.
         """
 
-        document.OperationDataImportBase.__init__(self, params)
+        base.OperationDataImportBase.__init__(self, params)
         self.simpleread = simpleread.SimpleRead(params.descriptor)
 
-    def doImport(self, document):
+    def doImport(self, doc):
         """Import data.
 
         Returns a list of datasets which were imported.
@@ -115,7 +120,7 @@ class OperationDataImport(document.OperationDataImportBase):
 
         # actually set the data in the document
         self.outdatasets = self.simpleread.setInDocument(
-            document, linkedfile=LF, prefix=p.prefix, suffix=p.suffix)
+            doc, linkedfile=LF, prefix=p.prefix, suffix=p.suffix)
         self.outinvalids = self.simpleread.getInvalidConversions()
 
 def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
@@ -140,7 +145,7 @@ def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
 
     realfilename = comm.findFileOnImportPath(filename)
 
-    params = importparams.ImportParamsSimple(
+    params = ImportParamsSimple(
         descriptor=descriptor, filename=realfilename,
         useblocks=useblocks, linked=linked,
         prefix=prefix, suffix=suffix,

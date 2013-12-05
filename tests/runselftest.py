@@ -50,6 +50,7 @@ import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
+import veusz.dataimport
 import veusz.document.svg_export as svg_export
 
 # required to get structures initialised

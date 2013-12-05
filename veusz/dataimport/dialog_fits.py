@@ -24,7 +24,6 @@ from ..compat import crange
 from . import defn_fits
 
 def _(text, disambiguation=None, context="Import_FITS"):
-    """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 pyfits = None

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2011 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -15,15 +14,59 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-###############################################################################
+##############################################################################
 
-"""Classes for linked files"""
+"""Parameters for import routines."""
 
-from __future__ import division
-import sys
-
-from ..compat import citems, cstr, crepr
+from __future__ import division, print_function
+from ..compat import citems, cstr
 from .. import utils
+
+class ImportParamsBase(object):
+    """Import parameters for the various imports.
+
+    Parameters:
+     filename: filename to import from
+     linked: whether to link to file
+     encoding: encoding for file
+     prefix: prefix for output dataset names
+     suffix: suffix for output dataset names
+     tags: list of tags to apply to output datasets
+    """
+
+    defaults = {
+        'filename': None,
+        'linked': False,
+        'encoding': 'utf_8',
+        'prefix': '',
+        'suffix': '',
+        'tags': None,
+        }
+
+    def __init__(self, **argsv):
+        """Initialise the reader to import data from filename.
+        """
+
+        #  set defaults
+        for k, v in citems(self.defaults):
+            setattr(self, k, v)
+
+        # set parameters
+        for k, v in citems(argsv):
+            if k not in self.defaults:
+                raise ValueError("Invalid parameter %s" % k)
+            setattr(self, k, v)
+
+        # extra parameters to copy besides defaults
+        self._extras = []
+
+    def copy(self):
+        """Make a copy of the parameters object."""
+
+        newp = {}
+        for k in list(self.defaults.keys()) + self._extras:
+            newp[k] = getattr(self, k)
+        return self.__class__(**newp)
 
 class LinkedFileBase(object):
     """A base class for linked files containing common routines."""
@@ -109,3 +152,68 @@ class LinkedFileBase(object):
         errors = op.outinvalids
 
         return (read, errors)
+
+class OperationDataImportBase(object):
+    """Default useful import class."""
+
+    def __init__(self, params):
+        self.params = params
+
+        # list of returned datasets
+        self.outdatasets = []
+        # list of returned custom variables
+        self.outcustoms = []
+        # invalid conversions
+        self.outinvalids = {}
+
+    def doImport(self, document):
+        """Do import, override this.
+        Return list of names of datasets read
+        """
+
+    def addCustoms(self, document, consts):
+        """Optionally, add the customs return by plugins to document."""
+
+        if len(consts) > 0:
+            self.oldconst = list(document.customs)
+            cd = document.customDict()
+            for item in consts:
+                if item[1] in cd:
+                    idx, ctype, val = cd[item[1]]
+                    document.customs[idx] = item
+                else:
+                    document.customs.append(item)
+            document.updateEvalContext()
+
+    def do(self, document):
+        """Do import."""
+
+        # remember datasets in document for undo
+        olddatasets = dict(document.data)
+        self.oldconst = None
+
+        # do actual import
+        self.doImport(document)
+
+        # only remember the parts we need
+        self.olddatasets = [ (n, olddatasets.get(n)) for n in self.outdatasets ]
+
+        # apply tags
+        if self.params.tags:
+            for n in self.outdatasets:
+                document.data[n].tags.update(self.params.tags)
+
+    def undo(self, document):
+        """Undo import."""
+
+        # put back old datasets
+        for name, ds in self.olddatasets:
+            if ds is None:
+                document.deleteData(name)
+            else:
+                document.setData(name, ds)
+
+        # for custom definitions
+        if self.oldconst is not None:
+            document.customs = self.oldconst
+            document.updateEvalContext()

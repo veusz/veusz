@@ -17,6 +17,7 @@
 ##############################################################################
 
 from __future__ import division, print_function
+import re
 
 from .. import qtall as qt4
 from .. import utils
@@ -25,7 +26,6 @@ from . import defn_twod
 from . import simpleread
 
 def _(text, disambiguation=None, context="Import_2D"):
-    """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTab2D(importdialog.ImportTab):

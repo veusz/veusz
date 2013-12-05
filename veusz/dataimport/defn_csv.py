@@ -19,10 +19,15 @@
 from __future__ import division, print_function
 
 from ..compat import citems, cstr, crepr
+from .. import qtall as qt4
 from .. import document
 from . import readcsv
+from . import base
 
-class ImportParamsCSV(document.ImportParamsBase):
+def _(text, disambiguation=None, context="Import_CSV"):
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class ImportParamsCSV(base.ImportParamsBase):
     """CSV import parameters.
 
     additional parameters:
@@ -48,14 +53,14 @@ class ImportParamsCSV(document.ImportParamsBase):
         'dateformat': 'YYYY-MM-DD|T|hh:mm:ss',
         'headermode': 'multi',
         }
-    defaults.update(document.ImportParamsBase.defaults)
+    defaults.update(base.ImportParamsBase.defaults)
 
     def __init__(self, **argsv):
-        document.ImportParamsBase.__init__(self, **argsv)
+        base.ImportParamsBase.__init__(self, **argsv)
         if self.headermode not in ('multi', '1st', 'none'):
             raise ValueError("Invalid headermode")
 
-class OperationDataImportCSV(document.OperationDataImportBase):
+class OperationDataImportCSV(base.OperationDataImportBase):
     """Import data from a CSV file."""
 
     descr = _('import CSV data')
@@ -73,7 +78,7 @@ class OperationDataImportCSV(document.OperationDataImportBase):
         # set the data
         self.outdatasets = csvr.setData(document, linkedfile=LF)
 
-class LinkedFileCSV(document.LinkedFileBase):
+class LinkedFileCSV(base.LinkedFileBase):
     """A CSV file linked to datasets."""
 
     def createOperation(self):

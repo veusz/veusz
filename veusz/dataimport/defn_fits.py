@@ -18,10 +18,15 @@
 
 from __future__ import division, print_function
 
+from .. import qtall as qt4
 from ..compat import citems, cstr, crepr
 from .. import document
+from . import base
 
-class ImportParamsFITS(document.ImportParamsBase):
+def _(text, disambiguation=None, context="Import_FITS"):
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class ImportParamsFITS(base.ImportParamsBase):
     """FITS file import parameters.
 
     Additional parameters:
@@ -42,9 +47,9 @@ class ImportParamsFITS(document.ImportParamsBase):
         'negerrcol': None,
         'wcsmode': None,
         }
-    defaults.update(document.ImportParamsBase.defaults)
+    defaults.update(base.ImportParamsBase.defaults)
 
-class LinkedFileFITS(document.LinkedFileBase):
+class LinkedFileFITS(base.LinkedFileBase):
     """Links a FITS file to the data."""
 
     def createOperation(self):
@@ -69,7 +74,7 @@ class LinkedFileFITS(document.LinkedFileBase):
 
         fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))
 
-class OperationDataImportFITS(document.OperationDataImportBase):
+class OperationDataImportFITS(base.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""
 
     descr = _('import FITS file')
