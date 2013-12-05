@@ -17,13 +17,12 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from ...compat import citems, cstr, crepr
-from ... import utils
-from ...document import (LinkedFileBase, OperationDataImportBase,
-                         Dataset2D, ImportParamsBase, registerImportCommand)
-from ..standard import simpleread
+from ..compat import citems, cstr, crepr
+from .. import utils
+from .. import document
+from . import simpleread
 
-class ImportParams2D(ImportParamsBase):
+class ImportParams2D(document.ImportParamsBase):
     """2D import parameters.
 
     additional parameters:
@@ -44,9 +43,9 @@ class ImportParams2D(ImportParamsBase):
         'invertcols': False,
         'transpose': False,
         }
-    defaults.update(ImportParamsBase.defaults)
+    defaults.update(document.ImportParamsBase.defaults)
 
-class LinkedFile2D(LinkedFileBase):
+class LinkedFile2D(document.LinkedFileBase):
     """Class representing a file linked to a 2d dataset."""
 
     def createOperation(self):
@@ -67,7 +66,7 @@ class LinkedFile2D(LinkedFileBase):
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
 
-class OperationDataImport2D(OperationDataImportBase):
+class OperationDataImport2D(document.OperationDataImportBase):
     """Import a 2D matrix from a file."""
     
     descr = _('import 2d data')
@@ -90,14 +89,14 @@ class OperationDataImport2D(OperationDataImportBase):
         LF = None
         if p.linked:
             assert p.filename
-            LF = linked.LinkedFile2D(p)
+            LF = LinkedFile2D(p)
 
         for name in p.datasetnames:
             sr = simpleread.SimpleRead2D(name, p)
             sr.readData(stream)
             self.outdatasets += sr.setInDocument(document, linkedfile=LF)
 
-def ImportFile2D(comi, filename, datasetnames, xrange=None, yrange=None,
+def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
                  invertrows=None, invertcols=None, transpose=None,
                  prefix="", suffix="", encoding='utf_8',
                  linked=False):
@@ -120,7 +119,7 @@ def ImportFile2D(comi, filename, datasetnames, xrange=None, yrange=None,
     """
 
     # look up filename on path
-    realfilename = comi.findFileOnImportPath(filename)
+    realfilename = comm.findFileOnImportPath(filename)
 
     if isinstance(datasetnames, cbasestr):
         datasetnames = [datasetnames]
@@ -133,8 +132,8 @@ def ImportFile2D(comi, filename, datasetnames, xrange=None, yrange=None,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImport2D(params)
-    comi.document.applyOperation(op)
-    if comi.verbose:
+    comm.document.applyOperation(op)
+    if comm.verbose:
         print("Imported datasets %s" % (', '.join(datasetnames)))
 
 def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
@@ -153,12 +152,12 @@ def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
     if isinstance(datasetnames, cbasestr):
         datasetnames = [datasetnames]
 
-    params = importparams.ImportParams2D(
+    params = ImportParams2D(
         datasetnames=datasetnames,
         datastr=dstring, xrange=xrange,
         yrange=yrange, invertrows=invertrows,
         invertcols=invertcols, transpose=transpose)
-    op = operations.OperationDataImport2D(params)
+    op = OperationDataImport2D(params)
     comm.document.applyOperation(op)
     if comm.verbose:
         print("Imported datasets %s" % (', '.join(datasetnames)))

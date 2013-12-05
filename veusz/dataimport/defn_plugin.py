@@ -19,12 +19,11 @@
 from __future__ import division, print_function
 import traceback
 
-from ...compat import citems, cstr, crepr
-from ...document import ( LinkedFileBase, OperationDataImportBase,
-                          Dataset, Dataset2D, ImportParamsBase,
-                          registerImportCommand )
+from ..compat import citems, cstr, crepr
+from .. import document
+from .. import plugins
 
-class ImportParamsPlugin(ImportParamsBase):
+class ImportParamsPlugin(document.ImportParamsBase):
     """Parameters for import plugins.
 
     Additional parameter:
@@ -35,7 +34,7 @@ class ImportParamsPlugin(ImportParamsBase):
     defaults = {
         'plugin': None,
         }
-    defaults.update(ImportParamsBase.defaults)
+    defaults.update(document.ImportParamsBase.defaults)
 
     def __init__(self, **argsv):
         """Initialise plugin parameters, splitting up default parameters
@@ -49,11 +48,11 @@ class ImportParamsPlugin(ImportParamsBase):
             else:
                 pluginpars[n] = v
 
-        ImportParamsBase.__init__(self, **upvars)
+        document.ImportParamsBase.__init__(self, **upvars)
         self.pluginpars = pluginpars
         self._extras.append('pluginpars')
 
-class LinkedFilePlugin(LinkedFileBase):
+class LinkedFilePlugin(document.LinkedFileBase):
     """Represent a file linked using an import plugin."""
 
     def createOperation(self):
@@ -78,7 +77,7 @@ class LinkedFilePlugin(LinkedFileBase):
 
         fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))
 
-class OperationDataImportPlugin(OperationDataImportBase):
+class OperationDataImportPlugin(document.OperationDataImportBase):
     """Import data using a plugin."""
 
     descr = _('import using plugin')
@@ -106,7 +105,7 @@ class OperationDataImportPlugin(OperationDataImportBase):
         # make link for file
         LF = None
         if p.linked:
-            LF = linked.LinkedFilePlugin(p)
+            LF = LinkedFilePlugin(p)
 
         customs = []
 
@@ -114,15 +113,15 @@ class OperationDataImportPlugin(OperationDataImportBase):
         names = []
         for d in results:
             if isinstance(d, plugins.Dataset1D):
-                ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
+                ds = document.Dataset(data=d.data, serr=d.serr, perr=d.perr,
                                       nerr=d.nerr)
             elif isinstance(d, plugins.Dataset2D):
-                ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
+                ds = document.Dataset2D(data=d.data, xrange=d.rangex,
                                         yrange=d.rangey)
             elif isinstance(d, plugins.DatasetText):
-                ds = datasets.DatasetText(data=d.data)
+                ds = document.DatasetText(data=d.data)
             elif isinstance(d, plugins.DatasetDateTime):
-                ds = datasets.DatasetDateTime(data=d.data)
+                ds = document.DatasetDateTime(data=d.data)
             elif isinstance(d, plugins.Constant):
                 customs.append( ['constant', d.name, d.val] )
                 continue
@@ -176,4 +175,4 @@ def ImportFilePlugin(comm, plugin, filename, **args):
         comm.document.log(exc)
     return op.outdatasets, op.outcustoms
 
-registerImportCommand('ImportFilePlugin', ImportFilePlugin)
+document.registerImportCommand('ImportFilePlugin', ImportFilePlugin)

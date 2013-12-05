@@ -17,13 +17,12 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from ...compat import citems, cstr, crepr
-from ... import utils
-from ...document import ( LinkedFileBase, OperationDataImportBase, Dataset,
-                          ImportParamsBase, registerImportCommand )
+from ..compat import citems, cstr, crepr
+from .. import utils
+from .. import document
 from . import simpleread
 
-class ImportParamsSimple(ImportParamsBase):
+class ImportParamsSimple(document.ImportParamsBase):
     """simpleread import parameters.
 
     additional parameters:
@@ -39,9 +38,9 @@ class ImportParamsSimple(ImportParamsBase):
         'datastr': None,
         'ignoretext': False,
         }
-    defaults.update(ImportParamsBase.defaults)
+    defaults.update(document.ImportParamsBase.defaults)
 
-class LinkedFile(LinkedFileBase):
+class LinkedFile(document.LinkedFileBase):
     """Instead of reading data from a string, data can be read from
     a "linked file". This means the same document can be reloaded, and
     the data would be reread from the file.
@@ -75,7 +74,7 @@ class LinkedFile(LinkedFileBase):
 
         fileobj.write("ImportFile(%s)\n" % (", ".join(params)))
 
-class OperationDataImport(OperationDataImportBase):
+class OperationDataImport(document.OperationDataImportBase):
     """Import 1D data from text files."""
 
     descr = _('import data')
@@ -84,7 +83,7 @@ class OperationDataImport(OperationDataImportBase):
         """Setup operation.
         """
 
-        OperationDataImportBase.__init__(self, params)
+        document.OperationDataImportBase.__init__(self, params)
         self.simpleread = simpleread.SimpleRead(params.descriptor)
 
     def doImport(self, document):
@@ -112,7 +111,7 @@ class OperationDataImport(OperationDataImportBase):
         LF = None
         if p.linked:
             assert p.filename
-            LF = linked.LinkedFile(p)
+            LF = LinkedFile(p)
 
         # actually set the data in the document
         self.outdatasets = self.simpleread.setInDocument(
@@ -146,7 +145,7 @@ def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
         useblocks=useblocks, linked=linked,
         prefix=prefix, suffix=suffix,
         ignoretext=ignoretext)
-    op = operations.OperationDataImport(params)
+    op = OperationDataImport(params)
     comm.document.applyOperation(op)
 
     if comm.verbose:
@@ -183,5 +182,5 @@ def ImportString(comm, descriptor, dstring, useblocks=False):
 
     return (op.outdatasets, op.outinvalids)
 
-registerImportCommand('ImportFile', ImportFile)
-registerImportCommand('ImportString', ImportString)
+document.registerImportCommand('ImportFile', ImportFile)
+document.registerImportCommand('ImportString', ImportString)

@@ -17,13 +17,12 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from ...compat import citems, cstr, crepr
-from ...document import (LinkedFileBase, OperationDataImportBase, Dataset,
-                         Dataset2D, ImportParamsBase,
-                         registerImportCommand)
+
+from ..compat import citems, cstr, crepr
+from .. import document
 from . import readcsv
 
-class ImportParamsCSV(ImportParamsBase):
+class ImportParamsCSV(document.ImportParamsBase):
     """CSV import parameters.
 
     additional parameters:
@@ -49,32 +48,32 @@ class ImportParamsCSV(ImportParamsBase):
         'dateformat': 'YYYY-MM-DD|T|hh:mm:ss',
         'headermode': 'multi',
         }
-    defaults.update(ImportParamsBase.defaults)
+    defaults.update(document.ImportParamsBase.defaults)
 
     def __init__(self, **argsv):
-        ImportParamsBase.__init__(self, **argsv)
+        document.ImportParamsBase.__init__(self, **argsv)
         if self.headermode not in ('multi', '1st', 'none'):
             raise ValueError("Invalid headermode")
 
-class OperationDataImportCSV(OperationDataImportBase):
+class OperationDataImportCSV(document.OperationDataImportBase):
     """Import data from a CSV file."""
 
     descr = _('import CSV data')
 
     def doImport(self, document):
         """Do the data import."""
-        
+
         csvr = readcsv.ReadCSV(self.params)
         csvr.readData()
 
         LF = None
         if self.params.linked:
-            LF = linked.LinkedFileCSV(self.params)
-        
+            LF = LinkedFileCSV(self.params)
+
         # set the data
         self.outdatasets = csvr.setData(document, linkedfile=LF)
 
-class LinkedFileCSV(LinkedFileBase):
+class LinkedFileCSV(document.LinkedFileBase):
     """A CSV file linked to datasets."""
 
     def createOperation(self):
@@ -157,4 +156,4 @@ def ImportFileCSV(comm, filename,
 
     return op.outdatasets
 
-registerImportCommand('ImportFileCSV', ImportFileCSV)
+document.registerImportCommand('ImportFileCSV', ImportFileCSV)

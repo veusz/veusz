@@ -17,12 +17,11 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from ...compat import citems, cstr, crepr
-from ...document import ( LinkedFileBase, OperationDataImportBase, Dataset,
-                          Dataset2D, ImportParamsBase,
-                          registerImportCommand )
 
-class ImportParamsFITS(ImportParamsBase):
+from ..compat import citems, cstr, crepr
+from .. import document
+
+class ImportParamsFITS(document.ImportParamsBase):
     """FITS file import parameters.
 
     Additional parameters:
@@ -43,9 +42,9 @@ class ImportParamsFITS(ImportParamsBase):
         'negerrcol': None,
         'wcsmode': None,
         }
-    defaults.update(ImportParamsBase.defaults)
+    defaults.update(document.ImportParamsBase.defaults)
 
-class LinkedFileFITS(LinkedFileBase):
+class LinkedFileFITS(document.LinkedFileBase):
     """Links a FITS file to the data."""
 
     def createOperation(self):
@@ -70,11 +69,11 @@ class LinkedFileFITS(LinkedFileBase):
 
         fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))
 
-class OperationDataImportFITS(OperationDataImportBase):
+class OperationDataImportFITS(document.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""
 
     descr = _('import FITS file')
-    
+
     def _import1d(self, hdu):
         """Import 1d data from hdu."""
 
@@ -96,11 +95,11 @@ class OperationDataImportFITS(OperationDataImportBase):
             negv = data.field(p.negerrcol)
 
         # actually create the dataset
-        return Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
+        return document.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
 
     def _import1dimage(self, hdu):
         """Import 1d image data form hdu."""
-        return Dataset(data=hdu.data)
+        return document.Dataset(data=hdu.data)
 
     def _import2dimage(self, hdu):
         """Import 2d image data from hdu."""
@@ -140,7 +139,7 @@ class OperationDataImportFITS(OperationDataImportBase):
             # no / broken wcs
             rangex = rangey = None
 
-        return Dataset2D(data, xrange=rangex, yrange=rangey)
+        return document.Dataset2D(data, xrange=rangex, yrange=rangey)
 
     def doImport(self, document):
         """Do the import."""
@@ -174,7 +173,7 @@ class OperationDataImportFITS(OperationDataImportBase):
         f.close()
 
         if p.linked:
-            ds.linked = linked.LinkedFileFITS(self.params)
+            ds.linked = LinkedFileFITS(self.params)
         if p.dsname in document.data:
             self.olddataset = document.data[p.dsname]
         else:
@@ -218,4 +217,4 @@ def ImportFITSFile(comm, dsname, filename, hdu,
     op = OperationDataImportFITS(params)
     comm.document.applyOperation(op)
 
-registerImportCommand('ImportFITSFile', ImportFITSFile)
+document.registerImportCommand('ImportFITSFile', ImportFITSFile)
