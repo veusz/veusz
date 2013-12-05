@@ -33,12 +33,12 @@ class ImportTabPlugins(importdialog.ImportTab):
 
     resource = 'import_plugins.ui'
 
-    def __init__(self, importdialog, promote=None):
+    def __init__(self, dialog, promote=None):
         """Initialise dialog. importdialog is the import dialog itself.
 
         If promote is set to a name of a plugin, it is promoted to its own tab
         """
-        importdialog.ImportTab.__init__(self, importdialog)
+        importdialog.ImportTab.__init__(self, dialog)
         self.promote = promote
         self.plugininstance = None
 

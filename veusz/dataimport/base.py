@@ -19,6 +19,8 @@
 """Parameters for import routines."""
 
 from __future__ import division, print_function
+import sys
+
 from ..compat import citems, cstr
 from .. import utils
 

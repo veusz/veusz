@@ -19,6 +19,7 @@
 from __future__ import division
 
 from .. import qtall as qt4
+from .. import utils
 from ..dialogs import importdialog, veuszdialog
 from ..compat import citems
 from . import defn_standard
