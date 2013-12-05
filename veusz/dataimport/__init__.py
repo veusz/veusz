@@ -17,3 +17,9 @@
 ###############################################################################
 
 # hooks to allow different datatypes to be imported
+
+from . import defn_standard, dialog_standard
+from . import defn_csv, dialog_csv
+from . import defn_fits, dialog_fits
+from . import defn_twod, dialog_twod
+from . import defn_plugins, dialog_plugins
