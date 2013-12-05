@@ -29,6 +29,9 @@ from .. import qtall as qt4
 from .. import utils
 from . import simpleread
 
+def _(text, disambiguation=None, context="Capture"):
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
 class CaptureFinishException(Exception):
     """An exception to say when a stream has been finished."""
 
@@ -53,7 +56,7 @@ class CaptureStream(simpleread.Stream):
                                                self._timedOut)
     timeout = property(None, _setTimeout, None,
                        "Time interval to stop in (seconds) or None")
-            
+
     def _timedOut(self):
         self.timedout = True
 
@@ -209,7 +212,7 @@ class SocketCaptureStream(CaptureStream):
 
     def getMoreData(self):
         """Read data from the socket."""
-        
+
         # see whether there is data to be read
         i, o, e = select.select([self.socket], [], [], 0)
         if i:
@@ -226,3 +229,41 @@ class SocketCaptureStream(CaptureStream):
     def close(self):
         """Close the socket."""
         self.socket.close()
+
+class OperationDataCaptureSet(object):
+    """An operation for setting the results from a SimpleRead into the
+    docunment's data from a data capture.
+
+    This is a bit primative, but it is not obvious how to isolate the capturing
+    functionality elsewhere."""
+
+    descr = _('data capture')
+
+    def __init__(self, simplereadobject):
+        """Takes a simpleread object containing the data to be set."""
+        self.simplereadobject = simplereadobject
+
+    def do(self, doc):
+        """Set the data in the document."""
+        # before replacing data, get a backup of document's data
+        databackup = dict(doc.data)
+
+        # set the data to the document and keep a list of what's changed
+        self.nameschanged = self.simplereadobject.setInDocument(doc)
+
+        # keep a copy of datasets which have changed from backup
+        self.olddata = {}
+        for name in self.nameschanged:
+            if name in databackup:
+                self.olddata[name] = databackup[name]
+
+    def undo(self, doc):
+        """Undo the results of the capture."""
+
+        for name in self.nameschanged:
+            if name in self.olddata:
+                # replace datasets with what was there previously
+                doc.setData(name, self.olddata[name])
+            else:
+                # or delete datasets that weren't there before
+                doc.deleteData(name)

@@ -35,7 +35,6 @@ from .. import embed
 from .. import plugins
 from .. import utils
 
-from . import importparams
 from . import datasets
 from . import operations
 from . import dataset_histo

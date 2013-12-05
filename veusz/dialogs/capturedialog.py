@@ -23,6 +23,7 @@ from ..compat import citems, cstr, cstrerror
 from .. import qtall as qt4
 from .. import document
 from .. import setting
+from ..dataimport import capture, simpleread
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CaptureDialog"):
@@ -146,7 +147,7 @@ class CaptureDialog(VeuszDialog):
 
         # object to interpret data from stream
         descriptor = self.descriptorEdit.text()
-        simpleread = document.SimpleRead(descriptor)
+        simprd = simpleread.SimpleRead(descriptor)
 
         maxlines = None
         timeout = None
@@ -179,15 +180,15 @@ class CaptureDialog(VeuszDialog):
             # create stream
             if method == 0:
                 # file/socket
-                stream = document.FileCaptureStream(self.filenameEdit.text())
+                stream = capture.FileCaptureStream(self.filenameEdit.text())
             elif method == 1:
                 # internet socket
-                stream = document.SocketCaptureStream(
+                stream = capture.SocketCaptureStream(
                     self.hostEdit.text(),
                     int(self.portEdit.text()) )
             elif method == 2:
                 # external program
-                stream = document.CommandCaptureStream(
+                stream = capture.CommandCaptureStream(
                     self.commandLineEdit.text())
         except EnvironmentError as e:
             # problem opening stream
@@ -199,8 +200,8 @@ class CaptureDialog(VeuszDialog):
 
         stream.maxlines = maxlines
         stream.timeout = timeout
-        simpleread.tail = tail
-        cd = CapturingDialog(self.document, simpleread, stream, self,
+        simprd.tail = tail
+        cd = CapturingDialog(self.document, simprd, stream, self,
                              updateinterval=updateinterval)
         self.mainwindow.showDialog(cd)
 
@@ -210,11 +211,11 @@ class CapturingDialog(VeuszDialog):
     """Capturing data dialog.
     Shows progress to user."""
 
-    def __init__(self, document, simpleread, stream, parent,
+    def __init__(self, document, simprd, stream, parent,
                  updateinterval = None):
         """Initialse capture dialog:
         document: document to send data to
-        simpleread: object to interpret data
+        simprd: object to interpret data
         stream: capturestream to read data from
         parent: parent widget
         updateinterval: if set, interval of seconds to update data in doc
@@ -223,7 +224,7 @@ class CapturingDialog(VeuszDialog):
         VeuszDialog.__init__(self, parent, 'capturing.ui')
 
         self.document = document
-        self.simpleread = simpleread
+        self.simpleread = simprd
         self.stream = stream
 
         # connect buttons
@@ -269,7 +270,7 @@ class CapturingDialog(VeuszDialog):
         """Time to read more data."""
         try:
             self.simpleread.readData(self.stream)
-        except document.CaptureFinishException as e:
+        except capture.CaptureFinishException as e:
             # stream tells us it's time to finish
             self.streamCaptureFinished( cstr(e) )
 
@@ -300,7 +301,7 @@ class CapturingDialog(VeuszDialog):
             self.updateoperation.undo(self.document)
 
         # create new one
-        self.updateoperation = document.OperationDataCaptureSet(
+        self.updateoperation = capture.OperationDataCaptureSet(
             self.simpleread)
 
         # apply it (bypass history here - urgh)
@@ -335,7 +336,7 @@ class CapturingDialog(VeuszDialog):
             self.updateoperation.undo(self.document)
 
         # apply real document operation update
-        op = document.OperationDataCaptureSet(self.simpleread)
+        op = capture.OperationDataCaptureSet(self.simpleread)
         self.document.applyOperation(op)
 
         # close dialog

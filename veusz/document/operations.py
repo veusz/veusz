@@ -814,44 +814,6 @@ class OperationDatasetDeleteByFile(object):
 ###############################################################################
 # Import datasets
 
-class OperationDataCaptureSet(object):
-    """An operation for setting the results from a SimpleRead into the
-    docunment's data from a data capture.
-
-    This is a bit primative, but it is not obvious how to isolate the capturing
-    functionality elsewhere."""
-
-    descr = _('data capture')
-
-    def __init__(self, simplereadobject):
-        """Takes a simpleread object containing the data to be set."""
-        self.simplereadobject = simplereadobject
-
-    def do(self, document):
-        """Set the data in the document."""
-        # before replacing data, get a backup of document's data
-        databackup = dict(document.data)
-        
-        # set the data to the document and keep a list of what's changed
-        self.nameschanged = self.simplereadobject.setInDocument(document)
-
-        # keep a copy of datasets which have changed from backup
-        self.olddata = {}
-        for name in self.nameschanged:
-            if name in databackup:
-                self.olddata[name] = databackup[name]
-
-    def undo(self, document):
-        """Undo the results of the capture."""
-
-        for name in self.nameschanged:
-            if name in self.olddata:
-                # replace datasets with what was there previously
-                document.setData(name, self.olddata[name])
-            else:
-                # or delete datasets that weren't there before
-                document.deleteData(name)
-
 class OperationDataTag(object):
     """Add a tag to a list of datasets."""
 
