@@ -23,3 +23,4 @@ from . import defn_csv, dialog_csv
 from . import defn_fits, dialog_fits
 from . import defn_twod, dialog_twod
 from . import defn_plugin, dialog_plugin
+from . import dialog_hdf5
