@@ -35,20 +35,16 @@ class ImportTabFITS(importdialog.ImportTab):
     def loadUi(self):
         importdialog.ImportTab.loadUi(self)
         # if different items are selected in fits tab
-        self.connect( self.fitshdulist, qt4.SIGNAL('itemSelectionChanged()'),
-                      self.slotFitsUpdateCombos )
-        self.connect( self.fitsdatasetname,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.dialog.enableDisableImport )
-        self.connect( self.fitsdatacolumn,
-                      qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.dialog.enableDisableImport )
-        self.connect( self.dialog.prefixcombo,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.dialog.enableDisableImport )
-        self.connect( self.dialog.suffixcombo,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.dialog.enableDisableImport )
+        self.fitshdulist.itemSelectionChanged.connect(
+            self.slotFitsUpdateCombos)
+        self.fitsdatasetname.editTextChanged.connect(
+            self.dialog.enableDisableImport)
+        self.fitsdatacolumn.currentIndexChanged.connect(
+            self.dialog.enableDisableImport)
+        self.dialog.prefixcombo.editTextChanged.connect(
+            self.dialog.enableDisableImport)
+        self.dialog.suffixcombo.editTextChanged.connect(
+            self.dialog.enableDisableImport)
 
         self.fitswcsmode.defaultlist = [
             _('Pixel (simple)'), _('Pixel (WCS)'), _('Fractional'),
